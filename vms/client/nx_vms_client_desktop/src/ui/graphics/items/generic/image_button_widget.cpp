@@ -273,7 +273,7 @@ void QnImageButtonWidget::paint(QPainter *painter, const QStyleOptionGraphicsIte
             StateFlags hoverState = m_state | Hovered;
             StateFlags normalState = m_state & ~Hovered;
             paint(painter, normalState, hoverState, m_hoverProgress,
-                checked_cast<QOpenGLWidget *>(widget), rect());
+                qobject_cast<QOpenGLWidget *>(widget), rect());
         });
 }
 
@@ -302,6 +302,14 @@ void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateF
     QRectF imageRect(rect);
     if (!m_imageMargins.isNull())
         imageRect = nx::vms::client::core::Geometry::eroded(imageRect, m_imageMargins);
+
+    if (!glWidget)
+    {
+        const auto& texturePixmap = pixmap(m_state);
+        if (!texturePixmap.isNull())
+            painter->drawPixmap(imageRect.toRect(), texturePixmap);
+        return;
+    }
 
     if (!m_initialized)
         initializeVao(imageRect, glWidget);

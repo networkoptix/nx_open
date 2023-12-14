@@ -6,6 +6,8 @@
 
 #include <QtGui/QPainter>
 #include <QtOpenGLWidgets/QOpenGLWidget>
+#include <QtWidgets/QGraphicsScene>
+#include <QtWidgets/QGraphicsView>
 
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/utils/geometry.h>
@@ -31,11 +33,21 @@ QRectF QnCurtainItem::boundingRect() const
 
 void QnCurtainItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *widget)
 {
+    const auto glWidget = qobject_cast<QOpenGLWidget*>(widget);
+    if (!glWidget)
+    {
+        if (!scene()->views().empty())
+        {
+            widget = scene()->views().front()->viewport();
+            QRectF viewportRect = painter->transform().inverted().mapRect(QRectF(widget->rect()));
+            painter->fillRect(viewportRect, m_color);
+        }
+        return;
+    }
 #ifdef Q_OS_WIN
     QRectF viewportRect = painter->transform().inverted().mapRect(QRectF(widget->rect()));
     painter->fillRect(viewportRect, m_color);
 #else
-    const auto glWidget = qobject_cast<QOpenGLWidget*>(widget);
     QnGlNativePainting::begin(glWidget, painter);
 
     const auto renderer = QnOpenGLRendererManager::instance(glWidget);

@@ -10,6 +10,7 @@ extern "C" {
 }
 
 #include <QtCore/QRunnable>
+#include <QtGui/QPainter>
 #include <QtWidgets/QApplication>
 
 #include <nx/media/config.h>
@@ -103,11 +104,13 @@ static BitrateCalculator bitrateCalculator;
 // -------------------------------------------------------------------------- //
 // DecodedPictureToOpenGLUploaderPrivate
 // -------------------------------------------------------------------------- //
-class DecodedPictureToOpenGLUploaderPrivate: public QOpenGLFunctions
+class DecodedPictureToOpenGLUploaderPrivate
 {
     Q_DECLARE_TR_FUNCTIONS(DecodedPictureToOpenGLUploaderPrivate)
 
 public:
+    QOpenGLFunctions* const gl;
+    QQuickWidget* const qw;
     GLint clampConstant;
     bool supportsNonPower2Textures;
     bool forceSoftYUV;
@@ -115,21 +118,23 @@ public:
     bool nv12SharedUsed;
     QScopedPointer<QnGlFunctions> functions;
 
-    DecodedPictureToOpenGLUploaderPrivate(QOpenGLWidget* glWidget):
-        QOpenGLFunctions(glWidget->context()),
+    DecodedPictureToOpenGLUploaderPrivate(QOpenGLWidget* glWidget, QQuickWidget* quickWidget):
+        gl(glWidget ? new QOpenGLFunctions(glWidget->context()) : nullptr),
+        qw(quickWidget),
         supportsNonPower2Textures(false),
         forceSoftYUV(false),
         yv12SharedUsed(false),
         nv12SharedUsed(false),
         functions(new QnGlFunctions(glWidget) /*Resets current context*/)
     {
-        glWidget->makeCurrent();
+        if (glWidget)
+            glWidget->makeCurrent();
 
         /* Clamp constant. */
         clampConstant = GL_CLAMP_TO_EDGE;
 
         /* Check for non-power of 2 textures. */
-        supportsNonPower2Textures = hasOpenGLFeature(OpenGLFeature::NPOTTextures);
+        supportsNonPower2Textures = !gl || gl->hasOpenGLFeature(QOpenGLFunctions::NPOTTextures);
     }
 
     ~DecodedPictureToOpenGLUploaderPrivate()
@@ -165,7 +170,8 @@ public:
     bool usingShaderYuvToRgb() const
     {
         return
-            !(functions->features() & QnGlFunctions::ShadersBroken)
+            (gl || qw)
+            && !(functions->features() & QnGlFunctions::ShadersBroken)
             && yv12SharedUsed
             && !forceSoftYUV;
     }
@@ -173,7 +179,8 @@ public:
     bool usingShaderNV12ToRgb() const
     {
         return
-            !(functions->features() & QnGlFunctions::ShadersBroken)
+            (gl || qw)
+            && !(functions->features() & QnGlFunctions::ShadersBroken)
             && nv12SharedUsed
             && !forceSoftYUV;
     }
@@ -226,7 +233,8 @@ public:
         //NOTE we do not delete texture here because it belongs to auxiliary gl context which will be removed when these textures are not needed anymore
         if( m_id != std::numeric_limits<GLuint>::max() )
         {
-            m_renderer->glDeleteTextures(1, &m_id);
+            if (m_renderer->gl)
+                m_renderer->gl->glDeleteTextures(1, &m_id);
             m_id = std::numeric_limits<GLuint>::max();
         }
     }
@@ -275,13 +283,16 @@ public:
             m_textureSize = textureSize;
             m_internalFormat = internalFormat;
 
-            m_renderer->glBindTexture(GL_TEXTURE_2D, m_id);
+            if (m_renderer->gl)
+            {
+                m_renderer->gl->glBindTexture(GL_TEXTURE_2D, m_id);
 
-            m_renderer->glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, textureSize.width(), textureSize.height(), 0, internalFormat, GL_UNSIGNED_BYTE, nullptr);
-            m_renderer->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            m_renderer->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            m_renderer->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, m_renderer->clampConstant);
-            m_renderer->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, m_renderer->clampConstant);
+                m_renderer->gl->glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, textureSize.width(), textureSize.height(), 0, internalFormat, GL_UNSIGNED_BYTE, nullptr);
+                m_renderer->gl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+                m_renderer->gl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+                m_renderer->gl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, m_renderer->clampConstant);
+                m_renderer->gl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, m_renderer->clampConstant);
+            }
 
             result = true;
         } else {
@@ -306,35 +317,43 @@ public:
             size_t fillSize = qMax(textureSize.height(), textureSize.width()) * ROUND_COEFF * internalFormatPixelSize * 16;
             uchar *filler = m_renderer->filler(fillValue, fillSize);
 
-            m_renderer->glBindTexture(GL_TEXTURE_2D, m_id);
+            if (m_renderer->gl)
+                m_renderer->gl->glBindTexture(GL_TEXTURE_2D, m_id);
+
             if (roundedWidth < textureSize.width()) {
 
                 //NX_ASSERT( textureSize == QSize(textureWidth, textureHeight) );
 
-                m_renderer->glTexSubImage2D(
-                    GL_TEXTURE_2D,
-                    0,
-                    roundedWidth,
-                    0,
-                    qMin(ROUND_COEFF, textureSize.width() - roundedWidth),
-                    textureSize.height(),
-                    internalFormat,
-                    GL_UNSIGNED_BYTE,
-                    filler );
+                if (m_renderer->gl)
+                {
+                    m_renderer->gl->glTexSubImage2D(
+                        GL_TEXTURE_2D,
+                        0,
+                        roundedWidth,
+                        0,
+                        qMin(ROUND_COEFF, textureSize.width() - roundedWidth),
+                        textureSize.height(),
+                        internalFormat,
+                        GL_UNSIGNED_BYTE,
+                        filler );
+                }
                 bitrateCalculator.bytesProcessed( qMin(ROUND_COEFF, textureSize.width() - roundedWidth)*textureSize.height()*internalFormatPixelSize );
             }
 
             if (height < textureSize.height()) {
-                m_renderer->glTexSubImage2D(
-                    GL_TEXTURE_2D,
-                    0,
-                    0,
-                    height,
-                    textureSize.width(),
-                    qMin(ROUND_COEFF, textureSize.height() - height),
-                    internalFormat,
-                    GL_UNSIGNED_BYTE,
-                    filler );
+                if (m_renderer->gl)
+                {
+                    m_renderer->gl->glTexSubImage2D(
+                        GL_TEXTURE_2D,
+                        0,
+                        0,
+                        height,
+                        textureSize.width(),
+                        qMin(ROUND_COEFF, textureSize.height() - height),
+                        internalFormat,
+                        GL_UNSIGNED_BYTE,
+                        filler );
+                }
                 bitrateCalculator.bytesProcessed( textureSize.width()*qMin(ROUND_COEFF, textureSize.height() - height)*internalFormatPixelSize );
             }
         }
@@ -346,8 +365,11 @@ public:
         if(m_allocated)
             return;
 
-        m_renderer->glGenTextures(1, &m_id);
-        glCheckError("glGenTextures");
+        if (m_renderer->gl)
+        {
+            m_renderer->gl->glGenTextures(1, &m_id);
+            glCheckError("glGenTextures");
+        }
 
         m_allocated = true;
     }
@@ -700,9 +722,10 @@ private:
 
 DecodedPictureToOpenGLUploader::DecodedPictureToOpenGLUploader(
     QOpenGLWidget* glWidget,
+    QQuickWidget* quickWidget,
     unsigned int /*asyncDepth*/ )
 :
-    d(new DecodedPictureToOpenGLUploaderPrivate(glWidget)),
+    d(new DecodedPictureToOpenGLUploaderPrivate(glWidget, quickWidget)),
     m_yuv2rgbBuffer( nullptr ),
     m_yuv2rgbBufferLen( 0 ),
     m_painterOpacity( 1.0 ),
@@ -897,6 +920,22 @@ DecodedPictureToOpenGLUploader::UploadedPicture* DecodedPictureToOpenGLUploader:
         frameUploader->picture()->m_skippingForbidden = true;   //otherwise, we could come to situation that there is no data to display
         lk.unlock();
         frameUploader->run();
+        if (!d->gl)
+        {
+            auto decodedFrame = frameUploader->decodedFrame();
+            if (decodedFrame->isExternalData())
+            {
+                // Since we don't upload to textures until getting into RHI rendering thread,
+                // we need to own the data.
+                auto frame = new CLVideoDecoderOutput();
+                frame->copyFrom(decodedFrame.get());
+                frameUploader->picture()->m_decodedFrame.reset(frame);
+            }
+            else
+            {
+                frameUploader->picture()->m_decodedFrame = std::move(decodedFrame);
+            }
+        }
         lk.relock();
         m_framesWaitingUploadInGUIThread.pop_front();
         delete frameUploader;
@@ -1278,14 +1317,17 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
     DecodedPictureToOpenGLUploader::UploadedPicture* const emptyPictureBuf,
     const CLConstVideoDecoderOutputPtr& frame)
 {
-    if (!m_initializedContext) // TODO: #vkutin #ynikitenkov Why here?
+    if (d->gl)
     {
-        m_initializedContext = QOpenGLContext::currentContext();
-        m_initializedSurface = m_initializedContext->surface();
-    }
+        if (!m_initializedContext) // TODO: #vkutin #ynikitenkov Why here?
+        {
+            m_initializedContext = QOpenGLContext::currentContext();
+            m_initializedSurface = m_initializedContext->surface();
+        }
 
-    if (frame->memoryType() == MemoryType::VideoMemory)
-        return renderVideoMemory(emptyPictureBuf, frame);
+        if (frame->memoryType() == MemoryType::VideoMemory)
+            return renderVideoMemory(emptyPictureBuf, frame);
+    }
 
     const AVPixelFormat format = (AVPixelFormat)frame->format;
     const unsigned int width = frame->width;
@@ -1345,8 +1387,11 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
                     .arg(qPower2Ceil(r_w[i],ROUND_COEFF))
                     .arg(h[i])
                     .arg(reinterpret_cast<size_t>(planes[i])));
-            d->glBindTexture( GL_TEXTURE_2D, texture->id() );
-            glCheckError("glBindTexture");
+            if (d->gl)
+            {
+                d->gl->glBindTexture( GL_TEXTURE_2D, texture->id() );
+                glCheckError("glBindTexture");
+            }
 
             const quint64 lineSizes_i = lineSizes[i];
             const quint64 r_w_i = r_w[i];
@@ -1354,20 +1399,23 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
 //            glCheckError("glPixelStorei");
             NX_ASSERT( lineSizes_i >= qPower2Ceil(r_w_i,ROUND_COEFF) );
 
-            loadImageData(
-                d.get(),
-                texture->textureSize().width(),
-                texture->textureSize().height(),
-                lineSizes_i,
-                h[i],
-                1,
-                singleComponent,
-                planes[i]);
-
+            if (d->gl)
+            {
+                loadImageData(
+                    d->gl,
+                    texture->textureSize().width(),
+                    texture->textureSize().height(),
+                    lineSizes_i,
+                    h[i],
+                    1,
+                    singleComponent,
+                    planes[i]);
+            }
             bitrateCalculator.bytesProcessed( qPower2Ceil(r_w[i],ROUND_COEFF)*h[i] );
         }
 
-        d->glBindTexture( GL_TEXTURE_2D, 0 );
+        if (d->gl)
+            d->gl->glBindTexture( GL_TEXTURE_2D, 0 );
 
         emptyPictureBuf->setColorFormat( format == AV_PIX_FMT_YUVA420P ? AV_PIX_FMT_YUVA420P : AV_PIX_FMT_YUV420P );
     }
@@ -1381,11 +1429,12 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
             else
                 texture->ensureInitialized(width / 2, height / 2, lineSizes[i]/2, 2, doubleComponent, 2, -1);
 
-            d->glBindTexture( GL_TEXTURE_2D, texture->id() );
+            if (d->gl)
+                d->gl->glBindTexture( GL_TEXTURE_2D, texture->id() );
             const uchar* pixels = planes[i];
 //            d->glPixelStorei( GL_UNPACK_ROW_LENGTH, i == 0 ? lineSizes[0] : (lineSizes[1]/2) );
 
-            loadImageData(d.get(),
+            loadImageData(d->gl,
                             texture->textureSize().width(),
                             texture->textureSize().height(),
                             i == 0 ? lineSizes[0] : (lineSizes[1]/2),
@@ -1400,8 +1449,11 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
                             i == 0 ? height : height / 2,
                             i == 0 ? singleComponent : doubleComponent,
                             GL_UNSIGNED_BYTE, pixels );*/
-            glCheckError("glTexSubImage2D");
-            d->glBindTexture( GL_TEXTURE_2D, 0 );
+            if (d->gl)
+            {
+                glCheckError("glTexSubImage2D");
+                d->gl->glBindTexture( GL_TEXTURE_2D, 0 );
+            }
             bitrateCalculator.bytesProcessed( (i == 0 ? qPower2Ceil(width,ROUND_COEFF) : width / 2)*(i == 0 ? height : height / 2) );
             //glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
             //glCheckError("glPixelStorei");
@@ -1427,7 +1479,8 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
         QnGlRendererTexture* texture = emptyPictureBuf->texture(0);
         texture->ensureInitialized( r_w[0], h[0], lineSizes[0], bytesPerPixel, GL_RGBA, 4, 0 );
 
-        d->glBindTexture(GL_TEXTURE_2D, texture->id());
+        if (d->gl)
+            d->gl->glBindTexture(GL_TEXTURE_2D, texture->id());
 
         const uchar* pixels = nullptr;
         int lineInPixelsSize = lineSizes[0] / bytesPerPixel;
@@ -1440,20 +1493,26 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
             return false;
 
 //        d->glPixelStorei(GL_UNPACK_ROW_LENGTH, lineInPixelsSize);
-        glCheckError("glPixelStorei");
+        if (d->gl)
+            glCheckError("glPixelStorei");
 
         int w = qPower2Ceil(r_w[0],ROUND_COEFF);
         int gl_bytes_per_pixel = glBytesPerPixel(format);
         int gl_format = glRGBFormat(format);
 
-        loadImageData(d.get(), texture->textureSize().width(),texture->textureSize().height(),lineInPixelsSize,h[0],gl_bytes_per_pixel,gl_format,pixels);
+        if (d->gl)
+            loadImageData(d->gl, texture->textureSize().width(),texture->textureSize().height(),lineInPixelsSize,h[0],gl_bytes_per_pixel,gl_format,pixels);
+
         bitrateCalculator.bytesProcessed( w*h[0]*4 );
         glCheckError("glTexSubImage2D");
 
 //        d->glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-        glCheckError("glPixelStorei");
+        if (d->gl)
+        {
+            glCheckError("glPixelStorei");
 
-        d->glBindTexture( GL_TEXTURE_2D, 0 );
+            d->gl->glBindTexture( GL_TEXTURE_2D, 0 );
+        }
 
         emptyPictureBuf->setColorFormat( AV_PIX_FMT_RGBA );
 
@@ -1480,7 +1539,8 @@ void DecodedPictureToOpenGLUploader::releaseDecodedPicturePool( std::deque<Uploa
         {
             if( pic->m_pbo[i].id == std::numeric_limits<GLuint>::max() )
                 continue;
-            d->glDeleteBuffers( 1, &pic->m_pbo[i].id );
+            if (d->gl)
+                d->gl->glDeleteBuffers( 1, &pic->m_pbo[i].id );
             pic->m_pbo[i].id = std::numeric_limits<GLuint>::max();
         }
         delete pic;

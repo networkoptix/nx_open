@@ -167,10 +167,15 @@ Q_GLOBAL_STATIC(QnGlFunctionsPrivateStorage, qn_glFunctionsPrivateStorage);
 
 QnGlFunctions::PrivatePtr QnGlFunctions::createPrivate(QOpenGLWidget* glWidget)
 {
-    const auto storage = qn_glFunctionsPrivateStorage();
     PrivatePtr result;
-    if(storage)
-        result = storage->get(glWidget);
+
+    if (glWidget)
+    {
+        const auto storage = qn_glFunctionsPrivateStorage();
+
+        if(storage)
+            result = storage->get(glWidget);
+    }
 
     if(result.isNull()) //< Application is being shut down.
         result = PrivatePtr(new QnGlFunctionsPrivate(nullptr));

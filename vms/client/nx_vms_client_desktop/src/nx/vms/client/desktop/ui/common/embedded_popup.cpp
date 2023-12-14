@@ -18,9 +18,12 @@
 #include <client_core/client_core_module.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/math/fuzzy.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
-#include <utils/common/event_processors.h>
+#include <nx/vms/client/desktop/window_context.h>
+#include <ui/widgets/main_window.h>
 #include <utils/common/delayed.h>
+#include <utils/common/event_processors.h>
 
 namespace nx::vms::client::desktop {
 
@@ -76,6 +79,10 @@ EmbeddedPopup::EmbeddedPopup(QObject* parent):
 {
     if (!d->quickWidget)
         return;
+
+    // If a parent widget is not set here - the Metal backend refuses to draw transparent window.
+    d->viewport = appContext()->mainWindowContext()->mainWindowWidget();
+    d->quickWidget->setParent(d->viewport);
 
     d->quickWidget->setClearColor(Qt::transparent);
     d->quickWidget->setAttribute(Qt::WA_TranslucentBackground);

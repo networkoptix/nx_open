@@ -275,6 +275,9 @@ void loadImageData(
     int gl_format,
     const uchar* pixels)
 {
+    if (!renderer)
+        return;
+
     Q_UNUSED(texture_wigth);
     Q_UNUSED(gl_bytes_per_pixel);
 
