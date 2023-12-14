@@ -595,7 +595,7 @@ void QnGridBackgroundItem::paint(
 
     if (!m_imgUploader)
     {
-        m_imgUploader.reset(new DecodedPictureToOpenGLUploader(glWidget));
+        m_imgUploader.reset(new DecodedPictureToOpenGLUploader(glWidget, nullptr));
         m_renderer.reset(new QnGLRenderer(glWidget, *m_imgUploader));
         m_imgUploader->setYV12ToRgbShaderUsed(m_renderer->isYV12ToRgbShaderUsed());
         m_imgUploader->setNV12ToRgbShaderUsed(m_renderer->isNV12ToRgbShaderUsed());
@@ -619,7 +619,7 @@ void QnGridBackgroundItem::paint(
 
     m_imgUploader->setOpacity(painter->opacity());
 
-    m_renderer->paint(QRectF(0, 0, 1, 1), targetRect);
+    m_renderer->paint(nullptr, QRectF(0, 0, 1, 1), targetRect);
 
     if (m_imgAsFrame->format == AV_PIX_FMT_YUVA420P || m_imgAsFrame->format == AV_PIX_FMT_RGBA)
         functions->glDisable(GL_BLEND);

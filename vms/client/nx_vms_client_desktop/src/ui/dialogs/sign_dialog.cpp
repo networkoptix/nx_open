@@ -63,7 +63,7 @@ public:
         QPainter painter(this);
         QnGlNativePainting::begin(this, &painter);
         if (m_renderer)
-            m_renderer->paint(0, QRectF(0.0, 0.0, 1.0, 1.0), m_videoRect, 1.0);
+            m_renderer->paint(&painter, 0, QRectF(0.0, 0.0, 1.0, 1.0), m_videoRect, 1.0);
         QnGlNativePainting::end(&painter);
     }
 

@@ -15,6 +15,8 @@
 #include <utils/media/frame_info.h>
 
 class QOpenGLWidget;
+class QQuickWidget;
+class QPainter;
 class DecodedPictureToOpenGLUploader;
 class QnGLRenderer;
 
@@ -35,7 +37,7 @@ public:
     /**
      * @param context must not be null.
      */
-    QnResourceWidgetRenderer(QObject* parent, QOpenGLWidget* widget);
+    QnResourceWidgetRenderer(QObject* parent, QWidget* viewport);
     ~QnResourceWidgetRenderer();
 
     void setChannelCount(int channelCount);
@@ -108,7 +110,8 @@ public:
     void setBlurFactor(qreal value);
 
     Qn::RenderStatus paint(
-        int channel, const QRectF& sourceRect, const QRectF& targetRect, qreal opacity);
+        QPainter* painter, int channel, const QRectF& sourceRect,
+        const QRectF& targetRect, qreal opacity);
     Qn::RenderStatus discardFrame(int channel);
     void skip(int channel);
 
@@ -187,7 +190,8 @@ private:
     /** Current screen size of a single channel, in pixels. */
     QSize m_channelScreenSize;
 
-    QOpenGLWidget* m_openGLWidget;
+    QOpenGLWidget* const m_openGLWidget;
+    QQuickWidget* m_quickWidget = nullptr;
 
     ScreenshotInterface* m_screenshotInterface = nullptr;
     int m_panoFactor = 1;

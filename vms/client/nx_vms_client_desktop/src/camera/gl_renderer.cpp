@@ -5,6 +5,7 @@
 #include <QtCore/QCoreApplication> //< For Q_DECLARE_TR_FUNCTIONS.
 #include <QtCore/QScopedPointer>
 #include <QtGui/QOpenGLFunctions>
+#include <QtGui/QPainter>
 #include <QtWidgets/QErrorMessage>
 
 #include <camera/client_video_camera.h>
@@ -25,6 +26,10 @@
 #include <utils/color_space/image_correction.h>
 #include <utils/color_space/yuvconvert.h>
 #include <utils/common/util.h>
+
+#include <nx/pathkit/rhi_paint_engine.h>
+#include <nx/vms/client/desktop/shaders/media_output_shader_data.h>
+#include <nx/vms/client/desktop/shaders/rhi_video_renderer.h>
 
 using nx::vms::client::core::Geometry;
 using namespace nx::vms::client::desktop;
@@ -69,7 +74,7 @@ bool QnGLRenderer::isPixelFormatSupported(AVPixelFormat pixfmt)
 
 QnGLRenderer::QnGLRenderer(QOpenGLWidget* glWidget, const DecodedPictureToOpenGLUploader& decodedPictureProvider ):
     QnGlFunctions(glWidget),
-    QOpenGLFunctions(glWidget->context()),
+    m_gl(glWidget ? (new QOpenGLFunctions(glWidget->context())) : nullptr),
     m_decodedPictureProvider( decodedPictureProvider ),
     m_brightness( 0 ),
     m_contrast( 0 ),
@@ -195,8 +200,8 @@ void QnGLRenderer::doBlurStep(
         (float)sourceRect.x(), (float)sourceRect.bottom()
     };
 
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, texture);
+    m_gl->glActiveTexture(GL_TEXTURE0);
+    m_gl->glBindTexture(GL_TEXTURE_2D, texture);
     glCheckError("glBindTexture");
 
     const auto renderer = QnOpenGLRendererManager::instance(glWidget());
@@ -235,7 +240,7 @@ Qn::RenderStatus QnGLRenderer::renderBlurFBO(const QRectF &sourceRect)
 
     m_blurBufferA->bind();
     static const qreal kOpaque = 1.0;
-    auto result = drawVideoData(sourceRect, dstPaintRect, kOpaque);
+    auto result = drawVideoData(nullptr, sourceRect, dstPaintRect, kOpaque);
     m_blurBufferA->release();
 
     const int kIterations = 8;
@@ -261,9 +266,18 @@ Qn::RenderStatus QnGLRenderer::renderBlurFBO(const QRectF &sourceRect)
     return result;
 }
 
-Qn::RenderStatus QnGLRenderer::paint(const QRectF &sourceRect, const QRectF &targetRect)
+Qn::RenderStatus QnGLRenderer::paint(
+    QPainter* painter, const QRectF &sourceRect, const QRectF &targetRect)
 {
-    QOpenGLFunctions::initializeOpenGLFunctions();
+    if (!m_gl)
+    {
+        m_blurBufferA.reset();
+        m_blurBufferB.reset();
+        m_prevBlurFactor = 0.0;
+        return drawVideoData(painter, sourceRect, targetRect, m_decodedPictureProvider.opacity());
+    }
+
+    m_gl->initializeOpenGLFunctions();
 
     if (!m_blurEnabled
         || !QOpenGLFramebufferObject::hasOpenGLFramebufferObjects()
@@ -272,7 +286,7 @@ Qn::RenderStatus QnGLRenderer::paint(const QRectF &sourceRect, const QRectF &tar
         m_blurBufferA.reset();
         m_blurBufferB.reset();
         m_prevBlurFactor = 0.0;
-        return drawVideoData(sourceRect, targetRect, m_decodedPictureProvider.opacity());
+        return drawVideoData(painter, sourceRect, targetRect, m_decodedPictureProvider.opacity());
     }
 
     Qn::RenderStatus result = prepareBlurBuffers();
@@ -325,6 +339,7 @@ Qn::RenderStatus QnGLRenderer::discardFrame()
 }
 
 Qn::RenderStatus QnGLRenderer::drawVideoData(
+    QPainter* painter,
     const QRectF& sourceRect,
     const QRectF& targetRect,
     qreal opacity)
@@ -361,6 +376,7 @@ Qn::RenderStatus QnGLRenderer::drawVideoData(
 
     if (!drawVideoTextures(
         picLock,
+        painter,
         Geometry::subRect(picLock->textureRect(), sourceRect),
         targetRect,
         planeCount,
@@ -399,8 +415,8 @@ void QnGLRenderer::drawVideoTextureDirectly(
         (float)tex0Coords.x(), (float)tex0Coords.bottom()
     };
 
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, tex0ID);
+    m_gl->glActiveTexture(GL_TEXTURE0);
+    m_gl->glBindTexture(GL_TEXTURE_2D, tex0ID);
     glCheckError("glBindTexture");
 
     auto renderer = QnOpenGLRendererManager::instance(glWidget());
@@ -428,6 +444,7 @@ ImageCorrectionResult QnGLRenderer::calcImageCorrection()
 
 bool QnGLRenderer::drawVideoTextures(
     const DecodedPictureToOpenGLUploader::ScopedPictureLock& picLock,
+    QPainter* painter,
     const QRectF& textureRect,
     const QRectF& viewRect,
     int planeCount,
@@ -506,6 +523,114 @@ bool QnGLRenderer::drawVideoTextures(
         programKey.cameraProjection = mediaParams.cameraProjection;
     }
 
+    if (!m_gl)
+    {
+        if (!painter)
+            return false;
+
+        auto decodedFrame = picLock->decodedFrame();
+        if (!decodedFrame)
+            return false;
+
+        auto pe = dynamic_cast<nx::pathkit::RhiPaintEngine*>(painter->paintEngine());
+
+        if (!pe) //< Software.
+        {
+            const AVPixelFormat format = (AVPixelFormat)decodedFrame->format;
+            const unsigned int width = decodedFrame->width;
+            const unsigned int height = decodedFrame->height;
+            if (NX_ASSERT(format == AV_PIX_FMT_RGBA))
+            {
+                QImage nonOwningImage(
+                    decodedFrame->data[0],
+                    width,
+                    height,
+                    decodedFrame->linesize[0],
+                    QImage::Format_RGBA8888_Premultiplied);
+
+                const QRectF sourceRect(
+                    textureRect.x() * nonOwningImage.width(),
+                    textureRect.y() * nonOwningImage.height(),
+                    textureRect.width() * nonOwningImage.width(),
+                    textureRect.height() * nonOwningImage.height());
+
+                painter->drawImage(viewRect, nonOwningImage, sourceRect);
+            }
+        }
+        else
+        {
+            if (!m_rhiVideoRenderer)
+                m_rhiVideoRenderer = std::make_shared<RhiVideoRenderer>();
+
+            nx::vms::client::desktop::MediaOutputShaderData program(programKey);
+
+            program.loadOpacity(opacity);
+
+            if (programKey.imageCorrection == MediaOutputShaderProgram::YuvImageCorrection::gamma)
+            {
+                const auto parameters = isPaused() || isStillImage
+                    ? calcImageCorrection()
+                    : picLock->imageCorrectionResult();
+
+                program.loadGammaCorrection(parameters);
+                if (m_histogramConsumer)
+                    m_histogramConsumer->setHistogramData(parameters);
+            }
+
+            program.loadDewarpingParameters(
+                mediaParams,
+                itemParams,
+                ar,
+                textureRect.right(),
+                textureRect.bottom());
+
+            const auto toDevice =
+                [painter](QPointF p)
+                {
+                    return QVector2D(
+                        painter->transform().map(p)
+                        * painter->device()->devicePixelRatioF());
+                };
+
+            program.verts[0] = toDevice(viewRect.topLeft());
+            program.verts[1] = toDevice(viewRect.topRight());
+            program.verts[2] = toDevice(viewRect.bottomLeft());
+            program.verts[3] = toDevice(viewRect.bottomRight());
+
+            program.texCoords[0] = QVector2D(textureRect.left(), textureRect.top());
+            program.texCoords[1] = QVector2D(textureRect.right(), textureRect.top());
+            program.texCoords[2] = QVector2D(textureRect.left(), textureRect.bottom());
+            program.texCoords[3] = QVector2D(textureRect.right(), textureRect.bottom());
+
+            RhiVideoRenderer::Data d = {
+                .frame = decodedFrame,
+                .data = program,
+                .sourceRect = textureRect
+            };
+
+            // TODO: #ikulaychuk Implement RHI resources cleanup on renderer thread.
+            pe->drawCustom({
+                .prepare = [d, renderer = m_rhiVideoRenderer](
+                    QRhi* rhi,
+                    QRhiRenderPassDescriptor* rp,
+                    QRhiResourceUpdateBatch* u,
+                    const QMatrix4x4& deviceMvp)
+                {
+                    // This function is called  on the rendering thread and create resources.
+                    // So the cleanup should happen on the same thread.
+                    // But currently threaded rendering is disabled (and we are using this code
+                    // only in QQuickWidget which itself does not use threaded rendering).
+                    renderer->prepare(d, deviceMvp, rhi, rp, u);
+                },
+                .render = [renderer = m_rhiVideoRenderer](
+                    QRhi*, QRhiCommandBuffer* cb, QSize viewportSize)
+                {
+                    renderer->render(cb, viewportSize);
+                }
+            });
+        }
+        return true;
+    }
     const auto program = MediaOutputShaderManager::instance(QOpenGLContext::currentContext())
         ->program(programKey);
 
@@ -547,8 +672,8 @@ bool QnGLRenderer::drawVideoTextures(
 
     for (int i = planeCount - 1; i >= 0; --i)
     {
-        glActiveTexture(GL_TEXTURE0 + i);
-        glBindTexture(GL_TEXTURE_2D, textureIds[i]);
+        m_gl->glActiveTexture(GL_TEXTURE0 + i);
+        m_gl->glBindTexture(GL_TEXTURE_2D, textureIds[i]);
         glCheckError("glBindTexture");
     }
 

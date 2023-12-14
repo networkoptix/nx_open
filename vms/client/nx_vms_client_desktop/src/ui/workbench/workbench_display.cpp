@@ -589,11 +589,6 @@ void QnWorkbenchDisplay::initialize(QGraphicsScene* scene, QGraphicsView* view)
 
             }, 1, this);
 
-        const auto viewport = new QOpenGLWidget(m_view);
-        viewport->makeCurrent();
-        viewport->setAttribute(Qt::WA_Hover);
-        m_view->setViewport(viewport);
-
         /* Turn on antialiasing at QPainter level. */
         m_view->setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform);
 
@@ -604,8 +599,9 @@ void QnWorkbenchDisplay::initialize(QGraphicsScene* scene, QGraphicsView* view)
         // #TODO: #FIXME: #vkutin THIS SHOULD BE REPLACED WITH A QT PATCH.
         QSharedPointer<QMetaObject::Connection> connection(new QMetaObject::Connection);
         const auto localCacheInit =
-            [/*required for QObject::disconnect*/ this, connection, viewport]()
+            [/*required for QObject::disconnect*/ this, connection]()
             {
+                const auto viewport = qobject_cast<QOpenGLWidget*>(m_view->viewport());
                 if (!NX_ASSERT(viewport->context(), "QOpenGLWidget::aboutToCompose with no context"))
                     return;
                 auto cache = QOpenGLTextureCache::cacheForContext(viewport->context());
@@ -614,7 +610,8 @@ void QnWorkbenchDisplay::initialize(QGraphicsScene* scene, QGraphicsView* view)
                 QObject::disconnect(*connection);
             };
 
-        *connection = connect(viewport, &QOpenGLWidget::aboutToCompose, this, localCacheInit);
+        if (const auto viewport = qobject_cast<QOpenGLWidget*>(m_view->viewport()))
+            *connection = connect(viewport, &QOpenGLWidget::aboutToCompose, this, localCacheInit);
         // ----------------------------------------------------------------------------------------
 
 #ifndef Q_OS_MACX

@@ -13,6 +13,7 @@
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/utils/mouse_spy.h>
 #include <nx/vms/client/desktop/utils/qml_property.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/event_processors.h>
 
@@ -77,6 +78,9 @@ BubbleToolTip::BubbleToolTip(
 
     if (!d->widget)
         return;
+
+    // If a parent widget is not set here - the Metal backend refuses to draw transparent window.
+    d->widget->setParent(context->mainWindowWidget());
 
     d->widget->setVisible(false);
     d->widget->setResizeMode(QQuickWidget::SizeViewToRootObject);

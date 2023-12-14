@@ -139,6 +139,8 @@ file(GLOB_RECURSE shader_sources CONFIGURE_DEPENDS
     "qml/*.frag"
     "shaders/qsb/*.vert"
     "shaders/qsb/*.frag"
+    "shaders/rhi/media_output/*.vert"
+    #"shaders/rhi/media_output/*.frag" - there is a single fragment shader that requires special handling.
 )
 
 # This command generates nx_vms_client_desktop_other_files target.
@@ -150,6 +152,40 @@ qt6_add_shaders(nx_vms_client_desktop "nx_vms_client_desktop_shaders"
         ${shader_sources}
 )
 set_property(TARGET nx_vms_client_desktop_other_files PROPERTY FOLDER client/other_files)
+
+set(formats "nv12;rgb;yv12;yva12")
+set(color_corrections "yuv_gamma;no_gamma")
+set(camera_projections "equidistant;stereographic;equisolid;equirectangular360")
+set(view_projections "rectilinear;equirectangular")
+
+macro(add_frag_shader unique_shader_suffix shader_defines)
+    qt6_add_shaders(nx_vms_client_desktop "desktop_client_fragment_shaders_${unique_shader_suffix}"
+        BATCHABLE
+        PREFIX
+            "/"
+        FILES
+            "shaders/rhi/media_output/main.frag"
+        DEFINES
+            ${shader_defines}
+        OUTPUTS
+            "shaders/rhi/media_output/main_${unique_shader_suffix}.frag.qsb"
+    )
+endmacro()
+
+foreach(format ${formats})
+    foreach(color ${color_corrections})
+        # Dewarping
+        foreach(camera_projection ${camera_projections})
+            foreach(view_projection ${view_projections})
+                add_frag_shader(
+                    "${format}_${color}_${camera_projection}_${view_projection}"
+                    "format_${format}=1;${color}=1;dewarping=1;camera_${camera_projection};view_${view_projection}")
+            endforeach()
+        endforeach()
+        # No texture transformation
+        add_frag_shader("${format}_${color}" "format_${format}=1;${color}=1")
+    endforeach()
+endforeach()
 
 target_compile_definitions(nx_vms_client_desktop
     PRIVATE NX_VMS_CLIENT_DESKTOP_API=${API_EXPORT_MACRO}

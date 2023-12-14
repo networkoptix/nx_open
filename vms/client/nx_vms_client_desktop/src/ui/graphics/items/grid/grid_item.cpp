@@ -6,6 +6,8 @@
 #include <limits>
 
 #include <QtGui/QPainter>
+#include <QtWidgets/QGraphicsScene>
+#include <QtWidgets/QGraphicsView>
 #include <QtWidgets/QWidget>
 
 #include <utils/common/scoped_painter_rollback.h>
@@ -127,6 +129,9 @@ void QnGridItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWid
 
     if(qFuzzyIsNull(painter->opacity()))
         return;
+
+    if (!widget)
+        widget = scene()->views().front();
 
     /* Calculate the extends that would cover entire viewport. */
     QRectF viewportRect = painter->transform().inverted().mapRect(QRectF(widget->rect()));
