@@ -3,6 +3,7 @@
 #include "server_certificate_viewer.h"
 #include "ui_server_certificate_viewer.h"
 
+#include <QtGui/QIcon>
 #include <QtWidgets/QScrollBar>
 #include <QtWidgets/QTabBar>
 #include <QtWidgets/QTreeWidgetItem>
@@ -16,6 +17,7 @@
 #include <nx/vms/client/core/network/remote_connection_user_interaction_delegate.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/core/skin/svg_icon_colorer.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/delegates/customizable_item_delegate.h>
@@ -42,6 +44,9 @@ QString highlightedText(const QString& text)
     const auto color = nx::vms::client::core::colorTheme()->color("light10");
     return QString("<span style=\"color: %1;\">%2</span>").arg(color.name()).arg(text);
 }
+
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kThemeSubstitutions = {
+    {QIcon::Normal, {.primary = "light4"}}};
 
 } // namespace
 
@@ -235,7 +240,7 @@ void ServerCertificateViewer::setCertificateData(
     {
         const auto& cert = m_certificates[i];
         auto newItem = new QTreeWidgetItem(lastItem);
-        newItem->setIcon(0, qnSkin->icon("misc/certificate_icon.svg"));
+        newItem->setIcon(0, qnSkin->icon("misc/certificate_icon.svg", kThemeSubstitutions));
         newItem->setText(0, name(cert.subject(), certificateDafaultName()));
         newItem->setData(0, Qt::UserRole, i); //< Store certificate index as UserRole data.
         lastItem = newItem;
