@@ -5,6 +5,8 @@
 
 #include <QtWidgets/QPushButton>
 
+#include <nx/vms/client/desktop/style/custom_style.h>
+
 QnLayoutNameDialog::QnLayoutNameDialog(const QString &caption, const QString &text, const QString &name, QDialogButtonBox::StandardButtons buttons, QWidget *parent):
     base_type(parent)
 {
@@ -21,12 +23,26 @@ QnLayoutNameDialog::QnLayoutNameDialog(QDialogButtonBox::StandardButtons buttons
     init(buttons);
 }
 
-void QnLayoutNameDialog::init(QDialogButtonBox::StandardButtons buttons) {
+void QnLayoutNameDialog::init(QDialogButtonBox::StandardButtons buttons)
+{
     ui.reset(new Ui::LayoutNameDialog());
 
     ui->setupUi(this);
 
     ui->buttonBox->setStandardButtons(buttons);
+    const auto buttonBoxButtons = ui->buttonBox->buttons();
+
+    if (auto it = std::find_if(buttonBoxButtons.begin(),
+            buttonBoxButtons.end(),
+            [this](auto button)
+            {
+                return ui->buttonBox->buttonRole(button) == QDialogButtonBox::AcceptRole;
+            });
+        NX_ASSERT(it != buttonBoxButtons.end()))
+    {
+        setAccentStyle(*it);
+    }
+
 
     connect(ui->nameLineEdit,   SIGNAL(textChanged(const QString &)),   this,   SLOT(at_nameLineEdit_textChanged(const QString &)));
     at_nameLineEdit_textChanged(ui->nameLineEdit->text());
