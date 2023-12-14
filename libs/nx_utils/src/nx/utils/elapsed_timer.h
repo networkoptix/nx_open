@@ -95,6 +95,14 @@ public:
     void invalidate();
     bool isValid() const;
     std::chrono::milliseconds elapsed() const;
+
+    template<typename TargetDuration = std::chrono::milliseconds>
+    std::optional<TargetDuration> maybeElapsed() const
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        return base_type::maybeElapsed<TargetDuration>();
+    }
+
 private:
     mutable Mutex m_mutex;
 };
