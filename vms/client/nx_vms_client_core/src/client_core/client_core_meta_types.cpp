@@ -28,6 +28,7 @@
 #include <nx/vms/client/core/common/utils/path_util.h>
 #include <nx/vms/client/core/common/utils/properties_sync.h>
 #include <nx/vms/client/core/common/utils/property_update_filter.h>
+#include <nx/vms/client/core/common/utils/row_count_watcher.h>
 #include <nx/vms/client/core/common/utils/validators.h>
 #include <nx/vms/client/core/common/utils/velocity_meter.h>
 #include <nx/vms/client/core/graphics/shader_helper.h>
@@ -158,6 +159,7 @@ void initializeMetaTypes()
     GlobalTemporaries::registerQmlType();
     analytics::IconManager::registerQmlType();
     AccessHelper::registerQmlType();
+    RowCountWatcher::registerQmlType();
 
     MediaPlayer::registerQmlTypes();
 
