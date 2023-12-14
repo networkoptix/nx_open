@@ -1461,10 +1461,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Local System ID</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Last master System merge ID</source>
         <translation></translation>
     </message>
@@ -1803,6 +1799,10 @@
     </message>
     <message>
         <source>Interval between the Cloud polling HTTP requests to synchronize the data.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Local System ID, null means the System is not set up yet.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
