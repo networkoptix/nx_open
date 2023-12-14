@@ -149,7 +149,8 @@
           "type": "Number",
           "subtype": "integer",
           "minValue": 0,
-          "unit": "°C"
+          "_comment": "\u00b0 is a degree symbol",
+          "unit": "\u00b0C"
         },
         {
           "name": "Tattoo",
@@ -363,7 +364,8 @@
           "type": "Number",
           "subtype": "integer",
           "minValue": 0,
-          "unit": "°C"
+          "_comment": "\u00b0 is a degree symbol",
+          "unit": "\u00b0C"
         },
         {
           "name": "Name",

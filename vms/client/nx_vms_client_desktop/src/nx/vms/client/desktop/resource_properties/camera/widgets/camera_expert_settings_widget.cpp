@@ -144,6 +144,7 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(
     check_box_utils::autoClearTristate(ui->remoteArchiveMotionDetectionCheckBox);
 
     spin_box_utils::autoClearSpecialValue(ui->panSensitivitySpinBox, 1.0);
+    spin_box_utils::setSpecialValue(ui->customWebPagePortSpinBox);
 
     setWarningStyle(ui->bitrateIncreaseWarningLabel);
     setWarningStyle(ui->generalWarningLabel);
@@ -224,7 +225,7 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(
         &CameraExpertSettingsWidget::clearSpinBoxSelection, Qt::QueuedConnection);
 
     connect(ui->useAutoWebPagePortCheckBox, &QCheckBox::clicked, this,
-        [this, store](bool checked)
+        [store](bool checked)
         {
             store->setCustomWebPagePort(checked ? 0 : nx::network::http::DEFAULT_HTTP_PORT);
         });

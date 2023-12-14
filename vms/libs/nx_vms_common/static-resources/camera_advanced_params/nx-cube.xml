@@ -188,7 +188,7 @@
                                 availableInOffline="true"
                                 confirmation="Reset all settings (including network) to default?"
                                 actionName="Reset"
-				description="Reset all settings to factory default (inсludes IP settings)"
+				description="Reset all settings to factory default (includes IP settings)"
 				readCmd="system"/>
 		</group>
 	</parameters>
