@@ -2,11 +2,14 @@
 
 #include "resource_widget_renderer.h"
 
+#include <QtQuickWidgets/QQuickWidget>
+
 #include <camera/gl_renderer.h>
 #include <client/client_runtime_settings.h>
 #include <nx/media/config.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
+#include <ui/graphics/view/quick_widget_container.h>
 
 #include "decodedpicturetoopengluploader.h"
 
@@ -18,20 +21,23 @@ const microseconds kNoPtsValue{AV_NOPTS_VALUE};
 
 QnResourceWidgetRenderer::QnResourceWidgetRenderer(
     QObject* parent,
-    QOpenGLWidget* openGLWidget):
+    QWidget* viewport):
     QObject(parent),
-    m_openGLWidget(openGLWidget)
+    m_openGLWidget(qobject_cast<QOpenGLWidget*>(viewport))
 {
+    if (auto container = qobject_cast<QuickWidgetContainer*>(viewport))
+        m_quickWidget = container->quickWidget();
+
     const auto previousContext = QOpenGLContext::currentContext();
     QSurface* previousSurface = previousContext ? previousContext->surface() : nullptr;
 
-    const auto differentContext = openGLWidget && previousContext != openGLWidget->context();
+    const auto differentContext = m_openGLWidget && previousContext != m_openGLWidget->context();
     if (differentContext)
-        openGLWidget->makeCurrent();
+        m_openGLWidget->makeCurrent();
 
     if (differentContext)
     {
-        openGLWidget->doneCurrent();
+        m_openGLWidget->doneCurrent();
         if (previousContext)
             previousContext->makeCurrent(previousSurface);
     }
@@ -45,8 +51,8 @@ void QnResourceWidgetRenderer::setChannelCount(int channelCount)
 {
     if (channelCount < 1)
         return;
-
-    m_openGLWidget->makeCurrent();
+    if (m_openGLWidget)
+        m_openGLWidget->makeCurrent();
     m_panoFactor = channelCount;
     m_renderingContexts.resize(channelCount);
 
@@ -56,10 +62,11 @@ void QnResourceWidgetRenderer::setChannelCount(int channelCount)
             continue;
 
         ctx = {};
-        ctx.uploader.reset(new DecodedPictureToOpenGLUploader(m_openGLWidget));
+        ctx.uploader.reset(new DecodedPictureToOpenGLUploader(m_openGLWidget, m_quickWidget));
         ctx.uploader->setForceSoftYUV(qnRuntime->isSoftwareYuv());
         ctx.renderer.reset(new QnGLRenderer(m_openGLWidget, *ctx.uploader));
-        ctx.renderer->setBlurEnabled(appContext()->localSettings()->glBlurEnabled());
+        ctx.renderer->setBlurEnabled(
+            appContext()->localSettings()->glBlurEnabled() && m_openGLWidget); // TODO: #ikulaychuk implement blur in RHI.
         ctx.renderer->setScreenshotInterface(m_screenshotInterface);
         ctx.uploader->setYV12ToRgbShaderUsed(ctx.renderer->isYV12ToRgbShaderUsed());
         ctx.uploader->setNV12ToRgbShaderUsed(ctx.renderer->isNV12ToRgbShaderUsed());
@@ -207,7 +214,11 @@ void QnResourceWidgetRenderer::setBlurFactor(qreal value)
 }
 
 Qn::RenderStatus QnResourceWidgetRenderer::paint(
-    int channel, const QRectF& sourceRect, const QRectF& targetRect, qreal opacity)
+    QPainter* painter,
+    int channel,
+    const QRectF& sourceRect,
+    const QRectF& targetRect,
+    qreal opacity)
 {
     if (m_renderingContexts.size() <= channel)
         return Qn::NothingRendered;
@@ -218,7 +229,7 @@ Qn::RenderStatus QnResourceWidgetRenderer::paint(
 
     ctx.uploader->setOpacity(opacity);
     ctx.renderer->setBlurFactor(m_blurFactor);
-    return ctx.renderer->paint(sourceRect, targetRect);
+    return ctx.renderer->paint(painter, sourceRect, targetRect);
 }
 
 Qn::RenderStatus QnResourceWidgetRenderer::discardFrame(int channel)

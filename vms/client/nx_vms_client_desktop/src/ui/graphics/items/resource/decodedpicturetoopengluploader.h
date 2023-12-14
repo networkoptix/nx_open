@@ -26,6 +26,7 @@ class DecodedPictureToOpenGLUploaderPrivate;
 class QnGlRendererTexture;
 class QnGlRendererTexturePack;
 class AVPacketUploader;
+class QQuickWidget;
 
 //!Used by decoding thread to load decoded picture from system memory to opengl texture(s)
 /*!
@@ -85,6 +86,9 @@ public:
 
         const ImageCorrectionResult& imageCorrectionResult() const;
 
+        /** Returns decoded frame if we don't user OpenGL textures (in case of RHI or software) */
+        CLConstVideoDecoderOutputPtr decodedFrame() const { return m_decodedFrame; }
+
     private:
         struct PBOData
         {
@@ -106,6 +110,7 @@ public:
         QRectF m_displayedRect;
         QnGlRendererTexturePack* m_texturePack;
         QSize m_onScreenSize;
+        CLConstVideoDecoderOutputPtr m_decodedFrame;
 
         UploadedPicture( DecodedPictureToOpenGLUploader* const uploader );
         UploadedPicture( const UploadedPicture& );
@@ -142,6 +147,7 @@ public:
     */
     DecodedPictureToOpenGLUploader(
         QOpenGLWidget* glWidget,
+        QQuickWidget* quickWidget,
         unsigned int asyncDepth = 1 );
     virtual ~DecodedPictureToOpenGLUploader();
 
