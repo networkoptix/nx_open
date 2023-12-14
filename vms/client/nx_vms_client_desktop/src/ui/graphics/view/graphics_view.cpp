@@ -3,27 +3,119 @@
 #include "graphics_view.h"
 
 #include <QtGui/QOpenGLContext>
-#include <QtWidgets/QApplication>
-#include <QtOpenGLWidgets/QOpenGLWidget>
-#include <QtWidgets/QGraphicsSceneWheelEvent>
 #include <QtGui/QWheelEvent>
+#include <QtOpenGLWidgets/QOpenGLWidget>
+#include <QtQml/QQmlEngine>
+#include <QtQuickWidgets/QQuickWidget>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QGraphicsSceneWheelEvent>
 
-#include <ui/common/palette.h>
-#include <nx/vms/client/core/skin/color_theme.h>
-
+#include <nx/pathkit/rhi_paint_device.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/trace/trace.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/system_logon/ui/welcome_screen.h>
+#include <nx/vms/client/desktop/window_context.h>
+#include <ui/common/palette.h>
+#include <ui/widgets/main_window.h>
+#include <ui/workbench/workbench_context.h>
 
-using namespace nx::vms::client::core;
+#include "rhi_rendering_item.h"
+#include "quick_widget_container.h"
 
-QnGraphicsView::QnGraphicsView(QGraphicsScene* scene, QWidget* parent):
-    QGraphicsView(scene, parent)
+using namespace nx::vms::client::desktop;
+using namespace nx::pathkit;
+
+struct QnGraphicsView::Private
+{
+    Private()
+    {
+    }
+
+    QOpenGLWidget* openGLWidget = nullptr;
+    QQuickWidget* quickWidget = nullptr;
+    QPointer<RhiRenderingItem> renderingItem;
+    bool frameEnded = true;
+};
+
+QnGraphicsView::QnGraphicsView(QGraphicsScene* scene, nx::vms::client::desktop::MainWindow* parent):
+    base_type(scene, parent),
+    d(new Private())
 {
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setTransformationAnchor(QGraphicsView::NoAnchor);
     setViewportUpdateMode(QGraphicsView::NoViewportUpdate);
-    setPaletteColor(this, QPalette::Base, colorTheme()->color("dark1"));
+    setPaletteColor(this, QPalette::Base, nx::vms::client::core::colorTheme()->color("dark1"));
+
+    auto sceneRendering = QString(nx::vms::client::desktop::ini().sceneRendering);
+
+    const auto graphicsApi = parent->welcomeScreen()
+        ? parent->welcomeScreen()->quickWindow()->rendererInterface()->graphicsApi()
+        : (appContext()->mainWindowContext()->quickWindow()
+            ? appContext()->mainWindowContext()->quickWindow()->rendererInterface()->graphicsApi()
+            : QQuickWindow::graphicsApi());
+
+    if (graphicsApi != QSGRendererInterface::OpenGL && sceneRendering == "qopenglwidget")
+        sceneRendering = "qml";
+
+    if (sceneRendering == "qopenglwidget")
+    {
+        d->openGLWidget = new QOpenGLWidget(this);
+        d->openGLWidget->makeCurrent();
+        d->openGLWidget->setAttribute(Qt::WA_Hover);
+        setViewport(d->openGLWidget);
+        return;
+    }
+
+    // When 'software' is requested but other APIs are available,
+    // QQuickWindow::graphicsApi() returns default platfrom API instead of 'software'.
+    if (QString(nx::vms::client::desktop::ini().graphicsApi) == "software"
+        || graphicsApi == QSGRendererInterface::Software)
+    {
+        // Painting on qml items via RHI is not supported in 'software' mode.
+        sceneRendering = "qpainter";
+    }
+
+    if (sceneRendering == "qpainter")
+    {
+        const auto viewport = new QWidget(this);
+        viewport->setAttribute(Qt::WA_Hover);
+        setViewport(viewport);
+        return;
+    }
+
+    auto container = new QuickWidgetContainer();
+    setViewport(container);
+
+    d->quickWidget = new QQuickWidget(
+        nx::vms::client::core::appContext()->qmlEngine(), this->viewport());
+
+    d->quickWidget->setObjectName("Scene");
+
+    // QQuickWidget is used only for RHI-based rendering.
+    d->quickWidget->setAttribute(Qt::WA_TransparentForMouseEvents);
+
+    d->quickWidget->setResizeMode(QQuickWidget::SizeRootObjectToView);
+    d->quickWidget->setSource(QUrl("Nx/MainScene/Scene.qml"));
+
+    container->setQuickWidget(d->quickWidget);
+
+    if (auto root = d->quickWidget->rootObject())
+        d->renderingItem = root->findChild<RhiRenderingItem*>("renderingItem");
+
+    NX_ASSERT(d->renderingItem);
+
+    d->quickWidget->quickWindow()->setColor(
+        nx::vms::client::core::colorTheme()->color("dark3")); //< window
+
+    connect(d->quickWidget->quickWindow(), &QQuickWindow::afterFrameEnd, this,
+        [this]()
+        {
+            d->frameEnded = true;
+        });
 }
 
 QnGraphicsView::~QnGraphicsView()
@@ -37,12 +129,41 @@ void QnGraphicsView::paintEvent(QPaintEvent* event)
     // Always make QOpenGLWidget context to be the current context.
     // This is what item paint functions expect and doing otherwise
     // may lead to unpredictable behavior.
-    if (const auto glWidget = qobject_cast<QOpenGLWidget*>(viewport()))
-        glWidget->makeCurrent();
+    if (d->openGLWidget)
+    {
+        d->openGLWidget->makeCurrent();
+        NX_ASSERT(QOpenGLContext::currentContext());
+        base_type::paintEvent(event);
+        return;
+    }
 
-    NX_ASSERT(QOpenGLContext::currentContext());
+    if (!d->quickWidget)
+    {
+        base_type::paintEvent(event);
+        return;
+    }
 
-    base_type::paintEvent(event);
+    // Avoid painting frames faster than QQuickWidget can render them.
+    if (!d->frameEnded)
+        return;
+    d->frameEnded = false;
+
+    if (!d->renderingItem)
+        return;
+
+    auto paintDevice = d->renderingItem->paintDevice();
+    const auto pixelRatio = d->quickWidget->quickWindow()->effectiveDevicePixelRatio();
+
+    paintDevice->setSize(d->quickWidget->quickWindow()->size() * pixelRatio);
+    paintDevice->setDevicePixelRatio(pixelRatio);
+    paintDevice->clear();
+
+    QPainter painter(paintDevice);
+    render(&painter, viewport()->rect());
+
+    // renderingItem->update() won't work because renderingItem rendering is triggered by
+    // QQuickWindow's beforeRendering() and beforeRenderPassRecording() signals.
+    d->quickWidget->quickWindow()->update();
 }
 
 void QnGraphicsView::wheelEvent(QWheelEvent* event)
@@ -85,4 +206,9 @@ void QnGraphicsView::changeEvent(QEvent* event)
 
     if (event->type() == QEvent::PaletteChange)
         setBackgroundBrush(palette().base());
+}
+
+QQuickWidget* QnGraphicsView::quickWidget() const
+{
+    return d->quickWidget;
 }

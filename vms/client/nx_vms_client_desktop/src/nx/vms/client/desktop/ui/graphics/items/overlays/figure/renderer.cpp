@@ -194,6 +194,17 @@ void Renderer::Private::drawPolyline(
     }
 
     const auto glWidget = qobject_cast<QOpenGLWidget*>(widget);
+    if (!glWidget)
+    {
+        QPainterPath path;
+        path.addPolygon(points);
+        if (type == FigureShapeType::closed)
+            path.closeSubpath();
+        painter->setPen(color);
+        painter->drawPath(path);
+        return;
+    }
+
     const auto functions = QOpenGLContext::currentContext()->functions();
 
     if (mode == DrawBatchMode::singleOperation)

@@ -608,8 +608,7 @@ void QnMediaResourceWidget::initRenderer()
 {
     // TODO: We shouldn't be using OpenGL context in class constructor.
     QGraphicsView *view = mainWindow()->view();
-    const auto viewport = dynamic_cast<QOpenGLWidget*>(view ? view->viewport() : nullptr);
-    m_renderer = new QnResourceWidgetRenderer(nullptr, viewport);
+    m_renderer = new QnResourceWidgetRenderer(nullptr, view->viewport());
     connect(m_renderer, &QnResourceWidgetRenderer::sourceSizeChanged, this,
         &QnMediaResourceWidget::updateAspectRatio);
     m_renderer->inUse();
@@ -1270,26 +1269,36 @@ Qn::RenderStatus QnMediaResourceWidget::paintVideoTexture(
     const QRectF& sourceSubRect,
     const QRectF& targetRect)
 {
+    QOpenGLFunctions* functions = nullptr;
     const auto glWidget = m_renderer->openGLWidget();
-    QnGlNativePainting::begin(glWidget, painter);
-
-    const auto functions = glWidget->context()->functions();
+    if (glWidget)
+    {
+        QnGlNativePainting::begin(glWidget, painter);
+        functions = glWidget->context()->functions();
+    }
 
     const qreal opacity = effectiveOpacity();
     bool opaque = qFuzzyCompare(opacity, 1.0);
     // Always use blending for images.
-    if (!opaque || (base_type::resource()->flags() & Qn::still_image))
+    if (functions)
     {
-        functions->glEnable(GL_BLEND);
-        functions->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        if (!opaque || (base_type::resource()->flags() & Qn::still_image))
+        {
+            functions->glEnable(GL_BLEND);
+            functions->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        }
     }
 
     m_renderer->setBlurFactor(m_statusOverlay->opacity());
-    const auto result = m_renderer->paint(channel, sourceSubRect, targetRect, opacity);
+    Qn::RenderStatus result = Qn::RenderStatus::NothingRendered;
+
+    result = m_renderer->paint(painter, channel, sourceSubRect, targetRect, opacity);
+
     m_paintedChannels[channel] = true;
 
     /* There is no need to restore blending state before invoking endNativePainting. */
-    QnGlNativePainting::end(painter);
+    if (glWidget)
+        QnGlNativePainting::end(painter);
 
     return result;
 }

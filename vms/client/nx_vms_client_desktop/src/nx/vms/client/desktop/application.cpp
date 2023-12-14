@@ -362,7 +362,17 @@ int runApplication(int argc, char** argv)
         }
     }
 
-    QQuickWindow::setGraphicsApi(QSGRendererInterface::OpenGL);
+    static const QHash<QString, QSGRendererInterface::GraphicsApi> nameToApi =
+    {
+        {"software", QSGRendererInterface::Software},
+        {"openvg", QSGRendererInterface::OpenVG},
+        {"opengl", QSGRendererInterface::OpenGL},
+        {"direct3d11", QSGRendererInterface::Direct3D11},
+        {"vulkan", QSGRendererInterface::Vulkan},
+        {"metal", QSGRendererInterface::Metal},
+    };
+    QQuickWindow::setGraphicsApi(nameToApi.value(ini().graphicsApi, QSGRendererInterface::OpenGL));
+    QQuickWindow::setDefaultAlphaBuffer(true);
 
     if (nx::build_info::isMacOsX())
     {

@@ -22,7 +22,9 @@ class QnHistogramConsumer;
 class QnFisheyePtzController;
 class QnGLShaderProgram;
 
-class QnGLRenderer : protected QnGlFunctions, protected QOpenGLFunctions
+namespace nx::vms::client::desktop { class RhiVideoRenderer; }
+
+class QnGLRenderer : protected QnGlFunctions
 {
 public:
     static bool isPixelFormatSupported(AVPixelFormat pixfmt);
@@ -43,7 +45,7 @@ public:
      */
     void setBlurFactor(qreal value);
 
-    Qn::RenderStatus paint(const QRectF &sourceRect, const QRectF &targetRect);
+    Qn::RenderStatus paint(QPainter* painter, const QRectF &sourceRect, const QRectF &targetRect);
     /** The same as paint but don't do actual painting. */
     Qn::RenderStatus discardFrame();
 
@@ -73,6 +75,7 @@ private:
     void applyMixerSettings(qreal brightness, qreal contrast, qreal hue, qreal saturation); // deprecated
     ImageCorrectionResult calcImageCorrection();
 private:
+    QOpenGLFunctions* const m_gl;
     const DecodedPictureToOpenGLUploader& m_decodedPictureProvider;
     qreal m_brightness;
     qreal m_contrast;
@@ -104,6 +107,7 @@ private:
     // applying fisheye dewarping if needed.
     bool drawVideoTextures(
         const DecodedPictureToOpenGLUploader::ScopedPictureLock& picLock,
+        QPainter* painter,
         const QRectF& textureRect,
         const QRectF& viewRect,
         int planeCount,
@@ -119,6 +123,7 @@ private:
     void drawBindedTexture(QnGLShaderProgram* shader , const float* v_array, const float* tx_array);
 
     Qn::RenderStatus drawVideoData(
+        QPainter* painter,
         const QRectF &sourceRect,
         const QRectF &targetRect,
         qreal opacity);
@@ -147,6 +152,7 @@ private:
     qreal m_prevBlurFactor;
 
     bool m_blurEnabled = true;
+    std::shared_ptr<nx::vms::client::desktop::RhiVideoRenderer> m_rhiVideoRenderer;
 };
 
 #endif //QN_GL_RENDERER_H

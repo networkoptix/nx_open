@@ -108,6 +108,7 @@
 #include <recording/time_period.h>
 #include <ui/common/notification_levels.h>
 #include <ui/common/weak_graphics_item_pointer.h>
+#include <ui/graphics/view/rhi_rendering_item.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout.h>
 #include <utils/color_space/image_correction.h>
@@ -285,6 +286,7 @@ void QnClientMetaTypes::registerQmlTypes()
     qmlRegisterType<FisheyeCalibrator>("nx.vms.client.desktop", 1, 0, "FisheyeCalibrator");
     qmlRegisterType<ConnectTilesProxyModel>("nx.vms.client.desktop", 1, 0, "ConnectTilesModel");
     qmlRegisterType<PerformanceInfo>("nx.vms.client.desktop", 1, 0, "PerformanceInfo");
+    qmlRegisterType<RhiRenderingItem>("nx.vms.client.desktop", 1, 0, "RhiRenderingItem");
 
     qmlRegisterUncreatableType<Workbench>("nx.client.desktop", 1, 0, "Workbench",
         "Cannot create instance of Workbench.");
