@@ -24,6 +24,7 @@
 #include <nx/utils/range_adapters.h>
 #include <nx/utils/scoped_connections.h>
 #include <nx/vms/api/types/access_rights_types.h>
+#include <nx/vms/client/core/common/utils/row_count_watcher.h>
 #include <nx/vms/client/core/qml/nx_globals_object.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
@@ -116,6 +117,8 @@ struct ResourceAccessRightsModel::Private
     QVector<ResourceAccessInfo> info;
     nx::utils::ScopedConnections contextConnections;
 
+    nx::vms::client::core::RowCountWatcher rowCountWatcher{};
+
     void updateInfo(bool suppressSignals = false);
     QVector<ResourceAccessInfo> calculateInfo() const;
     std::vector<QnUuid> getGroupContents(const QnUuid& groupId) const;
@@ -127,8 +130,12 @@ struct ResourceAccessRightsModel::Private
 
 ResourceAccessRightsModel::ResourceAccessRightsModel(QObject* parent):
     base_type(parent),
-    d(new Private{this})
+    d(new Private{.q = this})
 {
+    d->rowCountWatcher.setRecursiveTracking(true);
+
+    connect(&d->rowCountWatcher, &nx::vms::client::core::RowCountWatcher::recursiveRowCountChanged,
+        this, [this]() { d->updateInfo(); });
 }
 
 ResourceAccessRightsModel::~ResourceAccessRightsModel()
@@ -199,6 +206,9 @@ void ResourceAccessRightsModel::setResourceTreeIndex(const QModelIndex& value)
 
     d->resourceTreeIndex = value;
     d->item = AccessSubjectEditingContext::resourceAccessTreeItemInfo(d->resourceTreeIndex);
+
+    d->rowCountWatcher.setModel(const_cast<QAbstractItemModel*>(d->resourceTreeIndex.model()));
+    d->rowCountWatcher.setParentIndex(d->resourceTreeIndex);
 
     d->info.clear();
     d->updateInfo();
