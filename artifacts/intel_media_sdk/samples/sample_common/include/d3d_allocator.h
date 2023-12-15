@@ -36,25 +36,13 @@ enum eTypeHandle
     DXVA2_DECODER       = 0x01
 };
 
-struct D3DAllocatorParams : mfxAllocatorParams
-{
-    IDirect3DDeviceManager9 *pManager = nullptr;
-    DWORD surfaceUsage = 0;
-};
-
 class D3DFrameAllocator: public BaseFrameAllocator
 {
 public:
-    D3DFrameAllocator();
+    D3DFrameAllocator(IDirect3DDeviceManager9* pManager);
     virtual ~D3DFrameAllocator();
-
-    virtual mfxStatus Init(mfxAllocatorParams *pParams);
     virtual mfxStatus Close();
-
-    virtual IDirect3DDeviceManager9* GetDeviceManager()
-    {
-        return m_manager;
-    };
+    virtual IDirect3DDeviceManager9* GetDeviceManager() { return m_manager; };
 
     virtual mfxStatus LockFrame(mfxMemId mid, mfxFrameData *ptr);
     virtual mfxStatus UnlockFrame(mfxMemId mid, mfxFrameData *ptr);

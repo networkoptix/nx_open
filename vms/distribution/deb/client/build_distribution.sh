@@ -252,8 +252,11 @@ copyLibs()
         distrib_copySystemLibs "$STAGE_LIB" \
             libva.so.2 \
             libva-x11.so.2 \
+            libva-drm.so.2 \
+            libvpl.so.2 \
             libmfxhw64.so.1 \
             libmfx.so.1 \
+            libmfx-gen.so.1.2 \
             libcudart.so.11.0
     fi
 }

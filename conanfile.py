@@ -221,12 +221,15 @@ class NxOpenConan(ConanFile):
             if self.settings.arch == "x86_64":
                 copy_packages.append("libva")
                 copy_packages.append("intel-media-sdk")
+                copy_packages.append("intel-onevpl")
+                copy_packages.append("libvpl")
 
             if not self.isArm32:
                 copy_packages.append("ffmpeg")
         else:
             if self.isWindows:
                 copy_packages.append("intel-media-sdk-bin")
+                copy_packages.append("libvpl")
                 copy_packages.append("directx/JUN2010")
 
             copy_packages.append("ffmpeg")

@@ -4,7 +4,7 @@
 
 #include <QtCore/QString>
 
-#include <mfx/mfxvideo.h>
+#include <vpl/mfx.h>
 
 QString toString(mfxStatus status)
 {
