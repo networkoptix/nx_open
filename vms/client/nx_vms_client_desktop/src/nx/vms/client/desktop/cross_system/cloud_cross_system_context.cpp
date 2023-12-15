@@ -537,6 +537,7 @@ CloudCrossSystemContext::CloudCrossSystemContext(
 
     connect(this, &CloudCrossSystemContext::statusChanged, this, update);
     connect(systemDescription.data(), &QnBaseSystemDescription::onlineStateChanged, this, update);
+    connect(systemDescription.data(), &QnBaseSystemDescription::isCloudSystemChanged, this, update);
 }
 
 CloudCrossSystemContext::~CloudCrossSystemContext() = default;
@@ -553,7 +554,9 @@ bool CloudCrossSystemContext::isSystemReadyToUse() const
     // so it becomes offline. In that case the context is still connected but the system is
     // offline. When the system will be online again we could continue use connection from
     // the context.
-    return d->status == Status::connected && d->systemDescription->isOnline();
+    return d->status == Status::connected
+        && d->systemDescription->isOnline()
+        && d->systemDescription->isCloudSystem();
 }
 
 QString CloudCrossSystemContext::systemId() const
