@@ -19,6 +19,7 @@ VaDisplay::~VaDisplay()
 
 VaDisplay::VaDisplay()
 {
+
     m_display = vaGetDisplayGLX(XOpenDisplay(":0.0"));
     if (!m_display)
     {
@@ -26,7 +27,7 @@ VaDisplay::VaDisplay()
         return;
     }
 
-    int major, minor;
+    int major = 0, minor = 0;
     VAStatus status = vaInitialize(m_display, &major, &minor);
     if (status != VA_STATUS_SUCCESS)
     {

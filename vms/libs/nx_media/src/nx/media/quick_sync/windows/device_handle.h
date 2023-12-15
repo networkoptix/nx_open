@@ -8,7 +8,7 @@
 #include <d3d9.h>
 #include <dxva2api.h>
 
-#include <mfx/mfxvideo++.h>
+#include <vpl/mfx.h>
 
 #include "renderer.h"
 

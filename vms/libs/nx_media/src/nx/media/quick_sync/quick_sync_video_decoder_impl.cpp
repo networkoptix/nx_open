@@ -34,7 +34,7 @@ bool QuickSyncVideoDecoderImpl::isAvailable()
 {
     auto isAvalibaleImpl = []() {
         MFXVideoSession mfxSession;
-        mfxIMPL impl = MFX_IMPL_HARDWARE;
+        mfxIMPL impl = MFX_IMPL_TYPE_HARDWARE;
         mfxVersion version = { {0, 1} };
         mfxStatus status = mfxSession.Init(impl, &version);
         if (status < MFX_ERR_NONE)
@@ -98,20 +98,10 @@ bool QuickSyncVideoDecoderImpl::initDevice(int width, int height)
 
     // create memory allocator
     if (m_config.useVideoMemory)
-    {
         m_allocator = m_device.getAllocator();
-    }
     else
-    {
-        auto allocator = std::make_shared<SysMemFrameAllocator>();
-        auto status = allocator->Init(nullptr);
-        if (status < MFX_ERR_NONE)
-        {
-            NX_WARNING(this, "Failed to init allocator, error code: %1", status);
-            return false;
-        }
-        m_allocator = std::move(allocator);
-    }
+        m_allocator = std::make_shared<SysMemFrameAllocator>();
+
     m_mfxSession.SetFrameAllocator(m_allocator.get());
     return true;
 }
@@ -234,11 +224,15 @@ bool QuickSyncVideoDecoderImpl::init(
         return false;
     }
 
+#ifndef Q_OS_LINUX
     m_scaler = std::make_unique<VppScaler>(m_mfxSession, m_allocator);
     // Initialize the scaler to reserve the maximum size, since VPP does not support reset the
     // target size up
     QSize frameSize(m_mfxDecParams.mfx.FrameInfo.Width, m_mfxDecParams.mfx.FrameInfo.Height);
     return m_scaler->init(frameSize, frameSize);
+#else
+    return true;
+#endif
 }
 
 void QuickSyncVideoDecoderImpl::lockSurface(const mfxFrameSurface1* surface)

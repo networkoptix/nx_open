@@ -8,7 +8,8 @@
 
 #include <QtMultimedia/QVideoFrame>
 
-#include <mfx/mfxvideo++.h>
+#include <vpl/mfx.h>
+#include <vpl/mfxvideo++.h>
 
 extern "C" {
 
