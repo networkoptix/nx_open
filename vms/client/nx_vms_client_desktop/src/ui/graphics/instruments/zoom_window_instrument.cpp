@@ -580,7 +580,10 @@ void ZoomWindowInstrument::registerWidget(QnMediaResourceWidget *widget)
     /* Initialize frame color if zoom window was loaded from a layout and
      * not created through this instrument. */
     if (widget->isZoomWindow() && !widget->frameDistinctionColor().isValid())
-        widget->setFrameDistinctionColor(nextZoomWindowColor());
+    {
+        widget->setFrameDistinctionColor(
+            m_zoomWindowColor.isValid() ? m_zoomWindowColor : nextZoomWindowColor());
+    }
 }
 
 void ZoomWindowInstrument::unregisterWidget(QnMediaResourceWidget* widget)
@@ -950,6 +953,8 @@ void ZoomWindowInstrument::finishDrag(DragInfo* /*info*/)
 
     if (m_zoomWindowStartedEmitted)
         emit zoomWindowFinished(target());
+
+    m_zoomWindowColor = QColor();
 }
 
 void ZoomWindowInstrument::finishDragProcess(DragInfo* /*info*/)
@@ -1022,6 +1027,7 @@ void ZoomWindowInstrument::at_resizingStarted(
         return;
 
     m_windowTarget = checked_cast<ZoomWindowWidget*>(widget);
+    m_zoomWindowColor = m_windowTarget->zoomWidget()->frameDistinctionColor();
 }
 
 void ZoomWindowInstrument::at_resizing(
@@ -1076,4 +1082,5 @@ void ZoomWindowInstrument::at_resizingFinished(
     ResizingInfo* /*info*/)
 {
     m_windowTarget.clear();
+    m_zoomWindowColor = QColor();
 }

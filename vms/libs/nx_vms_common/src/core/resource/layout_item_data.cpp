@@ -24,7 +24,6 @@ bool LayoutItemData::operator==(const LayoutItemData& other) const
         && controlPtz == other.controlPtz
         && displayAnalyticsObjects == other.displayAnalyticsObjects
         && displayRoi == other.displayRoi
-        && frameDistinctionColor == other.frameDistinctionColor
         && contrastParams == other.contrastParams
         && dewarpingParams == other.dewarpingParams
         && displayHotspots == other.displayHotspots;
