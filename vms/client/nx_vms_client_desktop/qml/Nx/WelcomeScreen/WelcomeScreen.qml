@@ -204,7 +204,7 @@ Rectangle
                     }
                 }
 
-                Keys.onPressed: event.accepted = true
+                Keys.onPressed: (event) => event.accepted = true
             }
 
             VisibilityButton
