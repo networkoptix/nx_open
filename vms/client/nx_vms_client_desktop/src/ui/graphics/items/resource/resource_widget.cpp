@@ -168,8 +168,8 @@ QnResourceWidget::QnResourceWidget(
     /* Set up overlay widgets. */
     setFont(fontConfig()->large());
 
-    setPaletteColor(this, QPalette::WindowText, core::colorTheme()->color("light1"));
-    setPaletteColor(this, QPalette::Window, core::colorTheme()->color("dark5"));
+    setPaletteColor(this, QPalette::WindowText, core::colorTheme()->color("@light1"));
+    setPaletteColor(this, QPalette::Window, core::colorTheme()->color("@dark5"));
     setPaletteColor(this, QPalette::Highlight, core::colorTheme()->color("brand_core", 110));
 
     setupHud();
@@ -307,10 +307,10 @@ QIcon QnResourceWidget::loadSvgIcon(const QString& name) const
 
     using namespace nx::vms::client::core;
     static const QMap<QIcon::Mode, QColor> colors = {
-        {QIcon::Normal, core::colorTheme()->color("light4")},
-        {QIcon::Active, core::colorTheme()->color("light1")},
-        {QnIcon::Pressed, core::colorTheme()->color("light7")},
-        {QIcon::Disabled, core::colorTheme()->color("light4", /*alpha*/ 77)}};
+        {QIcon::Normal, core::colorTheme()->color("@light4")},
+        {QIcon::Active, core::colorTheme()->color("@light1")},
+        {QnIcon::Pressed, core::colorTheme()->color("@light7")},
+        {QIcon::Disabled, core::colorTheme()->color("@light4", /*alpha*/ 77)}};
 
     static const QColor checkedBgColor = core::colorTheme()->color("brand_core");
 

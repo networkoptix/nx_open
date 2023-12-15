@@ -718,6 +718,12 @@ static const QColor kBackground = "#212a2f"; //< Value of dark7 in default custo
 } // namespace
 
 const core::SvgIconColorer::IconSubstitutions Style::kTitleBarSubstitutions = {
+    { QnIcon::Normal, {
+        { kActiveForeground, "light4" },
+        { kInactiveForeground1, "dark15" },
+        { kInactiveForeground2, "dark16" },
+        { kBackground, "dark7" },
+    }},
     { QnIcon::Active, {
         { kActiveForeground, "light1" },
         { kInactiveForeground1, "light10" },
