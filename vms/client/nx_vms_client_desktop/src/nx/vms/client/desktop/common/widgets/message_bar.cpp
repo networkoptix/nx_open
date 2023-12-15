@@ -14,6 +14,7 @@
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/core/skin/svg_icon_colorer.h>
 #include <nx/vms/client/desktop/common/utils/custom_painted.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/helper.h>
@@ -23,9 +24,14 @@
 #include "nx/vms/client/desktop/common/widgets/control_bars.h"
 
 namespace {
-static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kTextButtonColors = {
-    {QIcon::Normal, {"light4"}}, {QIcon::Active, {"light3"}}};
-}
+
+static const QString kCrossColor = "#E1E7EA";
+static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kTextButtonColors = {
+    {QIcon::Normal, {{kCrossColor, "light4"}}}, {QIcon::Active, {{kCrossColor, "light3"}}}};
+static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kErrorTextButtonColors = {
+    {QIcon::Normal, {{kCrossColor, "@light4"}}}, {QIcon::Active, {{kCrossColor, "@light3"}}}};
+
+} // namespace
 
 namespace nx::vms::client::desktop {
 
@@ -34,7 +40,7 @@ struct CommonMessageBar::Private
     CommonMessageBar* const q;
     QnWordWrappedLabel* const label{new QnWordWrappedLabel(q)};
     QPushButton* const closeButton{
-        new QPushButton(qnSkin->icon("banners/close.svg"), QString(), q)};
+        new QPushButton(qnSkin->icon("banners/close.svg", kTextButtonColors), QString(), q)};
     QPushButton* icon{new QPushButton(QIcon(), QString(), q)};
     BarDescription::PropertyPointer isEnabledProperty;
     QHBoxLayout* buttonsHorizontalLayout;
@@ -167,7 +173,14 @@ void CommonMessageBar::hideInFuture()
 void CommonMessageBar::init(const BarDescription& barDescription)
 {
     d->closeButton->setVisible(barDescription.isClosable || !barDescription.isEnabledProperty.isNull());
-    setPaletteColor(this, QPalette::WindowText, core::colorTheme()->color("light4"));
+    setPaletteColor(this, QPalette::Text,
+        (barDescription.level == BarDescription::BarLevel::Error
+            ? core::colorTheme()->color("@light4")
+            : core::colorTheme()->color("light4")));
+
+    d->closeButton->setIcon(barDescription.level == BarDescription::BarLevel::Error
+        ? qnSkin->icon("banners/close.svg", kErrorTextButtonColors)
+        : qnSkin->icon("banners/close.svg", kTextButtonColors));
 
     auto font = d->label->font();
     font.setWeight(QFont::Medium);
@@ -192,7 +205,7 @@ void CommonMessageBar::init(const BarDescription& barDescription)
             icon = qnSkin->icon("banners/warning.svg");
             break;
         case BarDescription::BarLevel::Error:
-            backgroundColor = "attention.red_bg";
+            backgroundColor = "red_bg";
             frameColor = "red_d1";
             icon = qnSkin->icon("banners/error.svg");
             break;
