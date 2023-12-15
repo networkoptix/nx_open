@@ -14,8 +14,7 @@
 
 namespace nx::cloud::db::api {
 
-#define SystemRegistrationData_Fields (id)(name)(customization)(opaque)
-NX_REFLECTION_INSTRUMENT(SystemRegistrationData, SystemRegistrationData_Fields)
+NX_REFLECTION_INSTRUMENT(SystemRegistrationData, (id)(name)(customization)(opaque)(organizationId))
 
 // TODO: #akolesnikov Replace this and similar functions with nx::reflect::urlencoded.
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemRegistrationData* const systemData);
@@ -169,11 +168,11 @@ NX_REFLECTION_INSTRUMENT(GetSystemUsersRequest, (systemId)(localOnly))
 
 //-------------------------------------------------------------------------------------------------
 
-NX_REFLECTION_INSTRUMENT(CreateSystemOfferRequest, (toAccount)(systemId)(comment))
+NX_REFLECTION_INSTRUMENT(CreateSystemOfferRequest, (toAccount)(organizationId)(systemId)(comment))
 
 NX_REFLECTION_INSTRUMENT_ENUM(OfferStatus, offered, accepted, rejected)
 
-NX_REFLECTION_INSTRUMENT(SystemOffer, (fromAccount)(toAccount)(systemId)(systemName)(comment)(status))
+NX_REFLECTION_INSTRUMENT(SystemOffer, (fromAccount)(toAccount)(organizationId)(systemId)(systemName)(comment)(status))
 
 NX_REFLECTION_INSTRUMENT(SystemOfferPatch, (comment)(status))
 

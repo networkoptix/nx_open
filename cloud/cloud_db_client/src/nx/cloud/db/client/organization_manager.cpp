@@ -16,52 +16,37 @@ OrganizationManager::OrganizationManager(AsyncRequestsExecutor* requestsExecutor
 {
 }
 
-void OrganizationManager::bindSystem(
+void OrganizationManager::getSystemOffers(
     const std::string& organizationId,
-    api::SystemRegistrationData registrationData,
-    std::function<void(api::ResultCode, api::SystemData)> completionHandler)
+    std::function<void(api::ResultCode, std::vector<api::SystemOffer>)> completionHandler)
 {
-    if (registrationData.customization.empty())
-        registrationData.customization = nx::branding::customization().toStdString();
-
-    m_requestsExecutor->executeRequest<api::SystemData>(
-        Method::post,
-        rest::substituteParameters(kOrganizationSystemsPath, {organizationId}),
-        std::move(registrationData),
-        std::move(completionHandler));
-}
-
-void OrganizationManager::getSystems(
-    const std::string& organizationId,
-    std::function<void(api::ResultCode, std::vector<api::SystemDataEx>)> completionHandler)
-{
-    m_requestsExecutor->executeRequest<std::vector<api::SystemDataEx>>(
+    m_requestsExecutor->executeRequest<std::vector<api::SystemOffer>>(
         Method::get,
-        rest::substituteParameters(kOrganizationSystemsPath, {organizationId}),
+        rest::substituteParameters(kOrganizationSystemOwnershipOffers, {organizationId}),
         std::move(completionHandler));
 }
 
-void OrganizationManager::removeSystem(
+void OrganizationManager::acceptOffer(
     const std::string& organizationId,
     const std::string& systemId,
     std::function<void(api::ResultCode)> completionHandler)
 {
     m_requestsExecutor->executeRequest<void>(
-        Method::delete_,
-        rest::substituteParameters(kOrganizationSystemPath, {organizationId, systemId}),
+        Method::post,
+        rest::substituteParameters(kOrganizationSystemOwnershipOfferAccept,
+            {organizationId, systemId}),
         std::move(completionHandler));
 }
 
-void OrganizationManager::shareSystem(
+void OrganizationManager::rejectOffer(
     const std::string& organizationId,
     const std::string& systemId,
-    const api::ShareSystemRequest& request,
-    std::function<void(api::ResultCode, api::SystemSharing)> completionHandler)
+    std::function<void(api::ResultCode)> completionHandler)
 {
-    m_requestsExecutor->executeRequest<api::SystemSharing>(
+    m_requestsExecutor->executeRequest<void>(
         Method::post,
-        rest::substituteParameters(kOrganizationSystemUsersPath, {organizationId, systemId}),
-        request,
+        rest::substituteParameters(kOrganizationSystemOwnershipOfferReject,
+            {organizationId, systemId}),
         std::move(completionHandler));
 }
 

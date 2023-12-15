@@ -5,9 +5,9 @@
 #include <nx/network/http/http_client.h>
 #include <nx/network/http/rest/http_rest_client.h>
 
-namespace nx::cloud::cps {
+#include "api/request_paths.h"
 
-static constexpr char kSystemBindToOrganizationPath[] = "/partners/cloud_systems/";
+namespace nx::cloud::cps {
 
 ApiResultCodeDescriptor::ResultCode ApiResultCodeDescriptor::systemErrorCodeToResultCode(
     SystemError::ErrorCode systemErrorCode)
@@ -32,8 +32,10 @@ ApiResultCodeDescriptor::ResultCode ApiResultCodeDescriptor::getResultCodeFromRe
     switch (response.statusLine.statusCode)
     {
         case StatusCode::unauthorized:
-        case StatusCode::forbidden:
             return ResultCode::notAuthorized;
+
+        case StatusCode::forbidden:
+            return ResultCode::forbidden;
 
         case StatusCode::notFound:
             return ResultCode::notFound;
@@ -49,11 +51,11 @@ ApiResultCodeDescriptor::ResultCode ApiResultCodeDescriptor::getResultCodeFromRe
 
 ChannelPartnerClient::ChannelPartnerClient(
     const std::string& cloudHost,
-    const nx::utils::Url& baseMediatorApiUrl)
+    const nx::utils::Url& baseApiUrl)
     :
-    base_type(baseMediatorApiUrl, nx::network::ssl::kDefaultCertificateCheck),
-    m_cloudHost(cloudHost)
+    base_type(baseApiUrl, nx::network::ssl::kDefaultCertificateCheck)
 {
+    httpClientOptions().addAdditionalHeader("cloud-host", cloudHost);
 }
 
 ChannelPartnerClient::~ChannelPartnerClient()
@@ -63,15 +65,45 @@ ChannelPartnerClient::~ChannelPartnerClient()
 
 void ChannelPartnerClient::bindSystemToOrganization(
     api::SystemRegistrationRequest data,
-    nx::utils::MoveOnlyFunc<void(
-        ResultCode, api::SystemRegistrationResponse)> completionHandler)
+    nx::utils::MoveOnlyFunc<void(api::ResultCode, api::SystemRegistrationResponse)> handler)
 {
-    httpClientOptions().addAdditionalHeader("cloud-host", m_cloudHost);
     base_type::template makeAsyncCall<api::SystemRegistrationResponse>(
         nx::network::http::Method::post,
-        kSystemBindToOrganizationPath,
+        api::kSystemBindToOrganizationPath,
         std::move(data),
-        std::move(completionHandler));
+        std::move(handler));
+}
+
+void ChannelPartnerClient::getSystemUser(
+    const std::string& systemId,
+    const std::string& email,
+    nx::utils::MoveOnlyFunc<void(api::ResultCode, api::User)> handler)
+{
+    base_type::template makeAsyncCall<api::User>(
+        nx::network::http::Method::get,
+        nx::network::http::rest::substituteParameters(
+            api::kInternalSystemUserPath, {systemId, email}),
+        std::move(handler));
+}
+
+void ChannelPartnerClient::getSystemUsers(
+    const std::string& systemId,
+    nx::utils::MoveOnlyFunc<void(api::ResultCode, std::vector<api::User>)> handler)
+{
+    base_type::template makeAsyncCall<std::vector<api::User>>(
+        nx::network::http::Method::get,
+        nx::network::http::rest::substituteParameters(api::kInternalSystemUsersPath, {systemId}),
+        std::move(handler));
+}
+
+void ChannelPartnerClient::getUserSystems(
+    const std::string& email,
+    nx::utils::MoveOnlyFunc<void(api::ResultCode, std::vector<api::SystemAllowance>)> handler)
+{
+    base_type::template makeAsyncCall<std::vector<api::SystemAllowance>>(
+        nx::network::http::Method::get,
+        nx::network::http::rest::substituteParameters(api::kInternalUserSystemsPath, {email}),
+        std::move(handler));
 }
 
 } // namespace nx::cloud::cps

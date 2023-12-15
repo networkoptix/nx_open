@@ -243,7 +243,7 @@ void SystemManager::offerSystem(
 {
     m_requestsExecutor->executeRequest</*Reply*/ void>(
         nx::network::http::Method::post,
-        kSystemOwnershipOffers,
+        nx::network::http::rest::substituteParameters(kOfferSystemOwnership, {request.systemId}),
         request,
         std::move(completionHandler));
 }
@@ -256,8 +256,8 @@ void SystemManager::acceptSystemOffer(
     request.status = api::OfferStatus::accepted;
 
     m_requestsExecutor->executeRequest</*Reply*/ void>(
-        nx::network::http::Method::put,
-        nx::network::http::rest::substituteParameters(kSystemOwnershipOffer, {systemId}),
+        nx::network::http::Method::post,
+        nx::network::http::rest::substituteParameters(kSystemOwnershipOfferAccept, {systemId}),
         std::move(request),
         std::move(completionHandler));
 }
@@ -270,8 +270,8 @@ void SystemManager::rejectSystemOffer(
     request.status = api::OfferStatus::rejected;
 
     m_requestsExecutor->executeRequest</*Reply*/ void>(
-        nx::network::http::Method::put,
-        nx::network::http::rest::substituteParameters(kSystemOwnershipOffer, {systemId}),
+        nx::network::http::Method::post,
+        nx::network::http::rest::substituteParameters(kSystemOwnershipOfferReject, {systemId}),
         std::move(request),
         std::move(completionHandler));
 }
@@ -282,7 +282,7 @@ void SystemManager::deleteSystemOffer(
 {
     m_requestsExecutor->executeRequest</*Reply*/ void>(
         nx::network::http::Method::delete_,
-        nx::network::http::rest::substituteParameters(kSystemOwnershipOffer, {systemId}),
+        nx::network::http::rest::substituteParameters(kOfferSystemOwnership, {systemId}),
         std::move(completionHandler));
 }
 
