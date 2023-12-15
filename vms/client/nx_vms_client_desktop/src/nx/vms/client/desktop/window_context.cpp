@@ -7,6 +7,7 @@
 #include <QtCore/QPointer>
 
 #include <nx/vms/client/desktop/system_tab_bar/system_tab_bar_model.h>
+#include <ui/widgets/main_window.h>
 #include <ui/workbench/extensions/workbench_stream_synchronizer.h>
 #include <ui/workbench/watchers/workbench_layout_aspect_ratio_watcher.h>
 #include <ui/workbench/watchers/workbench_render_watcher.h>
@@ -67,6 +68,16 @@ QnWorkbenchStreamSynchronizer* WindowContext::streamSynchronizer() const
 SystemTabBarModel* WindowContext::systemTabBarModel() const
 {
     return d->systemTabBarModel.get();
+}
+
+QQuickWindow* WindowContext::quickWindow() const
+{
+    // Eventually main window would itself be QQuickWindow, but for now just use the one which
+    // always exists in both desktop and videowall modes.
+    if (const auto mainWindow = qobject_cast<MainWindow*>(mainWindowWidget()))
+        return mainWindow->quickWindow();
+
+    return nullptr;
 }
 
 } // namespace nx::vms::client::desktop

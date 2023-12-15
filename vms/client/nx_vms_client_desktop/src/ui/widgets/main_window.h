@@ -13,6 +13,7 @@
 
 class QBoxLayout;
 class QStackedLayout;
+class QQuickWindow;
 
 class QnGraphicsScene;
 class QnGraphicsView;
@@ -76,6 +77,9 @@ public:
     bool handleKeyPress(int key);
 
     bool isSystemTabBarUpdating();
+
+    /** Returns QQuickWindow for resource browser widget. */
+    QQuickWindow* quickWindow() const;
 
 public slots:
     bool handleOpenFile(const QString &message);

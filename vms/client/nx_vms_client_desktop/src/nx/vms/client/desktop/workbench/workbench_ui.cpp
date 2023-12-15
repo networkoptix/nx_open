@@ -1695,6 +1695,14 @@ void WorkbenchUi::createFpsWidget()
     setDebugInfoVisible(ini().developerMode);
 }
 
+QQuickWindow* WorkbenchUi::quickWindow() const
+{
+    if (const auto resourceTree = qobject_cast<ResourceTreeWorkbenchPanel*>(m_leftPanel))
+        return resourceTree->widget->quickWindow();
+
+    return nullptr;
+}
+
 #pragma endregion Fps widget methods
 
 } // namespace nx::vms::client::desktop
