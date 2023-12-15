@@ -92,7 +92,7 @@ public:
     virtual void saveCloudUserOfSystem(
         const std::string& systemId,
         const api::SystemSharing& userData,
-        std::function<void(api::ResultCode)> completionHandler) = 0;
+        std::function<void(api::ResultCode, api::SystemSharing)> completionHandler) = 0;
 
     /**
      * Returns list of access roles which can be used to share system systemId.
