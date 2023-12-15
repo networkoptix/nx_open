@@ -109,16 +109,20 @@ bool userLessThan(const QModelIndex& left, const QModelIndex& right, int sortCol
 // .primary = light10, .secondary = light4
 static const core::SvgIconColorer::ThemeSubstitutions kEnabledUncheckedIconSubstitutions = {
     {QIcon::Normal, {.primary = "light10", .secondary = "light4"}},
-    {QIcon::Selected, {.primary = "light4", .secondary = "light2"}}};
+    {QIcon::Active, {.primary = "light10", .secondary = "light4"}},
+    {QIcon::Selected, {.primary = "light10", .secondary = "light4"}}};
 static const core::SvgIconColorer::ThemeSubstitutions kEnabledCheckedIconSubstitutions = {
-    {QIcon::Normal, {.primary = "light2", .secondary = "light1"}},
-    {QIcon::Selected, {.primary = "light4", .secondary = "light2"}}};
+    {QIcon::Normal, {.primary = "light4", .secondary = "light1"}},
+    {QIcon::Active, {.primary = "light4", .secondary = "light1"}},
+    {QIcon::Selected, {.primary = "light2", .secondary = "light1"}}};
 static const core::SvgIconColorer::ThemeSubstitutions kDisabledUncheckedIconSubstitutions = {
-    {QIcon::Normal, {.primary = "light10", .secondary = "light4", .alpha = 0.3}},
-    {QIcon::Selected, {.primary = "light4", .secondary = "light2", .alpha = 0.3}}};
+    {QIcon::Normal, {.primary = "dark16", .secondary = "light13"}},
+    {QIcon::Active, {.primary = "dark16", .secondary = "light13"}},
+    {QIcon::Selected, {.primary = "light13", .secondary = "light7"}}};
 static const core::SvgIconColorer::ThemeSubstitutions kDisabledCheckedIconSubstitutions = {
-    {QIcon::Normal, {.primary = "light2", .secondary = "light1", .alpha = 0.3}},
-    {QIcon::Selected, {.primary = "light4", .secondary = "light2", .alpha = 0.3}}};
+    {QIcon::Normal, {.primary = "light13", .secondary = "light7"}},
+    {QIcon::Active, {.primary = "light13", .secondary = "light7"}},
+    {QIcon::Selected, {.primary = "light10", .secondary = "light4"}}};
 
 } // namespace
 
