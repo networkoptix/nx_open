@@ -654,7 +654,10 @@ void LicenseManagerWidget::handleWidgetStateChange()
         }
 
         if (body.key.isEmpty())
+        {
+            ui->licenseWidget->setState(QnLicenseWidget::Normal);
             return;
+        }
     }
 
     const auto isActivatedAlready = std::any_of(
