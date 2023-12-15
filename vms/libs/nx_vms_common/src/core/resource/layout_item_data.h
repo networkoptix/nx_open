@@ -30,7 +30,6 @@ struct NX_VMS_COMMON_API LayoutItemData
     bool controlPtz = false;
     bool displayAnalyticsObjects = false;
     bool displayRoi = true;
-    QColor frameDistinctionColor;
     nx::vms::api::ImageCorrectionData contrastParams;
     nx::vms::api::dewarping::ViewData dewarpingParams;
     bool displayHotspots = false;
@@ -50,7 +49,6 @@ NX_REFLECTION_INSTRUMENT(LayoutItemData,
     (controlPtz)
     (displayAnalyticsObjects)
     (displayRoi)
-    (frameDistinctionColor)
     (contrastParams)
     (dewarpingParams)
     (displayHotspots))
