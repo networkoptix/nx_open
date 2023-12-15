@@ -123,9 +123,9 @@ void SystemManager::getCloudUsersOfSystem(
 void SystemManager::saveCloudUserOfSystem(
     const std::string& systemId,
     const api::SystemSharing& userData,
-    std::function<void(api::ResultCode)> completionHandler)
+    std::function<void(api::ResultCode, api::SystemSharing)> completionHandler)
 {
-    m_requestsExecutor->executeRequest</*Output*/ void>(
+    m_requestsExecutor->executeRequest<api::SystemSharing>(
         nx::network::http::Method::post,
         nx::network::http::rest::substituteParameters(kSystemUsersPath, {systemId}),
         userData,
