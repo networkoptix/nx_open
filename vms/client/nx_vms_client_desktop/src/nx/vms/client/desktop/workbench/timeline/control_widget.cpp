@@ -58,6 +58,9 @@ bool paintButtonFunction(QPainter* painter, const QStyleOption* /*option*/, cons
 
 // TODO: @pprivalov Remove this old fashioned color substitutions when figma plugin is ready.
 static const QColor kBasePrimaryColor = "#ffffff";
+static const QColor kThumbnailsColor = "#e1e7ea";
+static const QColor kSoundColor = "#A5B7C0";
+static const QColor kUnmuteColor = "#698796";
 static const QColor kBackgroundColor = "#212A2F";
 static const QColor kCheckedColor = "#171C1F";
 
@@ -65,16 +68,31 @@ static const QColor kCheckedColor = "#171C1F";
 const core::SvgIconColorer::IconSubstitutions kNavigationIconSubstitutions =
 {
     { QnIcon::Normal, {
+        { kBasePrimaryColor, "light1"},
+        { kThumbnailsColor, "light4"},
+        { kSoundColor, "light10"},
+        { kUnmuteColor, "light16"},
         { kBackgroundColor, "dark7"},
     }},
     { QnIcon::Disabled, {
         { kBasePrimaryColor, "dark11"},
+        { kThumbnailsColor, "light11"},
+        { kSoundColor, "light10"},
+        { kUnmuteColor, "light16"},
         { kBackgroundColor, "dark6" },
     }},
     { QnIcon::Active, {  //< Hovered
+        { kBasePrimaryColor, "light1"},
+        { kThumbnailsColor, "light4"},
+        { kSoundColor, "light10"},
+        { kUnmuteColor, "light16"},
         { kBackgroundColor, "dark8" },
     }},
     { QnIcon::Pressed, {
+        { kBasePrimaryColor, "light1"},
+        { kThumbnailsColor, "light4"},
+        { kSoundColor, "light10"},
+        { kUnmuteColor, "light16"},
         { kBackgroundColor, "dark5"},
     }},
 };
@@ -83,19 +101,34 @@ const core::SvgIconColorer::IconSubstitutions kNavigationIconSubstitutions =
 const core::SvgIconColorer::IconSubstitutions kNavigationIconCheckedSubstitutions =
 {
     { QnIcon::Normal, {
+        { kBasePrimaryColor, "light1"},
+        { kThumbnailsColor, "light4"},
+        { kSoundColor, "light10"},
+        { kUnmuteColor, "light16"},
         { kBackgroundColor, "dark7"},
         { kCheckedColor, "green_l3"},
     }},
     { QnIcon::Disabled, {
         { kBasePrimaryColor, "dark11"},
+        { kThumbnailsColor, "light4"},
+        { kSoundColor, "light10"},
+        { kUnmuteColor, "light16"},
         { kBackgroundColor, "dark6" },
         { kCheckedColor, "green_l3"},
     }},
     { QnIcon::Active, {  //< Hovered
+        { kBasePrimaryColor, "light1"},
+        { kThumbnailsColor, "light4"},
+        { kSoundColor, "light10"},
+        { kUnmuteColor, "light16"},
         { kBackgroundColor, "dark8" },
         { kCheckedColor, "green_l3"},
     }},
     { QnIcon::Pressed, {
+        { kBasePrimaryColor, "light1"},
+        { kThumbnailsColor, "light4"},
+        { kSoundColor, "light10"},
+        { kUnmuteColor, "light16"},
         { kBackgroundColor, "dark5"},
         { kCheckedColor, "green_l3"},
     }},

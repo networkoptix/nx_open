@@ -9,12 +9,8 @@
 #include <QtGui/QColor>
 #include <QtQml/QtQml>
 
-#include <utils/common/hash.h>
-
-#include <utils/math/color_transformations.h>
-
 #include <nx/utils/log/log.h>
-#include <nx/utils/qt_helpers.h>
+#include <nx/vms/client/core/ini.h>
 #include <utils/common/hash.h>
 #include <utils/math/color_transformations.h>
 
@@ -22,6 +18,167 @@
 #include "icon.h"
 
 namespace nx::vms::client::core {
+
+namespace {
+
+QStringList kThemeSpecificColors = {
+    "red", "red_l", "red_d", "red_bg",
+    "blue", "blue_l", "blue_d",
+    "green", "green_l", "green_d",
+    "yellow", "yellow_l", "yellow_d"
+};
+
+QString basicColorsFileName()
+{
+    return ":/skin/basic_colors.json";
+}
+
+QString skinColorsFileName()
+{
+    QString scheme = ini().colorTheme;
+
+    if (scheme == "dark_blue")
+        return ":/skin/dark_blue.json";
+
+    if (scheme == "dark_green")
+        return ":/skin/dark_green.json";
+
+    if (scheme == "dark_orange")
+        return ":/skin/dark_orange.json";
+
+    if (scheme == "gray_orange")
+        return ":/skin/gray_orange.json";
+
+    if (scheme == "gray_white")
+        return ":/skin/gray_white.json";
+
+    // Default. Return skin colors.
+    return ":/skin/skin_colors.json";
+}
+
+QColor parseColor(const QString& value)
+{
+    if (value.startsWith('#'))
+        return QColor::fromString(value);
+
+    // TODO: Support HSL.
+
+    return {};
+}
+
+void initializeThemeSpecificColors(QJsonObject* object)
+{
+    static const QString kDarkTheme = "dark_theme";
+    static const QString kLightTheme = "light_theme";
+
+    // Early return on unit tests.
+    if (!object->contains(kDarkTheme) || !object->contains(kLightTheme))
+        return;
+
+    const auto theme = ini().invertColors ? kLightTheme : kDarkTheme;
+    for (const auto& color: kThemeSpecificColors)
+        object->insert(color, QString("%1.%2").arg(theme, color));
+}
+
+QJsonObject generatedAbsoluteColors(const ColorTree& tree)
+{
+    QJsonObject result;
+    auto colors = tree.getRootColors();
+
+    for (int i = 0; i < 18; ++i)
+    {
+        auto dark = colors[QString("dark%1").arg(i + 1)];
+        auto light = colors[QString("light%1").arg(i + 1)];
+
+        // Some unit tests don't have dark&light colors in the color scheme.
+        if (!dark.isValid() || !light.isValid())
+            continue;
+
+        // Original colors that could be used for Widgets that should always display light text.
+        result.insert(QString("@dark%1").arg(i + 1), dark.name());
+        result.insert(QString("@light%1").arg(i + 1), light.name());
+
+        if (ini().invertColors)
+            qSwap(dark, light);
+
+        result.insert(QString("dark%1").arg(i + 1), dark.name());
+        result.insert(QString("light%1").arg(i + 1), light.name());
+    }
+
+    return result;
+}
+
+QJsonObject generatedColorScheme()
+{
+    const auto kBrandStep = 0.05;
+
+    QJsonObject result;
+    // TODO: Fill @dark and @light color values for the standard themes.
+
+    auto primary = parseColor(ini().primaryColor);
+    auto background = parseColor(ini().backgroundColor);
+
+    if (!primary.isValid())
+        return result;
+
+    const auto pH = primary.hslHueF();
+    const auto pS = primary.hslSaturationF();
+    const auto pL = primary.lightnessF();
+
+    auto brand_core = QColor::fromHslF(pH, pS, pL);
+    auto brand_dark = QColor::fromHslF(pH, pS, pL - kBrandStep);
+    auto brand_light = QColor::fromHslF(pH, pS, pL + kBrandStep);
+
+    result.insert("brand_core", brand_core.name());
+    for (int i = 1; i <= 7; ++i)
+        result.insert(QString("brand_d%1").arg(i), brand_dark.name());
+    for (int i = 1; i <= 4; ++i)
+        result.insert(QString("brand_l%1").arg(i), brand_light.name());
+
+    const auto bH = background.isValid() ? background.hslHueF() : pH;
+    const auto bS = qBound(0., ini().backgroundSaturation, 1.);
+
+    const auto darkStep = qBound(0., ini().darkStep, 0.06);
+    const auto lightStep = qBound(0., ini().lightStep, 0.06);
+
+    const bool isRainbow = ini().colorTheme == QString("rainbow");
+
+    for (int i = 0; i < 18; ++i)
+    {
+        QColor dark, light;
+        if (isRainbow)
+        {
+            dark = QColor::fromHslF(i / 18., 0.25, 0.25);
+            light = QColor::fromHslF(1 - (i / 18.), 0.75, 0.75);
+        }
+        else
+        {
+            dark = QColor::fromHslF(bH, bS, darkStep * i);
+            light = QColor::fromHslF(bH, bS, 1 - lightStep * i);
+        }
+
+        // Original colors that could be used for Widgets that should always display light text.
+        result.insert(QString("@dark%1").arg(i + 1), dark.name());
+        result.insert(QString("@light%1").arg(i + 1), light.name());
+
+        if (ini().invertColors)
+            qSwap(dark, light);
+
+        result.insert(QString("dark%1").arg(i + 1), dark.name());
+        result.insert(QString("light%1").arg(i + 1), light.name());
+    }
+
+//    QStringList lst;
+//    for (auto it = result.begin(); it != result.end(); ++it)
+//    {
+//        lst << QString("    \"%1\":       \"%2\",").arg(it.key(), it.value().toString());
+//    }
+//    qDebug() << "\n" << lst.join("\n").toStdString().c_str();
+
+    return result;
+}
+
+} // namespace
 
 static ColorTheme* s_instance = nullptr;
 
@@ -64,10 +221,24 @@ void ColorTheme::Private::loadColors(const QString& mainColorsFile, const QStrin
 
     ColorTree baseColorTree = reader.getColorTree();
 
-    const QJsonObject currentSkinColors = readColorDataFromFile(skinColorsFile);
+    QJsonObject currentSkinColors = readColorDataFromFile(skinColorsFile);
+    initializeThemeSpecificColors(&currentSkinColors);
     reader.addColors(currentSkinColors);
 
     ColorTree actualColorTree = reader.getColorTree();
+
+    // A quick fix, since MessageBars explicitly use red_bg color now.
+    if (!actualColorTree.getRootColors().contains("red_bg"))
+        reader.addColors({{"red_bg", actualColorTree.getRootColors().value("red_d3").name()}});
+
+    const QJsonObject generatedColors =
+        QStringList{"rainbow", "generated"}.contains(ini().colorTheme)
+            ? generatedColorScheme()
+            : generatedAbsoluteColors(actualColorTree);
+    reader.addColors(generatedColors);
+
+    // That looks a bit strange.
+    actualColorTree = reader.getColorTree();
 
     colorTree = actualColorTree.toVariantMap();
     colorsByPath = actualColorTree.colorsByPath();
@@ -117,7 +288,7 @@ void ColorTheme::Private::initIconCustomizations()
 // ColorTheme
 
 ColorTheme::ColorTheme(QObject* parent):
-    ColorTheme(":/skin/basic_colors.json", ":/skin/skin_colors.json")
+    ColorTheme(basicColorsFileName(), skinColorsFileName())
 {
 }
 
