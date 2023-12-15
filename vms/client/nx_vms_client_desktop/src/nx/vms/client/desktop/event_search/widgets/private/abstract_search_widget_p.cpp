@@ -381,10 +381,9 @@ void AbstractSearchWidget::Private::setupViewportHeader()
     updateInformationToolTip();
 
     m_togglePreviewsButton->setChecked(ui->ribbon->previewsEnabled());
-    m_togglePreviewsButton->setIcon(qnSkin->icon("text_buttons/image_20.svg",
+    m_togglePreviewsButton->setIcon(qnSkin->icon("text_buttons/image_20x20.svg",
         kIconSubstitutions,
-        "text_buttons/image_20.svg",
-        kCheckedIconSubstitutions));
+        "text_buttons/image_hide_20x20.svg"));
 
     const auto updateThumbnailsToolTip =
         [this]()
