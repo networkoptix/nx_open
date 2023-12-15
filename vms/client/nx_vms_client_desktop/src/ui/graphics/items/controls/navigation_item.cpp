@@ -228,12 +228,13 @@ void QnNavigationItem::createZoomButton(
 
     const auto fileName = QString("slider/buttons/zoom_%1.svg").arg(zoomingName.toLower());
 
-    const QColor background = core::colorTheme()->color("dark6");
-    const QColor foreground = core::colorTheme()->color("light16");
+    const QColor background = "#1c2327";
+    const QColor foreground = "#698796";
     const core::SvgIconColorer::IconSubstitutions substitutions = {
-        { QnIcon::Active, {{ background, "dark7" }}},
-        { QnIcon::Pressed, {{ background, "dark5" }}},
-        { QnIcon::Disabled, {{ foreground, "dark9" }}}
+        { QnIcon::Normal, {{background, "dark6"}, {foreground, "light16"}}},
+        { QnIcon::Active, {{background, "dark7"}, {foreground, "light16"}}},
+        { QnIcon::Pressed, {{background, "dark5"}, {foreground, "light16"}}},
+        { QnIcon::Disabled, {{background, "dark6"}, {foreground, "dark9"}}}
     };
 
     button->setIcon(qnSkin->icon(fileName, "", nullptr, substitutions));

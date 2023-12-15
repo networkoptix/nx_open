@@ -1821,7 +1821,7 @@ void QnTimeSlider::updatePixmapCache()
 {
     QFont localFont(font());
     m_pixmapCache->setDefaultFont(localFont);
-    m_pixmapCache->setDefaultColor(palette().color(QPalette::BrightText));
+    m_pixmapCache->setDefaultColor(core::colorTheme()->color("@light1"));
 
     localFont.setWeight(kDateTextFontWeight);
     m_pixmapCache->setDateFont(localFont);

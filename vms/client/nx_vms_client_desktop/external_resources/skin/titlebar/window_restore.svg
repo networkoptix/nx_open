@@ -2,6 +2,6 @@
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg width="100%" height="100%" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
     <g transform="matrix(1,0,0,1,6,6)">
-        <path d="M8,5C8,4.448 8.448,4 9,4L15,4C15.552,4 16,4.448 16,5L16,11C16,11.552 15.552,12 15,12C14.448,12 14,11.552 14,11L14,6L9,6C8.448,6 8,5.552 8,5ZM6,14L6,10L10,10L10,14L6,14ZM4,9C4,8.448 4.448,8 5,8L11,8C11.552,8 12,8.448 12,9L12,15C12,15.552 11.552,16 11,16L5,16C4.448,16 4,15.552 4,15L4,9Z" style="fill:white;"/>
+        <path d="M8,5C8,4.448 8.448,4 9,4L15,4C15.552,4 16,4.448 16,5L16,11C16,11.552 15.552,12 15,12C14.448,12 14,11.552 14,11L14,6L9,6C8.448,6 8,5.552 8,5ZM6,14L6,10L10,10L10,14L6,14ZM4,9C4,8.448 4.448,8 5,8L11,8C11.552,8 12,8.448 12,9L12,15C12,15.552 11.552,16 11,16L5,16C4.448,16 4,15.552 4,15L4,9Z" fill="#E1E7EA"/>
     </g>
 </svg>
