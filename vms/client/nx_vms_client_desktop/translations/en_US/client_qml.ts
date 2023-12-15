@@ -2591,11 +2591,11 @@ Press Alt + Click to follow object</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>This user’s login duplicates the login of another user. None of them is able to login. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</source>
+        <source>When continuous sync with LDAP server is disabled, user membership in groups does not synchronize automatically. To update this information, initiate a manual sync.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>When continuous sync with LDAP server is disabled, user membership in groups does not synchronize automatically. To update this information, initiate a manual sync.</source>
+        <source>This user’s login duplicates the login of another user. None of them is able to log in. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
