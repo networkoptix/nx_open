@@ -226,53 +226,100 @@
      </widget>
      <widget class="QWidget" name="servicesUsagePage">
       <layout class="QVBoxLayout" name="servicesUsagePageLayout">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
        <item>
-        <widget class="QGroupBox" name="servicesUsageGroupBox">
-         <property name="title">
-          <string>Services Usage</string>
-         </property>
-         <property name="flat">
-          <bool>true</bool>
-         </property>
-         <layout class="QVBoxLayout" name="servicesUsageGroupBoxLayout">
-          <property name="spacing">
-           <number>0</number>
-          </property>
-          <property name="leftMargin">
-           <number>0</number>
-          </property>
-          <property name="topMargin">
-           <number>0</number>
-          </property>
-          <property name="rightMargin">
-           <number>0</number>
-          </property>
-          <property name="bottomMargin">
-           <number>0</number>
-          </property>
+        <widget class="nx::vms::client::desktop::Panel" name="servicesHeaderWidget" native="true">
+         <layout class="QVBoxLayout" name="servicesHeaderLayout">
           <item>
-           <widget class="QTreeView" name="servicesUsageItemView">
-            <property name="focusPolicy">
-             <enum>Qt::NoFocus</enum>
+           <widget class="QLabel" name="saasStateCaptionLabel">
+            <property name="text">
+             <string>Services state</string>
             </property>
-            <property name="showDropIndicator" stdset="0">
-             <bool>false</bool>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="saasStateValueLabel"/>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="Line" name="horizontalLine">
+         <property name="frameShadow">
+          <enum>QFrame::Plain</enum>
+         </property>
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QWidget" name="servicesContentsWidget" native="true">
+         <layout class="QVBoxLayout" name="servicesContentsLayout">
+          <item>
+           <widget class="QGroupBox" name="servicesUsageGroupBox">
+            <property name="title">
+             <string>Services Usage</string>
             </property>
-            <property name="selectionMode">
-             <enum>QAbstractItemView::NoSelection</enum>
+            <property name="flat">
+             <bool>true</bool>
             </property>
-            <property name="rootIsDecorated">
-             <bool>false</bool>
-            </property>
-            <property name="itemsExpandable">
-             <bool>false</bool>
-            </property>
-            <property name="expandsOnDoubleClick">
-             <bool>false</bool>
-            </property>
-            <attribute name="headerStretchLastSection">
-             <bool>false</bool>
-            </attribute>
+            <layout class="QVBoxLayout" name="servicesUsageGroupBoxLayout">
+             <property name="spacing">
+              <number>0</number>
+             </property>
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QTreeView" name="servicesUsageItemView">
+               <property name="focusPolicy">
+                <enum>Qt::NoFocus</enum>
+               </property>
+               <property name="showDropIndicator" stdset="0">
+                <bool>false</bool>
+               </property>
+               <property name="selectionMode">
+                <enum>QAbstractItemView::NoSelection</enum>
+               </property>
+               <property name="rootIsDecorated">
+                <bool>false</bool>
+               </property>
+               <property name="itemsExpandable">
+                <bool>false</bool>
+               </property>
+               <property name="expandsOnDoubleClick">
+                <bool>false</bool>
+               </property>
+               <attribute name="headerStretchLastSection">
+                <bool>false</bool>
+               </attribute>
+              </widget>
+             </item>
+            </layout>
            </widget>
           </item>
          </layout>
@@ -284,6 +331,14 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>nx::vms::client::desktop::Panel</class>
+   <extends>QWidget</extends>
+   <header location="global">nx/vms/client/desktop/common/widgets/panel.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
  <slots>
