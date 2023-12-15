@@ -14,11 +14,15 @@
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/saas/saas_service_manager.h>
 #include <nx/vms/common/saas/saas_service_usage_helper.h>
+#include <ui/common/palette.h>
 
 namespace {
 
 static constexpr QSize kPlaceholderImageSize(64, 64);
 static constexpr int kServiceUsageTableMinimumColumnWidth = 100;
+
+static constexpr auto kSaasStateLabelFontSize = 18;
+static constexpr auto kSaasStateLabelFontWeight = QFont::Medium;
 
 QFont placeholderMessageCaptionFont()
 {
@@ -104,7 +108,16 @@ void SaasInfoWidget::Private::setupPlaceholderPageUi()
 
 void SaasInfoWidget::Private::setupServicesUsagePageUi()
 {
-    ui->servicesUsagePage->setContentsMargins(nx::style::Metrics::kDefaultTopLevelMargins);
+    ui->servicesHeaderWidget->setContentsMargins(nx::style::Metrics::kDefaultTopLevelMargins);
+    ui->servicesContentsWidget->setContentsMargins(nx::style::Metrics::kDefaultTopLevelMargins);
+
+    QFont saasStateLabelFont;
+    saasStateLabelFont.setPixelSize(kSaasStateLabelFontSize);
+    saasStateLabelFont.setWeight(kSaasStateLabelFontWeight);
+    ui->saasStateValueLabel->setFont(saasStateLabelFont);
+
+    const QColor saasStateValueLabelColor(qApp->palette().color(QPalette::Normal, QPalette::BrightText));
+    setPaletteColor(ui->saasStateValueLabel, QPalette::WindowText, saasStateValueLabelColor);
 
     servicesSortModel->setSourceModel(servicesUsageModel.get());
     servicesSortModel->sort(saas::ServicesUsageModel::ServiceNameColumn);
@@ -132,6 +145,16 @@ void SaasInfoWidget::Private::updateUi()
     ui->stackedWidget->setCurrentWidget(hasPurchasedServices
         ? ui->servicesUsagePage
         : ui->placeholderPage);
+
+    QString saasStateLabelText;
+    if (serviceManager->saasActive())
+        saasStateLabelText = tr("Active");
+    else if (serviceManager->saasSuspended())
+        saasStateLabelText = tr("Suspended");
+    else if (serviceManager->saasShutDown())
+        saasStateLabelText = tr("Shut down");
+
+    ui->saasStateValueLabel->setText(saasStateLabelText);
 }
 
 //-------------------------------------------------------------------------------------------------
