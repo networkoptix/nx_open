@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <mfx/mfxvideo.h>
+#include <vpl/mfx.h>
 
 namespace nx::media::quick_sync {
 class QuickSyncVideoDecoderImpl;

@@ -2,7 +2,7 @@
 
 #include "compatibility_cache.h"
 
-#include <mfx/mfxvideo++.h>
+#include <vpl/mfx.h>
 #include <nx/media/utils.h>
 
 #include "quick_sync_video_decoder_impl.h"
@@ -111,7 +111,7 @@ bool CompatibilityCache::tryResolutionCompatibility(AVCodecID codec, int width, 
     param.mfx.FrameInfo.FourCC = MFX_FOURCC_NV12;
 
     MFXVideoSession mfxSession;
-    mfxIMPL impl = MFX_IMPL_AUTO_ANY;
+    mfxIMPL impl = MFX_IMPL_TYPE_HARDWARE;
     mfxVersion version = { {0, 1} };
     mfxStatus status = mfxSession.Init(impl, &version);
     if (status < MFX_ERR_NONE)
