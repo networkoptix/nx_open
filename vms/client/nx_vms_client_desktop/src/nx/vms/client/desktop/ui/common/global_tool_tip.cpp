@@ -129,6 +129,7 @@ public:
     QPoint hoverPos;
     bool enabled = true;
     bool showOnHover = true;
+    bool hovered = false;
     bool stickToItem = false;
     int delayMs = 500;
     int shortDelayMs = 100;
@@ -326,6 +327,7 @@ bool GlobalToolTipAttached::Private::eventFilter(QObject* watched, QEvent* event
         {
             const auto hover = static_cast<QHoverEvent*>(event);
             hoverPos = hover->pos();
+            hovered = event->type() != QEvent::HoverLeave;
 
             // Avoid restarting the tooltip show timer when there is no movement.
             if (event->type() == QEvent::HoverMove && hoverPos == hover->oldPos())
@@ -437,6 +439,8 @@ void GlobalToolTipAttached::setEnabled(bool value)
 
     if (!d->enabled)
         hide();
+    else if (d->hovered && d->showOnHover)
+        show(d->text);
 }
 
 bool GlobalToolTipAttached::showOnHover() const
