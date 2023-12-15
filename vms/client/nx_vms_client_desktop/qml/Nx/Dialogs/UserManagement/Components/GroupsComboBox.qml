@@ -151,7 +151,6 @@ Control
 
             Image
             {
-                opacity: control.enabled ? 0.4 : 1.0
                 anchors
                 {
                     right: parent.right

@@ -78,7 +78,7 @@ void setActionResourcesHolderDisplayFromModel(
 
 static const QColor klight16Color = "#698796";
 static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
-    {QnIcon::Normal, {{klight16Color, "light16"}}},
+    {QnIcon::Normal, {{klight16Color, "light4"}}},
 };
 
 } // namespace
