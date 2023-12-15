@@ -343,4 +343,18 @@ std::string getAttrValueOr(
     return defaultV;
 }
 
+void setAttrValue(
+    AttributesList& attrs, const std::string& name, const std::string& value)
+{
+    for (auto& attr: attrs)
+    {
+        if (attr.name == name)
+        {
+            attr.value = value;
+            return;
+        }
+    }
+    attrs.push_back({name, value});
+}
+
 } // namespace nx::cloud::db::api

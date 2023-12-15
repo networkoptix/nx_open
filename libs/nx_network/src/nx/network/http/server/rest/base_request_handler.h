@@ -58,6 +58,30 @@ public:
     }
 };
 
+/**
+ * Fetches request header with the given name.
+ * If there are multiple headers with the same name present, the first one is returned.
+ */
+template<const char* name>
+class HeaderFetcher
+{
+public:
+    using type = std::optional<std::string>;
+
+    static constexpr std::string_view kName{name};
+
+    type operator()(const network::http::RequestContext& ctx) const
+    {
+        if (auto it = ctx.request.headers.find(kName); it != ctx.request.headers.end())
+            return std::make_optional(it->second);
+        return std::nullopt;
+    }
+};
+
+/**
+ * Fetches the "Host" from the request. If the "Host" header is found and contains hostame only,
+ * it is returned as-is. If "Host" haeder contains host:port, then only "host" portion is provided.
+ */
 class HostHeaderFetcher
 {
 public:

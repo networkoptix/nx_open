@@ -11,11 +11,13 @@ namespace nx::cloud::cps::api {
  */
 struct SystemRegistrationRequest: nx::cloud::db::api::SystemRegistrationData
 {
+    using base_type = nx::cloud::db::api::SystemRegistrationData;
+
     /**%apidoc[opt] Optional organization name. */
     std::string organization;
 };
 
-NX_REFLECTION_INSTRUMENT(SystemRegistrationRequest, SystemRegistrationData_Fields(organization))
+NX_REFLECTION_INSTRUMENT(SystemRegistrationRequest, (organization))
 
 using SystemRegistrationResponse = nx::cloud::db::api::SystemData;
 

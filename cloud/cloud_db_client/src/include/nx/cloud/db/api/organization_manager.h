@@ -19,35 +19,21 @@ public:
     virtual ~OrganizationManager() = default;
 
     /**
-     * Create new system and bind it to organization.
-     * The calling user must the corresponding rights on the organization.
+     * Get the list of system offers either for the organization or by the organization.
      */
-    virtual void bindSystem(
+    virtual void getSystemOffers(
         const std::string& organizationId,
-        SystemRegistrationData registrationData,
-        std::function<void(ResultCode, SystemData)> completionHandler) = 0;
+        std::function<void(ResultCode, std::vector<api::SystemOffer>)> completionHandler) = 0;
 
-    /**
-     * Get all systems bound to the given organization.
-     */
-    virtual void getSystems(
-        const std::string& organizationId,
-        std::function<void(api::ResultCode, std::vector<api::SystemDataEx>)> completionHandler) = 0;
-
-    /**
-     * Remove organization-owned system.
-     * The calling user must the corresponding rights on the organization.
-     */
-    virtual void removeSystem(
+    virtual void acceptOffer(
         const std::string& organizationId,
         const std::string& systemId,
         std::function<void(ResultCode)> completionHandler) = 0;
 
-    virtual void shareSystem(
+    virtual void rejectOffer(
         const std::string& organizationId,
         const std::string& systemId,
-        const api::ShareSystemRequest& sharing,
-        std::function<void(api::ResultCode, api::SystemSharing)> completionHandler) = 0;
+        std::function<void(ResultCode)> completionHandler) = 0;
 };
 
 } // namespace nx::cloud::db::api

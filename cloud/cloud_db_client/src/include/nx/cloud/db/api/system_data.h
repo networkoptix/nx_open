@@ -40,6 +40,8 @@ using AttributesList = std::vector<Attribute>;
 
 std::string getAttrValueOr(
     const AttributesList& attrs, const std::string& name, const std::string& defaultV);
+void setAttrValue(
+    AttributesList& attrs, const std::string& name, const std::string& value);
 
 /**
  * Information required to register system in cloud.
@@ -58,6 +60,9 @@ struct SystemRegistrationData
 
     /**%apidoc Vms-specific data. Transparently stored and returned. */
     std::string opaque;
+
+    /**%apidoc Non-empty if system must be bound to an organization. */
+    std::optional<std::string> organizationId;
 };
 
 /**
@@ -158,14 +163,24 @@ struct SystemData
         return getAttrValueOr(attributes, "ownerAccountEmail", std::string());
     }
 
-    std::string ownerFullName() const
+    void setOwnerAccountEmail(const std::string& value)
     {
-        return getAttrValueOr(attributes, "ownerFullName", std::string());
+        setAttrValue(attributes, "ownerAccountEmail", value);
     }
 
     std::string organizationId() const
     {
         return getAttrValueOr(attributes, "organizationId", std::string());
+    }
+
+    void setOrganizationId(const std::string& value)
+    {
+        setAttrValue(attributes, "organizationId", value);
+    }
+
+    std::string ownerFullName() const
+    {
+        return getAttrValueOr(attributes, "ownerFullName", std::string());
     }
 };
 
@@ -340,6 +355,12 @@ struct ShareSystemRequest
 
 NX_REFLECTION_INSTRUMENT(ShareSystemRequest, (accountEmail)(roleIds)(permissions)(isEnabled)(vmsUserId))
 
+NX_REFLECTION_ENUM_CLASS(UserType,
+    system,
+    organization,
+    channel_partner
+)
+
 /**
  * Describes an account to system relation.
  */
@@ -362,6 +383,18 @@ struct SystemSharing: ShareSystemRequest
     /**%apidoc UTC time of the last login of user to the system. */
     std::chrono::system_clock::time_point lastLoginTime;
 
+    /**%apidoc User type. User may come from different sources: organization, channel partner,
+     * the system itself. This field provides lets to find out how the user gained access
+     * to the system.
+     */
+    api::UserType type = api::UserType::system;
+
+    /**%apidoc Indicates that the user record is readonly and cannot be affected via API. */
+    std::optional<bool> readonly;
+
+    // Internal attribute. Gives a hint to the UI whether to show the user in the list or not.
+    std::optional<bool> hidden;
+
     bool operator==(const SystemSharing& rhs) const
     {
         return std::tie(static_cast<const base_type&>(*this), systemId, accountId, accountFullName)
@@ -378,10 +411,10 @@ struct SystemSharing: ShareSystemRequest
 };
 
 #define SystemSharing_Fields (systemId)(accountId)(accountFullName)(usageFrequency)(lastLoginTime) \
-    (accountEmail)(roleIds)(permissions)(isEnabled)(vmsUserId)
+    (accountEmail)(roleIds)(permissions)(isEnabled)(vmsUserId)(type)(readonly)(hidden)
 
 NX_REFLECTION_INSTRUMENT(SystemSharing, (systemId)(accountId)(accountFullName)(usageFrequency) \
-    (lastLoginTime))
+    (lastLoginTime)(type)(readonly)(hidden))
 
 using SystemSharingList = std::vector<SystemSharing>;
 
@@ -454,6 +487,12 @@ struct SystemDataEx: SystemData
     /**%apidoc Access role of the entity (usually, an account) that requested the system information. */
     SystemAccessRole accessRole = SystemAccessRole::none;
 
+    /**%apidoc List of roles assigned to the user who requested this system info. */
+    std::vector<std::string> roleIds;
+
+    /**%apidoc List of permissions assigned to the user who requested this system info. */
+    std::vector<std::string> permissions;
+
     SystemHealth stateOfHealth = SystemHealth::offline;
 
     /**%apidoc
@@ -487,7 +526,8 @@ struct SystemDataEx: SystemData
 // will not been seen anywhere SystemDataEx type is used.
 // TODO: #akolesnikov Move NX_REFLECTION_INSTRUMENT for other types here as well.
 NX_REFLECTION_INSTRUMENT(SystemDataEx,
-    (accessRole)(stateOfHealth)(usageFrequency)(lastLoginTime)(mergeInfo)(capabilities)(version))
+    (accessRole)(roleIds)(permissions)(stateOfHealth)(usageFrequency)(lastLoginTime)(mergeInfo) \
+    (capabilities)(version))
 
 // Providing custom JSON serialization functions so that SystemDataEx::attributes are added on the
 // same level with other fields in the resulting JSON document.
@@ -533,6 +573,9 @@ struct UserSessionDescriptor
     std::optional<std::string> systemId;
 };
 
+//-------------------------------------------------------------------------------------------------
+// Merge.
+
 struct MergeRequest
 {
     /**%apidoc The system to merge to another system. This is the System that disappears
@@ -551,6 +594,53 @@ struct MergeRequest
       */
     std::optional<std::string> slaveSystemAccessToken;
 };
+
+NX_REFLECTION_ENUM_CLASS(VmsServerMergeStatus,
+
+    /**%apidoc Merge success. */
+    success,
+
+    /**%apidoc Server is not merged because it was offline when merge is started. */
+    offline,
+
+    /**%apidoc Server is not merged because /api/configure returns error. */
+    networkError,
+
+    /**%apidoc Server reported unrecognized status. */
+    unknown
+)
+
+/**%apidoc VMS server merge attempt result. */
+struct VmsServerMergeResult
+{
+    /**%apidoc id of VMS server. */
+    std::string serverId;
+
+    /**%apidoc Server name. */
+    std::string serverName;
+
+    /**%apidoc Server merge status. */
+    VmsServerMergeStatus status = VmsServerMergeStatus::success;
+
+    /**%apidoc Human-readable error message. */
+    std::string errorText;
+
+    bool operator==(const VmsServerMergeResult&) const = default;
+};
+
+NX_REFLECTION_INSTRUMENT(VmsServerMergeResult, (serverId)(serverName)(status)(errorText))
+
+struct MergeReply
+{
+    /**%apidoc The list of VMS servers of the slave system that could not be merged into the
+     * target system.
+     */
+    std::vector<VmsServerMergeResult> failedServers;
+};
+
+NX_REFLECTION_INSTRUMENT(MergeReply, (failedServers))
+
+//-------------------------------------------------------------------------------------------------
 
 enum class FilterField
 {
@@ -607,10 +697,16 @@ NX_REFLECTION_INSTRUMENT(DataSyncSettings, (onlineStatusExpirationPeriodMs) \
 
 struct CreateSystemOfferRequest
 {
-    /**%apidoc The account the system is offered to. */
-    std::string toAccount;
+    /**%apidoc The account email to offer the system to. Cannot be present simultaneously with
+     * organizationId.
+     */
+    std::optional<std::string> toAccount;
 
-    /**%apidoc ID of offered system. */
+    /**%apidoc The organization to offer the system to. Cannot be present simultaneously with
+     * toAccount.
+     */
+    std::optional<std::string> organizationId;
+
     std::string systemId;
 
     /**%apidoc Any text. */
@@ -631,8 +727,15 @@ struct SystemOffer
      */
     std::string fromAccount;
 
-    /**%apidoc The account the system has been offered to. */
-    std::string toAccount;
+    /**%apidoc The account the system has been offered to. Cannot be present simultaneously
+     * with organizationId.
+     */
+    std::optional<std::string> toAccount;
+
+    /**%apidoc The organization the system has been offered to. Cannot be present simultaneously
+     * with toAccount.
+     */
+    std::optional<std::string> organizationId;
 
     /**%apidoc Guess what. */
     std::string systemId;

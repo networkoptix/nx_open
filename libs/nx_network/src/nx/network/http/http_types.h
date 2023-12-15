@@ -233,7 +233,9 @@ enum Value: int
     accepted = 202,
     noContent = 204,
     partialContent = 206,
+    multiStatus = 207,
     lastSuccessCode = 299,
+
     multipleChoices = 300,
     movedPermanently = 301,
     movedTemporarily = 302,
@@ -625,7 +627,8 @@ public:
 NX_REFLECTION_ENUM_CLASS(AuthType,
     authBasicAndDigest,
     authDigest,
-    authBasic
+    authBasic,
+    authBearer
 )
 
 /** Contains HTTP header structures. */

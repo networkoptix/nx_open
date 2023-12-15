@@ -13,25 +13,19 @@ class OrganizationManager:
 public:
     OrganizationManager(AsyncRequestsExecutor* requestsExecutor);
 
-    virtual void bindSystem(
+    virtual void getSystemOffers(
         const std::string& organizationId,
-        api::SystemRegistrationData registrationData,
-        std::function<void(api::ResultCode, api::SystemData)> completionHandler) override;
+        std::function<void(api::ResultCode, std::vector<api::SystemOffer>)> completionHandler) override;
 
-    virtual void getSystems(
-        const std::string& organizationId,
-        std::function<void(api::ResultCode, std::vector<api::SystemDataEx>)> completionHandler) override;
-
-    virtual void removeSystem(
+    virtual void acceptOffer(
         const std::string& organizationId,
         const std::string& systemId,
         std::function<void(api::ResultCode)> completionHandler) override;
 
-    virtual void shareSystem(
+    virtual void rejectOffer(
         const std::string& organizationId,
         const std::string& systemId,
-        const api::ShareSystemRequest& request,
-        std::function<void(api::ResultCode, api::SystemSharing)> completionHandler) override;
+        std::function<void(api::ResultCode)> completionHandler) override;
 
 private:
     AsyncRequestsExecutor* m_requestsExecutor = nullptr;

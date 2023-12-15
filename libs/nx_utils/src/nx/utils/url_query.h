@@ -28,6 +28,8 @@ class NX_UTILS_API UrlQuery
 {
 public:
     UrlQuery(const QString& query = QString());
+    UrlQuery(const std::string_view& str);
+    UrlQuery(const char* str);
     explicit UrlQuery(const QUrlQuery& query): m_query(query){};
 
     template<
