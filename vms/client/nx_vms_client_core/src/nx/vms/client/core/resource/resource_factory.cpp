@@ -22,8 +22,9 @@ QnUserResourcePtr ResourceFactory::createUser(
     auto clientSystemContext = dynamic_cast<SystemContext*>(systemContext);
     if (NX_ASSERT(clientSystemContext))
     {
+        // On the client side due to queued connections slot may be handled after disconnect.
         const auto connection = clientSystemContext->connection();
-        if (NX_ASSERT(connection))
+        if (connection)
         {
             // User info for the pre-6.0 Systems where old permissions model is implemented.
             const auto userModel = connection->connectionInfo().compatibilityUserModel;

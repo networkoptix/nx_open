@@ -126,7 +126,9 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
     const auto on_resourceUpdated =
         [this](const auto& resource, ec2::NotificationSource source)
         {
-            updateResource(resource, source);
+            // On the client side due to queued connections slot may be handled after disconnect.
+            if (m_connection)
+                updateResource(resource, source);
         };
 
     const auto on_hardwareIdMappingAdded =
