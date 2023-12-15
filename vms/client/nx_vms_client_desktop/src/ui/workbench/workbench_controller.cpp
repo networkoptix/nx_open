@@ -1374,7 +1374,6 @@ void QnWorkbenchController::at_zoomTargetChanged(
     data.zoomTargetUuid = zoomTargetWidget->item()->uuid();
     data.rotation = zoomTargetWidget->item()->rotation();
     data.zoomRect = zoomRect;
-    data.frameDistinctionColor = widget->frameDistinctionColor();
     data.dewarpingParams = zoomTargetWidget->item()->dewarpingParams();
     // Zoom target must always be dewarped by 90 degrees.
     data.dewarpingParams.panoFactor = 1;
