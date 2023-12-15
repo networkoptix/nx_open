@@ -1405,10 +1405,6 @@
       <translation>システム名</translation>
     </message>
     <message>
-      <source>Local System ID</source>
-      <translation>ローカルシステムID</translation>
-    </message>
-    <message>
       <source>Last master System merge ID</source>
       <translation>最後のマスターシステム統合ID</translation>
     </message>
@@ -1748,6 +1744,10 @@
     <message>
       <source>Interval between the Cloud polling HTTP requests to synchronize the data.</source>
       <translation>データを同期するためにクラウドが HTTP リクエストをポーリングする間隔。</translation>
+    </message>
+    <message>
+      <source>Local System ID, null means the System is not set up yet.</source>
+      <translation>ローカルシステム ID。null の場合、システムがまだセットアップされていないことを意味します。</translation>
     </message>
   </context>
   <context>

@@ -1722,14 +1722,6 @@ PTZを行います</translation>
       <translation>ズームするには、マウスホイールを使用してください</translation>
     </message>
     <message>
-      <source>Target Lock Tracking</source>
-      <translation>ターゲットロック追跡</translation>
-    </message>
-    <message>
-      <source>Alt + Click to follow object</source>
-      <translation>Alt + クリックでオブジェクトを追跡</translation>
-    </message>
-    <message>
       <source>You can enable this guide again by going to Local Settings &gt; Advanced &gt; Reset All Warnings</source>
       <translation>このガイドを再度有効にするには、[ローカル設定 &gt; アドバンス &gt; すべての警告設定をリセット] を実行してください。</translation>
     </message>
@@ -1741,18 +1733,24 @@ New PTZ controls</source>
 の紹介</translation>
     </message>
     <message>
-      <source>Here is a quick guide
-on what has changed</source>
-      <translation>変更内容を
-簡単に説明します</translation>
-    </message>
-    <message>
       <source>Click, double-click, or drag
 mouse pointer while pressing
 Shift key to use Advanced PTZ</source>
       <translation>Shift キーを押しながら
 クリック、ダブルクリック、ドラッグ操作を行うことで、
 高度な PTZ を使用できます</translation>
+    </message>
+    <message>
+      <source>Here is a quick guide
+on what has changed.</source>
+      <translation>変更内容を
+簡単に説明します。</translation>
+    </message>
+    <message>
+      <source>To use Target Lock Tracking,
+Press Alt + Click to follow object</source>
+      <translation>ターゲットロックトラッキングを使用するには、
+Alt + クリックでオブジェクトを追跡します。</translation>
     </message>
   </context>
   <context>
