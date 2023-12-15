@@ -7,6 +7,7 @@
 #include <nx/utils/impl_ptr.h>
 
 class QWidget;
+class QQuickWindow;
 class QnWorkbenchContext;
 class QnWorkbenchRenderWatcher;
 class QnWorkbenchStreamSynchronizer;
@@ -46,6 +47,11 @@ public:
     QnWorkbenchStreamSynchronizer* streamSynchronizer() const;
 
     SystemTabBarModel* systemTabBarModel() const;
+
+    /**
+     * Returns resource browser quick window. Use only for obtaining graphics API information.
+     */
+    QQuickWindow* quickWindow() const;
 
 private:
     struct Private;

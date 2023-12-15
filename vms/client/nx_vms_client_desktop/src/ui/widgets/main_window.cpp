@@ -833,6 +833,11 @@ void MainWindow::updateContentsMargins()
     m_globalLayout->setContentsMargins(m_frameMargins);
 }
 
+QQuickWindow* MainWindow::quickWindow() const
+{
+    return m_ui->quickWindow();
+}
+
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
