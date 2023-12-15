@@ -17,6 +17,7 @@
 #include <ui/workbench/workbench_pane_settings.h>
 
 class QGraphicsWidget;
+class QQuickWindow;
 
 class InstrumentManager;
 class ActivityListenerInstrument;
@@ -117,6 +118,9 @@ public:
     bool isCalendarVisible() const;
 
     void setTitleUsed(bool titleUsed = true);
+
+    /** Returns QQuickWindow for resource browser widget. */
+    QQuickWindow* quickWindow() const;
 
 private:
     void setPerformanceInfoVisible(bool performanceInfoVisible = true);

@@ -9,6 +9,7 @@
 #include "window_context_aware.h"
 
 class QWidget;
+class QQuickWindow;
 
 struct QnStartupParameters;
 class QnWorkbenchDisplay;
@@ -121,6 +122,11 @@ public:
      * Process startup parameters and call related actions.
      */
     void handleStartupParameters(const QnStartupParameters& startupParams);
+
+    /**
+     * Returns resource browser quick window. Use only for obtaining graphics API information.
+     */
+    QQuickWindow* quickWindow() const;
 
 signals:
     /**

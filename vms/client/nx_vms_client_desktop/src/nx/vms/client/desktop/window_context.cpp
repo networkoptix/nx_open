@@ -29,6 +29,7 @@
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <statistics/statistics_manager.h>
 #include <ui/statistics/modules/actions_statistics_module.h>
+#include <ui/widgets/main_window.h>
 #include <ui/workbench/extensions/workbench_stream_synchronizer.h>
 #include <ui/workbench/watchers/workbench_layout_aspect_ratio_watcher.h>
 #include <ui/workbench/watchers/workbench_render_watcher.h>
@@ -270,6 +271,16 @@ void WindowContext::handleStartupParameters(const QnStartupParameters& startupPa
 {
     menu()->trigger(menu::ProcessStartupParametersAction,
         {Qn::StartupParametersRole, startupParams});
+}
+
+QQuickWindow* WindowContext::quickWindow() const
+{
+    // Eventually main window would itself be QQuickWindow, but for now just use the one which
+    // always exists in both desktop and videowall modes.
+    if (const auto mainWindow = qobject_cast<MainWindow*>(mainWindowWidget()))
+        return mainWindow->quickWindow();
+
+    return nullptr;
 }
 
 } // namespace nx::vms::client::desktop
