@@ -1722,14 +1722,6 @@ to activate PTZ</translation>
       <translation type="unfinished">Use mouse wheel to zoom</translation>
     </message>
     <message>
-      <source>Target Lock Tracking</source>
-      <translation type="unfinished">Target Lock Tracking</translation>
-    </message>
-    <message>
-      <source>Alt + Click to follow object</source>
-      <translation type="unfinished">Alt + Click to follow object</translation>
-    </message>
-    <message>
       <source>You can enable this guide again by going to Local Settings &gt; Advanced &gt; Reset All Warnings</source>
       <translation type="unfinished">You can enable this guide again by going to Local Settings &gt; Advanced &gt; Reset All Warnings</translation>
     </message>
@@ -1740,18 +1732,24 @@ New PTZ controls</source>
 การควบคุม PTZ ใหม่</translation>
     </message>
     <message>
-      <source>Here is a quick guide
-on what has changed</source>
-      <translation>นี่คือคำแนะนำโดยย่อ
-เกี่ยวกับสิ่งที่เปลี่ยนแปลงไป</translation>
-    </message>
-    <message>
       <source>Click, double-click, or drag
 mouse pointer while pressing
 Shift key to use Advanced PTZ</source>
       <translation>คลิก, ดับเบิลคลิก หรือลากตัวชี้เมาส์
 ในขณะที่กดปุ่ม Shift
 เพื่อใช้Adcanced PTZ</translation>
+    </message>
+    <message>
+      <source>Here is a quick guide
+on what has changed.</source>
+      <translation>นี่คือคำแนะนำโดยย่อ
+เกี่ยวกับสิ่งที่เปลี่ยนแปลงไป.</translation>
+    </message>
+    <message>
+      <source>To use Target Lock Tracking,
+Press Alt + Click to follow object</source>
+      <translation>หากต้องการใช้ Target Lock Tracking
+กด Alt + คลิกเพื่อติดตามวัตถุ</translation>
     </message>
   </context>
   <context>

@@ -1405,10 +1405,6 @@
       <translation>系统名称</translation>
     </message>
     <message>
-      <source>Local System ID</source>
-      <translation>本地系统 ID</translation>
-    </message>
-    <message>
       <source>Last master System merge ID</source>
       <translation type="unfinished">Last master System merge ID</translation>
     </message>
@@ -1748,6 +1744,10 @@
     <message>
       <source>Interval between the Cloud polling HTTP requests to synchronize the data.</source>
       <translation type="unfinished">Interval between the Cloud polling HTTP requests to synchronize the data.</translation>
+    </message>
+    <message>
+      <source>Local System ID, null means the System is not set up yet.</source>
+      <translation type="unfinished">Local System ID, null means the System is not set up yet.</translation>
     </message>
   </context>
   <context>

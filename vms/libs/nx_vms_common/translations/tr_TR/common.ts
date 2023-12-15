@@ -1461,10 +1461,6 @@
       <translation>Sistem Adı</translation>
     </message>
     <message>
-      <source>Local System ID</source>
-      <translation>Yerel Sistem Kimliği</translation>
-    </message>
-    <message>
       <source>Last master System merge ID</source>
       <translation>Son ana Sistem birleştirme kimliği</translation>
     </message>
@@ -1804,6 +1800,10 @@
     <message>
       <source>Interval between the Cloud polling HTTP requests to synchronize the data.</source>
       <translation>Verileri senkronize etmek için Bulut yoklama HTTP istekleri arasındaki aralık.</translation>
+    </message>
+    <message>
+      <source>Local System ID, null means the System is not set up yet.</source>
+      <translation>Yerel Sistem Kimliği, boş, Sistemin henüz kurulmadığı anlamına gelir.</translation>
     </message>
   </context>
   <context>

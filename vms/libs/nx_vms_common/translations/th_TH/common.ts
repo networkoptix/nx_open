@@ -1405,10 +1405,6 @@
       <translation>ชื่อระบบ</translation>
     </message>
     <message>
-      <source>Local System ID</source>
-      <translation>ระบบภายใน</translation>
-    </message>
-    <message>
       <source>Last master System merge ID</source>
       <translation type="unfinished">Last master System merge ID</translation>
     </message>
@@ -1748,6 +1744,10 @@
     <message>
       <source>Interval between the Cloud polling HTTP requests to synchronize the data.</source>
       <translation>Interval between the Cloud polling HTTP requests to synchronize the data.</translation>
+    </message>
+    <message>
+      <source>Local System ID, null means the System is not set up yet.</source>
+      <translation>Local System ID null หมายความว่าระบบยังไม่ได้ตั้งค่า</translation>
     </message>
   </context>
   <context>

@@ -1958,7 +1958,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Phones</source>
-      <translation type="unfinished">Phones</translation>
+      <translation>Телефоны</translation>
     </message>
     <message>
       <source>Emails</source>

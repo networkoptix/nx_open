@@ -1733,14 +1733,6 @@ for å aktivere PTZ</translation>
       <translation>Bruk musehjulet for å zoome</translation>
     </message>
     <message>
-      <source>Target Lock Tracking</source>
-      <translation>Mållåssporing</translation>
-    </message>
-    <message>
-      <source>Alt + Click to follow object</source>
-      <translation>Alt + klikk for å følge objektet</translation>
-    </message>
-    <message>
       <source>You can enable this guide again by going to Local Settings &gt; Advanced &gt; Reset All Warnings</source>
       <translation>Du kan aktivere denne veiledningen igjen ved å gå til Lokale innstillinger &gt; Avansert &gt; Tilbakestill alle advarsler</translation>
     </message>
@@ -1751,18 +1743,24 @@ New PTZ controls</source>
 nye PTZ-kontroller</translation>
     </message>
     <message>
-      <source>Here is a quick guide
-on what has changed</source>
-      <translation>Her er en hurtigguide
-om hva som har endret seg</translation>
-    </message>
-    <message>
       <source>Click, double-click, or drag
 mouse pointer while pressing
 Shift key to use Advanced PTZ</source>
       <translation>Klikk, dobbeltklikk eller dra
 musepeker mens du trykker
 Shift-tast for å bruke avansert PTZ</translation>
+    </message>
+    <message>
+      <source>Here is a quick guide
+on what has changed.</source>
+      <translation>Her er en hurtigguide
+om hva som har endret seg.</translation>
+    </message>
+    <message>
+      <source>To use Target Lock Tracking,
+Press Alt + Click to follow object</source>
+      <translation>For å bruke mållåssporing,
+Trykk Alt + Klikk for å følge objektet</translation>
     </message>
   </context>
   <context>

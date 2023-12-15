@@ -1461,10 +1461,6 @@
       <translation>Systemets namn</translation>
     </message>
     <message>
-      <source>Local System ID</source>
-      <translation>Lokalt system-ID</translation>
-    </message>
-    <message>
       <source>Last master System merge ID</source>
       <translation>Senaste huvudsystemets sammanslagnings-ID</translation>
     </message>
@@ -1804,6 +1800,10 @@
     <message>
       <source>Interval between the Cloud polling HTTP requests to synchronize the data.</source>
       <translation>Intervall mellan Cloud polling HTTP-förfrågningar för att synkronisera data.</translation>
+    </message>
+    <message>
+      <source>Local System ID, null means the System is not set up yet.</source>
+      <translation>Lokalt system-ID, null betyder att systemet inte är konfigurerat ännu.</translation>
     </message>
   </context>
   <context>

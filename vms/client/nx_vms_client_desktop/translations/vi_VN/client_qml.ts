@@ -1722,14 +1722,6 @@ to activate PTZ</source>
       <translation>Sử dụng con lăn chuột để thu phóng</translation>
     </message>
     <message>
-      <source>Target Lock Tracking</source>
-      <translation>Theo dõi khóa mục tiêu</translation>
-    </message>
-    <message>
-      <source>Alt + Click to follow object</source>
-      <translation>Alt + Nhấp để theo dõi đối tượng</translation>
-    </message>
-    <message>
       <source>You can enable this guide again by going to Local Settings &gt; Advanced &gt; Reset All Warnings</source>
       <translation>Bạn có thể bật lại hướng dẫn này bằng cách đi tới Cài đặt cục bộ &gt; Nâng cao &gt; Đặt lại tất cả cảnh báo</translation>
     </message>
@@ -1740,18 +1732,24 @@ New PTZ controls</source>
 New PTZ controls</translation>
     </message>
     <message>
-      <source>Here is a quick guide
-on what has changed</source>
-      <translation type="unfinished">Here is a quick guide
-on what has changed</translation>
-    </message>
-    <message>
       <source>Click, double-click, or drag
 mouse pointer while pressing
 Shift key to use Advanced PTZ</source>
       <translation type="unfinished">Click, double-click, or drag
 mouse pointer while pressing
 Shift key to use Advanced PTZ</translation>
+    </message>
+    <message>
+      <source>Here is a quick guide
+on what has changed.</source>
+      <translation type="unfinished">Here is a quick guide
+on what has changed.</translation>
+    </message>
+    <message>
+      <source>To use Target Lock Tracking,
+Press Alt + Click to follow object</source>
+      <translation type="unfinished">To use Target Lock Tracking,
+Press Alt + Click to follow object</translation>
     </message>
   </context>
   <context>

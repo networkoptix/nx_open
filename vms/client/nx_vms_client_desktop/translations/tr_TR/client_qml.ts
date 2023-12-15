@@ -1733,14 +1733,6 @@ herhangi bir bölümü üzerine sürükleyin</translation>
       <translation>Yakınlaştırmak için fare tekerleğini kullanın</translation>
     </message>
     <message>
-      <source>Target Lock Tracking</source>
-      <translation>Hedef Kilit Takibi</translation>
-    </message>
-    <message>
-      <source>Alt + Click to follow object</source>
-      <translation>Nesneyi takip etmek için Alt + klik</translation>
-    </message>
-    <message>
       <source>You can enable this guide again by going to Local Settings &gt; Advanced &gt; Reset All Warnings</source>
       <translation>Yerel Ayarlar &gt; Gelişmiş &gt; Tüm Uyarıları Sıfırla seçeneğine giderek bu kılavuzu tekrar etkinleştirebilirsiniz</translation>
     </message>
@@ -1750,16 +1742,22 @@ New PTZ controls</source>
       <translation>Yeni PTZ kontrolüyle tanışın</translation>
     </message>
     <message>
-      <source>Here is a quick guide
-on what has changed</source>
-      <translation>Nelerin değiştiğine dair kısa bir kılavuz</translation>
-    </message>
-    <message>
       <source>Click, double-click, or drag
 mouse pointer while pressing
 Shift key to use Advanced PTZ</source>
       <translation>Gelişmiş PTZ'yi kullanmak için
 Shift tuşuna basarken fare işaretçisini tıklayın, çift tıklayın veya sürükleyin</translation>
+    </message>
+    <message>
+      <source>Here is a quick guide
+on what has changed.</source>
+      <translation>Nelerin değiştiğine dair kısa bir kılavuz.</translation>
+    </message>
+    <message>
+      <source>To use Target Lock Tracking,
+Press Alt + Click to follow object</source>
+      <translation>Hedef Takip Kilidini kullanmak için,
+Nesneyi takip etmek için Alt + Tıklama tuşlarına basın</translation>
     </message>
   </context>
   <context>
