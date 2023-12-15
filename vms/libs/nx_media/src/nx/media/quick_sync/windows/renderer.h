@@ -13,7 +13,7 @@
 #include <QtGui/QOffscreenSurface>
 #include <QtGui/QOpenGLContext>
 
-#include <mfx/mfxvideo++.h>
+#include <vpl/mfx.h>
 
 namespace nx::media::quick_sync::windows {
 

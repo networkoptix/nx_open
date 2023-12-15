@@ -168,8 +168,10 @@ class NxOpenConan(ConanFile):
 
         if self.isLinux:
             if self.settings.arch == "x86_64":
-                self.requires("libva/2.16" "#65762acd637b7ab1d359128aca9e5119")
-                self.requires("intel-media-sdk/19.4" "#860f17b9422f0baaa3c7a31163d408eb")
+                self.requires("libva/2.16.0" "#a0949cd8f15ba93d12dd835002fe1170")
+                self.requires("libvpl/2023.4.0" "#46b5842e1d15a61f78f4f9d8f3061e41")
+                self.requires("intel-media-sdk/19.4" "#ecb7939833f8de0ffb197905a4f5a75a")
+                self.requires("intel-onevpl/23.4.2" "#da72e6e5e4cb8ce4baf25ce4c0b1a602")
 
                 self.requires("libmysqlclient/8.0.17" "#87d0d0dca416ff91ff910c66b57eab1a")
                 self.requires("libpq/13.4" "#3c130555eda25ad50be3824716b0ce4d")
@@ -193,6 +195,7 @@ class NxOpenConan(ConanFile):
         if self.isWindows:
             self.requires("directx/JUN2010" "#ca268f1b54e3874ad43524cd81447b01")
             self.requires("intel-media-sdk-bin/2019R1" "#0a123266dd20b84b16a4cc60b752fc4b")
+            self.requires("libvpl/2023.4.0" "#dbed8bf2164276de19adf7ca3f56055f")
             self.requires("msvc-redist/14.29.30133" "#9f10aa59e4671ce0669d6181e6b0a269")
             self.requires("winsdk-redist/10.0.20348.0" "#bf8bf6131653c35ae84474f399fe5113")
             self.requires("icu-win/70.1" "#1c50009a7165b74563ba149c315737f1")
@@ -218,12 +221,15 @@ class NxOpenConan(ConanFile):
             if self.settings.arch == "x86_64":
                 copy_packages.append("libva")
                 copy_packages.append("intel-media-sdk")
+                copy_packages.append("intel-onevpl")
+                copy_packages.append("libvpl")
 
             if not self.isArm32:
                 copy_packages.append("ffmpeg")
         else:
             if self.isWindows:
                 copy_packages.append("intel-media-sdk-bin")
+                copy_packages.append("libvpl")
                 copy_packages.append("directx/JUN2010")
 
             copy_packages.append("ffmpeg")

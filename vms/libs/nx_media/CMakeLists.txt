@@ -23,6 +23,7 @@ endif()
 if(hardware_decoders_x64)
     enable_language(CUDA)
     find_package(CUDAToolkit)
+    find_package(libvpl REQUIRED)
 
     # Add allocators from artifacts/intel_media_sdk/.
     set(intel_media_sdk_dir ${artifacts_dir}/intel_media_sdk/samples/sample_common)
@@ -110,16 +111,17 @@ endif()
 if(hardware_decoders_x64)
     if(LINUX)
         find_package(libva REQUIRED)
+        find_package(intel-onevpl REQUIRED)
         find_package(intel-media-sdk REQUIRED)
         target_link_libraries(nx_media
             PUBLIC
-            X11 dl GL libva::libva intel-media-sdk::intel-media-sdk
+            X11 dl GL libva::libva libvpl::vpl intel-onevpl::mfx-gen
         )
     endif()
 
     if(WINDOWS)
         include("${CONAN_INTEL-MEDIA-SDK-BIN_ROOT}/intel_media_sdk.cmake")
-        target_link_libraries(nx_media PUBLIC opengl32 dxva2 d3d9 intel-media-sdk)
+        target_link_libraries(nx_media PUBLIC opengl32 dxva2 d3d9 intel-media-sdk libvpl::vpl)
     endif()
 else()
     nx_exclude_sources_from_target(nx_media src/nx/media/nvidia)

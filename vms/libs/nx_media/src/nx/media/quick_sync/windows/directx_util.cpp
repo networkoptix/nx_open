@@ -60,16 +60,7 @@ bool DeviceContext::initialize(MFXVideoSession& session, int width, int height)
         return false;
     }
 
-    m_allocator = std::make_shared<windows::D3DFrameAllocator>();
-    windows::D3DAllocatorParams d3dAllocParams;
-    d3dAllocParams.pManager = m_device.getDeviceManager();
-    status = m_allocator->Init(&d3dAllocParams);
-    if (status < MFX_ERR_NONE)
-    {
-        m_allocator.reset();
-        NX_ERROR(NX_SCOPE_TAG, "Failed to init D3D allocator, error: %1", status);
-        return false;
-    }
+    m_allocator = std::make_shared<windows::D3DFrameAllocator>(m_device.getDeviceManager());
     return true;
 }
 

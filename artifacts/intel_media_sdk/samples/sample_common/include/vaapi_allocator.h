@@ -49,45 +49,14 @@ namespace MfxLoader
     class VA_Proxy;
 }
 
-struct vaapiAllocatorParams : mfxAllocatorParams
-{
-    enum {
-      DONOT_EXPORT = 0,
-      FLINK = 0x01,
-      PRIME = 0x02,
-      NATIVE_EXPORT_MASK = FLINK | PRIME,
-      CUSTOM = 0x100,
-      CUSTOM_FLINK = CUSTOM | FLINK,
-      CUSTOM_PRIME = CUSTOM | PRIME
-    };
-    class Exporter
-    {
-    public:
-      virtual ~Exporter(){}
-      virtual void* acquire(mfxMemId mid) = 0;
-      virtual void release(mfxMemId mid, void * hdl) = 0;
-    };
-
-    vaapiAllocatorParams()
-      : m_dpy(NULL)
-      , m_export_mode(DONOT_EXPORT)
-      , m_exporter(NULL)
-    {}
-
-    VADisplay m_dpy;
-    mfxU32 m_export_mode;
-    Exporter* m_exporter;
-};
-
 class VaapiFrameAllocator: public BaseFrameAllocator
 {
 public:
-    VaapiFrameAllocator();
+    VaapiFrameAllocator(VADisplay display);
     virtual ~VaapiFrameAllocator();
     VaapiFrameAllocator(VaapiFrameAllocator const&) = delete;
     VaapiFrameAllocator& operator=(VaapiFrameAllocator const&) = delete;
 
-    virtual mfxStatus Init(mfxAllocatorParams *pParams);
     virtual mfxStatus Close();
 
 protected:
@@ -102,7 +71,6 @@ protected:
 
     VADisplay m_dpy;
     mfxU32 m_export_mode;
-    vaapiAllocatorParams::Exporter* m_exporter;
 };
 
 } // namespace nx::media::quick_sync::linux

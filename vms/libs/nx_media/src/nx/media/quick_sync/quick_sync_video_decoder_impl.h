@@ -7,8 +7,8 @@
 #include <vector>
 
 #include <base_allocator.h>
-
-#include <mfx/mfxvideo++.h>
+#include <vpl/mfx.h>
+#include <vpl/mfxvideo++.h>
 
 #include "quick_sync_video_decoder.h"
 #include "utils.h"

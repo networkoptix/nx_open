@@ -101,8 +101,8 @@ D3DFORMAT ConvertMfxFourccToD3dFormat(mfxU32 fourcc)
     }
 }
 
-D3DFrameAllocator::D3DFrameAllocator()
-: m_manager(0), m_decoderService(0), m_processorService(0), m_hDecoder(0), m_hProcessor(0), m_surfaceUsage(0)
+D3DFrameAllocator::D3DFrameAllocator(IDirect3DDeviceManager9* manager)
+: m_manager(manager), m_decoderService(0), m_processorService(0), m_hDecoder(0), m_hProcessor(0), m_surfaceUsage(0)
 {
 }
 
@@ -111,19 +111,6 @@ D3DFrameAllocator::~D3DFrameAllocator()
     Close();
     for (unsigned i = 0; i < m_midsAllocated.size(); i++)
         MSDK_SAFE_FREE(m_midsAllocated[i]);
-}
-
-mfxStatus D3DFrameAllocator::Init(mfxAllocatorParams *pParams)
-{
-    D3DAllocatorParams *pd3dParams = 0;
-    pd3dParams = dynamic_cast<D3DAllocatorParams *>(pParams);
-    if (!pd3dParams)
-        return MFX_ERR_NOT_INITIALIZED;
-
-    m_manager = pd3dParams->pManager;
-    m_surfaceUsage = pd3dParams->surfaceUsage;
-
-    return MFX_ERR_NONE;
 }
 
 mfxStatus D3DFrameAllocator::Close()

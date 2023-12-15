@@ -27,12 +27,7 @@ or https://software.intel.com/en-us/media-client-solutions-support.
 #include <memory>
 #include <mutex>
 
-#include <mfx/mfxvideo.h>
-
-struct mfxAllocatorParams
-{
-    virtual ~mfxAllocatorParams(){};
-};
+#include <vpl/mfx.h>
 
 // this class implements methods declared in mfxFrameAllocator structure
 // simply redirecting them to virtual methods which should be overridden in derived classes
@@ -42,8 +37,6 @@ public:
     MFXFrameAllocator();
     virtual ~MFXFrameAllocator();
 
-     // optional method, override if need to pass some parameters to allocator from application
-    virtual mfxStatus Init(mfxAllocatorParams *pParams) = 0;
     virtual mfxStatus Close() = 0;
 
     virtual mfxStatus AllocFrames(mfxFrameAllocRequest *request, mfxFrameAllocResponse *response) = 0;
@@ -76,7 +69,6 @@ public:
     BaseFrameAllocator();
     virtual ~BaseFrameAllocator();
 
-    virtual mfxStatus Init(mfxAllocatorParams *pParams) = 0;
     virtual mfxStatus Close();
     virtual mfxStatus AllocFrames(mfxFrameAllocRequest *request, mfxFrameAllocResponse *response);
     virtual mfxStatus ReallocFrame(mfxMemId midIn, const mfxFrameInfo *info, mfxU16 memType, mfxMemId *midOut);
@@ -169,24 +161,5 @@ protected:
     virtual mfxStatus AllocImpl(mfxFrameAllocRequest *request, mfxFrameAllocResponse *response) = 0;
     virtual mfxStatus ReallocImpl(mfxMemId midIn, const mfxFrameInfo *info, mfxU16 memType, mfxMemId *midOut) = 0;
 };
-
-class MFXBufferAllocator : public mfxBufferAllocator
-{
-public:
-    MFXBufferAllocator();
-    virtual ~MFXBufferAllocator();
-
-    virtual mfxStatus AllocBuffer(mfxU32 nbytes, mfxU16 type, mfxMemId *mid) = 0;
-    virtual mfxStatus LockBuffer(mfxMemId mid, mfxU8 **ptr) = 0;
-    virtual mfxStatus UnlockBuffer(mfxMemId mid) = 0;
-    virtual mfxStatus FreeBuffer(mfxMemId mid) = 0;
-
-private:
-    static mfxStatus MFX_CDECL  Alloc_(mfxHDL pthis, mfxU32 nbytes, mfxU16 type, mfxMemId *mid);
-    static mfxStatus MFX_CDECL  Lock_(mfxHDL pthis, mfxMemId mid, mfxU8 **ptr);
-    static mfxStatus MFX_CDECL  Unlock_(mfxHDL pthis, mfxMemId mid);
-    static mfxStatus MFX_CDECL  Free_(mfxHDL pthis, mfxMemId mid);
-};
-
 
 #endif // __BASE_ALLOCATOR_H__

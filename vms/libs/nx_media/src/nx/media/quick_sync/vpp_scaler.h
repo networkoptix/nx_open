@@ -9,7 +9,8 @@
 
 #include <QtCore/QSize>
 
-#include <mfx/mfxvideo++.h>
+#include <vpl/mfx.h>
+#include <vpl/mfxvideo++.h>
 
 namespace nx::media::quick_sync {
 

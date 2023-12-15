@@ -22,61 +22,23 @@ or https://software.intel.com/en-us/media-client-solutions-support.
 #define ID_BUFFER MFX_MAKEFOURCC('B','U','F','F')
 #define ID_FRAME  MFX_MAKEFOURCC('F','R','M','E')
 
-
-SysMemFrameAllocator::SysMemFrameAllocator()
-: m_pBufferAllocator(0), m_bOwnBufferAllocator(false)
-{
-}
+mfxStatus AllocBuffer(mfxU32 nbytes, mfxU16 type, mfxMemId *mid);
+mfxStatus LockBuffer(mfxMemId mid, mfxU8 **ptr);
+mfxStatus UnlockBuffer(mfxMemId mid);
+mfxStatus FreeBuffer(mfxMemId mid);
 
 SysMemFrameAllocator::~SysMemFrameAllocator()
 {
     Close();
 }
 
-mfxStatus SysMemFrameAllocator::Init(mfxAllocatorParams *pParams)
-{
-    // check if any params passed from application
-    if (pParams)
-    {
-        SysMemAllocatorParams *pSysMemParams = 0;
-        pSysMemParams = dynamic_cast<SysMemAllocatorParams *>(pParams);
-        if (!pSysMemParams)
-            return MFX_ERR_NOT_INITIALIZED;
-
-        m_pBufferAllocator = pSysMemParams->pBufferAllocator;
-        m_bOwnBufferAllocator = false;
-    }
-
-    // if buffer allocator wasn't passed from application create own
-    if (!m_pBufferAllocator)
-    {
-        m_pBufferAllocator = new SysMemBufferAllocator;
-        if (!m_pBufferAllocator)
-            return MFX_ERR_MEMORY_ALLOC;
-
-        m_bOwnBufferAllocator = true;
-    }
-
-    return MFX_ERR_NONE;
-}
-
 mfxStatus SysMemFrameAllocator::Close()
 {
-    mfxStatus sts = BaseFrameAllocator::Close();
-
-    if (m_bOwnBufferAllocator)
-    {
-        delete m_pBufferAllocator;
-        m_pBufferAllocator = 0;
-    }
-    return sts;
+    return BaseFrameAllocator::Close();
 }
 
 mfxStatus SysMemFrameAllocator::LockFrame(mfxMemId mid, mfxFrameData *ptr)
 {
-    if (!m_pBufferAllocator)
-        return MFX_ERR_NOT_INITIALIZED;
-
     if (!ptr)
         return MFX_ERR_NULL_PTR;
 
@@ -85,14 +47,14 @@ mfxStatus SysMemFrameAllocator::LockFrame(mfxMemId mid, mfxFrameData *ptr)
         return MFX_ERR_NONE;
 
     sFrame *fs = 0;
-    mfxStatus sts = m_pBufferAllocator->Lock(m_pBufferAllocator->pthis, mid,(mfxU8 **)&fs);
+    mfxStatus sts = LockBuffer(mid,(mfxU8 **)&fs);
 
     if (MFX_ERR_NONE != sts)
         return sts;
 
     if (ID_FRAME != fs->id)
     {
-        m_pBufferAllocator->Unlock(m_pBufferAllocator->pthis, mid);
+        UnlockBuffer(mid);
         return MFX_ERR_INVALID_HANDLE;
     }
 
@@ -213,14 +175,11 @@ mfxStatus SysMemFrameAllocator::LockFrame(mfxMemId mid, mfxFrameData *ptr)
 
 mfxStatus SysMemFrameAllocator::UnlockFrame(mfxMemId mid, mfxFrameData *ptr)
 {
-    if (!m_pBufferAllocator)
-        return MFX_ERR_NOT_INITIALIZED;
-
     // If allocator uses pointers instead of mids, no further action is required
     if (!mid && ptr->Y)
         return MFX_ERR_NONE;
 
-    mfxStatus sts = m_pBufferAllocator->Unlock(m_pBufferAllocator->pthis, mid);
+    mfxStatus sts = UnlockBuffer(mid);
 
     if (MFX_ERR_NONE != sts)
         return sts;
@@ -331,9 +290,6 @@ mfxStatus SysMemFrameAllocator::ReallocImpl(mfxMemId mid, const mfxFrameInfo *in
     if (!info || !midOut)
         return MFX_ERR_NULL_PTR;
 
-    if (!m_pBufferAllocator)
-        return MFX_ERR_NOT_INITIALIZED;
-
     mfxU32 nbytes = GetSurfaceSize(info->FourCC, MSDK_ALIGN32(info->Width), MSDK_ALIGN32(info->Height));
     if(!nbytes)
         return MFX_ERR_UNSUPPORTED;
@@ -343,23 +299,23 @@ mfxStatus SysMemFrameAllocator::ReallocImpl(mfxMemId mid, const mfxFrameInfo *in
     if (!pmid)
         return MFX_ERR_MEMORY_ALLOC;
 
-    mfxStatus sts = m_pBufferAllocator->Free(m_pBufferAllocator->pthis, *pmid);
+    mfxStatus sts = FreeBuffer(*pmid);
     if (MFX_ERR_NONE != sts)
         return sts;
 
-    sts = m_pBufferAllocator->Alloc(m_pBufferAllocator->pthis,
+    sts = AllocBuffer(
         MSDK_ALIGN32(nbytes) + MSDK_ALIGN32(sizeof(sFrame)), MFX_MEMTYPE_SYSTEM_MEMORY, pmid);
     if (MFX_ERR_NONE != sts)
         return sts;
 
     sFrame *fs;
-    sts = m_pBufferAllocator->Lock(m_pBufferAllocator->pthis, *pmid, (mfxU8 **)&fs);
+    sts = LockBuffer(*pmid, (mfxU8 **)&fs);
     if (MFX_ERR_NONE != sts)
         return sts;
 
     fs->id = ID_FRAME;
     fs->info = *info;
-    m_pBufferAllocator->Unlock(m_pBufferAllocator->pthis, *pmid);
+    UnlockBuffer(*pmid);
 
     *midOut = *pmid;
     return MFX_ERR_NONE;
@@ -367,9 +323,6 @@ mfxStatus SysMemFrameAllocator::ReallocImpl(mfxMemId mid, const mfxFrameInfo *in
 
 mfxStatus SysMemFrameAllocator::AllocImpl(mfxFrameAllocRequest *request, mfxFrameAllocResponse *response)
 {
-    if (!m_pBufferAllocator)
-        return MFX_ERR_NOT_INITIALIZED;
-
     mfxU32 numAllocated = 0;
 
     mfxU32 nbytes = GetSurfaceSize(request->Info.FourCC, MSDK_ALIGN32(request->Info.Width), MSDK_ALIGN32(request->Info.Height));
@@ -381,21 +334,20 @@ mfxStatus SysMemFrameAllocator::AllocImpl(mfxFrameAllocRequest *request, mfxFram
     // allocate frames
     for (numAllocated = 0; numAllocated < request->NumFrameSuggested; numAllocated ++)
     {
-        mfxStatus sts = m_pBufferAllocator->Alloc(m_pBufferAllocator->pthis,
-            nbytes + MSDK_ALIGN32(sizeof(sFrame)), request->Type, &(mids[numAllocated]));
+        mfxStatus sts = AllocBuffer(nbytes + MSDK_ALIGN32(sizeof(sFrame)), request->Type, &(mids[numAllocated]));
 
         if (MFX_ERR_NONE != sts)
             break;
 
         sFrame *fs;
-        sts = m_pBufferAllocator->Lock(m_pBufferAllocator->pthis, mids[numAllocated], (mfxU8 **)&fs);
+        sts = LockBuffer(mids[numAllocated], (mfxU8 **)&fs);
 
         if (MFX_ERR_NONE != sts)
             break;
 
         fs->id = ID_FRAME;
         fs->info = request->Info;
-        sts = m_pBufferAllocator->Unlock(m_pBufferAllocator->pthis, mids[numAllocated]);
+        sts = UnlockBuffer(mids[numAllocated]);
 
         if (MFX_ERR_NONE != sts)
             break;
@@ -419,9 +371,6 @@ mfxStatus SysMemFrameAllocator::ReleaseResponse(mfxFrameAllocResponse *response)
     if (!response)
         return MFX_ERR_NULL_PTR;
 
-    if (!m_pBufferAllocator)
-        return MFX_ERR_NOT_INITIALIZED;
-
     mfxStatus sts = MFX_ERR_NONE;
 
     if (response->mids)
@@ -430,7 +379,7 @@ mfxStatus SysMemFrameAllocator::ReleaseResponse(mfxFrameAllocResponse *response)
         {
             if (response->mids[i])
             {
-                sts = m_pBufferAllocator->Free(m_pBufferAllocator->pthis, response->mids[i]);
+                sts = FreeBuffer(response->mids[i]);
                 if (MFX_ERR_NONE != sts)
                     return sts;
             }
@@ -443,17 +392,7 @@ mfxStatus SysMemFrameAllocator::ReleaseResponse(mfxFrameAllocResponse *response)
     return sts;
 }
 
-SysMemBufferAllocator::SysMemBufferAllocator()
-{
-
-}
-
-SysMemBufferAllocator::~SysMemBufferAllocator()
-{
-
-}
-
-mfxStatus SysMemBufferAllocator::AllocBuffer(mfxU32 nbytes, mfxU16 type, mfxMemId *mid)
+mfxStatus AllocBuffer(mfxU32 nbytes, mfxU16 type, mfxMemId *mid)
 {
     if (!mid)
         return MFX_ERR_NULL_PTR;
@@ -475,7 +414,7 @@ mfxStatus SysMemBufferAllocator::AllocBuffer(mfxU32 nbytes, mfxU16 type, mfxMemI
     return MFX_ERR_NONE;
 }
 
-mfxStatus SysMemBufferAllocator::LockBuffer(mfxMemId mid, mfxU8 **ptr)
+mfxStatus LockBuffer(mfxMemId mid, mfxU8 **ptr)
 {
     if (!ptr)
         return MFX_ERR_NULL_PTR;
@@ -491,7 +430,7 @@ mfxStatus SysMemBufferAllocator::LockBuffer(mfxMemId mid, mfxU8 **ptr)
     return MFX_ERR_NONE;
 }
 
-mfxStatus SysMemBufferAllocator::UnlockBuffer(mfxMemId mid)
+mfxStatus UnlockBuffer(mfxMemId mid)
 {
     sBuffer *bs = (sBuffer *)mid;
 
@@ -501,7 +440,7 @@ mfxStatus SysMemBufferAllocator::UnlockBuffer(mfxMemId mid)
     return MFX_ERR_NONE;
 }
 
-mfxStatus SysMemBufferAllocator::FreeBuffer(mfxMemId mid)
+mfxStatus FreeBuffer(mfxMemId mid)
 {
     sBuffer *bs = (sBuffer *)mid;
     if (!bs || ID_BUFFER != bs->id)
