@@ -15,7 +15,7 @@ class DbStatisticsCollector:
 {
 public:
     DbStatisticsCollector():
-        m_statisticsCollector(std::chrono::milliseconds(100), m_queryQueue)
+        m_statisticsCollector(std::chrono::milliseconds(100), m_queryQueue, &m_threadPoolSize)
     {
     }
 
@@ -118,6 +118,7 @@ protected:
 
 private:
     detail::QueryQueue m_queryQueue;
+    std::atomic<std::size_t> m_threadPoolSize{0};
     StatisticsCollector m_statisticsCollector;
     std::deque<nx::utils::test::ScopedTimeShift> m_timeShifts;
     std::deque<QueryExecutionInfo> m_records;

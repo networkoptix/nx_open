@@ -23,10 +23,12 @@ StatisticsCollector::StatisticsRecordContext::StatisticsRecordContext(QueryExecu
 
 StatisticsCollector::StatisticsCollector(
     std::chrono::milliseconds period,
-    const detail::QueryQueue& queryQueue)
+    const detail::QueryQueue& queryQueue,
+    std::atomic<std::size_t>* dbThreadPoolSize)
     :
     m_period(period),
     m_queryQueue(queryQueue),
+    m_dbThreadPoolSize(dbThreadPoolSize),
     m_requestExecutionTimesCalculationContext(&m_currentStatistics.requestExecutionTimes),
     m_waitingForExecutionTimesCalculationContext(&m_currentStatistics.waitingForExecutionTimes)
 {
@@ -56,6 +58,7 @@ QueryStatistics StatisticsCollector::getQueryStatistics() const
     }
 
     result.queryQueue = m_queryQueue.stats();
+    result.dbThreadPoolSize = m_dbThreadPoolSize->load();
     return result;
 }
 

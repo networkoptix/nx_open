@@ -171,6 +171,7 @@ struct QueryStatistics
     int requestsSucceeded = 0;
     int requestsFailed = 0;
     int requestsCancelled = 0;
+    std::size_t dbThreadPoolSize = 0;
     DurationStatistics requestExecutionTimes;
     DurationStatistics waitingForExecutionTimes;
     QueryQueueStats queryQueue;
@@ -178,6 +179,6 @@ struct QueryStatistics
 
 NX_REFLECTION_INSTRUMENT(QueryStatistics,
     (statisticalPeriod)(requestsSucceeded)(requestsFailed)(requestsCancelled) \
-    (requestExecutionTimes)(waitingForExecutionTimes)(queryQueue))
+    (dbThreadPoolSize)(requestExecutionTimes)(waitingForExecutionTimes)(queryQueue))
 
 } // namespace nx::sql
