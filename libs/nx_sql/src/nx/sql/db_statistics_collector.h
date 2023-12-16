@@ -29,7 +29,8 @@ class NX_SQL_API StatisticsCollector
 public:
     StatisticsCollector(
         std::chrono::milliseconds period,
-        const detail::QueryQueue& queryQueue);
+        const detail::QueryQueue& queryQueue,
+        std::atomic<std::size_t>* dbThreadPoolSize);
 
     void recordQuery(QueryExecutionInfo queryStatistics);
     QueryStatistics getQueryStatistics() const;
@@ -59,6 +60,7 @@ private:
 
     const std::chrono::milliseconds m_period;
     const detail::QueryQueue& m_queryQueue;
+    std::atomic<std::size_t>* m_dbThreadPoolSize = nullptr;
     std::deque<StatisticsRecordContext> m_recordQueue;
     mutable nx::Mutex m_mutex;
     QueryStatistics m_currentStatistics;

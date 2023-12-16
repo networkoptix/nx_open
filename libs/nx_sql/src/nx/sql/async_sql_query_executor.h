@@ -398,9 +398,9 @@ private:
     const ConnectionOptions m_connectionOptions;
     mutable nx::Mutex m_mutex;
     detail::QueryQueue m_queryQueue;
-    StatisticsCollector m_statisticsCollector;
     std::vector<std::unique_ptr<detail::BaseQueryExecutor>> m_dbThreads;
-    std::atomic<std::size_t> m_dbThreadsSize{0};
+    std::atomic<std::size_t> m_dbThreadPoolSize{0};
+    StatisticsCollector m_statisticsCollector;
     nx::utils::thread m_dropConnectionThread;
     nx::utils::SyncQueue<std::unique_ptr<detail::BaseQueryExecutor>> m_connectionsToDropQueue;
     bool m_terminated = false;
