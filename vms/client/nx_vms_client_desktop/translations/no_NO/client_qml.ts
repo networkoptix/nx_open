@@ -2603,12 +2603,12 @@ Trykk Alt + Klikk for å følge objektet</translation>
       <translation>LDAP-serveren er frakoblet. Brukeren kan ikke logge inn.</translation>
     </message>
     <message>
-      <source>This user’s login duplicates the login of another user. None of them is able to login. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</source>
-      <translation>Denne brukerens pålogging dupliserer påloggingen til en annen bruker. Ingen av dem klarer å logge på. For å løse dette problemet kan du endre brukerens pålogging eller deaktivere eller slette brukere med dupliserte pålogginger.</translation>
-    </message>
-    <message>
       <source>When continuous sync with LDAP server is disabled, user membership in groups does not synchronize automatically. To update this information, initiate a manual sync.</source>
       <translation>Når kontinuerlig synkronisering med LDAP-server er deaktivert, synkroniseres ikke brukermedlemskap i grupper automatisk. Start en manuell synkronisering for å oppdatere denne informasjonen.</translation>
+    </message>
+    <message>
+      <source>This user’s login duplicates the login of another user. None of them is able to log in. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</source>
+      <translation>Denne brukerens pålogging dupliserer påloggingen til en annen bruker. Ingen av dem kan logge på. For å løse dette problemet kan du endre brukerens pålogging eller deaktivere eller slette brukere med dupliserende pålogginger.</translation>
     </message>
   </context>
   <context>

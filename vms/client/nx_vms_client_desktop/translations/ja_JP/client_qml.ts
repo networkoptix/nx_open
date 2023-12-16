@@ -2590,12 +2590,12 @@ Alt + クリックでオブジェクトを追跡します。</translation>
       <translation>LDAPサーバーがオフラインです。ユーザーはログインできません。</translation>
     </message>
     <message>
-      <source>This user’s login duplicates the login of another user. None of them is able to login. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</source>
-      <translation>このユーザーのログイン名は、別のユーザーのログイン名と重複しています。どちらのユーザーもログインできません。この問題を解決するには、ユーザーのログイン名を変更するか、ログイン名が重複しているユーザーを無効化または削除してください。</translation>
-    </message>
-    <message>
       <source>When continuous sync with LDAP server is disabled, user membership in groups does not synchronize automatically. To update this information, initiate a manual sync.</source>
       <translation>LDAPサーバーとの継続的同期が無効になっている場合、グループのユーザーメンバーシップは自動的に同期されません。この情報を更新するには、手動同期を開始してください。</translation>
+    </message>
+    <message>
+      <source>This user’s login duplicates the login of another user. None of them is able to log in. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</source>
+      <translation>このユーザーのログイン名は、別のユーザーのログイン名と重複しています。どちらのユーザーもログインできません。この問題を解決するには、ユーザーのログイン名を変更するか、ログイン名が重複しているユーザーを無効化または削除してください。</translation>
     </message>
   </context>
   <context>

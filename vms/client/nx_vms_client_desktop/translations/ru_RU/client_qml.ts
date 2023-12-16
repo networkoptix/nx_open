@@ -2631,12 +2631,12 @@ Press Alt + Click to follow object</translation>
       <translation type="unfinished">LDAP server is offline. User is not able to log in.</translation>
     </message>
     <message>
-      <source>This user’s login duplicates the login of another user. None of them is able to login. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</source>
-      <translation type="unfinished">This user’s login duplicates the login of another user. None of them is able to login. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</translation>
-    </message>
-    <message>
       <source>When continuous sync with LDAP server is disabled, user membership in groups does not synchronize automatically. To update this information, initiate a manual sync.</source>
       <translation>Когда непрерывная синхронизация с сервером LDAP отключена, членство в группах не синхронизируется автоматически. Чтобы обновить эту информацию, инициируйте ручную синхронизацию.</translation>
+    </message>
+    <message>
+      <source>This user’s login duplicates the login of another user. None of them is able to log in. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</source>
+      <translation>Логин этого пользователя дублирует логин другого пользователя. Никто из них не может войти в систему. Чтобы решить эту проблему, вы можете изменить логин пользователя или отключить или удалить пользователей с дублирующимися логинами.</translation>
     </message>
   </context>
   <context>

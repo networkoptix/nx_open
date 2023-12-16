@@ -2589,12 +2589,12 @@ Press Alt + Click to follow object</translation>
       <translation>Máy chủ LDAP đang ngoại tuyến. Người dùng không thể đăng nhập.</translation>
     </message>
     <message>
-      <source>This user’s login duplicates the login of another user. None of them is able to login. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</source>
-      <translation>Thông tin đăng nhập của người dùng này trùng lặp với thông tin đăng nhập của người dùng khác. Không ai trong số họ có thể đăng nhập. Để giải quyết vấn đề này, bạn có thể thay đổi thông tin đăng nhập của người dùng hoặc vô hiệu hóa hoặc xóa người dùng có thông tin đăng nhập trùng lặp.</translation>
-    </message>
-    <message>
       <source>When continuous sync with LDAP server is disabled, user membership in groups does not synchronize automatically. To update this information, initiate a manual sync.</source>
       <translation type="unfinished">When continuous sync with LDAP server is disabled, user membership in groups does not synchronize automatically. To update this information, initiate a manual sync.</translation>
+    </message>
+    <message>
+      <source>This user’s login duplicates the login of another user. None of them is able to log in. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</source>
+      <translation type="unfinished">This user’s login duplicates the login of another user. None of them is able to log in. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</translation>
     </message>
   </context>
   <context>
