@@ -84,10 +84,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Connection timed out</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>The server is incompatible.</source>
         <translation></translation>
     </message>
@@ -141,11 +137,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Connection to %1 is not ready yet. Check the server’s internet connection or try again later.</source>
-        <comment>%1 is the cloud name (like Nx Cloud)</comment>
-        <translation></translation>
-    </message>
-    <message>
         <source>Connection to the server could not be established. Try again later.</source>
         <translation></translation>
     </message>
@@ -176,11 +167,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>To log in to this System, disable “Ask for a verification code on every login with your %1 account” in your %2.</source>
-        <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
-        <translation></translation>
-    </message>
-    <message>
         <source>Two-factor authentication is required.</source>
         <translation></translation>
     </message>
@@ -189,23 +175,65 @@
         <comment>%1 is link that leads to /account/security section of Nx Cloud</comment>
         <translation></translation>
     </message>
+    <message>
+        <source>Connection to %1 is not ready yet. Check the server&apos;s internet connection or try again later.</source>
+        <comment>%1 is the cloud name (like Nx Cloud)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Your access to this system has expired.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please contact the system administrator to regain access.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To log in to this System, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</source>
+        <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::client::core::AbstractAttributedEventModel</name>
+    <message numerus="yes">
+        <source>+%n values</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::client::core::AnalyticsSearchListModel</name>
+    <message>
+        <source>Unknown track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>deleted camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::client::core::BookmarkSearchListModel</name>
+    <message>
+        <source>deleted camera</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::core::CertificateWarning</name>
-    <message>
-        <source>Cannot verify the identity of %1</source>
-        <translation></translation>
-    </message>
     <message>
         <source>Server certificate is invalid.</source>
         <translation></translation>
     </message>
     <message>
         <source>Connecting to %1 for the first time?</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>certificate details</source>
         <translation></translation>
     </message>
     <message>
@@ -217,32 +245,25 @@
         <comment>%1 is &lt;help article&gt; link</comment>
         <translation></translation>
     </message>
-    <message>
-        <source>Review the %1 to ensure you trust the server you are connecting to.%2</source>
-        <comment>%1 is &lt;certificate details&gt; link, %2 are possible extra details</comment>
-        <translation></translation>
+    <message numerus="yes">
+        <source>Cannot verify the identity of %n servers</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
-        <source>the server&apos;s certificate</source>
-        <translation></translation>
+        <source>Review the certificates of the servers from this system.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>You can view %1 or read this %2 to learn more about the current problem.</source>
-        <comment>%1 is &lt;the server&apos;s certificate&gt; link, %2 is &lt;help article&gt; link</comment>
-        <translation></translation>
+        <source>This might be due to an expired server certificate or or an invalid certificate. Contact your system administrator for further investigation.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>This might be due to an expired server certificate or someone trying to impersonate %1 to steal your personal information.%2</source>
-        <comment>%1 is the system name, %2 are possible extra details</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>This message may be shown multiple times when connecting to a multi-server system.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>To learn more about the current problem view the server&apos;s certificate:</source>
-        <translation></translation>
+        <source>To learn more about the current problem read this %1.</source>
+        <comment>%1 is &lt;help article&gt; link</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -253,6 +274,82 @@
     </message>
     <message>
         <source>Primary audio device is not selected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::client::core::EventSearchUtils</name>
+    <message>
+        <source>Last day</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Last 7 days</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Last 30 days</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n Cameras</source>
+        <comment>%n is a number of cameras</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::client::core::ExtendedOutputCameraButtonController</name>
+    <message>
+        <source>Heater</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Wiper</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Door</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop Object Tracking</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::client::core::SoftwareTriggerCameraButtonController</name>
+    <message>
+        <source>Press and hold to</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>press and hold</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::client::core::TwoWayAudioCameraButtonController</name>
+    <message>
+        <source>Unmute</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Press and hold to speak</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
