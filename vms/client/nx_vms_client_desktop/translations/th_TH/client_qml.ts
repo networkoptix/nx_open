@@ -2589,12 +2589,12 @@ Press Alt + Click to follow object</source>
       <translation type="unfinished">LDAP server is offline. User is not able to log in.</translation>
     </message>
     <message>
-      <source>This user’s login duplicates the login of another user. None of them is able to login. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</source>
-      <translation type="unfinished">This user’s login duplicates the login of another user. None of them is able to login. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</translation>
-    </message>
-    <message>
       <source>When continuous sync with LDAP server is disabled, user membership in groups does not synchronize automatically. To update this information, initiate a manual sync.</source>
       <translation type="unfinished">When continuous sync with LDAP server is disabled, user membership in groups does not synchronize automatically. To update this information, initiate a manual sync.</translation>
+    </message>
+    <message>
+      <source>This user’s login duplicates the login of another user. None of them is able to log in. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</source>
+      <translation>การเข้าสู่ระบบของผู้ใช้รายนี้ซ้ำกับผู้ใช้รายอื่น ไม่มีใครสามารถเข้าสู่ระบบได้ หากต้องการแก้ไขปัญหานี้ คุณสามารถเปลี่ยนข้อมูลเข้าสู่ระบบของผู้ใช้ หรือปิดใช้งานหรือลบผู้ใช้ที่มีการเข้าสู่ระบบซ้ำได้</translation>
     </message>
   </context>
   <context>

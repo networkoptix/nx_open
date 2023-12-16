@@ -2603,12 +2603,12 @@ Tryck på Alt + Klicka för att följa objektet</translation>
       <translation>LDAP-servern är offline. Användaren kan inte logga in.</translation>
     </message>
     <message>
-      <source>This user’s login duplicates the login of another user. None of them is able to login. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</source>
-      <translation>Denna användares inloggning dubblerar inloggningen för en annan användare. Ingen av dem kan logga in. För att lösa det här problemet kan du ändra användarens inloggning eller inaktivera eller ta bort användare med duplicerade inloggningar.</translation>
-    </message>
-    <message>
       <source>When continuous sync with LDAP server is disabled, user membership in groups does not synchronize automatically. To update this information, initiate a manual sync.</source>
       <translation>När kontinuerlig synkronisering med LDAP-servern är inaktiverad synkroniseras inte användarmedlemskap i grupper automatiskt. För att uppdatera denna information, initiera en manuell synkronisering.</translation>
+    </message>
+    <message>
+      <source>This user’s login duplicates the login of another user. None of them is able to log in. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</source>
+      <translation>Denna användares inloggning dubblerar inloggningen för en annan användare. Ingen av dem kan logga in. För att lösa det här problemet kan du ändra användarens inloggning eller inaktivera eller ta bort användare med duplicerade inloggningar.</translation>
     </message>
   </context>
   <context>

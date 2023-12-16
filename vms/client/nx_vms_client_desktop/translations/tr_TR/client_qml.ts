@@ -2600,12 +2600,12 @@ Nesneyi takip etmek için Alt + Tıklama tuşlarına basın</translation>
       <translation>LDAP sunucusu çevrimdışı. Kullanıcı oturum açamıyor.</translation>
     </message>
     <message>
-      <source>This user’s login duplicates the login of another user. None of them is able to login. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</source>
-      <translation>Bu kullanıcının oturum açma bilgileri başka bir kullanıcının oturum açma bilgileri ile aynı. Hiçbiri giriş yapamıyor. Bu sorunu çözmek için kullanıcının oturum açma bilgilerini değiştirebilir veya oturum açma bilgileri kopyalanan kullanıcıları devre dışı bırakabilir veya silebilirsiniz.</translation>
-    </message>
-    <message>
       <source>When continuous sync with LDAP server is disabled, user membership in groups does not synchronize automatically. To update this information, initiate a manual sync.</source>
       <translation>LDAP sunucusuyla sürekli senkronizasyon devre dışı bırakıldığında, gruplardaki kullanıcı üyeliği otomatik olarak senkronize edilmez. Bu bilgileri güncellemek için manuel senkronizasyon başlatın.</translation>
+    </message>
+    <message>
+      <source>This user’s login duplicates the login of another user. None of them is able to log in. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</source>
+      <translation type="unfinished">This user’s login duplicates the login of another user. None of them is able to log in. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</translation>
     </message>
   </context>
   <context>
