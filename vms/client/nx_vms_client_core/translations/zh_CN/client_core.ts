@@ -201,20 +201,12 @@
   <context>
     <name>nx::vms::client::core::CertificateWarning</name>
     <message>
-      <source>Cannot verify the identity of %1</source>
-      <translation>无法验证 %1的身份</translation>
-    </message>
-    <message>
       <source>Server certificate is invalid.</source>
       <translation>无效的服务器凭证。</translation>
     </message>
     <message>
       <source>Connecting to %1 for the first time?</source>
       <translation>第一次连接到 %1 吗？</translation>
-    </message>
-    <message>
-      <source>certificate details</source>
-      <translation>凭证详细信息</translation>
     </message>
     <message>
       <source>help article</source>
@@ -225,32 +217,24 @@
       <comment>%1 is &lt;help article&gt; link</comment>
       <translation>请阅读%1 文件 以了解更多关于凭证验证细节。</translation>
     </message>
-    <message>
-      <source>Review the %1 to ensure you trust the server you are connecting to.%2</source>
-      <comment>%1 is &lt;certificate details&gt; link, %2 are possible extra details</comment>
-      <translation>请查看%1 ，以确认您信任要连线的服务器。 %2</translation>
+    <message numerus="yes">
+      <source>Cannot verify the identity of %n servers</source>
+      <translation type="unfinished">
+        <numerusform>Cannot verify the identity of %n servers</numerusform>
+      </translation>
     </message>
     <message>
-      <source>the server&apos;s certificate</source>
-      <translation>服务器&apos;s 凭证</translation>
+      <source>Review the certificates of the servers from this system.</source>
+      <translation type="unfinished">Review the certificates of the servers from this system.</translation>
     </message>
     <message>
-      <source>You can view %1 or read this %2 to learn more about the current problem.</source>
-      <comment>%1 is &lt;the server&apos;s certificate&gt; link, %2 is &lt;help article&gt; link</comment>
-      <translation>请查看 %1 ，或阅读 %2 文件了解更多资讯。</translation>
+      <source>This might be due to an expired server certificate or or an invalid certificate. Contact your system administrator for further investigation.</source>
+      <translation type="unfinished">This might be due to an expired server certificate or or an invalid certificate. Contact your system administrator for further investigation.</translation>
     </message>
     <message>
-      <source>This might be due to an expired server certificate or someone trying to impersonate %1 to steal your personal information.%2</source>
-      <comment>%1 is the system name, %2 are possible extra details</comment>
-      <translation>这可能是由于服务器凭证过期或有人试图冒充 %1 来窃取您的个人信息。 %2</translation>
-    </message>
-    <message>
-      <source>This message may be shown multiple times when connecting to a multi-server system.</source>
-      <translation>如连线至多服务器合并的系统，此讯息可能会重复出现。</translation>
-    </message>
-    <message>
-      <source>To learn more about the current problem view the server&apos;s certificate:</source>
-      <translation>请检视服务器凭证内容，来了解更多关于此问题的可能原因:</translation>
+      <source>To learn more about the current problem read this %1.</source>
+      <comment>%1 is &lt;help article&gt; link</comment>
+      <translation type="unfinished">To learn more about the current problem read this %1.</translation>
     </message>
   </context>
   <context>

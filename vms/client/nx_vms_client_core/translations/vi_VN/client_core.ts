@@ -201,20 +201,12 @@
   <context>
     <name>nx::vms::client::core::CertificateWarning</name>
     <message>
-      <source>Cannot verify the identity of %1</source>
-      <translation>Không thể xác minh danh tính của %1</translation>
-    </message>
-    <message>
       <source>Server certificate is invalid.</source>
       <translation>Chứng chỉ máy chủ không hợp lệ.</translation>
     </message>
     <message>
       <source>Connecting to %1 for the first time?</source>
       <translation>Kết nối với %1 lần đầu tiên?</translation>
-    </message>
-    <message>
-      <source>certificate details</source>
-      <translation>chi tiết chứng chỉ</translation>
     </message>
     <message>
       <source>help article</source>
@@ -225,32 +217,24 @@
       <comment>%1 is &lt;help article&gt; link</comment>
       <translation>Đọc %1 này để tìm hiểu thêm về xác thực chứng chỉ.</translation>
     </message>
-    <message>
-      <source>Review the %1 to ensure you trust the server you are connecting to.%2</source>
-      <comment>%1 is &lt;certificate details&gt; link, %2 are possible extra details</comment>
-      <translation>Xem lại %1 để đảm bảo bạn tin tưởng vào máy chủ mà bạn đang kết nối tới.%2</translation>
+    <message numerus="yes">
+      <source>Cannot verify the identity of %n servers</source>
+      <translation type="unfinished">
+        <numerusform>Cannot verify the identity of %n servers</numerusform>
+      </translation>
     </message>
     <message>
-      <source>the server&apos;s certificate</source>
-      <translation>chứng chỉ của máy chủ</translation>
+      <source>Review the certificates of the servers from this system.</source>
+      <translation type="unfinished">Review the certificates of the servers from this system.</translation>
     </message>
     <message>
-      <source>You can view %1 or read this %2 to learn more about the current problem.</source>
-      <comment>%1 is &lt;the server&apos;s certificate&gt; link, %2 is &lt;help article&gt; link</comment>
-      <translation>Bạn có thể xem %1 hoặc đọc %2 này để tìm hiểu thêm về vấn đề hiện tại.</translation>
+      <source>This might be due to an expired server certificate or or an invalid certificate. Contact your system administrator for further investigation.</source>
+      <translation type="unfinished">This might be due to an expired server certificate or or an invalid certificate. Contact your system administrator for further investigation.</translation>
     </message>
     <message>
-      <source>This might be due to an expired server certificate or someone trying to impersonate %1 to steal your personal information.%2</source>
-      <comment>%1 is the system name, %2 are possible extra details</comment>
-      <translation>Điều này có thể do chứng chỉ máy chủ đã hết hạn hoặc ai đó đang cố mạo danh %1 để lấy cắp thông tin cá nhân của bạn.%2</translation>
-    </message>
-    <message>
-      <source>This message may be shown multiple times when connecting to a multi-server system.</source>
-      <translation>Thông báo này có thể hiển thị nhiều lần khi kết nối với hệ thống nhiều máy chủ.</translation>
-    </message>
-    <message>
-      <source>To learn more about the current problem view the server&apos;s certificate:</source>
-      <translation>Để tìm hiểu thêm về sự cố hiện tại, hãy xem chứng chỉ của máy chủ:</translation>
+      <source>To learn more about the current problem read this %1.</source>
+      <comment>%1 is &lt;help article&gt; link</comment>
+      <translation type="unfinished">To learn more about the current problem read this %1.</translation>
     </message>
   </context>
   <context>

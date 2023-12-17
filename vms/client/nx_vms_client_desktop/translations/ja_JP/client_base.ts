@@ -6330,6 +6330,16 @@ We recommend you not to open this integration. If you understand the risks, you 
         <numerusform>%n マトリックスを削除しますか？</numerusform>
       </translation>
     </message>
+    <message>
+      <source>All members of %1 and %2 groups will get access to this layout</source>
+      <comment>%1 and %2 will be substituted with user group names</comment>
+      <translation type="unfinished">All members of %1 and %2 groups will get access to this layout</translation>
+    </message>
+    <message>
+      <source>Convert</source>
+      <comment>Converting layout to shared</comment>
+      <translation type="unfinished">Convert</translation>
+    </message>
   </context>
   <context>
     <name>ServerPickerStrings</name>
@@ -10662,6 +10672,21 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::SaasInfoWidget</name>
+    <message>
+      <source>Active</source>
+      <translation>アクティブ</translation>
+    </message>
+    <message>
+      <source>Suspended</source>
+      <translation>一時停止中</translation>
+    </message>
+    <message>
+      <source>Shut down</source>
+      <translation>シャットダウン</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::ScheduleGridWidget</name>
     <message>
       <source>All</source>
@@ -10983,12 +11008,14 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
       <translation>理解した上で接続</translation>
     </message>
     <message>
-      <source>I trust this server</source>
-      <translation>このサーバーを信用する</translation>
-    </message>
-    <message>
       <source>Continue</source>
       <translation>続行</translation>
+    </message>
+    <message numerus="yes">
+      <source>I trust these servers</source>
+      <translation type="unfinished">
+        <numerusform>I trust these servers</numerusform>
+      </translation>
     </message>
   </context>
   <context>

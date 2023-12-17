@@ -201,20 +201,12 @@
   <context>
     <name>nx::vms::client::core::CertificateWarning</name>
     <message>
-      <source>Cannot verify the identity of %1</source>
-      <translation>Kan inte verifiera identiteten på %1</translation>
-    </message>
-    <message>
       <source>Server certificate is invalid.</source>
       <translation>Serverns certifikat är ogiltigt.</translation>
     </message>
     <message>
       <source>Connecting to %1 for the first time?</source>
       <translation>Ansluter du till %1 för första gången?</translation>
-    </message>
-    <message>
-      <source>certificate details</source>
-      <translation>certifikatdetaljer</translation>
     </message>
     <message>
       <source>help article</source>
@@ -225,32 +217,25 @@
       <comment>%1 is &lt;help article&gt; link</comment>
       <translation>Läs denna %1 för att lära dig mer om certifikatvalidering.</translation>
     </message>
-    <message>
-      <source>Review the %1 to ensure you trust the server you are connecting to.%2</source>
-      <comment>%1 is &lt;certificate details&gt; link, %2 are possible extra details</comment>
-      <translation>Granska %1: an för att säkerställa att du litar på servern du ansluter till.%2</translation>
+    <message numerus="yes">
+      <source>Cannot verify the identity of %n servers</source>
+      <translation>
+        <numerusform>Kan inte verifiera identiteten för %n servrar</numerusform>
+        <numerusform>Kan inte verifiera identiteten för %n servrar</numerusform>
+      </translation>
     </message>
     <message>
-      <source>the server&apos;s certificate</source>
-      <translation>serverns&apos;s certifikat</translation>
+      <source>Review the certificates of the servers from this system.</source>
+      <translation>Granska certifikaten för servrarna från detta system.</translation>
     </message>
     <message>
-      <source>You can view %1 or read this %2 to learn more about the current problem.</source>
-      <comment>%1 is &lt;the server&apos;s certificate&gt; link, %2 is &lt;help article&gt; link</comment>
-      <translation>Du kan visa %1 eller läsa denna %2 för att lära dig mer om det aktuella problemet.</translation>
+      <source>This might be due to an expired server certificate or or an invalid certificate. Contact your system administrator for further investigation.</source>
+      <translation>Detta kan bero på ett utgånget servercertifikat eller ett ogiltigt certifikat. Kontakta din systemadministratör för vidare utredning.</translation>
     </message>
     <message>
-      <source>This might be due to an expired server certificate or someone trying to impersonate %1 to steal your personal information.%2</source>
-      <comment>%1 is the system name, %2 are possible extra details</comment>
-      <translation>Detta kan bero på ett utgånget servercertifikat eller att någon försöker utge sig för att vara %1 för att stjäla din personliga information.%2</translation>
-    </message>
-    <message>
-      <source>This message may be shown multiple times when connecting to a multi-server system.</source>
-      <translation>Detta meddelande kan visas flera gånger när du ansluter till ett multiserversystem.</translation>
-    </message>
-    <message>
-      <source>To learn more about the current problem view the server&apos;s certificate:</source>
-      <translation>För att lära dig mer om det aktuella problemet, se serverns&apos;s certifikat:</translation>
+      <source>To learn more about the current problem read this %1.</source>
+      <comment>%1 is &lt;help article&gt; link</comment>
+      <translation>För att lära dig mer om det aktuella problemet läs %1.</translation>
     </message>
   </context>
   <context>

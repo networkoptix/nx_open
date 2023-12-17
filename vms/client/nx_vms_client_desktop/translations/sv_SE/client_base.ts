@@ -6435,6 +6435,16 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
         <numerusform>Radera %n matriser?</numerusform>
       </translation>
     </message>
+    <message>
+      <source>All members of %1 and %2 groups will get access to this layout</source>
+      <comment>%1 and %2 will be substituted with user group names</comment>
+      <translation>Alla medlemmar i %1 och %2 grupper kommer att få tillgång till denna layout</translation>
+    </message>
+    <message>
+      <source>Convert</source>
+      <comment>Converting layout to shared</comment>
+      <translation>Konvertera</translation>
+    </message>
   </context>
   <context>
     <name>ServerPickerStrings</name>
@@ -10832,6 +10842,21 @@ Du kan tvinga det, men det kan avsevärt öka CPU-belastning.</translation>
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::SaasInfoWidget</name>
+    <message>
+      <source>Active</source>
+      <translation>Aktiv</translation>
+    </message>
+    <message>
+      <source>Suspended</source>
+      <translation>Suspenderad</translation>
+    </message>
+    <message>
+      <source>Shut down</source>
+      <translation>Stäng av</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::ScheduleGridWidget</name>
     <message>
       <source>All</source>
@@ -11154,12 +11179,15 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
       <translation>Anslut ändå</translation>
     </message>
     <message>
-      <source>I trust this server</source>
-      <translation>Jag litar på den här servern</translation>
-    </message>
-    <message>
       <source>Continue</source>
       <translation>Fortsätt</translation>
+    </message>
+    <message numerus="yes">
+      <source>I trust these servers</source>
+      <translation>
+        <numerusform>Jag litar på dessa servrar</numerusform>
+        <numerusform>Jag litar på dessa servrar</numerusform>
+      </translation>
     </message>
   </context>
   <context>

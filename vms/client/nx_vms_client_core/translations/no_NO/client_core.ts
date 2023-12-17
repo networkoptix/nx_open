@@ -201,20 +201,12 @@
   <context>
     <name>nx::vms::client::core::CertificateWarning</name>
     <message>
-      <source>Cannot verify the identity of %1</source>
-      <translation>Kan ikke verifisere identiteten til %1</translation>
-    </message>
-    <message>
       <source>Server certificate is invalid.</source>
       <translation>Server-sertifikatet er ugyldig.</translation>
     </message>
     <message>
       <source>Connecting to %1 for the first time?</source>
       <translation>Koble til %1 for første gang?</translation>
-    </message>
-    <message>
-      <source>certificate details</source>
-      <translation>sertifikatdetaljer</translation>
     </message>
     <message>
       <source>help article</source>
@@ -225,32 +217,25 @@
       <comment>%1 is &lt;help article&gt; link</comment>
       <translation>Les denne %1 for å lære mer om sertifikatvalidering.</translation>
     </message>
-    <message>
-      <source>Review the %1 to ensure you trust the server you are connecting to.%2</source>
-      <comment>%1 is &lt;certificate details&gt; link, %2 are possible extra details</comment>
-      <translation>Se gjennom %1 -en for å sikre at du stoler på serveren du kobler til.%2</translation>
+    <message numerus="yes">
+      <source>Cannot verify the identity of %n servers</source>
+      <translation type="unfinished">
+        <numerusform>Cannot verify the identity of %n servers</numerusform>
+        <numerusform>Cannot verify the identity of %n servers</numerusform>
+      </translation>
     </message>
     <message>
-      <source>the server&apos;s certificate</source>
-      <translation>serverens sertifikat</translation>
+      <source>Review the certificates of the servers from this system.</source>
+      <translation type="unfinished">Review the certificates of the servers from this system.</translation>
     </message>
     <message>
-      <source>You can view %1 or read this %2 to learn more about the current problem.</source>
-      <comment>%1 is &lt;the server&apos;s certificate&gt; link, %2 is &lt;help article&gt; link</comment>
-      <translation>Du kan se %1 eller lese denne %2 for å lære mer om det nåværende problemet.</translation>
+      <source>This might be due to an expired server certificate or or an invalid certificate. Contact your system administrator for further investigation.</source>
+      <translation type="unfinished">This might be due to an expired server certificate or or an invalid certificate. Contact your system administrator for further investigation.</translation>
     </message>
     <message>
-      <source>This might be due to an expired server certificate or someone trying to impersonate %1 to steal your personal information.%2</source>
-      <comment>%1 is the system name, %2 are possible extra details</comment>
-      <translation>Dette kan skyldes et utløpt serversertifikat eller at noen prøver å etterligne %1 for å stjele din personlige informasjon.%2</translation>
-    </message>
-    <message>
-      <source>This message may be shown multiple times when connecting to a multi-server system.</source>
-      <translation>Denne meldingen kan vises flere ganger når du kobler til et multiserversystem.</translation>
-    </message>
-    <message>
-      <source>To learn more about the current problem view the server&apos;s certificate:</source>
-      <translation>For å lære mer om det gjeldende problemet, se serverens sertifikat:</translation>
+      <source>To learn more about the current problem read this %1.</source>
+      <comment>%1 is &lt;help article&gt; link</comment>
+      <translation type="unfinished">To learn more about the current problem read this %1.</translation>
     </message>
   </context>
   <context>

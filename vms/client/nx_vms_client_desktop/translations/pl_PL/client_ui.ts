@@ -2469,6 +2469,10 @@
       <source>Services Usage</source>
       <translation>Użycie usług</translation>
     </message>
+    <message>
+      <source>Services state</source>
+      <translation type="unfinished">Services state</translation>
+    </message>
   </context>
   <context>
     <name>SayTextBusinessActionWidget</name>

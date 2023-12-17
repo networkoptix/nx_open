@@ -6330,6 +6330,16 @@ Chúng tôi khuyên bạn không nên mở tích hợp này. Nếu bạn hiểu 
         <numerusform>Xóa %n ma trận?</numerusform>
       </translation>
     </message>
+    <message>
+      <source>All members of %1 and %2 groups will get access to this layout</source>
+      <comment>%1 and %2 will be substituted with user group names</comment>
+      <translation type="unfinished">All members of %1 and %2 groups will get access to this layout</translation>
+    </message>
+    <message>
+      <source>Convert</source>
+      <comment>Converting layout to shared</comment>
+      <translation type="unfinished">Convert</translation>
+    </message>
   </context>
   <context>
     <name>ServerPickerStrings</name>
@@ -10661,6 +10671,21 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::SaasInfoWidget</name>
+    <message>
+      <source>Active</source>
+      <translation>Hoạt động</translation>
+    </message>
+    <message>
+      <source>Suspended</source>
+      <translation>Bị tạm ngưng</translation>
+    </message>
+    <message>
+      <source>Shut down</source>
+      <translation>Tắt nguồn</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::ScheduleGridWidget</name>
     <message>
       <source>All</source>
@@ -10983,12 +11008,14 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
       <translation>Vẫn kết nối</translation>
     </message>
     <message>
-      <source>I trust this server</source>
-      <translation>Tôi tin tưởng máy chủ này</translation>
-    </message>
-    <message>
       <source>Continue</source>
       <translation>Tiếp tục</translation>
+    </message>
+    <message numerus="yes">
+      <source>I trust these servers</source>
+      <translation type="unfinished">
+        <numerusform>I trust these servers</numerusform>
+      </translation>
     </message>
   </context>
   <context>
