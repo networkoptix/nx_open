@@ -201,20 +201,12 @@
   <context>
     <name>nx::vms::client::core::CertificateWarning</name>
     <message>
-      <source>Cannot verify the identity of %1</source>
-      <translation>%1 の識別情報を確認できません</translation>
-    </message>
-    <message>
       <source>Server certificate is invalid.</source>
       <translation>サーバー証明書が無効です。</translation>
     </message>
     <message>
       <source>Connecting to %1 for the first time?</source>
       <translation>%1 への接続は初めてですか?</translation>
-    </message>
-    <message>
-      <source>certificate details</source>
-      <translation>証明書の詳細</translation>
     </message>
     <message>
       <source>help article</source>
@@ -225,32 +217,24 @@
       <comment>%1 is &lt;help article&gt; link</comment>
       <translation>証明書検証の詳細については、この %1 をご参照ください。</translation>
     </message>
-    <message>
-      <source>Review the %1 to ensure you trust the server you are connecting to.%2</source>
-      <comment>%1 is &lt;certificate details&gt; link, %2 are possible extra details</comment>
-      <translation>%1 をご確認のうえ、接続先サーバーが信頼できることをお確かめください。%2</translation>
+    <message numerus="yes">
+      <source>Cannot verify the identity of %n servers</source>
+      <translation type="unfinished">
+        <numerusform>Cannot verify the identity of %n servers</numerusform>
+      </translation>
     </message>
     <message>
-      <source>the server&apos;s certificate</source>
-      <translation>サーバーの証明書</translation>
+      <source>Review the certificates of the servers from this system.</source>
+      <translation type="unfinished">Review the certificates of the servers from this system.</translation>
     </message>
     <message>
-      <source>You can view %1 or read this %2 to learn more about the current problem.</source>
-      <comment>%1 is &lt;the server&apos;s certificate&gt; link, %2 is &lt;help article&gt; link</comment>
-      <translation>現在の問題の詳細については、 %1 を表示するか、この %2 をご参照ください。</translation>
+      <source>This might be due to an expired server certificate or or an invalid certificate. Contact your system administrator for further investigation.</source>
+      <translation type="unfinished">This might be due to an expired server certificate or or an invalid certificate. Contact your system administrator for further investigation.</translation>
     </message>
     <message>
-      <source>This might be due to an expired server certificate or someone trying to impersonate %1 to steal your personal information.%2</source>
-      <comment>%1 is the system name, %2 are possible extra details</comment>
-      <translation>原因としては、サーバー証明書の有効期限が切れているか、誰かが %1 になりすまして個人情報を盗もうとしていることが考えられます。 %2</translation>
-    </message>
-    <message>
-      <source>This message may be shown multiple times when connecting to a multi-server system.</source>
-      <translation>このメッセージは、マルチサーバーシステムに接続する際に複数回表示される場合があります。</translation>
-    </message>
-    <message>
-      <source>To learn more about the current problem view the server&apos;s certificate:</source>
-      <translation>現在の問題の詳細については、サーバーの証明書をご確認ください:</translation>
+      <source>To learn more about the current problem read this %1.</source>
+      <comment>%1 is &lt;help article&gt; link</comment>
+      <translation type="unfinished">To learn more about the current problem read this %1.</translation>
     </message>
   </context>
   <context>

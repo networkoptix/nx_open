@@ -201,20 +201,12 @@
   <context>
     <name>nx::vms::client::core::CertificateWarning</name>
     <message>
-      <source>Cannot verify the identity of %1</source>
-      <translation>Не можливо перевірити справжність %1</translation>
-    </message>
-    <message>
       <source>Server certificate is invalid.</source>
       <translation>Сертифікат сервера недійсний.</translation>
     </message>
     <message>
       <source>Connecting to %1 for the first time?</source>
       <translation>З’єднання з %1 вперше?</translation>
-    </message>
-    <message>
-      <source>certificate details</source>
-      <translation>деталі сертифікату</translation>
     </message>
     <message>
       <source>help article</source>
@@ -225,32 +217,27 @@
       <comment>%1 is &lt;help article&gt; link</comment>
       <translation>Прочитайте цей матеріал %1, щоб дізнатися більше про перевірку сертифікату.</translation>
     </message>
-    <message>
-      <source>Review the %1 to ensure you trust the server you are connecting to.%2</source>
-      <comment>%1 is &lt;certificate details&gt; link, %2 are possible extra details</comment>
-      <translation>Зробити огляд %1 , щоб переконатися, що ви довіряєте серверу, до якого підключаєтесь.%2</translation>
+    <message numerus="yes">
+      <source>Cannot verify the identity of %n servers</source>
+      <translation type="unfinished">
+        <numerusform>Cannot verify the identity of %n servers</numerusform>
+        <numerusform>Cannot verify the identity of %n servers</numerusform>
+        <numerusform>Cannot verify the identity of %n servers</numerusform>
+        <numerusform>Cannot verify the identity of %n servers</numerusform>
+      </translation>
     </message>
     <message>
-      <source>the server&apos;s certificate</source>
-      <translation>сертифікат серверу&apos;</translation>
+      <source>Review the certificates of the servers from this system.</source>
+      <translation type="unfinished">Review the certificates of the servers from this system.</translation>
     </message>
     <message>
-      <source>You can view %1 or read this %2 to learn more about the current problem.</source>
-      <comment>%1 is &lt;the server&apos;s certificate&gt; link, %2 is &lt;help article&gt; link</comment>
-      <translation>Ви можете зробити огляд %1 або прочитати це %2 , щоб дізнатися більше про поточну проблему.</translation>
+      <source>This might be due to an expired server certificate or or an invalid certificate. Contact your system administrator for further investigation.</source>
+      <translation type="unfinished">This might be due to an expired server certificate or or an invalid certificate. Contact your system administrator for further investigation.</translation>
     </message>
     <message>
-      <source>This might be due to an expired server certificate or someone trying to impersonate %1 to steal your personal information.%2</source>
-      <comment>%1 is the system name, %2 are possible extra details</comment>
-      <translation>Це може бути пов’язано з простроченим сертифікатом сервера або тим, що хтось намагається видати себе за %1, щоб викрасти вашу особисту інформацію.%2</translation>
-    </message>
-    <message>
-      <source>This message may be shown multiple times when connecting to a multi-server system.</source>
-      <translation>Це повідомлення може відображатися кілька разів під час підключення до багатосерверної системи.</translation>
-    </message>
-    <message>
-      <source>To learn more about the current problem view the server&apos;s certificate:</source>
-      <translation>Щоб дізнатися більше про поточну проблему, перегляньте сертифікат сервера&apos;:</translation>
+      <source>To learn more about the current problem read this %1.</source>
+      <comment>%1 is &lt;help article&gt; link</comment>
+      <translation type="unfinished">To learn more about the current problem read this %1.</translation>
     </message>
   </context>
   <context>

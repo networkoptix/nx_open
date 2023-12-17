@@ -201,20 +201,12 @@
   <context>
     <name>nx::vms::client::core::CertificateWarning</name>
     <message>
-      <source>Cannot verify the identity of %1</source>
-      <translation>%1kimliği doğrulanamıyor</translation>
-    </message>
-    <message>
       <source>Server certificate is invalid.</source>
       <translation>Sunucunun sertifikası geçersiz.</translation>
     </message>
     <message>
       <source>Connecting to %1 for the first time?</source>
       <translation>%1 ile ilk kez mi bağlantı sağlıyorsunuz?</translation>
-    </message>
-    <message>
-      <source>certificate details</source>
-      <translation>sertifika detayları</translation>
     </message>
     <message>
       <source>help article</source>
@@ -225,32 +217,25 @@
       <comment>%1 is &lt;help article&gt; link</comment>
       <translation>Sertifika doğrulama hakkında daha fazla bilgi edinmek için bu %1 okuyun.</translation>
     </message>
-    <message>
-      <source>Review the %1 to ensure you trust the server you are connecting to.%2</source>
-      <comment>%1 is &lt;certificate details&gt; link, %2 are possible extra details</comment>
-      <translation>Bağlandığınız sunucuya güvendiğinizden emin olmak için %1 'i gözden geçirin.%2</translation>
+    <message numerus="yes">
+      <source>Cannot verify the identity of %n servers</source>
+      <translation type="unfinished">
+        <numerusform>Cannot verify the identity of %n servers</numerusform>
+        <numerusform>Cannot verify the identity of %n servers</numerusform>
+      </translation>
     </message>
     <message>
-      <source>the server&apos;s certificate</source>
-      <translation>sunucu&apos;s sertifikası</translation>
+      <source>Review the certificates of the servers from this system.</source>
+      <translation type="unfinished">Review the certificates of the servers from this system.</translation>
     </message>
     <message>
-      <source>You can view %1 or read this %2 to learn more about the current problem.</source>
-      <comment>%1 is &lt;the server&apos;s certificate&gt; link, %2 is &lt;help article&gt; link</comment>
-      <translation>Mevcut sorun hakkında daha fazla bilgi edinmek için %1 görüntüleyebilir veya bunu %2 okuyabilirsiniz.</translation>
+      <source>This might be due to an expired server certificate or or an invalid certificate. Contact your system administrator for further investigation.</source>
+      <translation type="unfinished">This might be due to an expired server certificate or or an invalid certificate. Contact your system administrator for further investigation.</translation>
     </message>
     <message>
-      <source>This might be due to an expired server certificate or someone trying to impersonate %1 to steal your personal information.%2</source>
-      <comment>%1 is the system name, %2 are possible extra details</comment>
-      <translation>Bunun nedeni süresi dolmuş bir sunucu sertifikası veya kişisel bilgilerinizi çalmak için %1 kimliğine bürünmeye çalışan biri olabilir.%2</translation>
-    </message>
-    <message>
-      <source>This message may be shown multiple times when connecting to a multi-server system.</source>
-      <translation>Bu mesaj, çok sunuculu bir sisteme bağlanırken birden çok kez gösterilebilir.</translation>
-    </message>
-    <message>
-      <source>To learn more about the current problem view the server&apos;s certificate:</source>
-      <translation>Mevcut sorun hakkında daha fazla bilgi edinmek için sunucu&apos;sertifikasını görüntüleyin:</translation>
+      <source>To learn more about the current problem read this %1.</source>
+      <comment>%1 is &lt;help article&gt; link</comment>
+      <translation type="unfinished">To learn more about the current problem read this %1.</translation>
     </message>
   </context>
   <context>

@@ -201,20 +201,12 @@
   <context>
     <name>nx::vms::client::core::CertificateWarning</name>
     <message>
-      <source>Cannot verify the identity of %1</source>
-      <translation>Não é possível verificar a identidade de %1</translation>
-    </message>
-    <message>
       <source>Server certificate is invalid.</source>
       <translation>O certificado do servidor é inválido.</translation>
     </message>
     <message>
       <source>Connecting to %1 for the first time?</source>
       <translation>Conectando a %1 pela primeira vez?</translation>
-    </message>
-    <message>
-      <source>certificate details</source>
-      <translation>detalhes do certificado</translation>
     </message>
     <message>
       <source>help article</source>
@@ -225,32 +217,25 @@
       <comment>%1 is &lt;help article&gt; link</comment>
       <translation>Leia este %1 para saber mais sobre validação de certificado.</translation>
     </message>
-    <message>
-      <source>Review the %1 to ensure you trust the server you are connecting to.%2</source>
-      <comment>%1 is &lt;certificate details&gt; link, %2 are possible extra details</comment>
-      <translation>Revise o %1 para garantir que você confia no servidor ao qual está se conectando.%2</translation>
+    <message numerus="yes">
+      <source>Cannot verify the identity of %n servers</source>
+      <translation type="unfinished">
+        <numerusform>Cannot verify the identity of %n servers</numerusform>
+        <numerusform>Cannot verify the identity of %n servers</numerusform>
+      </translation>
     </message>
     <message>
-      <source>the server&apos;s certificate</source>
-      <translation>o certificado do servidor</translation>
+      <source>Review the certificates of the servers from this system.</source>
+      <translation type="unfinished">Review the certificates of the servers from this system.</translation>
     </message>
     <message>
-      <source>You can view %1 or read this %2 to learn more about the current problem.</source>
-      <comment>%1 is &lt;the server&apos;s certificate&gt; link, %2 is &lt;help article&gt; link</comment>
-      <translation>Você pode ver %1 ou ler este %2 para saber mais sobre o problema atual.</translation>
+      <source>This might be due to an expired server certificate or or an invalid certificate. Contact your system administrator for further investigation.</source>
+      <translation type="unfinished">This might be due to an expired server certificate or or an invalid certificate. Contact your system administrator for further investigation.</translation>
     </message>
     <message>
-      <source>This might be due to an expired server certificate or someone trying to impersonate %1 to steal your personal information.%2</source>
-      <comment>%1 is the system name, %2 are possible extra details</comment>
-      <translation>Isso pode ser devido a um certificado de servidor expirado ou alguém tentando se passar por %1 para roubar suas informações pessoais.%2</translation>
-    </message>
-    <message>
-      <source>This message may be shown multiple times when connecting to a multi-server system.</source>
-      <translation>Esta mensagem pode ser mostrada várias vezes ao se conectar a um sistema multi-servidores.</translation>
-    </message>
-    <message>
-      <source>To learn more about the current problem view the server&apos;s certificate:</source>
-      <translation>Para saber mais sobre o problema atual veja o certificado do servidor:</translation>
+      <source>To learn more about the current problem read this %1.</source>
+      <comment>%1 is &lt;help article&gt; link</comment>
+      <translation type="unfinished">To learn more about the current problem read this %1.</translation>
     </message>
   </context>
   <context>

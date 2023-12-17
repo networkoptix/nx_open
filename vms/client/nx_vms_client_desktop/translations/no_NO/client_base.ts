@@ -6434,6 +6434,16 @@ Vi anbefaler at du ikke åpner denne integrasjonen. Hvis du forstår risikoen, k
         <numerusform>Vil du slette %n matriser?</numerusform>
       </translation>
     </message>
+    <message>
+      <source>All members of %1 and %2 groups will get access to this layout</source>
+      <comment>%1 and %2 will be substituted with user group names</comment>
+      <translation type="unfinished">All members of %1 and %2 groups will get access to this layout</translation>
+    </message>
+    <message>
+      <source>Convert</source>
+      <comment>Converting layout to shared</comment>
+      <translation type="unfinished">Convert</translation>
+    </message>
   </context>
   <context>
     <name>ServerPickerStrings</name>
@@ -10831,6 +10841,21 @@ Du kan fremtvinge det, men det kan øke CPU-belastningen betydelig.</translation
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::SaasInfoWidget</name>
+    <message>
+      <source>Active</source>
+      <translation>Aktiv</translation>
+    </message>
+    <message>
+      <source>Suspended</source>
+      <translation>Suspendert</translation>
+    </message>
+    <message>
+      <source>Shut down</source>
+      <translation type="unfinished">Shut down</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::ScheduleGridWidget</name>
     <message>
       <source>All</source>
@@ -11151,12 +11176,15 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
       <translation>Koble til uansett</translation>
     </message>
     <message>
-      <source>I trust this server</source>
-      <translation>Jeg stoler på denne serveren</translation>
-    </message>
-    <message>
       <source>Continue</source>
       <translation>Fortsette</translation>
+    </message>
+    <message numerus="yes">
+      <source>I trust these servers</source>
+      <translation type="unfinished">
+        <numerusform>I trust these servers</numerusform>
+        <numerusform>I trust these servers</numerusform>
+      </translation>
     </message>
   </context>
   <context>

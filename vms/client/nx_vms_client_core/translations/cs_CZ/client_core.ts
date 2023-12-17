@@ -201,20 +201,12 @@
   <context>
     <name>nx::vms::client::core::CertificateWarning</name>
     <message>
-      <source>Cannot verify the identity of %1</source>
-      <translation type="unfinished">Cannot verify the identity of %1</translation>
-    </message>
-    <message>
       <source>Server certificate is invalid.</source>
       <translation type="unfinished">Server certificate is invalid.</translation>
     </message>
     <message>
       <source>Connecting to %1 for the first time?</source>
       <translation>Připojujete se k %1 poprvé?</translation>
-    </message>
-    <message>
-      <source>certificate details</source>
-      <translation>podrobnosti certifikátu</translation>
     </message>
     <message>
       <source>help article</source>
@@ -225,32 +217,27 @@
       <comment>%1 is &lt;help article&gt; link</comment>
       <translation>Přečtěte si tento %1, abyste se dozvěděli více o ověřování certifikátů.</translation>
     </message>
-    <message>
-      <source>Review the %1 to ensure you trust the server you are connecting to.%2</source>
-      <comment>%1 is &lt;certificate details&gt; link, %2 are possible extra details</comment>
-      <translation>Zkontrolujte %1, abyste se ujistili, že důvěřujete serveru, ke kterému se připojujete.%2</translation>
+    <message numerus="yes">
+      <source>Cannot verify the identity of %n servers</source>
+      <translation type="unfinished">
+        <numerusform>Cannot verify the identity of %n servers</numerusform>
+        <numerusform>Cannot verify the identity of %n servers</numerusform>
+        <numerusform>Cannot verify the identity of %n servers</numerusform>
+        <numerusform>Cannot verify the identity of %n servers</numerusform>
+      </translation>
     </message>
     <message>
-      <source>the server&apos;s certificate</source>
-      <translation>certifikát serveru</translation>
+      <source>Review the certificates of the servers from this system.</source>
+      <translation type="unfinished">Review the certificates of the servers from this system.</translation>
     </message>
     <message>
-      <source>You can view %1 or read this %2 to learn more about the current problem.</source>
-      <comment>%1 is &lt;the server&apos;s certificate&gt; link, %2 is &lt;help article&gt; link</comment>
-      <translation>Chcete-li se dozvědět více o aktuálním problému, můžete si prohlédnout %1 nebo přečíst tento %2.</translation>
+      <source>This might be due to an expired server certificate or or an invalid certificate. Contact your system administrator for further investigation.</source>
+      <translation type="unfinished">This might be due to an expired server certificate or or an invalid certificate. Contact your system administrator for further investigation.</translation>
     </message>
     <message>
-      <source>This might be due to an expired server certificate or someone trying to impersonate %1 to steal your personal information.%2</source>
-      <comment>%1 is the system name, %2 are possible extra details</comment>
-      <translation>Může to být způsobeno vypršenou platností certifikátu serveru nebo někdo, kdo se snaží vydávat za %1, aby ukradl vaše osobní údaje.%2</translation>
-    </message>
-    <message>
-      <source>This message may be shown multiple times when connecting to a multi-server system.</source>
-      <translation>Tato zpráva se může zobrazit vícekrát při připojení k systému s více servery.</translation>
-    </message>
-    <message>
-      <source>To learn more about the current problem view the server&apos;s certificate:</source>
-      <translation>Chcete-li se dozvědět více o aktuálním problému, zobrazte certifikát serveru:</translation>
+      <source>To learn more about the current problem read this %1.</source>
+      <comment>%1 is &lt;help article&gt; link</comment>
+      <translation type="unfinished">To learn more about the current problem read this %1.</translation>
     </message>
   </context>
   <context>

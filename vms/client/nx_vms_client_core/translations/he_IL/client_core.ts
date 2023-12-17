@@ -201,20 +201,12 @@
   <context>
     <name>nx::vms::client::core::CertificateWarning</name>
     <message>
-      <source>Cannot verify the identity of %1</source>
-      <translation type="unfinished">Cannot verify the identity of %1</translation>
-    </message>
-    <message>
       <source>Server certificate is invalid.</source>
       <translation type="unfinished">Server certificate is invalid.</translation>
     </message>
     <message>
       <source>Connecting to %1 for the first time?</source>
       <translation>מתחבר ל %1 בפעם הראשונה?</translation>
-    </message>
-    <message>
-      <source>certificate details</source>
-      <translation>פרטי תעודה</translation>
     </message>
     <message>
       <source>help article</source>
@@ -225,32 +217,27 @@
       <comment>%1 is &lt;help article&gt; link</comment>
       <translation>קרא את ה %1 הזה כדי ללמוד עוד על אימות אישור.</translation>
     </message>
-    <message>
-      <source>Review the %1 to ensure you trust the server you are connecting to.%2</source>
-      <comment>%1 is &lt;certificate details&gt; link, %2 are possible extra details</comment>
-      <translation>עיין ב %1 כדי לוודא שאתה סומך על השרת שאליו אתה מתחבר.%2</translation>
+    <message numerus="yes">
+      <source>Cannot verify the identity of %n servers</source>
+      <translation type="unfinished">
+        <numerusform>Cannot verify the identity of %n servers</numerusform>
+        <numerusform>Cannot verify the identity of %n servers</numerusform>
+        <numerusform>Cannot verify the identity of %n servers</numerusform>
+        <numerusform>Cannot verify the identity of %n servers</numerusform>
+      </translation>
     </message>
     <message>
-      <source>the server&apos;s certificate</source>
-      <translation>אישור השרת</translation>
+      <source>Review the certificates of the servers from this system.</source>
+      <translation type="unfinished">Review the certificates of the servers from this system.</translation>
     </message>
     <message>
-      <source>You can view %1 or read this %2 to learn more about the current problem.</source>
-      <comment>%1 is &lt;the server&apos;s certificate&gt; link, %2 is &lt;help article&gt; link</comment>
-      <translation>אתה יכול להציג %1 או לקרוא את ה %2 הזה כדי ללמוד עוד על הבעיה הנוכחית.</translation>
+      <source>This might be due to an expired server certificate or or an invalid certificate. Contact your system administrator for further investigation.</source>
+      <translation type="unfinished">This might be due to an expired server certificate or or an invalid certificate. Contact your system administrator for further investigation.</translation>
     </message>
     <message>
-      <source>This might be due to an expired server certificate or someone trying to impersonate %1 to steal your personal information.%2</source>
-      <comment>%1 is the system name, %2 are possible extra details</comment>
-      <translation>זה עשוי לנבוע מתעודת שרת שפג תוקפו או שמישהו מנסה להתחזות ל %1 כדי לגנוב את המידע האישי שלך.%2</translation>
-    </message>
-    <message>
-      <source>This message may be shown multiple times when connecting to a multi-server system.</source>
-      <translation>הודעה זו עשויה להופיע מספר פעמים בעת חיבור למערכת מרובת שרתים.</translation>
-    </message>
-    <message>
-      <source>To learn more about the current problem view the server&apos;s certificate:</source>
-      <translation>למידע נוסף על הבעיה הנוכחית, עיין באישור של השרת:</translation>
+      <source>To learn more about the current problem read this %1.</source>
+      <comment>%1 is &lt;help article&gt; link</comment>
+      <translation type="unfinished">To learn more about the current problem read this %1.</translation>
     </message>
   </context>
   <context>

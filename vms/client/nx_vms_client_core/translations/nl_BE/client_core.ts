@@ -201,20 +201,12 @@
   <context>
     <name>nx::vms::client::core::CertificateWarning</name>
     <message>
-      <source>Cannot verify the identity of %1</source>
-      <translation>Kan de identiteit van %1 niet verifiëren</translation>
-    </message>
-    <message>
       <source>Server certificate is invalid.</source>
       <translation>Servercertificaat is ongeldig.</translation>
     </message>
     <message>
       <source>Connecting to %1 for the first time?</source>
       <translation>Voor het eerst verbinding maken met %1?</translation>
-    </message>
-    <message>
-      <source>certificate details</source>
-      <translation>certificaat details</translation>
     </message>
     <message>
       <source>help article</source>
@@ -225,32 +217,25 @@
       <comment>%1 is &lt;help article&gt; link</comment>
       <translation>Lees deze %1 voor meer informatie over certificaatvalidatie.</translation>
     </message>
-    <message>
-      <source>Review the %1 to ensure you trust the server you are connecting to.%2</source>
-      <comment>%1 is &lt;certificate details&gt; link, %2 are possible extra details</comment>
-      <translation>Bekijk de %1 om er zeker van te zijn dat u de server vertrouwt waarmee u verbinding maakt.%2</translation>
+    <message numerus="yes">
+      <source>Cannot verify the identity of %n servers</source>
+      <translation type="unfinished">
+        <numerusform>Cannot verify the identity of %n servers</numerusform>
+        <numerusform>Cannot verify the identity of %n servers</numerusform>
+      </translation>
     </message>
     <message>
-      <source>the server&apos;s certificate</source>
-      <translation>het server&apos;s-certificaat</translation>
+      <source>Review the certificates of the servers from this system.</source>
+      <translation type="unfinished">Review the certificates of the servers from this system.</translation>
     </message>
     <message>
-      <source>You can view %1 or read this %2 to learn more about the current problem.</source>
-      <comment>%1 is &lt;the server&apos;s certificate&gt; link, %2 is &lt;help article&gt; link</comment>
-      <translation>U kunt %1 bekijken of deze %2 lezen om meer te weten te komen over het huidige probleem.</translation>
+      <source>This might be due to an expired server certificate or or an invalid certificate. Contact your system administrator for further investigation.</source>
+      <translation type="unfinished">This might be due to an expired server certificate or or an invalid certificate. Contact your system administrator for further investigation.</translation>
     </message>
     <message>
-      <source>This might be due to an expired server certificate or someone trying to impersonate %1 to steal your personal information.%2</source>
-      <comment>%1 is the system name, %2 are possible extra details</comment>
-      <translation>Dit kan te wijten zijn aan een verlopen servercertificaat of aan iemand die probeert zich voor te doen als %1 om uw persoonlijke gegevens te stelen.%2</translation>
-    </message>
-    <message>
-      <source>This message may be shown multiple times when connecting to a multi-server system.</source>
-      <translation>Dit bericht kan meerdere keren worden weergegeven wanneer u verbinding maakt met een systeem met meerdere servers.</translation>
-    </message>
-    <message>
-      <source>To learn more about the current problem view the server&apos;s certificate:</source>
-      <translation>Bekijk het server&apos;s-certificaat voor meer informatie over het huidige probleem:</translation>
+      <source>To learn more about the current problem read this %1.</source>
+      <comment>%1 is &lt;help article&gt; link</comment>
+      <translation type="unfinished">To learn more about the current problem read this %1.</translation>
     </message>
   </context>
   <context>
