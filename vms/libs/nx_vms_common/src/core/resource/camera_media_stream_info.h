@@ -29,7 +29,8 @@ public:
     - rtsp
     - webm (webm over http)
     - hls (Apple Http Live Streaming)
-    - mjpg (motion jpeg over http)
+    - mjpeg (motion jpeg over http)
+    - webrtc
     */
     std::vector<QString> transports;
     //!if \a true this stream is produced by transcoding one of native (having this flag set to \a false) stream
