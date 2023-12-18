@@ -53,7 +53,7 @@ QString CertificateWarning::details(Reason reason, ClientType clientType)
         case Reason::serverCertificateChanged:
         {
             return tr(
-                "This might be due to an expired server certificate or or an invalid certificate. "
+                "This might be due to an expired server certificate or an invalid certificate. "
                 "Contact your system administrator for further investigation.");
         }
         default:
