@@ -92,7 +92,6 @@ public:
         m_state.currentLayoutId = QnUuid(state.value(kCurrentLayoutId).toString());
         m_state.runningTourId = QnUuid(state.value(kRunningTourId).toString());
         QJson::deserialize(state.value(kLayoutUuids), &m_state.layoutUuids);
-        QJson::deserialize(state.value(kUnsavedLayouts), &m_state.unsavedLayouts);
         return true;
     }
 
@@ -107,7 +106,6 @@ public:
             result[kCurrentLayoutId] = m_state.currentLayoutId.toString();
             result[kRunningTourId] = m_state.runningTourId.toString();
             QJson::serialize(m_state.layoutUuids, &result[kLayoutUuids]);
-            QJson::serialize(m_state.unsavedLayouts, &result[kUnsavedLayouts]);
             *state = result;
         }
     }
