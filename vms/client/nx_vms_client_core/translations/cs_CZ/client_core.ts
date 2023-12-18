@@ -2,29 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="cs_CZ" sourcelanguage="en">
   <context>
-    <name>QnCloudSystemInformationWatcher</name>
-    <message>
-      <source>Owner: %1</source>
-      <comment>%1 is a user name</comment>
-      <translation>Vlastník: %1</translation>
-    </message>
-    <message>
-      <source>Your System</source>
-      <translation>Váš systém</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnDesktopAudioOnlyDataProvider</name>
-    <message>
-      <source>Sample format of input device %1 is not supported.</source>
-      <translation>Formát vzoru vstupního zařízení %1 není podporován.</translation>
-    </message>
-    <message>
-      <source>Primary audio device is not selected.</source>
-      <translation>Není vybráno primární zvukové zařízení.</translation>
-    </message>
-  </context>
-  <context>
     <name>QnDirectSystemsFinder</name>
     <message>
       <source>System</source>
@@ -107,10 +84,6 @@
       <translation type="unfinished">%1 user login is temporarily unavailable</translation>
     </message>
     <message>
-      <source>Connection timed out</source>
-      <translation>Časový limit připojení vypršel</translation>
-    </message>
-    <message>
       <source>The server is incompatible.</source>
       <translation type="unfinished">The server is incompatible.</translation>
     </message>
@@ -164,11 +137,6 @@
       <translation type="unfinished">Connection to %1 is not ready yet. Check your internet connection or try again later.</translation>
     </message>
     <message>
-      <source>Connection to %1 is not ready yet. Check the server’s internet connection or try again later.</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connection to %1 is not ready yet. Check the server’s internet connection or try again later.</translation>
-    </message>
-    <message>
       <source>Connection to the server could not be established. Try again later.</source>
       <translation type="unfinished">Connection to the server could not be established. Try again later.</translation>
     </message>
@@ -199,11 +167,6 @@
       <translation type="unfinished">Too many login attempts. Try again in a minute.</translation>
     </message>
     <message>
-      <source>To log in to this System, disable “Ask for a verification code on every login with your %1 account” in your %2.</source>
-      <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation type="unfinished">To log in to this System, disable “Ask for a verification code on every login with your %1 account” in your %2.</translation>
-    </message>
-    <message>
       <source>Two-factor authentication is required.</source>
       <translation type="unfinished">Two-factor authentication is required.</translation>
     </message>
@@ -212,13 +175,61 @@
       <comment>%1 is link that leads to /account/security section of Nx Cloud</comment>
       <translation type="unfinished">You can enable two-factor authentication in your %1.</translation>
     </message>
+    <message>
+      <source>Connection to %1 is not ready yet. Check the server&apos;s internet connection or try again later.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">Connection to %1 is not ready yet. Check the server&apos;s internet connection or try again later.</translation>
+    </message>
+    <message>
+      <source>Connection failed</source>
+      <translation>Připojení se nezdařilo</translation>
+    </message>
+    <message>
+      <source>Your access to this system has expired.</source>
+      <translation type="unfinished">Your access to this system has expired.</translation>
+    </message>
+    <message>
+      <source>Please contact the system administrator to regain access.</source>
+      <translation type="unfinished">Please contact the system administrator to regain access.</translation>
+    </message>
+    <message>
+      <source>To log in to this System, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</source>
+      <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
+      <translation type="unfinished">To log in to this System, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::AbstractAttributedEventModel</name>
+    <message numerus="yes">
+      <source>+%n values</source>
+      <translation>
+        <numerusform>+%n hodnot</numerusform>
+        <numerusform>+%n hodnot</numerusform>
+        <numerusform>+%n hodnot</numerusform>
+        <numerusform>+%n hodnot</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::AnalyticsSearchListModel</name>
+    <message>
+      <source>Unknown track</source>
+      <translation>Neznámá cesta</translation>
+    </message>
+    <message>
+      <source>deleted camera</source>
+      <translation type="unfinished">deleted camera</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::BookmarkSearchListModel</name>
+    <message>
+      <source>deleted camera</source>
+      <translation type="unfinished">deleted camera</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::core::CertificateWarning</name>
-    <message>
-      <source>Cannot verify the identity of %1</source>
-      <translation type="unfinished">Cannot verify the identity of %1</translation>
-    </message>
     <message>
       <source>Server certificate is invalid.</source>
       <translation type="unfinished">Server certificate is invalid.</translation>
@@ -226,10 +237,6 @@
     <message>
       <source>Connecting to %1 for the first time?</source>
       <translation>Připojujete se k %1 poprvé?</translation>
-    </message>
-    <message>
-      <source>certificate details</source>
-      <translation>podrobnosti certifikátu</translation>
     </message>
     <message>
       <source>help article</source>
@@ -240,32 +247,116 @@
       <comment>%1 is &lt;help article&gt; link</comment>
       <translation>Přečtěte si tento %1, abyste se dozvěděli více o ověřování certifikátů.</translation>
     </message>
-    <message>
-      <source>Review the %1 to ensure you trust the server you are connecting to.%2</source>
-      <comment>%1 is &lt;certificate details&gt; link, %2 are possible extra details</comment>
-      <translation>Zkontrolujte %1, abyste se ujistili, že důvěřujete serveru, ke kterému se připojujete.%2</translation>
+    <message numerus="yes">
+      <source>Cannot verify the identity of %n servers</source>
+      <translation type="unfinished">
+        <numerusform>Cannot verify the identity of %n servers</numerusform>
+        <numerusform>Cannot verify the identity of %n servers</numerusform>
+        <numerusform>Cannot verify the identity of %n servers</numerusform>
+        <numerusform>Cannot verify the identity of %n servers</numerusform>
+      </translation>
     </message>
     <message>
-      <source>the server&apos;s certificate</source>
-      <translation>certifikát serveru</translation>
+      <source>Review the certificates of the servers from this system.</source>
+      <translation type="unfinished">Review the certificates of the servers from this system.</translation>
     </message>
     <message>
-      <source>You can view %1 or read this %2 to learn more about the current problem.</source>
-      <comment>%1 is &lt;the server&apos;s certificate&gt; link, %2 is &lt;help article&gt; link</comment>
-      <translation>Chcete-li se dozvědět více o aktuálním problému, můžete si prohlédnout %1 nebo přečíst tento %2.</translation>
+      <source>This might be due to an expired server certificate or or an invalid certificate. Contact your system administrator for further investigation.</source>
+      <translation type="unfinished">This might be due to an expired server certificate or or an invalid certificate. Contact your system administrator for further investigation.</translation>
     </message>
     <message>
-      <source>This might be due to an expired server certificate or someone trying to impersonate %1 to steal your personal information.%2</source>
-      <comment>%1 is the system name, %2 are possible extra details</comment>
-      <translation>Může to být způsobeno vypršenou platností certifikátu serveru nebo někdo, kdo se snaží vydávat za %1, aby ukradl vaše osobní údaje.%2</translation>
+      <source>To learn more about the current problem read this %1.</source>
+      <comment>%1 is &lt;help article&gt; link</comment>
+      <translation type="unfinished">To learn more about the current problem read this %1.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::DesktopAudioOnlyDataProvider</name>
+    <message>
+      <source>Sample format of input device %1 is not supported.</source>
+      <translation>Formát vzoru vstupního zařízení %1 není podporován.</translation>
     </message>
     <message>
-      <source>This message may be shown multiple times when connecting to a multi-server system.</source>
-      <translation>Tato zpráva se může zobrazit vícekrát při připojení k systému s více servery.</translation>
+      <source>Primary audio device is not selected.</source>
+      <translation>Není vybráno primární zvukové zařízení.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::EventSearchUtils</name>
+    <message>
+      <source>Last day</source>
+      <translation>Poslední den</translation>
     </message>
     <message>
-      <source>To learn more about the current problem view the server&apos;s certificate:</source>
-      <translation>Chcete-li se dozvědět více o aktuálním problému, zobrazte certifikát serveru:</translation>
+      <source>Last 7 days</source>
+      <translation>Posledních 7 dní</translation>
+    </message>
+    <message>
+      <source>Last 30 days</source>
+      <translation>Posledních 30 dní</translation>
+    </message>
+    <message>
+      <source>Any time</source>
+      <translation>Kdykoliv</translation>
+    </message>
+    <message>
+      <source>Any</source>
+      <translation>Libovolný</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Cameras</source>
+      <comment>%n is a number of cameras</comment>
+      <translation>
+        <numerusform>%n Kamera</numerusform>
+        <numerusform>%n Kamera</numerusform>
+        <numerusform>%n Kamera</numerusform>
+        <numerusform>%n Kamera</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::ExtendedOutputCameraButtonController</name>
+    <message>
+      <source>Heater</source>
+      <translation type="unfinished">Heater</translation>
+    </message>
+    <message>
+      <source>Wiper</source>
+      <translation type="unfinished">Wiper</translation>
+    </message>
+    <message>
+      <source>Open Door</source>
+      <translation type="unfinished">Open Door</translation>
+    </message>
+    <message>
+      <source>Stop Object Tracking</source>
+      <translation type="unfinished">Stop Object Tracking</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::SoftwareTriggerCameraButtonController</name>
+    <message>
+      <source>Press and hold to</source>
+      <translation>Stiskněte a podržte do</translation>
+    </message>
+    <message>
+      <source>press and hold</source>
+      <translation>stiskněte a podržte</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::TwoWayAudioCameraButtonController</name>
+    <message>
+      <source>Unmute</source>
+      <translation type="unfinished">Unmute</translation>
+    </message>
+    <message>
+      <source>Mute</source>
+      <translation type="unfinished">Mute</translation>
+    </message>
+    <message>
+      <source>Press and hold to speak</source>
+      <translation>Stiskněte a podržte pro hovor</translation>
     </message>
   </context>
 </TS>

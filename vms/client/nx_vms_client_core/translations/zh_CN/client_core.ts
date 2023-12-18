@@ -2,29 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="zh_CN" sourcelanguage="en">
   <context>
-    <name>QnCloudSystemInformationWatcher</name>
-    <message>
-      <source>Owner: %1</source>
-      <comment>%1 is a user name</comment>
-      <translation>所有者：%1</translation>
-    </message>
-    <message>
-      <source>Your System</source>
-      <translation>您的系统</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnDesktopAudioOnlyDataProvider</name>
-    <message>
-      <source>Sample format of input device %1 is not supported.</source>
-      <translation>不支持此输入设备 %1 示例格式。</translation>
-    </message>
-    <message>
-      <source>Primary audio device is not selected.</source>
-      <translation>未选择主要的音频设备。</translation>
-    </message>
-  </context>
-  <context>
     <name>QnDirectSystemsFinder</name>
     <message>
       <source>System</source>
@@ -107,10 +84,6 @@
       <translation>%1 帐户登入暂时无法使用</translation>
     </message>
     <message>
-      <source>Connection timed out</source>
-      <translation>连接超时</translation>
-    </message>
-    <message>
       <source>The server is incompatible.</source>
       <translation>此服务器版本与目前使用的客户端不相容。</translation>
     </message>
@@ -164,11 +137,6 @@
       <translation>与 %1 的连线失败，请检查您的网路连线或稍后重试。</translation>
     </message>
     <message>
-      <source>Connection to %1 is not ready yet. Check the server’s internet connection or try again later.</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>与 %1 的连线失败，请检查服务器的网路连线或稍后重试。</translation>
-    </message>
-    <message>
       <source>Connection to the server could not be established. Try again later.</source>
       <translation>服务器无法连线，请稍后再试。</translation>
     </message>
@@ -199,11 +167,6 @@
       <translation>登录尝试次数过多，请稍后再试。</translation>
     </message>
     <message>
-      <source>To log in to this System, disable “Ask for a verification code on every login with your %1 account” in your %2.</source>
-      <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation>在%2中关闭"每次使用%1帐户登录时皆要求输入验证码"选项来登录此系统</translation>
-    </message>
-    <message>
       <source>Two-factor authentication is required.</source>
       <translation>请先启用双重验证。</translation>
     </message>
@@ -212,13 +175,58 @@
       <comment>%1 is link that leads to /account/security section of Nx Cloud</comment>
       <translation>您可以在 %1中启用双重验证功能。</translation>
     </message>
+    <message>
+      <source>Connection to %1 is not ready yet. Check the server&apos;s internet connection or try again later.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">Connection to %1 is not ready yet. Check the server&apos;s internet connection or try again later.</translation>
+    </message>
+    <message>
+      <source>Connection failed</source>
+      <translation type="unfinished">Connection failed</translation>
+    </message>
+    <message>
+      <source>Your access to this system has expired.</source>
+      <translation type="unfinished">Your access to this system has expired.</translation>
+    </message>
+    <message>
+      <source>Please contact the system administrator to regain access.</source>
+      <translation type="unfinished">Please contact the system administrator to regain access.</translation>
+    </message>
+    <message>
+      <source>To log in to this System, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</source>
+      <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
+      <translation type="unfinished">To log in to this System, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::AbstractAttributedEventModel</name>
+    <message numerus="yes">
+      <source>+%n values</source>
+      <translation>
+        <numerusform>+%n 值</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::AnalyticsSearchListModel</name>
+    <message>
+      <source>Unknown track</source>
+      <translation>不明音轨</translation>
+    </message>
+    <message>
+      <source>deleted camera</source>
+      <translation type="unfinished">deleted camera</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::BookmarkSearchListModel</name>
+    <message>
+      <source>deleted camera</source>
+      <translation type="unfinished">deleted camera</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::core::CertificateWarning</name>
-    <message>
-      <source>Cannot verify the identity of %1</source>
-      <translation>无法验证 %1的身份</translation>
-    </message>
     <message>
       <source>Server certificate is invalid.</source>
       <translation>无效的服务器凭证。</translation>
@@ -226,10 +234,6 @@
     <message>
       <source>Connecting to %1 for the first time?</source>
       <translation>第一次连接到 %1 吗？</translation>
-    </message>
-    <message>
-      <source>certificate details</source>
-      <translation>凭证详细信息</translation>
     </message>
     <message>
       <source>help article</source>
@@ -240,32 +244,110 @@
       <comment>%1 is &lt;help article&gt; link</comment>
       <translation>请阅读%1 文件 以了解更多关于凭证验证细节。</translation>
     </message>
-    <message>
-      <source>Review the %1 to ensure you trust the server you are connecting to.%2</source>
-      <comment>%1 is &lt;certificate details&gt; link, %2 are possible extra details</comment>
-      <translation>请查看%1 ，以确认您信任要连线的服务器。 %2</translation>
+    <message numerus="yes">
+      <source>Cannot verify the identity of %n servers</source>
+      <translation type="unfinished">
+        <numerusform>Cannot verify the identity of %n servers</numerusform>
+      </translation>
     </message>
     <message>
-      <source>the server&apos;s certificate</source>
-      <translation>服务器&apos;s 凭证</translation>
+      <source>Review the certificates of the servers from this system.</source>
+      <translation type="unfinished">Review the certificates of the servers from this system.</translation>
     </message>
     <message>
-      <source>You can view %1 or read this %2 to learn more about the current problem.</source>
-      <comment>%1 is &lt;the server&apos;s certificate&gt; link, %2 is &lt;help article&gt; link</comment>
-      <translation>请查看 %1 ，或阅读 %2 文件了解更多资讯。</translation>
+      <source>This might be due to an expired server certificate or or an invalid certificate. Contact your system administrator for further investigation.</source>
+      <translation type="unfinished">This might be due to an expired server certificate or or an invalid certificate. Contact your system administrator for further investigation.</translation>
     </message>
     <message>
-      <source>This might be due to an expired server certificate or someone trying to impersonate %1 to steal your personal information.%2</source>
-      <comment>%1 is the system name, %2 are possible extra details</comment>
-      <translation>这可能是由于服务器凭证过期或有人试图冒充 %1 来窃取您的个人信息。 %2</translation>
+      <source>To learn more about the current problem read this %1.</source>
+      <comment>%1 is &lt;help article&gt; link</comment>
+      <translation type="unfinished">To learn more about the current problem read this %1.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::DesktopAudioOnlyDataProvider</name>
+    <message>
+      <source>Sample format of input device %1 is not supported.</source>
+      <translation>不支持此输入设备 %1 示例格式。</translation>
     </message>
     <message>
-      <source>This message may be shown multiple times when connecting to a multi-server system.</source>
-      <translation>如连线至多服务器合并的系统，此讯息可能会重复出现。</translation>
+      <source>Primary audio device is not selected.</source>
+      <translation>未选择主要的音频设备。</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::EventSearchUtils</name>
+    <message>
+      <source>Last day</source>
+      <translation>一天内</translation>
     </message>
     <message>
-      <source>To learn more about the current problem view the server&apos;s certificate:</source>
-      <translation>请检视服务器凭证内容，来了解更多关于此问题的可能原因:</translation>
+      <source>Last 7 days</source>
+      <translation>过去 7 天</translation>
+    </message>
+    <message>
+      <source>Last 30 days</source>
+      <translation>过去 30 天</translation>
+    </message>
+    <message>
+      <source>Any time</source>
+      <translation>任何时间</translation>
+    </message>
+    <message>
+      <source>Any</source>
+      <translation>任何</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Cameras</source>
+      <comment>%n is a number of cameras</comment>
+      <translation>
+        <numerusform>%n 支摄像机</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::ExtendedOutputCameraButtonController</name>
+    <message>
+      <source>Heater</source>
+      <translation>加热器</translation>
+    </message>
+    <message>
+      <source>Wiper</source>
+      <translation>雨刷</translation>
+    </message>
+    <message>
+      <source>Open Door</source>
+      <translation type="unfinished">Open Door</translation>
+    </message>
+    <message>
+      <source>Stop Object Tracking</source>
+      <translation type="unfinished">Stop Object Tracking</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::SoftwareTriggerCameraButtonController</name>
+    <message>
+      <source>Press and hold to</source>
+      <translation>请长按</translation>
+    </message>
+    <message>
+      <source>press and hold</source>
+      <translation>按住</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::TwoWayAudioCameraButtonController</name>
+    <message>
+      <source>Unmute</source>
+      <translation type="unfinished">Unmute</translation>
+    </message>
+    <message>
+      <source>Mute</source>
+      <translation type="unfinished">Mute</translation>
+    </message>
+    <message>
+      <source>Press and hold to speak</source>
+      <translation>长按进行发话</translation>
     </message>
   </context>
 </TS>

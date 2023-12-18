@@ -2,29 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="nl_BE" sourcelanguage="en">
   <context>
-    <name>QnCloudSystemInformationWatcher</name>
-    <message>
-      <source>Owner: %1</source>
-      <comment>%1 is a user name</comment>
-      <translation>Eigenaar: %1</translation>
-    </message>
-    <message>
-      <source>Your System</source>
-      <translation>Uw systeem</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnDesktopAudioOnlyDataProvider</name>
-    <message>
-      <source>Sample format of input device %1 is not supported.</source>
-      <translation>Voorbeeldformaat van invoerapparaat %1 wordt niet ondersteund.</translation>
-    </message>
-    <message>
-      <source>Primary audio device is not selected.</source>
-      <translation>Het primaire audio apparaat is niet geselecteerd.</translation>
-    </message>
-  </context>
-  <context>
     <name>QnDirectSystemsFinder</name>
     <message>
       <source>System</source>
@@ -107,10 +84,6 @@
       <translation>%1 gebruikers login is tijdelijk niet beschikbaar</translation>
     </message>
     <message>
-      <source>Connection timed out</source>
-      <translation>Connectie time-out</translation>
-    </message>
-    <message>
       <source>The server is incompatible.</source>
       <translation>De server is niet compatibel.</translation>
     </message>
@@ -164,11 +137,6 @@
       <translation>Verbinding met %1 is nog niet klaar. Controleer uw internetverbinding of probeer het later opnieuw.</translation>
     </message>
     <message>
-      <source>Connection to %1 is not ready yet. Check the server’s internet connection or try again later.</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Verbinding met %1 is nog niet gereed. Controleer de internetverbinding van de server of probeer het later opnieuw.</translation>
-    </message>
-    <message>
       <source>Connection to the server could not be established. Try again later.</source>
       <translation>Verbinding met de server kon niet worden gemaakt. Probeer het later opnieuw.</translation>
     </message>
@@ -199,11 +167,6 @@
       <translation>Te veel inlogpogingen. Probeer het over een minuut opnieuw.</translation>
     </message>
     <message>
-      <source>To log in to this System, disable “Ask for a verification code on every login with your %1 account” in your %2.</source>
-      <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation>Om in te loggen op dit systeem, schakelt u "Vraag om een verificatiecode bij elke login met uw %1 -account" in uw %2.</translation>
-    </message>
-    <message>
       <source>Two-factor authentication is required.</source>
       <translation>Tweestapsverificatie is vereist.</translation>
     </message>
@@ -212,13 +175,59 @@
       <comment>%1 is link that leads to /account/security section of Nx Cloud</comment>
       <translation>U kunt tweefactorauthenticatie inschakelen in uw %1.</translation>
     </message>
+    <message>
+      <source>Connection to %1 is not ready yet. Check the server&apos;s internet connection or try again later.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">Connection to %1 is not ready yet. Check the server&apos;s internet connection or try again later.</translation>
+    </message>
+    <message>
+      <source>Connection failed</source>
+      <translation>Verbinding mislukt</translation>
+    </message>
+    <message>
+      <source>Your access to this system has expired.</source>
+      <translation type="unfinished">Your access to this system has expired.</translation>
+    </message>
+    <message>
+      <source>Please contact the system administrator to regain access.</source>
+      <translation type="unfinished">Please contact the system administrator to regain access.</translation>
+    </message>
+    <message>
+      <source>To log in to this System, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</source>
+      <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
+      <translation type="unfinished">To log in to this System, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::AbstractAttributedEventModel</name>
+    <message numerus="yes">
+      <source>+%n values</source>
+      <translation>
+        <numerusform>+%n waarden</numerusform>
+        <numerusform>+%n waarden</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::AnalyticsSearchListModel</name>
+    <message>
+      <source>Unknown track</source>
+      <translation>Onbekend nummer</translation>
+    </message>
+    <message>
+      <source>deleted camera</source>
+      <translation type="unfinished">deleted camera</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::BookmarkSearchListModel</name>
+    <message>
+      <source>deleted camera</source>
+      <translation type="unfinished">deleted camera</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::core::CertificateWarning</name>
-    <message>
-      <source>Cannot verify the identity of %1</source>
-      <translation>Kan de identiteit van %1 niet verifiëren</translation>
-    </message>
     <message>
       <source>Server certificate is invalid.</source>
       <translation>Servercertificaat is ongeldig.</translation>
@@ -226,10 +235,6 @@
     <message>
       <source>Connecting to %1 for the first time?</source>
       <translation>Voor het eerst verbinding maken met %1?</translation>
-    </message>
-    <message>
-      <source>certificate details</source>
-      <translation>certificaat details</translation>
     </message>
     <message>
       <source>help article</source>
@@ -240,32 +245,112 @@
       <comment>%1 is &lt;help article&gt; link</comment>
       <translation>Lees deze %1 voor meer informatie over certificaatvalidatie.</translation>
     </message>
-    <message>
-      <source>Review the %1 to ensure you trust the server you are connecting to.%2</source>
-      <comment>%1 is &lt;certificate details&gt; link, %2 are possible extra details</comment>
-      <translation>Bekijk de %1 om er zeker van te zijn dat u de server vertrouwt waarmee u verbinding maakt.%2</translation>
+    <message numerus="yes">
+      <source>Cannot verify the identity of %n servers</source>
+      <translation type="unfinished">
+        <numerusform>Cannot verify the identity of %n servers</numerusform>
+        <numerusform>Cannot verify the identity of %n servers</numerusform>
+      </translation>
     </message>
     <message>
-      <source>the server&apos;s certificate</source>
-      <translation>het server&apos;s-certificaat</translation>
+      <source>Review the certificates of the servers from this system.</source>
+      <translation type="unfinished">Review the certificates of the servers from this system.</translation>
     </message>
     <message>
-      <source>You can view %1 or read this %2 to learn more about the current problem.</source>
-      <comment>%1 is &lt;the server&apos;s certificate&gt; link, %2 is &lt;help article&gt; link</comment>
-      <translation>U kunt %1 bekijken of deze %2 lezen om meer te weten te komen over het huidige probleem.</translation>
+      <source>This might be due to an expired server certificate or or an invalid certificate. Contact your system administrator for further investigation.</source>
+      <translation type="unfinished">This might be due to an expired server certificate or or an invalid certificate. Contact your system administrator for further investigation.</translation>
     </message>
     <message>
-      <source>This might be due to an expired server certificate or someone trying to impersonate %1 to steal your personal information.%2</source>
-      <comment>%1 is the system name, %2 are possible extra details</comment>
-      <translation>Dit kan te wijten zijn aan een verlopen servercertificaat of aan iemand die probeert zich voor te doen als %1 om uw persoonlijke gegevens te stelen.%2</translation>
+      <source>To learn more about the current problem read this %1.</source>
+      <comment>%1 is &lt;help article&gt; link</comment>
+      <translation type="unfinished">To learn more about the current problem read this %1.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::DesktopAudioOnlyDataProvider</name>
+    <message>
+      <source>Sample format of input device %1 is not supported.</source>
+      <translation>Voorbeeldformaat van invoerapparaat %1 wordt niet ondersteund.</translation>
     </message>
     <message>
-      <source>This message may be shown multiple times when connecting to a multi-server system.</source>
-      <translation>Dit bericht kan meerdere keren worden weergegeven wanneer u verbinding maakt met een systeem met meerdere servers.</translation>
+      <source>Primary audio device is not selected.</source>
+      <translation>Het primaire audio apparaat is niet geselecteerd.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::EventSearchUtils</name>
+    <message>
+      <source>Last day</source>
+      <translation>Laatste dag</translation>
     </message>
     <message>
-      <source>To learn more about the current problem view the server&apos;s certificate:</source>
-      <translation>Bekijk het server&apos;s-certificaat voor meer informatie over het huidige probleem:</translation>
+      <source>Last 7 days</source>
+      <translation>Laatste 7 dagen</translation>
+    </message>
+    <message>
+      <source>Last 30 days</source>
+      <translation>Laatste 30 dagen</translation>
+    </message>
+    <message>
+      <source>Any time</source>
+      <translation>Altijd</translation>
+    </message>
+    <message>
+      <source>Any</source>
+      <translation>Elk</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Cameras</source>
+      <comment>%n is a number of cameras</comment>
+      <translation>
+        <numerusform>%n Camera's</numerusform>
+        <numerusform>%n Camera's</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::ExtendedOutputCameraButtonController</name>
+    <message>
+      <source>Heater</source>
+      <translation>Verwarming</translation>
+    </message>
+    <message>
+      <source>Wiper</source>
+      <translation>Ruitenwissers</translation>
+    </message>
+    <message>
+      <source>Open Door</source>
+      <translation type="unfinished">Open Door</translation>
+    </message>
+    <message>
+      <source>Stop Object Tracking</source>
+      <translation type="unfinished">Stop Object Tracking</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::SoftwareTriggerCameraButtonController</name>
+    <message>
+      <source>Press and hold to</source>
+      <translation>Ingedrukt houden om</translation>
+    </message>
+    <message>
+      <source>press and hold</source>
+      <translation>houd ingedrukt</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::TwoWayAudioCameraButtonController</name>
+    <message>
+      <source>Unmute</source>
+      <translation>Dempen opheffen</translation>
+    </message>
+    <message>
+      <source>Mute</source>
+      <translation>Dempen</translation>
+    </message>
+    <message>
+      <source>Press and hold to speak</source>
+      <translation>Ingedrukt houden om te spreken</translation>
     </message>
   </context>
 </TS>

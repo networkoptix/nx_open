@@ -1,268 +1,268 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="da_DK" sourcelanguage="en_US">
+<TS version="2.1" language="mn_MN" sourcelanguage="en_US">
   <context>
     <name>CloseButton</name>
     <message>
       <source>Close Tab</source>
-      <translation>Luk fane</translation>
+      <translation>Табыг хаах</translation>
     </message>
   </context>
   <context>
     <name>MAC_APPLICATION_MENU</name>
     <message>
       <source>Services</source>
-      <translation>Tjeneste</translation>
+      <translation>Сервисүүд</translation>
     </message>
     <message>
       <source>Hide %1</source>
-      <translation>Skjul '%1'</translation>
+      <translation>%1 нуух</translation>
     </message>
     <message>
       <source>Hide Others</source>
-      <translation>Skjul øvrige</translation>
+      <translation>Бусад зүйлсийг нуух</translation>
     </message>
     <message>
       <source>Show All</source>
-      <translation>Vis alle</translation>
+      <translation>Бүгдийг харах</translation>
     </message>
     <message>
       <source>Preferences...</source>
-      <translation>Indstillinger...</translation>
+      <translation>Сонголтууд...</translation>
     </message>
     <message>
       <source>Quit %1</source>
-      <translation>Afslut %1</translation>
+      <translation>%1-г болих</translation>
     </message>
     <message>
       <source>About %1</source>
-      <translation>Om %1</translation>
+      <translation>%1-ийн тухай</translation>
     </message>
   </context>
   <context>
     <name>QAbstractSpinBox</name>
     <message>
       <source>&amp;Select All</source>
-      <translation>&amp;Vælg alt</translation>
+      <translation>&amp;Бүгдийг сонгох</translation>
     </message>
     <message>
       <source>&amp;Step up</source>
-      <translation>&amp;Trin op</translation>
+      <translation>&amp;Сайжруулах</translation>
     </message>
     <message>
       <source>Step &amp;down</source>
-      <translation>&amp;Trin ned</translation>
+      <translation>&amp;Бууруулах</translation>
     </message>
   </context>
   <context>
     <name>QAccessibleActionInterface</name>
     <message>
       <source>Press</source>
-      <translation>Tryk</translation>
+      <translation>Дарах</translation>
     </message>
     <message>
       <source>Increase</source>
-      <translation>Forøg</translation>
+      <translation>Өсгөх</translation>
     </message>
     <message>
       <source>Decrease</source>
-      <translation>Formindsk</translation>
+      <translation>Бууруулах</translation>
     </message>
     <message>
       <source>ShowMenu</source>
-      <translation>VisMenu</translation>
+      <translation>Цэсийг харах</translation>
     </message>
     <message>
       <source>SetFocus</source>
-      <translation>Indstil fokus</translation>
+      <translation>Төвлөрөх</translation>
     </message>
     <message>
       <source>Toggle</source>
-      <translation>Skift</translation>
+      <translation>Сэлгэх</translation>
     </message>
     <message>
       <source>Scroll Left</source>
-      <translation>Rul til venstre</translation>
+      <translation>Зүүн тийш гүйлгэх</translation>
     </message>
     <message>
       <source>Scroll Right</source>
-      <translation>Rul til højre</translation>
+      <translation>Баруун тийш гүйлгэх</translation>
     </message>
     <message>
       <source>Scroll Up</source>
-      <translation>Rul op</translation>
+      <translation>Дээш гүйлгэх</translation>
     </message>
     <message>
       <source>Scroll Down</source>
-      <translation>Rul ned</translation>
+      <translation>Доош гүйлгэх</translation>
     </message>
     <message>
       <source>Previous Page</source>
-      <translation>Forrige Side</translation>
+      <translation>Өмнөх хуудас</translation>
     </message>
     <message>
       <source>Next Page</source>
-      <translation>Næste side</translation>
+      <translation>Дараагийн хуудас</translation>
     </message>
     <message>
       <source>Triggers the action</source>
-      <translation>Udløser handlingen</translation>
+      <translation>Энэ үйлдлийг эхлүүлэх</translation>
     </message>
     <message>
       <source>Increase the value</source>
-      <translation>Forøg værdien</translation>
+      <translation>Хэмжээг ихэсгэх</translation>
     </message>
     <message>
       <source>Decrease the value</source>
-      <translation>Formindsk værdien</translation>
+      <translation>Хэмжээг багасгах</translation>
     </message>
     <message>
       <source>Shows the menu</source>
-      <translation>Viser menuen</translation>
+      <translation>Цэсийг харуулна</translation>
     </message>
     <message>
       <source>Sets the focus</source>
-      <translation>Sætter fokus</translation>
+      <translation>Фокусыг тохируулна</translation>
     </message>
     <message>
       <source>Toggles the state</source>
-      <translation>Skifter tilstanden</translation>
+      <translation>Бүтцийг тохируулна</translation>
     </message>
     <message>
       <source>Scrolls to the left</source>
-      <translation>Rul til venstre</translation>
+      <translation>Зүүн тийш гүйлгэнэ</translation>
     </message>
     <message>
       <source>Scrolls to the right</source>
-      <translation>Rul til højre</translation>
+      <translation>Баруун тийш гүйлгэнэ</translation>
     </message>
     <message>
       <source>Scrolls up</source>
-      <translation>Rul op</translation>
+      <translation>Дээш гүйлгэнэ</translation>
     </message>
     <message>
       <source>Scrolls down</source>
-      <translation>Rul ned</translation>
+      <translation>Доош гүйлгэнэ</translation>
     </message>
     <message>
       <source>Goes back a page</source>
-      <translation>Går en side tilbage</translation>
+      <translation>Өмнөх хуудас руу буцна</translation>
     </message>
     <message>
       <source>Goes to the next page</source>
-      <translation>Gå til næste side</translation>
+      <translation>Дараагийн хуудас руу очно</translation>
     </message>
   </context>
   <context>
     <name>QAndroidPlatformTheme</name>
     <message>
       <source>Yes</source>
-      <translation>Ja</translation>
+      <translation>Тийм</translation>
     </message>
     <message>
       <source>Yes to All</source>
-      <translation>Ja til alle</translation>
+      <translation>Бүгдийг зөвшөөрөх</translation>
     </message>
     <message>
       <source>No</source>
-      <translation>Nej</translation>
+      <translation>Үгүй</translation>
     </message>
     <message>
       <source>No to All</source>
-      <translation>Nej til alle</translation>
+      <translation>Бүгдийг зөвшөөрөхгүй</translation>
     </message>
   </context>
   <context>
     <name>QCocoaMenuItem</name>
     <message>
       <source>About Qt</source>
-      <translation>Om Qt</translation>
+      <translation>Qt-гийн тухай</translation>
     </message>
     <message>
       <source>About</source>
-      <translation>Om</translation>
+      <translation>Тухай</translation>
     </message>
     <message>
       <source>Config</source>
-      <translation>Konfiguration</translation>
+      <translation>Засах</translation>
     </message>
     <message>
       <source>Preference</source>
-      <translation>Præferencer</translation>
+      <translation>Тохиргоо</translation>
     </message>
     <message>
       <source>Options</source>
-      <translation>Valgmuligheder</translation>
+      <translation>Сонголтууд</translation>
     </message>
     <message>
       <source>Setting</source>
-      <translation>Indstilling</translation>
+      <translation>Тохиргоо</translation>
     </message>
     <message>
       <source>Setup</source>
-      <translation>Opsætning</translation>
+      <translation>Янзлах</translation>
     </message>
     <message>
       <source>Quit</source>
-      <translation>Afslut</translation>
+      <translation>Болих</translation>
     </message>
     <message>
       <source>Exit</source>
-      <translation>Afslut</translation>
+      <translation>Гарах</translation>
     </message>
     <message>
       <source>Cut</source>
-      <translation>Klip</translation>
+      <translation>Таслах</translation>
     </message>
     <message>
       <source>Copy</source>
-      <translation>Kopier</translation>
+      <translation>Хуулах</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation>Indsæt</translation>
+      <translation>Буулгах</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation>Vælg alt</translation>
+      <translation>Бүгдийг сонгох</translation>
     </message>
   </context>
   <context>
     <name>QCocoaTheme</name>
     <message>
       <source>Don&apos;t Save</source>
-      <translation>Gem&apos; ikke</translation>
+      <translation>Хадгалахгүй</translation>
     </message>
   </context>
   <context>
     <name>QColorDialog</name>
     <message>
       <source>Hu&amp;e:</source>
-      <translation>Nu&amp;ance:</translation>
+      <translation>&amp;Туяа:</translation>
     </message>
     <message>
       <source>&amp;Sat:</source>
-      <translation>&amp;mæt:</translation>
+      <translation>%Ханалт:</translation>
     </message>
     <message>
       <source>&amp;Val:</source>
-      <translation>&amp;Val:</translation>
+      <translation>&amp;Утга:</translation>
     </message>
     <message>
       <source>&amp;Red:</source>
-      <translation>&amp;Rød:</translation>
+      <translation>&amp;Улаан:</translation>
     </message>
     <message>
       <source>&amp;Green:</source>
-      <translation>&amp;Grøn:</translation>
+      <translation>&amp;Ногоон:</translation>
     </message>
     <message>
       <source>Bl&amp;ue:</source>
-      <translation>Bl&amp;å:</translation>
+      <translation>&amp;Цэнхэр:</translation>
     </message>
     <message>
       <source>A&amp;lpha channel:</source>
-      <translation>A&amp;lpha kanal:</translation>
+      <translation>&amp;Альфа суваг:</translation>
     </message>
     <message>
       <source>&amp;HTML:</source>
@@ -271,43 +271,43 @@
     <message>
       <source>Cursor at %1, %2
 Press ESC to cancel</source>
-      <translation>Markør ved %1, %2
-Tryk på ESC for at annullere</translation>
+      <translation>Курсор %1, %2 дээр байна
+Цуцлахын тулд ESC товчийг дарна уу</translation>
     </message>
     <message>
       <source>&amp;Pick Screen Color</source>
-      <translation>&amp;Vælg skærmfarve</translation>
+      <translation>&amp;Дэлгэцийн өнгө сонгох</translation>
     </message>
     <message>
       <source>Select Color</source>
-      <translation>Vælg farve</translation>
+      <translation>Өнгө сонгох</translation>
     </message>
     <message>
       <source>&amp;Basic colors</source>
-      <translation>&amp;Grundlæggende farver</translation>
+      <translation>&amp;Үндсэн өнгө</translation>
     </message>
     <message>
       <source>&amp;Custom colors</source>
-      <translation>&amp;Brugerdefinerede farver</translation>
+      <translation>&amp;Бусад өнгө</translation>
     </message>
     <message>
       <source>&amp;Add to Custom Colors</source>
-      <translation>&amp;Føj til brugerdefinerede farver</translation>
+      <translation>&amp;Бусад өнгөнд нэмэх</translation>
     </message>
   </context>
   <context>
     <name>QComboBox</name>
     <message>
       <source>False</source>
-      <translation>Falsk</translation>
+      <translation>Буруу</translation>
     </message>
     <message>
       <source>True</source>
-      <translation>Sand</translation>
+      <translation>Үнэн</translation>
     </message>
     <message>
       <source>Open the combo box selection popup</source>
-      <translation>Åbn popup-vinduet til valg af kombinationsboks</translation>
+      <translation type="unfinished">Open the combo box selection popup</translation>
     </message>
   </context>
   <context>
@@ -333,337 +333,337 @@ Tryk på ESC for at annullere</translation>
     <name>QDialog</name>
     <message>
       <source>What&apos;s This?</source>
-      <translation>Hvad&apos;er dette?</translation>
+      <translation>Энэ юу вэ?</translation>
     </message>
   </context>
   <context>
     <name>QDialogButtonBox</name>
     <message>
       <source>OK</source>
-      <translation>OK</translation>
+      <translation>ОК</translation>
     </message>
   </context>
   <context>
     <name>QDirModel</name>
     <message>
       <source>Name</source>
-      <translation>Navn</translation>
+      <translation>Нэр</translation>
     </message>
     <message>
       <source>Size</source>
-      <translation>Størrelse</translation>
+      <translation>Хэмжээ</translation>
     </message>
     <message>
       <source>Kind</source>
       <comment>Match OS X Finder</comment>
-      <translation>Type</translation>
+      <translation>Загвар</translation>
     </message>
     <message>
       <source>Type</source>
       <comment>All other platforms</comment>
-      <translation>Type</translation>
+      <translation>Төрөл</translation>
     </message>
     <message>
       <source>Date Modified</source>
-      <translation>Ændringsdato</translation>
+      <translation>Өөрчилсөн огноо</translation>
     </message>
   </context>
   <context>
     <name>QFile</name>
     <message>
       <source>Destination file is the same file.</source>
-      <translation>Destinationsfilen er den samme fil.</translation>
+      <translation type="unfinished">Destination file is the same file.</translation>
     </message>
     <message>
       <source>Source file does not exist.</source>
-      <translation>Kildefilen findes ikke.</translation>
+      <translation>Эх файл байхгүй байна.</translation>
     </message>
     <message>
       <source>Destination file exists</source>
-      <translation>Destinationsfilen findes allerede</translation>
+      <translation type="unfinished">Destination file exists</translation>
     </message>
     <message>
       <source>Error while renaming.</source>
-      <translation>Fejl under omdøbning.</translation>
+      <translation>Нэр өөрчлөхөд алдаа гарлаа.</translation>
     </message>
     <message>
       <source>Unable to restore from %1: %2</source>
-      <translation>Kan ikke gendanne fra %1: %2</translation>
+      <translation>%1:%2-с сэргээх боломжгүй</translation>
     </message>
     <message>
       <source>Will not rename sequential file using block copy</source>
-      <translation>Vil ikke omdøbe sekventiel fil ved hjælp af blokkopi</translation>
+      <translation type="unfinished">Will not rename sequential file using block copy</translation>
     </message>
     <message>
       <source>Cannot remove source file</source>
-      <translation>Kan ikke fjerne kildefilen</translation>
+      <translation>Эх файлыг устгах боломжгүй байна</translation>
     </message>
     <message>
       <source>Cannot open %1 for input</source>
-      <translation>Kan ikke åbne %1 for input</translation>
+      <translation>%1-г оролтод нээх боломжгүй байна</translation>
     </message>
     <message>
       <source>Cannot open for output</source>
-      <translation>Kan ikke åbne for output</translation>
+      <translation>Гаралтад нээх боломжгүй байна</translation>
     </message>
     <message>
       <source>Failure to write block</source>
-      <translation>Kunne ikke skrive blok</translation>
+      <translation type="unfinished">Failure to write block</translation>
     </message>
     <message>
       <source>Cannot create %1 for output</source>
-      <translation>Kan ikke oprette %1 til output</translation>
+      <translation>%1-г гаралтад нээх боломжгүй байна</translation>
     </message>
   </context>
   <context>
     <name>QFileDialog</name>
     <message>
       <source>Look in:</source>
-      <translation>Kig i:</translation>
+      <translation>Үзэх:</translation>
     </message>
     <message>
       <source>Back</source>
-      <translation>Tilbage</translation>
+      <translation>Буцах</translation>
     </message>
     <message>
       <source>Go back</source>
-      <translation>Gå tilbage</translation>
+      <translation>Буцах</translation>
     </message>
     <message>
       <source>Forward</source>
-      <translation>Fremad</translation>
+      <translation>Дараах</translation>
     </message>
     <message>
       <source>Go forward</source>
-      <translation>Gå fremad</translation>
+      <translation>Урагшлуулах</translation>
     </message>
     <message>
       <source>Parent Directory</source>
-      <translation>Overordnet mappe</translation>
+      <translation type="unfinished">Parent Directory</translation>
     </message>
     <message>
       <source>Go to the parent directory</source>
-      <translation>Gå til den overordnede mappe</translation>
+      <translation type="unfinished">Go to the parent directory</translation>
     </message>
     <message>
       <source>Create New Folder</source>
-      <translation>Opret ny mappe</translation>
+      <translation>Шинэ фолдер үүсгэх</translation>
     </message>
     <message>
       <source>Create a New Folder</source>
-      <translation>Opret ny mappe</translation>
+      <translation>Шинэ фолдер үүсгэх</translation>
     </message>
     <message>
       <source>List View</source>
-      <translation>Liste-visning</translation>
+      <translation>Жагсаалтаар харах</translation>
     </message>
     <message>
       <source>Change to list view mode</source>
-      <translation>Skift til listevisningstilstand</translation>
+      <translation>Жагсаалтаар харах горим руу өөрчлөх</translation>
     </message>
     <message>
       <source>Detail View</source>
-      <translation>Detaljevisning</translation>
+      <translation>Нарийвчлан харах</translation>
     </message>
     <message>
       <source>Change to detail view mode</source>
-      <translation>Skift til detaljevisningstilstand</translation>
+      <translation>Нарийвчлан харах горим руу өөрчлөх</translation>
     </message>
     <message>
       <source>Files of type:</source>
-      <translation>Filer af typen:</translation>
+      <translation>Ижил төрлийн файлууд:</translation>
     </message>
     <message>
       <source>Find Directory</source>
-      <translation>Find Mappe</translation>
+      <translation type="unfinished">Find Directory</translation>
     </message>
     <message>
       <source>Open</source>
-      <translation>Åbn</translation>
+      <translation>Нээх</translation>
     </message>
     <message>
       <source>Save As</source>
-      <translation>Gem som</translation>
+      <translation>Хадгалах</translation>
     </message>
     <message>
       <source>Directory:</source>
-      <translation>Mappe:</translation>
+      <translation type="unfinished">Directory:</translation>
     </message>
     <message>
       <source>File &amp;name:</source>
-      <translation>Fil &amp;navn:</translation>
+      <translation>Файл &amp;нэр:</translation>
     </message>
     <message>
       <source>&amp;Open</source>
-      <translation>&amp;Åbn</translation>
+      <translation>&amp;Нээх</translation>
     </message>
     <message>
       <source>&amp;Choose</source>
-      <translation>&amp;Vælg</translation>
+      <translation>&amp;Сонгох</translation>
     </message>
     <message>
       <source>&amp;Save</source>
-      <translation>&amp;Gem</translation>
+      <translation>&amp;Хадгалах</translation>
     </message>
     <message>
       <source>All Files (*)</source>
-      <translation>Alle filer (*)</translation>
+      <translation>Бүх файлууд (*)</translation>
     </message>
     <message>
       <source>Show </source>
-      <translation>Vis </translation>
+      <translation>Харах </translation>
     </message>
     <message>
       <source>&amp;Rename</source>
-      <translation>&amp;Omdøb</translation>
+      <translation>&amp;Нэр өөрчлөх</translation>
     </message>
     <message>
       <source>&amp;Delete</source>
-      <translation>&amp;Slet</translation>
+      <translation>&amp;Устгах</translation>
     </message>
     <message>
       <source>Show &amp;hidden files</source>
-      <translation>Vis &amp;skjulte filer</translation>
+      <translation>Нуусан файлуудыг харах</translation>
     </message>
     <message>
       <source>&amp;New Folder</source>
-      <translation>&amp;Ny Mappe</translation>
+      <translation>&amp;Шинэ фолдер</translation>
     </message>
     <message>
       <source>All files (*)</source>
-      <translation>Alle filer (*)</translation>
+      <translation>Бүх файлууд (*)</translation>
     </message>
     <message>
       <source>Directories</source>
-      <translation>Mapper</translation>
+      <translation type="unfinished">Directories</translation>
     </message>
     <message>
       <source>%1
 Directory not found.
 Please verify the correct directory name was given.</source>
-      <translation>%1
-Mappe ikke fundet.
-Bekræft venligst, at det korrekte mappenavn blev givet.</translation>
+      <translation type="unfinished">%1
+Directory not found.
+Please verify the correct directory name was given.</translation>
     </message>
     <message>
       <source>%1 already exists.
 Do you want to replace it?</source>
-      <translation>%1 eksisterer allerede.
-Vil du udskifte den?</translation>
+      <translation>%1 давхцаж байна.
+Та үүнийг орлуулахыг хүсч байна уу?</translation>
     </message>
     <message>
       <source>%1
 File not found.
 Please verify the correct file name was given.</source>
       <translation>%1
-Filen blev ikke fundet.
-Bekræft venligst, at det korrekte filnavn blev givet.</translation>
+Файл олдсонгүй.
+Файлын нэрийг зөв оруулсан эсэхийг шалгана уу.</translation>
     </message>
     <message>
       <source>New Folder</source>
-      <translation>Ny Mappe</translation>
+      <translation>Шинэ фолдер</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation>Slet</translation>
+      <translation>Устгах</translation>
     </message>
     <message>
       <source>&apos;%1&apos; is write protected.
 Do you want to delete it anyway?</source>
-      <translation>&apos;%1&apos; er skrivebeskyttet.
-Vil du slette det alligevel?</translation>
+      <translation type="unfinished">&apos;%1&apos; is write protected.
+Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Are you sure you want to delete &apos;%1&apos;?</source>
-      <translation>Er du sikker på, at du vil slette &apos;%1&apos;?</translation>
+      <translation>Та &apos;%1&apos;-г устгахдаа итгэлтэй байна уу?</translation>
     </message>
     <message>
       <source>Could not delete directory.</source>
-      <translation>Kunne ikke slette mappe.</translation>
+      <translation type="unfinished">Could not delete directory.</translation>
     </message>
     <message>
       <source>Recent Places</source>
-      <translation>Seneste Steder</translation>
+      <translation>Өмнөх байршлууд</translation>
     </message>
     <message>
       <source>Remove</source>
-      <translation>Fjern</translation>
+      <translation>Арилгах</translation>
     </message>
     <message>
       <source>My Computer</source>
-      <translation>Denne Computer</translation>
+      <translation>Миний компьютер</translation>
     </message>
     <message>
       <source>Drive</source>
-      <translation>Drev</translation>
+      <translation>Драйв</translation>
     </message>
     <message>
       <source>%1 File</source>
       <extracomment>%1 is a file name suffix, for example txt</extracomment>
-      <translation>%1 Fil</translation>
+      <translation>%1 файл</translation>
     </message>
     <message>
       <source>File</source>
-      <translation>Fil</translation>
+      <translation>Файл</translation>
     </message>
     <message>
       <source>File Folder</source>
       <comment>Match Windows Explorer</comment>
-      <translation>Fil Mappe</translation>
+      <translation>Файлын хавтас</translation>
     </message>
     <message>
       <source>Folder</source>
       <comment>All other platforms</comment>
-      <translation>Mappe</translation>
+      <translation>Хавтас</translation>
     </message>
     <message>
       <source>Alias</source>
       <comment>OS X Finder</comment>
-      <translation>Alias</translation>
+      <translation type="unfinished">Alias</translation>
     </message>
     <message>
       <source>Shortcut</source>
       <comment>All other platforms</comment>
-      <translation>Genvej</translation>
+      <translation>Товчлол</translation>
     </message>
     <message>
       <source>Unknown</source>
-      <translation>Ukendt</translation>
+      <translation>Тодорхойгүй</translation>
     </message>
     <message>
       <source>Sidebar</source>
-      <translation>Sidebjælke</translation>
+      <translation>Хажуугийн самбар</translation>
     </message>
     <message>
       <source>List of places and bookmarks</source>
-      <translation>Liste over steder og bogmærker</translation>
+      <translation>Газар болон тэмдэглэлийн жагсаалт</translation>
     </message>
     <message>
       <source>Files</source>
-      <translation>Filer</translation>
+      <translation>Файлууд</translation>
     </message>
     <message>
       <source>Alt+Left</source>
-      <translation>Alt+Venstre</translation>
+      <translation>Alt+Зүүн</translation>
     </message>
     <message>
       <source>Alt+Right</source>
-      <translation>Alt+højre</translation>
+      <translation>Alt+Баруун</translation>
     </message>
     <message>
       <source>Alt+Up</source>
-      <translation>Alt+Op</translation>
+      <translation>Alt+Дээш</translation>
     </message>
   </context>
   <context>
     <name>QFileSystemModel</name>
     <message>
       <source>%1 TB</source>
-      <translation>%1 TB</translation>
+      <translation>%1 ТБ</translation>
     </message>
     <message>
       <source>%1 GB</source>
-      <translation>%1 GB</translation>
+      <translation>%1 ГБ</translation>
     </message>
     <message>
       <source>%1 MB</source>
@@ -671,76 +671,76 @@ Vil du slette det alligevel?</translation>
     </message>
     <message>
       <source>%1 KB</source>
-      <translation>%1 KB</translation>
+      <translation>%1 КБ</translation>
     </message>
     <message>
       <source>%1 bytes</source>
-      <translation>%1 bytes</translation>
+      <translation>%1 бит-үүд</translation>
     </message>
     <message>
       <source>Invalid filename</source>
-      <translation>Ugyldigt filnavn</translation>
+      <translation>Файлын нэр буруу</translation>
     </message>
     <message>
       <source>&lt;b&gt;The name &quot;%1&quot; can not be used.&lt;/b&gt;&lt;p&gt;Try using another name, with fewer characters or no punctuations marks.</source>
-      <translation>&lt;b&gt;Navnet &quot;%1&quot; kan ikke bruges.&lt;/b&gt;&lt;p&gt;Prøv at bruge et andet navn med færre tegn eller ingen tegnsætningstegn.</translation>
+      <translation>&lt;b&gt; &quot;%1&quot; нэрийг ашиглах боломжгүй байна.&lt;/b&gt;&lt;p&gt; Цөөн тэмдэгттэй цэг таслалгүй нэр ашиглана уу.</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation>Navn</translation>
+      <translation>Нэр</translation>
     </message>
     <message>
       <source>Size</source>
-      <translation>Størrelse</translation>
+      <translation>Хэмжээ</translation>
     </message>
     <message>
       <source>Kind</source>
       <comment>Match OS X Finder</comment>
-      <translation>Type</translation>
+      <translation type="unfinished">Kind</translation>
     </message>
     <message>
       <source>Type</source>
       <comment>All other platforms</comment>
-      <translation>Type</translation>
+      <translation>Төрөл</translation>
     </message>
     <message>
       <source>Date Modified</source>
-      <translation>Ændringsdato</translation>
+      <translation>Өөрчилсөн огноо</translation>
     </message>
     <message>
       <source>My Computer</source>
-      <translation>Denne Computer</translation>
+      <translation>Миний компьютер</translation>
     </message>
     <message>
       <source>Computer</source>
-      <translation>Computer</translation>
+      <translation>Компьютер</translation>
     </message>
     <message>
       <source>%1 byte(s)</source>
-      <translation>%1 byte(s)</translation>
+      <translation>%1 бит(үүд)</translation>
     </message>
   </context>
   <context>
     <name>QGnomeTheme</name>
     <message>
       <source>&amp;OK</source>
-      <translation>&amp;OK</translation>
+      <translation>&amp;ОК</translation>
     </message>
     <message>
       <source>&amp;Save</source>
-      <translation>&amp;Gem</translation>
+      <translation>&amp;Хадгалах</translation>
     </message>
     <message>
       <source>&amp;Cancel</source>
-      <translation>&amp;Annuller</translation>
+      <translation>&amp;Цуцлах</translation>
     </message>
     <message>
       <source>&amp;Close</source>
-      <translation>&amp;Luk</translation>
+      <translation>&amp;Хаах</translation>
     </message>
     <message>
       <source>Close without Saving</source>
-      <translation>Afslut uden at gemme</translation>
+      <translation>Хадгалахгүйгээр хаах</translation>
     </message>
   </context>
   <context>
@@ -748,432 +748,432 @@ Vil du slette det alligevel?</translation>
     <message>
       <source>QT_LAYOUT_DIRECTION</source>
       <comment>Translate this string to the string &apos;LTR&apos; in left-to-right languages or to &apos;RTL&apos; in right-to-left languages (such as Hebrew and Arabic) to get proper widget layout.</comment>
-      <translation>QT_LAYOUT_DIRECTION</translation>
+      <translation type="unfinished">QT_LAYOUT_DIRECTION</translation>
     </message>
   </context>
   <context>
     <name>QIODevice</name>
     <message>
       <source>Permission denied</source>
-      <translation>Adgang nægtet</translation>
+      <translation>Зөвшөөрөл татгалзсан</translation>
     </message>
     <message>
       <source>Too many open files</source>
-      <translation>For mange åbne filer</translation>
+      <translation>Хэт олон нээлттэй файлууд</translation>
     </message>
     <message>
       <source>No such file or directory</source>
-      <translation>Ingen sådan fil eller mappe</translation>
+      <translation type="unfinished">No such file or directory</translation>
     </message>
     <message>
       <source>No space left on device</source>
-      <translation>Ikke mere plads på enheden</translation>
+      <translation>Төхөөөрмжийн багтаамж дүүрсэн байна</translation>
     </message>
     <message>
       <source>Unknown error</source>
-      <translation>Ukendt fejl</translation>
+      <translation>Үл мэдэгдэх алдаа</translation>
     </message>
     <message>
       <source>file to open is a directory</source>
-      <translation>fil der skal åbnes er en mappe</translation>
+      <translation type="unfinished">file to open is a directory</translation>
     </message>
   </context>
   <context>
     <name>QImageReader</name>
     <message>
       <source>Invalid device</source>
-      <translation>Ugyldig enhed</translation>
+      <translation>Тохирохгүй төхөөрөмж байна</translation>
     </message>
     <message>
       <source>File not found</source>
-      <translation>Fil ikke fundet</translation>
+      <translation>Файл олдсонгүй</translation>
     </message>
     <message>
       <source>Unsupported image format</source>
-      <translation>Billedformatet understøttes ikke</translation>
+      <translation>Тохирохгүй зургийн формат байна</translation>
     </message>
     <message>
       <source>Unable to read image data</source>
-      <translation>Kan ikke læse billeddata</translation>
+      <translation>Зургийн өгөгдлийг унших боломжгүй байна</translation>
     </message>
     <message>
       <source>Unknown error</source>
-      <translation>Ukendt fejl</translation>
+      <translation>Үл мэдэгдэх алдаа</translation>
     </message>
   </context>
   <context>
     <name>QImageWriter</name>
     <message>
       <source>Unknown error</source>
-      <translation>Ukendt fejl</translation>
+      <translation>Үл мэдэгдэх алдаа</translation>
     </message>
     <message>
       <source>Device is not set</source>
-      <translation>Enheden er ikke indstillet</translation>
+      <translation>Төхөөрөмжийг тохируулаагүй байна</translation>
     </message>
     <message>
       <source>Device not writable</source>
-      <translation>Enhed ikke skrivbar</translation>
+      <translation>Төхөөрөмж дээр бичих боломжгүй байна</translation>
     </message>
     <message>
       <source>Unsupported image format</source>
-      <translation>Billedformatet understøttes ikke</translation>
+      <translation>Тохирохгүй зургийн формат байна</translation>
     </message>
   </context>
   <context>
     <name>QInputDialog</name>
     <message>
       <source>Enter a value:</source>
-      <translation>Indtast værdi:</translation>
+      <translation>Утга оруулна уу:</translation>
     </message>
   </context>
   <context>
     <name>QKeySequenceEdit</name>
     <message>
       <source>Press shortcut</source>
-      <translation>Tryk på genvej</translation>
+      <translation>Товчлолыг дарах</translation>
     </message>
     <message>
       <source>%1, ...</source>
       <extracomment>This text is an &quot;unfinished&quot; shortcut, expands like &quot;Ctrl+A, ...&quot;</extracomment>
-      <translation>%1,...</translation>
+      <translation>%1, ...</translation>
     </message>
   </context>
   <context>
     <name>QLineEdit</name>
     <message>
       <source>&amp;Undo</source>
-      <translation>&amp;Fortryd</translation>
+      <translation>&amp;Буцаах</translation>
     </message>
     <message>
       <source>&amp;Redo</source>
-      <translation>Gendan</translation>
+      <translation>&amp;Дахин хийх</translation>
     </message>
     <message>
       <source>Cu&amp;t</source>
-      <translation>Kli&amp;p</translation>
+      <translation>&amp;Тастах</translation>
     </message>
     <message>
       <source>&amp;Copy</source>
-      <translation>&amp;Kopier</translation>
+      <translation>&amp;Хуулах</translation>
     </message>
     <message>
       <source>&amp;Paste</source>
-      <translation>&amp;Indsæt</translation>
+      <translation>&amp;Буулгах</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation>Slet</translation>
+      <translation>Устгах</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation>Vælg alt</translation>
+      <translation>Бүгдийг сонгох</translation>
     </message>
   </context>
   <context>
     <name>QMessageBox</name>
     <message>
       <source>Show Details...</source>
-      <translation>Vis detaljer...</translation>
+      <translation>Дэлгэрэнгүй харуулах...</translation>
     </message>
     <message>
       <source>Hide Details...</source>
-      <translation>Skjul detaljer...</translation>
+      <translation>Дэлгэрэнгүй мэдээллийг нуух...</translation>
     </message>
     <message>
       <source>OK</source>
-      <translation>OK</translation>
+      <translation>ОК</translation>
     </message>
     <message>
       <source>Help</source>
-      <translation>Hjælp</translation>
+      <translation>Тусламж</translation>
     </message>
   </context>
   <context>
     <name>QPlatformTheme</name>
     <message>
       <source>OK</source>
-      <translation>OK</translation>
+      <translation>ОК</translation>
     </message>
     <message>
       <source>Save</source>
-      <translation>Gem</translation>
+      <translation>Хадгалах</translation>
     </message>
     <message>
       <source>Save All</source>
-      <translation>Gem alt</translation>
+      <translation>Бүгдийг хадгалах</translation>
     </message>
     <message>
       <source>Open</source>
-      <translation>Åbn</translation>
+      <translation>Нээх</translation>
     </message>
     <message>
       <source>&amp;Yes</source>
-      <translation>&amp;Ja</translation>
+      <translation>&amp;Тийм</translation>
     </message>
     <message>
       <source>Yes to &amp;All</source>
-      <translation>Ja til &amp;Alle</translation>
+      <translation>&amp;Бүгдийг сонгох</translation>
     </message>
     <message>
       <source>&amp;No</source>
-      <translation>&amp;Nej</translation>
+      <translation>&amp;Үгүй</translation>
     </message>
     <message>
       <source>N&amp;o to All</source>
-      <translation>Nej til alle</translation>
+      <translation>&amp;Бүгдийг зөвшөөрөхгүй</translation>
     </message>
     <message>
       <source>Abort</source>
-      <translation>Afbryd</translation>
+      <translation>Цуцлах</translation>
     </message>
     <message>
       <source>Retry</source>
-      <translation>Prøv igen</translation>
+      <translation>Дахин оролдох</translation>
     </message>
     <message>
       <source>Ignore</source>
-      <translation>Ignorer</translation>
+      <translation>Татгалзах</translation>
     </message>
     <message>
       <source>Close</source>
-      <translation>Luk</translation>
+      <translation>Хаах</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation>Annuller</translation>
+      <translation>Цуцлах</translation>
     </message>
     <message>
       <source>Discard</source>
-      <translation>Kassér</translation>
+      <translation>Болих</translation>
     </message>
     <message>
       <source>Help</source>
-      <translation>Hjælp</translation>
+      <translation>Тусламж</translation>
     </message>
     <message>
       <source>Apply</source>
-      <translation>Gem ændringer</translation>
+      <translation>Ашиглах</translation>
     </message>
     <message>
       <source>Reset</source>
-      <translation>Nulstil</translation>
+      <translation>Дахин тохируулах</translation>
     </message>
     <message>
       <source>Restore Defaults</source>
-      <translation>Gendan standardindstillinger</translation>
+      <translation>Үндсэн тохиргооруу буцаах</translation>
     </message>
   </context>
   <context>
     <name>QProgressDialog</name>
     <message>
       <source>Cancel</source>
-      <translation>Annuller</translation>
+      <translation>Цуцлах</translation>
     </message>
   </context>
   <context>
     <name>QQnxFileDialogHelper</name>
     <message>
       <source>All files (*.*)</source>
-      <translation>Alle filer (*.*)</translation>
+      <translation>Бүх файлууд (*.*)</translation>
     </message>
   </context>
   <context>
     <name>QSaveFile</name>
     <message>
       <source>Existing file %1 is not writable</source>
-      <translation>Eksisterende fil %1 er ikke skrivbar</translation>
+      <translation>Уг файл %1 бичигдэх боломжгүй байна</translation>
     </message>
     <message>
       <source>Filename refers to a directory</source>
-      <translation>Filnavn henviser til en mappe</translation>
+      <translation type="unfinished">Filename refers to a directory</translation>
     </message>
     <message>
       <source>Writing canceled by application</source>
-      <translation>Skrivning annulleret af applikationen</translation>
+      <translation>Бичих үйлдлийг програм цуцалсан</translation>
     </message>
   </context>
   <context>
     <name>QScrollBar</name>
     <message>
       <source>Scroll here</source>
-      <translation>Rul her</translation>
+      <translation>Ийшээ гүйлгэ</translation>
     </message>
     <message>
       <source>Left edge</source>
-      <translation>Venstre kant</translation>
+      <translation>Зүүн булан</translation>
     </message>
     <message>
       <source>Top</source>
-      <translation>Øverste</translation>
+      <translation>Дээд хэсэг</translation>
     </message>
     <message>
       <source>Right edge</source>
-      <translation>Højre kant</translation>
+      <translation>Баруун булан</translation>
     </message>
     <message>
       <source>Bottom</source>
-      <translation>Nederst</translation>
+      <translation>Доод хэсэг</translation>
     </message>
     <message>
       <source>Page left</source>
-      <translation>Side til venstre</translation>
+      <translation>Зүүн талын хуудас</translation>
     </message>
     <message>
       <source>Page up</source>
-      <translation>Side op</translation>
+      <translation>Дээд талын хуудас</translation>
     </message>
     <message>
       <source>Page right</source>
-      <translation>Side til højre</translation>
+      <translation>Баруун талын хуудас</translation>
     </message>
     <message>
       <source>Page down</source>
-      <translation>Side ned</translation>
+      <translation>Доод талын хуудас</translation>
     </message>
     <message>
       <source>Scroll left</source>
-      <translation>Rul til venstre</translation>
+      <translation>Зүүн тийш гүйлгэх</translation>
     </message>
     <message>
       <source>Scroll up</source>
-      <translation>Rul op</translation>
+      <translation>Дээш гүйлгэх</translation>
     </message>
     <message>
       <source>Scroll right</source>
-      <translation>Rul til højre</translation>
+      <translation>Баруун тийш гүйлгэх</translation>
     </message>
     <message>
       <source>Scroll down</source>
-      <translation>Rul ned</translation>
+      <translation>Доош гүйлгэх</translation>
     </message>
   </context>
   <context>
     <name>QStandardPaths</name>
     <message>
       <source>Desktop</source>
-      <translation>Skrivebord</translation>
+      <translation>Дэлгэц</translation>
     </message>
     <message>
       <source>Documents</source>
-      <translation>Dokumenter</translation>
+      <translation>Баримт бичгүүд</translation>
     </message>
     <message>
       <source>Fonts</source>
-      <translation>Skrifttyper</translation>
+      <translation>Фонтууд</translation>
     </message>
     <message>
       <source>Applications</source>
-      <translation>Applikationer</translation>
+      <translation>Апп-ууд</translation>
     </message>
     <message>
       <source>Music</source>
-      <translation>Musik</translation>
+      <translation>Хөгжим</translation>
     </message>
     <message>
       <source>Movies</source>
-      <translation>Film</translation>
+      <translation>Кино</translation>
     </message>
     <message>
       <source>Pictures</source>
-      <translation>Billeder</translation>
+      <translation>Зургууд</translation>
     </message>
     <message>
       <source>Temporary Directory</source>
-      <translation>Midlertidig mappe</translation>
+      <translation type="unfinished">Temporary Directory</translation>
     </message>
     <message>
       <source>Home</source>
-      <translation>Hjem</translation>
+      <translation>Эхлэл</translation>
     </message>
     <message>
       <source>Application Data</source>
-      <translation>Applikation Data</translation>
+      <translation>Апп-н дата</translation>
     </message>
     <message>
       <source>Application Configuration</source>
-      <translation>Applikationskonfiguration</translation>
+      <translation>Апп-н тохиргоо</translation>
     </message>
     <message>
       <source>Cache</source>
-      <translation>Cache</translation>
+      <translation>Кэш</translation>
     </message>
     <message>
       <source>Shared Data</source>
-      <translation>Delte data</translation>
+      <translation>Хуваалцсан дата</translation>
     </message>
     <message>
       <source>Runtime</source>
-      <translation>Varighed</translation>
+      <translation>Ажилласан хугацаа</translation>
     </message>
     <message>
       <source>Configuration</source>
-      <translation>Opsætning</translation>
+      <translation>Тохиргоо</translation>
     </message>
     <message>
       <source>Shared Configuration</source>
-      <translation>Delt konfiguration</translation>
+      <translation>Хуваалцсан тохиргоо</translation>
     </message>
     <message>
       <source>Shared Cache</source>
-      <translation>Delt cache</translation>
+      <translation>Хуваалцсан кэш</translation>
     </message>
     <message>
       <source>Download</source>
-      <translation>Download</translation>
+      <translation>Татсан файл</translation>
     </message>
   </context>
   <context>
     <name>QTabBar</name>
     <message>
       <source>Scroll Left</source>
-      <translation>Rul til venstre</translation>
+      <translation>Зүүн тийш гүйлгэх</translation>
     </message>
     <message>
       <source>Scroll Right</source>
-      <translation>Rul til højre</translation>
+      <translation>Баруун тийш гүйлгэх</translation>
     </message>
   </context>
   <context>
     <name>QWhatsThisAction</name>
     <message>
       <source>What&apos;s This?</source>
-      <translation>Hvad&apos;er dette?</translation>
+      <translation>Энэ юу вэ?</translation>
     </message>
   </context>
   <context>
     <name>QWidgetTextControl</name>
     <message>
       <source>&amp;Undo</source>
-      <translation>&amp;Fortryd</translation>
+      <translation>&amp;Буцаах</translation>
     </message>
     <message>
       <source>&amp;Redo</source>
-      <translation>Gendan</translation>
+      <translation>&amp;Дахин хийх</translation>
     </message>
     <message>
       <source>Cu&amp;t</source>
-      <translation>Kli&amp;p</translation>
+      <translation>&amp;Тастах</translation>
     </message>
     <message>
       <source>&amp;Copy</source>
-      <translation>&amp;Kopier</translation>
+      <translation>&amp;Хуулах</translation>
     </message>
     <message>
       <source>Copy &amp;Link Location</source>
-      <translation>Kopiér &amp;Link-placering</translation>
+      <translation>&amp;Байршлыг хуулж холбох</translation>
     </message>
     <message>
       <source>&amp;Paste</source>
-      <translation>&amp;Indsæt</translation>
+      <translation>&amp;Буулгах</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation>Slet</translation>
+      <translation>Устгах</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation>Vælg alt</translation>
+      <translation>Бүгдийг сонгох</translation>
     </message>
   </context>
 </TS>

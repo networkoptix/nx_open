@@ -2,6 +2,17 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="ja_JP" sourcelanguage="en">
   <context>
+    <name>ApiErrorStrings</name>
+    <message>
+      <source>Invalid JSON content.</source>
+      <translation>無効な JSON コンテンツです。</translation>
+    </message>
+    <message>
+      <source>Unsupported content type.</source>
+      <translation>サポートされていないコンテンツタイプです。</translation>
+    </message>
+  </context>
+  <context>
     <name>ArchiveDuration</name>
     <message>
       <source>no data for forecast</source>
@@ -18,14 +29,6 @@
   </context>
   <context>
     <name>AuthResultTranslations</name>
-    <message>
-      <source>This user does not exist.</source>
-      <translation>該当ユーザが存在しません。</translation>
-    </message>
-    <message>
-      <source>Wrong password.</source>
-      <translation>パスワードが違います。</translation>
-    </message>
     <message>
       <source>The password is expired. Please contact your system administrator.</source>
       <translation>パスワードの有効期限が切れています。システム管理者に連絡してください。</translation>
@@ -57,6 +60,38 @@
     <message>
       <source>This user has been disabled by a system administrator.</source>
       <translation>このユーザーはシステム管理者によって無効にされています。</translation>
+    </message>
+    <message>
+      <source>This user does not exist or is unable to login.</source>
+      <translation>このユーザーは存在しないか、ログインできません。</translation>
+    </message>
+    <message>
+      <source>Wrong password</source>
+      <translation>パスワードが違います</translation>
+    </message>
+    <message>
+      <source>The ticket key is invalid or expired.</source>
+      <translation>チケットキーが無効または期限切れです。</translation>
+    </message>
+    <message>
+      <source>More than one user with the same login are presented.</source>
+      <translation>同一のログイン名を持つ複数のユーザーが存在します。</translation>
+    </message>
+    <message>
+      <source>Unable to verify LDAP server SSL/TLS certificate.</source>
+      <translation>LDAP サーバーの SSL/TLS 証明書を検証できません。</translation>
+    </message>
+  </context>
+  <context>
+    <name>BookmarkFacadeStrings</name>
+    <message>
+      <source>System Event</source>
+      <comment>Shows that the bookmark was created by a system event</comment>
+      <translation>システムイベント</translation>
+    </message>
+    <message>
+      <source>Removed camera</source>
+      <translation>カメラ削除</translation>
     </message>
   </context>
   <context>
@@ -135,11 +170,55 @@
     </message>
   </context>
   <context>
-    <name>QObject</name>
+    <name>PredefinedUserGroups</name>
     <message>
-      <source>System Event</source>
-      <comment>Shows that the bookmark was created by a system event</comment>
-      <translation>システムイベント</translation>
+      <source>Administrators</source>
+      <translation>管理者</translation>
+    </message>
+    <message>
+      <source>Power Users</source>
+      <translation>パワーユーザー</translation>
+    </message>
+    <message>
+      <source>Advanced Viewers</source>
+      <translation>上位ビューアー</translation>
+    </message>
+    <message>
+      <source>Viewers</source>
+      <translation>ビューアー</translation>
+    </message>
+    <message>
+      <source>Live Viewers</source>
+      <translation>ライブビューアー</translation>
+    </message>
+    <message>
+      <source>System Health Viewers</source>
+      <translation>システムヘルスビューアー</translation>
+    </message>
+    <message>
+      <source>Members of this group have unlimited System privileges. Administrators can create and modify Power Users, merge Systems and connect or disconnect System to  %1.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>このグループのメンバーには無制限のシステム権限があります。管理者は、パワーユーザーの作成および変更、システムの統合、 %1 への接続および解除ができます。</translation>
+    </message>
+    <message>
+      <source>Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the System configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</source>
+      <translation>このグループのメンバーは、上位ビューアーの権限に加えて、システム構成の大部分を制御できます。ただし、自身に対するグループや権限の変更または削除といった管理者関連の設定変更は許可されておらず、他のパワーユーザーの作成や編集もできません。</translation>
+    </message>
+    <message>
+      <source>Members of this group can, in addition to the permissions granted by the Viewers group, see and activate PTZ positions and PTZ tours, use 2-way audio, operate I/O module buttons, create and edit bookmarks, and view the Event Log.</source>
+      <translation>このグループのメンバーは、ビューアーグループの権限に加えて、PTZ ポジションおよび PTZ ツアーの表示と実行、双方向オーディオの使用、I/O モジュールのボタン操作、ブックマークの作成と編集、およびイベントログの表示を行うことができます。</translation>
+    </message>
+    <message>
+      <source>Members of this group can, in addition to the permissions granted by the Live Viewers group, view and export archive and Bookmarks.</source>
+      <translation>このグループのメンバーは、ライブビューアーの権限に加えて、アーカイブとブックマークを表示およびエクスポートできます。</translation>
+    </message>
+    <message>
+      <source>Members of this group can view live videos, I/O modules and web pages.</source>
+      <translation>このグループのメンバーは、ライブ映像、I/Oモジュール、Webページを表示できます。</translation>
+    </message>
+    <message>
+      <source>Members of this group can view System Health Monitoring information and server processor load in real-time (Server Monitoring).</source>
+      <translation>このグループのメンバーは、システムヘルスモニタリング情報およびサーバーのプロセッサー負荷をリアルタイムで表示できます (サーバーモニタリング)。</translation>
     </message>
   </context>
   <context>
@@ -190,7 +269,7 @@
     </message>
     <message>
       <source>Failed to configure parameter %1.</source>
-      <translation>パラメーター %1 設定失敗</translation>
+      <translation>パラメーター %1 の設定に失敗しました。</translation>
     </message>
     <message>
       <source>Please contact support.</source>
@@ -237,20 +316,12 @@
       <translation>不明なカメラ障害です。</translation>
     </message>
     <message>
-      <source>Invalid data was received from the device %1.</source>
-      <translation>デバイス %1 から無効なデータを受信しました。</translation>
-    </message>
-    <message>
-      <source>Invalid data was received from the camera %1.</source>
-      <translation>カメラ %1から無効なデータを受信しました。</translation>
-    </message>
-    <message>
       <source>Too many media errors. Please open device issues dialog for more details.</source>
-      <translation>メディアエラーが多すぎます。デバイス障害ダイアログを開いて詳細を確認してください。</translation>
+      <translation>多数のメディアエラー。デバイス障害ダイアログを開いて詳細を確認してください。</translation>
     </message>
     <message>
       <source>Too many media errors. Please open camera issues dialog for more details.</source>
-      <translation>メディアエラーが多すぎます。カメラ障害ダイアログを開いて詳細を確認してください。</translation>
+      <translation>多数のメディアエラー。カメラ障害ダイアログを開いて詳細を確認してください。</translation>
     </message>
     <message>
       <source>Please try to reboot the I/O module, then restore factory defaults on the web-page.</source>
@@ -269,12 +340,8 @@
       <translation>不明なI/Oモジュール障害です。</translation>
     </message>
     <message>
-      <source>Invalid data was received from the I/O module %1.</source>
-      <translation>I/Oモジュール %1 から無効なデータを受信しました。</translation>
-    </message>
-    <message>
       <source>Too many media errors. Please open I/O module issues dialog for more details.</source>
-      <translation>メディアエラーが多すぎます。I/Oモジュール障害ダイアログを開いて詳細を確認してください。</translation>
+      <translation>多数のメディアエラー。I/Oモジュール障害ダイアログを開いて詳細を確認してください。</translation>
     </message>
     <message>
       <source>Device initialization process is in progress.</source>
@@ -368,6 +435,25 @@
       <source>If disabled, try to enable Recording in I/O Module Settings (error &quot;%1&quot;).</source>
       <translation>無効になっている場合は、I/O モジュール設定で録画を有効にしてください (エラー &quot;%1&quot;)。</translation>
     </message>
+    <message>
+      <source>Invalid data was received from the device. Details: &quot;%1&quot;.</source>
+      <translation>デバイスから無効なデータを受信しました。詳細: &quot;%1&quot;。</translation>
+    </message>
+    <message>
+      <source>Invalid data was received from the camera. Details: &quot;%1&quot;.</source>
+      <translation>カメラから無効なデータを受信しました。詳細: &quot;%1&quot;。</translation>
+    </message>
+    <message>
+      <source>Invalid data was received from the I/O module. Details: &quot;%1&quot;.</source>
+      <translation>I/Oモジュールから無効なデータを受信しました。詳細: &quot;%1&quot;。</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCameraNamesWatcher</name>
+    <message>
+      <source>Removed camera</source>
+      <translation>カメラ削除</translation>
+    </message>
   </context>
   <context>
     <name>QnFfmpegAudioTranscoder</name>
@@ -420,7 +506,7 @@
     </message>
     <message>
       <source>Could not allocate output stream for recording.</source>
-      <translation>録画用の出力ストリームを割り当てることができません。</translation>
+      <translation>録画用の出力ストリームを割り当てることができませんでした。</translation>
     </message>
     <message>
       <source>Could not perform direct stream copy because frame size is undefined.</source>
@@ -573,7 +659,7 @@
     <message numerus="yes">
       <source>%n Analog Encoder Licenses</source>
       <translation>
-        <numerusform>%n アナログ エンコーダー ライセンス</numerusform>
+        <numerusform>%n アナログエンコーダーライセンス</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -655,7 +741,7 @@
       <source>%n/%1 Analog Encoder Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n/%1 アナログエンコーダライセンス</numerusform>
+        <numerusform>%n/%1 アナログエンコーダーライセンス</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -719,6 +805,27 @@
       <comment>%n will be replaced by the total count</comment>
       <translation>
         <numerusform>%n/%1 NVRライセンス</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Local Recording</source>
+      <translation>ローカル録画</translation>
+    </message>
+    <message>
+      <source>Local Recording service</source>
+      <translation>ローカル録画サービス</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Local Recording Services</source>
+      <translation>
+        <numerusform>%n ローカル録画サービス</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Local Recording Services</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 ローカル録画サービス</numerusform>
       </translation>
     </message>
   </context>
@@ -970,6 +1077,102 @@
         <numerusform> 年</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Msec</source>
+      <comment>Capitalized long suffix for displaying milliseconds</comment>
+      <translation>ミリ秒</translation>
+    </message>
+    <message>
+      <source>Sec</source>
+      <comment>Capitalized long suffix for displaying seconds</comment>
+      <translation>秒</translation>
+    </message>
+    <message>
+      <source>Min</source>
+      <comment>Capitalized long suffix for displaying minutes</comment>
+      <translation>分</translation>
+    </message>
+    <message>
+      <source>Hrs</source>
+      <comment>Capitalized long suffix for displaying hours</comment>
+      <translation>時間</translation>
+    </message>
+    <message>
+      <source>Days</source>
+      <comment>Capitalized long suffix for displaying days</comment>
+      <translation> 日</translation>
+    </message>
+    <message>
+      <source>Wks</source>
+      <comment>Capitalized long suffix for displaying weeks</comment>
+      <translation>週</translation>
+    </message>
+    <message>
+      <source>Mos</source>
+      <comment>Capitalized long suffix for displaying months</comment>
+      <translation>ヶ月</translation>
+    </message>
+    <message>
+      <source>Yrs</source>
+      <comment>Capitalized long suffix for displaying years</comment>
+      <translation>年</translation>
+    </message>
+    <message numerus="yes">
+      <source>Milliseconds</source>
+      <comment>Capitalized full suffix for displaying milliseconds</comment>
+      <translation>
+        <numerusform>ミリ秒</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Seconds</source>
+      <comment>Capitalized full suffix for displaying seconds</comment>
+      <translation>
+        <numerusform>秒</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Minutes</source>
+      <comment>Capitalized full suffix for displaying minutes</comment>
+      <translation>
+        <numerusform>分</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Hours</source>
+      <comment>Capitalized full suffix for displaying hours</comment>
+      <translation>
+        <numerusform>時間</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Days</source>
+      <comment>Capitalized fapitalized full suffix for displaying days</comment>
+      <translation>
+        <numerusform>日</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Weeks</source>
+      <comment>Capitalized full suffix for displaying weeks</comment>
+      <translation>
+        <numerusform>週</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Months</source>
+      <comment>Capitalized full suffix for displaying months</comment>
+      <translation>
+        <numerusform>ヶ月</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Years</source>
+      <comment>Capitalized full suffix for displaying years</comment>
+      <translation>
+        <numerusform> 年</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>QnTranscoder</name>
@@ -991,69 +1194,21 @@
     </message>
   </context>
   <context>
-    <name>QnUserRolesManager</name>
-    <message>
-      <source>Owner</source>
-      <translation>オーナー</translation>
-    </message>
-    <message>
-      <source>Administrator</source>
-      <translation>アドミニストレーター</translation>
-    </message>
-    <message>
-      <source>Advanced Viewer</source>
-      <translation>上位ビューアー</translation>
-    </message>
-    <message>
-      <source>Viewer</source>
-      <translation>ビューアー</translation>
-    </message>
-    <message>
-      <source>Live Viewer</source>
-      <translation>ライブビューアー</translation>
-    </message>
-    <message>
-      <source>Custom Role</source>
-      <translation>カスタムロール</translation>
-    </message>
+    <name>QnUserResource</name>
     <message>
       <source>Custom</source>
       <translation>カスタム</translation>
     </message>
     <message>
-      <source>Can manage all cameras and bookmarks.</source>
-      <translation>すべてのカメラとブックマークを管理できます。</translation>
-    </message>
-    <message>
-      <source>Can view all cameras and export video.</source>
-      <translation>すべてのカメラを表示し、録画映像をエクスポートできます。</translation>
-    </message>
-    <message>
-      <source>Can view live video from all cameras.</source>
-      <translation>すべてのカメラのライブ映像を表示できます。</translation>
-    </message>
-    <message>
-      <source>Custom user role.</source>
-      <translation>カスタムのユーザーロール。</translation>
-    </message>
-    <message>
-      <source>Custom permissions.</source>
-      <translation>カスタム権限</translation>
-    </message>
-    <message>
-      <source>Has access to whole System and can do everything.</source>
-      <translation>システム全体にアクセスでき、すべての操作を行うことができます。</translation>
-    </message>
-    <message>
-      <source>Has access to whole System and can manage it. Can create users.</source>
-      <translation>システム全体にアクセスでき、管理できます。ユーザーを作成できます。</translation>
+      <source>Multiple groups</source>
+      <translation>複数のグループ</translation>
     </message>
   </context>
   <context>
     <name>Result</name>
     <message>
       <source>Missing required parameter: %1.</source>
-      <translation>必要なパラメータがありません: %1</translation>
+      <translation>必須パラメーターがありません: %1。</translation>
     </message>
     <message>
       <source>Failed to process request.</source>
@@ -1062,31 +1217,31 @@
     <message>
       <source>Forbidden.</source>
       <comment>Generic HTTP response</comment>
-      <translation>アクセス禁止。</translation>
+      <translation>Forbidden</translation>
     </message>
     <message>
       <source>Conflict.</source>
       <comment>Generic HTTP response</comment>
-      <translation>競合。</translation>
+      <translation>Conflict</translation>
     </message>
     <message>
       <source>Bad request.</source>
       <comment>Generic HTTP response</comment>
-      <translation>不正なリクエスト。</translation>
+      <translation>Bad request</translation>
     </message>
     <message>
       <source>Not implemented.</source>
       <comment>Generic HTTP response</comment>
-      <translation>未実装。</translation>
+      <translation>Not implemented</translation>
     </message>
     <message>
       <source>Not found.</source>
       <comment>Generic HTTP response</comment>
-      <translation>見つかりません。</translation>
+      <translation>Not found</translation>
     </message>
     <message>
       <source>Internal error.</source>
-      <translation>内部エラー。</translation>
+      <translation>Internal error</translation>
     </message>
     <message>
       <source>Unsupported media type.</source>
@@ -1094,11 +1249,11 @@
     </message>
     <message>
       <source>Service unavailable.</source>
-      <translation>サービス利用不可。</translation>
+      <translation>Service unavailable</translation>
     </message>
     <message>
       <source>Unauthorized.</source>
-      <translation>権限がありません。</translation>
+      <translation>Unauthorized</translation>
     </message>
     <message>
       <source>Session expired.</source>
@@ -1107,11 +1262,57 @@
     <message>
       <source>Invalid parameter `%1`: %2.</source>
       <comment>%1 is name, %2 is value.</comment>
-      <translation>無効なパラメータ `%1`: %2。</translation>
+      <translation>無効なパラメーター `%1`: %2。</translation>
     </message>
     <message>
       <source>Session authorization required.</source>
       <translation>セッション認証が必要です。</translation>
+    </message>
+  </context>
+  <context>
+    <name>ServiceTypeDisplayStringHelper</name>
+    <message>
+      <source>Local recording</source>
+      <translation>ローカル録画</translation>
+    </message>
+    <message>
+      <source>Integration</source>
+      <translation>インテグレーション</translation>
+    </message>
+    <message>
+      <source>Cloud storage</source>
+      <translation>クラウドストレージ</translation>
+    </message>
+  </context>
+  <context>
+    <name>StringsHelper</name>
+    <message>
+      <source>SaaS uninitialized</source>
+      <translation>SaaS が初期化されていません</translation>
+    </message>
+    <message>
+      <source>SaaS active</source>
+      <translation>SaaS がアクティブです</translation>
+    </message>
+    <message>
+      <source>SaaS suspended</source>
+      <translation>SaaS は一時停止されました</translation>
+    </message>
+    <message>
+      <source>SaaS shut down</source>
+      <translation>SaaS はシャットダウンしました</translation>
+    </message>
+    <message>
+      <source>SaaS shut down automatically</source>
+      <translation>SaaS は自動的にシャットダウンしました</translation>
+    </message>
+    <message>
+      <source>Contact your channel partner for details.</source>
+      <translation>詳細については、チャネルパートナーにお問い合わせください。</translation>
+    </message>
+    <message>
+      <source>Check internet connection between VMS and license server.</source>
+      <translation>VMS とライセンスサーバー間のインターネット接続を確認してください。</translation>
     </message>
   </context>
   <context>
@@ -1123,74 +1324,6 @@
   </context>
   <context>
     <name>SystemSettings</name>
-    <message>
-      <source>SMTP host</source>
-      <translation>SMTPホスト</translation>
-    </message>
-    <message>
-      <source>Email from</source>
-      <translation>差出人</translation>
-    </message>
-    <message>
-      <source>SMTP user</source>
-      <translation>SMTPユーザー</translation>
-    </message>
-    <message>
-      <source>SMTP password</source>
-      <translation>SMTPパスワード</translation>
-    </message>
-    <message>
-      <source>Email signature</source>
-      <translation>メールの署名</translation>
-    </message>
-    <message>
-      <source>Email support link</source>
-      <translation>Eメールサポートリンク</translation>
-    </message>
-    <message>
-      <source>SMTP connection type</source>
-      <translation>SMTP接続タイプ</translation>
-    </message>
-    <message>
-      <source>SMTP port</source>
-      <translation>SMTPポート</translation>
-    </message>
-    <message>
-      <source>SMTP timeout (seconds)</source>
-      <translation>SMTPタイムアウト (秒)</translation>
-    </message>
-    <message>
-      <source>SMTP name</source>
-      <translation>SMTP名</translation>
-    </message>
-    <message>
-      <source>LDAP URI</source>
-      <translation>LDAP URI</translation>
-    </message>
-    <message>
-      <source>LDAP Admin DN</source>
-      <translation>LDAP管理者DN</translation>
-    </message>
-    <message>
-      <source>LDAP Admin password</source>
-      <translation>LDAP管理者パスワード</translation>
-    </message>
-    <message>
-      <source>LDAP search base</source>
-      <translation>LDAP検索ベース</translation>
-    </message>
-    <message>
-      <source>LDAP search filter</source>
-      <translation>LDAP検索フィルター</translation>
-    </message>
-    <message>
-      <source>LDAP password expiration (milliseconds)</source>
-      <translation>LDAPパスワードの有効期限 (ミリ秒)</translation>
-    </message>
-    <message>
-      <source>LDAP search timeout (seconds)</source>
-      <translation>LDAP 検索タイムアウト(秒)</translation>
-    </message>
     <message>
       <source>Anonymous statistics report allowed</source>
       <translation>匿名の統計レポートを許可</translation>
@@ -1296,11 +1429,6 @@
       <translation>サムネイルの自動更新</translation>
     </message>
     <message>
-      <source>Use %1 service to send emails instead of SMTP client</source>
-      <extracomment>%1 will be substituted with branded cloud service name e.g. &quot;Nx Cloud&quot;.</extracomment>
-      <translation>SMTPクライアントの代わりに %1 サービスを使用してメールを送信する</translation>
-    </message>
-    <message>
       <source>Max scene items (0 means default)</source>
       <translation>シーンの最大アイテム数 (0でデフォルト値を使用)</translation>
     </message>
@@ -1381,10 +1509,6 @@
       <translation>レコードキューの最大サイズ (要素数, 250-4000)</translation>
     </message>
     <message>
-      <source>RTP retry count</source>
-      <translation>RTPリトライ回数</translation>
-    </message>
-    <message>
       <source>RTP timeout (milliseconds)</source>
       <translation>RTPタイムアウト (ミリ秒)</translation>
     </message>
@@ -1427,10 +1551,6 @@
     <message>
       <source>Watermark settings</source>
       <translation>透かし設定</translation>
-    </message>
-    <message>
-      <source>Authorization Session token lifetime (minutes)</source>
-      <translation>認証セッショントークンの有効期間 (分)</translation>
     </message>
     <message>
       <source>Session token count limit on a single Server</source>
@@ -1541,15 +1661,6 @@
       <translation>カメラへの接続にHTTPSのみを使用</translation>
     </message>
     <message>
-      <source>Enable deprecated API functions (unsecure)</source>
-      <translation>非推奨の API 関数を有効にする (非セキュア)</translation>
-    </message>
-    <message>
-      <source>Enable deprecated API functions curently used by %1 software (unsecure)</source>
-      <comment>%1 is a company name</comment>
-      <translation>現在 %1 ソフトウェアで使用されている、非推奨のAPI関数を有効にする (非セキュア)</translation>
-    </message>
-    <message>
       <source>Expose IP addresses for autodiscovery</source>
       <translation>自動検出用に IP アドレスを公開する</translation>
     </message>
@@ -1587,11 +1698,89 @@
     </message>
     <message>
       <source>Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then closes the first one. We recommend setting this parameter&apos;s value to 2 or more.</source>
-      <translation>このサーバーに対する、トランスコーディングを使用したHTTP接続の最大数。Chromeは一度に2つの接続を開き、その後最初の接続を閉じます。したがって、このパラメータには2以上の値を設定することをお勧めします。</translation>
+      <translation>このサーバーに対する、トランスコーディングを使用したHTTP接続の最大数。Chromeは一度に2つの接続を開き、その後最初の接続を閉じます。したがって、このパラメーターには2以上の値を設定することをお勧めします。</translation>
     </message>
     <message>
       <source>Update releases.json file URL</source>
       <translation>releases.json ファイルの URL を更新</translation>
+    </message>
+    <message>
+      <source>LDAP settings</source>
+      <translation>LDAP設定</translation>
+    </message>
+    <message>
+      <source>SMTP settings</source>
+      <translation>SMTP 設定</translation>
+    </message>
+    <message>
+      <source>Organization Id</source>
+      <translation>組織 ID</translation>
+    </message>
+    <message>
+      <source>Semicolon-separated list of Servers designated to connect to the Cloud. Servers at the top of the list have higher priority. If the list is empty a Server for the Cloud connection is selected automatically.</source>
+      <translation>クラウドに接続するように指定されたサーバーのセミコロン区切りのリスト。リストの先頭にあるサーバーの優先度が高くなります。リストが空の場合、クラウド接続用のサーバーが自動的に選択されます。</translation>
+    </message>
+    <message>
+      <source>Maximum number of consecutive RTP errors before the server reconnects the RTSP session.</source>
+      <translation>サーバーが RTSP セッションに再接続するまでの連続 RTP エラーの最大数。</translation>
+    </message>
+    <message>
+      <source>Authorization Session token lifetime (seconds)</source>
+      <translation>認証セッショントークンの有効期間 (秒)</translation>
+    </message>
+    <message>
+      <source>Channel partners service</source>
+      <translation>チャネルパートナーサービス</translation>
+    </message>
+    <message>
+      <source>Allow Power User editing Security Settings</source>
+      <translation>パワーユーザーによるセキュリティ設定の編集を許可する</translation>
+    </message>
+    <message>
+      <source>Enable deprecated API functions (insecure)</source>
+      <translation>非推奨の API 関数を有効にする (非セキュア)</translation>
+    </message>
+    <message>
+      <source>Enable deprecated API functions currently used by %1 software (insecure)</source>
+      <comment>%1 is a company name</comment>
+      <translation>現在 %1 ソフトウェアで使用されている、非推奨のAPI関数を有効にする (非セキュア)</translation>
+    </message>
+    <message>
+      <source>Interval between the Cloud polling HTTP requests to synchronize the data.</source>
+      <translation>データを同期するためにクラウドが HTTP リクエストをポーリングする間隔。</translation>
+    </message>
+  </context>
+  <context>
+    <name>TimeFormat</name>
+    <message>
+      <source>just now</source>
+      <translation>たった今</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n minute(s) ago</source>
+      <translation>
+        <numerusform>%n 分前</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n hour(s) ago</source>
+      <translation>
+        <numerusform>%n 時間前</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>yesterday</source>
+      <translation>昨日</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n day(s) ago</source>
+      <translation>
+        <numerusform>%n 日前</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>a week ago</source>
+      <translation>1週間前</translation>
     </message>
   </context>
   <context>
@@ -1610,15 +1799,15 @@
     </message>
     <message>
       <source>Could not allocate output stream for recording.</source>
-      <translation>録画用の出力ストリームを割り当てることができません。</translation>
+      <translation>録画用の出力ストリームを割り当てることができませんでした。</translation>
     </message>
     <message>
       <source>Could not allocate output audio stream.</source>
-      <translation>音声出力ストリームを割り当てることができません。</translation>
+      <translation>音声出力ストリームを割り当てることができませんでした。</translation>
     </message>
     <message>
       <source>Could not allocate output metadata stream.</source>
-      <translation>メタデータ出力ストリームを割り当てられませんでした。</translation>
+      <translation>メタデータ出力ストリームを割り当てることができませんでした。</translation>
     </message>
     <message>
       <source>Invalid audio codec information.</source>
@@ -1644,16 +1833,13 @@
       <source>No data exported.</source>
       <translation>データはエクスポートされませんでした.</translation>
     </message>
-  </context>
-  <context>
-    <name>nx::utils::CryptedFileStream</name>
     <message>
-      <source>Wrong crypted stream size.</source>
-      <translation>暗号化されたストリームサイズが正しくありません.</translation>
+      <source>Unlock this portion of the archive to export its contents.</source>
+      <translation>エクスポートするには、アーカイブのこの部分をロック解除してください。</translation>
     </message>
     <message>
-      <source>Damaged crypted stream header.</source>
-      <translation>暗号化されたストリームヘッダーが破損しています</translation>
+      <source>Archive is unavailable now. Please try again later.</source>
+      <translation>アーカイブは現在利用できません。後でもう一度お試しください。</translation>
     </message>
   </context>
   <context>
@@ -1688,7 +1874,7 @@
     </message>
     <message>
       <source>Show text overlay</source>
-      <translation>テキストオーバーレイ表示</translation>
+      <translation>テキストオーバーレイを表示</translation>
     </message>
     <message>
       <source>Show on Alarm Layout</source>
@@ -1730,7 +1916,7 @@
     </message>
     <message>
       <source>Server Conflict</source>
-      <translation>サーバーの競合</translation>
+      <translation>サーバー競合</translation>
     </message>
     <message>
       <source>Server Started</source>
@@ -1890,11 +2076,11 @@
     <message>
       <source>Conflicting Server #%1: %2</source>
       <extracomment>Conflicting Server #5: 10.0.2.1</extracomment>
-      <translation>重複サーバー #%1: %2</translation>
+      <translation>競合サーバー #%1: %2</translation>
     </message>
     <message>
       <source>Conflicting Server: %1</source>
-      <translation>重複サーバー: %1</translation>
+      <translation>競合サーバー: %1</translation>
     </message>
     <message>
       <source>Trigger: %1</source>
@@ -1960,7 +2146,7 @@
     </message>
     <message>
       <source>System disk &quot;%1&quot; is almost full.</source>
-      <translation>システムディスク&quot;%1&quot; がほぼいっぱいです。</translation>
+      <translation>システムディスク &quot;%1&quot; の空き容量が少なくなっています。</translation>
     </message>
     <message>
       <source>start</source>
@@ -1982,33 +2168,19 @@
       <source>Trigger Name</source>
       <translation>トリガー名</translation>
     </message>
-    <message>
-      <source>Role</source>
-      <translation>ロール</translation>
-    </message>
     <message numerus="yes">
       <source>%n Users</source>
       <translation>
         <numerusform>%n ユーザー</numerusform>
       </translation>
     </message>
-    <message numerus="yes">
-      <source>%n Roles</source>
-      <translation>
-        <numerusform>%n ロール</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>All Administrators</source>
-      <translation>全ての管理者</translation>
-    </message>
     <message>
       <source>All Users</source>
-      <translation>全てのユーザー</translation>
+      <translation>すべてのユーザー</translation>
     </message>
     <message>
       <source>Select at least one user</source>
-      <translation>最低1人のユーザーを選択してください</translation>
+      <translation>ユーザーを1人以上選択してください</translation>
     </message>
     <message>
       <source>Soft Trigger</source>
@@ -2041,11 +2213,11 @@
     </message>
     <message>
       <source>Storage Issue</source>
-      <translation>ストレージエラー</translation>
+      <translation>ストレージ障害</translation>
     </message>
     <message>
       <source>Storage Issue at %1</source>
-      <translation>%1のストレージエラー</translation>
+      <translation>%1のストレージ障害</translation>
     </message>
     <message>
       <source>Set to fullscreen</source>
@@ -2069,7 +2241,7 @@
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is almost full.</source>
-      <translation>分析ストレージ &quot;%1&quot; は容量が不足しかけています。</translation>
+      <translation>分析ストレージ &quot;%1&quot; の空き容量が少なくなっています。</translation>
     </message>
     <message>
       <source>Plugin Diagnostic Event</source>
@@ -2204,10 +2376,6 @@
       <translation>ファイル %1 のバックアップに失敗しました</translation>
     </message>
     <message>
-      <source>Show Intercom Informer</source>
-      <translation>インターホン通知者を表示</translation>
-    </message>
-    <message>
       <source>Do HTTP(S) request</source>
       <translation>HTTP(S) リクエストを実行</translation>
     </message>
@@ -2253,7 +2421,7 @@
     </message>
     <message>
       <source>Also show source camera</source>
-      <translation>ソースカメラも表示する</translation>
+      <translation>ソースカメラも表示</translation>
     </message>
     <message>
       <source>Source camera</source>
@@ -2261,7 +2429,7 @@
     </message>
     <message>
       <source>Also show on source camera</source>
-      <translation>ソースカメラも表示する</translation>
+      <translation>ソースカメラにも表示</translation>
     </message>
     <message>
       <source>Also set on source camera</source>
@@ -2279,12 +2447,43 @@
       <source>Also play on source camera</source>
       <translation>ソースカメラでも再生</translation>
     </message>
-  </context>
-  <context>
-    <name>utils::QnCameraNamesWatcher</name>
+    <message numerus="yes">
+      <source>%n Groups</source>
+      <translation>
+        <numerusform>%n グループ</numerusform>
+      </translation>
+    </message>
     <message>
-      <source>Removed camera</source>
-      <translation>カメラ削除</translation>
+      <source>LDAP Sync Issue</source>
+      <translation>LDAP 同期の問題</translation>
+    </message>
+    <message>
+      <source>Failed to connect to the LDAP server.</source>
+      <translation>LDAP サーバーへの接続に失敗しました。</translation>
+    </message>
+    <message>
+      <source>Failed to complete the sync within a %1 timeout.</source>
+      <comment>Timeout duration in human-readable form (ex.: 1 minute)</comment>
+      <translation>%1 のタイムアウト以内に同期を完了できませんでした.</translation>
+    </message>
+    <message>
+      <source>Failed to complete the sync within a given timeout.</source>
+      <translation>指定されたタイムアウト以内に同期を完了できませんでした.</translation>
+    </message>
+    <message>
+      <source>No user accounts on LDAP server match the synchronization settings.</source>
+      <translation>同期設定に一致するユーザーアカウントが LDAP サーバー上に存在しません。</translation>
+    </message>
+    <message>
+      <source>Some LDAP users or groups were not found in the LDAP database.</source>
+      <translation>一部の LDAP ユーザーまたはグループが LDAP データベースで見つかりませんでした。</translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 (%n times)</source>
+      <comment>%1 is description of event. Will be replaced in runtime</comment>
+      <translation>
+        <numerusform>%1 (%n 回)</numerusform>
+      </translation>
     </message>
   </context>
 </TS>

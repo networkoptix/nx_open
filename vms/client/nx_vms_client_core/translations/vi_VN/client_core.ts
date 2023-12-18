@@ -2,29 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="vi_VN" sourcelanguage="en">
   <context>
-    <name>QnCloudSystemInformationWatcher</name>
-    <message>
-      <source>Owner: %1</source>
-      <comment>%1 is a user name</comment>
-      <translation>Chủ sở hữu: %1</translation>
-    </message>
-    <message>
-      <source>Your System</source>
-      <translation>Hệ thống của bạn</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnDesktopAudioOnlyDataProvider</name>
-    <message>
-      <source>Sample format of input device %1 is not supported.</source>
-      <translation>Định dạng mẫu của %1 thiết bị đầu vào không được hỗ trợ.</translation>
-    </message>
-    <message>
-      <source>Primary audio device is not selected.</source>
-      <translation>Thiết bị âm thanh chính không được chọn.</translation>
-    </message>
-  </context>
-  <context>
     <name>QnDirectSystemsFinder</name>
     <message>
       <source>System</source>
@@ -70,7 +47,7 @@
     <name>RemoteConnectionErrorStrings</name>
     <message>
       <source>Client version: %1</source>
-      <translation>Phiên bản máy trạm: %1</translation>
+      <translation>Phiên bản máy khách: %1</translation>
     </message>
     <message>
       <source>Server version: %1.</source>
@@ -82,7 +59,7 @@
     </message>
     <message>
       <source>Server has a different version:</source>
-      <translation>Máy chủ có một phiên bản khác nhau:</translation>
+      <translation>Máy chủ có một phiên bản khác:</translation>
     </message>
     <message>
       <source>You will be asked to restart the client in compatibility mode.</source>
@@ -107,24 +84,20 @@
       <translation>%1 người dùng đăng nhập tạm thời không khả dụng</translation>
     </message>
     <message>
-      <source>Connection timed out</source>
-      <translation>Hết thời gian kết nối</translation>
-    </message>
-    <message>
       <source>The server is incompatible.</source>
       <translation>Máy chủ không tương thích.</translation>
     </message>
     <message>
       <source>Connect to this server from web browser or through desktop client to set it up</source>
-      <translation>Kết nối với máy chủ này từ trình duyệt web hoặc máy tính để bàn để cài đặt</translation>
+      <translation>Kết nối với máy chủ này từ trình duyệt web hoặc thông qua máy khách để thiết lập máy chủ</translation>
     </message>
     <message>
       <source>LDAP Server connection timed out</source>
-      <translation>Kết nối LDAP Server time out</translation>
+      <translation>Đã hết thời gian kết nối Máy chủ LDAP</translation>
     </message>
     <message>
       <source>LDAP Server connection timed out.</source>
-      <translation>Kết nối LDAP Server time out.</translation>
+      <translation>Đã hết thời gian kết nối Máy chủ LDAP.</translation>
     </message>
     <message>
       <source>Session expired. Re-enter your password.</source>
@@ -140,7 +113,7 @@
     </message>
     <message>
       <source>User is disabled</source>
-      <translation>Người dùng bị tắt</translation>
+      <translation>Người dùng bị vô hiệu hóa</translation>
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
@@ -152,21 +125,16 @@
     </message>
     <message>
       <source>Internal error. Please try again later.</source>
-      <translation>Lỗi bên trong. Vui lòng thử lại sau.</translation>
+      <translation>Lỗi nội bộ. Vui lòng thử lại sau.</translation>
     </message>
     <message>
       <source>If this error persists, please contact your system administrator.</source>
-      <translation>Nếu lỗi này vẫn còn, xin vui lòng liên hệ với quản trị viên hệ thống của bạn.</translation>
+      <translation>Nếu lỗi này vẫn tiếp diễn, vui lòng liên hệ với quản trị viên hệ thống của bạn.</translation>
     </message>
     <message>
       <source>Connection to %1 is not ready yet. Check your internet connection or try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Kết nối với %1 chưa sẵn sàng. Kiểm tra kết nối mạng hoặc thử lại sau.</translation>
-    </message>
-    <message>
-      <source>Connection to %1 is not ready yet. Check the server’s internet connection or try again later.</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Kết nối với %1 chưa sẵn sàng. Kiểm tra kết nối mạng của máy chủ hoặc thử lại sau.</translation>
     </message>
     <message>
       <source>Connection to the server could not be established. Try again later.</source>
@@ -199,11 +167,6 @@
       <translation>Quá nhiều lần thử đăng nhập. Hãy thử lại sau một phút.</translation>
     </message>
     <message>
-      <source>To log in to this System, disable “Ask for a verification code on every login with your %1 account” in your %2.</source>
-      <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation>Để đăng nhập vào Hệ thống này, hãy tắt “Yêu cầu mã xác minh trên mỗi lần đăng nhập bằng tài khoản %1” trong %2.</translation>
-    </message>
-    <message>
       <source>Two-factor authentication is required.</source>
       <translation>Yêu cầu xác thực hai yếu tố.</translation>
     </message>
@@ -212,13 +175,58 @@
       <comment>%1 is link that leads to /account/security section of Nx Cloud</comment>
       <translation>Bạn có thể bật xác thực hai yếu tố tại %1.</translation>
     </message>
+    <message>
+      <source>Connection to %1 is not ready yet. Check the server&apos;s internet connection or try again later.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">Connection to %1 is not ready yet. Check the server&apos;s internet connection or try again later.</translation>
+    </message>
+    <message>
+      <source>Connection failed</source>
+      <translation>Kết nối thất bại</translation>
+    </message>
+    <message>
+      <source>Your access to this system has expired.</source>
+      <translation>Quyền truy cập của bạn vào hệ thống này đã hết hạn.</translation>
+    </message>
+    <message>
+      <source>Please contact the system administrator to regain access.</source>
+      <translation>Vui lòng liên hệ với quản trị viên hệ thống để lấy lại quyền truy cập.</translation>
+    </message>
+    <message>
+      <source>To log in to this System, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</source>
+      <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
+      <translation type="unfinished">To log in to this System, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::AbstractAttributedEventModel</name>
+    <message numerus="yes">
+      <source>+%n values</source>
+      <translation>
+        <numerusform>+%n giá trị</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::AnalyticsSearchListModel</name>
+    <message>
+      <source>Unknown track</source>
+      <translation>Theo dõi không xác định</translation>
+    </message>
+    <message>
+      <source>deleted camera</source>
+      <translation>camera đã xóa</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::BookmarkSearchListModel</name>
+    <message>
+      <source>deleted camera</source>
+      <translation>camera đã xóa</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::core::CertificateWarning</name>
-    <message>
-      <source>Cannot verify the identity of %1</source>
-      <translation>Không thể xác minh danh tính của %1</translation>
-    </message>
     <message>
       <source>Server certificate is invalid.</source>
       <translation>Chứng chỉ máy chủ không hợp lệ.</translation>
@@ -228,44 +236,118 @@
       <translation>Kết nối với %1 lần đầu tiên?</translation>
     </message>
     <message>
-      <source>certificate details</source>
-      <translation>chi tiết chứng chỉ</translation>
-    </message>
-    <message>
       <source>help article</source>
-      <translation>bài báo trợ giúp</translation>
+      <translation>bài viết trợ giúp</translation>
     </message>
     <message>
       <source>Read this %1 to learn more about certificate validation.</source>
       <comment>%1 is &lt;help article&gt; link</comment>
       <translation>Đọc %1 này để tìm hiểu thêm về xác thực chứng chỉ.</translation>
     </message>
-    <message>
-      <source>Review the %1 to ensure you trust the server you are connecting to.%2</source>
-      <comment>%1 is &lt;certificate details&gt; link, %2 are possible extra details</comment>
-      <translation>Xem lại %1 để đảm bảo bạn tin tưởng vào máy chủ mà bạn đang kết nối tới.%2</translation>
+    <message numerus="yes">
+      <source>Cannot verify the identity of %n servers</source>
+      <translation type="unfinished">
+        <numerusform>Cannot verify the identity of %n servers</numerusform>
+      </translation>
     </message>
     <message>
-      <source>the server&apos;s certificate</source>
-      <translation>chứng chỉ của máy chủ</translation>
+      <source>Review the certificates of the servers from this system.</source>
+      <translation type="unfinished">Review the certificates of the servers from this system.</translation>
     </message>
     <message>
-      <source>You can view %1 or read this %2 to learn more about the current problem.</source>
-      <comment>%1 is &lt;the server&apos;s certificate&gt; link, %2 is &lt;help article&gt; link</comment>
-      <translation>Bạn có thể xem %1 hoặc đọc %2 này để tìm hiểu thêm về vấn đề hiện tại.</translation>
+      <source>This might be due to an expired server certificate or or an invalid certificate. Contact your system administrator for further investigation.</source>
+      <translation type="unfinished">This might be due to an expired server certificate or or an invalid certificate. Contact your system administrator for further investigation.</translation>
     </message>
     <message>
-      <source>This might be due to an expired server certificate or someone trying to impersonate %1 to steal your personal information.%2</source>
-      <comment>%1 is the system name, %2 are possible extra details</comment>
-      <translation>Điều này có thể do chứng chỉ máy chủ đã hết hạn hoặc ai đó đang cố mạo danh %1 để lấy cắp thông tin cá nhân của bạn.%2</translation>
+      <source>To learn more about the current problem read this %1.</source>
+      <comment>%1 is &lt;help article&gt; link</comment>
+      <translation type="unfinished">To learn more about the current problem read this %1.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::DesktopAudioOnlyDataProvider</name>
+    <message>
+      <source>Sample format of input device %1 is not supported.</source>
+      <translation>Định dạng mẫu của %1 thiết bị đầu vào không được hỗ trợ.</translation>
     </message>
     <message>
-      <source>This message may be shown multiple times when connecting to a multi-server system.</source>
-      <translation>Thông báo này có thể hiển thị nhiều lần khi kết nối với hệ thống nhiều máy chủ.</translation>
+      <source>Primary audio device is not selected.</source>
+      <translation>Thiết bị âm thanh chính không được chọn.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::EventSearchUtils</name>
+    <message>
+      <source>Last day</source>
+      <translation>Hôm qua</translation>
     </message>
     <message>
-      <source>To learn more about the current problem view the server&apos;s certificate:</source>
-      <translation>Để tìm hiểu thêm về sự cố hiện tại, hãy xem chứng chỉ của máy chủ:</translation>
+      <source>Last 7 days</source>
+      <translation>7 ngày qua</translation>
+    </message>
+    <message>
+      <source>Last 30 days</source>
+      <translation>30 ngày qua</translation>
+    </message>
+    <message>
+      <source>Any time</source>
+      <translation>Mọi lúc</translation>
+    </message>
+    <message>
+      <source>Any</source>
+      <translation>Bất kỳ</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Cameras</source>
+      <comment>%n is a number of cameras</comment>
+      <translation>
+        <numerusform>%n camera</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::ExtendedOutputCameraButtonController</name>
+    <message>
+      <source>Heater</source>
+      <translation>Sưởi</translation>
+    </message>
+    <message>
+      <source>Wiper</source>
+      <translation>Cần gạt</translation>
+    </message>
+    <message>
+      <source>Open Door</source>
+      <translation>Mở Cửa</translation>
+    </message>
+    <message>
+      <source>Stop Object Tracking</source>
+      <translation type="unfinished">Stop Object Tracking</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::SoftwareTriggerCameraButtonController</name>
+    <message>
+      <source>Press and hold to</source>
+      <translation>Nhấn và giữ để</translation>
+    </message>
+    <message>
+      <source>press and hold</source>
+      <translation>nhấn và giữ</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::TwoWayAudioCameraButtonController</name>
+    <message>
+      <source>Unmute</source>
+      <translation>Bật tiếng</translation>
+    </message>
+    <message>
+      <source>Mute</source>
+      <translation>Tắt tiếng</translation>
+    </message>
+    <message>
+      <source>Press and hold to speak</source>
+      <translation>Nhấn và giữ để nói</translation>
     </message>
   </context>
 </TS>

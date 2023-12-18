@@ -2,29 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="sv_SE" sourcelanguage="en">
   <context>
-    <name>QnCloudSystemInformationWatcher</name>
-    <message>
-      <source>Owner: %1</source>
-      <comment>%1 is a user name</comment>
-      <translation>Ägare: %1</translation>
-    </message>
-    <message>
-      <source>Your System</source>
-      <translation>Ditt system</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnDesktopAudioOnlyDataProvider</name>
-    <message>
-      <source>Sample format of input device %1 is not supported.</source>
-      <translation>Samplingsformat för inmatningsenhet %1 stöds inte.</translation>
-    </message>
-    <message>
-      <source>Primary audio device is not selected.</source>
-      <translation>Primär ljudenhet är inte vald.</translation>
-    </message>
-  </context>
-  <context>
     <name>QnDirectSystemsFinder</name>
     <message>
       <source>System</source>
@@ -107,10 +84,6 @@
       <translation>%1 användarinloggning är tillfälligt otillgänglig</translation>
     </message>
     <message>
-      <source>Connection timed out</source>
-      <translation>Anslutningen tog för lång tid</translation>
-    </message>
-    <message>
       <source>The server is incompatible.</source>
       <translation>Servern är inkompatibel.</translation>
     </message>
@@ -164,11 +137,6 @@
       <translation>Anslutningen till %1 är inte klar ännu. Kontrollera din internetanslutning eller försök igen senare.</translation>
     </message>
     <message>
-      <source>Connection to %1 is not ready yet. Check the server’s internet connection or try again later.</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Anslutningen till %1 är inte klar ännu. Kontrollera serverns internetanslutning eller försök igen senare.</translation>
-    </message>
-    <message>
       <source>Connection to the server could not be established. Try again later.</source>
       <translation>Anslutning till servern kunde inte upprättas. Försök igen senare.</translation>
     </message>
@@ -199,11 +167,6 @@
       <translation>Alltför många försök. Försök igen om någon minut.</translation>
     </message>
     <message>
-      <source>To log in to this System, disable “Ask for a verification code on every login with your %1 account” in your %2.</source>
-      <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation>För att logga in på detta system, inaktivera "Be om en verifieringskod vid varje inloggning med ditt %1 -konto" i din %2.</translation>
-    </message>
-    <message>
       <source>Two-factor authentication is required.</source>
       <translation>Tvåfaktorsautentisering krävs.</translation>
     </message>
@@ -212,13 +175,59 @@
       <comment>%1 is link that leads to /account/security section of Nx Cloud</comment>
       <translation>Du kan aktivera tvåfaktorsautentisering i din %1.</translation>
     </message>
+    <message>
+      <source>Connection to %1 is not ready yet. Check the server&apos;s internet connection or try again later.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Anslutningen till %1 är inte klar ännu. Kontrollera serverns internetanslutning eller försök igen senare.</translation>
+    </message>
+    <message>
+      <source>Connection failed</source>
+      <translation>Anslutningen misslyckades</translation>
+    </message>
+    <message>
+      <source>Your access to this system has expired.</source>
+      <translation>Din åtkomst till det här systemet har upphört att gälla.</translation>
+    </message>
+    <message>
+      <source>Please contact the system administrator to regain access.</source>
+      <translation>Kontakta systemadministratören för att återfå åtkomst.</translation>
+    </message>
+    <message>
+      <source>To log in to this System, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</source>
+      <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
+      <translation>För att logga in på detta system, inaktivera &quot;Be om en verifieringskod vid varje inloggning med ditt %1 konto&quot; i ditt %2.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::AbstractAttributedEventModel</name>
+    <message numerus="yes">
+      <source>+%n values</source>
+      <translation>
+        <numerusform>+%n värden</numerusform>
+        <numerusform>+%n värden</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::AnalyticsSearchListModel</name>
+    <message>
+      <source>Unknown track</source>
+      <translation>Okänt spår</translation>
+    </message>
+    <message>
+      <source>deleted camera</source>
+      <translation>borttagen kamera</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::BookmarkSearchListModel</name>
+    <message>
+      <source>deleted camera</source>
+      <translation>borttagen kamera</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::core::CertificateWarning</name>
-    <message>
-      <source>Cannot verify the identity of %1</source>
-      <translation>Kan inte verifiera identiteten på %1</translation>
-    </message>
     <message>
       <source>Server certificate is invalid.</source>
       <translation>Serverns certifikat är ogiltigt.</translation>
@@ -226,10 +235,6 @@
     <message>
       <source>Connecting to %1 for the first time?</source>
       <translation>Ansluter du till %1 för första gången?</translation>
-    </message>
-    <message>
-      <source>certificate details</source>
-      <translation>certifikatdetaljer</translation>
     </message>
     <message>
       <source>help article</source>
@@ -240,32 +245,112 @@
       <comment>%1 is &lt;help article&gt; link</comment>
       <translation>Läs denna %1 för att lära dig mer om certifikatvalidering.</translation>
     </message>
-    <message>
-      <source>Review the %1 to ensure you trust the server you are connecting to.%2</source>
-      <comment>%1 is &lt;certificate details&gt; link, %2 are possible extra details</comment>
-      <translation>Granska %1: an för att säkerställa att du litar på servern du ansluter till.%2</translation>
+    <message numerus="yes">
+      <source>Cannot verify the identity of %n servers</source>
+      <translation>
+        <numerusform>Kan inte verifiera identiteten för %n servrar</numerusform>
+        <numerusform>Kan inte verifiera identiteten för %n servrar</numerusform>
+      </translation>
     </message>
     <message>
-      <source>the server&apos;s certificate</source>
-      <translation>serverns&apos;s certifikat</translation>
+      <source>Review the certificates of the servers from this system.</source>
+      <translation>Granska certifikaten för servrarna från detta system.</translation>
     </message>
     <message>
-      <source>You can view %1 or read this %2 to learn more about the current problem.</source>
-      <comment>%1 is &lt;the server&apos;s certificate&gt; link, %2 is &lt;help article&gt; link</comment>
-      <translation>Du kan visa %1 eller läsa denna %2 för att lära dig mer om det aktuella problemet.</translation>
+      <source>This might be due to an expired server certificate or or an invalid certificate. Contact your system administrator for further investigation.</source>
+      <translation>Detta kan bero på ett utgånget servercertifikat eller ett ogiltigt certifikat. Kontakta din systemadministratör för vidare utredning.</translation>
     </message>
     <message>
-      <source>This might be due to an expired server certificate or someone trying to impersonate %1 to steal your personal information.%2</source>
-      <comment>%1 is the system name, %2 are possible extra details</comment>
-      <translation>Detta kan bero på ett utgånget servercertifikat eller att någon försöker utge sig för att vara %1 för att stjäla din personliga information.%2</translation>
+      <source>To learn more about the current problem read this %1.</source>
+      <comment>%1 is &lt;help article&gt; link</comment>
+      <translation>För att lära dig mer om det aktuella problemet läs %1.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::DesktopAudioOnlyDataProvider</name>
+    <message>
+      <source>Sample format of input device %1 is not supported.</source>
+      <translation>Samplingsformat för inmatningsenhet %1 stöds inte.</translation>
     </message>
     <message>
-      <source>This message may be shown multiple times when connecting to a multi-server system.</source>
-      <translation>Detta meddelande kan visas flera gånger när du ansluter till ett multiserversystem.</translation>
+      <source>Primary audio device is not selected.</source>
+      <translation>Primär ljudenhet är inte vald.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::EventSearchUtils</name>
+    <message>
+      <source>Last day</source>
+      <translation>Senaste dagen</translation>
     </message>
     <message>
-      <source>To learn more about the current problem view the server&apos;s certificate:</source>
-      <translation>För att lära dig mer om det aktuella problemet, se serverns&apos;s certifikat:</translation>
+      <source>Last 7 days</source>
+      <translation>Senaste 7 dagarna</translation>
+    </message>
+    <message>
+      <source>Last 30 days</source>
+      <translation>Senaste 30 Dagarna</translation>
+    </message>
+    <message>
+      <source>Any time</source>
+      <translation>När som helst</translation>
+    </message>
+    <message>
+      <source>Any</source>
+      <translation>Någon</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Cameras</source>
+      <comment>%n is a number of cameras</comment>
+      <translation>
+        <numerusform>%n Kameror</numerusform>
+        <numerusform>%n Kameror</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::ExtendedOutputCameraButtonController</name>
+    <message>
+      <source>Heater</source>
+      <translation>Värmare</translation>
+    </message>
+    <message>
+      <source>Wiper</source>
+      <translation>Torkare</translation>
+    </message>
+    <message>
+      <source>Open Door</source>
+      <translation>Öppna dörr</translation>
+    </message>
+    <message>
+      <source>Stop Object Tracking</source>
+      <translation>Stoppa objektspårning</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::SoftwareTriggerCameraButtonController</name>
+    <message>
+      <source>Press and hold to</source>
+      <translation>Tryck och håll för att</translation>
+    </message>
+    <message>
+      <source>press and hold</source>
+      <translation>tryck och håll</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::TwoWayAudioCameraButtonController</name>
+    <message>
+      <source>Unmute</source>
+      <translation>Ljud på</translation>
+    </message>
+    <message>
+      <source>Mute</source>
+      <translation>Tysta</translation>
+    </message>
+    <message>
+      <source>Press and hold to speak</source>
+      <translation>Tryck och håll för att tala</translation>
     </message>
   </context>
 </TS>

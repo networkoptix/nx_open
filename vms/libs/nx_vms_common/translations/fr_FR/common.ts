@@ -2,6 +2,17 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="fr_FR" sourcelanguage="en">
   <context>
+    <name>ApiErrorStrings</name>
+    <message>
+      <source>Invalid JSON content.</source>
+      <translation>Contenu JSON invalide.</translation>
+    </message>
+    <message>
+      <source>Unsupported content type.</source>
+      <translation>Type de contenu non pris en charge.</translation>
+    </message>
+  </context>
+  <context>
     <name>ArchiveDuration</name>
     <message>
       <source>no data for forecast</source>
@@ -18,14 +29,6 @@
   </context>
   <context>
     <name>AuthResultTranslations</name>
-    <message>
-      <source>This user does not exist.</source>
-      <translation>Cet utilisateur n'existe pas.</translation>
-    </message>
-    <message>
-      <source>Wrong password.</source>
-      <translation>Mot de passe incorrect.</translation>
-    </message>
     <message>
       <source>The password is expired. Please contact your system administrator.</source>
       <translation>Le mot de passe a expiré. Veuillez contacter votre administrateur système.</translation>
@@ -57,6 +60,38 @@
     <message>
       <source>This user has been disabled by a system administrator.</source>
       <translation>Cet utilisateur a été désactivé par un administrateur système.</translation>
+    </message>
+    <message>
+      <source>This user does not exist or is unable to login.</source>
+      <translation>Cet utilisateur n'existe pas ou ne parvient pas à se connecter.</translation>
+    </message>
+    <message>
+      <source>Wrong password</source>
+      <translation>Mot de passe incorrect</translation>
+    </message>
+    <message>
+      <source>The ticket key is invalid or expired.</source>
+      <translation>La clé de ticket est invalide ou a expiré.</translation>
+    </message>
+    <message>
+      <source>More than one user with the same login are presented.</source>
+      <translation>Plusieurs utilisateurs avec le même identifiant sont présentés.</translation>
+    </message>
+    <message>
+      <source>Unable to verify LDAP server SSL/TLS certificate.</source>
+      <translation>Impossible de vérifier le certificat SSL/TLS du serveur LDAP.</translation>
+    </message>
+  </context>
+  <context>
+    <name>BookmarkFacadeStrings</name>
+    <message>
+      <source>System Event</source>
+      <comment>Shows that the bookmark was created by a system event</comment>
+      <translation>Événement système</translation>
+    </message>
+    <message>
+      <source>Removed camera</source>
+      <translation>Caméra retirée</translation>
     </message>
   </context>
   <context>
@@ -141,11 +176,55 @@
     </message>
   </context>
   <context>
-    <name>QObject</name>
+    <name>PredefinedUserGroups</name>
     <message>
-      <source>System Event</source>
-      <comment>Shows that the bookmark was created by a system event</comment>
-      <translation>Événement système</translation>
+      <source>Administrators</source>
+      <translation>Administrateurs</translation>
+    </message>
+    <message>
+      <source>Power Users</source>
+      <translation>Utilisateurs expérimentés</translation>
+    </message>
+    <message>
+      <source>Advanced Viewers</source>
+      <translation>Visualisateur avancé</translation>
+    </message>
+    <message>
+      <source>Viewers</source>
+      <translation>Visualisateur</translation>
+    </message>
+    <message>
+      <source>Live Viewers</source>
+      <translation>Visualisateur en direct</translation>
+    </message>
+    <message>
+      <source>System Health Viewers</source>
+      <translation>Visualisateur d’intégrité du système</translation>
+    </message>
+    <message>
+      <source>Members of this group have unlimited System privileges. Administrators can create and modify Power Users, merge Systems and connect or disconnect System to  %1.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">Members of this group have unlimited System privileges. Administrators can create and modify Power Users, merge Systems and connect or disconnect System to  %1.</translation>
+    </message>
+    <message>
+      <source>Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the System configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</source>
+      <translation type="unfinished">Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the System configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</translation>
+    </message>
+    <message>
+      <source>Members of this group can, in addition to the permissions granted by the Viewers group, see and activate PTZ positions and PTZ tours, use 2-way audio, operate I/O module buttons, create and edit bookmarks, and view the Event Log.</source>
+      <translation type="unfinished">Members of this group can, in addition to the permissions granted by the Viewers group, see and activate PTZ positions and PTZ tours, use 2-way audio, operate I/O module buttons, create and edit bookmarks, and view the Event Log.</translation>
+    </message>
+    <message>
+      <source>Members of this group can, in addition to the permissions granted by the Live Viewers group, view and export archive and Bookmarks.</source>
+      <translation type="unfinished">Members of this group can, in addition to the permissions granted by the Live Viewers group, view and export archive and Bookmarks.</translation>
+    </message>
+    <message>
+      <source>Members of this group can view live videos, I/O modules and web pages.</source>
+      <translation type="unfinished">Members of this group can view live videos, I/O modules and web pages.</translation>
+    </message>
+    <message>
+      <source>Members of this group can view System Health Monitoring information and server processor load in real-time (Server Monitoring).</source>
+      <translation type="unfinished">Members of this group can view System Health Monitoring information and server processor load in real-time (Server Monitoring).</translation>
     </message>
   </context>
   <context>
@@ -243,14 +322,6 @@
       <translation>Problème caméra inconnue.</translation>
     </message>
     <message>
-      <source>Invalid data was received from the device %1.</source>
-      <translation>Données invalides reçues depuis le périphérique %1.</translation>
-    </message>
-    <message>
-      <source>Invalid data was received from the camera %1.</source>
-      <translation>Données invalides reçues depuis la caméra %1.</translation>
-    </message>
-    <message>
       <source>Too many media errors. Please open device issues dialog for more details.</source>
       <translation>Trop d'erreurs média. S.V.P. ouvrir le dialogue de problèmes périphérique pour plus de détails.</translation>
     </message>
@@ -273,10 +344,6 @@
     <message>
       <source>Unknown I/O module issue.</source>
       <translation>Problème module I/O inconnue.</translation>
-    </message>
-    <message>
-      <source>Invalid data was received from the I/O module %1.</source>
-      <translation>Données invalides reçues depuis le module I/O %1.</translation>
     </message>
     <message>
       <source>Too many media errors. Please open I/O module issues dialog for more details.</source>
@@ -373,6 +440,25 @@
     <message>
       <source>If disabled, try to enable Recording in I/O Module Settings (error &quot;%1&quot;).</source>
       <translation>Si désactivé, essayez d'activer l'enregistrement dans les paramètres du module I/O (erreur &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>Invalid data was received from the device. Details: &quot;%1&quot;.</source>
+      <translation>Des données non valides ont été reçues de l'appareil. Détails: &quot;%1&quot;.</translation>
+    </message>
+    <message>
+      <source>Invalid data was received from the camera. Details: &quot;%1&quot;.</source>
+      <translation>Des données non valides ont été reçues de la caméra. Détails: &quot;%1&quot;.</translation>
+    </message>
+    <message>
+      <source>Invalid data was received from the I/O module. Details: &quot;%1&quot;.</source>
+      <translation>Des données non valides ont été reçues du module d'E/S. Détails : &quot;%1&quot;.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCameraNamesWatcher</name>
+    <message>
+      <source>Removed camera</source>
+      <translation>Caméra retirée</translation>
     </message>
   </context>
   <context>
@@ -753,6 +839,29 @@
         <numerusform>%n/%1 Licences NVR</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Local Recording</source>
+      <translation type="unfinished">Local Recording</translation>
+    </message>
+    <message>
+      <source>Local Recording service</source>
+      <translation type="unfinished">Local Recording service</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Local Recording Services</source>
+      <translation type="unfinished">
+        <numerusform>%n Local Recording Services</numerusform>
+        <numerusform>%n Local Recording Services</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Local Recording Services</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation type="unfinished">
+        <numerusform>%n/%1 Local Recording Services</numerusform>
+        <numerusform>%n/%1 Local Recording Services</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>QnResourceNameStrings</name>
@@ -1016,6 +1125,110 @@
         <numerusform>année</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Msec</source>
+      <comment>Capitalized long suffix for displaying milliseconds</comment>
+      <translation type="unfinished">Msec</translation>
+    </message>
+    <message>
+      <source>Sec</source>
+      <comment>Capitalized long suffix for displaying seconds</comment>
+      <translation type="unfinished">Sec</translation>
+    </message>
+    <message>
+      <source>Min</source>
+      <comment>Capitalized long suffix for displaying minutes</comment>
+      <translation>Min</translation>
+    </message>
+    <message>
+      <source>Hrs</source>
+      <comment>Capitalized long suffix for displaying hours</comment>
+      <translation type="unfinished">Hrs</translation>
+    </message>
+    <message>
+      <source>Days</source>
+      <comment>Capitalized long suffix for displaying days</comment>
+      <translation type="unfinished">Days</translation>
+    </message>
+    <message>
+      <source>Wks</source>
+      <comment>Capitalized long suffix for displaying weeks</comment>
+      <translation type="unfinished">Wks</translation>
+    </message>
+    <message>
+      <source>Mos</source>
+      <comment>Capitalized long suffix for displaying months</comment>
+      <translation type="unfinished">Mos</translation>
+    </message>
+    <message>
+      <source>Yrs</source>
+      <comment>Capitalized long suffix for displaying years</comment>
+      <translation type="unfinished">Yrs</translation>
+    </message>
+    <message numerus="yes">
+      <source>Milliseconds</source>
+      <comment>Capitalized full suffix for displaying milliseconds</comment>
+      <translation type="unfinished">
+        <numerusform>Milliseconds</numerusform>
+        <numerusform>Milliseconds</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Seconds</source>
+      <comment>Capitalized full suffix for displaying seconds</comment>
+      <translation type="unfinished">
+        <numerusform>Seconds</numerusform>
+        <numerusform>Seconds</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Minutes</source>
+      <comment>Capitalized full suffix for displaying minutes</comment>
+      <translation>
+        <numerusform>Minutes</numerusform>
+        <numerusform>Minutes</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Hours</source>
+      <comment>Capitalized full suffix for displaying hours</comment>
+      <translation type="unfinished">
+        <numerusform>Hours</numerusform>
+        <numerusform>Hours</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Days</source>
+      <comment>Capitalized fapitalized full suffix for displaying days</comment>
+      <translation type="unfinished">
+        <numerusform>Days</numerusform>
+        <numerusform>Days</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Weeks</source>
+      <comment>Capitalized full suffix for displaying weeks</comment>
+      <translation type="unfinished">
+        <numerusform>Weeks</numerusform>
+        <numerusform>Weeks</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Months</source>
+      <comment>Capitalized full suffix for displaying months</comment>
+      <translation type="unfinished">
+        <numerusform>Months</numerusform>
+        <numerusform>Months</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Years</source>
+      <comment>Capitalized full suffix for displaying years</comment>
+      <translation type="unfinished">
+        <numerusform>Years</numerusform>
+        <numerusform>Years</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>QnTranscoder</name>
@@ -1037,62 +1250,14 @@
     </message>
   </context>
   <context>
-    <name>QnUserRolesManager</name>
-    <message>
-      <source>Owner</source>
-      <translation>Propriétaire</translation>
-    </message>
-    <message>
-      <source>Administrator</source>
-      <translation>Administrateur</translation>
-    </message>
-    <message>
-      <source>Advanced Viewer</source>
-      <translation>Visualisateur avancé</translation>
-    </message>
-    <message>
-      <source>Viewer</source>
-      <translation>Visualisateur</translation>
-    </message>
-    <message>
-      <source>Live Viewer</source>
-      <translation>Visualiseur en direct</translation>
-    </message>
-    <message>
-      <source>Custom Role</source>
-      <translation>Rôle personnalisé</translation>
-    </message>
+    <name>QnUserResource</name>
     <message>
       <source>Custom</source>
       <translation>Personnalisé</translation>
     </message>
     <message>
-      <source>Can manage all cameras and bookmarks.</source>
-      <translation>Peut gérer toutes les caméras et signets.</translation>
-    </message>
-    <message>
-      <source>Can view all cameras and export video.</source>
-      <translation>Peut voir toutes les caméras et exporter viédo.</translation>
-    </message>
-    <message>
-      <source>Can view live video from all cameras.</source>
-      <translation>Peut voir vidéo en direct de toutes les caméras.</translation>
-    </message>
-    <message>
-      <source>Custom user role.</source>
-      <translation>Rôle utilisateur personnalisé.</translation>
-    </message>
-    <message>
-      <source>Custom permissions.</source>
-      <translation>Autorisations personnalisées.</translation>
-    </message>
-    <message>
-      <source>Has access to whole System and can do everything.</source>
-      <translation>Accès à l'ensemble du système et peut tout faire.</translation>
-    </message>
-    <message>
-      <source>Has access to whole System and can manage it. Can create users.</source>
-      <translation>Accès à l’ensemble du système et peut le gérer. Peut créer des utilisateurs.</translation>
+      <source>Multiple groups</source>
+      <translation>Plusieurs groupes</translation>
     </message>
   </context>
   <context>
@@ -1157,7 +1322,53 @@
     </message>
     <message>
       <source>Session authorization required.</source>
-      <translation type="unfinished">Session authorization required.</translation>
+      <translation>Autorisation de session requise.</translation>
+    </message>
+  </context>
+  <context>
+    <name>ServiceTypeDisplayStringHelper</name>
+    <message>
+      <source>Local recording</source>
+      <translation type="unfinished">Local recording</translation>
+    </message>
+    <message>
+      <source>Integration</source>
+      <translation type="unfinished">Integration</translation>
+    </message>
+    <message>
+      <source>Cloud storage</source>
+      <translation type="unfinished">Cloud storage</translation>
+    </message>
+  </context>
+  <context>
+    <name>StringsHelper</name>
+    <message>
+      <source>SaaS uninitialized</source>
+      <translation type="unfinished">SaaS uninitialized</translation>
+    </message>
+    <message>
+      <source>SaaS active</source>
+      <translation type="unfinished">SaaS active</translation>
+    </message>
+    <message>
+      <source>SaaS suspended</source>
+      <translation type="unfinished">SaaS suspended</translation>
+    </message>
+    <message>
+      <source>SaaS shut down</source>
+      <translation type="unfinished">SaaS shut down</translation>
+    </message>
+    <message>
+      <source>SaaS shut down automatically</source>
+      <translation type="unfinished">SaaS shut down automatically</translation>
+    </message>
+    <message>
+      <source>Contact your channel partner for details.</source>
+      <translation type="unfinished">Contact your channel partner for details.</translation>
+    </message>
+    <message>
+      <source>Check internet connection between VMS and license server.</source>
+      <translation type="unfinished">Check internet connection between VMS and license server.</translation>
     </message>
   </context>
   <context>
@@ -1169,74 +1380,6 @@
   </context>
   <context>
     <name>SystemSettings</name>
-    <message>
-      <source>SMTP host</source>
-      <translation>Hôte SMTP</translation>
-    </message>
-    <message>
-      <source>Email from</source>
-      <translation>Courriel de</translation>
-    </message>
-    <message>
-      <source>SMTP user</source>
-      <translation>Utilisateur SMTP</translation>
-    </message>
-    <message>
-      <source>SMTP password</source>
-      <translation>Mot de passe SMTP</translation>
-    </message>
-    <message>
-      <source>Email signature</source>
-      <translation>Signature de l'e-mail</translation>
-    </message>
-    <message>
-      <source>Email support link</source>
-      <translation>Lien de support par courriel</translation>
-    </message>
-    <message>
-      <source>SMTP connection type</source>
-      <translation>Type de connexion SMTP</translation>
-    </message>
-    <message>
-      <source>SMTP port</source>
-      <translation>Port SMTP</translation>
-    </message>
-    <message>
-      <source>SMTP timeout (seconds)</source>
-      <translation>Délai SMTP (secondes)</translation>
-    </message>
-    <message>
-      <source>SMTP name</source>
-      <translation>Nom SMTP</translation>
-    </message>
-    <message>
-      <source>LDAP URI</source>
-      <translation>LDAP URI</translation>
-    </message>
-    <message>
-      <source>LDAP Admin DN</source>
-      <translation>LDAP admin DN</translation>
-    </message>
-    <message>
-      <source>LDAP Admin password</source>
-      <translation>Mot de passe LDAP Admin</translation>
-    </message>
-    <message>
-      <source>LDAP search base</source>
-      <translation>Base de recherche LDAP</translation>
-    </message>
-    <message>
-      <source>LDAP search filter</source>
-      <translation>Filtre de recherche LDAP</translation>
-    </message>
-    <message>
-      <source>LDAP password expiration (milliseconds)</source>
-      <translation>Expiration du mot de passe LDAP (millisecondes)</translation>
-    </message>
-    <message>
-      <source>LDAP search timeout (seconds)</source>
-      <translation>Délai de recherche LDAP (secondes)</translation>
-    </message>
     <message>
       <source>Anonymous statistics report allowed</source>
       <translation>Statistique anonyme autorisée</translation>
@@ -1343,11 +1486,6 @@
       <translation>Mise à jour automatique des vignettes</translation>
     </message>
     <message>
-      <source>Use %1 service to send emails instead of SMTP client</source>
-      <extracomment>%1 will be substituted with branded cloud service name e.g. &quot;Nx Cloud&quot;.</extracomment>
-      <translation>Utiliser le service %1 pour envoyer des courriels au lieu du client SMTP</translation>
-    </message>
-    <message>
       <source>Max scene items (0 means default)</source>
       <translation>Nombre maximum d'éléments de scène (0 signifie par défaut)</translation>
     </message>
@@ -1428,10 +1566,6 @@
       <translation>Taille maximale de la file d'attente d'enregistrements (éléments, 250-4000)</translation>
     </message>
     <message>
-      <source>RTP retry count</source>
-      <translation>Nombre de tentatives RTP</translation>
-    </message>
-    <message>
       <source>RTP timeout (milliseconds)</source>
       <translation>Délai RTP (millisecondes)</translation>
     </message>
@@ -1474,10 +1608,6 @@
     <message>
       <source>Watermark settings</source>
       <translation>Paramètres du filigrane</translation>
-    </message>
-    <message>
-      <source>Authorization Session token lifetime (minutes)</source>
-      <translation>Durée de vie du jeton de session d'autorisation (minutes)</translation>
     </message>
     <message>
       <source>Session token count limit on a single Server</source>
@@ -1589,15 +1719,6 @@
       <translation>Utiliser uniquement HTTPS pour les caméras</translation>
     </message>
     <message>
-      <source>Enable deprecated API functions (unsecure)</source>
-      <translation>Activer les fonctions API obsolètes (non sécurisées)</translation>
-    </message>
-    <message>
-      <source>Enable deprecated API functions curently used by %1 software (unsecure)</source>
-      <comment>%1 is a company name</comment>
-      <translation>Activer les fonctions API obsolètes actuellement utilisées par le logiciel %1 (non sécurisées)</translation>
-    </message>
-    <message>
       <source>Expose IP addresses for autodiscovery</source>
       <translation>Exposer les adresses IP pour la découverte automatique</translation>
     </message>
@@ -1640,6 +1761,87 @@
     <message>
       <source>Update releases.json file URL</source>
       <translation>Mettre à jour l'URL du fichier releases.json</translation>
+    </message>
+    <message>
+      <source>LDAP settings</source>
+      <translation>Paramètres LDAP</translation>
+    </message>
+    <message>
+      <source>SMTP settings</source>
+      <translation>Paramètres SMTP</translation>
+    </message>
+    <message>
+      <source>Organization Id</source>
+      <translation type="unfinished">Organization Id</translation>
+    </message>
+    <message>
+      <source>Semicolon-separated list of Servers designated to connect to the Cloud. Servers at the top of the list have higher priority. If the list is empty a Server for the Cloud connection is selected automatically.</source>
+      <translation>Liste séparée par des virgules de serveurs désignés pour se connecter au Cloud. Les serveurs en haut de la liste ont une priorité plus élevée. Si la liste est vide, un serveur pour la connexion Cloud est sélectionné automatiquement.</translation>
+    </message>
+    <message>
+      <source>Maximum number of consecutive RTP errors before the server reconnects the RTSP session.</source>
+      <translation type="unfinished">Maximum number of consecutive RTP errors before the server reconnects the RTSP session.</translation>
+    </message>
+    <message>
+      <source>Authorization Session token lifetime (seconds)</source>
+      <translation>Durée de vie du jeton de session d'autorisation (secondes)</translation>
+    </message>
+    <message>
+      <source>Channel partners service</source>
+      <translation type="unfinished">Channel partners service</translation>
+    </message>
+    <message>
+      <source>Allow Power User editing Security Settings</source>
+      <translation type="unfinished">Allow Power User editing Security Settings</translation>
+    </message>
+    <message>
+      <source>Enable deprecated API functions (insecure)</source>
+      <translation type="unfinished">Enable deprecated API functions (insecure)</translation>
+    </message>
+    <message>
+      <source>Enable deprecated API functions currently used by %1 software (insecure)</source>
+      <comment>%1 is a company name</comment>
+      <translation type="unfinished">Enable deprecated API functions currently used by %1 software (insecure)</translation>
+    </message>
+    <message>
+      <source>Interval between the Cloud polling HTTP requests to synchronize the data.</source>
+      <translation type="unfinished">Interval between the Cloud polling HTTP requests to synchronize the data.</translation>
+    </message>
+  </context>
+  <context>
+    <name>TimeFormat</name>
+    <message>
+      <source>just now</source>
+      <translation>à l’instant</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n minute(s) ago</source>
+      <translation>
+        <numerusform>il y a %n minute</numerusform>
+        <numerusform>il y a %n minute(s)</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n hour(s) ago</source>
+      <translation>
+        <numerusform>il y a %n heure</numerusform>
+        <numerusform>il y a %n heures</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>yesterday</source>
+      <translation>hier</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n day(s) ago</source>
+      <translation>
+        <numerusform>il y a %n jour</numerusform>
+        <numerusform>il y a %n jours</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>a week ago</source>
+      <translation>il y a une semaine</translation>
     </message>
   </context>
   <context>
@@ -1692,16 +1894,13 @@
       <source>No data exported.</source>
       <translation>Aucune donnée exportée.</translation>
     </message>
-  </context>
-  <context>
-    <name>nx::utils::CryptedFileStream</name>
     <message>
-      <source>Wrong crypted stream size.</source>
-      <translation>Mauvaise taille de flux chiffré.</translation>
+      <source>Unlock this portion of the archive to export its contents.</source>
+      <translation>Déverrouillez cette partie de l'archive pour exporter son contenu.</translation>
     </message>
     <message>
-      <source>Damaged crypted stream header.</source>
-      <translation>En-tête de flux chiffré endommagé.</translation>
+      <source>Archive is unavailable now. Please try again later.</source>
+      <translation>Les archives sont indisponibles maintenant. Veuillez réessayer plus tard.</translation>
     </message>
   </context>
   <context>
@@ -2040,27 +2239,12 @@
       <source>Trigger Name</source>
       <translation>Nom du déclencheur</translation>
     </message>
-    <message>
-      <source>Role</source>
-      <translation>Rôle</translation>
-    </message>
     <message numerus="yes">
       <source>%n Users</source>
       <translation>
         <numerusform>%n utilisateur</numerusform>
         <numerusform>%n utilisateurs</numerusform>
       </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Roles</source>
-      <translation>
-        <numerusform>%n rôle</numerusform>
-        <numerusform>%n rôle</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>All Administrators</source>
-      <translation>Tous Administrateurs</translation>
     </message>
     <message>
       <source>All Users</source>
@@ -2264,10 +2448,6 @@
       <translation>Échec de la sauvegarde du fichier %1</translation>
     </message>
     <message>
-      <source>Show Intercom Informer</source>
-      <translation>Afficher l'informateur d'interphone</translation>
-    </message>
-    <message>
       <source>Do HTTP(S) request</source>
       <translation>Faire une requête HTTP(S)</translation>
     </message>
@@ -2325,26 +2505,59 @@
     </message>
     <message>
       <source>Also set on source camera</source>
-      <translation type="unfinished">Also set on source camera</translation>
+      <translation>Également défini sur la caméra source</translation>
     </message>
     <message>
       <source>Also trigger on source camera</source>
-      <translation type="unfinished">Also trigger on source camera</translation>
+      <translation>Déclenche également sur la caméra source</translation>
     </message>
     <message>
       <source>Also record source camera</source>
-      <translation type="unfinished">Also record source camera</translation>
+      <translation>Enregistrer également la caméra source</translation>
     </message>
     <message>
       <source>Also play on source camera</source>
-      <translation type="unfinished">Also play on source camera</translation>
+      <translation>Jouer également sur la caméra source</translation>
     </message>
-  </context>
-  <context>
-    <name>utils::QnCameraNamesWatcher</name>
+    <message numerus="yes">
+      <source>%n Groups</source>
+      <translation>
+        <numerusform>%n groupe</numerusform>
+        <numerusform>%n groupes</numerusform>
+      </translation>
+    </message>
     <message>
-      <source>Removed camera</source>
-      <translation>Caméra retirée</translation>
+      <source>LDAP Sync Issue</source>
+      <translation type="unfinished">LDAP Sync Issue</translation>
+    </message>
+    <message>
+      <source>Failed to connect to the LDAP server.</source>
+      <translation type="unfinished">Failed to connect to the LDAP server.</translation>
+    </message>
+    <message>
+      <source>Failed to complete the sync within a %1 timeout.</source>
+      <comment>Timeout duration in human-readable form (ex.: 1 minute)</comment>
+      <translation type="unfinished">Failed to complete the sync within a %1 timeout.</translation>
+    </message>
+    <message>
+      <source>Failed to complete the sync within a given timeout.</source>
+      <translation type="unfinished">Failed to complete the sync within a given timeout.</translation>
+    </message>
+    <message>
+      <source>No user accounts on LDAP server match the synchronization settings.</source>
+      <translation type="unfinished">No user accounts on LDAP server match the synchronization settings.</translation>
+    </message>
+    <message>
+      <source>Some LDAP users or groups were not found in the LDAP database.</source>
+      <translation type="unfinished">Some LDAP users or groups were not found in the LDAP database.</translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 (%n times)</source>
+      <comment>%1 is description of event. Will be replaced in runtime</comment>
+      <translation>
+        <numerusform>%1 (%n fois)</numerusform>
+        <numerusform>%1 (%n fois)</numerusform>
+      </translation>
     </message>
   </context>
 </TS>
