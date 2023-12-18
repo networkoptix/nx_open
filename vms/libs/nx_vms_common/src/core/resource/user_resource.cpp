@@ -28,9 +28,6 @@
 #include <utils/common/synctime.h>
 
 const QnUuid QnUserResource::kAdminGuid("99cbc715-539b-4bfe-856f-799b45b69b1e");
-const QString QnUserResource::kIntegrationRequestDataProperty("integrationRequestData");
-
-using nx::vms::api::analytics::IntegrationRequestData;
 
 QByteArray QnUserHash::toString(const Type& type)
 {
@@ -583,35 +580,6 @@ void QnUserResource::setAttributes(nx::vms::api::UserAttributes value)
         m_attributes = value;
     }
     emit attributesChanged(::toSharedPointer(this));
-}
-
-std::optional<IntegrationRequestData> QnUserResource::integrationRequestData() const
-{
-    NX_MUTEX_LOCKER locker(&m_mutex);
-    const QString serializedIntegrationRequestData = getProperty(kIntegrationRequestDataProperty);
-    const auto [integrationRequestData, deserializationResult] =
-        nx::reflect::json::deserialize<IntegrationRequestData>(
-            serializedIntegrationRequestData.toStdString());
-
-    if (!deserializationResult)
-        return std::nullopt;
-
-    return integrationRequestData;
-}
-
-void QnUserResource::setIntegrationRequestData(
-    std::optional<IntegrationRequestData> integrationRequestData)
-{
-    NX_MUTEX_LOCKER locker(&m_mutex);
-    if (!integrationRequestData)
-        setProperty(kIntegrationRequestDataProperty, QString());
-
-    const std::string serializedIntegrationRequestData =
-        nx::reflect::json::serialize(*integrationRequestData);
-
-    setProperty(
-        kIntegrationRequestDataProperty,
-        QString::fromStdString(serializedIntegrationRequestData));
 }
 
 std::map<QnUuid, nx::vms::api::AccessRights> QnUserResource::ownResourceAccessRights() const

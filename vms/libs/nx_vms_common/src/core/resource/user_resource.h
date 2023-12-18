@@ -8,7 +8,6 @@
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/scrypt.h>
 #include <nx/utils/uuid.h>
-#include <nx/vms/api/analytics/integration_request.h>
 #include <nx/vms/api/data/user_data.h>
 #include <nx/vms/api/data/user_model.h>
 #include <nx_ec/data/api_conversion_functions.h>
@@ -94,7 +93,6 @@ public:
     friend void ec2::fromApiToResource(const nx::vms::api::UserData&, const QnUserResourcePtr&);
 
     static const QnUuid kAdminGuid;
-    static const QString kIntegrationRequestDataProperty;
 
     QnUserResource(nx::vms::api::UserType userType, nx::vms::api::UserExternalId externalId);
     virtual ~QnUserResource();
@@ -167,10 +165,6 @@ public:
 
     nx::vms::api::UserAttributes attributes() const;
     void setAttributes(nx::vms::api::UserAttributes value);
-
-    std::optional<nx::vms::api::analytics::IntegrationRequestData> integrationRequestData() const;
-    void setIntegrationRequestData(
-        std::optional<nx::vms::api::analytics::IntegrationRequestData> integrationRequestData);
 
     std::map<QnUuid, nx::vms::api::AccessRights> ownResourceAccessRights() const;
 

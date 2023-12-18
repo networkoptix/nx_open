@@ -6,7 +6,6 @@
 
 #include <api/server_rest_connection.h>
 #include <nx/utils/guarded_callback.h>
-#include <nx/vms/api/analytics/integration_request.h>
 #include <nx/vms/client/desktop/system_context.h>
 
 namespace nx::vms::client::desktop {
