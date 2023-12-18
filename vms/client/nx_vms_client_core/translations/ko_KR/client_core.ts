@@ -2,29 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="ko_KR" sourcelanguage="en">
   <context>
-    <name>QnCloudSystemInformationWatcher</name>
-    <message>
-      <source>Owner: %1</source>
-      <comment>%1 is a user name</comment>
-      <translation>소유자: %1</translation>
-    </message>
-    <message>
-      <source>Your System</source>
-      <translation>귀하의 시스템</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnDesktopAudioOnlyDataProvider</name>
-    <message>
-      <source>Sample format of input device %1 is not supported.</source>
-      <translation>입력된 장치 %1의 샘플 형식은 지원 되지 않습니다.</translation>
-    </message>
-    <message>
-      <source>Primary audio device is not selected.</source>
-      <translation>기본 오디오 장치가 선택 되지 않습니다.</translation>
-    </message>
-  </context>
-  <context>
     <name>QnDirectSystemsFinder</name>
     <message>
       <source>System</source>
@@ -107,10 +84,6 @@
       <translation>%1 사용자 로그인을 일시적으로 사용할 수 없습니다</translation>
     </message>
     <message>
-      <source>Connection timed out</source>
-      <translation>연결 시간이 초과되었습니다.</translation>
-    </message>
-    <message>
       <source>The server is incompatible.</source>
       <translation>서버가 호환되지 않습니다.</translation>
     </message>
@@ -164,11 +137,6 @@
       <translation>%1에 대한 연결이 아직 준비되지 않았습니다. 인터넷 연결을 확인하거나 나중에 다시 시도하십시오.</translation>
     </message>
     <message>
-      <source>Connection to %1 is not ready yet. Check the server’s internet connection or try again later.</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>%1에 대한 연결이 아직 준비되지 않았습니다. 서버의 인터넷 연결을 확인하거나 나중에 다시 시도하십시오.</translation>
-    </message>
-    <message>
       <source>Connection to the server could not be established. Try again later.</source>
       <translation>서버에 연결할 수 없습니다. 나중에 다시 시도하세요.</translation>
     </message>
@@ -199,11 +167,6 @@
       <translation>로그인 시도가 너무 많습니다. 잠시 후에 다시 시도하십시오.</translation>
     </message>
     <message>
-      <source>To log in to this System, disable “Ask for a verification code on every login with your %1 account” in your %2.</source>
-      <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation>이 시스템에 로그인하려면, %2에서 " %1 계정으로 로그인할 때마다 인증 코드 요청"을 비활성화하십시오.</translation>
-    </message>
-    <message>
       <source>Two-factor authentication is required.</source>
       <translation>이중 인증이 필요합니다.</translation>
     </message>
@@ -212,13 +175,58 @@
       <comment>%1 is link that leads to /account/security section of Nx Cloud</comment>
       <translation>%1에서 2단계 인증을 사용할 수 있습니다.</translation>
     </message>
+    <message>
+      <source>Connection to %1 is not ready yet. Check the server&apos;s internet connection or try again later.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">Connection to %1 is not ready yet. Check the server&apos;s internet connection or try again later.</translation>
+    </message>
+    <message>
+      <source>Connection failed</source>
+      <translation>연결 실패</translation>
+    </message>
+    <message>
+      <source>Your access to this system has expired.</source>
+      <translation type="unfinished">Your access to this system has expired.</translation>
+    </message>
+    <message>
+      <source>Please contact the system administrator to regain access.</source>
+      <translation type="unfinished">Please contact the system administrator to regain access.</translation>
+    </message>
+    <message>
+      <source>To log in to this System, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</source>
+      <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
+      <translation type="unfinished">To log in to this System, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::AbstractAttributedEventModel</name>
+    <message numerus="yes">
+      <source>+%n values</source>
+      <translation>
+        <numerusform>+%n 값</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::AnalyticsSearchListModel</name>
+    <message>
+      <source>Unknown track</source>
+      <translation>알 수없는 트랙</translation>
+    </message>
+    <message>
+      <source>deleted camera</source>
+      <translation type="unfinished">deleted camera</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::BookmarkSearchListModel</name>
+    <message>
+      <source>deleted camera</source>
+      <translation type="unfinished">deleted camera</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::core::CertificateWarning</name>
-    <message>
-      <source>Cannot verify the identity of %1</source>
-      <translation>%1의 신원을 확인할 수 없습니다</translation>
-    </message>
     <message>
       <source>Server certificate is invalid.</source>
       <translation>서버 인증서가 유효하지 않습니다.</translation>
@@ -226,10 +234,6 @@
     <message>
       <source>Connecting to %1 for the first time?</source>
       <translation>처음으로 %1 에 연결하시겠습니까?</translation>
-    </message>
-    <message>
-      <source>certificate details</source>
-      <translation>인증서 정보</translation>
     </message>
     <message>
       <source>help article</source>
@@ -240,32 +244,110 @@
       <comment>%1 is &lt;help article&gt; link</comment>
       <translation>인증서 유효성 검사에 대해 자세히 알아보려면 이 %1 을 읽으십시오.</translation>
     </message>
-    <message>
-      <source>Review the %1 to ensure you trust the server you are connecting to.%2</source>
-      <comment>%1 is &lt;certificate details&gt; link, %2 are possible extra details</comment>
-      <translation>%1 을 검토하여 연결 중인 서버를 신뢰할 수 있는지 확인하십시오.%2</translation>
+    <message numerus="yes">
+      <source>Cannot verify the identity of %n servers</source>
+      <translation type="unfinished">
+        <numerusform>Cannot verify the identity of %n servers</numerusform>
+      </translation>
     </message>
     <message>
-      <source>the server&apos;s certificate</source>
-      <translation>서버 인증서</translation>
+      <source>Review the certificates of the servers from this system.</source>
+      <translation type="unfinished">Review the certificates of the servers from this system.</translation>
     </message>
     <message>
-      <source>You can view %1 or read this %2 to learn more about the current problem.</source>
-      <comment>%1 is &lt;the server&apos;s certificate&gt; link, %2 is &lt;help article&gt; link</comment>
-      <translation>현재 문제에 대해 자세히 알아보려면 %1 을 보거나 이 %2 을 읽을 수 있습니다.</translation>
+      <source>This might be due to an expired server certificate or or an invalid certificate. Contact your system administrator for further investigation.</source>
+      <translation type="unfinished">This might be due to an expired server certificate or or an invalid certificate. Contact your system administrator for further investigation.</translation>
     </message>
     <message>
-      <source>This might be due to an expired server certificate or someone trying to impersonate %1 to steal your personal information.%2</source>
-      <comment>%1 is the system name, %2 are possible extra details</comment>
-      <translation>만료된 서버 인증서 또는 누군가가 %1 을 가장하여 개인 정보를 도용하기 때문일 수 있습니다.%2</translation>
+      <source>To learn more about the current problem read this %1.</source>
+      <comment>%1 is &lt;help article&gt; link</comment>
+      <translation type="unfinished">To learn more about the current problem read this %1.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::DesktopAudioOnlyDataProvider</name>
+    <message>
+      <source>Sample format of input device %1 is not supported.</source>
+      <translation>입력된 장치 %1의 샘플 형식은 지원 되지 않습니다.</translation>
     </message>
     <message>
-      <source>This message may be shown multiple times when connecting to a multi-server system.</source>
-      <translation>이 메시지는 다중 서버 시스템에 연결할 때 여러 번 표시될 수 있습니다.</translation>
+      <source>Primary audio device is not selected.</source>
+      <translation>기본 오디오 장치가 선택 되지 않습니다.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::EventSearchUtils</name>
+    <message>
+      <source>Last day</source>
+      <translation>마지막 날</translation>
     </message>
     <message>
-      <source>To learn more about the current problem view the server&apos;s certificate:</source>
-      <translation>현재 문제에 대해 자세히 알아보려면 서버의 인증서를 확인하십시오.</translation>
+      <source>Last 7 days</source>
+      <translation>지난 7 일</translation>
+    </message>
+    <message>
+      <source>Last 30 days</source>
+      <translation>지난 30 일</translation>
+    </message>
+    <message>
+      <source>Any time</source>
+      <translation>모든 시간</translation>
+    </message>
+    <message>
+      <source>Any</source>
+      <translation>아무거나</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Cameras</source>
+      <comment>%n is a number of cameras</comment>
+      <translation>
+        <numerusform>카메라 %n 대</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::ExtendedOutputCameraButtonController</name>
+    <message>
+      <source>Heater</source>
+      <translation>히터</translation>
+    </message>
+    <message>
+      <source>Wiper</source>
+      <translation>와이퍼</translation>
+    </message>
+    <message>
+      <source>Open Door</source>
+      <translation type="unfinished">Open Door</translation>
+    </message>
+    <message>
+      <source>Stop Object Tracking</source>
+      <translation type="unfinished">Stop Object Tracking</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::SoftwareTriggerCameraButtonController</name>
+    <message>
+      <source>Press and hold to</source>
+      <translation>하기위해 누르고 있음</translation>
+    </message>
+    <message>
+      <source>press and hold</source>
+      <translation>누르고 있음</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::TwoWayAudioCameraButtonController</name>
+    <message>
+      <source>Unmute</source>
+      <translation type="unfinished">Unmute</translation>
+    </message>
+    <message>
+      <source>Mute</source>
+      <translation type="unfinished">Mute</translation>
+    </message>
+    <message>
+      <source>Press and hold to speak</source>
+      <translation>누른상태에서 말하세요</translation>
     </message>
   </context>
 </TS>

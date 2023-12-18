@@ -2,6 +2,17 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="sv_SE" sourcelanguage="en">
   <context>
+    <name>ApiErrorStrings</name>
+    <message>
+      <source>Invalid JSON content.</source>
+      <translation>Ogiltigt JSON-innehåll.</translation>
+    </message>
+    <message>
+      <source>Unsupported content type.</source>
+      <translation>Innehållstyp stöds inte.</translation>
+    </message>
+  </context>
+  <context>
     <name>ArchiveDuration</name>
     <message>
       <source>no data for forecast</source>
@@ -18,14 +29,6 @@
   </context>
   <context>
     <name>AuthResultTranslations</name>
-    <message>
-      <source>This user does not exist.</source>
-      <translation>Denna användaren finns inte.</translation>
-    </message>
-    <message>
-      <source>Wrong password.</source>
-      <translation>Fel lösenord.</translation>
-    </message>
     <message>
       <source>The password is expired. Please contact your system administrator.</source>
       <translation>Lösenordet har löpt ut. Kontakta din systemadministratör.</translation>
@@ -57,6 +60,38 @@
     <message>
       <source>This user has been disabled by a system administrator.</source>
       <translation>Den här användaren är inaktiverad av systemadministratören.</translation>
+    </message>
+    <message>
+      <source>This user does not exist or is unable to login.</source>
+      <translation>Denna användare finns inte eller kan inte logga in.</translation>
+    </message>
+    <message>
+      <source>Wrong password</source>
+      <translation>Fel lösenord</translation>
+    </message>
+    <message>
+      <source>The ticket key is invalid or expired.</source>
+      <translation>Ärendenyckeln är ogiltig eller har gått ut.</translation>
+    </message>
+    <message>
+      <source>More than one user with the same login are presented.</source>
+      <translation>Mer än en användare med samma inloggning visas.</translation>
+    </message>
+    <message>
+      <source>Unable to verify LDAP server SSL/TLS certificate.</source>
+      <translation>Det gick inte att verifiera LDAP-serverns SSL/TLS-certifikat.</translation>
+    </message>
+  </context>
+  <context>
+    <name>BookmarkFacadeStrings</name>
+    <message>
+      <source>System Event</source>
+      <comment>Shows that the bookmark was created by a system event</comment>
+      <translation>Systemhändelse</translation>
+    </message>
+    <message>
+      <source>Removed camera</source>
+      <translation>Borttagen kamera</translation>
     </message>
   </context>
   <context>
@@ -141,11 +176,55 @@
     </message>
   </context>
   <context>
-    <name>QObject</name>
+    <name>PredefinedUserGroups</name>
     <message>
-      <source>System Event</source>
-      <comment>Shows that the bookmark was created by a system event</comment>
-      <translation>Systemhändelse</translation>
+      <source>Administrators</source>
+      <translation>Administratörer</translation>
+    </message>
+    <message>
+      <source>Power Users</source>
+      <translation>Expertanvändare</translation>
+    </message>
+    <message>
+      <source>Advanced Viewers</source>
+      <translation>Avancerade användare</translation>
+    </message>
+    <message>
+      <source>Viewers</source>
+      <translation>Användare</translation>
+    </message>
+    <message>
+      <source>Live Viewers</source>
+      <translation>Begränsad användare</translation>
+    </message>
+    <message>
+      <source>System Health Viewers</source>
+      <translation>Visare av systemhälsa</translation>
+    </message>
+    <message>
+      <source>Members of this group have unlimited System privileges. Administrators can create and modify Power Users, merge Systems and connect or disconnect System to  %1.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Medlemmar i denna grupp har obegränsade systembehörigheter. Administratörer kan skapa och ändra Power Users, slå samman system och ansluta eller koppla från System till  %1.</translation>
+    </message>
+    <message>
+      <source>Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the System configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</source>
+      <translation>Medlemmar i den här gruppen kan, utöver de behörigheter som beviljas av gruppen Advanced Viewers, kontrollera det mesta av systemkonfigurationen, men de får inte ändra några administratörsrelaterade inställningar, som att ta bort eller ändra sina egna grupper och behörigheter, och kan inte skapa eller redigera andra avancerade användare.</translation>
+    </message>
+    <message>
+      <source>Members of this group can, in addition to the permissions granted by the Viewers group, see and activate PTZ positions and PTZ tours, use 2-way audio, operate I/O module buttons, create and edit bookmarks, and view the Event Log.</source>
+      <translation>Medlemmar i denna grupp kan, förutom de behörigheter som beviljats av Viewers-gruppen, se och aktivera PTZ-positioner och PTZ-turer, använd 2-vägs ljud, kör I/O-modulknappar, skapa och redigera bokmärken och visa händelseloggen.</translation>
+    </message>
+    <message>
+      <source>Members of this group can, in addition to the permissions granted by the Live Viewers group, view and export archive and Bookmarks.</source>
+      <translation>Medlemmar i denna grupp kan, utöver de behörigheter som beviljats av Live-läsargruppen, visa och exportera arkiv och bokmärken.</translation>
+    </message>
+    <message>
+      <source>Members of this group can view live videos, I/O modules and web pages.</source>
+      <translation>Medlemmar i den här gruppen kan se livevideor, I/O-moduler och webbsidor.</translation>
+    </message>
+    <message>
+      <source>Members of this group can view System Health Monitoring information and server processor load in real-time (Server Monitoring).</source>
+      <translation>Medlemmar i denna grupp kan se information och serverprocessorbelastning i realtid (Server Monitoring).</translation>
     </message>
   </context>
   <context>
@@ -243,14 +322,6 @@
       <translation>Okänt kameraproblem.</translation>
     </message>
     <message>
-      <source>Invalid data was received from the device %1.</source>
-      <translation>Felaktiga data har tagits emot från enheten %1.</translation>
-    </message>
-    <message>
-      <source>Invalid data was received from the camera %1.</source>
-      <translation>Felaktiga data har tagits emot från kameran %1.</translation>
-    </message>
-    <message>
       <source>Too many media errors. Please open device issues dialog for more details.</source>
       <translation>För många mediafel. Vänligen öppna dialogrutan Enhetsproblem för mer information.</translation>
     </message>
@@ -273,10 +344,6 @@
     <message>
       <source>Unknown I/O module issue.</source>
       <translation>Okänd I/O-modulproblem.</translation>
-    </message>
-    <message>
-      <source>Invalid data was received from the I/O module %1.</source>
-      <translation>Ogiltiga data mottogs från I/O-modulen %1.</translation>
     </message>
     <message>
       <source>Too many media errors. Please open I/O module issues dialog for more details.</source>
@@ -373,6 +440,25 @@
     <message>
       <source>If disabled, try to enable Recording in I/O Module Settings (error &quot;%1&quot;).</source>
       <translation>Om den är inaktiverad, försök att aktivera inspelning i I/O-modulinställningar (fel &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>Invalid data was received from the device. Details: &quot;%1&quot;.</source>
+      <translation>Ogiltig data togs emot från enheten. Detaljer: &quot;%1&quot;.</translation>
+    </message>
+    <message>
+      <source>Invalid data was received from the camera. Details: &quot;%1&quot;.</source>
+      <translation>Ogiltig data togs emot från kameran. Detaljer: &quot;%1&quot;.</translation>
+    </message>
+    <message>
+      <source>Invalid data was received from the I/O module. Details: &quot;%1&quot;.</source>
+      <translation>Ogiltig data togs emot från I/O-modulen. Detaljer: &quot;%1&quot;.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCameraNamesWatcher</name>
+    <message>
+      <source>Removed camera</source>
+      <translation>Borttagen kamera</translation>
     </message>
   </context>
   <context>
@@ -753,6 +839,29 @@
         <numerusform>%n/%1 NVR licenser</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Local Recording</source>
+      <translation>Lokal inspelning</translation>
+    </message>
+    <message>
+      <source>Local Recording service</source>
+      <translation>Lokal inspelningstjänst</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Local Recording Services</source>
+      <translation>
+        <numerusform>%n Lokala inspelningstjänster</numerusform>
+        <numerusform>%n Lokala inspelningstjänster</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Local Recording Services</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 Lokala inspelningstjänster</numerusform>
+        <numerusform>%n/%1 Lokala inspelningstjänster</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>QnResourceNameStrings</name>
@@ -1016,6 +1125,110 @@
         <numerusform>år</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Msec</source>
+      <comment>Capitalized long suffix for displaying milliseconds</comment>
+      <translation>Msek</translation>
+    </message>
+    <message>
+      <source>Sec</source>
+      <comment>Capitalized long suffix for displaying seconds</comment>
+      <translation>Sek</translation>
+    </message>
+    <message>
+      <source>Min</source>
+      <comment>Capitalized long suffix for displaying minutes</comment>
+      <translation>Min</translation>
+    </message>
+    <message>
+      <source>Hrs</source>
+      <comment>Capitalized long suffix for displaying hours</comment>
+      <translation>Timmar</translation>
+    </message>
+    <message>
+      <source>Days</source>
+      <comment>Capitalized long suffix for displaying days</comment>
+      <translation>Dagar</translation>
+    </message>
+    <message>
+      <source>Wks</source>
+      <comment>Capitalized long suffix for displaying weeks</comment>
+      <translation>Veckor</translation>
+    </message>
+    <message>
+      <source>Mos</source>
+      <comment>Capitalized long suffix for displaying months</comment>
+      <translation>Månader</translation>
+    </message>
+    <message>
+      <source>Yrs</source>
+      <comment>Capitalized long suffix for displaying years</comment>
+      <translation>År</translation>
+    </message>
+    <message numerus="yes">
+      <source>Milliseconds</source>
+      <comment>Capitalized full suffix for displaying milliseconds</comment>
+      <translation>
+        <numerusform>Millisekunder</numerusform>
+        <numerusform>Millisekunder</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Seconds</source>
+      <comment>Capitalized full suffix for displaying seconds</comment>
+      <translation>
+        <numerusform>Sekunder</numerusform>
+        <numerusform>Sekunder</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Minutes</source>
+      <comment>Capitalized full suffix for displaying minutes</comment>
+      <translation>
+        <numerusform>Minuter</numerusform>
+        <numerusform>Minuter</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Hours</source>
+      <comment>Capitalized full suffix for displaying hours</comment>
+      <translation>
+        <numerusform>Timmar</numerusform>
+        <numerusform>Timmar</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Days</source>
+      <comment>Capitalized fapitalized full suffix for displaying days</comment>
+      <translation>
+        <numerusform>Dagar</numerusform>
+        <numerusform>Dagar</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Weeks</source>
+      <comment>Capitalized full suffix for displaying weeks</comment>
+      <translation>
+        <numerusform>Veckor</numerusform>
+        <numerusform>Veckor</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Months</source>
+      <comment>Capitalized full suffix for displaying months</comment>
+      <translation>
+        <numerusform>Månader</numerusform>
+        <numerusform>Månader</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Years</source>
+      <comment>Capitalized full suffix for displaying years</comment>
+      <translation>
+        <numerusform>År</numerusform>
+        <numerusform>År</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>QnTranscoder</name>
@@ -1037,62 +1250,14 @@
     </message>
   </context>
   <context>
-    <name>QnUserRolesManager</name>
-    <message>
-      <source>Owner</source>
-      <translation>Ägare</translation>
-    </message>
-    <message>
-      <source>Administrator</source>
-      <translation>Administratör</translation>
-    </message>
-    <message>
-      <source>Advanced Viewer</source>
-      <translation>Avancerad användare</translation>
-    </message>
-    <message>
-      <source>Viewer</source>
-      <translation>Användare</translation>
-    </message>
-    <message>
-      <source>Live Viewer</source>
-      <translation>Begränsad användare</translation>
-    </message>
-    <message>
-      <source>Custom Role</source>
-      <translation>Anpassad roll</translation>
-    </message>
+    <name>QnUserResource</name>
     <message>
       <source>Custom</source>
       <translation>Anpassad</translation>
     </message>
     <message>
-      <source>Can manage all cameras and bookmarks.</source>
-      <translation>Kan hantera alla kameror och bokmärken.</translation>
-    </message>
-    <message>
-      <source>Can view all cameras and export video.</source>
-      <translation>Kan visa alla kameror och exportera video.</translation>
-    </message>
-    <message>
-      <source>Can view live video from all cameras.</source>
-      <translation>Kan visa livevideo från alla kameror.</translation>
-    </message>
-    <message>
-      <source>Custom user role.</source>
-      <translation>Anpassad användarroll.</translation>
-    </message>
-    <message>
-      <source>Custom permissions.</source>
-      <translation>Anpassade behörigheter.</translation>
-    </message>
-    <message>
-      <source>Has access to whole System and can do everything.</source>
-      <translation>Har tillgång till hela systemet och kan göra allt.</translation>
-    </message>
-    <message>
-      <source>Has access to whole System and can manage it. Can create users.</source>
-      <translation>Har tillgång till hela systemet och kan hantera det. Kan skapa användare.</translation>
+      <source>Multiple groups</source>
+      <translation>Flera grupper</translation>
     </message>
   </context>
   <context>
@@ -1161,6 +1326,52 @@
     </message>
   </context>
   <context>
+    <name>ServiceTypeDisplayStringHelper</name>
+    <message>
+      <source>Local recording</source>
+      <translation>Lokal inspelning</translation>
+    </message>
+    <message>
+      <source>Integration</source>
+      <translation>Integration</translation>
+    </message>
+    <message>
+      <source>Cloud storage</source>
+      <translation>Molnlagring</translation>
+    </message>
+  </context>
+  <context>
+    <name>StringsHelper</name>
+    <message>
+      <source>SaaS uninitialized</source>
+      <translation>SaaS oinitierad</translation>
+    </message>
+    <message>
+      <source>SaaS active</source>
+      <translation>SaaS aktiv</translation>
+    </message>
+    <message>
+      <source>SaaS suspended</source>
+      <translation>SaaS avstängt</translation>
+    </message>
+    <message>
+      <source>SaaS shut down</source>
+      <translation>SaaS stängs av</translation>
+    </message>
+    <message>
+      <source>SaaS shut down automatically</source>
+      <translation>SaaS stängs av automatiskt</translation>
+    </message>
+    <message>
+      <source>Contact your channel partner for details.</source>
+      <translation>Kontakta din kanalpartner för mer information.</translation>
+    </message>
+    <message>
+      <source>Check internet connection between VMS and license server.</source>
+      <translation>Kontrollera internetanslutningen mellan VMS och licensserver.</translation>
+    </message>
+  </context>
+  <context>
     <name>SystemHelpers</name>
     <message>
       <source>New System</source>
@@ -1169,74 +1380,6 @@
   </context>
   <context>
     <name>SystemSettings</name>
-    <message>
-      <source>SMTP host</source>
-      <translation>SMTP Server</translation>
-    </message>
-    <message>
-      <source>Email from</source>
-      <translation>E-post från</translation>
-    </message>
-    <message>
-      <source>SMTP user</source>
-      <translation>SMTP användare</translation>
-    </message>
-    <message>
-      <source>SMTP password</source>
-      <translation>SMTP lösenord</translation>
-    </message>
-    <message>
-      <source>Email signature</source>
-      <translation>Epostsignatur</translation>
-    </message>
-    <message>
-      <source>Email support link</source>
-      <translation>E-posta support</translation>
-    </message>
-    <message>
-      <source>SMTP connection type</source>
-      <translation>Typ av SMTP-anslutning</translation>
-    </message>
-    <message>
-      <source>SMTP port</source>
-      <translation>SMTP Port</translation>
-    </message>
-    <message>
-      <source>SMTP timeout (seconds)</source>
-      <translation>SMTP timeout (sekunder)</translation>
-    </message>
-    <message>
-      <source>SMTP name</source>
-      <translation>SMTP namn</translation>
-    </message>
-    <message>
-      <source>LDAP URI</source>
-      <translation>LDAP URI</translation>
-    </message>
-    <message>
-      <source>LDAP Admin DN</source>
-      <translation>LDAP Admin DN</translation>
-    </message>
-    <message>
-      <source>LDAP Admin password</source>
-      <translation>LDAP Admin lösenord</translation>
-    </message>
-    <message>
-      <source>LDAP search base</source>
-      <translation>LDAP-sökbas</translation>
-    </message>
-    <message>
-      <source>LDAP search filter</source>
-      <translation>LDAP-sökfilter</translation>
-    </message>
-    <message>
-      <source>LDAP password expiration (milliseconds)</source>
-      <translation>LDAP-lösenordsutgång (millisekunder)</translation>
-    </message>
-    <message>
-      <source>LDAP search timeout (seconds)</source>
-      <translation>Timeout för LDAP-sökning (sekunder)</translation>
-    </message>
     <message>
       <source>Anonymous statistics report allowed</source>
       <translation>Anonym statistikrapport tillåten</translation>
@@ -1342,11 +1485,6 @@
       <translation>Miniatyrer automatisk uppdatering</translation>
     </message>
     <message>
-      <source>Use %1 service to send emails instead of SMTP client</source>
-      <extracomment>%1 will be substituted with branded cloud service name e.g. &quot;Nx Cloud&quot;.</extracomment>
-      <translation>Använd tjänsten %1 för att skicka e-post istället för SMTP-klient</translation>
-    </message>
-    <message>
       <source>Max scene items (0 means default)</source>
       <translation>Max scenobjekt (0 betyder standard)</translation>
     </message>
@@ -1427,10 +1565,6 @@
       <translation>Max inspelningsköstorlek (element 250-4000)</translation>
     </message>
     <message>
-      <source>RTP retry count</source>
-      <translation>Max antal RTP återförsök</translation>
-    </message>
-    <message>
       <source>RTP timeout (milliseconds)</source>
       <translation>RTP timeout (millisekunder)</translation>
     </message>
@@ -1473,10 +1607,6 @@
     <message>
       <source>Watermark settings</source>
       <translation>Vattenmärkesinställningar</translation>
-    </message>
-    <message>
-      <source>Authorization Session token lifetime (minutes)</source>
-      <translation>Livstid för auktoriseringssessionstoken (minuter)</translation>
     </message>
     <message>
       <source>Session token count limit on a single Server</source>
@@ -1587,15 +1717,6 @@
       <translation>Använd endast HTTPS för kameror</translation>
     </message>
     <message>
-      <source>Enable deprecated API functions (unsecure)</source>
-      <translation>Aktivera föråldrade API-funktioner (osäkra)</translation>
-    </message>
-    <message>
-      <source>Enable deprecated API functions curently used by %1 software (unsecure)</source>
-      <comment>%1 is a company name</comment>
-      <translation>Aktivera föråldrade API-funktioner som för närvarande används av %1 -programvara (osäker)</translation>
-    </message>
-    <message>
       <source>Expose IP addresses for autodiscovery</source>
       <translation>Exponera IP-adresser för autodiscovery</translation>
     </message>
@@ -1638,6 +1759,87 @@
     <message>
       <source>Update releases.json file URL</source>
       <translation>Uppdatera releases.json filens URL</translation>
+    </message>
+    <message>
+      <source>LDAP settings</source>
+      <translation>LDAP-inställningar</translation>
+    </message>
+    <message>
+      <source>SMTP settings</source>
+      <translation>SMTP-inställningar</translation>
+    </message>
+    <message>
+      <source>Organization Id</source>
+      <translation>Organisationens Id</translation>
+    </message>
+    <message>
+      <source>Semicolon-separated list of Servers designated to connect to the Cloud. Servers at the top of the list have higher priority. If the list is empty a Server for the Cloud connection is selected automatically.</source>
+      <translation>Semikolonseparerad lista över servrar som är utsedda att ansluta till molnet. Servrar överst på listan har högre prioritet. Om listan är tom väljs en server för molnanslutningen automatiskt.</translation>
+    </message>
+    <message>
+      <source>Maximum number of consecutive RTP errors before the server reconnects the RTSP session.</source>
+      <translation>Maximalt antal på varandra följande RTP-fel innan servern återansluter RTSP-sessionen.</translation>
+    </message>
+    <message>
+      <source>Authorization Session token lifetime (seconds)</source>
+      <translation>Livstid för auktoriseringssessionstoken (sekunder)</translation>
+    </message>
+    <message>
+      <source>Channel partners service</source>
+      <translation>Kanal partners service</translation>
+    </message>
+    <message>
+      <source>Allow Power User editing Security Settings</source>
+      <translation>Tillåt Power User redigering av säkerhetsinställningar</translation>
+    </message>
+    <message>
+      <source>Enable deprecated API functions (insecure)</source>
+      <translation>Aktivera föråldrade API-funktioner (osäkra)</translation>
+    </message>
+    <message>
+      <source>Enable deprecated API functions currently used by %1 software (insecure)</source>
+      <comment>%1 is a company name</comment>
+      <translation>Aktivera föråldrade API-funktioner som för närvarande används av %1 programvara (osäker)</translation>
+    </message>
+    <message>
+      <source>Interval between the Cloud polling HTTP requests to synchronize the data.</source>
+      <translation>Intervall mellan Cloud polling HTTP-förfrågningar för att synkronisera data.</translation>
+    </message>
+  </context>
+  <context>
+    <name>TimeFormat</name>
+    <message>
+      <source>just now</source>
+      <translation>precis nu</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n minute(s) ago</source>
+      <translation>
+        <numerusform>%n minut(er) sedan</numerusform>
+        <numerusform>%n minut(er) sedan</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n hour(s) ago</source>
+      <translation>
+        <numerusform>%n timmar sedan</numerusform>
+        <numerusform>%n timmar sedan</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>yesterday</source>
+      <translation>igår</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n day(s) ago</source>
+      <translation>
+        <numerusform>%n dag(ar) sedan</numerusform>
+        <numerusform>%n dag(ar) sedan</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>a week ago</source>
+      <translation>en vecka sedan</translation>
     </message>
   </context>
   <context>
@@ -1690,16 +1892,13 @@
       <source>No data exported.</source>
       <translation>Ingen data exporterad.</translation>
     </message>
-  </context>
-  <context>
-    <name>nx::utils::CryptedFileStream</name>
     <message>
-      <source>Wrong crypted stream size.</source>
-      <translation>Fel krypterad strömstorlek.</translation>
+      <source>Unlock this portion of the archive to export its contents.</source>
+      <translation>Lås upp denna del av arkivet för att exportera dess innehåll.</translation>
     </message>
     <message>
-      <source>Damaged crypted stream header.</source>
-      <translation>Skadad krypterad strömhuvud.</translation>
+      <source>Archive is unavailable now. Please try again later.</source>
+      <translation>Arkivet är inte tillgängligt nu. Vänligen försök igen senare.</translation>
     </message>
   </context>
   <context>
@@ -2038,27 +2237,12 @@
       <source>Trigger Name</source>
       <translation>Utlösarens namn</translation>
     </message>
-    <message>
-      <source>Role</source>
-      <translation>Roll</translation>
-    </message>
     <message numerus="yes">
       <source>%n Users</source>
       <translation>
         <numerusform>%n användare</numerusform>
         <numerusform>%n användare</numerusform>
       </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Roles</source>
-      <translation>
-        <numerusform>%n Roller</numerusform>
-        <numerusform>%n Roller</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>All Administrators</source>
-      <translation>Alla administratörer</translation>
     </message>
     <message>
       <source>All Users</source>
@@ -2262,10 +2446,6 @@
       <translation>Det gick inte att säkerhetskopiera fil %1</translation>
     </message>
     <message>
-      <source>Show Intercom Informer</source>
-      <translation>Visa Intercom Informer</translation>
-    </message>
-    <message>
       <source>Do HTTP(S) request</source>
       <translation>Gör HTTP(S)-begäran</translation>
     </message>
@@ -2337,12 +2517,45 @@
       <source>Also play on source camera</source>
       <translation>Spela också på källkameran</translation>
     </message>
-  </context>
-  <context>
-    <name>utils::QnCameraNamesWatcher</name>
+    <message numerus="yes">
+      <source>%n Groups</source>
+      <translation>
+        <numerusform>%n Grupper</numerusform>
+        <numerusform>%n Grupper</numerusform>
+      </translation>
+    </message>
     <message>
-      <source>Removed camera</source>
-      <translation>Borttagen kamera</translation>
+      <source>LDAP Sync Issue</source>
+      <translation>LDAP-synkroniseringsproblem</translation>
+    </message>
+    <message>
+      <source>Failed to connect to the LDAP server.</source>
+      <translation>Det gick inte att ansluta till LDAP-servern.</translation>
+    </message>
+    <message>
+      <source>Failed to complete the sync within a %1 timeout.</source>
+      <comment>Timeout duration in human-readable form (ex.: 1 minute)</comment>
+      <translation>Det gick inte att slutföra synkroniseringen inom en timeout på %1.</translation>
+    </message>
+    <message>
+      <source>Failed to complete the sync within a given timeout.</source>
+      <translation>Det gick inte att slutföra synkroniseringen inom en given timeout.</translation>
+    </message>
+    <message>
+      <source>No user accounts on LDAP server match the synchronization settings.</source>
+      <translation>Inga användarkonton på LDAP-servern matchar synkroniseringsinställningarna.</translation>
+    </message>
+    <message>
+      <source>Some LDAP users or groups were not found in the LDAP database.</source>
+      <translation>Vissa LDAP-användare eller grupper hittades inte i LDAP-databasen.</translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 (%n times)</source>
+      <comment>%1 is description of event. Will be replaced in runtime</comment>
+      <translation>
+        <numerusform>%1 (%n gånger)</numerusform>
+        <numerusform>%1 (%n gånger)</numerusform>
+      </translation>
     </message>
   </context>
 </TS>

@@ -2,29 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="es_ES" sourcelanguage="en">
   <context>
-    <name>QnCloudSystemInformationWatcher</name>
-    <message>
-      <source>Owner: %1</source>
-      <comment>%1 is a user name</comment>
-      <translation>Propietario: %1</translation>
-    </message>
-    <message>
-      <source>Your System</source>
-      <translation>Su Sistema</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnDesktopAudioOnlyDataProvider</name>
-    <message>
-      <source>Sample format of input device %1 is not supported.</source>
-      <translation>Formato de muestra del dispositivo de entrada %1 no es compatible.</translation>
-    </message>
-    <message>
-      <source>Primary audio device is not selected.</source>
-      <translation>El dispositivo de audio primario no está seleccionado.</translation>
-    </message>
-  </context>
-  <context>
     <name>QnDirectSystemsFinder</name>
     <message>
       <source>System</source>
@@ -107,10 +84,6 @@
       <translation>%1 el inicio de sesión de usuario no está disponible temporalmente</translation>
     </message>
     <message>
-      <source>Connection timed out</source>
-      <translation>Tiempo de espera agotado</translation>
-    </message>
-    <message>
       <source>The server is incompatible.</source>
       <translation>El servidor es incompatible.</translation>
     </message>
@@ -164,11 +137,6 @@
       <translation>La conexión a %1 aún no está lista. Comprueba tu conexión a Internet o vuelve a intentarlo más tarde.</translation>
     </message>
     <message>
-      <source>Connection to %1 is not ready yet. Check the server’s internet connection or try again later.</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>La conexión a %1 aún no está lista. Compruebe la conexión a Internet del servidor o vuelva a intentarlo más tarde.</translation>
-    </message>
-    <message>
       <source>Connection to the server could not be established. Try again later.</source>
       <translation>No se pudo establecer la conexión con el servidor. Vuelva a intentarlo más tarde.</translation>
     </message>
@@ -199,11 +167,6 @@
       <translation>Demasiados intentos de inicio de sesión. Inténtalo más tarde.</translation>
     </message>
     <message>
-      <source>To log in to this System, disable “Ask for a verification code on every login with your %1 account” in your %2.</source>
-      <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation>Para iniciar sesión en este Sistema, deshabilite "Solicitar un código de verificación en cada inicio de sesión con su cuenta %1 " en su %2.</translation>
-    </message>
-    <message>
       <source>Two-factor authentication is required.</source>
       <translation>La autenticación de dos factores es obligatoria.</translation>
     </message>
@@ -212,13 +175,59 @@
       <comment>%1 is link that leads to /account/security section of Nx Cloud</comment>
       <translation>Puede habilitar la autenticación de dos factores en su %1.</translation>
     </message>
+    <message>
+      <source>Connection to %1 is not ready yet. Check the server&apos;s internet connection or try again later.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">Connection to %1 is not ready yet. Check the server&apos;s internet connection or try again later.</translation>
+    </message>
+    <message>
+      <source>Connection failed</source>
+      <translation>Error de conexión</translation>
+    </message>
+    <message>
+      <source>Your access to this system has expired.</source>
+      <translation type="unfinished">Your access to this system has expired.</translation>
+    </message>
+    <message>
+      <source>Please contact the system administrator to regain access.</source>
+      <translation type="unfinished">Please contact the system administrator to regain access.</translation>
+    </message>
+    <message>
+      <source>To log in to this System, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</source>
+      <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
+      <translation type="unfinished">To log in to this System, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::AbstractAttributedEventModel</name>
+    <message numerus="yes">
+      <source>+%n values</source>
+      <translation>
+        <numerusform>+%n valores</numerusform>
+        <numerusform>+%n valores</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::AnalyticsSearchListModel</name>
+    <message>
+      <source>Unknown track</source>
+      <translation>Pista desconocida</translation>
+    </message>
+    <message>
+      <source>deleted camera</source>
+      <translation>cámara eliminada</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::BookmarkSearchListModel</name>
+    <message>
+      <source>deleted camera</source>
+      <translation>cámara eliminada</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::core::CertificateWarning</name>
-    <message>
-      <source>Cannot verify the identity of %1</source>
-      <translation>No se puede verificar la identidad de %1</translation>
-    </message>
     <message>
       <source>Server certificate is invalid.</source>
       <translation>El certificado del servidor no es válido.</translation>
@@ -226,10 +235,6 @@
     <message>
       <source>Connecting to %1 for the first time?</source>
       <translation>¿Conectarse a %1 por primera vez?</translation>
-    </message>
-    <message>
-      <source>certificate details</source>
-      <translation>Detalles del certificado</translation>
     </message>
     <message>
       <source>help article</source>
@@ -240,32 +245,112 @@
       <comment>%1 is &lt;help article&gt; link</comment>
       <translation>Lea este %1 para obtener más información sobre la validación de certificados.</translation>
     </message>
-    <message>
-      <source>Review the %1 to ensure you trust the server you are connecting to.%2</source>
-      <comment>%1 is &lt;certificate details&gt; link, %2 are possible extra details</comment>
-      <translation>Revise el %1 para asegurarse de que confías en el servidor al que te estás conectando.%2</translation>
+    <message numerus="yes">
+      <source>Cannot verify the identity of %n servers</source>
+      <translation type="unfinished">
+        <numerusform>Cannot verify the identity of %n servers</numerusform>
+        <numerusform>Cannot verify the identity of %n servers</numerusform>
+      </translation>
     </message>
     <message>
-      <source>the server&apos;s certificate</source>
-      <translation>el certificado del servidor</translation>
+      <source>Review the certificates of the servers from this system.</source>
+      <translation type="unfinished">Review the certificates of the servers from this system.</translation>
     </message>
     <message>
-      <source>You can view %1 or read this %2 to learn more about the current problem.</source>
-      <comment>%1 is &lt;the server&apos;s certificate&gt; link, %2 is &lt;help article&gt; link</comment>
-      <translation>Puede ver %1 o leer este %2 para obtener más información sobre el problema actual.</translation>
+      <source>This might be due to an expired server certificate or or an invalid certificate. Contact your system administrator for further investigation.</source>
+      <translation type="unfinished">This might be due to an expired server certificate or or an invalid certificate. Contact your system administrator for further investigation.</translation>
     </message>
     <message>
-      <source>This might be due to an expired server certificate or someone trying to impersonate %1 to steal your personal information.%2</source>
-      <comment>%1 is the system name, %2 are possible extra details</comment>
-      <translation>Es posible que esto se deba a que un certificado de servidor caducado o a alguien que intenta hacerse pasar por %1 para robar su información personal.%2</translation>
+      <source>To learn more about the current problem read this %1.</source>
+      <comment>%1 is &lt;help article&gt; link</comment>
+      <translation type="unfinished">To learn more about the current problem read this %1.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::DesktopAudioOnlyDataProvider</name>
+    <message>
+      <source>Sample format of input device %1 is not supported.</source>
+      <translation>Formato de muestra del dispositivo de entrada %1 no es compatible.</translation>
     </message>
     <message>
-      <source>This message may be shown multiple times when connecting to a multi-server system.</source>
-      <translation>Este mensaje puede mostrarse varias veces cuando se conecta a un sistema multiservidor.</translation>
+      <source>Primary audio device is not selected.</source>
+      <translation>El dispositivo de audio primario no está seleccionado.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::EventSearchUtils</name>
+    <message>
+      <source>Last day</source>
+      <translation>Último día</translation>
     </message>
     <message>
-      <source>To learn more about the current problem view the server&apos;s certificate:</source>
-      <translation>Para obtener más información sobre el problema actual, consulte el certificado del servidor&apos;:</translation>
+      <source>Last 7 days</source>
+      <translation>Últimos 7 días</translation>
+    </message>
+    <message>
+      <source>Last 30 days</source>
+      <translation>Últimos 30 días</translation>
+    </message>
+    <message>
+      <source>Any time</source>
+      <translation>Cualquier momento</translation>
+    </message>
+    <message>
+      <source>Any</source>
+      <translation>Cualquiera</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Cameras</source>
+      <comment>%n is a number of cameras</comment>
+      <translation>
+        <numerusform>%n Camaras</numerusform>
+        <numerusform>%n Camaras</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::ExtendedOutputCameraButtonController</name>
+    <message>
+      <source>Heater</source>
+      <translation>Calentador</translation>
+    </message>
+    <message>
+      <source>Wiper</source>
+      <translation>Limpiaparabrisas</translation>
+    </message>
+    <message>
+      <source>Open Door</source>
+      <translation type="unfinished">Open Door</translation>
+    </message>
+    <message>
+      <source>Stop Object Tracking</source>
+      <translation type="unfinished">Stop Object Tracking</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::SoftwareTriggerCameraButtonController</name>
+    <message>
+      <source>Press and hold to</source>
+      <translation>Presione y mantenga presionado</translation>
+    </message>
+    <message>
+      <source>press and hold</source>
+      <translation>presione y mantenga presionado</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::TwoWayAudioCameraButtonController</name>
+    <message>
+      <source>Unmute</source>
+      <translation type="unfinished">Unmute</translation>
+    </message>
+    <message>
+      <source>Mute</source>
+      <translation type="unfinished">Mute</translation>
+    </message>
+    <message>
+      <source>Press and hold to speak</source>
+      <translation>Pulsa y mantén presionado para grabar</translation>
     </message>
   </context>
 </TS>

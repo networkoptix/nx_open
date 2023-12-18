@@ -2,29 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="ja_JP" sourcelanguage="en">
   <context>
-    <name>QnCloudSystemInformationWatcher</name>
-    <message>
-      <source>Owner: %1</source>
-      <comment>%1 is a user name</comment>
-      <translation>オーナー: %1</translation>
-    </message>
-    <message>
-      <source>Your System</source>
-      <translation>お使いのシステム</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnDesktopAudioOnlyDataProvider</name>
-    <message>
-      <source>Sample format of input device %1 is not supported.</source>
-      <translation>入力デバイス %1 のサンプルフォーマットはサポートされていません。</translation>
-    </message>
-    <message>
-      <source>Primary audio device is not selected.</source>
-      <translation>プライマリーオーディオ デバイスが選択されていません。</translation>
-    </message>
-  </context>
-  <context>
     <name>QnDirectSystemsFinder</name>
     <message>
       <source>System</source>
@@ -107,10 +84,6 @@
       <translation>%1 ユーザーのログインは一時的に利用できません</translation>
     </message>
     <message>
-      <source>Connection timed out</source>
-      <translation>接続がタイムアウトしました</translation>
-    </message>
-    <message>
       <source>The server is incompatible.</source>
       <translation>サーバーに互換性がありません。</translation>
     </message>
@@ -164,11 +137,6 @@
       <translation>%1 への接続はまだ準備ができていません。インターネット接続を確認するか、後でもう一度お試しください。</translation>
     </message>
     <message>
-      <source>Connection to %1 is not ready yet. Check the server’s internet connection or try again later.</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>%1 への接続はまだ準備ができていません。サーバーのインターネット接続を確認するか、後でもう一度お試しください。</translation>
-    </message>
-    <message>
       <source>Connection to the server could not be established. Try again later.</source>
       <translation>サーバーへの接続を確立できませんでした。後でもう一度お試しください。</translation>
     </message>
@@ -199,11 +167,6 @@
       <translation>ログイン試行回数が多すぎます。しばらくしてからもう一度お試しください。</translation>
     </message>
     <message>
-      <source>To log in to this System, disable “Ask for a verification code on every login with your %1 account” in your %2.</source>
-      <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation>このシステムにログインするには、 %2 で「%1 アカウントでログインするたびに認証コードを要求する」を無効にします。</translation>
-    </message>
-    <message>
       <source>Two-factor authentication is required.</source>
       <translation>二要素認証が必要です。</translation>
     </message>
@@ -212,13 +175,58 @@
       <comment>%1 is link that leads to /account/security section of Nx Cloud</comment>
       <translation>%1 で二要素認証を有効にできます。</translation>
     </message>
+    <message>
+      <source>Connection to %1 is not ready yet. Check the server&apos;s internet connection or try again later.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">Connection to %1 is not ready yet. Check the server&apos;s internet connection or try again later.</translation>
+    </message>
+    <message>
+      <source>Connection failed</source>
+      <translation>接続に失敗しました</translation>
+    </message>
+    <message>
+      <source>Your access to this system has expired.</source>
+      <translation>このシステムへのアクセス有効期限が切れました。</translation>
+    </message>
+    <message>
+      <source>Please contact the system administrator to regain access.</source>
+      <translation>アクセスを回復するには、システム管理者に連絡してください。</translation>
+    </message>
+    <message>
+      <source>To log in to this System, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</source>
+      <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
+      <translation type="unfinished">To log in to this System, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::AbstractAttributedEventModel</name>
+    <message numerus="yes">
+      <source>+%n values</source>
+      <translation>
+        <numerusform>+%n 値</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::AnalyticsSearchListModel</name>
+    <message>
+      <source>Unknown track</source>
+      <translation>不明なトラック</translation>
+    </message>
+    <message>
+      <source>deleted camera</source>
+      <translation>削除されたカメラ</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::BookmarkSearchListModel</name>
+    <message>
+      <source>deleted camera</source>
+      <translation>削除されたカメラ</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::core::CertificateWarning</name>
-    <message>
-      <source>Cannot verify the identity of %1</source>
-      <translation>%1 の識別情報を確認できません</translation>
-    </message>
     <message>
       <source>Server certificate is invalid.</source>
       <translation>サーバー証明書が無効です。</translation>
@@ -226,10 +234,6 @@
     <message>
       <source>Connecting to %1 for the first time?</source>
       <translation>%1 への接続は初めてですか?</translation>
-    </message>
-    <message>
-      <source>certificate details</source>
-      <translation>証明書の詳細</translation>
     </message>
     <message>
       <source>help article</source>
@@ -240,32 +244,110 @@
       <comment>%1 is &lt;help article&gt; link</comment>
       <translation>証明書検証の詳細については、この %1 をご参照ください。</translation>
     </message>
-    <message>
-      <source>Review the %1 to ensure you trust the server you are connecting to.%2</source>
-      <comment>%1 is &lt;certificate details&gt; link, %2 are possible extra details</comment>
-      <translation>%1 をご確認のうえ、接続先サーバーが信頼できることをお確かめください。%2</translation>
+    <message numerus="yes">
+      <source>Cannot verify the identity of %n servers</source>
+      <translation>
+        <numerusform>%n サーバーの識別情報を確認できません</numerusform>
+      </translation>
     </message>
     <message>
-      <source>the server&apos;s certificate</source>
-      <translation>サーバーの証明書</translation>
+      <source>Review the certificates of the servers from this system.</source>
+      <translation type="unfinished">Review the certificates of the servers from this system.</translation>
     </message>
     <message>
-      <source>You can view %1 or read this %2 to learn more about the current problem.</source>
-      <comment>%1 is &lt;the server&apos;s certificate&gt; link, %2 is &lt;help article&gt; link</comment>
-      <translation>現在の問題の詳細については、 %1 を表示するか、この %2 をご参照ください。</translation>
+      <source>This might be due to an expired server certificate or or an invalid certificate. Contact your system administrator for further investigation.</source>
+      <translation type="unfinished">This might be due to an expired server certificate or or an invalid certificate. Contact your system administrator for further investigation.</translation>
     </message>
     <message>
-      <source>This might be due to an expired server certificate or someone trying to impersonate %1 to steal your personal information.%2</source>
-      <comment>%1 is the system name, %2 are possible extra details</comment>
-      <translation>原因としては、サーバー証明書の有効期限が切れているか、誰かが %1 になりすまして個人情報を盗もうとしていることが考えられます。 %2</translation>
+      <source>To learn more about the current problem read this %1.</source>
+      <comment>%1 is &lt;help article&gt; link</comment>
+      <translation type="unfinished">To learn more about the current problem read this %1.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::DesktopAudioOnlyDataProvider</name>
+    <message>
+      <source>Sample format of input device %1 is not supported.</source>
+      <translation>入力デバイス %1 のサンプルフォーマットはサポートされていません。</translation>
     </message>
     <message>
-      <source>This message may be shown multiple times when connecting to a multi-server system.</source>
-      <translation>このメッセージは、マルチサーバーシステムに接続する際に複数回表示される場合があります。</translation>
+      <source>Primary audio device is not selected.</source>
+      <translation>プライマリーオーディオ デバイスが選択されていません。</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::EventSearchUtils</name>
+    <message>
+      <source>Last day</source>
+      <translation>過去1日間</translation>
     </message>
     <message>
-      <source>To learn more about the current problem view the server&apos;s certificate:</source>
-      <translation>現在の問題の詳細については、サーバーの証明書をご確認ください:</translation>
+      <source>Last 7 days</source>
+      <translation>過去 7 日間</translation>
+    </message>
+    <message>
+      <source>Last 30 days</source>
+      <translation>過去 30 日間</translation>
+    </message>
+    <message>
+      <source>Any time</source>
+      <translation>いつでも</translation>
+    </message>
+    <message>
+      <source>Any</source>
+      <translation>すべて</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Cameras</source>
+      <comment>%n is a number of cameras</comment>
+      <translation>
+        <numerusform>%n カメラ</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::ExtendedOutputCameraButtonController</name>
+    <message>
+      <source>Heater</source>
+      <translation>ヒーター</translation>
+    </message>
+    <message>
+      <source>Wiper</source>
+      <translation>ワイパー</translation>
+    </message>
+    <message>
+      <source>Open Door</source>
+      <translation>ドアを開ける</translation>
+    </message>
+    <message>
+      <source>Stop Object Tracking</source>
+      <translation type="unfinished">Stop Object Tracking</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::SoftwareTriggerCameraButtonController</name>
+    <message>
+      <source>Press and hold to</source>
+      <translation>長押し</translation>
+    </message>
+    <message>
+      <source>press and hold</source>
+      <translation>押したまま</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::TwoWayAudioCameraButtonController</name>
+    <message>
+      <source>Unmute</source>
+      <translation>ミュート解除</translation>
+    </message>
+    <message>
+      <source>Mute</source>
+      <translation>ミュート</translation>
+    </message>
+    <message>
+      <source>Press and hold to speak</source>
+      <translation>長押しで話す</translation>
     </message>
   </context>
 </TS>
