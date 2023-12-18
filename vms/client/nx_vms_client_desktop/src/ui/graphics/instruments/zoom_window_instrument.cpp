@@ -93,7 +93,8 @@ public:
 
         setHelpTopic(this, HelpTopic::Id::MainWindow_MediaItem_ZoomWindows);
 
-        updateInteractivity();
+        setAcceptedMouseButtons(Qt::LeftButton);
+        setClickableButtons(Qt::LeftButton);
     }
 
     virtual ~ZoomWindowWidget() override;
@@ -154,8 +155,6 @@ public:
             return;
 
         m_interactive = interactive;
-
-        updateInteractivity();
     }
 
 protected:
@@ -221,14 +220,6 @@ protected:
             result = Qn::TitleBarArea;
 
         return result;
-    }
-
-private:
-    void updateInteractivity()
-    {
-        const auto buttons = m_interactive ? Qt::LeftButton : Qt::NoButton;
-        setAcceptedMouseButtons(buttons);
-        setClickableButtons(buttons);
     }
 
 private:
