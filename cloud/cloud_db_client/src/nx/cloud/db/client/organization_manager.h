@@ -11,7 +11,7 @@ class OrganizationManager:
     public api::OrganizationManager
 {
 public:
-    OrganizationManager(AsyncRequestsExecutor* requestsExecutor);
+    OrganizationManager(ApiRequestsExecutor* requestsExecutor);
 
     virtual void getSystemOffers(
         const std::string& organizationId,
@@ -28,7 +28,7 @@ public:
         std::function<void(api::ResultCode)> completionHandler) override;
 
 private:
-    AsyncRequestsExecutor* m_requestsExecutor = nullptr;
+    ApiRequestsExecutor* m_requestsExecutor = nullptr;
 };
 
 } // namespace nx::cloud::db::api

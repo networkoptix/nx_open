@@ -10,9 +10,10 @@
 namespace nx::cloud::db::client {
 
 Connection::Connection(
-    network::cloud::CloudModuleUrlFetcher* const endPointFetcher)
+    const nx::utils::Url& baseUrl,
+    nx::network::ssl::AdapterFunc adapterFunc)
     :
-    m_requestExecutor(endPointFetcher),
+    m_requestExecutor(baseUrl, std::move(adapterFunc)),
     m_accountManager(&m_requestExecutor),
     m_systemManager(&m_requestExecutor),
     m_organizationManager(&m_requestExecutor),
@@ -73,7 +74,7 @@ void Connection::bindToAioThread(
 
 void Connection::setCredentials(nx::network::http::Credentials credentials)
 {
-    m_requestExecutor.setCredentials(credentials);
+    m_requestExecutor.httpClientOptions().setCredentials(credentials);
 }
 
 void Connection::setProxyVia(
@@ -82,30 +83,37 @@ void Connection::setProxyVia(
     nx::network::http::Credentials credentials,
     nx::network::ssl::AdapterFunc adapterFunc)
 {
-    m_requestExecutor.setProxyCredentials(credentials);
-    m_requestExecutor.setProxyVia({proxyHost, proxyPort}, adapterFunc, /*isSecure*/ true);
+    m_requestExecutor.httpClientOptions().setProxyCredentials(credentials);
+    m_requestExecutor.httpClientOptions().setProxyVia(
+        {proxyHost, proxyPort}, /*isSecure*/ true, adapterFunc);
 }
 
 void Connection::setRequestTimeout(std::chrono::milliseconds timeout)
 {
     m_requestExecutor.setRequestTimeout(timeout);
+    m_requestExecutor.httpClientOptions().setTimeouts({
+        .sendTimeout = timeout,
+        .responseReadTimeout = timeout,
+        .messageBodyReadTimeout = timeout});
 }
 
 std::chrono::milliseconds Connection::requestTimeout() const
 {
-    return m_requestExecutor.requestTimeout();
+    return m_requestExecutor.httpClientOptions().timeouts().responseReadTimeout;
 }
 
 void Connection::setAdditionalHeaders(nx::network::http::HttpHeaders headers)
 {
-    m_requestExecutor.setAdditionalHeaders(std::move(headers));
+    m_requestExecutor.httpClientOptions().setAdditionalHeaders(std::move(headers));
 }
 
 void Connection::ping(
     std::function<void(api::ResultCode, api::ModuleInfo)> completionHandler)
 {
-    m_requestExecutor.executeRequest<api::ModuleInfo>(
+    m_requestExecutor.makeAsyncCall<api::ModuleInfo>(
+        nx::network::http::Method::get,
         kPingPath,
+        {}, //query
         std::move(completionHandler));
 }
 

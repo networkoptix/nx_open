@@ -11,7 +11,7 @@ class AuthProvider:
     public api::AuthProvider
 {
 public:
-    AuthProvider(AsyncRequestsExecutor* requestsExecutor);
+    AuthProvider(ApiRequestsExecutor* requestsExecutor);
 
     virtual void getCdbNonce(
         std::function<void(api::ResultCode, api::NonceData)> completionHandler) override;
@@ -52,7 +52,7 @@ public:
             std::chrono::system_clock::time_point)> completionHandler) override;
 
 private:
-    AsyncRequestsExecutor* m_requestsExecutor = nullptr;
+    ApiRequestsExecutor* m_requestsExecutor = nullptr;
 };
 
 } // namespace nx::cloud::db::client

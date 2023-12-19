@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/network/http/generic_api_client.h>
+#include <nx/network/http/server/rest/base_request_handler.h>
 
 #include "simple_service/service_launcher.h"
 #include "simple_service/view.h"
@@ -10,7 +11,21 @@
 namespace nx::network::http::test {
 
 namespace {
-constexpr char kDefaultPath[] = "/simpleService/handler";
+
+static constexpr char kDefaultPath[] = "/simpleService/handler";
+
+template<const char* name>
+struct HeaderFetcher
+{
+    static constexpr std::string_view kName{name};
+
+    std::string operator()(const http::Response& response)
+    {
+        auto it = response.headers.find(kName);
+        return it != response.headers.end() ? it->second : "";
+    }
+};
+
 } // namespace
 
 //added this class to open protected GenericApiClient functions for testing
@@ -69,7 +84,7 @@ public:
     }
 
 public:
-    using Result = std::tuple<ResultType, http::server::test::Response>;
+    using Result = std::tuple<ResultType, http::server::test::Response, std::string /*Server header*/>;
 
     std::unique_ptr<Client> m_client;
     SimpleServiceLauncher m_instance;
@@ -86,8 +101,13 @@ protected:
 
     void whenPerformApiCall()
     {
-        m_client->makeAsyncCall<http::server::test::Response>(
-            nx::network::http::Method::get, kDefaultPath, [this](auto&&... args) {
+        static constexpr char kHeaderName[] = "Server";
+
+        m_client->makeAsyncCall<http::server::test::Response, HeaderFetcher<kHeaderName>>(
+            nx::network::http::Method::get,
+            kDefaultPath,
+            {}, //query
+            [this](auto&&... args) {
                 // Using post to make sure that the completion handler has returned before saving the result.
                 m_client->post([this, args = std::make_tuple(std::forward<decltype(args)>(args)...)]() {
                     m_results.push(std::move(args));
