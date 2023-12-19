@@ -2,8 +2,12 @@
 
 #include "panic_recording_action.h"
 
+#include "../action_builder_fields/optional_time_field.h"
 #include "../manifest.h"
+#include "../utils/field.h"
 #include "../utils/type.h"
+
+using namespace std::chrono_literals;
 
 namespace nx::vms::rules {
 
@@ -15,6 +19,14 @@ const ItemDescriptor& PanicRecordingAction::manifest()
         .description = tr("Panic Recording mode switches recording settings for all cameras"
             " to maximum FPS and quality."),
         .flags = ItemFlag::prolonged,
+        .fields = {
+            utils::makeTimeFieldDescriptor<OptionalTimeField>(
+                    utils::kDurationFieldName,
+                    tr("Fixed Duration"),
+                    {},
+                    {.initialValue = 5s, .defaultValue = 5s, .maximumValue = 9999h, .minimumValue = 1s}),
+            utils::makeIntervalFieldDescriptor(tr("Interval of Action"))
+        }
     };
     return kDescriptor;
 }
