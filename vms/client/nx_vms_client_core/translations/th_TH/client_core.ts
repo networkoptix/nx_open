@@ -246,8 +246,8 @@
     </message>
     <message numerus="yes">
       <source>Cannot verify the identity of %n servers</source>
-      <translation type="unfinished">
-        <numerusform>Cannot verify the identity of %n servers</numerusform>
+      <translation>
+        <numerusform>ไม่สามารถตรวจสอบข้อมูลของเซิร์ฟเวอร์ %n เครื่องได้</numerusform>
       </translation>
     </message>
     <message>
