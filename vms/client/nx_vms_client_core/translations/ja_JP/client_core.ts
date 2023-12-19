@@ -178,7 +178,7 @@
     <message>
       <source>Connection to %1 is not ready yet. Check the server&apos;s internet connection or try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connection to %1 is not ready yet. Check the server&apos;s internet connection or try again later.</translation>
+      <translation>%1 への接続はまだ準備ができていません。サーバーのインターネット接続を確認するか、後でもう一度お試しください。</translation>
     </message>
     <message>
       <source>Connection failed</source>
@@ -195,7 +195,7 @@
     <message>
       <source>To log in to this System, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</source>
       <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation type="unfinished">To log in to this System, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</translation>
+      <translation>このシステムにログインするには、 %2 で &quot;%1 アカウントでログインするたびに確認コードを要求する&quot; を無効にしてください。</translation>
     </message>
   </context>
   <context>
@@ -252,16 +252,16 @@
     </message>
     <message>
       <source>Review the certificates of the servers from this system.</source>
-      <translation type="unfinished">Review the certificates of the servers from this system.</translation>
+      <translation>このシステムからのサーバー証明書を確認してください。</translation>
     </message>
     <message>
       <source>This might be due to an expired server certificate or or an invalid certificate. Contact your system administrator for further investigation.</source>
-      <translation type="unfinished">This might be due to an expired server certificate or or an invalid certificate. Contact your system administrator for further investigation.</translation>
+      <translation>期限切れまたは無効なサーバー証明書が原因である可能性があります。詳細な調査については、システム管理者にお問い合わせください。</translation>
     </message>
     <message>
       <source>To learn more about the current problem read this %1.</source>
       <comment>%1 is &lt;help article&gt; link</comment>
-      <translation type="unfinished">To learn more about the current problem read this %1.</translation>
+      <translation>現在の問題の詳細については、こちらの %1 を参照してください。</translation>
     </message>
   </context>
   <context>
@@ -279,19 +279,19 @@
     <name>nx::vms::client::core::EventSearchUtils</name>
     <message>
       <source>Last day</source>
-      <translation>過去1日間</translation>
+      <translation>直近 24 時間</translation>
     </message>
     <message>
       <source>Last 7 days</source>
-      <translation>過去 7 日間</translation>
+      <translation>直近 7 日間</translation>
     </message>
     <message>
       <source>Last 30 days</source>
-      <translation>過去 30 日間</translation>
+      <translation>直近 30 日間</translation>
     </message>
     <message>
       <source>Any time</source>
-      <translation>いつでも</translation>
+      <translation>期間指定なし</translation>
     </message>
     <message>
       <source>Any</source>
@@ -321,18 +321,18 @@
     </message>
     <message>
       <source>Stop Object Tracking</source>
-      <translation type="unfinished">Stop Object Tracking</translation>
+      <translation>オブジェクト追跡を停止</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::core::SoftwareTriggerCameraButtonController</name>
     <message>
       <source>Press and hold to</source>
-      <translation>長押し</translation>
+      <translation>長押しで</translation>
     </message>
     <message>
       <source>press and hold</source>
-      <translation>押したまま</translation>
+      <translation>長押し</translation>
     </message>
   </context>
   <context>

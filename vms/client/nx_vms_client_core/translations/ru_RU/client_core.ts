@@ -250,7 +250,7 @@
     <message numerus="yes">
       <source>Cannot verify the identity of %n servers</source>
       <translation type="unfinished">
-        <numerusform>Cannot verify the identity of %n servers</numerusform>
+        <numerusform>Не удается проверить подлинность %n серверов</numerusform>
         <numerusform>Cannot verify the identity of %n servers</numerusform>
         <numerusform>Cannot verify the identity of %n servers</numerusform>
         <numerusform>Cannot verify the identity of %n servers</numerusform>
@@ -258,7 +258,7 @@
     </message>
     <message>
       <source>Review the certificates of the servers from this system.</source>
-      <translation type="unfinished">Review the certificates of the servers from this system.</translation>
+      <translation>Просмотрите сертификаты серверов этой системы.</translation>
     </message>
     <message>
       <source>This might be due to an expired server certificate or or an invalid certificate. Contact your system administrator for further investigation.</source>
@@ -267,7 +267,7 @@
     <message>
       <source>To learn more about the current problem read this %1.</source>
       <comment>%1 is &lt;help article&gt; link</comment>
-      <translation type="unfinished">To learn more about the current problem read this %1.</translation>
+      <translation>Чтобы узнать больше о текущей проблеме, прочитайте %1.</translation>
     </message>
   </context>
   <context>
