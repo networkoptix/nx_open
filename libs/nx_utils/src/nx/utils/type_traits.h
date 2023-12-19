@@ -3,7 +3,9 @@
 #pragma once
 
 #include <functional>
+#include <optional>
 #include <type_traits>
+#include <vector>
 
 namespace nx::utils {
 
@@ -30,6 +32,18 @@ template<typename T>
 struct IsIterator<T, std::void_t<typename std::iterator_traits<T>::value_type>>: std::true_type {};
 
 template<typename... U> inline constexpr bool IsIteratorV = IsIterator<U...>::value;
+
+template<typename>
+struct IsOptional: std::false_type {};
+
+template<typename T>
+struct IsOptional<std::optional<T>>: std::true_type {};
+
+template<typename>
+struct IsVector: std::false_type {};
+
+template<typename T, typename A>
+struct IsVector<std::vector<T, A>>: std::true_type {};
 
 } // namespace nx::utils
 

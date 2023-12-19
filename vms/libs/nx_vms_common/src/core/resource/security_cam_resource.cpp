@@ -163,7 +163,7 @@ QnSecurityCamResource::QnSecurityCamResource():
     m_cachedCameraMediaCapabilities(
         [this]()
         {
-            return QJson::deserialized<nx::media::CameraMediaCapability>(
+            return QJson::deserialized<nx::vms::api::CameraMediaCapability>(
                 getProperty(ResourcePropertyKey::kMediaCapabilities).toUtf8());
         }),
     m_cachedExplicitDeviceType(
@@ -421,9 +421,11 @@ void QnSecurityCamResource::updateInternal(const QnResourcePtr& source, Notifier
 int QnSecurityCamResource::getMaxFps(StreamIndex streamIndex) const
 {
     const auto capabilities = cameraMediaCapability();
-    int result = capabilities.streamCapabilities.value(streamIndex).maxFps;
-    if (result > 0)
-        return result;
+    if (auto f = capabilities.streamCapabilities.find(streamIndex);
+        f != capabilities.streamCapabilities.cend() && f->second.maxFps > 0)
+    {
+        return f->second.maxFps;
+    }
 
     // Compatibility with version < 3.1.2
     QString value = getProperty(ResourcePropertyKey::kMaxFps);
@@ -432,7 +434,7 @@ int QnSecurityCamResource::getMaxFps(StreamIndex streamIndex) const
 
 void QnSecurityCamResource::setMaxFps(int fps, StreamIndex streamIndex)
 {
-    nx::media::CameraMediaCapability capability = cameraMediaCapability();
+    nx::vms::api::CameraMediaCapability capability = cameraMediaCapability();
     capability.streamCapabilities[streamIndex].maxFps = fps;
     setCameraMediaCapability(capability);
 }
@@ -584,12 +586,12 @@ bool QnSecurityCamResource::hasDualStreaming() const {
     return m_cachedHasDualStreaming.get();
 }
 
-nx::media::CameraMediaCapability QnSecurityCamResource::cameraMediaCapability() const
+nx::vms::api::CameraMediaCapability QnSecurityCamResource::cameraMediaCapability() const
 {
     return m_cachedCameraMediaCapabilities.get();
 }
 
-void QnSecurityCamResource::setCameraMediaCapability(const nx::media::CameraMediaCapability& value)
+void QnSecurityCamResource::setCameraMediaCapability(const nx::vms::api::CameraMediaCapability& value)
 {
     setProperty(
         ResourcePropertyKey::kMediaCapabilities, QString::fromLatin1(QJson::serialized(value)));
@@ -1935,12 +1937,13 @@ float QnSecurityCamResource::suggestBitrateKbps(
     if (streamParams.bitrateKbps > 0)
     {
         auto result = streamParams.bitrateKbps;
-        auto streamCapability = cameraMediaCapability().streamCapabilities.value(toStreamIndex(role));
-        if (streamCapability.maxBitrateKbps > 0)
+        const auto& streamCapabilities = cameraMediaCapability().streamCapabilities;
+        if (auto f = streamCapabilities.find(toStreamIndex(role));
+            f != streamCapabilities.cend() && f->second.maxBitrateKbps > 0)
         {
-            result = qBound(streamCapability.minBitrateKbps,
-                result, streamCapability.maxBitrateKbps);
+            result = qBound(f->second.minBitrateKbps, result, f->second.maxBitrateKbps);
         }
+
         return result;
     }
     return suggestBitrateForQualityKbps(
@@ -1953,7 +1956,12 @@ int QnSecurityCamResource::suggestBitrateForQualityKbps(Qn::StreamQuality qualit
     if (role == Qn::CR_Default)
         role = Qn::CR_LiveVideo;
     auto mediaCaps = cameraMediaCapability();
-    auto streamCapability = mediaCaps.streamCapabilities.value(toStreamIndex(role));
+    auto streamCapability =
+        [&]
+        {
+            auto f = mediaCaps.streamCapabilities.find(toStreamIndex(role));
+            return f != mediaCaps.streamCapabilities.cend() ? f->second : nx::vms::api::CameraStreamCapability();
+        }();
 
     return nx::vms::common::CameraBitrateCalculator::suggestBitrateForQualityKbps(
         quality,

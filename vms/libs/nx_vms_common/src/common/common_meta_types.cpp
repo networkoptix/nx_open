@@ -36,7 +36,6 @@
 #include <core/resource/layout_item_data.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource/media_stream_capability.h>
 #include <core/resource/motion_window.h>
 #include <core/resource/resource.h>
 #include <core/resource/resource_data_structures.h>
@@ -61,6 +60,7 @@
 #include <nx/string.h>
 #include <nx/utils/metatypes.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/api/data/media_stream_capability.h>
 #include <nx/vms/api/metatypes.h>
 #include <nx/vms/common/p2p/downloader/file_information.h>
 #include <nx/vms/common/ptz/command.h>
@@ -255,7 +255,7 @@ void QnCommonMetaTypes::initialize()
     qRegisterMetaType<system_health::MessageType>();
 
     qRegisterMetaType<Qn::StatusChangeReason>("Qn::StatusChangeReason");
-    qRegisterMetaType<nx::media::CameraTraits>();
+    qRegisterMetaType<nx::vms::api::CameraTraits>();
 
     qRegisterMetaType<std::map<QnUuid, nx::vms::api::AccessRights>>();
     qRegisterMetaType<nx::core::access::ResourceAccessMap>();
@@ -275,7 +275,7 @@ void QnCommonMetaTypes::initialize()
     QnJsonSerializer::registerSerializer<nx::vms::common::ptz::Override>();
 
     QnJsonSerializer::registerSerializer<std::vector<QnCameraAdvancedParameterOverload>>();
-    QnJsonSerializer::registerSerializer<nx::media::CameraTraits>();
+    QnJsonSerializer::registerSerializer<nx::vms::api::CameraTraits>();
 
     qRegisterMetaType<QnChannelMapping>();
     qRegisterMetaType<QList<QnChannelMapping>>();
