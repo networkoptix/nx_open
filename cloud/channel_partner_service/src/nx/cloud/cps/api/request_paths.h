@@ -4,15 +4,15 @@
 
 namespace nx::cloud::cps::api {
 
-static constexpr char kSystemBindToOrganizationPath[] = "/partners/cloud_systems/";
+static constexpr char kSystemBindToOrganizationPath[] = "/partners/api/v2/cloud_systems/";
 
 static constexpr char kInternalSystemUsersPath[] =
-    "/api/v2/internal/partners/systems/{systemId}/users";
+    "/partners/api/v2/internal/systems/{systemId}/users";
 
 static constexpr char kInternalSystemUserPath[] =
-    "/api/v2/internal/partners/systems/{systemId}/users/{email}";
+    "/partners/api/v2/internal/systems/{systemId}/users/{email}";
 
 static constexpr char kInternalUserSystemsPath[] =
-    "/api/v2/internal/partners/users/{email}/systems";
+    "/partners/api/v2/internal/users/{email}/systems";
 
 } // namespace nx::cloud::cps::api
