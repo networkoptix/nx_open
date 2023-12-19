@@ -26,10 +26,14 @@
 namespace {
 
 static const QString kCrossColor = "#E1E7EA";
+static const QString kErrorIconColor = "#E1E7EA";
 static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kTextButtonColors = {
     {QIcon::Normal, {{kCrossColor, "light4"}}}, {QIcon::Active, {{kCrossColor, "light3"}}}};
 static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kErrorTextButtonColors = {
-    {QIcon::Normal, {{kCrossColor, "@light4"}}}, {QIcon::Active, {{kCrossColor, "@light3"}}}};
+    {QIcon::Normal, {{kCrossColor, "dark4"}}}, {QIcon::Active, {{kCrossColor, "dark5"}}}};
+static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kErrorIconColors = {
+    {QIcon::Normal, {{kErrorIconColor, "dark4"}}}};
+
 
 } // namespace
 
@@ -175,7 +179,7 @@ void CommonMessageBar::init(const BarDescription& barDescription)
     d->closeButton->setVisible(barDescription.isClosable || !barDescription.isEnabledProperty.isNull());
     setPaletteColor(this, QPalette::Text,
         (barDescription.level == BarDescription::BarLevel::Error
-            ? core::colorTheme()->color("@light4")
+            ? core::colorTheme()->color("dark4")
             : core::colorTheme()->color("light4")));
 
     d->closeButton->setIcon(barDescription.level == BarDescription::BarLevel::Error
@@ -202,8 +206,8 @@ void CommonMessageBar::init(const BarDescription& barDescription)
             icon = qnSkin->icon("banners/warning.svg");
             break;
         case BarDescription::BarLevel::Error:
-            backgroundColor = "red_bg";
-            icon = qnSkin->icon("banners/error.svg");
+            backgroundColor = "red_d3";
+            icon = qnSkin->icon("banners/error.svg", kErrorIconColors);
             break;
     }
 
