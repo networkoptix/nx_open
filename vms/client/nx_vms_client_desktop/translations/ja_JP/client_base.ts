@@ -175,7 +175,7 @@
     </message>
     <message>
       <source>Show Welcome Screen</source>
-      <translation>ようこそ画面の表示</translation>
+      <translation>初期画面を表示</translation>
     </message>
     <message>
       <source>Window</source>
@@ -878,7 +878,7 @@
     </message>
     <message>
       <source>Welcome Screen</source>
-      <translation>ようこそ画面</translation>
+      <translation>初期画面</translation>
     </message>
     <message>
       <source>Add Web Page...</source>
@@ -1064,7 +1064,7 @@
     </message>
     <message>
       <source>New Welcome Screen</source>
-      <translation>新しいようこそ画面</translation>
+      <translation>新しい初期画面</translation>
     </message>
     <message>
       <source>Show Proxied Resources</source>
@@ -6333,12 +6333,12 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message>
       <source>All members of %1 and %2 groups will get access to this layout</source>
       <comment>%1 and %2 will be substituted with user group names</comment>
-      <translation type="unfinished">All members of %1 and %2 groups will get access to this layout</translation>
+      <translation>%1 および %2 グループのすべてのメンバーがこのレイアウトにアクセスできます</translation>
     </message>
     <message>
       <source>Convert</source>
       <comment>Converting layout to shared</comment>
-      <translation type="unfinished">Convert</translation>
+      <translation>変換</translation>
     </message>
   </context>
   <context>
@@ -11013,8 +11013,8 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message numerus="yes">
       <source>I trust these servers</source>
-      <translation type="unfinished">
-        <numerusform>I trust these servers</numerusform>
+      <translation>
+        <numerusform>このサーバーを信用する</numerusform>
       </translation>
     </message>
   </context>

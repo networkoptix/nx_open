@@ -6431,12 +6431,12 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message>
       <source>All members of %1 and %2 groups will get access to this layout</source>
       <comment>%1 and %2 will be substituted with user group names</comment>
-      <translation type="unfinished">All members of %1 and %2 groups will get access to this layout</translation>
+      <translation>%1 ve %2 grubunun tüm üyeleri bu düzene erişebilecek</translation>
     </message>
     <message>
       <source>Convert</source>
       <comment>Converting layout to shared</comment>
-      <translation type="unfinished">Convert</translation>
+      <translation>Dönüştür</translation>
     </message>
   </context>
   <context>
@@ -11176,7 +11176,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <message numerus="yes">
       <source>I trust these servers</source>
       <translation type="unfinished">
-        <numerusform>I trust these servers</numerusform>
+        <numerusform>Bu sunuculara güveniyorum</numerusform>
         <numerusform>I trust these servers</numerusform>
       </translation>
     </message>

@@ -174,7 +174,7 @@
     <message>
       <source>To log in to this System, disable “Ask for a verification code on every login with your %1 account” in your %2.</source>
       <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation>このシステムにログインするには、 %2 で「%1 アカウントでログインするたびに確認コードを要求する」を無効にします。</translation>
+      <translation>このシステムにログインするには、 %2 で「%1 アカウントでログインするたびに確認コードを要求する」を無効にししてください。</translation>
     </message>
     <message>
       <source>Two-factor authentication is required.</source>
@@ -219,22 +219,22 @@
     </message>
     <message numerus="yes">
       <source>Cannot verify the identity of %n servers</source>
-      <translation type="unfinished">
-        <numerusform>Cannot verify the identity of %n servers</numerusform>
+      <translation>
+        <numerusform>%n サーバーの識別情報を確認できません</numerusform>
       </translation>
     </message>
     <message>
       <source>Review the certificates of the servers from this system.</source>
-      <translation type="unfinished">Review the certificates of the servers from this system.</translation>
+      <translation>このシステムからのサーバー証明書を確認してください。</translation>
     </message>
     <message>
       <source>This might be due to an expired server certificate or or an invalid certificate. Contact your system administrator for further investigation.</source>
-      <translation type="unfinished">This might be due to an expired server certificate or or an invalid certificate. Contact your system administrator for further investigation.</translation>
+      <translation>期限切れまたは無効なサーバー証明書が原因である可能性があります。詳細な調査については、システム管理者にお問い合わせください。</translation>
     </message>
     <message>
       <source>To learn more about the current problem read this %1.</source>
       <comment>%1 is &lt;help article&gt; link</comment>
-      <translation type="unfinished">To learn more about the current problem read this %1.</translation>
+      <translation>現在の問題の詳細については、こちらの %1 を参照してください。</translation>
     </message>
   </context>
   <context>
