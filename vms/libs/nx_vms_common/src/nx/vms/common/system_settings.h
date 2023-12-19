@@ -42,7 +42,6 @@ struct SystemSettingNames
     #define DECLARE_SETTING_NAME(NAME) static const inline QString NAME = NX_FMT( #NAME )
 
     DECLARE_SETTING_NAME(backupSettings);
-    DECLARE_SETTING_NAME(channelPartnerServer);
     DECLARE_SETTING_NAME(cloudAccountName);
     DECLARE_SETTING_NAME(cloudAuthKey);
     DECLARE_SETTING_NAME(cloudHost);
@@ -103,7 +102,6 @@ struct SystemSettingNames
     };
 
     static const inline std::set<QString> kSecurityNames = {
-        channelPartnerServer,
         cloudPollingIntervalS,
         disabledVendors,
         insecureDeprecatedApiEnabled,
@@ -446,9 +444,6 @@ public:
     QString licenseServerUrl() const;
     void setLicenseServerUrl(const QString& value);
 
-    nx::utils::Url channelPartnerServerUrl() const;
-    void setChannelPartnerServerUrl(const nx::utils::Url& value);
-
     nx::utils::Url resourceFileUri() const;
 
     QString cloudNotificationsLanguage() const;
@@ -679,7 +674,6 @@ private:
     QnResourcePropertyAdaptor<nx::vms::api::MetadataStorageChangePolicy>* m_metadataStorageChangePolicyAdaptor = nullptr;
     QnResourcePropertyAdaptor<std::map<QString, int>>* m_specificFeaturesAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_licenseServerUrlAdaptor = nullptr;
-    QnResourcePropertyAdaptor<nx::utils::Url>* m_channelPartnerServerUrlAdaptor = nullptr;
     QnResourcePropertyAdaptor<nx::utils::Url>* m_resourceFileUriAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_cloudNotificationsLanguageAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_additionalLocalFsTypesAdaptor = nullptr;
