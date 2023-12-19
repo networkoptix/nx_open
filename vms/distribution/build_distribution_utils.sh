@@ -133,7 +133,7 @@ distrib_onExit()
 #
 # [in] BUILD_DIR
 #
-distrib_copyMediaserverPluginsToDir() # plugins-folder-name target-dir plugin_lib_name...
+distrib_copyMediaserverPluginsToDir() # target_dir_name plugin_lib_name...
 {
     local -r plugins_dir_name="$1" && shift #< E.g. plugins, plugins_optional.
 
@@ -672,8 +672,11 @@ distrib_copyServerBins() # additional_bins_to_copy...
     install -m 755 "${SCRIPTS_DIR}/upgrade_config.sh" "${stage_bin}/"
 }
 
-# [in] SERVER_PLUGINS
-# [in] SERVER_PLUGINS_OPTIONAL
+# [in] SERVER_PLUGINS[]
+# [in] SERVER_PLUGINS_OPTIONAL[]
+# [in] SERVER_PLUGINS_TO_MOVE_TO_OPTIONAL[]
+# [in] STAGE
+# [in] BIN_INSTALL_PATH
 distrib_copyMediaserverPlugins()
 {
     echo ""
@@ -681,6 +684,19 @@ distrib_copyMediaserverPlugins()
 
     distrib_copyMediaserverPluginsToDir "plugins" "${SERVER_PLUGINS[@]}"
     distrib_copyMediaserverPluginsToDir "plugins_optional" "${SERVER_PLUGINS_OPTIONAL[@]}"
+
+    local -r main_plugin_dir="${STAGE}/${BIN_INSTALL_PATH}/plugins"
+    local -r optional_plugin_dir="${STAGE}/${BIN_INSTALL_PATH}/plugins_optional"
+    local plugin
+    for plugin in "${SERVER_PLUGINS_TO_MOVE_TO_OPTIONAL[@]}"; do
+        if [[ -d "${main_plugin_dir}/${plugin}" ]]; then
+            echo "Moving ${plugin} from ${main_plugin_dir}/ to ${optional_plugin_dir}/"
+            mv "${main_plugin_dir}/${plugin}" "${optional_plugin_dir}/"
+        else
+            echo "Moving lib${plugin}.so from ${main_plugin_dir}/ to ${optional_plugin_dir}/"
+            mv "${main_plugin_dir}/lib${plugin}.so" "${optional_plugin_dir}/"
+        fi
+    done
 }
 
 distrib_createArchive() # archive dir command...
