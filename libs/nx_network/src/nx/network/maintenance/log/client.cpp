@@ -22,12 +22,14 @@ void Client::getConfiguration(
     base_type::template makeAsyncCall<Loggers>(
         http::Method::get,
         kLoggers,
+        {}, // query
         std::move(completionHandler));
 }
 
 std::tuple<Client::ResultCode, Loggers> Client::getConfiguration()
 {
-    return base_type::template makeSyncCall<Loggers>(http::Method::get, kLoggers);
+    return base_type::template makeSyncCall<Loggers>(
+        http::Method::get, kLoggers, nx::utils::UrlQuery());
 }
 
 } // namespace nx::network::maintenance::log

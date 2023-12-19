@@ -10,7 +10,7 @@
 namespace nx::cloud::db::client {
 
 BatchUserProcessingManager::BatchUserProcessingManager(
-    AsyncRequestsExecutor* requestsExecutor):
+    ApiRequestsExecutor* requestsExecutor):
     m_requestsExecutor(requestsExecutor)
 {
 }
@@ -19,20 +19,22 @@ void BatchUserProcessingManager::createUpdateBatch(
     const api::CreateBatchRequest& request,
     std::function<void(api::ResultCode, api::CreateBatchResponse)> completionHandler)
 {
-    m_requestsExecutor->executeRequest<api::CreateBatchResponse>(
+    m_requestsExecutor->makeAsyncCall<api::CreateBatchResponse>(
         nx::network::http::Method::post,
         kSystemUsersBatchPath,
+        {}, //query
         request,
         std::move(completionHandler));
 }
 
 void BatchUserProcessingManager::getBatchState(
-    const std::string & batchId,
+    const std::string& batchId,
     std::function<void(api::ResultCode, api::BatchState)> completionHandler)
 {
-    m_requestsExecutor->executeRequest<api::BatchState>(
+    m_requestsExecutor->makeAsyncCall<api::BatchState>(
         nx::network::http::Method::get,
         nx::network::http::rest::substituteParameters(kSystemUsersBatchStatePath, {batchId}),
+        {}, //query
         std::move(completionHandler));
 }
 
@@ -40,9 +42,10 @@ void BatchUserProcessingManager::getBatchErrorInfo(
     const std::string& batchId,
     std::function<void(api::ResultCode, api::BatchErrorInfo)> completionHandler)
 {
-    m_requestsExecutor->executeRequest<api::BatchErrorInfo>(
+    m_requestsExecutor->makeAsyncCall<api::BatchErrorInfo>(
         nx::network::http::Method::get,
         nx::network::http::rest::substituteParameters(kSystemUsersBatchErrorInfoPath, {batchId}),
+        {}, //query
         std::move(completionHandler));
 }
 

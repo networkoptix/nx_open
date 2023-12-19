@@ -13,7 +13,7 @@ class MaintenanceManager:
     public api::MaintenanceManager
 {
 public:
-    MaintenanceManager(AsyncRequestsExecutor* requestsExecutor);
+    MaintenanceManager(ApiRequestsExecutor* requestsExecutor);
 
     virtual void getConnectionsFromVms(
         std::function<void(api::ResultCode, api::VmsConnectionDataList)> completionHandler) override;
@@ -22,7 +22,7 @@ public:
         std::function<void(api::ResultCode, api::Statistics)> completionHandler) override;
 
 private:
-    AsyncRequestsExecutor* m_requestsExecutor = nullptr;
+    ApiRequestsExecutor* m_requestsExecutor = nullptr;
 };
 
 } // namespace nx::cloud::db::client

@@ -11,7 +11,7 @@ class OauthManager:
     public api::OauthManager
 {
 public:
-    OauthManager(AsyncRequestsExecutor* requestsExecutor);
+    OauthManager(ApiRequestsExecutor* requestsExecutor);
 
     virtual void issueToken(
         const api::IssueTokenRequest& request,
@@ -50,7 +50,7 @@ public:
             completionHandler) override;
 
 private:
-    AsyncRequestsExecutor* m_requestsExecutor = nullptr;
+    ApiRequestsExecutor* m_requestsExecutor = nullptr;
 };
 
 } // namespace nx::cloud::db::client

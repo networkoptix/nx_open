@@ -16,7 +16,7 @@ class AccountManager:
     public api::AccountManager
 {
 public:
-    AccountManager(AsyncRequestsExecutor* requestsExecutor);
+    AccountManager(ApiRequestsExecutor* requestsExecutor);
 
     virtual void registerNewAccount(
         api::AccountRegistrationData accountData,
@@ -67,7 +67,7 @@ public:
         std::function<void(api::ResultCode, api::AccountSecuritySettings)> completionHandler) override;
 
 private:
-    AsyncRequestsExecutor* m_requestsExecutor = nullptr;
+    ApiRequestsExecutor* m_requestsExecutor = nullptr;
 };
 
 } // nx::cloud::db::client

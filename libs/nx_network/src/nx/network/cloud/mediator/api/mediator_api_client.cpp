@@ -28,6 +28,7 @@ void Client::getListeningPeers(
         nx::network::http::Method::get,
         nx::network::http::rest::substituteParameters(
             kStatisticsSystemPeersPath, {systemId}),
+        {}, // query
         std::move(completionHandler));
 }
 
@@ -37,7 +38,8 @@ std::tuple<Client::ResultCode, SystemPeers> Client::getListeningPeers(
     return base_type::template makeSyncCall<SystemPeers>(
         nx::network::http::Method::get,
         nx::network::http::rest::substituteParameters(
-            kStatisticsSystemPeersPath, {systemId}));
+            kStatisticsSystemPeersPath, {systemId}),
+        nx::utils::UrlQuery());
 }
 
 void Client::initiateConnection(
@@ -48,6 +50,7 @@ void Client::initiateConnection(
         nx::network::http::Method::post,
         nx::network::http::rest::substituteParameters(
             kServerSessionsPath, {request.destinationHostName}),
+        {}, // query
         request,
         std::move(completionHandler));
 }
@@ -60,6 +63,7 @@ void Client::reportUplinkSpeed(
         nx::network::http::Method::post,
         nx::network::http::rest::substituteParameters(
             kConnectionSpeedUplinkPathV2, {connectionSpeed.systemId, connectionSpeed.serverId}),
+        {}, // query
         connectionSpeed.connectionSpeed,
         std::move(completionHandler));
 }
@@ -70,6 +74,7 @@ void Client::getStatistics(
     base_type::template makeAsyncCall<Statistics>(
         nx::network::http::Method::get,
         kStatisticsMetricsPath,
+        {}, // query
         std::move(completionHandler));
 }
 
@@ -77,7 +82,8 @@ std::tuple<ResultCode, Statistics> Client::getStatistics()
 {
     return base_type::template makeSyncCall<Statistics>(
         nx::network::http::Method::get,
-        kStatisticsMetricsPath);
+        kStatisticsMetricsPath,
+        nx::utils::UrlQuery());
 }
 
 void Client::getListeningPeersStatistics(
@@ -86,6 +92,7 @@ void Client::getListeningPeersStatistics(
     base_type::template makeAsyncCall<ListeningPeerStatistics>(
         nx::network::http::Method::get,
         kStatisticsListeningPeersPath,
+        {}, // query
         std::move(completionHandler));
 }
 
@@ -93,7 +100,8 @@ std::tuple<ResultCode, ListeningPeerStatistics> Client::getListeningPeersStatist
 {
     return base_type::template makeSyncCall<ListeningPeerStatistics>(
         nx::network::http::Method::get,
-        kStatisticsListeningPeersPath);
+        kStatisticsListeningPeersPath,
+        nx::utils::UrlQuery());
 }
 
 ApiResultCodeDescriptor::ResultCode ApiResultCodeDescriptor::systemErrorCodeToResultCode(

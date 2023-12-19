@@ -11,7 +11,7 @@ namespace nx::cloud::db::client {
 
 using namespace nx::network::http;
 
-OrganizationManager::OrganizationManager(AsyncRequestsExecutor* requestsExecutor):
+OrganizationManager::OrganizationManager(ApiRequestsExecutor* requestsExecutor):
     m_requestsExecutor(requestsExecutor)
 {
 }
@@ -20,9 +20,10 @@ void OrganizationManager::getSystemOffers(
     const std::string& organizationId,
     std::function<void(api::ResultCode, std::vector<api::SystemOffer>)> completionHandler)
 {
-    m_requestsExecutor->executeRequest<std::vector<api::SystemOffer>>(
+    m_requestsExecutor->makeAsyncCall<std::vector<api::SystemOffer>>(
         Method::get,
         rest::substituteParameters(kOrganizationSystemOwnershipOffers, {organizationId}),
+        {}, //query
         std::move(completionHandler));
 }
 
@@ -31,10 +32,11 @@ void OrganizationManager::acceptOffer(
     const std::string& systemId,
     std::function<void(api::ResultCode)> completionHandler)
 {
-    m_requestsExecutor->executeRequest<void>(
+    m_requestsExecutor->makeAsyncCall<void>(
         Method::post,
         rest::substituteParameters(kOrganizationSystemOwnershipOfferAccept,
             {organizationId, systemId}),
+        {}, //query
         std::move(completionHandler));
 }
 
@@ -43,10 +45,11 @@ void OrganizationManager::rejectOffer(
     const std::string& systemId,
     std::function<void(api::ResultCode)> completionHandler)
 {
-    m_requestsExecutor->executeRequest<void>(
+    m_requestsExecutor->makeAsyncCall<void>(
         Method::post,
         rest::substituteParameters(kOrganizationSystemOwnershipOfferReject,
             {organizationId, systemId}),
+        {}, //query
         std::move(completionHandler));
 }
 
