@@ -1293,7 +1293,7 @@ Handle ServerConnection::eventLog(
     params.remove("serverId");
 
     return executeGet(
-        NX_FMT("rest/v3/servers/%1/eventLog", formatRestId(serverId)),
+        NX_FMT("rest/v3/servers/%1/events", formatRestId(serverId)),
         params,
         std::move(callback),
         targetThread,
