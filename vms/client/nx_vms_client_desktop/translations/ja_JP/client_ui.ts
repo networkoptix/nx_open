@@ -1436,7 +1436,7 @@
     </message>
     <message>
       <source>Automatically restore saved windows configuration</source>
-      <translation>保存したウィンドウの設定を自動的に復元する</translation>
+      <translation>保存されたウィンドウ設定を自動的に復元する</translation>
     </message>
     <message>
       <source>Play audio from all cameras on layout</source>

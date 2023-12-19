@@ -146,7 +146,7 @@
     </message>
     <message>
       <source>Show Welcome Screen</source>
-      <translation>ようこそ画面の表示</translation>
+      <translation>初期画面を表示</translation>
     </message>
     <message>
       <source>Tab</source>
@@ -897,7 +897,7 @@
     </message>
     <message>
       <source>Welcome Screen</source>
-      <translation>ようこそ画面</translation>
+      <translation>初期画面</translation>
     </message>
     <message>
       <source>Add Web Page...</source>
