@@ -30,17 +30,16 @@ namespace nx::analytics::db {
 
 struct ObjectPosition
 {
-    /** Device the object has been detected on. */
+    /**%apidoc Id of a Device the Object has been detected on. */
     QnUuid deviceId;
 
     qint64 timestampUs = 0;
     qint64 durationUs = 0;
     QRectF boundingBox;
 
-    /** Variable object attributes. E.g., car speed. */
+    /**%apidoc Attributes of an Object, like a car speed. */
     nx::common::metadata::Attributes attributes;
 };
-
 #define ObjectPosition_analytics_storage_Fields \
     (deviceId)(timestampUs)(durationUs)(boundingBox)(attributes)
 QN_FUSION_DECLARE_FUNCTIONS(ObjectPosition, (json)(ubjson), NX_VMS_COMMON_API);
@@ -48,6 +47,19 @@ NX_REFLECTION_INSTRUMENT(ObjectPosition, ObjectPosition_analytics_storage_Fields
 
 struct NX_VMS_COMMON_API ObjectRegion
 {
+    /**%apidoc
+     * Roughly defines a region on a video frame where the Object(s) were detected, as an array of
+     * bytes encoded in base64.
+     * <br/>
+     * The region is represented as a grid of 32 rows and 44 columns, stored by columns. The grid
+     * coordinate system starts at the top left corner, the row index grows down and the column
+     * index grows right. This grid is represented as a contiguous array, each bit of which
+     * corresponds to the state of a particular cell of the grid (1 if the region includes the
+     * cell, 0 otherwise). The bit index for a cell with coordinates (column, row) can be
+     * calculated using the following formula: bitIndex = gridHeight * column + row.
+     * <br/>
+     * NOTE: This is the same binary format that is used by the VMS for motion detection metadata.
+     */
     QByteArray boundingBoxGrid;
 
     void add(const QRectF& rect);
@@ -109,21 +121,32 @@ NX_REFLECTION_INSTRUMENT(BestShotEx, BestShotEx_analytics_storage_Fields)
 
 struct ObjectTrack
 {
-    /** Device object has been detected on. */
     QnUuid id;
+
+    /**%apidoc Id of a Device the Object has been detected on. */
     QnUuid deviceId;
-    QString objectTypeId; //< TODO: #rvasilenko Rename to bestShotObjectTypeId
-    nx::common::metadata::Attributes attributes; //< TODO: #rvasilenko Rename to bestShotAttributes
+
+    /**%apidoc
+     * %// TODO: #rvasilenko Rename to bestShotObjectTypeId when used for Best Shots.
+     */
+    QString objectTypeId;
+
+    nx::common::metadata::Attributes attributes;
+
     qint64 firstAppearanceTimeUs = 0;
+
     qint64 lastAppearanceTimeUs = 0;
+
     ObjectRegion objectPosition;
+
     BestShot bestShot;
+
     QnUuid analyticsEngineId;
 
-    /**
-     * Groups data under specified value. I.e., it allows to store multiple independent sets of
-     * data in a single DB instead of having to create a separate DB instance for each unique
-     * value of the storageId.
+    /**%apidoc
+     * Groups the data under the specified value. I.e., it allows to store multiple independent
+     * sets of data in a single DB instead of having to create a separate DB instance for each
+     * unique value of the storageId.
      */
     std::string storageId;
 };
