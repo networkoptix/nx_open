@@ -12,6 +12,7 @@
 #include <core/resource/resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/network/http/http_types.h>
 #include <nx/vms/api/types/connection_types.h>
 #include <nx/vms/common/license/license_usage_watcher.h>
 #include <nx/vms/common/saas/saas_service_manager.h>
@@ -735,29 +736,28 @@ VideoWallLicenseUsageProposer::~VideoWallLicenseUsageProposer()
 
 const QString ChannelPartnerServer::baseUrl(const common::SystemSettings* settings)
 {
-    auto result = settings->channelPartnerServerUrl().toString();
-    result = result.trimmed();
-    while (result.endsWith('/'))
-        result.chop(1);
-    return result + "/api/v2";
+    auto url = nx::utils::Url::fromUserInput(settings->cloudHost());
+    url.setScheme(nx::network::http::kSecureUrlSchemeName);
+    url.setPath("/partners/api/v2");
+    return url.toString();
 }
 
 const nx::utils::Url ChannelPartnerServer::reportUrl(const common::SystemSettings* settings)
 {
     const auto systemId = settings->cloudSystemId();
-    return baseUrl(settings) + NX_FMT("/partners/cloud_systems/%1/system_usage_report/", systemId);
+    return baseUrl(settings) + NX_FMT("/cloud_systems/%1/system_usage_report/", systemId);
 }
 
 const nx::utils::Url ChannelPartnerServer::saasServicesUrl(const common::SystemSettings* settings)
 {
     const auto systemId = settings->cloudSystemId();
-    return baseUrl(settings) + NX_FMT("/partners/cloud_systems/%1/services/", systemId);
+    return baseUrl(settings) + NX_FMT("/cloud_systems/%1/services/", systemId);
 }
 
 const nx::utils::Url ChannelPartnerServer::saasDataUrl(const common::SystemSettings* settings)
 {
     const auto systemId = settings->cloudSystemId();
-    return baseUrl(settings) + NX_FMT("/partners/cloud_systems/%1/saas_report/", systemId);
+    return baseUrl(settings) + NX_FMT("/cloud_systems/%1/saas_report/", systemId);
 }
 
 } // namespace nx::vms::license
