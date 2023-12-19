@@ -19,6 +19,7 @@ void MaintenanceClient::getRelays(
     base_type::template makeAsyncCall<api::Relays>(
         nx::network::http::Method::get,
         kDbRelaysPath,
+        {}, // query
         std::move(handler));
 }
 
@@ -26,7 +27,8 @@ std::tuple<api::Result, api::Relays> MaintenanceClient::getRelays()
 {
     return base_type::template makeSyncCall<api::Relays>(
         nx::network::http::Method::get,
-        kDbRelaysPath);
+        kDbRelaysPath,
+        nx::utils::UrlQuery()); // query
 }
 
 void MaintenanceClient::deleteRelay(
@@ -36,6 +38,7 @@ void MaintenanceClient::deleteRelay(
     base_type::template makeAsyncCall<void>(
         nx::network::http::Method::delete_,
         nx::network::http::rest::substituteParameters(kDbRelayPath, {name}),
+        {}, // query
         std::move(handler));
 }
 
@@ -43,7 +46,8 @@ api::Result MaintenanceClient::deleteRelay(const std::string& name)
 {
     return std::get<0>(base_type::template makeSyncCall<void>(
         nx::network::http::Method::delete_,
-        nx::network::http::rest::substituteParameters(kDbRelayPath, {name})));
+        nx::network::http::rest::substituteParameters(kDbRelayPath, {name}),
+        nx::utils::UrlQuery()));
 }
 
 } // namespace nx::cloud::relay::api

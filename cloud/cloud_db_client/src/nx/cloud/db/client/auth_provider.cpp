@@ -11,7 +11,7 @@
 
 namespace nx::cloud::db::client {
 
-AuthProvider::AuthProvider(AsyncRequestsExecutor* requestsExecutor):
+AuthProvider::AuthProvider(ApiRequestsExecutor* requestsExecutor):
     m_requestsExecutor(requestsExecutor)
 {
 }
@@ -19,8 +19,10 @@ AuthProvider::AuthProvider(AsyncRequestsExecutor* requestsExecutor):
 void AuthProvider::getCdbNonce(
     std::function<void(api::ResultCode, api::NonceData)> completionHandler)
 {
-    m_requestsExecutor->executeRequest<api::NonceData>(
+    m_requestsExecutor->makeAsyncCall<api::NonceData>(
+        nx::network::http::Method::get,
         kAuthGetNoncePath,
+        {}, //query
         std::move(completionHandler));
 }
 
@@ -28,10 +30,13 @@ void AuthProvider::getCdbNonce(
     const std::string& systemId,
     std::function<void(api::ResultCode, api::NonceData)> completionHandler)
 {
-    m_requestsExecutor->executeRequest<api::NonceData>(
+    nx::utils::UrlQuery query;
+    query.addQueryItem("systemId", systemId);
+
+    m_requestsExecutor->makeAsyncCall<api::NonceData>(
         nx::network::http::Method::get,
         kAuthGetNoncePath,
-        api::SystemId(systemId),
+        query,
         std::move(completionHandler));
 }
 
@@ -39,9 +44,10 @@ void AuthProvider::getAuthenticationResponse(
     const api::AuthRequest& authRequest,
     std::function<void(api::ResultCode, api::AuthResponse)> completionHandler)
 {
-    m_requestsExecutor->executeRequest<api::AuthResponse>(
+    m_requestsExecutor->makeAsyncCall<api::AuthResponse>(
         nx::network::http::Method::post,
         kAuthGetAuthenticationPath,
+        {}, //query
         authRequest,
         std::move(completionHandler));
 }
@@ -62,9 +68,10 @@ void AuthProvider::resolveUserCredentials(
     const api::UserAuthorization& authorization,
     std::function<void(api::ResultCode, api::CredentialsDescriptor)> completionHandler)
 {
-    m_requestsExecutor->executeRequest<api::CredentialsDescriptor>(
+    m_requestsExecutor->makeAsyncCall<api::CredentialsDescriptor>(
         nx::network::http::Method::post,
         kAuthResolveUserCredentials,
+        {}, //query
         authorization,
         std::move(completionHandler));
 }
@@ -76,9 +83,10 @@ void AuthProvider::resolveUserCredentialsList(
 {
     static constexpr char kCacheControl[] = "Cache-Control";
 
-    m_requestsExecutor->executeRequest<api::CredentialsDescriptorList, HttpHeaderFetcher<kCacheControl>>(
+    m_requestsExecutor->makeAsyncCall<api::CredentialsDescriptorList, HttpHeaderFetcher<kCacheControl>>(
         nx::network::http::Method::post,
         kAuthResolveUserCredentialsList,
+        {}, //query
         authorizationList,
         std::move(completionHandler));
 }
@@ -88,9 +96,10 @@ void AuthProvider::getSystemAccessLevel(
     const api::UserAuthorization& authorization,
     std::function<void(api::ResultCode, api::SystemAccess)> completionHandler)
 {
-    m_requestsExecutor->executeRequest<api::SystemAccess>(
+    m_requestsExecutor->makeAsyncCall<api::SystemAccess>(
         nx::network::http::Method::post,
         network::http::rest::substituteParameters(kAuthSystemAccessLevel, {systemId}),
+        {}, //query
         authorization,
         std::move(completionHandler));
 }
@@ -173,12 +182,13 @@ void AuthProvider::getVmsServerTlsPublicKey(
 
     static constexpr char kExpiresHeader[] = "Expires";
 
-    m_requestsExecutor->executeRequest<api::VmsServerCertificatePublicKey, HttpHeaderFetcher<kExpiresHeader>>(
+    m_requestsExecutor->makeAsyncCall<api::VmsServerCertificatePublicKey, HttpHeaderFetcher<kExpiresHeader>>(
         nx::network::http::Method::get,
         network::http::rest::substituteParameters(
             std::string(kAuthVmsServerCertificatePublicKey)
                 + "?valid=" + (isValid ? "1" : "0"),
             {systemId, serverId, fingerprint}),
+        {}, //query
         std::move(completionHandlerWrapper));
 }
 

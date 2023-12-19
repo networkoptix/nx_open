@@ -20,7 +20,9 @@ class Connection:
     public api::Connection
 {
 public:
-    Connection(network::cloud::CloudModuleUrlFetcher* const endPointFetcher);
+    Connection(
+        const nx::utils::Url& baseUrl,
+        nx::network::ssl::AdapterFunc adapterFunc);
 
     virtual api::AccountManager* accountManager() override;
     virtual api::SystemManager* systemManager() override;
@@ -51,7 +53,7 @@ public:
         std::function<void(api::ResultCode, api::ModuleInfo)> completionHandler) override;
 
 private:
-    AsyncRequestsExecutor m_requestExecutor;
+    ApiRequestsExecutor m_requestExecutor;
     AccountManager m_accountManager;
     SystemManager m_systemManager;
     OrganizationManager m_organizationManager;

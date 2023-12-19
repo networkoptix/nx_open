@@ -13,7 +13,7 @@ class SystemManager:
     public api::SystemManager
 {
 public:
-    SystemManager(AsyncRequestsExecutor* requestsExecutor);
+    SystemManager(ApiRequestsExecutor* requestsExecutor);
 
     virtual void bindSystem(
         api::SystemRegistrationData registrationData,
@@ -170,7 +170,7 @@ public:
         std::function<void(api::ResultCode)> completionHandler) override;
 
 private:
-    AsyncRequestsExecutor* m_requestsExecutor = nullptr;
+    ApiRequestsExecutor* m_requestsExecutor = nullptr;
 };
 
 } // namespace nx::cloud::db::client

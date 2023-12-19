@@ -13,7 +13,7 @@ class BatchUserProcessingManager:
     public api::BatchUserProcessingManager
 {
 public:
-    BatchUserProcessingManager(AsyncRequestsExecutor* requestsExecutor);
+    BatchUserProcessingManager(ApiRequestsExecutor* requestsExecutor);
 
     virtual void createUpdateBatch(
         const api::CreateBatchRequest& request,
@@ -28,8 +28,7 @@ public:
         std::function<void(api::ResultCode, api::BatchErrorInfo)> completionHandler) override;
 
 private:
-
-    AsyncRequestsExecutor* m_requestsExecutor = nullptr;
+    ApiRequestsExecutor* m_requestsExecutor = nullptr;
 };
 
 } // namespace nx::cloud::db::client
