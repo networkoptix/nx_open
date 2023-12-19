@@ -667,7 +667,11 @@ ActionPtr ActionBuilder::buildAction(const AggregatedEventPtr& aggregatedEvent)
 void ActionBuilder::handleAggregatedEvents()
 {
     for (const auto& event: m_aggregator->popEvents())
+    {
+        NX_VERBOSE(
+            this, "Aggregated event %1(%2) was sent to execution", event->type(), event->state());
         buildAndEmitAction(event);
+    }
 }
 
 Engine* ActionBuilder::engine() const
