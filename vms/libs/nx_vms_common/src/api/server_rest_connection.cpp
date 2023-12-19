@@ -1316,7 +1316,7 @@ Handle ServerConnection::getCameraCredentials(
                 QByteArray result,
                 const nx::network::http::HttpHeaders& /*headers*/)
             {
-                nx::vms::api::DeviceModel resultObject;
+                nx::vms::api::DeviceModelV1 resultObject;
 
                 static const auto kMaskedPassword = QLatin1String("******");
 

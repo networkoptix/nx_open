@@ -9,10 +9,18 @@ bool deserialize(QnJsonContext* /*ctx*/, const QJsonValue& value, ResolutionData
 {
     if (value.isString())
     {
+        const auto str = value.toString().toStdString();
+
+        // Regex below fails for this case.
+        if (str == "-1p")
+        {
+            target->size = QSize();
+            return true;
+        }
+
         std::regex re("^([+-]?\\d+)([px])([+-]?\\d+)?$");
         std::smatch match;
 
-        const auto str = value.toString().toStdString();
         if (!std::regex_search(str, match, re))
             return false;
 

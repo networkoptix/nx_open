@@ -4,6 +4,7 @@
 
 #include <common/common_globals.h>
 #include <core/resource/resource_fwd.h>
+#include <nx/vms/api/data/media_stream_capability.h>
 
 namespace nx { namespace media { struct CameraStreamCapability; } }
 
@@ -22,7 +23,7 @@ struct NX_VMS_COMMON_API CameraBitrateCalculator
         QSize resolution,
         int fps,
         const QString& codec,
-        media::CameraStreamCapability streamCapability,
+        nx::vms::api::CameraStreamCapability streamCapability,
         bool useBitratePerGop);
 
     static float roundKbpsToMbps(float kbps, int decimals = 1);

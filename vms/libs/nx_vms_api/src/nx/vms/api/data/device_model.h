@@ -6,8 +6,14 @@
 #include <tuple>
 #include <type_traits>
 
+#include <QtCore/QString>
+
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/instrument.h>
+#include <nx/utils/uuid.h>
+// #include <nx/vms/api/data/camera_media_stream_info.h> // TODO: #skolesnik
+#include <nx/vms/api/analytics/device_agent_manifest.h>
+#include <nx/vms/api/data/media_stream_capability.h>
 #include <nx/vms/api/types/device_type.h>
 
 #include "camera_attributes_data.h"
@@ -29,7 +35,10 @@ struct DeviceGroupSettings
 QN_FUSION_DECLARE_FUNCTIONS(DeviceGroupSettings, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(DeviceGroupSettings, DeviceGroupSettings_Fields);
 
-struct NX_VMS_API DeviceModelGeneral
+/**%apidoc Device information object.
+ * %param[opt]:object parameters Device specific key-value parameters.
+ */
+struct NX_VMS_API DeviceModelGeneral: ResourceWithParameters
 {
     /**%apidoc Depends on `physicalId`. Calculated automatically by default. */
     QnUuid id;
@@ -80,23 +89,43 @@ struct NX_VMS_API DeviceModelGeneral
      */
     std::optional<Credentials> credentials;
 
-    DeviceModelGeneral() = default;
-    explicit DeviceModelGeneral(CameraData data);
-
+    static DeviceModelGeneral fromCameraData(CameraData data);
     CameraData toCameraData() &&;
+
+    using DbReadTypes = std::tuple<CameraData,
+        CameraAttributesData,
+        ResourceStatusDataList,
+        ResourceParamWithRefDataList>;
+
+    using DbUpdateTypes = std::tuple<CameraData,
+        std::optional<CameraAttributesData>,
+        std::optional<ResourceStatusData>,
+        ResourceParamWithRefDataList>;
+
+    using DbListTypes = std::tuple<CameraDataList,
+        CameraAttributesDataList,
+        ResourceStatusDataList,
+        ResourceParamWithRefDataList>;
+
+    [[nodiscard]] QnUuid getId() const { return id; }
+    void setId(QnUuid id_) { id = id_; }
+    static_assert(isCreateModelV<DeviceModelGeneral>);
+    static_assert(isUpdateModelV<DeviceModelGeneral>);
+    static_assert(isFlexibleIdModelV<DeviceModelGeneral>);
 };
 #define DeviceModelGeneral_Fields \
-    (id)(name)(url)(typeId)(mac)(serverId)(physicalId)(isManuallyAdded)(vendor)(model)(group)(credentials)
+    (id)(name)(url)(typeId)(mac)(serverId)(physicalId) \
+    (isManuallyAdded)(vendor)(model)(group)(credentials)(parameters)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST_EX(DeviceModelGeneral, (json))
 NX_REFLECTION_INSTRUMENT(DeviceModelGeneral, DeviceModelGeneral_Fields);
 
+/**%apidoc
+ * %param[unused]:object parameters Device specific key-value parameters.
+ */
 struct NX_VMS_API DeviceModelForSearch: DeviceModelGeneral
 {
     /**%apidoc Whether Device was already found. */
     bool wasAlreadyFound = false;
-
-    DeviceModelForSearch() = default;
-    explicit DeviceModelForSearch(CameraData cameraData);
 };
 #define DeviceModelForSearch_Fields DeviceModelGeneral_Fields(wasAlreadyFound)
 QN_FUSION_DECLARE_FUNCTIONS(DeviceModelForSearch, (json), NX_VMS_API)
@@ -263,12 +292,7 @@ NX_REFLECTION_ENUM_CLASS(DeviceCapability,
 )
 Q_DECLARE_FLAGS(DeviceCapabilities, DeviceCapability)
 
-
-// TODO #lbusygin: Remove 'isLicenseUsed' field in v2, it is duplicated by 'schedule.enabled'.
-/**%apidoc Device information object.
- * %param[opt]:object parameters Device specific key-value parameters.
- */
-struct NX_VMS_API DeviceModel: DeviceModelGeneral, ResourceWithParameters
+struct NX_VMS_API DeviceModelV1: DeviceModelGeneral
 {
     /**%apidoc[opt] */
     QString logicalId;
@@ -291,54 +315,47 @@ struct NX_VMS_API DeviceModel: DeviceModelGeneral, ResourceWithParameters
     /**%apidoc[opt] */
     CameraBackupQuality backupQuality = CameraBackupDefault;
 
+    /**%apidoc[immutable] */
+    std::optional<DeviceCapabilities> capabilities;
+
     /**%apidoc[immutable]
      * %// Appeared starting from /rest/v2/devices.
      */
     std::optional<DeviceType> deviceType;
 
-    /**%apidoc[immutable] */
-    std::optional<DeviceCapabilities> capabilities;
+    DbUpdateTypes toDbTypes() &&;
+    static std::vector<DeviceModelV1> fromDbTypes(DbListTypes data);
+};
+#define DeviceModelV1_Fields DeviceModelGeneral_Fields \
+    (logicalId)(options)(schedule) (motion) (status) (isLicenseUsed) \
+    (backupQuality) (capabilities) (deviceType)
+QN_FUSION_DECLARE_FUNCTIONS(DeviceModelV1, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(DeviceModelV1, DeviceModelV1_Fields);
 
-    DeviceModel() = default;
-    explicit DeviceModel(CameraData cameraData);
+struct NX_VMS_API DeviceModelV3: DeviceModelV1
+{
+    /**%apidoc[readonly] */
+    std::vector<QnUuid> compatibleAnalyticsEngineIds;
 
-    using DbReadTypes = std::tuple<
-        CameraData,
-        CameraAttributesData,
-        ResourceStatusDataList,
-        ResourceParamWithRefDataList
-    >;
+    /**%apidoc[readonly] */
+    CameraMediaCapability mediaCapabilities;
 
-    using DbUpdateTypes = std::tuple<
-        CameraData,
-        std::optional<CameraAttributesData>,
-        std::optional<ResourceStatusData>,
-        ResourceParamWithRefDataList
-    >;
+    // TODO: #skolesnik Apidoc, move to vms api from common
+    //    std::optional<CameraMediaStreams> mediaStreams;
 
-    using DbListTypes = std::tuple<
-        CameraDataList,
-        CameraAttributesDataList,
-        ResourceStatusDataList,
-        ResourceParamWithRefDataList
-    >;
+    /**%apidoc[readonly] */
+    std::optional<QJsonObject> streamUrls;
 
-    QnUuid getId() const { return id; }
-    void setId(QnUuid id_) { id = std::move(id_); }
-    static_assert(isCreateModelV<DeviceModel>);
-    static_assert(isUpdateModelV<DeviceModel>);
-    static_assert(isFlexibleIdModelV<DeviceModel>);
+    std::optional<std::vector<QnUuid>> userEnabledAnalyticsEngineIds;
 
     DbUpdateTypes toDbTypes() &&;
-    static std::vector<DeviceModel> fromDbTypes(DbListTypes data);
-
-    void extractFromList(const QnUuid& id, ResourceParamWithRefDataList* list);
+    static std::vector<DeviceModelV3> fromDbTypes(DbListTypes data);
 };
-#define DeviceModel_Fields DeviceModelGeneral_Fields \
-    (parameters)(logicalId)(status)(options)(schedule)(motion)(isLicenseUsed)(backupQuality) \
-    (deviceType)(capabilities)
-QN_FUSION_DECLARE_FUNCTIONS(DeviceModel, (json), NX_VMS_API)
-NX_REFLECTION_INSTRUMENT(DeviceModel, DeviceModel_Fields);
+#define DeviceModelV3_Fields DeviceModelGeneral_Fields DeviceModelV1_Fields \
+    (compatibleAnalyticsEngineIds)(mediaCapabilities)(streamUrls)           \
+    (userEnabledAnalyticsEngineIds)(parameters)
+QN_FUSION_DECLARE_FUNCTIONS(DeviceModelV3, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(DeviceModelV3, DeviceModelV3_Fields);
 
 struct NX_VMS_API DeviceTypeModel
 {
@@ -350,5 +367,7 @@ struct NX_VMS_API DeviceTypeModel
 #define DeviceTypeModel_Fields (id)(parentId)(name)(manufacturer)
 QN_FUSION_DECLARE_FUNCTIONS(DeviceTypeModel, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(DeviceTypeModel, DeviceTypeModel_Fields);
+
+using DeviceModel = DeviceModelV3;
 
 } // namespace nx::vms::api

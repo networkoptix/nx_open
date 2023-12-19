@@ -1,10 +1,10 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "media_stream_capability.h"
+
 #include <nx/fusion/model_functions.h>
 
-namespace nx {
-namespace media {
+namespace nx::vms::api {
 
 CameraStreamCapability::CameraStreamCapability(float minBitrate, float maxBitrate, int fps)
 :
@@ -27,5 +27,4 @@ QString CameraStreamCapability::toString() const
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(CameraStreamCapability, (json), CameraStreamCapability_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(CameraMediaCapability, (json), CameraMediaCapability_Fields)
 
-} // namespace media
-} // namespace nx
+} // namespace nx::vms::api
