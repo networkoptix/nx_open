@@ -22,7 +22,7 @@ namespace nx::vms::client::core {
 namespace {
 
 QStringList kThemeSpecificColors = {
-    "red", "red_l", "red_d", "red_bg",
+    "red", "red_l", "red_d",
     "blue", "blue_l", "blue_d",
     "green", "green_l", "green_d",
     "yellow", "yellow_l", "yellow_d"
@@ -226,10 +226,6 @@ void ColorTheme::Private::loadColors(const QString& mainColorsFile, const QStrin
     reader.addColors(currentSkinColors);
 
     ColorTree actualColorTree = reader.getColorTree();
-
-    // A quick fix, since MessageBars explicitly use red_bg color now.
-    if (!actualColorTree.getRootColors().contains("red_bg"))
-        reader.addColors({{"red_bg", actualColorTree.getRootColors().value("red_d3").name()}});
 
     const QJsonObject generatedColors =
         QStringList{"rainbow", "generated"}.contains(ini().colorTheme)
