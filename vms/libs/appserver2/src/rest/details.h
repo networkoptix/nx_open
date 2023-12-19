@@ -3,6 +3,7 @@
 #pragma once
 
 #include <nx/utils/member_detector.h>
+#include <nx/utils/type_traits.h>
 
 namespace ec2::details {
 
@@ -12,26 +13,6 @@ MEMBER_CHECKER(toDbTypes);
 MEMBER_CHECKER(kResourceTypeId);
 MEMBER_CHECKER(id);
 #undef MEMBER_CHECKER
-
-template<typename>
-struct IsVector: std::false_type
-{
-};
-
-template<typename T, typename A>
-struct IsVector<std::vector<T, A>>: std::true_type
-{
-};
-
-template<typename>
-struct IsOptional: std::false_type
-{
-};
-
-template<typename T>
-struct IsOptional<std::optional<T>>: std::true_type
-{
-};
 
 template<typename F, typename... Args, size_t... Is>
 auto callQueryFuncImpl(const std::tuple<Args...>& t, F&& f, std::index_sequence<Is...>)
@@ -62,7 +43,7 @@ Result callUpdateFunc(const std::tuple<Args...>& t, F&& f)
 template<typename Data, typename Functor>
 auto invokeOnVector(Data&& data, Functor&& functor)
 {
-    if constexpr (IsVector<std::decay_t<decltype(data)>>::value)
+    if constexpr (nx::utils::IsVector<std::decay_t<decltype(data)>>::value)
         return functor(std::decay_t<decltype(data[0])>());
     else
         return functor(std::move(data));
@@ -71,7 +52,7 @@ auto invokeOnVector(Data&& data, Functor&& functor)
 template<typename Data, typename Functor>
 auto invokeOnOptional(Data&& data, Functor&& functor)
 {
-    if constexpr (IsOptional<std::decay_t<decltype(data)>>::value)
+    if constexpr (nx::utils::IsOptional<std::decay_t<decltype(data)>>::value)
         return invokeOnVector(std::decay_t<decltype(*data)>(), std::move(functor));
     else
         return invokeOnVector(std::move(data), std::move(functor));
@@ -140,7 +121,7 @@ void assertModelToDbTypesProducedValidResult(const DbType& value, const Id& id)
     if constexpr (!std::is_same_v<DbType, IgnoredDbType>
         && !std::is_same_v<DbType, nx::vms::api::ResourceStatusData>)
     {
-        if constexpr (IsVector<DbType>::value)
+        if constexpr (nx::utils::IsVector<DbType>::value)
         {
             NX_ASSERT(std::find_if(value.begin(),
                           value.end(),

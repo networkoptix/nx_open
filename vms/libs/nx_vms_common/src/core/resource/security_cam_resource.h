@@ -7,12 +7,12 @@
 #include <core/dataprovider/live_stream_params.h>
 #include <core/misc/schedule_task.h>
 #include <core/resource/media_resource.h>
-#include <core/resource/media_stream_capability.h>
 #include <core/resource/network_resource.h>
 #include <nx/core/resource/using_media2_type.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/value_cache.h>
 #include <nx/vms/api/data/device_model.h>
+#include <nx/vms/api/data/media_stream_capability.h>
 #include <nx/vms/common/resource/camera_hotspots_data.h>
 #include <nx/vms/common/resource/remote_archive_types.h>
 #include <nx/vms/event/event_fwd.h>
@@ -208,8 +208,8 @@ public:
     void setCameraCapabilities(nx::vms::api::DeviceCapabilities capabilities);
     void setCameraCapability(nx::vms::api::DeviceCapability capability, bool value);
 
-    nx::media::CameraMediaCapability cameraMediaCapability() const;
-    void setCameraMediaCapability(const nx::media::CameraMediaCapability& value);
+    nx::vms::api::CameraMediaCapability cameraMediaCapability() const;
+    void setCameraMediaCapability(const nx::vms::api::CameraMediaCapability& value);
 
     bool isRecordingEventAttached() const;
 
@@ -669,7 +669,7 @@ private:
     nx::utils::CachedValue<MotionType> m_motionType;
     nx::utils::CachedValue<bool> m_cachedIsIOModule;
     nx::utils::CachedValue<bool> m_cachedCanConfigureRemoteRecording;
-    nx::utils::CachedValue<nx::media::CameraMediaCapability> m_cachedCameraMediaCapabilities;
+    nx::utils::CachedValue<nx::vms::api::CameraMediaCapability> m_cachedCameraMediaCapabilities;
     nx::utils::CachedValue<nx::vms::api::DeviceType> m_cachedExplicitDeviceType;
     nx::utils::CachedValue<MotionStreamIndex> m_cachedMotionStreamIndex;
     nx::utils::CachedValue<QnIOPortDataList> m_cachedIoPorts;

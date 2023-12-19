@@ -52,7 +52,7 @@ public:
             [id = std::move(filter.getId()), &processor](auto&& x)
             {
                 using Arg = std::decay_t<decltype(x)>;
-                using Output = std::conditional_t<IsVector<Arg>::value, Arg, std::vector<Arg>>;
+                using Output = std::conditional_t<nx::utils::IsVector<Arg>::value, Arg, std::vector<Arg>>;
                 auto future = processor.template processQueryAsync<decltype(id), Output>(
                     getReadCommand<Output>(),
                     std::move(id),
@@ -115,7 +115,7 @@ public:
                     using DbType = std::decay_t<decltype(x)>;
                     Result result;
                     assertModelToDbTypesProducedValidResult<IgnoredDbType, DbType, Model>(x, id);
-                    if constexpr (IsVector<DbType>::value)
+                    if constexpr (nx::utils::IsVector<DbType>::value)
                     {
                         const auto command = getUpdateCommand<std::decay_t<decltype(x[0])>>();
                         result = copy.template processMultiUpdateSync<DbType>(
@@ -141,7 +141,7 @@ public:
                         std::move(items),
                         [update = std::move(update), &copy, list](auto&& x) mutable
                         {
-                            if constexpr (IsOptional<std::decay_t<decltype(x)>>::value)
+                            if constexpr (nx::utils::IsOptional<std::decay_t<decltype(x)>>::value)
                                 return x ? update(std::move(*x), copy, list) : Result();
                             else
                                 return update(std::move(x), copy, list);

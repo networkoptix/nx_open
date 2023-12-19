@@ -2,18 +2,16 @@
 
 #pragma once
 
-#include <QtCore/QMap>
-#include <QtCore/QSize>
+#include <map>
 
-#include <common/common_globals.h>
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/enum_instrument.h>
 #include <nx/vms/api/data/resolution_data.h>
+#include <nx/vms/api/types/motion_types.h>
 
-namespace nx {
-namespace media {
+namespace nx::vms::api {
 
-struct NX_VMS_COMMON_API CameraStreamCapability
+struct NX_VMS_API CameraStreamCapability
 {
     float minBitrateKbps = 0;
     float maxBitrateKbps = 0;
@@ -26,19 +24,25 @@ struct NX_VMS_COMMON_API CameraStreamCapability
     QString toString() const;
 };
 #define CameraStreamCapability_Fields (minBitrateKbps)(maxBitrateKbps)(defaultBitrateKbps)(defaultFps)(maxFps)
-QN_FUSION_DECLARE_FUNCTIONS(CameraStreamCapability, (json), NX_VMS_COMMON_API)
+QN_FUSION_DECLARE_FUNCTIONS(CameraStreamCapability, (json), NX_VMS_API)
 
-struct NX_VMS_COMMON_API CameraMediaCapability
+struct NX_VMS_API CameraMediaCapability
 {
-    QMap<nx::vms::api::StreamIndex, CameraStreamCapability> streamCapabilities;
+    std::map<nx::vms::api::StreamIndex, CameraStreamCapability> streamCapabilities;
     bool hasDualStreaming = false;
     bool hasAudio = false;
+
+    /**%apidoc:string
+     * Resolution in format `{width}x{height}`. The string either may contain width
+     * and height (for instance 320x240) or height only (for instance 240p).
+     * By default, 640x480 is used.
+     */
     nx::vms::api::ResolutionData maxResolution;
 
     // TODO: move more fields to here like io port settings e.t.c
 };
 #define CameraMediaCapability_Fields (streamCapabilities)(hasDualStreaming)(hasAudio)(maxResolution)
-QN_FUSION_DECLARE_FUNCTIONS(CameraMediaCapability, (json), NX_VMS_COMMON_API)
+QN_FUSION_DECLARE_FUNCTIONS(CameraMediaCapability, (json), NX_VMS_API)
 
 NX_REFLECTION_ENUM_CLASS(CameraTraitType,
     aspectRatioDependent = 1
@@ -51,5 +55,4 @@ using CameraTraitNameString = QString;
 using CameraTraitAttributes = std::map<QString, QString>;
 using CameraTraits = std::map<CameraTraitNameString, CameraTraitAttributes>;
 
-} // media
-} // nx
+} // namespace nx::vms::api
