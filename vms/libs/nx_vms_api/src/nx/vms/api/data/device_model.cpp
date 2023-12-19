@@ -2,32 +2,342 @@
 
 #include "device_model.h"
 
-#include <nx/utils/std/algorithm.h>
-#include <nx/fusion/model_functions.h>
+#include <iterator>
+#include <unordered_map>
 
-static const QString kCredentials("credentials");
-static const QString kDefaultCredentials("defaultCredentials");
-static const QString kCameraCapabilities("cameraCapabilities");
+#include <nx/fusion/model_functions.h>
+#include <nx/utils/std/algorithm.h>
 
 namespace nx::vms::api {
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DeviceGroupSettings, (json), DeviceGroupSettings_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DeviceModelGeneral, (json), DeviceModelGeneral_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DeviceOptions, (json), DeviceOptions_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DeviceScheduleSettings, (json), DeviceScheduleSettings_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DeviceMotionSettings, (json), DeviceMotionSettings_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DeviceModelV1, (json), DeviceModelV1_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DeviceModelV3, (json), DeviceModelV3_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DeviceModelForSearch, (json), DeviceModelForSearch_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DeviceTypeModel, (json), DeviceTypeModel_Fields)
 
-DeviceModelGeneral::DeviceModelGeneral(CameraData data):
-    id(std::move(data.id)),
-    physicalId(std::move(data.physicalId)),
-    url(std::move(data.url)),
-    typeId(std::move(data.typeId)),
-    name(std::move(data.name)),
-    mac(std::move(data.mac)),
-    serverId(std::move(data.parentId)),
-    isManuallyAdded(std::move(data.manuallyAdded)),
-    vendor(std::move(data.vendor)),
-    model(std::move(data.model))
+namespace {
+// TODO: #skolesnik Solve duplication of constant's definitions.
+const QString kCompatibleAnalyticsEnginesProperty = "compatibleAnalyticsEngines";
+const QString kMediaCapabilities = "mediaCapabilities";
+const QString kMediaStreams = "mediaStreams";
+const QString kStreamUrls = "streamUrls";
+const QString kUserEnabledAnalyticsEnginesProperty = "userEnabledAnalyticsEngines";
+
+const QString kCredentials("credentials");
+const QString kDefaultCredentials("defaultCredentials");
+const QString kCameraCapabilities("cameraCapabilities");
+
+void extractParametersToFields(DeviceModelV1* m)
 {
-    if (!data.groupId.isEmpty() || !data.groupName.isEmpty())
-        group = DeviceGroupSettings{std::move(data.groupId), std::move(data.groupName)};
+    if (const auto it = m->parameters.find(kCredentials); it != m->parameters.end())
+    {
+        if (const auto value = it->second.toString(); !value.isEmpty())
+            m->credentials = Credentials::parseColon(value, /*hidePassword*/ false);
+        m->parameters.erase(it);
+    }
+
+    if (const auto it = m->parameters.find(kDefaultCredentials); it != m->parameters.end())
+    {
+        if (!m->credentials)
+        {
+            if (const auto value = it->second.toString(); !value.isEmpty())
+                m->credentials = Credentials::parseColon(value, /*hidePassword*/ false);
+        }
+        m->parameters.erase(it);
+    }
+
+    if (const auto it = m->parameters.find(kCameraCapabilities); it != m->parameters.end())
+    {
+        m->capabilities = static_cast<DeviceCapabilities>(it->second.toInt());
+        m->parameters.erase(it);
+    }
+    else
+    {
+        m->capabilities = DeviceCapability::noCapabilities;
+    }
+}
+
+void extractParametersToFields(DeviceModelV3* m)
+{
+    extractParametersToFields(static_cast<DeviceModelV1*>(m));
+
+    if (const auto it = m->parameters.find(kCompatibleAnalyticsEnginesProperty); it != m->parameters.end())
+    {
+        QJson::deserialize(it->second, &m->compatibleAnalyticsEngineIds);
+        m->parameters.erase(it);
+    }
+
+    if (const auto it = m->parameters.find(kMediaCapabilities); it != m->parameters.end())
+    {
+        QJson::deserialize(it->second, &m->mediaCapabilities);
+        m->parameters.erase(it);
+    }
+
+    // MapField{kMediaStreams, &DeviceModelV3::mediaStreams}, // TODO: #skolesnik
+
+    if (const auto it = m->parameters.find(kStreamUrls);
+        it != m->parameters.end() /*&& NX_ASSERT(it->second.isObject())*/)
+    {
+        m->streamUrls = it->second.toObject();
+        m->parameters.erase(it);
+    }
+
+    if (const auto it = m->parameters.find(kUserEnabledAnalyticsEnginesProperty);
+        it != m->parameters.end())
+    {
+        m->userEnabledAnalyticsEngineIds = std::vector<QnUuid>();
+        auto& value = *m->userEnabledAnalyticsEngineIds;
+        QJson::deserialize(it->second, &value);
+        m->parameters.erase(it);
+    }
+}
+
+// Fields that marked as `readonly` for apidoc must not be included here, because they are ignored
+// by the Schema, hence are not initialized (empty). Having such fields in the `kExtractedOnRequest`
+// list will result in creating the corresponding `parameters["field_name"]` with default emtpy
+// value.
+void moveFieldsToParameters(DeviceModelV1* m)
+{
+    // This code has been copied as is. It didn't invalidate the `credentials` field.
+    if (m->credentials)
+        m->parameters[kCredentials] = m->credentials->asString();
+}
+
+// Fields that marked as `readonly` for apidoc must not be included here, because they are ignored
+// by the Schema, hence are not initialized (empty). Having such fields in the `kExtractedOnRequest`
+// list will result in creating the corresponding `parameters["field_name"]` with default emtpy
+// value.
+void moveFieldsToParameters(DeviceModelV3* m)
+{
+    moveFieldsToParameters(static_cast<DeviceModelV1*>(m));
+
+    // MapField{kMediaStreams, &DeviceModelV3::mediaStreams}, // TODO: #skolesnik
+
+    if (m->userEnabledAnalyticsEngineIds)
+    {
+        QJson::serialize(*m->userEnabledAnalyticsEngineIds,
+            &m->parameters[kUserEnabledAnalyticsEnginesProperty]);
+    }
+}
+
+
+struct LessById
+{
+    template <typename L, typename R>
+    bool operator()(const L& lhs, const R& rhs) const
+    {
+        return lhs.getId() < rhs.getId();
+    }
+} constexpr lessById{};
+
+// This can and should be done by QueryProcessor.
+std::unordered_map<QnUuid, std::vector<ResourceParamData>> toResourceMap(
+    std::vector<ResourceParamWithRefData> resourcesWithIds)
+{
+    std::unordered_map<QnUuid, std::vector<ResourceParamData>> result;
+    std::sort(resourcesWithIds.begin(), resourcesWithIds.end(), lessById);
+
+    for (auto l = resourcesWithIds.begin(); l != resourcesWithIds.end();)
+    {
+        auto r = l;
+        while (r != resourcesWithIds.end() && r->getId() == l->getId())
+            ++r;
+
+        auto& resources = result[l->getId()];
+        resources.reserve(std::distance(l, r));
+        std::transform(std::make_move_iterator(l),
+            std::make_move_iterator(r),
+            std::back_inserter(resources),
+            [](ResourceParamWithRefData data) -> ResourceParamData { return std::move(data); });
+
+        l = r;
+    }
+
+    return result;
+}
+
+template<typename Model>
+std::vector<Model> fromCameras(std::vector<CameraData> cameras)
+{
+    std::vector<Model> result;
+    result.reserve(cameras.size());
+    std::transform(std::make_move_iterator(cameras.begin()),
+        std::make_move_iterator(cameras.end()),
+        std::back_inserter(result),
+        [](CameraData data) -> Model
+        {
+            return {DeviceModelGeneral::fromCameraData(std::move(data))};
+        });
+
+    return result;
+}
+
+template <typename Model>
+typename Model::DbUpdateTypes toDbTypes(Model model)
+{
+    std::optional<ResourceStatusData> statusData;
+    if (model.status)
+        statusData = ResourceStatusData(model.id, *model.status);
+
+    CameraAttributesData attributes;
+    attributes.cameraId = model.id;
+    attributes.cameraName = model.name;
+    attributes.logicalId = model.logicalId;
+    attributes.backupQuality = model.backupQuality;
+    if (model.group)
+        attributes.userDefinedGroupName = model.group->name;
+
+    attributes.controlEnabled = model.options.isControlEnabled;
+    attributes.audioEnabled = model.options.isAudioEnabled;
+    attributes.disableDualStreaming = model.options.isDualStreamingDisabled;
+    attributes.dewarpingParams = model.options.dewarpingParams.toLatin1();
+    attributes.preferredServerId = model.options.preferredServerId;
+    attributes.failoverPriority = model.options.failoverPriority;
+    attributes.backupQuality = model.options.backupQuality;
+    attributes.backupContentType = model.options.backupContentType;
+    attributes.backupPolicy = model.options.backupPolicy;
+
+    attributes.scheduleEnabled = model.schedule.isEnabled;
+    attributes.scheduleTasks = model.schedule.tasks;
+
+    using namespace std::chrono;
+    if (model.schedule.minArchivePeriodS)
+        attributes.minArchivePeriodS = seconds(*model.schedule.minArchivePeriodS);
+    else if (model.schedule.minArchiveDays)
+        attributes.minArchivePeriodS = days(*model.schedule.minArchiveDays);
+
+    if (model.schedule.maxArchivePeriodS)
+        attributes.maxArchivePeriodS = seconds(*model.schedule.maxArchivePeriodS);
+    else if (model.schedule.maxArchiveDays)
+        attributes.maxArchivePeriodS = days(*model.schedule.maxArchiveDays);
+
+    attributes.motionType = model.motion.type;
+    attributes.motionMask = model.motion.mask.toLatin1();
+    attributes.recordBeforeMotionSec = model.motion.recordBeforeS;
+    attributes.recordAfterMotionSec = model.motion.recordAfterS;
+    attributes.checkResourceExists = CheckResourceExists::no;
+
+    moveFieldsToParameters(&model);
+
+    // Should be explained why.
+    // It is erased on request from `parameters`, does it mean that the Core doesn't use it from `parameters`?
+    // If so, why is it present in `parameters` on response?
+    model.parameters.erase(kCameraCapabilities);
+
+    auto data = std::move(model).toCameraData();
+    auto parameters = static_cast<const ResourceWithParameters&>(model).asList(data.id);
+    return {std::move(data), std::move(attributes), std::move(statusData), std::move(parameters)};
+}
+
+template <typename Model>
+std::vector<Model> fromDbTypes(typename Model::DbListTypes all)
+{
+    const auto binaryFind =
+        [](auto& container, const Model& model)
+        {
+            using result_type = typename std::decay_t<decltype(container)>::value_type*;
+            auto found = std::lower_bound(container.begin(), container.end(), model, lessById);
+            if (found != container.end())
+                return result_type(&*found);
+
+            return result_type(nullptr);
+        };
+
+    // This all can be done by the QueryProcessor or the CrudHandler.
+    auto statuses = nx::utils::unique_sorted(
+        std::move(std::get<std::vector<ResourceStatusData>>(all)), lessById);
+    auto attributes = nx::utils::unique_sorted(
+        std::move(std::get<std::vector<CameraAttributesData>>(all)), lessById);
+    std::unordered_map<QnUuid, std::vector<ResourceParamData>> resources =
+        toResourceMap(std::move(std::get<std::vector<ResourceParamWithRefData>>(all)));
+    auto devices = fromCameras<Model>(
+        nx::utils::unique_sorted(std::move(std::get<std::vector<CameraData>>(all)), lessById));
+
+    for (Model& m: devices)
+    {
+        if (auto a = binaryFind(attributes, m); a)
+        {
+            if (!a->cameraName.isEmpty())
+                m.name = a->cameraName;
+
+            m.logicalId = a->logicalId;
+            m.backupQuality = a->backupQuality;
+            m.isLicenseUsed = a->scheduleEnabled;
+            if (!a->userDefinedGroupName.isEmpty())
+            {
+                if (m.group)
+                    m.group->name = a->userDefinedGroupName;
+                else
+                {
+                    NX_DEBUG(typeid(Model),
+                        "Device %1 has userDefinedGroupName in DB, but model.group is not set",
+                        m.id);
+                }
+            }
+
+            m.options.isControlEnabled = a->controlEnabled;
+            m.options.isAudioEnabled = a->audioEnabled;
+            m.options.isDualStreamingDisabled = a->disableDualStreaming;
+            m.options.dewarpingParams = a->dewarpingParams;
+            m.options.preferredServerId = a->preferredServerId;
+            m.options.failoverPriority = a->failoverPriority;
+            m.options.backupQuality = a->backupQuality;
+            m.options.backupContentType = a->backupContentType;
+            m.options.backupPolicy = a->backupPolicy;
+
+            m.schedule.isEnabled = a->scheduleEnabled;
+            m.schedule.tasks = a->scheduleTasks;
+
+            using namespace std::chrono;
+            m.schedule.minArchivePeriodS = duration_cast<seconds>(a->minArchivePeriodS).count();
+            m.schedule.minArchiveDays = duration_cast<days>(a->minArchivePeriodS).count();
+            m.schedule.maxArchivePeriodS = duration_cast<seconds>(a->maxArchivePeriodS).count();
+            m.schedule.maxArchiveDays = duration_cast<days>(a->maxArchivePeriodS).count();
+
+            m.motion.type = a->motionType;
+            m.motion.mask = a->motionMask;
+            m.motion.recordBeforeS = a->recordBeforeMotionSec;
+            m.motion.recordAfterS = a->recordAfterMotionSec;
+        }
+
+        if (auto s = binaryFind(statuses, m); s)
+            m.status = s->status;
+        else
+            m.status = ResourceStatus::offline;
+
+        if (auto f = resources.find(m.id); f != resources.cend())
+        {
+            for (ResourceParamData& r: f->second)
+                static_cast<ResourceWithParameters&>(m).setFromParameter(r);
+
+            resources.erase(f);
+        }
+
+        extractParametersToFields(&m);
+    }
+
+    return devices;
+}
+
+} // namespace
+
+DeviceModelGeneral DeviceModelGeneral::fromCameraData(CameraData data)
+{
+    return {.id = data.id,
+        .physicalId = std::move(data.physicalId),
+        .url = std::move(data.url),
+        .typeId = data.typeId,
+        .name = std::move(data.name),
+        .mac = data.mac,
+        .serverId = data.parentId,
+        .isManuallyAdded = data.manuallyAdded,
+        .vendor = std::move(data.vendor),
+        .model = std::move(data.model)};
 }
 
 CameraData DeviceModelGeneral::toCameraData() &&
@@ -51,174 +361,24 @@ CameraData DeviceModelGeneral::toCameraData() &&
     return data;
 }
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DeviceOptions, (json), DeviceOptions_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DeviceScheduleSettings, (json), DeviceScheduleSettings_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DeviceMotionSettings, (json), DeviceMotionSettings_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DeviceModel, (json), DeviceModel_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DeviceModelForSearch, (json), DeviceModelForSearch_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DeviceTypeModel, (json), DeviceTypeModel_Fields)
-
-DeviceModelForSearch::DeviceModelForSearch(CameraData cameraData):
-    DeviceModelGeneral{std::move(cameraData)}
+DeviceModelV1::DbUpdateTypes DeviceModelV1::toDbTypes() &&
 {
+    return api::toDbTypes(std::move(*this));
 }
 
-DeviceModel::DeviceModel(CameraData cameraData):
-    DeviceModelGeneral{std::move(cameraData)}
+std::vector<DeviceModelV1> DeviceModelV1::fromDbTypes(DbListTypes data)
 {
+    return api::fromDbTypes<DeviceModelV1>(std::move(data));
 }
 
-DeviceModel::DbUpdateTypes DeviceModel::toDbTypes() &&
+DeviceModelV3::DbUpdateTypes DeviceModelV3::toDbTypes() &&
 {
-    std::optional<ResourceStatusData> statusData;
-    if (status)
-        statusData = ResourceStatusData(id, *status);
-
-    CameraAttributesData attributes;
-    attributes.cameraId = id;
-    attributes.cameraName = name;
-    attributes.logicalId = logicalId;
-    attributes.backupQuality = backupQuality;
-    if (group)
-        attributes.userDefinedGroupName = group->name;
-
-    attributes.controlEnabled = options.isControlEnabled;
-    attributes.audioEnabled = options.isAudioEnabled;
-    attributes.disableDualStreaming = options.isDualStreamingDisabled;
-    attributes.dewarpingParams = options.dewarpingParams.toLatin1();
-    attributes.preferredServerId = options.preferredServerId;
-    attributes.failoverPriority = options.failoverPriority;
-    attributes.backupQuality = options.backupQuality;
-    attributes.backupContentType = options.backupContentType;
-    attributes.backupPolicy = options.backupPolicy;
-
-    attributes.scheduleEnabled = schedule.isEnabled;
-    attributes.scheduleTasks = schedule.tasks;
-
-    using namespace std::chrono;
-    if (schedule.minArchivePeriodS)
-        attributes.minArchivePeriodS = seconds(*schedule.minArchivePeriodS);
-    else if (schedule.minArchiveDays)
-        attributes.minArchivePeriodS = days(*schedule.minArchiveDays);
-
-    if (schedule.maxArchivePeriodS)
-        attributes.maxArchivePeriodS = seconds(*schedule.maxArchivePeriodS);
-    else if (schedule.maxArchiveDays)
-        attributes.maxArchivePeriodS = days(*schedule.maxArchiveDays);
-
-    attributes.motionType = motion.type;
-    attributes.motionMask = motion.mask.toLatin1();;
-    attributes.recordBeforeMotionSec = motion.recordBeforeS;
-    attributes.recordAfterMotionSec = motion.recordAfterS;
-
-    attributes.checkResourceExists = CheckResourceExists::no;
-
-    if (credentials)
-        parameters[kCredentials] = credentials->asString();
-
-    parameters.erase(kCameraCapabilities);
-
-    auto data = std::move(*this).toCameraData();
-    auto parameters = asList(data.id);
-    return {std::move(data), std::move(attributes), std::move(statusData), std::move(parameters)};
+    return api::toDbTypes(std::move(*this));
 }
 
-std::vector<DeviceModel> DeviceModel::fromDbTypes(DbListTypes all)
+std::vector<DeviceModelV3> DeviceModelV3::fromDbTypes(DbListTypes data)
 {
-    auto& allAttributes = std::get<CameraAttributesDataList>(all);
-    auto& allStatuses = std::get<ResourceStatusDataList>(all);
-    return ResourceWithParameters::fillListFromDbTypes<DeviceModel, CameraData>(
-        &all,
-        [&allAttributes, &allStatuses](CameraData data)
-        {
-            DeviceModel model(std::move(data));
-
-            auto attributes = nx::utils::find_if(
-                allAttributes,
-                [&id = model.id](const auto& attributes) { return attributes.cameraId == id; });
-            if (attributes)
-            {
-                if (!attributes->cameraName.isEmpty())
-                    model.name = attributes->cameraName;
-                model.logicalId = attributes->logicalId;
-                model.backupQuality = attributes->backupQuality;
-                model.isLicenseUsed = attributes->scheduleEnabled;
-                if (!attributes->userDefinedGroupName.isEmpty())
-                {
-                    if (model.group)
-                    {
-                        model.group->name = attributes->userDefinedGroupName;
-                    }
-                    else
-                    {
-                        NX_DEBUG(typeid(DeviceModel),
-                            "Device %1 has userDefinedGroupName in DB, but model.group is not set",
-                            model.id);
-                    }
-                }
-
-                model.options.isControlEnabled = attributes->controlEnabled;
-                model.options.isAudioEnabled = attributes->audioEnabled;
-                model.options.isDualStreamingDisabled = attributes->disableDualStreaming;
-                model.options.dewarpingParams = attributes->dewarpingParams;
-                model.options.preferredServerId = attributes->preferredServerId;
-                model.options.failoverPriority = attributes->failoverPriority;
-                model.options.backupQuality = attributes->backupQuality;
-                model.options.backupContentType = attributes->backupContentType;
-                model.options.backupPolicy = attributes->backupPolicy;
-
-                model.schedule.isEnabled = attributes->scheduleEnabled;
-                model.schedule.tasks = attributes->scheduleTasks;
-
-                using namespace std::chrono;
-                model.schedule.minArchivePeriodS = duration_cast<seconds>(attributes->minArchivePeriodS).count();
-                model.schedule.minArchiveDays = duration_cast<days>(attributes->minArchivePeriodS).count();
-                model.schedule.maxArchivePeriodS = duration_cast<seconds>(attributes->maxArchivePeriodS).count();
-                model.schedule.maxArchiveDays = duration_cast<days>(attributes->maxArchivePeriodS).count();
-
-                model.motion.type = attributes->motionType;
-                model.motion.mask = attributes->motionMask;
-                model.motion.recordBeforeS = attributes->recordBeforeMotionSec;
-                model.motion.recordAfterS = attributes->recordAfterMotionSec;
-            }
-
-            const auto status = nx::utils::find_if(
-                allStatuses, [id = model.getId()](const auto& s) { return s.id == id; });
-            model.status = status ? status->status : ResourceStatus::offline;
-
-            return model;
-        });
-}
-
-void DeviceModel::extractFromList(const QnUuid& id, ResourceParamWithRefDataList* list)
-{
-    ResourceWithParameters::extractFromList(id, list);
-
-    if (const auto it = parameters.find(kCredentials); it != parameters.end())
-    {
-        if (const auto value = it->second.toString(); !value.isEmpty())
-            credentials = Credentials::parseColon(value, /*hidePassword*/ false);
-        parameters.erase(it);
-    }
-    if (const auto it = parameters.find(kDefaultCredentials); it != parameters.end())
-    {
-        if (!credentials)
-        {
-            if (const auto value = it->second.toString(); !value.isEmpty())
-                credentials = Credentials::parseColon(value, /*hidePassword*/ false);
-        }
-        parameters.erase(it);
-    }
-
-    if (const auto it = parameters.find(kCameraCapabilities); it != parameters.end())
-    {
-        capabilities = static_cast<DeviceCapabilities>(it->second.toInt());
-        parameters.erase(it);
-    }
-    else
-    {
-        capabilities = DeviceCapability::noCapabilities;
-    }
+    return api::fromDbTypes<DeviceModelV3>(std::move(data));
 }
 
 } // namespace nx::vms::api

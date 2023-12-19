@@ -865,8 +865,13 @@ State loadSingleCameraProperties(
         nx::vms::common::camera_hotspots::supportsCameraHotspots(singleCamera);
 
     state.recording.defaultStreamResolution = singleCamera->streamInfo().getResolution();
-    state.recording.mediaStreamCapability = singleCamera->cameraMediaCapability().
-        streamCapabilities.value(StreamIndex::primary);
+    state.recording.mediaStreamCapability =
+        [&singleCamera]
+        {
+            const auto& streamCapabilities = singleCamera->cameraMediaCapability().streamCapabilities;
+            auto it = streamCapabilities.find(StreamIndex::primary);
+            return it != streamCapabilities.cend() ? it->second : api::CameraStreamCapability();
+        }();
 
     state.recording.customBitrateAvailable = true;
 

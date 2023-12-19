@@ -12,7 +12,6 @@
 #include <core/ptz/ptz_preset.h>
 #include <core/resource/camera_advanced_param.h>
 #include <core/resource/device_dependent_strings.h>
-#include <core/resource/media_stream_capability.h>
 #include <core/resource/motion_window.h>
 #include <nx/core/resource/using_media2_type.h>
 #include <nx/reflect/enum_instrument.h>
@@ -22,6 +21,7 @@
 #include <nx/vms/api/data/device_profile.h>
 #include <nx/vms/api/data/dewarping_data.h>
 #include <nx/vms/api/data/license_data.h>
+#include <nx/vms/api/data/media_stream_capability.h>
 #include <nx/vms/api/data/saas_data.h>
 #include <nx/vms/api/types/rtp_types.h>
 #include <nx/vms/client/core/utils/rotation.h>
@@ -335,7 +335,7 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractFluxState
         RecordScheduleCellData brush;
         MetadataRadioButton metadataRadioButton = MetadataRadioButton::motion;
 
-        media::CameraStreamCapability mediaStreamCapability;
+        api::CameraStreamCapability mediaStreamCapability;
         bool useBitratePerGop = false;
         QSize defaultStreamResolution;
 

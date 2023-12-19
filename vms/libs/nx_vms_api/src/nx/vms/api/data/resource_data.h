@@ -66,6 +66,10 @@ struct NX_VMS_API ResourceParamData
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(ResourceParamData)
 NX_REFLECTION_INSTRUMENT(ResourceParamData, ResourceParamData_Fields)
 
+// REFACTORME:
+// Apparently, this type exists for mapping named parameters to ids.
+// Instead of a list of {.id, .value, .name} it can be done with a simple `std::map<QnUuid, ResourceParamData>`.
+// In this case, mapping between API and DB types can be done in a straightforward loop without convoluted indirections.
 struct NX_VMS_API ResourceParamWithRefData: ResourceParamData
 {
     ResourceParamWithRefData() = default;
