@@ -22,9 +22,9 @@ const qreal kBytesInGB = 1024.0 * 1024.0 * 1024.0;
 const qreal kBytesInTb = 1024.0 * kBytesInGB;
 
 static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kThemeSubstitutions = {
-    {QIcon::Normal, {.primary = "light14"}},
-    {QIcon::Active, {.primary = "light15"}},
-    {QIcon::Selected, {.primary = "light13"}},
+    {QIcon::Normal, {.primary = "light10"}},
+    {QIcon::Active, {.primary = "light9"}},
+    {QIcon::Selected, {.primary = "light11"}},
 };
 
 static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kDeleteThemeSubstitutions = {
