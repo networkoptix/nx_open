@@ -6338,7 +6338,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message>
       <source>Convert</source>
       <comment>Converting layout to shared</comment>
-      <translation type="unfinished">Convert</translation>
+      <translation>แปลง</translation>
     </message>
   </context>
   <context>
@@ -10679,11 +10679,11 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Suspended</source>
-      <translation type="unfinished">Suspended</translation>
+      <translation>ถูกระงับ</translation>
     </message>
     <message>
       <source>Shut down</source>
-      <translation type="unfinished">Shut down</translation>
+      <translation>ปิดเครื่อง</translation>
     </message>
   </context>
   <context>
@@ -11014,8 +11014,8 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message numerus="yes">
       <source>I trust these servers</source>
-      <translation type="unfinished">
-        <numerusform>I trust these servers</numerusform>
+      <translation>
+        <numerusform>ฉันเชื่อถือเซิร์ฟเวอร์เหล่านี้</numerusform>
       </translation>
     </message>
   </context>

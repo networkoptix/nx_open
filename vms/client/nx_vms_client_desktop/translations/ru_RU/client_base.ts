@@ -6638,12 +6638,12 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message>
       <source>All members of %1 and %2 groups will get access to this layout</source>
       <comment>%1 and %2 will be substituted with user group names</comment>
-      <translation type="unfinished">All members of %1 and %2 groups will get access to this layout</translation>
+      <translation>Все участники групп %1 и %2 получат доступ к этой раскладке</translation>
     </message>
     <message>
       <source>Convert</source>
       <comment>Converting layout to shared</comment>
-      <translation type="unfinished">Convert</translation>
+      <translation>Конвертировать</translation>
     </message>
   </context>
   <context>
@@ -11181,7 +11181,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Suspended</source>
-      <translation type="unfinished">Suspended</translation>
+      <translation>Приостановлен</translation>
     </message>
     <message>
       <source>Shut down</source>
@@ -11519,7 +11519,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message numerus="yes">
       <source>I trust these servers</source>
       <translation type="unfinished">
-        <numerusform>I trust these servers</numerusform>
+        <numerusform>Я доверяю этим серверам</numerusform>
         <numerusform>I trust these servers</numerusform>
         <numerusform>I trust these servers</numerusform>
         <numerusform>I trust these servers</numerusform>
