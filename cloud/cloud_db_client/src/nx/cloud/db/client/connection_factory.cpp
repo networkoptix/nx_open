@@ -2,8 +2,10 @@
 
 #include "connection_factory.h"
 
-#include <nx/utils/std/cpp14.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/cloud/random_online_endpoint_selector.h>
+#include <nx/network/url/url_builder.h>
+#include <nx/utils/std/cpp14.h>
 
 #include "cdb_connection.h"
 
@@ -11,12 +13,12 @@ namespace nx::cloud::db::client {
 
 static constexpr auto kDefaultRequestTimeout = std::chrono::seconds(11);
 
-ConnectionFactory::ConnectionFactory() = default;
-
-ConnectionFactory::~ConnectionFactory()
+ConnectionFactory::ConnectionFactory():
+    m_cloudUrl("https://" + nx::network::SocketGlobals::cloud().cloudHost() + "/")
 {
-    m_endPointFetcher.pleaseStopSync();
 }
+
+ConnectionFactory::~ConnectionFactory() = default;
 
 void ConnectionFactory::connect(
     std::function<void(api::ResultCode, std::unique_ptr<api::Connection>)> completionHandler)
@@ -32,7 +34,8 @@ void ConnectionFactory::connect(
 
 std::unique_ptr<api::Connection> ConnectionFactory::createConnection()
 {
-    std::unique_ptr<api::Connection> connection = std::make_unique<Connection>(&m_endPointFetcher);
+    auto connection = std::make_unique<Connection>(
+        m_cloudUrl, nx::network::ssl::kDefaultCertificateCheck);
     connection->setRequestTimeout(kDefaultRequestTimeout);
     return connection;
 }
@@ -52,7 +55,7 @@ std::string ConnectionFactory::toString(api::ResultCode resultCode) const
 
 void ConnectionFactory::setCloudUrl(const std::string& url)
 {
-    m_endPointFetcher.setUrl(nx::utils::Url(QString::fromStdString(url)));
+    m_cloudUrl = url;
 }
 
 } // nx::cloud::db::client

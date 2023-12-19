@@ -28,7 +28,7 @@ public:
     virtual void setCloudUrl(const std::string& url) override;
 
 private:
-    network::cloud::CloudDbUrlFetcher m_endPointFetcher;
+    nx::utils::Url m_cloudUrl;
 };
 
 } // nx::cloud::db::client

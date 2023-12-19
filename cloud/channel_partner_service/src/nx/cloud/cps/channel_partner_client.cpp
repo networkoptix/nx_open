@@ -74,6 +74,7 @@ void ChannelPartnerClient::bindSystemToOrganization(
     base_type::template makeAsyncCall<api::SystemRegistrationResponse>(
         nx::network::http::Method::post,
         api::kSystemBindToOrganizationPath,
+        {}, // query
         std::move(data),
         std::move(handler));
 }
@@ -86,6 +87,7 @@ void ChannelPartnerClient::unbindSystemFromOrganization(
         nx::network::http::Method::delete_,
         nx::network::http::rest::substituteParameters(
             api::kUnbindSystemFromOrganizationPath, {systemId}),
+        {}, // query
         std::move(handler));
 }
 
@@ -98,6 +100,7 @@ void ChannelPartnerClient::getSystemUser(
         nx::network::http::Method::get,
         nx::network::http::rest::substituteParameters(
             api::kInternalSystemUserPath, {systemId, email}),
+        {}, // query
         std::move(handler));
 }
 
@@ -108,6 +111,7 @@ void ChannelPartnerClient::getSystemUsers(
     base_type::template makeAsyncCall<std::vector<api::User>>(
         nx::network::http::Method::get,
         nx::network::http::rest::substituteParameters(api::kInternalSystemUsersPath, {systemId}),
+        {}, // query
         std::move(handler));
 }
 
@@ -118,6 +122,7 @@ void ChannelPartnerClient::getUserSystems(
     base_type::template makeAsyncCall<std::vector<api::SystemAllowance>>(
         nx::network::http::Method::get,
         nx::network::http::rest::substituteParameters(api::kInternalUserSystemsPath, {email}),
+        {}, // query
         std::move(handler));
 }
 

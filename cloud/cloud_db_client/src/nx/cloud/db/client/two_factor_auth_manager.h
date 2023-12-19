@@ -12,7 +12,7 @@ class TwoFactorAuthManager:
     public api::TwoFactorAuthManager
 {
 public:
-    TwoFactorAuthManager(AsyncRequestsExecutor* requestsExecutor);
+    TwoFactorAuthManager(ApiRequestsExecutor* requestsExecutor);
 
     virtual void generateTotpKey(
         std::function<void(api::ResultCode, api::GenerateKeyResponse)> completionHandler) override;
@@ -41,7 +41,7 @@ public:
         std::function<void(api::ResultCode, api::BackupCodes)> completionHandler) override;
 
 private:
-    AsyncRequestsExecutor* m_requestsExecutor = nullptr;
+    ApiRequestsExecutor* m_requestsExecutor = nullptr;
 };
 
 } // namespace nx::cloud::db::client

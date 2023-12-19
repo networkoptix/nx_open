@@ -8,7 +8,7 @@
 
 namespace nx::cloud::db::client {
 
-TwoFactorAuthManager::TwoFactorAuthManager(AsyncRequestsExecutor* requestsExecutor):
+TwoFactorAuthManager::TwoFactorAuthManager(ApiRequestsExecutor* requestsExecutor):
     m_requestsExecutor(requestsExecutor)
 {
 }
@@ -16,9 +16,10 @@ TwoFactorAuthManager::TwoFactorAuthManager(AsyncRequestsExecutor* requestsExecut
 void TwoFactorAuthManager::generateTotpKey(
     std::function<void(api::ResultCode, api::GenerateKeyResponse)> completionHandler)
 {
-    m_requestsExecutor->executeRequest<api::GenerateKeyResponse>(
+    m_requestsExecutor->makeAsyncCall<api::GenerateKeyResponse>(
         nx::network::http::Method::post,
         kTwoFactorAuthGetKey,
+        {}, //query
         std::move(completionHandler));
 }
 
@@ -26,9 +27,10 @@ void TwoFactorAuthManager::generateBackupCodes(
     const api::GenerateBackupCodesRequest& request,
     std::function<void(api::ResultCode, api::BackupCodes)> completionHandler)
 {
-    m_requestsExecutor->executeRequest<api::BackupCodes>(
+    m_requestsExecutor->makeAsyncCall<api::BackupCodes>(
         nx::network::http::Method::post,
         kTwoFactorAuthBackupCodes,
+        {}, //query
         request,
         std::move(completionHandler));
 }
@@ -38,13 +40,13 @@ void TwoFactorAuthManager::validateTotpKey(
     const api::ValidateKeyRequest& request,
     std::function<void(api::ResultCode)> completionHandler)
 {
-    const auto requestPath =
-        nx::network::http::rest::substituteParameters(kTwoFactorAuthValidateKey, {key});
+    nx::utils::UrlQuery query;
+    query.addQueryItem("token", request.token);
 
-    m_requestsExecutor->executeRequest</*Output*/ void>(
+    m_requestsExecutor->makeAsyncCall</*Output*/ void>(
         nx::network::http::Method::get,
-        requestPath,
-        request,
+        nx::network::http::rest::substituteParameters(kTwoFactorAuthValidateKey, {key}),
+        query,
         std::move(completionHandler));
 }
 
@@ -53,13 +55,13 @@ void TwoFactorAuthManager::validateBackupCode(
     const api::ValidateBackupCodeRequest& request,
     std::function<void(api::ResultCode)> completionHandler)
 {
-    const auto requestPath =
-        nx::network::http::rest::substituteParameters(kTwoFactorAuthBackupCode, {code});
+    nx::utils::UrlQuery query;
+    query.addQueryItem("token", request.token);
 
-    m_requestsExecutor->executeRequest</*Output*/ void>(
+    m_requestsExecutor->makeAsyncCall</*Output*/ void>(
         nx::network::http::Method::get,
-        requestPath,
-        request,
+        nx::network::http::rest::substituteParameters(kTwoFactorAuthBackupCode, {code}),
+        query,
         std::move(completionHandler));
 }
 
@@ -67,27 +69,29 @@ void TwoFactorAuthManager::deleteBackupCodes(
     const std::string& codes,
     std::function<void(api::ResultCode)> completionHandler)
 {
-    const auto requestPath =
-        nx::network::http::rest::substituteParameters(kTwoFactorAuthBackupCode, {codes});
-
-    m_requestsExecutor->executeRequest</*Output*/ void>(
+    m_requestsExecutor->makeAsyncCall</*Output*/ void>(
         nx::network::http::Method::delete_,
-        requestPath,
+        nx::network::http::rest::substituteParameters(kTwoFactorAuthBackupCode, {codes}),
+        {}, //query
         std::move(completionHandler));
 }
 
 void TwoFactorAuthManager::deleteTotpKey(std::function<void(api::ResultCode)> completionHandler)
 {
-    m_requestsExecutor->executeRequest</*Output*/ void>(
-        nx::network::http::Method::delete_, kTwoFactorAuthGetKey, std::move(completionHandler));
+    m_requestsExecutor->makeAsyncCall</*Output*/ void>(
+        nx::network::http::Method::delete_,
+        kTwoFactorAuthGetKey,
+        {}, //query
+        std::move(completionHandler));
 }
 
 void TwoFactorAuthManager::getBackupCodes(
     std::function<void(api::ResultCode, api::BackupCodes)> completionHandler)
 {
-    m_requestsExecutor->executeRequest<api::BackupCodes>(
+    m_requestsExecutor->makeAsyncCall<api::BackupCodes>(
         nx::network::http::Method::get,
         kTwoFactorAuthBackupCodes,
+        {}, //query
         std::move(completionHandler));
 }
 

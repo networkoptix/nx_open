@@ -79,37 +79,37 @@ public:
      * Full set of HTTP client options that are set on every request.
      */
     ClientOptions& httpClientOptions() { return this->m_clientOptions; }
+    const ClientOptions& httpClientOptions() const { return this->m_clientOptions; }
 
 protected:
     /**
-     * @param args The last argument of this pack MUST be the completion handler which will be
-     * invoked as completionHandler(ResultCode, OutputData).
+     * @param ResponseFetchers 0 or more fetchers applied to the HTTP response object.
+     * Returned result is passed to the handler.
+     * @param handler. Signature: void(ResultType, OutputData, ResponseFetchers()(response)...).
      */
-    template<typename OutputData, typename... InputArgsAndCompletionHandler>
+    template<typename OutputData, typename... ResponseFetchers, typename InputData, typename Handler>
     void makeAsyncCall(
         const network::http::Method& method,
         const std::string& requestPath,
         const nx::utils::UrlQuery& urlQuery,
-        InputArgsAndCompletionHandler&&... args);
+        InputData&& inputData,
+        Handler handler);
 
-    template<
-        typename OutputData,
-        typename... InputArgsAndCompletionHandler,
-        typename = std::enable_if_t<!std::is_same_v<
-            nx::utils::tuple_first_element_t<
-                std::tuple<std::decay_t<InputArgsAndCompletionHandler>...>>,
-            nx::utils::UrlQuery>>>
+    // Same as the previous overload, but without input data.
+    template<typename OutputData, typename... ResponseFetchers, typename Handler>
     void makeAsyncCall(
         const network::http::Method& method,
         const std::string& requestPath,
-        InputArgsAndCompletionHandler&&... args);
+        const nx::utils::UrlQuery& urlQuery,
+        Handler handler);
 
     template<typename Output, typename InputTuple, typename Handler,
-        typename SerializationLibWrapper = detail::NxReflectWrapper>
+        typename SerializationLibWrapper = detail::NxReflectWrapper, typename... ResponseFetchers>
     void makeAsyncCallWithRetries(
         const network::http::Method& method,
         const std::string& requestPath,
         const nx::utils::UrlQuery& urlQuery,
+        std::tuple<ResponseFetchers...> /*dummy*/,
         InputTuple&& argsTuple,
         unsigned attemptNum,
         Handler handler);
@@ -143,7 +143,7 @@ private:
     template<typename Output, typename SerializationLibWrapper, typename... Args>
     auto createHttpClient(const nx::utils::Url& url, Args&&... args);
 
-    template<typename Request, typename CompletionHandler, typename... Output>
+    template<typename... ResponseFetchers, typename Request, typename CompletionHandler, typename... Output>
     void processResponse(
         Request* requestPtr,
         CompletionHandler handler,
@@ -256,36 +256,51 @@ void GenericApiClient<ApiResultCodeDescriptor, Base>::stopWhileInAioThread()
 }
 
 template<HasResultCodeT ApiResultCodeDescriptor, typename Base>
-template<typename Output, typename... InputArgsAndCompletionHandler>
+template<typename Output, typename... ResponseFetchers, typename InputData, typename Handler>
 inline void GenericApiClient<ApiResultCodeDescriptor, Base>::makeAsyncCall(
     const network::http::Method& method,
     const std::string& requestPath,
     const nx::utils::UrlQuery& urlQuery,
-    InputArgsAndCompletionHandler&&... args)
+    InputData&& inputData,
+    Handler handler)
 {
-    static_assert(sizeof...(args) > 0);
-
-    auto argsTuple = nx::utils::make_tuple_from_arg_range<0, sizeof...(args) - 1>(
-        std::forward<InputArgsAndCompletionHandler>(args)...);
-
-    auto handler = std::get<0>(nx::utils::make_tuple_from_arg_range<sizeof...(args) - 1, 1>(
-        std::forward<InputArgsAndCompletionHandler>(args)...));
-
     makeAsyncCallWithRetries<Output>(
         method,
         requestPath,
         urlQuery,
-        std::move(argsTuple),
+        std::tuple<ResponseFetchers...>{},
+        std::make_tuple(std::forward<InputData>(inputData)),
         1,
         std::move(handler));
 }
 
 template<HasResultCodeT ApiResultCodeDescriptor, typename Base>
-template<typename Output, typename InputTuple, typename Handler, typename SerializationLibWrapper>
+template<typename Output, typename... ResponseFetchers, typename Handler>
+inline void GenericApiClient<ApiResultCodeDescriptor, Base>::makeAsyncCall(
+    const network::http::Method& method,
+    const std::string& requestPath,
+    const nx::utils::UrlQuery& urlQuery,
+    Handler handler)
+{
+    makeAsyncCallWithRetries<Output>(
+        method,
+        requestPath,
+        urlQuery,
+        std::tuple<ResponseFetchers...>{},
+        std::tuple<>{},
+        1,
+        std::move(handler));
+}
+
+template<HasResultCodeT ApiResultCodeDescriptor, typename Base>
+template<typename Output,
+    typename InputTuple, typename Handler, typename SerializationLibWrapper, typename... ResponseFetchers
+>
 inline void GenericApiClient<ApiResultCodeDescriptor, Base>::makeAsyncCallWithRetries(
     const network::http::Method& method,
     const std::string& requestPath,
     const nx::utils::UrlQuery& urlQuery,
+    std::tuple<ResponseFetchers...> /*dummy*/,
     InputTuple&& argsTuple,
     unsigned attemptNum,
     Handler handler)
@@ -313,6 +328,7 @@ inline void GenericApiClient<ApiResultCodeDescriptor, Base>::makeAsyncCallWithRe
                 method,
                 requestPath,
                 urlQuery,
+                std::tuple<ResponseFetchers...>{},
                 std::move(argsTuple),
                 ++attemptNum,
                 std::move(handler));
@@ -325,22 +341,11 @@ inline void GenericApiClient<ApiResultCodeDescriptor, Base>::makeAsyncCallWithRe
         method,
         [this, request, handlerWrapper = std::move(handlerWrapper)](auto&&... args) mutable
         {
-            this->processResponse(request, std::move(handlerWrapper), std::forward<decltype(args)>(args)...);
+            this->processResponse<ResponseFetchers...>(
+                request,
+                std::move(handlerWrapper),
+                std::forward<decltype(args)>(args)...);
         });
-}
-
-template<HasResultCodeT ApiResultCodeDescriptor, typename Base>
-template<typename Output, typename... InputArgsAndCompletionHandler, typename>
-inline void GenericApiClient<ApiResultCodeDescriptor, Base>::makeAsyncCall(
-    const network::http::Method& method,
-    const std::string& requestPath,
-    InputArgsAndCompletionHandler&&... args)
-{
-    this->makeAsyncCall<Output>(
-        method,
-        requestPath,
-        nx::utils::UrlQuery(),
-        std::forward<InputArgsAndCompletionHandler>(args)...);
 }
 
 template<HasResultCodeT ApiResultCodeDescriptor, typename Base>
@@ -393,7 +398,7 @@ auto GenericApiClient<ApiResultCodeDescriptor, Base>::createHttpClient(
 }
 
 template<HasResultCodeT ApiResultCodeDescriptor, typename Base>
-template<typename Request, typename CompletionHandler, typename... Output>
+template<typename... ResponseFetchers, typename Request, typename CompletionHandler, typename... Output>
 void GenericApiClient<ApiResultCodeDescriptor, Base>::processResponse(
     Request* requestPtr,
     CompletionHandler handler,
@@ -406,7 +411,8 @@ void GenericApiClient<ApiResultCodeDescriptor, Base>::processResponse(
     const auto resultCode =
         getResultCode(error, response, requestPtr->lastFusionRequestResult(), output...);
 
-    handler(resultCode, std::move(output)...);
+    handler(resultCode, std::move(output)...,
+        ResponseFetchers()(response ? *response : network::http::Response())...);
 }
 
 template<HasResultCodeT ApiResultCodeDescriptor, typename Base>
@@ -453,11 +459,13 @@ auto GenericApiClient<ApiResultCodeDescriptor, Base>::makeSyncCallInternal(Input
 {
     std::promise<ResultTuple> done;
 
-    makeAsyncCall<Output>(std::forward<InputArgs>(inputArgs)..., [this, &done](auto&&... args) {
-        auto result = std::make_tuple(std::move(args)...);
-        // Doing post to make sure all network operations are completed before returning.
-        this->post([&done, result = std::move(result)]() { done.set_value(std::move(result)); });
-    });
+    makeAsyncCall<Output>(
+        std::forward<InputArgs>(inputArgs)...,
+        [this, &done](auto&&... args) {
+            auto result = std::make_tuple(std::move(args)...);
+            // Doing post to make sure all network operations are completed before returning.
+            this->post([&done, result = std::move(result)]() { done.set_value(std::move(result)); });
+        });
 
     auto result = done.get_future().get();
     return result;
