@@ -83,6 +83,14 @@ void OptionalDurationPicker::updateUi()
         }
     }
 
+    if (m_fieldDescriptor->fieldName == vms::rules::utils::kIntervalFieldName)
+    {
+        const auto durationField =
+            getActionField<vms::rules::OptionalTimeField>(vms::rules::utils::kDurationFieldName);
+        if (durationField)
+            setVisible(durationField->value() != vms::rules::OptionalTimeField::value_type::zero());
+    }
+
     {
         QSignalBlocker blocker{m_timeDurationWidget};
         m_timeDurationWidget->setValue(
