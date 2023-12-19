@@ -10,13 +10,16 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/resource_dialogs/camera_selection_dialog.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
-#include <nx/vms/client/core/skin/skin.h>
+#include <ui/common/palette.h>
 
 #include "../flux/camera_settings_dialog_state.h"
 #include "../flux/camera_settings_dialog_store.h"
+#include "nx/vms/client/desktop/style/helper.h"
 
 namespace nx::vms::client::desktop {
 
@@ -107,15 +110,14 @@ void AudioRedirectPickerWidget::loadState(const CameraSettingsDialogState& state
     ui->redirectOptionLabel->setVisible(!capabilityCheck(device));
 
     ui->devicePickerButton->setVisible(!capabilityCheck(device) || !redirectDevice.isNull());
-
     if (!redirectDevice.isNull())
     {
         ui->redirectOptionLabel->setText(activeRedirectLabelText());
         ui->devicePickerButton->setText(redirectDevice->getName());
-        ui->devicePickerButton->setIcon(qnResIconCache->icon(redirectDevice));
+        ui->devicePickerButton->setIcon(
+            qnResIconCache->icon(redirectDevice).pixmap(nx::style::Metrics::kDefaultIconSize));
         setWarningStyleOn(ui->devicePickerButton,
             !capabilityCheck(redirectDevice) || !sameServerCheck(redirectDevice));
-
         if (!capabilityCheck(redirectDevice))
             ui->errorLabel->setText(invalidRedirectErrorText());
         else if (!sameServerCheck(redirectDevice))
@@ -128,10 +130,14 @@ void AudioRedirectPickerWidget::loadState(const CameraSettingsDialogState& state
     {
         ui->redirectOptionLabel->setText(requiredRedirectLabelText());
         ui->devicePickerButton->setText(tr("Select Device..."));
-        ui->devicePickerButton->setIcon(qnResIconCache->icon(QnResourceIconCache::Cameras));
+        ui->devicePickerButton->setIcon(qnResIconCache->icon(QnResourceIconCache::Cameras)
+            .pixmap(nx::style::Metrics::kDefaultIconSize));
         setWarningStyleOn(ui->devicePickerButton, false);
         ui->errorLabel->setVisible(false);
     }
+    setPaletteColor(ui->devicePickerButton,
+        QPalette::ButtonText,
+        core::ColorTheme::instance()->color("light10"));
 }
 
 void AudioRedirectPickerWidget::showEvent(QShowEvent* event)
