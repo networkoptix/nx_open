@@ -229,12 +229,12 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>This might be due to an expired server certificate or or an invalid certificate. Contact your system administrator for further investigation.</source>
+        <source>To learn more about the current problem read this %1.</source>
+        <comment>%1 is &lt;help article&gt; link</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>To learn more about the current problem read this %1.</source>
-        <comment>%1 is &lt;help article&gt; link</comment>
+        <source>This might be due to an expired server certificate or an invalid certificate. Contact your system administrator for further investigation.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

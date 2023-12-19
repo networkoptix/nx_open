@@ -1927,6 +1927,34 @@ License Key: %2</source>
         <source>Emails</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>RHI backend</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>RHI device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>RHI device ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>RHI vendor ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>RHI max texture size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Graphics API</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to get GPU information for %1</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnAbstractPtzDialog</name>
