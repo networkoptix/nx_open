@@ -5,12 +5,13 @@ import QtQuick.Layouts 1.15
 
 import Nx 1.0
 import Nx.Core 1.0
+import Nx.Controls
 
 ColumnLayout
 {
     id: placeholder
 
-    property alias imageSource: placeholderImage.source
+    property alias imageSource: placeholderImage.sourcePath
     property alias text: placeholderMainText.text
     property alias additionalText: placeholderAdditionalText.text
 
@@ -23,7 +24,7 @@ ColumnLayout
 
     spacing: 8
 
-    Image
+    SvgImage
     {
         id: placeholderImage
 
@@ -32,6 +33,7 @@ ColumnLayout
         width: 64
         height: 64
 
+        primaryColor: textColor
         sourceSize: Qt.size(width, height)
     }
 
