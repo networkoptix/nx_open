@@ -18,6 +18,8 @@
 #include "resource_data.h"
 #include "type_traits.h"
 
+#undef DeviceCapabilities
+
 namespace nx::vms::api {
 
 struct DeviceGroupSettings
