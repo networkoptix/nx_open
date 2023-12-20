@@ -8,10 +8,10 @@ import Nx.Core
 import Nx.Controls
 import Nx.Dialogs
 
-DialogWithState
+Dialog
 {
     id: dialog
-    objectName: "ManageIntegrationsDialog"
+    objectName: "IntegrationsDialog"
 
     modality: Qt.ApplicationModal
 
@@ -24,10 +24,8 @@ DialogWithState
     title: qsTr("Manage Integrations")
     color: ColorTheme.colors.dark7
 
-    property bool loading: false
-    property bool modified: false
-
     property var store: null
+    property var requestsModel: store ? store.makeApiIntegrationRequestsModel() : null
 
     DialogTabControl
     {
@@ -36,6 +34,7 @@ DialogWithState
 
         dialogLeftPadding: dialog.leftPadding
         dialogRightPadding: dialog.rightPadding
+        tabBar.spacing: 0
 
         Tab
         {
@@ -47,7 +46,21 @@ DialogWithState
             page: IntegrationsTab
             {
                 store: dialog.store
-                anchors.fill: parent
+                requestsModel: dialog.requestsModel
+                visible: dialog.visible
+            }
+        }
+
+        Tab
+        {
+            button: DialogTabButton
+            {
+                text: qsTr("Settings")
+            }
+
+            page: SettingsTab
+            {
+                requestsModel: dialog.requestsModel
             }
         }
     }
@@ -56,5 +69,29 @@ DialogWithState
     {
         buttonLayout: DialogButtonBox.KdeLayout
         standardButtons: DialogButtonBox.Ok | DialogButtonBox.Apply | DialogButtonBox.Cancel
+
+        Component.onCompleted:
+        {
+            let applyButton = buttonBox.standardButton(DialogButtonBox.Apply)
+            applyButton.enabled = Qt.binding(function() { return !!store && store.hasChanges })
+        }
+    }
+
+    onAccepted:
+    {
+        if (store)
+            store.applySettingsValues()
+    }
+
+    onApplied:
+    {
+        if (store)
+            store.applySettingsValues()
+    }
+
+    onRejected:
+    {
+        if (store)
+            store.discardChanges()
     }
 }

@@ -16,6 +16,11 @@ Control
     property bool collapsed: !highlighted
     property bool collapsible: false
 
+    function reset()
+    {
+        collapsed = !highlighted
+    }
+
     contentItem: Column
     {
         spacing: 16

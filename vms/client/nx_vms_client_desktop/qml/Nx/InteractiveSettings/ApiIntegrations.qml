@@ -7,6 +7,8 @@ import Nx.Controls
 import nx.vms.client.core
 import nx.vms.client.desktop
 
+import "private"
+
 Scrollable
 {
     id: root
@@ -22,8 +24,8 @@ Scrollable
 
         Section
         {
-            header: qsTr("API Integrations")
-            description:
+            header.text: qsTr("API Integrations")
+            description.text:
                 qsTr("API Integrations interact with %1 Server via REST API and exchange metadata")
                     .arg(Branding.vmsName())
 
@@ -34,10 +36,10 @@ Scrollable
         {
             id: requestSection
 
-            header: qsTr("New requests") + (requests.count > 0 ? ` (${requests.count})` : "")
-            description: qsTr("API Integration may be enabled after verifying the code received"
-                + " from Integration provider. New requests may be disabled to prevent unwanted"
-                + " interaction.")
+            header.text: qsTr("New requests") + (requests.count > 0 ? ` (${requests.count})` : "")
+            description.text: qsTr("API Integration may be enabled after verifying the code"
+                + " received from Integration provider. New requests may be disabled to prevent"
+                + " unwanted interaction.")
 
             visible: !!requestsModel
             checkable: false

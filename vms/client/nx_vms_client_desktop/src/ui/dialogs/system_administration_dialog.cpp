@@ -112,26 +112,29 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget* parent):
     auto routingWidget = new QnRoutingManagementWidget(this);
     addPage(RoutingManagement, routingWidget, tr("Routing"));
 
-    const auto analyticsSettingsWidget = new AnalyticsSettingsWidget(this);
-    auto updateAnalyticsSettingsWidgetVisibility =
-        [this, analyticsSettingsWidget]
-        {
-            setPageVisible(Analytics, analyticsSettingsWidget->shouldBeVisible());
-        };
+    if (!ini().integrationsManagement)
+    {
+        const auto analyticsSettingsWidget = new AnalyticsSettingsWidget(this);
+        auto updateAnalyticsSettingsWidgetVisibility =
+            [this, analyticsSettingsWidget]
+            {
+                setPageVisible(Analytics, analyticsSettingsWidget->shouldBeVisible());
+            };
 
-    addPage(
-        Analytics,
-        analyticsSettingsWidget,
-        ini().enableMetadataApi ? tr("Integrations") : tr("Plugins"));
+        addPage(
+            Analytics,
+            analyticsSettingsWidget,
+            ini().enableMetadataApi ? tr("Integrations") : tr("Plugins"));
 
-    connect(analyticsSettingsWidget, &AnalyticsSettingsWidget::visibilityUpdateRequested, this,
-        updateAnalyticsSettingsWidgetVisibility);
+        connect(analyticsSettingsWidget, &AnalyticsSettingsWidget::visibilityUpdateRequested, this,
+            updateAnalyticsSettingsWidgetVisibility);
+    }
+
 
     auto advancedSettingsWidget = new AdvancedSystemSettingsWidget(system(), this);
     addPage(Advanced, advancedSettingsWidget, tr("Advanced"));
 
     loadDataToUi();
-    updateAnalyticsSettingsWidgetVisibility();
     updateLicenseAndSaasInfoPagesVisibility();
 
     autoResizePagesToContents(

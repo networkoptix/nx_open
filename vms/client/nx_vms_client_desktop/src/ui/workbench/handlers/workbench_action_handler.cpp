@@ -109,6 +109,7 @@
 #include <nx/vms/client/desktop/state/screen_manager.h>
 #include <nx/vms/client/desktop/state/shared_memory_manager.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
+#include <nx/vms/client/desktop/system_administration/dialogs/integrations_dialog.h>
 #include <nx/vms/client/desktop/system_administration/widgets/advanced_system_settings_widget.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/logic/context_current_user_watcher.h>
@@ -299,6 +300,8 @@ ActionHandler::ActionHandler(QObject *parent) :
         &ActionHandler::openFailoverPriorityDialog);
     connect(action(menu::OpenBookmarksSearchAction), &QAction::triggered, this,
         &ActionHandler::at_openBookmarksSearchAction_triggered);
+    connect(action(menu::OpenIntegrationsAction), &QAction::triggered, this,
+        &ActionHandler::openIntegrationsActionTriggered);
     connect(action(menu::OpenBusinessLogAction), &QAction::triggered, this,
         &ActionHandler::at_openBusinessLogAction_triggered);
     connect(action(menu::OpenAuditLogAction), &QAction::triggered, this,
@@ -2027,6 +2030,19 @@ void ActionHandler::at_openBookmarksSearchAction_triggered()
 
     if (!firstTime)
         m_searchBookmarksDialog->setParameters(startTimeMs, endTimeMs, filterText);
+}
+
+void ActionHandler::openIntegrationsActionTriggered()
+{
+    if (!m_integrationsDialog)
+        m_integrationsDialog = new IntegrationsDialog(mainWindowWidget());
+
+    const auto parameters = menu()->currentParameters(sender());
+    const auto parent = utils::extractParentWidget(parameters, mainWindowWidget());
+    m_integrationsDialog->setTransientParent(parent);
+
+    m_integrationsDialog->open();
+    m_integrationsDialog->raise();
 }
 
 void ActionHandler::at_openBusinessLogAction_triggered() {

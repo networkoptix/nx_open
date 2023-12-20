@@ -10,8 +10,8 @@ import Nx.Controls
 Column
 {
     id: root
-    property alias header: header.text
-    property alias description: description.text
+    property alias header: header
+    property alias description: description
     property bool checkable: false
     property alias checked: switchButton.checked
 
@@ -59,6 +59,8 @@ Column
     Text
     {
         id: description
+
+        visible: !!text
 
         font.pixelSize: 14
         color: ColorTheme.windowText

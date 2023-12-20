@@ -19,6 +19,7 @@
 #include <nx/vms/client/desktop/common/widgets/hint_button.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/menu/action_parameters.h>
 #include <nx/vms/client/desktop/menu/actions.h>
@@ -135,6 +136,10 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(
         qnSkin->icon("system_settings/audit_trail_56.svg", kNormalIconSubstitutions));
     m_buttons[kBookmarksButton    ]->setIcon(
         qnSkin->icon("system_settings/bookmarks_56.svg", kNormalIconSubstitutions));
+    m_buttons[kIntegrationsButton ]->setIcon(
+        qnSkin->icon("system_settings/integrations_56.svg", kNormalIconSubstitutions));
+
+    m_buttons[kIntegrationsButton]->setVisible(ini().integrationsManagement);
 
     retranslateUi();
 
@@ -144,6 +149,7 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(
         HelpTopic::Id::Administration_General_CamerasList);
     setHelpTopic(m_buttons[kAuditLogButton], HelpTopic::Id::AuditTrail);
     setHelpTopic(m_buttons[kBookmarksButton], HelpTopic::Id::Bookmarks_Search);
+    setHelpTopic(m_buttons[kIntegrationsButton], HelpTopic::Id::PluginsAndAnalytics);
 
     connect(m_buttons[kBusinessRulesButton], &QPushButton::clicked, this,
         [this] { menu()->trigger(menu::OpenBusinessRulesAction); });
@@ -159,6 +165,9 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(
 
     connect(m_buttons[kBookmarksButton], &QPushButton::clicked, this,
         [this] { menu()->trigger(menu::OpenBookmarksSearchAction); });
+
+    connect(m_buttons[kIntegrationsButton], &QPushButton::clicked, this,
+        [this] { menu()->trigger(menu::OpenIntegrationsAction); });
 
     connect(m_systemSettingsWidget, &QnAbstractPreferencesWidget::hasChangesChanged,
         this, &QnAbstractPreferencesWidget::hasChangesChanged);
@@ -189,6 +198,7 @@ void QnGeneralSystemAdministrationWidget::retranslateUi()
     m_buttons[kEventLogButton     ]->setText(tr("Event Log"));
     m_buttons[kAuditLogButton     ]->setText(tr("Audit Trail"));
     m_buttons[kBookmarksButton    ]->setText(tr("Bookmarks"));
+    m_buttons[kIntegrationsButton ]->setText(tr("Integrations"));
     m_buttons[kCameraListButton   ]->setText(
         QnDeviceDependentStrings::getDefaultNameFromSet(resourcePool(), tr("Device List"), tr("Camera List")));
 
@@ -213,6 +223,9 @@ void QnGeneralSystemAdministrationWidget::retranslateUi()
 
     m_buttons[kBookmarksButton]->setToolTip(shortcutString(menu::OpenBookmarksSearchAction,
         tr("Open Bookmarks List")));
+
+    m_buttons[kIntegrationsButton]->setToolTip(shortcutString(menu::OpenIntegrationsAction,
+        tr("Open Integrations")));
 
     m_buttons[kCameraListButton]->setToolTip(shortcutString(menu::CameraListAction,
         QnDeviceDependentStrings::getDefaultNameFromSet(

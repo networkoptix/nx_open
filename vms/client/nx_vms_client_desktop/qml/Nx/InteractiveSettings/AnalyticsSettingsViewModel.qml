@@ -82,7 +82,8 @@ NxObject
                 append({
                     name: engineInfo.name,
                     engineId: request.engineId ?? "",
-                    requestId: request.requestId
+                    requestId: request.requestId,
+                    type: engineInfo.type
                 })
             }
 
@@ -108,6 +109,7 @@ NxObject
                     name: engine.name,
                     engineId: engine.id.toString(),
                     requestId: "",
+                    type: engine.type,
                     visible: true,
                 })
             }
@@ -338,6 +340,7 @@ NxObject
                 version: request.version ?? "",
                 description: request.description ?? "",
                 vendor: request.vendor ?? "",
+                type: "api"
             }
             : null
     }

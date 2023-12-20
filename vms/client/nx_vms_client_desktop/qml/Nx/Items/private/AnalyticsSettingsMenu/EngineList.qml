@@ -66,6 +66,7 @@ Column
                 settingsModel: container.settingsModel
                 selected: container.isSelected
                 text: model.name || modelData.name || "" //< Engine name.
+                type: model.type ?? ""
             }
         }
     }

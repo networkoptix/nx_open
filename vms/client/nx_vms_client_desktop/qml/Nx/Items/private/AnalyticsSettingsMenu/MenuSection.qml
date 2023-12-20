@@ -1,10 +1,13 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.15
-import QtQuick.Controls 2.15
+import QtQuick
+import QtQuick.Controls
 
-import Nx 1.0
-import Nx.Core 1.0
+import Nx
+import Nx.Core
+import Nx.Controls
+
+import nx.vms.client.desktop
 
 import "."
 
@@ -25,6 +28,7 @@ Column
     property int level: 0
     property bool collapsible: content.implicitHeight > 0
     property bool mainItemVisible: true
+    property string iconSource: ""
 
     signal clicked()
 
@@ -45,20 +49,54 @@ Column
             control.clicked()
         }
 
-        ArrowButton
+        iconComponent: LocalSettings.iniConfigValue("integrationsManagement") ? icon : arrow
+
+        Component
         {
-            height: parent.height
-            x: menuItem.leftPadding - 8 - width / 2
-            visible: collapsible
-            state: menuContent.collapsed ? "right" : "down"
-            icon.lineWidth: control.level === 0 ? 1.5 : 1
-
-            onClicked:
+            id: icon
+            SvgImage
             {
-                if (selected && !menuItem.current)
-                    menuItem.click()
+                sourcePath: level === 0
+                    ? iconSource
+                    : collapsed
+                        ? "skin/text_buttons/arrow_right_20.svg"
+                        : "skin/text_buttons/arrow_down_20.svg"
 
-                menuContent.collapsed = !menuContent.collapsed
+                primaryColor: menuItem.color
+                visible: level === 0 || collapsible
+
+                MouseArea
+                {
+                    anchors.fill: parent
+                    onClicked:
+                    {
+                        if (selected && !menuItem.current)
+                            menuItem.click()
+
+                        menuContent.collapsed = !menuContent.collapsed
+                    }
+                }
+            }
+        }
+
+        Component
+        {
+            id: arrow
+            ArrowButton
+            {
+                width: 10
+                height: 10
+                visible: collapsible
+                icon.lineWidth: control.level === 0 ? 1.5 : 1
+                state: menuContent.collapsed ? "right" : "down"
+
+                onClicked:
+                {
+                    if (selected && !menuItem.current)
+                        menuItem.click()
+
+                    menuContent.collapsed = !menuContent.collapsed
+                }
             }
         }
 

@@ -3,6 +3,7 @@ module Nx.InteractiveSettings
 AnalyticsSettingsView 1.0 AnalyticsSettingsView.qml
 AnalyticsSettingsViewModel 1.0 AnalyticsSettingsViewModel.qml
 SaasBanner 1.0 SaasBanner.qml
+Section 1.0 Section.qml
 SettingsView 1.0 SettingsView.qml
 SettingsPlaceholder 1.0 SettingsPlaceholder.qml
 InformationPanel 1.0 InformationPanel.qml

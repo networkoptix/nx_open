@@ -7,6 +7,7 @@
 #include <api/server_rest_connection.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/api/analytics/integration_request.h>
+#include <nx/vms/client/desktop/resource/rest_api_helper.h>
 #include <nx/vms/client/desktop/system_context.h>
 
 namespace nx::vms::client::desktop {
@@ -61,7 +62,7 @@ void ApiIntegrationRequestsModel::refresh()
         nx::network::rest::Params(),
         nx::utils::guarded(this,
             [this](bool success,
-                rest::Handle requestId,
+                rest::Handle,
                 const QByteArray& data,
                 const nx::network::http::HttpHeaders&)
             {
@@ -82,7 +83,7 @@ void ApiIntegrationRequestsModel::reject(const QString& id)
         nx::format("/rest/v3/analytics/integrations/*/requests/%1", id),
         nx::network::rest::Params(),
         nx::utils::guarded(this,
-            [this](bool success, rest::Handle, const rest::ServerConnection::EmptyResponseType&)
+            [this](bool, rest::Handle, const rest::ServerConnection::EmptyResponseType&)
             {
                 refresh();
             }),
@@ -94,18 +95,17 @@ void ApiIntegrationRequestsModel::approve(const QString& id, const QString&)
     if (!connection()) //< It may be null if the client just disconnected from the server.
         return;
 
-    connectedServerApi()->postEmptyResult(
+    connectedServerApi()->postRest(
+        systemContext()->restApiHelper()->getSessionTokenHelper(),
         nx::format("/rest/v3/analytics/integrations/*/requests/%1/approve", id),
         nx::network::rest::Params(),
         /*body*/ QByteArray(),
         nx::utils::guarded(this,
-            [this](bool success, rest::Handle, const rest::ServerConnection::EmptyResponseType&)
+            [this](bool, rest::Handle, const rest::ServerConnection::ErrorOrEmpty&)
             {
                 refresh();
             }),
-        thread(),
-        /*proxyToServer*/ {},
-        /*contentType*/ std::nullopt);
+        thread());
 }
 
 } // namespace nx::vms::client::desktop

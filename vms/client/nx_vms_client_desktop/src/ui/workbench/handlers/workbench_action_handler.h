@@ -21,6 +21,7 @@
 #include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/resource/resource_fwd.h>
 #include <nx/vms/client/desktop/state/shared_memory_manager.h>
+#include <nx/vms/client/desktop/system_administration/dialogs/integrations_dialog.h>
 #include <recording/time_period.h>
 #include <ui/dialogs/audit_log_dialog.h>
 #include <ui/dialogs/camera_list_dialog.h>
@@ -46,6 +47,7 @@ namespace nx::vms::client::desktop {
 class AdvancedUpdateSettingsDialog;
 class SceneBanner;
 class AdvancedSearchDialog;
+class IntegrationsDialog;
 
 namespace rules { class RulesDialog; }
 
@@ -174,6 +176,7 @@ protected:
     void at_businessEventsAction_triggered();
     void at_openBusinessRulesAction_triggered();
     void at_openBookmarksSearchAction_triggered();
+    void openIntegrationsActionTriggered();
     void at_openBusinessLogAction_triggered();
     void at_openAuditLogAction_triggered();
     void at_cameraListAction_triggered();
@@ -302,6 +305,7 @@ private:
     QPointer<AdvancedUpdateSettingsDialog> m_advancedUpdateSettingsDialog;
     QPointer<AdvancedSearchDialog> m_advancedSearchDialog;
     QPointer<rules::RulesDialog> m_rulesDialog;
+    QPointer<IntegrationsDialog> m_integrationsDialog;
     std::unique_ptr<experimental::MainWindow> m_mainWindow;
 
     QQueue<QnMediaResourcePtr> m_layoutExportResources;
