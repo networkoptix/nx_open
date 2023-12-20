@@ -5,6 +5,7 @@
 #include <range/v3/view/reverse.hpp>
 
 #include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/desktop/rules/model_view/event_parameters_model.h>
 #include <nx/vms/common/html/html.h>
 
 #include "../utils/completer.h"
@@ -54,15 +55,14 @@ TextWithFieldsPicker::TextWithFieldsPicker(SystemContext* context, CommonParamsW
     base(context, parent),
     d(new Private(this))
 {
-    d->completer = new Completer{wordsToComplete(), m_textEdit, this};
+    d->completer = new Completer{
+        new EventParametersModel(vms::rules::TextWithFields::substitutionsByGroup(), this),
+        m_textEdit,
+        this};
 }
 
 TextWithFieldsPicker::~TextWithFieldsPicker(){}
 
-QStringList TextWithFieldsPicker::wordsToComplete() const
-{
-    return vms::rules::TextWithFields::availableFunctions();
-}
 
 void TextWithFieldsPicker::updateUi()
 {

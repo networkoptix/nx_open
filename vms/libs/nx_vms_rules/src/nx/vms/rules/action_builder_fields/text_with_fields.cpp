@@ -219,7 +219,7 @@ struct TextWithFields::Private
 
         while (cur != text.size())
         {
-            if (text[cur] == '{')
+            if (text[cur] == kStartOfSubstitutionSymbol)
             {
                 if (start != cur)
                 {
@@ -234,7 +234,7 @@ struct TextWithFields::Private
                 inSub = true;
             }
 
-            if (text[cur] == '}' && inSub)
+            if (text[cur] == kEndOfSubstitutionSymbol && inSub)
             {
                 if (start + 1 != cur)
                 {
@@ -340,11 +340,15 @@ void TextWithFields::setText(const QString& text)
     emit textChanged();
 }
 
-const QStringList& TextWithFields::availableFunctions()
+TextWithFields::EventParametersByGroup TextWithFields::substitutionsByGroup()
 {
-    static const QStringList availableFunctionsList =
-        kFormatFunctions.keys().replaceInStrings(QRegularExpression{"^(.*)"}, "{\\1}");
-    return availableFunctionsList;
+    EventParametersByGroup result;
+    for (auto& key: kFormatFunctions.keys())
+    {
+        // TODO: init specifically elements with group different from "event".
+        result["event"].push_back(kStartOfSubstitutionSymbol + key + kEndOfSubstitutionSymbol);
+    }
+    return result;
 }
 
 } // namespace nx::vms::rules

@@ -2,9 +2,12 @@
 
 #pragma once
 
+#include <QtCore/QAbstractListModel>
 #include <QtWidgets/QCompleter>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QTextEdit>
+
+#include <nx/utils/impl_ptr.h>
 
 namespace nx::vms::client::desktop::rules {
 
@@ -15,23 +18,15 @@ class Completer: public QObject
 public:
     Completer(const QStringList& words, QLineEdit* lineEdit, QObject* parent = nullptr);
     Completer(const QStringList& words, QTextEdit* textEdit, QObject* parent = nullptr);
+    Completer(QAbstractListModel* model, QTextEdit* textEdit, QObject* parent = nullptr);
+    virtual ~Completer() override;
 
 protected:
     bool eventFilter(QObject* obj, QEvent* event) override;
 
 private:
-    QCompleter m_completer;
-
-    struct CurrentWord
-    {
-        int begin{0};
-        int length{0};
-    };
-    CurrentWord m_currentWord;
-    bool m_isCompletingInProgress{false};
-
-    void updateCompleter(int cursorPosition, const QString& text);
-    void replaceCurrentWordWithCompleted(QString& text, const QString& completedText) const;
+    struct Private;
+    nx::utils::ImplPtr<Private> d;
 };
 
 } // namespace nx::vms::client::desktop::rules
