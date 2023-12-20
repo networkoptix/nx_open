@@ -27,6 +27,32 @@
     <number>0</number>
    </property>
    <item>
+    <widget class="nx::vms::client::desktop::Panel" name="headerWidget" native="true">
+     <layout class="QVBoxLayout" name="headerLayout">
+      <item>
+       <widget class="QLabel" name="saasStateCaptionLabel">
+        <property name="text">
+         <string>Services state</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="saasStateValueLabel"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="Line" name="horizontalLine">
+     <property name="frameShadow">
+      <enum>QFrame::Plain</enum>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QStackedWidget" name="stackedWidget">
      <property name="currentIndex">
       <number>0</number>
@@ -241,32 +267,6 @@
        <property name="bottomMargin">
         <number>0</number>
        </property>
-       <item>
-        <widget class="nx::vms::client::desktop::Panel" name="servicesHeaderWidget" native="true">
-         <layout class="QVBoxLayout" name="servicesHeaderLayout">
-          <item>
-           <widget class="QLabel" name="saasStateCaptionLabel">
-            <property name="text">
-             <string>Services state</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="saasStateValueLabel"/>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item>
-        <widget class="Line" name="horizontalLine">
-         <property name="frameShadow">
-          <enum>QFrame::Plain</enum>
-         </property>
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-        </widget>
-       </item>
        <item>
         <widget class="QWidget" name="servicesContentsWidget" native="true">
          <layout class="QVBoxLayout" name="servicesContentsLayout">
