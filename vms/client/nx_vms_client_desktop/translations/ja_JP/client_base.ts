@@ -1910,6 +1910,34 @@ License Key: %2</source>
       <source>Emails</source>
       <translation>Eメール</translation>
     </message>
+    <message>
+      <source>RHI backend</source>
+      <translation>RHI バックエンド</translation>
+    </message>
+    <message>
+      <source>RHI device</source>
+      <translation>RHI デバイス</translation>
+    </message>
+    <message>
+      <source>RHI device ID</source>
+      <translation>RHI デバイスID</translation>
+    </message>
+    <message>
+      <source>RHI vendor ID</source>
+      <translation>RHI ベンダーID</translation>
+    </message>
+    <message>
+      <source>RHI max texture size</source>
+      <translation>RHI 最大テクスチャサイズ</translation>
+    </message>
+    <message>
+      <source>Graphics API</source>
+      <translation>グラフィックスAPI</translation>
+    </message>
+    <message>
+      <source>Unable to get GPU information for %1</source>
+      <translation>%1 の GPU 情報を取得できません</translation>
+    </message>
   </context>
   <context>
     <name>QnAbstractPtzDialog</name>
