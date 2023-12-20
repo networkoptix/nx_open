@@ -16,16 +16,15 @@ Item
     id: analyticsSettings
 
     property var store: null
-    property var engineLicenseSummaryProvider: null
-    property var saasServiceManager: null
+    property var engineLicenseSummaryProvider: store && store.engineLicenseSummaryProvider()
+    property var saasServiceManager: store && store.saasServiceManager()
+    property alias requestsModel: viewModel.requestsModel
 
     function activateEngine(engineId) { viewModel.setCurrentEngine(engineId) }
 
     AnalyticsSettingsViewModel
     {
         id: viewModel
-
-        requestsModel: store ? store.makeApiIntegrationRequestsModel() : null
 
         onEngineRequested: (engineId) =>
         {
@@ -35,6 +34,9 @@ Item
 
         function storeUpdated()
         {
+            if (!store)
+                return
+
             const engineId = store.getCurrentEngineId()
             const licenseSummary = engineLicenseSummaryProvider
                 ? engineLicenseSummaryProvider.licenseSummary(engineId)
@@ -114,7 +116,7 @@ Item
         {
             checkable: false
             refreshable: false
-            removable: true
+            removable: !!viewModel.currentRequestId
             streamSelectorVisible: false
         }
 
@@ -147,7 +149,9 @@ Item
 
     onStoreChanged:
     {
-        store.setCurrentEngineId(viewModel.currentEngineId ?? NxGlobals.uuid(""))
+        if (store)
+            store.setCurrentEngineId(viewModel.currentEngineId ?? NxGlobals.uuid(""))
+
         viewModel.storeUpdated()
     }
 }

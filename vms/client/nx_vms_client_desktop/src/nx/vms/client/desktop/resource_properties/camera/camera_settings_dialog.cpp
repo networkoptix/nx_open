@@ -394,7 +394,9 @@ CameraSettingsDialog::CameraSettingsDialog(SystemContext* systemContext, QWidget
         int(CameraSettingsTab::analytics),
         new CameraAnalyticsSettingsWidget(
             systemContext, d->store, appContext()->qmlEngine(), ui->tabWidget),
-        ini().enableMetadataApi ? tr("Integrations") : tr("Plugins"));
+        ini().enableMetadataApi || ini().integrationsManagement
+            ? tr("Integrations")
+            : tr("Plugins"));
 
     GenericTabbedDialog::addPage(
         int(CameraSettingsTab::expert),

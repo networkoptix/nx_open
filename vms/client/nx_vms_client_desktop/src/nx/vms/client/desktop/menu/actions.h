@@ -477,6 +477,11 @@ enum IDType
     OpenBookmarksSearchAction,
 
     /**
+     * Opens integrations dialog.
+     */
+    OpenIntegrationsAction,
+
+    /**
      * Opens camera list dialog.
      */
     CameraListAction,

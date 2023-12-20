@@ -43,6 +43,7 @@ private:
         kCameraListButton,
         kAuditLogButton,
         kBookmarksButton,
+        kIntegrationsButton,
 
         kButtonCount
     };

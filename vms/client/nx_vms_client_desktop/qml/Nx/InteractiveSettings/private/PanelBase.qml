@@ -17,6 +17,7 @@ FocusScope
     property alias sourceItem: sourceControl.contentItem
     property alias content: content.contentItem
     property alias permissions: permissions
+    property alias authCode: authCode
     property var request
 
     property bool approveButtonVisible: !!request
@@ -28,13 +29,6 @@ FocusScope
 
     implicitWidth: column.implicitWidth
     implicitHeight: column.implicitHeight
-
-    onRequestChanged: authCode.clear()
-    onVisibleChanged:
-    {
-        authCode.clear()
-        permissions.collapsed = true
-    }
 
     Control
     {
@@ -122,6 +116,19 @@ FocusScope
                     text: qsTr("Approve")
                     enabled: authCode.valid || !authCode.visible
                     onClicked: informationPanel.approveClicked(authCode.value)
+
+                    Keys.onShortcutOverride: (event) =>
+                    {
+                        switch (event.key)
+                        {
+                            case Qt.Key_Enter:
+                            case Qt.Key_Return:
+                                event.accepted = true
+                                focus = false
+                                informationPanel.approveClicked(authCode.value)
+                                break
+                        }
+                    }
                 }
 
                 Button

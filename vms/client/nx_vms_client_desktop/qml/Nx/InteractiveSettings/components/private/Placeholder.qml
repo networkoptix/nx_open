@@ -16,10 +16,14 @@ import nx.vms.client.desktop
  */
 Control
 {
+    id: control
+
     property alias header: header.text
+    property alias headerFont: header.font
     property alias description: description.text
     property alias imageSource: image.source
     readonly property real positionRatio: 2/3
+    property var preferredWidth
 
     contentItem: ColumnLayout
     {
@@ -60,7 +64,7 @@ Control
             onLinkActivated: (link) => Qt.openUrlExternally(link)
 
             Layout.alignment: Qt.AlignCenter
-            Layout.maximumWidth: parent.width
+            Layout.maximumWidth: control.preferredWidth ?? parent.width
             Layout.topMargin: 16
         }
 
@@ -82,7 +86,7 @@ Control
             onLinkActivated: (link) => Qt.openUrlExternally(link)
 
             Layout.alignment: Qt.AlignCenter
-            Layout.maximumWidth: parent.width
+            Layout.maximumWidth: control.preferredWidth ?? parent.width
             Layout.topMargin: 8
         }
 

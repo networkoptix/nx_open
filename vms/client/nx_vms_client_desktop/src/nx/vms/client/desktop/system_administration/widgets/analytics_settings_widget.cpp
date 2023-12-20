@@ -3,10 +3,12 @@
 #include "analytics_settings_widget.h"
 
 #include <QtCore/QUrlQuery>
+#include <QtQml/QQmlEngine>
+#include <QtQuick/QQuickItem>
 
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
-
-#include "private/analytics_settings_widget_p.h"
+#include <utils/common/event_processors.h>
 
 using namespace nx::vms::common;
 
@@ -15,12 +17,27 @@ namespace nx::vms::client::desktop {
 AnalyticsSettingsWidget::AnalyticsSettingsWidget(QWidget* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    d(new Private(this))
+    m_view(std::make_unique<QQuickWidget>(appContext()->qmlEngine(), this)),
+    m_store(std::make_unique<AnalyticsSettingsStore>(this))
 {
-    anchorWidgetToParent(d->view.get());
+    m_view->setClearColor(palette().window().color());
+    m_view->setResizeMode(QQuickWidget::SizeRootObjectToView);
+    m_view->setSource(QUrl("Nx/Dialogs/SystemSettings/AnalyticsSettings.qml"));
+    m_view->rootObject()->setProperty("store", QVariant::fromValue(m_store.get()));
 
-    connect(d.get(), &Private::analyticsEnginesChanged, this,
-        &AnalyticsSettingsWidget::visibilityUpdateRequested);
+    installEventHandler(this, {QEvent::Show, QEvent::Hide}, this,
+        [this]() { m_view->rootObject()->setVisible(isVisible()); });
+
+    if (!NX_ASSERT(m_view->rootObject()))
+        return;
+
+    anchorWidgetToParent(m_view.get());
+
+    connect(m_store.get(), &AnalyticsSettingsStore::analyticsEnginesChanged,
+        this, &AnalyticsSettingsWidget::visibilityUpdateRequested);
+
+    connect(m_store.get(), &AnalyticsSettingsStore::hasChangesChanged,
+        this, &AnalyticsSettingsWidget::hasChangesChanged);
 }
 
 AnalyticsSettingsWidget::~AnalyticsSettingsWidget()
@@ -31,37 +48,30 @@ AnalyticsSettingsWidget::~AnalyticsSettingsWidget()
 
 void AnalyticsSettingsWidget::loadDataToUi()
 {
-    d->updateEngines();
+    if (!m_view->rootObject())
+        return;
+
+    m_store->updateEngines();
 }
 
 void AnalyticsSettingsWidget::applyChanges()
 {
-    d->applySettingsValues();
+    m_store->applySettingsValues();
 }
 
 void AnalyticsSettingsWidget::discardChanges()
 {
-    d->settingsValuesByEngineId.clear();
-    d->hasChanges = false;
-    if (auto api = d->connectedServerApi())
-    {
-        for (auto handle: d->pendingApplyRequests)
-            api->cancelRequest(handle);
-        for (auto handle: d->pendingRefreshRequests)
-            api->cancelRequest(handle);
-    }
-    d->pendingApplyRequests.clear();
-    d->pendingRefreshRequests.clear();
+    m_store->discardChanges();
 }
 
 bool AnalyticsSettingsWidget::hasChanges() const
 {
-    return d->hasChanges;
+    return m_store->hasChanges();
 }
 
 bool AnalyticsSettingsWidget::isNetworkRequestRunning() const
 {
-    return !d->pendingApplyRequests.empty() || !d->pendingRefreshRequests.empty();
+    return m_store->isNetworkRequestRunning();
 }
 
 bool AnalyticsSettingsWidget::activate(const QUrl& url)
@@ -70,14 +80,17 @@ bool AnalyticsSettingsWidget::activate(const QUrl& url)
 
     const auto& engineId = QnUuid::fromStringSafe(urlQuery.queryItemValue("engineId"));
     if (!engineId.isNull())
-        d->activateEngine(engineId);
+    {
+        return QMetaObject::invokeMethod(m_view->rootObject(), "activateEngine",
+            Q_ARG(QVariant, QVariant::fromValue(engineId)));
+    }
 
     return true;
 }
 
 bool AnalyticsSettingsWidget::shouldBeVisible() const
 {
-    return !d->engines.empty();
+    return !m_store->isEmpty();
 }
 
 } // namespace nx::vms::client::desktop

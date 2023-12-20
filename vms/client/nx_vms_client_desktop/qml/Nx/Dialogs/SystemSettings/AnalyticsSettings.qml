@@ -18,8 +18,8 @@ Item
     id: analyticsSettings
 
     property var store: null
-    property var engineLicenseSummaryProvider: null
-    property var saasServiceManager: null
+    property var engineLicenseSummaryProvider: store && store.engineLicenseSummaryProvider()
+    property var saasServiceManager: store && store.saasServiceManager()
     property alias viewModel: viewModel
 
     function activateEngine(engineId) { viewModel.setCurrentEngine(engineId) }
@@ -59,27 +59,14 @@ Item
         }
     }
 
-    Component
-    {
-        id: analyticsSettingsMenu
-        AnalyticsSettingsMenu { viewModel: analyticsSettings.viewModel }
-    }
-
-    Component
-    {
-        id: integrationsMenu
-        IntegrationsMenu { viewModel: analyticsSettings.viewModel }
-    }
-
-    Loader
+    AnalyticsSettingsMenu
     {
         id: menu
+
         width: 240
         height: parent.height - saasBanner.height
 
-        sourceComponent: LocalSettings.iniConfigValue("integrationsManagement")
-            ? integrationsMenu
-            : analyticsSettingsMenu
+        viewModel: viewModel
     }
 
     Item

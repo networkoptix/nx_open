@@ -6,6 +6,7 @@ import QtQuick.Layouts
 import nx.vms.client.desktop
 
 import "private"
+import "components/private"
 
 StackLayout
 {
@@ -19,11 +20,21 @@ StackLayout
     currentIndex:
         Array.from(children).findIndex((widget) => widget.itemType === viewModel.currentItemType)
 
-    SettingsPlaceholder
+    Item
     {
         property string itemType: "Placeholder"
-        header: qsTr("Integrations allow the seamless utilization of video analytics on various"
-            + " devices from the VMS.\nSelect an Integration to begin configuring its parameters.")
+
+        Placeholder
+        {
+            y: 64
+            width: parent.width
+            preferredWidth: 260
+            headerFont.pixelSize: 14
+            imageSource: "image://svg/skin/integrations/integrations_placeholder.svg"
+            header: qsTr("Integrations allow the seamless utilization of video analytics on"
+                + " various devices from the VMS.\nSelect an Integration to begin configuring its"
+                + " parameters.")
+        }
     }
 
     Plugins
@@ -79,6 +90,12 @@ StackLayout
             visible: !viewModel.currentRequestId
         }
 
+        onVisibleChanged:
+        {
+            header.permissions.reset()
+            header.authCode.clear()
+        }
+
         Connections
         {
             target: viewModel
@@ -115,6 +132,7 @@ StackLayout
 
             function onCurrentItemChanged()
             {
+                header.authCode.clear()
                 header.forceActiveFocus()
             }
         }

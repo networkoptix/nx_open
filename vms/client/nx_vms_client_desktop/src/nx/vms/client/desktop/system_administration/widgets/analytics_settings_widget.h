@@ -2,7 +2,12 @@
 
 #pragma once
 
+#include <memory>
+
+#include <QtQuickWidgets/QQuickWidget>
+
 #include <nx/utils/uuid.h>
+#include <nx/vms/client/desktop/system_administration/models/analytics_settings_store.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
 
@@ -31,8 +36,8 @@ signals:
     void visibilityUpdateRequested();
 
 private:
-    class Private;
-    const QScopedPointer<Private> d;
+    const std::unique_ptr<QQuickWidget> m_view;
+    const std::unique_ptr<AnalyticsSettingsStore> m_store;
 };
 
 } // namespace nx::vms::client::desktop

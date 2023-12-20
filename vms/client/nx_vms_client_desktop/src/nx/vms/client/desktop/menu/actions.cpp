@@ -659,6 +659,12 @@ void initialize(Manager* manager, Action* root)
             condition::isDeviceAccessRelevant(nx::vms::api::AccessRight::viewBookmarks)
             && !condition::showreelIsRunning());
 
+    factory(OpenIntegrationsAction)
+        .flags(NoTarget)
+        .mode(DesktopMode)
+        .requiredPowerUserPermissions()
+        .text(ContextMenu::tr("Open Integrations..."));
+
     factory(LoginToCloud)
         .flags(NoTarget)
         .text(ContextMenu::tr("Log in to %1...", "Log in to Nx Cloud")
