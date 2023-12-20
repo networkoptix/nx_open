@@ -248,13 +248,13 @@
     <message numerus="yes">
       <source>Cannot verify the identity of %n servers</source>
       <translation type="unfinished">
-        <numerusform>Cannot verify the identity of %n servers</numerusform>
+        <numerusform>Kan ikke bekrefte identiteten til %n servere</numerusform>
         <numerusform>Cannot verify the identity of %n servers</numerusform>
       </translation>
     </message>
     <message>
       <source>Review the certificates of the servers from this system.</source>
-      <translation type="unfinished">Review the certificates of the servers from this system.</translation>
+      <translation>Se gjennom sertifikatene til serverne fra dette systemet.</translation>
     </message>
     <message>
       <source>This might be due to an expired server certificate or or an invalid certificate. Contact your system administrator for further investigation.</source>
@@ -263,7 +263,7 @@
     <message>
       <source>To learn more about the current problem read this %1.</source>
       <comment>%1 is &lt;help article&gt; link</comment>
-      <translation type="unfinished">To learn more about the current problem read this %1.</translation>
+      <translation>Les denne %1for å lære mer om det nåværende problemet.</translation>
     </message>
   </context>
   <context>
