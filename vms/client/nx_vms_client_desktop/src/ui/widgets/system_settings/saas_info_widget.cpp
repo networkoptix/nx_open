@@ -84,6 +84,7 @@ struct SaasInfoWidget::Private
     std::unique_ptr<saas::ServicesSortModel> servicesSortModel =
         std::make_unique<saas::ServicesSortModel>();
 
+    void setupHeaderUi();
     void setupPlaceholderPageUi();
     void setupServicesUsagePageUi();
     void updateUi();
@@ -91,6 +92,20 @@ struct SaasInfoWidget::Private
 
 //-------------------------------------------------------------------------------------------------
 // SaasInfoWidget::Private definition.
+
+void SaasInfoWidget::Private::setupHeaderUi()
+{
+    ui->headerWidget->setContentsMargins(nx::style::Metrics::kDefaultTopLevelMargins);
+
+    const QColor saasStateValueLabelColor(
+        qApp->palette().color(QPalette::Normal, QPalette::BrightText));
+    setPaletteColor(ui->saasStateValueLabel, QPalette::WindowText, saasStateValueLabelColor);
+
+    QFont saasStateLabelFont;
+    saasStateLabelFont.setPixelSize(kSaasStateLabelFontSize);
+    saasStateLabelFont.setWeight(kSaasStateLabelFontWeight);
+    ui->saasStateValueLabel->setFont(saasStateLabelFont);
+}
 
 void SaasInfoWidget::Private::setupPlaceholderPageUi()
 {
@@ -108,31 +123,22 @@ void SaasInfoWidget::Private::setupPlaceholderPageUi()
 
 void SaasInfoWidget::Private::setupServicesUsagePageUi()
 {
-    ui->servicesHeaderWidget->setContentsMargins(nx::style::Metrics::kDefaultTopLevelMargins);
     ui->servicesContentsWidget->setContentsMargins(nx::style::Metrics::kDefaultTopLevelMargins);
-
-    QFont saasStateLabelFont;
-    saasStateLabelFont.setPixelSize(kSaasStateLabelFontSize);
-    saasStateLabelFont.setWeight(kSaasStateLabelFontWeight);
-    ui->saasStateValueLabel->setFont(saasStateLabelFont);
-
-    const QColor saasStateValueLabelColor(qApp->palette().color(QPalette::Normal, QPalette::BrightText));
-    setPaletteColor(ui->saasStateValueLabel, QPalette::WindowText, saasStateValueLabelColor);
 
     servicesSortModel->setSourceModel(servicesUsageModel.get());
     servicesSortModel->sort(saas::ServicesUsageModel::ServiceNameColumn);
     ui->servicesUsageItemView->setModel(servicesSortModel.get());
 
-    const auto header = ui->servicesUsageItemView->header();
-    header->setMinimumSectionSize(kServiceUsageTableMinimumColumnWidth);
-    header->setSectionsMovable(false);
-    header->setSectionResizeMode(
+    const auto itemViewHeader = ui->servicesUsageItemView->header();
+    itemViewHeader->setMinimumSectionSize(kServiceUsageTableMinimumColumnWidth);
+    itemViewHeader->setSectionsMovable(false);
+    itemViewHeader->setSectionResizeMode(
         saas::ServicesUsageModel::ServiceNameColumn, QHeaderView::Stretch);
-    header->setSectionResizeMode(
+    itemViewHeader->setSectionResizeMode(
         saas::ServicesUsageModel::ServiceTypeColumn, QHeaderView::Stretch);
-    header->setSectionResizeMode(
+    itemViewHeader->setSectionResizeMode(
         saas::ServicesUsageModel::TotalQantityColumn, QHeaderView::ResizeToContents);
-    header->setSectionResizeMode(
+    itemViewHeader->setSectionResizeMode(
         saas::ServicesUsageModel::UsedQantityColumn, QHeaderView::ResizeToContents);
 }
 
@@ -166,6 +172,7 @@ SaasInfoWidget::SaasInfoWidget(SystemContext* systemContext, QWidget* parent):
     d(new Private({this}))
 {
     d->ui->setupUi(this);
+    d->setupHeaderUi();
     d->setupPlaceholderPageUi();
     d->setupServicesUsagePageUi();
 

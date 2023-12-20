@@ -16,10 +16,13 @@
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/logic/connect_to_cloud_tool.h>
 #include <nx/vms/client/desktop/system_logon/logic/fresh_session_token_helper.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/common/html/html.h>
+#include <nx/vms/common/saas/saas_service_manager.h>
+#include <nx/vms/common/saas/saas_utils.h>
 #include <nx/vms/common/system_settings.h>
 #include <ui/common/palette.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
@@ -120,7 +123,13 @@ void QnCloudManagementWidget::loadDataToUi()
 
     if (linked)
     {
-        ui->accountLabel->setText(globalSettings()->cloudAccountName());
+        const auto saasInitialized = nx::vms::common::saas::saasInitialized(systemContext());
+        const auto saasServiceManager = systemContext()->saasServiceManager();
+
+        ui->accountLabel->setText(saasInitialized
+            ? saasServiceManager->data().organization.name
+            : globalSettings()->cloudAccountName());
+
         ui->stackedWidget->setCurrentWidget(ui->linkedPage);
     }
     else
