@@ -24,8 +24,8 @@ static const QColor kLight10Color = "#A5B7C0";
 static const QColor kLight12Color = "#91A7B2";
 static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
     {QIcon::Normal, {{kLight10Color, "light16"}, {kLight16Color, "light16"}, {kLight12Color, "light16"}}},
-    {QIcon::Active, {{kLight10Color, "light15"}, {kLight16Color, "light15"}, {kLight12Color, "light15"}}},
-    {QIcon::Selected, {{kLight16Color, "light15"}, {kLight12Color, "light11"}}},
+    {QIcon::Active, {{kLight10Color, "light14"}, {kLight16Color, "light14"}, {kLight12Color, "light14"}}},
+    {QIcon::Selected, {{kLight16Color, "light17"}, {kLight12Color, "light17"}}},
 };
 
 int rowOf(QGridLayout* layout, QWidget* widget)
@@ -46,7 +46,7 @@ CameraInfoWidget::CameraInfoWidget(QWidget* parent):
     ui->multipleNameLabel->setReadOnly(true);
     ui->showOnLayoutButton->setIcon(qnSkin->icon("text_buttons/play_20.svg", kIconSubstitutions));
     ui->eventLogButton->setIcon(qnSkin->icon("text_buttons/event_log_20.svg", kIconSubstitutions));
-    ui->cameraRulesButton->setIcon(qnSkin->icon("text_buttons/event_rules_20.svg", kIconSubstitutions));
+    ui->cameraRulesButton->setIcon(qnSkin->icon("text_buttons/event_rules_20x20.svg", kIconSubstitutions));
 
     autoResizePagesToContents(ui->stackedWidget,
         {QSizePolicy::Preferred, QSizePolicy::Fixed},
