@@ -1785,10 +1785,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Channel partners service</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Enable deprecated API functions currently used by %1 software (insecure)</source>
         <comment>%1 is a company name</comment>
         <translation type="unfinished"></translation>
