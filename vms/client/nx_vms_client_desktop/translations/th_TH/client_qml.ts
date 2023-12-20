@@ -462,7 +462,7 @@
     </message>
     <message>
       <source>Suspended</source>
-      <translation type="unfinished">Suspended</translation>
+      <translation>ถูกระงับ</translation>
     </message>
     <message>
       <source>Shut Down</source>

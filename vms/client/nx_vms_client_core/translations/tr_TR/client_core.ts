@@ -229,13 +229,13 @@
       <translation>Bu sistemdeki sunucuların sertifikalarını inceleyin.</translation>
     </message>
     <message>
-      <source>This might be due to an expired server certificate or or an invalid certificate. Contact your system administrator for further investigation.</source>
-      <translation>Bunun nedeni, süresi dolmuş bir sunucu sertifikası veya geçersiz bir sertifika olabilir. Daha fazla araştırma için sistem yöneticinizle iletişime geçin.</translation>
-    </message>
-    <message>
       <source>To learn more about the current problem read this %1.</source>
       <comment>%1 is &lt;help article&gt; link</comment>
       <translation>Mevcut sorun hakkında daha fazla bilgi edinmek için bunu okuyun %1.</translation>
+    </message>
+    <message>
+      <source>This might be due to an expired server certificate or an invalid certificate. Contact your system administrator for further investigation.</source>
+      <translation type="unfinished">This might be due to an expired server certificate or an invalid certificate. Contact your system administrator for further investigation.</translation>
     </message>
   </context>
   <context>

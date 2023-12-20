@@ -229,13 +229,13 @@
       <translation>Granska certifikaten för servrarna från detta system.</translation>
     </message>
     <message>
-      <source>This might be due to an expired server certificate or or an invalid certificate. Contact your system administrator for further investigation.</source>
-      <translation>Detta kan bero på ett utgånget servercertifikat eller ett ogiltigt certifikat. Kontakta din systemadministratör för vidare utredning.</translation>
-    </message>
-    <message>
       <source>To learn more about the current problem read this %1.</source>
       <comment>%1 is &lt;help article&gt; link</comment>
       <translation>För att lära dig mer om det aktuella problemet läs %1.</translation>
+    </message>
+    <message>
+      <source>This might be due to an expired server certificate or an invalid certificate. Contact your system administrator for further investigation.</source>
+      <translation>Detta kan bero på ett utgånget servercertifikat eller ett ogiltigt certifikat. Kontakta din systemadministratör för vidare utredning.</translation>
     </message>
   </context>
   <context>

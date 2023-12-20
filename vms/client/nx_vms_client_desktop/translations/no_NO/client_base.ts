@@ -1928,6 +1928,34 @@ Lisensnøkkel: %2</translation>
       <source>Emails</source>
       <translation>E-poster</translation>
     </message>
+    <message>
+      <source>RHI backend</source>
+      <translation>RHI backend</translation>
+    </message>
+    <message>
+      <source>RHI device</source>
+      <translation>RHI enhet</translation>
+    </message>
+    <message>
+      <source>RHI device ID</source>
+      <translation>RHI enhets-ID</translation>
+    </message>
+    <message>
+      <source>RHI vendor ID</source>
+      <translation>RHI leverandør-ID</translation>
+    </message>
+    <message>
+      <source>RHI max texture size</source>
+      <translation>RHI max teksturstørrelse</translation>
+    </message>
+    <message>
+      <source>Graphics API</source>
+      <translation>Grafikk API</translation>
+    </message>
+    <message>
+      <source>Unable to get GPU information for %1</source>
+      <translation>Kan ikke hente GPU-informasjon for %1</translation>
+    </message>
   </context>
   <context>
     <name>QnAbstractPtzDialog</name>
@@ -6437,12 +6465,12 @@ Vi anbefaler at du ikke åpner denne integrasjonen. Hvis du forstår risikoen, k
     <message>
       <source>All members of %1 and %2 groups will get access to this layout</source>
       <comment>%1 and %2 will be substituted with user group names</comment>
-      <translation type="unfinished">All members of %1 and %2 groups will get access to this layout</translation>
+      <translation>Alle medlemmer av %1 og %2 grupper vil få tilgang til denne layouten</translation>
     </message>
     <message>
       <source>Convert</source>
       <comment>Converting layout to shared</comment>
-      <translation type="unfinished">Convert</translation>
+      <translation>Konvertere</translation>
     </message>
   </context>
   <context>
@@ -10852,7 +10880,7 @@ Du kan fremtvinge det, men det kan øke CPU-belastningen betydelig.</translation
     </message>
     <message>
       <source>Shut down</source>
-      <translation type="unfinished">Shut down</translation>
+      <translation>Skru av</translation>
     </message>
   </context>
   <context>
@@ -11182,7 +11210,7 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
     <message numerus="yes">
       <source>I trust these servers</source>
       <translation type="unfinished">
-        <numerusform>I trust these servers</numerusform>
+        <numerusform>Jeg stoler på disse serverne</numerusform>
         <numerusform>I trust these servers</numerusform>
       </translation>
     </message>

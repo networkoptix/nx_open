@@ -228,13 +228,13 @@
       <translation>このシステムからのサーバー証明書を確認してください。</translation>
     </message>
     <message>
-      <source>This might be due to an expired server certificate or or an invalid certificate. Contact your system administrator for further investigation.</source>
-      <translation>期限切れまたは無効なサーバー証明書が原因である可能性があります。詳細な調査については、システム管理者にお問い合わせください。</translation>
-    </message>
-    <message>
       <source>To learn more about the current problem read this %1.</source>
       <comment>%1 is &lt;help article&gt; link</comment>
       <translation>現在の問題の詳細については、こちらの %1 を参照してください。</translation>
+    </message>
+    <message>
+      <source>This might be due to an expired server certificate or an invalid certificate. Contact your system administrator for further investigation.</source>
+      <translation>期限切れまたは無効なサーバー証明書が原因である可能性があります。詳細な調査については、システム管理者にお問い合わせください。</translation>
     </message>
   </context>
   <context>

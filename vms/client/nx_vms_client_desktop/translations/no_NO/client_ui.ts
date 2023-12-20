@@ -2471,7 +2471,7 @@
     </message>
     <message>
       <source>Services state</source>
-      <translation type="unfinished">Services state</translation>
+      <translation>Tjenester tilstand</translation>
     </message>
   </context>
   <context>

@@ -1946,6 +1946,34 @@ License Key: %2</translation>
       <source>Emails</source>
       <translation type="unfinished">Emails</translation>
     </message>
+    <message>
+      <source>RHI backend</source>
+      <translation type="unfinished">RHI backend</translation>
+    </message>
+    <message>
+      <source>RHI device</source>
+      <translation type="unfinished">RHI device</translation>
+    </message>
+    <message>
+      <source>RHI device ID</source>
+      <translation type="unfinished">RHI device ID</translation>
+    </message>
+    <message>
+      <source>RHI vendor ID</source>
+      <translation type="unfinished">RHI vendor ID</translation>
+    </message>
+    <message>
+      <source>RHI max texture size</source>
+      <translation type="unfinished">RHI max texture size</translation>
+    </message>
+    <message>
+      <source>Graphics API</source>
+      <translation type="unfinished">Graphics API</translation>
+    </message>
+    <message>
+      <source>Unable to get GPU information for %1</source>
+      <translation type="unfinished">Unable to get GPU information for %1</translation>
+    </message>
   </context>
   <context>
     <name>QnAbstractPtzDialog</name>

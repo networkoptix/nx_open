@@ -1928,6 +1928,34 @@ Licensnyckel: %2</translation>
       <source>Emails</source>
       <translation>E-post</translation>
     </message>
+    <message>
+      <source>RHI backend</source>
+      <translation>RHI backend</translation>
+    </message>
+    <message>
+      <source>RHI device</source>
+      <translation>RHI enhet</translation>
+    </message>
+    <message>
+      <source>RHI device ID</source>
+      <translation>RHI enhets-ID</translation>
+    </message>
+    <message>
+      <source>RHI vendor ID</source>
+      <translation>RHI leverantörs ID</translation>
+    </message>
+    <message>
+      <source>RHI max texture size</source>
+      <translation>RHI max texturstorlek</translation>
+    </message>
+    <message>
+      <source>Graphics API</source>
+      <translation>Grafik API</translation>
+    </message>
+    <message>
+      <source>Unable to get GPU information for %1</source>
+      <translation>Det går inte att få GPU-information för %1</translation>
+    </message>
   </context>
   <context>
     <name>QnAbstractPtzDialog</name>
