@@ -16,7 +16,6 @@ public:
     virtual ~TextWithFieldsPicker() override;
 
     void updateUi() override;
-    QStringList wordsToComplete() const;
 private:
     struct Private;
     nx::utils::ImplPtr<Private> d;

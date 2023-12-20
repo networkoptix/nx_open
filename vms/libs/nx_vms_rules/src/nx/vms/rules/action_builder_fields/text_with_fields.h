@@ -46,8 +46,11 @@ public:
     };
 
     using ParsedValues = QList<ValueDescriptor>;
+    using EventParametersByGroup = std::map<QString, QList<QString>>;
 
-    static const QStringList& availableFunctions();
+    static EventParametersByGroup substitutionsByGroup();
+    static constexpr char kStartOfSubstitutionSymbol = '{';
+    static constexpr char kEndOfSubstitutionSymbol = '}';
 
 signals:
     void textChanged();

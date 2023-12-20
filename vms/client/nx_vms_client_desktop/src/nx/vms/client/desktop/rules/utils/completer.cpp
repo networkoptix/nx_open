@@ -6,68 +6,70 @@
 #include <QtGui/QKeyEvent>
 #include <QtWidgets/QAbstractItemView>
 
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/rules/action_builder_fields/text_with_fields.h>
+#include <ui/common/palette.h>
+
+#include "event_parameters_dropdown_delegate.h"
+
 namespace nx::vms::client::desktop::rules {
 
-Completer::Completer(const QStringList& words, QLineEdit* lineEdit, QObject* parent):
-    QObject(parent), m_completer{words}
+struct Completer::Private: public QObject
 {
-    m_completer.setCaseSensitivity(Qt::CaseInsensitive);
-    m_completer.setWidget(lineEdit);
+    QCompleter* completer{nullptr};
+    Completer* q;
 
-    connect(&m_completer,
-        QOverload<const QString&>::of(&QCompleter::activated),
-        this,
-        [this, lineEdit](const QString& completedText)
-        {
-            auto currentText = lineEdit->text();
-            replaceCurrentWordWithCompleted(currentText, completedText);
+    struct CurrentWord
+    {
+        int begin{0};
+        int length{0};
+    };
 
-            QScopedValueRollback rollback{m_isCompletingInProgress, true};
-            lineEdit->setText(currentText);
-            lineEdit->setCursorPosition(m_currentWord.begin + completedText.size());
-        });
+    CurrentWord currentWord;
+    bool isCompletingInProgress{false};
 
-    const auto triggerCompletion =
-        [this, lineEdit]
-        {
-            if (m_isCompletingInProgress)
-                return;
+    Private(Completer* parent): q(parent){};
+    void updateCompleter(int cursorPosition, const QString& text);
+    void replaceCurrentWordWithCompleted(QString& text, const QString& completedText) const;
+    void initCompleterForTextEdit(QTextEdit* textEdit);
+    void initPopup(QAbstractItemView* popup);
+};
 
-            updateCompleter(lineEdit->cursorPosition(), lineEdit->text());
-            m_completer.complete(lineEdit->rect());
-        };
-
-    connect(lineEdit, &QLineEdit::textChanged, this, triggerCompletion);
-    connect(lineEdit, &QLineEdit::cursorPositionChanged, this, triggerCompletion);
+void Completer::Private::initPopup(QAbstractItemView* popup)
+{
+    popup->installEventFilter(q);
+    popup->setItemDelegate(new EventParametersDropDownDelegate(q));
+    setPaletteColor(popup, QPalette::Base, core::colorTheme()->color("dark13"));
+    // Color of highlight and scroll.
+    setPaletteColor(popup, QPalette::Midlight, core::colorTheme()->color("dark16"));
 }
 
-Completer::Completer(const QStringList& words, QTextEdit* textEdit, QObject* parent):
-    QObject(parent), m_completer{words}
+void Completer::Private::initCompleterForTextEdit(QTextEdit* textEdit)
 {
-    m_completer.setCaseSensitivity(Qt::CaseInsensitive);
-    m_completer.setWidget(textEdit);
-    m_completer.popup()->installEventFilter(this);
+    completer->setCaseSensitivity(Qt::CaseInsensitive);
+    completer->setWidget(textEdit);
+    initPopup(completer->popup());
 
-    connect(&m_completer,
+    connect(completer,
         QOverload<const QString&>::of(&QCompleter::activated),
-        this,
+        q,
         [this, textEdit](const QString& completedText)
         {
             auto currentText = textEdit->toPlainText();
             replaceCurrentWordWithCompleted(currentText, completedText);
 
-            QScopedValueRollback rollback{m_isCompletingInProgress, true};
+            QScopedValueRollback rollback{isCompletingInProgress, true};
             textEdit->setText(currentText);
 
             auto cursor = textEdit->textCursor();
-            cursor.setPosition(m_currentWord.begin + completedText.size());
+            cursor.setPosition(currentWord.begin + completedText.size());
             textEdit->setTextCursor(cursor);
         });
 
     const auto triggerCompleter =
         [this, textEdit]
         {
-            if (m_isCompletingInProgress)
+            if (isCompletingInProgress)
                 return;
 
             updateCompleter(textEdit->textCursor().position(), textEdit->toPlainText());
@@ -75,13 +77,103 @@ Completer::Completer(const QStringList& words, QTextEdit* textEdit, QObject* par
             const auto cursorRect =
                 textEdit->cursorRect().adjusted(0, 0, 0, textEdit->fontMetrics().descent());
             const auto textEditrect = textEdit->rect();
-            m_completer.complete(QRect{
+            completer->complete(QRect{
                 QPoint{textEditrect.left(), cursorRect.top()},
                 QPoint{textEditrect.right(), cursorRect.bottom()}});
         };
 
-    connect(textEdit, &QTextEdit::textChanged, this, triggerCompleter);
-    connect(textEdit, &QTextEdit::cursorPositionChanged, this, triggerCompleter);
+    connect(textEdit, &QTextEdit::textChanged, q, triggerCompleter);
+    connect(textEdit, &QTextEdit::cursorPositionChanged, q, triggerCompleter);
+}
+
+void Completer::Private::updateCompleter(int cursorPosition, const QString& text)
+{
+    static const QRegularExpression spacePattern{"\\s", QRegularExpression::CaseInsensitiveOption};
+
+    const QStringView textBeforeCursor{text.data(), cursorPosition};
+    const auto startOfSubstitution =
+        textBeforeCursor.lastIndexOf(vms::rules::TextWithFields::kStartOfSubstitutionSymbol);
+    currentWord.begin = startOfSubstitution == -1 ? 0 : startOfSubstitution;
+
+    const auto spaceAfterWord = text.indexOf(spacePattern, cursorPosition);
+    const auto wordEnd = spaceAfterWord == -1 ? text.size() : spaceAfterWord;
+    currentWord.length = wordEnd - currentWord.begin;
+
+    const auto currentWordSlice =
+        textBeforeCursor.sliced(currentWord.begin, cursorPosition - currentWord.begin);
+
+    // Completer will popup, when cursor placed after the bracket symbol (for e.g '{' is typed)
+    // Completion prefix is set up as current word with bracket.
+    completer->setCompletionPrefix(currentWordSlice.toString());
+}
+
+void Completer::Private::replaceCurrentWordWithCompleted(QString& text, const QString& completedText) const
+{
+    if (currentWord.length == 0)
+    {
+        text.insert(currentWord.begin, completedText);
+    }
+    else
+    {
+        text.remove(currentWord.begin, currentWord.length);
+        text.insert(currentWord.begin, completedText);
+    }
+}
+
+
+Completer::~Completer()
+{
+}
+
+Completer::Completer(QAbstractListModel* model, QTextEdit* textEdit, QObject* parent):
+    QObject(parent),
+    d(new Private(this))
+{
+    d->completer = new QCompleter(model, this);
+    d->initCompleterForTextEdit(textEdit);
+}
+
+Completer::Completer(const QStringList& words, QLineEdit* lineEdit, QObject* parent):
+    QObject(parent),
+    d(new Private(this))
+{
+    d->completer = new QCompleter(words, this);
+    d->completer->setCaseSensitivity(Qt::CaseInsensitive);
+    d->completer->setWidget(lineEdit);
+
+    connect(d->completer,
+        QOverload<const QString&>::of(&QCompleter::activated),
+        this,
+        [this, lineEdit](const QString& completedText)
+        {
+            auto currentText = lineEdit->text();
+            d->replaceCurrentWordWithCompleted(currentText, completedText);
+
+            QScopedValueRollback rollback{d->isCompletingInProgress, true};
+            lineEdit->setText(currentText);
+            lineEdit->setCursorPosition(d->currentWord.begin + completedText.size());
+        });
+
+    const auto triggerCompletion =
+        [this, lineEdit]
+        {
+            if (d->isCompletingInProgress)
+                return;
+
+            d->updateCompleter(lineEdit->cursorPosition(), lineEdit->text());
+            d->completer->complete(lineEdit->rect());
+        };
+
+    connect(lineEdit, &QLineEdit::textChanged, this, triggerCompletion);
+    connect(lineEdit, &QLineEdit::cursorPositionChanged, this, triggerCompletion);
+}
+
+Completer::Completer(const QStringList& words, QTextEdit* textEdit, QObject* parent):
+    QObject(parent),
+    d(new Private(this))
+{
+    d->completer = new QCompleter(words, this);
+    d->initCompleterForTextEdit(textEdit);
 }
 
 bool Completer::eventFilter(QObject* obj, QEvent* event)
@@ -95,9 +187,8 @@ bool Completer::eventFilter(QObject* obj, QEvent* event)
         {
             case Qt::Key_Enter:
             case Qt::Key_Return:
-                m_completer.popup()->hide();
-                emit m_completer.activated(m_completer.popup()->currentIndex().data().toString());
-
+                d->completer->popup()->hide();
+                emit d->completer->activated(d->completer->popup()->currentIndex().data().toString());
                 return true;
             default:
                 break;
@@ -105,37 +196,6 @@ bool Completer::eventFilter(QObject* obj, QEvent* event)
     }
 
     return QObject::eventFilter(obj, event);
-}
-
-void Completer::updateCompleter(int cursorPosition, const QString& text)
-{
-    static const QRegularExpression spacePattern{"\\s", QRegularExpression::CaseInsensitiveOption};
-
-    QStringView textBeforeCursor{text.data(), cursorPosition};
-    auto spaceBeforeWord = textBeforeCursor.lastIndexOf(spacePattern);
-    m_currentWord.begin = spaceBeforeWord == -1 ? 0 : (spaceBeforeWord + 1);
-
-    auto spaceAfterWord = text.indexOf(spacePattern, cursorPosition);
-    auto wordEnd = spaceAfterWord == -1 ? text.size() : spaceAfterWord;
-    m_currentWord.length = wordEnd - m_currentWord.begin;
-
-    auto currentWordSlice =
-        textBeforeCursor.sliced(m_currentWord.begin, cursorPosition - m_currentWord.begin);
-
-    m_completer.setCompletionPrefix(currentWordSlice.toString());
-}
-
-void Completer::replaceCurrentWordWithCompleted(QString& text, const QString& completedText) const
-{
-    if (m_currentWord.length == 0)
-    {
-        text.insert(m_currentWord.begin, completedText);
-    }
-    else
-    {
-        text.remove(m_currentWord.begin, m_currentWord.length);
-        text.insert(m_currentWord.begin, completedText);
-    }
 }
 
 } // namespace nx::vms::client::desktop::rules
