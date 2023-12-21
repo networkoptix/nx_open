@@ -11,7 +11,8 @@ namespace nx::vms::client::core
 {
     struct CloudAuthData;
     struct CloudBindData;
-}
+    struct CloudTokens;
+} // namespace nx::vms::client::core
 
 namespace nx::vms::client::desktop {
 
@@ -48,6 +49,7 @@ public:
 
     const nx::vms::client::core::CloudAuthData& authData() const;
     const nx::vms::client::core::CloudBindData& cloudBindData() const;
+    const nx::vms::client::core::CloudTokens& cloudTokens() const;
 
     void setCredentials(const nx::network::http::Credentials& credentials);
     void setSystemName(const QString& systenName);
@@ -55,6 +57,7 @@ public:
 signals:
     void authDataReady();
     void bindToCloudDataReady();
+    void cloudTokensReady();
 
 private:
     void loadPage();
