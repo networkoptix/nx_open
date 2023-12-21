@@ -1785,10 +1785,6 @@
       <translation>Sunucu RTSP oturumuna yeniden bağlanmadan önce art arda meydana gelebilecek maksimum RTP hatası sayısı.</translation>
     </message>
     <message>
-      <source>Channel partners service</source>
-      <translation>Kanal iş ortakları hizmeti</translation>
-    </message>
-    <message>
       <source>Enable deprecated API functions currently used by %1 software (insecure)</source>
       <comment>%1 is a company name</comment>
       <translation>Şu anda %1 yazılımı tarafından kullanılan, kullanımdan kaldırılmış API işlevlerini etkinleştirin (güvenli değil)</translation>

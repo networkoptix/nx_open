@@ -1729,10 +1729,6 @@
       <translation>サーバーが RTSP セッションに再接続するまでの連続 RTP エラーの最大数。</translation>
     </message>
     <message>
-      <source>Channel partners service</source>
-      <translation>チャネルパートナーサービス</translation>
-    </message>
-    <message>
       <source>Enable deprecated API functions currently used by %1 software (insecure)</source>
       <comment>%1 is a company name</comment>
       <translation>現在 %1 ソフトウェアで使用されている、非推奨のAPI関数を有効にする (非セキュア)</translation>

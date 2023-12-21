@@ -9863,7 +9863,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Downloading updates...</source>
-      <translation>アップデートをダウンロードしています…</translation>
+      <translation>更新ファイルをダウンロードしています…</translation>
     </message>
     <message>
       <source>Finish Update</source>
@@ -9967,7 +9967,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Latest Available Update</source>
-      <translation>最新の利用可能な更新プログラム</translation>
+      <translation>利用可能な最新の更新プログラム</translation>
     </message>
     <message>
       <source>Specific Build</source>

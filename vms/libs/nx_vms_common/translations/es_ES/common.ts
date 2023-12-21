@@ -1785,10 +1785,6 @@
       <translation type="unfinished">Maximum number of consecutive RTP errors before the server reconnects the RTSP session.</translation>
     </message>
     <message>
-      <source>Channel partners service</source>
-      <translation>Servicio de socios de canal</translation>
-    </message>
-    <message>
       <source>Enable deprecated API functions currently used by %1 software (insecure)</source>
       <comment>%1 is a company name</comment>
       <translation>Habilitar funciones API obsoletas actualmente utilizadas por el software %1 (inseguro)</translation>

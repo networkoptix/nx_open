@@ -1785,10 +1785,6 @@
       <translation>Maksimalt antal på hinanden følgende RTP-fejl, før serveren genopretter forbindelsen til RTSP-sessionen.</translation>
     </message>
     <message>
-      <source>Channel partners service</source>
-      <translation type="unfinished">Channel partners service</translation>
-    </message>
-    <message>
       <source>Enable deprecated API functions currently used by %1 software (insecure)</source>
       <comment>%1 is a company name</comment>
       <translation type="unfinished">Enable deprecated API functions currently used by %1 software (insecure)</translation>
