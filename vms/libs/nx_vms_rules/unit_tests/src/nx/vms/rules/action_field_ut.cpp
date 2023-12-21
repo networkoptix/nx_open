@@ -1,6 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include <chrono>
+
 #include <gtest/gtest.h>
 
 #include <QtCore/QString>
@@ -9,6 +10,8 @@
 #include <nx/vms/rules/action_builder_fields/builtin_fields.h>
 #include <nx/vms/rules/aggregated_event.h>
 #include <nx/vms/rules/engine.h>
+#include <nx/vms/rules/event_filter_fields/builtin_fields.h>
+#include <nx/vms/rules/events/builtin_events.h>
 
 #include "test_event.h"
 #include "test_router.h"
@@ -160,6 +163,44 @@ TEST_F(ActionFieldTest, EventTimeProlongedEvent)
     // End time is time of current event.
     EXPECT_EQ(fieldInactiveTime.build(aggregatedEvent).toString(),
         fieldInactiveEndTime.build(aggregatedEvent).toString());
+}
+
+TEST_F(ActionFieldTest, EventAttributes)
+{
+    const auto kNameField = QStringLiteral("Name");
+    const auto kName = QStringLiteral("Temporal Displacement");
+    const auto kLicensePlateNumberField = QStringLiteral("LicensePlate.Number");
+    const auto kLicensePlateNumber = QStringLiteral("OUTATIME");
+
+    ASSERT_TRUE(engine->registerEventField(
+        fieldMetatype<SourceCameraField>(), [] { return new SourceCameraField(); }));
+    ASSERT_TRUE(engine->registerEventField(fieldMetatype<AnalyticsObjectTypeField>(),
+        [this] { return new AnalyticsObjectTypeField(systemContext()); }));
+    ASSERT_TRUE(engine->registerEventField(fieldMetatype<ObjectLookupField>(),
+        [this] { return new ObjectLookupField(systemContext()); }));
+    ASSERT_TRUE(engine->registerEvent(
+        AnalyticsObjectEvent::manifest(), [] { return new AnalyticsObjectEvent(); }));
+
+    static const EventData kEventAtributeData = {{"type", AnalyticsObjectEvent::manifest().id}};
+    TextWithFields field(systemContext());
+    auto event = engine->buildEvent(kEventAtributeData);
+
+    // This has to be added manually since the Json conversion will fail.
+    static const nx::common::metadata::Attributes kAttributes{
+        {kNameField, kName}, {kLicensePlateNumberField, kLicensePlateNumber}};
+    const char* kAttributesField = "attributes";
+    event->setProperty(kAttributesField, QVariant::fromValue(kAttributes));
+
+    auto aggregatedEvent = AggregatedEventPtr::create(event);
+    field.setText(
+        QStringLiteral("{event.attributes.%1} {event.attributes.%2} \"{event.attributes.empty}\"")
+            .arg(kNameField)
+            .arg(kLicensePlateNumberField));
+
+    const auto& actual = field.build(aggregatedEvent).toString();
+    const auto& expected = QStringLiteral("%1 %2 \"\"").arg(kName).arg(kLicensePlateNumber);
+
+    EXPECT_EQ(expected, actual);
 }
 
 TEST_F(ActionFieldTest, CreateGuid)
