@@ -37,6 +37,9 @@ QString resourcePath(const QnResourcePtr& resource, bool forceCloud)
     if (resource->hasFlags(Qn::local_media))
         return resource->getUrl();
 
+    if (resource->hasFlags(Qn::web_page))
+        return resource->getUrl();
+
     if (resource.dynamicCast<CrossSystemLayoutResource>())
         return resourcePath(resource->getId(), kGenericCloudSystemId);
 
@@ -99,7 +102,19 @@ QnResourcePtr getResourceByDescriptor(const nx::vms::common::ResourceDescriptor&
     if (!NX_ASSERT(systemContext))
         return {};
 
-    return systemContext->resourcePool()->getResourceByDescriptor(descriptor);
+    const auto resource = systemContext->resourcePool()->getResourceByDescriptor(descriptor);
+
+    if (resource)
+        return resource;
+
+    // There are resources that are not cross-system resources but exist together with cloud
+    // layouts. Therefore, it is necessary to check for the presence of such resources in cloud
+    // layout system context resource pool. For example web pages and local files.
+    systemContext = appContext()->cloudLayoutsSystemContext();
+    if (systemContext)
+        return systemContext->resourcePool()->getResourceByDescriptor(descriptor);
+
+    return {};
 }
 
 bool isCrossSystemResource(const nx::vms::common::ResourceDescriptor& descriptor)
