@@ -14,6 +14,7 @@ namespace nx::vms::client::core {
 
 struct CloudAuthData;
 struct CloudBindData;
+struct CloudTokens;
 
 /**
  * Implements logic for OAuth authentication process. Constructs URL to be used for the
@@ -70,6 +71,9 @@ public:
     /** Bind to cloud parameters. */
     const CloudBindData& cloudBindData() const;
 
+    /** Cloud access and refresh tokens. */
+    const CloudTokens& cloudTokens() const;
+
     /** Set code returned by cloud on login to cloud operation. */
     Q_INVOKABLE void setCode(const QString& code);
 
@@ -79,8 +83,12 @@ public:
     /** Callback is called when system is bound to the cloud. */
     Q_INVOKABLE void setBindInfo(const CloudBindData& info);
 
+    /** Callback is called after system is bound to the cloud with the current tokens. */
+    Q_INVOKABLE void setTokens(const CloudTokens& cloudTokens);
+
 signals:
     void bindToCloudDataReady();
+    void cloudTokensReady();
     void authDataReady();
     void cancelled();
 

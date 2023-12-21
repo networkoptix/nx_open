@@ -33,6 +33,7 @@ struct OauthClient::Private: public QObject
     QString locale;
     CloudAuthData authData;
     CloudBindData cloudBindData;
+    CloudTokens cloudTokens;
     QString systemName;
     std::unique_ptr<Connection> m_connection;
     std::unique_ptr<CloudConnectionFactory> m_cloudConnectionFactory;
@@ -217,11 +218,24 @@ const CloudBindData& OauthClient::cloudBindData() const
     return d->cloudBindData;
 }
 
+const CloudTokens& OauthClient::cloudTokens() const
+{
+    return d->cloudTokens;
+}
+
 void OauthClient::setBindInfo(const CloudBindData& info)
 {
     NX_DEBUG(this, "Setting cloud bind data: %1", info.systemId);
     d->cloudBindData = info;
     emit bindToCloudDataReady();
+}
+
+void OauthClient::setTokens(const CloudTokens& cloudTokens)
+{
+    NX_DEBUG(this, "Cloud tokens are set");
+
+    d->cloudTokens = cloudTokens;
+    emit cloudTokensReady();
 }
 
 void OauthClient::setCode(const QString& code)

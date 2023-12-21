@@ -56,6 +56,7 @@ OauthLoginDialog::OauthLoginDialog(
     const auto helper = d->oauthClient();
     connect(helper, &core::OauthClient::authDataReady, this, &OauthLoginDialog::authDataReady);
     connect(helper, &core::OauthClient::bindToCloudDataReady, this, &OauthLoginDialog::bindToCloudDataReady);
+    connect(helper, &core::OauthClient::cloudTokensReady, this, &OauthLoginDialog::cloudTokensReady);
     connect(helper, &core::OauthClient::cancelled, this, &OauthLoginDialog::reject);
 }
 
@@ -120,6 +121,11 @@ const nx::vms::client::core::CloudAuthData& OauthLoginDialog::authData() const
 const nx::vms::client::core::CloudBindData& OauthLoginDialog::cloudBindData() const
 {
     return d->oauthClient()->cloudBindData();
+}
+
+const nx::vms::client::core::CloudTokens& OauthLoginDialog::cloudTokens() const
+{
+    return d->oauthClient()->cloudTokens();
 }
 
 void OauthLoginDialog::setCredentials(const nx::network::http::Credentials& credentials)

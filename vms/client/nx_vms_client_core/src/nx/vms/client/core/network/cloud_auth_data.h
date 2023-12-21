@@ -44,4 +44,10 @@ struct CloudBindData
     QString organizationId;
 };
 
+struct CloudTokens
+{
+    QString accessToken;
+    QString refreshToken;
+};
+
 } // namespace nx::vms::client::core
