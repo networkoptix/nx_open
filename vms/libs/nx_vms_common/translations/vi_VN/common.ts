@@ -1729,10 +1729,6 @@
       <translation>Số lỗi RTP liên tiếp tối đa trước khi máy chủ kết nối lại phiên RTSP.</translation>
     </message>
     <message>
-      <source>Channel partners service</source>
-      <translation>Dịch vụ Đối tác đại lý</translation>
-    </message>
-    <message>
       <source>Enable deprecated API functions currently used by %1 software (insecure)</source>
       <comment>%1 is a company name</comment>
       <translation>Bật các hàm API deprecated đang được phần mềm %1 sử dụng (không an toàn)</translation>

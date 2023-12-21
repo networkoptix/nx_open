@@ -1729,10 +1729,6 @@
       <translation>จำนวนข้อผิดพลาด RTP ติดต่อกันสูงสุดก่อนที่เซิร์ฟเวอร์จะเชื่อมต่อเซสชัน RTSP อีกครั้ง</translation>
     </message>
     <message>
-      <source>Channel partners service</source>
-      <translation>บริการ Channel partners</translation>
-    </message>
-    <message>
       <source>Enable deprecated API functions currently used by %1 software (insecure)</source>
       <comment>%1 is a company name</comment>
       <translation type="unfinished">Enable deprecated API functions currently used by %1 software (insecure)</translation>
