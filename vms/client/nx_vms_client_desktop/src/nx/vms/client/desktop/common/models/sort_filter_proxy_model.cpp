@@ -48,6 +48,13 @@ int SortFilterProxyModel::sourceRole(const QString& name) const
     return roleNames().key(name.toUtf8(), Qt::DisplayRole);
 }
 
+void SortFilterProxyModel::sort(int column, Qt::SortOrder order)
+{
+    QSortFilterProxyModel::sort(column, order);
+    emit sortColumnChanged();
+    emit sortOrderChanged();
+}
+
 void SortFilterProxyModel::setSortRoleName(const QString& name, bool force)
 {
     if (m_sortRoleName == name && !force)

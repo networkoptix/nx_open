@@ -2,35 +2,35 @@
 
 import QtQml
 import QtQuick
-import QtQuick.Controls
 
 import Nx
 import Nx.Controls
 import Nx.Core
+import Nx.Models
 
+import nx.vms.client.core
 import nx.vms.client.desktop
 
 Button
 {
     id: control
 
-    enum Order
+    property AbstractItemModel model //< The property is not marked as required intentionally, to prevent assignment from the wrong context.
+
+    property var headerDataAccessor: ModelDataAccessor
     {
-        AscendingOrder,
-        DescendingOrder,
-        NoOrder
-    }
+        model: control.model
 
-    property var sortOrder: HeaderButton.NoOrder
-    property bool isCheckbox: false
+        onHeaderDataChanged: (orientation, first, last) =>
+        {
+            if (index < first || index > last)
+                return
 
-    property var _inputCheckState: Qt.Unchecked // Private, internal-usage only.
+            if (orientation !== Qt.Horizontal)
+                return
 
-    signal checkStateChanged(int checkState)
-
-    function setCheckState(checkState)
-    {
-        _inputCheckState = checkState
+            control.text = model.headerData(index, Qt.Horizontal)
+        }
     }
 
     leftPadding: 8
@@ -46,99 +46,78 @@ Button
     font.pixelSize: 14
     font.weight: Font.Medium
 
+    text: !!model ? model.headerData(index, Qt.Horizontal) : ""
+
     iconUrl:
     {
-        if (sortOrder === HeaderButton.AscendingOrder)
-            return "image://svg/skin/table_view/ascending.svg"
+        if (!!model && model.sortColumn === index)
+        {
+            if (model.sortOrder == Qt.AscendingOrder)
+                return "image://svg/skin/table_view/ascending.svg"
 
-        if (sortOrder === HeaderButton.DescendingOrder)
-            return "image://svg/skin/table_view/descending.svg"
+            if (model.sortOrder == Qt.DescendingOrder)
+                return "image://svg/skin/table_view/descending.svg"
+        }
 
         return ""
     }
+    iconWidth: 20
+    iconHeight: 20
 
-    contentItem: Loader
+    contentItem: Item
     {
-        sourceComponent: control.isCheckbox ? checkboxComponent : textComponent
+        implicitWidth:
+            label.implicitWidth + iconItem.anchors.leftMargin + iconItem.implicitWidth
 
-        Component
+        implicitHeight: Math.max(label.height, iconItem.height)
+
+        Text
         {
-            id: checkboxComponent
+            id: label
 
-            Item
-            {
-                implicitWidth: checkBox.implicitWidth
-                implicitHeight: checkBox.implicitHeight
+            width: Math.min(implicitWidth, parent.width - iconItem.width - 4)
+            anchors.verticalCenter: parent.verticalCenter
 
-                CheckBox
-                {
-                    id: checkBox
+            text: control.text
 
-                    font: control.font
-                    checkState: control._inputCheckState
-                    anchors.verticalCenter: parent.verticalCenter
-
-                    onCheckStateChanged:
-                    {
-                        if (checkState !== control._inputCheckState)
-                            control.checkStateChanged(checkState)
-                    }
-                }
-            }
+            color: control.textColor
+            font: control.font
+            elide: Text.ElideRight
         }
 
-        Component
+        IconImage
         {
-            id: textComponent
+            id: iconItem
 
-            Item
-            {
-                implicitWidth:
-                    label.implicitWidth + iconItem.anchors.leftMargin + iconItem.implicitWidth
+            anchors.left: label.right
+            anchors.leftMargin: 4
+            anchors.verticalCenter: parent.verticalCenter
 
-                implicitHeight: Math.max(label.height, iconItem.height)
+            source: control.icon.source
+            sourceSize: Qt.size(control.icon.width, control.icon.height)
+            visible: !!source && width > 0 && height > 0
 
-                Text
-                {
-                    id: label
+            width: source != "" ? control.icon.width : 0
+            height: source != "" ? control.icon.height : 0
 
-                    width: Math.min(implicitWidth, parent.width - iconItem.width - 4)
-                    anchors.verticalCenter: parent.verticalCenter
-
-                    text: control.text
-
-                    color: control.textColor
-                    font: control.font
-                    elide: Text.ElideRight
-                }
-
-                IconImage
-                {
-                    id: iconItem
-
-                    anchors.left: label.right
-                    anchors.leftMargin: 4
-                    anchors.verticalCenter: parent.verticalCenter
-
-                    source: control.icon.source
-                    sourceSize: Qt.size(control.icon.width, control.icon.height)
-
-                    onSourceChanged:
-                    {
-                        // It is needed for correct implicitWidth recalculation.
-                        label.elide = Text.ElideNone
-                        width = Math.min(implicitWidth, parent.width - iconItem.width - 4)
-                        label.elide = Text.ElideRight
-                    }
-
-                    visible: !!source && width > 0 && height > 0
-
-                    width: source != "" ? control.icon.width : 0
-                    height: source != "" ? control.icon.height : 0
-
-                    color: control.textColor
-                }
-            }
+            color: control.textColor
         }
+    }
+
+    onClicked:
+    {
+        if (!model)
+            return
+
+        let sortOrder = Qt.AscendingOrder
+        if (model.sortColumn === index)
+        {
+            if (model.sortOrder === Qt.AscendingOrder)
+                sortOrder = Qt.DescendingOrder
+            else
+                sortOrder = Qt.AscendingOrder
+        }
+
+        control.model.sort(index, sortOrder)
     }
 }

@@ -8,9 +8,12 @@ ArrowIcon 1.0 ArrowIcon.qml
 AutoScalableItem 1.0 AutoScalableItem.qml
 AutoScroller 1.0 AutoScroller.qml
 BasicTableCellDelegate 1.0 BasicTableCellDelegate.qml
+BasicSelectableTableCellDelegate 1.0 BasicSelectableTableCellDelegate.qml
+BasicSelectableTableCheckableCellDelegate 1.0 BasicSelectableTableCheckableCellDelegate.qml
 Bubble 1.0 Bubble.qml
 BubbleToolTip 1.0 BubbleToolTip.qml
 Button 1.0 Button.qml
+CheckableTableView 1.0 CheckableTableView.qml
 CheckBox 1.0 CheckBox.qml
 CheckBoxImage 1.0 CheckBoxImage.qml
 ComboBox 1.0 ComboBox.qml

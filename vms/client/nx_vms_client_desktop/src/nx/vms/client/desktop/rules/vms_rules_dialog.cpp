@@ -111,17 +111,17 @@ void VmsRulesDialog::editRule(QnUuid id)
     if (result == QDialogButtonBox::Reset)
     {
         // QDialogButtonBox::Reset means user requested to delete the rule.
-        deleteRuleImpl(id);
+        deleteRulesImpl({id});
         return;
     }
 
     saveRuleImpl(clone);
 }
 
-void VmsRulesDialog::deleteRule(QnUuid id)
+void VmsRulesDialog::deleteRules(const QnUuidList& ids)
 {
-    if (ConfirmationDialogs::confirmDelete(m_parentWidget))
-        deleteRuleImpl(id);
+    if (ConfirmationDialogs::confirmDelete(m_parentWidget, ids.size()))
+        deleteRulesImpl(ids);
 }
 
 void VmsRulesDialog::resetToDefaults()
@@ -135,21 +135,24 @@ void VmsRulesDialog::openEventLogDialog()
     action(menu::OpenEventLogAction)->trigger();
 }
 
-void VmsRulesDialog::deleteRuleImpl(QnUuid id)
+void VmsRulesDialog::deleteRulesImpl(const QnUuidList& ids)
 {
     auto connection = messageBusConnection();
     if (!connection)
         return;
 
     const auto rulesManager = connection->getVmsRulesManager(Qn::kSystemAccess);
-    rulesManager->deleteRule(
+    for (const auto& id: ids)
+    {
+        rulesManager->deleteRule(
         id,
         [this](int /*requestId*/, ec2::ErrorCode errorCode)
         {
             if (errorCode != ec2::ErrorCode::ok)
-                setError(tr("Delete rule error: ") + ec2::toString(errorCode));
+                setError(tr("Delete rule error: ") + ec2::toString(errorCode)); //< TODO: #mmalofeev add error to some list.
         },
         this);
+    }
 }
 
 void VmsRulesDialog::saveRuleImpl(const std::shared_ptr<vms::rules::Rule>& rule)

@@ -1,22 +1,21 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+#include <gtest/gtest.h>
+
 #include <QtCore/QAbstractListModel>
 #include <QtCore/QSortFilterProxyModel>
 #include <QtTest/QAbstractItemModelTester>
 
-#include <gtest/gtest.h>
-
 #include <nx/utils/log/format.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/math/math.h>
-#include <nx/vms/client/desktop/common/models/row_selection_model.h>
+#include <nx/vms/client/desktop/common/models/row_check_model.h>
 
-namespace nx::vms::client::desktop {
-namespace test {
+namespace nx::vms::client::desktop::test {
 
 namespace {
 
-// A mock source model class for RowSelectionModel that implements Qt list model.
+// A mock source model class for RowCheckModel that implements Qt list model.
 class MockSourceModel: public QAbstractListModel
 {
 public:
@@ -126,29 +125,31 @@ private:
     std::vector<int> m_data;
 };
 
-class RowSelectionModelTest: public testing::Test
+class RowCheckModelTest: public testing::Test
 {
 protected:
     void SetUp() override
     {
-        sourceModel = new MockSourceModel();
-        model = new RowSelectionModel();
+        sourceModel = std::make_unique<MockSourceModel>();
+        model = std::make_unique<RowCheckModel>();
 
-        m_sourceModelTester = new QAbstractItemModelTester(
-            sourceModel,
+        m_sourceModelTester = std::make_unique<QAbstractItemModelTester>(
+            sourceModel.get(),
             QAbstractItemModelTester::FailureReportingMode::Fatal);
 
-        m_modelTester = new QAbstractItemModelTester(
-            model,
+        m_modelTester = std::make_unique<QAbstractItemModelTester>(
+            model.get(),
             QAbstractItemModelTester::FailureReportingMode::Fatal);
 
-        model->setSourceModel(sourceModel);
+        model->setSourceModel(sourceModel.get());
     }
 
     void TearDown() override
     {
-        delete model;
-        delete sourceModel;
+        m_modelTester.reset();
+        m_sourceModelTester.reset();
+        model.reset();
+        sourceModel.reset();
     }
 
     void whenSourceModelIsReset(const std::vector<int>& values)
@@ -166,7 +167,9 @@ protected:
 
         for (int i = 0; i < sourceValues.size(); ++i)
         {
-            ASSERT_EQ(model->index(i, 0).data().value<Qt::CheckState>(), checkStateValues[i]);
+            ASSERT_EQ(
+                model->index(i, 0).data(Qt::CheckStateRole).value<Qt::CheckState>(),
+                checkStateValues[i]);
             ASSERT_EQ(model->index(i, 1).data().toString(), QString::number(sourceValues[i]));
         }
     };
@@ -188,25 +191,27 @@ protected:
 
         for (int i = 0; i < checkStateValues.size(); ++i)
         {
-            ASSERT_EQ(model->index(i, 0).data().value<Qt::CheckState>(), checkStateValues[i]);
+            ASSERT_EQ(
+                model->index(i, 0).data(Qt::CheckStateRole).value<Qt::CheckState>(),
+                checkStateValues[i]);
         }
     };
 
-    MockSourceModel* sourceModel;
-    RowSelectionModel* model;
+    std::unique_ptr<MockSourceModel> sourceModel;
+    std::unique_ptr<RowCheckModel> model;
 
 private:
-    QAbstractItemModelTester* m_sourceModelTester;
-    QAbstractItemModelTester* m_modelTester;
+    std::unique_ptr<QAbstractItemModelTester> m_sourceModelTester;
+    std::unique_ptr<QAbstractItemModelTester> m_modelTester;
 };
 
 } // namespace
 
-TEST_F(RowSelectionModelTest, ResetCheck)
+TEST_F(RowCheckModelTest, ResetCheck)
 {
     auto whenCheckStateValuesAreUpdated = [&]()
         {
-            model->setData(model->index(1, 0), Qt::Checked);
+            model->setData(model->index(1, 0), Qt::Checked, Qt::CheckStateRole);
         };
 
     // ---------------------------------------------
@@ -223,11 +228,11 @@ TEST_F(RowSelectionModelTest, ResetCheck)
         {Qt::Unchecked, Qt::Unchecked, Qt::Unchecked, Qt::Unchecked});
 }
 
-TEST_F(RowSelectionModelTest, InsertRemoveMoveCheck)
+TEST_F(RowCheckModelTest, InsertRemoveMoveCheck)
 {
     auto checkStateIsSet = [&]()
         {
-            model->setData(model->index(1, 0), Qt::Checked);
+            model->setData(model->index(1, 0), Qt::Checked, Qt::CheckStateRole);
         };
 
     auto whenRowIsInserted = [&]()
@@ -271,50 +276,21 @@ TEST_F(RowSelectionModelTest, InsertRemoveMoveCheck)
     thenDataAreUpdated({1, 3, 2}, {Qt::Unchecked, Qt::Unchecked, Qt::Checked});
 }
 
-TEST_F(RowSelectionModelTest, CheckboxColumnVisibleCheck)
-{
-    auto thenColumnsStateIsValid = [&]()
-        {
-            ASSERT_EQ(sourceModel->columnCount(), 1);
-            ASSERT_EQ(model->columnCount(), 2);
-            ASSERT_EQ(model->headerData(0, Qt::Orientation::Horizontal, Qt::CheckStateRole), Qt::Unchecked);
-        };
-
-    auto whenCheckboxColumnSetInvisible = [&]()
-        {
-            model->setCheckboxColumnVisible(false);
-        };
-
-    auto thenColumnsStateIsUpdated = [&]()
-        {
-            ASSERT_EQ(model->columnCount(), 1);
-            ASSERT_NE(model->headerData(0, Qt::Orientation::Horizontal, Qt::CheckStateRole), Qt::Unchecked);
-        };
-
-    // ---------------------------------------------
-
-    whenSourceModelIsReset({1, 2, 3});
-    thenColumnsStateIsValid();
-
-    whenCheckboxColumnSetInvisible();
-    thenColumnsStateIsUpdated();
-}
-
-TEST_F(RowSelectionModelTest, GetSelectedRowsCheck)
+TEST_F(RowCheckModelTest, GetSelectedRowsCheck)
 {
     auto selectedRowsAreAbsent = [&]()
         {
-            ASSERT_EQ(model->getSelectedRows(), QVector<int>{});
+            ASSERT_EQ(model->checkedRows(), QList<int>{});
         };
 
     auto whenRowIsSelected = [&](int rowIndex)
         {
-            model->setData(model->index(rowIndex, 0), Qt::Checked);
+            model->setData(model->index(rowIndex, 0), Qt::Checked, Qt::CheckStateRole);
         };
 
-    auto selectedRowsListIsUpdated = [&](const QVector<int>& selectedIndexes)
+    auto selectedRowsListIsUpdated = [&](const QList<int>& selectedIndexes)
         {
-            ASSERT_EQ(model->getSelectedRows(), selectedIndexes);
+            ASSERT_EQ(model->checkedRows(), selectedIndexes);
         };
 
     auto whenFirstRowMoved = [&]()
@@ -345,7 +321,7 @@ TEST_F(RowSelectionModelTest, GetSelectedRowsCheck)
     selectedRowsListIsUpdated({});
 }
 
-TEST_F(RowSelectionModelTest, SourceDataChangedCheck)
+TEST_F(RowCheckModelTest, SourceDataChangedCheck)
 {
     auto whenSourceRowValueIsSet = [&](int row, int value)
         {
@@ -361,16 +337,16 @@ TEST_F(RowSelectionModelTest, SourceDataChangedCheck)
     thenSourceDataAreUpdated({4, 2, 3});
 }
 
-TEST_F(RowSelectionModelTest, DataChangedCheck)
+TEST_F(RowCheckModelTest, DataChangedCheck)
 {
     auto whenRowIsSelected = [&](int rowIndex)
         {
-            model->setData(model->index(rowIndex, 0), Qt::Checked);
+            model->setData(model->index(rowIndex, 0), Qt::Checked, Qt::CheckStateRole);
         };
 
     auto whenRowIsUnselected = [&](int rowIndex)
         {
-            model->setData(model->index(rowIndex, 0), Qt::Unchecked);
+            model->setData(model->index(rowIndex, 0), Qt::Unchecked, Qt::CheckStateRole);
         };
 
     // ---------------------------------------------
@@ -385,10 +361,10 @@ TEST_F(RowSelectionModelTest, DataChangedCheck)
     thenCheckStatesAreUpdated({Qt::Unchecked, Qt::Unchecked, Qt::Unchecked});
 }
 
-TEST_F(RowSelectionModelTest, LayoutChangedCheck)
+TEST_F(RowCheckModelTest, LayoutChangedCheck)
 {
     QSortFilterProxyModel sortModel;
-    sortModel.setSourceModel(sourceModel);
+    sortModel.setSourceModel(sourceModel.get());
     model->setSourceModel(&sortModel);
 
     QPersistentModelIndex persistentIndex;
@@ -447,5 +423,4 @@ TEST_F(RowSelectionModelTest, LayoutChangedCheck)
     thenPersistentIndexRowIs(2, "3");
 }
 
-} // namespace test
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::desktop::test

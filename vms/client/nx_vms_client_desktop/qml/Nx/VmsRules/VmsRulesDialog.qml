@@ -4,12 +4,14 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtQml
+import Qt.labs.qmlmodels
 
 import Nx
 import Nx.Core
 import Nx.Controls
 import Nx.Dialogs
 
+import nx.vms.client.core
 import nx.vms.client.desktop
 
 Dialog
@@ -20,14 +22,12 @@ Dialog
     property alias errorString: alertBar.label.text
     property var dialog: null
 
-    function deleteSelectedRule()
+    function deleteCheckedRules()
     {
-        if (!selectionModel.hasSelection)
+        if (!tableView.hasCheckedRows)
             return
 
-        dialog.deleteRule(rulesSortFilterModel.sourceModel.data(
-            rulesSortFilterModel.mapToSource(selectionModel.selectedIndexes[0]),
-            RulesTableModel.RuleIdRole))
+        dialog.deleteRules(rulesSortFilterModel.getRuleIds(tableView.checkedRows))
     }
 
     title: qsTr("Vms Rules")
@@ -55,23 +55,31 @@ Dialog
             {
                 text: qsTr("Add Rule")
                 iconUrl: "image://svg/skin/buttons/add_20x20_deprecated.svg"
+                visible: !tableView.hasCheckedRows
                 onClicked:
                 {
                     root.dialog.addRule()
                 }
             }
 
+            Text
+            {
+                visible: tableView.hasCheckedRows
+                text: qsTr("%1 selected:").arg(tableView.checkedRows.length)
+                color: ColorTheme.brightText
+                font.pixelSize: FontConfig.large.pixelSize
+            }
+
             TextButton
             {
                 text: qsTr("Duplicate")
                 icon.source: "image://svg/skin/text_buttons/copy_20.svg"
-                visible: selectionModel.hasSelection
+                visible: tableView.checkedRows.length === 1
 
                 onClicked:
                 {
-                    root.dialog.duplicateRule(rulesSortFilterModel.sourceModel.data(
-                        rulesSortFilterModel.mapToSource(selectionModel.selectedIndexes[0]),
-                        RulesTableModel.RuleIdRole))
+                    const ruleIds = rulesSortFilterModel.getRuleIds(tableView.checkedRows)
+                    root.dialog.duplicateRule(ruleIds[0])
                 }
             }
 
@@ -79,11 +87,11 @@ Dialog
             {
                 text: qsTr("Delete")
                 icon.source: "image://svg/skin/text_buttons/delete_20_deprecated.svg"
-                visible: selectionModel.hasSelection
+                visible: tableView.hasCheckedRows
 
                 onClicked:
                 {
-                    root.deleteSelectedRule()
+                    root.deleteCheckedRules()
                 }
             }
 
@@ -93,7 +101,7 @@ Dialog
             {
                 onTextChanged:
                 {
-                    tableView.model.setFilterRegularExpression(text)
+                    rulesSortFilterModel.setFilterRegularExpression(text)
                 }
             }
         }
@@ -108,7 +116,7 @@ Dialog
             visible: !tableView.visible
         }
 
-        TableView
+        CheckableTableView
         {
             id: tableView
 
@@ -121,101 +129,30 @@ Dialog
             rowSpacing: 0
             horizontalHeaderVisible: true
             selectionBehavior: TableView.SelectRows
-            editTriggers: TableView.NoEditTriggers
-            model: RulesSortFilterProxyModel { id: rulesSortFilterModel }
-            selectionModel: ItemSelectionModel { id: selectionModel }
+            sourceModel: RulesSortFilterProxyModel
+            {
+                id: rulesSortFilterModel
+            }
             visible: rows !== 0
 
-            columnWidthProvider: function (columnIndex)
+            delegate: DelegateChooser
             {
-                if (columnIndex === RulesTableModel.StateColumn)
-                    return 28 // image width + required margin.
-
-                return (width - 28) / (RulesTableModel.ColumnsCount - 1)
-            }
-
-            delegate: Rectangle
-            {
-                id: cellDelegate
-
-                required property bool selected
-                required property bool current
-
-                implicitHeight: 28
-                color: selected ? ColorTheme.colors.brand_d6 : ColorTheme.colors.dark7
-
-                RowLayout
+                DelegateChoice
                 {
-                    id: cellDelegateLayout
-                    anchors.fill: parent
-                    spacing: 8
-
-                    Image
-                    {
-                        Layout.alignment: Qt.AlignVCenter
-
-                        sourceSize.width: 20
-                        sourceSize.height: 20
-
-                        source: decoration ?? ""
-                        visible: !!decoration
-                    }
-
-                    Text
-                    {
-                        id: displayText
-
-                        Layout.fillWidth: true
-                        Layout.rightMargin: 8
-
-                        text: display ? display : ""
-                        elide: Text.ElideRight
-                        color: ColorTheme.text
-                        visible: !!display
-                    }
+                    column: 0
+                    BasicSelectableTableCheckableCellDelegate {}
                 }
 
-                MouseArea
+                DelegateChoice
                 {
-                    anchors.fill: parent
-                    onClicked:
+                    BasicSelectableTableCellDelegate
                     {
-                        selectionModel.select(
-                            tableView.index(row, column),
-                            ItemSelectionModel.ClearAndSelect | ItemSelectionModel.Rows)
-                        tableView.focus = true
+                        onDoubleClicked:
+                        {
+                            root.dialog.editRule(rulesSortFilterModel.data(
+                                rulesSortFilterModel.index(row, column), RulesTableModel.RuleIdRole))
+                        }
                     }
-
-                    onDoubleClicked:
-                    {
-                        root.dialog.editRule(ruleId)
-                    }
-                }
-            }
-
-            Keys.onPressed: (event) =>
-            {
-                if (!selectionModel.hasSelection)
-                    return
-
-                if (event.key == Qt.Key_Delete
-                    || (Qt.platform.os === "osx" && event.key == Qt.Key_Backspace))
-                {
-                    root.deleteSelectedRule()
-                    event.accepted = true;
-                }
-                else if ((event.key == Qt.Key_Down || event.key == Qt.Key_Up)
-                    && selectionModel.hasSelection)
-                {
-                    const rowToSelect = MathUtils.bound(
-                        0,
-                        selectionModel.selectedIndexes[0].row + (event.key == Qt.Key_Down ? 1 : -1),
-                        tableView.rows - 1)
-                    selectionModel.select(
-                        tableView.index(rowToSelect, 0),
-                        ItemSelectionModel.ClearAndSelect | ItemSelectionModel.Rows)
-
-                    event.accepted = true;
                 }
             }
         }
@@ -242,6 +179,11 @@ Dialog
             {
                 text: qsTr("Event Log...")
                 icon.source: "image://svg/skin/buttons/event_log_20_deprecated.svg"
+
+                onClicked:
+                {
+                    root.dialog.openEventLogDialog()
+                }
             }
 
             TextButton

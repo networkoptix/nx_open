@@ -16,9 +16,9 @@ Text
 
     font.pixelSize: 14
 
-    text: model.display
+    text: model.display ?? ""
 
     color: model.foregroundColor ?? ColorTheme.colors.light4
 
-    GlobalToolTip.text: model.toolTip || ""
+    GlobalToolTip.text: model.toolTip ?? ""
 }

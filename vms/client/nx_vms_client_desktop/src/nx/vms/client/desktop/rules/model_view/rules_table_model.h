@@ -36,7 +36,8 @@ public:
         RuleIdRole = Qt::UserRole,
         ResourceIdsRole,
         FieldRole,
-        IsSystemRuleRole
+        IsSystemRuleRole,
+        SortDataRole
     };
     Q_ENUM(Roles)
 
@@ -48,6 +49,9 @@ public:
     virtual Qt::ItemFlags flags(const QModelIndex& index) const override;
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
     virtual QHash<int, QByteArray> roleNames() const override;
+
+    /** Returns list of the rule ids for the given indexes. */
+    QnUuidList getRuleIds(const QModelIndexList& indexes) const;
 
     static void registerQmlType();
 

@@ -28,7 +28,7 @@ void customizeDialog(
 
 } // namespace
 
-bool ConfirmationDialogs::confirmDelete(QWidget* parent)
+bool ConfirmationDialogs::confirmDelete(QWidget* parent, size_t count)
 {
     auto showOnce = showOnceSettings();
     if (showOnce->deleteRule())
@@ -38,7 +38,7 @@ bool ConfirmationDialogs::confirmDelete(QWidget* parent)
     customizeDialog(
         dialog,
         QnMessageBox::Icon::Question,
-        tr("Delete Rule?"),
+        tr("Delete %n Rules?", "", count),
         tr("This action cannot be undone"),
         QDialogButtonBox::Cancel,
         QDialogButtonBox::NoButton,

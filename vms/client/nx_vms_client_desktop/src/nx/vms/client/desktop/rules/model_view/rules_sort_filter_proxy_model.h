@@ -4,6 +4,8 @@
 
 #include <QtCore/QSortFilterProxyModel>
 
+#include <nx/utils/uuid.h>
+
 namespace nx::vms::client::desktop::rules {
 
 class RulesTableModel;
@@ -15,6 +17,9 @@ class RulesSortFilterProxyModel: public QSortFilterProxyModel
 public:
     using QSortFilterProxyModel::QSortFilterProxyModel;
     explicit RulesSortFilterProxyModel(QObject* parent = nullptr);
+
+    /** Returns rule ids for the given rows. */
+    Q_INVOKABLE QnUuidList getRuleIds(const QList<int>& rows) const;
 
     static void registerQmlType();
 

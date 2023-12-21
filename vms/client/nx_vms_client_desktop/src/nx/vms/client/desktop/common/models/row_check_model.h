@@ -10,28 +10,24 @@
 
 namespace nx::vms::client::desktop {
 
-class NX_VMS_CLIENT_DESKTOP_API RowSelectionModel: public QAbstractProxyModel
+// TODO: #mmalofeev consider inherit from the SortFilterProxyModel.
+class NX_VMS_CLIENT_DESKTOP_API RowCheckModel: public QAbstractProxyModel
 {
     Q_OBJECT
     using base_type = QAbstractProxyModel;
 
-public:
-    static void registerQmlType();
+    Q_PROPERTY(QList<int> checkedRows READ checkedRows NOTIFY checkedRowsChanged)
+    Q_PROPERTY(int sortColumn READ sortColumn NOTIFY sortColumnChanged)
+    Q_PROPERTY(Qt::SortOrder sortOrder READ sortOrder NOTIFY sortOrderChanged)
 
 public:
-    explicit RowSelectionModel(QObject* parent = nullptr);
-    virtual ~RowSelectionModel() override;
+    explicit RowCheckModel(QObject* parent = nullptr);
+    virtual ~RowCheckModel() override;
 
-    Q_INVOKABLE QVector<int> getSelectedRows() const;
-    Q_INVOKABLE void setCheckboxColumnVisible(const bool visible);
+    QList<int> checkedRows() const;
 
     virtual void setSourceModel(QAbstractItemModel* sourceModel) override;
-
-    virtual QVariant headerData(
-        int section,
-        Qt::Orientation orientation,
-        int role = Qt::DisplayRole) const override;
-
+    virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
     virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
     virtual bool setData(
         const QModelIndex& index,
@@ -52,13 +48,27 @@ public:
 
     virtual void sort(int column, Qt::SortOrder order = Qt::AscendingOrder) override;
 
+    virtual QHash<int, QByteArray> roleNames() const override;
+
+    int sortColumn() const;
+    Qt::SortOrder sortOrder() const;
+
+    static void registerQmlType();
+
+signals:
+    void checkedRowsChanged();
+    void sortColumnChanged();
+    void sortOrderChanged();
+
 private:
-    bool m_checkboxColumnVisible = true;
     std::set<QPersistentModelIndex> m_checkedRows;
     nx::utils::ScopedConnections m_connections;
 
     QList<QPersistentModelIndex> m_layoutChangePersistentIndexes;
     QModelIndexList m_proxyIndexes;
+
+    int m_sortColumn = -1;
+    Qt::SortOrder m_sortOrder{};
 };
 
 } // namespace nx::vms::client::desktop

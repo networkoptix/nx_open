@@ -1,6 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "row_selection_model.h"
+#include "row_check_model.h"
 
 #include <QtQml/QQmlEngine>
 
@@ -8,57 +8,40 @@
 
 namespace nx::vms::client::desktop {
 
-void RowSelectionModel::registerQmlType()
+void RowCheckModel::registerQmlType()
 {
-    qmlRegisterType<RowSelectionModel>("nx.vms.client.desktop", 1, 0, "RowSelectionModel");
+    qmlRegisterType<RowCheckModel>("nx.vms.client.desktop", 1, 0, "RowCheckModel");
 }
 
-RowSelectionModel::RowSelectionModel(QObject* parent):
-    QAbstractProxyModel(parent)
-{
-}
-
-RowSelectionModel::~RowSelectionModel()
+RowCheckModel::RowCheckModel(QObject* parent):
+    base_type(parent)
 {
 }
 
-QVector<int> RowSelectionModel::getSelectedRows() const
+RowCheckModel::~RowCheckModel()
 {
-    QVector<int> result;
+}
 
-    for (auto iter = m_checkedRows.begin(); iter != m_checkedRows.end(); ++iter)
+QList<int> RowCheckModel::checkedRows() const
+{
+    QList<int> result; // TODO: #mmalofeev Consider use list as index holder.
+    for (const auto& i: m_checkedRows)
     {
-        if (iter->isValid())
-            result.push_back(iter->row());
+        if (i.isValid())
+            result.push_back(i.row());
     }
 
     std::sort(result.begin(), result.end());
-
     return result;
 }
 
-void RowSelectionModel::setCheckboxColumnVisible(const bool visible)
-{
-    if (m_checkboxColumnVisible == visible)
-        return;
-
-    if (visible)
-        beginInsertColumns(QModelIndex(), 0, 0);
-    else
-        beginRemoveColumns(QModelIndex(), 0, 0);
-
-    m_checkboxColumnVisible = visible;
-
-    if (visible)
-        endInsertColumns();
-    else
-        endRemoveColumns();
-}
-
-void RowSelectionModel::setSourceModel(QAbstractItemModel* sourceModel)
+void RowCheckModel::setSourceModel(QAbstractItemModel* sourceModel)
 {
     m_checkedRows.clear();
-    QAbstractProxyModel::setSourceModel(sourceModel);
+
+    base_type::setSourceModel(sourceModel);
+
+    emit checkedRowsChanged();
 
     m_connections.reset();
 
@@ -68,11 +51,12 @@ void RowSelectionModel::setSourceModel(QAbstractItemModel* sourceModel)
             {
                 beginResetModel();
                 m_checkedRows.clear();
+                emit checkedRowsChanged();
             });
 
     m_connections <<
         connect(sourceModel, &QAbstractItemModel::modelReset,
-            this, &RowSelectionModel::endResetModel);
+            this, &RowCheckModel::endResetModel);
 
     m_connections <<
         connect(sourceModel, &QAbstractItemModel::rowsAboutToBeInserted, this,
@@ -83,7 +67,7 @@ void RowSelectionModel::setSourceModel(QAbstractItemModel* sourceModel)
 
     m_connections <<
         connect(sourceModel, &QAbstractItemModel::rowsInserted,
-            this, &RowSelectionModel::endInsertRows);
+            this, &RowCheckModel::endInsertRows);
 
     m_connections <<
         connect(sourceModel, &QAbstractItemModel::rowsAboutToBeRemoved, this,
@@ -93,8 +77,12 @@ void RowSelectionModel::setSourceModel(QAbstractItemModel* sourceModel)
             });
 
     m_connections <<
-        connect(sourceModel, &QAbstractItemModel::rowsRemoved,
-            this, &RowSelectionModel::endRemoveRows);
+        connect(sourceModel, &QAbstractItemModel::rowsRemoved,this,
+            [this]()
+            {
+                endRemoveRows();
+                emit checkedRowsChanged();
+            });
 
     m_connections <<
         connect(sourceModel, &QAbstractItemModel::rowsAboutToBeMoved, this,
@@ -116,7 +104,7 @@ void RowSelectionModel::setSourceModel(QAbstractItemModel* sourceModel)
 
     m_connections <<
         connect(sourceModel, &QAbstractItemModel::rowsMoved,
-            this, &RowSelectionModel::endMoveRows);
+            this, &RowCheckModel::endMoveRows);
 
     m_connections <<
         connect(sourceModel, &QAbstractItemModel::layoutAboutToBeChanged, this,
@@ -131,9 +119,6 @@ void RowSelectionModel::setSourceModel(QAbstractItemModel* sourceModel)
                 const auto proxyPersistentIndexes = persistentIndexList();
                 for (const QModelIndex& proxyPersistentIndex: proxyPersistentIndexes)
                 {
-                    if (proxyPersistentIndex.column() == 0)
-                        continue; //< Don't need to save this model native indexes.
-
                     m_proxyIndexes.append(proxyPersistentIndex);
                     NX_ASSERT(proxyPersistentIndex.isValid());
                     const QPersistentModelIndex srcPersistentIndex =
@@ -153,9 +138,19 @@ void RowSelectionModel::setSourceModel(QAbstractItemModel* sourceModel)
 
                 for (int i = 0; i < m_proxyIndexes.size(); ++i)
                 {
-                    changePersistentIndex(
-                        m_proxyIndexes.at(i),
-                        mapFromSource(m_layoutChangePersistentIndexes.at(i)));
+                    QModelIndex targetIndex;
+                    if (m_proxyIndexes.at(i).column() == 0)
+                    {
+                        // Restore target index from the nearest sibling index.
+                        targetIndex =
+                            index(mapFromSource(m_layoutChangePersistentIndexes.at(i)).row(), 0, {});
+                    }
+                    else
+                    {
+                        targetIndex = mapFromSource(m_layoutChangePersistentIndexes.at(i));
+                    }
+
+                    changePersistentIndex(m_proxyIndexes.at(i), targetIndex);
                 }
 
                 m_layoutChangePersistentIndexes.clear();
@@ -178,52 +173,49 @@ void RowSelectionModel::setSourceModel(QAbstractItemModel* sourceModel)
         connect(sourceModel, &QAbstractItemModel::headerDataChanged, this,
             [this](Qt::Orientation orientation, int first, int last)
             {
-                emit headerDataChanged(
-                    orientation,
-                    m_checkboxColumnVisible ? first + 1 : first,
-                    m_checkboxColumnVisible ? last + 1 : last);
+                emit headerDataChanged(orientation, first + 1, last + 1);
             });
 }
 
-QVariant RowSelectionModel::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant RowCheckModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     NX_ASSERT(section < columnCount());
 
     if (orientation != Qt::Orientation::Horizontal)
         return QVariant();
 
-    if (section == 0 && m_checkboxColumnVisible)
+    if (section == 0)
     {
         if (role == Qt::CheckStateRole)
             return Qt::Unchecked;
+
+        return {};
     }
 
-    return sourceModel()->headerData(
-        section - (m_checkboxColumnVisible ? 1 : 0),
-        orientation,
-        role);
+    return sourceModel()->headerData(section - 1, orientation, role);
 }
 
-QVariant RowSelectionModel::data(const QModelIndex& index, int role) const
+QVariant RowCheckModel::data(const QModelIndex& index, int role) const
 {
     NX_ASSERT(index.isValid());
 
-    if (m_checkboxColumnVisible && index.column() == 0 && role == Qt::DisplayRole)
+    if (index.column() == 0 && role == Qt::CheckStateRole)
     {
         const QModelIndex checkboxIndex = sourceModel()->index(index.row(), 0);
         if (m_checkedRows.count(checkboxIndex) > 0)
             return Qt::Checked;
+
         return Qt::Unchecked;
     }
 
     return sourceModel()->data(mapToSource(index), role);
 }
 
-bool RowSelectionModel::setData(const QModelIndex& index, const QVariant& value, int role)
+bool RowCheckModel::setData(const QModelIndex& index, const QVariant& value, int role)
 {
     NX_ASSERT(index.isValid());
 
-    if (m_checkboxColumnVisible && index.column() == 0 && role == Qt::EditRole)
+    if (index.column() == 0 && role == Qt::CheckStateRole)
     {
         const QModelIndex checkboxIndex = sourceModel()->index(index.row(), 0);
         if (m_checkedRows.count(checkboxIndex) > 0)
@@ -231,48 +223,52 @@ bool RowSelectionModel::setData(const QModelIndex& index, const QVariant& value,
         else
             m_checkedRows.insert(QPersistentModelIndex(checkboxIndex));
 
-        emit dataChanged(index, index, {Qt::DisplayRole});
+        emit checkedRowsChanged();
+
+        emit dataChanged(index, index, {Qt::CheckStateRole});
         return true;
     }
 
     return sourceModel()->setData(mapToSource(index), value, role);
 }
 
-QModelIndex RowSelectionModel::index(int row, int column, const QModelIndex& parent) const
+QModelIndex RowCheckModel::index(int row, int column, const QModelIndex& /*parent*/) const
 {
     return createIndex(row, column);
 }
 
-QModelIndex RowSelectionModel::parent(const QModelIndex& index) const
+QModelIndex RowCheckModel::parent(const QModelIndex& /*index*/) const
 {
     return {};
 }
 
-QModelIndex RowSelectionModel::mapFromSource(const QModelIndex& sourceIndex) const
+QModelIndex RowCheckModel::mapFromSource(const QModelIndex& sourceIndex) const
 {
     if (!sourceIndex.isValid() || !sourceModel())
         return {};
 
     NX_ASSERT(sourceIndex.row() < sourceModel()->rowCount());
 
-    return index(
-        sourceIndex.row(),
-        sourceIndex.column() + (m_checkboxColumnVisible ? 1 : 0));
+    return index(sourceIndex.row(), sourceIndex.column() + 1);
 }
 
-QModelIndex RowSelectionModel::mapToSource(const QModelIndex& proxyIndex) const
+QModelIndex RowCheckModel::mapToSource(const QModelIndex& proxyIndex) const
 {
     if (!proxyIndex.isValid() || !sourceModel())
         return {};
 
     NX_ASSERT(proxyIndex.row() < rowCount());
 
-    return sourceModel()->index(
-        proxyIndex.row(),
-        proxyIndex.column() - (m_checkboxColumnVisible ? 1 : 0));
+    if (proxyIndex.column() == 0)
+    {
+        // Get the nearest sibling for the index from check box column.
+        return sourceModel()->index(proxyIndex.row(), proxyIndex.column());
+    }
+
+    return sourceModel()->index(proxyIndex.row(), proxyIndex.column() - 1);
 }
 
-int RowSelectionModel::rowCount(const QModelIndex& parent) const
+int RowCheckModel::rowCount(const QModelIndex& parent) const
 {
     if (!sourceModel() || parent.isValid())
         return 0;
@@ -280,17 +276,39 @@ int RowSelectionModel::rowCount(const QModelIndex& parent) const
     return sourceModel()->rowCount();
 }
 
-int RowSelectionModel::columnCount(const QModelIndex& parent) const
+int RowCheckModel::columnCount(const QModelIndex& parent) const
 {
     if (!sourceModel() || parent.isValid())
         return 0;
 
-    return sourceModel()->columnCount() + (m_checkboxColumnVisible ? 1 : 0);
+    return sourceModel()->columnCount() + 1;
 }
 
-void RowSelectionModel::sort(int column, Qt::SortOrder order)
+void RowCheckModel::sort(int column, Qt::SortOrder order)
 {
-    base_type::sort(m_checkboxColumnVisible ? column - 1 : column, order);
+    base_type::sort(column - 1, order);
+
+    m_sortColumn = column;
+    m_sortOrder = order;
+    emit sortColumnChanged();
+    emit sortOrderChanged();
+}
+
+QHash<int, QByteArray> RowCheckModel::roleNames() const
+{
+    auto result = base_type::roleNames();
+    result[Qt::CheckStateRole] = "checkState";
+    return result;
+}
+
+int RowCheckModel::sortColumn() const
+{
+    return m_sortColumn;
+}
+
+Qt::SortOrder RowCheckModel::sortOrder() const
+{
+    return m_sortOrder;
 }
 
 } // namespace nx::vms::client::desktop
