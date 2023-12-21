@@ -63,6 +63,7 @@ private:
         const QString& organizationId = QString());
 
     void onBindToCloudDataReady();
+    void onCloudTokensReady();
 
 private:
     QWidget* m_parent;

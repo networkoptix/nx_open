@@ -207,6 +207,13 @@ void OauthLoginDialogPrivate::setBindInfo(const QJsonObject& jsonObject)
     m_oauthClient->setBindInfo(std::move(info));
 }
 
+void OauthLoginDialogPrivate::setTokens(const QJsonObject& jsonObject)
+{
+    m_oauthClient->setTokens(CloudTokens{
+        .accessToken = jsonObject.value("access_token").toString(),
+        .refreshToken = jsonObject.value("refresh_token").toString()});
+}
+
 void OauthLoginDialogPrivate::twoFaVerified(const QString& code)
 {
     m_oauthClient->twoFaVerified(code);

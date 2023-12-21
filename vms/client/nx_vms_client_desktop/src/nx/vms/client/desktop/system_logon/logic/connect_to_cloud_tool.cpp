@@ -147,6 +147,11 @@ void ConnectToCloudTool::requestCloudAuthData()
         &ConnectToCloudTool::onBindToCloudDataReady);
     connect(
         m_oauthLoginDialog,
+        &OauthLoginDialog::cloudTokensReady,
+        this,
+        &ConnectToCloudTool::onCloudTokensReady);
+    connect(
+        m_oauthLoginDialog,
         &OauthLoginDialog::rejected,
         this,
         &ConnectToCloudTool::cancel);
@@ -171,6 +176,13 @@ void ConnectToCloudTool::onBindToCloudDataReady()
     systemData.attributes.push_back({.name = "organizationId", .value = bindResult.organizationId.toStdString()});
 
     onBindFinished(std::move(systemData));
+}
+
+void ConnectToCloudTool::onCloudTokensReady()
+{
+    m_cloudAuthData.credentials.authToken =
+        network::http::BearerAuthToken{m_oauthLoginDialog->cloudTokens().accessToken.toStdString()};
+    m_cloudAuthData.refreshToken = m_oauthLoginDialog->cloudTokens().refreshToken.toStdString();
 }
 
 void ConnectToCloudTool::onCloudAuthDataReady()
@@ -301,7 +313,8 @@ void ConnectToCloudTool::onLocalSessionTokenReady()
         {
             if (std::holds_alternative<rest::Empty>(reply))
             {
-                NX_DEBUG(this, "Server bind succeded");
+                NX_DEBUG(this, "Server bind succeeded");
+                qnCloudStatusWatcher->setAuthData(m_cloudAuthData);
                 showSuccess(QString::fromStdString(m_cloudAuthData.credentials.username));
                 return;
             }
