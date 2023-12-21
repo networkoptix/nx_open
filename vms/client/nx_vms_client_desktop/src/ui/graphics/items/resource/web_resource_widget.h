@@ -44,8 +44,8 @@ protected:
         QPainter *painter, int channel, const QRectF &channelRect, const QRectF &paintRect) override;
 
 private:
-    void initClientApiSupport();
     void setupOverlays();
+    void disableHotkeyHints();
     void setupWidget();
     bool verifyCertificate(const QString& pemString, const QUrl& url);
     bool askUserToAcceptCertificate(

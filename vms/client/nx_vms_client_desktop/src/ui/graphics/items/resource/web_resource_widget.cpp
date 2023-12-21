@@ -106,6 +106,7 @@ QnWebResourceWidget::QnWebResourceWidget(
         this, &QnWebResourceWidget::setupWidget);
 
     setupOverlays();
+    disableHotkeyHints();
     updateButtonsVisibility();
 
     const auto controller = m_webEngineView->controller();
@@ -166,6 +167,17 @@ void QnWebResourceWidget::setupOverlays()
 
         buttonsBar->addButton(Qn::ReloadPageButton, reloadButton);
     }
+}
+
+void QnWebResourceWidget::disableHotkeyHints()
+{
+    // Reset button tooltips to a basic tooltip text without hotkey hints.
+    auto closeButton = titleBar()->rightButtonsBar()->button(Qn::CloseButton);
+    if (NX_ASSERT(closeButton))
+        closeButton->setToolTip(closeButtonTooltip());
+    auto infoButton = titleBar()->rightButtonsBar()->button(Qn::InfoButton);
+    if (NX_ASSERT(infoButton))
+        infoButton->setToolTip(infoButtonTooltip());
 }
 
 void QnWebResourceWidget::setupWidget()
