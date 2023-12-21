@@ -275,6 +275,32 @@ InvalidatorPtr cloudLayoutIconInvalidator(const QnLayoutResourcePtr& layout)
     return result;
 }
 
+GenericItem::DataProvider cloudLayoutExtraStatusProvider(const QnLayoutResourcePtr& layout)
+{
+    return
+        [layout]
+        {
+            return layout->locked()
+                ? static_cast<int>(ResourceExtraStatusFlag::locked)
+                : static_cast<int>(ResourceExtraStatusFlag::empty);
+        };
+}
+
+InvalidatorPtr cloudLayoutExtraStatusInvalidator(const QnLayoutResourcePtr& layout)
+{
+    auto result = std::make_shared<Invalidator>();
+
+    result->connections()->add(QObject::connect(
+        layout.get(),
+        &QnLayoutResource::lockedChanged,
+        [invalidator = result.get()]
+        {
+            invalidator->invalidate();
+        }));
+
+    return result;
+}
+
 GenericItem::FlagsProvider cloudLayoutFlagsProvider(const QnLayoutResourcePtr& layout)
 {
     return
@@ -624,12 +650,15 @@ AbstractItemPtr ResourceTreeItemFactory::createCloudLayoutItem(const QnLayoutRes
     const auto iconProvider = cloudLayoutIconProvider(layout);
     const auto iconInvalidator = cloudLayoutIconInvalidator(layout);
     const auto flagsProvider = cloudLayoutFlagsProvider(layout);
+    const auto extraStatusProvider = cloudLayoutExtraStatusProvider(layout);
+    const auto extraStatusInvalidator = cloudLayoutExtraStatusInvalidator(layout);
 
     return GenericItemBuilder()
         .withRole(Qt::DisplayRole, nameProvider, nameInvalidator)
         .withRole(Qn::ResourceRole, QVariant::fromValue(layout.staticCast<QnResource>()))
         .withRole(Qn::ResourceIconKeyRole, iconProvider, iconInvalidator)
         .withRole(Qn::NodeTypeRole, QVariant::fromValue(NodeType::resource))
+        .withRole(Qn::ResourceExtraStatusRole, extraStatusProvider, extraStatusInvalidator)
         .withFlags(flagsProvider);
 }
 
