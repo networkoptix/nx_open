@@ -1599,6 +1599,7 @@ void SystemSettings::resetCloudParams()
     setCloudAccountName(QString());
     setCloudSystemId(QString());
     setCloudAuthKey(QString());
+    setOrganizationId(QnUuid());
 }
 
 QString SystemSettings::cloudHost() const

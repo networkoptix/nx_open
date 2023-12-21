@@ -15,34 +15,36 @@ namespace nx::cloud::cps {
 
 namespace api {
 
-using ResultCode = nx::cloud::db::api::ResultCode;
+using Result = nx::cloud::db::api::Result;
 
 } // namespace api
 
 struct ApiResultCodeDescriptor
 {
-    using ResultCode = api::ResultCode;
+    using ResultCode = api::Result;
 
     template<typename... Output>
-    static ResultCode getResultCode(
+    static api::Result getResultCode(
         SystemError::ErrorCode systemErrorCode,
         const nx::network::http::Response* response,
-        const nx::network::http::ApiRequestResult& /*fusionRequestResult*/,
+        const nx::network::http::ApiRequestResult& fusionRequestResult,
         const Output&...)
     {
         if (systemErrorCode != SystemError::noError)
             return systemErrorCodeToResultCode(systemErrorCode);
 
         if (!response)
-            return ResultCode::networkError;
+            return {nx::cloud::db::api::ResultCode::networkError};
 
-        return getResultCodeFromResponse(*response);
+        return getResultCodeFromResponse(*response, fusionRequestResult);
     }
 
 private:
-    static ResultCode systemErrorCodeToResultCode(SystemError::ErrorCode systemErrorCode);
+    static api::Result systemErrorCodeToResultCode(SystemError::ErrorCode systemErrorCode);
 
-    static ResultCode getResultCodeFromResponse(const network::http::Response& response);
+    static api::Result getResultCodeFromResponse(
+        const network::http::Response& response,
+        const nx::network::http::ApiRequestResult& fusionRequestResult);
 };
 
 class ChannelPartnerClient:
@@ -51,18 +53,16 @@ class ChannelPartnerClient:
     using base_type = nx::network::http::GenericApiClient<ApiResultCodeDescriptor>;
 
 public:
-    /**
-     * @param cloudHost Value to be passed in the "cloud-host" header in every request.
-     * @param url Base URL of the channel partner service. Actual request URL is constructed as
-     * "baseUrl + apiCallPath".
-     * TODO: #akolesnikov Get rid of the cloudHost argument when the deployment is fixed.
-     */
-    ChannelPartnerClient(const std::string& cloudHost, const nx::utils::Url& baseApiUrl);
+    ChannelPartnerClient(const nx::utils::Url& baseApiUrl);
     ~ChannelPartnerClient();
 
     void bindSystemToOrganization(
         api::SystemRegistrationRequest data,
-        nx::utils::MoveOnlyFunc<void(api::ResultCode, api::SystemRegistrationResponse)> handler);
+        nx::utils::MoveOnlyFunc<void(api::Result, api::SystemRegistrationResponse)> handler);
+
+    void unbindSystemFromOrganization(
+        std::string systemId,
+        nx::utils::MoveOnlyFunc<void(api::Result)> handler);
 
     /**
      * The request must be authorized using valid user's OAUTH2 token.
@@ -70,18 +70,18 @@ public:
     void getSystemUser(
         const std::string& systemId,
         const std::string& email,
-        nx::utils::MoveOnlyFunc<void(api::ResultCode, api::User)> handler);
+        nx::utils::MoveOnlyFunc<void(api::Result, api::User)> handler);
 
     /**
      * The request must be authorized using valid user's OAUTH2 token.
      */
     void getSystemUsers(
         const std::string& systemId,
-        nx::utils::MoveOnlyFunc<void(api::ResultCode, std::vector<api::User>)> handler);
+        nx::utils::MoveOnlyFunc<void(api::Result, std::vector<api::User>)> handler);
 
     void getUserSystems(
         const std::string& email,
-        nx::utils::MoveOnlyFunc<void(api::ResultCode, std::vector<api::SystemAllowance>)> handler);
+        nx::utils::MoveOnlyFunc<void(api::Result, std::vector<api::SystemAllowance>)> handler);
 };
 
 } // namespace nx::cloud::cps
