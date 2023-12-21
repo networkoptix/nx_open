@@ -164,7 +164,10 @@ QnServerSettingsDialog::~QnServerSettingsDialog()
 
 void QnServerSettingsDialog::setupShowWebServerLink()
 {
-    const auto buttonsLayout = qobject_cast<QHBoxLayout*>(ui->buttonBox->layout());
+    // The button box is initialized in the base class on polish event.
+    ensurePolished();
+
+    const auto buttonsLayout = qobject_cast<QHBoxLayout*>(buttonBox()->layout());
     if (!buttonsLayout)
     {
         NX_ASSERT(false, "Invalid QDialogButtonBox layout");
