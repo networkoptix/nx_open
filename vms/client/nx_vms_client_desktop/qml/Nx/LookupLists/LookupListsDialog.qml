@@ -230,11 +230,11 @@ Dialog
                         id: deleteItemButton
 
                         text: qsTr("Delete")
-                        visible: false
+                        visible: tableView.checkedRows.length > 0
                         icon.source: "image://svg/skin/text_buttons/delete_20_deprecated.svg"
                         onClicked:
                         {
-                            entriesModel.deleteEntries(tableView.getSelectedRowIndexes())
+                            entriesModel.deleteEntries(tableView.checkedRows)
                             hasChanges = true
                         }
                     }
@@ -252,9 +252,7 @@ Dialog
                         icon.source: "image://svg/skin/text_buttons/export.svg"
                         onClicked:
                         {
-                            exportProcessor.exportListEntries(
-                                tableView.getSelectedRowIndexes(),
-                                entriesModel)
+                            exportProcessor.exportListEntries(tableView.checkedRows, entriesModel)
                         }
                     }
                     Item { Layout.fillWidth: true }
@@ -269,23 +267,11 @@ Dialog
             LookupListTable
             {
                 id: tableView
-
-                model: SortFilterProxyModel { sourceModel: entriesModel }
-                taxonomy: control.taxonomy
-
-                onHeaderCheckStateChanged:
+                sourceModel: SortFilterProxyModel
                 {
-                    const selectedIndexes = getSelectedRowIndexes()
-                    if (selectedIndexes.length === 0 && deleteItemButton.visible)
-                    {
-                        deleteItemButton.visible = false
-                    }
-                    else if (selectedIndexes.length !== 0 && !deleteItemButton.visible)
-                    {
-                        deleteItemButton.visible = true
-                    }
+                    sourceModel: entriesModel
                 }
-
+                taxonomy: control.taxonomy
                 onEditingChanged: control.editing = tableView.editing
                 onValueChanged: hasChanges = true
 

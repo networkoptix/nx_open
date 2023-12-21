@@ -125,6 +125,15 @@ QVariant RulesTableModel::data(const QModelIndex& index, int role) const
     if (!isRuleValid(rule))
         return {};
 
+    const auto column = index.column();
+    if (role == SortDataRole)
+    {
+        if (column == StateColumn)
+            return rule->enabled();
+
+        return data(index, Qt::DisplayRole);
+    }
+
     if (role == IsSystemRuleRole)
         return rule->isSystem();
 
@@ -157,24 +166,30 @@ Qt::ItemFlags RulesTableModel::flags(const QModelIndex& index) const
 
 QVariant RulesTableModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
-    if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
+    if (orientation == Qt::Horizontal)
     {
-        switch (section)
+        if (role == Qt::SizeHintRole && section == StateColumn)
+            return QSize{20, 20}; //< Icon size.
+
+        if (role == Qt::DisplayRole)
         {
-            case StateColumn:
-                return "";
-            case EventColumn:
-                return tr("Event");
-            case SourceColumn:
-                return tr("Source");
-            case ActionColumn:
-                return tr("Action");
-            case TargetColumn:
-                return tr("Target");
-            case CommentColumn:
-                return tr("Comment");
-            default:
-                return {};
+            switch (section)
+            {
+                case StateColumn:
+                    return "";
+                case EventColumn:
+                    return tr("Event");
+                case SourceColumn:
+                    return tr("Source");
+                case ActionColumn:
+                    return tr("Action");
+                case TargetColumn:
+                    return tr("Target");
+                case CommentColumn:
+                    return tr("Comment");
+                default:
+                    return {};
+            }
         }
     }
 
@@ -186,6 +201,7 @@ QHash<int, QByteArray> RulesTableModel::roleNames() const
     auto roles = QAbstractTableModel::roleNames();
 
     roles[RuleIdRole] = "ruleId";
+    roles[SortDataRole] = "sortData";
 
     return roles;
 }

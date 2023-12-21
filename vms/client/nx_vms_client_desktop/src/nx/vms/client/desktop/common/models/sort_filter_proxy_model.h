@@ -31,6 +31,8 @@ class SortFilterProxyModel: public QSortFilterProxyModel
     Q_PROPERTY(QString filterRoleName
         READ filterRoleName WRITE setFilterRoleName NOTIFY filterRoleNameChanged)
     Q_PROPERTY(int count READ count NOTIFY countChanged)
+    Q_PROPERTY(int sortColumn READ sortColumn NOTIFY sortColumnChanged)
+    Q_PROPERTY(Qt::SortOrder sortOrder READ sortOrder NOTIFY sortOrderChanged)
 
 public:
     SortFilterProxyModel(QObject* parent = nullptr);
@@ -43,12 +45,16 @@ public:
     int count() const;
     int sourceRole(const QString& name) const;
 
+    void sort(int column, Qt::SortOrder order = Qt::AscendingOrder) override;
+
     static void registerQmlType();
 
 signals:
     void countChanged();
     void sortRoleNameChanged();
     void filterRoleNameChanged();
+    void sortColumnChanged();
+    void sortOrderChanged();
 
 private:
     nx::utils::ScopedConnection m_rowsInsertedConnection;

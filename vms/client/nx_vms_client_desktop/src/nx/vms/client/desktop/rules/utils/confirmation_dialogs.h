@@ -11,7 +11,7 @@ class ConfirmationDialogs
     Q_DECLARE_TR_FUNCTIONS(VmsRulesDialogHelper)
 
 public:
-    static bool confirmDelete(QWidget* parent);
+    static bool confirmDelete(QWidget* parent, size_t count = 1);
     static bool confirmReset(QWidget* parent);
 };
 

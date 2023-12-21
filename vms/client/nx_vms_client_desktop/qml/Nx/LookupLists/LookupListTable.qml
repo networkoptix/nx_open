@@ -14,7 +14,7 @@ import Nx.Dialogs
 import nx.vms.client.desktop
 import nx.vms.client.desktop.analytics as Analytics
 
-TableView
+CheckableTableView
 {
     id: control
 
@@ -25,7 +25,6 @@ TableView
     columnSpacing: 0
     rowSpacing: 0
 
-    showCheckboxColumn: true
     horizontalHeaderVisible: true
     horizontalHeaderEnabled: !editing
 
@@ -39,37 +38,15 @@ TableView
         return false
     }
 
-    DelegateChooser
+    delegate: DelegateChooser
     {
-        id: chooser
-
         DelegateChoice
         {
-            id: delegateChoice
-
             column: 0
 
-            Rectangle
+            BasicSelectableTableCheckableCellDelegate
             {
-                implicitWidth: 28
-                implicitHeight: 28
-                color: ColorTheme.colors.dark7
-
-                CheckBox
-                {
-                    id: checkBox
-
-                    x: 8
-                    y: 6
-                    anchors.verticalCenter: parent.verticalCenter
-                    checked: model.display
-                    enabled: !editing
-                    onCheckStateChanged:
-                    {
-                        if (checkState !== model.display)
-                            model.edit = checkState
-                    }
-                }
+                enabled: !editing
             }
         }
 
@@ -102,6 +79,4 @@ TableView
             }
         }
     }
-
-    delegate: chooser
 }
