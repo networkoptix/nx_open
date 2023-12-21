@@ -173,10 +173,10 @@ ServerCertificateViewer::ServerCertificateViewer(
 
     // Set up the warning banner.
     ui->warningBanner->init({.level = BarDescription::BarLevel::Error});
+    pinCertificateButton = ui->warningBanner->addButton(
+        tr("Pin to this certificate"), "misc/pin_text_icon.svg");
     viewPinnedButton = ui->warningBanner->addButton(
         tr("View pinned certificate"), "misc/certificate_text_icon.svg");
-    pinCertificateButton =
-        ui->warningBanner->addButton(tr("Pin to this certificate"), "misc/pin_text_icon.svg");
 
     // Due to layout flaws caused by QTreeWidgets, dialog size constraints should be set through
     // its child element.
