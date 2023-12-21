@@ -2403,20 +2403,7 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
         if (nx::vms::common::saas::saasInitialized(systemContext()))
         {
             if (systemContext()->saasServiceManager()->saasShutDown())
-            {
-                switch (systemContext()->saasServiceManager()->saasState())
-                {
-                    case nx::vms::api::SaasState::shutdown:
-                        return Qn::SaasShutDown;
-
-                    case nx::vms::api::SaasState::autoShutdown:
-                        return Qn::SaasShutDownAutomatically;
-
-                    default:
-                        NX_ASSERT(false);
-                        return Qn::SaasShutDown;
-                }
-            }
+                return Qn::SaasShutDown;
         }
         else if (!isVideoWallLicenseValid())
         {

@@ -2,6 +2,7 @@
 
 #include "saas_utils.h"
 
+#include <nx/utils/log/assert.h>
 #include <nx/vms/api/data/saas_data.h>
 #include <nx/vms/common/saas/saas_service_manager.h>
 #include <nx/vms/common/system_context.h>
@@ -62,27 +63,6 @@ bool integrationServicesOverused(SystemContext* systemContext)
         nx::vms::api::SaasService::kAnalyticsIntegrationServiceType);
 }
 
-QString StringsHelper::shortState(nx::vms::api::SaasState state)
-{
-    using namespace nx::vms::api;
-    switch (state)
-    {
-        case SaasState::uninitialized:
-            return tr("SaaS uninitialized");
-        case SaasState::active:
-            return tr("SaaS active");
-        case SaasState::suspend:
-            return tr("SaaS suspended");
-        case SaasState::shutdown:
-            return tr("SaaS shut down");
-        case SaasState::autoShutdown:
-            return tr("SaaS shut down automatically");
-
-        default:
-            return QString();
-    }
-}
-
 QString StringsHelper::recommendedAction(nx::vms::api::SaasState state)
 {
     using namespace nx::vms::api;
@@ -100,6 +80,7 @@ QString StringsHelper::recommendedAction(nx::vms::api::SaasState state)
             return tr("Check internet connection between VMS and license server.");
 
         default:
+            NX_ASSERT(false);
             return QString();
     }
 }

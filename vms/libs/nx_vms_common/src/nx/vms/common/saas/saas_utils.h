@@ -34,11 +34,6 @@ class NX_VMS_COMMON_API StringsHelper
 
 public:
     /**
-     * @return Human readable representation of the given SaaS state enumeration value.
-     */
-    static QString shortState(nx::vms::api::SaasState state);
-
-    /**
      * @return Recommended action for a user if the given SaaS state is non-operational or
      *     requires attention.
      */

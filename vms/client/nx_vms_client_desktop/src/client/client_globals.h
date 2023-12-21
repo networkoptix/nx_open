@@ -405,7 +405,6 @@ namespace Qn
         MismatchedCertificateOverlay,
         InformationRequiredOverlay,
         SaasShutDown,
-        SaasShutDownAutomatically,
 
         OverlayCount
     };

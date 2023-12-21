@@ -187,11 +187,10 @@ void BackupSettingsWidget::loadState(const ServerSettingsDialogState& state)
         if (ServiceManager::saasShutDown(saasState) && cloudBackupStorage)
         {
             ui->stackedWidget->setCurrentWidget(ui->genericPlaceholderPage);
-            ui->genericPlaceholderCaptionLabel->setText(StringsHelper::shortState(saasState));
-
+            ui->genericPlaceholderCaptionLabel->setText(tr("System shut down"));
             ui->genericPlaceholderMessageLabel->setText(
-                tr("To perform backup to the cloud storage SaaS must be in active state. %1")
-                    .arg( StringsHelper::recommendedAction(saasState)).trimmed());
+                tr("To perform backup to a cloud storage, the System should be in active state. %1")
+                    .arg(StringsHelper::recommendedAction(saasState)).trimmed());
 
             m_backupSettingsViewWidget->setTreeEntityFactoryFunction({});
             return;
@@ -222,6 +221,20 @@ void BackupSettingsWidget::loadState(const ServerSettingsDialogState& state)
                     std::move(serverCamerasEntity),
                     std::move(newAddedCamerasItem));
             });
+
+        QString alertBarMessage;
+        if (cloudBackupStorage && saasState == nx::vms::api::SaasState::suspend)
+        {
+            alertBarMessage = tr("System suspended. To make changes to backup configuration, the "
+                "System should be in active state. %1")
+                    .arg(nx::vms::common::saas::StringsHelper::recommendedAction(saasState));
+            m_backupSettingsViewWidget->resourceViewWidget()->footerWidget()->setHidden(true);
+        }
+        else
+        {
+            m_backupSettingsViewWidget->resourceViewWidget()->footerWidget()->setHidden(false);
+        }
+        m_backupSettingsViewWidget->resourceViewWidget()->setInvalidMessage(alertBarMessage);
 
         m_backupSettingsViewWidget->resourceViewWidget()->makeRequiredItemsVisible();
         ui->backupBandwidthSettingsWidget->loadDataToUi();
