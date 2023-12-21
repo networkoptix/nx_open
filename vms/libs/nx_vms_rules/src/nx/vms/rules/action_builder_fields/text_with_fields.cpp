@@ -3,13 +3,17 @@
 #include "text_with_fields.h"
 
 #include <QtCore/QDateTime>
+#include <QtCore/QStringLiteral>
 
+#include <analytics/common/object_metadata.h>
 #include <nx/utils/datetime.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/metatypes.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/rules/engine.h>
+#include <nx/vms/rules/events/builtin_events.h>
+#include <nx/vms/rules/utils/type.h>
 
 #include "../aggregated_event.h"
 #include "../utils/event_details.h"
@@ -178,6 +182,31 @@ QString eventSource(const AggregatedEventPtr& eventAggregator, common::SystemCon
     return eventAggregator->initialEvent()->source(context);
 }
 
+QString eventAttribute(const QString& attributeName, const AggregatedEventPtr& eventAggregator)
+{
+    using Attributes = nx::common::metadata::Attributes;
+    const char* kAttributesField = "attributes";
+
+    bool isAnalyticsObjectEvent =
+        eventAggregator->type() == vms::rules::utils::type<vms::rules::AnalyticsObjectEvent>();
+    if (!isAnalyticsObjectEvent)
+        return {};
+
+    if (const auto& attributesVariant = eventAggregator->property(kAttributesField);
+        attributesVariant.canConvert<Attributes>())
+    {
+        const auto& attributes = attributesVariant.value<Attributes>();
+        auto it = std::find_if(attributes.begin(),
+            attributes.end(),
+            [&attributeName](const auto& attribute) { return attribute.name == attributeName; });
+
+        if (it != attributes.end())
+            return it->value;
+    }
+
+    return {};
+}
+
 const QMap<QString, FormatFunction> kFormatFunctions = {
     { "@CreateGuid", &createGuid },
     { "@EventType", &eventType },
@@ -208,7 +237,6 @@ struct TextWithFields::Private
     QString text;
     TextWithFields* const q;
     QList<ValueDescriptor> values;
-
 
     void parseText()
     {
@@ -291,8 +319,16 @@ QVariant TextWithFields::build(const AggregatedEventPtr& eventAggregator) const
     {
         if (value.type == FieldType::Substitution)
         {
+            static const auto kEventAttributesPrefix = QStringLiteral("event.attributes.");
             const auto& name = value.value;
-            if (const auto function = formatFunction(name))
+
+            if (name.startsWith(kEventAttributesPrefix))
+            {
+                result += eventAttribute(
+                    name.sliced(kEventAttributesPrefix.size()), eventAggregator);
+                continue;
+            }
+            else if (const auto function = formatFunction(name))
             {
                 result += function(eventAggregator, systemContext());
                 continue;
