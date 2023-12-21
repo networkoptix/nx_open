@@ -55,8 +55,8 @@ namespace {
 static const QColor kLight16Color = "#698796";
 static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
     {QIcon::Normal, {{kLight16Color, "light4"}}},
-    {QIcon::Active, {{kLight16Color, "light5"}}},
-    {QIcon::Selected, {{kLight16Color, "light3"}}},
+    {QIcon::Active, {{kLight16Color, "light4"}}},
+    {QIcon::Selected, {{kLight16Color, "light4"}}},
 };
 
 } // namespace

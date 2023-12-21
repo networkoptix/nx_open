@@ -30,9 +30,9 @@ static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubst
 };
 
 static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kDownloadSettingsSubstitutions = {
-    {QIcon::Normal, {{kLight16Color, "light10"}}},
-    {QIcon::Active, {{kLight16Color, "light9"}}},
-    {QIcon::Selected, {{kLight16Color, "light11"}}},
+    {QIcon::Normal, {{kLight16Color, "light4"}}},
+    {QIcon::Active, {{kLight16Color, "light4"}}},
+    {QIcon::Selected, {{kLight16Color, "light4"}}},
 };
 
 } // namespace
