@@ -378,7 +378,7 @@ void QnResourceWidget::createButtons()
 
     auto closeButton = createStatisticAwareButton("res_widget_close");
     closeButton->setIcon(loadSvgIcon("item/close.svg"));
-    closeButton->setToolTip(tooltipText(tr("Close"), QKeySequence{"Del"}));
+    closeButton->setToolTip(tooltipText(closeButtonTooltip(), QKeySequence{"Del"}));
     closeButton->setObjectName("CloseButton");
     connect(closeButton, &QnImageButtonWidget::clicked, this, &QnResourceWidget::close,
         Qt::QueuedConnection);
@@ -387,7 +387,7 @@ void QnResourceWidget::createButtons()
     infoButton->setIcon(loadSvgIcon("item/info.svg"));
     infoButton->setCheckable(true);
     infoButton->setChecked(item()->displayInfo());
-    infoButton->setToolTip(tooltipText(tr("Information"), QKeySequence{"I"}));
+    infoButton->setToolTip(tooltipText(infoButtonTooltip(), QKeySequence{"I"}));
     infoButton->setObjectName("InformationButton");
     connect(infoButton, &QnImageButtonWidget::toggled, this, &QnResourceWidget::at_infoButton_toggled);
 
@@ -635,6 +635,16 @@ void QnResourceWidget::updateInfoText()
 {
     updateDetailsText();
     updatePositionText();
+}
+
+QString QnResourceWidget::infoButtonTooltip() const
+{
+    return tr("Information");
+}
+
+QString QnResourceWidget::closeButtonTooltip() const
+{
+    return tr("Close");
 }
 
 QString QnResourceWidget::calculateDetailsText() const

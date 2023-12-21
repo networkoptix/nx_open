@@ -15,6 +15,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
+#include <core/resource/webpage_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/string.h>
 #include <nx/vms/client/core/ptz/helpers.h>
@@ -355,16 +356,21 @@ QAction* ShowOnItemsFactory::initInfoAction(const Parameters& parameters, QObjec
 {
     const QnResourceWidgetList widgets = parameters.widgets();
     QList<QnResourceWidget*> actualWidgets;
+    bool isWebPage = false;
     for (const auto widget: widgets)
     {
         if (!(widget->visibleButtons() & Qn::InfoButton) && !widget->isInfoVisible())
             return nullptr;
 
         actualWidgets.append(widget);
+
+        if (widget->resource().dynamicCast<QnWebPageResource>())
+            isWebPage = true;
     }
 
     const auto action = new QAction(tr("Info"), parent);
-    action->setShortcuts({QKeySequence("I"), QKeySequence("Alt+I")});
+    if (!isWebPage)
+        action->setShortcuts({QKeySequence("I"), QKeySequence("Alt+I")});
     action->setShortcutVisibleInContextMenu(true);
     action->setCheckable(true);
     action->setChecked(std::all_of(actualWidgets.begin(), actualWidgets.end(),

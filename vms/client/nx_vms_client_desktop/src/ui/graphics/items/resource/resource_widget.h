@@ -372,6 +372,9 @@ protected:
 
     void updateInfoText();
 
+    QString infoButtonTooltip() const;
+    QString closeButtonTooltip() const;
+
     QnStatusOverlayController *statusOverlayController() const;
 
     virtual int calculateButtonsVisibility() const;
