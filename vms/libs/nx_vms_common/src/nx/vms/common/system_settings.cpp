@@ -646,7 +646,7 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         [] { return tr("Update interval for remote session token cache (other Servers and Cloud)"); });
 
     m_remoteSessionTimeoutAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
-        Names::remoteSessionTimeoutS, 10 * 60, [](const int& value) { return value > 0; }, this,
+        Names::remoteSessionTimeoutS, 6 /*hours*/ * 60 * 60, [](const int& value) { return value > 0; }, this,
         [] { return tr("Timeout for remote session token cache (other Servers and Cloud)"); });
 
     m_defaultVideoCodecAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
