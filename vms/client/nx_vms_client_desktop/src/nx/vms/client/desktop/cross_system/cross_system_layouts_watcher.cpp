@@ -78,6 +78,9 @@ CrossSystemLayoutsWatcher::CrossSystemLayoutsWatcher(QObject* parent):
                 if (resource && resource->hasFlags(Qn::local_media))
                     return;
 
+                if (!item.resource.path.isEmpty())
+                    return;
+
                 NX_ASSERT(!crossSystemResourceSystemId(item.resource).isEmpty(),
                     "Disable `validateCloudLayouts` in the `nx_vms_client_desktop.ini` if get "
                     "this assert on the client start, then delete misconstructed cloud layouts");

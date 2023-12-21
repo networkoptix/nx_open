@@ -4,7 +4,11 @@
 
 #include <QtCore/QTimer>
 
+#include <core/resource/avi/avi_resource.h>
+#include <core/resource/avi/filetypesupport.h>
+#include <core/resource/resource_directory_browser.h>
 #include <core/resource/user_resource.h>
+#include <core/resource/webpage_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/http/buffer_source.h>
@@ -60,6 +64,11 @@ nx::utils::Url actualLayoutsEndpoint()
         .setScheme(kSecureUrlSchemeName)
         .setHost(nx::network::SocketGlobals::cloud().cloudHost())
         .toUrl();
+}
+
+bool isWebPage(const QString& url)
+{
+    return nx::network::http::isUrlScheme(nx::utils::Url(url).scheme());
 }
 
 } // namespace
@@ -150,6 +159,60 @@ struct CloudLayoutsManager::Private
 
         if (!layoutsToRemove.empty())
             resourcePool->removeResources(layoutsToRemove.values());
+
+        createResourcesFromLayout(layouts);
+    }
+
+    void createResourcesFromLayout(const std::vector<CrossSystemLayoutData>& crossSystemLayoutsList)
+    {
+        QnResourceList newlyCreatedResources;
+        auto resourcePool = systemContext->resourcePool();
+        auto resourcesToRemove = resourcePool->getResources().filtered(
+            [](const QnResourcePtr& resource)
+            {
+                return resource->hasFlags(Qn::local_media | Qn::web_page);
+            });
+
+        for (const auto& layout: crossSystemLayoutsList)
+        {
+            for (const auto& item: layout.items)
+            {
+                QnResourcePtr resource = resourcePool->getResourceById(item.resourceId);
+                if (resource)
+                {
+                    resource->setUrl(item.resourcePath);
+                    resource->setName(item.name);
+                    resourcesToRemove.removeOne(resource);
+                    continue;
+                }
+
+                if (isWebPage(item.resourcePath))
+                {
+                    resource = QnResourcePtr(new QnWebPageResource());
+                }
+                else if (FileTypeSupport::isMovieFileExt(item.resourcePath)
+                    || FileTypeSupport::isImageFileExt(item.resourcePath))
+                {
+                    resource = ResourceDirectoryBrowser::createArchiveResource(
+                        item.resourcePath, resourcePool);
+                }
+                else
+                {
+                    continue;
+                }
+
+                resource->setIdUnsafe(item.resourceId);
+                resource->setUrl(item.resourcePath);
+                resource->setName(item.name);
+                newlyCreatedResources.push_back(resource);
+            }
+        }
+
+        if (!newlyCreatedResources.empty())
+            resourcePool->addResources(newlyCreatedResources);
+
+        if (!resourcesToRemove.empty())
+            resourcePool->removeResources(resourcesToRemove);
     }
 
     void ensureUser()
@@ -316,7 +379,7 @@ struct CloudLayoutsManager::Private
             return;
 
         auto internalCallback =
-            [this, layout, callback](bool success)
+            [layout, callback](bool success)
             {
                 if (success)
                 {

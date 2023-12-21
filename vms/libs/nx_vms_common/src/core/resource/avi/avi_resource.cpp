@@ -38,6 +38,7 @@ QnAviResource::QnAviResource(const QString& file)
     if (FileTypeSupport::isImageFileExt(file))
     {
         addFlags(Qn::still_image);
+        removeFlags(Qn::video | Qn::audio);
         m_imageAspectRatio = getAspectRatioFromImage(file);
     }
     m_timeZoneOffset = Qn::InvalidUtcOffset;

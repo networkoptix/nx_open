@@ -269,24 +269,11 @@ QnResourcePtr ResourceDirectoryBrowser::createArchiveResource(
     const QString path = QDir::fromNativeSeparators(filename);
     NX_ASSERT(path == filename);
 
-    if (FileTypeSupport::isMovieFileExt(path))
-    {
+    if (FileTypeSupport::isMovieFileExt(path) || FileTypeSupport::isImageFileExt(path))
         return QnResourcePtr(new QnAviResource(path));
-    }
 
-    if (FileTypeSupport::isImageFileExt(path))
-    {
-        QnResourcePtr res(new QnAviResource(path));
-        res->addFlags(Qn::still_image);
-        res->removeFlags(Qn::video | Qn::audio);
-        return res;
-    }
-
-    if (resourcePool)
-    {
-        if (FileTypeSupport::isValidLayoutFile(path))
-            return layoutFromFile(path, resourcePool);
-    }
+    if (resourcePool && FileTypeSupport::isValidLayoutFile(path))
+        return layoutFromFile(path, resourcePool);
 
     return QnResourcePtr();
 }
