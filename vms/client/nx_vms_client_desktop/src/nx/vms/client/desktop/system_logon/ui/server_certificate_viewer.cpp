@@ -46,7 +46,10 @@ QString highlightedText(const QString& text)
 }
 
 static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kThemeSubstitutions = {
-    {QIcon::Normal, {.primary = "light4"}}};
+    {QIcon::Normal, {.primary = "light4"}},
+    {QIcon::Active, {.primary = "light4"}},
+    {QIcon::Selected, {.primary = "light4"}},
+};
 
 } // namespace
 

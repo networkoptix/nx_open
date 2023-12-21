@@ -365,9 +365,12 @@ void SelectableTextButton::paintEvent(QPaintEvent* /*event*/)
         const auto iconRect = QStyle::alignedRect(layoutDirection(),
             Qt::AlignLeft | Qt::AlignVCenter, iconSize, rect);
 
-        const auto iconMode = d->state == State::deactivated
+        auto iconMode = d->state == State::deactivated
             ? (hovered ? QIcon::Active : QIcon::Normal)
             : ((d->accented && d->state != State::selected) ? QIcon::Selected : QIcon::Normal);
+
+        if (d->state == State::unselected && !d->accented)
+            iconMode = QIcon::Selected;
 
         const auto iconState = d->state == State::selected
             ? QIcon::On
