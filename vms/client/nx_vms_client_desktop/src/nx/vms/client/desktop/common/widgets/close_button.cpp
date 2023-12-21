@@ -8,10 +8,11 @@
 namespace nx::vms::client::desktop {
 
 static const QColor kLight16Color = "#698796";
+static const QColor kLight10Color = "#A5B7C0";
 static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
-    {QIcon::Normal, {{kLight16Color, "light16"}}},
-    {QIcon::Active, {{kLight16Color, "light17"}}},
-    {QIcon::Selected, {{kLight16Color, "light15"}}},
+    {QIcon::Normal, {{kLight16Color, "light16"}, {kLight10Color, "light16"}}},
+    {QIcon::Active, {{kLight16Color, "light14"}, {kLight10Color, "light14"}}},
+    {QIcon::Selected, {{kLight16Color, "light17"}, {kLight10Color, "light17"}}},
 };
 
 CloseButton::CloseButton(QWidget* parent):

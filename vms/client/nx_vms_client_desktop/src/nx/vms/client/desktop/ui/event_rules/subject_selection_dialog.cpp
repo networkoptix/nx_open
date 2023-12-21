@@ -189,6 +189,10 @@ SubjectSelectionDialog::SubjectSelectionDialog(QWidget* parent, Qt::WindowFlags 
     connect(ui->groupsTreeView->model(), &QAbstractItemModel::rowsRemoved, this, updateVisibility);
     connect(ui->groupsTreeView->model(), &QAbstractItemModel::modelReset, this, updateVisibility);
 
+    setPaletteColor(ui->searchLineEdit,
+        QPalette::Disabled,
+        QPalette::PlaceholderText,
+        core::colorTheme()->color("dark10"));
     // Customized top margin for panel content:
     static constexpr int kContentTopMargin = 8;
     Style::setGroupBoxContentTopMargin(ui->usersGroupBox, kContentTopMargin);

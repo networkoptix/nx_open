@@ -35,6 +35,11 @@ static const QColor kLight4Color = "#E1E7EA";
 static const QColor kBaseWindowTextColor = "#698796"; //< Value of light16 ('windowText').
 
 const core::SvgIconColorer::IconSubstitutions kTitleBarIconSubstitutions = {
+    { QnIcon::Normal, {
+        { kBasePrimaryColor, "light10" },
+        { kLight4Color, "light4" },
+        { kBaseWindowTextColor, "light16" },
+    }},
     { QnIcon::Disabled, {
         { kBasePrimaryColor, "dark14" },
         { kLight4Color, "dark17" },

@@ -132,7 +132,7 @@ Item
         Image
         {
             width: 22
-            height: 22
+            height: 14
 
             source: closedTileItem.tile.connectable && !context.hasCloudConnectionIssue
                 ? "image://svg/skin/welcome_screen/tile/cloud_online_20.svg"
