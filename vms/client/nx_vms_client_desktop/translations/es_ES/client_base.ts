@@ -1558,19 +1558,19 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Users are receiving emails</source>
-      <translation type="unfinished">Users are receiving emails</translation>
+      <translation>Los usuarios están recibiendo correos electrónicos.</translation>
     </message>
     <message>
       <source>Users will start receiving emails right after you apply settings</source>
-      <translation type="unfinished">Users will start receiving emails right after you apply settings</translation>
+      <translation>Los usuarios comenzarán a recibir correos electrónicos justo después de aplicar la configuración</translation>
     </message>
     <message>
       <source>Unable to test SMTP server</source>
-      <translation type="unfinished">Unable to test SMTP server</translation>
+      <translation>No se puede probar el servidor SMTP</translation>
     </message>
     <message>
       <source>Additional info required</source>
-      <translation type="unfinished">Additional info required</translation>
+      <translation>Se necesita información adicional</translation>
     </message>
   </context>
   <context>
