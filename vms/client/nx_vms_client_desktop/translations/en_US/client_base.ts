@@ -4489,11 +4489,6 @@ to %1</source>
         </translation>
     </message>
     <message>
-        <source>User %1 has no %2 permission</source>
-        <comment>%1 is the name of selected user, %2 is permission name</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Selected users have no %1 permission</source>
         <comment>%1 is permission name</comment>
         <translation type="unfinished"></translation>
@@ -4505,6 +4500,16 @@ to %1</source>
             <numerusform>%n of %1 selected users has no %2 permission</numerusform>
             <numerusform>%n of %1 selected users have no %2 permission</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>User %1 has no %2 permissions for selected camera</source>
+        <comment>%1 is the name of selected user, %2 is permission name</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User %1 has no %2 permissions for some of selected cameras</source>
+        <comment>%1 is the name of the selected user, %2 is the permission name</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
