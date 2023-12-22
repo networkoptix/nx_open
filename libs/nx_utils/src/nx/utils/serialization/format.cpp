@@ -27,7 +27,7 @@ const char* serializationFormatToHttpContentType(SerializationFormat format)
         case SerializationFormat::urlEncoded:
             return "application/x-www-form-urlencoded";
         default:
-            NX_ASSERT(false);
+            NX_ASSERT(false, "Value: %1", static_cast<int>(format));
             return "unsupported";
     }
 }
