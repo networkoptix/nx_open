@@ -1317,15 +1317,15 @@ PTZを行います</translation>
     </message>
     <message>
       <source>Last day</source>
-      <translation>過去1日間</translation>
+      <translation>直近 24 時間</translation>
     </message>
     <message>
       <source>Last 7 days</source>
-      <translation>過去 7 日間</translation>
+      <translation>直近 7 日間</translation>
     </message>
     <message>
       <source>Last 30 days</source>
-      <translation>過去 30 日間</translation>
+      <translation>直近 30 日間</translation>
     </message>
     <message>
       <source>Selected on Timeline</source>

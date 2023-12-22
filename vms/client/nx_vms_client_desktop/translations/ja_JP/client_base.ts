@@ -6309,13 +6309,13 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
       <translation>
-        <numerusform>選択したファイルは %1に記録されましたが、最後の %n 日に録画されたファイルのみをアップロードできます。これはカメラのアーカイブ設定で変更できます。</numerusform>
+        <numerusform>選択したファイルは %1 に録画されたものですが、アップロードできるのは直近 %n 日間に録画されたファイルのみです。これはカメラのアーカイブ設定で変更できます。</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
       <translation>
-        <numerusform>選択したファイルは %1 から %2の間で記録されましたが、最後の %n 日に記録されたファイルのみをアップロードできます。これはカメラのアーカイブ設定で変更できます。</numerusform>
+        <numerusform>選択したファイルは %1 から %2 までに録画されたものですが、アップロードできるのは直近 %n 日間に録画されたファイルのみです。これはカメラのアーカイブ設定で変更できます。</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -6878,15 +6878,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Last day</source>
-      <translation>過去24時間</translation>
+      <translation>直近 24 時間</translation>
     </message>
     <message>
       <source>Last 7 days</source>
-      <translation>過去 7 日間</translation>
+      <translation>直近 7 日間</translation>
     </message>
     <message>
       <source>Last 30 days</source>
-      <translation>過去 30 日間</translation>
+      <translation>直近 30 日間</translation>
     </message>
     <message>
       <source>Selected on Timeline</source>
