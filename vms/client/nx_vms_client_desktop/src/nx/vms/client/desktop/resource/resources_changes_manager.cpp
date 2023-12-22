@@ -452,7 +452,7 @@ rest::Handle ResourcesChangesManager::saveServer(
         [this, server, callback=std::move(callback)](
             bool success,
             rest::Handle requestId,
-            rest::ServerConnection::ErrorOrEmpty reply)
+            rest::ErrorOrData<QByteArray> reply)
         {
             if (success && std::holds_alternative<nx::network::rest::Result>(reply))
             {
@@ -475,17 +475,15 @@ rest::Handle ResourcesChangesManager::saveServer(
     body.id = change.serverId;
     body.backupBitrateBytesPerSecond = change.backupBitrateBytesPerSecond;
     body.name = change.serverName.isEmpty() ? server->getName() : change.serverName;
-    body.url = server->getUrl();
     body.isFailoverEnabled = change.allowAutoRedundancy;
     body.maxCameras = change.maxCameras;
     body.locationId = change.locationId;
-    body.version = server->getVersion().toString();
 
     auto modifiedProperties = resourcePropertyDictionary()->modifiedProperties(server->getId());
     for (auto [key, value]: nx::utils::keyValueRange(modifiedProperties))
         body.parameters[key] = QJsonValue(value);
 
-    return api->putRest(systemContext->restApiHelper()->getSessionTokenHelper(),
+    return api->patchRest(systemContext->restApiHelper()->getSessionTokenHelper(),
         QString("/rest/v3/servers/%1").arg(server->getId().toString()),
         network::rest::Params{},
         QByteArray::fromStdString(nx::reflect::json::serialize(body)),
