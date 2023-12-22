@@ -33,9 +33,9 @@ NX_REFLECTION_INSTRUMENT(
     nx_vms_api_analytics_IntegrationRequestIdentity_Fields);
 
 /**%apidoc
- * Data to create/update an Integration request in the VMS.
+ * Integration manifest.
  */
-struct NX_VMS_API RegisterIntegrationRequest: public IntegrationRequestIdentity
+struct NX_VMS_API ApiIntegrationManifest
 {
     /**%apidoc Integration id. */
     QString id;
@@ -55,16 +55,38 @@ struct NX_VMS_API RegisterIntegrationRequest: public IntegrationRequestIdentity
     /**%apidoc Integration authentication code, 4 decimal digits. */
     QString pinCode;
 
-    bool operator==(const RegisterIntegrationRequest& other) const = default;
+    bool operator==(const ApiIntegrationManifest& other) const = default;
 };
-#define nx_vms_api_analytics_RegisterIntegrationRequest_Fields \
-    nx_vms_api_analytics_IntegrationRequestIdentity_Fields \
+#define nx_vms_api_analytics_ApiIntegrationManifest_Fields \
     (id) \
     (name) \
     (description) \
     (version) \
     (vendor) \
     (pinCode)
+QN_FUSION_DECLARE_FUNCTIONS(
+    ApiIntegrationManifest, (json)(ubjson), NX_VMS_API);
+NX_REFLECTION_INSTRUMENT(
+    ApiIntegrationManifest,
+    nx_vms_api_analytics_ApiIntegrationManifest_Fields);
+
+/**%apidoc
+ * Data to create/update an Integration request in the VMS.
+ */
+struct NX_VMS_API RegisterIntegrationRequest: public IntegrationRequestIdentity
+{
+    /**%apidoc Integration manifest. */
+    ApiIntegrationManifest integrationManifest;
+
+    /**%apidoc String containing the Engine manifest. */
+    QString engineManifestString;
+
+    bool operator==(const RegisterIntegrationRequest& other) const = default;
+};
+#define nx_vms_api_analytics_RegisterIntegrationRequest_Fields \
+    nx_vms_api_analytics_IntegrationRequestIdentity_Fields \
+    (integrationManifest) \
+    (engineManifestString)
 QN_FUSION_DECLARE_FUNCTIONS(
     RegisterIntegrationRequest, (json)(ubjson), NX_VMS_API);
 NX_REFLECTION_INSTRUMENT(

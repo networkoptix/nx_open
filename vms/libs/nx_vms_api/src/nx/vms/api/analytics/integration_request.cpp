@@ -6,6 +6,10 @@
 
 namespace nx::vms::api::analytics {
 
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ApiIntegrationManifest,
+    (json)(ubjson),
+    nx_vms_api_analytics_ApiIntegrationManifest_Fields, (brief, true))
+
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(IntegrationRequestIdentity,
     (json)(ubjson),
     nx_vms_api_analytics_IntegrationRequestIdentity_Fields, (brief, true))
