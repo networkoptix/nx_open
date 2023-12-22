@@ -461,9 +461,16 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
 
     ui->useMedia2ToFetchProfilesGroupBox->setVisible(state.expert.areOnvifSettingsApplicable);
 
-    const auto index = ui->useMedia2ToFetchProfilesComboBox->findData(
-        QVariant::fromValue(state.expert.useMedia2ToFetchProfiles()));
-    ui->useMedia2ToFetchProfilesComboBox->setCurrentIndex(index);
+    if (state.expert.useMedia2ToFetchProfiles.hasValue())
+    {
+        const auto index = ui->useMedia2ToFetchProfilesComboBox->findData(
+            QVariant::fromValue(state.expert.useMedia2ToFetchProfiles()));
+        ui->useMedia2ToFetchProfilesComboBox->setCurrentIndex(index);
+    }
+    else
+    {
+        ui->useMedia2ToFetchProfilesComboBox->setCurrentIndex(0 /*multiple values*/);
+    }
 
     ::setReadOnly(ui->useMedia2ToFetchProfilesComboBox, state.readOnly);
     ::setReadOnly(ui->comboBoxPrimaryProfile, state.readOnly);
