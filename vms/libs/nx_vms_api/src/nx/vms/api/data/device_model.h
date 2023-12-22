@@ -11,8 +11,8 @@
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/instrument.h>
 #include <nx/utils/uuid.h>
-// #include <nx/vms/api/data/camera_media_stream_info.h> // TODO: #skolesnik
 #include <nx/vms/api/analytics/device_agent_manifest.h>
+#include <nx/vms/api/data/device_media_stream_info.h>
 #include <nx/vms/api/data/media_stream_capability.h>
 #include <nx/vms/api/types/device_type.h>
 
@@ -33,7 +33,7 @@ struct DeviceGroupSettings
 };
 #define DeviceGroupSettings_Fields (id)(name)
 QN_FUSION_DECLARE_FUNCTIONS(DeviceGroupSettings, (json), NX_VMS_API)
-NX_REFLECTION_INSTRUMENT(DeviceGroupSettings, DeviceGroupSettings_Fields);
+NX_REFLECTION_INSTRUMENT(DeviceGroupSettings, DeviceGroupSettings_Fields)
 
 /**%apidoc Device information object.
  * %param[opt]:object parameters Device specific key-value parameters.
@@ -340,20 +340,25 @@ struct NX_VMS_API DeviceModelV3: DeviceModelV1
     /**%apidoc[readonly] */
     CameraMediaCapability mediaCapabilities;
 
-    // TODO: #skolesnik Apidoc, move to vms api from common
-    //    std::optional<CameraMediaStreams> mediaStreams;
+    /**%apidoc[readonly] */
+    std::vector<DeviceMediaStreamInfo> mediaStreams;
 
     /**%apidoc[readonly] */
     std::optional<QJsonObject> streamUrls;
 
+    // TODO: #skolesnik
+    //     Fix the bug which prevents from creating a new camera with a non-`std::nullopt` value.
+    //     The crash also happens when creating a new camera passing `userEnabledAnalyticsEngines`
+    //     (empty or not) in `parameters` via `v{1-2}`.
+    //     PATCH (or PUT with existing) works fine.
     std::optional<std::vector<QnUuid>> userEnabledAnalyticsEngineIds;
 
     DbUpdateTypes toDbTypes() &&;
     static std::vector<DeviceModelV3> fromDbTypes(DbListTypes data);
 };
 #define DeviceModelV3_Fields DeviceModelGeneral_Fields DeviceModelV1_Fields \
-    (compatibleAnalyticsEngineIds)(mediaCapabilities)(streamUrls)           \
-    (userEnabledAnalyticsEngineIds)(parameters)
+    (compatibleAnalyticsEngineIds)(mediaCapabilities)(mediaStreams)         \
+    (streamUrls)(userEnabledAnalyticsEngineIds)(parameters)
 QN_FUSION_DECLARE_FUNCTIONS(DeviceModelV3, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(DeviceModelV3, DeviceModelV3_Fields);
 

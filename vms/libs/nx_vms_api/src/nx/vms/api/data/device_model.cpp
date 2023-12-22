@@ -6,6 +6,7 @@
 #include <unordered_map>
 
 #include <nx/fusion/model_functions.h>
+#include <nx/fusion/serialization/json.h>
 #include <nx/utils/std/algorithm.h>
 
 namespace nx::vms::api {
@@ -78,7 +79,41 @@ void extractParametersToFields(DeviceModelV3* m)
         m->parameters.erase(it);
     }
 
-    // MapField{kMediaStreams, &DeviceModelV3::mediaStreams}, // TODO: #skolesnik
+    if (const auto it = m->parameters.find(kMediaStreams); it != m->parameters.end())
+    {
+        QJsonValue jsonValue = it->second.isObject()
+            ? std::move(it->second.toObject()["streams"])
+            : std::move(it->second);
+
+        if (NX_ASSERT(jsonValue.isArray()))
+        {
+            QJsonArray mediaStreams = jsonValue.toArray();
+            const size_t s = mediaStreams.size();
+            for (QJsonValueRef streamReference: mediaStreams)
+            {
+                // `nx::vms::common::CameraMediaStreamInfo.transports` is stored as
+                // `std::vector<QString>`, hence needs to be converted to enum flags.
+                if (!NX_ASSERT(streamReference.isObject()))
+                    continue;
+
+                QJsonObject stream = streamReference.toObject();
+                std::vector<api::StreamTransportType> transports;
+                if (!NX_ASSERT(QJson::deserialize(stream["transports"], &transports)))
+                    continue;
+
+                api::StreamTransportTypes flags = {};
+                for (auto t: transports)
+                    flags |= t;
+
+                stream["transports"] = nx::toString(flags);
+                streamReference = std::move(stream);
+            }
+
+            NX_ASSERT(QJson::deserialize(mediaStreams, &m->mediaStreams));
+        }
+
+        m->parameters.erase(it);
+    }
 
     if (const auto it = m->parameters.find(kStreamUrls);
         it != m->parameters.end() /*&& NX_ASSERT(it->second.isObject())*/)
@@ -115,8 +150,6 @@ void moveFieldsToParameters(DeviceModelV1* m)
 void moveFieldsToParameters(DeviceModelV3* m)
 {
     moveFieldsToParameters(static_cast<DeviceModelV1*>(m));
-
-    // MapField{kMediaStreams, &DeviceModelV3::mediaStreams}, // TODO: #skolesnik
 
     if (m->userEnabledAnalyticsEngineIds)
     {
