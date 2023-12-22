@@ -31,6 +31,7 @@
 #include <nx/vms/client/desktop/event_search/widgets/abstract_search_widget.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_ribbon.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_tile.h>
+#include <nx/vms/client/desktop/event_search/widgets/placeholder_widget.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
@@ -63,6 +64,12 @@ NotificationListWidget::Private::Private(NotificationListWidget* q):
     m_ribbonContainer(new QWidget(q)),
     m_filterSystemsButton(new SelectableTextButton(q)),
     m_eventRibbon(new EventRibbon(m_ribbonContainer)),
+    m_placeholder(PlaceholderWidget::create(
+        qnSkin->pixmap("left_panel/placeholders/notifications.svg"),
+        AbstractSearchWidget::makePlaceholderText(tr("No new notifications"), {}),
+        tr("Notifications Settings"),
+        [this] { menu()->trigger(menu::PreferencesNotificationTabAction); },
+        q)),
     m_model(new NotificationTabModel(windowContext(), this)),
     m_filterModel(new QSortFilterProxyModel(q))
 {
@@ -92,6 +99,7 @@ NotificationListWidget::Private::Private(NotificationListWidget* q):
     headerLayout->addWidget(m_filterSystemsButton);
     setupFilterSystemsButton();
 
+    anchorWidgetToParent(m_placeholder);
     anchorWidgetToParent(m_eventRibbon);
 
     const auto viewportHeader = new QWidget(q);
@@ -125,14 +133,17 @@ NotificationListWidget::Private::Private(NotificationListWidget* q):
         q,
         &NotificationListWidget::unreadCountChanged);
 
-    const auto updateCountLabel =
+    const auto onCountChanged =
         [this]
         {
             const auto count = m_eventRibbon->count();
+
             m_itemCounterLabel->setText(count > 0 ? tr("%n notifications", "", count) : "");
+            m_placeholder->setVisible(count <= 0);
         };
 
-    connect(m_eventRibbon, &EventRibbon::countChanged, this, updateCountLabel);
+    connect(m_eventRibbon, &EventRibbon::countChanged, this, onCountChanged);
+
     connect(workbenchContext(), &QnWorkbenchContext::userChanged, this,
         [this] { changeFilterVisibilityIfNeeded(); });
 
@@ -142,10 +153,9 @@ NotificationListWidget::Private::Private(NotificationListWidget* q):
         this,
         [this] { changeFilterVisibilityIfNeeded(); });
 
-    updateCountLabel();
-
     TileInteractionHandler::install(m_eventRibbon);
 
+    onCountChanged();
     changeFilterVisibilityIfNeeded();
 }
 

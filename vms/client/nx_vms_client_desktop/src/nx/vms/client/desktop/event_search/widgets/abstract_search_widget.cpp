@@ -9,6 +9,7 @@
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/window_context.h>
+#include <nx/vms/common/html/html.h>
 
 #include "private/abstract_search_widget_p.h"
 
@@ -168,8 +169,14 @@ void AbstractSearchWidget::addSearchAction(QAction* action)
 
 QString AbstractSearchWidget::makePlaceholderText(const QString& title, const QString& description)
 {
-    static const QString kTemplate = "<center><p>%1</p><p><font size='-1'>%2</font></p></center>";
-    return kTemplate.arg(title, description);
+    using namespace nx::vms::common::html;
+
+    QStringList lines = {paragraph(title)};
+
+    if (!description.isEmpty())
+        lines.push_back(paragraph(NX_FMT("<font size='-1'>%1</font>", description)));
+
+    return tagged(lines.join(""), "center");
 }
 
 } // namespace nx::vms::client::desktop
