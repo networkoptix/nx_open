@@ -44,6 +44,7 @@ private:
     QWidget* const m_ribbonContainer;
     SelectableTextButton* const m_filterSystemsButton;
     EventRibbon* const m_eventRibbon;
+    QWidget* const m_placeholder;
     NotificationTabModel* const m_model;
     QSortFilterProxyModel* const m_filterModel;
     QHash<RightPanel::SystemSelection, QAction*> m_systemSelectionActions;
