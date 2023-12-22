@@ -1778,7 +1778,7 @@
     </message>
     <message>
       <source>Maximum number of consecutive RTP errors before the server reconnects the RTSP session.</source>
-      <translation type="unfinished">Maximum number of consecutive RTP errors before the server reconnects the RTSP session.</translation>
+      <translation>Número máximo de errores RTP consecutivos antes de que el servidor vuelva a conectar la sesión RTSP.</translation>
     </message>
     <message>
       <source>Authorization Session token lifetime (seconds)</source>
@@ -1803,7 +1803,7 @@
     </message>
     <message>
       <source>Interval between the Cloud polling HTTP requests to synchronize the data.</source>
-      <translation type="unfinished">Interval between the Cloud polling HTTP requests to synchronize the data.</translation>
+      <translation>Intervalo entre las peticiones HTTP en la nube para sincronizar los datos.</translation>
     </message>
   </context>
   <context>
