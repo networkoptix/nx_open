@@ -2,8 +2,9 @@
 
 #pragma once
 
+#include <string>
+
 #include <QtCore/QRectF>
-#include <QtCore/QString>
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/uuid.h>
@@ -12,15 +13,15 @@ namespace nx::vms::api::analytics {
 
 struct NX_VMS_API EngineIdentity
 {
-    QString engineId;
+    std::string engineId;
 };
 #define nx_vms_api_analytics_EngineIdentity_Fields (engineId)
 QN_FUSION_DECLARE_FUNCTIONS(EngineIdentity, (json), NX_VMS_API)
 
 struct NX_VMS_API DeviceAgentIdentity
 {
-    QString engineId;
-    QString deviceId;
+    std::string engineId;
+    std::string deviceId;
 };
 #define nx_vms_api_analytics_DeviceAgentIdentity_Fields (engineId)(deviceId)
 QN_FUSION_DECLARE_FUNCTIONS(DeviceAgentIdentity, (json), NX_VMS_API)
@@ -29,23 +30,22 @@ NX_VMS_API bool operator<(const DeviceAgentIdentity& first, const DeviceAgentIde
 
 struct NX_VMS_API ObtainEngineRequestParameters
 {
-    QString engineId;
-    QString engineName;
+    std::string engineId;
 };
-#define nx_vms_api_analytics_ObtainEngineRequestParameters_Fields (engineId)(engineName)
+#define nx_vms_api_analytics_ObtainEngineRequestParameters_Fields (engineId)
 QN_FUSION_DECLARE_FUNCTIONS(ObtainEngineRequestParameters, (json), NX_VMS_API)
 
 struct NX_VMS_API ObtainDeviceAgentRequestParameters
 {
-    QString deviceId;
+    std::string deviceId;
 };
 #define nx_vms_api_analytics_ObtainDeviceAgentRequestParameters_Fields (deviceId)
 QN_FUSION_DECLARE_FUNCTIONS(ObtainDeviceAgentRequestParameters, (json), NX_VMS_API)
 
 struct NX_VMS_API RpcObjectMetadataAttribute
 {
-    QString name;
-    QString value;
+    std::string name;
+    std::string value;
 };
 #define nx_vms_api_analytics_RpcObjectMetadataAttribute_Fields (name)(value)
 QN_FUSION_DECLARE_FUNCTIONS(RpcObjectMetadataAttribute, (json), NX_VMS_API)
@@ -63,7 +63,7 @@ QN_FUSION_DECLARE_FUNCTIONS(Rect, (json), NX_VMS_API)
 struct NX_VMS_API RpcObjectMetadata
 {
     nx::Uuid trackId;
-    QString typeId;
+    std::string typeId;
     Rect boundingBox;
     std::vector<RpcObjectMetadataAttribute> attributes;
 };
