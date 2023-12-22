@@ -1782,7 +1782,7 @@
     </message>
     <message>
       <source>Maximum number of consecutive RTP errors before the server reconnects the RTSP session.</source>
-      <translation type="unfinished">Maximum number of consecutive RTP errors before the server reconnects the RTSP session.</translation>
+      <translation>Número máximo de errores RTP consecutivos antes de que el servidor vuelva a conectar la sesión RTSP.</translation>
     </message>
     <message>
       <source>Enable deprecated API functions currently used by %1 software (insecure)</source>
@@ -1795,11 +1795,11 @@
     </message>
     <message>
       <source>Interval between the Cloud polling HTTP requests to synchronize the data.</source>
-      <translation type="unfinished">Interval between the Cloud polling HTTP requests to synchronize the data.</translation>
+      <translation>Intervalo entre las peticiones HTTP en la nube para sincronizar los datos.</translation>
     </message>
     <message>
       <source>Local System ID, null means the System is not set up yet.</source>
-      <translation type="unfinished">Local System ID, null means the System is not set up yet.</translation>
+      <translation>ID del sistema local, null significa que el sistema no está configurado todavía.</translation>
     </message>
   </context>
   <context>

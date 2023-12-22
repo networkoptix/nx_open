@@ -69,7 +69,7 @@
     </message>
     <message>
       <source>Group Members Attribute</source>
-      <translation type="unfinished">Group Members Attribute</translation>
+      <translation>Atributo de los miembros del grupo</translation>
     </message>
   </context>
   <context>
@@ -948,11 +948,11 @@
     </message>
     <message>
       <source>When continuous sync with LDAP server is disabled, groups do not synchronize automatically. To update this group, initiate a manual sync.</source>
-      <translation type="unfinished">When continuous sync with LDAP server is disabled, groups do not synchronize automatically. To update this group, initiate a manual sync.</translation>
+      <translation>Cuando se deshabilita la sincronización continua, la membresía del usuario en grupos no se sincroniza automáticamente. Para actualizar esta información, inicie una sincronización manual.</translation>
     </message>
     <message>
       <source>This group is not found in the LDAP database.</source>
-      <translation type="unfinished">This group is not found in the LDAP database.</translation>
+      <translation>Este grupo no se encuentra en la base de datos LDAP.</translation>
     </message>
   </context>
   <context>
@@ -1263,19 +1263,19 @@
     </message>
     <message>
       <source>Not configured yet</source>
-      <translation type="unfinished">Not configured yet</translation>
+      <translation>Ninguno configurado todavía</translation>
     </message>
     <message>
       <source>Configure</source>
-      <translation type="unfinished">Configure</translation>
+      <translation>Configurar</translation>
     </message>
     <message>
       <source>Specify at least one filter to synchronize users and groups</source>
-      <translation type="unfinished">Specify at least one filter to synchronize users and groups</translation>
+      <translation>Especifique al menos un filtro para sincronizar usuarios y grupos</translation>
     </message>
     <message>
       <source>Continuous sync with LDAP server is disabled for this system. Updates to groups and users and groups membership will occur solely through manual synchronization.</source>
-      <translation type="unfinished">Continuous sync with LDAP server is disabled for this system. Updates to groups and users and groups membership will occur solely through manual synchronization.</translation>
+      <translation>La importación continua desde LDAP está deshabilitada para este sistema. Las actualizaciones de grupos y membresías de usuarios y grupos; se realizarán únicamente mediante sincronización manual.</translation>
     </message>
   </context>
   <context>
@@ -1739,28 +1739,28 @@ para activar PTZ</translation>
     <message>
       <source>Introducing
 New PTZ controls</source>
-      <translation type="unfinished">Introducing
-New PTZ controls</translation>
+      <translation>Presentamos
+nuevos controles PTZ</translation>
     </message>
     <message>
       <source>Click, double-click, or drag
 mouse pointer while pressing
 Shift key to use Advanced PTZ</source>
-      <translation type="unfinished">Click, double-click, or drag
-mouse pointer while pressing
-Shift key to use Advanced PTZ</translation>
+      <translation>Haga clic, haga doble clic o arrastre un puntero
+mientras presiona la tecla
+Mayús para usar PTZ Avanzado</translation>
     </message>
     <message>
       <source>Here is a quick guide
 on what has changed.</source>
-      <translation type="unfinished">Here is a quick guide
-on what has changed.</translation>
+      <translation>Aquí hay una guía rápida
+sobre lo que ha cambiado.</translation>
     </message>
     <message>
       <source>To use Target Lock Tracking,
 Press Alt + Click to follow object</source>
-      <translation type="unfinished">To use Target Lock Tracking,
-Press Alt + Click to follow object</translation>
+      <translation>Para usar el seguimiento de bloqueo de destino,
+Presione Alt + Clic para seguir el objeto</translation>
     </message>
   </context>
   <context>
@@ -2232,7 +2232,7 @@ Press Alt + Click to follow object</translation>
     <name>StringEditor</name>
     <message>
       <source>Min 3 characters</source>
-      <translation type="unfinished">Min 3 characters</translation>
+      <translation>Mínimo 3 caracteres</translation>
     </message>
   </context>
   <context>
@@ -2262,12 +2262,12 @@ Press Alt + Click to follow object</translation>
     <message>
       <source>Valid from %1 to %2 (by server time)</source>
       <extracomment>Example: Valid from 14.05.2023 to 24.05.2023, 12:24 (by server time)</extracomment>
-      <translation type="unfinished">Valid from %1 to %2 (by server time)</translation>
+      <translation>Válido de %1 a %2 (según hora del servidor)</translation>
     </message>
     <message>
       <source>Valid from %1 to %2 (by server time) or for %3 after login</source>
       <extracomment>Valid from 14.05.2023 to 24.05.2023 (by server time) or for 12 hours after login</extracomment>
-      <translation type="unfinished">Valid from %1 to %2 (by server time) or for %3 after login</translation>
+      <translation>Válido de %1 a %2 (según la hora del servidor) o para %3 después de iniciar sesión</translation>
     </message>
   </context>
   <context>
@@ -2604,11 +2604,11 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>When continuous sync with LDAP server is disabled, user membership in groups does not synchronize automatically. To update this information, initiate a manual sync.</source>
-      <translation type="unfinished">When continuous sync with LDAP server is disabled, user membership in groups does not synchronize automatically. To update this information, initiate a manual sync.</translation>
+      <translation>Cuando se deshabilita la sincronización continua, la membresía del usuario en grupos no se sincroniza automáticamente. Para actualizar esta información, inicie una sincronización manual.</translation>
     </message>
     <message>
       <source>This user’s login duplicates the login of another user. None of them is able to log in. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</source>
-      <translation type="unfinished">This user’s login duplicates the login of another user. None of them is able to log in. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</translation>
+      <translation>El inicio de sesión de este usuario duplica el inicio de sesión de otro usuario. Ninguno de ellos puede iniciar sesión. Para resolver este problema, puede cambiar el inicio de sesión del usuario o deshabilitar o eliminar usuarios con inicios de sesión duplicados.</translation>
     </message>
   </context>
   <context>

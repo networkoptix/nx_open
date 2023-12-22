@@ -673,11 +673,11 @@
     </message>
     <message>
       <source>Record audio</source>
-      <translation type="unfinished">Record audio</translation>
+      <translation>Grabar audio</translation>
     </message>
     <message>
       <source>Do not send Stop PTZ command</source>
-      <translation type="unfinished">Do not send Stop PTZ command</translation>
+      <translation>No enviar el comando Detener PTZ</translation>
     </message>
   </context>
   <context>
@@ -2471,7 +2471,7 @@
     </message>
     <message>
       <source>Services state</source>
-      <translation type="unfinished">Services state</translation>
+      <translation>Estado de los servicios</translation>
     </message>
   </context>
   <context>

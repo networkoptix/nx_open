@@ -1083,7 +1083,7 @@
     </message>
     <message>
       <source>Convert to Shared Layout</source>
-      <translation type="unfinished">Convert to Shared Layout</translation>
+      <translation>Convertir a diseño compartido</translation>
     </message>
   </context>
   <context>
@@ -1129,7 +1129,7 @@
     <name>DirectParentsModel</name>
     <message>
       <source>LDAP group membership is managed on LDAP server</source>
-      <translation type="unfinished">LDAP group membership is managed on LDAP server</translation>
+      <translation>La membresía del grupo LDAP se administra en LDAP</translation>
     </message>
   </context>
   <context>
@@ -1693,19 +1693,19 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Users are receiving emails</source>
-      <translation type="unfinished">Users are receiving emails</translation>
+      <translation>Los usuarios están recibiendo correos electrónicos.</translation>
     </message>
     <message>
       <source>Users will start receiving emails right after you apply settings</source>
-      <translation type="unfinished">Users will start receiving emails right after you apply settings</translation>
+      <translation>Los usuarios comenzarán a recibir correos electrónicos justo después de aplicar la configuración</translation>
     </message>
     <message>
       <source>Unable to test SMTP server</source>
-      <translation type="unfinished">Unable to test SMTP server</translation>
+      <translation>No se puede probar el servidor SMTP</translation>
     </message>
     <message>
       <source>Additional info required</source>
-      <translation type="unfinished">Additional info required</translation>
+      <translation>Se necesita información adicional</translation>
     </message>
   </context>
   <context>
@@ -4477,19 +4477,19 @@ a %1</translation>
     <message>
       <source>User group %1 has no %2 permission</source>
       <comment>%1 is the name of selected user group, %2 is permission name</comment>
-      <translation type="unfinished">User group %1 has no %2 permission</translation>
+      <translation>El usuario %1 no tiene permiso %2</translation>
     </message>
     <message>
       <source>Selected user groups have no %1 permission</source>
       <comment>%1 is permission name</comment>
-      <translation type="unfinished">Selected user groups have no %1 permission</translation>
+      <translation>Los usuarios seleccionados no tienen permiso %1</translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 selected user groups have no %2 permission</source>
       <comment>%1 is number of selected user groups, %2 is permission name</comment>
-      <translation type="unfinished">
-        <numerusform>%n of %1 selected user groups have no %2 permission</numerusform>
-        <numerusform>%n of %1 selected user groups have no %2 permission</numerusform>
+      <translation>
+        <numerusform>%n de %1 usuarios seleccionados no tienen permiso %2</numerusform>
+        <numerusform>%n de %1 usuarios seleccionados no tienen permiso %2</numerusform>
       </translation>
     </message>
     <message>
@@ -5406,7 +5406,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Failed to save system settings</source>
-      <translation type="unfinished">Failed to save system settings</translation>
+      <translation>No se pudo guardar la configuración del sistema</translation>
     </message>
   </context>
   <context>
@@ -5571,11 +5571,11 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Intercom call</source>
-      <translation type="unfinished">Intercom call</translation>
+      <translation>Llamada Intercom</translation>
     </message>
     <message>
       <source>Intercom missed call</source>
-      <translation type="unfinished">Intercom missed call</translation>
+      <translation>Llamada perdida de Intercom</translation>
     </message>
   </context>
   <context>
@@ -6016,30 +6016,30 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message numerus="yes">
       <source>Failed to open %n devices on the video wall:</source>
-      <translation type="unfinished">
-        <numerusform>Failed to open %n devices on the video wall:</numerusform>
-        <numerusform>Failed to open %n devices on the video wall:</numerusform>
+      <translation>
+        <numerusform>No se pudieron abrir %n dispositivos en el muro de video:</numerusform>
+        <numerusform>Error al abrir dispositivos %n en la pared de vídeo:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Failed to open %n cameras on the video wall:</source>
-      <translation type="unfinished">
-        <numerusform>Failed to open %n cameras on the video wall:</numerusform>
-        <numerusform>Failed to open %n cameras on the video wall:</numerusform>
+      <translation>
+        <numerusform>No se pudieron abrir %n dispositivos en el muro de video:</numerusform>
+        <numerusform>No se pudieron abrir %n dispositivos en el muro de video:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>You cannot add to the video wall devices for which you do not have View Live permission.</source>
-      <translation type="unfinished">
-        <numerusform>You cannot add to the video wall devices for which you do not have View Live permission.</numerusform>
-        <numerusform>You cannot add to the video wall devices for which you do not have View Live permission.</numerusform>
+      <translation>
+        <numerusform>No puede agregar al muro de videos dispositivos para los cuales no tiene permiso Ver en vivo.</numerusform>
+        <numerusform>No puede agregar al muro de videos dispositivos para los cuales no tiene permiso Ver en vivo.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>You cannot add to the video wall cameras for which you do not have View Live permission.</source>
-      <translation type="unfinished">
-        <numerusform>You cannot add to the video wall cameras for which you do not have View Live permission.</numerusform>
-        <numerusform>You cannot add to the video wall cameras for which you do not have View Live permission.</numerusform>
+      <translation>
+        <numerusform>No puede agregar al muro de videos dispositivos para los cuales no tiene permiso Ver en vivo.</numerusform>
+        <numerusform>No puede agregar al muro de videos dispositivos para los cuales no tiene permiso Ver en vivo.</numerusform>
       </translation>
     </message>
   </context>
@@ -6464,12 +6464,12 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message>
       <source>All members of %1 and %2 groups will get access to this layout</source>
       <comment>%1 and %2 will be substituted with user group names</comment>
-      <translation type="unfinished">All members of %1 and %2 groups will get access to this layout</translation>
+      <translation>Todos los miembros de los grupos %1 y %2 tendrán acceso a este diseño.</translation>
     </message>
     <message>
       <source>Convert</source>
       <comment>Converting layout to shared</comment>
-      <translation type="unfinished">Convert</translation>
+      <translation>Convertir</translation>
     </message>
   </context>
   <context>
@@ -7441,7 +7441,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Missed Call</source>
-      <translation type="unfinished">Missed Call</translation>
+      <translation>Llamada perdida</translation>
     </message>
   </context>
   <context>
@@ -9141,11 +9141,11 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Current group is a member of all groups selected on this tab and inherits permissions from each of them.</source>
-      <translation type="unfinished">Current group is a member of all groups selected on this tab and inherits permissions from each of them.</translation>
+      <translation>El grupo actual es miembro de todos los grupos seleccionados en esta pestaña y hereda los permisos de cada uno de ellos.</translation>
     </message>
     <message>
       <source>Select one or multiple groups from which the current group will inherit permissions</source>
-      <translation type="unfinished">Select one or multiple groups from which the current group will inherit permissions</translation>
+      <translation>Seleccione uno o varios grupos de los cuales el grupo actual heredará permisos</translation>
     </message>
   </context>
   <context>
@@ -9741,7 +9741,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>It is recommended to contact %1 before proceeding.</source>
-      <translation type="unfinished">It is recommended to contact %1 before proceeding.</translation>
+      <translation>Se recomienda contactar con %1 antes de continuar.</translation>
     </message>
   </context>
   <context>
@@ -10180,23 +10180,23 @@ Puede forzarlo, pero puede aumentar significativamente la carga de la CPU.</tran
     <name>nx::vms::client::desktop::NonEditableUsersAndGroups</name>
     <message>
       <source>User management for organization users is available only at the organization level, not the system level</source>
-      <translation type="unfinished">User management for organization users is available only at the organization level, not the system level</translation>
+      <translation>La administración de usuarios para usuarios de la organización está disponible solo a nivel de organización, no a nivel de sistema.</translation>
     </message>
     <message>
       <source>You do not have permissions to modify this user</source>
-      <translation type="unfinished">You do not have permissions to modify this user</translation>
+      <translation>No tiene permiso para editar este usuario.</translation>
     </message>
     <message>
       <source>You cannot modify a user with a non-unique login</source>
-      <translation type="unfinished">You cannot modify a user with a non-unique login</translation>
+      <translation>No puede modificar un usuario con un inicio de sesión no único</translation>
     </message>
     <message>
       <source>You may not have permissions to modify certain members of this group, or it includes users with duplicate logins</source>
-      <translation type="unfinished">You may not have permissions to modify certain members of this group, or it includes users with duplicate logins</translation>
+      <translation>Es posible que no tenga permisos para modificar ciertos miembros de este grupo o que incluya usuarios con inicios de sesión duplicados</translation>
     </message>
     <message>
       <source>You do not have permissions to modify this group</source>
-      <translation type="unfinished">You do not have permissions to modify this group</translation>
+      <translation>No tienes permiso para modificar este grupo</translation>
     </message>
   </context>
   <context>
@@ -10875,11 +10875,11 @@ Puede forzarlo, pero puede aumentar significativamente la carga de la CPU.</tran
     </message>
     <message>
       <source>Suspended</source>
-      <translation type="unfinished">Suspended</translation>
+      <translation>Suspendido</translation>
     </message>
     <message>
       <source>Shut down</source>
-      <translation type="unfinished">Shut down</translation>
+      <translation>Apagar</translation>
     </message>
   </context>
   <context>
@@ -11210,9 +11210,9 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message numerus="yes">
       <source>I trust these servers</source>
-      <translation type="unfinished">
-        <numerusform>I trust these servers</numerusform>
-        <numerusform>I trust these servers</numerusform>
+      <translation>
+        <numerusform>Confío en estos servidores</numerusform>
+        <numerusform>Confío en estos servidores</numerusform>
       </translation>
     </message>
   </context>
