@@ -178,7 +178,7 @@
     <message>
       <source>Connection to %1 is not ready yet. Check the server&apos;s internet connection or try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connection to %1 is not ready yet. Check the server&apos;s internet connection or try again later.</translation>
+      <translation>La conexión a %1 aún no está lista. Compruebe la conexión a Internet del servidor o vuelva a intentarlo más tarde.</translation>
     </message>
     <message>
       <source>Connection failed</source>
@@ -195,7 +195,7 @@
     <message>
       <source>To log in to this System, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</source>
       <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation type="unfinished">To log in to this System, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</translation>
+      <translation>Para iniciar sesión en este Sistema, deshabilite "Solicitar un código de verificación en cada inicio de sesión con su cuenta %1 " en su %2.</translation>
     </message>
   </context>
   <context>
@@ -247,14 +247,14 @@
     </message>
     <message numerus="yes">
       <source>Cannot verify the identity of %n servers</source>
-      <translation type="unfinished">
-        <numerusform>Cannot verify the identity of %n servers</numerusform>
-        <numerusform>Cannot verify the identity of %n servers</numerusform>
+      <translation>
+        <numerusform>No se puede verificar la identidad de servidores %n</numerusform>
+        <numerusform>No se puede verificar la identidad de servidores %n</numerusform>
       </translation>
     </message>
     <message>
       <source>Review the certificates of the servers from this system.</source>
-      <translation type="unfinished">Review the certificates of the servers from this system.</translation>
+      <translation>Revisar los certificados de los servidores de este sistema.</translation>
     </message>
     <message>
       <source>This might be due to an expired server certificate or or an invalid certificate. Contact your system administrator for further investigation.</source>
@@ -263,7 +263,7 @@
     <message>
       <source>To learn more about the current problem read this %1.</source>
       <comment>%1 is &lt;help article&gt; link</comment>
-      <translation type="unfinished">To learn more about the current problem read this %1.</translation>
+      <translation>Para obtener más información sobre el problema actual, lea esto %1.</translation>
     </message>
   </context>
   <context>
@@ -320,11 +320,11 @@
     </message>
     <message>
       <source>Open Door</source>
-      <translation type="unfinished">Open Door</translation>
+      <translation>Abrir Puerta</translation>
     </message>
     <message>
       <source>Stop Object Tracking</source>
-      <translation type="unfinished">Stop Object Tracking</translation>
+      <translation>Detener el seguimiento de objetos</translation>
     </message>
   </context>
   <context>
@@ -342,11 +342,11 @@
     <name>nx::vms::client::core::TwoWayAudioCameraButtonController</name>
     <message>
       <source>Unmute</source>
-      <translation type="unfinished">Unmute</translation>
+      <translation>Activar sonido</translation>
     </message>
     <message>
       <source>Mute</source>
-      <translation type="unfinished">Mute</translation>
+      <translation>Silenciar</translation>
     </message>
     <message>
       <source>Press and hold to speak</source>
