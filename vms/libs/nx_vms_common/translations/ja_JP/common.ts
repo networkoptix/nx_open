@@ -1660,11 +1660,11 @@
     <name>nx::utils::CryptedFileStream</name>
     <message>
       <source>Wrong crypted stream size.</source>
-      <translation>暗号化されたストリームサイズが正しくありません.</translation>
+      <translation>暗号化されたストリームのサイズが間違っています。</translation>
     </message>
     <message>
       <source>Damaged crypted stream header.</source>
-      <translation>暗号化されたストリームヘッダーが破損しています</translation>
+      <translation>暗号化されたストリームのヘッダーが破損しています。</translation>
     </message>
   </context>
   <context>
