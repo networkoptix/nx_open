@@ -4489,11 +4489,6 @@ to %1</source>
       </translation>
     </message>
     <message>
-      <source>User %1 has no %2 permission</source>
-      <comment>%1 is the name of selected user, %2 is permission name</comment>
-      <translation>%1 kullanıcısının hiçbir %2 izni yok</translation>
-    </message>
-    <message>
       <source>Selected users have no %1 permission</source>
       <comment>%1 is permission name</comment>
       <translation>Seçilen kullanıcıların %1 izni yok</translation>
@@ -4505,6 +4500,16 @@ to %1</source>
         <numerusform>%1 in %n i kullanıcısı için %2 izni yok</numerusform>
         <numerusform>%1 in %n i kullanıcısı için %2 izni yok</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>User %1 has no %2 permissions for selected camera</source>
+      <comment>%1 is the name of selected user, %2 is permission name</comment>
+      <translation>%1 Kullanıcısının seçilen kamera için %2 izni yok</translation>
+    </message>
+    <message>
+      <source>User %1 has no %2 permissions for some of selected cameras</source>
+      <comment>%1 is the name of the selected user, %2 is the permission name</comment>
+      <translation>%1 Kullanıcısının seçilen kameralardan bazıları için %2 izni yok</translation>
     </message>
   </context>
   <context>

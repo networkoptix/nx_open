@@ -9,11 +9,11 @@
     </message>
     <message>
       <source>Select area</source>
-      <translation>エリアを選択</translation>
+      <translation>領域指定</translation>
     </message>
     <message>
       <source>Select some area on the video...</source>
-      <translation>映像上のエリアを選択してください…</translation>
+      <translation>映像上で領域を指定してください…</translation>
     </message>
     <message>
       <source>In selected area</source>
@@ -2005,7 +2005,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>All other client windows will be closed.</source>
-      <translation>他のすべてのクライアント ウィンドウが閉じられます。</translation>
+      <translation>他のすべてのクライアントウィンドウが閉じられます。</translation>
     </message>
     <message>
       <source>Security settings changed</source>
@@ -4436,11 +4436,6 @@ to %1</source>
       </translation>
     </message>
     <message>
-      <source>User %1 has no %2 permission</source>
-      <comment>%1 is the name of selected user, %2 is permission name</comment>
-      <translation>ユーザー %1 には %2 権限がありません</translation>
-    </message>
-    <message>
       <source>Selected users have no %1 permission</source>
       <comment>%1 is permission name</comment>
       <translation>選択されたユーザーには %1 権限がありません</translation>
@@ -4451,6 +4446,16 @@ to %1</source>
       <translation>
         <numerusform>選択された %1 ユーザーのうち %n 名には %2 権限がありません</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>User %1 has no %2 permissions for selected camera</source>
+      <comment>%1 is the name of selected user, %2 is permission name</comment>
+      <translation>ユーザー %1 には、選択したカメラに対する %2 権限がありません</translation>
+    </message>
+    <message>
+      <source>User %1 has no %2 permissions for some of selected cameras</source>
+      <comment>%1 is the name of the selected user, %2 is the permission name</comment>
+      <translation>ユーザー %1 には、選択したカメラの一部に対する %2 権限がありません</translation>
     </message>
   </context>
   <context>
@@ -6407,7 +6412,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     <name>SimpleMotionSearchWidget::Private</name>
     <message>
       <source>Select area on the video to filter results</source>
-      <translation>映像領域を選択して結果をフィルタリング</translation>
+      <translation>映像上で領域指定して結果をフィルタリング</translation>
     </message>
     <message>
       <source>In selected area</source>
@@ -8776,7 +8781,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
-      <translation>エクスポートされた.EXEファイルのサイズは4 GBを超えるため、Windowsで開くことはできません。%1 Clientでのみ再生できます。</translation>
+      <translation>エクスポートされた .EXE ファイルのサイズは4 GBを超えるため、Windowsではダブルクリックで開くことができません。%1 クライアントでのみ再生できます。</translation>
     </message>
     <message>
       <source>Settings are not available for .NOV and .EXE files.</source>

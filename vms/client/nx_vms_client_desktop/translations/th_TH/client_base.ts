@@ -4435,11 +4435,6 @@ to %1</source>
       </translation>
     </message>
     <message>
-      <source>User %1 has no %2 permission</source>
-      <comment>%1 is the name of selected user, %2 is permission name</comment>
-      <translation>ผู้ใช้ %1 ไม่มีสิทธิ์ในการใช้ %2</translation>
-    </message>
-    <message>
       <source>Selected users have no %1 permission</source>
       <comment>%1 is permission name</comment>
       <translation>ผู้ใช้ที่เลือกไม่มีสิทธิ์ในการใช้งาน %1</translation>
@@ -4450,6 +4445,16 @@ to %1</source>
       <translation>
         <numerusform>%n จาก %1 ผู้ใช้ที่เลือกไม่มีสิทธิ์ในการใช้ %2</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>User %1 has no %2 permissions for selected camera</source>
+      <comment>%1 is the name of selected user, %2 is permission name</comment>
+      <translation>ผู้ใช้ %1 ไม่มีสิทธิ์ %2 สำหรับกล้องที่เลือก</translation>
+    </message>
+    <message>
+      <source>User %1 has no %2 permissions for some of selected cameras</source>
+      <comment>%1 is the name of the selected user, %2 is the permission name</comment>
+      <translation>ผู้ใช้ %1 ไม่มีสิทธิ์ %2 สำหรับกล้องบางตัวที่เลือก</translation>
     </message>
   </context>
   <context>

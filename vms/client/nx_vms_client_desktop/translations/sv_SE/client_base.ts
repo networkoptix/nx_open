@@ -4494,11 +4494,6 @@ till %1</translation>
       </translation>
     </message>
     <message>
-      <source>User %1 has no %2 permission</source>
-      <comment>%1 is the name of selected user, %2 is permission name</comment>
-      <translation>Användare %1 har ingen %2 behörighet</translation>
-    </message>
-    <message>
       <source>Selected users have no %1 permission</source>
       <comment>%1 is permission name</comment>
       <translation>Valda användare har inte %1 behörighet</translation>
@@ -4510,6 +4505,16 @@ till %1</translation>
         <numerusform>%n av %1 valda användare har ingen %2 behörighet</numerusform>
         <numerusform>%n av %1 valda användare har ingen %2 behörighet</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>User %1 has no %2 permissions for selected camera</source>
+      <comment>%1 is the name of selected user, %2 is permission name</comment>
+      <translation>Användare %1 har inga %2 behörigheter för den valda kameran</translation>
+    </message>
+    <message>
+      <source>User %1 has no %2 permissions for some of selected cameras</source>
+      <comment>%1 is the name of the selected user, %2 is the permission name</comment>
+      <translation>Användare %1 har inga %2 behörigheter för vissa valda kameror</translation>
     </message>
   </context>
   <context>
