@@ -1922,11 +1922,11 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Phones</source>
-      <translation type="unfinished">Phones</translation>
+      <translation>Teléfonos</translation>
     </message>
     <message>
       <source>Emails</source>
-      <translation type="unfinished">Emails</translation>
+      <translation>Correos electrónicos</translation>
     </message>
     <message>
       <source>RHI backend</source>
@@ -4493,11 +4493,6 @@ a %1</translation>
       </translation>
     </message>
     <message>
-      <source>User %1 has no %2 permission</source>
-      <comment>%1 is the name of selected user, %2 is permission name</comment>
-      <translation>El usuario %1 no tiene permiso %2</translation>
-    </message>
-    <message>
       <source>Selected users have no %1 permission</source>
       <comment>%1 is permission name</comment>
       <translation>Los usuarios seleccionados no tienen permiso %1</translation>
@@ -4509,6 +4504,16 @@ a %1</translation>
         <numerusform>%n de %1 usuarios seleccionados no tienen permiso %2</numerusform>
         <numerusform>%n de %1 usuarios seleccionados no tienen permiso %2</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>User %1 has no %2 permissions for selected camera</source>
+      <comment>%1 is the name of selected user, %2 is permission name</comment>
+      <translation type="unfinished">User %1 has no %2 permissions for selected camera</translation>
+    </message>
+    <message>
+      <source>User %1 has no %2 permissions for some of selected cameras</source>
+      <comment>%1 is the name of the selected user, %2 is the permission name</comment>
+      <translation type="unfinished">User %1 has no %2 permissions for some of selected cameras</translation>
     </message>
   </context>
   <context>
@@ -12678,7 +12683,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>For</source>
-      <translation type="unfinished">For</translation>
+      <translation>Para</translation>
     </message>
     <message>
       <source>Value</source>

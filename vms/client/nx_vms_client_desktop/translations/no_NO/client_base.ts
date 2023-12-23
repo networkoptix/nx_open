@@ -4494,11 +4494,6 @@ til %1</translation>
       </translation>
     </message>
     <message>
-      <source>User %1 has no %2 permission</source>
-      <comment>%1 is the name of selected user, %2 is permission name</comment>
-      <translation>Bruker %1 har ingen %2 tillatelse</translation>
-    </message>
-    <message>
       <source>Selected users have no %1 permission</source>
       <comment>%1 is permission name</comment>
       <translation>Valgte brukere har ingen %1 tillatelse</translation>
@@ -4510,6 +4505,16 @@ til %1</translation>
         <numerusform>%n av %1 utvalgte roller har ingen %2 tillatelse</numerusform>
         <numerusform>%n av %1 utvalgte brukere har ingen %2 tillatelse</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>User %1 has no %2 permissions for selected camera</source>
+      <comment>%1 is the name of selected user, %2 is permission name</comment>
+      <translation type="unfinished">User %1 has no %2 permissions for selected camera</translation>
+    </message>
+    <message>
+      <source>User %1 has no %2 permissions for some of selected cameras</source>
+      <comment>%1 is the name of the selected user, %2 is the permission name</comment>
+      <translation type="unfinished">User %1 has no %2 permissions for some of selected cameras</translation>
     </message>
   </context>
   <context>

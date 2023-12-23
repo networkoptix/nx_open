@@ -4492,11 +4492,6 @@ to %1</source>
       </translation>
     </message>
     <message>
-      <source>User %1 has no %2 permission</source>
-      <comment>%1 is the name of selected user, %2 is permission name</comment>
-      <translation>%1 felhasználónak nincs %2 engedélye</translation>
-    </message>
-    <message>
       <source>Selected users have no %1 permission</source>
       <comment>%1 is permission name</comment>
       <translation>A kiválasztott felhasználónak nincs %1 engedélye</translation>
@@ -4508,6 +4503,16 @@ to %1</source>
         <numerusform>%n/%1 felhasználónak nincs %2 engedélye</numerusform>
         <numerusform>%n/%1 felhasználónak nincs %2 engedélye</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>User %1 has no %2 permissions for selected camera</source>
+      <comment>%1 is the name of selected user, %2 is permission name</comment>
+      <translation type="unfinished">User %1 has no %2 permissions for selected camera</translation>
+    </message>
+    <message>
+      <source>User %1 has no %2 permissions for some of selected cameras</source>
+      <comment>%1 is the name of the selected user, %2 is the permission name</comment>
+      <translation type="unfinished">User %1 has no %2 permissions for some of selected cameras</translation>
     </message>
   </context>
   <context>

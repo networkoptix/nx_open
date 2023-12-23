@@ -4436,11 +4436,6 @@ to %1</source>
       </translation>
     </message>
     <message>
-      <source>User %1 has no %2 permission</source>
-      <comment>%1 is the name of selected user, %2 is permission name</comment>
-      <translation>사용자 %1에게는 %2 권한이 없습니다.</translation>
-    </message>
-    <message>
       <source>Selected users have no %1 permission</source>
       <comment>%1 is permission name</comment>
       <translation>선택한 사용자에게는 %1 권한이 없습니다.</translation>
@@ -4451,6 +4446,16 @@ to %1</source>
       <translation>
         <numerusform>선택한 %1중 %n 사용자에 %2 권한이 없습니다.</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>User %1 has no %2 permissions for selected camera</source>
+      <comment>%1 is the name of selected user, %2 is permission name</comment>
+      <translation type="unfinished">User %1 has no %2 permissions for selected camera</translation>
+    </message>
+    <message>
+      <source>User %1 has no %2 permissions for some of selected cameras</source>
+      <comment>%1 is the name of the selected user, %2 is the permission name</comment>
+      <translation type="unfinished">User %1 has no %2 permissions for some of selected cameras</translation>
     </message>
   </context>
   <context>

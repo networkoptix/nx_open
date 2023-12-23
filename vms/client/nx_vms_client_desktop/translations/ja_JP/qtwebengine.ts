@@ -326,7 +326,7 @@
     </message>
     <message>
       <source>Open link in new window</source>
-      <translation>リンクを新しいウィンドウで開く</translation>
+      <translation>リンクを新規ウィンドウで開く</translation>
     </message>
     <message>
       <source>Open link in new tab</source>

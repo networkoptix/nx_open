@@ -4491,11 +4491,6 @@ to %1</source>
       </translation>
     </message>
     <message>
-      <source>User %1 has no %2 permission</source>
-      <comment>%1 is the name of selected user, %2 is permission name</comment>
-      <translation>Utente %1 non ha %2 autorizzazione</translation>
-    </message>
-    <message>
       <source>Selected users have no %1 permission</source>
       <comment>%1 is permission name</comment>
       <translation>Gli utenti selezionati non hanno %1 autorizzazione</translation>
@@ -4507,6 +4502,16 @@ to %1</source>
         <numerusform>%n di %1 gli utenti selezionati non hanno %2 autorizzazione</numerusform>
         <numerusform>%n di %1 gli utenti selezionati non hanno %2 autorizzazione</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>User %1 has no %2 permissions for selected camera</source>
+      <comment>%1 is the name of selected user, %2 is permission name</comment>
+      <translation type="unfinished">User %1 has no %2 permissions for selected camera</translation>
+    </message>
+    <message>
+      <source>User %1 has no %2 permissions for some of selected cameras</source>
+      <comment>%1 is the name of the selected user, %2 is the permission name</comment>
+      <translation type="unfinished">User %1 has no %2 permissions for some of selected cameras</translation>
     </message>
   </context>
   <context>

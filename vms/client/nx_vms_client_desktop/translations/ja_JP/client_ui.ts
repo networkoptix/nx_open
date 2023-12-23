@@ -2835,7 +2835,7 @@
     </message>
     <message>
       <source>Select Users</source>
-      <translation>ユーザを選択</translation>
+      <translation>ユーザー選択</translation>
     </message>
     <message>
       <source>Nothing matches your search.</source>

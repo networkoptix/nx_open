@@ -141,11 +141,11 @@
     <name>AnalyticsPanel</name>
     <message>
       <source>Select area</source>
-      <translation>エリア選択</translation>
+      <translation>領域指定</translation>
     </message>
     <message>
       <source>Select some area on the video...</source>
-      <translation>映像上のエリアを選択してください…</translation>
+      <translation>映像上で領域を指定してください…</translation>
     </message>
     <message>
       <source>In selected area</source>
@@ -182,11 +182,11 @@
     </message>
     <message>
       <source>Select area</source>
-      <translation>エリア選択</translation>
+      <translation>領域指定</translation>
     </message>
     <message>
       <source>Select some area on the video...</source>
-      <translation>映像上のエリアを選択してください…</translation>
+      <translation>映像上で領域を指定してください…</translation>
     </message>
     <message>
       <source>In selected area</source>
@@ -1414,7 +1414,7 @@
     </message>
     <message>
       <source>Select an area on the video to filter results</source>
-      <translation>映像領域を選択して結果をフィルタリング</translation>
+      <translation>映像上で領域指定して結果をフィルタリング</translation>
     </message>
   </context>
   <context>
