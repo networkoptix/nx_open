@@ -9,11 +9,11 @@
     </message>
     <message>
       <source>Select area</source>
-      <translation>エリアを選択</translation>
+      <translation>領域指定</translation>
     </message>
     <message>
       <source>Select some area on the video...</source>
-      <translation>映像上のエリアを選択してください…</translation>
+      <translation>映像上で領域を指定してください…</translation>
     </message>
     <message>
       <source>In selected area</source>
@@ -1859,7 +1859,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>All other client windows will be closed.</source>
-      <translation>他のすべてのクライアント ウィンドウが閉じられます。</translation>
+      <translation>他のすべてのクライアントウィンドウが閉じられます。</translation>
     </message>
     <message>
       <source>Security settings changed</source>
@@ -6663,7 +6663,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>SimpleMotionSearchWidget::Private</name>
     <message>
       <source>Select area on the video to filter results</source>
-      <translation>映像領域を選択して結果をフィルタリング</translation>
+      <translation>映像上で領域指定して結果をフィルタリング</translation>
     </message>
     <message>
       <source>In selected area</source>
@@ -7497,7 +7497,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Select areas on the preview to set chosen sensitivity for.</source>
-      <translation>選択した感度を適用するには、プレビュー上の領域を選択します。</translation>
+      <translation>選択した感度を適用するには、プレビュー上の領域を選択してください。</translation>
     </message>
     <message>
       <source>Choose a motion detection sensitivity and select some areas on the preview to set it for.</source>
@@ -8505,7 +8505,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
-      <translation>エクスポートされた.EXEファイルのサイズは4 GBを超えるため、Windowsで開くことはできません。%1 Clientでのみ再生できます。</translation>
+      <translation>エクスポートされた .EXE ファイルのサイズは4 GBを超えるため、Windowsではダブルクリックで開くことができません。%1 クライアントでのみ再生できます。</translation>
     </message>
     <message>
       <source>Settings are not available for .NOV and .EXE files.</source>
