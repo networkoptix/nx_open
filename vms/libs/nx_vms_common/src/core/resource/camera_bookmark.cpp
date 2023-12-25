@@ -241,9 +241,9 @@ QnCameraBookmarkTagList QnCameraBookmarkTag::mergeCameraBookmarkTags(const QnMul
     result.reserve(std::min(limit, maxSize));
 
     QMap<QString, int> mergedTags;
-    for (const QnCameraBookmarkTagList &source: nonEmptyLists)
+    for (const QnCameraBookmarkTagList &s: nonEmptyLists)
     {
-        for (const auto &tag: source)
+        for (const auto &tag: s)
         {
             auto &currentCount = mergedTags[tag.name];
             currentCount += tag.count;

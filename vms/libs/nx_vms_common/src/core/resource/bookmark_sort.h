@@ -18,8 +18,14 @@ NX_VMS_COMMON_API std::function<bool(const QnCameraBookmark&, const QnCameraBook
 
 namespace nx::vms::common {
 
-NX_VMS_COMMON_API std::function<bool(const nx::vms::api::Bookmark&, const nx::vms::api::Bookmark&)>
-    createBookmarkSortPredicate(
+NX_VMS_COMMON_API std::function<bool(const nx::vms::api::BookmarkV1&, const nx::vms::api::BookmarkV1&)>
+    createBookmarkSortPredicateV1(
+        nx::vms::api::BookmarkSortField sortField,
+        Qt::SortOrder sortOrder,
+        QnResourcePool* resourcePool);
+
+NX_VMS_COMMON_API std::function<bool(const nx::vms::api::BookmarkV3&, const nx::vms::api::BookmarkV3&)>
+    createBookmarkSortPredicateV3(
         nx::vms::api::BookmarkSortField sortField,
         Qt::SortOrder sortOrder,
         QnResourcePool* resourcePool);
