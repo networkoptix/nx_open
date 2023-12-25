@@ -502,7 +502,6 @@ void QnVirtualCameraResource::setDeviceAgentManifest(
     setProperty(
         kDeviceAgentManifestsProperty,
         QString::fromUtf8(nx::reflect::json::serialize(manifests)));
-    m_cachedDeviceAgentManifests.reset();
 }
 
 std::optional<nx::vms::api::StreamIndex>
