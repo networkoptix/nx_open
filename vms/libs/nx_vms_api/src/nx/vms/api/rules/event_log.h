@@ -19,7 +19,7 @@ struct NX_VMS_API EventLogFilter: public nx::vms::api::ServerTimePeriod
     std::optional<nx::vms::api::json::ValueOrArray<QString>> eventResourceId;
 
     /**%apidoc:stringArray
-     * List of event types. See /rest/v{3-}/events/manifest/events for event manifests
+     * List of event types. See /rest/v{4-}/events/manifest/events for event manifests
      * with possible event types.
      */
     std::optional<nx::vms::api::json::ValueOrArray<QString>> eventType;
@@ -33,7 +33,7 @@ struct NX_VMS_API EventLogFilter: public nx::vms::api::ServerTimePeriod
     QString eventSubtype;
 
     /**%apidoc:stringArray
-     * List of action types. See /rest/v{3-}/events/manifest/actions for action manifests
+     * List of action types. See /rest/v{4-}/events/manifest/actions for action manifests
      * with possible action types.
      */
     std::optional<nx::vms::api::json::ValueOrArray<QString>> actionType;
@@ -78,12 +78,12 @@ struct NX_VMS_API EventLogRecord
     std::chrono::milliseconds timestampMs;
 
     /**%apidoc Event data. Key is 'fieldName' from event manifest and value is serialized field
-     * data. See /rest/v{3-}/events/manifest/events for event manifests.
+     * data. See /rest/v{4-}/events/manifest/events for event manifests.
      */
     QMap<QString, QJsonValue> eventData;
 
     /**%apidoc[opt] Action data. Key is 'fieldName' from action manifest and value is serialized field
-     * data. See /rest/v{3-}/events/manifest/actions for action manifests.
+     * data. See /rest/v{4-}/events/manifest/actions for action manifests.
      */
     QMap<QString, QJsonValue> actionData;
 

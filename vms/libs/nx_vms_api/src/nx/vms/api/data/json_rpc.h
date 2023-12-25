@@ -28,7 +28,7 @@ struct NX_VMS_API JsonRpcRequest
     std::string jsonrpc = "2.0";
 
     /**%apidoc
-     * %example rest.v3.system.info.get
+     * %example rest.v{1-}.servers.info.list
      */
     std::string method;
 
