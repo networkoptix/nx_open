@@ -210,7 +210,9 @@ TEST_F(PaintEngineTest, checkRendering)
     std::cerr << "Image error: " << accError << " or " << errPercent << "%" <<"\n";
 
     if (rhi->backend() != QRhi::Null)
+    {
         EXPECT_LE(errPercent, 0.5); //< This is more of a sanity check.
+    }
 
     ASSERT_EQ(referenceImage.size(), rhiImage.size());
 }
