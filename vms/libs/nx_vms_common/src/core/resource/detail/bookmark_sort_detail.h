@@ -15,8 +15,15 @@ NX_VMS_COMMON_API std::function<bool(const QnCameraBookmark&, const QnCameraBook
 namespace nx::vms::common {
 
 /** Forward declaration. */
-NX_VMS_COMMON_API std::function<bool(const nx::vms::api::Bookmark&, const nx::vms::api::Bookmark&)>
-    createBookmarkSortPredicate(
+NX_VMS_COMMON_API std::function<bool(const nx::vms::api::BookmarkV1&, const nx::vms::api::BookmarkV1&)>
+    createBookmarkSortPredicateV1(
+        nx::vms::api::BookmarkSortField sortField,
+        Qt::SortOrder sortOrder,
+        QnResourcePool* resourcePool);
+
+/** Forward declaration. */
+NX_VMS_COMMON_API std::function<bool(const nx::vms::api::BookmarkV3&, const nx::vms::api::BookmarkV3&)>
+    createBookmarkSortPredicateV3(
         nx::vms::api::BookmarkSortField sortField,
         Qt::SortOrder sortOrder,
         QnResourcePool* resourcePool);
@@ -25,20 +32,22 @@ namespace detail {
 
 template<typename BookmarkType>
 inline BookmarkType createBookmarkAtTimePoint(
-    const QnUuid& id,
-    const std::chrono::milliseconds& time)
+    const QnUuid& id, const std::chrono::milliseconds& time)
 {
     BookmarkType result;
-    result.guid = id;
+    result.setId(id);
     result.startTimeMs = time;
     return result;
 }
 
 template<>
-inline nx::vms::api::Bookmark createBookmarkAtTimePoint<nx::vms::api::Bookmark>(
+inline QnCameraBookmark createBookmarkAtTimePoint<QnCameraBookmark>(
     const QnUuid& id, const std::chrono::milliseconds& time)
 {
-    return nx::vms::api::Bookmark{.id = id, .startTimeMs = time};
+    QnCameraBookmark result;
+    result.guid = id;
+    result.startTimeMs = time;
+    return result;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -75,13 +84,23 @@ inline std::function<bool (const BookmarkType&, const BookmarkType&)> bookmarkSo
 }
 
 template<>
-inline std::function<bool (const nx::vms::api::Bookmark&, const nx::vms::api::Bookmark&)>
-    bookmarkSortPredicate<nx::vms::api::Bookmark>(
-    nx::vms::api::BookmarkSortField sortField,
-    Qt::SortOrder sortOrder,
-    QnResourcePool* resourcePool)
+inline std::function<bool (const nx::vms::api::BookmarkV1&, const nx::vms::api::BookmarkV1&)>
+    bookmarkSortPredicate<nx::vms::api::BookmarkV1>(
+        nx::vms::api::BookmarkSortField sortField,
+        Qt::SortOrder sortOrder,
+        QnResourcePool* resourcePool)
 {
-    return nx::vms::common::createBookmarkSortPredicate(sortField, sortOrder, resourcePool);
+    return nx::vms::common::createBookmarkSortPredicateV1(sortField, sortOrder, resourcePool);
+}
+
+template<>
+inline std::function<bool(const nx::vms::api::BookmarkV3&, const nx::vms::api::BookmarkV3&)>
+    bookmarkSortPredicate<nx::vms::api::BookmarkV3>(
+        nx::vms::api::BookmarkSortField sortField,
+        Qt::SortOrder sortOrder,
+        QnResourcePool* resourcePool)
+{
+    return nx::vms::common::createBookmarkSortPredicateV3(sortField, sortOrder, resourcePool);
 }
 
 } // namespace detail
