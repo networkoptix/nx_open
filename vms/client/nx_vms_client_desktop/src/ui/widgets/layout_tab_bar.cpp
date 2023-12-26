@@ -106,7 +106,12 @@ QnLayoutTabBar::QnLayoutTabBar(
     setUsesScrollButtons(false);
     setProperty(nx::style::Properties::kSideIndentation, QVariant::fromValue(kTabIndents));
     setDoubleLevelContentMargins();
-    setDoubleLevelPalette();
+
+    if (ini().enableMultiSystemTabBar)
+        setDoubleLevelPalette();
+    else
+        setSingleLevelPalette();
+
     setFont(fontConfig()->font("systemTabBar"));
     setProperty(nx::style::Properties::kDontPolishFontProperty, true);
 
