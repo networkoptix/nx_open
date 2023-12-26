@@ -5,6 +5,7 @@ import QtQuick
 import Nx.Core
 import Nx.Debug
 
+import nx.vms.client.core
 import nx.vms.client.desktop
 
 Item
@@ -42,5 +43,10 @@ Item
 
         anchors.top: parent.top
         x: rootItem.notificationsPanelX - width
+    }
+
+    TextureSizeHelper
+    {
+        objectName: "textureSizeHelper"
     }
 }

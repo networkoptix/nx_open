@@ -78,7 +78,7 @@ public:
 
     bool isSystemTabBarUpdating();
 
-    /** Returns QQuickWindow for resource browser widget. */
+    /** Returns QQuickWindow for this window (welcome screen, scene or resource browser). */
     QQuickWindow* quickWindow() const;
 
 public slots:

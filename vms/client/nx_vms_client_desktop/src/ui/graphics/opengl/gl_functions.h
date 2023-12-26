@@ -24,6 +24,8 @@ typedef uint64_t GLuint64;
 
 class QnGlFunctions
 {
+    friend class QnGraphicsView;
+
 public:
     enum Feature
     {
@@ -85,6 +87,8 @@ public:
     static bool isWarningsEnabled();
 
 private:
+    static void overrideMaxTextureSize(int size);
+
     using PrivatePtr = QSharedPointer<QnGlFunctionsPrivate>;
     static PrivatePtr createPrivate(QOpenGLWidget* glWidget);
     PrivatePtr d;

@@ -190,13 +190,21 @@ void LoginDialog::setupIntroView()
     else
     {
         const auto introWidget = new QQuickWidget(qnClientCoreModule->mainQmlEngine(), this);
-        introWidget->rootContext()->setContextProperty("maxTextureSize",
-            QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE));
 
-        introWidget->setSource({ "Nx/Intro/Intro.qml" });
-        introWidget->rootObject()->setProperty("introPath", QString("file:///") + introPath);
-        introWidget->setResizeMode(QQuickWidget::SizeRootObjectToView);
+        connect(introWidget, &QQuickWidget::statusChanged, this,
+            [introWidget, introPath](QQuickWidget::Status status)
+            {
+                if (status != QQuickWidget::Ready)
+                    return;
+
+                introWidget->rootObject()->setProperty(
+                    "introPath",
+                    QString("file:///") + introPath);
+            });
+
         layout->addWidget(new IntroContainer(introWidget));
+        introWidget->setSource({ "Nx/Intro/Intro.qml" });
+        introWidget->setResizeMode(QQuickWidget::SizeRootObjectToView);
     }
 }
 
