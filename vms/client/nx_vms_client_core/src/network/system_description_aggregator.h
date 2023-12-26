@@ -23,7 +23,7 @@ public:
 
     void mergeSystem(int priority, const QnSystemDescriptionPtr& system);
 
-    void removeSystem(const QString& systemId, int priority);
+    void removeSystem(const QString& systemId, int priority, bool isMerge = false);
 
 public: // overrides
     QString id() const override;
