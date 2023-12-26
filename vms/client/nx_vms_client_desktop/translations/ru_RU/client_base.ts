@@ -4621,12 +4621,12 @@ to %1</source>
     <message>
       <source>User %1 has no %2 permissions for selected camera</source>
       <comment>%1 is the name of selected user, %2 is permission name</comment>
-      <translation type="unfinished">User %1 has no %2 permissions for selected camera</translation>
+      <translation>Пользователь %1 не имеет разрешений %2 для выбранной камеры</translation>
     </message>
     <message>
       <source>User %1 has no %2 permissions for some of selected cameras</source>
       <comment>%1 is the name of the selected user, %2 is the permission name</comment>
-      <translation type="unfinished">User %1 has no %2 permissions for some of selected cameras</translation>
+      <translation>Пользователь %1 не имеет разрешения %2 для некоторых из выбранных камер</translation>
     </message>
   </context>
   <context>
