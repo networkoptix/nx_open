@@ -155,9 +155,6 @@ CameraMotionSettingsWidget::CameraMotionSettingsWidget(
             motionItem->setProperty("visible", QVariant::fromValue(false));
     });
 
-    m_motionWidget->rootContext()->setContextProperty("maxTextureSize",
-        QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE));
-
     m_motionWidget->setSource(QString("Nx/Motion/MotionSettingsItem.qml"));
     m_motionWidget->setResizeMode(QQuickWidget::SizeRootObjectToView);
     ui->motionContainerWidget->layout()->addWidget(m_motionWidget);

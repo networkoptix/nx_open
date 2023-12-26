@@ -53,9 +53,6 @@ QmlResourceBrowserWidget::QmlResourceBrowserWidget(QnWorkbenchContext* context, 
     rootContext()->setContextProperty(
         QnWorkbenchContextAware::kQmlWorkbenchContextPropertyName, this->context());
 
-    rootContext()->setContextProperty("maxTextureSize",
-        QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE));
-
     setClearColor(Qt::transparent);
     setResizeMode(QQuickWidget::ResizeMode::SizeRootObjectToView);
     setSource(QUrl("Nx/LeftPanel/private/ResourceBrowserWrapper.qml"));

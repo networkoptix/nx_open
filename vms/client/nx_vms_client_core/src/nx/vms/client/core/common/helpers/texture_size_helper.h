@@ -5,39 +5,40 @@
 #include <atomic>
 
 #include <QtCore/QObject>
-
-Q_MOC_INCLUDE("QtQuick/QQuickWindow")
+#include <QtQuick/QQuickItem>
 
 class QQuickWindow;
 
+/**
+ * Tracks window RHI to provide maximum texture size via maxTextureSize property.
+ * When no RHI is present the maxTextureSize is set to a predefined value 2048.
+ */
 namespace nx::vms::client::core {
 
-class TextureSizeHelper: public QObject
+class NX_VMS_CLIENT_CORE_API TextureSizeHelper: public QQuickItem
 {
     Q_OBJECT
     Q_PROPERTY(int maxTextureSize READ maxTextureSize NOTIFY maxTextureSizeChanged)
-    Q_PROPERTY(QQuickWindow* window READ window WRITE setWindow NOTIFY windowChanged)
 
 public:
-    TextureSizeHelper(QObject* parent = nullptr);
+    TextureSizeHelper(QQuickItem* parent = nullptr);
 
     int maxTextureSize() const;
 
-    QQuickWindow* window() const;
-    void setWindow(QQuickWindow* window);
-
     static void registerQmlType();
+
+private slots:
+    void setWindow(QQuickWindow* win);
 
 private:
     void setMaxTextureSize(int size);
 
 signals:
     void maxTextureSizeChanged();
-    void windowChanged();
 
 private:
-    QQuickWindow* m_window = nullptr;
-    std::atomic_int m_maxTextureSize;
+    QPointer<QQuickWindow> m_window;
+    int m_maxTextureSize = 0;
 };
 
 } // namespace nx::vms::client::core

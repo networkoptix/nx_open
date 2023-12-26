@@ -63,6 +63,7 @@
 #include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/graphics/view/graphics_scene.h>
 #include <ui/graphics/view/graphics_view.h>
+#include <ui/graphics/view/quick_widget_container.h>
 #include <ui/widgets/main_window_title_bar_state.h>
 #include <ui/widgets/main_window_title_bar_widget.h>
 #include <ui/workaround/hidpi_workarounds.h>
@@ -239,13 +240,13 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     // screen) in one window. Without it QGLWidget content may be not displayed in some OSes.
     m_view->setAttribute(Qt::WA_DontCreateNativeAncestors);
 
-    /* Set up model & control machinery. */
-    display()->initialize(m_scene.data(), m_view.data());
-
     // Controls which are initialized further access mainWindow() through the context. Set it here
     // to avoid passing main window pointer to constructors (though it will certainly be more
     // correct).
     context->setMainWindow(this);
+
+    /* Set up model & control machinery. */
+    display()->initialize(m_scene.data(), m_view.data());
 
     if (qnRuntime->isVideoWallMode())
         display()->setNormalMarginFlags({});
@@ -835,7 +836,13 @@ void MainWindow::updateContentsMargins()
 
 QQuickWindow* MainWindow::quickWindow() const
 {
-    return m_ui->quickWindow();
+    // Invisible welcome screen may not have RHI initialized (e.g. after device loss).
+    if (m_welcomeScreen && m_welcomeScreen->isVisible())
+        return m_welcomeScreen->quickWindow();
+    if (const auto container = qobject_cast<QuickWidgetContainer*>(m_view->viewport()))
+        return container->quickWidget()->quickWindow();
+
+    return m_ui ? m_ui->quickWindow() : nullptr;
 }
 
 // -------------------------------------------------------------------------- //

@@ -17,12 +17,15 @@ Rectangle
     property alias introPath: mediaPlayer.source
     property alias aspectRatio: mediaPlayer.aspectRatio
 
-    readonly property int maximumTextureSize: maxTextureSize //< Global context property.
+    TextureSizeHelper
+    {
+        id: textureSizeHelper
+    }
 
     MediaPlayer
     {
         id: mediaPlayer
-        maxTextureSize: intro.maximumTextureSize
+        maxTextureSize: textureSizeHelper.maxTextureSize
         videoSurface: videoOutput.videoSink
         onSourceChanged: updatePlayingState()
         Component.onCompleted: updatePlayingState()
