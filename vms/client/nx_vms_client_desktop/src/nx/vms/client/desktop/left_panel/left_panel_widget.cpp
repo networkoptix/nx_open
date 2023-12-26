@@ -80,9 +80,6 @@ LeftPanelWidget::LeftPanelWidget(WindowContext* context, QWidget* parent):
 
     rootContext()->setContextProperty(WindowContext::kQmlPropertyName, context);
 
-    rootContext()->setContextProperty("maxTextureSize",
-        QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE));
-
     connect(this, &QQuickWidget::statusChanged, d.get(),
         [this]()
         {

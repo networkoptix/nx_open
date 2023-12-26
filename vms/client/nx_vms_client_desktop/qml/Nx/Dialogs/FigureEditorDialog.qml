@@ -47,7 +47,6 @@ Window
     TextureSizeHelper
     {
         id: textureSizeHelper
-        window: dialog
     }
 
     MediaPlayer
