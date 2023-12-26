@@ -236,6 +236,28 @@ QSGNode* MotionRegionsItem::Private::updatePaintNode(QSGNode* node)
     return geometryNode;
 }
 
+void MotionRegionsItem::Private::handleWindowChanged(QQuickWindow* win)
+{
+    if (windowConnection)
+    {
+        disconnect(windowConnection);
+        windowConnection = {};
+        cleanup();
+    }
+
+    if (!win)
+        return;
+
+    windowConnection = connect(win, &QQuickWindow::sceneGraphInvalidated, q,
+        [this]() { cleanup(); }, Qt::DirectConnection);
+}
+
+void MotionRegionsItem::Private::cleanup()
+{
+    m_currentState.texture.reset();
+    m_labelsTexture.reset();
+}
+
 void MotionRegionsItem::Private::releaseResources()
 {
     const auto clearTextures =

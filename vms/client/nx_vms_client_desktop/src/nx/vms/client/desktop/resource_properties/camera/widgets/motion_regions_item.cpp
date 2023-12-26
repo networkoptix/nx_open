@@ -14,6 +14,11 @@ MotionRegionsItem::MotionRegionsItem(QQuickItem* parent):
     d(new Private(this))
 {
     setFlag(QQuickItem::ItemHasContents);
+    connect(this, &QQuickItem::windowChanged, this,
+        [this](QQuickWindow* win)
+        {
+            d->handleWindowChanged(win);
+        });
 }
 
 MotionRegionsItem::~MotionRegionsItem()

@@ -29,6 +29,7 @@ public:
     Private(FocusFrameItem* parent);
 
 public:
+    QMetaObject::Connection windowConnection;
     QColor color = core::colorTheme()->color("dark1");
     int frameWidth = 1;
     bool textureDirty = true;
@@ -71,6 +72,7 @@ FocusFrameItem::FocusFrameItem(QQuickItem* parent):
     d(new Private(this))
 {
     setFlag(QQuickItem::ItemHasContents);
+    connect(this, &QQuickItem::windowChanged, this, &FocusFrameItem::handleWindowChanged);
 }
 
 FocusFrameItem::~FocusFrameItem()
@@ -113,6 +115,34 @@ void FocusFrameItem::setFrameWidth(int frameWidth)
 void FocusFrameItem::registerQmlType()
 {
     qmlRegisterType<FocusFrameItem>("nx.client.desktop", 1, 0, "FocusFrame");
+}
+
+void FocusFrameItem::handleWindowChanged(QQuickWindow* win)
+{
+    if (d->windowConnection)
+    {
+        disconnect(d->windowConnection);
+        d->windowConnection = {};
+        cleanup();
+    }
+
+    if (win)
+    {
+        d->windowConnection = connect(win, &QQuickWindow::sceneGraphInvalidated, this,
+            &FocusFrameItem::cleanup, Qt::DirectConnection);
+    }
+}
+
+void FocusFrameItem::cleanup()
+{
+    const auto texture = d->material->texture();
+    if (!texture)
+        return;
+
+    d->material->setTexture(nullptr);
+    d->textureDirty = true;
+
+    delete texture;
 }
 
 void FocusFrameItem::releaseResources()
