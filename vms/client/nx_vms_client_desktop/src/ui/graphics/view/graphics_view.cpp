@@ -13,12 +13,14 @@
 #include <nx/pathkit/rhi_paint_device.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/trace/trace.h>
+#include <nx/vms/client/core/common/helpers/texture_size_helper.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/system_logon/ui/welcome_screen.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <ui/common/palette.h>
+#include <ui/graphics/opengl/gl_functions.h>
 #include <ui/widgets/main_window.h>
 #include <ui/workbench/workbench_context.h>
 
@@ -27,6 +29,8 @@
 
 using namespace nx::vms::client::desktop;
 using namespace nx::pathkit;
+
+using TextureSizeHelper = nx::vms::client::core::TextureSizeHelper;
 
 struct QnGraphicsView::Private
 {
@@ -37,6 +41,7 @@ struct QnGraphicsView::Private
     QOpenGLWidget* openGLWidget = nullptr;
     QQuickWidget* quickWidget = nullptr;
     QPointer<RhiRenderingItem> renderingItem;
+    QPointer<TextureSizeHelper> textureSizeHelperItem;
     bool frameEnded = true;
 };
 
@@ -104,7 +109,20 @@ QnGraphicsView::QnGraphicsView(QGraphicsScene* scene, nx::vms::client::desktop::
     container->setQuickWidget(d->quickWidget);
 
     if (auto root = d->quickWidget->rootObject())
+    {
         d->renderingItem = root->findChild<RhiRenderingItem*>("renderingItem");
+        d->textureSizeHelperItem = root->findChild<TextureSizeHelper*>("textureSizeHelper");
+        if (d->textureSizeHelperItem)
+        {
+            // Workaround for QnVideoStreamDisplay and QnGLRenderer using GL_MAX_TEXTURE_INTEGER.
+            // Provide new max texture size when
+            connect(d->textureSizeHelperItem, &TextureSizeHelper::maxTextureSizeChanged, this,
+                [this]()
+                {
+                    QnGlFunctions::overrideMaxTextureSize(d->textureSizeHelperItem->maxTextureSize());
+                });
+        }
+    }
 
     NX_ASSERT(d->renderingItem);
 

@@ -11,16 +11,35 @@
 #include <QtGui/QOpenGLFunctions>
 #include <QtGui/QOffscreenSurface>
 #include <QtOpenGLWidgets/QOpenGLWidget>
+#include <QtQuick/QQuickWindow>
 
-#include <nx/utils/log/assert.h>
-#include <nx/utils/thread/mutex.h>
+#if QT_VERSION >= QT_VERSION_CHECK(6,6,0)
+    #include <rhi/qrhi.h>
+#else
+    #include <QtGui/private/qrhi_p.h>
+#endif
 
 #include <nx/build_info.h>
+#include <nx/utils/log/assert.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/window_context.h>
 
 #include "gl_context_data.h"
 
 namespace
 {
+
+QRhi* getRhi(QQuickWindow* window)
+{
+    #if QT_VERSION >= QT_VERSION_CHECK(6,6,0)
+        return window->rhi();
+    #else
+        const auto ri = window->rendererInterface();
+        return static_cast<QRhi*>(ri->getResource(window, QSGRendererInterface::RhiResource));
+    #endif
+}
 
 enum
 {
@@ -40,16 +59,17 @@ public:
     const QnGlFunctions::OpenGLInfo& info() const;
     GLint maxTextureSize() const;
 
-#ifdef Q_OS_MACX
-    void overrideMaxTextureSize(GLint value);
-#endif // Q_OS_MACX
+    void overrideMaxTextureSize(int value);
 
 private:
     StaticOpenGLInfo();
 
 private:
     QnGlFunctions::OpenGLInfo m_info;
-    GLint m_maxTextureSize = DefaultMaxTextureSize;
+
+    // Most usages are from the GUI thread, but QnVideoStreamDisplay uses this value
+    // from the decoder thread.
+    std::atomic_int m_maxTextureSize = DefaultMaxTextureSize;
 };
 
 StaticOpenGLInfo& StaticOpenGLInfo::instance()
@@ -60,6 +80,18 @@ StaticOpenGLInfo& StaticOpenGLInfo::instance()
 
 StaticOpenGLInfo::StaticOpenGLInfo()
 {
+    using namespace nx::vms::client::desktop;
+
+    if (QString(ini().graphicsApi) != "opengl")
+    {
+        if (auto quickWindow = appContext()->mainWindowContext()->quickWindow())
+        {
+            if (auto rhi = getRhi(quickWindow))
+                m_maxTextureSize = rhi->resourceLimit(QRhi::TextureSizeMax);
+        }
+        return;
+    }
+
     QOffscreenSurface surface;
     surface.create();
 
@@ -81,7 +113,7 @@ StaticOpenGLInfo::StaticOpenGLInfo()
     GLint maxTextureSize = -1;
     functions->glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
     m_maxTextureSize = nx::build_info::isLinux()
-        ? std::min<GLint>(maxTextureSize, LinuxMaxTextureSize)
+        ? std::min<int>(maxTextureSize, LinuxMaxTextureSize)
         : maxTextureSize;
 }
 
@@ -95,12 +127,10 @@ GLint StaticOpenGLInfo::maxTextureSize() const
     return m_maxTextureSize;
 }
 
-#if defined(Q_OS_MACX)
 void StaticOpenGLInfo::overrideMaxTextureSize(GLint value)
 {
     m_maxTextureSize = value;
 }
-#endif // defined(Q_OS_MACX)
 
 } // namespace
 
@@ -116,6 +146,9 @@ public:
     QnGlFunctionsPrivate(QOpenGLWidget* glWidget):
         m_glWidget(glWidget)
     {
+        if (!glWidget)
+            return;
+
         const auto& info = StaticOpenGLInfo::instance().info();
         if (info.vendor.contains("Tungsten Graphics")
             && info.renderer.contains("Gallium 0.1, Poulsbo on EMGD"))
@@ -249,6 +282,11 @@ QnGlFunctions::Features QnGlFunctions::estimatedFeatures()
     #else
         return {};
     #endif
+}
+
+void QnGlFunctions::overrideMaxTextureSize(int size)
+{
+    StaticOpenGLInfo::instance().overrideMaxTextureSize(size);
 }
 
 GLint QnGlFunctions::estimatedInteger(GLenum target)

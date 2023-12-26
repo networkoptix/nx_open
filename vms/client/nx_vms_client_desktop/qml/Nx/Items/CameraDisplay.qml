@@ -41,7 +41,6 @@ Rectangle
     TextureSizeHelper
     {
         id: textureSizeHelper
-        window: cameraDisplay.Window.window
     }
 
     MediaPlayer

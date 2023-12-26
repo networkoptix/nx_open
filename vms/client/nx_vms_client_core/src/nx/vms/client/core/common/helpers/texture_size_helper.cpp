@@ -2,28 +2,42 @@
 
 #include "texture_size_helper.h"
 
-#include <QtGui/QOpenGLContext>
-#include <QtGui/QOpenGLFunctions>
 #include <QtQuick/QQuickWindow>
+
+#if QT_VERSION >= QT_VERSION_CHECK(6,6,0)
+    #include <rhi/qrhi.h>
+#else
+    #include <QtGui/private/qrhi_p.h>
+#endif
+
+namespace {
+
+QRhi* getRhi(QQuickWindow* window)
+{
+    #if QT_VERSION >= QT_VERSION_CHECK(6,6,0)
+        return window->rhi();
+    #else
+        const auto ri = window->rendererInterface();
+        return static_cast<QRhi*>(ri->getResource(window, QSGRendererInterface::RhiResource));
+    #endif
+}
+
+} // namespace
 
 namespace nx::vms::client::core {
 
 static constexpr int kDefaultMaxSize = 2048;
 
-TextureSizeHelper::TextureSizeHelper(QObject* parent):
-    QObject(parent),
-    m_maxTextureSize(kDefaultMaxSize)
+TextureSizeHelper::TextureSizeHelper(QQuickItem* parent):
+    QQuickItem(parent),
+    m_maxTextureSize(0)
 {
+    connect(this, &QQuickItem::windowChanged, this, &TextureSizeHelper::setWindow);
 }
 
 int TextureSizeHelper::maxTextureSize() const
 {
-    return m_maxTextureSize.load();
-}
-
-QQuickWindow* TextureSizeHelper::window() const
-{
-    return m_window;
+    return m_maxTextureSize <= 0 ? kDefaultMaxSize : m_maxTextureSize;
 }
 
 void TextureSizeHelper::setWindow(QQuickWindow* window)
@@ -35,29 +49,28 @@ void TextureSizeHelper::setWindow(QQuickWindow* window)
         m_window->disconnect(this);
 
     m_window = window;
-    emit windowChanged();
 
     if (m_window)
     {
         connect(m_window, &QQuickWindow::beforeSynchronizing, this,
             [this]()
             {
-                const auto context = QOpenGLContext::currentContext();
-                if (!context)
+                if (m_maxTextureSize > 0)
                     return;
 
-                m_window->disconnect(this);
-
-                int size = 0;
-                context->functions()->glGetIntegerv(GL_MAX_TEXTURE_SIZE, &size);
-                setMaxTextureSize(size);
+                if (auto rhi = getRhi(m_window))
+                    setMaxTextureSize(rhi->resourceLimit(QRhi::TextureSizeMax));
+                else
+                    setMaxTextureSize(kDefaultMaxSize);
             },
             Qt::DirectConnection);
+
+        connect(m_window, &QQuickWindow::sceneGraphInvalidated, this,
+            [this]() { setMaxTextureSize(0); });
     }
-    else
-    {
-        setMaxTextureSize(kDefaultMaxSize);
-    }
+
+    // Avoid emitting maxTextureSizeChanged() signal when window is nullptr
+    // because we may be inside the destructor already.
 }
 
 void TextureSizeHelper::registerQmlType()
@@ -67,7 +80,7 @@ void TextureSizeHelper::registerQmlType()
 
 void TextureSizeHelper::setMaxTextureSize(int size)
 {
-    const int oldSize = m_maxTextureSize.exchange(size);
+    const auto oldSize = std::exchange(m_maxTextureSize, size);
     if (oldSize != size)
         emit maxTextureSizeChanged();
 }
