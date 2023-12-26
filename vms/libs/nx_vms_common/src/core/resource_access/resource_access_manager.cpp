@@ -809,7 +809,10 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
     {
         // Everyone can edit own data, except own access rights.
         Qn::Permissions result = Qn::ReadWriteSavePermission | Qn::WritePasswordPermission
-            | Qn::WriteEmailPermission | Qn::WriteFullNamePermission;
+            | Qn::WriteFullNamePermission;
+
+        if (!subject.user()->isTemporary())
+            result |= Qn::WriteEmailPermission;
 
         if (isSubjectAdministrator)
             result |= Qn::WriteDigestPermission;
