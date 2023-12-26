@@ -158,12 +158,24 @@ public:
             quickWindow->setGeometry(QRect({}, outSize));
 
             outPixmap = QPixmap::fromImage(quickWindow->grabWindow());
-            qDebug() << outPixmap.size() << quickWindow->size();
             return;
         }
         else //if (quickWindow->graphicsApi() != QSGRendererInterface::OpenGL)
         {
             auto rhi = getRhi(quickWindow.get());
+
+            if (rhi && rhi->isDeviceLost())
+            {
+                renderControl->invalidate();
+                rhi = nullptr;
+            }
+
+            if (!rhi)
+            {
+                if (!renderControl->initialize())
+                    return;
+                rhi = getRhi(quickWindow.get());
+            }
 
             const auto pixelRatio = quickWindow->effectiveDevicePixelRatio();
             const QSize deviceSize = outSize * pixelRatio;
@@ -299,17 +311,21 @@ private:
         format.setDepthBufferSize(24);
         format.setStencilBufferSize(8);
 
-        context->setFormat(format);
-        context->setShareContext(QOpenGLContext::globalShareContext());
-        context->setObjectName("NameValueTableContext");
-        NX_ASSERT(context->create());
-        surface->setFormat(context->format());
-        surface->create();
+        const auto graphicsApi =
+            appContext()->mainWindowContext()->quickWindow()->rendererInterface()->graphicsApi();
+
+        if (graphicsApi == QSGRendererInterface::OpenGL)
+        {
+            context->setFormat(format);
+            context->setShareContext(QOpenGLContext::globalShareContext());
+            context->setObjectName("NameValueTableContext");
+            NX_ASSERT(context->create());
+            surface->setFormat(context->format());
+            surface->create();
+        }
 
         const auto contextGuard = bindContext();
 
-        const auto graphicsApi =
-            appContext()->mainWindowContext()->quickWindow()->rendererInterface()->graphicsApi();
         if (graphicsApi != QSGRendererInterface::Software)
             renderControl->initialize();
 
