@@ -54,6 +54,9 @@ public:
     QSGNode* updatePaintNode(QSGNode* node);
     void releaseResources();
 
+    void handleWindowChanged(QQuickWindow* win);
+    void cleanup();
+
 private:
     void invalidateRegionsTexture();
     void ensureRegionsTexture();
@@ -134,6 +137,7 @@ private:
     core::MotionGrid m_motionGrid;
     QImage m_regionsImage;
     bool m_updateRegionsTexture = true;
+    QMetaObject::Connection windowConnection;
 };
 
 } // namespace nx::vms::client::desktop

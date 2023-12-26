@@ -39,6 +39,10 @@ protected:
         UpdatePaintNodeData* updatePaintNodeData) override;
     virtual void releaseResources() override;
 
+private slots:
+    void handleWindowChanged(QQuickWindow* win);
+    void cleanup();
+
 private:
     class Private;
     nx::utils::ImplPtr<Private> d;

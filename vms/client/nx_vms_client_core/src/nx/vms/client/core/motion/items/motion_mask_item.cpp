@@ -103,6 +103,7 @@ public:
     QSharedPointer<QSGTexture> texture;
     bool textureDirty = true;
     MotionMaskItemTextureProvider* provider = nullptr;
+    QMetaObject::Connection windowConnection;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -112,6 +113,22 @@ MotionMaskItem::MotionMaskItem(QQuickItem* parent):
     d(new Private(this))
 {
     setFlag(QQuickItem::ItemHasContents);
+    connect(this, &QQuickItem::windowChanged, this,
+        [this](QQuickWindow* win)
+        {
+            if (d->windowConnection)
+            {
+                disconnect(d->windowConnection);
+                d->windowConnection = {};
+                d->texture.reset();
+            }
+
+            if (!win)
+                return;
+
+            d->windowConnection = connect(win, &QQuickWindow::sceneGraphInvalidated, this,
+                [this]() { d->texture.reset(); }, Qt::DirectConnection);
+        });
 }
 
 MotionMaskItem::~MotionMaskItem()
