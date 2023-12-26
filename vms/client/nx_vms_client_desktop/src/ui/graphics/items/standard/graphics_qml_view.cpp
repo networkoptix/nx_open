@@ -274,7 +274,7 @@ struct GraphicsQmlView::Private
     Private(GraphicsQmlView* view): view(view) {}
 
     void resetComponent();
-    void ensureOffscreen();
+    bool ensureOffscreen();
     void ensureVao(QnTextureGLShaderProgram* shader);
     void updateSizes();
     bool isTextureInitializationRequired(qreal devicePixelRatio);
@@ -314,7 +314,7 @@ GraphicsQmlView::GraphicsQmlView(QGraphicsItem* parent, Qt::WindowFlags wFlags):
     d->quickWindow->setGeometry(0, 0, 640, 480); //< Will be resized later.
     d->quickWindow->setColor(palette().color(QPalette::Window));
 
-    d->ensureOffscreen();
+    NX_ASSERT(d->ensureOffscreen());
 
     d->qmlEngine = qnClientCoreModule->mainQmlEngine();
     d->resetComponent();
@@ -507,6 +507,8 @@ void GraphicsQmlView::setData(const QByteArray& data, const QUrl& url)
 void GraphicsQmlView::Private::initRenderTarget()
 {
     auto rhi = getRhi(quickWindow.get());
+    if (!rhi || rhi->isDeviceLost())
+        return;
 
     const auto pixelRatio = quickWindow->effectiveDevicePixelRatio();
     const QSize deviceSize = quickWindow->size() * pixelRatio;
@@ -553,19 +555,35 @@ void GraphicsQmlView::Private::updateSizes()
     }
 }
 
-void GraphicsQmlView::Private::ensureOffscreen()
+bool GraphicsQmlView::Private::ensureOffscreen()
 {
     const auto api = quickWindow->rendererInterface()->graphicsApi();
     if (api == QSGRendererInterface::Software)
-        return;
+        return true;
+
+    std::shared_ptr<QQuickItem> ro;
 
     if (offscreenInitialized)
-        return;
+    {
+        auto rhi = getRhi(quickWindow.get());
+        if (!rhi->isDeviceLost())
+            return true;
+
+        quickWindow->setRenderTarget({});
+        quickWindow->disconnect(view);
+        rhiRenderTarget.reset();
+        rhiTexture.reset();
+        rp.reset();
+
+        renderControl->invalidate();
+        offscreenInitialized = false;
+    }
 
     if (!qobject_cast<QOpenGLWidget*>(
         appContext()->mainWindowContext()->workbenchContext()->mainWindow()->viewport()))
     {
-        renderControl->initialize();
+        if (!renderControl->initialize())
+            return false;
 
         auto rhi = getRhi(quickWindow.get());
 
@@ -585,19 +603,22 @@ void GraphicsQmlView::Private::ensureOffscreen()
                 rbResult->completed =
                     [rbResult, rhi, this]
                     {
-                        QImage nonOwningImage(
-                            reinterpret_cast<const uchar*>(rbResult->data.constData()),
-                            rbResult->pixelSize.width(),
-                            rbResult->pixelSize.height(),
-                            QImage::Format_RGBA8888_Premultiplied);
+                        if (!rbResult->data.isEmpty())
+                        {
+                            QImage nonOwningImage(
+                                reinterpret_cast<const uchar*>(rbResult->data.constData()),
+                                rbResult->pixelSize.width(),
+                                rbResult->pixelSize.height(),
+                                QImage::Format_RGBA8888_Premultiplied);
 
-                        nonOwningImage.setDevicePixelRatio(quickWindow->effectiveDevicePixelRatio());
+                            nonOwningImage.setDevicePixelRatio(
+                                quickWindow->effectiveDevicePixelRatio());
 
-                        // Must copy here because the image does not own the data.
-                        this->rhiImage = rhi->isYUpInFramebuffer()
-                            ? QPixmap::fromImage(nonOwningImage.mirrored(false, true))
-                            : QPixmap::fromImage(nonOwningImage);
-
+                            // Must copy here because the image does not own the data.
+                            this->rhiImage = rhi->isYUpInFramebuffer()
+                                ? QPixmap::fromImage(nonOwningImage.mirrored(false, true))
+                                : QPixmap::fromImage(nonOwningImage);
+                        }
                         delete rbResult;
                     };
 
@@ -610,7 +631,7 @@ void GraphicsQmlView::Private::ensureOffscreen()
             Qt::DirectConnection);
 
         offscreenInitialized = true;
-        return;
+        return true;
     }
 
     openglContext.reset(new QOpenGLContext());
@@ -638,6 +659,7 @@ void GraphicsQmlView::Private::ensureOffscreen()
     openglContext->doneCurrent();
 
     offscreenInitialized = true;
+    return true;
 }
 
 void GraphicsQmlView::Private::ensureVao(QnTextureGLShaderProgram* shader)
@@ -865,6 +887,9 @@ void GraphicsQmlView::paint(QPainter* painter, const QStyleOptionGraphicsItem*, 
         }
         else
         {
+            if (!d->ensureOffscreen())
+                return;
+
             d->renderControl->polishItems();
 
             d->renderControl->beginFrame();
