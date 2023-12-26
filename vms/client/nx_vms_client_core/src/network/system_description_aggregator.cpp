@@ -94,7 +94,7 @@ void QnSystemDescriptionAggregator::mergeSystem(int priority,
         return;
 
     if (m_systems.contains(priority))
-        removeSystem(m_systems[priority]->id(), priority);
+        removeSystem(m_systems[priority]->id(), priority, /*isMerge*/ true);
 
     m_systems.insert(priority, system);
 
@@ -184,7 +184,8 @@ void QnSystemDescriptionAggregator::onOnlineStateChanged()
     emit onlineStateChanged();
 }
 
-void QnSystemDescriptionAggregator::removeSystem(const QString& systemId, int priority)
+void QnSystemDescriptionAggregator::removeSystem(
+    const QString& systemId, int priority, bool isMerge)
 {
     if (!m_systems.contains(priority))
         return;
@@ -199,7 +200,10 @@ void QnSystemDescriptionAggregator::removeSystem(const QString& systemId, int pr
     disconnect(system.data(), nullptr, this, nullptr);
     m_systems.remove(priority);
 
-    updateServers();
+    // There is no need to update servers during a systems merge. They will be updated at the end of
+    // mergeSystem() (see VMS-47244)
+    if (!isMerge)
+        updateServers();
 
     if (!m_systems.isEmpty())
         emitSystemChanged();
