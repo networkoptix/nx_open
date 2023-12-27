@@ -64,7 +64,7 @@ struct NX_VMS_API ServerModel: ResourceWithParameters
      */
     QString url;
 
-    /**%apidoc[opt] */
+    /**%apidoc[readonly] */
     QString version;
 
     /**%apidoc[opt] */
