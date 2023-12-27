@@ -20,6 +20,7 @@ Instrument
     readonly property bool edgeHovered: enabled && d.edgeHovered
 
     enabled: model && model.count >= 2
+    hoverEnabled: true
 
     property var d: QtObject
     {
@@ -90,7 +91,7 @@ Instrument
         }
     }
 
-    onHoverMove:
+    onHoverMove: (hover) =>
     {
         if (model.count < 2)
         {

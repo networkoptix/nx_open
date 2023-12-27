@@ -10,6 +10,8 @@ DragInstrument
 
     property bool forcefullyHovered: false
 
+    hoverEnabled: true
+
     enabled:
     {
         if (pointMakerInstrument && pointMakerInstrument.enabled)

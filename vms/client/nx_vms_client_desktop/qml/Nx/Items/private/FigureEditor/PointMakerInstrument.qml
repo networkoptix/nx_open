@@ -30,6 +30,7 @@ Instrument
         enabled && d.hoveredPointIndex >= 0 ? getPoint(d.hoveredPointIndex) : undefined
 
     enabled: false
+    hoverEnabled: true
 
     property var d: NxObject
     {
@@ -132,7 +133,7 @@ Instrument
         }
     }
 
-    onMousePress:
+    onMousePress: (mouse) =>
     {
         mouse.accepted = true
 
@@ -145,13 +146,10 @@ Instrument
         d.processMove(mouse)
     }
 
-    onMouseMove:
-        d.processMove(mouse)
+    onMouseMove: (mouse) => d.processMove(mouse)
+    onHoverMove: (hover) => d.processMove(hover)
 
-    onHoverMove:
-        d.processMove(hover)
-
-    onMouseRelease:
+    onMouseRelease: (mouse) =>
     {
         mouse.accepted = true
 
