@@ -6,9 +6,7 @@
 #include <core/resource/media_resource.h>
 #include <core/resource/resource.h>
 
-class NX_VMS_COMMON_API QnAbstractArchiveResource:
-    public QnResource,
-    public QnMediaResource
+class NX_VMS_COMMON_API QnAbstractArchiveResource: public QnMediaResource
 {
     Q_OBJECT;
 

@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <core/resource/media_resource.h>
 #include <nx/utils/mac_address.h>
 #include <nx/utils/url.h>
 #include <nx/utils/value_cache.h>
@@ -10,7 +11,7 @@
 
 class QAuthenticator;
 
-class NX_VMS_COMMON_API QnNetworkResource: public QnResource
+class NX_VMS_COMMON_API QnNetworkResource: public QnMediaResource
 {
     Q_OBJECT
 
