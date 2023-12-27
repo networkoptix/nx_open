@@ -54,9 +54,8 @@ typedef QnSharedResourcePointer<QnLayoutResource> QnLayoutResourcePtr;
 typedef QnSharedResourcePointerList<QnLayoutResource> QnLayoutResourceList;
 typedef QSet<QnLayoutResourcePtr> QnLayoutResourceSet;
 
-// TODO: #sivanov Not a resource, actually.
 class QnMediaResource;
-typedef QSharedPointer<QnMediaResource> QnMediaResourcePtr;
+typedef QnSharedResourcePointer<QnMediaResource> QnMediaResourcePtr;
 
 class QnAbstractArchiveResource;
 typedef QnSharedResourcePointer<QnAbstractArchiveResource> QnAbstractArchiveResourcePtr;

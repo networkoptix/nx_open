@@ -166,6 +166,9 @@ void QnResourceDiscoveryManager::stop()
     wait();
     NX_MUTEX_LOCKER lock(&m_searchersListMutex);
     m_searchersList.clear();
+
+    for (auto& resourceList: m_lastDiscoveredResources)
+        resourceList.clear();
 }
 
 void QnResourceDiscoveryManager::pleaseStop()
