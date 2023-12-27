@@ -50,7 +50,7 @@ public:
 
     void sync(RhiPaintDevice* pd);
 
-    void prepare(QRhiRenderPassDescriptor* rp, QRhiResourceUpdateBatch* u);
+    bool prepare(QRhiRenderPassDescriptor* rp, QRhiResourceUpdateBatch* u);
     void render(QRhiCommandBuffer* cb);
 
 private:
