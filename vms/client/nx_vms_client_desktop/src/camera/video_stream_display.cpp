@@ -402,8 +402,8 @@ MultiThreadDecodePolicy QnVideoStreamDisplay::toEncoderPolicy(bool useMtDecoding
 
 bool canAddIntel(const QnConstCompressedVideoDataPtr& data, bool reverseMode)
 {
-    return appContext()->localSettings()->hardwareDecodingEnabled()
-        && isIntel()
+    return isIntel()
+        && appContext()->localSettings()->hardwareDecodingEnabled()
         && !reverseMode
         && QuickSyncVideoDecoderOldPlayer::instanceCount()
             < appContext()->localSettings()->maxHardwareDecoders()
@@ -412,8 +412,8 @@ bool canAddIntel(const QnConstCompressedVideoDataPtr& data, bool reverseMode)
 
 bool canAddNvidia(const QnConstCompressedVideoDataPtr& data, bool reverseMode)
 {
-    return appContext()->localSettings()->hardwareDecodingEnabled()
-        && isNvidia()
+    return isNvidia()
+        && appContext()->localSettings()->hardwareDecodingEnabled()
         && !reverseMode
         && NvidiaVideoDecoderOldPlayer::instanceCount()
             < appContext()->localSettings()->maxHardwareDecoders()

@@ -205,7 +205,8 @@ int runApplicationInternal(QApplication* application, const QnStartupParameters&
 
     NX_INFO(NX_SCOPE_TAG, "IniConfig iniFilesDir: %1",  nx::kit::IniConfig::iniFilesDir());
 
-    QnGLCheckerInstrument::checkGLHardware();
+    if (QString(nx::vms::client::desktop::ini().graphicsApi) == "opengl")
+        QnGLCheckerInstrument::checkGLHardware();
     client.initWebEngine();
 
     if (startupParams.customUri.isValid())

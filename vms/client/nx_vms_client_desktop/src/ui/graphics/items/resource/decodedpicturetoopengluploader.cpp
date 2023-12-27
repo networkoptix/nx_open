@@ -117,6 +117,7 @@ public:
     bool yv12SharedUsed;
     bool nv12SharedUsed;
     QScopedPointer<QnGlFunctions> functions;
+    QnGlFunctions::Features features;
 
     DecodedPictureToOpenGLUploaderPrivate(QOpenGLWidget* glWidget, QQuickWidget* quickWidget):
         gl(glWidget ? new QOpenGLFunctions(glWidget->context()) : nullptr),
@@ -124,11 +125,18 @@ public:
         supportsNonPower2Textures(false),
         forceSoftYUV(false),
         yv12SharedUsed(false),
-        nv12SharedUsed(false),
-        functions(new QnGlFunctions(glWidget) /*Resets current context*/)
+        nv12SharedUsed(false)
     {
         if (glWidget)
+        {
+            functions.reset(new QnGlFunctions(glWidget)); //< Resets current context.
+            features = functions->features();
             glWidget->makeCurrent();
+        }
+        else if (!qw)
+        {
+            features |= QnGlFunctions::ShadersBroken;
+        }
 
         /* Clamp constant. */
         clampConstant = GL_CLAMP_TO_EDGE;
@@ -169,18 +177,14 @@ public:
 
     bool usingShaderYuvToRgb() const
     {
-        return
-            (gl || qw)
-            && !(functions->features() & QnGlFunctions::ShadersBroken)
+        return !(features & QnGlFunctions::ShadersBroken)
             && yv12SharedUsed
             && !forceSoftYUV;
     }
 
     bool usingShaderNV12ToRgb() const
     {
-        return
-            (gl || qw)
-            && !(functions->features() & QnGlFunctions::ShadersBroken)
+        return !(features & QnGlFunctions::ShadersBroken)
             && nv12SharedUsed
             && !forceSoftYUV;
     }
