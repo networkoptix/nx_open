@@ -20,7 +20,7 @@ class QnAbstractStreamDataProvider;
  * or local QnAbstractArchiveResource based.
  * \note Derived class MUST call \a initMediaResource() just after object instantiation
 */
-class NX_VMS_COMMON_API QnMediaResource
+class NX_VMS_COMMON_API QnMediaResource: public QnResource
 {
 public:
     QnMediaResource();
