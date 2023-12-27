@@ -3,8 +3,13 @@
 #pragma once
 
 #include <QtCore/QSharedPointer>
+#include <QtCore/QObject>
 
 #include <nx/utils/log/to_string.h>
+
+#ifdef TRACE_REFCOUNT_CHANGE
+    #include "ref_count_tracing_mixin.h"
+#endif
 
 /**
  * Shared pointer implementation via QSharedPointer, adding a conversion from `this` to "shared".
@@ -12,16 +17,34 @@
  */
 template<class Resource>
 class QnSharedResourcePointer: public QSharedPointer<Resource>
+    #ifdef TRACE_REFCOUNT_CHANGE
+        , public RefcountTracingMixin
+    #endif
 {
     typedef QSharedPointer<Resource> base_type;
 
 public:
-    QnSharedResourcePointer() {}
+    QnSharedResourcePointer()
+    {
+        #ifdef TRACE_REFCOUNT_CHANGE
+            RefcountTracingMixin::traceRefcountIncrement(this->data());
+        #endif
+    }
+
+   ~QnSharedResourcePointer()
+   {
+        #ifdef TRACE_REFCOUNT_CHANGE
+            RefcountTracingMixin::traceRefcountDecrement();
+        #endif
+   }
 
     explicit QnSharedResourcePointer(Resource* ptr):
         base_type(ptr)
     {
         initialize(*this);
+        #ifdef TRACE_REFCOUNT_CHANGE
+            RefcountTracingMixin::traceRefcountIncrement(this->data());
+        #endif
     }
 
     template<class Deleter>
@@ -29,55 +52,102 @@ public:
         base_type(ptr, d)
     {
         initialize(*this);
+        #ifdef TRACE_REFCOUNT_CHANGE
+            RefcountTracingMixin::traceRefcountIncrement(this->data());
+        #endif
     }
 
     // copy
+    QnSharedResourcePointer(const QnSharedResourcePointer<Resource>& other):
+        base_type(other)
+    {
+        #ifdef TRACE_REFCOUNT_CHANGE
+            RefcountTracingMixin::traceRefcountIncrement(this->data());
+        #endif
+    }
+
     QnSharedResourcePointer(const QSharedPointer<Resource>& other):
         base_type(other)
     {
+        #ifdef TRACE_REFCOUNT_CHANGE
+            RefcountTracingMixin::traceRefcountIncrement(this->data());
+        #endif
     }
 
-    QnSharedResourcePointer<Resource>& operator=(const QSharedPointer<Resource>& other)
+    QnSharedResourcePointer<Resource>& operator=(const QnSharedResourcePointer<Resource>& other)
     {
+        #ifdef TRACE_REFCOUNT_CHANGE
+            RefcountTracingMixin::traceRefcountDecrement();
+        #endif
         base_type::operator=(other);
+        #ifdef TRACE_REFCOUNT_CHANGE
+            RefcountTracingMixin::traceRefcountIncrement(this->data());
+        #endif
         return *this;
     }
 
     template<class OtherResource>
-    QnSharedResourcePointer(const QSharedPointer<OtherResource>& other):
+    QnSharedResourcePointer(const QnSharedResourcePointer<OtherResource>& other):
         base_type(other)
     {
+        #ifdef TRACE_REFCOUNT_CHANGE
+            RefcountTracingMixin::traceRefcountIncrement(this->data());
+        #endif
     }
 
     template<class OtherResource>
-    QnSharedResourcePointer<Resource>& operator=(const QSharedPointer<OtherResource>& other)
+    QnSharedResourcePointer<Resource>& operator=(const QnSharedResourcePointer<OtherResource>& other)
     {
+        #ifdef TRACE_REFCOUNT_CHANGE
+            RefcountTracingMixin::traceRefcountDecrement();
+        #endif
         base_type::operator=(other);
+        #ifdef TRACE_REFCOUNT_CHANGE
+            RefcountTracingMixin::traceRefcountIncrement(this->data());
+        #endif
         return *this;
     }
 
     // move
-    QnSharedResourcePointer(QSharedPointer<Resource>&& other):
+    QnSharedResourcePointer(QnSharedResourcePointer<Resource>&& other):
         base_type(std::move(other))
     {
+        #ifdef TRACE_REFCOUNT_CHANGE
+            RefcountTracingMixin::traceRefcountIncrement(this->data());
+        #endif
     }
 
-    QnSharedResourcePointer<Resource>& operator=(QSharedPointer<Resource>&& other)
+    QnSharedResourcePointer<Resource>& operator=(QnSharedResourcePointer<Resource>&& other)
     {
+        #ifdef TRACE_REFCOUNT_CHANGE
+            RefcountTracingMixin::traceRefcountDecrement();
+        #endif
         base_type::operator=(std::move(other));
+        #ifdef TRACE_REFCOUNT_CHANGE
+            RefcountTracingMixin::traceRefcountIncrement(this->data());
+        #endif
         return *this;
     }
 
     template<class OtherResource>
-    QnSharedResourcePointer(QSharedPointer<OtherResource>&& other):
+    QnSharedResourcePointer(QnSharedResourcePointer<OtherResource>&& other):
         base_type(std::move(other))
     {
+        #ifdef TRACE_REFCOUNT_CHANGE
+            RefcountTracingMixin::traceRefcountIncrement(this->data());
+        #endif
     }
 
     template<class OtherResource>
-    QnSharedResourcePointer<Resource>& operator=(QSharedPointer<OtherResource>&& other)
+    QnSharedResourcePointer<Resource>& operator=(QnSharedResourcePointer<OtherResource>&& other)
     {
+        #ifdef TRACE_REFCOUNT_CHANGE
+            RefcountTracingMixin::traceRefcountDecrement();
+        #endif
         base_type::operator=(std::move(other));
+        #ifdef TRACE_REFCOUNT_CHANGE
+            RefcountTracingMixin::traceRefcountIncrement(this->data());
+        #endif
         return *this;
     }
 
@@ -89,20 +159,35 @@ public:
     template<class OtherResource>
     void reset(OtherResource *resource)
     {
+        #ifdef TRACE_REFCOUNT_CHANGE
+            RefcountTracingMixin::traceRefcountDecrement();
+        #endif
         base_type::reset(resource);
         initialize(*this);
+        #ifdef TRACE_REFCOUNT_CHANGE
+            RefcountTracingMixin::traceRefcountIncrement(this->data());
+        #endif
     }
 
     template<class OtherResource>
     QnSharedResourcePointer(const QWeakPointer<OtherResource>& other):
         base_type(other)
     {
+        #ifdef TRACE_REFCOUNT_CHANGE
+            RefcountTracingMixin::traceRefcountIncrement(this->data());
+        #endif
     }
 
     template<class OtherResource>
     QnSharedResourcePointer<Resource>& operator=(const QWeakPointer<OtherResource>& other)
     {
+        #ifdef TRACE_REFCOUNT_CHANGE
+            RefcountTracingMixin::traceRefcountDecrement();
+        #endif
         base_type::operator=(other);
+        #ifdef TRACE_REFCOUNT_CHANGE
+            RefcountTracingMixin::traceRefcountIncrement(this->data());
+        #endif
         return *this;
     }
 
@@ -131,7 +216,7 @@ public:
     }
 
     template<class OtherResource>
-    static void initialize(const QSharedPointer<OtherResource>& resource)
+    static void initialize(const QnSharedResourcePointer<OtherResource>& resource)
     {
         if (resource)
             resource->initWeakPointer(resource);
