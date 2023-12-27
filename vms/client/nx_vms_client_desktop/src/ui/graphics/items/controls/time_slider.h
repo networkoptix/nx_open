@@ -585,16 +585,16 @@ private:
 
     int m_lineCount;
     qreal m_totalLineStretch;
-    QVector<LineData> m_lineData;
+    std::vector<LineData> m_lineData;
 
-    QVector<QnTimeStep> m_steps;
-    QVector<TimeStepData> m_stepData;
+    const QVector<QnTimeStep>* m_steps;
+    std::vector<TimeStepData> m_stepData;
     int m_maxStepIndex;
     int m_textMinStepIndex = 0;
     qreal m_msecsPerPixel;
     qreal m_animationUpdateMSecsPerPixel;
-    QVector<milliseconds> m_nextTickmarkPos;
-    QVector<QVector<QPointF> > m_tickmarkLines;
+    std::vector<milliseconds> m_nextTickmarkPos;
+    std::vector<QList<QPointF> > m_tickmarkLines;
 
     std::unique_ptr<ThumbnailLoadingManager> m_thumbnailManager;
     ThumbnailPanel* m_thumbnailPanel = nullptr;
