@@ -618,8 +618,8 @@ bool QnGLRenderer::drawVideoTextures(
                 {
                     // This function is called  on the rendering thread and create resources.
                     // So the cleanup should happen on the same thread.
-                    // But currently threaded rendering is disabled (and we are using this code
-                    // only in QQuickWidget which itself does not use threaded rendering).
+                    // But currently we are using this code only in QQuickWidget
+                    // which ifself does not use threaded rendering.
                     renderer->prepare(d, deviceMvp, rhi, rp, u);
                 },
                 .render = [renderer = m_rhiVideoRenderer](

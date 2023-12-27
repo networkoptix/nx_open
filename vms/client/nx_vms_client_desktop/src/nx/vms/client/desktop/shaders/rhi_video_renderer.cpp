@@ -15,6 +15,82 @@
 
 namespace nx::vms::client::desktop {
 
+class RhiCleanupHelper
+{
+public:
+    using KeyType = void*;
+    using Callback = std::function<void(QRhi*)>;
+
+public:
+    static void set(QRhi* rhi, KeyType key, Callback callback);
+    static void remove(QRhi* rhi, KeyType key);
+
+private:
+    // Per RHI data.
+    struct Data;
+
+    static Data* dataFor(QRhi* rhi, bool alloc = true);
+};
+
+struct RhiCleanupHelper::Data
+{
+    QRhi* const rhi;
+    QHash<KeyType, Callback> callbacks;
+
+    void add(KeyType key, Callback callback)
+    {
+        callbacks[key] = callback;
+    }
+
+    void remove(KeyType key)
+    {
+        callbacks.remove(key);
+    }
+
+    Data(QRhi* rhi): rhi(rhi) {}
+
+    ~Data() //< RHI is destroyed.
+    {
+        const auto allCallbacks = callbacks.values();
+        for (auto& callback: allCallbacks)
+            callback(rhi);
+    }
+};
+
+void RhiCleanupHelper::set(QRhi* rhi, KeyType key, RhiCleanupHelper::Callback callback)
+{
+    if (rhi)
+        dataFor(rhi)->add(key, callback);
+}
+
+void RhiCleanupHelper::remove(QRhi* rhi, KeyType key)
+{
+    if (auto data = dataFor(rhi, false))
+        data->remove(key);
+}
+
+RhiCleanupHelper::Data* RhiCleanupHelper::dataFor(QRhi* rhi, bool alloc)
+{
+    static QHash<QRhi*, Data*> cleanupData;
+    auto it = cleanupData.constFind(rhi);
+    if (it != cleanupData.constEnd())
+        return *it;
+
+    if (!alloc)
+        return nullptr;
+
+    auto data = new Data(rhi);
+    rhi->addCleanupCallback(
+        [data](QRhi* rhi)
+        {
+            cleanupData.remove(rhi);
+            delete data;
+        });
+
+    cleanupData.insert(rhi, data);
+    return data;
+}
+
 namespace {
 
 static constexpr int kYPlaneIndex = 0;
@@ -189,9 +265,20 @@ struct RhiVideoRenderer::Private
 {
     Private() {}
 
+    void cleanup()
+    {
+        ps.reset();
+        vbuf.reset();
+        ubuf.reset();
+        sampler.reset();
+        srb.reset();
+        textures.clear();
+        rhi = nullptr;
+    }
+
     RhiVideoRenderer::Data data;
 
-    QRhi* rhi;
+    QRhi* rhi = nullptr;
 
     std::unique_ptr<QRhiBuffer> vbuf;
     std::unique_ptr<QRhiBuffer> ubuf;
@@ -211,6 +298,7 @@ RhiVideoRenderer::RhiVideoRenderer():
 
 RhiVideoRenderer::~RhiVideoRenderer()
 {
+    RhiCleanupHelper::remove(d->rhi, this);
 }
 
 void RhiVideoRenderer::init(
@@ -380,7 +468,15 @@ void RhiVideoRenderer::prepare(
     QRhiRenderPassDescriptor* rp,
     QRhiResourceUpdateBatch* rub)
 {
-    d->rhi = rhi;
+    if (rhi != d->rhi)
+    {
+        RhiCleanupHelper::remove(d->rhi, this);
+        if (d->rhi)
+            d->cleanup();
+
+        RhiCleanupHelper::set(rhi, this, [this](QRhi*){ d->cleanup(); });
+        d->rhi = rhi;
+    }
 
     if (!d->ps || data.data.key != d->data.data.key)
         init(data, rhi, rp);
