@@ -59,7 +59,7 @@ Item
                 grip.dragStarted()
         }
 
-        onPressed:
+        onPressed: (mouse) =>
         {
             if (!grip.parent)
                 return
@@ -68,16 +68,16 @@ Item
                 drag.target = grip
         }
 
-        onReleased:
+        onReleased: (mouse) =>
         {
             if (mouse.button === Qt.LeftButton)
                 drag.target = undefined
         }
 
-        onMouseXChanged: processMove(mouse)
-        onMouseYChanged: processMove(mouse)
+        onMouseXChanged: (mouse) => processMove(mouse)
+        onMouseYChanged: (mouse) => processMove(mouse)
 
-        onClicked: grip.clicked(mouse.button)
+        onClicked: (mouse) => grip.clicked(mouse.button)
 
         function processMove(mouse)
         {

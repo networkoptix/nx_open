@@ -217,7 +217,7 @@ Figure
                 }
             }
 
-            onClicked:
+            onClicked: (button) =>
             {
                 if (button === Qt.RightButton)
                 {

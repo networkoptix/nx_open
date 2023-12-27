@@ -613,7 +613,11 @@ Figure
 
     hintStyle: acceptable ? DialogBanner.Style.Info : DialogBanner.Style.Error
 
-    hoverInstrument: Instrument { item: mouseArea }
+    hoverInstrument: Instrument
+    {
+        item: mouseArea
+        hoverEnabled: true
+    }
 
     // TODO: #vkutin #dklychkov Avoid code duplication with ObjectSizeConstraints.qml
 
