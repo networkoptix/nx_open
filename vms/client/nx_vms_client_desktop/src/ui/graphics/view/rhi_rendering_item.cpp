@@ -168,7 +168,12 @@ void RhiRenderingItemRenderer::frameStart()
 
     QRhiResourceUpdateBatch *resourceUpdates = rhi->nextResourceUpdateBatch();
 
-    m_paintRenderer->prepare(rt->renderPassDescriptor(), resourceUpdates);
+    if (!m_paintRenderer->prepare(rt->renderPassDescriptor(), resourceUpdates))
+    {
+        resourceUpdates->release();
+        return;
+    }
+
     cb->resourceUpdate(resourceUpdates);
 }
 

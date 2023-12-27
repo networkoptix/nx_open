@@ -229,7 +229,7 @@ void RhiPaintDeviceRenderer::createPathPipeline(QRhiRenderPassDescriptor* rp)
     cps->create();
 }
 
-void RhiPaintDeviceRenderer::prepare(QRhiRenderPassDescriptor* rp, QRhiResourceUpdateBatch* u)
+bool RhiPaintDeviceRenderer::prepare(QRhiRenderPassDescriptor* rp, QRhiResourceUpdateBatch* u)
 {
     if (!cps)
     {
@@ -250,15 +250,18 @@ void RhiPaintDeviceRenderer::prepare(QRhiRenderPassDescriptor* rp, QRhiResourceU
         m_size);
 
     vbuf->setSize(vertexData.size() * sizeof(vertexData[0]));
-    vbuf->create();
+    if (!vbuf->create())
+        return false;
 
     tvbuf->setSize(textureData.size() * sizeof(textureData[0]));
-    tvbuf->create();
+    if (!tvbuf->create())
+        return false;
 
     u->uploadStaticBuffer(vbuf.get(), vertexData.data());
     u->uploadStaticBuffer(tvbuf.get(), textureData.data());
 
     u->updateDynamicBuffer(ubuf.get(), 0, 64, modelView().constData());
+    return true;
 }
 
 QMatrix4x4 RhiPaintDeviceRenderer::modelView() const
