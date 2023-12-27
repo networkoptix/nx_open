@@ -27,9 +27,7 @@ namespace nx::core::resource { class AbstractRemoteArchiveManager; }
 namespace nx::media { enum class StreamEvent; }
 namespace nx::core::ptz { enum class PresetType; }
 
-class NX_VMS_COMMON_API QnSecurityCamResource:
-    public QnNetworkResource,
-    public QnMediaResource
+class NX_VMS_COMMON_API QnSecurityCamResource: public QnNetworkResource
 {
     Q_OBJECT
     using base_type = QnNetworkResource;

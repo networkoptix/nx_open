@@ -235,7 +235,7 @@ protected:
             return;
 
         const QString engineStringId = engineParameters[kIdKey].toString();
-        auto analyticsEngine = AnalyticsEngineResourceMockPtr::create();
+        AnalyticsEngineResourceMockPtr analyticsEngine = AnalyticsEngineResourceMockPtr::create();
         analyticsEngine->setIdUnsafe(toUuid(engineStringId));
         analyticsEngine->setIsDeviceDependent(
             engineParameters[kIsDeviceDependentKey].toBool(/*defaultValue*/ false));
@@ -273,7 +273,7 @@ protected:
         static const QString kSupportedEventTypesKey = "supportedEventTypes";
         static const QString kSupportedObjectTypesKey = "supportedObjectTypes";
 
-        auto device = CameraResourceStubPtr::create();
+        CameraResourceStubPtr device = CameraResourceStubPtr::create();
 
         const QString deviceStringId = deviceParameters[kIdKey].toString();
         device->setIdUnsafe(toUuid(deviceStringId));
