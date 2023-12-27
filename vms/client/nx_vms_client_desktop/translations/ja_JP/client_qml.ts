@@ -76,7 +76,7 @@
     <name>AdvancedUpdateSettings</name>
     <message>
       <source>Advanced Update Settings</source>
-      <translation>詳細設定</translation>
+      <translation>更新の詳細設定</translation>
     </message>
     <message>
       <source>Notifications</source>
@@ -1723,7 +1723,7 @@ PTZを行います</translation>
     </message>
     <message>
       <source>You can enable this guide again by going to Local Settings &gt; Advanced &gt; Reset All Warnings</source>
-      <translation>このガイドを再度有効にするには、[ローカル設定 &gt; アドバンス &gt; すべての警告設定をリセット] を実行してください。</translation>
+      <translation>このガイドを再度有効にするには、[ローカル設定 &gt; 上級設定 &gt; すべての警告設定をリセット] を実行してください。</translation>
     </message>
     <message>
       <source>Introducing
@@ -1738,7 +1738,7 @@ mouse pointer while pressing
 Shift key to use Advanced PTZ</source>
       <translation>Shift キーを押しながら
 クリック、ダブルクリック、ドラッグ操作を行うことで、
-高度な PTZ を使用できます</translation>
+アドバンストPTZ を使用できます</translation>
     </message>
     <message>
       <source>Here is a quick guide
@@ -1894,7 +1894,7 @@ Alt + クリックでオブジェクトを追跡します。</translation>
     </message>
     <message>
       <source>Web Pages</source>
-      <translation>ウェブページ</translation>
+      <translation>Webページ</translation>
     </message>
     <message>
       <source>Health Monitors</source>
@@ -1957,7 +1957,7 @@ Alt + クリックでオブジェクトを追跡します。</translation>
     </message>
     <message>
       <source>Web Pages</source>
-      <translation>ウェブページ</translation>
+      <translation>Webページ</translation>
     </message>
     <message>
       <source>Local Files</source>
@@ -2648,7 +2648,7 @@ Alt + クリックでオブジェクトを追跡します。</translation>
     <name>WelcomeScreen</name>
     <message>
       <source>Official Website</source>
-      <translation>公式ウェブサイト</translation>
+      <translation>公式Webサイト</translation>
     </message>
     <message>
       <source>Help &amp; User Manual</source>

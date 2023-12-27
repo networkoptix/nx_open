@@ -195,7 +195,7 @@
     </message>
     <message>
       <source>Web Page...</source>
-      <translation>ウェブページ...</translation>
+      <translation>Webページ...</translation>
     </message>
     <message>
       <source>New Layout...</source>
@@ -211,11 +211,11 @@
     </message>
     <message>
       <source>Web Client...</source>
-      <translation>ウェブクライアント...</translation>
+      <translation>Webクライアント...</translation>
     </message>
     <message>
       <source>Open Web Client...</source>
-      <translation>ウェブクライアントを開く...</translation>
+      <translation>Webクライアントを開く...</translation>
     </message>
     <message>
       <source>Save Current Layout</source>
@@ -482,7 +482,7 @@
     </message>
     <message>
       <source>Check File Watermark</source>
-      <translation>ファイルウォーターマーク確認</translation>
+      <translation>ファイルのウォーターマークを確認</translation>
     </message>
     <message>
       <source>Image Enhancement...</source>
@@ -614,7 +614,7 @@
     </message>
     <message>
       <source>Server Web Page...</source>
-      <translation>サーバーウェブページ...</translation>
+      <translation>サーバーWebページ...</translation>
     </message>
     <message>
       <source>Server Settings...</source>
@@ -882,7 +882,7 @@
     </message>
     <message>
       <source>Add Web Page...</source>
-      <translation>ウェブページを追加...</translation>
+      <translation>Webページを追加...</translation>
     </message>
     <message>
       <source>Show Servers</source>
@@ -1032,7 +1032,7 @@
     </message>
     <message>
       <source>New Web Page...</source>
-      <translation>新規ウェブページ...</translation>
+      <translation>新規Webページ...</translation>
     </message>
     <message>
       <source>Add Showreel...</source>
@@ -1052,7 +1052,7 @@
     </message>
     <message>
       <source>Proxied Web Page...</source>
-      <translation>プロキシされたウェブページ...</translation>
+      <translation>プロキシされたWebページ...</translation>
     </message>
     <message>
       <source>Layout</source>
@@ -1811,7 +1811,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>This camera does not support advanced PTZ</source>
-      <translation>このカメラは高度なPTZをサポートしていません</translation>
+      <translation>このカメラはアドバンストPTZをサポートしていません</translation>
     </message>
     <message>
       <source>Zooming out...</source>
@@ -3912,7 +3912,7 @@ to %1</source>
     </message>
     <message>
       <source>Advanced</source>
-      <translation>アドバンス</translation>
+      <translation>上級設定</translation>
     </message>
     <message>
       <source>Restart required</source>
@@ -4761,7 +4761,7 @@ to %1</source>
     </message>
     <message>
       <source>Server Web Page</source>
-      <translation>サーバーウェブページ...</translation>
+      <translation>サーバーWebページ</translation>
     </message>
     <message>
       <source>Plugins</source>
@@ -5333,7 +5333,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Advanced</source>
-      <translation>アドバンス</translation>
+      <translation>上級設定</translation>
     </message>
     <message>
       <source>Integrations</source>
@@ -5701,7 +5701,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Web Page</source>
-      <translation>ウェブページ</translation>
+      <translation>Webページ</translation>
     </message>
     <message>
       <source>You try to open the
@@ -7741,7 +7741,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Web Page</source>
-      <translation>ウェブページ</translation>
+      <translation>Webページ</translation>
     </message>
     <message>
       <source>Expert</source>
@@ -7965,7 +7965,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>This web page is requesting access to your account for authorization</source>
-      <translation>このウェブページは認証のためにあなたのアカウントへのアクセスを要求しています</translation>
+      <translation>このWebページは、認証のためにあなたのアカウントへのアクセスを要求しています</translation>
     </message>
   </context>
   <context>
@@ -10366,11 +10366,11 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Web Page</source>
-      <translation>ウェブページ</translation>
+      <translation>Webページ</translation>
     </message>
     <message>
       <source>Turn on webpage proxy on &lt;b&gt;General&lt;/b&gt; tab.</source>
-      <translation>&lt;b&gt;一般&lt;/b&gt; タブでウェブページプロキシをオンにしてください。</translation>
+      <translation>&lt;b&gt;一般&lt;/b&gt; タブでWebページプロキシをオンにしてください。</translation>
     </message>
     <message>
       <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</source>
@@ -10402,11 +10402,11 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>New Web Page</source>
-      <translation>新規ウェブページ</translation>
+      <translation>新規Webページ</translation>
     </message>
     <message>
       <source>Edit Web Page</source>
-      <translation>ウェブページの編集</translation>
+      <translation>Webページの編集</translation>
     </message>
     <message>
       <source>New Proxied Web Page</source>
@@ -10414,7 +10414,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Edit Proxied Web Page</source>
-      <translation>プロキシされたウェブページを編集</translation>
+      <translation>プロキシされたWebページの編集</translation>
     </message>
     <message>
       <source>New Integration</source>
@@ -10943,7 +10943,7 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>Watermarks will be displayed over live, archive and exported videos for non-power users only. You and other power users will not see them.</source>
-      <translation>透かし模様は、パワーユーザー以外のユーザーのライブ、アーカイブ、エクスポート後の映像に表示されます。あなたや他のパワーユーザーが透かし模様を見ることはありません。</translation>
+      <translation>ウォーターマーク (透かし) は、パワーユーザー以外のユーザーのライブ、アーカイブ、エクスポート映像にのみ表示されます。あなたや他のパワーユーザーには表示されません。</translation>
     </message>
     <message>
       <source>Encrypting video traffic may significantly increase CPU usage</source>
@@ -12193,7 +12193,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Web Pages</source>
-      <translation>ウェブページ</translation>
+      <translation>Webページ</translation>
     </message>
     <message>
       <source>Users</source>
@@ -13051,7 +13051,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Failed to open server web page</source>
-      <translation>サーバーの ウェブ ページを開くのに失敗しました</translation>
+      <translation>サーバーのWebページを開けませんでした</translation>
     </message>
     <message numerus="yes">
       <source>Failed to change password on %n cameras of %1</source>
