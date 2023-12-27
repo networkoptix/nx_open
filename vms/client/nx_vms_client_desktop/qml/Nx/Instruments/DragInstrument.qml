@@ -26,7 +26,7 @@ Instrument
     property bool _started: false
     property point _pressItemPosition
 
-    onMousePress:
+    onMousePress: (mouse) =>
     {
         if (!target)
             return
@@ -36,7 +36,7 @@ Instrument
         mouse.accepted = true
     }
 
-    onMouseRelease:
+    onMouseRelease: (mouse) =>
     {
         if (!_started || !target)
             return
@@ -48,7 +48,7 @@ Instrument
         mouse.accepted = true
     }
 
-    onMouseMove:
+    onMouseMove: (mouse) =>
     {
         if (!target)
             return
