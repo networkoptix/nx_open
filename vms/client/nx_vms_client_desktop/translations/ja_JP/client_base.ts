@@ -182,7 +182,7 @@
     </message>
     <message>
       <source>Web Page...</source>
-      <translation>ウェブページ...</translation>
+      <translation>Webページ...</translation>
     </message>
     <message>
       <source>New Layout...</source>
@@ -198,11 +198,11 @@
     </message>
     <message>
       <source>Web Client...</source>
-      <translation>ウェブクライアント...</translation>
+      <translation>Webクライアント...</translation>
     </message>
     <message>
       <source>Open Web Client...</source>
-      <translation>ウェブクライアントを開く...</translation>
+      <translation>Webクライアントを開く...</translation>
     </message>
     <message>
       <source>Save Current Layout</source>
@@ -469,7 +469,7 @@
     </message>
     <message>
       <source>Check File Watermark</source>
-      <translation>ファイルウォーターマーク確認</translation>
+      <translation>ファイルのウォーターマークを確認</translation>
     </message>
     <message>
       <source>Image Enhancement...</source>
@@ -617,7 +617,7 @@
     </message>
     <message>
       <source>Server Web Page...</source>
-      <translation>サーバーウェブページ...</translation>
+      <translation>サーバーWebページ...</translation>
     </message>
     <message>
       <source>Server Settings...</source>
@@ -901,7 +901,7 @@
     </message>
     <message>
       <source>Add Web Page...</source>
-      <translation>ウェブページを追加...</translation>
+      <translation>Webページを追加...</translation>
     </message>
     <message>
       <source>Show Servers</source>
@@ -967,7 +967,7 @@
     </message>
     <message>
       <source>Add Proxied Web Page...</source>
-      <translation>プロキシされたウェブページを追加...</translation>
+      <translation>プロキシされたWebページを追加...</translation>
     </message>
     <message>
       <source>Cell Spacing</source>
@@ -1698,7 +1698,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>This camera does not support advanced PTZ</source>
-      <translation>このカメラは高度なPTZをサポートしていません</translation>
+      <translation>このカメラはアドバンストPTZをサポートしていません</translation>
     </message>
     <message>
       <source>Zooming out...</source>
@@ -4020,7 +4020,7 @@ to %1</source>
     </message>
     <message>
       <source>Advanced</source>
-      <translation>アドバンス</translation>
+      <translation>上級設定</translation>
     </message>
     <message>
       <source>Settings file is read-only. Please contact your system administrator. All changes will be lost after program exit.</source>
@@ -4921,7 +4921,7 @@ to %1</source>
     </message>
     <message>
       <source>Server Web Page</source>
-      <translation>サーバーウェブページ...</translation>
+      <translation>サーバーWebページ</translation>
     </message>
     <message>
       <source>Plugins</source>
@@ -5463,7 +5463,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Advanced</source>
-      <translation>アドバンス</translation>
+      <translation>上級設定</translation>
     </message>
   </context>
   <context>
@@ -7646,7 +7646,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Web Page</source>
-      <translation>ウェブページ</translation>
+      <translation>Webページ</translation>
     </message>
     <message>
       <source>Expert</source>
@@ -7862,7 +7862,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>This web page is requesting access to your account for authorization</source>
-      <translation>このウェブページは認証のためにあなたのアカウントへのアクセスを要求しています</translation>
+      <translation>このWebページは、認証のためにあなたのアカウントへのアクセスを要求しています</translation>
     </message>
   </context>
   <context>
@@ -9814,27 +9814,27 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Web Page</source>
-      <translation>ウェブページ</translation>
+      <translation>Webページ</translation>
     </message>
     <message>
       <source>Add Proxied Web Page</source>
-      <translation>プロキシされたウェブページを追加</translation>
+      <translation>プロキシされたWebページの追加</translation>
     </message>
     <message>
       <source>Add Web Page</source>
-      <translation>ウェブページを追加</translation>
+      <translation>Webページの追加</translation>
     </message>
     <message>
       <source>Edit Proxied Web Page</source>
-      <translation>プロキシされたウェブページを編集</translation>
+      <translation>プロキシされたWebページの編集</translation>
     </message>
     <message>
       <source>Edit Web Page</source>
-      <translation>ウェブページの編集</translation>
+      <translation>Webページの編集</translation>
     </message>
     <message>
       <source>Turn on webpage proxy on &lt;b&gt;General&lt;/b&gt; tab.</source>
-      <translation>&lt;b&gt;一般&lt;/b&gt; タブでウェブページプロキシをオンにしてください。</translation>
+      <translation>&lt;b&gt;一般&lt;/b&gt; タブでWebページプロキシをオンにしてください。</translation>
     </message>
     <message>
       <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</source>
@@ -10205,7 +10205,7 @@ You can still change quality and FPS directly on the camera.</source>
     </message>
     <message>
       <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
-      <translation>透かし模様は、管理者以外のユーザーのライブ、アーカイブ、エクスポートされたビデオに表示されます。あなたや他の管理者が透かし模様を見ることはありません。</translation>
+      <translation>ウォーターマーク (透かし) は、管理者以外のユーザーのライブ、アーカイブ、エクスポート映像にのみ表示されます。あなたや他の管理者には表示されません。</translation>
     </message>
     <message>
       <source>Archive encryption password</source>
@@ -11187,7 +11187,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Web Pages</source>
-      <translation>ウェブページ</translation>
+      <translation>Webページ</translation>
     </message>
     <message>
       <source>Users</source>
@@ -11752,7 +11752,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Failed to open server web page</source>
-      <translation>サーバーの ウェブ ページを開くのに失敗しました</translation>
+      <translation>サーバーのWebページを開けませんでした</translation>
     </message>
     <message numerus="yes">
       <source>Failed to change password on %n cameras of %1</source>

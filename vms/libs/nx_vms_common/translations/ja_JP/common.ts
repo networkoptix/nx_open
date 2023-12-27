@@ -832,7 +832,7 @@
     </message>
     <message>
       <source>Watermark: %1</source>
-      <translation>透かし: %1</translation>
+      <translation>ウォーターマーク: %1</translation>
     </message>
     <message>
       <source>Hardware ID: %1</source>
@@ -1425,7 +1425,7 @@
     </message>
     <message>
       <source>Watermark settings</source>
-      <translation>透かし設定</translation>
+      <translation>ウォーターマーク設定</translation>
     </message>
     <message>
       <source>Authorization Session token lifetime (minutes)</source>

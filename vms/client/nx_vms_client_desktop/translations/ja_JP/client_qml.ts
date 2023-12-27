@@ -5,7 +5,7 @@
     <name>AdvancedUpdateSettings</name>
     <message>
       <source>Advanced Update Settings</source>
-      <translation>詳細設定</translation>
+      <translation>更新の詳細設定</translation>
     </message>
     <message>
       <source>Notifications</source>
@@ -897,7 +897,7 @@ PTZを行います</translation>
     </message>
     <message>
       <source>Click, double-click, or drag the mouse pointer while pressing the Shift key to use Advanced PTZ</source>
-      <translation>高度な PTZ を使用するには、Shift キーを押しながらマウスクリック、ダブルクリック、またはドラッグ操作を行います</translation>
+      <translation>アドバンストPTZ を使用するには、Shift キーを押しながらマウスクリック、ダブルクリック、またはドラッグ操作を行います</translation>
     </message>
     <message>
       <source>Go to Local Settings to enable a drag marker over the center of the video</source>
@@ -1008,7 +1008,7 @@ PTZを行います</translation>
     </message>
     <message>
       <source>Web Pages</source>
-      <translation>ウェブページ</translation>
+      <translation>Webページ</translation>
     </message>
     <message>
       <source>Users</source>
@@ -1360,7 +1360,7 @@ PTZを行います</translation>
     <name>WelcomeScreen</name>
     <message>
       <source>Official Website</source>
-      <translation>公式ウェブサイト</translation>
+      <translation>公式Webサイト</translation>
     </message>
     <message>
       <source>Help &amp; User Manual</source>
