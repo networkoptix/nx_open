@@ -506,7 +506,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(
         &QnMediaResourceWidget::updateWatermark);
 
     connect(this, &QnMediaResourceWidget::updateInfoTextLater, this,
-        &QnMediaResourceWidget::updateCurrentUtcPosMs);
+        &QnMediaResourceWidget::updateCurrentUtcPosMs, Qt::QueuedConnection);
 
     connect(layoutResource().get(),
         &LayoutResource::itemDataChanged,
