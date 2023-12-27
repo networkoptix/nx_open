@@ -72,7 +72,7 @@ Window
 
     Shortcut
     {
-        sequence: StandardKey.Cancel
+        sequences: [StandardKey.Cancel]
         onActivated: dialog.close()
     }
 
