@@ -71,6 +71,8 @@ using nx::vms::client::core::Geometry;
 
 namespace {
 
+static const QVector<QnTimeStep> kEmptySteps;
+
 /* Note that most numbers below are given relative to time slider size. */
 
 /* Tickmark bar. */
@@ -451,14 +453,14 @@ public:
         QnTimeSlider::createSteps(&m_absolute,& m_relative);
     }
 
-    const QVector<QnTimeStep>& absolute() const
+    const QVector<QnTimeStep>* absolute() const
     {
-        return m_absolute;
+        return &m_absolute;
     }
 
-    const QVector<QnTimeStep>& relative() const
+    const QVector<QnTimeStep>* relative() const
     {
-        return m_relative;
+        return &m_relative;
     }
 
 private:
@@ -590,6 +592,7 @@ QnTimeSlider::QnTimeSlider(
     m_selecting(false),
     m_lineCount(0),
     m_totalLineStretch(0.0),
+    m_steps(&kEmptySteps),
     m_maxStepIndex(0),
     m_msecsPerPixel(1.0),
     m_animationUpdateMSecsPerPixel(1.0),
@@ -1913,8 +1916,8 @@ workbench::timeline::TimeMarker::TimeContent QnTimeSlider::tooltipTimeContent(
     content.isTimestamp = isUtc;
     if (!isUtc)
         content.localFileLength = maximum();
-    content.showMilliseconds = m_steps[m_textMinStepIndex].unitMSecs == 1ms;
-    content.showDate = m_steps[m_textMinStepIndex].unitMSecs > 24h;
+    content.showMilliseconds = (*m_steps)[m_textMinStepIndex].unitMSecs == 1ms;
+    content.showDate = (*m_steps)[m_textMinStepIndex].unitMSecs > 24h;
     return content;
 }
 
@@ -1941,19 +1944,19 @@ void QnTimeSlider::updateSteps()
 {
     m_steps = m_options.testFlag(UseUTC) ? timeSteps()->absolute() : timeSteps()->relative();
 
-    m_nextTickmarkPos.resize(m_steps.size());
-    m_tickmarkLines.resize(m_steps.size());
-    m_stepData.resize(m_steps.size());
+    m_nextTickmarkPos.resize(m_steps->size());
+    m_tickmarkLines.resize(m_steps->size());
+    m_stepData.resize(m_steps->size());
 }
 
 void QnTimeSlider::updateTickmarkTextSteps()
 {
     // TODO: #sivanov This one is VERY slow right now.
 
-    for (int i = 0; i < m_steps.size(); i++)
+    for (int i = 0; i < m_steps->size(); i++)
     {
         static const int referenceHeight = kTickmarkFontHeights[0];
-        QString text = toLongestShortString(m_steps[i]);
+        QString text = toLongestShortString((*m_steps)[i]);
         QPixmap pixmap = m_pixmapCache->textPixmap(text, referenceHeight);
         m_stepData[i].textWidthToHeight = static_cast<qreal>(pixmap.width()) / referenceHeight;
     }
@@ -2078,7 +2081,7 @@ void QnTimeSlider::updateMinimalWindow()
 
 int QnTimeSlider::findTopLevelStepIndex() const
 {
-    int stepCount = m_steps.size();
+    int stepCount = m_steps->size();
     qreal width = rect().width();
 
     /* Detect which steps map into visible tickmark levels. */
@@ -2089,7 +2092,7 @@ int QnTimeSlider::findTopLevelStepIndex() const
     for (; minStepIndex >= 0; --minStepIndex)
     {
         /* Pixel distance between tickmarks of this level: */
-        qreal separationPixels = m_steps[minStepIndex].stepMSecs.count() / m_msecsPerPixel;
+        qreal separationPixels = (*m_steps)[minStepIndex].stepMSecs.count() / m_msecsPerPixel;
 
         /* Correct maxStepIndexLimit if needed: */
         if (separationPixels >= width)
@@ -2143,7 +2146,7 @@ void QnTimeSlider::updateStepAnimationTargets()
 {
     bool updateNeeded = (qAbs(m_msecsPerPixel - m_animationUpdateMSecsPerPixel)
         / qMin(m_msecsPerPixel, m_animationUpdateMSecsPerPixel)) > kPerPixelChangeThresholdMs;
-    if (!updateNeeded || m_steps.empty())
+    if (!updateNeeded || m_steps->empty())
         return;
 
     m_maxStepIndex = findTopLevelStepIndex();
@@ -2154,10 +2157,10 @@ void QnTimeSlider::updateStepAnimationTargets()
     int minLevelStepIndexMinusOne = qMax(0, m_maxStepIndex - kNumTickmarkLevels);
 
     int prevLevel = -1;
-    for (int i = m_steps.size() - 1; i >= minLevelStepIndexMinusOne; --i)
+    for (int i = m_steps->size() - 1; i >= minLevelStepIndexMinusOne; --i)
     {
         TimeStepData& data = m_stepData[i];
-        qreal separationPixels = m_steps[i].stepMSecs.count() / m_msecsPerPixel;
+        qreal separationPixels = (*m_steps)[i].stepMSecs.count() / m_msecsPerPixel;
 
         int level = tickmarkLevel(i);
         data.targetHeight = separationPixels >= kMinTickmarkLineStepPixels ? kTickmarkLengthPixels[level] : 0.0;
@@ -2186,7 +2189,7 @@ void QnTimeSlider::updateStepAnimationTargets()
         data.targetLineOpacity = qFuzzyIsNull(data.targetHeight) ? 0.0 : 1.0;
         if (prevTextVisible && data.targetTextOpacity == 0)
         {
-            m_textMinStepIndex = qMin(i + 1, m_steps.size() - 1);
+            m_textMinStepIndex = std::min<int>(i + 1, m_steps->size() - 1);
             updateToolTipText();
         }
         prevTextVisible = data.targetTextOpacity;
@@ -2214,7 +2217,7 @@ void QnTimeSlider::updateStepAnimationTargets()
 
 void QnTimeSlider::animateStepValues(int deltaMs)
 {
-    int stepCount = m_steps.size();
+    int stepCount = m_steps->size();
     for (int i = 0; i < stepCount; i++)
     {
         TimeStepData& data = m_stepData[i];
@@ -2279,7 +2282,7 @@ bool QnTimeSlider::animateThumbnail(qreal dt, ThumbnailData& data)
 
 void QnTimeSlider::updateAggregationValue()
 {
-    if (m_lineData.isEmpty())
+    if (m_lineData.empty())
         return;
 
     /* Aggregate to 1/16-pixels. */
@@ -2826,7 +2829,7 @@ void QnTimeSlider::drawSolidBackground(QPainter* painter, const QRectF& rect)
 
 void QnTimeSlider::drawTickmarks(QPainter* painter, const QRectF& rect)
 {
-    int stepCount = m_steps.size();
+    int stepCount = m_steps->size();
 
     /* Find minimal tickmark step index. */
     int minStepIndex = qMax(m_maxStepIndex - kNumTickmarkLevels, 0); /* min level step index minus one */
@@ -2846,7 +2849,7 @@ void QnTimeSlider::drawTickmarks(QPainter* painter, const QRectF& rect)
 
     /* Initialize next positions for tickmark steps. */
     for (int i = minStepIndex; i < stepCount; i++)
-        m_nextTickmarkPos[i] = milliseconds(roundUp(startPos, m_steps[i]));
+        m_nextTickmarkPos[i] = milliseconds(roundUp(startPos, (*m_steps)[i]));
 
     /* Draw tickmarks. */
     for (int i = 0; i < m_tickmarkLines.size(); i++)
@@ -2863,7 +2866,7 @@ void QnTimeSlider::drawTickmarks(QPainter* painter, const QRectF& rect)
         for (; index < stepCount; index++)
         {
             if (m_nextTickmarkPos[index] == pos)
-                m_nextTickmarkPos[index] = milliseconds(add(pos, m_steps[index]));
+                m_nextTickmarkPos[index] = milliseconds(add(pos, (*m_steps)[index]));
             else
                 break;
         }
@@ -2878,7 +2881,7 @@ void QnTimeSlider::drawTickmarks(QPainter* painter, const QRectF& rect)
         if (!qFuzzyIsNull(m_stepData[index].currentTextOpacity) && kTickmarkFontHeights[level])
         {
             QPixmap pixmap = m_pixmapCache->tickmarkTextPixmap(level, pos,
-                kTickmarkFontHeights[level], m_steps[index]);
+                kTickmarkFontHeights[level], (*m_steps)[index]);
             const auto pixmapSize = pixmap.size() / pixmap.devicePixelRatio();
             qreal topMargin = qFloor((kTickmarkTextHeightPixels[level] - pixmapSize.height()) * 0.5);
             QRectF textRect(x - pixmapSize.width() / 2.0, rect.top() + lineHeight + topMargin, pixmapSize.width(), pixmapSize.height());
@@ -2924,18 +2927,18 @@ void QnTimeSlider::drawDates(QPainter* painter, const QRectF& rect)
             return kDateBarBackgrounds[number % kDateBarBackgrounds.size()];
         };
 
-    int stepCount = m_steps.size();
+    int stepCount = m_steps->size();
 
     /* Find index of the highlight time step. */
     int highlightIndex = 0;
     qreal highlightSpanPixels = qMax(size().width() * kMinDateSpanFraction, kMinDateSpanPixels);
     for (; highlightIndex < stepCount; highlightIndex++)
-        if (!m_steps[highlightIndex].longFormat.isEmpty()
-            && m_steps[highlightIndex].stepMSecs.count() / m_msecsPerPixel >= highlightSpanPixels)
+        if (!(*m_steps)[highlightIndex].longFormat.isEmpty()
+            && (*m_steps)[highlightIndex].stepMSecs.count() / m_msecsPerPixel >= highlightSpanPixels)
                 break;
 
     highlightIndex = qMin(highlightIndex, stepCount - 1); //< TODO: #sivanov Remove this line.
-    const QnTimeStep& highlightStep = m_steps[highlightIndex];
+    const QnTimeStep& highlightStep = (*m_steps)[highlightIndex];
 
     qreal topMargin = qFloor((rect.height() - kDateTextFontHeight) * 0.5);
 
