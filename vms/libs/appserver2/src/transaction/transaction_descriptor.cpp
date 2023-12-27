@@ -1652,14 +1652,7 @@ struct ModifyResourceParamAccess
         const nx::vms::api::ResourceParamWithRefData& param)
     {
         const auto resPool = systemContext->resourcePool();
-        const auto camera = resPool->getResourceById<QnVirtualCameraResource>(param.resourceId);
-        if (!NX_ASSERT(camera))
-        {
-            return Result(ErrorCode::serverError, nx::format(ServerApiErrors::tr(
-                "Camera %1 does not exist."), param.resourceId));
-        }
-
-        QSet<QnUuid> newEngines = camera->calculateUserEnabledAnalyticsEngines(param.value);
+        QSet<QnUuid> newEngines = QnVirtualCameraResource::calculateUserEnabledAnalyticsEngines(param.value);
         nx::vms::common::saas::IntegrationServiceUsageHelper helper(systemContext);
         helper.proposeChange(param.resourceId, newEngines);
         if (helper.isOverflow())
