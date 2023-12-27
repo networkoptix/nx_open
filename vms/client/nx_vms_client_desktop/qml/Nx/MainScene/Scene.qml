@@ -31,9 +31,7 @@ Item
             rightMargin: 16
         }
         color: "#505050"
-        text: "Experimental: %1/%2"
-            .arg(LocalSettings.iniConfigValue("graphicsApi"))
-            .arg(LocalSettings.iniConfigValue("sceneRendering"))
+        text: "Experimental: %1".arg(LocalSettings.iniConfigValue("graphicsApi"))
         font.pixelSize: 20
     }
 
