@@ -129,10 +129,13 @@ struct ObjectTrack
     QnUuid deviceId;
 
     /**%apidoc
-     * %// TODO: #rvasilenko Rename to bestShotObjectTypeId when used for Best Shots.
+     * %// TODO: #rvasilenko Rename to bestShotObjectTypeId.
      */
     QString objectTypeId;
 
+    /**%apidoc
+     * %// TODO: #rvasilenko Rename to bestShotAttributes.
+     */
     nx::common::metadata::Attributes attributes;
 
     qint64 firstAppearanceTimeUs = 0;
