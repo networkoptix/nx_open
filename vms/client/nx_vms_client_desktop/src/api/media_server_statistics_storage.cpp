@@ -7,6 +7,7 @@
 #include <api/server_rest_connection.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/qt_helpers.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -46,9 +47,10 @@ QnMediaServerStatisticsStorage::~QnMediaServerStatisticsStorage()
     NX_VERBOSE(this, nx::format("Deleted for server %1.").arg(m_serverId));
 }
 
-void QnMediaServerStatisticsStorage::registerConsumer(QObject* target, const char* slot)
+void QnMediaServerStatisticsStorage::registerConsumer(
+    QObject* target, std::function<void()> callback)
 {
-    connect(this, SIGNAL(statisticsChanged()), target, slot);
+    connect(this, &QnMediaServerStatisticsStorage::statisticsChanged, target, callback);
     ++m_listeners;
     NX_VERBOSE(this, nx::format("Consumer added: 0x%1").arg((quint64) target, 0, 16));
 }
@@ -90,11 +92,10 @@ void QnMediaServerStatisticsStorage::setFlagsFilter(Qn::StatisticsDeviceType dev
 
 void QnMediaServerStatisticsStorage::update()
 {
-    NX_VERBOSE(this, "Update requested.");
-
     const auto server =
         resourcePool()->getResourceById<QnMediaServerResource>(m_serverId);
-    bool canRequest = connection()
+    auto api = connectedServerApi();
+    const bool canRequest = api
         && server
         && server->getStatus() == nx::vms::api::ResourceStatus::online;
 
@@ -114,22 +115,19 @@ void QnMediaServerStatisticsStorage::update()
     emit statisticsChanged();
 
     if (!m_listeners || !canRequest)
-    {
-        NX_VERBOSE(this, "Can't send request.");
         return;
-    }
 
     if (m_updateRequests == 0 || m_updateRequests * m_updatePeriod > kRetryTimeoutMs)
     {
-        m_updateRequestHandle = connectedServerApi()->getStatistics(
-            m_serverId,
+        auto callback = nx::utils::guarded(this,
             [this](bool success, rest::Handle handle, const nx::network::rest::JsonResult& result)
             {
                 handleStatisticsReply(success, handle, result);
-            },
-            thread());
+            });
+
+        m_updateRequestHandle = api->getStatistics(m_serverId, callback, thread());
         m_updateRequests = 0;
-        NX_VERBOSE(this, nx::format("Update requested. Handle: %1.").arg(m_updateRequestHandle));
+        NX_VERBOSE(this, "Update requested. Handle: %1.", m_updateRequestHandle);
     }
     ++m_updateRequests;
 }
@@ -137,7 +135,8 @@ void QnMediaServerStatisticsStorage::update()
 void QnMediaServerStatisticsStorage::handleStatisticsReply(
     bool success, rest::Handle handle, const nx::network::rest::JsonResult& result)
 {
-    NX_VERBOSE(this, nx::format("Reply received. Handle: %1, Status: %2.").args(handle, success));
+    NX_VERBOSE(this, "Reply received. Handle: %1, success: %2, code: %3, error: %4",
+        handle, success, result.error, result.errorString);
 
     if (handle != m_updateRequestHandle)
         return;
