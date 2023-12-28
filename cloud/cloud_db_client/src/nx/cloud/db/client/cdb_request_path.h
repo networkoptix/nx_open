@@ -15,7 +15,7 @@ static constexpr char kAccountSelfPath[] = "/cdb/account/self";
 static constexpr char kAccountStatusPath[] = "/cdb/account/{accountEmail}/status";
 
 static constexpr char kAccountSecuritySettingsPath[] = "/cdb/account/{accountEmail}/settings/security";
-static constexpr char kAccountForSharingPath[] = "/cdb/account/{accountEmail}/sharing-data";
+static constexpr char kAccountForSharingPath[] = "/cdb/internal/v0/account/{accountEmail}/sharing-data";
 
 static constexpr char kAccountEmailParam[] = "accountEmail";
 
