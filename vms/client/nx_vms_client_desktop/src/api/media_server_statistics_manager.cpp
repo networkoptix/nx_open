@@ -22,7 +22,7 @@ QnMediaServerStatisticsManager::QnMediaServerStatisticsManager(
 void QnMediaServerStatisticsManager::registerConsumer(
     const QnMediaServerResourcePtr& resource,
     QObject* target,
-    const char* slot)
+    std::function<void()> callback)
 {
     if (!NX_ASSERT(resource->systemContext() == systemContext()))
         return;
@@ -39,7 +39,7 @@ void QnMediaServerStatisticsManager::registerConsumer(
         for (Qn::StatisticsDeviceType key: m_flagsFilter.keys())
             m_statistics[id]->setFlagsFilter(key, m_flagsFilter[key]);
     }
-    m_statistics[id]->registerConsumer(target, slot);
+    m_statistics[id]->registerConsumer(target, callback);
 }
 
 void QnMediaServerStatisticsManager::unregisterConsumer(

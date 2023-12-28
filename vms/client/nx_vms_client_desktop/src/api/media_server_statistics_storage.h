@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <functional>
+
 #include <QtCore/QHash>
 #include <QtCore/QString>
 
@@ -18,7 +20,8 @@ namespace nx::network::rest { struct JsonResult; }
 /**
  * Class that receives, parses and stores statistics data from one server.
  */
-class QnMediaServerStatisticsStorage: public QObject,
+class QnMediaServerStatisticsStorage:
+    public QObject,
     public nx::vms::client::desktop::SystemContextAware
 {
     Q_OBJECT
@@ -38,7 +41,7 @@ public:
      * @param target An object to be notified about new data.
      * @param slot A slot to be called when new data is received.
      */
-    void registerConsumer(QObject* target, const char* slot);
+    void registerConsumer(QObject* target, std::function<void()> callback);
 
     /** Unregister a consumer object which was previously registered with registerConsumer(). */
     void unregisterConsumer(QObject* target);
@@ -57,7 +60,7 @@ signals:
     /** This signal is emitted when new data is received. */
     void statisticsChanged();
 
-private slots:
+private:
     /** Send update request to the server. */
     void update();
 
