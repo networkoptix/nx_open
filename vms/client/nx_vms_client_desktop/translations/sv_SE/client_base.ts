@@ -10234,6 +10234,14 @@ Du kan tvinga det, men det kan avsevärt öka CPU-belastning.</translation>
       <source>All Systems</source>
       <translation>Alla system</translation>
     </message>
+    <message>
+      <source>No new notifications</source>
+      <translation>Inga nya notifieringar</translation>
+    </message>
+    <message>
+      <source>Notifications Settings</source>
+      <translation>Meddelandeinställningar</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::OauthLoginPlaceholder</name>

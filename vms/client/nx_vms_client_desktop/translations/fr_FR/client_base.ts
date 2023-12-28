@@ -10234,6 +10234,14 @@ Vous pouvez le forcer, mais il peut augmenter significativement la charge du pro
       <source>All Systems</source>
       <translation>Tous les systèmes</translation>
     </message>
+    <message>
+      <source>No new notifications</source>
+      <translation>Aucune nouvelle notification</translation>
+    </message>
+    <message>
+      <source>Notifications Settings</source>
+      <translation>Paramètres des notifications</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::OauthLoginPlaceholder</name>

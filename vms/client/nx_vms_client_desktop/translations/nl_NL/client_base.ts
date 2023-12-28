@@ -10230,6 +10230,14 @@ Je kunt het forceren, maar het kan de CPU-belasting aanzienlijk verhogen.</trans
       <source>All Systems</source>
       <translation>Alle systemen</translation>
     </message>
+    <message>
+      <source>No new notifications</source>
+      <translation>Geen nieuwe meldingen</translation>
+    </message>
+    <message>
+      <source>Notifications Settings</source>
+      <translation>Notificatie instellingen</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::OauthLoginPlaceholder</name>

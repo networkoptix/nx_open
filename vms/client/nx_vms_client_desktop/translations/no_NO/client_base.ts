@@ -4509,12 +4509,12 @@ til %1</translation>
     <message>
       <source>User %1 has no %2 permissions for selected camera</source>
       <comment>%1 is the name of selected user, %2 is permission name</comment>
-      <translation type="unfinished">User %1 has no %2 permissions for selected camera</translation>
+      <translation>Bruker %1 har ingen %2 -tillatelser for valgt kamera</translation>
     </message>
     <message>
       <source>User %1 has no %2 permissions for some of selected cameras</source>
       <comment>%1 is the name of the selected user, %2 is the permission name</comment>
-      <translation type="unfinished">User %1 has no %2 permissions for some of selected cameras</translation>
+      <translation>Bruker %1 har ingen %2 tillatelser for noen av de valgte kameraene</translation>
     </message>
   </context>
   <context>
@@ -10232,6 +10232,14 @@ Du kan fremtvinge det, men det kan øke CPU-belastningen betydelig.</translation
     <message>
       <source>All Systems</source>
       <translation>Alle systemer</translation>
+    </message>
+    <message>
+      <source>No new notifications</source>
+      <translation>Ingen nye varsler</translation>
+    </message>
+    <message>
+      <source>Notifications Settings</source>
+      <translation>Varslingsinnstillinger</translation>
     </message>
   </context>
   <context>

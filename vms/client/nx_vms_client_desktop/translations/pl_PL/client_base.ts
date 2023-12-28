@@ -10537,6 +10537,14 @@ Możesz to wymusić, ale może to znacznie zwiększyć obciążenie procesora.</
       <source>All Systems</source>
       <translation>Wszystkie systemy</translation>
     </message>
+    <message>
+      <source>No new notifications</source>
+      <translation>Brak nowych powiadomień</translation>
+    </message>
+    <message>
+      <source>Notifications Settings</source>
+      <translation>Ustawienia powiadomień</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::OauthLoginPlaceholder</name>

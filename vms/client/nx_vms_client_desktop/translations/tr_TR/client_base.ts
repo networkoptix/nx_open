@@ -10227,6 +10227,14 @@ Zorlayabilirsiniz, ancak CPU yükünü önemli ölçüde artırabilir.</translat
       <source>All Systems</source>
       <translation>Tüm sistemler</translation>
     </message>
+    <message>
+      <source>No new notifications</source>
+      <translation>Yeni bildirim yok</translation>
+    </message>
+    <message>
+      <source>Notifications Settings</source>
+      <translation>Bildirim Ayarları</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::OauthLoginPlaceholder</name>

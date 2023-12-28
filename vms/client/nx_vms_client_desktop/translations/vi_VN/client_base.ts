@@ -10074,6 +10074,14 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
       <source>All Systems</source>
       <translation>Tất cả Hệ thống</translation>
     </message>
+    <message>
+      <source>No new notifications</source>
+      <translation>Không có thông báo mới</translation>
+    </message>
+    <message>
+      <source>Notifications Settings</source>
+      <translation>Cài đặt thông báo</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::OauthLoginPlaceholder</name>
