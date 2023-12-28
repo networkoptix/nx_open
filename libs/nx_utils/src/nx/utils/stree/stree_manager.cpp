@@ -33,7 +33,8 @@ std::unique_ptr<nx::utils::stree::AbstractNode> StreeManager::loadStree(const nx
     QXmlStreamReader reader(data.toRawByteArray());
     if (!nx::utils::parseXml(reader, xmlHandler))
     {
-        NX_WARNING(typeid(StreeManager), "Failed to parse stree xml: %1", reader.errorString());
+        NX_WARNING(typeid(StreeManager), "Failed to parse stree xml: %1. %2",
+            reader.errorString(), xmlHandler.errorString());
         return nullptr;
     }
 
