@@ -10233,6 +10233,14 @@ Du kan tvinge det, men det kan øge CPU-belastningen betydeligt.</translation>
       <source>All Systems</source>
       <translation>Alle systemer</translation>
     </message>
+    <message>
+      <source>No new notifications</source>
+      <translation type="unfinished">No new notifications</translation>
+    </message>
+    <message>
+      <source>Notifications Settings</source>
+      <translation>Notifikationsindstillinger</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::OauthLoginPlaceholder</name>

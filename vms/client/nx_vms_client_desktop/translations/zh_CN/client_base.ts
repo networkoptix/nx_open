@@ -10073,6 +10073,14 @@ You can force it, but it may significantly increase CPU load.</source>
       <source>All Systems</source>
       <translation>所有系统</translation>
     </message>
+    <message>
+      <source>No new notifications</source>
+      <translation>没有新通知</translation>
+    </message>
+    <message>
+      <source>Notifications Settings</source>
+      <translation>通知设置</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::OauthLoginPlaceholder</name>

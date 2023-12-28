@@ -10230,6 +10230,14 @@ Sie können es erzwingen, aber es kann die CPU-Last erheblich erhöhen.</transla
       <source>All Systems</source>
       <translation>Alle Systeme</translation>
     </message>
+    <message>
+      <source>No new notifications</source>
+      <translation>Keine neuen Benachrichtigungen</translation>
+    </message>
+    <message>
+      <source>Notifications Settings</source>
+      <translation>Benachrichtigungseinstellungen</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::OauthLoginPlaceholder</name>

@@ -10232,6 +10232,14 @@ Puede forzarlo, pero puede aumentar significativamente la carga de la CPU.</tran
       <source>All Systems</source>
       <translation>Todos los Sistemas</translation>
     </message>
+    <message>
+      <source>No new notifications</source>
+      <translation>No hay notificaciones nuevas</translation>
+    </message>
+    <message>
+      <source>Notifications Settings</source>
+      <translation>Configuración de notificaciones</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::OauthLoginPlaceholder</name>

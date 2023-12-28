@@ -10232,6 +10232,14 @@ You can force it, but it may significantly increase CPU load.</translation>
       <source>All Systems</source>
       <translation>Minden rendszer</translation>
     </message>
+    <message>
+      <source>No new notifications</source>
+      <translation>Nincs új értesítés</translation>
+    </message>
+    <message>
+      <source>Notifications Settings</source>
+      <translation type="unfinished">Notifications Settings</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::OauthLoginPlaceholder</name>

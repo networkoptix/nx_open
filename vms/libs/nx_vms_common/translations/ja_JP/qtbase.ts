@@ -262,7 +262,7 @@
     </message>
     <message>
       <source>A&amp;lpha channel:</source>
-      <translation>アルファチャネル(&amp;L):</translation>
+      <translation>アルファチャンネル (&amp;L):</translation>
     </message>
     <message>
       <source>&amp;HTML:</source>

@@ -10541,6 +10541,14 @@ You can force it, but it may significantly increase CPU load.</translation>
       <source>All Systems</source>
       <translation>כל המערכות</translation>
     </message>
+    <message>
+      <source>No new notifications</source>
+      <translation>אין התראות חדשות</translation>
+    </message>
+    <message>
+      <source>Notifications Settings</source>
+      <translation type="unfinished">Notifications Settings</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::OauthLoginPlaceholder</name>

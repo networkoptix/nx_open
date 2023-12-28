@@ -1115,7 +1115,7 @@
     </message>
     <message>
       <source>Number of deactivations exceeded limit for this license.</source>
-      <translation>非アクティブの数がこのライセンスの上限を超えました</translation>
+      <translation>このライセンスの無効化回数が上限に達しました。</translation>
     </message>
     <message>
       <source>Hardware ID of Server with this license does not match Hardware ID on which license was activated.</source>
@@ -1515,7 +1515,7 @@ License Key: %2</source>
     <message numerus="yes">
       <source>%n channels.</source>
       <translation>
-        <numerusform>%nチャンネル</numerusform>
+        <numerusform>%n チャンネル。</numerusform>
       </translation>
     </message>
     <message>
@@ -5941,7 +5941,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Activate License...</source>
-      <translation>ライセンスを有効化...</translation>
+      <translation>ライセンスの有効化...</translation>
     </message>
     <message>
       <source>To add Video Wall, SaaS should be in active state. %1</source>
@@ -9245,7 +9245,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message numerus="yes">
       <source>%n channels.</source>
       <translation>
-        <numerusform>%nチャンネル</numerusform>
+        <numerusform>%n チャンネル。</numerusform>
       </translation>
     </message>
     <message>
@@ -10074,6 +10074,14 @@ You can force it, but it may significantly increase CPU load.</source>
     <message>
       <source>All Systems</source>
       <translation>すべてのシステム</translation>
+    </message>
+    <message>
+      <source>No new notifications</source>
+      <translation>新しい通知はありません</translation>
+    </message>
+    <message>
+      <source>Notifications Settings</source>
+      <translation>通知設定</translation>
     </message>
   </context>
   <context>
