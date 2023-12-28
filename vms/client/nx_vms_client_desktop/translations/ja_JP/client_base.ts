@@ -1066,7 +1066,7 @@
     </message>
     <message>
       <source>Number of deactivations exceeded limit for this license.</source>
-      <translation>非アクティブの数がこのライセンスの上限を超えました</translation>
+      <translation>このライセンスの無効化回数が上限に達しました。</translation>
     </message>
     <message>
       <source>Hardware ID of Server with this license does not match Hardware ID on which license was activated.</source>
@@ -1394,7 +1394,7 @@ License Key: %2</source>
     <message numerus="yes">
       <source>%n channels.</source>
       <translation>
-        <numerusform>%nチャンネル</numerusform>
+        <numerusform>%n チャンネル。</numerusform>
       </translation>
     </message>
     <message>
@@ -3944,7 +3944,7 @@ to %1</source>
     <message numerus="yes">
       <source>%n channels.</source>
       <translation>
-        <numerusform>%nチャンネル</numerusform>
+        <numerusform>%n チャンネル。</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -6255,7 +6255,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Activate License...</source>
-      <translation>ライセンスを有効化...</translation>
+      <translation>ライセンスの有効化...</translation>
     </message>
   </context>
   <context>
