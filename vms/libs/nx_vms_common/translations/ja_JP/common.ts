@@ -824,7 +824,7 @@
     </message>
     <message>
       <source>FREE License</source>
-      <translation>無償ライセンス</translation>
+      <translation>無料ライセンス</translation>
     </message>
     <message>
       <source>Licensed To: %1</source>

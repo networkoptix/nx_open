@@ -1772,7 +1772,7 @@
     </message>
     <message>
       <source>Activate Free License</source>
-      <translation>無料ライセンスの有効化</translation>
+      <translation>無料ライセンスを有効化</translation>
     </message>
     <message>
       <source>Activate License</source>
