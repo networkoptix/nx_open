@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <functional>
+
 #include <QtCore/QHash>
 #include <QtCore/QString>
 
@@ -41,7 +43,8 @@ public:
      * \param target            Object that will be notified about new data.
      * \param slot              Slot that will be called when new data will be received.
      */
-    void registerConsumer(const QnMediaServerResourcePtr &resource, QObject *target, const char *slot);
+    void registerConsumer(
+        const QnMediaServerResourcePtr &resource, QObject *target, std::function<void()> callback);
 
     /**
      *  Unregister the consumer object.
