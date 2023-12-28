@@ -23,6 +23,8 @@ Connection::Connection(
     m_twoFactorAuthManager(&m_requestExecutor),
     m_batchUserProcessingManager(&m_requestExecutor)
 {
+    m_requestExecutor.setCacheEnabled(true);
+
     bindToAioThread(m_requestExecutor.getAioThread());
 }
 
@@ -115,6 +117,11 @@ void Connection::ping(
         kPingPath,
         {}, //query
         std::move(completionHandler));
+}
+
+void Connection::setCacheEnabled(bool enabled)
+{
+    m_requestExecutor.setCacheEnabled(enabled);
 }
 
 } // namespace nx::cloud::db::client

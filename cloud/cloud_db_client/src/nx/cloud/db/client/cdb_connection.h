@@ -52,6 +52,13 @@ public:
     virtual void ping(
         std::function<void(api::ResultCode, api::ModuleInfo)> completionHandler) override;
 
+    /**
+     * Set caching GET reply on/off. Caching is done through saving a reply identified by server
+     * by ETag header value. See GenericApiClient::setCacheEnabled for more details.
+     * Enabled by default.
+     */
+    void setCacheEnabled(bool enabled);
+
 private:
     ApiRequestsExecutor m_requestExecutor;
     AccountManager m_accountManager;
