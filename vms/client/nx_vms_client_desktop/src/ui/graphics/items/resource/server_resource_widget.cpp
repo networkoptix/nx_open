@@ -51,14 +51,16 @@ namespace {
     }
 
     /** Create path for the chart */
-    QPainterPath createChartPath(const QList<qreal> &values, qreal x_step, qreal scale, qreal elapsedStep, qreal *currentValue) {
+    QPainterPath createChartPath(
+        const QList<qreal> &values, qreal x_step, qreal scale, qreal elapsedStep, qreal *currentValue)
+    {
         QPainterPath path;
         qreal maxValue = -1;
         qreal lastValue = 0;
         const qreal x_step2 = x_step*.5;
 
-        qreal x1, y1;
-        x1 = -x_step * elapsedStep;
+        qreal x1 = -x_step * elapsedStep;
+        qreal y1 = 0.0;
 
         qreal baseAngle = elapsedStep >= 0.5
             ? radiansToDegrees(qAcos(2 * (1 - elapsedStep)))
@@ -162,7 +164,7 @@ namespace {
 
     const char *legendKeyPropertyName = "_qn_legendKey";
 
-} // anonymous namespace
+} // namespace
 
 // -------------------------------------------------------------------------- //
 // LegendButtonWidget
@@ -449,7 +451,7 @@ QnServerResourceWidget::QnServerResourceWidget(
     m_manager->setFlagsFilter(
         Qn::StatisticsNETWORK, appContext()->localSettings()->statisticsNetworkFilter());
     m_pointsLimit = QnMediaServerStatisticsManager::kPointsLimit;
-    m_manager->registerConsumer(m_resource, this, SLOT(at_statistics_received()));
+    m_manager->registerConsumer(m_resource, this, [this] { at_statistics_received(); });
     m_updatePeriod = m_manager->updatePeriod(m_resource);
     setOption(QnResourceWidget::WindowRotationForbidden);
 
