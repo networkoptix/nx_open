@@ -270,12 +270,13 @@ typename Model::DbUpdateTypes toDbTypes(Model model)
 template <typename Model>
 std::vector<Model> fromDbTypes(typename Model::DbListTypes all)
 {
+    // TODO: #skolesnik Move to/use nx utils.
     const auto binaryFind =
         [](auto& container, const Model& model)
         {
             using result_type = typename std::decay_t<decltype(container)>::value_type*;
             auto found = std::lower_bound(container.begin(), container.end(), model, lessById);
-            if (found != container.end())
+            if (found != container.end() && !(lessById(model, *found)))
                 return result_type(&*found);
 
             return result_type(nullptr);
