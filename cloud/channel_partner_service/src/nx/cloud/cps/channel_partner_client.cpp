@@ -126,4 +126,16 @@ void ChannelPartnerClient::getUserSystems(
         std::move(handler));
 }
 
+void ChannelPartnerClient::getOrganization(
+    const std::string& organizationId,
+    nx::utils::MoveOnlyFunc<void(api::Result, api::Organization)> handler)
+{
+    base_type::template makeAsyncCall<api::Organization>(
+        nx::network::http::Method::get,
+        nx::network::http::rest::substituteParameters(
+            api::kOrganizationPath, {organizationId}),
+        {}, // query
+        std::move(handler));
+}
+
 } // namespace nx::cloud::cps

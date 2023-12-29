@@ -5,6 +5,7 @@
 namespace nx::cloud::cps::api {
 
 static constexpr char kSystemBindToOrganizationPath[] = "/partners/api/v2/cloud_systems/";
+
 static constexpr char kUnbindSystemFromOrganizationPath[] =
     "/partners/api/v2/cloud_systems/{systemId}";
 
@@ -16,5 +17,7 @@ static constexpr char kInternalSystemUserPath[] =
 
 static constexpr char kInternalUserSystemsPath[] =
     "/partners/api/v2/internal/users/{email}/systems";
+
+static constexpr char kOrganizationPath[] = "/partners/api/v2/organizations/{organizationId}/";
 
 } // namespace nx::cloud::cps::api
