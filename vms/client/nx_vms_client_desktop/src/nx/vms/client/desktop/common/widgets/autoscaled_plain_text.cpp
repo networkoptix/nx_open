@@ -85,15 +85,18 @@ public:
             {
                 /* Do some sensible addition to font weight: */
                 int weight = m_effectiveFont.weight() + static_cast<int>(
-                    (QFont::Bold - QFont::Normal) * (factor - 1.0));
+                    (QFont::Normal - QFont::Light) * (factor - 1.0));
 
                 // These have changed in the past so be careful.
                 static_assert(QFont::Thin == 100 && QFont::Normal == 400
-                    && QFont ::Bold == 700 && QFont::Black == 900);
+                    && QFont::Bold == 700 && QFont::Black == 900);
                 constexpr int kMinQFontWeight = 1;
                 constexpr int kMaxQFontWeight = 1'000;
 
-                weight = qBound(kMinQFontWeight, weight, kMaxQFontWeight);
+                // Do not allow normal text to become bold.
+                int maxWeight = m_effectiveFont.weight() > QFont::Normal ? kMaxQFontWeight : QFont::Normal;
+
+                weight = qBound(kMinQFontWeight, weight, maxWeight);
                 m_effectiveFont.setWeight((QFont::Weight) weight);
             }
         }
