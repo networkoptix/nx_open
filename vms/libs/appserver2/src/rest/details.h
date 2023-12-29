@@ -14,32 +14,6 @@ MEMBER_CHECKER(kResourceTypeId);
 MEMBER_CHECKER(id);
 #undef MEMBER_CHECKER
 
-template<typename F, typename... Args, size_t... Is>
-auto callQueryFuncImpl(const std::tuple<Args...>& t, F&& f, std::index_sequence<Is...>)
-{
-    return std::make_tuple(f(std::get<Is>(t))...);
-}
-
-template<typename F, typename... Args>
-auto callQueryFunc(const std::tuple<Args...>& t, F&& f)
-{
-    return callQueryFuncImpl(t, std::forward<F>(f), std::make_index_sequence<sizeof...(Args)>{});
-}
-
-template<typename F, typename... Args, size_t... Is>
-Result callUpdateFuncImpl(const std::tuple<Args...>& t, F&& f, std::index_sequence<Is...>)
-{
-    Result result;
-    (... && (result = f(std::get<Is>(t))));
-    return result;
-}
-
-template<typename F, typename... Args>
-Result callUpdateFunc(const std::tuple<Args...>& t, F&& f)
-{
-    return callUpdateFuncImpl(t, std::forward<F>(f), std::make_index_sequence<sizeof...(Args)>{});
-}
-
 template<typename Data, typename Functor>
 auto invokeOnVector(Data&& data, Functor&& functor)
 {
