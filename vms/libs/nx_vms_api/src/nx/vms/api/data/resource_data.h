@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <unordered_map>
+
 #include <QtCore/QJsonValue>
 #include <QtCore/QString>
 
@@ -96,6 +98,10 @@ struct NX_VMS_API ResourceParamWithRefData: ResourceParamData
 };
 #define ResourceParamWithRefData_Fields ResourceParamData_Fields (resourceId)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(ResourceParamWithRefData)
+
+// This can and should be done by QueryProcessor.
+std::unordered_map<QnUuid, std::vector<ResourceParamData>> NX_VMS_API toParameterMap(
+    std::vector<ResourceParamWithRefData> parametersWithIds);
 
 struct NX_VMS_API ResourceWithParameters
 {

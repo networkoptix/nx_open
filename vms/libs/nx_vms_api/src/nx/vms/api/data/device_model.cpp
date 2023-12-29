@@ -158,7 +158,6 @@ void moveFieldsToParameters(DeviceModelV3* m)
     }
 }
 
-
 struct LessById
 {
     template <typename L, typename R>
@@ -167,32 +166,6 @@ struct LessById
         return lhs.getId() < rhs.getId();
     }
 } constexpr lessById{};
-
-// This can and should be done by QueryProcessor.
-std::unordered_map<QnUuid, std::vector<ResourceParamData>> toResourceMap(
-    std::vector<ResourceParamWithRefData> resourcesWithIds)
-{
-    std::unordered_map<QnUuid, std::vector<ResourceParamData>> result;
-    std::sort(resourcesWithIds.begin(), resourcesWithIds.end(), lessById);
-
-    for (auto l = resourcesWithIds.begin(); l != resourcesWithIds.end();)
-    {
-        auto r = l;
-        while (r != resourcesWithIds.end() && r->getId() == l->getId())
-            ++r;
-
-        auto& resources = result[l->getId()];
-        resources.reserve(std::distance(l, r));
-        std::transform(std::make_move_iterator(l),
-            std::make_move_iterator(r),
-            std::back_inserter(resources),
-            [](ResourceParamWithRefData data) -> ResourceParamData { return std::move(data); });
-
-        l = r;
-    }
-
-    return result;
-}
 
 template<typename Model>
 std::vector<Model> fromCameras(std::vector<CameraData> cameras)
@@ -270,27 +243,27 @@ typename Model::DbUpdateTypes toDbTypes(Model model)
 template <typename Model>
 std::vector<Model> fromDbTypes(typename Model::DbListTypes all)
 {
-    // TODO: #skolesnik Move to/use nx utils.
     const auto binaryFind =
-        [](auto& container, const Model& model)
+        [](auto& container, const auto& model)
         {
-            using result_type = typename std::decay_t<decltype(container)>::value_type*;
-            auto found = std::lower_bound(container.begin(), container.end(), model, lessById);
-            if (found != container.end() && !(lessById(model, *found)))
-                return result_type(&*found);
-
-            return result_type(nullptr);
+            return nx::utils::binary_find(container, model, lessById);
         };
+
+    // Ignore Clang-Tidy warnings about `'all' is used after being moved`.
+    // To move an element from `std::tuple`, a specific overload`T&& std::get(tuple&&)`
+    // must be selected.
+    // `std::move(all)` casts to rvalue-reference.
+    // `std::get` moves only the requested element.
 
     // This all can be done by the QueryProcessor or the CrudHandler.
     auto statuses = nx::utils::unique_sorted(
-        std::move(std::get<std::vector<ResourceStatusData>>(all)), lessById);
+        std::get<std::vector<ResourceStatusData>>(std::move(all)), lessById);
     auto attributes = nx::utils::unique_sorted(
-        std::move(std::get<std::vector<CameraAttributesData>>(all)), lessById);
-    std::unordered_map<QnUuid, std::vector<ResourceParamData>> resources =
-        toResourceMap(std::move(std::get<std::vector<ResourceParamWithRefData>>(all)));
+        std::get<std::vector<CameraAttributesData>>(std::move(all)), lessById);
+    std::unordered_map<QnUuid, std::vector<ResourceParamData>> parameters =
+        toParameterMap(std::get<std::vector<ResourceParamWithRefData>>(std::move(all)));
     auto devices = fromCameras<Model>(
-        nx::utils::unique_sorted(std::move(std::get<std::vector<CameraData>>(all)), lessById));
+        nx::utils::unique_sorted(std::get<std::vector<CameraData>>(std::move(all)), lessById));
 
     for (Model& m: devices)
     {
@@ -344,12 +317,12 @@ std::vector<Model> fromDbTypes(typename Model::DbListTypes all)
         else
             m.status = ResourceStatus::offline;
 
-        if (auto f = resources.find(m.id); f != resources.cend())
+        if (auto f = parameters.find(m.id); f != parameters.cend())
         {
             for (ResourceParamData& r: f->second)
                 static_cast<ResourceWithParameters&>(m).setFromParameter(r);
 
-            resources.erase(f);
+            parameters.erase(f);
         }
 
         extractParametersToFields(&m);

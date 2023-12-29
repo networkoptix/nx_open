@@ -81,6 +81,33 @@ std::optional<QJsonValue> ResourceWithParameters::parameter(const QString& key) 
     return std::nullopt;
 }
 
+std::unordered_map<QnUuid, std::vector<ResourceParamData>> toParameterMap(
+    std::vector<ResourceParamWithRefData> parametersWithIds)
+{
+    std::unordered_map<QnUuid, std::vector<ResourceParamData>> result;
+    std::sort(parametersWithIds.begin(),
+        parametersWithIds.end(),
+        [](const auto& lhs, const auto& rhs) { return lhs.getId() < rhs.getId(); });
+
+    for (auto l = parametersWithIds.begin(); l != parametersWithIds.end();)
+    {
+        auto r = l;
+        while (r != parametersWithIds.end() && r->getId() == l->getId())
+            ++r;
+
+        auto& resources = result[l->getId()];
+        resources.reserve(std::distance(l, r));
+        std::transform(std::make_move_iterator(l),
+            std::make_move_iterator(r),
+            std::back_inserter(resources),
+            [](ResourceParamWithRefData data) -> ResourceParamData { return std::move(data); });
+
+        l = r;
+    }
+
+    return result;
+}
+
 } // namespace api
 } // namespace vms
 } // namespace nx

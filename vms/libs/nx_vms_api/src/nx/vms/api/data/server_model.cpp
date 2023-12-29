@@ -2,10 +2,62 @@
 
 #include "server_model.h"
 
+#include <set>
+
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/std/algorithm.h>
 
 namespace nx::vms::api {
+
+namespace {
+
+struct LessById
+{
+    using is_transparent = std::true_type;
+
+    template<typename L, typename R>
+    bool operator()(const L& lhs, const R& rhs) const
+    {
+        return lhs.getId() < rhs.getId();
+    }
+} constexpr lessById{};
+
+std::vector<ServerModel> fromServerData(std::vector<MediaServerData> dataList)
+{
+    using namespace nx::utils;
+
+    std::vector<ServerModel> result;
+    result.reserve(dataList.size());
+
+    for (auto&& d: dataList)
+    {
+        using namespace nx::utils;
+
+        // Don't mind Clang-Tidy: `emplace_back` will not compile.
+        result.push_back({.id = d.id,
+            .name = std::move(d.name),
+            .url = std::move(d.url),
+            .version = std::move(d.version),
+            .endpoints =
+                [&]() -> std::vector<QString>
+                {
+                    if (d.networkAddresses.isEmpty())
+                        return {};
+
+                    auto s = d.networkAddresses.split(';');
+                    return {std::make_move_iterator(s.begin()), std::make_move_iterator(s.end())};
+                }(),
+            .authKey = std::move(d.authKey),
+            .osInfo =
+                !d.osInfo.isEmpty() ? std::optional{OsInfo::fromString(d.osInfo)} : std::nullopt,
+            .flags = d.flags,
+            .status = ResourceStatus::undefined});
+    }
+
+    return result;
+}
+
+} // namespace
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ServerModel, (json), ServerModel_Fields)
 
@@ -29,80 +81,96 @@ ServerModel::DbUpdateTypes ServerModel::toDbTypes() &&
     MediaServerUserAttributesData attributesData;
     attributesData.serverId = mainData.id;
     attributesData.serverName = mainData.name;
-    attributesData.maxCameras = maxCameras.value_or(0);
+    attributesData.maxCameras = maxCameras;
     attributesData.allowAutoRedundancy = isFailoverEnabled;
     attributesData.backupBitrateBytesPerSecond = backupBitrateBytesPerSecond;
     attributesData.locationId = locationId;
 
     attributesData.checkResourceExists = CheckResourceExists::no;
 
-    std::optional<ResourceStatusData> statusData;
-    if (status)
-        statusData = ResourceStatusData(mainData.id, *status);
-
     auto parameters = asList(mainData.id);
     return {
         std::move(mainData),
         std::move(attributesData),
-        std::move(statusData),
         std::move(parameters),
     };
 }
 
 std::vector<ServerModel> ServerModel::fromDbTypes(DbListTypes all)
 {
-    auto& allAttributes = std::get<MediaServerUserAttributesDataList>(all);
-    auto& allStatuses = std::get<ResourceStatusDataList>(all);
-    auto& allStorages = std::get<StorageDataList>(all);
-    return ResourceWithParameters::fillListFromDbTypes<ServerModel, MediaServerData>(
-        &all,
-        [&allAttributes, &allStatuses, &allStorages](MediaServerData data)
+    const auto binaryFind =
+        [](auto& container, const auto& model)
         {
-            ServerModel model;
-            model.id = std::move(data.id);
-            model.name = std::move(data.name);
-            model.url = std::move(data.url);
-            model.version = std::move(data.version);
-            if (!data.networkAddresses.isEmpty())
-            {
-                for (const auto& endpoint: data.networkAddresses.split(QChar(';')))
-                    model.endpoints.push_back(endpoint);
-            }
-            if (!data.osInfo.isEmpty())
-                model.osInfo = nx::utils::OsInfo::fromString(data.osInfo);
-            model.flags = std::move(data.flags);
-            model.authKey = std::move(data.authKey);
+            return nx::utils::binary_find(container, model, lessById);
+        };
 
-            if (auto attrs = nx::utils::find_if(
-                allAttributes, [id = model.getId()](const auto& a) { return a.serverId == id; }))
-            {
-                if (!attrs->serverName.isEmpty())
-                    model.name = std::move(attrs->serverName);
-                if (attrs->maxCameras)
-                    model.maxCameras = attrs->maxCameras;
-                model.isFailoverEnabled = attrs->allowAutoRedundancy;
-                model.backupBitrateBytesPerSecond = attrs->backupBitrateBytesPerSecond;
-                model.locationId = attrs->locationId;
-            }
+    // Ignore Clang-Tidy warnings about `'all' is used after being moved`.
+    // To move an element from `std::tuple`, a specific overload`T&& std::get(tuple&&)`
+    // must be selected.
+    // `std::move(all)` casts to rvalue-reference.
+    // `std::get` moves only the requested element.
 
-            const auto status = nx::utils::find_if(
-                allStatuses, [id = model.getId()](const auto& s) { return s.id == id; });
-            model.status = status ? status->status : ResourceStatus::offline;
+    std::vector<ServerModel> servers = fromServerData(nx::utils::unique_sorted(
+        std::get<std::vector<MediaServerData>>(std::move(all)), lessById));
 
-            nx::utils::erase_if(
-                allStorages,
-                [&model](const auto& storage)
-                {
-                    if (storage.parentId != model.getId())
-                        return false;
-                    if (!model.storages)
-                        model.storages = std::vector<StorageModel>();
-                    model.storages->push_back(StorageModel::fromDb(storage));
-                    return true;
-                });
+    // This all can be done by the QueryProcessor or the CrudHandler.
+    auto attributes = nx::utils::unique_sorted(
+        std::get<std::vector<MediaServerUserAttributesData>>(std::move(all)), lessById);
+    auto statuses = nx::utils::unique_sorted(
+        std::get<std::vector<ResourceStatusData>>(std::move(all)), lessById);
+    std::unordered_map<QnUuid, std::vector<ResourceParamData>> parameters =
+        toParameterMap(std::get<std::vector<ResourceParamWithRefData>>(std::move(all)));
+    auto storages =
+        [](std::vector<StorageData> list)
+        {
+            std::multiset<StorageData, LessById> result;
+            for (auto&& s: list)
+                result.insert(std::move(s));
+            return result;
+        }(std::get<std::vector<StorageData>>(std::move(all)));
 
-            return model;
-        });
+    for (ServerModel& s: servers)
+    {
+        if (auto a = binaryFind(attributes, s))
+        {
+            // Override, if user has specified an alias
+            s.name = !a->serverName.isEmpty()
+                ? std::move(a->serverName)
+                : std::move(s.name);
+
+            // Default initialization for `ServerModel::maxCameras` is `0`.
+            // No need to check for `0` for the attribute.
+            s.maxCameras = a->maxCameras;
+            s.isFailoverEnabled = a->allowAutoRedundancy;
+            s.backupBitrateBytesPerSecond = a->backupBitrateBytesPerSecond;
+            s.locationId = a->locationId;
+        }
+
+        // `status` should not be nullable in the DB and this check should be an assertion
+        if (auto status = binaryFind(statuses, s))
+            s.status = status->status;
+        else
+            s.status = ResourceStatus::offline;
+
+        if (auto f = parameters.find(s.id); f != parameters.cend())
+        {
+            for (ResourceParamData& r: f->second)
+                static_cast<ResourceWithParameters&>(s).setFromParameter(r);
+
+            parameters.erase(f);
+        }
+
+        {
+            const auto [begin, end] = storages.equal_range(s);
+            s.storages.reserve(std::distance(begin, end));
+            std::transform(std::make_move_iterator(begin),
+                std::make_move_iterator(end),
+                std::back_inserter(s.storages),
+                [](StorageData d) -> StorageModel { return StorageModel::fromDb(std::move(d)); });
+        }
+    }
+
+    return servers;
 }
 
 } // namespace nx::vms::api
