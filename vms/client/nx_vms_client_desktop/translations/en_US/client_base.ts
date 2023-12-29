@@ -2056,7 +2056,7 @@ License Key: %2</source>
 <context>
     <name>QnAttachToVideowallDialog</name>
     <message>
-        <source>%1. To attach to Video Wall, SaaS must be in active state. %2</source>
+        <source>System shut down. To attach to a Video Wall, the System should be in active state. %1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5029,11 +5029,7 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>SAAS SHUT DOWN</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>NO CONNECTION TO THE LICENSE SERVER</source>
+        <source>SYSTEM SHUT DOWN</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6004,10 +6000,6 @@ We recommend you not to open this integration. If you understand the risks, you 
         <source>Activate License...</source>
         <translation></translation>
     </message>
-    <message>
-        <source>To add Video Wall, SaaS should be in active state. %1</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message numerus="yes">
         <source>Failed to open %n devices on the video wall:</source>
         <translation>
@@ -6035,6 +6027,14 @@ We recommend you not to open this integration. If you understand the risks, you 
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <source>System shut down</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To add a Video Wall, the System should be in active state. %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7352,11 +7352,19 @@ We recommend you not to open this integration. If you understand the risks, you 
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>To perform backup to the cloud storage SaaS must be in active state. %1</source>
+        <source>– Applies to all servers</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>– Applies to all servers</source>
+        <source>System shut down</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To perform backup to a cloud storage, the System should be in active state. %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System suspended. To make changes to backup configuration, the System should be in active state. %1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
