@@ -29,6 +29,34 @@ ForwardIt binary_find(ForwardIt first, ForwardIt last, const T& value, Compare c
     return last;
 }
 
+template <typename Container, typename T>
+typename Container::value_type* binary_find(const Container& c, const T& value)
+{
+    const auto it = binary_find(c.begin(), c.end(), value);
+    return it != c.end() ? &*it : nullptr;
+}
+
+template <typename Container, typename T>
+typename Container::value_type* binary_find(Container& c, const T& value)
+{
+    const auto it = binary_find(c.begin(), c.end(), value);
+    return it != c.end() ? &*it : nullptr;
+}
+
+template <typename Container, typename T, typename Compare>
+typename Container::value_type* binary_find(const Container& c, const T& value, Compare comp)
+{
+    const auto it = binary_find(c.begin(), c.end(), value, comp);
+    return it != c.end() ? &*it : nullptr;
+}
+
+template <typename Container, typename T, typename Compare>
+typename Container::value_type* binary_find(Container& c, const T& value, Compare comp)
+{
+    const auto it = binary_find(c.begin(), c.end(), value, comp);
+    return it != c.end() ? &*it : nullptr;
+}
+
 /**
  * Elements from [first, last) range matching p are moved to outFirst.
  * And such element cell is moved to the end of [first, last) range.
