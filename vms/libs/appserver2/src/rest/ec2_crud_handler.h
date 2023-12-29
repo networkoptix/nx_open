@@ -8,6 +8,8 @@
 #include <database/db_manager.h>
 #include <nx/network/rest/params.h>
 #include <nx/network/rest/request.h>
+#include <nx/utils/elapsed_timer.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/vms/ec2/ec_connection_notification_manager.h>
 #include <transaction/transaction.h>
 
@@ -48,8 +50,10 @@ public:
         auto processor = m_queryProcessor->getAccess(request.userSession);
         validateType(processor, filter, m_objectType);
 
-        auto query =
-            [id = std::move(filter.getId()), &processor](auto&& x)
+        // `std::type_identity` (or similar) can be used to pass the read type info and avoid
+        // useless `readType` object instantiation.
+        const auto query =
+            [id = filter.getId(), &processor](const auto& readType)
             {
                 using Arg = std::decay_t<decltype(x)>;
                 using Output = std::conditional_t<nx::utils::IsVector<Arg>::value, Arg, std::vector<Arg>>;
@@ -65,6 +69,7 @@ public:
             };
         if constexpr (fromDbTypesExists<Model>::value)
         {
+            const auto logGuard = logTime("Query and Convert from DB types");
             return Model::fromDbTypes(
                 callQueryFunc(typename Model::DbReadTypes(), std::move(query)));
         }
@@ -226,6 +231,15 @@ private:
                     SubscriptionHandler::notify(nx::toString(id), NotifyType::update, {});
                 }
                 return true;
+            });
+    }
+
+    nx::utils::Guard logTime(const char* label) const
+    {
+        return nx::utils::Guard(
+            [this, label, timer = nx::utils::ElapsedTimer(nx::utils::ElapsedTimerState::started)]
+            {
+                NX_VERBOSE(this, "`%1` in `%2`", label, timer.elapsed());
             });
     }
 
