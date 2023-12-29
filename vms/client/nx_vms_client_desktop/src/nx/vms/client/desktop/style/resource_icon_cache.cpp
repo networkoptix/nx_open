@@ -101,6 +101,7 @@ Key calculateStatus(Key key, const QnResourcePtr& resource)
 
     switch (resource->getStatus())
     {
+        case nx::vms::api::ResourceStatus::recording:
         case nx::vms::api::ResourceStatus::online:
         {
             if (key == Key::Server && isCurrentlyConnectedServer(resource))
