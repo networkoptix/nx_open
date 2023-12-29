@@ -55,27 +55,45 @@ public:
         const auto query =
             [id = filter.getId(), &processor](const auto& readType)
             {
-                using Arg = std::decay_t<decltype(x)>;
+                using Arg = std::decay_t<decltype(readType)>;
                 using Output = std::conditional_t<nx::utils::IsVector<Arg>::value, Arg, std::vector<Arg>>;
-                auto future = processor.template processQueryAsync<decltype(id), Output>(
+                return processor.template processQueryAsync<decltype(id), Output>(
                     getReadCommand<Output>(),
                     std::move(id),
                     std::make_pair<Result, Output>);
+            };
+
+        const auto readFuture =
+            [](auto future)
+            {
                 future.waitForFinished();
                 auto [result, output] = future.resultAt(0);
                 if (!result)
                     throwError(std::move(result));
                 return output;
             };
+
         if constexpr (fromDbTypesExists<Model>::value)
         {
             const auto logGuard = logTime("Query and Convert from DB types");
+
+            auto futures = std::apply(
+                [&](const auto&... readTypes)
+                {
+                    return std::make_tuple(query(readTypes)...);
+                },
+                typename Model::DbReadTypes());
             return Model::fromDbTypes(
-                callQueryFunc(typename Model::DbReadTypes(), std::move(query)));
+                std::apply(
+                    [readFuture](auto&&... futures) -> typename Model::DbListTypes
+                    {
+                        return {readFuture(std::forward<decltype(futures)>(futures))...};
+                    },
+                    std::move(futures)));
         }
         else
         {
-            return query(Model());
+            return readFuture(query(Model()));
         }
     }
 
@@ -114,7 +132,7 @@ public:
             validateResourceTypeId(mainDbItem);
 
             using IgnoredDbType = std::decay_t<decltype(mainDbItem)>;
-            auto update =
+            const auto update =
                 [id = data.getId()](auto&& x, auto& copy, auto* list)
                 {
                     using DbType = std::decay_t<decltype(x)>;
@@ -140,17 +158,25 @@ public:
             processor.processCustomUpdateAsync(
                 ApiCommand::CompositeSave,
                 [&promise](Result result) { promise.set_value(std::move(result)); },
-                [update = std::move(update), items = std::move(items)](auto& copy, auto* list)
+                [update, items = std::move(items)](auto& copy, auto* list)
                 {
-                    return callUpdateFunc(
-                        std::move(items),
-                        [update = std::move(update), &copy, list](auto&& x) mutable
+                    const auto updateItem =
+                        [update, &copy, list](auto&& item) -> Result
                         {
-                            if constexpr (nx::utils::IsOptional<std::decay_t<decltype(x)>>::value)
-                                return x ? update(std::move(*x), copy, list) : Result();
+                            if constexpr (nx::utils::IsOptional<std::decay_t<decltype(item)>>::value)
+                                return item ? update(std::move(*item), copy, list) : Result();
                             else
-                                return update(std::move(x), copy, list);
-                        });
+                                return update(std::move(item), copy, list);
+                        };
+
+                    return std::apply(
+                        [updateItem](auto&&... items) -> Result
+                        {
+                            Result result{};
+                            (... && (result = updateItem(std::forward<decltype(items)>(items))));
+                            return result;
+                        },
+                        std::move(items));
                 });
         }
         else
