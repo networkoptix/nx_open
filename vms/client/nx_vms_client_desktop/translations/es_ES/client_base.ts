@@ -7468,11 +7468,11 @@ We recommend you not to open this integration. If you understand the risks, you 
     <name>nx::vms::client::desktop::CameraButtonController</name>
     <message>
       <source>Mute</source>
-      <translation type="unfinished">Mute</translation>
+      <translation>Silenciar</translation>
     </message>
     <message>
       <source>Unmute</source>
-      <translation type="unfinished">Unmute</translation>
+      <translation>Activar sonido</translation>
     </message>
     <message>
       <source>Heater</source>
@@ -7484,7 +7484,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Open Door</source>
-      <translation type="unfinished">Open Door</translation>
+      <translation>Abrir Puerta</translation>
     </message>
   </context>
   <context>

@@ -1985,7 +1985,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Strict</source>
-      <translation type="unfinished">Strict</translation>
+      <translation>เข้มงวด</translation>
     </message>
     <message>
       <source>May lead to privacy issues</source>
