@@ -35,8 +35,8 @@ public:
     void setAlignment(Qt::Alignment alignment);
 
     /** If weightScaled is false, effective font always has the same weight as font.
-    * If weightScaled is true (default), the more downscaled effective font is,
-    * the more weight it gains (25 QFont::weight points per 2x downscale): */
+     * If weightScaled is true (default), the more downscaled effective font is,
+     * the more weight it gains (100 QFont::weight points per 2x downscale): */
     bool weightScaled() const; //< if font weight is inversely scaled with font size
     void setWeightScaled(bool value);
 
