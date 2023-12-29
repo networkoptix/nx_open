@@ -86,12 +86,17 @@ struct NX_VMS_API ServerModel: ResourceWithParameters
 
     /**%apidoc[opt] */
     bool isFailoverEnabled = false;
-    std::optional<int> maxCameras = 0;
+
+    /**%apidoc[opt] */
+    int maxCameras = 0;
 
     BackupBitrateBytesPerSecond backupBitrateBytesPerSecond;
 
-    std::optional<ResourceStatus> status;
-    std::optional<std::vector<StorageModel>> storages;
+    /**%apidoc[readonly] */
+    ResourceStatus status = ResourceStatus::undefined;
+
+    /**%apidoc[readonly] */
+    std::vector<StorageModel> storages;
 
     using DbReadTypes = std::tuple<
         MediaServerData,
@@ -103,7 +108,6 @@ struct NX_VMS_API ServerModel: ResourceWithParameters
     using DbUpdateTypes = std::tuple<
         MediaServerData,
         std::optional<MediaServerUserAttributesData>,
-        std::optional<ResourceStatusData>,
         ResourceParamWithRefDataList>;
 
     using DbListTypes = std::tuple<
