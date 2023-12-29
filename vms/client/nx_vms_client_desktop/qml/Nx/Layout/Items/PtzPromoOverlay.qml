@@ -16,10 +16,19 @@ Control
 
     background: null
 
+    property bool currentShowBasics: false
+    property bool currentShowTargetLock: false
+
     signal closeRequested()
 
     function setPagesVisibility(showBasics: bool, showTargetLock: bool)
     {
+        if (currentShowBasics == showBasics && currentShowTargetLock == showTargetLock)
+            return
+
+        currentShowBasics = showBasics
+        currentShowTargetLock = showTargetLock
+
         pagesRepeater.model = null
 
         pagesModel.clear()
