@@ -272,7 +272,7 @@ void DeviceAgent::eventThreadLoop()
             std::unique_lock<std::mutex> lock(m_eventThreadMutex);
             if (m_terminated)
                 break;
-            static const seconds kEventGenerationPeriod{3};
+            static const milliseconds kEventGenerationPeriod{500};
             m_eventThreadCondition.wait_for(lock, kEventGenerationPeriod);
         }
     }
