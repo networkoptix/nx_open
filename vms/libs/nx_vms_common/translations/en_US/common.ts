@@ -1343,26 +1343,6 @@
 <context>
     <name>StringsHelper</name>
     <message>
-        <source>SaaS uninitialized</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>SaaS active</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>SaaS suspended</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>SaaS shut down</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>SaaS shut down automatically</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Contact your channel partner for details.</source>
         <translation type="unfinished"></translation>
     </message>
