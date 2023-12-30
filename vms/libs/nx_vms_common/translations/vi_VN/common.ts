@@ -1287,26 +1287,6 @@
   <context>
     <name>StringsHelper</name>
     <message>
-      <source>SaaS uninitialized</source>
-      <translation>SaaS chưa được khởi tạo</translation>
-    </message>
-    <message>
-      <source>SaaS active</source>
-      <translation>SaaS đang hoạt động</translation>
-    </message>
-    <message>
-      <source>SaaS suspended</source>
-      <translation>SaaS bị đình chỉ</translation>
-    </message>
-    <message>
-      <source>SaaS shut down</source>
-      <translation>SaaS ngừng hoạt động</translation>
-    </message>
-    <message>
-      <source>SaaS shut down automatically</source>
-      <translation>SaaS tự động tắt</translation>
-    </message>
-    <message>
       <source>Contact your channel partner for details.</source>
       <translation>Hãy liên hệ với đối tác của bạn để biết chi tiết.</translation>
     </message>

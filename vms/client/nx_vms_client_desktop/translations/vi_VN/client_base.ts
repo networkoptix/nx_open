@@ -2039,8 +2039,8 @@ Khóa giấy phép: %2</translation>
   <context>
     <name>QnAttachToVideowallDialog</name>
     <message>
-      <source>%1. To attach to Video Wall, SaaS must be in active state. %2</source>
-      <translation>%1. Để gắn vào Tường video, SaaS phải ở trạng thái hoạt động. %2</translation>
+      <source>System shut down. To attach to a Video Wall, the System should be in active state. %1</source>
+      <translation type="unfinished">System shut down. To attach to a Video Wall, the System should be in active state. %1</translation>
     </message>
   </context>
   <context>
@@ -4966,12 +4966,8 @@ to %1</source>
       <translation>KHÔNG CÓ QUYỀN XUẤT VIDEO</translation>
     </message>
     <message>
-      <source>SAAS SHUT DOWN</source>
-      <translation>SAAS ĐÃ BỊ TẮT</translation>
-    </message>
-    <message>
-      <source>NO CONNECTION TO THE LICENSE SERVER</source>
-      <translation>KHÔNG KẾT NỐI VỚI MÁY CHỦ CẤP PHÉP</translation>
+      <source>SYSTEM SHUT DOWN</source>
+      <translation type="unfinished">SYSTEM SHUT DOWN</translation>
     </message>
   </context>
   <context>
@@ -5943,10 +5939,6 @@ Chúng tôi khuyên bạn không nên mở tích hợp này. Nếu bạn hiểu 
       <source>Activate License...</source>
       <translation>Kích hoạt Giấy phép...</translation>
     </message>
-    <message>
-      <source>To add Video Wall, SaaS should be in active state. %1</source>
-      <translation>Để thêm Tường Video, SaaS phải ở trạng thái hoạt động. %1</translation>
-    </message>
     <message numerus="yes">
       <source>Failed to open %n devices on the video wall:</source>
       <translation type="unfinished">
@@ -5970,6 +5962,14 @@ Chúng tôi khuyên bạn không nên mở tích hợp này. Nếu bạn hiểu 
       <translation type="unfinished">
         <numerusform>You cannot add to the video wall cameras for which you do not have View Live permission.</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>System shut down</source>
+      <translation>Hệ thống tắt</translation>
+    </message>
+    <message>
+      <source>To add a Video Wall, the System should be in active state. %1</source>
+      <translation type="unfinished">To add a Video Wall, the System should be in active state. %1</translation>
     </message>
   </context>
   <context>
@@ -7240,12 +7240,20 @@ Chúng tôi khuyên bạn không nên mở tích hợp này. Nếu bạn hiểu 
       <translation>Cài đặt sao lưu không có sẵn</translation>
     </message>
     <message>
-      <source>To perform backup to the cloud storage SaaS must be in active state. %1</source>
-      <translation>Để thực hiện sao lưu vào bộ lưu trữ đám mây, SaaS phải ở trạng thái hoạt động. %1</translation>
-    </message>
-    <message>
       <source>– Applies to all servers</source>
       <translation>– Áp dụng cho tất cả các máy chủ</translation>
+    </message>
+    <message>
+      <source>System shut down</source>
+      <translation>Hệ thống tắt</translation>
+    </message>
+    <message>
+      <source>To perform backup to a cloud storage, the System should be in active state. %1</source>
+      <translation type="unfinished">To perform backup to a cloud storage, the System should be in active state. %1</translation>
+    </message>
+    <message>
+      <source>System suspended. To make changes to backup configuration, the System should be in active state. %1</source>
+      <translation type="unfinished">System suspended. To make changes to backup configuration, the System should be in active state. %1</translation>
     </message>
   </context>
   <context>

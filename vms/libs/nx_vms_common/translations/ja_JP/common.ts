@@ -1287,26 +1287,6 @@
   <context>
     <name>StringsHelper</name>
     <message>
-      <source>SaaS uninitialized</source>
-      <translation>SaaS が初期化されていません</translation>
-    </message>
-    <message>
-      <source>SaaS active</source>
-      <translation>SaaS がアクティブです</translation>
-    </message>
-    <message>
-      <source>SaaS suspended</source>
-      <translation>SaaS は一時停止されました</translation>
-    </message>
-    <message>
-      <source>SaaS shut down</source>
-      <translation>SaaS はシャットダウンしました</translation>
-    </message>
-    <message>
-      <source>SaaS shut down automatically</source>
-      <translation>SaaS は自動的にシャットダウンしました</translation>
-    </message>
-    <message>
       <source>Contact your channel partner for details.</source>
       <translation>詳細については、チャネルパートナーにお問い合わせください。</translation>
     </message>

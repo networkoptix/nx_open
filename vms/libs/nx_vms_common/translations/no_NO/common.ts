@@ -1343,26 +1343,6 @@
   <context>
     <name>StringsHelper</name>
     <message>
-      <source>SaaS uninitialized</source>
-      <translation>SaaS uinitialisert</translation>
-    </message>
-    <message>
-      <source>SaaS active</source>
-      <translation>SaaS aktiv</translation>
-    </message>
-    <message>
-      <source>SaaS suspended</source>
-      <translation>SaaS suspendert</translation>
-    </message>
-    <message>
-      <source>SaaS shut down</source>
-      <translation>SaaS avsluttet</translation>
-    </message>
-    <message>
-      <source>SaaS shut down automatically</source>
-      <translation>SaaS avsluttes automatisk</translation>
-    </message>
-    <message>
       <source>Contact your channel partner for details.</source>
       <translation>Kontakt kanalpartneren din for detaljer.</translation>
     </message>
