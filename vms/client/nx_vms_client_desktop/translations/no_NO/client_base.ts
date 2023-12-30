@@ -2057,8 +2057,8 @@ Lisensnøkkel: %2</translation>
   <context>
     <name>QnAttachToVideowallDialog</name>
     <message>
-      <source>%1. To attach to Video Wall, SaaS must be in active state. %2</source>
-      <translation>%1. For å koble til Video Wall, må SaaS være i aktiv tilstand. %2</translation>
+      <source>System shut down. To attach to a Video Wall, the System should be in active state. %1</source>
+      <translation type="unfinished">System shut down. To attach to a Video Wall, the System should be in active state. %1</translation>
     </message>
   </context>
   <context>
@@ -5035,12 +5035,8 @@ til %1</translation>
       <translation type="unfinished">NO EXPORT PERMISSION</translation>
     </message>
     <message>
-      <source>SAAS SHUT DOWN</source>
-      <translation type="unfinished">SAAS SHUT DOWN</translation>
-    </message>
-    <message>
-      <source>NO CONNECTION TO THE LICENSE SERVER</source>
-      <translation type="unfinished">NO CONNECTION TO THE LICENSE SERVER</translation>
+      <source>SYSTEM SHUT DOWN</source>
+      <translation type="unfinished">SYSTEM SHUT DOWN</translation>
     </message>
   </context>
   <context>
@@ -6016,10 +6012,6 @@ Vi anbefaler at du ikke åpner denne integrasjonen. Hvis du forstår risikoen, k
       <source>Activate License...</source>
       <translation>Aktiver lisens...</translation>
     </message>
-    <message>
-      <source>To add Video Wall, SaaS should be in active state. %1</source>
-      <translation type="unfinished">To add Video Wall, SaaS should be in active state. %1</translation>
-    </message>
     <message numerus="yes">
       <source>Failed to open %n devices on the video wall:</source>
       <translation>
@@ -6047,6 +6039,14 @@ Vi anbefaler at du ikke åpner denne integrasjonen. Hvis du forstår risikoen, k
         <numerusform>Du kan ikke legge til kameraer på videoveggen du ikke har View Live-tillatelse til.</numerusform>
         <numerusform>Du kan ikke legge til kameraer på videoveggen du ikke har View Live-tillatelse til.</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>System shut down</source>
+      <translation type="unfinished">System shut down</translation>
+    </message>
+    <message>
+      <source>To add a Video Wall, the System should be in active state. %1</source>
+      <translation type="unfinished">To add a Video Wall, the System should be in active state. %1</translation>
     </message>
   </context>
   <context>
@@ -7364,12 +7364,20 @@ Vi anbefaler at du ikke åpner denne integrasjonen. Hvis du forstår risikoen, k
       <translation type="unfinished">Backup settings are not available</translation>
     </message>
     <message>
-      <source>To perform backup to the cloud storage SaaS must be in active state. %1</source>
-      <translation type="unfinished">To perform backup to the cloud storage SaaS must be in active state. %1</translation>
-    </message>
-    <message>
       <source>– Applies to all servers</source>
       <translation>– Gjelder alle servere</translation>
+    </message>
+    <message>
+      <source>System shut down</source>
+      <translation type="unfinished">System shut down</translation>
+    </message>
+    <message>
+      <source>To perform backup to a cloud storage, the System should be in active state. %1</source>
+      <translation type="unfinished">To perform backup to a cloud storage, the System should be in active state. %1</translation>
+    </message>
+    <message>
+      <source>System suspended. To make changes to backup configuration, the System should be in active state. %1</source>
+      <translation type="unfinished">System suspended. To make changes to backup configuration, the System should be in active state. %1</translation>
     </message>
   </context>
   <context>

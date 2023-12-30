@@ -1343,26 +1343,6 @@
   <context>
     <name>StringsHelper</name>
     <message>
-      <source>SaaS uninitialized</source>
-      <translation>SaaS başlatılmamış</translation>
-    </message>
-    <message>
-      <source>SaaS active</source>
-      <translation>SaaS aktif</translation>
-    </message>
-    <message>
-      <source>SaaS suspended</source>
-      <translation>SaaS askıya alındı</translation>
-    </message>
-    <message>
-      <source>SaaS shut down</source>
-      <translation>SaaS kapatıldı</translation>
-    </message>
-    <message>
-      <source>SaaS shut down automatically</source>
-      <translation>SaaS otomatik olarak kapanıyor</translation>
-    </message>
-    <message>
       <source>Contact your channel partner for details.</source>
       <translation>Ayrıntılar için kanal ortağınızla iletişime geçin.</translation>
     </message>

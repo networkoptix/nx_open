@@ -2057,8 +2057,8 @@ Licensnyckel: %2</translation>
   <context>
     <name>QnAttachToVideowallDialog</name>
     <message>
-      <source>%1. To attach to Video Wall, SaaS must be in active state. %2</source>
-      <translation>%1. För att ansluta till videovägg måste SaaS vara i aktivt tillstånd. %2</translation>
+      <source>System shut down. To attach to a Video Wall, the System should be in active state. %1</source>
+      <translation>Systemet stängs av. För att ansluta till en videovägg bör systemet vara i aktivt tillstånd. %1</translation>
     </message>
   </context>
   <context>
@@ -5035,12 +5035,8 @@ till %1</translation>
       <translation>INGET EXPORTTILLSTÅND</translation>
     </message>
     <message>
-      <source>SAAS SHUT DOWN</source>
-      <translation>SAAS STÄNGDE NED</translation>
-    </message>
-    <message>
-      <source>NO CONNECTION TO THE LICENSE SERVER</source>
-      <translation>INGEN ANSLUTNING TILL LICENSSERVERN</translation>
+      <source>SYSTEM SHUT DOWN</source>
+      <translation>SYSTEM STÄNGS NER</translation>
     </message>
   </context>
   <context>
@@ -6017,10 +6013,6 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
       <source>Activate License...</source>
       <translation>Aktivera licens...</translation>
     </message>
-    <message>
-      <source>To add Video Wall, SaaS should be in active state. %1</source>
-      <translation>För att lägga till videovägg bör SaaS vara i aktivt tillstånd. %1</translation>
-    </message>
     <message numerus="yes">
       <source>Failed to open %n devices on the video wall:</source>
       <translation>
@@ -6048,6 +6040,14 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
         <numerusform>Du kan inte lägga till kameror på videoväggen som du inte har View Live-behörighet för.</numerusform>
         <numerusform>Du kan inte lägga till kameror på videoväggen som du inte har View Live-behörighet för.</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>System shut down</source>
+      <translation>Systemet stängs av</translation>
+    </message>
+    <message>
+      <source>To add a Video Wall, the System should be in active state. %1</source>
+      <translation>För att lägga till en videovägg måste systemet vara i aktivt tillstånd. %1</translation>
     </message>
   </context>
   <context>
@@ -7365,12 +7365,20 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
       <translation>Säkerhetskopieringsinställningar är inte tillgängliga</translation>
     </message>
     <message>
-      <source>To perform backup to the cloud storage SaaS must be in active state. %1</source>
-      <translation>För att kunna utföra säkerhetskopiering till molnlagring måste SaaS vara i aktivt skick. %1</translation>
-    </message>
-    <message>
       <source>– Applies to all servers</source>
       <translation>– Gäller för alla servrar</translation>
+    </message>
+    <message>
+      <source>System shut down</source>
+      <translation>System avstängt</translation>
+    </message>
+    <message>
+      <source>To perform backup to a cloud storage, the System should be in active state. %1</source>
+      <translation>För att säkerhetskopiera till en molnlagring bör systemet vara i aktivt tillstånd. %1</translation>
+    </message>
+    <message>
+      <source>System suspended. To make changes to backup configuration, the System should be in active state. %1</source>
+      <translation>Systemet är avstängt. För att göra ändringar i säkerhetskopieringskonfigurationen bör systemet vara i aktivt tillstånd. %1</translation>
     </message>
   </context>
   <context>
