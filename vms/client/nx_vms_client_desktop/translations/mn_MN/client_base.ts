@@ -231,7 +231,7 @@
     </message>
     <message>
       <source>Go to Fullscreen</source>
-      <translation type="unfinished">Go to Fullscreen</translation>
+      <translation>Дэлгэцийг томруулах</translation>
     </message>
     <message>
       <source>Exit Fullscreen</source>
