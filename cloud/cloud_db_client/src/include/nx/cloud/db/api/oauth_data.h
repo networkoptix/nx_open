@@ -3,8 +3,8 @@
 #pragma once
 
 #include <chrono>
-#include <optional>
 #include <map>
+#include <optional>
 #include <string>
 
 #include <nx/reflect/instrument.h>
@@ -79,6 +79,9 @@ struct TokenInfo
      * authorization code).
      */
     std::string scope;
+
+    /**%apidoc A session is identified by a refresh token. It is used to track 2fa state.*/
+    std::string session;
 };
 
 struct IssueTokenResponse: public TokenInfo
