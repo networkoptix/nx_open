@@ -18,7 +18,7 @@ Item
     id: analyticsSettings
 
     property var store: null
-    property var engineLicenseSummaryProvider: store && store.engineLicenseSummaryProvider()
+    property var engineLicenseSummaryProvider: store && store.makeEngineLicenseSummaryProvider()
     property var saasServiceManager: store && store.saasServiceManager()
     property alias viewModel: viewModel
 

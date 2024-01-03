@@ -12,13 +12,11 @@
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/desktop/analytics/analytics_actions_helper.h>
 #include <nx/vms/client/desktop/analytics/analytics_engines_watcher.h>
-#include <nx/vms/client/desktop/common/utils/engine_license_summary_provider.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/utils/qml_property.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/common/resource/analytics_plugin_resource.h>
-#include <nx/vms/common/saas/saas_service_manager.h>
 
 using namespace nx::vms::common;
 
@@ -404,17 +402,22 @@ bool AnalyticsSettingsStore::isNetworkRequestRunning() const
 ApiIntegrationRequestsModel*
     AnalyticsSettingsStore::makeApiIntegrationRequestsModel() const
 {
-    return ini().enableMetadataApi
-        ? new ApiIntegrationRequestsModel(systemContext(), /*parent*/ m_parent)
-        : nullptr;
+    if (!ini().enableMetadataApi)
+        return nullptr;
+
+    auto requestsModel = new ApiIntegrationRequestsModel(systemContext(), m_parent);
+    QQmlEngine::setObjectOwnership(requestsModel, QQmlEngine::CppOwnership);
+    return requestsModel;
 }
 
-QObject* AnalyticsSettingsStore::engineLicenseSummaryProvider() const
+EngineLicenseSummaryProvider* AnalyticsSettingsStore::makeEngineLicenseSummaryProvider() const
 {
-    return new EngineLicenseSummaryProvider(systemContext(), m_parent);
+    auto licenseProvider = new EngineLicenseSummaryProvider(systemContext(), m_parent);
+    QQmlEngine::setObjectOwnership(licenseProvider, QQmlEngine::CppOwnership);
+    return licenseProvider;
 }
 
-QObject* AnalyticsSettingsStore::saasServiceManager() const
+saas::ServiceManager* AnalyticsSettingsStore::saasServiceManager() const
 {
     saas::ServiceManager* saasServiceManager = systemContext()->saasServiceManager();
     QQmlEngine::setObjectOwnership(saasServiceManager, QQmlEngine::CppOwnership);

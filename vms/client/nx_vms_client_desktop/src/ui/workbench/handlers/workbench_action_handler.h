@@ -305,7 +305,7 @@ private:
     QPointer<AdvancedUpdateSettingsDialog> m_advancedUpdateSettingsDialog;
     QPointer<AdvancedSearchDialog> m_advancedSearchDialog;
     QPointer<rules::RulesDialog> m_rulesDialog;
-    QPointer<IntegrationsDialog> m_integrationsDialog;
+    std::unique_ptr<IntegrationsDialog> m_integrationsDialog;
     std::unique_ptr<experimental::MainWindow> m_mainWindow;
 
     QQueue<QnMediaResourcePtr> m_layoutExportResources;
