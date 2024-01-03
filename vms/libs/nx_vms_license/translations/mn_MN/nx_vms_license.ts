@@ -36,7 +36,7 @@
     <name>nx::vms::license::Validator</name>
     <message>
       <source>Invalid signature</source>
-      <translation type="unfinished">Invalid signature</translation>
+      <translation>Гарын үсэг буруу</translation>
     </message>
     <message>
       <source>Server with matching Hardware ID not found</source>
