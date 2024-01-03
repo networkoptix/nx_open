@@ -302,7 +302,7 @@ NX_REFLECTION_INSTRUMENT(SaasSecurity, SaasSecurity_fields)
 /**%apidoc SaasData from license server */
 struct NX_VMS_API SaasData
 {
-    /**%apidoc Cloud system Id */
+    /**%apidoc Cloud Site Id */
     QnUuid cloudSystemId;
 
     /**%apidoc Channel partner information */

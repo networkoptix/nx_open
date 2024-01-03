@@ -11,13 +11,13 @@
 
 namespace nx::vms::api {
 
-NX_REFLECTION_ENUM_CLASS(SystemCloudService,
+NX_REFLECTION_ENUM_CLASS(CloudService,
 
     /**%apidoc[unused] */
     all,
 
     /**%apidoc
-     * Fetch information about Cloud users, System name, 2FA enabled.
+     * Sync information with Cloud about Cloud users, attributes, settings.
      */
     cdb,
 
@@ -32,16 +32,16 @@ NX_REFLECTION_ENUM_CLASS(SystemCloudService,
     css
 );
 
-struct NX_VMS_API SystemCloudSyncRequest
+struct NX_VMS_API CloudSyncRequest
 {
-    SystemCloudService service = SystemCloudService::all;
+    CloudService service = CloudService::all;
 
     /**%apidoc[opt] Wait until the data is processed. */
     bool waitForDone = false;
 };
-#define SystemCloudSyncRequest_Fields (waitForDone)
-NX_REFLECTION_INSTRUMENT(SystemCloudSyncRequest, SystemCloudSyncRequest_Fields)
-QN_FUSION_DECLARE_FUNCTIONS(SystemCloudSyncRequest, (json), NX_VMS_API)
+#define CloudSyncRequest_Fields (waitForDone)
+NX_REFLECTION_INSTRUMENT(CloudSyncRequest, CloudSyncRequest_Fields)
+QN_FUSION_DECLARE_FUNCTIONS(CloudSyncRequest, (json), NX_VMS_API)
 
 struct NX_VMS_API CloudPullingStatus
 {

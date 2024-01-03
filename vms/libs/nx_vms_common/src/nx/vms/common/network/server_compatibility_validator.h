@@ -14,7 +14,7 @@ class QnCommonModule;
 namespace nx::vms::api {
 
 struct ModuleInformation;
-struct SystemInformation;
+struct SiteInformation;
 
 } // namespace nx::vms::api
 
@@ -72,7 +72,7 @@ public:
     static bool isInitialized();
 
     static std::optional<Reason> check(
-        const nx::vms::api::SystemInformation& systemInformation,
+        const nx::vms::api::SiteInformation& siteInformation,
         Purpose purpose = Purpose::connect);
 
     static std::optional<Reason> check(
@@ -80,7 +80,7 @@ public:
         Purpose purpose = Purpose::connect);
 
     static bool isCompatible(
-        const nx::vms::api::SystemInformation& systemInformation,
+        const nx::vms::api::SiteInformation& siteInformation,
         Purpose purpose = Purpose::connect);
 
     static bool isCompatible(

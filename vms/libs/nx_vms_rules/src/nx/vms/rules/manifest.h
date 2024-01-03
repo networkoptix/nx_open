@@ -110,8 +110,8 @@ struct ItemDescriptor
     QString emailTemplatePath; // TODO: #mmalofeev split ItemDescriptor to EventDescriptior and ActionDescriptor.
 
     /**%apidoc[opt]
-     * Required Server flags on at least one Server in the System to be able
-     * to deal with such an event or action.
+     * Required Server flags on at least one Server of the merged ones to deal with such an event
+     * or action.
      */
     vms::api::ServerFlags serverFlags;
 };

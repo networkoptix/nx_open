@@ -121,7 +121,7 @@ struct NX_VMS_API LdapSettings
     std::chrono::seconds continuousSyncIntervalS = 1h;
 
     /**%apidoc[opt]
-     * Preferred Server in the System that will be used to execute synchronization with the LDAP
+     * Preferred Server in the Site that will be used to execute synchronization with the LDAP
      * Server if it is online and has connection with the LDAP Server.
      */
     QnUuid preferredMasterSyncServer;

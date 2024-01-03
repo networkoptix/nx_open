@@ -28,7 +28,7 @@
 #include <nx/vms/api/data/merge_status_reply.h>
 #include <nx/vms/api/data/module_information.h>
 #include <nx/vms/api/data/resource_data.h>
-#include <nx/vms/api/data/system_merge_data.h>
+#include <nx/vms/api/data/site_merge_data.h>
 #include <nx/vms/api/data/system_merge_history_record.h>
 #include <nx/vms/api/data/user_model.h>
 #include <nx_ec/ec_api_fwd.h>
@@ -68,7 +68,7 @@ public:
         nx::network::http::StatusCode::Value)>;
 
     void mergeSystems(
-        const nx::vms::api::SystemMergeData& request, MergeSystemsHandler completionHandler);
+        const nx::vms::api::SiteMergeData& request, MergeSystemsHandler completionHandler);
 
     void updateCloudStorage(UpdateCloudStorageHandler completionHandler);
 

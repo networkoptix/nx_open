@@ -25,7 +25,7 @@ NX_REFLECTION_ENUM_CLASS(UserType,
     /**%apidoc This User is imported from LDAP Server. */
     ldap = 1,
 
-    /**%apidoc This is a Cloud User with access to this VMS System. */
+    /**%apidoc This is a Cloud User with access to this VMS Site. */
     cloud = 2
 )
 

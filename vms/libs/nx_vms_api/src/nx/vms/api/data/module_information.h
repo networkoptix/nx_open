@@ -59,10 +59,10 @@ struct NX_VMS_API ModuleInformation: ServerPortInformation
     QnUuid localSystemId;
     HwPlatform hwPlatform;
 
-    /**%apidoc Current time synchronized with the VMS System, in milliseconds since epoch. */
+    /**%apidoc Current time synchronized with the VMS Site, in milliseconds since epoch. */
     std::chrono::milliseconds synchronizedTimeMs{0};
 
-    /**%apidoc Presented if the System is bound to the Cloud. */
+    /**%apidoc Presented if the Site is bound to the Cloud. */
     std::optional<QnUuid> cloudOwnerId;
     std::optional<QnUuid> organizationId;
     nx::vms::api::SaasState saasState = nx::vms::api::SaasState::uninitialized;
@@ -182,7 +182,7 @@ struct NX_VMS_API ServerRuntimeInformation: ServerPortInformation, ServerTimeZon
     /**%apidoc Local OS time on the Server, in milliseconds since epoch. */
     std::chrono::milliseconds osTimeMs{0};
 
-    /**%apidoc Current time synchronized with the VMS System, in milliseconds since epoch. */
+    /**%apidoc Current time synchronized with the VMS Site, in milliseconds since epoch. */
     std::chrono::milliseconds synchronizedTimeMs{0};
 
     RuntimeData runtimeData;

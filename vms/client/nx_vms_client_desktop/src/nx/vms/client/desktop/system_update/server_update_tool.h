@@ -8,7 +8,7 @@
 #include <api/server_rest_connection.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/software_version.h>
-#include <nx/vms/api/data/system_information.h>
+#include <nx/vms/api/data/site_information.h>
 #include <nx/vms/client/desktop/system_context_aware.h>
 #include <nx/vms/client/desktop/system_update/update_contents.h>
 #include <nx/vms/client/desktop/utils/upload_state.h>

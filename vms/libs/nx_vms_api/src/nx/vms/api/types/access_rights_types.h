@@ -26,7 +26,7 @@ enum class GlobalPermission
     /* Administrative permissions. */
 
     /**%apidoc[unused]
-     * Administrator permissions: full control of the VMS system.
+     * Administrator permissions: full control of the VMS Site.
      * Not directly assignable, only inherited from the Administrators predefined group.
      */
     administrator = 0x20000000,
@@ -43,7 +43,7 @@ enum class GlobalPermission
     viewLogs = 0x00000010,
 
     /**%apidoc
-     * Can access System Health Monitoring information.
+     * Can access Metrics.
      */
     viewMetrics = 0x00000020,
 

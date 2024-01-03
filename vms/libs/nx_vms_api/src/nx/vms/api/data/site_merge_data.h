@@ -9,9 +9,9 @@
 
 namespace nx::vms::api {
 
-struct NX_VMS_API SystemMergeData
+struct NX_VMS_API SiteMergeData
 {
-    /**%apidoc The SocketAddress of remote system server. */
+    /**%apidoc The SocketAddress of remote Site server. */
     std::string remoteEndpoint; //< TODO: Is SocketAddress to be used?
 
     /**%apidoc The token should be fresh obtained from `/rest/v{1-}/login/sessions`. */
@@ -23,13 +23,13 @@ struct NX_VMS_API SystemMergeData
     /**%apidoc[opt] */
     QnUuid remoteServerId;
 
-    /**%apidoc[opt] Whether remote System settings should be taken. */
+    /**%apidoc[opt] Whether remote Site settings should be taken. */
     bool takeRemoteSettings = false;
 
-    /**%apidoc[opt] Merge only one Server from remote System. */
+    /**%apidoc[opt] Merge only one Server from remote Site. */
     bool mergeOneServer = false;
 
-    /**%apidoc[opt] Whether incompatible System should be ignored. */
+    /**%apidoc[opt] Whether incompatible Site should be ignored. */
     bool ignoreIncompatible = false;
 
     /**%apidoc[opt] Whether found Server duplicates should be ignored if they are offline. */
@@ -38,7 +38,7 @@ struct NX_VMS_API SystemMergeData
     /**%apidoc[opt] No actual merge if true. */
     bool dryRun = false;
 };
-#define SystemMergeData_Fields \
+#define SiteMergeData_Fields \
     (remoteEndpoint) \
     (remoteSessionToken) \
     (remoteCertificatePem) \
@@ -48,6 +48,6 @@ struct NX_VMS_API SystemMergeData
     (ignoreIncompatible) \
     (ignoreOfflineServerDuplicates) \
     (dryRun)
-QN_FUSION_DECLARE_FUNCTIONS(SystemMergeData, (json), NX_VMS_API)
+QN_FUSION_DECLARE_FUNCTIONS(SiteMergeData, (json), NX_VMS_API)
 
 } // namespace nx::vms::api

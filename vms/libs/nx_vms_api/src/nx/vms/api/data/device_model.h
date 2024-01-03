@@ -85,7 +85,7 @@ struct NX_VMS_API DeviceModelGeneral: ResourceWithParameters
     std::optional<DeviceGroupSettings> group;
 
     /**%apidoc The password is only visible for admins if exposeDeviceCredentials option is enabled
-     * in the System settings.
+     * in the Site settings.
      */
     std::optional<Credentials> credentials;
 

@@ -182,7 +182,7 @@ struct NX_VMS_API BookmarkBase
 
     /**%apidoc[readonly]
      * Time of the Bookmark creation in milliseconds since epoch. Equals to startTimeMs field if
-     * the Bookmark is created by the System.
+     * the Bookmark is created by the Site.
      */
     std::optional<std::chrono::milliseconds> creationTimeMs{0};
 };

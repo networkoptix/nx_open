@@ -15,7 +15,7 @@ struct QnPingReply
     /**%apidoc Id of the Server Module. */
     QnUuid moduleGuid;
 
-    /**%apidoc Id of the System. */
+    /**%apidoc Id of the Site. */
     QnUuid localSystemId;
 
     /**%apidoc[proprietary]*/

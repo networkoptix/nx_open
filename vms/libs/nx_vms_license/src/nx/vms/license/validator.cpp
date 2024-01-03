@@ -118,15 +118,15 @@ QString Validator::errorMessage(QnLicenseErrorCode errCode, Qn::LicenseType lice
             switch (licenseType)
             {
                 case Qn::LC_Start:
-                    return tr("Only one Starter license is allowed per System.")
+                    return tr("Only one Starter license is allowed per Site.")
                         + '\n'
                         + tr("You already have one active Starter license.");
                 case Qn::LC_Nvr:
-                    return tr("Only one NVR license is allowed per System.")
+                    return tr("Only one NVR license is allowed per Site.")
                         + '\n'
                         + tr("You already have one active NVR license.");
                 default:
-                    return tr("Only one license of this type is allowed per System.")
+                    return tr("Only one license of this type is allowed per Site.")
                         + '\n'
                         + tr("You already have one active license of the same type.");
             }

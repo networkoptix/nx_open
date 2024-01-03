@@ -10,7 +10,7 @@
 struct NX_VMS_COMMON_API MergeSystemData: public CurrentPasswordData
 {
     /**
-     * Remote system url.
+     * Remote Site url.
      */
     QString url;
     QString getKey;

@@ -19,11 +19,11 @@ struct NX_VMS_API ResourceGroup
     QString name;
 
     /**%apidoc
-     * %example All Devices in this VMS system.
+     * %example All Devices in this VMS Site.
      */
     QString description;
 
-    /**%apidoc Whether this group comes with the System and can not be removed. */
+    /**%apidoc Whether this group comes with the Site and can not be removed. */
     bool isPredefined = false;
 
     QnUuid getId() const { return id; }

@@ -20,7 +20,7 @@ NX_REFLECTION_ENUM(AuthResult,
     /** No auth method found or custom auth scheme without login/password is failed. */
     Auth_Forbidden,
     Auth_PasswordExpired, /**< Password is expired. */
-    Auth_LDAPConnectError, /**< Can't connect to the LDAP system to authenticate. */
+    Auth_LDAPConnectError, /**< Can't connect to the LDAP server to authenticate. */
     Auth_CloudConnectError, /**< Can't connect to the Cloud to authenticate. */
     Auth_DisabledUser, /**< Disabled user. */
     Auth_InvalidCsrfToken, /**< For cookie login. */
