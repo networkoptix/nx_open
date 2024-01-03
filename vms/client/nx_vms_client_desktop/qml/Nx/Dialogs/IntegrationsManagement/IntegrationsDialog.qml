@@ -8,6 +8,8 @@ import Nx.Core
 import Nx.Controls
 import Nx.Dialogs
 
+import nx.vms.client.desktop
+
 Dialog
 {
     id: dialog
@@ -26,6 +28,8 @@ Dialog
 
     property var store: null
     property var requestsModel: store ? store.makeApiIntegrationRequestsModel() : null
+
+    WindowContextAware.onBeforeSystemChanged: reject()
 
     DialogTabControl
     {

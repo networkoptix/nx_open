@@ -2035,7 +2035,7 @@ void ActionHandler::at_openBookmarksSearchAction_triggered()
 void ActionHandler::openIntegrationsActionTriggered()
 {
     if (!m_integrationsDialog)
-        m_integrationsDialog = new IntegrationsDialog(mainWindowWidget());
+        m_integrationsDialog = std::make_unique<IntegrationsDialog>(mainWindowWidget());
 
     const auto parameters = menu()->currentParameters(sender());
     const auto parent = utils::extractParentWidget(parameters, mainWindowWidget());
@@ -3458,6 +3458,8 @@ void ActionHandler::deleteDialogs() {
 
     if (m_advancedSearchDialog)
         delete m_advancedSearchDialog.data();
+
+    m_integrationsDialog.reset();
 }
 
 } // namespace workbench

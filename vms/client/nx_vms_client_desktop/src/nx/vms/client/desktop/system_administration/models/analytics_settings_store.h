@@ -13,8 +13,10 @@
 #include <api/server_rest_connection_fwd.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/desktop/analytics/analytics_engines_watcher.h>
+#include <nx/vms/client/desktop/common/utils/engine_license_summary_provider.h>
 #include <nx/vms/client/desktop/current_system_context_aware.h>
 #include <nx/vms/client/desktop/system_administration/models/api_integration_requests_model.h>
+#include <nx/vms/common/saas/saas_service_manager.h>
 
 namespace nx::vms::client::desktop {
 
@@ -63,13 +65,12 @@ public:
     void updateHasChanges();
     bool isNetworkRequestRunning() const;
 
-
     Q_INVOKABLE void applySettingsValues();
     Q_INVOKABLE void discardChanges();
 
     Q_INVOKABLE ApiIntegrationRequestsModel* makeApiIntegrationRequestsModel() const;
-    Q_INVOKABLE QObject* engineLicenseSummaryProvider() const;
-    Q_INVOKABLE QObject* saasServiceManager() const;
+    Q_INVOKABLE EngineLicenseSummaryProvider* makeEngineLicenseSummaryProvider() const;
+    Q_INVOKABLE nx::vms::common::saas::ServiceManager* saasServiceManager() const;
 
 signals:
     void analyticsEnginesChanged();
