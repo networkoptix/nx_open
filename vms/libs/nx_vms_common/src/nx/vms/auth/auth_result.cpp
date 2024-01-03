@@ -36,7 +36,7 @@ QString AuthResultTranslations::toErrorMessage(AuthResult value)
             return tr("Wrong password");
 
         case Auth_PasswordExpired:
-            return tr("The password is expired. Please contact your system administrator.");
+            return tr("The password is expired. Please contact your Site administrator.");
 
         case Auth_LDAPConnectError:
             return tr("The LDAP server is not accessible. Please try again later.");
@@ -46,7 +46,7 @@ QString AuthResultTranslations::toErrorMessage(AuthResult value)
                 .arg(nx::branding::cloudName());
 
         case Auth_DisabledUser:
-            return tr("This user has been disabled by a system administrator.");
+            return tr("This user has been disabled by a Site administrator.");
 
         case Auth_LockedOut:
             return tr("The user is locked out due to several failed attempts. Please try again later.");
@@ -54,7 +54,7 @@ QString AuthResultTranslations::toErrorMessage(AuthResult value)
         case Auth_Forbidden:
         case Auth_InvalidCsrfToken:
         case Auth_DisabledBasicAndDigest:
-            return tr("This authorization method is forbidden. Please contact your system administrator.");
+            return tr("This authorization method is forbidden. Please contact your Site administrator.");
 
         case Auth_WrongSessionToken:
             return tr("The session key is invalid or expired.");
@@ -69,7 +69,7 @@ QString AuthResultTranslations::toErrorMessage(AuthResult value)
     }
 
     NX_ASSERT(false, "Unhandled value: %1", value);
-    return tr("Internal server error (%1). Please contact your system administrator.").arg(value);
+    return tr("Internal server error (%1). Please contact your Site administrator.").arg(value);
 }
 
 } // namespace

@@ -10,7 +10,7 @@
 #include <nx/vms/api/data/login.h>
 #include <nx/vms/api/data/merge_status_reply.h>
 #include <nx/vms/api/data/module_information.h>
-#include <nx/vms/api/data/system_merge_data.h>
+#include <nx/vms/api/data/site_merge_data.h>
 
 namespace nx::network::http { class Credentials; }
 
@@ -63,7 +63,7 @@ public:
         QnMediaServerResourcePtr proxy,
         nx::network::ssl::AdapterFunc proxyAdapterFunc,
         const nx::network::http::Credentials& credentials,
-        const nx::vms::api::SystemMergeData& request,
+        const nx::vms::api::SiteMergeData& request,
         Callback<nx::vms::api::MergeStatusReply> callback);
 
 private:

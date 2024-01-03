@@ -38,13 +38,13 @@ enum class ResourceStatus
 
     /**%apidoc
      * The Device status is unknown. It may show up while Servers synchronize status information.
-     * If this status persists, it indicates an internal System problem.
+     * If this status persists, it indicates an internal Site problem.
      * %caption NotDefined
      */
     undefined = 4,
 
     /**%apidoc
-     * Applies only to Servers. The Server is incompatible only when it has the System name
+     * Applies only to Servers. The Server is incompatible only when it has the Site name
      * different from the current one, or it has an incompatible protocol version.
      * %caption Incompatible
      */
@@ -265,11 +265,8 @@ enum ServerFlag
     /**%apidoc[unused] Removed in 5.1, was proprietary. */
     SF_deprecated_HasHDD = 0x080,
 
-    /**%apidoc
-     * The System is just installed, it has the default admin password and is not connected to the
-     * Cloud.
-     * %deprecated Is returned by the API only for compatibility. A proper indicator of a new
-     *     System is the empty (null) localSystemId.
+    /**%apidoc[unused]
+     * Removed in 6.1 - A proper indicator of a new System is the empty (null) localSystemId.
      */
     SF_NewSystem = 0x100,
 

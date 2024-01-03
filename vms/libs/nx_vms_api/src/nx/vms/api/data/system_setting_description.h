@@ -30,7 +30,7 @@ struct NX_VMS_API SystemSettingDescription
 
     /**
      * Can only be modified by Administrators by default. Power Users require `securityForPowerUsers`
-     * System Setting to be enabled in order to modify these.
+     * Setting to be enabled in order to modify these.
      */
     bool isSecurity = false;
 

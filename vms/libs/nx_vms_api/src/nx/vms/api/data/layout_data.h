@@ -51,7 +51,7 @@ struct NX_VMS_API LayoutItemData: IdData
     /**%apidoc Device unique id.*/
     QnUuid resourceId;
 
-    /**%apidoc [opt] If the item represents a local file - the URL of the file. For cross-System
+    /**%apidoc [opt] If the item represents a local file - the URL of the file. For cross-Site
      * layouts, contains the special URL of the Device. Otherwise is empty. Can be filled with the
      * Device logical id when saving the Layout.
      */

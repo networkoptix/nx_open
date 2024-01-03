@@ -85,7 +85,7 @@ bool isCloudSystem(const nx::vms::api::ModuleInformation& info)
 QString getSystemName(const nx::vms::api::ModuleInformation& info)
 {
     return helpers::isNewSystem(info)
-        ? SystemHelpers::tr("New System")
+        ? SystemHelpers::tr("New Site")
         : info.systemName;
 }
 

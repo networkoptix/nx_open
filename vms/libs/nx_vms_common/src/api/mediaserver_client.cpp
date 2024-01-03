@@ -70,7 +70,7 @@ bool MediaServerClient::login(const std::string& username, const std::string& pa
 }
 
 void MediaServerClient::mergeSystems(
-    const nx::vms::api::SystemMergeData& request,
+    const nx::vms::api::SiteMergeData& request,
     MergeSystemsHandler completionHandler)
 {
     performRestApiRequest(

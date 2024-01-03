@@ -33,7 +33,7 @@ public:
         /**%apidoc There's no such file in the downloader. */
         notFound = 0,
 
-        /**%apidoc The file is being downloaded from an external URL and System Servers. */
+        /**%apidoc The file is being downloaded from an external URL and Site Servers. */
         downloading,
 
         /**%apidoc Waiting for the file to be manually uploaded. */

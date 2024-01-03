@@ -24,7 +24,7 @@ struct NX_VMS_API TimeReplyCore
     milliseconds osTime = 0ms;
 
     /**%apidoc
-     * Synchronized time of the VMS System, in milliseconds since epoch.
+     * Synchronized time of the VMS Site, in milliseconds since epoch.
      * %deprecated
      */
     milliseconds vmsTime = 0ms;

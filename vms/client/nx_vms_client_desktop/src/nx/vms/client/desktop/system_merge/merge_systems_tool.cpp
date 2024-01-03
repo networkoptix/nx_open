@@ -57,7 +57,7 @@ struct MergeSystemsTool::Context
     std::string targetUser;
     std::string targetPassword;
     nx::vms::api::ServerInformation targetInfo;
-    nx::vms::api::SystemMergeData mergeData;
+    nx::vms::api::SiteMergeData mergeData;
     nx::network::ssl::CertificateChain targetHandshakeChain;
     QnLicenseList targetLicenses;
 

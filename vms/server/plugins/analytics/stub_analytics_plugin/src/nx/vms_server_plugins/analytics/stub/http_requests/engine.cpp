@@ -67,7 +67,7 @@ R"json(
                         "type": "TextField",
                         "name": ")json" + kHttpPathVar + R"json(",
                         "caption": "HTTP endpoint path",
-                        "defaultValue": "/rest/v1/system/settings"
+                        "defaultValue": "/rest/v4/site/settings"
                     },
                     {
                         "type": "TextField",

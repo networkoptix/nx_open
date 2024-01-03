@@ -6,8 +6,7 @@
 #include <nx/build_info.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/socket_global.h>
-#include <nx/vms/api/data/module_information.h>
-#include <nx/vms/api/data/system_information.h>
+#include <nx/vms/api/data/site_information.h>
 #include <nx/vms/api/protocol_version.h>
 #include <nx_ec/ec_api_common.h>
 
@@ -127,14 +126,14 @@ bool ServerCompatibilityValidator::isInitialized()
 }
 
 std::optional<ServerCompatibilityValidator::Reason> ServerCompatibilityValidator::check(
-    const SystemInformation& systemInformation,
+    const SiteInformation& siteInformation,
     Purpose purpose)
 {
     return checkInternal(
-        systemInformation.customization,
-        systemInformation.protoVersion,
-        systemInformation.version,
-        systemInformation.cloudHost,
+        siteInformation.customization,
+        siteInformation.protoVersion,
+        siteInformation.version,
+        siteInformation.cloudHost,
         purpose);
 }
 
@@ -151,10 +150,10 @@ std::optional<ServerCompatibilityValidator::Reason> ServerCompatibilityValidator
 }
 
 bool ServerCompatibilityValidator::isCompatible(
-    const SystemInformation& systemInformation,
+    const SiteInformation& siteInformation,
     Purpose purpose)
 {
-    return check(systemInformation, purpose) == std::nullopt;
+    return check(siteInformation, purpose) == std::nullopt;
 }
 
 bool ServerCompatibilityValidator::isCompatible(

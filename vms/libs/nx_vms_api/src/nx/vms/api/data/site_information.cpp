@@ -1,12 +1,12 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "system_information.h"
+#include "site_information.h"
 
 #include <nx/fusion/model_functions.h>
 
 namespace nx::vms::api {
 
-SystemInformation::SystemInformation(const ModuleInformation& module):
+SiteInformation::SiteInformation(const ModuleInformation& module):
     name(module.systemName),
     customization(module.customization),
     version(module.version),
@@ -23,10 +23,12 @@ SystemInformation::SystemInformation(const ModuleInformation& module):
         cloudId = module.cloudSystemId;
 }
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(SystemInformation, (json), SystemInformation_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(OtherSystemRequest, (json), OtherSystemRequest_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(LocalSystemAuth, (json), LocalSystemAuth_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(SiteInformation, (json), SiteInformation_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(OtherSiteRequest, (json), OtherSiteRequest_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(LocalSiteAuth, (json), LocalSystemAuth_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(CloudSiteAuth, (json), CloudSiteAuth_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(CloudSystemAuth, (json), CloudSystemAuth_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(SetupSiteData, (json), SetupSiteData_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(SetupSystemData, (json), SetupSystemData_Fields)
 
 } // namespace nx::vms::api

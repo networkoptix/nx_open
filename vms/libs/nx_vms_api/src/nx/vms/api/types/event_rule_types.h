@@ -136,16 +136,16 @@ NX_REFLECTION_ENUM(EventType,
     /** Analytics SDK object detected. */
     analyticsSdkObjectDetected = 17,
 
-    /** A Server handshake certificate mismatched the certificate saved in the System DB. */
+    /** A Server handshake certificate mismatched the certificate saved in the Site DB. */
     serverCertificateError = 18,
 
     /** LDAP sync issue. */
     ldapSyncIssueEvent = 19,
 
-    /** System health message. */
+    /** Site health message. */
     systemHealthEvent = 500,
 
-    /** System health message. */
+    /** Site health message. */
     maxSystemHealthEvent = 599,
 
     /** Event group. */

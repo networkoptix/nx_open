@@ -45,8 +45,8 @@
 #include <nx/vms/api/data/device_actions.h>
 #include <nx/vms/api/data/ldap.h>
 #include <nx/vms/api/data/peer_data.h>
+#include <nx/vms/api/data/site_information.h>
 #include <nx/vms/api/data/storage_encryption_data.h>
-#include <nx/vms/api/data/system_information.h>
 #include <nx/vms/api/rules/event_log.h>
 #include <nx/vms/common/api/helpers/parser_helper.h>
 #include <nx/vms/common/application_context.h>
@@ -643,7 +643,7 @@ Handle ServerConnection::unbindSystemFromCloud(
     Result<ErrorOrEmpty>::type callback,
     QThread* targetThread)
 {
-    nx::vms::api::LocalSystemAuth data;
+    nx::vms::api::LocalSiteAuth data;
     data.password = password;
 
     auto request = prepareRestRequest(

@@ -332,7 +332,7 @@ void MergeSystemRequestsManager::mergeSystem(
     QnMediaServerResourcePtr proxy,
     nx::network::ssl::AdapterFunc proxyAdapterFunc,
     const nx::network::http::Credentials& credentials,
-    const nx::vms::api::SystemMergeData& data,
+    const nx::vms::api::SiteMergeData& data,
     Callback<nx::vms::api::MergeStatusReply> callback)
 {
     NX_DEBUG(this, "Merging target %1 to %2", data.remoteEndpoint, proxy);

@@ -32,7 +32,7 @@ protected:
         if (creatorId == CameraBookmark::systemUserId())
         {
             return BookmarkSort::tr(
-                "System Event", "Shows that the bookmark was created by a system event");
+                "Site Event", "Shows that the bookmark was created by a Site event");
         }
 
         const auto userResource = resourcePool->getResourceById<QnUserResource>(creatorId);

@@ -43,14 +43,14 @@ struct PredefinedUserGroups::Private
     static QString description(const QnUuid& groupId)
     {
         if (groupId == kAdministratorsGroupId)
-            return tr("Members of this group have unlimited System privileges. Administrators can "
-                "create and modify Power Users, merge Systems and connect or disconnect "
-                "System to  %1.", "%1 is the cloud name (like Nx Cloud)")
+            return tr("Members of this group have unlimited Site privileges. Administrators can "
+                "create and modify Power Users, merge Sites and connect or disconnect "
+                "Site to %1.", "%1 is the cloud name (like Nx Cloud)")
                 .arg(nx::branding::cloudName());
 
         if (groupId == kPowerUsersGroupId)
             return tr("Members of this group can, in addition to the permissions granted by the "
-                "Advanced Viewers group, control most of the System configuration, but are not "
+                "Advanced Viewers group, control most of the Site configuration, but are not "
                 "allowed to change any Administrator related settings, like delete or change "
                 "their own groups and permissions, and cannot create or edit other Power Users.");
 
@@ -67,7 +67,7 @@ struct PredefinedUserGroups::Private
             return tr("Members of this group can view live videos, I/O modules and web pages.");
 
         if (groupId == kSystemHealthViewersGroupId)
-            return tr("Members of this group can view System Health Monitoring information and "
+            return tr("Members of this group can view Site Health Monitoring information and "
                 "server processor load in real-time (Server Monitoring).");
 
         NX_ASSERT(false, "Not a predefined user group: %1", groupId);
