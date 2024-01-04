@@ -58,7 +58,9 @@ public:
      * violates data consistency with licensing server. Thus, using this method is expected only
      * for state when licensing server is inaccessible.
      */
-    void setSaasState(nx::vms::api::SaasState saasState);
+    void setSaasStateSync(nx::vms::api::SaasState saasState);
+
+    void setSaasStateAsync(nx::vms::api::SaasState saasState);
 
     /**
      * @return Parameters of purchased analytics integration services, indexed by service ID.
@@ -132,6 +134,7 @@ private:
 
     template <typename ServiceParamsType>
     std::map<QnUuid, ServiceParamsType> purchasedServices(const QString& serviceType) const;
+    void setSaasStateInternal(api::SaasState saasState, bool waitForDone);
 
 private:
     mutable nx::Mutex m_mutex;
