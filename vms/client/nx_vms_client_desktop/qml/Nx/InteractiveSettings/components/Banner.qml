@@ -28,6 +28,7 @@ Control
     contentItem: RowLayout
     {
         spacing: 8
+        baselineOffset: label.y + label.baselineOffset
 
         Image
         {
