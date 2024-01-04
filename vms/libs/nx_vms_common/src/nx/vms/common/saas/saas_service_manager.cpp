@@ -126,22 +126,42 @@ api::SaasState ServiceManager::saasState() const
     return m_data.state;
 }
 
-void ServiceManager::setSaasState(api::SaasState saasState)
+void ServiceManager::setSaasStateAsync(api::SaasState saasState)
 {
-    NX_MUTEX_LOCKER mutexLocker(&m_mutex);
-    m_data.state = saasState;
+    setSaasStateInternal(saasState, /*waitForDone*/ false);
+}
 
+void ServiceManager::setSaasStateSync(api::SaasState saasState)
+{
+    setSaasStateInternal(saasState, /*waitForDone*/ true);
+}
+
+void ServiceManager::setSaasStateInternal(api::SaasState saasState, bool waitForDone)
+{
     if (ec2::AbstractECConnectionPtr connection = systemContext()->messageBusConnection())
     {
+        auto d = this->data();
+        d.state = saasState;
+
+        std::unique_ptr<std::promise<void>> promise;
+        if (waitForDone)
+            promise = std::make_unique<std::promise<void>>();
+
         nx::vms::api::ResourceParamWithRefData data(
             QnUuid(),
             kSaasDataPropertyKey,
-            QString::fromStdString(nx::reflect::json::serialize(m_data)));
+            QString::fromStdString(nx::reflect::json::serialize(d)));
         nx::vms::api::ResourceParamWithRefDataList dataList;
         dataList.push_back(data);
         connection->getResourceManager(Qn::kSystemAccess)->save(
             dataList,
-            [](int, ec2::ErrorCode) {});
+            [&promise](int, ec2::ErrorCode)
+            {
+                if (promise)
+                    promise->set_value();
+            });
+        if (promise)
+            promise->get_future().wait();
     }
 }
 
