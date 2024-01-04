@@ -17,6 +17,7 @@ ScrollView
 
     implicitWidth: 200
     implicitHeight: 64
+    baselineOffset: textArea.baselineOffset
 
     TextArea
     {

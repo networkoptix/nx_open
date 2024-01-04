@@ -44,6 +44,7 @@ Button
     {
         implicitWidth: text.implicitWidth + control.spacing + switchIcon.width
         implicitHeight: text.implicitHeight
+        baselineOffset: text.baselineOffset
 
         Text
         {
