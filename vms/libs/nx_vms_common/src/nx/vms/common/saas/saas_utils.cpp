@@ -6,6 +6,7 @@
 #include <nx/vms/api/data/saas_data.h>
 #include <nx/vms/common/saas/saas_service_manager.h>
 #include <nx/vms/common/system_context.h>
+#include <nx/vms/common/system_settings.h>
 
 namespace nx::vms::common::saas {
 
@@ -33,7 +34,8 @@ bool servicesOverused(SystemContext* systemContext, const QString& seriviceType)
 
 bool saasInitialized(SystemContext* systemContext)
 {
-    return systemContext->saasServiceManager()->saasState() != SaasState::uninitialized;
+    return systemContext->saasServiceManager()->saasState() != SaasState::uninitialized
+        && !systemContext->globalSettings()->organizationId().isNull();
 }
 
 bool saasServicesOperational(SystemContext* systemContext)
