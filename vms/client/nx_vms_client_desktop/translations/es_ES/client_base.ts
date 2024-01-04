@@ -2058,7 +2058,7 @@ License Key: %2</translation>
     <name>QnAttachToVideowallDialog</name>
     <message>
       <source>System shut down. To attach to a Video Wall, the System should be in active state. %1</source>
-      <translation type="unfinished">System shut down. To attach to a Video Wall, the System should be in active state. %1</translation>
+      <translation>Sistema apagado. Para adjuntar a una pared de vídeo, el sistema debe estar en estado activo. %1</translation>
     </message>
   </context>
   <context>
@@ -4508,12 +4508,12 @@ a %1</translation>
     <message>
       <source>User %1 has no %2 permissions for selected camera</source>
       <comment>%1 is the name of selected user, %2 is permission name</comment>
-      <translation type="unfinished">User %1 has no %2 permissions for selected camera</translation>
+      <translation>El usuario %1 no tiene permisos %2 para la cámara seleccionada</translation>
     </message>
     <message>
       <source>User %1 has no %2 permissions for some of selected cameras</source>
       <comment>%1 is the name of the selected user, %2 is the permission name</comment>
-      <translation type="unfinished">User %1 has no %2 permissions for some of selected cameras</translation>
+      <translation>El usuario %1 no tiene permisos %2 para algunas de las cámaras seleccionadas</translation>
     </message>
   </context>
   <context>
@@ -5034,7 +5034,7 @@ a %1</translation>
     </message>
     <message>
       <source>SYSTEM SHUT DOWN</source>
-      <translation type="unfinished">SYSTEM SHUT DOWN</translation>
+      <translation>APAGADO DEL SISTEMA</translation>
     </message>
   </context>
   <context>
@@ -6041,11 +6041,11 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>System shut down</source>
-      <translation type="unfinished">System shut down</translation>
+      <translation>Apagado del sistema</translation>
     </message>
     <message>
       <source>To add a Video Wall, the System should be in active state. %1</source>
-      <translation type="unfinished">To add a Video Wall, the System should be in active state. %1</translation>
+      <translation>Para agregar un Video Wall, el sistema debe estar en estado activo. %1</translation>
     </message>
   </context>
   <context>
@@ -7368,15 +7368,15 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>System shut down</source>
-      <translation type="unfinished">System shut down</translation>
+      <translation>Apagado del sistema</translation>
     </message>
     <message>
       <source>To perform backup to a cloud storage, the System should be in active state. %1</source>
-      <translation type="unfinished">To perform backup to a cloud storage, the System should be in active state. %1</translation>
+      <translation>Para realizar la copia de seguridad a un almacenamiento en la nube, el sistema debe estar en estado activo. %1</translation>
     </message>
     <message>
       <source>System suspended. To make changes to backup configuration, the System should be in active state. %1</source>
-      <translation type="unfinished">System suspended. To make changes to backup configuration, the System should be in active state. %1</translation>
+      <translation>Sistema suspendido. Para realizar cambios en la configuración de la copia de seguridad, el sistema debe estar en estado activo. %1</translation>
     </message>
   </context>
   <context>
