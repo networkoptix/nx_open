@@ -39,10 +39,10 @@ public:
     {
         {
             NX_MUTEX_LOCKER lock(&m_mutex);
-            if (m_value
+            if (m_valueVersion == m_version
                 && (m_expirationTime.count() == 0 || !m_timer.hasExpired(m_expirationTime)))
             {
-                return *m_value;
+                return m_value;
             }
         }
         return updated();
@@ -51,26 +51,20 @@ public:
     void reset()
     {
         NX_MUTEX_LOCKER lock(&m_mutex);
-        m_value.reset();
+        ++m_version;
     }
 
     void update()
     {
-        ValueType value = m_valueGenerator();
-        {
-            NX_MUTEX_LOCKER lock(&m_mutex);
-            m_value = std::move(value);
-            m_timer.restart();
-        }
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        update(&lock);
     }
 
     ValueType updated() const
     {
-        ValueType value = m_valueGenerator();
         NX_MUTEX_LOCKER lock(&m_mutex);
-        m_value = std::move(value);
-        m_timer.restart();
-        return *m_value;
+        update(&lock);
+        return m_value;
     }
 
     bool isExpired() const
@@ -80,9 +74,29 @@ public:
     }
 
 private:
+
+    void update(nx::Locker<nx::Mutex>* lock) const
+    {
+        int version = ++m_version;
+
+        lock->unlock();
+        ValueType value = m_valueGenerator();
+        lock->relock();
+
+        if (version < m_valueVersion)
+            return; //< Already updated
+
+        m_valueVersion = version;
+        m_value = std::move(value);
+        m_timer.restart();
+    }
+
+private:
     mutable nx::Mutex m_mutex;
 
-    mutable std::optional<ValueType> m_value;
+    mutable ValueType m_value;
+    mutable int64_t m_valueVersion = -1;
+    mutable int64_t m_version = 0;
     const MoveOnlyFunc<ValueType()> m_valueGenerator;
 
     mutable ElapsedTimer m_timer;

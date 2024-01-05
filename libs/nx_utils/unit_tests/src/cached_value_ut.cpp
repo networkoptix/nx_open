@@ -38,6 +38,9 @@ public:
     static SpecialFunctionsCatcher* m_catcher;
 
 public:
+
+    SomeType(): m_value(0) {}
+
     SomeType(int value): m_value(value)  { m_catcher->construct(); }
     ~SomeType() { m_catcher->destruct(); }
 
