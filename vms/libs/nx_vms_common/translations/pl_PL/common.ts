@@ -1551,7 +1551,7 @@
     </message>
     <message>
       <source>Installed update information</source>
-      <translation type="unfinished">Installed update information</translation>
+      <translation>Informacje o zainstalowanej aktualizacji</translation>
     </message>
     <message>
       <source>Downloader peers for files</source>
@@ -1567,15 +1567,15 @@
     </message>
     <message>
       <source>Authorization Session token lifetime (minutes)</source>
-      <translation type="unfinished">Authorization Session token lifetime (minutes)</translation>
+      <translation>Aktywność tokena sesji autoryzacyjnej (w minutach)</translation>
     </message>
     <message>
       <source>Session token count limit on a single Server</source>
-      <translation type="unfinished">Session token count limit on a single Server</translation>
+      <translation>Limit sesji tokenów na pojedynczym serwerze</translation>
     </message>
     <message>
       <source>Max session token count per user on single Server</source>
-      <translation type="unfinished">Max session token count per user on single Server</translation>
+      <translation>Maksymalna ilość sesji tokenów na użytkownika na jednym serwerze</translation>
     </message>
     <message>
       <source>Update interval for remote session token cache (other Servers and Cloud)</source>
@@ -1635,11 +1635,11 @@
     </message>
     <message>
       <source>Storage encryption enabled</source>
-      <translation type="unfinished">Storage encryption enabled</translation>
+      <translation>Szyfrowanie pamięci masowej włączone</translation>
     </message>
     <message>
       <source>Current storage encryption key</source>
-      <translation type="unfinished">Current storage encryption key</translation>
+      <translation>Bieżący klucz szyfrowania magazynu</translation>
     </message>
     <message>
       <source>HTTP header: Origin</source>
@@ -1736,7 +1736,7 @@
     </message>
     <message>
       <source>Maximum number of consecutive RTP errors before the server reconnects the RTSP session.</source>
-      <translation type="unfinished">Maximum number of consecutive RTP errors before the server reconnects the RTSP session.</translation>
+      <translation>Maksymalna liczba następujących po sobie błędów RTP przed ponownym połączeniem sesji RTSP.</translation>
     </message>
     <message>
       <source>RTP timeout (milliseconds)</source>
