@@ -1089,7 +1089,7 @@
     </message>
     <message>
       <source>Convert to Shared Layout</source>
-      <translation type="unfinished">Convert to Shared Layout</translation>
+      <translation>Konwertuj na układ udostępniony</translation>
     </message>
   </context>
   <context>
@@ -1954,15 +1954,15 @@ Klucz licencyjny: %2</translation>
     </message>
     <message>
       <source>Partner information</source>
-      <translation type="unfinished">Partner information</translation>
+      <translation>Informacje o partnerze</translation>
     </message>
     <message>
       <source>Phones</source>
-      <translation type="unfinished">Phones</translation>
+      <translation>Telefony</translation>
     </message>
     <message>
       <source>Emails</source>
-      <translation type="unfinished">Emails</translation>
+      <translation>E-maile</translation>
     </message>
     <message>
       <source>RHI backend</source>
@@ -6923,13 +6923,13 @@ Zalecamy nie otwierać tej integracji. Jeśli rozumiesz ryzyko, możesz otworzy�
     </message>
     <message>
       <source>Failed to delete group.</source>
-      <translation type="unfinished">Failed to delete group.</translation>
+      <translation>Nie udało się usunąć grupy.</translation>
     </message>
     <message numerus="yes">
       <source>Failed to delete %n groups.</source>
       <translation type="unfinished">
-        <numerusform>Failed to delete %n groups.</numerusform>
-        <numerusform>Failed to delete %n groups.</numerusform>
+        <numerusform>Nie udało się usunąć %n grup.</numerusform>
+        <numerusform>Nie udało się usunąć %n grup.</numerusform>
         <numerusform>Failed to delete %n groups.</numerusform>
         <numerusform>Failed to delete %n groups.</numerusform>
       </translation>
@@ -7215,15 +7215,15 @@ Zalecamy nie otwierać tej integracji. Jeśli rozumiesz ryzyko, możesz otworzy�
     <name>nx::vms::client::desktop::AccessRightsList</name>
     <message>
       <source>View Archive</source>
-      <translation type="unfinished">View Archive</translation>
+      <translation>Zobacz archiwum</translation>
     </message>
     <message>
       <source>Export Archive</source>
-      <translation type="unfinished">Export Archive</translation>
+      <translation>Eksportuj archiwum</translation>
     </message>
     <message>
       <source>View Bookmarks</source>
-      <translation type="unfinished">View Bookmarks</translation>
+      <translation>Wyświetl zakładki</translation>
     </message>
     <message>
       <source>Manage Bookmarks</source>
@@ -7235,11 +7235,11 @@ Zalecamy nie otwierać tej integracji. Jeśli rozumiesz ryzyko, możesz otworzy�
     </message>
     <message>
       <source>Edit Settings</source>
-      <translation type="unfinished">Edit Settings</translation>
+      <translation>Edytuj ustawienia</translation>
     </message>
     <message>
       <source>View Live</source>
-      <translation type="unfinished">View Live</translation>
+      <translation>Podgląd na żywo</translation>
     </message>
     <message>
       <source>Depending on the resource type it either allows user to modify device settings or to control video wall.</source>
@@ -7595,7 +7595,7 @@ Zalecamy nie otwierać tej integracji. Jeśli rozumiesz ryzyko, możesz otworzy�
     </message>
     <message>
       <source>Backup settings are not available</source>
-      <translation type="unfinished">Backup settings are not available</translation>
+      <translation>Ustawienia kopii zapasowej są niedostępne</translation>
     </message>
     <message>
       <source>– Applies to all servers</source>
@@ -7695,7 +7695,7 @@ Zalecamy nie otwierać tej integracji. Jeśli rozumiesz ryzyko, możesz otworzy�
     </message>
     <message>
       <source>Missed Call</source>
-      <translation type="unfinished">Missed Call</translation>
+      <translation>Nieodebrane połączenie</translation>
     </message>
   </context>
   <context>
@@ -7829,15 +7829,15 @@ Zalecamy nie otwierać tej integracji. Jeśli rozumiesz ryzyko, możesz otworzy�
     <name>nx::vms::client::desktop::CameraHotspotItem</name>
     <message>
       <source>Open Camera</source>
-      <translation type="unfinished">Open Camera</translation>
+      <translation>Otwórz kamerę</translation>
     </message>
     <message>
       <source>Open Camera in new Tab</source>
-      <translation type="unfinished">Open Camera in new Tab</translation>
+      <translation>Otwórz kamerę w nowej karcie</translation>
     </message>
     <message>
       <source>Open Camera in place</source>
-      <translation type="unfinished">Open Camera in place</translation>
+      <translation>Otwórz kamerę w tym miejscu</translation>
     </message>
   </context>
   <context>

@@ -2040,7 +2040,7 @@ License Key: %2</source>
     <name>QnAttachToVideowallDialog</name>
     <message>
       <source>System shut down. To attach to a Video Wall, the System should be in active state. %1</source>
-      <translation type="unfinished">System shut down. To attach to a Video Wall, the System should be in active state. %1</translation>
+      <translation>システムがシャットダウンしました。ビデオウォールに接続するには、システムがアクティブな状態である必要があります。 %1</translation>
     </message>
   </context>
   <context>
@@ -4969,7 +4969,7 @@ to %1</source>
     </message>
     <message>
       <source>SYSTEM SHUT DOWN</source>
-      <translation type="unfinished">SYSTEM SHUT DOWN</translation>
+      <translation>システムがシャットダウンしました</translation>
     </message>
   </context>
   <context>
@@ -5969,7 +5969,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>To add a Video Wall, the System should be in active state. %1</source>
-      <translation type="unfinished">To add a Video Wall, the System should be in active state. %1</translation>
+      <translation>ビデオウォールを追加するには、システムがアクティブな状態である必要があります。 %1</translation>
     </message>
   </context>
   <context>
@@ -7249,11 +7249,11 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>To perform backup to a cloud storage, the System should be in active state. %1</source>
-      <translation type="unfinished">To perform backup to a cloud storage, the System should be in active state. %1</translation>
+      <translation>クラウドストレージへのバックアップを実行するには、システムがアクティブな状態である必要があります。 %1</translation>
     </message>
     <message>
       <source>System suspended. To make changes to backup configuration, the System should be in active state. %1</source>
-      <translation type="unfinished">System suspended. To make changes to backup configuration, the System should be in active state. %1</translation>
+      <translation>システムが一時停止されました。バックアップ設定を変更するには、システムがアクティブな状態である必要があります。 %1</translation>
     </message>
   </context>
   <context>
