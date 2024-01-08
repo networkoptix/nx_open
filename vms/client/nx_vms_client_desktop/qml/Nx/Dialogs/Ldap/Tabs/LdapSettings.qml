@@ -547,7 +547,7 @@ Rectangle
 
         SectionHeader
         {
-            text: qsTr("Filters")
+            text: qsTr("Search Bases")
 
             Layout.fillWidth: true
             Layout.leftMargin: 16
@@ -569,7 +569,7 @@ Rectangle
                 {
                     list.currentIndex = -1
                     const filterDialog = filterComponent.createObject(
-                        control, {"title": qsTr("Add Filter")})
+                        control, {"title": qsTr("Add Search Base")})
                     filterDialog.name = ""
                     filterDialog.baseDn = ""
                     filterDialog.filter = ""
@@ -730,7 +730,7 @@ Rectangle
 
                 Text
                 {
-                    text: qsTr("Specify at least one filter to synchronize users and groups")
+                    text: qsTr("Specify at least one search base to synchronize users and groups")
                     font: Qt.font({pixelSize: 14, weight: Font.Bold})
                     color: ColorTheme.colors.yellow_core
                 }
@@ -762,9 +762,9 @@ Rectangle
 
                 style: DialogBanner.Style.Warning
 
-                text: qsTr("No users or groups match synchronization settings and are added to the "
-                    + "system DB. Make sure LDAP server parameters and filters are configured "
-                    + "correctly.")
+                text: qsTr("No users or groups match synchronization settings and are added to "
+                    + "the system DB. Make sure LDAP server parameters and search bases are "
+                    + "configured correctly.")
 
                 Layout.fillWidth: true
 
