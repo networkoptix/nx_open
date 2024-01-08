@@ -3,6 +3,7 @@
 #include "ini_helpers.h"
 
 #include <nx/kit/ini_config.h>
+#include <nx/utils/log/assert.h>
 
 namespace nx::vms::client::core {
 

@@ -2,6 +2,8 @@
 
 #include "fetch_request.h"
 
+#include <QtQml/QtQml>
+
 #include <recording/time_period.h>
 #include <utils/common/synctime.h>
 

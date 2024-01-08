@@ -2,6 +2,8 @@
 
 #include "bookmark_search_list_model.h"
 
+#include <QtQml/QQmlEngine>
+
 #include <camera/camera_bookmarks_manager.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>

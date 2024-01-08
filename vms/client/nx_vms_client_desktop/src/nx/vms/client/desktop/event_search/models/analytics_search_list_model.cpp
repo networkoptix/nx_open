@@ -5,6 +5,7 @@
 #include <QtWidgets/QMenu>
 
 #include <analytics/db/analytics_db_types.h>
+#include <client/client_globals.h>
 #include <core/resource/camera_resource.h>
 #include <nx/analytics/action_type_descriptor_manager.h>
 #include <nx/utils/guarded_callback.h>

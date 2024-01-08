@@ -4,14 +4,19 @@
 
 #include <chrono>
 
+#include <QtCore/QTimer>
+#include <QtGui/QPalette>
+
 #include <api/helpers/event_log_multiserver_request_data.h>
 #include <api/server_rest_connection.h>
+#include <client/client_globals.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/event/actions/abstract_action.h>
 #include <nx/vms/event/strings_helper.h>
 #include <nx/vms/client/core/access/access_controller.h>
+#include <nx/vms/client/core/event_search/event_search_globals.h>
 #include <nx/vms/client/core/event_search/models/detail/multi_request_id_holder.h>
 #include <nx/vms/client/core/event_search/utils/event_search_item_helper.h>
 #include <nx/vms/client/core/skin/skin.h>

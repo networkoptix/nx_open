@@ -2,7 +2,9 @@
 
 #include "analytics_search_list_model.h"
 
+#include <QtCore/QScopedValueRollback>
 #include <QtGui/QPixmap>
+#include <QtQml/QQmlEngine>
 
 #include <analytics/db/analytics_db_types.h>
 #include <api/server_rest_connection.h>
