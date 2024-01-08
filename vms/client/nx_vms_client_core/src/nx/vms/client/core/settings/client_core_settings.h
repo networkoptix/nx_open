@@ -75,8 +75,6 @@ public:
     Property<QHash<QnUuid, LocalConnectionData>>
         recentLocalConnections{this, "recentLocalConnections"};
 
-    Property<QList<WeightData>> localSystemWeightsData{this, "localSystemWeightsData"};
-
     Property<SystemSearchAddressesHash> searchAddresses{this, "searchAddresses"};
 
     Property<QList<watchers::KnownServerConnections::Connection>>
@@ -115,9 +113,6 @@ public:
         const nx::utils::Url& url);
 
     void removeRecentConnection(const QnUuid& localSystemId);
-
-    /** Update weight data as if client just logged in to the system. */
-    void updateWeightData(const QnUuid& localId);
 
 private:
     void migrateOldSettings();
