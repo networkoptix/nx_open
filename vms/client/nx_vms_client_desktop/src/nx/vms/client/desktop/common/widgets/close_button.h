@@ -16,6 +16,13 @@ class CloseButton: public HoverButton
 
 public:
     CloseButton(QWidget* parent = nullptr);
+    void setAccented(bool accented);
+
+protected:
+    virtual void paintEvent(QPaintEvent* event) override;
+
+private:
+    bool m_accented = false;
 };
 
 } // namespace nx::vms::client::desktop

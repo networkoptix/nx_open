@@ -70,7 +70,7 @@ static const QColor kDark17Color = "#53707F";
 static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
     {QIcon::Normal, {{kLight16Color, "light16"}, {kDark17Color, "light16"}}},
     {QIcon::Active, {{kLight16Color, "light14"}, {kDark17Color, "light14"}}},
-    {QIcon::Selected, {{kLight16Color, "light14"}, {kDark17Color, "light14"}}},
+    {QIcon::Selected, {{kLight16Color, "light10"}, {kDark17Color, "light14"}}},
     {QnIcon::Pressed, {{kLight16Color, "light14"}, {kDark17Color, "light14"}}},
 };
 
@@ -483,8 +483,8 @@ void AbstractSearchWidget::Private::setupCameraSelection()
 {
     ui->cameraSelectionButton->setSelectable(false);
     ui->cameraSelectionButton->setDeactivatable(true);
-    ui->cameraSelectionButton->setIcon(
-        qnSkin->icon("text_buttons/camera_20.svg", kIconSubstitutions));
+    auto icon = qnSkin->icon("text_buttons/camera_20.svg", kIconSubstitutions);
+    ui->cameraSelectionButton->setIcon(icon);
     ui->cameraSelectionButton->setFocusPolicy(Qt::NoFocus);
 
     const auto updateButtonText =

@@ -49,10 +49,13 @@ namespace {
 static const auto kAnalyticsEventType = utils::type<AnalyticsEvent>();
 
 static const QColor kLight12Color = "#91A7B2";
+static const QColor kLight16Color = "#698796";
 static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
-    {QIcon::Normal, {{kLight12Color, "light12"}}},
-    {QIcon::Active, {{kLight12Color, "light13"}}},
-    {QIcon::Selected, {{kLight12Color, "light11"}}},
+    {QIcon::Normal, {{kLight12Color, "light12"}, {kLight16Color, "light16"}}},
+    {QIcon::Active, {{kLight12Color, "light13"}, {kLight16Color, "light14"}}},
+    {QIcon::Selected, {{kLight12Color, "light11"}, {kLight16Color, "light10"}}},
+    {QnIcon::Pressed, {{kLight12Color, "light11"}, {kLight16Color, "light14"}}},
+
 };
 
 } // namespace
