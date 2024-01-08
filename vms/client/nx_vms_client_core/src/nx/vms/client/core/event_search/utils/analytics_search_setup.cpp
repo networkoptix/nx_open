@@ -3,6 +3,7 @@
 #include "analytics_search_setup.h"
 
 #include <QtCore/QPointer>
+#include <QtQml/QtQml>
 
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/core/utils/managed_camera_set.h>

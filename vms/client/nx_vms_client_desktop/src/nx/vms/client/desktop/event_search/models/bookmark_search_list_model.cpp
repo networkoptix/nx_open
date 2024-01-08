@@ -2,6 +2,9 @@
 
 #include "bookmark_search_list_model.h"
 
+#include <QtGui/QPalette>
+
+#include <client/client_globals.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 
