@@ -218,11 +218,9 @@ QnStatusOverlayWidget::QnStatusOverlayWidget(QGraphicsWidget* parent):
     m_centralAreaImage(new QLabel()),
     m_caption(new QLabel()),
     m_description(new QLabel()),
-
     m_button(new QPushButton()),
     m_customButton(new QPushButton()),
     m_suggestion(new QLabel())
-
 {
     makeTransparentForMouse(this);
 
@@ -241,7 +239,8 @@ void QnStatusOverlayWidget::paint(QPainter* painter,
     QWidget* /*widget*/)
 {
     const PainterTransformScaleStripper scaleStripper(painter);
-    painter->fillRect(scaleStripper.mapRect(rect()), palette().color(QPalette::Window));
+    painter->fillRect(scaleStripper.mapRect(rect()).adjusted(-0.5, -0.5, 0.5, 0.5),
+        palette().window());
 }
 
 void QnStatusOverlayWidget::setVisibleControls(Controls controls)
