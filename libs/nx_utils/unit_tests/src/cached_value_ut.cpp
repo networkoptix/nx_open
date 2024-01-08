@@ -144,7 +144,7 @@ TEST(CachedValue, ExpirationTime)
         [](){ SomeType::m_catcher = &SomeType::m_defaultCatcher; });
 
     expectSpecialFunctionCalls(catcherMocks[0], 1, -1, 1, 0);
-    CachedValue<SomeType> value([n = 0]() mutable { return SomeType(n++); }, expiryTime);
+    CachedValueWithTimeout<SomeType> value([n = 0]() mutable { return SomeType(n++); }, expiryTime);
     EXPECT_EQ(value.get().m_value, 0);
 
     // Nothing should happen before any call to CachedValue.
@@ -188,7 +188,7 @@ TEST(CachedValue, LongTimeOfValueGeneration)
         [](){ SomeType::m_catcher = &SomeType::m_defaultCatcher; });
 
     expectSpecialFunctionCalls(catcherMocks[0], 1, -1, 1, 0);
-    CachedValue<SomeType> value(
+    CachedValueWithTimeout<SomeType> value(
         [expiryTime, &timeShift, n = 0]() mutable
         {
             timeShift.applyRelativeShift(expiryTime + 1ms);
