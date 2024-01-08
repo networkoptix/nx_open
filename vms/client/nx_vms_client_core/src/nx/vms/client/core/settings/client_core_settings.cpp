@@ -208,30 +208,6 @@ void Settings::removeRecentConnection(const QnUuid& localSystemId)
     recentLocalConnections = connections;
 }
 
-void Settings::updateWeightData(const QnUuid& localId)
-{
-    auto weightData = localSystemWeightsData();
-    const auto itWeightData = std::find_if(weightData.begin(), weightData.end(),
-        [localId](const WeightData& data) { return data.localId == localId; });
-
-    auto currentWeightData = (itWeightData == weightData.end()
-        ? WeightData{localId, 0, QDateTime::currentMSecsSinceEpoch(), true}
-        : *itWeightData);
-
-    currentWeightData.weight = nx::utils::calculateSystemUsageFrequency(
-        time_point<system_clock>(milliseconds(currentWeightData.lastConnectedUtcMs)),
-        currentWeightData.weight) + 1;
-    currentWeightData.lastConnectedUtcMs = QDateTime::currentMSecsSinceEpoch();
-    currentWeightData.realConnection = true;
-
-    if (itWeightData == weightData.end())
-        weightData.append(currentWeightData);
-    else
-        *itWeightData = currentWeightData;
-
-    localSystemWeightsData = weightData;
-}
-
 void Settings::migrateOldSettings()
 {
     auto oldSettings = std::make_unique<Settings>(
