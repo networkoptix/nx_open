@@ -699,9 +699,6 @@ void ConnectActionsHandler::storeConnectionRecord(
 
     const auto localId = ::helpers::getLocalSystemId(info);
 
-    if (options.testFlag(UpdateSystemWeight))
-        appContext()->coreSettings()->updateWeightData(localId);
-
     const nx::network::http::Credentials& credentials = connectionInfo.credentials;
 
     const bool cloudConnection = connectionInfo.isCloud();
