@@ -2,6 +2,8 @@
 
 #include "motion_stream_alerts.h"
 
+#include <core/resource/camera_resource.h>
+
 namespace nx::vms::client::desktop {
 
 QString MotionStreamAlerts::resolutionAlert(std::optional<MotionStreamAlert> alert)
@@ -21,10 +23,13 @@ QString MotionStreamAlerts::implicitlyDisabledAlert(
     switch (*alert)
     {
         case MotionStreamAlert::implicitlyDisabled:
-            return tr("Motion detection for this camera is not currently working because of "
-                "changed stream resolution.\n"
-                "You can force it, but it may significantly increase CPU load.",
-                "\"\\n\" is a line break, don't change it.");
+            return nx::format(tr("Motion detection is currently disabled for this camera because "
+                "the video stream exceed the %1 * %2 resolution.\n"
+                "You can force motion detection, but it may lead to a "
+                "substantial increase in CPU load.",
+                "\"\\n\" is a line break, don't change it."))
+                .args(QnVirtualCameraResource::kMaximumSecondaryStreamResolution.width(),
+                QnVirtualCameraResource::kMaximumSecondaryStreamResolution.height());
 
         case MotionStreamAlert::willBeImplicitlyDisabled:
             if (multiSelection)
