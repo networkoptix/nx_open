@@ -29,6 +29,8 @@ class MultiImageProvider;
 class AbstractSearchSynchronizer;
 class OverlappableSearchWidget;
 class AnimatedCompactTabWidget;
+class NotificationBellWidget;
+class NotificationBellManager;
 
 class EventPanel::Private:
     public QObject,
@@ -82,6 +84,9 @@ private:
 
     QWidget* m_previousTab = nullptr;
     QWidget* m_lastTab = nullptr;
+
+    NotificationBellWidget* m_notificationBellWidget = nullptr;
+    NotificationBellManager* m_notificationBellManager = nullptr;
 
     std::unique_ptr<ThumbnailTooltip> m_tooltip;
 

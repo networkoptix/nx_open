@@ -47,6 +47,7 @@
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/utils/widget_utils.h>
 #include <nx/vms/client/desktop/window_context.h>
+#include <nx/vms/client/desktop/workbench/handlers/notification_action_handler.h>
 #include <nx/vms/client/desktop/workbench/widgets/thumbnail_tooltip.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/animation/variant_animator.h>
@@ -54,9 +55,12 @@
 #include <ui/common/notification_levels.h>
 #include <ui/processors/hover_processor.h>
 #include <ui/workaround/hidpi_workarounds.h>
+#include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_navigator.h>
 #include <utils/common/event_processors.h>
+
+#include "notification_bell_manager_p.h"
 
 using namespace std::chrono;
 
@@ -272,7 +276,7 @@ EventPanel::Private::Private(EventPanel* q):
         }
 
         connect(m_tabs, &QTabWidget::currentChanged, this,
-            [this]()
+            [this]
             {
                 const auto isSpecialTab =
                     [this](const QWidget* tab) -> bool
@@ -281,6 +285,9 @@ EventPanel::Private::Private(EventPanel* q):
                     };
 
                 const auto currentTab = m_tabs->currentWidget();
+
+                m_notificationBellManager->setAlarmStateActive(
+                    m_tabIds[currentTab] != Tab::notifications);
 
                 if (!isSpecialTab(m_lastTab) || !isSpecialTab(currentTab))
                     m_previousTab = m_notificationsTab;
@@ -387,6 +394,14 @@ EventPanel::Private::Private(EventPanel* q):
 
     appContext()->clientStateHandler()->registerDelegate(
         kEventPanelStorageKey, std::make_unique<StateDelegate>(this));
+
+    const auto handler = windowContext()->notificationActionHandler();
+
+    connect(handler, &NotificationActionHandler::systemHealthEventAdded,
+        m_notificationBellManager, &NotificationBellManager::handleNotificationAdded);
+
+    connect(handler, &NotificationActionHandler::systemHealthEventRemoved,
+        m_notificationBellManager, &NotificationBellManager::handleNotificationRemoved);
 }
 
 EventPanel::Private::~Private()
@@ -414,6 +429,7 @@ bool EventPanel::Private::setCurrentTab(Tab tab)
         return false;
 
     m_tabs->setCurrentIndex(index);
+
     return true;
 }
 
@@ -471,10 +487,15 @@ void EventPanel::Private::rebuildTabs()
                     // Add tab.
                     if (currentIndex == kNotificationTabIndex)
                     {
+                        NX_ASSERT(!m_notificationBellWidget && !m_notificationBellManager);
+                        m_notificationBellWidget = new NotificationBellWidget(q);
+                        m_notificationBellManager =
+                            new NotificationBellManager(m_notificationBellWidget, q);
+
                         m_tabs->insertIconWidgetTab(
                             currentIndex,
                             tab,
-                            new NotificationBellWidget(q),
+                            m_notificationBellWidget,
                             text.toUpper());
                     }
                     else
