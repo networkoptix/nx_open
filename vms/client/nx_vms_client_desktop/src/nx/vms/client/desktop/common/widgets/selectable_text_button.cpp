@@ -167,6 +167,8 @@ bool SelectableTextButton::accented() const
 void SelectableTextButton::setAccented(bool accented)
 {
     d->accented = accented;
+    if (d->deactivateButton)
+        d->deactivateButton->setAccented(accented);
     update();
 }
 
@@ -367,10 +369,7 @@ void SelectableTextButton::paintEvent(QPaintEvent* /*event*/)
 
         auto iconMode = d->state == State::deactivated
             ? (hovered ? QIcon::Active : QIcon::Normal)
-            : ((d->accented && d->state != State::selected) ? QIcon::Selected : QIcon::Normal);
-
-        if (d->state == State::unselected && !d->accented)
-            iconMode = QIcon::Selected;
+            : ((d->accented && d->state != State::selected) ? QIcon::Selected : QnIcon::Pressed);
 
         const auto iconState = d->state == State::selected
             ? QIcon::On

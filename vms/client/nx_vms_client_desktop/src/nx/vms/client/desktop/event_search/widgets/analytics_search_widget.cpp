@@ -43,6 +43,7 @@
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/analytics/analytics_icon_manager.h>
 #include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/icon.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/utils/qml_helpers.h>
 #include <nx/vms/client/desktop/analytics/analytics_taxonomy_manager.h>
@@ -67,8 +68,9 @@ namespace nx::vms::client::desktop {
 
 static const core::SvgIconColorer::ThemeSubstitutions kThemeSubstitutions = {
     {QIcon::Normal, {.primary = "light16"}},
-    {QIcon::Active, {.primary = "light17"}},
-    {QIcon::Selected, {.primary = "light15"}},
+    {QIcon::Active, {.primary = "light14"}},
+    {QIcon::Selected, {.primary = "light10"}},
+    {QnIcon::Pressed, {.primary = "light14"}},
 };
 
 using namespace std::chrono;
@@ -282,7 +284,7 @@ void AnalyticsSearchWidget::Private::resetFilters()
 void AnalyticsSearchWidget::Private::setupEngineSelection()
 {
     m_engineSelectionButton->setDeactivatedText(tr("Any plugin"));
-    m_engineSelectionButton->setIcon(qnSkin->icon("text_buttons/plugins.svg"));
+    m_engineSelectionButton->setIcon(qnSkin->icon("text_buttons/plugins.svg", kThemeSubstitutions));
 
     m_engineSelectionButton->setMenu(m_engineMenu);
 
