@@ -72,8 +72,8 @@ ValueHistory<Value>::ValueHistory(std::chrono::milliseconds maxAge, size_t maxSi
 template<typename Value>
 void ValueHistory<Value>::update(Value value)
 {
-    const auto now = monotonicTime();
     NX_MUTEX_LOCKER locker(&m_mutex);
+    const auto now = monotonicTime();
     if (m_values.empty() || m_values.back().first != value)
         m_values.emplace_back(std::move(value), now);
 
