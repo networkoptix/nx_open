@@ -120,10 +120,10 @@ public:
 
     /*
      * @return Information about cameras which consumes SAAS services.
-     * key - cameraId, value - serviceId. If there is not enough services for some camera
+     * key - camera physicalId, value - serviceId. If there is not enough services for some camera
      * then the service value is an empty UUID.
      */
-    std::map<QnUuid, QnUuid> servicesByCameras() const;
+    std::map<QString, QnUuid> servicesByCameras() const;
 
     /* Propose change that resources are used for cloud storage.
      *  @param devices New full set of resources that is going to be used.
