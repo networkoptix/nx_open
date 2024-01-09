@@ -7,6 +7,7 @@
 #include <QtCore/QSize>
 #include <QtCore/QString>
 
+#include <nx/vms/api/types/motion_types.h>
 #include <nx/vms/client/core/media/media_player.h>
 #include <nx/vms/client/core/resource/media_dewarping_params.h>
 #include <nx/vms/client/core/resource/resource_helper.h>
@@ -52,6 +53,8 @@ public:
     bool isVirtualCamera() const;
     bool audioEnabled() const;
     MediaPlayer::VideoQuality livePreviewVideoQuality() const;
+    Q_INVOKABLE MediaPlayer::VideoQuality streamQuality(
+        nx::vms::api::StreamIndex streamIndex) const;
 
 signals:
     void serverNameChanged();

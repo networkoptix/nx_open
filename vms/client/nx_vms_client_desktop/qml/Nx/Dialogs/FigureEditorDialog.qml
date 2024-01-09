@@ -32,6 +32,7 @@ Window
 
     property alias figureType: editor.figureType
     property alias figureSettings: editor.figureSettings
+    property alias player: player
 
     property bool showPalette: true
     property bool showClearButton: true

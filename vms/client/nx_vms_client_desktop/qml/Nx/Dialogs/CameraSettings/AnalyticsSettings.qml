@@ -144,6 +144,9 @@ Item
                 active: visible
             }
 
+            analyticsStreamQuality:
+                mediaResourceHelper.streamQuality(settingsViewHeader.currentStreamIndex)
+
             requestParametersFunction: (model) => { return backend.requestParameters(model) }
 
             onValuesEdited: (activeItem, parameters) =>

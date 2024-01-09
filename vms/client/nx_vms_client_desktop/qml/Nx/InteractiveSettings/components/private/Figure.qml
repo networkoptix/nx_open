@@ -1,14 +1,13 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.6
+import QtQuick
 
-import Nx 1.0
-import Nx.Core 1.0
-import Nx.Controls 1.0
-import Nx.Dialogs 1.0
+import Nx
+import Nx.Core
+import Nx.Controls
+import Nx.Dialogs
 
-// Warning! Uses "mediaResourceHelper" and "settingsView" objects from context.
-// TODO: #vkutin #dklychkov Avoid it if possible.
+import nx.vms.client.core
 
 /**
  * Interactive Settings private type.
@@ -106,6 +105,8 @@ LabeledItem
                 figureType: control.figureType
                 figureSettings: control.figureSettings
                 resourceId: sharedData.resourceId
+                player.videoQuality:
+                    sharedData.analyticsStreamQuality ?? MediaPlayer.LowVideoQuality
 
                 onAccepted:
                 {
