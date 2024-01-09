@@ -59,6 +59,8 @@ LabeledItem
             {
                 figureType: figureView.figureType
                 resourceId: sharedData.resourceId
+                player.videoQuality:
+                    sharedData.analyticsStreamQuality ?? MediaPlayer.LowVideoQuality
 
                 onAccepted:
                     setValue(serializeFigure())

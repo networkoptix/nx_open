@@ -22,6 +22,7 @@ Item
     property Item headerItem: null
     property Item placeholderItem: null
     property alias thumbnailSource: sharedData.thumbnailSource
+    property alias analyticsStreamQuality: sharedData.analyticsStreamQuality
     readonly property bool isEmpty: !!contentItem && contentItem.isEmpty
 
     /** Function with model argument returns json object or null if the request is canceled. */
@@ -44,6 +45,7 @@ Item
 
         property var thumbnailSource: null
         property var resourceId: thumbnailSource ? thumbnailSource.cameraId : NxGlobals.uuid("")
+        property var analyticsStreamQuality: null
     }
 
     function loadModel(model, initialValues, sectionPath, restoreScrollPosition)

@@ -142,6 +142,14 @@ MediaDewarpingParams MediaResourceHelper::fisheyeParams() const
         : MediaDewarpingParams();
 }
 
+MediaPlayer::VideoQuality MediaResourceHelper::streamQuality(
+    nx::vms::api::StreamIndex streamIndex) const
+{
+    return streamIndex == nx::vms::api::StreamIndex::primary
+        ? MediaPlayer::HighVideoQuality
+        : MediaPlayer::LowVideoQuality;
+}
+
 MediaResourceHelper::Private::Private(MediaResourceHelper* q):
     q(q)
 {
