@@ -433,11 +433,11 @@ std::map<QnUuid, LicenseSummaryData> CloudStorageServiceUsageHelper::allInfoBySe
     return result;
 }
 
-std::map<QnUuid, QnUuid> CloudStorageServiceUsageHelper::servicesByCameras() const
+std::map<QString, QnUuid> CloudStorageServiceUsageHelper::servicesByCameras() const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
 
-    std::map<QnUuid, QnUuid> result;
+    std::map<QString, QnUuid> result;
     using Data = std::pair<QnUuid, int>; //< ServiceId and channels.
     const auto saasData = m_context->saasServiceManager()->data();
     std::multimap<int, Data> availableChannels;
@@ -463,7 +463,7 @@ std::map<QnUuid, QnUuid> CloudStorageServiceUsageHelper::servicesByCameras() con
         auto it = availableChannels.lower_bound(megapixels);
         if (it == availableChannels.end())
         {
-            result.emplace(camera->getId(), QnUuid()); //< No service available.
+            result.emplace(camera->getPhysicalId(), QnUuid()); //< No service available.
             continue;
         }
 
@@ -479,7 +479,7 @@ std::map<QnUuid, QnUuid> CloudStorageServiceUsageHelper::servicesByCameras() con
         }
 
         Data& data = it->second;
-        result.emplace(camera->getId(), data.first);
+        result.emplace(camera->getPhysicalId(), data.first);
         --data.second;
     }
 
