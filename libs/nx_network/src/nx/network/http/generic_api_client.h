@@ -150,14 +150,18 @@ private:
         virtual ~BaseCacheEntry() = default;
     };
 
-    template<typename T>
+    // The second template parameter here is to use a partial specialization instead of an explicit
+    // one for the case when reply type is "void".
+    template<typename T, typename Dummy = void>
     struct CacheEntry: BaseCacheEntry
     {
         T reply;
     };
 
-    template<>
-    struct CacheEntry<void>: BaseCacheEntry
+    // Special case - reply type is "void". Use partial specialization to avoid GCC error
+    // "explicit specialization in non-namespace scope".
+    template<typename Dummy>
+    struct CacheEntry<void, Dummy>: BaseCacheEntry
     {
     };
 
@@ -466,7 +470,7 @@ std::string GenericApiClient<ApiResultCodeDescriptor, Base>::makeCacheKey(
 
 template<HasResultCodeT ApiResultCodeDescriptor, typename Base>
 template<typename CachedType>
-std::shared_ptr<const typename GenericApiClient<ApiResultCodeDescriptor, Base>::template CacheEntry<CachedType>>
+std::shared_ptr<const typename GenericApiClient<ApiResultCodeDescriptor, Base>::template CacheEntry<CachedType, void>>
     GenericApiClient<ApiResultCodeDescriptor, Base>::findCacheEntry(
         const network::http::Method& method,
         const std::string& requestPath)
