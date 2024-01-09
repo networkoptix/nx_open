@@ -33,6 +33,7 @@ QDialogButtonBox::StandardButton getRestartDialogAnswer()
     QnMessageBox dialog(nullptr);
     dialog.setText(QnLocalSettingsDialog::tr("Some changes will take effect only after %1 restart")
         .arg(nx::branding::desktopClientDisplayName()));
+    dialog.setIcon(QnMessageBox::Icon::Question);
 
     dialog.setStandardButtons(QDialogButtonBox::Cancel);
     const auto restartNowButton = dialog.addButton(
