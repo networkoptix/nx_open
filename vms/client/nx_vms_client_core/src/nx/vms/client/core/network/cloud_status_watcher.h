@@ -67,7 +67,7 @@ public:
     Q_INVOKABLE void resetAuthData();
 
     bool setInitialAuthData(const nx::vms::client::core::CloudAuthData& authData);
-    bool setAuthData(const nx::vms::client::core::CloudAuthData& authData);
+    bool setAuthData(const nx::vms::client::core::CloudAuthData& authData, bool forced = false);
 
     QString cloudLogin() const;
     bool is2FaEnabledForUser() const;
