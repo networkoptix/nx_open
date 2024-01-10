@@ -303,7 +303,8 @@ struct CloudCrossSystemContextDataLoader::Private
         {
             currentRequest = requestSystemSettings();
         }
-        else if (!licenses)
+        else if (!licenses && user
+            && user->permissions.testFlag(nx::vms::api::GlobalPermission::powerUser))
         {
             currentRequest = requestLicenses();
         }
