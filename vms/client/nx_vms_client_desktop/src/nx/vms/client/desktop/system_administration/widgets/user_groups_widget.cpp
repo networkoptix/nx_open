@@ -54,7 +54,7 @@ constexpr int kMaximumInteractiveColumnWidth = 600;
 constexpr int kDefaultInteractiveColumnWidth = 200;
 
 static const core::SvgIconColorer::ThemeSubstitutions kTextButtonColors = {
-    {QIcon::Normal, {"light4"}}, {QIcon::Active, {"light3"}}};
+    {QIcon::Normal, {"light4"}}, {QIcon::Active, {"light2"}}};
 
 } // namespace
 

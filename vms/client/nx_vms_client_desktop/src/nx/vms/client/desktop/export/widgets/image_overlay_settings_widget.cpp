@@ -70,7 +70,8 @@ ImageOverlaySettingsWidget::ImageOverlaySettingsWidget(QWidget* parent):
             emit dataChanged(m_data);
         });
 
-    ui->deleteButton->setIcon(qnSkin->icon("text_buttons/delete_20_deprecated.svg"));
+    ui->deleteButton->setIcon(
+        qnSkin->icon("text_buttons/delete_20_deprecated.svg", kIconSubstitutions));
 
     connect(ui->deleteButton, &QPushButton::clicked,
         this, &ImageOverlaySettingsWidget::deleteClicked);
