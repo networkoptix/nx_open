@@ -698,7 +698,9 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         [] { return tr("LDAP settings"); });
 
     m_cloudPollingIntervalAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
-        Names::cloudPollingIntervalS, 60, [](const int& value) { return value >= 1; }, this,
+        Names::cloudPollingIntervalS, 60,
+        [](const int& value) { return value >= 1 && value <= 600; }, // < [1s, 10m]
+        this,
         []
         {
             return tr("Interval between the Cloud polling HTTP requests to synchronize the data.");
