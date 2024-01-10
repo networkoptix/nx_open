@@ -188,23 +188,27 @@ public:
         const auto parameters = q->menu()->currentParameters(q->sender());
 
         const bool ptzActive = widget->options().testFlag(QnResourceWidget::ControlPtz);
+        const bool fisheyeDewarpingActive =
+            widget->options().testFlag(QnResourceWidget::DisplayDewarped);
         const bool ptzForced = parameters.argument(Qn::ItemDataRole::ForceRole).toBool();
-        if (!isSupported || (!ptzActive && !ptzForced))
-        {
-            QnMediaResourcePtr mediaResource = widget->resource();
-            if (!mediaResource)
-                return false;
 
-            QnResource* resource = mediaResource->toResource();
-            if (!resource)
-                return false;
+        if (fisheyeDewarpingActive)
+            return true;
 
-            showPtzBanner(resource->getName());
+        if (isSupported && (ptzActive || ptzForced))
+            return true;
 
+        QnMediaResourcePtr mediaResource = widget->resource();
+        if (!mediaResource)
             return false;
-        }
 
-        return true;
+        QnResource* resource = mediaResource->toResource();
+        if (!resource)
+            return false;
+
+        showPtzBanner(resource->getName());
+
+        return false;
     }
 
     bool checkPtzEnabled()
