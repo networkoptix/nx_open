@@ -127,7 +127,7 @@ struct CloudStatusWatcher::Private: public QObject
     bool checkSuppressed();
 
     const CloudAuthData& authData() const;
-    bool setAuthData(const CloudAuthData& authData, bool initial);
+    bool setAuthData(const CloudAuthData& authData, bool initial, bool forced = false);
 
     void saveCredentials() const;
 
@@ -142,7 +142,7 @@ struct CloudStatusWatcher::Private: public QObject
     void setStatus(CloudStatusWatcher::Status newStatus, CloudStatusWatcher::ErrorCode error);
 
     void resetCloudConnection();
-    void updateConnection(bool initial);
+    void updateConnection(bool initial, bool forced = false);
     void issueAccessToken();
     void onAccessTokenIssued(ResultCode result, IssueTokenResponse response);
     void validateAccessToken();
@@ -248,9 +248,9 @@ void CloudStatusWatcher::resetAuthData()
     appContext()->coreSettings()->setCloudAuthData(CloudAuthData());
 }
 
-bool CloudStatusWatcher::setAuthData(const CloudAuthData& authData)
+bool CloudStatusWatcher::setAuthData(const CloudAuthData& authData, bool forced)
 {
-    return d->setAuthData(authData, /*initial*/ false);
+    return d->setAuthData(authData, /*initial*/ false, forced);
 }
 
 bool CloudStatusWatcher::setInitialAuthData(const CloudAuthData& authData)
@@ -482,11 +482,10 @@ void CloudStatusWatcher::Private::resetCloudConnection()
     hasUpdateSystemsRequest = false;
 }
 
-void CloudStatusWatcher::Private::updateConnection(bool initial)
+void CloudStatusWatcher::Private::updateConnection(bool initial, bool forced)
 {
-    const auto status = (initial
-        ? CloudStatusWatcher::Offline
-        : CloudStatusWatcher::LoggedOut);
+    const auto status =
+        (initial || forced) ? CloudStatusWatcher::Offline : CloudStatusWatcher::LoggedOut;
     setStatus(status, CloudStatusWatcher::NoError);
     resetCloudConnection();
 
@@ -506,7 +505,7 @@ void CloudStatusWatcher::Private::updateConnection(bool initial)
 
     cloudConnection = cloudConnectionFactory->createConnection();
 
-    if (credentials.authToken.empty())
+    if (credentials.authToken.empty() || forced)
     {
         issueAccessToken();
     }
@@ -768,7 +767,7 @@ bool CloudStatusWatcher::Private::checkSuppressed()
     return true;
 }
 
-bool CloudStatusWatcher::Private::setAuthData(const CloudAuthData& authData, bool initial)
+bool CloudStatusWatcher::Private::setAuthData(const CloudAuthData& authData, bool initial, bool forced)
 {
     NX_ASSERT(!authData.credentials.authToken.isPassword());
 
@@ -781,7 +780,7 @@ bool CloudStatusWatcher::Private::setAuthData(const CloudAuthData& authData, boo
     m_authData = authData;
     m_tokenUpdater->onTokenUpdated(m_authData.expiresAt);
 
-    updateConnection(initial);
+    updateConnection(initial, forced);
 
     if (userChanged)
         emit q->cloudLoginChanged();
