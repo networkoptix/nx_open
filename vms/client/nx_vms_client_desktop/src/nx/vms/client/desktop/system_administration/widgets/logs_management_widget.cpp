@@ -129,6 +129,7 @@ void LogsManagementWidget::setupUi()
     font.setBold(false);
     ui->downloadButton->setFont(font);
     ui->settingsButton->setFont(font);
+    ui->resetButton->setFont(font);
 
     ui->downloadButton->setIcon(
         qnSkin->icon("text_buttons/download_20.svg", kDownloadSettingsSubstitutions));

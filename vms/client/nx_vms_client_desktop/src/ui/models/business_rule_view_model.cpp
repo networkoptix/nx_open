@@ -596,8 +596,11 @@ QIcon QnBusinessRuleViewModel::iconForAction() const
     if (isActionUsingSourceCamera())
         return qnResIconCache->icon(QnResourceIconCache::Camera);
 
-    static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions colorSubs = {
-        {QnIcon::Normal, {.primary = "light10"}}, {QnIcon::Selected, {.primary = "light4"}}};
+    static const QColor kBaseColor{"#A5B7C0"};
+    static const QColor kWarningColor{"#FBBC05"};
+    static const nx::vms::client::core::SvgIconColorer::IconSubstitutions colorSubs = {
+        {QnIcon::Normal, {{kBaseColor, "light10"}, {kWarningColor, "yellow_core"}}},
+        {QnIcon::Selected, {{kBaseColor, "light4"}, {kWarningColor, "yellow_core"}}}};
 
     switch (m_actionType)
     {
