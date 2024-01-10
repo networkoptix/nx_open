@@ -32,10 +32,11 @@ namespace {
 
 static const QColor kLight10Color = "#A5B7C0";
 static const core::SvgIconColorer::IconSubstitutions kEnabledUncheckedIconSubstitutions = {
+    {QIcon::Normal, {{kLight10Color, "light10"}}},
     {QIcon::Selected, {{kLight10Color, "light4"}}}};
 static const core::SvgIconColorer::IconSubstitutions kEnabledCheckedIconSubstitutions = {
-    {QIcon::Normal, {{kLight10Color, "light2"}}},
-    {QIcon::Selected, {{kLight10Color, "light4"}}}};
+    {QIcon::Normal, {{kLight10Color, "light4"}}},
+    {QIcon::Selected, {{kLight10Color, "light2"}}}};
 static const core::SvgIconColorer::IconSubstitutions kDisabledUncheckedIconSubstitutions = {
     {QIcon::Normal, {{kLight10Color, "dark16"}}},
     {QIcon::Selected, {{kLight10Color, "light13"}}}};
