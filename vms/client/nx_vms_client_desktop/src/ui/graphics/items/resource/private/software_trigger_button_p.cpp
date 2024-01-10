@@ -547,7 +547,7 @@ void SoftwareTriggerButtonPrivate::ensureImages()
             return generatePixmap(backgroundColor, QColor(), buttonPixmap);
         };
 
-    static const QColor kNormalColor = core::colorTheme()->color("dark1", 128);
+    static const QColor kNormalColor = core::colorTheme()->color("@dark1", 128);
     static const QColor kActiveColor = core::colorTheme()->color("brand_core", 179);
     static const QColor kPressedColor = core::colorTheme()->color("brand_core", 128);
     static const QColor kErrorBackgroundColor = core::colorTheme()->color("red_core", 128);

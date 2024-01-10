@@ -33,7 +33,7 @@ Item
     property real bottomOverhang: 0
 
     property color color: ColorTheme.colors.dark13
-    property color textColor: ColorTheme.colors.brand_contrast
+    property color textColor: ColorTheme.colors.light1
 
     property string text
     property font font
