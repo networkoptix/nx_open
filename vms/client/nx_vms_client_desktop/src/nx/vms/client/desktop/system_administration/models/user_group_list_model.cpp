@@ -111,8 +111,7 @@ struct UserGroupListModel::Private
         QStringList result;
         for (const auto parentId: group.parentGroupIds)
         {
-            const auto parentGroup = q->systemContext()->userGroupManager()->find(parentId);
-            if (NX_ASSERT(parentGroup))
+            if (const auto parentGroup = q->systemContext()->userGroupManager()->find(parentId))
                 result.push_back(parentGroup->name);
         }
 
