@@ -100,7 +100,7 @@ void CloudActionsHandler::at_loginToCloudAction_triggered()
         /*sessionAware*/ false);
 
     if (!authData.empty())
-        qnCloudStatusWatcher->setAuthData(authData);
+        qnCloudStatusWatcher->setAuthData(authData, /*forced*/true);
 }
 
 void CloudActionsHandler::at_logoutFromCloudAction_triggered()
