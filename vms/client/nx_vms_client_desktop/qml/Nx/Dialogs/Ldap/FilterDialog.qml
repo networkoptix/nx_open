@@ -35,7 +35,7 @@ Dialog
 
     property string testMessage: ""
 
-    title: qsTr("Edit Filter")
+    title: qsTr("Edit Search Base")
 
     color: ColorTheme.colors.dark7
 
