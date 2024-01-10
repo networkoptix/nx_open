@@ -294,39 +294,40 @@ copyQtLibs()
     echo "Copying Qt libs"
 
     local QT_LIBS=(
+        Concurrent
         Core
         Core5Compat
+        DBus
         Gui
-        Widgets
-        WebChannel
-        WebEngineCore
-        WebEngineQuick
-        WebEngineWidgets
-        WebView
-        OpenGL
-        OpenGLWidgets
+        LabsQmlModels
         Multimedia
         MultimediaQuick
+        Network
+        OpenGL
+        OpenGLWidgets
         Positioning
         Qml
         QmlModels
         QmlWorkerScript
         Quick
-        QuickWidgets
-        QuickTemplates2
         QuickControls2
         QuickControls2Impl
+        QuickEffects
         QuickLayouts
         QuickShapes
-        QuickEffects
+        QuickTemplates2
+        QuickWidgets
         ShaderTools
-        XcbQpa
-        DBus
-        Xml
-        Concurrent
-        Network
         Sql
         Svg
+        WebChannel
+        WebEngineCore
+        WebEngineQuick
+        WebEngineWidgets
+        WebView
+        Widgets
+        XcbQpa
+        Xml
     )
     if [ "$ARCH" == "arm" ]
     then
