@@ -82,7 +82,7 @@ struct PredefinedUserGroups::Private
                 | GlobalPermission::powerUser
                 | GlobalPermission::viewLogs
                 | GlobalPermission::generateEvents
-                | GlobalPermission::systemHealth;
+                | GlobalPermission::viewMetrics;
         }
 
         if (groupId == kPowerUsersGroupId)
@@ -90,14 +90,14 @@ struct PredefinedUserGroups::Private
             return GlobalPermission::powerUser
                 | GlobalPermission::viewLogs
                 | GlobalPermission::generateEvents
-                | GlobalPermission::systemHealth;
+                | GlobalPermission::viewMetrics;
         }
 
         if (groupId == kAdvancedViewersGroupId)
             return GlobalPermission::viewLogs;
 
         if (groupId == kSystemHealthViewersGroupId)
-            return GlobalPermission::systemHealth;
+            return GlobalPermission::viewMetrics;
 
         if (groupId == kViewersGroupId || groupId == kLiveViewersGroupId)
             return {};

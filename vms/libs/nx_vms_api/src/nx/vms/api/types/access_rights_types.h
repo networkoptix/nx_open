@@ -45,7 +45,7 @@ enum class GlobalPermission
     /**%apidoc
      * Can access System Health Monitoring information.
      */
-    systemHealth = 0x00000020,
+    viewMetrics = 0x00000020,
 
     /**%apidoc
      * Can generate VMS Events.
@@ -66,14 +66,14 @@ NX_REFLECTION_INSTRUMENT_ENUM(GlobalPermission,
     administrator,
     powerUser,
     viewLogs,
-    systemHealth,
+    viewMetrics,
     generateEvents)
 
 Q_DECLARE_FLAGS(GlobalPermissions, GlobalPermission)
 Q_DECLARE_OPERATORS_FOR_FLAGS(GlobalPermissions)
 
 constexpr GlobalPermissions kAssignableGlobalPermissions =
-    GlobalPermission::viewLogs | GlobalPermission::generateEvents | GlobalPermission::systemHealth;
+    GlobalPermission::viewLogs | GlobalPermission::generateEvents | GlobalPermission::viewMetrics;
 
 // -------------------------------------------------------------------------------------------------
 
