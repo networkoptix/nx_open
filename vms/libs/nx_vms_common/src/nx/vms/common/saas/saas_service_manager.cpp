@@ -143,7 +143,7 @@ void ServiceManager::setSaasStateInternal(api::SaasState saasState, bool waitFor
         auto d = this->data();
         d.state = saasState;
 
-        std::unique_ptr<std::promise<void>> promise;
+        std::shared_ptr<std::promise<void>> promise;
         if (waitForDone)
             promise = std::make_unique<std::promise<void>>();
 
@@ -155,7 +155,7 @@ void ServiceManager::setSaasStateInternal(api::SaasState saasState, bool waitFor
         dataList.push_back(data);
         connection->getResourceManager(Qn::kSystemAccess)->save(
             dataList,
-            [&promise](int, ec2::ErrorCode)
+            [promise](int, ec2::ErrorCode)
             {
                 if (promise)
                     promise->set_value();
