@@ -124,6 +124,20 @@ static const core::SvgIconColorer::ThemeSubstitutions kDisabledCheckedIconSubsti
     {QIcon::Active, {.primary = "light13", .secondary = "light7"}},
     {QIcon::Selected, {.primary = "light10", .secondary = "light4"}}};
 
+static const QColor kLight10Color = "#A5B7C0";
+static const core::SvgIconColorer::IconSubstitutions kCheckboxEnabledUncheckedIconSubstitutions = {
+    {QIcon::Normal, {{kLight10Color, "light10"}}},
+    {QIcon::Selected, {{kLight10Color, "light4"}}}};
+static const core::SvgIconColorer::IconSubstitutions kCheckboxEnabledCheckedIconSubstitutions = {
+    {QIcon::Normal, {{kLight10Color, "light4"}}},
+    {QIcon::Selected, {{kLight10Color, "light2"}}}};
+static const core::SvgIconColorer::IconSubstitutions kCheckboxDisabledUncheckedIconSubstitutions = {
+    {QIcon::Normal, {{kLight10Color, "dark16"}}},
+    {QIcon::Selected, {{kLight10Color, "light13"}}}};
+static const core::SvgIconColorer::IconSubstitutions kCheckboxDisabledCheckedIconSubstitutions = {
+    {QIcon::Normal, {{kLight10Color, "light13"}}},
+    {QIcon::Selected, {{kLight10Color, "light10"}}}};
+
 } // namespace
 
 class UserListModel::Private:
@@ -692,10 +706,30 @@ QVariant UserListModel::data(const QModelIndex& index, int role) const
         {
             if (const auto path = data(index, Qn::DecorationPathRole).toString(); !path.isEmpty())
             {
-                core::SvgIconColorer::ThemeSubstitutions colorSubstitutions;
-
                 const bool checked =
                     data(index.siblingAtColumn(CheckBoxColumn), Qt::CheckStateRole).toBool();
+
+                if (index.column() == IsCustomColumn)
+                {
+                    core::SvgIconColorer::IconSubstitutions colorSubstitutions;
+
+                    if (data(index, Qn::DisabledRole).toBool())
+                    {
+                        colorSubstitutions = checked
+                            ? kCheckboxDisabledCheckedIconSubstitutions
+                            : kCheckboxDisabledUncheckedIconSubstitutions;
+                    }
+                    else
+                    {
+                        colorSubstitutions = checked
+                            ? kCheckboxEnabledCheckedIconSubstitutions
+                            : kCheckboxEnabledUncheckedIconSubstitutions;
+                    }
+                    return qnSkin->icon(path, colorSubstitutions);
+                }
+
+                core::SvgIconColorer::ThemeSubstitutions colorSubstitutions;
+
                 if (data(index, Qn::DisabledRole).toBool())
                 {
                     colorSubstitutions = checked
