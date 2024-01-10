@@ -1826,7 +1826,7 @@
     </message>
     <message>
       <source>Limit Max Volume</source>
-      <translation>Maksimum Sesi Sınırla</translation>
+      <translation>Maksimum Alanı Sınırla</translation>
     </message>
   </context>
   <context>
