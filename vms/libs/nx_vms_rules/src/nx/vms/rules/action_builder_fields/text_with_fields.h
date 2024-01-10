@@ -42,15 +42,9 @@ public:
         QString value;
         qsizetype start = 0;
         qsizetype length = 0;
-        bool correct = false;
     };
 
     using ParsedValues = QList<ValueDescriptor>;
-    using EventParametersByGroup = std::map<QString, QList<QString>>;
-
-    static EventParametersByGroup substitutionsByGroup();
-    static constexpr char kStartOfSubstitutionSymbol = '{';
-    static constexpr char kEndOfSubstitutionSymbol = '}';
 
 signals:
     void textChanged();

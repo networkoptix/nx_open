@@ -5,12 +5,15 @@
 #include <QtWidgets/QApplication>
 
 #include <nx/vms/client/desktop/style/helper.h>
-#include <nx/vms/rules/action_builder_fields/text_with_fields.h>
+#include <nx/vms/rules/utils/event_parameter_helper.h>
 #include <utils/common/scoped_painter_rollback.h>
+
+#include "separator.h"
 
 bool isSeparator(const QModelIndex& index)
 {
-    return index.data(Qt::AccessibleDescriptionRole).toString() == "separator";
+    return index.data(Qt::AccessibleDescriptionRole)
+        .canConvert<nx::vms::client::desktop::rules::Separator>();
 }
 
 namespace nx::vms::client::desktop {
@@ -44,11 +47,9 @@ void EventParametersDropDownDelegate::paint(
 }
 
 QString EventParametersDropDownDelegate::displayText(
-    const QVariant& value, const QLocale& locale) const
+    const QVariant& value, const QLocale& /*locale*/) const
 {
-    return value.toString()
-        .replace(rules::TextWithFields::kStartOfSubstitutionSymbol, "")
-        .replace(rules::TextWithFields::kEndOfSubstitutionSymbol, "");
+    return vms::rules::utils::EventParameterHelper::removeBrackets(value.toString());
 }
 
 } // namespace nx::vms::client::desktop

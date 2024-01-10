@@ -29,6 +29,11 @@ protected:
         return P::parentParamsWidget()->eventFilter()->template fieldByName<T>(name);
     }
 
+    std::optional<vms::rules::ItemDescriptor> getEventDescriptor() const
+    {
+        return P::parentParamsWidget()->eventDescriptor();
+    }
+
     F* theField() const
     {
         auto field = theFieldImpl<F>();

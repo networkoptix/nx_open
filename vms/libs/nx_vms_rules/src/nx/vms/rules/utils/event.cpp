@@ -30,4 +30,21 @@ bool hasSourceServer(const vms::rules::ItemDescriptor& eventDescriptor)
         });
 }
 
+QnUuid sourceId(const BasicEvent* event)
+{
+    const auto getId =
+        [event](const char* propName)
+        {
+            return event->property(propName).value<QnUuid>();
+        };
+
+    if (const auto cameraId = getId(utils::kCameraIdFieldName); !cameraId.isNull())
+        return cameraId;
+
+    if (const auto serverId = getId(utils::kServerIdFieldName); !serverId.isNull())
+        return serverId;
+
+    return {};
+}
+
 } // namespace nx::vms::rules

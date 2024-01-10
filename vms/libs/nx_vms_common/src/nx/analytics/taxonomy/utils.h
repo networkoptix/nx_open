@@ -13,6 +13,7 @@ namespace nx::analytics::taxonomy {
 
 class AbstractEventType;
 class AbstractResourceSupportProxy;
+class AbstractState;
 
 template<typename Container, typename Item>
 bool contains(const Container& container, const Item& item)
@@ -48,5 +49,8 @@ NX_VMS_COMMON_API bool eventBelongsToGroup(
     const QString& groupId);
 
 QString maybeUnscopedExtendedObjectTypeId(const QString& scopedExtendedObjectTypeId);
+
+NX_VMS_COMMON_API QList<QString> getAttributesNames(
+    const AbstractState* taxonomyState, const QString& objectId);
 
 } // namespace nx::analytics::taxonomy

@@ -4,24 +4,27 @@
 
 #include <QtCore/QAbstractListModel>
 
-#include <nx/vms/rules/action_builder_fields/text_with_fields.h>
+#include <nx/utils/impl_ptr.h>
 
 namespace nx::vms::client::desktop::rules {
 
-class EventParametersModel: public QAbstractListModel
+class NX_VMS_CLIENT_DESKTOP_API EventParametersModel: public QAbstractListModel
 {
     Q_OBJECT
 public:
-    EventParametersModel(
-        const nx::vms::rules::TextWithFields::EventParametersByGroup& eventParameters,
-        QObject* parent);
+    EventParametersModel(const QList<QString>& eventParameters, QObject* parent = nullptr);
+    ~EventParametersModel();
 
     int rowCount(const QModelIndex& parent) const override;
     QVariant data(const QModelIndex& index, int role) const override;
+    void expandGroup(const QString& groupName);
+    void resetExpandedGroup();
+    bool isSubGroupName(const QString& groupName);
+    bool isCorrectParameter(const QString& eventParameter);
 
 private:
-    QList<QString> groupedEventParametersNames;
-    bool isSeparator(const QModelIndex& index) const;
+    struct Private;
+    nx::utils::ImplPtr<Private> d;
 };
 
 } // namespace nx::vms::client::desktop::rules

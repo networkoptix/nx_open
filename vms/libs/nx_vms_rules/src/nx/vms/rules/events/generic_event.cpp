@@ -70,7 +70,7 @@ const ItemDescriptor& GenericEvent::manifest()
         .flags = {ItemFlag::instant, ItemFlag::prolonged},
         .fields = {
             utils::makeStateFieldDescriptor(tr("State"), {}, State::instant),
-            makeFieldDescriptor<TextLookupField>("source", tr("And Source")),
+            makeFieldDescriptor<TextLookupField>(utils::kSourceFieldName, tr("And Source")),
             makeFieldDescriptor<TextLookupField>(utils::kCaptionFieldName, tr("And Caption")),
             makeFieldDescriptor<TextLookupField>(utils::kDescriptionFieldName, tr("And Description")),
             makeFieldDescriptor<CustomizableFlagField>(utils::kOmitLoggingFieldName, tr("Omit logging")),

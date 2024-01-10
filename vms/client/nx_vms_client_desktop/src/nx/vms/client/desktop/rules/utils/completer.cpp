@@ -6,18 +6,26 @@
 #include <QtGui/QKeyEvent>
 #include <QtWidgets/QAbstractItemView>
 
+#include <nx/utils/log/assert.h>
 #include <nx/vms/client/core/skin/color_theme.h>
-#include <nx/vms/rules/action_builder_fields/text_with_fields.h>
+#include <nx/vms/client/desktop/rules/model_view/event_parameters_model.h>
+#include <nx/vms/rules/utils/event_parameter_helper.h>
 #include <ui/common/palette.h>
 
 #include "event_parameters_dropdown_delegate.h"
 
 namespace nx::vms::client::desktop::rules {
 
+using namespace nx::vms::rules::utils;
+
 struct Completer::Private: public QObject
 {
     QCompleter* completer{nullptr};
     Completer* q;
+    // Same pointer as completer->model(). Kept to avoid frequent dynamic cast.
+    EventParametersModel* completerModel {nullptr};
+    // Same pointer as completer->widget(). Kept to avoid frequent dynamic cast.
+    QTextEdit* textEdit{nullptr};
 
     struct CurrentWord
     {
@@ -31,9 +39,88 @@ struct Completer::Private: public QObject
     Private(Completer* parent): q(parent){};
     void updateCompleter(int cursorPosition, const QString& text);
     void replaceCurrentWordWithCompleted(QString& text, const QString& completedText) const;
-    void initCompleterForTextEdit(QTextEdit* textEdit);
+    void initCompleterForTextEdit(QTextEdit* inputTextEdit);
     void initPopup(QAbstractItemView* popup);
+    void triggerCompleterForTextEdit();
+    void completeTextForTextEdit(const QString& textToComplete);
+    bool isSameAsCurrentWord(const QString& currentText, const QString& replacement);
+    void onCompleteActivatedForModel(const QString& textFromCompleter);
 };
+
+void Completer::Private::onCompleteActivatedForModel(const QString& textFromCompleter)
+{
+    if (!completerModel || textFromCompleter.isEmpty())
+        return;
+
+    QString textToComplete = textFromCompleter;
+    const bool isSubGroupName = completerModel->isSubGroupName(textToComplete);
+    bool needToReshowPopup = isSubGroupName;
+    if (isSubGroupName)
+    {
+        const auto lastChar = textToComplete.back();
+        if (!NX_ASSERT(EventParameterHelper::isEndOfEventParameter(lastChar)))
+            return;
+
+        textToComplete.removeLast(); // Remove closing bracket, to be able fill subgroups.
+        if (isSameAsCurrentWord(textEdit->toPlainText(), textToComplete))
+        {
+            // The current name of subgroup is already a desired replacement.
+            // Finish typing of paramter.
+            needToReshowPopup = false;
+            textToComplete += lastChar;
+        }
+    }
+
+    completeTextForTextEdit(textToComplete);
+
+    if (isSubGroupName && needToReshowPopup)
+        triggerCompleterForTextEdit();
+    else
+        completerModel->resetExpandedGroup();
+}
+
+bool Completer::Private::isSameAsCurrentWord(
+    const QString& currentText, const QString& replacement)
+{
+    if (currentWord.length == 0)
+        return false;
+
+    const QString word = currentText.sliced(currentWord.begin, currentWord.length);
+    return word == replacement;
+}
+
+void Completer::Private::completeTextForTextEdit(const QString& completedText)
+{
+    if (!textEdit)
+        return;
+
+    auto currentText = textEdit->toPlainText();
+
+    replaceCurrentWordWithCompleted(currentText, completedText);
+
+    QScopedValueRollback rollback{isCompletingInProgress, true};
+    textEdit->setText(currentText);
+
+    auto cursor = textEdit->textCursor();
+    cursor.setPosition(currentWord.begin + completedText.size());
+    textEdit->setTextCursor(cursor);
+}
+
+void Completer::Private::triggerCompleterForTextEdit()
+{
+    if (isCompletingInProgress || textEdit == nullptr)
+        return;
+
+    updateCompleter(textEdit->textCursor().position(), textEdit->toPlainText());
+
+    const auto cursorRect =
+        textEdit->cursorRect().adjusted(0, 0, 0, textEdit->fontMetrics().descent());
+    const auto textEditRect = textEdit->rect();
+    completer->complete(QRect{
+        QPoint{textEditRect.left(), cursorRect.top()},
+        QPoint{textEditRect.right(), cursorRect.bottom()}});
+}
+
 
 void Completer::Private::initPopup(QAbstractItemView* popup)
 {
@@ -44,46 +131,21 @@ void Completer::Private::initPopup(QAbstractItemView* popup)
     setPaletteColor(popup, QPalette::Midlight, core::colorTheme()->color("dark16"));
 }
 
-void Completer::Private::initCompleterForTextEdit(QTextEdit* textEdit)
+void Completer::Private::initCompleterForTextEdit(QTextEdit* inputTextEdit)
 {
     completer->setCaseSensitivity(Qt::CaseInsensitive);
-    completer->setWidget(textEdit);
+    completer->setWidget(inputTextEdit);
+    textEdit = inputTextEdit;
     initPopup(completer->popup());
 
-    connect(completer,
-        QOverload<const QString&>::of(&QCompleter::activated),
-        q,
-        [this, textEdit](const QString& completedText)
-        {
-            auto currentText = textEdit->toPlainText();
-            replaceCurrentWordWithCompleted(currentText, completedText);
-
-            QScopedValueRollback rollback{isCompletingInProgress, true};
-            textEdit->setText(currentText);
-
-            auto cursor = textEdit->textCursor();
-            cursor.setPosition(currentWord.begin + completedText.size());
-            textEdit->setTextCursor(cursor);
-        });
-
-    const auto triggerCompleter =
-        [this, textEdit]
-        {
-            if (isCompletingInProgress)
-                return;
-
-            updateCompleter(textEdit->textCursor().position(), textEdit->toPlainText());
-
-            const auto cursorRect =
-                textEdit->cursorRect().adjusted(0, 0, 0, textEdit->fontMetrics().descent());
-            const auto textEditrect = textEdit->rect();
-            completer->complete(QRect{
-                QPoint{textEditrect.left(), cursorRect.top()},
-                QPoint{textEditrect.right(), cursorRect.bottom()}});
-        };
-
-    connect(textEdit, &QTextEdit::textChanged, q, triggerCompleter);
-    connect(textEdit, &QTextEdit::cursorPositionChanged, q, triggerCompleter);
+    connect(inputTextEdit,
+        &QTextEdit::textChanged,
+        this,
+        &Completer::Private::triggerCompleterForTextEdit);
+    connect(inputTextEdit,
+        &QTextEdit::cursorPositionChanged,
+        this,
+        &Completer::Private::triggerCompleterForTextEdit);
 }
 
 void Completer::Private::updateCompleter(int cursorPosition, const QString& text)
@@ -92,7 +154,7 @@ void Completer::Private::updateCompleter(int cursorPosition, const QString& text
 
     const QStringView textBeforeCursor{text.data(), cursorPosition};
     const auto startOfSubstitution =
-        textBeforeCursor.lastIndexOf(vms::rules::TextWithFields::kStartOfSubstitutionSymbol);
+        EventParameterHelper::getLatestEventParameterPos(textBeforeCursor.toString());
     currentWord.begin = startOfSubstitution == -1 ? 0 : startOfSubstitution;
 
     const auto spaceAfterWord = text.indexOf(spacePattern, cursorPosition);
@@ -102,9 +164,11 @@ void Completer::Private::updateCompleter(int cursorPosition, const QString& text
     const auto currentWordSlice =
         textBeforeCursor.sliced(currentWord.begin, cursorPosition - currentWord.begin);
 
+    if (completerModel)
+        completerModel->expandGroup(currentWordSlice.toString());
     // Completer will popup, when cursor placed after the bracket symbol (for e.g '{' is typed)
     // Completion prefix is set up as current word with bracket.
-    completer->setCompletionPrefix(currentWordSlice.toString());
+    completer->setCompletionPrefix(currentWordSlice.toString()); // TODO: #vbutkevich fix grouping
 }
 
 void Completer::Private::replaceCurrentWordWithCompleted(QString& text, const QString& completedText) const
@@ -125,12 +189,36 @@ Completer::~Completer()
 {
 }
 
-Completer::Completer(QAbstractListModel* model, QTextEdit* textEdit, QObject* parent):
+void Completer::setModel(EventParametersModel* model)
+{
+    if (model == nullptr)
+        return;
+
+    d->completerModel = model;
+    model->setParent(d->completer);
+    d->completer->setModel(d->completerModel);
+}
+
+bool Completer::containsElement(const QString& element)
+{
+    if (d->completerModel)
+        return d->completerModel->isCorrectParameter(element);
+
+    return true; // TODO: #vbutkevich need to add solution for other types of models
+}
+
+Completer::Completer(EventParametersModel* model, QTextEdit* textEdit, QObject* parent):
     QObject(parent),
     d(new Private(this))
 {
-    d->completer = new QCompleter(model, this);
+    d->completer = new QCompleter(this);
+    setModel(model);
     d->initCompleterForTextEdit(textEdit);
+
+    connect(d->completer,
+        QOverload<const QString&>::of(&QCompleter::activated),
+        d.get(),
+        &Completer::Private::onCompleteActivatedForModel);
 }
 
 Completer::Completer(const QStringList& words, QLineEdit* lineEdit, QObject* parent):
@@ -173,6 +261,11 @@ Completer::Completer(const QStringList& words, QTextEdit* textEdit, QObject* par
     d(new Private(this))
 {
     d->completer = new QCompleter(words, this);
+
+    connect(d->completer,
+        QOverload<const QString&>::of(&QCompleter::activated),
+        d.get(),
+        &Completer::Private::completeTextForTextEdit);
     d->initCompleterForTextEdit(textEdit);
 }
 

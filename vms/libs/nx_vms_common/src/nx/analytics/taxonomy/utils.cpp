@@ -1,12 +1,14 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "utils.h"
+
 #include <optional>
 
 #include "abstract_event_type.h"
 #include "abstract_group.h"
 #include "abstract_object_type.h"
 #include "abstract_scope.h"
+#include "abstract_state.h"
 #include "proxy_attribute.h"
 
 namespace nx::analytics::taxonomy {
@@ -157,6 +159,31 @@ bool eventBelongsToGroup(const AbstractEventType* eventType, const QString& grou
 
     return false;
 };
+
+QList<QString> getAttributesNames(const AbstractState* taxonomyState, const QString& objectId)
+{
+    QList<QString> result;
+    std::function<void(const AbstractObjectType*, QString)> addAttributesRecursive =
+        [&](const AbstractObjectType* objectType, const QString& prefix)
+        {
+            if (!objectType)
+                return;
+
+            for (const auto& attribute: objectType->attributes())
+            {
+                const QString attributeName =
+                    prefix.isEmpty() ? attribute->name() : prefix + "." + attribute->name();
+
+                if (attribute->type() == AbstractAttribute::Type::object)
+                    addAttributesRecursive(attribute->objectType(), attributeName);
+                else
+                    result.push_back(attributeName);
+            }
+        };
+
+    addAttributesRecursive(taxonomyState->objectTypeById(objectId), {});
+    return result;
+}
 
 // TODO: Remove later, when the code debt issue described below is fixed.
 //

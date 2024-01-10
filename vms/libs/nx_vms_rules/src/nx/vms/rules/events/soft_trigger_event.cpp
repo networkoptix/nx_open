@@ -104,7 +104,7 @@ const ItemDescriptor& SoftTriggerEvent::manifest()
                 tr("Occurs at"),
                 {},
                 {{"acceptAll", true}}),
-            makeFieldDescriptor<SourceUserField>("userId", tr("By")),
+            makeFieldDescriptor<SourceUserField>(utils::kUserIdFieldName, tr("By")),
             makeFieldDescriptor<CustomizableTextField>("triggerName", tr("Name")),
             makeFieldDescriptor<CustomizableIconField>("triggerIcon", tr("Icon")),
         },

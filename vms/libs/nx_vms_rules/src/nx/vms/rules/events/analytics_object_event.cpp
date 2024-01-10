@@ -103,7 +103,7 @@ const ItemDescriptor& AnalyticsObjectEvent::manifest()
             makeFieldDescriptor<AnalyticsObjectTypeField>(
                 utils::kObjectTypeIdFieldName, tr("Of Type"), {}, {}, {utils::kCameraIdFieldName}),
             makeFieldDescriptor<ObjectLookupField>(
-                "attributes", tr("And Object"), {}, {}, {utils::kObjectTypeIdFieldName}),
+                utils::kAttributesFieldName, tr("And Object"), {}, {}, {utils::kObjectTypeIdFieldName}),
         },
         .permissions = {
             .resourcePermissions = {
