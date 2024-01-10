@@ -276,7 +276,7 @@
     <name>BackupBandwidthSettingsWidget</name>
     <message>
       <source>No Limit</source>
-      <translation>制限無し</translation>
+      <translation>制限なし</translation>
     </message>
     <message>
       <source>Fixed</source>
