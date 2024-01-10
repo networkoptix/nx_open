@@ -16,7 +16,7 @@ public:
         const RtpHeader& rtpHeader,
         quint8* rtpBufferBase,
         int bufferOffset,
-        int readed,
+        int bytesRead,
         bool& gotData) override;
     virtual void clear() override {}
     virtual CodecParametersConstPtr getCodecParameters() override;
