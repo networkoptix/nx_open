@@ -8,6 +8,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/metatypes.h>
 #include <nx/vms/common/system_context.h>
+#include <nx/vms/rules/utils/event.h>
 
 #include "engine.h"
 #include "utils/event_details.h"
@@ -69,14 +70,6 @@ QString BasicEvent::cacheKey() const
     return {};
 }
 
-QString BasicEvent::source(common::SystemContext* context) const
-{
-    if (auto resource = context->resourcePool()->getResourceById(sourceId()))
-        return resource->getName();
-
-    return sourceId().toString();
-}
-
 QVariantMap BasicEvent::details(common::SystemContext* context) const
 {
     QVariantMap result;
@@ -85,7 +78,7 @@ QVariantMap BasicEvent::details(common::SystemContext* context) const
     utils::insertIfNotEmpty(result, utils::kNameDetailName, name(context));
     utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption(context));
 
-    if (const auto source = sourceId(); !source.isNull())
+    if (const auto source = sourceId(this); !source.isNull())
     {
         result[utils::kSourceIdDetailName] = QVariant::fromValue(source);
         utils::insertIfNotEmpty(
@@ -105,19 +98,6 @@ QString BasicEvent::name(common::SystemContext* context) const
 QString BasicEvent::extendedCaption(common::SystemContext* context) const
 {
     return tr("%1 event has occurred").arg(name(context));
-}
-
-QnUuid BasicEvent::sourceId() const
-{
-    const auto getId = [this](const char* propName){ return property(propName).value<QnUuid>(); };
-
-    if (const auto cameraId = getId(utils::kCameraIdFieldName); !cameraId.isNull())
-        return cameraId;
-
-    if (const auto serverId = getId(utils::kServerIdFieldName); !serverId.isNull())
-        return serverId;
-
-    return {};
 }
 
 } // namespace nx::vms::rules

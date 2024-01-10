@@ -10,7 +10,7 @@
 #include <nx/utils/impl_ptr.h>
 
 namespace nx::vms::client::desktop::rules {
-
+class EventParametersModel;
 class Completer: public QObject
 {
     Q_OBJECT
@@ -18,8 +18,14 @@ class Completer: public QObject
 public:
     Completer(const QStringList& words, QLineEdit* lineEdit, QObject* parent = nullptr);
     Completer(const QStringList& words, QTextEdit* textEdit, QObject* parent = nullptr);
-    Completer(QAbstractListModel* model, QTextEdit* textEdit, QObject* parent = nullptr);
+    Completer(EventParametersModel* model, QTextEdit* textEdit, QObject* parent = nullptr);
     virtual ~Completer() override;
+
+    /**
+     * Takes ownership of model. Deletes previously used model.
+     */
+    void setModel(EventParametersModel* model);
+    bool containsElement(const QString& element);
 
 protected:
     bool eventFilter(QObject* obj, QEvent* event) override;

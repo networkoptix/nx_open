@@ -109,7 +109,7 @@ const ItemDescriptor& AnalyticsEvent::manifest()
             utils::makeStateFieldDescriptor(tr("Begin When")),
             makeFieldDescriptor<SourceCameraField>(utils::kCameraIdFieldName, tr("Occurs at")),
             makeFieldDescriptor<AnalyticsEventTypeField>(
-                "eventTypeId", tr("Of Type"), {}, {}, {utils::kCameraIdFieldName}),
+                utils::kEventTypeIdFieldName, tr("Of Type"), {}, {}, {utils::kCameraIdFieldName}),
             makeFieldDescriptor<TextLookupField>(utils::kCaptionFieldName, tr("And Caption")),
             makeFieldDescriptor<TextLookupField>(utils::kDescriptionFieldName, tr("And Description")),
             // TODO: #amalov Consider adding following fields in 5.1+.

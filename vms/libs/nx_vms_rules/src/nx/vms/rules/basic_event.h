@@ -50,8 +50,6 @@ public:
     State state() const;
     void setState(State state);
 
-    QString source(common::SystemContext* context) const;
-
     /**
      * Key for more detailed event aggregation. Used in SendMailAction.
      * Returns event type by default.
@@ -89,12 +87,6 @@ protected:
 
     QString name(common::SystemContext* context) const;
     QString extendedCaption(common::SystemContext* context) const;
-
-    /**
-    * Returns event source to display in notification tile and tooltip.
-    * Keep in sync with AbstractEvent.getResource().
-    */
-    QnUuid sourceId() const;
 
 private:
     std::chrono::microseconds m_timestamp = std::chrono::microseconds::zero();
