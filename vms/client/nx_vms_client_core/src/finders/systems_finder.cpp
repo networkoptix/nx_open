@@ -87,7 +87,7 @@ void QnSystemsFinder::addSystemsFinder(QnAbstractSystemsFinder* finder, int prio
 
 void QnSystemsFinder::onBaseSystemDiscovered(const QnSystemDescriptionPtr& system, int priority)
 {
-    const auto it = m_systems.find(system->localId());
+    const auto it = m_systems.find({system->localId(), system->id()});
     if (it != m_systems.end())
     {
         m_systemToLocalId[system->id()] = system->localId();
@@ -140,7 +140,7 @@ void QnSystemsFinder::onBaseSystemDiscovered(const QnSystemDescriptionPtr& syste
             appContext()->coreSettings()->recentLocalConnections = connections;
         };
 
-    m_systems.insert(target->localId(), target);
+    m_systems.insert({target->localId(), target->id()}, target);
     connect(target.get(), &QnBaseSystemDescription::systemNameChanged, this,
         updateRecordInRecentConnections);
     connect(target.get(), &QnBaseSystemDescription::versionChanged, this,
@@ -156,7 +156,7 @@ void QnSystemsFinder::onSystemLost(const QString& systemId, int priority)
     if (localIdIter == m_systemToLocalId.end())
         return;
 
-    const auto it = m_systems.find(*localIdIter);
+    const auto it = m_systems.find({*localIdIter, systemId});
     if (it == m_systems.end())
         return;
 
@@ -190,7 +190,7 @@ QnSystemDescriptionPtr QnSystemsFinder::getSystem(const QString& systemId) const
     if (localIdIter == m_systemToLocalId.end())
         return QnSystemDescriptionPtr();
 
-    const auto it = m_systems.find(*localIdIter);
+    const auto it = m_systems.find({*localIdIter, systemId});
     return (it == m_systems.end()
         ? QnSystemDescriptionPtr()
         : it->dynamicCast<QnBaseSystemDescription>());

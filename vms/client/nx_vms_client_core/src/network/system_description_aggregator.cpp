@@ -195,8 +195,6 @@ void QnSystemDescriptionAggregator::removeSystem(
     if (system->id() != systemId)
         return;
 
-    const auto oldServers = servers();
-
     disconnect(system.data(), nullptr, this, nullptr);
     m_systems.remove(priority);
 
