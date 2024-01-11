@@ -14,12 +14,9 @@
 #include <nx/utils/algorithm/index_of.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/text/human_readable.h>
 
 namespace {
-
-// TODO: #sivanov #vkutin Refactor to use HumanReadable helper class.
-const qreal kBytesInGB = 1024.0 * 1024.0 * 1024.0;
-const qreal kBytesInTb = 1024.0 * kBytesInGB;
 
 static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kThemeSubstitutions = {
     {QIcon::Normal, {.primary = "light10"}},
@@ -305,13 +302,18 @@ QString QnStorageListModel::displayData(const QModelIndex& index, bool forcedTex
                     return tr("Loading...");
                 default:
                 {
-                    // TODO: #sivanov #vkutin Refactor to use HumanReadable helper class.
-                    const auto tb = storageData.totalSpace / kBytesInTb;
-                    if (tb >= 1.0)
-                        return tr("%1 TB").arg(QString::number(tb, 'f', 1));
+                    if (storageData.totalSpace < 0)
+                        return tr("Unknown size");
 
-                    const auto gb = storageData.totalSpace / kBytesInGB;
-                    return tr("%1 GB").arg(QString::number(gb, 'f', 1));
+                    using nx::vms::text::HumanReadable;
+
+                    return HumanReadable::digitalSizePrecise(
+                        storageData.totalSpace,
+                        HumanReadable::DigitalSizeUnit::VolumeSize,
+                        HumanReadable::DigitalSizeMultiplier::Binary,
+                        HumanReadable::SuffixFormat::Long,
+                        /*decimalSeparator*/ ".",
+                        /*precision*/ 1);
                 }
             }
         }
