@@ -7152,7 +7152,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Cannot be modified for new added cameras</source>
-      <translation>新しく追加されたカメラでは変更できません</translation>
+      <translation>新規追加されたカメラについては変更できません</translation>
     </message>
     <message>
       <source>This device provides only one data stream</source>
@@ -7207,7 +7207,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Bandwidth Limit</source>
-      <translation>帯域制限</translation>
+      <translation>帯域幅制限</translation>
     </message>
     <message>
       <source>New added cameras</source>
@@ -7215,15 +7215,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>New added cameras settings will apply to all servers in the system.</source>
-      <translation>新しく追加されたカメラの設定は、システム内のすべてのサーバーに適用されます。</translation>
+      <translation>新規追加されたカメラについての設定は、システム内のすべてのサーバーに適用されます。</translation>
     </message>
     <message>
       <source>Backup will be turned on for new added cameras on all servers in the system.</source>
-      <translation>システム内いずれかのサーバーに新しく追加されたカメラのバックアップがオンになります。</translation>
+      <translation>システム内のすべてのサーバーで、新規追加されたカメラのバックアップがオンになります。</translation>
     </message>
     <message>
       <source>Backup will be turned off for new added cameras on all servers in the system.</source>
-      <translation>システム内いずれかのサーバーに新しく追加されたカメラのバックアップはオフになります。</translation>
+      <translation>システム内のすべてのサーバーで、新規追加されたカメラのバックアップがオフになります。</translation>
     </message>
     <message>
       <source>Storage Management</source>
