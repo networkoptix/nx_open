@@ -27,9 +27,11 @@ public:
      * Collects list of visible event parameters for a specific event Type and Analytic Object
      * Type.
      */
-    static EventParametersNames getVisibleEventParameters(const QString& eventType,
+    static EventParametersNames getVisibleEventParameters(
+        const QString& eventType,
         common::SystemContext* systemContext,
-        const QString& objectTypeField);
+        const QString& objectTypeField,
+        State eventState = State::none);
     /**
      * Generates eventParameter's replacement for specific event, if it is applicable.
      */

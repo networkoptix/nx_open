@@ -29,7 +29,7 @@ constexpr int kSubgroupStart = 2;
 const auto kEventAttributesPrefix = QStringLiteral("event.attributes.");
 
 using FormatFunction = std::function<QString(const AggregatedEventPtr&, common::SystemContext*)>;
-using FilterFunction = std::function<bool(const ItemDescriptor&)>;
+using FilterFunction = std::function<bool(const ItemDescriptor&, State)>;
 
 struct SubstitutionDesc
 {
@@ -70,7 +70,7 @@ bool isValidEventAttribute(
         .contains(text);
 }
 
-bool deviceEvents(const ItemDescriptor& itemDescriptor)
+bool deviceEvents(const ItemDescriptor& itemDescriptor, State)
 {
     return std::any_of(itemDescriptor.fields.begin(),itemDescriptor.fields.end(),
         [](const FieldDescriptor& desc)
@@ -79,13 +79,12 @@ bool deviceEvents(const ItemDescriptor& itemDescriptor)
         });
 }
 
-bool prolongedEvents(const ItemDescriptor&)
+bool prolongedEvents(const ItemDescriptor&, State eventState)
 {
-    // TODO: #vbutkevich implement me
-    return true;
+    return eventState == State::started || eventState == State::stopped;
 }
 
-bool userEvents(const ItemDescriptor& itemDescriptor)
+bool userEvents(const ItemDescriptor& itemDescriptor, State)
 {
     return std::any_of(itemDescriptor.fields.begin(),itemDescriptor.fields.end(),
         [](const FieldDescriptor& desc)
@@ -93,7 +92,10 @@ bool userEvents(const ItemDescriptor& itemDescriptor)
 }
 
 bool substitutionIsApplicable(
-    const SubstitutionDesc& desc, const QString& eventType, common::SystemContext* context)
+    const SubstitutionDesc& desc,
+    const QString& eventType,
+    State eventState,
+    common::SystemContext* context)
 {
     if (!desc.filter)
         return true;
@@ -102,7 +104,7 @@ bool substitutionIsApplicable(
     if (!eventDesc)
         return false;
 
-    return desc.filter(eventDesc.value());
+    return desc.filter(eventDesc.value(), eventState);
 }
 
 const std::map<QString, SubstitutionDesc> kFormatFunctions = {
@@ -135,21 +137,21 @@ const std::map<QString, SubstitutionDesc> kFormatFunctions = {
 };
 
 FormatFunction formatFunction(
-    const QString& name, common::SystemContext* context, const AggregatedEventPtr& eventAggregator)
+    const QString& name, common::SystemContext* context, const AggregatedEventPtr& event)
 {
     if (name.startsWith(kEventAttributesPrefix))
     {
-        if (!isValidEventAttribute(name, context, eventAggregator))
+        if (!isValidEventAttribute(name, context, event))
             return {};
 
-        return [&](const AggregatedEventPtr& event, common::SystemContext* /*context*/)
+        return [name](const AggregatedEventPtr& event, common::SystemContext* /*context*/)
                { return eventAttribute(name.sliced(kEventAttributesPrefix.size()), event); };
     }
 
     const auto it = kFormatFunctions.find(name);
     if (it == kFormatFunctions.end())
         return {};
-    if (!substitutionIsApplicable(it->second, eventAggregator->type(), context))
+    if (!substitutionIsApplicable(it->second, event->type(), event->state(), context))
         return {};
     return it->second.formatFunction;
 }
@@ -158,7 +160,10 @@ FormatFunction formatFunction(
 
 namespace nx::vms::rules::utils {
 EventParameterHelper::EventParametersNames EventParameterHelper::getVisibleEventParameters(
-    const QString& eventType, common::SystemContext* systemContext, const QString& objectTypeField)
+    const QString& eventType,
+    common::SystemContext* systemContext,
+    const QString& objectTypeField,
+    State eventState)
 {
     if (eventType.isEmpty())
         return {};
@@ -169,7 +174,7 @@ EventParameterHelper::EventParametersNames EventParameterHelper::getVisibleEvent
         if (!desc.visible)
             continue; // Hidden elements are processed, but not visible in drop down menu.
 
-        if (!substitutionIsApplicable(desc, eventType, systemContext))
+        if (!substitutionIsApplicable(desc, eventType, eventState, systemContext))
             continue;
 
         result.push_back(key);

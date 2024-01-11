@@ -8,6 +8,7 @@
 #include <nx/vms/client/desktop/rules/model_view/event_parameters_model.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/rules/event_filter_fields/analytics_object_type_field.h>
+#include <nx/vms/rules/event_filter_fields/state_field.h>
 #include <nx/vms/rules/utils/event_parameter_helper.h>
 #include <nx/vms/rules/utils/field.h>
 
@@ -23,6 +24,7 @@ struct TextWithFieldsPicker::Private: public QObject
     bool connected = false;
     TextWithFieldsPicker* const q;
     QString objectType;
+    api::rules::State eventState;
 
     Private(TextWithFieldsPicker* parent): q(parent){};
     void addFormattingToText(const vms::rules::TextWithFields::ParsedValues& parsedValues) const
@@ -64,7 +66,7 @@ struct TextWithFieldsPicker::Private: public QObject
     {
         const auto model =
             new EventParametersModel(EventParameterHelper::getVisibleEventParameters(
-                desc.id, q->common::SystemContextAware::systemContext(), objectType));
+                desc.id, q->common::SystemContextAware::systemContext(), objectType, eventState));
         completer->setModel(model);
     }
 
@@ -75,18 +77,28 @@ struct TextWithFieldsPicker::Private: public QObject
         return objectTypeField ? objectTypeField->value() : QString();
     }
 
-    void setAnaliticsObjectType(const std::optional<vms::rules::ItemDescriptor>& desc)
+    api::rules::State getStateFieldValue() const
+    {
+        const auto stateField =
+            q->getEventField<vms::rules::StateField>(kStateFieldName);
+        return stateField ? stateField->value() : api::rules::State::none;
+    }
+
+    void updateCompleterModel(const std::optional<vms::rules::ItemDescriptor>& desc)
     {
         if (!desc)
             return;
 
-        const auto newValue = getObjectTypeFieldValue();
-        if (newValue == objectType)
+        const auto newObjectTypeValue = getObjectTypeFieldValue();
+        const auto newStateValue = getStateFieldValue();
+
+        // Updating completer model only if AnalyticsObjectType or Event State was changed.
+        if (newObjectTypeValue == objectType && newStateValue == eventState)
             return;
 
-        objectType = newValue;
+        objectType = newObjectTypeValue;
+        eventState = newStateValue;
 
-        // Updating completer model only if AnalyticsObjectType was changed.
         setCompleterModel(desc.value());
 
         if (q->theField())
@@ -122,7 +134,7 @@ void TextWithFieldsPicker::updateUi()
     }
 
     theField()->parseText();
-    d->setAnaliticsObjectType(desc);
+    d->updateCompleterModel(desc);
     base::updateUi();
 }
 

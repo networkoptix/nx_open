@@ -184,10 +184,10 @@ TEST_F(ActionFieldTest, EventTimestamp)
 TEST_F(ActionFieldTest, EventStartTimeInstantEvent)
 {
     TextWithFields fieldStartTime(systemContext());
-    fieldStartTime.setText("{event.time.start}");
-    // There is no start time for Instant event.
-    EXPECT_TRUE(
-        fieldStartTime.build(AggregatedEventPtr::create(makeEvent())).toString().isEmpty());
+    QString arg = "{event.time.start}";
+    fieldStartTime.setText(arg);
+    // There is no start time for Instant event, so there is no substitution.
+    EXPECT_EQ(arg, fieldStartTime.build(AggregatedEventPtr::create(makeEvent())).toString());
 }
 
 TEST_F(ActionFieldTest, EventTimeProlongedEvent)
@@ -539,6 +539,34 @@ TEST_F(ActionFieldTest, EventParametersHelperCustomEvent)
     ASSERT_FALSE(visibleElements.empty());
     containsParametersForAllEvents(visibleElements);
     notContainsHiddenElements(visibleElements);
+}
+
+TEST_F(ActionFieldTest, EventParametersProlongedEvents)
+{
+    makeAnalyticsEvent();
+
+    auto visibleElements = utils::EventParameterHelper::getVisibleEventParameters(
+        utils::type<AnalyticsEvent>(), systemContext(), {}, State::started);
+    ASSERT_FALSE(visibleElements.empty());
+    containsParametersForAllEvents(visibleElements);
+    notContainsHiddenElements(visibleElements);
+
+    ASSERT_TRUE(visibleElements.contains("event.time.start"));
+    ASSERT_TRUE(visibleElements.contains("event.time.end"));
+}
+
+TEST_F(ActionFieldTest, EventParametersInstantEvents)
+{
+    makeAnalyticsEvent();
+
+    auto visibleElements = utils::EventParameterHelper::getVisibleEventParameters(
+        utils::type<AnalyticsEvent>(), systemContext(), {}, State::instant);
+    ASSERT_FALSE(visibleElements.empty());
+    containsParametersForAllEvents(visibleElements);
+    notContainsHiddenElements(visibleElements);
+
+    ASSERT_FALSE(visibleElements.contains("event.time.start"));
+    ASSERT_FALSE(visibleElements.contains("event.time.end"));
 }
 
 } // namespace nx::vms::rules::test
