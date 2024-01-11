@@ -10,6 +10,8 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
 #include <nx/branding.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
+#include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/api/data/backup_settings.h>
 #include <nx/vms/api/data/email_settings.h>
@@ -19,6 +21,8 @@
 #include <nx/vms/api/data/watermark_settings.h>
 #include <nx/vms/common/system_context.h>
 #include <utils/email/email.h>
+
+#include "nx/network/http/http_types.h"
 
 using namespace std::chrono;
 using namespace std::chrono_literals;
@@ -2074,7 +2078,19 @@ void SystemSettings::setMetadataStorageChangePolicy(nx::vms::api::MetadataStorag
 
 QString SystemSettings::supportedOrigins() const
 {
-    return m_supportedOriginsAdaptor->value();
+    auto supportedOrigins = m_supportedOriginsAdaptor->value();
+    if (supportedOrigins != "*" && !nx::network::SocketGlobals::cloud().cloudHost().empty())
+    {
+        auto cloudUrl = nx::utils::Url::fromUserInput(
+            QString::fromStdString(nx::network::SocketGlobals::cloud().cloudHost()));
+        cloudUrl.setScheme(nx::network::http::kSecureUrlSchemeName);
+
+        if (supportedOrigins.isEmpty() || supportedOrigins == "null")
+            supportedOrigins = cloudUrl.toString();
+        else
+            supportedOrigins += "," + cloudUrl.toString();
+    }
+    return supportedOrigins;
 }
 void SystemSettings::setSupportedOrigins(const QString& value)
 {
