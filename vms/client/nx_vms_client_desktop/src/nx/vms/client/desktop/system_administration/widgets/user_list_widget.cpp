@@ -693,7 +693,8 @@ void UserListWidget::Private::updateBanners()
             usersModel->ldapUserCount()));
 
     ldapServerOfflineWarning->setVisible(
-        q->systemContext()->ldapStatusWatcher()->status()
+        !q->systemContext()->globalSettings()->ldap().isEmpty()
+        && q->systemContext()->ldapStatusWatcher()->status()
         && q->systemContext()->ldapStatusWatcher()->status()->state
             != api::LdapStatus::State::online
         && usersModel->ldapUserCount() > 0);
