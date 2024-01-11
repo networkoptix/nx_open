@@ -73,6 +73,8 @@ public:
 
     virtual ~DeviceSearcher();
 
+    void start();
+
     virtual void pleaseStop() override;
     void stop();
 
