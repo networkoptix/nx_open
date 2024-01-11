@@ -36,7 +36,8 @@ private:
     nx::sdk::Result<sdk::analytics::IAction::Result> executeActionWithMessageResult(
         nx::sdk::Uuid trackId,
         nx::sdk::Uuid deviceId,
-        int64_t timestampUs);
+        int64_t timestampUs,
+        nx::sdk::Ptr<nx::sdk::analytics::IObjectTrackInfo> objectTrackInfo);
 
     nx::sdk::Result<sdk::analytics::IAction::Result> executeActionWithUrlResult();
 
@@ -44,6 +45,7 @@ private:
         nx::sdk::Uuid trackId,
         nx::sdk::Uuid deviceId,
         int64_t timestampUs,
+        nx::sdk::Ptr<nx::sdk::analytics::IObjectTrackInfo> objectTrackInfo,
         const std::map<std::string, std::string>& params);
 
     nx::sdk::Result<sdk::analytics::IAction::Result> executeActionWithRequirements(
