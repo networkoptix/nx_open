@@ -55,18 +55,20 @@ DeviceSearcher::DeviceSearcher(
     m_timerManager(timerManager)
 {
     m_receiveBuffer.reserve(kReadBufferCapacity);
-    {
-        NX_MUTEX_LOCKER lk(&m_mutex);
-        m_timerID = m_timerManager->addTimer(
-            this,
-            std::chrono::milliseconds(m_discoverTryTimeoutMS));
-    }
-    m_cacheTimer.start();
 }
 
 DeviceSearcher::~DeviceSearcher()
 {
     stop();
+}
+
+void DeviceSearcher::start()
+{
+    NX_MUTEX_LOCKER lk(&m_mutex);
+    m_timerID = m_timerManager->addTimer(
+        this,
+        std::chrono::milliseconds(m_discoverTryTimeoutMS));
+    m_cacheTimer.start();
 }
 
 void DeviceSearcher::pleaseStop()
