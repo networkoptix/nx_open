@@ -7112,7 +7112,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Cannot be modified for new added cameras</source>
-      <translation>新しく追加されたカメラでは変更できません</translation>
+      <translation>新規追加されたカメラについては変更できません</translation>
     </message>
     <message>
       <source>This device provides only one data stream</source>
@@ -7211,7 +7211,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Bandwidth Limit</source>
-      <translation>帯域制限</translation>
+      <translation>帯域幅制限</translation>
     </message>
     <message>
       <source>New added cameras</source>
