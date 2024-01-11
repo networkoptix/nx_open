@@ -454,11 +454,12 @@ void WorkbenchUi::storeSettings()
 
 void WorkbenchUi::updateCursor()
 {
-#ifndef Q_OS_MACX
     bool curtained = m_inactive;
     if (mainWindow()->view() && !m_timeline->isHovered())
-        mainWindow()->view()->viewport()->setCursor(QCursor(curtained ? Qt::BlankCursor : Qt::ArrowCursor));
-#endif
+    {
+        mainWindow()->view()->viewport()->setCursor(
+            QCursor(curtained ? Qt::BlankCursor : Qt::ArrowCursor));
+    }
 }
 
 bool WorkbenchUi::calculateTimelineVisible(QnResourceWidget* widget) const
