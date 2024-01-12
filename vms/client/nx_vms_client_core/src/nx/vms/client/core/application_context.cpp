@@ -105,10 +105,19 @@ struct ApplicationContext::Private
 
     void initializeNetworkModules()
     {
+        using namespace nx::vms::common;
+        using Protocol = ServerCompatibilityValidator::Protocol;
+
+        ServerCompatibilityValidator::DeveloperFlags developerFlags;
+        if (ignoreCustomization)
+            developerFlags.setFlag(ServerCompatibilityValidator::DeveloperFlag::ignoreCustomization);
+
         if (!nx::vms::common::ServerCompatibilityValidator::isInitialized())
         {
             nx::vms::common::ServerCompatibilityValidator::initialize(
-                q->localPeerType());
+                q->localPeerType(),
+                Protocol::autoDetect,
+                developerFlags);
         }
         cloudStatusWatcher = std::make_unique<CloudStatusWatcher>();
         moduleDiscoveryManager = std::make_unique<nx::vms::discovery::Manager>();
@@ -117,6 +126,8 @@ struct ApplicationContext::Private
 
     ApplicationContext* const q;
     const ApplicationContext::Mode mode;
+    const bool ignoreCustomization = false;
+
     QQmlEngine* qmlEngine = nullptr;
     std::unique_ptr<Settings> settings;
     std::unique_ptr<CloudStatusWatcher> cloudStatusWatcher;
@@ -135,11 +146,12 @@ ApplicationContext::ApplicationContext(
     Mode mode,
     PeerType peerType,
     const QString& customCloudHost,
+    bool ignoreCustomization,
     const QString& customExternalResourceFile,
     QObject* parent)
     :
     common::ApplicationContext(peerType, customCloudHost, parent),
-    d(new Private{.q = this, .mode = mode})
+    d(new Private{.q = this, .mode = mode, .ignoreCustomization = ignoreCustomization})
 {
     if (NX_ASSERT(!s_instance))
         s_instance = this;
