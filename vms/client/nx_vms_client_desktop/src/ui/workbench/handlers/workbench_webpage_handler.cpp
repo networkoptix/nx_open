@@ -2,7 +2,14 @@
 
 #include "workbench_webpage_handler.h"
 
+#include <quazip/JlCompress.h>
+#include <quazip/quazip.h>
+#include <quazip/quazipfile.h>
+
+#include <QtCore/QFile>
+#include <QtCore/QTemporaryDir>
 #include <QtGui/QAction>
+#include <QtGui/QDesktopServices>
 
 #include <client/client_globals.h>
 #include <client/client_message_processor.h>
@@ -22,7 +29,6 @@ QnWorkbenchWebPageHandler::QnWorkbenchWebPageHandler(QObject* parent /*= nullptr
     base_type(parent),
     QnWorkbenchContextAware(parent)
 {
-
     connect(qnClientMessageProcessor, &QnClientMessageProcessor::initialResourcesReceived, this,
         [this]
         {
@@ -51,6 +57,22 @@ QnWorkbenchWebPageHandler::QnWorkbenchWebPageHandler(QObject* parent /*= nullptr
         connect(action(menu::NewIntegrationAction), &QAction::triggered,
             this, [this] { addNewWebPage(nx::vms::api::WebPageSubtype::clientApi); });
     }
+
+    connect(action(menu::OpenJavaScriptApiDocumentation), &QAction::triggered, this,
+        []()
+        {
+            QTemporaryDir tempDir;
+            tempDir.setAutoRemove(false);
+
+            QFile doc(":/js_api_doc.zip");
+            JlCompress::extractDir(&doc, tempDir.path());
+
+            const QString filePath = tempDir.filePath("index.html");
+
+            if (QFile::exists(filePath))
+                QDesktopServices::openUrl(QUrl::fromLocalFile(filePath));
+        });
+
 }
 
 QnWorkbenchWebPageHandler::~QnWorkbenchWebPageHandler()

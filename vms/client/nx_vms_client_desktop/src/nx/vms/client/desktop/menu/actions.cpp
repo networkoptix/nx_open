@@ -1508,6 +1508,14 @@ void initialize(Manager* manager, Action* root)
             .condition(condition::isIntegration() && !condition::showreelIsRunning());
     }
 
+    factory(OpenJavaScriptApiDocumentation)
+        .flags(Scene | SingleTarget)
+        .requiredPowerUserPermissions()
+        .text(ContextMenu::tr("JavaScript API..."))
+        .condition(
+            condition::isTrue(ini().javaScriptApiDocumentation) && condition::isIntegration()
+        );
+
     factory(WebPageSettingsAction)
         .flags(Scene | Tree | SingleTarget | ResourceTarget)
         .requiredPowerUserPermissions()

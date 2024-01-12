@@ -14,12 +14,31 @@ class Globals: public QObject
 public:
     using QObject::QObject;
 
+    /**
+     * Some operations return an error code which shows the status of the execution. The user
+     * should not rely on numeric values but rather should use the following defined codes.
+     *
+     * Example:
+     *
+     *     const error = await vms.tab.saveLayout()
+     *     if (error.code != vms.ErrorCode.success)
+     *         alert(`Can't save layout: ${error.description}`)
+     *
+     * @ingroup vms
+     */
     enum ErrorCode
     {
-        success, //< Success operation status.
-        failed, //< Operation is failed because of unspecified error.
-        denied, //< No accesss rights to preform an operation.
-        invalid_args //< Invalid arguments specified.
+        /** The operation was successful. */
+        success,
+
+        /** The operation has failed because of an unspecified error. */
+        failed,
+
+        /** No access rights to preform an operation. */
+        denied,
+
+        /** Invalid arguments specified. */
+        invalid_args,
     };
     Q_ENUMS(ErrorCode)
 };

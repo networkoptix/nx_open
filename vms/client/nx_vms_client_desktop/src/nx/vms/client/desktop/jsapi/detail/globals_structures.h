@@ -8,11 +8,21 @@
 
 namespace nx::vms::client::desktop::jsapi {
 
-/** Represents the error description of some operation. */
+/**
+ * Represents the error description of some operation.
+ * @ingroup vms
+ */
 struct Error
 {
-    int code = Globals::success;
+    using ErrorCode = Globals::ErrorCode;
+
+    /** Error code of the operation. */
+    int code = ErrorCode::success;
+
+    /** Human-readable description of the error. */
     QString description;
+
+    /** @privatesection */
 
     static Error make(Globals::ErrorCode code,
         const QString& description = QString());

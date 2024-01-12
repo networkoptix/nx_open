@@ -330,6 +330,10 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
     NX_INI_FLAG(false, integrationsManagement,
         "[Feature] Enables Integrations Management feature.");
 
+    // VMS-39166
+    NX_INI_FLAG(false, javaScriptApiDocumentation,
+        "[Feature] Enables the JavaScript API documentation.");
+
     // ---------------------------------------------------------------------------------------------
     // Support section.
     // Flags here can be removed when support engineers decide whether to discard the flag or move

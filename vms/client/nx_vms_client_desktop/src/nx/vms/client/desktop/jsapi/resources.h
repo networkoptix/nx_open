@@ -27,7 +27,10 @@ public:
 
     virtual ~Resources() override;
 
-    /** Check if a resource with the specified id may have media stream (at least theoretically). */
+    /**
+     * Checks if the Resource with the specified id can have a media stream.
+     * @ingroup vms-resources
+     */
     Q_INVOKABLE bool hasMediaStream(const QString& resourceId) const;
 
     /** List of all available (to user and by the API constraints) resources. */

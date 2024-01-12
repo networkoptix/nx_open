@@ -63,7 +63,7 @@ ResourcesApiBackend::~ResourcesApiBackend()
 {
 }
 
-detail::Resource::List ResourcesApiBackend::resources() const
+Resource::List ResourcesApiBackend::resources() const
 {
     const auto resources = appContext()->unifiedResourcePool()->resources(
         [](const QnResourcePtr& resource)
@@ -73,7 +73,7 @@ detail::Resource::List ResourcesApiBackend::resources() const
     return detail::Resource::from(resources);
 }
 
-detail::ResourceResult ResourcesApiBackend::resource(const ResourceUniqueId& resourceId) const
+ResourceResult ResourcesApiBackend::resource(const ResourceUniqueId& resourceId) const
 {
     const auto pool = appContext()->unifiedResourcePool();
     const auto resource = pool->resource(

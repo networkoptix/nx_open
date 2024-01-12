@@ -26,10 +26,11 @@ class TabApiBackend: public QObject
 
 public:
     /**
-     * Creates backend for the management functions and watchs for the tab with the specified
+     * Creates backend for the management functions and watches for the tab with the specified
      * layout.
      * @param context Context to be used for the access to the workbench functions.
      * @param layout Layout to be watched for.
+     * @param parent Parent.
      */
     TabApiBackend(
         WindowContext* context,
@@ -39,47 +40,54 @@ public:
     virtual ~TabApiBackend() override;
 
     /**
-     * Full state of the watched tab. States contains information about all items and corresponding
-     * layout.
-     * @see State
+     * @addtogroup vms-tab
+     * Contains methods and signals to work with the tab containing the current web page.
+     * @{
      */
+
+    /** @return Complete tab state. */
     State state() const;
 
-    /** Description of the item with specified id or error if it can't be found. */
+    /** @return Description of an item with the specified identifier. */
     ItemResult item(const QUuid& itemId) const;
 
-    /** Add item for the specified resource and initializes it with the specified parameters. */
+    /**
+      * Adds an item from the Resource with the specified identifier and item parameters.
+      * @return Item description on success.
+     */
     ItemResult addItem(
         const ResourceUniqueId& resourceId,
         const ItemParams& params);
 
-    /** Change specified parameters for the item with the selected id. */
+    /** Sets parameters for the item with the specified identifier. */
     Error setItemParams(
         const QUuid& itemId,
         const ItemParams& params);
 
-    /** Remove workbench item with specified id from the tab and corresponding layout. */
+    /** Removes the item with the specified identifier. */
     Error removeItem(const QUuid& itemId);
 
     /**
-     * Make all items synced with the specified item. All items on the tab
-     * will have the same timestamp,playing state and speed.
+     * Makes all items synced with the specified item. All items on the tab will have the same
+     * timestamp / playing state and speed.
      */
     Error syncWith(const QUuid& itemId);
 
-    /** Stop syncing of the corresponding layout. */
+    /** Stops syncing of the corresponding Layout. */
     Error stopSyncPlay();
 
-    /** Set properties for the corresponding layout. */
+    /** Sets the specified properties for the corresponding Layout. */
     Error setLayoutProperties(const LayoutProperties& properties);
 
-    /** Save layout. */
+    /** Saves the Layout. */
     Error saveLayout();
 
 signals:
     void itemAdded(const Item& item);
     void itemRemoved(const QnUuid& itemId);
     void itemChanged(const Item& item);
+
+    /** @} */ // group vms-tab
 
 private:
     struct Private;

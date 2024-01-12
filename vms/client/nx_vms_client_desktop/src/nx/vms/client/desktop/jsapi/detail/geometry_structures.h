@@ -6,6 +6,9 @@
 
 namespace nx::vms::client::desktop::jsapi::detail {
 
+/**
+ * @ingroup vms
+ */
 struct Point
 {
     int x = 0;
@@ -13,6 +16,9 @@ struct Point
 };
 NX_REFLECTION_INSTRUMENT(Point, (x)(y))
 
+/**
+ * @ingroup vms
+ */
 struct Size
 {
     int width = 0;
@@ -20,11 +26,16 @@ struct Size
 };
 NX_REFLECTION_INSTRUMENT(Size, (width)(height))
 
+/**
+ * @ingroup vms
+ */
 struct Rect
 {
-    Point pos; //< Top left point.
+    /** Top left point of the rectangle. */
+    Point pos;
     Size size;
 
+    /** @private */
     template<typename Source>
     static Rect from(const Source& source)
     {
