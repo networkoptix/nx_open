@@ -1022,6 +1022,11 @@ enum IDType
     NewIntegrationAction,
 
     /**
+     * Opens the JavaScript API documentation.
+     */
+    OpenJavaScriptApiDocumentation,
+
+    /**
      * Opens a webpage creation dialog.
      */
     NewWebPageAction,

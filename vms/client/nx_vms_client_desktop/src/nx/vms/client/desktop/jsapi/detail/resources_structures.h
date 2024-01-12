@@ -12,19 +12,34 @@
 
 namespace nx::vms::client::desktop::jsapi::detail {
 
-/** Represent type of the resource. */
+/**
+ * @ingroup vms
+ */
 NX_REFLECTION_ENUM_CLASS(ResourceType,
+    /** Invalid Resource type. */
     undefined,
-    server,
-    camera,
-    io_module,
-    virtual_camera,
-    web_page,
-    local_video,
-    local_image)
 
-/** Type of the specified resource. */
-ResourceType resourceType(const QnResourcePtr& resource);
+    /** Server Resource. */
+    server,
+
+    /** Real camera Resource. */
+    camera,
+
+    /** IO module Resource. */
+    io_module,
+
+    /** Some streaming Resource like an RTSP sources. */
+    virtual_camera,
+
+    /** Web page Resource. */
+    web_page,
+
+    /** Video file Resource. */
+    local_video,
+
+    /** Image file Resource. */
+    local_image
+)
 
 struct ResourceUniqueId
 {
@@ -44,13 +59,20 @@ NX_REFLECTION_TAG_TYPE(ResourceUniqueId, useStringConversionForSerialization)
 std::string toString(const ResourceUniqueId& id);
 bool fromString(const std::string& str, ResourceUniqueId* id);
 
-/** Resource description. */
+/**
+ * Resource description.
+ * @ingroup vms
+ */
 struct Resource
 {
+    /** Unique identifier. */
     ResourceUniqueId id;
+
     QString name;
     ResourceType type = ResourceType::undefined;
     int logicalId = 0;
+
+    /** @privatesection */
 
     using List = QList<Resource>;
     static Resource from(const QnResourcePtr& resource);
@@ -58,15 +80,23 @@ struct Resource
 };
 NX_REFLECTION_INSTRUMENT(Resource, (id)(name)(type)(logicalId))
 
-/** Represent result of resource 'get' operation. */
+/**
+ * Resource operation result.
+ * @ingroup vms
+ */
 struct ResourceResult
 {
+    /** Error description. */
     Error error;
+
+    /** Resource description. */
     Resource resource;
 };
 NX_REFLECTION_INSTRUMENT(ResourceResult, (error)(resource))
 
 /** Check if a resource with the specified type may have media stream (at least theoretically). */
 bool hasMediaStream(const ResourceType type);
+
+ResourceType resourceType(const QnResourcePtr& resource);
 
 } // namespace nx::vms::client::desktop::jsapi::detail

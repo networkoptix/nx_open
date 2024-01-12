@@ -24,9 +24,24 @@ public:
     {
     }
 
+    /**
+     * @addtogroup vms-self
+     * Contains methods to control the current web-page widget.
+     * @{
+    */
+
+    /**
+     * Sets the web-page widget minimal interface mode. In this mode only the close button is
+     * visible.
+     */
     Error setMinimalInterfaceMode(bool value);
 
+    /**
+     * Prevents showing the default context menu.
+     */
     Error setPreventDefaultContextMenu(bool value);
+
+    /** @} */ // group self
 
 private:
     Self* const q = nullptr;

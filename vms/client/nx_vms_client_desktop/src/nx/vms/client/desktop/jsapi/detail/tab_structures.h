@@ -15,55 +15,90 @@
 
 namespace nx::vms::client::desktop::jsapi::detail {
 
-/** Represent some period of time. */
+/**
+ * Represents some period of time.
+ * @ingroup vms
+ */
 struct TimePeriod
 {
+    /** Start time in milliseconds from Epoch. */
     std::chrono::milliseconds startTimeMs;
-    std::chrono::milliseconds durationMs; //< '-1' means infinite duration.
+
+    /** Duration in milliseconds, -1 means infinite duration. */
+    std::chrono::milliseconds durationMs;
 };
 NX_REFLECTION_INSTRUMENT(TimePeriod, (startTimeMs)(durationMs))
 
 /**
- * Represent media parameters for the workbench item. Media parameters exist only for the
- * items with available video streams.
+ * Represents media parameters for a tab item. Media parameters exist only for items with available
+ * video streams.
+ * @ingroup vms
  */
 struct MediaParams
 {
+    /** Playback speed. */
     std::optional<double> speed = 1.0;
+
+    /** Current timestamp of the media stream. */
     std::optional<std::chrono::milliseconds> timestampMs;
+
+    /** Selected timeline part. */
     std::optional<TimePeriod> timelineSelection;
+
+    /** Visible part of the timeline. */
     std::optional<TimePeriod> timelineWindow;
 };
 NX_REFLECTION_INSTRUMENT(MediaParams, (speed)(timestampMs)(timelineSelection)(timelineWindow))
 
 /**
- * Represent item parameters. Media parameters are optional and available only for
- * the appropriate item types.
+ * Represents tab item parameters. Media parameters are optional and available only for the
+ * appropriate item types.
+ * @ingroup vms
  */
 struct ItemParams
 {
+    /** Shows if the item is in the selection or is single-selected. */
     std::optional<bool> selected;
+
+    /** Shows if the item is a focused one. */
     std::optional<bool> focused;
+
+    /** Geometry of the item. */
     std::optional<Rect> geometry;
 
+    /** Media parameters of the item (if applicable). */
     std::optional<MediaParams> media;
 };
 NX_REFLECTION_INSTRUMENT(ItemParams,(selected)(focused)(geometry)(media))
 
-/** Represent workbench item. Consist of the bound resource and parameters of the item. */
+/**
+ * Represents the tab item description.
+ * @ingroup vms
+ */
 struct Item
 {
+    /** Unique item identifier. */
     QnUuid id;
 
+    /** Resource connected to the item. */
     Resource resource;
+
+    /** Item parameters related to the appearance. */
     ItemParams params;
+
 };
 NX_REFLECTION_INSTRUMENT(Item, (id)(resource)(params))
 
-/** Represent result of an operation with an item like item addition or its request. */
+/**
+ * Represents item operation result.
+ * @ingroup vms
+ */
 struct ItemResult
 {
+    /** Error description. */
     Error error;
+
+    /** Related item description. */
     std::optional<Item> item;
 };
 NX_REFLECTION_INSTRUMENT(ItemResult, (error)(item))
@@ -71,32 +106,49 @@ NX_REFLECTION_INSTRUMENT(ItemResult, (error)(item))
 using ItemVector = std::vector<Item>;
 
 /**
- * Represent items selection state. Consist of the focused item and array of the items
- * which are selected.
+ * Represents selection and focus states for the tab.
+ * @ingroup vms
  */
 struct ItemSelection
 {
+    /** Currently focused item on the tab. */
     std::optional<Item> focusedItem;
+
+    /** Array of selected items on the tab. */
     std::optional<ItemVector> selectedItems;
 };
 NX_REFLECTION_INSTRUMENT(ItemSelection, (focusedItem)(selectedItems))
 
-/** Represent currently supported properties of the underlying layout. */
+/**
+ * Represents all properties of the current Layout on the tab, that are available to the API.
+ * @ingroup vms
+ */
 struct LayoutProperties
 {
+    /** Minimum size of the Layout, if specified. */
     std::optional<Size> minimumSize;
+
+    /** The state "locked". */
     std::optional<bool> locked;
 };
 NX_REFLECTION_INSTRUMENT(LayoutProperties, (minimumSize)(locked))
 
-/** Represent full state of the tab. */
+/**
+ * Represents the complete current state of the tab.
+ * @ingroup vms
+ */
 struct State
 {
+    /** Shows if the current Layout on the tab is synced. */
     bool sync = false;
 
+    /** Array of the all items on the tab. */
     ItemVector items;
+
+    /** Current selection state. */
     ItemSelection selection;
 
+    /** Related Layout properties. */
     LayoutProperties properties;
 };
 NX_REFLECTION_INSTRUMENT(State, (sync)(items)(selection)(properties))
