@@ -17,6 +17,8 @@
 
 using namespace nx::vms::client::core;
 
+namespace {
+
 enum class SystemHideFlag
 {
     none = 0,
@@ -24,8 +26,19 @@ enum class SystemHideFlag
     notConnectableCloud = 1 << 1,
     requireCompatibilityMode = 1 << 2,
     nonLocalHost = 1 << 3,
+    autoDiscovered = 1 << 4,
 };
 Q_DECLARE_FLAGS(SystemHideFlags, SystemHideFlag)
+
+enum Priority
+{
+    kCloudPriority,
+    kDirectFinder,
+    kRecentFinder,
+    kScopeFinder,
+};
+
+} // namespace
 
 QnSystemsFinder::QnSystemsFinder(QObject* parent):
     base_type(parent)
@@ -33,27 +46,19 @@ QnSystemsFinder::QnSystemsFinder(QObject* parent):
     NX_ASSERT(nx::vms::common::ServerCompatibilityValidator::isInitialized(),
         "Internal finders use it on start when processing existing system descriptions");
 
-    enum
-    {
-        kCloudPriority,
-        kDirectFinder,
-        kRecentFinder,
-        kScopeFinder,
-    };
-
-    auto cloudSystemsFinder = new CloudSystemsFinder(this);
-    addSystemsFinder(cloudSystemsFinder, kCloudPriority);
-
-    SearchAddressManager* searchUrlManager = new SearchAddressManager(this);
-
-    auto directSystemsFinder = new QnDirectSystemsFinder(searchUrlManager, this);
-    addSystemsFinder(directSystemsFinder, kDirectFinder);
-
+    // Load saved systems first.
     auto recentLocalSystemsFinder = new QnRecentLocalSystemsFinder(this);
     addSystemsFinder(recentLocalSystemsFinder, kRecentFinder);
 
     auto scopeLocalSystemsFinder = new ScopeLocalSystemsFinder(this);
     addSystemsFinder(scopeLocalSystemsFinder, kScopeFinder);
+
+    auto cloudSystemsFinder = new CloudSystemsFinder(this);
+    addSystemsFinder(cloudSystemsFinder, kCloudPriority);
+
+    auto searchUrlManager = new SearchAddressManager(this);
+    auto directSystemsFinder = new QnDirectSystemsFinder(searchUrlManager, this);
+    addSystemsFinder(directSystemsFinder, kDirectFinder);
 }
 
 QnSystemsFinder::~QnSystemsFinder()
@@ -117,6 +122,9 @@ void QnSystemsFinder::onBaseSystemDiscovered(const QnSystemDescriptionPtr& syste
     }
 
     if (systemHideOptions.testFlag(SystemHideFlag::nonLocalHost) && !system->hasLocalServer())
+        return;
+
+    if (systemHideOptions.testFlag(SystemHideFlag::autoDiscovered) && priority == kDirectFinder)
         return;
 
     m_systemToLocalId[system->id()] = system->localId();
