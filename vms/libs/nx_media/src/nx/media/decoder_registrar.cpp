@@ -10,7 +10,7 @@
 
 #include "android_video_decoder.h"
 #include "android_audio_decoder.h"
-#include "ios_video_decoder.h"
+#include "mac_video_decoder.h"
 
 #include <nx/media/quick_sync/qsv_supported.h>
 #ifdef __QSV_SUPPORTED__
@@ -40,11 +40,11 @@ void DecoderRegistrar::registerDecoders(const QMap<int, QSize>& maxFfmpegResolut
     }
     #endif
 
-    #if defined(Q_OS_IOS)
+    #if defined(Q_OS_IOS) || defined(Q_OS_MACOS)
     {
         static const int kHardwareDecodersCount = 1;
-        VideoDecoderRegistry::instance()->addPlugin<IOSVideoDecoder>(
-            "IOSVideoDecoder", kHardwareDecodersCount);
+        VideoDecoderRegistry::instance()->addPlugin<MacVideoDecoder>(
+            "MacVideoDecoder", kHardwareDecodersCount);
     }
     #endif
 
