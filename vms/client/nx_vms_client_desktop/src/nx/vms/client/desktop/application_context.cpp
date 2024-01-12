@@ -692,6 +692,7 @@ ApplicationContext::ApplicationContext(
         toCoreMode(mode),
         peerType(startupParameters),
         actualCloudHost(),
+        /*ignoreCustomization*/ false,
         /*customExternalResourceFile*/ "client_external.dat",
         parent),
     d(new Private{
