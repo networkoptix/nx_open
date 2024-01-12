@@ -108,6 +108,12 @@ if(ANDROID OR IOS)
     target_link_libraries(nx_media PRIVATE libjpeg-turbo::libjpeg-turbo)
 endif()
 
+if(MACOSX)
+    find_library(CoreVideo_LIBRARY CoreVideo)
+    mark_as_advanced(CoreVideo_LIBRARY)
+    target_link_libraries(nx_media PRIVATE ${CoreVideo_LIBRARY})
+endif()
+
 if(hardware_decoders_x64)
     if(LINUX)
         find_package(libva REQUIRED)

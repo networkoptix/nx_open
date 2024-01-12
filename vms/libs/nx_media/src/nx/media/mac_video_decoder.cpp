@@ -1,7 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "ios_video_decoder.h"
-#if defined(Q_OS_IOS)
+#include "mac_video_decoder.h"
+#if defined(Q_OS_IOS) || defined(Q_OS_MACOS)
 
 extern "C"
 {
@@ -15,6 +15,7 @@ extern "C"
 #include <QtCore/QDebug>
 #include <QtCore/QFile>
 
+#include <nx/build_info.h>
 #include <nx/codec/nal_units.h>
 #include <nx/media/ffmpeg_helper.h>
 #include <nx/media/h264_utils.h>
@@ -184,13 +185,13 @@ private:
 //-------------------------------------------------------------------------------------------------
 // FfmpegDecoderPrivate
 
-class IOSVideoDecoderPrivate: public QObject
+class MacVideoDecoderPrivate: public QObject
 {
-    Q_DECLARE_PUBLIC(IOSVideoDecoder)
-    IOSVideoDecoder* q_ptr;
+    Q_DECLARE_PUBLIC(MacVideoDecoder)
+    MacVideoDecoder* q_ptr;
 
 public:
-    IOSVideoDecoderPrivate()
+    MacVideoDecoderPrivate()
     :
         codecContext(nullptr),
         frame(av_frame_alloc()),
@@ -198,7 +199,7 @@ public:
     {
     }
 
-    ~IOSVideoDecoderPrivate()
+    ~MacVideoDecoderPrivate()
     {
         closeCodecContext();
         av_frame_free(&frame);
@@ -214,7 +215,7 @@ public:
     bool isHardwareAccelerated = false;
 };
 
-void IOSVideoDecoderPrivate::initContext(const QnConstCompressedVideoDataPtr& frame)
+void MacVideoDecoderPrivate::initContext(const QnConstCompressedVideoDataPtr& frame)
 {
     if (!frame || !frame->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey))
         return;
@@ -253,7 +254,7 @@ void IOSVideoDecoderPrivate::initContext(const QnConstCompressedVideoDataPtr& fr
     codecContext->refcounted_frames = 1;
 }
 
-void IOSVideoDecoderPrivate::closeCodecContext()
+void MacVideoDecoderPrivate::closeCodecContext()
 {
     if (codecContext)
         av_videotoolbox_default_free(codecContext);
@@ -264,20 +265,20 @@ void IOSVideoDecoderPrivate::closeCodecContext()
 //-------------------------------------------------------------------------------------------------
 // FfmpegDecoder
 
-IOSVideoDecoder::IOSVideoDecoder(
+MacVideoDecoder::MacVideoDecoder(
     const RenderContextSynchronizerPtr& /*synchronizer*/,
     const QSize& /*resolution*/)
     :
     AbstractVideoDecoder(),
-    d_ptr(new IOSVideoDecoderPrivate())
+    d_ptr(new MacVideoDecoderPrivate())
 {
 }
 
-IOSVideoDecoder::~IOSVideoDecoder()
+MacVideoDecoder::~MacVideoDecoder()
 {
 }
 
-bool IOSVideoDecoder::isCompatible(
+bool MacVideoDecoder::isCompatible(
     const AVCodecID codec,
     const QSize& resolution,
     bool /*allowOverlay*/,
@@ -304,7 +305,7 @@ bool IOSVideoDecoder::isCompatible(
     return fixedResolution.width() <= maxRes.width() && fixedResolution.height() <= maxRes.height();
 }
 
-QSize IOSVideoDecoder::maxResolution(const AVCodecID codec)
+QSize MacVideoDecoder::maxResolution(const AVCodecID codec)
 {
     static const QSize kHdReadyResolution(1280, 720);
     static const QSize kFullHdResolution(1920, 1080);
@@ -316,6 +317,9 @@ QSize IOSVideoDecoder::maxResolution(const AVCodecID codec)
     {
         case AV_CODEC_ID_H264:
         case AV_CODEC_ID_H265:
+            if (nx::build_info::isMacOsX())
+                return kDci4kResolution;
+
             if (deviceInfo.type == IosDeviceInformation::Type::iPhone)
             {
                 if (deviceInfo.majorVersion >= IosDeviceInformation::iPhone6)
@@ -341,11 +345,11 @@ QSize IOSVideoDecoder::maxResolution(const AVCodecID codec)
     }
 }
 
-int IOSVideoDecoder::decode(
+int MacVideoDecoder::decode(
     const QnConstCompressedVideoDataPtr& videoData,
     VideoFramePtr* outDecodedFrame)
 {
-    Q_D(IOSVideoDecoder);
+    Q_D(MacVideoDecoder);
 
     auto compressedVideoData = videoData;
     if (videoData && nx::media::isAnnexb(videoData.get()))
@@ -439,9 +443,9 @@ int IOSVideoDecoder::decode(
     return frameNum;
 }
 
-AbstractVideoDecoder::Capabilities IOSVideoDecoder::capabilities() const
+AbstractVideoDecoder::Capabilities MacVideoDecoder::capabilities() const
 {
-    Q_D(const IOSVideoDecoder);
+    Q_D(const MacVideoDecoder);
     return d->isHardwareAccelerated ? Capability::hardwareAccelerated : Capability::noCapability;
 }
 
