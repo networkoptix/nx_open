@@ -1231,20 +1231,8 @@
       <translation>切断</translation>
     </message>
     <message>
-      <source>Filters</source>
-      <translation>フィルター</translation>
-    </message>
-    <message>
       <source>Add</source>
       <translation>追加</translation>
-    </message>
-    <message>
-      <source>Add Filter</source>
-      <translation>フィルターを追加</translation>
-    </message>
-    <message>
-      <source>No users or groups match synchronization settings and are added to the system DB. Make sure LDAP server parameters and filters are configured correctly.</source>
-      <translation>同期設定に一致するユーザーまたはグループが存在しないため、システムの DB には追加されません。 LDAP サーバーのパラメーターとフィルターが正しく構成されていることを確認してください。</translation>
     </message>
     <message>
       <source>Please use care when altering LDAP settings. Incorrect configuration could disrupt system availability for a large number of users simultaneously.</source>
@@ -1263,12 +1251,24 @@
       <translation>設定</translation>
     </message>
     <message>
-      <source>Specify at least one filter to synchronize users and groups</source>
-      <translation>ユーザーとグループを同期するには、1 つ以上のフィルターを指定してください</translation>
-    </message>
-    <message>
       <source>Continuous sync with LDAP server is disabled for this system. Updates to groups and users and groups membership will occur solely through manual synchronization.</source>
       <translation>このシステムでは、LDAP サーバーとの継続的同期が無効になっています。グループ、ユーザー、およびグループメンバーシップの更新は、手動同期によってのみ行われます。</translation>
+    </message>
+    <message>
+      <source>Search Bases</source>
+      <translation>検索ベース</translation>
+    </message>
+    <message>
+      <source>Add Search Base</source>
+      <translation>検索ベースを追加</translation>
+    </message>
+    <message>
+      <source>Specify at least one search base to synchronize users and groups</source>
+      <translation>ユーザーとグループを同期するには、1 つ以上の検索ベースを指定してください</translation>
+    </message>
+    <message>
+      <source>No users or groups match synchronization settings and are added to the system DB. Make sure LDAP server parameters and search bases are configured correctly.</source>
+      <translation>同期設定に一致するユーザーまたはグループが存在しないため、システムの DB には追加されません。 LDAP サーバーのパラメーターと検索ベースが正しく構成されていることを確認してください。</translation>
     </message>
   </context>
   <context>

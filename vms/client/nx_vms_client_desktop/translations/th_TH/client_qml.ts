@@ -1231,20 +1231,8 @@
       <translation>ตัดการเชื่อมต่อ</translation>
     </message>
     <message>
-      <source>Filters</source>
-      <translation type="unfinished">Filters</translation>
-    </message>
-    <message>
       <source>Add</source>
       <translation>เพิ่ม</translation>
-    </message>
-    <message>
-      <source>Add Filter</source>
-      <translation type="unfinished">Add Filter</translation>
-    </message>
-    <message>
-      <source>No users or groups match synchronization settings and are added to the system DB. Make sure LDAP server parameters and filters are configured correctly.</source>
-      <translation type="unfinished">No users or groups match synchronization settings and are added to the system DB. Make sure LDAP server parameters and filters are configured correctly.</translation>
     </message>
     <message>
       <source>Please use care when altering LDAP settings. Incorrect configuration could disrupt system availability for a large number of users simultaneously.</source>
@@ -1263,12 +1251,24 @@
       <translation type="unfinished">Configure</translation>
     </message>
     <message>
-      <source>Specify at least one filter to synchronize users and groups</source>
-      <translation type="unfinished">Specify at least one filter to synchronize users and groups</translation>
-    </message>
-    <message>
       <source>Continuous sync with LDAP server is disabled for this system. Updates to groups and users and groups membership will occur solely through manual synchronization.</source>
       <translation type="unfinished">Continuous sync with LDAP server is disabled for this system. Updates to groups and users and groups membership will occur solely through manual synchronization.</translation>
+    </message>
+    <message>
+      <source>Search Bases</source>
+      <translation>ค้นหา Bases</translation>
+    </message>
+    <message>
+      <source>Add Search Base</source>
+      <translation>เพิ่มฐานการค้นหา</translation>
+    </message>
+    <message>
+      <source>Specify at least one search base to synchronize users and groups</source>
+      <translation>ระบุฐานการค้นหาอย่างน้อยหนึ่งฐานเพื่อซิงโครไนซ์ผู้ใช้และกลุ่ม</translation>
+    </message>
+    <message>
+      <source>No users or groups match synchronization settings and are added to the system DB. Make sure LDAP server parameters and search bases are configured correctly.</source>
+      <translation>ไม่มีผู้ใช้หรือกลุ่มที่ตรงกับการตั้งค่าการซิงโครไนซ์และถูกเพิ่มลงในฐานข้อมูลระบบ ตรวจสอบให้แน่ใจว่าพารามิเตอร์เซิร์ฟเวอร์ LDAP และฐานการค้นหาได้รับการกำหนดค่าอย่างถูกต้อง</translation>
     </message>
   </context>
   <context>

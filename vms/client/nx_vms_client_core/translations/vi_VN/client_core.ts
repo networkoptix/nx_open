@@ -219,22 +219,22 @@
     </message>
     <message numerus="yes">
       <source>Cannot verify the identity of %n servers</source>
-      <translation type="unfinished">
-        <numerusform>Cannot verify the identity of %n servers</numerusform>
+      <translation>
+        <numerusform>Không thể xác minh danh tính của %n máy chủ</numerusform>
       </translation>
     </message>
     <message>
       <source>Review the certificates of the servers from this system.</source>
-      <translation type="unfinished">Review the certificates of the servers from this system.</translation>
+      <translation>Xem lại chứng chỉ của máy chủ từ hệ thống này.</translation>
     </message>
     <message>
       <source>To learn more about the current problem read this %1.</source>
       <comment>%1 is &lt;help article&gt; link</comment>
-      <translation type="unfinished">To learn more about the current problem read this %1.</translation>
+      <translation>Để tìm hiểu thêm về vấn đề hiện tại, hãy đọc %1.</translation>
     </message>
     <message>
       <source>This might be due to an expired server certificate or an invalid certificate. Contact your system administrator for further investigation.</source>
-      <translation type="unfinished">This might be due to an expired server certificate or an invalid certificate. Contact your system administrator for further investigation.</translation>
+      <translation>Điều này có thể do chứng chỉ máy chủ đã hết hạn hoặc chứng chỉ không hợp lệ. Hãy liên hệ với quản trị viên hệ thống của bạn để tìm hiểu thêm.</translation>
     </message>
   </context>
   <context>

@@ -1719,11 +1719,11 @@
     </message>
     <message>
       <source>Interval between the Cloud polling HTTP requests to synchronize the data.</source>
-      <translation type="unfinished">Interval between the Cloud polling HTTP requests to synchronize the data.</translation>
+      <translation>Khoảng thời gian giữa yêu cầu HTTP thăm dò đám mây để đồng bộ hóa dữ liệu.</translation>
     </message>
     <message>
       <source>Local System ID, null means the System is not set up yet.</source>
-      <translation type="unfinished">Local System ID, null means the System is not set up yet.</translation>
+      <translation>ID hệ thống cục bộ, null có nghĩa là Hệ thống chưa được thiết lập.</translation>
     </message>
   </context>
   <context>
