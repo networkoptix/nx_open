@@ -1747,7 +1747,7 @@
     </message>
     <message>
       <source>Interval between the Cloud polling HTTP requests to synchronize the data.</source>
-      <translation type="unfinished">Interval between the Cloud polling HTTP requests to synchronize the data.</translation>
+      <translation>Khoảng thời gian giữa yêu cầu HTTP thăm dò đám mây để đồng bộ hóa dữ liệu.</translation>
     </message>
   </context>
   <context>
