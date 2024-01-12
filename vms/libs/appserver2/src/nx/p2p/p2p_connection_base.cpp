@@ -608,6 +608,12 @@ void ConnectionBase::onMessageSent(SystemError::ErrorCode errorCode, size_t byte
     }
 }
 
+void ConnectionBase::transactionSkipped()
+{
+    if (m_dataToSend.empty())
+        emit allDataSent(weakPointer());
+}
+
 void ConnectionBase::onNewMessageRead(SystemError::ErrorCode errorCode, size_t bytesRead)
 {
     if (bytesRead == 0)
