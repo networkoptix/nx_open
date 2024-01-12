@@ -2,7 +2,7 @@
 
 #pragma once
 #include <QtCore/QtGlobal>
-#if defined(Q_OS_IOS)
+#if defined(Q_OS_IOS) || defined(Q_OS_MACOS)
 
 #include <QtCore/QObject>
 #include <QtMultimedia/QVideoFrame>
@@ -14,16 +14,16 @@
 namespace nx {
 namespace media {
 
-class IOSVideoDecoderPrivate;
+class MacVideoDecoderPrivate;
 
 /**
  * Implements ffmpeg video decoder.
  */
-class IOSVideoDecoder: public AbstractVideoDecoder
+class MacVideoDecoder: public AbstractVideoDecoder
 {
 public:
-    IOSVideoDecoder(const RenderContextSynchronizerPtr& synchronizer, const QSize& resolution);
-    virtual ~IOSVideoDecoder();
+    MacVideoDecoder(const RenderContextSynchronizerPtr& synchronizer, const QSize& resolution);
+    virtual ~MacVideoDecoder();
 
     static bool isCompatible(
         const AVCodecID codec,
@@ -41,8 +41,8 @@ private:
     void ffmpegToQtVideoFrame(VideoFramePtr* result);
 
 private:
-    QScopedPointer<IOSVideoDecoderPrivate> d_ptr;
-    Q_DECLARE_PRIVATE(IOSVideoDecoder);
+    QScopedPointer<MacVideoDecoderPrivate> d_ptr;
+    Q_DECLARE_PRIVATE(MacVideoDecoder);
 };
 
 } // namespace media
