@@ -26,6 +26,7 @@ struct NX_VMS_CLIENT_CORE_API Ini: nx::kit::IniConfig
         " * 2 - Not connectable cloud systems.\n"
         " * 4 - Compatible systems which require compatibility mode.\n"
         " * 8 - All systems except those on localhost.\n"
+        " * 16 - Local auto-discovered and not connected before.\n"
     );
 
     NX_INI_INT(30000, cameraDataLoadingIntervalMs,
