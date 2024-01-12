@@ -1238,20 +1238,8 @@
       <translation>Koppla från</translation>
     </message>
     <message>
-      <source>Filters</source>
-      <translation>Filter</translation>
-    </message>
-    <message>
       <source>Add</source>
       <translation>Lägg till</translation>
-    </message>
-    <message>
-      <source>Add Filter</source>
-      <translation>Lägg till filter</translation>
-    </message>
-    <message>
-      <source>No users or groups match synchronization settings and are added to the system DB. Make sure LDAP server parameters and filters are configured correctly.</source>
-      <translation>Inga användare eller grupper matchar synkroniseringsinställningarna och läggs till i systemet DB. Se till att LDAP-serverns parametrar och filter är konfigurerade korrekt.</translation>
     </message>
     <message>
       <source>Please use care when altering LDAP settings. Incorrect configuration could disrupt system availability for a large number of users simultaneously.</source>
@@ -1270,12 +1258,24 @@
       <translation>Konfigurera</translation>
     </message>
     <message>
-      <source>Specify at least one filter to synchronize users and groups</source>
-      <translation>Ange minst ett filter för att synkronisera användare och grupper</translation>
-    </message>
-    <message>
       <source>Continuous sync with LDAP server is disabled for this system. Updates to groups and users and groups membership will occur solely through manual synchronization.</source>
       <translation>Kontinuerlig synkronisering med LDAP-server är inaktiverad för det här systemet. Uppdateringar av grupper och användare och gruppmedlemskap sker enbart genom manuell synkronisering.</translation>
+    </message>
+    <message>
+      <source>Search Bases</source>
+      <translation>Sökbas</translation>
+    </message>
+    <message>
+      <source>Add Search Base</source>
+      <translation>Lägg till sökbas</translation>
+    </message>
+    <message>
+      <source>Specify at least one search base to synchronize users and groups</source>
+      <translation>Ange minst en sökbas för att synkronisera användare och grupper</translation>
+    </message>
+    <message>
+      <source>No users or groups match synchronization settings and are added to the system DB. Make sure LDAP server parameters and search bases are configured correctly.</source>
+      <translation>Inga användare eller grupper matchar synkroniseringsinställningarna och läggs till i systemets DB. Se till att LDAP-serverparametrar och sökbaser är korrekt konfigurerade.</translation>
     </message>
   </context>
   <context>

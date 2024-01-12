@@ -1238,20 +1238,8 @@
       <translation>Bağlantıyı kes</translation>
     </message>
     <message>
-      <source>Filters</source>
-      <translation>Filtreler</translation>
-    </message>
-    <message>
       <source>Add</source>
       <translation>Ekle</translation>
-    </message>
-    <message>
-      <source>Add Filter</source>
-      <translation>Filtre Ekle</translation>
-    </message>
-    <message>
-      <source>No users or groups match synchronization settings and are added to the system DB. Make sure LDAP server parameters and filters are configured correctly.</source>
-      <translation type="unfinished">No users or groups match synchronization settings and are added to the system DB. Make sure LDAP server parameters and filters are configured correctly.</translation>
     </message>
     <message>
       <source>Please use care when altering LDAP settings. Incorrect configuration could disrupt system availability for a large number of users simultaneously.</source>
@@ -1270,12 +1258,24 @@
       <translation>Yapılandır</translation>
     </message>
     <message>
-      <source>Specify at least one filter to synchronize users and groups</source>
-      <translation>Kullanıcıları ve grupları senkronize etmek için en az bir filtre belirtin</translation>
-    </message>
-    <message>
       <source>Continuous sync with LDAP server is disabled for this system. Updates to groups and users and groups membership will occur solely through manual synchronization.</source>
       <translation>Bu sistem için LDAP sunucusuyla sürekli senkronizasyon devre dışı bırakıldı. Gruplara, kullanıcılara ve grup üyeliğine ilişkin güncellemeler yalnızca manuel senkronizasyon yoluyla gerçekleştirilecektir.</translation>
+    </message>
+    <message>
+      <source>Search Bases</source>
+      <translation>Arama Tabanları</translation>
+    </message>
+    <message>
+      <source>Add Search Base</source>
+      <translation>Arama Tabanı Ekle</translation>
+    </message>
+    <message>
+      <source>Specify at least one search base to synchronize users and groups</source>
+      <translation>Kullanıcıları ve grupları senkronize etmek için en az bir arama tabanı belirtin</translation>
+    </message>
+    <message>
+      <source>No users or groups match synchronization settings and are added to the system DB. Make sure LDAP server parameters and search bases are configured correctly.</source>
+      <translation type="unfinished">No users or groups match synchronization settings and are added to the system DB. Make sure LDAP server parameters and search bases are configured correctly.</translation>
     </message>
   </context>
   <context>

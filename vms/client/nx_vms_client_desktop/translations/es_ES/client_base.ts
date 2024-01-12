@@ -5568,7 +5568,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>System shut down</source>
-      <translation type="unfinished">System shut down</translation>
+      <translation>Apagado del sistema</translation>
     </message>
     <message>
       <source>Intercom call</source>
