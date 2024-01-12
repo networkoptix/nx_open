@@ -68,14 +68,14 @@ QnSystemDescriptionPtr QnDirectSystemsFinder::getSystem(const QString &id) const
         return (desc->id() == id);
     };
 
-    const auto it = std::find_if(systemDescriptions.begin()
-        , systemDescriptions.end(), predicate);
+    const auto it = std::find_if(
+        systemDescriptions.begin(), systemDescriptions.end(), predicate);
 
     return (it == systemDescriptions.end()
         ? QnSystemDescriptionPtr() : QnSystemDescriptionPtr(*it));
 }
 
-void QnDirectSystemsFinder::removeSystem(const SystemsHash::iterator& it)
+void QnDirectSystemsFinder::removeSystem(SystemsHash::iterator it)
 {
     if (it == m_systems.end())
         return;
@@ -90,7 +90,7 @@ void QnDirectSystemsFinder::removeSystem(const SystemsHash::iterator& it)
     emit systemLost(system->id());
 }
 
-void QnDirectSystemsFinder::updateServerData(nx::vms::discovery::ModuleEndpoint module)
+void QnDirectSystemsFinder::updateServerData(const nx::vms::discovery::ModuleEndpoint& module)
 {
     const QnUuid localSystemId = helpers::getLocalSystemId(module);
     const QString systemId = helpers::getTargetSystemId(module);
@@ -191,7 +191,7 @@ void QnDirectSystemsFinder::removeServer(QnUuid id)
 }
 
 void QnDirectSystemsFinder::updateServerInternal(
-    const SystemsHash::iterator systemIt, nx::vms::discovery::ModuleEndpoint module)
+    SystemsHash::iterator systemIt, const nx::vms::discovery::ModuleEndpoint& module)
 {
     const bool serverIsInKnownSystem = (systemIt != m_systems.end());
     NX_ASSERT(serverIsInKnownSystem, "Server is not known");
@@ -214,12 +214,13 @@ void QnDirectSystemsFinder::updateServerInternal(
     removeServer(module.id);
     updateServerData(module);
 
-    module.endpoint = nx::network::url::getEndpoint(serverHost);
-    NX_ASSERT(!module.endpoint.address.toString().empty());
-    updatePrimaryAddress(std::move(module));
+    auto updatedModule = module;
+    updatedModule.endpoint = nx::network::url::getEndpoint(serverHost);
+    NX_ASSERT(!updatedModule.endpoint.address.toString().empty());
+    updatePrimaryAddress(updatedModule);
 }
 
-void QnDirectSystemsFinder::updatePrimaryAddress(nx::vms::discovery::ModuleEndpoint module)
+void QnDirectSystemsFinder::updatePrimaryAddress(const nx::vms::discovery::ModuleEndpoint& module)
 {
     auto systemIt = getSystemItByServer(module.id);
     const bool serverIsInKnownSystem = (systemIt != m_systems.end());
@@ -255,7 +256,6 @@ void QnDirectSystemsFinder::updatePrimaryAddress(nx::vms::discovery::ModuleEndpo
     static const auto kNameTemplate = tr("System (%1)", "%1 is ip and port of system");
     if (isOldServer(module))
         systemDescription->setName(nx::format(kNameTemplate).arg(module.endpoint.toString()));
-
 }
 
 QnDirectSystemsFinder::SystemsHash::iterator
