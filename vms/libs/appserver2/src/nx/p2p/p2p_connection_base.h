@@ -117,7 +117,7 @@ public:
 
             case nx::p2p::FilterResult::deny:
                 // As if the transaction has been sent.
-                m_timer.post([this]() { emit allDataSent(weakPointer()); });
+                m_timer.post([this]() { transactionSkipped(); });
                 return true;
 
             case nx::p2p::FilterResult::deserializedTransactionRequired:
@@ -134,7 +134,7 @@ public:
         if (shouldTransactionBeSentToPeer(tran) != nx::p2p::FilterResult::deny)
             sendMessage(std::forward<Args>(args)...);
         else
-            m_timer.post([this]() { emit allDataSent(weakPointer()); });
+            m_timer.post([this]() { transactionSkipped(); });
     }
 
     void sendMessage(MessageType messageType, const nx::Buffer& data);
@@ -199,6 +199,7 @@ private:
     void handleMessage(const nx::Buffer& message);
     int messageHeaderSize(bool isClient) const;
     MessageType getMessageType(const nx::Buffer& buffer, bool isClient) const;
+    void transactionSkipped();
 
 private:
     enum class CredentialsSource
