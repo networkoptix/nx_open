@@ -46,6 +46,7 @@ public:
         Mode mode,
         PeerType peerType,
         const QString& customCloudHost,
+        bool ignoreCustomization,
         const QString& customExternalResourceFile = {},
         QObject* parent = nullptr);
     virtual ~ApplicationContext() override;
