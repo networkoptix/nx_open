@@ -702,10 +702,6 @@
 <context>
     <name>FilterDialog</name>
     <message>
-        <source>Edit Filter</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Name</source>
         <translation type="unfinished"></translation>
     </message>
@@ -727,6 +723,10 @@
     </message>
     <message>
         <source>Filters help control access to the system and synchronization by specifying which users and/or groups from the Base DN are allowed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit Search Base</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
