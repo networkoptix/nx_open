@@ -625,7 +625,7 @@
     </message>
     <message>
       <source>Merge to Currently Connected System...</source>
-      <translation>接続しているシステムに統合...</translation>
+      <translation>現在接続しているシステムに統合...</translation>
     </message>
     <message>
       <source>None</source>
@@ -3151,7 +3151,7 @@ to %1</source>
     </message>
     <message>
       <source>Database backup is being uploaded to the server. Please wait.</source>
-      <translation>データベースバックアップをサーバーにアップロード中　暫くお待ちください.</translation>
+      <translation>データベースのバックアップをサーバーにアップロードしています。しばらくお待ちください。</translation>
     </message>
     <message>
       <source>Failed to back up database</source>
