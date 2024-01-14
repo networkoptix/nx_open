@@ -706,10 +706,6 @@
   <context>
     <name>FilterDialog</name>
     <message>
-      <source>Edit Filter</source>
-      <translation>Redigera filter</translation>
-    </message>
-    <message>
       <source>Name</source>
       <translation>Namn</translation>
     </message>
@@ -732,6 +728,10 @@
     <message>
       <source>Filters help control access to the system and synchronization by specifying which users and/or groups from the Base DN are allowed.</source>
       <translation>Filter hjälper till att kontrollera åtkomst till systemet och synkronisering genom att ange vilka användare och/eller grupper från Base DN som är tillåtna.</translation>
+    </message>
+    <message>
+      <source>Edit Search Base</source>
+      <translation>Redigera sökbas</translation>
     </message>
   </context>
   <context>
