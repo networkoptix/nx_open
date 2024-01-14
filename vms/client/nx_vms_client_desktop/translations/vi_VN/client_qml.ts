@@ -700,10 +700,6 @@
   <context>
     <name>FilterDialog</name>
     <message>
-      <source>Edit Filter</source>
-      <translation>Chỉnh sửa bộ lọc</translation>
-    </message>
-    <message>
       <source>Name</source>
       <translation>Tên</translation>
     </message>
@@ -726,6 +722,10 @@
     <message>
       <source>Filters help control access to the system and synchronization by specifying which users and/or groups from the Base DN are allowed.</source>
       <translation>Bộ lọc giúp kiểm soát quyền truy cập vào hệ thống và đồng bộ hóa bằng cách chỉ định người dùng và/hoặc nhóm nào từ Base DN được phép.</translation>
+    </message>
+    <message>
+      <source>Edit Search Base</source>
+      <translation type="unfinished">Edit Search Base</translation>
     </message>
   </context>
   <context>
