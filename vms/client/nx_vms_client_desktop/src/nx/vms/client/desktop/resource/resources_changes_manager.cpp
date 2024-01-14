@@ -433,6 +433,13 @@ void ResourcesChangesManager::saveCamerasCore(
         apiCameras, makeReplyProcessor(this, handler), this);
 }
 
+// Descendant of nx::vms::api::ServerModel structure that serializes partially to be used as body
+// for partial server resource update via PATCH request.
+struct PartialServerModel: public nx::vms::api::ServerModel
+{};
+NX_REFLECTION_INSTRUMENT(PartialServerModel, (id)(name)(locationId)(isFailoverEnabled)\
+    (maxCameras)(backupBitrateBytesPerSecond)(parameters))
+
 rest::Handle ResourcesChangesManager::saveServer(
     const QnMediaServerResourcePtr& server,
     SaveServerCallback callback)
@@ -468,7 +475,7 @@ rest::Handle ResourcesChangesManager::saveServer(
                 callback(success, requestId);
         };
 
-    nx::vms::api::ServerModel body;
+    PartialServerModel body;
 
     auto change = server->userAttributes();
 
