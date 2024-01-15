@@ -348,7 +348,7 @@ class NX_CODEC_API SEIUnit: public NALUnit {
 public:
     SEIUnit(): NALUnit(), pic_struct(0), m_cpb_removal_delay_baseaddr(0), m_cpb_removal_delay_bitpos(0) {}
     virtual ~SEIUnit() {}
-    void deserialize(SPSUnit& sps, int orig_hrd_parameters_present_flag);
+    bool deserialize(SPSUnit& sps, int orig_hrd_parameters_present_flag);
     int cpb_removal_delay;
     int dpb_output_delay;
     int pic_struct;
