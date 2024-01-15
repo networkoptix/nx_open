@@ -46,6 +46,12 @@ bool storeUrlForRole(Qn::ConnectionRole role)
 
 } // namespace
 
+namespace nx::vms::api::analytics {
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
+    DeviceAgentManifest, (json), DeviceAgentManifest_Fields, (brief, true))
+
+} // namespace nx::vms::api::analytics
+
 using AnalyzedStreamIndexMap = QMap<QnUuid, nx::vms::api::StreamIndex>;
 using AnalyticsEntitiesByEngine = QnVirtualCameraResource::AnalyticsEntitiesByEngine;
 
@@ -83,7 +89,7 @@ QnVirtualCameraResource::QnVirtualCameraResource():
     m_cachedCompatibleAnalyticsEngines(
         [this]() { return calculateCompatibleAnalyticsEngines(); }),
     m_cachedDeviceAgentManifests(
-        [this]() { return fetchDeviceAgentManifests(); }),
+        [this]() { return deviceAgentManifests(); }),
     m_cachedSupportedEventTypes(
         [this]() { return calculateSupportedEventTypes(); }),
     m_cachedSupportedObjectTypes(
@@ -468,7 +474,7 @@ AnalyticsEntitiesByEngine QnVirtualCameraResource::calculateSupportedObjectTypes
 }
 
 QnVirtualCameraResource::DeviceAgentManifestMap
-    QnVirtualCameraResource::fetchDeviceAgentManifests() const
+    QnVirtualCameraResource::deviceAgentManifests() const
 {
     const auto data = getProperty(kDeviceAgentManifestsProperty).toStdString();
     if (data.empty())
@@ -476,8 +482,19 @@ QnVirtualCameraResource::DeviceAgentManifestMap
 
     auto [deserializedManifestMap, result] =
         nx::reflect::json::deserialize<DeviceAgentManifestMap>(data);
-    if (!result)
-        NX_WARNING(this, "Failed to deserialize manifest: %1", result.toString());
+
+    if (!result.success)
+    {
+        // Trying to deserialize with another method to support client connections to
+        // the old systems.
+        bool deserialized = false;
+        deserializedManifestMap = QJson::deserialized<DeviceAgentManifestMap>(
+            data, {}, &deserialized);
+
+        if (!deserialized)
+            NX_WARNING(this, "Failed to deserialize manifest: %1", result.toString());
+    }
+
     return deserializedManifestMap;
 }
 
