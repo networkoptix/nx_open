@@ -35,35 +35,21 @@ public:
     TimeMode timeMode() const;
     void setTimeMode(TimeMode mode);
 
-    /** Utc offset for the given resource. Supports cameras (current parent server offset is used)
-     *  and exported files (offset is stored inside).
-     */
-    static qint64 utcOffset(const QnMediaResourcePtr& resource,
-        qint64 defaultValue = Qn::InvalidUtcOffset);
-
-    /** Offset value, used in gui elements. Depends on user time mode settings. */
-    qint64 displayOffset(const QnMediaResourcePtr& resource) const;
-
-    /** Current time on the given server. Really, sync time is used, but with correct utc offset. */
-    static QDateTime serverTime(const ServerResourcePtr& server, qint64 msecsSinceEpoch);
+    static QTimeZone timeZone(const QnMediaResourcePtr& resource);
 
     /** Time value, than takes into account user time mode settings. */
     QDateTime displayTime(qint64 msecsSinceEpoch) const; //< Using current server.
     QDateTime displayTime(const ServerResourcePtr& server, qint64 msecsSinceEpoch) const;
 
 signals:
-    void displayOffsetsChanged();
-    void timeModeChanged();
+    void timeZoneChanged();
 
 private:
-    void sendRequest(const QnMediaServerResourcePtr& server);
-
-    qint64 localOffset(const QnMediaResourcePtr& resource,
-        qint64 defaultValue = Qn::InvalidUtcOffset) const;
+    void ensureServerTimeZoneIsValid(const ServerResourcePtr& server);
 
 private:
-    void handleResourceAdded(const QnResourcePtr& resource);
-    void handleResourceRemoved(const QnResourcePtr& resource);
+    void handleResourcesAdded(const QnResourceList& resources);
+    void handleResourcesRemoved(const QnResourceList& resources);
 
 private:
     TimeMode m_mode = serverTimeMode;

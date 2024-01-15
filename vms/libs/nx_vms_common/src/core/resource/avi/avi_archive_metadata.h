@@ -2,12 +2,16 @@
 
 #pragma once
 
+#include <chrono>
+
 #include <QtCore/QSize>
 
-#include <common/common_globals.h>
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/enum_instrument.h>
+#include <nx/reflect/instrument.h>
+#include <nx/utils/serialization/qt_geometry_reflect_json.h>
 #include <nx/vms/api/data/dewarping_data.h>
+#include <nx/vms/time/timezone.h>
 
 struct AVFormatContext;
 
@@ -33,7 +37,12 @@ struct NX_VMS_COMMON_API QnAviArchiveMetadata
 
     int version = kDefaultVersion;
     QByteArray signature;
-    qint64 timeZoneOffset = Qn::InvalidUtcOffset;
+
+    // Time zone offset from UTC in milliseconds.
+    std::chrono::milliseconds timeZoneOffset = nx::vms::time::kInvalidUtcOffset;
+
+    QString timeZoneId;
+
     qint64 startTimeMs = 0; //< Start time in milliseconds since epoch.
     QVector<int> videoLayoutChannels;
     QSize videoLayoutSize;
@@ -47,10 +56,13 @@ struct NX_VMS_COMMON_API QnAviArchiveMetadata
     static QnAviArchiveMetadata loadFromFile(const AVFormatContext* context);
     static Format formatFromExtension(const QString& extension);
     bool saveToFile(AVFormatContext* context, Format format);
+
+    bool operator==(const QnAviArchiveMetadata& other) const = default;
 };
 
-#define QnAviArchiveMetadata_Fields (version)(signature)(timeZoneOffset)(startTimeMs) \
+#define QnAviArchiveMetadata_Fields (version)(signature)(timeZoneOffset)(timeZoneId)(startTimeMs) \
     (videoLayoutChannels)(videoLayoutSize)(dewarpingParams)(overridenAr)(integrityHash)\
     (metadataStreamVersion)(encryptionData)(rotation)
 
 QN_FUSION_DECLARE_FUNCTIONS(QnAviArchiveMetadata, (json), NX_VMS_COMMON_API)
+NX_REFLECTION_INSTRUMENT(QnAviArchiveMetadata, QnAviArchiveMetadata_Fields)

@@ -34,10 +34,8 @@
 #include <utils/common/util.h>
 #include <utils/media/ffmpeg_io_context.h>
 
-extern "C"
-{
+extern "C" {
 #include <libavformat/avformat.h>
-
 } // extern "C"
 
 using namespace nx::vms::common;
@@ -722,11 +720,7 @@ bool QnAviArchiveDelegate::initMetadata()
     }
 
     if (aviRes)
-    {
         aviRes->setAviMetadata(m_metadata);
-        if (m_metadata.timeZoneOffset != Qn::InvalidUtcOffset)
-            aviRes->setTimeZoneOffset(m_metadata.timeZoneOffset);
-    }
 
     return true;
 }

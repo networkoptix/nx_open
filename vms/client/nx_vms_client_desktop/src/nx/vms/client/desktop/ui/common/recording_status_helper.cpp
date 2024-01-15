@@ -78,7 +78,7 @@ void RecordingStatusHelper::initialize()
 
     connect(
         serverTimeWatcher(),
-        &core::ServerTimeWatcher::displayOffsetsChanged,
+        &core::ServerTimeWatcher::timeZoneChanged,
         this,
         &RecordingStatusHelper::updateRecordingMode);
 }

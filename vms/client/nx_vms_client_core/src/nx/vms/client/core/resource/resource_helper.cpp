@@ -35,7 +35,7 @@ void ResourceHelper::initialize()
     m_initialized = true;
 
     const auto timeWatcher = systemContext()->serverTimeWatcher();
-    connect(timeWatcher, &ServerTimeWatcher::displayOffsetsChanged,
+    connect(timeWatcher, &ServerTimeWatcher::timeZoneChanged,
         this, &ResourceHelper::displayOffsetChanged);
 
     connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
@@ -180,12 +180,19 @@ bool ResourceHelper::hasVideo() const
     return mediaResource && mediaResource->hasVideo();
 }
 
+// FIXME: #sivanov Used in the only place in the mobile client.
 qint64 ResourceHelper::displayOffset() const
 {
-    const auto mediaResource = m_resource.dynamicCast<QnMediaResource>();
-    return mediaResource
-        ? serverTimeWatcher()->displayOffset(m_resource.dynamicCast<QnMediaResource>())
-        : 0;
+    using namespace std::chrono;
+
+    if (serverTimeWatcher()->timeMode() == ServerTimeWatcher::clientTimeMode)
+        return 0;
+
+    const milliseconds resourceOffset = seconds(ServerTimeWatcher::timeZone(
+        m_resource.dynamicCast<QnMediaResource>()).offsetFromUtc(QDateTime::currentDateTime()));
+    const milliseconds localOffset = seconds(QDateTime::currentDateTime().offsetFromUtc());
+
+    return (resourceOffset - localOffset).count();
 }
 
 } // namespace nx::vms::client::core

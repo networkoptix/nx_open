@@ -30,7 +30,6 @@
 #include <nx/utils/qt_helpers.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/utils/geometry.h>
-#include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/camera/storage_location_camera_controller.h>
 #include <nx/vms/client/desktop/common/utils/audio_dispatcher.h>
@@ -44,6 +43,7 @@
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/utils/timezone_helper.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/handlers/notification_action_executor.h>
 #include <nx/vms/client/desktop/workbench/resource/resource_widget_factory.h>
@@ -2252,14 +2252,12 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged()
             mediaResourceWidget->setOverlayVisible(/*visible*/ true, /*animate*/ false);
             mediaResourceWidget->setInfoVisible(/*visible*/ true, /*animate*/ false);
 
-            const auto timeWatcher = mediaResourceWidget->systemContext()->serverTimeWatcher();
-            const qint64 displayTimeMs =
-                timeMs.value() + timeWatcher->displayOffset(mediaResourceWidget->resource());
-
-            // TODO: #sivanov Common code, another copy is in QnWorkbenchScreenshotHandler.
+            // FIXME: #sivanov Looks like duration string should be used for non-utc resources.
             QString timeString = resource->hasFlags(Qn::utc)
-                ? nx::vms::time::toString(displayTimeMs)
-                : nx::vms::time::toString(displayTimeMs, nx::vms::time::Format::hh_mm_ss_zzz);
+                ? nx::vms::time::toString(QDateTime::fromMSecsSinceEpoch(
+                    timeMs.value(),
+                    displayTimeZone(mediaResourceWidget->resource())))
+                : nx::vms::time::toString(timeMs.value(), nx::vms::time::Format::hh_mm_ss_zzz);
 
             mediaResourceWidget->setTitleTextFormat(QLatin1String("%1\t") + timeString);
         }

@@ -4,14 +4,13 @@
 
 #include <map>
 #include <optional>
+#include <set>
 
 #include <QtCore/QCoreApplication>
-#include <QtCore/QString>
 #include <QtCore/QLocale>
+#include <QtCore/QString>
 
-#include <nx/utils/literal.h>
 #include <nx/utils/log/assert.h>
-#include <nx/utils/std/optional.h>
 
 namespace {
 
@@ -29,33 +28,6 @@ QString getShortFormatWithSeconds(const QLocale& locale)
     const auto divider = dividerPos > 0 ? QChar(result[dividerPos]) : QChar(':');
     result.insert(dividerPos + 3, divider + QString("ss"));
     return result;
-}
-
-QString durationToString(std::chrono::milliseconds value, nx::vms::time::Format format)
-{
-    const auto hours =
-        std::chrono::duration_cast<std::chrono::hours>(value);
-    const auto minutes =
-        std::chrono::duration_cast<std::chrono::minutes>(value - hours);
-    const auto seconds =
-        std::chrono::duration_cast<std::chrono::seconds>(value - hours - minutes);
-    const auto milliseconds =
-        std::chrono::duration_cast<std::chrono::milliseconds>(value - hours - minutes - seconds);
-
-    QString result = QString::number(hours.count());
-    if (format >= nx::vms::time::Format::hhh_mm)
-        result += ":" + QString::number(minutes.count()).rightJustified(2, '0');
-    if (format >= nx::vms::time::Format::hhh_mm_ss)
-        result += ":" + QString::number(seconds.count()).rightJustified(2, '0');
-    if (format >= nx::vms::time::Format::hhh_mm_ss_zzz)
-        result += "." + QString::number(milliseconds.count()).rightJustified(3, '0');
-    return result;
-}
-
-bool isDurationFormat(nx::vms::time::Format format)
-{
-    return nx::vms::time::Format::duration_formats_begin <= format
-        && format < nx::vms::time::Format::duration_formats_end;
 }
 
 struct TimeFormat
@@ -130,8 +102,6 @@ const FormatsHash& DateTimeFormats::defaultFormats()
         {Format::m, "mm"},
         {Format::s, "ss"},
         {Format::a, "a"},
-        {Format::mm_ss, "mm:ss"},
-        {Format::mm_ss_zzz, "mm:ss.zzz"},
         {Format::hh, "hh:00"},
         {Format::hh_mm, "hh:mm"},
         {Format::hh_mm_ss, "hh:mm:ss"},
@@ -267,8 +237,6 @@ bool Formatter::is24HoursTimeFormat() const
 
 QString Formatter::toString(const QDateTime& value, Format format) const
 {
-    NX_ASSERT(!isDurationFormat(format), "Inappropriate time format.");
-
     switch (format)
     {
         case Format::h:
@@ -282,23 +250,16 @@ QString Formatter::toString(const QDateTime& value, Format format) const
 
 QString Formatter::toString(const QTime& time, Format format) const
 {
-    NX_ASSERT(!isDurationFormat(format), "Inappropriate time format.");
-
     return toString(QDateTime(QDate::currentDate(), time, Qt::UTC), format);
 }
 
 QString Formatter::toString(const QDate& date, Format format) const
 {
-    NX_ASSERT(!isDurationFormat(format), "Inappropriate time format.");
-
     return toString(QDateTime(date, QTime(0, 0)), format);
 }
 
 QString Formatter::toString(qint64 msSinceEpoch, Format format) const
 {
-    if (isDurationFormat(format))
-        return durationToString(std::chrono::milliseconds(msSinceEpoch), format);
-
     return toString(QDateTime::fromMSecsSinceEpoch(msSinceEpoch), format);
 }
 
@@ -308,6 +269,66 @@ QString Formatter::getFormatString(Format format) const
 }
 
 //--------------------------------------------------------------------------------------------------
+
+QString toDurationString(std::chrono::milliseconds value, Duration format)
+{
+    bool withHours = false;
+    bool withMinutes = false;
+    bool withSeconds = false;
+    bool withMs = false;
+
+    switch (format)
+    {
+        case Duration::hh_mm_ss_zzz:
+            withMs = true;
+            [[fallthrough]];
+        case Duration::hh_mm_ss:
+            withSeconds = true;
+            [[fallthrough]];
+        case Duration::hh_mm:
+            withMinutes = true;
+            [[fallthrough]];
+        case Duration::hh:
+            withHours = true;
+            break;
+        case Duration::mm_ss_zzz:
+            withMs = true;
+            [[fallthrough]];
+        case Duration::mm_ss:
+            withSeconds = true;
+            [[fallthrough]];
+        case Duration::mm:
+            withMinutes = true;
+            break;
+    }
+
+    const auto hours = withHours
+        ? std::chrono::duration_cast<std::chrono::hours>(value)
+        : std::chrono::hours(0);
+    const auto minutes =
+        std::chrono::duration_cast<std::chrono::minutes>(value - hours);
+    const auto seconds =
+        std::chrono::duration_cast<std::chrono::seconds>(value - hours - minutes);
+    const auto milliseconds =
+        std::chrono::duration_cast<std::chrono::milliseconds>(value - hours - minutes - seconds);
+
+    QString result;
+    if (withHours)
+    {
+        result = QString::number(hours.count());
+        if (withMinutes)
+            result += ":" + QString::number(minutes.count()).rightJustified(2, '0');
+    }
+    else
+    {
+        result = QString::number(minutes.count());
+    }
+    if (withSeconds)
+        result += ":" + QString::number(seconds.count()).rightJustified(2, '0');
+    if (withMs)
+        result += "." + QString::number(milliseconds.count()).rightJustified(3, '0');
+    return result;
+}
 
 qint64 systemDisplayOffset()
 {

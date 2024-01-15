@@ -61,7 +61,6 @@
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/utils/geometry.h>
-#include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/painter_transform_scale_stripper.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
@@ -93,6 +92,7 @@
 #include <nx/vms/client/desktop/ui/graphics/items/overlays/figure/figures_watcher.h>
 #include <nx/vms/client/desktop/ui/graphics/items/overlays/roi_figures_overlay_widget.h>
 #include <nx/vms/client/desktop/ui/graphics/items/resource/widget_analytics_controller.h>
+#include <nx/vms/client/desktop/utils/timezone_helper.h>
 #include <nx/vms/client/desktop/watermark/watermark_painter.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
@@ -2277,14 +2277,16 @@ QString QnMediaResourceWidget::calculatePositionText() const
     if (!d->resource->flags().testFlag(Qn::utc))
         return QString();
 
-    static const auto extractTime =
-        [](qint64 dateTimeUsec)
+    const auto extractTime =
+        [this](qint64 dateTimeUsec)
         {
             if (isSpecialDateTimeValueUsec(dateTimeUsec))
                 return QString();
 
             const auto dateTimeMs = dateTimeUsec / kMicroInMilliSeconds;
-            const QString result = nx::vms::time::toString(dateTimeMs);
+            QDateTime dt = QDateTime::fromMSecsSinceEpoch(dateTimeMs, displayTimeZone(resource()));
+
+            const QString result = nx::vms::time::toString(dt);
 
             return ini().showPreciseItemTimestamps
                 ? nx::format("%1<br/>%2 us").args(result, dateTimeUsec).toQString() //< Dev option.
@@ -2295,7 +2297,7 @@ QString QnMediaResourceWidget::calculatePositionText() const
 
     const QString timeString = (d->display()->camDisplay()->isRealTimeSource()
             ? tr("LIVE")
-            : extractTime(getDisplayTimeUsec()));
+            : extractTime(getUtcCurrentTimeUsec()));
 
     static const int kPositionTextPixelSize = 12;
 
@@ -3023,16 +3025,6 @@ qint64 QnMediaResourceWidget::getUtcCurrentTimeMs() const
         return 0;
 
     return datetimeUsec / 1000;
-}
-
-qint64 QnMediaResourceWidget::getDisplayTimeUsec() const
-{
-    qint64 result = getUtcCurrentTimeUsec();
-    if (!isSpecialDateTimeValueUsec(result))
-    {
-        result += serverTimeWatcher()->displayOffset(d->mediaResource) * 1000ll;
-    }
-    return result;
 }
 
 QnScrollableTextItemsWidget* QnMediaResourceWidget::bookmarksContainer()

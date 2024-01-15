@@ -6,10 +6,10 @@
 #include <chrono>
 #include <future>
 
+#include <QtCore/QDateTime>
 #include <QtGui/QClipboard>
 #include <QtGui/QGuiApplication>
 #include <QtWidgets/QPushButton>
-#include <QtCore/QDateTime>
 
 #include <api/server_rest_connection.h>
 #include <client/client_globals.h>
@@ -195,7 +195,7 @@ struct UserSettingsDialog::Private
 
         connect(
             parent->systemContext()->serverTimeWatcher(),
-            &core::ServerTimeWatcher::displayOffsetsChanged,
+            &core::ServerTimeWatcher::timeZoneChanged,
             q,
             [this]{ updateDisplayOffset(); });
 
@@ -237,13 +237,11 @@ struct UserSettingsDialog::Private
 
     QDateTime serverDate(milliseconds msecsSinceEpoch) const
     {
-        const auto timeWatcher = q->systemContext()->serverTimeWatcher();
-        const auto server = timeWatcher->currentServer().dynamicCast<core::ServerResource>();
-
-        if (!server) //< The server may absent on reconnection.
-            return QDateTime::fromMSecsSinceEpoch(msecsSinceEpoch.count());
-
-        return timeWatcher->serverTime(server, msecsSinceEpoch.count());
+        const auto server = q->systemContext()->currentServer().objectCast<core::ServerResource>();
+        const QTimeZone tz = NX_ASSERT(server)
+            ? server->timeZone()
+            : QTimeZone::LocalTime;
+        return QDateTime::fromMSecsSinceEpoch(msecsSinceEpoch.count(), tz);
     }
 
     QString linkFromToken(const std::string& token) const

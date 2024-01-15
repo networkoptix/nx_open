@@ -6,9 +6,9 @@
 #include <memory>
 #include <optional>
 
-#include <QtCore/QLocale>
 #include <QtCore/QPointer>
 #include <QtCore/QScopedPointer>
+#include <QtCore/QTimeZone>
 
 #include <qt_graphics_items/graphics_slider.h>
 
@@ -254,8 +254,7 @@ public:
     const QVector<milliseconds>& indicators() const;
     void setIndicators(const QVector<milliseconds>& indicators);
 
-    milliseconds localOffset() const;
-    void setLocalOffset(milliseconds utcOffset);
+    void setTimeZone(QTimeZone value);
 
     TimeMarker* tooltip() const;
     bool isTooltipVisible() const;
@@ -619,9 +618,8 @@ private:
 
     QVector<milliseconds> m_indicators;
 
-    milliseconds m_localOffset;
-
-    QLocale m_locale;
+    /** Timezone corresponding to the currently selected resource. */
+    QTimeZone m_timeZone{QTimeZone::LocalTime};
 
     std::optional<QPointF> m_hoverMousePos;
     qreal m_lastLineBarValue;
