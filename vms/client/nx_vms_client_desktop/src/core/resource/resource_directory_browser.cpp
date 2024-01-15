@@ -183,7 +183,17 @@ ResourceDirectoryBrowser::ResourceDirectoryBrowser(
         m_resourceProducer, &LocalResourceProducer::createLocalResources);
 
     connect(m_localResourceDirectoryModel, &LocalResourcesDirectoryModel::layoutFileChanged,
-        m_resourceProducer, &LocalResourceProducer::updateFileLayoutResource);
+        this,
+        [this](const QString& path)
+        {
+            m_resourceProducer->updateFileLayoutResource(path);
+
+            if (auto layout =
+                resourcePool()->getResourceByUrl(path).dynamicCast<QnFileLayoutResource>())
+            {
+                emit layoutUpdatedFromFile(layout);
+            }
+        });
 
     connect(m_localResourceDirectoryModel, &LocalResourcesDirectoryModel::videoFileChanged,
         m_resourceProducer, &LocalResourceProducer::updateVideoFileResource);
