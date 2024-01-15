@@ -4,6 +4,8 @@
 
 #include <optional>
 
+#include <QtCore/QTimeZone>
+
 #include <export/signer.h>
 #include <nx/core/transcoding/filters/filter_chain.h>
 #include <nx/vms/client/core/network/remote_connection_aware.h>
@@ -26,7 +28,7 @@ public:
     virtual ~ExportStorageStreamRecorder() override;
 
     void setTranscodeFilters(const nx::core::transcoding::FilterChain& filters);
-    void setServerTimeZoneMs(qint64 value);
+    void setServerTimeZone(QTimeZone value);
     void setTranscoderFixedFrameRate(int value);
     void setTranscoderQuality(Qn::StreamQuality quality);
     void addRecordingContext(const QString& fileName, const QnStorageResourcePtr& storage);
@@ -50,7 +52,7 @@ private:
     bool m_isLayoutsInitialised = false;
     int64_t m_preciseStartTimeUs = 0;
     std::optional<nx::core::transcoding::FilterChain> m_transcodeFilters;
-    qint64 m_serverTimeZoneMs = Qn::InvalidUtcOffset;
+    QTimeZone m_timeZone{QTimeZone::LocalTime};
     AVCodecID m_dstVideoCodec = AV_CODEC_ID_NONE;
     std::unique_ptr<QnFfmpegVideoTranscoder> m_videoTranscoder;
     std::unique_ptr<QnFfmpegAudioTranscoder> m_audioTranscoder;

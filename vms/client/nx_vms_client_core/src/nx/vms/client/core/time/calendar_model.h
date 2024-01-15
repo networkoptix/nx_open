@@ -5,6 +5,7 @@
 #include <QtCore/QAbstractListModel>
 #include <QtCore/QDate>
 #include <QtCore/QLocale>
+#include <QtCore/QTimeZone>
 
 #include <nx/utils/impl_ptr.h>
 
@@ -22,6 +23,7 @@ class NX_VMS_CLIENT_CORE_API CalendarModel: public QAbstractListModel
     Q_PROPERTY(int year READ year WRITE setYear NOTIFY yearChanged)
     Q_PROPERTY(int month READ month WRITE setMonth NOTIFY monthChanged)
     Q_PROPERTY(QLocale locale READ locale WRITE setLocale NOTIFY localeChanged)
+    Q_PROPERTY(QTimeZone timeZone READ timeZone WRITE setTimeZone NOTIFY timeZoneChanged)
     Q_PROPERTY(nx::vms::client::core::AbstractTimePeriodStorage* periodStorage
         READ periodStorage
         WRITE setPeriodStorage
@@ -57,6 +59,9 @@ public: // Properties and invokables.
     QLocale locale() const;
     void setLocale(const QLocale& locale);
 
+    QTimeZone timeZone() const;
+    void setTimeZone(const QTimeZone& timeZone);
+
     AbstractTimePeriodStorage* periodStorage() const;
     void setPeriodStorage(AbstractTimePeriodStorage* store);
 
@@ -78,6 +83,7 @@ signals:
     void periodStorageChanged();
     void allCamerasPeriodStorageChanged();
     void localeChanged();
+    void timeZoneChanged();
     void displayOffsetChanged();
 
 private:

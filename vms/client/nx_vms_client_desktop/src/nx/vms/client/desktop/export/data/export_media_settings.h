@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <QtCore/QTimeZone>
+
 #include <core/resource/resource_fwd.h>
 #include <nx/core/transcoding/filters/transcoding_settings.h>
 #include <nx/vms/client/desktop/common/utils/filesystem.h>
@@ -14,7 +16,6 @@ struct ExportMediaSettings
     QnTimePeriod period;
     Filename fileName;
     qint64 timelapseFrameStepMs = 0; //< 0 means disabled timelapse.
-    qint64 serverTimeZoneMs = 0;
 
     nx::core::transcoding::Settings transcodingSettings;
 };

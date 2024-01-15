@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <QtCore/qnamespace.h>
+#include <QtCore/QInternal>
 
 #include <nx/reflect/instrument.h>
 

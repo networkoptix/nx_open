@@ -13,6 +13,7 @@
 
 using namespace std::chrono;
 using nx::vms::time::Format;
+using nx::vms::time::Duration;
 
 namespace nx::vms::client::desktop::workbench::timeline {
 
@@ -108,7 +109,7 @@ void TimeMarker::setMode(Mode value)
 void TimeMarker::setTimeContent(const TimeContent& value)
 {
     d->timeContent = value;
-    d->timestampMs = value.archivePosition.count();
+    d->timestampMs = value.position.count();
     d->applyTimeContent();
 }
 
@@ -138,23 +139,25 @@ void TimeMarker::Private::applyTimeContent()
     QString dateTextLine;
     QString timeTextLine;
 
-    Format timeFormat;
     if (timeContent->isTimestamp)
     {
-        const QDateTime dateTime =
-            QDateTime::fromMSecsSinceEpoch(timeContent->displayPosition.count());
+        const QDateTime dateTime = QDateTime::fromMSecsSinceEpoch(
+            timeContent->position.count(),
+            timeContent->timeZone);
         dateTextLine = toString(dateTime.date(), Format::dd_MM_yyyy, dateFormatter);
-        timeFormat = timeContent->showMilliseconds ? Format::hh_mm_ss_zzz : Format::hh_mm_ss;
+        const Format timeFormat = timeContent->showMilliseconds
+            ? Format::hh_mm_ss_zzz
+            : Format::hh_mm_ss;
+        timeTextLine = toString(dateTime, timeFormat);
     }
     else
     {
         dateTextLine.clear();
-        timeFormat = timeContent->localFileLength >= 1h
-            ? (timeContent->showMilliseconds ? Format::hhh_mm_ss_zzz : Format::hhh_mm_ss)
-            : (timeContent->showMilliseconds ? Format::mm_ss_zzz : Format::mm_ss);
+        const Duration timeFormat = timeContent->localFileLength >= 1h
+            ? (timeContent->showMilliseconds ? Duration::hh_mm_ss_zzz : Duration::hh_mm_ss)
+            : (timeContent->showMilliseconds ? Duration::mm_ss_zzz : Duration::mm_ss);
+        timeTextLine = toDurationString(timeContent->position, timeFormat);
     }
-
-    timeTextLine = toString(timeContent->displayPosition.count(), timeFormat);
 
     if (dateTextLine.isEmpty())
     {

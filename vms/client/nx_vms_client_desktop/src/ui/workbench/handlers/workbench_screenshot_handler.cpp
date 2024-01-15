@@ -33,6 +33,7 @@
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/utils/timezone_helper.h>
 #include <nx/vms/time/formatter.h>
 #include <platform/environment.h>
 #include <transcoding/filters/filter_helper.h>
@@ -47,12 +48,23 @@ using namespace nx::vms::client::desktop::ui;
 using namespace nx::vms::api;
 
 namespace {
-    const int showProgressDelay = 1500; // 1.5 sec
-    const int minProgressDisplayTime = 1000; // 1 sec
 
-    /* Parameter value to load latest available screenshot. */
-    const qint64 latestScreenshotTime = -1;
+const int showProgressDelay = 1500; // 1.5 sec
+const int minProgressDisplayTime = 1000; // 1 sec
+
+std::chrono::milliseconds widgetUtcTime(QnMediaResourceWidget *widget)
+{
+    // TODO: #sivanov Investigate whether widget->position() can be used.
+    QnResourceDisplayPtr display = widget->display();
+
+    qint64 timeUsec = display->camDisplay()->getCurrentTime();
+    if (timeUsec == qint64(AV_NOPTS_VALUE))
+        return nx::api::ImageRequest::kLatestThumbnail;
+
+    return std::chrono::milliseconds(timeUsec / 1000);
 }
+
+} // namespace
 
 bool SharedScreenshotParameters::isInitialized() const
 {
@@ -76,11 +88,16 @@ QString QnScreenshotParameters::timeString(bool forFilename) const
         ? nx::vms::time::Format::filename_date
         : nx::vms::time::Format::dd_MM_yyyy_hh_mm_ss;
 
-    if (utcTimestampMsec == latestScreenshotTime)
+    // FIXME: #sivanov Looks supicious, but probably kLatestThumbnail never happens in real life.
+    if (utcTimestamp == nx::api::ImageRequest::kLatestThumbnail)
         return nx::vms::time::toString(QTime::currentTime(), timeFormat);
+
+    const auto dateTime = QDateTime::fromMSecsSinceEpoch(utcTimestamp.count(), timeZone);
     if (isUtc)
-        return nx::vms::time::toString(displayTimeMsec, fullFormat);
-    return nx::vms::time::toString(displayTimeMsec, timeFormat);
+        return nx::vms::time::toString(dateTime, fullFormat);
+
+    // FIXME: #sivanov Investigate this branch, looks like logic is outdated and works incorrectly.
+    return nx::vms::time::toString(dateTime, timeFormat);
 }
 
 template<typename CornerData>
@@ -257,24 +274,6 @@ ImageProvider* QnWorkbenchScreenshotHandler::getLocalScreenshotProvider(QnMediaR
     return new BasicImageProvider(screenshot);
 }
 
-qint64 QnWorkbenchScreenshotHandler::screenshotTimeMSec(QnMediaResourceWidget *widget, bool adjust) {
-    QnResourceDisplayPtr display = widget->display();
-
-    qint64 timeUsec = display->camDisplay()->getCurrentTime();
-    if (timeUsec == qint64(AV_NOPTS_VALUE))
-        return latestScreenshotTime;
-
-    qint64 timeMSec = timeUsec / 1000;
-    if (!adjust)
-        return timeMSec;
-
-    const auto timeWatcher = widget->systemContext()->serverTimeWatcher();
-    qint64 localOffset = timeWatcher->displayOffset(widget->resource());
-
-    timeMSec += localOffset;
-    return timeMSec;
-}
-
 void QnWorkbenchScreenshotHandler::takeDebugScreenshotsSet(QnMediaResourceWidget *widget) {
     QStack<QString> keyStack;
     SharedScreenshotParameters lastParams = appContext()->localSettings()->lastScreenshotParams();
@@ -358,9 +357,9 @@ void QnWorkbenchScreenshotHandler::takeDebugScreenshotsSet(QnMediaResourceWidget
 
     QnScreenshotParameters parameters;
     {
-        parameters.utcTimestampMsec = screenshotTimeMSec(widget);
-        parameters.isUtc = widget->resource()->toResource()->flags() & Qn::utc;
-        parameters.displayTimeMsec = screenshotTimeMSec(widget, true);
+        parameters.utcTimestamp = widgetUtcTime(widget);
+        parameters.timeZone = displayTimeZone(widget->resource());
+        parameters.isUtc = widget->resource()->toResource()->flags().testFlag(Qn::utc);
         Key timeKey(keyStack, lit("_") + parameters.timeString(/*forFilename*/ true));
 
         parameters.itemDewarpingParams = widget->item()->dewarpingParams();
@@ -439,9 +438,9 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
     }
 
     QnScreenshotParameters parameters;
-    parameters.utcTimestampMsec = screenshotTimeMSec(widget);
-    parameters.isUtc = widget->resource()->toResource()->flags() & Qn::utc;
-    parameters.displayTimeMsec = screenshotTimeMSec(widget, true);
+    parameters.utcTimestamp = widgetUtcTime(widget);
+    parameters.timeZone = displayTimeZone(widget->resource());
+    parameters.isUtc = widget->resource()->toResource()->flags().testFlag(Qn::utc);
     parameters.sharedParameters.filename = filename;
     // TODO: #sivanov Store full screenshot settings.
     parameters.itemDewarpingParams = widget->item()->dewarpingParams();
@@ -602,11 +601,19 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
     QnScreenshotParameters parameters = loader->parameters();
     QImage result = image;
 
-    if (!result.isNull()) {
-        // TODO: #sivanov Simplify the logic.
-        parameters.sharedParameters.timestampParams.timeMs = parameters.utcTimestampMsec == latestScreenshotTime
-            ? QDateTime::currentMSecsSinceEpoch()
-            : parameters.displayTimeMsec;
+    if (!result.isNull())
+    {
+        if (parameters.utcTimestamp == nx::api::ImageRequest::kLatestThumbnail)
+        {
+            parameters.sharedParameters.timestampParams.timestamp =
+                std::chrono::milliseconds(QDateTime::currentMSecsSinceEpoch());
+            parameters.sharedParameters.timestampParams.timeZone = QTimeZone::LocalTime;
+        }
+        else
+        {
+            parameters.sharedParameters.timestampParams.timestamp = parameters.utcTimestamp;
+            parameters.sharedParameters.timestampParams.timeZone = parameters.timeZone;
+        }
 
         QnLegacyTranscodingSettings transcodeParams;
         // Doing heavy filters only. This filters doesn't supported on server side for screenshots
@@ -628,8 +635,8 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
         if (!filters.isEmpty())
         {
             QSharedPointer<CLVideoDecoderOutput> frame(new CLVideoDecoderOutput(result));
-            // TODO: #sivanov How is this supposed to work with latestScreenshotTime?
-            frame->pts = parameters.utcTimestampMsec * 1000;
+            // TODO: #sivanov Looks like pts is not needed actually as kLatestThumbnail is handled.
+            frame->pts = parameters.sharedParameters.timestampParams.timestamp.count() * 1000;
             frame = filters.apply(frame);
             result = frame ? frame->toImage() : QImage();
         }
@@ -741,9 +748,7 @@ void QnWorkbenchScreenshotHandler::takeScreenshot(QnMediaResourceWidget *widget,
             request.streamSelectionMode =
                 nx::api::CameraImageRequest::StreamSelectionMode::forcedPrimary;
 
-            request.timestampMs = localParameters.utcTimestampMsec == latestScreenshotTime
-                ? nx::api::ImageRequest::kLatestThumbnail
-                : std::chrono::milliseconds(localParameters.utcTimestampMsec);
+            request.timestampMs = localParameters.utcTimestamp;
 
             imageProvider = new nx::vms::client::desktop::CameraThumbnailProvider(request);
         }

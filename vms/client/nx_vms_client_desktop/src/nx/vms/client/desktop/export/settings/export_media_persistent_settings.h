@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <QtCore/QTimeZone>
 #include <QtGui/QFont>
 
 #include <nx/core/transcoding/timestamp_format.h>
@@ -122,7 +123,7 @@ struct NX_VMS_CLIENT_DESKTOP_API ExportTimestampOverlayPersistentSettings:
     TimestampFormat format = TimestampFormat::longDate;
     int fontSize = 18;
     int maximumFontSize = 400;
-    qint64 serverTimeDisplayOffsetMs = 0;
+    QTimeZone timeZone{QTimeZone::LocalTime};
     QColor foreground = Qt::white;
     QColor outline = Qt::black;
     QFont font;

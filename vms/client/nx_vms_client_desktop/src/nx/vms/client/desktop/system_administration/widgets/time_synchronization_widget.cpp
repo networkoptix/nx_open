@@ -183,7 +183,7 @@ void TimeSynchronizationWidget::loadDataToUi()
         serverInfo.ipAddress = QnResourceDisplayInfo(server).host();
         serverInfo.online = server->getStatus() == nx::vms::api::ResourceStatus::online;
         serverInfo.hasInternet = server->hasInternetAccess();
-        serverInfo.timeZoneOffset = server->timeZoneInfo().utcOffset;
+        serverInfo.timeZoneOffset = server->timeZoneInfo().timeZoneOffsetMs;
         servers.push_back(serverInfo);
     }
 

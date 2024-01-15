@@ -2,11 +2,13 @@
 
 #pragma once
 
-#include <QtCore/qnamespace.h>
+#include <QtCore/QInternal>
 
 #include <transcoding/filters/abstract_image_filter.h>
 
 #include "../timestamp_format.h"
+
+class QTimeZone;
 
 namespace nx {
 namespace core {
@@ -25,7 +27,7 @@ public:
 
     static QString timestampTextUtc(
         qint64 sinceEpochMs,
-        int displayOffsetMs,
+        const QTimeZone& timeZone,
         TimestampFormat format);
 
     static QString timestampTextSimple(qint64 timeOffsetMs);

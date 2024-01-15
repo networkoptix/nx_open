@@ -375,10 +375,12 @@ void SoftwareTriggersWatcher::updateTriggerAvailability(QnUuid id)
     if (!description)
         return;
 
-    const auto dateTime = d->server
-        ? systemContext()->serverTimeWatcher()
-            ->serverTime(d->server, qnSyncTime->currentMSecsSinceEpoch())
-        : qnSyncTime->currentDateTime();
+    // FIXME: #sivanov System-wide timezone should be used here when it is introduced.
+    const QTimeZone tz = NX_ASSERT(d->server)
+        ? d->server->timeZone()
+        : QTimeZone::LocalTime;
+
+    const auto dateTime = QDateTime::fromMSecsSinceEpoch(qnSyncTime->currentMSecsSinceEpoch(), tz);
 
     bool enabled = description->enabled;
 

@@ -4,6 +4,7 @@
 
 #include <chrono>
 
+#include <QtCore/QTimeZone>
 #include <QtGui/QColor>
 
 #include <nx/utils/impl_ptr.h>
@@ -31,8 +32,8 @@ class TimeMarker: public BubbleToolTip
 public:
     struct TimeContent
     {
-        std::chrono::milliseconds archivePosition{};
-        std::chrono::milliseconds displayPosition{};
+        std::chrono::milliseconds position{};
+        QTimeZone timeZone{QTimeZone::LocalTime};
         bool isTimestamp = true;
         std::chrono::milliseconds localFileLength{}; //< Should be 0 if archive is not local file.
         bool showDate = true;

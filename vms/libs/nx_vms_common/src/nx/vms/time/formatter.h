@@ -9,15 +9,13 @@
 
 namespace nx::vms::time {
 
-enum Format
+enum class Format
 {
     h, // Hours value in current system time format without noon mark (13 or 1, for example).
     m, // Minutes in the "mm" format.
     s, // Seconds in the "ss" format.
     a, // AM/PM mark if applicable by current locale settings or empty string otherwise.
 
-    mm_ss,
-    mm_ss_zzz,
     hh, // "13:00" or "8 pm"
     hh_mm,
     hh_mm_ss, // ~=QLocale::Time::ShortFormat
@@ -39,17 +37,6 @@ enum Format
 
     filename_date, // "yyyy_MMM_dd_hh_mm_ss"
     filename_time, // "hh_mm_ss"
-
-    // Duration is formatted time position relative to zero.
-    // No time zone consideration added.
-    // Any duration longer than 24 hours will be shown with hours number more than 24.
-
-    duration_formats_begin,
-    hhh = duration_formats_begin,
-    hhh_mm,
-    hhh_mm_ss,
-    hhh_mm_ss_zzz,
-    duration_formats_end,
 };
 
 class Formatter;
@@ -122,5 +109,18 @@ NX_VMS_COMMON_API bool is24HoursTimeFormat(FormatterPtr formatter = Formatter::s
 
 // Formats relative time in the past in human readable form like "just now", "3 minutes ago" etc.
 NX_VMS_COMMON_API QString fromNow(std::chrono::seconds duration);
+
+enum class Duration
+{
+    hh,
+    hh_mm,
+    hh_mm_ss,
+    hh_mm_ss_zzz,
+    mm,
+    mm_ss,
+    mm_ss_zzz,
+};
+
+NX_VMS_COMMON_API QString toDurationString(std::chrono::milliseconds value, Duration format);
 
 } // namespace nx::vms::time

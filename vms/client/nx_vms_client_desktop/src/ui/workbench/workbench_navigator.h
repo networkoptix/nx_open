@@ -242,7 +242,8 @@ protected slots:
     void updateTimelineRelevancy();
     void updateSyncIsForced();
 
-    void updateLocalOffset();
+    /** Update timezone on a timeline and calendar based on the currently selected resource. */
+    void updateTimeZone();
 
     void updateThumbnailsLoader();
 

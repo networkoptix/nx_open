@@ -42,15 +42,27 @@ QString getValueFromString(const QString& line)
 
 int timeZone(QDateTime dt1)
 {
+    // Function can be simplified to use this line only:
+    const int alternativeResult = dt1.offsetFromUtc();
+
     QDateTime dt2 = dt1.toUTC();
     dt1.setTimeSpec(Qt::UTC);
     int res = dt2.secsTo(dt1);
+    NX_ASSERT(res == alternativeResult,
+        "Offset from UTC mismatch, expected %1 while actual is %2",
+        alternativeResult,
+        res);
     return res;
 }
 
 int currentTimeZone()
 {
-    return timeZone(QDateTime::fromMSecsSinceEpoch(nx::utils::millisSinceEpoch().count()));
+    // Function can be simplified to use this line only:
+    const int alternativeResult = QDateTime::currentDateTime().offsetFromUtc();
+
+    const int result = timeZone(QDateTime::fromMSecsSinceEpoch(nx::utils::millisSinceEpoch().count()));
+    NX_ASSERT(result == alternativeResult);
+    return result;
 }
 
 static uint hash(const QChar *p, int n)

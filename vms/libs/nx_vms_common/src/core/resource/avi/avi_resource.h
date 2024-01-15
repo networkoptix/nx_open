@@ -4,6 +4,8 @@
 
 #include <optional>
 
+#include <QtCore/QTimeZone>
+
 #include <nx/media/config.h>
 #include <nx/media/meta_data_packet.h>
 #include <nx/streaming/abstract_archive_resource.h>
@@ -40,11 +42,12 @@ public:
     void setMotionBuffer(const QnMetaDataLightVector& data, int channel);
     const QnMetaDataLightVector& getMotionBuffer(int channel) const;
 
-    /* Set item time zone offset in ms */
-    void setTimeZoneOffset(qint64 value);
+    /** Set item time zone. */
+    void setTimeZone(const QTimeZone& timeZone);
 
-    /* Return item time zone offset in ms */
-    qint64 timeZoneOffset() const;
+    /** Timezone of the file if it was stored during export. */
+    QTimeZone timeZone() const;
+
     virtual QnAviArchiveDelegate* createArchiveDelegate() const;
     virtual bool hasVideo(const QnAbstractStreamDataProvider* dataProvider) const override;
 
@@ -69,7 +72,7 @@ public:
 private:
     QnStorageResourcePtr m_storage;
     QnMetaDataLightVector m_motionBuffer[CL_MAX_CHANNELS];
-    qint64 m_timeZoneOffset;
+    QTimeZone m_timeZone{QTimeZone::LocalTime};
     QnAspectRatio m_imageAspectRatio;
     std::optional<QnAviArchiveMetadata> m_aviMetadata;
     mutable std::optional<bool> m_hasVideo;

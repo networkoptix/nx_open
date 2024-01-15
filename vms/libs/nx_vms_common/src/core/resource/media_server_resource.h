@@ -168,9 +168,9 @@ public:
 
 protected:
     virtual void updateInternal(const QnResourcePtr& source, NotifierList& notifiers) override;
+    virtual void atPropertyChanged(const QnResourcePtr& self, const QString& key);
 
-private slots:
-    void at_propertyChanged(const QnResourcePtr& /*res*/, const QString& key);
+private:
     void at_cloudSettingsChanged();
 
     void resetCachedValues();

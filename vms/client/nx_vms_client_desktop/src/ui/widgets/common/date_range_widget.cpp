@@ -141,12 +141,9 @@ QDateTime QnDateRangeWidget::actualDateTime(const QDate& userDate) const
 
     const auto server = currentServer().dynamicCast<nx::vms::client::core::ServerResource>();
     if (!server)
-        return QDateTime(userDate, kMidnight, Qt::UTC);
+        return userDate.startOfDay();
 
-    return QDateTime(userDate,
-        kMidnight,
-        Qt::OffsetFromUTC,
-        duration_cast<std::chrono::seconds>(server->timeZoneInfo().utcOffset).count());
+    return QDateTime(userDate, kMidnight, server->timeZone());
 }
 
 QDate QnDateRangeWidget::displayDate(qint64 timestampMs) const

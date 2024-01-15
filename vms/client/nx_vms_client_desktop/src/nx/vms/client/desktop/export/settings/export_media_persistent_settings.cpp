@@ -183,7 +183,7 @@ OverlaySettingsPtr ExportTimestampOverlayPersistentSettings::createRuntimeSettin
     runtimeSettings->offset = offset;
     runtimeSettings->alignment = alignment;
     runtimeSettings->format = format;
-    runtimeSettings->serverTimeDisplayOffsetMs = serverTimeDisplayOffsetMs;
+    runtimeSettings->timeZone = timeZone;
     runtimeSettings->fontSize = fontSize;
     runtimeSettings->foreground = foreground;
     runtimeSettings->outline = outline;

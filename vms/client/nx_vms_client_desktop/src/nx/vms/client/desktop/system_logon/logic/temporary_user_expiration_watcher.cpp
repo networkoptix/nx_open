@@ -64,7 +64,7 @@ TemporaryUserExpirationWatcher::TemporaryUserExpirationWatcher(QObject* parent):
         });
 
     connect(systemContext()->serverTimeWatcher(),
-        &core::ServerTimeWatcher::displayOffsetsChanged,
+        &core::ServerTimeWatcher::timeZoneChanged,
         this,
         &TemporaryUserExpirationWatcher::updateNotification);
 

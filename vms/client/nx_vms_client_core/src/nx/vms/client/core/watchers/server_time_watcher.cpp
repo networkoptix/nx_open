@@ -9,7 +9,6 @@
 #include <client_core/client_core_module.h>
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
@@ -17,14 +16,13 @@
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/resource/server.h>
 #include <nx/vms/client/core/system_context.h>
-#include <utils/common/synctime.h>
 
 using namespace std::chrono;
 
 namespace {
 
 // Update offset once in 2 minutes.
-constexpr int kServerTimeUpdatePeriodMs = 1000 * 60 * 2;
+constexpr minutes kServerTimeUpdatePeriod = 2min;
 
 } // namespace
 
@@ -36,32 +34,26 @@ ServerTimeWatcher::ServerTimeWatcher(SystemContext* systemContext, QObject* pare
 {
     const auto resourcePool = this->resourcePool();
 
-    connect(resourcePool, &QnResourcePool::resourceAdded, this,
-        &ServerTimeWatcher::handleResourceAdded);
-    connect(resourcePool, &QnResourcePool::resourceRemoved, this,
-        &ServerTimeWatcher::handleResourceRemoved);
+    connect(resourcePool, &QnResourcePool::resourcesAdded, this,
+        &ServerTimeWatcher::handleResourcesAdded);
+    connect(resourcePool, &QnResourcePool::resourcesRemoved, this,
+        &ServerTimeWatcher::handleResourcesRemoved);
 
-    /* We need to process only servers. */
-    for (const auto& resource: resourcePool->servers())
-        handleResourceAdded(resource);
+    handleResourcesAdded(resourcePool->servers());
 
     const auto updateTimeData =
         [this, resourcePool]()
         {
-            const auto onlineServers = resourcePool->getAllServers(nx::vms::api::ResourceStatus::online);
+            const auto onlineServers = resourcePool->getAllServers(
+                nx::vms::api::ResourceStatus::online);
             for (const auto& server: onlineServers)
-                sendRequest(server);
+                ensureServerTimeZoneIsValid(server.dynamicCast<ServerResource>());
         };
 
     connect(&m_timer, &QTimer::timeout, this, updateTimeData);
-    m_timer.setInterval(kServerTimeUpdatePeriodMs);
+    m_timer.setInterval(kServerTimeUpdatePeriod);
     m_timer.setSingleShot(false);
     m_timer.start();
-
-    connect(this, &ServerTimeWatcher::timeModeChanged,
-        this, &ServerTimeWatcher::displayOffsetsChanged);
-    connect(qnSyncTime, &QnSyncTime::timeChanged, this,
-        &ServerTimeWatcher::displayOffsetsChanged);
 }
 
 ServerTimeWatcher::TimeMode ServerTimeWatcher::timeMode() const
@@ -76,78 +68,18 @@ void ServerTimeWatcher::setTimeMode(TimeMode mode)
 
     m_mode = mode;
 
-    emit timeModeChanged();
+    emit timeZoneChanged();
 }
 
-qint64 ServerTimeWatcher::utcOffset(
-    const QnMediaResourcePtr& resource,
-    qint64 defaultValue)
+QTimeZone ServerTimeWatcher::timeZone(const QnMediaResourcePtr& resource)
 {
     if (auto fileResource = resource.dynamicCast<QnAviResource>())
-    {
-        qint64 result = fileResource->timeZoneOffset();
-        if (result != Qn::InvalidUtcOffset)
-            NX_ASSERT(fileResource->hasFlags(Qn::utc), "Only utc resources should have offset.");
-
-        return result == Qn::InvalidUtcOffset
-            ? defaultValue
-            : result;
-    }
+        return fileResource->timeZone();
 
     if (auto server = resource->toResource()->getParentResource().dynamicCast<ServerResource>())
-    {
-        NX_ASSERT(resource->toResourcePtr()->hasFlags(Qn::utc),
-            "Only utc resources should have offset.");
-        return server->timeZoneInfo().utcOffset.count();
-    }
+        return server->timeZone();
 
-    return defaultValue;
-}
-
-qint64 ServerTimeWatcher::displayOffset(const QnMediaResourcePtr& resource) const
-{
-    return timeMode() == clientTimeMode
-        ? 0
-        : localOffset(resource, 0);
-}
-
-QDateTime ServerTimeWatcher::serverTime(
-    const ServerResourcePtr& server,
-    qint64 msecsSinceEpoch)
-{
-    // Try to use actual server timezone when possible.
-    if (NX_ASSERT(server) && ini().useNativeServerTimeZone)
-    {
-        QByteArray timezoneId = server->timeZoneInfo().timezoneId.toUtf8();
-        const bool isTzAvailable = QTimeZone::isTimeZoneIdAvailable(timezoneId);
-        QTimeZone tz(timezoneId);
-        if (!timezoneId.isEmpty() && isTzAvailable && tz.isValid())
-        {
-            QDateTime result;
-            result.setTimeZone(tz);
-            result.setMSecsSinceEpoch(msecsSinceEpoch);
-            NX_TRACE(NX_SCOPE_TAG, "Calculated time based on server timezone %1 is %2",
-                server->timeZoneInfo().timezoneId, result);
-            return result;
-        }
-        else
-        {
-            NX_VERBOSE(NX_SCOPE_TAG, "Timezone is not available, using default calculation.");
-        }
-    }
-
-    // Intentionally fall-through to default calculation.
-    {
-        const auto utcOffset = duration_cast<seconds>(server->timeZoneInfo().utcOffset);
-
-        QDateTime result;
-        result.setTimeSpec(Qt::OffsetFromUTC);
-        result.setOffsetFromUtc(utcOffset.count());
-        result.setMSecsSinceEpoch(msecsSinceEpoch);
-        NX_TRACE(NX_SCOPE_TAG, "Calculated time based on server utc offset %1 is %2",
-            utcOffset, result);
-        return result;
-    }
+    return QTimeZone{QTimeZone::LocalTime};
 }
 
 QDateTime ServerTimeWatcher::displayTime(qint64 msecsSinceEpoch) const
@@ -158,35 +90,21 @@ QDateTime ServerTimeWatcher::displayTime(qint64 msecsSinceEpoch) const
 QDateTime ServerTimeWatcher::displayTime(const ServerResourcePtr& server,
     qint64 msecsSinceEpoch) const
 {
-    if (!server || timeMode() == clientTimeMode)
-        return QDateTime::fromMSecsSinceEpoch(msecsSinceEpoch);
+    const QTimeZone tz = (server && timeMode() == serverTimeMode)
+        ? server->timeZone()
+        : QTimeZone::LocalTime;
 
-    return serverTime(server, msecsSinceEpoch);
+    return QDateTime::fromMSecsSinceEpoch(msecsSinceEpoch, tz);
 }
 
-qint64 ServerTimeWatcher::localOffset(
-    const QnMediaResourcePtr& resource,
-    qint64 defaultValue) const
+void ServerTimeWatcher::ensureServerTimeZoneIsValid(const ServerResourcePtr& server)
 {
-    const qint64 utcOffsetMs = utcOffset(resource, Qn::InvalidUtcOffset);
-
-    if (utcOffsetMs == Qn::InvalidUtcOffset)
-        return defaultValue;
-
-    auto localDateTime = QDateTime::currentDateTime();
-    const auto utcDateTime = localDateTime.toUTC();
-    localDateTime.setTimeSpec(Qt::UTC);
-
-    return utcOffsetMs - utcDateTime.msecsTo(localDateTime);
-}
-
-void ServerTimeWatcher::sendRequest(const QnMediaServerResourcePtr& server)
-{
-    if (server->getStatus() != nx::vms::api::ResourceStatus::online || server->hasFlags(Qn::fake))
+    // Timezone is already set and valid.
+    if (!NX_ASSERT(server) || !server->timeZoneInfo().timeZoneId.isEmpty())
         return;
 
-    auto connection = this->connection();
-    if (!connection)
+    auto api = connectedServerApi();
+    if (!api)
         return;
 
     auto callback = nx::utils::guarded(this,
@@ -201,34 +119,45 @@ void ServerTimeWatcher::sendRequest(const QnMediaServerResourcePtr& server)
                 return;
 
             const auto result = reply.deserialized<QnTimeReply>();
-            server->setTimeZoneInfo({result.timezoneId, milliseconds(result.timeZoneOffset)});
+            server->overrideTimeZoneInfo({
+                .timeZoneOffsetMs = milliseconds(result.timeZoneOffset),
+                .timeZoneId = result.timezoneId
+            });
         });
 
-    connectedServerApi()->getServerLocalTime(
-        server->getId(),
-        callback,
-        this->thread());
+    api->getServerLocalTime(server->getId(), callback, this->thread());
 }
 
-void ServerTimeWatcher::handleResourceAdded(const QnResourcePtr& resource)
+void ServerTimeWatcher::handleResourcesAdded(const QnResourceList& resources)
 {
-    const auto server = resource.dynamicCast<ServerResource>();
-    if (!server || server->hasFlags(Qn::fake))
-        return;
+    bool atLeastOneServerAdded = false;
+    for (const auto& resource: resources)
+    {
+        const auto server = resource.objectCast<ServerResource>();
+        if (!server || server->hasFlags(Qn::fake))
+            return;
 
-    const auto updateServer = [this, server]{ sendRequest(server); };
+        atLeastOneServerAdded = true;
+        if (server->getStatus() == nx::vms::api::ResourceStatus::online)
+            ensureServerTimeZoneIsValid(server);
 
-    connect(server.get(), &QnMediaServerResource::apiUrlChanged, this, updateServer);
-    connect(server.get(), &QnMediaServerResource::statusChanged, this, updateServer);
-    updateServer();
+        connect(server.get(), &QnResource::statusChanged, this,
+            [this](const QnResourcePtr& resource)
+            {
+                ensureServerTimeZoneIsValid(resource.objectCast<ServerResource>());
+            });
+        connect(server.get(), &ServerResource::timeZoneChanged, this,
+            &ServerTimeWatcher::timeZoneChanged);
+    }
 
-    connect(server.get(), &ServerResource::timeZoneInfoChanged, this,
-        &ServerTimeWatcher::displayOffsetsChanged);
+    if (atLeastOneServerAdded)
+        emit timeZoneChanged();
 }
 
-void ServerTimeWatcher::handleResourceRemoved(const QnResourcePtr& resource)
+void ServerTimeWatcher::handleResourcesRemoved(const QnResourceList& resources)
 {
-    resource->disconnect(this);
+    for (const auto& resource: resources)
+        resource->disconnect(this);
 }
 
 } // namespace nx::vms::client::core
