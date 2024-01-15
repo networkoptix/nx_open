@@ -223,7 +223,7 @@ void BackupSettingsWidget::loadState(const ServerSettingsDialogState& state)
             });
 
         QString alertBarMessage;
-        if (cloudBackupStorage && saasState == nx::vms::api::SaasState::suspend)
+        if (cloudBackupStorage && saasState == nx::vms::api::SaasState::suspended)
         {
             alertBarMessage = tr("System suspended. To make changes to backup configuration, the "
                 "System should be in active state. %1")
