@@ -117,20 +117,7 @@ struct ResourceSupportProxy::Private:
         if (!device)
             return;
 
-        const QString serializedManifests =
-            device->getProperty(QnVirtualCameraResource::kDeviceAgentManifestsProperty);
-
-        using DeviceAgentManifests = std::map<QnUuid, DeviceAgentManifest>;
-
-        auto [manifests, result] =
-            nx::reflect::json::deserialize<DeviceAgentManifests>(serializedManifests.toUtf8().toStdString());
-
-        if (!result.success)
-        {
-            NX_WARNING(this, "Failed to deserialize manifest: %1", result.toString());
-        }
-
-        for (const auto& [engineId, manifest]: manifests)
+        for (const auto& [engineId, manifest]: device->deviceAgentManifests())
         {
             SupportInfo supportInfo = supportInfoFromDeviceAgentManifest(manifest);
             supportInfoCache[deviceId][engineId] = std::move(supportInfo);
