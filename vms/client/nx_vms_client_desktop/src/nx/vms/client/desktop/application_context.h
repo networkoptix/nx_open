@@ -30,6 +30,7 @@ class ObjectDisplaySettings;
 class PerformanceMonitor;
 class RadassController;
 class ResourceFactory;
+class ResourceDirectoryBrowser;
 class ResourcesChangesManager;
 class RunningInstancesManager;
 class ScreenRecordingSettings;
@@ -218,6 +219,8 @@ public:
     UploadManager* uploadManager() const;
 
     QnResourceDiscoveryManager* resourceDiscoveryManager() const;
+
+    ResourceDirectoryBrowser* resourceDirectoryBrowser() const;
 
     ResourcesChangesManager* resourcesChangesManager() const;
 
