@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <chrono>
+
 #include <QtWidgets/QWidget>
 
 #include <core/resource/resource_fwd.h>
@@ -132,6 +134,9 @@ protected:
 
     /** Add a button to search edit. */
     void addSearchAction(QAction* action);
+
+    /** Sets the search delay. */
+    void setSearchDelay(std::chrono::milliseconds delay);
 
 private:
     /**

@@ -57,6 +57,7 @@
 #include <nx/vms/client/desktop/event_search/utils/analytics_search_setup.h>
 #include <nx/vms/client/desktop/event_search/utils/common_object_search_setup.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_ribbon.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/utils/qml_property.h>
@@ -150,6 +151,7 @@ AnalyticsSearchWidget::AnalyticsSearchWidget(WindowContext* context, QWidget* pa
     commonSetup()->setCameraSelection(RightPanel::CameraSelection::layout);
 
     addSearchAction(action(menu::OpenAdvancedSearchDialog));
+    setSearchDelay(milliseconds(ini().analyticsSearchRequestDelayMs));
 
     connect(model(), &AbstractSearchListModel::isOnlineChanged, this,
         &AnalyticsSearchWidget::updateAllowance);

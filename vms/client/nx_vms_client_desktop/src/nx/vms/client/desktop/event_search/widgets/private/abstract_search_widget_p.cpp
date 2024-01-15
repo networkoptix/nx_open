@@ -925,4 +925,9 @@ void AbstractSearchWidget::Private::addSearchAction(QAction* action)
     ui->headerSearchLayout->addWidget(advancedButton);
 }
 
+void AbstractSearchWidget::Private::setSearchDelay(std::chrono::milliseconds delay)
+{
+    m_textFilterEdit->setTextChangedSignalFilterMs(delay.count());
+}
+
 } // namespace nx::vms::client::desktop
