@@ -126,12 +126,12 @@ NX_REFLECTION_ENUM_CLASS(SaasState,
     active,
 
     /**%apidoc Saas services are suspended manually */
-    suspend,
+    suspended,
 
-    /**%apidoc Saas services are shutdown manually */
+    /**%apidoc Saas services are shut down manually */
     shutdown,
 
-    /**%apidoc Saas services are shutdown automatically */
+    /**%apidoc Saas services are shut down automatically */
     autoShutdown
 );
 

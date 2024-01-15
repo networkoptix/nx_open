@@ -41,7 +41,7 @@ bool saasInitialized(SystemContext* systemContext)
 bool saasServicesOperational(SystemContext* systemContext)
 {
     const auto state = systemContext->saasServiceManager()->saasState();
-    return state == SaasState::active || state == SaasState::suspend;
+    return state == SaasState::active || state == SaasState::suspended;
 }
 
 bool localRecordingServicesOverused(SystemContext* systemContext)
@@ -74,7 +74,7 @@ QString StringsHelper::recommendedAction(nx::vms::api::SaasState state)
         case SaasState::active:
             return QString();
 
-        case SaasState::suspend:
+        case SaasState::suspended:
         case SaasState::shutdown:
             return tr("Contact your channel partner for details.");
 
