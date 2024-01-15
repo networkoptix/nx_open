@@ -247,6 +247,7 @@ public:
     void setScreenRecordingOn(bool value);
 
     Q_INVOKABLE bool isReadOnly() const;
+    Q_INVOKABLE bool hasChanges() const;
 
 signals:
     void stateChanged(const CameraSettingsDialogState& state);

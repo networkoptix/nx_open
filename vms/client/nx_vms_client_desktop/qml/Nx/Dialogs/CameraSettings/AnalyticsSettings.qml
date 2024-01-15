@@ -49,8 +49,9 @@ Item
 
             supportsDualStreaming = store.dualStreamingEnabled()
             analyticsSettings.resourceId = resourceId
-            const isInitial =
-                !analyticsSettings.initialized || analyticsSettings.resourceId !== resourceId
+            const isInitial = !store.hasChanges()
+                || !analyticsSettings.initialized
+                || analyticsSettings.resourceId !== resourceId
 
             const currentEngineId = store.currentAnalyticsEngineId()
             const userEnabledAnalyticsEngines = store.userEnabledAnalyticsEngines()
