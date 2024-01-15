@@ -240,6 +240,9 @@ public:
 
     static QSet<QnUuid> calculateUserEnabledAnalyticsEngines(const QString& value);
 
+    using DeviceAgentManifestMap = std::map<QnUuid, nx::vms::api::analytics::DeviceAgentManifest>;
+    DeviceAgentManifestMap deviceAgentManifests() const;
+
 signals:
     void ptzCapabilitiesChanged(const QnVirtualCameraResourcePtr& camera);
     void userEnabledAnalyticsEnginesChanged(const QnVirtualCameraResourcePtr& camera);
@@ -256,7 +259,6 @@ protected:
         const QString& key, const QString& prevValue, const QString& newValue) override;
 
 private:
-    using DeviceAgentManifestMap = std::map<QnUuid, nx::vms::api::analytics::DeviceAgentManifest>;
     using ManifestItemIdsFetcher =
         std::function<std::set<QString>(const nx::vms::api::analytics::DeviceAgentManifest&)>;
 
@@ -270,7 +272,6 @@ private:
     std::map<QnUuid, std::set<QString>> calculateSupportedEventTypes() const;
     std::map<QnUuid, std::set<QString>> calculateSupportedObjectTypes() const;
 
-    DeviceAgentManifestMap fetchDeviceAgentManifests() const;
 
     std::optional<nx::vms::api::StreamIndex> obtainUserChosenAnalyzedStreamIndex(
         QnUuid engineId) const;
