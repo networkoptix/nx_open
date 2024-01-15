@@ -73,6 +73,7 @@ Item
             id: header
 
             model: eventModel
+            searchDelay: LocalSettings.iniConfigValue("analyticsSearchRequestDelayMs")
 
             width: filtersPanel.width
             height: implicitHeight
@@ -347,7 +348,7 @@ Item
         PropertyUpdateFilter on delayedAttributesFilter
         {
             source: analyticsFilters.selectedAttributeFilters
-            minimumIntervalMs: 250
+            minimumIntervalMs: LocalSettings.iniConfigValue("analyticsSearchRequestDelayMs")
         }
 
         Binding

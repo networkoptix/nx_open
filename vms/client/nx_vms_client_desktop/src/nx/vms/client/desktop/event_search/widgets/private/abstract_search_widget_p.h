@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <chrono>
 #include <optional>
 #include <vector>
 
@@ -79,6 +80,7 @@ public:
     bool footerToggled() const;
 
     void addSearchAction(QAction* action);
+    void setSearchDelay(std::chrono::milliseconds delay);
 
 private:
     void setupModels();

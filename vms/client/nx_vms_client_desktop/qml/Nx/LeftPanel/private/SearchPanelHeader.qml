@@ -20,6 +20,7 @@ Column
     property alias filtersColumn: filtersColumn
 
     property alias searchText: searchField.text
+    property int searchDelay: 250
 
     signal filtersReset()
 
@@ -100,7 +101,7 @@ Column
         PropertyUpdateFilter on delayedText
         {
             source: searchField.text
-            minimumIntervalMs: 250
+            minimumIntervalMs: header.searchDelay
         }
 
         Binding

@@ -157,6 +157,7 @@ Window
                     id: header
 
                     model: eventModel
+                    searchDelay: LocalSettings.iniConfigValue("analyticsSearchRequestDelayMs")
 
                     y: 12
                     width: filtersContainer.width
@@ -694,7 +695,7 @@ Window
         PropertyUpdateFilter on delayedAttributesFilter
         {
             source: analyticsFilters.selectedAttributeFilters
-            minimumIntervalMs: 250
+            minimumIntervalMs: LocalSettings.iniConfigValue("analyticsSearchRequestDelayMs")
         }
 
         function showSelectionOnLayout()

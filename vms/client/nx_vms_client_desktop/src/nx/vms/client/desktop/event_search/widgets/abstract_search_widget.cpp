@@ -167,6 +167,11 @@ void AbstractSearchWidget::addSearchAction(QAction* action)
     d->addSearchAction(action);
 }
 
+void AbstractSearchWidget::setSearchDelay(std::chrono::milliseconds delay)
+{
+    d->setSearchDelay(delay);
+}
+
 QString AbstractSearchWidget::makePlaceholderText(const QString& title, const QString& description)
 {
     using namespace nx::vms::common::html;

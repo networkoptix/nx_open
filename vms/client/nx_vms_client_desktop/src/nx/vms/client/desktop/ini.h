@@ -186,6 +186,10 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
     NX_INI_FLAG(false, mainSceneInQml,
         "[Dev] Allow to render main scene translated to QML.");
 
+    // VMS-42523
+    NX_INI_INT(250, analyticsSearchRequestDelayMs,
+        "[Dev] Analytics search request delay in milliseconds.");
+
     // ---------------------------------------------------------------------------------------------
     // Design section
     // Flags here can be removed when designers approve the resulting approach.
