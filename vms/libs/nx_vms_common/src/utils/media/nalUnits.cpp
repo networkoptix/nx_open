@@ -6,6 +6,8 @@
 #include <QtCore/QTextStream>
 #include <QtCore/QDebug>
 
+#include <nx/utils/log/log.h>
+
 #ifdef _MSC_VER
 #    pragma warning(disable: 4189) /* C4189: '?' : local variable is initialized but not referenced. */
 #    pragma warning(disable: 4101) /* C4101: '?' : unreferenced local variable. */
@@ -1590,40 +1592,47 @@ void SliceUnit::write_ref_pic_list_reordering(BitStreamWriter& bitWriter)
 #endif
 
 // --------------- SEI UNIT ------------------------
-void SEIUnit::deserialize(SPSUnit& sps, int orig_hrd_parameters_present_flag)
+bool SEIUnit::deserialize(SPSUnit& sps, int orig_hrd_parameters_present_flag)
 {
     quint8* nalEnd = m_nalBuffer + m_nalBufferLen;
     try {
         int rez = NALUnit::deserialize(m_nalBuffer, nalEnd);
         if (rez != 0)
-            return;
+            return false;
+
         quint8* curBuff = m_nalBuffer + 1;
-        while (curBuff < nalEnd-1) {
+        while (curBuff < nalEnd-1)
+        {
             int payloadType = 0;
             for(; *curBuff  ==  0xFF && curBuff < nalEnd; curBuff++)
                 payloadType += 0xFF;
             if (curBuff >= nalEnd)
-                return;
+                return false;
+
             payloadType += *curBuff++;
             if (curBuff >= nalEnd)
-                return;
+                return false;
 
             int payloadSize = 0;
             for(; *curBuff  ==  0xFF && curBuff < nalEnd; curBuff++)
                 payloadSize += 0xFF;
+
             if (curBuff >= nalEnd)
-                return;
+                return false;
+
             payloadSize += *curBuff++;
-            if (curBuff >= nalEnd)
-                return;
+            if (curBuff >= nalEnd || curBuff + payloadSize > nalEnd)
+                return false;
+
             sei_payload(sps, payloadType, curBuff, payloadSize, orig_hrd_parameters_present_flag);
             m_processedMessages.insert(payloadType);
             curBuff += payloadSize;
         }
     } catch (BitStreamException const&) {
-        qWarning() << "Bad SEI detected. SEI too short";
+        NX_DEBUG(this, "Bad SEI detected. SEI too short");
+        return false;
     }
-    return;
+    return true;
 }
 
 int SEIUnit::updateSeiParam(SPSUnit& sps, bool removePulldown, int orig_hrd_parameters_present_flag)
