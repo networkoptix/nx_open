@@ -931,4 +931,9 @@ bool CameraSettingsDialogStore::isReadOnly() const
     return d->state.readOnly;
 }
 
+bool CameraSettingsDialogStore::hasChanges() const
+{
+    return d->state.hasChanges;
+}
+
 } // namespace nx::vms::client::desktop
