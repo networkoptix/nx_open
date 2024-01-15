@@ -66,6 +66,9 @@ public:
     static QnResourcePtr createArchiveResource(const QString& filename,
         const QPointer<QnResourcePool>& resourcePool);
 
+signals:
+    void layoutUpdatedFromFile(const QnFileLayoutResourcePtr& layout);
+
 private:
     void dropResourcesFromDirectory(const QString& path);
     void stopInternal();
