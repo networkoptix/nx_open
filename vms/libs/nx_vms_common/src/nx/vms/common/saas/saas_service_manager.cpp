@@ -6,13 +6,13 @@
 
 #include <core/resource_management/resource_properties.h>
 #include <licensing/license.h>
-#include <nx_ec/abstract_ec_connection.h>
-#include <nx_ec/managers/abstract_resource_manager.h>
 #include <nx/reflect/json/deserializer.h>
 #include <nx/reflect/json/serializer.h>
 #include <nx/reflect/string_conversion.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/common/system_context.h>
+#include <nx_ec/abstract_ec_connection.h>
+#include <nx_ec/managers/abstract_resource_manager.h>
 
 static const QString kSaasDataPropertyKey("saasData");
 static const QString kSaasServicesPropertyKey("saasServices");
@@ -192,7 +192,7 @@ bool ServiceManager::saasActive() const
 bool ServiceManager::saasSuspended() const
 {
     NX_MUTEX_LOCKER mutexLocker(&m_mutex);
-    return m_data.state == nx::vms::api::SaasState::suspend;
+    return m_data.state == nx::vms::api::SaasState::suspended;
 }
 
 bool ServiceManager::saasSuspendedOrShutDown() const
@@ -204,7 +204,7 @@ bool ServiceManager::saasSuspendedOrShutDown() const
 bool ServiceManager::saasSuspendedOrShutDown(nx::vms::api::SaasState state)
 {
     using namespace nx::vms::api;
-    return state == SaasState::suspend || saasShutDown(state);
+    return state == SaasState::suspended || saasShutDown(state);
 }
 
 bool ServiceManager::saasShutDown() const

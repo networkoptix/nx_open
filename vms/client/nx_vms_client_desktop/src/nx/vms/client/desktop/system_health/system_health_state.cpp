@@ -450,7 +450,7 @@ bool SystemHealthState::Private::calculateState(SystemHealthIndex index) const
         case SystemHealthIndex::saasInSuspendedState:
             return hasPowerUserPermissions()
                 && q->systemContext()->saasServiceManager()->saasState()
-                    == nx::vms::api::SaasState::suspend;
+                    == nx::vms::api::SaasState::suspended;
 
         case SystemHealthIndex::saasInShutdownState:
             return hasPowerUserPermissions()

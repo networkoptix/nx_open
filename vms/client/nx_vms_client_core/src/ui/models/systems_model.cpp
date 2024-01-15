@@ -271,7 +271,7 @@ QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
         case Is2FaEnabledForSystem:
             return system->is2FaEnabled();
         case IsSaasSuspended:
-            return system->saasState() == nx::vms::api::SaasState::suspend;
+            return system->saasState() == nx::vms::api::SaasState::suspended;
         case IsSaasShutDown:
             return system->saasState() == nx::vms::api::SaasState::shutdown
                 || system->saasState() == nx::vms::api::SaasState::autoShutdown;
