@@ -1023,6 +1023,11 @@ QnResourceDiscoveryManager* ApplicationContext::resourceDiscoveryManager() const
     return d->localResourcesContext->resourceDiscoveryManager.get();
 }
 
+ResourceDirectoryBrowser* ApplicationContext::resourceDirectoryBrowser() const
+{
+    return d->localResourcesContext->resourceDirectoryBrowser.get();
+}
+
 ResourcesChangesManager* ApplicationContext::resourcesChangesManager() const
 {
     return d->resourcesChangesManager.get();

@@ -22,6 +22,7 @@
 #include <nx/streaming/archive_stream_reader.h>
 #include <nx/vms/client/core/resource/data_loaders/caching_camera_data_loader.h>
 #include <nx/vms/client/core/utils/grid_walker.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/dialogs/progress_dialog.h>
 #include <nx/vms/client/desktop/export/data/export_media_settings.h>
 #include <nx/vms/client/desktop/export/dialogs/export_settings_dialog.h>
@@ -316,6 +317,17 @@ WorkbenchExportHandler::WorkbenchExportHandler(QObject *parent):
         &WorkbenchExportHandler::exportProcessUpdated);
     connect(d->exportManager.get(), &ExportManager::processFinished, this,
         &WorkbenchExportHandler::exportProcessFinished);
+
+    connect(
+        appContext()->resourceDirectoryBrowser(),
+        &ResourceDirectoryBrowser::layoutUpdatedFromFile,
+        this,
+        [](const QnFileLayoutResourcePtr& layout)
+        {
+            auto systemContext = SystemContext::fromResource(layout);
+            if (NX_ASSERT(systemContext))
+                systemContext->layoutSnapshotManager()->store(layout);
+        });
 
     connect(action(menu::ExportVideoAction), &QAction::triggered, this,
         [this]()
