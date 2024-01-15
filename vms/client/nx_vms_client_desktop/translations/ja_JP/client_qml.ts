@@ -725,7 +725,7 @@
     </message>
     <message>
       <source>Edit Search Base</source>
-      <translation type="unfinished">Edit Search Base</translation>
+      <translation>検索ベースを編集</translation>
     </message>
   </context>
   <context>
