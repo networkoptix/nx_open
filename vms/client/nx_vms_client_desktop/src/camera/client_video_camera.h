@@ -50,7 +50,7 @@ public:
     void exportMediaPeriodToFile(const QnTimePeriod &timePeriod,
         const QString& fileName, const QString& format,
         QnStorageResourcePtr storage,
-        qint64 serverTimeZoneMs,
+        const QTimeZone& timeZone,
         const nx::core::transcoding::Settings& transcodingSettings,
         const QnTimePeriodList& playbackMask = QnTimePeriodList());
 

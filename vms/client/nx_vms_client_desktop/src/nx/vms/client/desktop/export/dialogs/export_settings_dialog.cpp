@@ -17,7 +17,6 @@
 #include <nx/utils/math/math.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
-#include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/widgets/busy_indicator.h>
 #include <nx/vms/client/desktop/common/widgets/control_bars.h>
@@ -28,8 +27,10 @@
 #include <nx/vms/client/desktop/image_providers/layout_thumbnail_loader.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/utils/timezone_helper.h>
 #include <nx/vms/time/formatter.h>
 #include <ui/common/palette.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -643,24 +644,20 @@ void ExportSettingsDialog::setMediaParams(
 {
     d->dispatch(Reducer::enableTab, ExportMode::media);
 
-    const auto resource = mediaResource->toResourcePtr();
-    auto systemContext = SystemContext::fromResource(resource);
+    const QTimeZone resourceTimeZone = timeZone(mediaResource);
+    const QTimeZone timestampTimeZone = displayTimeZone(mediaResource);
 
-    const auto timeWatcher = systemContext->serverTimeWatcher();
-    d->dispatch(Reducer::setServerTimeZoneOffsetMs, timeWatcher->utcOffset(mediaResource, Qn::InvalidUtcOffset));
-
-    const auto timestampOffsetMs = timeWatcher->displayOffset(mediaResource);
-    d->dispatch(Reducer::setTimestampOffsetMs, timestampOffsetMs);
-
+    d->dispatch(Reducer::setTimestampTimeZone, timestampTimeZone);
 
     const auto currentSettings = d->state().getExportMediaSettings();
     const auto startTimeMs = currentSettings.period.startTimeMs;
 
     QString timePart;
+    const auto resource = mediaResource->toResourcePtr();
     if (resource->hasFlags(Qn::utc))
     {
-        timePart = nx::vms::time::toString(startTimeMs + timestampOffsetMs,
-            nx::vms::time::Format::filename_date);
+        auto dateTime = QDateTime::fromMSecsSinceEpoch(startTimeMs, timestampTimeZone);
+        timePart = nx::vms::time::toString(dateTime, nx::vms::time::Format::filename_date);
     }
     else
     {

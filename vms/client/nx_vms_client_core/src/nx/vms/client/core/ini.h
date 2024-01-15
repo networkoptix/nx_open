@@ -10,10 +10,6 @@ struct NX_VMS_CLIENT_CORE_API Ini: nx::kit::IniConfig
 {
     Ini(): IniConfig("nx_vms_client_core.ini") { reload(); }
 
-    // VMS-39456.
-    NX_INI_FLAG(false, useNativeServerTimeZone,
-        "[Support] Use OS-provided timezone when displaying UI elements based on server time.");
-
     // VMS-30347.
     NX_INI_INT(8, maxLastConnectedTilesStored,
         "[Support] Maximum last connected systems tiles stored on the Welcome Screen");

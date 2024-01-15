@@ -1,12 +1,12 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#ifndef QN_TIME_SLIDER_PIXMAP_CACHE_H
-#define QN_TIME_SLIDER_PIXMAP_CACHE_H
+#pragma once
 
 #include <chrono>
 
 #include <QtCore/QCache>
 #include <QtCore/QObject>
+#include <QtCore/QTimeZone>
 #include <QtGui/QFont>
 #include <QtGui/QPixmap>
 
@@ -52,8 +52,18 @@ public:
     qreal devicePixelRatio() const;
     void setDevicePixelRatio(qreal value);
 
-    const QPixmap& tickmarkTextPixmap(int level, milliseconds position, int height, const QnTimeStep& step);
-    const QPixmap& dateTextPixmap(milliseconds position, int height, const QnTimeStep& step);
+    const QPixmap& tickmarkTextPixmap(
+        int level,
+        milliseconds position,
+        int height,
+        const QnTimeStep& step,
+        const QTimeZone& timeZone);
+
+    const QPixmap& dateTextPixmap(
+        milliseconds position,
+        int height,
+        const QnTimeStep& step,
+        const QTimeZone& timeZone);
 
     const QPixmap& textPixmap(const QString& text, int height);
     const QPixmap& textPixmap(const QString& text, int height, const QColor& color);
@@ -82,5 +92,3 @@ private:
     using LongKeyCache = QCache<QnTimeStepLongCacheKey, const QPixmap>;
     LongKeyCache m_pixmapByLongPositionKey;
 };
-
-#endif // QN_TIME_SLIDER_PIXMAP_CACHE_H

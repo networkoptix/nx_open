@@ -130,9 +130,9 @@ int ExportStorageStreamRecorder::getStreamIndex(const QnConstAbstractMediaDataPt
     return QnStreamRecorder::getStreamIndex(mediaData);
 }
 
-void ExportStorageStreamRecorder::setServerTimeZoneMs(qint64 value)
+void ExportStorageStreamRecorder::setServerTimeZone(QTimeZone value)
 {
-    m_serverTimeZoneMs = value;
+    m_timeZone = std::move(value);
 }
 
 bool ExportStorageStreamRecorder::isTranscodingEnabled() const
@@ -143,7 +143,15 @@ bool ExportStorageStreamRecorder::isTranscodingEnabled() const
 void ExportStorageStreamRecorder::adjustMetaData(QnAviArchiveMetadata& metaData) const
 {
     metaData.signature = QnSignHelper::addSignatureFiller(QnSignHelper::getSignMagic());
-    metaData.timeZoneOffset = m_serverTimeZoneMs;
+
+    if (NX_ASSERT(m_timeZone.isValid()))
+    {
+        // Store timezone offset for playback compatibility with older clients.
+        metaData.timeZoneOffset =
+            std::chrono::seconds(m_timeZone.offsetFromUtc(QDateTime::currentDateTime()));
+        metaData.timeZoneId = m_timeZone.id();
+    }
+
     if (isTranscodingEnabled())
     {
         metaData.dewarpingParams.enabled = false;

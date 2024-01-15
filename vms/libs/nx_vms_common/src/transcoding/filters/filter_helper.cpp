@@ -5,6 +5,7 @@
 #include <core/resource/media_resource.h>
 #include <nx/core/transcoding/filters/legacy_transcoding_settings.h>
 #include <nx/core/transcoding/filters/text_image_filter.h>
+#include <nx/utils/log/log.h>
 #include <nx/vms/time/formatter.h>
 #include <utils/common/util.h>
 #include <utils/media/frame_info.h>
@@ -38,16 +39,16 @@ QString getFrameTimestampText(
     const nx::core::transcoding::TimestampParams& params)
 {
     QString result;
-    qint64 displayTime = (params.timeMs > 0)
-        ? params.timeMs
+    const qint64 timestampMs = NX_ASSERT(params.timestamp.count() > 0)
+        ? params.timestamp.count()
         : frame->pts / 1000;
 
-    displayTime += params.displayOffset;
+    QDateTime displayTime = QDateTime::fromMSecsSinceEpoch(timestampMs, params.timeZone);
 
-    if (displayTime * 1000 >= UTC_TIME_DETECTION_THRESHOLD)
+    if (timestampMs * 1000 >= UTC_TIME_DETECTION_THRESHOLD)
         result = nx::vms::time::toString(displayTime);
-    else
-        result = nx::vms::time::toString(displayTime, nx::vms::time::Format::hh_mm_ss_zzz);
+    else // FIXME: #sivanov Looks like duration string should be used here without offset.
+        result = nx::vms::time::toString(timestampMs, nx::vms::time::Format::hh_mm_ss_zzz);
 
     return result;
 }

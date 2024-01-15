@@ -101,8 +101,8 @@ void LivePreview::showAt(
 
     setTimeContent(timeContent);
 
-    d->thumbnailSource->setTimestamp(d->dataExistsForTime(timeContent.archivePosition)
-        ? timeContent.archivePosition
+    d->thumbnailSource->setTimestamp(d->dataExistsForTime(timeContent.position)
+        ? timeContent.position
         : LivePreviewThumbnail::kNoTimestamp);
 
     show();

@@ -4,6 +4,7 @@
 
 #include <QtCore/QBuffer>
 #include <QtCore/QEventLoop>
+#include <QtCore/QTimer>
 
 #include <camera/camera_data_manager.h>
 #include <camera/client_video_camera.h>
@@ -22,7 +23,6 @@
 #include <nx/vms/api/data/layout_data.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/resource/data_loaders/caching_camera_data_loader.h>
-#include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/export/data/nov_metadata.h>
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
@@ -30,6 +30,7 @@
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/utils/local_file_cache.h>
 #include <nx/vms/client/desktop/utils/server_image_cache.h>
+#include <nx/vms/client/desktop/utils/timezone_helper.h>
 #include <nx_ec/data/api_conversion_functions.h>
 
 #if defined(Q_OS_WIN)
@@ -230,10 +231,14 @@ NovMetadata ExportLayoutTool::prepareLayoutAndMetadata()
         const bool exportAllowed =
             accessController->hasPermissions(resource, Qn::ExportPermission);
 
+        const QTimeZone tz = timeZone(mediaResource);
         metadata.itemProperties[localItem.uuid] = {
             .name = resource->getName(),
-            .timeZoneOffset =
-                core::ServerTimeWatcher::utcOffset(mediaResource, Qn::InvalidUtcOffset),
+            .timeZoneOffset = resource->hasFlags(Qn::utc)
+                ? tz.offsetFromUtc(
+                    QDateTime::fromMSecsSinceEpoch(d->settings.period.startTimeMs, tz)) * 1000LL
+                : 0,
+            .timeZoneId = tz.id(),
             .flags = exportAllowed
                 ? NovItemProperties::Flag::empty : NovItemProperties::Flag::noExportPermission};
     }
@@ -503,7 +508,6 @@ bool ExportLayoutTool::exportMediaResource(const QnMediaResourcePtr& resource)
     }
 
     QString uniqId = fileNameForResource(resource->toResourcePtr());
-    qint64 serverTimeZone = client::core::ServerTimeWatcher::utcOffset(resource, Qn::InvalidUtcOffset);
 
     QnTimePeriodList playbackMask;
     for (const auto& bookmark: d->settings.bookmarks)
@@ -514,9 +518,9 @@ bool ExportLayoutTool::exportMediaResource(const QnMediaResourcePtr& resource)
 
     m_currentCamera->exportMediaPeriodToFile(d->settings.period,
         uniqId,
-        lit("mkv"),
+        "mkv",
         d->storage,
-        serverTimeZone,
+        timeZone(resource),
         d->settings.transcodingSettings,
         playbackMask);
 

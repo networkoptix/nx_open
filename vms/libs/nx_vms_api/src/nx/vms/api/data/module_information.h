@@ -17,6 +17,7 @@
 #include "data_macros.h"
 #include "os_information.h"
 #include "runtime_data.h"
+#include "server_timezone_information.h"
 #include "software_version_serialization.h"
 #include "timestamp.h"
 
@@ -34,8 +35,9 @@ struct NX_VMS_API ServerPortInformation
     QnUuid id;
     bool operator==(const ServerPortInformation& other) const = default;
 };
+#define ServerPortInformation_Fields (port)(id)
 NX_VMS_API_DECLARE_STRUCT_EX(ServerPortInformation, (ubjson)(json)(xml)(csv_record))
-NX_REFLECTION_INSTRUMENT(ServerPortInformation, (port)(id));
+NX_REFLECTION_INSTRUMENT(ServerPortInformation, ServerPortInformation_Fields);
 
 struct NX_VMS_API ModuleInformation: ServerPortInformation
 {
@@ -173,7 +175,7 @@ struct NX_VMS_API ServerInformation: ModuleInformationWithAddresses
 NX_VMS_API_DECLARE_STRUCT_AND_LIST_EX(ServerInformation, (json))
 NX_REFLECTION_INSTRUMENT(ServerInformation, ServerInformation_Fields);
 
-struct NX_VMS_API ServerRuntimeInformation: ServerPortInformation
+struct NX_VMS_API ServerRuntimeInformation: ServerPortInformation, ServerTimeZoneInformation
 {
     nx::utils::OsInfo osInfo;
 
@@ -182,12 +184,6 @@ struct NX_VMS_API ServerRuntimeInformation: ServerPortInformation
 
     /**%apidoc Current time synchronized with the VMS System, in milliseconds since epoch. */
     std::chrono::milliseconds synchronizedTimeMs{0};
-
-    /**%apidoc Time zone offset, in milliseconds. */
-    std::chrono::milliseconds timeZoneOffsetMs{0};
-
-    /**%apidoc Identification of the time zone in the text form. */
-    QString timeZoneId;
 
     RuntimeData runtimeData;
 
@@ -198,7 +194,9 @@ struct NX_VMS_API ServerRuntimeInformation: ServerPortInformation
 };
 
 #define ServerRuntimeInformation_Fields \
-    (port)(id)(osInfo)(osTimeMs)(synchronizedTimeMs)(timeZoneOffsetMs)(timeZoneId)(runtimeData)
+    ServerPortInformation_Fields \
+    ServerTimeZoneInformation_Fields \
+    (osInfo)(osTimeMs)(synchronizedTimeMs)(runtimeData)
 
 NX_VMS_API_DECLARE_STRUCT_EX(ServerRuntimeInformation, (json))
 NX_REFLECTION_INSTRUMENT(ServerRuntimeInformation, ServerRuntimeInformation_Fields);

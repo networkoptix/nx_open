@@ -2,16 +2,16 @@
 
 #include "calendar_model.h"
 
-#include <QtQml/QtQml>
+#include <functional>
+
 #include <QtCore/QLocale>
 #include <QtCore/QTimeZone>
-
-#include <functional>
+#include <QtQml/QtQml>
 
 #include <nx/reflect/enum_instrument.h>
 #include <nx/utils/log/assert.h>
-#include <nx/vms/client/core/time/calendar_utils.h>
 #include <nx/vms/client/core/media/abstract_time_period_storage.h>
+#include <nx/vms/client/core/time/calendar_utils.h>
 #include <recording/time_period_list.h>
 
 using namespace std::chrono;
@@ -113,6 +113,7 @@ struct CalendarModel::Private
     Month currentMonth;
     QList<Day> days;
     QLocale locale;
+    QTimeZone timeZone{QTimeZone::LocalTime}; //< FIXME: #sivanov Implement timezone usage.
 
     AbstractTimePeriodStorage* periodStorage[(int) PeriodStorageType::count]{nullptr, nullptr};
     bool populated = false;
@@ -351,6 +352,22 @@ void CalendarModel::setLocale(const QLocale& locale)
 
     d->locale = locale;
     emit localeChanged();
+
+    d->resetDaysModelData();
+}
+
+QTimeZone CalendarModel::timeZone() const
+{
+    return d->timeZone;
+}
+
+void CalendarModel::setTimeZone(const QTimeZone& timeZone)
+{
+    if (d->timeZone == timeZone)
+        return;
+
+    d->timeZone = timeZone;
+    emit timeZoneChanged();
 
     d->resetDaysModelData();
 }

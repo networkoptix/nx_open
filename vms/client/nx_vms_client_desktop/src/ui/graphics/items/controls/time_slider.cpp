@@ -602,7 +602,6 @@ QnTimeSlider::QnTimeSlider(
     m_tooltipVisible(false),
     m_lastMinuteAnimationDelta(0),
     m_pixmapCache(new QnTimeSliderPixmapCache(kNumTickmarkLevels, this)),
-    m_localOffset(0),
     m_lastLineBarValue(),
     m_bookmarksViewer(createBookmarksViewer(context->mainWindow()->view())),
     m_bookmarksVisible(false),
@@ -1010,10 +1009,8 @@ void QnTimeSlider::setOption(Option option, bool value)
 
 void QnTimeSlider::setTimeRange(milliseconds min, milliseconds max)
 {
-    // All positions within slider range should satisfy (position + m_localOffset >= 0)
-    // at all times. setTimeRange() and setLocalOffset() can be called independently, so adjust
-    // range according to m_localOffset in both methods.
-    min = qMax(-m_localOffset, min);
+    // All positions within slider range should satisfy (position >= 0) at all times.
+    min = qMax(0ms, min);
     max = qMax(min, max);
     setRange(min.count(), max.count());
 }
@@ -1711,19 +1708,12 @@ void QnTimeSlider::setIndicators(const QVector<milliseconds>& indicators)
     m_indicators = indicators;
 }
 
-milliseconds QnTimeSlider::localOffset() const
+void QnTimeSlider::setTimeZone(QTimeZone value)
 {
-    return m_localOffset;
-}
-
-void QnTimeSlider::setLocalOffset(milliseconds localOffset)
-{
-    if (m_localOffset == localOffset)
+    if (m_timeZone == value)
         return;
 
-    m_localOffset = localOffset;
-    setTimeRange(minimum(), maximum());
-
+    m_timeZone = value;
     updateToolTipText();
 }
 
@@ -1911,8 +1901,8 @@ workbench::timeline::TimeMarker::TimeContent QnTimeSlider::tooltipTimeContent(
 {
     TimeMarker::TimeContent content;
     const bool isUtc = m_options.testFlag(UseUTC);
-    content.displayPosition = isUtc ? (pos + localOffset()) : pos;
-    content.archivePosition = pos;
+    content.timeZone = m_timeZone;
+    content.position = pos;
     content.isTimestamp = isUtc;
     if (!isUtc)
         content.localFileLength = maximum();
@@ -2843,13 +2833,13 @@ void QnTimeSlider::drawTickmarks(QPainter* painter, const QRectF& rect)
     /* Find initial and maximal positions. */
     QPointF overlap(kMaxTickmarkTextSizePixels / 2.0, 0.0);
     milliseconds startPos = qMax(minimum() + 1ms,
-        timeFromPosition(positionFromTime(m_windowStart) - overlap, false)) + m_localOffset;
+        timeFromPosition(positionFromTime(m_windowStart) - overlap, false));
     milliseconds endPos = qMin(maximum() - 1ms,
-        timeFromPosition(positionFromTime(m_windowEnd) + overlap, false)) + m_localOffset;
+        timeFromPosition(positionFromTime(m_windowEnd) + overlap, false));
 
     /* Initialize next positions for tickmark steps. */
     for (int i = minStepIndex; i < stepCount; i++)
-        m_nextTickmarkPos[i] = milliseconds(roundUp(startPos, (*m_steps)[i]));
+        m_nextTickmarkPos[i] = milliseconds(roundUp(startPos, (*m_steps)[i], m_timeZone));
 
     /* Draw tickmarks. */
     for (int i = 0; i < m_tickmarkLines.size(); i++)
@@ -2866,7 +2856,7 @@ void QnTimeSlider::drawTickmarks(QPainter* painter, const QRectF& rect)
         for (; index < stepCount; index++)
         {
             if (m_nextTickmarkPos[index] == pos)
-                m_nextTickmarkPos[index] = milliseconds(add(pos, (*m_steps)[index]));
+                m_nextTickmarkPos[index] = milliseconds(add(pos, (*m_steps)[index], m_timeZone));
             else
                 break;
         }
@@ -2874,14 +2864,14 @@ void QnTimeSlider::drawTickmarks(QPainter* painter, const QRectF& rect)
         index--;
         int level = tickmarkLevel(index);
 
-        qreal x = quickPositionFromTime(pos - m_localOffset, false);
+        qreal x = quickPositionFromTime(pos, false);
 
         /* Draw label if needed. */
         qreal lineHeight = m_stepData[index].currentHeight;
         if (!qFuzzyIsNull(m_stepData[index].currentTextOpacity) && kTickmarkFontHeights[level])
         {
             QPixmap pixmap = m_pixmapCache->tickmarkTextPixmap(level, pos,
-                kTickmarkFontHeights[level], (*m_steps)[index]);
+                kTickmarkFontHeights[level], (*m_steps)[index], m_timeZone);
             const auto pixmapSize = pixmap.size() / pixmap.devicePixelRatio();
             qreal topMargin = qFloor((kTickmarkTextHeightPixels[level] - pixmapSize.height()) * 0.5);
             QRectF textRect(x - pixmapSize.width() / 2.0, rect.top() + lineHeight + topMargin, pixmapSize.width(), pixmapSize.height());
@@ -2891,7 +2881,7 @@ void QnTimeSlider::drawTickmarks(QPainter* painter, const QRectF& rect)
         }
 
         /* Calculate line ends. */
-        if (pos - m_localOffset >= m_windowStart && pos - m_localOffset <= m_windowEnd)
+        if (pos >= m_windowStart && pos <= m_windowEnd)
         {
             m_tickmarkLines[index] <<
                 QPointF(x, rect.top()) <<
@@ -2946,20 +2936,20 @@ void QnTimeSlider::drawDates(QPainter* painter, const QRectF& rect)
     QnScopedPainterBrushRollback brushRollback(painter);
 
     /* Draw highlight. */
-    qint64 pos1 = roundUp(m_windowStart + m_localOffset, highlightStep);
-    qint64 pos0 = sub(milliseconds(pos1), highlightStep);
+    qint64 pos1 = roundUp(m_windowStart, highlightStep, m_timeZone);
+    qint64 pos0 = sub(milliseconds(pos1), highlightStep, m_timeZone);
     qreal x0 = quickPositionFromTime(m_windowStart);
-    qint64 number = absoluteNumber(milliseconds(pos1), highlightStep);
-    while(true)
+    qint64 number = absoluteNumber(milliseconds(pos1), highlightStep, m_timeZone);
+    while (true)
     {
-        qreal x1 = quickPositionFromTime(milliseconds(pos1) - m_localOffset);
+        qreal x1 = quickPositionFromTime(milliseconds(pos1));
 
         painter->setPen(Qt::NoPen);
         painter->setBrush(backgroundColor(number));
         painter->drawRect(QRectF(x0, rect.top(), x1 - x0, rect.height()));
 
         QPixmap pixmap = m_pixmapCache->
-            dateTextPixmap(milliseconds(pos0), kDateTextFontHeight, highlightStep);
+            dateTextPixmap(milliseconds(pos0), kDateTextFontHeight, highlightStep, m_timeZone);
         const auto pixmapSize = pixmap.size() / pixmap.devicePixelRatio();
         QRectF textRect((x0 + x1) / 2.0 - pixmapSize.width() / 2.0,
             rect.top() + topMargin, pixmapSize.width(), pixmapSize.height());
@@ -2970,11 +2960,11 @@ void QnTimeSlider::drawDates(QPainter* painter, const QRectF& rect)
 
         drawCroppedPixmap(painter, textRect, rect, pixmap, pixmap.rect());
 
-        if (pos1 >= (m_windowEnd + m_localOffset).count())
+        if (pos1 >= m_windowEnd.count())
             break;
 
         pos0 = pos1;
-        pos1 = add(milliseconds(pos1), highlightStep);
+        pos1 = add(milliseconds(pos1), highlightStep, m_timeZone);
         number++;
         x0 = x1;
     }

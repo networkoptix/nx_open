@@ -39,4 +39,17 @@ TEST(FormatterTest, fromNow)
     EXPECT_EQ(toString(date, Format::d_MMMM_yyyy), fromNow(duration_cast<seconds>(msecsAgo)));
 }
 
+TEST(FormatterTest, durationString)
+{
+    static const milliseconds kSampleValue = 28h + 7min + 5s + 27ms;
+
+    EXPECT_EQ(toDurationString(kSampleValue, Duration::hh), QString("28"));
+    EXPECT_EQ(toDurationString(kSampleValue, Duration::hh_mm), QString("28:07"));
+    EXPECT_EQ(toDurationString(kSampleValue, Duration::hh_mm_ss), QString("28:07:05"));
+    EXPECT_EQ(toDurationString(kSampleValue, Duration::hh_mm_ss_zzz), QString("28:07:05.027"));
+    EXPECT_EQ(toDurationString(kSampleValue, Duration::mm), QString("1687"));
+    EXPECT_EQ(toDurationString(kSampleValue, Duration::mm_ss), QString("1687:05"));
+    EXPECT_EQ(toDurationString(kSampleValue, Duration::mm_ss_zzz), QString("1687:05.027"));
+}
+
 } // namespace nx::vms::time::test

@@ -4,6 +4,7 @@
 
 #include <QtCore/QRectF>
 #include <QtCore/QSharedPointer>
+#include <QtCore/QTimeZone>
 #include <QtCore/QVector>
 #include <QtGui/QColor>
 #include <QtGui/QImage>
@@ -75,8 +76,7 @@ struct TimestampOverlaySettings: OverlaySettings
     int fontSize = 18;
     QColor foreground = Qt::white;
     QColor outline = Qt::black;
-    // Use client time to ensure WYSIWYG if needed.
-    qint64 serverTimeDisplayOffsetMs = 0;
+    QTimeZone timeZone{QTimeZone::LocalTime}; //< Use client time to ensure WYSIWYG if needed.
     virtual Type type() const override { return Type::timestamp; }
 };
 

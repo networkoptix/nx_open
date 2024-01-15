@@ -1,17 +1,18 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#ifndef QN_TIME_STEP_H
-#define QN_TIME_STEP_H
+#pragma once
 
 #include <chrono>
 
 #include <QtCore/QPair>
 #include <QtCore/QString>
+#include <QtCore/QTimeZone>
 #include <QtCore/QtGlobal>
 
 class QnTimeStep
 {
     using milliseconds = std::chrono::milliseconds;
+
 public:
     enum Type
     {
@@ -26,8 +27,13 @@ public:
 
     QnTimeStep() = default;
 
-    QnTimeStep(Type type, milliseconds unitMSecs, int stepUnits, int wrapUnits,
-        const QString& format, const QString& longFormat, bool isRelative = true);
+    QnTimeStep(Type type,
+        milliseconds unitMSecs,
+        int stepUnits,
+        int wrapUnits,
+        const QString& format,
+        const QString& longFormat,
+        bool isRelative = true);
 
     /** Type of the time step. */
     Type type = Milliseconds;
@@ -62,23 +68,38 @@ public:
 typedef QPair<qint64, qint64> QnTimeStepLongCacheKey;
 
 // These function are used in low-level drawings, so we return qint64 instead of time.
-qint64 roundUp(std::chrono::milliseconds msecs, const QnTimeStep &step);
-qint64 add(std::chrono::milliseconds msecs, const QnTimeStep &step);
-qint64 sub(std::chrono::milliseconds msecs, const QnTimeStep &step);
-qint64 absoluteNumber(std::chrono::milliseconds msecs, const QnTimeStep &step);
+qint64 roundUp(std::chrono::milliseconds msecs, const QnTimeStep& step, const QTimeZone& timeZone);
+qint64 add(std::chrono::milliseconds msecs, const QnTimeStep& step, const QTimeZone& timeZone);
+qint64 sub(std::chrono::milliseconds msecs, const QnTimeStep& step, const QTimeZone& timeZone);
 
-qint32 shortCacheKey(std::chrono::milliseconds msecs, int height, const QnTimeStep &step);
+qint64 absoluteNumber(
+    std::chrono::milliseconds msecs,
+    const QnTimeStep& step,
+    const QTimeZone& timeZone);
 
-QnTimeStepLongCacheKey longCacheKey(std::chrono::milliseconds msecs, int height, const QnTimeStep &step);
+qint32 shortCacheKey(
+    std::chrono::milliseconds msecs,
+    int height,
+    const QnTimeStep& step,
+    const QTimeZone& timeZone);
+
+QnTimeStepLongCacheKey longCacheKey(
+    std::chrono::milliseconds msecs,
+    int height,
+    const QnTimeStep& step);
 
 // TODO: #sivanov What to do with locale-translation inconsistencies?
 
 // Used for time label below ticks (both smaller and bigger).
-QString toShortString(std::chrono::milliseconds msecs, const QnTimeStep &step);
+QString toShortString(
+    std::chrono::milliseconds msecs,
+    const QnTimeStep& step,
+    const QTimeZone& timeZone);
 
-QString toLongestShortString(const QnTimeStep &step);
+QString toLongestShortString(const QnTimeStep& step);
 
 // Used for upper time labels in rectangles.
-QString toLongString(std::chrono::milliseconds msecs, const QnTimeStep &step);
-
-#endif // QN_TIME_STEP_H
+QString toLongString(
+    std::chrono::milliseconds msecs,
+    const QnTimeStep& step,
+    const QTimeZone& timeZone);

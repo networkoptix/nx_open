@@ -138,16 +138,20 @@ void QnTimeSliderPixmapCache::setDevicePixelRatio(qreal value)
 }
 
 const QPixmap& QnTimeSliderPixmapCache::tickmarkTextPixmap(
-    int level, milliseconds position, int height, const QnTimeStep& step)
+    int level,
+    milliseconds position,
+    int height,
+    const QnTimeStep& step,
+    const QTimeZone& timeZone)
 {
     level = qBound(0, level, numLevels() - 1);
-    qint32 key = shortCacheKey(position, qRound(height * m_devicePixelRatio), step);
+    qint32 key = shortCacheKey(position, qRound(height * m_devicePixelRatio), step, timeZone);
 
     const QPixmap* result = m_pixmapByShortPositionKey[level]->object(key);
     if (result)
         return *result;
 
-    result = new QPixmap(textPixmap(toShortString(position, step), height,
+    result = new QPixmap(textPixmap(toShortString(position, step, timeZone), height,
         m_tickmarkColors[level], m_tickmarkFonts[level]));
     m_pixmapByShortPositionKey[level]->insert(key, result,
         result->width() * result->height() * result->depth() / 8);
@@ -155,7 +159,10 @@ const QPixmap& QnTimeSliderPixmapCache::tickmarkTextPixmap(
 }
 
 const QPixmap& QnTimeSliderPixmapCache::dateTextPixmap(
-    milliseconds position, int height, const QnTimeStep& step)
+    milliseconds position,
+    int height,
+    const QnTimeStep& step,
+    const QTimeZone& timeZone)
 {
     QnTimeStepLongCacheKey key = longCacheKey(position, qRound(height * m_devicePixelRatio), step);
 
@@ -163,7 +170,8 @@ const QPixmap& QnTimeSliderPixmapCache::dateTextPixmap(
     if (result)
         return *result;
 
-    result = new QPixmap(textPixmap(toLongString(position, step), height, m_dateColor, m_dateFont));
+    result = new QPixmap(
+        textPixmap(toLongString(position, step, timeZone), height, m_dateColor, m_dateFont));
     m_pixmapByLongPositionKey.insert(
         key, result, result->width() * result->height() * result->depth() / 8);
     return *result;

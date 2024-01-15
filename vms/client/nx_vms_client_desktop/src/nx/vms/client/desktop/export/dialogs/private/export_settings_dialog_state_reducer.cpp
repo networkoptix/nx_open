@@ -75,8 +75,9 @@ QString calculateLongestStringViewDateTime(TimestampFormat format)
         QDateTime dateTime(QDate(2000, month, 20), kLongestTime);
         maxLength = std::max(maxLength,
             nx::core::transcoding::TimestampFilter::timestampTextUtc(
-                dateTime.toMSecsSinceEpoch(), 0, format)
-                .length());
+                dateTime.toMSecsSinceEpoch(),
+                QTimeZone::LocalTime,
+                format).length());
     }
     return QString(maxLength, QChar('8'));
 }
@@ -159,13 +160,14 @@ State ExportSettingsDialogStateReducer::loadSettings(State state,
     const LocalSettings* localSettings,
     const QString& cacheDirLocation)
 {
-    qint64 timestampOffsetMs =
-        state.exportMediaPersistentSettings.timestampOverlay.serverTimeDisplayOffsetMs;
+    // TODO: #sivanov Persistent and runtime settings should be splitted better.
+    const auto timeZone = state.exportMediaPersistentSettings.timestampOverlay.timeZone;
     state.exportMediaPersistentSettings = state.bookmarkName.isEmpty()
         ? localSettings->exportMediaSettings()
         : localSettings->exportBookmarkSettings();
-    state.exportMediaPersistentSettings.timestampOverlay.serverTimeDisplayOffsetMs =
-        timestampOffsetMs;
+
+    // Restore runtime option, overridden by persisten settings.
+    state.exportMediaPersistentSettings.timestampOverlay.timeZone = timeZone;
 
     if (state.bookmarkName.isEmpty())
         state.exportMediaPersistentSettings.usedOverlays.removeOne(ExportOverlayType::bookmark);
@@ -207,7 +209,8 @@ State ExportSettingsDialogStateReducer::loadSettings(State state,
     state.applyTranscodingSettings();
     state.updateBookmarkText();
 
-    state = setSpeed(std::move(state), state.exportMediaPersistentSettings.rapidReview.speed);
+    const auto speed = state.exportMediaPersistentSettings.rapidReview.speed;
+    state = setSpeed(std::move(state), speed);
 
     if (state.bookmarkName.isEmpty()
         || mode == ExportMode::layout
@@ -218,15 +221,11 @@ State ExportSettingsDialogStateReducer::loadSettings(State state,
     return selectOverlay(std::move(state), ExportOverlayType::bookmark);
 }
 
-State ExportSettingsDialogStateReducer::setServerTimeZoneOffsetMs(State state, qint64 offsetMs)
+State ExportSettingsDialogStateReducer::setTimestampTimeZone(
+    State state,
+    const QTimeZone &timeZone)
 {
-    state.exportMediaSettings.serverTimeZoneMs = offsetMs;
-    return state;
-}
-
-State ExportSettingsDialogStateReducer::setTimestampOffsetMs(State state, qint64 offsetMs)
-{
-    state.exportMediaPersistentSettings.timestampOverlay.serverTimeDisplayOffsetMs = offsetMs;
+    state.exportMediaPersistentSettings.timestampOverlay.timeZone = timeZone;
     return state;
 }
 

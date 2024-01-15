@@ -71,8 +71,6 @@ struct TimeSynchronizationWidgetState: AbstractFluxState
                 continue;
 
             const auto utcOffset = server.timeZoneOffset;
-            if (utcOffset == milliseconds(Qn::InvalidUtcOffset))
-                continue;
 
             if (!initialized)
             {

@@ -29,16 +29,5 @@ struct SyncTimeData
 };
 #define SyncTimeData_Fields (utcTimeMs)(isTakenFromInternet)
 
-struct ApiDateTimeData
-{
-    qint64 timeSinceEpochMs = 0;
-    QString timeZoneId;
-    qint64 timeZoneOffsetMs = 0;
-};
-#define ApiDateTimeData_Fields (timeSinceEpochMs)(timeZoneId)(timeZoneOffsetMs)
-
 QN_FUSION_DECLARE_FUNCTIONS(QnTimeReply, (json)(ubjson)(xml)(csv_record), NX_VMS_COMMON_API)
-QN_FUSION_DECLARE_FUNCTIONS(ApiDateTimeData,
-    (json)(ubjson)(xml)(csv_record),
-    NX_VMS_COMMON_API)
 QN_FUSION_DECLARE_FUNCTIONS(SyncTimeData, (json)(ubjson)(xml)(csv_record), NX_VMS_COMMON_API)

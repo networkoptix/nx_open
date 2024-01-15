@@ -33,12 +33,13 @@ NX_VMS_COMMON_API QString getPathSeparator(const QString& path);
 
 NX_VMS_COMMON_API QString getValueFromString(const QString& line);
 
-// TODO: #sivanov Move to time.h
-// TODO: Rename to reflect that result is in seconds.
-/*
- * \returns                             Current time zone offset in seconds.
+//TODO: #rvasilenko Remove this function, use QDateTime::offsetFromUtc() instead.
+/**
+ * Current time zone offset from UTC in seconds.
  */
 NX_VMS_COMMON_API int timeZone(QDateTime dt1);
+
+//TODO: #rvasilenko Remove this function, use QDateTime::currentDateTime().offsetFromUtc() instead.
 NX_VMS_COMMON_API int currentTimeZone();
 
 static const qint64 UTC_TIME_DETECTION_THRESHOLD = 1'000'000ll * 3600*24*100;

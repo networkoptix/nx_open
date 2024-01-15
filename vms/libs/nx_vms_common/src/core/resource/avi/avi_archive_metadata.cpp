@@ -7,9 +7,8 @@ extern "C" {
 }
 
 #include <export/sign_helper.h>
-
 #include <nx/fusion/model_functions.h>
-
+#include <nx/reflect/json.h>
 #include <nx/utils/log/log.h>
 
 namespace {
@@ -205,11 +204,15 @@ QnAviArchiveMetadata QnAviArchiveMetadata::loadFromFile(const AVFormatContext* c
 
     const auto metadata = tagValueRaw(context, CustomTag, format);
     QnAviArchiveMetadata result = QJson::deserialized<QnAviArchiveMetadata>(metadata);
+    auto [validate, success] = nx::reflect::json::deserialize<QnAviArchiveMetadata>(
+        metadata.toStdString());
+    // FIXME: #sivanov Switch to nx_reflect in master branch.
+    NX_ASSERT(result == validate, "Fusion vs reflect serialization mismatch");
 
     if (result.version >= kVersionBeforeTheIntegrityCheck)
         return result;
 
-    // For now there are only one version, so no different migration methods are required.
+    // All following code is actual only to support files exported by VMS 2.6 and older.
 
     result.signature = tagValueRaw(context, SignatureTag, format);
 
@@ -219,8 +222,8 @@ QnAviArchiveMetadata QnAviArchiveMetadata::loadFromFile(const AVFormatContext* c
     {
         bool deserialized = false;
         qint64 value = tmp[4].trimmed().toLongLong(&deserialized);
-        if (deserialized && value != Qn::InvalidUtcOffset && value != -1)
-            result.timeZoneOffset = value;
+        if (deserialized && value != -1)
+            result.timeZoneOffset = std::chrono::milliseconds(value);
     }
 
     result.rotation = getVideoRotation(context);
@@ -258,11 +261,14 @@ bool QnAviArchiveMetadata::saveToFile(AVFormatContext* context, Format format)
                 return;
 
             isSuccessful = false;
-            NX_VERBOSE(this, nx::format("Error writing metadata %1: %2").args(getTagName(tag, format),
-                errCode));
+            NX_WARNING(this, "Error writing metadata %1: %2", getTagName(tag, format), errCode);
         };
 
+    // FIXME: #sivanov Switch to nx_reflect in master branch.
     setValueLogged(CustomTag, QJson::serialized<QnAviArchiveMetadata>(*this));
+    QByteArray validate = QByteArray::fromStdString(nx::reflect::json::serialize(*this));
+    NX_ASSERT(QJson::deserialized<QnAviArchiveMetadata>(validate) == *this,
+        "Fusion vs reflect serialization mismatch");
 
     // Other tags are not supported in mp4 format.
     if (format == Format::mp4)

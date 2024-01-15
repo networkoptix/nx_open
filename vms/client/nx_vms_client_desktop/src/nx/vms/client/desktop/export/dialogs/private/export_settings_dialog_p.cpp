@@ -423,7 +423,7 @@ QString ExportSettingsDialog::Private::timestampText(qint64 timeMs) const
     {
         return nx::core::transcoding::TimestampFilter::timestampTextUtc(
             timeMs,
-            state().exportMediaPersistentSettings.timestampOverlay.serverTimeDisplayOffsetMs,
+            state().exportMediaPersistentSettings.timestampOverlay.timeZone,
             state().exportMediaPersistentSettings.timestampOverlay.format);
     }
 
@@ -442,7 +442,9 @@ ExportInfoOverlayPersistentSettings ExportSettingsDialog::Private::getInfoTextDa
     {
         const auto exportTime = nx::utils::millisSinceEpoch();
         const auto exportTimeString = nx::core::transcoding::TimestampFilter::timestampTextUtc(
-            exportTime.count(), 0, data.format);
+            exportTime.count(),
+            QTimeZone::LocalTime,
+            data.format);
 
         data.dateText = tr("Exported: %1", "Duration will be substituted").arg(exportTimeString);
     }

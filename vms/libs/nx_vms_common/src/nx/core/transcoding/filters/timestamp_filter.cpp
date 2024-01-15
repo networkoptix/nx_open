@@ -3,16 +3,16 @@
 #include "timestamp_filter.h"
 
 #include <QtCore/QDateTime>
+#include <QtGui/QFontMetrics>
 #include <QtGui/QPainter>
 #include <QtGui/QPainterPath>
-#include <QtGui/QFontMetrics>
 
-#include <utils/common/util.h>
-#include <utils/media/frame_info.h>
 #include <nx/core/transcoding/filters/image_to_frame_painter.h>
 #include <nx/core/transcoding/filters/transcoding_settings.h>
 #include <nx/utils/log/assert.h>
 #include <nx/vms/time/formatter.h>
+#include <utils/common/util.h>
+#include <utils/media/frame_info.h>
 
 namespace {
 
@@ -63,7 +63,7 @@ void TimestampFilter::Internal::updateTimestamp(const CLVideoDecoderOutputPtr& f
     m_currentTimeMs = displayTime;
 
     const auto timeString = displayTime * 1000 >= UTC_TIME_DETECTION_THRESHOLD
-        ? timestampTextUtc(m_currentTimeMs, m_params.serverTimeDisplayOffsetMs, m_params.format)
+        ? timestampTextUtc(m_currentTimeMs, m_params.timeZone, m_params.format)
         : timestampTextSimple(m_currentTimeMs);
 
     const QSize textMargins(m_fontMetrics.averageCharWidth() / 2, 1);
@@ -113,24 +113,19 @@ QSize TimestampFilter::updatedResolution(const QSize& sourceSize)
 
 QString TimestampFilter::timestampTextUtc(
     qint64 sinceEpochMs,
-    int displayOffsetMs,
+    const QTimeZone& timeZone,
     TimestampFormat format)
 {
-    // TODO: Here was this code, which was not consistent with other places.
-    // However, sometime nx::vms::time::toString should be expanded to accept different zones.
-    // const auto secondsFromUtc = QDateTime::currentDateTime().offsetFromUtc()
-    //     + (displayOffsetMs / 1000);
-    // const auto dateTime = QDateTime::fromMSecsSinceEpoch(
-    //     sinceEpochMs + (displayOffsetMs % 1000), Qt::OffsetFromUTC, secondsFromUtc);
-
-    const auto dateTime = QDateTime::fromMSecsSinceEpoch(sinceEpochMs + displayOffsetMs);
+    using namespace nx::vms::time;
+    // TODO: #sivanov nx::vms::time::toString should be expanded to accept different zones.
+    const auto dateTime = QDateTime::fromMSecsSinceEpoch(sinceEpochMs, timeZone);
 
     switch (format)
     {
         case TimestampFormat::longDate:
-            return nx::vms::time::toString(dateTime, nx::vms::time::dddd_d_MMMM_yyyy_hh_mm_ss);
+            return toString(dateTime, Format::dddd_d_MMMM_yyyy_hh_mm_ss);
         case TimestampFormat::shortDate:
-            return nx::vms::time::toString(dateTime);
+            return toString(dateTime);
         case TimestampFormat::ISODate:
             return dateTime.toString(Qt::ISODate);
         case TimestampFormat::RFC2822Date:
