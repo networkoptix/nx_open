@@ -649,6 +649,7 @@ void QnStorageAnalyticsWidget::hideEvent(QHideEvent*)
 {
     killTimer(m_updateTimerId);
     m_updateTimerId = 0;
+    m_dirty = true;
 }
 
 void QnStorageAnalyticsWidget::timerEvent(QTimerEvent*)
