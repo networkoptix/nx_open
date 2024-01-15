@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <limits>
-
 #include <QtCore/QMetaType>
 #include <QtCore/QStringList>
 
@@ -588,12 +586,6 @@ namespace Qn {
     {
         return ::qHash(int(value), seed);
     }
-
-    /**
-     * Invalid value for a timezone UTC offset.
-     */
-    static const qint64 InvalidUtcOffset = std::numeric_limits<qint64>::max();
-#define InvalidUtcOffset InvalidUtcOffset
 
     /**
      * Helper function that can be used to 'place' macros into Qn namespace.

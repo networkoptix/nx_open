@@ -35,6 +35,7 @@
 #include <nx/utils/pending_operation.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/string.h>
+#include <nx/vms/client/core/ini.h>
 #include <nx/vms/client/core/resource/data_loaders/caching_camera_data_loader.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/access/caching_access_controller.h>
@@ -43,9 +44,11 @@
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
+#include <nx/vms/client/desktop/resource/server.h>
 #include <nx/vms/client/desktop/server_runtime_events/server_runtime_event_connector.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/scene/widgets/timeline_calendar_widget.h>
+#include <nx/vms/client/desktop/utils/timezone_helper.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/state/thumbnail_search_state.h>
 #include <nx/vms/client/desktop/workbench/timeline/thumbnail_loading_manager.h>
@@ -448,8 +451,8 @@ void QnWorkbenchNavigator::initialize()
 
     // TODO: #sivanov Actualize used system context.
     const auto timeWatcher = system()->serverTimeWatcher();
-    connect(timeWatcher, &nx::vms::client::core::ServerTimeWatcher::displayOffsetsChanged,
-        this, &QnWorkbenchNavigator::updateLocalOffset);
+    connect(timeWatcher, &nx::vms::client::core::ServerTimeWatcher::timeZoneChanged,
+        this, &QnWorkbenchNavigator::updateTimeZone);
 
     connect(workbenchContext()->instance<QnWorkbenchUserInactivityWatcher>(),
         &QnWorkbenchUserInactivityWatcher::stateChanged,
@@ -804,9 +807,7 @@ void QnWorkbenchNavigator::addSyncedWidget(QnMediaResourceWidget *widget)
     ++m_syncedResources[syncedResource];
 
     connect(syncedResource->toResourcePtr().get(), &QnResource::parentIdChanged,
-        this, &QnWorkbenchNavigator::updateLocalOffset);
-    connect(syncedResource->toResourcePtr().get(), &QnResource::propertyChanged,
-        this, &QnWorkbenchNavigator::updateLocalOffset);
+        this, &QnWorkbenchNavigator::updateTimeZone);
 
     if (auto loader = systemContext->cameraDataManager()->loader(syncedResource))
     {
@@ -845,9 +846,7 @@ void QnWorkbenchNavigator::removeSyncedWidget(QnMediaResourceWidget *widget)
         return;
 
     auto syncedResource = widget->resource();
-
-    disconnect(syncedResource->toResourcePtr().get(), &QnResource::parentIdChanged,
-        this, &QnWorkbenchNavigator::updateLocalOffset);
+    syncedResource->toResourcePtr()->disconnect(this);
 
     if (display() && !display()->isChangingLayout())
     {
@@ -1333,7 +1332,7 @@ void QnWorkbenchNavigator::updateCentralWidget()
         m_centralWidgetConnections << connect(m_centralWidget->resource().get(),
             &QnResource::parentIdChanged,
             this,
-            &QnWorkbenchNavigator::updateLocalOffset);
+            &QnWorkbenchNavigator::updateTimeZone);
     }
 
     updateCurrentWidget();
@@ -1467,7 +1466,7 @@ void QnWorkbenchNavigator::updateCurrentWidget()
         executeDelayedParented(callback, this);
     }
 
-    updateLocalOffset();
+    updateTimeZone();
     updateCurrentPeriods();
     updateLive();
     updatePlaying();
@@ -1482,17 +1481,21 @@ void QnWorkbenchNavigator::updateCurrentWidget()
         emit currentResourceChanged();
 }
 
-void QnWorkbenchNavigator::updateLocalOffset()
+void QnWorkbenchNavigator::updateTimeZone()
 {
-    qint64 localOffset = m_currentMediaWidget
-        ? m_currentMediaWidget->systemContext()->serverTimeWatcher()->displayOffset(
-            m_currentMediaWidget->resource())
-        : 0;
+    const QTimeZone tz = m_currentMediaWidget
+        ? displayTimeZone(m_currentMediaWidget->resource())
+        : QTimeZone::LocalTime;
 
     if (m_timeSlider)
-        m_timeSlider->setLocalOffset(milliseconds(localOffset));
+        m_timeSlider->setTimeZone(tz);
+
+    // TODO: #dklychkov Implement timezone support for the calendar widget.
+    const milliseconds resourceOffset = seconds(tz.offsetFromUtc(QDateTime::currentDateTime()));
+    const milliseconds localOffset = seconds(QDateTime::currentDateTime().offsetFromUtc());
+
     if (m_calendar)
-        m_calendar->displayOffset = localOffset;
+        m_calendar->displayOffset = (resourceOffset - localOffset).count();
 }
 
 QnWorkbenchNavigator::WidgetFlags QnWorkbenchNavigator::calculateResourceWidgetFlags(const QnResourcePtr& resource) const

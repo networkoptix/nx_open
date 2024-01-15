@@ -397,7 +397,6 @@ private:
 
     void updateCompositeOverlayMode();
 
-    qint64 getDisplayTimeUsec() const;
     qint64 getUtcCurrentTimeUsec() const;
     qint64 getUtcCurrentTimeMs() const;
 

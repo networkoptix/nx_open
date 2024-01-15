@@ -61,7 +61,7 @@ QnMediaServerResource::QnMediaServerResource():
         this, &QnMediaServerResource::resetCachedValues, Qt::DirectConnection);
 
     connect(this, &QnResource::propertyChanged,
-        this, &QnMediaServerResource::at_propertyChanged, Qt::DirectConnection);
+        this, &QnMediaServerResource::atPropertyChanged, Qt::DirectConnection);
 }
 
 QnMediaServerResource::~QnMediaServerResource()
@@ -71,7 +71,7 @@ QnMediaServerResource::~QnMediaServerResource()
     m_runningIfRequests.clear();
 }
 
-void QnMediaServerResource::at_propertyChanged(const QnResourcePtr& /*res*/, const QString& key)
+void QnMediaServerResource::atPropertyChanged(const QnResourcePtr& /*self*/, const QString& key)
 {
     if (key == QnMediaResource::panicRecordingKey())
     {

@@ -102,7 +102,7 @@ public:
 
     static std::pair<bool, State> setApplyFilters(State state, bool value);
 
-    static State setTimestampOffsetMs(State state, qint64 offsetMs);
+    static State setTimestampTimeZone(State state, const QTimeZone& timeZone);
 
     static State setTimestampOverlaySettings(
         State state,
@@ -127,8 +127,6 @@ public:
     static std::pair<bool, State> setOverlayOffset(State state, ExportOverlayType type, int x, int y);
 
     static std::pair<bool, State> overlayPositionChanged(State state, ExportOverlayType type, QRect geometry, QSize space);
-
-    static State setServerTimeZoneOffsetMs(State state, qint64 offsetMs);
 
     static State loadSettings(State state,
         const LocalSettings* localSettings,

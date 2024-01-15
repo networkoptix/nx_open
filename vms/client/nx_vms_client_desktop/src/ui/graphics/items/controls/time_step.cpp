@@ -16,8 +16,11 @@ inline milliseconds timeToMSecs(const QTime& time)
     return milliseconds(QTime(0, 0, 0, 0).msecsTo(time));
 }
 
-QDateTime addHours(const QDateTime& dateTime, int hours)
+QDateTime addHours(const QDateTime& dateTime, int hours, const QTimeZone& timeZone)
 {
+    if (!NX_ASSERT(dateTime.isValid()))
+        return dateTime;
+
     int oldHours = dateTime.time().hour();
     int newHours = oldHours + hours;
 
@@ -38,17 +41,18 @@ QDateTime addHours(const QDateTime& dateTime, int hours)
         QTime(newHours,
             dateTime.time().minute(),
             dateTime.time().second(),
-            dateTime.time().msec()));
+            dateTime.time().msec()),
+        timeZone);
 
     if (result.isValid())
         return result;
 
-    // In Qt 5 the resulting date may be invalid when incoming date and time represent a
+    // In the Qt5/Qt6 the resulting date may be invalid when incoming date and time represent a
     // non-existing time point of daylight saving time shift. For example if the clock is shifted
     // 1h forward in the US, the interval 2:00 - 3:00 will not exist. After 1:59 it's be 3:00.
     // If we try to construct QDateTime for 2:00, it'll become invalid and will have a timestamp of
     // 1:00. To overcome this issue, we need to try to add 1 hour more.
-    return addHours(dateTime, hours + 1);
+    return addHours(dateTime, hours + 1, timeZone);
 }
 } // namespace
 
@@ -73,12 +77,12 @@ QnTimeStep::QnTimeStep(
 {
 }
 
-qint64 roundUp(milliseconds msecs, const QnTimeStep& step)
+qint64 roundUp(milliseconds msecs, const QnTimeStep& step, const QTimeZone& timeZone)
 {
     if (step.isRelative)
         return qCeil(msecs.count(), step.stepMSecs.count());
 
-    QDateTime dateTime = QDateTime::fromMSecsSinceEpoch(msecs.count());
+    QDateTime dateTime = QDateTime::fromMSecsSinceEpoch(msecs.count(), timeZone);
     switch(step.type)
     {
         case QnTimeStep::Milliseconds:
@@ -96,7 +100,10 @@ qint64 roundUp(milliseconds msecs, const QnTimeStep& step)
             {
                 int oldHour = dateTime.time().hour();
                 int newHour = qCeil(oldHour + 1, step.stepUnits);
-                dateTime = addHours(QDateTime(dateTime.date(), QTime(oldHour, 0, 0, 0)), newHour - oldHour);
+                dateTime = addHours(
+                    QDateTime(dateTime.date(), QTime(oldHour, 0, 0, 0), timeZone),
+                    newHour - oldHour,
+                    timeZone);
             }
             break;
 
@@ -105,8 +112,13 @@ qint64 roundUp(milliseconds msecs, const QnTimeStep& step)
                 || (dateTime.date().day() != 1 && dateTime.date().day() % step.stepUnits != 0))
             {
                 int oldDay = dateTime.date().day();
-                int newDay = qMin(qCeil(oldDay + 1, step.stepUnits), dateTime.date().daysInMonth() + 1);
-                dateTime = QDateTime(dateTime.date().addDays(newDay - oldDay), QTime(0, 0, 0, 0));
+                int newDay = qMin(
+                    qCeil(oldDay + 1, step.stepUnits),
+                    dateTime.date().daysInMonth() + 1);
+                dateTime = QDateTime(
+                    dateTime.date().addDays(newDay - oldDay),
+                    QTime(0, 0, 0, 0),
+                    timeZone);
             }
             break;
 
@@ -117,8 +129,11 @@ qint64 roundUp(milliseconds msecs, const QnTimeStep& step)
                 int oldMonth = dateTime.date().month();
                 int newMonth = qCeil(oldMonth /* No +1 here as months are numbered from 1. */,
                     step.stepUnits) + 1;
-                dateTime = QDateTime(QDate(dateTime.date().year(), dateTime.date().month(), 1)
-                    .addMonths(newMonth - oldMonth), QTime(0, 0, 0, 0));
+                dateTime = QDateTime(
+                    QDate(dateTime.date().year(), dateTime.date().month(), 1)
+                        .addMonths(newMonth - oldMonth),
+                    QTime(0, 0, 0, 0),
+                    timeZone);
             }
             break;
 
@@ -128,8 +143,10 @@ qint64 roundUp(milliseconds msecs, const QnTimeStep& step)
             {
                 int oldYear = dateTime.date().year();
                 int newYear = qCeil(oldYear + 1, step.stepUnits);
-                dateTime = QDateTime(QDate(dateTime.date().year(), 1, 1)
-                    .addYears(newYear - oldYear), QTime(0, 0, 0, 0));
+                dateTime = QDateTime(
+                    QDate(dateTime.date().year(), 1, 1).addYears(newYear - oldYear),
+                    QTime(0, 0, 0, 0),
+                    timeZone);
             }
             break;
 
@@ -141,12 +158,12 @@ qint64 roundUp(milliseconds msecs, const QnTimeStep& step)
     return dateTime.toMSecsSinceEpoch();
 }
 
-qint64 add(milliseconds msecs, const QnTimeStep& step)
+qint64 add(milliseconds msecs, const QnTimeStep& step, const QTimeZone& timeZone)
 {
     if (step.isRelative)
         return (msecs + step.stepMSecs).count();
 
-    switch(step.type)
+    switch (step.type)
     {
         case QnTimeStep::Minutes:
         case QnTimeStep::Seconds:
@@ -154,19 +171,20 @@ qint64 add(milliseconds msecs, const QnTimeStep& step)
             return (msecs + step.stepMSecs).count();
 
         case QnTimeStep::Hours:
-            return addHours(QDateTime::fromMSecsSinceEpoch(msecs.count()),
-                step.stepUnits).toMSecsSinceEpoch();
+            return addHours(QDateTime::fromMSecsSinceEpoch(msecs.count(), timeZone),
+                step.stepUnits,
+                timeZone).toMSecsSinceEpoch();
 
         case QnTimeStep::Days:
-            return QDateTime::fromMSecsSinceEpoch(msecs.count()).
+            return QDateTime::fromMSecsSinceEpoch(msecs.count(), timeZone).
                 addDays(step.stepUnits).toMSecsSinceEpoch();
 
         case QnTimeStep::Months:
-            return QDateTime::fromMSecsSinceEpoch(msecs.count()).
+            return QDateTime::fromMSecsSinceEpoch(msecs.count(), timeZone).
                 addMonths(step.stepUnits).toMSecsSinceEpoch();
 
         case QnTimeStep::Years:
-            return QDateTime::fromMSecsSinceEpoch(msecs.count()).
+            return QDateTime::fromMSecsSinceEpoch(msecs.count(), timeZone).
                 addYears(step.stepUnits).toMSecsSinceEpoch();
 
         default:
@@ -175,7 +193,7 @@ qint64 add(milliseconds msecs, const QnTimeStep& step)
     }
 }
 
-qint64 sub(milliseconds msecs, const QnTimeStep& step)
+qint64 sub(milliseconds msecs, const QnTimeStep& step, const QTimeZone& timeZone)
 {
     if (step.isRelative)
         return (msecs - step.stepMSecs).count();
@@ -188,19 +206,20 @@ qint64 sub(milliseconds msecs, const QnTimeStep& step)
             return (msecs - step.stepMSecs).count();
 
         case QnTimeStep::Hours:
-            return addHours(QDateTime::fromMSecsSinceEpoch(msecs.count()),
-                -step.stepUnits).toMSecsSinceEpoch();
+            return addHours(QDateTime::fromMSecsSinceEpoch(msecs.count(), timeZone),
+                -step.stepUnits,
+                timeZone).toMSecsSinceEpoch();
 
         case QnTimeStep::Days:
-            return QDateTime::fromMSecsSinceEpoch(msecs.count()).
+            return QDateTime::fromMSecsSinceEpoch(msecs.count(), timeZone).
                 addDays(-step.stepUnits).toMSecsSinceEpoch();
 
         case QnTimeStep::Months:
-            return QDateTime::fromMSecsSinceEpoch(msecs.count()).
+            return QDateTime::fromMSecsSinceEpoch(msecs.count(), timeZone).
                 addMonths(-step.stepUnits).toMSecsSinceEpoch();
 
         case QnTimeStep::Years:
-            return QDateTime::fromMSecsSinceEpoch(msecs.count()).
+            return QDateTime::fromMSecsSinceEpoch(msecs.count(), timeZone).
                 addYears(-step.stepUnits).toMSecsSinceEpoch();
 
         default:
@@ -209,7 +228,7 @@ qint64 sub(milliseconds msecs, const QnTimeStep& step)
     }
 }
 
-qint64 absoluteNumber(milliseconds msecs, const QnTimeStep& step)
+qint64 absoluteNumber(milliseconds msecs, const QnTimeStep& step, const QTimeZone& timeZone)
 {
     if (step.isRelative)
         return msecs / step.stepMSecs;
@@ -224,7 +243,7 @@ qint64 absoluteNumber(milliseconds msecs, const QnTimeStep& step)
             break;
     }
 
-    QDateTime dateTime = QDateTime::fromMSecsSinceEpoch(msecs.count());
+    QDateTime dateTime = QDateTime::fromMSecsSinceEpoch(msecs.count(), timeZone);
     switch(step.type)
     {
         case QnTimeStep::Hours:
@@ -249,7 +268,11 @@ qint64 absoluteNumber(milliseconds msecs, const QnTimeStep& step)
     }
 }
 
-qint32 shortCacheKey(milliseconds msecs, int height, const QnTimeStep& step)
+qint32 shortCacheKey(
+    milliseconds msecs,
+    int height,
+    const QnTimeStep& step,
+    const QTimeZone& timeZone)
 {
     qint32 timeKey;
 
@@ -259,7 +282,7 @@ qint32 shortCacheKey(milliseconds msecs, int height, const QnTimeStep& step)
     }
     else
     {
-        QDateTime dateTime = QDateTime::fromMSecsSinceEpoch(msecs.count());
+        QDateTime dateTime = QDateTime::fromMSecsSinceEpoch(msecs.count(), timeZone);
         switch(step.type)
         {
             case QnTimeStep::Milliseconds:
@@ -297,7 +320,7 @@ QnTimeStepLongCacheKey longCacheKey(milliseconds msecs, int height, const QnTime
         (height << 8) | (step.index << 1) | (step.isRelative ? 1 : 0));
 }
 
-QString toShortString(milliseconds msecs, const QnTimeStep& step)
+QString toShortString(milliseconds msecs, const QnTimeStep& step, const QTimeZone& timeZone)
 {
     if (step.isRelative)
         return QString::number(msecs / step.unitMSecs % step.wrapUnits) + step.format;
@@ -306,12 +329,18 @@ QString toShortString(milliseconds msecs, const QnTimeStep& step)
     {
         case QnTimeStep::Milliseconds:
         case QnTimeStep::Seconds:
-            return QString::number(timeToMSecs(QDateTime::fromMSecsSinceEpoch(msecs.count()).time())
+        {
+            return QString::number(
+                timeToMSecs(
+                    QDateTime::fromMSecsSinceEpoch(msecs.count(), timeZone).time())
                 / step.unitMSecs % step.wrapUnits) + step.format;
+        }
 
         default:
+        {
             return QnDateTimeFormatter::dateTimeToString(step.format,
-                QDateTime::fromMSecsSinceEpoch(msecs.count()), QLocale());
+                QDateTime::fromMSecsSinceEpoch(msecs.count(), timeZone), QLocale());
+        }
     }
 }
 
@@ -418,10 +447,10 @@ QString toLongestShortString(const QnTimeStep& step)
     }
 }
 
-QString toLongString(milliseconds msecs, const QnTimeStep& step)
+QString toLongString(milliseconds msecs, const QnTimeStep& step, const QTimeZone& timeZone)
 {
     return step.isRelative
         ? QString()
         : QnDateTimeFormatter::dateTimeToString(
-            step.longFormat, QDateTime::fromMSecsSinceEpoch(msecs.count()), QLocale());
+            step.longFormat, QDateTime::fromMSecsSinceEpoch(msecs.count(), timeZone), QLocale());
 }

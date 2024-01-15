@@ -36,9 +36,16 @@ struct QnScreenshotParameters
     QnScreenshotParameters();
 
     QnMediaResourcePtr resource;
-    qint64 utcTimestampMsec = 0;
+
+    /** UTC time of the screenshot, can also contain nx::api::ImageRequest::kLatestThumbnail. */
+    std::chrono::milliseconds utcTimestamp;
+
+    /** Time zone which should be used to paint timestamp. */
+    QTimeZone timeZone{QTimeZone::LocalTime};
+
+    /** Whether original media has timestamps in UTC. */
     bool isUtc = false;
-    qint64 displayTimeMsec = 0;
+
     SharedScreenshotParameters sharedParameters;
 
     nx::vms::api::ImageCorrectionData imageCorrectionParams;
@@ -111,7 +118,6 @@ private:
     void takeDebugScreenshotsSet(QnMediaResourceWidget *widget);
     std::vector<QnCustomFileDialog::FileFilter> generateFileFilters();
 
-    qint64 screenshotTimeMSec(QnMediaResourceWidget *widget, bool adjust = false);
     void takeScreenshot(QnMediaResourceWidget *widget, const QnScreenshotParameters &parameters);
 
 private:

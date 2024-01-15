@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include <QtCore/qnamespace.h>
-#include <QtCore/QString>
 #include <QtCore/QByteArray>
+#include <QtCore/QInternal>
+#include <QtCore/QString>
 
 #include <nx/reflect/enum_instrument.h>
 #include <nx/reflect/instrument.h>

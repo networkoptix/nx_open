@@ -10,6 +10,7 @@
 #include <core/storage/file_storage/layout_storage_resource.h>
 #include <nx/streaming/archive_stream_reader.h>
 #include <nx/utils/fs/file.h>
+#include <nx/vms/time/timezone.h>
 
 #include "avi_archive_delegate.h"
 #include "filetypesupport.h"
@@ -41,7 +42,6 @@ QnAviResource::QnAviResource(const QString& file)
         removeFlags(Qn::video | Qn::audio);
         m_imageAspectRatio = getAspectRatioFromImage(file);
     }
-    m_timeZoneOffset = Qn::InvalidUtcOffset;
     setIdUnsafe(QnUuid::fromArbitraryData(getUrl()));
 }
 
@@ -179,14 +179,14 @@ const QnMetaDataLightVector& QnAviResource::getMotionBuffer(int channel) const
     return m_motionBuffer[channel];
 }
 
-void QnAviResource::setTimeZoneOffset(qint64 value)
+void QnAviResource::setTimeZone(const QTimeZone& value)
 {
-    m_timeZoneOffset = value;
+    m_timeZone = value;
 }
 
-qint64 QnAviResource::timeZoneOffset() const
+QTimeZone QnAviResource::timeZone() const
 {
-    return m_timeZoneOffset;
+    return m_timeZone;
 }
 
 void QnAviResource::setAviMetadata(const QnAviArchiveMetadata& value)
@@ -201,6 +201,10 @@ void QnAviResource::setAviMetadata(const QnAviArchiveMetadata& value)
         isRotationChanged = m_aviMetadata->rotation != m_previousRotation.value();
         m_previousRotation = m_aviMetadata->rotation;
     }
+
+    setTimeZone(nx::vms::time::timeZone(
+        value.timeZoneId,
+        std::chrono::milliseconds(value.timeZoneOffset)));
 
     if (isRotationChanged)
         emit rotationChanged();

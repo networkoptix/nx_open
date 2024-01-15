@@ -16,6 +16,7 @@
 #include <nx/streaming/rtsp_client_archive_delegate.h>
 #include <nx/vms/client/desktop/export/data/export_media_settings.h>
 #include <nx/vms/client/desktop/export/tools/export_timelapse_recorder.h>
+#include <nx/vms/client/desktop/utils/timezone_helper.h>
 
 namespace nx::vms::client::desktop {
 
@@ -123,7 +124,8 @@ struct ExportMediaTool::Private
         }
 
         if (!timelapseFrameStepUs)
-            exportRecorder->setServerTimeZoneMs(settings.serverTimeZoneMs);
+            exportRecorder->setServerTimeZone(timeZone(mediaResource));
+
         exportRecorder->setContainer(container(settings.fileName.extension));
 
         dataProvider->addDataProcessor(exportRecorder.data());

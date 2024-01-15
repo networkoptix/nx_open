@@ -12,7 +12,11 @@ namespace nx::vms::client::desktop {
 struct NovItemProperties
 {
     QString name;
+
+    /** TimeZone offset from UTC in milliseconds. */
     qint64 timeZoneOffset = 0;
+
+    QString timeZoneId;
 
     NX_REFLECTION_ENUM_CLASS_IN_CLASS(Flag,
         empty,
@@ -21,7 +25,7 @@ struct NovItemProperties
     Flags flags = Flag::empty;
 };
 using NovItemPropertiesMap = std::unordered_map<QnUuid, NovItemProperties>;
-NX_REFLECTION_INSTRUMENT(NovItemProperties, (name)(timeZoneOffset)(flags))
+NX_REFLECTION_INSTRUMENT(NovItemProperties, (name)(timeZoneOffset)(timeZoneId)(flags))
 
 /** Metadata file, describing exported nov-file contents. */
 struct NovMetadata

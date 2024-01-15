@@ -3,33 +3,23 @@
 #include "client_video_camera.h"
 
 #include <client_core/client_core_module.h>
-
-#include <nx/utils/log/log.h>
-#include <nx/utils/datetime.h>
-
-#include <nx/streaming/abstract_media_stream_data_provider.h>
-#include <nx/streaming/rtsp_client_archive_delegate.h>
-#include <nx/streaming/archive_stream_reader.h>
-
-#include <core/resource/media_resource.h>
-#include <core/resource/camera_resource.h>
-#include <core/resource/security_cam_resource.h>
-
-#include <nx/streaming/rtsp_client_archive_delegate.h>
-#include <nx/streaming/archive_stream_reader.h>
-#include <nx/network/http/custom_headers.h>
 #include <core/dataprovider/data_provider_factory.h>
-
-#include <recording/time_period.h>
-#include <core/resource/avi/thumbnails_stream_reader.h>
 #include <core/resource/avi/avi_archive_delegate.h>
-#include <utils/common/util.h>
-#include <common/common_module.h>
-
+#include <core/resource/avi/thumbnails_stream_reader.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource/media_resource.h>
+#include <core/resource/security_cam_resource.h>
 #include <media/filters/h264_mp4_to_annexb.h>
-
+#include <nx/network/http/custom_headers.h>
+#include <nx/streaming/abstract_media_stream_data_provider.h>
+#include <nx/streaming/archive_stream_reader.h>
+#include <nx/streaming/rtsp_client_archive_delegate.h>
+#include <nx/utils/datetime.h>
+#include <nx/utils/log/log.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <recording/time_period.h>
 #include <utils/common/delayed.h>
+#include <utils/common/util.h>
 
 QnClientVideoCamera::QnClientVideoCamera(const QnMediaResourcePtr &resource, QnAbstractMediaStreamDataProvider* reader):
     base_type(nullptr),
@@ -137,11 +127,12 @@ void QnClientVideoCamera::setLightCPUMode(QnAbstractVideoDecoder::DecodeMode val
     m_camdispay.setLightCPUMode(val);
 }
 
-void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod,
+void QnClientVideoCamera::exportMediaPeriodToFile(
+    const QnTimePeriod &timePeriod,
     const  QString& fileName,
     const QString& format,
     QnStorageResourcePtr storage,
-    qint64 serverTimeZoneMs,
+    const QTimeZone& timeZone,
     const nx::core::transcoding::Settings& transcodingSettings,
     const QnTimePeriodList& playbackMask)
 {
@@ -219,7 +210,7 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
         return;
     }
 
-    m_exportRecorder->setServerTimeZoneMs(serverTimeZoneMs);
+    m_exportRecorder->setServerTimeZone(timeZone);
     m_exportRecorder->setContainer(format);
 
     nx::core::transcoding::FilterChain filters(

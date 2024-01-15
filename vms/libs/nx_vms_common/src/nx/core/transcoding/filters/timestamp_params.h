@@ -2,6 +2,10 @@
 
 #pragma once
 
+#include <chrono>
+
+#include <QtCore/QTimeZone>
+
 #include "filter_params.h"
 
 namespace nx::core::transcoding {
@@ -9,9 +13,12 @@ namespace nx::core::transcoding {
 struct TimestampParams
 {
     FilterParams filterParams;
-    qint64 displayOffset = 0;
-    qint64 timeMs = 0;
+    std::chrono::milliseconds timestamp;
+    QTimeZone timeZone{QTimeZone::LocalTime};
+
     bool operator==(const TimestampParams&) const = default;
 };
-NX_REFLECTION_INSTRUMENT(TimestampParams, (filterParams)(displayOffset)(timeMs))
+// Serialization is used to store persistent parameters in settings, runtime fields are not needed.
+NX_REFLECTION_INSTRUMENT(TimestampParams, (filterParams))
+
 } // namespace nx::core::transcoding

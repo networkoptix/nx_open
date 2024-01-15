@@ -148,8 +148,9 @@ QString ImportFromDeviceDialogModel::Private::getStatusText(const QModelIndex& i
         case State::inProgress:
         {
             NX_ASSERT(iter != deviceData.end());
-            const auto timeLeftString = nx::vms::time::toString(
-                iter->second.importTimeLeft.count(), nx::vms::time::Format::hhh_mm);
+            const auto timeLeftString = nx::vms::time::toDurationString(
+                iter->second.importTimeLeft,
+                nx::vms::time::Duration::hh_mm);
 
             return ImportFromDeviceDialogModel::tr("In progress... (%1 left)").arg(timeLeftString);
         }

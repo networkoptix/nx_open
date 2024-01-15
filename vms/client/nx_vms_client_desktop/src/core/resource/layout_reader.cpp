@@ -20,6 +20,7 @@
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
 #include <nx/vms/client/desktop/utils/local_file_cache.h>
 #include <nx/vms/common/system_context.h>
+#include <nx/vms/time/timezone.h>
 
 #include "layout_proto.h"
 
@@ -29,6 +30,12 @@ namespace {
 
 constexpr int kUtf8UsedVersion = 51;
 constexpr int kItemMetadataIntroducedVersion = 52;
+
+QTimeZone calculateTimeZone(const NovItemProperties& item)
+{
+    using namespace std::chrono;
+    return nx::vms::time::timeZone(item.timeZoneId, milliseconds(item.timeZoneOffset));
+}
 
 } // namespace
 
@@ -199,16 +206,12 @@ QnFileLayoutResourcePtr layout::layoutFromFile(
         aviResource->setStorage(storage);
         aviResource->setParentId(layout->getId());
 
-        if (auto it = metadata.itemProperties.find(item.uuid); it != metadata.itemProperties.end())
+        if (metadata.itemProperties.contains(item.uuid))
         {
-            if (const auto name = it->second.name; !name.isEmpty())
+            const auto& itemProperties = metadata.itemProperties[item.uuid];
+            if (const auto name = itemProperties.name; !name.isEmpty())
                 aviResource->setName(name);
-
-            if (const auto timeZoneOffset = it->second.timeZoneOffset;
-                timeZoneOffset != Qn::InvalidUtcOffset)
-            {
-                aviResource->setTimeZoneOffset(timeZoneOffset);
-            }
+            aviResource->setTimeZone(calculateTimeZone(itemProperties));
         }
 
         auto resourcePool = qnClientCoreModule->resourcePool();

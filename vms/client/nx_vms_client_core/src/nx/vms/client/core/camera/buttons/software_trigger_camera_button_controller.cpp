@@ -295,11 +295,14 @@ void SoftwareTriggerCameraButtonController::Private::updateButtonByRule(RulePoin
 
 void SoftwareTriggerCameraButtonController::Private::updateButtonAvailability(CameraButton button)
 {
-    const auto context = q->systemContext();
-    const auto dateTime = server
-        ? context->serverTimeWatcher()->serverTime(server, qnSyncTime->currentMSecsSinceEpoch())
-        : qnSyncTime->currentDateTime();
+    // FIXME: #sivanov System-wide timezone should be used here when it is introduced.
+    const QTimeZone tz = NX_ASSERT(server)
+        ? server->timeZone()
+        : QTimeZone::LocalTime;
 
+    const auto dateTime = QDateTime::fromMSecsSinceEpoch(qnSyncTime->currentMSecsSinceEpoch(), tz);
+
+    const auto context = q->systemContext();
     bool enabled = button.enabled;
     if (isVmsRuleFlags.contains(button.id))
     {
