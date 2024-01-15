@@ -41,6 +41,32 @@ TEST(NalUnits, decodeNal)
     }
 }
 
+TEST(NalUnits, h264SEIWrongPayloadSize)
+{
+    SPSUnit sps;
+    {
+        SEIUnit sei;
+        uint8_t data[] =
+            {0x26, 0x00, 0x03, 0x34, 0xac, 0x56};
+        sei.decodeBuffer(data, data + sizeof(data));
+        ASSERT_TRUE(sei.deserialize(sps, 0));
+    }
+    {
+        SEIUnit sei;
+        uint8_t data[] =
+            {0x26, 0x00, 0x04, 0x34, 0xac, 0x56};
+        sei.decodeBuffer(data, data + sizeof(data));
+        ASSERT_FALSE(sei.deserialize(sps, 0));
+    }
+    {
+        SEIUnit sei;
+        uint8_t data[] =
+            {0x26, 0x00, 0xFF, 0x01, 0x34, 0xac, 0x56};
+        sei.decodeBuffer(data, data + sizeof(data));
+        ASSERT_FALSE(sei.deserialize(sps, 0));
+    }
+}
+
 TEST(NalUnits, h264SPSWrongResolution)
 {
     SPSUnit sps;
