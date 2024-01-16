@@ -100,6 +100,12 @@ void ServiceManager::loadSaasData(const std::string_view& saasDataJson)
         saasDataJson);
 }
 
+QByteArray ServiceManager::rawData() const
+{
+    return systemContext()->resourcePropertyDictionary()->value(
+        QnUuid(), kSaasDataPropertyKey).toUtf8();
+}
+
 void ServiceManager::loadServiceData(const std::string_view& servicesJson)
 {
     setJsonToDictionary(

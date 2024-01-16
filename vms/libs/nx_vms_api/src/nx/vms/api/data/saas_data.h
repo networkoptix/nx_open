@@ -11,6 +11,7 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/instrument.h>
+#include <nx/utils/latin1_array.h>
 #include <nx/utils/software_version.h>
 #include <nx/utils/uuid.h>
 
@@ -319,9 +320,12 @@ struct NX_VMS_API SaasData
     /**%apidoc Security data. It is used to validate saas data*/
     SaasSecurity security;
 
+    /**%apidoc Data block signature. Signature is calculated for data with empty signature field.*/
+    QnLatin1Array signature;
+
     bool operator==(const SaasData&) const = default;
 };
-#define SaasData_fields (cloudSystemId)(channelPartner)(organization)(state)(services)(security)
+#define SaasData_fields (cloudSystemId)(channelPartner)(organization)(state)(services)(security)(signature)
 NX_REFLECTION_INSTRUMENT(SaasData, SaasData_fields)
 
 } // namespace nx::vms::api

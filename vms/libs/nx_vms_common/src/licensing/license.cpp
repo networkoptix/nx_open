@@ -58,7 +58,30 @@ QnPeerRuntimeInfo remoteInfo(QnRuntimeInfoManager* manager, const QnUuid& server
     return manager->item(serverId);
 }
 
-bool isSignatureMatch(
+/** Make sure class names totally the same as on the activation server. */
+static std::array<LicenseTypeInfo, Qn::LC_Count> licenseTypeInfo = {
+    LicenseTypeInfo{Qn::LC_Trial, "trial", false},
+    LicenseTypeInfo{Qn::LC_Analog, "analog", false},
+    LicenseTypeInfo{Qn::LC_Professional, "digital", /*allowedToShareChannel*/ true},
+    LicenseTypeInfo{Qn::LC_Edge, "edge", /*allowedToShareChannel*/ true},
+    LicenseTypeInfo{Qn::LC_VMAX, "vmax", false},
+    LicenseTypeInfo{Qn::LC_AnalogEncoder, "analogencoder", false},
+    LicenseTypeInfo{Qn::LC_VideoWall, "videowall", false},
+    LicenseTypeInfo{Qn::LC_IO, "iomodule", false},
+    LicenseTypeInfo{Qn::LC_Start, "starter", /*allowedToShareChannel*/ true},
+    LicenseTypeInfo{Qn::LC_Free, "free", /*allowedToShareChannel*/ true},
+    LicenseTypeInfo{Qn::LC_Bridge, "bridge", false},
+    LicenseTypeInfo{Qn::LC_Nvr, "nvr", /*allowedToShareChannel*/ true},
+    LicenseTypeInfo{Qn::LC_SaasLocalRecording, "saas", /*allowedToShareChannel*/ true},
+    LicenseTypeInfo{Qn::LC_Invalid, "", false},
+};
+
+} // namespace
+
+//-------------------------------------------------------------------------------------------------
+// QnLicense
+
+bool QnLicense::isSignatureMatch(
     const QByteArray& data, const QByteArray& signature, const QByteArray& publicKey)
 {
 #ifdef ENABLE_SSL
@@ -68,7 +91,7 @@ bool isSignatureMatch(
     QByteArray dataHash = hash.result();
 
     // Load RSA public key
-    BIO *bp = BIO_new_mem_buf(const_cast<char *>(publicKey.data()), publicKey.size());
+    BIO* bp = BIO_new_mem_buf(const_cast<char*>(publicKey.data()), publicKey.size());
     RSA* publicRSAKey = PEM_read_bio_RSA_PUBKEY(bp, 0, 0, 0);
     BIO_free(bp);
 
@@ -95,29 +118,6 @@ bool isSignatureMatch(
     return true;
 #endif
 }
-
-/** Make sure class names totally the same as on the activation server. */
-static std::array<LicenseTypeInfo, Qn::LC_Count> licenseTypeInfo = {
-    LicenseTypeInfo{Qn::LC_Trial, "trial", false},
-    LicenseTypeInfo{Qn::LC_Analog, "analog", false},
-    LicenseTypeInfo{Qn::LC_Professional, "digital", /*allowedToShareChannel*/ true},
-    LicenseTypeInfo{Qn::LC_Edge, "edge", /*allowedToShareChannel*/ true},
-    LicenseTypeInfo{Qn::LC_VMAX, "vmax", false},
-    LicenseTypeInfo{Qn::LC_AnalogEncoder, "analogencoder", false},
-    LicenseTypeInfo{Qn::LC_VideoWall, "videowall", false},
-    LicenseTypeInfo{Qn::LC_IO, "iomodule", false},
-    LicenseTypeInfo{Qn::LC_Start, "starter", /*allowedToShareChannel*/ true},
-    LicenseTypeInfo{Qn::LC_Free, "free", /*allowedToShareChannel*/ true},
-    LicenseTypeInfo{Qn::LC_Bridge, "bridge", false},
-    LicenseTypeInfo{Qn::LC_Nvr, "nvr", /*allowedToShareChannel*/ true},
-    LicenseTypeInfo{Qn::LC_SaasLocalRecording, "saas", /*allowedToShareChannel*/ true},
-    LicenseTypeInfo{Qn::LC_Invalid, "", false},
-};
-
-} // namespace
-
-//-------------------------------------------------------------------------------------------------
-// QnLicense
 
 bool QnLicense::RegionalSupport::isValid() const
 {
