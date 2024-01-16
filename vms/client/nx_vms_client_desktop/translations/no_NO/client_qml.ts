@@ -1263,19 +1263,19 @@
     </message>
     <message>
       <source>Search Bases</source>
-      <translation type="unfinished">Search Bases</translation>
+      <translation>Søkebaser</translation>
     </message>
     <message>
       <source>Add Search Base</source>
-      <translation type="unfinished">Add Search Base</translation>
+      <translation>Legg til søkebase</translation>
     </message>
     <message>
       <source>Specify at least one search base to synchronize users and groups</source>
-      <translation type="unfinished">Specify at least one search base to synchronize users and groups</translation>
+      <translation>Spesifiser minst én søkebase for å synkronisere brukere og grupper</translation>
     </message>
     <message>
       <source>No users or groups match synchronization settings and are added to the system DB. Make sure LDAP server parameters and search bases are configured correctly.</source>
-      <translation type="unfinished">No users or groups match synchronization settings and are added to the system DB. Make sure LDAP server parameters and search bases are configured correctly.</translation>
+      <translation>Ingen brukere eller grupper samsvarer med synkroniseringsinnstillinger og legges til i systemdatabasen. Sørg for at LDAP-serverparametere og søkebaser er riktig konfigurert.</translation>
     </message>
   </context>
   <context>
