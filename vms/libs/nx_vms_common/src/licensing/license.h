@@ -40,6 +40,9 @@ class NX_VMS_COMMON_API QnLicense
 
 public:
 
+    static bool isSignatureMatch(
+        const QByteArray& data, const QByteArray& signature, const QByteArray& publicKey);
+
     struct NX_VMS_COMMON_API RegionalSupport
     {
         /**
