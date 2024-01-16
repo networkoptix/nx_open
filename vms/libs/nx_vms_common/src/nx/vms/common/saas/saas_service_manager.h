@@ -119,6 +119,8 @@ public:
     void setEnabled(bool value);
     bool isEnabled() const;
 
+    QByteArray rawData() const;
+
 signals:
     void saasStateChanged();
     void dataChanged();
