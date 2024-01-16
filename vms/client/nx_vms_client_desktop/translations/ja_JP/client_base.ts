@@ -171,7 +171,7 @@
     </message>
     <message>
       <source>Browse Local Files</source>
-      <translation>ローカルのファイルを参照</translation>
+      <translation>ローカルファイルを参照</translation>
     </message>
     <message>
       <source>Show Welcome Screen</source>
@@ -4828,7 +4828,7 @@ to %1</source>
     </message>
     <message>
       <source>Servers with failover enabled will automatically take cameras from offline Servers with the same Location ID.</source>
-      <translation>フェイルオーバーが有効なサーバーは、同じロケーションIDをもつオフラインサーバーからカメラを自動的に引き継ぎます。</translation>
+      <translation>フェイルオーバーが有効なサーバーは、同じ所在地IDをもつオフラインサーバーからカメラを自動的に引き継ぎます。</translation>
     </message>
     <message>
       <source>The certificate received from the Server does not match the pinned certificate.</source>
@@ -4873,7 +4873,7 @@ to %1</source>
     </message>
     <message>
       <source>UNAUTHORIZED</source>
-      <translation>認証が必要です</translation>
+      <translation>未認証</translation>
     </message>
     <message>
       <source>SERVER UNAVAILABLE</source>

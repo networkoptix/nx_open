@@ -91,14 +91,14 @@
     </message>
     <message>
       <source>Backup Finished</source>
-      <translation type="unfinished">Backup Finished</translation>
+      <translation>Tworzenie kopii zapasowej zakończone</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::BasicEvent</name>
     <message>
       <source>%1 event has occurred</source>
-      <translation type="unfinished">%1 event has occurred</translation>
+      <translation>Wystąpiło %1 zdarzeń</translation>
     </message>
   </context>
   <context>
@@ -178,7 +178,7 @@
     <name>nx::vms::rules::DebugEvent</name>
     <message>
       <source>Debug Event</source>
-      <translation type="unfinished">Debug Event</translation>
+      <translation>Zdarzenie debugowania</translation>
     </message>
     <message>
       <source>Action</source>
@@ -186,7 +186,7 @@
     </message>
     <message>
       <source>Value</source>
-      <translation type="unfinished">Value</translation>
+      <translation>Wartość</translation>
     </message>
   </context>
   <context>
@@ -218,7 +218,7 @@
     <message numerus="yes">
       <source>Device Disconnected</source>
       <translation type="unfinished">
-        <numerusform>Device Disconnected</numerusform>
+        <numerusform>Urządzenie odłączone</numerusform>
         <numerusform>Device Disconnected</numerusform>
         <numerusform>Device Disconnected</numerusform>
         <numerusform>Device Disconnected</numerusform>
@@ -227,7 +227,7 @@
     <message numerus="yes">
       <source>Camera Disconnected</source>
       <translation type="unfinished">
-        <numerusform>Camera Disconnected</numerusform>
+        <numerusform>Kamera odłączona</numerusform>
         <numerusform>Camera Disconnected</numerusform>
         <numerusform>Camera Disconnected</numerusform>
         <numerusform>Camera Disconnected</numerusform>
@@ -574,7 +574,7 @@
     </message>
     <message>
       <source>Failed to force using camera time, as it lags too much. System time will be used instead.</source>
-      <translation type="unfinished">Failed to force using camera time, as it lags too much. System time will be used instead.</translation>
+      <translation>Nie udało się wymusić użycia czasu kamery, ponieważ jest on zbyt opóźniony. Zamiast tego zostanie użyty czas systemowy.</translation>
     </message>
   </context>
   <context>
@@ -597,7 +597,7 @@
     </message>
     <message>
       <source>Tooltip</source>
-      <translation type="unfinished">Tooltip</translation>
+      <translation>Wskazówka</translation>
     </message>
     <message>
       <source>Show Desktop Notification</source>
@@ -1113,7 +1113,7 @@
     </message>
     <message>
       <source>Unknown event</source>
-      <translation type="unfinished">Unknown event</translation>
+      <translation>Nieznane wydarzenie</translation>
     </message>
     <message>
       <source>Unknown action</source>
