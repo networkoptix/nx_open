@@ -2,12 +2,12 @@
 
 #pragma once
 
-#include <core/resource/media_server_resource.h>
 #include <nx/vms/client/core/network/remote_connection_fwd.h>
+#include <nx/vms/client/core/resource/server.h>
 
 namespace nx::vms::client::desktop {
 
-class CrossSystemServerResource: public QnMediaServerResource
+class CrossSystemServerResource: public nx::vms::client::core::ServerResource
 {
 public:
     /** Main server which was used for connection establishing. */
