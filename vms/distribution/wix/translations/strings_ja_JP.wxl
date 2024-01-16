@@ -51,11 +51,11 @@
   <String Id="FailureRestartText">ソフトウェアのロールバックを完了するにはコンピューターを再起動する必要があります</String>
   <String Id="FailureRestartButton">再起動</String>
   <String Id="FailureCloseButton">閉じる</String>
-  <String Id="WillInstall">[WixBundleName] はお使いのデバイスにインストールされます</String>
+  <String Id="WillInstall">[WixBundleName] がお使いのデバイスにインストールされます</String>
   <String Id="FilesInUseHeader">使用中のファイル</String>
   <String Id="FilesInUseLabel">インストールを続行するには、次のアプリケーションを停止する必要があります:</String>
-  <String Id="FilesInUseCloseRadioButton">アプリケーションを閉じて再起動を試みます</String>
-  <String Id="FilesInUseDontCloseRadioButton">アプリケーションを終了しないでください。再起動が必要になります</String>
+  <String Id="FilesInUseCloseRadioButton">アプリケーションを終了し、それらの再起動を試みる</String>
+  <String Id="FilesInUseDontCloseRadioButton">アプリケーションを終了しない (要再起動)</String>
   <String Id="FilesInUseOkButton">OK</String>
   <String Id="FilesInUseCancelButton">キャンセル</String>
   <String Id="Options">オプション</String>
