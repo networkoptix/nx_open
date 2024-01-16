@@ -12,10 +12,12 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/client/core/common/utils/cloud_url_helper.h>
 #include <nx/vms/client/core/network/remote_connection.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
+#include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/logic/connect_to_cloud_tool.h>
 #include <nx/vms/client/desktop/system_logon/logic/fresh_session_token_helper.h>
@@ -34,14 +36,43 @@ using namespace nx::vms::common;
 
 namespace {
 
-const int kAccountFontPixelSize = 24;
-
 core::CloudUrlHelper urlHelper()
 {
     using nx::vms::utils::SystemUri;
     return core::CloudUrlHelper(
         SystemUri::ReferralSource::DesktopClient,
         SystemUri::ReferralContext::SettingsDialog);
+}
+
+QFont accountLabelFont()
+{
+    static constexpr auto kAccountFontSize = 18;
+    static constexpr auto kAccountFontWeight = QFont::Medium;
+
+    QFont font;
+    font.setPixelSize(kAccountFontSize);
+    font.setWeight(kAccountFontWeight);
+    return font;
+}
+
+QFont placeholderCaptionFont()
+{
+    static constexpr auto kPlaceholderCaptionFontSize = 16;
+    static constexpr auto kPlaceholderCaptionFontWeight = QFont::Medium;
+
+    QFont font;
+    font.setPixelSize(kPlaceholderCaptionFontSize);
+    font.setWeight(kPlaceholderCaptionFontWeight);
+    return font;
+}
+
+QFont placeholderDescriptionFont()
+{
+    static constexpr auto kPlaceholderDescriptionFontSize = 14;
+
+    QFont font;
+    font.setPixelSize(kPlaceholderDescriptionFontSize);
+    return font;
 }
 
 } // namespace
@@ -55,39 +86,32 @@ QnCloudManagementWidget::QnCloudManagementWidget(QWidget *parent):
 
     setHelpTopic(this, HelpTopic::Id::SystemSettings_Cloud);
 
-    const QColor nxColor(qApp->palette().color(QPalette::Normal, QPalette::BrightText));
-    QFont accountFont(ui->accountLabel->font());
-    accountFont.setPixelSize(kAccountFontPixelSize);
-    ui->accountLabel->setFont(accountFont);
-    for (auto label: { ui->accountLabel, ui->promo1TextLabel, ui->promo2TextLabel, ui->promo3TextLabel })
-        setPaletteColor(label, QPalette::WindowText, nxColor);
-
-    ui->arrow1Label->setPixmap(qnSkin->pixmap("promo/cloud_tab_arrow.png"));
-    ui->arrow2Label->setPixmap(ui->arrow1Label->pixmap());
-
-    ui->promo1Label->setPixmap(qnSkin->pixmap("promo/cloud_tab_promo_1.png"));
-    ui->promo2Label->setPixmap(qnSkin->pixmap("promo/cloud_tab_promo_2.png"));
-    ui->promo3Label->setPixmap(qnSkin->pixmap("promo/cloud_tab_promo_3.png"));
+    ui->accountLabel->setFont(accountLabelFont());
+    setPaletteColor(ui->accountLabel, QPalette::WindowText, palette().color(QPalette::BrightText));
+    ui->accountLabelLayout->setSpacing(nx::style::Metrics::kInterSpace);
 
     ui->unlinkButton->setText(tr("Disconnect System from %1",
         "%1 is the cloud name (like Nx Cloud)").arg(nx::branding::cloudName()));
+
     ui->goToCloudButton->setText(tr("Open %1 Portal",
         "%1 is the cloud name (like Nx Cloud)").arg(nx::branding::cloudName()));
 
     ui->linkButton->setText(tr("Connect System to %1...",
         "%1 is the cloud name (like Nx Cloud)").arg(nx::branding::cloudName()));
 
-    ui->promo1TextLabel->setText(tr("Create %1\naccount",
-        "%1 is the cloud name (like Nx Cloud)").arg(nx::branding::cloudName()));
-    ui->promo2TextLabel->setText(tr("Connect System\nto %1",
-        "%1 is the cloud name (like Nx Cloud)").arg(nx::branding::cloudName()));
-    ui->promo3TextLabel->setText(tr("Connect to your Systems\nfrom anywhere with any\ndevices"));
+    const auto placeholderTextsColor = core::colorTheme()->color("dark17");
+    setPaletteColor(ui->placeholderCaptionLabel, QPalette::WindowText, placeholderTextsColor);
+    setPaletteColor(ui->placeholderDescriptionLabel, QPalette::WindowText, placeholderTextsColor);
 
-    ui->learnMoreLabel->setText(
-        nx::vms::common::html::link(
-            tr("Learn more about %1", "%1 is the cloud name (like Nx Cloud)").arg(
-                nx::branding::cloudName()),
-            urlHelper().aboutUrl()));
+    ui->placeholderCaptionLabel->setFont(placeholderCaptionFont());
+    ui->placeholderDescriptionLabel->setFont(placeholderDescriptionFont());
+
+    ui->placeholderDescriptionLabel->setText(
+        tr("There is currently no connection between your system and %1.",
+            "%1 is the cloud name (like Nx Cloud)").arg(nx::branding::cloudName()));
+
+    ui->notLinkedPlaceholderImageLabel->setPixmap(
+        qnSkin->pixmap("placeholders/cloud_placeholder.svg"));
 
     connect(ui->goToCloudButton, &QPushButton::clicked, this,
         [this]
@@ -109,6 +133,9 @@ QnCloudManagementWidget::QnCloudManagementWidget(QWidget *parent):
 
     connect(globalSettings(), &SystemSettings::cloudSettingsChanged,
         this, &QnCloudManagementWidget::loadDataToUi);
+
+    connect(systemContext()->saasServiceManager(), &saas::ServiceManager::dataChanged,
+        this, &QnCloudManagementWidget::loadDataToUi);
 }
 
 QnCloudManagementWidget::~QnCloudManagementWidget()
@@ -126,9 +153,27 @@ void QnCloudManagementWidget::loadDataToUi()
         const auto saasInitialized = nx::vms::common::saas::saasInitialized(systemContext());
         const auto saasServiceManager = systemContext()->saasServiceManager();
 
-        ui->accountLabel->setText(saasInitialized
+        const auto accountText = saasInitialized
             ? saasServiceManager->data().organization.name
-            : globalSettings()->cloudAccountName());
+            : globalSettings()->cloudAccountName();
+
+        const auto accountPixmap = saasInitialized
+            ? qnSkin->pixmap("saas/organization_icon.svg")
+            : qnSkin->pixmap("user_settings/user_cloud.svg");
+
+        ui->accountLabel->setText(accountText);
+        ui->accountLabelIcon->setPixmap(accountPixmap);
+
+        if (accountText.isEmpty())
+            ui->accountStackedWidget->setCurrentWidget(ui->accountPreloaderPage);
+
+        // After system binded to an organization it takes few seconds before SaaS report will be
+        // retrieved from channel partners service. Until that system isn't recognized as one using
+        // SaaS licensing model, also both cloud account name and organization name will be empty.
+        // During this transitional state preloader is shown instead of an organization name.
+        ui->accountStackedWidget->setCurrentWidget(accountText.isEmpty()
+            ? ui->accountPreloaderPage
+            : ui->accountLabelPage);
 
         ui->stackedWidget->setCurrentWidget(ui->linkedPage);
     }
