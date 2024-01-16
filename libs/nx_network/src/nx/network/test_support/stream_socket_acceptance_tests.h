@@ -647,6 +647,24 @@ protected:
         }
     }
 
+    std::tuple<int /*bytesReadCnt*/, std::basic_string<uint8_t> /*buf*/> whenServerReadsSome()
+    {
+        std::basic_string<uint8_t> readBuf(4096, 'x');
+
+        int bytesReceived = std::get<1>(m_prevAcceptResult)->recv(readBuf.data(), readBuf.size(), 0);
+        if (bytesReceived > 0)
+        {
+            m_synchronousServerReceivedData.write(readBuf.data(), bytesReceived);
+            readBuf.resize(bytesReceived);
+        }
+        else
+        {
+            readBuf.clear();
+        }
+
+        return std::make_tuple(bytesReceived, std::move(readBuf));
+    }
+
     void whenClientConnectionIsClosed()
     {
         m_connection.reset();
@@ -1936,6 +1954,33 @@ TYPED_TEST_P(
 
 TYPED_TEST_P(
     StreamSocketAcceptance,
+    exception_thrown_by_recv_handler_is_handled_properly_even_when_socket_was_removed)
+{
+    this->givenPingPongServer();
+    this->givenConnectedSocket();
+
+    this->whenClientSentPing();
+
+    std::promise<void> done;
+    this->whenReceivedMessageFromServerAsync(
+        [this, &done]()
+        {
+            this->whenClientConnectionIsClosed();
+
+            // Making sure we signal the promise after this handler completion.
+            SocketGlobals::instance().aioService().getCurrentAioThread()->post(
+                nullptr, [&done]() { done.set_value(); });
+
+            throw std::runtime_error("test");
+        });
+
+    done.get_future().wait();
+
+    // assert process does not crash.
+}
+
+TYPED_TEST_P(
+    StreamSocketAcceptance,
     socket_is_usable_after_exception_is_thrown_by_send_completion_handler)
 {
     this->givenListeningServerSocket();
@@ -1945,6 +1990,36 @@ TYPED_TEST_P(
     this->whenServerReadsWithFlags(MSG_WAITALL);
 
     this->thenServerReceivedData();
+}
+
+TYPED_TEST_P(
+    StreamSocketAcceptance,
+    exception_thrown_by_send_handler_is_handled_properly_even_when_socket_was_removed)
+{
+    this->givenListeningServerSocket();
+    this->givenConnectedSocket();
+
+    std::promise<void> done;
+
+    this->whenSendAsyncRandomDataToServer(
+        [this, &done]()
+        {
+            this->whenClientConnectionIsClosed();
+
+            // Making sure we signal the promise after this handler completion.
+            SocketGlobals::instance().aioService().getCurrentAioThread()->post(
+                nullptr, [&done]() { done.set_value(); });
+
+            throw std::runtime_error("test");
+        });
+
+    done.get_future().wait();
+
+    this->whenAcceptConnection();
+    this->thenConnectionHasBeenAccepted();
+    this->whenServerReadsSome();
+
+    // assert process does not crash.
 }
 
 TYPED_TEST_P(
@@ -2339,7 +2414,9 @@ REGISTER_TYPED_TEST_SUITE_P(StreamSocketAcceptance,
     cancel_io,
     socket_is_ready_for_io_after_read_cancellation,
     socket_is_usable_after_exception_is_thrown_by_read_completion_handler,
+    exception_thrown_by_recv_handler_is_handled_properly_even_when_socket_was_removed,
     socket_is_usable_after_exception_is_thrown_by_send_completion_handler,
+    exception_thrown_by_send_handler_is_handled_properly_even_when_socket_was_removed,
     socket_aio_thread_can_be_changed_after_io_cancellation_during_connect_completion,
     socket_aio_thread_can_be_changed_after_io_cancellation_during_send_completion,
     change_aio_thread_of_accepted_connection,

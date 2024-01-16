@@ -106,7 +106,9 @@ void StreamTransformingAsyncChannel::tryToCompleteUserTasks(
         }
         catch (const std::exception& e)
         {
-            NX_WARNING(this, "Exception caught while reporting SSL I/O completion. %1", e.what());
+            // NOTE: this may be already deleted here: it is tested by watcher.interrupted() below.
+            NX_DEBUG(typeid(StreamTransformingAsyncChannel), "%1. Exception caught while reporting "
+                "SSL I/O completion. %2", (void*) this, e.what());
         }
 
         if (watcher.interrupted())
@@ -436,20 +438,23 @@ bool StreamTransformingAsyncChannel::completeRawSendTasks(
         if (!sendTask.userHandler)
             continue;
 
+        nx::utils::InterruptionFlag::Watcher interruptionWatcher(&m_aioInterruptionFlag);
+
         try
         {
-            nx::utils::InterruptionFlag::Watcher interruptionWatcher(&m_aioInterruptionFlag);
             nx::utils::swapAndCall(
                 sendTask.userHandler,
                 sysErrorCode,
                 sysErrorCode == SystemError::noError ? sendTask.userByteCount : (size_t) -1);
-            if (interruptionWatcher.interrupted())
-                return false;
         }
         catch (const std::exception& e)
         {
-            NX_WARNING(this, "Exception caught while reporting SSL raw send completion. %1", e.what());
+            NX_DEBUG(typeid(StreamTransformingAsyncChannel), "%1. Exception caught while reporting "
+                "SSL raw send completion. %2", (void*) this, e.what());
         }
+
+        if (interruptionWatcher.interrupted())
+            return false;
     }
 
     return true;
