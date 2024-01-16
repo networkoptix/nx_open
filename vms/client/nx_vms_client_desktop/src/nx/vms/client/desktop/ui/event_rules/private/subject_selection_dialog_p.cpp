@@ -16,6 +16,7 @@
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/skin/svg_icon_colorer.h>
+#include <nx/vms/common/user_management/predefined_user_groups.h>
 #include <nx/vms/common/user_management/user_group_manager.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
 #include <ui/models/user_roles_model.h>
@@ -390,17 +391,28 @@ GroupListDelegate::~GroupListDelegate()
 void GroupListDelegate::initStyleOption(QStyleOptionViewItem* option,
     const QModelIndex& index) const
 {
-    static const core::SvgIconColorer::ThemeSubstitutions colorSubs = {
-        {QnIcon::Normal, {.primary = "light10"}}, {QnIcon::Selected, {.primary = "light4"}}};
-
     base_type::initStyleOption(option, index);
     if (index.column() == QnUserRolesModel::NameColumn)
     {
-        const auto validationState = index.data(Qn::ValidationStateRole).value<QValidator::State>();
-        option->icon = validationState == QValidator::Acceptable
-            ? qnSkin->icon(lit("tree/users.svg"), colorSubs)
-            : qnSkin->icon(lit("tree/users_alert.svg"), colorSubs);
+        static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions colorSubs = {
+            {QnIcon::Normal, {.primary = "light10"}},
+            {QnIcon::Selected, {.primary = "light4"}}};
 
+        const auto roleId = index.data(Qn::UuidRole).value<QnUuid>();
+        const auto role = userGroupManager()->find(roleId).value_or(api::UserGroupData{});
+        QString iconPath;
+        const auto validationState =
+            index.data(Qn::ValidationStateRole).value<QValidator::State>();
+        if (validationState != QValidator::Acceptable)
+            iconPath = "tree/users_alert.svg";
+        else if (role.type == nx::vms::api::UserType::ldap)
+            iconPath = "user_settings/group_ldap.svg";
+        else if (nx::vms::common::PredefinedUserGroups::contains(roleId))
+            iconPath = "user_settings/group_built_in.svg";
+        else
+            iconPath = "user_settings/group_custom.svg";
+
+        option->icon = qnSkin->icon(iconPath, colorSubs);
         option->decorationSize = core::Skin::maximumSize(option->icon);
         option->features |= QStyleOptionViewItem::HasDecoration;
     }

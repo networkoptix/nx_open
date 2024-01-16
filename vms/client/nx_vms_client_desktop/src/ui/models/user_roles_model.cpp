@@ -1,24 +1,22 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "user_roles_model.h"
-#include "private/user_roles_model_p.h"
 
-#include <algorithm>
-
-#include <QtCore/QVector>
 #include <QtCore/QScopedValueRollback>
+#include <QtCore/QVector>
 
 #include <client/client_globals.h>
 #include <common/common_globals.h>
-#include <core/resource_access/resource_access_manager.h>
 #include <core/resource/user_resource.h>
-#include <ui/models/private/user_roles_model_p.h>
-#include <ui/workbench/workbench_context_aware.h>
-#include <ui/workbench/workbench_context.h>
-
-#include <nx/utils/string.h>
+#include <core/resource_access/resource_access_manager.h>
 #include <nx/utils/scope_guard.h>
+#include <nx/utils/string.h>
 #include <nx/vms/api/data/user_group_data.h>
+#include <ui/models/private/user_roles_model_p.h>
+#include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_context_aware.h>
+
+#include "private/user_roles_model_p.h"
 
 QnUserRolesModel::QnUserRolesModel(QObject* parent, DisplayRoleFlags flags):
     base_type(parent),
