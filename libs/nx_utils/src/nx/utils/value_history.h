@@ -105,11 +105,11 @@ template<typename Action> // void(const Value& value, std::chrono::milliseconds 
 void ValueHistory<Value>::forEach(
     std::chrono::milliseconds maxAge, const Action& action, const Border& border) const
 {
-    auto now = monotonicTime();
     NX_MUTEX_LOCKER locker(&m_mutex);
     if (m_values.empty())
         return;
 
+    auto now = monotonicTime();
     auto bound = m_values.begin();
     const auto deadline = now - fixAge(maxAge);
     if (maxAge > m_maxAge / 2)
