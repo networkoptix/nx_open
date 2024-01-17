@@ -148,8 +148,8 @@ QJsonObject generatedColorScheme()
         QColor dark, light;
         if (isRainbow)
         {
-            dark = QColor::fromHslF(i / 18., 0.25, 0.25);
-            light = QColor::fromHslF(1 - (i / 18.), 0.75, 0.75);
+            dark = QColor::fromHslF(i / 18., 0.25, 0.2 + 0.1 * i / 18);
+            light = QColor::fromHslF(1 - (i / 18.), 0.75, 0.8 - 0.1 * i / 18);
         }
         else
         {
@@ -216,13 +216,13 @@ void ColorTheme::Private::loadColors(const QString& mainColorsFile, const QStrin
 
     ColorThemeReader reader;
 
-    const QJsonObject baseColors = readColorDataFromFile(mainColorsFile);
+    QJsonObject baseColors = readColorDataFromFile(mainColorsFile);
+    initializeThemeSpecificColors(&baseColors);
     reader.addColors(baseColors);
 
-    ColorTree baseColorTree = reader.getColorTree();
+    const ColorTree baseColorTree = reader.getColorTree();
 
     QJsonObject currentSkinColors = readColorDataFromFile(skinColorsFile);
-    initializeThemeSpecificColors(&currentSkinColors);
     reader.addColors(currentSkinColors);
 
     ColorTree actualColorTree = reader.getColorTree();

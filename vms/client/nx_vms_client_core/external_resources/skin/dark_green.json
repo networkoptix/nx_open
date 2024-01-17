@@ -35,72 +35,6 @@
     "light16":      "#7b929d",
     "light17":      "#728b97",
 
-    "dark_theme": {
-        "red":      "#F44336",
-        "red_l":    "#EF5350",
-        "red_d":    "#E53935",
-        "yellow":   "#FFC107",
-        "yellow_l": "#FFCA28",
-        "yellow_d": "#FFB300",
-        "green":    "#4CAF50",
-        "green_l":  "#66BB6A",
-        "green_d":  "#43A047",
-        "blue":     "#1E88E5",
-        "blue_l":   "#42A5F5",
-        "blue_d":   "#1E88E5"
-    },
-
-    "light_theme": {
-        "red":      "#C62828",
-        "red_l":    "#D32F2F",
-        "red_d":    "#B71C1C",
-        "yellow":   "#FF8F00",
-        "yellow_l": "#FFA000",
-        "yellow_d": "#FF6F00",
-        "green":    "#2E7D32",
-        "green_l":  "#689F38",
-        "green_d":  "#33691E",
-        "blue":     "#1565C0",
-        "blue_l":   "#0288D1",
-        "blue_d":   "#01579B"
-    },
-
-    "blue8":        "blue_l",
-    "blue9":        "blue_l",
-    "blue10":       "blue",
-    "blue11":       "blue_d",
-    "blue12":       "blue_d",
-    "blue13":       "blue_d",
-    "blue14":       "blue_d",
-
-    "green_attention": "green",
-    "green_l4":     "green_l",
-    "green_l3":     "green_l",
-    "green_l2":     "green_l",
-    "green_l1":     "green_l",
-    "green_core":   "green",
-    "green_d1":     "green_d",
-    "green_d2":     "green_d",
-    "green_d3":     "green_d",
-
-    "yellow_attention": "yellow",
-    "yellow_core":  "yellow",
-    "yellow_d1":    "yellow_d",
-    "yellow_d2":    "yellow_d",
-
-    "red_l3":       "red_l",
-    "red_l2":       "red_l",
-    "red_l1":       "red_l",
-    "red_core":     "red",
-    "red_attention": "red",
-    "red_d1":       "red_d",
-    "red_d2":       "red_d",
-    "red_d3":       "red_d",
-    "red_d4":       "red_d",
-    "red_d5":       "red_d",
-    "red_d6":       "red_d",
-    "red_d7":       "red_d",
-
     "brand_l4":     "#aed34d",
     "brand_l3":     "#aed34d",
     "brand_l2":     "#aed34d",
@@ -114,5 +48,5 @@
     "brand_d6":     "#97be2f",
     "brand_d7":     "#97be2f",
 
-    "brand_contrast":"#121517"
+    "brand_contrast": "dark4"
 }
