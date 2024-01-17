@@ -23,7 +23,7 @@ Item
     property string textRoleName: "text"
 
     // If color is specified, a color rectangle icon is added to the line.
-    property string colorRoleName: "color"
+    property string colorsRoleName: "colors"
 
     property font font
     property font nameFont: control.font
@@ -115,6 +115,28 @@ Item
         onPositioningComplete:
             updateRowLookup()
 
+        component Colors: Row
+        {
+            property var colors
+
+            visible: !!colors && colors.length > 0
+            spacing: 4
+
+            Repeater
+            {
+                model: colors
+
+                Rectangle
+                {
+                    width: 16
+                    height: 16
+                    color: modelData ?? "transparent"
+                    border.color: ColorTheme.transparent(ColorTheme.colors.light1, 0.1)
+                    radius: 1
+                }
+            }
+        }
+
         Repeater
         {
             id: repeater
@@ -144,22 +166,14 @@ Item
                         copyable ? 4 : Math.round((LocalSettings.iniConfigValue("attributeTableSpacing") / 2))
                     bottomPadding:
                         copyable ? 4 : (LocalSettings.iniConfigValue("attributeTableSpacing") - topPadding)
-                    leftPadding: color.visible ? color.width + 4 : 0
+                    leftPadding: colorsRow.visible ? colorsRow.width + 4 : 0
 
-                    Rectangle
+                    Colors
                     {
-                        id: color
+                        id: colorsRow
 
-                        property var modelColor: modelData[colorRoleName] || null
-
+                        colors: modelData[colorsRoleName]
                         anchors.verticalCenter: parent.verticalCenter
-
-                        width: 16
-                        height: 16
-                        visible: !!modelColor
-                        color: modelColor ?? "transparent"
-                        border.color: ColorTheme.transparent(ColorTheme.colors.light1, 0.1)
-                        radius: 1
                     }
                 }
             }

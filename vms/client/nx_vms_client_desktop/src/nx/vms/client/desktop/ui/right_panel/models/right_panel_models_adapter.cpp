@@ -744,7 +744,7 @@ QVariantList RightPanelModelsAdapter::flattenAttributeList(const analytics::Attr
         result.append(QJsonObject{{"text", attribute.displayedName}});
         result.append(QJsonObject{
             {"text", Private::valuesText(attribute.displayedValues)},
-            {"color", QJsonValue::fromVariant(attribute.colorValue)},
+            {"colors", QJsonValue::fromVariant(attribute.colorValues)},
         });
     }
 
