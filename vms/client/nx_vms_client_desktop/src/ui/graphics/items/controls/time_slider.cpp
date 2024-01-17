@@ -333,7 +333,7 @@ public:
         m_colors[Qn::MotionContent] = analytics
             ? core::colorTheme()->color("yellow_core")
             : core::colorTheme()->color("red_d1");
-        m_colors[Qn::TimePeriodContentCount] = core::colorTheme()->color("green_d3");
+        m_colors[Qn::TimePeriodContentCount] = core::colorTheme()->color("timeline.background");
 
         m_position = m_minChunkLength = 0ms;
     }
