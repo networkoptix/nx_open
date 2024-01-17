@@ -18,6 +18,7 @@
 #include <nx/network/http/custom_headers.h>
 #include <nx/network/http/http_types.h>
 #include <nx/network/rest/result.h>
+#include <nx/network/stun/message.h>
 #include <nx/utils/gzip/gzip_compressor.h>
 #include <nx/utils/log/log.h>
 #include <utils/common/util.h>
@@ -192,7 +193,8 @@ bool QnTCPConnectionProcessor::isLargeRequestAllowed(const QByteArray& message)
 int QnTCPConnectionProcessor::checkForBinaryProtocol(const QByteArray& message)
 {
     Q_D(QnTCPConnectionProcessor);
-    if (message.size() > 4 && message[0] == 0x0 && message[2] == 0x0 && message[3] == 0x1)
+    if (message.size() > 10 && message[0] == 0x0 && message[2] == 0x0 && message[3] == 0x1
+        && qFromBigEndian(*(uint32_t*) &message.data()[6]) == nx::network::stun::MAGIC_COOKIE)
     {
         /* By rfc4571, first TWO bytes should be a length.
          * But, for STUN content, first message is Binding Request,
