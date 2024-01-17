@@ -8233,7 +8233,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Initializing scan...</source>
-      <translation>イニシャライズ　スキャン...</translation>
+      <translation>スキャンを初期化中...</translation>
     </message>
     <message>
       <source>Scanning online hosts...</source>
