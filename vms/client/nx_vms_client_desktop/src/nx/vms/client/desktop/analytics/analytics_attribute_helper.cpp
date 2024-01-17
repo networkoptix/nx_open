@@ -195,10 +195,12 @@ AttributeList AttributeHelper::preprocessAttributes(
 
             case AbstractAttribute::Type::color:
             {
-                const QColor color =
-                    Private::findColor(path.last()->colorType(), attr.values.last());
+                const auto colorType = path.last()->colorType();
+                QVariantList colors;
+                for (const QString& value: attr.values)
+                    colors.push_back(Private::findColor(colorType, value));
 
-                known.push_back({attr.name, attr.values, name, attr.values, color});
+                known.push_back({attr.name, attr.values, name, attr.values, colors});
                 break;
             }
 
