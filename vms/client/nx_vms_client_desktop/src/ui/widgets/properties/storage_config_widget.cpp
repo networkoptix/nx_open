@@ -197,6 +197,29 @@ public:
         if (index.column() != QnStorageListModel::CheckBoxColumn)
             result.setWidth(qMax(result.width(), kMinimumColumnWidth));
 
+        if (index.column() == QnStorageListModel::UrlColumn)
+        {
+            if (const auto itemView = dynamic_cast<const QTreeView*>(option.widget))
+            {
+                int urlColumnSizeConstraint = itemView->viewport()->width() - 1;
+                for (auto column = 0; column < QnStorageListModel::ColumnCount; ++column)
+                {
+                    if (column == QnStorageListModel::UrlColumn)
+                        continue;
+
+                    if (column == QnStorageListModel::SpacerColumn)
+                        continue;
+
+                    urlColumnSizeConstraint -= itemView->header()->sectionSize(column);
+                }
+                result.setWidth(std::min(result.width(), std::max(0, urlColumnSizeConstraint)));
+            }
+            else
+            {
+                NX_ASSERT(false, "Unexpected item view type");
+            }
+        }
+
         return result;
     }
 
@@ -559,11 +582,16 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent):
     sortModel->setSourceModel(m_model.data());
     ui->storageView->setModel(sortModel);
     ui->storageView->sortByColumn(0, Qt::AscendingOrder);
-    ui->storageView->header()->setStretchLastSection(false);
-    ui->storageView->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
-    ui->storageView->header()->setSectionResizeMode(
-        QnStorageListModel::SeparatorColumn, QHeaderView::Stretch);
-    ui->storageView->header()->setSectionsMovable(false);
+    ui->storageView->setHeaderHidden(false);
+
+    const auto headerView = ui->storageView->header();
+    headerView->setStretchLastSection(false);
+    headerView->setSectionResizeMode(QHeaderView::ResizeToContents);
+    headerView->setSectionResizeMode(QnStorageListModel::SpacerColumn, QHeaderView::Stretch);
+    headerView->setSectionsMovable(false);
+    headerView->setMinimumSectionSize(0);
+    headerView->setSortIndicatorShown(false);
+    headerView->setSectionsClickable(false);
 
     ui->storageView->setMouseTracking(true);
     ui->storageView->installEventFilter(m_columnResizer.data());
@@ -814,8 +842,8 @@ void QnStorageConfigWidget::updateWarnings()
         messages.push_back(
             {
                 .text = tr("If cloud storage is activated for backup, other backup storages will "
-                    "be deactivated and the “All archive” option for already configured devices "
-                    "will be changed to “Motion, Object, Bookmarks”"),
+                    "be deactivated and the \"All archive\" option for already configured devices "
+                    "will be changed to \"Motion, Object, Bookmarks\""),
                 .level = BarDescription::BarLevel::Warning,
                 .isEnabledProperty = &messageBarSettings()->storageConfigCloudStorageWarning
             });
@@ -824,8 +852,9 @@ void QnStorageConfigWidget::updateWarnings()
     {
         messages.push_back(
             {
-                .text = tr("If cloud storage is activated for backup, the “All archive” option "
-                    "for already configured devices will be changed to “Motion, Object, Bookmarks”"),
+                .text = tr("If cloud storage is activated for backup, the \"All archive\" option "
+                    "for already configured devices will be changed to "
+                    "\"Motion, Object, Bookmarks\""),
                 .level = BarDescription::BarLevel::Warning,
                 .isEnabledProperty = &messageBarSettings()->storageConfigCloudStorageWarning
             });
