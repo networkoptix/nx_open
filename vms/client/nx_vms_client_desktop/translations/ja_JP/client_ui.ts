@@ -1063,7 +1063,7 @@
     <name>DeviceAdditionDialog</name>
     <message>
       <source>to</source>
-      <translation>終了</translation>
+      <translation>追加先</translation>
     </message>
     <message>
       <source>SELECT SERVER</source>
