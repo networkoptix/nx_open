@@ -30,7 +30,7 @@ public:
         StorageArchiveModeColumn,
         TotalSpaceColumn,
         ActionsColumn,
-        SeparatorColumn,
+        SpacerColumn,
         CheckBoxColumn,
 
         ColumnCount

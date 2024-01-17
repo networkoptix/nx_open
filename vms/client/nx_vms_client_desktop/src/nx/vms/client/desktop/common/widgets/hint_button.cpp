@@ -89,7 +89,7 @@ HintButton* HintButton::createHeaderViewHint(QHeaderView* headerView, int sectio
     const auto hintButton = new HintButton(headerView);
     hintButton->m_headerViewSection = section;
 
-    connect(headerView, &QHeaderView::sectionResized, hintButton,
+    connect(headerView, &QHeaderView::geometriesChanged, hintButton,
         [hintButton, headerView]{ hintButton->updateGeometry(headerView); });
 
     connect(headerView, &QHeaderView::sectionMoved, hintButton,
