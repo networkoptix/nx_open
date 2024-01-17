@@ -8437,7 +8437,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Initializing scan...</source>
-      <translation>イニシャライズ　スキャン...</translation>
+      <translation>スキャンを初期化中...</translation>
     </message>
     <message>
       <source>Scanning online hosts...</source>
