@@ -3,9 +3,9 @@
 #pragma once
 
 #include <QtCore/QByteArray>
-#include <QtCore/QScopedPointer>
 #include <QtQuick/QQuickItem>
 
+#include <nx/utils/impl_ptr.h>
 #include <nx/vms/client/core/motion/motion_grid.h>
 
 namespace nx::vms::client::core {
@@ -43,7 +43,7 @@ protected:
 
 private:
     class Private;
-    const QScopedPointer<Private> d;
+    nx::utils::ImplPtr<Private> d;
 };
 
 } // namespace nx::vms::client::core

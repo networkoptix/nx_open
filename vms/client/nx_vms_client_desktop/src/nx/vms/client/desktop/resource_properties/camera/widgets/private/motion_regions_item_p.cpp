@@ -12,11 +12,13 @@
 #include <QtQuick/QSGTextureMaterial>
 #include <QtQuick/QSGTexture>
 
-#include <nx/vms/client/core/motion/helpers/camera_motion_helper.h>
-#include <nx/vms/client/core/graphics/shader_helper.h>
-
+#include <nx/utils/log/assert.h>
+#include <nx/utils/math/fuzzy.h>
 #include <nx/utils/scoped_model_operations.h>
 #include <nx/utils/thread/custom_runnable.h>
+#include <nx/vms/client/core/motion/helpers/camera_motion_helper.h>
+#include <nx/vms/client/core/graphics/shader_helper.h>
+#include <nx/vms/client/core/scene_graph/texture_material.h>
 
 namespace nx::vms::client::desktop {
 
@@ -24,15 +26,18 @@ namespace {
 
 static constexpr qreal kFontSizeMultiplier = 1.2; //< Multiplier for cell height.
 
+qint64 comparisonKey(QSGTexture* texture)
+{
+    return texture ? texture->comparisonKey() : -1;
+}
+
 } // namespace
 
 //-------------------------------------------------------------------------------------------------
 // MotionRegionsItem::Private
 
 MotionRegionsItem::Private::Private(MotionRegionsItem* q):
-    q(q),
-    m_regionsImage(core::MotionGrid::kWidth, core::MotionGrid::kHeight,
-        QImage::Format_RGBA8888_Premultiplied)
+    q(q)
 {
 }
 
@@ -60,7 +65,7 @@ void MotionRegionsItem::Private::setMotionHelper(core::CameraMotionHelper* value
                 return;
 
             updateLabelPositions();
-            invalidateRegionsTexture();
+            m_regionsTextureDirty = true;
             q->update();
         };
 
@@ -96,7 +101,7 @@ void MotionRegionsItem::Private::setChannel(int value)
 
     m_channel = value;
     updateLabelPositions();
-    invalidateRegionsTexture();
+    m_regionsTextureDirty = true;
     q->update();
 
     emit q->channelChanged();
@@ -131,7 +136,7 @@ void MotionRegionsItem::Private::setSensitivityColors(const QVector<QColor>& val
         return;
 
     m_sensitivityColors = value;
-    invalidateRegionsTexture();
+    m_regionsTextureDirty = true;
     q->update();
 
     emit q->sensitivityColorsChanged();
@@ -186,22 +191,28 @@ void MotionRegionsItem::Private::setFillOpacity(qreal value)
 
 QSGNode* MotionRegionsItem::Private::updatePaintNode(QSGNode* node)
 {
-    auto geometryNode = static_cast<QSGGeometryNode*>(node);
+    const auto window = q->window();
+    if (!NX_ASSERT(window))
+        return nullptr;
+
+    const auto devicePixelRatio = window->effectiveDevicePixelRatio();
+    if (!qFuzzyEquals(m_devicePixelRatio, devicePixelRatio))
+        m_labelsTextureDirty = true;
+
+    m_devicePixelRatio = devicePixelRatio;
+
+    auto geometryNode = dynamic_cast<QSGGeometryNode*>(node);
     bool nodeCreated{false};
+
     if (!geometryNode)
     {
         geometryNode = new QSGGeometryNode();
         geometryNode->setGeometry(
             new QSGGeometry(QSGGeometry::defaultAttributes_TexturedPoint2D(), 4));
-        geometryNode->geometry()->setDrawingMode(GL_TRIANGLE_STRIP);
+        geometryNode->geometry()->setDrawingMode(QSGGeometry::DrawTriangleStrip);
         geometryNode->setFlags(QSGNode::OwnsGeometry | QSGNode::OwnsMaterial);
-        geometryNode->setMaterial(new Material());
-        geometryNode->material()->setFlag(QSGMaterial::Blending);
-        node = geometryNode;
         nodeCreated = true;
     }
-
-    ensureRegionsTexture();
 
     const auto w = q->width();
     const auto h = q->height();
@@ -209,6 +220,12 @@ QSGNode* MotionRegionsItem::Private::updatePaintNode(QSGNode* node)
     const auto resolution = QSize(w - 1, h - 1); //< 1 pixel is reserved for right/bottom borders.
     const bool resized = resolution != m_currentState.resolution;
     m_currentState.resolution = resolution;
+
+    m_cellSize = QSizeF(
+        qreal(resolution.width()) / core::MotionGrid::kWidth,
+        qreal(resolution.height()) / core::MotionGrid::kHeight);
+
+    m_labelSize = QSize(int(m_cellSize.width()), int(m_cellSize.height() * 2));
 
     if (resized || nodeCreated)
     {
@@ -224,55 +241,33 @@ QSGNode* MotionRegionsItem::Private::updatePaintNode(QSGNode* node)
     }
 
     updateLabelsNode(geometryNode, resized || m_labelsDirty);
+    m_labelsDirty = false;
 
-    auto& currentState = static_cast<Material*>(geometryNode->material())->uniforms;
-    if (currentState != m_currentState)
+    auto material = dynamic_cast<Material*>(geometryNode->material());
+    if (!material)
     {
-        currentState = m_currentState;
-        currentState.dirty = true;
+        material = new Material();
+        material->setFlag(QSGMaterial::Blending);
+        geometryNode->setMaterial(material);
+        m_regionsTextureDirty = true;
+    }
+
+    if (m_regionsTextureDirty)
+    {
+        material->texture.reset(createRegionsTexture());
+        material->uniforms.texture = nullptr;
+        m_currentState.texture = material->texture.get();
+        m_regionsTextureDirty = false;
+    }
+
+    if (material->uniforms != m_currentState)
+    {
+        material->uniforms = m_currentState;
+        material->uniforms.dirty = true;
         geometryNode->markDirty(QSGNode::DirtyMaterial);
     }
 
     return geometryNode;
-}
-
-void MotionRegionsItem::Private::handleWindowChanged(QQuickWindow* win)
-{
-    if (windowConnection)
-    {
-        disconnect(windowConnection);
-        windowConnection = {};
-        cleanup();
-    }
-
-    if (!win)
-        return;
-
-    windowConnection = connect(win, &QQuickWindow::sceneGraphInvalidated, q,
-        [this]() { cleanup(); }, Qt::DirectConnection);
-}
-
-void MotionRegionsItem::Private::cleanup()
-{
-    m_currentState.texture.reset();
-    m_labelsTexture.reset();
-}
-
-void MotionRegionsItem::Private::releaseResources()
-{
-    const auto clearTextures =
-        [texture = std::move(m_currentState.texture),
-            labelsTexture = std::move(m_labelsTexture)]() mutable
-        {
-            texture.reset();
-            labelsTexture.reset();
-        };
-
-    const auto window = q->window();
-    window->scheduleRenderJob(
-        new nx::utils::thread::CustomRunnable(clearTextures),
-        QQuickWindow::AfterSynchronizingStage);
-    window->update();
 }
 
 void MotionRegionsItem::Private::updateLabelsNode(QSGNode* mainNode, bool geometryDirty)
@@ -281,112 +276,96 @@ void MotionRegionsItem::Private::updateLabelsNode(QSGNode* mainNode, bool geomet
         ? static_cast<QSGGeometryNode*>(mainNode->childAtIndex(0))
         : nullptr;
 
-    if (!m_labels.empty())
-        ensureLabelsTexture();
-
-    if (m_labels.empty() || !m_labelsTexture)
+    if (m_labels.empty())
     {
-        if (labelsNode)
-            mainNode->removeChildNode(labelsNode);
-    }
-    else
-    {
-        if (!labelsNode)
-        {
-            labelsNode = new QSGGeometryNode();
-            labelsNode->setFlags(
-                QSGNode::OwnsGeometry | QSGNode::OwnsMaterial | QSGNode::OwnedByParent);
-            labelsNode->setMaterial(new QSGTextureMaterial());
-            labelsNode->material()->setFlag(QSGMaterial::Blending);
-            labelsNode->setGeometry(new QSGGeometry(
-                QSGGeometry::defaultAttributes_TexturedPoint2D(), 6 * m_labels.size()));
-            labelsNode->geometry()->setDrawingMode(GL_TRIANGLES);
-
-            geometryDirty = true;
-            mainNode->appendChildNode(labelsNode);
-        }
-
-        if (geometryDirty)
-        {
-            labelsNode->geometry()->allocate(6 * m_labels.size());
-            labelsNode->markDirty(QSGNode::DirtyGeometry);
-
-            // Text item width and height.
-            const bool transposed = (m_rotationQuadrants & 1) != 0;
-            const qreal w = transposed ? m_labelSize.height() : m_labelSize.width();
-            const qreal h = transposed ? m_labelSize.width() : m_labelSize.height();
-
-            // Texture cell width.
-            const qreal tw = 1.0 / (QnMotionRegion::kSensitivityLevelCount - 1);
-
-            auto data = labelsNode->geometry()->vertexDataAsTexturedPoint2D();
-            for (const auto& label: m_labels)
-            {
-                // Top left vertex position.
-                const qreal x = std::ceil(m_cellSize.width() * label.position.x());
-                const qreal y = std::ceil(m_cellSize.height() * label.position.y());
-
-                // Left texture position.
-                const qreal u = tw * (label.sensitivity - 1);
-
-                std::array<QPointF, 4> uv{{{u, 0}, {u, 1}, {u + tw, 1}, {u + tw, 0}}};
-                std::rotate(uv.rbegin(), uv.rbegin() + m_rotationQuadrants, uv.rend());
-
-                data[0].set(x, y, uv[0].x(), uv[0].y());
-                data[1].set(x, y + h, uv[1].x(), uv[1].y());
-                data[2].set(x + w, y + h, uv[2].x(), uv[2].y());
-                data[3] = data[0];
-                data[4] = data[2];
-                data[5].set(x + w, y, uv[3].x(), uv[3].y());
-                data += 6;
-            }
-        }
-
-        auto material = static_cast<QSGTextureMaterial*>(labelsNode->material());
-        if (material->texture() != m_labelsTexture.data())
-        {
-            material->setTexture(m_labelsTexture.data());
-            labelsNode->markDirty(QSGNode::DirtyMaterial);
-        }
+        delete labelsNode;
+        return;
     }
 
-    m_labelsDirty = false;
+    if (!labelsNode)
+    {
+        labelsNode = new QSGGeometryNode();
+        labelsNode->setFlags(
+            QSGNode::OwnsGeometry | QSGNode::OwnsMaterial | QSGNode::OwnedByParent);
+        labelsNode->setGeometry(new QSGGeometry(
+            QSGGeometry::defaultAttributes_TexturedPoint2D(), 6 * m_labels.size()));
+        labelsNode->geometry()->setDrawingMode(QSGGeometry::DrawTriangles);
+        labelsNode->setMaterial(new core::sg::TextureMaterial());
+        labelsNode->material()->setFlag(QSGMaterial::Blending);
+        mainNode->appendChildNode(labelsNode);
+
+        m_labelsTextureDirty = true;
+        geometryDirty = true;
+    }
+
+    if (m_labelsTextureDirty)
+    {
+        const auto material = static_cast<core::sg::TextureMaterial*>(labelsNode->material());
+        material->resetTexture(createLabelsTexture());
+        labelsNode->markDirty(QSGNode::DirtyMaterial);
+        m_labelsTextureDirty = false;
+    }
+
+    if (geometryDirty)
+    {
+        labelsNode->geometry()->allocate(6 * m_labels.size());
+        labelsNode->markDirty(QSGNode::DirtyGeometry);
+
+        // Text item width and height.
+        const bool transposed = (m_rotationQuadrants & 1) != 0;
+        const qreal w = transposed ? m_labelSize.height() : m_labelSize.width();
+        const qreal h = transposed ? m_labelSize.width() : m_labelSize.height();
+
+        // Texture cell width.
+        const qreal tw = 1.0 / (QnMotionRegion::kSensitivityLevelCount - 1);
+
+        auto data = labelsNode->geometry()->vertexDataAsTexturedPoint2D();
+        for (const auto& label: m_labels)
+        {
+            // Top left vertex position.
+            const qreal x = std::ceil(m_cellSize.width() * label.position.x());
+            const qreal y = std::ceil(m_cellSize.height() * label.position.y());
+
+            // Left texture position.
+            const qreal u = tw * (label.sensitivity - 1);
+
+            std::array<QPointF, 4> uv{{{u, 0}, {u, 1}, {u + tw, 1}, {u + tw, 0}}};
+            std::rotate(uv.rbegin(), uv.rbegin() + m_rotationQuadrants, uv.rend());
+
+            data[0].set(x, y, uv[0].x(), uv[0].y());
+            data[1].set(x, y + h, uv[1].x(), uv[1].y());
+            data[2].set(x + w, y + h, uv[2].x(), uv[2].y());
+            data[3] = data[0];
+            data[4] = data[2];
+            data[5].set(x + w, y, uv[3].x(), uv[3].y());
+            data += 6;
+        }
+    }
 }
 
-void MotionRegionsItem::Private::invalidateRegionsTexture()
+QSGTexture* MotionRegionsItem::Private::createRegionsTexture() const
 {
-    m_updateRegionsTexture = true;
+    const auto texture = q->window()->createTextureFromImage(createRegionsImage());
+    texture->setHorizontalWrapMode(QSGTexture::ClampToEdge);
+    texture->setVerticalWrapMode(QSGTexture::ClampToEdge);
+    texture->setFiltering(QSGTexture::Nearest);
+    return texture;
 }
 
-void MotionRegionsItem::Private::ensureRegionsTexture()
+QImage MotionRegionsItem::Private::createRegionsImage() const
 {
-    if (!m_updateRegionsTexture && m_currentState.texture)
-        return;
+    QImage regionsImage(core::MotionGrid::kWidth, core::MotionGrid::kHeight,
+        QImage::Format_RGBA8888_Premultiplied);
 
-    m_updateRegionsTexture = false;
-    const auto window = q->window();
-    if (!window)
-        return;
-
-    updateRegionsImage();
-
-    m_currentState.texture.reset(window->createTextureFromImage(m_regionsImage));
-    m_currentState.texture->setHorizontalWrapMode(QSGTexture::ClampToEdge);
-    m_currentState.texture->setVerticalWrapMode(QSGTexture::ClampToEdge);
-    m_currentState.texture->setFiltering(QSGTexture::Nearest);
-}
-
-void MotionRegionsItem::Private::updateRegionsImage()
-{
-    m_regionsImage.fill(Qt::transparent);
+    regionsImage.fill(Qt::transparent);
     if (!m_motionHelper)
-        return;
+        return regionsImage;
 
     const auto regions = m_motionHelper->motionRegionList();
     if (m_channel >= regions.size())
-        return;
+        return regionsImage;
 
-    QPainter painter(&m_regionsImage);
+    QPainter painter(&regionsImage);
     const auto region = regions[m_channel];
 
     for (int sensitivity = 1; sensitivity < QnMotionRegion::kSensitivityLevelCount; ++sensitivity)
@@ -398,38 +377,28 @@ void MotionRegionsItem::Private::updateRegionsImage()
 
         painter.fillPath(path, color);
     }
+
+    return regionsImage;
 }
 
-void MotionRegionsItem::Private::ensureLabelsTexture()
+QSGTexture* MotionRegionsItem::Private::createLabelsTexture() const
 {
-    if (!m_labelsTextureDirty)
-        return;
+    const auto texture = q->window()->createTextureFromImage(createLabelsImage());
+    texture->setHorizontalWrapMode(QSGTexture::ClampToEdge);
+    texture->setVerticalWrapMode(QSGTexture::ClampToEdge);
+    texture->setFiltering(QSGTexture::Nearest);
+    return texture;
+}
 
-    const auto window = q->window();
-    if (!window)
-    {
-        m_labelsTexture.reset();
-        return;
-    }
-
-    // Update cell size.
-    m_cellSize.setWidth(qreal(m_currentState.resolution.width()) / core::MotionGrid::kWidth);
-    m_cellSize.setHeight(qreal(m_currentState.resolution.height()) / core::MotionGrid::kHeight);
-
-    // Label size as rounded two cells.
-    m_labelSize = QSize(int(m_cellSize.width()), int(m_cellSize.height() * 2));
-
-    // Texture size.
+QImage MotionRegionsItem::Private::createLabelsImage() const
+{
     const auto size = QSize(
         m_labelSize.width() * (QnMotionRegion::kSensitivityLevelCount - 1),
         m_labelSize.height())
-            * window->effectiveDevicePixelRatio();
-
-    if (m_labelsTexture && m_labelsTexture->textureSize() == size)
-        return;
+            * m_devicePixelRatio;
 
     QImage image(size, QImage::Format_RGBA8888_Premultiplied);
-    image.setDevicePixelRatio(window->effectiveDevicePixelRatio());
+    image.setDevicePixelRatio(m_devicePixelRatio);
     image.fill(Qt::transparent);
 
     QPainter painter(&image);
@@ -446,13 +415,7 @@ void MotionRegionsItem::Private::ensureLabelsTexture()
         rect.moveLeft(rect.left() + m_labelSize.width());
     }
 
-    painter.end();
-
-    m_labelsTexture.reset(window->createTextureFromImage(image));
-    m_labelsTexture->setHorizontalWrapMode(QSGTexture::ClampToEdge);
-    m_labelsTexture->setVerticalWrapMode(QSGTexture::ClampToEdge);
-    m_labelsTexture->setFiltering(QSGTexture::Nearest);
-    m_labelsTextureDirty = false;
+    return image;
 }
 
 void MotionRegionsItem::Private::updateLabelPositions(bool force)
@@ -604,7 +567,7 @@ bool MotionRegionsItem::Private::State::operator==(const State& other) const
 {
     return resolution == other.resolution
         && borderColor == other.borderColor
-        && texture == other.texture
+        && comparisonKey(texture) == comparisonKey(other.texture)
         && qFuzzyIsNull(fillOpacity - other.fillOpacity);
 }
 
@@ -707,7 +670,7 @@ int MotionRegionsItem::Private::Material::compare(const QSGMaterial *other) cons
     const auto otherMaterial = static_cast<const Material*>(other);
 
     const qint64 diff =
-        uniforms.texture->comparisonKey() - otherMaterial->uniforms.texture->comparisonKey();
+        comparisonKey(uniforms.texture) - comparisonKey(otherMaterial->uniforms.texture);
 
     if (diff != 0)
         return diff < 0 ? -1 : 1;

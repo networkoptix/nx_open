@@ -35,13 +35,7 @@ signals:
 
 protected:
     virtual QSGNode* updatePaintNode(
-        QSGNode* node,
-        UpdatePaintNodeData* updatePaintNodeData) override;
-    virtual void releaseResources() override;
-
-private slots:
-    void handleWindowChanged(QQuickWindow* win);
-    void cleanup();
+        QSGNode* node, UpdatePaintNodeData* updatePaintNodeData) override;
 
 private:
     class Private;
