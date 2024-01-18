@@ -15,6 +15,11 @@ void HttpStreamSocketServer::setPersistentConnectionEnabled(bool value)
     m_persistentConnectionEnabled = value;
 }
 
+void HttpStreamSocketServer::setExtraResponseHeaders(HttpHeaders responseHeaders)
+{
+    m_extraResponseHeaders = std::move(responseHeaders);
+}
+
 void HttpStreamSocketServer::redirectAllRequestsTo(SocketAddress addressToRedirect)
 {
     m_addressToRedirect = std::move(addressToRedirect);
@@ -54,6 +59,7 @@ std::shared_ptr<HttpServerConnection> HttpStreamSocketServer::createConnection(
         m_requestHandler,
         m_addressToRedirect);
     result->setPersistentConnectionEnabled(m_persistentConnectionEnabled);
+    result->setExtraResponseHeaders(m_extraResponseHeaders);
     result->setOnResponseSent(
         [this](const auto& requestProcessingTime)
         {

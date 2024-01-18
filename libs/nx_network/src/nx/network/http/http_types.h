@@ -1122,6 +1122,12 @@ NX_NETWORK_API header::UserAgent defaultUserAgent();
 NX_NETWORK_API std::string serverString();
 
 /**
+ * @return Server header value containing well-known HTTP server name(s).
+ * Should be used by HTTP servers for better compatibility with browsers.
+ */
+NX_NETWORK_API std::string compatibilityServerName();
+
+/**
  * Convert QDateTime to HTTP header date format according to RFC 1123#5.2.14.
  */
 NX_NETWORK_API std::string formatDateTime(const QDateTime& value);

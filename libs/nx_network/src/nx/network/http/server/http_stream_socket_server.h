@@ -48,6 +48,11 @@ public:
 
     void setPersistentConnectionEnabled(bool value);
 
+    /**
+     * Set some HTTP headers to be included in every response.
+     */
+    void setExtraResponseHeaders(HttpHeaders responseHeaders);
+
     void redirectAllRequestsTo(SocketAddress addressToRedirect);
 
     virtual server::HttpStatistics httpStatistics() const override;
@@ -59,6 +64,7 @@ protected:
 private:
     nx::network::http::AbstractRequestHandler* m_requestHandler = nullptr;
     bool m_persistentConnectionEnabled = true;
+    HttpHeaders m_extraResponseHeaders;
 
     mutable nx::Mutex m_mutex;
     nx::network::http::server::RequestStatisticsCalculator m_statsCalculator;

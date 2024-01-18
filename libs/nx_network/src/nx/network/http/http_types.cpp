@@ -2355,6 +2355,11 @@ std::string serverString()
     return defaultServerString;
 }
 
+std::string compatibilityServerName()
+{
+    return COMPATIBILITY_SERVER_STRING;
+}
+
 std::string formatDateTime(const QDateTime& value)
 {
     // Starts with Monday to correspond to QDate::dayOfWeek() return value: 1 for Monday, 7 for Sunday

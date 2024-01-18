@@ -79,6 +79,11 @@ void HttpServerConnection::setPersistentConnectionEnabled(bool value)
     m_persistentConnectionEnabled = value;
 }
 
+void HttpServerConnection::setExtraResponseHeaders(HttpHeaders responseHeaders)
+{
+    m_extraResponseHeaders = std::move(responseHeaders);
+}
+
 void HttpServerConnection::setOnResponseSent(
     nx::utils::MoveOnlyFunc<void(std::chrono::microseconds)> handler)
 {
@@ -384,9 +389,20 @@ void HttpServerConnection::addResponseHeaders(
 {
     static constexpr auto kYear = std::chrono::hours(24) * 365;
 
-    nx::network::http::insertOrReplaceHeader(
-        &response->headers,
-        HttpHeader(header::Server::NAME, http::serverString()));
+    for (const auto& hdr : m_extraResponseHeaders)
+    {
+        // Don't replace headers added by the request processors.
+        if (!response->headers.contains(hdr.first))
+            response->headers.insert(hdr);
+    }
+
+    // ... Except for the Server header. It should be customizable and only added if not present.
+    if (!response->headers.contains(header::Server::NAME))
+    {
+        nx::network::http::insertOrReplaceHeader(
+            &response->headers,
+            HttpHeader(header::Server::NAME, http::serverString()));
+    }
 
     nx::network::http::insertOrReplaceHeader(
         &response->headers,
