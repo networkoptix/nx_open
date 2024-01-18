@@ -44,7 +44,7 @@ MouseArea
         selectionStarted = false
     }
 
-    onPressed:
+    onPressed: (mouse) =>
     {
         movedSinceLastPress = false
         if (mouse.button == Qt.LeftButton)
@@ -53,7 +53,7 @@ MouseArea
             stopSelection()
     }
 
-    onReleased:
+    onReleased: (mouse) =>
     {
         if (selectionStarted && mouse.button == Qt.LeftButton)
         {
@@ -67,7 +67,7 @@ MouseArea
         }
     }
 
-    onPositionChanged:
+    onPositionChanged: (mouse) =>
     {
         movedSinceLastPress = true
         if (selectionStarted)
