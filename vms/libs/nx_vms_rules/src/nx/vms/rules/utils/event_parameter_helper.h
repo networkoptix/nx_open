@@ -20,7 +20,7 @@ public:
     static QString getMainGroupName(const QString& text);
     static bool isStartOfEventParameter(const QChar& symbol);
     static bool isEndOfEventParameter(const QChar& symbol);
-    static size_t getLatestEventParameterPos(const QString& text);
+    static int getLatestEventParameterPos(const QStringView& text, int stopPosition);
     static bool containsSubgroups(const QString& eventParameter);
 
     /**

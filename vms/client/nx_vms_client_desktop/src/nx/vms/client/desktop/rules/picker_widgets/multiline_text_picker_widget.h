@@ -5,7 +5,6 @@
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QTextEdit>
 
-#include <nx/vms/common/html/html.h>
 #include <nx/vms/rules/action_builder_fields/text_with_fields.h>
 
 #include "../utils/completer.h"
@@ -68,7 +67,7 @@ protected:
 
     void onTextChanged()
     {
-        theField()->setText(nx::vms::common::html::toPlainText(m_textEdit->toPlainText()));
+        theField()->setText(m_textEdit->toPlainText());
     }
 };
 
