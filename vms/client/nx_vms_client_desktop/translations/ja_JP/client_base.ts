@@ -2546,7 +2546,7 @@ License Key: %2</source>
     <message numerus="yes">
       <source>%1 does not support two-way audio</source>
       <translation>
-        <numerusform>%1 は双方向オーディオをサポートしません</numerusform>
+        <numerusform>%1 は双方向音声をサポートしていません</numerusform>
       </translation>
     </message>
   </context>
@@ -3316,11 +3316,11 @@ to %1</source>
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation>オーディオエンコーダーをイニシャライズできません.</translation>
+      <translation>音声エンコーダーを初期化できませんでした。</translation>
     </message>
     <message>
       <source>Could not start primary audio device.</source>
-      <translation>プライマリーオーディオデバイスを開始できません。</translation>
+      <translation>プライマリ音声デバイスを開始できませんでした。</translation>
     </message>
     <message>
       <source>Screen width must be a multiple of 8.</source>
@@ -3328,7 +3328,7 @@ to %1</source>
     </message>
     <message>
       <source>Could not initialize audio device &quot;%1&quot;.</source>
-      <translation>オーディオデバイス&quot;%1&quot; を初期化できませんでした</translation>
+      <translation>音声デバイス &quot;%1&quot; を初期化できませんでした。</translation>
     </message>
     <message>
       <source>Could not detect capturing resolution</source>
@@ -4327,7 +4327,7 @@ to %1</source>
     </message>
     <message>
       <source>PTZ, Device Output, 2-Way Audio, Soft Triggers.</source>
-      <translation>PTZ、デバイス出力、双方向オーディオ、ソフトトリガー</translation>
+      <translation>PTZ、デバイス出力、双方向音声、ソフトトリガー</translation>
     </message>
   </context>
   <context>
@@ -5051,7 +5051,7 @@ to %1</source>
     </message>
     <message>
       <source>UNAUTHORIZED</source>
-      <translation>未認証</translation>
+      <translation>要認証</translation>
     </message>
     <message>
       <source>SERVER UNAVAILABLE</source>
@@ -7034,43 +7034,43 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>This device does not have an audio input, or it is not configured correctly. Select another device as an audio source.</source>
-      <translation>このデバイスには音声入力がないか、正しく構成されていません。オーディオソースとして別のデバイスを選択してください。</translation>
+      <translation>このデバイスには音声入力がないか、正しく設定されていません。音声ソースとして別のデバイスを選択してください。</translation>
     </message>
     <message>
       <source>This camera does not have an audio input, or it is not configured correctly. Select another camera as an audio source.</source>
-      <translation>このカメラには音声入力がないか、正しく構成されていません。オーディオソースとして別のカメラを選択してください。</translation>
+      <translation>このカメラには音声入力がないか、正しく設定されていません。音声ソースとして別のカメラを選択してください。</translation>
     </message>
     <message>
       <source>This device does not have an audio output, or it is not configured correctly. Select another device for audio playback.</source>
-      <translation>このデバイスには音声出力がないか、正しく構成されていません。オーディオ再生用に別のデバイスを選択してください。</translation>
+      <translation>このデバイスには音声出力がないか、正しく設定されていません。音声再生用に別のデバイスを選択してください。</translation>
     </message>
     <message>
       <source>This camera does not have an audio output, or it is not configured correctly. Select another camera for audio playback.</source>
-      <translation>このカメラには音声出力がないか、正しく構成されていません。オーディオ再生用に別のカメラを選択してください。</translation>
+      <translation>このカメラには音声出力がないか、正しく設定されていません。音声再生用に別のカメラを選択してください。</translation>
     </message>
     <message>
       <source>Use this device for audio output</source>
-      <translation>このデバイスをオーディオ出力に使用する</translation>
+      <translation>このデバイスを音声出力に使用する</translation>
     </message>
     <message>
       <source>Use this camera for audio output</source>
-      <translation>このカメラをオーディオ出力に使用する</translation>
+      <translation>このカメラを音声出力に使用する</translation>
     </message>
     <message>
       <source>Use audio stream from another device</source>
-      <translation>別のデバイスからのオーディオストリームを使用する</translation>
+      <translation>別のデバイスの音声ストリームを使用する</translation>
     </message>
     <message>
       <source>Use audio stream from another camera</source>
-      <translation>別のカメラからのオーディオストリームを使用</translation>
+      <translation>別のカメラの音声ストリームを使用</translation>
     </message>
     <message>
       <source>Transmit audio stream to another device</source>
-      <translation>オーディオストリームを別のデバイスに送信する</translation>
+      <translation>音声ストリームを別のデバイスに送信する</translation>
     </message>
     <message>
       <source>Transmit audio stream to another camera</source>
-      <translation>オーディオストリームを別のカメラに送信する</translation>
+      <translation>音声ストリームを別のカメラに送信する</translation>
     </message>
     <message>
       <source>Selected device doesn&apos;t have audio input or it&apos;s not configured. Audio stream is not available.</source>
@@ -7098,11 +7098,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Use audio stream from this device</source>
-      <translation>このデバイスのオーディオストリームを使用する</translation>
+      <translation>このデバイスの音声ストリームを使用する</translation>
     </message>
     <message>
       <source>Use audio stream from this camera</source>
-      <translation>このカメラのオーディオストリームを使用する</translation>
+      <translation>このカメラの音声ストリームを使用する</translation>
     </message>
     <message>
       <source>%1 is connected to another server. Audio stream is not available</source>
@@ -7308,7 +7308,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::CameraAdvancedParamsWidget</name>
     <message>
       <source>Loading values...</source>
-      <translation>設定の読込み中...</translation>
+      <translation>値を読み込み中...</translation>
     </message>
     <message>
       <source>Applying changes...</source>
@@ -7516,11 +7516,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Will be transferred partially:</source>
-      <translation>部分的に移転されます:</translation>
+      <translation>部分的に移行されます:</translation>
     </message>
     <message>
       <source>Will not be transferred:</source>
-      <translation>移転されません:</translation>
+      <translation>移行されません:</translation>
     </message>
     <message>
       <source>Next</source>
@@ -7536,7 +7536,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Data for Transfer</source>
-      <translation>移転するデータ</translation>
+      <translation>移行するデータ</translation>
     </message>
     <message>
       <source>Camera replaced!</source>
@@ -7544,7 +7544,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Checking if the old camera&apos;s data can be transferred to the new camera.</source>
-      <translation>古いカメラのデータが新しいカメラに移転できるか確認しています。</translation>
+      <translation>古いカメラのデータを新しいカメラに移行できるか確認しています。</translation>
     </message>
     <message>
       <source>Some data and settings may not be compatible with the new camera</source>
@@ -7771,7 +7771,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>You need to select a device that will provide audio.</source>
-      <translation>オーディオを提供するデバイスを選択する必要があります。</translation>
+      <translation>音声を提供するデバイスを選択する必要があります。</translation>
     </message>
     <message>
       <source>2-way audio will be disabled</source>
@@ -7779,7 +7779,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>You need to select a device to transmit the audio stream to and use for audio playback.</source>
-      <translation>音声ストリームを送信してオーディオ再生に使用するデバイスを選択する必要があります。</translation>
+      <translation>音声ストリームの送信先として音声を再生するデバイスを選択する必要があります。</translation>
     </message>
   </context>
   <context>
@@ -8398,7 +8398,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Video or audio codec is incompatible with selected format.</source>
-      <translation>映像または音声のコーデックが、選択した形式との互換性を持ちません。</translation>
+      <translation>映像または音声のコーデックが、選択した形式に対応していません。</translation>
     </message>
     <message>
       <source>File write error.</source>
@@ -8533,7 +8533,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>AVI format is not recommended to export a recording with audio track.</source>
-      <translation>オーディオトラックを含む録画映像をエクスポートする場合、AVI形式は推奨されません。</translation>
+      <translation>音声トラックを含む録画映像をエクスポートする場合、AVI形式は推奨されません。</translation>
     </message>
     <message>
       <source>Export is not available: This camera does not have a video archive for the selected time period.</source>
@@ -9518,7 +9518,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Calling...</source>
-      <translation>発信中...</translation>
+      <translation>呼出中...</translation>
     </message>
   </context>
   <context>
@@ -10448,7 +10448,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <name>nx::vms::client::desktop::ServerUpdateTool</name>
     <message>
       <source>No connection to the server.</source>
-      <translation>サーバー に接続できません.</translation>
+      <translation>サーバーに接続できません。</translation>
     </message>
     <message>
       <source>Network error.</source>
@@ -11819,7 +11819,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Some settings may not be transferred from the replaced camera due to compatibility issues.</source>
-      <translation>互換性の問題により、交換したカメラから一部の設定が移転されない場合があります。</translation>
+      <translation>互換性の問題により、交換されるカメラから一部の設定が移行されない場合があります。</translation>
     </message>
     <message>
       <source>Confirm undo replacement?</source>

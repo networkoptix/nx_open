@@ -874,7 +874,7 @@
     </message>
     <message>
       <source>Audio</source>
-      <translation>オーディオ</translation>
+      <translation>音声</translation>
     </message>
     <message>
       <source>Enable audio</source>
@@ -1412,7 +1412,7 @@
     </message>
     <message>
       <source>Audio Input</source>
-      <translation>オーディオ入力</translation>
+      <translation>音声入力</translation>
     </message>
     <message>
       <source>First Source</source>

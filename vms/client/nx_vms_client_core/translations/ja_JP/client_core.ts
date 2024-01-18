@@ -21,7 +21,7 @@
     </message>
     <message>
       <source>Primary audio device is not selected.</source>
-      <translation>プライマリーオーディオ デバイスが選択されていません。</translation>
+      <translation>プライマリ音声デバイスが選択されていません。</translation>
     </message>
   </context>
   <context>
