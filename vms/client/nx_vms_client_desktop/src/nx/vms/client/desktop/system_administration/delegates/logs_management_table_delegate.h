@@ -32,6 +32,13 @@ private:
         const QStyleOptionViewItem& styleOption,
         const QModelIndex& index) const;
 
+    void paintLogLevelColumn(
+        QPainter* painter,
+        const QStyleOptionViewItem& styleOption,
+        const QModelIndex& index) const;
+
+    void drawText(const QModelIndex& index, QRect textRect, QStyle* style, QStyleOptionViewItem option, QPainter* painter, bool extra) const;
+
 private:
     mutable QnTextPixmapCache m_textPixmapCache;
 };

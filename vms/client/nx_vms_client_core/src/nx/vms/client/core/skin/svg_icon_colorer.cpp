@@ -158,6 +158,9 @@ const SvgIconColorer::IconSubstitutions SvgIconColorer::kTreeIconSubstitutions =
         { kBaseSecondaryColor, "red_l3" },
         { kBaseWindowTextColor, "light16" },
     }},
+    { QnIcon::Pressed, {
+        { kBasePrimaryColor, "light1" },
+    }},
 };
 
 const SvgIconColorer::IconSubstitutions SvgIconColorer::kDefaultIconSubstitutions = {

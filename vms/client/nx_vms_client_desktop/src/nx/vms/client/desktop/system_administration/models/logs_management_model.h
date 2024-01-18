@@ -21,9 +21,9 @@ class LogsManagementModel: public QAbstractTableModel
 public:
     enum Columns
     {
+        CheckBoxColumn,
         NameColumn,
         LogLevelColumn,
-        CheckBoxColumn,
         StatusColumn,
         ColumnCount
     };
