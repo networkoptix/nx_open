@@ -18,9 +18,7 @@ const QString kWarningLogLevelColor = "yellow_d2";
 static const QColor kLight10Color = "#A5B7C0";
 static const QColor kLight16Color = "#698796";
 static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
-    {QIcon::Normal, {{kLight10Color, "light10"}, {kLight16Color, "light16"}}},
-    {QIcon::Active, {{kLight10Color, "light11"}, {kLight16Color, "light17"}}},
-    {QIcon::Selected, {{kLight16Color, "light15"}}},
+    {QIcon::Normal, {{kLight10Color, "attention.green"}, {kLight16Color, "attention.red"}}}
 };
 
 QIcon icon(LogsManagementUnitPtr unit)
@@ -37,13 +35,14 @@ QIcon statusIcon(LogsManagementUnitPtr unit)
     {
         case State::pending:
         case State::loading:
+            // TODO: @pprivalov use proper icon, probably it should be gif
             return qnSkin->icon("text_buttons/rapid_review_20.svg", kIconSubstitutions); //< FIXME: #spanasenko Use a separate icon.
 
         case State::complete:
-            return qnSkin->icon("text_buttons/ok_20.svg", kIconSubstitutions);
+            return qnSkin->icon("text_buttons/yes_20x20.svg", kIconSubstitutions);
 
         case State::error:
-            return qnSkin->icon("text_buttons/error.svg");
+            return qnSkin->icon("text_buttons/close_medium_20x20.svg", kIconSubstitutions);
     }
 
     return {};
