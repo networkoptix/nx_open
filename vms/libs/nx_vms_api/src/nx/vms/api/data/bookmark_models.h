@@ -36,23 +36,23 @@ struct NX_VMS_API BookmarkFilterBase
     {
     }
 
-    /**%apidoc[opt] Minimum start time for the bookmark. */
+    /**%apidoc[opt] Minimum start time for the Bookmark. */
     std::chrono::milliseconds startTimeMs{};
 
-    /**%apidoc[opt] Maximum end time for the bookmark. */
+    /**%apidoc[opt] Maximum end time for the Bookmark. */
     std::chrono::milliseconds endTimeMs{};
 
     /**%apidoc[opt]
-     * Time point around which bookmarks are going to be returned. If parameter is specified then
-     * request returns nearest (by start time) limit/2 bookmarks before the split point and nearest
-     * limit/2 bookmarks after.
-     * To derminate nearest bookmarks start time field is taken into consideration. If there are
-     * bookmarks with the same start time then guid field is used to determine the order.
-     * After bookmarks are gathered they are sorted by the specified column.
-     * In case of ascending sorting (whatever the sorting column is) the split point is right after
-     * the specified time point. In case of descending order the split point is right before the
-     * specified time point.
-     * In addition to the sort filed all returned bookmarks are sorted by the guid field.
+     * Time point around which bookmarks are going to be returned. If this parameter is specified
+     * then the request returns the nearest limit/2 bookmarks before the split point and the
+     * nearest limit/2 bookmarks after.
+     * The start time of the bookmarks is used as the time to compare this field against. If there
+     * are bookmarks with the same start time then the deviceId field is used to determine the
+     * order.
+     * After bookmarks are gathered they are sorted by the specified column. In case of ascending
+     * order, the split point is right after the specified time point. In case of descending order
+     * the split point is right before the specified time point. In addition to the sort field, all
+     * returned bookmarks are sorted by deviceId.
      */
     std::optional<std::chrono::milliseconds> centralTimePointMs;
 
@@ -67,38 +67,53 @@ struct NX_VMS_API BookmarkFilterBase
      * %value asc
      * %value desc
      */
-    Qt::SortOrder order = Qt::AscendingOrder;
+    Qt::SortOrder order{Qt::AscendingOrder};
 
     /**%apidoc[opt] Bookmark field used for ordering. */
-    BookmarkSortField column = BookmarkSortField::startTime;
+    BookmarkSortField column{BookmarkSortField::startTime};
 
-    /**%apidoc[opt] Do not return bookmarks with duration less than this value. */
+    /**%apidoc[opt] Minimum duration of returned Bookmarks. */
     std::optional<std::chrono::milliseconds> minVisibleLengthMs;
 
     /**%apidoc:stringArray Device ids to get Bookmarks on. */
     nx::vms::api::json::ValueOrArray<QString> deviceId;
 
-    /**%apidoc[opt] Minimum creation time of the bookmark (in milliseconds since epoch, or as a string). */
+    /**%apidoc[opt]
+     * Minimum creation time of the Bookmark (in milliseconds since epoch, or as a string).
+     */
     std::chrono::milliseconds creationStartTimeMs{};
 
-    /**%apidoc[opt] Maximum creation time of the bookmark (in milliseconds since epoch, or as a string) */
+    /**%apidoc[opt]
+     * Maximum creation time of the Bookmark (in milliseconds since epoch, or as a string).
+     */
     std::chrono::milliseconds creationEndTimeMs{};
 };
 #define BookmarkFilterBase_Fields \
     (startTimeMs)(endTimeMs)(centralTimePointMs)(text)(limit)(order)(column) \
     (minVisibleLengthMs)(deviceId)(creationStartTimeMs)(creationEndTimeMs)
 
-struct BookmarkIdV1
+struct NX_VMS_API BookmarkSharingSettings
+{
+    /**%apidoc[opt] Time the shareable Bookmark expires in milliseconds since epoch. */
+    std::chrono::milliseconds expirationTimeMs{0};
+
+    /**%apidoc[opt] Password required to access the Bookmark. */
+    std::optional<QString> password;
+};
+#define BookmarkSharingSettings_Fields (expirationTimeMs)(password)
+QN_FUSION_DECLARE_FUNCTIONS(BookmarkSharingSettings, (json), NX_VMS_API)
+
+struct NX_VMS_API BookmarkIdV1
 {
     /**%apidoc[opt] Bookmark id. */
     QnUuid id;
 
-    BookmarkIdV1(QnUuid id = {}): id(std::move(id)) {}
+    BookmarkIdV1(QnUuid id = {}): id(id) {}
     const QnUuid& bookmarkId() const { return id; }
-    QnUuid serverId() const { return QnUuid(); }
+    QnUuid serverId() const { return {}; }
 
     const QnUuid& getId() const { return id; }
-    void setId(QnUuid id_) { id = std::move(id_); }
+    void setId(QnUuid id_) { id = id_; }
     QString toString() const { return id.toSimpleString(); }
 };
 #define BookmarkIdV1_Fields (id)
@@ -108,6 +123,9 @@ struct NX_VMS_API BookmarkIdV3
 {
     /**%apidoc[opt] Combined Bookmark and Server ids `{bookmarkId}_{serverId}`. */
     QString id;
+
+    static QnUuid bookmarkIdFromCombined(const QString& id);
+    static QnUuid serverIdFromCombined(const QString& id);
 
     BookmarkIdV3(QString id = {}): id(std::move(id)) {}
     QnUuid bookmarkId() const;
@@ -167,7 +185,6 @@ struct NX_VMS_API BookmarkBase
      * the Bookmark is created by the System.
      */
     std::optional<std::chrono::milliseconds> creationTimeMs{0};
-
 };
 #define BookmarkBase_Fields \
     (deviceId) \
@@ -178,6 +195,7 @@ struct NX_VMS_API BookmarkBase
     (tags) \
     (creatorUserId) \
     (creationTimeMs)
+QN_FUSION_DECLARE_FUNCTIONS(BookmarkBase, (json), NX_VMS_API)
 
 /**%apidoc
  * %param[readonly] id
@@ -188,10 +206,10 @@ struct NX_VMS_API BookmarkV1: BookmarkBase, BookmarkIdV1
     QnUuid serverId;
 
     using BookmarkIdV1::BookmarkIdV1;
-    void setIds(QnUuid bookmarkId, QnUuid serverId)
+    void setIds(QnUuid bookmarkId, QnUuid serverId_)
     {
-        id = std::move(bookmarkId);
-        this->serverId = std::move(serverId);
+        id = bookmarkId;
+        serverId = serverId_;
     }
 };
 #define BookmarkV1_Fields BookmarkBase_Fields BookmarkIdV1_Fields (serverId)
@@ -213,9 +231,10 @@ QN_FUSION_DECLARE_FUNCTIONS(BookmarkWithRuleV1, (json), NX_VMS_API)
  */
 struct NX_VMS_API BookmarkV3: BookmarkBase, BookmarkIdV3
 {
-     using BookmarkIdV3::BookmarkIdV3;
+    using BookmarkIdV3::BookmarkIdV3;
+    std::optional<BookmarkSharingSettings> share;
 };
-#define BookmarkV3_Fields BookmarkBase_Fields BookmarkIdV3_Fields
+#define BookmarkV3_Fields BookmarkBase_Fields BookmarkIdV3_Fields (share)
 QN_FUSION_DECLARE_FUNCTIONS(BookmarkV3, (json), NX_VMS_API)
 
 using Bookmark = BookmarkV3;
@@ -230,8 +249,6 @@ struct NX_VMS_API BookmarkWithRuleV3: BookmarkV3
 };
 #define BookmarkWithRuleV3_Fields BookmarkV3_Fields (eventRuleId)
 QN_FUSION_DECLARE_FUNCTIONS(BookmarkWithRuleV3, (json), NX_VMS_API)
-
-using BookmarkWithRule = BookmarkWithRuleV3;
 
 struct NX_VMS_API BookmarkTagFilter
 {

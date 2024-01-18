@@ -8,14 +8,22 @@
 #include <QtCore/QString>
 #include <QtCore/QVector>
 
-struct QnCameraBookmark;
+namespace nx::vms::common {
+
+struct CameraBookmark;
+struct CameraBookmarkSearchFilter;
+struct CameraBookmarkTag;
+
+} // namespace nx::vms::common
+
+using QnCameraBookmark = nx::vms::common::CameraBookmark;
+using QnCameraBookmarkSearchFilter = nx::vms::common::CameraBookmarkSearchFilter;
+using QnCameraBookmarkTag =  nx::vms::common::CameraBookmarkTag;
+
 typedef QVector<QnCameraBookmark> QnCameraBookmarkList;
 typedef std::vector<QnCameraBookmarkList> QnMultiServerCameraBookmarkList;
 
-struct QnCameraBookmarkSearchFilter;
-
 typedef QSet<QString> QnCameraBookmarkTags;
 
-struct QnCameraBookmarkTag;
 typedef QVector<QnCameraBookmarkTag> QnCameraBookmarkTagList;
 typedef std::vector<QnCameraBookmarkTagList> QnMultiServerCameraBookmarkTagList;

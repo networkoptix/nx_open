@@ -13,7 +13,6 @@
 #include <nx/sdk/cloud_storage/helpers/data.h>
 #include <nx/sdk/cloud_storage/i_codec_info.h>
 #include <nx/sdk/helpers/ref_countable.h>
-#include <plugins/plugin_tools.h>
 
 extern "C" {
 #include <libavcodec/avcodec.h>

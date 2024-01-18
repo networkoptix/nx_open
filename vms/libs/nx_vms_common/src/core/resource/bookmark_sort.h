@@ -10,12 +10,6 @@
 
 #include "detail/bookmark_sort_detail.h"
 
-NX_VMS_COMMON_API std::function<bool(const QnCameraBookmark&, const QnCameraBookmark&)>
-    createBookmarkSortPredicate(
-        nx::vms::api::BookmarkSortField sortField,
-        Qt::SortOrder sortOrder,
-        QnResourcePool* resourcePool);
-
 namespace nx::vms::common {
 
 NX_VMS_COMMON_API std::function<bool(const nx::vms::api::BookmarkV1&, const nx::vms::api::BookmarkV1&)>

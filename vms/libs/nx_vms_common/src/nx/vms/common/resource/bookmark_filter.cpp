@@ -15,12 +15,12 @@ BookmarkTextFilter::BookmarkTextFilter(const QString& text)
     }
 };
 
-bool BookmarkTextFilter::operator()(const QnCameraBookmark& bookmark) const
+bool BookmarkTextFilter::operator()(const CameraBookmark& bookmark) const
 {
     return match(bookmark);
 }
 
-bool BookmarkTextFilter::match(const QnCameraBookmark& bookmark) const
+bool BookmarkTextFilter::match(const CameraBookmark& bookmark) const
 {
     for (const auto& [word, wordRegExp]: m_words)
     {

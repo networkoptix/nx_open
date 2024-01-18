@@ -28,16 +28,12 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(BookmarkWithRuleV1, (json), BookmarkWithRuleV1_
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(BookmarkV3, (json), BookmarkV3_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(BookmarkWithRuleV3, (json), BookmarkWithRuleV3_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(BookmarkTagFilter, (json), BookmarkTagFilter_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(BookmarkSharingSettings, (json), BookmarkSharingSettings_Fields)
 
-void BookmarkIdV3::setIds(const QnUuid& bookmarkId, const QnUuid& serverId)
-{
-    id = bookmarkId.toSimpleString() + '_' + serverId.toSimpleString();
-}
-
-QnUuid BookmarkIdV3::bookmarkId() const
+QnUuid BookmarkIdV3::bookmarkIdFromCombined(const QString& id)
 {
     if (id.isEmpty())
-        return QnUuid();
+        return {};
 
     const auto p = findIdSeparator(id, '_');
     if (!p)
@@ -46,17 +42,32 @@ QnUuid BookmarkIdV3::bookmarkId() const
     return QnUuid::fromStringSafe(id.mid(0, *p));
 }
 
-QnUuid BookmarkIdV3::serverId() const
+QnUuid BookmarkIdV3::serverIdFromCombined(const QString& id)
 {
     if (id.isEmpty())
-        return QnUuid();
+        return {};
 
     const auto from = findIdSeparator(id, '_');
     if (!from)
-        return QnUuid();
+        return {};
 
     const auto to = findIdSeparator(id, '.');
     return QnUuid::fromStringSafe(id.mid(*from + 1, to ? *to : -1));
+}
+
+void BookmarkIdV3::setIds(const QnUuid& bookmarkId, const QnUuid& serverId)
+{
+    id = bookmarkId.toSimpleString() + '_' + serverId.toSimpleString();
+}
+
+QnUuid BookmarkIdV3::bookmarkId() const
+{
+    return bookmarkIdFromCombined(id);
+}
+
+QnUuid BookmarkIdV3::serverId() const
+{
+    return serverIdFromCombined(id);
 }
 
 } // namespace nx::vms::api

@@ -13,24 +13,24 @@
 #include <utils/camera/bookmark_helpers.h>
 #include <utils/camera/camera_names_watcher.h>
 
+namespace {
+
 using namespace std::chrono;
 using namespace nx::vms::common;
 
-namespace {
-
 using BinaryPredicate =
-    std::function<bool (const QnCameraBookmark& first, const QnCameraBookmark& second)> ;
+    std::function<bool (const CameraBookmark& first, const CameraBookmark& second)> ;
 
 QnMultiServerCameraBookmarkList sortEachList(
     SystemContext* systemContext,
     QnMultiServerCameraBookmarkList sources,
-    const QnBookmarkSortOrder& sortProp)
+    const BookmarkSortOrder& sortProp)
 {
     const auto resourcePool = systemContext->resourcePool();
     for (auto& source: sources)
         nx::vms::common::sortBookmarks(source, sortProp.column, sortProp.order, resourcePool);
 
-    return std::move(sources);
+    return sources;
 }
 
 using ItersLinkedList = QLinkedList<QnCameraBookmarkList::const_iterator>;
@@ -48,14 +48,15 @@ QnCameraBookmarkList getSparseByIters(ItersLinkedList& bookmarkIters, int limit)
 {
     NX_ASSERT(limit > 0, "Limit should be greater than 0!");
     if (limit <= 0)
-        return QnCameraBookmarkList();
+        return {};
 
     if (bookmarkIters.size() <= limit)
         return createListFromIters(bookmarkIters);
 
     // Thin out bookmarks with calculated step
     const int removeCount = (bookmarkIters.size() - limit);
-    const double removeStep = static_cast<double>(removeCount) / static_cast<double>(bookmarkIters.size());
+    const double removeStep =
+        static_cast<double>(removeCount) / static_cast<double>(bookmarkIters.size());
 
     double counter = 0.0;
     double prevCounter = 0.0;
@@ -64,7 +65,8 @@ QnCameraBookmarkList getSparseByIters(ItersLinkedList& bookmarkIters, int limit)
     {
         if (qFuzzyBetween(prevCounter, removedCounter, counter))
         {
-            it = bookmarkIters.erase(it); // We have to remove item if next integer counter is reached
+            // We have to remove item if next integer counter is reached
+            it = bookmarkIters.erase(it);
             removedCounter += 1.0;
         }
         else
@@ -82,9 +84,8 @@ QnCameraBookmarkList getSparseBookmarks(
     int limit,
     const BinaryPredicate &pred)
 {
-    NX_ASSERT(limit > 0, "Limit should be greater than 0!");
-    if (limit <= 0)
-        return QnCameraBookmarkList();
+    if (!NX_ASSERT(limit > 0, "Limit should be greater than 0!"))
+        return {};
 
     if (!minVisibleLength || (bookmarks.size() <= limit))
         return bookmarks;
@@ -111,36 +112,37 @@ QnCameraBookmarkList getSparseBookmarks(
 
     return nx::utils::algorithm::merge_sorted_lists(std::move(toMergeLists), pred, limit);
 }
+
 } // namespace
 
+namespace nx::vms::common {
 
-QnBookmarkSortOrder::QnBookmarkSortOrder(nx::vms::api::BookmarkSortField column, Qt::SortOrder order):
-    column(column),
-    order(order)
+BookmarkSortOrder::BookmarkSortOrder(
+    nx::vms::api::BookmarkSortField column, Qt::SortOrder order):
+    column(column), order(order)
 {
 }
 
-const QnBookmarkSortOrder QnBookmarkSortOrder::defaultOrder = QnBookmarkSortOrder();
+const BookmarkSortOrder BookmarkSortOrder::defaultOrder = BookmarkSortOrder();
 
-const QString QnCameraBookmark::kGuidParam("guid");
-const QString QnCameraBookmark::kCreationStartTimeParam("creationStartTimeMs");
-const QString QnCameraBookmark::kCreationEndTimeParam("creationEndTimeMs");
+const QString CameraBookmark::kGuidParam("guid");
+const QString CameraBookmark::kCreationStartTimeParam("creationStartTimeMs");
+const QString CameraBookmark::kCreationEndTimeParam("creationEndTimeMs");
 
-
-milliseconds QnCameraBookmark::endTime() const
+milliseconds CameraBookmark::endTime() const
 {
     return startTimeMs + durationMs;
 }
 
-bool QnCameraBookmark::isNull() const
+bool CameraBookmark::isNull() const
 {
     return guid.isNull();
 }
 
-QString QnCameraBookmark::tagsToString(const QnCameraBookmarkTags &tags, const QString &delimiter)
+QString CameraBookmark::tagsToString(const QnCameraBookmarkTags& tags, const QString& delimiter)
 {
     QStringList validTags;
-    for (const QString &tag: tags)
+    for (const QString& tag: tags)
     {
         QString trimmed = tag.trimmed();
         if (!trimmed.isEmpty())
@@ -149,47 +151,46 @@ QString QnCameraBookmark::tagsToString(const QnCameraBookmarkTags &tags, const Q
     return validTags.join(delimiter);
 }
 
-milliseconds QnCameraBookmark::creationTime() const
+milliseconds CameraBookmark::creationTime() const
 {
     return creatorId.isNull() ? startTimeMs : creationTimeStampMs;
 }
 
-bool QnCameraBookmark::isCreatedBySystem() const
+bool CameraBookmark::shareable() const
+{
+    return share.shareable;
+}
+
+bool CameraBookmark::createdBySystem() const
 {
     return creatorId == systemUserId();
 }
 
-QnUuid QnCameraBookmark::systemUserId()
+QnUuid CameraBookmark::systemUserId()
 {
+    // Unique UUID used to identify all bookmarks that are create by the system
     return QnUuid::fromStringSafe("{51723d00-51bd-4420-8116-75e5f85dfcf4}");
 }
 
-QnCameraBookmark::QnCameraBookmark():
-    creatorId(systemUserId()),
-    timeout(-1),
-    startTimeMs(0),
-    durationMs(0)
-{
-}
-
-QnCameraBookmarkList QnCameraBookmark::mergeCameraBookmarks(
-    SystemContext* systemContext,
-    const QnMultiServerCameraBookmarkList &source,
-    const QnBookmarkSortOrder &sortOrder,
+QnCameraBookmarkList CameraBookmark::mergeCameraBookmarks(SystemContext* systemContext,
+    const QnMultiServerCameraBookmarkList& source,
+    const BookmarkSortOrder& sortOrder,
     const std::optional<milliseconds>& minVisibleLength,
     int limit)
 {
     NX_ASSERT(limit > 0, "Limit should be greater than 0!");
     if (limit <= 0)
-        return QnCameraBookmarkList();
+        return {};
 
-    const auto pred = ::createBookmarkSortPredicate(sortOrder.column, sortOrder.order,
+    const auto pred = ::createBookmarkSortPredicate(sortOrder.column,
+        sortOrder.order,
         systemContext ? systemContext->resourcePool() : nullptr); //< For unit test flexibility.
 
-    const int intermediateLimit = (minVisibleLength ? QnCameraBookmarkSearchFilter::kNoLimit : limit);
+    const int intermediateLimit =
+        minVisibleLength ? CameraBookmarkSearchFilter::kNoLimit : limit;
     QnCameraBookmarkList result;
 
-    switch(sortOrder.column)
+    switch (sortOrder.column)
     {
         case nx::vms::api::BookmarkSortField::creationTime:
         case nx::vms::api::BookmarkSortField::creator:
@@ -197,7 +198,8 @@ QnCameraBookmarkList QnCameraBookmark::mergeCameraBookmarks(
         case nx::vms::api::BookmarkSortField::tags:
         {
             auto bookmarksList = sortEachList(systemContext, source, sortOrder);
-            result = nx::utils::algorithm::merge_sorted_lists(std::move(bookmarksList), pred, limit);
+            result =
+                nx::utils::algorithm::merge_sorted_lists(std::move(bookmarksList), pred, limit);
             break;
         }
         default:
@@ -213,20 +215,24 @@ QnCameraBookmarkList QnCameraBookmark::mergeCameraBookmarks(
     return getSparseBookmarks(result, minVisibleLength, limit, pred);
 }
 
-QnCameraBookmarkTagList QnCameraBookmarkTag::mergeCameraBookmarkTags(const QnMultiServerCameraBookmarkTagList &source, int limit) {
+QnCameraBookmarkTagList CameraBookmarkTag::mergeCameraBookmarkTags(
+    const QnMultiServerCameraBookmarkTagList& source, int limit)
+{
     NX_ASSERT(limit > 0, "Limit must be correct");
     if (limit <= 0)
-        return QnCameraBookmarkTagList();
+        return {};
 
     QnMultiServerCameraBookmarkTagList nonEmptyLists;
-    for (const auto &list: source)
+    for (const auto& list: source)
+    {
         if (!list.isEmpty())
             nonEmptyLists.push_back(list);
+    }
 
     if (nonEmptyLists.empty())
-        return QnCameraBookmarkTagList();
+        return {};
 
-    if(nonEmptyLists.size() == 1)
+    if (nonEmptyLists.size() == 1)
     {
         QnCameraBookmarkTagList result = nonEmptyLists.front();
         if (result.size() > limit)
@@ -236,16 +242,16 @@ QnCameraBookmarkTagList QnCameraBookmarkTag::mergeCameraBookmarkTags(const QnMul
 
     QnCameraBookmarkTagList result;
     int maxSize = 0;
-    for (const auto &list: nonEmptyLists)
+    for (const auto& list: nonEmptyLists)
         maxSize += list.size();
     result.reserve(std::min(limit, maxSize));
 
     QMap<QString, int> mergedTags;
-    for (const QnCameraBookmarkTagList &s: nonEmptyLists)
+    for (const auto& list: nonEmptyLists)
     {
-        for (const auto &tag: s)
+        for (const auto& tag: list)
         {
-            auto &currentCount = mergedTags[tag.name];
+            auto& currentCount = mergedTags[tag.name];
             currentCount += tag.count;
         }
     }
@@ -254,31 +260,27 @@ QnCameraBookmarkTagList QnCameraBookmarkTag::mergeCameraBookmarkTags(const QnMul
     for (auto it = mergedTags.begin(); it != mergedTags.end(); ++it)
         sortedTags.insert(it.value(), it.key());
 
-    for (auto it = sortedTags.begin(); it != sortedTags.end(); ++it) {
+    for (auto it = sortedTags.begin(); it != sortedTags.end(); ++it)
+    {
         if (result.size() >= limit)
             break;
 
-        result.push_front(QnCameraBookmarkTag(it.value(), it.key()));
+        result.push_front(CameraBookmarkTag{it.value(), it.key()});
     }
 
     return result;
 }
 
-
-bool QnCameraBookmark::isValid() const {
-    return !isNull()
-        && !name.isEmpty()
-        && !cameraId.isNull()
-        && durationMs > 0ms;
+bool CameraBookmark::isValid() const
+{
+    return !isNull() && !name.isEmpty() && !cameraId.isNull() && durationMs > 0ms;
 }
 
 void serialize(nx::reflect::json::SerializationContext* ctx, const QnCameraBookmarkTags& value)
 {
     ctx->composer.startArray();
     for (const auto& it: value)
-    {
         nx::reflect::BasicSerializer::serializeAdl(ctx, it);
-    }
     ctx->composer.endArray();
 }
 
@@ -304,54 +306,55 @@ nx::reflect::DeserializationResult deserialize(
     return true;
 }
 
-bool operator<(const QnCameraBookmark &first, const QnCameraBookmark &other)
+bool operator<(const CameraBookmark& first, const CameraBookmark& other)
 {
     if (first.startTimeMs == other.startTimeMs)
         return first.guid.toRfc4122() < other.guid.toRfc4122();
     return first.startTimeMs < other.startTimeMs;
 }
 
-bool operator<(milliseconds first, const QnCameraBookmark &other)
+bool operator<(milliseconds first, const CameraBookmark& other)
 {
     return first < other.startTimeMs;
 }
 
-bool operator<(const QnCameraBookmark &first, milliseconds other)
+bool operator<(const CameraBookmark& first, milliseconds other)
 {
     return first.startTimeMs < other;
 }
 
-QDebug operator<<(QDebug dbg, const QnCameraBookmark &bookmark)
+QDebug operator<<(QDebug dbg, const CameraBookmark& bookmark)
 {
     if (bookmark.durationMs > 0ms)
     {
-        dbg.nospace()
-            << "QnCameraBookmark("
-            << QDateTime::fromMSecsSinceEpoch(bookmark.startTimeMs.count()).toString(lit("dd hh:mm"))
-            << " - "
-            << QDateTime::fromMSecsSinceEpoch((bookmark.startTimeMs + bookmark.durationMs).count()).
-                toString(lit("dd hh:mm"))
-            << ')';
+        dbg.nospace() << "CameraBookmark("
+                      << QDateTime::fromMSecsSinceEpoch(bookmark.startTimeMs.count())
+                             .toString(lit("dd hh:mm"))
+                      << " - "
+                      << QDateTime::fromMSecsSinceEpoch(
+                             (bookmark.startTimeMs + bookmark.durationMs).count())
+                             .toString(lit("dd hh:mm"))
+                      << ')';
     }
     else
     {
-        dbg.nospace()
-            << "QnCameraBookmark INSTANT ("
-            << QDateTime::fromMSecsSinceEpoch(bookmark.startTimeMs.count()).toString(lit("dd hh:mm"))
-            << ')';
+        dbg.nospace() << "CameraBookmark INSTANT ("
+                      << QDateTime::fromMSecsSinceEpoch(bookmark.startTimeMs.count())
+                             .toString(lit("dd hh:mm"))
+                      << ')';
     }
     dbg.space() << "timeout" << bookmark.timeout.count();
     dbg.space() << bookmark.name << bookmark.description;
-    dbg.space() << QnCameraBookmark::tagsToString(bookmark.tags);
+    dbg.space() << CameraBookmark::tagsToString(bookmark.tags);
     return dbg.space();
 }
 
-QString QnCameraBookmarkSearchFilter::toString() const
+QString CameraBookmarkSearchFilter::toString() const
 {
     return QString::fromStdString(nx::reflect::json::serialize(*this));
 }
 
-bool QnCameraBookmarkSearchFilter::isValid() const
+bool CameraBookmarkSearchFilter::isValid() const
 {
     if (limit <= 0)
         return false;
@@ -359,10 +362,10 @@ bool QnCameraBookmarkSearchFilter::isValid() const
     if (startTimeMs != milliseconds::zero() && endTimeMs != milliseconds::zero())
         return startTimeMs <= endTimeMs;
 
-     return true;
+    return true;
 }
 
-bool QnCameraBookmarkSearchFilter::checkBookmark(const QnCameraBookmark &bookmark) const
+bool CameraBookmarkSearchFilter::checkBookmark(const CameraBookmark& bookmark) const
 {
     if (startTimeMs != milliseconds::zero() && bookmark.endTime() < startTimeMs)
         return false;
@@ -373,9 +376,9 @@ bool QnCameraBookmarkSearchFilter::checkBookmark(const QnCameraBookmark &bookmar
     return text.isEmpty() || BookmarkTextFilter(text).match(bookmark);
 }
 
-const int QnCameraBookmarkSearchFilter::kNoLimit = std::numeric_limits<int>::max();
+const int CameraBookmarkSearchFilter::kNoLimit = std::numeric_limits<int>::max();
 
-QString bookmarkToString(const QnCameraBookmark& bookmark)
+QString bookmarkToString(const CameraBookmark& bookmark)
 {
     return bookmark.name;
 }
@@ -383,7 +386,7 @@ QString bookmarkToString(const QnCameraBookmark& bookmark)
 QVariantList bookmarkListToVariantList(const QnCameraBookmarkList& bookmarks)
 {
     QVariantList result;
-    for  (const auto& b : bookmarks)
+    for (const auto& b: bookmarks)
         result << QVariant::fromValue(b);
     return result;
 }
@@ -391,19 +394,37 @@ QVariantList bookmarkListToVariantList(const QnCameraBookmarkList& bookmarks)
 QnCameraBookmarkList variantListToBookmarkList(const QVariantList& list)
 {
     QnCameraBookmarkList result;
-    for  (const auto& v : list)
-        result << v.value<QnCameraBookmark>();
+    for (const auto& v: list)
+        result << v.value<CameraBookmark>();
     return result;
 }
 
-void serialize_field(const QnCameraBookmarkTags& /*value*/, QVariant* /*target*/) {return ;}
-void deserialize_field(const QVariant& /*value*/, QnCameraBookmarkTags* /*target*/) {return ;}
+void serialize_field(const QnCameraBookmarkTags& /*value*/, QVariant* /*target*/)
+{
+}
+void deserialize_field(const QVariant& /*value*/, QnCameraBookmarkTags* /*target*/)
+{
+}
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnBookmarkSortOrder, (json), QnBookmarkSortOrder_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    QnCameraBookmarkSearchFilter, (json), QnCameraBookmarkSearchFilter_Fields)
+void serialize_field(const BookmarkShareableParams& from, QVariant* to)
+{
+    *to = QString(QJson::serialized(from));
+}
+void deserialize_field(const QVariant& from, BookmarkShareableParams* to)
+{
+    QJson::deserialize(from.toString(), to);
+}
 
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(BookmarkSortOrder, (json), BookmarkSortOrder_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    QnCameraBookmark, (sql_record)(json)(ubjson)(xml)(csv_record), QnCameraBookmark_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnCameraBookmarkTag,
-    (sql_record)(json)(ubjson)(xml)(csv_record), QnCameraBookmarkTag_Fields)
+    CameraBookmarkSearchFilter, (json), CameraBookmarkSearchFilter_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(BookmarkShareableParams,
+    (sql_record) (json) (ubjson) (xml) (csv_record),
+    BookmarkShareableParams_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
+    CameraBookmark, (sql_record) (json) (ubjson) (xml) (csv_record), CameraBookmark_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
+    CameraBookmarkTag,
+    (sql_record) (json) (ubjson) (xml) (csv_record), CameraBookmarkTag_Fields)
+
+} // namespace nx::vms::common

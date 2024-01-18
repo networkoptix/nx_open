@@ -5,14 +5,13 @@
 
 class QnResourcePool;
 
+namespace nx::vms::common {
 /** Forward declaration. */
-NX_VMS_COMMON_API std::function<bool(const QnCameraBookmark&, const QnCameraBookmark&)>
+NX_VMS_COMMON_API std::function<bool(const CameraBookmark&, const CameraBookmark&)>
     createBookmarkSortPredicate(
         nx::vms::api::BookmarkSortField sortField,
         Qt::SortOrder sortOrder,
         QnResourcePool* resourcePool);
-
-namespace nx::vms::common {
 
 /** Forward declaration. */
 NX_VMS_COMMON_API std::function<bool(const nx::vms::api::BookmarkV1&, const nx::vms::api::BookmarkV1&)>
@@ -41,10 +40,10 @@ inline BookmarkType createBookmarkAtTimePoint(
 }
 
 template<>
-inline QnCameraBookmark createBookmarkAtTimePoint<QnCameraBookmark>(
+inline CameraBookmark createBookmarkAtTimePoint<CameraBookmark>(
     const QnUuid& id, const std::chrono::milliseconds& time)
 {
-    QnCameraBookmark result;
+    CameraBookmark result;
     result.guid = id;
     result.startTimeMs = time;
     return result;
@@ -80,7 +79,7 @@ inline std::function<bool (const BookmarkType&, const BookmarkType&)> bookmarkSo
     Qt::SortOrder sortOrder,
     QnResourcePool* resourcePool)
 {
-    return ::createBookmarkSortPredicate(sortField, sortOrder, resourcePool);
+    return nx::vms::common::createBookmarkSortPredicate(sortField, sortOrder, resourcePool);
 }
 
 template<>
