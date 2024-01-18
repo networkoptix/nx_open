@@ -875,7 +875,7 @@
     </message>
     <message>
       <source>Audio</source>
-      <translation>オーディオ</translation>
+      <translation>音声</translation>
     </message>
     <message>
       <source>Enable audio</source>
@@ -967,6 +967,10 @@
     <message>
       <source>This system is connected to</source>
       <translation>このシステムは次のアカウントと連携しています。</translation>
+    </message>
+    <message>
+      <source>No connection</source>
+      <translation>接続できません</translation>
     </message>
   </context>
   <context>
@@ -1383,7 +1387,7 @@
     </message>
     <message>
       <source>Audio Input</source>
-      <translation>オーディオ入力</translation>
+      <translation>音声入力</translation>
     </message>
     <message>
       <source>First Source</source>

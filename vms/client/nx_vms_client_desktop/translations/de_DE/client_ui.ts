@@ -968,6 +968,10 @@
       <source>This system is connected to</source>
       <translation>Dieses System ist verbunden mit</translation>
     </message>
+    <message>
+      <source>No connection</source>
+      <translation>Keine Verbindung</translation>
+    </message>
   </context>
   <context>
     <name>ConnectingToServerDialog</name>

@@ -2972,12 +2972,6 @@ Khóa giấy phép: %2</translation>
   <context>
     <name>QnCloudManagementWidget</name>
     <message>
-      <source>Connect to your Systems
-from anywhere with any
-devices</source>
-      <translation>Kết nối với Hệ thống của bạn từ mọi nơi với bất kỳ thiết bị nào</translation>
-    </message>
-    <message>
       <source>Disconnect System from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Hệ thống đã ngắt kết nối từ %1</translation>
@@ -2991,23 +2985,6 @@ devices</source>
       <source>Connect System to %1...</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Kết nối Hệ thống với %1...</translation>
-    </message>
-    <message>
-      <source>Create %1
-account</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Tạo tài khoản %1</translation>
-    </message>
-    <message>
-      <source>Connect System
-to %1</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Kết nối Hệ thống với %1</translation>
-    </message>
-    <message>
-      <source>Learn more about %1</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Tìm hiểu thêm về %1</translation>
     </message>
     <message>
       <source>Enter your account password to disconnect System from %1</source>
@@ -3053,6 +3030,11 @@ to %1</source>
     <message>
       <source>System will be accessible only through local network.</source>
       <translation>Hệ thống sẽ chỉ có thể truy cập thông qua mạng nội bộ.</translation>
+    </message>
+    <message>
+      <source>There is currently no connection between your system and %1.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">There is currently no connection between your system and %1.</translation>
     </message>
   </context>
   <context>

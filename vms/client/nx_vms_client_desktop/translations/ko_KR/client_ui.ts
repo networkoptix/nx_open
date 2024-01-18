@@ -968,6 +968,10 @@
       <source>This system is connected to</source>
       <translation>이 시스템은 다음과 연결되어 있습니다.</translation>
     </message>
+    <message>
+      <source>No connection</source>
+      <translation type="unfinished">No connection</translation>
+    </message>
   </context>
   <context>
     <name>ConnectingToServerDialog</name>
