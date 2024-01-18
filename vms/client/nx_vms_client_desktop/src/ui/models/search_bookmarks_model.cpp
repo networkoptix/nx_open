@@ -319,7 +319,7 @@ QVariant QnSearchBookmarksModelPrivate::getData(const QModelIndex& index, int ro
             if (bookmark.creatorId.isNull())
                 return QVariant();
 
-            return bookmark.isCreatedBySystem()
+            return bookmark.createdBySystem()
                 ? qnResIconCache->icon(QnResourceIconCache::CurrentSystem)
                 : qnResIconCache->icon(QnResourceIconCache::User);
         }

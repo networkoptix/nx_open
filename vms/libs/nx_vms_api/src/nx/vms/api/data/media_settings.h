@@ -18,6 +18,15 @@ namespace nx::vms::api {
 
 struct NX_VMS_API MediaSettings
 {
+    NX_REFLECTION_ENUM_CLASS_IN_CLASS(ValidationResult,
+        nullId,
+        invalidStreamIndex,
+        invalidRotation,
+        invalidDewarpingPanofactor,
+        invalidZoom,
+        isValid
+    );
+
     /**%apidoc
      * Device id (can be obtained from "id", "physicalId" or "logicalId" field via
      * /rest/v{1-}/devices) or MAC address (not supported for certain Devices).
@@ -100,7 +109,11 @@ struct NX_VMS_API MediaSettings
      */
     bool panoramic = true;
 
+    ValidationResult validateMediaSettings() const;
+
     bool isValid() const;
+
+    bool isLiveRequest() const;
 };
 #define MediaSettings_Fields (id)(stream)(positionUs)(resolution)(resolutionWhenTranscoding)\
     (rotation)(dewarping)(dewarpingXangle)(dewarpingYangle)(dewarpingFov)(dewarpingPanofactor)(zoom)

@@ -4,38 +4,50 @@
 
 namespace nx::vms::api {
 
-bool MediaSettings::isValid() const
+MediaSettings::ValidationResult MediaSettings::validateMediaSettings() const
 {
     if (id.isNull())
-        return false;
+        return ValidationResult::nullId;
+
     if (stream != nx::vms::api::StreamIndex::undefined
         && stream != nx::vms::api::StreamIndex::primary
         && stream != nx::vms::api::StreamIndex::secondary)
     {
-        return false;
+        return ValidationResult::invalidStreamIndex;
     }
+
     if (rotation != "auto"
         && rotation != "0"
         && rotation != "90"
         && rotation != "180"
         && rotation != "270")
     {
-        return false;
+        return ValidationResult::invalidRotation;
     }
-    auto validateFloat = [](double value) -> bool
-        {
-            return value >= 0.0 && value <= 1.0;
-        };
 
     if (dewarpingPanofactor != 1 && dewarpingPanofactor != 2 && dewarpingPanofactor != 4)
-        return false;
+        return ValidationResult::invalidDewarpingPanofactor;
+
     if (zoom)
     {
         for (const auto value: {zoom->x(), zoom->y(), zoom->width(), zoom->height()})
-            if (!validateFloat(value))
-                return false;
+        {
+            if (value < 0.0 || value > 1.0)
+                return ValidationResult::invalidZoom;
+        }
     }
-    return true;
+
+    return ValidationResult::isValid;
+}
+
+bool MediaSettings::isValid() const
+{
+    return validateMediaSettings() == ValidationResult::isValid;
+}
+
+bool MediaSettings::isLiveRequest() const
+{
+    return !positionUs;
 }
 
 } // namespace nx::vms::api

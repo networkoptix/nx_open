@@ -18,7 +18,9 @@ namespace Ui { class ExportSettingsDialog; }
 class QnMediaResourceWidget;
 struct QnTimePeriod;
 class QnWorkbenchContext;
-struct QnCameraBookmark;
+namespace nx::vms::common { struct CameraBookmark; }
+using QnCameraBookmark = nx::vms::common::CameraBookmark;
+
 namespace nx::vms::common { struct LayoutItemData; }
 
 namespace nx::vms::client::desktop {

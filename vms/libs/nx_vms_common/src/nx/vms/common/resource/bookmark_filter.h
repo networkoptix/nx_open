@@ -15,8 +15,8 @@ class NX_VMS_COMMON_API BookmarkTextFilter
 public:
     BookmarkTextFilter(const QString& text);
 
-    bool match(const QnCameraBookmark& bookmark) const;
-    bool operator()(const QnCameraBookmark& bookmark) const;
+    bool match(const CameraBookmark& bookmark) const;
+    bool operator()(const CameraBookmark& bookmark) const;
 
 private:
     std::vector<std::pair<QString, QRegularExpression>> m_words;

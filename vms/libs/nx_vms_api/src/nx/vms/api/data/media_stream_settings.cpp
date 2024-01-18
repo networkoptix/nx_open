@@ -8,6 +8,16 @@ namespace nx::vms::api {
 
 const QString MediaStreamSettings::kMpjpegBoundary = "mjpeg_frame";
 
+MediaStreamSettings::ValidationResult MediaStreamSettings::validateStreamSettings() const
+{
+    auto mimeType = getMimeType(nx::toString(format));
+
+    if (mimeType.isEmpty())
+        return ValidationResult::invalidFormat;
+
+    return ValidationResult::isValid;
+}
+
 QByteArray MediaStreamSettings::getMimeType(const QString& format)
 {
     if (format == "mkv")
@@ -18,9 +28,7 @@ QByteArray MediaStreamSettings::getMimeType(const QString& format)
         return "video/mp2t";
     else if (format == "mp4")
         return "video/mp4";
-    else if (format == "3gp" || format == "_3gp")
-        return "video/3gp";
-    else if (format == "rtp")
+    else if (format == "3gp" || format == "_3gp" || format == "rtp")
         return "video/3gp";
     else if (format == "flv")
         return "video/x-flv";
@@ -29,9 +37,10 @@ QByteArray MediaStreamSettings::getMimeType(const QString& format)
     else if (format == "mpjpeg")
         return "multipart/x-mixed-replace;boundary=" + kMpjpegBoundary.toUtf8();
     else
-        return QByteArray();
+        return {};
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(MediaStreamSettings, (json), MediaStreamSettings_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(BookmarkStreamSettings, (json), BookmarkStreamSettings_Fields)
 
 } // namespace nx::vms::api

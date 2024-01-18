@@ -2,8 +2,6 @@
 
 #include "bookmark_sort.h"
 
-#include <algorithm>
-
 #include <QtCore/QCoreApplication>
 
 #include <api/helpers/camera_id_helper.h>
@@ -17,9 +15,10 @@
 #include <nx/utils/log/format.h>
 #include <nx/vms/api/data/bookmark_models.h>
 
-using nx::vms::api::BookmarkSortField;
-
 namespace {
+
+using namespace nx::vms::common;
+using nx::vms::api::BookmarkSortField;
 
 struct BookmarkSort //< Just a context for translation functions.
 {
@@ -28,9 +27,9 @@ protected:
     static QString creatorName(const QnUuid& creatorId, QnResourcePool* resourcePool)
     {
         if (creatorId.isNull())
-            return QString();
+            return {};
 
-        if (creatorId == QnCameraBookmark::systemUserId())
+        if (creatorId == CameraBookmark::systemUserId())
         {
             return BookmarkSort::tr(
                 "System Event", "Shows that the bookmark was created by a system event");
@@ -67,7 +66,8 @@ struct BookmarkFacade: BookmarkSort
         if (!NX_ASSERT(resourcePool))
             return {};
 
-        const auto cameraResource = resourcePool->getResourceById<QnVirtualCameraResource>(bookmark.deviceId);
+        const auto cameraResource =
+            resourcePool->getResourceById<QnVirtualCameraResource>(bookmark.deviceId);
         return cameraResource
             ? QnResourceDisplayInfo(cameraResource).toString(Qn::RI_NameOnly)
             : nx::format("<%1>", BookmarkSort::tr("Removed camera")).toQString();
@@ -75,9 +75,9 @@ struct BookmarkFacade: BookmarkSort
 };
 
 template<>
-struct BookmarkFacade<QnCameraBookmark>: BookmarkSort
+struct BookmarkFacade<CameraBookmark>: BookmarkSort
 {
-    using Bookmark = QnCameraBookmark;
+    using Bookmark = CameraBookmark;
 
     static const auto& id(const Bookmark& bookmark) { return bookmark.guid; }
     static const auto& name(const Bookmark& bookmark) { return bookmark.name; }
@@ -171,17 +171,17 @@ std::function<bool(const Bookmark&, const Bookmark&)>
 
 } // namespace
 
-std::function<bool(const QnCameraBookmark&, const QnCameraBookmark&)>
+namespace nx::vms::common {
+
+std::function<bool(const CameraBookmark&, const CameraBookmark&)>
     createBookmarkSortPredicate(
         BookmarkSortField sortField,
         Qt::SortOrder sortOrder,
         QnResourcePool* resourcePool)
 {
-    return createGenericBookmarkSortPredicate<QnCameraBookmark>(
+    return createGenericBookmarkSortPredicate<CameraBookmark>(
         sortField, sortOrder == Qt::AscendingOrder, resourcePool);
 }
-
-namespace nx::vms::common {
 
 std::function<bool(const nx::vms::api::BookmarkV1&, const nx::vms::api::BookmarkV1&)>
     createBookmarkSortPredicateV1(
@@ -203,4 +203,4 @@ std::function<bool(const nx::vms::api::BookmarkV3&, const nx::vms::api::Bookmark
         sortField, sortOrder == Qt::AscendingOrder, resourcePool);
 }
 
-} // namespace nx::vms::api
+} // namespace nx::vms::common

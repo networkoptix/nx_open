@@ -16,6 +16,11 @@ struct NX_VMS_API MediaStreamSettings: public MediaSettings
     static const QString kMpjpegBoundary;
     static constexpr int kDefaultMaxCachedFrames = 1;
 
+    NX_REFLECTION_ENUM_CLASS_IN_CLASS(ValidationResult,
+        invalidFormat,
+        isValid
+    );
+
     NX_REFLECTION_ENUM_CLASS_IN_CLASS(Format,
         webm,
         mpegts,
@@ -88,6 +93,9 @@ struct NX_VMS_API MediaStreamSettings: public MediaSettings
      */
     bool download = false;
 
+    ValidationResult validateStreamSettings() const;
+    QString getStreamingFormat() const;
+
     static QByteArray getMimeType(const QString& format);
 };
 #define MediaStreamSettings_Fields MediaSettings_Fields(format)(quality)(endPositionUs)\
@@ -95,5 +103,14 @@ struct NX_VMS_API MediaStreamSettings: public MediaSettings
     (durationS)(signature)(utcTimestamps)(continuousTimestamps)(download)
 QN_FUSION_DECLARE_FUNCTIONS(MediaStreamSettings, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(MediaStreamSettings, MediaStreamSettings_Fields)
+
+struct NX_VMS_API BookmarkStreamSettings: public MediaStreamSettings
+{
+    QString bookmarkId;
+    std::optional<std::string> password;
+};
+#define BookmarkStreamSettings_Fields MediaStreamSettings_Fields(bookmarkId)(password)
+QN_FUSION_DECLARE_FUNCTIONS(BookmarkStreamSettings, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(BookmarkStreamSettings, BookmarkStreamSettings_Fields)
 
 } // namespace nx::vms::api
