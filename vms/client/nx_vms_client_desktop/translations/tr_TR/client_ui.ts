@@ -968,6 +968,10 @@
       <source>This system is connected to</source>
       <translation>Sistem buna bağlandı</translation>
     </message>
+    <message>
+      <source>No connection</source>
+      <translation>Bağlantı yok</translation>
+    </message>
   </context>
   <context>
     <name>ConnectingToServerDialog</name>

@@ -3010,12 +3010,6 @@ License Key: %2</translation>
   <context>
     <name>QnCloudManagementWidget</name>
     <message>
-      <source>Connect to your Systems
-from anywhere with any
-devices</source>
-      <translation>U kunt nu verbinding maken met uw systemen waar u maar wilt en met al uw apparaten</translation>
-    </message>
-    <message>
       <source>Disconnect System from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Ontkoppel het systeem van %1</translation>
@@ -3029,23 +3023,6 @@ devices</source>
       <source>Connect System to %1...</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Systeem verbinden met %1...</translation>
-    </message>
-    <message>
-      <source>Create %1
-account</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Maak %1</translation>
-    </message>
-    <message>
-      <source>Connect System
-to %1</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Verbind systeem met %1</translation>
-    </message>
-    <message>
-      <source>Learn more about %1</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Meer informatie over %1</translation>
     </message>
     <message>
       <source>Enter your account password to disconnect System from %1</source>
@@ -3091,6 +3068,11 @@ to %1</source>
     <message>
       <source>System will be accessible only through local network.</source>
       <translation>Systeem zal alleen toegankelijk zijn via het lokale netwerk.</translation>
+    </message>
+    <message>
+      <source>There is currently no connection between your system and %1.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">There is currently no connection between your system and %1.</translation>
     </message>
   </context>
   <context>

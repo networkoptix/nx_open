@@ -3086,12 +3086,6 @@ Klucz licencyjny: %2</translation>
   <context>
     <name>QnCloudManagementWidget</name>
     <message>
-      <source>Connect to your Systems
-from anywhere with any
-devices</source>
-      <translation>Podłącz się do systemów z dowolnego miejsca i z dowolnych urządzeń</translation>
-    </message>
-    <message>
       <source>Disconnect System from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Odłącz system od %1</translation>
@@ -3105,23 +3099,6 @@ devices</source>
       <source>Connect System to %1...</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Podłącz system do %1...</translation>
-    </message>
-    <message>
-      <source>Create %1
-account</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Utwórz konto %1</translation>
-    </message>
-    <message>
-      <source>Connect System
-to %1</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Podłącz system do %1</translation>
-    </message>
-    <message>
-      <source>Learn more about %1</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Dowiedz się więcej o %1</translation>
     </message>
     <message>
       <source>Enter your account password to disconnect System from %1</source>
@@ -3167,6 +3144,11 @@ to %1</source>
     <message>
       <source>System will be accessible only through local network.</source>
       <translation>System będzie dostępny tylko w sieci lokalnej.</translation>
+    </message>
+    <message>
+      <source>There is currently no connection between your system and %1.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">There is currently no connection between your system and %1.</translation>
     </message>
   </context>
   <context>
@@ -13056,7 +13038,7 @@ Nie przypinaj tego certyfikatu, jeśli nie zmodyfikowałeś %2 certyfikatu SSL s
     </message>
     <message>
       <source>Value</source>
-      <translation type="unfinished">Value</translation>
+      <translation>Wartość</translation>
     </message>
   </context>
   <context>

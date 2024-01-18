@@ -3010,14 +3010,6 @@ Lisensnøkkel: %2</translation>
   <context>
     <name>QnCloudManagementWidget</name>
     <message>
-      <source>Connect to your Systems
-from anywhere with any
-devices</source>
-      <translation>Koble til systemene
-fra hvor som helst med
-enhet</translation>
-    </message>
-    <message>
       <source>Disconnect System from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Koble systemet fra %1</translation>
@@ -3031,25 +3023,6 @@ enhet</translation>
       <source>Connect System to %1...</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Koble systemet til %1...</translation>
-    </message>
-    <message>
-      <source>Create %1
-account</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Opprett %1
-konto</translation>
-    </message>
-    <message>
-      <source>Connect System
-to %1</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Koble System
-til %1</translation>
-    </message>
-    <message>
-      <source>Learn more about %1</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Lær mer om %1</translation>
     </message>
     <message>
       <source>Enter your account password to disconnect System from %1</source>
@@ -3095,6 +3068,11 @@ til %1</translation>
     <message>
       <source>System will be accessible only through local network.</source>
       <translation>Systemet vil kun være tilgjengelig via lokalt nettverk.</translation>
+    </message>
+    <message>
+      <source>There is currently no connection between your system and %1.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">There is currently no connection between your system and %1.</translation>
     </message>
   </context>
   <context>

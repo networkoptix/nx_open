@@ -968,6 +968,10 @@
       <source>This system is connected to</source>
       <translation>Hệ thống này được kết nối với</translation>
     </message>
+    <message>
+      <source>No connection</source>
+      <translation>Không có kết nối</translation>
+    </message>
   </context>
   <context>
     <name>ConnectingToServerDialog</name>
