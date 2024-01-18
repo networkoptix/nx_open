@@ -35,9 +35,7 @@ signals:
 
 protected:
     virtual QSGNode* updatePaintNode(
-        QSGNode* node,
-        UpdatePaintNodeData* updatePaintNodeData) override;
-    virtual void releaseResources() override;
+        QSGNode* node, UpdatePaintNodeData* updatePaintNodeData) override;
 
 private:
     class Private;

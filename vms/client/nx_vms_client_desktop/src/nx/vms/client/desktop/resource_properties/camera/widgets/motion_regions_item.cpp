@@ -101,9 +101,4 @@ QSGNode* MotionRegionsItem::updatePaintNode(
     return d->updatePaintNode(node);
 }
 
-void MotionRegionsItem::releaseResources()
-{
-    d->releaseResources();
-}
-
 } // namespace nx::vms::client::desktop
