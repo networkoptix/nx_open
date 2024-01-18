@@ -22,6 +22,7 @@ public:
 
     int argc() const;
     char** argv();
+    const char** constArgv() const;
 
 private:
     std::vector<char*> m_args;

@@ -146,6 +146,8 @@ protected:
         ASSERT_EQ(m_issuer, m_lastVerifiedCertificate.issuer());
     }
 
+    const Response* clientResponse() { return m_client.response(); }
+
 private:
     bool verifyServerCertificate(
         nx::network::ssl::CertificateChainView chain,
@@ -233,6 +235,20 @@ TEST_F(HttpServerBuilder, multiple_listeners_on_the_same_local_port)
     assertThereAreNListenersOnGivenPort(
         settings().listeningConcurrency, settings().endpoints.front().port);
     assertListenersAreDistributedAcrossAioThreadPool();
+}
+
+TEST_F(HttpServerBuilder, extra_response_headers)
+{
+    settings().extraResponseHeaders.emplace(header::Server::NAME, compatibilityServerName());
+    settings().extraResponseHeaders.emplace("Hello", "World");
+
+    buildServer();
+    ASSERT_TRUE(server().listen());
+
+    assertServerAcceptsHttpRequests();
+
+    ASSERT_EQ(compatibilityServerName(), clientResponse()->headers.find(header::Server::NAME)->second);
+    ASSERT_EQ("World", clientResponse()->headers.find("Hello")->second);
 }
 
 } // namespace nx::network::http::server::test

@@ -217,6 +217,13 @@ protected:
         ASSERT_TRUE(m_prevResponse->headers.find(headerName) != m_prevResponse->headers.end());
     }
 
+    void thenResponseHeaderIs(const std::string& headerName, const std::string& headerValue)
+    {
+        const auto it = m_prevResponse->headers.find(headerName);
+        ASSERT_NE(m_prevResponse->headers.end(), it);
+        ASSERT_EQ(headerValue, it->second);
+    }
+
     void thenResponseDoesNotContainHeader(const std::string& headerName)
     {
         ASSERT_TRUE(m_prevResponse->headers.find(headerName) == m_prevResponse->headers.end());
@@ -288,6 +295,11 @@ protected:
     {
         return nx::network::url::Builder()
             .setScheme(urlScheme).setEndpoint(m_httpServer.serverAddress()).setPath(path);
+    }
+
+    void setExtraResponseHeaders(HttpHeaders headers)
+    {
+        m_httpServer.server().setExtraResponseHeaders(std::move(headers));
     }
 
 private:
@@ -584,6 +596,38 @@ TEST_F(HttpServerConnection, inactivity_timeout_is_prolonged)
     whenTimePasses(inactivityTimeout / 2);
 
     thenServerDoesNotCloseConnection(std::chrono::milliseconds(100));
+}
+
+TEST_F(HttpServerConnection, custom_server_header)
+{
+    HttpHeaders responseHeaders {{"Server", compatibilityServerName()}};
+    setExtraResponseHeaders(responseHeaders);
+
+    whenIssuedRequestViaRawTcp();
+
+    thenResponseHeaderIs("Server", compatibilityServerName());
+}
+
+TEST_F(HttpServerConnection, default_server_header)
+{
+    // given no custom sever header
+
+    whenIssuedRequestViaRawTcp();
+
+    thenResponseHeaderIs("Server", serverString());
+}
+
+TEST_F(HttpServerConnection, set_response_headers)
+{
+    HttpHeaders responseHeaders {
+        {"Hello", "World"},
+        {"Server", compatibilityServerName()}};
+    setExtraResponseHeaders(responseHeaders);
+
+    whenIssuedRequestViaRawTcp();
+
+    thenResponseHeaderIs("Hello", "World");
+    thenResponseHeaderIs("Server", compatibilityServerName());
 }
 
 //-------------------------------------------------------------------------------------------------

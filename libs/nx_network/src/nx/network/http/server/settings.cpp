@@ -23,16 +23,11 @@ static constexpr char kSslCertificatePath[] = "certificatePath";
 static constexpr char kSslCertificateMonitorTimeout[] = "certificateMonitorTimeout";
 static constexpr char kSslAllowedSslVersions[] = "allowedSslVersions";
 
-Settings::Settings(const char* groupName):
-    m_groupName(groupName)
-{
-}
-
-void Settings::load(const SettingsReader& settings0)
+void Settings::load(const SettingsReader& settings0, const char * groupName)
 {
     using namespace std::chrono;
 
-    QnSettingsGroupReader settings(settings0, m_groupName.c_str());
+    QnSettingsGroupReader settings(settings0, groupName);
 
     tcpBacklogSize = settings.value(kTcpBacklogSize, tcpBacklogSize).toInt();
 
@@ -52,6 +47,7 @@ void Settings::load(const SettingsReader& settings0)
     listeningConcurrency = settings.value(kListeningConcurrency, listeningConcurrency).toInt();
 
     loadSsl(settings);
+    loadHeaders(settings);
 }
 
 void Settings::loadEndpoints(
@@ -91,6 +87,22 @@ void Settings::loadSsl(const SettingsReader& settings0)
     ssl.allowedSslVersions = settings.value(
         kSslAllowedSslVersions,
         ssl.allowedSslVersions.c_str()).toString().toStdString();
+}
+
+void Settings::loadHeaders(const SettingsReader& settings)
+{
+    static constexpr char kHeaders[] = "extraResponseHeaders";
+
+    if (!settings.containsGroup(kHeaders))
+        return;
+
+    const auto args = QnSettingsGroupReader{settings, kHeaders}.allArgs();
+    for (const auto& arg : args)
+    {
+        insertOrReplaceHeader(
+            &extraResponseHeaders,
+            HttpHeader{arg.first.toStdString(), arg.second.toStdString()});
+    }
 }
 
 } // namespace nx::network::http::server

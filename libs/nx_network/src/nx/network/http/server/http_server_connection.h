@@ -98,6 +98,11 @@ public:
     void setPersistentConnectionEnabled(bool value);
 
     /**
+     * Set some HTTP headers to be sent in every response.
+     */
+    void setExtraResponseHeaders(HttpHeaders responseheaders);
+
+    /**
      * @param handler Invoked just after sending the response headers.
      */
     void setOnResponseSent(
@@ -180,6 +185,7 @@ private:
     std::optional<ChunkedStreamParser> m_chunkedBodyParser;
     bool m_isPersistent = false;
     bool m_persistentConnectionEnabled = true;
+    HttpHeaders m_extraResponseHeaders;
     std::deque<std::unique_ptr<ResponseMessageContext>> m_responseQueue;
     // The TCP connection originator endpoint or client endpoint taked from Forwarded-For or
     // X-Forwarded-For headers.

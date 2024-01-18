@@ -51,9 +51,15 @@ public:
         m_tcpBackLogSize = tcpBackLogSize;
     }
 
+    void setExtraResponseHeaders(HttpHeaders responseHeaders)
+    {
+        m_extraResponseHeaders = std::move(responseHeaders);
+    }
+
     bool listen()
     {
         initializeHttpStatisticsProvider();
+        propagateExtraResponseHeaders();
 
         return base_type::listen(m_tcpBackLogSize);
     }
@@ -97,6 +103,7 @@ private:
     int m_tcpBackLogSize = Settings::kDefaultTcpBacklogSize;
     std::vector<nx::utils::Url> m_urls;
     std::unique_ptr<SummingStatisticsProvider> m_httpStatsProvider;
+    HttpHeaders m_extraResponseHeaders;
 
     void initializeHttpStatisticsProvider()
     {
@@ -109,6 +116,15 @@ private:
 
         m_httpStatsProvider =
             std::make_unique<SummingStatisticsProvider>(std::move(providers));
+    }
+
+    void propagateExtraResponseHeaders()
+    {
+        forEachListener(
+            [this](HttpStreamSocketServer* server)
+            {
+                server->setExtraResponseHeaders(m_extraResponseHeaders);
+            });
     }
 };
 
