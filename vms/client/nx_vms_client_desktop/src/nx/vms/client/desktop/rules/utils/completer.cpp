@@ -108,7 +108,7 @@ void Completer::Private::completeTextForTextEdit(const QString& completedText)
 
 void Completer::Private::triggerCompleterForTextEdit()
 {
-    if (isCompletingInProgress || textEdit == nullptr)
+    if (isCompletingInProgress || textEdit == nullptr || !textEdit->hasFocus())
         return;
 
     updateCompleter(textEdit->textCursor().position(), textEdit->toPlainText());
@@ -154,7 +154,7 @@ void Completer::Private::updateCompleter(int cursorPosition, const QString& text
 
     const QStringView textBeforeCursor{text.data(), cursorPosition};
     const auto startOfSubstitution =
-        EventParameterHelper::getLatestEventParameterPos(textBeforeCursor.toString());
+        EventParameterHelper::getLatestEventParameterPos(textBeforeCursor, cursorPosition - 1);
     currentWord.begin = startOfSubstitution == -1 ? 0 : startOfSubstitution;
 
     const auto spaceAfterWord = text.indexOf(spacePattern, cursorPosition);

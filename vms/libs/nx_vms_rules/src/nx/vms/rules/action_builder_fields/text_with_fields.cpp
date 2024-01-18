@@ -125,8 +125,8 @@ void TextWithFields::setText(const QString& text)
         return;
 
     d->text = text;
-    d->parseText();
     emit textChanged();
+    d->parseText();
 }
 
 } // namespace nx::vms::rules

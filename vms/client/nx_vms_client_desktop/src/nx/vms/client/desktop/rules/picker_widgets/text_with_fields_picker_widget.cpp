@@ -2,11 +2,10 @@
 
 #include "text_with_fields_picker_widget.h"
 
-#include <range/v3/view/reverse.hpp>
+#include <QTextCursor>
 
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/rules/model_view/event_parameters_model.h>
-#include <nx/vms/common/html/html.h>
 #include <nx/vms/rules/event_filter_fields/analytics_object_type_field.h>
 #include <nx/vms/rules/event_filter_fields/state_field.h>
 #include <nx/vms/rules/utils/event_parameter_helper.h>
@@ -27,39 +26,58 @@ struct TextWithFieldsPicker::Private: public QObject
     api::rules::State eventState;
 
     Private(TextWithFieldsPicker* parent): q(parent){};
-    void addFormattingToText(const vms::rules::TextWithFields::ParsedValues& parsedValues) const
+
+    QTextCharFormat getIncorrectCharFormat(QTextCharFormat charFormat) const
+    {
+        const auto warningColor = core::colorTheme()->color("red_d3");
+        charFormat.setUnderlineStyle(QTextCharFormat::UnderlineStyle::WaveUnderline);
+        charFormat.setUnderlineColor(warningColor);
+        charFormat.setForeground(q->palette().text());
+        return charFormat;
+    }
+
+    QTextCharFormat getCorrectCharFormat(QTextCharFormat charFormat) const
+    {
+        const auto highlightColor = core::colorTheme()->color("brand_core");
+        QBrush brush = q->palette().text();
+        brush.setColor(highlightColor);
+        charFormat.setForeground(brush);
+        charFormat.setUnderlineStyle(QTextCharFormat::UnderlineStyle::NoUnderline);
+        return charFormat;
+    }
+
+    void addFormattingToText(const vms::rules::TextWithFields::ParsedValues& parsedValues)
     {
         if (!NX_ASSERT(q->theField()))
             return;
-        QString formattedText = q->theField()->text();
-        const auto highlightColor = core::colorTheme()->color("brand_core");
-        const auto warningColor = core::colorTheme()->color("red_d3");
 
-        for (auto& val: parsedValues | ranges::views::reverse)
+        if (q->m_textEdit->toPlainText().isEmpty())
+            return;
+
+        auto textCursor = q->m_textEdit->textCursor();
+        const auto charFormat = textCursor.charFormat();
+        const auto correctCharFormat = getCorrectCharFormat(charFormat);
+        const auto incorrectCharFromat = getIncorrectCharFormat(charFormat);
+
+        // To change color of part of text from QTextEditor and keep normal behaviour of cursor,
+        // have to create a selection by copied cursor, and change char format of selection.
+        // The original cursor and text from QTextEditor kept intact.
+        for (auto& val: parsedValues)
         {
             if (val.type != vms::rules::TextWithFields::FieldType::Substitution)
                 continue;
 
-            const QString valueInBrackets = EventParameterHelper::addBrackets(val.value);
+            QTextCursor cursor = textCursor;
+            cursor.setPosition(val.start);
+            cursor.setPosition(val.start + val.length, QTextCursor::KeepAnchor);
 
             const bool isCorrectValue = completer->containsElement(val.value);
-            const auto htmlSubstitution = isCorrectValue
-                ? common::html::colored(valueInBrackets, highlightColor)
-                : common::html::underlinedColored(valueInBrackets, warningColor);
-
-            formattedText.replace(val.start, val.length, htmlSubstitution);
+            cursor.setCharFormat(isCorrectValue ? correctCharFormat : incorrectCharFromat);
         }
-        const QSignalBlocker blocker{q->m_textEdit};
 
-        // To avoid reseting of cursor position need to save it,
-        // to restore it after changing of text.
-        const auto cursorPos = q->m_textEdit->textCursor().position();
-
-        q->m_textEdit->setHtml(formattedText);
-
-        auto cursor = q->m_textEdit->textCursor();
-        cursor.setPosition(cursorPos, QTextCursor::MoveAnchor);
-        q->m_textEdit->setTextCursor(cursor);
+        // Resetting char format, to avoid overlapping of char format outside the selection.
+        textCursor.setCharFormat({});
+        q->m_textEdit->setTextCursor(textCursor);
     }
 
     void setCompleterModel(const vms::rules::ItemDescriptor& desc)
@@ -100,9 +118,6 @@ struct TextWithFieldsPicker::Private: public QObject
         eventState = newStateValue;
 
         setCompleterModel(desc.value());
-
-        if (q->theField())
-            q->theField()->parseText(); //< Need to re-parse text and add new formatting.
     }
 };
 
@@ -133,9 +148,9 @@ void TextWithFieldsPicker::updateUi()
         d->connected = true;
     }
 
-    theField()->parseText();
-    d->updateCompleterModel(desc);
     base::updateUi();
+    d->updateCompleterModel(desc);
+    theField()->parseText();
 }
 
 } // namespace nx::vms::client::desktop::rules

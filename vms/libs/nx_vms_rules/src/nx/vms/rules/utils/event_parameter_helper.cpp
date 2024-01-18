@@ -2,6 +2,8 @@
 
 #include "event_parameter_helper.h"
 
+#include <QStringView>
+
 #include <QtCore/QStringLiteral>
 
 #include <nx/analytics/taxonomy/abstract_state.h>
@@ -247,9 +249,19 @@ bool EventParameterHelper::isEndOfEventParameter(const QChar& symbol)
     return symbol == kEndOfSubstitutionSymbol;
 }
 
-size_t EventParameterHelper::getLatestEventParameterPos(const QString& text)
+int EventParameterHelper::getLatestEventParameterPos(const QStringView& text, int stopPosition)
 {
-    return text.lastIndexOf(kStartOfSubstitutionSymbol);
+    if (stopPosition >= text.size())
+        return -1;
+
+    for (int i = stopPosition; i >= 0; i--)
+    {
+        if (text[i] == kStartOfSubstitutionSymbol)
+            return i;
+        if (text[i] == kEndOfSubstitutionSymbol || text[i].isSpace())
+            return -1;
+    }
+    return -1;
 }
 
 bool EventParameterHelper::containsSubgroups(const QString& eventParameter)
