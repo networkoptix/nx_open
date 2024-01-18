@@ -52,16 +52,14 @@ public:
     void setFillOpacity(qreal value);
 
     QSGNode* updatePaintNode(QSGNode* node);
-    void releaseResources();
-
-    void handleWindowChanged(QQuickWindow* win);
-    void cleanup();
 
 private:
-    void invalidateRegionsTexture();
-    void ensureRegionsTexture();
-    void ensureLabelsTexture();
-    void updateRegionsImage();
+    QImage createRegionsImage() const;
+    QSGTexture* createRegionsTexture() const;
+
+    QImage createLabelsImage() const;
+    QSGTexture* createLabelsTexture() const;
+
     void updateLabelPositions(bool force = false);
     void updateLabelsNode(QSGNode* mainNode, bool geometryDirty);
 
@@ -70,8 +68,8 @@ private:
     {
         QSize resolution;
         QColor borderColor = core::colorTheme()->color("dark1");
-        float fillOpacity = 0.1;
-        QSharedPointer<QSGTexture> texture;
+        float fillOpacity = 0.1f;
+        QPointer<QSGTexture> texture; //< A weak pointer to the texture owned by the SG.
 
         bool dirty = true;
 
@@ -102,7 +100,7 @@ private:
     public:
         Material();
         QSGMaterialType* type() const override;
-        int compare(const QSGMaterial *other) const override;
+        int compare(const QSGMaterial* other) const override;
 
         QSGMaterialShader* createShader(QSGRendererInterface::RenderMode) const override
         {
@@ -110,6 +108,7 @@ private:
         }
 
         State uniforms;
+        std::unique_ptr<QSGTexture> texture;
     };
 
     struct LabelData
@@ -120,24 +119,23 @@ private:
 
 private:
     QPointer<core::CameraMotionHelper> m_motionHelper;
+    core::MotionGrid m_motionGrid;
+
     int m_channel = 0;
     int m_rotationQuadrants = 0;
     QVector<QColor> m_sensitivityColors;
+    QColor m_labelsColor = core::colorTheme()->color("dark1");
 
     State m_currentState;
-
-    QVector<LabelData> m_labels;
-    QSharedPointer<QSGTexture> m_labelsTexture;
+    qreal m_devicePixelRatio = 1.0;
     QSizeF m_cellSize;
     QSize m_labelSize;
-    QColor m_labelsColor = core::colorTheme()->color("dark1");
-    bool m_labelsTextureDirty = true;
+
+    QVector<LabelData> m_labels;
     bool m_labelsDirty = true;
 
-    core::MotionGrid m_motionGrid;
-    QImage m_regionsImage;
-    bool m_updateRegionsTexture = true;
-    QMetaObject::Connection windowConnection;
+    bool m_labelsTextureDirty = true;
+    bool m_regionsTextureDirty = true;
 };
 
 } // namespace nx::vms::client::desktop

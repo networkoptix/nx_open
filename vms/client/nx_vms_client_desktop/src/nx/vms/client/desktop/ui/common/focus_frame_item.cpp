@@ -3,14 +3,17 @@
 #include "focus_frame_item.h"
 
 #include <cmath>
+#include <memory>
 
 #include <QtGui/QImage>
 #include <QtQuick/QQuickWindow>
 #include <QtQuick/QSGTextureMaterial>
 #include <QtQuick/QSGGeometryNode>
 
+#include <nx/utils/log/assert.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/thread/custom_runnable.h>
+#include <nx/vms/client/core/scene_graph/texture_material.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 
 namespace nx::vms::client::desktop {
@@ -29,26 +32,23 @@ public:
     Private(FocusFrameItem* parent);
 
 public:
-    QMetaObject::Connection windowConnection;
     QColor color = core::colorTheme()->color("dark1");
     int frameWidth = 1;
-    bool textureDirty = true;
-    QScopedPointer<QSGTextureMaterial> material;
 
-    void updateDotTexture();
+    bool textureDirty = true;
+
+    QSGTexture* createDotTexture();
 };
 
-FocusFrameItem::Private::Private(FocusFrameItem* parent):
-    q(parent),
-    material(new QSGTextureMaterial())
+FocusFrameItem::Private::Private(FocusFrameItem* parent): q(parent)
 {
 }
 
-void FocusFrameItem::Private::updateDotTexture()
+QSGTexture* FocusFrameItem::Private::createDotTexture()
 {
     const auto window = q->window();
-    if (!window)
-        return;
+    if (!NX_ASSERT(window))
+        return nullptr;
 
     QImage image(kTextureSize, kTextureSize, QImage::Format_RGBA8888);
     image.setPixelColor(0, 0, color);
@@ -56,15 +56,7 @@ void FocusFrameItem::Private::updateDotTexture()
     image.setPixelColor(0, 1, Qt::transparent);
     image.setPixelColor(1, 0, Qt::transparent);
 
-    const auto texture = window->createTextureFromImage(image);
-
-    if (material->texture())
-        delete material->texture();
-
-    material->setTexture(texture);
-    material->setHorizontalWrapMode(QSGTexture::Repeat);
-    material->setVerticalWrapMode(QSGTexture::Repeat);
-    textureDirty = false;
+    return window->createTextureFromImage(image);
 }
 
 FocusFrameItem::FocusFrameItem(QQuickItem* parent):
@@ -72,7 +64,6 @@ FocusFrameItem::FocusFrameItem(QQuickItem* parent):
     d(new Private(this))
 {
     setFlag(QQuickItem::ItemHasContents);
-    connect(this, &QQuickItem::windowChanged, this, &FocusFrameItem::handleWindowChanged);
 }
 
 FocusFrameItem::~FocusFrameItem()
@@ -117,74 +108,34 @@ void FocusFrameItem::registerQmlType()
     qmlRegisterType<FocusFrameItem>("nx.client.desktop", 1, 0, "FocusFrame");
 }
 
-void FocusFrameItem::handleWindowChanged(QQuickWindow* win)
-{
-    if (d->windowConnection)
-    {
-        disconnect(d->windowConnection);
-        d->windowConnection = {};
-        cleanup();
-    }
-
-    if (win)
-    {
-        d->windowConnection = connect(win, &QQuickWindow::sceneGraphInvalidated, this,
-            &FocusFrameItem::cleanup, Qt::DirectConnection);
-    }
-}
-
-void FocusFrameItem::cleanup()
-{
-    const auto texture = d->material->texture();
-    if (!texture)
-        return;
-
-    d->material->setTexture(nullptr);
-    d->textureDirty = true;
-
-    delete texture;
-}
-
-void FocusFrameItem::releaseResources()
-{
-    const auto texture = d->material->texture();
-    if (!texture)
-        return;
-
-    const auto quickWindow = window();
-    const auto clearTexture = nx::utils::guarded(texture, [texture]() { delete texture; });
-
-    // We must release all resources before releaseResources finish, as Qt doc says.
-    d->material->setTexture(nullptr);
-    d->textureDirty = true; //< Just in case.
-
-    quickWindow->scheduleRenderJob(
-        new nx::utils::thread::CustomRunnable(clearTexture),
-        QQuickWindow::AfterSynchronizingStage);
-    quickWindow->update();
-}
-
 QSGNode* FocusFrameItem::updatePaintNode(
     QSGNode* node, QQuickItem::UpdatePaintNodeData* /*updatePaintNodeData*/)
 {
-    auto geometryNode = static_cast<QSGGeometryNode*>(node);
-
+    auto geometryNode = dynamic_cast<QSGGeometryNode*>(node);
     if (!geometryNode)
     {
         geometryNode = new QSGGeometryNode();
         geometryNode->setGeometry(
             new QSGGeometry(QSGGeometry::defaultAttributes_TexturedPoint2D(), 4 * 6));
-        geometryNode->geometry()->setDrawingMode(GL_TRIANGLES);
-        geometryNode->setFlag(QSGNode::OwnsGeometry);
-        geometryNode->setMaterial(d->material.data());
+        geometryNode->geometry()->setDrawingMode(QSGGeometry::DrawTriangles);
+        geometryNode->setFlags(QSGNode::OwnsGeometry | QSGNode::OwnsMaterial);
+    }
 
-        node = geometryNode;
+    auto material = dynamic_cast<core::sg::TextureMaterial*>(geometryNode->material());
+    if (!material)
+    {
+        material = new core::sg::TextureMaterial();
+        material->setHorizontalWrapMode(QSGTexture::Repeat);
+        material->setVerticalWrapMode(QSGTexture::Repeat);
+        geometryNode->setMaterial(material);
+        d->textureDirty = true;
     }
 
     if (d->textureDirty)
     {
-        d->updateDotTexture();
+        material->resetTexture(d->createDotTexture());
         geometryNode->markDirty(QSGNode::DirtyMaterial);
+        d->textureDirty = false;
     }
 
     const auto fw = d->frameWidth;
@@ -227,7 +178,7 @@ QSGNode* FocusFrameItem::updatePaintNode(
 
     geometryNode->markDirty(QSGNode::DirtyGeometry);
 
-    return node;
+    return geometryNode;
 }
 
 } // namespace nx::vms::client::desktop
