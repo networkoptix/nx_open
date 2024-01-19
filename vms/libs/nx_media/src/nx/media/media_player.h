@@ -298,6 +298,8 @@ public:
     QString tag() const;
     void setTag(const QString& value);
 
+    Q_INVOKABLE void invalidateServer();
+
 public slots:
     void play();
     void pause();
