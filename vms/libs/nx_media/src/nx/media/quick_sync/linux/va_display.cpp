@@ -20,7 +20,7 @@ VaDisplay::~VaDisplay()
 VaDisplay::VaDisplay()
 {
 
-    m_display = vaGetDisplayGLX(XOpenDisplay(":0.0"));
+    m_display = vaGetDisplayGLX(XOpenDisplay(nullptr));
     if (!m_display)
     {
         NX_DEBUG(this, "Cannot create VADisplay");
