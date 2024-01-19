@@ -360,7 +360,7 @@ Result<> CUDT::getOpt(UDTOpt optName, void* optval, int& optlen)
             break;
 
         case UDT_SNDTIMEO:
-            *(int*)optval = m_sendTimeout.count();
+            *(int*)optval = (int) m_sendTimeout.count();
             optlen = sizeof(int);
             break;
 
@@ -573,7 +573,7 @@ Result<> CUDT::connect(const detail::SocketAddress& serv_addr)
     serv_addr.copy(m_ConnReq.m_piPeerIP);
 
     // Random Initial Sequence Number
-    srand(CTimer::getTime().count());
+    srand((int) CTimer::getTime().count());
     m_iISN = m_ConnReq.m_iISN = (int32_t)(CSeqNo::m_iMaxSeqNo * (double(rand()) / RAND_MAX));
 
     m_iLastDecSeq = m_iISN - 1;
