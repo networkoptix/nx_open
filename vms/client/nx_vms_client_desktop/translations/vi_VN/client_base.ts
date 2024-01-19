@@ -5092,12 +5092,12 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <translation>Ghi âm được kích hoạt trên USB lưu trữ</translation>
     </message>
     <message>
-      <source>If cloud storage is activated for backup, other backup storages will be deactivated and the “All archive” option for already configured devices will be changed to “Motion, Object, Bookmarks”</source>
-      <translation>Nếu bộ lưu trữ đám mây được kích hoạt để sao lưu, các bộ lưu trữ sao lưu khác sẽ bị vô hiệu hóa và tùy chọn “Tất cả kho lưu trữ” cho các thiết bị đã được định cấu hình sẽ được thay đổi thành “Chuyển động, Đối tượng, Dấu trang”</translation>
+      <source>If cloud storage is activated for backup, other backup storages will be deactivated and the &quot;All archive&quot; option for already configured devices will be changed to &quot;Motion, Object, Bookmarks&quot;</source>
+      <translation type="unfinished">If cloud storage is activated for backup, other backup storages will be deactivated and the &quot;All archive&quot; option for already configured devices will be changed to &quot;Motion, Object, Bookmarks&quot;</translation>
     </message>
     <message>
-      <source>If cloud storage is activated for backup, the “All archive” option for already configured devices will be changed to “Motion, Object, Bookmarks”</source>
-      <translation>Nếu bộ lưu trữ đám mây được kích hoạt để sao lưu, tùy chọn “Tất cả kho lưu trữ” cho các thiết bị đã được định cấu hình sẽ được thay đổi thành “Chuyển động, Đối tượng, Dấu trang”</translation>
+      <source>If cloud storage is activated for backup, the &quot;All archive&quot; option for already configured devices will be changed to &quot;Motion, Object, Bookmarks&quot;</source>
+      <translation type="unfinished">If cloud storage is activated for backup, the &quot;All archive&quot; option for already configured devices will be changed to &quot;Motion, Object, Bookmarks&quot;</translation>
     </message>
   </context>
   <context>

@@ -5158,12 +5158,12 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
       <translation>Innspilling aktivert på USB-lagringen</translation>
     </message>
     <message>
-      <source>If cloud storage is activated for backup, other backup storages will be deactivated and the “All archive” option for already configured devices will be changed to “Motion, Object, Bookmarks”</source>
-      <translation>Hvis skylagring er aktivert for sikkerhetskopiering, vil andre sikkerhetskopieringslagringer bli deaktivert og alternativet "Alle arkiver" for allerede konfigurerte enheter endres til "Bevegelse, objekt, bokmerker"</translation>
+      <source>If cloud storage is activated for backup, other backup storages will be deactivated and the &quot;All archive&quot; option for already configured devices will be changed to &quot;Motion, Object, Bookmarks&quot;</source>
+      <translation>Hvis skylagring er aktivert for sikkerhetskopiering, vil andre sikkerhetskopieringslagringer bli deaktivert og alternativet &quot;Alle arkiv&quot; for allerede konfigurerte enheter vil bli endret til &quot;Motion, Object, Bookmarks&quot;</translation>
     </message>
     <message>
-      <source>If cloud storage is activated for backup, the “All archive” option for already configured devices will be changed to “Motion, Object, Bookmarks”</source>
-      <translation>Hvis skylagring er aktivert for sikkerhetskopiering, vil alternativet "Alle arkiver" for allerede konfigurerte enheter endres til "Bevegelse, objekt, bokmerker"</translation>
+      <source>If cloud storage is activated for backup, the &quot;All archive&quot; option for already configured devices will be changed to &quot;Motion, Object, Bookmarks&quot;</source>
+      <translation>Hvis skylagring er aktivert for sikkerhetskopiering, vil alternativet &quot;Alle arkiv&quot; for allerede konfigurerte enheter endres til &quot;Motion, Object, Bookmarks&quot;</translation>
     </message>
   </context>
   <context>

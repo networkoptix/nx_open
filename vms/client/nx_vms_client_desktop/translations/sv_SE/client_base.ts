@@ -5158,12 +5158,12 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <translation>Inspelningen aktiverades på USB-minnet</translation>
     </message>
     <message>
-      <source>If cloud storage is activated for backup, other backup storages will be deactivated and the “All archive” option for already configured devices will be changed to “Motion, Object, Bookmarks”</source>
-      <translation>Om molnlagring aktiveras för säkerhetskopiering, kommer andra säkerhetskopieringslagringar att avaktiveras och alternativet "Allt arkiv" för redan konfigurerade enheter kommer att ändras till "Rörelse, Objekt, Bokmärken"</translation>
+      <source>If cloud storage is activated for backup, other backup storages will be deactivated and the &quot;All archive&quot; option for already configured devices will be changed to &quot;Motion, Object, Bookmarks&quot;</source>
+      <translation>Om molnlagring är aktiverat för säkerhetskopiering, andra säkerhetskopieringslagringar kommer att inaktiveras och &quot;Alla arkiv&quot; alternativ för redan konfigurerade enheter kommer att ändras till &quot;Motion, Objekt, bokmärken&quot;</translation>
     </message>
     <message>
-      <source>If cloud storage is activated for backup, the “All archive” option for already configured devices will be changed to “Motion, Object, Bookmarks”</source>
-      <translation>Om molnlagring aktiveras för säkerhetskopiering, kommer andra säkerhetskopieringslagringar att avaktiveras och alternativet "Allt arkiv" för redan konfigurerade enheter kommer att ändras till "Rörelse, Objekt, Bokmärken"</translation>
+      <source>If cloud storage is activated for backup, the &quot;All archive&quot; option for already configured devices will be changed to &quot;Motion, Object, Bookmarks&quot;</source>
+      <translation>Om molnlagring är aktiverat för säkerhetskopiering, &quot;Alla arkiv&quot; alternativ för redan konfigurerade enheter kommer att ändras till &quot;Rörelse, objekt, bokmärken&quot;</translation>
     </message>
   </context>
   <context>
