@@ -27,6 +27,9 @@ public:
     void accept() override;
     void reject() override;
 
+protected:
+    void buttonBoxClicked(QDialogButtonBox::StandardButton button) override;
+
 private:
     EditableLabel* m_editableLabel{nullptr};
     QPushButton* m_deleteButton{nullptr};
