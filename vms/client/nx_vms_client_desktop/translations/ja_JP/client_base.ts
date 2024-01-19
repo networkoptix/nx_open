@@ -214,7 +214,7 @@
     </message>
     <message>
       <source>Save Video Wall View</source>
-      <translation>ビデオウォールの保存</translation>
+      <translation>ビデオウォールビューを保存</translation>
     </message>
     <message>
       <source>Start Screen Recording</source>
@@ -393,19 +393,19 @@
     </message>
     <message>
       <source>Attach to Video Wall...</source>
-      <translation>ビデオウォールモニター設定...</translation>
+      <translation>ビデオウォールに接続...</translation>
     </message>
     <message>
       <source>Switch to Video Wall mode...</source>
-      <translation>ビデオウォール開始...</translation>
+      <translation>ビデオウォールモードに切り替え...</translation>
     </message>
     <message>
       <source>Save Video Wall</source>
-      <translation>ビデオウォールの保存</translation>
+      <translation>ビデオウォールを保存</translation>
     </message>
     <message>
       <source>Save Current Matrix</source>
-      <translation>マトリックスの保存</translation>
+      <translation>現在のマトリックスを保存</translation>
     </message>
     <message>
       <source>Load Matrix</source>
@@ -417,7 +417,7 @@
     </message>
     <message>
       <source>Stop Video Wall</source>
-      <translation>ビデオウォール停止</translation>
+      <translation>ビデオウォールを停止</translation>
     </message>
     <message>
       <source>Clear Screen</source>
@@ -769,7 +769,7 @@
     </message>
     <message>
       <source>Export Video...</source>
-      <translation>動画をエクスポート...</translation>
+      <translation>映像をエクスポート...</translation>
     </message>
     <message>
       <source>Export Bookmark...</source>
@@ -2040,7 +2040,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Exporting video</source>
-      <translation>ビデオエクスポート</translation>
+      <translation>映像のエクスポート</translation>
     </message>
     <message>
       <source>System name changed</source>
@@ -3258,7 +3258,7 @@ to %1</source>
     </message>
     <message>
       <source>View live video</source>
-      <translation>ライブビデオ表示</translation>
+      <translation>ライブ映像の表示</translation>
     </message>
     <message>
       <source>Adjust device settings</source>
@@ -3278,7 +3278,7 @@ to %1</source>
     </message>
     <message>
       <source>Export video</source>
-      <translation>ビデオエクスポート</translation>
+      <translation>映像のエクスポート</translation>
     </message>
     <message>
       <source>Control Video Walls</source>
@@ -3308,11 +3308,11 @@ to %1</source>
     <name>QnDesktopDataProvider</name>
     <message>
       <source>Could not find video encoder %1.</source>
-      <translation>ビデオエンコーダー%1を検出できません.</translation>
+      <translation>ビデオエンコーダー %1 が見つかりませんでした。</translation>
     </message>
     <message>
       <source>Could not initialize video encoder.</source>
-      <translation>ビデオエンコーダーをイニシャライズできません.</translation>
+      <translation>ビデオエンコーダーを初期化できませんでした。</translation>
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
@@ -3403,7 +3403,7 @@ to %1</source>
     <name>QnEventLogModel</name>
     <message>
       <source>Motion video</source>
-      <translation>モーションビデオ</translation>
+      <translation>モーション映像</translation>
     </message>
     <message>
       <source>Date/Time</source>
@@ -3536,7 +3536,7 @@ to %1</source>
     <name>QnGLCheckerInstrument</name>
     <message>
       <source>Video card drivers are outdated or not installed</source>
-      <translation>ビデオ カードのドライバーが古いかインストールされていません</translation>
+      <translation>ビデオカードのドライバーが古いか、インストールされていません</translation>
     </message>
     <message>
       <source>%1 may not work properly.</source>
@@ -5970,7 +5970,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Display %1</source>
-      <translation>ディスプレー %1</translation>
+      <translation>ディスプレイ %1</translation>
     </message>
     <message>
       <source>Delete &quot;%1&quot;?</source>
@@ -5981,7 +5981,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnVideowallScreenWidget</name>
     <message>
       <source>PC %1</source>
-      <translation>Pc %1</translation>
+      <translation>PC %1</translation>
     </message>
     <message>
       <source>PC %1 - Display %2</source>
@@ -6191,7 +6191,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Video Wall %1</source>
-      <translation>ビデオウォール l %1</translation>
+      <translation>ビデオウォール %1</translation>
     </message>
     <message>
       <source>New Video Wall...</source>
@@ -6199,11 +6199,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>New Matrix %1</source>
-      <translation>次のマトリックス %1</translation>
+      <translation>新規マトリックス %1</translation>
     </message>
     <message>
       <source>To enable this feature, please activate a Video Wall license.</source>
-      <translation>この機能を有効にするにはビデオウォールライセンスを有効にしてください</translation>
+      <translation>この機能を有効にするには、ビデオウォールライセンスを有効化してください。</translation>
     </message>
     <message>
       <source>Failed to apply changes</source>
@@ -6221,7 +6221,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>To start it again, you should have physical access to its computer.</source>
-      <translation>再度起動するには、そのコンピューターへ直接アクセスすることが必要です</translation>
+      <translation>もう一度起動するには、そのコンピューターに物理的にアクセスできる必要があります。</translation>
     </message>
     <message>
       <source>Stop</source>
@@ -6239,11 +6239,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Control session cannot be started.</source>
-      <translation>コントロール セッションを開始できません</translation>
+      <translation>コントロールセッションを開始できません。</translation>
     </message>
     <message>
       <source>Cannot save empty matrix</source>
-      <translation>空のマトリックスを保存できません</translation>
+      <translation>空のマトリックスは保存できません</translation>
     </message>
     <message>
       <source>Screen is being controlled by another user</source>
@@ -6270,7 +6270,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>No video files found in selected folder</source>
-      <translation>選択したフォルダーにビデオファイルがありません</translation>
+      <translation>選択したフォルダー内に映像ファイルが見つかりません</translation>
     </message>
     <message>
       <source>Stop uploading?</source>
@@ -6288,7 +6288,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Use .MKV, .AVI, .MP4 or other video files.</source>
-      <translation>MKV、AVI、MP4、またはその他のビデオファイルを使用してください。</translation>
+      <translation>.MKV、.AVI、.MP4、またはその他の映像ファイルを使用してください。</translation>
     </message>
     <message numerus="yes">
       <source>Selected files do not have timestamps</source>
@@ -6298,7 +6298,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Only video files with correct timestamp are supported.</source>
-      <translation>正しいタイムスタンプを持つビデオファイルのみがサポートされています。</translation>
+      <translation>正しいタイムスタンプを持つ映像ファイルのみがサポートされています。</translation>
     </message>
     <message numerus="yes">
       <source>Selected files are too old</source>
@@ -6410,12 +6410,12 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>%1 covers period for which video has already been uploaded.</source>
       <comment>Filename will be substituted</comment>
-      <translation>%1 は既にアップロードされているビデオの期間と重複します。</translation>
+      <translation>%1 はすでにアップロードされている映像の期間と重複します。</translation>
     </message>
     <message>
       <source>%1 covers period for which video is being uploaded.</source>
       <comment>Filename will be substituted</comment>
-      <translation>%1 は既にアップロードされているビデオの期間と重複します。</translation>
+      <translation>%1 はアップロード中の映像の期間と重複します。</translation>
     </message>
   </context>
   <context>
@@ -6506,7 +6506,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>You are going to delete some resources to which you have access from Video Wall only. You will not see them in your resource list after it and will not be able to add them to Video Wall again.</source>
-      <translation>ビデオウォールからのみアクセス可能なリソースを削除しようとしました　削除するとリソース一リストには表示されません　再度ビデオウォールに追加することはできません</translation>
+      <translation>ビデオウォールでのみアクセス可能なリソースを削除しようとしています。削除後、それらはリソースリストに表示されなくなり、ビデオウォールに再度追加することはできなくなります。</translation>
     </message>
     <message>
       <source>You will lose access to following resources:</source>
@@ -6589,7 +6589,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>Some video files are still being uploaded to %n virtual cameras:</source>
       <translation>
-        <numerusform>一部のファイルは%n個の仮想カメラにアップロード中です:</numerusform>
+        <numerusform>一部の映像ファイルが %n 仮想カメラにアップロードされています:</numerusform>
       </translation>
     </message>
     <message>
@@ -6804,7 +6804,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>View live video</source>
-      <translation>ライブビデオ表示</translation>
+      <translation>ライブ映像の表示</translation>
     </message>
     <message>
       <source>Adjust device settings</source>
@@ -6824,7 +6824,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Export video</source>
-      <translation>ビデオエクスポート</translation>
+      <translation>映像のエクスポート</translation>
     </message>
     <message>
       <source>Control Video Walls</source>
@@ -6851,11 +6851,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Local files cannot be placed on Video Wall Screen attached to another computer</source>
-      <translation>ローカル ファイルを別のコンピューターに接続されているビデオウォールスクリーンに配置できません</translation>
+      <translation>ローカルファイルは、別のコンピューターに接続されたビデオウォール画面には配置できません</translation>
     </message>
     <message>
       <source>To display local files on Video Wall, please attach them using computer where Video Wall is hosted.</source>
-      <translation>ローカルファアイルをビデオウォールに表示するにはビデオウォールを表示するコンピューターのローカル ファイルを使用してください</translation>
+      <translation>ビデオウォールにローカルファイルを表示するには、ビデオウォールをホストしているコンピューターでファイルを添付してください。</translation>
     </message>
   </context>
   <context>
@@ -8414,7 +8414,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Video transcoding required.</source>
-      <translation>ビデオのトランスコーディングが必要です。</translation>
+      <translation>映像のトランスコーディングが必要です。</translation>
     </message>
     <message>
       <source>Archive is encrypted.</source>
@@ -8501,7 +8501,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>We recommend to export video from this camera as &quot;Multi Video&quot; to avoid downscaling.</source>
-      <translation>ダウンスケールを避けるため、&quot;マルチビデオ&quot;としてエクスポートする事を推奨します。</translation>
+      <translation>ダウンスケーリングを避けるために、このカメラからの映像は &quot;複数映像&quot; としてエクスポートすることをお勧めします。</translation>
     </message>
     <message>
       <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
@@ -8537,7 +8537,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Export is not available: This camera does not have a video archive for the selected time period.</source>
-      <translation>エクスポートできません: このカメラには、選択した期間のビデオアーカイブがありません。</translation>
+      <translation>エクスポートは利用できません: このカメラには、選択した期間の映像アーカイブがありません。</translation>
     </message>
   </context>
   <context>
@@ -9876,7 +9876,7 @@ You can force it, but it may significantly increase CPU load.</source>
     <message numerus="yes">
       <source>For exporting as Rapid Review video length should be at least %n seconds.</source>
       <translation>
-        <numerusform>ラピッドレビューとしてエクスポートするには、ビデオの長さが %n 秒以上必要です。</numerusform>
+        <numerusform>ラピッドレビューとしてエクスポートするには、映像の長さが %n 秒以上必要です。</numerusform>
       </translation>
     </message>
   </context>
@@ -10219,7 +10219,7 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>Encrypts archive data to prevent it from being viewed outside of the system. You will not be required to enter the encryption password to view the video archive within this system.</source>
-      <translation>アーカイブデータを暗号化して、システムの外部で閲覧されないようにします。このシステム内でビデオアーカイブを表示する場合、暗号化パスワードを入力する必要はありません。</translation>
+      <translation>アーカイブデータを暗号化して、システムの外部で閲覧されないようにします。このシステム内で映像アーカイブを表示する場合、暗号化パスワードを入力する必要はありません。</translation>
     </message>
     <message>
       <source>Failed to set archive encryption password</source>
@@ -11027,7 +11027,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Exporting video</source>
-      <translation>ビデオエクスポート</translation>
+      <translation>映像のエクスポート</translation>
     </message>
     <message>
       <source>Stop Export</source>
@@ -11064,7 +11064,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Local files not allowed for Multi-Video export</source>
-      <translation>ローカルファイルをマルチビデオエクスポートには使用できません</translation>
+      <translation>ローカルファイルは、複数映像のエクスポートには使用できません</translation>
     </message>
     <message>
       <source>Please remove all local files from the layout and try again.</source>

@@ -450,7 +450,7 @@
     </message>
     <message>
       <source>Could not initialize video encoder.</source>
-      <translation>ビデオエンコーダーをイニシャライズできません.</translation>
+      <translation>ビデオエンコーダーを初期化できませんでした。</translation>
     </message>
   </context>
   <context>
@@ -1617,7 +1617,7 @@
     </message>
     <message>
       <source>Could not create output file for video recording.</source>
-      <translation>ビデオ記録の為の出力ファイルを作成出来ません..</translation>
+      <translation>映像録画用の出力ファイルを作成できませんでした。</translation>
     </message>
     <message>
       <source>Could not allocate output stream for recording.</source>
@@ -1641,7 +1641,7 @@
     </message>
     <message>
       <source>Video transcoding required.</source>
-      <translation>ビデオのトランスコーディングが必要です。</translation>
+      <translation>映像のトランスコーディングが必要です。</translation>
     </message>
     <message>
       <source>File write error. Not enough free space.</source>

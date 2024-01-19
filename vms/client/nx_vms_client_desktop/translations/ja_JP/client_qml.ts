@@ -386,7 +386,7 @@
     </message>
     <message>
       <source>Display on video</source>
-      <translation>ビデオに表示</translation>
+      <translation>映像に表示</translation>
     </message>
   </context>
   <context>
@@ -532,7 +532,7 @@
     </message>
     <message>
       <source>Select video stream from the camera for analysis</source>
-      <translation>分析に使うビデオストリームを選択</translation>
+      <translation>分析に使用する映像ストリームを選択してください</translation>
     </message>
     <message>
       <source>Refresh</source>
