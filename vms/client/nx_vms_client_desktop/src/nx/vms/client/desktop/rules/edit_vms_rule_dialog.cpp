@@ -216,7 +216,8 @@ EditVmsRuleDialog::EditVmsRuleDialog(QWidget* parent):
 
         auto buttonBox = new QDialogButtonBox;
         buttonBox->setOrientation(Qt::Horizontal);
-        buttonBox->setStandardButtons(QDialogButtonBox::Cancel | QDialogButtonBox::Ok);
+        buttonBox->setStandardButtons(
+            QDialogButtonBox::Cancel | QDialogButtonBox::Ok | QDialogButtonBox::Apply);
         buttonBox->setCenterButtons(false);
         footerLayout->addWidget(buttonBox);
 
@@ -247,6 +248,17 @@ void EditVmsRuleDialog::accept()
 void EditVmsRuleDialog::reject()
 {
     done(QDialogButtonBox::Cancel);
+}
+
+void EditVmsRuleDialog::buttonBoxClicked(QDialogButtonBox::StandardButton button)
+{
+    if (button == QDialogButtonBox::StandardButton::Apply)
+    {
+        done(QDialogButtonBox::Ok);
+        return;
+    }
+
+    QnSessionAwareButtonBoxDialog::buttonBoxClicked(button);
 }
 
 void EditVmsRuleDialog::displayComment()
