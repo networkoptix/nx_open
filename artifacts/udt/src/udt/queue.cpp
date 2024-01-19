@@ -359,10 +359,18 @@ CSndQueue::~CSndQueue()
     m_pSndUList.reset();
 }
 
-void CSndQueue::start()
+Result<> CSndQueue::start()
 {
-    // TODO: #akolesnikov std::thread can throw.
-    m_WorkerThread = std::thread([this]() { worker(); });
+    try
+    {
+        m_WorkerThread = std::thread([this]() { worker(); });
+    }
+    catch (const std::system_error& e)
+    {
+        return Error(e.code().value());
+    }
+
+    return success();
 }
 
 void CSndQueue::worker()
@@ -650,10 +658,18 @@ CRcvQueue::~CRcvQueue()
     stop();
 }
 
-void CRcvQueue::start()
+Result<> CRcvQueue::start()
 {
-    // TODO: #akolesnikov std::thread can throw.
-    m_WorkerThread = std::thread(&CRcvQueue::worker, this);
+    try
+    {
+        m_WorkerThread = std::thread(&CRcvQueue::worker, this);
+    }
+    catch (const std::system_error& e)
+    {
+        return Error(e.code().value());
+    }
+
+    return success();
 }
 
 void CRcvQueue::stop()
