@@ -10,6 +10,7 @@
 
 extern "C" {
 #include <libavcodec/avcodec.h>
+#include <libswscale/swscale.h>
 
 } // extern "C"
 
@@ -85,7 +86,10 @@ public:
 
     /** Scale frame to new size */
     CLVideoDecoderOutputPtr scaled(
-        const QSize& newSize, AVPixelFormat newFormat = AV_PIX_FMT_NONE) const;
+        const QSize& newSize,
+        AVPixelFormat newFormat = AV_PIX_FMT_NONE,
+        bool keepAspectRatio = false,
+        int scaleFlags = SWS_BICUBIC) const;
 
     QSize size() const { return QSize(width, height); }
     int64_t sizeBytes() const;

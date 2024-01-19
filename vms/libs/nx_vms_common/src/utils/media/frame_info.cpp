@@ -17,16 +17,15 @@
 #include <nx/utils/switch.h>
 #include <utils/color_space/yuvconvert.h>
 
-extern "C"
-{
+extern "C" {
 #ifdef WIN32
-#define AVPixFmtDescriptor __declspec(dllimport) AVPixFmtDescriptor
+    #define AVPixFmtDescriptor __declspec(dllimport) AVPixFmtDescriptor
 #endif
 #include <libavutil/imgutils.h>
 #include <libavutil/pixdesc.h>
-#include <libswscale/swscale.h>
+#include <libavutil/rational.h>
 #ifdef WIN32
-#   undef AVPixFmtDescriptor
+    #undef AVPixFmtDescriptor
 #endif
 };
 
@@ -243,8 +242,7 @@ void CLVideoDecoderOutput::memZero()
         if (QnFfmpegHelper::isChromaPlane(i, descriptor))
             h >>= descriptor->log2_chroma_h;
 
-        int bpp = descriptor->comp[i].step;
-        int fillLen = h*w*bpp;
+        int fillLen = h*w;
         memset(data[i], i == 0 ? 0 : 0x80, fillLen);
     }
 }
@@ -503,7 +501,11 @@ bool CLVideoDecoderOutput::invalidScaleParameters(const QSize& size) const
     return size.width() == 0 || size.height() == 0 || height == 0 || width == 0;
 }
 
-CLVideoDecoderOutputPtr CLVideoDecoderOutput::scaled(const QSize& newSize, AVPixelFormat newFormat) const
+CLVideoDecoderOutputPtr CLVideoDecoderOutput::scaled(
+    const QSize& newSize,
+    AVPixelFormat newFormat,
+    bool keepAspectRatio,
+    int scaleFlags) const
 {
     if (invalidScaleParameters(newSize))
         return nullptr;
@@ -515,11 +517,31 @@ CLVideoDecoderOutputPtr CLVideoDecoderOutput::scaled(const QSize& newSize, AVPix
             newFormat = AV_PIX_FMT_RGB24;
     }
 
+    QSize scaleSize = newSize;
+    if (keepAspectRatio)
+    {
+        const AVRational oldAspectRatio = {.num = width, .den = height};
+        const AVRational newAspectRatio = {.num = newSize.width(), .den = newSize.height()};
+        int comparationResult = av_cmp_q(oldAspectRatio, newAspectRatio);
+        if (comparationResult > 0)
+        {
+            int64_t newHeight = newSize.width() * oldAspectRatio.den / oldAspectRatio.num;
+            scaleSize.setHeight((int) newHeight);
+        }
+        else if (comparationResult < 0)
+        {
+            int64_t newWidth = newSize.height() * oldAspectRatio.num / oldAspectRatio.den;
+            scaleSize.setWidth((int) newWidth);
+        }
+        NX_ASSERT(scaleSize.width() != 0 && scaleSize.width() <= newSize.width()
+            && scaleSize.height() != 0 && scaleSize.height() <= newSize.height());
+    }
+
     // Absolute robustness for the case, when operator 'new' throws an exception.
     std::unique_ptr<SwsContext, decltype(&sws_freeContext)> scaleContext(
         sws_getContext(width, height, (AVPixelFormat)format,
-            newSize.width(), newSize.height(), newFormat,
-            SWS_BICUBIC, NULL, NULL, NULL), sws_freeContext);
+            scaleSize.width(), scaleSize.height(), newFormat,
+            scaleFlags, NULL, NULL, NULL), sws_freeContext);
 
     if (scaleContext)
     {
@@ -527,6 +549,8 @@ CLVideoDecoderOutputPtr CLVideoDecoderOutput::scaled(const QSize& newSize, AVPix
         dst->reallocate(newSize.width(), newSize.height(), newFormat);
         dst->assignMiscData(this);
         dst->sample_aspect_ratio = 1.0;
+        if (keepAspectRatio)
+            dst->memZero();
 
         sws_scale(scaleContext.get(), data, linesize, 0, height, dst->data, dst->linesize);
         return dst;
