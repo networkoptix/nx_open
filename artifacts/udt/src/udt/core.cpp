@@ -908,7 +908,7 @@ void CUDT::close()
         CInfoBlock::convert(m_pPeerAddr, ib.m_piIP);
         ib.m_iRTT = m_iRTT;
         ib.m_iBandwidth = m_iBandwidth;
-        m_pCache->update(&ib);
+        m_pCache->put(ib.getKey(), ib);
 
         m_bConnected = false;
     }
@@ -2671,7 +2671,7 @@ void CUDT::initializeConnectedSocket(const detail::SocketAddress& addr)
     CInfoBlock ib;
     ib.m_iIPversion = m_iIPversion;
     CInfoBlock::convert(addr, ib.m_piIP);
-    if (m_pCache->lookup(&ib) >= 0)
+    if (m_pCache->lookup(ib.getKey(), &ib))
     {
         m_iRTT = ib.m_iRTT;
         m_iBandwidth = ib.m_iBandwidth;
