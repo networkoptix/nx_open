@@ -46,213 +46,51 @@ Yunhong Gu, last updated 01/27/2011
 #include <vector>
 
 #include "common.h"
+#include "detail/lru_cache.h"
 #include "socket_addresss.h"
 #include "udt.h"
 
-class CCacheItem
-{
-public:
-    virtual ~CCacheItem() {}
-
-public:
-    virtual CCacheItem& operator=(const CCacheItem&) = 0;
-
-    // The "==" operator SHOULD only compare key values.
-    virtual bool operator==(const CCacheItem&) = 0;
-
-    // Functionality:
-    //    get a deep copy clone of the current item
-    // Parameters:
-    //    None.
-    // Returned value:
-    //    Pointer to the new item, or NULL if failed.
-
-    virtual CCacheItem* clone() = 0;
-
-    // Functionality:
-    //    get a random key value between 0 and MAX_INT to be used for the hash in cache
-    // Parameters:
-    //    None.
-    // Returned value:
-    //    A random hash key.
-
-    virtual int getKey() = 0;
-
-    // If there is any shared resources between the cache item and its clone,
-    // the shared resource should be released by this function.
-    virtual void release() {}
-};
-
-template<typename T> class CCache
+template<typename T>
+class CCache
 {
 public:
     CCache(int size = 1024):
-        m_iMaxSize(size),
-        m_iHashSize(size * 3),
-        m_iCurrSize(0)
+        m_cache(size)
     {
-        m_vHashPtr.resize(m_iHashSize);
-    }
-
-    ~CCache()
-    {
-        clear();
     }
 
 public:
-    // Functionality:
-    //    find the matching item in the cache.
-    // Parameters:
-    //    0) [in/out] data: storage for the retrieved item; initially it must carry the key information
-    // Returned value:
-    //    0 if found a match, otherwise -1.
-
-    int lookup(T* data)
+    // Get item by the key. If item with such key is found, it is copied to *data.
+    // @return true if found a match, false otherwise.
+    bool lookup(int key, T* data)
     {
-        std::lock_guard<std::mutex> cacheguard(m_Lock);
+        std::lock_guard<std::mutex> cacheguard(m_lock);
 
-        int key = data->getKey();
-        if (key < 0)
-            return -1;
-        if (key >= m_iMaxSize)
-            key %= m_iHashSize;
+        auto item = m_cache.getValue(key);
+        if (!item)
+            return false;
 
-        const ItemPtrList& item_list = m_vHashPtr[key];
-        for (typename ItemPtrList::const_iterator i = item_list.begin(); i != item_list.end(); ++i)
-        {
-            if (*data == ***i)
-            {
-                // copy the cached info
-                *data = ***i;
-                return 0;
-            }
-        }
-
-        return -1;
+        *data = *item;
+        return true;
     }
 
-    // Functionality:
-    //    update an item in the cache, or insert one if it doesn't exist; oldest item may be removed
-    // Parameters:
-    //    0) [in] data: the new item to updated/inserted to the cache
-    // Returned value:
-    //    0 if success, otherwise -1.
-
-    int update(T* data)
+    // Insert new or update existing item in the cache.
+    void put(int key, T data)
     {
-        std::lock_guard<std::mutex> cacheguard(m_Lock);
-
-        int key = data->getKey();
-        if (key < 0)
-            return -1;
-        if (key >= m_iMaxSize)
-            key %= m_iHashSize;
-
-        T* curr = NULL;
-
-        ItemPtrList& item_list = m_vHashPtr[key];
-        for (typename ItemPtrList::iterator i = item_list.begin(); i != item_list.end(); ++i)
-        {
-            if (*data == ***i)
-            {
-                // update the existing entry with the new value
-                ***i = *data;
-                curr = **i;
-
-                // remove the current entry
-                m_StorageList.erase(*i);
-                item_list.erase(i);
-
-                // re-insert to the front
-                m_StorageList.push_front(curr);
-                item_list.push_front(m_StorageList.begin());
-
-                return 0;
-            }
-        }
-
-        // create new entry and insert to front
-        curr = data->clone();
-        m_StorageList.push_front(curr);
-        item_list.push_front(m_StorageList.begin());
-
-        ++m_iCurrSize;
-        if (m_iCurrSize >= m_iMaxSize)
-        {
-            // Cache overflow, remove oldest entry.
-            T* last_data = m_StorageList.back();
-            int last_key = last_data->getKey() % m_iHashSize;
-
-            item_list = m_vHashPtr[last_key];
-            for (typename ItemPtrList::iterator i = item_list.begin(); i != item_list.end(); ++i)
-            {
-                if (*last_data == ***i)
-                {
-                    item_list.erase(i);
-                    break;
-                }
-            }
-
-            last_data->release();
-            delete last_data;
-            m_StorageList.pop_back();
-            --m_iCurrSize;
-        }
-
-        return 0;
+        std::lock_guard<std::mutex> cacheguard(m_lock);
+        m_cache.put(key, std::move(data));
     }
-
-    // Functionality:
-    //    Specify the cache size (i.e., max number of items).
-    // Parameters:
-    //    0) [in] size: max cache size.
-    // Returned value:
-    //    None.
-
-    void setSizeLimit(int size)
-    {
-        m_iMaxSize = size;
-        m_iHashSize = size * 3;
-        m_vHashPtr.resize(m_iHashSize);
-    }
-
-    // Functionality:
-    //    Clear all entries in the cache, restore to initialization state.
-    // Parameters:
-    //    None.
-    // Returned value:
-    //    None.
 
     void clear()
     {
-        for (auto i = m_StorageList.begin(); i != m_StorageList.end(); ++i)
-        {
-            (*i)->release();
-            delete *i;
-        }
-        m_StorageList.clear();
-        for (auto i = m_vHashPtr.begin(); i != m_vHashPtr.end(); ++i)
-            i->clear();
-        m_iCurrSize = 0;
+        std::lock_guard<std::mutex> cacheguard(m_lock);
+        m_cache.clear();
     }
 
 private:
-    std::list<T*> m_StorageList;
-    typedef typename std::list<T*>::iterator ItemPtr;
-    typedef std::list<ItemPtr> ItemPtrList;
-    std::vector<ItemPtrList> m_vHashPtr;
-
-    int m_iMaxSize;
-    int m_iHashSize;
-    int m_iCurrSize;
-
-    std::mutex m_Lock;
-
-private:
-    CCache(const CCache&);
-    CCache& operator=(const CCache&);
+    udt::detail::LruCache<int, T> m_cache;
+    std::mutex m_lock;
 };
-
 
 class CInfoBlock
 {
@@ -269,12 +107,10 @@ public:
 
 public:
     CInfoBlock();
-    virtual ~CInfoBlock() = default;
-    virtual CInfoBlock& operator=(const CInfoBlock& obj);
-    virtual bool operator==(const CInfoBlock& obj) const;
-    virtual CInfoBlock* clone();
-    virtual int getKey();
-    virtual void release() {}
+
+    int getKey() const;
+
+    bool operator==(const CInfoBlock& obj) const;
 
 public:
 
