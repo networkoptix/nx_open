@@ -16,16 +16,64 @@
 
 namespace nx::sdk::cloud_storage {
 
+template<typename T>
+struct ValueOrError
+{
+    static ValueOrError<T> makeValue(T t)
+    {
+        ValueOrError<T> result;
+        result.v = std::move(t);
+        return result;
+    }
+
+    static ValueOrError<T> makeError(std::string s)
+    {
+        ValueOrError<T> result;
+        result.e = std::move(s);
+        return result;
+    }
+
+    operator bool() const
+    {
+        return (bool) v;
+    }
+
+    T value() const
+    {
+        return *v;
+    }
+
+    std::string error() const
+    {
+        return *e;
+    }
+
+private:
+    std::optional<T> v;
+    std::optional<std::string> e;
+
+    ValueOrError() = default;
+};
+
+/**
+ * Every data structure here has two alternative ways of constructing from the string and json:
+ * 1) Constructors which throw exception on invalid data.
+ * 2) static `fromJson` functions which never throw and return error if parsing fails.
+ */
+
 struct PluginManifest
 {
-    PluginManifest(const char* jsonStr);
-    PluginManifest(const nx::kit::Json& json);
+    PluginManifest(const char* jsonStr) noexcept(false);
+    PluginManifest(const nx::kit::Json& json) noexcept(false);
     PluginManifest(
         const std::string& id,
         const std::string& name,
         const std::string& description,
         const std::string& version,
         const std::string& vendor);
+
+    static ValueOrError<PluginManifest> fromJson(const char* jsonStr) noexcept;
+    static ValueOrError<PluginManifest> fromJson(const nx::kit::Json& json) noexcept;
 
     PluginManifest() = default;
 
@@ -49,10 +97,13 @@ struct PluginManifest
 
 struct TimePeriod
 {
-    TimePeriod(const char* jsonStr);
-    TimePeriod(const nx::kit::Json& json);
+    TimePeriod(const char* jsonStr) noexcept(false);
+    TimePeriod(const nx::kit::Json& json) noexcept(false);
     TimePeriod(std::chrono::milliseconds startTimestamp, std::chrono::milliseconds duration);
     TimePeriod() = default;
+
+    static ValueOrError<TimePeriod> fromJson(const char* jsonStr) noexcept;
+    static ValueOrError<TimePeriod> fromJson(const nx::kit::Json& json) noexcept;
 
     template<typename T>
     TimePeriod(const T&) = delete;
@@ -77,10 +128,13 @@ TimePeriodList timePeriodListFromJson(const char* data);
 
 struct KeyValuePair
 {
-    KeyValuePair(const char* jsonStr);
-    KeyValuePair(const nx::kit::Json& json);
+    KeyValuePair(const char* jsonStr) noexcept(false);
+    KeyValuePair(const nx::kit::Json& json) noexcept(false);
     KeyValuePair() = default;
     KeyValuePair(const std::string& name, const std::string& value);
+
+    static ValueOrError<KeyValuePair> fromJson(const char* jsonStr) noexcept;
+    static ValueOrError<KeyValuePair> fromJson(const nx::kit::Json& json) noexcept;
 
     template<typename T>
     KeyValuePair(const T&) = delete;
@@ -101,9 +155,12 @@ using DeviceParameter = KeyValuePair;
 struct DeviceDescription
 {
     DeviceDescription() = default;
-    DeviceDescription(const char* jsonData);
-    DeviceDescription(const nx::kit::Json& json);
+    DeviceDescription(const char* jsonData) noexcept(false);
+    DeviceDescription(const nx::kit::Json& json) noexcept(false);
     DeviceDescription(const nx::sdk::IDeviceInfo* info);
+
+    static ValueOrError<DeviceDescription> fromJson(const char* jsonStr) noexcept;
+    static ValueOrError<DeviceDescription> fromJson(const nx::kit::Json& json) noexcept;
 
     template<typename T>
     DeviceDescription(const T&) = delete;
@@ -126,9 +183,12 @@ std::string toString(sdk::cloud_storage::MetadataType metadataType);
 // Plugin should keep bookmarks as is, without any changes.
 struct Bookmark
 {
-    Bookmark(const char* jsonData);
-    Bookmark(const nx::kit::Json& json);
+    Bookmark(const char* jsonData) noexcept(false);
+    Bookmark(const nx::kit::Json& json) noexcept(false);
     Bookmark() = default;
+
+    static ValueOrError<Bookmark> fromJson(const char* jsonStr) noexcept;
+    static ValueOrError<Bookmark> fromJson(const nx::kit::Json& json) noexcept;
 
     template<typename T>
     Bookmark(const T&) = delete;
@@ -178,9 +238,12 @@ struct BookmarkFilter
         description,
     };
 
-    BookmarkFilter(const char* jsonData);
-    BookmarkFilter(const nx::kit::Json& json);
+    BookmarkFilter(const char* jsonData) noexcept(false);
+    BookmarkFilter(const nx::kit::Json& json) noexcept(false);
     BookmarkFilter() = default;
+
+    static ValueOrError<BookmarkFilter> fromJson(const char* jsonStr) noexcept;
+    static ValueOrError<BookmarkFilter> fromJson(const nx::kit::Json& json) noexcept;
 
     template<typename T>
     BookmarkFilter(const T&) = delete;
@@ -213,8 +276,11 @@ struct BookmarkFilter
 struct Motion
 {
     Motion() = default;
-    Motion(const char* jsonData);
-    Motion(const nx::kit::Json& json);
+    Motion(const char* jsonData) noexcept(false);
+    Motion(const nx::kit::Json& json) noexcept(false);
+
+    static ValueOrError<Motion> fromJson(const char* jsonStr) noexcept;
+    static ValueOrError<Motion> fromJson(const nx::kit::Json& json) noexcept;
 
     template<typename T>
     Motion(const T&) = delete;
@@ -237,10 +303,13 @@ struct Motion
 
 struct Rect
 {
-    Rect(const char* jsonData);
-    Rect(const nx::kit::Json& json);
+    Rect(const char* jsonData) noexcept(false);
+    Rect(const nx::kit::Json& json) noexcept(false);
     Rect(double x, double y, double w, double h);
     Rect() = default;
+
+    static ValueOrError<Rect> fromJson(const char* jsonStr) noexcept;
+    static ValueOrError<Rect> fromJson(const nx::kit::Json& json) noexcept;
 
     template<typename T>
     Rect(const T&) = delete;
@@ -270,8 +339,11 @@ private:
 struct MotionFilter
 {
     MotionFilter() = default;
-    MotionFilter(const char* jsonData);
-    MotionFilter(const nx::kit::Json& json);
+    MotionFilter(const char* jsonData) noexcept(false);
+    MotionFilter(const nx::kit::Json& json) noexcept(false);
+
+    static ValueOrError<MotionFilter> fromJson(const char* jsonStr) noexcept;
+    static ValueOrError<MotionFilter> fromJson(const nx::kit::Json& json) noexcept;
 
     template<typename T>
     MotionFilter(const T&) = delete;
@@ -304,8 +376,11 @@ using Attributes = std::vector<KeyValuePair>;
 struct ObjectRegion
 {
     ObjectRegion() = default;
-    ObjectRegion(const nx::kit::Json & json);
-    ObjectRegion(const char* jsonData);
+    ObjectRegion(const nx::kit::Json & json) noexcept(false);
+    ObjectRegion(const char* jsonData) noexcept(false);
+
+    static ValueOrError<ObjectRegion> fromJson(const char* jsonStr) noexcept;
+    static ValueOrError<ObjectRegion> fromJson(const nx::kit::Json& json) noexcept;
 
     template<typename T>
     ObjectRegion(const T&) = delete;
@@ -325,8 +400,11 @@ struct ObjectRegion
 struct BestShot
 {
     BestShot() = default;
-    BestShot(const nx::kit::Json& json);
-    BestShot(const char* jsonData);
+    BestShot(const nx::kit::Json& json) noexcept(false);
+    BestShot(const char* jsonData) noexcept(false);
+
+    static ValueOrError<BestShot> fromJson(const char* jsonStr) noexcept;
+    static ValueOrError<BestShot> fromJson(const nx::kit::Json& json) noexcept;
 
     template<typename T>
     BestShot(const T&) = delete;
@@ -344,8 +422,11 @@ struct BestShot
 struct ObjectTrack
 {
     ObjectTrack() = default;
-    ObjectTrack(const nx::kit::Json & json);
-    ObjectTrack(const char* jsonData);
+    ObjectTrack(const nx::kit::Json & json) noexcept(false);
+    ObjectTrack(const char* jsonData) noexcept(false);
+
+    static ValueOrError<ObjectTrack> fromJson(const char* jsonStr) noexcept;
+    static ValueOrError<ObjectTrack> fromJson(const nx::kit::Json& json) noexcept;
 
     template<typename T>
     ObjectTrack(const T&) = delete;
@@ -380,8 +461,11 @@ struct ObjectTrack
 struct BestShotImage
 {
     BestShotImage() = default;
-    BestShotImage(const nx::kit::Json& json);
-    BestShotImage(const char* jsonData);
+    BestShotImage(const nx::kit::Json& json) noexcept(false);
+    BestShotImage(const char* jsonData) noexcept(false);
+
+    static ValueOrError<BestShotImage> fromJson(const char* jsonStr) noexcept;
+    static ValueOrError<BestShotImage> fromJson(const nx::kit::Json& json) noexcept;
 
     template<typename T>
     BestShotImage(const T&) = delete;
@@ -405,8 +489,11 @@ AnalyticsLookupResult analyticsLookupResultFromJson(const char* data);
 struct RangePoint
 {
     RangePoint() = default;
-    RangePoint(const nx::kit::Json& json);
-    RangePoint(const char* jsonData);
+    RangePoint(const nx::kit::Json& json) noexcept(false);
+    RangePoint(const char* jsonData) noexcept(false);
+
+    static ValueOrError<RangePoint> fromJson(const char* jsonStr) noexcept;
+    static ValueOrError<RangePoint> fromJson(const nx::kit::Json& json) noexcept;
 
     template<typename T>
     RangePoint(const T&) = delete;
@@ -426,8 +513,11 @@ struct RangePoint
 struct NumericRange
 {
     NumericRange() = default;
-    NumericRange(const nx::kit::Json& json);
-    NumericRange(const char* jsonData);
+    NumericRange(const nx::kit::Json& json) noexcept(false);
+    NumericRange(const char* jsonData) noexcept(false);
+
+    static ValueOrError<NumericRange> fromJson(const char* jsonStr) noexcept;
+    static ValueOrError<NumericRange> fromJson(const nx::kit::Json& json) noexcept;
 
     template<typename T>
     NumericRange(const T&) = delete;
@@ -460,8 +550,11 @@ struct NumericRange
 struct AttributeSearchCondition
 {
     AttributeSearchCondition() = default;
-    AttributeSearchCondition(const nx::kit::Json& json);
-    AttributeSearchCondition(const char* jsonData);
+    AttributeSearchCondition(const nx::kit::Json& json) noexcept(false);
+    AttributeSearchCondition(const char* jsonData) noexcept(false);
+
+    static ValueOrError<AttributeSearchCondition> fromJson(const char* jsonStr) noexcept;
+    static ValueOrError<AttributeSearchCondition> fromJson(const nx::kit::Json& json) noexcept;
 
     template<typename T>
     AttributeSearchCondition(const T&) = delete;
@@ -516,8 +609,11 @@ struct AttributeSearchCondition
 struct AnalyticsFilter
 {
     AnalyticsFilter() = default;
-    AnalyticsFilter(const char* jsonData);
-    AnalyticsFilter(const nx::kit::Json& json);
+    AnalyticsFilter(const char* jsonData) noexcept(false);
+    AnalyticsFilter(const nx::kit::Json& json) noexcept(false);
+
+    static ValueOrError<AnalyticsFilter> fromJson(const char* jsonStr) noexcept;
+    static ValueOrError<AnalyticsFilter> fromJson(const nx::kit::Json& json) noexcept;
 
     template<typename T>
     AnalyticsFilter(const T&) = delete;
@@ -563,9 +659,12 @@ struct AnalyticsFilter
 struct CodecInfoData
 {
     CodecInfoData();
-    CodecInfoData(const char* jsonData);
-    CodecInfoData(const nx::kit::Json& json);
+    CodecInfoData(const char* jsonData) noexcept(false);
+    CodecInfoData(const nx::kit::Json& json) noexcept(false);
     CodecInfoData(const nx::sdk::cloud_storage::ICodecInfo* codecInfo);
+
+    static ValueOrError<CodecInfoData> fromJson(const char* jsonStr) noexcept;
+    static ValueOrError<CodecInfoData> fromJson(const nx::kit::Json& json) noexcept;
 
     template<typename T>
     CodecInfoData(const T&) = delete;
@@ -614,8 +713,11 @@ struct MediaPacketData
 struct CloudDeviceReportEntry
 {
     CloudDeviceReportEntry() = default;
-    CloudDeviceReportEntry(const char* jsonData);
-    CloudDeviceReportEntry(const nx::kit::Json& json);
+    CloudDeviceReportEntry(const char* jsonData) noexcept(false);
+    CloudDeviceReportEntry(const nx::kit::Json& json) noexcept(false);
+
+    static ValueOrError<CloudDeviceReportEntry> fromJson(const char* jsonStr) noexcept;
+    static ValueOrError<CloudDeviceReportEntry> fromJson(const nx::kit::Json& json) noexcept;
 
     std::string id;
     std::string serviceId;
@@ -629,8 +731,11 @@ using CloudDeviceEntryList = std::vector<CloudDeviceReportEntry>;
 struct CloudDeviceReport
 {
     CloudDeviceReport() = default;
-    CloudDeviceReport(const char* jsonData);
-    CloudDeviceReport(const nx::kit::Json& json);
+    CloudDeviceReport(const char* jsonData) noexcept(false);
+    CloudDeviceReport(const nx::kit::Json& json) noexcept(false);
+
+    static ValueOrError<CloudDeviceReport> fromJson(const char* jsonStr) noexcept;
+    static ValueOrError<CloudDeviceReport> fromJson(const nx::kit::Json& json) noexcept;
 
     std::string cloudSystemId;
     CloudDeviceEntryList devices;
