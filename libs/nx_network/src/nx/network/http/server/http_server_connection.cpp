@@ -108,7 +108,7 @@ void HttpServerConnection::processMessage(
     auto requestContext = prepareRequestAuthContext(std::move(*requestMessage.request));
 
     NX_VERBOSE(this, "Processing request %1 received from %2",
-        requestContext->request.requestLine.url, getForeignAddress());
+        requestContext->request.requestLine, getForeignAddress());
 
     checkForConnectionPersistency(requestContext->request);
 
