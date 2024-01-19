@@ -781,6 +781,21 @@ void PlayerPrivate::applyVideoQuality()
     at_hurryUp(); //< skip waiting for current frame
 }
 
+void Player::invalidateServer()
+{
+    Q_D(Player);
+
+    if (!d->archiveReader)
+        return;
+
+    auto delegate = dynamic_cast<QnRtspClientArchiveDelegate*>(
+        d->archiveReader->getArchiveDelegate());
+
+    if (!delegate)
+        return;
+    delegate->invalidateServer();
+}
+
 bool PlayerPrivate::createArchiveReader()
 {
     if (!resource)
