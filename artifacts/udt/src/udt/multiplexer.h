@@ -2,6 +2,8 @@
 
 #include <memory>
 
+#include "result.h"
+
 class CSndQueue;
 class CRcvQueue;
 class AbstractUdpChannel;
@@ -21,7 +23,7 @@ public:
         int id);
     virtual ~Multiplexer();
 
-    void start();
+    Result<> start();
 
     void shutdown();
 

@@ -88,7 +88,7 @@ static constexpr int kMaxSocketId = std::numeric_limits<int>::max() - 1;
 CUDTUnited::CUDTUnited()
 {
     // Socket ID MUST start from a random value
-    srand(CTimer::getTime().count());
+    srand((int) CTimer::getTime().count());
     m_SocketIdSequence = kMinSocketId + (int)((1 << 30) * (double(rand()) / RAND_MAX));
 
     m_cache = std::make_unique<CCache<CInfoBlock>>();
@@ -148,7 +148,7 @@ Result<> CUDTUnited::deinitializeUdtLibrary()
         return success();
 
     {
-        std::lock_guard<std::mutex> lock(m_GCStopLock);
+        std::lock_guard<std::mutex> lock1(m_GCStopLock);
         m_bClosing = true;
         m_GCStopCond.notify_all();
     }
@@ -955,13 +955,13 @@ std::shared_ptr<CUDTSocket> CUDTUnited::locateSocketByHandshakeInfo(
 
     for (const auto& sockId: it->second)
     {
-        auto it = m_Sockets.find(sockId);
+        auto sockIt = m_Sockets.find(sockId);
         // this socket might have been closed and moved m_ClosedSockets
-        if (it == m_Sockets.end())
+        if (sockIt == m_Sockets.end())
             continue;
 
-        if (peer == it->second->m_pPeerAddr)
-            return it->second;
+        if (peer == sockIt->second->m_pPeerAddr)
+            return sockIt->second;
     }
 
     return nullptr;
@@ -1242,7 +1242,11 @@ Result<> CUDTUnited::updateMux(
     s->m_pUDT->setMultiplexer(multiplexer);
     s->m_multiplexerId = multiplexer->id;
 
-    multiplexer->start();
+    if (auto result = multiplexer->start(); !result.ok())
+    {
+        multiplexer->channel().shutdown();
+        return result;
+    }
 
     return success();
 }

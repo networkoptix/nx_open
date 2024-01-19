@@ -32,10 +32,15 @@ Multiplexer::~Multiplexer()
     shutdown();
 }
 
-void Multiplexer::start()
+Result<> Multiplexer::start()
 {
-    m_sendQueue->start();
-    m_recvQueue->start();
+    if (auto result = m_sendQueue->start(); !result.ok())
+        return result;
+
+    if (auto result = m_recvQueue->start(); !result.ok())
+        return result;
+
+    return success();
 }
 
 void Multiplexer::shutdown()

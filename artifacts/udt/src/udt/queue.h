@@ -54,6 +54,7 @@ Yunhong Gu, last updated 01/12/2011
 
 #include "channel.h"
 #include "common.h"
+#include "result.h"
 #include "unit_queue.h"
 
 static constexpr auto kSyncRepeatMinPeriod = std::chrono::milliseconds(250);
@@ -248,7 +249,7 @@ public:
     CSndQueue(const CSndQueue&) = delete;
     CSndQueue& operator=(const CSndQueue&) = delete;
 
-    void start();
+    Result<> start();
 
     // Functionality:
     //    Send out a packet to a given address.
@@ -318,7 +319,7 @@ public:
     CRcvQueue(const CRcvQueue&) = delete;
     CRcvQueue& operator=(const CRcvQueue&) = delete;
 
-    void start();
+    Result<> start();
     void stop();
 
     // Functionality:
