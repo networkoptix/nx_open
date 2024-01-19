@@ -200,6 +200,30 @@ PluginManifest::PluginManifest(const nx::kit::Json& json)
     vendor = getStringValue(json, "vendor");
 }
 
+ValueOrError<PluginManifest> PluginManifest::fromJson(const char* jsonStr) noexcept
+{
+    try
+    {
+        return ValueOrError<PluginManifest>::makeValue(PluginManifest(jsonStr));
+    }
+    catch (const std::exception& e)
+    {
+        return ValueOrError<PluginManifest>::makeError(e.what());
+    }
+}
+
+ValueOrError<PluginManifest> PluginManifest::fromJson(const nx::kit::Json& json) noexcept
+{
+    try
+    {
+        return ValueOrError<PluginManifest>::makeValue(PluginManifest(json));
+    }
+    catch (const std::exception& e)
+    {
+        return ValueOrError<PluginManifest>::makeError(e.what());
+    }
+}
+
 PluginManifest::PluginManifest(
     const std::string& id,
     const std::string& name,
@@ -309,6 +333,30 @@ KeyValuePair::KeyValuePair(const nx::kit::Json& json)
     value = getStringValue(json, "value");
 }
 
+ValueOrError<KeyValuePair> KeyValuePair::fromJson(const char* jsonStr) noexcept
+{
+    try
+    {
+        return ValueOrError<KeyValuePair>::makeValue(KeyValuePair(jsonStr));
+    }
+    catch (const std::exception& e)
+    {
+        return ValueOrError<KeyValuePair>::makeError(e.what());
+    }
+}
+
+ValueOrError<KeyValuePair> KeyValuePair::fromJson(const nx::kit::Json& json) noexcept
+{
+    try
+    {
+        return ValueOrError<KeyValuePair>::makeValue(KeyValuePair(json));
+    }
+    catch (const std::exception& e)
+    {
+        return ValueOrError<KeyValuePair>::makeError(e.what());
+    }
+}
+
 KeyValuePair::KeyValuePair(const std::string& name, const std::string& value):
     name(name), value(value)
 {
@@ -350,6 +398,30 @@ DeviceDescription::DeviceDescription(const char* jsonData): DeviceDescription(pa
 DeviceDescription::DeviceDescription(const nx::kit::Json& json)
 {
     parameters = getObjectListValue<KeyValuePair>(json, "parameters");
+}
+
+ValueOrError<DeviceDescription> DeviceDescription::fromJson(const char* jsonStr) noexcept
+{
+    try
+    {
+        return ValueOrError<DeviceDescription>::makeValue(DeviceDescription(jsonStr));
+    }
+    catch (const std::exception& e)
+    {
+        return ValueOrError<DeviceDescription>::makeError(e.what());
+    }
+}
+
+ValueOrError<DeviceDescription> DeviceDescription::fromJson(const nx::kit::Json& json) noexcept
+{
+    try
+    {
+        return ValueOrError<DeviceDescription>::makeValue(DeviceDescription(json));
+    }
+    catch (const std::exception& e)
+    {
+        return ValueOrError<DeviceDescription>::makeError(e.what());
+    }
 }
 
 DeviceDescription::DeviceDescription(const nx::sdk::IDeviceInfo* info)
@@ -429,6 +501,30 @@ Bookmark::Bookmark(const nx::kit::Json& json)
     duration = milliseconds(getIntValue(json, "duration"));
     tags = getStringListValue(json, "tags");
     deviceId = getStringValue(json, "deviceId");
+}
+
+ValueOrError<Bookmark> Bookmark::fromJson(const char* jsonStr) noexcept
+{
+    try
+    {
+        return ValueOrError<Bookmark>::makeValue(Bookmark(jsonStr));
+    }
+    catch (const std::exception& e)
+    {
+        return ValueOrError<Bookmark>::makeError(e.what());
+    }
+}
+
+ValueOrError<Bookmark> Bookmark::fromJson(const nx::kit::Json& json) noexcept
+{
+    try
+    {
+        return ValueOrError<Bookmark>::makeValue(Bookmark(json));
+    }
+    catch (const std::exception& e)
+    {
+        return ValueOrError<Bookmark>::makeError(e.what());
+    }
 }
 
 bool Bookmark::operator==(const Bookmark& other) const
@@ -555,6 +651,30 @@ BookmarkFilter::BookmarkFilter(const nx::kit::Json& json)
     creationEndTimestamp = getOptionalDurationValue<milliseconds>(json, "creationEndTimestamp");
 }
 
+ValueOrError<BookmarkFilter> BookmarkFilter::fromJson(const char* jsonStr) noexcept
+{
+    try
+    {
+        return ValueOrError<BookmarkFilter>::makeValue(BookmarkFilter(jsonStr));
+    }
+    catch (const std::exception& e)
+    {
+        return ValueOrError<BookmarkFilter>::makeError(e.what());
+    }
+}
+
+ValueOrError<BookmarkFilter> BookmarkFilter::fromJson(const nx::kit::Json& json) noexcept
+{
+    try
+    {
+        return ValueOrError<BookmarkFilter>::makeValue(BookmarkFilter(json));
+    }
+    catch (const std::exception& e)
+    {
+        return ValueOrError<BookmarkFilter>::makeError(e.what());
+    }
+}
+
 bool BookmarkFilter::operator==(const BookmarkFilter& other) const
 {
     return other.column == column && other.creationEndTimestamp == creationEndTimestamp
@@ -612,6 +732,30 @@ Motion::Motion(const nx::kit::Json& json)
     dataBase64 = getStringValue(json, "dataBase64");
 }
 
+ValueOrError<Motion> Motion::fromJson(const char* jsonStr) noexcept
+{
+    try
+    {
+        return ValueOrError<Motion>::makeValue(Motion(jsonStr));
+    }
+    catch (const std::exception& e)
+    {
+        return ValueOrError<Motion>::makeError(e.what());
+    }
+}
+
+ValueOrError<Motion> Motion::fromJson(const nx::kit::Json& json) noexcept
+{
+    try
+    {
+        return ValueOrError<Motion>::makeValue(Motion(json));
+    }
+    catch (const std::exception& e)
+    {
+        return ValueOrError<Motion>::makeError(e.what());
+    }
+}
+
 bool Motion::operator==(const Motion& other) const
 {
     return other.channel == channel && other.dataBase64 == dataBase64 && other.deviceId == deviceId
@@ -639,6 +783,30 @@ Rect::Rect(const nx::kit::Json& json)
     y = getIntValue(json, "y");
     w = getIntValue(json, "w");
     h = getIntValue(json, "h");
+}
+
+ValueOrError<Rect> Rect::fromJson(const char* jsonStr) noexcept
+{
+    try
+    {
+        return ValueOrError<Rect>::makeValue(Rect(jsonStr));
+    }
+    catch (const std::exception& e)
+    {
+        return ValueOrError<Rect>::makeError(e.what());
+    }
+}
+
+ValueOrError<Rect> Rect::fromJson(const nx::kit::Json& json) noexcept
+{
+    try
+    {
+        return ValueOrError<Rect>::makeValue(Rect(json));
+    }
+    catch (const std::exception& e)
+    {
+        return ValueOrError<Rect>::makeError(e.what());
+    }
 }
 
 Rect::Rect(double x, double y, double w, double h):
@@ -711,6 +879,30 @@ TimePeriod::TimePeriod(const nx::kit::Json& json)
     duration = milliseconds(getIntValue(json, "duration"));
 }
 
+ValueOrError<TimePeriod> TimePeriod::fromJson(const char* jsonStr) noexcept
+{
+    try
+    {
+        return ValueOrError<TimePeriod>::makeValue(TimePeriod(jsonStr));
+    }
+    catch (const std::exception& e)
+    {
+        return ValueOrError<TimePeriod>::makeError(e.what());
+    }
+}
+
+ValueOrError<TimePeriod> TimePeriod::fromJson(const nx::kit::Json& json) noexcept
+{
+    try
+    {
+        return ValueOrError<TimePeriod>::makeValue(TimePeriod(json));
+    }
+    catch (const std::exception& e)
+    {
+        return ValueOrError<TimePeriod>::makeError(e.what());
+    }
+}
+
 TimePeriod::TimePeriod(
     std::chrono::milliseconds startTimestamp,
     std::chrono::milliseconds duration)
@@ -733,6 +925,30 @@ MotionFilter::MotionFilter(const nx::kit::Json& json)
     limit = optionalLimit ? std::optional<int>((int)*optionalLimit) : std::nullopt;
     order = sortOrderFromString(getStringValue(json, "order"));
     detailLevel = milliseconds(getIntValue(json, "detailLevel"));
+}
+
+ValueOrError<MotionFilter> MotionFilter::fromJson(const char* jsonStr) noexcept
+{
+    try
+    {
+        return ValueOrError<MotionFilter>::makeValue(MotionFilter(jsonStr));
+    }
+    catch (const std::exception& e)
+    {
+        return ValueOrError<MotionFilter>::makeError(e.what());
+    }
+}
+
+ValueOrError<MotionFilter> MotionFilter::fromJson(const nx::kit::Json& json) noexcept
+{
+    try
+    {
+        return ValueOrError<MotionFilter>::makeValue(MotionFilter(json));
+    }
+    catch (const std::exception& e)
+    {
+        return ValueOrError<MotionFilter>::makeError(e.what());
+    }
 }
 
 bool MotionFilter::operator==(const MotionFilter& other) const
@@ -876,6 +1092,30 @@ RangePoint::RangePoint(const char* jsonData): RangePoint(parseJson(jsonData))
 {
 }
 
+ValueOrError<RangePoint> RangePoint::fromJson(const char* jsonStr) noexcept
+{
+    try
+    {
+        return ValueOrError<RangePoint>::makeValue(RangePoint(jsonStr));
+    }
+    catch (const std::exception& e)
+    {
+        return ValueOrError<RangePoint>::makeError(e.what());
+    }
+}
+
+ValueOrError<RangePoint> RangePoint::fromJson(const nx::kit::Json& json) noexcept
+{
+    try
+    {
+        return ValueOrError<RangePoint>::makeValue(RangePoint(json));
+    }
+    catch (const std::exception& e)
+    {
+        return ValueOrError<RangePoint>::makeError(e.what());
+    }
+}
+
 RangePoint::RangePoint(float value, bool inclusive): value(value), inclusive(inclusive)
 {
 }
@@ -906,6 +1146,30 @@ nx::kit::Json NumericRange::to_json() const
         result["to"] = *to;
 
     return result;
+}
+
+ValueOrError<NumericRange> NumericRange::fromJson(const char* jsonStr) noexcept
+{
+    try
+    {
+        return ValueOrError<NumericRange>::makeValue(NumericRange(jsonStr));
+    }
+    catch (const std::exception& e)
+    {
+        return ValueOrError<NumericRange>::makeError(e.what());
+    }
+}
+
+ValueOrError<NumericRange> NumericRange::fromJson(const nx::kit::Json& json) noexcept
+{
+    try
+    {
+        return ValueOrError<NumericRange>::makeValue(NumericRange(json));
+    }
+    catch (const std::exception& e)
+    {
+        return ValueOrError<NumericRange>::makeError(e.what());
+    }
 }
 
 NumericRange::NumericRange(const char* jsonData): NumericRange(parseJson(jsonData))
@@ -1046,6 +1310,30 @@ AttributeSearchCondition::AttributeSearchCondition(const char* jsonData):
 {
 }
 
+ValueOrError<AttributeSearchCondition> AttributeSearchCondition::fromJson(const char* jsonStr) noexcept
+{
+    try
+    {
+        return ValueOrError<AttributeSearchCondition>::makeValue(AttributeSearchCondition(jsonStr));
+    }
+    catch (const std::exception& e)
+    {
+        return ValueOrError<AttributeSearchCondition>::makeError(e.what());
+    }
+}
+
+ValueOrError<AttributeSearchCondition> AttributeSearchCondition::fromJson(const nx::kit::Json& json) noexcept
+{
+    try
+    {
+        return ValueOrError<AttributeSearchCondition>::makeValue(AttributeSearchCondition(json));
+    }
+    catch (const std::exception& e)
+    {
+        return ValueOrError<AttributeSearchCondition>::makeError(e.what());
+    }
+}
+
 bool AttributeSearchCondition::operator==(const AttributeSearchCondition& other) const
 {
     return other.isNegative == isNegative && other.name == name && other.range == range
@@ -1121,6 +1409,30 @@ AnalyticsFilter::AnalyticsFilter(const nx::kit::Json& json)
         getObjectListValue<AttributeSearchCondition>(json, "attributeSearchConditions");
 }
 
+ValueOrError<AnalyticsFilter> AnalyticsFilter::fromJson(const char* jsonStr) noexcept
+{
+    try
+    {
+        return ValueOrError<AnalyticsFilter>::makeValue(AnalyticsFilter(jsonStr));
+    }
+    catch (const std::exception& e)
+    {
+        return ValueOrError<AnalyticsFilter>::makeError(e.what());
+    }
+}
+
+ValueOrError<AnalyticsFilter> AnalyticsFilter::fromJson(const nx::kit::Json& json) noexcept
+{
+    try
+    {
+        return ValueOrError<AnalyticsFilter>::makeValue(AnalyticsFilter(json));
+    }
+    catch (const std::exception& e)
+    {
+        return ValueOrError<AnalyticsFilter>::makeError(e.what());
+    }
+}
+
 bool AnalyticsFilter::operator==(const AnalyticsFilter& other) const
 {
     return other.analyticsEngineId == analyticsEngineId
@@ -1176,6 +1488,30 @@ nx::kit::Json ObjectRegion::to_json() const
     return nx::kit::Json::object({{"boundingBoxGridBase64", boundingBoxGridBase64}});
 }
 
+ValueOrError<ObjectRegion> ObjectRegion::fromJson(const char* jsonStr) noexcept
+{
+    try
+    {
+        return ValueOrError<ObjectRegion>::makeValue(ObjectRegion(jsonStr));
+    }
+    catch (const std::exception& e)
+    {
+        return ValueOrError<ObjectRegion>::makeError(e.what());
+    }
+}
+
+ValueOrError<ObjectRegion> ObjectRegion::fromJson(const nx::kit::Json& json) noexcept
+{
+    try
+    {
+        return ValueOrError<ObjectRegion>::makeValue(ObjectRegion(json));
+    }
+    catch (const std::exception& e)
+    {
+        return ValueOrError<ObjectRegion>::makeError(e.what());
+    }
+}
+
 BestShot::BestShot(const nx::kit::Json& json)
 {
     timestamp = microseconds(getIntValue(json, "timestamp"));
@@ -1185,6 +1521,30 @@ BestShot::BestShot(const nx::kit::Json& json)
 
 BestShot::BestShot(const char* jsonData): BestShot(parseJson(jsonData))
 {
+}
+
+ValueOrError<BestShot> BestShot::fromJson(const char* jsonStr) noexcept
+{
+    try
+    {
+        return ValueOrError<BestShot>::makeValue(BestShot(jsonStr));
+    }
+    catch (const std::exception& e)
+    {
+        return ValueOrError<BestShot>::makeError(e.what());
+    }
+}
+
+ValueOrError<BestShot> BestShot::fromJson(const nx::kit::Json& json) noexcept
+{
+    try
+    {
+        return ValueOrError<BestShot>::makeValue(BestShot(json));
+    }
+    catch (const std::exception& e)
+    {
+        return ValueOrError<BestShot>::makeError(e.what());
+    }
 }
 
 bool BestShot::operator==(const BestShot& other) const
@@ -1216,6 +1576,30 @@ ObjectTrack::ObjectTrack(const nx::kit::Json & json)
     objectPosition = getObjectValue<ObjectRegion>(json, "objectPosition");
     analyticsEngineId = getStringValue(json, "analyticsEngineId");
     bestShot = getObjectValue<BestShot>(json, "bestShot");
+}
+
+ValueOrError<ObjectTrack> ObjectTrack::fromJson(const char* jsonStr) noexcept
+{
+    try
+    {
+        return ValueOrError<ObjectTrack>::makeValue(ObjectTrack(jsonStr));
+    }
+    catch (const std::exception& e)
+    {
+        return ValueOrError<ObjectTrack>::makeError(e.what());
+    }
+}
+
+ValueOrError<ObjectTrack> ObjectTrack::fromJson(const nx::kit::Json& json) noexcept
+{
+    try
+    {
+        return ValueOrError<ObjectTrack>::makeValue(ObjectTrack(json));
+    }
+    catch (const std::exception& e)
+    {
+        return ValueOrError<ObjectTrack>::makeError(e.what());
+    }
 }
 
 bool ObjectTrack::operator==(const ObjectTrack& other) const
@@ -1251,6 +1635,30 @@ BestShotImage::BestShotImage(const nx::kit::Json& json)
 
 BestShotImage::BestShotImage(const char* jsonData): BestShotImage(parseJson(jsonData))
 {
+}
+
+ValueOrError<BestShotImage> BestShotImage::fromJson(const char* jsonStr) noexcept
+{
+    try
+    {
+        return ValueOrError<BestShotImage>::makeValue(BestShotImage(jsonStr));
+    }
+    catch (const std::exception& e)
+    {
+        return ValueOrError<BestShotImage>::makeError(e.what());
+    }
+}
+
+ValueOrError<BestShotImage> BestShotImage::fromJson(const nx::kit::Json& json) noexcept
+{
+    try
+    {
+        return ValueOrError<BestShotImage>::makeValue(BestShotImage(json));
+    }
+    catch (const std::exception& e)
+    {
+        return ValueOrError<BestShotImage>::makeError(e.what());
+    }
 }
 
 bool BestShotImage::operator == (const BestShotImage& other) const
@@ -1294,6 +1702,30 @@ CodecInfoData::CodecInfoData(const nx::kit::Json& json)
     channelLayout = getIntValue(json, "channelLayout");
     channelNumber = getIntValue(json, "channelNumber");
     extradataBase64 = getStringValue(json, "extradataBase64");
+}
+
+ValueOrError<CodecInfoData> CodecInfoData::fromJson(const char* jsonStr) noexcept
+{
+    try
+    {
+        return ValueOrError<CodecInfoData>::makeValue(CodecInfoData(jsonStr));
+    }
+    catch (const std::exception& e)
+    {
+        return ValueOrError<CodecInfoData>::makeError(e.what());
+    }
+}
+
+ValueOrError<CodecInfoData> CodecInfoData::fromJson(const nx::kit::Json& json) noexcept
+{
+    try
+    {
+        return ValueOrError<CodecInfoData>::makeValue(CodecInfoData(json));
+    }
+    catch (const std::exception& e)
+    {
+        return ValueOrError<CodecInfoData>::makeError(e.what());
+    }
 }
 
 bool CodecInfoData::operator==(const CodecInfoData& other) const
@@ -1385,6 +1817,30 @@ CloudDeviceReportEntry::CloudDeviceReportEntry(const nx::kit::Json& json)
     serviceId = getStringValue(json, "serviceId");
 }
 
+ValueOrError<CloudDeviceReportEntry> CloudDeviceReportEntry::fromJson(const char* jsonStr) noexcept
+{
+    try
+    {
+        return ValueOrError<CloudDeviceReportEntry>::makeValue(CloudDeviceReportEntry(jsonStr));
+    }
+    catch (const std::exception& e)
+    {
+        return ValueOrError<CloudDeviceReportEntry>::makeError(e.what());
+    }
+}
+
+ValueOrError<CloudDeviceReportEntry> CloudDeviceReportEntry::fromJson(const nx::kit::Json& json) noexcept
+{
+    try
+    {
+        return ValueOrError<CloudDeviceReportEntry>::makeValue(CloudDeviceReportEntry(json));
+    }
+    catch (const std::exception& e)
+    {
+        return ValueOrError<CloudDeviceReportEntry>::makeError(e.what());
+    }
+}
+
 nx::kit::Json CloudDeviceReportEntry::to_json() const
 {
     return nx::kit::Json::object({
@@ -1405,6 +1861,30 @@ CloudDeviceReport::CloudDeviceReport(const nx::kit::Json& json)
 {
     cloudSystemId = getStringValue(json, "cloudSystemId");
     devices = getObjectListValue<CloudDeviceReportEntry>(json, "devices");
+}
+
+ValueOrError<CloudDeviceReport> CloudDeviceReport::fromJson(const char* jsonStr) noexcept
+{
+    try
+    {
+        return ValueOrError<CloudDeviceReport>::makeValue(CloudDeviceReport(jsonStr));
+    }
+    catch (const std::exception& e)
+    {
+        return ValueOrError<CloudDeviceReport>::makeError(e.what());
+    }
+}
+
+ValueOrError<CloudDeviceReport> CloudDeviceReport::fromJson(const nx::kit::Json& json) noexcept
+{
+    try
+    {
+        return ValueOrError<CloudDeviceReport>::makeValue(CloudDeviceReport(json));
+    }
+    catch (const std::exception& e)
+    {
+        return ValueOrError<CloudDeviceReport>::makeError(e.what());
+    }
 }
 
 nx::kit::Json CloudDeviceReport::to_json() const
