@@ -199,6 +199,11 @@ void QnRtspClientArchiveDelegate::setCamera(const QnSecurityCamResourcePtr& came
     setupRtspSession(camera, m_server, m_rtspSession.get());
 }
 
+void QnRtspClientArchiveDelegate::invalidateServer()
+{
+    m_currentServerUpToDate.clear();
+}
+
 void QnRtspClientArchiveDelegate::updateCredentials(
     const nx::network::http::Credentials& credentials)
 {

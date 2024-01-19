@@ -125,6 +125,9 @@ public:
 
     void setMediaRole(PlaybackMode mode);
     virtual bool reopen() override;
+
+    void invalidateServer();
+
 signals:
     void dataDropped(QnArchiveStreamReader* reader);
     void needUpdateTimeLine();
