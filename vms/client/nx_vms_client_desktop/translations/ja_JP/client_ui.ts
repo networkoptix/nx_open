@@ -44,7 +44,7 @@
     </message>
     <message>
       <source>Enable image enhancement</source>
-      <translation>画像補正有効</translation>
+      <translation>画像補正を有効化</translation>
     </message>
     <message>
       <source>Gamma</source>
@@ -221,7 +221,7 @@
     </message>
     <message>
       <source>Exporting video</source>
-      <translation>ビデオエクスポート</translation>
+      <translation>映像のエクスポート</translation>
     </message>
     <message>
       <source>Watching live</source>
@@ -923,7 +923,7 @@
     </message>
     <message>
       <source>Video Export</source>
-      <translation>映像エクスポート</translation>
+      <translation>映像のエクスポート</translation>
     </message>
     <message>
       <source>Live Video and Archive</source>
@@ -1281,7 +1281,7 @@
     <name>ExportSettingsDialog</name>
     <message>
       <source>Export Video</source>
-      <translation>ビデオをエクスポート</translation>
+      <translation>映像のエクスポート</translation>
     </message>
     <message>
       <source>Single Camera</source>
@@ -1293,7 +1293,7 @@
     </message>
     <message>
       <source>Multi Video</source>
-      <translation>複数ビデオ</translation>
+      <translation>複数映像</translation>
     </message>
   </context>
   <context>
@@ -1437,7 +1437,7 @@
     <name>ImageControlWidget</name>
     <message>
       <source>Image Control</source>
-      <translation>イメージコントロール</translation>
+      <translation>画像コントロール</translation>
     </message>
     <message>
       <source>Aspect ratio</source>
@@ -2206,7 +2206,7 @@
     <name>QnAttachToVideowallDialog</name>
     <message>
       <source>Attach to Video Wall...</source>
-      <translation>ビデオウォールレイアウト設定...</translation>
+      <translation>ビデオウォールに接続...</translation>
     </message>
     <message>
       <source>Preview</source>
@@ -2295,11 +2295,11 @@
     </message>
     <message>
       <source>Launch video wall when Windows starts.</source>
-      <translation>Windows起動時にビデオウォールを開始する.</translation>
+      <translation>Windows起動時にビデオウォールを開始する</translation>
     </message>
     <message>
       <source>Place shortcut on desktop.</source>
-      <translation>デスクトップにショートカットを作成.</translation>
+      <translation>デスクトップにショートカットを作成</translation>
     </message>
     <message>
       <source>Enable timeline on video wall</source>

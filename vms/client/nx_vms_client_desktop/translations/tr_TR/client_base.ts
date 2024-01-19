@@ -5156,12 +5156,12 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <translation>USB depolamada kayıt etkinleştirildi</translation>
     </message>
     <message>
-      <source>If cloud storage is activated for backup, other backup storages will be deactivated and the “All archive” option for already configured devices will be changed to “Motion, Object, Bookmarks”</source>
-      <translation>Yedekleme için bulut depolama etkinleştirilirse, diğer yedekleme depoları devre dışı bırakılacak ve önceden yapılandırılmış cihazlar için "Tüm arşiv" seçeneği "Hareket, Nesne, Yer İmleri" olarak değiştirilecektir</translation>
+      <source>If cloud storage is activated for backup, other backup storages will be deactivated and the &quot;All archive&quot; option for already configured devices will be changed to &quot;Motion, Object, Bookmarks&quot;</source>
+      <translation type="unfinished">If cloud storage is activated for backup, other backup storages will be deactivated and the &quot;All archive&quot; option for already configured devices will be changed to &quot;Motion, Object, Bookmarks&quot;</translation>
     </message>
     <message>
-      <source>If cloud storage is activated for backup, the “All archive” option for already configured devices will be changed to “Motion, Object, Bookmarks”</source>
-      <translation>Yedekleme için bulut depolama etkinleştirilirse önceden yapılandırılmış cihazlar için "Tüm arşiv" seçeneği "Hareket, Nesne, Yer İmleri" olarak değiştirilecektir</translation>
+      <source>If cloud storage is activated for backup, the &quot;All archive&quot; option for already configured devices will be changed to &quot;Motion, Object, Bookmarks&quot;</source>
+      <translation type="unfinished">If cloud storage is activated for backup, the &quot;All archive&quot; option for already configured devices will be changed to &quot;Motion, Object, Bookmarks&quot;</translation>
     </message>
   </context>
   <context>
