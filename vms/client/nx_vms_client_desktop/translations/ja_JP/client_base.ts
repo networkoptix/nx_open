@@ -454,7 +454,7 @@
     </message>
     <message>
       <source>Save Current Position...</source>
-      <translation>現在のポジションを保存する...</translation>
+      <translation>現在のポジションを保存...</translation>
     </message>
     <message>
       <source>Manage...</source>
@@ -4227,7 +4227,7 @@ License Key: %2</source>
     <message numerus="yes">
       <source>Tour has %n identical positions</source>
       <translation>
-        <numerusform>ツアーには%nポジションが含まれます</numerusform>
+        <numerusform>ツアーでは同一のポジションが %n 回連続します</numerusform>
       </translation>
     </message>
     <message>
@@ -4248,11 +4248,11 @@ License Key: %2</source>
     </message>
     <message>
       <source>Tour should contain at least 2 positions.</source>
-      <translation>ツアーには最低2ポジション必要です.</translation>
+      <translation>ツアーには少なくとも2つのポジションが必要です。</translation>
     </message>
     <message>
       <source>Tour Time: %1.</source>
-      <translation>ツアー時間: %1.</translation>
+      <translation>ツアー時間: %1。</translation>
     </message>
     <message numerus="yes">
       <source>about %n minutes</source>
@@ -7003,7 +7003,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Use audio stream from another camera</source>
-      <translation>別のカメラの音声ストリームを使用</translation>
+      <translation>別のカメラの音声ストリームを使用する</translation>
     </message>
     <message>
       <source>Transmit audio stream to another device</source>
@@ -11279,7 +11279,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <message>
       <source>Display selected for</source>
       <comment>Time will follow</comment>
-      <translation>表示</translation>
+      <translation>表示期間</translation>
     </message>
   </context>
   <context>
@@ -12830,11 +12830,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <name>nx::vms::client::desktop::ui::action::ShowreelSettingsFactory</name>
     <message>
       <source>Switch with Hotkeys</source>
-      <translation>ホットキーで切替え</translation>
+      <translation>ホットキーで切り替え</translation>
     </message>
     <message>
       <source>Switch on Timer</source>
-      <translation>時間で切替え</translation>
+      <translation>時間で切り替え</translation>
     </message>
   </context>
   <context>

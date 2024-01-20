@@ -1080,7 +1080,7 @@
     </message>
     <message>
       <source>Convert to Shared Layout</source>
-      <translation type="unfinished">Convert to Shared Layout</translation>
+      <translation>Chuyển đổi sang bố cục được chia sẻ</translation>
     </message>
   </context>
   <context>
@@ -1126,7 +1126,7 @@
     <name>DirectParentsModel</name>
     <message>
       <source>LDAP group membership is managed on LDAP server</source>
-      <translation type="unfinished">LDAP group membership is managed on LDAP server</translation>
+      <translation>Thành viên nhóm LDAP được quản lý trên máy chủ LDAP</translation>
     </message>
   </context>
   <context>
@@ -1912,11 +1912,11 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>RHI backend</source>
-      <translation type="unfinished">RHI backend</translation>
+      <translation>Hỗ trợ RHI</translation>
     </message>
     <message>
       <source>RHI device</source>
-      <translation type="unfinished">RHI device</translation>
+      <translation>Thiết bị RHI</translation>
     </message>
     <message>
       <source>RHI device ID</source>

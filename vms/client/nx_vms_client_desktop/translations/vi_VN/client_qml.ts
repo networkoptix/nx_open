@@ -725,7 +725,7 @@
     </message>
     <message>
       <source>Edit Search Base</source>
-      <translation type="unfinished">Edit Search Base</translation>
+      <translation>Chỉnh sửa cơ sở tìm kiếm</translation>
     </message>
   </context>
   <context>
@@ -942,11 +942,11 @@
     </message>
     <message>
       <source>When continuous sync with LDAP server is disabled, groups do not synchronize automatically. To update this group, initiate a manual sync.</source>
-      <translation type="unfinished">When continuous sync with LDAP server is disabled, groups do not synchronize automatically. To update this group, initiate a manual sync.</translation>
+      <translation>Khi tắt tính năng đồng bộ hóa liên tục với máy chủ LDAP, các nhóm sẽ không tự động đồng bộ hóa. Để cập nhật nhóm này, hãy bắt đầu đồng bộ hóa thủ công.</translation>
     </message>
     <message>
       <source>This group is not found in the LDAP database.</source>
-      <translation type="unfinished">This group is not found in the LDAP database.</translation>
+      <translation>Không tìm thấy nhóm này trong cơ sở dữ liệu LDAP.</translation>
     </message>
   </context>
   <context>
@@ -1244,31 +1244,31 @@
     </message>
     <message>
       <source>Not configured yet</source>
-      <translation type="unfinished">Not configured yet</translation>
+      <translation>Chưa được cấu hình</translation>
     </message>
     <message>
       <source>Configure</source>
-      <translation type="unfinished">Configure</translation>
+      <translation>Đặt cấu hình</translation>
     </message>
     <message>
       <source>Continuous sync with LDAP server is disabled for this system. Updates to groups and users and groups membership will occur solely through manual synchronization.</source>
-      <translation type="unfinished">Continuous sync with LDAP server is disabled for this system. Updates to groups and users and groups membership will occur solely through manual synchronization.</translation>
+      <translation>Đồng bộ hóa liên tục với máy chủ LDAP của hệ thống này đã bị tắt. Cập nhật cho nhóm, người dùng và thành viên nhóm sẽ chỉ diễn ra thông qua đồng bộ hóa thủ công.</translation>
     </message>
     <message>
       <source>Search Bases</source>
-      <translation type="unfinished">Search Bases</translation>
+      <translation>Cơ sở tìm kiếm</translation>
     </message>
     <message>
       <source>Add Search Base</source>
-      <translation type="unfinished">Add Search Base</translation>
+      <translation>Thêm cơ sở tìm kiếm</translation>
     </message>
     <message>
       <source>Specify at least one search base to synchronize users and groups</source>
-      <translation type="unfinished">Specify at least one search base to synchronize users and groups</translation>
+      <translation>Chỉ định ít nhất một cơ sở tìm kiếm để đồng bộ hóa người dùng và nhóm</translation>
     </message>
     <message>
       <source>No users or groups match synchronization settings and are added to the system DB. Make sure LDAP server parameters and search bases are configured correctly.</source>
-      <translation type="unfinished">No users or groups match synchronization settings and are added to the system DB. Make sure LDAP server parameters and search bases are configured correctly.</translation>
+      <translation>Không có người dùng hoặc nhóm nào phù hợp với cài đặt đồng bộ hóa và được thêm vào cơ sở dữ liệu hệ thống. Đảm bảo các tham số máy chủ LDAP và cơ sở tìm kiếm được định cấu hình chính xác.</translation>
     </message>
   </context>
   <context>
@@ -1605,11 +1605,11 @@
     </message>
     <message>
       <source>Resources table gives you an overview of user or group permissions and allows you to assign permissions for specific resources.</source>
-      <translation type="unfinished">Resources table gives you an overview of user or group permissions and allows you to assign permissions for specific resources.</translation>
+      <translation>Bảng tài nguyên cung cấp cho bạn cái nhìn tổng quan về quyền của người dùng hoặc nhóm và cho phép bạn chỉ định quyền cho các tài nguyên cụ thể.</translation>
     </message>
     <message>
       <source>If you select a permission that depends on another permission both permissions will be granted automatically.</source>
-      <translation type="unfinished">If you select a permission that depends on another permission both permissions will be granted automatically.</translation>
+      <translation>Nếu bạn chọn một quyền phụ thuộc vào một quyền khác thì cả hai quyền đó sẽ được cấp tự động.</translation>
     </message>
   </context>
   <context>
@@ -1728,28 +1728,28 @@ to activate PTZ</source>
     <message>
       <source>Introducing
 New PTZ controls</source>
-      <translation type="unfinished">Introducing
-New PTZ controls</translation>
+      <translation>Giới thiệu
+Điều khiển PTZ mới</translation>
     </message>
     <message>
       <source>Click, double-click, or drag
 mouse pointer while pressing
 Shift key to use Advanced PTZ</source>
-      <translation type="unfinished">Click, double-click, or drag
-mouse pointer while pressing
-Shift key to use Advanced PTZ</translation>
+      <translation>Nhấp, nhấp đúp hoặc kéo
+con trỏ chuột đồng thời nhấn
+phím Shift để sử dụng Trình PTZ nâng cao</translation>
     </message>
     <message>
       <source>Here is a quick guide
 on what has changed.</source>
-      <translation type="unfinished">Here is a quick guide
-on what has changed.</translation>
+      <translation>Đây là hướng dẫn nhanh
+về những thay đổi.</translation>
     </message>
     <message>
       <source>To use Target Lock Tracking,
 Press Alt + Click to follow object</source>
-      <translation type="unfinished">To use Target Lock Tracking,
-Press Alt + Click to follow object</translation>
+      <translation>Để sử dụng Target Lock Tracking,
+Nhấn Alt + Click để theo dõi đối tượng</translation>
     </message>
   </context>
   <context>
@@ -2219,7 +2219,7 @@ Press Alt + Click to follow object</translation>
     <name>StringEditor</name>
     <message>
       <source>Min 3 characters</source>
-      <translation type="unfinished">Min 3 characters</translation>
+      <translation>Tối thiểu 3 ký tự</translation>
     </message>
   </context>
   <context>
@@ -2249,12 +2249,12 @@ Press Alt + Click to follow object</translation>
     <message>
       <source>Valid from %1 to %2 (by server time)</source>
       <extracomment>Example: Valid from 14.05.2023 to 24.05.2023, 12:24 (by server time)</extracomment>
-      <translation type="unfinished">Valid from %1 to %2 (by server time)</translation>
+      <translation>Có hiệu lực từ %1 đến %2 (theo thời gian của máy chủ)</translation>
     </message>
     <message>
       <source>Valid from %1 to %2 (by server time) or for %3 after login</source>
       <extracomment>Valid from 14.05.2023 to 24.05.2023 (by server time) or for 12 hours after login</extracomment>
-      <translation type="unfinished">Valid from %1 to %2 (by server time) or for %3 after login</translation>
+      <translation>Có giá trị từ %1 đến %2 (theo thời gian của máy chủ) hoặc %3 sau khi đăng nhập</translation>
     </message>
   </context>
   <context>
@@ -2590,11 +2590,11 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>When continuous sync with LDAP server is disabled, user membership in groups does not synchronize automatically. To update this information, initiate a manual sync.</source>
-      <translation type="unfinished">When continuous sync with LDAP server is disabled, user membership in groups does not synchronize automatically. To update this information, initiate a manual sync.</translation>
+      <translation>Khi đồng bộ hóa liên tục với máy chủ LDAP bị tắt, tư cách thành viên của người dùng trong nhóm sẽ không tự động đồng bộ hóa. Để cập nhật thông tin này, hãy bắt đầu đồng bộ hóa thủ công.</translation>
     </message>
     <message>
       <source>This user’s login duplicates the login of another user. None of them is able to log in. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</source>
-      <translation type="unfinished">This user’s login duplicates the login of another user. None of them is able to log in. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</translation>
+      <translation>Thông tin đăng nhập của người dùng này trùng lặp với thông tin đăng nhập của người dùng khác. Không ai trong số họ có thể đăng nhập. Để giải quyết vấn đề này, bạn có thể thay đổi thông tin đăng nhập của người dùng hoặc vô hiệu hóa hoặc xóa người dùng có thông tin đăng nhập trùng lặp.</translation>
     </message>
   </context>
   <context>
