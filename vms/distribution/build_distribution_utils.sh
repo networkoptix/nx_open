@@ -301,10 +301,20 @@ distrib_copyServerSystemLibs() # destination_path
         distrib_copySystemLibs "${destination_path}" "${libs_to_copy[@]}"
     fi
 
-    echo "Copying ALSA library (used only if libasound2 deb is not installed)"
+    echo ""
+    echo "Copying fallback system libs"
 
-    mkdir -p "${destination_path}/libasound2"
-    distrib_copySystemLibs "${destination_path}/libasound2" libasound.so.2
+    local -r fallback_lib_path="${destination_path}/fallback"
+    mkdir -p "${fallback_lib_path}"
+
+    local -a fallback_libs_to_copy=(
+        libasound.so.2
+        libudev.so.1
+    )
+
+    distrib_copySystemLibs "${fallback_lib_path}" "${fallback_libs_to_copy[@]}"
+
+    echo "${fallback_libs_to_copy[@]}" > "${fallback_lib_path}/libs.txt"
 }
 
 # Copy libraries from the specified directory using copy_system_library.py.
