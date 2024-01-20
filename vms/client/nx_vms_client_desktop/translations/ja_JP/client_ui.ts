@@ -2243,11 +2243,11 @@
     </message>
     <message>
       <source>Go To Position</source>
-      <translation>ポジション移動</translation>
+      <translation>ポジションに移動</translation>
     </message>
     <message>
       <source>Create Tour</source>
-      <translation>ツアー登録</translation>
+      <translation>ツアー作成</translation>
     </message>
     <message>
       <source>Start Tour</source>

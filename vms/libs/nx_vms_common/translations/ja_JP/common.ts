@@ -533,7 +533,7 @@
     </message>
     <message>
       <source>Time</source>
-      <translation>時間</translation>
+      <translation>時限</translation>
     </message>
     <message>
       <source>Time Licenses</source>
