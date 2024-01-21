@@ -2278,7 +2278,7 @@
     </message>
     <message>
       <source>I/O Module was disconnected</source>
-      <translation>I / Oモジュールが切断されました</translation>
+      <translation>I/Oモジュールが切断されました</translation>
     </message>
     <message>
       <source>Analytics Object Detected</source>

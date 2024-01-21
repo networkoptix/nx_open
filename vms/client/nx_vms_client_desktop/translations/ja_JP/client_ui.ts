@@ -1521,7 +1521,7 @@
     </message>
     <message>
       <source>Enable tile interface</source>
-      <translation>タイル状インターフェイスを有効化</translation>
+      <translation>タイル状インターフェースを有効化</translation>
     </message>
   </context>
   <context>
