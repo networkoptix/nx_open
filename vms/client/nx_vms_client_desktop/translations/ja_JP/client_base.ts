@@ -3638,7 +3638,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Default state</source>
-      <translation>初期ステータス</translation>
+      <translation>標準状態</translation>
     </message>
     <message>
       <source>Name</source>
@@ -3672,12 +3672,12 @@ License Key: %2</source>
     <message>
       <source>Grounded circuit</source>
       <comment>IO Port State</comment>
-      <translation>NC</translation>
+      <translation>接地回路</translation>
     </message>
     <message>
       <source>Invalid state</source>
       <comment>IO Port State</comment>
-      <translation>無効なステータス</translation>
+      <translation>不正な状態</translation>
     </message>
     <message>
       <source>On click</source>
@@ -3685,22 +3685,22 @@ License Key: %2</source>
     </message>
     <message>
       <source>Duration</source>
-      <translation>時間</translation>
+      <translation>動作継続時間</translation>
     </message>
     <message>
       <source>Open circuit</source>
       <comment>IO Port State</comment>
-      <translation>NO</translation>
+      <translation>開回路</translation>
     </message>
     <message>
       <source>Toggle state</source>
       <comment>IO Output Port Action</comment>
-      <translation>ステータスを切り替える</translation>
+      <translation>状態切替</translation>
     </message>
     <message>
       <source>Impulse</source>
       <comment>IO Output Port Action</comment>
-      <translation>インパルス</translation>
+      <translation>固定期間出力</translation>
     </message>
     <message>
       <source>ID</source>
@@ -4866,7 +4866,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>DEVICE DISABLED</source>
-      <translation>デバイスは無効化されています</translation>
+      <translation>デバイスは無効です</translation>
     </message>
     <message>
       <source>Device Settings</source>
@@ -10844,7 +10844,7 @@ You can still change quality and FPS directly on the camera.</source>
     </message>
     <message>
       <source>Motion detection is disabled for this I/O module</source>
-      <translation>このI / Oモジュールではモーション検知が無効になっています</translation>
+      <translation>このI/Oモジュールではモーション検知が無効になっています</translation>
     </message>
     <message>
       <source>Motion detection is disabled for some of the selected I/O modules</source>
@@ -10860,11 +10860,11 @@ You can still change quality and FPS directly on the camera.</source>
     </message>
     <message>
       <source>Object detection is disabled for this I/O module</source>
-      <translation>このI / Oモジュールではオブジェクト検出が無効になっています</translation>
+      <translation>このI/Oモジュールではオブジェクト検出が無効になっています</translation>
     </message>
     <message>
       <source>Object detection is disabled for some of the selected I/O modules</source>
-      <translation>選択したI / Oモジュールの一部でオブジェクト検出が無効になっています</translation>
+      <translation>選択したI/Oモジュールの一部で、オブジェクト検出が無効になっています</translation>
     </message>
     <message>
       <source>Motion &amp; object detection is disabled for this I/O module</source>
@@ -10872,7 +10872,7 @@ You can still change quality and FPS directly on the camera.</source>
     </message>
     <message>
       <source>Motion &amp; object detection is disabled for some of the selected I/O modules</source>
-      <translation>選択したI / Oモジュールの一部で、モーションとオブジェクトの検出が無効になっています</translation>
+      <translation>選択したI/Oモジュールの一部で、モーションとオブジェクトの検出が無効になっています</translation>
     </message>
   </context>
   <context>
