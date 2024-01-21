@@ -1005,7 +1005,7 @@
     </message>
     <message>
       <source>Administrator</source>
-      <translation>アドミニストレーター</translation>
+      <translation>管理者</translation>
     </message>
     <message>
       <source>Advanced Viewer</source>
@@ -2141,7 +2141,7 @@
     </message>
     <message>
       <source>I/O Module was disconnected</source>
-      <translation>I / Oモジュールが切断されました</translation>
+      <translation>I/Oモジュールが切断されました</translation>
     </message>
     <message>
       <source>Analytics Object Detected</source>
