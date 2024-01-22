@@ -1107,6 +1107,27 @@ struct LogsManagementWatcher::Private
         }
     }
 
+    void reinit()
+    {
+        {
+            NX_MUTEX_LOCKER lock(&mutex);
+            path = "";
+            state = State::empty;
+
+            // Reinit client unit.
+            client->data()->setChecked(false);
+
+            initNotificationManager();
+            updateClientLogLevelWarning();
+            updateServerLogLevelWarning();
+        }
+
+        emit q->stateChanged(State::empty);
+        emit q->selectionChanged(Qt::Unchecked);
+        emit q->itemListChanged();
+        api->loadInitialSettings();
+    }
+
     // A helper struct with long-running functions that should be called without locking the mutex.
     // These functions are encapsulated into a separate struct to ensure that they don't access any
     // Private fields.
@@ -1136,12 +1157,8 @@ struct LogsManagementWatcher::Private
                     }
                 });
 
-            q->connection()->serverApi()->getRawResult(
-                "/rest/v2/servers/*/logSettings",
-                {},
-                callback,
-                q->thread()
-            );
+            if (auto api = q->connectedServerApi())
+                api->getRawResult("/rest/v2/servers/*/logSettings", {}, callback, q->thread());
         }
 
         void loadServerSettings(const QnUuid& serverId)
@@ -1161,12 +1178,14 @@ struct LogsManagementWatcher::Private
                     q->onReceivedServerLogSettings(settings.getId(), settings);
                 });
 
-            q->connection()->serverApi()->getRawResult(
-                QString("/rest/v2/servers/%1/logSettings").arg(serverId.toString()),
-                {},
-                callback,
-                q->thread()
-            );
+            if (auto api = q->connectedServerApi(); NX_ASSERT(api))
+            {
+                api->getRawResult(
+                    QString("/rest/v2/servers/%1/logSettings").arg(serverId.toString()),
+                    {},
+                    callback,
+                    q->thread());
+            }
         }
 
         bool storeServerSettings(
@@ -1195,17 +1214,15 @@ struct LogsManagementWatcher::Private
                     //TODO: #spanasenko Report an error.
                 });
 
-            q->connection()->serverApi()->putServerLogSettings(
-                helper,
-                server->id(),
-                newSettings,
-                callback,
-                q->thread()
-            );
+            auto api = q->connectedServerApi();
+            if (!NX_ASSERT(api))
+                return false;
 
+            api->putServerLogSettings(helper, server->id(), newSettings, callback, q->thread());
             return true;
         }
     };
+
     QScopedPointer<Api> api;
 };
 
@@ -1280,6 +1297,13 @@ LogsManagementWatcher::LogsManagementWatcher(SystemContext* context, QObject* pa
                 emit itemListChanged();
         });
 
+    connect(context, &SystemContext::remoteIdChanged, this,
+        [this](const QnUuid& id)
+        {
+            if (!id.isNull())
+                d->reinit();
+        });
+
     qRegisterMetaType<State>();
 }
 
@@ -1295,26 +1319,7 @@ void LogsManagementWatcher::setMessageProcessor(QnCommonMessageProcessor* messag
             messageProcessor,
             &QnCommonMessageProcessor::initialResourcesReceived,
             this,
-            [this]
-            {
-                {
-                    NX_MUTEX_LOCKER lock(&d->mutex);
-                    d->path = "";
-                    d->state = State::empty;
-
-                    // Reinit client unit.
-                    d->client->data()->setChecked(false);
-
-                    d->initNotificationManager();
-                    d->updateClientLogLevelWarning();
-                    d->updateServerLogLevelWarning();
-                }
-
-                emit stateChanged(State::empty);
-                emit selectionChanged(Qt::Unchecked);
-                emit itemListChanged();
-                d->api->loadInitialSettings();
-            });
+            [this] { d->reinit(); });
     }
 }
 
