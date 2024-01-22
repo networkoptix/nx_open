@@ -383,20 +383,23 @@ QnAuditRecordRefList QnAuditLogDialog::filterChildDataByCameras(const QnAuditRec
     QSet<QnUuid> selectedCameras;
     for (const QnAuditRecord* record: checkedRows)
     {
-        if (NX_ASSERT(!record->resources.empty()))
+        if (!record->resources.empty())
             selectedCameras << record->resources[0];
     }
+    if (selectedCameras.empty())
+        return {};
 
     QnAuditRecordRefList result;
-    auto filter = [&selectedCameras] (const QnAuditRecord* record)
-    {
-        for (const auto& id: record->resources)
+    auto filter =
+        [&selectedCameras] (const QnAuditRecord* record)
         {
-            if (selectedCameras.contains(id))
-                return true;
-        }
-        return false;
-    };
+            for (const auto& id: record->resources)
+            {
+                if (selectedCameras.contains(id))
+                    return true;
+            }
+            return false;
+        };
     std::copy_if(m_filteredData.begin(), m_filteredData.end(), std::back_inserter(result), filter);
     return result;
 }
