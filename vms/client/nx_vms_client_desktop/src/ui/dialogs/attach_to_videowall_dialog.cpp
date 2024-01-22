@@ -96,8 +96,8 @@ void QnAttachToVideowallDialog::updateLicencesUsage()
     int localScreensChange = ui->manageWidget->proposedItemsCount() - used;
 
     using namespace nx::vms::license;
-    VideoWallLicenseUsageHelper helper(systemContext);
-    VideoWallLicenseUsageProposer proposer(systemContext, &helper, localScreensChange);
+    ConfigureVideoWallLicenseUsageHelper helper(systemContext);
+    helper.setScreenCountChange(localScreensChange);
 
     QPalette palette = this->palette();
     bool licensesOk = helper.isValid();

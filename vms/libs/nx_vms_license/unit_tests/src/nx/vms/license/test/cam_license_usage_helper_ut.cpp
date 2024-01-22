@@ -137,19 +137,12 @@ TEST_F(QnCamLicenseUsageHelperTest, borrowTrialLicenses)
     addLicenses(Qn::LC_Trial, 5);
     ASSERT_TRUE(m_helper->isValid());
 
-    auto devices = m_helper->usedDevices(Qn::LC_Trial);
-    ASSERT_EQ(5, devices.size());
-
-
     addRecordingCamera(Qn::LC_VMAX);
     ASSERT_FALSE(m_helper->isValid());
 
     /* Now we should have 5 trial and 1 edge licenses for 2 vmax cameras and 1 of each other type. */
     addLicenses(Qn::LC_Edge, 1);
     ASSERT_TRUE(m_helper->isValid());
-
-    devices = m_helper->usedDevices(Qn::LC_Edge);
-    ASSERT_EQ(1, devices.size());
 }
 
 /** Advanced test for license borrowing. */

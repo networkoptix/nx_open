@@ -50,9 +50,6 @@ enum class UsageStatus
 
 typedef std::array<int, Qn::LC_Count> LicensesArray;
 
-using LicenseUsageByDevice = QVector<QnUuid>;
-using LicensesArrayEx =  std::array<LicenseUsageByDevice, Qn::LC_Count>;
-
 class UsageHelper:
     public QObject,
     public /*mixin*/ common::SystemContextAware
@@ -104,9 +101,6 @@ public:
     /** Number of licenses of the selected type currently in use (including proposed). */
     int usedLicenses(Qn::LicenseType licenseType) const;
 
-    /** @return the list of Devices that spend requested license type. */
-    std::set<QnUuid> usedDevices(Qn::LicenseType licenseType) const;
-
     /**
      *  Number of licenses of the selected type lacking for system to work.
      *  Always equals to 0 of the helper is valid.
@@ -128,13 +122,18 @@ public:
     void setCustomValidator(std::unique_ptr<Validator> validator);
 
 protected:
-    virtual void calculateUsedLicenses(LicensesArrayEx& basicUsedLicenses, LicensesArrayEx& proposedToUse) const = 0;
+    virtual void calculateUsedLicenses(
+        LicensesArray& basicUsedLicenses,
+        LicensesArray& proposedToUse) const = 0;
+    virtual int calculateOverflowLicenses(
+        Qn::LicenseType licenseType,
+        int /*borrowedLicenses*/) const;
 
     virtual QList<Qn::LicenseType> calculateLicenseTypes() const = 0;
 
     void updateCache() const;
 private:
-    LicenseUsageByDevice borrowLicenses(const LicenseCompatibility& compat, LicensesArrayEx& licenses) const;
+    int borrowLicenses(const LicenseCompatibility& compat, LicensesArray& licenses) const;
 
 private:
     mutable bool m_dirty;
@@ -148,9 +147,9 @@ private:
 
         ListHelper licenses;
         LicensesArray total;
-        LicensesArrayEx used;
+        LicensesArray used;
         LicensesArray proposed;
-        LicensesArrayEx overflow;
+        LicensesArray overflow;
     };
 
     mutable Cache m_cache;
@@ -198,7 +197,9 @@ signals:
 
 protected:
     virtual QList<Qn::LicenseType> calculateLicenseTypes() const override;
-    virtual void calculateUsedLicenses(LicensesArrayEx& basicUsedLicenses, LicensesArrayEx& proposedToUse) const override;
+    virtual void calculateUsedLicenses(
+        LicensesArray& basicUsedLicenses,
+        LicensesArray& proposedToUse) const override;
 
 private:
     QSet<QnVirtualCameraResourcePtr> m_proposedToEnable;
@@ -231,40 +232,47 @@ class VideoWallLicenseUsageHelper: public UsageHelper
 {
     Q_OBJECT
     using base_type = UsageHelper;
+
 public:
     VideoWallLicenseUsageHelper(common::SystemContext* context, QObject* parent = nullptr);
 
     virtual bool isValid() const override;
     virtual bool isValid(Qn::LicenseType licenseType) const override;
 
-    /** Propose to use some more or less licenses directly (e.g. to start control session). */
-    void propose(int count);
-
     /** Calculate how many licenses are required for the given screens count. */
     static int licensesForScreens(int screens);
+    static int screensPerLicense();
 
 protected:
     virtual QList<Qn::LicenseType> calculateLicenseTypes() const override;
     virtual void calculateUsedLicenses(
-        LicensesArrayEx& basicUsedLicenses,
-        LicensesArrayEx& proposedToUse) const override;
+        LicensesArray& basicUsedLicenses,
+        LicensesArray& proposedToUse) const override;
+};
+
+class ConfigureVideoWallLicenseUsageHelper: public VideoWallLicenseUsageHelper
+{
+    Q_OBJECT
+    using base_type = VideoWallLicenseUsageHelper;
+
+public:
+    ConfigureVideoWallLicenseUsageHelper(common::SystemContext* context, QObject* parent = nullptr);
+    virtual ~ConfigureVideoWallLicenseUsageHelper() override;
+
+    /** Propose to use some more or less licenses directly. */
+    void propose(int count);
+
+    /** Set the number of screen which should be added to videowall. */
+    void setScreenCountChange(int configurationScreenCountDelta);
+
+protected:
+    virtual void calculateUsedLicenses(
+        LicensesArray& basicUsedLicenses,
+        LicensesArray& proposedToUse) const override;
 
 private:
     int m_proposed = 0;
-};
-
-/** Utility RAAA class to propose some licenses usage. */
-class VideoWallLicenseUsageProposer
-{
-public:
-    VideoWallLicenseUsageProposer(
-        common::SystemContext* context,
-        VideoWallLicenseUsageHelper* helper,
-        int screenCount);
-    ~VideoWallLicenseUsageProposer();
-private:
-    QPointer<VideoWallLicenseUsageHelper> m_helper;
-    int m_count;
+    int m_configurationScreenCountDelta = 0;
 };
 
 } // namespace nx::vms::license
