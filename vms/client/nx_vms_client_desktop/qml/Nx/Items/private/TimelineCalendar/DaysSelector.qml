@@ -16,6 +16,7 @@ Item
     property var selection: NxGlobals.dateRange(d.today, DateUtils.addDays(d.today, 1))
 
     property alias displayOffset: calendarModel.displayOffset
+    property alias timeZone: calendarModel.timeZone
     property date currentDate: new Date(new Date().getTime() + displayOffset)
     property alias locale: calendarModel.locale
     property alias visibleYear: calendarModel.year

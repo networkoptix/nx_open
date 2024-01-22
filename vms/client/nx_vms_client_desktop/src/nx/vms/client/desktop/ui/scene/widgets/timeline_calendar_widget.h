@@ -28,6 +28,7 @@ public:
     QmlProperty<int> visibleYear{this, "visibleYear"};
     QmlProperty<int> visibleMonth{this, "visibleMonth"};
     QmlProperty<qint64> displayOffset{this, "displayOffset"};
+    QmlProperty<QTimeZone> timeZone{this, "timeZone"};
     QmlProperty<bool> periodsVisible{this, "periodsVisible"};
     QmlProperty<qreal> opacity{this, "opacity"};
     QmlProperty<bool> hovered{this, "hovered"};
