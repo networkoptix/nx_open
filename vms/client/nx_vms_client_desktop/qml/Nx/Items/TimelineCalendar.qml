@@ -22,6 +22,7 @@ Control
     property alias allCamerasPeriodStorage: daysSelector.allCamerasPeriodStorage
     property alias periodsVisible: daysSelector.periodsVisible
     property alias displayOffset: daysSelector.displayOffset
+    property alias timeZone: daysSelector.timeZone
 
     // We use different locales to get the region settings (like first day of week) and to get the
     // translated names (days of week, months).
@@ -253,6 +254,7 @@ Control
                 allCamerasPeriodStorage: daysSelector.allCamerasPeriodStorage
                 periodsVisible: daysSelector.periodsVisible
                 displayOffset: daysSelector.displayOffset
+                timeZone: daysSelector.timeZone
 
                 enabled: DateUtils.areDatesEqual(selection.start, visualSelectionEnd)
 

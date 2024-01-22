@@ -159,9 +159,11 @@ void CalendarModel::Private::updateArchiveInfo(PeriodStorageType type)
     const QnTimePeriodList timePeriods =
         store ? store->periods(Qn::RecordingContent) : QnTimePeriodList();
 
+    const qint64 startPosition = days.first().date.startOfDay(timeZone).toMSecsSinceEpoch();
+
     const QBitArray archivePresence = calendar_utils::buildArchivePresence(
         timePeriods,
-        milliseconds(days.first().startTime),
+        milliseconds(startPosition),
         days.size(),
         [](milliseconds timestamp) -> milliseconds { return timestamp + 24h; });
 
