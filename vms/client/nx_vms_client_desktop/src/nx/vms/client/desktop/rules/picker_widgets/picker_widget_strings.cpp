@@ -85,21 +85,6 @@ QString DropdownTextPickerWidgetStrings::automaticValue()
     return tr("automatic");
 }
 
-QString DropdownTextPickerWidgetStrings::state(api::rules::State value)
-{
-    switch (value)
-    {
-        case api::rules::State::instant:
-            return tr("Event Occurs");
-        case api::rules::State::started:
-            return tr("Event Starts");
-        case api::rules::State::stopped:
-            return tr("Event Stops");
-        default:
-            return tr("None");
-    }
-}
-
 QString FlagsPickerWidgetStrings::eventLevelDisplayString(api::EventLevel eventLevel)
 {
     switch(eventLevel)

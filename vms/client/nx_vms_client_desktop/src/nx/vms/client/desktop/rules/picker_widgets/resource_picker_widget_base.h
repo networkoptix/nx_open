@@ -16,7 +16,7 @@ class ResourcePickerWidgetBase: public PlainFieldPickerWidget<F>
     using base = PlainFieldPickerWidget<F>;
 
 public:
-    explicit ResourcePickerWidgetBase(SystemContext* context, CommonParamsWidget* parent):
+    explicit ResourcePickerWidgetBase(SystemContext* context, ParamsWidget* parent):
         base(context, parent)
     {
         auto contentLayout = new QVBoxLayout;

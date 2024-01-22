@@ -144,7 +144,7 @@ const ItemDescriptor& NetworkIssueEvent::manifest()
         .id = utils::type<NetworkIssueEvent>(),
         .groupId = kDeviceIssueEventGroup,
         .displayName = tr("Network Issue"),
-        .flags = {ItemFlag::aggregationByTypeSupported},
+        .flags = {ItemFlag::instant, ItemFlag::aggregationByTypeSupported},
         .permissions = {
             .resourcePermissions = {{utils::kCameraIdFieldName, Qn::ViewContentPermission}}
         },

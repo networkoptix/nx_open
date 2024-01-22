@@ -24,7 +24,7 @@ const ItemDescriptor& BookmarkAction::manifest()
             makeFieldDescriptor<TargetDeviceField>(utils::kDeviceIdsFieldName, tr("At")),
             utils::makeTimeFieldDescriptor<OptionalTimeField>(
                 utils::kDurationFieldName,
-                tr("Fixed Duration"),
+                tr("Duration"),
                 {},
                 {.initialValue = 5s, .defaultValue = 5s, .maximumValue = 600s, .minimumValue = 5s}),
             utils::makeTimeFieldDescriptor<TimeField>(

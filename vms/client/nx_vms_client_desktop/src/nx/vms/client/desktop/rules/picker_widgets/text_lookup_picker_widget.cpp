@@ -20,7 +20,7 @@ namespace nx::vms::client::desktop::rules {
 
 using LookupCheckType = vms::rules::TextLookupCheckType;
 
-TextLookupPicker::TextLookupPicker(SystemContext* context, CommonParamsWidget* parent):
+TextLookupPicker::TextLookupPicker(SystemContext* context, ParamsWidget* parent):
     TitledFieldPickerWidget<vms::rules::TextLookupField>(context, parent)
 {
     setCheckBoxEnabled(false);

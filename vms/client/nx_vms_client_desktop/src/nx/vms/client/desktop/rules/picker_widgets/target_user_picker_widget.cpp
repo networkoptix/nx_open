@@ -76,7 +76,7 @@ void TargetUserPicker::updateUi()
 
 void TargetUserPicker::createPolicy()
 {
-    const auto actionId = parentParamsWidget()->descriptor().id;
+    const auto actionId = parentParamsWidget()->descriptor()->id;
     if (actionId == vms::rules::utils::type<vms::rules::SendEmailAction>())
     {
         m_policy = std::make_unique<QnUserWithEmailValidationPolicy>();

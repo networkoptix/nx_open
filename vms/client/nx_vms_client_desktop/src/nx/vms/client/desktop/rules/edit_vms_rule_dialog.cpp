@@ -25,7 +25,8 @@
 #include "dialog_details/action_type_picker_widget.h"
 #include "dialog_details/event_type_picker_widget.h"
 #include "dialog_details/styled_frame.h"
-#include "params_widgets/editor_factory.h"
+#include "params_widgets/action_parameters_widget.h"
+#include "params_widgets/event_parameters_widget.h"
 #include "utils/confirmation_dialogs.h"
 
 namespace {
@@ -278,20 +279,13 @@ void EditVmsRuleDialog::displayRule()
         m_actionTypePicker->setActionType(m_rule->actionBuilders().first()->actionType());
     }
 
-    displayEventEditor(m_rule->eventFilters().first()->eventType());
-    displayActionEditor(m_rule->actionBuilders().first()->actionType());
+    displayEventEditor();
+    displayActionEditor();
 }
 
-void EditVmsRuleDialog::displayActionEditor(const QString& actionType)
+void EditVmsRuleDialog::displayActionEditor()
 {
-    const auto actionDescriptor = systemContext()->vmsRulesEngine()->actionDescriptor(actionType);
-    if (!NX_ASSERT(actionDescriptor))
-        return;
-
-    auto actionEditorWidget =
-        ActionEditorFactory::createWidget(actionDescriptor.value(), windowContext());
-    if (!NX_ASSERT(actionEditorWidget))
-        return;
+    auto actionEditorWidget = new ActionParametersWidget{windowContext()};
 
     auto replacedLayoutItem = m_actionEditorWidget->parentWidget()->layout()->replaceWidget(
         m_actionEditorWidget, actionEditorWidget);
@@ -306,16 +300,9 @@ void EditVmsRuleDialog::displayActionEditor(const QString& actionType)
     actionEditorWidget->setRule(m_rule);
 }
 
-void EditVmsRuleDialog::displayEventEditor(const QString& eventType)
+void EditVmsRuleDialog::displayEventEditor()
 {
-    const auto eventDescriptor = systemContext()->vmsRulesEngine()->eventDescriptor(eventType);
-    if (!NX_ASSERT(eventDescriptor))
-        return;
-
-    auto eventEditorWidget =
-        EventEditorFactory::createWidget(eventDescriptor.value(), windowContext());
-    if (!NX_ASSERT(eventEditorWidget))
-        return;
+    auto eventEditorWidget = new EventParametersWidget{windowContext()};
 
     auto replacedLayoutItem = m_eventEditorWidget->parentWidget()->layout()->replaceWidget(
         m_eventEditorWidget, eventEditorWidget);
@@ -367,6 +354,7 @@ void EditVmsRuleDialog::onActionTypeChanged(const QString& actionType)
     m_rule->takeActionBuilder(0);
 
     auto actionBuilder = systemContext()->vmsRulesEngine()->buildActionBuilder(actionType);
+    // TODO: #mmalofeev correct values(at least state and duration).
     m_rule->addActionBuilder(std::move(actionBuilder));
 
     displayRule();
@@ -377,6 +365,7 @@ void EditVmsRuleDialog::onEventTypeChanged(const QString& eventType)
     m_rule->takeEventFilter(0);
 
     auto eventFilter = systemContext()->vmsRulesEngine()->buildEventFilter(eventType);
+    // TODO: #mmalofeev correct values(at least state and duration).
     m_rule->addEventFilter(std::move(eventFilter));
 
     displayRule();

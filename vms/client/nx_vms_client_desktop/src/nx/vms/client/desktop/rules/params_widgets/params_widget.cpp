@@ -6,6 +6,7 @@
 
 #include <nx/vms/client/desktop/rules/picker_widgets/picker_widget.h>
 #include <nx/vms/rules/engine.h>
+#include <nx/vms/rules/utils/common.h>
 #include <ui/common/palette.h>
 
 namespace nx::vms::client::desktop::rules {
@@ -20,43 +21,16 @@ ParamsWidget::ParamsWidget(WindowContext* context, QWidget* parent):
 {
 }
 
-void ParamsWidget::setDescriptor(const ItemDescriptor& value)
-{
-    m_itemDescriptor = value;
-
-    onDescriptorSet();
-
-    // At the moment all pickers must be instantiated.
-    setupLineEditsPlaceholderColor();
-}
-
-const vms::rules::ItemDescriptor& ParamsWidget::descriptor() const
-{
-    return m_itemDescriptor;
-}
-
 void ParamsWidget::setRule(const std::shared_ptr<vms::rules::Rule>& rule)
 {
+    if (!NX_ASSERT(!m_rule, "Rule must be set only once"))
+        return;
+
     m_rule = rule;
+
+    onRuleSet();
+
     updateUi();
-
-    // A queued connection is used below, because field value validation occurs while the field is
-    // displayed. It may lead to the field value changing, which in turn tends to emit the
-    // signal again before the field display function ends, which may lead to troubles.
-
-    connect(
-        m_rule->eventFilters().first(),
-        &vms::rules::EventFilter::changed,
-        this,
-        &ParamsWidget::updateUi,
-        Qt::QueuedConnection);
-
-    connect(
-        m_rule->actionBuilders().first(),
-        &vms::rules::ActionBuilder::changed,
-        this,
-        &ParamsWidget::updateUi,
-        Qt::QueuedConnection);
 }
 
 std::optional<vms::rules::ItemDescriptor> ParamsWidget::actionDescriptor() const
@@ -85,19 +59,9 @@ void ParamsWidget::setReadOnly(bool value)
         picker->setReadOnly(value);
 }
 
-void ParamsWidget::onDescriptorSet()
+std::optional<rules::FieldDescriptor> ParamsWidget::fieldDescriptor(const QString& fieldName) const
 {
-}
-
-std::optional<rules::FieldDescriptor> ParamsWidget::fieldDescriptor(const QString& fieldName)
-{
-    for (const auto& field: m_itemDescriptor.fields)
-    {
-        if (field.fieldName == fieldName)
-            return field;
-    }
-
-    return std::nullopt;
+    return vms::rules::utils::fieldByName(fieldName, descriptor().value());
 }
 
 void ParamsWidget::setupLineEditsPlaceholderColor()

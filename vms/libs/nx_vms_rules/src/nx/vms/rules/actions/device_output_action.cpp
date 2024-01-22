@@ -23,7 +23,7 @@ const ItemDescriptor& DeviceOutputAction::manifest()
             makeFieldDescriptor<OutputPortField>("outputPortId", tr("Output ID")),
             utils::makeTimeFieldDescriptor<OptionalTimeField>(
                 utils::kDurationFieldName,
-                tr("Fixed Duration"),
+                tr("Duration"),
                 {},
                 {.initialValue = 1s, .defaultValue = 1s, .minimumValue = 1s}),
         }

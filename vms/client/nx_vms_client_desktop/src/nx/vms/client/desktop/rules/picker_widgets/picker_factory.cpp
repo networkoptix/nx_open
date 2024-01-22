@@ -9,6 +9,7 @@
 #include <nx/vms/rules/events/builtin_events.h>
 #include <nx/vms/rules/utils/type.h>
 
+#include "action_duration_picker_widget.h"
 #include "analytics_object_attributes_picker_widget.h"
 #include "camera_picker_widget.h"
 #include "customizable_icon_picker_widget.h"
@@ -45,81 +46,101 @@ namespace nx::vms::client::desktop::rules {
 
 namespace {
 
-PickerWidget* createSourceCameraPicker(SystemContext* context, CommonParamsWidget* parent)
+PickerWidget* createSourceCameraPicker(SystemContext* context, ParamsWidget* parent)
 {
-    if (parent->descriptor().id == vms::rules::utils::type<vms::rules::AnalyticsEvent>())
+    if (parent->descriptor()->id == vms::rules::utils::type<vms::rules::AnalyticsEvent>())
         return new SourceCameraPicker<QnCameraAnalyticsPolicy>(context, parent);
 
-    if (parent->descriptor().id == vms::rules::utils::type<vms::rules::AnalyticsObjectEvent>())
+    if (parent->descriptor()->id == vms::rules::utils::type<vms::rules::AnalyticsObjectEvent>())
         return new SourceCameraPicker<QnCameraAnalyticsPolicy>(context, parent);
 
-    if (parent->descriptor().id == vms::rules::utils::type<vms::rules::CameraInputEvent>())
+    if (parent->descriptor()->id == vms::rules::utils::type<vms::rules::CameraInputEvent>())
         return new SourceCameraPicker<QnCameraInputPolicy>(context, parent);
 
-    if (parent->descriptor().id == vms::rules::utils::type<vms::rules::MotionEvent>())
+    if (parent->descriptor()->id == vms::rules::utils::type<vms::rules::MotionEvent>())
         return new SourceCameraPicker<QnCameraMotionPolicy>(context, parent);
 
     return new SourceCameraPicker<QnAllowAnyCameraPolicy>(context, parent);;
 }
 
-PickerWidget* createSourceServerPicker(SystemContext* context, CommonParamsWidget* parent)
+PickerWidget* createSourceServerPicker(SystemContext* context, ParamsWidget* parent)
 {
-    if (parent->descriptor().id == vms::rules::utils::type<vms::rules::PoeOverBudgetEvent>())
+    if (parent->descriptor()->id == vms::rules::utils::type<vms::rules::PoeOverBudgetEvent>())
         return new SourceServerPicker<QnPoeOverBudgetPolicy>(context, parent);
 
-    if (parent->descriptor().id == vms::rules::utils::type<vms::rules::FanErrorEvent>())
+    if (parent->descriptor()->id == vms::rules::utils::type<vms::rules::FanErrorEvent>())
         return new SourceServerPicker<QnFanErrorPolicy>(context, parent);
 
     NX_ASSERT(false, "Must not be here");
     return {};
 }
 
-PickerWidget* createTargetDevicePicker(SystemContext* context, CommonParamsWidget* parent)
+PickerWidget* createTargetDevicePicker(SystemContext* context, ParamsWidget* parent)
 {
-    if (parent->descriptor().id == vms::rules::utils::type<vms::rules::BookmarkAction>())
+    if (parent->descriptor()->id == vms::rules::utils::type<vms::rules::BookmarkAction>())
         return new TargetCameraPicker<QnBookmarkActionPolicy>(context, parent);
 
-    if (parent->descriptor().id == vms::rules::utils::type<vms::rules::DeviceOutputAction>())
+    if (parent->descriptor()->id == vms::rules::utils::type<vms::rules::DeviceOutputAction>())
         return new TargetCameraPicker<QnCameraOutputPolicy>(context, parent);
 
-    if (parent->descriptor().id == vms::rules::utils::type<vms::rules::DeviceRecordingAction>())
+    if (parent->descriptor()->id == vms::rules::utils::type<vms::rules::DeviceRecordingAction>())
         return new TargetCameraPicker<QnCameraRecordingPolicy>(context, parent);
 
-    if (parent->descriptor().id == vms::rules::utils::type<vms::rules::PlaySoundAction>()
-        || parent->descriptor().id == vms::rules::utils::type<vms::rules::RepeatSoundAction>()
-        || parent->descriptor().id == vms::rules::utils::type<vms::rules::SpeakAction>())
+    if (parent->descriptor()->id == vms::rules::utils::type<vms::rules::PlaySoundAction>()
+        || parent->descriptor()->id == vms::rules::utils::type<vms::rules::RepeatSoundAction>()
+        || parent->descriptor()->id == vms::rules::utils::type<vms::rules::SpeakAction>())
     {
         return new TargetCameraPicker<QnCameraAudioTransmitPolicy>(context, parent);
     }
 
-    if (parent->descriptor().id == vms::rules::utils::type<vms::rules::PtzPresetAction>())
+    if (parent->descriptor()->id == vms::rules::utils::type<vms::rules::PtzPresetAction>())
         return new TargetCameraPicker<QnExecPtzPresetPolicy>(context, parent);
 
-    if (parent->descriptor().id == vms::rules::utils::type<vms::rules::ShowOnAlarmLayoutAction>())
+    if (parent->descriptor()->id == vms::rules::utils::type<vms::rules::ShowOnAlarmLayoutAction>())
         return new TargetCameraPicker<QnRequireCameraPolicy>(context, parent);
 
     return new TargetCameraPicker<QnAllowAnyCameraPolicy>(context, parent);
 }
 
-PickerWidget* createTargetServerPicker(SystemContext* context, CommonParamsWidget* parent)
+PickerWidget* createTargetServerPicker(SystemContext* context, ParamsWidget* parent)
 {
-    if (parent->descriptor().id == vms::rules::utils::type<vms::rules::BuzzerAction>())
+    if (parent->descriptor()->id == vms::rules::utils::type<vms::rules::BuzzerAction>())
         return new TargetServerPicker<QnBuzzerPolicy>(context, parent);
 
     NX_ASSERT(false, "Must not be here");
     return {};
 }
 
-PickerWidget* createSingleTargetCameraPicker(SystemContext* context, CommonParamsWidget* parent)
+PickerWidget* createSingleTargetCameraPicker(SystemContext* context, ParamsWidget* parent)
 {
-    if (parent->descriptor().id == vms::rules::utils::type<vms::rules::EnterFullscreenAction>())
+    if (parent->descriptor()->id == vms::rules::utils::type<vms::rules::EnterFullscreenAction>())
         return new SingleTargetDevicePicker<QnFullscreenCameraPolicy>(context, parent);
 
-    if (parent->descriptor().id == vms::rules::utils::type<vms::rules::PtzPresetAction>())
+    if (parent->descriptor()->id == vms::rules::utils::type<vms::rules::PtzPresetAction>())
         return new SingleTargetDevicePicker<QnExecPtzPresetPolicy>(context, parent);
 
     NX_ASSERT(false, "Must not be here.");
     return {};
+}
+
+PickerWidget* createOptionalDurationPicker(
+    const vms::rules::FieldDescriptor& fieldDescriptor,
+    SystemContext* context,
+    ParamsWidget* parent)
+{
+    if (fieldDescriptor.fieldName == vms::rules::utils::kDurationFieldName)
+    {
+        const auto event = parent->eventDescriptor();
+        const auto isEventInstantOnly = event->flags.testFlag(vms::rules::ItemFlag::instant)
+            && !event->flags.testFlag(vms::rules::ItemFlag::prolonged);
+        if (isEventInstantOnly)
+            return new DurationPicker<vms::rules::OptionalTimeField>(context, parent);
+
+        // Create picker widget which also controls event state.
+        return new ActionDurationPickerWidget(context, parent, event.value());
+    }
+
+    return new OptionalDurationPicker(context, parent);
 }
 
 } // namespace
@@ -129,7 +150,7 @@ using nx::vms::rules::fieldMetatype;
 PickerWidget* PickerFactory::createWidget(
     const vms::rules::FieldDescriptor& descriptor,
     WindowContext* windowContext,
-    CommonParamsWidget* parent)
+    ParamsWidget* parent)
 {
     PickerWidget* pickerWidget{};
     const auto context = windowContext->system();
@@ -189,7 +210,7 @@ PickerWidget* PickerFactory::createWidget(
     else if (descriptor.id == fieldMetatype<nx::vms::rules::LayoutField>())
         pickerWidget = new SingleTargetLayoutPicker(context, parent);
     else if (descriptor.id == fieldMetatype<nx::vms::rules::OptionalTimeField>())
-        pickerWidget = new OptionalDurationPicker(context, parent);
+        pickerWidget = createOptionalDurationPicker(descriptor, context, parent);
     else if (descriptor.id == fieldMetatype<nx::vms::rules::OutputPortField>())
         pickerWidget = new OutputPortPicker(context, parent);
     else if (descriptor.id == fieldMetatype<nx::vms::rules::PasswordField>())

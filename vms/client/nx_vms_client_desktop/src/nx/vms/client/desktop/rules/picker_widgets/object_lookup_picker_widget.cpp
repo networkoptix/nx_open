@@ -22,7 +22,7 @@ namespace nx::vms::client::desktop::rules {
 
 using LookupCheckType = vms::rules::ObjectLookupCheckType;
 
-ObjectLookupPicker::ObjectLookupPicker(SystemContext* context, CommonParamsWidget* parent):
+ObjectLookupPicker::ObjectLookupPicker(SystemContext* context, ParamsWidget* parent):
     TitledFieldPickerWidget<vms::rules::ObjectLookupField>(context, parent)
 {
     setCheckBoxEnabled(false);

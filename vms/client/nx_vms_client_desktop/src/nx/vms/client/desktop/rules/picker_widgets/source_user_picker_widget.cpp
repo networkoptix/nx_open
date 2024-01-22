@@ -16,7 +16,7 @@
 
 namespace nx::vms::client::desktop::rules {
 
-SourceUserPicker::SourceUserPicker(SystemContext* context, CommonParamsWidget* parent):
+SourceUserPicker::SourceUserPicker(SystemContext* context, ParamsWidget* parent):
     ResourcePickerWidgetBase<vms::rules::SourceUserField>(context, parent)
 {
 }
@@ -26,7 +26,7 @@ void SourceUserPicker::onDescriptorSet()
     ResourcePickerWidgetBase<vms::rules::SourceUserField>::onDescriptorSet();
 
     if (nx::vms::rules::utils::type<nx::vms::rules::SoftTriggerEvent>()
-        == parentParamsWidget()->descriptor().id)
+        == parentParamsWidget()->descriptor()->id)
     {
         m_validationPolicy = std::make_unique<QnRequiredAccessRightPolicy>(
             nx::vms::api::AccessRight::userInput);

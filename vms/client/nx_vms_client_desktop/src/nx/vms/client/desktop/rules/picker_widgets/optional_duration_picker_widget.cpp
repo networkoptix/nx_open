@@ -9,7 +9,7 @@
 
 namespace nx::vms::client::desktop::rules {
 
-OptionalDurationPicker::OptionalDurationPicker(SystemContext* context, CommonParamsWidget* parent):
+OptionalDurationPicker::OptionalDurationPicker(SystemContext* context, ParamsWidget* parent):
      TitledFieldPickerWidget<vms::rules::OptionalTimeField>(context, parent)
 {
     auto mainLayout = new QHBoxLayout;
@@ -42,9 +42,7 @@ void OptionalDurationPicker::onDescriptorSet()
 {
     TitledFieldPickerWidget<vms::rules::OptionalTimeField>::onDescriptorSet();
 
-    if (m_fieldDescriptor->fieldName == vms::rules::utils::kDurationFieldName)
-        m_label->setText(tr(""));
-    else if (m_fieldDescriptor->fieldName == vms::rules::utils::kIntervalFieldName)
+    if (m_fieldDescriptor->fieldName == vms::rules::utils::kIntervalFieldName)
         m_label->setText(tr("Once in"));
     else if (m_fieldDescriptor->fieldName == vms::rules::utils::kPlaybackTimeFieldName)
         m_label->setText(tr("For"));
@@ -67,28 +65,18 @@ void OptionalDurationPicker::onDescriptorSet()
 
 void OptionalDurationPicker::updateUi()
 {
-    auto field = theField();
-
-    if (m_fieldDescriptor->fieldName == vms::rules::utils::kDurationFieldName)
-    {
-        const bool isProlonged =
-            parentParamsWidget()->eventDescriptor()->flags.testFlag(vms::rules::ItemFlag::prolonged);
-
-        ::setReadOnly(m_enabledSwitch, !isProlonged);
-
-        if (!isProlonged && field->value() == vms::rules::OptionalTimeField::value_type::zero())
-        {
-            field->setValue(m_fieldDescriptor->properties.value("default").value<std::chrono::seconds>());
-            return;
-        }
-    }
+    const auto field = theField();
 
     if (m_fieldDescriptor->fieldName == vms::rules::utils::kIntervalFieldName)
     {
         const auto durationField =
             getActionField<vms::rules::OptionalTimeField>(vms::rules::utils::kDurationFieldName);
         if (durationField)
+        {
+            // If the action has duration field, 'Interval of action' picker must be visible only
+            // when duration value is non zero.
             setVisible(durationField->value() != vms::rules::OptionalTimeField::value_type::zero());
+        }
     }
 
     {

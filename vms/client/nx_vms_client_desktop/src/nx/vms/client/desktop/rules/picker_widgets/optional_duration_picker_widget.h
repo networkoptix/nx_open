@@ -14,7 +14,7 @@ class OptionalDurationPicker: public TitledFieldPickerWidget<vms::rules::Optiona
     Q_OBJECT
 
 public:
-    OptionalDurationPicker(SystemContext* context, CommonParamsWidget* parent);
+    OptionalDurationPicker(SystemContext* context, ParamsWidget* parent);
 
 protected:
     void onDescriptorSet() override;

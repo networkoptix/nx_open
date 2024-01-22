@@ -47,8 +47,8 @@ private:
     void displayState();
     void displayControls();
 
-    void displayActionEditor(const QString& actionType);
-    void displayEventEditor(const QString& eventType);
+    void displayActionEditor();
+    void displayEventEditor();
 
     void onCommentChanged(const QString& comment);
     void onDeleteClicked();

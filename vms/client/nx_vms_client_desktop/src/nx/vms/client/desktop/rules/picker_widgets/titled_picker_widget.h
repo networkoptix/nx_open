@@ -16,7 +16,7 @@ class TitledPickerWidget: public PickerWidget
     Q_OBJECT
 
 public:
-    TitledPickerWidget(SystemContext* context, CommonParamsWidget* parent);
+    TitledPickerWidget(SystemContext* context, ParamsWidget* parent);
 
     void setCheckBoxEnabled(bool value);
     void setChecked(bool value);

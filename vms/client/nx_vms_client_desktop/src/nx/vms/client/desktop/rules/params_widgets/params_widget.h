@@ -24,13 +24,9 @@ class ParamsWidget: public QWidget, public WindowContextAware
 public:
     explicit ParamsWidget(WindowContext* context, QWidget* parent = nullptr);
 
-    /** Sets descriptor the widget customization is depends on. */
-    void setDescriptor(const vms::rules::ItemDescriptor& value);
-
-    const vms::rules::ItemDescriptor& descriptor() const;
-
     void setRule(const std::shared_ptr<vms::rules::Rule>& rule);
 
+    virtual std::optional<vms::rules::ItemDescriptor> descriptor() const = 0;
     std::optional<vms::rules::ItemDescriptor> actionDescriptor() const;
     vms::rules::ActionBuilder* actionBuilder() const;
     std::optional<vms::rules::ItemDescriptor> eventDescriptor() const;
@@ -41,25 +37,18 @@ public:
     virtual void updateUi() = 0;
 
 protected:
-    /**
-     * Calls after the descriptor is set. Here derived classes must customize the widget using
-     * the descriptor.
-     */
-    virtual void onDescriptorSet();
+    virtual void onRuleSet() = 0;
 
     /**
      * Returns field descriptor by the field name from the item descriptor set. If there is
      * no such a field in the item descriptor returns nullopt.
      */
-    std::optional<vms::rules::FieldDescriptor> fieldDescriptor(const QString& fieldName);
+    std::optional<vms::rules::FieldDescriptor> fieldDescriptor(const QString& fieldName) const;
 
 private:
     void setupLineEditsPlaceholderColor();
 
-    vms::rules::ItemDescriptor m_itemDescriptor;
     std::shared_ptr<vms::rules::Rule> m_rule;
-    vms::rules::ActionBuilder* m_actionBuilder{nullptr};
-    vms::rules::EventFilter* m_eventFilter{nullptr};
 };
 
 } // namespace nx::vms::client::desktop::rules

@@ -47,7 +47,7 @@ protected:
 class HttpContentTypePicker: public HttpParametersPickerBase<vms::rules::ContentTypeField>
 {
 public:
-    HttpContentTypePicker(SystemContext* context, CommonParamsWidget* parent):
+    HttpContentTypePicker(SystemContext* context, ParamsWidget* parent):
         HttpParametersPickerBase<vms::rules::ContentTypeField>(context, parent)
     {
         QSignalBlocker blocker{m_comboBox};
@@ -63,7 +63,7 @@ public:
 class HttpMethodPicker: public HttpParametersPickerBase<vms::rules::HttpMethodField>
 {
 public:
-    HttpMethodPicker(SystemContext* context, CommonParamsWidget* parent):
+    HttpMethodPicker(SystemContext* context, ParamsWidget* parent):
         HttpParametersPickerBase<vms::rules::HttpMethodField>(context, parent)
     {
         QSignalBlocker blocker{m_comboBox};

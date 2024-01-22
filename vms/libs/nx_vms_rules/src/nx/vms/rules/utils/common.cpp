@@ -13,6 +13,18 @@
 
 namespace nx::vms::rules::utils {
 
+std::optional<FieldDescriptor> fieldByName(
+    const QString& fieldName, const ItemDescriptor& descriptor)
+{
+    for (const auto& field: descriptor.fields)
+    {
+        if (field.fieldName == fieldName)
+            return field;
+    }
+
+    return std::nullopt;
+}
+
 bool isLoggingAllowed(const Engine* engine, QnUuid ruleId)
 {
     const auto rule = engine->rule(ruleId);

@@ -14,7 +14,6 @@
 #include <ui/widgets/business/time_duration_widget.h>
 
 #include "field_picker_widget.h"
-#include "picker_widget_strings.h"
 #include "picker_widget_utils.h"
 
 namespace nx::vms::client::desktop::rules {
@@ -26,7 +25,7 @@ class DurationPicker: public PlainFieldPickerWidget<F>
     using base = PlainFieldPickerWidget<F>;
 
 public:
-    DurationPicker(SystemContext* context, CommonParamsWidget* parent):
+    DurationPicker(SystemContext* context, ParamsWidget* parent):
         base(context, parent)
     {
         auto contentLayout = new QHBoxLayout;
@@ -54,6 +53,10 @@ protected:
     {
         base::onDescriptorSet();
 
+        m_timeDurationWidget->addDurationSuffix(QnTimeStrings::Suffix::Minutes);
+        m_timeDurationWidget->addDurationSuffix(QnTimeStrings::Suffix::Hours);
+        m_timeDurationWidget->addDurationSuffix(QnTimeStrings::Suffix::Days);
+
         auto maxIt = m_fieldDescriptor->properties.constFind("max");
         if (maxIt != m_fieldDescriptor->properties.constEnd())
             m_timeDurationWidget->setMaximum(maxIt->template value<std::chrono::seconds>().count());
@@ -78,12 +81,9 @@ protected:
 
             const auto hasDuration =
                 durationField->value() != vms::rules::OptionalTimeField::value_type::zero();
-            if (hasDuration && field->value() != F::value_type::zero())
-            {
-                field->setValue(F::value_type::zero());
-                return;
-            }
 
+            // Pre and post recording pickers (except bookmark action pre-recording) must be
+            // visible for the user only when action hasn't duration.
             this->setVisible(!hasDuration);
         }
 

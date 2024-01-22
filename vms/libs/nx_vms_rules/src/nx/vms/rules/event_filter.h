@@ -96,7 +96,10 @@ signals:
     void stateChanged();
 
     /** Emitted whenever any field property is changed. */
-    void changed();
+    void changed(const QString& fieldName);
+
+private slots:
+    void onFieldChanged();
 
 private:
     /** Match all event fields excluding state. */

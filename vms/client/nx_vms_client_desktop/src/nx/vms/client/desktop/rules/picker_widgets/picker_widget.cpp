@@ -4,14 +4,14 @@
 
 #include <QtWidgets/QHBoxLayout>
 
-#include <nx/vms/client/desktop/rules/params_widgets/common_params_widget.h>
+#include <nx/vms/client/desktop/rules/params_widgets/params_widget.h>
 
 namespace nx::vms::client::desktop::rules {
 
 using Field = vms::rules::Field;
 using FieldDescriptor = vms::rules::FieldDescriptor;
 
-PickerWidget::PickerWidget(SystemContext* context, CommonParamsWidget* parent):
+PickerWidget::PickerWidget(SystemContext* context, ParamsWidget* parent):
     QWidget(parent),
     SystemContextAware(context)
 {
@@ -34,9 +34,9 @@ bool PickerWidget::hasDescriptor() const
     return m_fieldDescriptor != std::nullopt;
 }
 
-CommonParamsWidget* PickerWidget::parentParamsWidget() const
+ParamsWidget* PickerWidget::parentParamsWidget() const
 {
-    return dynamic_cast<CommonParamsWidget*>(parent());
+    return dynamic_cast<ParamsWidget*>(parent());
 }
 
 } // namespace nx::vms::client::desktop::rules

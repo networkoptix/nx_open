@@ -112,10 +112,10 @@ void EventFilter::addField(const QString& name, std::unique_ptr<EventFilterField
 {
     field->moveToThread(thread());
 
-    nx::utils::watchOnPropertyChanges(
-        field.get(),
-        this,
-        QMetaMethod::fromSignal(&EventFilter::changed));
+    static const auto onFieldChangedMetaMethod =
+        metaObject()->method(metaObject()->indexOfMethod("onFieldChanged()"));
+    if (NX_ASSERT(onFieldChangedMetaMethod.isValid()))
+        nx::utils::watchOnPropertyChanges(field.get(), this, onFieldChangedMetaMethod);
 
     m_fields[name] = std::move(field);
     updateState();
@@ -193,6 +193,22 @@ void EventFilter::updateState()
 
     QScopedValueRollback<bool> guard(m_updateInProgress, true);
     emit stateChanged();
+}
+
+void EventFilter::onFieldChanged()
+{
+    const auto changedField = sender();
+
+    for (const auto& [fieldName, field]: m_fields)
+    {
+        if (field.get() == changedField)
+        {
+            emit changed(fieldName);
+            return;
+        }
+    }
+
+    NX_ASSERT(false, "Must not be here");
 }
 
 } // namespace nx::vms::rules

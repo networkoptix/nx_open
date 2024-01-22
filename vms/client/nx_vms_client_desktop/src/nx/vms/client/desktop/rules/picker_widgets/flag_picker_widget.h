@@ -19,7 +19,7 @@ class FlagPicker: public PlainFieldPickerWidget<F>
     using base = PlainFieldPickerWidget<F>;
 
 public:
-    FlagPicker(SystemContext* context, CommonParamsWidget* parent):
+    FlagPicker(SystemContext* context, ParamsWidget* parent):
         base(context, parent)
     {
         auto contentLayout = new QHBoxLayout;

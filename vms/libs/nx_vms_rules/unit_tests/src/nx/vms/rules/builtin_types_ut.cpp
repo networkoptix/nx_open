@@ -56,6 +56,8 @@ public:
 
         EXPECT_FALSE(manifest.id.isEmpty());
         EXPECT_FALSE(manifest.displayName.isEmpty());
+        EXPECT_TRUE(manifest.flags.testFlag(ItemFlag::instant)
+            || manifest.flags.testFlag(ItemFlag::prolonged));
 
         // Check all manifest fields correspond to properties with the same name.
         for (const auto& field: manifest.fields)

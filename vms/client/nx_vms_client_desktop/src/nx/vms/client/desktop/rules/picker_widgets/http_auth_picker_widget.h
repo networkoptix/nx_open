@@ -15,7 +15,7 @@ class HttpAuthPicker: public FieldPickerWidget<vms::rules::HttpAuthField, Picker
     using base = FieldPickerWidget<vms::rules::HttpAuthField, PickerWidget>;
 
 public:
-    HttpAuthPicker(SystemContext* context, CommonParamsWidget* parent);
+    HttpAuthPicker(SystemContext* context, ParamsWidget* parent);
     virtual ~HttpAuthPicker() override;
 
     void setReadOnly(bool value) override;

@@ -12,7 +12,7 @@
 
 namespace nx::vms::client::desktop::rules {
 
-TitledPickerWidget::TitledPickerWidget(SystemContext* context, CommonParamsWidget* parent):
+TitledPickerWidget::TitledPickerWidget(SystemContext* context, ParamsWidget* parent):
     PickerWidget{context, parent}
 {
     auto mainLayout = new QVBoxLayout{this};

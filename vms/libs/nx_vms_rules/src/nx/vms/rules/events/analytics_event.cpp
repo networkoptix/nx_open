@@ -104,7 +104,7 @@ const ItemDescriptor& AnalyticsEvent::manifest()
         .id = utils::type<AnalyticsEvent>(),
         .displayName = tr("Analytics Event"),
         .description = "",
-        .flags = {ItemFlag::instant, ItemFlag::prolonged},
+        .flags = {ItemFlag::prolonged},
         .fields = {
             utils::makeStateFieldDescriptor(tr("Begin When")),
             makeFieldDescriptor<SourceCameraField>(utils::kCameraIdFieldName, tr("Occurs at")),

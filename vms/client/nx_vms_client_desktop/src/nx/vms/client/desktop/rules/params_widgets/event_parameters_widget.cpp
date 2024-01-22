@@ -1,11 +1,12 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "common_params_widget.h"
+#include "event_parameters_widget.h"
 
 #include <QtWidgets/QVBoxLayout>
 
 #include <nx/vms/client/desktop/rules/picker_widgets/picker_factory.h>
 #include <nx/vms/client/desktop/style/helper.h>
+#include <nx/vms/rules/utils/field.h>
 #include <ui/workbench/workbench_context.h>
 
 #include "../dialog_details/dotted_line.h"
@@ -13,13 +14,24 @@
 
 namespace nx::vms::client::desktop::rules {
 
-CommonParamsWidget::CommonParamsWidget(WindowContext* context, QWidget* parent):
+EventParametersWidget::EventParametersWidget(WindowContext* context, QWidget* parent):
     ParamsWidget(context, parent)
 {
 }
 
-void CommonParamsWidget::onDescriptorSet()
+std::optional<vms::rules::ItemDescriptor> EventParametersWidget::descriptor() const
 {
+    return eventDescriptor();
+}
+
+void EventParametersWidget::onRuleSet()
+{
+    connect(
+        eventFilter(),
+        &vms::rules::EventFilter::changed,
+        this,
+        &EventParametersWidget::onEventFieldChanged);
+
     auto layout = new QVBoxLayout;
     layout->setSpacing(0);
     layout->setContentsMargins(0, 0, 0, 0);
@@ -27,8 +39,12 @@ void CommonParamsWidget::onDescriptorSet()
     m_pickers.clear();
 
     bool isPreviousPlain{true};
-    for (const auto& fieldDescriptor: descriptor().fields)
+    const auto event = descriptor();
+    for (const auto& fieldDescriptor: event->fields)
     {
+        if (fieldDescriptor.fieldName == vms::rules::utils::kStateFieldName)
+            continue; //< State field is displayed by the action editor.
+
         if (!fieldDescriptor.properties.value("visible", true).toBool())
             continue;
 
@@ -57,10 +73,15 @@ void CommonParamsWidget::onDescriptorSet()
     setLayout(layout);
 }
 
-void CommonParamsWidget::updateUi()
+void EventParametersWidget::updateUi()
 {
     for (auto picker: m_pickers)
         picker->updateUi();
+}
+
+void EventParametersWidget::onEventFieldChanged(const QString& /*fieldName*/)
+{
+    updateUi();
 }
 
 } // namespace nx::vms::client::desktop::rules

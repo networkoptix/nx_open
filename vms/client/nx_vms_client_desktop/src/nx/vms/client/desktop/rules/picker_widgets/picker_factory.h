@@ -16,7 +16,7 @@ public:
     static PickerWidget* createWidget(
         const vms::rules::FieldDescriptor& descriptor,
         WindowContext* context,
-        CommonParamsWidget* parent);
+        ParamsWidget* parent);
 };
 
 } // namespace nx::vms::client::desktop::rules
