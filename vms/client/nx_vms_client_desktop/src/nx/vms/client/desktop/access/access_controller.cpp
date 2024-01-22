@@ -14,6 +14,7 @@
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/assert.h>
+#include <nx/vms/client/core/resource/screen_recording/desktop_resource.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/desktop/cross_system/cross_system_camera_resource.h>
@@ -191,6 +192,18 @@ Qn::Permissions AccessController::Private::permissionsForCamera(
 
     if (camera->hasFlags(Qn::cross_system))
         permissions &= ~Qn::GenericEditPermissions;
+
+    if (camera->hasFlags(Qn::desktop_camera))
+    {
+        if (const auto user = q->user())
+        {
+            const auto ownDesktopCameraId = core::DesktopResource::calculateUniqueId(
+                q->systemContext()->peerId(), q->user()->getId());
+
+            if (camera->getPhysicalId() == ownDesktopCameraId)
+                permissions |= Qn::ViewLivePermission;
+        }
+    }
 
     if (ini().allowToPutAnyAccessibleDeviceOnScene && permissions.testFlag(Qn::ReadPermission))
         permissions.setFlag(Qn::ViewContentPermission);
