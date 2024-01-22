@@ -169,6 +169,11 @@ public:
                         ips.push_back(std::move(entry.host));
                 }
 
+                // NOTE: Since NX_ASSERT only prints error to log in release build, it is possible
+                // that ips is empty at this point.
+                if (code == SystemError::noError && ips.empty())
+                    code = SystemError::hostUnreachable;
+
                 m_addressResolverIsInUse = false;
                 this->m_resolveResultScheduler.dispatch(
                     [handler = std::move(handler), code, ips = std::move(ips)]() mutable
