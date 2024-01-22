@@ -14,20 +14,17 @@
 
 namespace nx::vms::license::test {
 
-class QnVideowallLicenseUsageHelperTest: public nx::vms::common::test::ContextBasedTest
+class ConfigureVideowallLicenseUsageHelperTest: public nx::vms::common::test::ContextBasedTest
 {
 protected:
-
-    // virtual void SetUp() will be called before each test is run.
     virtual void SetUp()
     {
         m_licenses.reset(new QnLicensePoolScaffold(systemContext()->licensePool()));
-        m_helper.reset(new VideoWallLicenseUsageHelper(systemContext()));
+        m_helper.reset(new ConfigureVideoWallLicenseUsageHelper(systemContext()));
         m_helper->setCustomValidator(
             std::make_unique<QLicenseStubValidator>(systemContext()));
     }
 
-    // virtual void TearDown() will be called after each test is run.
     virtual void TearDown()
     {
         m_helper.reset();
@@ -67,16 +64,11 @@ protected:
         return m_helper->isValid(Qn::LC_VideoWall);
     }
 
-    // Declares the variables your tests want to use.
     QScopedPointer<QnLicensePoolScaffold> m_licenses;
-    QScopedPointer<VideoWallLicenseUsageHelper> m_helper;
+    QScopedPointer<ConfigureVideoWallLicenseUsageHelper> m_helper;
 };
 
-/**
- * License text should be based on the screen count only. All changes in the screens count must be
- * correctly handled.
- */
-TEST_F(QnVideowallLicenseUsageHelperTest, validityDependsOnScreensCount)
+TEST_F(ConfigureVideowallLicenseUsageHelperTest, validityDependsOnScreensCount)
 {
     // Licenses are not required initially.
     ASSERT_TRUE(enoughLicenses());
@@ -107,6 +99,32 @@ TEST_F(QnVideowallLicenseUsageHelperTest, validityDependsOnScreensCount)
     addVideoWallWithItems(1);
     ASSERT_TRUE(enoughLicenses());
     addVideoWallWithItems(1);
+    ASSERT_FALSE(enoughLicenses());
+}
+
+TEST_F(ConfigureVideowallLicenseUsageHelperTest, proposalChecks)
+{
+    auto videowall = addVideoWall();
+
+    m_helper->setScreenCountChange(3);
+
+    // Zero licenses are not enough for 3 proposed items.
+    ASSERT_FALSE(enoughLicenses());
+
+    // Single license is still not enough for 3 proposed items.
+    addLicenses(1);
+    ASSERT_FALSE(enoughLicenses());
+
+    // 2 licenses are enough for 0-4 items (3 proposed items in this case).
+    addLicenses(1);
+    ASSERT_TRUE(enoughLicenses());
+
+    // 2 licenses are enough for 1 real and 3 proposed items.
+    addItem(videowall);
+    ASSERT_TRUE(enoughLicenses());
+
+    // 2 licenses are enough for 5 items (2 real and 3 proposed).
+    addItem(videowall);
     ASSERT_FALSE(enoughLicenses());
 }
 
