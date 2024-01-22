@@ -24,7 +24,7 @@ constexpr auto kOneHundredPercent = 100;
 
 } // namespace
 
-VolumePicker::VolumePicker(WindowContext* context, CommonParamsWidget* parent):
+VolumePicker::VolumePicker(WindowContext* context, ParamsWidget* parent):
     PlainFieldPickerWidget<vms::rules::VolumeField>(context->system(), parent),
     WindowContextAware(context)
 {

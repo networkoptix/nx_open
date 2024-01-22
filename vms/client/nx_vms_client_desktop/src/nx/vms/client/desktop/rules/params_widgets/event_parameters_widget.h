@@ -10,20 +10,20 @@ namespace nx::vms::client::desktop::rules {
 
 class PickerWidget;
 
-/**
- * Used if no custom editor is provided. Dynamically creates pickers according to the passed
- * descriptor.
- */
-class CommonParamsWidget: public ParamsWidget
+class EventParametersWidget: public ParamsWidget
 {
     Q_OBJECT
 
 public:
-    CommonParamsWidget(WindowContext* context, QWidget* parent = nullptr);
+    explicit EventParametersWidget(WindowContext* context, QWidget* parent = nullptr);
+
+    virtual std::optional<vms::rules::ItemDescriptor> descriptor() const override;
 
 private:
-    virtual void onDescriptorSet() override;
+    virtual void onRuleSet() override;
     virtual void updateUi() override;
+
+    void onEventFieldChanged(const QString& fieldName);
 
     std::vector<PickerWidget*> m_pickers;
 };

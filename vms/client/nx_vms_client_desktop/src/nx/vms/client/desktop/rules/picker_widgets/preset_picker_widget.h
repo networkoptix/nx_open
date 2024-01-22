@@ -13,7 +13,7 @@ class PresetPickerWidget: public PlainPickerWidget
     Q_OBJECT
 
 public:
-    PresetPickerWidget(SystemContext* context, CommonParamsWidget* parent);
+    PresetPickerWidget(SystemContext* context, ParamsWidget* parent);
 
     void updateUi() override;
 

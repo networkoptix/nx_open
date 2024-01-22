@@ -20,7 +20,7 @@ const ItemDescriptor& SendEmailAction::manifest()
         .id = utils::type<SendEmailAction>(),
         .displayName = tr("Send Email"),
         .description = "",
-        .flags = {ItemFlag::aggregationByTypeSupported, ItemFlag::omitLogging},
+        .flags = {ItemFlag::instant, ItemFlag::aggregationByTypeSupported, ItemFlag::omitLogging},
         .fields = {
             utils::makeTargetUserFieldDescriptor(
                 tr("To"),

@@ -19,7 +19,7 @@ class VolumePicker:
     Q_OBJECT
 
 public:
-    VolumePicker(WindowContext* context, CommonParamsWidget* parent);
+    VolumePicker(WindowContext* context, ParamsWidget* parent);
 
 private:
     QSlider* m_volumeSlider = nullptr;

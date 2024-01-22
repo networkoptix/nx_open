@@ -8,7 +8,7 @@
 
 namespace nx::vms::client::desktop::rules {
 
-PlainPickerWidget::PlainPickerWidget(SystemContext* context, CommonParamsWidget* parent):
+PlainPickerWidget::PlainPickerWidget(SystemContext* context, ParamsWidget* parent):
     PickerWidget{context, parent}
 {
     auto mainLayout = new QHBoxLayout{this};

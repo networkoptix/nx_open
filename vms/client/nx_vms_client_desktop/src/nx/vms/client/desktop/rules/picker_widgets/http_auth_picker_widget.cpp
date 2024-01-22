@@ -66,7 +66,7 @@ struct HttpAuthPicker::Private
     }
 };
 
-HttpAuthPicker::HttpAuthPicker(SystemContext* context, CommonParamsWidget* parent):
+HttpAuthPicker::HttpAuthPicker(SystemContext* context, ParamsWidget* parent):
     base(context, parent), d(new HttpAuthPicker::Private())
 {
     auto mainLayout = new QVBoxLayout{this};

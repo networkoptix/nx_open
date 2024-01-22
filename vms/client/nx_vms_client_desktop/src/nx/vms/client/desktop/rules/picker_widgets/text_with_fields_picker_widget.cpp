@@ -121,7 +121,7 @@ struct TextWithFieldsPicker::Private: public QObject
     }
 };
 
-TextWithFieldsPicker::TextWithFieldsPicker(SystemContext* context, CommonParamsWidget* parent):
+TextWithFieldsPicker::TextWithFieldsPicker(SystemContext* context, ParamsWidget* parent):
     base(context, parent),
     d(new Private(this))
 {

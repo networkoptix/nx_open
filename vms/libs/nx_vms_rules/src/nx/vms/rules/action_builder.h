@@ -111,9 +111,12 @@ signals:
     void stateChanged();
 
     /** Emitted whenever any field property is changed. */
-    void changed();
+    void changed(const QString& fieldName);
 
     void action(const ActionPtr& action);
+
+private slots:
+    void onFieldChanged();
 
 protected:
     void processEvent(const EventPtr& event);

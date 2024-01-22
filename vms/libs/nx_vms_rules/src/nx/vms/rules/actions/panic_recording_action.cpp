@@ -22,7 +22,7 @@ const ItemDescriptor& PanicRecordingAction::manifest()
         .fields = {
             utils::makeTimeFieldDescriptor<OptionalTimeField>(
                     utils::kDurationFieldName,
-                    tr("Fixed Duration"),
+                    tr("Duration"),
                     {},
                     {.initialValue = 5s, .defaultValue = 5s, .maximumValue = 9999h, .minimumValue = 1s}),
             utils::makeIntervalFieldDescriptor(tr("Interval of Action"))

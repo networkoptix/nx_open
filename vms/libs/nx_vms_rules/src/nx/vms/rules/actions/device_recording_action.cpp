@@ -26,7 +26,7 @@ const ItemDescriptor& DeviceRecordingAction::manifest()
             makeFieldDescriptor<FpsField>("fps", tr("FPS"), {}, {}, {utils::kDeviceIdsFieldName}),
             utils::makeTimeFieldDescriptor<OptionalTimeField>(
                 utils::kDurationFieldName,
-                tr("Fixed Duration"),
+                tr("Duration"),
                 {},
                 {.initialValue = 5s, .defaultValue = 5s, .maximumValue = 9999h, .minimumValue = 1s}),
             utils::makeTimeFieldDescriptor<TimeField>(

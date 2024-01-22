@@ -15,7 +15,7 @@
 #include <nx/vms/rules/manifest.h>
 #include <ui/workbench/workbench_context_aware.h>
 
-#include "../params_widgets/common_params_widget.h"
+#include "../params_widgets/params_widget.h"
 
 namespace nx::vms::client::desktop::rules {
 
@@ -28,7 +28,7 @@ class PickerWidget: public QWidget, public SystemContextAware
     Q_OBJECT
 
 public:
-    PickerWidget(SystemContext* context, CommonParamsWidget* parent);
+    PickerWidget(SystemContext* context, ParamsWidget* parent);
 
     /** Sets field descriptor the picker customization is depends on. */
     void setDescriptor(const vms::rules::FieldDescriptor& descriptor);
@@ -42,7 +42,7 @@ public:
 
     virtual void updateUi() = 0;
 
-    CommonParamsWidget* parentParamsWidget() const;
+    ParamsWidget* parentParamsWidget() const;
 
 protected:
     /**

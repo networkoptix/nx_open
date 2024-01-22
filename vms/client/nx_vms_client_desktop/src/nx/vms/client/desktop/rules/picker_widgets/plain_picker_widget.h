@@ -15,7 +15,7 @@ class PlainPickerWidget: public PickerWidget
     Q_OBJECT
 
 public:
-    PlainPickerWidget(SystemContext* context, CommonParamsWidget* parent);
+    PlainPickerWidget(SystemContext* context, ParamsWidget* parent);
 
     void setReadOnly(bool value) override;
 

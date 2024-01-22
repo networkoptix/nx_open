@@ -16,7 +16,7 @@
 namespace nx::vms::client::desktop::rules {
 
 SingleTargetLayoutPicker::SingleTargetLayoutPicker(
-    SystemContext* context, CommonParamsWidget* parent)
+    SystemContext* context, ParamsWidget* parent)
     :
     ResourcePickerWidgetBase<vms::rules::LayoutField>(context, parent)
 {

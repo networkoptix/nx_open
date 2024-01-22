@@ -350,10 +350,10 @@ void ActionBuilder::addField(const QString& name, std::unique_ptr<ActionBuilderF
             setAggregationInterval(optionalTimeField->value());
     }
 
-    nx::utils::watchOnPropertyChanges(
-        field.get(),
-        this,
-        QMetaMethod::fromSignal(&ActionBuilder::changed));
+    static const auto onFieldChangedMetaMethod =
+        metaObject()->method(metaObject()->indexOfMethod("onFieldChanged()"));
+    if (NX_ASSERT(onFieldChangedMetaMethod.isValid()))
+        nx::utils::watchOnPropertyChanges(field.get(), this, onFieldChangedMetaMethod);
 
     m_fields[name] = std::move(field);
 
@@ -677,6 +677,22 @@ void ActionBuilder::handleAggregatedEvents()
 Engine* ActionBuilder::engine() const
 {
     return m_rule ? const_cast<Engine*>(m_rule->engine()) : nullptr;
+}
+
+void ActionBuilder::onFieldChanged()
+{
+    const auto changedField = sender();
+
+    for (const auto& [fieldName, field]: m_fields)
+    {
+        if (field.get() == changedField)
+        {
+            emit changed(fieldName);
+            return;
+        }
+    }
+
+    NX_ASSERT(false, "Must not be here");
 }
 
 } // namespace nx::vms::rules

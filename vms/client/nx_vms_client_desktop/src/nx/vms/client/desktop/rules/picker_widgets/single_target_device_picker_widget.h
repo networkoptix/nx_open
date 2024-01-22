@@ -25,7 +25,7 @@ class SingleTargetDevicePicker:
     public ResourcePickerWidgetBase<vms::rules::TargetSingleDeviceField>
 {
 public:
-    SingleTargetDevicePicker(SystemContext* context, CommonParamsWidget* parent):
+    SingleTargetDevicePicker(SystemContext* context, ParamsWidget* parent):
         ResourcePickerWidgetBase<vms::rules::TargetSingleDeviceField>(context, parent)
     {
         if (!Policy::canUseSourceCamera())
@@ -65,7 +65,7 @@ private:
         if (Policy::canUseSourceCamera())
         {
             m_checkBox->setText(ResourcePickerWidgetStrings::useEventSourceString(
-                parentParamsWidget()->descriptor().id));
+                parentParamsWidget()->descriptor()->id));
         }
     }
 

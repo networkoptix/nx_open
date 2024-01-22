@@ -11,7 +11,7 @@
 #include <nx/vms/rules/utils/event.h>
 #include <nx/vms/rules/utils/field.h>
 
-#include "../params_widgets/common_params_widget.h"
+#include "../params_widgets/params_widget.h"
 #include "picker_widget_strings.h"
 #include "resource_picker_widget_base.h"
 
@@ -71,7 +71,7 @@ template<typename Policy>
 class TargetCameraPicker: public CameraPickerWidgetBase<vms::rules::TargetDeviceField, Policy>
 {
 public:
-    TargetCameraPicker(SystemContext* context, CommonParamsWidget* parent):
+    TargetCameraPicker(SystemContext* context, ParamsWidget* parent):
         CameraPickerWidgetBase<vms::rules::TargetDeviceField, Policy>(context, parent)
     {
         auto contentLayout = qobject_cast<QVBoxLayout*>(m_contentWidget->layout());
@@ -93,7 +93,7 @@ protected:
         CameraPickerWidgetBase<vms::rules::TargetDeviceField, Policy>::onDescriptorSet();
 
         m_checkBox->setText(ResourcePickerWidgetStrings::useEventSourceString(
-            parentParamsWidget()->descriptor().id));
+            parentParamsWidget()->descriptor()->id));
     }
 
     void updateUi() override
