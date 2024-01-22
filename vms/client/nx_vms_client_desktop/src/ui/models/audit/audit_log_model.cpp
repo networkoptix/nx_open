@@ -2,8 +2,6 @@
 
 #include "audit_log_model.h"
 
-#include <cassert>
-
 #include <QtGui/QPalette>
 
 #include <api/common_message_processor.h>
