@@ -2018,6 +2018,12 @@ void QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered()
     /* Layout that is currently on the drop-target item. */
     auto currentLayout = resourcePool()->getResourceById<LayoutResource>(targetIndex.item().layout);
 
+    if (currentLayout && currentLayout->locked())
+    {
+        SceneBanner::show(tr("Screen is locked and cannot be changed"));
+        return;
+    }
+
     auto keyboardModifiers = parameters.argument<Qt::KeyboardModifiers>(Qn::KeyboardModifiersRole);
 
     /* Case of dropping from one screen to another. */
