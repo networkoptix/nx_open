@@ -4,10 +4,10 @@
 
 #include <QtCore/QSharedPointer>
 
-#include <nx/vms/client/core/time/calendar_utils.h>
-#include <nx/vms/client/core/time/calendar_model.h>
-#include <nx/vms/client/core/time/time_common_properties_test.h>
 #include <nx/vms/client/core/media/abstract_time_period_storage.h>
+#include <nx/vms/client/core/time/calendar_model.h>
+#include <nx/vms/client/core/time/calendar_utils.h>
+#include <nx/vms/client/core/time/time_common_properties_test.h>
 #include <recording/time_period_list.h>
 
 namespace nx::vms::client::core {
@@ -208,22 +208,30 @@ QDate HighlightTestFixture::findHighlightedCell() const
 
 qint64 HighlightTestFixture::firstDayStartTimestamp() const
 {
-    return kTestMonthStart.toMSecsSinceEpoch() - model.displayOffset();
+    auto testMonthStart = kTestMonthStart;
+    testMonthStart.setTimeZone(model.timeZone());
+    return testMonthStart.toMSecsSinceEpoch();
 }
 
 qint64 HighlightTestFixture::lastDayEndTimestamp() const
 {
-    return kTestMonthEnd.toMSecsSinceEpoch() - model.displayOffset();
+    auto testMonthEnd = kTestMonthEnd;
+    testMonthEnd.setTimeZone(model.timeZone());
+    return testMonthEnd.toMSecsSinceEpoch();
 }
 
 qint64 HighlightTestFixture::beforeFirstVisibleDayStartTimestamp()
 {
-    return kFirstVisibleDay.toMSecsSinceEpoch() - model.displayOffset() - 1;
+    auto firstVisibleDay = kFirstVisibleDay;
+    firstVisibleDay.setTimeZone(model.timeZone());
+    return firstVisibleDay.toMSecsSinceEpoch() - 1;
 }
 
 qint64 HighlightTestFixture::afterLastDayStartTimestamp()
 {
-    return kTestMonthEnd.toMSecsSinceEpoch() - model.displayOffset() + 1;
+    auto testMonthEnd = kTestMonthEnd;
+    testMonthEnd.setTimeZone(model.timeZone());
+    return testMonthEnd.toMSecsSinceEpoch() + 1;
 }
 
 //--------------------------------------------------------------------------------------------------

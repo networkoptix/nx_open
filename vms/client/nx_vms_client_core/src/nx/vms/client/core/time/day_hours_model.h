@@ -5,6 +5,7 @@
 #include <QtCore/QAbstractListModel>
 #include <QtCore/QDate>
 #include <QtCore/QLocale>
+#include <QtCore/QTimeZone>
 
 #include <nx/utils/impl_ptr.h>
 
@@ -31,6 +32,8 @@ class NX_VMS_CLIENT_CORE_API DayHoursModel: public QAbstractListModel
         NOTIFY allCamerasPeriodStorageChanged)
     Q_PROPERTY(qint64 displayOffset READ displayOffset WRITE setDisplayOffset
         NOTIFY displayOffsetChanged)
+    Q_PROPERTY(QTimeZone timeZone READ timeZone WRITE setTimeZone
+        NOTIFY timeZoneChanged)
 
 public:
     enum Role
@@ -38,6 +41,7 @@ public:
         HourRole = Qt::UserRole + 1,
         HasArchiveRole,
         AnyCameraHasArchiveRole,
+        IsHourValidRole,
     };
 
     DayHoursModel(QObject* parent = nullptr);
@@ -58,6 +62,9 @@ public:
     qint64 displayOffset() const;
     void setDisplayOffset(qint64 value);
 
+    QTimeZone timeZone() const;
+    void setTimeZone(QTimeZone value);
+
     static void registerQmlType();
 
 public:
@@ -72,6 +79,7 @@ signals:
     void periodStorageChanged();
     void allCamerasPeriodStorageChanged();
     void displayOffsetChanged();
+    void timeZoneChanged();
 
 private:
     struct Private;

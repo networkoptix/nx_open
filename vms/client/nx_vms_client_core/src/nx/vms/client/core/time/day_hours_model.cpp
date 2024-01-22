@@ -2,11 +2,11 @@
 
 #include "day_hours_model.h"
 
-#include <QtQml/QtQml>
+#include <functional>
+
 #include <QtCore/QDateTime>
 #include <QtCore/QTimeZone>
-
-#include <functional>
+#include <QtQml/QtQml>
 
 #include <nx/reflect/enum_instrument.h>
 #include <nx/utils/log/assert.h>
@@ -55,6 +55,7 @@ struct DayHoursModel::Private
     bool amPmTime = true;
     QDate date;
     qint64 displayOffset = 0;
+    QTimeZone timeZone{QTimeZone::LocalTime};
     bool hourHasArchive[(int) PeriodStorageType::count][kHoursPerDay];
 
     AbstractTimePeriodStorage* periodStorage[(int) PeriodStorageType::count]{nullptr, nullptr};
@@ -81,7 +82,7 @@ void DayHoursModel::Private::updateArchiveInfo(PeriodStorageType type)
     const QnTimePeriodList timePeriods =
         store ? store->periods(Qn::RecordingContent) : QnTimePeriodList();
 
-    const qint64 startPosition = date.startOfDay().toMSecsSinceEpoch() - displayOffset;
+    const qint64 startPosition = date.startOfDay(timeZone).toMSecsSinceEpoch();
 
     const QBitArray archivePresence = calendar_utils::buildArchivePresence(
         timePeriods,
@@ -213,6 +214,22 @@ void DayHoursModel::setDisplayOffset(qint64 value)
     d->resetModelData();
 }
 
+QTimeZone DayHoursModel::timeZone() const
+{
+    return d->timeZone;
+}
+
+void DayHoursModel::setTimeZone(QTimeZone value)
+{
+    if (d->timeZone == value)
+        return;
+
+    d->timeZone = value;
+    emit timeZoneChanged();
+
+    d->resetModelData();
+}
+
 void DayHoursModel::registerQmlType()
 {
     qmlRegisterType<DayHoursModel>("nx.vms.client.core", 1, 0, "DayHoursModel");
@@ -242,6 +259,12 @@ QVariant DayHoursModel::data(const QModelIndex& index, int role) const
             return d->hourHasArchive[(int) PeriodStorageType::currentCamera][hour];
         case AnyCameraHasArchiveRole:
             return d->hourHasArchive[(int) PeriodStorageType::allCameras][hour];
+        case IsHourValidRole:
+        {
+            auto dateTime = d->date.startOfDay(d->timeZone);
+            dateTime.setTime(QTime(hour,0));
+            return dateTime.isValid();
+        }
     }
 
     return QVariant();
@@ -257,6 +280,7 @@ QHash<int, QByteArray> DayHoursModel::roleNames() const
             {HourRole, "hour"},
             {HasArchiveRole, "hasArchive"},
             {AnyCameraHasArchiveRole, "anyCameraHasArchive"},
+            {IsHourValidRole, "isHourValid"},
         });
     }
     return roleNames;

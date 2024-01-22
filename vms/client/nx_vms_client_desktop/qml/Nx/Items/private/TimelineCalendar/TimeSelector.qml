@@ -1,10 +1,12 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.15
+import QtQuick
 
-import nx.vms.client.core 1.0
-import Nx 1.0
-import Nx.Core 1.0
+import Nx
+import Nx.Core
+
+import nx.vms.client.core
+import nx.vms.client.desktop
 
 Item
 {
@@ -20,6 +22,7 @@ Item
     property int selectionEnd: maximumHour
 
     property alias displayOffset: dayHoursModel.displayOffset
+    property alias timeZone: dayHoursModel.timeZone
     property alias periodStorage: dayHoursModel.periodStorage
     property alias allCamerasPeriodStorage: dayHoursModel.allCamerasPeriodStorage
     property bool periodsVisible: true
@@ -81,6 +84,10 @@ Item
                 height: 32
 
                 enabled: hourItem.hour >= minimumHour && hourItem.hour <= maximumHour
+                    && model.isHourValid
+
+                GlobalToolTip.text:
+                    model.isHourValid ? "" : qsTr("Not clickable due to the DST change")
 
                 SelectionMarker
                 {

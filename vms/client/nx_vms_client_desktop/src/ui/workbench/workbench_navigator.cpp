@@ -1468,7 +1468,10 @@ void QnWorkbenchNavigator::updateTimeZone()
     const milliseconds localOffset = seconds(QDateTime::currentDateTime().offsetFromUtc());
 
     if (m_calendar)
+    {
         m_calendar->displayOffset = (resourceOffset - localOffset).count();
+        m_calendar->timeZone = tz;
+    }
 }
 
 QnWorkbenchNavigator::WidgetFlags QnWorkbenchNavigator::calculateResourceWidgetFlags(const QnResourcePtr& resource) const
@@ -2153,23 +2156,26 @@ void QnWorkbenchNavigator::updateCalendarFromSlider()
     if (!isValid())
         return;
 
-    const auto targetStart = QDateTime::fromMSecsSinceEpoch(
-        m_timeSlider->windowTargetStart().count() + m_calendar->displayOffset);
-    const auto targetEnd = QDateTime::fromMSecsSinceEpoch(
-        m_timeSlider->windowTargetEnd().count() + m_calendar->displayOffset);
-
     auto selection = m_calendar->selection();
+    auto selectionWithZone = m_calendar->selection();
+    selectionWithZone.start.setTimeZone(m_calendar->timeZone);
+    selectionWithZone.end.setTimeZone(m_calendar->timeZone);
 
-    if (!m_timeSlider->isAnimatingWindowToCertainPosition() || selection.start != targetStart)
+    if (!m_timeSlider->isAnimatingWindowToCertainPosition()
+        || selectionWithZone.start.toMSecsSinceEpoch() != m_timeSlider->windowTargetStart().count())
     {
-        selection.start = QDateTime::fromMSecsSinceEpoch(
-            m_timeSlider->windowStart().count() + m_calendar->displayOffset);
+        selectionWithZone.start.setMSecsSinceEpoch(m_timeSlider->windowStart().count());
     }
-    if (!m_timeSlider->isAnimatingWindowToCertainPosition() || selection.end != targetEnd)
+    if (!m_timeSlider->isAnimatingWindowToCertainPosition()
+        || selectionWithZone.end.toMSecsSinceEpoch() != m_timeSlider->windowTargetEnd().count())
     {
-        selection.end = QDateTime::fromMSecsSinceEpoch(
-            m_timeSlider->windowEnd().count() + m_calendar->displayOffset);
+        selectionWithZone.end.setMSecsSinceEpoch(m_timeSlider->windowEnd().count());
     }
+
+    selectionWithZone.start.setTimeZone(selection.start.timeZone());
+    selectionWithZone.end.setTimeZone(selection.end.timeZone());
+    selection.start.setMSecsSinceEpoch(selectionWithZone.start.toMSecsSinceEpoch());
+    selection.end.setMSecsSinceEpoch(selectionWithZone.end.toMSecsSinceEpoch());
 
     if (m_calendar->selection() != selection)
     {
@@ -2188,10 +2194,14 @@ void QnWorkbenchNavigator::updateTimeSliderWindowFromCalendar()
     const bool animate = true;
     const bool forceResize = true;
 
+    auto dateStart = m_calendar->selection().start;
+    auto dateEnd = m_calendar->selection().end;
+    dateStart.setTimeZone(m_calendar->timeZone);
+    dateEnd.setTimeZone(m_calendar->timeZone);
+
     m_timeSlider->setWindow(
-        milliseconds(
-            m_calendar->selection().start.toMSecsSinceEpoch() - m_calendar->displayOffset),
-        milliseconds(m_calendar->selection().end.toMSecsSinceEpoch() - m_calendar->displayOffset),
+        milliseconds(dateStart.toMSecsSinceEpoch()),
+        milliseconds(dateEnd.toMSecsSinceEpoch()),
         animate,
         forceResize
     );
