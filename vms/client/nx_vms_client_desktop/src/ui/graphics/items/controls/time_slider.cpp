@@ -1716,6 +1716,7 @@ void QnTimeSlider::setTimeZone(QTimeZone value)
         return;
 
     m_timeZone = value;
+    m_pixmapCache->clear();
     updateToolTipText();
 }
 
