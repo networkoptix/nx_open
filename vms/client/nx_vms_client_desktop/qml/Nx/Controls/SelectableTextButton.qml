@@ -142,6 +142,8 @@ Button
                 name: button.icon.name
                 color: text.color
                 source: button.icon.source
+                sourceSize: Qt.size(button.icon.width, button.icon.height)
+
                 visible: status === Image.Ready
 
                 Layout.alignment: Qt.AlignVCenter
