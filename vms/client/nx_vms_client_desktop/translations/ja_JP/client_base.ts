@@ -4203,7 +4203,7 @@ to %1</source>
     <name>QnNewVirtualCameraDialog</name>
     <message>
       <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation>&quot;仮想カメラ&quot; はビデオファイル用の仮想ストレージです。システム上のどのサーバーにもアップロードでき、どのユーザーでもアクセスできます。</translation>
+      <translation>&quot;仮想カメラ&quot; は動画ファイル用の仮想ストレージです。システム上の任意のサーバーにアップロードでき、任意のユーザーがアクセスできます。</translation>
     </message>
     <message>
       <source>Virtual Camera</source>
@@ -8154,7 +8154,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Copy archive length settings</source>
-      <translation>アーカイブ設定のコピー</translation>
+      <translation>アーカイブ保持期間の設定もコピー</translation>
     </message>
     <message>
       <source>Recording Schedule contains recording modes that are not supported by the selected cameras. Unsupported recording modes will be changed to &quot;Record Always&quot;.</source>
