@@ -101,7 +101,7 @@ struct LdapSettingsWidget::Private
         modified(quickWidget, "modified"),
         hasConfig(quickWidget, "hasConfig")
     {
-        connect(quickWidget, &QQuickWidget::statusChanged,
+        connect(quickWidget, &QQuickWidget::statusChanged, q,
             [this](QQuickWidget::Status status)
             {
                 switch (status)
@@ -126,7 +126,7 @@ struct LdapSettingsWidget::Private
         quickWidget->setResizeMode(QQuickWidget::SizeRootObjectToView);
         quickWidget->setSource(kLdapSettingsQmlComponentUrl);
 
-        QObject::connect(q, &LdapSettingsWidget::stateChanged,
+        connect(q, &LdapSettingsWidget::stateChanged, q,
             [this]
             {
                 const auto currentSettings = getState();
@@ -139,7 +139,7 @@ struct LdapSettingsWidget::Private
         statusUpdateTimer.setInterval(kStatusUpdateInterval);
         statusUpdateTimer.setSingleShot(false);
 
-        q->connect(&statusUpdateTimer, &QTimer::timeout,
+        connect(&statusUpdateTimer, &QTimer::timeout, q,
             [this]
             {
                 if (!modified
@@ -156,7 +156,7 @@ struct LdapSettingsWidget::Private
                 mergeUpdate(q->globalSettings()->ldap());
             });
 
-        q->connect(q->systemContext()->ldapStatusWatcher(), &LdapStatusWatcher::refreshFinished,
+        connect(q->systemContext()->ldapStatusWatcher(), &LdapStatusWatcher::refreshFinished, q,
             [this]() { handleLdapStatusUpdate(); });
     }
 
