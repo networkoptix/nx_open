@@ -19,12 +19,14 @@ Rectangle
         {
             case DialogBanner.Style.Error:
                 return {
-                    "background": ColorTheme.colors.red_d1,
+                    "color": ColorTheme.colors.red_attention,
+                    "background": ColorTheme.colors.dark9,
                     "icon": "image://svg/skin/banners/error.svg"
                 }
 
             case DialogBanner.Style.Warning:
                 return {
+                    "color": ColorTheme.colors.light4,
                     "background": ColorTheme.colors.dark9,
                     "icon": "image://svg/skin/banners/warning.svg"
                 }
@@ -32,6 +34,7 @@ Rectangle
             case DialogBanner.Style.Info:
             default:
                 return {
+                    "color": ColorTheme.colors.light4,
                     "background": ColorTheme.colors.dark9,
                     "icon": "image://svg/skin/banners/info.svg"
                 }
@@ -100,7 +103,7 @@ Rectangle
                 topPadding: 2
                 wrapMode: Text.WordWrap
 
-                color: ColorTheme.colors.light4
+                color: control.styleData.color
                 font: Qt.font({pixelSize: 14, weight: Font.Medium})
             }
 
