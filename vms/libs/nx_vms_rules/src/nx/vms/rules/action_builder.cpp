@@ -21,6 +21,7 @@
 #include "action_builder_field.h"
 #include "action_builder_fields/optional_time_field.h"
 #include "action_builder_fields/target_user_field.h"
+#include "action_builder_fields/text_field.h"
 #include "aggregated_event.h"
 #include "aggregator.h"
 #include "basic_action.h"
@@ -556,7 +557,7 @@ ActionBuilder::Actions ActionBuilder::buildActionsForTargetUsers(
     if (!NX_ASSERT(eventManifest))
         return {};
 
-    UuidSelection initialFieldValue {
+    UuidSelection initialTargetUsersValue {
         .ids = targetUsersField->ids(),
         .all = targetUsersField->acceptAll()
     };
@@ -569,8 +570,6 @@ ActionBuilder::Actions ActionBuilder::buildActionsForTargetUsers(
 
     std::unordered_map<QByteArray, EventUsers> eventUsersMap;
     nx::vms::common::BusinessEventFilterResourcePropertyAdaptor userFilter;
-
-    QSignalBlocker signalBlocker{targetUsersField};
 
     // If the action should be shown to some users it is required to check if the user has
     // appropriate rights to see the event details.
@@ -606,9 +605,34 @@ ActionBuilder::Actions ActionBuilder::buildActionsForTargetUsers(
             it->second.userIds << user->getId();
     }
 
-    Actions result;
-    auto actionManifect = engine()->actionDescriptor(actionType());
+    auto additionalRecipientsField = fieldByNameImpl<ActionTextField>(utils::kEmailsFieldName);
+    QString initialAdditionalRecipientsValue;
 
+    QSignalBlocker targetUsersSignalBlocker{targetUsersField};
+    QSignalBlocker additionalRecipientsSignalBlocker{additionalRecipientsField};
+
+    Actions result;
+    if (additionalRecipientsField && !additionalRecipientsField->value().isEmpty())
+    {
+        // It is required to take separate action for the additional recipients. The additional
+        // recipients will be treated as power users, i.e., filtration is not required.
+
+        NX_VERBOSE(
+            this,
+            "Building action for additional recipients: %1",
+            additionalRecipientsField->value());
+
+        targetUsersField->setSelection({}); //< Only additional recipients must be in the action.
+
+        result.push_back(buildAction(aggregatedEvent));
+
+        // All the rest actions must be created without additional recipients, to prevent action
+        // duplication.
+        initialAdditionalRecipientsValue = additionalRecipientsField->value();
+        additionalRecipientsField->setValue({});
+    }
+
+    const auto actionManifest = engine()->actionDescriptor(actionType());
     for (auto& [key, value]: eventUsersMap)
     {
         NX_VERBOSE(this, "Building action for users: %1", value.userIds);
@@ -621,13 +645,17 @@ ActionBuilder::Actions ActionBuilder::buildActionsForTargetUsers(
         auto actions = filterActionPermissions(
             buildAction(value.event),
             targetUsersField->systemContext(),
-            actionManifect->permissions);
+            actionManifest->permissions);
 
         result.insert(result.end(), actions.begin(), actions.end());
     }
 
     // Recover initial target users selection.
-    targetUsersField->setSelection(initialFieldValue);
+    targetUsersField->setSelection(initialTargetUsersValue);
+
+    // Recover initial additional recipients value.
+    if (additionalRecipientsField)
+        additionalRecipientsField->setValue(initialAdditionalRecipientsValue);
 
     return result;
 }
