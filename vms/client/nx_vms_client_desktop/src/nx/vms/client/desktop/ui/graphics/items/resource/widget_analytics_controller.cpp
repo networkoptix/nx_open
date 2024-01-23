@@ -391,11 +391,7 @@ void WidgetAnalyticsController::Private::updateObjectAreas(microseconds timestam
 
         const auto zoomRect = mediaResourceWidget->zoomRect();
         const auto figure = figureFromObjectData(objectInfo, figureRectangle, zoomRect);
-        if (figure && figure->isValid())
-        {
-            analyticsWidget->addOrUpdateArea(areaInfo, figure);
-        }
-        else
+        if (!figure || !figure->isValid())
         {
             NX_VERBOSE(this,
                 "Object info has invalid rectangle data or does not fit to the widget: %1",
@@ -404,7 +400,7 @@ void WidgetAnalyticsController::Private::updateObjectAreas(microseconds timestam
             continue;
         }
 
-        QString debugInfoDescriptor(ini().displayAnalyticsObjectsDebugInfo);
+        const QString debugInfoDescriptor(ini().displayAnalyticsObjectsDebugInfo);
         if (!debugInfoDescriptor.isEmpty())
         {
             const auto addInfoRow =
@@ -413,10 +409,10 @@ void WidgetAnalyticsController::Private::updateObjectAreas(microseconds timestam
                 {
                     if (allowAll || debugInfoDescriptor.contains(key))
                     {
-                        areaInfo.text += '\n';
-                        areaInfo.text += label;
-                        areaInfo.text += '\t';
-                        areaInfo.text += QnLexical::serialized(value);
+                        const QString rowText =
+                            NX_FMT("\n%1\t%2", label, QnLexical::serialized(value));
+                        areaInfo.text += rowText;
+                        areaInfo.hoverText += rowText;
                     }
                 };
 
@@ -429,6 +425,8 @@ void WidgetAnalyticsController::Private::updateObjectAreas(microseconds timestam
             addInfoRow("future_ts", "Future TS", objectInfo.futureRectangleTimestamp.count());
             addInfoRow("future_rect", "Future Rect", objectInfo.futureRectangle);
         }
+
+        analyticsWidget->addOrUpdateArea(areaInfo, figure);
     }
 }
 
