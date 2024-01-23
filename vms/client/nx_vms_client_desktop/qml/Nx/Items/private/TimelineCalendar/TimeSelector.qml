@@ -87,7 +87,7 @@ Item
                     && model.isHourValid
 
                 GlobalToolTip.text:
-                    model.isHourValid ? "" : qsTr("Not clickable due to the DST change")
+                    model.isHourValid ? "" : qsTr("Time is unavailable due to DST changes")
 
                 SelectionMarker
                 {
