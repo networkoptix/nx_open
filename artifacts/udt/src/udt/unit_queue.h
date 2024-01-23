@@ -1,11 +1,12 @@
 #pragma once
 
+#include <memory>
 #include <mutex>
 #include <vector>
 
 #include "packet.h"
 
-class UnitQueue;
+class UnitQueueImpl;
 
 struct UDT_API Unit
 {
@@ -17,7 +18,7 @@ struct UDT_API Unit
         msgDropped,
     };
 
-    Unit(UnitQueue*, std::unique_ptr<CPacket> packet);
+    Unit(std::weak_ptr<UnitQueueImpl> unitQueue, std::unique_ptr<CPacket> packet);
     Unit(Unit&&) = default;
     ~Unit();
 
@@ -27,7 +28,7 @@ struct UDT_API Unit
     Flag flag() const;
 
 private:
-    UnitQueue* m_unitQueue = nullptr;
+    std::weak_ptr<UnitQueueImpl> m_unitQueue;
     std::unique_ptr<CPacket> m_packet;
     Flag m_iFlag = Flag::free_;
 };
@@ -48,15 +49,17 @@ public:
     UnitQueue(const UnitQueue&) = delete;
     UnitQueue& operator=(const UnitQueue&) = delete;
 
-    // Returns an available pre-allocated packet.
+    /**
+     * @return an available pre-allocated packet.
+     * When the Unit object is destroyed, the packet is put back into the queue if the queue is
+     * still alive. So, the user code doesn't need to worry about the relative lifetime of the
+     * UnitQueue and Unit objects.
+     */
     Unit takeNextAvailUnit();
 
     // Put packet taken previously with UnitQueue::takeNextAvailUnit back for a later reuse.
     void putBack(std::unique_ptr<CPacket> packet);
 
 private:
-    int m_bufferSize = 0;
-    std::vector<std::unique_ptr<CPacket>> m_availablePackets;
-    int m_takenPackets = 0;
-    std::mutex m_mutex;
+    std::shared_ptr<UnitQueueImpl> m_impl;
 };
