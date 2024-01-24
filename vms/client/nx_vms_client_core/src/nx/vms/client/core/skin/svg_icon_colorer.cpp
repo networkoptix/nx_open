@@ -160,8 +160,7 @@ const SvgIconColorer::IconSubstitutions SvgIconColorer::kTreeIconSubstitutions =
     }},
 };
 
-const SvgIconColorer::IconSubstitutions SvgIconColorer::kDefaultIconSubstitutions = {
-    { QIcon::Normal, {
+const SvgIconColorer::Substitutions kMapFromOldColorTheme = {
         { QColor("#000000"), "dark1" },
         { QColor("#080707"), "dark2" },
         { QColor("#0d0e0f"), "dark3" },
@@ -213,13 +212,12 @@ const SvgIconColorer::IconSubstitutions SvgIconColorer::kDefaultIconSubstitution
 
         { QColor("#43c2ff"), "blue8" },
         { QColor("#39b2ef"), "blue9" },
-        { QColor("#2fa2db"), "blue10" },
+//        { QColor("#2fa2db"), "blue10" }, //< Matches brand_core.
         { QColor("#2592c3"), "blue11" },
         { QColor("#1b82ad"), "blue12" },
         { QColor("#117297"), "blue13" },
         { QColor("#076281"), "blue14" },
 
-//        { QColor("#3a911e"), "green_attention" },
         { QColor("#56e829"), "green_l4" },
         { QColor("#51d22a"), "green_l3" },
         { QColor("#4cbc28"), "green_l2" },
@@ -229,12 +227,10 @@ const SvgIconColorer::IconSubstitutions SvgIconColorer::kDefaultIconSubstitution
         { QColor("#2a551e"), "green_d2" },
         { QColor("#22391e"), "green_d3" },
 
-//        { QColor("#fbbc05"), "yellow_attention" },
         { QColor("#fbbc05"), "yellow_core" },
         { QColor("#e1a700"), "yellow_d1" },
         { QColor("#c79200"), "yellow_d2" },
 
-//        { QColor("#c22626"), "red_attention" },
         { QColor("#ff2e2e"), "red_l3" },
         { QColor("#f02c2c"), "red_l2" },
         { QColor("#d92a2a"), "red_l1" },
@@ -246,7 +242,13 @@ const SvgIconColorer::IconSubstitutions SvgIconColorer::kDefaultIconSubstitution
         { QColor("#480d0d"), "red_d5" },
         { QColor("#330909"), "red_d6" },
         { QColor("#1d0505"), "red_d7" },
-    }},
+};
+
+const SvgIconColorer::IconSubstitutions SvgIconColorer::kDefaultIconSubstitutions = {
+    { QIcon::Normal, kMapFromOldColorTheme },
+    { QIcon::Active, kMapFromOldColorTheme },
+    { QIcon::Selected, kMapFromOldColorTheme },
+    { QIcon::Disabled, kMapFromOldColorTheme },
 };
 
 SvgIconColorer::SvgIconColorer(
