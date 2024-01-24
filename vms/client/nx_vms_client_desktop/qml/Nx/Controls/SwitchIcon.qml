@@ -19,8 +19,8 @@ Item
 
     property int animationDuration: 0
 
-    implicitWidth: 30
-    implicitHeight: 15
+    implicitWidth: 33
+    implicitHeight: 17
     baselineOffset: implicitHeight - 2
 
     readonly property bool _transparentHandle: handleColor.a === 0
@@ -44,7 +44,7 @@ Item
         {
             id: uncheckedindicator
 
-            width: parent.height / 2 + 2
+            width: parent.height / 2 + 2.5
             height: width
             radius: height / 2
             x: parent.width - parent.height / 2 - width / 2
