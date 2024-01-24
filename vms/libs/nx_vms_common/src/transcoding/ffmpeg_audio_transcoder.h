@@ -76,6 +76,9 @@ public:
      */
     void setFrameSize(int value);
 
+    bool sendPacket(const QnConstAbstractMediaDataPtr& media);
+    bool receivePacket(QnAbstractMediaDataPtr* const result);
+
 private:
     void tuneContextsWithMedia(
         AVCodecContext* inCtx,
