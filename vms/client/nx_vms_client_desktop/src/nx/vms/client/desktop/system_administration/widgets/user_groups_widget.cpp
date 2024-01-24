@@ -487,6 +487,11 @@ void UserGroupsWidget::Private::setupUi()
         &Private::deleteNotFoundLdapGroups);
 
     deleteSelectedButton->setFlat(true);
+    auto font = deleteSelectedButton->font();
+    font.setPixelSize(14);
+    deleteSelectedButton->setFont(font);
+    deleteSelectedButton->setProperty(nx::style::Properties::kCustomTextButtonIconSpacing, 4);
+
     connect(deleteSelectedButton, &QPushButton::clicked, this, &Private::deleteSelected);
 
     constexpr int kButtonBarHeight = 40;
