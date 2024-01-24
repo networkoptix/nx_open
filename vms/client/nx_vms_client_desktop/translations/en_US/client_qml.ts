@@ -2355,7 +2355,7 @@ Press Alt + Click to follow object</source>
         <translation></translation>
     </message>
     <message>
-        <source>Not clickable due to the DST change</source>
+        <source>Time is unavailable due to DST changes</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
