@@ -242,6 +242,12 @@ void CloudServerSocket::setSupportedConnectionMethods(
     m_supportedConnectionMethods = value;
 }
 
+CloudConnectListenerStatusReport CloudServerSocket::getStatusReport() const
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    return m_lastListenStatusReport;
+}
+
 void CloudServerSocket::moveToListeningState()
 {
     NX_VERBOSE(this, "Moving to the listening state");
@@ -331,19 +337,22 @@ void CloudServerSocket::onListenRequestCompleted(
     {
         NX_DEBUG(this, "Listen request completed successfully");
         m_state = State::listening;
+        saveSuccessListenStartToStatusReport();
         startAcceptingConnections(response);
         return;
     }
 
     NX_DEBUG(this, "Listen request has failed: %1", resultCode);
 
+    saveMediatorErrorToStatusReport(resultCode, /*clear report*/ true);
+
     if (!m_mediatorRegistrationRetryTimer.scheduleNextTry(
             std::bind(&CloudServerSocket::retryRegistration, this)))
     {
-        // It is not supposed to happen in production, is it?
+        // It is not supposed to happen in production given m_mediatorRegistrationRetryTimer policy.
         NX_WARNING(this, "Stopped mediator registration retries. Last result code %1", resultCode);
         m_state = State::readyToListen;
-        reportResult(SystemError::invalidData); //< TODO: #akolesnikov Use better error code.
+        reportResult(SystemError::hostUnreachable);
     }
 }
 
@@ -549,6 +558,29 @@ void CloudServerSocket::onMediatorConnectionRestored()
         NX_DEBUG(this, "Register on mediator after reconnect");
         issueRegistrationRequest();
     }
+}
+
+void CloudServerSocket::saveSuccessListenStartToStatusReport()
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    m_lastListenStatusReport = {};
+    m_lastListenStatusReport.listening = true;
+}
+
+void CloudServerSocket::saveMediatorErrorToStatusReport(
+    nx::hpm::api::ResultCode resultCode, bool clearReport)
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+
+    if (clearReport)
+        m_lastListenStatusReport = {};
+
+    m_lastListenStatusReport.listening = false;
+    m_lastListenStatusReport.mediatorErrors.push_back({});
+    if (m_mediatorConnector->address())
+        m_lastListenStatusReport.mediatorErrors.back().url = m_mediatorConnector->address()->tcpUrl;
+    m_lastListenStatusReport.mediatorErrors.back().result =
+        nx::hpm::api::Result(resultCode, nx::reflect::toString(resultCode));
 }
 
 void CloudServerSocket::stopWhileInAioThread()
