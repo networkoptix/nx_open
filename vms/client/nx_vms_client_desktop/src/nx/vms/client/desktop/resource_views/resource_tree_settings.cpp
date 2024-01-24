@@ -102,17 +102,13 @@ private:
 ResourceTreeSettings::ResourceTreeSettings(QObject* parent):
     base_type(parent)
 {
-    if (ini().newPanelsLayout)
-        return;
-
     appContext()->clientStateHandler()->registerDelegate(
         kResourceTreeSettingsDelegateId, std::make_unique<StateDelegate>(this));
 }
 
 ResourceTreeSettings::~ResourceTreeSettings()
 {
-    if (!ini().newPanelsLayout)
-        appContext()->clientStateHandler()->unregisterDelegate(kResourceTreeSettingsDelegateId);
+    appContext()->clientStateHandler()->unregisterDelegate(kResourceTreeSettingsDelegateId);
 }
 
 bool ResourceTreeSettings::showServersInTree() const

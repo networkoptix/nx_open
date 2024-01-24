@@ -300,6 +300,6 @@ Column
     LoggingCategory
     {
         id: category
-        name: "Nx.LeftPanel.AnalyticsFilters"
+        name: "Nx.AnalyticsFilters"
     }
 }

@@ -2,9 +2,9 @@
 
 // This file is needed only while QML ResourceBrowser is displayed over the C++ scene.
 
-import QtQuick 2.15
+import QtQuick
 
-import Nx.Items 1.0
+import Nx.Items
 
 Item
 {

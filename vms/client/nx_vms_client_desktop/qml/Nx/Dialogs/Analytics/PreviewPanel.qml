@@ -1,16 +1,15 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.11
+import QtQuick
 
-import Nx 1.0
-import Nx.Core 1.0
-import Nx.Controls 1.0
-import Nx.Items 1.0
+import Nx
+import Nx.Core
+import Nx.Controls
+import Nx.Items
+import Nx.RightPanel
 
 import nx.vms.client.core
-import nx.vms.client.desktop 1.0
-
-import "../../../RightPanel/private"
+import nx.vms.client.desktop
 
 Rectangle
 {
@@ -258,7 +257,7 @@ Rectangle
 
         Column
         {
-            id: dislayColumn
+            id: displayColumn
 
             anchors.top: parent.top
             anchors.left: parent.left
@@ -298,7 +297,7 @@ Rectangle
         {
             id: nameValueScrollView
 
-            anchors.top: dislayColumn.bottom
+            anchors.top: displayColumn.bottom
             anchors.topMargin: 16
             anchors.bottom: parent.bottom
             anchors.bottomMargin: 12

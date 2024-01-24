@@ -2,6 +2,9 @@ module Nx.RightPanel
 
 EventGrid 1.0 EventGrid.qml
 EventRibbon 1.0 EventRibbon.qml
+ResourceList 1.0 ResourceList.qml
 ResultsPlaceholder 1.0 ResultsPlaceholder.qml
 RightPanel 1.0 RightPanel.qml
 RightPanelGlobals 1.0 globals.js
+SearchPanel 1.0 SearchPanel.qml
+SearchPanelHeader 1.0 SearchPanelHeader.qml

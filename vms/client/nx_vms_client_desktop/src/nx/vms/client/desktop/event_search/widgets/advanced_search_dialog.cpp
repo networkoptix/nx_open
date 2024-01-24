@@ -41,7 +41,7 @@ static const QString kScreenNumberKey = "screenNumber";
 
 AdvancedSearchDialog::AdvancedSearchDialog(QWidget* parent) :
     QmlDialogWrapper(
-        QUrl("Nx/LeftPanel/private/analytics/AnalyticsSearchDialog.qml"),
+        QUrl("Nx/Dialogs/Analytics/AnalyticsSearchDialog.qml"),
         {},
         parent),
     QnSessionAwareDelegate(parent)

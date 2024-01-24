@@ -28,11 +28,11 @@ struct QnPaneSettings;
 
 namespace nx::vms::client::desktop {
 
-class AbstractWorkbenchPanel;
 class CalendarWorkbenchPanel;
 class DebugInfoInstrument;
 class NotificationsWorkbenchPanel;
 class PerformanceInfoWidget;
+class ResourceTreeWorkbenchPanel;
 class TimelineWorkbenchPanel;
 class TitleWorkbenchPanel;
 
@@ -195,8 +195,6 @@ private:
     void updateCalendarVisibilityAnimated();
     void updateControlsVisibilityAnimated();
 
-    void updateLeftPanelMaximumWidth();
-
     void updateAutoFpsLimit();
 
     void at_freespaceAction_triggered();
@@ -246,7 +244,7 @@ private:
     QPointer<TimelineWorkbenchPanel> m_timeline;
 
     /* Left-side panel. */
-    QPointer<AbstractWorkbenchPanel> m_leftPanel;
+    QPointer<ResourceTreeWorkbenchPanel> m_resourceTreePanel;
 
     /* Title-related state. */
     QPointer<TitleWorkbenchPanel> m_title;

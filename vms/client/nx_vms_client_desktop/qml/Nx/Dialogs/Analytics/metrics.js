@@ -14,13 +14,6 @@ const kDefaultFilterColumnWidth = 200
 const kMinimumFilterColumnWidth = 188
 const kMaximumFilterColumnWidth = 480
 
-const kDefaultResourceBrowserWidth = 320
-const kMinimumResourceBrowserWidth = 200
-const kMaximumResourceBrowserWidth = 480
-
-const kDefaultObjectSearchColumns = 2
-const kMaximumObjectSearchColumns = 4
-
 const kCounterBlockHeight = 48
 
 const kDefaultDialogWidth = 1170

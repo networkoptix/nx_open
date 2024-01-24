@@ -37,8 +37,7 @@ using namespace ui;
 
 namespace {
 
-int narrowWidth() { return ini().newPanelsLayout ? 264 : 283; }
-
+static constexpr int kNarrowWidth = 283;
 static constexpr int kWideWidth = 433;
 
 } // namespace
@@ -88,7 +87,7 @@ public:
 
     void setWidth(int newWidth)
     {
-        static const auto kThreshold = (narrowWidth() + kWideWidth) / 2;
+        static const auto kThreshold = (kNarrowWidth + kWideWidth) / 2;
         static constexpr int kBoundaryWidth = 8;
 
         int newMinimumWidth = m_itemToResize->minimumWidth();
@@ -96,7 +95,7 @@ public:
         if (newWidth > kThreshold + kBoundaryWidth)
             newMinimumWidth = kWideWidth;
         else if (newWidth < kThreshold - kBoundaryWidth)
-            newMinimumWidth = narrowWidth();
+            newMinimumWidth = kNarrowWidth;
 
         const int sizeDelta = m_itemToResize->minimumWidth() - newMinimumWidth;
         if (sizeDelta == 0)
@@ -352,7 +351,7 @@ void NotificationsWorkbenchPanel::initEventPanel()
     m_baseWidget->setMinimumSize(m_widget->size());
 
     m_panelResizer.reset(new ResizerWidget(m_baseWidget, backgroundItem));
-    m_panelResizer->setWidth(narrowWidth());
+    m_panelResizer->setWidth(kNarrowWidth);
     m_panelResizer->setVisible(m_resizeable);
     auto dragProcessor = new DragProcessor(this);
     dragProcessor->setHandler(m_panelResizer.data());

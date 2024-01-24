@@ -1,14 +1,14 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.14
-import QtQuick.Controls 2.14
-import QtQuick.Layouts 1.14
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Layouts
 
-import Nx 1.0
-import Nx.Core 1.0
-import Nx.Controls 1.0
+import Nx
+import Nx.Core
+import Nx.Controls
 
-import nx.vms.client.desktop 1.0
+import nx.vms.client.desktop
 
 import "metrics.js" as Metrics
 
@@ -18,23 +18,11 @@ Control
 
     property alias displayedItemsText: displayedItemsLabel.text
     property alias availableItemsText: availableItemsButton.text
-
-    property alias showInformation: informationButton.checked
-    property alias showThumbnails: thumbnailsButton.checked
-
     property alias showPreview: previewButton.checked
-
-    property bool showRemoveColumn: false
-    property bool showAddColumn: false
-
-    property bool showInformationButton: false
-    property bool showThumbnailsButton: true
 
     readonly property int iconWidth: 20
     readonly property int iconHeight: 20
 
-    signal removeColumnClicked()
-    signal addColumnClicked()
     signal commitNewItemsRequested()
 
     height: displayedItemsText ? Metrics.kCounterBlockHeight : 0
@@ -119,68 +107,7 @@ Control
             id: toolbar
 
             topPadding: 2
-            spacing: 8
             rightPadding: 7 //< Align to the right border of the rightmost column tile.
-
-            TextButton
-            {
-                id: removeColumnButton
-
-                icon.source: "image://svg/skin/left_panel/deletecolumn.svg"
-                icon.width: control.iconWidth
-                icon.height: control.iconHeight
-
-                color: ColorTheme.colors.light16
-                visible: control.showRemoveColumn
-                GlobalToolTip.text: qsTr("Remove column")
-
-                onClicked: control.removeColumnClicked()
-            }
-
-            TextButton
-            {
-                id: addColumnButton
-
-                icon.source: "image://svg/skin/left_panel/addcolumn.svg"
-                icon.width: control.iconWidth
-                icon.height: control.iconHeight
-
-                color: ColorTheme.colors.light16
-                visible: control.showAddColumn
-                GlobalToolTip.text: qsTr("Add column")
-
-                onClicked: control.addColumnClicked()
-            }
-
-            TextButton
-            {
-                id: informationButton
-
-                checkable: true
-                checked: true
-                icon.source: `image://svg/skin/left_panel/${checked ? 'no' : ''}list.svg`
-                icon.width: control.iconWidth
-                icon.height: control.iconHeight
-
-                color: ColorTheme.colors.light16
-                visible: control.showInformationButton
-                GlobalToolTip.text: checked ? qsTr("Hide information") : qsTr("Show information")
-            }
-
-            TextButton
-            {
-                id: thumbnailsButton
-
-                checkable: true
-                checked: true
-                icon.source: `image://svg/skin/left_panel/${checked ? 'no' : ''}image.svg`
-                icon.width: control.iconWidth
-                icon.height: control.iconHeight
-
-                color: ColorTheme.colors.light16
-                visible: control.showThumbnailsButton
-                GlobalToolTip.text: checked ? qsTr("Hide thumbnails") : qsTr("Show thumbnails")
-            }
 
             TextButton
             {
@@ -202,14 +129,20 @@ Control
                 background: Rectangle
                 {
                     radius: 2
+
                     color:
                     {
                         if (previewButton.checked)
-                            return previewButton.hovered ? ColorTheme.colors.dark11 : ColorTheme.colors.dark10
+                        {
+                            return previewButton.hovered
+                                ? ColorTheme.colors.dark11
+                                : ColorTheme.colors.dark10
+                        }
 
-                        return previewButton.hovered ? ColorTheme.colors.dark8 : ColorTheme.colors.dark7
+                        return previewButton.hovered
+                            ? ColorTheme.colors.dark8
+                            : ColorTheme.colors.dark7
                     }
-
                 }
             }
         }

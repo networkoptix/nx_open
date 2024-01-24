@@ -53,7 +53,7 @@ QmlResourceBrowserWidget::QmlResourceBrowserWidget(WindowContext* context, QWidg
 
     setClearColor(Qt::transparent);
     setResizeMode(QQuickWidget::ResizeMode::SizeRootObjectToView);
-    setSource(QUrl("Nx/LeftPanel/private/ResourceBrowserWrapper.qml"));
+    setSource(QUrl("Nx/Items/private/ResourceBrowserWrapper.qml"));
 
     installEventHandler(this, QEvent::Move, this, &QmlResourceBrowserWidget::positionChanged);
 

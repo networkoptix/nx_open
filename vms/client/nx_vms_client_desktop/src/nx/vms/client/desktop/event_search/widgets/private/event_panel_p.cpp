@@ -114,11 +114,8 @@ public:
         SubstateFlags flags,
         const StartupParameters& /*params*/) override
     {
-        if (!flags.testFlag(ClientStateDelegate::Substate::systemIndependentParameters)
-            || ini().newPanelsLayout)
-        {
+        if (!flags.testFlag(ClientStateDelegate::Substate::systemIndependentParameters))
             return false;
-        }
 
         m_panel->m_bookmarksTab->searchWidget()->setPreviewToggled(
             state.value(kBookmarksPreviewKey).toBool(true));
@@ -160,19 +157,16 @@ public:
         if (flags.testFlag(ClientStateDelegate::Substate::systemIndependentParameters))
         {
             DelegateState result;
-            if (!ini().newPanelsLayout)
-            {
-                result[kBookmarksPreviewKey] =
-                    m_panel->m_bookmarksTab->searchWidget()->previewToggled();
-                result[kEventsPreviewKey] = m_panel->m_eventsTab->searchWidget()->previewToggled();
-                // TODO: #amalov Save state for new event panel.
-                result[kMotionPreviewKey] = m_panel->m_motionTab->previewToggled();
-                result[kObjectsPreviewKey] =
-                    m_panel->m_analyticsTab->searchWidget()->previewToggled();
-                result[kObjectsInformation] =
-                    m_panel->m_analyticsTab->searchWidget()->footerToggled();
-                result[kTabIndexKey] = static_cast<int>(m_panel->currentTab());
-            }
+            result[kBookmarksPreviewKey] =
+                m_panel->m_bookmarksTab->searchWidget()->previewToggled();
+            result[kEventsPreviewKey] = m_panel->m_eventsTab->searchWidget()->previewToggled();
+            // TODO: #amalov Save state for new event panel.
+            result[kMotionPreviewKey] = m_panel->m_motionTab->previewToggled();
+            result[kObjectsPreviewKey] =
+                m_panel->m_analyticsTab->searchWidget()->previewToggled();
+            result[kObjectsInformation] =
+                m_panel->m_analyticsTab->searchWidget()->footerToggled();
+            result[kTabIndexKey] = static_cast<int>(m_panel->currentTab());
             *state = result;
         }
     }
@@ -190,197 +184,183 @@ EventPanel::Private::Private(EventPanel* q):
     q(q),
     m_tooltip(new ThumbnailTooltip(q->windowContext()))
 {
-    if (ini().newPanelsLayout)
-    {
-        m_notificationsTab = new NotificationListWidget(q);
-    }
-    else
-    {
-        auto compactTabBar = new CompactTabBar();
-        compactTabBar->setCustomTabEnabledFunction(
-            [this](int index)
+    auto compactTabBar = new CompactTabBar();
+    compactTabBar->setCustomTabEnabledFunction(
+        [this](int index)
+        {
+            const bool isCurrentLayoutCrossSystem =
+                isCrossSystemLayout(workbench()->currentLayout());
+
+            if (isCurrentLayoutCrossSystem
+                && (index == static_cast<int>(Tab::analytics)
+                    || index == static_cast<int>(Tab::bookmarks)
+                    || index == static_cast<int>(Tab::events)))
             {
-                const bool isCurrentLayoutCrossSystem =
-                    isCrossSystemLayout(workbench()->currentLayout());
+                return false;
+            }
 
-                if (isCurrentLayoutCrossSystem
-                    && (index == static_cast<int>(Tab::analytics)
-                        || index == static_cast<int>(Tab::bookmarks)
-                        || index == static_cast<int>(Tab::events)))
-                {
-                    return false;
-                }
+            return m_tabs->isTabEnabled(index);
+        });
 
-                return m_tabs->isTabEnabled(index);
-            });
+    m_tabs = new AnimatedCompactTabWidget(compactTabBar, q);
+    m_tabs->setStyleSheet("QTabWidget::tab-bar { left: -1px; } ");
 
-        m_tabs = new AnimatedCompactTabWidget(compactTabBar, q);
-        m_tabs->setStyleSheet("QTabWidget::tab-bar { left: -1px; } ");
+    const auto context = windowContext();
+    m_notificationsTab = new NotificationListWidget(m_tabs);
+    m_counterLabel = new NotificationCounterLabel(m_tabs->tabBar());
+    m_motionTab = new SimpleMotionSearchWidget(context, m_tabs);
+    m_bookmarksTab = new OverlappableSearchWidget(new BookmarkSearchWidget(context), m_tabs);
+    m_eventsTab = new OverlappableSearchWidget(new EventSearchWidget(context), m_tabs);
+    m_vmsEventsTab = new OverlappableSearchWidget(new VmsEventSearchWidget(context), m_tabs);
+    m_analyticsTab = new OverlappableSearchWidget(new AnalyticsSearchWidget(context), m_tabs);
 
-        const auto context = windowContext();
-        m_notificationsTab = new NotificationListWidget(m_tabs);
-        m_counterLabel = new NotificationCounterLabel(m_tabs->tabBar());
-        m_motionTab = new SimpleMotionSearchWidget(context, m_tabs);
-        m_bookmarksTab = new OverlappableSearchWidget(new BookmarkSearchWidget(context), m_tabs);
-        m_eventsTab = new OverlappableSearchWidget(new EventSearchWidget(context), m_tabs);
-        m_vmsEventsTab = new OverlappableSearchWidget(new VmsEventSearchWidget(context), m_tabs);
-        m_analyticsTab = new OverlappableSearchWidget(new AnalyticsSearchWidget(context), m_tabs);
+    m_synchronizers = {
+        {m_motionTab, m_motionTab, new MotionSearchSynchronizer(
+            context, m_motionTab->commonSetup(), m_motionTab->motionModel(), this)},
+        {m_bookmarksTab, m_bookmarksTab->searchWidget(), new BookmarkSearchSynchronizer(
+            context, m_bookmarksTab->searchWidget()->commonSetup(), this)},
+        {m_analyticsTab, m_analyticsTab->searchWidget(), new AnalyticsSearchSynchronizer(
+            context,
+            m_analyticsTab->searchWidget()->commonSetup(),
+            static_cast<AnalyticsSearchWidget*>(m_analyticsTab->searchWidget())->analyticsSetup(),
+            this)}};
 
-        m_synchronizers = {
-            {m_motionTab, m_motionTab, new MotionSearchSynchronizer(
-                context, m_motionTab->commonSetup(), m_motionTab->motionModel(), this)},
-            {m_bookmarksTab, m_bookmarksTab->searchWidget(), new BookmarkSearchSynchronizer(
-                context, m_bookmarksTab->searchWidget()->commonSetup(), this)},
-            {m_analyticsTab, m_analyticsTab->searchWidget(), new AnalyticsSearchSynchronizer(
-                context,
-                m_analyticsTab->searchWidget()->commonSetup(),
-                static_cast<AnalyticsSearchWidget*>(m_analyticsTab->searchWidget())->analyticsSetup(),
-                this)}};
-
-        m_tabIds = {
-            {m_notificationsTab, Tab::notifications},
-            {m_motionTab, Tab::motion},
-            {m_bookmarksTab, Tab::bookmarks},
-            {m_eventsTab, Tab::events},
-            {m_vmsEventsTab, Tab::vmsEvents},
-            {m_analyticsTab, Tab::analytics}};
-    }
+    m_tabIds = {
+        {m_notificationsTab, Tab::notifications},
+        {m_motionTab, Tab::motion},
+        {m_bookmarksTab, Tab::bookmarks},
+        {m_eventsTab, Tab::events},
+        {m_vmsEventsTab, Tab::vmsEvents},
+        {m_analyticsTab, Tab::analytics}};
 
     auto layout = new QVBoxLayout(q);
     layout->setContentsMargins(QMargins());
 
-    if (ini().newPanelsLayout)
+    layout->addWidget(m_tabs);
+
+    // Initially all tab widgets must be hidden.
+    for (const auto tab: m_tabIds.keys())
+        tab->hide();
+
+    static constexpr int kTabBarShift = 10;
+    m_tabs->setProperty(style::Properties::kTabBarShift, kTabBarShift);
+    setTabShape(m_tabs->tabBar(), style::TabShape::Compact);
+
+    for (const auto& data: m_synchronizers)
     {
-        layout->addWidget(m_notificationsTab);
+        connect(data.synchronizer, &AbstractSearchSynchronizer::activeChanged, this,
+            [this, &data](bool isActive)
+            {
+                if (data.searchWidget->isAllowed())
+                    setTabCurrent(data.tab, isActive);
+            });
     }
-    else
-    {
-        layout->addWidget(m_tabs);
 
-        // Initially all tab widgets must be hidden.
-        for (const auto tab: m_tabIds.keys())
-            tab->hide();
-
-        static constexpr int kTabBarShift = 10;
-        m_tabs->setProperty(style::Properties::kTabBarShift, kTabBarShift);
-        setTabShape(m_tabs->tabBar(), style::TabShape::Compact);
-
-        for (const auto& data: m_synchronizers)
+    connect(m_tabs, &QTabWidget::currentChanged, this,
+        [this]
         {
-            connect(data.synchronizer, &AbstractSearchSynchronizer::activeChanged, this,
-                [this, &data](bool isActive)
+            const auto isSpecialTab =
+                [this](const QWidget* tab) -> bool
                 {
-                    if (data.searchWidget->isAllowed())
-                        setTabCurrent(data.tab, isActive);
-                });
-        }
+                    return tab == m_motionTab || tab == m_analyticsTab;
+                };
 
-        connect(m_tabs, &QTabWidget::currentChanged, this,
-            [this]
-            {
-                const auto isSpecialTab =
-                    [this](const QWidget* tab) -> bool
-                    {
-                        return tab == m_motionTab || tab == m_analyticsTab;
-                    };
+            const auto currentTab = m_tabs->currentWidget();
 
-                const auto currentTab = m_tabs->currentWidget();
+            m_notificationBellManager->setAlarmStateActive(
+                m_tabIds[currentTab] != Tab::notifications);
 
-                m_notificationBellManager->setAlarmStateActive(
-                    m_tabIds[currentTab] != Tab::notifications);
+            if (!isSpecialTab(m_lastTab) || !isSpecialTab(currentTab))
+                m_previousTab = m_notificationsTab;
 
-                if (!isSpecialTab(m_lastTab) || !isSpecialTab(currentTab))
-                    m_previousTab = m_notificationsTab;
+            m_lastTab = currentTab;
 
-                m_lastTab = currentTab;
+            for (const auto& data: m_synchronizers)
+                data.synchronizer->setActive(m_tabs->currentWidget() == data.tab);
 
-                for (const auto& data: m_synchronizers)
-                    data.synchronizer->setActive(m_tabs->currentWidget() == data.tab);
+            NX_VERBOSE(this->q, "Tab changed; previous: %1, current: %2",
+                m_previousTab, m_lastTab);
 
-                NX_VERBOSE(this->q, "Tab changed; previous: %1, current: %2",
-                    m_previousTab, m_lastTab);
+            emit this->q->currentTabChanged(
+                m_tabIds.value(m_lastTab), EventPanel::QPrivateSignal());
+        });
 
-                emit this->q->currentTabChanged(
-                    m_tabIds.value(m_lastTab), EventPanel::QPrivateSignal());
-            });
+    connect(action(menu::NotificationsTabAction), &QAction::triggered, this,
+        [this] { setCurrentTab(Tab::notifications); });
 
-        connect(action(menu::NotificationsTabAction), &QAction::triggered, this,
-            [this] { setCurrentTab(Tab::notifications); });
+    connect(action(menu::MotionTabAction), &QAction::triggered, this,
+        [this] { setCurrentTab(Tab::motion); });
 
-        connect(action(menu::MotionTabAction), &QAction::triggered, this,
-            [this] { setCurrentTab(Tab::motion); });
-
-        connect(action(menu::SwitchMotionTabAction), &QAction::triggered, this,
-            [this]
-            {
-                if (currentTab() == Tab::motion)
-                    setCurrentTab(Tab::notifications);
-                else
-                    setCurrentTab(Tab::motion);
-            });
-
-        connect(action(menu::BookmarksTabAction), &QAction::triggered, this,
-            [this] { setCurrentTab(Tab::bookmarks); });
-
-        // TODO: #amalov Support new vms events tab.
-        connect(action(menu::EventsTabAction), &QAction::triggered, this,
-            [this] { setCurrentTab(Tab::events); });
-
-        connect(action(menu::ObjectsTabAction), &QAction::triggered, this,
-            [this] { setCurrentTab(Tab::analytics); });
-
-        connect(m_notificationsTab, &NotificationListWidget::unreadCountChanged,
-            this, &Private::updateUnreadCounter);
-
-        m_counterLabel->hide();
-
-        connect(m_tabs->tabBar(), &QTabBar::tabBarDoubleClicked, this,
-            [this](int index)
-            {
-                if (m_tabs->currentIndex() != index)
-                    return;
-
-                if (auto tab = qobject_cast<AbstractSearchWidget*>(m_tabs->currentWidget()))
-                    tab->goToLive();
-            });
-
-        using Tabs = std::initializer_list<AbstractSearchWidget*>;
-        for (const auto tab: Tabs{
-            m_eventsTab->searchWidget(),
-            m_vmsEventsTab->searchWidget(),
-            m_motionTab,
-            m_bookmarksTab->searchWidget(),
-            m_analyticsTab->searchWidget()})
+    connect(action(menu::SwitchMotionTabAction), &QAction::triggered, this,
+        [this]
         {
-            m_connections << connect(tab, &AbstractSearchWidget::tileHovered,
-                this, &EventPanel::Private::at_eventTileHovered);
+            if (currentTab() == Tab::motion)
+                setCurrentTab(Tab::notifications);
+            else
+                setCurrentTab(Tab::motion);
+        });
 
-            connect(tab, &AbstractSearchWidget::allowanceChanged,
-                this, &Private::rebuildTabs);
-        }
+    connect(action(menu::BookmarksTabAction), &QAction::triggered, this,
+        [this] { setCurrentTab(Tab::bookmarks); });
 
-        connect(
-            workbench(),
-            &Workbench::currentLayoutChanged,
-            this,
-            [this]
-            {
-                const bool isCurrentLayoutCrossSystem
-                    = isCrossSystemLayout(workbench()->currentLayout());
+    // TODO: #amalov Support new vms events tab.
+    connect(action(menu::EventsTabAction), &QAction::triggered, this,
+        [this] { setCurrentTab(Tab::events); });
 
-                // Bookmarks, analytics and events are not supported for the cross systems at the moment.
-                const auto appearance = isCurrentLayoutCrossSystem
-                    ? OverlappableSearchWidget::Appearance::overlay
-                    : OverlappableSearchWidget::Appearance::searchWidget;
+    connect(action(menu::ObjectsTabAction), &QAction::triggered, this,
+        [this] { setCurrentTab(Tab::analytics); });
 
-                m_bookmarksTab->setAppearance(appearance);
-                m_eventsTab->setAppearance(appearance);
-                m_vmsEventsTab->setAppearance(appearance);
-                m_analyticsTab->setAppearance(appearance);
-            });
+    connect(m_notificationsTab, &NotificationListWidget::unreadCountChanged,
+        this, &Private::updateUnreadCounter);
 
-        rebuildTabs();
+    m_counterLabel->hide();
+
+    connect(m_tabs->tabBar(), &QTabBar::tabBarDoubleClicked, this,
+        [this](int index)
+        {
+            if (m_tabs->currentIndex() != index)
+                return;
+
+            if (auto tab = qobject_cast<AbstractSearchWidget*>(m_tabs->currentWidget()))
+                tab->goToLive();
+        });
+
+    using Tabs = std::initializer_list<AbstractSearchWidget*>;
+    for (const auto tab: Tabs{
+        m_eventsTab->searchWidget(),
+        m_vmsEventsTab->searchWidget(),
+        m_motionTab,
+        m_bookmarksTab->searchWidget(),
+        m_analyticsTab->searchWidget()})
+    {
+        m_connections << connect(tab, &AbstractSearchWidget::tileHovered,
+            this, &EventPanel::Private::at_eventTileHovered);
+
+        connect(tab, &AbstractSearchWidget::allowanceChanged,
+            this, &Private::rebuildTabs);
     }
+
+    connect(
+        workbench(),
+        &Workbench::currentLayoutChanged,
+        this,
+        [this]
+        {
+            const bool isCurrentLayoutCrossSystem
+                = isCrossSystemLayout(workbench()->currentLayout());
+
+            // Bookmarks, analytics and events are not supported for the cross systems at the moment.
+            const auto appearance = isCurrentLayoutCrossSystem
+                ? OverlappableSearchWidget::Appearance::overlay
+                : OverlappableSearchWidget::Appearance::searchWidget;
+
+            m_bookmarksTab->setAppearance(appearance);
+            m_eventsTab->setAppearance(appearance);
+            m_vmsEventsTab->setAppearance(appearance);
+            m_analyticsTab->setAppearance(appearance);
+        });
+
+    rebuildTabs();
 
     m_connections << connect(m_notificationsTab, &NotificationListWidget::tileHovered,
         this, &EventPanel::Private::at_eventTileHovered);
@@ -411,17 +391,11 @@ EventPanel::Private::~Private()
 
 EventPanel::Tab EventPanel::Private::currentTab() const
 {
-    if (ini().newPanelsLayout)
-        return Tab::notifications;
-
     return m_tabIds.value(m_tabs->currentWidget());
 }
 
 bool EventPanel::Private::setCurrentTab(Tab tab)
 {
-    if (ini().newPanelsLayout)
-        return NX_ASSERT(tab == Tab::notifications);
-
     m_requestedTab = tab; // It's possible that this tab will be temporary hidden in rebuildTabs().
 
     const int index = m_tabs->indexOf(m_tabIds.key(tab));
@@ -435,12 +409,6 @@ bool EventPanel::Private::setCurrentTab(Tab tab)
 
 void EventPanel::Private::setTabCurrent(QWidget* tab, bool current)
 {
-    if (ini().newPanelsLayout)
-    {
-        NX_ASSERT(tab == m_notificationsTab);
-        return;
-    }
-
     if (current)
     {
         if (m_tabs->indexOf(tab) >= 0)
@@ -462,8 +430,6 @@ void EventPanel::Private::setTabCurrent(QWidget* tab, bool current)
 
 void EventPanel::Private::rebuildTabs()
 {
-    NX_ASSERT(!ini().newPanelsLayout);
-
     int currentIndex = 0;
 
     static constexpr int kNotificationTabIndex = 0;
@@ -564,8 +530,6 @@ void EventPanel::Private::rebuildTabs()
 
 void EventPanel::Private::updateUnreadCounter(int count, QnNotificationLevel::Value importance)
 {
-    NX_ASSERT(!ini().newPanelsLayout);
-
     m_counterLabel->setVisible(count > 0);
     if (count == 0)
         return;
