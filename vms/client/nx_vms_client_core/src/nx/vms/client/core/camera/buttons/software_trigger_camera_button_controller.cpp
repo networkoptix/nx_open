@@ -205,7 +205,6 @@ struct SoftwareTriggerCameraButtonController::Private
     const HintStyle hintStyle;
 
     QSet<QnUuid> isVmsRuleFlags;
-    ServerResourcePtr server;
 
     void updateButtons();
     void addOrUpdateButtonData(const CameraButton& button, bool isVmsRule);
@@ -215,8 +214,6 @@ struct SoftwareTriggerCameraButtonController::Private
     void updateButtonByRule(RulePointerType rule);
 
     void updateButtonAvailability(CameraButton button);
-
-    void handleCameraUpdated();
 
     bool setEventTriggerState(const QnUuid& ruleId, vms::event::EventState state);
     bool setVmsTriggerState(const QnUuid& ruleId, vms::event::EventState state);
@@ -296,6 +293,12 @@ void SoftwareTriggerCameraButtonController::Private::updateButtonByRule(RulePoin
 void SoftwareTriggerCameraButtonController::Private::updateButtonAvailability(CameraButton button)
 {
     // FIXME: #sivanov System-wide timezone should be used here when it is introduced.
+
+    const auto camera = q->camera();
+    const auto server = camera
+        ? camera->getParentResource().objectCast<ServerResource>()
+        : ServerResourcePtr{};
+
     const QTimeZone tz = NX_ASSERT(server)
         ? server->timeZone()
         : QTimeZone::LocalTime;
@@ -324,17 +327,6 @@ void SoftwareTriggerCameraButtonController::Private::updateButtonAvailability(Ca
 
     button.enabled = enabled;
     q->addOrUpdateButton(button);
-}
-
-void SoftwareTriggerCameraButtonController::Private::handleCameraUpdated()
-{
-    const auto& camera = q->camera();
-    server = camera
-        ? camera->getParentServer().dynamicCast<ServerResource>()
-        : ServerResourcePtr();
-
-    // TODO: handle parent server (parentIdChanged) signal
-    updateButtons();
 }
 
 bool SoftwareTriggerCameraButtonController::Private::setEventTriggerState(
@@ -450,16 +442,7 @@ SoftwareTriggerCameraButtonController::SoftwareTriggerCameraButtonController(
     }
 
     connect(this, &BaseCameraButtonController::hasRequiredPermissionsChanged, this, updateButtons);
-
-    connect(context->resourcePool(), &QnResourcePool::resourcesRemoved, this,
-        [this](const QnResourceList& resources)
-        {
-            if (d->server && resources.contains(d->server))
-                d->server.clear();
-        });
-
-    connect(this, &SoftwareTriggerCameraButtonController::cameraChanged, this,
-        [this]() { d->handleCameraUpdated(); });
+    connect(this, &BaseCameraButtonController::cameraChanged, this, updateButtons);
 
     static const auto kUpdateTriggerAvailabilityInterval = std::chrono::seconds(1);
     const auto updateTimer(new QTimer(this));
