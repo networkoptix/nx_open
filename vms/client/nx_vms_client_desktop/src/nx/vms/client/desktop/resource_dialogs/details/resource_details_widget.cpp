@@ -48,7 +48,7 @@ QWidget* createWarningWidget(const QString& caption, const QString& message)
     const auto iconSize = QSize(
         nx::style::Metrics::kDefaultIconSize,
         nx::style::Metrics::kDefaultIconSize);
-    const auto warningPixmap = qnSkin->icon("tree/buggy.png").pixmap(iconSize);
+    const auto warningPixmap = qnSkin->icon("tree/buggy.svg").pixmap(iconSize);
     const auto warningCaptionColor = nx::vms::client::core::colorTheme()->color("yellow_core");
     const auto warningMessageColor = nx::vms::client::core::colorTheme()->color("yellow_d2");
 
