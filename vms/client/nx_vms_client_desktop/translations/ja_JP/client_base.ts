@@ -6293,7 +6293,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>Selected files do not have timestamps</source>
       <translation>
-        <numerusform>選択したファイルにタイムスタンプがありません</numerusform>
+        <numerusform>選択したファイルにはタイムスタンプがありません</numerusform>
       </translation>
     </message>
     <message>
@@ -6400,7 +6400,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>%1 does not have timestamp.</source>
       <comment>Filename will be substituted</comment>
-      <translation>%1には タイムスタンプがありません。</translation>
+      <translation>%1 にはタイムスタンプがありません。</translation>
     </message>
     <message>
       <source>%1 is older than allowed in camera archive settings.</source>
@@ -7642,7 +7642,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Advanced</source>
-      <translation>アドバンス</translation>
+      <translation>詳細設定</translation>
     </message>
     <message>
       <source>Web Page</source>
@@ -7724,7 +7724,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Motion + Lo-Res</source>
-      <translation>常時低 ＋ モーション高解像度</translation>
+      <translation>モーション + 低解像度</translation>
     </message>
     <message>
       <source>Objects + Lo-Res</source>
@@ -9908,7 +9908,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Motion + Lo-Res</source>
-      <translation>常時低 ＋ モーション高解像度</translation>
+      <translation>モーション + 低解像度</translation>
     </message>
     <message>
       <source>Recording motion and objects</source>
@@ -10099,7 +10099,8 @@ You can still change quality and FPS directly on the camera.</source>
     <message>
       <source>Motion
  + Low-Res</source>
-      <translation>モーション + 低解像度</translation>
+      <translation>モーション
+ +低解像度</translation>
     </message>
     <message>
       <source>Motion detection is disabled for some of the selected devices</source>

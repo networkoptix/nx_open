@@ -687,7 +687,7 @@
     </message>
     <message>
       <source>Do not send Stop PTZ command</source>
-      <translation type="unfinished">Do not send Stop PTZ command</translation>
+      <translation>Không gửi lệnh Dừng PTZ</translation>
     </message>
   </context>
   <context>
