@@ -181,104 +181,116 @@ bool QnFfmpegAudioTranscoder::initResampler()
 int QnFfmpegAudioTranscoder::transcodePacket(
     const QnConstAbstractMediaDataPtr& media, QnAbstractMediaDataPtr* const result)
 {
-    int error = 0;
-
     if (result)
         result->reset();
 
-    if (media)
-    {
-        // 1. push media to decoder
-        m_channelNumber = media->channelNumber;
-        if (media->dataType != QnAbstractMediaData::DataType::AUDIO)
-            return 0;
-
-        tuneContextsWithMedia(m_decoderCtx, m_encoderCtx, media);
-        if (!m_resamplerInitialized)
-        {
-            if (!initResampler())
-                return AVERROR(EINVAL);
-            m_resamplerInitialized = true;
-        }
-
-        auto avPacket = av_packet_alloc();
-        avPacket->data = (uint8_t*)(media->data());
-        avPacket->size = media->dataSize();
-        avPacket->dts = media->timestamp;
-        avPacket->pts = media->timestamp;
-
-        error = avcodec_send_packet(m_decoderCtx, avPacket);
-        av_packet_free(&avPacket);
-
-        NX_ASSERT(error != AVERROR(EAGAIN),
-            "Wrong transcoder usage: decoder can't receive more data, pull all the encoded packets first");
-
-        if (error)
-        {
-            NX_WARNING(this, "ffmpeg audio decoder error: %1",
-                QnFfmpegHelper::avErrorToString(error));
-            return error;
-        }
-
-        // 2. get media from decoder
-        while (true)
-        {
-            AVFrame* decodedFrame = av_frame_alloc();
-            if (!decodedFrame)
-            {
-                NX_ERROR(this, "Failed to transcode audio packet: out of memory");
-                return AVERROR(ENOMEM);
-            }
-            auto guard = nx::utils::makeScopeGuard([&decodedFrame]() {av_frame_free(&decodedFrame); });
-
-            error = avcodec_receive_frame(m_decoderCtx, decodedFrame);
-            // There is not enough data to decode
-            if (error == AVERROR(EAGAIN))
-                break;
-            if (error)
-            {
-                NX_WARNING(this, "Could not receive audio frame from decoder, Error code: %1.",
-                    QnFfmpegHelper::avErrorToString(error));
-                return error;
-            }
-
-            // 3. Resample data
-            if (!m_resampler.pushFrame(decodedFrame))
-            {
-                NX_WARNING(this, "Could not allocate sample buffers");
-                av_frame_free(&decodedFrame);
-                return AVERROR(EINVAL);
-            }
-
-            // 4. Send data to the encoder
-            while (AVFrame* resampledFrame = m_resampler.nextFrame())
-            {
-                error = avcodec_send_frame(m_encoderCtx, resampledFrame);
-                if (error && error != AVERROR(EAGAIN))
-                {
-                    NX_WARNING(this, "Could not send audio frame to encoder, Error code: %1.",
-                        QnFfmpegHelper::avErrorToString(error));
-                    return error;
-                }
-            }
-        }
-    }
-
-    // 5. get media from encoder
-    QnFfmpegAvPacket encodedPacket;
-    error = avcodec_receive_packet(m_encoderCtx, &encodedPacket);
-    if (error == AVERROR(EAGAIN)) // Not enough data to encode packet.
+    if (media && media->dataType != QnAbstractMediaData::DataType::AUDIO)
         return 0;
 
-    if (error)
+    if (media && !sendPacket(media))
+        return -1;
+
+    return receivePacket(result) ? 0 : -1;
+}
+
+bool QnFfmpegAudioTranscoder::sendPacket(const QnConstAbstractMediaDataPtr& media)
+{
+    m_channelNumber = media->channelNumber;
+
+    // 1. push media to decoder
+    tuneContextsWithMedia(m_decoderCtx, m_encoderCtx, media);
+    if (!m_resamplerInitialized)
     {
-        NX_WARNING(this, "Could not receive audio packet from encoder, Error code: %1.",
-            QnFfmpegHelper::avErrorToString(error));
-        return error;
+        if (!initResampler())
+            return false;
+
+        m_resamplerInitialized = true;
     }
 
-    *result = createMediaDataFromAVPacket(encodedPacket);
-    return 0;
+    auto avPacket = av_packet_alloc();
+    avPacket->data = (uint8_t*)(media->data());
+    avPacket->size = media->dataSize();
+    avPacket->dts = media->timestamp;
+    avPacket->pts = media->timestamp;
+
+    int error = avcodec_send_packet(m_decoderCtx, avPacket);
+    av_packet_free(&avPacket);
+
+    if (error && error != AVERROR_EOF)
+    {
+        NX_WARNING(this, "ffmpeg audio decoder error: %1", QnFfmpegHelper::avErrorToString(error));
+        return false;
+    }
+
+    // 2. get media from decoder
+    while (true)
+    {
+        AVFrame* decodedFrame = av_frame_alloc();
+        if (!decodedFrame)
+        {
+            NX_ERROR(this, "Failed to transcode audio packet: out of memory");
+            return false;
+        }
+        auto guard = nx::utils::makeScopeGuard([&decodedFrame]() {av_frame_free(&decodedFrame); });
+
+        error = avcodec_receive_frame(m_decoderCtx, decodedFrame);
+        // There is not enough data to decode
+        if (error == AVERROR(EAGAIN) || error == AVERROR_EOF)
+            break;
+
+        if (error != 0)
+        {
+            NX_WARNING(this, "Could not receive audio frame from decoder, Error code: %1.",
+                QnFfmpegHelper::avErrorToString(error));
+            return false;
+        }
+
+        // 3. Resample data
+        if (!m_resampler.pushFrame(decodedFrame))
+        {
+            NX_WARNING(this, "Could not allocate sample buffers");
+            return false;
+        }
+    }
+    return true;
+}
+
+bool QnFfmpegAudioTranscoder::receivePacket(QnAbstractMediaDataPtr* const result)
+{
+    while (true)
+    {
+        // 1. Try to get media from encoder.
+        QnFfmpegAvPacket encodedPacket;
+        int status = avcodec_receive_packet(m_encoderCtx, &encodedPacket);
+        if (status == 0)
+        {
+            *result = createMediaDataFromAVPacket(encodedPacket);
+            return true;
+        }
+        if (status == AVERROR_EOF)
+            return true;
+
+        if (status && status != AVERROR(EAGAIN))
+        {
+            NX_WARNING(this, "Could not receive audio packet from encoder, Error code: %1.",
+                QnFfmpegHelper::avErrorToString(status));
+            return false;
+        }
+
+        // 2. Send data to the encoder.
+        AVFrame* resampledFrame = m_resampler.nextFrame();
+        if (!resampledFrame)
+            return true;
+
+        status = avcodec_send_frame(m_encoderCtx, resampledFrame);
+        if (status && status != AVERROR_EOF)
+        {
+            NX_WARNING(this, "Could not send audio frame to encoder, Error code: %1.",
+                QnFfmpegHelper::avErrorToString(status));
+            return false;
+        }
+    }
+    return true;
 }
 
 AVCodecContext* QnFfmpegAudioTranscoder::getCodecContext()
