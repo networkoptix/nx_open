@@ -242,7 +242,11 @@ CodecParametersPtr ExportStorageStreamRecorder::getVideoCodecParameters(
 
         m_videoTranscoder->setFilterChain(*m_transcodeFilters);
         m_videoTranscoder->setQuality(Qn::StreamQuality::highest);
-        m_videoTranscoder->open(videoData);
+        if (!m_videoTranscoder->open(videoData))
+        {
+            NX_WARNING(this, "Failed to open video transcoder");
+            return nullptr;
+        }
         return std::make_shared<CodecParameters>(m_videoTranscoder->getCodecContext());
     }
 
