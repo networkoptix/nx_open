@@ -38,6 +38,11 @@ public:
     QnUuid runningTourId;
     QList<QnUuid> layoutUuids;
     QList<UnsavedLayout> unsavedLayouts;
+
+    bool isEmpty() const
+    {
+        return layoutUuids.empty() && unsavedLayouts.empty();
+    }
 };
 
 #define WorkbenchStateUnsavedLayoutItem_Fields (resource)(uuid)(flags)(combinedGeometry) \

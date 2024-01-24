@@ -46,8 +46,6 @@ public:
 
     QSize sizeHint() const;
     void activatePreviousSystemTab();
-    void setExpanded(bool value);
-    bool isExpanded() const;
 
 private:
     void updateControlsGeometry();

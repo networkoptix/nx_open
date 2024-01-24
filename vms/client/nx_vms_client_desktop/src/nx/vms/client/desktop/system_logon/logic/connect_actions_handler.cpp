@@ -86,6 +86,7 @@
 #include <ui/graphics/opengl/gl_functions.h>
 #include <ui/statistics/modules/certificate_statistics_module.h>
 #include <ui/widgets/main_window.h>
+#include <ui/widgets/system_tab_bar_state_handler.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_license_notifier.h>
@@ -586,6 +587,7 @@ void ConnectActionsHandler::establishConnection(RemoteConnectionPtr connection)
                         if (system()->user())
                             appContext()->clientStateHandler()->clientDisconnected();
 
+                        mainWindow()->titleBarStateStore()->removeCurrentSystem();
                         disconnectFromServer(DisconnectFlag::Force);
                         if (!qnRuntime->isDesktopMode())
                             menu()->trigger(menu::DelayedForcedExitAction);
@@ -883,8 +885,6 @@ void ConnectActionsHandler::updatePreloaderVisibility()
             // Show welcome screen, hide preloader.
             resourceModeAction->setChecked(false);
             welcomeScreen->setConnectingToSystem(/*systemId*/ {});
-            if (!mainWindow()->isSystemTabBarUpdating())
-                welcomeScreen->setGlobalPreloaderVisible(false);
             break;
         }
         case LogicalState::connecting:
@@ -1293,9 +1293,6 @@ bool ConnectActionsHandler::disconnectFromServer(DisconnectFlags flags)
         if (auto welcomeScreen = mainWindow()->welcomeScreen())
             emit welcomeScreen->dropConnectingState();
     }
-    if (force)
-        workbench()->removeSystem(system()->localSystemId());
-
     clearConnection();
     return true;
 }
@@ -1394,6 +1391,7 @@ void ConnectActionsHandler::connectToServer(LogonData logonData, ConnectionOptio
                     error->externalDescription = tr("Authentication details are incorrect");
 
                 handleConnectionError(*error);
+                mainWindow()->titleBarStateStore()->removeCurrentSystem();
                 disconnectFromServer(DisconnectFlag::Force);
             }
             else

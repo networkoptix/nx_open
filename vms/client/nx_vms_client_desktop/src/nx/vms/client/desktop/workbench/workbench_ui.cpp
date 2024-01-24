@@ -58,6 +58,7 @@
 #include <ui/graphics/view/graphics_view.h>
 #include <ui/widgets/layout_tab_bar.h>
 #include <ui/widgets/main_window.h>
+#include <ui/widgets/main_window_title_bar_state.h>
 #include <ui/widgets/main_window_title_bar_widget.h>
 #include <ui/workbench/watchers/workbench_render_watcher.h>
 #include <ui/workbench/workbench_context.h>
@@ -423,7 +424,9 @@ void WorkbenchUi::storeSettings()
 
     QnPaneSettings& title = m_settings[Qn::WorkbenchPane::Title];
     title.state = makePaneState(isTitleOpened());
-    title.expanded = m_title->isExpanded();
+    title.expanded = ini().enableMultiSystemTabBar
+        ? mainWindow()->titleBarStateStore()->isExpanded()
+        : false;
 
     if (m_leftPanel)
     {
@@ -873,11 +876,7 @@ void WorkbenchUi::loadSettings(bool animated, bool useDefault /*unused?*/)
     if (ini().enableMultiSystemTabBar)
     {
         const bool expanded = m_settings[Qn::WorkbenchPane::Title].expanded;
-        m_title->setExpanded(expanded);
-        if (expanded)
-            mainWindow()->titleBar()->expand();
-        else
-            mainWindow()->titleBar()->collapse();
+        mainWindow()->titleBarStateStore()->setExpanded(expanded);
     }
     setTimelineOpened(m_settings[Qn::WorkbenchPane::Navigation].state == Qn::PaneState::Opened, animated);
     setNotificationsOpened(m_settings[Qn::WorkbenchPane::Notifications].state == Qn::PaneState::Opened, animated);
