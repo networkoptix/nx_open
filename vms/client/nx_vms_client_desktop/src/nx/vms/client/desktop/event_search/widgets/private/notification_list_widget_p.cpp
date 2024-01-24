@@ -51,6 +51,18 @@
 
 #include "tile_interaction_handler_p.h"
 
+namespace {
+
+static const QColor kLight16Color = "#698796";
+static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
+    {QIcon::Normal, {{kLight16Color, "light16"}}},
+    {QIcon::Active, {{kLight16Color, "light14"}}},
+    {QIcon::Selected, {{kLight16Color, "light10"}}},
+    {QnIcon::Pressed, {{kLight16Color, "light14"}}},
+};
+
+} // namespace
+
 namespace nx::vms::client::desktop {
 
 NotificationListWidget::Private::Private(NotificationListWidget* q):
@@ -168,7 +180,7 @@ void NotificationListWidget::Private::setupFilterSystemsButton()
     m_filterSystemsButton->setFlat(true);
     m_filterSystemsButton->setSelectable(false);
     m_filterSystemsButton->setDeactivatable(true);
-    m_filterSystemsButton->setIcon(qnSkin->icon("text_buttons/system.svg"));
+    m_filterSystemsButton->setIcon(qnSkin->icon("text_buttons/system.svg", kIconSubstitutions));
     m_filterSystemsButton->setFocusPolicy(Qt::NoFocus);
 
     auto menu = new QMenu(q);
