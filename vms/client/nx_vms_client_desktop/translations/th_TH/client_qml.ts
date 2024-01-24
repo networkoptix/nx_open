@@ -2353,6 +2353,10 @@ Press Alt + Click to follow object</source>
       <source>Selected on Timeline</source>
       <translation>เลือกในแทบเวลา</translation>
     </message>
+    <message>
+      <source>Not clickable due to the DST change</source>
+      <translation>ไม่สามารถคลิกได้เนื่องจากการเปลี่ยนแปลง DST</translation>
+    </message>
   </context>
   <context>
     <name>TreeView</name>

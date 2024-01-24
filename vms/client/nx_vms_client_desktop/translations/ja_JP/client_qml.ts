@@ -2354,6 +2354,10 @@ Alt + クリックでオブジェクトを追跡します。</translation>
       <source>Selected on Timeline</source>
       <translation>タイムラインで選択</translation>
     </message>
+    <message>
+      <source>Not clickable due to the DST change</source>
+      <translation>DST (サマータイム) の変更によりクリックできません</translation>
+    </message>
   </context>
   <context>
     <name>TreeView</name>

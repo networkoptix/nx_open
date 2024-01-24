@@ -2363,6 +2363,10 @@ Nesneyi takip etmek için Alt + Tıklama tuşlarına basın</translation>
       <source>Selected on Timeline</source>
       <translation>Seçilen zaman</translation>
     </message>
+    <message>
+      <source>Not clickable due to the DST change</source>
+      <translation type="unfinished">Not clickable due to the DST change</translation>
+    </message>
   </context>
   <context>
     <name>TreeView</name>

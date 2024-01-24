@@ -2517,7 +2517,7 @@
     </message>
     <message>
       <source>Motion + Lo-Res</source>
-      <translation>常時低 ＋ モーション高解像度</translation>
+      <translation>モーション + 低解像度</translation>
     </message>
     <message>
       <source>Do Not Record</source>
