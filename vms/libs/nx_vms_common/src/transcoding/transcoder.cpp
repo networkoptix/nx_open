@@ -47,11 +47,6 @@ AVCodecContext* QnCodecTranscoder::getCodecContext()
 }
 */
 
-QString QnCodecTranscoder::getLastError() const
-{
-    return m_lastErrMessage;
-}
-
 void QnCodecTranscoder::setQuality( Qn::StreamQuality quality )
 {
     m_quality = quality;
@@ -298,10 +293,10 @@ int QnTranscoder::setVideoCodec(
             break;
             */
         case TM_OpenCLTranscode:
-            m_lastErrMessage = tr("OpenCL transcoding is not implemented.");
+            NX_ERROR(this, "OpenCL transcoding is not implemented.");
             return OperationResult::Error;
         default:
-            m_lastErrMessage = tr("Unknown transcoding method.");
+            NX_ERROR(this, "Unknown transcoding method.");
             return OperationResult::Error;
     }
     return OperationResult::Success;
@@ -332,14 +327,12 @@ QnTranscoder::OperationResult QnTranscoder::setAudioCodec(AVCodecID codec, Trans
             */
         case TM_OpenCLTranscode:
             m_lastErrMessage = tr("OpenCLTranscode is not implemented.");
-            break;
+            return OperationResult::Error;
         default:
             m_lastErrMessage = tr("Unknown transcode method");
-            break;
+            return OperationResult::Error;
     }
-    return m_lastErrMessage.isEmpty()
-        ? OperationResult::Success
-        : OperationResult::Error;
+    return OperationResult::Success;
 }
 
 int QnTranscoder::openAndTranscodeDelayedData()

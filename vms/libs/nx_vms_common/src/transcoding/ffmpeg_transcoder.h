@@ -82,7 +82,6 @@ private:
     AVCodecParameters* m_audioCodecParameters = nullptr;
     int m_videoBitrate = 0;
     AVFormatContext* m_formatCtx = nullptr;
-    QString m_lastErrMessage;
 
     QString m_container;
     qint64 m_baseTime = AV_NOPTS_VALUE;
