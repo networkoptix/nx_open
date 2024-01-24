@@ -61,6 +61,7 @@ static const QColor kBasePrimaryColor = "#ffffff";
 static const QColor kThumbnailsColor = "#e1e7ea";
 static const QColor kSoundColor = "#A5B7C0";
 static const QColor kUnmuteColor = "#698796";
+static const QColor kUnmuteCrossColor = "#C22626";
 static const QColor kBackgroundColor = "#212A2F";
 static const QColor kCheckedColor = "#171C1F";
 
@@ -105,6 +106,7 @@ const core::SvgIconColorer::IconSubstitutions kNavigationIconCheckedSubstitution
         { kThumbnailsColor, "light4"},
         { kSoundColor, "light10"},
         { kUnmuteColor, "light16"},
+        { kUnmuteCrossColor, "red_core"},
         { kBackgroundColor, "dark7"},
         { kCheckedColor, "green_l3"},
     }},
@@ -113,6 +115,7 @@ const core::SvgIconColorer::IconSubstitutions kNavigationIconCheckedSubstitution
         { kThumbnailsColor, "light4"},
         { kSoundColor, "light10"},
         { kUnmuteColor, "light16"},
+        { kUnmuteCrossColor, "red_core"},
         { kBackgroundColor, "dark6" },
         { kCheckedColor, "green_l3"},
     }},
@@ -121,6 +124,7 @@ const core::SvgIconColorer::IconSubstitutions kNavigationIconCheckedSubstitution
         { kThumbnailsColor, "light4"},
         { kSoundColor, "light10"},
         { kUnmuteColor, "light16"},
+        { kUnmuteCrossColor, "red_core"},
         { kBackgroundColor, "dark8" },
         { kCheckedColor, "green_l3"},
     }},
@@ -129,6 +133,7 @@ const core::SvgIconColorer::IconSubstitutions kNavigationIconCheckedSubstitution
         { kThumbnailsColor, "light4"},
         { kSoundColor, "light10"},
         { kUnmuteColor, "light16"},
+        { kUnmuteCrossColor, "red_core"},
         { kBackgroundColor, "dark5"},
         { kCheckedColor, "green_l3"},
     }},
