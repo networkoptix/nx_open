@@ -40,8 +40,6 @@ struct BaseCameraButtonController::Private
     void setupCamera();
 
     void cancelActiveActions();
-
-    void handleCameraChanged();
 };
 
 void BaseCameraButtonController::Private::setupCamera()
@@ -60,46 +58,50 @@ void BaseCameraButtonController::Private::setupCamera()
         camera.reset();
 
     const auto previousCamera = camera;
+    const bool hadRequiredPermissions = hasRequiredPermissions;
+
     camera = newCamera;
+
+    const auto accessController = q->systemContext()->accessController();
+    accessNotifier = camera
+        ? accessController->createNotifier(camera)
+        : AccessController::NotifierPtr{};
+
+    if (accessNotifier)
+    {
+        const auto updateHasRequiredPermissions =
+            [this](const QnResourcePtr& camera, Qn::Permissions permissions)
+            {
+                if (!NX_ASSERT(camera == this->camera))
+                    return;
+
+                const bool newHasRequiredPermissions = camera
+                    && ((permissions & requiredPermissions) == requiredPermissions);
+
+                if (hasRequiredPermissions == newHasRequiredPermissions)
+                    return;
+
+                hasRequiredPermissions = newHasRequiredPermissions;
+                emit q->hasRequiredPermissionsChanged();
+            };
+
+        QObject::connect(accessNotifier.get(), &AccessController::Notifier::permissionsChanged,
+            q, updateHasRequiredPermissions);
+    }
+
+    hasRequiredPermissions = camera
+        && ((accessController->permissions(camera) & requiredPermissions) == requiredPermissions);
+
     emit q->cameraChanged(camera, previousCamera);
+
+    if (hasRequiredPermissions != hadRequiredPermissions)
+        emit q->hasRequiredPermissionsChanged();
 }
 
 void BaseCameraButtonController::Private::cancelActiveActions()
 {
     while (!activeActions.empty())
         q->cancelAction(*activeActions.cbegin());
-}
-
-void BaseCameraButtonController::Private::handleCameraChanged()
-{
-    const auto camera = q->camera();
-    const auto accessController = q->systemContext()->accessController();
-
-    accessNotifier = camera
-        ? accessController->createNotifier(camera)
-        : AccessController::NotifierPtr{};
-
-    const auto updatePermissions =
-        [this](const QnResourcePtr& camera, Qn::Permissions current, Qn::Permissions /*old*/)
-        {
-            const bool value = camera && (current & requiredPermissions == requiredPermissions);
-            if (hasRequiredPermissions == value)
-                return;
-
-            hasRequiredPermissions = value;
-            emit q->hasRequiredPermissionsChanged();
-        };
-
-    if (accessNotifier)
-    {
-        QObject::connect(accessNotifier.get(), &AccessController::Notifier::permissionsChanged,
-            q, updatePermissions);
-    }
-
-    const auto currentPermissions = camera
-        ? accessController->permissions(camera)
-        : Qn::Permissions{};
-    updatePermissions(camera, currentPermissions, /*oldPermissions*/ {});
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -124,9 +126,6 @@ BaseCameraButtonController::BaseCameraButtonController(
             if (fields.testFlag(CameraButton::Field::type))
                 cancelAction(button.id);
         });
-
-    connect(this, &BaseCameraButtonController::cameraChanged,
-        this, [this]() { d->handleCameraChanged(); });
 }
 
 BaseCameraButtonController::~BaseCameraButtonController()
