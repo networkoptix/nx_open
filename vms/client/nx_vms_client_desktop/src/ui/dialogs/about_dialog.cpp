@@ -333,9 +333,9 @@ void QnAboutDialog::initSaasSupportInfo()
     addLabelAtPosition(tr("Partner information"), ui->supportLayout->rowCount() - 1, /*column*/ 0);
 
     // Web links.
-    for (const auto& webAddress: channelPartnerSupportData.sites)
+    for (const auto& siteInfo: channelPartnerSupportData.sites)
     {
-        auto webAddressLabel = appendLabelRow(html::link(QUrl(webAddress)));
+        auto webAddressLabel = appendLabelRow(html::link(QUrl(siteInfo.value)));
         webAddressLabel->setOpenExternalLinks(true);
     }
 
@@ -347,7 +347,7 @@ void QnAboutDialog::initSaasSupportInfo()
     }
     for (const auto& phoneInfo: channelPartnerSupportData.phones)
     {
-        auto phoneText = html::phoneNumberLink(phoneInfo.phone);
+        auto phoneText = html::phoneNumberLink(phoneInfo.value);
         if (!phoneInfo.description.isEmpty())
             phoneText = nx::format("%1 - %2").args(phoneText, phoneInfo.description);
 
@@ -363,7 +363,7 @@ void QnAboutDialog::initSaasSupportInfo()
     }
     for (const auto& emailInfo: channelPartnerSupportData.emails)
     {
-        auto emailLabel = appendLabelRow(html::mailtoLink(emailInfo.email));
+        auto emailLabel = appendLabelRow(html::mailtoLink(emailInfo.value));
         emailLabel->setOpenExternalLinks(true);
     }
 

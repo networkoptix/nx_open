@@ -60,9 +60,9 @@ int purchasedServicesCount(const nx::vms::common::saas::ServiceManager* serviceM
 
 QUrl channelPartnerUrl(const nx::vms::common::saas::ServiceManager* serviceManager)
 {
-    const auto webPagesAddresses = serviceManager->data().channelPartner.supportInformation.sites;
-    return !webPagesAddresses.empty()
-        ? QUrl(webPagesAddresses.front())
+    const auto webPagesInfo = serviceManager->data().channelPartner.supportInformation.sites;
+    return !webPagesInfo.empty()
+        ? QUrl(webPagesInfo.front().value)
         : QUrl();
 }
 
