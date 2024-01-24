@@ -251,18 +251,27 @@ public:
         auto storage = index.data(Qn::StorageInfoDataRole).value<QnStorageModelInfo>();
 
         // Set disabled style for unchecked rows.
-        if (!index.sibling(index.row(), QnStorageListModel::CheckBoxColumn).data(Qt::CheckStateRole).toBool())
+        bool isEnabled = index.sibling(
+            index.row(), QnStorageListModel::CheckBoxColumn).data(Qt::CheckStateRole).toBool();
+        if (!isEnabled)
             opt.state &= ~QStyle::State_Enabled;
 
         // Set proper color for action text buttons.
         if (index.column() == QnStorageListModel::ActionsColumn)
         {
+            static const auto kEnabledAlpha = 255;
+            static const auto kDisabledAlpha = 77; //< Value from makeApplicationPalette().
+            double alpha = isEnabled ? kEnabledAlpha : kDisabledAlpha;
+            QColor baseColor;
+
             if (hasHoverableText && hovered)
-                opt.palette.setColor(QPalette::Text, vms::client::core::colorTheme()->color("light14"));
+                baseColor = vms::client::core::colorTheme()->color("light14");
             else if (hasHoverableText)
-                opt.palette.setColor(QPalette::Text, opt.palette.color(QPalette::WindowText));
+                baseColor = opt.palette.color(QPalette::WindowText);
             else // Either hidden (has no text) or selected, we can use 'Selected' style for both.
-                opt.palette.setColor(QPalette::Text, opt.palette.color(QPalette::Light));
+                baseColor = opt.palette.color(QPalette::Light);
+
+            opt.palette.setColor(QPalette::Text, withAlpha(baseColor, alpha));
         }
 
         // Set warning color for inaccessible storages.
