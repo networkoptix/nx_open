@@ -4,6 +4,7 @@
 
 #include <QtCore/QScopedPointer>
 
+#include <core/resource/resource_fwd.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
 
 class QByteArray;
@@ -32,7 +33,7 @@ class EncryptedArchivePasswordDialog:
     using base_type = QnSessionAwareButtonBoxDialog;
 
 public:
-    EncryptedArchivePasswordDialog(QWidget* parent);
+    EncryptedArchivePasswordDialog(const QnMediaResourcePtr& mediaResource, QWidget* parent);
     ~EncryptedArchivePasswordDialog();
 
     /**

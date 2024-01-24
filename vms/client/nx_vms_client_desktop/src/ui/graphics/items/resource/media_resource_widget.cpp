@@ -3095,7 +3095,7 @@ void QnMediaResourceWidget::processEncryptedArchiveUnlockRequst()
     if (!m_encryptedArchivePasswordDialog)
     {
         m_encryptedArchivePasswordDialog.reset(
-            new EncryptedArchivePasswordDialog(mainWindow()));
+            new EncryptedArchivePasswordDialog(resource(), mainWindow()));
     }
     m_encryptedArchivePasswordDialog->showForEncryptionData(m_encryptedArchiveData);
 }
