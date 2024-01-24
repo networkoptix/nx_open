@@ -7,6 +7,7 @@
 
 #include <nx/network/abstract_socket.h>
 #include <nx/network/aggregate_acceptor.h>
+#include <nx/network/cloud/tunnel/relay/api/relay_api_data_types.h>
 #include <nx/network/retry_timer.h>
 #include <nx/network/socket_attributes_cache.h>
 #include <nx/reflect/enum_instrument.h>
@@ -19,6 +20,30 @@
 #include "tunnel/tunnel_acceptor_factory.h"
 
 namespace nx::network::cloud {
+
+struct CloudConnectListenerStatusReport
+{
+    template<typename ResultType>
+    struct Error
+    {
+        nx::utils::Url url;
+        ResultType result;
+    };
+
+    /**
+     * true if listening for incoming cloud connections. Note that it is possible that some errors
+     * still occurred, but the socket is still listening.
+     */
+    bool listening = false;
+
+    /**
+     * The list of errors connecting to a mediator encountered during the last listen attempt.
+     */
+    std::vector<Error<nx::hpm::api::Result>> mediatorErrors;
+
+    /** Errors while interracting with relays. */
+    std::vector<Error<nx::cloud::relay::api::Result>> relayErrors;
+};
 
 /**
  * Accepts connections incoming via mediator.
@@ -79,6 +104,12 @@ public:
     void setSupportedConnectionMethods(hpm::api::ConnectionMethods value);
 
     /**
+     * Provides the current status of the listener. Note that the list of errors is cleared on
+     * every listen attempt.
+     */
+    CloudConnectListenerStatusReport getStatusReport() const;
+
+    /**
      * For use in tests only.
      */
     void moveToListeningState();
@@ -127,9 +158,13 @@ protected:
     hpm::api::ConnectionMethods m_supportedConnectionMethods = 0xFFFF; //< No limits by default.
     nx::utils::MoveOnlyFunc<void(hpm::api::ResultCode)> m_registrationHandler;
     AggregateAcceptor m_aggregateAcceptor;
+    mutable nx::Mutex m_mutex;
+    CloudConnectListenerStatusReport m_lastListenStatusReport;
 
 private:
     void stopWhileInAioThread();
+    void saveSuccessListenStartToStatusReport();
+    void saveMediatorErrorToStatusReport(nx::hpm::api::ResultCode resultCode, bool clearReport);
 };
 
 //-------------------------------------------------------------------------------------------------
