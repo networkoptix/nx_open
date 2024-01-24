@@ -340,6 +340,10 @@ int runApplication(int argc, char** argv)
     QQuickStyle::setStyle("Basic");
     initQmlGlyphCacheWorkaround();
 
+    // NativeTextRendering is required for the equal text rendering on widgets and qml.
+    if (nx::build_info::isMacOsX() || nx::build_info::isLinux())
+        QQuickWindow::setTextRenderType(QQuickWindow::TextRenderType::NativeTextRendering);
+
     nx::utils::rlimit::setMaxFileDescriptors(8000);
 
     // This attribute is needed to embed QQuickWidget into other QWidgets.
