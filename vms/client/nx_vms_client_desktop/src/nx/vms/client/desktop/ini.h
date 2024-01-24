@@ -279,11 +279,6 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
     NX_INI_FLAG(false, pluginInformationInServerSettings,
         "[Feature] Show information about installed plugin libraries in Server Settings.");
 
-    // VMS-20293 Left Panel.
-    NX_INI_FLAG(false, newPanelsLayout,
-        "[Feature] Enables new layout with Search Panels and Resources Panel grouped\n"
-        "into one Left-side Panel");
-
     // VMS-21806
     NX_INI_STRING("auto", defaultResolution,
         "[Feature] Default behavior of the layout resolution in client.\n"

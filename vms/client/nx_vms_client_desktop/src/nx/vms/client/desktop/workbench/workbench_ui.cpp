@@ -25,7 +25,6 @@
 #include <nx/vms/client/desktop/debug_utils/instruments/frame_time_points_provider_instrument.h>
 #include <nx/vms/client/desktop/debug_utils/utils/performance_monitor.h>
 #include <nx/vms/client/desktop/ini.h>
-#include <nx/vms/client/desktop/left_panel/left_panel_widget.h>
 #include <nx/vms/client/desktop/left_panel/qml_resource_browser_widget.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/menu/action_parameter_types.h>
@@ -70,7 +69,6 @@
 #include <utils/common/event_processors.h>
 
 #include "panels/calendar_workbench_panel.h"
-#include "panels/left_workbench_panel.h"
 #include "panels/notifications_workbench_panel.h"
 #include "panels/resource_tree_workbench_panel.h"
 #include "panels/special_layout_panel.h"
@@ -412,7 +410,7 @@ WorkbenchUi::~WorkbenchUi()
     delete m_notifications;
     delete m_title;
     delete m_layoutPanel;
-    delete m_leftPanel;
+    delete m_resourceTreePanel;
     delete m_debugOverlayLabel;
 
     delete m_controlsWidget;
@@ -428,20 +426,18 @@ void WorkbenchUi::storeSettings()
         ? mainWindow()->titleBarStateStore()->isExpanded()
         : false;
 
-    if (m_leftPanel)
+    if (m_resourceTreePanel)
     {
         QnPaneSettings& left = m_settings[Qn::WorkbenchPane::Tree];
         left.state = makePaneState(isLeftPanelOpened(), isLeftPanelPinned());
-        if (!ini().newPanelsLayout)
-            left.span = m_leftPanel->geometry().width();
+        left.span = m_resourceTreePanel->geometry().width();
     }
 
     if (m_notifications)
     {
         QnPaneSettings& notifications = m_settings[Qn::WorkbenchPane::Notifications];
         notifications.state = makePaneState(isNotificationsOpened(), isNotificationsPinned());
-        if (!ini().newPanelsLayout)
-            notifications.span = m_notifications->geometry().width();
+        notifications.span = m_notifications->geometry().width();
     }
 
     QnPaneSettings& navigation = m_settings[Qn::WorkbenchPane::Navigation];
@@ -498,14 +494,8 @@ bool WorkbenchUi::calculateTimelineVisible(QnResourceWidget* widget) const
 
 menu::ActionScope WorkbenchUi::currentScope() const
 {
-    if (m_leftPanel && m_leftPanel->isFocused())
-    {
-        if (qobject_cast<ResourceTreeWorkbenchPanel*>(m_leftPanel))
-            return menu::TreeScope;
-
-        if (auto lp = qobject_cast<LeftWorkbenchPanel*>(m_leftPanel))
-            return lp->currentScope();
-    }
+    if (m_resourceTreePanel && m_resourceTreePanel->isFocused())
+        return menu::TreeScope;
 
     QGraphicsItem *focusItem = mainWindow()->scene()->focusItem();
     if (focusItem == m_timeline->item)
@@ -527,12 +517,7 @@ menu::Parameters WorkbenchUi::currentParameters(menu::ActionScope scope) const
     switch (scope)
     {
         case menu::TreeScope:
-        {
-            if (auto tree = qobject_cast<ResourceTreeWorkbenchPanel*>(m_leftPanel))
-                return tree->widget->currentParameters(scope);
-            if (auto lp = qobject_cast<LeftWorkbenchPanel*>(m_leftPanel))
-                return lp->currentParameters(scope);
-        }
+            return m_resourceTreePanel->widget->currentParameters(scope);
 
         case menu::TimelineScope:
             return navigator()->currentWidget();
@@ -699,7 +684,7 @@ void WorkbenchUi::updateViewportMargins(bool animate)
     if (m_flags.testFlag(AdjustMargins))
     {
         newMargins = calculateViewportMargins(
-            panelEffectiveGeometry(m_leftPanel),
+            panelEffectiveGeometry(m_resourceTreePanel),
             panelEffectiveGeometry(m_title),
             timelineEffectiveGeometry,
             panelEffectiveGeometry(m_notifications),
@@ -729,7 +714,7 @@ bool WorkbenchUi::isHovered() const
 {
     return
         (m_timeline->isHovered())
-        || (m_leftPanel && m_leftPanel->isHovered())
+        || (m_resourceTreePanel && m_resourceTreePanel->isHovered())
         || (m_title && m_title->isHovered())
         || (m_notifications && m_notifications->isHovered())
         || (m_calendar && m_calendar->isHovered());
@@ -870,8 +855,8 @@ void WorkbenchUi::loadSettings(bool animated, bool useDefault /*unused?*/)
         m_settings = Qn::defaultPaneSettings();
 
     setLeftPanelOpened(m_settings[Qn::WorkbenchPane::Tree].state == Qn::PaneState::Opened, animated);
-    if (m_leftPanel && !ini().newPanelsLayout)
-        m_leftPanel->setPanelSize(m_settings[Qn::WorkbenchPane::Tree].span);
+    if (m_resourceTreePanel)
+        m_resourceTreePanel->setPanelSize(m_settings[Qn::WorkbenchPane::Tree].span);
     setTitleOpened(m_settings[Qn::WorkbenchPane::Title].state == Qn::PaneState::Opened, animated);
     if (ini().enableMultiSystemTabBar)
     {
@@ -880,7 +865,7 @@ void WorkbenchUi::loadSettings(bool animated, bool useDefault /*unused?*/)
     }
     setTimelineOpened(m_settings[Qn::WorkbenchPane::Navigation].state == Qn::PaneState::Opened, animated);
     setNotificationsOpened(m_settings[Qn::WorkbenchPane::Notifications].state == Qn::PaneState::Opened, animated);
-    if (m_notifications && !ini().newPanelsLayout)
+    if (m_notifications)
         m_notifications->setPanelSize(m_settings[Qn::WorkbenchPane::Notifications].span);
     setCalendarOpened(m_settings[Qn::WorkbenchPane::Calendar].state == Qn::PaneState::Opened, animated);
     if (m_timeline)
@@ -1023,8 +1008,8 @@ void WorkbenchUi::at_controlsWidget_geometryChanged()
         m_notifications->setX(rect.right() + (isNotificationsOpened() ? -m_notifications->geometry().width() : 1.0 /* Just in case. */));
     }
 
-    if (m_leftPanel)
-        m_leftPanel->stopAnimations();
+    if (m_resourceTreePanel)
+        m_resourceTreePanel->stopAnimations();
 
     if (m_calendar)
         m_calendar->stopAnimations();
@@ -1056,29 +1041,29 @@ void WorkbenchUi::createControlsWidget()
 
 void WorkbenchUi::setLeftPanelVisible(bool visible, bool animate)
 {
-    if (m_leftPanel)
-        m_leftPanel->setVisible(visible, animate);
+    if (m_resourceTreePanel)
+        m_resourceTreePanel->setVisible(visible, animate);
 }
 
 bool WorkbenchUi::isLeftPanelPinned() const
 {
-    return m_leftPanel && m_leftPanel->isPinned();
+    return m_resourceTreePanel && m_resourceTreePanel->isPinned();
 }
 
 bool WorkbenchUi::isLeftPanelVisible() const
 {
-    return m_leftPanel && m_leftPanel->isVisible();
+    return m_resourceTreePanel && m_resourceTreePanel->isVisible();
 }
 
 bool WorkbenchUi::isLeftPanelOpened() const
 {
-    return m_leftPanel && m_leftPanel->isOpened();
+    return m_resourceTreePanel && m_resourceTreePanel->isOpened();
 }
 
 void WorkbenchUi::setLeftPanelOpened(bool opened, bool animate)
 {
-    if (m_leftPanel)
-        m_leftPanel->setOpened(opened, animate);
+    if (m_resourceTreePanel)
+        m_resourceTreePanel->setOpened(opened, animate);
 }
 
 QRectF WorkbenchUi::updatedLeftPanelGeometry(
@@ -1096,29 +1081,19 @@ QRectF WorkbenchUi::updatedLeftPanelGeometry(
 
 void WorkbenchUi::updateLeftPanelGeometry()
 {
-    if (!m_leftPanel)
+    if (!m_resourceTreePanel)
         return;
-
-    updateLeftPanelMaximumWidth();
 
     QRectF titleGeometry = (m_title && m_title->isVisible())
         ? m_title->geometry()
         : QRectF();
 
     /* Update painting rect the "fair" way. */
-    QRectF geometry = updatedLeftPanelGeometry(m_leftPanel->geometry(), titleGeometry,
+    QRectF geometry = updatedLeftPanelGeometry(m_resourceTreePanel->geometry(), titleGeometry,
         m_timeline->item->geometry());
 
     const auto setYAndHeight =
-        [this](qreal y, qreal height)
-        {
-            if (auto tree = qobject_cast<ResourceTreeWorkbenchPanel*>(m_leftPanel))
-                tree->setYAndHeight(y, height);
-            else if (auto lp = qobject_cast<LeftWorkbenchPanel*>(m_leftPanel))
-                lp->setYAndHeight(y, height);
-            else
-                NX_ASSERT(false);
-        };
+        [this](qreal y, qreal height) { m_resourceTreePanel->setYAndHeight(y, height); };
 
     setYAndHeight(geometry.topLeft().y(), static_cast<int>(geometry.height()));
 
@@ -1146,71 +1121,43 @@ void WorkbenchUi::updateLeftPanelGeometry()
     defer |= !qFuzzyEquals(titleGeometry, titleEffectiveGeometry);
 
     /* Calculate target geometry. */
-    geometry = updatedLeftPanelGeometry(m_leftPanel->geometry(), titleEffectiveGeometry,
+    geometry = updatedLeftPanelGeometry(m_resourceTreePanel->geometry(), titleEffectiveGeometry,
         QRectF(sliderPos, m_timeline->item->size()));
 
-    if (qFuzzyEquals(geometry, m_leftPanel->geometry()))
+    if (qFuzzyEquals(geometry, m_resourceTreePanel->geometry()))
         return;
 
     /* Defer size change if it doesn't cause empty space to occur. */
-    if (defer && geometry.height() < m_leftPanel->geometry().height())
+    if (defer && geometry.height() < m_resourceTreePanel->geometry().height())
         return;
 
     setYAndHeight(geometry.topLeft().y(), static_cast<int>(geometry.height()));
 }
 
-void WorkbenchUi::updateLeftPanelMaximumWidth()
-{
-    const auto leftPanel = qobject_cast<LeftWorkbenchPanel*>(m_leftPanel);
-    if (!leftPanel)
-        return;
-
-    // Avoid shrinking the left panel when it is invisible. Do not use isWorkbenchVisible()
-    // here because it gives wrong result (visible == true) when the application starts.
-    if (!mainWindow()->view()->isVisible())
-        return;
-
-    const auto rightLimit = m_notifications && m_notifications->isVisible()
-        ? m_notifications->geometry().x()
-        : mainWindow()->view()->width();
-
-    leftPanel->setMaximumAllowedWidth(rightLimit - kReservedSceneWidth);
-}
-
 void WorkbenchUi::createLeftPanelWidget(const QnPaneSettings& settings)
 {
-    if (ini().newPanelsLayout)
-    {
-        m_leftPanel = new LeftWorkbenchPanel(settings, mainWindow()->view(), m_controlsWidget, this);
-    }
-    else
-    {
-        m_leftPanel = new ResourceTreeWorkbenchPanel(settings, mainWindow()->view(), m_controlsWidget,
-            this);
-    }
+    m_resourceTreePanel = new ResourceTreeWorkbenchPanel(settings, mainWindow()->view(), m_controlsWidget,
+        this);
 
-    m_connections << connect(m_leftPanel, &AbstractWorkbenchPanel::openedChanged, this,
+    m_connections << connect(m_resourceTreePanel, &AbstractWorkbenchPanel::openedChanged, this,
         [this](bool opened)
         {
-            if (opened && m_leftPanel->isPinned())
+            if (opened && m_resourceTreePanel->isPinned())
                 m_inFreespace = false;
         });
 
-    m_connections << connect(m_leftPanel, &AbstractWorkbenchPanel::visibleChanged, this,
+    m_connections << connect(m_resourceTreePanel, &AbstractWorkbenchPanel::visibleChanged, this,
         &WorkbenchUi::updateLeftPanelGeometry);
 
-    m_connections << connect(m_leftPanel, &AbstractWorkbenchPanel::hoverEntered, this,
+    m_connections << connect(m_resourceTreePanel, &AbstractWorkbenchPanel::hoverEntered, this,
         &WorkbenchUi::updateControlsVisibilityAnimated);
-    m_connections << connect(m_leftPanel, &AbstractWorkbenchPanel::hoverLeft, this,
+    m_connections << connect(m_resourceTreePanel, &AbstractWorkbenchPanel::hoverLeft, this,
         &WorkbenchUi::updateControlsVisibilityAnimated);
 
-    m_connections << connect(m_leftPanel, &AbstractWorkbenchPanel::geometryChanged, this,
+    m_connections << connect(m_resourceTreePanel, &AbstractWorkbenchPanel::geometryChanged, this,
         &WorkbenchUi::updateViewportMarginsAnimated);
-    m_connections << connect(m_leftPanel, &AbstractWorkbenchPanel::geometryChanged, this,
+    m_connections << connect(m_resourceTreePanel, &AbstractWorkbenchPanel::geometryChanged, this,
         &WorkbenchUi::updateLayoutPanelGeometry);
-
-    installEventHandler(mainWindow()->view(), {QEvent::Show, QEvent::Resize}, this,
-        &WorkbenchUi::updateLeftPanelMaximumWidth);
 }
 
 #pragma endregion Tree widget methods
@@ -1349,8 +1296,8 @@ void WorkbenchUi::updateLayoutPanelGeometry()
         ? m_notifications->effectiveGeometry().left()
         : m_controlsWidgetRect.right();
 
-    const auto leftRight = m_leftPanel && m_leftPanel->isVisible()
-        ? m_leftPanel->effectiveGeometry().right()
+    const auto leftRight = m_resourceTreePanel && m_resourceTreePanel->isVisible()
+        ? m_resourceTreePanel->effectiveGeometry().right()
         : m_controlsWidgetRect.left();
 
     const auto topLeft = QPointF(leftRight, titleGeometry.bottom());
@@ -1362,8 +1309,6 @@ void WorkbenchUi::updateNotificationsGeometry()
 {
     if (!m_notifications)
         return;
-
-    updateLeftPanelMaximumWidth();
 
     /* Update painting rect the "fair" way. */
     QRectF titleGeometry = (m_title && m_title->isVisible())
@@ -1725,10 +1670,7 @@ void WorkbenchUi::createFpsWidget()
 
 QQuickWindow* WorkbenchUi::quickWindow() const
 {
-    if (const auto resourceTree = qobject_cast<ResourceTreeWorkbenchPanel*>(m_leftPanel))
-        return resourceTree->widget->quickWindow();
-
-    return nullptr;
+    return m_resourceTreePanel->widget->quickWindow();
 }
 
 #pragma endregion Fps widget methods

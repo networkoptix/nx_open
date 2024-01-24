@@ -2106,22 +2106,11 @@ void initialize(Manager* manager, Action* root)
         .toggledText(ContextMenu::tr("Hide Title Bar"))
         .condition(new ToggleTitleBarCondition());
 
-    if (ini().newPanelsLayout)
-    {
-        factory(ToggleLeftPanelAction)
-            .flags(NoTarget)
-            .text(ContextMenu::tr("Show Panel")) //< To be displayed on button tooltip
-            .toggledText(ContextMenu::tr("Hide Panel"))
-            .condition(condition::treeNodeType(ResourceTree::NodeType::root));
-    }
-    else
-    {
-        factory(ToggleTreeAction)
-            .flags(NoTarget)
-            .text(ContextMenu::tr("Show Tree")) //< To be displayed on button tooltip
-            .toggledText(ContextMenu::tr("Hide Tree"))
-            .condition(condition::treeNodeType(ResourceTree::NodeType::root));
-    }
+    factory(ToggleTreeAction)
+        .flags(NoTarget)
+        .text(ContextMenu::tr("Show Tree")) //< To be displayed on button tooltip
+        .toggledText(ContextMenu::tr("Hide Tree"))
+        .condition(condition::treeNodeType(ResourceTree::NodeType::root));
 
     factory(PinTimelineAction)
         .flags(NoTarget)

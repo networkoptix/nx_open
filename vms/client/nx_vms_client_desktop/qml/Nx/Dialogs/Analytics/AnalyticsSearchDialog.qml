@@ -15,9 +15,7 @@ import nx.vms.client.core
 import nx.vms.client.desktop
 import nx.vms.client.desktop.analytics as Analytics
 
-import ".."
-
-import "../metrics.js" as Metrics
+import "metrics.js" as Metrics
 
 Window
 {
@@ -313,8 +311,6 @@ Window
                     return `+ ${newResults}`
                 }
 
-                showThumbnailsButton: false
-
                 onShowPreviewChanged:
                     previewPanel.slideAnimationEnabled = true
 
@@ -453,7 +449,6 @@ Window
 
                     context: windowContext
                     type: { return RightPanelModel.Type.analytics }
-                    previewsEnabled: counterBlock.showThumbnails
                     active: true
 
                     Component.onCompleted:

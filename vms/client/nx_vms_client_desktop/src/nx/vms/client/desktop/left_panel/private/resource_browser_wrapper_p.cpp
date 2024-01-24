@@ -22,8 +22,6 @@
 #include <nx/vms/client/desktop/window_context.h>
 #include <ui/workbench/workbench_context.h>
 
-#include "../left_panel_widget.h"
-
 namespace nx::vms::client::desktop {
 
 namespace {

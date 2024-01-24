@@ -13,6 +13,7 @@ import nx.vms.client.core
 import nx.vms.client.desktop
 
 import ".."
+import "../.."
 import "../../globals.js" as RightPanelGlobals
 import "metrics.js" as Metrics
 

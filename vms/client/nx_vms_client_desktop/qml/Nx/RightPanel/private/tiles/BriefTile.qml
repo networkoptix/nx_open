@@ -11,6 +11,7 @@ import nx.vms.client.core
 import nx.vms.client.desktop
 
 import ".."
+import "../.."
 import "../../globals.js" as RightPanelGlobals
 
 TileBase
