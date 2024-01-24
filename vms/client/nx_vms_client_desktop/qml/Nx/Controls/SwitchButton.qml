@@ -16,10 +16,9 @@ Button
     id: control
 
     implicitHeight: 28
-    spacing: 8
-
-    font.pixelSize: FontConfig.normal.pixelSize
-    font.weight: Font.Medium
+    spacing: 16
+    font: FontConfig.normal
+    rightPadding: 4
 
     checkable: true
 
