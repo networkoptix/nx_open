@@ -10,7 +10,9 @@
 
 namespace nx::vms::client::desktop {
 
-class SystemTabBarModel;
+struct MainWindowTitleBarState;
+class MainWindowTitleBarStateStore;
+class SystemTabBarStateHandler;
 
 class SystemTabBar:
     public QTabBar,
@@ -18,32 +20,39 @@ class SystemTabBar:
 {
     Q_OBJECT
     using base_type = QTabBar;
+    using Store = MainWindowTitleBarStateStore;
+    using State = MainWindowTitleBarState;
+    using StateHandler = SystemTabBarStateHandler;
 
 public:
     SystemTabBar(QWidget* parent = nullptr);
+    void setStateStore(QSharedPointer<Store> store, QSharedPointer<StateHandler> stateHandler);
     void rebuildTabs();
     void activateHomeTab();
-    void activatePreviousTab();
     bool isHomeTabActive() const;
     bool isUpdating() const;
 
 protected:
     virtual QSize tabSizeHint(int index) const override;
+    virtual void mousePressEvent(QMouseEvent* event) override;
+    virtual void mouseMoveEvent(QMouseEvent* event) override;
+    virtual void dragEnterEvent(QDragEnterEvent* event) override;
+    virtual void dropEvent(QDropEvent* event) override;
 
 private:
-    void addClosableTab(const QString& text, const QnSystemDescriptionPtr& systemDescription);
+    void insertClosableTab(int index,
+        const QString& text,
+        const QnSystemDescriptionPtr& systemDescription);
     bool isHomeTab(int index) const;
     int homeTabIndex() const;
-    void updateHomeTab();
-    SystemTabBarModel* model() const;
-
-    void at_currentTabChanged(int index);
-    void at_currentSystemChanged(QnSystemDescriptionPtr systemDescription);
-    void at_systemDisconnected();
+    void updateHomeTabView();
+    QPixmap imageData(int tabIndex) const;
 
 private:
     bool m_updating = false;
-    int m_lastTabIndex = -1;
+    QSharedPointer<Store> m_store;
+    QSharedPointer<StateHandler> m_stateHandler;
+    QPoint m_dragStartPosition;
 };
 
 } // namespace nx::vms::client::desktop

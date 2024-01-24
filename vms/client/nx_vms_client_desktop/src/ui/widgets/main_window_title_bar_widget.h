@@ -13,6 +13,7 @@ class QnMainWindowTitleBarWidgetPrivate;
 namespace nx::vms::client::desktop {
 class ToolButton;
 class MainWindowTitleBarStateStore;
+class SystemTabBarStateHandler;
 } // namespace nx::vms::client::desktop
 
 class QnMainWindowTitleBarWidget:
@@ -24,6 +25,7 @@ class QnMainWindowTitleBarWidget:
 
     using base_type = QWidget;
     using Store = nx::vms::client::desktop::MainWindowTitleBarStateStore;
+    using StateHandler = nx::vms::client::desktop::SystemTabBarStateHandler;
 
 public:
     static constexpr int kSystemBarHeight = 32;
@@ -39,24 +41,19 @@ public:
     void setY(int y);
 
     QnLayoutTabBar* tabBar() const;
-    void setStateStore(QSharedPointer<Store> store);
-    QSharedPointer<Store> stateStore() const;
+    void setStateStore(QSharedPointer<Store> store, QSharedPointer<StateHandler> stateHandler);
 
     /**
     * Sets tab bar and "add"/"tabs list menu" buttons visible (or not)
     */
     void setTabBarStuffVisible(bool visible);
-    void setHomeTabActive(bool isActive);
+    void hideLayoutPanel(bool hide);
     bool isExpanded() const;
-    void collapse();
-    void expand();
-    bool isSystemTabBarUpdating() const;
 
 signals:
     void yChanged(int newY);
     void geometryChanged();
     void toggled(bool expanded);
-    void homeTabActivationChanged(bool isActive);
 
 protected:
     virtual void mouseDoubleClickEvent(QMouseEvent* event) override;
@@ -85,6 +82,8 @@ private:
 
     void initMultiSystemTabBar();
     void initLayoutsOnlyTabBar();
+    void collapse();
+    void expand();
 
 private:
     Q_DECLARE_PRIVATE(QnMainWindowTitleBarWidget)

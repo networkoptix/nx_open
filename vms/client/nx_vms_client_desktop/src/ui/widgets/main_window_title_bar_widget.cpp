@@ -38,6 +38,7 @@
 #include <ui/widgets/cloud_status_panel.h>
 #include <ui/widgets/layout_tab_bar.h>
 #include <ui/widgets/main_window_title_bar_state.h>
+#include <ui/widgets/system_tab_bar_state_handler.h>
 #include <ui/workaround/hidpi_workarounds.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_layout.h>
@@ -153,7 +154,7 @@ public:
 
     // Inner state of the widget: expanded and homeTabActive:
     bool expanded = true;
-    bool homeTabActive = true;
+    bool layoutPanelHidden = true;
 };
 
 QnMainWindowTitleBarWidgetPrivate::QnMainWindowTitleBarWidgetPrivate(
@@ -294,30 +295,26 @@ QnLayoutTabBar* QnMainWindowTitleBarWidget::tabBar() const
     return d->layoutBar;
 }
 
-void QnMainWindowTitleBarWidget::setStateStore(QSharedPointer<Store> store)
+void QnMainWindowTitleBarWidget::setStateStore(QSharedPointer<Store> store,
+    QSharedPointer<StateHandler> stateHandler)
 {
     Q_D(QnMainWindowTitleBarWidget);
     d->store = store;
     connect(this, &QnMainWindowTitleBarWidget::toggled,
-        store.data(), &MainWindowTitleBarStateStore::setExpanded);
-    connect(this, &QnMainWindowTitleBarWidget::homeTabActivationChanged,
-        store.data(), &MainWindowTitleBarStateStore::setHomeTabActive);
-    connect(store.data(), &MainWindowTitleBarStateStore::stateChanged, this,
-        [this](MainWindowTitleBarState state)
+        store.get(), &MainWindowTitleBarStateStore::setExpanded);
+    connect(store.get(), &MainWindowTitleBarStateStore::stateChanged, this,
+        [this, store](MainWindowTitleBarState state)
         {
             if (state.expanded)
                 expand();
             else
                 collapse();
 
-            setHomeTabActive(state.homeTabActive);
+            hideLayoutPanel(store->isLayoutPanelHidden());
         });
-}
-
-QSharedPointer<QnMainWindowTitleBarWidget::Store> QnMainWindowTitleBarWidget::stateStore() const
-{
-    Q_D(const QnMainWindowTitleBarWidget);
-    return d->store;
+    connect(stateHandler.get(), &SystemTabBarStateHandler::enableChanged,
+        this, &QWidget::setEnabled);
+    d->systemBar->setStateStore(store, stateHandler);
 }
 
 void QnMainWindowTitleBarWidget::setTabBarStuffVisible(bool visible)
@@ -329,13 +326,13 @@ void QnMainWindowTitleBarWidget::setTabBarStuffVisible(bool visible)
     action(menu::OpenNewTabAction)->setEnabled(visible);
 }
 
-void QnMainWindowTitleBarWidget::setHomeTabActive(bool isActive)
+void QnMainWindowTitleBarWidget::hideLayoutPanel(bool hide)
 {
     Q_D(QnMainWindowTitleBarWidget);
-    if (d->homeTabActive == isActive)
+    if (d->layoutPanelHidden == hide)
         return;
 
-    if (isActive)
+    if (hide)
     {
         if (d->expanded)
         {
@@ -344,11 +341,9 @@ void QnMainWindowTitleBarWidget::setHomeTabActive(bool isActive)
             d->systemBar->show();
         }
         setFixedHeight(kSystemBarHeight);
-        d->systemBar->activateHomeTab();
     }
     else
     {
-        d->systemBar->activatePreviousTab();
         for (auto widget: d->widgetsToTransfer)
             widget->show();
         if (!d->expanded)
@@ -356,21 +351,14 @@ void QnMainWindowTitleBarWidget::setHomeTabActive(bool isActive)
         else
             setFixedHeight(kFullTitleBarHeight);
     }
-    d->resizer->setVisible(!isActive);
-    d->homeTabActive = isActive;
-    emit homeTabActivationChanged(isActive);
+    d->resizer->setVisible(!hide);
+    d->layoutPanelHidden = hide;
 }
 
 bool QnMainWindowTitleBarWidget::isExpanded() const
 {
     Q_D(const QnMainWindowTitleBarWidget);
     return d->expanded;
-}
-
-bool QnMainWindowTitleBarWidget::isSystemTabBarUpdating() const
-{
-    Q_D(const QnMainWindowTitleBarWidget);
-    return d->systemBar && d->systemBar->isUpdating();
 }
 
 void QnMainWindowTitleBarWidget::mouseDoubleClickEvent(QMouseEvent* event)
@@ -411,7 +399,8 @@ void QnMainWindowTitleBarWidget::dragMoveEvent(QDragMoveEvent* event)
     if (d->mimeData->isEmpty())
         return;
 
-    if (!qBetween(d->layoutBar->pos().x(), event->pos().x(), d->cloudPanel->pos().x()))
+    const int x = event->position().toPoint().x();
+    if (!qBetween(d->layoutBar->pos().x(), x, d->cloudPanel->pos().x()))
         return;
 
     event->acceptProposedAction();
@@ -720,13 +709,13 @@ void QnMainWindowTitleBarWidget::expand()
             line->setContentsMargins(kDoubleLevelVLineContentMargins);
             setPaletteColor(line, QPalette::Shadow, core::colorTheme()->color("dark12"));
         }
-        if (d->homeTabActive)
+        if (d->layoutPanelHidden)
             widget->hide();
     }
     d->systemBar->show();
     d->layoutBar->setDoubleLevelContentMargins();
     d->layoutBar->setDoubleLevelPalette();
-    if (!d->homeTabActive)
+    if (!d->layoutPanelHidden)
         setFixedHeight(kFullTitleBarHeight);
     emit toggled(true);
 }

@@ -7,6 +7,7 @@
 
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/workbench/workbench_animations.h>
 #include <ui/animation/opacity_animator.h>
@@ -41,7 +42,13 @@ TitleWorkbenchPanel::TitleWorkbenchPanel(
     m_yAnimator(new VariantAnimator(this)),
     m_opacityProcessor(new HoverFocusProcessor(parentGraphicsWidget))
 {
-    m_widget->setStateStore(mainWindow()->titleBar()->stateStore());
+    m_widget->setObjectName("WorkbenchTitleBar");
+    if (ini().enableMultiSystemTabBar)
+    {
+        m_widget->setStateStore(
+            mainWindow()->titleBarStateStore(),
+            mainWindow()->systemTabBarStateHandler());
+    }
     connect(m_widget, &QnMainWindowTitleBarWidget::geometryChanged, this,
         &TitleWorkbenchPanel::updateControlsGeometry);
 
@@ -189,19 +196,6 @@ void TitleWorkbenchPanel::setGeometry(const QRect& geometry)
 QSize TitleWorkbenchPanel::sizeHint() const
 {
     return m_widget->sizeHint();
-}
-
-void TitleWorkbenchPanel::setExpanded(bool value)
-{
-    if (value)
-        m_widget->expand();
-    else
-        m_widget->collapse();
-}
-
-bool TitleWorkbenchPanel::isExpanded() const
-{
-    return m_widget->isExpanded();
 }
 
 void TitleWorkbenchPanel::updateControlsGeometry()

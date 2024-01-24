@@ -20,9 +20,9 @@ namespace nx::vms::client::desktop {
 
 class NotificationActionHandler;
 class ShowreelActionsHandler;
-class SystemTabBarModel;
 class Workbench;
 class WorkbenchStateManager;
+class ConnectActionsHandler;
 
 namespace workbench {
 
@@ -100,8 +100,6 @@ public:
      */
     QnWorkbenchStreamSynchronizer* streamSynchronizer() const;
 
-    SystemTabBarModel* systemTabBarModel() const;
-
     /** Manages showreel running in the current window, handles corresponding actions.  */
     ShowreelActionsHandler* showreelActionsHandler() const;
 
@@ -117,6 +115,8 @@ public:
      */
     // DisconnectConfirmer?!!!
     WorkbenchStateManager* workbenchStateManager() const;
+
+    ConnectActionsHandler* connectActionsHandler() const;
 
     /**
      * Process startup parameters and call related actions.

@@ -168,8 +168,6 @@ public:
 
     void addSystem(QnUuid systemId, const LogonData& logonData);
     void addSystem(const QString& systemId, const LogonData& logonData);
-    void removeSystem(const QnSystemDescriptionPtr& systemDescription);
-    void removeSystem(const QnUuid& systemId);
 
     /**
      * @return Grid mapper for this workbench.
@@ -189,7 +187,7 @@ public:
     void setItem(Qn::ItemRole role, QnWorkbenchItem* item);
 
     void update(const WorkbenchState& state);
-    void submit(WorkbenchState& state, bool forceIncludeEmptyLayouts = false);
+    void submit(WorkbenchState& state);
     void applyLoadedState();
     bool isInLayoutChangeProcess() const;
     bool isInSessionRestoreProcess() const;

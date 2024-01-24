@@ -22,7 +22,6 @@
 #include <nx/vms/client/desktop/statistics/context_statistics_module.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/logic/connect_actions_handler.h>
-#include <nx/vms/client/desktop/system_tab_bar/system_tab_bar_model.h>
 #include <nx/vms/client/desktop/virtual_camera/virtual_camera_action_handler.h>
 #include <nx/vms/client/desktop/workbench/extensions/local_notifications_manager.h>
 #include <nx/vms/client/desktop/workbench/handlers/notification_action_handler.h>
@@ -59,7 +58,6 @@ struct WindowContext::Private
     std::unique_ptr<QnWorkbenchRenderWatcher> resourceWidgetRenderWatcher;
     std::unique_ptr<QnWorkbenchLayoutAspectRatioWatcher> layoutAspectRatioWatcher;
     std::unique_ptr<QnWorkbenchStreamSynchronizer> streamSynchronizer;
-    std::unique_ptr<SystemTabBarModel> systemTabBarModel;
     std::unique_ptr<LocalNotificationsManager> localNotificationsManager;
     std::unique_ptr<WorkbenchStateManager> workbenchStateManager;
 
@@ -135,10 +133,7 @@ WindowContext::WindowContext(QObject* parent):
 
     // Depends on resourceWidgetRenderWatcher.
     d->streamSynchronizer = std::make_unique<QnWorkbenchStreamSynchronizer>(this);
-
-    d->systemTabBarModel = std::make_unique<SystemTabBarModel>(this);
     d->localNotificationsManager = std::make_unique<LocalNotificationsManager>();
-
     d->workbenchContext->initialize();
 
     // Action handlers.
@@ -242,11 +237,6 @@ QnWorkbenchStreamSynchronizer* WindowContext::streamSynchronizer() const
     return d->streamSynchronizer.get();
 }
 
-SystemTabBarModel* WindowContext::systemTabBarModel() const
-{
-    return d->systemTabBarModel.get();
-}
-
 ShowreelActionsHandler* WindowContext::showreelActionsHandler() const
 {
     return d->showreelActionsHandler.get();
@@ -265,6 +255,11 @@ LocalNotificationsManager* WindowContext::localNotificationsManager() const
 WorkbenchStateManager* WindowContext::workbenchStateManager() const
 {
     return d->workbenchStateManager.get();
+}
+
+ConnectActionsHandler* WindowContext::connectActionsHandler() const
+{
+    return d->connectActionHandler.get();
 }
 
 void WindowContext::handleStartupParameters(const QnStartupParameters& startupParams)

@@ -26,6 +26,7 @@ class WorkbenchUi;
 class ScreenManager;
 class WelcomeScreen;
 class MainWindowTitleBarStateStore;
+class SystemTabBarStateHandler;
 
 class MainWindow: public QnEmulatedFrameWidget, public WindowContextAware
 {
@@ -76,7 +77,8 @@ public:
      */
     bool handleKeyPress(int key);
 
-    bool isSystemTabBarUpdating();
+    QSharedPointer<MainWindowTitleBarStateStore> titleBarStateStore() const;
+    QSharedPointer<SystemTabBarStateHandler> systemTabBarStateHandler() const;
 
     /** Returns QQuickWindow for this window (welcome screen, scene or resource browser). */
     QQuickWindow* quickWindow() const;

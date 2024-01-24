@@ -30,12 +30,13 @@
 #include <nx/vms/client/desktop/showreel/showreel_actions_handler.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/system_tab_bar/system_tab_bar_model.h>
 #include <nx/vms/client/desktop/utils/webengine_profile_manager.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/common/showreel/showreel_manager.h>
 #include <nx/vms/common/system_settings.h>
 #include <ui/graphics/items/resource/resource_widget.h>
+#include <ui/widgets/main_window.h>
+#include <ui/widgets/main_window_title_bar_state.h>
 #include <ui/workbench/extensions/workbench_stream_synchronizer.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
@@ -494,14 +495,12 @@ void Workbench::addSystem(QnUuid systemId, const LogonData& logonData)
     if (!ini().enableMultiSystemTabBar)
         return;
 
-    auto systemDescription = qnSystemsFinder->getSystem(systemId.toString());
-    if (systemDescription.isNull())
-        systemDescription = qnSystemsFinder->getSystem(systemId.toSimpleString());
-
+    auto systemDescription = qnSystemsFinder->getSystem(systemId.toSimpleString());
     if (!NX_ASSERT(systemDescription, "Can't find description for system: %1", systemId))
         return;
 
-    windowContext()->systemTabBarModel()->addSystem(systemDescription, logonData);
+    const auto stateStore = mainWindow()->titleBarStateStore();
+    stateStore->addSystem(systemDescription, logonData);
     emit currentSystemChanged(systemDescription);
 }
 
@@ -514,19 +513,8 @@ void Workbench::addSystem(const QString& systemId, const LogonData& logonData)
 
     NX_ASSERT(systemDescription, "Can't find description for system: %1", systemId);
 
-    windowContext()->systemTabBarModel()->addSystem(systemDescription, logonData);
+    mainWindow()->titleBarStateStore()->addSystem(systemDescription, logonData);
     emit currentSystemChanged(systemDescription);
-}
-
-void Workbench::removeSystem(const QnSystemDescriptionPtr& systemDescription)
-{
-    windowContext()->systemTabBarModel()->removeSystem(systemDescription);
-}
-
-void Workbench::removeSystem(const QnUuid& systemId)
-{
-    if (!systemId.isNull())
-        windowContext()->systemTabBarModel()->removeSystem(systemId.toSimpleString());
 }
 
 void Workbench::setCurrentLayout(QnWorkbenchLayout* layout)
@@ -863,7 +851,7 @@ void Workbench::update(const WorkbenchState& state)
     }
 }
 
-void Workbench::submit(WorkbenchState& state, bool forceIncludeEmptyLayouts)
+void Workbench::submit(WorkbenchState& state)
 {
     auto isLayoutSupported = [](const LayoutResourcePtr& layout, bool allowLocals)
     {
@@ -911,8 +899,7 @@ void Workbench::submit(WorkbenchState& state, bool forceIncludeEmptyLayouts)
             if (isLayoutSupported(resource, /*allowLocals*/ false))
                 state.layoutUuids.push_back(sourceId(resource));
 
-            if (resource->hasFlags(Qn::local) &&
-                (!resource->getItems().empty() || forceIncludeEmptyLayouts))
+            if (resource->hasFlags(Qn::local))
             {
                 WorkbenchState::UnsavedLayout unsavedLayout;
                 unsavedLayout.id = resource->getId();
@@ -926,9 +913,7 @@ void Workbench::submit(WorkbenchState& state, bool forceIncludeEmptyLayouts)
                 unsavedLayout.isCrossSystem = resource->hasFlags(Qn::cross_system);
 
                 for (const auto& itemData: resource->getItems().values())
-                {
                     unsavedLayout.items << itemData;
-                }
                 state.unsavedLayouts << unsavedLayout;
             }
         }
@@ -939,12 +924,11 @@ void Workbench::submit(WorkbenchState& state, bool forceIncludeEmptyLayouts)
 
 void Workbench::applyLoadedState()
 {
-    auto model = windowContext()->systemTabBarModel();
-    auto modelIndex = model->findSystem(system()->localSystemId());
-    if (modelIndex.isValid())
+    if (ini().enableMultiSystemTabBar)
     {
-        const auto workbenchState = modelIndex.data(Qn::WorkbenchStateRole).value<WorkbenchState>();
-        if (!workbenchState.layoutUuids.empty() || !workbenchState.unsavedLayouts.empty())
+        const auto store = mainWindow()->titleBarStateStore();
+        const auto workbenchState = store->workbenchState(system()->localSystemId());
+        if (!workbenchState.isEmpty())
         {
             update(workbenchState);
             return;
