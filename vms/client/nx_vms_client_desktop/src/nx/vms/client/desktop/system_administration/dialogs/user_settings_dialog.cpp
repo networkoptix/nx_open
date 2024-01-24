@@ -49,6 +49,7 @@
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/resource/rest_api_helper.h>
 #include <nx/vms/client/desktop/resource_properties/user/utils/access_subject_editing_context.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/system_administration/globals/user_group_request_chain.h>
 #include <nx/vms/client/desktop/system_administration/watchers/non_editable_users_and_groups.h>
 #include <nx/vms/client/desktop/system_administration/watchers/traffic_relay_url_watcher.h>
@@ -59,6 +60,7 @@
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/ui/messages/resources_messages.h>
 #include <nx/vms/client/desktop/utils/ldap_status_watcher.h>
+#include <nx/vms/client/desktop/utils/timezone_helper.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/resource/server_host_priority.h>
@@ -849,8 +851,15 @@ void UserSettingsDialog::cancelRequest()
 
 int UserSettingsDialog::displayOffset(qint64 msecsSinceEpoch)
 {
+    if (d->user && d->user->userType() == nx::vms::api::UserType::temporaryLocal
+        && systemContext()->userWatcher()->user()->getId() == d->user->getId()
+        && appContext()->localSettings()->timeMode() == Qn::ClientTimeMode)
+    {
+        return 0;
+    }
+
     const auto serverTime = d->serverDate(milliseconds(msecsSinceEpoch));
-    const auto clientTime = QDateTime::fromMSecsSinceEpoch(msecsSinceEpoch);
+    const auto clientTime = QDateTime::fromMSecsSinceEpoch(msecsSinceEpoch, QTimeZone::LocalTime);
 
     return duration_cast<milliseconds>(
         seconds(serverTime.offsetFromUtc() - clientTime.offsetFromUtc())).count();
