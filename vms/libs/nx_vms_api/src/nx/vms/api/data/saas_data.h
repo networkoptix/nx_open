@@ -180,33 +180,18 @@ struct ServiceTypeStatus
 #define ServiceTypeState_fields (status)(issueExpirationDate)
 NX_REFLECTION_INSTRUMENT(ServiceTypeStatus, ServiceTypeState_fields)
 
-/**%apidoc ChannelPartnerSupportPhone */
-struct NX_VMS_API ChannelPartnerSupportPhone
-{
-    /**%apidoc Phone number */
-    QString phone;
-
-    /**%apidoc[opt] Explanation of the phone number */
-    QString description;
-
-    bool operator==(const ChannelPartnerSupportPhone&) const = default;
-};
-#define ChannelPartnerSupportPhone_fields (phone)(description)
-NX_REFLECTION_INSTRUMENT(ChannelPartnerSupportPhone, ChannelPartnerSupportPhone_fields)
-
 /**%apidoc ChannelPartnerSupportEmail */
-struct NX_VMS_API ChannelPartnerSupportEmail
+struct NX_VMS_API ChannelPartnerSupportContactInfoRecord
 {
-    /**%apidoc Email address */
-    QString email;
+    /**%apidoc Email address, phone number or web page address */
+    QString value;
 
-    /**%apidoc[opt] Explanation of the email address */
+    /**%apidoc[opt] Description of the contact information record */
     QString description;
 
-    bool operator==(const ChannelPartnerSupportEmail&) const = default;
+    bool operator==(const ChannelPartnerSupportContactInfoRecord&) const = default;
 };
-#define ChannelPartnerSupportEmail_fields (email)(description)
-NX_REFLECTION_INSTRUMENT(ChannelPartnerSupportEmail, ChannelPartnerSupportEmail_fields)
+NX_REFLECTION_INSTRUMENT(ChannelPartnerSupportContactInfoRecord, (value)(description))
 
 /**%apidoc ChannelPartnerSupportCustomInfo */
 struct NX_VMS_API ChannelPartnerSupportCustomInfo
@@ -219,20 +204,19 @@ struct NX_VMS_API ChannelPartnerSupportCustomInfo
 
     bool operator==(const ChannelPartnerSupportCustomInfo&) const = default;
 };
-#define ChannelPartnerSupportCustomInfo_fields (label)(value)
-NX_REFLECTION_INSTRUMENT(ChannelPartnerSupportCustomInfo, ChannelPartnerSupportCustomInfo_fields)
+NX_REFLECTION_INSTRUMENT(ChannelPartnerSupportCustomInfo, (label)(value))
 
 /**%apidoc ChannelPartnerSupportInformation */
 struct NX_VMS_API ChannelPartnerSupportInformation
 {
-    /**%apidoc Set of web page addresses */
-    std::vector<QString> sites;
+    /**%apidoc Set of structures describing web page addresses */
+    std::vector<ChannelPartnerSupportContactInfoRecord> sites;
 
     /**%apidoc Set of structures describing phone numbers */
-    std::vector<ChannelPartnerSupportPhone> phones;
+    std::vector<ChannelPartnerSupportContactInfoRecord> phones;
 
     /**%apidoc Set of structures describing email addresses */
-    std::vector<ChannelPartnerSupportEmail> emails;
+    std::vector<ChannelPartnerSupportContactInfoRecord> emails;
 
     /**%apidoc Set of structures describing any other information */
     std::vector<ChannelPartnerSupportCustomInfo> custom;
