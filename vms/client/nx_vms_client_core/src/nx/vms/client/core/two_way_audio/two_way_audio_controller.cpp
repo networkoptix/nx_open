@@ -109,7 +109,7 @@ TwoWayAudioController::~TwoWayAudioController()
 void TwoWayAudioController::registerQmlType()
 {
     qmlRegisterUncreatableType<TwoWayAudioController>(
-        "nx.client.core", 1, 0, "TwoWayAudioController",
+        "nx.vms.client.core", 1, 0, "TwoWayAudioController",
         "Cannot create an instance of TwoWayAudioController without a system context.");
 }
 

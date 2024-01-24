@@ -107,7 +107,7 @@ QPoint CursorManager::pos() const
 
 void CursorManager::registerQmlType()
 {
-    qmlRegisterType<CursorManager>("nx.client.desktop", 1, 0, "CursorManager");
+    qmlRegisterType<CursorManager>("nx.vms.client.desktop", 1, 0, "CursorManager");
 }
 
 } // namespace nx::vms::client::desktop

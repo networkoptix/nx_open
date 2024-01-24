@@ -92,7 +92,7 @@ void MotionRegionsItem::setFillOpacity(qreal value)
 
 void MotionRegionsItem::registerQmlType()
 {
-    qmlRegisterType<MotionRegionsItem>("nx.client.desktop", 1, 0, "MotionRegions");
+    qmlRegisterType<MotionRegionsItem>("nx.vms.client.desktop", 1, 0, "MotionRegions");
 }
 
 QSGNode* MotionRegionsItem::updatePaintNode(

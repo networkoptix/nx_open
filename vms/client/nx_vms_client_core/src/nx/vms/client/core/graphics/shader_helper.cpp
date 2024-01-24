@@ -29,7 +29,7 @@ QString ShaderHelper::processSource(const QString& source)
 
 void ShaderHelper::registerQmlType()
 {
-    qmlRegisterSingletonType<ShaderHelper>("nx.client.core.graphics", 1, 0, "ShaderHelper",
+    qmlRegisterSingletonType<ShaderHelper>("nx.vms.client.core", 1, 0, "ShaderHelper",
         shaderHelperProvider);
 }
 

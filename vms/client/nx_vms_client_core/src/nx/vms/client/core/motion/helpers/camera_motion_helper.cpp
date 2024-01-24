@@ -68,7 +68,7 @@ void CameraMotionHelper::fillRegion(int channel, int sensitivity, const QPoint& 
 
 void CameraMotionHelper::registerQmlType()
 {
-    qmlRegisterType<CameraMotionHelper>("nx.client.core", 1, 0, "CameraMotionHelper");
+    qmlRegisterType<CameraMotionHelper>("nx.vms.client.core", 1, 0, "CameraMotionHelper");
 }
 
 } // namespace nx::vms::client::core

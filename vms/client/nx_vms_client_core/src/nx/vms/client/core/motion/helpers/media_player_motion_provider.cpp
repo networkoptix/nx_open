@@ -95,7 +95,8 @@ QByteArray MediaPlayerMotionProvider::motionMask(int channel) const
 
 void MediaPlayerMotionProvider::registerQmlType()
 {
-    qmlRegisterType<MediaPlayerMotionProvider>("nx.client.core", 1, 0, "MediaPlayerMotionProvider");
+    qmlRegisterType<MediaPlayerMotionProvider>(
+        "nx.vms.client.core", 1, 0, "MediaPlayerMotionProvider");
 }
 
 } // namespace nx::vms::client::core

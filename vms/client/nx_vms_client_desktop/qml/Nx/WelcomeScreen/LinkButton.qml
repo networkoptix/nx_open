@@ -1,9 +1,10 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import Nx 1.0
-import Nx.Core 1.0
-import Nx.Controls 1.0
-import nx.client.desktop 1.0
+import Nx
+import Nx.Core
+import Nx.Controls
+
+import nx.vms.client.desktop
 
 TextButton
 {

@@ -7,7 +7,7 @@ import Nx
 import Nx.Core
 import Nx.Controls
 
-import nx.client.desktop
+import nx.vms.client.desktop
 
 Button
 {

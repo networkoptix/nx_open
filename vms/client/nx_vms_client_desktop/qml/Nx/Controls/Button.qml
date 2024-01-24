@@ -6,7 +6,7 @@ import QtQuick.Controls.impl
 
 import Nx
 import Nx.Core
-import nx.client.desktop
+
 import nx.vms.client.core
 import nx.vms.client.desktop
 

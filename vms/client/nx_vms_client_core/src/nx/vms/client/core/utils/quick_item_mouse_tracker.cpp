@@ -155,7 +155,7 @@ void QuickItemMouseTracker::setContainsMouse(bool containsMouse)
 
 void QuickItemMouseTracker::registerQmlType()
 {
-    qmlRegisterType<QuickItemMouseTracker>("nx.client.core", 1, 0, "MouseTracker");
+    qmlRegisterType<QuickItemMouseTracker>("nx.vms.client.core", 1, 0, "MouseTracker");
 }
 
 } // namespace nx::vms::client::core

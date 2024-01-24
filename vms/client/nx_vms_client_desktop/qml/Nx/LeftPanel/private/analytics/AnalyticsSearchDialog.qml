@@ -10,7 +10,7 @@ import Nx.Controls
 import Nx.Models
 import Nx.RightPanel
 
-import nx.client.desktop
+import nx.vms.client.desktop
 import nx.vms.client.core
 import nx.vms.client.desktop
 import nx.vms.client.desktop.analytics as Analytics

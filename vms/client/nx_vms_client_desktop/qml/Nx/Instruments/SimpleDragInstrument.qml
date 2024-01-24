@@ -5,7 +5,7 @@ import QtQuick
 import Nx
 import Nx.Core
 
-import nx.client.core
+import nx.vms.client.core
 import nx.vms.client.desktop
 
 Instrument

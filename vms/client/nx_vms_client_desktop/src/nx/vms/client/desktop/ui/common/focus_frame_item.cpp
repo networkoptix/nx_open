@@ -105,7 +105,7 @@ void FocusFrameItem::setFrameWidth(int frameWidth)
 
 void FocusFrameItem::registerQmlType()
 {
-    qmlRegisterType<FocusFrameItem>("nx.client.desktop", 1, 0, "FocusFrame");
+    qmlRegisterType<FocusFrameItem>("nx.vms.client.desktop", 1, 0, "FocusFrame");
 }
 
 QSGNode* FocusFrameItem::updatePaintNode(

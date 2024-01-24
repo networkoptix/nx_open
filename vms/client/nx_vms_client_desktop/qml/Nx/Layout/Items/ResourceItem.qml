@@ -1,13 +1,14 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.14
-import QtQml 2.14
+import QtQml
+import QtQuick
 
-import Nx 1.0
-import Nx.Core 1.0
-import Nx.Instruments 1.0
-import nx.client.core 1.0
-import nx.client.desktop 1.0
+import Nx
+import Nx.Core
+import Nx.Instruments
+
+import nx.vms.client.core
+import nx.vms.client.desktop
 
 Item
 {

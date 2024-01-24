@@ -206,7 +206,7 @@ void MotionMaskItem::releaseResources()
 
 void MotionMaskItem::registerQmlType()
 {
-    qmlRegisterType<MotionMaskItem>("nx.client.core", 1, 0, "MotionMaskItem");
+    qmlRegisterType<MotionMaskItem>("nx.vms.client.core", 1, 0, "MotionMaskItem");
 }
 
 } // namespace nx::vms::client::core
