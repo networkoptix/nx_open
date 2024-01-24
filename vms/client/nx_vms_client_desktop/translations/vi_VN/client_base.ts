@@ -1920,23 +1920,23 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>RHI device ID</source>
-      <translation type="unfinished">RHI device ID</translation>
+      <translation>ID thiết bị RHI</translation>
     </message>
     <message>
       <source>RHI vendor ID</source>
-      <translation type="unfinished">RHI vendor ID</translation>
+      <translation>ID nhà cung cấp RHI</translation>
     </message>
     <message>
       <source>RHI max texture size</source>
-      <translation type="unfinished">RHI max texture size</translation>
+      <translation>Kích thước kết cấu tối đa RHI</translation>
     </message>
     <message>
       <source>Graphics API</source>
-      <translation type="unfinished">Graphics API</translation>
+      <translation>API đồ họa</translation>
     </message>
     <message>
       <source>Unable to get GPU information for %1</source>
-      <translation type="unfinished">Unable to get GPU information for %1</translation>
+      <translation>Không thể lấy thông tin GPU cho %1</translation>
     </message>
   </context>
   <context>
@@ -2040,7 +2040,7 @@ Khóa giấy phép: %2</translation>
     <name>QnAttachToVideowallDialog</name>
     <message>
       <source>System shut down. To attach to a Video Wall, the System should be in active state. %1</source>
-      <translation type="unfinished">System shut down. To attach to a Video Wall, the System should be in active state. %1</translation>
+      <translation>Hệ thống đã tắt. Để gắn vào Tường Video, Hệ thống phải ở trạng thái hoạt động. %1</translation>
     </message>
   </context>
   <context>
@@ -3034,7 +3034,7 @@ Khóa giấy phép: %2</translation>
     <message>
       <source>There is currently no connection between your system and %1.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">There is currently no connection between your system and %1.</translation>
+      <translation>Hiện tại không có kết nối giữa hệ thống của bạn và %1.</translation>
     </message>
   </context>
   <context>
@@ -4431,12 +4431,12 @@ Khóa giấy phép: %2</translation>
     <message>
       <source>User %1 has no %2 permissions for selected camera</source>
       <comment>%1 is the name of selected user, %2 is permission name</comment>
-      <translation type="unfinished">User %1 has no %2 permissions for selected camera</translation>
+      <translation>Người dùng %1 không có quyền %2 nào đối với camera đã chọn</translation>
     </message>
     <message>
       <source>User %1 has no %2 permissions for some of selected cameras</source>
       <comment>%1 is the name of the selected user, %2 is the permission name</comment>
-      <translation type="unfinished">User %1 has no %2 permissions for some of selected cameras</translation>
+      <translation>Người dùng %1 không có quyền %2 đối với một số camera được chọn</translation>
     </message>
   </context>
   <context>
@@ -4949,7 +4949,7 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>SYSTEM SHUT DOWN</source>
-      <translation type="unfinished">SYSTEM SHUT DOWN</translation>
+      <translation>HỆ THỐNG ĐÃ TẮT</translation>
     </message>
   </context>
   <context>
@@ -5093,11 +5093,11 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>If cloud storage is activated for backup, other backup storages will be deactivated and the &quot;All archive&quot; option for already configured devices will be changed to &quot;Motion, Object, Bookmarks&quot;</source>
-      <translation type="unfinished">If cloud storage is activated for backup, other backup storages will be deactivated and the &quot;All archive&quot; option for already configured devices will be changed to &quot;Motion, Object, Bookmarks&quot;</translation>
+      <translation>Nếu bộ lưu trữ đám mây được kích hoạt để sao lưu, các bộ lưu trữ sao lưu khác sẽ bị vô hiệu hóa và tùy chọn &quot;Tất cả lưu trữ&quot; cho các thiết bị đã được định cấu hình sẽ được thay đổi thành &quot;Chuyển động, Đối tượng, Dấu trang&quot;</translation>
     </message>
     <message>
       <source>If cloud storage is activated for backup, the &quot;All archive&quot; option for already configured devices will be changed to &quot;Motion, Object, Bookmarks&quot;</source>
-      <translation type="unfinished">If cloud storage is activated for backup, the &quot;All archive&quot; option for already configured devices will be changed to &quot;Motion, Object, Bookmarks&quot;</translation>
+      <translation>Nếu bộ lưu trữ đám mây được kích hoạt để sao lưu, tùy chọn &quot;Tất cả lưu trữ&quot; cho các thiết bị đã được cấu hình sẽ được thay đổi thành &quot;Chuyển động, Đối tượng, Dấu trang&quot;</translation>
     </message>
   </context>
   <context>
@@ -5321,7 +5321,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Failed to save system settings</source>
-      <translation type="unfinished">Failed to save system settings</translation>
+      <translation>Không lưu được cài đặt hệ thống</translation>
     </message>
   </context>
   <context>
@@ -5486,11 +5486,11 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Intercom call</source>
-      <translation type="unfinished">Intercom call</translation>
+      <translation>Cuộc gọi Liên lạc nội bộ</translation>
     </message>
     <message>
       <source>Intercom missed call</source>
-      <translation type="unfinished">Intercom missed call</translation>
+      <translation>Cuộc gọi nhỡ liên lạc nội bộ</translation>
     </message>
   </context>
   <context>
@@ -5923,26 +5923,26 @@ Chúng tôi khuyên bạn không nên mở tích hợp này. Nếu bạn hiểu 
     </message>
     <message numerus="yes">
       <source>Failed to open %n devices on the video wall:</source>
-      <translation type="unfinished">
-        <numerusform>Failed to open %n devices on the video wall:</numerusform>
+      <translation>
+        <numerusform>Không mở được %n thiết bị trên tường video:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Failed to open %n cameras on the video wall:</source>
-      <translation type="unfinished">
-        <numerusform>Failed to open %n cameras on the video wall:</numerusform>
+      <translation>
+        <numerusform>Không mở được %n camera trên tường video:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>You cannot add to the video wall devices for which you do not have View Live permission.</source>
-      <translation type="unfinished">
-        <numerusform>You cannot add to the video wall devices for which you do not have View Live permission.</numerusform>
+      <translation>
+        <numerusform>Bạn không thể thêm vào Tường video các thiết bị mà bạn không có quyền Xem trực tiếp.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>You cannot add to the video wall cameras for which you do not have View Live permission.</source>
-      <translation type="unfinished">
-        <numerusform>You cannot add to the video wall cameras for which you do not have View Live permission.</numerusform>
+      <translation>
+        <numerusform>Bạn không thể thêm vào Tường video các camera mà bạn không có quyền Xem trực tiếp.</numerusform>
       </translation>
     </message>
     <message>
@@ -5951,7 +5951,7 @@ Chúng tôi khuyên bạn không nên mở tích hợp này. Nếu bạn hiểu 
     </message>
     <message>
       <source>To add a Video Wall, the System should be in active state. %1</source>
-      <translation type="unfinished">To add a Video Wall, the System should be in active state. %1</translation>
+      <translation>Để thêm Tường Video, Hệ thống phải ở trạng thái hoạt động. %1</translation>
     </message>
   </context>
   <context>
@@ -6348,12 +6348,12 @@ Chúng tôi khuyên bạn không nên mở tích hợp này. Nếu bạn hiểu 
     <message>
       <source>All members of %1 and %2 groups will get access to this layout</source>
       <comment>%1 and %2 will be substituted with user group names</comment>
-      <translation type="unfinished">All members of %1 and %2 groups will get access to this layout</translation>
+      <translation>Tất cả thành viên của nhóm %1 và %2 sẽ có quyền truy cập vào bố cục này</translation>
     </message>
     <message>
       <source>Convert</source>
       <comment>Converting layout to shared</comment>
-      <translation type="unfinished">Convert</translation>
+      <translation>Chuyển đổi</translation>
     </message>
   </context>
   <context>
@@ -7231,11 +7231,11 @@ Chúng tôi khuyên bạn không nên mở tích hợp này. Nếu bạn hiểu 
     </message>
     <message>
       <source>To perform backup to a cloud storage, the System should be in active state. %1</source>
-      <translation type="unfinished">To perform backup to a cloud storage, the System should be in active state. %1</translation>
+      <translation>Để thực hiện sao lưu vào bộ lưu trữ đám mây, Hệ thống phải ở trạng thái hoạt động. %1</translation>
     </message>
     <message>
       <source>System suspended. To make changes to backup configuration, the System should be in active state. %1</source>
-      <translation type="unfinished">System suspended. To make changes to backup configuration, the System should be in active state. %1</translation>
+      <translation>Hệ thống bị đình chỉ. Để thực hiện các thay đổi đối với cấu hình sao lưu, Hệ thống phải ở trạng thái hoạt động. %1</translation>
     </message>
   </context>
   <context>
@@ -7310,7 +7310,7 @@ Chúng tôi khuyên bạn không nên mở tích hợp này. Nếu bạn hiểu 
     </message>
     <message>
       <source>Missed Call</source>
-      <translation type="unfinished">Missed Call</translation>
+      <translation>Cuộc gọi Nhỡ</translation>
     </message>
   </context>
   <context>
@@ -8989,11 +8989,11 @@ Chúng tôi khuyên bạn không nên mở tích hợp này. Nếu bạn hiểu 
     </message>
     <message>
       <source>Current group is a member of all groups selected on this tab and inherits permissions from each of them.</source>
-      <translation type="unfinished">Current group is a member of all groups selected on this tab and inherits permissions from each of them.</translation>
+      <translation>Nhóm hiện tại là thành viên của tất cả các nhóm được chọn trên thẻ này và kế thừa quyền từ mỗi nhóm.</translation>
     </message>
     <message>
       <source>Select one or multiple groups from which the current group will inherit permissions</source>
-      <translation type="unfinished">Select one or multiple groups from which the current group will inherit permissions</translation>
+      <translation>Chọn một hoặc nhiều nhóm mà nhóm hiện tại sẽ kế thừa quyền</translation>
     </message>
   </context>
   <context>
@@ -9580,7 +9580,7 @@ Hãy nhớ trả lại Mức ghi nhật ký về cài đặt mặc định sau k
     </message>
     <message>
       <source>It is recommended to contact %1 before proceeding.</source>
-      <translation type="unfinished">It is recommended to contact %1 before proceeding.</translation>
+      <translation>Khuyến nghị liên hệ với %1 trước khi tiếp tục.</translation>
     </message>
   </context>
   <context>
@@ -10007,18 +10007,18 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
     <name>nx::vms::client::desktop::NoPermissionsOverlayWidget</name>
     <message>
       <source>You do not have permission to edit settings of this camera</source>
-      <translation type="unfinished">You do not have permission to edit settings of this camera</translation>
+      <translation>Bạn không có quyền chỉnh sửa cài đặt của camera này</translation>
     </message>
     <message>
       <source>You do not have permission to edit settings of some cameras</source>
-      <translation type="unfinished">You do not have permission to edit settings of some cameras</translation>
+      <translation>Bạn không có quyền chỉnh sửa cài đặt của một số camera</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::NonEditableUsersAndGroups</name>
     <message>
       <source>User management for organization users is available only at the organization level, not the system level</source>
-      <translation type="unfinished">User management for organization users is available only at the organization level, not the system level</translation>
+      <translation>Quản lý người dùng dành cho người dùng tổ chức chỉ khả dụng ở cấp tổ chức chứ không phải cấp hệ thống</translation>
     </message>
     <message>
       <source>You do not have permissions to modify this user</source>
@@ -10026,15 +10026,15 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
     </message>
     <message>
       <source>You cannot modify a user with a non-unique login</source>
-      <translation type="unfinished">You cannot modify a user with a non-unique login</translation>
+      <translation>Bạn không thể sửa đổi người dùng bằng thông tin đăng nhập không phải duy nhất</translation>
     </message>
     <message>
       <source>You may not have permissions to modify certain members of this group, or it includes users with duplicate logins</source>
-      <translation type="unfinished">You may not have permissions to modify certain members of this group, or it includes users with duplicate logins</translation>
+      <translation>Có thể bạn không có quyền sửa đổi một số thành viên nhất định của nhóm này hoặc nhóm bao gồm những người dùng có thông tin đăng nhập trùng lặp</translation>
     </message>
     <message>
       <source>You do not have permissions to modify this group</source>
-      <translation type="unfinished">You do not have permissions to modify this group</translation>
+      <translation>Bạn không có quyền sửa đổi nhóm này</translation>
     </message>
   </context>
   <context>
@@ -11044,8 +11044,8 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message numerus="yes">
       <source>I trust these servers</source>
-      <translation type="unfinished">
-        <numerusform>I trust these servers</numerusform>
+      <translation>
+        <numerusform>Tôi tin tưởng những máy chủ này</numerusform>
       </translation>
     </message>
   </context>

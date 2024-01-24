@@ -2366,6 +2366,10 @@ Trykk Alt + Klikk for å følge objektet</translation>
       <source>Selected on Timeline</source>
       <translation>Valgt på tidslinjen</translation>
     </message>
+    <message>
+      <source>Not clickable due to the DST change</source>
+      <translation>Ikke klikkbar på grunn av DST-endringen</translation>
+    </message>
   </context>
   <context>
     <name>TreeView</name>

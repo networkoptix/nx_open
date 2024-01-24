@@ -2353,6 +2353,10 @@ Nhấn Alt + Click để theo dõi đối tượng</translation>
       <source>Selected on Timeline</source>
       <translation>Được chọn trên Dòng thời gian</translation>
     </message>
+    <message>
+      <source>Not clickable due to the DST change</source>
+      <translation>Không thể nhấp được do thay đổi DST</translation>
+    </message>
   </context>
   <context>
     <name>TreeView</name>
