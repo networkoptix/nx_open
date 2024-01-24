@@ -63,6 +63,8 @@ private:
         std::shared_ptr<WebSocketConnection> connection;
         std::vector<nx::utils::Guard> guards;
         std::list<std::thread> threads;
+
+        void stop();
     };
 
     void executeAsync(
