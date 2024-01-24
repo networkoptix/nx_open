@@ -100,6 +100,9 @@ struct AccountData
 
     /**%apidoc Maximum authentication session lifetime. */
     std::optional<std::chrono::seconds> authSessionLifetime;
+
+    /**%apidoc[readonly] Shows if this account belongs to an organization. */
+    std::optional<bool> accountBelongsToOrganization;
 };
 
 struct AccountStatusData
@@ -140,6 +143,12 @@ struct AccountUpdateData
 
     /**%apidoc One-time password from the authenticator app or any other source. */
     std::optional<std::string> mfaCode;
+};
+
+struct AccountOrganizationAttrs
+{
+    /**%apidoc Shows if this account belongs to an organization. */
+    bool belongsToSomeOrganization = false;
 };
 
 // Holder structure to send just email in a response.
