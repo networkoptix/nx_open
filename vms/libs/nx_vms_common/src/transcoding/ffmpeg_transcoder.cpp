@@ -122,17 +122,14 @@ int QnFfmpegTranscoder::setContainer(const QString& container)
     AVOutputFormat * outputCtx = av_guess_format(m_container.toLatin1().data(), NULL, NULL);
     if (outputCtx == 0)
     {
-        m_lastErrMessage = tr("Container %1 was not found in FFMPEG library.").arg(container);
-        qWarning() << m_lastErrMessage;
+        NX_WARNING(this, "Container %1 was not found in FFMPEG library.", container);
         return -1;
     }
-    //outputCtx->flags |= AVFMT_VARIABLE_FPS;
 
     int err = avformat_alloc_output_context2(&m_formatCtx, outputCtx, 0, "");
     if (err != 0)
     {
-        m_lastErrMessage = tr("Could not create output context for format %1.").arg(container);
-        qWarning() << m_lastErrMessage;
+        NX_WARNING(this, "Could not create output context for format %1.", container);
         return -2;
     }
     if (container == QLatin1String("rtp"))
@@ -171,8 +168,7 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
         AVStream* videoStream = avformat_new_stream(m_formatCtx, nullptr);
         if (videoStream == 0)
         {
-            m_lastErrMessage = tr("Could not allocate output stream for recording.");
-            NX_ERROR(this, m_lastErrMessage);
+            NX_ERROR(this, "Could not allocate output stream for recording.");
             return -1;
         }
 
@@ -186,9 +182,7 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
             m_vTranscoder->setSourceResolution(m_sourceResolution);
             if (!m_vTranscoder->open(video))
             {
-                m_vTranscoder->getLastError().isEmpty();
-                NX_WARNING(this, "Can't open video transcoder for RTSP streaming: [%1]",
-                    m_vTranscoder->getLastError());
+                NX_WARNING(this, "Can't open video transcoder for RTSP streaming");
                 return -1;
             }
 
@@ -221,7 +215,8 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
                 videoHeight = decoder.getHeight();
                 if (videoWidth < 1 || videoHeight < 1)
                 {
-                    m_lastErrMessage = tr("Could not perform direct stream copy because frame size is undefined.");
+                    NX_WARNING(this,
+                        "Could not perform direct stream copy because frame size is undefined.");
                     closeFfmpegContext();
                     return -3;
                 }
@@ -296,8 +291,7 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
         AVStream* audioStream = avformat_new_stream(m_formatCtx, nullptr);
         if (audioStream == 0)
         {
-            m_lastErrMessage = tr("Could not allocate output stream for recording.");
-            NX_ERROR(this, m_lastErrMessage);
+            NX_ERROR(this, "Could not allocate output stream for recording.");
             return -1;
         }
 
@@ -305,7 +299,7 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
         AVCodec* avCodec = avcodec_find_decoder(m_audioCodec);
         if (avCodec == 0)
         {
-            m_lastErrMessage = tr("Could not find codec %1.").arg(m_audioCodec);
+            NX_WARNING(this, "Could not find codec %1.", m_audioCodec);
             closeFfmpegContext();
             return -2;
         }
@@ -337,8 +331,7 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
     if (rez < 0)
     {
         closeFfmpegContext();
-        m_lastErrMessage = tr("Video or audio codec is incompatible with container %1.").arg(m_container);
-        NX_ERROR(this, m_lastErrMessage);
+        NX_ERROR(this, "Video or audio codec is incompatible with container %1.", m_container);
         return -3;
     }
 
