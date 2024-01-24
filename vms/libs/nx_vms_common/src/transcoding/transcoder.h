@@ -75,13 +75,11 @@ public:
         \return return Return error code or 0 if no error
     */
     virtual int transcodePacket(const QnConstAbstractMediaDataPtr& media, QnAbstractMediaDataPtr* const result) = 0;
-    QString getLastError() const;
     virtual void setQuality( Qn::StreamQuality quality );
     static QRect roundRect(const QRect& srcRect);
     static QSize roundSize(const QSize& size);
 
 protected:
-    QString m_lastErrMessage;
     QnCodecParams::Value m_params;
     int m_bitrate;
     AVCodecID m_codecId;

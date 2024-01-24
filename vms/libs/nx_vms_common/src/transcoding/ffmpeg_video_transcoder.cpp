@@ -179,7 +179,7 @@ bool QnFfmpegVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
     AVCodec* avCodec = avcodec_find_encoder(m_codecId);
     if (avCodec == 0)
     {
-        m_lastErrMessage = tr("Could not find encoder for codec %1.").arg(m_codecId);
+        NX_WARNING(this, "Could not find encoder for codec %1.", m_codecId);
         return false;
     }
 
@@ -237,7 +237,8 @@ bool QnFfmpegVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
 
     if (avcodec_open2(m_encoderCtx, avCodec, options) < 0)
     {
-        m_lastErrMessage = tr("Could not initialize video encoder.");
+        NX_WARNING(this, "Could not initialize video encoder.");
+        close();
         return false;
     }
 
@@ -253,13 +254,6 @@ int QnFfmpegVideoTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
         result->reset();
 
     const auto video = std::dynamic_pointer_cast<const QnCompressedVideoData>(media);
-
-    if (!m_lastErrMessage.isEmpty())
-    {
-        NX_DEBUG(this, "Transcoding error: %1", m_lastErrMessage);
-        return -3;
-    }
-
     if (auto ret = transcodePacketImpl(video, result))
         return ret;
 
@@ -311,7 +305,13 @@ std::pair<uint32_t, QnFfmpegVideoDecoder*> QnFfmpegVideoTranscoder::getDecoder(
 int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDataPtr& video, QnAbstractMediaDataPtr* const result)
 {
     if (!m_encoderCtx && video)
-        open(video);
+    {
+        if (!open(video))
+        {
+            NX_WARNING(this, "Faield to open video transcoder");
+            return false;
+        }
+    }
 
     if (!m_encoderCtx)
     {

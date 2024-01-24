@@ -98,7 +98,7 @@ bool QnFfmpegAudioTranscoder::open(const QnConstCompressedAudioDataPtr& audio)
 {
     if (!audio->context)
     {
-        m_lastErrMessage = tr("Audio context was not specified.");
+        NX_WARNING(this, "Audio context was not specified.");
         return false;
     }
     return open(audio->context);
@@ -111,7 +111,7 @@ bool QnFfmpegAudioTranscoder::open(const CodecParametersConstPtr& context)
     AVCodec* avCodec = avcodec_find_encoder(m_codecId);
     if (!avCodec)
     {
-        m_lastErrMessage = tr("Could not find encoder for codec %1.").arg(m_codecId);
+        NX_WARNING(this, "Could not find encoder for codec %1.", m_codecId);
         return false;
     }
 
@@ -135,15 +135,14 @@ bool QnFfmpegAudioTranscoder::open(const CodecParametersConstPtr& context)
 
     if (avcodec_open2(m_encoderCtx, avCodec, 0) < 0)
     {
-        m_lastErrMessage = tr("Could not initialize audio encoder.");
+        NX_WARNING(this, "Could not initialize audio encoder.");
         return false;
     }
 
     avCodec = avcodec_find_decoder(context->getCodecId());
     if (!avCodec)
     {
-        m_lastErrMessage = tr("Could not find decoder for codec %1.")
-            .arg(context->getCodecId());
+        NX_WARNING(this, "Could not find decoder for codec %1.", context->getCodecId());
         return false;
     }
 
@@ -151,7 +150,7 @@ bool QnFfmpegAudioTranscoder::open(const CodecParametersConstPtr& context)
     context->toAvCodecContext(m_decoderCtx);
     if (avcodec_open2(m_decoderCtx, avCodec, 0) < 0)
     {
-        m_lastErrMessage = tr("Could not initialize audio decoder.");
+        NX_WARNING(this, "Could not initialize audio decoder.");
         return false;
     }
 
@@ -238,15 +237,15 @@ int QnFfmpegAudioTranscoder::transcodePacket(
                 break;
             if (error)
             {
-                m_lastErrMessage = tr("Could not receive audio frame from decoder, Error code: %1.")
-                    .arg(error);
+                NX_WARNING(this, "Could not receive audio frame from decoder, Error code: %1.",
+                    QnFfmpegHelper::avErrorToString(error));
                 return error;
             }
 
             // 3. Resample data
             if (!m_resampler.pushFrame(decodedFrame))
             {
-                m_lastErrMessage = tr("Could not allocate sample buffers");
+                NX_WARNING(this, "Could not allocate sample buffers");
                 av_frame_free(&decodedFrame);
                 return AVERROR(EINVAL);
             }
@@ -257,8 +256,8 @@ int QnFfmpegAudioTranscoder::transcodePacket(
                 error = avcodec_send_frame(m_encoderCtx, resampledFrame);
                 if (error && error != AVERROR(EAGAIN))
                 {
-                    m_lastErrMessage = tr("Could not send audio frame to encoder, Error code: %1.")
-                        .arg(error);
+                    NX_WARNING(this, "Could not send audio frame to encoder, Error code: %1.",
+                        QnFfmpegHelper::avErrorToString(error));
                     return error;
                 }
             }
@@ -273,8 +272,8 @@ int QnFfmpegAudioTranscoder::transcodePacket(
 
     if (error)
     {
-        m_lastErrMessage = tr("Could not receive audio packet from encoder, Error code: %1.")
-            .arg(error);
+        NX_WARNING(this, "Could not receive audio packet from encoder, Error code: %1.",
+            QnFfmpegHelper::avErrorToString(error));
         return error;
     }
 
