@@ -842,7 +842,7 @@ qreal Geometry::distanceToEdge(const QPointF& p, const QLineF& edge)
 
 void Geometry::registerQmlType()
 {
-    qmlRegisterSingletonType<Geometry>("nx.client.core", 1, 0, "Geometry", &createInstance);
+    qmlRegisterSingletonType<Geometry>("nx.vms.client.core", 1, 0, "Geometry", &createInstance);
 }
 
 } // namespace nx::vms::client::core

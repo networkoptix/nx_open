@@ -153,7 +153,7 @@ QSizeF FrameSection::sizeDelta(const QPointF& dragDelta, FrameSection::Section s
 void FrameSection::registedQmlType()
 {
     qmlRegisterSingletonType<FrameSection>(
-        "nx.client.core", 1, 0, "FrameSection", &createFrameSection);
+        "nx.vms.client.core", 1, 0, "FrameSection", &createFrameSection);
 }
 
 } // namespace nx::vms::client::core

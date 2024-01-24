@@ -7,7 +7,7 @@ import Nx
 import Nx.Controls
 import Nx.Core
 
-import nx.client.desktop
+import nx.vms.client.desktop
 
 TextButton
 {

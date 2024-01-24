@@ -1,17 +1,18 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.6
-import QtQuick.Controls 2.4
-import QtQuick.Layouts 1.11
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Layouts
 
-import Nx 1.0
-import Nx.Core 1.0
-import Nx.Controls 1.0
-import Nx.Items 1.0
-import Nx.Layout 1.0
-import Nx.RightPanel 1.0
-import nx.client.desktop 1.0
-import Nx.Debug 1.0
+import nx.vms.client.desktop
+
+import Nx
+import Nx.Core
+import Nx.Controls
+import Nx.Debug
+import Nx.Items
+import Nx.Layout
+import Nx.RightPanel
 
 Control
 {

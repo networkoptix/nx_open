@@ -306,7 +306,7 @@ QIcon RecordingStatusHelper::icon(const QnVirtualCameraResourcePtr& camera)
 
 void RecordingStatusHelper::registerQmlType()
 {
-    qmlRegisterType<RecordingStatusHelper>("nx.client.desktop", 1, 0, "RecordingStatusHelper");
+    qmlRegisterType<RecordingStatusHelper>("nx.vms.client.desktop", 1, 0, "RecordingStatusHelper");
 }
 
 void RecordingStatusHelper::updateRecordingMode()

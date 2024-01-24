@@ -5,7 +5,7 @@ import QtQuick
 import Nx.Items
 import Nx.Motion
 
-import nx.client.core
+import nx.vms.client.core
 
 CameraDisplay
 {

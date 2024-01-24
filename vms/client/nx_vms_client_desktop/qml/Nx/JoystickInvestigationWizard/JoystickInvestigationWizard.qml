@@ -1,16 +1,15 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+import QtQml
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import QtQml
 
 import Nx
 import Nx.Controls
 import Nx.Dialogs
 import Nx.JoystickInvestigationWizard
 
-import nx.client.desktop
 import nx.vms.client.desktop
 
 Dialog

@@ -288,19 +288,19 @@ void QnClientMetaTypes::registerQmlTypes()
     qmlRegisterType<PerformanceInfo>("nx.vms.client.desktop", 1, 0, "PerformanceInfo");
     qmlRegisterType<RhiRenderingItem>("nx.vms.client.desktop", 1, 0, "RhiRenderingItem");
 
-    qmlRegisterUncreatableType<Workbench>("nx.client.desktop", 1, 0, "Workbench",
+    qmlRegisterUncreatableType<Workbench>("nx.vms.client.desktop", 1, 0, "Workbench",
         "Cannot create instance of Workbench.");
-    qmlRegisterUncreatableType<QnWorkbenchContext>("nx.client.desktop", 1, 0, "WorkbenchContext",
-        "Cannot create instance of WorkbenchContext.");
-    qmlRegisterUncreatableType<QnWorkbenchLayout>("nx.client.desktop", 1, 0, "WorkbenchLayout",
+    qmlRegisterUncreatableType<QnWorkbenchContext>("nx.vms.client.desktop", 1, 0,
+        "WorkbenchContext", "Cannot create instance of WorkbenchContext.");
+    qmlRegisterUncreatableType<QnWorkbenchLayout>("nx.vms.client.desktop", 1, 0, "WorkbenchLayout",
         "Cannot create instance of WorkbenchLayout.");
 
-    qmlRegisterUncreatableType<joystick::JoystickButtonSettingsModel>("nx.vms.client.desktop", 1, 0,
-        "JoystickButtonSettingsModel",
+    qmlRegisterUncreatableType<joystick::JoystickButtonSettingsModel>(
+        "nx.vms.client.desktop", 1, 0, "JoystickButtonSettingsModel",
         "JoystickButtonSettingsModel can be created from C++ code only.");
 
-    qmlRegisterUncreatableType<joystick::JoystickButtonActionChoiceModel>("nx.vms.client.desktop", 1, 0,
-        "JoystickButtonActionChoiceModel",
+    qmlRegisterUncreatableType<joystick::JoystickButtonActionChoiceModel>(
+        "nx.vms.client.desktop", 1, 0, "JoystickButtonActionChoiceModel",
         "JoystickButtonActionChoiceModel can be created from C++ code only.");
 
     qmlRegisterUncreatableType<AccessSubjectEditingContext>("nx.vms.client.desktop", 1, 0,

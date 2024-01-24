@@ -247,9 +247,10 @@ int LayoutModel::rowCount(const QModelIndex& parent) const
 
 void LayoutModel::registerQmlType()
 {
-    qmlRegisterType<LayoutModel>("nx.client.desktop", 1, 0, "LayoutModel");
-    qmlRegisterUncreatableType<LayoutItemAdaptor>("nx.client.desktop", 1, 0, "LayoutItemAdaptor",
-        lit("Cannot create instance of LayoutItemAdaptor."));
+    qmlRegisterType<LayoutModel>("nx.vms.client.desktop", 1, 0, "LayoutModel");
+
+    qmlRegisterUncreatableType<LayoutItemAdaptor>("nx.vms.client.desktop", 1, 0,
+        "LayoutItemAdaptor", "Cannot create instance of LayoutItemAdaptor.");
 }
 
 } // namespace nx::vms::client::desktop

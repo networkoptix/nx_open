@@ -10,7 +10,6 @@ import Nx.Controls
 import Nx.Instruments
 import Nx.Items
 
-import nx.client.core
 import nx.vms.client.core
 import nx.vms.client.desktop
 
