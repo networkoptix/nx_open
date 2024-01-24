@@ -18,10 +18,12 @@
 
 namespace {
 
-static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kThemeSubstitutions = {
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kAnalyticsIconSubstitutions = {
     {QIcon::Normal, {.primary = "light10"}},
-    {QIcon::Active, {.primary = "light9"}},
-    {QIcon::Selected, {.primary = "light11"}},
+};
+
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kAnalyticsHoveredIconSubstitutions = {
+    {QIcon::Normal, {.primary = "light14"}},
 };
 
 static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kDeleteThemeSubstitutions = {
@@ -392,7 +394,7 @@ QVariant QnStorageListModel::data(const QModelIndex& index, int role) const
 
                 if (storage.id == m_metadataStorageId)
                 {
-                    return qnSkin->icon("text_buttons/default_20x20.svg", kThemeSubstitutions)
+                    return qnSkin->icon("text_buttons/default_20x20.svg", kAnalyticsIconSubstitutions)
                         .pixmap(QSize(20, 20));
                 }
 
@@ -402,7 +404,7 @@ QVariant QnStorageListModel::data(const QModelIndex& index, int role) const
 
                 if (couldStoreAnalytics(storage))
                 {
-                    return qnSkin->icon("text_buttons/default_20x20.svg", kThemeSubstitutions)
+                    return qnSkin->icon("text_buttons/default_20x20.svg", kAnalyticsHoveredIconSubstitutions)
                         .pixmap(QSize(20, 20));
                 }
             }
