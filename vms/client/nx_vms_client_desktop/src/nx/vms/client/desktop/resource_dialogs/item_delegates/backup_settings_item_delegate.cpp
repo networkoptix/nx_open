@@ -60,7 +60,7 @@ BackupSettingsItemDelegate::BackupSettingsItemDelegate(
     :
     base_type(parent),
     m_hoverTracker(hoverTracker),
-    m_warningPixmap(qnSkin->pixmap("tree/buggy.png"))
+    m_warningPixmap(qnSkin->pixmap("tree/buggy.svg"))
 {
     NX_ASSERT(m_hoverTracker);
     initDropdownColorTable();

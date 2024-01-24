@@ -656,7 +656,7 @@ QIcon QnBusinessRuleViewModel::iconForAction() const
         {
             const QnResourceList resources = resourcePool()->getResourcesByIds(actionResources());
             if (resources.empty())
-                return qnSkin->icon("tree/buggy.png");
+                return qnSkin->icon("tree/buggy.svg");
 
             if (resources.size() == 1)
                 return qnResIconCache->icon(resources.first());
