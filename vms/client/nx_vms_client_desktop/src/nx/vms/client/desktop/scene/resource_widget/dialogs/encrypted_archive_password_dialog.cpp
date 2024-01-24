@@ -11,6 +11,7 @@
 
 #include <api/server_rest_connection.h>
 #include <common/common_module.h>
+#include <core/resource/media_resource.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/core/skin/color_theme.h>
@@ -24,7 +25,10 @@
 
 namespace nx::vms::client::desktop {
 
-EncryptedArchivePasswordDialog::EncryptedArchivePasswordDialog(QWidget* parent):
+EncryptedArchivePasswordDialog::EncryptedArchivePasswordDialog(
+    const QnMediaResourcePtr& mediaResource,
+    QWidget* parent)
+    :
     base_type(parent),
     ui(new Ui::EncryptedArchivePasswordDialog())
 {
@@ -48,7 +52,7 @@ EncryptedArchivePasswordDialog::EncryptedArchivePasswordDialog(QWidget* parent):
     setPaletteColor(ui->textLabel, QPalette::WindowText, core::colorTheme()->color("light10"));
 
     connect(decryptButton, &QPushButton::clicked, this,
-        [this]()
+        [this, mediaResource]()
         {
             ui->inputField->validate();
             if (!ui->inputField->isValid())
@@ -60,7 +64,11 @@ EncryptedArchivePasswordDialog::EncryptedArchivePasswordDialog(QWidget* parent):
                     accept();
                 });
 
-            auto api = system()->connectedServerApi();
+            auto systemContext = SystemContext::fromResource(mediaResource);
+            if (!NX_ASSERT(systemContext))
+                return;
+
+            auto api = systemContext->connectedServerApi();
             if (NX_ASSERT(api))
             {
                 api->setStorageEncryptionPassword(
