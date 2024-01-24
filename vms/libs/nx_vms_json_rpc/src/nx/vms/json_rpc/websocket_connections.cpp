@@ -98,12 +98,10 @@ void WebSocketConnections::removeConnection(WebSocketConnection* connection)
         if (auto it = m_connections.find(connection); it != m_connections.end())
         {
             holder = std::move(it->second);
-            holder.connection.reset();
             m_connections.erase(it);
         }
     }
-    for (auto& thread: holder.threads)
-        thread.join();
+    holder.stop();
 }
 
 void WebSocketConnections::addConnectionGuards(WebSocketConnection* connection, std::vector<nx::utils::Guard> guards)
@@ -130,10 +128,15 @@ void WebSocketConnections::clear()
         m_connections.swap(connections);
     }
     for (auto& [_, connection]: connections)
-    {
-        for (auto& thread: connection.threads)
-            thread.join();
-    }
+        connection.stop();
+}
+
+void WebSocketConnections::Connection::stop()
+{
+    for (auto& thread: threads)
+        thread.detach();
+    auto connectionPtr = connection.get();
+    connectionPtr->pleaseStop([connection = std::move(connection)]() {});
 }
 
 } // namespace nx::vms::json_rpc
