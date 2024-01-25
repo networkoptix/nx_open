@@ -7,6 +7,9 @@
 
 namespace nx::branding {
 
+/** Customization color theme. */
+NX_BRANDING_API QString colorTheme();
+
 /** Customization id. */
 NX_BRANDING_API QString customization();
 
