@@ -9,6 +9,7 @@
 #include <QtGui/QColor>
 #include <QtQml/QtQml>
 
+#include <nx/branding.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/core/ini.h>
 #include <utils/common/hash.h>
@@ -35,25 +36,12 @@ QString basicColorsFileName()
 
 QString skinColorsFileName()
 {
-    QString scheme = ini().colorTheme;
+    const QString iniColorTheme(ini().colorTheme);
+    const QString colorTheme = iniColorTheme.isEmpty()
+        ? branding::colorTheme()
+        : iniColorTheme;
 
-    if (scheme == "dark_blue")
-        return ":/skin/dark_blue.json";
-
-    if (scheme == "dark_green")
-        return ":/skin/dark_green.json";
-
-    if (scheme == "dark_orange")
-        return ":/skin/dark_orange.json";
-
-    if (scheme == "gray_orange")
-        return ":/skin/gray_orange.json";
-
-    if (scheme == "gray_white")
-        return ":/skin/gray_white.json";
-
-    // Default. Return skin colors.
-    return ":/skin/skin_colors.json";
+    return QString(":/skin/%1.json").arg(colorTheme);
 }
 
 QColor parseColor(const QString& value)
