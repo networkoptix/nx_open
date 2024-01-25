@@ -17,6 +17,10 @@ ServerRequestStorage::~ServerRequestStorage()
 
 void ServerRequestStorage::storeHandle(rest::Handle handle)
 {
+    // Request failed, no need to store invalid handle.
+    if (handle == rest::Handle{})
+        return;
+
     NX_ASSERT(!m_handles.contains(handle));
     m_handles.insert(handle);
 }
