@@ -223,7 +223,7 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
     m_exportRecorder->setContainer(format);
 
     nx::core::transcoding::FilterChain filters(
-        transcodingSettings, m_resource->getDewarpingParams(), m_resource->getVideoLayout());
+        transcodingSettings, nx::vms::api::dewarping::MediaData(), nullptr);
     m_exportRecorder->setTranscodeFilters(filters);
 
     m_exportReader->addDataProcessor(m_exportRecorder);
