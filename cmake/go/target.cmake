@@ -35,6 +35,8 @@ function(nx_go_add_target target)
     file(GLOB_RECURSE GO_SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR} *.go)
     set(GO_TARGET_DEPENDS ${GO_TARGET_DEPENDS} ${GO_SRC_FILES})
 
+    go_fetch_module_dependencies()
+
     list_subdirectories(${CMAKE_CURRENT_SOURCE_DIR}/cmd executables)
     list(REMOVE_ITEM executables internal)
 
@@ -70,27 +72,32 @@ function(nx_go_build target working_dir package_path)
     cmake_parse_arguments(GO_BUILD "" "${one_value_args}" "${multi_value_args}" ${ARGN})
 
     nx_go_fix_target_exe(${target} target_exe)
+    set(target_output_path ${CMAKE_BINARY_DIR}/bin/${target_exe})
 
-    add_custom_target(${target} ALL DEPENDS ${CMAKE_BINARY_DIR}/bin/${target_exe})
+    add_custom_target(${target} ALL DEPENDS ${target_output_path})
+    set_target_properties(${target} PROPERTIES GO_OUTPUT_FILE ${target_output_path})
 
     if(GO_BUILD_FOLDER)
         set_target_properties(${target} PROPERTIES FOLDER ${GO_BUILD_FOLDER})
     endif()
 
-    if(WIN32)
-        set(GO_ENV PATH="${CONAN_MINGW-W64_ROOT}/bin")
-        set(GO_BUILD_CUSTOM_ENV TMP=${CMAKE_CURRENT_BINARY_DIR})
-    else()
-        set(GO_ENV GOTMPDIR=${CMAKE_CURRENT_BINARY_DIR})
-    endif()
+    # Checking if GO_OUTPUT_FILE target property is defined for each dependency and adding it to
+    # the list of of dependencies if it is.
+    set(allBinDeps ${GO_BUILD_DEPENDS})
 
+    foreach(dep IN LISTS GO_BUILD_DEPENDS)
+        if(TARGET ${dep})
+            get_property(dep_output_binary TARGET ${dep} PROPERTY GO_OUTPUT_FILE)
+            list(APPEND allBinDeps ${dep_output_binary})
+        endif()
+    endforeach()
+
+    get_go_cmake_command(cmake_go)
     add_custom_command(
-        OUTPUT ${CMAKE_BINARY_DIR}/bin/${target_exe}
+        OUTPUT ${target_output_path}
         WORKING_DIRECTORY ${working_dir}
-        DEPENDS ${GO_BUILD_DEPENDS}
-        COMMAND ${CMAKE_COMMAND} -E env "${GO_ENV}" "${GO_BUILD_CUSTOM_ENV}" ${NX_GO_COMPILER} build ${package_path}
-        COMMAND ${CMAKE_COMMAND} -E copy ${target_exe} ${CMAKE_BINARY_DIR}/bin
-        COMMAND ${CMAKE_COMMAND} -E remove -f ${target_exe}
+        DEPENDS ${allBinDeps}
+        ${cmake_go} build -o ${target_output_path} ${package_path}
     )
 
     if(GO_BUILD_C_GO_INCLUDE_DIRECTORY)

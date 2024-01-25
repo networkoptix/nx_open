@@ -28,6 +28,8 @@ function(nx_go_add_test target)
 
     nx_go_list_test_packages(${CMAKE_CURRENT_SOURCE_DIR} package_paths)
 
+    go_fetch_module_dependencies(TEST)
+
     foreach(path ${package_paths})
         if ("${path}" IN_LIST GO_TEST_EXCLUDE_FOLDERS)
             continue()
@@ -68,32 +70,37 @@ function(nx_go_build_test target working_dir package_path)
     cmake_parse_arguments(GO_BUILD_TEST "" "${one_value_args}" "${multi_value_args}" ${ARGN})
 
     nx_go_fix_target_exe(${target} target_exe)
-    set(target_path ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${target_exe})
 
     set(compile_command ${NX_GO_COMPILER} test -c ${package_path} -o ${target_exe})
 
     file(GLOB_RECURSE test_source_files FOLLOW_SYMLINKS "${package_path}/*.go")
 
-    if(WIN32)
-        list(PREPEND compile_command ${CMAKE_COMMAND} -E env PATH="${CONAN_MINGW-W64_ROOT}/bin")
-    endif()
+    # Checking if GO_OUTPUT_FILE target property is defined for each dependency and adding it to
+    # the list of of dependencies if it is.
+    set(allBinDeps ${GO_BUILD_TEST_DEPENDS})
+    foreach(dep IN LISTS GO_BUILD_TEST_DEPENDS)
+        if(TARGET ${dep})
+            get_property(dep_output_binary TARGET ${dep} PROPERTY GO_OUTPUT_FILE)
+            list(APPEND allBinDeps ${dep_output_binary})
+        endif()
+    endforeach()
 
+    set(target_output_path ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${target_exe})
+    get_go_cmake_command(cmake_go)
     add_custom_command(
-        OUTPUT ${target_path}
+        OUTPUT ${target_output_path}
         WORKING_DIRECTORY ${working_dir}
-        DEPENDS ${test_source_files} ${GO_BUILD_TEST_DEPENDS}
-        COMMAND ${compile_command}
-        COMMAND ${CMAKE_COMMAND} -E copy ${target_exe} ${target_path}
-        COMMAND ${CMAKE_COMMAND} -E remove -f ${target_exe}
+        DEPENDS ${test_source_files} ${allBinDeps}
+        ${cmake_go} test -cover -c ${package_path} -v -o ${target_output_path}
     )
 
     nx_find_files(go_sources ${package_path} "go")
-    add_custom_target(${target} ALL SOURCES ${go_sources} DEPENDS ${target_path})
+    add_custom_target(${target} ALL SOURCES ${go_sources} DEPENDS ${target_output_path})
     if(GO_BUILD_TEST_FOLDER)
         set_target_properties(${target} PROPERTIES FOLDER ${GO_BUILD_TEST_FOLDER})
     endif()
 
-    add_test(NAME ${target} COMMAND ${target_path})
+    add_test(NAME ${target} COMMAND ${target_output_path})
 
     # NOTE: unit_tests is a custom target set in open/cmake/test_utils.cmake
     add_dependencies(unit_tests ${target})
