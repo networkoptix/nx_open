@@ -2355,8 +2355,8 @@ Alt + クリックでオブジェクトを追跡します。</translation>
       <translation>タイムラインで選択</translation>
     </message>
     <message>
-      <source>Not clickable due to the DST change</source>
-      <translation>DST (サマータイム) の変更によりクリックできません</translation>
+      <source>Time is unavailable due to DST changes</source>
+      <translation>DST (サマータイム) の変更により時刻が利用できません</translation>
     </message>
   </context>
   <context>
