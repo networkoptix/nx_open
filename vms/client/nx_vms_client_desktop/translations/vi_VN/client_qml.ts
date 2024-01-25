@@ -2354,8 +2354,8 @@ Nhấn Alt + Click để theo dõi đối tượng</translation>
       <translation>Được chọn trên Dòng thời gian</translation>
     </message>
     <message>
-      <source>Not clickable due to the DST change</source>
-      <translation>Không thể nhấp được do thay đổi DST</translation>
+      <source>Time is unavailable due to DST changes</source>
+      <translation type="unfinished">Time is unavailable due to DST changes</translation>
     </message>
   </context>
   <context>

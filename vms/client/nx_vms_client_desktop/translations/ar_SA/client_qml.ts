@@ -2419,8 +2419,8 @@ Press Alt + Click to follow object</translation>
       <translation type="unfinished">Selected on Timeline</translation>
     </message>
     <message>
-      <source>Not clickable due to the DST change</source>
-      <translation type="unfinished">Not clickable due to the DST change</translation>
+      <source>Time is unavailable due to DST changes</source>
+      <translation type="unfinished">Time is unavailable due to DST changes</translation>
     </message>
   </context>
   <context>

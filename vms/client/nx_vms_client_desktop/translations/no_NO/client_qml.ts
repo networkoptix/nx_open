@@ -2367,8 +2367,8 @@ Trykk Alt + Klikk for å følge objektet</translation>
       <translation>Valgt på tidslinjen</translation>
     </message>
     <message>
-      <source>Not clickable due to the DST change</source>
-      <translation>Ikke klikkbar på grunn av DST-endringen</translation>
+      <source>Time is unavailable due to DST changes</source>
+      <translation type="unfinished">Time is unavailable due to DST changes</translation>
     </message>
   </context>
   <context>
