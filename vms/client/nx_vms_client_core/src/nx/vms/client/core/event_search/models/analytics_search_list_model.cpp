@@ -526,18 +526,19 @@ rest::Handle AnalyticsSearchListModel::Private::lookupObjectTracksCached(
                     return;
                 }
 
-                NX_VERBOSE(q, "Found cached request with %1 callbacks", contextIt->callbacks.size());
-                if (NX_ASSERT(contextIt->handle == handle && !contextIt->callbacks.empty()))
-                {
-                    const auto last = --contextIt->callbacks.end();
+                auto tmp = *contextIt;
+                cachedRequests.erase(contextIt);
 
-                    for (auto it = contextIt->callbacks.begin(); it != last; ++it)
+                NX_VERBOSE(q, "Found cached request with %1 callbacks", tmp.callbacks.size());
+                if (NX_ASSERT(tmp.handle == handle && !tmp.callbacks.empty()))
+                {
+                    const auto last = --tmp.callbacks.end();
+
+                    for (auto it = tmp.callbacks.begin(); it != last; ++it)
                         (it->second)(success, handle, nx::analytics::db::LookupResult(result));
 
                     (last->second)(success, handle, std::move(result));
                 }
-
-                cachedRequests.erase(contextIt);
 
                 NX_VERBOSE(q, "Removed handle=%1 from cache, %2 requests are still cached",
                     handle, cachedRequests.size());
