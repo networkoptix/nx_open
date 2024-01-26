@@ -32,6 +32,8 @@ struct MainWindowTitleBarState
     ConnectActionsHandler::LogicalState connectState =
         ConnectActionsHandler::LogicalState::disconnected;
     QList<SystemData> systems;
+    bool systemUpdating = false;
+
     int findSystemIndex(const QnUuid& systemId) const;
 };
 
@@ -59,6 +61,7 @@ public:
     void removeCurrentSystem();
     void changeCurrentSystem(QnSystemDescriptionPtr systemDescription);
     void moveSystem(int indexFrom, int indexTo);
+    void setSystemUpdating(bool value);
 
     int systemCount() const;
     std::optional<State::SystemData> systemData(int index) const;
@@ -68,6 +71,7 @@ public:
     int activeSystemTab() const;
     QnUuid currentSystemId() const;
     WorkbenchState workbenchState(const QnUuid& systemId) const;
+    bool isTitleBarEnabled() const;
 
 signals:
     void stateChanged(const State& state);

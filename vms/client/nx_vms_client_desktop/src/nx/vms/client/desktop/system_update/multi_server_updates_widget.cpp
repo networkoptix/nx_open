@@ -49,6 +49,8 @@
 #include <ui/dialogs/common/message_box.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
 #include <ui/models/resource/resource_list_model.h>
+#include <ui/widgets/main_window.h>
+#include <ui/widgets/main_window_title_bar_state.h>
 #include <ui/widgets/views/resource_list_view.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/applauncher_utils.h>
@@ -921,6 +923,7 @@ void MultiServerUpdatesWidget::atUpdateCurrentState()
             m_clientUpdateTool->getInstalledClientVersions());
         if (!hasActiveUpdate())
         {
+            mainWindow()->titleBarStateStore()->setSystemUpdating(false);
             if (m_updateInfo.preferOtherUpdate(checkResponse))
             {
                 setUpdateTarget(checkResponse, /*activeUpdate=*/false);
@@ -936,6 +939,7 @@ void MultiServerUpdatesWidget::atUpdateCurrentState()
             NX_VERBOSE(this, "atUpdateCurrentState() got update version='%1', but we are already "
                 "updating to version='%2' in state=%3. Ignoring it.", checkResponse.info.version,
                 m_updateInfo.info.version, toString(m_widgetState));
+            mainWindow()->titleBarStateStore()->setSystemUpdating(true);
         }
     }
 
