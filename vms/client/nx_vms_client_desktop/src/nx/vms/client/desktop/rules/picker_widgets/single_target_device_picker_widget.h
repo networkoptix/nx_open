@@ -56,6 +56,7 @@ private:
             return;
 
         field->setId(*selectedCameras.begin());
+        field->setUseSource(false);
     }
 
     void onDescriptorSet() override
@@ -116,7 +117,15 @@ private:
 
     void onStateChanged()
     {
-        theField()->setUseSource(m_checkBox->isChecked());
+        if (m_checkBox->isChecked())
+        {
+            theField()->setUseSource(true);
+            theField()->setId({});
+        }
+        else
+        {
+            theField()->setUseSource(false);
+        }
     }
 
     QIcon icon(const QnVirtualCameraResourcePtr& camera)
