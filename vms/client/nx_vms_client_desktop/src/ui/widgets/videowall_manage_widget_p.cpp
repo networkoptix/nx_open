@@ -16,6 +16,7 @@
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/math/color_transformations.h>
 #include <utils/math/linear_combination.h>
+#include <utils/screen_snaps_geometry.h>
 #include <utils/screen_utils.h>
 
 using nx::vms::client::core::Geometry;
@@ -640,17 +641,18 @@ nx::vms::client::desktop::videowall::Model QnVideowallManageWidgetPrivate::model
     return model;
 }
 
-void QnVideowallManageWidgetPrivate::setModel(const nx::vms::client::desktop::videowall::Model& model)
+void QnVideowallManageWidgetPrivate::setModel(
+    const nx::vms::client::desktop::videowall::Model& model)
 {
     // Screen information from model is ignored because it is set elsewhere.
     m_items.clear(); // Probably extra safety.
-    const QList<QRect> screens = q->screenGeometries();
+    const QList<QRect> screenGeometries = q->screenGeometries();
     for (const auto& item: model.items)
     {
         ModelItem modelItem(ItemType::Existing, item.id, q);
         modelItem.name = item.name;
         modelItem.snaps = item.snaps;
-        modelItem.geometry = item.snaps.geometry(screens);
+        modelItem.geometry = screenSnapsGeometry(item.snaps, screenGeometries);
         m_items << modelItem;
         setFree(modelItem.snaps, false);
     }
@@ -690,7 +692,7 @@ QRect QnVideowallManageWidgetPrivate::targetRect(const QRect& rect) const
 
 void QnVideowallManageWidgetPrivate::setFree(const QnScreenSnaps& snaps, bool value)
 {
-    const QRect itemRect = snaps.geometry(q->screenGeometries());
+    const QRect itemRect = screenSnapsGeometry(snaps, q->screenGeometries());
     QSet<int> screenIdxs = Screens::coveredBy(itemRect, q->screenGeometries());
     // if the item takes some screens, it should take them fully
     if (screenIdxs.size() > 1)
@@ -1140,7 +1142,7 @@ QRect QnVideowallManageWidgetPrivate::calculateProposedMoveGeometry(
 {
     QRect geometry = item.geometry;
 
-    const QRect itemRect = item.snaps.geometry(q->screenGeometries());
+    const QRect itemRect = screenSnapsGeometry(item.snaps, q->screenGeometries());
     const int screenCount = Screens::coveredBy(itemRect, q->screenGeometries()).size();
     if (multiScreen)
         *multiScreen = screenCount > 1;

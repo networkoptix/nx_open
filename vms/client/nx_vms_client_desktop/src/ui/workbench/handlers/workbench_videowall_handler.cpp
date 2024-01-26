@@ -96,6 +96,7 @@
 #include <utils/common/checked_cast.h>
 #include <utils/common/delayed.h>
 #include <utils/common/uuid_pool.h>
+#include <utils/screen_snaps_geometry.h>
 #include <utils/screen_utils.h>
 #include <utils/unity_launcher_workaround.h>
 
@@ -153,7 +154,8 @@ void addItemToLayout(const LayoutResourcePtr& layout, const QnVideoWallItemIndex
     if (!firstIdx.isValid())
         return;
 
-    QList<int> screens = screensCoveredByItem(firstIdx.item(), firstIdx.videowall()).values();
+    QList<int> screens =
+        screensCoveredByItem(firstIdx.item(), firstIdx.videowall()).values();
     std::sort(screens.begin(), screens.end());
     if (screens.isEmpty())
         return;
@@ -258,71 +260,15 @@ LayoutSnapshotManager* snapshotManager()
 }
 
 // Main window geometry should have position in physical coordinates and size - in logical.
-QRect mainWindowGeometry(const QnScreenSnaps& snaps)
+QRect mainWindowGeometry(const QnScreenSnaps& snaps, QWidget* mainWindowWidget)
 {
     if (!snaps.isValid())
         return {};
 
-    return snaps.geometry(nx::gui::Screens::logicalGeometries());
+    return screenSnapsToWidgetGeometry(snaps, mainWindowWidget);
 }
 
 } // namespace
-
-//--------------------------------------------------------------------------------------------------
-
-// Workaround for the geometry changes. In MacOsX setGeometry function call on main window
-// hangs all drawing to the whole client. As workaround we turn off updates before geometry changes
-// and return them back when resize operations are complete.
-class QnWorkbenchVideoWallHandler::GeometrySetter: public QObject
-{
-    using base_type = QObject;
-
-public:
-    GeometrySetter(QWidget* target, QObject* parent = nullptr);
-
-    void changeGeometry(const QRect& geometry);
-
-    bool eventFilter(QObject* watched, QEvent* event);
-
-private:
-    QWidget* const m_target;
-    QSize m_finalSize;
-};
-
-QnWorkbenchVideoWallHandler::GeometrySetter::GeometrySetter(QWidget* target, QObject* parent):
-    base_type(parent),
-    m_target(target)
-{
-    if (nx::build_info::isMacOsX())
-        m_target->installEventFilter(this);
-}
-
-void QnWorkbenchVideoWallHandler::GeometrySetter::changeGeometry(const QRect& geometry)
-{
-    const auto targetSize = geometry.size();
-    if (nx::build_info::isMacOsX() && m_target->geometry().size() != targetSize)
-    {
-        m_target->setUpdatesEnabled(false);
-        m_finalSize = targetSize;
-    }
-    m_target->setGeometry(geometry);
-}
-
-bool QnWorkbenchVideoWallHandler::GeometrySetter::eventFilter(QObject* watched, QEvent* event)
-{
-    if (!m_finalSize.isEmpty() && watched == m_target && event->type() == QEvent::Resize)
-    {
-        const auto currentSize = static_cast<QResizeEvent*>(event)->size();
-        if (m_finalSize == currentSize)
-        {
-            m_finalSize = QSize();
-            const auto setUpdatesEnabled = [this]() { m_target->setUpdatesEnabled(true); };
-            static constexpr int kSomeSmallDelayMs = 1000;
-            executeDelayedParented(setUpdatesEnabled, kSomeSmallDelayMs, this);
-        }
-    }
-    return base_type::eventFilter(watched, event);
-}
 
 //--------------------------------------------------------------------------------------------------
 
@@ -3266,22 +3212,10 @@ void QnWorkbenchVideoWallHandler::updateMainWindowGeometry(const QnScreenSnaps& 
     if (!NX_ASSERT(screenSnaps.isValid()))
         return;
 
-    // Target geometry will be used in QWidget::setGeometry(), so it expects physical coordinates
-    // for window position and logical coordinates for it's size.
-    const QRect targetGeometry = mainWindowGeometry(screenSnaps);
-
-    if (!NX_ASSERT(targetGeometry.isValid()))
-        return;
-
     if (!m_geometrySetter)
-        m_geometrySetter.reset(new GeometrySetter(mainWindowWidget()));
+        m_geometrySetter.reset(new MultiscreenWidgetGeometrySetter(mainWindowWidget()));
 
-    // Geometry must be changed twice: after the first time window screen is updated correctly, so
-    // on the second time it is correctly used for QWidget internal dpi-aware calculations.
-    m_geometrySetter->changeGeometry(targetGeometry);
-    executeDelayedParented(
-        [this, targetGeometry]{ m_geometrySetter->changeGeometry(targetGeometry); },
-        this);
+    m_geometrySetter->changeGeometry(screenSnaps);
 }
 
 void QnWorkbenchVideoWallHandler::updateControlLayout(
@@ -3290,7 +3224,6 @@ void QnWorkbenchVideoWallHandler::updateControlLayout(
 {
     if (action == ItemAction::Changed)
     {
-
         // index to place updated layout
         int layoutIndex = -1;
         bool wasCurrent = false;
@@ -3400,7 +3333,7 @@ void QnWorkbenchVideoWallHandler::updateReviewLayout(
                 if (other != indices.cend()
                     && (other->item().pcUuid == item.pcUuid)
                     && (screensCoveredByItem(other->item(), videowall)
-                           == screensCoveredByItem(item, videowall)))
+                        == screensCoveredByItem(item, videowall)))
                 {
                     return workbenchItem;
                 }
@@ -3441,7 +3374,8 @@ void QnWorkbenchVideoWallHandler::updateReviewLayout(
             }
             else
             {
-                addItemToLayout(layoutResource,
+                addItemToLayout(
+                    layoutResource,
                     QnVideoWallItemIndexList() << QnVideoWallItemIndex(videowall, item.uuid));
             }
         };

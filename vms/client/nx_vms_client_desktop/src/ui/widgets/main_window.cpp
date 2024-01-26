@@ -900,7 +900,8 @@ void MainWindow::keyPressEvent(QKeyEvent* event)
     handleKeyPress(event->key());
 }
 
-void MainWindow::resizeEvent(QResizeEvent *event) {
+void MainWindow::resizeEvent(QResizeEvent* event)
+{
     base_type::resizeEvent(event);
     updateScreenInfo();
 }
