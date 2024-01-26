@@ -13,7 +13,6 @@
 #include <nx/media/video_data_packet.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/url.h>
-#include <utils/common/util.h>
 #include <utils/media/ffmpeg_io_context.h>
 
 #include "helpers/recording_context_helpers.h"
@@ -445,7 +444,10 @@ bool StorageRecordingContext::doPrepareToStart(
         }
 
         allocateFfmpegObjects(mediaData, videoLayout, audioLayout, ctx);
-        if (!fileStarted(startTimeUs() / 1000, currentTimeZone() / 60, ctx.fileName))
+        if (!fileStarted(
+            startTimeUs() / 1000,
+            QDateTime::currentDateTime().offsetFromUtc() / 60,
+            ctx.fileName))
         {
             throw ErrorEx(
                 Error::Code::fileWrite,
