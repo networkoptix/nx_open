@@ -9,12 +9,9 @@
 #include <QtGui/QColor>
 #include <QtQml/QtQml>
 
-#include <utils/common/hash.h>
-
-#include <utils/math/color_transformations.h>
-
+#include <nx/branding.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/qt_helpers.h>
+#include <nx/vms/client/core/ini.h>
 #include <utils/common/hash.h>
 #include <utils/math/color_transformations.h>
 
@@ -22,6 +19,75 @@
 #include "icon.h"
 
 namespace nx::vms::client::core {
+
+namespace {
+
+QStringList kThemeSpecificColors = {
+    "red", "red_l", "red_d",
+    "blue", "blue_l", "blue_d",
+    "green", "green_l", "green_d",
+    "yellow", "yellow_l", "yellow_d"
+};
+
+QString basicColorsFileName()
+{
+    return ":/skin/basic_colors.json";
+}
+
+QString skinColorsFileName()
+{
+    return QString(":/skin/%1.json").arg(branding::colorTheme());
+}
+
+QColor parseColor(const QString& value)
+{
+    if (value.startsWith('#'))
+        return QColor::fromString(value);
+
+           // TODO: Support HSL.
+
+    return {};
+}
+
+void initializeThemeSpecificColors(QJsonObject* object)
+{
+    static const QString kDarkTheme = "dark_theme";
+    static const QString kLightTheme = "light_theme";
+
+           // Early return on unit tests.
+    if (!object->contains(kDarkTheme) || !object->contains(kLightTheme))
+        return;
+
+    for (const auto& color: kThemeSpecificColors)
+        object->insert(color, QString("%1.%2").arg(kDarkTheme, color));
+}
+
+QJsonObject generatedAbsoluteColors(const ColorTree& tree)
+{
+    QJsonObject result;
+    auto colors = tree.getRootColors();
+
+    for (int i = 0; i < 18; ++i)
+    {
+        auto dark = colors[QString("dark%1").arg(i + 1)];
+        auto light = colors[QString("light%1").arg(i + 1)];
+
+               // Some unit tests don't have dark&light colors in the color scheme.
+        if (!dark.isValid() || !light.isValid())
+            continue;
+
+               // Original colors that could be used for Widgets that should always display light text.
+        result.insert(QString("@dark%1").arg(i + 1), dark.name());
+        result.insert(QString("@light%1").arg(i + 1), light.name());
+
+        result.insert(QString("dark%1").arg(i + 1), dark.name());
+        result.insert(QString("light%1").arg(i + 1), light.name());
+    }
+
+    return result;
+}
+
+} // namespace
 
 static ColorTheme* s_instance = nullptr;
 
@@ -59,15 +125,22 @@ void ColorTheme::Private::loadColors(const QString& mainColorsFile, const QStrin
 
     ColorThemeReader reader;
 
-    const QJsonObject baseColors = readColorDataFromFile(mainColorsFile);
+    QJsonObject baseColors = readColorDataFromFile(mainColorsFile);
+    initializeThemeSpecificColors(&baseColors);
     reader.addColors(baseColors);
 
-    ColorTree baseColorTree = reader.getColorTree();
+    const ColorTree baseColorTree = reader.getColorTree();
 
-    const QJsonObject currentSkinColors = readColorDataFromFile(skinColorsFile);
+    QJsonObject currentSkinColors = readColorDataFromFile(skinColorsFile);
     reader.addColors(currentSkinColors);
 
     ColorTree actualColorTree = reader.getColorTree();
+
+    const QJsonObject generatedColors = generatedAbsoluteColors(actualColorTree);
+    reader.addColors(generatedColors);
+
+    // That looks a bit strange.
+    actualColorTree = reader.getColorTree();
 
     colorTree = actualColorTree.toVariantMap();
     colorsByPath = actualColorTree.colorsByPath();
@@ -91,7 +164,7 @@ QJsonObject ColorTheme::Private::readColorDataFromFile(const QString& fileName) 
 
         const bool parsed = error.error == QJsonParseError::NoError;
         if (NX_ASSERT(parsed, "JSON parse error: %1", error.errorString())
-                && NX_ASSERT(json.isObject(), "Invalid JSON structure"))
+            && NX_ASSERT(json.isObject(), "Invalid JSON structure"))
         {
             return json.object();
         }
@@ -117,7 +190,7 @@ void ColorTheme::Private::initIconCustomizations()
 // ColorTheme
 
 ColorTheme::ColorTheme(QObject* parent):
-    ColorTheme(":/skin/basic_colors.json", ":/skin/skin_colors.json")
+    ColorTheme(basicColorsFileName(), skinColorsFileName())
 {
 }
 

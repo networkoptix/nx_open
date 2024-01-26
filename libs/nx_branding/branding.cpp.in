@@ -4,6 +4,11 @@
 
 namespace nx::branding {
 
+QString colorTheme()
+{
+    return R"(${customization.skin})";
+}
+
 QString customization()
 {
     return R"(${customization})";
