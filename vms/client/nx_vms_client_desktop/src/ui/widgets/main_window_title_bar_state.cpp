@@ -41,6 +41,7 @@ struct MainWindowTitleBarStateReducer
     static State removeCurrentSystem(State&& state);
     static State changeCurrentSystem(State&& state, QnSystemDescriptionPtr systemDescription);
     static State moveSystem(State&& state, int indexFrom, int IndexTo);
+    static State setSystemUpdating(State&& state, bool value);
 };
 
 MainWindowTitleBarStateReducer::State MainWindowTitleBarStateReducer::setExpanded(
@@ -118,6 +119,7 @@ MainWindowTitleBarStateReducer::State MainWindowTitleBarStateReducer::removeSyst
         if (index == state.activeSystemTab)
         {
             state.homeTabActive = true;
+            state.expanded = true;
             state.activeSystemTab = -1;
             state.currentSystemId = {};
         }
@@ -165,6 +167,13 @@ MainWindowTitleBarStateReducer::State MainWindowTitleBarStateReducer::moveSystem
     state = removeSystem(std::move(state), indexFrom);
     state = insertSystem(std::move(state), indexTo, systemData);
     state.activeSystemTab = indexTo;
+    return state;
+}
+
+MainWindowTitleBarStateReducer::State MainWindowTitleBarStateReducer::setSystemUpdating(
+    State&& state, bool value)
+{
+    state.systemUpdating = value;
     return state;
 }
 
@@ -265,6 +274,11 @@ void MainWindowTitleBarStateStore::moveSystem(int indexFrom, int indexTo)
     dispatch(Reducer::moveSystem, indexFrom, indexTo);
 }
 
+void MainWindowTitleBarStateStore::setSystemUpdating(bool value)
+{
+    dispatch(Reducer::setSystemUpdating, value);
+}
+
 int MainWindowTitleBarStateStore::systemCount() const
 {
     return state().systems.count();
@@ -313,4 +327,11 @@ WorkbenchState MainWindowTitleBarStateStore::workbenchState(const QnUuid& system
 
     return {};
 }
+
+bool MainWindowTitleBarStateStore::isTitleBarEnabled() const
+{
+    return !state().systemUpdating
+        && state().connectState != ConnectActionsHandler::LogicalState::connecting;
+}
+
 } // nx::vms::client::desktop

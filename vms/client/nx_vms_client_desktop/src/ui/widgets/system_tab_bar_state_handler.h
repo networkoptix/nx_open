@@ -22,7 +22,6 @@ public:
 signals:
     void tabsChanged();
     void activeSystemTabChanged(int index);
-    void enableChanged(bool enable);
 
 private:
     void at_stateChanged(const State& state);

@@ -43,9 +43,6 @@ void SystemTabBarStateHandler::setStateStore(QSharedPointer<Store> store)
 
 void SystemTabBarStateHandler::at_stateChanged(const State& state)
 {
-    if (state.connectState != m_storedState.connectState)
-        emit enableChanged(state.connectState != ConnectActionsHandler::LogicalState::connecting);
-
     if (state.systems != m_storedState.systems)
         emit tabsChanged();
 

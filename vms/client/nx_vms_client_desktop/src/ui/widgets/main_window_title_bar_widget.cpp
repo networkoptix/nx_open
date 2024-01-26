@@ -310,10 +310,9 @@ void QnMainWindowTitleBarWidget::setStateStore(QSharedPointer<Store> store,
             else
                 collapse();
 
+            setEnabled(store->isTitleBarEnabled());
             hideLayoutPanel(store->isLayoutPanelHidden());
         });
-    connect(stateHandler.get(), &SystemTabBarStateHandler::enableChanged,
-        this, &QWidget::setEnabled);
     d->systemBar->setStateStore(store, stateHandler);
 }
 
