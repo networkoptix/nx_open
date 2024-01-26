@@ -33,6 +33,7 @@ public:
     */
     QByteArray schedule() const;
     void setSchedule(const QByteArray& schedule);
+    void setSchedules(const QVector<QByteArray>& schedules);
 
 private:
     const std::unique_ptr<Ui::WeekTimeScheduleDialog> ui;

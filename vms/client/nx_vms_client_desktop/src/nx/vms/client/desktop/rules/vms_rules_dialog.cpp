@@ -5,6 +5,7 @@
 #include <nx/vms/api/rules/rule.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/ui/dialogs/week_time_schedule_dialog.h>
 #include <nx/vms/rules/action_builder.h>
 #include <nx/vms/rules/actions/show_notification_action.h>
 #include <nx/vms/rules/engine.h>
@@ -68,6 +69,35 @@ void VmsRulesDialog::addRule()
         return;
 
     saveRuleImpl(newRule);
+}
+
+void VmsRulesDialog::editSchedule(const QnUuidList& ids)
+{
+    if (!NX_ASSERT(!ids.empty()))
+        return;
+
+    auto engine = systemContext()->vmsRulesEngine();
+
+    QVector<QByteArray> schedules;
+    for (auto id: ids)
+        schedules.push_back(engine->rule(id)->schedule());
+
+    WeekTimeScheduleDialog dialog(m_parentWidget, /*isEmptyAllowed*/ false);
+    dialog.setSchedules(schedules);
+    if (dialog.exec() != QDialog::Accepted)
+        return;
+
+    const auto schedule = dialog.schedule();
+    for (auto id: ids)
+    {
+        auto clone = engine->cloneRule(id);
+        if (!NX_ASSERT(clone))
+            return;
+
+        clone->setSchedule(schedule);
+
+        saveRuleImpl(clone);
+    }
 }
 
 void VmsRulesDialog::duplicateRule(QnUuid id)
