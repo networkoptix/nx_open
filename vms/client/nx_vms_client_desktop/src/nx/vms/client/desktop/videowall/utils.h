@@ -9,6 +9,8 @@ namespace nx::vms::client::desktop {
 /**
  * Set of screen indices, covered by the given videowall item.
  */
-QSet<int> screensCoveredByItem(const QnVideoWallItem& item, const QnVideoWallResourcePtr& videoWall);
+QSet<int> screensCoveredByItem(
+    const QnVideoWallItem& item,
+    const QnVideoWallResourcePtr& videoWall);
 
 } // namespace nx::vms::client::desktop

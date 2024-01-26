@@ -5,7 +5,6 @@
 #include <array>
 
 #include <QtCore/QDebug>
-#include <QtCore/QRect>
 #include <QtCore/QSet>
 
 struct NX_VMS_COMMON_API QnScreenSnap
@@ -49,8 +48,6 @@ struct NX_VMS_COMMON_API QnScreenSnaps
     std::array<QnScreenSnap, 4> values;
 
     bool isValid() const;
-
-    QRect geometry(const QList<QRect>& screens) const;
 
     bool operator==(const QnScreenSnaps& other) const
     {
