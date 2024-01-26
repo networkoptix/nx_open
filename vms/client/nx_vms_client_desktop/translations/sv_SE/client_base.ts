@@ -6027,6 +6027,10 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
       <source>To add a Video Wall, the System should be in active state. %1</source>
       <translation>För att lägga till en videovägg måste systemet vara i aktivt tillstånd. %1</translation>
     </message>
+    <message>
+      <source>Screen is locked and cannot be changed</source>
+      <translation type="unfinished">Screen is locked and cannot be changed</translation>
+    </message>
   </context>
   <context>
     <name>QnWorkbenchVirtualCameraHandler</name>

@@ -6170,6 +6170,10 @@ Zalecamy nie otwierać tej integracji. Jeśli rozumiesz ryzyko, możesz otworzy�
       <source>To add a Video Wall, the System should be in active state. %1</source>
       <translation type="unfinished">To add a Video Wall, the System should be in active state. %1</translation>
     </message>
+    <message>
+      <source>Screen is locked and cannot be changed</source>
+      <translation type="unfinished">Screen is locked and cannot be changed</translation>
+    </message>
   </context>
   <context>
     <name>QnWorkbenchVirtualCameraHandler</name>

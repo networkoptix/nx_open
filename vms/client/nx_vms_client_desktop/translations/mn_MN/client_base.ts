@@ -133,7 +133,7 @@
     </message>
     <message>
       <source>Connect to System</source>
-      <translation type="unfinished">Connect to System</translation>
+      <translation>Серверт холбогдох</translation>
     </message>
     <message>
       <source>Help</source>
@@ -572,7 +572,7 @@
     </message>
     <message>
       <source>Camera Settings...</source>
-      <translation type="unfinished">Camera Settings...</translation>
+      <translation>Камерын тохиргоо...</translation>
     </message>
     <message>
       <source>Cameras Settings...</source>
@@ -1590,7 +1590,7 @@ License Key: %2</translation>
     <name>OauthLoginDialog</name>
     <message>
       <source>Connect to System</source>
-      <translation type="unfinished">Connect to System</translation>
+      <translation>Серверт холбогдох</translation>
     </message>
   </context>
   <context>
@@ -3924,7 +3924,7 @@ License Key: %2</translation>
     <name>QnLocalSettingsDialog</name>
     <message>
       <source>General</source>
-      <translation type="unfinished">General</translation>
+      <translation>Ерөнхий</translation>
     </message>
     <message>
       <source>Look and Feel</source>
@@ -4579,7 +4579,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Search</source>
-      <translation type="unfinished">Search</translation>
+      <translation>Хайх</translation>
     </message>
     <message>
       <source>N/A</source>
@@ -4776,7 +4776,7 @@ License Key: %2</translation>
     <name>QnServerSettingsDialog</name>
     <message>
       <source>General</source>
-      <translation type="unfinished">General</translation>
+      <translation>Ерөнхий</translation>
     </message>
     <message>
       <source>Storage Analytics</source>
@@ -4938,7 +4938,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Camera Settings</source>
-      <translation type="unfinished">Camera Settings</translation>
+      <translation>Камерын тохиргоо</translation>
     </message>
     <message>
       <source>I/O Module Settings</source>
@@ -5339,7 +5339,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnSystemAdministrationDialog</name>
     <message>
       <source>General</source>
-      <translation type="unfinished">General</translation>
+      <translation>Ерөнхий</translation>
     </message>
     <message>
       <source>Licenses</source>
@@ -6026,6 +6026,10 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message>
       <source>To add a Video Wall, the System should be in active state. %1</source>
       <translation type="unfinished">To add a Video Wall, the System should be in active state. %1</translation>
+    </message>
+    <message>
+      <source>Screen is locked and cannot be changed</source>
+      <translation type="unfinished">Screen is locked and cannot be changed</translation>
     </message>
   </context>
   <context>
@@ -7837,7 +7841,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     <name>nx::vms::client::desktop::CameraSettingsDialog</name>
     <message>
       <source>General</source>
-      <translation type="unfinished">General</translation>
+      <translation>Ерөнхий</translation>
     </message>
     <message>
       <source>Recording</source>
@@ -7898,7 +7902,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Camera Settings</source>
-      <translation type="unfinished">Camera Settings</translation>
+      <translation>Камерын тохиргоо</translation>
     </message>
     <message>
       <source>Cameras Settings</source>
@@ -8550,7 +8554,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Search</source>
-      <translation type="unfinished">Search</translation>
+      <translation>Хайх</translation>
     </message>
     <message>
       <source>Initializing scan...</source>
@@ -9269,7 +9273,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     <name>nx::vms::client::desktop::LayoutSettingsDialog</name>
     <message>
       <source>General</source>
-      <translation type="unfinished">General</translation>
+      <translation>Ерөнхий</translation>
     </message>
     <message>
       <source>Background</source>
@@ -11047,7 +11051,7 @@ You can still change quality and FPS directly on the camera.</translation>
     <name>nx::vms::client::desktop::SearchLineEdit</name>
     <message>
       <source>Search</source>
-      <translation type="unfinished">Search</translation>
+      <translation>Хайх</translation>
     </message>
   </context>
   <context>
@@ -12359,7 +12363,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
-      <translation type="unfinished">Cameras &amp; Devices</translation>
+      <translation>Камер &amp; Төхөөрөмж</translation>
     </message>
     <message>
       <source>Layouts</source>
