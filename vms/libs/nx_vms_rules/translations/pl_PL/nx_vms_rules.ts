@@ -1003,11 +1003,11 @@
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</translation>
+      <translation>Błąd bazy danych analizy wideo &quot;%1&quot;: niewystarczające uprawnienia w zamontowanej lokalizacji.</translation>
     </message>
     <message>
       <source>Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</source>
-      <translation type="unfinished">Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</translation>
+      <translation>Możnat zainicjować szyfrowanie AES podczas nagrywania archiwum. Dane są zapisywane bez szyfrowania.</translation>
     </message>
     <message>
       <source>RAID error: %1.</source>

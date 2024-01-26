@@ -5953,6 +5953,10 @@ Chúng tôi khuyên bạn không nên mở tích hợp này. Nếu bạn hiểu 
       <source>To add a Video Wall, the System should be in active state. %1</source>
       <translation>Để thêm Tường Video, Hệ thống phải ở trạng thái hoạt động. %1</translation>
     </message>
+    <message>
+      <source>Screen is locked and cannot be changed</source>
+      <translation type="unfinished">Screen is locked and cannot be changed</translation>
+    </message>
   </context>
   <context>
     <name>QnWorkbenchVirtualCameraHandler</name>

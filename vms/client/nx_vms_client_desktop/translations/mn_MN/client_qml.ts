@@ -990,7 +990,7 @@
     </message>
     <message>
       <source>Search</source>
-      <translation type="unfinished">Search</translation>
+      <translation>Хайх</translation>
     </message>
     <message>
       <source>Nothing found</source>
@@ -1892,7 +1892,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
-      <translation type="unfinished">Cameras &amp; Devices</translation>
+      <translation>Камер &amp; Төхөөрөмж</translation>
     </message>
     <message>
       <source>Layouts</source>
@@ -1944,7 +1944,7 @@ Press Alt + Click to follow object</translation>
     <name>ResourceSearchPane</name>
     <message>
       <source>Search</source>
-      <translation type="unfinished">Search</translation>
+      <translation>Хайх</translation>
     </message>
     <message>
       <source>Servers</source>
@@ -1952,7 +1952,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
-      <translation type="unfinished">Cameras &amp; Devices</translation>
+      <translation>Камер &amp; Төхөөрөмж</translation>
     </message>
     <message>
       <source>Layouts</source>
@@ -2051,14 +2051,14 @@ Press Alt + Click to follow object</translation>
     <name>SearchEdit</name>
     <message>
       <source>Search</source>
-      <translation type="unfinished">Search</translation>
+      <translation>Хайх</translation>
     </message>
   </context>
   <context>
     <name>SearchField</name>
     <message>
       <source>Search</source>
-      <translation type="unfinished">Search</translation>
+      <translation>Хайх</translation>
     </message>
   </context>
   <context>
@@ -2154,7 +2154,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Camera Settings</source>
-      <translation type="unfinished">Camera Settings</translation>
+      <translation>Камерын тохиргоо</translation>
     </message>
     <message>
       <source>I/O Module Settings</source>

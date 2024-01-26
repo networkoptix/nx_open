@@ -257,11 +257,11 @@
     </message>
     <message>
       <source>Clear Filter</source>
-      <translation>フィルタークリア</translation>
+      <translation>フィルターを解除</translation>
     </message>
     <message>
       <source>Email settings</source>
-      <translation>Email設定</translation>
+      <translation>メール設定</translation>
     </message>
     <message>
       <source>All servers are offline. Audit data is not available.</source>
@@ -419,7 +419,7 @@
     </message>
     <message>
       <source>Clear Filter</source>
-      <translation>フィルタークリア</translation>
+      <translation>フィルターを解除</translation>
     </message>
   </context>
   <context>
@@ -1168,7 +1168,7 @@
     </message>
     <message>
       <source>Clear Filter</source>
-      <translation>フィルタークリア</translation>
+      <translation>フィルターを解除</translation>
     </message>
     <message>
       <source>Refresh</source>

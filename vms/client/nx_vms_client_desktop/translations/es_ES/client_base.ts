@@ -6026,6 +6026,10 @@ We recommend you not to open this integration. If you understand the risks, you 
       <source>To add a Video Wall, the System should be in active state. %1</source>
       <translation>Para agregar un Video Wall, el sistema debe estar en estado activo. %1</translation>
     </message>
+    <message>
+      <source>Screen is locked and cannot be changed</source>
+      <translation type="unfinished">Screen is locked and cannot be changed</translation>
+    </message>
   </context>
   <context>
     <name>QnWorkbenchVirtualCameraHandler</name>
