@@ -288,8 +288,8 @@ Result validateResourceTypeId(const T& data)
     {
         if (data.typeId != T::kResourceTypeId)
         {
-            throw nx::network::rest::Exception::internalServerError(
-                "Parameter typeId doesn't match its resource data structure");
+            throw nx::network::rest::Exception::invalidParameter(
+                "typeId", "Does not match its resource data structure");
         }
     }
 
