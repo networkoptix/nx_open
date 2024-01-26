@@ -15,6 +15,7 @@
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/desktop/resource/resource_fwd.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
+#include <nx/vms/client/desktop/utils/multiscreen_widget_geometry_setter.h>
 #include <nx/vms/license/license_usage_fwd.h>
 #include <nx_ec/ec_api_fwd.h>
 #include <ui/workbench/workbench_context_aware.h>
@@ -270,7 +271,5 @@ private:
 
     nx::vms::license::VideoWallLicenseUsageHelper* m_licensesHelper;
     QScopedPointer<QnUuidPool> m_uuidPool;
-
-    class GeometrySetter;
-    QScopedPointer<GeometrySetter> m_geometrySetter;
+    QScopedPointer<MultiscreenWidgetGeometrySetter> m_geometrySetter;
 };
