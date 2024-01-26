@@ -453,7 +453,7 @@
     <name>QnFfmpegVideoTranscoder</name>
     <message>
       <source>Could not find encoder for codec %1.</source>
-      <translation type="unfinished">Could not find encoder for codec %1.</translation>
+      <translation>Кодлогч %1 олдсонгүй.</translation>
     </message>
     <message>
       <source>Could not initialize video encoder.</source>
@@ -814,16 +814,16 @@
     </message>
     <message numerus="yes">
       <source>%n Cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n Cameras</numerusform>
-        <numerusform>%n Cameras</numerusform>
+      <translation>
+        <numerusform>%n Камерууд</numerusform>
+        <numerusform>%n Камерууд</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n cameras</numerusform>
-        <numerusform>%n cameras</numerusform>
+      <translation>
+        <numerusform>%n камерууд</numerusform>
+        <numerusform>%n камерууд</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -995,9 +995,9 @@
     <message numerus="yes">
       <source>days</source>
       <comment>Full suffix for displaying days</comment>
-      <translation type="unfinished">
-        <numerusform>days</numerusform>
-        <numerusform>days</numerusform>
+      <translation>
+        <numerusform>өдөр</numerusform>
+        <numerusform>өдөр</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1048,11 +1048,11 @@
     <name>QnUserRolesManager</name>
     <message>
       <source>Owner</source>
-      <translation type="unfinished">Owner</translation>
+      <translation>Эзэмшигч</translation>
     </message>
     <message>
       <source>Administrator</source>
-      <translation type="unfinished">Administrator</translation>
+      <translation>Админ</translation>
     </message>
     <message>
       <source>Advanced Viewer</source>
@@ -1060,11 +1060,11 @@
     </message>
     <message>
       <source>Viewer</source>
-      <translation type="unfinished">Viewer</translation>
+      <translation>Хянагч</translation>
     </message>
     <message>
       <source>Live Viewer</source>
-      <translation type="unfinished">Live Viewer</translation>
+      <translation>Шууд бичлэг хянагч</translation>
     </message>
     <message>
       <source>Custom Role</source>

@@ -361,7 +361,7 @@
     </message>
     <message>
       <source>Open in New Tab</source>
-      <translation>新規タブで開く</translation>
+      <translation>新しいタブで開く</translation>
     </message>
     <message>
       <source>Monitor in New Tab</source>
@@ -1913,7 +1913,7 @@ License Key: %2</source>
     <name>QnAuditLogDialog</name>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation>選択箇所をクリップボードにコピー</translation>
+      <translation>選択範囲をクリップボードにコピー</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
@@ -1925,7 +1925,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Export selected records to a file</source>
-      <translation>選択範囲をファイルにエクスポート</translation>
+      <translation>選択したレコードをファイルにエクスポート</translation>
     </message>
     <message>
       <source>Devices</source>
@@ -2068,7 +2068,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Database restored</source>
-      <translation>データベースリストア</translation>
+      <translation>データベースのリストア</translation>
     </message>
     <message>
       <source>Session begins</source>
@@ -2144,7 +2144,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Email settings changed</source>
-      <translation>Email設定変更</translation>
+      <translation>メール設定変更</translation>
     </message>
     <message>
       <source>Filled circle mark means the archive is still available</source>
@@ -2170,7 +2170,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Event rules reset to default</source>
-      <translation>イベントルールをリセット</translation>
+      <translation>イベントルールのリセット</translation>
     </message>
     <message>
       <source>Storage added</source>
@@ -2641,11 +2641,11 @@ License Key: %2</source>
     <name>QnCameraListDialog</name>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation>選択したものをクリップボードにコピー</translation>
+      <translation>選択範囲をクリップボードにコピー</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation>選択したものをファイルにエクスポート...</translation>
+      <translation>選択範囲をファイルにエクスポート...</translation>
     </message>
     <message>
       <source>Select All</source>
@@ -3354,11 +3354,11 @@ to %1</source>
     </message>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation>選択箇所をクリップボードにコピー</translation>
+      <translation>選択範囲をクリップボードにコピー</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation>選択箇所をファイルにエクスポート...</translation>
+      <translation>選択範囲をファイルにエクスポート...</translation>
     </message>
     <message>
       <source>Select All</source>
@@ -3366,7 +3366,7 @@ to %1</source>
     </message>
     <message>
       <source>Clear Filter</source>
-      <translation>フィルタークリア</translation>
+      <translation>フィルターを解除</translation>
     </message>
     <message>
       <source>Export selected events to file</source>
@@ -5158,7 +5158,7 @@ to %1</source>
     </message>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation>選択箇所をクリップボードにコピー</translation>
+      <translation>選択範囲をクリップボードにコピー</translation>
     </message>
     <message>
       <source>Refresh</source>
@@ -6256,6 +6256,10 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Activate License...</source>
       <translation>ライセンスの有効化...</translation>
+    </message>
+    <message>
+      <source>Screen is locked and cannot be changed</source>
+      <translation>スクリーンがロックされているため変更できません</translation>
     </message>
   </context>
   <context>
@@ -10698,7 +10702,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Open in New Tab</source>
-      <translation>新規タブで開く</translation>
+      <translation>新しいタブで開く</translation>
     </message>
     <message>
       <source>This action is not supported for notifications from other Systems</source>

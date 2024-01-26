@@ -1106,7 +1106,7 @@
     </message>
     <message>
       <source>Search</source>
-      <translation type="unfinished">Search</translation>
+      <translation>Хайх</translation>
     </message>
     <message>
       <source>Stop</source>
@@ -1730,7 +1730,7 @@
     </message>
     <message>
       <source>New License</source>
-      <translation type="unfinished">New License</translation>
+      <translation>Шинэ лиценз</translation>
     </message>
     <message>
       <source>Details...</source>
@@ -2822,7 +2822,7 @@
     </message>
     <message>
       <source>General</source>
-      <translation type="unfinished">General</translation>
+      <translation>Ерөнхий</translation>
     </message>
     <message>
       <source>Issued by</source>
@@ -3340,7 +3340,7 @@
     <name>WebpageDialog</name>
     <message>
       <source>General</source>
-      <translation type="unfinished">General</translation>
+      <translation>Ерөнхий</translation>
     </message>
     <message>
       <source>Proxy this webpage via server</source>

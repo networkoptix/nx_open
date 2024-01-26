@@ -6334,6 +6334,10 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
       <source>Activate License...</source>
       <translation>Activar Licencia...</translation>
     </message>
+    <message>
+      <source>Screen is locked and cannot be changed</source>
+      <translation type="unfinished">Screen is locked and cannot be changed</translation>
+    </message>
   </context>
   <context>
     <name>QnWorkbenchVirtualCameraHandler</name>
