@@ -524,14 +524,11 @@ QString EventSearchListModel::Private::iconPath(const vms::event::EventParameter
         case EventType::cameraMotionEvent:
             return "events/motion.svg";
 
-        // TODO: #vkutin Fill with actual pixmaps as soon as they're created.
+        // TODO: #spanasenko Fill with actual pixmaps as soon as they're created.
         case EventType::cameraInputEvent:
-            return "tree/camera.svg";
-
         case EventType::analyticsSdkEvent:
         case EventType::analyticsSdkObjectDetected:
-            // TODO:
-            return {};
+            return "tree/camera.svg";
 
         default:
             return {};
