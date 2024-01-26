@@ -3,6 +3,7 @@
 #include "utils.h"
 
 #include <core/resource/videowall_resource.h>
+#include <utils/screen_snaps_geometry.h>
 #include <utils/screen_utils.h>
 
 namespace nx::vms::client::desktop {
@@ -16,7 +17,7 @@ QSet<int> screensCoveredByItem(const QnVideoWallItem& item, const QnVideoWallRes
             screenGeometries << screen.desktopGeometry;
     }
 
-    const QRect itemGeometry = item.screenSnaps.geometry(screenGeometries);
+    const QRect itemGeometry = screenSnapsGeometry(item.screenSnaps, screenGeometries);
     return nx::gui::Screens::coveredBy(itemGeometry, screenGeometries);
 }
 

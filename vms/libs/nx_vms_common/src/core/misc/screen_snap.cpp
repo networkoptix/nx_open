@@ -3,6 +3,7 @@
 #include "screen_snap.h"
 
 #include <nx/utils/log/assert.h>
+#include <nx/utils/log/log.h>
 
 namespace {
 
@@ -42,38 +43,11 @@ int QnScreenSnap::snapsPerScreen()
 
 bool QnScreenSnaps::isValid() const
 {
-    return std::all_of(values.cbegin(), values.cend(), [](const QnScreenSnap &snap) { return snap.isValid(); });
-}
-
-QRect QnScreenSnaps::geometry(const QList<QRect>& screens) const
-{
-    if (!isValid())
-        return {};
-
-    if (!NX_ASSERT(!screens.empty()))
-        return {};
-
-    auto screen =
-        [&screens](int i) { return i >= 0 && i < screens.size() ? screens[i] : screens[0]; };
-
-    const QRect leftScreen = screen(left().screenIndex);
-    const int x1 = leftScreen.x()
-        + (leftScreen.width() / QnScreenSnap::snapsPerScreen()) * left().snapIndex;
-
-    const QRect topScreen = screen(top().screenIndex);
-    const int y1 = topScreen.y()
-        + (topScreen.height() / QnScreenSnap::snapsPerScreen()) * top().snapIndex;
-
-    const QRect rightScreen = screen(right().screenIndex);
-    const int x2 = rightScreen.right()
-        - (rightScreen.width() / QnScreenSnap::snapsPerScreen()) * right().snapIndex;
-
-    const QRect bottomScreen = screen(bottom().screenIndex);
-    const int y2 = bottomScreen.bottom()
-        - (bottomScreen.height() / QnScreenSnap::snapsPerScreen()) * bottom().snapIndex;
-
-    // Swap coordinates if screens were moved.
-    return QRect(QPoint(x1, y1), QPoint(x2, y2)).normalized();
+    return std::all_of(values.cbegin(), values.cend(),
+        [](const QnScreenSnap &snap)
+        {
+            return snap.isValid();
+        });
 }
 
 QDebug operator<<(QDebug dbg, const QnScreenSnap& snap)
