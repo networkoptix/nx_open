@@ -76,7 +76,7 @@ struct NX_VMS_API ServerModel: ResourceWithParameters
     /**%apidoc[readonly] */
     std::optional<nx::utils::OsInfo> osInfo;
 
-    /**%apidoc[opt] */
+    /**%apidoc[readonly] */
     ServerFlags flags = SF_None;
 
     /**%apidoc[opt]
