@@ -43,20 +43,25 @@ WeekTimeScheduleDialog::WeekTimeScheduleDialog(QWidget* parent, bool isEmptyAllo
     ui->buttonBox->setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     ui->alertBar->init({.level = BarDescription::BarLevel::Error});
 
-    if (!isEmptyAllowed)
-    {
-        connect(
-            ui->gridWidget,
-            &ScheduleGridWidget::gridDataChanged,
-            this,
-            [this]
+    connect(
+        ui->gridWidget,
+        &ScheduleGridWidget::gridDataChanged,
+        this,
+        [this, isEmptyAllowed]
+        {
+            ui->gridWidget->setActive(true);
+
+            if (!isEmptyAllowed)
             {
                 const auto isEmptySchedule = ui->gridWidget->empty();
                 ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(!isEmptySchedule);
                 ui->alertBar->setText(
                     isEmptySchedule ? tr("Empty schedule is not allowed") : QString{});
-            });
-    }
+                return;
+            }
+
+            ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
+        });
 }
 
 WeekTimeScheduleDialog::~WeekTimeScheduleDialog()
@@ -96,6 +101,23 @@ void WeekTimeScheduleDialog::setSchedule(const QByteArray& schedule)
         for (int hour = 0; hour < nx::vms::common::kHoursInDay; ++hour)
             ui->gridWidget->setCellData(dayOfWeek, hour, reader.getBit());
     }
+}
+
+void WeekTimeScheduleDialog::setSchedules(const QVector<QByteArray>& schedules)
+{
+    if (!NX_ASSERT(!schedules.isEmpty()))
+        return;
+
+    if (std::equal(schedules.cbegin() + 1, schedules.cend(), schedules.cbegin()))
+    {
+        // All the given schedules are equal.
+        setSchedule(schedules.first());
+        return;
+    }
+
+    // Inactive state indicates that the given schedules are not equal.
+    ui->gridWidget->setActive(false);
+    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
 }
 
 QString WeekTimeScheduleDialog::scheduleTasks() const

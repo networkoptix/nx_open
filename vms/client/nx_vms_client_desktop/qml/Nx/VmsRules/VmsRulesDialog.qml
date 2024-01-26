@@ -72,6 +72,19 @@ Dialog
 
             TextButton
             {
+                text: qsTr("Schedule")
+                icon.source: "image://svg/skin/text_buttons/calendar_20.svg"
+                visible: tableView.hasCheckedRows
+
+                onClicked:
+                {
+                    const ruleIds = rulesSortFilterModel.getRuleIds(tableView.checkedRows)
+                    root.dialog.editSchedule(ruleIds)
+                }
+            }
+
+            TextButton
+            {
                 text: qsTr("Duplicate")
                 icon.source: "image://svg/skin/text_buttons/copy_20.svg"
                 visible: tableView.checkedRows.length === 1

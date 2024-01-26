@@ -21,6 +21,7 @@ public:
     void setError(const QString& error);
 
     Q_INVOKABLE void addRule();
+    Q_INVOKABLE void editSchedule(const QnUuidList& ids);
     Q_INVOKABLE void duplicateRule(QnUuid id);
     Q_INVOKABLE void editRule(QnUuid id);
     Q_INVOKABLE void deleteRules(const QnUuidList& ids);
