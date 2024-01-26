@@ -406,7 +406,7 @@ std::optional<ModuleConnector::Module::Endpoints::iterator>
     return std::nullopt;
 }
 
-void ModuleConnector::Module::connectToGroup(Endpoints::iterator endpointsGroup)
+void ModuleConnector::Module::connectToGroup(Endpoints::iterator endpointsGroup, bool byTimer)
 {
     if (m_parent->m_isPassiveMode)
     {
@@ -418,10 +418,10 @@ void ModuleConnector::Module::connectToGroup(Endpoints::iterator endpointsGroup)
     }
 
     // Cancel reconnect timer if the method was called not after timeout.
-    if (const auto timeLeft = m_reconnectTimer.timeToEvent(); timeLeft)
+    if (!byTimer)
     {
         NX_VERBOSE(this, "Reconnect was requested %1 before timeout, resetting reconnect delays",
-            *timeLeft);
+            m_reconnectTimer.timeToEvent().value_or(std::chrono::nanoseconds::zero()));
         m_reconnectTimer.cancelSync();
     }
 
@@ -429,7 +429,8 @@ void ModuleConnector::Module::connectToGroup(Endpoints::iterator endpointsGroup)
     {
         if (!m_id.isNull())
         {
-            m_reconnectTimer.scheduleNextTry([this](){ connectToGroup(m_endpoints.begin()); });
+            m_reconnectTimer.scheduleNextTry(
+                [this]() { connectToGroup(m_endpoints.begin(), /*byTimer*/ true); });
             NX_VERBOSE(this, "No more endpoints, retry in %1", m_reconnectTimer.currentDelay());
             m_parent->m_disconnectedHandler(m_id);
         }

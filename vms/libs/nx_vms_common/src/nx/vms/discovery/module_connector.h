@@ -97,7 +97,7 @@ private:
 
         Priority hostPriority(const nx::network::HostAddress& host) const;
         std::optional<Endpoints::iterator> saveEndpoint(nx::network::SocketAddress endpoint);
-        void connectToGroup(Endpoints::iterator endpointsGroup);
+        void connectToGroup(Endpoints::iterator endpointsGroup, bool byTimer = false);
         void connectToEndpoint(const nx::network::SocketAddress& endpoint, Endpoints::iterator endpointsGroup);
 
         bool saveConnection(
