@@ -71,6 +71,7 @@ public:
 
 signals:
     void stateChanged(const State& state);
+    void systemNameChanged(int index, const QString& name);
 };
 
 } // nx::vms::client::desktop

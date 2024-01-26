@@ -2,6 +2,8 @@
 
 #include "main_window_title_bar_state.h"
 
+#include <network/system_description.h>
+
 namespace nx::vms::client::desktop {
 
 bool MainWindowTitleBarState::SystemData::operator==(const SystemData& other) const
@@ -217,6 +219,13 @@ void MainWindowTitleBarStateStore::addSystem(const QnSystemDescriptionPtr& syste
     State::SystemData value =
         {.systemDescription = systemDescription, .logonData = std::move(logonData)};
     dispatch(Reducer::addSystem, value);
+
+    connect(systemDescription.get(), &QnSystemDescription::systemNameChanged, this,
+        [this, systemDescription]
+        {
+            const int index = state().findSystemIndex(systemDescription->localId());
+            emit systemNameChanged(index, systemDescription->name());
+        });
 }
 
 void MainWindowTitleBarStateStore::insertSystem(int index, const State::SystemData systemData)

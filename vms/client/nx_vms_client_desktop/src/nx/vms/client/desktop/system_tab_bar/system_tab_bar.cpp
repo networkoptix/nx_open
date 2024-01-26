@@ -98,6 +98,11 @@ void SystemTabBar::setStateStore(QSharedPointer<Store> store,
             setCurrentIndex(index);
             updateHomeTabView();
         });
+    connect(m_store.get(), &Store::systemNameChanged, this,
+        [this](int index, const QString& text)
+        {
+            setTabText(index, text);
+        });
 }
 
 void SystemTabBar::rebuildTabs()
