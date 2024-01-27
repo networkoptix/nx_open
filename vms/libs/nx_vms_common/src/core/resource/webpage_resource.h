@@ -78,11 +78,16 @@ public:
     bool isCertificateCheckEnabled() const;
     void setCertificateCheckEnabled(bool value);
 
+    /** Webpage auto refresh interval, zero or negative value means auto refresh is disabled. */
+    std::chrono::seconds refreshInterval() const;
+    void setRefreshInterval(std::chrono::seconds interval);
+
     Options getOptions() const;
 
 signals:
     void subtypeChanged(const QnWebPageResourcePtr& webPage);
     void proxyDomainAllowListChanged(const QnWebPageResourcePtr& webPage);
+    void refreshIntervalChanged();
 
 private:
     // This class must not store its status on server side

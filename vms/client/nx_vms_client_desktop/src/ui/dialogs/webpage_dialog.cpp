@@ -20,8 +20,10 @@
 #include <nx/vms/client/desktop/settings/message_bar_settings.h>
 #include <nx/vms/client/desktop/ui/messages/resources_messages.h>
 #include <nx/vms/common/html/html.h>
+#include <nx/vms/text/time_strings.h>
 
 using namespace nx::vms::api;
+using namespace std::chrono;
 
 namespace {
 
@@ -34,6 +36,13 @@ bool isValidUrl(const QUrl& url)
 }
 
 static constexpr auto kAnyDomain = "*";
+static constexpr int kInvalidIndex = -1;
+
+enum DurationUnitItemRole
+{
+    UnitSuffixRole = Qt::UserRole,
+    UnitDurationRole,
+};
 
 } // namespace
 
@@ -163,6 +172,57 @@ QnWebpageDialog::QnWebpageDialog(QWidget* parent, EditMode editMode):
         {
             setSubtype(checked ? WebPageSubtype::clientApi : WebPageSubtype::none);
         });
+
+    const auto updateSuffix =
+        [this]()
+        {
+            for (int i = 0; i < ui->comboBoxRefreshPeriodUnit->count(); ++i)
+            {
+                const auto unitSuffix =
+                    static_cast<QnTimeStrings::Suffix>(
+                        ui->comboBoxRefreshPeriodUnit->itemData(i, UnitSuffixRole).toInt());
+
+                ui->comboBoxRefreshPeriodUnit->setItemText(
+                    i,
+                    QnTimeStrings::fullSuffixCapitalized(
+                        unitSuffix,
+                        ui->spinBoxRefreshPeriod->value()));
+            }
+        };
+
+    connect(ui->spinBoxRefreshPeriod, &QSpinBox::valueChanged, updateSuffix);
+    connect(ui->refreshCheckBox, &QCheckBox::stateChanged, this,
+        [this, updateSuffix]()
+        {
+            updateSuffix();
+            ui->refreshParametersWidget->setVisible(ui->refreshCheckBox->isChecked());
+        });
+
+    static const auto addDurationUnitComboBoxItem =
+        [](
+            QComboBox* unitComboBox,
+            QnTimeStrings::Suffix unitSuffux,
+            seconds unitDuration)
+        {
+            const auto itemText = QnTimeStrings::fullSuffixCapitalized(unitSuffux);
+
+            unitComboBox->addItem(itemText);
+            const auto itemIndex = unitComboBox->count() - 1;
+
+            unitComboBox->setItemData(
+                itemIndex,
+                QVariant(static_cast<int>(unitSuffux)), UnitSuffixRole);
+            unitComboBox->setItemData(
+                itemIndex,
+                QVariant::fromValue(unitDuration),
+                UnitDurationRole);
+        };
+
+    addDurationUnitComboBoxItem(
+        ui->comboBoxRefreshPeriodUnit, QnTimeStrings::Suffix::Seconds, 1s);
+    addDurationUnitComboBoxItem(
+        ui->comboBoxRefreshPeriodUnit, QnTimeStrings::Suffix::Minutes, 1min);
+    ui->comboBoxRefreshPeriodUnit->setCurrentIndex(kInvalidIndex);
 
     updateText();
     updateSelectServerMenuButtonVisibility();
@@ -339,6 +399,41 @@ void QnWebpageDialog::setProxyDomainAllowList(const QStringList& allowList)
     m_initialProxyAll = allowList.contains(kAnyDomain);
     ui->proxyAllContentsCheckBox->setChecked(m_initialProxyAll);
     ui->allowListField->setText(allowList.join(','));
+}
+
+seconds QnWebpageDialog::refreshInterval() const
+{
+    if (!ui->refreshCheckBox->isChecked())
+        return 0s;
+
+    return ui->comboBoxRefreshPeriodUnit->itemData(
+        ui->comboBoxRefreshPeriodUnit->currentIndex(),
+        UnitDurationRole
+    ).value<seconds>() * ui->spinBoxRefreshPeriod->value();
+}
+
+void QnWebpageDialog::setRefreshInterval(seconds interval)
+{
+    const int value = interval.count();
+    ui->refreshCheckBox->setChecked(value > 0);
+
+    int periodIndex = 0;
+    int spinBoxValue = 5; //< Default value is 5 seconds.
+
+    for (int i = 0; i < ui->comboBoxRefreshPeriodUnit->count(); ++i)
+    {
+        const auto newValue = value
+            / ui->comboBoxRefreshPeriodUnit->itemData(i, UnitDurationRole).value<seconds>().count();
+
+        if (newValue <= 0)
+            break;
+
+        periodIndex = i;
+        spinBoxValue = newValue;
+    }
+
+    ui->comboBoxRefreshPeriodUnit->setCurrentIndex(periodIndex);
+    ui->spinBoxRefreshPeriod->setValue(spinBoxValue);
 }
 
 void QnWebpageDialog::setResourceId(QnUuid id)

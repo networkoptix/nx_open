@@ -48,6 +48,9 @@ public:
     QStringList proxyDomainAllowList() const;
     void setProxyDomainAllowList(const QStringList& allowList);
 
+    std::chrono::seconds refreshInterval() const;
+    void setRefreshInterval(std::chrono::seconds interval);
+
     void setResourceId(QnUuid id);
 
     bool isCertificateCheckEnabled() const;

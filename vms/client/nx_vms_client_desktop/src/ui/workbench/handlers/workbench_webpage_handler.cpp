@@ -107,6 +107,7 @@ void QnWorkbenchWebPageHandler::addNewWebPage(nx::vms::api::WebPageSubtype subty
     webPage->setProxyId(dialog->proxyId());
     webPage->setProxyDomainAllowList(dialog->proxyDomainAllowList());
     webPage->setCertificateCheckEnabled(dialog->isCertificateCheckEnabled());
+    webPage->setRefreshInterval(dialog->refreshInterval());
 
     qnResourcesChangesManager->saveWebPage(webPage);
     menu()->trigger(menu::SelectNewItemAction, webPage);
@@ -127,6 +128,7 @@ void QnWorkbenchWebPageHandler::editWebPage()
     const auto oldSubType = webPage->subtype();
     const auto oldProxyDomainAllowList = webPage->proxyDomainAllowList();
     const auto oldCertCheck = webPage->isCertificateCheckEnabled();
+    const auto oldRefreshInterval = webPage->refreshInterval();
 
     QScopedPointer<QnWebpageDialog> dialog(
         new QnWebpageDialog(mainWindowWidget(), QnWebpageDialog::EditPage));
@@ -137,6 +139,7 @@ void QnWorkbenchWebPageHandler::editWebPage()
     dialog->setSubtype(oldSubType);
     dialog->setProxyDomainAllowList(oldProxyDomainAllowList);
     dialog->setCertificateCheckEnabled(oldCertCheck);
+    dialog->setRefreshInterval(oldRefreshInterval);
 
     dialog->setResourceId(webPage->getId());
 
@@ -149,13 +152,15 @@ void QnWorkbenchWebPageHandler::editWebPage()
     const auto subtype = dialog->subtype();
     const auto proxyDomainAllowList = dialog->proxyDomainAllowList();
     const auto certCheck = dialog->isCertificateCheckEnabled();
+    const auto refreshInterval = dialog->refreshInterval();
 
     if (oldName == name
         && oldUrl == url.toString()
         && oldProxy == proxy
         && oldSubType == subtype
         && proxyDomainAllowList == oldProxyDomainAllowList
-        && oldCertCheck == certCheck)
+        && oldCertCheck == certCheck
+        && oldRefreshInterval == refreshInterval)
     {
         return;
     }
@@ -166,5 +171,6 @@ void QnWorkbenchWebPageHandler::editWebPage()
     webPage->setSubtype(subtype);
     webPage->setProxyDomainAllowList(proxyDomainAllowList);
     webPage->setCertificateCheckEnabled(certCheck);
+    webPage->setRefreshInterval(refreshInterval);
     qnResourcesChangesManager->saveWebPage(webPage);
 }

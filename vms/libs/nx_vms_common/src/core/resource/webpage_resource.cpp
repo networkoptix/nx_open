@@ -14,10 +14,12 @@ namespace {
 static const QString kSubtypePropertyName = ResourcePropertyKey::WebPage::kSubtypeKey;
 static const QString kProxyDomainAllowListPropertyName = "proxyDomainAllowList";
 static const QString kCertificateCheckPropertyName = "certificateCheck";
+static const QString kRefreshIntervalPropertyName = "refreshIntervalS";
 
 } // namespace
 
 using namespace nx::vms::api;
+using namespace std::chrono;
 
 QnWebPageResource::QnWebPageResource():
     base_type()
@@ -32,6 +34,8 @@ QnWebPageResource::QnWebPageResource():
                 emit subtypeChanged(toSharedPointer(this));
             else if (key == kProxyDomainAllowListPropertyName)
                 emit proxyDomainAllowListChanged(toSharedPointer(this));
+            else if (key == kRefreshIntervalPropertyName)
+                emit refreshIntervalChanged();
         });
 }
 
@@ -111,6 +115,17 @@ void QnWebPageResource::setCertificateCheckEnabled(bool value)
 {
     // Default value is treated as `true`.
     setProperty(kCertificateCheckPropertyName, value ? "" : "0");
+}
+
+seconds QnWebPageResource::refreshInterval() const
+{
+    const QString propString = getProperty(kRefreshIntervalPropertyName);
+    return propString.isEmpty() ? 0s : seconds(propString.toUInt());
+}
+
+void QnWebPageResource::setRefreshInterval(seconds interval)
+{
+    setProperty(kRefreshIntervalPropertyName, QString::number(interval.count()));
 }
 
 QnWebPageResource::Options QnWebPageResource::getOptions() const
