@@ -392,7 +392,7 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
                 if (m_widgetState == WidgetUpdateState::initial && !m_updateCheck.valid())
                 {
                     m_updateCheck = m_serverUpdateTool->checkForUpdate(
-                        update::LatestVmsVersionParams{appContext()->version()});
+                        update::LatestVmsVersionParams{getMinimumComponentVersion()});
                 }
             }
         });
@@ -1044,7 +1044,7 @@ void MultiServerUpdatesWidget::recheckSpecificBuild()
 
     clearUpdateInfo();
     m_updateCheck = m_serverUpdateTool->checkForUpdate(
-        update::CertainVersionParams{m_pickedSpecificBuild, appContext()->version()});
+        update::CertainVersionParams{m_pickedSpecificBuild, getMinimumComponentVersion()});
     loadDataToUi();
 }
 
@@ -1085,7 +1085,7 @@ void MultiServerUpdatesWidget::checkForInternetUpdates(bool initial)
     {
         clearUpdateInfo();
         m_updateCheck = m_serverUpdateTool->checkForUpdate(
-            update::LatestVmsVersionParams{appContext()->version()});
+            update::LatestVmsVersionParams{getMinimumComponentVersion()});
         m_updateReport.compareAndSet(m_updateReport->checking, isChecking());
         // We have changed 'isChecking' here.
         syncUpdateCheckToUi();
@@ -1748,7 +1748,7 @@ void MultiServerUpdatesWidget::processInitialState()
     {
         clearUpdateInfo();
         m_updateCheck = m_serverUpdateTool->checkForUpdate(
-            update::LatestVmsVersionParams{appContext()->version()});
+            update::LatestVmsVersionParams{getMinimumComponentVersion()});
     }
 
     if (!m_serverUpdateCheck.valid())
