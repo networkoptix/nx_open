@@ -396,8 +396,10 @@ int PeerStateTracker::setUpdateStatus(const std::map<QnUuid, nx::vms::common::up
                 changed |= compareAndSet(status.second.errorCode, item->errorCode);
 
                 changed |= compareAndSet(
-                    // -1 because we don't count an update package for the current client.
-                    (int) status.second.downloads.size() - 1, item->offlinePackageCount);
+                    // -1 because we don't count an update package for the server itself.
+                    (int) status.second.downloads.size()
+                        - (status.second.mainUpdatePackage.isEmpty() ? 0 : 1),
+                    item->offlinePackageCount);
 
                 int offlinePackageProgress = 0;
                 auto haveCorruptedDownloads = false;
