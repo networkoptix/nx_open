@@ -2,6 +2,7 @@
 
 #include "web_resource_widget.h"
 
+#include <QtCore/QTimer>
 #include <QtWidgets/QGraphicsView>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QPushButton>
@@ -19,6 +20,7 @@
 #include <nx/vms/client/desktop/ui/dialogs/client_api_auth_dialog.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/html/html.h>
+#include <nx/vms/text/time_strings.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
 #include <ui/graphics/items/generic/image_button_bar.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
@@ -32,6 +34,7 @@
 #include <utils/common/delayed.h>
 
 using namespace nx::vms::client::desktop;
+using namespace std::chrono;
 
 namespace {
 
@@ -48,7 +51,8 @@ QnWebResourceWidget::QnWebResourceWidget(
     base_type(systemContext, windowContext, item, parent),
     m_webEngineView(item->data(Qn::ItemWebPageSavedStateDataRole).isNull()
         ? new GraphicsWebEngineView(resource(), this)
-        : new GraphicsWebEngineView({}, this)) //< Page will be loaded from saved state later.
+        : new GraphicsWebEngineView({}, this)), //< Page will be loaded from saved state later.
+    m_refreshTimer(new QTimer())
 {
     setOption(AllowFocus, false);
 
@@ -101,6 +105,9 @@ QnWebResourceWidget::QnWebResourceWidget(
             if (ok)
                 m_pageLoaded = true;
         });
+
+    connect(m_refreshTimer.get(), &QTimer::timeout,
+        m_webEngineView.get(), &GraphicsWebEngineView::reload);
 
     connect(layoutResource().get(), &QnLayoutResource::lockedChanged,
         this, &QnWebResourceWidget::setupWidget);
@@ -159,8 +166,40 @@ void QnWebResourceWidget::setupOverlays()
                 this->updateDetailsText();
             });
 
+        auto webResource = qobject_cast<QnWebPageResource*>(resource().get());
         auto reloadButton = createStatisticAwareButton(lit("web_widget_reload"));
-        reloadButton->setIcon(loadSvgIcon("item/refresh.svg"));
+        const auto updateRefreshInterval =
+            [webResource, reloadButton, this]()
+            {
+                int value = webResource->refreshInterval().count();
+                reloadButton->setIcon(loadSvgIcon(value > 0
+                    ? "item/refresh_auto.svg"
+                    : "item/refresh.svg"));
+
+                m_refreshTimer->setInterval(
+                    duration_cast<milliseconds>(webResource->refreshInterval()));
+
+                if (value > 0)
+                    m_refreshTimer->start();
+                else
+                    m_refreshTimer->stop();
+
+                const auto minutesValue = duration_cast<minutes>(webResource->refreshInterval());
+                const QString suffix = QnTimeStrings::suffix(
+                    minutesValue.count() > 0
+                        ? QnTimeStrings::Suffix::Minutes
+                        : QnTimeStrings::Suffix::Seconds);
+
+                setToolTip(value > 0
+                    ? QString("Auto-refresh every %1%2").arg(value).arg(suffix)
+                    : tr("Refresh"));
+            };
+
+        connect(webResource, &QnWebPageResource::refreshIntervalChanged,
+            this, updateRefreshInterval);
+
+        updateRefreshInterval();
+
         reloadButton->setObjectName("ReloadButton");
         connect(reloadButton, &QnImageButtonWidget::clicked,
             m_webEngineView.get(), &GraphicsWebEngineView::reload);

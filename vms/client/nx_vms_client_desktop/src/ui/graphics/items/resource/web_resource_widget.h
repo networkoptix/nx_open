@@ -53,6 +53,7 @@ private:
 
 private:
     std::unique_ptr<nx::vms::client::desktop::GraphicsWebEngineView> m_webEngineView;
+    std::unique_ptr<QTimer> m_refreshTimer;
     bool m_validCertificate = true;
     bool m_pageLoaded = false;
     bool m_isMinimalTitleBar = false;
