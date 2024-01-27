@@ -33,7 +33,12 @@ Item
     property bool autoRepeat: true
     property bool hasPreloader: false
 
-    readonly property real videoAspectRatio: loader.item ? loader.item.content.mediaPlayer.aspectRatio : 0
+    readonly property real videoAspectRatio: loader.item
+        ? loader.item.content.mediaPlayer.aspectRatio
+        : 16 / 9
+    readonly property real videoRotation: loader.item
+        ? loader.item.content.defaultRotation
+        : 0
     readonly property bool playing: loader.item ? loader.item.content.mediaPlayer.playing : false
     readonly property bool playingPlayerState: loader.item
         ? loader.item.content.mediaPlayer.playbackState == MediaPlayer.Playing
