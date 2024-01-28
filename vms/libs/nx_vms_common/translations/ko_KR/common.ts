@@ -456,83 +456,6 @@
     </message>
   </context>
   <context>
-    <name>QnFfmpegAudioTranscoder</name>
-    <message>
-      <source>Audio context was not specified.</source>
-      <translation>오디오 컨텍스트가 지정되어있지 않습니다.</translation>
-    </message>
-    <message>
-      <source>Could not find encoder for codec %1.</source>
-      <translation>%1 codec의 인코더를 찾을 수 없습니다.</translation>
-    </message>
-    <message>
-      <source>Could not initialize audio encoder.</source>
-      <translation>오디오 인코더를 초기화할 수 없습니다.</translation>
-    </message>
-    <message>
-      <source>Could not initialize audio decoder.</source>
-      <translation>오디오 인코더를 초기화할 수 없습니다.</translation>
-    </message>
-    <message>
-      <source>Could not find decoder for codec %1.</source>
-      <translation>%1 codec의 인코더를 찾을 수 없습니다.</translation>
-    </message>
-    <message>
-      <source>Could not send audio frame to encoder, Error code: %1.</source>
-      <translation>디코더롤 오디오 프레임을 전송할 수 없습니다: 에러코드 %1.</translation>
-    </message>
-    <message>
-      <source>Could not receive audio packet from encoder, Error code: %1.</source>
-      <translation>디코더에서 오디오 패킷을 받을 수 없습니다: 에러코드 %1.</translation>
-    </message>
-    <message>
-      <source>Could not receive audio frame from decoder, Error code: %1.</source>
-      <translation>디코더에서 오디오 프레임을 받을 수 없습니다: 에러코드 %1.</translation>
-    </message>
-    <message>
-      <source>Could not allocate sample buffers</source>
-      <translation>샘플 버퍼를 할당 할 수 없습니다.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnFfmpegTranscoder</name>
-    <message>
-      <source>Container %1 was not found in FFMPEG library.</source>
-      <translation>FFMPEG 라이브러리에서 %1의 공간을 찾을 수 없습니다.</translation>
-    </message>
-    <message>
-      <source>Could not create output context for format %1.</source>
-      <translation>%1 포맷을 위한 출력 컨텍스트를 만들 수 없음.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output stream for recording.</source>
-      <translation>저장을 위한 출력 스트림을 할당 할 수 없습니다.</translation>
-    </message>
-    <message>
-      <source>Could not perform direct stream copy because frame size is undefined.</source>
-      <translation>프레임 크기가 확실치 않기 때문에 직접 스트림 복사를 실행할 수 없습니다.</translation>
-    </message>
-    <message>
-      <source>Could not find codec %1.</source>
-      <translation>%1 codec을 찾을 수 없습니다.</translation>
-    </message>
-    <message>
-      <source>Video or audio codec is incompatible with container %1.</source>
-      <translation>비디오 또는 오디오 코덱은 %1 컨테이너와 호환되지 않습니다.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnFfmpegVideoTranscoder</name>
-    <message>
-      <source>Could not find encoder for codec %1.</source>
-      <translation>%1 codec의 인코더를 찾을 수 없습니다.</translation>
-    </message>
-    <message>
-      <source>Could not initialize video encoder.</source>
-      <translation>비디오 인코더를 초기화 할 수 없습니다.</translation>
-    </message>
-  </context>
-  <context>
     <name>QnLicense</name>
     <message>
       <source>Analog</source>
@@ -1176,14 +1099,6 @@
   </context>
   <context>
     <name>QnTranscoder</name>
-    <message>
-      <source>OpenCL transcoding is not implemented.</source>
-      <translation>OpenCLTranscode가 구현되어있지 않음.</translation>
-    </message>
-    <message>
-      <source>Unknown transcoding method.</source>
-      <translation>알수없는 변환 방법.</translation>
-    </message>
     <message>
       <source>OpenCLTranscode is not implemented.</source>
       <translation>OpenCLTranscode가 구현되어있지 않음.</translation>

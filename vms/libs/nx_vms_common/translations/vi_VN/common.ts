@@ -456,83 +456,6 @@
     </message>
   </context>
   <context>
-    <name>QnFfmpegAudioTranscoder</name>
-    <message>
-      <source>Audio context was not specified.</source>
-      <translation>Nội dung âm thanh không được chỉ định.</translation>
-    </message>
-    <message>
-      <source>Could not find encoder for codec %1.</source>
-      <translation>Không thể tìm thấy %1 Một bộ mã hóa để mã hóa.</translation>
-    </message>
-    <message>
-      <source>Could not initialize audio encoder.</source>
-      <translation>Không thể khởi tạo bộ mã hóa âm thanh.</translation>
-    </message>
-    <message>
-      <source>Could not initialize audio decoder.</source>
-      <translation>Không thể khởi tạo bộ giải mã âm thanh.</translation>
-    </message>
-    <message>
-      <source>Could not find decoder for codec %1.</source>
-      <translation>Không thể tìm thấy %1 Một bộ mã hóa để mã hóa.</translation>
-    </message>
-    <message>
-      <source>Could not send audio frame to encoder, Error code: %1.</source>
-      <translation>Không thể gửi khung âm thanh tới bộ mã hóa, Mã lỗi: %1.</translation>
-    </message>
-    <message>
-      <source>Could not receive audio packet from encoder, Error code: %1.</source>
-      <translation>Không thể nhận gói tin âm thanh từ bộ mã hóa, Mã lỗi: %1.</translation>
-    </message>
-    <message>
-      <source>Could not receive audio frame from decoder, Error code: %1.</source>
-      <translation>Không thể nhận gói tin âm thanh từ bộ mã hóa, Mã lỗi: %1.</translation>
-    </message>
-    <message>
-      <source>Could not allocate sample buffers</source>
-      <translation>Không thể phân bổ bộ đệm mẫu</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnFfmpegTranscoder</name>
-    <message>
-      <source>Container %1 was not found in FFMPEG library.</source>
-      <translation>Trong FFMPEG Thư lãm thư viện không thể tìm thấy một container %1.</translation>
-    </message>
-    <message>
-      <source>Could not create output context for format %1.</source>
-      <translation>Không thể thiết lập một định dạng %1 Các đầu ra.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output stream for recording.</source>
-      <translation>Không thể phân bổ luồng đầu ra để ghi.</translation>
-    </message>
-    <message>
-      <source>Could not perform direct stream copy because frame size is undefined.</source>
-      <translation>Không thể thực hiện sao chép luồng trực tiếp vì kích thước khung chưa được xác định.</translation>
-    </message>
-    <message>
-      <source>Could not find codec %1.</source>
-      <translation>Không thể tìm thấy %1 Mã hóa.</translation>
-    </message>
-    <message>
-      <source>Video or audio codec is incompatible with container %1.</source>
-      <translation>Mã hóa video hoặc âm thanh không tương thích với vùng chứa %1.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnFfmpegVideoTranscoder</name>
-    <message>
-      <source>Could not find encoder for codec %1.</source>
-      <translation>Không thể tìm thấy %1 Một bộ mã hóa để mã hóa.</translation>
-    </message>
-    <message>
-      <source>Could not initialize video encoder.</source>
-      <translation>Không thể khởi tạo bộ mã hóa video.</translation>
-    </message>
-  </context>
-  <context>
     <name>QnLicense</name>
     <message>
       <source>Analog</source>
@@ -1176,14 +1099,6 @@
   </context>
   <context>
     <name>QnTranscoder</name>
-    <message>
-      <source>OpenCL transcoding is not implemented.</source>
-      <translation>Chuyển mã OpenCL không được triển khai.</translation>
-    </message>
-    <message>
-      <source>Unknown transcoding method.</source>
-      <translation>Phương thức chuyển mã không xác định.</translation>
-    </message>
     <message>
       <source>OpenCLTranscode is not implemented.</source>
       <translation>Chuyển mã OpenCL không được triển khai.</translation>

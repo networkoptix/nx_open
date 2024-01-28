@@ -462,83 +462,6 @@
     </message>
   </context>
   <context>
-    <name>QnFfmpegAudioTranscoder</name>
-    <message>
-      <source>Audio context was not specified.</source>
-      <translation>Audio-Kontext wurde nicht definiert.</translation>
-    </message>
-    <message>
-      <source>Could not find encoder for codec %1.</source>
-      <translation>Encoder für Codec %1 konnte nicht gefunden werden.</translation>
-    </message>
-    <message>
-      <source>Could not initialize audio encoder.</source>
-      <translation>Audio-Encoder konnte nicht initialisiert werden.</translation>
-    </message>
-    <message>
-      <source>Could not initialize audio decoder.</source>
-      <translation>Audio-Decoder konnte nicht initialisiert werden.</translation>
-    </message>
-    <message>
-      <source>Could not find decoder for codec %1.</source>
-      <translation>Encoder für Codec %1 konnte nicht gefunden werden.</translation>
-    </message>
-    <message>
-      <source>Could not send audio frame to encoder, Error code: %1.</source>
-      <translation>Audioframe konnte nicht an den Encoder gesendet werden, Fehlercode: %1.</translation>
-    </message>
-    <message>
-      <source>Could not receive audio packet from encoder, Error code: %1.</source>
-      <translation>Audiopaket konnte nicht vom Encoder empfangen werden, Fehlercode: %1.</translation>
-    </message>
-    <message>
-      <source>Could not receive audio frame from decoder, Error code: %1.</source>
-      <translation>Audioframe konnte nicht vom Decoder empfangen werden, Fehlercode: %1.</translation>
-    </message>
-    <message>
-      <source>Could not allocate sample buffers</source>
-      <translation>Konnte Samplebuffer nicht zuordnen</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnFfmpegTranscoder</name>
-    <message>
-      <source>Container %1 was not found in FFMPEG library.</source>
-      <translation>Container %1 wurde in der FFMPEG-Library nicht gefunden.</translation>
-    </message>
-    <message>
-      <source>Could not create output context for format %1.</source>
-      <translation>Output-Kontext für Format %1 konnte nicht geschaffen werden.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output stream for recording.</source>
-      <translation>Der Output-Stream für die Aufnahme konnte nicht belegt werden.</translation>
-    </message>
-    <message>
-      <source>Could not perform direct stream copy because frame size is undefined.</source>
-      <translation>Stream-Kopie kann nicht ausgeführt werden, da die Framegröße nicht definiert wurde.</translation>
-    </message>
-    <message>
-      <source>Could not find codec %1.</source>
-      <translation>Codec %1 konnte nicht gefunden werden.</translation>
-    </message>
-    <message>
-      <source>Video or audio codec is incompatible with container %1.</source>
-      <translation>Video- oder Audiocodec ist mit Container %1 nicht kompatibel.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnFfmpegVideoTranscoder</name>
-    <message>
-      <source>Could not find encoder for codec %1.</source>
-      <translation>Encoder für Codec %1 konnte nicht gefunden werden.</translation>
-    </message>
-    <message>
-      <source>Could not initialize video encoder.</source>
-      <translation>Video-Encoder konnte nicht initialisiert werden.</translation>
-    </message>
-  </context>
-  <context>
     <name>QnLicense</name>
     <message>
       <source>Analog</source>
@@ -1232,14 +1155,6 @@
   </context>
   <context>
     <name>QnTranscoder</name>
-    <message>
-      <source>OpenCL transcoding is not implemented.</source>
-      <translation>OpenCL-Umkodierung wurde nicht implementiert.</translation>
-    </message>
-    <message>
-      <source>Unknown transcoding method.</source>
-      <translation>Unbekannte Umkodierungsmethode.</translation>
-    </message>
     <message>
       <source>OpenCLTranscode is not implemented.</source>
       <translation>OpenCL-Umkodierung wurde nicht implementiert.</translation>

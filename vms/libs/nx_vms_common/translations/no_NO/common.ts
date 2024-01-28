@@ -462,83 +462,6 @@
     </message>
   </context>
   <context>
-    <name>QnFfmpegAudioTranscoder</name>
-    <message>
-      <source>Audio context was not specified.</source>
-      <translation>Lyd kontekst ble ikke spesifisert.</translation>
-    </message>
-    <message>
-      <source>Could not find encoder for codec %1.</source>
-      <translation>Kunne ikke finne encoder for codec %1.</translation>
-    </message>
-    <message>
-      <source>Could not initialize audio encoder.</source>
-      <translation>Kunne ikke initialisere lydkoderen.</translation>
-    </message>
-    <message>
-      <source>Could not initialize audio decoder.</source>
-      <translation>Kunne ikke initialisere lydkoderen.</translation>
-    </message>
-    <message>
-      <source>Could not find decoder for codec %1.</source>
-      <translation>Kunne ikke finne encoder for codec %1.</translation>
-    </message>
-    <message>
-      <source>Could not send audio frame to encoder, Error code: %1.</source>
-      <translation>Kunne ikke sende lydramme til koder, Feilkode: %1.</translation>
-    </message>
-    <message>
-      <source>Could not receive audio packet from encoder, Error code: %1.</source>
-      <translation>Kunne ikke sende lydramme til koder, Feilkode: %1.</translation>
-    </message>
-    <message>
-      <source>Could not receive audio frame from decoder, Error code: %1.</source>
-      <translation>Kunne ikke sende lydramme til koder, Feilkode: %1.</translation>
-    </message>
-    <message>
-      <source>Could not allocate sample buffers</source>
-      <translation>Kunne ikke allokere prøvebuffere</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnFfmpegTranscoder</name>
-    <message>
-      <source>Container %1 was not found in FFMPEG library.</source>
-      <translation>Container %1 ble ikke funnet i FFMPEG-biblioteket.</translation>
-    </message>
-    <message>
-      <source>Could not create output context for format %1.</source>
-      <translation>Kunne ikke opprette utgangskontekst for format %1.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output stream for recording.</source>
-      <translation>Kunne ikke allokere utgangsstrøm for opptak.</translation>
-    </message>
-    <message>
-      <source>Could not perform direct stream copy because frame size is undefined.</source>
-      <translation>Kunne ikke utføre direkte stream kopiering fordi rammestørrelsen er udefinert.</translation>
-    </message>
-    <message>
-      <source>Could not find codec %1.</source>
-      <translation>Kunne ikke finne kodek %1.</translation>
-    </message>
-    <message>
-      <source>Video or audio codec is incompatible with container %1.</source>
-      <translation>Video- eller lydkodek er inkompatibel med container %1.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnFfmpegVideoTranscoder</name>
-    <message>
-      <source>Could not find encoder for codec %1.</source>
-      <translation>Kunne ikke finne encoder for codec %1.</translation>
-    </message>
-    <message>
-      <source>Could not initialize video encoder.</source>
-      <translation>Kunne ikke initialisere video encoder.</translation>
-    </message>
-  </context>
-  <context>
     <name>QnLicense</name>
     <message>
       <source>Analog</source>
@@ -1232,14 +1155,6 @@
   </context>
   <context>
     <name>QnTranscoder</name>
-    <message>
-      <source>OpenCL transcoding is not implemented.</source>
-      <translation>OpenCL-transkoding er ikke implementert.</translation>
-    </message>
-    <message>
-      <source>Unknown transcoding method.</source>
-      <translation>Ukjent transkodingsmetode.</translation>
-    </message>
     <message>
       <source>OpenCLTranscode is not implemented.</source>
       <translation>OpenCLTranscode er ikke implementert.</translation>

@@ -474,83 +474,6 @@
     </message>
   </context>
   <context>
-    <name>QnFfmpegAudioTranscoder</name>
-    <message>
-      <source>Audio context was not specified.</source>
-      <translation>Аудіо потік не визначено.</translation>
-    </message>
-    <message>
-      <source>Could not find encoder for codec %1.</source>
-      <translation>Не знайдено енкодер для кодека %1.</translation>
-    </message>
-    <message>
-      <source>Could not initialize audio encoder.</source>
-      <translation>Неможливо ініціалізувати звуковий кодек.</translation>
-    </message>
-    <message>
-      <source>Could not initialize audio decoder.</source>
-      <translation>Не вдалося ініціалізувати аудіо декодер.</translation>
-    </message>
-    <message>
-      <source>Could not find decoder for codec %1.</source>
-      <translation>Не знайдено декодер для кодека %1.</translation>
-    </message>
-    <message>
-      <source>Could not send audio frame to encoder, Error code: %1.</source>
-      <translation>Чи не вдалося відправити звукові дані кодувальнику, код помилки: %1.</translation>
-    </message>
-    <message>
-      <source>Could not receive audio packet from encoder, Error code: %1.</source>
-      <translation>Не вдалося отримати аудіо пакет від кодувальника, код помилки: %1.</translation>
-    </message>
-    <message>
-      <source>Could not receive audio frame from decoder, Error code: %1.</source>
-      <translation>Не вдалося отримати звукові дані від декодера, код помилки: %1.</translation>
-    </message>
-    <message>
-      <source>Could not allocate sample buffers</source>
-      <translation>Не вдається виділити буфер зразка</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnFfmpegTranscoder</name>
-    <message>
-      <source>Container %1 was not found in FFMPEG library.</source>
-      <translation>Контейнер %1 не був знайдений у бібліотеці FFMPEG.</translation>
-    </message>
-    <message>
-      <source>Could not create output context for format %1.</source>
-      <translation>Неможливо створити вихідний потік для формату %1.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output stream for recording.</source>
-      <translation>Неможливо створити буфер для запису потоку.</translation>
-    </message>
-    <message>
-      <source>Could not perform direct stream copy because frame size is undefined.</source>
-      <translation>Не вдалось виконати копію прямого потоку, оскільки розмір кадру не визначений.</translation>
-    </message>
-    <message>
-      <source>Could not find codec %1.</source>
-      <translation>Не вдалося знайти кодек %1.</translation>
-    </message>
-    <message>
-      <source>Video or audio codec is incompatible with container %1.</source>
-      <translation>Відео або аудіо кодек несумісний з форматом %1.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnFfmpegVideoTranscoder</name>
-    <message>
-      <source>Could not find encoder for codec %1.</source>
-      <translation>Не знайдено енкодер для кодека %1.</translation>
-    </message>
-    <message>
-      <source>Could not initialize video encoder.</source>
-      <translation>Помилка ініціалізації кодувальника відео.</translation>
-    </message>
-  </context>
-  <context>
     <name>QnLicense</name>
     <message>
       <source>Analog</source>
@@ -1344,14 +1267,6 @@
   </context>
   <context>
     <name>QnTranscoder</name>
-    <message>
-      <source>OpenCL transcoding is not implemented.</source>
-      <translation>Переодування OpenCL не реалізовано.</translation>
-    </message>
-    <message>
-      <source>Unknown transcoding method.</source>
-      <translation>Невідомий метод перекодування.</translation>
-    </message>
     <message>
       <source>OpenCLTranscode is not implemented.</source>
       <translation>OpenCLTranscode не реалізований.</translation>

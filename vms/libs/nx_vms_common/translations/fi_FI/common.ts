@@ -462,83 +462,6 @@
     </message>
   </context>
   <context>
-    <name>QnFfmpegAudioTranscoder</name>
-    <message>
-      <source>Audio context was not specified.</source>
-      <translation>Äänikontekstia ei ole määritetty.</translation>
-    </message>
-    <message>
-      <source>Could not find encoder for codec %1.</source>
-      <translation>Koodekin %1 kooderia ei löytynyt.</translation>
-    </message>
-    <message>
-      <source>Could not initialize audio encoder.</source>
-      <translation>Äänikooderia ei voitu alustaa.</translation>
-    </message>
-    <message>
-      <source>Could not initialize audio decoder.</source>
-      <translation>Äänikooderia ei voitu alustaa.</translation>
-    </message>
-    <message>
-      <source>Could not find decoder for codec %1.</source>
-      <translation>Koodekin %1 dekooderia ei löytynyt.</translation>
-    </message>
-    <message>
-      <source>Could not send audio frame to encoder, Error code: %1.</source>
-      <translation>Äänikehystä ei voitu lähettää kooderiin, virhekoodi: %1.</translation>
-    </message>
-    <message>
-      <source>Could not receive audio packet from encoder, Error code: %1.</source>
-      <translation>Äänipakettia ei voitu vastaanottaa enkooderilta, virhekoodi: %1.</translation>
-    </message>
-    <message>
-      <source>Could not receive audio frame from decoder, Error code: %1.</source>
-      <translation>Äänipakettia ei voitu vastaanottaa dekooderilta, virhekoodi: %1.</translation>
-    </message>
-    <message>
-      <source>Could not allocate sample buffers</source>
-      <translation>Näytepuskuria ei voitu varata</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnFfmpegTranscoder</name>
-    <message>
-      <source>Container %1 was not found in FFMPEG library.</source>
-      <translation>Sisältöä %1 ei löytynyt FFMPEG-kirjastosta.</translation>
-    </message>
-    <message>
-      <source>Could not create output context for format %1.</source>
-      <translation>Ulostulon sisältöä ei voitu luoda muodossa %1.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output stream for recording.</source>
-      <translation>Ulostulon streamia ei voinut varata tallentamiseen.</translation>
-    </message>
-    <message>
-      <source>Could not perform direct stream copy because frame size is undefined.</source>
-      <translation>Suoraa lähetystä ei voitu suorittaa, koska paketin koko on määrittelemätön.</translation>
-    </message>
-    <message>
-      <source>Could not find codec %1.</source>
-      <translation>Koodekkia ei löytynyt %1.</translation>
-    </message>
-    <message>
-      <source>Video or audio codec is incompatible with container %1.</source>
-      <translation>Video- tai äänikoodekki ei ole yhteensopiva sisällön kanssa %1.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnFfmpegVideoTranscoder</name>
-    <message>
-      <source>Could not find encoder for codec %1.</source>
-      <translation>Koodekin %1 dekooderia ei löytynyt.</translation>
-    </message>
-    <message>
-      <source>Could not initialize video encoder.</source>
-      <translation>Ääni enkooderia ei voitu alustaa.</translation>
-    </message>
-  </context>
-  <context>
     <name>QnLicense</name>
     <message>
       <source>Analog</source>
@@ -1232,14 +1155,6 @@
   </context>
   <context>
     <name>QnTranscoder</name>
-    <message>
-      <source>OpenCL transcoding is not implemented.</source>
-      <translation>OpenCL-transkoodausta ei ole impementoitu.</translation>
-    </message>
-    <message>
-      <source>Unknown transcoding method.</source>
-      <translation>Tuntematon transkoodausmenetelmä.</translation>
-    </message>
     <message>
       <source>OpenCLTranscode is not implemented.</source>
       <translation>OpenCL-transkoodausta ei ole impementoitu.</translation>

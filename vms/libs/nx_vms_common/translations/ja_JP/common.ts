@@ -456,83 +456,6 @@
     </message>
   </context>
   <context>
-    <name>QnFfmpegAudioTranscoder</name>
-    <message>
-      <source>Audio context was not specified.</source>
-      <translation>オーディオコンテキストが指定されていません。</translation>
-    </message>
-    <message>
-      <source>Could not find encoder for codec %1.</source>
-      <translation>コーデック %1 のエンコーダーが見つかりません。</translation>
-    </message>
-    <message>
-      <source>Could not initialize audio encoder.</source>
-      <translation>音声エンコーダーを初期化できませんでした。</translation>
-    </message>
-    <message>
-      <source>Could not initialize audio decoder.</source>
-      <translation>音声デコーダーを初期化できませんでした。</translation>
-    </message>
-    <message>
-      <source>Could not find decoder for codec %1.</source>
-      <translation>コーデック %1 のデコーダーが見つかりません。</translation>
-    </message>
-    <message>
-      <source>Could not send audio frame to encoder, Error code: %1.</source>
-      <translation>音声フレームをエンコーダーに送信できませんでした。エラー コード: %1。</translation>
-    </message>
-    <message>
-      <source>Could not receive audio packet from encoder, Error code: %1.</source>
-      <translation>エンコーダーから音声パケットを受信できませんでした。エラーコード: %1。</translation>
-    </message>
-    <message>
-      <source>Could not receive audio frame from decoder, Error code: %1.</source>
-      <translation>デコーダーから音声フレームを受信できませんでした。エラーコード: %1。</translation>
-    </message>
-    <message>
-      <source>Could not allocate sample buffers</source>
-      <translation>サンプルバッファを割り当てることができませんでした</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnFfmpegTranscoder</name>
-    <message>
-      <source>Container %1 was not found in FFMPEG library.</source>
-      <translation>FFMPEGライブラリーにコンテナ%1が見つかりません.</translation>
-    </message>
-    <message>
-      <source>Could not create output context for format %1.</source>
-      <translation>フォーマット %1 の出力コンテキストを作成出来ませんでした。</translation>
-    </message>
-    <message>
-      <source>Could not allocate output stream for recording.</source>
-      <translation>録画用の出力ストリームを割り当てることができませんでした。</translation>
-    </message>
-    <message>
-      <source>Could not perform direct stream copy because frame size is undefined.</source>
-      <translation>フレームサイズが指定されていないのでストリームを直接コピーできません.</translation>
-    </message>
-    <message>
-      <source>Could not find codec %1.</source>
-      <translation>コーデック%1が見つかりません。</translation>
-    </message>
-    <message>
-      <source>Video or audio codec is incompatible with container %1.</source>
-      <translation>映像または音声のコーデックが、%1 コンテナに対応していません。</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnFfmpegVideoTranscoder</name>
-    <message>
-      <source>Could not find encoder for codec %1.</source>
-      <translation>コーデック %1 のエンコーダーが見つかりません。</translation>
-    </message>
-    <message>
-      <source>Could not initialize video encoder.</source>
-      <translation>ビデオエンコーダーを初期化できませんでした。</translation>
-    </message>
-  </context>
-  <context>
     <name>QnLicense</name>
     <message>
       <source>Analog</source>
@@ -1176,14 +1099,6 @@
   </context>
   <context>
     <name>QnTranscoder</name>
-    <message>
-      <source>OpenCL transcoding is not implemented.</source>
-      <translation>オープンCLトランスコードが実装されていません.</translation>
-    </message>
-    <message>
-      <source>Unknown transcoding method.</source>
-      <translation>未知のトランスコード手段.</translation>
-    </message>
     <message>
       <source>OpenCLTranscode is not implemented.</source>
       <translation>OpenCLトランスコードが実装されていません.</translation>

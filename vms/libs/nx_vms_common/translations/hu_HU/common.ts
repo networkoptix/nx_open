@@ -462,83 +462,6 @@
     </message>
   </context>
   <context>
-    <name>QnFfmpegAudioTranscoder</name>
-    <message>
-      <source>Audio context was not specified.</source>
-      <translation>Nincs audió tartalom megadva.</translation>
-    </message>
-    <message>
-      <source>Could not find encoder for codec %1.</source>
-      <translation>Nem található enkóder a %1 codec-hez.</translation>
-    </message>
-    <message>
-      <source>Could not initialize audio encoder.</source>
-      <translation>Audió enkóder nem inicializálható.</translation>
-    </message>
-    <message>
-      <source>Could not initialize audio decoder.</source>
-      <translation>Audió dekóder nem inicializálható.</translation>
-    </message>
-    <message>
-      <source>Could not find decoder for codec %1.</source>
-      <translation>Nem található enkóder a %1 codec-hez.</translation>
-    </message>
-    <message>
-      <source>Could not send audio frame to encoder, Error code: %1.</source>
-      <translation>Audio küldése encoder felé sikertelen. Hibakód: %1.</translation>
-    </message>
-    <message>
-      <source>Could not receive audio packet from encoder, Error code: %1.</source>
-      <translation>Audiocsomag fogadása az encodertől sikertelen. Hibakód: %1.</translation>
-    </message>
-    <message>
-      <source>Could not receive audio frame from decoder, Error code: %1.</source>
-      <translation>Audiokeret fogadása encoder-től siikertelen. Hibakód: %1.</translation>
-    </message>
-    <message>
-      <source>Could not allocate sample buffers</source>
-      <translation>Mintapufferek felszabadítása sikertelen</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnFfmpegTranscoder</name>
-    <message>
-      <source>Container %1 was not found in FFMPEG library.</source>
-      <translation>%1 tároló nem található az FFMPEG mappában.</translation>
-    </message>
-    <message>
-      <source>Could not create output context for format %1.</source>
-      <translation>Nem hozható léttre a kimenti formátum %1.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output stream for recording.</source>
-      <translation>Nem lehet lefoglalni a kimeneti stream-et a rogzítéshez.</translation>
-    </message>
-    <message>
-      <source>Could not perform direct stream copy because frame size is undefined.</source>
-      <translation>Nem lehet a közvetlen stream másolást végrehajtani, mert a képkocka méret nincs definiálva.</translation>
-    </message>
-    <message>
-      <source>Could not find codec %1.</source>
-      <translation>Nem található %1 codec.</translation>
-    </message>
-    <message>
-      <source>Video or audio codec is incompatible with container %1.</source>
-      <translation>Videó vagy audió kodek nem kompatibilis %1 tárolóval.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnFfmpegVideoTranscoder</name>
-    <message>
-      <source>Could not find encoder for codec %1.</source>
-      <translation>Nem található enkóder %1 kodekhez.</translation>
-    </message>
-    <message>
-      <source>Could not initialize video encoder.</source>
-      <translation>Videó enkóder nem inicializálható.</translation>
-    </message>
-  </context>
-  <context>
     <name>QnLicense</name>
     <message>
       <source>Analog</source>
@@ -1232,14 +1155,6 @@
   </context>
   <context>
     <name>QnTranscoder</name>
-    <message>
-      <source>OpenCL transcoding is not implemented.</source>
-      <translation>OpenCL átkódolás nincs megvalósítva.</translation>
-    </message>
-    <message>
-      <source>Unknown transcoding method.</source>
-      <translation>Ismeretlen átkódolási metódus.</translation>
-    </message>
     <message>
       <source>OpenCLTranscode is not implemented.</source>
       <translation>OpenCL átkódolás nincs megvalósítva.</translation>

@@ -462,83 +462,6 @@
     </message>
   </context>
   <context>
-    <name>QnFfmpegAudioTranscoder</name>
-    <message>
-      <source>Audio context was not specified.</source>
-      <translation>Ses İçeriği Belirlenemedi.</translation>
-    </message>
-    <message>
-      <source>Could not find encoder for codec %1.</source>
-      <translation>%1 Kodek'i İçin Kodlayıcı Bulunamadı.</translation>
-    </message>
-    <message>
-      <source>Could not initialize audio encoder.</source>
-      <translation>Ses Kodlayıcısı Başlatılamadı.</translation>
-    </message>
-    <message>
-      <source>Could not initialize audio decoder.</source>
-      <translation>Ses Kod Çözüsüsü Başlatılamadı.</translation>
-    </message>
-    <message>
-      <source>Could not find decoder for codec %1.</source>
-      <translation>%1 için kodlayıcı bulunamadı.</translation>
-    </message>
-    <message>
-      <source>Could not send audio frame to encoder, Error code: %1.</source>
-      <translation>Encodera ses gönderilemedi. Hata kodu:%1.</translation>
-    </message>
-    <message>
-      <source>Could not receive audio packet from encoder, Error code: %1.</source>
-      <translation>Encoder dan ses alınamadı, Hata kodu: %1.</translation>
-    </message>
-    <message>
-      <source>Could not receive audio frame from decoder, Error code: %1.</source>
-      <translation>Decoder dan ses alınamadı, Hata kodu: %1.</translation>
-    </message>
-    <message>
-      <source>Could not allocate sample buffers</source>
-      <translation>Arabellek alınamadı</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnFfmpegTranscoder</name>
-    <message>
-      <source>Container %1 was not found in FFMPEG library.</source>
-      <translation>%1 Taşıyıcısı FFMPEG Kütüphanesinde Bulunamadı.</translation>
-    </message>
-    <message>
-      <source>Could not create output context for format %1.</source>
-      <translation>%1 Formatı İçin Çıkış İçeriği Oluşturulamadı.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output stream for recording.</source>
-      <translation>Kayıt İçin Çıkış Akışı Sağlanamadı.</translation>
-    </message>
-    <message>
-      <source>Could not perform direct stream copy because frame size is undefined.</source>
-      <translation>Sayfa Boyutu Belirlenemediğinden Doğrudan Akış Kopyası Gerçekleştirilemedi.</translation>
-    </message>
-    <message>
-      <source>Could not find codec %1.</source>
-      <translation>%1 Kodek'i Bulunamadı.</translation>
-    </message>
-    <message>
-      <source>Video or audio codec is incompatible with container %1.</source>
-      <translation>Ses veya Video Kodek'i %1 Taşıyıcısıyla Uyumsuz.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnFfmpegVideoTranscoder</name>
-    <message>
-      <source>Could not find encoder for codec %1.</source>
-      <translation>%1 Kodek'i İçin Kodlayıcı Bulunamadı.</translation>
-    </message>
-    <message>
-      <source>Could not initialize video encoder.</source>
-      <translation>Video Kodlayıcısı Başlatılamadı.</translation>
-    </message>
-  </context>
-  <context>
     <name>QnLicense</name>
     <message>
       <source>Analog</source>
@@ -1232,14 +1155,6 @@
   </context>
   <context>
     <name>QnTranscoder</name>
-    <message>
-      <source>OpenCL transcoding is not implemented.</source>
-      <translation>OpenCL Kod Çözme Uygulanamadı.</translation>
-    </message>
-    <message>
-      <source>Unknown transcoding method.</source>
-      <translation>Bilinmeyen Kod Çözme Yöntemi.</translation>
-    </message>
     <message>
       <source>OpenCLTranscode is not implemented.</source>
       <translation>OpenCL Yeniden Kodlama Uygulanamadı.</translation>

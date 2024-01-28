@@ -456,83 +456,6 @@
     </message>
   </context>
   <context>
-    <name>QnFfmpegAudioTranscoder</name>
-    <message>
-      <source>Audio context was not specified.</source>
-      <translation>未指定音频内容</translation>
-    </message>
-    <message>
-      <source>Could not find encoder for codec %1.</source>
-      <translation>%1无法发现音频编码器.</translation>
-    </message>
-    <message>
-      <source>Could not initialize audio encoder.</source>
-      <translation>无法初始化音频编码器.</translation>
-    </message>
-    <message>
-      <source>Could not initialize audio decoder.</source>
-      <translation>无法初始化音频解码器。</translation>
-    </message>
-    <message>
-      <source>Could not find decoder for codec %1.</source>
-      <translation>%1无法发现音频编码器.</translation>
-    </message>
-    <message>
-      <source>Could not send audio frame to encoder, Error code: %1.</source>
-      <translation>无法发送音频帧到编码器，错误代码︰ %1。</translation>
-    </message>
-    <message>
-      <source>Could not receive audio packet from encoder, Error code: %1.</source>
-      <translation>无法接收音频数据包从编码器，错误代码︰ %1。</translation>
-    </message>
-    <message>
-      <source>Could not receive audio frame from decoder, Error code: %1.</source>
-      <translation>无法从编码器接收音频数据包，错误代码︰ %1。</translation>
-    </message>
-    <message>
-      <source>Could not allocate sample buffers</source>
-      <translation>不能分配样本缓冲区</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnFfmpegTranscoder</name>
-    <message>
-      <source>Container %1 was not found in FFMPEG library.</source>
-      <translation>容器%1不是在FFMPEG库中找到。</translation>
-    </message>
-    <message>
-      <source>Could not create output context for format %1.</source>
-      <translation>无法创建输出格式 %1.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output stream for recording.</source>
-      <translation>无法为录像分配输出流。</translation>
-    </message>
-    <message>
-      <source>Could not perform direct stream copy because frame size is undefined.</source>
-      <translation>不能执行直接视频流复制，原因是帧的大小是不确定的。</translation>
-    </message>
-    <message>
-      <source>Could not find codec %1.</source>
-      <translation>%1无法发现音频编码器.</translation>
-    </message>
-    <message>
-      <source>Video or audio codec is incompatible with container %1.</source>
-      <translation>视频或音频编解码器与%1选定格式不兼容。</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnFfmpegVideoTranscoder</name>
-    <message>
-      <source>Could not find encoder for codec %1.</source>
-      <translation>%1无法发现音频编码器.</translation>
-    </message>
-    <message>
-      <source>Could not initialize video encoder.</source>
-      <translation>不能初始化视频编码器。</translation>
-    </message>
-  </context>
-  <context>
     <name>QnLicense</name>
     <message>
       <source>Analog</source>
@@ -1176,14 +1099,6 @@
   </context>
   <context>
     <name>QnTranscoder</name>
-    <message>
-      <source>OpenCL transcoding is not implemented.</source>
-      <translation>OpenCLT代码转换器未执行.</translation>
-    </message>
-    <message>
-      <source>Unknown transcoding method.</source>
-      <translation>未知编码转换方法.</translation>
-    </message>
     <message>
       <source>OpenCLTranscode is not implemented.</source>
       <translation>OpenCL代码转换器未执行</translation>

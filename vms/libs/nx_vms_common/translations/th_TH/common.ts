@@ -456,83 +456,6 @@
     </message>
   </context>
   <context>
-    <name>QnFfmpegAudioTranscoder</name>
-    <message>
-      <source>Audio context was not specified.</source>
-      <translation>เสียงไม่ได้ระบุ.</translation>
-    </message>
-    <message>
-      <source>Could not find encoder for codec %1.</source>
-      <translation>ไม่พบการเข้ารหัสสำหรับตัวแปลงสัญญาณ %1.</translation>
-    </message>
-    <message>
-      <source>Could not initialize audio encoder.</source>
-      <translation>ไม่สามารถเริ่มต้น เข้ารหัส เสียง.</translation>
-    </message>
-    <message>
-      <source>Could not initialize audio decoder.</source>
-      <translation>ไม่สามารถเริ่มต้น ถอดรหัส เสียง.</translation>
-    </message>
-    <message>
-      <source>Could not find decoder for codec %1.</source>
-      <translation>ไม่พบการเข้ารหัสสำหรับตัวแปลงสัญญาณ %1.</translation>
-    </message>
-    <message>
-      <source>Could not send audio frame to encoder, Error code: %1.</source>
-      <translation>ไม่สามารถส่งกรอบเสียงไปยังรหัสเข้ารหัสรหัสข้อผิดพลาด: %1</translation>
-    </message>
-    <message>
-      <source>Could not receive audio packet from encoder, Error code: %1.</source>
-      <translation>ไม่สามารถส่งกรอบเสียงไปยังรหัสเข้ารหัสรหัสข้อผิดพลาด: %1</translation>
-    </message>
-    <message>
-      <source>Could not receive audio frame from decoder, Error code: %1.</source>
-      <translation>ไม่สามารถส่งกรอบเสียงไปยังรหัสเข้ารหัสรหัสข้อผิดพลาด: %1</translation>
-    </message>
-    <message>
-      <source>Could not allocate sample buffers</source>
-      <translation>ไม่สามารถจัดสรรบัฟเฟอร์ตัวอย่างรหัสข้อผิดพลาด</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnFfmpegTranscoder</name>
-    <message>
-      <source>Container %1 was not found in FFMPEG library.</source>
-      <translation>ภาชนะ %1 ไม่พบในสมุด FFMPEG.</translation>
-    </message>
-    <message>
-      <source>Could not create output context for format %1.</source>
-      <translation>ไม่สามารถสร้างเอาท์พุทสำหรับรูปแบบ %1.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output stream for recording.</source>
-      <translation>ไม่สามารถจัดการส่งออกสตรีม สำหรับการบันทึก.</translation>
-    </message>
-    <message>
-      <source>Could not perform direct stream copy because frame size is undefined.</source>
-      <translation>ไม่สามารถดำเนินการสำเนาสตรีมได้โดยตรงเพราะขนาดของกรอบไม่ได้กำหนด.</translation>
-    </message>
-    <message>
-      <source>Could not find codec %1.</source>
-      <translation>ไม่สามารถหาตัวแปลงสัญญาณ %1.</translation>
-    </message>
-    <message>
-      <source>Video or audio codec is incompatible with container %1.</source>
-      <translation>วิดีโอหรือตัวแปลงสัญญาณเสียงเข้ากันไม่ได้กับภาชนะ %1.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnFfmpegVideoTranscoder</name>
-    <message>
-      <source>Could not find encoder for codec %1.</source>
-      <translation>ไม่พบการเข้ารหัสสำหรับตัวแปลงสัญญาณ %1.</translation>
-    </message>
-    <message>
-      <source>Could not initialize video encoder.</source>
-      <translation>ไม่สามารถเริ่มต้น เข้ารหัส วีดีโอ.</translation>
-    </message>
-  </context>
-  <context>
     <name>QnLicense</name>
     <message>
       <source>Analog</source>
@@ -1176,14 +1099,6 @@
   </context>
   <context>
     <name>QnTranscoder</name>
-    <message>
-      <source>OpenCL transcoding is not implemented.</source>
-      <translation>การแปลงรหัส OpenCL ไม่ได้ดำเนินการ.</translation>
-    </message>
-    <message>
-      <source>Unknown transcoding method.</source>
-      <translation>วิธีการแปลงไม่รู้จัก.</translation>
-    </message>
     <message>
       <source>OpenCLTranscode is not implemented.</source>
       <translation>OpenCL แปลงไม่ได้ดำเนินการ.</translation>

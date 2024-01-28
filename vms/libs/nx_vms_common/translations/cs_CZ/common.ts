@@ -474,83 +474,6 @@
     </message>
   </context>
   <context>
-    <name>QnFfmpegAudioTranscoder</name>
-    <message>
-      <source>Audio context was not specified.</source>
-      <translation>Zvukový kontext nebyl zadán.</translation>
-    </message>
-    <message>
-      <source>Could not find encoder for codec %1.</source>
-      <translation>Nelze najít kodér pro kodek %1.</translation>
-    </message>
-    <message>
-      <source>Could not initialize audio encoder.</source>
-      <translation>Nelze inicializovat zvukový enkodér.</translation>
-    </message>
-    <message>
-      <source>Could not initialize audio decoder.</source>
-      <translation>Nelze inicializovat zvukový dekodér.</translation>
-    </message>
-    <message>
-      <source>Could not find decoder for codec %1.</source>
-      <translation>Nelze najít dekodér pro kodek %1.</translation>
-    </message>
-    <message>
-      <source>Could not send audio frame to encoder, Error code: %1.</source>
-      <translation>Nelze odeslat zvuk do enkodéru, kód chyby: %1.</translation>
-    </message>
-    <message>
-      <source>Could not receive audio packet from encoder, Error code: %1.</source>
-      <translation>Nelze přijímat zvukové pakety z enkodéru, kód chyby: %1.</translation>
-    </message>
-    <message>
-      <source>Could not receive audio frame from decoder, Error code: %1.</source>
-      <translation>Nelze přijmout zvuk z dekodéru, kód chyby: %1.</translation>
-    </message>
-    <message>
-      <source>Could not allocate sample buffers</source>
-      <translation>Nelze přidělit vyrovnávací paměti vzorku, kód chyby</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnFfmpegTranscoder</name>
-    <message>
-      <source>Container %1 was not found in FFMPEG library.</source>
-      <translation>Kontejner %1 nebyl nalezen v knihovně FFMPEG.</translation>
-    </message>
-    <message>
-      <source>Could not create output context for format %1.</source>
-      <translation>Nelze vytvořit kontext výstupu pro formát %1.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output stream for recording.</source>
-      <translation>Nelze přidělit výstupní stream pro záznam.</translation>
-    </message>
-    <message>
-      <source>Could not perform direct stream copy because frame size is undefined.</source>
-      <translation>Nelze provést přímou kopii streamu, protože velikost snímku není definována.</translation>
-    </message>
-    <message>
-      <source>Could not find codec %1.</source>
-      <translation>Nelze nalézt kodek %1.</translation>
-    </message>
-    <message>
-      <source>Video or audio codec is incompatible with container %1.</source>
-      <translation>Video nebo audio kodek není kompatibilní s kontejnerem %1.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnFfmpegVideoTranscoder</name>
-    <message>
-      <source>Could not find encoder for codec %1.</source>
-      <translation>Nelze najít enkodér pro kodek %1.</translation>
-    </message>
-    <message>
-      <source>Could not initialize video encoder.</source>
-      <translation>Nelze inicializovat video enkodér.</translation>
-    </message>
-  </context>
-  <context>
     <name>QnLicense</name>
     <message>
       <source>Analog</source>
@@ -1344,14 +1267,6 @@
   </context>
   <context>
     <name>QnTranscoder</name>
-    <message>
-      <source>OpenCL transcoding is not implemented.</source>
-      <translation>Překódování OpenCL není implementováno.</translation>
-    </message>
-    <message>
-      <source>Unknown transcoding method.</source>
-      <translation>Neznámá metoda překódování.</translation>
-    </message>
     <message>
       <source>OpenCLTranscode is not implemented.</source>
       <translation>Překódování OpenCL není implementováno.</translation>
