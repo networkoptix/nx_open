@@ -474,83 +474,6 @@
     </message>
   </context>
   <context>
-    <name>QnFfmpegAudioTranscoder</name>
-    <message>
-      <source>Audio context was not specified.</source>
-      <translation>Kontekst audio nie został określony.</translation>
-    </message>
-    <message>
-      <source>Could not find encoder for codec %1.</source>
-      <translation>Nie można znaleźć enkodera dla kodeka %1.</translation>
-    </message>
-    <message>
-      <source>Could not initialize audio encoder.</source>
-      <translation>Nie można zainicjować enkodera audio.</translation>
-    </message>
-    <message>
-      <source>Could not initialize audio decoder.</source>
-      <translation>Nie można zainicjować dekodera audio.</translation>
-    </message>
-    <message>
-      <source>Could not find decoder for codec %1.</source>
-      <translation>Nie można znaleźć dekodera dla kodeka %1.</translation>
-    </message>
-    <message>
-      <source>Could not send audio frame to encoder, Error code: %1.</source>
-      <translation>Nie można wysłać ramki audio do enkodera, kod błędu: %1.</translation>
-    </message>
-    <message>
-      <source>Could not receive audio packet from encoder, Error code: %1.</source>
-      <translation>Nie można odebrać pakietu audio z enkodera, kod błędu: %1.</translation>
-    </message>
-    <message>
-      <source>Could not receive audio frame from decoder, Error code: %1.</source>
-      <translation>Nie można odebrać ramki audio z dekodera, kod błędu: %1.</translation>
-    </message>
-    <message>
-      <source>Could not allocate sample buffers</source>
-      <translation>Nie można przydzielić buforów próbki</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnFfmpegTranscoder</name>
-    <message>
-      <source>Container %1 was not found in FFMPEG library.</source>
-      <translation>Nie znaleziono kontenera %1 w bibliotece FFMPEG.</translation>
-    </message>
-    <message>
-      <source>Could not create output context for format %1.</source>
-      <translation>Nie można utworzyć kontekstu wyjściowego dla formatu %1.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output stream for recording.</source>
-      <translation>Nie można przydzielić strumienia wyjściowego dla nagrywania.</translation>
-    </message>
-    <message>
-      <source>Could not perform direct stream copy because frame size is undefined.</source>
-      <translation>Nie można wykonać bezpośredniej kopii strumienia, ponieważ rozmiar ramki nie jest zdefiniowany.</translation>
-    </message>
-    <message>
-      <source>Could not find codec %1.</source>
-      <translation>Nie można znaleźć kodeka %1.</translation>
-    </message>
-    <message>
-      <source>Video or audio codec is incompatible with container %1.</source>
-      <translation>Kodek wideo lub audio jest niezgodny z kontenerem %1.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnFfmpegVideoTranscoder</name>
-    <message>
-      <source>Could not find encoder for codec %1.</source>
-      <translation>Nie można znaleźć enkodera dla kodeka %1.</translation>
-    </message>
-    <message>
-      <source>Could not initialize video encoder.</source>
-      <translation>Nie można zainicjować enkodera wideo.</translation>
-    </message>
-  </context>
-  <context>
     <name>QnLicense</name>
     <message>
       <source>Analog</source>
@@ -1344,14 +1267,6 @@
   </context>
   <context>
     <name>QnTranscoder</name>
-    <message>
-      <source>OpenCL transcoding is not implemented.</source>
-      <translation>Transkodowanie OpenCL nie jest zaimplementowane.</translation>
-    </message>
-    <message>
-      <source>Unknown transcoding method.</source>
-      <translation>Nieznana metoda transkodowania.</translation>
-    </message>
     <message>
       <source>OpenCLTranscode is not implemented.</source>
       <translation>Transkodowanie OpenCL nie jest zaimplementowane.</translation>

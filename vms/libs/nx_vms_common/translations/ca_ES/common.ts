@@ -462,83 +462,6 @@
     </message>
   </context>
   <context>
-    <name>QnFfmpegAudioTranscoder</name>
-    <message>
-      <source>Audio context was not specified.</source>
-      <translation>No s'ha especificat el context de l'àudio.</translation>
-    </message>
-    <message>
-      <source>Could not find encoder for codec %1.</source>
-      <translation>No s'ha trobat el codificador per al còdec %1.</translation>
-    </message>
-    <message>
-      <source>Could not initialize audio encoder.</source>
-      <translation>No s'ha pogut inicialitzar el codificador d'àudio.</translation>
-    </message>
-    <message>
-      <source>Could not initialize audio decoder.</source>
-      <translation>No s'ha pogut inicialitzar el descodificador d'àudio.</translation>
-    </message>
-    <message>
-      <source>Could not find decoder for codec %1.</source>
-      <translation>No s'ha trobat el descodificador per al còdec %1.</translation>
-    </message>
-    <message>
-      <source>Could not send audio frame to encoder, Error code: %1.</source>
-      <translation>No s'ha pogut enviar el segment d'àudio al codificador, codi d'error: %1.</translation>
-    </message>
-    <message>
-      <source>Could not receive audio packet from encoder, Error code: %1.</source>
-      <translation>No s'ha pogut rebre el paquet d'àudio del codificador, codi d'error: %1.</translation>
-    </message>
-    <message>
-      <source>Could not receive audio frame from decoder, Error code: %1.</source>
-      <translation>No s'ha pogut rebre el segment d'àudio del descodificador, codi d'error: %1.</translation>
-    </message>
-    <message>
-      <source>Could not allocate sample buffers</source>
-      <translation>No s'ha pogut assignar memòria intermèdia de mostra</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnFfmpegTranscoder</name>
-    <message>
-      <source>Container %1 was not found in FFMPEG library.</source>
-      <translation>No s'ha trobat el contenidor %1 a la biblioteca FFMPEG.</translation>
-    </message>
-    <message>
-      <source>Could not create output context for format %1.</source>
-      <translation>No s'ha pogut crear el context de sortida per al format %1.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output stream for recording.</source>
-      <translation>No s'ha pogut assignar el flux de sortida per a l'enregistrament.</translation>
-    </message>
-    <message>
-      <source>Could not perform direct stream copy because frame size is undefined.</source>
-      <translation>No s'ha pogut fer una còpia de flux directe perquè la mida del segment no està definida.</translation>
-    </message>
-    <message>
-      <source>Could not find codec %1.</source>
-      <translation>No s'ha trobat el còdec %1.</translation>
-    </message>
-    <message>
-      <source>Video or audio codec is incompatible with container %1.</source>
-      <translation>El còdec de vídeo o àudio és incompatible amb el contenidor %1.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnFfmpegVideoTranscoder</name>
-    <message>
-      <source>Could not find encoder for codec %1.</source>
-      <translation>No s'ha trobat el codificador per al còdec %1.</translation>
-    </message>
-    <message>
-      <source>Could not initialize video encoder.</source>
-      <translation>No s'ha pogut inicialitzar el codificador de vídeo.</translation>
-    </message>
-  </context>
-  <context>
     <name>QnLicense</name>
     <message>
       <source>Analog</source>
@@ -1232,14 +1155,6 @@
   </context>
   <context>
     <name>QnTranscoder</name>
-    <message>
-      <source>OpenCL transcoding is not implemented.</source>
-      <translation>La transcodificació OpenCL no està implementada.</translation>
-    </message>
-    <message>
-      <source>Unknown transcoding method.</source>
-      <translation>Mètode de transcodificació desconegut.</translation>
-    </message>
     <message>
       <source>OpenCLTranscode is not implemented.</source>
       <translation>La transcodificació OpenCL no està implementada.</translation>

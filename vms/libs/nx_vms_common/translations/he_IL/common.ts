@@ -474,83 +474,6 @@
     </message>
   </context>
   <context>
-    <name>QnFfmpegAudioTranscoder</name>
-    <message>
-      <source>Audio context was not specified.</source>
-      <translation>לא צוין הקשר אודיו.</translation>
-    </message>
-    <message>
-      <source>Could not find encoder for codec %1.</source>
-      <translation>לא נמצא מקודד לקודק %1.</translation>
-    </message>
-    <message>
-      <source>Could not initialize audio encoder.</source>
-      <translation>לא ניתן להפעיל את מקודד האודיו.</translation>
-    </message>
-    <message>
-      <source>Could not initialize audio decoder.</source>
-      <translation>לא ניתן לאתחל את מקודד האודיו.</translation>
-    </message>
-    <message>
-      <source>Could not find decoder for codec %1.</source>
-      <translation>לא נמצא מקודד לקודק %1.</translation>
-    </message>
-    <message>
-      <source>Could not send audio frame to encoder, Error code: %1.</source>
-      <translation>לא ניתן לשלוח מסגרת שמע למפענח, קוד שגיאה: %1.</translation>
-    </message>
-    <message>
-      <source>Could not receive audio packet from encoder, Error code: %1.</source>
-      <translation>לא ניתן היה לקבל חבילת שמע מהמקודד, קוד שגיאה: %1.</translation>
-    </message>
-    <message>
-      <source>Could not receive audio frame from decoder, Error code: %1.</source>
-      <translation>לא יכול לקבל מסגרת שמע מהמפענח, קוד שגיאה: %1.</translation>
-    </message>
-    <message>
-      <source>Could not allocate sample buffers</source>
-      <translation>לא היתה אפשרות להקצות מאגרי דגימה</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnFfmpegTranscoder</name>
-    <message>
-      <source>Container %1 was not found in FFMPEG library.</source>
-      <translation>מעטפת %1 לא נמצא בספריית FFMPEG.</translation>
-    </message>
-    <message>
-      <source>Could not create output context for format %1.</source>
-      <translation>לא ניתן ליצור הקשר פלט לפורמט %1.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output stream for recording.</source>
-      <translation>לא ניתן להקצות זרם פלט להקלטה.</translation>
-    </message>
-    <message>
-      <source>Could not perform direct stream copy because frame size is undefined.</source>
-      <translation>לא ניתן לבצע העתקת זרם ישירה בגלל שגודל המסגרת איננו מוגדר.</translation>
-    </message>
-    <message>
-      <source>Could not find codec %1.</source>
-      <translation>הקודק %1 לא נמצא.</translation>
-    </message>
-    <message>
-      <source>Video or audio codec is incompatible with container %1.</source>
-      <translation>קידוד הוידאו/אודיו אינו תואם למעטפת %1.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnFfmpegVideoTranscoder</name>
-    <message>
-      <source>Could not find encoder for codec %1.</source>
-      <translation>לא נמצא מקודד לקודק %1.</translation>
-    </message>
-    <message>
-      <source>Could not initialize video encoder.</source>
-      <translation>לא ניתן לאתחל את מקודד הוידאו.</translation>
-    </message>
-  </context>
-  <context>
     <name>QnLicense</name>
     <message>
       <source>Analog</source>
@@ -1344,14 +1267,6 @@
   </context>
   <context>
     <name>QnTranscoder</name>
-    <message>
-      <source>OpenCL transcoding is not implemented.</source>
-      <translation>קידוד מחדש על ידי OpenCL אינו מיושם.</translation>
-    </message>
-    <message>
-      <source>Unknown transcoding method.</source>
-      <translation>שיטת המרה לא מוכרת.</translation>
-    </message>
     <message>
       <source>OpenCLTranscode is not implemented.</source>
       <translation>קידוד מחדש על ידי OpenCL אינו מיושם.</translation>

@@ -456,83 +456,6 @@
     </message>
   </context>
   <context>
-    <name>QnFfmpegAudioTranscoder</name>
-    <message>
-      <source>Audio context was not specified.</source>
-      <translation>未指定聲音內容.</translation>
-    </message>
-    <message>
-      <source>Could not find encoder for codec %1.</source>
-      <translation>找不到 %1 編碼的編碼器.</translation>
-    </message>
-    <message>
-      <source>Could not initialize audio encoder.</source>
-      <translation>無法初始化聲音編碼器。</translation>
-    </message>
-    <message>
-      <source>Could not initialize audio decoder.</source>
-      <translation>無法初始化聲音解碼器.</translation>
-    </message>
-    <message>
-      <source>Could not find decoder for codec %1.</source>
-      <translation>找不到 %1 編碼的編碼器.</translation>
-    </message>
-    <message>
-      <source>Could not send audio frame to encoder, Error code: %1.</source>
-      <translation>無法傳送音訊至編碼器, 錯誤代碼: %1.</translation>
-    </message>
-    <message>
-      <source>Could not receive audio packet from encoder, Error code: %1.</source>
-      <translation>無法從編碼器接收音訊封包, 錯誤代碼: %1.</translation>
-    </message>
-    <message>
-      <source>Could not receive audio frame from decoder, Error code: %1.</source>
-      <translation>無法從解碼器接收音訊封包, 錯誤代碼: %1.</translation>
-    </message>
-    <message>
-      <source>Could not allocate sample buffers</source>
-      <translation>無法分配樣本緩衝</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnFfmpegTranscoder</name>
-    <message>
-      <source>Container %1 was not found in FFMPEG library.</source>
-      <translation>在 FFMPEG 函式庫內找不到容器 %1 。</translation>
-    </message>
-    <message>
-      <source>Could not create output context for format %1.</source>
-      <translation>無法建立格式 %1 的輸出內容。</translation>
-    </message>
-    <message>
-      <source>Could not allocate output stream for recording.</source>
-      <translation>無法分配錄影用的輸出串流。</translation>
-    </message>
-    <message>
-      <source>Could not perform direct stream copy because frame size is undefined.</source>
-      <translation>無法進行直接串流複製，因為未定義圖框尺寸大小。</translation>
-    </message>
-    <message>
-      <source>Could not find codec %1.</source>
-      <translation>找不到 %1 編碼。</translation>
-    </message>
-    <message>
-      <source>Video or audio codec is incompatible with container %1.</source>
-      <translation>影像或聲音編碼與容器 %1 不相容。</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnFfmpegVideoTranscoder</name>
-    <message>
-      <source>Could not find encoder for codec %1.</source>
-      <translation>找不到 %1 編碼的編碼器.</translation>
-    </message>
-    <message>
-      <source>Could not initialize video encoder.</source>
-      <translation>無法初始化編碼器.</translation>
-    </message>
-  </context>
-  <context>
     <name>QnLicense</name>
     <message>
       <source>Analog</source>
@@ -1176,14 +1099,6 @@
   </context>
   <context>
     <name>QnTranscoder</name>
-    <message>
-      <source>OpenCL transcoding is not implemented.</source>
-      <translation>OpenCL 轉碼未執行.</translation>
-    </message>
-    <message>
-      <source>Unknown transcoding method.</source>
-      <translation>未知轉碼模式。</translation>
-    </message>
     <message>
       <source>OpenCLTranscode is not implemented.</source>
       <translation>OpenCL 轉碼未被執行.</translation>

@@ -6029,7 +6029,7 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     </message>
     <message>
       <source>Screen is locked and cannot be changed</source>
-      <translation type="unfinished">Screen is locked and cannot be changed</translation>
+      <translation>Skärmen är låst och kan inte ändras</translation>
     </message>
   </context>
   <context>
