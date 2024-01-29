@@ -132,13 +132,12 @@ Item
         Image
         {
             width: 22
-            height: 14
+            height: 16
 
             source: closedTileItem.tile.connectable && !context.hasCloudConnectionIssue
-                ? "image://svg/skin/welcome_screen/tile/cloud_online_20.svg"
-                : "image://svg/skin/welcome_screen/tile/cloud.svg"
-            sourceSize: Qt.size(20, 20)
-            fillMode: Image.Pad
+                ? "image://svg/skin/welcome_screen/tile/cloud.svg"
+                : "image://svg/skin/welcome_screen/tile/cloud_offline.svg"
+            sourceSize: Qt.size(width, height)
 
             visible: tile.cloud
         }
