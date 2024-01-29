@@ -18,6 +18,7 @@ class SystemTabBarStateHandler: public QObject, public QnWorkbenchContextAware
 public:
     SystemTabBarStateHandler(QObject* parent);
     void setStateStore(QSharedPointer<Store> store);
+    void moveSystem(int indexFrom, int indexTo);
 
 signals:
     void tabsChanged();

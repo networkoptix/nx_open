@@ -32,7 +32,8 @@ struct MainWindowTitleBarStateReducer
     static State setExpanded(State&& state, bool value);
     static State setHomeTabActive(State&& state, bool value);
     static State setCurrentSystemId(State&& state, QnUuid value);
-    static State setActiveSystemTab(State&& state, int value);
+    static State setActiveSystemTab(State&& state, int index);
+    static State activateHomeTab(State&& state);
     static State setConnectionState(State&& state, ConnectActionsHandler::LogicalState value);
     static State addSystem(State&& state, State::SystemData value);
     static State insertSystem(State&& state, int index, State::SystemData value);
@@ -74,9 +75,17 @@ MainWindowTitleBarStateReducer::State MainWindowTitleBarStateReducer::setCurrent
 }
 
 MainWindowTitleBarStateReducer::State MainWindowTitleBarStateReducer::setActiveSystemTab(
-    State&& state, int value)
+    State&& state, int index)
 {
-    state.activeSystemTab = value;
+    state.activeSystemTab = index;
+    return state;
+}
+
+MainWindowTitleBarStateReducer::State MainWindowTitleBarStateReducer::activateHomeTab(
+    State&& state)
+{
+    state.expanded = true;
+    state.homeTabActive = true;
     return state;
 }
 
@@ -272,6 +281,11 @@ void MainWindowTitleBarStateStore::changeCurrentSystem(QnSystemDescriptionPtr sy
 void MainWindowTitleBarStateStore::moveSystem(int indexFrom, int indexTo)
 {
     dispatch(Reducer::moveSystem, indexFrom, indexTo);
+}
+
+void MainWindowTitleBarStateStore::activateHomeTab()
+{
+    dispatch(Reducer::activateHomeTab);
 }
 
 void MainWindowTitleBarStateStore::setSystemUpdating(bool value)

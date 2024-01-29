@@ -61,6 +61,7 @@ public:
     void removeCurrentSystem();
     void changeCurrentSystem(QnSystemDescriptionPtr systemDescription);
     void moveSystem(int indexFrom, int indexTo);
+    void activateHomeTab();
     void setSystemUpdating(bool value);
 
     int systemCount() const;

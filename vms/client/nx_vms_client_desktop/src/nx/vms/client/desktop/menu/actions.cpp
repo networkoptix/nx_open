@@ -358,22 +358,11 @@ void initialize(Manager* manager, Action* root)
 
     factory()
         .flags(Main | TitleBar | Tree | SingleTarget | ResourceTarget)
-        .text(ContextMenu::tr("New"));
+        .text(ContextMenu::tr("New"))
+        .condition(condition::isLoggedIn(/*defaultVisibility*/ DisabledAction));
 
     factory.beginSubMenu();
     {
-        factory(OpenNewTabAction)
-            .flags(Main | TitleBar | SingleTarget | NoTarget | GlobalHotkey)
-            .mode(DesktopMode)
-            .text(ContextMenu::tr("Layout"))
-            .pulledText(ContextMenu::tr("New Layout"))
-            .shortcut("Ctrl+T")
-            .condition(!condition::showreelIsRunning())
-            .icon(qnSkin->icon("titlebar/plus_16.svg",
-                nullptr,
-                nullptr,
-                kTitleBarIconSubstitutions));
-
         factory(OpenNewWindowAction)
             .flags(Main | GlobalHotkey)
             .mode(DesktopMode)
@@ -383,11 +372,23 @@ void initialize(Manager* manager, Action* root)
             .condition(condition::isLoggedIn()
                  && ConditionWrapper(new LightModeCondition(Qn::LightModeNoNewWindow)));
 
+        factory(OpenNewTabAction)
+            .flags(Main | TitleBar | SingleTarget | NoTarget | GlobalHotkey)
+            .mode(DesktopMode)
+            .text(ContextMenu::tr("Layout Tab"))
+            .pulledText(ContextMenu::tr("New Layout Tab"))
+            .shortcut("Ctrl+T")
+            .condition(!condition::showreelIsRunning())
+            .icon(qnSkin->icon("titlebar/plus_16.svg",
+                nullptr,
+                nullptr,
+                kTitleBarIconSubstitutions));
+
         factory(OpenWelcomeScreenAction)
             .flags(Main | GlobalHotkey)
             .mode(DesktopMode)
-            .text(ContextMenu::tr("Welcome Screen"))
-            .pulledText(ContextMenu::tr("New Welcome Screen"))
+            .text(ContextMenu::tr("Welcome Screen Tab"))
+            .pulledText(ContextMenu::tr("New Welcome Screen Tab"))
             .shortcut("Ctrl+Shift+T")
             .condition(new LightModeCondition(Qn::LightModeNoNewWindow));
     }
