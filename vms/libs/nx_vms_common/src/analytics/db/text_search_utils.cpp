@@ -115,9 +115,6 @@ bool TextMatcher::empty() const
 
 bool TextMatcher::matchAttributes(const nx::common::metadata::Attributes& attributes) const
 {
-    if (attributes.empty())
-        return false;
-
     const uint64_t mask = matchExactAttributes(attributes)
         | checkAttributesPresence(attributes)
         | matchAttributeValues(attributes);
