@@ -15,6 +15,7 @@
 #include <nx/utils/scoped_change_notifier.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/common/models/item_model_algorithm.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/resource_dialogs/backup_settings_view_common.h>
 #include <nx/vms/client/desktop/resource_dialogs/resource_dialogs_constants.h>
@@ -27,6 +28,11 @@
 #include <nx/vms/common/system_settings.h>
 
 namespace {
+
+static constexpr auto kAllMetadataContentTypes = nx::vms::api::BackupContentTypes({
+    nx::vms::api::BackupContentType::motion,
+    nx::vms::api::BackupContentType::analytics,
+    nx::vms::api::BackupContentType::bookmarks});
 
 /**
  * Scoped guard that accumulates sequence of single row 'dataChanged' notifications that should be
@@ -143,6 +149,8 @@ struct BackupSettingsDecoratorModel::Private
 
     std::optional<MessageTexts> nothingToBackupWarning(const QModelIndex& index) const;
     std::optional<MessageTexts> servicesOveruseWarning(const QModelIndex& index) const;
+    std::optional<MessageTexts> contentTypesFixedForCloudStorageWarning(
+        const QModelIndex& index) const;
 
     int availableCloudStorageServices(const QnVirtualCameraResourcePtr& camera) const;
     void proposeServicesUsageChange();
@@ -282,6 +290,35 @@ std::optional<MessageTexts> BackupSettingsDecoratorModel::Private::nothingToBack
     }
 
     return {};
+}
+
+std::optional<MessageTexts> BackupSettingsDecoratorModel::Private::
+    contentTypesFixedForCloudStorageWarning(const QModelIndex& index) const
+{
+    if (!isCloudBackupStorage)
+        return {};
+
+    if (index.column() != ContentTypesColumn && index.column() != WarningIconColumn)
+        return {};
+
+    const auto camera = q->cameraResource(index);
+    if (camera.isNull())
+        return {};
+
+    if (camera->getBackupContentType() != nx::vms::api::BackupContentType::archive)
+        return {};
+
+    if (!changedContentTypes.contains(camera))
+        return {};
+
+    if (changedContentTypes.value(camera) != kAllMetadataContentTypes)
+        return {};
+
+    const auto warningCaption = tr("Setting was changed");
+    const auto warningMessage = tr("\"All archive\" option was changed to "
+        "\"Motion, Objects, Bookmarks\" due to cloud storage backup was enabled");
+
+    return {{warningCaption, warningMessage}};
 }
 
 std::optional<MessageTexts> BackupSettingsDecoratorModel::Private::servicesOveruseWarning(
@@ -492,6 +529,7 @@ QVariant BackupSettingsDecoratorModel::data(const QModelIndex& index, int role) 
     const auto insufficientServices = d->isCloudBackupStorage && availableServices <= 0;
 
     const auto nothingToBackupWarning = d->nothingToBackupWarning(index);
+    const auto contentTypesChangedWarning = d->contentTypesFixedForCloudStorageWarning(index);
     const auto servicesOveruseWarning = d->servicesOveruseWarning(index);
 
     switch (role)
@@ -553,8 +591,8 @@ QVariant BackupSettingsDecoratorModel::data(const QModelIndex& index, int role) 
             break;
 
         case IsItemWarningStyleRole:
-            if ((column == ContentTypesColumn || column == WarningIconColumn)
-                && nothingToBackupWarning)
+            if ((column == WarningIconColumn)
+                && (nothingToBackupWarning || contentTypesChangedWarning))
             {
                 return true;
             }
@@ -572,9 +610,13 @@ QVariant BackupSettingsDecoratorModel::data(const QModelIndex& index, int role) 
                     warningMessages.append(servicesOveruseWarning.value());
 
                 if ((column == ContentTypesColumn || column == WarningIconColumn)
-                    && nothingToBackupWarning)
+                    && (nothingToBackupWarning || contentTypesChangedWarning))
                 {
-                    warningMessages.append(nothingToBackupWarning.value());
+                    if (nothingToBackupWarning)
+                        warningMessages.append(nothingToBackupWarning.value());
+
+                    if (contentTypesChangedWarning)
+                        warningMessages.append(contentTypesChangedWarning.value());
                 }
                 return QVariant::fromValue(warningMessages);
             }
@@ -760,6 +802,8 @@ void BackupSettingsDecoratorModel::loadState(const ServerSettingsDialogState& st
     d->cloudStorageUsageHelper.reset(d->isCloudBackupStorage
         ? new nx::vms::common::saas::CloudStorageServiceUsageHelper(systemContext())
         : nullptr);
+
+    fixBackupContentTypesForCloudStorage();
 }
 
 bool BackupSettingsDecoratorModel::hasChanges() const
@@ -788,9 +832,34 @@ bool BackupSettingsDecoratorModel::isNetworkRequestRunning() const
     return d->isNetworkRequestRunning();
 }
 
+void BackupSettingsDecoratorModel::fixBackupContentTypesForCloudStorage()
+{
+    if (!d->isCloudBackupStorage)
+        return;
+
+    const auto leafIndexes = item_model::getLeafIndexes(this);
+    QModelIndexList camerasIndexes;
+    std::copy_if(leafIndexes.cbegin(), leafIndexes.cend(), std::back_inserter(camerasIndexes),
+        [this](const QModelIndex& index)
+        {
+            if (const auto camera = cameraResource(index))
+                return d->backupContentTypes(camera) == nx::vms::api::BackupContentType::archive;
+
+            return false;
+        });
+
+    setBackupContentTypes(camerasIndexes, kAllMetadataContentTypes);
+}
+
 void BackupSettingsDecoratorModel::applyChanges()
 {
     d->applyChanges();
+    if (rowCount() > 0)
+    {
+        emit dataChanged(
+            index(0, WarningIconColumn),
+            index(rowCount() - 1, ColumnCount - 1));
+    }
 }
 
 } // namespace nx::vms::client::desktop

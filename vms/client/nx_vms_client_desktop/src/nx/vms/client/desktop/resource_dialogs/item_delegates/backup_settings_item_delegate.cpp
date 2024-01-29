@@ -251,10 +251,6 @@ BackupSettingsItemDelegate::DropdownStateFlags BackupSettingsItemDelegate::dropd
     dropdownState.setFlag(DropdownStateFlag::selected,
         styleOption.state.testFlag(QStyle::State_Selected));
 
-    const auto isWarningStyleData = index.data(IsItemWarningStyleRole);
-    dropdownState.setFlag(DropdownStateFlag::warning,
-        !isWarningStyleData.isNull() && isWarningStyleData.toBool());
-
     return dropdownState;
 }
 
@@ -290,22 +286,6 @@ void BackupSettingsItemDelegate::initDropdownColorTable()
     m_dropdownColorTable.insert(
         {DropdownStateFlag::enabled, DropdownStateFlag::selected, DropdownStateFlag::hovered},
         core::colorTheme()->color("light4"));
-
-    m_dropdownColorTable.insert(
-        {DropdownStateFlag::enabled, DropdownStateFlag::warning},
-        core::colorTheme()->color("yellow_d2"));
-
-    m_dropdownColorTable.insert(
-        {DropdownStateFlag::enabled, DropdownStateFlag::selected, DropdownStateFlag::warning},
-        core::colorTheme()->color("yellow_d1"));
-
-    m_dropdownColorTable.insert(
-        {DropdownStateFlag::enabled, DropdownStateFlag::hovered, DropdownStateFlag::warning},
-        core::colorTheme()->color("yellow_core"));
-
-    m_dropdownColorTable.insert({DropdownStateFlag::enabled, DropdownStateFlag::selected,
-        DropdownStateFlag::hovered, DropdownStateFlag::warning},
-            core::colorTheme()->color("yellow_core"));
 }
 
 } // namespace nx::vms::client::desktop
