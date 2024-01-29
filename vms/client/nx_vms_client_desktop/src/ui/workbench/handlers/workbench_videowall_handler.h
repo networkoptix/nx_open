@@ -235,7 +235,7 @@ private:
     void saveVideowall(const QnVideoWallResourcePtr& videowall, bool saveLayout = false,
         VideoWallCallbackFunction callback = {});
     void saveVideowalls(const QSet<QnVideoWallResourcePtr>& videowalls, bool saveLayout = false,
-        std::function<void(const QnVideoWallResourceList& successfullySaved)> callback = {});
+        VideoWallCallbackFunction callback = {});
     void saveVideowallAndReviewLayout(
         const QnVideoWallResourcePtr& videowall,
         nx::vms::client::desktop::LayoutResourcePtr reviewLayout = {},
