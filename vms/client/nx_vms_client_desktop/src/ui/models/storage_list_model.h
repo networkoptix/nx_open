@@ -27,6 +27,7 @@ public:
         UrlColumn,
         TypeColumn,
         StoragePoolColumn,
+        StorageArchiveModeWarningIconColumn,
         StorageArchiveModeColumn,
         TotalSpaceColumn,
         ActionsColumn,
@@ -43,6 +44,12 @@ public:
 
     QnStorageListModel(QObject* parent = nullptr);
     virtual ~QnStorageListModel();
+
+    /**
+     * @return Translated lexical representation of the given storage archive mode enumeration
+     *     value in a title case.
+     */
+    static QString toString(nx::vms::api::StorageArchiveMode archiveMode);
 
     void setStorages(const QnStorageModelInfoList& storages);
     void addStorage(const QnStorageModelInfo& storage);
@@ -91,6 +98,18 @@ public:
     virtual QVariant headerData(int section, Qt::Orientation orientation,
         int role = Qt::DisplayRole) const override;
 
+    using ServersByExternalStorageArchiveMode =
+        std::map<nx::vms::api::StorageArchiveMode, QnMediaServerResourceList>;
+    /**
+     * @param storageInfo Record that represents one of external storages presented in this model.
+     * @return List of servers, that use external storages with the same URLs as in the storage
+     *     description passed as a parameter. The list of servers is broken down according to
+     *     storage archive modes that are used to access corresponding storages. The server
+     *     presented by the model is also present in the result.
+     */
+    ServersByExternalStorageArchiveMode serversUsingSameExternalStorage(
+        const QnStorageModelInfo& storageInfo) const;
+
     bool isReadOnly() const;
     void setReadOnly(bool readOnly);
 
@@ -101,6 +120,7 @@ protected:
         int role = Qt::EditRole) override;
 
 private:
+    QVariant storageArchiveModeWarningIconColumnData(const QModelIndex& index, int role) const;
     QString displayData(const QModelIndex& index, bool forcedText) const;
     QVariant mouseCursorData(const QModelIndex& index) const;
     QVariant checkstateData(const QModelIndex& index) const;

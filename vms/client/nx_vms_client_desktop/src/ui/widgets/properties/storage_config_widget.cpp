@@ -38,12 +38,15 @@
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/style.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/common/html/html.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/time/formatter.h>
 #include <server/server_storage_manager.h>
+#include <ui/common/indents.h>
 #include <ui/dialogs/storage_url_dialog.h>
 #include <ui/models/storage_list_model.h>
 #include <ui/models/storage_model_info.h>
+#include <ui/widgets/views/resource_list_view.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/scoped_painter_rollback.h>
@@ -55,7 +58,8 @@ using namespace nx::vms::client::desktop;
 
 namespace {
 
-static constexpr int kMinimumColumnWidth = 80;
+static constexpr int kMinimumColumnWidth = 60;
+static constexpr int kMaximumMismatchingArchiveModesMessageBoxWidth = 400;
 
 NX_REFLECTION_ENUM_CLASS(StorageType,
     ram,
@@ -142,6 +146,36 @@ QnVirtualCameraResourceList getCamerasWithIncompatibleCloudBackupSettings(
         });
 }
 
+QWidget* createMismatchingArchiveModesDetailsWidget(
+    QnStorageListModel::ServersByExternalStorageArchiveMode serversByArchiveAccessMode)
+{
+    using namespace nx::style;
+
+    const auto widgetLayout = new QVBoxLayout();
+    widgetLayout->setContentsMargins({});
+    widgetLayout->setSpacing(Metrics::kDefaultLayoutSpacing.height());
+
+    for (const auto& [archiveMode, servers]: serversByArchiveAccessMode)
+    {
+        widgetLayout->addWidget(new QLabel(QnStorageListModel::toString(archiveMode)));
+
+        const auto resourceListView = new QnResourceListView(servers);
+        resourceListView->setProperty(Properties::kSideIndentation,
+            QVariant::fromValue(QnIndents(Metrics::kStandardPadding)));
+
+        if (servers.size() == 1)
+            resourceListView->setFixedHeight(Metrics::kViewRowHeight);
+
+        widgetLayout->addWidget(resourceListView);
+    }
+    widgetLayout->addStretch();
+
+    const auto detailsWidget = new QWidget();
+    detailsWidget->setLayout(widgetLayout);
+
+    return detailsWidget;
+}
+
 //-------------------------------------------------------------------------------------------------
 // StoragesSortModel
 
@@ -186,16 +220,22 @@ public:
         const QStyleOptionViewItem& option,
         const QModelIndex& index) const override
     {
-        QSize result = base_type::sizeHint(option, index);
+        auto result = base_type::sizeHint(option, index);
 
-        if (index.column() == QnStorageListModel::StoragePoolColumn
-            && index.flags().testFlag(Qt::ItemIsEditable))
+
+        if ((index.column() == QnStorageListModel::StoragePoolColumn
+            || index.column() == QnStorageListModel::StorageArchiveModeColumn)
+                && index.flags().testFlag(Qt::ItemIsEditable))
         {
             result.rwidth() += style::Metrics::kArrowSize + style::Metrics::kStandardPadding;
         }
 
-        if (index.column() != QnStorageListModel::CheckBoxColumn)
+        if (index.column() != QnStorageListModel::StorageArchiveModeWarningIconColumn
+            && index.column() != QnStorageListModel::SpacerColumn
+            && index.column() != QnStorageListModel::CheckBoxColumn)
+        {
             result.setWidth(qMax(result.width(), kMinimumColumnWidth));
+        }
 
         if (index.column() == QnStorageListModel::UrlColumn)
         {
@@ -220,7 +260,23 @@ public:
             }
         }
 
+        if (index.column() == QnStorageListModel::StorageArchiveModeWarningIconColumn)
+        {
+            result.rwidth() = !index.data(Qt::DecorationRole).isNull()
+                ? nx::style::Metrics::kDefaultIconSize + nx::style::Metrics::kStandardPadding
+                : 0;
+        }
+
         return result;
+    }
+
+    virtual void initStyleOption(
+        QStyleOptionViewItem* option,
+        const QModelIndex& index) const override
+    {
+        base_type::initStyleOption(option, index);
+        if (index.column() == QnStorageListModel::StorageArchiveModeWarningIconColumn)
+            option->displayAlignment = Qt::AlignRight | Qt::AlignVCenter;
     }
 
     virtual void paint(
@@ -324,37 +380,6 @@ public:
 private:
     QPointer<ItemViewHoverTracker> m_hoverTracker;
     QPersistentModelIndex m_editedIndex;
-};
-
-//-------------------------------------------------------------------------------------------------
-// ColumnResizer
-
-class ColumnResizer: public QObject
-{
-public:
-    ColumnResizer(QObject* parent = nullptr):
-        QObject(parent)
-    {
-    }
-
-protected:
-    bool eventFilter(QObject* object, QEvent* event)
-    {
-        auto view = qobject_cast<TreeView*>(object);
-
-        if (view && event->type() == QEvent::Resize)
-        {
-            int occupiedWidth = 0;
-            for (int i = 1; i < view->model()->columnCount(); ++i)
-                occupiedWidth += view->sizeHintForColumn(i);
-
-            const int urlWidth = view->sizeHintForColumn(QnStorageListModel::UrlColumn);
-            view->setColumnWidth(QnStorageListModel::UrlColumn,
-                qMin(urlWidth, view->width() - occupiedWidth));
-        }
-
-        return false;
-    }
 };
 
 static constexpr int kUpdateStatusTimeoutMs = 5 * 1000;
@@ -559,7 +584,6 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent):
     ui(new Ui::StorageConfigWidget()),
     m_server(),
     m_model(new QnStorageListModel()),
-    m_columnResizer(new ColumnResizer(this)),
     m_updateStatusTimer(new QTimer(this)),
     m_storagePoolMenu(new QMenu(this)),
     m_storageArchiveModeMenu(new QMenu(this))
@@ -613,6 +637,7 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent):
     headerView->setSectionsMovable(false);
     headerView->setMinimumSectionSize(0);
     headerView->setSectionsClickable(false);
+    headerView->setSortIndicatorShown(false);
 
     const auto archiveModeHint = HintButton::createHeaderViewHint(
         ui->storageView->header(), QnStorageListModel::StorageArchiveModeColumn);
@@ -626,7 +651,6 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent):
         tr("Isolated - server reads and writes only its own folder."));
 
     ui->storageView->setMouseTracking(true);
-    ui->storageView->installEventFilter(m_columnResizer.data());
 
     auto itemClicked =
         [this, itemDelegate](const QModelIndex& index)
@@ -1134,6 +1158,39 @@ void QnStorageConfigWidget::atStorageViewClicked(const QModelIndex& index)
     else if (index.column() == QnStorageListModel::CheckBoxColumn)
     {
         updateWarnings();
+    }
+    else if (index.column() == QnStorageListModel::StorageArchiveModeWarningIconColumn
+        && record.isExternal)
+    {
+        using namespace nx::vms::common;
+
+        const auto serversByArchiveAccessMode = m_model->serversUsingSameExternalStorage(record);
+        if (serversByArchiveAccessMode.size() > 1)
+        {
+            const auto messageBoxCaption =
+                tr("The System Servers have different read-write policies for the storage");
+
+            const auto storageUrlDisplayString =
+                index.siblingAtColumn(QnStorageListModel::UrlColumn).data().toString();
+
+            const auto messageBoxExtraText =
+                tr("URL: %1", "%1 will be substituted with storage URL, e.g '192.168.1.10/media'")
+                    .arg(storageUrlDisplayString);
+
+            QnMessageBox messageBox(
+                QnMessageBoxIcon::Warning,
+                messageBoxCaption,
+                messageBoxExtraText,
+                QDialogButtonBox::Ok,
+                QDialogButtonBox::Ok,
+                window());
+
+            messageBox.setMaximumWidth(kMaximumMismatchingArchiveModesMessageBoxWidth);
+            messageBox.addCustomWidget(
+                createMismatchingArchiveModesDetailsWidget(serversByArchiveAccessMode));
+
+            messageBox.exec();
+        }
     }
 
     emit hasChangesChanged();
