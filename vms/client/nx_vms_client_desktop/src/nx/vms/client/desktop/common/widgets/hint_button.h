@@ -72,6 +72,8 @@ private:
     bool hasHelpTopic() const;
 
 private:
+    friend class Style;
+
     QPixmap m_regularPixmap;
     QPixmap m_highlightedPixmap;
     QString m_hintText;

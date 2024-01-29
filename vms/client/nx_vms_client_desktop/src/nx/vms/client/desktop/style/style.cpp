@@ -55,6 +55,7 @@
 #include <nx/vms/client/desktop/common/utils/painter_transform_scale_stripper.h>
 #include <nx/vms/client/desktop/common/utils/popup_shadow.h>
 #include <nx/vms/client/desktop/common/widgets/detail/base_input_field.h>
+#include <nx/vms/client/desktop/common/widgets/hint_button.h>
 #include <nx/vms/client/desktop/common/widgets/input_field.h>
 #include <nx/vms/client/desktop/common/widgets/scroll_bar_proxy.h>
 #include <nx/vms/client/desktop/common/widgets/slide_switch.h>
@@ -3420,11 +3421,13 @@ QRect Style::subElementRect(
                 QRect rect = item->rect.adjusted(
                     indents.left() - defaultMargin, 0, -(indents.right() - defaultMargin), 0);
 
-                /* Workaround to be able to align icon in an icon-only viewitem by model /
-                 * Qt::TextAlignmentRole: */
+                // Workaround to make it possible to align the icon in an icon-only view item
+                // according to the flags provided by the Qt::TextAlignmentRole.
                 if (isIconOnlyItem(*item))
                 {
                     QSize iconSize = item->icon.actualSize(item->decorationSize);
+                    if (rect.width() < iconSize.width())
+                        rect = item->rect; //< Omit paddings if there is not enough space.
                     return alignedRect(item->direction, item->displayAlignment, iconSize, rect);
                 }
 
@@ -3737,6 +3740,25 @@ QSize Style::sizeFromContents(
                 const int height = header->orientation == Qt::Horizontal
                     ? qMax(textSize.height(), Metrics::kHeaderSize)
                     : kUnusedHeight; //< vertical header height is calculated elsewhere
+
+                // Extend the item view header section to fit the attached hint button.
+                if (widget)
+                {
+                    const auto childrenHintButtons =
+                        widget->findChildren<HintButton*>(Qt::FindDirectChildrenOnly);
+
+                    for (auto childHintButton: childrenHintButtons)
+                    {
+                        if (!NX_ASSERT(childHintButton->m_headerViewSection))
+                            continue;
+
+                        if (childHintButton->m_headerViewSection.value() == header->section)
+                        {
+                            width += childHintButton->width() + Metrics::kHintButtonMargin;
+                            break;
+                        }
+                    }
+                }
 
                 return QSize(width, height);
             }

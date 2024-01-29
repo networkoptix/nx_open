@@ -6,7 +6,6 @@
 #include <QtCore/QDateTime>
 #include <QtCore/QFlags>
 #include <QtCore/QModelIndex>
-#include <QtWidgets/QWidget>
 
 #include <api/model/api_model_fwd.h>
 #include <api/server_rest_connection_fwd.h>
@@ -110,7 +109,6 @@ private:
     QScopedPointer<Ui::StorageConfigWidget> ui;
     QnMediaServerResourcePtr m_server;
     QScopedPointer<QnStorageListModel> m_model;
-    QScopedPointer<QObject> m_columnResizer;
     QTimer* m_updateStatusTimer;
     QMenu* m_storagePoolMenu;
     QMenu* m_storageArchiveModeMenu;

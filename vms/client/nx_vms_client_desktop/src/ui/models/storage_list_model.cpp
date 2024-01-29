@@ -10,10 +10,12 @@
 #include <core/resource/client_storage_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/storage_resource.h>
+#include <core/resource_management/resource_pool.h>
 #include <nx/network/socket_common.h>
 #include <nx/utils/algorithm/index_of.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/common/html/html.h>
 #include <nx/vms/text/human_readable.h>
 
 namespace {
@@ -65,6 +67,28 @@ QnStorageListModel::QnStorageListModel(QObject* parent):
 
 QnStorageListModel::~QnStorageListModel()
 {
+}
+
+QString QnStorageListModel::toString(nx::vms::api::StorageArchiveMode archiveMode)
+{
+    switch (archiveMode)
+    {
+        case nx::vms::api::StorageArchiveMode::isolated:
+            return tr("Isolated");
+
+        case nx::vms::api::StorageArchiveMode::exclusive:
+            return tr("Exclusive");
+
+        case nx::vms::api::StorageArchiveMode::shared:
+            return tr("Shared");
+
+        case nx::vms::api::StorageArchiveMode::undefined:
+            return tr("Undefined");
+
+        default:
+            NX_ASSERT(false, "Unexpected storage archive mode");
+            return {};
+    }
 }
 
 void QnStorageListModel::setStorages(const QnStorageModelInfoList& storages)
@@ -272,26 +296,13 @@ QString QnStorageListModel::displayData(const QModelIndex& index, bool forcedTex
 
         case StorageArchiveModeColumn:
         {
-            switch (storageData.archiveMode)
+            if (storageData.archiveMode == nx::vms::api::StorageArchiveMode::undefined
+                && !canChangeStorageArchiveMode(storageData))
             {
-                case nx::vms::api::StorageArchiveMode::isolated:
-                    return tr("Isolated");
-
-                case nx::vms::api::StorageArchiveMode::exclusive:
-                    return tr("Exclusive");
-
-                case nx::vms::api::StorageArchiveMode::shared:
-                    return tr("Shared");
-
-                case nx::vms::api::StorageArchiveMode::undefined:
-                    return canChangeStorageArchiveMode(storageData)
-                        ? tr("Undefined")
-                        : QString();
-
-                default:
-                    NX_ASSERT(false, "Unexpected storage archive mode");
-                    return QString();
+                return QString();
             }
+
+            return toString(storageData.archiveMode);
         }
 
         case TotalSpaceColumn:
@@ -381,6 +392,9 @@ QVariant QnStorageListModel::data(const QModelIndex& index, int role) const
 {
     if (!hasIndex(index.row(), index.column(), index.parent()))
         return QVariant();
+
+    if (index.column() == StorageArchiveModeWarningIconColumn)
+        return storageArchiveModeWarningIconColumnData(index, role);
 
     switch (role)
     {
@@ -487,6 +501,54 @@ bool QnStorageListModel::setData(const QModelIndex& index, const QVariant& value
     return base_type::setData(index, value, role);
 }
 
+QVariant QnStorageListModel::storageArchiveModeWarningIconColumnData(
+    const QModelIndex& index, int role) const
+{
+    if (!NX_ASSERT(index.isValid() && index.column() == StorageArchiveModeWarningIconColumn))
+        return {};
+
+    if (role == Qn::StorageInfoDataRole)
+        return QVariant::fromValue<QnStorageModelInfo>(storage(index));
+
+    const auto storageInfo = m_storages.at(index.row());
+    if (!storageInfo.isExternal)
+        return {};
+
+    const auto serversByArchiveAccessMode =
+        serversUsingSameExternalStorage(m_storages.at(index.row()));
+
+    // Either no such storages were found or the same archive mode mode is used for each one.
+    if (serversByArchiveAccessMode.size() <= 1)
+        return {};
+
+    switch (role)
+    {
+        case Qn::ItemMouseCursorRole:
+            return QVariant::fromValue<int>(Qt::PointingHandCursor);
+
+        case Qt::DecorationRole:
+            return qnSkin->pixmap("tree/buggy.png");
+
+        case Qt::ToolTipRole:
+        {
+            using namespace nx::vms::common;
+
+            QStringList hintParagraphs;
+            hintParagraphs.push_back(html::paragraph(tr("The storage has different read-write "
+                "policies across various Servers in the System")));
+
+            hintParagraphs.push_back(html::paragraph(html::colored(
+                html::toHtmlEscaped(tr("Click on the icon to see Servers list")),
+                nx::vms::client::core::colorTheme()->color("light16"))));
+
+            return hintParagraphs.join("");
+        }
+
+        default:
+            return {};
+    }
+}
+
 Qt::ItemFlags QnStorageListModel::flags(const QModelIndex& index) const
 {
     auto isEnabled = [this](const QModelIndex& index)
@@ -567,6 +629,50 @@ QVariant QnStorageListModel::headerData(int section, Qt::Orientation orientation
         default:
             return {};
     }
+}
+
+QnStorageListModel::ServersByExternalStorageArchiveMode
+    QnStorageListModel::serversUsingSameExternalStorage(const QnStorageModelInfo& storageInfo) const
+{
+    ServersByExternalStorageArchiveMode result;
+
+    if (!NX_ASSERT(m_server, "Model is not initialized"))
+        return result;
+
+    if (!NX_ASSERT(storageInfo.isExternal,
+        "Description of external storage is expected as input parameter"))
+    {
+        return result;
+    }
+
+    const auto itr = std::find_if(m_storages.cbegin(), m_storages.cend(),
+        [storageInfo](const QnStorageModelInfo& record)
+        {
+            return record.id == storageInfo.id;
+        });
+
+    if (!NX_ASSERT(itr != m_storages.end(),
+        "Description of storage represented by this modes is expected as input parameter"))
+    {
+        return result;
+    }
+
+    const auto resourcePool = m_server->resourcePool();
+
+    const auto sameUrlStorages = resourcePool->getResources<QnStorageResource>().filtered(
+        [this, storageInfo](const QnStorageResourcePtr& otherStorage)
+        {
+            return otherStorage->getParentServer() != m_server
+                && otherStorage->getUrl() == storageInfo.url
+                && otherStorage->isExternal();
+        });
+
+    for (const auto& storage: sameUrlStorages)
+        result[storage->storageArchiveMode()].append(storage->getParentServer());
+
+    result[storageInfo.archiveMode].append(m_server);
+
+    return result;
 }
 
 bool QnStorageListModel::isReadOnly() const

@@ -17,21 +17,12 @@
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/style.h>
+#include <nx/vms/common/html/html.h>
 
 namespace {
 
 // Extra margin for a hint button attached to group box or header view.
 static constexpr int kExtraMargin = 2;
-
-QString makeParagraph(const QString& text)
-{
-    return QString("<p>%1</p>").arg(text);
-}
-
-QString makeColoredText(const QString& text, const QColor& color)
-{
-    return QString("<i style='color: %1'>%2</i>").arg(color.name(QColor::HexRgb), text);
-}
 
 } // namespace
 
@@ -93,6 +84,9 @@ HintButton* HintButton::createHeaderViewHint(QHeaderView* headerView, int sectio
         [hintButton, headerView]{ hintButton->updateGeometry(headerView); });
 
     connect(headerView, &QHeaderView::sectionMoved, hintButton,
+        [hintButton, headerView]{ hintButton->updateGeometry(headerView); });
+
+    connect(headerView, &QHeaderView::sectionResized, hintButton,
         [hintButton, headerView]{ hintButton->updateGeometry(headerView); });
 
     return hintButton;
@@ -183,6 +177,7 @@ void HintButton::updateGeometry(QHeaderView* headerView)
 
     QRect updatedGeometry({}, size());
     updatedGeometry.moveCenter(headerView->rect().center());
+    updatedGeometry.translate(0, 1);
     updatedGeometry.moveLeft(sectionTextRect.right() + kMargin);
 
     setGeometry(updatedGeometry);
@@ -200,19 +195,21 @@ bool HintButton::hasHelpTopic() const
 
 void HintButton::showTooltip(bool show)
 {
+    using namespace nx::vms::common;
+
     if (!m_tooltipVisible && show)
     {
         const auto hintLines = m_hintText.split(QChar::LineFeed);
 
         QStringList hintParagraphs;
         for (const auto& hintLine: hintLines)
-            hintParagraphs.push_back(makeParagraph(hintLine));
+            hintParagraphs.push_back(html::paragraph(hintLine));
 
         if (hasHelpTopic())
         {
-            hintParagraphs.push_back(makeParagraph(
-                makeColoredText(tr("Click on the icon to read more"),
-                    core::colorTheme()->color("light16"))));
+            hintParagraphs.push_back(html::paragraph(
+                html::colored(tr("Click on the icon to read more"),
+                core::colorTheme()->color("light16"))));
         }
 
         QPoint hintSpawnPos = mapToGlobal(rect().bottomLeft());
