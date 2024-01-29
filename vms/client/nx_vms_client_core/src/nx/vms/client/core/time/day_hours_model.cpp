@@ -2,6 +2,7 @@
 
 #include "day_hours_model.h"
 
+#include <chrono>
 #include <functional>
 
 #include <QtCore/QDateTime>
@@ -82,16 +83,27 @@ void DayHoursModel::Private::updateArchiveInfo(PeriodStorageType type)
     const QnTimePeriodList timePeriods =
         store ? store->periods(Qn::RecordingContent) : QnTimePeriodList();
 
-    const qint64 startPosition = date.startOfDay(timeZone).toMSecsSinceEpoch();
+    const auto startDateTime = date.startOfDay(timeZone);
+    const auto endDateTime = date.addDays(1).startOfDay(timeZone);
+    const qint64 startPosition = startDateTime.toMSecsSinceEpoch();
+    const auto dateHours = duration_cast<hours>(endDateTime - startDateTime).count();
 
     const QBitArray archivePresence = calendar_utils::buildArchivePresence(
         timePeriods,
         milliseconds(startPosition),
-        kHoursPerDay,
+        dateHours,
         [](milliseconds timestamp) -> milliseconds { return timestamp + 1h; });
 
-    for (int i = 0; i < kHoursPerDay; ++i)
-        hourHasArchive[(int) type][i] = archivePresence[i];
+    auto archiveSorage = hourHasArchive[(int) type];
+    std::fill(archiveSorage, archiveSorage + kHoursPerDay, false);
+    for (int i = 0; i < dateHours; ++i)
+    {
+        const auto dateTime = startDateTime.addDuration(i * 1h);
+        if (!dateTime.isValid())
+            continue;
+
+        archiveSorage[dateTime.time().hour()] |= archivePresence[i];
+    }
 }
 
 void DayHoursModel::Private::setPeriodStorage(
