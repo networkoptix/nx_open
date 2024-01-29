@@ -640,9 +640,10 @@ void QnWorkbenchVideoWallHandler::updateItemsLayout(
     }
 
     saveVideowalls(videoWalls, /*saveLayout*/ false,
-        [this](const QnVideoWallResourceList& successfullySaved)
+        [this](bool successfullySaved, const QnVideoWallResourcePtr& videowall)
         {
-            cleanupUnusedLayouts(successfullySaved);
+            if (successfullySaved)
+                cleanupUnusedLayouts({videowall});
         });
 }
 
@@ -1648,9 +1649,10 @@ void QnWorkbenchVideoWallHandler::at_detachFromVideoWallAction_triggered()
     }
 
     saveVideowalls(videoWalls, /*saveLayout*/ false,
-        [this](const QnVideoWallResourceList& successfullySaved)
+        [this](bool successfullySaved, const QnVideoWallResourcePtr& videowall)
         {
-            cleanupUnusedLayouts(successfullySaved);
+            if (successfullySaved)
+                cleanupUnusedLayouts({videowall});
         });
 }
 
@@ -1673,9 +1675,10 @@ void QnWorkbenchVideoWallHandler::at_deleteVideoWallItemAction_triggered()
     }
 
     saveVideowalls(videoWalls, /*saveLayout*/ true,
-        [this](const QnVideoWallResourceList& successfullySaved)
+        [this](bool successfullySaved, const QnVideoWallResourcePtr& videowall)
         {
-            cleanupUnusedLayouts(successfullySaved);
+            if (successfullySaved)
+                cleanupUnusedLayouts({videowall});
         });
 }
 
@@ -3042,10 +3045,10 @@ void QnWorkbenchVideoWallHandler::saveVideowall(
 void QnWorkbenchVideoWallHandler::saveVideowalls(
     const QSet<QnVideoWallResourcePtr>& videowalls,
     bool saveLayout,
-    std::function<void(const QnVideoWallResourceList& successfullySaved)> callback)
+    VideoWallCallbackFunction callback)
 {
     for (const QnVideoWallResourcePtr& videowall: videowalls)
-        saveVideowall(videowall, saveLayout);
+        saveVideowall(videowall, saveLayout, callback);
 }
 
 bool QnWorkbenchVideoWallHandler::saveReviewLayout(
@@ -3484,13 +3487,15 @@ void QnWorkbenchVideoWallHandler::saveVideowallAndReviewLayout(
     if (reviewLayout)
     {
         const auto saveLayoutCallback =
-            [id = reviewLayout->getId()](int /*reqId*/, ec2::ErrorCode errorCode)
+            [id = reviewLayout->getId(), videowall, callback](
+                int /*reqId*/,
+                ec2::ErrorCode errorCode)
             {
                 snapshotManager()->markBeingSaved(id, false);
-                if (errorCode != ec2::ErrorCode::ok)
-                    return;
+                if (errorCode == ec2::ErrorCode::ok)
+                    snapshotManager()->markChanged(id, false);
 
-                snapshotManager()->markChanged(id, false);
+                callback(errorCode == ec2::ErrorCode::ok, videowall);
             };
 
         if (saveReviewLayout(reviewLayout, saveLayoutCallback))
