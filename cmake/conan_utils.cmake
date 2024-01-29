@@ -79,6 +79,12 @@ function(_configure_conan)
             ERROR_MESSAGE "Can not add Nx Conan remote."
         )
     endif()
+
+    if(DEFINED ENV{NX_ARTIFACTORY_USERNAME} AND DEFINED ENV{NX_ARTIFACTORY_PASSWORD})
+        message(STATUS "Using custom conan credentials $ENV{NX_ARTIFACTORY_USERNAME}:******")
+        set(ENV{CONAN_LOGIN_USERNAME_nx} $ENV{NX_ARTIFACTORY_USERNAME})
+        set(ENV{CONAN_PASSWORD_nx} $ENV{NX_ARTIFACTORY_PASSWORD})
+    endif()
 endfunction()
 
 function(nx_run_conan)
