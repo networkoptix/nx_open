@@ -13,21 +13,6 @@ bool supportsCameraHotspots(const QnResourcePtr& cameraResource)
     if (!camera)
         return false;
 
-    const auto unsupportedPtzCapabilities =
-        Ptz::AbsolutePtrzCapabilities
-        | Ptz::ContinuousPtrzCapabilities
-        | Ptz::RelativePtrzCapabilities;
-
-    const auto operationalPtzCapabilities =
-        camera->getPtzCapabilities(nx::vms::common::ptz::Type::operational);
-
-    if ((operationalPtzCapabilities & unsupportedPtzCapabilities)
-        != Ptz::Capability::NoPtzCapabilities)
-    {
-        return false;
-    }
-
-    // TODO: #vbreus Only virtual cameras that have actual footage should be allowed.
     return !camera->flags().testFlag(Qn::desktop_camera)
         && camera->hasVideo();
 }

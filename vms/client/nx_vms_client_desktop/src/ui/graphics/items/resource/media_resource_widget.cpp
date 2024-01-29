@@ -2151,12 +2151,23 @@ void QnMediaResourceWidget::channelScreenSizeChangedNotify()
 
 void QnMediaResourceWidget::optionsChangedNotify(Options changedFlags)
 {
-    const bool motionSearchChanged = changedFlags.testFlag(DisplayMotion);
-    const bool ptzChanged = changedFlags.testFlag(ControlPtz);
+    const auto saveItemDataState =
+        [this](Qn::ItemDataRole role)
+        {
+            m_savedItemDataState.insert(role, item()->data(role));
+        };
 
+    const auto restoreItemDataState =
+        [this]()
+        {
+            for (const auto role: m_savedItemDataState.keys())
+                item()->setData(role, m_savedItemDataState.take(role));
+        };
+
+    const bool motionSearchChanged = changedFlags.testFlag(DisplayMotion);
+    const bool motionSearchEnabled = options().testFlag(DisplayMotion);
     if (motionSearchChanged)
     {
-        const bool motionSearchEnabled = options().testFlag(DisplayMotion);
         d->setMotionEnabled(motionSearchEnabled);
 
         titleBar()->rightButtonsBar()->setButtonsChecked(
@@ -2168,12 +2179,6 @@ void QnMediaResourceWidget::optionsChangedNotify(Options changedFlags)
             // disabled, also Camera Hotspots will be hidden, since Hotspot items are mouse
             // grabbers and may interfere selection process. Dewarped view params and Camera
             // Hotspots enabled state are saved before engaging motion selection process.
-
-            const auto saveItemDataState =
-                [this](Qn::ItemDataRole role)
-                {
-                    m_savedItemDataState.insert(role, item()->data(role));
-                };
 
             if (item()->dewarpingParams().enabled)
                 saveItemDataState(Qn::ItemImageDewarpingRole);
@@ -2190,11 +2195,6 @@ void QnMediaResourceWidget::optionsChangedNotify(Options changedFlags)
         else
         {
             unsetAreaSelectionType(AreaType::motion);
-
-            // Stored item parameters are applied back after exiting motion search mode.
-
-            for (const auto role: m_savedItemDataState.keys())
-                item()->setData(role, m_savedItemDataState.take(role));
         }
 
         updateTimelineVisibility();
@@ -2204,15 +2204,28 @@ void QnMediaResourceWidget::optionsChangedNotify(Options changedFlags)
         emit motionSearchModeEnabled(motionSearchEnabled);
     }
 
-    if (ptzChanged && options().testFlag(ControlPtz))
+    const bool ptzChanged = changedFlags.testFlag(ControlPtz);
+    const bool ptzEnabled = options().testFlag(ControlPtz);
+    if (ptzChanged && ptzEnabled)
     {
         titleBar()->rightButtonsBar()->setButtonsChecked(
-        Qn::MotionSearchButton | Qn::ZoomWindowButton, false);
+            Qn::MotionSearchButton | Qn::ZoomWindowButton, false);
+
+        if (!options().testFlag(DisplayDewarped)) //< True PTZ.
+        {
+            if (item()->displayHotspots())
+                saveItemDataState(Qn::ItemDisplayHotspotsRole);
+
+            titleBar()->rightButtonsBar()->setButtonsChecked(Qn::HotspotsButton, false);
+        }
     }
 
     if (motionSearchChanged || ptzChanged)
     {
         static constexpr int kInvalidKeyboardModifier = 1;
+
+        if (!motionSearchEnabled && !ptzEnabled)
+            restoreItemDataState();
 
         if (options().testFlag(ControlPtz))
             setProperty(Qn::MotionSelectionModifiers, kInvalidKeyboardModifier); //< Disable.
@@ -2949,8 +2962,11 @@ void QnMediaResourceWidget::updateFisheye()
     const bool fisheyeEnabled = enabled && m_dewarpingParams.enabled;
 
     const bool showFisheyeOverlay = fisheyeEnabled && !isZoomWindow();
-    setOption(ControlPtz, showFisheyeOverlay);
-    setOption(DisplayDewarped, fisheyeEnabled);
+
+    auto updatedOptions = options();
+    updatedOptions.setFlag(ControlPtz, showFisheyeOverlay);
+    updatedOptions.setFlag(DisplayDewarped, fisheyeEnabled);
+    setOptions(updatedOptions);
 
     if (fisheyeEnabled && titleBar()->rightButtonsBar()->button(Qn::FishEyeButton))
         titleBar()->rightButtonsBar()->button(Qn::FishEyeButton)->setChecked(fisheyeEnabled);
