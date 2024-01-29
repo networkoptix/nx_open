@@ -46,6 +46,16 @@ public:
     void setBackupQuality(const QModelIndexList& indexes, CameraBackupQuality quality);
     void setBackupEnabled(const QModelIndexList& indexes, bool enabled);
 
+    /**
+     * If loaded state indicates that cloud backup storage is used, calling this method is
+     * equivalent to calling of setBackupContentType() method with following parameters values:
+     * - indexes: list of indexes corresponding to all of camera rows, where camera has
+     *     BackupContentType::archive current backup content type (may not be applied).
+     * - contentTypes: BackupContentType::motion | BackupContentType::analytics
+     *     | BackupContentType::bookmarks value.
+     */
+    void fixBackupContentTypesForCloudStorage();
+
     bool hasChanges() const;
     void applyChanges();
     void discardChanges();

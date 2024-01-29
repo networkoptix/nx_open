@@ -42,6 +42,7 @@ signals:
 protected:
     virtual QAbstractItemModel* model() const override;
     virtual void setupHeader() override;
+    virtual void showEvent(QShowEvent* event) override;
 
 private:
     void loadState(const ServerSettingsDialogState& state);

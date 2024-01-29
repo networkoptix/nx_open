@@ -22,7 +22,6 @@ public:
         enabled = 0x1,
         hovered = 0x2,
         selected = 0x4,
-        warning = 0x8,
     };
     Q_ENUM(DropdownStateFlag)
     Q_DECLARE_FLAGS(DropdownStateFlags, DropdownStateFlag)
