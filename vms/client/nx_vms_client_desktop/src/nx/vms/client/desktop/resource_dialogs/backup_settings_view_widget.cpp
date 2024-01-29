@@ -246,6 +246,12 @@ void BackupSettingsViewWidget::setupHeader()
     header->setSectionHidden(ResolutionColumn, !m_isCloudBackupStorage);
 }
 
+void BackupSettingsViewWidget::showEvent(QShowEvent* event)
+{
+    base_type::showEvent(event);
+    m_backupSettingsDecoratorModel->fixBackupContentTypesForCloudStorage();
+}
+
 bool BackupSettingsViewWidget::hasChanges() const
 {
     return m_backupSettingsDecoratorModel->hasChanges();
