@@ -410,11 +410,21 @@ std::vector<RhiPaintDeviceRenderer::Batch> RhiPaintDeviceRenderer::processEntrie
             const QPointF bottomLeft = paintPixmap->transform.map(r.bottomLeft());
             const QPointF bottomRight = paintPixmap->transform.map(r.bottomRight());
 
+            QRectF src(0, 0, 1, 1);
+
+            if (const auto s = paintPixmap->pixmap.size(); !s.isEmpty())
+            {
+                src.setX(paintPixmap->src.x() / s.width());
+                src.setY(paintPixmap->src.y() / s.height());
+                src.setWidth(paintPixmap->src.width() / s.width());
+                src.setHeight(paintPixmap->src.height() / s.height());
+            }
+
             std::vector<float> vertexData = {
-                (float) topLeft.x(),     (float) topLeft.y(),     0.0f, 0.0f, (float) paintPixmap->opacity,
-                (float) topRight.x(),    (float) topRight.y(),    1.0f, 0.0f, (float) paintPixmap->opacity,
-                (float) bottomLeft.x(),  (float) bottomLeft.y(),  0.0f, 1.0f, (float) paintPixmap->opacity,
-                (float) bottomRight.x(), (float) bottomRight.y(), 1.0f, 1.0f, (float) paintPixmap->opacity,
+                (float) topLeft.x(),     (float) topLeft.y(),     (float) src.left(),  (float) src.top(),    (float) paintPixmap->opacity,
+                (float) topRight.x(),    (float) topRight.y(),    (float) src.right(), (float) src.top(),    (float) paintPixmap->opacity,
+                (float) bottomLeft.x(),  (float) bottomLeft.y(),  (float) src.left(),  (float) src.bottom(), (float) paintPixmap->opacity,
+                (float) bottomRight.x(), (float) bottomRight.y(), (float) src.right(), (float) src.bottom(), (float) paintPixmap->opacity,
             };
 
             batches.push_back({
