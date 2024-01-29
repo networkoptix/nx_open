@@ -87,10 +87,11 @@ DetailedResourceTreeWidget::DetailedResourceTreeWidget(
     connect(accessController(), &AccessController::userChanged, this,
         [this]()
         {
+            m_treeEntityBuilder->setUser(accessController()->user());
+
             if (!m_entityFactoryFunction)
                 return;
 
-            m_treeEntityBuilder->setUser(accessController()->user());
             auto newTreeEntity = m_entityFactoryFunction(m_treeEntityBuilder.get());
             m_entityModel->setRootEntity(newTreeEntity.get());
             m_treeEntity = std::move(newTreeEntity);
