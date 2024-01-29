@@ -29,6 +29,8 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(BookmarkV3, (json), BookmarkV3_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(BookmarkWithRuleV3, (json), BookmarkWithRuleV3_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(BookmarkTagFilter, (json), BookmarkTagFilter_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(BookmarkSharingSettings, (json), BookmarkSharingSettings_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(BookmarkDescriptionRequest,
+    (json), BookmarkDescriptionRequest_Fields)
 
 QnUuid BookmarkIdV3::bookmarkIdFromCombined(const QString& id)
 {

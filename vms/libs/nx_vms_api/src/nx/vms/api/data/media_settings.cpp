@@ -6,9 +6,6 @@ namespace nx::vms::api {
 
 MediaSettings::ValidationResult MediaSettings::validateMediaSettings() const
 {
-    if (id.isNull())
-        return ValidationResult::nullId;
-
     if (stream != nx::vms::api::StreamIndex::undefined
         && stream != nx::vms::api::StreamIndex::primary
         && stream != nx::vms::api::StreamIndex::secondary)

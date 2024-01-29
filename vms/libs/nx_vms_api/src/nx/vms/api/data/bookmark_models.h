@@ -258,6 +258,20 @@ struct NX_VMS_API BookmarkTagFilter
 #define BookmarkTagFilter_Fields (limit)
 QN_FUSION_DECLARE_FUNCTIONS(BookmarkTagFilter, (json), NX_VMS_API)
 
+struct NX_VMS_API BookmarkDescriptionRequest: BookmarkIdV3
+{
+    using BookmarkIdV3::BookmarkIdV3;
+    /**%apidoc[opt]
+     * Password protection used to authenticate the request if the Bookmark is password protected.
+     * Should be set to:
+     *   synchronizedTimeMs + ":" + SHA256(SHA256(bookmarkId + password) + synchronizedTimeMs)
+     *   Where synchronizedTimeMs should be obtained from /rest/v4/site/info
+     */
+    std::optional<QString> passwordProtection;
+};
+#define BookmarkDescriptionRequest_Fields BookmarkIdV3_Fields (passwordProtection)
+QN_FUSION_DECLARE_FUNCTIONS(BookmarkDescriptionRequest, (json), NX_VMS_API)
+
 using BookmarkTagCounts = Map<QString /*tag*/, int /*count*/>;
 
 } // namespace nx::vms::api

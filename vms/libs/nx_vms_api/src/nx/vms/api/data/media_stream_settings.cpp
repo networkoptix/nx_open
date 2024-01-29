@@ -6,9 +6,9 @@
 
 namespace nx::vms::api {
 
-const QString MediaStreamSettings::kMpjpegBoundary = "mjpeg_frame";
+const QString StreamSettings::kMpjpegBoundary = "mjpeg_frame";
 
-MediaStreamSettings::ValidationResult MediaStreamSettings::validateStreamSettings() const
+StreamSettings::ValidationResult StreamSettings::validateStreamSettings() const
 {
     auto mimeType = getMimeType(nx::toString(format));
 
@@ -18,7 +18,7 @@ MediaStreamSettings::ValidationResult MediaStreamSettings::validateStreamSetting
     return ValidationResult::isValid;
 }
 
-QByteArray MediaStreamSettings::getMimeType(const QString& format)
+QByteArray StreamSettings::getMimeType(const QString& format)
 {
     if (format == "mkv")
         return "video/x-matroska";
@@ -40,6 +40,7 @@ QByteArray MediaStreamSettings::getMimeType(const QString& format)
         return {};
 }
 
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(StreamSettings, (json), StreamSettings_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(MediaStreamSettings, (json), MediaStreamSettings_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(BookmarkStreamSettings, (json), BookmarkStreamSettings_Fields)
 
