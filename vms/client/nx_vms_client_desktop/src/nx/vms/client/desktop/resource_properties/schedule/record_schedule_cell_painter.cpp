@@ -48,8 +48,12 @@ struct RecordScheduleCellPainter::Private
     const QColor recordMotionAndObjectsColor = core::colorTheme()->color("orange_l2");
     const QColor recordMotionAndObjectsHoveredColor = recordMotionAndObjectsColor.lighter(110);
     const QColor cellBorderColor = core::colorTheme()->color("dark4");
-    const QColor lightCellTextColor = core::colorTheme()->color("light4");
-    const QColor darkCellTextColor = core::colorTheme()->color("dark7");
+
+    // The following two colors are used to choose the color of a cell text depending on its type.
+    // After the latest change, we always use the same color for text, but the code has been kept
+    // intact in case we need to roll back that change or update the colors again.
+    const QColor lightCellTextColor = core::colorTheme()->color("@dark4");
+    const QColor darkCellTextColor = core::colorTheme()->color("@dark4");
 
     QColor cellColor(RecordingType recordingType, MetadataTypes metadataTypes, bool hovered) const
     {
