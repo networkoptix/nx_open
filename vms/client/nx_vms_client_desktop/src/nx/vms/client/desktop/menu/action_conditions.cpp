@@ -1973,12 +1973,14 @@ ConditionWrapper isTrue(bool value)
         });
 }
 
-ConditionWrapper isLoggedIn()
+ConditionWrapper isLoggedIn(ActionVisibility defaultVisibility)
 {
-    return new CustomBoolCondition(
-        [](const Parameters& /*parameters*/, WindowContext* context)
+    return new CustomCondition(
+        [defaultVisibility](const Parameters& /*parameters*/, WindowContext* context)
         {
-            return !context->workbenchContext()->user().isNull();
+            return context->workbenchContext()->user().isNull()
+                ? defaultVisibility
+                : EnabledAction;
         });
 }
 

@@ -160,6 +160,7 @@
 #include <ui/graphics/items/resource/resource_widget_renderer.h>
 #include <ui/models/resource/resource_list_model.h>
 #include <ui/widgets/main_window.h>
+#include <ui/widgets/main_window_title_bar_state.h>
 #include <ui/widgets/main_window_title_bar_widget.h>
 #include <ui/widgets/views/resource_list_view.h>
 #include <ui/workbench/extensions/workbench_stream_synchronizer.h>
@@ -1249,10 +1250,9 @@ void ActionHandler::at_openNewWindowAction_triggered()
 {
     if (ini().enableMultiSystemTabBar)
     {
-        if (mainWindow()->titleBar()->isExpanded())
-            mainWindow()->setWelcomeScreenVisible(true);
-        else
-            at_openWelcomeScreenAction_triggered();
+        appContext()->clientStateHandler()->createNewWindow(
+            /*logonData*/ std::nullopt,
+            /*args*/ {QnStartupParameters::kSkipAutoLoginKey});
         return;
     }
 
@@ -1264,9 +1264,16 @@ void ActionHandler::at_openNewWindowAction_triggered()
 
 void ActionHandler::at_openWelcomeScreenAction_triggered()
 {
-    appContext()->clientStateHandler()->createNewWindow(
-        /*logonData*/ std::nullopt,
-        /*args*/ {QnStartupParameters::kSkipAutoLoginKey});
+    if (ini().enableMultiSystemTabBar)
+    {
+        mainWindow()->titleBarStateStore()->activateHomeTab();
+    }
+    else
+    {
+        appContext()->clientStateHandler()->createNewWindow(
+            /*logonData*/ std::nullopt,
+            /*args*/ {QnStartupParameters::kSkipAutoLoginKey});
+    }
 }
 
 void ActionHandler::at_reviewShowreelInNewWindowAction_triggered()
