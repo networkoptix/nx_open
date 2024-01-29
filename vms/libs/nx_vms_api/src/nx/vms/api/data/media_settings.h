@@ -27,15 +27,9 @@ struct NX_VMS_API MediaSettings
         isValid
     );
 
-    /**%apidoc
-     * Device id (can be obtained from "id", "physicalId" or "logicalId" field via
-     * /rest/v{1-}/devices) or MAC address (not supported for certain Devices).
-     */
-    QnUuid id;
-
     /**%apidoc[opt]
-     * %value undefined The Server auto-detects the preferred stream index based on the destination
-     * resolution.
+     *     %value undefined The Server auto-detects the preferred stream index based on the
+     *     destination resolution.
      */
     StreamIndex stream = nx::vms::api::StreamIndex::undefined;
 
@@ -64,11 +58,11 @@ struct NX_VMS_API MediaSettings
      * A transcoding option. Item rotation, in degrees. If the parameter is `auto`, the video will
      * be rotated to the default value defined in the Device Settings dialog.
      *
-     * %value auto
-     * %value 0
-     * %value 90
-     * %value 180
-     * %value 270
+     *     %value "auto"
+     *     %value "0"
+     *     %value "90"
+     *     %value "180"
+     *     %value "270"
      */
     std::string rotation = "0";
 
@@ -115,7 +109,7 @@ struct NX_VMS_API MediaSettings
 
     bool isLiveRequest() const;
 };
-#define MediaSettings_Fields (id)(stream)(positionUs)(resolution)(resolutionWhenTranscoding)\
+#define MediaSettings_Fields (stream)(positionUs)(resolution)(resolutionWhenTranscoding)\
     (rotation)(dewarping)(dewarpingXangle)(dewarpingYangle)(dewarpingFov)(dewarpingPanofactor)(zoom)
 QN_FUSION_DECLARE_FUNCTIONS(MediaSettings, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(MediaSettings, MediaSettings_Fields)

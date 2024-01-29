@@ -11,7 +11,7 @@
 
 namespace nx::vms::api {
 
-struct NX_VMS_API MediaStreamSettings: public MediaSettings
+struct NX_VMS_API StreamSettings: MediaSettings
 {
     static const QString kMpjpegBoundary;
     static constexpr int kDefaultMaxCachedFrames = 1;
@@ -98,18 +98,37 @@ struct NX_VMS_API MediaStreamSettings: public MediaSettings
 
     static QByteArray getMimeType(const QString& format);
 };
-#define MediaStreamSettings_Fields MediaSettings_Fields(format)(quality)(endPositionUs)\
+#define StreamSettings_Fields MediaSettings_Fields(format)(quality)(endPositionUs)\
     (dropLateFrames)(standFrameDuration)(realTimeOptimization)(audioOnly)(accurateSeek)\
     (durationS)(signature)(utcTimestamps)(continuousTimestamps)(download)
+QN_FUSION_DECLARE_FUNCTIONS(StreamSettings, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(StreamSettings, StreamSettings_Fields)
+
+
+struct NX_VMS_API MediaStreamSettings: public StreamSettings
+{
+    /**%apidoc
+     * Device id (can be obtained from "id", "physicalId" or "logicalId" field via
+     * /rest/v{1-}/devices) or MAC address (not supported for certain Devices).
+     */
+    QnUuid id;
+};
+#define MediaStreamSettings_Fields StreamSettings_Fields(id)
 QN_FUSION_DECLARE_FUNCTIONS(MediaStreamSettings, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(MediaStreamSettings, MediaStreamSettings_Fields)
 
-struct NX_VMS_API BookmarkStreamSettings: public MediaStreamSettings
+struct NX_VMS_API BookmarkStreamSettings: public StreamSettings
 {
     QString bookmarkId;
-    std::optional<std::string> password;
+    /**%apidoc[opt]
+     * Password protection used to authenticate the request if the Bookmark is password protected.
+     * Should be set to:
+     *   synchronizedTimeMs + ":" + SHA256(SHA256(bookmarkId + password) + synchronizedTimeMs)
+     *   Where synchronizedTimeMs should be obtained from /rest/v4/site/info
+     */
+    std::optional<std::string> passwordProtection;
 };
-#define BookmarkStreamSettings_Fields MediaStreamSettings_Fields(bookmarkId)(password)
+#define BookmarkStreamSettings_Fields StreamSettings_Fields(bookmarkId)(passwordProtection)
 QN_FUSION_DECLARE_FUNCTIONS(BookmarkStreamSettings, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(BookmarkStreamSettings, BookmarkStreamSettings_Fields)
 
