@@ -69,6 +69,25 @@ AnalyticsSearchSetup::AnalyticsSearchSetup(
             d->areaEnabled = areaEnabled;
             emit areaEnabledChanged();
         });
+
+    connect(this, &AnalyticsSearchSetup::objectTypesChanged,
+        this, &AnalyticsSearchSetup::parametersChanged);
+    connect(this, &AnalyticsSearchSetup::relevantObjectTypesChanged,
+        this, &AnalyticsSearchSetup::parametersChanged);
+    connect(this, &AnalyticsSearchSetup::combinedTextFilterChanged,
+        this, &AnalyticsSearchSetup::parametersChanged);
+    connect(this, &AnalyticsSearchSetup::areaChanged,
+        this, &AnalyticsSearchSetup::parametersChanged);
+    connect(this, &AnalyticsSearchSetup::areaEnabledChanged,
+        this, &AnalyticsSearchSetup::parametersChanged);
+    connect(this, &AnalyticsSearchSetup::areaSelectionActiveChanged,
+        this, &AnalyticsSearchSetup::parametersChanged);
+    connect(this, &AnalyticsSearchSetup::availableNewTracksChanged,
+        this, &AnalyticsSearchSetup::parametersChanged);
+    connect(this, &AnalyticsSearchSetup::attributeFiltersChanged,
+        this, &AnalyticsSearchSetup::parametersChanged);
+    connect(this, &AnalyticsSearchSetup::engineChanged,
+        this, &AnalyticsSearchSetup::parametersChanged);
 }
 
 AnalyticsSearchSetup::~AnalyticsSearchSetup()
