@@ -167,8 +167,12 @@ std::vector<nx::analytics::taxonomy::AbstractEngine*> AnalyticsFilterModel::engi
 
 void AnalyticsFilterModel::setObjectTypes(const std::vector<taxonomy::ObjectType*>& objectTypes)
 {
+    const auto typesMap = objectTypesMap(objectTypes);
+    if (typesMap == m_objectTypesById)
+        return;
+
     m_objectTypes = objectTypes;
-    m_objectTypesById = objectTypesMap(m_objectTypes);
+    m_objectTypesById = typesMap;
     emit objectTypesChanged();
 }
 
@@ -195,17 +199,23 @@ void AnalyticsFilterModel::update(
         || m_devices != devices
         || m_liveTypesExcluded != liveTypesExcluded)
     {
-        m_engine = engine;
         if (m_engine != engine)
+        {
+            m_engine = engine;
             emit selectedEngineChanged();
+        }
 
-        m_devices = devices;
         if (devices != m_devices)
+        {
+            m_devices = devices;
             emit selectedDevicesChanged();
+        }
 
-        m_attributeValues = attributeValues;
         if (m_attributeValues != attributeValues)
+        {
+            m_attributeValues = attributeValues;
             emit selectedAttributeValuesChanged();
+        }
 
         m_liveTypesExcluded = liveTypesExcluded;
 
