@@ -205,8 +205,7 @@ private:
             rtspClient->setCamera(camera);
             rtspClient->setPlayNowModeAllowed(false);
             rtspClient->setMediaRole(PlaybackMode::export_);
-            if (isRapidReview)
-                rtspClient->setRange(startTimeUs, endTimeUs, timelapseFrameStepUs);
+            rtspClient->setRange(startTimeUs, endTimeUs, timelapseFrameStepUs);
         }
 
         dataProvider.reset(archiveReader);

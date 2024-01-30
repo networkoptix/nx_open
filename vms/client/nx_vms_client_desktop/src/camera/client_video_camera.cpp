@@ -173,6 +173,7 @@ void QnClientVideoCamera::exportMediaPeriodToFile(
             rtspClient->setCamera(camera);
             rtspClient->setPlayNowModeAllowed(false);
             rtspClient->setMediaRole(PlaybackMode::export_);
+            rtspClient->setRange(startTimeUs, endTimeUs, 0);
         }
 
         m_exportReader = archiveReader;
