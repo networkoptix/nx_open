@@ -513,7 +513,8 @@ void Workbench::addSystem(const QString& systemId, const LogonData& logonData)
 
     NX_ASSERT(systemDescription, "Can't find description for system: %1", systemId);
 
-    mainWindow()->titleBarStateStore()->addSystem(systemDescription, logonData);
+    if (ini().enableMultiSystemTabBar)
+        mainWindow()->titleBarStateStore()->addSystem(systemDescription, logonData);
     emit currentSystemChanged(systemDescription);
 }
 

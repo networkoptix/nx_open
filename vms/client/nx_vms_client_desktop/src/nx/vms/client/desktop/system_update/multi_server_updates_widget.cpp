@@ -923,7 +923,8 @@ void MultiServerUpdatesWidget::atUpdateCurrentState()
             m_clientUpdateTool->getInstalledClientVersions());
         if (!hasActiveUpdate())
         {
-            mainWindow()->titleBarStateStore()->setSystemUpdating(false);
+            if (ini().enableMultiSystemTabBar)
+                mainWindow()->titleBarStateStore()->setSystemUpdating(false);
             if (m_updateInfo.preferOtherUpdate(checkResponse))
             {
                 setUpdateTarget(checkResponse, /*activeUpdate=*/false);
@@ -939,7 +940,8 @@ void MultiServerUpdatesWidget::atUpdateCurrentState()
             NX_VERBOSE(this, "atUpdateCurrentState() got update version='%1', but we are already "
                 "updating to version='%2' in state=%3. Ignoring it.", checkResponse.info.version,
                 m_updateInfo.info.version, toString(m_widgetState));
-            mainWindow()->titleBarStateStore()->setSystemUpdating(true);
+            if (ini().enableMultiSystemTabBar)
+                mainWindow()->titleBarStateStore()->setSystemUpdating(true);
         }
     }
 
