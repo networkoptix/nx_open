@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 
 #include <analytics/common/object_metadata.h>
+#include <analytics/db/text_search_utils.h>
 
 namespace nx::analytics::db::test {
 
@@ -64,6 +65,32 @@ TEST(AttributeEx, isNumericAttribute)
     ASSERT_FALSE(AttributeEx::isNumberOrRange("speed", "[inf...1]"));
     ASSERT_FALSE(AttributeEx::isNumberOrRange("speed", "inf"));
     ASSERT_FALSE(AttributeEx::isNumberOrRange("speed", "-inf"));
+}
+
+TEST(TextMatcher, matchesAtrributes)
+{
+    const nx::common::metadata::Attributes nonEmptyAttributes{
+        nx::common::metadata::Attribute("some_name", "some_value")
+    };
+    const nx::common::metadata::Attributes emptyAttributes;
+
+    const QString emptyDescription;
+    const QString nonEmptyDescription = "\"textExpr\"";
+
+    {
+        nx::analytics::db::TextMatcher textMatcher(emptyDescription);
+        ASSERT_TRUE(textMatcher.matchAttributes(emptyAttributes));
+    }
+
+    {
+        nx::analytics::db::TextMatcher textMatcher(nonEmptyDescription);
+        ASSERT_FALSE(textMatcher.matchAttributes(emptyAttributes));
+    }
+
+    {
+        nx::analytics::db::TextMatcher textMatcher(emptyDescription);
+        ASSERT_TRUE(textMatcher.matchAttributes(nonEmptyAttributes));
+    }
 }
 
 } // namespace
