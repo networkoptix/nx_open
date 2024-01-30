@@ -48,7 +48,8 @@ public:
         QnWorkbenchLayout* layout,
         std::function<void(int, ec2::ErrorCode)> callback);
 
-    void checkResourcesPermissions(QnResourceList& resources);
+    void filterAllowedMediaResources(QnResourceList& resources) const;
+    void filterAllowedLayoutItems(const nx::vms::client::desktop::LayoutResourcePtr& layout) const;
 
 private:
     enum class ItemAction

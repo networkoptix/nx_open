@@ -1393,14 +1393,18 @@ LayoutResourcePtr QnWorkbenchVideoWallHandler::constructLayout(
         ? resources.first().dynamicCast<LayoutResource>()
         : LayoutResourcePtr();
 
-    LayoutResourcePtr layout = sourceLayout ?
-        sourceLayout->clone() :
-        LayoutResourcePtr(new LayoutResource());
+    LayoutResourcePtr layout = sourceLayout
+        ? sourceLayout->clone()
+        : LayoutResourcePtr(new LayoutResource());
 
     layout->setIdUnsafe(m_uuidPool->getFreeId());
     layout->addFlags(Qn::local);
 
-    if (!sourceLayout)
+    if (sourceLayout)
+    {
+        filterAllowedLayoutItems(layout);
+    }
+    else
     {
         qreal desiredAspectRatio = defaultAr;
         for (qreal ar : aspectRatios.keys())
@@ -2005,7 +2009,13 @@ void QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered()
         targetResources = parameters.resources();
     }
 
-    checkResourcesPermissions(targetResources);
+    // Allow to drop a layout only if it's the only resource being dropped.
+    // Otherwise layouts will be filtered out from the list.
+    const bool layoutIsBeingDropped = targetResources.size() == 1
+        && targetResources.front().objectCast<QnLayoutResource>();
+
+    if (!layoutIsBeingDropped)
+        filterAllowedMediaResources(targetResources);
 
     if (targetResources.isEmpty())
         return;
@@ -2027,10 +2037,10 @@ void QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered()
         const auto& values = currentLayout->getItems().values();
         hasDesktopCamera |= std::any_of(values.begin(), values.end(),
             [this](const LayoutItemData &item)
-        {
-            QnResourcePtr childResource = resourcePool()->getResourceById(item.resource.id);
-            return childResource && childResource->hasFlags(Qn::desktop_camera);
-        });
+            {
+                QnResourcePtr childResource = resourcePool()->getResourceById(item.resource.id);
+                return childResource && childResource->hasFlags(Qn::desktop_camera);
+            });
     }
 
     /* If Control pressed, add items to current layout. */
@@ -3104,21 +3114,40 @@ bool QnWorkbenchVideoWallHandler::saveReviewLayout(
     return !videowalls.isEmpty();
 }
 
-void QnWorkbenchVideoWallHandler::checkResourcesPermissions(QnResourceList& resources)
+void QnWorkbenchVideoWallHandler::filterAllowedMediaResources(QnResourceList& resources) const
 {
-    QnVirtualCameraResourceList noAccessResources;
-    nx::utils::erase_if(resources,
-        [&noAccessResources](const QnResourcePtr& resource)
+    const auto isAllowed =
+        [](const QnResourcePtr& resource)
         {
             if (resource->hasFlags(Qn::cross_system))
-                return true;
-
-            const auto accessController =
-                SystemContext::fromResource(resource)->accessController();
-            if (accessController->hasPermissions(resource, Qn::ViewLivePermission))
                 return false;
-            if (auto virtualCamera = resource.dynamicCast<QnVirtualCameraResource>())
+
+            if (!(QnResourceAccessFilter::isShareableMedia(resource)
+                || resource->hasFlags(Qn::desktop_camera)
+                || resource->hasFlags(Qn::local_media)))
+            {
+                return false;
+            }
+
+            if (resource.objectCast<QnVirtualCameraResource>())
+            {
+                return SystemContext::fromResource(resource)->accessController()->hasPermissions(
+                    resource, Qn::ViewLivePermission);
+            }
+
+            return true;
+        };
+
+    QnVirtualCameraResourceList noAccessResources;
+    nx::utils::erase_if(resources,
+        [&](const QnResourcePtr& resource)
+        {
+            if (isAllowed(resource))
+                return false;
+
+            if (auto virtualCamera = resource.objectCast<QnVirtualCameraResource>())
                 noAccessResources << virtualCamera;
+
             return true;
         });
 
@@ -3152,6 +3181,23 @@ void QnWorkbenchVideoWallHandler::checkResourcesPermissions(QnResourceList& reso
             messageBox.exec();
         };
         executeDelayed(showMessage);
+    }
+}
+
+void QnWorkbenchVideoWallHandler::filterAllowedLayoutItems(const LayoutResourcePtr& layout) const
+{
+    const auto itemResources = layoutResources(layout);
+    QnResourceList allowedResources{itemResources.cbegin(), itemResources.cend()};
+    filterAllowedMediaResources(allowedResources);
+    QSet<QnUuid> allowedResourceIds;
+    for (const auto& allowedResource: allowedResources)
+        allowedResourceIds.insert(allowedResource->getId());
+
+    const auto itemsCopy = layout->getItems();
+    for (const auto& item: itemsCopy)
+    {
+        if (!allowedResourceIds.contains(item.resource.id))
+            layout->removeItem(item.uuid);
     }
 }
 
