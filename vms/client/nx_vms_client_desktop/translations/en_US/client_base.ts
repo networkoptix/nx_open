@@ -7271,6 +7271,14 @@ We recommend you not to open this integration. If you understand the risks, you 
         <source>Resolution</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Setting was changed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&quot;All archive&quot; option was changed to &quot;Motion, Objects, Bookmarks&quot; due to cloud storage backup was enabled</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::BackupSettingsPickerWidget</name>
