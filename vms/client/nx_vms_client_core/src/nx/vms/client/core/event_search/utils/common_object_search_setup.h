@@ -115,6 +115,8 @@ signals:
     void singleCameraChanged();
     void mixedDevicesChanged();
 
+    void parametersChanged();
+
 private:
     class Private;
     nx::utils::ImplPtr<Private> d;

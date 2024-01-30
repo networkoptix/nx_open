@@ -79,6 +79,7 @@ signals:
     void engineChanged();
     void ensureVisibleRequested(std::chrono::milliseconds timestamp, const QnUuid& trackId,
         const QnTimePeriod& proposedTimeWindow);
+    void parametersChanged();
 
 private:
     struct Private;

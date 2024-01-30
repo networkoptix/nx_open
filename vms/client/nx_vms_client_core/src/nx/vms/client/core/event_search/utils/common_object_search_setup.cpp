@@ -94,6 +94,21 @@ CommonObjectSearchSetup::CommonObjectSearchSetup(QObject* parent):
         this, &CommonObjectSearchSetup::selectedCamerasTextChanged);
     connect(this, &CommonObjectSearchSetup::selectedCamerasChanged,
         this, &CommonObjectSearchSetup::selectedCamerasTextChanged);
+
+    connect(this, &CommonObjectSearchSetup::modelChanged,
+        this, &CommonObjectSearchSetup::parametersChanged);
+    connect(this, &CommonObjectSearchSetup::timeSelectionChanged,
+        this, &CommonObjectSearchSetup::parametersChanged);
+    connect(this, &CommonObjectSearchSetup::cameraSelectionChanged,
+        this, &CommonObjectSearchSetup::parametersChanged);
+    connect(this, &CommonObjectSearchSetup::selectedCamerasTextChanged,
+        this, &CommonObjectSearchSetup::parametersChanged);
+    connect(this, &CommonObjectSearchSetup::selectedCamerasChanged,
+        this, &CommonObjectSearchSetup::parametersChanged);
+    connect(this, &CommonObjectSearchSetup::singleCameraChanged,
+        this, &CommonObjectSearchSetup::parametersChanged);
+    connect(this, &CommonObjectSearchSetup::mixedDevicesChanged,
+        this, &CommonObjectSearchSetup::parametersChanged);
 }
 
 CommonObjectSearchSetup::~CommonObjectSearchSetup()
