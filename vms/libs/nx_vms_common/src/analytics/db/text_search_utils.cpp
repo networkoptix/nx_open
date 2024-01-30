@@ -126,6 +126,14 @@ bool TextMatcher::empty() const
 
 bool TextMatcher::matchAttributes(const nx::common::metadata::Attributes& attributes) const
 {
+    // Empty condition list matches both empty and non-empty attribute lists.
+    if (m_conditions.empty())
+        return true;
+
+    // Non-empty condition list doesn't match empty attribute list.
+    if (attributes.empty())
+        return false;
+
     const uint64_t mask = matchExactAttributes(attributes)
         | checkAttributesPresence(attributes)
         | matchAttributeValues(attributes);
