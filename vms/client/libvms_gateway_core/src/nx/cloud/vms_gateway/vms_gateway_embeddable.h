@@ -2,8 +2,11 @@
 
 #pragma once
 
+#include <map>
+#include <set>
+
 #include <nx/network/http/http_types.h>
-#include <nx/network/socket_common.h>
+#include <nx/network/socket_factory.h>
 #include <nx/utils/test_support/module_instance_launcher.h>
 
 #include "vms_gateway_process_public.h"
@@ -28,6 +31,11 @@ public:
     void enforceSslFor(const network::SocketAddress& targetAddress, bool enabled = true);
     void enforceHeadersFor(
         const network::SocketAddress& targetAddress, network::http::HttpHeaders headers);
+
+    std::map<uint16_t, uint16_t> forward(
+        const nx::network::SocketAddress& target,
+        const std::set<uint16_t>& targetPorts,
+        const nx::network::ssl::AdapterFunc& certificateCheck);
 
 protected:
     virtual void beforeModuleStart() override;
