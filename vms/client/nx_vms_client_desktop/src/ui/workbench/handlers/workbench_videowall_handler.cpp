@@ -3541,7 +3541,8 @@ void QnWorkbenchVideoWallHandler::saveVideowallAndReviewLayout(
                 if (errorCode == ec2::ErrorCode::ok)
                     snapshotManager()->markChanged(id, false);
 
-                callback(errorCode == ec2::ErrorCode::ok, videowall);
+                if (callback)
+                    callback(errorCode == ec2::ErrorCode::ok, videowall);
             };
 
         if (saveReviewLayout(reviewLayout, saveLayoutCallback))
