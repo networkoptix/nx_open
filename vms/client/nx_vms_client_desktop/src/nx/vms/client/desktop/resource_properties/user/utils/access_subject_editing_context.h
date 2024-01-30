@@ -108,7 +108,7 @@ public:
     };
     Q_ENUM(SubjectType);
 
-    SubjectType currentSubjectType() const;
+    Q_INVOKABLE SubjectType currentSubjectType() const;
     void setCurrentSubject(const QnUuid& subjectId, SubjectType type);
 
     nx::core::access::ResourceAccessMap ownResourceAccessMap() const;
