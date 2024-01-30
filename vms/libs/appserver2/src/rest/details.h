@@ -338,7 +338,7 @@ void validateType(const auto& processor, const T& data, ApiObjectType requiredTy
             if (objectType == ApiObject_NotDefined || objectType == requiredType)
                 return;
 
-            throw nx::network::rest::Exception::notFound();
+            throw nx::network::rest::Exception::notFound(NX_FMT("Object type %1 is not found", id));
         }
     }
 }
