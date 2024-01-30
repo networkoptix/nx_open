@@ -63,6 +63,14 @@ void VmsGatewayEmbeddable::enforceHeadersFor(
     moduleInstance()->impl()->enforceHeadersFor(targetAddress, std::move(headers));
 }
 
+std::map<uint16_t, uint16_t> VmsGatewayEmbeddable::forward(
+    const nx::network::SocketAddress& target,
+    const std::set<uint16_t>& targetPorts,
+    const nx::network::ssl::AdapterFunc& certificateCheck)
+{
+    return moduleInstance()->impl()->forward(target, targetPorts, certificateCheck);
+}
+
 void VmsGatewayEmbeddable::beforeModuleStart()
 {
     moduleInstance()->impl()->setEnableLoggingInitialization(false);

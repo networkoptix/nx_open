@@ -2,6 +2,8 @@
 
 #include "vms_gateway_process.h"
 
+#include <network/cloud/cloud_media_server_endpoint_verificator.h>
+#include <nx/branding.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/cloud/cloud_connect_settings.h>
 #include <nx/network/cloud/mediator_connector.h>
@@ -11,22 +13,18 @@
 #include <nx/network/ssl/context.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/network/url/url_parse_helper.h>
-
 #include <nx/utils/app_info.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/stree/stree_manager.h>
-#include <nx/utils/std/cpp14.h>
 #include <nx/utils/platform/current_process.h>
-
-#include <network/cloud/cloud_media_server_endpoint_verificator.h>
-
-#include <nx/branding.h>
+#include <nx/utils/std/cpp14.h>
+#include <nx/utils/stree/stree_manager.h>
 
 #include "access_control/authentication_manager.h"
 #include "http/connect_handler.h"
 #include "http/http_api_path.h"
 #include "http/proxy_handler.h"
 #include "http/url_rewriter.h"
+#include "port_forwarding.h"
 #include "stree/cdb_ns.h"
 
 static int registerQtResources()
@@ -162,6 +160,8 @@ int VmsGatewayProcess::serviceMain(
             return 5;
 
         m_httpEndpoints = httpServer->endpoints();
+        m_portForwarding = std::make_unique<PortForwarding>(m_runTimeOptions);
+
         NX_INFO(this, "%1 has been started on %2",
             kApplicationDisplayName,
             containerString(m_httpEndpoints));
@@ -273,6 +273,14 @@ void VmsGatewayProcess::registerApiHandlers(
     msgDispatcher->addModRewriteRule(
         nx::network::url::normalizePath(nx::format("/%1/").arg(kApiPathPrefix).toStdString()),
         "/");
+}
+
+std::map<uint16_t, uint16_t> VmsGatewayProcess::forward(
+    const nx::network::SocketAddress& target,
+    const std::set<uint16_t>& targetPorts,
+    const nx::network::ssl::AdapterFunc& certificateCheck)
+{
+    return m_portForwarding->forward(target, targetPorts, certificateCheck);
 }
 
 } // namespace cloud

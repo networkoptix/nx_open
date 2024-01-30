@@ -19,6 +19,9 @@ if(withDesktopClient)
 
     add_subdirectory(applauncher)
     add_subdirectory(desktop_client)
-    add_subdirectory(libvms_gateway_core)
     add_subdirectory(nx_vms_client_desktop)
+endif()
+
+if(withDesktopClient OR withTests)
+    add_subdirectory(libvms_gateway_core)
 endif()

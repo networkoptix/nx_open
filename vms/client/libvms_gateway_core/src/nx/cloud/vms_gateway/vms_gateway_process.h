@@ -25,6 +25,7 @@ namespace relaying { class RelayEngine; }
 namespace gateway {
 
 class AuthorizationManager;
+class PortForwarding;
 
 class NX_VMS_GATEWAY_API VmsGatewayProcess:
     public nx::utils::Service
@@ -40,6 +41,11 @@ public:
     void enforceSslFor(const network::SocketAddress& targetAddress, bool enabled = true);
     void enforceHeadersFor(const network::SocketAddress& targetAddress, network::http::HttpHeaders headers);
 
+    std::map<uint16_t, uint16_t> forward(
+        const nx::network::SocketAddress& target,
+        const std::set<uint16_t>& targetPorts,
+        const nx::network::ssl::AdapterFunc& certificateCheck);
+
 protected:
     virtual std::unique_ptr<nx::utils::AbstractServiceSettings> createSettings() override;
     virtual int serviceMain(const nx::utils::AbstractServiceSettings& settings) override;
@@ -51,6 +57,7 @@ private:
     conf::RunTimeOptions m_runTimeOptions;
     std::vector<network::SocketAddress> m_httpEndpoints;
     nx::network::cloud::tcp::EndpointVerificatorFactory::Function m_endpointVerificatorFactoryBak;
+    std::unique_ptr<PortForwarding> m_portForwarding;
 
     void initializeCloudConnect(const conf::Settings& settings);
 
