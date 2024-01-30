@@ -1637,7 +1637,7 @@ void ActionHandler::at_dropResourcesAction_triggered()
         if (currentLayout->resource()->layoutType() == LayoutResource::LayoutType::videoWall)
         {
             workbenchContext()->instance<QnWorkbenchVideoWallHandler>()->
-                checkResourcesPermissions(resources);
+                filterAllowedMediaResources(resources);
         }
 
         if (!currentLayout->resource())
