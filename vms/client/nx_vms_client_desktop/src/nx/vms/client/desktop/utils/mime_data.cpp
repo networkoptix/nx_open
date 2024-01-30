@@ -417,7 +417,7 @@ bool MimeData::allowedInWindowContext(const WindowContext* context) const
 {
     const auto userId = data(kUserIdMimeType);
     if (userId.isEmpty())
-        return false;
+        return true; //< Allow to drag'n'drop local files.
 
     const auto user = context->system()->user();
     if (!user || user->getId() != QnUuid::fromString(userId.data()))
