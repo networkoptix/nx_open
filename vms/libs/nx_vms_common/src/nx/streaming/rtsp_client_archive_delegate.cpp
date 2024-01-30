@@ -1033,7 +1033,8 @@ void QnRtspClientArchiveDelegate::setRange(qint64 startTime, qint64 endTime, qin
         nx::utils::timestampToDebugString(endTime),
         frameStep);
 
-    setAdditionalAttribute(kMediaStepParamName, QByteArray::number(frameStep));
+    if (frameStep != 0)
+        setAdditionalAttribute(kMediaStepParamName, QByteArray::number(frameStep));
     seek(startTime, endTime);
 }
 
