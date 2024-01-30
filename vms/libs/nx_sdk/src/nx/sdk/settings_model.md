@@ -441,7 +441,8 @@ NOTE: There is a similar non-editable item with a different look, called `Banner
 ---------------------------------------------------------------------------------------------------
 ## PolygonFigure
 
-Polygon figure field. Supports maximum points limitation.
+Polygon figure field. Supports maximum points limitation. The `"useLabelField"` field is optional
+(`true` by default) and is used to show or hide the figure label text field.
 
 [proprietary]
 
@@ -457,6 +458,7 @@ Polygon figure field. Supports maximum points limitation.
         "name": "polygon1",
         "caption": "Polygon",
         "description": "Some polygon",
+        "useLabelField": true,
         "minPoints": 4,
         "maxPoints": 8
     }
@@ -479,7 +481,8 @@ Polygon figure field. Supports maximum points limitation.
 ---------------------------------------------------------------------------------------------------
 ## BoxFigure
 
-Box figure field.
+Box figure field. The `"useLabelField"` field is optional (`true` by default) and is used to show
+or hide the figure label text field.
 
 [proprietary]
 
@@ -493,7 +496,8 @@ Box figure field.
         "type": "BoxFigure",
         "name": "box1",
         "caption": "Box",
-        "description": "Some box"
+        "description": "Some box",
+        "useLabelField": true
     }
 
 ### Setting Value
@@ -515,7 +519,8 @@ Box figure field.
 
 Line or polyline figure field. Supports minimum and maximum points limitation (default value: 2 for
 both min and max). Can have single crossing direction or not have any (equivalent to having both
-directions).
+directions). The `"useLabelField"` field is optional (`true` by default) and is used to show or
+hide the figure label text field.
 
 [proprietary]
 
@@ -530,6 +535,7 @@ directions).
         "name": "line1",
         "caption": "Line",
         "description": "Some line",
+        "useLabelField": true,
         "minPoints": 2,
         "maxPoints": 8,
         "allowedDirections": "one"
