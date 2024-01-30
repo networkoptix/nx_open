@@ -620,7 +620,8 @@ void ConnectActionsHandler::establishConnection(RemoteConnectionPtr connection)
                         if (system()->user())
                             appContext()->clientStateHandler()->clientDisconnected();
 
-                        mainWindow()->titleBarStateStore()->removeCurrentSystem();
+                        if (ini().enableMultiSystemTabBar)
+                            mainWindow()->titleBarStateStore()->removeCurrentSystem();
                         disconnectFromServer(DisconnectFlag::Force);
                         if (!qnRuntime->isDesktopMode())
                             menu()->trigger(menu::DelayedForcedExitAction);
@@ -1424,7 +1425,8 @@ void ConnectActionsHandler::connectToServer(LogonData logonData, ConnectionOptio
                     error->externalDescription = tr("Authentication details are incorrect");
 
                 handleConnectionError(*error);
-                mainWindow()->titleBarStateStore()->removeCurrentSystem();
+                if (ini().enableMultiSystemTabBar)
+                    mainWindow()->titleBarStateStore()->removeCurrentSystem();
                 disconnectFromServer(DisconnectFlag::Force);
             }
             else
