@@ -60,6 +60,7 @@
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/session_manager/session_manager.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
+#include <nx/vms/client/desktop/settings/show_once_settings.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
 #include <nx/vms/client/desktop/statistics/context_statistics_module.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -338,6 +339,13 @@ ConnectActionsHandler::ConnectActionsHandler(WindowContext* windowContext, QObje
     connect(action(menu::DisconnectMainMenuAction), &QAction::triggered, this,
         [this]()
         {
+            if (qnRuntime->isDesktopMode()
+                && ini().enableMultiSystemTabBar
+                && !askDisconnectConfirmation())
+            {
+                return;
+            }
+
             if (auto session = system()->session())
                 session->autoTerminateIfNeeded();
 
@@ -403,6 +411,31 @@ ConnectActionsHandler::ConnectActionsHandler(WindowContext* windowContext, QObje
 
 ConnectActionsHandler::~ConnectActionsHandler()
 {
+}
+
+bool ConnectActionsHandler::askDisconnectConfirmation() const
+{
+    if (showOnceSettings()->disconnectFromSystem())
+        return true;
+
+    QnMessageBox messageBox(
+        QnMessageBox::Icon::Question,
+        tr("Are you sure you want to disconnect?"),
+        "",
+        QDialogButtonBox::Cancel,
+        QDialogButtonBox::NoButton,
+        mainWindowWidget());
+    messageBox.addButton(tr("Disconnect"),
+        QDialogButtonBox::AcceptRole,
+        Qn::ButtonAccent::Standard);
+    messageBox.setCheckBoxEnabled();
+    messageBox.setWindowTitle(tr("Disconnect"));
+    if (messageBox.exec() == QDialogButtonBox::Cancel)
+        return false;
+
+    if (messageBox.isChecked())
+        showOnceSettings()->disconnectFromSystem = true;
+    return true;
 }
 
 ConnectActionsHandler::LogicalState ConnectActionsHandler::logicalState() const

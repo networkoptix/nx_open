@@ -58,6 +58,8 @@ public:
     ConnectActionsHandler(WindowContext* windowContext, QObject* parent = nullptr);
     ~ConnectActionsHandler();
 
+    bool askDisconnectConfirmation() const;
+
 signals:
     void stateChanged(LogicalState logicalValue, QPrivateSignal);
 

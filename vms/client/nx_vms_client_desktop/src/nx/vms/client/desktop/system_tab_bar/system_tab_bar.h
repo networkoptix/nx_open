@@ -38,6 +38,7 @@ protected:
     virtual void mouseMoveEvent(QMouseEvent* event) override;
     virtual void dragEnterEvent(QDragEnterEvent* event) override;
     virtual void dropEvent(QDropEvent* event) override;
+    virtual void contextMenuEvent(QContextMenuEvent* event) override;
 
 private:
     void insertClosableTab(int index,

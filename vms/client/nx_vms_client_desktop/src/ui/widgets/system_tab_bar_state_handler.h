@@ -19,6 +19,9 @@ public:
     SystemTabBarStateHandler(QObject* parent);
     void setStateStore(QSharedPointer<Store> store);
     void moveSystem(int indexFrom, int indexTo);
+    void removeSystem(QnUuid systemId);
+    void removeCurrentSystem();
+    void swapSystems(int indexFrom, int indexTo);
 
 signals:
     void tabsChanged();

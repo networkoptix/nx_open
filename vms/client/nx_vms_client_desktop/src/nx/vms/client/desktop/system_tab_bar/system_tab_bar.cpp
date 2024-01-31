@@ -8,6 +8,7 @@
 #include <QtGui/QDrag>
 #include <QtGui/QPainter>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QMenu>
 #include <QtWidgets/QToolButton>
 
 #include <nx/vms/client/core/skin/color_theme.h>
@@ -24,6 +25,7 @@
 #include <ui/common/indents.h>
 #include <ui/widgets/main_window_title_bar_state.h>
 #include <ui/widgets/system_tab_bar_state_handler.h>
+#include <ui/workaround/hidpi_workarounds.h>
 #include <utils/common/delayed.h>
 
 #include "private/close_tab_button.h"
@@ -229,6 +231,28 @@ void SystemTabBar::dropEvent(QDropEvent* event)
 
     event->acceptProposedAction();
     m_store->moveSystem(indexFrom, indexTo);
+}
+
+void SystemTabBar::contextMenuEvent(QContextMenuEvent* event)
+{
+    const int index = tabAt(event->pos());
+    if (index == homeTabIndex())
+        return;
+
+    QMenu menu(this);
+    menu.addAction(tr("Disconnect"),
+        [this, index]()
+        {
+            if (windowContext()->connectActionsHandler()->askDisconnectConfirmation())
+                m_store->removeSystem(index);
+        });
+
+    menu.addAction(tr("Open in New Window"), [this, index]()
+        {
+            if (const auto systemData = m_store->systemData(index))
+                appContext()->clientStateHandler()->createNewWindow(systemData->logonData);
+        });
+    QnHiDpiWorkarounds::showMenu(&menu, QCursor::pos());
 }
 
 void SystemTabBar::insertClosableTab(int index,
