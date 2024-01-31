@@ -35,7 +35,7 @@ std::optional<QJsonObject> AnalyticsActionSettingsDialog::request(
     QWidget* parent)
 {
     AnalyticsActionSettingsDialog dialog(settingsModel, parent);
-    if (!dialog.exec())
+    if (!dialog.exec(Qt::ApplicationModal))
         return {};
 
     return dialog.getValues();
