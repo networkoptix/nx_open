@@ -7159,6 +7159,14 @@ We recommend you not to open this integration. If you understand the risks, you 
       <source>Resolution</source>
       <translation>解像度</translation>
     </message>
+    <message>
+      <source>Setting was changed</source>
+      <translation>設定が変更されました</translation>
+    </message>
+    <message>
+      <source>&quot;All archive&quot; option was changed to &quot;Motion, Objects, Bookmarks&quot; due to cloud storage backup was enabled</source>
+      <translation>クラウドストレージが有効化されたため、「すべてのアーカイブ」オプションは「モーション、オブジェクト、ブックマーク」に変更されました。</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BackupSettingsPickerWidget</name>

@@ -7280,6 +7280,14 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
       <source>Resolution</source>
       <translation>Upplösning</translation>
     </message>
+    <message>
+      <source>Setting was changed</source>
+      <translation>Inställningen ändrades</translation>
+    </message>
+    <message>
+      <source>&quot;All archive&quot; option was changed to &quot;Motion, Objects, Bookmarks&quot; due to cloud storage backup was enabled</source>
+      <translation>&quot;Allt arkiv&quot; alternativet ändrades till &quot;Motion, Objects, Bookmarks&quot; på grund av att säkerhetskopiering av molnlagring var aktiverad</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BackupSettingsPickerWidget</name>

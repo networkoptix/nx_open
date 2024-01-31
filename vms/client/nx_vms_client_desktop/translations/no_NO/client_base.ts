@@ -7279,6 +7279,14 @@ Vi anbefaler at du ikke åpner denne integrasjonen. Hvis du forstår risikoen, k
       <source>Resolution</source>
       <translation>Oppløsning</translation>
     </message>
+    <message>
+      <source>Setting was changed</source>
+      <translation>Innstillingen ble endret</translation>
+    </message>
+    <message>
+      <source>&quot;All archive&quot; option was changed to &quot;Motion, Objects, Bookmarks&quot; due to cloud storage backup was enabled</source>
+      <translation>&quot;Alt arkiv&quot; -alternativet ble endret til &quot;Motion, Objects, Bookmarks&quot; på grunn av at sikkerhetskopiering av skylagring ble aktivert</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BackupSettingsPickerWidget</name>

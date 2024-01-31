@@ -1655,7 +1655,7 @@
     </message>
     <message>
       <source>Click on the last point to finish drawing the polygon.</source>
-      <translation>多角形を完成させるには、最後の点をクリックします。</translation>
+      <translation>多角形の描画を終了するには、終点をクリックしてください。</translation>
     </message>
     <message numerus="yes">
       <source>The maximum number of points has been reached (%n points).</source>
