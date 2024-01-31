@@ -81,6 +81,9 @@ public:
     /** Warning which is displayed when the rules are reset to defaults. */
     Property<bool> resetRules{this, "resetRules"};
 
+    /** Confirmation which is displayed on disconnecting from system. */
+    Property<bool> disconnectFromSystem{this, "disconnectFromSystem"};
+
 private:
     /** Flag whether settings were successfully migrated from the 5.1 settings format. */
     Property<bool> migrationDone{this, "migrationDone"};

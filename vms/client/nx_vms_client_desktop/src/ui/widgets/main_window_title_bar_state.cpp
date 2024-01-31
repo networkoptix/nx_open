@@ -114,43 +114,33 @@ MainWindowTitleBarStateReducer::State MainWindowTitleBarStateReducer::insertSyst
 MainWindowTitleBarStateReducer::State MainWindowTitleBarStateReducer::removeSystem(State&& state,
     int index)
 {
+    if (index < 0)
+        return state;
+
     state.systems.removeAt(index);
+    if (index == state.activeSystemTab)
+    {
+        state.homeTabActive = true;
+        state.activeSystemTab = -1;
+        state.currentSystemId = {};
+    }
+    else if (index < state.activeSystemTab)
+    {
+        state.activeSystemTab--;
+    }
     return state;
 }
 
 MainWindowTitleBarStateReducer::State MainWindowTitleBarStateReducer::removeSystemId(State&& state,
     QnUuid systemId)
 {
-    const auto index = state.findSystemIndex(systemId);
-    if (index >= 0)
-    {
-        state.systems.removeAt(index);
-        if (index == state.activeSystemTab)
-        {
-            state.homeTabActive = true;
-            state.expanded = true;
-            state.activeSystemTab = -1;
-            state.currentSystemId = {};
-        }
-        else if (index < state.activeSystemTab)
-        {
-            state.activeSystemTab--;
-        }
-    }
-    return state;
+    return removeSystem(std::move(state), state.findSystemIndex(systemId));
 }
 
 MainWindowTitleBarStateReducer::State MainWindowTitleBarStateReducer::removeCurrentSystem(
     State&& state)
 {
-    if (state.activeSystemTab < 0)
-        return state;
-
-    state = removeSystem(std::move(state), state.activeSystemTab);
-    state.homeTabActive = true;
-    state.homeTabActive = -1;
-    state.currentSystemId = {};
-    return state;
+    return removeSystem(std::move(state), state.activeSystemTab);
 }
 
 MainWindowTitleBarStateReducer::State MainWindowTitleBarStateReducer::changeCurrentSystem(
