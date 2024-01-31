@@ -823,7 +823,11 @@
 <context>
     <name>GlobalPermissionsTab</name>
     <message>
-        <source>On system level user has permissions to:</source>
+        <source>At the system level, group members have permissions to:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>At the system level, the user has permissions to:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
