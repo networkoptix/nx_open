@@ -1,10 +1,10 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.6
+import QtQuick
 
-import Nx.Controls 1.0
+import Nx.Controls
 
-import nx.vms.client.desktop 1.0
+import nx.vms.client.desktop
 
 TabControl
 {
@@ -14,12 +14,19 @@ TabControl
     {
         id: notificationsTab
 
-        button: CompactTabButton
+        component RightPanelTabButton: CompactTabButton
         {
             leftPadding: 0
             rightPadding: 0
             focusFrameEnabled: false
-            icon.source: "image://svg/skin/events/tabs/notifications.svg"
+            icon.width: 20
+            icon.height: 20
+            font.capitalization: Font.AllUppercase
+        }
+
+        button: RightPanelTabButton
+        {
+            icon.source: "image://svg/skin/events/tabs/notifications.svg?primary=white"
             text: qsTr("Notifications")
         }
 
@@ -43,12 +50,9 @@ TabControl
     {
         id: motionTab
 
-        button: CompactTabButton
+        button: RightPanelTabButton
         {
-            leftPadding: 0
-            rightPadding: 0
-            focusFrameEnabled: false
-            icon.source: "image://svg/skin/events/tabs/motion.svg"
+            icon.source: "image://svg/skin/events/tabs/motion.svg?primary=white"
             text: qsTr("Motion")
         }
 
@@ -73,12 +77,9 @@ TabControl
     {
         id: bookmarksTab
 
-        button: CompactTabButton
+        button: RightPanelTabButton
         {
-            leftPadding: 0
-            rightPadding: 0
-            focusFrameEnabled: false
-            icon.source: "image://svg/skin/events/tabs/bookmarks.svg"
+            icon.source: "image://svg/skin/events/tabs/bookmarks.svg?primary=white"
             text: qsTr("Bookmarks")
         }
 
@@ -102,12 +103,9 @@ TabControl
     {
         id: eventsTab
 
-        button: CompactTabButton
+        button: RightPanelTabButton
         {
-            leftPadding: 0
-            rightPadding: 0
-            focusFrameEnabled: false
-            icon.source: "image://svg/skin/events/tabs/events.svg"
+            icon.source: "image://svg/skin/events/tabs/events.svg?primary=white"
             text: qsTr("Events")
         }
 
@@ -131,12 +129,9 @@ TabControl
     {
         id: analyticsTab
 
-        button: CompactTabButton
+        button: RightPanelTabButton
         {
-            leftPadding: 0
-            rightPadding: 0
-            focusFrameEnabled: false
-            icon.source: "image://svg/skin/events/tabs/analytics.svg"
+            icon.source: "image://svg/skin/events/tabs/analytics.svg?primary=white"
             text: qsTr("Analytics")
         }
 

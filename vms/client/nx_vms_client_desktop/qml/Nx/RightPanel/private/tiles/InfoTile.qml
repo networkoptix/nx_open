@@ -128,6 +128,7 @@ TileBase
             color: tile.foregroundColor
             remainderColor: tile.secondaryForegroundColor
             resourceNames: (model && model.resourceList) || []
+            visible: count > 0
         }
 
         Preview
@@ -158,12 +159,12 @@ TileBase
 
             videoPreviewResourceId: (model && model.previewResource && model.previewResource.id)
                 || NxGlobals.uuid("")
-        }
 
-        Item
-        {
-            id: overlayContainer
-            anchors.fill: preview
+            Item
+            {
+                id: overlayContainer
+                anchors.fill: preview
+            }
         }
 
         Text
