@@ -159,7 +159,7 @@ class NxOpenConan(ConanFile):
             self.requires("customization/1.0")  #< Always use the latest revision.
 
         self.requires("boost/1.83.0" "#e0be85c6f8107d7e960246e31cbbf7ab")
-        self.requires("rapidjson/1.1.0" "#c2e048b9e956f5d9ff93d2d72b4486da")
+        self.requires("rapidjson/cci.20230929" "#624c0094d741e6a3749d2e44d834b96c")
 
         if self.isWindows or self.isLinux:
             if self.settings.arch == "x86_64":
