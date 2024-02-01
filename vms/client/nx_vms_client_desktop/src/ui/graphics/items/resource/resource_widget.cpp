@@ -1014,9 +1014,7 @@ int QnResourceWidget::calculateButtonsVisibility() const
         && permissions.testFlag(Qn::AddRemoveItemsPermission);
 
     if (hasCloseButtonPermissions && !fullscreenMode)
-    {
-         result |= Qn::CloseButton;
-    }
+        result |= Qn::CloseButton;
 
     if (fullscreenMode)
         result |= Qn::FullscreenButton;
