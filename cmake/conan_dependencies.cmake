@@ -46,7 +46,7 @@ if(targetDevice MATCHES "^linux|^edge")
     list(APPEND _additional_conan_parameters
         "--profile:host ${open_source_root}/cmake/conan_profiles/gcc.profile"
     )
-elseif(targetDevice MATCHES "macos")
+elseif(targetDevice MATCHES "^macos|^ios")
     list(APPEND _additional_conan_parameters
         "--profile:build ${open_source_root}/cmake/conan_profiles/xcode.profile"
         "--profile:host ${open_source_root}/cmake/conan_profiles/xcode.profile"
