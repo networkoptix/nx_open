@@ -827,8 +827,12 @@
   <context>
     <name>GlobalPermissionsTab</name>
     <message>
-      <source>On system level user has permissions to:</source>
-      <translation>På systemnivå har användaren behörigheter att:</translation>
+      <source>At the system level, group members have permissions to:</source>
+      <translation>På systemnivå, har gruppmedlemmar behörigheter att:</translation>
+    </message>
+    <message>
+      <source>At the system level, the user has permissions to:</source>
+      <translation>På systemnivå har användaren behörighet att:</translation>
     </message>
   </context>
   <context>

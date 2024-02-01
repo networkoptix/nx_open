@@ -821,7 +821,11 @@
   <context>
     <name>GlobalPermissionsTab</name>
     <message>
-      <source>On system level user has permissions to:</source>
+      <source>At the system level, group members have permissions to:</source>
+      <translation>システムレベルでは、グループメンバーには以下の権限があります:</translation>
+    </message>
+    <message>
+      <source>At the system level, the user has permissions to:</source>
       <translation>システムレベルでは、ユーザーには以下の権限があります:</translation>
     </message>
   </context>
