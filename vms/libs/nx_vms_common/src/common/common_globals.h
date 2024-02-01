@@ -559,6 +559,10 @@ namespace Qn {
         // Layout access permission for the running videowall instance.
         VideoWallLayoutPermissions = ModifyLayoutPermission,
 
+        // Locked layout access permission for the running videowall instance.
+        VideoWallLockedLayoutPermissions = ModifyLayoutPermission
+            &~ (AddRemoveItemsPermission | WriteNamePermission),
+
         // Media access permission for the running videowall instance.
         // PTZ is intended here.
         VideoWallMediaPermissions = ReadPermission
