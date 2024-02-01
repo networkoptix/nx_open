@@ -254,7 +254,11 @@ Qn::Permissions AccessController::Private::permissionsForRemoteLayout(
     }
 
     if (qnRuntime->isVideoWallMode())
-        return Qn::VideoWallLayoutPermissions;
+    {
+        return layout->locked()
+            ? Qn::VideoWallLockedLayoutPermissions
+            : Qn::VideoWallLayoutPermissions;
+    }
 
     // No other resources must be available while we are logged out.
     // We may come here while receiving initial resources, when user is still not set.
