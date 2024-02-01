@@ -50,7 +50,7 @@ void LookupListPreviewProcessor::setImportFilePathFromDialog()
     appContext()->localSettings()->lastImportDir = QFileInfo(fileName).absolutePath();
 }
 
-bool LookupListPreviewProcessor::buildTablePreview(LookupListPreviewEntriesModel* model,
+bool LookupListPreviewProcessor::buildTablePreview(LookupListImportEntriesModel* model,
     const QString& filePath,
     const QString& separator,
     bool hasHeader)
@@ -67,7 +67,7 @@ bool LookupListPreviewProcessor::buildTablePreview(LookupListPreviewEntriesModel
         int lineIndex = 0;
         QTextStream in(&file);
 
-        LookupListPreviewEntriesModel::PreviewRawData newData;
+        LookupListImportEntriesModel::PreviewRawData newData;
         while (!in.atEnd() && lineIndex < d->rowsNumber)
         {
             QString fileLine = in.readLine();
@@ -150,7 +150,7 @@ bool LookupListPreviewProcessor::dataHasHeaderRow()
     return d->dataHasHeaderRow;
 }
 
-void LookupListPreviewProcessor::reset(LookupListPreviewEntriesModel* model)
+void LookupListPreviewProcessor::reset(LookupListImportEntriesModel* model)
 {
     if (!NX_ASSERT(model))
         return;

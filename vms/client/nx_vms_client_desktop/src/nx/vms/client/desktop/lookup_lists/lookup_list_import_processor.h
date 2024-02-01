@@ -2,19 +2,14 @@
 
 #pragma once
 
-#include <QtCore/QList>
 #include <QtCore/QObject>
 #include <QtCore/QString>
-#include <QtCore/QUrl>
-#include <QtCore/QVector>
 
 #include <nx/utils/impl_ptr.h>
 
-#include "lookup_list_preview_processor.h"
+#include "lookup_list_import_entries_model.h"
 
 namespace nx::vms::client::desktop {
-
-typedef QMap<QPair<int, QString>, QString> Clarifications;
 
 class NX_VMS_CLIENT_DESKTOP_API LookupListImportProcessor: public QObject
 {
@@ -27,12 +22,14 @@ public:
     Q_INVOKABLE bool importListEntries(const QString sourceFile,
         const QString separator,
         const bool importHeaders,
-        LookupListPreviewEntriesModel* model);
-    Q_INVOKABLE void cancelImport();
+        LookupListImportEntriesModel* model);
+    Q_INVOKABLE bool applyFixUps(LookupListImportEntriesModel* model);
+    Q_INVOKABLE void cancelRunningTask();
 
     enum ImportExitCode
     {
         Success,
+        ClarificationRequired,
         Canceled,
         InternalError,
         EmptyFileError,
@@ -43,9 +40,9 @@ public:
 
 signals:
     void importStarted();
-    void importFinished(const ImportExitCode code);
-    void importClarificationsRequired(Clarifications& clarifications);
-
+    void importFinished(ImportExitCode code);
+    void fixupStarted();
+    void fixupFinished(ImportExitCode code);
 private:
     class Private;
     nx::utils::ImplPtr<Private> d;

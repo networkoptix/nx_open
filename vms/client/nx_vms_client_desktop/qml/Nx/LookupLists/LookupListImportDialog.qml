@@ -18,6 +18,7 @@ Dialog
 {
     id: control
 
+    required property Analytics.StateView taxonomy
     required property LookupListEntriesModel model
     title: qsTr("Import List")
     minimumWidth: 611
@@ -207,7 +208,7 @@ Dialog
             anchors.topMargin: 4
             anchors.bottom: parent.bottom
             width: parent.width
-            model: previewModel
+            model: importModel
 
         }
     }
@@ -222,7 +223,7 @@ Dialog
             onClicked:
             {
                 importProcessor.importListEntries(processor.filePath, processor.separator,
-                    processor.dataHasHeaderRow, previewModel)
+                    processor.dataHasHeaderRow, importModel)
             }
         }
 
@@ -231,15 +232,16 @@ Dialog
             text: qsTr("Cancel")
             onClicked:
             {
-                importProcessor.cancelImport()
+                importProcessor.cancelRunningTask()
                 control.close()
             }
         }
     }
 
-    LookupListPreviewEntriesModel
+    LookupListImportEntriesModel
     {
-        id: previewModel
+        id: importModel
+
         lookupListEntriesModel: control.model
     }
 
@@ -247,9 +249,9 @@ Dialog
     {
         id: processor
 
-        function initPreviewModel()
+        function initImportModel()
         {
-            buildTablePreview(previewModel, filePath, separator, dataHasHeaderRow)
+            buildTablePreview(importModel, filePath, separator, dataHasHeaderRow)
         }
 
         rowsNumber: 10
@@ -257,15 +259,20 @@ Dialog
         separator: separatorField.text
         dataHasHeaderRow: headerCheckBox.checked
 
-        onSeparatorChanged: initPreviewModel()
-        onFilePathChanged: initPreviewModel()
-        onDataHasHeaderRowChanged: initPreviewModel()
+        onSeparatorChanged: initImportModel()
+        onFilePathChanged: initImportModel()
+        onDataHasHeaderRowChanged: initImportModel()
     }
 
     onVisibleChanged:
     {
         separatorField.focus = false
-        processor.reset(previewModel)
+        processor.reset(importModel)
+    }
+
+    onRejected:
+    {
+        fixLookupListImportDialog.reject()
     }
 
     ProgressDialog
@@ -275,15 +282,29 @@ Dialog
         title: qsTr("Import List")
         processName: qsTr("Importing")
         visible: false
-        onRejected: importProcessor.cancelImport()
+        onRejected: importProcessor.cancelRunningTask()
         onDoneClicked: control.accept()
+    }
+    
+    FixLookupListImportDialog
+    {
+        id: fixLookupListImportDialog
+
+        taxonomy: control.taxonomy
+        model: importModel
+        onAccepted: importProcessor.applyFixUps(importModel)
+        onRejected: control.accept()
     }
 
     LookupListImportProcessor
     {
         id: importProcessor
 
-        onImportStarted: importProgressBar.progressStarted()
+        onImportStarted:
+        {
+            importProgressBar.processName = qsTr("Importing")
+            importProgressBar.progressStarted()
+        }
         onImportFinished: (exitCode) =>
         {
             switch (exitCode)
@@ -299,10 +320,33 @@ Dialog
                         qsTr("Please ensure that file exists and you have access to selected file"),
                         MessageBox.Ok);
                     break;
-                default:
+                case LookupListImportProcessor.ClarificationRequired:
+                    fixLookupListImportDialog.visible = true
                     importProgressBar.visible = false
+                    break;
+                default:
+                    control.reject()
             }
-
         }
+
+        onFixupStarted:
+        {
+            importProgressBar.processName = qsTr("Fixing imported entries")
+            importProgressBar.progressStarted()
+        }
+
+        onFixupFinished: (exitCode) =>
+        {
+            switch (exitCode)
+            {
+                case LookupListImportProcessor.Success:
+                    importProgressBar.progressFinished()
+                    entriesImported()
+                    break;
+                default:
+                    control.reject()
+            }
+        }
+
     }
 }
