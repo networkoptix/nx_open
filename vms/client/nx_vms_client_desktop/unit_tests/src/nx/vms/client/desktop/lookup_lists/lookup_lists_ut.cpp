@@ -7,11 +7,14 @@
 
 #include <nx/utils/test_support/test_options.h>
 #include <nx/vms/api/data/lookup_list_data.h>
+#include <nx/vms/client/desktop/analytics/taxonomy/object_type.h>
+#include <nx/vms/client/desktop/analytics/taxonomy/state_view.h>
 #include <nx/vms/client/desktop/lookup_lists/lookup_list_export_processor.h>
 #include <nx/vms/client/desktop/lookup_lists/lookup_list_model.h>
 #include <nx/vms/client/desktop/lookup_lists/lookup_list_preview_processor.h>
 
 using namespace nx::vms::client::desktop;
+using namespace nx::vms::client::desktop::analytics::taxonomy;
 using namespace nx::vms::api;
 
 namespace {
@@ -91,7 +94,7 @@ void checkBuildingLookupListPreviewModel(
     LookupListModel lookupListModelImportTo(modelImportTo);
     LookupListEntriesModel listEntriesImportTo;
     listEntriesImportTo.setListModel(&lookupListModelImportTo);
-    LookupListPreviewEntriesModel previewModel;
+    LookupListImportEntriesModel previewModel;
 
     previewModel.setLookupListEntriesModel(&listEntriesImportTo);
     LookupListPreviewProcessor previewProcessor;
@@ -151,4 +154,94 @@ TEST(LookupListTests, import_table_with_bigger_num_columns)
 {
     checkBuildingLookupListPreviewModel(
         bigColumnNumberExampleData(), smallColumnNumberExampleData());
+}
+
+/**
+ * Check that addition of empty rows is prohibited.
+ */
+TEST(LookupListTests, add_empty_row)
+{
+    // Initalize LookupListImportEntriesModel with required objects.
+    LookupListModel exportedModel(bigColumnNumberExampleData());
+    LookupListEntriesModel entriesModel;
+    entriesModel.setListModel(&exportedModel);
+    LookupListImportEntriesModel importModel;
+    importModel.setLookupListEntriesModel(&entriesModel);
+
+    // Create entry with empty values of columns and attempt to add it to the model.
+    QVariantMap entry;
+    entry["Number"] = {};
+    entry["Color"] = {};
+
+    const int rowCountBefore = importModel.lookupListEntriesModel()->rowCount();
+    importModel.addLookupListEntry(entry);
+    const int rowCountAfter = importModel.lookupListEntriesModel()->rowCount();
+
+    // The entry should not be added to the model,
+    // so the number of rows before and after must be the same.
+    ASSERT_EQ(rowCountBefore, rowCountAfter);
+}
+
+/**
+ * Check validation of generic list. Basically validation with disabled taxonomy.
+ */
+TEST(LookupListTests, validate_generic_list)
+{
+    // Initalize LookupListImportEntriesModel with required objects.
+    LookupListModel exportedModel(bigColumnNumberExampleData());
+    LookupListEntriesModel entriesModel;
+    entriesModel.setListModel(&exportedModel);
+    LookupListImportEntriesModel importModel;
+    StateView stateView({}, nullptr);
+    entriesModel.setTaxonomy(&stateView);
+    importModel.setLookupListEntriesModel(&entriesModel);
+
+    const int rowCountBefore = entriesModel.rowCount();
+
+    // Create valid entry for Generic List and add it to the model.
+    QVariantMap entry;
+    entry["Value"] = "trulala";
+    importModel.addLookupListEntry(entry);
+
+    // Check that number of rows increased to one.
+    ASSERT_EQ(rowCountBefore + 1, entriesModel.rowCount());
+
+    // Check that there are no fixup required.
+    ASSERT_FALSE(importModel.fixupRequired());
+}
+
+/**
+ * Check that revert of import deletes imported rows.
+ */
+TEST(LookupListTests, revert_import)
+{
+    // Initalize LookupListImportEntriesModel with required objects.
+    LookupListModel exportedModel(smallColumnNumberExampleData());
+    LookupListEntriesModel entriesModel;
+    entriesModel.setListModel(&exportedModel);
+    LookupListImportEntriesModel importModel;
+    importModel.setLookupListEntriesModel(&entriesModel);
+    StateView stateView({}, nullptr);
+    entriesModel.setTaxonomy(&stateView);
+
+    // Create valid entry for Generic List.
+    QVariantMap entry;
+    entry["Value"] = "trulala";
+
+    const int countOfAdditions = 12;
+    const int rowCountBefore = entriesModel.rowCount();
+    // Adding the entry `countOfAdditions` times to model.
+    for(int i = 0 ; i < countOfAdditions; i++)
+        importModel.addLookupListEntry(entry);
+
+    // Check that there are no fixup required.
+    ASSERT_FALSE(importModel.fixupRequired());
+
+    // Check that number of rows incresead.
+    ASSERT_EQ(rowCountBefore + countOfAdditions, entriesModel.rowCount());
+
+    importModel.revertImport();
+
+    // Check that number of rows is the same as before import.
+    ASSERT_EQ(rowCountBefore, entriesModel.rowCount());
 }

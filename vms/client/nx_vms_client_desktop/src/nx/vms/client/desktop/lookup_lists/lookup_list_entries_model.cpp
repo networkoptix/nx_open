@@ -5,13 +5,15 @@
 #include <range/v3/view/reverse.hpp>
 
 #include <QtCore/QString>
-#include <QtCore/QStringLiteral>
 
+#include <nx/reflect/json/deserializer.h>
 #include <nx/utils/range_adapters.h>
+#include <nx/vms/client/desktop/analytics/taxonomy/attribute_set.h>
+#include <nx/vms/client/desktop/analytics/taxonomy/color_set.h>
+#include <nx/vms/client/desktop/analytics/taxonomy/enumeration.h>
+#include <nx/vms/client/desktop/analytics/taxonomy/object_type.h>
 #include <ui/utils/table_export_helper.h>
-
-// TODO: @pprivalov this is an entrance point when you start to deal with validate
-// #include <nx/vms/client/desktop/analytics/analytics_taxonomy_manager.h>
+#include <utils/common/hash.h>
 
 namespace nx::vms::client::desktop {
 
@@ -27,11 +29,112 @@ QString attribute(const nx::vms::api::LookupListData& list, int column)
 
 } // namespace
 
-struct LookupListEntriesModel::Private
+class LookupListEntriesModel::Private
 {
+public:
+    using Validator = std::function<bool(const QString&)>;
+
     QPointer<LookupListModel> data;
     std::optional<QList<int>> rowsIndexesToShow;
+    QMap<QString, Validator> validatorByAttributeName;
+    analytics::taxonomy::StateView* taxonomy;
+    void initValidators();
+    static bool numberValidator(const QString&);
+    static bool booleanValidator(const QString&);
 };
+
+bool LookupListEntriesModel::Private::numberValidator(const QString& value)
+{
+    int ignored;
+    double ignoredDouble;
+    const std::string stdString(value.toStdString());
+    return reflect::json::deserialize(stdString, &ignored)
+        || reflect::json::deserialize(stdString, &ignoredDouble);
+}
+
+bool LookupListEntriesModel::Private::booleanValidator(const QString& value)
+{
+    bool ignored;
+    return reflect::json::deserialize(value.toStdString(), &ignored);
+}
+
+void LookupListEntriesModel::Private::initValidators()
+{
+   using namespace analytics::taxonomy;
+
+    if (!taxonomy)
+        return;
+
+    validatorByAttributeName.clear();
+    if (!data)
+        return;
+
+    const ObjectType* objectType = taxonomy->objectTypeById(data->rawData().objectTypeId);
+
+    if (objectType == nullptr)
+        return;
+
+    std::function<void(const std::vector<Attribute*>&, const QString&)>
+        collectAttributesValuesRecursive =
+            [&](const std::vector<Attribute*>& attributes, const QString& parentAttributeName)
+    {
+        for (const auto& attribute: attributes)
+        {
+            const QString fullAttributeName = parentAttributeName.isEmpty()
+                ? attribute->name
+                : parentAttributeName + "." + attribute->name;
+
+            switch (attribute->type)
+            {
+                case Attribute::Type::number:
+                {
+                    validatorByAttributeName[fullAttributeName] = &Private::numberValidator;
+                    break;
+                }
+                case Attribute::Type::boolean:
+                {
+                    validatorByAttributeName[fullAttributeName] = &Private::booleanValidator;
+                    break;
+                }
+                case Attribute::Type::attributeSet:
+                {
+                    collectAttributesValuesRecursive(
+                        attribute->attributeSet->attributes(), fullAttributeName);
+                    break;
+                }
+                case Attribute::Type::colorSet:
+                {
+                    QSet<QColor> itemSet;
+                    for (const auto& item: attribute->colorSet->items())
+                        itemSet.insert(QColor::fromString(item));
+
+                    validatorByAttributeName[fullAttributeName] =
+                        [itemSet](const QString& value)
+                        {
+                            return itemSet.contains(QColor::fromString(value));
+                        };
+                    break;
+                }
+                case Attribute::Type::enumeration:
+                {
+                    const auto items = attribute->enumeration->items();
+                    const QSet itemSet(items.begin(), items.end());
+                    validatorByAttributeName[fullAttributeName] = [itemSet](const QString& value)
+                    { return itemSet.contains(value); };
+                    break;
+                }
+                default:
+                {
+                    // String and undefined values.
+                    validatorByAttributeName[fullAttributeName] =
+                        [](const QString&) { return true; };
+                }
+            }
+        }
+    };
+
+    collectAttributesValuesRecursive(objectType->attributes(), {});
+}
 
 LookupListEntriesModel::LookupListEntriesModel(QObject* parent):
     base_type(parent),
@@ -151,7 +254,7 @@ void LookupListEntriesModel::setListModel(LookupListModel* value)
     beginResetModel();
     d->data = value;
     endResetModel();
-
+    d->initValidators();
     emit listModelChanged(value);
 
     if (d->data)
@@ -189,8 +292,12 @@ void LookupListEntriesModel::deleteEntries(const QVector<int>& rows)
     if (!NX_ASSERT(!rows.empty()))
         return;
 
-    for (auto& index: rows | ranges::views::reverse)
+    const std::set<int, std::greater<>> uniqueValuesInDescendingOrder(rows.begin(), rows.end());
+    for (const auto& index: uniqueValuesInDescendingOrder)
     {
+        if (index >= d->data->rawData().entries.size())
+            continue;
+
         beginRemoveRows({}, index, index);
         d->data->rawData().entries.erase(d->data->rawData().entries.begin() + index);
         endRemoveRows();
@@ -217,56 +324,39 @@ void LookupListEntriesModel::exportEntries(const QSet<int>& selectedRows, QTextS
     QnTableExportHelper::exportToStreamCsv(this, indexes, outputCsv);
 }
 
-bool LookupListEntriesModel::updateHeaders(const QStringList& headers)
+bool LookupListEntriesModel::isValidValue(const QString& value, const QString& attributeName)
 {
-     if (!NX_ASSERT(d->data))
-        return false;
+    if (d->validatorByAttributeName.isEmpty())
+        return true; //< No validation is required.
 
-    auto currentHeaders = d->data->attributeNames();
-    bool differenceFound = false;
-    int i = 0;
+    if (value.isEmpty())
+        return true;
 
-    // Replacing old headers. If data is not empty we should update entries as well.
-    for(; i < currentHeaders.size(); ++i)
-    {
-        if (headers.size() <= i)
-            break;
+    if (const auto validator = d->validatorByAttributeName.value(attributeName))
+        return validator(value);
 
-        if (headers[i] != currentHeaders[i])
-        {
-            currentHeaders[i] = headers[i];
-            differenceFound = true;
-        }
-    }
-    // If headers is longer then current, append rest of headers.
-    for (; i < headers.size(); ++i)
-    {
-        currentHeaders.append(headers[i]);
-        differenceFound = true;
-    }
-
-    if (differenceFound)
-    {
-        d->data->setAttributeNames(currentHeaders);
-        // TODO: @pprivalov Update data if nessessary. Do it when validate will be implemented.
-    }
-    return true;
+    return false; //< Incorrect attributeName is passed.
 }
 
-// TODO Implement it later.
-bool LookupListEntriesModel::validate()
+analytics::taxonomy::StateView* LookupListEntriesModel::taxonomy()
 {
-    /*QStringList unparsed;
-    for (const auto& entry : m_data->rawData().entries)
-    {
-        for(const auto& iter : entry)
-        {
-            QString typeId = m_data->rawData().objectTypeId;
-            // TODO validate if iter.second matches the restrictions of iter.first
-        }
+    return d->taxonomy;
+}
 
-    }*/
-    return true; //unparsed.empty();
+void LookupListEntriesModel::setTaxonomy(analytics::taxonomy::StateView* taxonomy)
+{
+    d->taxonomy = taxonomy;
+    emit taxonomyChanged();
+}
+
+int LookupListEntriesModel::columnPosOfAttribute(const QString& attributeName)
+{
+    if (!d->data)
+        return -1;
+
+    const auto& attributeNames = d->data->rawData().attributeNames;
+    const auto pos = std::find(attributeNames.begin(), attributeNames.end(), attributeName);
+    return pos != attributeNames.end() ? std::distance(attributeNames.begin(), pos) : -1;
 }
 
 void LookupListEntriesModel::setFilter(const QString& searchText, int resultLimit)

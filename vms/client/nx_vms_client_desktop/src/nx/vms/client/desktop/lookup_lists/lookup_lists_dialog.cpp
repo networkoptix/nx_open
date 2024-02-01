@@ -23,8 +23,8 @@ void LookupListsDialog::registerQmlTypes()
         "nx.vms.client.desktop", 1, 0, "LookupListExportProcessor");
     qmlRegisterType<LookupListPreviewProcessor>(
         "nx.vms.client.desktop", 1, 0, "LookupListPreviewProcessor");
-    qmlRegisterType<LookupListPreviewEntriesModel>(
-        "nx.vms.client.desktop", 1, 0, "LookupListPreviewEntriesModel");
+    qmlRegisterType<LookupListImportEntriesModel>(
+        "nx.vms.client.desktop", 1, 0, "LookupListImportEntriesModel");
     qmlRegisterType<LookupListImportProcessor>(
         "nx.vms.client.desktop", 1, 0, "LookupListImportProcessor");
 }

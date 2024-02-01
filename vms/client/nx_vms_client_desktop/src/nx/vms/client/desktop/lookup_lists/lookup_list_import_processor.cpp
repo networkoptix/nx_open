@@ -8,8 +8,6 @@
 #include <QtCore/QScopedPointer>
 #include <QtCore/QString>
 
-#include <nx/vms/client/desktop/lookup_lists/lookup_list_entries_model.h>
-#include <nx/vms/client/desktop/lookup_lists/lookup_list_model.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
 
 namespace nx::vms::client::desktop {
@@ -21,26 +19,39 @@ class LookupListImportProcessor::Private: public QObject
 public:
     Private(LookupListImportProcessor* q);
     void processImportTaskResult();
-    static ImportExitCode runTask(const QString sourceFile,
+    void processFixupTaskResult();
+    static ImportExitCode runImportTask(const QString sourceFile,
         const QString separator,
         bool importHeaders,
-        LookupListPreviewEntriesModel* model);
-    QFutureWatcher<ImportExitCode> currentTask;
-    QMap<QPair<int, QString>, QString> clarifications;
+        LookupListImportEntriesModel* model);
+    static ImportExitCode runFixupTask(LookupListImportEntriesModel* model);
+
+    QFutureWatcher<ImportExitCode> currentImportTask;
+    QFutureWatcher<ImportExitCode> currentFixupTask;
 };
 
 LookupListImportProcessor::Private::Private(LookupListImportProcessor* q): QObject(), q(q)
 {
 }
 
-/** Fill temporary model and create list of replacements. Then after call for next dialog apply
- * replacements and merge to main model.
+LookupListImportProcessor::ImportExitCode LookupListImportProcessor::Private::runFixupTask(
+    LookupListImportEntriesModel* model)
+{
+    if (!NX_ASSERT(model))
+        return InternalError;
+
+    model->applyFix();
+    return Success;
+}
+
+/**
+ * Parses and validates values from CSV files. Parsed correct result added to input model.
  */
-LookupListImportProcessor::ImportExitCode LookupListImportProcessor::Private::runTask(
+LookupListImportProcessor::ImportExitCode LookupListImportProcessor::Private::runImportTask(
     const QString sourceFile,
     const QString separator,
     bool importHeaders,
-    LookupListPreviewEntriesModel* model)
+    LookupListImportEntriesModel* model)
 {
     if (!NX_ASSERT(model))
         return InternalError;
@@ -55,23 +66,12 @@ LookupListImportProcessor::ImportExitCode LookupListImportProcessor::Private::ru
 
     QTextStream streamCsv(&file);
     if (importHeaders)
-    {
-        // Currently just skip headers if them are in file
-        streamCsv.readLine();
-        //TODO @pprivalov implement this later
-        //model->updateHeaders(streamCsv.readLine().split(separator));
-    }
+        streamCsv.readLine(); //< Just skip headers if them are in file.
 
-    QScopedPointer<LookupListEntriesModel> tempModel(new LookupListEntriesModel());
-    auto listModel = QScopedPointer<LookupListModel>(new LookupListModel());
-    tempModel->setListModel(listModel.get());
-    tempModel->listModel()->setAttributeNames(
-        model->lookupListEntriesModel()->listModel()->attributeNames());
-
-    QVariantMap entry;
     for (auto line = streamCsv.readLine(); !line.isEmpty(); line = streamCsv.readLine())
     {
         auto words = line.split(separator);
+        QVariantMap entry;
         for (int columnIndex = 0; columnIndex < model->columnCount(); ++columnIndex)
         {
             if (columnIndex >= words.size())
@@ -80,35 +80,24 @@ LookupListImportProcessor::ImportExitCode LookupListImportProcessor::Private::ru
             auto columnIndexToAttributeIter = columnIndexToAttribute.find(columnIndex);
             if (columnIndexToAttributeIter == columnIndexToAttribute.end())
                 continue; //< "Do not import" was chosen.
+
             entry[columnIndexToAttributeIter.value()] = words[columnIndex];
         }
-        if (!entry.isEmpty())
-            tempModel->addEntry(entry);
+
+        model->addLookupListEntry(entry);
     }
 
-    if (tempModel->rowCount() == 0)
-        return EmptyFileError;
-    /*
-    // TODO: @pprivalov Handle replacements
-    if (m_tempModel->validate())
-        return ReplacementRequired;
-    */
-
-    // TODO: move to separate method after replacements are applied
-    for (const auto& entry: tempModel->listModel()->rawData().entries)
-    {
-        QVariantMap varianEntry;
-        for (auto pair: entry)
-            varianEntry[pair.first] = pair.second;
-        model->lookupListEntriesModel()->addEntry(varianEntry);
-    }
-
-    return Success;
+    return model->fixupRequired() ? ClarificationRequired : Success;
 }
 
 void LookupListImportProcessor::Private::processImportTaskResult()
 {
-    emit q->importFinished(currentTask.isCanceled() ? Canceled : currentTask.result());
+    emit q->importFinished(currentImportTask.isCanceled() ? Canceled : currentImportTask.result());
+}
+
+void LookupListImportProcessor::Private::processFixupTaskResult()
+{
+    emit q->fixupFinished(currentFixupTask.isCanceled() ? Canceled : currentFixupTask.result());
 }
 
 // ------------------------------------------------------------------------------------------------------
@@ -122,38 +111,68 @@ LookupListImportProcessor::~LookupListImportProcessor()
 {
 }
 
-void LookupListImportProcessor::cancelImport()
+void LookupListImportProcessor::cancelRunningTask()
 {
-    if (d->currentTask.isRunning())
-        d->currentTask.cancel();
+    if (d->currentImportTask.isRunning())
+        d->currentImportTask.cancel();
+    if (d->currentFixupTask.isRunning())
+        d->currentFixupTask.cancel();
 }
 
 bool LookupListImportProcessor::importListEntries(const QString sourceFile,
     const QString separator,
     const bool importHeaders,
-    LookupListPreviewEntriesModel* model)
+    LookupListImportEntriesModel* model)
 {
-    if (d->currentTask.isRunning())
-        return false;
+    if (d->currentFixupTask.isRunning() || d->currentImportTask.isRunning())
+        return false; //< Import and fixup tasks can't be run simultaneously.
 
     if (sourceFile.isEmpty() || separator.isEmpty())
         return false;
 
-    auto future = QtConcurrent::run(LookupListImportProcessor::Private::runTask,
+    auto future = QtConcurrent::run(LookupListImportProcessor::Private::runImportTask,
         sourceFile,
         separator,
         importHeaders,
         model);
-    d->currentTask.setFuture(future);
+    d->currentImportTask.setFuture(future);
 
-    connect(&d->currentTask,
+    connect(&d->currentImportTask,
         &QFutureWatcherBase::started,
         this,
         &LookupListImportProcessor::importStarted);
-    connect(&d->currentTask,
+    connect(&d->currentImportTask,
+        &QFutureWatcherBase::canceled,
+        d.get(),
+        &Private::processFixupTaskResult);
+    connect(&d->currentImportTask,
         &QFutureWatcherBase::finished,
         d.get(),
         &LookupListImportProcessor::Private::processImportTaskResult);
+
+    return true;
+}
+
+bool LookupListImportProcessor::applyFixUps(LookupListImportEntriesModel* model)
+{
+    if (d->currentFixupTask.isRunning() || d->currentImportTask.isRunning())
+        return false; //< Import and fixup tasks can't be run simultaneously.
+
+    auto future = QtConcurrent::run(Private::runFixupTask, model);
+    d->currentFixupTask.setFuture(future);
+
+    connect(&d->currentFixupTask,
+        &QFutureWatcherBase::started,
+        this,
+        &LookupListImportProcessor::fixupStarted);
+    connect(&d->currentFixupTask,
+        &QFutureWatcherBase::canceled,
+        d.get(),
+        &Private::processFixupTaskResult);
+    connect(&d->currentFixupTask,
+        &QFutureWatcherBase::finished,
+        d.get(),
+        &Private::processFixupTaskResult);
 
     return true;
 }

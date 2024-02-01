@@ -45,6 +45,8 @@ Dialog
     LookupListEntriesModel
     {
         id: entriesModel
+
+        taxonomy: control.taxonomy
         listModel: currentList
     }
 
@@ -344,6 +346,7 @@ Dialog
         id: importDialog
 
         model: entriesModel
+        taxonomy: control.taxonomy
         visible: false
         onEntriesImported: hasChanges = true
     }

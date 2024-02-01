@@ -66,6 +66,7 @@ Dialog
     {
         control.visible = true
         progressBar.title = qsTr(processName)
+        progressBar.value = 0
         progressBar.indeterminate = true
         isVisibleCancelButton = true
         isVisibleDoneButton = false
@@ -75,6 +76,7 @@ Dialog
     {
         progressBar.title = qsTr("Finished")
         progressBar.indeterminate = false
+        progressBar.value = 1.0
         isVisibleCancelButton = false
         isVisibleDoneButton = true
     }
@@ -87,6 +89,5 @@ Dialog
         anchors.right: parent.right
         anchors.top: parent.top
         anchors.margins: 16
-        value: 1.0
     }
 }

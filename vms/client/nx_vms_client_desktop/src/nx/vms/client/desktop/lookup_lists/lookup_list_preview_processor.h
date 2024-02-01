@@ -10,7 +10,7 @@
 
 #include <nx/utils/impl_ptr.h>
 
-#include "lookup_list_preview_entries_model.h"
+#include "lookup_list_import_entries_model.h"
 
 namespace nx::vms::client::desktop {
 
@@ -33,12 +33,12 @@ public:
     explicit LookupListPreviewProcessor(QObject* parent = nullptr);
     virtual ~LookupListPreviewProcessor() override;
     Q_INVOKABLE void setImportFilePathFromDialog();
-    Q_INVOKABLE bool buildTablePreview(LookupListPreviewEntriesModel* model,
+    Q_INVOKABLE bool buildTablePreview(LookupListImportEntriesModel* model,
         const QString& filePath,
         const QString& separator,
         bool hasHeader);
 
-    Q_INVOKABLE void reset(LookupListPreviewEntriesModel* model);
+    Q_INVOKABLE void reset(LookupListImportEntriesModel* model);
 
     void setRowsNumber(int rowsNumber);
     void setSeparator(const QString& separator);

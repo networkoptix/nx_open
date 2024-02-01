@@ -8,6 +8,7 @@
 
 #include <nx/utils/impl_ptr.h>
 #include <nx/vms/api/data/lookup_list_data.h>
+#include <nx/vms/client/desktop/analytics/taxonomy/state_view.h>
 
 #include "lookup_list_model.h"
 
@@ -25,6 +26,11 @@ class NX_VMS_CLIENT_DESKTOP_API LookupListEntriesModel: public QAbstractTableMod
     Q_PROPERTY(int rowCount
         READ rowCount
         NOTIFY rowCountChanged);
+
+    Q_PROPERTY(analytics::taxonomy::StateView* taxonomy
+        READ taxonomy
+        WRITE setTaxonomy
+        NOTIFY taxonomyChanged)
 
     using base_type = QAbstractTableModel;
 
@@ -59,16 +65,20 @@ public:
     Q_INVOKABLE void addEntry(const QVariantMap& values);
     Q_INVOKABLE void deleteEntries(const QVector<int>& rows);
     void exportEntries(const QSet<int>& selectedRows, QTextStream& outputCsv);
-    bool updateHeaders(const QStringList& headers);
-    bool validate();
+    bool isValidValue(const QString& value, const QString& attributeName);
     Q_INVOKABLE void setFilter(const QString& searchText, int resultLimit);
+
+    Q_INVOKABLE analytics::taxonomy::StateView* taxonomy();
+    Q_INVOKABLE void setTaxonomy(analytics::taxonomy::StateView* taxonomy);
+    int columnPosOfAttribute(const QString& attributeName);
 
 signals:
     void listModelChanged(LookupListModel* listModel);
     void rowCountChanged();
+    void taxonomyChanged();
 
 private:
-    struct Private;
+    class Private;
     nx::utils::ImplPtr<Private> d;
 };
 
