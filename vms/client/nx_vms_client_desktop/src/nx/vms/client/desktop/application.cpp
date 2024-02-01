@@ -350,21 +350,10 @@ int runApplication(int argc, char** argv)
     QApplication::setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
 
     const QnStartupParameters startupParams = QnStartupParameters::fromCommandLineArg(argc, argv);
-    if (startupParams.hiDpiDisabled)
+    if (ini().roundDpiScaling)
     {
-        QApplication::setAttribute(Qt::AA_DisableHighDpiScaling);
-    }
-    else
-    {
-        // These attributes must be set before application instance is created.
-        QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-        QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
-
-        if (ini().roundDpiScaling)
-        {
-            QApplication::setHighDpiScaleFactorRoundingPolicy(
-                Qt::HighDpiScaleFactorRoundingPolicy::Round);
-        }
+        QApplication::setHighDpiScaleFactorRoundingPolicy(
+            Qt::HighDpiScaleFactorRoundingPolicy::Round);
     }
 
     static const QHash<QString, QSGRendererInterface::GraphicsApi> nameToApi =
