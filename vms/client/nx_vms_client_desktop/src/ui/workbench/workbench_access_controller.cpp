@@ -294,7 +294,11 @@ Qn::Permissions QnWorkbenchAccessController::calculateRemoteLayoutPermissions(
     }
 
     if (qnRuntime->isVideoWallMode())
-        return Qn::VideoWallLayoutPermissions;
+    {
+        return layout->locked()
+            ? Qn::VideoWallLockedLayoutPermissions
+            : Qn::VideoWallLayoutPermissions;
+    }
 
     /*
      * No other resources must be available while we are logged out.
