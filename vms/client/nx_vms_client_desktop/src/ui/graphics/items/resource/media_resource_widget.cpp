@@ -2480,6 +2480,18 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
         if (!NX_ASSERT(d->camera) || !d->camera->isScheduleEnabled())
             return Qn::IoModuleDisabledOverlay;
 
+        const auto hasArchive = [this](const QnSecurityCamResourcePtr& camera)
+        {
+            auto systemContext = SystemContext::fromResource(camera);
+            if (!NX_ASSERT(systemContext))
+                return false;
+
+            auto loader = systemContext->cameraDataManager()->loader(d->mediaResource,
+                /*createIfNotExists*/ false);
+            return loader && loader->periods(Qn::RecordingContent).containTime(
+                d->display()->camDisplay()->getExternalTime() / 1000);
+        };
+
         if (d->isPlayingLive())
         {
             return d->accessController()->
