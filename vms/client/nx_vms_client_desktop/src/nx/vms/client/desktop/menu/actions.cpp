@@ -222,7 +222,8 @@ void initialize(Manager* manager, Action* root)
         .flags(Tree | VideoWallReviewScene | SingleTarget | MultiTarget | VideoWallItemTarget)
         .text(ContextMenu::tr("Push my screen"))
         .requiredTargetPermissions(Qn::VideoWallResourceRole, Qn::ReadWriteSavePermission)
-        .condition(ConditionWrapper(new DesktopCameraCondition()));
+        .condition(ConditionWrapper(new DesktopCameraCondition())
+            && !condition::selectedItemsContainLockedLayout());
 
     factory(QueueAppRestartAction)
         .flags(NoTarget);
@@ -1171,7 +1172,8 @@ void initialize(Manager* manager, Action* root)
         .flags(Tree | VideoWallReviewScene | SingleTarget | MultiTarget | VideoWallItemTarget)
         .text(ContextMenu::tr("Clear Screen"))
         .requiredTargetPermissions(Qn::VideoWallResourceRole, Qn::ReadWriteSavePermission)
-        .condition(ConditionWrapper(new DetachFromVideoWallCondition()));
+        .condition(ConditionWrapper(new DetachFromVideoWallCondition())
+            && !condition::selectedItemsContainLockedLayout());
 
     factory(SelectCurrentServerAction)
         .flags(Tree | SingleTarget | ResourceTarget)
