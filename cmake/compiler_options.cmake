@@ -64,6 +64,7 @@ add_definitions(
     -DBOOST_BIND_NO_PLACEHOLDERS
     -D_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING
     -DQT_NO_EXCEPTIONS
+    -DRAPIDJSON_HAS_STDSTRING
 )
 
 # These definitions are specific for Windows headers.
