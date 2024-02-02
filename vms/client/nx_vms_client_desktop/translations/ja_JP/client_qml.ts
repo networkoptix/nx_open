@@ -2427,7 +2427,7 @@ Alt + クリックでオブジェクトを追跡します。</translation>
     </message>
     <message>
       <source>Email</source>
-      <translation>Eメール</translation>
+      <translation>メールアドレス</translation>
     </message>
     <message>
       <source>Password</source>
@@ -2533,7 +2533,7 @@ Alt + クリックでオブジェクトを追跡します。</translation>
     </message>
     <message>
       <source>Email</source>
-      <translation>Eメール</translation>
+      <translation>メールアドレス</translation>
     </message>
     <message>
       <source>Change password</source>
