@@ -2052,6 +2052,28 @@ ConditionWrapper isLayoutTourReviewMode()
         });
 }
 
+ConditionWrapper selectedItemsContainLockedLayout()
+{
+    return new CustomBoolCondition(
+        [](const Parameters& parameters, QnWorkbenchContext* context)
+        {
+            const auto videoWallItemIndexes = parameters.videoWallItems();
+            for (const QnVideoWallItemIndex& index: videoWallItemIndexes)
+            {
+                if (!index.isValid())
+                    continue;
+
+                QnVideoWallItem existingItem = index.item();
+                const auto layout = context->resourcePool()
+                    ->getResourceById<QnLayoutResource>(existingItem.layout);
+                if (layout && layout->locked())
+                    return true;
+            }
+
+            return false;
+        });
+}
+
 ConditionWrapper canSavePtzPosition()
 {
     return new CustomBoolCondition(

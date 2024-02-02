@@ -699,6 +699,8 @@ ConditionWrapper canMakeShowreel();
 
 ConditionWrapper isWorkbenchVisible();
 
+ConditionWrapper selectedItemsContainLockedLayout();
+
 /** Check if there is a saved Session State for the current system-user pair. */
 ConditionWrapper hasSavedWindowsState();
 
