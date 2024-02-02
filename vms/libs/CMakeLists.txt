@@ -17,9 +17,7 @@ if(withMediaServer
     add_subdirectory(nx_vms_common)
     add_subdirectory(nx_vms_license)
     add_subdirectory(nx_vms_update)
-    add_subdirectory(nx_media_core)
-    add_subdirectory(nx_codec)
-    add_subdirectory(nx_rtp)
+    add_subdirectory(nx_vms_utils)
 endif()
 
 if(withMediaServer)
@@ -34,14 +32,4 @@ endif()
 
 if (withMediaServer OR withDesktopClient OR withMobileClient)
     add_subdirectory(nx_vms_rules)
-endif()
-
-if(withMediaServer
-    OR withTestCamera
-    OR withDesktopClient
-    OR withMobileClient
-    OR withClouds
-    OR openSourceBuild
-)
-    add_subdirectory(nx_vms_utils)
 endif()
