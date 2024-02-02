@@ -2087,7 +2087,7 @@
     </message>
     <message>
       <source>Email</source>
-      <translation>Eメール</translation>
+      <translation>メールアドレス</translation>
     </message>
     <message>
       <source>Password</source>

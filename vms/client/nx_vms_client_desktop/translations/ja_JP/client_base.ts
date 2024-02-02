@@ -3763,7 +3763,7 @@ to %1</source>
     </message>
     <message>
       <source>Email</source>
-      <translation>Email</translation>
+      <translation>メールアドレス</translation>
     </message>
     <message>
       <source>DN</source>
@@ -5314,7 +5314,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</source>
-      <translation>容量が小さくて、他に十分な領域があるストレージがある場合には書込み先として使用されません</translation>
+      <translation>小さすぎるパーティションとシステムパーティションは予備領域とされ、他に十分なストレージ領域がある場合は書き込みには使用されません。</translation>
     </message>
     <message>
       <source>Reserved</source>
@@ -5431,7 +5431,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Email</source>
-      <translation>Email</translation>
+      <translation>メールサーバー</translation>
     </message>
     <message>
       <source>Updates</source>
@@ -5723,7 +5723,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Email</source>
-      <translation>Email</translation>
+      <translation>メールアドレス</translation>
     </message>
     <message>
       <source>To enable digest authentication password reset is required</source>
@@ -5881,7 +5881,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Email</source>
-      <translation>Email</translation>
+      <translation>メールアドレス</translation>
     </message>
     <message>
       <source>Email cannot be empty.</source>
@@ -10872,7 +10872,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Email</source>
-      <translation>Email</translation>
+      <translation>メールアドレス</translation>
     </message>
     <message>
       <source>Groups</source>
@@ -11577,7 +11577,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Email</source>
-      <translation>Email</translation>
+      <translation>メールアドレス</translation>
     </message>
     <message>
       <source>Reason for deactivation</source>
