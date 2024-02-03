@@ -324,7 +324,7 @@
     </message>
     <message>
       <source>Stop Object Tracking</source>
-      <translation type="unfinished">Stop Object Tracking</translation>
+      <translation>Obje Takibini Durdur</translation>
     </message>
   </context>
   <context>
