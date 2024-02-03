@@ -11405,7 +11405,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>The provided link is not valid</source>
-      <translation type="unfinished">The provided link is not valid</translation>
+      <translation>Sağlanan bağlantı geçerli değil</translation>
     </message>
   </context>
   <context>
@@ -11570,7 +11570,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Some features may not be available.</source>
-      <translation type="unfinished">Some features may not be available.</translation>
+      <translation>Bazı özellikler mevcut olmayabilir.</translation>
     </message>
   </context>
   <context>
