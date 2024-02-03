@@ -135,7 +135,7 @@ def command_sign(args):
 
 def setup_arguments_parser():
     parser = argparse.ArgumentParser()
-    subparsers = parser.add_subparsers()
+    subparsers = parser.add_subparsers(required=True)
 
     parser_import = subparsers.add_parser(
         "import", help="Import keys from a p12 file into a keychain")
