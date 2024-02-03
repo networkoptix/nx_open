@@ -151,3 +151,48 @@ else()
     set(zip_compression_level 6)
     set(gzip_compression_level 6)
 endif()
+
+set(appleTeamId "" CACHE STRING "Custom team id for signing a developer build.")
+
+if(NOT appleTeamId)
+    if(IOS)
+        set(identityFromCustomization "${customization.mobile.ios.signIdentity}")
+    else()
+        set(identityFromCustomization "${customization.desktop.macos.signIdentity}")
+    endif()
+
+    if(identityFromCustomization)
+        string(REGEX REPLACE "^.*\\(([^\\)]+)\\)$" "\\1" appleTeamId "${identityFromCustomization}")
+    endif()
+endif()
+
+if(NOT appleTeamId)
+    nx_execute_process_or_fail(
+        COMMAND ${PYTHON_EXECUTABLE} ${open_source_root}/build_utils/macos/team.py
+            select
+        OUTPUT_VARIABLE appleTeamId
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        ERROR_MESSAGE
+            "Cannot determine the developer team id automatically. "
+            "Please specify it manually via -DappleTeamId"
+    )
+endif()
+
+if(developerBuild)
+    nx_execute_process_or_fail(
+        COMMAND ${PYTHON_EXECUTABLE} ${open_source_root}/build_utils/macos/team.py
+            isfree ${appleTeamId}
+        OUTPUT_VARIABLE appleTeamIdIsFreeString
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        ERROR_MESSAGE
+            "Cannot determine the developer team ${appleTeamId} capabilities."
+    )
+endif()
+
+if(appleTeamIdIsFreeString STREQUAL "True")
+    set(appleTeamIdIsFree TRUE)
+    message(WARNING "Push notifications capability is disabled because free team id ${appleTeamId}"
+        " is used for signing")
+else()
+    set(appleTeamIdIsFree FALSE)
+endif()
