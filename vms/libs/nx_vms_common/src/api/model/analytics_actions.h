@@ -7,11 +7,31 @@
 #include <analytics/db/analytics_db_types.h>
 #include <nx/fusion/model_functions_fwd.h>
 
+/**
+ * NOTE: Corresponds to struct IAction::Result.
+ */
 struct NX_VMS_COMMON_API AnalyticsActionResult
 {
+    /**%apidoc
+     * URL to be opened by the Client in an embedded browser, or a null or empty string. If
+     * non-empty, messageToUser must be null or empty.
+     */
     QString actionUrl;
+
+    /**%apidoc
+     * Text to be shown to the user by the Client, or a null or empty string. If non-empty,
+     * actionUrl must be null or empty.
+     */
     QString messageToUser;
+
+    /**%apidoc
+     * Whether proxying through the connected server should be used for actionUrl.
+     */
     bool useProxy = false;
+
+    /**%apidoc
+     * Whether device authentication should be used for actionUrl.
+     */
     bool useDeviceCredentials = false;
 };
 #define AnalyticsActionResult_Fields (actionUrl)(messageToUser)(useProxy)(useDeviceCredentials)
