@@ -13,6 +13,7 @@
 #include <nx/vms/api/rules/rule.h>
 #include <nx/vms/common/utils/schedule.h>
 #include <nx/vms/rules/ini.h>
+#include <nx/vms/rules/utils/event.h>
 #include <nx/vms/utils/translation/scoped_locale.h>
 #include <utils/common/delayed.h>
 #include <utils/common/synctime.h>
@@ -61,7 +62,6 @@ Engine::Engine(std::unique_ptr<Router> router, QObject* parent):
     QObject(parent),
     m_router(std::move(router)),
     m_ruleMutex(nx::Mutex::Recursive),
-    m_eventCache(std::make_unique<EventCache>()),
     m_aggregationTimer(new QTimer(this))
 {
     const QString rulesVersion(ini().rulesEngine);
@@ -219,7 +219,7 @@ bool Engine::registerEvent(const ItemDescriptor& descriptor, const EventConstruc
 
     if (m_eventDescriptors.contains(descriptor.id))
     {
-        NX_ERROR(this, "Register event failed: % is already registered", descriptor.id);
+        NX_ERROR(this, "Register event failed: %1 is already registered", descriptor.id);
         return false;
     }
 
@@ -735,20 +735,20 @@ std::unique_ptr<ActionBuilderField> Engine::buildActionField(const QString& fiel
 size_t Engine::processEvent(const EventPtr& event)
 {
     if (!m_enabled)
-        return {};
+        return 0;
 
     checkOwnThread();
     NX_DEBUG(this, "Processing Event: %1, state: %2", event->type(), event->state());
 
-    const auto cacheKey = event->cacheKey();
-    if (m_eventCache->eventWasCached(cacheKey))
-    {
-        NX_VERBOSE(this, "Skipping cached event with key: %1", cacheKey);
-        return {};
-    }
+    if (!checkEvent(event))
+        return 0;
 
-    if (!m_eventCache->checkEventState(event))
-        return {};
+    if (event->state() == State::started)
+    {
+        // Appropriate `stopped` event must be removed from the watcher when the the engine
+        // completely process the event - after all the action builders are called.
+        m_runningEventWatcher.add(event);
+    }
 
     EventData eventData;
     QSet<QByteArray> eventFields; // TODO: #spanasenko Cache data.
@@ -797,13 +797,18 @@ size_t Engine::processEvent(const EventPtr& event)
 
     NX_DEBUG(this, "Matched with %1 rules", ruleIds.size());
 
-    if (!ruleIds.empty())
+    if (ruleIds.empty())
     {
-        m_eventCache->cacheEvent(cacheKey);
+        if (event->state() == State::stopped)
+            m_runningEventWatcher.erase(event);
 
-        eventData = serializeProperties(event.get(), eventFields);
-        m_router->routeEvent(eventData, ruleIds, resources);
+        return 0;
     }
+
+    m_eventCache.cacheEvent(event->cacheKey());
+
+    eventData = serializeProperties(event.get(), eventFields);
+    m_router->routeEvent(eventData, ruleIds, resources);
 
     return ruleIds.size();
 }
@@ -849,7 +854,8 @@ void Engine::processAcceptedEvent(const QnUuid& ruleId, const EventData& eventDa
         }
     }
 
-    m_eventCache->stopRunningEvent(event);
+    if (event->state() == State::stopped)
+        m_runningEventWatcher.erase(event);
 }
 
 void Engine::processAction(const ActionPtr& action)
@@ -871,11 +877,18 @@ bool Engine::isActionFieldRegistered(const QString& fieldId) const
     return m_actionFields.contains(fieldId);
 }
 
-EventCache* Engine::eventCache() const
+const EventCache& Engine::eventCache() const
 {
     checkOwnThread();
 
-    return m_eventCache.get();
+    return m_eventCache;
+}
+
+const RunningEventWatcher& Engine::runningEventWatcher() const
+{
+    checkOwnThread();
+
+    return m_runningEventWatcher;
 }
 
 void Engine::toggleTimer(nx::utils::TimerEventHandler* handler, bool on)
@@ -907,6 +920,42 @@ void Engine::checkOwnThread() const
     const auto currentThread = QThread::currentThread();
     NX_ASSERT(this->thread() == currentThread,
         "Unexpected thread: %1", currentThread->objectName());
+}
+
+bool Engine::checkEvent(const EventPtr& event) const
+{
+    // This check is required to reduce the number of spamming events.
+    if (m_eventCache.eventWasCached(event->cacheKey()))
+    {
+        NX_VERBOSE(this, "Skipping cached event %1 with key: %2", event->type(), event->cacheKey());
+        return false;
+    }
+
+    if (isProlonged(event))
+    {
+        // It is required to check if the prolonged events are coming in the right order.
+        // Each stopped event must follow started event. Repeated start and stop events
+        // should be ignored.
+        const auto isEventRunning = m_runningEventWatcher.isRunning(event);
+
+        if (event->state() == State::started)
+        {
+            if (isEventRunning)
+            {
+                NX_VERBOSE(this, "Event %1-%2 doesn't match due to repeated start",
+                    event->type(), event->resourceKey());
+                return false;
+            }
+        }
+        else if (!isEventRunning)
+        {
+            NX_VERBOSE(this, "Event %1-%2 doesn't match due to stop without start",
+                event->type(), event->resourceKey());
+            return false;
+        }
+    }
+
+    return true;
 }
 
 } // namespace nx::vms::rules

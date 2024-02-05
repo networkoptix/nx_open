@@ -529,41 +529,64 @@ TEST_F(EngineTest, cacheTimeout)
 
     // Same cache events are matched after timeout.
     std::this_thread::sleep_for(5ms);
-    engine->eventCache()->cleanupOldEventsFromCache(1ms, 1ms);
+    auto& eventCache = const_cast<EventCache&>(engine->eventCache());
+    eventCache.cleanupOldEventsFromCache(1ms, 1ms);
     EXPECT_EQ(engine->processEvent(event), 1);
     EXPECT_EQ(engine->processEvent(event), 0);
 }
 
 TEST_F(EngineTest, cacheState)
 {
-    engine->registerEvent(TestEvent::manifest(), testEventConstructor);
+    engine->registerEventField(fieldMetatype<StateField>(), [] { return new StateField{}; });
+    EXPECT_TRUE(engine->registerEvent(
+        TestEventWithState::manifest(), [] { return new TestEventWithState{}; }));
 
-    // Both rules accept any event.
-    auto rule1 = std::make_unique<Rule>(QnUuid::createUuid(), engine.get());
-    rule1->addEventFilter(engine->buildEventFilter(utils::type<TestEvent>()));
-    engine->updateRule(serialize(rule1.get()));
+    // Make event filter that accept only events with a started state.
+    auto eventFilter = engine->buildEventFilter(utils::type<TestEventWithState>());
+    auto stateField = eventFilter->fieldByName<StateField>(utils::kStateFieldName);
+    stateField->setValue(State::started);
 
-    auto rule2 = std::make_unique<Rule>(QnUuid::createUuid(), engine.get());
-    rule2->addEventFilter(engine->buildEventFilter(utils::type<TestEvent>()));
-    engine->updateRule(serialize(rule2.get()));
+    auto rule = std::make_unique<Rule>(QnUuid::createUuid(), engine.get());
+    rule->addEventFilter(std::move(eventFilter));
 
-    auto event = TestEventPtr::create(std::chrono::microseconds::zero(), State::started);
+    // Register two identical rules.
+    engine->updateRule(serialize(rule.get()));
+    rule->setId(QnUuid::createUuid());
+    engine->updateRule(serialize(rule.get()));
+
+    auto event = TestEventWithStatePtr::create(std::chrono::microseconds::zero(), State::started);
 
     // Event state is cached.
     EXPECT_EQ(engine->processEvent(event), 2);
-    // As state is not changed, ignore the event.
+    EXPECT_TRUE(engine->runningEventWatcher().isRunning(event));
+    // As state is not changed, the event must be ignored.
     EXPECT_EQ(engine->processEvent(event), 0);
 
-    // New state must be handled and cached.
     event->setState(State::stopped);
-    EXPECT_EQ(engine->processEvent(event), 2);
-    // Cached state is ignored.
     EXPECT_EQ(engine->processEvent(event), 0);
+    // After the event is processed it must be removed from the event cache.
+    EXPECT_FALSE(engine->runningEventWatcher().isRunning(event));
+}
 
-    // State is not cached for the instant event.
-    event->setState(State::instant);
+TEST_F(EngineTest, instantEventsAreNotAddedToRunningEventWatcher)
+{
+    engine->registerEvent(TestEvent::manifest(), testEventConstructor);
+
+    // Makes rule accepted any event.
+    auto rule = std::make_unique<Rule>(QnUuid::createUuid(), engine.get());
+    rule->addEventFilter(engine->buildEventFilter(utils::type<TestEvent>()));
+
+    // Register two such rules.
+    engine->updateRule(serialize(rule.get()));
+    rule->setId(QnUuid::createUuid());
+    engine->updateRule(serialize(rule.get()));
+
+    auto event = TestEventPtr::create(std::chrono::microseconds::zero(), State::instant);
+
     EXPECT_EQ(engine->processEvent(event), 2);
+    EXPECT_FALSE(engine->runningEventWatcher().isRunning(event));
     EXPECT_EQ(engine->processEvent(event), 2);
+    EXPECT_FALSE(engine->runningEventWatcher().isRunning(event));
 }
 
 TEST_F(EngineTest, notStartedEventIsNotProcessed)

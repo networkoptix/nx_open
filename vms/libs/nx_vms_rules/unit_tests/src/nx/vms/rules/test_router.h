@@ -4,6 +4,7 @@
 
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/rules/router.h>
+#include <utils/common/synctime.h>
 
 namespace nx::vms::rules::test {
 
@@ -26,9 +27,10 @@ public:
 /** May be used for test fixture inheritance. */
 struct TestEngineHolder
 {
+    QnSyncTime syncTime;
     std::unique_ptr<Engine> engine;
 
-    TestEngineHolder(nx::vms::common::SystemContext* context):
+    explicit TestEngineHolder(nx::vms::common::SystemContext* context):
         engine(std::make_unique<Engine>(std::make_unique<TestRouter>()))
     {
         context->setVmsRulesEngine(engine.get());

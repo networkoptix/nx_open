@@ -6,7 +6,9 @@
 #include <nx/vms/api/types/event_rule_types.h>
 #include <nx/vms/rules/basic_event.h>
 #include <nx/vms/rules/camera_conflict_list.h>
+#include <nx/vms/rules/event_filter_fields/state_field.h>
 #include <nx/vms/rules/utils/event_details.h>
+#include <nx/vms/rules/utils/field.h>
 #include <nx/vms/rules/utils/type.h>
 
 namespace nx::vms::rules::test {
@@ -129,7 +131,34 @@ public:
     QString m_cacheKey;
 };
 
+class TestEventWithState : public nx::vms::rules::BasicEvent
+{
+    Q_OBJECT
+    Q_CLASSINFO("type", "nx.events.test.withState")
+
+public:
+    using BasicEvent::BasicEvent;
+
+    static ItemDescriptor manifest()
+    {
+        return ItemDescriptor{
+            .id = utils::type<TestEventWithState>(),
+            .displayName = "Test event with state",
+            .flags = {ItemFlag::prolonged},
+            .fields = {
+                makeFieldDescriptor<StateField>(utils::kStateFieldName, "State field", {})
+            }
+        };
+    }
+
+    QString resourceKey() const override
+    {
+        return {};
+    }
+};
+
 using SimpleEventPtr = QSharedPointer<SimpleEvent>;
 using TestEventPtr = QSharedPointer<TestEvent>;
+using TestEventWithStatePtr = QSharedPointer<TestEventWithState>;
 
 } // namespace nx::vms::rules::test

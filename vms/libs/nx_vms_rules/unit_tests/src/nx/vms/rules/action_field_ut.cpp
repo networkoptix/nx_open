@@ -6,15 +6,23 @@
 
 #include <QtCore/QString>
 
+#include <nx/vms/api/rules/rule.h>
 #include <nx/vms/common/test_support/test_context.h>
+#include <nx/vms/rules/action_builder.h>
 #include <nx/vms/rules/action_builder_fields/builtin_fields.h>
+#include <nx/vms/rules/action_executor.h>
 #include <nx/vms/rules/aggregated_event.h>
 #include <nx/vms/rules/engine.h>
+#include <nx/vms/rules/event_filter.h>
 #include <nx/vms/rules/event_filter_fields/builtin_fields.h>
 #include <nx/vms/rules/events/builtin_events.h>
+#include <nx/vms/rules/rule.h>
+#include <nx/vms/rules/utils/api.h>
 #include <nx/vms/rules/utils/event_parameter_helper.h>
 
+#include "test_action.h"
 #include "test_event.h"
+#include "test_infra.h"
 #include "test_router.h"
 
 namespace nx::vms::rules::test {
@@ -192,47 +200,68 @@ TEST_F(ActionFieldTest, EventStartTimeInstantEvent)
 
 TEST_F(ActionFieldTest, EventTimeProlongedEvent)
 {
-    TextWithFields fieldActiveStartTime(systemContext());
-    fieldActiveStartTime.setText("{event.time.start}");
+    engine->registerActionField(
+        fieldMetatype<TextWithFields>(), [this] { return new TextWithFields{systemContext()}; });
+    engine->registerAction(
+        TestActionWithTextWithFields::manifest(),
+        [] { return new TestActionWithTextWithFields{}; });
 
-    TextWithFields fieldActiveTime(systemContext());
-    fieldActiveTime.setText("{event.time}");
+    auto eventFilter = engine->buildEventFilter(utils::type<TestEvent>());
 
-    TextWithFields fieldActiveEndTime(systemContext());
-    fieldActiveEndTime.setText("{event.time.end}");
+    auto actionBuilder = engine->buildActionBuilder(utils::type<TestActionWithTextWithFields>());
+    auto textWithFieldsField =
+        actionBuilder->fieldByName<TextWithFields>(TestActionWithTextWithFields::kFieldName);
+    textWithFieldsField->setText(
+        QString{"{event.time.start}%1{event.time}%1{event.time.end}"}.arg("|"));
+
+    auto rule = std::make_unique<Rule>(QnUuid::createUuid(), engine.get());
+    rule->addEventFilter(std::move(eventFilter));
+    rule->addActionBuilder(std::move(actionBuilder));
+
+    engine->updateRule(serialize(rule.get()));
+
+    TestActionExecutor executor;
+    engine->addActionExecutor(utils::type<TestActionWithTextWithFields>(), &executor);
 
     auto eventStart = makeEvent(State::started);
     engine->processEvent(eventStart);
 
-    auto aggregatedEvent = AggregatedEventPtr::create(eventStart);
-    auto activeEventTime = fieldActiveTime.build(aggregatedEvent).toString();
-
-    // Event start time and timestamp are equal.
-    EXPECT_EQ(activeEventTime, fieldActiveStartTime.build(aggregatedEvent).toString());
-
-    // Event doesn't have end time yet.
-    EXPECT_TRUE(fieldActiveEndTime.build(aggregatedEvent).toString().isEmpty());
-
     auto eventEnd = makeEvent(State::stopped);
     engine->processEvent(eventEnd);
 
-    TextWithFields fieldInactiveStartTime(systemContext());
-    fieldInactiveStartTime.setText("{event.time.start}");
+    EXPECT_EQ(executor.actions.size(), 2);
 
-    TextWithFields fieldInactiveTime(systemContext());
-    fieldInactiveTime.setText("{event.time}");
+    struct Timestamps
+    {
+        QString startTime, activeTime, endTime;
 
-    TextWithFields fieldInactiveEndTime(systemContext());
-    fieldInactiveEndTime.setText("{event.time.end}");
+        static Timestamps fromAction(TestActionWithTextWithFields* action)
+        {
+            const auto split = action->m_text.split("|");
+            return Timestamps{split[0], split[1], split[2]};
+        }
+    };
 
-    aggregatedEvent = AggregatedEventPtr::create(eventEnd);
+    const auto startedAction =
+        dynamic_cast<TestActionWithTextWithFields*>(executor.actions.at(0).get());
+    const auto startedActionTimestamps = Timestamps::fromAction(startedAction);
 
-    // Start time is start of previous event.
-    EXPECT_EQ(activeEventTime, fieldInactiveStartTime.build(aggregatedEvent).toString());
+    EXPECT_TRUE(!startedActionTimestamps.startTime.isEmpty()
+        && !startedActionTimestamps.activeTime.isEmpty());
+    EXPECT_TRUE(startedActionTimestamps.endTime.isEmpty()); //< Event doesn't have end time yet.
+    // Started and active time are equal for the started entity.
+    EXPECT_EQ(startedActionTimestamps.startTime, startedActionTimestamps.activeTime);
 
-    // End time is time of current event.
-    EXPECT_EQ(fieldInactiveTime.build(aggregatedEvent).toString(),
-        fieldInactiveEndTime.build(aggregatedEvent).toString());
+    const auto stoppedAction =
+        dynamic_cast<TestActionWithTextWithFields*>(executor.actions.at(1).get());
+    const auto stoppedActionTimestamps = Timestamps::fromAction(stoppedAction);
+
+    EXPECT_TRUE(!stoppedActionTimestamps.startTime.isEmpty()
+        && !stoppedActionTimestamps.activeTime.isEmpty()
+        && !stoppedActionTimestamps.endTime.isEmpty());
+    EXPECT_EQ(stoppedActionTimestamps.startTime, startedActionTimestamps.startTime);
+    // End and active time are equal for the stopped entity.
+    EXPECT_EQ(stoppedActionTimestamps.activeTime, stoppedActionTimestamps.endTime);
 }
 
 TEST_F(ActionFieldTest, EventAttributes)

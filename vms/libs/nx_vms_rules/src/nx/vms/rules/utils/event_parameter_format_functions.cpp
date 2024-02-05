@@ -172,7 +172,7 @@ QString eventTimeStart(const AggregatedEventPtr& eventAggregator, common::System
             return eventTime(eventAggregator, context);
         case State::stopped:
             return nx::utils::timestampToISO8601(
-                context->vmsRulesEngine()->eventCache()->runningEventStartTimestamp(
+                context->vmsRulesEngine()->runningEventWatcher().startTime(
                     eventAggregator->initialEvent()));
         default:
             return {};
