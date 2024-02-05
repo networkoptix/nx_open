@@ -78,9 +78,11 @@ using core::NetworkManager;
 
 struct CloudLayoutsManager::Private
 {
+    using CloudStatus = core::CloudStatusWatcher::Status;
+
     CloudLayoutsManager* const q;
     QPointer<core::CloudStatusWatcher> cloudStatusWatcher = appContext()->cloudStatusWatcher();
-    bool online = false;
+    CloudStatus status = CloudStatus::Offline;
     std::unique_ptr<SystemContext> systemContext = std::make_unique<SystemContext>(
         SystemContext::Mode::cloudLayouts,
         appContext()->peerId(),
@@ -242,7 +244,7 @@ struct CloudLayoutsManager::Private
             nx::utils::guarded(q,
                 [this](NetworkManager::Response response)
                 {
-                    if (!online)
+                    if (status != CloudStatus::Online)
                         return;
 
                     if (!StatusCode::isSuccessCode(response.statusLine.statusCode))
@@ -408,25 +410,32 @@ struct CloudLayoutsManager::Private
         systemContext->resourcePool()->removeResource(layout);
     }
 
-    void setOnline(bool value)
+    void setCloudStatus(CloudStatus value)
     {
-        if (value == online)
+        if (value == status)
             return;
 
-        online = value;
-        if (value)
+        const auto oldStatus = value;
+        status = value;
+
+        if (status == CloudStatus::Online)
         {
             timer->start();
             ensureUser();
             updateLayouts();
         }
-        else
+        else if (status == CloudStatus::LoggedOut)
         {
             timer->stop();
             clearContext();
         }
+        else if (oldStatus == CloudStatus::Online && status == CloudStatus::Offline)
+        {
+            // There is no need to turn resource status offline. The servers and cameras may be
+            // still available via local network.
+            timer->stop();
+        }
     }
-
 };
 
 CloudLayoutsManager::CloudLayoutsManager(QObject* parent):
@@ -437,10 +446,9 @@ CloudLayoutsManager::CloudLayoutsManager(QObject* parent):
     connect(d->cloudStatusWatcher.data(),
         &core::CloudStatusWatcher::statusChanged,
         this,
-        [this]()
+        [this](Private::CloudStatus status)
         {
-            d->setOnline(
-                d->cloudStatusWatcher->status() == core::CloudStatusWatcher::Status::Online);
+            d->setCloudStatus(status);
         });
 
      appContext()->addSystemContext(d->systemContext.get());
