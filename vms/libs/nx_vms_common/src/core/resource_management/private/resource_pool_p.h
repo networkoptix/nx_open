@@ -47,6 +47,6 @@ public:
     std::atomic_bool hasIoModules{false};
     QSet<QnMediaServerResourcePtr> mediaServers;
     QSet<QnStorageResourcePtr> storages;
-    QMap<QString, QnNetworkResourcePtr> resourcesByPhysicalId;
+    QMap<QString, QnVirtualCameraResourcePtr> camerasByPhysicalId;
     std::unordered_map<QString, SameNameUsers> usersByName;
 };

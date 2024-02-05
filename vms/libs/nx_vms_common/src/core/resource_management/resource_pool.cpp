@@ -323,10 +323,10 @@ QnResourcePtr QnResourcePool::getResourceByUrl(
         });
 }
 
-QnNetworkResourcePtr QnResourcePool::getNetworkResourceByPhysicalId(const QString& physicalId) const
+QnVirtualCameraResourcePtr QnResourcePool::getCameraByPhysicalId(const QString& physicalId) const
 {
     NX_READ_LOCKER locker(&m_resourcesMutex);
-    return d->resourcesByPhysicalId.value(physicalId);
+    return d->camerasByPhysicalId.value(physicalId);
 }
 
 QnNetworkResourcePtr QnResourcePool::getResourceByMacAddress(const QString& mac) const
@@ -495,7 +495,7 @@ void QnResourcePool::clear()
         d->hasIoModules = false;
         d->mediaServers.clear();
         d->storages.clear();
-        d->resourcesByPhysicalId.clear();
+        d->camerasByPhysicalId.clear();
         d->usersByName.clear();
     }
 

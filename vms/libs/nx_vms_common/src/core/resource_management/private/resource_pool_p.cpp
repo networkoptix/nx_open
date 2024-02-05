@@ -30,7 +30,7 @@ void QnResourcePool::Private::handleResourceAdded(const QnResourcePtr& resource)
     }
     else if (const auto camera = resource.dynamicCast<QnVirtualCameraResource>())
     {
-        resourcesByPhysicalId.insert(camera->getPhysicalId(), camera);
+        camerasByPhysicalId.insert(camera->getPhysicalId(), camera);
         QObject::connect(camera.data(), &QnVirtualCameraResource::isIOModuleChanged, q,
             [this, camera]()
             {
@@ -76,7 +76,7 @@ void QnResourcePool::Private::handleResourceRemoved(const QnResourcePtr& resourc
     }
     else if (const auto camera = resource.dynamicCast<QnVirtualCameraResource>())
     {
-        resourcesByPhysicalId.remove(camera->getPhysicalId());
+        camerasByPhysicalId.remove(camera->getPhysicalId());
         camera->disconnect(q);
         ioModules.remove(camera);
         hasIoModules = !ioModules.isEmpty();

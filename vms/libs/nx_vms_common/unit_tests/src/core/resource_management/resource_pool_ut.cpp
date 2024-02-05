@@ -137,7 +137,7 @@ TEST_F(QnResourcePoolTest, findCameraTest)
     runThreads("physicalId", /*expectSuccess*/ true,
         [&](auto c) { return resourcePool()->getResourceByPhysicalId<QnNetworkResource>(c->getPhysicalId()); });
     runThreads("physicalId", /*expectSuccess*/ true,
-        [&](auto c) { return resourcePool()->getNetworkResourceByPhysicalId(c->getPhysicalId()); });
+        [&](auto c) { return resourcePool()->getCameraByPhysicalId(c->getPhysicalId()); });
     runThreads("logicalId", /*expectSuccess*/ true,
         [&](auto c) { return resourcePool()->getResourcesByLogicalId(c->logicalId()).at(0); });
     runThreads("MAC", /*expectSuccess*/ true,

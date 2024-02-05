@@ -131,7 +131,7 @@ QString QnRecordingStatsModel::displayData(const QModelIndex &index) const
                 return value.physicalId; //< We use value.physicalId as name for pseudo-cameras.
 
             return nx::utils::elideString(
-                QnResourceDisplayInfo(resourcePool()->getNetworkResourceByPhysicalId(value.physicalId))
+                QnResourceDisplayInfo(resourcePool()->getCameraByPhysicalId(value.physicalId))
                     .toString(appContext()->localSettings()->resourceInfoLevel()),
                 m_data.maxNameLength);
         }
@@ -209,18 +209,26 @@ QVariant QnRecordingStatsModel::data(const QModelIndex &index, int role) const
                 return QVariant();
 
             if (rowType == Totals)
-                return qnResIconCache->icon(QnResourceIconCache::Cameras | QnResourceIconCache::AlwaysSelected);
+            {
+                return qnResIconCache->icon(
+                    QnResourceIconCache::Cameras | QnResourceIconCache::AlwaysSelected);
+            }
 
             if (rowType == Normal)
-                return qnResIconCache->icon(resourcePool()->getNetworkResourceByPhysicalId(m_data.cameras[index.row()].physicalId));
+            {
+                return qnResIconCache->icon(
+                    resourcePool()->getCameraByPhysicalId(m_data.cameras[index.row()].physicalId));
+            }
 
             break;
         }
         case Qn::ResourceRole: //< This is used by QnResourceItemDelegate to draw contents.
         {
             if (rowType == Normal)
+            {
                 return QVariant::fromValue<QnResourcePtr>(
-                    resourcePool()->getNetworkResourceByPhysicalId(m_data.cameras[index.row()].physicalId));
+                    resourcePool()->getCameraByPhysicalId(m_data.cameras[index.row()].physicalId));
+            }
 
             break;
         }
