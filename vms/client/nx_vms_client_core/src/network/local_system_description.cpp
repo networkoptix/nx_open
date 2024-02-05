@@ -4,18 +4,18 @@
 
 #include <network/system_helpers.h>
 
-QnSystemDescription::PointerType QnLocalSystemDescription::createFactory(const QString& systemId)
+QnLocalSystemDescriptionPtr QnLocalSystemDescription::createFactory(const QString& systemId)
 {
-    return PointerType(static_cast<base_type*>(new QnLocalSystemDescription(systemId)));
+    return QnLocalSystemDescriptionPtr(new QnLocalSystemDescription(systemId));
 }
 
-QnSystemDescription::PointerType QnLocalSystemDescription::create(
+QnLocalSystemDescriptionPtr QnLocalSystemDescription::create(
     const QString& systemId,
     const QnUuid& localSystemId,
     const QString& systemName)
 {
-    return PointerType(static_cast<base_type*>(
-        new QnLocalSystemDescription(systemId, localSystemId, systemName)));
+    return QnLocalSystemDescriptionPtr(new QnLocalSystemDescription(
+        systemId, localSystemId, systemName));
 }
 
 QnLocalSystemDescription::QnLocalSystemDescription(const QString& systemId):

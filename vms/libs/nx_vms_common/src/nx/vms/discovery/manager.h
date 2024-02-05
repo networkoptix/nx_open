@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <map>
-#include <memory>
 #include <optional>
 
 #include <QtCore/QObject>
@@ -12,15 +10,10 @@
 #include <nx/network/retry_timer.h>
 #include <nx/network/socket_common.h>
 #include <nx/utils/impl_ptr.h>
-#include <nx/utils/thread/mutex.h>
 #include <nx/utils/url.h>
 #include <nx/vms/api/data/module_information.h>
 
 namespace nx::vms::discovery {
-
-class DeprecatedMulticastFinder;
-class ModuleConnector;
-class UdpMulticastFinder;
 
 struct NX_VMS_COMMON_API ModuleEndpoint: api::ModuleInformationWithAddresses
 {
@@ -29,7 +22,8 @@ struct NX_VMS_COMMON_API ModuleEndpoint: api::ModuleInformationWithAddresses
     ModuleEndpoint(
         api::ModuleInformationWithAddresses old = {},
         nx::network::SocketAddress endpoint = {});
-    bool operator==(const ModuleEndpoint& rhs) const;
+
+    bool operator==(const ModuleEndpoint& rhs) const = default;
 };
 
 /**
