@@ -38,17 +38,21 @@ FocusScope
         control.editingStarted()
         editor.value = model.display
         isEditing = true
-        editor.setFocus()
+        editor.startEditing()
     }
 
     function commit()
     {
-        const valueChanged = editor.value !== model.display
         const previousValue = model.display
-        model.edit = editor.value
+        const newValue = editor.value
+
         isEditing = false
-        if (valueChanged)
-            control.valueChanged(model.edit, previousValue)
+
+        if (previousValue === newValue)
+            return
+
+        model.edit = newValue
+        control.valueChanged(newValue, previousValue)
     }
 
     function revert(valueRevertTo)
