@@ -50,15 +50,20 @@ public:
     public: Ptr<const IStringMap> params() const { return Ptr(getParams()); }
 
     /**
-     * Data returned to the Server after the Action has been executed. Only one of the strings can
-     * be set non-empty.
+     * Data returned to the Server after the Action has been executed.
      */
     struct Result
     {
-        /** If neither null nor empty, the Client will open this URL in an embedded browser. */
+        /**
+         * URL to be opened by the Client in an embedded browser, or a null or empty string. If
+         * non-empty, messageToUser must be null or empty.
+         */
         Ptr<IString> actionUrl;
 
-        /** If neither null nor empty, the Client will show this text to the user. */
+        /**
+         * Text to be shown to the user by the Client, or a null or empty string. If non-empty,
+         * actionUrl must be null or empty.
+         */
         Ptr<IString> messageToUser;
     };
 };
