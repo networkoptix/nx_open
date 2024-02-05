@@ -332,7 +332,7 @@ void initialize(Manager* manager, Action* root)
         .mode(DesktopMode)
         .text(ContextMenu::tr("Connect to Server..."))
         .conditionalText(ContextMenu::tr("Connect to Another Server..."),
-            condition::isLoggedIn())
+            condition::isLoggedIn() && condition::homeTabIsNotActive())
         .shortcut("Ctrl+Shift+C")
         .condition(!condition::showreelIsRunning());
 
@@ -344,14 +344,14 @@ void initialize(Manager* manager, Action* root)
         .mode(DesktopMode)
         .text(ContextMenu::tr("Disconnect from Server"))
         .shortcut("Ctrl+Shift+D")
-        .condition(condition::isLoggedIn());
+        .condition(condition::isLoggedIn() && condition::homeTabIsNotActive());
 
     factory(ResourcesModeAction)
         .flags(Main)
         .mode(DesktopMode)
         .text(ContextMenu::tr("Browse Local Files"))
         .toggledText(ContextMenu::tr("Show Welcome Screen"))
-        .condition(!condition::isLoggedIn());
+        .condition(!condition::isLoggedIn() && condition::homeTabIsNotActive());
 
     factory()
         .flags(Main | Tree)
@@ -360,7 +360,8 @@ void initialize(Manager* manager, Action* root)
     factory()
         .flags(Main | TitleBar | Tree | SingleTarget | ResourceTarget)
         .text(ContextMenu::tr("New"))
-        .condition(condition::isLoggedIn(/*defaultVisibility*/ DisabledAction));
+        .condition(condition::isLoggedIn(/*defaultVisibility*/ DisabledAction)
+            && condition::homeTabIsNotActive(/*defaultVisibility*/ DisabledAction));
 
     factory.beginSubMenu();
     {
@@ -446,7 +447,7 @@ void initialize(Manager* manager, Action* root)
         .flags(Main | Tree | Scene)
         .mode(DesktopMode)
         .text(ContextMenu::tr("Open"))
-        .condition(!condition::showreelIsRunning());
+        .condition(!condition::showreelIsRunning() && condition::homeTabIsNotActive());
 
     factory.beginSubMenu();
     {
@@ -614,7 +615,8 @@ void initialize(Manager* manager, Action* root)
         .condition(
             condition::treeNodeType({ResourceTree::NodeType::currentSystem,
                 ResourceTree::NodeType::servers, ResourceTree::NodeType::camerasAndDevices})
-            && !condition::showreelIsRunning());
+            && !condition::showreelIsRunning()
+            && condition::homeTabIsNotActive());
 
     factory(SystemUpdateAction)
         .flags(NoTarget)
@@ -629,7 +631,8 @@ void initialize(Manager* manager, Action* root)
         .flags(Main | Tree)
         .requiredPowerUserPermissions()
         .text(ContextMenu::tr("User Management..."))
-        .condition(condition::treeNodeType(ResourceTree::NodeType::users));
+        .condition(condition::treeNodeType(ResourceTree::NodeType::users)
+            && condition::homeTabIsNotActive());
 
     factory(OpenLookupListsDialogAction)
         .flags(Main)
@@ -655,7 +658,8 @@ void initialize(Manager* manager, Action* root)
     factory(OpenAuditLogAction)
         .flags(Main)
         .requiredPowerUserPermissions()
-        .text(ContextMenu::tr("Audit Trail..."));
+        .text(ContextMenu::tr("Audit Trail..."))
+        .condition(condition::homeTabIsNotActive());
 
     factory(OpenBookmarksSearchAction)
         .flags(Main | GlobalHotkey)
@@ -664,7 +668,8 @@ void initialize(Manager* manager, Action* root)
         .shortcut("Ctrl+B")
         .condition(
             condition::isDeviceAccessRelevant(nx::vms::api::AccessRight::viewBookmarks)
-            && !condition::showreelIsRunning());
+            && !condition::showreelIsRunning()
+            && condition::homeTabIsNotActive());
 
     factory(OpenIntegrationsAction)
         .flags(NoTarget)
@@ -734,7 +739,8 @@ void initialize(Manager* manager, Action* root)
 
     factory()
         .flags(Main | Tree)
-        .text(ContextMenu::tr("Add"));
+        .text(ContextMenu::tr("Add"))
+        .condition(condition::homeTabIsNotActive());
 
     factory.beginSubMenu();
     {
@@ -801,6 +807,7 @@ void initialize(Manager* manager, Action* root)
             condition::treeNodeType({ResourceTree::NodeType::currentSystem,
                 ResourceTree::NodeType::servers, ResourceTree::NodeType::camerasAndDevices})
             && ConditionWrapper(new RequiresAdministratorCondition())
+            && condition::homeTabIsNotActive()
         );
 
     // TODO: Implement proxy actions to allow the same action to be shown in different locations.
@@ -827,7 +834,8 @@ void initialize(Manager* manager, Action* root)
         .flags(Main | NoTarget)
         .mode(DesktopMode)
         .text(ContextMenu::tr("Import From Devices..."))
-        .condition(condition::isDeviceAccessRelevant(nx::vms::api::AccessRight::edit));
+        .condition(condition::isDeviceAccessRelevant(nx::vms::api::AccessRight::edit)
+            && condition::homeTabIsNotActive());
 
     factory()
         .flags(Main)
@@ -858,7 +866,9 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Save Window Configuration"))
         .conditionalText(ContextMenu::tr("Save Windows Configuration"),
             condition::hasOtherWindowsInSession())
-        .condition(condition::isLoggedIn() && !condition::hasSavedWindowsState());
+        .condition(condition::isLoggedIn()
+            && !condition::hasSavedWindowsState()
+            && condition::homeTabIsNotActive());
 
     factory()
         .flags(Main)
