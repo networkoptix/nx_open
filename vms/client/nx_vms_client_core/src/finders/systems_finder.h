@@ -19,7 +19,7 @@ class NX_VMS_CLIENT_CORE_API QnSystemsFinder: public QnAbstractSystemsFinder
 
 public:
     explicit QnSystemsFinder(QObject* parent = nullptr);
-    virtual ~QnSystemsFinder();
+    virtual ~QnSystemsFinder() override;
 
     void addSystemsFinder(QnAbstractSystemsFinder* finder, int priority);
 
@@ -33,32 +33,14 @@ private:
     void onBaseSystemDiscovered(const QnSystemDescriptionPtr& system, int priority);
     void onSystemLost(const QString& systemId, int priority);
 
-public:
-    // LocalID is not a unique system ID. A user can have multiple systems locally (for example, for
-    // QA purposes), and each of them can be linked to the cloud under a different Cloud ID. There
-    // are different ways to do this, such as cloning a virtual machine with a system installed. We
-    // will use a pair of locaID and CloudID to uniquely identify a system tile.
-    struct SystemTileId
-    {
-        QnUuid localId;
-        QString cloudId;
-
-        bool operator==(const SystemTileId&) const = default;
-    };
-
 private:
     using SystemsFinderList = QMap<QnAbstractSystemsFinder*, nx::utils::ScopedConnectionsPtr>;
     using AggregatorPtr = QSharedPointer<QnSystemDescriptionAggregator>;
-    using AggregatorsList = QHash<SystemTileId, AggregatorPtr>;
+    using AggregatorsList = QHash<QnUuid, AggregatorPtr>;
 
     SystemsFinderList m_finders;
     AggregatorsList m_systems;
     QHash<QString, QnUuid> m_systemToLocalId;
 };
-
-inline size_t qHash(const QnSystemsFinder::SystemTileId& key, size_t seed = 0)
-{
-    return qHashMulti(seed, key.localId, key.cloudId);
-}
 
 #define qnSystemsFinder QnSystemsFinder::instance()
