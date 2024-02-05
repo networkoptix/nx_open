@@ -1708,8 +1708,7 @@ ActionVisibility DesktopCameraCondition::check(const Parameters& /*parameters*/,
 
         /* Do not check real pointer type to speed up check. */
         const auto desktopCamera =
-            context->workbenchContext()->resourcePool()->getNetworkResourceByPhysicalId(
-                desktopCameraId);
+            context->workbenchContext()->resourcePool()->getCameraByPhysicalId(desktopCameraId);
         if (desktopCamera && desktopCamera->hasFlags(Qn::desktop_camera))
             return EnabledAction;
 

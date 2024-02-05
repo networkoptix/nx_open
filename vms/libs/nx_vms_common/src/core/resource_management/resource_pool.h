@@ -254,7 +254,7 @@ public:
     template<class Resource>
     QnSharedResourcePointer<Resource> getResourceByPhysicalId(const QString& id) const
     {
-        return getNetworkResourceByPhysicalId(id).dynamicCast<Resource>();
+        return getCameraByPhysicalId(id).dynamicCast<Resource>();
     }
 
     template<class Resource>
@@ -284,7 +284,7 @@ public:
     QnResourcePtr getResourceByUrl(
         const QString& url, const QnUuid& parentServerId = QnUuid()) const;
 
-    QnNetworkResourcePtr getNetworkResourceByPhysicalId(const QString& physicalId) const;
+    QnVirtualCameraResourcePtr getCameraByPhysicalId(const QString& physicalId) const;
     QnNetworkResourcePtr getResourceByMacAddress(const QString& mac) const;
 
     QnUserResourcePtr getAdministrator() const;

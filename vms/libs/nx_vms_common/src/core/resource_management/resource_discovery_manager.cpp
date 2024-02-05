@@ -400,7 +400,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
             case DiscoveryMode::partiallyEnabled:
                 if (auto networkResource = it->first.dynamicCast<QnNetworkResource>())
                 {
-                    if (!resPool->getNetworkResourceByPhysicalId(networkResource->getPhysicalId()))
+                    if (!resPool->getCameraByPhysicalId(networkResource->getPhysicalId()))
                         continue;   //ignoring newly discovered camera
                 }
                 it->first->addFlags(Qn::search_upd_only);
@@ -432,7 +432,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
         }
 
         //if camera is already in resource pool and it was added manually, then ignoring it...
-        QnNetworkResourcePtr existingRes = resPool->getNetworkResourceByPhysicalId( camRes->getPhysicalId() );
+        QnNetworkResourcePtr existingRes = resPool->getCameraByPhysicalId(camRes->getPhysicalId());
         if( existingRes )
         {
 
@@ -511,7 +511,7 @@ bool QnResourceDiscoveryManager::processDiscoveredResources(QnResourceList& reso
             continue;
         }
 
-        auto existingResource = resPool->getNetworkResourceByPhysicalId(newNetworkResource->getPhysicalId());
+        auto existingResource = resPool->getCameraByPhysicalId(newNetworkResource->getPhysicalId());
         if (existingResource)
         {
             existingResource->mergeResourcesIfNeeded(newNetworkResource);
