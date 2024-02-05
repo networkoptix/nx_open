@@ -37,13 +37,14 @@ QList<int> RowCheckModel::checkedRows() const
 
 void RowCheckModel::setSourceModel(QAbstractItemModel* sourceModel)
 {
+    beginResetModel();
+
     m_checkedRows.clear();
-
-    base_type::setSourceModel(sourceModel);
-
     emit checkedRowsChanged();
 
     m_connections.reset();
+
+    base_type::setSourceModel(sourceModel);
 
     m_connections <<
         connect(sourceModel, &QAbstractItemModel::modelAboutToBeReset, this,
@@ -175,6 +176,8 @@ void RowCheckModel::setSourceModel(QAbstractItemModel* sourceModel)
             {
                 emit headerDataChanged(orientation, first + 1, last + 1);
             });
+
+    endResetModel();
 }
 
 QVariant RowCheckModel::headerData(int section, Qt::Orientation orientation, int role) const

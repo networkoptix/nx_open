@@ -21,10 +21,13 @@ TableView
         return column === 0
     }
 
-    model: RowCheckModel
+    model: SortFilterProxyModel
     {
-        id: rowCheckModel
-        sourceModel: root.sourceModel
+        sourceModel: RowCheckModel
+        {
+            id: rowCheckModel
+            sourceModel: root.sourceModel
+        }
     }
 
     headerDelegate: DelegateChooser
@@ -34,7 +37,7 @@ TableView
             index: 0
             CheckableHeaderButton
             {
-                model: root.model
+                model: rowCheckModel
                 width: root.columnWidthProvider(index)
             }
         }

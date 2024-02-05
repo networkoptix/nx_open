@@ -269,10 +269,7 @@ Dialog
             LookupListTable
             {
                 id: tableView
-                sourceModel: SortFilterProxyModel
-                {
-                    sourceModel: entriesModel
-                }
+                sourceModel: entriesModel
                 taxonomy: control.taxonomy
                 onEditingChanged: control.editing = tableView.editing
                 onValueChanged: hasChanges = true

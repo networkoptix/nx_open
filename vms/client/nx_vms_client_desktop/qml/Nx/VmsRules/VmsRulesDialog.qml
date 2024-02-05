@@ -162,8 +162,8 @@ Dialog
                     {
                         onDoubleClicked:
                         {
-                            root.dialog.editRule(rulesSortFilterModel.data(
-                                rulesSortFilterModel.index(row, column), RulesTableModel.RuleIdRole))
+                            root.dialog.editRule(tableView.model.data(
+                                tableView.model.index(row, column), RulesTableModel.RuleIdRole))
                         }
                     }
                 }

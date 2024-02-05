@@ -20,14 +20,22 @@ Control
 
     property bool isGeneric: !objectType
     property string value
+    property bool editing: false
 
     signal editingStarted
     signal editingFinished
 
-    function setFocus()
+    function startEditing()
     {
-        control.editingStarted()
+        editing = true
         loader.item.forceActiveFocus()
+        editingStarted()
+    }
+
+    function finishEditing()
+    {
+        editing = false
+        editingFinished()
     }
 
     component ComboBoxBasedEditor: ComboBox
@@ -40,17 +48,16 @@ Control
 
         onActivated: (index) =>
         {
-            control.editingStarted()
             control.value = index ? valueAt(index) : qsTr("Any %1").arg(attribute.name)
-            control.editingFinished()
+            control.finishEditing()
         }
 
         Component.onCompleted: currentIndex = indexOfValue(control.value)
 
         onActiveFocusChanged:
         {
-            if (!activeFocus)
-                control.editingFinished()
+            if (!activeFocus && control.editing)
+                control.finishEditing()
         }
     }
 
@@ -70,7 +77,7 @@ Control
             onEditingFinished:
             {
                 if (!contextMenuOpening)
-                    control.editingFinished()
+                    control.finishEditing()
             }
 
             Component.onCompleted: text = control.value
@@ -100,7 +107,7 @@ Control
             onEditingFinished:
             {
                 if (!contextMenuOpening)
-                    control.editingFinished()
+                    control.finishEditing()
             }
             Component.onCompleted: setValue(control.value)
         }
