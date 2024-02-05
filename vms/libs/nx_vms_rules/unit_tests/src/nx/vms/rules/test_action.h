@@ -4,11 +4,10 @@
 
 #include <nx/vms/rules/action_builder_fields/target_device_field.h>
 #include <nx/vms/rules/action_builder_fields/target_user_field.h>
+#include <nx/vms/rules/action_builder_fields/text_with_fields.h>
 #include <nx/vms/rules/basic_action.h>
 #include <nx/vms/rules/utils/field.h>
 #include <nx/vms/rules/utils/type.h>
-
-#include "test_field.h"
 
 namespace nx::vms::rules::test {
 
@@ -150,6 +149,30 @@ public:
 
 public:
     nx::vms::rules::UuidSelection m_users;
+};
+
+class TestActionWithTextWithFields: public nx::vms::rules::BasicAction
+{
+    Q_OBJECT
+    Q_CLASSINFO("type", "nx.actions.test.withTextWithFields")
+
+    Q_PROPERTY(QString text MEMBER m_text)
+
+public:
+    static constexpr auto kFieldName = "text";
+    static ItemDescriptor manifest()
+    {
+        return ItemDescriptor{
+            .id = utils::type<TestActionWithTextWithFields>(),
+            .displayName = "Test action for text with fields",
+            .flags = {ItemFlag::prolonged},
+            .fields = {
+                makeFieldDescriptor<TextWithFields>(kFieldName, tr("Text with fields"))
+            }
+        };
+    }
+
+    QString m_text;
 };
 
 } // namespace nx::vms::rules::test

@@ -19,6 +19,7 @@
 
 #include "event_cache.h"
 #include "rules_fwd.h"
+#include "running_event_watcher.h"
 
 namespace nx::vms::api::rules {
 struct ActionBuilder;
@@ -156,7 +157,8 @@ public:
     /** Processes incoming analytics events and returns matched rule count. */
     size_t processAnalyticsEvents(const std::vector<EventPtr>& events);
 
-    EventCache* eventCache() const;
+    const EventCache& eventCache() const;
+    const RunningEventWatcher& runningEventWatcher() const;
 
     void toggleTimer(nx::utils::TimerEventHandler* handler, bool on);
 
@@ -187,6 +189,10 @@ public: // Declare following methods public for testing purposes.
 private:
     // Assuming cache access and event processing are in the same thread.
     void checkOwnThread() const;
+
+    // Check whether the given event should be processed. The method is checking if the event is
+    // not cached, and if the event is prolonged, it checks that it has a valid state.
+    bool checkEvent(const EventPtr& event) const;
 
     std::unique_ptr<Rule> buildRule(const api::Rule& ruleData) const;
     std::unique_ptr<Rule> cloneRule(const Rule* rule) const;
@@ -239,7 +245,8 @@ private:
     QSet<nx::utils::TimerEventHandler*> m_timerHandlers;
 
     // All the fields below should be used by Engine's thread only.
-    std::unique_ptr<EventCache> m_eventCache;
+    EventCache m_eventCache;
+    RunningEventWatcher m_runningEventWatcher;
 
     QTimer* m_aggregationTimer;
 };
