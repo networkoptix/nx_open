@@ -258,18 +258,29 @@ struct NX_VMS_API BookmarkTagFilter
 #define BookmarkTagFilter_Fields (limit)
 QN_FUSION_DECLARE_FUNCTIONS(BookmarkTagFilter, (json), NX_VMS_API)
 
-struct NX_VMS_API BookmarkDescriptionRequest: BookmarkIdV3
+struct NX_VMS_API BookmarkProtection
 {
-    using BookmarkIdV3::BookmarkIdV3;
+    static QString getDigest(QnUuid bookmarkId, const QString& password);
+    static QString getProtection(const QString& digest, std::chrono::milliseconds syncTime);
+    static std::chrono::milliseconds getSyncTime(const QString& protection);
+
     /**%apidoc[opt]
      * Password protection used to authenticate the request if the Bookmark is password protected.
      * Should be set to:
-     *   synchronizedTimeMs + ":" + SHA256(SHA256(bookmarkId + password) + synchronizedTimeMs)
+     *   synchronizedTimeMs + ":" +
+     *      BASE64(SHA256(BASE64(SHA256(bookmarkId + password)) + synchronizedTimeMs))
      *   Where synchronizedTimeMs should be obtained from /rest/v4/site/info
+     * Call will fail with
      */
-    std::optional<QString> passwordProtection;
+    QString passwordProtection;
+};
+
+struct NX_VMS_API BookmarkDescriptionRequest: BookmarkIdV3, BookmarkProtection
+{
+    using BookmarkIdV3::BookmarkIdV3;
 };
 #define BookmarkDescriptionRequest_Fields BookmarkIdV3_Fields (passwordProtection)
+NX_REFLECTION_INSTRUMENT(BookmarkDescriptionRequest, BookmarkDescriptionRequest_Fields);
 QN_FUSION_DECLARE_FUNCTIONS(BookmarkDescriptionRequest, (json), NX_VMS_API)
 
 using BookmarkTagCounts = Map<QString /*tag*/, int /*count*/>;

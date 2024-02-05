@@ -126,7 +126,7 @@ struct NX_VMS_API BookmarkStreamSettings: public StreamSettings
      *   synchronizedTimeMs + ":" + SHA256(SHA256(bookmarkId + password) + synchronizedTimeMs)
      *   Where synchronizedTimeMs should be obtained from /rest/v4/site/info
      */
-    std::optional<std::string> passwordProtection;
+    QString passwordProtection;
 };
 #define BookmarkStreamSettings_Fields StreamSettings_Fields(bookmarkId)(passwordProtection)
 QN_FUSION_DECLARE_FUNCTIONS(BookmarkStreamSettings, (json), NX_VMS_API)
