@@ -8,9 +8,21 @@
 
 #include <analytics/db/analytics_db_types.h>
 
+/**
+ * NOTE: Corresponds to struct IAction::Result.
+ */
 struct NX_VMS_COMMON_API AnalyticsActionResult
 {
+    /**%apidoc
+     * URL to be opened by the Client in an embedded browser, or a null or empty string. If
+     * non-empty, messageToUser must be null or empty.
+     */
     QString actionUrl;
+
+    /**%apidoc
+     * Text to be shown to the user by the Client, or a null or empty string. If non-empty,
+     * actionUrl must be null or empty.
+     */
     QString messageToUser;
 };
 #define AnalyticsActionResult_Fields (actionUrl)(messageToUser)
