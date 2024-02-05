@@ -168,7 +168,7 @@ void Parser::handleFrame()
         }
     }
 
-    m_frameHandler(m_firstFrame ? m_opCode : FrameType::continuation, m_frameBuffer, m_fin);
+    m_frameHandler(m_firstFrame ? m_opCode : FrameType::continuation, std::move(m_frameBuffer), m_fin);
     m_frameBuffer.clear();
 
     if (m_firstFrame)

@@ -12,17 +12,12 @@ int MultiBuffer::size() const
     return m_buffers.back().locked ? (int)m_buffers.size() : (int)m_buffers.size() - 1;
 }
 
-void MultiBuffer::append(const nx::Buffer& buf)
-{
-    append(buf.data(), buf.size());
-}
-
-void MultiBuffer::append(const char* data, int size)
+void MultiBuffer::append(nx::Buffer&& buf, FrameType type)
 {
     if (m_buffers.empty() || m_buffers.back().locked)
-        m_buffers.emplace_back();
-
-    m_buffers.back().buffer.append(data, size);
+        m_buffers.emplace_back(Frame{std::move(buf), type});
+    else
+        m_buffers.back().frame.buffer.append(buf.data(), buf.size()); //< No check for type change.
 }
 
 void MultiBuffer::lock()
@@ -33,23 +28,23 @@ void MultiBuffer::lock()
     m_buffers.back().locked = true;
 }
 
-nx::Buffer MultiBuffer::popFront()
+Frame MultiBuffer::popFront()
 {
     if (m_buffers.empty() || !m_buffers.front().locked)
-        return nx::Buffer();
+        return Frame();
 
-    nx::Buffer result = std::move(m_buffers.front().buffer);
+    auto result = std::move(m_buffers.front().frame);
     m_buffers.pop_front();
 
     return result;
 }
 
-nx::Buffer MultiBuffer::popBack()
+Frame MultiBuffer::popBack()
 {
     if (m_buffers.empty() || !m_buffers.back().locked)
-        return nx::Buffer();
+        return Frame();
 
-    nx::Buffer result = std::move(m_buffers.back().buffer);
+    auto result = std::move(m_buffers.back().frame);
     m_buffers.pop_back();
 
     return result;
@@ -70,7 +65,7 @@ void MultiBuffer::clearLast()
     if (m_buffers.empty())
         return;
 
-    m_buffers.back().buffer.clear();
+    m_buffers.back().frame.buffer.clear();
     m_buffers.back().locked = false;
 }
 

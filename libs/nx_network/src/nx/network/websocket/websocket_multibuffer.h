@@ -6,7 +6,15 @@
 
 #include <nx/utils/buffer.h>
 
+#include "websocket_common_types.h"
+
 namespace nx::network::websocket {
+
+struct Frame
+{
+    nx::Buffer buffer;
+    FrameType type = FrameType::text;
+};
 
 /**
  * Multi-frame(message) buffer. Represents a deque (queue) of buffers.
@@ -17,10 +25,10 @@ class NX_NETWORK_API MultiBuffer
 {
     struct LockableBuffer
     {
-        nx::Buffer buffer;
+        Frame frame;
         bool locked;
 
-        LockableBuffer() : locked(false) {}
+        LockableBuffer(Frame&& frame): frame(std::move(frame)), locked(false) {}
     };
 
     using BuffersType = std::deque<LockableBuffer>;
@@ -28,14 +36,13 @@ class NX_NETWORK_API MultiBuffer
 public:
     int size() const;
 
-    void append(const nx::Buffer& buf);
-    void append(const char* data, int size);
+    void append(nx::Buffer&& buf, FrameType type = FrameType::text);
 
     void lock();
     bool locked() const;
 
-    nx::Buffer popBack();
-    nx::Buffer popFront();
+    Frame popBack();
+    Frame popFront();
 
     void clear();
     void clearLast();
