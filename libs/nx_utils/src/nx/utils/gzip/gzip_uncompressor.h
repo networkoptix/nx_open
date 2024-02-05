@@ -12,7 +12,15 @@ namespace nx::utils::bstream::gzip {
 class NX_UTILS_API Uncompressor: public AbstractByteStreamFilter
 {
 public:
-    Uncompressor(const std::shared_ptr<AbstractByteStreamFilter>& nextFilter = nullptr);
+    enum class Method
+    {
+        gzip,
+        deflate
+    };
+public:
+    Uncompressor(
+        const std::shared_ptr<AbstractByteStreamFilter>& nextFilter = nullptr,
+        Method method = Method::gzip);
     virtual ~Uncompressor() override;
 
     virtual bool processData(const ConstBufferRefType& data) override;
