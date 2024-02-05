@@ -1,11 +1,13 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "websocket_parser.h"
-#include <nx/network/socket_common.h>
-#include <nx/utils/gzip/gzip_compressor.h>
 
 #include <algorithm>
+
 #include <stdint.h>
+
+#include <nx/network/socket_common.h>
+#include <nx/utils/gzip/gzip_compressor.h>
 
 namespace nx::network::websocket {
 
@@ -16,7 +18,8 @@ Parser::Parser(Role role, GotFrameHandler handler):
         [this] (const nx::Buffer& data)
         {
             this->m_uncompressed += data;
-        }))
+        }),
+        nx::utils::bstream::gzip::Uncompressor::Method::deflate)
 {
 }
 
