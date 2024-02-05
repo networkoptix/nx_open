@@ -8,6 +8,7 @@
 namespace nx::utils::bstream::gzip {
 
 static constexpr int kOutputBufferSize = 16 * 1024;
+static constexpr int kDeflateWindowSize = 15; //< Max window size.
 
 class Uncompressor::Private
 {
@@ -23,14 +24,19 @@ public:
     State state = State::init;
     z_stream zStream;
     Buffer outputBuffer;
+    Method method = Method::gzip;
 };
 
-Uncompressor::Uncompressor(const std::shared_ptr<AbstractByteStreamFilter>& nextFilter):
+Uncompressor::Uncompressor(
+    const std::shared_ptr<AbstractByteStreamFilter>& nextFilter,
+    Method method)
+    :
     AbstractByteStreamFilter(nextFilter),
     d(new Private())
 {
     memset(&d->zStream, 0, sizeof(d->zStream));
     d->outputBuffer.resize(kOutputBufferSize);
+    d->method = method;
 }
 
 Uncompressor::~Uncompressor()
@@ -61,7 +67,9 @@ bool Uncompressor::processData(const ConstBufferRefType& data)
                 // 32 is added for automatic zlib header detection, see
                 // http://www.zlib.net/manual.html#Advanced.
                 inflateEnd(&d->zStream);
-                zResult = inflateInit2(&d->zStream, 32 + MAX_WBITS);
+                zResult = inflateInit2(
+                    &d->zStream,
+                    d->method == Method::gzip ? (32 + MAX_WBITS) : -kDeflateWindowSize);
                 NX_ASSERT(zResult == Z_OK);
                 d->state = Private::State::inProgress;
                 continue;
