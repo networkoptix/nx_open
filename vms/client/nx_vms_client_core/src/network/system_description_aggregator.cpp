@@ -93,8 +93,17 @@ void QnSystemDescriptionAggregator::mergeSystem(int priority,
     if (!system)
         return;
 
-    if (m_systems.contains(priority))
+    if (const auto it = m_systems.find(priority); it != m_systems.end())
+    {
+        const auto oldSystem = *it;
+
+        // VMS-43161: There may be multiple cloud systems with the same local id.
+        // Ignoring the offline systems in this case.
+        if (oldSystem->id() != system->id() && oldSystem->isOnline() && !system->isOnline())
+            return;
+
         removeSystem(m_systems[priority]->id(), priority, /*isMerge*/ true);
+    }
 
     m_systems.insert(priority, system);
 
@@ -192,7 +201,7 @@ void QnSystemDescriptionAggregator::removeSystem(
 
     const auto& system = m_systems[priority];
 
-    if (system->id() != systemId)
+    if (system->id() != systemId && !isMerge)
         return;
 
     disconnect(system.data(), nullptr, this, nullptr);
