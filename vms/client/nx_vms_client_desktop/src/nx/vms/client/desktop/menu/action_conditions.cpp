@@ -43,6 +43,7 @@
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/desktop/cross_system/cross_system_layout_resource.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/joystick/settings/manager.h>
 #include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/network/cloud_url_validator.h>
@@ -75,6 +76,7 @@
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/widgets/main_window.h>
+#include <ui/widgets/main_window_title_bar_state.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>
@@ -2531,6 +2533,21 @@ ConditionWrapper isWebPage()
 ConditionWrapper isWebPageOrIntegration()
 {
     return hasWebPageSubtype(std::nullopt);
+}
+
+ConditionWrapper homeTabIsNotActive(ActionVisibility defaultVisibility)
+{
+    return new CustomCondition(
+        [defaultVisibility](const Parameters& /*parameters*/, WindowContext* context)
+        {
+            if (!ini().enableMultiSystemTabBar)
+                return EnabledAction;
+
+            const auto mainWindow = qobject_cast<MainWindow*>(context->mainWindowWidget());
+            return mainWindow->titleBarStateStore()->isHomeTabActive()
+                ? defaultVisibility
+                : EnabledAction;
+        });
 }
 
 } // namespace condition

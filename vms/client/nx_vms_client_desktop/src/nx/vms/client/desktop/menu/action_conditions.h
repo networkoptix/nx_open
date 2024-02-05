@@ -753,6 +753,11 @@ ConditionWrapper isIntegration();
  */
 ConditionWrapper isWebPageOrIntegration();
 
+/**
+ * Check if the Home tab is not active in multi-system mode.
+ */
+ConditionWrapper homeTabIsNotActive(ActionVisibility defaultVisibility = InvisibleAction);
+
 } // namespace condition
 
 } // namespace menu
