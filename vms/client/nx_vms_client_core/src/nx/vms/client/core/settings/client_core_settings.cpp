@@ -197,8 +197,9 @@ void Settings::removeRecentConnection(const QnUuid& localSystemId)
     NX_VERBOSE(NX_SCOPE_TAG, "Removing recent system connection id: %1", localSystemId);
 
     auto connections = recentLocalConnections();
-    connections.remove(localSystemId);
-    recentLocalConnections = connections;
+
+    if (connections.remove(localSystemId))
+        recentLocalConnections = connections;
 }
 
 void Settings::migrateOldSettings()

@@ -10,9 +10,11 @@ class NX_VMS_CLIENT_CORE_API QnLocalSystemDescription: public QnSystemDescriptio
     using base_type = QnSystemDescription;
 
 public:
-    static PointerType createFactory(const QString& systemId);
+    using SystemDescriptionPtr = QSharedPointer<QnLocalSystemDescription>;
 
-    static PointerType create(
+    static SystemDescriptionPtr createFactory(const QString& systemId);
+
+    static SystemDescriptionPtr create(
         const QString& systemId,
         const QnUuid& localSystemId,
         const QString& systemName);
@@ -40,8 +42,6 @@ private:
         const QnUuid& localSystemId,
         const QString& systemName);
 
-    virtual ~QnLocalSystemDescription() = default;
-
     void init();
 
     void updateNewSystemState();
@@ -49,3 +49,5 @@ private:
 private:
     bool m_isNewSystem;
 };
+
+using QnLocalSystemDescriptionPtr = QnLocalSystemDescription::SystemDescriptionPtr;

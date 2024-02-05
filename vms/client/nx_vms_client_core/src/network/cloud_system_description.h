@@ -6,7 +6,7 @@
 
 #include <network/system_description.h>
 
-class QnCloudSystemDescription: public QnSystemDescription
+class NX_VMS_CLIENT_CORE_API QnCloudSystemDescription: public QnSystemDescription
 {
     Q_OBJECT
     using base_type = QnSystemDescription;

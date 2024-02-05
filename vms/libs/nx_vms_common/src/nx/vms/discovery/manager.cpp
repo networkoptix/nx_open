@@ -2,16 +2,16 @@
 
 #include "manager.h"
 
-#include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
-#include <nx_ec/data/api_conversion_functions.h>
+#include <core/resource_management/resource_pool.h>
 #include <nx/fusion/serialization/json.h>
 #include <nx/network/address_resolver.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/log/log.h>
-#include <nx/vms/common/system_settings.h>
 #include <nx/utils/scoped_connections.h>
+#include <nx/vms/common/system_settings.h>
+#include <nx_ec/data/api_conversion_functions.h>
 #include <utils/common/synctime.h>
 
 #include "deprecated_multicast_finder.h"
@@ -27,12 +27,6 @@ ModuleEndpoint::ModuleEndpoint(
     endpoint(std::move(endpoint))
 {
     NX_ASSERT(!this->endpoint.address.toString().empty());
-}
-
-bool ModuleEndpoint::operator==(const ModuleEndpoint& rhs) const
-{
-    typedef const nx::vms::api::ModuleInformationWithAddresses& BaseRef;
-    return BaseRef(*this) == BaseRef(rhs) && endpoint == rhs.endpoint;
 }
 
 struct Manager::Private
