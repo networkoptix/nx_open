@@ -25,6 +25,7 @@ NX_VMS_COMMON_API QString Result::errorToString(Result::Error value)
         case Result::Unauthorized: return "unauthorized";
         case Result::SessionExpired: return "sessionExpired";
         case Result::SessionRequired: return "sessionRequired";
+        case Result::Gone: return "gone";
     };
 
     return NX_FMT("Unknown_%1", static_cast<int>(value));
@@ -68,6 +69,9 @@ nx::network::http::StatusCode::Value Result::toHttpStatus(Error code)
 
         case Error::InternalServerError:
             return http::StatusCode::internalServerError;
+
+        case Error::Gone:
+            return http::StatusCode::gone;
 
         default:
             return http::StatusCode::badRequest;
@@ -203,6 +207,12 @@ Result Result::sessionRequired(std::optional<QString> customMessage)
 {
     return Result{SessionRequired,
         customMessage ? *customMessage : tr("Session authorization required.")};
+}
+
+Result Result::gone(std::optional<QString> customMessage)
+{
+    return Result{Gone,
+        customMessage ? *customMessage : tr("Resource no longer present on server.")};
 }
 
 void serialize(const Result::Error& value, QString* target)

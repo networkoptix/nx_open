@@ -27,6 +27,7 @@ namespace nx::network::rest {
  *     %value serviceUnavailable
  *     %value unauthorized
  *     %value sessionExpired
+ *     %value gone
  *
  * %// The typical apidoc comment for the result of a function looks like (without `//`):
  * %//return
@@ -119,6 +120,11 @@ public:
          * %caption 14
          */
         SessionRequired = 14,
+
+        /**%apidoc
+         * %caption 15
+         */
+        Gone = 15,
     };
 
     static QString errorToString(Result::Error value);
@@ -149,6 +155,7 @@ public:
     static Result unauthorized(std::optional<QString> customMessage = std::nullopt);
     static Result sessionExpired(std::optional<QString> customMessage = std::nullopt);
     static Result sessionRequired(std::optional<QString> customMessage = std::nullopt);
+    static Result gone(std::optional<QString> customMessage = std::nullopt);
 
     template<typename Value>
     static Result invalidParameter(const QString& name, const Value& value)

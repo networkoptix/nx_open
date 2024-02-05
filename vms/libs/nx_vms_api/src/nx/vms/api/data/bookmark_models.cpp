@@ -2,7 +2,10 @@
 
 #include "bookmark_models.h"
 
+#include <QStringRef>
+
 #include <nx/fusion/model_functions.h>
+#include <nx/utils/cryptographic_hash.h>
 
 namespace nx::vms::api {
 
@@ -70,6 +73,39 @@ QnUuid BookmarkIdV3::bookmarkId() const
 QnUuid BookmarkIdV3::serverId() const
 {
     return serverIdFromCombined(id);
+}
+
+std::chrono::milliseconds BookmarkProtection::getSyncTime(const QString& protection)
+{
+    const auto p = findIdSeparator(protection, ':');
+    if (!p)
+        return {};
+
+    return std::chrono::milliseconds(QStringRef(&protection, 0, *p).toLongLong());
+}
+
+QString BookmarkProtection::getProtection(
+    const QString& digest,
+    std::chrono::milliseconds synchronizedMs)
+{
+    nx::utils::QnCryptographicHash hasher(nx::utils::QnCryptographicHash::Algorithm::Sha256);
+
+    hasher.addData(digest.toUtf8());
+    hasher.addData(QByteArray().setNum(synchronizedMs.count()));
+
+    nx::Buffer hashResult(hasher.result());
+    return QString::number(synchronizedMs.count()) + ":"
+        + QString::fromStdString(hashResult.toBase64());
+}
+
+QString BookmarkProtection::getDigest(QnUuid bookmarkId, const QString& password)
+{
+    nx::utils::QnCryptographicHash hasher(nx::utils::QnCryptographicHash::Algorithm::Sha256);
+
+    hasher.addData(bookmarkId.toString().toUtf8());
+    hasher.addData(password.toUtf8());
+
+    return QString::fromStdString(nx::Buffer(hasher.result()).toBase64());
 }
 
 } // namespace nx::vms::api

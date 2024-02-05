@@ -36,6 +36,7 @@ public:
     // NX_REST_EXCEPTION_METHOD(unauthorized) - Use UnauthorizedException with appropriate AuthResult.
     // NX_REST_EXCEPTION_METHOD(sessionExpired) - Use UnauthorizedException::sessionExpired.
     NX_REST_EXCEPTION_METHOD(sessionRequired)
+    NX_REST_EXCEPTION_METHOD(gone)
     #undef NX_REST_EXCEPTION_METHOD
 
 private:
