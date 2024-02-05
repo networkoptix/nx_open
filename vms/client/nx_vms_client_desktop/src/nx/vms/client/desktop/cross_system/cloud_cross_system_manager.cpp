@@ -63,9 +63,12 @@ CloudCrossSystemManager::CloudCrossSystemManager(QObject* parent):
         [this, setCloudSystems](auto status)
         {
             NX_VERBOSE(this, "Cloud status changed to %1", status);
-            setCloudSystems(status == QnCloudStatusWatcher::Online
-                ? appContext()->cloudStatusWatcher()->cloudSystems()
-                : QnCloudSystemList());
+
+            // Leaving system list as is in case of Cloud going offline.
+            if (status == QnCloudStatusWatcher::Online)
+                setCloudSystems(appContext()->cloudStatusWatcher()->cloudSystems());
+            else if (status == QnCloudStatusWatcher::LoggedOut)
+                setCloudSystems({});
         });
 
     connect(
