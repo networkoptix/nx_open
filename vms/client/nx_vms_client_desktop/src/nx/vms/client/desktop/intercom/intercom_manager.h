@@ -27,7 +27,7 @@ public:
     virtual ~IntercomManager() override;
 
 private:
-    struct Private;
+    class Private;
     nx::utils::ImplPtr<Private> d;
 };
 
