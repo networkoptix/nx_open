@@ -61,6 +61,25 @@
     </message>
 </context>
 <context>
+    <name>CameraSettingsLicenseWatcher::Private</name>
+    <message numerus="yes">
+        <source>%1 are used</source>
+        <comment>Text like &apos;5/10 Professional Licenses&apos; will be substituted</comment>
+        <translation type="unfinished">
+            <numerusform>%1 is used</numerusform>
+            <numerusform>%1 are used</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 are required</source>
+        <comment>Text like &apos;5 Professional Licenses&apos; will be substituted</comment>
+        <translation type="unfinished">
+            <numerusform>%1 is required</numerusform>
+            <numerusform>%1 are required</numerusform>
+        </translation>
+    </message>
+</context>
+<context>
     <name>CertificatesModel</name>
     <message>
         <source>Subject</source>
@@ -1340,6 +1359,13 @@
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
+    </message>
+</context>
+<context>
+    <name>IntercomManager::Private</name>
+    <message>
+        <source>%1 Layout</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4453,44 +4479,23 @@ License Key: %2</source>
 <context>
     <name>QnRequiredAccessRightPolicy</name>
     <message>
-        <source>User group %1 has no %2 permission</source>
+        <source>%1 group does not have %2 permission for some of selected cameras</source>
         <comment>%1 is the name of selected user group, %2 is permission name</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Selected user groups have no %1 permission</source>
-        <comment>%1 is permission name</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <source>%n of %1 selected user groups have no %2 permission</source>
-        <comment>%1 is number of selected user groups, %2 is permission name</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Selected users have no %1 permission</source>
-        <comment>%1 is permission name</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <source>%n of %1 selected users have no %2 permission</source>
-        <comment>%1 is number of selected users, %2 is permission name</comment>
-        <translation type="unfinished">
-            <numerusform>%n of %1 selected users has no %2 permission</numerusform>
-            <numerusform>%n of %1 selected users have no %2 permission</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>User %1 has no %2 permissions for selected camera</source>
-        <comment>%1 is the name of selected user, %2 is permission name</comment>
+        <source>%1 groups and %2 users do not have %3 permission for some of selected cameras</source>
+        <comment>%1 is number of selected user groups, %2 is number of users, %3 is permission name</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>User %1 has no %2 permissions for some of selected cameras</source>
+        <source>%1 user does not have %2 permission for some of selected cameras</source>
         <comment>%1 is the name of the selected user, %2 is the permission name</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 users do not have %2 permission for some of selected cameras</source>
+        <comment>%1 is number of selected users, %2 is permission name</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8012,25 +8017,6 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
 </context>
 <context>
-    <name>nx::vms::client::desktop::CameraSettingsLicenseWatcher</name>
-    <message numerus="yes">
-        <source>%1 are used</source>
-        <comment>Text like &apos;5/10 Professional Licenses&apos; will be substituted</comment>
-        <translation>
-            <numerusform>%1 is used</numerusform>
-            <numerusform>%1 are used</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%1 are required</source>
-        <comment>Text like &apos;5 Professional Licenses&apos; will be substituted</comment>
-        <translation>
-            <numerusform>%1 is required</numerusform>
-            <numerusform>%1 are required</numerusform>
-        </translation>
-    </message>
-</context>
-<context>
     <name>nx::vms::client::desktop::CameraStreamsDialog</name>
     <message>
         <source>Primary Stream</source>
@@ -9201,13 +9187,6 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
         <source>Failed to merge %1 to our system.</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>nx::vms::client::desktop::IntercomManager</name>
-    <message>
-        <source>%1 Layout</source>
         <translation></translation>
     </message>
 </context>

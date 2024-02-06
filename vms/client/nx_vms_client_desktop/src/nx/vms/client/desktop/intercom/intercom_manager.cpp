@@ -37,11 +37,15 @@ namespace nx::vms::client::desktop {
 // ------------------------------------------------------------------------------------------------
 // IntercomManager::Private
 
-struct IntercomManager::Private: public QObject
+class IntercomManager::Private: public QObject
 {
+    Q_DECLARE_TR_FUNCTIONS(IntercomManager::Private)
+
+public:
     IntercomManager* const q;
 
     Private(IntercomManager* owner):
+        QObject(),
         q(owner)
     {
         const auto accessController = qobject_cast<CachingAccessController*>(q->accessController());
