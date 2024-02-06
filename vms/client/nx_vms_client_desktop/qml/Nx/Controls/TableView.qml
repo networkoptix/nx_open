@@ -19,7 +19,7 @@ TableView
 {
     id: control
 
-    property var sourceModel
+    property var sourceModel: null
     property alias horizontalHeaderVisible: columnsHeader.visible
     property alias headerBackgroundColor: columnsHeader.color
     property alias horizontalHeaderEnabled: columnsHeader.enabled
