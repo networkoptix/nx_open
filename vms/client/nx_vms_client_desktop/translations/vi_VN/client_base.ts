@@ -6258,7 +6258,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Screen is locked and cannot be changed</source>
-      <translation type="unfinished">Screen is locked and cannot be changed</translation>
+      <translation>Màn hình bị khóa và không thể thay đổi được</translation>
     </message>
   </context>
   <context>
