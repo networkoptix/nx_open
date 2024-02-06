@@ -18,7 +18,10 @@ static constexpr QSize kBaseDialogSize(600, 500);
 
 namespace nx::vms::client::desktop {
 
-WebViewDialog::WebViewDialog(QWidget* parent):
+WebViewDialog::WebViewDialog(
+    QWidget* parent,
+    QDialogButtonBox::StandardButtons buttons)
+    :
     base_type(parent, Qt::Window),
     m_webWidget(new WebWidget(this))
 {
@@ -26,7 +29,7 @@ WebViewDialog::WebViewDialog(QWidget* parent):
     line->setFrameShape(QFrame::HLine);
     line->setFixedHeight(1);
 
-    auto buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok, this);
+    auto buttonBox = new QDialogButtonBox(buttons, this);
 
     auto mainLayout = new QVBoxLayout(this);
     mainLayout->setContentsMargins(QMargins());
@@ -34,11 +37,13 @@ WebViewDialog::WebViewDialog(QWidget* parent):
     mainLayout->addWidget(line);
     mainLayout->addWidget(buttonBox);
 
+    buttonBox->setVisible(buttons != QDialogButtonBox::NoButton);
+
     // Set some resonable size to avoid completely shrinked dialog.
     resize(kBaseDialogSize);
 }
 
-int WebViewDialog::showUrl(
+void WebViewDialog::init(
     const QUrl& url,
     bool enableClientApi,
     WindowContext* context,
@@ -61,7 +66,7 @@ int WebViewDialog::showUrl(
         m_webWidget->controller()->initClientApiSupport(context, authCondition);
     }
 
-    return exec();
+    return;
 }
 
 } // namespace nx::vms::client::desktop

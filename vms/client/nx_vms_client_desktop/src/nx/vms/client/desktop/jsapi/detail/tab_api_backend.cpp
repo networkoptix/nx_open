@@ -73,7 +73,7 @@ struct TabApiBackend::Private: public QObject
 {
     TabApiBackend* const q;
     WindowContext* const context;
-    QnWorkbenchLayout* const layout;
+    QPointer<QnWorkbenchLayout> layout;
     QnWorkbenchDisplay* const display;
     QnWorkbenchNavigator* const navigator;
 
@@ -647,6 +647,9 @@ TabApiBackend::~TabApiBackend()
 
 State TabApiBackend::state() const
 {
+    if (!d->layout)
+        return {};
+
     detail::State result;
     result.items = d->allItemStates();
     result.sync = d->isSyncedLayout();
@@ -672,6 +675,9 @@ ItemResult TabApiBackend::item(const QUuid& itemId) const
 
 ItemResult TabApiBackend::addItem(const ResourceUniqueId& resourceId, const ItemParams& params)
 {
+    if (!d->layout)
+        return {Error::failed(), {}};
+
     const auto pool = appContext()->unifiedResourcePool();
     const auto resource = pool->resource(resourceId.id, resourceId.localSystemId);
     if (!resource)
@@ -742,6 +748,9 @@ Error TabApiBackend::syncWith(const QUuid& itemId)
     if (itemId.isNull())
         return Error::invalidArguments(tr(""));
 
+    if (!d->layout)
+        return Error::failed();
+
     const auto item = d->layout->item(itemId);
     if (!item)
         return cantFindItemResult();
@@ -757,6 +766,9 @@ Error TabApiBackend::syncWith(const QUuid& itemId)
 
 Error TabApiBackend::stopSyncPlay()
 {
+    if (!d->layout)
+        return Error::failed();
+
     if (d->context->workbench()->currentLayout() == d->layout)
     {
         auto streamSynchronizer = d->context->workbench()->windowContext()->streamSynchronizer();

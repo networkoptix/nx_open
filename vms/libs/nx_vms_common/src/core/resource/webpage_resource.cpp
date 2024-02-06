@@ -7,6 +7,7 @@
 #include <nx/reflect/string_conversion.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/serialization/qt_core_types.h>
+#include <nx/utils/serialization/qt_geometry_reflect_json.h>
 #include <nx/vms/api/data/webpage_data.h>
 
 namespace {
@@ -15,6 +16,8 @@ const QString kSubtypePropertyName = ResourcePropertyKey::WebPage::kSubtypeKey;
 const QString kProxyDomainAllowListPropertyName = "proxyDomainAllowList";
 const QString kCertificateCheckPropertyName = "certificateCheck";
 static const QString kRefreshIntervalPropertyName = "refreshIntervalS";
+static const QString kOpenInDialogPropertyName = "openInDialog";
+static const QString kDialogSizePropertyName = "dialogSize";
 
 } // namespace
 
@@ -126,6 +129,34 @@ seconds QnWebPageResource::refreshInterval() const
 void QnWebPageResource::setRefreshInterval(seconds interval)
 {
     setProperty(kRefreshIntervalPropertyName, QString::number(interval.count()));
+}
+
+bool QnWebPageResource::isOpenInDialog() const
+{
+    auto [value, _] =
+        nx::reflect::json::deserialize<bool>(getProperty(kOpenInDialogPropertyName).toStdString());
+
+    return value;
+}
+
+void QnWebPageResource::setOpenInDialog(bool value)
+{
+    setProperty(
+        kOpenInDialogPropertyName, QString::fromStdString(nx::reflect::json::serialize(value)));
+}
+
+QSize QnWebPageResource::dialogSize() const
+{
+    auto [size, _] =
+        nx::reflect::json::deserialize<QSize>(getProperty(kDialogSizePropertyName).toStdString());
+
+    return size;
+}
+
+void QnWebPageResource::setDialogSize(const QSize& size)
+{
+    setProperty(
+        kDialogSizePropertyName, QString::fromStdString(nx::reflect::json::serialize(size)));
 }
 
 QnWebPageResource::Options QnWebPageResource::getOptions() const

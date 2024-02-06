@@ -14,7 +14,8 @@ namespace nx::vms::client::desktop { class WindowContext; }
 namespace nx::vms::client::desktop::jsapi {
 
 /**
- * Self object provides functionality related to the current web page item.
+ * Self object provides functionality related to the current web page item. Note that this object
+ * is unavailable if the web page is opened in a dialog.
  */
 class Self: public QObject
 {
