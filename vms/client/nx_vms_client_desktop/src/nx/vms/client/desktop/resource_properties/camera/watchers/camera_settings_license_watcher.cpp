@@ -51,6 +51,8 @@ private:
 
 class CameraSettingsLicenseWatcher::Private: public QObject
 {
+    Q_DECLARE_TR_FUNCTIONS(CameraSettingsLicenseWatcher::Private)
+
     CameraSettingsLicenseWatcher* const q = nullptr;
 
 public:
@@ -120,7 +122,7 @@ private:
                     continue;
 
                 const int total = helper.totalLicenses(type);
-                const auto message = CameraSettingsLicenseWatcher::tr("%1 are used",
+                const auto message = tr("%1 are used",
                     "Text like '5/10 Professional Licenses' will be substituted", used)
                         .arg(QnLicense::displayText(type, used, total));
 
@@ -141,10 +143,9 @@ private:
             if (required == 0)
                 continue;
 
-            const auto message = setWarningStyleHtml(CameraSettingsLicenseWatcher::tr(
-                    "%1 are required",
-                    "Text like '5 Professional Licenses' will be substituted", required)
-                        .arg(QnLicense::displayText(type, required)));
+            const auto message = setWarningStyleHtml(tr("%1 are required",
+                "Text like '5 Professional Licenses' will be substituted", required)
+                    .arg(QnLicense::displayText(type, required)));
 
             requiredLicenses << message;
         }

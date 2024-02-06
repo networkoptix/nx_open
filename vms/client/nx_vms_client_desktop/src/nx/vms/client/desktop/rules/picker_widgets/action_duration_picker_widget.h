@@ -14,6 +14,8 @@ namespace nx::vms::client::desktop::rules {
 class ActionDurationPickerWidget:
     public FieldPickerWidget<vms::rules::OptionalTimeField, PickerWidget>
 {
+    Q_DECLARE_TR_FUNCTIONS(ActionDurationPickerWidget)
+
 public:
     ActionDurationPickerWidget(
         SystemContext* context,
