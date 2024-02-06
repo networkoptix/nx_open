@@ -40,13 +40,15 @@ void AnalyticsActionsHelper::processResult(
             NX_WARNING(NX_SCOPE_TAG, "Can not authenticate %1", result.actionUrl);
 
         QnSessionAware<WebViewDialog> webDialog(parent);
-        webDialog.showUrl(
+        webDialog.init(
             result.actionUrl,
             /*enableClientApi*/ true,
             context,
             result.useProxy ? proxyResource : QnResourcePtr{},
             result.useDeviceCredentials ? authenticator : nullptr,
             /*checkCertificate*/ !result.useDeviceCredentials);
+
+        webDialog.exec();
     }
 }
 

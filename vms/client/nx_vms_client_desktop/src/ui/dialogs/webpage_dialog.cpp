@@ -37,6 +37,7 @@ bool isValidUrl(const QUrl& url)
 
 static constexpr auto kAnyDomain = "*";
 static constexpr int kInvalidIndex = -1;
+constexpr QSize kDefaultOpenInDialogSize{800, 600};
 
 enum DurationUnitItemRole
 {
@@ -223,6 +224,30 @@ QnWebpageDialog::QnWebpageDialog(QWidget* parent, EditMode editMode):
     addDurationUnitComboBoxItem(
         ui->comboBoxRefreshPeriodUnit, QnTimeStrings::Suffix::Minutes, 1min);
     ui->comboBoxRefreshPeriodUnit->setCurrentIndex(kInvalidIndex);
+
+    ui->dialogWidthField->setTitle(tr("Dialog width"));
+    ui->dialogHeightField->setTitle(tr("Dialog height"));
+
+    auto dialogSizeAligner = new Aligner(this);
+    dialogSizeAligner->registerTypeAccessor<InputField>(InputField::createLabelWidthAccessor());
+    dialogSizeAligner->addWidgets({
+        ui->dialogWidthField,
+        ui->dialogHeightField
+    });
+
+    ui->dialogWidthField->setValidator(
+        defaultIntValidator(1, std::numeric_limits<int>::max(), ""));
+    ui->dialogHeightField->setValidator(
+        defaultIntValidator(1, std::numeric_limits<int>::max(), ""));
+
+    connect(ui->openInDialogCheckBox, &QCheckBox::stateChanged, this,
+        [this]()
+        {
+            ui->dialogWidthField->setVisible(ui->openInDialogCheckBox->isChecked());
+            ui->dialogHeightField->setVisible(ui->openInDialogCheckBox->isChecked());
+        });
+
+    setOpenInDialogSize(kDefaultOpenInDialogSize);
 
     updateText();
     updateSelectServerMenuButtonVisibility();
@@ -449,6 +474,29 @@ bool QnWebpageDialog::isCertificateCheckEnabled() const
 void QnWebpageDialog::setCertificateCheckEnabled(bool value)
 {
     ui->disableCertificateCheckBox->setChecked(!value);
+}
+
+bool QnWebpageDialog::isOpenInDialog() const
+{
+    return ui->openInDialogCheckBox->isChecked();
+}
+
+void QnWebpageDialog::setOpenInDialog(bool value)
+{
+    ui->openInDialogCheckBox->setChecked(value);
+}
+
+QSize QnWebpageDialog::openInDialogSize() const
+{
+    return {ui->dialogWidthField->text().toInt(), ui->dialogHeightField->text().toInt()};
+}
+
+void QnWebpageDialog::setOpenInDialogSize(const QSize& size)
+{
+    ui->dialogWidthField->setText(QString::number(
+        size.isValid() ? size.width() : kDefaultOpenInDialogSize.width()));
+    ui->dialogHeightField->setText(QString::number(
+        size.isValid() ? size.height() : kDefaultOpenInDialogSize.height()));
 }
 
 void QnWebpageDialog::accept()

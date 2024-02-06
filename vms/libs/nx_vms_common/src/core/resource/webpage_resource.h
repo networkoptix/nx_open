@@ -82,6 +82,12 @@ public:
     std::chrono::seconds refreshInterval() const;
     void setRefreshInterval(std::chrono::seconds interval);
 
+    bool isOpenInDialog() const;
+    void setOpenInDialog(bool value);
+
+    QSize dialogSize() const;
+    void setDialogSize(const QSize& size);
+
     Options getOptions() const;
 
 signals:

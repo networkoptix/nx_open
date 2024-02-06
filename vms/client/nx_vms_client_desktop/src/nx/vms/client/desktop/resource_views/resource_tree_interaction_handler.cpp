@@ -613,6 +613,13 @@ void ResourceTreeInteractionHandler::activateItem(const QModelIndex& index,
                 break;
             }
 
+            if (auto webPage = resource.dynamicCast<QnWebPageResource>();
+                webPage && webPage->isOpenInDialog())
+            {
+                menu()->trigger(menu::OpenWebPageInNewDialog, webPage);
+                return;
+            }
+
             const bool isShowreelReviewLayout =
                 workbench()->currentLayout()->isShowreelReviewLayout();
 

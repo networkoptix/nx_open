@@ -1111,6 +1111,12 @@ void initialize(Manager* manager, Action* root)
             && ConditionWrapper(new LightModeCondition(Qn::LightModeNoNewWindow))
         );
 
+    factory(OpenWebPageInNewDialog)
+        .mode(DesktopMode)
+        .flags(Tree | Scene | SingleTarget | MultiTarget | ResourceTarget | WidgetTarget)
+        .text(ContextMenu::tr("Open in New Dialog"))
+        .condition(condition::isWebPageOrIntegration());
+
     factory(OpenCurrentLayoutInNewWindowAction)
         .flags(NoTarget)
         .condition(new LightModeCondition(Qn::LightModeNoNewWindow));

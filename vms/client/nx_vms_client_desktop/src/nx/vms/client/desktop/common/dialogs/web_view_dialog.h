@@ -23,11 +23,14 @@ class WebViewDialog: public QnButtonBoxDialog
     using base_type = QnButtonBoxDialog;
 
 public:
-    WebViewDialog(QWidget* parent = nullptr);
+    WebViewDialog(
+        QWidget* parent = nullptr,
+        QDialogButtonBox::StandardButtons buttons = QDialogButtonBox::Ok);
+
     virtual ~WebViewDialog() override = default;
 
     /**
-     * Shows Webpage.
+     * Initializes WebViewDialog.
      * @param url Url to show.
      * @param enableClientApi Enable client api.
      * @param context Workbench context.
@@ -36,7 +39,7 @@ public:
      * @param checkCertificate Enable certificate check.
      * @param parent Dialog's parent.
      */
-    int showUrl(
+    void init(
         const QUrl& url,
         bool enableClientApi,
         WindowContext* context,
