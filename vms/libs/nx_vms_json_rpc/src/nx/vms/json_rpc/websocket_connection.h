@@ -16,7 +16,9 @@ namespace nx::vms::json_rpc {
 class IncomingProcessor;
 namespace detail { class OutgoingProcessor; }
 
-class NX_VMS_JSON_RPC_API WebSocketConnection: public nx::network::aio::BasicPollable
+class NX_VMS_JSON_RPC_API WebSocketConnection:
+    public nx::network::aio::BasicPollable,
+    public std::enable_shared_from_this<WebSocketConnection>
 {
 public:
     using base_type = nx::network::aio::BasicPollable;
