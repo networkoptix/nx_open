@@ -101,8 +101,13 @@ void WebSocketClient::onUpgrade()
             nx::network::websocket::CompressionType::perMessageDeflate),
         [this](auto connection)
         {
-            NX_ASSERT(m_connection.get() == connection);
-            m_connection.reset();
+            if (m_connection)
+            {
+                NX_ASSERT(m_connection.get() == connection,
+                    "m_connection=%1, connection=%2", m_connection, connection);
+                auto connectionPtr = m_connection.get();
+                connectionPtr->pleaseStop([connection = std::move(m_connection)]() {});
+            }
         },
         std::move(handler));
     m_connection->start();
