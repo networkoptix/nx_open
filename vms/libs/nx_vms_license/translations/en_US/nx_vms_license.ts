@@ -60,23 +60,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Only one Starter license is allowed per System.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>You already have one active Starter license.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Only one NVR license is allowed per System.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>You already have one active NVR license.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Only one license of this type is allowed per System.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -89,6 +77,18 @@
     </message>
     <message>
         <source>Unknown error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Only one Starter license is allowed per Site.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Only one NVR license is allowed per Site.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Only one license of this type is allowed per Site.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

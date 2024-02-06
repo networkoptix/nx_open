@@ -37,13 +37,6 @@
     </message>
 </context>
 <context>
-    <name>ActionTypePickerWidget</name>
-    <message>
-        <source>Do</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
     <name>AdjustVideoDialog</name>
     <message>
         <source>Image Enhancement</source>
@@ -311,13 +304,6 @@
     </message>
     <message>
         <source>No backup</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>BackupSettingsWidget</name>
-    <message>
-        <source>Server is offline. Backup settings are not available.</source>
         <translation></translation>
     </message>
 </context>
@@ -666,14 +652,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Import From Device</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Import video automatically</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Web Page</source>
         <translation></translation>
     </message>
@@ -686,7 +664,19 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Import video manually</source>
+        <source>Record audio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import Video from Device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import camera or server offline periods</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do not send Stop PTZ command</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -978,6 +968,10 @@
         <source>This system is connected to</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>No connection</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ConnectingToServerDialog</name>
@@ -1190,17 +1184,6 @@
     </message>
 </context>
 <context>
-    <name>EventTypePickerWidget</name>
-    <message>
-        <source>When</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Generic event</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
     <name>ExecHttpRequestActionWidget</name>
     <message>
         <source>Login to authenticate (optional)</source>
@@ -1358,25 +1341,6 @@
     <name>FilteredResourceViewWidget</name>
     <message>
         <source>Nothing found</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>FooterWidget</name>
-    <message>
-        <source>Add Comment</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Set Schedule</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Test Action</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Add a comment</source>
         <translation></translation>
     </message>
 </context>
@@ -1642,45 +1606,6 @@
     </message>
 </context>
 <context>
-    <name>LdapSettingsDialog</name>
-    <message>
-        <source>Optional</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Testing...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>LDAP Settings</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Server URL</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Password</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Search Base</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Search Filter</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Search Timeout (s)</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Admin DN or CN</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
     <name>LicenseDetailsDialog</name>
     <message>
         <source>License Details</source>
@@ -1805,6 +1730,18 @@
         <source>Test</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Use Credentials</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use Link</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Link</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>LogsManagementWidget</name>
@@ -1925,6 +1862,18 @@
     <message>
         <source>Take system name and settings from:</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>warn icon</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;Warning label&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;We recommend that you consult with support before proceeding.&gt;</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2064,16 +2013,16 @@
 <context>
     <name>PasswordDialog</name>
     <message>
-        <source>Sign in</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Password</source>
         <translation></translation>
     </message>
     <message>
         <source>Username</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Sign in to web page</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2127,13 +2076,6 @@
     </message>
     <message>
         <source>INFO</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>PoeSettingsWidget</name>
-    <message>
-        <source>Attention! Power limit exceeded</source>
         <translation></translation>
     </message>
 </context>
@@ -2468,10 +2410,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Disable Aero</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Capture Cursor</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2518,26 +2456,26 @@
     </message>
 </context>
 <context>
-    <name>RulesDialog</name>
+    <name>SaasInfoWidget</name>
     <message>
-        <source>Alarm/Event Rules</source>
-        <translation></translation>
+        <source>Services state</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>New Rule</source>
-        <translation></translation>
+        <source>No services found</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Delete Rule</source>
-        <translation></translation>
+        <source>Contact your Channel Partner to add services</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Select a Rule</source>
-        <translation></translation>
+        <source>Channel Partner Contact</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Reset Default Rules</source>
-        <translation></translation>
+        <source>Services Usage</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2657,14 +2595,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Encrypting video traffic will significantly increase CPU usage.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Connection with cameras that do not support HTTPS will be lost.</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Force servers to accept only encrypted connections</source>
         <translation></translation>
     </message>
@@ -2724,14 +2654,6 @@
     </message>
     <message>
         <source>Details</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Pin to this certificate</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>View pinned certificate</source>
         <translation></translation>
     </message>
 </context>
@@ -2878,22 +2800,6 @@
         <source>Reindex Backup</source>
         <translation></translation>
     </message>
-    <message>
-        <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Recording was enabled on the USB storage</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Analytics and motion data will continue to be stored on the disabled storage.</source>
-        <translation></translation>
-    </message>
 </context>
 <context>
     <name>StorageRebuildWidget</name>
@@ -3027,8 +2933,16 @@
         <translation></translation>
     </message>
     <message>
-        <source>+ Add Group</source>
-        <translation></translation>
+        <source>Add Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+F</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Del</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3038,8 +2952,16 @@
         <translation></translation>
     </message>
     <message>
-        <source>+ Add User</source>
-        <translation></translation>
+        <source>Add User</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+F</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Del</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3105,10 +3027,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Proxy this webpage via server</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>SELECT SERVER</source>
         <translation></translation>
     </message>
@@ -3125,8 +3043,12 @@
         <translation></translation>
     </message>
     <message>
-        <source>Allow opening web page without SSL certificate checking</source>
-        <translation></translation>
+        <source>Auto-refresh web page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Every</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
