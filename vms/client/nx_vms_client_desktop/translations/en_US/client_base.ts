@@ -2,6 +2,37 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="en_US" sourcelanguage="en">
 <context>
+    <name>ActionDurationPickerWidget</name>
+    <message>
+        <source>For the duration of event</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Of fixed duration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Begin When</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Event Occurs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Event Starts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Event Stops</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Duration</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>AnalyticsSearchWidget::Private</name>
     <message>
         <source>Any type</source>
@@ -57,6 +88,25 @@
         <translation type="unfinished">
             <numerusform>Source and %n more Camera</numerusform>
             <numerusform>Source and %n more Cameras</numerusform>
+        </translation>
+    </message>
+</context>
+<context>
+    <name>CameraSettingsLicenseWatcher::Private</name>
+    <message numerus="yes">
+        <source>%1 are used</source>
+        <comment>Text like &apos;5/10 Professional Licenses&apos; will be substituted</comment>
+        <translation type="unfinished">
+            <numerusform>%1 is used</numerusform>
+            <numerusform>%1 are used</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 are required</source>
+        <comment>Text like &apos;5 Professional Licenses&apos; will be substituted</comment>
+        <translation type="unfinished">
+            <numerusform>%1 is required</numerusform>
+            <numerusform>%1 are required</numerusform>
         </translation>
     </message>
 </context>
@@ -1323,6 +1373,13 @@
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
+    </message>
+</context>
+<context>
+    <name>IntercomManager::Private</name>
+    <message>
+        <source>%1 Layout</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7837,25 +7894,6 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
 </context>
 <context>
-    <name>nx::vms::client::desktop::CameraSettingsLicenseWatcher</name>
-    <message numerus="yes">
-        <source>%1 are used</source>
-        <comment>Text like &apos;5/10 Professional Licenses&apos; will be substituted</comment>
-        <translation>
-            <numerusform>%1 is used</numerusform>
-            <numerusform>%1 are used</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%1 are required</source>
-        <comment>Text like &apos;5 Professional Licenses&apos; will be substituted</comment>
-        <translation>
-            <numerusform>%1 is required</numerusform>
-            <numerusform>%1 are required</numerusform>
-        </translation>
-    </message>
-</context>
-<context>
     <name>nx::vms::client::desktop::CameraStreamsDialog</name>
     <message>
         <source>Primary Stream</source>
@@ -8985,13 +9023,6 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message>
         <source>Failed to merge %1 to our system.</source>
         <translation></translation>
-    </message>
-</context>
-<context>
-    <name>nx::vms::client::desktop::IntercomManager::Private</name>
-    <message>
-        <source>%1 Layout</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -12701,37 +12732,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
         <source>Start Showreel</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>nx::vms::client::desktop::rules::ActionDurationPickerWidget</name>
-    <message>
-        <source>For the duration of event</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Of fixed duration</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Begin When</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Event Occurs</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Event Starts</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Event Stops</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Duration</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

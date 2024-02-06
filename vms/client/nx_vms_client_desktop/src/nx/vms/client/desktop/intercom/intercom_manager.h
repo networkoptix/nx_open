@@ -20,7 +20,7 @@ public:
     ~IntercomManager();
 
 private:
-    struct Private;
+    class Private;
     nx::utils::ImplPtr<Private> d;
 };
 

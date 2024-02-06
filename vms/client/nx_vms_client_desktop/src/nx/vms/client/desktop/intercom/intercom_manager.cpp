@@ -37,11 +37,15 @@ namespace nx::vms::client::desktop {
 // ------------------------------------------------------------------------------------------------
 // IntercomManager::Private
 
-struct IntercomManager::Private: public QObject, public SystemContextAware
+class IntercomManager::Private: public QObject, public SystemContextAware
 {
+    Q_DECLARE_TR_FUNCTIONS(IntercomManager::Private)
+
+public:
     IntercomManager* const q;
 
     Private(SystemContext* context, IntercomManager* owner):
+        QObject(),
         SystemContextAware(context),
         q(owner)
     {
