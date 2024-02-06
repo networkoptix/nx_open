@@ -799,6 +799,15 @@ std::string QnMediaServerResource::userProvidedCertificate() const
     return getProperty(ResourcePropertyKey::Server::kUserProvidedCertificate).toStdString();
 }
 
+std::vector<nx::vms::api::PortForwardingConfiguration>
+    QnMediaServerResource::portForwardingConfigurations() const
+{
+    std::vector<nx::vms::api::PortForwardingConfiguration> result;
+    auto serialized = getProperty(ResourcePropertyKey::Server::kPortForwardingConfigurations);
+    NX_ASSERT(QJson::deserialize(serialized, &result), serialized);
+    return result;
+}
+
 bool QnMediaServerResource::isWebCamerasDiscoveryEnabled() const
 {
     return QnLexical::deserialized(

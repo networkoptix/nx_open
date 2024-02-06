@@ -11,6 +11,7 @@
 
 #include "media_server_data.h"
 #include "module_information.h" //< For nx::utils::OsInfo fusion.
+#include "port_forwarding_configuration.h"
 #include "storage_model.h"
 
 namespace nx::vms::api {
@@ -98,6 +99,9 @@ struct NX_VMS_API ServerModel: ResourceWithParameters
     /**%apidoc[readonly] */
     std::vector<StorageModel> storages;
 
+    /**%apidoc[readonly] */
+    std::vector<PortForwardingConfiguration> portForwardingConfigurations;
+
     using DbReadTypes = std::tuple<
         MediaServerData,
         MediaServerUserAttributesData,
@@ -129,7 +133,7 @@ struct NX_VMS_API ServerModel: ResourceWithParameters
 #define ServerModel_Fields \
     (id)(name)(url)(version)(endpoints)(authKey)(osInfo)(flags) \
     (isFailoverEnabled)(locationId)(maxCameras)(backupBitrateBytesPerSecond) \
-    (status)(storages)(parameters)
+    (status)(storages)(portForwardingConfigurations)(parameters)
 QN_FUSION_DECLARE_FUNCTIONS(ServerModel, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(ServerModel, ServerModel_Fields);
 
