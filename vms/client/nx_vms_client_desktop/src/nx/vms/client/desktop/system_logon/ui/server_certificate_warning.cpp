@@ -8,6 +8,7 @@
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QScrollArea>
 
+#include <nx/network/address_resolver.h>
 #include <nx/network/ssl/certificate.h>
 #include <nx/vms/api/data/module_information.h>
 #include <nx/vms/client/core/network/remote_connection_user_interaction_delegate.h>
@@ -119,11 +120,6 @@ ServerCertificateWarning::ServerCertificateWarning(
             setPaletteColor(serverNameLabel,
                 QPalette::WindowText, core::colorTheme()->color("light10"));
 
-            auto serverAddressLabel = new QLabel(
-                QString::fromStdString(certificateInfo.address.address.toString()));
-            setPaletteColor(serverAddressLabel,
-                QPalette::WindowText, core::colorTheme()->color("light16"));
-
             auto certificateDetailsLabel = new QLabel(
                 common::html::localLink("Certificate details", kCertificateLink));
 
@@ -148,7 +144,20 @@ ServerCertificateWarning::ServerCertificateWarning(
 
             serverTextLayout->addWidget(serverIconLabel);
             serverTextLayout->addWidget(serverNameLabel);
-            serverTextLayout->addWidget(serverAddressLabel);
+
+            const auto serverAddress = certificateInfo.address.address.toString();
+            const bool showServerAddress =
+                !network::SocketGlobals::addressResolver().isCloudHostname(serverAddress);
+            if (showServerAddress)
+            {
+                auto serverAddressLabel = new QLabel(QString::fromStdString(serverAddress));
+
+                setPaletteColor(serverAddressLabel,
+                    QPalette::WindowText,
+                    core::colorTheme()->color("light16"));
+                serverTextLayout->addWidget(serverAddressLabel);
+            }
+
             serverTextLayout->addStretch();
 
             auto certificateDetailsLayout = new QHBoxLayout();
