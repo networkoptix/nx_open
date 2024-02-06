@@ -3,6 +3,7 @@
 #pragma once
 
 #include <optional>
+#include <vector>
 
 #include <QtCore/QElapsedTimer>
 
@@ -18,6 +19,7 @@
 #include <nx/vms/api/data/media_server_data.h>
 #include <nx/vms/api/data/module_information.h>
 #include <nx/vms/api/data/os_information.h>
+#include <nx/vms/api/data/port_forwarding_configuration.h>
 
 namespace nx::network::http { class AsyncHttpClientPtr; }
 namespace nx::core::resource::edge { class EdgeServerStateTracker; }
@@ -160,6 +162,8 @@ public:
 
     std::string certificate() const;
     std::string userProvidedCertificate() const;
+
+    std::vector<nx::vms::api::PortForwardingConfiguration> portForwardingConfigurations() const;
 
     bool isWebCamerasDiscoveryEnabled() const;
     void setWebCamerasDiscoveryEnabled(bool value);

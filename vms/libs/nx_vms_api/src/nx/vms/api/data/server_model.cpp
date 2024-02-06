@@ -118,7 +118,7 @@ std::vector<ServerModel> ServerModel::fromDbTypes(DbListTypes all)
         std::get<std::vector<MediaServerUserAttributesData>>(std::move(all)), lessById);
     auto statuses = nx::utils::unique_sorted(
         std::get<std::vector<ResourceStatusData>>(std::move(all)), lessById);
-    std::unordered_map<QnUuid, std::vector<ResourceParamData>> parameters =
+    std::unordered_map<QnUuid, std::vector<ResourceParamData>> parametersPerServer =
         toParameterMap(std::get<std::vector<ResourceParamWithRefData>>(std::move(all)));
     auto storages =
         [](std::vector<StorageData> list)
@@ -152,12 +152,22 @@ std::vector<ServerModel> ServerModel::fromDbTypes(DbListTypes all)
         else
             s.status = ResourceStatus::offline;
 
-        if (auto f = parameters.find(s.id); f != parameters.cend())
+        if (auto parameters = parametersPerServer.find(s.id);
+            parameters != parametersPerServer.cend())
         {
-            for (ResourceParamData& r: f->second)
-                static_cast<ResourceWithParameters&>(s).setFromParameter(r);
-
-            parameters.erase(f);
+            for (const auto& parameter: parameters->second)
+            {
+                if (parameter.name == "portForwardingConfigurations")
+                {
+                    NX_ASSERT(QJson::deserialize(parameter.value, &s.portForwardingConfigurations),
+                        "%1", parameter.value);
+                }
+                else
+                {
+                    static_cast<ResourceWithParameters&>(s).setFromParameter(parameter);
+                }
+            }
+            parametersPerServer.erase(parameters);
         }
 
         {

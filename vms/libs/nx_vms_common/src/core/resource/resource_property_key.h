@@ -178,6 +178,7 @@ NX_VMS_COMMON_API extern const QString kUserProvidedCertificate;
 NX_VMS_COMMON_API extern const QString kWebCamerasDiscoveryEnabled;
 NX_VMS_COMMON_API extern const QString kMetadataStorageIdKey;
 NX_VMS_COMMON_API extern const QString kTimeZoneInformation;
+NX_VMS_COMMON_API extern const QString kPortForwardingConfigurations;
 
 } // namespace Server
 

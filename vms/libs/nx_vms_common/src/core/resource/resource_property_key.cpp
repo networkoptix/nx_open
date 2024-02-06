@@ -121,6 +121,7 @@ const QString kUserProvidedCertificate("userProvidedCertificate");
 const QString kWebCamerasDiscoveryEnabled("webCamerasDiscoveryEnabled");
 const QString kMetadataStorageIdKey("metadataStorageId");
 const QString kTimeZoneInformation("timeZoneInformation");
+const QString kPortForwardingConfigurations("portForwardingConfigurations");
 
 } // namespace ResourcePropertyKey::Server
 
