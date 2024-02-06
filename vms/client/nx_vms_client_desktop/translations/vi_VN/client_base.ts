@@ -5955,7 +5955,7 @@ Chúng tôi khuyên bạn không nên mở tích hợp này. Nếu bạn hiểu 
     </message>
     <message>
       <source>Screen is locked and cannot be changed</source>
-      <translation type="unfinished">Screen is locked and cannot be changed</translation>
+      <translation>Màn hình bị khóa và không thể thay đổi được</translation>
     </message>
   </context>
   <context>
@@ -7162,11 +7162,11 @@ Chúng tôi khuyên bạn không nên mở tích hợp này. Nếu bạn hiểu 
     </message>
     <message>
       <source>Setting was changed</source>
-      <translation type="unfinished">Setting was changed</translation>
+      <translation>Cài đặt đã được thay đổi</translation>
     </message>
     <message>
       <source>&quot;All archive&quot; option was changed to &quot;Motion, Objects, Bookmarks&quot; due to cloud storage backup was enabled</source>
-      <translation type="unfinished">&quot;All archive&quot; option was changed to &quot;Motion, Objects, Bookmarks&quot; due to cloud storage backup was enabled</translation>
+      <translation>&quot;Tất cả tùy chọn lưu trữ&quot; đã được thay đổi thành &quot;Chuyển động, Đối tượng, Dấu trang&quot; do tính năng sao lưu bộ nhớ đám mây đã được bật</translation>
     </message>
   </context>
   <context>

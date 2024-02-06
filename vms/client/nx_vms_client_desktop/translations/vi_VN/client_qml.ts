@@ -822,11 +822,11 @@
     <name>GlobalPermissionsTab</name>
     <message>
       <source>At the system level, group members have permissions to:</source>
-      <translation type="unfinished">At the system level, group members have permissions to:</translation>
+      <translation>Ở cấp độ hệ thống, các thành viên nhóm có quyền:</translation>
     </message>
     <message>
       <source>At the system level, the user has permissions to:</source>
-      <translation type="unfinished">At the system level, the user has permissions to:</translation>
+      <translation>Ở cấp độ hệ thống, người dùng có quyền:</translation>
     </message>
   </context>
   <context>
@@ -2359,7 +2359,7 @@ Nhấn Alt + Click để theo dõi đối tượng</translation>
     </message>
     <message>
       <source>Time is unavailable due to DST changes</source>
-      <translation type="unfinished">Time is unavailable due to DST changes</translation>
+      <translation>Thời gian không có sẵn do thay đổi DST</translation>
     </message>
   </context>
   <context>
