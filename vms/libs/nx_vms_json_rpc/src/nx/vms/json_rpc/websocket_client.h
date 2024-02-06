@@ -43,7 +43,7 @@ private:
     nx::utils::Url m_url;
     RequestHandler m_handler;
     std::unique_ptr<nx::network::http::AsyncClient> m_handshakeClient;
-    std::unique_ptr<nx::vms::json_rpc::WebSocketConnection> m_connection;
+    std::shared_ptr<nx::vms::json_rpc::WebSocketConnection> m_connection;
 };
 
 } // namespace nx::vms::json_rpc
