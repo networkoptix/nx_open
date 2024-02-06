@@ -12,10 +12,15 @@
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/core/network/certificate_verifier.h>
 #include <nx/vms/client/core/network/remote_connection_user_interaction_delegate.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/license/remote_licenses.h>
 #include <nx_ec/data/api_conversion_functions.h>
+#include <ui/widgets/main_window.h>
+#include <ui/widgets/main_window_title_bar_state.h>
 
 namespace {
 
@@ -258,6 +263,14 @@ void MergeSystemsTool::reportMergeFinished(
 
     auto targetInfo = ctx.targetInfo;
     m_contextMap.erase(ctx.mergeData.remoteServerId);
+    if (ini().enableMultiSystemTabBar)
+    {
+        if (const auto mainWindow = dynamic_cast<MainWindow*>(
+            appContext()->mainWindowContext()->mainWindowWidget()))
+        {
+            mainWindow->titleBarStateStore()->removeSystem(targetInfo.localSystemId);
+        }
+    }
 
     emit mergeFinished(status, errorText, targetInfo);
 }
