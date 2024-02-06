@@ -180,11 +180,15 @@ bool verifyUpdateContents(
         return false;
     }
 
-    if (clientData.currentVersion == targetVersion)
+    // Client-only update should not be scheduled if current client is up to date and the release
+    // date has already passed.
+    if (clientData.currentVersion == targetVersion && activeServers.empty())
     {
         const auto releaseDate = contents.info.releaseDate.count();
         if (releaseDate > 0 && qnSyncTime->currentMSecsSinceEpoch() >= releaseDate)
         {
+            NX_DEBUG(logTag, "%1(): Client is up to date. Ignoring version %2.", __func__,
+                contents.info.version);
             contents.error = nx::vms::common::update::InformationError::noNewVersion;
             return false;
         }

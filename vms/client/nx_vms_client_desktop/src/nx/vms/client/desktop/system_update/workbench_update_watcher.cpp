@@ -152,6 +152,17 @@ void WorkbenchUpdateWatcher::syncState()
     }
 }
 
+nx::utils::SoftwareVersion WorkbenchUpdateWatcher::getMinimumComponentVersion() const
+{
+    nx::utils::SoftwareVersion minVersion = appContext()->version();
+    for (const QnMediaServerResourcePtr& server: systemContext()->resourcePool()->servers())
+    {
+        if (server->getVersion() < minVersion)
+            minVersion = server->getVersion();
+    }
+    return minVersion;
+}
+
 void WorkbenchUpdateWatcher::atUpdateCurrentState()
 {
     NX_ASSERT(m_private);
@@ -215,12 +226,12 @@ void WorkbenchUpdateWatcher::atStartCheckUpdate()
     if (versionOverride.isNull())
     {
         m_private->updateCheck = m_private->serverUpdateTool->checkForUpdate(
-            update::LatestVmsVersionParams{appContext()->version()});
+            update::LatestVmsVersionParams{getMinimumComponentVersion()});
     }
     else
     {
         m_private->updateCheck = m_private->serverUpdateTool->checkForUpdate(
-            update::CertainVersionParams{versionOverride, appContext()->version()});
+            update::CertainVersionParams{versionOverride, getMinimumComponentVersion()});
     }
 }
 
