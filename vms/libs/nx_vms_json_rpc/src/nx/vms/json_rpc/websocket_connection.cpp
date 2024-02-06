@@ -98,6 +98,7 @@ void WebSocketConnection::start()
 
 WebSocketConnection::~WebSocketConnection()
 {
+    m_onDone(this);
 }
 
 void WebSocketConnection::bindToAioThread(nx::network::aio::AbstractAioThread* aioThread)

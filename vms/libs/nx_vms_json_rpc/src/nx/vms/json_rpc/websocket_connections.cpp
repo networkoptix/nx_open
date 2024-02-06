@@ -48,7 +48,7 @@ WebSocketConnection* WebSocketConnections::addConnection(
     std::any connectionInfo, std::unique_ptr<nx::network::websocket::WebSocket> socket)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
-    auto connection = std::make_shared<WebSocketConnection>(std::move(socket),
+    auto connection = std::make_unique<WebSocketConnection>(std::move(socket),
         [this](auto connection) { removeConnection(connection); },
         [this, connectionInfo = std::move(connectionInfo)](auto request, auto handler, auto connection)
         {
@@ -135,8 +135,11 @@ void WebSocketConnections::Connection::stop()
 {
     for (auto& thread: threads)
         thread.detach();
-    auto connectionPtr = connection.get();
-    connectionPtr->pleaseStop([connection = std::move(connection)]() {});
+    if (connection)
+    {
+        auto connectionPtr = connection.get();
+        connectionPtr->pleaseStop([connection = std::move(connection)]() {});
+    }
 }
 
 } // namespace nx::vms::json_rpc
