@@ -53,6 +53,8 @@ private:
     void atUpdateCurrentState();
     void syncState();
 
+    nx::utils::SoftwareVersion getMinimumComponentVersion() const;
+
 private:
     /** We should not check for updates if this option is disabled in global settings. */
     bool m_autoChecksEnabled = false;
