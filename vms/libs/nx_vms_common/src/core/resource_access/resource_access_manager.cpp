@@ -85,7 +85,7 @@ bool verifyDesktopCameraOnLayout(
         return false;
 
     // User can push only own screen (check by name).
-    if (desktopCamera->getName() != subject.user()->getName())
+    if (desktopCamera->getName().compare(subject.user()->getName(), Qt::CaseInsensitive) != 0)
         return false;
 
     // Screen can be pushed only on videowall.
