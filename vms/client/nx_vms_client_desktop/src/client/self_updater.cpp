@@ -109,8 +109,7 @@ bool runMinilaucherInternal(const QStringList& args)
     }
     else if (QProcess::startDetached(minilauncherPath, args)) /*< arguments are MUST here */
     {
-        NX_INFO(typeid(SelfUpdater),
-            lit("Minilauncher process started successfully."));
+        NX_INFO(typeid(SelfUpdater), "Minilauncher process started successfully.");
         return true;
     }
 
@@ -320,7 +319,7 @@ bool copyApplauncherInstance(const QDir& sourceDir, const QDir& targetDir)
 
     if (windows)
     {
-        for (const auto& entry: sourceBinDir.entryList(QStringList{lit("*.dll")}, QDir::Files))
+        for (const auto& entry: sourceBinDir.entryList({"*.dll"}, QDir::Files))
         {
             if (!checkedCopy(sourceBinDir.absoluteFilePath(entry), targetBinDir.absolutePath()))
                 return false;
@@ -366,7 +365,7 @@ void SelfUpdater::updateApplauncher()
     const QDir targetDir(componentDataDir(kApplauncher));
     const QDir backupDir(componentDataDir(kApplauncherBackup));
 
-    const auto lockFilePath = companyDataDir.absoluteFilePath(lit("applauncher-update.lock"));
+    const auto lockFilePath = companyDataDir.absoluteFilePath("applauncher-update.lock");
 
     /* Lock update file to make sure we will not try to update applauncher
        by several client instances. */
@@ -382,7 +381,7 @@ void SelfUpdater::updateApplauncher()
     const auto applauncherVersion = getVersionFromFile(versionFile);
     if (m_clientVersion <= applauncherVersion)
     {
-        NX_INFO(this, lit("Applauncher is up to date"));
+        NX_INFO(this, "Applauncher is up to date");
 
         if (backupDir.exists())
         {
@@ -400,7 +399,7 @@ void SelfUpdater::updateApplauncher()
         [this]()
         {
             if (!runMinilaucher())
-                NX_ERROR(this, lit("Could not run applauncher again!"));
+                NX_ERROR(this, "Could not run applauncher again!");
         });
 
 
@@ -496,7 +495,7 @@ void SelfUpdater::updateApplauncher()
 
     QDir(backupDir).removeRecursively();
 
-    NX_INFO(this, lit("Applauncher updated successfully."));
+    NX_INFO(this, "Applauncher updated successfully.");
 }
 
 bool SelfUpdater::updateHelpFile(const HelpFileDescription& helpDescription)
@@ -610,7 +609,7 @@ bool SelfUpdater::updateMinilauncherOnWindows(bool hasAdminRights)
     if (qApp->applicationDirPath().startsWith(nx::branding::installationRoot(),
         Qt::CaseInsensitive))
     {
-        NX_INFO(this, lit("Minilauncher will not be updated."));
+        NX_INFO(this, "Minilauncher will not be updated.");
         return true;
     }
 
@@ -712,7 +711,7 @@ bool SelfUpdater::runNewClient(const QStringList& args)
 bool SelfUpdater::runMinilaucher()
 {
     // We don't want another client instance here.
-    const auto args = QStringList({ lit("--exec") });
+    const auto args = QStringList{"--exec"};
     return runMinilaucherInternal(args);
 }
 
@@ -726,7 +725,7 @@ bool SelfUpdater::updateMinilauncherOnWindowsInDir(const QDir& installRoot,
         installRoot.absoluteFilePath(nx::branding::applauncherBinaryName());
     if (!QFileInfo::exists(applauncherPath))
     {
-        NX_INFO(this, lit("Renaming applauncher..."));
+        NX_INFO(this, "Renaming applauncher...");
         const auto sourceApplauncherPath =
             installRoot.absoluteFilePath(nx::branding::minilauncherBinaryName());
         if (!QFileInfo::exists(sourceApplauncherPath))
@@ -741,15 +740,15 @@ bool SelfUpdater::updateMinilauncherOnWindowsInDir(const QDir& installRoot,
                 applauncherPath);
             return false;
         }
-        NX_INFO(this, lit("Applauncher renamed successfully"));
+        NX_INFO(this, "Applauncher renamed successfully");
     }
 
-    NX_INFO(this, lit("Updating minilauncher..."));
+    NX_INFO(this, "Updating minilauncher...");
     const QDir binDir(installRoot.absoluteFilePath(QnClientInstallationsManager::binDirSuffix()));
 
     const QString minilauncherPath =
         binDir.absoluteFilePath(nx::branding::minilauncherBinaryName());
-    const QString minilauncherBackupPath = minilauncherPath + lit(".bak");
+    const QString minilauncherBackupPath = minilauncherPath + ".bak";
 
     /* Existing minilauncher should be backed up. */
     if (QFileInfo::exists(minilauncherPath))
@@ -788,7 +787,7 @@ bool SelfUpdater::updateMinilauncherOnWindowsInDir(const QDir& installRoot,
         return false;
     }
 
-    NX_INFO(this, lit("Minilauncher updated successfully"));
+    NX_INFO(this, "Minilauncher updated successfully");
     NX_ASSERT_HEAVY_CONDITION(isMinilaucherUpdated(installRoot));
 
     return true;
