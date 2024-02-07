@@ -876,14 +876,14 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         &QnAbstractResourcePropertyAdaptor::valueChanged,
         this,
         &SystemSettings::sessionsLimitChanged,
-        Qt::QueuedConnection);
+        Qt::DirectConnection);
 
     connect(
         m_sessionsLimitPerUserAdaptor,
         &QnAbstractResourcePropertyAdaptor::valueChanged,
         this,
         &SystemSettings::sessionsLimitPerUserChanged,
-        Qt::QueuedConnection);
+        Qt::DirectConnection);
 
     connect(
         m_remoteSessionUpdateAdaptor,
