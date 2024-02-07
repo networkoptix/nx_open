@@ -887,7 +887,7 @@ QPixmap NotificationListModel::Private::pixmapForAction(
     switch (QnNotificationLevel::valueOf(action))
     {
         case QnNotificationLevel::Value::CriticalNotification:
-            return qnSkin->pixmap("events/alert_red.png");
+            return qnSkin->colorize(qnSkin->pixmap("events/alert_red.png"), color);
 
         case QnNotificationLevel::Value::ImportantNotification:
             return qnSkin->pixmap("events/alert_yellow.png");
