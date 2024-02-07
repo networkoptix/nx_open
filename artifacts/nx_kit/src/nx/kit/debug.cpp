@@ -129,7 +129,7 @@ void assertionFailed(
 {
     printFunc((std::string("\n")
         + ">>> ASSERTION FAILED: "
-        + relativeSrcFilename(file) + ":" + toString(line)
+        + file + ":" + toString(line)
         + " (" + conditionStr + ") " + message
     ).c_str());
 
