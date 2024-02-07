@@ -294,6 +294,11 @@ Output calculateHash(const Input& data)
     return hash;
 }
 
+std::string sha1(const std::string_view& data)
+{
+    return calculateHash<QnSha1CryptographicHashPrivate, std::string>(data);
+}
+
 QByteArray sha3_256(const QByteArray& data)
 {
     return calculateHash<QnSha3256CryptographicHashPrivate, QByteArray>(data);
