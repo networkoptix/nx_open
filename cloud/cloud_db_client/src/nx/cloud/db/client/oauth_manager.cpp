@@ -75,7 +75,7 @@ void OauthManager::deleteToken(
         std::move(completionHandler));
 }
 
-void OauthManager::deleteTokens(
+void OauthManager::deleteTokensByClientId(
     const std::string& clientId,
     nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler)
 {

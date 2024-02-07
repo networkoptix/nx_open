@@ -41,7 +41,7 @@ public:
     virtual void deleteToken(
         const std::string& token, nx::utils::MoveOnlyFunc<void(ResultCode)> completionHandler) = 0;
 
-    virtual void deleteTokens(
+    virtual void deleteTokensByClientId(
         const std::string& clientId,
         nx::utils::MoveOnlyFunc<void(ResultCode)> completionHandler) = 0;
 

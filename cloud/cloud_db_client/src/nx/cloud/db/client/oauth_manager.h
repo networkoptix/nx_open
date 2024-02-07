@@ -38,7 +38,7 @@ public:
         const std::string& token,
         nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler) override;
 
-    virtual void deleteTokens(
+    virtual void deleteTokensByClientId(
         const std::string& clientId,
         nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler) override;
 
