@@ -111,7 +111,8 @@ void LookupListEntriesModel::Private::initValidators()
                     validatorByAttributeName[fullAttributeName] =
                         [itemSet](const QString& value)
                         {
-                            return itemSet.contains(QColor::fromString(value));
+                            const auto color = QColor::fromString(value);
+                            return color.isValid() && itemSet.contains(color);
                         };
                     break;
                 }
@@ -346,6 +347,7 @@ analytics::taxonomy::StateView* LookupListEntriesModel::taxonomy()
 void LookupListEntriesModel::setTaxonomy(analytics::taxonomy::StateView* taxonomy)
 {
     d->taxonomy = taxonomy;
+    d->initValidators();
     emit taxonomyChanged();
 }
 
