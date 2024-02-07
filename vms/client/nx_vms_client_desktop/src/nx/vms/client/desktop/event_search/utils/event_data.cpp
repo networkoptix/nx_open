@@ -98,7 +98,8 @@ QPixmap eventIcon(
             {
                 if (path.endsWith(".svg"))
                     return qnSkin->icon(path, kIconSubstitutions).pixmap(QSize(20, 20));
-                return qnSkin->pixmap(path);
+
+                return qnSkin->colorize(qnSkin->pixmap(path), color);
             }
 
             return {};
