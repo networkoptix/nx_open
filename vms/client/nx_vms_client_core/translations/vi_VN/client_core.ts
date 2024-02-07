@@ -178,7 +178,7 @@
     <message>
       <source>Connection to %1 is not ready yet. Check the server&apos;s internet connection or try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connection to %1 is not ready yet. Check the server&apos;s internet connection or try again later.</translation>
+      <translation>Kết nối với %1 chưa sẵn sàng. Hãy kiểm tra kết nối internet của máy chủ hoặc thử lại sau.</translation>
     </message>
     <message>
       <source>Connection failed</source>
@@ -195,7 +195,7 @@
     <message>
       <source>To log in to this System, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</source>
       <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation type="unfinished">To log in to this System, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</translation>
+      <translation>Để đăng nhập vào Hệ thống này, hãy tắt &quot;Yêu cầu mã xác minh mỗi lần đăng nhập bằng tài khoản %1&quot; trong %2 của bạn.</translation>
     </message>
   </context>
   <context>
@@ -256,7 +256,7 @@
     </message>
     <message>
       <source>This might be due to an expired server certificate or or an invalid certificate. Contact your system administrator for further investigation.</source>
-      <translation type="unfinished">This might be due to an expired server certificate or or an invalid certificate. Contact your system administrator for further investigation.</translation>
+      <translation>Điều này có thể là do chứng chỉ máy chủ đã hết hạn hoặc chứng chỉ không hợp lệ. Hãy liên hệ với quản trị viên hệ thống của bạn để tìm hiểu thêm.</translation>
     </message>
     <message>
       <source>To learn more about the current problem read this %1.</source>
