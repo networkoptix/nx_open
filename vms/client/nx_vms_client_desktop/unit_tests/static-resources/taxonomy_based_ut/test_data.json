@@ -1,0 +1,333 @@
+{
+  "descriptors": {
+    "engineDescriptors": {
+      "2a6397b7-9645-4f9a-b6c3-78320c6a0633": {
+        "id": "2a6397b7-9645-4f9a-b6c3-78320c6a0633",
+        "name": "Engine 1"
+      }
+    },
+    "enumTypeDescriptors": {
+      "base.enum.type.1": {
+        "id": "base.enum.type.1",
+        "name": "Base Enum Type 1",
+        "items": [
+          "base enum item 1.1",
+          "base enum item 1.2",
+          "base enum item 1.3"
+        ]
+      },
+      "base.enum.type.2": {
+        "id": "base.enum.type.2",
+        "name": "Base Enum Type 2",
+        "items": [
+          "base enum item 2.1",
+          "base enum item 2.2",
+          "base enum item 2.3"
+        ]
+      },
+      "derived.enum.type.1": {
+        "id": "derived.enum.type.1",
+        "name": "Derived Enum Type 1",
+        "base": "base.enum.type.1",
+        "items": [
+          "derived enum item 1.1",
+          "derived enum item 1.2",
+          "derived enum item 1.3"
+        ],
+        "baseItems": [
+          "base enum item 1.1",
+          "base enum item 1.2"
+        ]
+      },
+      "derived.enum.type.1.1": {
+        "id": "derived.enum.type.1.1",
+        "name": "Derived Enum Type 1.1",
+        "base": "base.enum.type.1",
+        "items": [
+          "derived enum item 1.1.1",
+          "derived enum item 1.1.2",
+          "derived enum item 1.1.3"
+        ],
+        "baseItems": [
+          "base enum item 1.1",
+          "base enum item 1.2"
+        ]
+      },
+      "derived.enum.type.2": {
+        "id": "derived.enum.type.2",
+        "name": "Derived Enum Type 2",
+        "base": "base.enum.type.2",
+        "items": [
+          "derived enum item 2.1",
+          "derived enum item 2.2",
+          "derived enum item 2.3"
+        ],
+        "baseItems": [
+          "base enum item 2.1",
+          "base enum item 2.2"
+        ]
+      },
+      "derived.enum.type.2.1": {
+        "id": "derived.enum.type.2.1",
+        "name": "Derived Enum Type 2.1",
+        "base": "base.enum.type.2",
+        "items": [
+          "derived enum item 2.1.1",
+          "derived enum item 2.1.2",
+          "derived enum item 2.1.3"
+        ],
+        "baseItems": [
+          "base enum item 2.1",
+          "base enum item 2.2"
+        ]
+      }
+    },
+    "colorTypeDescriptors": {
+      "base.color.type.1": {
+        "id": "base.color.type.1",
+        "name": "Base Color Type 1",
+        "items": [
+          {
+            "name": "base color 1.1",
+            "rgb": "#000000"
+          },
+          {
+            "name": "base color 1.2",
+            "rgb": "#111111"
+          },
+          {
+            "name": "base color 1.3",
+            "rgb": "#222222"
+          }
+        ]
+      },
+      "base.color.type.2": {
+        "id": "base.color.type.2",
+        "name": "Base Color Type 2",
+        "items": [
+          {
+            "name": "base color 2.1",
+            "rgb": "#333333"
+          },
+          {
+            "name": "base color 2.2",
+            "rgb": "#444444"
+          },
+          {
+            "name": "base color 2.3",
+            "rgb": "#555555"
+          }
+        ]
+      },
+      "derived.color.type.1": {
+        "id": "derived.color.type.1",
+        "name": "Derived Color Type 1",
+        "base": "base.color.type.1",
+        "items": [
+          {
+            "name": "derived color 1.1",
+            "rgb": "#010101"
+          },
+          {
+            "name": "derived color 1.2",
+            "rgb": "#121212"
+          },
+          {
+            "name": "derived color 1.3",
+            "rgb": "#232323"
+          }
+        ],
+        "baseItems": [
+          "base color 1.1",
+          "base color 1.2"
+        ]
+      },
+      "derived.color.type.1.1": {
+        "id": "derived.color.type.1.1",
+        "name": "Derived Color Type 1.1",
+        "base": "base.color.type.1",
+        "items": [
+          {
+            "name": "derived color 1.1.1",
+            "rgb": "#101010"
+          },
+          {
+            "name": "derived color 1.1.2",
+            "rgb": "#212121"
+          },
+          {
+            "name": "derived color 1.1.3",
+            "rgb": "#323232"
+          }
+        ],
+        "baseItems": [
+          "base color 1.1",
+          "base color 1.2"
+        ]
+      },
+      "derived.color.type.2": {
+        "id": "derived.color.type.2",
+        "name": "Derived Color Type 2",
+        "base": "base.color.type.2",
+        "items": [
+          {
+            "name": "derived color 2.1",
+            "rgb": "#343434"
+          },
+          {
+            "name": "derived color 2.2",
+            "rgb": "#454545"
+          },
+          {
+            "name": "derived color 2.3",
+            "rgb": "#565656"
+          }
+        ],
+        "baseItems": [
+          "base color 2.1",
+          "base color 2.2"
+        ]
+      },
+      "derived.color.type.2.1": {
+        "id": "derived.color.type.2.1",
+        "name": "Derived Color Type 2.1",
+        "base": "base.color.type.2",
+        "items": [
+          {
+            "name": "derived color 2.1.1",
+            "rgb": "#787878"
+          },
+          {
+            "name": "derived color 2.1.2",
+            "rgb": "#898989"
+          },
+          {
+            "name": "derived color 2.1.3",
+            "rgb": "#909090"
+          }
+        ],
+        "baseItems": [
+          "base color 2.1",
+          "base color 2.2"
+        ]
+      }
+    },
+    "objectTypeDescriptors": {
+      "base.object.type.2": {
+        "id": "base.object.type.2",
+        "name": "Base Object Type 2",
+        "attributes": [
+          {
+            "name": "Plate",
+            "type": "String"
+          },
+          {
+            "name": "Count",
+            "type": "Number"
+          }
+        ]
+      },
+      "base.object.type.1": {
+        "id": "base.object.type.1",
+        "name": "Base Object Type 1",
+        "icon": "base.icon",
+        "attributes": [
+          {
+            "name": "Base Type String Attribute 1",
+            "type": "String"
+          },
+          {
+            "name": "Approved",
+            "type": "Boolean"
+          },
+          {
+            "name": "Number",
+            "type": "Number",
+            "subtype": "float"
+          },
+          {
+            "name": "Base Type Numeric Attribute 2",
+            "type": "Number",
+            "subtype": "float",
+            "minValue": 1.0,
+            "maxValue": 10.0,
+            "unit": "kg"
+          },
+          {
+            "name": "Base Type Numeric Attribute 3",
+            "type": "Number",
+            "subtype": "integer"
+          },
+          {
+            "name": "Base Type Numeric Attribute 4",
+            "type": "Number",
+            "subtype": "integer",
+            "minValue": 2,
+            "maxValue": 20,
+            "unit": "unit"
+          },
+          {
+            "name": "Enum",
+            "type": "Enum",
+            "subtype": "base.enum.type.1"
+          },
+          {
+            "name": "Color",
+            "type": "Color",
+            "subtype": "base.color.type.1"
+          },
+          {
+            "name": "License",
+            "type": "Object",
+            "subtype": "base.object.type.2"
+          }
+        ]
+      }
+    }
+  },
+  "input": {
+    "objectTypes": [
+      "base.object.type.2",
+      "base.object.type.1"
+    ],
+    "attributeSupportInfo": {
+      "base.object.type.2": {
+        "Plate": {
+          "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+        },
+        "Count": {
+          "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+        }
+      },
+      "base.object.type.1": {
+        "Base Type String Attribute 1": {
+          "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+        },
+        "Approved": {
+          "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+        },
+        "Number": {
+          "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+        },
+        "Base Type Numeric Attribute 2": {
+          "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+        },
+        "Base Type Numeric Attribute 3": {
+          "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+        },
+        "Base Type Numeric Attribute 4": {
+          "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+        },
+        "Enum": {
+          "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+        },
+        "Color": {
+          "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+        },
+        "License": {
+          "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+        }
+      }
+    }
+  }
+}
