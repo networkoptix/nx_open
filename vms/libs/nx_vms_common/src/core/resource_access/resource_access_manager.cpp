@@ -863,6 +863,11 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
         }
     }
 
+    // LDAP Default is similar to predefined groups and cannot be deleted, but it can be included in
+    // other groups or its description can be modified.
+    if (targetGroup.id == kDefaultLdapGroupId)
+        result.setFlag(Qn::RemovePermission, false);
+
     if (targetGroup.attributes.testFlag(UserAttribute::readonly))
         return result & Qn::ReadPermission;
 
