@@ -69,18 +69,19 @@ public:
     QStringList eventDetails(
         const EventParameters& params, AttrSerializePolicy policy) const;
 
+    enum Url { localIp, publicIp, cloud };
+
     /**
      * Construct url, opening webadmin view for the given camera at the given time.
      * @param id Camera id.
      * @param timestamp Timestamp.
-     * @param usePublicIp If the url is formed on the server side, we can force public server ip to
-     *     be used instead of the local one. Actual for server-side only.
+     * @param urlType Url type. Actual for server-side only.
      * @param proxyAddress Force proxy address to be used. Actual for the client side only.
      */
     QString urlForCamera(
         const QnUuid& id,
         std::chrono::milliseconds timestamp,
-        bool usePublicIp,
+        Url urlType,
         const std::optional<nx::network::SocketAddress>& proxyAddress = std::nullopt) const;
 
     QString toggleStateToString(EventState state) const;
