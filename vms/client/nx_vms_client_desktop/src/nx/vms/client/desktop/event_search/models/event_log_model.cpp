@@ -454,7 +454,7 @@ QString EventLogModel::motionUrl(Column column, const EventLogModelData& data) c
     return m_stringHelper->urlForCamera(
         device->getId(),
         duration_cast<milliseconds>(data.event(systemContext())->timestamp()),
-        /*usePublicIp*/ true, //< Not used on the client side anyway.
+        nx::vms::rules::utils::StringHelper::publicIp, //< Not used on the client side anyway.
         connectionAddress);
 }
 

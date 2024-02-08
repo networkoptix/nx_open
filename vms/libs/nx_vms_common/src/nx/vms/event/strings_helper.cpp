@@ -3,18 +3,20 @@
 #include "strings_helper.h"
 
 #include <analytics/common/object_metadata.h>
+#include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_history.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/network_resource.h>
-#include <core/resource/resource.h>
 #include <core/resource/resource_display_info.h>
+#include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
-#include <core/resource_management/resource_pool.h>
-#include <nx/analytics/taxonomy/abstract_state.h>
+#include <nx_ec/abstract_ec_connection.h>
 #include <nx/analytics/taxonomy/abstract_state_watcher.h>
+#include <nx/analytics/taxonomy/abstract_state.h>
 #include <nx/fusion/serialization/json.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/reflect/string_conversion.h>
 #include <nx/utils/log/assert.h>
@@ -24,10 +26,10 @@
 #include <nx/vms/api/analytics/engine_manifest.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/system_context.h>
+#include <nx/vms/common/system_settings.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
 #include <nx/vms/text/human_readable.h>
 #include <nx/vms/time/formatter.h>
-#include <nx_ec/abstract_ec_connection.h>
 #include <utils/common/id.h>
 
 #include "aggregation_info.h"
@@ -781,7 +783,7 @@ QStringList StringsHelper::aggregatedEventDetails(
 QString StringsHelper::urlForCamera(
     const QnUuid& id,
     std::chrono::milliseconds timestamp,
-    bool usePublicIp,
+    Url urlType,
     const std::optional<nx::network::SocketAddress>& proxyAddress) const
 {
     static constexpr int kDefaultHttpPort = 80;
@@ -812,24 +814,35 @@ QString StringsHelper::urlForCamera(
             server = newServer;
 
         nx::utils::Url serverUrl = server->getRemoteUrl();
-        if (usePublicIp)
+        switch (urlType)
         {
-            const auto publicIp = server->getProperty(ResourcePropertyKey::Server::kPublicIp);
-            if (publicIp.isEmpty())
-                return QString();
-
-            const QStringList parts = publicIp.split(':');
-            builder.setHost(parts[0]);
-            if (parts.size() > 1)
-                builder.setPort(parts[1].toInt());
-            else
+            case Url::localIp:
+                builder.setHost(serverUrl.host());
                 builder.setPort(serverUrl.port(kDefaultHttpPort));
-        }
-        else /*usePublicIp*/
-        {
-            builder.setHost(serverUrl.host());
-            builder.setPort(serverUrl.port(kDefaultHttpPort));
-        }
+                break;
+            case Url::publicIp:
+            {
+                const auto publicIp = server->getProperty(ResourcePropertyKey::Server::kPublicIp);
+                if (publicIp.isEmpty())
+                    return QString();
+
+                const QStringList parts = publicIp.split(':');
+                builder.setHost(parts[0]);
+                if (parts.size() > 1)
+                    builder.setPort(parts[1].toInt());
+                else
+                    builder.setPort(serverUrl.port(kDefaultHttpPort));
+                break;
+            }
+            case Url::cloud:
+            {
+                const auto sId = QnUuid::fromStringSafe(systemSettings()->cloudSystemId());
+                return builder.setHost(nx::network::SocketGlobals::cloud().cloudHost())
+                    .setPath(NX_FMT("/systems/%1/view/%2", sId.toSimpleString(), id.toSimpleString()))
+                    .setQuery(NX_FMT("time=%1", timestamp.count()))
+                    .toUrl().toString();
+            }
+        };
     }
 
     builder.setPath("/static/index.html")
