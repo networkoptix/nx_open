@@ -9,6 +9,8 @@
 
 namespace {
 
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kOfflineTheme = {{QIcon::Normal, {.primary = "red_core"}}};
+
 template<typename Type>
 int toInt(Type value)
 {
@@ -324,10 +326,29 @@ QString QnStatusOverlayController::statusIconPath(Qn::ResourceStatusOverlay over
     return extractValue(overlay, kIconPaths);
 }
 
+const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions QnStatusOverlayController::statusIconColors(Qn::ResourceStatusOverlay overlay)
+{
+    switch (overlay)
+    {
+        case Qn::OfflineOverlay:
+            return kOfflineTheme;
+        default:
+            return {};
+    }
+}
+
 QPixmap QnStatusOverlayController::statusIcon(Qn::ResourceStatusOverlay status)
 {
     const auto pixmapPath = statusIconPath(status);
-    return pixmapPath.isEmpty() ? QPixmap() : qnSkin->pixmap(pixmapPath, true);
+    const auto colorTheme = statusIconColors(status);
+
+    if (pixmapPath.isEmpty())
+        return QPixmap();
+
+    QSize size = qnSkin->pixmap(pixmapPath, true).size();
+    return colorTheme.isEmpty()
+        ? qnSkin->pixmap(pixmapPath, true)
+        : qnSkin->icon(pixmapPath, colorTheme).pixmap(size);
 }
 
 QnStatusOverlayController::IntStringHash

@@ -6,6 +6,7 @@
 
 #include <client/client_globals.h>
 #include <core/resource/resource_fwd.h>
+#include <nx/vms/client/core/skin/svg_icon_colorer.h>
 #include <ui/graphics/items/overlays/resource_status_overlay_widget.h>
 
 class QnStatusOverlayWidget;
@@ -42,6 +43,7 @@ public:
     static QString descriptionText(Qn::ResourceStatusOverlay overlay);
     static QString suggestionText(Qn::ResourceStatusOverlay overlay, bool buttonPresent);
     static QString statusIconPath(Qn::ResourceStatusOverlay overlay);
+    static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions statusIconColors(Qn::ResourceStatusOverlay overlay);
     static QPixmap statusIcon(Qn::ResourceStatusOverlay overlay);
 
 signals:
