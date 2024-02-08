@@ -477,7 +477,7 @@ bool isDefaultExpertSettings(const State& state)
         return false;
     }
 
-    if (!state.expert.recordAudioEnabled.valueOr(false))
+    if (state.expert.recordAudioDisabled.valueOr(true))
         return false;
 
     if (state.canSwitchPtzPresetTypes() && (!state.expert.preferredPtzPresetType.hasValue()
@@ -1345,10 +1345,10 @@ State CameraSettingsDialogStateReducer::loadCameras(
             return !camera->isPrimaryStreamRecorded();
         });
 
-    fetchFromCameras<bool>(state.expert.recordAudioEnabled, cameras,
+    fetchFromCameras<bool>(state.expert.recordAudioDisabled, cameras,
         [](const Camera& camera)
         {
-            return camera->isAudioRecorded();
+            return !camera->isAudioRecorded();
         });
 
     fetchFromCameras<bool>(state.expert.secondaryRecordingDisabled, cameras,
@@ -2436,12 +2436,12 @@ State CameraSettingsDialogStateReducer::setPrimaryRecordingDisabled(State state,
     return state;
 }
 
-State CameraSettingsDialogStateReducer::setRecordAudioEnabled(State state, bool value)
+State CameraSettingsDialogStateReducer::setRecordAudioDisabled(State state, bool value)
 {
     NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
 
     state.hasChanges = true;
-    state.expert.recordAudioEnabled.setUser(value);
+    state.expert.recordAudioDisabled.setUser(value);
     state.isDefaultExpertSettings = isDefaultExpertSettings(state);
     state = handleStreamParametersChange(std::move(state));
 
@@ -2689,7 +2689,7 @@ State CameraSettingsDialogStateReducer::resetExpertSettings(State state)
     state = setUseMedia2ToFetchProfiles(std::move(state), UsingOnvifMedia2Type::autoSelect);
     state = setPrimaryRecordingDisabled(std::move(state), false);
     state = setSecondaryRecordingDisabled(std::move(state), false);
-    state = setRecordAudioEnabled(std::move(state), true);
+    state = setRecordAudioDisabled(std::move(state), false);
     state = setPreferredPtzPresetType(std::move(state), nx::core::ptz::PresetType::undefined);
     state = setForcedPtzPanTiltCapability(std::move(state), false);
     state = setForcedPtzZoomCapability(std::move(state), false);
