@@ -277,7 +277,7 @@ Dialog
                 {
                     id: testStatus
 
-                    Image
+                    SvgImage
                     {
                         visible: dialog.testState == LdapSettings.TestState.ok
                             || dialog.testState == LdapSettings.TestState.error
@@ -286,9 +286,13 @@ Dialog
                         Layout.topMargin: (testButton.height - height) / 2
                         Layout.leftMargin: 8
 
-                        source: dialog.testState == LdapSettings.TestState.ok
+                        primaryColor: dialog.testState == LdapSettings.TestState.ok
+                            ? "green_core"
+                            : "red_core"
+
+                        sourcePath: dialog.testState == LdapSettings.TestState.ok
                             ? "image://svg/skin/user_settings/connection_ok.svg"
-                            : "image://svg/skin/user_settings/connection_error.svg"
+                            : "image://svg/skin/text_buttons/error.svg"
                         sourceSize: Qt.size(20, 20)
                     }
 

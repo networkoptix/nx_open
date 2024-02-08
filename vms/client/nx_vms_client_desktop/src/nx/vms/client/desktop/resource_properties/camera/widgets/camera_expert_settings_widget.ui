@@ -45,53 +45,6 @@
        <number>16</number>
       </property>
       <item>
-       <widget class="QWidget" name="warningContainer" native="true">
-        <property name="autoFillBackground">
-         <bool>false</bool>
-        </property>
-        <layout class="QHBoxLayout" name="horizontalLayout_7">
-         <property name="leftMargin">
-          <number>16</number>
-         </property>
-         <property name="topMargin">
-          <number>16</number>
-         </property>
-         <property name="rightMargin">
-          <number>16</number>
-         </property>
-         <property name="bottomMargin">
-          <number>16</number>
-         </property>
-         <item>
-          <widget class="QLabel" name="iconLabel">
-           <property name="maximumSize">
-            <size>
-             <width>32</width>
-             <height>32</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="generalWarningLabel">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
-             <horstretch>1</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text">
-            <string>Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</string>
-           </property>
-           <property name="wordWrap">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-      </item>
-      <item>
        <widget class="QScrollArea" name="scrollArea">
         <property name="horizontalScrollBarPolicy">
          <enum>Qt::ScrollBarAlwaysOff</enum>
@@ -827,6 +780,9 @@
    </item>
    <item>
     <widget class="nx::vms::client::desktop::CommonMessageBar" name="motionImplicitlyDisabledAlertBar" native="true"/>
+   </item>
+   <item>
+    <widget class="nx::vms::client::desktop::CommonMessageBar" name="generalWarningAlertBar" native="true"/>
    </item>
   </layout>
  </widget>
