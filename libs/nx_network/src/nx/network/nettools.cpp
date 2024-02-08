@@ -23,7 +23,6 @@
 #if defined(Q_OS_LINUX)
     #include <netdb.h>
 
-    #include <sys/socket.h>
     #ifndef Q_OS_ANDROID
         #include <ifaddrs.h>
     #endif
@@ -33,6 +32,11 @@
     #include <sys/ioctl.h>
     #include <sys/socket.h>
     #include <sys/types.h>
+
+    #include <net/if_arp.h>
+
+    #include <netinet/in.h>
+    #include <arpa/inet.h>
 #elif defined(Q_OS_MAC)
     #include <err.h>
     #include <ifaddrs.h>
@@ -422,8 +426,36 @@ utils::MacAddress getMacByIP(const QHostAddress& ip, bool /*net*/)
 #endif
 
 #else // Linux
-utils::MacAddress getMacByIP(const QHostAddress& /*ip*/, bool /*net*/)
+utils::MacAddress getMacByIP(const QHostAddress& ip, bool /*net*/)
 {
+    const auto interfaceList = getAllIPv4Interfaces(
+        /* ignore usb */ false, InterfaceListPolicy::keepAllAddressesPerInterface);
+    const auto it = std::find_if(interfaceList.begin(), interfaceList.end(),
+        [&ip](const auto& iface) { return iface.isHostBelongToIpv4Network(ip); });
+    if (it == interfaceList.end())
+        return utils::MacAddress(); //< Can't proceed without interface name.
+
+    arpreq req;
+    memset(&req, 0, sizeof(req));
+
+    auto sin = (sockaddr_in*) &req.arp_pa;
+    sin->sin_family = AF_INET;
+    sin->sin_addr.s_addr = htonl(ip.toIPv4Address());
+    strncpy(req.arp_dev, it->name.toStdString().c_str(), sizeof(req.arp_dev) - 1);
+
+    if (int s = socket(AF_INET, SOCK_DGRAM, 0); s != -1)
+    {
+        if (ioctl(s, SIOCGARP, &req) != -1)
+        {
+            if (req.arp_flags & ATF_COM)
+            {
+                auto rawData = (const unsigned char*) &req.arp_ha.sa_data[0];
+                return utils::MacAddress::fromRawData(rawData);
+            }
+        }
+        close(s);
+    }
+
     return utils::MacAddress();
 }
 
