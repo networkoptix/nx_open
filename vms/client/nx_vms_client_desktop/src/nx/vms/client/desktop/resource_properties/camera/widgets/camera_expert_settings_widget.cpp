@@ -27,6 +27,7 @@
 
 #include "../flux/camera_settings_dialog_state.h"
 #include "../flux/camera_settings_dialog_store.h"
+#include "nx/vms/client/desktop/common/widgets/message_bar.h"
 #include "private/motion_stream_alerts.h"
 
 namespace nx::vms::client::desktop {
@@ -147,7 +148,6 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(
     spin_box_utils::setSpecialValue(ui->customWebPagePortSpinBox);
 
     setWarningStyle(ui->bitrateIncreaseWarningLabel);
-    setWarningStyle(ui->generalWarningLabel);
     setWarningStyle(ui->logicalIdWarningLabel);
     setWarningStyle(ui->presetTypeLimitationsLabel);
 
@@ -168,11 +168,6 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(
         QVariant::fromValue(vms::api::RtpTransportType::automatic));
     ui->comboBoxTransport->addItem("TCP", QVariant::fromValue(vms::api::RtpTransportType::tcp));
     ui->comboBoxTransport->addItem("UDP", QVariant::fromValue(vms::api::RtpTransportType::udp));
-
-    ui->iconLabel->setPixmap(qnSkin->pixmap("theme/warning.png"));
-    ui->iconLabel->setScaledContents(true);
-
-    setWarningFrame(ui->warningContainer);
 
     connect(store, &CameraSettingsDialogStore::stateChanged,
         this, &CameraExpertSettingsWidget::loadState);
@@ -312,6 +307,10 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(
 
     connect(ui->restoreDefaultsButton, &QPushButton::clicked,
         store, &CameraSettingsDialogStore::resetExpertSettings);
+
+    ui->generalWarningAlertBar->init({.text = tr("Do not change these settings unless you are"
+        " absolutely sure of their potential impact on your system performance"),
+        .level = BarDescription::BarLevel::Warning});
 
     ui->motionImplicitlyDisabledAlertBar->init({.level = BarDescription::BarLevel::Error});
     const auto forceDetectionButton = new QPushButton(ui->motionImplicitlyDisabledAlertBar);
