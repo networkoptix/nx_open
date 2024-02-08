@@ -17,6 +17,7 @@
 #include "special_objects/plugin.h"
 #include "taxonomy_features/plugin.h"
 #include "video_frames/plugin.h"
+#include "error_reporting/plugin.h"
 
 extern "C" NX_PLUGIN_API nx::sdk::IPlugin* createNxPluginByIndex(int instanceIndex)
 {
@@ -39,6 +40,7 @@ extern "C" NX_PLUGIN_API nx::sdk::IPlugin* createNxPluginByIndex(int instanceInd
 		case 12: return new object_detection::Plugin();
         case 13: return new object_actions::Plugin();
         case 14: return new http_requests::Plugin();
+        case 15: return new error_reporting::Plugin();
         default: return nullptr;
     }
 }
