@@ -193,8 +193,8 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(
     connect(ui->checkBoxSecondaryRecorder, &QCheckBox::clicked,
         store, &CameraSettingsDialogStore::setSecondaryRecordingDisabled);
 
-    connect(ui->checkBoxRecordAudio, &QCheckBox::clicked,
-        store, &CameraSettingsDialogStore::setRecordAudioEnabled);
+    connect(ui->checkBoxDontRecordAudio, &QCheckBox::clicked,
+        store, &CameraSettingsDialogStore::setRecordAudioDisabled);
 
     connect(ui->forcedPanTiltCheckBox, &QCheckBox::clicked,
         store, &CameraSettingsDialogStore::setForcedPtzPanTiltCapability);
@@ -479,7 +479,7 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
         ui->checkBoxSecondaryRecorder, state.expert.secondaryRecordingDisabled);
 
     check_box_utils::setupTristateCheckbox(
-        ui->checkBoxRecordAudio, state.expert.recordAudioEnabled);
+        ui->checkBoxDontRecordAudio, state.expert.recordAudioDisabled);
 
     ui->checkBoxSecondaryRecorder->setVisible(hasDualStreaming);
     ui->checkBoxSecondaryRecorder->setEnabled(!state.expert.dualStreamingDisabled.valueOr(false)
@@ -487,7 +487,7 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
 
     ::setReadOnly(ui->checkBoxPrimaryRecorder, state.readOnly);
     ::setReadOnly(ui->checkBoxSecondaryRecorder, state.readOnly);
-    ::setReadOnly(ui->checkBoxRecordAudio, state.readOnly);
+    ::setReadOnly(ui->checkBoxDontRecordAudio, state.readOnly);
 
     // Media Streaming.
 
