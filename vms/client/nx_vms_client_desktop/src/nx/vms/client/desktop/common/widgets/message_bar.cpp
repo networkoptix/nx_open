@@ -27,13 +27,14 @@ namespace {
 
 static const QString kCrossColor = "#E1E7EA";
 static const QString kErrorIconColor = "#E1E7EA";
+static const QString kCertificateWarningIconColor = "#698796";
 static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kTextButtonColors = {
-    {QIcon::Normal, {{kCrossColor, "light4"}}}, {QIcon::Active, {{kCrossColor, "light3"}}}};
+    {QIcon::Normal, {{kCrossColor, "light4"}, {kCertificateWarningIconColor, "light4"}}},
+    {QIcon::Active, {{kCrossColor, "light3"}}}};
 static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kErrorTextButtonColors = {
     {QIcon::Normal, {{kCrossColor, "dark4"}}}, {QIcon::Active, {{kCrossColor, "dark5"}}}};
 static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kErrorIconColors = {
     {QIcon::Normal, {{kErrorIconColor, "red_l1"}}}};
-
 
 } // namespace
 
