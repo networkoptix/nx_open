@@ -938,7 +938,7 @@ QPixmap NotificationListModel::Private::pixmapForAction(
         }
 
         case EventType::cameraMotionEvent:
-            return qnSkin->pixmap("events/motion.svg");
+            return qnSkin->icon("tree/camera.svg", kIconSubstitutions).pixmap(QSize(20, 20));
 
         case EventType::storageFailureEvent:
             return qnSkin->icon("events/storage_20.svg", kIconSubstitutions).pixmap(QSize(20, 20));
