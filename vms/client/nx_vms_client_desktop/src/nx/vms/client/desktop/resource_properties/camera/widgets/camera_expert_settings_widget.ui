@@ -188,9 +188,9 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QCheckBox" name="checkBoxRecordAudio">
+                 <widget class="QCheckBox" name="checkBoxDontRecordAudio">
                   <property name="text">
-                   <string>Record audio</string>
+                   <string>Do not record audio</string>
                   </property>
                  </widget>
                 </item>
