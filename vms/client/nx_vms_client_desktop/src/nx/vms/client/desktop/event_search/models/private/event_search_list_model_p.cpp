@@ -502,6 +502,8 @@ QString EventSearchListModel::Private::iconPath(const vms::event::EventParameter
             return "events/connection_red.png";
 
         case EventType::networkIssueEvent:
+            return "events/alert_yellow.png";
+
         case EventType::cameraIpConflictEvent:
             return "events/connection_yellow.png";
 
@@ -522,8 +524,6 @@ QString EventSearchListModel::Private::iconPath(const vms::event::EventParameter
         }
 
         case EventType::cameraMotionEvent:
-            return "events/motion.svg";
-
         // TODO: #spanasenko Fill with actual pixmaps as soon as they're created.
         case EventType::cameraInputEvent:
         case EventType::analyticsSdkEvent:
