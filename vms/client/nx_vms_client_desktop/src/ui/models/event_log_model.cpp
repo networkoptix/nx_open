@@ -646,7 +646,7 @@ QString QnEventLogModel::motionUrl(Column column, const vms::event::ActionData& 
     return m_stringsHelper->urlForCamera(
         action.eventParams.eventResourceId,
         std::chrono::milliseconds(action.eventParams.eventTimestampUsec / 1000),
-        /*usePublicIp*/ true, //< Not used on the client side anyway.
+        nx::vms::event::StringsHelper::publicIp, //< Not used on the client side anyway.
         connectionAddress);
 }
 
