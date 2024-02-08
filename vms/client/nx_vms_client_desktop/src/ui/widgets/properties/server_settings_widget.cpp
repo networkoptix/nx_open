@@ -42,6 +42,7 @@
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/system_settings.h>
 #include <ui/common/read_only.h>
+#include <ui/dialogs/common/message_box.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/synctime.h>
@@ -683,6 +684,14 @@ void QnServerSettingsWidget::showServerCertificate(const QString& id)
 
     if (!NX_ASSERT(m_server))
         return;
+
+    if (!context()->globalSettings()->isAuditTrailEnabled())
+    {
+        QnMessageBox::warning(this,
+            tr("Certificate details are not available"),
+            tr("To access certificate details, enable the Audit Trail feature."));
+        return;
+    }
 
     std::string pem;
     ServerCertificateViewer::Mode mode;
