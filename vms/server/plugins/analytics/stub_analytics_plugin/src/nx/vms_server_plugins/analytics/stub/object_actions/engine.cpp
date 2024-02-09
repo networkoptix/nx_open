@@ -23,6 +23,7 @@ namespace object_actions {
 
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
+using Uuid = nx::sdk::Uuid;
 
 static std::string indent(int level)
 {

@@ -9,11 +9,11 @@
 #include <licensing/license_fwd.h>
 #include <nx/media/video_data_packet.h>
 #include <nx/utils/cryptographic_hash.h>
+#include <nx/utils/uuid.h>
 
 static const char EXPORT_SIGN_MAGIC[] = "RhjrjLbkMxTujHI!";
 static const nx::utils::QnCryptographicHash::Algorithm EXPORT_SIGN_METHOD = nx::utils::QnCryptographicHash::Md5;
 
-class QnUuid;
 class SPSUnit;
 class PPSUnit;
 class QnLicensePool;

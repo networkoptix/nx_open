@@ -11,12 +11,12 @@
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/event/actions/abstract_action.h>
 #include <nx/vms/event/event_fwd.h>
+#include <nx/utils/uuid.h>
 
 #include "../event_search_list_model.h"
 #include "abstract_async_search_list_model_p.h"
 
 class QTimer;
-class QnUuid;
 
 namespace nx::vms::event { class StringsHelper; }
 

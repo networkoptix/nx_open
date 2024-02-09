@@ -11,22 +11,24 @@
 
 #include <nx/reflect/instrument.h>
 
-class NX_UTILS_API QnUuid
+namespace nx {
+
+class NX_UTILS_API Uuid
 {
     Q_GADGET
 
 public:
     static const size_t RFC4122_SIZE = 16;
 
-    QnUuid();
-    QnUuid(const QnUuid&) = default;
-    QnUuid(QnUuid&&) = default;
+    Uuid() = default;
+    Uuid(const Uuid&) = default;
+    Uuid(Uuid&&) = default;
 
-    explicit QnUuid(const char* text);
-    explicit QnUuid(const QString& text);
-    explicit QnUuid(const QByteArray& text);
-    explicit QnUuid(const std::string& text);
-    QnUuid(const QUuid& uuid);
+    explicit Uuid(const char* text);
+    explicit Uuid(const QString& text);
+    explicit Uuid(const QByteArray& text);
+    explicit Uuid(const std::string& text);
+    Uuid(const QUuid& uuid);
 
     const QUuid& getQUuid() const;
 
@@ -48,48 +50,48 @@ public:
 
     QUuid toQUuid() const;
 
-    bool operator<( const QnUuid& other ) const;
-    bool operator>( const QnUuid& other ) const;
+    bool operator<(const Uuid& other) const;
+    bool operator>(const Uuid& other) const;
 
-    constexpr bool operator!=(const QnUuid& other) const
+    constexpr bool operator!=(const Uuid& other) const
     {
         return m_uuid != other.m_uuid;
     }
 
-    constexpr bool operator==(const QnUuid& other) const
+    constexpr bool operator==(const Uuid& other) const
     {
         return m_uuid == other.m_uuid;
     }
 
-    QnUuid& operator=(const QnUuid&) = default;
-    QnUuid& operator=(QnUuid&&) = default;
+    Uuid& operator=(const Uuid&) = default;
+    Uuid& operator=(Uuid&&) = default;
 
-    static QnUuid fromRfc4122( const QByteArray& bytes );
-    static QnUuid fromHardwareId( const QString& hwid );
-    static QnUuid createUuid();
+    static Uuid fromRfc4122(const QByteArray& bytes);
+    static Uuid fromHardwareId(const QString& hwid);
+    static Uuid createUuid();
 
-    /** Construct QnUuid from pool of id's. Pool is determined by base id and individual offset. */
-    static QnUuid createUuidFromPool(const QUuid &baseId, uint offset);
+    /** Construct Uuid from pool of id's. Pool is determined by base id and individual offset. */
+    static Uuid createUuidFromPool(const QUuid &baseId, uint offset);
 
     /**
-     * Construct QnUuid from string representation.
-     * If the string is not a valid UUID null QnUuid will be returned.
+     * Construct Uuid from string representation.
+     * If the string is not a valid UUID null Uuid will be returned.
      */
-    static QnUuid fromStringSafe(const QString& uuid);
-    static QnUuid fromStringSafe(const QByteArray& uuid);
-    static QnUuid fromStringSafe(const char* uuid);
-    static QnUuid fromStringSafe(const std::string_view& uuid);
+    static Uuid fromStringSafe(const QString& uuid);
+    static Uuid fromStringSafe(const QByteArray& uuid);
+    static Uuid fromStringSafe(const char* uuid);
+    static Uuid fromStringSafe(const std::string_view& uuid);
 
     /**
-     * Create fixed QnUuid from any data. As a value of uuid the MD5 hash is taken so created uuids
+     * Create fixed Uuid from any data. As a value of uuid the MD5 hash is taken so created uuids
      * will be equal for equal strings given. Also there is a collision possibility.
      */
-    static QnUuid fromArbitraryData(const QByteArray& data);
-    static QnUuid fromArbitraryData(const QString& data);
-    static QnUuid fromArbitraryData(std::string_view data);
+    static Uuid fromArbitraryData(const QByteArray& data);
+    static Uuid fromArbitraryData(const QString& data);
+    static Uuid fromArbitraryData(std::string_view data);
 
     template<size_t N>
-    static QnUuid fromArbitraryData(const char (&data)[N])
+    static Uuid fromArbitraryData(const char (&data)[N])
     {
         return fromArbitraryData(std::string_view(data, N));
     }
@@ -98,39 +100,43 @@ public:
     static bool isUuidString(const QString& data);
     static bool isUuidString(const std::string& data);
 
-    static QnUuid fromString(const std::string_view& str);
+    static Uuid fromString(const std::string_view& str);
 
 private:
     QUuid m_uuid;
 
-    friend NX_UTILS_API QDataStream& operator>>(QDataStream& s, QnUuid& id);
+    friend NX_UTILS_API QDataStream& operator>>(QDataStream& s, Uuid& id);
 };
 
-NX_REFLECTION_TAG_TYPE(QnUuid, useStringConversionForSerialization)
+NX_REFLECTION_TAG_TYPE(Uuid, useStringConversionForSerialization)
+
+NX_UTILS_API QString changedGuidByteOrder(const QString& guid);
+
+NX_UTILS_API QDataStream& operator<<(QDataStream& s, const Uuid& id);
+NX_UTILS_API QDebug operator<<(QDebug dbg, const Uuid& id);
+NX_UTILS_API QDataStream& operator>>(QDataStream& s, Uuid& id);
+
+} // namespace nx
 
 namespace std {
 
 template<>
-struct hash<QnUuid>
+struct hash<nx::Uuid>
 {
-    size_t operator()(const QnUuid& id) const
+    size_t operator()(const nx::Uuid& id, size_t seed = 0) const
     {
-        return qHash(id.getQUuid());
+        return qHash(id.getQUuid(), seed);
     }
 };
 
 } // namespace std
 
-namespace nx::utils {
+// TODO: Remove and replace all over the code.
+using QnUuid = nx::Uuid;
+using QnUuidSet = QSet<nx::Uuid>;
+using QnUuidList = QList<nx::Uuid>;
 
-NX_UTILS_API QString changedGuidByteOrder(const QString& guid);
-
-} // namespace nx::utils
-
-using QnUuidSet = QSet<QnUuid>;
-using QnUuidList = QList<QnUuid>;
-
-NX_UTILS_API size_t qHash(const QnUuid& uuid, size_t seed = 0 ) noexcept;
-NX_UTILS_API QDataStream& operator<<(QDataStream& s, const QnUuid& id);
-NX_UTILS_API QDebug operator<<(QDebug dbg, const QnUuid& id);
-NX_UTILS_API QDataStream& operator>>(QDataStream& s, QnUuid& id);
+inline size_t qHash(const QnUuid& id, size_t seed = 0)
+{
+    return qHash(id.getQUuid(), seed);
+}

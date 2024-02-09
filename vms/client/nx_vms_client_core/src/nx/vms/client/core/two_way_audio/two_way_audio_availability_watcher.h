@@ -6,8 +6,8 @@
 
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/impl_ptr.h>
+#include <nx/utils/uuid.h>
 
-class QnUuid;
 namespace nx::vms::license { class SingleCamLicenseStatusHelper; }
 
 namespace nx::vms::client::core {

@@ -5,11 +5,11 @@
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/client/core/common/utils/common_module_aware.h>
 #include <nx/vms/client/desktop/common/widgets/dropdown_button.h>
+#include <nx/utils/uuid.h>
 
 #include "server_online_status_watcher.h"
 
 class QMenu;
-class QnUuid;
 
 class QnChooseServerButton: public DropdownButton, public nx::vms::client::core::CommonModuleAware
 {
