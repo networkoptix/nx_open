@@ -213,6 +213,8 @@ private:
     void clearDownloadFolder();
     void verifyUpdateFile();
 
+    nx::vms::applauncher::api::ResultType installUpdateSync();
+
     /**
      * Converts applauncher::api::ResultType to a readable string.
      */
