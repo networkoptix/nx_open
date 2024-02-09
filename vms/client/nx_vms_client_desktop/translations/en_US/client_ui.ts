@@ -682,11 +682,11 @@
         <translation></translation>
     </message>
     <message>
-        <source>Record audio</source>
+        <source>Do not send Stop PTZ command</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Do not send Stop PTZ command</source>
+        <source>Do not record audio</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
