@@ -20,6 +20,7 @@
 #include <core/resource/resource_fwd.h>
 #include <nx/analytics/taxonomy/abstract_object_type.h>
 #include <nx/utils/scope_guard.h>
+#include <nx/utils/uuid.h>
 #include <nx/vms/client/core/network/remote_connection_aware.h>
 #include <nx/vms/client/desktop/analytics/analytics_attribute_helper.h>
 #include <nx/vms/client/desktop/camera/camera_fwd.h>
@@ -29,7 +30,6 @@
 
 #include "../analytics_search_list_model.h"
 
-class QnUuid;
 class QnMediaResourceWidget;
 class QMenu;
 class QJsonObject;

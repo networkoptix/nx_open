@@ -25,9 +25,9 @@ namespace special_objects {
 
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
-
 using namespace std::chrono;
 using namespace std::literals::chrono_literals;
+using Uuid = nx::sdk::Uuid;
 
 Engine::Engine(Plugin* plugin):
     nx::sdk::analytics::Engine(NX_DEBUG_ENABLE_OUTPUT, plugin->instanceId()),

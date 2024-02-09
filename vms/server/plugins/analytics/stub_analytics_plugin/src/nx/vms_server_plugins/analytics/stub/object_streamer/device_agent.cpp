@@ -27,6 +27,7 @@ namespace object_streamer {
 
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
+using Uuid = nx::sdk::Uuid;
 
 using nx::kit::Json;
 

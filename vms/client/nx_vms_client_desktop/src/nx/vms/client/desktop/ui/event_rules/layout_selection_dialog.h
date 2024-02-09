@@ -10,9 +10,9 @@
 
 #include <core/resource/resource_fwd.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
+#include <nx/utils/uuid.h>
 
 class QnResourceListModel;
-class QnUuid;
 
 namespace Ui {
 class LayoutSelectionDialog;

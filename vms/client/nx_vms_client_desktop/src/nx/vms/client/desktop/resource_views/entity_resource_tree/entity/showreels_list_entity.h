@@ -3,10 +3,10 @@
 #pragma once
 
 #include <nx/utils/scoped_connections.h>
+#include <nx/utils/uuid.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity/unique_key_list_entity.h>
 
 namespace nx::vms::common { class ShowreelManager; }
-class QnUuid;
 
 namespace nx::vms::client::desktop {
 namespace entity_resource_tree {
