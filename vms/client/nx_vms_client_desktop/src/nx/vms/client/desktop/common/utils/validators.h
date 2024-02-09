@@ -7,8 +7,7 @@
 #include <QtGui/QValidator>
 
 #include <core/resource/resource_fwd.h>
-
-class QnUuid;
+#include <nx/utils/uuid.h>
 
 namespace nx::vms::client::desktop {
 

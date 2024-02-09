@@ -16,8 +16,7 @@
 #include <ui/delegates/resource_item_delegate.h>
 #include <ui/models/resource/resource_list_model.h>
 #include <ui/models/user_roles_model.h>
-
-class QnUuid;
+#include <nx/utils/uuid.h>
 
 namespace nx::vms::client::desktop {
 namespace ui {

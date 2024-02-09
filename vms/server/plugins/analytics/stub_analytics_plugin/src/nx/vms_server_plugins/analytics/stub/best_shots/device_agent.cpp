@@ -22,6 +22,7 @@ namespace best_shots {
 
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
+using Uuid = nx::sdk::Uuid;
 
 static const int kTrackLength = 200;
 static const float kMaxObjectHeight = 0.25F;

@@ -11,8 +11,6 @@
 #include <nx/core/core_fwd.h>
 #include <nx/utils/uuid.h>
 
-class QnUuid;
-
 namespace nx::core::access {
 
 /**
