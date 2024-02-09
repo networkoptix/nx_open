@@ -20,7 +20,7 @@ struct DeviceAgentId
 
 inline size_t qHash(const DeviceAgentId& key)
 {
-    return qHash(key.device) + qHash(key.engine);
+    return ::qHash(key.device) + ::qHash(key.engine);
 }
 
 struct NX_VMS_CLIENT_DESKTOP_API DeviceAgentData

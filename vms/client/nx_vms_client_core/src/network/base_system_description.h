@@ -5,9 +5,9 @@
 #include <QtCore/QObject>
 
 #include <nx/utils/url.h>
+#include <nx/utils/uuid.h>
 #include <nx/vms/api/data/module_information.h>
 
-class QnUuid;
 class QnBaseSystemDescription;
 typedef QSharedPointer<QnBaseSystemDescription> QnSystemDescriptionPtr;
 

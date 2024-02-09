@@ -4,9 +4,9 @@
 
 #include <nx/media/media_data_packet.h>
 #include <nx/utils/cryptographic_hash.h>
+#include <nx/utils/uuid.h>
 
 class QnLicensePool;
-class QnUuid;
 
 /*
  * Class helper that build new version of signature that process audio frames separately, due to

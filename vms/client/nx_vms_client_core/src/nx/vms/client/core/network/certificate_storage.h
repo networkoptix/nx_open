@@ -8,11 +8,11 @@
 #include <QtCore/QObject>
 
 #include <nx/utils/impl_ptr.h>
+#include <nx/utils/uuid.h>
 
 #include "server_certificate_validation_level.h"
 
 class QString;
-class QnUuid;
 
 namespace nx::vms::client::core {
 

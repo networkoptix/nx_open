@@ -8,8 +8,7 @@
 
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/software_version.h>
-
-class QnUuid;
+#include <nx/utils/uuid.h>
 
 namespace nx::vms::common::update { struct Information; }
 

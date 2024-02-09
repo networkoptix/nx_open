@@ -37,6 +37,7 @@ using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 using namespace std::chrono;
 using namespace std::literals::chrono_literals;
+using Uuid = nx::sdk::Uuid;
 
 DeviceAgent::DeviceAgent(Engine* engine, const nx::sdk::IDeviceInfo* deviceInfo):
     ConsumingDeviceAgent(deviceInfo, NX_DEBUG_ENABLE_OUTPUT, engine->plugin()->instanceId()),

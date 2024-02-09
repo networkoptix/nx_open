@@ -9,14 +9,13 @@
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/socket_common.h>
 #include <nx/utils/scope_guard.h>
+#include <nx/utils/uuid.h>
 #include <nx/vms/client/core/network/remote_connection_fwd.h>
 #include <nx/vms/client/desktop/window_context_aware.h>
 
 namespace nx::vms::common { struct Credentials; }
 namespace nx::utils { class Url; }
 namespace nx::network::http { class AsyncHttpClientPtr; }
-
-class QnUuid;
 
 namespace nx::vms::client::desktop {
 

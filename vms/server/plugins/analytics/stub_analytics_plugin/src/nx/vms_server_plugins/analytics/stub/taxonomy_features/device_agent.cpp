@@ -24,6 +24,7 @@ namespace taxonomy_features {
 
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
+using Uuid = nx::sdk::Uuid;
 
 static constexpr int kTrackLength = 200;
 static constexpr float kMaxBoundingBoxWidth = 0.5F;
