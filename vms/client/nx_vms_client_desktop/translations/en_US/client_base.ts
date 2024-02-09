@@ -7569,6 +7569,10 @@ We recommend you not to open this integration. If you understand the risks, you 
         <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Do not change these settings unless you are absolutely sure of their potential impact on your system performance</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::CameraHotspotItem</name>
