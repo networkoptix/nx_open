@@ -388,11 +388,11 @@
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation>オーディオエンコーダーをイニシャライズできません.</translation>
+      <translation>音声エンコーダーを初期化できませんでした。</translation>
     </message>
     <message>
       <source>Could not initialize audio decoder.</source>
-      <translation>オーディオエンコーダーをイニシャライズできません.</translation>
+      <translation>音声デコーダーを初期化できませんでした。</translation>
     </message>
     <message>
       <source>Could not find decoder for codec %1.</source>
@@ -400,15 +400,15 @@
     </message>
     <message>
       <source>Could not send audio frame to encoder, Error code: %1.</source>
-      <translation>エラー コード エンコーダーへオーディオ フレームを送信できませんでした: %1</translation>
+      <translation>音声フレームをエンコーダーに送信できませんでした。エラー コード: %1。</translation>
     </message>
     <message>
       <source>Could not receive audio packet from encoder, Error code: %1.</source>
-      <translation>エラーコード エンコーダーからオーディオ パケットを受信できませんでした: %1</translation>
+      <translation>エンコーダーから音声パケットを受信できませんでした。エラーコード: %1。</translation>
     </message>
     <message>
       <source>Could not receive audio frame from decoder, Error code: %1.</source>
-      <translation>エラー コード デコーダーからオーディオ フレームを受信できませんでした: %1</translation>
+      <translation>デコーダーから音声フレームを受信できませんでした。エラーコード: %1。</translation>
     </message>
     <message>
       <source>Could not allocate sample buffers</source>
@@ -439,7 +439,7 @@
     </message>
     <message>
       <source>Video or audio codec is incompatible with container %1.</source>
-      <translation>映像または音声のコーデックが %1 形式と互換性がありません。</translation>
+      <translation>映像または音声のコーデックが、%1 コンテナに対応していません。</translation>
     </message>
   </context>
   <context>
@@ -450,7 +450,7 @@
     </message>
     <message>
       <source>Could not initialize video encoder.</source>
-      <translation>ビデオエンコーダーをイニシャライズできません.</translation>
+      <translation>ビデオエンコーダーを初期化できませんでした。</translation>
     </message>
   </context>
   <context>
@@ -533,7 +533,7 @@
     </message>
     <message>
       <source>Time</source>
-      <translation>時間</translation>
+      <translation>時限</translation>
     </message>
     <message>
       <source>Time Licenses</source>
@@ -1005,7 +1005,7 @@
     </message>
     <message>
       <source>Administrator</source>
-      <translation>アドミニストレーター</translation>
+      <translation>管理者</translation>
     </message>
     <message>
       <source>Advanced Viewer</source>
@@ -1105,7 +1105,7 @@
     </message>
     <message>
       <source>Unauthorized.</source>
-      <translation>Unauthorized</translation>
+      <translation>要認証。</translation>
     </message>
     <message>
       <source>Session expired.</source>
@@ -1553,7 +1553,7 @@
     </message>
     <message>
       <source>Media buffer size for audio only devices (KB, 1KB-1MB)</source>
-      <translation>オーディオのみのデバイスに対するメディアバッファサイズ (KB, 1KB-1MB)</translation>
+      <translation>音声のみのデバイスに対するメディアバッファサイズ (KB, 1KB-1MB)</translation>
     </message>
     <message>
       <source>Enable 2FA for the System</source>
@@ -1617,7 +1617,7 @@
     </message>
     <message>
       <source>Could not create output file for video recording.</source>
-      <translation>ビデオ記録の為の出力ファイルを作成出来ません..</translation>
+      <translation>映像録画用の出力ファイルを作成できませんでした。</translation>
     </message>
     <message>
       <source>Could not allocate output stream for recording.</source>
@@ -1641,7 +1641,7 @@
     </message>
     <message>
       <source>Video transcoding required.</source>
-      <translation>ビデオのトランスコーディングが必要です。</translation>
+      <translation>映像のトランスコーディングが必要です。</translation>
     </message>
     <message>
       <source>File write error. Not enough free space.</source>
@@ -2141,7 +2141,7 @@
     </message>
     <message>
       <source>I/O Module was disconnected</source>
-      <translation>I / Oモジュールが切断されました</translation>
+      <translation>I/Oモジュールが切断されました</translation>
     </message>
     <message>
       <source>Analytics Object Detected</source>

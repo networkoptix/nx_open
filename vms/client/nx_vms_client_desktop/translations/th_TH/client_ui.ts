@@ -682,12 +682,12 @@
       <translation type="unfinished">Web Page Port</translation>
     </message>
     <message>
-      <source>Record audio</source>
-      <translation type="unfinished">Record audio</translation>
-    </message>
-    <message>
       <source>Do not send Stop PTZ command</source>
       <translation type="unfinished">Do not send Stop PTZ command</translation>
+    </message>
+    <message>
+      <source>Do not record audio</source>
+      <translation type="unfinished">Do not record audio</translation>
     </message>
   </context>
   <context>
@@ -914,7 +914,7 @@
     <name>CloudLayoutsIntroDialog</name>
     <message>
       <source>BETA</source>
-      <translation type="unfinished">BETA</translation>
+      <translation>BETA</translation>
     </message>
     <message>
       <source>Available Actions</source>

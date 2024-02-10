@@ -24,7 +24,7 @@
     </message>
     <message>
       <source>Wrong password.</source>
-      <translation type="unfinished">Wrong password.</translation>
+      <translation>Kata sandi salah.</translation>
     </message>
     <message>
       <source>The password is expired. Please contact your system administrator.</source>
@@ -1009,15 +1009,15 @@
     </message>
     <message>
       <source>Advanced Viewer</source>
-      <translation type="unfinished">Advanced Viewer</translation>
+      <translation>Viewer Tingkat Lanjut</translation>
     </message>
     <message>
       <source>Viewer</source>
-      <translation type="unfinished">Viewer</translation>
+      <translation>Viewer</translation>
     </message>
     <message>
       <source>Live Viewer</source>
-      <translation type="unfinished">Live Viewer</translation>
+      <translation>Viewer Live</translation>
     </message>
     <message>
       <source>Custom Role</source>
@@ -1025,7 +1025,7 @@
     </message>
     <message>
       <source>Custom</source>
-      <translation type="unfinished">Custom</translation>
+      <translation>Kustom</translation>
     </message>
     <message>
       <source>Can manage all cameras and bookmarks.</source>

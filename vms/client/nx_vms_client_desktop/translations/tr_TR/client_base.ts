@@ -1658,7 +1658,7 @@ License Key: %2</source>
     <name>PermissionsInfoTable</name>
     <message>
       <source>Cameras &amp; Resources</source>
-      <translation>Kameralar ve Kaynkalar</translation>
+      <translation>Kameralar ve Kaynaklar</translation>
     </message>
     <message>
       <source>Shared Layouts</source>
@@ -11360,7 +11360,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Cameras &amp; Resources</source>
-      <translation>Kameralar ve Kaynkalar</translation>
+      <translation>Kameralar ve Kaynaklar</translation>
     </message>
     <message>
       <source>Shared Layouts</source>

@@ -51,7 +51,7 @@
     </message>
     <message>
       <source>Enable image enhancement</source>
-      <translation>画像補正有効</translation>
+      <translation>画像補正を有効化</translation>
     </message>
     <message>
       <source>Gamma</source>
@@ -228,7 +228,7 @@
     </message>
     <message>
       <source>Exporting video</source>
-      <translation>ビデオエクスポート</translation>
+      <translation>映像のエクスポート</translation>
     </message>
     <message>
       <source>Watching live</source>
@@ -264,11 +264,11 @@
     </message>
     <message>
       <source>Clear Filter</source>
-      <translation>フィルタークリア</translation>
+      <translation>フィルターを解除</translation>
     </message>
     <message>
       <source>Email settings</source>
-      <translation>Email設定</translation>
+      <translation>メール設定</translation>
     </message>
     <message>
       <source>All servers are offline. Audit data is not available.</source>
@@ -433,7 +433,7 @@
     </message>
     <message>
       <source>Clear Filter</source>
-      <translation>フィルタークリア</translation>
+      <translation>フィルターを解除</translation>
     </message>
   </context>
   <context>
@@ -682,12 +682,12 @@
       <translation>Webページポート</translation>
     </message>
     <message>
-      <source>Record audio</source>
-      <translation>音声を録音する</translation>
-    </message>
-    <message>
       <source>Do not send Stop PTZ command</source>
       <translation>PTZ 停止コマンドを送信しない</translation>
+    </message>
+    <message>
+      <source>Do not record audio</source>
+      <translation>音声を録音しない</translation>
     </message>
   </context>
   <context>
@@ -874,7 +874,7 @@
     </message>
     <message>
       <source>Audio</source>
-      <translation>オーディオ</translation>
+      <translation>音声</translation>
     </message>
     <message>
       <source>Enable audio</source>
@@ -922,7 +922,7 @@
     </message>
     <message>
       <source>Video Export</source>
-      <translation>映像エクスポート</translation>
+      <translation>映像のエクスポート</translation>
     </message>
     <message>
       <source>Live Video and Archive</source>
@@ -1163,7 +1163,7 @@
     </message>
     <message>
       <source>Clear Filter</source>
-      <translation>フィルタークリア</translation>
+      <translation>フィルターを解除</translation>
     </message>
     <message>
       <source>Refresh</source>
@@ -1287,7 +1287,7 @@
     <name>ExportSettingsDialog</name>
     <message>
       <source>Export Video</source>
-      <translation>ビデオをエクスポート</translation>
+      <translation>映像のエクスポート</translation>
     </message>
     <message>
       <source>Single Camera</source>
@@ -1299,7 +1299,7 @@
     </message>
     <message>
       <source>Multi Video</source>
-      <translation>複数ビデオ</translation>
+      <translation>複数映像</translation>
     </message>
   </context>
   <context>
@@ -1412,7 +1412,7 @@
     </message>
     <message>
       <source>Audio Input</source>
-      <translation>オーディオ入力</translation>
+      <translation>音声入力</translation>
     </message>
     <message>
       <source>First Source</source>
@@ -1462,7 +1462,7 @@
     <name>ImageControlWidget</name>
     <message>
       <source>Image Control</source>
-      <translation>イメージコントロール</translation>
+      <translation>画像コントロール</translation>
     </message>
     <message>
       <source>Aspect ratio</source>
@@ -1553,7 +1553,7 @@
     </message>
     <message>
       <source>Enable tile interface</source>
-      <translation>タイル状インターフェイスを有効化</translation>
+      <translation>タイル状インターフェースを有効化</translation>
     </message>
   </context>
   <context>
@@ -2087,7 +2087,7 @@
     </message>
     <message>
       <source>Email</source>
-      <translation>Eメール</translation>
+      <translation>メールアドレス</translation>
     </message>
     <message>
       <source>Password</source>
@@ -2243,11 +2243,11 @@
     </message>
     <message>
       <source>Go To Position</source>
-      <translation>ポジション移動</translation>
+      <translation>ポジションに移動</translation>
     </message>
     <message>
       <source>Create Tour</source>
-      <translation>ツアー登録</translation>
+      <translation>ツアー作成</translation>
     </message>
     <message>
       <source>Start Tour</source>
@@ -2332,7 +2332,7 @@
     <name>QnAttachToVideowallDialog</name>
     <message>
       <source>Attach to Video Wall...</source>
-      <translation>ビデオウォールレイアウト設定...</translation>
+      <translation>ビデオウォールに接続...</translation>
     </message>
     <message>
       <source>Preview</source>
@@ -2464,11 +2464,11 @@
     </message>
     <message>
       <source>Launch video wall when Windows starts.</source>
-      <translation>Windows起動時にビデオウォールを開始する.</translation>
+      <translation>Windows起動時にビデオウォールを開始する</translation>
     </message>
     <message>
       <source>Place shortcut on desktop.</source>
-      <translation>デスクトップにショートカットを作成.</translation>
+      <translation>デスクトップにショートカットを作成</translation>
     </message>
     <message>
       <source>Enable timeline on video wall</source>
@@ -2701,7 +2701,7 @@
     </message>
     <message>
       <source>Motion + Lo-Res</source>
-      <translation>常時低 ＋ モーション高解像度</translation>
+      <translation>モーション + 低解像度</translation>
     </message>
     <message>
       <source>Do Not Record</source>
@@ -2784,7 +2784,7 @@
     </message>
     <message>
       <source>Encrypting video traffic will significantly increase CPU usage.</source>
-      <translation>ビデオトラフィックを暗号化すると、CPU使用率が大幅に増加します。</translation>
+      <translation>映像トラフィックを暗号化すると、CPU使用率が大幅に増加します。</translation>
     </message>
     <message>
       <source>Connection with cameras that do not support HTTPS will be lost.</source>

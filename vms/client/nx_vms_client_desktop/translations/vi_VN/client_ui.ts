@@ -682,12 +682,12 @@
       <translation>Cổng trang web</translation>
     </message>
     <message>
-      <source>Record audio</source>
-      <translation>Ghi âm</translation>
+      <source>Do not send Stop PTZ command</source>
+      <translation>Không gửi lệnh Dừng PTZ</translation>
     </message>
     <message>
-      <source>Do not send Stop PTZ command</source>
-      <translation type="unfinished">Do not send Stop PTZ command</translation>
+      <source>Do not record audio</source>
+      <translation type="unfinished">Do not record audio</translation>
     </message>
   </context>
   <context>

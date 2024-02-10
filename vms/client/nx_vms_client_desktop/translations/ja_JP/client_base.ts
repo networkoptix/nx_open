@@ -214,7 +214,7 @@
     </message>
     <message>
       <source>Save Video Wall View</source>
-      <translation>ビデオウォールの保存</translation>
+      <translation>ビデオウォールビューを保存</translation>
     </message>
     <message>
       <source>Start Screen Recording</source>
@@ -361,7 +361,7 @@
     </message>
     <message>
       <source>Open in New Tab</source>
-      <translation>新規タブで開く</translation>
+      <translation>新しいタブで開く</translation>
     </message>
     <message>
       <source>Monitor in New Tab</source>
@@ -393,19 +393,19 @@
     </message>
     <message>
       <source>Attach to Video Wall...</source>
-      <translation>ビデオウォールモニター設定...</translation>
+      <translation>ビデオウォールに接続...</translation>
     </message>
     <message>
       <source>Switch to Video Wall mode...</source>
-      <translation>ビデオウォール開始...</translation>
+      <translation>ビデオウォールモードに切り替え...</translation>
     </message>
     <message>
       <source>Save Video Wall</source>
-      <translation>ビデオウォールの保存</translation>
+      <translation>ビデオウォールを保存</translation>
     </message>
     <message>
       <source>Save Current Matrix</source>
-      <translation>マトリックスの保存</translation>
+      <translation>現在のマトリックスを保存</translation>
     </message>
     <message>
       <source>Load Matrix</source>
@@ -417,7 +417,7 @@
     </message>
     <message>
       <source>Stop Video Wall</source>
-      <translation>ビデオウォール停止</translation>
+      <translation>ビデオウォールを停止</translation>
     </message>
     <message>
       <source>Clear Screen</source>
@@ -441,7 +441,7 @@
     </message>
     <message>
       <source>Save Current Position...</source>
-      <translation>現在のポジションを保存する...</translation>
+      <translation>現在のポジションを保存...</translation>
     </message>
     <message>
       <source>Manage...</source>
@@ -769,7 +769,7 @@
     </message>
     <message>
       <source>Export Video...</source>
-      <translation>動画をエクスポート...</translation>
+      <translation>映像をエクスポート...</translation>
     </message>
     <message>
       <source>Export Bookmark...</source>
@@ -1913,7 +1913,7 @@ License Key: %2</source>
     <name>QnAuditLogDialog</name>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation>選択箇所をクリップボードにコピー</translation>
+      <translation>選択範囲をクリップボードにコピー</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
@@ -1925,7 +1925,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Export selected records to a file</source>
-      <translation>選択範囲をファイルにエクスポート</translation>
+      <translation>選択したレコードをファイルにエクスポート</translation>
     </message>
     <message>
       <source>Devices</source>
@@ -2040,7 +2040,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Exporting video</source>
-      <translation>ビデオエクスポート</translation>
+      <translation>映像のエクスポート</translation>
     </message>
     <message>
       <source>System name changed</source>
@@ -2068,7 +2068,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Database restored</source>
-      <translation>データベースリストア</translation>
+      <translation>データベースのリストア</translation>
     </message>
     <message>
       <source>Session begins</source>
@@ -2144,7 +2144,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Email settings changed</source>
-      <translation>Email設定変更</translation>
+      <translation>メール設定変更</translation>
     </message>
     <message>
       <source>Filled circle mark means the archive is still available</source>
@@ -2170,7 +2170,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Event rules reset to default</source>
-      <translation>イベントルールをリセット</translation>
+      <translation>イベントルールのリセット</translation>
     </message>
     <message>
       <source>Storage added</source>
@@ -2546,7 +2546,7 @@ License Key: %2</source>
     <message numerus="yes">
       <source>%1 does not support two-way audio</source>
       <translation>
-        <numerusform>%1 は双方向オーディオをサポートしません</numerusform>
+        <numerusform>%1 は双方向音声をサポートしていません</numerusform>
       </translation>
     </message>
   </context>
@@ -2641,11 +2641,11 @@ License Key: %2</source>
     <name>QnCameraListDialog</name>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation>選択したものをクリップボードにコピー</translation>
+      <translation>選択範囲をクリップボードにコピー</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation>選択したものをファイルにエクスポート...</translation>
+      <translation>選択範囲をファイルにエクスポート...</translation>
     </message>
     <message>
       <source>Select All</source>
@@ -3254,11 +3254,11 @@ to %1</source>
     </message>
     <message>
       <source>Administrator</source>
-      <translation>アドミニストレーター</translation>
+      <translation>管理者</translation>
     </message>
     <message>
       <source>View live video</source>
-      <translation>ライブビデオ表示</translation>
+      <translation>ライブ映像の表示</translation>
     </message>
     <message>
       <source>Adjust device settings</source>
@@ -3278,7 +3278,7 @@ to %1</source>
     </message>
     <message>
       <source>Export video</source>
-      <translation>ビデオエクスポート</translation>
+      <translation>映像のエクスポート</translation>
     </message>
     <message>
       <source>Control Video Walls</source>
@@ -3308,19 +3308,19 @@ to %1</source>
     <name>QnDesktopDataProvider</name>
     <message>
       <source>Could not find video encoder %1.</source>
-      <translation>ビデオエンコーダー%1を検出できません.</translation>
+      <translation>ビデオエンコーダー %1 が見つかりませんでした。</translation>
     </message>
     <message>
       <source>Could not initialize video encoder.</source>
-      <translation>ビデオエンコーダーをイニシャライズできません.</translation>
+      <translation>ビデオエンコーダーを初期化できませんでした。</translation>
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation>オーディオエンコーダーをイニシャライズできません.</translation>
+      <translation>音声エンコーダーを初期化できませんでした。</translation>
     </message>
     <message>
       <source>Could not start primary audio device.</source>
-      <translation>プライマリーオーディオデバイスを開始できません。</translation>
+      <translation>プライマリ音声デバイスを開始できませんでした。</translation>
     </message>
     <message>
       <source>Screen width must be a multiple of 8.</source>
@@ -3328,7 +3328,7 @@ to %1</source>
     </message>
     <message>
       <source>Could not initialize audio device &quot;%1&quot;.</source>
-      <translation>オーディオデバイス&quot;%1&quot; を初期化できませんでした</translation>
+      <translation>音声デバイス &quot;%1&quot; を初期化できませんでした。</translation>
     </message>
     <message>
       <source>Could not detect capturing resolution</source>
@@ -3354,11 +3354,11 @@ to %1</source>
     </message>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation>選択箇所をクリップボードにコピー</translation>
+      <translation>選択範囲をクリップボードにコピー</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation>選択箇所をファイルにエクスポート...</translation>
+      <translation>選択範囲をファイルにエクスポート...</translation>
     </message>
     <message>
       <source>Select All</source>
@@ -3366,7 +3366,7 @@ to %1</source>
     </message>
     <message>
       <source>Clear Filter</source>
-      <translation>フィルタークリア</translation>
+      <translation>フィルターを解除</translation>
     </message>
     <message>
       <source>Export selected events to file</source>
@@ -3403,7 +3403,7 @@ to %1</source>
     <name>QnEventLogModel</name>
     <message>
       <source>Motion video</source>
-      <translation>モーションビデオ</translation>
+      <translation>モーション映像</translation>
     </message>
     <message>
       <source>Date/Time</source>
@@ -3536,7 +3536,7 @@ to %1</source>
     <name>QnGLCheckerInstrument</name>
     <message>
       <source>Video card drivers are outdated or not installed</source>
-      <translation>ビデオ カードのドライバーが古いかインストールされていません</translation>
+      <translation>ビデオカードのドライバーが古いか、インストールされていません</translation>
     </message>
     <message>
       <source>%1 may not work properly.</source>
@@ -3628,7 +3628,7 @@ to %1</source>
     </message>
     <message>
       <source>Default state</source>
-      <translation>初期ステータス</translation>
+      <translation>標準状態</translation>
     </message>
     <message>
       <source>Name</source>
@@ -3662,12 +3662,12 @@ to %1</source>
     <message>
       <source>Grounded circuit</source>
       <comment>IO Port State</comment>
-      <translation>NC</translation>
+      <translation>接地回路</translation>
     </message>
     <message>
       <source>Invalid state</source>
       <comment>IO Port State</comment>
-      <translation>無効なステータス</translation>
+      <translation>不正な状態</translation>
     </message>
     <message>
       <source>On click</source>
@@ -3675,22 +3675,22 @@ to %1</source>
     </message>
     <message>
       <source>Duration</source>
-      <translation>時間</translation>
+      <translation>動作継続時間</translation>
     </message>
     <message>
       <source>Open circuit</source>
       <comment>IO Port State</comment>
-      <translation>NO</translation>
+      <translation>開回路</translation>
     </message>
     <message>
       <source>Toggle state</source>
       <comment>IO Output Port Action</comment>
-      <translation>ステータスを切り替える</translation>
+      <translation>状態切替</translation>
     </message>
     <message>
       <source>Impulse</source>
       <comment>IO Output Port Action</comment>
-      <translation>インパルス</translation>
+      <translation>固定期間出力</translation>
     </message>
     <message>
       <source>ID</source>
@@ -3763,7 +3763,7 @@ to %1</source>
     </message>
     <message>
       <source>Email</source>
-      <translation>Email</translation>
+      <translation>メールアドレス</translation>
     </message>
     <message>
       <source>DN</source>
@@ -4203,7 +4203,7 @@ to %1</source>
     <name>QnNewVirtualCameraDialog</name>
     <message>
       <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation>&quot;仮想カメラ&quot; はビデオファイル用の仮想ストレージです。システム上のどのサーバーにもアップロードでき、どのユーザーでもアクセスできます。</translation>
+      <translation>&quot;仮想カメラ&quot; は動画ファイル用の仮想ストレージです。システム上の任意のサーバーにアップロードでき、任意のユーザーがアクセスできます。</translation>
     </message>
     <message>
       <source>Virtual Camera</source>
@@ -4327,7 +4327,7 @@ to %1</source>
     </message>
     <message>
       <source>PTZ, Device Output, 2-Way Audio, Soft Triggers.</source>
-      <translation>PTZ、デバイス出力、双方向オーディオ、ソフトトリガー</translation>
+      <translation>PTZ、デバイス出力、双方向音声、ソフトトリガー</translation>
     </message>
   </context>
   <context>
@@ -4405,7 +4405,7 @@ to %1</source>
     <message numerus="yes">
       <source>Tour has %n identical positions</source>
       <translation>
-        <numerusform>ツアーには%nポジションが含まれます</numerusform>
+        <numerusform>ツアーでは同一のポジションが %n 回連続します</numerusform>
       </translation>
     </message>
     <message>
@@ -4426,11 +4426,11 @@ to %1</source>
     </message>
     <message>
       <source>Tour should contain at least 2 positions.</source>
-      <translation>ツアーには最低2ポジション必要です.</translation>
+      <translation>ツアーには少なくとも2つのポジションが必要です。</translation>
     </message>
     <message>
       <source>Tour Time: %1.</source>
-      <translation>ツアー時間: %1.</translation>
+      <translation>ツアー時間: %1。</translation>
     </message>
     <message numerus="yes">
       <source>about %n minutes</source>
@@ -5051,7 +5051,7 @@ to %1</source>
     </message>
     <message>
       <source>UNAUTHORIZED</source>
-      <translation>未認証</translation>
+      <translation>要認証</translation>
     </message>
     <message>
       <source>SERVER UNAVAILABLE</source>
@@ -5063,7 +5063,7 @@ to %1</source>
     </message>
     <message>
       <source>DEVICE DISABLED</source>
-      <translation>デバイスは無効化されています</translation>
+      <translation>デバイスは無効です</translation>
     </message>
     <message>
       <source>Device Settings</source>
@@ -5158,7 +5158,7 @@ to %1</source>
     </message>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation>選択箇所をクリップボードにコピー</translation>
+      <translation>選択範囲をクリップボードにコピー</translation>
     </message>
     <message>
       <source>Refresh</source>
@@ -5314,7 +5314,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</source>
-      <translation>容量が小さくて、他に十分な領域があるストレージがある場合には書込み先として使用されません</translation>
+      <translation>小さすぎるパーティションとシステムパーティションは予備領域とされ、他に十分なストレージ領域がある場合は書き込みには使用されません。</translation>
     </message>
     <message>
       <source>Reserved</source>
@@ -5431,7 +5431,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Email</source>
-      <translation>Email</translation>
+      <translation>メールサーバー</translation>
     </message>
     <message>
       <source>Updates</source>
@@ -5723,7 +5723,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Email</source>
-      <translation>Email</translation>
+      <translation>メールアドレス</translation>
     </message>
     <message>
       <source>To enable digest authentication password reset is required</source>
@@ -5881,7 +5881,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Email</source>
-      <translation>Email</translation>
+      <translation>メールアドレス</translation>
     </message>
     <message>
       <source>Email cannot be empty.</source>
@@ -5970,7 +5970,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Display %1</source>
-      <translation>ディスプレー %1</translation>
+      <translation>ディスプレイ %1</translation>
     </message>
     <message>
       <source>Delete &quot;%1&quot;?</source>
@@ -5981,7 +5981,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnVideowallScreenWidget</name>
     <message>
       <source>PC %1</source>
-      <translation>Pc %1</translation>
+      <translation>PC %1</translation>
     </message>
     <message>
       <source>PC %1 - Display %2</source>
@@ -6191,7 +6191,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Video Wall %1</source>
-      <translation>ビデオウォール l %1</translation>
+      <translation>ビデオウォール %1</translation>
     </message>
     <message>
       <source>New Video Wall...</source>
@@ -6199,11 +6199,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>New Matrix %1</source>
-      <translation>次のマトリックス %1</translation>
+      <translation>新規マトリックス %1</translation>
     </message>
     <message>
       <source>To enable this feature, please activate a Video Wall license.</source>
-      <translation>この機能を有効にするにはビデオウォールライセンスを有効にしてください</translation>
+      <translation>この機能を有効にするには、ビデオウォールライセンスを有効化してください。</translation>
     </message>
     <message>
       <source>Failed to apply changes</source>
@@ -6221,7 +6221,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>To start it again, you should have physical access to its computer.</source>
-      <translation>再度起動するには、そのコンピューターへ直接アクセスすることが必要です</translation>
+      <translation>もう一度起動するには、そのコンピューターに物理的にアクセスできる必要があります。</translation>
     </message>
     <message>
       <source>Stop</source>
@@ -6239,11 +6239,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Control session cannot be started.</source>
-      <translation>コントロール セッションを開始できません</translation>
+      <translation>コントロールセッションを開始できません。</translation>
     </message>
     <message>
       <source>Cannot save empty matrix</source>
-      <translation>空のマトリックスを保存できません</translation>
+      <translation>空のマトリックスは保存できません</translation>
     </message>
     <message>
       <source>Screen is being controlled by another user</source>
@@ -6270,7 +6270,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>No video files found in selected folder</source>
-      <translation>選択したフォルダーにビデオファイルがありません</translation>
+      <translation>選択したフォルダー内に映像ファイルが見つかりません</translation>
     </message>
     <message>
       <source>Stop uploading?</source>
@@ -6288,17 +6288,17 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Use .MKV, .AVI, .MP4 or other video files.</source>
-      <translation>MKV、AVI、MP4、またはその他のビデオファイルを使用してください。</translation>
+      <translation>.MKV、.AVI、.MP4、またはその他の映像ファイルを使用してください。</translation>
     </message>
     <message numerus="yes">
       <source>Selected files do not have timestamps</source>
       <translation>
-        <numerusform>選択したファイルにタイムスタンプがありません</numerusform>
+        <numerusform>選択したファイルにはタイムスタンプがありません</numerusform>
       </translation>
     </message>
     <message>
       <source>Only video files with correct timestamp are supported.</source>
-      <translation>正しいタイムスタンプを持つビデオファイルのみがサポートされています。</translation>
+      <translation>正しいタイムスタンプを持つ映像ファイルのみがサポートされています。</translation>
     </message>
     <message numerus="yes">
       <source>Selected files are too old</source>
@@ -6400,7 +6400,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>%1 does not have timestamp.</source>
       <comment>Filename will be substituted</comment>
-      <translation>%1には タイムスタンプがありません。</translation>
+      <translation>%1 にはタイムスタンプがありません。</translation>
     </message>
     <message>
       <source>%1 is older than allowed in camera archive settings.</source>
@@ -6410,12 +6410,12 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>%1 covers period for which video has already been uploaded.</source>
       <comment>Filename will be substituted</comment>
-      <translation>%1 は既にアップロードされているビデオの期間と重複します。</translation>
+      <translation>%1 はすでにアップロードされている映像の期間と重複します。</translation>
     </message>
     <message>
       <source>%1 covers period for which video is being uploaded.</source>
       <comment>Filename will be substituted</comment>
-      <translation>%1 は既にアップロードされているビデオの期間と重複します。</translation>
+      <translation>%1 はアップロード中の映像の期間と重複します。</translation>
     </message>
   </context>
   <context>
@@ -6506,7 +6506,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>You are going to delete some resources to which you have access from Video Wall only. You will not see them in your resource list after it and will not be able to add them to Video Wall again.</source>
-      <translation>ビデオウォールからのみアクセス可能なリソースを削除しようとしました　削除するとリソース一リストには表示されません　再度ビデオウォールに追加することはできません</translation>
+      <translation>ビデオウォールでのみアクセス可能なリソースを削除しようとしています。削除後、それらはリソースリストに表示されなくなり、ビデオウォールに再度追加することはできなくなります。</translation>
     </message>
     <message>
       <source>You will lose access to following resources:</source>
@@ -6589,7 +6589,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>Some video files are still being uploaded to %n virtual cameras:</source>
       <translation>
-        <numerusform>一部のファイルは%n個の仮想カメラにアップロード中です:</numerusform>
+        <numerusform>一部の映像ファイルが %n 仮想カメラにアップロードされています:</numerusform>
       </translation>
     </message>
     <message>
@@ -6800,11 +6800,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Administrator</source>
-      <translation>アドミニストレーター</translation>
+      <translation>管理者</translation>
     </message>
     <message>
       <source>View live video</source>
-      <translation>ライブビデオ表示</translation>
+      <translation>ライブ映像の表示</translation>
     </message>
     <message>
       <source>Adjust device settings</source>
@@ -6824,7 +6824,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Export video</source>
-      <translation>ビデオエクスポート</translation>
+      <translation>映像のエクスポート</translation>
     </message>
     <message>
       <source>Control Video Walls</source>
@@ -6851,11 +6851,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Local files cannot be placed on Video Wall Screen attached to another computer</source>
-      <translation>ローカル ファイルを別のコンピューターに接続されているビデオウォールスクリーンに配置できません</translation>
+      <translation>ローカルファイルは、別のコンピューターに接続されたビデオウォール画面には配置できません</translation>
     </message>
     <message>
       <source>To display local files on Video Wall, please attach them using computer where Video Wall is hosted.</source>
-      <translation>ローカルファアイルをビデオウォールに表示するにはビデオウォールを表示するコンピューターのローカル ファイルを使用してください</translation>
+      <translation>ビデオウォールにローカルファイルを表示するには、ビデオウォールをホストしているコンピューターでファイルを添付してください。</translation>
     </message>
   </context>
   <context>
@@ -7034,43 +7034,43 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>This device does not have an audio input, or it is not configured correctly. Select another device as an audio source.</source>
-      <translation>このデバイスには音声入力がないか、正しく構成されていません。オーディオソースとして別のデバイスを選択してください。</translation>
+      <translation>このデバイスには音声入力がないか、正しく設定されていません。音声ソースとして別のデバイスを選択してください。</translation>
     </message>
     <message>
       <source>This camera does not have an audio input, or it is not configured correctly. Select another camera as an audio source.</source>
-      <translation>このカメラには音声入力がないか、正しく構成されていません。オーディオソースとして別のカメラを選択してください。</translation>
+      <translation>このカメラには音声入力がないか、正しく設定されていません。音声ソースとして別のカメラを選択してください。</translation>
     </message>
     <message>
       <source>This device does not have an audio output, or it is not configured correctly. Select another device for audio playback.</source>
-      <translation>このデバイスには音声出力がないか、正しく構成されていません。オーディオ再生用に別のデバイスを選択してください。</translation>
+      <translation>このデバイスには音声出力がないか、正しく設定されていません。音声再生用に別のデバイスを選択してください。</translation>
     </message>
     <message>
       <source>This camera does not have an audio output, or it is not configured correctly. Select another camera for audio playback.</source>
-      <translation>このカメラには音声出力がないか、正しく構成されていません。オーディオ再生用に別のカメラを選択してください。</translation>
+      <translation>このカメラには音声出力がないか、正しく設定されていません。音声再生用に別のカメラを選択してください。</translation>
     </message>
     <message>
       <source>Use this device for audio output</source>
-      <translation>このデバイスをオーディオ出力に使用する</translation>
+      <translation>このデバイスを音声出力に使用する</translation>
     </message>
     <message>
       <source>Use this camera for audio output</source>
-      <translation>このカメラをオーディオ出力に使用する</translation>
+      <translation>このカメラを音声出力に使用する</translation>
     </message>
     <message>
       <source>Use audio stream from another device</source>
-      <translation>別のデバイスからのオーディオストリームを使用する</translation>
+      <translation>別のデバイスの音声ストリームを使用する</translation>
     </message>
     <message>
       <source>Use audio stream from another camera</source>
-      <translation>別のカメラからのオーディオストリームを使用</translation>
+      <translation>別のカメラの音声ストリームを使用する</translation>
     </message>
     <message>
       <source>Transmit audio stream to another device</source>
-      <translation>オーディオストリームを別のデバイスに送信する</translation>
+      <translation>音声ストリームを別のデバイスに送信する</translation>
     </message>
     <message>
       <source>Transmit audio stream to another camera</source>
-      <translation>オーディオストリームを別のカメラに送信する</translation>
+      <translation>音声ストリームを別のカメラに送信する</translation>
     </message>
     <message>
       <source>Selected device doesn&apos;t have audio input or it&apos;s not configured. Audio stream is not available.</source>
@@ -7098,11 +7098,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Use audio stream from this device</source>
-      <translation>このデバイスのオーディオストリームを使用する</translation>
+      <translation>このデバイスの音声ストリームを使用する</translation>
     </message>
     <message>
       <source>Use audio stream from this camera</source>
-      <translation>このカメラのオーディオストリームを使用する</translation>
+      <translation>このカメラの音声ストリームを使用する</translation>
     </message>
     <message>
       <source>%1 is connected to another server. Audio stream is not available</source>
@@ -7308,7 +7308,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::CameraAdvancedParamsWidget</name>
     <message>
       <source>Loading values...</source>
-      <translation>設定の読込み中...</translation>
+      <translation>値を読み込み中...</translation>
     </message>
     <message>
       <source>Applying changes...</source>
@@ -7516,11 +7516,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Will be transferred partially:</source>
-      <translation>部分的に移転されます:</translation>
+      <translation>部分的に移行されます:</translation>
     </message>
     <message>
       <source>Will not be transferred:</source>
-      <translation>移転されません:</translation>
+      <translation>移行されません:</translation>
     </message>
     <message>
       <source>Next</source>
@@ -7536,7 +7536,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Data for Transfer</source>
-      <translation>移転するデータ</translation>
+      <translation>移行するデータ</translation>
     </message>
     <message>
       <source>Camera replaced!</source>
@@ -7544,7 +7544,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Checking if the old camera&apos;s data can be transferred to the new camera.</source>
-      <translation>古いカメラのデータが新しいカメラに移転できるか確認しています。</translation>
+      <translation>古いカメラのデータを新しいカメラに移行できるか確認しています。</translation>
     </message>
     <message>
       <source>Some data and settings may not be compatible with the new camera</source>
@@ -7642,7 +7642,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Advanced</source>
-      <translation>アドバンス</translation>
+      <translation>詳細設定</translation>
     </message>
     <message>
       <source>Web Page</source>
@@ -7724,7 +7724,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Motion + Lo-Res</source>
-      <translation>常時低 ＋ モーション高解像度</translation>
+      <translation>モーション + 低解像度</translation>
     </message>
     <message>
       <source>Objects + Lo-Res</source>
@@ -7771,7 +7771,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>You need to select a device that will provide audio.</source>
-      <translation>オーディオを提供するデバイスを選択する必要があります。</translation>
+      <translation>音声を提供するデバイスを選択する必要があります。</translation>
     </message>
     <message>
       <source>2-way audio will be disabled</source>
@@ -7779,7 +7779,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>You need to select a device to transmit the audio stream to and use for audio playback.</source>
-      <translation>音声ストリームを送信してオーディオ再生に使用するデバイスを選択する必要があります。</translation>
+      <translation>音声ストリームの送信先として音声を再生するデバイスを選択する必要があります。</translation>
     </message>
   </context>
   <context>
@@ -8154,7 +8154,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Copy archive length settings</source>
-      <translation>アーカイブ設定のコピー</translation>
+      <translation>アーカイブ保持期間の設定もコピー</translation>
     </message>
     <message>
       <source>Recording Schedule contains recording modes that are not supported by the selected cameras. Unsupported recording modes will be changed to &quot;Record Always&quot;.</source>
@@ -8398,7 +8398,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Video or audio codec is incompatible with selected format.</source>
-      <translation>映像または音声のコーデックが、選択した形式との互換性を持ちません。</translation>
+      <translation>映像または音声のコーデックが、選択した形式に対応していません。</translation>
     </message>
     <message>
       <source>File write error.</source>
@@ -8414,7 +8414,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Video transcoding required.</source>
-      <translation>ビデオのトランスコーディングが必要です。</translation>
+      <translation>映像のトランスコーディングが必要です。</translation>
     </message>
     <message>
       <source>Archive is encrypted.</source>
@@ -8501,7 +8501,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>We recommend to export video from this camera as &quot;Multi Video&quot; to avoid downscaling.</source>
-      <translation>ダウンスケールを避けるため、&quot;マルチビデオ&quot;としてエクスポートする事を推奨します。</translation>
+      <translation>ダウンスケーリングを避けるために、このカメラからの映像は &quot;複数映像&quot; としてエクスポートすることをお勧めします。</translation>
     </message>
     <message>
       <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
@@ -8533,11 +8533,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>AVI format is not recommended to export a recording with audio track.</source>
-      <translation>オーディオトラックを含む録画映像をエクスポートする場合、AVI形式は推奨されません。</translation>
+      <translation>音声トラックを含む録画映像をエクスポートする場合、AVI形式は推奨されません。</translation>
     </message>
     <message>
       <source>Export is not available: This camera does not have a video archive for the selected time period.</source>
-      <translation>エクスポートできません: このカメラには、選択した期間のビデオアーカイブがありません。</translation>
+      <translation>エクスポートは利用できません: このカメラには、選択した期間の映像アーカイブがありません。</translation>
     </message>
   </context>
   <context>
@@ -9518,7 +9518,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Calling...</source>
-      <translation>発信中...</translation>
+      <translation>呼出中...</translation>
     </message>
   </context>
   <context>
@@ -9876,7 +9876,7 @@ You can force it, but it may significantly increase CPU load.</source>
     <message numerus="yes">
       <source>For exporting as Rapid Review video length should be at least %n seconds.</source>
       <translation>
-        <numerusform>ラピッドレビューとしてエクスポートするには、ビデオの長さが %n 秒以上必要です。</numerusform>
+        <numerusform>ラピッドレビューとしてエクスポートするには、映像の長さが %n 秒以上必要です。</numerusform>
       </translation>
     </message>
   </context>
@@ -9908,7 +9908,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Motion + Lo-Res</source>
-      <translation>常時低 ＋ モーション高解像度</translation>
+      <translation>モーション + 低解像度</translation>
     </message>
     <message>
       <source>Recording motion and objects</source>
@@ -10099,7 +10099,8 @@ You can still change quality and FPS directly on the camera.</source>
     <message>
       <source>Motion
  + Low-Res</source>
-      <translation>モーション + 低解像度</translation>
+      <translation>モーション
+ +低解像度</translation>
     </message>
     <message>
       <source>Motion detection is disabled for some of the selected devices</source>
@@ -10151,7 +10152,7 @@ You can still change quality and FPS directly on the camera.</source>
     </message>
     <message>
       <source>Motion detection is disabled for this I/O module</source>
-      <translation>このI / Oモジュールではモーション検知が無効になっています</translation>
+      <translation>このI/Oモジュールではモーション検知が無効になっています</translation>
     </message>
     <message>
       <source>Motion detection is disabled for some of the selected I/O modules</source>
@@ -10167,11 +10168,11 @@ You can still change quality and FPS directly on the camera.</source>
     </message>
     <message>
       <source>Object detection is disabled for this I/O module</source>
-      <translation>このI / Oモジュールではオブジェクト検出が無効になっています</translation>
+      <translation>このI/Oモジュールではオブジェクト検出が無効になっています</translation>
     </message>
     <message>
       <source>Object detection is disabled for some of the selected I/O modules</source>
-      <translation>選択したI / Oモジュールの一部でオブジェクト検出が無効になっています</translation>
+      <translation>選択したI/Oモジュールの一部で、オブジェクト検出が無効になっています</translation>
     </message>
     <message>
       <source>Motion &amp; object detection is disabled for this I/O module</source>
@@ -10179,7 +10180,7 @@ You can still change quality and FPS directly on the camera.</source>
     </message>
     <message>
       <source>Motion &amp; object detection is disabled for some of the selected I/O modules</source>
-      <translation>選択したI / Oモジュールの一部で、モーションとオブジェクトの検出が無効になっています</translation>
+      <translation>選択したI/Oモジュールの一部で、モーションとオブジェクトの検出が無効になっています</translation>
     </message>
   </context>
   <context>
@@ -10219,7 +10220,7 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>Encrypts archive data to prevent it from being viewed outside of the system. You will not be required to enter the encryption password to view the video archive within this system.</source>
-      <translation>アーカイブデータを暗号化して、システムの外部で閲覧されないようにします。このシステム内でビデオアーカイブを表示する場合、暗号化パスワードを入力する必要はありません。</translation>
+      <translation>アーカイブデータを暗号化して、システムの外部で閲覧されないようにします。このシステム内で映像アーカイブを表示する場合、暗号化パスワードを入力する必要はありません。</translation>
     </message>
     <message>
       <source>Failed to set archive encryption password</source>
@@ -10448,7 +10449,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <name>nx::vms::client::desktop::ServerUpdateTool</name>
     <message>
       <source>No connection to the server.</source>
-      <translation>サーバー に接続できません.</translation>
+      <translation>サーバーに接続できません。</translation>
     </message>
     <message>
       <source>Network error.</source>
@@ -10697,7 +10698,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Open in New Tab</source>
-      <translation>新規タブで開く</translation>
+      <translation>新しいタブで開く</translation>
     </message>
     <message>
       <source>This action is not supported for notifications from other Systems</source>
@@ -10867,7 +10868,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Email</source>
-      <translation>Email</translation>
+      <translation>メールアドレス</translation>
     </message>
     <message>
       <source>Groups</source>
@@ -11027,7 +11028,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Exporting video</source>
-      <translation>ビデオエクスポート</translation>
+      <translation>映像のエクスポート</translation>
     </message>
     <message>
       <source>Stop Export</source>
@@ -11064,7 +11065,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Local files not allowed for Multi-Video export</source>
-      <translation>ローカルファイルをマルチビデオエクスポートには使用できません</translation>
+      <translation>ローカルファイルは、複数映像のエクスポートには使用できません</translation>
     </message>
     <message>
       <source>Please remove all local files from the layout and try again.</source>
@@ -11498,11 +11499,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <name>nx::vms::client::desktop::ui::action::LayoutTourSettingsFactory</name>
     <message>
       <source>Switch with Hotkeys</source>
-      <translation>ホットキーで切替え</translation>
+      <translation>ホットキーで切り替え</translation>
     </message>
     <message>
       <source>Switch on Timer</source>
-      <translation>時間で切替え</translation>
+      <translation>時間で切り替え</translation>
     </message>
   </context>
   <context>
@@ -11572,7 +11573,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Email</source>
-      <translation>Email</translation>
+      <translation>メールアドレス</translation>
     </message>
     <message>
       <source>Reason for deactivation</source>
@@ -11819,7 +11820,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Some settings may not be transferred from the replaced camera due to compatibility issues.</source>
-      <translation>互換性の問題により、交換したカメラから一部の設定が移転されない場合があります。</translation>
+      <translation>互換性の問題により、交換されるカメラから一部の設定が移行されない場合があります。</translation>
     </message>
     <message>
       <source>Confirm undo replacement?</source>
@@ -11860,7 +11861,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     <message>
       <source>Display selected for</source>
       <comment>Time will follow</comment>
-      <translation>表示</translation>
+      <translation>表示期間</translation>
     </message>
   </context>
   <context>

@@ -1251,7 +1251,7 @@ to activate PTZ</source>
     <name>StringEditor</name>
     <message>
       <source>Min 3 characters</source>
-      <translation type="unfinished">Min 3 characters</translation>
+      <translation>Tối thiểu 3 ký tự</translation>
     </message>
   </context>
   <context>

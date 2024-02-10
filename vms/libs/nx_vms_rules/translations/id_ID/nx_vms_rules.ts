@@ -21,7 +21,7 @@
     </message>
     <message>
       <source>State</source>
-      <translation type="unfinished">State</translation>
+      <translation>Status</translation>
     </message>
     <message>
       <source>Camera</source>
@@ -106,7 +106,7 @@
     </message>
     <message>
       <source>State</source>
-      <translation type="unfinished">State</translation>
+      <translation>Status</translation>
     </message>
     <message>
       <source>Camera</source>
@@ -239,7 +239,7 @@
     </message>
     <message>
       <source>State</source>
-      <translation type="unfinished">State</translation>
+      <translation>Status</translation>
     </message>
     <message>
       <source>Source</source>
@@ -320,7 +320,7 @@
     </message>
     <message>
       <source>State</source>
-      <translation type="unfinished">State</translation>
+      <translation>Status</translation>
     </message>
     <message>
       <source>Camera</source>
@@ -481,7 +481,7 @@
     </message>
     <message>
       <source>State</source>
-      <translation type="unfinished">State</translation>
+      <translation>Status</translation>
     </message>
     <message>
       <source>Server</source>
@@ -597,7 +597,7 @@
     </message>
     <message>
       <source>State</source>
-      <translation type="unfinished">State</translation>
+      <translation>Status</translation>
     </message>
     <message>
       <source>Cameras</source>

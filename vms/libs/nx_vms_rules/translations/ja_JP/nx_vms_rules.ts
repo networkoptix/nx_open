@@ -144,7 +144,7 @@
     </message>
     <message>
       <source>I/O Module was disconnected</source>
-      <translation>I / Oモジュールが切断されました</translation>
+      <translation>I/Oモジュールが切断されました</translation>
     </message>
     <message>
       <source>Device %1 was disconnected</source>

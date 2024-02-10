@@ -696,7 +696,7 @@ Do you want to delete it anyway?</translation>
     <message>
       <source>Kind</source>
       <comment>Match OS X Finder</comment>
-      <translation type="unfinished">Kind</translation>
+      <translation>Загвар</translation>
     </message>
     <message>
       <source>Type</source>
