@@ -82,7 +82,7 @@ void BaseCameraButtonController::Private::handleCameraChanged()
     const auto updatePermissions =
         [this](const QnResourcePtr& camera, Qn::Permissions current, Qn::Permissions /*old*/)
         {
-            const bool value = camera && (current & requiredPermissions == requiredPermissions);
+            const bool value = camera && ((current & requiredPermissions) == requiredPermissions);
             if (hasRequiredPermissions == value)
                 return;
 
