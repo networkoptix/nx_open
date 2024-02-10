@@ -67,7 +67,7 @@
     </message>
     <message>
       <source>Wrong password</source>
-      <translation type="unfinished">Wrong password</translation>
+      <translation>Kata sandi salah</translation>
     </message>
     <message>
       <source>The ticket key is invalid or expired.</source>
@@ -1197,7 +1197,7 @@
     <name>QnUserResource</name>
     <message>
       <source>Custom</source>
-      <translation type="unfinished">Custom</translation>
+      <translation>Kustom</translation>
     </message>
     <message>
       <source>Multiple groups</source>
