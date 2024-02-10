@@ -682,12 +682,12 @@
       <translation>Webページポート</translation>
     </message>
     <message>
-      <source>Record audio</source>
-      <translation>音声を録音する</translation>
-    </message>
-    <message>
       <source>Do not send Stop PTZ command</source>
       <translation>PTZ 停止コマンドを送信しない</translation>
+    </message>
+    <message>
+      <source>Do not record audio</source>
+      <translation>音声を録音しない</translation>
     </message>
   </context>
   <context>

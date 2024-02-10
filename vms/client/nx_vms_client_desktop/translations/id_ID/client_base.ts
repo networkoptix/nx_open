@@ -2933,7 +2933,7 @@ to %1</translation>
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
-      <translation type="unfinished">Too many attempts. Try again in a minute.</translation>
+      <translation>Terlalu banyak percobaan. Coba sebentar lagi.</translation>
     </message>
     <message>
       <source>Network error. Please check your Internet connection and try again.</source>
@@ -2962,7 +2962,7 @@ to %1</translation>
     <name>QnCloudResultMessages</name>
     <message>
       <source>Account not found</source>
-      <translation type="unfinished">Account not found</translation>
+      <translation>Akun tidak ditemukan</translation>
     </message>
     <message>
       <source>Account is not activated.</source>
@@ -2979,7 +2979,7 @@ to %1</translation>
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
-      <translation type="unfinished">Too many attempts. Try again in a minute.</translation>
+      <translation>Terlalu banyak percobaan. Coba sebentar lagi.</translation>
     </message>
   </context>
   <context>
@@ -5321,7 +5321,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Reserved</source>
-      <translation type="unfinished">Reserved</translation>
+      <translation>Dicadangkan</translation>
     </message>
     <message>
       <source>local</source>
@@ -9868,7 +9868,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Custom</source>
-      <translation type="unfinished">Custom</translation>
+      <translation>Kustom</translation>
     </message>
   </context>
   <context>
@@ -10883,7 +10883,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Custom</source>
-      <translation type="unfinished">Custom</translation>
+      <translation>Kustom</translation>
     </message>
   </context>
   <context>

@@ -682,12 +682,12 @@
       <translation>Port de la page Web</translation>
     </message>
     <message>
-      <source>Record audio</source>
-      <translation type="unfinished">Record audio</translation>
-    </message>
-    <message>
       <source>Do not send Stop PTZ command</source>
       <translation type="unfinished">Do not send Stop PTZ command</translation>
+    </message>
+    <message>
+      <source>Do not record audio</source>
+      <translation type="unfinished">Do not record audio</translation>
     </message>
   </context>
   <context>

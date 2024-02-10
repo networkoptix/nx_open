@@ -682,12 +682,12 @@
       <translation type="unfinished">Web Page Port</translation>
     </message>
     <message>
-      <source>Record audio</source>
-      <translation type="unfinished">Record audio</translation>
-    </message>
-    <message>
       <source>Do not send Stop PTZ command</source>
       <translation type="unfinished">Do not send Stop PTZ command</translation>
+    </message>
+    <message>
+      <source>Do not record audio</source>
+      <translation type="unfinished">Do not record audio</translation>
     </message>
   </context>
   <context>
@@ -870,7 +870,7 @@
     </message>
     <message>
       <source>Edit Credentials</source>
-      <translation type="unfinished">Edit Credentials</translation>
+      <translation>Edit Kredensial</translation>
     </message>
     <message>
       <source>Audio</source>
@@ -2982,7 +2982,7 @@
     </message>
     <message>
       <source>State</source>
-      <translation type="unfinished">State</translation>
+      <translation>Status</translation>
     </message>
   </context>
   <context>
