@@ -524,10 +524,6 @@
       <translation>По умолчанию</translation>
     </message>
     <message>
-      <source>Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
-      <translation>Внимание! Не изменяйте эти настройки, если вы не уверены, что это не отразится на производительности вашей системы.</translation>
-    </message>
-    <message>
       <source>Keep camera stream and profile settings</source>
       <translation>Не менять настройки потоков и профилей камеры</translation>
     </message>
@@ -672,12 +668,12 @@
       <translation type="unfinished">Import camera or server offline periods</translation>
     </message>
     <message>
-      <source>Record audio</source>
-      <translation type="unfinished">Record audio</translation>
-    </message>
-    <message>
       <source>Do not send Stop PTZ command</source>
       <translation>Не отправлять команду остановки PTZ</translation>
+    </message>
+    <message>
+      <source>Do not record audio</source>
+      <translation>Не записывать звук</translation>
     </message>
   </context>
   <context>

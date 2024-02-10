@@ -524,10 +524,6 @@
       <translation>Przywróć domyślne</translation>
     </message>
     <message>
-      <source>Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
-      <translation>Nie zmieniaj tych ustawień, chyba że jesteś całkowicie pewny ich potencjalnego wpływu na wydajność systemu.</translation>
-    </message>
-    <message>
       <source>Keep camera stream and profile settings</source>
       <translation>Zachowaj ustawienia strumieni i profile kamer</translation>
     </message>
@@ -672,12 +668,12 @@
       <translation>Importuj okresy offline kamery lub serwera</translation>
     </message>
     <message>
-      <source>Record audio</source>
-      <translation type="unfinished">Record audio</translation>
-    </message>
-    <message>
       <source>Do not send Stop PTZ command</source>
       <translation type="unfinished">Do not send Stop PTZ command</translation>
+    </message>
+    <message>
+      <source>Do not record audio</source>
+      <translation type="unfinished">Do not record audio</translation>
     </message>
   </context>
   <context>

@@ -59,6 +59,23 @@
     </message>
   </context>
   <context>
+    <name>CameraSettingsLicenseWatcher::Private</name>
+    <message numerus="yes">
+      <source>%1 are used</source>
+      <comment>Text like &apos;5/10 Professional Licenses&apos; will be substituted</comment>
+      <translation>
+        <numerusform>%1 が使用されます</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 are required</source>
+      <comment>Text like &apos;5 Professional Licenses&apos; will be substituted</comment>
+      <translation>
+        <numerusform>%1 が必要です</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>CertificatesModel</name>
     <message>
       <source>Subject</source>
@@ -1334,6 +1351,13 @@
       <translation>
         <numerusform>%n グループを削除しますか?</numerusform>
       </translation>
+    </message>
+  </context>
+  <context>
+    <name>IntercomManager::Private</name>
+    <message>
+      <source>%1 Layout</source>
+      <translation>%1 レイアウト</translation>
     </message>
   </context>
   <context>
@@ -4400,43 +4424,24 @@ License Key: %2</source>
   <context>
     <name>QnRequiredAccessRightPolicy</name>
     <message>
-      <source>User group %1 has no %2 permission</source>
+      <source>%1 group does not have %2 permission for some of selected cameras</source>
       <comment>%1 is the name of selected user group, %2 is permission name</comment>
-      <translation>ユーザーグループ %1 には %2 権限がありません</translation>
+      <translation>%1 グループには、選択したカメラの一部に対する %2 権限がありません</translation>
     </message>
     <message>
-      <source>Selected user groups have no %1 permission</source>
-      <comment>%1 is permission name</comment>
-      <translation>選択されたユーザーグループには %1 権限がありません</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n of %1 selected user groups have no %2 permission</source>
-      <comment>%1 is number of selected user groups, %2 is permission name</comment>
-      <translation>
-        <numerusform>選択された %1 ユーザーグループのうち、 %n グループには %2 権限がありません</numerusform>
-      </translation>
+      <source>%1 groups and %2 users do not have %3 permission for some of selected cameras</source>
+      <comment>%1 is number of selected user groups, %2 is number of users, %3 is permission name</comment>
+      <translation>%1 グループおよび %2 ユーザーには、選択したカメラの一部に対する %3 権限がありません</translation>
     </message>
     <message>
-      <source>Selected users have no %1 permission</source>
-      <comment>%1 is permission name</comment>
-      <translation>選択されたユーザーには %1 権限がありません</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n of %1 selected users have no %2 permission</source>
-      <comment>%1 is number of selected users, %2 is permission name</comment>
-      <translation>
-        <numerusform>選択された %1 ユーザーのうち %n 名には %2 権限がありません</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>User %1 has no %2 permissions for selected camera</source>
-      <comment>%1 is the name of selected user, %2 is permission name</comment>
-      <translation>ユーザー %1 には、選択したカメラに対する %2 権限がありません</translation>
-    </message>
-    <message>
-      <source>User %1 has no %2 permissions for some of selected cameras</source>
+      <source>%1 user does not have %2 permission for some of selected cameras</source>
       <comment>%1 is the name of the selected user, %2 is the permission name</comment>
-      <translation>ユーザー %1 には、選択したカメラの一部に対する %2 権限がありません</translation>
+      <translation>%1 ユーザーには、選択したカメラの一部に対する %2 権限がありません</translation>
+    </message>
+    <message>
+      <source>%1 users do not have %2 permission for some of selected cameras</source>
+      <comment>%1 is number of selected users, %2 is permission name</comment>
+      <translation>%1 ユーザーには、選択したカメラの一部に対する %2 権限がありません</translation>
     </message>
   </context>
   <context>
@@ -7447,6 +7452,10 @@ We recommend you not to open this integration. If you understand the risks, you 
       <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant</source>
       <translation>録画スケジュール内の映像品質およびフレームレート(FPS) の項目はカメラに設定されなくなります</translation>
     </message>
+    <message>
+      <source>Do not change these settings unless you are absolutely sure of their potential impact on your system performance</source>
+      <translation>システムパフォーマンスに対する潜在的な影響を正確に理解していない場合、これらの設定を変更しないでください。</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraHotspotItem</name>
@@ -7884,23 +7893,6 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message>
       <source>You need to select a device to transmit the audio stream to and use for audio playback.</source>
       <translation>音声ストリームの送信先として音声を再生するデバイスを選択する必要があります。</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::CameraSettingsLicenseWatcher</name>
-    <message numerus="yes">
-      <source>%1 are used</source>
-      <comment>Text like &apos;5/10 Professional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>%1 が使用されます</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%1 are required</source>
-      <comment>Text like &apos;5 Professional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>%1 が必要です</numerusform>
-      </translation>
     </message>
   </context>
   <context>
@@ -9066,13 +9058,6 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message>
       <source>Failed to merge %1 to our system.</source>
       <translation>システムに %1 を統合できませんでした。</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::IntercomManager</name>
-    <message>
-      <source>%1 Layout</source>
-      <translation>%1 レイアウト</translation>
     </message>
   </context>
   <context>

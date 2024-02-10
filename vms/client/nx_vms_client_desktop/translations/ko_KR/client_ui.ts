@@ -524,10 +524,6 @@
       <translation>초기값 복구</translation>
     </message>
     <message>
-      <source>Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
-      <translation>시스템 성능에 잠재적으로 영향을 미칠 수 있다는 확신이 들지 않으면이 설정을 변경하지 마십시오.</translation>
-    </message>
-    <message>
       <source>Keep camera stream and profile settings</source>
       <translation>카메라 스트림 및 프로필 설정 유지</translation>
     </message>
@@ -672,12 +668,12 @@
       <translation type="unfinished">Import camera or server offline periods</translation>
     </message>
     <message>
-      <source>Record audio</source>
-      <translation type="unfinished">Record audio</translation>
-    </message>
-    <message>
       <source>Do not send Stop PTZ command</source>
       <translation type="unfinished">Do not send Stop PTZ command</translation>
+    </message>
+    <message>
+      <source>Do not record audio</source>
+      <translation type="unfinished">Do not record audio</translation>
     </message>
   </context>
   <context>

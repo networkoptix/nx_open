@@ -79,7 +79,7 @@
     </message>
     <message>
       <source>Wrong password</source>
-      <translation type="unfinished">Wrong password</translation>
+      <translation>Kata sandi salah</translation>
     </message>
   </context>
   <context>
@@ -1112,7 +1112,7 @@
     <name>QnUserResource</name>
     <message>
       <source>Custom</source>
-      <translation type="unfinished">Custom</translation>
+      <translation>Kustom</translation>
     </message>
     <message>
       <source>Multiple groups</source>

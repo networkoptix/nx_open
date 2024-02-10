@@ -1136,7 +1136,7 @@
     <name>JoystickInvestigationWizard</name>
     <message>
       <source>Save</source>
-      <translation type="unfinished">Save</translation>
+      <translation>Simpan</translation>
     </message>
     <message>
       <source>Previous</source>
@@ -1515,7 +1515,7 @@
     </message>
     <message>
       <source>Custom</source>
-      <translation type="unfinished">Custom</translation>
+      <translation>Kustom</translation>
     </message>
     <message>
       <source>No custom groups yet</source>
@@ -1555,7 +1555,7 @@
     <message>
       <source>Custom</source>
       <comment>Section name in a list of items: &apos;Custom groups&apos;</comment>
-      <translation type="unfinished">Custom</translation>
+      <translation>Kustom</translation>
     </message>
   </context>
   <context>
