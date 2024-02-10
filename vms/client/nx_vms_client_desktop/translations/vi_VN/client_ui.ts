@@ -524,10 +524,6 @@
       <translation>khôi phục mặc định</translation>
     </message>
     <message>
-      <source>Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
-      <translation>Cảnh báo! Không thay đổi các thiết lập này, trừ khi bạn hoàn toàn chắc chắn về tác động tiềm năng của họ về hiệu năng hệ thống của bạn.</translation>
-    </message>
-    <message>
       <source>Keep camera stream and profile settings</source>
       <translation>Giữ các luồng camera và cài đặt cấu hình</translation>
     </message>
@@ -672,12 +668,12 @@
       <translation>Nhập thời gian ngoại tuyến của camera hoặc máy chủ</translation>
     </message>
     <message>
-      <source>Record audio</source>
-      <translation>Ghi âm</translation>
-    </message>
-    <message>
       <source>Do not send Stop PTZ command</source>
       <translation>Không gửi lệnh Dừng PTZ</translation>
+    </message>
+    <message>
+      <source>Do not record audio</source>
+      <translation type="unfinished">Do not record audio</translation>
     </message>
   </context>
   <context>

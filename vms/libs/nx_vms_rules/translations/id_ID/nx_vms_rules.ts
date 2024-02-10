@@ -159,7 +159,7 @@
     </message>
     <message>
       <source>State</source>
-      <translation type="unfinished">State</translation>
+      <translation>Status</translation>
     </message>
     <message>
       <source>Input Signal on Device</source>
@@ -384,7 +384,7 @@
     </message>
     <message>
       <source>State</source>
-      <translation type="unfinished">State</translation>
+      <translation>Status</translation>
     </message>
     <message>
       <source>Omit logging</source>

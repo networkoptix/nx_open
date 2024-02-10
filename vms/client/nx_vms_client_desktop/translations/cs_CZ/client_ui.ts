@@ -524,10 +524,6 @@
       <translation>Obnovit výchozí</translation>
     </message>
     <message>
-      <source>Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
-      <translation>Neměňte tato nastavení, pokud si nejste úplně jisti, že by mohly mít vliv na výkon systému.</translation>
-    </message>
-    <message>
       <source>Keep camera stream and profile settings</source>
       <translation>Zachovat stream a nastavení profilu kamery</translation>
     </message>
@@ -672,12 +668,12 @@
       <translation type="unfinished">Import camera or server offline periods</translation>
     </message>
     <message>
-      <source>Record audio</source>
-      <translation type="unfinished">Record audio</translation>
-    </message>
-    <message>
       <source>Do not send Stop PTZ command</source>
       <translation type="unfinished">Do not send Stop PTZ command</translation>
+    </message>
+    <message>
+      <source>Do not record audio</source>
+      <translation type="unfinished">Do not record audio</translation>
     </message>
   </context>
   <context>

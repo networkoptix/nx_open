@@ -61,6 +61,25 @@
     </message>
   </context>
   <context>
+    <name>CameraSettingsLicenseWatcher::Private</name>
+    <message numerus="yes">
+      <source>%1 are used</source>
+      <comment>Text like &apos;5/10 Professional Licenses&apos; will be substituted</comment>
+      <translation>
+        <numerusform>%1 används</numerusform>
+        <numerusform>%1 används</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 are required</source>
+      <comment>Text like &apos;5 Professional Licenses&apos; will be substituted</comment>
+      <translation>
+        <numerusform>%1 krävs</numerusform>
+        <numerusform>%1 krävs</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>CertificatesModel</name>
     <message>
       <source>Subject</source>
@@ -1340,6 +1359,13 @@
         <numerusform>Radera %n objekt?</numerusform>
         <numerusform>Radera %n objekt?</numerusform>
       </translation>
+    </message>
+  </context>
+  <context>
+    <name>IntercomManager::Private</name>
+    <message>
+      <source>%1 Layout</source>
+      <translation>%1 Layout</translation>
     </message>
   </context>
   <context>
@@ -4454,45 +4480,24 @@ Licensnyckel: %2</translation>
   <context>
     <name>QnRequiredAccessRightPolicy</name>
     <message>
-      <source>User group %1 has no %2 permission</source>
+      <source>%1 group does not have %2 permission for some of selected cameras</source>
       <comment>%1 is the name of selected user group, %2 is permission name</comment>
-      <translation>Användargrupp %1 har ingen %2 behörighet</translation>
+      <translation>%1 gruppen har inte %2 behörighet för vissa av utvalda kameror</translation>
     </message>
     <message>
-      <source>Selected user groups have no %1 permission</source>
-      <comment>%1 is permission name</comment>
-      <translation>Valda användargrupper har ingen %1 behörighet</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n of %1 selected user groups have no %2 permission</source>
-      <comment>%1 is number of selected user groups, %2 is permission name</comment>
-      <translation>
-        <numerusform>%n av %1 valda användargrupper har ingen %2 behörighet</numerusform>
-        <numerusform>%n av %1 valda användargrupper har ingen %2 behörighet</numerusform>
-      </translation>
+      <source>%1 groups and %2 users do not have %3 permission for some of selected cameras</source>
+      <comment>%1 is number of selected user groups, %2 is number of users, %3 is permission name</comment>
+      <translation>%1 grupper och %2 användare har inte %3 behörighet för några av valda kameror</translation>
     </message>
     <message>
-      <source>Selected users have no %1 permission</source>
-      <comment>%1 is permission name</comment>
-      <translation>Valda användare har inte %1 behörighet</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n of %1 selected users have no %2 permission</source>
-      <comment>%1 is number of selected users, %2 is permission name</comment>
-      <translation>
-        <numerusform>%n av %1 valda användare har ingen %2 behörighet</numerusform>
-        <numerusform>%n av %1 valda användare har ingen %2 behörighet</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>User %1 has no %2 permissions for selected camera</source>
-      <comment>%1 is the name of selected user, %2 is permission name</comment>
-      <translation>Användare %1 har inga %2 behörigheter för den valda kameran</translation>
-    </message>
-    <message>
-      <source>User %1 has no %2 permissions for some of selected cameras</source>
+      <source>%1 user does not have %2 permission for some of selected cameras</source>
       <comment>%1 is the name of the selected user, %2 is the permission name</comment>
-      <translation>Användare %1 har inga %2 behörigheter för vissa valda kameror</translation>
+      <translation>%1 användare har inte %2 behörighet för vissa av utvalda kameror</translation>
+    </message>
+    <message>
+      <source>%1 users do not have %2 permission for some of selected cameras</source>
+      <comment>%1 is number of selected users, %2 is permission name</comment>
+      <translation>%1 användare har inte %2 behörighet för vissa av utvalda kameror</translation>
     </message>
   </context>
   <context>
@@ -7573,6 +7578,10 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
       <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant</source>
       <translation>Inställningar för kvalitet och bildfrekvens (FPS) i inspelningsplanen blir irrelevanta</translation>
     </message>
+    <message>
+      <source>Do not change these settings unless you are absolutely sure of their potential impact on your system performance</source>
+      <translation>Ändra inte dessa inställningar om du inte är helt säker på deras eventuella inverkan på systemets prestanda</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraHotspotItem</name>
@@ -8018,25 +8027,6 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     <message>
       <source>You need to select a device to transmit the audio stream to and use for audio playback.</source>
       <translation>Du måste välja en enhet för att överföra ljudströmmen till och använda för ljuduppspelning.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::CameraSettingsLicenseWatcher</name>
-    <message numerus="yes">
-      <source>%1 are used</source>
-      <comment>Text like &apos;5/10 Professional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>%1 används</numerusform>
-        <numerusform>%1 används</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%1 are required</source>
-      <comment>Text like &apos;5 Professional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>%1 krävs</numerusform>
-        <numerusform>%1 krävs</numerusform>
-      </translation>
     </message>
   </context>
   <context>
@@ -9211,13 +9201,6 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     <message>
       <source>Failed to merge %1 to our system.</source>
       <translation>Misslyckades att slå samman %1 till vårt system.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::IntercomManager</name>
-    <message>
-      <source>%1 Layout</source>
-      <translation>%1 Layout</translation>
     </message>
   </context>
   <context>

@@ -524,10 +524,6 @@
       <translation>Restaurar valores predeterminados</translation>
     </message>
     <message>
-      <source>Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
-      <translation>No cambie estas configuraciones a menos que esté absolutamente seguro de su posible impacto en el rendimiento de su sistema.</translation>
-    </message>
-    <message>
       <source>Keep camera stream and profile settings</source>
       <translation>Mantener la transmisión de la cámara y la configuración del perfil</translation>
     </message>
@@ -672,12 +668,12 @@
       <translation type="unfinished">Import camera or server offline periods</translation>
     </message>
     <message>
-      <source>Record audio</source>
-      <translation>Grabar audio</translation>
-    </message>
-    <message>
       <source>Do not send Stop PTZ command</source>
       <translation>No enviar el comando Detener PTZ</translation>
+    </message>
+    <message>
+      <source>Do not record audio</source>
+      <translation type="unfinished">Do not record audio</translation>
     </message>
   </context>
   <context>

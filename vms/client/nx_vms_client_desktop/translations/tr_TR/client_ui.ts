@@ -524,10 +524,6 @@
       <translation>Varsayılanları Geri Yükle</translation>
     </message>
     <message>
-      <source>Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
-      <translation>Uyarı! Bu ayarları değiştrimeniz önerilmez. Bu değişiklikler olası sistem sorunlarına yol açabilir.</translation>
-    </message>
-    <message>
       <source>Keep camera stream and profile settings</source>
       <translation>Kamera akış ve profil ayarlarını koru</translation>
     </message>
@@ -672,12 +668,12 @@
       <translation>Kamera veya sunucu çevrimdışı dönemlerini içe aktarın</translation>
     </message>
     <message>
-      <source>Record audio</source>
-      <translation>Ses kaydı</translation>
-    </message>
-    <message>
       <source>Do not send Stop PTZ command</source>
       <translation>PTZ'yi Durdur komutunu göndermeyin</translation>
+    </message>
+    <message>
+      <source>Do not record audio</source>
+      <translation type="unfinished">Do not record audio</translation>
     </message>
   </context>
   <context>

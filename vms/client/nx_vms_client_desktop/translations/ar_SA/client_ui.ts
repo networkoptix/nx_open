@@ -524,10 +524,6 @@
       <translation>Restore Defaults</translation>
     </message>
     <message>
-      <source>Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
-      <translation>لا تقم بتغيير هذه الإعدادات إلا إذا كنت متأكدًا تمامًا من تأثيرها المحتمل على أداء نظامك.</translation>
-    </message>
-    <message>
       <source>Keep camera stream and profile settings</source>
       <translation>الحفاظ على دفق الكاميرا وإعدادات الملف الشخصي</translation>
     </message>
@@ -672,12 +668,12 @@
       <translation type="unfinished">Import camera or server offline periods</translation>
     </message>
     <message>
-      <source>Record audio</source>
-      <translation type="unfinished">Record audio</translation>
-    </message>
-    <message>
       <source>Do not send Stop PTZ command</source>
       <translation type="unfinished">Do not send Stop PTZ command</translation>
+    </message>
+    <message>
+      <source>Do not record audio</source>
+      <translation type="unfinished">Do not record audio</translation>
     </message>
   </context>
   <context>

@@ -524,10 +524,6 @@
       <translation>恢復預設值</translation>
     </message>
     <message>
-      <source>Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
-      <translation>請避免變更這些設定，除非您清楚明白該變更對系統運作及其效能的潛在影響.</translation>
-    </message>
-    <message>
       <source>Keep camera stream and profile settings</source>
       <translation>保持攝影機的串流及配置檔設定</translation>
     </message>
@@ -672,12 +668,12 @@
       <translation type="unfinished">Import camera or server offline periods</translation>
     </message>
     <message>
-      <source>Record audio</source>
-      <translation type="unfinished">Record audio</translation>
-    </message>
-    <message>
       <source>Do not send Stop PTZ command</source>
       <translation type="unfinished">Do not send Stop PTZ command</translation>
+    </message>
+    <message>
+      <source>Do not record audio</source>
+      <translation type="unfinished">Do not record audio</translation>
     </message>
   </context>
   <context>

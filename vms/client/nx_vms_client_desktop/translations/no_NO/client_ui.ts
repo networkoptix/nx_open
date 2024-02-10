@@ -524,10 +524,6 @@
       <translation>Gjenopprett standardinnstillinger</translation>
     </message>
     <message>
-      <source>Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
-      <translation>Ikke endre disse innstillingene med mindre du er helt sikker på deres potensielle innvirkning på systemets ytelse.</translation>
-    </message>
-    <message>
       <source>Keep camera stream and profile settings</source>
       <translation>Bruk videostrøm innstillinger satt i kamera</translation>
     </message>
@@ -672,12 +668,12 @@
       <translation>Importer kamera eller server offline perioder</translation>
     </message>
     <message>
-      <source>Record audio</source>
-      <translation>Ta opp lyd</translation>
-    </message>
-    <message>
       <source>Do not send Stop PTZ command</source>
       <translation>Ikke send Stop PTZ-kommandoen</translation>
+    </message>
+    <message>
+      <source>Do not record audio</source>
+      <translation>Ikke ta opp lyd</translation>
     </message>
   </context>
   <context>
