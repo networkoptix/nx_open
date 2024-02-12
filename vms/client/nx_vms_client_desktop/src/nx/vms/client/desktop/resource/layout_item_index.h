@@ -17,13 +17,13 @@ class NX_VMS_CLIENT_DESKTOP_API LayoutItemIndex
 {
 public:
     LayoutItemIndex();
-    LayoutItemIndex(const LayoutResourcePtr& layout, const QnUuid& uuid);
+    LayoutItemIndex(const LayoutResourcePtr& layout, const nx::Uuid& uuid);
 
     const LayoutResourcePtr& layout() const;
     void setLayout(const LayoutResourcePtr& layout);
 
-    const QnUuid& uuid() const;
-    void setUuid(const QnUuid& uuid);
+    const nx::Uuid& uuid() const;
+    void setUuid(const nx::Uuid& uuid);
 
     bool isNull() const;
 
@@ -32,7 +32,7 @@ public:
 
 private:
     LayoutResourcePtr m_layout;
-    QnUuid m_uuid;
+    nx::Uuid m_uuid;
 };
 
 using LayoutItemIndexList = QList<LayoutItemIndex>;

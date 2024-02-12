@@ -12,7 +12,7 @@ class CanModifyStorageTest: public ::testing::Test
 protected:
     CanModifyStorageData data;
     nx::vms::api::ResourceData existingResource;
-    QnUuid parentId = QnUuid::createUuid();
+    nx::Uuid parentId = nx::Uuid::createUuid();
     bool logFuncCalled = false;
     bool getExistingStorageCalled = false;
 

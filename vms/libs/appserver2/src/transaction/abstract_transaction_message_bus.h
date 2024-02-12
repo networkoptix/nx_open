@@ -42,22 +42,22 @@ public:
     virtual void start() = 0;
     virtual void stop() = 0;
 
-    virtual QSet<QnUuid> directlyConnectedClientPeers() const = 0;
-    virtual QSet<QnUuid> directlyConnectedServerPeers() const = 0;
+    virtual QSet<nx::Uuid> directlyConnectedClientPeers() const = 0;
+    virtual QSet<nx::Uuid> directlyConnectedServerPeers() const = 0;
 
-    virtual QnUuid routeToPeerVia(
-        const QnUuid& dstPeer, int* distance, nx::network::SocketAddress* knownPeerAddress) const = 0;
-    virtual int distanceToPeer(const QnUuid& dstPeer) const = 0;
+    virtual nx::Uuid routeToPeerVia(
+        const nx::Uuid& dstPeer, int* distance, nx::network::SocketAddress* knownPeerAddress) const = 0;
+    virtual int distanceToPeer(const nx::Uuid& dstPeer) const = 0;
 
     virtual void addOutgoingConnectionToPeer(
-        const QnUuid& id,
+        const nx::Uuid& id,
         nx::vms::api::PeerType peerType,
         const nx::utils::Url& url,
         std::optional<nx::network::http::Credentials> credentials = std::nullopt,
         nx::network::ssl::AdapterFunc adapterFunc = nx::network::ssl::kDefaultCertificateCheck) = 0;
-    virtual void removeOutgoingConnectionFromPeer(const QnUuid& id) = 0;
+    virtual void removeOutgoingConnectionFromPeer(const nx::Uuid& id) = 0;
     virtual void updateOutgoingConnection(
-        const QnUuid& id, nx::network::http::Credentials credentials) = 0;
+        const nx::Uuid& id, nx::network::http::Credentials credentials) = 0;
 
     virtual void dropConnections() = 0;
 
@@ -72,12 +72,12 @@ public:
     virtual ConnectionGuardSharedState* connectionGuardSharedState() = 0;
 
 signals:
-    void peerFound(QnUuid data, nx::vms::api::PeerType peerType);
-    void peerLost(QnUuid data, nx::vms::api::PeerType peerType);
-    void remotePeerUnauthorized(QnUuid id);
-    void remotePeerForbidden(QnUuid id, const QString& message);
-    void remotePeerHandshakeError(QnUuid id);
-    void stateChanged(const QnUuid& id, const QString& state);
+    void peerFound(nx::Uuid data, nx::vms::api::PeerType peerType);
+    void peerLost(nx::Uuid data, nx::vms::api::PeerType peerType);
+    void remotePeerUnauthorized(nx::Uuid id);
+    void remotePeerForbidden(nx::Uuid id, const QString& message);
+    void remotePeerHandshakeError(nx::Uuid id);
+    void stateChanged(const nx::Uuid& id, const QString& state);
 
     /** Emitted on a new direct connection to a remote peer has been established */
     void newDirectConnectionEstablished(QnAbstractTransactionTransport* transport);

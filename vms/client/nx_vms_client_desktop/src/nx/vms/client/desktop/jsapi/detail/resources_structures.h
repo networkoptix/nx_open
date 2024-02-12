@@ -43,8 +43,8 @@ NX_REFLECTION_ENUM_CLASS(ResourceType,
 
 struct ResourceUniqueId
 {
-    QnUuid id;
-    QnUuid localSystemId;
+    nx::Uuid id;
+    nx::Uuid localSystemId;
 
     ResourceUniqueId() = default;
     ResourceUniqueId(const QString& id);

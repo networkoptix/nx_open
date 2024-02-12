@@ -38,7 +38,7 @@ protected:
     }
 
     QnLayoutResourcePtr createLayout(
-        Qn::ResourceFlags flags, bool locked = false, const QnUuid& parentId = QnUuid())
+        Qn::ResourceFlags flags, bool locked = false, const nx::Uuid& parentId = nx::Uuid())
     {
         QnLayoutResourcePtr layout;
         if (flags.testFlag(Qn::exported_layout))
@@ -51,7 +51,7 @@ protected:
             layout.reset(new LayoutResource());
         }
 
-        layout->setIdUnsafe(QnUuid::createUuid());
+        layout->setIdUnsafe(nx::Uuid::createUuid());
         layout->addFlags(flags);
         layout->setLocked(locked);
 
@@ -224,7 +224,7 @@ TEST_F(AccessControllerTest, checkPermissionForNewCloudUser)
 
     const QnUserResourcePtr newCloudUser(
         new QnUserResource(nx::vms::api::UserType::cloud, /*externalId*/ {}));
-    newCloudUser->setIdUnsafe(QnUuid::createUuid());
+    newCloudUser->setIdUnsafe(nx::Uuid::createUuid());
     resourcePool()->addResource(newCloudUser);
 
     CHECK_DOESNT_HAVE_PERMISSIONS(newCloudUser, Qn::WriteDigestPermission);
@@ -237,7 +237,7 @@ TEST_F(AccessControllerTest, userGroupChangesUpdatePermissionsForTheirMembers)
     const QnUserResourcePtr newLocalUser(
         new QnUserResource(nx::vms::api::UserType::local, /*externalId*/ {}));
     newLocalUser->setName(userName2);
-    newLocalUser->setIdUnsafe(QnUuid::createUuid());
+    newLocalUser->setIdUnsafe(nx::Uuid::createUuid());
     newLocalUser->setGroupIds({api::kPowerUsersGroupId});
     resourcePool()->addResource(newLocalUser);
 
@@ -254,7 +254,7 @@ TEST_F(AccessControllerTest, userGroupChangesUpdatePermissionsForTheirMembers)
         systemContext()->accessController()->hasPermissions(newLocalUser, Qn::SavePermission));
 
     api::UserGroupData newGroup;
-    newGroup.id = QnUuid::createUuid();
+    newGroup.id = nx::Uuid::createUuid();
     newGroup.name = "test_group";
     newGroup.parentGroupIds = {api::kPowerUsersGroupId};
     systemContext()->userGroupManager()->addOrUpdate(newGroup);

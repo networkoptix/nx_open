@@ -19,8 +19,8 @@ class SimpleEvent: public nx::vms::rules::BasicEvent
     Q_OBJECT
     Q_CLASSINFO("type", "nx.events.test")
 
-    Q_PROPERTY(QnUuid cameraId MEMBER m_cameraId)
-    Q_PROPERTY(QnUuidList deviceIds MEMBER m_deviceIds)
+    Q_PROPERTY(nx::Uuid cameraId MEMBER m_cameraId)
+    Q_PROPERTY(UuidList deviceIds MEMBER m_deviceIds)
 public:
     static ItemDescriptor manifest()
     {
@@ -37,8 +37,8 @@ public:
     }
 
     using BasicEvent::BasicEvent;
-    QnUuid m_cameraId;
-    QnUuidList m_deviceIds;
+    nx::Uuid m_cameraId;
+    UuidList m_deviceIds;
 };
 
 class TestEvent: public nx::vms::rules::BasicEvent
@@ -47,9 +47,9 @@ class TestEvent: public nx::vms::rules::BasicEvent
     Q_OBJECT
     Q_CLASSINFO("type", "nx.events.test.permissions")
 
-    Q_PROPERTY(QnUuid serverId MEMBER m_serverId)
-    Q_PROPERTY(QnUuid cameraId MEMBER m_cameraId)
-    Q_PROPERTY(QnUuidList deviceIds MEMBER m_deviceIds)
+    Q_PROPERTY(nx::Uuid serverId MEMBER m_serverId)
+    Q_PROPERTY(nx::Uuid cameraId MEMBER m_cameraId)
+    Q_PROPERTY(UuidList deviceIds MEMBER m_deviceIds)
 
     Q_PROPERTY(int intField MEMBER m_intField)
     Q_PROPERTY(QString text MEMBER m_text)
@@ -114,9 +114,9 @@ public:
         return result;
     }
 
-    QnUuid m_serverId;
-    QnUuid m_cameraId;
-    QnUuidList m_deviceIds;
+    nx::Uuid m_serverId;
+    nx::Uuid m_cameraId;
+    UuidList m_deviceIds;
 
     int m_intField{};
     QString m_text;

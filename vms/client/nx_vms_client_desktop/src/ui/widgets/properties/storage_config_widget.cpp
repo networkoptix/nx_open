@@ -391,7 +391,7 @@ public:
             systemContext->serverRuntimeEventConnector(),
             &ServerRuntimeEventConnector::analyticsStorageParametersChanged,
             this,
-            [this](const QnUuid& serverId)
+            [this](const nx::Uuid& serverId)
             {
                 if (m_server && serverId == m_server->getId())
                     requestMetadataFromServer();
@@ -1261,7 +1261,7 @@ void QnStorageConfigWidget::applyChanges()
 
     applyStoragesChanges(storagesToUpdate, m_model->storages());
 
-    QSet<QnUuid> newIdList;
+    QSet<nx::Uuid> newIdList;
     for (const auto& storageData: m_model->storages())
         newIdList.insert(storageData.id);
 
@@ -1334,10 +1334,10 @@ void QnStorageConfigWidget::cancelRebuild(bool isMain)
     storagePool.rebuildCancelled = true;
 }
 
-void QnStorageConfigWidget::confirmNewMetadataStorage(const QnUuid& storageId)
+void QnStorageConfigWidget::confirmNewMetadataStorage(const nx::Uuid& storageId)
 {
     const auto updateServerSettings =
-        [this](const vms::api::MetadataStorageChangePolicy policy, const QnUuid& storageId)
+        [this](const vms::api::MetadataStorageChangePolicy policy, const nx::Uuid& storageId)
         {
             NX_ASSERT(m_currentRequest == 0);
 

@@ -53,7 +53,7 @@ using namespace nx::vms::api;
 
 using NodeType = ResourceTree::NodeType;
 using ResourceItemCreator = std::function<AbstractItemPtr(const QnResourcePtr&)>;
-using UuidItemCreator = std::function<AbstractItemPtr(const QnUuid&)>;
+using UuidItemCreator = std::function<AbstractItemPtr(const nx::Uuid&)>;
 
 using UserdDefinedGroupIdGetter = std::function<QString(const QnResourcePtr&, int)>;
 using UserdDefinedGroupItemCreator = std::function<AbstractItemPtr(const QString&)>;
@@ -172,7 +172,7 @@ LayoutItemCreator layoutItemCreator(
     bool hasPowerUserPermissions)
 {
     return
-        [=](const QnUuid& itemId) -> AbstractItemPtr
+        [=](const nx::Uuid& itemId) -> AbstractItemPtr
         {
             const auto itemData = layout->getItem(itemId);
 
@@ -208,7 +208,7 @@ UuidItemCreator otherServerItemCreator(
     bool hasPowerUserPermissions = false)
 {
     return
-        [=](const QnUuid& serverId) -> AbstractItemPtr
+        [=](const nx::Uuid& serverId) -> AbstractItemPtr
         {
             return factory->createOtherServerItem(serverId);
         };
@@ -303,7 +303,7 @@ std::function<AbstractItemPtr(const QString&)> parentServerItemCreator(
         [resourcePool, factory](const QString& serverId) -> AbstractItemPtr
         {
             const auto serverResource =
-                resourcePool->getResourceById(QnUuid::fromStringSafe(serverId));
+                resourcePool->getResourceById(nx::Uuid::fromStringSafe(serverId));
             return factory->createResourceItem(serverResource);
         };
 }
@@ -780,7 +780,7 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createLayoutsGroupEntity() const
 AbstractEntityPtr ResourceTreeEntityBuilder::createShowreelsGroupEntity() const
 {
     const auto showreelItemCreator =
-        [this](const QnUuid& id) { return m_itemFactory->createShowreelItem(id); };
+        [this](const nx::Uuid& id) { return m_itemFactory->createShowreelItem(id); };
 
     const auto showreelManager = systemContext()->showreelManager();
 
@@ -873,13 +873,13 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createVideowallsEntity() const
             const auto videoWall = resource.dynamicCast<QnVideoWallResource>();
 
             const auto videoWallScreenCreator =
-                [this, videoWall](const QnUuid& id)
+                [this, videoWall](const nx::Uuid& id)
                 {
                     return m_itemFactory->createVideoWallScreenItem(videoWall, id);
                 };
 
             const auto videoWallMatrixCreator =
-                [this, videoWall](const QnUuid& id)
+                [this, videoWall](const nx::Uuid& id)
                 {
                     return m_itemFactory->createVideoWallMatrixItem(videoWall, id);
                 };
@@ -906,11 +906,11 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createVideowallsEntity() const
 
 AbstractEntityPtr ResourceTreeEntityBuilder::createLocalOtherSystemsEntity() const
 {
-    using GroupingRule = GroupingRule<QString, QnUuid>;
-    using GroupingRuleStack = GroupingEntity<QString, QnUuid>::GroupingRuleStack;
+    using GroupingRule = GroupingRule<QString, nx::Uuid>;
+    using GroupingRuleStack = GroupingEntity<QString, nx::Uuid>::GroupingRuleStack;
 
     const auto systemNameGetter =
-        [this](const QnUuid& serverId, int /*order*/) -> QString
+        [this](const nx::Uuid& serverId, int /*order*/) -> QString
         {
             const auto moduleInformation =
                 systemContext()->otherServersManager()->getModuleInformationWithAddresses(serverId);
@@ -933,7 +933,7 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createLocalOtherSystemsEntity() con
         1, //< Dimension
         numericOrder()};
 
-    auto otherSystemsGroupingEntity = std::make_unique<GroupingEntity<QString, QnUuid>>(
+    auto otherSystemsGroupingEntity = std::make_unique<GroupingEntity<QString, nx::Uuid>>(
         otherServerItemCreator(m_itemFactory.get(), user()),
         Qn::UuidRole,
         numericOrder(),

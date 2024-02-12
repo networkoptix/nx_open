@@ -71,7 +71,7 @@ void EngineHolder::connectEngine(
         return;
 
     connect(processor, &QnCommonMessageProcessor::vmsRulesReset, engine,
-        [engine](QnUuid peerId, const nx::vms::api::rules::RuleList& rules)
+        [engine](nx::Uuid peerId, const nx::vms::api::rules::RuleList& rules)
         {
             engine->setId(peerId);
             engine->resetRules(rules);
@@ -86,7 +86,7 @@ void EngineHolder::connectEngine(
         connectionType);
 
     connect(processor, &QnCommonMessageProcessor::vmsRuleRemoved, engine,
-        [engine](QnUuid id)
+        [engine](nx::Uuid id)
         {
             engine->removeRule(id);
         },

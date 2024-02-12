@@ -23,9 +23,9 @@ protected:
     virtual void SetUp() override
     {
         engine = std::make_unique<Engine>(std::make_unique<TestRouter>());
-        mockRule = std::make_unique<Rule>(QnUuid(), engine.get());
+        mockRule = std::make_unique<Rule>(nx::Uuid(), engine.get());
 
-        filter = std::make_unique<EventFilter>(QnUuid::createUuid(), "nx.events.generic");
+        filter = std::make_unique<EventFilter>(nx::Uuid::createUuid(), "nx.events.generic");
         filter->addField("source", std::make_unique<KeywordsField>());
         filter->addField("caption", std::make_unique<KeywordsField>());
         filter->addField("description", std::make_unique<KeywordsField>());
@@ -50,8 +50,8 @@ protected:
             source,
             caption,
             description,
-            QnUuid::createUuid(),
-            QnUuidList({QnUuid::createUuid()}));
+            nx::Uuid::createUuid(),
+            UuidList({nx::Uuid::createUuid()}));
     }
 
     std::unique_ptr <Engine> engine;

@@ -14,7 +14,7 @@ namespace nx::vms::client::desktop {
 
 struct AnalyticsEngineInfo
 {
-    QnUuid id;
+    nx::Uuid id;
     QString name;
     QString description;
     QString version;

@@ -25,12 +25,12 @@ const nx::network::SocketAddress kMulticastEndpoint("239.255.11.12:0");
 class DiscoveryUdpMulticastFinder: public testing::Test
 {
 public:
-    DiscoveryUdpMulticastFinder(): systemId(QnUuid::createUuid()) {}
+    DiscoveryUdpMulticastFinder(): systemId(nx::Uuid::createUuid()) {}
 
     nx::vms::api::ModuleInformationWithAddresses makeModuleInformation() const
     {
         nx::vms::api::ModuleInformationWithAddresses module;
-        module.id = QnUuid::createUuid();
+        module.id = nx::Uuid::createUuid();
         module.localSystemId = systemId;
         module.type = "test";
         module.customization = "test";
@@ -51,7 +51,7 @@ public:
 
 protected:
     UdpMulticastFinder moduleFinder;
-    QnUuid systemId;
+    nx::Uuid systemId;
 };
 
 TEST_F(DiscoveryUdpMulticastFinder, Base)

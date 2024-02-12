@@ -531,7 +531,7 @@ int QnFfmpegTranscoder::finalizeInternal(nx::utils::ByteArray* const /*result*/)
     return 0;
 }
 
-QByteArray QnFfmpegTranscoder::getSignature(QnLicensePool* licensePool, const QnUuid& serverId)
+QByteArray QnFfmpegTranscoder::getSignature(QnLicensePool* licensePool, const nx::Uuid& serverId)
 {
     return m_mediaSigner.buildSignature(licensePool, serverId);
 }

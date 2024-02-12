@@ -136,7 +136,7 @@ void QnClientMessageProcessor::updateResource(
         resourcePool()->addResource(resource);
 }
 
-void QnClientMessageProcessor::handleRemotePeerFound(QnUuid peer, nx::vms::api::PeerType peerType)
+void QnClientMessageProcessor::handleRemotePeerFound(nx::Uuid peer, nx::vms::api::PeerType peerType)
 {
     base_type::handleRemotePeerFound(peer, peerType);
 
@@ -168,7 +168,7 @@ void QnClientMessageProcessor::handleRemotePeerFound(QnUuid peer, nx::vms::api::
     emit connectionOpened();
 }
 
-void QnClientMessageProcessor::handleRemotePeerLost(QnUuid peer, nx::vms::api::PeerType peerType)
+void QnClientMessageProcessor::handleRemotePeerLost(nx::Uuid peer, nx::vms::api::PeerType peerType)
 {
     base_type::handleRemotePeerLost(peer, peerType);
 
@@ -178,9 +178,9 @@ void QnClientMessageProcessor::handleRemotePeerLost(QnUuid peer, nx::vms::api::P
     if (!m_connected)
         return;
 
-    const QnUuid currentPeer = connection()
+    const nx::Uuid currentPeer = connection()
         ? connection()->moduleInformation().id
-        : QnUuid();
+        : nx::Uuid();
 
     if (currentPeer.isNull())
     {
@@ -214,7 +214,7 @@ void QnClientMessageProcessor::handleRemotePeerLost(QnUuid peer, nx::vms::api::P
     }
 }
 
-void QnClientMessageProcessor::removeHardwareIdMapping(const QnUuid& id)
+void QnClientMessageProcessor::removeHardwareIdMapping(const nx::Uuid& id)
 {
     emit hardwareIdMappingRemoved(id);
 }

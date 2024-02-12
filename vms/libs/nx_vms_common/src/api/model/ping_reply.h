@@ -13,10 +13,10 @@ struct QnPingReply
     QnPingReply(): sysIdTime(0) {}
 
     /**%apidoc Id of the Server Module. */
-    QnUuid moduleGuid;
+    nx::Uuid moduleGuid;
 
     /**%apidoc Id of the Site. */
-    QnUuid localSystemId;
+    nx::Uuid localSystemId;
 
     /**%apidoc[proprietary]*/
     qint64 sysIdTime;

@@ -107,10 +107,10 @@ void ResourceTreeModelTest::setSystemName(const QString& name) const
 }
 
 QnUserResourcePtr ResourceTreeModelTest::addUser(
-    const QString& name, const std::optional<QnUuid>& groupId) const
+    const QString& name, const std::optional<nx::Uuid>& groupId) const
 {
     QnUserResourcePtr user(new QnUserResource(nx::vms::api::UserType::local, /*externalId*/ {}));
-    user->setIdUnsafe(QnUuid::createUuid());
+    user->setIdUnsafe(nx::Uuid::createUuid());
     user->setName(name);
     if (groupId)
         user->setGroupIds({*groupId});
@@ -122,7 +122,7 @@ QnUserResourcePtr ResourceTreeModelTest::addUser(
 ServerResourcePtr ResourceTreeModelTest::addServer(const QString& name) const
 {
     ServerResourcePtr server(new ServerResource());
-    server->setIdUnsafe(QnUuid::createUuid());
+    server->setIdUnsafe(nx::Uuid::createUuid());
     server->setName(name);
     resourcePool()->addResource(server);
     return server;
@@ -131,7 +131,7 @@ ServerResourcePtr ResourceTreeModelTest::addServer(const QString& name) const
 QnMediaServerResourcePtr ResourceTreeModelTest::addEdgeServer(const QString& name, const QString& address) const
 {
     QnMediaServerResourcePtr server(new ServerResource());
-    server->setIdUnsafe(QnUuid::createUuid());
+    server->setIdUnsafe(nx::Uuid::createUuid());
     server->setName(name);
     server->setServerFlags(server->getServerFlags() | ServerFlag::SF_Edge);
     server->setNetAddrList({nx::network::SocketAddress(address.toStdString())});
@@ -145,7 +145,7 @@ void ResourceTreeModelTest::addOtherServer(const QString& name) const
 
     nx::vms::api::DiscoveredServerData discoveredServer;
     discoveredServer.name = name;
-    discoveredServer.id = QnUuid::createUuid();
+    discoveredServer.id = nx::Uuid::createUuid();
     discoveredServer.status = nx::vms::api::ResourceStatus::incompatible;
     discoveredServer.version = nx::utils::SoftwareVersion(2, 3, 0, 1); //< Min suitable version.
 
@@ -181,11 +181,11 @@ QnFileLayoutResourcePtr ResourceTreeModelTest::addFileLayout(
 
 LayoutResourcePtr ResourceTreeModelTest::addLayout(
     const QString& name,
-    const QnUuid& parentId) const
+    const nx::Uuid& parentId) const
 {
     LayoutResourcePtr layout(new LayoutResource());
     layout->setName(name);
-    layout->setIdUnsafe(QnUuid::createUuid());
+    layout->setIdUnsafe(nx::Uuid::createUuid());
     layout->setParentId(parentId);
     resourcePool()->addResource(layout);
     return layout;
@@ -197,7 +197,7 @@ QnWebPageResourcePtr ResourceTreeModelTest::addWebPage(
 {
     QnWebPageResourcePtr webPage(new QnWebPageResource());
     webPage->setName(name);
-    webPage->setIdUnsafe(QnUuid::createUuid());
+    webPage->setIdUnsafe(nx::Uuid::createUuid());
     resourcePool()->addResource(webPage);
 
     // Properties can be set only after Resource is added to the Resource Pool.
@@ -209,11 +209,11 @@ QnWebPageResourcePtr ResourceTreeModelTest::addWebPage(
 QnWebPageResourcePtr ResourceTreeModelTest::addProxiedWebPage(
     const QString& name,
     WebPageSubtype subtype,
-    const QnUuid& serverId) const
+    const nx::Uuid& serverId) const
 {
     QnWebPageResourcePtr webPage(new QnWebPageResource());
     webPage->setName(name);
-    webPage->setIdUnsafe(QnUuid::createUuid());
+    webPage->setIdUnsafe(nx::Uuid::createUuid());
     webPage->setProxyId(serverId);
     resourcePool()->addResource(webPage);
 
@@ -227,7 +227,7 @@ QnVideoWallResourcePtr ResourceTreeModelTest::addVideoWall(const QString& name) 
 {
     QnVideoWallResourcePtr videoWall(new QnVideoWallResource());
     videoWall->setName(name);
-    videoWall->setIdUnsafe(QnUuid::createUuid());
+    videoWall->setIdUnsafe(nx::Uuid::createUuid());
     resourcePool()->addResource(videoWall);
     return videoWall;
 }
@@ -240,7 +240,7 @@ QnVideoWallItem ResourceTreeModelTest::addVideoWallScreen(
     layout->setData(Qn::VideoWallResourceRole, QVariant::fromValue(videoWall));
     QnVideoWallItem screen;
     screen.name = name;
-    screen.uuid = QnUuid::createUuid();
+    screen.uuid = nx::Uuid::createUuid();
     screen.layout = layout->getId();
     videoWall->items()->addOrUpdateItem(screen);
     return screen;
@@ -252,7 +252,7 @@ QnVideoWallMatrix ResourceTreeModelTest::addVideoWallMatrix(
 {
     QnVideoWallMatrix matrix;
     matrix.name = name;
-    matrix.uuid = QnUuid::createUuid();
+    matrix.uuid = nx::Uuid::createUuid();
     for (const QnVideoWallItem& item: videoWall->items()->getItems())
     {
         if (item.layout.isNull() || !resourcePool()->getResourceById(item.layout))
@@ -281,10 +281,10 @@ void ResourceTreeModelTest::updateVideoWallMatrix(
 
 ShowreelData ResourceTreeModelTest::addShowreel(
     const QString& name,
-    const QnUuid& parentId) const
+    const nx::Uuid& parentId) const
 {
     ShowreelData showreel;
-    showreel.id = QnUuid::createUuid();
+    showreel.id = nx::Uuid::createUuid();
     showreel.parentId = parentId;
     showreel.name = name;
     systemContext()->showreelManager()->addOrUpdateShowreel(showreel);
@@ -293,12 +293,12 @@ ShowreelData ResourceTreeModelTest::addShowreel(
 
 QnVirtualCameraResourcePtr ResourceTreeModelTest::addCamera(
     const QString& name,
-    const QnUuid& parentId,
+    const nx::Uuid& parentId,
     const QString& hostAddress) const
 {
     QnVirtualCameraResourcePtr camera(new CameraResourceStub());
     camera->setName(name);
-    camera->setIdUnsafe(QnUuid::createUuid());
+    camera->setIdUnsafe(nx::Uuid::createUuid());
     camera->setParentId(parentId);
     if (!hostAddress.isEmpty())
         camera->setHostAddress(hostAddress);
@@ -311,7 +311,7 @@ QnVirtualCameraResourcePtr ResourceTreeModelTest::addEdgeCamera(
 {
     QnVirtualCameraResourcePtr camera(new CameraResourceStub());
     camera->setName(name);
-    camera->setIdUnsafe(QnUuid::createUuid());
+    camera->setIdUnsafe(nx::Uuid::createUuid());
     camera->setParentId(edgeServer->getId());
     if (NX_ASSERT(!edgeServer->getNetAddrList().empty(), "Edge server should have some network address"))
         camera->setHostAddress(toQString(edgeServer->getNetAddrList().first().address.toString()));
@@ -321,11 +321,11 @@ QnVirtualCameraResourcePtr ResourceTreeModelTest::addEdgeCamera(
 
 QnVirtualCameraResourcePtr ResourceTreeModelTest::addVirtualCamera(
     const QString& name,
-    const QnUuid& parentId /*= QnUuid()*/) const
+    const nx::Uuid& parentId /*= nx::Uuid()*/) const
 {
     QnVirtualCameraResourcePtr camera(new CameraResourceStub());
     camera->setName(name);
-    camera->setIdUnsafe(QnUuid::createUuid());
+    camera->setIdUnsafe(nx::Uuid::createUuid());
     camera->setParentId(parentId);
     camera->setFlags(camera->flags() | Qn::ResourceFlag::virtual_camera);
     resourcePool()->addResource(camera);
@@ -334,11 +334,11 @@ QnVirtualCameraResourcePtr ResourceTreeModelTest::addVirtualCamera(
 
 QnVirtualCameraResourcePtr ResourceTreeModelTest::addIOModule(
     const QString& name,
-    const QnUuid& parentId /*= QnUuid()*/) const
+    const nx::Uuid& parentId /*= nx::Uuid()*/) const
 {
     QnVirtualCameraResourcePtr camera(new CameraResourceStub());
     camera->setName(name);
-    camera->setIdUnsafe(QnUuid::createUuid());
+    camera->setIdUnsafe(nx::Uuid::createUuid());
     camera->setParentId(parentId);
     camera->setFlags(camera->flags() | Qn::ResourceFlag::io_module);
     resourcePool()->addResource(camera);
@@ -348,11 +348,11 @@ QnVirtualCameraResourcePtr ResourceTreeModelTest::addIOModule(
 QnVirtualCameraResourcePtr ResourceTreeModelTest::addRecorderCamera(
     const QString& name,
     const QString& groupId,
-    const QnUuid& parentId /*= QnUuid()*/) const
+    const nx::Uuid& parentId /*= nx::Uuid()*/) const
 {
     CameraResourceStubPtr camera(new CameraResourceStub());
     camera->setName(name);
-    camera->setIdUnsafe(QnUuid::createUuid());
+    camera->setIdUnsafe(nx::Uuid::createUuid());
     camera->setParentId(parentId);
     camera->setGroupId(groupId);
     camera->markCameraAsNvr();
@@ -363,11 +363,11 @@ QnVirtualCameraResourcePtr ResourceTreeModelTest::addRecorderCamera(
 QnVirtualCameraResourcePtr ResourceTreeModelTest::addMultisensorSubCamera(
     const QString& name,
     const QString& groupId,
-    const QnUuid& parentId /*= QnUuid()*/) const
+    const nx::Uuid& parentId /*= nx::Uuid()*/) const
 {
     QnVirtualCameraResourcePtr camera(new CameraResourceStub());
     camera->setName(name);
-    camera->setIdUnsafe(QnUuid::createUuid());
+    camera->setIdUnsafe(nx::Uuid::createUuid());
     camera->setParentId(parentId);
     camera->setGroupId(groupId);
     resourcePool()->addResource(camera);
@@ -376,12 +376,12 @@ QnVirtualCameraResourcePtr ResourceTreeModelTest::addMultisensorSubCamera(
 
 QnVirtualCameraResourcePtr ResourceTreeModelTest::addIntercomCamera(
     const QString& name,
-    const QnUuid& parentId,
+    const nx::Uuid& parentId,
     const QString& hostAddress) const
 {
     QnClientCameraResourcePtr camera(new ClientCameraResourceStub());
     camera->setName(name);
-    camera->setIdUnsafe(QnUuid::createUuid());
+    camera->setIdUnsafe(nx::Uuid::createUuid());
     camera->setParentId(parentId);
     if (!hostAddress.isEmpty())
         camera->setHostAddress(hostAddress);
@@ -400,7 +400,7 @@ QnVirtualCameraResourcePtr ResourceTreeModelTest::addIntercomCamera(
 
 LayoutResourcePtr ResourceTreeModelTest::addIntercomLayout(
     const QString& name,
-    const QnUuid& parentId) const
+    const nx::Uuid& parentId) const
 {
     LayoutResourcePtr layout(new LayoutResource());
     layout->setName(name);
@@ -435,7 +435,7 @@ void ResourceTreeModelTest::addToLayout(
     {
         common::LayoutItemData layoutItemData;
         layoutItemData.resource.id = resource->getId();
-        layoutItemData.uuid = QnUuid::createUuid();
+        layoutItemData.uuid = nx::Uuid::createUuid();
         layout->addItem(layoutItemData);
     }
 }
@@ -444,7 +444,7 @@ void ResourceTreeModelTest::setVideoWallScreenRuntimeStatus(
     const QnVideoWallResourcePtr& videoWall,
     const QnVideoWallItem& videoWallScreen,
     bool isOnline,
-    const QnUuid& controlledBy)
+    const nx::Uuid& controlledBy)
 {
     QnVideoWallItem updatedVideoWallScreen = videoWallScreen;
     updatedVideoWallScreen.runtimeStatus.online = isOnline;
@@ -473,7 +473,7 @@ void ResourceTreeModelTest::setupAccessToResourceForUser(
 
 void ResourceTreeModelTest::setupAccessToObjectForUser(
     const QnUserResourcePtr& user,
-    const QnUuid& resourceOrGroupId,
+    const nx::Uuid& resourceOrGroupId,
     nx::vms::api::AccessRights accessRights) const
 {
     if (!NX_ASSERT(user && !resourceAccessManager()->hasPowerUserPermissions(user)))
@@ -505,14 +505,14 @@ void ResourceTreeModelTest::setupControlAllVideoWallsAccess(const QnUserResource
 }
 
 QnUserResourcePtr ResourceTreeModelTest::loginAs(
-    const QString& name, const std::optional<QnUuid>& groupId) const
+    const QString& name, const std::optional<nx::Uuid>& groupId) const
 {
     logout();
     const auto users = resourcePool()->getResources<QnUserResource>();
 
-    const std::vector<QnUuid> groupIds = groupId
-        ? std::vector<QnUuid>{*groupId}
-        : std::vector<QnUuid>{};
+    const std::vector<nx::Uuid> groupIds = groupId
+        ? std::vector<nx::Uuid>{*groupId}
+        : std::vector<nx::Uuid>{};
 
     const auto itr = std::find_if(users.cbegin(), users.cend(),
         [this, name, &groupIds](const QnUserResourcePtr& user)

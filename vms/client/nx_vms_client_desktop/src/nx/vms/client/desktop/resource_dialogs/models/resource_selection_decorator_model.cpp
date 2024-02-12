@@ -169,9 +169,9 @@ void ResourceSelectionDecoratorModel::setSelectedResources(const QSet<QnResource
     emit selectedResourcesChanged();
 }
 
-QnUuidSet ResourceSelectionDecoratorModel::selectedResourcesIds() const
+UuidSet ResourceSelectionDecoratorModel::selectedResourcesIds() const
 {
-    QnUuidSet result;
+    UuidSet result;
     for (const auto& resource: m_selectedResources)
         result.insert(resource->getId());
     return result;

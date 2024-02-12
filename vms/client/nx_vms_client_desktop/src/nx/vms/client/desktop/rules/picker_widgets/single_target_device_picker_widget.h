@@ -50,7 +50,7 @@ private:
     void onSelectButtonClicked() override
     {
         auto field = theField();
-        auto selectedCameras = QnUuidSet{field->id()};
+        auto selectedCameras = UuidSet{field->id()};
 
         if (!CameraSelectionDialog::selectCameras<Policy>(selectedCameras, this))
             return;

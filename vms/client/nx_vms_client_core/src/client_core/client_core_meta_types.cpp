@@ -119,7 +119,7 @@ void initializeMetaTypes()
     qmlRegisterType<Collator>("Nx.Core", 1, 0, "Collator");
 
     qmlRegisterSingletonType<NxGlobalsObject>("Nx", 1, 0, "NxGlobals", &createNxGlobals);
-    qmlRegisterUncreatableType<QnUuid>(
+    qmlRegisterUncreatableType<nx::Uuid>(
         "Nx.Utils", 1, 0, "Uuid", "Cannot create an instance of Uuid.");
     qmlRegisterUncreatableType<utils::Url>(
         "Nx.Utils", 1, 0, "Url", "Cannot create an instance of Url.");

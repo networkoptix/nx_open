@@ -121,7 +121,7 @@ ResourceAccessTarget accessTarget(const QModelIndex& resourceTreeModelIndex)
 
 ResourceAccessTarget::ResourceAccessTarget(const QnResourcePtr& resource):
     m_resource(resource),
-    m_id(resource ? resource->getId() : QnUuid{})
+    m_id(resource ? resource->getId() : nx::Uuid{})
 {
 }
 
@@ -131,16 +131,16 @@ ResourceAccessTarget::ResourceAccessTarget(SpecialResourceGroup group):
 {
 }
 
-ResourceAccessTarget::ResourceAccessTarget(const QnUuid& specialResourceGroupId):
+ResourceAccessTarget::ResourceAccessTarget(const nx::Uuid& specialResourceGroupId):
     m_group(specialResourceGroup(specialResourceGroupId)),
-    m_id(m_group ? specialResourceGroupId : QnUuid{})
+    m_id(m_group ? specialResourceGroupId : nx::Uuid{})
 {
     NX_ASSERT(specialResourceGroupId.isNull() || m_group);
 }
 
 ResourceAccessTarget::ResourceAccessTarget(
     QnResourcePool* resourcePool,
-    const QnUuid& resourceOrGroupId)
+    const nx::Uuid& resourceOrGroupId)
     :
     m_resource(NX_ASSERT(resourcePool)
         ? resourcePool->getResourceById(resourceOrGroupId)
@@ -148,7 +148,7 @@ ResourceAccessTarget::ResourceAccessTarget(
     m_group(m_resource
         ? decltype(m_group){}
         : specialResourceGroup(resourceOrGroupId)),
-    m_id(m_resource ? m_resource->getId() : (m_group ? resourceOrGroupId : QnUuid{}))
+    m_id(m_resource ? m_resource->getId() : (m_group ? resourceOrGroupId : nx::Uuid{}))
 {
 }
 
@@ -177,7 +177,7 @@ public:
     };
 
 public:
-    QnUuid currentSubjectId;
+    nx::Uuid currentSubjectId;
     SubjectType currentSubjectType = SubjectType::user;
     const QPointer<SubjectHierarchy> systemSubjectHierarchy;
     const std::unique_ptr<Hierarchy> currentHierarchy;
@@ -186,7 +186,7 @@ public:
     const std::unique_ptr<AccessRightsResolver::Notifier> notifier;
     bool hierarchyChanged = false;
     bool updatingAccessRights = false;
-    mutable QSet<QnUuid> currentlyAccessibleIdsCache; //< For filter by permissions.
+    mutable QSet<nx::Uuid> currentlyAccessibleIdsCache; //< For filter by permissions.
 
 public:
     explicit Private(AccessSubjectEditingContext* q):
@@ -246,7 +246,7 @@ public:
 
     void handleResourcesAddedOrRemoved(const QnResourceList& resources)
     {
-        QSet<QnUuid> affectedGroupIds;
+        QSet<nx::Uuid> affectedGroupIds;
 
         for (const auto& resource: resources)
         {
@@ -260,10 +260,10 @@ public:
     };
 
     void handleSystemHierarchyChanged(
-        const QSet<QnUuid>& added,
-        const QSet<QnUuid>& removed,
-        const QSet<QnUuid>& /*groupsWithChangedMembers*/,
-        const QSet<QnUuid>& subjectsWithChangedParents)
+        const QSet<nx::Uuid>& added,
+        const QSet<nx::Uuid>& removed,
+        const QSet<nx::Uuid>& /*groupsWithChangedMembers*/,
+        const QSet<nx::Uuid>& subjectsWithChangedParents)
     {
         if (removed.contains(currentSubjectId))
         {
@@ -501,7 +501,7 @@ AccessSubjectEditingContext::~AccessSubjectEditingContext()
     // Required here for forward-declared scoped pointer destruction.
 }
 
-QnUuid AccessSubjectEditingContext::currentSubjectId() const
+nx::Uuid AccessSubjectEditingContext::currentSubjectId() const
 {
     return d->currentSubjectId;
 }
@@ -512,7 +512,7 @@ AccessSubjectEditingContext::SubjectType AccessSubjectEditingContext::currentSub
 }
 
 void AccessSubjectEditingContext::setCurrentSubject(
-    const QnUuid& subjectId, SubjectType subjectType)
+    const nx::Uuid& subjectId, SubjectType subjectType)
 {
     if (d->currentSubjectId == subjectId)
     {
@@ -549,7 +549,7 @@ ResourceAccessMap AccessSubjectEditingContext::ownResourceAccessMap() const
 }
 
 bool AccessSubjectEditingContext::hasOwnAccessRight(
-    const QnUuid& resourceOrGroupId,
+    const nx::Uuid& resourceOrGroupId,
     nx::vms::api::AccessRight accessRight) const
 {
     return ownResourceAccessMap().value(resourceOrGroupId, {}).testFlag(accessRight);
@@ -567,10 +567,10 @@ nx::vms::api::GlobalPermissions AccessSubjectEditingContext::globalPermissions()
     return d->accessRightsResolver->globalPermissions(d->currentSubjectId);
 }
 
-QSet<QnUuid> AccessSubjectEditingContext::globalPermissionSource(
+QSet<nx::Uuid> AccessSubjectEditingContext::globalPermissionSource(
     nx::vms::api::GlobalPermission perm) const
 {
-    QSet<QnUuid> result;
+    QSet<nx::Uuid> result;
 
     const auto directParents = subjectHierarchy()->directParents(d->currentSubjectId);
 
@@ -607,13 +607,13 @@ ResourceAccessDetails AccessSubjectEditingContext::accessDetails(
         : d->accessRightsResolver->accessDetails(d->currentSubjectId, resource, accessRight);
 }
 
-QList<QnUuid> AccessSubjectEditingContext::resourceGroupAccessProviders(
-    const QnUuid& resourceGroupId, AccessRight accessRight) const
+QList<nx::Uuid> AccessSubjectEditingContext::resourceGroupAccessProviders(
+    const nx::Uuid& resourceGroupId, AccessRight accessRight) const
 {
     if (d->currentSubjectId.isNull())
         return {};
 
-    QList<QnUuid> result;
+    QList<nx::Uuid> result;
     for (const auto groupId: d->currentHierarchy->directParents(d->currentSubjectId))
     {
         if (d->accessRightsResolver->accessRights(groupId, resourceGroupId).testFlag(accessRight))
@@ -666,7 +666,7 @@ AccessRights AccessSubjectEditingContext::availableAccessRights() const
 }
 
 void AccessSubjectEditingContext::setRelations(
-    const QSet<QnUuid>& parents, const QSet<QnUuid>& members)
+    const QSet<nx::Uuid>& parents, const QSet<nx::Uuid>& members)
 {
     if (!NX_ASSERT(!d->currentSubjectId.isNull()))
         return;
@@ -710,7 +710,7 @@ void AccessSubjectEditingContext::revert()
     resetAccessibleByPermissionsFilter();
 }
 
-QnUuid AccessSubjectEditingContext::specialResourceGroupFor(const QnResourcePtr& resource)
+nx::Uuid AccessSubjectEditingContext::specialResourceGroupFor(const QnResourcePtr& resource)
 {
     if (resource.objectCast<QnVirtualCameraResource>())
         return kAllDevicesGroupId;
@@ -727,7 +727,7 @@ QnUuid AccessSubjectEditingContext::specialResourceGroupFor(const QnResourcePtr&
     return {};
 }
 
-QnUuid AccessSubjectEditingContext::specialResourceGroup(ResourceTree::NodeType nodeType)
+nx::Uuid AccessSubjectEditingContext::specialResourceGroup(ResourceTree::NodeType nodeType)
 {
     switch (nodeType)
     {
@@ -745,7 +745,7 @@ QnUuid AccessSubjectEditingContext::specialResourceGroup(ResourceTree::NodeType 
             return nx::vms::api::kAllServersGroupId;
 
         default:
-            return QnUuid();
+            return nx::Uuid();
     }
 }
 
@@ -795,7 +795,7 @@ AccessRights AccessSubjectEditingContext::combinedRelevantAccessRights(
 
 void AccessSubjectEditingContext::modifyAccessRightMap(
     ResourceAccessMap& accessRightMap,
-    const QnUuid& resourceOrGroupId,
+    const nx::Uuid& resourceOrGroupId,
     AccessRights modifiedRightsMask,
     bool value,
     bool withDependent,
@@ -875,7 +875,7 @@ QnResourceList AccessSubjectEditingContext::selectionLayouts(
     return result;
 }
 
-QnResourceList AccessSubjectEditingContext::getGroupResources(const QnUuid& resourceGroupId) const
+QnResourceList AccessSubjectEditingContext::getGroupResources(const nx::Uuid& resourceGroupId) const
 {
     // Only special resource groups are supported at this time.
 
@@ -887,7 +887,7 @@ QnResourceList AccessSubjectEditingContext::getGroupResources(const QnUuid& reso
     switch (*group)
     {
         case SpecialResourceGroup::allDevices:
-            return resourcePool->getAllCameras(QnUuid{}, true);
+            return resourcePool->getAllCameras(nx::Uuid{}, true);
 
         case SpecialResourceGroup::allServers:
             return resourcePool->servers();

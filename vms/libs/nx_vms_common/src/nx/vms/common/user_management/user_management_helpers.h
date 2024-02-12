@@ -36,7 +36,7 @@ void getUsersAndGroups(
     SystemContext* systemContext,
     const IdList& idList,
     QnUserResourceList& users,
-    QList<QnUuid>& groupIds)
+    QList<nx::Uuid>& groupIds)
 {
     nx::vms::api::UserGroupDataList groups;
     getUsersAndGroups(systemContext, idList, users, groups);
@@ -52,7 +52,7 @@ template<class IdList>
 QnUserResourceSet allUsers(SystemContext* context, const IdList& ids)
 {
     QnUserResourceList users;
-    QnUuidList groupIds;
+    UuidList groupIds;
     nx::vms::common::getUsersAndGroups(context, ids, users, groupIds);
 
     auto result = nx::utils::toQSet(users);
@@ -98,9 +98,9 @@ inline QStringList userGroupNames(const QnUserResourcePtr& user)
 }
 
 template<class IdList>
-QSet<QnUuid> userGroupsWithParents(SystemContext* systemContext, const IdList& groupIds)
+QSet<nx::Uuid> userGroupsWithParents(SystemContext* systemContext, const IdList& groupIds)
 {
-    QSet<QnUuid> result{groupIds.begin(), groupIds.end()};
+    QSet<nx::Uuid> result{groupIds.begin(), groupIds.end()};
     if (!NX_ASSERT(systemContext))
         return result;
 
@@ -108,7 +108,7 @@ QSet<QnUuid> userGroupsWithParents(SystemContext* systemContext, const IdList& g
     return result;
 }
 
-inline QSet<QnUuid> userGroupsWithParents(const QnUserResourcePtr& user)
+inline QSet<nx::Uuid> userGroupsWithParents(const QnUserResourcePtr& user)
 {
     return userGroupsWithParents(user->systemContext(), user->groupIds());
 }

@@ -125,7 +125,7 @@ void extractParametersToFields(DeviceModelV3* m)
     if (const auto it = m->parameters.find(kUserEnabledAnalyticsEnginesProperty);
         it != m->parameters.end())
     {
-        m->userEnabledAnalyticsEngineIds = std::vector<QnUuid>();
+        m->userEnabledAnalyticsEngineIds = std::vector<nx::Uuid>();
         auto& value = *m->userEnabledAnalyticsEngineIds;
         QJson::deserialize(it->second, &value);
         m->parameters.erase(it);
@@ -260,7 +260,7 @@ std::vector<Model> fromDbTypes(typename Model::DbListTypes all)
         std::get<std::vector<ResourceStatusData>>(std::move(all)), lessById);
     auto attributes = nx::utils::unique_sorted(
         std::get<std::vector<CameraAttributesData>>(std::move(all)), lessById);
-    std::unordered_map<QnUuid, std::vector<ResourceParamData>> parameters =
+    std::unordered_map<nx::Uuid, std::vector<ResourceParamData>> parameters =
         toParameterMap(std::get<std::vector<ResourceParamWithRefData>>(std::move(all)));
     auto devices = fromCameras<Model>(
         nx::utils::unique_sorted(std::get<std::vector<CameraData>>(std::move(all)), lessById));

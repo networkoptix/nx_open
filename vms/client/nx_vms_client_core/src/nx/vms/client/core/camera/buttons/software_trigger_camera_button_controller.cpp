@@ -59,7 +59,7 @@ bool filterOutOutdatedOpenDoorTrigger(const nx::vms::event::RulePtr& rule)
 
     const auto& eventResources = rule->eventResources();
     const auto cameraId = eventResources.empty()
-        ? QnUuid()
+        ? nx::Uuid()
         : eventResources.front();
     return rule->id() == nx::vms::client::core::IntercomHelper::intercomOpenDoorRuleId(cameraId);
 }
@@ -67,7 +67,7 @@ bool filterOutOutdatedOpenDoorTrigger(const nx::vms::event::RulePtr& rule)
 bool isSuitableRule(
     const nx::vms::event::RulePtr& rule,
     const QnUserResourcePtr& currentUser,
-    const QnUuid& resourceId)
+    const nx::Uuid& resourceId)
 {
     if (rule->isDisabled() || rule->eventType() != nx::vms::api::softwareTriggerEvent)
         return false;
@@ -98,7 +98,7 @@ bool isSuitableRule(
 bool isSuitableRule(
     const nx::vms::rules::Rule* rule,
     const QnUserResourcePtr& currentUser,
-    QnUuid resourceId)
+    nx::Uuid resourceId)
 {
     if (!rule->enabled())
         return false;
@@ -204,20 +204,20 @@ struct SoftwareTriggerCameraButtonController::Private
     SoftwareTriggerCameraButtonController * const q;
     const HintStyle hintStyle;
 
-    QSet<QnUuid> isVmsRuleFlags;
+    QSet<nx::Uuid> isVmsRuleFlags;
 
     void updateButtons();
     void addOrUpdateButtonData(const CameraButton& button, bool isVmsRule);
-    void tryRemoveButton(const QnUuid& buttonId);
+    void tryRemoveButton(const nx::Uuid& buttonId);
 
     template<typename RulePointerType>
     void updateButtonByRule(RulePointerType rule);
 
     void updateButtonAvailability(CameraButton button);
 
-    bool setEventTriggerState(const QnUuid& ruleId, vms::event::EventState state);
-    bool setVmsTriggerState(const QnUuid& ruleId, vms::event::EventState state);
-    void updateActiveTrigger(const QnUuid& ruleId, vms::event::EventState state, bool success);
+    bool setEventTriggerState(const nx::Uuid& ruleId, vms::event::EventState state);
+    bool setVmsTriggerState(const nx::Uuid& ruleId, vms::event::EventState state);
+    void updateActiveTrigger(const nx::Uuid& ruleId, vms::event::EventState state, bool success);
 };
 
 void SoftwareTriggerCameraButtonController::Private::updateButtons()
@@ -225,7 +225,7 @@ void SoftwareTriggerCameraButtonController::Private::updateButtons()
     auto removedIds =
         [this]()
         {
-            QnUuidSet result;
+            UuidSet result;
             for (const auto& button: q->buttons())
                 result.insert(button.id);
             return result;
@@ -270,7 +270,7 @@ void SoftwareTriggerCameraButtonController::Private::addOrUpdateButtonData(
     updateButtonAvailability(button);
 }
 
-void SoftwareTriggerCameraButtonController::Private::tryRemoveButton(const QnUuid& buttonId)
+void SoftwareTriggerCameraButtonController::Private::tryRemoveButton(const nx::Uuid& buttonId)
 {
     if (q->removeButton(buttonId))
         isVmsRuleFlags.remove(buttonId);
@@ -330,7 +330,7 @@ void SoftwareTriggerCameraButtonController::Private::updateButtonAvailability(Ca
 }
 
 bool SoftwareTriggerCameraButtonController::Private::setEventTriggerState(
-    const QnUuid& ruleId,
+    const nx::Uuid& ruleId,
     vms::event::EventState state)
 {
     const auto rule = q->systemContext()->eventRuleManager()->rule(ruleId);
@@ -365,7 +365,7 @@ bool SoftwareTriggerCameraButtonController::Private::setEventTriggerState(
 }
 
 bool SoftwareTriggerCameraButtonController::Private::setVmsTriggerState(
-    const QnUuid& ruleId,
+    const nx::Uuid& ruleId,
     vms::event::EventState state)
 {
     const auto rule = q->systemContext()->vmsRulesEngine()->rule(ruleId);
@@ -400,7 +400,7 @@ bool SoftwareTriggerCameraButtonController::Private::setVmsTriggerState(
 }
 
 void SoftwareTriggerCameraButtonController::Private::updateActiveTrigger(
-    const QnUuid& ruleId,
+    const nx::Uuid& ruleId,
     vms::event::EventState state,
     bool success)
 {
@@ -424,7 +424,7 @@ SoftwareTriggerCameraButtonController::SoftwareTriggerCameraButtonController(
     auto ruleManager = context->eventRuleManager();
 
     const auto updateButtons = [this]() { d->updateButtons(); };
-    const auto tryRemoveButton = [this](const QnUuid& id) { d->tryRemoveButton(id); };
+    const auto tryRemoveButton = [this](const nx::Uuid& id) { d->tryRemoveButton(id); };
     const auto updateButtonByRule = [this](auto rule) { d->updateButtonByRule(rule); };
 
     connect(ruleManager, &vms::event::RuleManager::rulesReset, this, updateButtons);

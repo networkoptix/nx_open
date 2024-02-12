@@ -146,7 +146,7 @@ void CompatibilityVersionInstallationDialog::processUpdateContents(const UpdateC
     // We need to supply non-zero Uuid for the client to make verification work.
     // commonModule->globalSettings()->localSystemId() is zero right now.
     ClientVerificationData clientData;
-    clientData.clientId = QnUuid("cccccccc-cccc-cccc-cccc-cccccccccccc");
+    clientData.clientId = nx::Uuid("cccccccc-cccc-cccc-cccc-cccccccccccc");
     clientData.fillDefault();
     VerificationOptions options;
     options.compatibilityMode = true;

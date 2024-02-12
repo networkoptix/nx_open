@@ -25,9 +25,9 @@ signals:
         const nx::vms::api::AnalyticsEngineData& analyticsEngine,
         ec2::NotificationSource source);
 
-    void analyticsPluginRemoved(const QnUuid& id, ec2::NotificationSource source);
+    void analyticsPluginRemoved(const nx::Uuid& id, ec2::NotificationSource source);
 
-    void analyticsEngineRemoved(const QnUuid& id, ec2::NotificationSource source);
+    void analyticsEngineRemoved(const nx::Uuid& id, ec2::NotificationSource source);
 };
 
 /**
@@ -67,18 +67,18 @@ public:
     ErrorCode saveSync(const nx::vms::api::AnalyticsEngineData& data);
 
     virtual int removeAnalyticsPlugin(
-        const QnUuid& id,
+        const nx::Uuid& id,
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) = 0;
 
-    ErrorCode removeAnalyticsPluginSync(const QnUuid& id);
+    ErrorCode removeAnalyticsPluginSync(const nx::Uuid& id);
 
     virtual int removeAnalyticsEngine(
-        const QnUuid& id,
+        const nx::Uuid& id,
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) = 0;
 
-    ErrorCode removeAnalyticsEngineSync(const QnUuid& id);
+    ErrorCode removeAnalyticsEngineSync(const nx::Uuid& id);
 };
 
 } // namespace ec2

@@ -15,7 +15,7 @@ namespace nx::vms::common {
 struct UserGroupManager::Private
 {
     mutable nx::Mutex mutex;
-    std::unordered_map<QnUuid, UserGroupData> customGroups;
+    std::unordered_map<nx::Uuid, UserGroupData> customGroups;
 };
 
 UserGroupManager::UserGroupManager(QObject* parent):
@@ -29,10 +29,10 @@ UserGroupManager::~UserGroupManager()
     // Required here for forward-declared scoped pointer destruction.
 }
 
-std::unordered_map<QnUuid, UserGroupData> UserGroupManager::customGroups(
+std::unordered_map<nx::Uuid, UserGroupData> UserGroupManager::customGroups(
     std::function<bool(const nx::vms::api::UserGroupData&)> predicate) const
 {
-    std::unordered_map<QnUuid, UserGroupData> result;
+    std::unordered_map<nx::Uuid, UserGroupData> result;
     NX_MUTEX_LOCKER lk(&d->mutex);
     for (const auto& it: d->customGroups)
     {
@@ -42,10 +42,10 @@ std::unordered_map<QnUuid, UserGroupData> UserGroupManager::customGroups(
     return result;
 }
 
-std::vector<QnUuid> UserGroupManager::customGroupIds(
+std::vector<nx::Uuid> UserGroupManager::customGroupIds(
     std::function<bool(const nx::vms::api::UserGroupData&)> predicate) const
 {
-    std::vector<QnUuid> result;
+    std::vector<nx::Uuid> result;
     NX_MUTEX_LOCKER lk(&d->mutex);
     result.reserve(d->customGroups.size());
     for (const auto& [id, data]: d->customGroups)
@@ -74,9 +74,9 @@ UserGroupDataList UserGroupManager::groups(Selection types) const
     return result;
 }
 
-QList<QnUuid> UserGroupManager::ids(Selection types) const
+QList<nx::Uuid> UserGroupManager::ids(Selection types) const
 {
-    QList<QnUuid> result;
+    QList<nx::Uuid> result;
     if (types != Selection::custom)
         result = PredefinedUserGroups::ids();
 
@@ -92,7 +92,7 @@ QList<QnUuid> UserGroupManager::ids(Selection types) const
     return result;
 }
 
-bool UserGroupManager::contains(const QnUuid& groupId) const
+bool UserGroupManager::contains(const nx::Uuid& groupId) const
 {
     if (PredefinedUserGroups::contains(groupId))
         return true;
@@ -101,7 +101,7 @@ bool UserGroupManager::contains(const QnUuid& groupId) const
     return d->customGroups.contains(groupId);
 }
 
-std::optional<UserGroupData> UserGroupManager::find(const QnUuid& groupId) const
+std::optional<UserGroupData> UserGroupManager::find(const nx::Uuid& groupId) const
 {
     if (auto predefinedGroup = PredefinedUserGroups::find(groupId))
         return predefinedGroup;
@@ -165,7 +165,7 @@ bool UserGroupManager::addOrUpdate(const UserGroupData& group)
     return true;
 }
 
-bool UserGroupManager::remove(const QnUuid& groupId)
+bool UserGroupManager::remove(const nx::Uuid& groupId)
 {
     if (groupId.isNull() || PredefinedUserGroups::contains(groupId))
         return false;

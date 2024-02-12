@@ -12,8 +12,8 @@ namespace api {
 
 struct NX_VMS_API SyncMarkerRecordData
 {
-    QnUuid peerID;
-    QnUuid dbID;
+    nx::Uuid peerID;
+    nx::Uuid dbID;
     int sequence = 0;
 };
 #define SyncMarkerRecordData_Fields (peerID)(dbID)(sequence)

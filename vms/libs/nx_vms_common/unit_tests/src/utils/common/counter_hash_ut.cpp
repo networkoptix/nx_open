@@ -8,7 +8,7 @@
 
 namespace {
 
-static const QnUuid kId = QnUuid::createUuid();
+static const nx::Uuid kId = nx::Uuid::createUuid();
 
 }
 
@@ -19,7 +19,7 @@ protected:
     // virtual void SetUp() will be called before each test is run.
     virtual void SetUp()
     {
-        hash.reset(new QnCounterHash<QnUuid>());
+        hash.reset(new QnCounterHash<nx::Uuid>());
     }
 
     // virtual void TearDown() will be called after each test is run.
@@ -28,7 +28,7 @@ protected:
         hash.reset();
     }
 
-    QScopedPointer<QnCounterHash<QnUuid>> hash;
+    QScopedPointer<QnCounterHash<nx::Uuid>> hash;
 };
 
 TEST_F(QnCounterHashTest, checkInit)

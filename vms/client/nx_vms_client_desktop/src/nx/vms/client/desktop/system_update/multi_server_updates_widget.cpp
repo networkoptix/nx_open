@@ -139,7 +139,7 @@ QTableView* injectResourceList(
     return resourceList;
 }
 
-void toDebugString(QStringList& lines, const QString& caption, const QSet<QnUuid>& uids)
+void toDebugString(QStringList& lines, const QString& caption, const QSet<nx::Uuid>& uids)
 {
     QStringList report;
     for (auto id: uids)
@@ -582,7 +582,7 @@ void MultiServerUpdatesWidget::initDownloadActions()
 }
 
 MultiServerUpdatesWidget::VersionReport MultiServerUpdatesWidget::calculateUpdateVersionReport(
-    const UpdateContents& contents, QnUuid clientId)
+    const UpdateContents& contents, nx::Uuid clientId)
 {
     VersionReport report;
 
@@ -791,7 +791,7 @@ void MultiServerUpdatesWidget::setUpdateTarget(
     // TODO: We should split state flags more consistenly.
 }
 
-QnUuid MultiServerUpdatesWidget::clientPeerId() const
+nx::Uuid MultiServerUpdatesWidget::clientPeerId() const
 {
     return m_stateTracker->getClientPeerId(systemContext());
 }
@@ -1374,7 +1374,7 @@ void MultiServerUpdatesWidget::atCancelUpdateComplete(bool success, const QStrin
             messageBox->setInformativeText(error);
             messageBox->setStandardButtons(QDialogButtonBox::Ok);
             messageBox->exec();
-            QSet<QnUuid> peersIssued = m_stateTracker->peersIssued();
+            QSet<nx::Uuid> peersIssued = m_stateTracker->peersIssued();
             if (m_widgetState == WidgetUpdateState::cancelingDownload)
                 setTargetState(WidgetUpdateState::downloading, peersIssued);
             else
@@ -1404,7 +1404,7 @@ void MultiServerUpdatesWidget::atStartInstallComplete(bool success, const QStrin
             messageBox->setInformativeText(error);
             messageBox->setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Retry);
             messageBox->setDefaultButton(QDialogButtonBox::Ok);
-            QSet<QnUuid> servers = m_stateTracker->peersIssued();
+            QSet<nx::Uuid> servers = m_stateTracker->peersIssued();
             if (messageBox->exec() == QDialogButtonBox::Retry)
             {
                 servers.remove(clientPeerId());
@@ -1434,10 +1434,10 @@ void MultiServerUpdatesWidget::atFinishUpdateComplete(bool success, const QStrin
     if (success)
     {
         m_stateTracker->processInstallTaskSet();
-        const QSet<QnUuid> peersIssued = m_stateTracker->peersIssued();
-        const QSet<QnUuid> peersComplete = m_stateTracker->peersComplete();
-        const QSet<QnUuid> serversComplete = peersComplete - QSet{clientPeerId()};
-        const QSet<QnUuid> peersFailed = m_stateTracker->peersFailed();
+        const QSet<nx::Uuid> peersIssued = m_stateTracker->peersIssued();
+        const QSet<nx::Uuid> peersComplete = m_stateTracker->peersComplete();
+        const QSet<nx::Uuid> serversComplete = peersComplete - QSet{clientPeerId()};
+        const QSet<nx::Uuid> peersFailed = m_stateTracker->peersFailed();
 
         if (m_finishingForcefully || !serversComplete.empty() || peersComplete == peersIssued)
         {
@@ -1710,7 +1710,7 @@ ServerUpdateTool::ProgressInfo MultiServerUpdatesWidget::calculateActionProgress
             m_serverUpdateTool->calculateManualDownloadProgress(result);
 
         result.uploadingOfflinePackages = false;
-        for (const QnUuid& serverId: peersDownloadingOfflineUpdates)
+        for (const nx::Uuid& serverId: peersDownloadingOfflineUpdates)
         {
             const UpdateItemPtr item = m_stateTracker->findItemById(serverId);
             const auto maxOfflinePackageProgress = item->offlinePackageCount * 100;
@@ -2153,7 +2153,7 @@ void MultiServerUpdatesWidget::completeClientInstallation(bool clientUpdated)
     // are deinitialized correctly.
     qnClientMessageProcessor->holdConnection(QnClientMessageProcessor::HoldConnectionPolicy::none);
 
-    const QnUuidSet incompatibleServers = m_stateTracker->serversWithChangedProtocol();
+    const UuidSet incompatibleServers = m_stateTracker->serversWithChangedProtocol();
     if (clientUpdated || !incompatibleServers.empty())
     {
         NX_INFO(this, "completeInstallation() - servers %1 have new protocol. Forcing reconnect",
@@ -2255,7 +2255,7 @@ bool MultiServerUpdatesWidget::processUploaderChanges(bool force)
 }
 
 void MultiServerUpdatesWidget::setTargetState(
-    WidgetUpdateState state, const QSet<QnUuid>& targets, bool runCommands)
+    WidgetUpdateState state, const QSet<nx::Uuid>& targets, bool runCommands)
 {
     bool clearTaskSet = true;
     if (m_widgetState != state)
@@ -2290,7 +2290,7 @@ void MultiServerUpdatesWidget::setTargetState(
                 NX_ASSERT(!targets.empty());
                 if (runCommands && !targets.empty())
                 {
-                    QSet<QnUuid> servers = targets;
+                    QSet<nx::Uuid> servers = targets;
                     servers.remove(clientPeerId());
                     m_serverUpdateTool->requestInstallAction(servers);
                 }
@@ -2300,7 +2300,7 @@ void MultiServerUpdatesWidget::setTargetState(
                 m_stateTracker->setPeersInstalling(targets, true);
                 if (runCommands && !targets.empty())
                 {
-                    QSet<QnUuid> servers = targets;
+                    QSet<nx::Uuid> servers = targets;
                     servers.remove(clientPeerId());
                     if (!servers.empty())
                     {
@@ -2348,7 +2348,7 @@ void MultiServerUpdatesWidget::closePanelNotifications()
         return;
     auto manager = windowContext()->localNotificationsManager();
     manager->remove(m_rightPanelDownloadProgress);
-    m_rightPanelDownloadProgress = QnUuid();
+    m_rightPanelDownloadProgress = nx::Uuid();
 }
 
 void MultiServerUpdatesWidget::syncVersionReport(const VersionReport& report)
@@ -2846,7 +2846,7 @@ void MultiServerUpdatesWidget::syncDebugInfoToUi()
         toDebugString(debugState, "issued", m_stateTracker->peersIssued());
         toDebugString(debugState, "failed", m_stateTracker->peersFailed());
         toDebugString(debugState, "with update", m_updateInfo.peersWithUpdate);
-        QSet<QnUuid> activeServers;
+        QSet<nx::Uuid> activeServers;
         for (const auto& server: m_stateTracker->activeServers())
             activeServers.insert(server.first);
         toDebugString(debugState, "activeServers", activeServers);

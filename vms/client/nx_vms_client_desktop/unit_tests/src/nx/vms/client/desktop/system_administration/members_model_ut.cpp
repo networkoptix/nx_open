@@ -105,14 +105,14 @@ public:
         ASSERT_EQ(offset, m_model->data(m_model->index(row), MembersModel::OffsetRole).toInt());
     }
 
-    QnUuid addUser(
+    nx::Uuid addUser(
         const QString& name,
-        const std::vector<QnUuid>& parents,
+        const std::vector<nx::Uuid>& parents,
         const api::UserType& userType = api::UserType::local)
     {
         QnUserResourcePtr user(
             new QnUserResource(userType, /*externalId*/ {}));
-        user->setIdUnsafe(QnUuid::createUuid());
+        user->setIdUnsafe(nx::Uuid::createUuid());
         user->setName(name);
         user->addFlags(Qn::remote);
         user->setGroupIds(parents);
@@ -120,17 +120,17 @@ public:
         return user->getId();
     }
 
-    QnUuid addGroup(const QString& name, const std::vector<QnUuid>& parents)
+    nx::Uuid addGroup(const QString& name, const std::vector<nx::Uuid>& parents)
     {
         api::UserGroupData group;
-        group.setId(QnUuid::createUuid());
+        group.setId(nx::Uuid::createUuid());
         group.name = name;
         group.parentGroupIds = parents;
         systemContext()->userGroupManager()->addOrUpdate(group);
         return group.id;
     }
 
-    QnUuid addLdapDefaultGroup(const std::vector<QnUuid>& parents)
+    nx::Uuid addLdapDefaultGroup(const std::vector<nx::Uuid>& parents)
     {
         api::UserGroupData group;
         group.setId(nx::vms::api::kDefaultLdapGroupId);
@@ -142,7 +142,7 @@ public:
     }
 
 
-    void removeUser(const QnUuid& id)
+    void removeUser(const nx::Uuid& id)
     {
         auto resourcePool = systemContext()->resourcePool();
         auto resource = resourcePool->getResourceById<QnUserResource>(id);
@@ -150,12 +150,12 @@ public:
         resourcePool->removeResource(resource);
     }
 
-    void removeGroup(const QnUuid& id)
+    void removeGroup(const nx::Uuid& id)
     {
         const auto allUsers = systemContext()->resourcePool()->getResources<QnUserResource>();
         for (const auto& user: allUsers)
         {
-            std::vector<QnUuid> ids = user->groupIds();
+            std::vector<nx::Uuid> ids = user->groupIds();
             if (nx::utils::erase_if(ids, [&user](auto id){ return id == user->getId(); }))
                 user->setGroupIds(ids);
         }
@@ -170,7 +170,7 @@ public:
         systemContext()->userGroupManager()->remove(id);
     }
 
-    void renameGroup(const QnUuid& id, const QString& newName)
+    void renameGroup(const nx::Uuid& id, const QString& newName)
     {
         auto group = systemContext()->userGroupManager()->find(id).value_or(api::UserGroupData{});
         ASSERT_EQ(id, group.id);
@@ -178,7 +178,7 @@ public:
         systemContext()->userGroupManager()->addOrUpdate(group);
     }
 
-    void renameUser(const QnUuid& id, const QString& newName)
+    void renameUser(const nx::Uuid& id, const QString& newName)
     {
         auto resourcePool = systemContext()->resourcePool();
         auto resource = resourcePool->getResourceById<QnUserResource>(id);
@@ -186,7 +186,7 @@ public:
         resource->setName(newName);
     }
 
-    void enableUser(const QnUuid& id, bool enable)
+    void enableUser(const nx::Uuid& id, bool enable)
     {
         auto resourcePool = systemContext()->resourcePool();
         auto resource = resourcePool->getResourceById<QnUserResource>(id);
@@ -256,14 +256,14 @@ public:
     }
 
     std::unique_ptr<MembersModel> m_model;
-    QnUuid m_group2;
-    QnUuid m_group3;
-    QnUuid m_group4;
-    QnUuid m_group5;
-    QnUuid m_admin;
-    QnUuid m_user2;
-    QnUuid m_user3;
-    QnUuid m_user5;
+    nx::Uuid m_group2;
+    nx::Uuid m_group3;
+    nx::Uuid m_group4;
+    nx::Uuid m_group5;
+    nx::Uuid m_admin;
+    nx::Uuid m_user2;
+    nx::Uuid m_user3;
+    nx::Uuid m_user5;
 };
 
 TEST_F(MembersModelTest, prerequisiteCheckPredefinedGroupNames)

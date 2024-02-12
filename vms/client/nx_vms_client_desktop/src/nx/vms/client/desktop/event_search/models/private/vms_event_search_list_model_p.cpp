@@ -212,7 +212,7 @@ QVariant VmsEventSearchListModel::Private::data(
                 sourceId.isValid())
             {
                 if (const auto resource =
-                    q->system()->resourcePool()->getResourceById(sourceId.value<QnUuid>()))
+                    q->system()->resourcePool()->getResourceById(sourceId.value<nx::Uuid>()))
                 {
                     return QVariant::fromValue(QnResourceList({resource}));
                 }
@@ -231,7 +231,7 @@ QVariant VmsEventSearchListModel::Private::data(
 
             return QVariant::fromValue<QnResourcePtr>(
                 q->system()->resourcePool()->getResourceById<QnVirtualCameraResource>(
-                    details.value(rules::utils::kSourceIdDetailName).value<QnUuid>()));
+                    details.value(rules::utils::kSourceIdDetailName).value<nx::Uuid>()));
         }
 
         case Qn::HelpTopicIdRole:

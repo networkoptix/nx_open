@@ -285,7 +285,7 @@ TEST_F(VideowallItemAccessResolverTest, videowallAdded)
     const auto itemId = addVideoWallItem(videowall, layout1);
 
     QnVideoWallMatrix matrix;
-    matrix.uuid = QnUuid::createUuid();
+    matrix.uuid = nx::Uuid::createUuid();
     auto layout2 = addLayout();
     layout2->setParentId(videowall->getId());
     matrix.layoutByItem[itemId] = layout2->getId();
@@ -357,7 +357,7 @@ TEST_F(VideowallItemAccessResolverTest, videowallMatrixLayouts)
     ASSERT_EQ(resolver->accessRights(kTestSubjectId, layout3), AccessRights());
 
     QnVideoWallMatrix matrix;
-    matrix.uuid = QnUuid::createUuid();
+    matrix.uuid = nx::Uuid::createUuid();
     matrix.layoutByItem[item1] = layout1->getId();
     matrix.layoutByItem[item2] = layout2->getId();
     matrix.layoutByItem[item3] = layout3->getId();

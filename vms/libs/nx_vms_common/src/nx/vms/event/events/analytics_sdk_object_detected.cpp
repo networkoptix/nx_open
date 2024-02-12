@@ -28,7 +28,7 @@ AnalyticsSdkObjectDetected::AnalyticsSdkObjectDetected(
 {
 }
 
-QnUuid AnalyticsSdkObjectDetected::engineId() const
+nx::Uuid AnalyticsSdkObjectDetected::engineId() const
 {
     return m_metadata.analyticsEngineId;
 }
@@ -38,7 +38,7 @@ const QString& AnalyticsSdkObjectDetected::objectTypeId() const
     return m_metadata.typeId;
 }
 
-QnUuid AnalyticsSdkObjectDetected::objectTrackId() const
+nx::Uuid AnalyticsSdkObjectDetected::objectTrackId() const
 {
     return m_metadata.trackId;
 }

@@ -26,14 +26,14 @@ nx::vms::common::SystemContext* QnCommonModuleAware::systemContext() const
     return NX_ASSERT(m_commonModule) ? m_commonModule->systemContext() : nullptr;
 }
 
-QnUuid QnCommonModuleAware::peerId() const
+nx::Uuid QnCommonModuleAware::peerId() const
 {
-    return NX_ASSERT(m_commonModule) ? m_commonModule->systemContext()->peerId() : QnUuid();
+    return NX_ASSERT(m_commonModule) ? m_commonModule->systemContext()->peerId() : nx::Uuid();
 }
 
-QnUuid QnCommonModuleAware::sessionId() const
+nx::Uuid QnCommonModuleAware::sessionId() const
 {
-    return NX_ASSERT(m_commonModule) ? m_commonModule->systemContext()->sessionId() : QnUuid();
+    return NX_ASSERT(m_commonModule) ? m_commonModule->systemContext()->sessionId() : nx::Uuid();
 }
 
 QnLicensePool* QnCommonModuleAware::licensePool() const

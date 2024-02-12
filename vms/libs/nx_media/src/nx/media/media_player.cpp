@@ -1226,7 +1226,7 @@ void Player::setSource(const QUrl& url)
     else
     {
         d->resource = commonModule()->systemContext()
-            ->resourcePool()->getResourceById(QnUuid(d->url.path().mid(1)));
+            ->resourcePool()->getResourceById(nx::Uuid(d->url.path().mid(1)));
     }
 
     if (d->resource)

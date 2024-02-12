@@ -103,7 +103,7 @@ signals:
         const QPoint& globalPos,
         bool withStandardInteraction,
         QWidget* parent);
-    void pluginActionRequested(const QnUuid& engineId, const QString& actionTypeId,
+    void pluginActionRequested(const nx::Uuid& engineId, const QString& actionTypeId,
         const nx::analytics::db::ObjectTrack& track, const QnVirtualCameraResourcePtr& camera);
 
 protected:

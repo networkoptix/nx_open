@@ -85,9 +85,9 @@ public:
 
     void setFilterText(const QString& text);
 
-    void setCameras(const std::set<QnUuid>& cameras);
+    void setCameras(const std::set<nx::Uuid>& cameras);
 
-    const std::set<QnUuid>& cameras() const;
+    const std::set<nx::Uuid>& cameras() const;
 
     void applyFilter();
 
@@ -104,7 +104,7 @@ public:
     void cancelUpdatingOperation();
 
 private:
-    int getBookmarkIndex(const QnUuid& bookmarkId) const;
+    int getBookmarkIndex(const nx::Uuid& bookmarkId) const;
     nx::utils::SharedGuardPtr startUpdateOperation();
     bool isUpdating() const;
 
@@ -141,7 +141,7 @@ QnSearchBookmarksModelPrivate::QnSearchBookmarksModelPrivate(QnSearchBookmarksMo
     // FIXME: #sivanov Actually we must listen for all system contexts here.
     auto bookmarksManager = appContext()->currentSystemContext()->cameraBookmarksManager();
     connect(bookmarksManager, &QnCameraBookmarksManager::bookmarkRemoved, this,
-        [this](const QnUuid& bookmarkId)
+        [this](const nx::Uuid& bookmarkId)
         {
             if (m_updatingWeakGuard.lock())
                 return;
@@ -173,7 +173,7 @@ QnSearchBookmarksModelPrivate::QnSearchBookmarksModelPrivate(QnSearchBookmarksMo
         });
 }
 
-int QnSearchBookmarksModelPrivate::getBookmarkIndex(const QnUuid& bookmarkId) const
+int QnSearchBookmarksModelPrivate::getBookmarkIndex(const nx::Uuid& bookmarkId) const
 {
     return nx::utils::algorithm::index_of(m_bookmarks,
         [bookmarkId](const QnCameraBookmark& item) { return bookmarkId == item.guid; });
@@ -197,12 +197,12 @@ void QnSearchBookmarksModelPrivate::setFilterText(const QString& text)
     m_filter.text = text;
 }
 
-const std::set<QnUuid>& QnSearchBookmarksModelPrivate::cameras() const
+const std::set<nx::Uuid>& QnSearchBookmarksModelPrivate::cameras() const
 {
     return m_filter.cameras;
 }
 
-void QnSearchBookmarksModelPrivate::setCameras(const std::set<QnUuid>& cameras)
+void QnSearchBookmarksModelPrivate::setCameras(const std::set<nx::Uuid>& cameras)
 {
     m_filter.cameras = cameras;
 }
@@ -431,13 +431,13 @@ void QnSearchBookmarksModel::setFilterText(const QString& text)
     d->setFilterText(text);
 }
 
-void QnSearchBookmarksModel::setCameras(const std::set<QnUuid>& cameras)
+void QnSearchBookmarksModel::setCameras(const std::set<nx::Uuid>& cameras)
 {
     Q_D(QnSearchBookmarksModel);
     d->setCameras(cameras);
 }
 
-const std::set<QnUuid>& QnSearchBookmarksModel::cameras() const
+const std::set<nx::Uuid>& QnSearchBookmarksModel::cameras() const
 {
     Q_D(const QnSearchBookmarksModel);
     return d->cameras();

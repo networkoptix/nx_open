@@ -39,7 +39,7 @@ struct ApplicationContext::Private
 
     cloud::tcp::EndpointVerificatorFactory::Function endpointVerificatorFactoryBak;
     mutable nx::Mutex mutex;
-    QMap<QnUuid, int> longToShortInstanceId;
+    QMap<nx::Uuid, int> longToShortInstanceId;
     const PeerType localPeerType;
     QString locale{nx::branding::defaultLocale()};
 
@@ -144,22 +144,22 @@ void ApplicationContext::setLocale(const QString& value)
     d->locale = value;
 }
 
-void ApplicationContext::setModuleShortId(const QnUuid& id, int number)
+void ApplicationContext::setModuleShortId(const nx::Uuid& id, int number)
 {
     NX_MUTEX_LOCKER lock(&d->mutex);
     d->longToShortInstanceId.insert(id, number);
 }
 
-int ApplicationContext::moduleShortId(const QnUuid& id) const
+int ApplicationContext::moduleShortId(const nx::Uuid& id) const
 {
     NX_MUTEX_LOCKER lock(&d->mutex);
     auto itr = d->longToShortInstanceId.find(id);
     return itr != d->longToShortInstanceId.end() ? itr.value() : -1;
 }
 
-QString ApplicationContext::moduleDisplayName(const QnUuid& id) const
+QString ApplicationContext::moduleDisplayName(const nx::Uuid& id) const
 {
-    static const QnUuid kCloudPeerId("674BAFD7-4EEC-4BBA-84AA-A1BAEA7FC6DB");
+    static const nx::Uuid kCloudPeerId("674BAFD7-4EEC-4BBA-84AA-A1BAEA7FC6DB");
     if (id == kCloudPeerId)
         return "Cloud";
 

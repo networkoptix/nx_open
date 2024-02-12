@@ -138,7 +138,7 @@ void MergeSystemsDialog::updateKnownSystems()
 
     std::multimap<QString, QString> labelUrlMap;
 
-    for (const QnUuid& otherServerId: systemContext()->otherServersManager()->getServers())
+    for (const nx::Uuid& otherServerId: systemContext()->otherServersManager()->getServers())
     {
         QString url = systemContext()->otherServersManager()->getUrl(otherServerId).toString();
         QString label = OtherServerDisplayInfo(otherServerId, systemContext()->otherServersManager())
@@ -205,7 +205,7 @@ void MergeSystemsDialog::at_testConnectionButton_clicked()
     if (!NX_ASSERT(system()->user()->isAdministrator()))
         return;
 
-    m_mergeContextId = QnUuid();
+    m_mergeContextId = nx::Uuid();
     m_url.clear();
     m_targetModule.reset();
     m_remoteOwnerCredentials = nx::network::http::Credentials();

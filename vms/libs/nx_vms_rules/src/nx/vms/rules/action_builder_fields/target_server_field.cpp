@@ -26,11 +26,11 @@ QVariant TargetServerField::build(const AggregatedEventPtr& event) const
     auto serverIds = ids().values();
 
     if (useSource())
-       serverIds << utils::getFieldValue(event, utils::kServerIdFieldName, QnUuid());
+       serverIds << utils::getFieldValue(event, utils::kServerIdFieldName, nx::Uuid());
 
     // Removing duplicates and maintaining order.
-    QnUuidSet uniqueIds;
-    QnUuidList result;
+    UuidSet uniqueIds;
+    UuidList result;
     for (const auto id: serverIds)
     {
         if (!id.isNull() && !uniqueIds.contains(id))

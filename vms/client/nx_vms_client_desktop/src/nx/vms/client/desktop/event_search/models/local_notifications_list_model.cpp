@@ -52,7 +52,7 @@ LocalNotificationsListModel::LocalNotificationsListModel(WindowContext* context,
     m_notifications(context->localNotificationsManager()->notifications())
 {
     const auto added =
-        [this](const QnUuid& notificationId)
+        [this](const nx::Uuid& notificationId)
         {
             if (m_notifications.contains(notificationId))
             {
@@ -65,7 +65,7 @@ LocalNotificationsListModel::LocalNotificationsListModel(WindowContext* context,
         };
 
     const auto removed =
-        [this](const QnUuid& notificationId)
+        [this](const nx::Uuid& notificationId)
         {
             const auto index = m_notifications.index_of(notificationId);
             if (index < 0)
@@ -82,7 +82,7 @@ LocalNotificationsListModel::LocalNotificationsListModel(WindowContext* context,
         [this](QVector<int> roles = {})
         {
             return
-                [this, roles](const QnUuid& notificationId)
+                [this, roles](const nx::Uuid& notificationId)
                 {
                     const auto index = m_notifications.index_of(notificationId);
                     if (index < 0)

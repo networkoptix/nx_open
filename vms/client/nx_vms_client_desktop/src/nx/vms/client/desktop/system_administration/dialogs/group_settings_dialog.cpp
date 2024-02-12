@@ -39,8 +39,8 @@ namespace {
 
 struct DifferencesResult
 {
-    QSet<QnUuid> removed;
-    QSet<QnUuid> added;
+    QSet<nx::Uuid> removed;
+    QSet<nx::Uuid> added;
 };
 
 /** Returns differences between two sets. */
@@ -85,7 +85,7 @@ struct GroupSettingsDialog::Private
     QmlProperty<bool> deleteAvailable;
     QmlProperty<bool> ldapError;
 
-    QnUuid groupId;
+    nx::Uuid groupId;
     GroupSettingsDialogState originalState;
 
     Private(GroupSettingsDialog* parent, DialogType dialogType):
@@ -104,7 +104,7 @@ struct GroupSettingsDialog::Private
 
     bool hasCycles(const GroupSettingsDialogState& state)
     {
-        QSet<QnUuid> directParents;
+        QSet<nx::Uuid> directParents;
         for (const auto& group: state.parentGroups)
             directParents.insert(group.id);
 
@@ -160,7 +160,7 @@ GroupSettingsDialog::GroupSettingsDialog(
         connect(systemContext->nonEditableUsersAndGroups(),
             &NonEditableUsersAndGroups::groupModified,
             this,
-            [this](const QnUuid& groupId)
+            [this](const nx::Uuid& groupId)
             {
                 if (d->groupId != groupId)
                     return;
@@ -197,10 +197,10 @@ GroupSettingsDialog::GroupSettingsDialog(
             &nx::core::access::SubjectHierarchy::changed,
             this,
             [this](
-                const QSet<QnUuid>& /*added*/,
-                const QSet<QnUuid>& /*removed*/,
-                const QSet<QnUuid>& groupsWithChangedMembers,
-                const QSet<QnUuid>& /*subjectsWithChangedParents*/)
+                const QSet<nx::Uuid>& /*added*/,
+                const QSet<nx::Uuid>& /*removed*/,
+                const QSet<nx::Uuid>& groupsWithChangedMembers,
+                const QSet<nx::Uuid>& /*subjectsWithChangedParents*/)
             {
                 if (groupsWithChangedMembers.contains(d->groupId))
                     updateStateFrom(d->groupId);
@@ -228,7 +228,7 @@ GroupSettingsDialog::GroupSettingsDialog(
         systemContext->accessRightsManager(),
         &nx::core::access::AbstractAccessRightsManager::ownAccessRightsChanged,
         this,
-        [this](const QSet<QnUuid>& subjectIds)
+        [this](const QSet<nx::Uuid>& subjectIds)
         {
             if (subjectIds.contains(d->groupId))
                 updateStateFrom(d->groupId);
@@ -310,7 +310,7 @@ void GroupSettingsDialog::onDeleteRequested()
     removeGroups(windowContext(), {d->groupId}, std::move(handleRemove));
 }
 
-bool GroupSettingsDialog::setGroup(const QnUuid& groupId)
+bool GroupSettingsDialog::setGroup(const nx::Uuid& groupId)
 {
     if (!d->groupId.isNull() && d->groupId == groupId)
         return true; //< Do not reset state upon setting the same group.
@@ -356,7 +356,7 @@ bool GroupSettingsDialog::setGroup(const QnUuid& groupId)
     return true;
 }
 
-GroupSettingsDialogState GroupSettingsDialog::createState(const QnUuid& groupId)
+GroupSettingsDialogState GroupSettingsDialog::createState(const nx::Uuid& groupId)
 {
     GroupSettingsDialogState state;
 
@@ -370,7 +370,7 @@ GroupSettingsDialogState GroupSettingsDialog::createState(const QnUuid& groupId)
 
         state.name = nx::utils::generateUniqueString(
             usedNames, tr("New Group"), tr("New Group %1"));
-        state.groupId = QnUuid::createUuid();
+        state.groupId = nx::Uuid::createUuid();
     }
     else
     {
@@ -403,7 +403,7 @@ GroupSettingsDialogState GroupSettingsDialog::createState(const QnUuid& groupId)
         const auto subjectHierarchy = systemContext()->accessSubjectHierarchy();
         const auto memberIds = subjectHierarchy->directMembers(groupId);
 
-        QList<QnUuid> users;
+        QList<nx::Uuid> users;
 
         for (const auto& memberId: memberIds)
         {
@@ -618,7 +618,7 @@ void GroupSettingsDialog::saveState(const GroupSettingsDialogState& state)
 
 void GroupSettingsDialog::removeGroups(
     WindowContext* windowContext,
-    const QSet<QnUuid>& idsToRemove,
+    const QSet<nx::Uuid>& idsToRemove,
     nx::utils::MoveOnlyFunc<void(bool, const QString&)> callback)
 {
     auto systemContext = windowContext->system();
@@ -630,7 +630,7 @@ void GroupSettingsDialog::removeGroups(
     // allow to break hierarchy between LDAP members.
     // This is acceptable for LDAP groups because continuous sync is supposed to fix such errors on
     // the fly.
-    QSet<QnUuid> ldapGroups;
+    QSet<nx::Uuid> ldapGroups;
     for (const auto& id: idsToRemove)
     {
         if (const auto group = systemContext->userGroupManager()->find(id);

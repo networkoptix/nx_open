@@ -166,10 +166,10 @@ bool CameraBookmark::createdBySystem() const
     return creatorId == systemUserId();
 }
 
-QnUuid CameraBookmark::systemUserId()
+nx::Uuid CameraBookmark::systemUserId()
 {
     // Unique UUID used to identify all bookmarks that are create by the system
-    return QnUuid::fromStringSafe("{51723d00-51bd-4420-8116-75e5f85dfcf4}");
+    return nx::Uuid::fromStringSafe("{51723d00-51bd-4420-8116-75e5f85dfcf4}");
 }
 
 CameraBookmarkList CameraBookmark::mergeCameraBookmarks(SystemContext* systemContext,

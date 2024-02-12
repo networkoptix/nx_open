@@ -52,7 +52,7 @@ TransactionFilter::MatchResult TransactionFilter::matchSpecificContents(
 {
     if (auto it = contents.find("resourceId"); it != contents.end())
     {
-        if (param.resourceId != QnUuid::fromStringSafe(it->second))
+        if (param.resourceId != nx::Uuid::fromStringSafe(it->second))
             return MatchResult::notMatched;
     }
 

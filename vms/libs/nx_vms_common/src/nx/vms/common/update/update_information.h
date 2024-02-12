@@ -15,7 +15,7 @@ namespace nx::vms::common::update {
 
 struct NX_VMS_COMMON_API Information: nx::vms::update::PublicationInfo
 {
-    QList<QnUuid> participants = {};
+    QList<nx::Uuid> participants = {};
     std::chrono::milliseconds lastInstallationRequestTime{-1};
 
     bool isValid() const;

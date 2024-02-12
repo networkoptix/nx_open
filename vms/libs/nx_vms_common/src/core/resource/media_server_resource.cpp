@@ -110,7 +110,7 @@ void QnMediaServerResource::resetCachedValues()
     m_panicModeCache.reset();
 }
 
-QSet<QnUuid> QnMediaServerResource::activeAnalyticsEngineIds() const
+QSet<nx::Uuid> QnMediaServerResource::activeAnalyticsEngineIds() const
 {
     const auto context = systemContext();
     if (!NX_ASSERT(context))
@@ -184,7 +184,7 @@ QList<nx::network::SocketAddress> QnMediaServerResource::getNetAddrList() const
 
 void QnMediaServerResource::setAdditionalUrls(const QList<nx::utils::Url> &urls)
 {
-    QnUuid id = getId();
+    nx::Uuid id = getId();
     QList<nx::utils::Url> oldUrls = getAdditionalUrls();
     if (oldUrls == urls)
         return;
@@ -200,7 +200,7 @@ QList<nx::utils::Url> QnMediaServerResource::getAdditionalUrls() const
 
 void QnMediaServerResource::setIgnoredUrls(const QList<nx::utils::Url> &urls)
 {
-    QnUuid id = getId();
+    nx::Uuid id = getId();
     QList<nx::utils::Url> oldUrls = getIgnoredUrls();
     if (oldUrls == urls)
         return;
@@ -367,12 +367,12 @@ QString QnMediaServerResource::rtspUrl() const
 
 QnStorageResourceList QnMediaServerResource::getStorages() const
 {
-    const QnUuid ownId = getId();
+    const nx::Uuid ownId = getId();
     QnStorageResourceList result;
     for (const auto& storage: resourcePool()->storages())
     {
         // Add own storages and system-wide (cloud) storages which have empty parent ID.
-        const QnUuid parentId = storage->getParentId();
+        const nx::Uuid parentId = storage->getParentId();
         if (parentId == ownId || parentId.isNull())
             result.append(storage);
     }
@@ -560,12 +560,12 @@ bool QnMediaServerResource::setUserAttributesAndNotify(
     return hasChanges;
 }
 
-QnUuid QnMediaServerResource::metadataStorageId() const
+nx::Uuid QnMediaServerResource::metadataStorageId() const
 {
-    return QnUuid::fromStringSafe(getProperty(ResourcePropertyKey::Server::kMetadataStorageIdKey));
+    return nx::Uuid::fromStringSafe(getProperty(ResourcePropertyKey::Server::kMetadataStorageIdKey));
 }
 
-void QnMediaServerResource::setMetadataStorageId(const QnUuid& value)
+void QnMediaServerResource::setMetadataStorageId(const nx::Uuid& value)
 {
     setProperty(ResourcePropertyKey::Server::kMetadataStorageIdKey, value.toString());
 }

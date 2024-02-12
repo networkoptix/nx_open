@@ -25,7 +25,7 @@ public:
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
 
     virtual int remove(
-        const QnUuid& layoutId,
+        const nx::Uuid& layoutId,
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
 
@@ -52,9 +52,9 @@ int QnLayoutManager<QueryProcessorType>::getLayouts(
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
     const int requestId = generateRequestID();
-    processor().template processQueryAsync<const QnUuid&, nx::vms::api::LayoutDataList>(
+    processor().template processQueryAsync<const nx::Uuid&, nx::vms::api::LayoutDataList>(
         ApiCommand::getLayouts,
-        QnUuid(),
+        nx::Uuid(),
         [requestId, handler = handlerExecutor.bind(std::move(handler))](auto&&... args) mutable
         {
             handler(requestId, std::move(args)...);
@@ -81,7 +81,7 @@ int QnLayoutManager<QueryProcessorType>::save(
 
 template<class QueryProcessorType>
 int QnLayoutManager<QueryProcessorType>::remove(
-    const QnUuid& layoutId,
+    const nx::Uuid& layoutId,
     Handler<> handler,
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {

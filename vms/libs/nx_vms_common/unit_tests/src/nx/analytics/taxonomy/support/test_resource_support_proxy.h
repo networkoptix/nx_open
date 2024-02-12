@@ -14,15 +14,15 @@ public:
     virtual bool isEntityTypeSupported(
         EntityType entityType,
         const QString& entityTypeId,
-        QnUuid deviceId,
-        QnUuid engineId) const override;
+        nx::Uuid deviceId,
+        nx::Uuid engineId) const override;
 
     virtual bool isEntityTypeAttributeSupported(
         EntityType entityType,
         const QString& entityTypeId,
         const QString& fullAttributeName,
-        QnUuid deviceId,
-        QnUuid engineId) const override;
+        nx::Uuid deviceId,
+        nx::Uuid engineId) const override;
 };
 
 } // namespace nx::analytics::taxonomy

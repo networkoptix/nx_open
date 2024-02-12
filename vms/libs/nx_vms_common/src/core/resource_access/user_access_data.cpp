@@ -7,14 +7,14 @@
 
 namespace Qn {
 
-UserAccessData::UserAccessData(QnUuid userId, Access access):
+UserAccessData::UserAccessData(nx::Uuid userId, Access access):
     userId(std::move(userId)),
     access(access)
 {
 }
 
 UserAccessData::UserAccessData(
-    QnUuid userId, Token token, Duration duration, TimePoint issued)
+    nx::Uuid userId, Token token, Duration duration, TimePoint issued)
     :
     UserAccessData(std::move(userId))
 {
@@ -22,7 +22,7 @@ UserAccessData::UserAccessData(
 }
 
 UserAccessData::UserAccessData(
-    QnUuid userId, Token token, Duration age, Duration expiresIn, TimePoint now)
+    nx::Uuid userId, Token token, Duration age, Duration expiresIn, TimePoint now)
     :
     UserAccessData(
         std::move(userId), std::move(token), /*duration*/ age + expiresIn, /*issued*/ now - age)
@@ -84,11 +84,11 @@ QString toString(UserAccessData::Access access)
 }
 
 const UserAccessData kSystemAccess(
-    QnUuid("bc292159-2be9-4e84-a242-bc6122b315e4"),
+    nx::Uuid("bc292159-2be9-4e84-a242-bc6122b315e4"),
     UserAccessData::Access::System);
 
 const UserAccessData kVideowallUserAccess(
-    QnUuid("1044d2a5-639d-4c49-963e-c03898d0c113"),
+    nx::Uuid("1044d2a5-639d-4c49-963e-c03898d0c113"),
     UserAccessData::Access::ReadAllResources);
 
 } //namespace Qn

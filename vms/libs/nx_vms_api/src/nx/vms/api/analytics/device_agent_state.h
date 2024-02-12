@@ -13,15 +13,15 @@ struct NX_VMS_API DeviceAgentState
      * Device id (can be obtained from "id", "physicalId" or "logicalId" field via
      * `GET /rest/v{1-}/devices`) or MAC address (not supported for certain cameras).
      */
-    QnUuid id;
-    QnUuid engineId;
+    nx::Uuid id;
+    nx::Uuid engineId;
     bool isEnabled = false;
 
     DeviceAgentState() = default;
-    DeviceAgentState(const QnUuid& id): id(id) {}
+    DeviceAgentState(const nx::Uuid& id): id(id) {}
     bool operator==(const DeviceAgentState& other) const = default;
 
-    QnUuid getId() const { return id; }
+    nx::Uuid getId() const { return id; }
 };
 #define DeviceAgentState_Fields (id)(engineId)(isEnabled)
 QN_FUSION_DECLARE_FUNCTIONS(DeviceAgentState, (json), NX_VMS_API)

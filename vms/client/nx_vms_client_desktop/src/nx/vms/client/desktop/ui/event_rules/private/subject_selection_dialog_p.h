@@ -41,9 +41,9 @@ public:
     virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 
     // All users from explicitly checked roles, regardless of allUsers value.
-    QSet<QnUuid> checkedUsers() const;
+    QSet<nx::Uuid> checkedUsers() const;
 
-    QValidator::State validateRole(const QnUuid& roleId) const;
+    QValidator::State validateRole(const nx::Uuid& roleId) const;
     QValidator::State validateUsers(std::vector<QnResourceAccessSubject> subjects) const;
 
     bool allUsers() const;
@@ -56,7 +56,7 @@ private:
     RoleValidator m_roleValidator;
     UserValidator m_userValidator; //< Not used if m_roleValidator is set.
     bool m_allUsers = false; //< All users are considered checked.
-    mutable QHash<QnUuid, QValidator::State> m_validationStates;
+    mutable QHash<nx::Uuid, QValidator::State> m_validationStates;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -81,9 +81,9 @@ public:
     explicit UserListModel(RoleListModel* rolesModel, QObject* parent);
 
     // Explicitly checked users, regardless of allUsers value.
-    QSet<QnUuid> checkedUsers() const;
+    QSet<nx::Uuid> checkedUsers() const;
 
-    void setCheckedUsers(const QSet<QnUuid>& ids);
+    void setCheckedUsers(const QSet<nx::Uuid>& ids);
 
     void setUserValidator(UserValidator userValidator);
 

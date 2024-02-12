@@ -108,34 +108,34 @@ FieldDescriptor makeActionFlagFieldDescriptor(
         fieldName, displayName, description, {{"value", defaultValue}});
 }
 
-QnUuidList getDeviceIds(const AggregatedEventPtr& event)
+UuidList getDeviceIds(const AggregatedEventPtr& event)
 {
-    QnUuidList result;
-    result << getFieldValue<QnUuid>(event, utils::kCameraIdFieldName);
-    result << getFieldValue<QnUuidList>(event, utils::kDeviceIdsFieldName);
-    result.removeAll(QnUuid());
+    UuidList result;
+    result << getFieldValue<nx::Uuid>(event, utils::kCameraIdFieldName);
+    result << getFieldValue<UuidList>(event, utils::kDeviceIdsFieldName);
+    result.removeAll(nx::Uuid());
 
     return result;
 }
 
-QnUuidList getResourceIds(const AggregatedEventPtr& event)
+UuidList getResourceIds(const AggregatedEventPtr& event)
 {
     auto result = getDeviceIds(event);
-    result << getFieldValue<QnUuid>(event, kServerIdFieldName);
-    result << getFieldValue<QnUuid>(event, kEngineIdFieldName);
+    result << getFieldValue<nx::Uuid>(event, kServerIdFieldName);
+    result << getFieldValue<nx::Uuid>(event, kEngineIdFieldName);
     // TODO: #amalov Consider reporting user in resource list.
-    result.removeAll(QnUuid());
+    result.removeAll(nx::Uuid());
 
     return result;
 }
 
-QnUuidList getResourceIds(const ActionPtr& action)
+UuidList getResourceIds(const ActionPtr& action)
 {
-    QnUuidList result;
-    result << getFieldValue<QnUuid>(action, kCameraIdFieldName);
-    result << getFieldValue<QnUuidList>(action, kDeviceIdsFieldName);
-    result << getFieldValue<QnUuid>(action, kServerIdFieldName);
-    result.removeAll(QnUuid());
+    UuidList result;
+    result << getFieldValue<nx::Uuid>(action, kCameraIdFieldName);
+    result << getFieldValue<UuidList>(action, kDeviceIdsFieldName);
+    result << getFieldValue<nx::Uuid>(action, kServerIdFieldName);
+    result.removeAll(nx::Uuid());
 
     return result;
 }

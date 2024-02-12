@@ -132,7 +132,7 @@ NX_REFLECTION_ENUM_CLASS(SpecialResourceGroup,
 struct NX_VMS_API PermissionsModel
 {
     /**%apidoc All inherited group ids, can be obtained from `GET /rest/v{3-}/userGroups` */
-    std::vector<QnUuid> groupIds;
+    std::vector<nx::Uuid> groupIds;
 
     /**%apidoc[opt] All inherited permissions. */
     GlobalPermissions permissions = GlobalPermission::none;
@@ -142,7 +142,7 @@ struct NX_VMS_API PermissionsModel
      * `/rest/v{3-}/servers`, etc.) or Resource Group (can be obtained from
      * `/rest/v{3-}/resourceGroups`).
      */
-    std::map<QnUuid, AccessRights> resourceAccessRights;
+    std::map<nx::Uuid, AccessRights> resourceAccessRights;
 };
 #define PermissionsModel_Fields (groupIds)(permissions)(resourceAccessRights)
 
@@ -150,13 +150,13 @@ QN_FUSION_DECLARE_FUNCTIONS(PermissionsModel, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(PermissionsModel, PermissionsModel_Fields)
 
 // Special resource group ids.
-NX_VMS_API extern const QnUuid kAllDevicesGroupId;
-NX_VMS_API extern const QnUuid kAllWebPagesGroupId;
-NX_VMS_API extern const QnUuid kAllServersGroupId;
-NX_VMS_API extern const QnUuid kAllVideoWallsGroupId;
+NX_VMS_API extern const nx::Uuid kAllDevicesGroupId;
+NX_VMS_API extern const nx::Uuid kAllWebPagesGroupId;
+NX_VMS_API extern const nx::Uuid kAllServersGroupId;
+NX_VMS_API extern const nx::Uuid kAllVideoWallsGroupId;
 
-NX_VMS_API std::optional<SpecialResourceGroup> specialResourceGroup(const QnUuid& id);
-NX_VMS_API QnUuid specialResourceGroupId(SpecialResourceGroup group);
+NX_VMS_API std::optional<SpecialResourceGroup> specialResourceGroup(const nx::Uuid& id);
+NX_VMS_API nx::Uuid specialResourceGroupId(SpecialResourceGroup group);
 
 // GoogleTest printers.
 NX_VMS_API void PrintTo(GlobalPermission value, std::ostream* os);

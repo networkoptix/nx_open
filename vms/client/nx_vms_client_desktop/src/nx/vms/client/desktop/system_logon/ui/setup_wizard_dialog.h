@@ -19,7 +19,7 @@ class SetupWizardDialog: public QnDialog
 public:
     explicit SetupWizardDialog(
         nx::network::SocketAddress address,
-        const QnUuid& serverId,
+        const nx::Uuid& serverId,
         QWidget* parent = nullptr);
     ~SetupWizardDialog() override;
 

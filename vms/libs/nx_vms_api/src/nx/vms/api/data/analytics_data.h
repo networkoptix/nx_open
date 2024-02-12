@@ -15,7 +15,7 @@ namespace nx::vms::api {
 struct NX_VMS_API AnalyticsPluginData: ResourceData
 {
     static const QString kResourceTypeName;
-    static const QnUuid kResourceTypeId;
+    static const nx::Uuid kResourceTypeId;
 };
 
 #define AnalyticsPluginData_Fields ResourceData_Fields
@@ -23,7 +23,7 @@ struct NX_VMS_API AnalyticsPluginData: ResourceData
 struct NX_VMS_API AnalyticsEngineData: ResourceData
 {
     static const QString kResourceTypeName;
-    static const QnUuid kResourceTypeId;
+    static const nx::Uuid kResourceTypeId;
 };
 
 #define AnalyticsEngineData_Fields ResourceData_Fields
@@ -273,6 +273,6 @@ NX_VMS_API_DECLARE_STRUCT_AND_LIST(AnalyticsPluginData)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(AnalyticsEngineData)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(PluginInfo)
 
-using ExtendedPluginInfoByServer = std::map<QnUuid, PluginInfoExList>;
+using ExtendedPluginInfoByServer = std::map<nx::Uuid, PluginInfoExList>;
 
 } // namespace nx::vms::api

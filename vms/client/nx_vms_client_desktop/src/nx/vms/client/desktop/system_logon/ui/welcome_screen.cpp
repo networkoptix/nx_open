@@ -147,7 +147,7 @@ WelcomeScreen::~WelcomeScreen()
     m_runningRequests.clear();
 }
 
-void WelcomeScreen::connectionToSystemEstablished(const QnUuid& systemId)
+void WelcomeScreen::connectionToSystemEstablished(const nx::Uuid& systemId)
 {
     emit closeTile(systemId.toString());
 }
@@ -384,7 +384,7 @@ void WelcomeScreen::connectToLocalSystem(
 
     connectToSystemInternal(
         systemId,
-        serverId.isEmpty() ? std::nullopt : std::optional{QnUuid::fromStringSafe(serverId)},
+        serverId.isEmpty() ? std::nullopt : std::optional{nx::Uuid::fromStringSafe(serverId)},
         nx::network::SocketAddress(url.host(), url.port()),
         nx::network::http::PasswordCredentials{userName.toStdString(), password.toStdString()},
         storePassword);
@@ -401,7 +401,7 @@ void WelcomeScreen::connectToLocalSystemUsingSavedPassword(
     if (!NX_ASSERT(system, "System is empty"))
         return;
 
-    const QnUuid localSystemId = system->localId();
+    const nx::Uuid localSystemId = system->localId();
     const auto credentials = CredentialsManager::credentials(
         localSystemId,
         userName.toStdString());
@@ -409,7 +409,7 @@ void WelcomeScreen::connectToLocalSystemUsingSavedPassword(
 
     connectToSystemInternal(
         systemId,
-        serverId.isEmpty() ? std::nullopt : std::optional{QnUuid::fromStringSafe(serverId)},
+        serverId.isEmpty() ? std::nullopt : std::optional{nx::Uuid::fromStringSafe(serverId)},
         nx::network::SocketAddress::fromUrl(url),
         credentials.value_or(network::http::Credentials{}),
         storePassword);
@@ -419,14 +419,14 @@ void WelcomeScreen::forgetUserPassword(
     const QString& localSystemId,
     const QString& user)
 {
-    const auto localId = QnUuid::fromStringSafe(localSystemId);
+    const auto localId = nx::Uuid::fromStringSafe(localSystemId);
     if (!localId.isNull() && !user.isEmpty())
         CredentialsManager::forgetStoredPassword(localId, user.toStdString());
 }
 
 void WelcomeScreen::forgetAllCredentials(const QString& localSystemId)
 {
-    const auto localId = QnUuid::fromStringSafe(localSystemId);
+    const auto localId = nx::Uuid::fromStringSafe(localSystemId);
     if (!localId.isNull())
         CredentialsManager::removeCredentials(localId);
 }
@@ -511,7 +511,7 @@ void WelcomeScreen::createSystemModel()
 
 void WelcomeScreen::connectToSystemInternal(
     const QString& systemId, //< Actually that's a tile id.
-    const std::optional<QnUuid>& serverId,
+    const std::optional<nx::Uuid>& serverId,
     const nx::network::SocketAddress& address,
     const nx::network::http::Credentials& credentials,
     bool storePassword,
@@ -599,7 +599,7 @@ void WelcomeScreen::setupFactorySystem(
 
 void WelcomeScreen::setupFactorySystem(
     const nx::network::SocketAddress& address,
-    const QnUuid& serverId)
+    const nx::Uuid& serverId)
 {
     setVisibleControls(false);
     const auto controlsGuard = nx::utils::makeSharedGuard(
@@ -666,7 +666,7 @@ void WelcomeScreen::createAccount()
 
 void WelcomeScreen::deleteSystem(const QString& systemId, const QString& localSystemId)
 {
-    const auto localSystemUuid = QnUuid::fromStringSafe(localSystemId);
+    const auto localSystemUuid = nx::Uuid::fromStringSafe(localSystemId);
     NX_ASSERT(!localSystemUuid.isNull());
     if (localSystemUuid.isNull())
         return;

@@ -170,8 +170,8 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc, char** arg
         result.customUri = nx::vms::utils::SystemUri(fixedUri);
         NX_DEBUG(NX_SCOPE_TAG, "Parsed to %1", result.customUri.toUrl());
     }
-    result.videoWallGuid = QnUuid(strVideoWallGuid);
-    result.videoWallItemGuid = QnUuid(strVideoWallItemGuid);
+    result.videoWallGuid = nx::Uuid(strVideoWallGuid);
+    result.videoWallItemGuid = nx::Uuid(strVideoWallItemGuid);
 
     result.qmlImportPaths = qmlImportPaths.split(',', Qt::SkipEmptyParts);
 

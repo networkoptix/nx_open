@@ -19,7 +19,7 @@ struct QnPeerRuntimeInfo
         uuid(runtimeData.peer.id),
         data(runtimeData){}
 
-    QnUuid uuid;
+    nx::Uuid uuid;
     nx::vms::api::RuntimeData data;
 
     bool operator==(const QnPeerRuntimeInfo& other) const
@@ -38,7 +38,7 @@ struct QnPeerRuntimeInfo
 Q_DECLARE_TYPEINFO(QnPeerRuntimeInfo, Q_MOVABLE_TYPE);
 
 typedef QList<QnPeerRuntimeInfo> QnPeerRuntimeInfoList;
-typedef QHash<QnUuid, QnPeerRuntimeInfo> QnPeerRuntimeInfoMap;
+typedef QHash<nx::Uuid, QnPeerRuntimeInfo> QnPeerRuntimeInfoMap;
 
 
 class NX_VMS_COMMON_API QnRuntimeInfoManager:
@@ -53,8 +53,8 @@ public:
     const QnThreadsafeItemStorage<QnPeerRuntimeInfo>* items() const;
 
     QnPeerRuntimeInfo localInfo() const;
-    bool hasItem(const QnUuid& id);
-    QnPeerRuntimeInfo item(const QnUuid& id) const;
+    bool hasItem(const nx::Uuid& id);
+    QnPeerRuntimeInfo item(const nx::Uuid& id) const;
 
     void setMessageProcessor(QnCommonMessageProcessor* messageProcessor);
     void updateLocalItem(const QnPeerRuntimeInfo& value);

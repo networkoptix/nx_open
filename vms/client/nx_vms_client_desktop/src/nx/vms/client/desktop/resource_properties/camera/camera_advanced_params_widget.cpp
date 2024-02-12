@@ -71,10 +71,10 @@ namespace nx::vms::client::desktop {
 struct CameraAdvancedParamsWidget::Private
 {
     QPointer<CameraSettingsDialogStore> store;
-    QnUuid selectedServer;
+    nx::Uuid selectedServer;
     std::unique_ptr<core::ptz::RemotePtzController> ptzController;
     QnCameraAdvancedParams manifest;
-    QnUuid cameraId;
+    nx::Uuid cameraId;
 
     bool isValid = false;
     bool isCurrentTab = false; //< Values must be requested only when Advanced tab is opened.
@@ -188,7 +188,7 @@ void CameraAdvancedParamsWidget::loadState(const CameraSettingsDialogState& stat
     updateButtonsState();
 }
 
-void CameraAdvancedParamsWidget::setSelectedServer(const QnUuid& serverId)
+void CameraAdvancedParamsWidget::setSelectedServer(const nx::Uuid& serverId)
 {
     d->selectedServer = serverId;
 }

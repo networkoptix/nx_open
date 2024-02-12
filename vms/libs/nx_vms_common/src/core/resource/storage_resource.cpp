@@ -169,11 +169,11 @@ void QnStorageResource::fillID()
     setIdUnsafe(fillID(getParentId(), getUrl()));
 }
 
-QnUuid QnStorageResource::fillID(const QnUuid& mserverId, const QString& url)
+nx::Uuid QnStorageResource::fillID(const nx::Uuid& mserverId, const QString& url)
 {
     QByteArray data1 = mserverId.toRfc4122();
     QByteArray data2 = url.toUtf8();
-    return QnUuid::fromArbitraryData(data1.append(data2));
+    return nx::Uuid::fromArbitraryData(data1.append(data2));
 }
 
 bool QnStorageResource::isExternal() const

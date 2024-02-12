@@ -11,7 +11,7 @@
 
 struct NX_VMS_COMMON_API ConfigureSystemData: public PasswordData
 {
-    QnUuid localSystemId;
+    nx::Uuid localSystemId;
     QString cloudSystemId;
     bool wholeSystem = false;
     qint64 sysIdTime = 0;
@@ -25,12 +25,12 @@ struct NX_VMS_COMMON_API ConfigureSystemData: public PasswordData
     bool rewriteLocalSettings = false;
     QString systemName; //added for compatibility with NxTool
     QString currentPassword; // required for password change only
-    QnUuid mergeId;
-    std::set<QnUuid> remoteRemovedObjects;
+    nx::Uuid mergeId;
+    std::set<nx::Uuid> remoteRemovedObjects;
     bool isLocal = false;
 
     // All servers from a cluster A.
-    std::set<QnUuid> foreignServers;
+    std::set<nx::Uuid> foreignServers;
 
     bool operator==(const ConfigureSystemData& other) const = default;
 };

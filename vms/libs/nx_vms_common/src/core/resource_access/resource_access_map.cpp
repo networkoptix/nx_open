@@ -43,7 +43,7 @@ QString toString(const ResourceAccessMap& accessMap, QnResourcePool* resourcePoo
     const QString lineTemplate = multiLine ? "    {%1: %2}" : "{%1: %2}";
 
     const auto resourceName =
-        [resourcePool](const QnUuid& resourceId) -> QString
+        [resourcePool](const nx::Uuid& resourceId) -> QString
         {
             if (const auto specialGroup = nx::vms::api::specialResourceGroup(resourceId))
                 return nx::format("%1", *specialGroup).toQString();

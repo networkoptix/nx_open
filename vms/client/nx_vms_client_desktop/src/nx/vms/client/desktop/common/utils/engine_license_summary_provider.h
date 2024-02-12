@@ -17,17 +17,17 @@ public:
     explicit EngineLicenseSummaryProvider(SystemContext* context, QObject* parent = nullptr);
 
     /** Returns license summary for the given engine. */
-    Q_INVOKABLE QVariant licenseSummary(QnUuid engineId) const;
+    Q_INVOKABLE QVariant licenseSummary(nx::Uuid engineId) const;
 
     /**
      * Returns license summary for the given engine with the proposed activated engines on
      * the camera with the given id.
      */
     Q_INVOKABLE QVariant licenseSummary(
-        QnUuid engineId, QnUuid cameraId, const QVariantList& proposedEngines) const;
+        nx::Uuid engineId, nx::Uuid cameraId, const QVariantList& proposedEngines) const;
 
-    QSet<QnUuid> overusedEngines(
-        QnUuid cameraId, const QSet<QnUuid>& proposedEngines) const;
+    QSet<nx::Uuid> overusedEngines(
+        nx::Uuid cameraId, const QSet<nx::Uuid>& proposedEngines) const;
 };
 
 } // namespace nx::vms::client::desktop

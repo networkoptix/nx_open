@@ -15,11 +15,11 @@ namespace nx::vms::api::analytics {
 
 struct NX_VMS_API EngineModel
 {
-    QnUuid id;
+    nx::Uuid id;
     QString name;
-    QnUuid integrationId;
+    nx::Uuid integrationId;
 
-    QnUuid getId() const { return id; }
+    nx::Uuid getId() const { return id; }
 
     EngineModel() = default;
     explicit EngineModel(AnalyticsEngineData data);

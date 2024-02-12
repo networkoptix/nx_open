@@ -62,7 +62,7 @@ QN_FUSION_DECLARE_FUNCTIONS(Rect, (json), NX_VMS_API)
 
 struct NX_VMS_API RpcObjectMetadata
 {
-    QnUuid trackId;
+    nx::Uuid trackId;
     QString typeId;
     Rect boundingBox;
     std::vector<RpcObjectMetadataAttribute> attributes;

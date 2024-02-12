@@ -32,7 +32,7 @@ public:
         loginAs(nx::vms::api::kPowerUsersGroupId);
         createResourceTreeModel();
         editingContext.reset(new AccessSubjectEditingContext(systemContext()));
-        editingContext->setCurrentSubject(QnUuid::createUuid(),
+        editingContext->setCurrentSubject(nx::Uuid::createUuid(),
             AccessSubjectEditingContext::SubjectType::user);
     }
 

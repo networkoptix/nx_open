@@ -34,12 +34,12 @@ AbstractCameraButtonController::AbstractCameraButtonController(
 {
 }
 
-QnUuid AbstractCameraButtonController::resourceId() const
+nx::Uuid AbstractCameraButtonController::resourceId() const
 {
     return m_resourceId;
 }
 
-void AbstractCameraButtonController::setResourceId(const QnUuid& value)
+void AbstractCameraButtonController::setResourceId(const nx::Uuid& value)
 {
     if (m_resourceId == value)
         return;
@@ -48,21 +48,21 @@ void AbstractCameraButtonController::setResourceId(const QnUuid& value)
     emit resourceIdChanged();
 }
 
-void AbstractCameraButtonController::safeEmitActionStarted(const QnUuid& id, bool success)
+void AbstractCameraButtonController::safeEmitActionStarted(const nx::Uuid& id, bool success)
 {
     executeLater(
         nx::utils::guarded(this, [=]() { emit actionStarted(id, success, QPrivateSignal()); }),
         this);
 }
 
-void AbstractCameraButtonController::safeEmitActionStopped(const QnUuid& id, bool success)
+void AbstractCameraButtonController::safeEmitActionStopped(const nx::Uuid& id, bool success)
 {
     executeLater(
         nx::utils::guarded(this, [=]() { emit actionStopped(id, success, QPrivateSignal()); }),
         this);
 }
 
-void AbstractCameraButtonController::safeEmitActionCancelled(const QnUuid& id)
+void AbstractCameraButtonController::safeEmitActionCancelled(const nx::Uuid& id)
 {
     executeLater(
         nx::utils::guarded(this, [=]() { emit actionCancelled(id, QPrivateSignal()); }),

@@ -278,7 +278,7 @@ QVariant EventLogModel::mouseCursorData(
 
 QnResourcePtr EventLogModel::getResource(Column column, const EventLogModelData& data) const
 {
-    QnUuidList resourceIds;
+    UuidList resourceIds;
 
     switch (column)
     {
@@ -321,7 +321,7 @@ QVariant EventLogModel::iconData(Column column, const EventLogModelData& data) c
             else
             {
                 QnUserResourceList users;
-                QList<QnUuid> groups;
+                QList<nx::Uuid> groups;
                 nx::vms::common::getUsersAndGroups(systemContext(), selection.ids, users, groups);
                 userCount += (users.size() + groups.size());
             }
@@ -408,7 +408,7 @@ QString EventLogModel::tooltip(Column column, const EventLogModelData& data) con
     return result;
 }
 
-bool EventLogModel::hasAccessToArchive(const QnUuid& cameraId) const
+bool EventLogModel::hasAccessToArchive(const nx::Uuid& cameraId) const
 {
     const auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(cameraId);
     NX_ASSERT(camera, "Resource is not a camera");

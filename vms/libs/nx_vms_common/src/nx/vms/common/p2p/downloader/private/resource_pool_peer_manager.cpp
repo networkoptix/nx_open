@@ -34,7 +34,7 @@ class ResourcePoolPeerManager::Private
     ResourcePoolPeerManager* const q = nullptr;
 
 public:
-    QHash<QnUuid, rest::ServerConnectionPtr> directConnectionByServerId;
+    QHash<nx::Uuid, rest::ServerConnectionPtr> directConnectionByServerId;
     PeerSelector peerSelector;
 
     nx::Mutex mutex;
@@ -73,9 +73,9 @@ public:
         return result;
     }
 
-    QList<QnUuid> otherPeersIds() const
+    QList<nx::Uuid> otherPeersIds() const
     {
-        QList<QnUuid> result;
+        QList<nx::Uuid> result;
 
         for (const auto& info: otherPeersInfos())
             result.append(info.id);
@@ -108,7 +108,7 @@ ResourcePoolPeerManager::~ResourcePoolPeerManager()
 {
 }
 
-QString ResourcePoolPeerManager::peerString(const QnUuid& peerId) const
+QString ResourcePoolPeerManager::peerString(const nx::Uuid& peerId) const
 {
     QString result;
 
@@ -130,18 +130,18 @@ QString ResourcePoolPeerManager::peerString(const QnUuid& peerId) const
     return result;
 }
 
-QList<QnUuid> ResourcePoolPeerManager::getAllPeers() const
+QList<nx::Uuid> ResourcePoolPeerManager::getAllPeers() const
 {
     return d->otherPeersIds();
 }
 
-QList<QnUuid> ResourcePoolPeerManager::peers() const
+QList<nx::Uuid> ResourcePoolPeerManager::peers() const
 {
     auto otherInfo = d->otherPeersInfos();
     return d->peerSelector.selectPeers(otherInfo);
 }
 
-int ResourcePoolPeerManager::distanceTo(const QnUuid& peerId) const
+int ResourcePoolPeerManager::distanceTo(const nx::Uuid& peerId) const
 {
     const auto& connection = messageBusConnection();
     if (!connection)
@@ -153,7 +153,7 @@ int ResourcePoolPeerManager::distanceTo(const QnUuid& peerId) const
 }
 
 void ResourcePoolPeerManager::setServerDirectConnection(
-    const QnUuid& id, const rest::ServerConnectionPtr& connection)
+    const nx::Uuid& id, const rest::ServerConnectionPtr& connection)
 {
     NX_MUTEX_LOCKER lock(&d->mutex);
 
@@ -175,7 +175,7 @@ void ResourcePoolPeerManager::setIndirectInternetRequestsAllowed(bool allow)
 }
 
 AbstractPeerManager::RequestContextPtr<FileInformation> ResourcePoolPeerManager::requestFileInfo(
-    const QnUuid& peerId,
+    const nx::Uuid& peerId,
     const QString& fileName,
     const nx::utils::Url& url)
 {
@@ -222,7 +222,7 @@ AbstractPeerManager::RequestContextPtr<FileInformation> ResourcePoolPeerManager:
 }
 
 AbstractPeerManager::RequestContextPtr<QVector<QByteArray>> ResourcePoolPeerManager::requestChecksums(
-    const QnUuid& peerId, const QString& fileName)
+    const nx::Uuid& peerId, const QString& fileName)
 {
     const auto& connection = getConnection(peerId);
     if (!connection)
@@ -249,7 +249,7 @@ AbstractPeerManager::RequestContextPtr<QVector<QByteArray>> ResourcePoolPeerMana
 }
 
 AbstractPeerManager::RequestContextPtr<nx::Buffer> ResourcePoolPeerManager::downloadChunk(
-    const QnUuid& peerId,
+    const nx::Uuid& peerId,
     const QString& fileName,
     const nx::utils::Url& url,
     int chunkIndex,
@@ -293,12 +293,12 @@ AbstractPeerManager::RequestContextPtr<nx::Buffer> ResourcePoolPeerManager::down
         promise->get_future(), makeCanceller(promise, connection, handle));
 }
 
-QnMediaServerResourcePtr ResourcePoolPeerManager::getServer(const QnUuid& peerId) const
+QnMediaServerResourcePtr ResourcePoolPeerManager::getServer(const nx::Uuid& peerId) const
 {
     return resourcePool()->getResourceById<QnMediaServerResource>(peerId);
 }
 
-rest::ServerConnectionPtr ResourcePoolPeerManager::getConnection(const QnUuid& peerId) const
+rest::ServerConnectionPtr ResourcePoolPeerManager::getConnection(const nx::Uuid& peerId) const
 {
     {
         NX_MUTEX_LOCKER lock(&d->mutex);

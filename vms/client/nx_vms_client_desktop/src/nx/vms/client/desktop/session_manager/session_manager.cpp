@@ -30,7 +30,7 @@ const int kMaxInstancesPerSession = 20;
 constexpr int stateLockStaleTimeMs = 2000;
 constexpr int trylockTimeoutMs = 10;
 
-QString makeSessionName(const QnUuid& systemId, const QnUuid& user)
+QString makeSessionName(const nx::Uuid& systemId, const nx::Uuid& user)
 {
     return QString("%1@%2").arg(user.toSimpleString(), systemId.toSimpleString());
 }
@@ -48,7 +48,7 @@ struct SessionManager::InstanceData
     qint64 pid = 0;
     int sessionStateIndex = -1;
     // Storage for instance guid in binary form, according to rfc4122
-    char instanceId[QnUuid::RFC4122_SIZE];
+    char instanceId[nx::Uuid::RFC4122_SIZE];
 
     static constexpr auto kSessionNameSize = 128;
     // Each guid looks like xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx and takes 36 symbols.
@@ -64,11 +64,11 @@ struct SessionManager::InstanceData
         return name == QLatin1String(sessionName, maxLen);
     }
 
-    void setGuid(const QnUuid& uuid)
+    void setGuid(const nx::Uuid& uuid)
     {
         auto rawGuid = uuid.toRfc4122();
-        NX_ASSERT(rawGuid.size() == QnUuid::RFC4122_SIZE);
-        memcpy(instanceId, rawGuid.data(), QnUuid::RFC4122_SIZE);
+        NX_ASSERT(rawGuid.size() == nx::Uuid::RFC4122_SIZE);
+        memcpy(instanceId, rawGuid.data(), nx::Uuid::RFC4122_SIZE);
     }
 
     // Sets session name. If name is empty, then sessionName is completely cleaned.
@@ -131,11 +131,11 @@ struct SessionManager::Private
      * This is root instance GUID. It is often set to hardware PC UUID.
      * Actual instance ID is calculated using this root ID and client's index.
      */
-    QnUuid rootInstanceGuid = QnUuid::createUuid();
+    nx::Uuid rootInstanceGuid = nx::Uuid::createUuid();
     /** Base path to store session data. It is set from config in SessionManager constructor. */
     QString storageBasePath;
-    QnUuid systemId;
-    QnUuid userId;
+    nx::Uuid systemId;
+    nx::Uuid userId;
     std::atomic<bool> hasSessionData = false;
     bool exitSession = false;
     /**
@@ -462,7 +462,7 @@ QSet<int> SessionManager::findRunningStatesUnsafe(const QString& sessionName)
 }
 
 bool SessionManager::acquireSessionInstance(
-    const QnUuid& systemId, const QnUuid& userId, bool forceNewInstance)
+    const nx::Uuid& systemId, const nx::Uuid& userId, bool forceNewInstance)
 {
     NX_ASSERT(!userId.isNull());
     NX_ASSERT(!systemId.isNull());

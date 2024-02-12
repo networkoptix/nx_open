@@ -20,7 +20,7 @@ struct GroupSettingsDialogState
     Q_GADGET
 
     // Subject ID should go first for correct AccessSubjectEditingContext initialization.
-    Q_PROPERTY(QnUuid groupId MEMBER groupId)
+    Q_PROPERTY(nx::Uuid groupId MEMBER groupId)
 
     Q_PROPERTY(QString name MEMBER name)
     Q_PROPERTY(bool nameEditable MEMBER nameEditable)
@@ -32,7 +32,7 @@ struct GroupSettingsDialogState
         READ getParentGroups
         WRITE setParentGroups)
     Q_PROPERTY(bool parentGroupsEditable MEMBER parentGroupsEditable)
-    Q_PROPERTY(QList<QnUuid> groups READ getGroups WRITE setGroups)
+    Q_PROPERTY(QList<nx::Uuid> groups READ getGroups WRITE setGroups)
     Q_PROPERTY(MembersListWrapper users MEMBER users)
     Q_PROPERTY(bool membersEditable MEMBER membersEditable)
     Q_PROPERTY(nx::vms::api::GlobalPermissions globalPermissions MEMBER globalPermissions)
@@ -43,7 +43,7 @@ struct GroupSettingsDialogState
 public:
     bool operator==(const GroupSettingsDialogState& other) const = default;
 
-    QnUuid groupId;
+    nx::Uuid groupId;
 
     QString name;
     bool nameEditable = true;
@@ -66,9 +66,9 @@ public:
     }
 
     bool parentGroupsEditable = true;
-    std::set<QnUuid> groups;
-    QList<QnUuid> getGroups() const { return {groups.begin(), groups.end()}; }
-    void setGroups(const QList<QnUuid>& v) { groups = {v.begin(), v.end()}; }
+    std::set<nx::Uuid> groups;
+    QList<nx::Uuid> getGroups() const { return {groups.begin(), groups.end()}; }
+    void setGroups(const QList<nx::Uuid>& v) { groups = {v.begin(), v.end()}; }
 
     MembersListWrapper users;
 
@@ -81,11 +81,11 @@ public:
 };
 
 class NX_VMS_CLIENT_DESKTOP_API GroupSettingsDialog:
-    public QmlDialogWithState<GroupSettingsDialogState, QnUuid>,
+    public QmlDialogWithState<GroupSettingsDialogState, nx::Uuid>,
     SystemContextAware,
     WindowContextAware
 {
-    using base_type = QmlDialogWithState<GroupSettingsDialogState, QnUuid>;
+    using base_type = QmlDialogWithState<GroupSettingsDialogState, nx::Uuid>;
 
     Q_OBJECT
 
@@ -108,7 +108,7 @@ public:
 
     ~GroupSettingsDialog();
 
-    bool setGroup(const QnUuid& groupId);
+    bool setGroup(const nx::Uuid& groupId);
 
     Q_INVOKABLE QString validateName(const QString& text);
     Q_INVOKABLE bool isOkClicked() const { return acceptOnSuccess(); }
@@ -118,7 +118,7 @@ public:
 
     static void removeGroups(
         WindowContext* windowContext,
-        const QSet<QnUuid>& idsToRemove,
+        const QSet<nx::Uuid>& idsToRemove,
         nx::utils::MoveOnlyFunc<void(bool, const QString&)> callback = {});
 
 public slots:
@@ -126,7 +126,7 @@ public slots:
     void onAddGroupRequested();
 
 protected:
-    virtual GroupSettingsDialogState createState(const QnUuid& groupId) override;
+    virtual GroupSettingsDialogState createState(const nx::Uuid& groupId) override;
     virtual void saveState(const GroupSettingsDialogState& state) override;
 
 private:

@@ -67,7 +67,7 @@ void LocalSessionTokenExpirationWatcher::notify(std::chrono::minutes timeLeft)
     connect(
         m_notificationManager,
         &workbench::LocalNotificationsManager::cancelRequested,
-        [this](QnUuid notificationId)
+        [this](nx::Uuid notificationId)
         {
             if (notificationId == m_notification)
             {
@@ -79,7 +79,7 @@ void LocalSessionTokenExpirationWatcher::notify(std::chrono::minutes timeLeft)
     connect(
         m_notificationManager,
         &workbench::LocalNotificationsManager::interactionRequested,
-        [this, action](QnUuid notificationId)
+        [this, action](nx::Uuid notificationId)
         {
             if (notificationId == m_notification)
                 action->trigger();

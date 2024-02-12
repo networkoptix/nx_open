@@ -9,12 +9,12 @@ namespace nx::vms::common::p2p::downloader {
 namespace {
 
 template<typename P>
-QList<QnUuid> filterPeers(
+QList<nx::Uuid> filterPeers(
     const QList<PeerSelector::PeerInformation>& peers,
     P predicate,
-    const QList<QnUuid>& additionalPeers = {})
+    const QList<nx::Uuid>& additionalPeers = {})
 {
-    QSet<QnUuid> result(additionalPeers.begin(), additionalPeers.end());
+    QSet<nx::Uuid> result(additionalPeers.begin(), additionalPeers.end());
     for (const auto& peer: peers)
     {
         if (predicate(peer))
@@ -25,7 +25,7 @@ QList<QnUuid> filterPeers(
 
 } // namespace
 
-QList<QnUuid> PeerSelector::selectPeers(const QList<PeerSelector::PeerInformation>& peers)
+QList<nx::Uuid> PeerSelector::selectPeers(const QList<PeerSelector::PeerInformation>& peers)
 {
     switch (peerSelectionPolicy)
     {

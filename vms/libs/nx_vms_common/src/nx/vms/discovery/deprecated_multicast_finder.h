@@ -45,7 +45,7 @@ public:
         bool listenAndRespond = false;
         size_t multicastCount = 0;
         std::function<bool()> responseEnabled;
-        QnUuid peerId;
+        nx::Uuid peerId;
 
         static constexpr size_t kUnlimited = std::numeric_limits<size_t>::max();
     };
@@ -94,12 +94,12 @@ private:
     class RevealRequest
     {
     public:
-        RevealRequest(const QnUuid& moduleGuid, nx::vms::api::PeerType peerType);
+        RevealRequest(const nx::Uuid& moduleGuid, nx::vms::api::PeerType peerType);
 
         QByteArray serialize();
         static bool isValid(const quint8 *bufStart, const quint8 *bufEnd);
     private:
-        const QnUuid m_moduleGuid;
+        const nx::Uuid m_moduleGuid;
         const nx::vms::api::PeerType m_peerType;
     };
 

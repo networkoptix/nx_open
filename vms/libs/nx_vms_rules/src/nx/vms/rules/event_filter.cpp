@@ -26,7 +26,7 @@
 
 namespace nx::vms::rules {
 
-EventFilter::EventFilter(const QnUuid& id, const QString& eventType):
+EventFilter::EventFilter(const nx::Uuid& id, const QString& eventType):
     m_id(id),
     m_eventType(eventType)
 {
@@ -38,7 +38,7 @@ EventFilter::~EventFilter()
 {
 }
 
-QnUuid EventFilter::id() const
+nx::Uuid EventFilter::id() const
 {
     return m_id;
 }

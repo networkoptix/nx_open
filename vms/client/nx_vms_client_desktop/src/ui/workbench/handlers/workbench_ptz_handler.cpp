@@ -91,7 +91,7 @@ public:
 private:
     QWidget* m_parent;
     QnVirtualCameraResourcePtr m_camera;
-    QnUuid m_resourceId;
+    nx::Uuid m_resourceId;
     std::unique_ptr<QnJsonResourcePropertyHandler<PresetIdByHotkey>> m_propertyHandler;
     mutable nx::Mutex m_mutex;
 };

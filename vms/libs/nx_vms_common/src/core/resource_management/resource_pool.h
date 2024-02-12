@@ -130,7 +130,7 @@ public:
     template<class Resource, class IdList>
     QnSharedResourcePointerList<Resource> getResourcesByIds(
         const IdList& idList,
-        std::function<QnUuid(const typename IdList::value_type&)> id =
+        std::function<nx::Uuid(const typename IdList::value_type&)> id =
             [](const auto& item) { return item; }
     ) const
     {
@@ -198,7 +198,7 @@ public:
     QnNetworkResourceList getAllNetResourceByHostAddress(const nx::String& hostAddress) const;
 
     QnVirtualCameraResourceList getAllCameras(
-        const QnUuid& parentId = {}, bool ignoreDesktopCameras = false) const;
+        const nx::Uuid& parentId = {}, bool ignoreDesktopCameras = false) const;
     QnVirtualCameraResourceList getAllCameras(
         const QnResourcePtr& server,  bool ignoreDesktopCameras = false) const;
 
@@ -223,7 +223,7 @@ public:
      */
     QnMediaServerResourcePtr masterCloudSyncServer() const;
 
-    QnResourceList getResourcesByParentId(const QnUuid& parentId) const;
+    QnResourceList getResourcesByParentId(const nx::Uuid& parentId) const;
 
     // Returns list of resources with such flag.
     QnResourceList getResourcesWithFlag(Qn::ResourceFlag flag) const;
@@ -258,7 +258,7 @@ public:
     }
 
     template<class Resource>
-    QnSharedResourcePointer<Resource> getResourceById(const QnUuid& id) const
+    QnSharedResourcePointer<Resource> getResourceById(const nx::Uuid& id) const
     {
         NX_READ_LOCKER locker(&m_resourcesMutex);
         auto itr = m_resources.find(id);
@@ -267,7 +267,7 @@ public:
             : QnSharedResourcePointer<Resource>();
     }
 
-    QnResourcePtr getResourceById(const QnUuid& id) const;
+    QnResourcePtr getResourceById(const nx::Uuid& id) const;
 
     // Shared id is groupId for multichannel resources and physicalId for single channel resources.
     QnSecurityCamResourceList getResourcesBySharedId(const QString& sharedId) const;
@@ -282,7 +282,7 @@ public:
         const nx::vms::common::ResourceDescriptor& descriptor) const;
 
     QnResourcePtr getResourceByUrl(
-        const QString& url, const QnUuid& parentServerId = QnUuid()) const;
+        const QString& url, const nx::Uuid& parentServerId = nx::Uuid()) const;
 
     QnVirtualCameraResourcePtr getCameraByPhysicalId(const QString& physicalId) const;
     QnNetworkResourcePtr getResourceByMacAddress(const QString& mac) const;
@@ -296,28 +296,28 @@ public:
      * @param uuid                              Unique id of the item.
      * @return                                  Valid index containing the videowall and item's uuid or null index if such item does not exist.
      */
-    QnVideoWallItemIndex getVideoWallItemByUuid(const QnUuid& uuid) const;
+    QnVideoWallItemIndex getVideoWallItemByUuid(const nx::Uuid& uuid) const;
 
     /**
      * @brief getVideoWallItemsByUuid           Find list of videowall items by their uuids.
      * @param uuids                             Unique ids of the items.
      * @return                                  List of valid indices containing the videowall and items' uuid.
      */
-    QnVideoWallItemIndexList getVideoWallItemsByUuid(const QList<QnUuid>& uuids) const;
+    QnVideoWallItemIndexList getVideoWallItemsByUuid(const QList<nx::Uuid>& uuids) const;
 
     /**
      * @brief getVideoWallMatrixByUuid          Find videowall matrix by uuid.
      * @param uuid                              Unique id of the matrix.
      * @return                                  Index containing the videowall and matrix's uuid.
      */
-    QnVideoWallMatrixIndex getVideoWallMatrixByUuid(const QnUuid& uuid) const;
+    QnVideoWallMatrixIndex getVideoWallMatrixByUuid(const nx::Uuid& uuid) const;
 
     /**
      * @brief getVideoWallMatricesByUuid        Find list of videowall matrices by their uuids.
      * @param uuids                             Unique ids of the matrices.
      * @return                                  List of indices containing the videowall and matrices' uuid.
      */
-    QnVideoWallMatrixIndexList getVideoWallMatricesByUuid(const QList<QnUuid>& uuids) const;
+    QnVideoWallMatrixIndexList getVideoWallMatricesByUuid(const QList<nx::Uuid>& uuids) const;
 
     /** Check if there is at least one I/O Module in the system. */
     bool containsIoModules() const;
@@ -373,7 +373,7 @@ private:
     bool m_tranInProgress;
 
     QnResourceList m_tmpResources;
-    QHash<QnUuid, QnResourcePtr> m_resources;
+    QHash<nx::Uuid, QnResourcePtr> m_resources;
     mutable QnUserResourcePtr m_adminResource;
     std::unique_ptr<QThreadPool> m_threadPool;
 };

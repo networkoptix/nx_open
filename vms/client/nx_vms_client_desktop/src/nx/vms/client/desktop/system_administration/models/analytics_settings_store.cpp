@@ -52,7 +52,7 @@ AnalyticsSettingsStore::AnalyticsSettingsStore(QWidget* parent):
         this, &AnalyticsSettingsStore::updateEngine);
 
     connect(m_enginesWatcher.get(), &AnalyticsEnginesWatcher::engineSettingsModelChanged, this,
-        [this](const QnUuid& engineId)
+        [this](const nx::Uuid& engineId)
         {
             if (engineId == m_currentEngineId)
                 emit currentSettingsStateChanged();
@@ -76,14 +76,14 @@ void AnalyticsSettingsStore::updateEngines()
     }
 }
 
-void AnalyticsSettingsStore::setCurrentEngineId(const QnUuid& engineId)
+void AnalyticsSettingsStore::setCurrentEngineId(const nx::Uuid& engineId)
 {
     m_currentEngineId = engineId;
     emit currentSettingsStateChanged();
     refreshSettings(m_currentEngineId);
 }
 
-QJsonObject AnalyticsSettingsStore::settingsValues(const QnUuid& engineId)
+QJsonObject AnalyticsSettingsStore::settingsValues(const nx::Uuid& engineId)
 {
     return m_settingsValuesByEngineId.value(engineId).values;
 }
@@ -95,7 +95,7 @@ QVariant AnalyticsSettingsStore::requestParameters(const QJsonObject& model)
 }
 
 void AnalyticsSettingsStore::setSettingsValues(
-    const QnUuid& engineId,
+    const nx::Uuid& engineId,
     const QString& activeElement,
     const QJsonObject& values,
     const QJsonObject& parameters)
@@ -108,13 +108,13 @@ void AnalyticsSettingsStore::setSettingsValues(
     updateHasChanges();
 }
 
-QJsonObject AnalyticsSettingsStore::settingsModel(const QnUuid& engineId)
+QJsonObject AnalyticsSettingsStore::settingsModel(const nx::Uuid& engineId)
 {
     return m_settingsModelByEngineId.value(engineId);
 }
 
 void AnalyticsSettingsStore::addEngine(
-    const QnUuid& /*engineId*/, const AnalyticsEngineInfo& engineInfo)
+    const nx::Uuid& /*engineId*/, const AnalyticsEngineInfo& engineInfo)
 {
     // Hide device-dependent engines without settings on the model level.
     if (!isEngineVisible(engineInfo))
@@ -131,12 +131,12 @@ void AnalyticsSettingsStore::addEngine(
     emit analyticsEnginesChanged();
 }
 
-void AnalyticsSettingsStore::removeEngine(const QnUuid& engineId)
+void AnalyticsSettingsStore::removeEngine(const nx::Uuid& engineId)
 {
     auto it = std::find_if(m_engines.begin(), m_engines.end(),
         [&engineId](const auto& item)
         {
-            return item.toMap().value("id").template value<QnUuid>() == engineId;
+            return item.toMap().value("id").template value<nx::Uuid>() == engineId;
         });
 
     if (it == m_engines.end())
@@ -147,7 +147,7 @@ void AnalyticsSettingsStore::removeEngine(const QnUuid& engineId)
     emit analyticsEnginesChanged();
 }
 
-void AnalyticsSettingsStore::setErrors(const QnUuid& engineId, const QJsonObject& errors)
+void AnalyticsSettingsStore::setErrors(const nx::Uuid& engineId, const QJsonObject& errors)
 {
     if (m_errors.value(engineId) == errors)
         return;
@@ -159,7 +159,7 @@ void AnalyticsSettingsStore::setErrors(const QnUuid& engineId, const QJsonObject
 }
 
 void AnalyticsSettingsStore::resetSettings(
-    const QnUuid& engineId,
+    const nx::Uuid& engineId,
     const QJsonObject& model,
     const QJsonObject& values,
     const QJsonObject& errors,
@@ -175,12 +175,12 @@ void AnalyticsSettingsStore::resetSettings(
     updateHasChanges();
 }
 
-void AnalyticsSettingsStore::updateEngine(const QnUuid& engineId)
+void AnalyticsSettingsStore::updateEngine(const nx::Uuid& engineId)
 {
     auto it = std::find_if(m_engines.begin(), m_engines.end(),
         [&engineId](const auto& item)
         {
-            return item.toMap().value("id").template value<QnUuid>() == engineId;
+            return item.toMap().value("id").template value<nx::Uuid>() == engineId;
         });
 
     if (it == m_engines.end())
@@ -205,7 +205,7 @@ void AnalyticsSettingsStore::setLoading(bool loading)
     emit loadingChanged();
 }
 
-void AnalyticsSettingsStore::refreshSettings(const QnUuid& engineId)
+void AnalyticsSettingsStore::refreshSettings(const nx::Uuid& engineId)
 {
     if (engineId.isNull())
         return;
@@ -323,7 +323,7 @@ void AnalyticsSettingsStore::discardChanges()
 }
 
 void AnalyticsSettingsStore::activeElementChanged(
-    const QnUuid& engineId,
+    const nx::Uuid& engineId,
     const QString& activeElement,
     const QJsonObject& parameters)
 {

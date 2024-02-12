@@ -54,18 +54,18 @@ struct NX_VMS_CLIENT_DESKTOP_API UpdateContents
     QString source;
 
     /** A set of servers without proper update file. */
-    QSet<QnUuid> missingUpdate;
+    QSet<nx::Uuid> missingUpdate;
     /** A set of servers that can not accept update version. */
-    QSet<QnUuid> invalidVersion;
+    QSet<nx::Uuid> invalidVersion;
     /** A set of peers to be ignored during this update. */
-    QSet<QnUuid> ignorePeers;
+    QSet<nx::Uuid> ignorePeers;
     /** A set of peers with update packages verified. */
-    QSet<QnUuid> peersWithUpdate;
+    QSet<nx::Uuid> peersWithUpdate;
     /**
      * Maps a server id, which OS is no longer supported to an error message.
      * The message is displayed to the user.
      */
-    QMap<QnUuid, QString> unsuportedSystemsReport;
+    QMap<nx::Uuid, QString> unsuportedSystemsReport;
     /** Path to eula file. */
     QString eulaPath;
     /** A folder with offline update packages. */
@@ -95,7 +95,7 @@ struct NX_VMS_CLIENT_DESKTOP_API UpdateContents
          * A set of targets that should receive this package.
          * This set is used by client to keep track of package uploads.
          */
-        QSet<QnUuid> targets;
+        QSet<nx::Uuid> targets;
     };
     QHash<QString, PackageProperties> packageProperties;
 
@@ -128,7 +128,7 @@ struct NX_VMS_CLIENT_DESKTOP_API UpdateContents
     bool isEmpty() const;
 
     /** Checks if peer has update package. */
-    bool peerHasUpdate(const QnUuid& id) const;
+    bool peerHasUpdate(const nx::Uuid& id) const;
 
     /**
      * Compares this update info with 'other' and decides whether we should pick other one.

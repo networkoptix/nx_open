@@ -36,7 +36,7 @@ public:
 
     virtual QString idForToStringFromPtr() const override;
 
-    static QnUuid uuidFromManifest(const QString& id);
+    static nx::Uuid uuidFromManifest(const QString& id);
 };
 
 } // namespace nx::vms::common

@@ -83,7 +83,7 @@ MainTreeResourceItemDecorator::MainTreeResourceItemDecorator(
     entity_item_model::AbstractItemPtr sourceItem,
     Permissions permissions,
     NodeType nodeType,
-    const std::optional<QnUuid>& itemUuid)
+    const std::optional<nx::Uuid>& itemUuid)
     :
     base_type(),
     m_sourceItem(std::move(sourceItem)),

@@ -121,7 +121,7 @@ bool ProxyObjectType::hasEverBeenSupported() const
     return m_proxiedObjectType->hasEverBeenSupported();
 }
 
-bool ProxyObjectType::isSupported(QnUuid engineId, QnUuid deviceId) const
+bool ProxyObjectType::isSupported(nx::Uuid engineId, nx::Uuid deviceId) const
 {
     return m_proxiedObjectType->isSupported(engineId, deviceId);
 }

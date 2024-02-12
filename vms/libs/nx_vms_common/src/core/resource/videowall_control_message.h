@@ -52,8 +52,8 @@ public:
     QnVideoWallControlMessage(Operation operation):
         operation(operation){}
 
-    QnUuid videoWallGuid;
-    QnUuid instanceGuid;
+    nx::Uuid videoWallGuid;
+    nx::Uuid instanceGuid;
     Operation operation = Operation::Undefined;
     QHash<QString, QString> params;
 

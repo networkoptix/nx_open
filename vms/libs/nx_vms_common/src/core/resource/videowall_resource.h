@@ -35,7 +35,7 @@ public:
     void setTimelineEnabled(bool value);
 
     /** Utility method to get IDs of all online items. */
-    QList<QnUuid> onlineItems() const;
+    QList<nx::Uuid> onlineItems() const;
 
     virtual nx::vms::api::ResourceStatus getStatus() const override;
 

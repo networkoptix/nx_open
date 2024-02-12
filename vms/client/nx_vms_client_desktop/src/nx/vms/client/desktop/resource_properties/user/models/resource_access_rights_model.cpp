@@ -45,7 +45,7 @@ using namespace nx::vms::api;
 
 namespace {
 
-void modifyAccessRightMap(ResourceAccessMap& accessRightMap, const QnUuid& resourceOrGroupId,
+void modifyAccessRightMap(ResourceAccessMap& accessRightMap, const nx::Uuid& resourceOrGroupId,
     AccessRights modifiedRightsMask, bool value)
 {
     AccessSubjectEditingContext::modifyAccessRightMap(
@@ -121,7 +121,7 @@ struct ResourceAccessRightsModel::Private
 
     void updateInfo(bool suppressSignals = false);
     QVector<ResourceAccessInfo> calculateInfo() const;
-    std::vector<QnUuid> getGroupContents(const QnUuid& groupId) const;
+    std::vector<nx::Uuid> getGroupContents(const nx::Uuid& groupId) const;
 
     bool isEditable(int index) const;
 
@@ -166,7 +166,7 @@ void ResourceAccessRightsModel::setContext(AccessSubjectEditingContext* value)
 
         d->contextConnections <<
             connect(d->context, &AccessSubjectEditingContext::resourceGroupsChanged, this,
-                [this](const QSet<QnUuid>& resourceGroupIds)
+                [this](const QSet<nx::Uuid>& resourceGroupIds)
                 {
                     if (resourceGroupIds.contains(d->item.target.groupId()))
                         d->updateInfo();
@@ -335,7 +335,7 @@ void ResourceAccessRightsModel::registerQmlTypes()
     qRegisterMetaType<QVector<AccessRight>>();
     qRegisterMetaType<QVector<ResourceAccessInfo>>();
     qRegisterMetaType<QVector<ResourceAccessTreeItem>>();
-    qRegisterMetaType<QVector<QnUuid>>();
+    qRegisterMetaType<QVector<nx::Uuid>>();
     qRegisterMetaType<QVector<QnResource*>>();
 
     qmlRegisterUncreatableType<ResourceAccessInfo>("nx.vms.client.desktop", 1, 0,
@@ -480,7 +480,7 @@ QVector<ResourceAccessInfo> ResourceAccessRightsModel::Private::calculateInfo() 
 
         if (newInfo.providedVia != ResourceAccessInfo::ProvidedVia::none)
         {
-            const QSet<QnUuid> providerIds{details.keyBegin(), details.keyEnd()};
+            const QSet<nx::Uuid> providerIds{details.keyBegin(), details.keyEnd()};
 
             // Show only the direct parents which provide current access rights.
             const auto directParents =
@@ -504,8 +504,8 @@ QVector<ResourceAccessInfo> ResourceAccessRightsModel::Private::calculateInfo() 
     return result;
 }
 
-std::vector<QnUuid> ResourceAccessRightsModel::Private::getGroupContents(
-    const QnUuid& groupId) const
+std::vector<nx::Uuid> ResourceAccessRightsModel::Private::getGroupContents(
+    const nx::Uuid& groupId) const
 {
     // Only special resource groups are supported at this time.
 
@@ -516,7 +516,7 @@ std::vector<QnUuid> ResourceAccessRightsModel::Private::getGroupContents(
     if (groupResources.empty())
         return {};
 
-    std::vector<QnUuid> result;
+    std::vector<nx::Uuid> result;
     result.reserve(groupResources.size());
     std::transform(groupResources.begin(), groupResources.end(), std::back_inserter(result),
         [](const QnResourcePtr& resource) { return resource->getId(); });

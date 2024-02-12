@@ -93,7 +93,7 @@ public:
     friend void ec2::fromResourceToApi(const QnUserResourcePtr&, nx::vms::api::UserData&);
     friend void ec2::fromApiToResource(const nx::vms::api::UserData&, const QnUserResourcePtr&);
 
-    static const QnUuid kAdminGuid;
+    static const nx::Uuid kAdminGuid;
     static const QString kIntegrationRequestDataProperty;
 
     QnUserResource(nx::vms::api::UserType userType, nx::vms::api::UserExternalId externalId);
@@ -147,10 +147,10 @@ public:
      */
     bool isBuiltInAdmin() const;
 
-    std::vector<QnUuid> groupIds() const;
-    void setGroupIds(const std::vector<QnUuid>& value);
+    std::vector<nx::Uuid> groupIds() const;
+    void setGroupIds(const std::vector<nx::Uuid>& value);
 
-    void setResourceAccessRights(const std::map<QnUuid, nx::vms::api::AccessRights>& value);
+    void setResourceAccessRights(const std::map<nx::Uuid, nx::vms::api::AccessRights>& value);
 
     bool isEnabled() const;
     void setEnabled(bool isEnabled);
@@ -172,7 +172,7 @@ public:
     void setIntegrationRequestData(
         std::optional<nx::vms::api::analytics::IntegrationRequestData> integrationRequestData);
 
-    std::map<QnUuid, nx::vms::api::AccessRights> ownResourceAccessRights() const;
+    std::map<nx::Uuid, nx::vms::api::AccessRights> ownResourceAccessRights() const;
 
     virtual nx::vms::api::ResourceStatus getStatus() const override;
 
@@ -186,7 +186,7 @@ public:
 
 signals:
     void permissionsChanged(const QnUserResourcePtr& user);
-    void userGroupsChanged(const QnUserResourcePtr& user, const std::vector<QnUuid>& previousRoleIds);
+    void userGroupsChanged(const QnUserResourcePtr& user, const std::vector<nx::Uuid>& previousRoleIds);
 
     void enabledChanged(const QnUserResourcePtr& user);
 
@@ -217,12 +217,12 @@ private:
     QByteArray m_cryptSha512Hash;
     QString m_realm;
     std::atomic<GlobalPermissions> m_permissions;
-    std::vector<QnUuid> m_groupIds;
+    std::vector<nx::Uuid> m_groupIds;
     std::atomic<bool> m_isAdministratorCache{false};
     std::atomic<bool> m_isEnabled{true};
     QString m_email;
     QString m_fullName;
     nx::vms::api::UserExternalId m_externalId;
     nx::vms::api::UserAttributes m_attributes;
-    std::map<QnUuid, nx::vms::api::AccessRights> m_resourceAccessRights;
+    std::map<nx::Uuid, nx::vms::api::AccessRights> m_resourceAccessRights;
 };

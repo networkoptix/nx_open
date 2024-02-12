@@ -20,7 +20,7 @@ signals:
     void addedOrUpdated(
         const nx::vms::api::VideowallData& videowall, ec2::NotificationSource source);
 
-    void removed(const QnUuid& id, ec2::NotificationSource source);
+    void removed(const nx::Uuid& id, ec2::NotificationSource source);
     void controlMessage(const nx::vms::api::VideowallControlMessageData& message);
 };
 
@@ -46,11 +46,11 @@ public:
     ErrorCode saveSync(const nx::vms::api::VideowallData& data);
 
     virtual int remove(
-        const QnUuid& id,
+        const nx::Uuid& id,
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) = 0;
 
-    ErrorCode removeSync(const QnUuid& id);
+    ErrorCode removeSync(const nx::Uuid& id);
 
     virtual int sendControlMessage(
         const nx::vms::api::VideowallControlMessageData& data,

@@ -126,9 +126,9 @@ public:
     void setCustomRotation(core::StandardRotation value);
     void setRecordingEnabled(bool value);
     void setAudioEnabled(bool value);
-    void setAudioInputDeviceId(const QnUuid& deviceId);
+    void setAudioInputDeviceId(const nx::Uuid& deviceId);
     void setTwoWayAudioEnabled(bool value);
-    void setAudioOutputDeviceId(const QnUuid& deviceId);
+    void setAudioOutputDeviceId(const nx::Uuid& deviceId);
     void setCameraHotspotsEnabled(bool value);
     void setCameraHotspotsData(const nx::vms::common::CameraHotspotDataList& cameraHotspots);
 
@@ -186,34 +186,34 @@ public:
     void generateLogicalId();
     void resetExpertSettings();
 
-    Q_INVOKABLE QnUuid resourceId() const;
+    Q_INVOKABLE nx::Uuid resourceId() const;
     Q_INVOKABLE QVariantList analyticsEngines() const;
     void setAnalyticsEngines(const QList<AnalyticsEngineInfo>& value);
     Q_INVOKABLE QVariantList userEnabledAnalyticsEngines() const;
-    void setUserEnabledAnalyticsEngines(const QSet<QnUuid>& value);
-    Q_INVOKABLE QnUuid currentAnalyticsEngineId() const;
-    Q_INVOKABLE void setCurrentAnalyticsEngineId(const QnUuid& engineId);
+    void setUserEnabledAnalyticsEngines(const QSet<nx::Uuid>& value);
+    Q_INVOKABLE nx::Uuid currentAnalyticsEngineId() const;
+    Q_INVOKABLE void setCurrentAnalyticsEngineId(const nx::Uuid& engineId);
     Q_INVOKABLE bool analyticsSettingsLoading() const;
     Q_INVOKABLE void setUserEnabledAnalyticsEngines(const QVariantList& value);
-    Q_INVOKABLE int analyticsStreamIndex(const QnUuid& engineId) const;
-    Q_INVOKABLE void setAnalyticsStreamIndex(const QnUuid& engineId, int value);
-    void setAnalyticsStreamIndex(const QnUuid& engineId,
+    Q_INVOKABLE int analyticsStreamIndex(const nx::Uuid& engineId) const;
+    Q_INVOKABLE void setAnalyticsStreamIndex(const nx::Uuid& engineId, int value);
+    void setAnalyticsStreamIndex(const nx::Uuid& engineId,
         nx::vms::api::StreamIndex value,
         ModificationSource source = ModificationSource::local);
 
-    Q_INVOKABLE QJsonObject deviceAgentSettingsModel(const QnUuid& engineId) const;
-    Q_INVOKABLE QJsonObject deviceAgentSettingsValues(const QnUuid& engineId) const;
+    Q_INVOKABLE QJsonObject deviceAgentSettingsModel(const nx::Uuid& engineId) const;
+    Q_INVOKABLE QJsonObject deviceAgentSettingsValues(const nx::Uuid& engineId) const;
     Q_INVOKABLE void setDeviceAgentSettingsValues(
-        const QnUuid& engineId,
+        const nx::Uuid& engineId,
         const QString& activeElement,
         const QJsonObject& paramsModel,
         const QJsonObject& values);
-    void handleOverusedEngines(const QSet<QnUuid>& overusedEngines);
+    void handleOverusedEngines(const QSet<nx::Uuid>& overusedEngines);
 
-    Q_INVOKABLE void refreshDeviceAgentSettings(const QnUuid& engineId);
+    Q_INVOKABLE void refreshDeviceAgentSettings(const nx::Uuid& engineId);
     void resetDeviceAgentData(
-        const QnUuid& engineId, const DeviceAgentData& data, bool resetUser = true);
-    Q_INVOKABLE QJsonObject deviceAgentSettingsErrors(const QnUuid& engineId) const;
+        const nx::Uuid& engineId, const DeviceAgentData& data, bool resetUser = true);
+    Q_INVOKABLE QJsonObject deviceAgentSettingsErrors(const nx::Uuid& engineId) const;
 
     Q_INVOKABLE bool dualStreamingEnabled() const;
     Q_INVOKABLE bool recordingEnabled() const;

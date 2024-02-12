@@ -35,19 +35,19 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(BookmarkSharingSettings, (json), BookmarkSharin
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(BookmarkDescriptionRequest,
     (json), BookmarkDescriptionRequest_Fields)
 
-QnUuid BookmarkIdV3::bookmarkIdFromCombined(const QString& id)
+nx::Uuid BookmarkIdV3::bookmarkIdFromCombined(const QString& id)
 {
     if (id.isEmpty())
         return {};
 
     const auto p = findIdSeparator(id, '_');
     if (!p)
-        return QnUuid::fromStringSafe(id);
+        return nx::Uuid::fromStringSafe(id);
 
-    return QnUuid::fromStringSafe(id.mid(0, *p));
+    return nx::Uuid::fromStringSafe(id.mid(0, *p));
 }
 
-QnUuid BookmarkIdV3::serverIdFromCombined(const QString& id)
+nx::Uuid BookmarkIdV3::serverIdFromCombined(const QString& id)
 {
     if (id.isEmpty())
         return {};
@@ -57,20 +57,20 @@ QnUuid BookmarkIdV3::serverIdFromCombined(const QString& id)
         return {};
 
     const auto to = findIdSeparator(id, '.');
-    return QnUuid::fromStringSafe(id.mid(*from + 1, to ? *to : -1));
+    return nx::Uuid::fromStringSafe(id.mid(*from + 1, to ? *to : -1));
 }
 
-void BookmarkIdV3::setIds(const QnUuid& bookmarkId, const QnUuid& serverId)
+void BookmarkIdV3::setIds(const nx::Uuid& bookmarkId, const nx::Uuid& serverId)
 {
     id = bookmarkId.toSimpleString() + '_' + serverId.toSimpleString();
 }
 
-QnUuid BookmarkIdV3::bookmarkId() const
+nx::Uuid BookmarkIdV3::bookmarkId() const
 {
     return bookmarkIdFromCombined(id);
 }
 
-QnUuid BookmarkIdV3::serverId() const
+nx::Uuid BookmarkIdV3::serverId() const
 {
     return serverIdFromCombined(id);
 }
@@ -98,7 +98,7 @@ QString BookmarkProtection::getProtection(
         + QString::fromStdString(hashResult.toBase64());
 }
 
-QString BookmarkProtection::getDigest(QnUuid bookmarkId, const QString& password)
+QString BookmarkProtection::getDigest(nx::Uuid bookmarkId, const QString& password)
 {
     nx::utils::QnCryptographicHash hasher(nx::utils::QnCryptographicHash::Algorithm::Sha256);
 

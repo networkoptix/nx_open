@@ -95,14 +95,14 @@ struct ServerSelectionDialog::Private: public QObject, public SystemContextAware
 {
     Private(
         const ServerSelectionDialog* owner,
-        const QnUuidSet& selectedServersIds,
+        const UuidSet& selectedServersIds,
         ServerSelectionDialog::ServerFilter filterFunctor);
     ~Private();
 
     void onItemClicked(const QModelIndex& index);
 
     const ServerSelectionDialog* q = nullptr;
-    QnUuidSet selectedServersIds;
+    UuidSet selectedServersIds;
     ServerSelectionDialog::ServerFilter filterFunctor;
 
     AbstractEntityPtr serversEntity;
@@ -113,7 +113,7 @@ struct ServerSelectionDialog::Private: public QObject, public SystemContextAware
 
 ServerSelectionDialog::Private::Private(
     const ServerSelectionDialog* owner,
-    const QnUuidSet& selectedServersIds,
+    const UuidSet& selectedServersIds,
     ServerSelectionDialog::ServerFilter filterFunctor)
     :
     SystemContextAware(owner->system()),
@@ -152,7 +152,7 @@ void ServerSelectionDialog::Private::onItemClicked(const QModelIndex& index)
 }
 
 bool ServerSelectionDialog::selectServers(
-    QnUuidSet& selectedServers,
+    UuidSet& selectedServers,
     ServerFilter filterFunctor,
     const QString& infoMessage,
     QWidget* parent)
@@ -174,7 +174,7 @@ bool ServerSelectionDialog::selectServers(
 }
 
 ServerSelectionDialog::ServerSelectionDialog(
-    const QnUuidSet& selectedServers,
+    const UuidSet& selectedServers,
     ServerFilter filterFunctor,
     const QString& infoMessage,
     QWidget* parent)

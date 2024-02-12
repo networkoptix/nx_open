@@ -149,14 +149,14 @@ NX_REFLECTION_INSTRUMENT(NetworkBlockData, NetworkBlockData_Fields)
 
 struct NX_VMS_API NvrNetworkRequest
 {
-    QnUuid getId() { return id; }
+    nx::Uuid getId() { return id; }
 
     /**%apidoc:string
      * Server id. Can be obtained from "id" field via `GET /rest/v{1-}/servers` or be "this" to
      * refer to the current Server.
      * %example this
      */
-    QnUuid id;
+    nx::Uuid id;
 
     NetworkPortWithPoweringModeList portPowerList;
 };

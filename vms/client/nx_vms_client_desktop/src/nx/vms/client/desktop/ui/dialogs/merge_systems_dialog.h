@@ -67,7 +67,7 @@ private:
     std::unique_ptr<Delegate> m_delegate;
     MergeSystemsTool* const m_mergeTool;
 
-    QnUuid m_mergeContextId;
+    nx::Uuid m_mergeContextId;
     std::optional<nx::vms::api::ModuleInformation> m_targetModule;
     nx::utils::Url m_url;
     nx::network::http::Credentials m_remoteOwnerCredentials;

@@ -29,8 +29,8 @@ public:
 
     virtual TextFilterSetup* textFilter() const override;
 
-    QnUuid selectedEngine() const;
-    void setSelectedEngine(const QnUuid& value);
+    nx::Uuid selectedEngine() const;
+    void setSelectedEngine(const nx::Uuid& value);
 
     QStringList selectedObjectTypes() const;
     void setSelectedObjectTypes(const QStringList& value);
@@ -66,7 +66,7 @@ public:
     static constexpr int kUnknownAvailableTrackCount = -1;
 
 signals:
-    void pluginActionRequested(const QnUuid& engineId, const QString& actionTypeId,
+    void pluginActionRequested(const nx::Uuid& engineId, const QString& actionTypeId,
         const nx::analytics::db::ObjectTrack& track, const QnVirtualCameraResourcePtr& camera,
         QPrivateSignal);
 

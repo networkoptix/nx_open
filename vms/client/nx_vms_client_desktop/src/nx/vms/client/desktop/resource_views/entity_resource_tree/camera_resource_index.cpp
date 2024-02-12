@@ -74,11 +74,11 @@ void CameraResourceIndex::onResourceRemoved(const QnResourcePtr& resource)
 
 void CameraResourceIndex::onCameraParentIdChanged(
     const QnResourcePtr& resource,
-    const QnUuid& previousParentServerId)
+    const nx::Uuid& previousParentServerId)
 {
     const auto camera = resource.staticCast<QnVirtualCameraResource>();
 
-    const QnUuid parentServerId = camera->getParentId();
+    const nx::Uuid parentServerId = camera->getParentId();
     const auto previousParentServer = m_resourcePool->getResourceById(previousParentServerId);
 
     m_camerasByServer[previousParentServerId].remove(camera);

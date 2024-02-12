@@ -116,9 +116,9 @@ public:
     static State setCustomRotation(State state, core::StandardRotation value);
     static std::pair<bool, State> setRecordingEnabled(State state, bool value);
     static State setAudioEnabled(State state, bool value);
-    static State setAudioInputDeviceId(State state, const QnUuid& deviceId);
+    static State setAudioInputDeviceId(State state, const nx::Uuid& deviceId);
     static State setTwoWayAudioEnabled(State state, bool value);
-    static State setAudioOutputDeviceId(State state, const QnUuid& deviceId);
+    static State setAudioOutputDeviceId(State state, const nx::Uuid& deviceId);
     static State setCameraHotspotsEnabled(State state, bool value);
     static State setCameraHotspotsData(State state,
         const nx::vms::common::CameraHotspotDataList& cameraHotspots);
@@ -167,21 +167,21 @@ public:
     static State resetExpertSettings(State state);
     static std::pair<bool, State> setAnalyticsEngines(
         State state, const QList<AnalyticsEngineInfo>& value);
-    static State handleOverusedEngines(State state, const QSet<QnUuid>& overusedEngines);
-    static std::pair<bool, State> setCurrentAnalyticsEngineId(State state, const QnUuid& value);
+    static State handleOverusedEngines(State state, const QSet<nx::Uuid>& overusedEngines);
+    static std::pair<bool, State> setCurrentAnalyticsEngineId(State state, const nx::Uuid& value);
 
-    static State setUserEnabledAnalyticsEngines(State state, const QSet<QnUuid>& value);
+    static State setUserEnabledAnalyticsEngines(State state, const QSet<nx::Uuid>& value);
     static State setAnalyticsStreamIndex(
-        State state, const QnUuid& engineId, State::StreamIndex value, ModificationSource source);
+        State state, const nx::Uuid& engineId, State::StreamIndex value, ModificationSource source);
 
     static std::pair<bool, State> setDeviceAgentSettingsValues(
         State state,
-        const QnUuid& engineId,
+        const nx::Uuid& engineId,
         const QString& activeElement,
         const QJsonObject& values,
         const QJsonObject& paramValues);
 
-    static State refreshDeviceAgentSettings(State state, const QnUuid& engineId);
+    static State refreshDeviceAgentSettings(State state, const nx::Uuid& engineId);
 
     /**
      * Resets Analytics Device Agent Data.
@@ -193,7 +193,7 @@ public:
      */
     static std::pair<bool, State> resetDeviceAgentData(
         State state,
-        const QnUuid& engineId,
+        const nx::Uuid& engineId,
         const DeviceAgentData& values,
         bool replaceUser = false);
 

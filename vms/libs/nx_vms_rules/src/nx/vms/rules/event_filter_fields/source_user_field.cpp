@@ -19,7 +19,7 @@ bool SourceUserField::match(const QVariant& value) const
     if (acceptAll())
         return true;
 
-    const auto userId = value.value<QnUuid>();
+    const auto userId = value.value<nx::Uuid>();
     if (ids().contains(userId))
         return true;
 

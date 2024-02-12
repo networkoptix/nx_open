@@ -47,9 +47,9 @@ class NX_VMS_RULES_API Engine: public QObject
 
 public:
     using RulePtr = std::shared_ptr<Rule>;
-    using RuleSet = std::unordered_map<QnUuid, RulePtr>;
+    using RuleSet = std::unordered_map<nx::Uuid, RulePtr>;
     using ConstRulePtr = std::shared_ptr<const Rule>;
-    using ConstRuleSet = std::unordered_map<QnUuid, ConstRulePtr>;
+    using ConstRuleSet = std::unordered_map<nx::Uuid, ConstRulePtr>;
 
     using EventConstructor = std::function<BasicEvent*()>;
     using EventFieldConstructor = std::function<EventFilterField*()>;
@@ -61,7 +61,7 @@ public:
     Engine(std::unique_ptr<Router> router, QObject* parent = nullptr);
     ~Engine();
 
-    void setId(QnUuid id);
+    void setId(nx::Uuid id);
 
     bool isEnabled() const;
     bool isOldEngineEnabled() const;
@@ -74,10 +74,10 @@ public:
     ConstRuleSet rules() const;
 
     /** Returns rule with the given id or nullptr. */
-    ConstRulePtr rule(const QnUuid& id) const;
+    ConstRulePtr rule(const nx::Uuid& id) const;
 
     /** Returns a copy of the rule with the given id or nullptr. */
-    RulePtr cloneRule(const QnUuid& id) const;
+    RulePtr cloneRule(const nx::Uuid& id) const;
 
     /** Emits corresponding signal. */
     void updateRule(const api::Rule& ruleData);
@@ -86,7 +86,7 @@ public:
     void resetRules(const std::vector<api::Rule>& rulesData);
 
     /** Removes existing rule from the engine, does nothing otherwise. Emits corresponding signal. */
-    void removeRule(QnUuid ruleId);
+    void removeRule(nx::Uuid ruleId);
 
 // Event management methods.
     /**
@@ -163,8 +163,8 @@ public:
     void toggleTimer(nx::utils::TimerEventHandler* handler, bool on);
 
 signals:
-    void ruleAddedOrUpdated(QnUuid ruleId, bool added);
-    void ruleRemoved(QnUuid ruleId);
+    void ruleAddedOrUpdated(nx::Uuid ruleId, bool added);
+    void ruleRemoved(nx::Uuid ruleId);
     void rulesReset();
 
     void actionBuilt(
@@ -197,15 +197,15 @@ private:
     std::unique_ptr<Rule> buildRule(const api::Rule& ruleData) const;
     std::unique_ptr<Rule> cloneRule(const Rule* rule) const;
 
-    void processAcceptedEvent(const QnUuid& ruleId, const EventData& eventData);
+    void processAcceptedEvent(const nx::Uuid& ruleId, const EventData& eventData);
     void processAction(const ActionPtr& action);
 
     std::unique_ptr<EventFilter> buildEventFilter(const ItemDescriptor& descriptor) const;
-    std::unique_ptr<EventFilter> buildEventFilter(QnUuid id, const QString& type) const;
+    std::unique_ptr<EventFilter> buildEventFilter(nx::Uuid id, const QString& type) const;
     std::unique_ptr<EventFilterField> buildEventField(const api::Field& serialized) const;
 
     std::unique_ptr<ActionBuilder> buildActionBuilder(const ItemDescriptor& descriptor) const;
-    std::unique_ptr<ActionBuilder> buildActionBuilder(QnUuid id, const QString& type) const;
+    std::unique_ptr<ActionBuilder> buildActionBuilder(nx::Uuid id, const QString& type) const;
     std::unique_ptr<ActionBuilderField> buildActionField(const api::Field& serialized) const;
 
     /**
@@ -223,7 +223,7 @@ private:
     bool m_enabled = false;
     bool m_oldEngineEnabled = true;
 
-    QnUuid m_id;
+    nx::Uuid m_id;
     std::unique_ptr<Router> m_router;
 
     QList<QPointer<EventConnector>> m_connectors;

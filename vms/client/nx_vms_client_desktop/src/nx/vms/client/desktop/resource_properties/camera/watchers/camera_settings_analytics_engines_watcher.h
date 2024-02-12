@@ -21,7 +21,7 @@ public:
     virtual ~CameraSettingsAnalyticsEnginesWatcherInterface() = default;
 
     virtual QList<AnalyticsEngineInfo> engineInfoList() const = 0;
-    virtual nx::vms::api::StreamIndex analyzedStreamIndex(const QnUuid& engineId) const = 0;
+    virtual nx::vms::api::StreamIndex analyzedStreamIndex(const nx::Uuid& engineId) const = 0;
 };
 
 class CameraSettingsAnalyticsEnginesWatcher:
@@ -40,7 +40,7 @@ public:
     void setCamera(const QnVirtualCameraResourcePtr& camera);
 
     virtual QList<AnalyticsEngineInfo> engineInfoList() const override;
-    virtual nx::vms::api::StreamIndex analyzedStreamIndex(const QnUuid& engineId) const override;
+    virtual nx::vms::api::StreamIndex analyzedStreamIndex(const nx::Uuid& engineId) const override;
 
 private:
     class Private;

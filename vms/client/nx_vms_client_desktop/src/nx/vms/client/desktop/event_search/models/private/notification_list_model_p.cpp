@@ -131,7 +131,7 @@ QnVirtualCameraResourceList getAlarmCameras(
     return alarmCameras;
 }
 
-QnResourcePtr getResource(QnUuid resourceId, const QString& cloudSystemId)
+QnResourcePtr getResource(nx::Uuid resourceId, const QString& cloudSystemId)
 {
     if (resourceId.isNull())
         return {};
@@ -155,7 +155,7 @@ QnVirtualCameraResourceList getActionDevices(
     const QString& cloudSystemId)
 {
     auto deviceIds = action->deviceIds();
-    deviceIds.removeAll(QnUuid());
+    deviceIds.removeAll(nx::Uuid());
 
     if (deviceIds.isEmpty())
         return {};
@@ -496,7 +496,7 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
     }
 
     EventData eventData;
-    eventData.id = actionHasId ? actionId : QnUuid::createUuid();
+    eventData.id = actionHasId ? actionId : nx::Uuid::createUuid();
     eventData.title = title;
     eventData.description = description(params);
     eventData.toolTip = tooltip(action);
@@ -738,11 +738,11 @@ void NotificationListModel::Private::removeNotification(const vms::event::Abstra
         q->removeEvent(id);
 }
 
-void NotificationListModel::Private::removeAllItems(QnUuid ruleId)
+void NotificationListModel::Private::removeAllItems(nx::Uuid ruleId)
 {
     if (auto it = m_uuidHashes.find(ruleId); it != m_uuidHashes.end())
     {
-        QnUuidSet itemsToRemove;
+        UuidSet itemsToRemove;
         for (const auto& idSet: *it)
             itemsToRemove.unite(idSet);
 
@@ -752,7 +752,7 @@ void NotificationListModel::Private::removeAllItems(QnUuid ruleId)
 }
 
 void NotificationListModel::Private::setupAcknowledgeAction(EventData& eventData,
-    const QnUuid& cameraId, const nx::vms::event::AbstractActionPtr& action)
+    const nx::Uuid& cameraId, const nx::vms::event::AbstractActionPtr& action)
 {
     if (action->actionType() != vms::api::ActionType::showPopupAction)
     {

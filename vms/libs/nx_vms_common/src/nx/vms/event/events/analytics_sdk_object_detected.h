@@ -20,9 +20,9 @@ public:
         const nx::common::metadata::ObjectMetadataPacketPtr& packet,
         const nx::common::metadata::ObjectMetadata& metadata);
 
-    QnUuid engineId() const;
+    nx::Uuid engineId() const;
     const QString& objectTypeId() const;
-    QnUuid objectTrackId() const;
+    nx::Uuid objectTrackId() const;
 
     virtual EventParameters getRuntimeParams() const override;
     virtual EventParameters getRuntimeParamsEx(

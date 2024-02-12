@@ -22,7 +22,7 @@ class NX_VMS_CLIENT_CORE_API KnownServerConnections: public QObject
 public:
     struct Connection
     {
-        QnUuid serverId;
+        nx::Uuid serverId;
         nx::utils::Url url;
 
         bool operator==(const Connection& other) const = default;
@@ -32,7 +32,7 @@ public:
     ~KnownServerConnections();
 
     void start();
-    void saveConnection(const QnUuid& serverId, nx::network::SocketAddress address);
+    void saveConnection(const nx::Uuid& serverId, nx::network::SocketAddress address);
 
 private:
     struct Private;

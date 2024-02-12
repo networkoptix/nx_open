@@ -410,7 +410,7 @@ void NavigationWidget::showMessage(const QString& text)
     m_messages.insert(id);
 
     connect(SceneBanners::instance(), &SceneBanners::removed, this,
-        [this](const QnUuid& id) { m_messages.remove(id); });
+        [this](const nx::Uuid& id) { m_messages.remove(id); });
 }
 
 void NavigationWidget::at_stepBackwardButton_clicked()

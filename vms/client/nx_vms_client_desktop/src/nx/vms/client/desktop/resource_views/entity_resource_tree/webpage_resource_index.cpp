@@ -39,7 +39,7 @@ QVector<QnResourcePtr> WebPageResourceIndex::allProxiedWebResources() const
     return result;
 }
 
-QVector<QnResourcePtr> WebPageResourceIndex::webPagesOnServer(const QnUuid& serverId) const
+QVector<QnResourcePtr> WebPageResourceIndex::webPagesOnServer(const nx::Uuid& serverId) const
 {
     const auto& webPagesSet = m_webPagesByServer.value(serverId);
     return QVector<QnResourcePtr>(webPagesSet.cbegin(), webPagesSet.cend());
@@ -81,11 +81,11 @@ void WebPageResourceIndex::onResourceRemoved(const QnResourcePtr& resource)
 
 void WebPageResourceIndex::onWebPageParentIdChanged(
     const QnResourcePtr& resource,
-    const QnUuid& previousParentServerId)
+    const nx::Uuid& previousParentServerId)
 {
     const auto webPage = resource.staticCast<QnWebPageResource>();
 
-    const QnUuid parentServerId = webPage->getParentId();
+    const nx::Uuid parentServerId = webPage->getParentId();
     const auto previousParentServer = m_resourcePool->getResourceById(previousParentServerId);
 
     m_webPagesByServer[previousParentServerId].remove(webPage);

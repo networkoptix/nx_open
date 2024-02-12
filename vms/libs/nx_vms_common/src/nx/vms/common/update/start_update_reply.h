@@ -11,7 +11,7 @@ namespace nx::vms::common::update {
 struct NX_VMS_COMMON_API StartUpdateReply
 {
     Information info;
-    QList<QnUuid> persistentStorageServers;
+    QList<nx::Uuid> persistentStorageServers;
 };
 
 #define StartUpdateReply_Fields \

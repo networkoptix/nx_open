@@ -15,7 +15,7 @@ using namespace nx::vms::client::core;
 
 namespace {
 
-static const QnUuid kDesktopResourceUuid("{B3B2235F-D279-4d28-9012-00DE1002A61D}");
+static const nx::Uuid kDesktopResourceUuid("{B3B2235F-D279-4d28-9012-00DE1002A61D}");
 
 } // namespace
 
@@ -36,7 +36,7 @@ DesktopResource::~DesktopResource()
     disconnectFromServer();
 }
 
-QnUuid DesktopResource::getDesktopResourceUuid()
+nx::Uuid DesktopResource::getDesktopResourceUuid()
 {
     return kDesktopResourceUuid;
 }
@@ -48,7 +48,7 @@ bool DesktopResource::isConnected() const
 
 void DesktopResource::initializeConnection(
     const QnMediaServerResourcePtr& server,
-    const QnUuid& userId)
+    const nx::Uuid& userId)
 {
     NX_ASSERT(!m_connection, "Double initialization");
     disconnectFromServer();
@@ -81,7 +81,7 @@ AudioLayoutConstPtr DesktopResource::getAudioLayout(
     return nullptr;
 }
 
-QString DesktopResource::calculateUniqueId(const QnUuid& moduleId, const QnUuid& userId)
+QString DesktopResource::calculateUniqueId(const nx::Uuid& moduleId, const nx::Uuid& userId)
 {
     return moduleId.toString() + userId.toString();
 }

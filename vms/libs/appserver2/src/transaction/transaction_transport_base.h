@@ -98,7 +98,7 @@ public:
 
     /** Initializer for incoming connection. */
     QnTransactionTransportBase(
-        const QnUuid& localSystemId,
+        const nx::Uuid& localSystemId,
         const std::string& connectionGuid,
         ConnectionLockGuard connectionLockGuard,
         const nx::vms::api::PeerData& localPeer,
@@ -112,7 +112,7 @@ public:
 
     //!Initializer for outgoing connection
     QnTransactionTransportBase(
-        const QnUuid& localSystemId,
+        const nx::Uuid& localSystemId,
         ConnectionGuardSharedState* const connectionGuardSharedState,
         const nx::vms::api::PeerData& localPeer,
         std::chrono::milliseconds tcpKeepAliveTimeout,
@@ -227,8 +227,8 @@ signals:
         QByteArray data,
         const QnTransactionTransportHeader &transportHeader);
     void stateChanged(State state);
-    void remotePeerUnauthorized(const QnUuid& id);
-    void peerIdDiscovered(const nx::utils::Url& url, const QnUuid& id);
+    void remotePeerUnauthorized(const nx::Uuid& id);
+    void peerIdDiscovered(const nx::utils::Url& url, const nx::Uuid& id);
     void onSomeDataReceivedFromRemotePeer();
 
 protected:
@@ -259,7 +259,7 @@ private:
         none,
     };
 
-    QnUuid m_localSystemId;
+    nx::Uuid m_localSystemId;
     const nx::vms::api::PeerData m_localPeer;
     nx::vms::api::PeerData m_remotePeer;
 
@@ -329,7 +329,7 @@ private:
 
 private:
     QnTransactionTransportBase(
-        const QnUuid& localSystemId,
+        const nx::Uuid& localSystemId,
         ConnectionGuardSharedState* const connectionGuardSharedState,
         const nx::vms::api::PeerData& localPeer,
         PeerRole peerRole,
@@ -341,7 +341,7 @@ private:
     void processTransactionData( const nx::Buffer& data);
     void setStateNoLock(State state);
     void cancelConnecting();
-    static void connectingCanceledNoLock(const QnUuid& remoteGuid, bool isOriginator);
+    static void connectingCanceledNoLock(const nx::Uuid& remoteGuid, bool isOriginator);
     void addHttpChunkExtensions( nx::network::http::HttpHeaders* const transactionHeaders );
     void processChunkExtensions( const nx::network::http::HttpHeaders& httpChunkHeader );
     void onSomeBytesRead( SystemError::ErrorCode errorCode, size_t bytesRead );

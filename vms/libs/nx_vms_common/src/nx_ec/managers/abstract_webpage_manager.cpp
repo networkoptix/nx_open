@@ -25,7 +25,7 @@ ErrorCode AbstractWebPageManager::saveSync(const nx::vms::api::WebPageData& data
         });
 }
 
-ErrorCode AbstractWebPageManager::removeSync(const QnUuid& id)
+ErrorCode AbstractWebPageManager::removeSync(const nx::Uuid& id)
 {
     return detail::callSync(
         [&](auto handler)

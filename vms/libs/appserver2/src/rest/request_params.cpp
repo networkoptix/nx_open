@@ -103,7 +103,7 @@ bool parseHttpRequestParams(
     nx::vms::common::SystemContext* /*systemContext*/,
     const QString& /*command*/,
     const nx::network::rest::Params& params,
-    QnUuid* id)
+    nx::Uuid* id)
 {
     return deserialize(params, "id", id);
 }
@@ -118,7 +118,7 @@ bool parseHttpRequestParams(
     const bool result = deserialize(params, "id", &stringValue);
     if (result)
     {
-        static const QnUuid kNonExistingUuid("{11111111-1111-1111-1111-111111111111}");
+        static const nx::Uuid kNonExistingUuid("{11111111-1111-1111-1111-111111111111}");
         *id = nx::camera_id_helper::flexibleIdToId(
             systemContext->resourcePool(), stringValue);
         if (id->isNull())
@@ -137,7 +137,7 @@ bool parseHttpRequestParams(
     const bool result = deserialize(params, "id", &stringValue);
     if (result)
     {
-        static const QnUuid kNonExistingUuid("{11111111-1111-1111-1111-111111111111}");
+        static const nx::Uuid kNonExistingUuid("{11111111-1111-1111-1111-111111111111}");
         *id = nx::layout_id_helper::flexibleIdToId(
             systemContext->resourcePool(), stringValue);
         if (id->isNull())
@@ -146,7 +146,7 @@ bool parseHttpRequestParams(
     return result;
 }
 
-void toUrlParams(const QnUuid& id, QUrlQuery* query)
+void toUrlParams(const nx::Uuid& id, QUrlQuery* query)
 {
     serialize(id, "id", query);
 }

@@ -23,7 +23,7 @@ static const network::RetryPolicy kReconnectPolicy(
     network::RetryPolicy::kInfiniteRetries,
     std::chrono::milliseconds(100), 2, std::chrono::seconds(1), 0);
 
-struct SystemIds { QnUuid local; QString cloud; };
+struct SystemIds { nx::Uuid local; QString cloud; };
 
 class DiscoveryModuleConnector: public testing::Test
 {
@@ -50,7 +50,7 @@ public:
             });
 
         connector->setDisconnectHandler(
-            [this](QnUuid id)
+            [this](nx::Uuid id)
             {
                 NX_MUTEX_LOCKER lock(&m_mutex);
                 const auto iterator = m_knownServers.find(id);
@@ -79,7 +79,7 @@ public:
         connector.reset();
     }
 
-    void expectConnect(const QnUuid& id, const nx::network::SocketAddress& endpoint)
+    void expectConnect(const nx::Uuid& id, const nx::network::SocketAddress& endpoint)
     {
         NX_INFO(this, nx::format("Excpecting connect to %1 on %2").args(id, endpoint));
 
@@ -92,7 +92,7 @@ public:
         }
     }
 
-    void expectDisconnect(const QnUuid& id)
+    void expectDisconnect(const nx::Uuid& id)
     {
         NX_INFO(this, nx::format("Excpecting disconnect of %1").arg(id));
 
@@ -105,7 +105,7 @@ public:
         }
     }
 
-    void expectConflict(const QnUuid& serverId, const SystemIds& left, const SystemIds& right)
+    void expectConflict(const nx::Uuid& serverId, const SystemIds& left, const SystemIds& right)
     {
         NX_MUTEX_LOCKER lock(&m_mutex);
         const auto start = std::chrono::steady_clock::now();
@@ -124,7 +124,7 @@ public:
         }
     }
 
-    void expectNoUnexpectedConflicts(const std::set<QnUuid>& serverIds)
+    void expectNoUnexpectedConflicts(const std::set<nx::Uuid>& serverIds)
     {
         for (const auto& [l, r] : m_conflicts)
         {
@@ -149,9 +149,9 @@ public:
     }
 
     nx::network::SocketAddress addMediaserver(
-        QnUuid id,
+        nx::Uuid id,
         nx::network::HostAddress ip = nx::network::HostAddress::localhost,
-        QnUuid localSystemId = QnUuid::createUuid(),
+        nx::Uuid localSystemId = nx::Uuid::createUuid(),
         QString cloudSystemId = QString())
     {
         auto server = std::make_unique<Server>(id, std::move(localSystemId), std::move(cloudSystemId));
@@ -200,7 +200,7 @@ private:
         nx::utils::Lockable<nx::vms::api::ModuleInformation> info;
         nx::network::http::TestHttpServer http;
 
-        Server(QnUuid id, QnUuid localSystemId, QString cloudSystemId)
+        Server(nx::Uuid id, nx::Uuid localSystemId, QString cloudSystemId)
         {
             info.lock()->id = std::move(id);
             info.lock()->localSystemId = std::move(localSystemId);
@@ -223,7 +223,7 @@ private:
 
     nx::Mutex m_mutex;
     nx::WaitCondition m_condition;
-    std::map<QnUuid, nx::network::SocketAddress> m_knownServers;
+    std::map<nx::Uuid, nx::network::SocketAddress> m_knownServers;
     std::vector<std::pair<api::ModuleInformation, api::ModuleInformation>> m_conflicts;
 };
 
@@ -250,12 +250,12 @@ struct DnsAlias
 
 TEST_F(DiscoveryModuleConnector, AddEndpoints)
 {
-    const auto id1 = QnUuid::createUuid();
+    const auto id1 = nx::Uuid::createUuid();
     const auto endpoint1 = addMediaserver(id1);
     connector->newEndpoints({endpoint1}, id1);
     expectConnect(id1, endpoint1);
 
-    const auto id2 = QnUuid::createUuid();
+    const auto id2 = nx::Uuid::createUuid();
     const auto endpoint2 = addMediaserver(id2);
     connector->newEndpoints({endpoint2});
     expectConnect(id2, endpoint2);
@@ -273,9 +273,9 @@ TEST_F(DiscoveryModuleConnector, AddEndpoints)
 
 TEST_F(DiscoveryModuleConnector, DISABLED_EndpointConflict)
 {
-    const auto serverId1 = QnUuid::createUuid();
-    const auto localSystemId1 = QnUuid::createUuid();
-    const auto localSystemId2 = QnUuid::createUuid();
+    const auto serverId1 = nx::Uuid::createUuid();
+    const auto localSystemId1 = nx::Uuid::createUuid();
+    const auto localSystemId2 = nx::Uuid::createUuid();
 
     const auto endpoint1 = addMediaserver(serverId1, nx::network::HostAddress::localhost, localSystemId1, "");
     connector->newEndpoints({endpoint1}, serverId1);
@@ -285,9 +285,9 @@ TEST_F(DiscoveryModuleConnector, DISABLED_EndpointConflict)
 
     expectConflict(serverId1, {localSystemId1, ""}, {localSystemId2, ""});
 
-    const auto serverId2 = QnUuid::createUuid();
-    const auto localSystemId3 = QnUuid();
-    const auto localSystemId4 = QnUuid::createUuid();
+    const auto serverId2 = nx::Uuid::createUuid();
+    const auto localSystemId3 = nx::Uuid();
+    const auto localSystemId4 = nx::Uuid::createUuid();
 
     const auto endpoint3 = addMediaserver(serverId2, nx::network::HostAddress::localhost, localSystemId3, "");
     connector->newEndpoints({endpoint3}, serverId2);
@@ -297,8 +297,8 @@ TEST_F(DiscoveryModuleConnector, DISABLED_EndpointConflict)
 
     expectConflict(serverId2, {localSystemId3, ""}, {localSystemId4, ""});
 
-    const auto serverId3 = QnUuid::createUuid();
-    const auto localSystemId5 = QnUuid::createUuid();
+    const auto serverId3 = nx::Uuid::createUuid();
+    const auto localSystemId5 = nx::Uuid::createUuid();
     const QString cloudSystemId = "abcdef";
 
     const auto endpoint5 = addMediaserver(serverId3, nx::network::HostAddress::localhost, localSystemId5, cloudSystemId);
@@ -314,7 +314,7 @@ TEST_F(DiscoveryModuleConnector, DISABLED_EndpointConflict)
 
 TEST_F(DiscoveryModuleConnector, forgetModule)
 {
-    const auto id = QnUuid::createUuid();
+    const auto id = nx::Uuid::createUuid();
     const auto endpoint = addMediaserver(id);
     connector->newEndpoints({endpoint});
     expectConnect(id, endpoint);
@@ -327,7 +327,7 @@ TEST_F(DiscoveryModuleConnector, ActivateDiactivate)
     connector->deactivate();
     std::this_thread::sleep_for(kExpectNoChanesDelay);
 
-    const auto id = QnUuid::createUuid();
+    const auto id = nx::Uuid::createUuid();
     const auto endpoint1 = addMediaserver(id);
     connector->newEndpoints({endpoint1});
     expectNoChanges();
@@ -356,7 +356,7 @@ TEST_F(DiscoveryModuleConnector, EndpointPriority)
     if (interfaceIpsV4.empty())
         return;
 
-    const auto id = QnUuid::createUuid();
+    const auto id = nx::Uuid::createUuid();
     connector->deactivate();
 
     const auto networkEndpoint = addMediaserver(id, interfaceIpsV4.begin()->toStdString());
@@ -373,7 +373,7 @@ TEST_F(DiscoveryModuleConnector, EndpointPriority)
     connector->newEndpoints({newLocalEndpoint}, id);
     expectConnect(id, newLocalEndpoint); //< New local is prioritized.
 
-    const auto cloudSystemId = QnUuid::createUuid().toSimpleString();
+    const auto cloudSystemId = nx::Uuid::createUuid().toSimpleString();
     const DnsAlias dnsEndpoint(addMediaserver(id), "local-domain-name-1.com");
     const DnsAlias cloudEndpoint(addMediaserver(id), (id.toSimpleString() + "." + cloudSystemId).toStdString());
 
@@ -399,7 +399,7 @@ TEST_F(DiscoveryModuleConnector, EndpointPriority)
 
 TEST_F(DiscoveryModuleConnector, IgnoredEndpoints)
 {
-    const auto id = QnUuid::createUuid();
+    const auto id = nx::Uuid::createUuid();
     connector->deactivate();
     std::this_thread::sleep_for(kExpectNoChanesDelay);
 
@@ -431,13 +431,13 @@ TEST_F(DiscoveryModuleConnector, IgnoredEndpoints)
 // This unit test is just for easy debug agains real mediaserver.
 TEST_F(DiscoveryModuleConnector, DISABLED_RealLocalServer)
 {
-    connector->newEndpoints({ nx::network::SocketAddress("127.0.0.1:7001") }, QnUuid());
+    connector->newEndpoints({ nx::network::SocketAddress("127.0.0.1:7001") }, nx::Uuid());
     std::this_thread::sleep_for(std::chrono::hours(1));
 }
 
 TEST_F(DiscoveryModuleConnector, IgnoredEndpointsByStrings)
 {
-    const auto firstId = QnUuid::createUuid();
+    const auto firstId = nx::Uuid::createUuid();
     const auto firstEndpoint1 = addMediaserver(firstId);
     const auto firstEndpoint2 = addMediaserver(firstId);
 
@@ -448,7 +448,7 @@ TEST_F(DiscoveryModuleConnector, IgnoredEndpointsByStrings)
     connector->setForbiddenEndpoints({firstEndpoint1.toString()}, firstId);
     expectConnect(firstId, firstEndpoint2); //< Switch to a single avaliable.
 
-    const auto secondId = QnUuid::createUuid();
+    const auto secondId = nx::Uuid::createUuid();
     const auto secondEndpoint1 = addMediaserver(secondId);
     const auto secondEndpoint2 = addMediaserver(secondId);
 

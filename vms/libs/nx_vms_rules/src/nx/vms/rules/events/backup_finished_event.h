@@ -12,7 +12,7 @@ class NX_VMS_RULES_API BackupFinishedEvent: public BasicEvent
     Q_OBJECT
     Q_CLASSINFO("type", "nx.events.archiveBackupFinished")
 
-    FIELD(QnUuid, serverId, setServerId)
+    FIELD(nx::Uuid, serverId, setServerId)
 
 public:
     BackupFinishedEvent() = default;

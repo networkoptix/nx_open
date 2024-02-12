@@ -72,8 +72,8 @@ struct QnStartupParameters
     QString logLevel;
     QString logFile;
     QString lightMode;
-    QnUuid videoWallGuid;
-    QnUuid videoWallItemGuid;
+    nx::Uuid videoWallGuid;
+    nx::Uuid videoWallItemGuid;
     QString engineVersion;
     int vmsProtocolVersion = 0;
     QString ipVersion;

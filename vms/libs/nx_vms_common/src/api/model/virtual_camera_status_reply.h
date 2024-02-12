@@ -17,10 +17,10 @@ struct QnVirtualCameraStatusReply
     bool consuming = false;
 
     /**%apidoc User who has the lock, if any. */
-    QnUuid userId;
+    nx::Uuid userId;
 
     /**%apidoc Lock token if any. */
-    QnUuid token;
+    nx::Uuid token;
 
     /**%apidoc Consume progress, if ongoing. */
     int progress = 0;

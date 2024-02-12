@@ -59,16 +59,16 @@ public:
     ~MessageBus() override;
 
     virtual void addOutgoingConnectionToPeer(
-        const QnUuid& id,
+        const nx::Uuid& id,
         nx::vms::api::PeerType peerType,
         const nx::utils::Url& url,
         std::optional<nx::network::http::Credentials> credentials,
         nx::network::ssl::AdapterFunc adapterFunc) override;
-    virtual void removeOutgoingConnectionFromPeer(const QnUuid& id) override;
+    virtual void removeOutgoingConnectionFromPeer(const nx::Uuid& id) override;
     virtual void updateOutgoingConnection(
-        const QnUuid& id, nx::network::http::Credentials credentials) override;
+        const nx::Uuid& id, nx::network::http::Credentials credentials) override;
 
-    QMap<QnUuid, P2pConnectionPtr> connections() const;
+    QMap<nx::Uuid, P2pConnectionPtr> connections() const;
     int connectionTries() const;
 
     // Self peer information
@@ -78,11 +78,11 @@ public:
     virtual void start() override;
     virtual void stop() override;
 
-    virtual QSet<QnUuid> directlyConnectedClientPeers() const override;
-    virtual QSet<QnUuid> directlyConnectedServerPeers() const override;
-    virtual QnUuid routeToPeerVia(
-        const QnUuid& dstPeer, int* distance, nx::network::SocketAddress* knownPeerAddress) const override;
-    virtual int distanceToPeer(const QnUuid& dstPeer) const override;
+    virtual QSet<nx::Uuid> directlyConnectedClientPeers() const override;
+    virtual QSet<nx::Uuid> directlyConnectedServerPeers() const override;
+    virtual nx::Uuid routeToPeerVia(
+        const nx::Uuid& dstPeer, int* distance, nx::network::SocketAddress* knownPeerAddress) const override;
+    virtual int distanceToPeer(const nx::Uuid& dstPeer) const override;
     virtual void dropConnections() override;
     virtual ConnectionInfos connectionInfos() const override;
 
@@ -122,7 +122,7 @@ protected:
         const ec2::QnAbstractTransaction& tran,
     Connection::Direction direction) const;
 
-    void deleteRemoveUrlById(const QnUuid& id);
+    void deleteRemoveUrlById(const nx::Uuid& id);
 
     virtual void doPeriodicTasks();
     virtual void addOfflinePeersFromDb() {}
@@ -144,7 +144,7 @@ protected:
     virtual void onThreadStopped() {}
 
 protected:
-    static QString peerName(const QnUuid& id);
+    static QString peerName(const nx::Uuid& id);
     QMap<vms::api::PersistentIdData, P2pConnectionPtr> getCurrentSubscription() const;
 
     /**  Local connections are not supposed to be shown in 'aliveMessage' */
@@ -192,7 +192,7 @@ private:
      * This function sends removeRuntimeInfoData transactions to the all connected clients
      * about peer with specified id.
      */
-    void sendRuntimeInfoRemovedToClients(const QnUuid& id);
+    void sendRuntimeInfoRemovedToClients(const nx::Uuid& id);
 private slots:
     void at_gotMessage(QWeakPointer<ConnectionBase> connection, MessageType messageType, const nx::Buffer& payload);
     void at_stateChanged(QWeakPointer<ConnectionBase> connection, Connection::State state);
@@ -208,7 +208,7 @@ public:
         const vms::api::PersistentIdData& peer,
         const QMap<vms::api::PersistentIdData, P2pConnectionPtr>& currentSubscription) const;
     bool needStartConnection(
-        const QnUuid& peerId,
+        const nx::Uuid& peerId,
         const QMap<vms::api::PersistentIdData, P2pConnectionPtr>& currentSubscription) const;
     static ConnectionContext* context(const P2pConnectionPtr& connection);
 
@@ -260,19 +260,19 @@ protected:
     private:
         const MessageBus* owner;
     } m_miscData;
-    QMap<QnUuid, P2pConnectionPtr> m_connections; //< Actual connection list
+    QMap<nx::Uuid, P2pConnectionPtr> m_connections; //< Actual connection list
     QElapsedTimer m_lastPeerInfoTimer;
     QMap<vms::api::PersistentIdData, vms::api::RuntimeData> m_lastRuntimeInfo;
 protected:
     void dropConnectionsThreadUnsafe();
 private:
-    QMap<QnUuid, P2pConnectionPtr> m_outgoingConnections; //< Temporary list of outgoing connections
+    QMap<nx::Uuid, P2pConnectionPtr> m_outgoingConnections; //< Temporary list of outgoing connections
 
     struct RemoteConnection
     {
         RemoteConnection() {}
         RemoteConnection(
-            const QnUuid& peerId,
+            const nx::Uuid& peerId,
             nx::vms::api::PeerType peerType,
             const nx::utils::Url& url,
             std::optional<nx::network::http::Credentials> credentials,
@@ -286,7 +286,7 @@ private:
         {
         }
 
-        QnUuid peerId;
+        nx::Uuid peerId;
         nx::vms::api::PeerType peerType = nx::vms::api::PeerType::notDefined;
         nx::utils::Url url;
         std::optional<nx::network::http::Credentials> credentials;
@@ -306,7 +306,7 @@ private:
     QElapsedTimer m_outConnectionsTimer;
     std::set<vms::api::PeerData> m_lastAlivePeers;
     std::atomic<bool> m_started{false};
-    QMap<QnUuid, Connection::State> m_lastConnectionState;
+    QMap<nx::Uuid, Connection::State> m_lastConnectionState;
 };
 
 } // namespace p2p

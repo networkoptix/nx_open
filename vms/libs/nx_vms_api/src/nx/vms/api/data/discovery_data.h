@@ -14,7 +14,7 @@ namespace api {
 struct NX_VMS_API DiscoverPeerData
 {
     QString url;
-    QnUuid id;
+    nx::Uuid id;
 };
 #define DiscoverPeerData_Fields \
     (url)(id)

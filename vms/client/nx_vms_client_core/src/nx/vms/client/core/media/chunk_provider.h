@@ -18,7 +18,7 @@ class NX_VMS_CLIENT_CORE_API ChunkProvider:
     Q_OBJECT
     using base_type = AbstractTimePeriodStorage;
 
-    Q_PROPERTY(QnUuid resourceId READ resourceId WRITE setResourceId NOTIFY resourceIdChanged)
+    Q_PROPERTY(nx::Uuid resourceId READ resourceId WRITE setResourceId NOTIFY resourceIdChanged)
     Q_PROPERTY(qint64 bottomBound READ bottomBound NOTIFY bottomBoundChanged)
     Q_PROPERTY(bool loading READ isLoading NOTIFY loadingChanged)
     Q_PROPERTY(bool loadingMotion READ isLoadingMotion NOTIFY loadingMotionChanged)
@@ -27,8 +27,8 @@ class NX_VMS_CLIENT_CORE_API ChunkProvider:
 public:
     ChunkProvider(QObject* parent = nullptr);
 
-    QnUuid resourceId() const;
-    void setResourceId(const QnUuid& id);
+    nx::Uuid resourceId() const;
+    void setResourceId(const nx::Uuid& id);
 
     virtual const QnTimePeriodList& periods(Qn::TimePeriodContent type) const override;
     qint64 bottomBound() const;

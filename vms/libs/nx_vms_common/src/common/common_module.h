@@ -44,8 +44,8 @@ public:
     //---------------------------------------------------------------------------------------------
     // Temporary methods for the migration simplification.
     nx::vms::common::AbstractCertificateVerifier* certificateVerifier() const;
-    QnUuid peerId() const;
-    QnUuid sessionId() const;
+    nx::Uuid peerId() const;
+    nx::Uuid sessionId() const;
     QnLicensePool* licensePool() const;
     QnRuntimeInfoManager* runtimeInfoManager() const;
     QnResourcePool* resourcePool() const;

@@ -8,7 +8,7 @@ QnSelectCamerasDialogButton::QnSelectCamerasDialogButton(QWidget* parent):
     base_type(parent)
 {
     m_selectCamerasFunction =
-        [this](QnUuidSet& resources)
+        [this](UuidSet& resources)
         {
             return CameraSelectionDialog::selectCameras<CameraSelectionDialog::DummyPolicy>(
                 resources, this);

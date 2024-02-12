@@ -12,7 +12,7 @@ class NX_VMS_RULES_API TextOverlayAction: public BasicAction
     Q_OBJECT
     Q_CLASSINFO("type", "nx.actions.textOverlay")
 
-    FIELD(QnUuidList, deviceIds, setDeviceIds)
+    FIELD(UuidList, deviceIds, setDeviceIds)
     FIELD(nx::vms::rules::UuidSelection, users, setUsers)
     FIELD(std::chrono::microseconds, duration, setDuration)
     FIELD(QString, text, setText)

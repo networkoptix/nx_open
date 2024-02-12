@@ -41,7 +41,7 @@ NX_REFLECTION_INSTRUMENT(DeviceGroupSettings, DeviceGroupSettings_Fields)
 struct NX_VMS_API DeviceModelGeneral: ResourceWithParameters
 {
     /**%apidoc Depends on `physicalId`. Calculated automatically by default. */
-    QnUuid id;
+    nx::Uuid id;
 
     /**%apidoc
      * Depends on the Device hardware and firmware. Unique per device.
@@ -58,7 +58,7 @@ struct NX_VMS_API DeviceModelGeneral: ResourceWithParameters
      * Device Driver id, can be obtained from <code>GET /rest/v{1-}/devices/&ast;/types</code>.
      * %example 1b7181ce-0227-d3f7-9443-c86aab922d96
      */
-    QnUuid typeId;
+    nx::Uuid typeId;
 
     /**%apidoc[opt]
      * %example Device 1
@@ -71,7 +71,7 @@ struct NX_VMS_API DeviceModelGeneral: ResourceWithParameters
     /**%apidoc[opt]
      * Parent Server, can be obtained from `GET /rest/v{1-}/servers`, current Server by default.
      */
-    QnUuid serverId;
+    nx::Uuid serverId;
 
     /**%apidoc[opt] */
     bool isManuallyAdded = false;
@@ -107,8 +107,8 @@ struct NX_VMS_API DeviceModelGeneral: ResourceWithParameters
         ResourceStatusDataList,
         ResourceParamWithRefDataList>;
 
-    [[nodiscard]] QnUuid getId() const { return id; }
-    void setId(QnUuid id_) { id = id_; }
+    [[nodiscard]] nx::Uuid getId() const { return id; }
+    void setId(nx::Uuid id_) { id = id_; }
     static_assert(isCreateModelV<DeviceModelGeneral>);
     static_assert(isUpdateModelV<DeviceModelGeneral>);
     static_assert(isFlexibleIdModelV<DeviceModelGeneral>);
@@ -146,7 +146,7 @@ struct DeviceOptions
     QString dewarpingParams;
 
     /**%apidoc[opt] */
-    QnUuid preferredServerId;
+    nx::Uuid preferredServerId;
 
     /**%apidoc[opt] */
     FailoverPriority failoverPriority = FailoverPriority::medium;
@@ -335,7 +335,7 @@ NX_REFLECTION_INSTRUMENT(DeviceModelV1, DeviceModelV1_Fields);
 struct NX_VMS_API DeviceModelV3: DeviceModelV1
 {
     /**%apidoc[readonly] */
-    std::vector<QnUuid> compatibleAnalyticsEngineIds;
+    std::vector<nx::Uuid> compatibleAnalyticsEngineIds;
 
     /**%apidoc[readonly] */
     CameraMediaCapability mediaCapabilities;
@@ -351,7 +351,7 @@ struct NX_VMS_API DeviceModelV3: DeviceModelV1
     //     The crash also happens when creating a new camera passing `userEnabledAnalyticsEngines`
     //     (empty or not) in `parameters` via `v{1-2}`.
     //     PATCH (or PUT with existing) works fine.
-    std::optional<std::vector<QnUuid>> userEnabledAnalyticsEngineIds;
+    std::optional<std::vector<nx::Uuid>> userEnabledAnalyticsEngineIds;
 
     DbUpdateTypes toDbTypes() &&;
     static std::vector<DeviceModelV3> fromDbTypes(DbListTypes data);
@@ -364,8 +364,8 @@ NX_REFLECTION_INSTRUMENT(DeviceModelV3, DeviceModelV3_Fields);
 
 struct NX_VMS_API DeviceTypeModel
 {
-    QnUuid id;
-    std::optional<QnUuid> parentId;
+    nx::Uuid id;
+    std::optional<nx::Uuid> parentId;
     QString name;
     QString manufacturer;
 };

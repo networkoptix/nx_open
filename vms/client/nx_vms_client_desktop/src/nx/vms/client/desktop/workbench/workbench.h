@@ -166,7 +166,7 @@ public:
      */
     void setCurrentLayoutIndex(int index);
 
-    void addSystem(QnUuid systemId, const LogonData& logonData);
+    void addSystem(nx::Uuid systemId, const LogonData& logonData);
     void addSystem(const QString& systemId, const LogonData& logonData);
 
     /**

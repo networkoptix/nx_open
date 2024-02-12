@@ -21,7 +21,7 @@ class NX_VMS_CLIENT_CORE_API AbstractCameraButtonController: public QObject,
     Q_OBJECT
     using base_type = QObject;
 
-    Q_PROPERTY(QnUuid resourceId
+    Q_PROPERTY(nx::Uuid resourceId
         READ resourceId
         WRITE setResourceId
         NOTIFY resourceIdChanged)
@@ -36,14 +36,14 @@ public:
         std::unique_ptr<nx::vms::common::SystemContextInitializer> contextInitializer,
         QObject* parent = nullptr);
 
-    QnUuid resourceId() const;
-    void setResourceId(const QnUuid& value);
+    nx::Uuid resourceId() const;
+    void setResourceId(const nx::Uuid& value);
 
     /** Returns list of the available camera buttons. */
     virtual CameraButtons buttons() const = 0;
 
     /** Returns camera button description with specified identifier. */
-    virtual OptionalCameraButton button(const QnUuid& buttonId) const = 0;
+    virtual OptionalCameraButton button(const nx::Uuid& buttonId) const = 0;
 
     /**
      * Tries to starts action for the specified button. Returns whether the start command was
@@ -52,7 +52,7 @@ public:
      * function call is finished and when the action is actually started, using
      * safeEmitActionStarted function call.
      */
-    Q_INVOKABLE virtual bool startAction(const QnUuid& buttonId) = 0;
+    Q_INVOKABLE virtual bool startAction(const nx::Uuid& buttonId) = 0;
 
     /**
      * Tries to stop action for the specified button. Returns whether the stop command was
@@ -60,7 +60,7 @@ public:
      * Should emit 'actionStopped' after current function call is finished and when the action
      * is actually stopped, using safeEmitActionStopped function call.
      */
-    Q_INVOKABLE virtual bool stopAction(const QnUuid& buttonId) = 0;
+    Q_INVOKABLE virtual bool stopAction(const nx::Uuid& buttonId) = 0;
 
     /**
      * Tries to cancel action for the specified button. Returns whether action can be cancelled.
@@ -68,34 +68,34 @@ public:
      * Should emit 'actionCancelled' after current function call is finished when the action
      * is actually cancelled, using safeEmitActionCancelled function call.
      */
-    Q_INVOKABLE virtual bool cancelAction(const QnUuid& buttonId) = 0;
+    Q_INVOKABLE virtual bool cancelAction(const nx::Uuid& buttonId) = 0;
 
     /** Returns wheter the action for the specified button is active. */
-    Q_INVOKABLE virtual bool actionIsActive(const QnUuid& buttonId) const = 0;
+    Q_INVOKABLE virtual bool actionIsActive(const nx::Uuid& buttonId) const = 0;
 
 protected:
-    void safeEmitActionStarted(const QnUuid& buttonId, bool success);
-    void safeEmitActionStopped(const QnUuid& buttonId, bool success);
-    void safeEmitActionCancelled(const QnUuid& buttonId);
+    void safeEmitActionStarted(const nx::Uuid& buttonId, bool success);
+    void safeEmitActionStopped(const nx::Uuid& buttonId, bool success);
+    void safeEmitActionCancelled(const nx::Uuid& buttonId);
 
 signals:
     void resourceIdChanged();
 
     void buttonAdded(const CameraButton& button);
     void buttonChanged(const CameraButton& button, CameraButton::Fields fields);
-    void buttonRemoved(const QnUuid& buttonId);
+    void buttonRemoved(const nx::Uuid& buttonId);
 
     /** Emitted when action for the specified button is strated with some result. */
-    void actionStarted(const QnUuid& buttonId, bool success, QPrivateSignal);
+    void actionStarted(const nx::Uuid& buttonId, bool success, QPrivateSignal);
 
     /** Emitted when action for the specified button is stooped with some result. */
-    void actionStopped(const QnUuid& buttonId, bool success, QPrivateSignal);
+    void actionStopped(const nx::Uuid& buttonId, bool success, QPrivateSignal);
 
     /** Emitted when action for the specified button is cancelled. */
-    void actionCancelled(const QnUuid& buttonId, QPrivateSignal);
+    void actionCancelled(const nx::Uuid& buttonId, QPrivateSignal);
 
 private:
-    QnUuid m_resourceId;
+    nx::Uuid m_resourceId;
 };
 
 } // namespace nx::vms::client::core

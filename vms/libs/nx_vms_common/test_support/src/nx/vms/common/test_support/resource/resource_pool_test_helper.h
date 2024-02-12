@@ -22,10 +22,10 @@ public:
     struct Ids
     {
         Ids(NoGroupTag) {}
-        Ids(const QnUuid& id): data({id}) {}
-        Ids(std::initializer_list<QnUuid> ids): data(ids) {}
+        Ids(const nx::Uuid& id): data({id}) {}
+        Ids(std::initializer_list<nx::Uuid> ids): data(ids) {}
 
-        std::vector<QnUuid> data;
+        std::vector<nx::Uuid> data;
     };
 
     static constexpr auto kTestUserName = "user";
@@ -36,7 +36,7 @@ public:
         const QString& name = kTestUserName,
         nx::vms::api::UserType userType = nx::vms::api::UserType::local,
         GlobalPermissions globalPermissions = GlobalPermission::none,
-        const std::map<QnUuid, nx::vms::api::AccessRights>& resourceAccessRights = {},
+        const std::map<nx::Uuid, nx::vms::api::AccessRights>& resourceAccessRights = {},
         const QString& ldapDn = "");
 
     QnUserResourcePtr addUser(
@@ -44,12 +44,12 @@ public:
         const QString& name = kTestUserName,
         nx::vms::api::UserType userType = nx::vms::api::UserType::local,
         GlobalPermissions globalPermissions = GlobalPermission::none,
-        const std::map<QnUuid, nx::vms::api::AccessRights>& resourceAccessRights = {},
+        const std::map<nx::Uuid, nx::vms::api::AccessRights>& resourceAccessRights = {},
         const QString& ldapDn = "");
 
     virtual QnLayoutResourcePtr createLayout();
     QnLayoutResourcePtr addLayout();
-    QnUuid addToLayout(const QnLayoutResourcePtr& layout, const QnResourcePtr& resource);
+    nx::Uuid addToLayout(const QnLayoutResourcePtr& layout, const QnResourcePtr& resource);
 
     static constexpr auto kUseDefaultLicense = Qn::LC_Count;
     nx::CameraResourceStubPtr createCamera(Qn::LicenseType licenseType = kUseDefaultLicense);
@@ -68,9 +68,9 @@ public:
     QnVideoWallResourcePtr createVideoWall();
     QnVideoWallResourcePtr addVideoWall();
     QnLayoutResourcePtr addLayoutForVideoWall(const QnVideoWallResourcePtr& videoWall);
-    QnUuid addVideoWallItem(const QnVideoWallResourcePtr& videoWall,
+    nx::Uuid addVideoWallItem(const QnVideoWallResourcePtr& videoWall,
         const QnLayoutResourcePtr& itemLayout);
-    bool changeVideoWallItem(const QnVideoWallResourcePtr& videoWall, const QnUuid& itemId,
+    bool changeVideoWallItem(const QnVideoWallResourcePtr& videoWall, const nx::Uuid& itemId,
         const QnLayoutResourcePtr& itemLayout);
 
     QnMediaServerResourcePtr addServer(nx::vms::api::ServerFlags additionalFlags = nx::vms::api::SF_None);
@@ -80,11 +80,11 @@ public:
     nx::vms::api::UserGroupData createUserGroup(
         QString name,
         Ids parentGroupIds = NoGroup,
-        const std::map<QnUuid, nx::vms::api::AccessRights>& resourceAccessRights = {},
+        const std::map<nx::Uuid, nx::vms::api::AccessRights>& resourceAccessRights = {},
         GlobalPermissions permissions = GlobalPermission::none);
 
     void addOrUpdateUserGroup(const nx::vms::api::UserGroupData& group);
-    void removeUserGroup(const QnUuid& groupId);
+    void removeUserGroup(const nx::Uuid& groupId);
 
     void clear();
 };

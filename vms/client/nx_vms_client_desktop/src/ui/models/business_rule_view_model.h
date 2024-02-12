@@ -68,7 +68,7 @@ public:
     bool isValid(Column column) const;
     bool isValid() const; //checks validity for entire row
 
-    QnUuid id() const;
+    nx::Uuid id() const;
 
     bool isModified() const;
     void setModified(bool value);
@@ -76,8 +76,8 @@ public:
     nx::vms::api::EventType eventType() const;
     void setEventType(const nx::vms::api::EventType value);
 
-    QSet<QnUuid> eventResources() const;
-    void setEventResources(const QSet<QnUuid>& value);
+    QSet<nx::Uuid> eventResources() const;
+    void setEventResources(const QSet<nx::Uuid>& value);
 
     nx::vms::event::EventParameters eventParams() const;
     void setEventParams(const nx::vms::event::EventParameters& params);
@@ -88,11 +88,11 @@ public:
     nx::vms::api::ActionType actionType() const;
     void setActionType(const nx::vms::api::ActionType value);
 
-    QSet<QnUuid> actionResources() const;
-    void setActionResources(const QSet<QnUuid>& value);
+    QSet<nx::Uuid> actionResources() const;
+    void setActionResources(const QSet<nx::Uuid>& value);
 
-    QSet<QnUuid> actionResourcesRaw() const;
-    void setActionResourcesRaw(const QSet<QnUuid>& value);
+    QSet<nx::Uuid> actionResourcesRaw() const;
+    void setActionResourcesRaw(const QSet<nx::Uuid>& value);
 
     bool isActionProlonged() const;
 
@@ -144,7 +144,7 @@ public:
 
 public:
     // TODO: #vkutin #3.2 Temporary workaround to pass "all users" as a special uuid.
-    static const QnUuid kAllUsersId;
+    static const nx::Uuid kAllUsersId;
 
 signals:
     void dataChanged(Fields fields);
@@ -161,17 +161,17 @@ private:
     void toggleActionUseSource();
 
 private:
-    QnUuid m_id;
+    nx::Uuid m_id;
     bool m_modified;
 
     nx::vms::api::EventType m_eventType;
-    QSet<QnUuid> m_eventResources;
+    QSet<nx::Uuid> m_eventResources;
     nx::vms::event::EventParameters m_eventParams;
     nx::vms::api::EventState m_eventState;
     QHash<nx::vms::api::EventType, nx::vms::event::EventParameters> m_cachedEventParams;
 
     nx::vms::api::ActionType m_actionType;
-    QSet<QnUuid> m_actionResources;
+    QSet<nx::Uuid> m_actionResources;
     nx::vms::event::ActionParameters m_actionParams;
     QHash<nx::vms::api::ActionType, nx::vms::event::ActionParameters> m_cachedActionParams;
 

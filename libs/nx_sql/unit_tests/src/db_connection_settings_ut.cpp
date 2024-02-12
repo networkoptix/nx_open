@@ -24,7 +24,7 @@ public:
     {
         m_defaultOptions.driverType = RdbmsDriverType::postgresql;
         m_defaultOptions.maxConnectionCount = nx::utils::random::number<int>(1, 100);
-        m_defaultOptions.dbName = QnUuid::createUuid().toString();
+        m_defaultOptions.dbName = nx::Uuid::createUuid().toString();
         m_defaultOptions.encoding = "invalidEncoding";
     }
 

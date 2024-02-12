@@ -8,6 +8,6 @@ namespace nx::vms::client::desktop {
 
 class SystemContext;
 
-QString getBookmarkCreatorName(const QnUuid& creatorId, SystemContext* context);
+QString getBookmarkCreatorName(const nx::Uuid& creatorId, SystemContext* context);
 
 } // namespace nx::vms::client::desktop

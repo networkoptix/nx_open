@@ -36,7 +36,7 @@ public:
 
     void setServerUpdateStatus(QnMediaServerResourcePtr server, Status status)
     {
-        std::map<QnUuid, nx::vms::common::update::Status> statusData;
+        std::map<nx::Uuid, nx::vms::common::update::Status> statusData;
         auto id = server->getId();
         statusData[id] = nx::vms::common::update::Status(id, status, Error::noError);
         m_stateTracker->setUpdateStatus(statusData);
@@ -44,7 +44,7 @@ public:
 
     void setTask(QnMediaServerResourceList servers)
     {
-        QSet<QnUuid> peers;
+        QSet<nx::Uuid> peers;
         for (const auto& server: servers)
             peers.insert(server->getId());
         m_stateTracker->setTask(peers);

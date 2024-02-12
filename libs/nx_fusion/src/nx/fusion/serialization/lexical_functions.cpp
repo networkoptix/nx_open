@@ -100,14 +100,14 @@ bool deserialize(const QString &value, bool *target)
     }
 }
 
-void serialize(const QnUuid &value, QString *target)
+void serialize(const nx::Uuid &value, QString *target)
 {
     *target = value.toString();
 }
 
-bool deserialize(const QString &value, QnUuid *target)
+bool deserialize(const QString &value, nx::Uuid *target)
 {
-    QnUuid result = QnUuid::fromStringSafe(value);
+    nx::Uuid result = nx::Uuid::fromStringSafe(value);
     if (result.isNull()
         && !value.isEmpty()
         && value != QLatin1String("00000000-0000-0000-0000-000000000000")

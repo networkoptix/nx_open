@@ -19,8 +19,8 @@ TEST(videoCache, cacheSize)
 {
     VideoCache cache;
     cache.setCacheSize(1s);
-    QnUuid id = QnUuid::createUuid();
-    cache.setCachedDevices(0, QSet<QnUuid>{id});
+    nx::Uuid id = nx::Uuid::createUuid();
+    cache.setCachedDevices(0, QSet<nx::Uuid>{id});
     cache.add(id, makeFrame(1ms));
     cache.add(id, makeFrame(800ms));
     cache.add(id, makeFrame(100ms));
@@ -43,11 +43,11 @@ TEST(videoCache, resourceList)
 {
     VideoCache cache;
     cache.setCacheSize(1s);
-    QnUuid id1 = QnUuid::createUuid();
-    QnUuid id2 = QnUuid::createUuid();
-    QnUuid id3 = QnUuid::createUuid();
+    nx::Uuid id1 = nx::Uuid::createUuid();
+    nx::Uuid id2 = nx::Uuid::createUuid();
+    nx::Uuid id3 = nx::Uuid::createUuid();
 
-    cache.setCachedDevices(0, QSet<QnUuid>{id1, id2});
+    cache.setCachedDevices(0, QSet<nx::Uuid>{id1, id2});
 
     cache.add(id1, makeFrame(1ms));
     cache.add(id2, makeFrame(1ms));
@@ -61,7 +61,7 @@ TEST(videoCache, resourceList)
     cache.image(id3, 0ms, &result);
     ASSERT_EQ(result, VideoCache::kNoTimestamp);
 
-    cache.setCachedDevices(0, QSet<QnUuid>{id2, id3});
+    cache.setCachedDevices(0, QSet<nx::Uuid>{id2, id3});
     cache.add(id3, makeFrame(1ms));
 
     cache.image(id1, 0ms, &result);

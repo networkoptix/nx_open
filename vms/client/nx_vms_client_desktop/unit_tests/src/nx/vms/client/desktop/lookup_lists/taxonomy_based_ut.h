@@ -11,7 +11,7 @@ namespace nx::vms::client::desktop {
 struct InputData
 {
     using AttributeSupportInfo = std::map<QString /*attributeName*/,
-        std::map<QnUuid /*engineId*/, std::set<QnUuid /*deviceId*/>>>;
+        std::map<nx::Uuid /*engineId*/, std::set<nx::Uuid /*deviceId*/>>>;
 
     std::vector<QString> objectTypes;
     std::map<QString, AttributeSupportInfo> attributeSupportInfo;

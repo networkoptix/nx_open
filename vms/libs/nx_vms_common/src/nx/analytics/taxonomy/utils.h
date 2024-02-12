@@ -23,17 +23,17 @@ bool contains(const Container& container, const Item& item)
 
 struct AttributeSupportInfoTree
 {
-    std::set<QnUuid> supportByEngine;
+    std::set<nx::Uuid> supportByEngine;
     std::map<QString /*attributeName*/, AttributeSupportInfoTree> nestedAttributeSupportInfo;
 };
 
 std::map<QString, AttributeSupportInfoTree> buildAttributeSupportInfoTree(
     const std::vector<AbstractAttribute*>& attributes,
-    std::map<QString, std::set<QnUuid /*engineId*/>> supportInfo);
+    std::map<QString, std::set<nx::Uuid /*engineId*/>> supportInfo);
 
 std::vector<AbstractAttribute*> makeSupportedAttributes(
     const std::vector<AbstractAttribute*>& attributes,
-    std::map<QString, std::set<QnUuid /*engineId*/>> supportInfo,
+    std::map<QString, std::set<nx::Uuid /*engineId*/>> supportInfo,
     AbstractResourceSupportProxy* resourceSupportProxy,
     QString rootParentTypeId,
     EntityType rootEntityType);

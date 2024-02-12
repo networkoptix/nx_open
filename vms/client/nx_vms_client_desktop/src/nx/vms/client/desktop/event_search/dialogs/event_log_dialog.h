@@ -34,8 +34,8 @@ public:
     void disableUpdateData();
     void enableUpdateData();
     void setDateRange(qint64 startTimeMs, qint64 endTimeMs);
-    const QnUuidSet& eventDevices() const;
-    void setEventDevices(const QnUuidSet& ids);
+    const UuidSet& eventDevices() const;
+    void setEventDevices(const UuidSet& ids);
     void setActionType(const QString& value);
     void setEventType(const QString& value);
     void setAnalyticsEventType(nx::vms::api::analytics::EventTypeId value);
@@ -90,7 +90,7 @@ private:
 
     rest::Handle m_request = {};
 
-    QnUuidSet m_eventDevices;
+    UuidSet m_eventDevices;
     bool m_updateDisabled = false;
     bool m_dirty = false;
 

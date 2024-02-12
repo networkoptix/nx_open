@@ -97,7 +97,7 @@ public:
     qint64 ttl = 0;
 
     /**%apidoc[proprietary] */
-    QList<QnUuid> additionalPeers;
+    QList<nx::Uuid> additionalPeers;
 
     /**%apidoc
      * Path to the file's parent directory on the Server. If empty, the default path is used.

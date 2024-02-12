@@ -14,7 +14,7 @@ namespace event {
 
 PluginDiagnosticEvent::PluginDiagnosticEvent(
     qint64 timeStamp,
-    const QnUuid& engineResourceId,
+    const nx::Uuid& engineResourceId,
     const QString& caption,
     const QString& description,
     nx::vms::api::EventLevel level,

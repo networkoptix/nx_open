@@ -104,19 +104,19 @@ public:
     }
 
     /** @return Human readable peer name. This is mostly used in logs. */
-    virtual QString peerString(const QnUuid& peerId) const { return peerId.toString(); }
-    virtual QList<QnUuid> getAllPeers() const = 0;
-    virtual QList<QnUuid> peers() const = 0;
-    virtual int distanceTo(const QnUuid& peerId) const = 0;
+    virtual QString peerString(const nx::Uuid& peerId) const { return peerId.toString(); }
+    virtual QList<nx::Uuid> getAllPeers() const = 0;
+    virtual QList<nx::Uuid> peers() const = 0;
+    virtual int distanceTo(const nx::Uuid& peerId) const = 0;
 
     virtual RequestContextPtr<FileInformation> requestFileInfo(
-        const QnUuid& peer, const QString& fileName, const nx::utils::Url& url) = 0;
+        const nx::Uuid& peer, const QString& fileName, const nx::utils::Url& url) = 0;
 
     virtual RequestContextPtr<QVector<QByteArray>> requestChecksums(
-        const QnUuid& peer, const QString& fileName) = 0;
+        const nx::Uuid& peer, const QString& fileName) = 0;
 
     virtual RequestContextPtr<nx::Buffer> downloadChunk(
-        const QnUuid& peerId,
+        const nx::Uuid& peerId,
         const QString& fileName,
         const nx::utils::Url& url,
         int chunkIndex,

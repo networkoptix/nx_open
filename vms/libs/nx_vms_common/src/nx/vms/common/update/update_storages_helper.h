@@ -8,13 +8,13 @@
 
 namespace nx::vms::common::update::storage {
 
-using ServerToStorages = std::pair<QnUuid, nx::vms::api::StorageSpaceDataList>;
+using ServerToStorages = std::pair<nx::Uuid, nx::vms::api::StorageSpaceDataList>;
 using ServerToStoragesList = std::vector<ServerToStorages>;
 
 NX_VMS_COMMON_API std::optional<nx::vms::api::StorageSpaceData> selectOne(
     const nx::vms::api::StorageSpaceDataList& candidates, int64_t minTotalSpaceGb);
 
-NX_VMS_COMMON_API QList<QnUuid> selectServers(
+NX_VMS_COMMON_API QList<nx::Uuid> selectServers(
     const ServerToStoragesList& serverToStorages, int64_t minStorageTotalSpaceGb);
 
 } // namespace nx::vms::common::update::storage

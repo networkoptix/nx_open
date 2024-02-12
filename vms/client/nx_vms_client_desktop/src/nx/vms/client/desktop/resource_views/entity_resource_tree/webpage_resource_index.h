@@ -21,7 +21,7 @@ public:
     WebPageResourceIndex(const QnResourcePool* resourcePool);
 
     QVector<QnResourcePtr> allProxiedWebResources() const;
-    QVector<QnResourcePtr> webPagesOnServer(const QnUuid& serverId) const;
+    QVector<QnResourcePtr> webPagesOnServer(const nx::Uuid& serverId) const;
     QVector<QnResourcePtr> allWebPages() const;
 
 signals:
@@ -36,7 +36,7 @@ signals:
 private:
     void onResourceAdded(const QnResourcePtr& resource);
     void onResourceRemoved(const QnResourcePtr& resource);
-    void onWebPageParentIdChanged(const QnResourcePtr& webPage, const QnUuid& previousParentId);
+    void onWebPageParentIdChanged(const QnResourcePtr& webPage, const nx::Uuid& previousParentId);
 
 private:
     void indexAllWebPages();
@@ -44,7 +44,7 @@ private:
 
 private:
     const QnResourcePool* m_resourcePool;
-    QHash<QnUuid, QSet<QnResourcePtr>> m_webPagesByServer;
+    QHash<nx::Uuid, QSet<QnResourcePtr>> m_webPagesByServer;
 };
 
 } // namespace entity_resource_tree

@@ -63,7 +63,7 @@ bool ConnectToCurrentSystemTool::tryClose(bool /*force*/)
     return true;
 }
 
-void ConnectToCurrentSystemTool::start(const QnUuid& targetOtherServerId)
+void ConnectToCurrentSystemTool::start(const nx::Uuid& targetOtherServerId)
 {
     NX_DEBUG(this, "Try to connect server with id: %1", targetOtherServerId);
 

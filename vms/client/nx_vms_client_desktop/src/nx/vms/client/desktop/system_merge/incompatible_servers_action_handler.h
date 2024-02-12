@@ -32,7 +32,7 @@ public:
     ~IncompatibleServersActionHandler();
 
 private:
-    void connectToCurrentSystem(const QnUuid& otherServerId);
+    void connectToCurrentSystem(const nx::Uuid& otherServerId);
 
     QString requestPassword() const;
 

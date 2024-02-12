@@ -111,7 +111,7 @@ struct NX_VMS_API MediaStreamSettings: public StreamSettings
      * Device id (can be obtained from "id", "physicalId" or "logicalId" field via
      * /rest/v{1-}/devices) or MAC address (not supported for certain Devices).
      */
-    QnUuid id;
+    nx::Uuid id;
 };
 #define MediaStreamSettings_Fields StreamSettings_Fields(id)
 QN_FUSION_DECLARE_FUNCTIONS(MediaStreamSettings, (json), NX_VMS_API)

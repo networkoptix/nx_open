@@ -27,27 +27,27 @@ public:
         AbstractResourceAccessResolver* baseResolver,
         QnResourcePool* resourcePool);
 
-    ResourceAccessMap ensureAccessMap(const QnUuid& subjectId) const;
+    ResourceAccessMap ensureAccessMap(const nx::Uuid& subjectId) const;
 
-    void handleBaseAccessChanged(const QSet<QnUuid>& subjectIds);
+    void handleBaseAccessChanged(const QSet<nx::Uuid>& subjectIds);
     void handleReset();
 
     void handleResourcesAdded(const QnResourceList& resources);
     void handleResourcesRemoved(const QnResourceList& resources);
     void handleIntercomsAddedOrRemoved(const QnVirtualCameraResourceList& intercoms, bool isAdded);
 
-    void invalidateSubjects(const QSet<QnUuid>& subjectIds);
+    void invalidateSubjects(const QSet<nx::Uuid>& subjectIds);
 
-    QSet<QnUuid> invalidateCache(); //< Returns all subject ids that were cached.
+    QSet<nx::Uuid> invalidateCache(); //< Returns all subject ids that were cached.
 
     void notifyResolutionChanged(const QnVirtualCameraResourceList& intercoms,
-        const QSet<QnUuid>& knownAffectedSubjectIds);
+        const QSet<nx::Uuid>& knownAffectedSubjectIds);
 
 public:
     const QPointer<AbstractResourceAccessResolver> baseResolver;
     const QPointer<QnResourcePool> resourcePool;
     QSet<QnVirtualCameraResourcePtr> allIntercoms;
-    mutable QHash<QnUuid, ResourceAccessMap> cachedAccessMaps;
+    mutable QHash<nx::Uuid, ResourceAccessMap> cachedAccessMaps;
     mutable nx::Mutex mutex;
 };
 
@@ -69,14 +69,14 @@ IntercomLayoutAccessResolver::~IntercomLayoutAccessResolver()
     // Required here for forward-declared scoped pointer destruction.
 }
 
-ResourceAccessMap IntercomLayoutAccessResolver::resourceAccessMap(const QnUuid& subjectId) const
+ResourceAccessMap IntercomLayoutAccessResolver::resourceAccessMap(const nx::Uuid& subjectId) const
 {
     return d->baseResolver && d->resourcePool
         ? d->ensureAccessMap(subjectId)
         : ResourceAccessMap();
 }
 
-GlobalPermissions IntercomLayoutAccessResolver::globalPermissions(const QnUuid& subjectId) const
+GlobalPermissions IntercomLayoutAccessResolver::globalPermissions(const nx::Uuid& subjectId) const
 {
     return d->baseResolver
         ? d->baseResolver->globalPermissions(subjectId)
@@ -84,7 +84,7 @@ GlobalPermissions IntercomLayoutAccessResolver::globalPermissions(const QnUuid& 
 }
 
 ResourceAccessDetails IntercomLayoutAccessResolver::accessDetails(
-    const QnUuid& subjectId,
+    const nx::Uuid& subjectId,
     const QnResourcePtr& resource,
     nx::vms::api::AccessRight accessRight) const
 {
@@ -148,7 +148,7 @@ IntercomLayoutAccessResolver::Private::Private(
 }
 
 ResourceAccessMap IntercomLayoutAccessResolver::Private::ensureAccessMap(
-    const QnUuid& subjectId) const
+    const nx::Uuid& subjectId) const
 {
     NX_MUTEX_LOCKER lk(&mutex);
 
@@ -179,16 +179,16 @@ ResourceAccessMap IntercomLayoutAccessResolver::Private::ensureAccessMap(
     return accessMap;
 }
 
-void IntercomLayoutAccessResolver::Private::handleBaseAccessChanged(const QSet<QnUuid>& subjectIds)
+void IntercomLayoutAccessResolver::Private::handleBaseAccessChanged(const QSet<nx::Uuid>& subjectIds)
 {
     NX_DEBUG(q, "Base resolution changed for %1 subjects: %2", subjectIds.size(), subjectIds);
     invalidateSubjects(subjectIds);
     q->notifyAccessChanged(subjectIds);
 }
 
-void IntercomLayoutAccessResolver::Private::invalidateSubjects(const QSet<QnUuid>& subjectIds)
+void IntercomLayoutAccessResolver::Private::invalidateSubjects(const QSet<nx::Uuid>& subjectIds)
 {
-    QSet<QnUuid> affectedCachedSubjectIds;
+    QSet<nx::Uuid> affectedCachedSubjectIds;
     {
         NX_MUTEX_LOCKER lk(&mutex);
 
@@ -216,10 +216,10 @@ void IntercomLayoutAccessResolver::Private::handleReset()
     q->notifyAccessReset();
 }
 
-QSet<QnUuid> IntercomLayoutAccessResolver::Private::invalidateCache()
+QSet<nx::Uuid> IntercomLayoutAccessResolver::Private::invalidateCache()
 {
     NX_MUTEX_LOCKER lk(&mutex);
-    const auto cachedSubjectIds = QSet<QnUuid>(
+    const auto cachedSubjectIds = QSet<nx::Uuid>(
         cachedAccessMaps.keyBegin(), cachedAccessMaps.keyEnd());
 
     cachedAccessMaps.clear();
@@ -244,7 +244,7 @@ void IntercomLayoutAccessResolver::Private::handleIntercomsAddedOrRemoved(
     if (!baseResolver || intercoms.empty())
         return;
 
-    QSet<QnUuid> affectedCachedSubjectIds;
+    QSet<nx::Uuid> affectedCachedSubjectIds;
     {
         NX_MUTEX_LOCKER lk(&mutex);
         for (const auto& intercom: intercoms)
@@ -273,10 +273,10 @@ void IntercomLayoutAccessResolver::Private::handleIntercomsAddedOrRemoved(
 }
 
 void IntercomLayoutAccessResolver::Private::notifyResolutionChanged(
-    const QnVirtualCameraResourceList& intercoms, const QSet<QnUuid>& knownAffectedSubjectIds)
+    const QnVirtualCameraResourceList& intercoms, const QSet<nx::Uuid>& knownAffectedSubjectIds)
 {
     const auto watchedSubjectIds = q->notifier()->watchedSubjectIds();
-    QSet<QnUuid> affectedWatchedSubjectIds;
+    QSet<nx::Uuid> affectedWatchedSubjectIds;
 
     for (const auto id: watchedSubjectIds)
     {

@@ -284,7 +284,7 @@ ActionHandler::ActionHandler(QObject *parent) :
         {
             QUrl url;
 
-            if (const QnUuid& engineId = menu()->currentParameters(sender()).resource()->getId();
+            if (const nx::Uuid& engineId = menu()->currentParameters(sender()).resource()->getId();
                 !engineId.isNull())
             {
                 url.setQuery("engineId=" + engineId.toString());
@@ -975,14 +975,14 @@ void ActionHandler::at_openInLayoutAction_triggered()
             {Qn::ItemTimeRole, Qn::ItemPausedRole, Qn::ItemSpeedRole};
 
         using ExtraItemDataHash = QHash<Qn::ItemDataRole, QVariant>;
-        QHash<QnUuid, ExtraItemDataHash> extraItemRoleValues;
+        QHash<nx::Uuid, ExtraItemDataHash> extraItemRoleValues;
 
-        QHash<QnUuid, LayoutItemData> itemDataByUuid;
+        QHash<nx::Uuid, LayoutItemData> itemDataByUuid;
         for (auto widget: widgets)
         {
             LayoutItemData data = widget->item()->data();
             const auto oldUuid = data.uuid;
-            data.uuid = QnUuid::createUuid();
+            data.uuid = nx::Uuid::createUuid();
             data.flags = Qn::PendingGeometryAdjustment;
             itemDataByUuid[oldUuid] = data;
 
@@ -1191,7 +1191,7 @@ void ActionHandler::at_openInCurrentLayoutAction_triggered()
     const auto currentLayout = workbench()->currentLayout();
 
     // Check if we are in videowall control mode
-    QnUuid videoWallItemGuid = currentLayout->data(Qn::VideoWallItemGuidRole).value<QnUuid>();
+    nx::Uuid videoWallItemGuid = currentLayout->data(Qn::VideoWallItemGuidRole).value<nx::Uuid>();
     if (!videoWallItemGuid.isNull())
     {
         QnVideoWallItemIndex index = resourcePool()->getVideoWallItemByUuid(videoWallItemGuid);
@@ -1284,7 +1284,7 @@ void ActionHandler::at_reviewShowreelInNewWindowAction_triggered()
 
     // For now place method here until openNewWindow code would be shared.
     const auto parameters = menu()->currentParameters(sender());
-    auto id = parameters.argument<QnUuid>(Qn::UuidRole);
+    auto id = parameters.argument<nx::Uuid>(Qn::UuidRole);
 
     MimeData data;
     data.setEntities({id});
@@ -1370,7 +1370,7 @@ std::optional<QnVirtualCameraResourceList> ActionHandler::checkCameraList(
             modifiedResources << errorResources;
     }
 
-    const QnUuid serverId = server->getId();
+    const nx::Uuid serverId = server->getId();
     qnResourcesChangesManager->saveCameras(modifiedResources,
         [serverId](const QnVirtualCameraResourcePtr &camera)
         {
@@ -1426,7 +1426,7 @@ void ActionHandler::moveResourcesToServer(
     // We can safely move webpages - the user is admin or there are no webpages.
     // But we can do it only after ensuring that cameras are also moved. Otherwise we end up with
     // inconsistent state - resources split between two servers.
-    const auto serverId = server ? server->getId() : QnUuid();
+    const auto serverId = server ? server->getId() : nx::Uuid();
     const auto moveWebPages =
         [serverId](const QnWebPageResourceList& webPages)
         {
@@ -1809,7 +1809,7 @@ void ActionHandler::at_goToLayoutItemAction_triggered()
         return;
 
     const auto parameters = menu()->currentParameters(sender());
-    const auto uuid = parameters.argument(Qn::ItemUuidRole).value<QnUuid>();
+    const auto uuid = parameters.argument(Qn::ItemUuidRole).value<nx::Uuid>();
 
     const auto centralItem = workbench()->item(Qn::CentralRole);
 
@@ -2059,7 +2059,7 @@ void ActionHandler::at_openBusinessLogAction_triggered() {
 
     vms::api::EventType eventType = parameters.argument(Qn::EventTypeRole, vms::api::EventType::anyEvent);
     auto cameras = parameters.resources().filtered<QnVirtualCameraResource>();
-    QSet<QnUuid> ids;
+    QSet<nx::Uuid> ids;
     for (auto camera: cameras)
         ids << camera->getId();
 
@@ -2280,7 +2280,7 @@ void ActionHandler::at_thumbnailsSearchAction_triggered()
 
     /* Construct and add a new layout. */
     LayoutResourcePtr layout(new LayoutResource());
-    layout->setIdUnsafe(QnUuid::createUuid());
+    layout->setIdUnsafe(nx::Uuid::createUuid());
     layout->setName(tr("Preview Search for %1").arg(resource->getName()));
 
     qint64 time = period.startTimeMs;

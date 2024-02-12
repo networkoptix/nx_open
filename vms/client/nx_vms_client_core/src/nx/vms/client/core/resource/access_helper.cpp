@@ -60,12 +60,12 @@ AccessHelper::~AccessHelper()
     // Required here for forward-declared scoped pointer destruction.
 }
 
-QnUuid AccessHelper::resourceId() const
+nx::Uuid AccessHelper::resourceId() const
 {
-    return d->resource ? d->resource->getId() : QnUuid{};
+    return d->resource ? d->resource->getId() : nx::Uuid{};
 }
 
-void AccessHelper::setResourceId(const QnUuid& value)
+void AccessHelper::setResourceId(const nx::Uuid& value)
 {
     setResource(resourcePool()->getResourceById(value));
 }

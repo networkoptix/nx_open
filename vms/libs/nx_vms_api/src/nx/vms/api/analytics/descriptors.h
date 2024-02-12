@@ -18,7 +18,7 @@ namespace nx::vms::api::analytics {
 
 struct DescriptorScope
 {
-    QnUuid engineId;
+    nx::Uuid engineId;
     mutable QString groupId;
     mutable QString provider;
     mutable bool hasTypeEverBeenSupportedInThisScope = false;
@@ -60,7 +60,7 @@ template<typename T>
 struct hasScopes<T, std::void_t<decltype(std::declval<T>().scopes)>>: std::true_type {};
 
 template<typename T>
-DescriptorScope scopeFromItem(QnUuid engineId, T item)
+DescriptorScope scopeFromItem(nx::Uuid engineId, T item)
 {
     DescriptorScope scope;
     if (engineId.isNull())
@@ -142,14 +142,14 @@ NX_REFLECTION_INSTRUMENT(PluginDescriptor, nx_vms_api_analyitcs_PluginDescriptor
 
 struct EngineDescriptor
 {
-    QnUuid id;
+    nx::Uuid id;
     QString name;
     QString pluginId;
     EngineManifest::Capabilities capabilities;
 
     EngineDescriptor() = default;
     EngineDescriptor(
-        QnUuid id,
+        nx::Uuid id,
         QString name,
         QString pluginId,
         const EngineManifest& engineManifest)
@@ -163,7 +163,7 @@ struct EngineDescriptor
 
     bool operator==(const EngineDescriptor& other) const = default;
 
-    QnUuid getId() const { return id; }
+    nx::Uuid getId() const { return id; }
 };
 #define nx_vms_api_analytics_EngineDescriptor_Fields (id)(name)(pluginId)(capabilities)
 NX_REFLECTION_INSTRUMENT(EngineDescriptor, nx_vms_api_analytics_EngineDescriptor_Fields);
@@ -171,7 +171,7 @@ NX_REFLECTION_INSTRUMENT(EngineDescriptor, nx_vms_api_analytics_EngineDescriptor
 struct GroupDescriptor: BaseScopedDescriptor
 {
     GroupDescriptor() = default;
-    GroupDescriptor(QnUuid engineId, const Group& group):
+    GroupDescriptor(nx::Uuid engineId, const Group& group):
         BaseScopedDescriptor(scopeFromItem(engineId, group), group)
     {
     }
@@ -215,7 +215,7 @@ NX_REFLECTION_INSTRUMENT(ExtendedScopedDescriptor,
 struct EventTypeDescriptor: public ExtendedScopedDescriptor
 {
     EventTypeDescriptor() = default;
-    EventTypeDescriptor(QnUuid engineId, const EventType& eventType):
+    EventTypeDescriptor(nx::Uuid engineId, const EventType& eventType):
         ExtendedScopedDescriptor(scopeFromItem(engineId, eventType), eventType),
         flags(eventType.flags)
     {
@@ -240,7 +240,7 @@ NX_REFLECTION_INSTRUMENT(EventTypeDescriptor, nx_vms_api_analyitcs_EventTypeDesc
 struct ObjectTypeDescriptor: public ExtendedScopedDescriptor
 {
     ObjectTypeDescriptor() = default;
-    ObjectTypeDescriptor(QnUuid engineId, const ObjectType& objectType):
+    ObjectTypeDescriptor(nx::Uuid engineId, const ObjectType& objectType):
         ExtendedScopedDescriptor(scopeFromItem(engineId, objectType), objectType),
         flags(objectType.flags)
     {
@@ -272,7 +272,7 @@ NX_REFLECTION_INSTRUMENT(ObjectTypeDescriptor, nx_vms_api_analyitcs_ObjectTypeDe
 struct ActionTypeDescriptor: BaseDescriptor
 {
     ActionTypeDescriptor() = default;
-    ActionTypeDescriptor(QnUuid /*engineId*/, EngineManifest::ObjectAction actionType):
+    ActionTypeDescriptor(nx::Uuid /*engineId*/, EngineManifest::ObjectAction actionType):
         BaseDescriptor(
             actionType.id,
             actionType.name),
@@ -298,7 +298,7 @@ NX_REFLECTION_INSTRUMENT(ActionTypeDescriptor, nx_vms_api_analytics_ActionTypeDe
 struct EnumTypeDescriptor: public BaseDescriptor
 {
     EnumTypeDescriptor() = default;
-    EnumTypeDescriptor(QnUuid /*engineId*/, EnumType enumType):
+    EnumTypeDescriptor(nx::Uuid /*engineId*/, EnumType enumType):
         BaseDescriptor(enumType),
         base(std::move(enumType.base)),
         baseItems(std::move(enumType.baseItems)),
@@ -322,7 +322,7 @@ NX_REFLECTION_INSTRUMENT(EnumTypeDescriptor, nx_vms_api_analytics_EnumTypeDescri
 struct ColorTypeDescriptor: public BaseDescriptor
 {
     ColorTypeDescriptor() = default;
-    ColorTypeDescriptor(QnUuid /*engineId*/, ColorType colorType):
+    ColorTypeDescriptor(nx::Uuid /*engineId*/, ColorType colorType):
         BaseDescriptor(colorType),
         base(std::move(colorType.base)),
         baseItems(std::move(colorType.baseItems)),

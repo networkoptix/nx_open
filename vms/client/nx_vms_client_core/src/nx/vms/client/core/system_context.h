@@ -51,7 +51,7 @@ public:
      */
     SystemContext(
         Mode mode,
-        QnUuid peerId,
+        nx::Uuid peerId,
         nx::core::access::Mode resourceAccessMode = nx::core::access::Mode::cached,
         QObject* parent = nullptr);
     virtual ~SystemContext() override;
@@ -85,7 +85,7 @@ public:
     /**
      * Id of the server which was used to establish the Remote Session (if it is present).
      */
-    QnUuid currentServerId() const;
+    nx::Uuid currentServerId() const;
 
     /**
      * The server which was used to establish the Remote Session (if it is present).
@@ -132,7 +132,7 @@ public:
     AccessController* accessController() const;
 
 signals:
-    void remoteIdChanged(const QnUuid& id);
+    void remoteIdChanged(const nx::Uuid& id);
 
     /**
      * Signal which sent when current user of this system context is changed. Actual only while

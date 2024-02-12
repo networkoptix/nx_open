@@ -49,7 +49,7 @@ QnLayoutResourceList getLayoutsInternal(const QnBusinessRuleViewModel* model)
         model->actionResourcesRaw());
 }
 
-QSet<QnUuid> toIds(const QnResourceList& resources)
+QSet<nx::Uuid> toIds(const QnResourceList& resources)
 {
     return nx::utils::toQSet(resources.ids());
 }
@@ -152,15 +152,15 @@ QnVirtualCameraResourcePtr FullscreenActionHelper::camera(const QnBusinessRuleVi
     return getCameraInternal(model);
 }
 
-QSet<QnUuid> FullscreenActionHelper::cameraIds(const QnBusinessRuleViewModel* model)
+QSet<nx::Uuid> FullscreenActionHelper::cameraIds(const QnBusinessRuleViewModel* model)
 {
-    QSet<QnUuid> result;
+    QSet<nx::Uuid> result;
     if (const auto camera = getCameraInternal(model))
         result.insert(camera->getId());
     return result;
 }
 
-QSet<QnUuid> FullscreenActionHelper::setCamera(
+QSet<nx::Uuid> FullscreenActionHelper::setCamera(
     const QnBusinessRuleViewModel* model,
     const QnVirtualCameraResourcePtr& camera)
 {
@@ -170,9 +170,9 @@ QSet<QnUuid> FullscreenActionHelper::setCamera(
     return result;
 }
 
-QSet<QnUuid> FullscreenActionHelper::setCameraIds(
+QSet<nx::Uuid> FullscreenActionHelper::setCameraIds(
     const QnBusinessRuleViewModel* model,
-    const QSet<QnUuid>& cameraIds)
+    const QSet<nx::Uuid>& cameraIds)
 {
     auto result = layoutIds(model);
     if (!cameraIds.empty())
@@ -185,21 +185,21 @@ QnLayoutResourceList FullscreenActionHelper::layouts(const QnBusinessRuleViewMod
     return getLayoutsInternal(model);
 }
 
-QSet<QnUuid> FullscreenActionHelper::layoutIds(const QnBusinessRuleViewModel* model)
+QSet<nx::Uuid> FullscreenActionHelper::layoutIds(const QnBusinessRuleViewModel* model)
 {
     return toIds(getLayoutsInternal(model));
 }
 
-QSet<QnUuid> FullscreenActionHelper::setLayouts(
+QSet<nx::Uuid> FullscreenActionHelper::setLayouts(
     const QnBusinessRuleViewModel* model,
     const QnLayoutResourceList& layouts)
 {
     return setLayoutIds(model, toIds(layouts));
 }
 
-QSet<QnUuid> FullscreenActionHelper::setLayoutIds(
+QSet<nx::Uuid> FullscreenActionHelper::setLayoutIds(
     const QnBusinessRuleViewModel* model,
-    const QSet<QnUuid>& layoutIds)
+    const QSet<nx::Uuid>& layoutIds)
 {
     auto result = layoutIds;
     if (const auto camera = getCameraInternal(model))

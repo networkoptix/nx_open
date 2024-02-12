@@ -30,7 +30,7 @@ public:
 using UniqueResourceSource = UniqueKeySource<QnResourcePtr>;
 using UniqueResourceSourcePtr = std::shared_ptr<UniqueResourceSource>;
 
-using UniqueUuidSource = UniqueKeySource<QnUuid>;
+using UniqueUuidSource = UniqueKeySource<nx::Uuid>;
 using UniqueUuidSourcePtr = std::shared_ptr<UniqueUuidSource>;
 
 using UniqueStringSource = UniqueKeySource<QString>;

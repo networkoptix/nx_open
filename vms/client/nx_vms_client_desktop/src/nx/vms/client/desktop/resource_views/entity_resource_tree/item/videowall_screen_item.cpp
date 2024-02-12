@@ -37,7 +37,7 @@ namespace entity_resource_tree {
 
 VideoWallScreenItem::VideoWallScreenItem(
     const QnVideoWallResourcePtr& videoWall,
-    const QnUuid& screenId)
+    const nx::Uuid& screenId)
     :
     base_type(),
     m_videoWall(videoWall),

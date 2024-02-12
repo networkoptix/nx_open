@@ -246,7 +246,7 @@ public slots: //< Class is exposed to QML. All functions in section below are in
      * must be set.
      *
      * If you want to create a new preset, a good idea would be to set its id to
-     * <tt>QnUuid::createUuid().toString()</tt>.
+     * <tt>nx::Uuid::createUuid().toString()</tt>.
      *
      * This function is expected to be implemented only if this controller has
      * <tt>Ptz::PresetsPtzCapability<tt>.
@@ -308,7 +308,7 @@ public slots: //< Class is exposed to QML. All functions in section below are in
      * Note that id of the provided preset must be set.
      *
      * If you want to create a new preset, a good idea would be to set its id to
-     * <tt>QnUuid::createUuid().toString()</tt>.
+     * <tt>nx::Uuid::createUuid().toString()</tt>.
      *
      * This function is expected to be implemented only if this controller has
      * <tt>Ptz::ToursPtzCapability<tt>.

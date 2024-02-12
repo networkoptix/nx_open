@@ -13,8 +13,8 @@ static constexpr int kInitialTableRowSize = 4096;
 namespace nx::core::access {
 
 bool PermissionsCache::setPermissions(
-    const QnUuid& subjectId,
-    const QnUuid& resourceId,
+    const nx::Uuid& subjectId,
+    const nx::Uuid& resourceId,
     Qn::Permissions permissions)
 {
     if (!NX_ASSERT(!subjectId.isNull() && !resourceId.isNull()))
@@ -60,8 +60,8 @@ bool PermissionsCache::setPermissions(
 }
 
 bool PermissionsCache::removePermissions(
-    const QnUuid& subjectId,
-    const QnUuid& resourceId)
+    const nx::Uuid& subjectId,
+    const nx::Uuid& resourceId)
 {
     if (!NX_ASSERT(!subjectId.isNull() && !resourceId.isNull()))
         return false;
@@ -89,7 +89,7 @@ bool PermissionsCache::removePermissions(
 }
 
 PermissionsCache::ResourceIdsWithPermissions PermissionsCache::permissionsForSubject(
-    const QnUuid& subjectId) const
+    const nx::Uuid& subjectId) const
 {
     if (!NX_ASSERT(!subjectId.isNull()))
         return {};
@@ -108,7 +108,7 @@ PermissionsCache::ResourceIdsWithPermissions PermissionsCache::permissionsForSub
     return result;
 }
 
-void PermissionsCache::removeSubject(const QnUuid& subjectId)
+void PermissionsCache::removeSubject(const nx::Uuid& subjectId)
 {
     if (!NX_ASSERT(!subjectId.isNull()))
         return;
@@ -119,7 +119,7 @@ void PermissionsCache::removeSubject(const QnUuid& subjectId)
     removeResource(subjectId);
 }
 
-void PermissionsCache::removeResource(const QnUuid& resourceId)
+void PermissionsCache::removeResource(const nx::Uuid& resourceId)
 {
     if (!NX_ASSERT(!resourceId.isNull()))
         return;
@@ -130,7 +130,7 @@ void PermissionsCache::removeResource(const QnUuid& resourceId)
 
     const auto index = indexItr->second;
 
-    m_resourcesOrder[index] = QnUuid();
+    m_resourcesOrder[index] = nx::Uuid();
     m_indexOfResource.erase(resourceId);
 
     auto rowItr = m_storage.begin();
@@ -156,8 +156,8 @@ void PermissionsCache::removeResource(const QnUuid& resourceId)
 }
 
 std::optional<Qn::Permissions> PermissionsCache::permissions(
-    const QnUuid& subjectId,
-    const QnUuid& resourceId) const
+    const nx::Uuid& subjectId,
+    const nx::Uuid& resourceId) const
 {
     if (!NX_ASSERT(!subjectId.isNull() && !resourceId.isNull()))
         return {};

@@ -30,7 +30,7 @@ QString listToString(const AbstractEntity* entity)
 }
 
 const auto uuidItemCreator =
-    [](const QnUuid& id) -> AbstractItemPtr
+    [](const nx::Uuid& id) -> AbstractItemPtr
     {
         return GenericItemBuilder()
             .withRole(Qt::DisplayRole, QVariant::fromValue(id.toString()))
@@ -38,7 +38,7 @@ const auto uuidItemCreator =
     };
 
 const auto uuidNullItemCreator =
-    [](const QnUuid&) -> AbstractItemPtr
+    [](const nx::Uuid&) -> AbstractItemPtr
     {
         return AbstractItemPtr();
     };
@@ -68,10 +68,10 @@ namespace test {
 
 TEST_F(EntityItemModelTest, nullUuidIsntValidKey)
 {
-    const auto nullUuid = QnUuid();
+    const auto nullUuid = nx::Uuid();
     EXPECT_TRUE(nullUuid.isNull());
 
-    auto listWithUuudKey = makeKeyList<QnUuid>(uuidItemCreator, noOrder());
+    auto listWithUuudKey = makeKeyList<nx::Uuid>(uuidItemCreator, noOrder());
 
     auto notificationRecorder = std::make_unique<EntityLoggingNotificationListener>();
     auto queueChecker = notificationRecorder->queueChecker();
@@ -85,13 +85,13 @@ TEST_F(EntityItemModelTest, nullUuidIsntValidKey)
 
 TEST_F(EntityItemModelTest, nullUuidsAreFilteredBySetKeysMethod)
 {
-    QVector<QnUuid> keys;
-    keys.append(QnUuid());
-    keys.append(QnUuid::createUuid());
-    keys.append(QnUuid());
-    keys.append(QnUuid::createUuid());
+    QVector<nx::Uuid> keys;
+    keys.append(nx::Uuid());
+    keys.append(nx::Uuid::createUuid());
+    keys.append(nx::Uuid());
+    keys.append(nx::Uuid::createUuid());
 
-    auto listWithUuudKey = makeKeyList<QnUuid>(uuidItemCreator, noOrder());
+    auto listWithUuudKey = makeKeyList<nx::Uuid>(uuidItemCreator, noOrder());
 
     auto notificationRecorder = std::make_unique<EntityLoggingNotificationListener>();
     auto queueChecker = notificationRecorder->queueChecker();
@@ -107,10 +107,10 @@ TEST_F(EntityItemModelTest, nullUuidsAreFilteredBySetKeysMethod)
 
 TEST_F(EntityItemModelTest, nothingAddedIfNullItemCreated)
 {
-    const auto uuid = QnUuid::createUuid();
+    const auto uuid = nx::Uuid::createUuid();
     EXPECT_TRUE(!uuid.isNull());
 
-    auto listWithUuudKey = makeKeyList<QnUuid>(uuidNullItemCreator, noOrder());
+    auto listWithUuudKey = makeKeyList<nx::Uuid>(uuidNullItemCreator, noOrder());
 
     auto notificationRecorder = std::make_unique<EntityLoggingNotificationListener>();
     auto queueChecker = notificationRecorder->queueChecker();
@@ -161,10 +161,10 @@ TEST_F(EntityItemModelTest, zeroIntegralIsValidKey)
 
 TEST_F(EntityItemModelTest, secondAtemptToInsertItemWithSameKeyIsUnsuccessfull)
 {
-    const auto uuid = QnUuid::createUuid();
+    const auto uuid = nx::Uuid::createUuid();
     EXPECT_FALSE(uuid.isNull());
 
-    auto listWithUuudKey = makeKeyList<QnUuid>(uuidItemCreator, noOrder());
+    auto listWithUuudKey = makeKeyList<nx::Uuid>(uuidItemCreator, noOrder());
 
     auto notificationRecorder = std::make_unique<EntityLoggingNotificationListener>();
     auto queueChecker = notificationRecorder->queueChecker();
@@ -182,10 +182,10 @@ TEST_F(EntityItemModelTest, secondAtemptToInsertItemWithSameKeyIsUnsuccessfull)
 
 TEST_F(EntityItemModelTest, secondAtemptToRemoveItemWithSameKeyIsUnsuccessfull)
 {
-    const auto uuid = QnUuid::createUuid();
+    const auto uuid = nx::Uuid::createUuid();
     EXPECT_FALSE(uuid.isNull());
 
-    auto listWithUuudKey = makeKeyList<QnUuid>(uuidItemCreator, noOrder());
+    auto listWithUuudKey = makeKeyList<nx::Uuid>(uuidItemCreator, noOrder());
 
     listWithUuudKey->addItem(uuid);
 
@@ -206,10 +206,10 @@ TEST_F(EntityItemModelTest, secondAtemptToRemoveItemWithSameKeyIsUnsuccessfull)
 
 TEST_F(EntityItemModelTest, reusingKeyIsValid)
 {
-    const auto uuid = QnUuid::createUuid();
+    const auto uuid = nx::Uuid::createUuid();
     EXPECT_FALSE(uuid.isNull());
 
-    auto listWithUuudKey = makeKeyList<QnUuid>(uuidItemCreator, noOrder());
+    auto listWithUuudKey = makeKeyList<nx::Uuid>(uuidItemCreator, noOrder());
 
     auto notificationRecorder = std::make_unique<EntityLoggingNotificationListener>();
     auto queueChecker = notificationRecorder->queueChecker();

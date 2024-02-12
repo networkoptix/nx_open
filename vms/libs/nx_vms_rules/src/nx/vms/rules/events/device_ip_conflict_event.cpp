@@ -19,8 +19,8 @@ namespace nx::vms::rules {
 
 DeviceIpConflictEvent::DeviceIpConflictEvent(
     std::chrono::microseconds timestamp,
-    QnUuid serverId,
-    QnUuidList deviceIds,
+    nx::Uuid serverId,
+    UuidList deviceIds,
     const QHostAddress& address,
     const QStringList& macAddrList)
     :

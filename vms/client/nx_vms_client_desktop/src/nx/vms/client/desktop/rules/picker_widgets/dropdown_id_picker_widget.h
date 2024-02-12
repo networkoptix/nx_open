@@ -95,7 +95,7 @@ protected:
     void onCurrentIndexChanged() override
     {
         theField()->setValue(
-            m_comboBox->currentData(ui::PluginDiagnosticEventModel::PluginIdRole).value<QnUuid>());
+            m_comboBox->currentData(ui::PluginDiagnosticEventModel::PluginIdRole).value<nx::Uuid>());
     }
 
     void updateUi()
@@ -109,12 +109,12 @@ protected:
         m_comboBox->setEnabled(m_pluginDiagnosticEventModel->isValid());
         m_comboBox->model()->sort(0);
 
-        QnUuid pluginId = theField()->value();
+        nx::Uuid pluginId = theField()->value();
         if (pluginId.isNull())
         {
             pluginId = m_comboBox->itemData(
                 0,
-                ui::PluginDiagnosticEventModel::PluginIdRole).value<QnUuid>();
+                ui::PluginDiagnosticEventModel::PluginIdRole).value<nx::Uuid>();
         }
 
         auto pluginListModel = m_comboBox->model();
@@ -165,7 +165,7 @@ protected:
     void onCurrentIndexChanged() override
     {
         theField()->setEngineId(
-            m_comboBox->currentData(ui::AnalyticsSdkEventModel::EngineIdRole).value<QnUuid>());
+            m_comboBox->currentData(ui::AnalyticsSdkEventModel::EngineIdRole).value<nx::Uuid>());
         theField()->setTypeId(
             m_comboBox->currentData(ui::AnalyticsSdkEventModel::EventTypeIdRole).value<QString>());
     }
@@ -176,7 +176,7 @@ protected:
 
         m_analyticsSdkEventModel->loadFromCameras(
             getCameras(),
-            m_comboBox->currentData(ui::AnalyticsSdkEventModel::EngineIdRole).value<QnUuid>(),
+            m_comboBox->currentData(ui::AnalyticsSdkEventModel::EngineIdRole).value<nx::Uuid>(),
             m_comboBox->currentData(ui::AnalyticsSdkEventModel::EventTypeIdRole).value<QString>());
 
         m_comboBox->setEnabled(m_analyticsSdkEventModel->isValid());
@@ -258,7 +258,7 @@ protected:
         QSignalBlocker blocker{m_comboBox};
 
         const auto ids = getCameras().ids();
-        m_comboBox->setDevices(QnUuidSet{ids.begin(), ids.end()});
+        m_comboBox->setDevices(UuidSet{ids.begin(), ids.end()});
 
         m_comboBox->setSelectedMainObjectTypeId(theField()->value());
     }

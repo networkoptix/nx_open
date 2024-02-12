@@ -15,7 +15,7 @@ namespace nx::vms::client::desktop {
 class RecordingStatusHelper: public QObject, public SystemContextAware
 {
     Q_OBJECT
-    Q_PROPERTY(QnUuid cameraId READ cameraId WRITE setCameraId NOTIFY cameraIdChanged)
+    Q_PROPERTY(nx::Uuid cameraId READ cameraId WRITE setCameraId NOTIFY cameraIdChanged)
     Q_PROPERTY(QString tooltip READ tooltip NOTIFY recordingModeChanged)
     Q_PROPERTY(QString shortTooltip READ shortTooltip NOTIFY recordingModeChanged)
     Q_PROPERTY(QString qmlIconName READ qmlIconName NOTIFY recordingModeChanged)
@@ -24,8 +24,8 @@ public:
     RecordingStatusHelper(SystemContext* systemContext, QObject* parent = nullptr);
     RecordingStatusHelper(); //< QML constructor.
 
-    QnUuid cameraId() const;
-    void setCameraId(const QnUuid& id);
+    nx::Uuid cameraId() const;
+    void setCameraId(const nx::Uuid& id);
 
     QnVirtualCameraResourcePtr camera() const;
     void setCamera(const QnVirtualCameraResourcePtr& camera);

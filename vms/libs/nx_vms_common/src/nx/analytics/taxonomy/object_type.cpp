@@ -78,7 +78,7 @@ bool ObjectType::hasEverBeenSupported() const
     return m_impl->hasEverBeenSupported();
 }
 
-bool ObjectType::isSupported(QnUuid engineId, QnUuid deviceId) const
+bool ObjectType::isSupported(nx::Uuid engineId, nx::Uuid deviceId) const
 {
     return m_impl->isSupported(engineId, deviceId);
 }

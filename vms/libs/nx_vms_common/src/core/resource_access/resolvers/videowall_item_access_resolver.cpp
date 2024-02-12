@@ -35,9 +35,9 @@ public:
         AbstractResourceAccessResolver* baseResolver,
         QnResourcePool* resourcePool);
 
-    ResourceAccessMap ensureAccessMap(const QnUuid& subjectId) const;
+    ResourceAccessMap ensureAccessMap(const nx::Uuid& subjectId) const;
 
-    void handleBaseAccessChanged(const QSet<QnUuid>& subjectIds);
+    void handleBaseAccessChanged(const QSet<nx::Uuid>& subjectIds);
     void handleReset();
 
     void handleVideowallAdded(const QnVideoWallResourcePtr& videowall);
@@ -45,29 +45,29 @@ public:
     void handleVideowallLayoutsChanged(const QnVideoWallResourcePtr& videowall);
 
     void handleVideowallLayoutsAdded(const QnVideoWallResourcePtr& videowall,
-        const QVector<QnUuid>& layoutIds);
+        const QVector<nx::Uuid>& layoutIds);
 
     void handleVideowallLayoutsRemoved(const QnVideoWallResourcePtr& videowall,
-        const QVector<QnUuid>& layoutIds);
+        const QVector<nx::Uuid>& layoutIds);
 
     void handleLayoutAdded(const QnLayoutResourcePtr& layout);
     void handleLayoutRemoved(const QnLayoutResourcePtr& layout);
-    void handleLayoutParentChanged(const QnResourcePtr& layoutResource, const QnUuid& oldParentId);
+    void handleLayoutParentChanged(const QnResourcePtr& layoutResource, const nx::Uuid& oldParentId);
 
-    void invalidateSubjects(const QSet<QnUuid>& subjectIds);
+    void invalidateSubjects(const QSet<nx::Uuid>& subjectIds);
 
-    QSet<QnUuid> invalidateCache(); //< Returns all subject ids that were cached.
+    QSet<nx::Uuid> invalidateCache(); //< Returns all subject ids that were cached.
 
     void notifyResolutionChanged(const QnVideoWallResourcePtr& videowall,
-        const QSet<QnUuid>& knownAffectedSubjectIds);
+        const QSet<nx::Uuid>& knownAffectedSubjectIds);
 
 public:
     const QPointer<AbstractResourceAccessResolver> baseResolver;
     const QPointer<QnResourcePool> resourcePool;
     const std::shared_ptr<VideowallLayoutWatcher> videowallWatcher;
-    mutable QHash<QnUuid, ResourceAccessMap> cachedAccessMaps;
-    mutable QHash<QnVideoWallResourcePtr, QSet<QnUuid>> videowallSubjects;
-    mutable QHash<QnUuid, QSet<QnVideoWallResourcePtr>> subjectVideowalls;
+    mutable QHash<nx::Uuid, ResourceAccessMap> cachedAccessMaps;
+    mutable QHash<QnVideoWallResourcePtr, QSet<nx::Uuid>> videowallSubjects;
+    mutable QHash<nx::Uuid, QSet<QnVideoWallResourcePtr>> subjectVideowalls;
     mutable nx::Mutex mutex;
 };
 
@@ -89,14 +89,14 @@ VideowallItemAccessResolver::~VideowallItemAccessResolver()
     // Required here for forward-declared scoped pointer destruction.
 }
 
-ResourceAccessMap VideowallItemAccessResolver::resourceAccessMap(const QnUuid& subjectId) const
+ResourceAccessMap VideowallItemAccessResolver::resourceAccessMap(const nx::Uuid& subjectId) const
 {
     return d->baseResolver && d->resourcePool
         ? d->ensureAccessMap(subjectId)
         : ResourceAccessMap();
 }
 
-GlobalPermissions VideowallItemAccessResolver::globalPermissions(const QnUuid& subjectId) const
+GlobalPermissions VideowallItemAccessResolver::globalPermissions(const nx::Uuid& subjectId) const
 {
     return d->baseResolver
         ? d->baseResolver->globalPermissions(subjectId)
@@ -104,7 +104,7 @@ GlobalPermissions VideowallItemAccessResolver::globalPermissions(const QnUuid& s
 }
 
 ResourceAccessDetails VideowallItemAccessResolver::accessDetails(
-    const QnUuid& subjectId,
+    const nx::Uuid& subjectId,
     const QnResourcePtr& resource,
     nx::vms::api::AccessRight accessRight) const
 {
@@ -197,7 +197,7 @@ VideowallItemAccessResolver::Private::Private(
 }
 
 ResourceAccessMap VideowallItemAccessResolver::Private::ensureAccessMap(
-    const QnUuid& subjectId) const
+    const nx::Uuid& subjectId) const
 {
     NX_MUTEX_LOCKER lk(&mutex);
 
@@ -244,16 +244,16 @@ ResourceAccessMap VideowallItemAccessResolver::Private::ensureAccessMap(
     return cachedAccessMapRef;
 }
 
-void VideowallItemAccessResolver::Private::handleBaseAccessChanged(const QSet<QnUuid>& subjectIds)
+void VideowallItemAccessResolver::Private::handleBaseAccessChanged(const QSet<nx::Uuid>& subjectIds)
 {
     NX_DEBUG(q, "Base resolution changed for %1 subjects: %2", subjectIds.size(), subjectIds);
     invalidateSubjects(subjectIds);
     q->notifyAccessChanged(subjectIds);
 }
 
-void VideowallItemAccessResolver::Private::invalidateSubjects(const QSet<QnUuid>& subjectIds)
+void VideowallItemAccessResolver::Private::invalidateSubjects(const QSet<nx::Uuid>& subjectIds)
 {
-    QSet<QnUuid> affectedCachedSubjectIds;
+    QSet<nx::Uuid> affectedCachedSubjectIds;
     {
         NX_MUTEX_LOCKER lk(&mutex);
 
@@ -285,10 +285,10 @@ void VideowallItemAccessResolver::Private::invalidateSubjects(const QSet<QnUuid>
 }
 
 void VideowallItemAccessResolver::Private::notifyResolutionChanged(
-    const QnVideoWallResourcePtr& videowall, const QSet<QnUuid>& knownAffectedSubjectIds)
+    const QnVideoWallResourcePtr& videowall, const QSet<nx::Uuid>& knownAffectedSubjectIds)
 {
     const auto watchedSubjectIds = q->notifier()->watchedSubjectIds();
-    QSet<QnUuid> affectedWatchedSubjectIds;
+    QSet<nx::Uuid> affectedWatchedSubjectIds;
 
     for (const auto id: watchedSubjectIds)
     {
@@ -307,10 +307,10 @@ void VideowallItemAccessResolver::Private::handleReset()
     q->notifyAccessReset();
 }
 
-QSet<QnUuid> VideowallItemAccessResolver::Private::invalidateCache()
+QSet<nx::Uuid> VideowallItemAccessResolver::Private::invalidateCache()
 {
     NX_MUTEX_LOCKER lk(&mutex);
-    const auto cachedSubjectIds = QSet<QnUuid>(
+    const auto cachedSubjectIds = QSet<nx::Uuid>(
         cachedAccessMaps.keyBegin(), cachedAccessMaps.keyEnd());
 
     cachedAccessMaps.clear();
@@ -326,7 +326,7 @@ void VideowallItemAccessResolver::Private::handleVideowallAdded(
     if (!baseResolver)
         return;
 
-    QSet<QnUuid> affectedCachedSubjectIds;
+    QSet<nx::Uuid> affectedCachedSubjectIds;
     {
         NX_MUTEX_LOCKER lk(&mutex);
 
@@ -351,7 +351,7 @@ void VideowallItemAccessResolver::Private::handleVideowallRemoved(
     const QnVideoWallResourcePtr& videowall)
 {
     const auto invalidateVideowallData =
-        [this](const QnVideoWallResourcePtr& videowall) -> QSet<QnUuid> /*videowallSubjectIds*/
+        [this](const QnVideoWallResourcePtr& videowall) -> QSet<nx::Uuid> /*videowallSubjectIds*/
         {
             NX_MUTEX_LOCKER lk(&mutex);
             const auto subjectIds = videowallSubjects.take(videowall);
@@ -376,7 +376,7 @@ void VideowallItemAccessResolver::Private::handleVideowallRemoved(
 }
 
 void VideowallItemAccessResolver::Private::handleVideowallLayoutsAdded(
-    const QnVideoWallResourcePtr& videowall, const QVector<QnUuid>& layoutIds)
+    const QnVideoWallResourcePtr& videowall, const QVector<nx::Uuid>& layoutIds)
 {
     bool changed = false;
     for (const auto& layoutId: layoutIds)
@@ -408,7 +408,7 @@ void VideowallItemAccessResolver::Private::handleVideowallLayoutsAdded(
 }
 
 void VideowallItemAccessResolver::Private::handleVideowallLayoutsRemoved(
-    const QnVideoWallResourcePtr& videowall, const QVector<QnUuid>& layoutIds)
+    const QnVideoWallResourcePtr& videowall, const QVector<nx::Uuid>& layoutIds)
 {
     for (const auto& layoutId: layoutIds)
     {
@@ -437,7 +437,7 @@ void VideowallItemAccessResolver::Private::handleVideowallLayoutsChanged(
     const QnVideoWallResourcePtr& videowall)
 {
     const auto invalidateVideowallSubjects =
-        [this](const QnVideoWallResourcePtr& videowall) -> QSet<QnUuid> /*videowallSubjectIds*/
+        [this](const QnVideoWallResourcePtr& videowall) -> QSet<nx::Uuid> /*videowallSubjectIds*/
         {
             NX_MUTEX_LOCKER lk(&mutex);
             const auto subjectIds = videowallSubjects.take(videowall);
@@ -479,7 +479,7 @@ void VideowallItemAccessResolver::Private::handleLayoutRemoved(const QnLayoutRes
 }
 
 void VideowallItemAccessResolver::Private::handleLayoutParentChanged(
-    const QnResourcePtr& layoutResource, const QnUuid& oldParentId)
+    const QnResourcePtr& layoutResource, const nx::Uuid& oldParentId)
 {
     const auto layout = layoutResource.objectCast<QnLayoutResource>();
     if (!NX_ASSERT(layout) || !resourcePool)

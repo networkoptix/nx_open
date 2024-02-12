@@ -50,12 +50,12 @@ protected:
     virtual void updateResource(const QnResourcePtr& resource, ec2::NotificationSource source) override;
     virtual void onGotInitialNotification(const nx::vms::api::FullInfoData& fullData) override;
 
-    virtual void handleRemotePeerFound(QnUuid peer, nx::vms::api::PeerType peerType) override;
-    virtual void handleRemotePeerLost(QnUuid peer, nx::vms::api::PeerType peerType) override;
-    virtual void removeHardwareIdMapping(const QnUuid& id) override;
+    virtual void handleRemotePeerFound(nx::Uuid peer, nx::vms::api::PeerType peerType) override;
+    virtual void handleRemotePeerLost(nx::Uuid peer, nx::vms::api::PeerType peerType) override;
+    virtual void removeHardwareIdMapping(const nx::Uuid& id) override;
 
 signals:
-    void hardwareIdMappingRemoved(const QnUuid& id);
+    void hardwareIdMappingRemoved(const nx::Uuid& id);
 
 private:
     QnClientConnectionStatus m_status;

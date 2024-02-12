@@ -20,7 +20,7 @@ struct NX_VMS_API WebRtcTrackerSettings: public MediaSettings
      * Device id (can be obtained from "id", "physicalId" or "logicalId" field via
      * /rest/v{1-}/devices) or MAC address (not supported for certain Devices).
      */
-    QnUuid id;
+    nx::Uuid id;
 
     /**%apidoc
      * If specified, regulates the speed of streaming from the Archive. Has no effect for live

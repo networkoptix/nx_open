@@ -35,7 +35,7 @@ struct CertificateStorage::Private
 
     bool persistent{false};
 
-    QFile keyFile(const QnUuid& serverId) const
+    QFile keyFile(const nx::Uuid& serverId) const
     {
         return QFile(dataDir.filePath(kFileNameTemplate.arg(serverId.toSimpleString())));
     }
@@ -59,7 +59,7 @@ CertificateStorage::~CertificateStorage()
 {
 }
 
-std::optional<std::string> CertificateStorage::pinnedCertificate(const QnUuid& serverId) const
+std::optional<std::string> CertificateStorage::pinnedCertificate(const nx::Uuid& serverId) const
 {
     NX_MUTEX_LOCKER lock(&d->mutex);
 
@@ -73,7 +73,7 @@ std::optional<std::string> CertificateStorage::pinnedCertificate(const QnUuid& s
     return keyFile.readAll().toStdString();
 }
 
-void CertificateStorage::pinCertificate(const QnUuid& serverId, const std::string& publicKey)
+void CertificateStorage::pinCertificate(const nx::Uuid& serverId, const std::string& publicKey)
 {
     NX_MUTEX_LOCKER lock(&d->mutex);
 

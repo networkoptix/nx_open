@@ -33,12 +33,12 @@ public:
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
 
     virtual int removeAnalyticsPlugin(
-        const QnUuid& id,
+        const nx::Uuid& id,
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
 
     virtual int removeAnalyticsEngine(
-        const QnUuid& id,
+        const nx::Uuid& id,
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
 
@@ -65,9 +65,9 @@ int AnalyticsManager<QueryProcessor>::getAnalyticsPlugins(
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
     const int requestId = generateRequestID();
-    processor().template processQueryAsync<QnUuid, nx::vms::api::AnalyticsPluginDataList>(
+    processor().template processQueryAsync<nx::Uuid, nx::vms::api::AnalyticsPluginDataList>(
         ApiCommand::getAnalyticsPlugins,
-        QnUuid(),
+        nx::Uuid(),
         [requestId, handler = handlerExecutor.bind(std::move(handler))](auto&&... args) mutable
         {
             handler(requestId, std::move(args)...);
@@ -81,9 +81,9 @@ int AnalyticsManager<QueryProcessor>::getAnalyticsEngines(
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
     const int requestId = generateRequestID();
-    processor().template processQueryAsync<QnUuid, nx::vms::api::AnalyticsEngineDataList>(
+    processor().template processQueryAsync<nx::Uuid, nx::vms::api::AnalyticsEngineDataList>(
         ApiCommand::getAnalyticsEngines,
-        QnUuid(),
+        nx::Uuid(),
         [requestId, handler = handlerExecutor.bind(std::move(handler))](auto&&... args) mutable
         {
             handler(requestId, std::move(args)...);
@@ -127,7 +127,7 @@ int AnalyticsManager<QueryProcessor>::save(
 
 template<typename QueryProcessor>
 int AnalyticsManager<QueryProcessor>::removeAnalyticsPlugin(
-    const QnUuid& id, Handler<> handler, nx::utils::AsyncHandlerExecutor handlerExecutor)
+    const nx::Uuid& id, Handler<> handler, nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
     const int requestId = generateRequestID();
     processor().processUpdateAsync(
@@ -142,7 +142,7 @@ int AnalyticsManager<QueryProcessor>::removeAnalyticsPlugin(
 
 template<typename QueryProcessor>
 int AnalyticsManager<QueryProcessor>::removeAnalyticsEngine(
-    const QnUuid& id, Handler<> handler, nx::utils::AsyncHandlerExecutor handlerExecutor)
+    const nx::Uuid& id, Handler<> handler, nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
     const int requestId = generateRequestID();
     processor().processUpdateAsync(

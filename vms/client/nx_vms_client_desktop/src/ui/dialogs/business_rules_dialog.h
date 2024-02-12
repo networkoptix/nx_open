@@ -45,7 +45,7 @@ public:
     virtual void reject() override;
 
 private:
-    void at_message_ruleDeleted(const QnUuid &id);
+    void at_message_ruleDeleted(const nx::Uuid &id);
 
     void at_newRuleButton_clicked();
     void at_testRuleButton_clicked();
@@ -82,11 +82,11 @@ private:
     QScopedPointer<Ui::BusinessRulesDialog> ui;
 
     QnBusinessRulesActualModel* m_rulesViewModel;
-    QList<QnUuid> m_pendingDeleteRules;
+    QList<nx::Uuid> m_pendingDeleteRules;
 
     QnBusinessRuleWidget* m_currentDetailsWidget;
 
-    QMap<int, QnUuid> m_deleting;
+    QMap<int, nx::Uuid> m_deleting;
 
     QMenu* m_popupMenu;
 

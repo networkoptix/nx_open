@@ -50,7 +50,7 @@ static constexpr const char* nxRSAPublicKey3 = "-----BEGIN PUBLIC KEY-----\n"
 /* One analog encoder requires one license to maintain this number of cameras. */
 static constexpr int camerasPerAnalogEncoderCount = 1;
 
-QnPeerRuntimeInfo remoteInfo(QnRuntimeInfoManager* manager, const QnUuid& serverId)
+QnPeerRuntimeInfo remoteInfo(QnRuntimeInfoManager* manager, const nx::Uuid& serverId)
 {
     if (!manager->hasItem(serverId))
         return QnPeerRuntimeInfo();
@@ -761,12 +761,12 @@ bool QnLicensePool::isEmpty() const
     return m_licenseDict.isEmpty();
 }
 
-QVector<QString> QnLicensePool::hardwareIds(const QnUuid& serverId) const
+QVector<QString> QnLicensePool::hardwareIds(const nx::Uuid& serverId) const
 {
     return remoteInfo(m_context->runtimeInfoManager(), serverId).data.hardwareIds;
 }
 
-QString QnLicensePool::currentHardwareId(const QnUuid& serverId) const
+QString QnLicensePool::currentHardwareId(const nx::Uuid& serverId) const
 {
     QString hardwareId;
 

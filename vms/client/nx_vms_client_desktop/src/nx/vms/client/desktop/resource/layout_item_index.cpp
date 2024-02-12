@@ -12,7 +12,7 @@ LayoutItemIndex::LayoutItemIndex()
 {
 }
 
-LayoutItemIndex::LayoutItemIndex(const LayoutResourcePtr& layout, const QnUuid& uuid):
+LayoutItemIndex::LayoutItemIndex(const LayoutResourcePtr& layout, const nx::Uuid& uuid):
     m_layout(layout),
     m_uuid(uuid)
 {
@@ -28,12 +28,12 @@ void LayoutItemIndex::setLayout(const LayoutResourcePtr& layout)
     m_layout = layout;
 }
 
-const QnUuid& LayoutItemIndex::uuid() const
+const nx::Uuid& LayoutItemIndex::uuid() const
 {
     return m_uuid;
 }
 
-void LayoutItemIndex::setUuid(const QnUuid& uuid)
+void LayoutItemIndex::setUuid(const nx::Uuid& uuid)
 {
     m_uuid = uuid;
 }

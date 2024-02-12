@@ -4,22 +4,22 @@
 
 namespace nx::vms::rules {
 
-QnUuid UniqueIdField::id() const
+nx::Uuid UniqueIdField::id() const
 {
     if (m_id.isNull())
-        m_id = QnUuid::createUuid();
+        m_id = nx::Uuid::createUuid();
 
     return m_id;
 }
 
-void UniqueIdField::setId(QnUuid id)
+void UniqueIdField::setId(nx::Uuid id)
 {
     m_id = id;
 }
 
 bool UniqueIdField::match(const QVariant& eventValue) const
 {
-    return eventValue.value<QnUuid>() == m_id;
+    return eventValue.value<nx::Uuid>() == m_id;
 }
 
 } // namespace nx::vms::rules

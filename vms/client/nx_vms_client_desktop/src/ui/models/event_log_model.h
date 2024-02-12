@@ -83,14 +83,14 @@ private:
     static int helpTopicIdData(Column column, const nx::vms::event::ActionData& action);
 
     QString motionUrl(Column column, const nx::vms::event::ActionData& action) const;
-    QString getSubjectNameById(const QnUuid& id) const;
-    QString getSubjectsText(const std::vector<QnUuid>& ids) const;
+    QString getSubjectNameById(const nx::Uuid& id) const;
+    QString getSubjectsText(const std::vector<nx::Uuid>& ids) const;
 
-    QString getResourceNameString(const QnUuid& id) const;
+    QString getResourceNameString(const nx::Uuid& id) const;
 
     bool hasVideoLink(const nx::vms::event::ActionData& action) const;
-    bool hasAccessToCamera(const QnUuid& cameraId) const;
-    bool hasAccessToArchive(const QnUuid& cameraId) const;
+    bool hasAccessToCamera(const nx::Uuid& cameraId) const;
+    bool hasAccessToArchive(const nx::Uuid& cameraId) const;
 
 private:
     QList<Column> m_columns;

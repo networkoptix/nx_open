@@ -82,7 +82,7 @@ QString StringHelper::timestampTime(std::chrono::microseconds eventTimestamp) co
     return time::toString(dateTime.time());
 }
 
-QString StringHelper::plugin(QnUuid pluginId) const
+QString StringHelper::plugin(nx::Uuid pluginId) const
 {
     using nx::analytics::taxonomy::AbstractState;
     using nx::analytics::taxonomy::AbstractEngine;
@@ -101,7 +101,7 @@ QString StringHelper::plugin(QnUuid pluginId) const
     return {};
 }
 
-QString StringHelper::resource(QnUuid resourceId, Qn::ResourceInfoLevel detailLevel) const
+QString StringHelper::resource(nx::Uuid resourceId, Qn::ResourceInfoLevel detailLevel) const
 {
     return resource(systemContext()->resourcePool()->getResourceById(resourceId), detailLevel);
 }
@@ -113,7 +113,7 @@ QString StringHelper::resource(
     return resource ? QnResourceDisplayInfo(resource).toString(detailLevel) : QString();
 }
 
-QString StringHelper::resourceIp(QnUuid resourceId) const
+QString StringHelper::resourceIp(nx::Uuid resourceId) const
 {
     auto resource = systemContext()->resourcePool()->getResourceById(resourceId);
     if (!resource)
@@ -123,7 +123,7 @@ QString StringHelper::resourceIp(QnUuid resourceId) const
 }
 
 QString StringHelper::urlForCamera(
-    QnUuid id,
+    nx::Uuid id,
     std::chrono::microseconds timestamp,
     Url urlType,
     const std::optional<nx::network::SocketAddress>& proxyAddress) const
@@ -180,7 +180,7 @@ QString StringHelper::urlForCamera(
             }
             case Url::cloud:
             {
-                const auto sId = QnUuid::fromStringSafe(systemSettings()->cloudSystemId());
+                const auto sId = nx::Uuid::fromStringSafe(systemSettings()->cloudSystemId());
                 return builder.setHost(nx::network::SocketGlobals::cloud().cloudHost())
                     .setPath(NX_FMT("/systems/%1/view/%2", sId.toSimpleString(), id.toSimpleString()))
                     .setQuery(NX_FMT("time=%1", timestamp.count()))

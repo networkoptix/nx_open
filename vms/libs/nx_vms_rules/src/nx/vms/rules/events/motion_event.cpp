@@ -12,7 +12,7 @@
 
 namespace nx::vms::rules {
 
-MotionEvent::MotionEvent(std::chrono::microseconds timestamp, State state, QnUuid deviceId):
+MotionEvent::MotionEvent(std::chrono::microseconds timestamp, State state, nx::Uuid deviceId):
     base_type(timestamp, state, deviceId)
 {
 }

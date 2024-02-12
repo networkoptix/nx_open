@@ -21,7 +21,7 @@ class NX_VMS_COMMON_API AbstractMiscNotificationManager: public QObject
 
 signals:
     void systemIdChangeRequested(
-        const QnUuid& systemId, qint64 sysIdTime, nx::vms::api::Timestamp tranLogTime);
+        const nx::Uuid& systemId, qint64 sysIdTime, nx::vms::api::Timestamp tranLogTime);
 
     void miscDataChanged(const QString& name, const QString& value);
 };
@@ -32,14 +32,14 @@ public:
     virtual ~AbstractMiscManager() = default;
 
     virtual int changeSystemId(
-        const QnUuid& systemId,
+        const nx::Uuid& systemId,
         qint64 sysIdTime,
         nx::vms::api::Timestamp tranLogTime,
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) = 0;
 
     ErrorCode changeSystemIdSync(
-        const QnUuid& systemId, qint64 sysIdTime, nx::vms::api::Timestamp tranLogTime);
+        const nx::Uuid& systemId, qint64 sysIdTime, nx::vms::api::Timestamp tranLogTime);
 
     virtual int cleanupDatabase(
         bool cleanupDbObjects,

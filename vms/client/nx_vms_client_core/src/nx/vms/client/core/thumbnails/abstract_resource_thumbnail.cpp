@@ -383,7 +383,7 @@ void AbstractResourceThumbnail::Private::setImage(const QImage& value)
 
     NX_VERBOSE(q, "Received new image %3x%4 for %1 (%2)",
         resource ? resource->getName() : QString("<no resource>"),
-        resource ? resource->getId() : QnUuid(),
+        resource ? resource->getId() : nx::Uuid(),
         value.width(),
         value.height());
 

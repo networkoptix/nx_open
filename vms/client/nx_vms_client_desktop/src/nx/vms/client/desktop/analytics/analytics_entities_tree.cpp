@@ -74,7 +74,7 @@ NodePtr buildEventTypesTree(const std::vector<EngineScope<AbstractEventType>>& e
     for (const EngineScope<AbstractEventType>& engineScope: eventTypeTree)
     {
         auto engine = makeNode(NodeType::engine, root, engineScope.engine->name());
-        const QnUuid engineId(engineScope.engine->id());
+        const nx::Uuid engineId(engineScope.engine->id());
         engine->engineId = engineId;
         root->children.push_back(engine);
 
@@ -119,7 +119,7 @@ NodePtr buildObjectTypesTree(const std::vector<EngineScope<AbstractObjectType>>&
         if (!NX_ASSERT(taxonomyEngine))
             continue;
 
-        const QnUuid engineId = QnUuid::fromStringSafe(taxonomyEngine->id());
+        const nx::Uuid engineId = nx::Uuid::fromStringSafe(taxonomyEngine->id());
         auto engine = makeNode(NodeType::engine, root, taxonomyEngine->name());
         engine->engineId = engineId;
         root->children.push_back(engine);
@@ -391,7 +391,7 @@ NodePtr AnalyticsEventsSearchTreeBuilder::calculateEventTypesTree() const
         return NodePtr(new Node(NodeType::root, {}));
 
     // TODO: #sivanov Shouldn't we filter out cameras here the same way?
-    const auto devices = resourcePool()->getAllCameras(QnUuid(), /*ignoreDesktopCameras*/ true);
+    const auto devices = resourcePool()->getAllCameras(nx::Uuid(), /*ignoreDesktopCameras*/ true);
 
     const std::shared_ptr<AbstractState> taxonomyState = systemContext()->analyticsTaxonomyState();
     if (!taxonomyState)
@@ -451,7 +451,7 @@ AnalyticsObjectsSearchTreeBuilder::AnalyticsObjectsSearchTreeBuilder(
 
 AnalyticsEntitiesTreeBuilder::NodePtr AnalyticsObjectsSearchTreeBuilder::objectTypesTree() const
 {
-    const auto devices = resourcePool()->getAllCameras(QnUuid(), /*ignoreDesktopCameras*/ true);
+    const auto devices = resourcePool()->getAllCameras(nx::Uuid(), /*ignoreDesktopCameras*/ true);
     const std::shared_ptr<AbstractState> taxonomyState = systemContext()->analyticsTaxonomyState();
     if (!taxonomyState)
         return NodePtr();

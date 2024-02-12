@@ -26,7 +26,7 @@ constexpr int kRetryTimeoutMs = 5000;
 
 QnMediaServerStatisticsStorage::QnMediaServerStatisticsStorage(
     SystemContext* systemContext,
-    const QnUuid& serverId,
+    const nx::Uuid& serverId,
     int pointsLimit,
     QObject* parent)
     :

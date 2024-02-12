@@ -21,7 +21,7 @@ EngineLicenseSummaryProvider::EngineLicenseSummaryProvider(SystemContext* contex
 {
 }
 
-QVariant EngineLicenseSummaryProvider::licenseSummary(QnUuid engineId) const
+QVariant EngineLicenseSummaryProvider::licenseSummary(nx::Uuid engineId) const
 {
     if (const auto engine =
         resourcePool()->getResourceById<common::AnalyticsEngineResource>(engineId))
@@ -48,7 +48,7 @@ QVariant EngineLicenseSummaryProvider::licenseSummary(QnUuid engineId) const
 }
 
 QVariant EngineLicenseSummaryProvider::licenseSummary(
-    QnUuid engineId, QnUuid cameraId, const QVariantList& proposedEngines) const
+    nx::Uuid engineId, nx::Uuid cameraId, const QVariantList& proposedEngines) const
 {
     if (const auto engine =
         resourcePool()->getResourceById<common::AnalyticsEngineResource>(engineId))
@@ -58,7 +58,7 @@ QVariant EngineLicenseSummaryProvider::licenseSummary(
 
         auto usageHelper = common::saas::IntegrationServiceUsageHelper{systemContext()};
         usageHelper.proposeChange(
-            cameraId, nx::utils::toQSet(nx::utils::toTypedQList<QnUuid>(proposedEngines)));
+            cameraId, nx::utils::toQSet(nx::utils::toTypedQList<nx::Uuid>(proposedEngines)));
 
         auto summary = usageHelper.info(engine->plugin()->manifest().id).toVariantMap();
 
@@ -76,8 +76,8 @@ QVariant EngineLicenseSummaryProvider::licenseSummary(
     return {};
 }
 
-QSet<QnUuid> EngineLicenseSummaryProvider::overusedEngines(
-    QnUuid cameraId, const QSet<QnUuid>& proposedEngines) const
+QSet<nx::Uuid> EngineLicenseSummaryProvider::overusedEngines(
+    nx::Uuid cameraId, const QSet<nx::Uuid>& proposedEngines) const
 {
     auto usageHelper = common::saas::IntegrationServiceUsageHelper{systemContext()};
     usageHelper.proposeChange(cameraId, proposedEngines);
@@ -85,7 +85,7 @@ QSet<QnUuid> EngineLicenseSummaryProvider::overusedEngines(
     if (!usageHelper.isOverflow())
         return {};
 
-    QSet<QnUuid> result;
+    QSet<nx::Uuid> result;
     for (const auto& engineId: proposedEngines)
     {
         const auto engine =

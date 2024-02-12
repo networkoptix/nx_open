@@ -67,9 +67,9 @@ QString AnalyticsPluginResource::idForToStringFromPtr() const
     return nx::format("[%1 %2]").args(getName(), getId());
 }
 
-QnUuid AnalyticsPluginResource::uuidFromManifest(const QString& id)
+nx::Uuid AnalyticsPluginResource::uuidFromManifest(const QString& id)
 {
-    return QnUuid::fromArbitraryData(id);
+    return nx::Uuid::fromArbitraryData(id);
 }
 
 } // namespace nx::vms::common

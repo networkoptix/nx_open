@@ -21,7 +21,7 @@ struct CameraSettingsAnalyticsEnginesWatcherStub:
     }
 
     virtual nx::vms::api::StreamIndex analyzedStreamIndex(
-        const QnUuid& /*engineId*/) const override
+        const nx::Uuid& /*engineId*/) const override
     {
         return nx::vms::api::StreamIndex::undefined;
     }
@@ -41,12 +41,12 @@ struct CameraSettingsTestFixture::Private
         analyticsEnginesWatcher = std::make_unique<CameraSettingsAnalyticsEnginesWatcherStub>();
     }
 
-    QnUuid ensureAnalyticsEngineExistsAndGetId()
+    nx::Uuid ensureAnalyticsEngineExistsAndGetId()
     {
         if (analyticsEnginesWatcher->analyticsEngines.empty())
         {
             analyticsEnginesWatcher->analyticsEngines.push_back({
-                .id = QnUuid::createUuid(),
+                .id = nx::Uuid::createUuid(),
                 .isDeviceDependent = false});
         }
         return analyticsEnginesWatcher->analyticsEngines.front().id;

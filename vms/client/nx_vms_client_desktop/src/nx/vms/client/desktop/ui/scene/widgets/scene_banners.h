@@ -26,16 +26,16 @@ public:
     SceneBanners(QWidget* parentWidget);
     virtual ~SceneBanners() override;
 
-    QnUuid add(const QString& text,
+    nx::Uuid add(const QString& text,
         std::optional<std::chrono::milliseconds> timeout = {},
         std::optional<QFont> font = {});
 
-    bool remove(const QnUuid& id, bool immediately = false);
+    bool remove(const nx::Uuid& id, bool immediately = false);
 
-    bool changeText(const QnUuid& id, const QString& newText);
+    bool changeText(const nx::Uuid& id, const QString& newText);
 
 signals:
-    void removed(const QnUuid& id);
+    void removed(const nx::Uuid& id);
 
 private:
     class Private;
@@ -58,10 +58,10 @@ public:
     bool changeText(const QString& value);
 
 protected:
-    explicit SceneBanner(const QnUuid& id, QObject* parent = nullptr);
+    explicit SceneBanner(const nx::Uuid& id, QObject* parent = nullptr);
 
 private:
-    QnUuid m_id;
+    nx::Uuid m_id;
 };
 
 } // namespace nx::vms::client::desktop

@@ -35,8 +35,8 @@ public:
     void disableUpdateData();
     void enableUpdateData();
     void setDateRange(qint64 startTimeMs, qint64 endTimeMs);
-    QnUuidSet getCameraList() const;
-    void setCameraList(const QnUuidSet& ids);
+    UuidSet getCameraList() const;
+    void setCameraList(const UuidSet& ids);
     void setActionType(nx::vms::api::ActionType value);
     void setEventType(nx::vms::api::EventType value);
     void setAnalyticsEventType(nx::vms::api::analytics::EventTypeId value);
@@ -97,7 +97,7 @@ private:
     QSet<rest::Handle> m_requests;
 
     nx::vms::event::ActionDataList m_allEvents;
-    QSet<QnUuid> m_filterCameraList;
+    QSet<nx::Uuid> m_filterCameraList;
     bool m_updateDisabled;
     bool m_dirty;
 

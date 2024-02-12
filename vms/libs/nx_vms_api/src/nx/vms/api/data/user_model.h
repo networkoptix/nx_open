@@ -22,7 +22,7 @@ namespace nx::vms::api {
  */
 struct NX_VMS_API UserModelBase
 {
-    QnUuid id;
+    nx::Uuid id;
 
     /**%apidoc
      * %example admin
@@ -63,8 +63,8 @@ struct NX_VMS_API UserModelBase
 
     bool operator==(const UserModelBase& other) const = default;
 
-    QnUuid getId() const { return id; }
-    void setId(QnUuid id_) { id = std::move(id_); }
+    nx::Uuid getId() const { return id; }
+    void setId(nx::Uuid id_) { id = std::move(id_); }
 
     UserDataEx toUserData() &&;
     static UserModelBase fromUserData(UserData&& baseData);
@@ -102,13 +102,13 @@ struct NX_VMS_API UserModelV1: public UserModelBase
     GlobalPermissionsDeprecated permissions = GlobalPermissionDeprecated::none;
 
     /**%apidoc[opt] User Role id, can be obtained from `GET /rest/v{1-}/userRoles`. */
-    QnUuid userRoleId;
+    nx::Uuid userRoleId;
 
     /**%apidoc
      * List of accessible Resource ids for the User. The access rights are calculated from the
      * `permissions` value when the User accesses a Resource.
      */
-    std::optional<std::vector<QnUuid>> accessibleResources;
+    std::optional<std::vector<nx::Uuid>> accessibleResources;
 
     bool operator==(const UserModelV1& other) const = default;
 
@@ -175,7 +175,7 @@ using TemporaryTokenList = std::vector<TemporaryToken>;
 struct NX_VMS_API UserModelV3: public UserModelBase
 {
     /**%apidoc[opt] User group id, can be obtained from `GET /rest/v{3-}/userGroups`. */
-    std::vector<QnUuid> groupIds;
+    std::vector<nx::Uuid> groupIds;
 
     /**%apidoc[opt] */
     GlobalPermissions permissions = GlobalPermission::none;
@@ -185,7 +185,7 @@ struct NX_VMS_API UserModelV3: public UserModelBase
      * `/rest/v{3-}/servers`, etc.) or Resource Group (can be obtained from
      * `/rest/v{3-}/resourceGroups`).
      */
-    std::map<QnUuid, AccessRights> resourceAccessRights;
+    std::map<nx::Uuid, AccessRights> resourceAccessRights;
 
     /**%apidoc
      * This token should be used only when the user type is `temporaryLocal`.

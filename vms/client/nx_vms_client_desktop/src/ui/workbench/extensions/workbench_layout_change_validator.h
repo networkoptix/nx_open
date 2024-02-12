@@ -20,7 +20,7 @@ public:
     bool confirmDeleteVideoWallMatrices(const QnVideoWallMatrixIndexList& matrixIndexes) const;
 
 private:
-    void addLayoutResourceIds(const QnLayoutResourcePtr& layout, QSet<QnUuid>& resourceIds) const;
+    void addLayoutResourceIds(const QnLayoutResourcePtr& layout, QSet<nx::Uuid>& resourceIds) const;
 
     bool isAccessibleBySpecifiedProvidersOnly(
         const QnResourcePtr& resource, const QSet<QnResourcePtr>& specificProviders) const;

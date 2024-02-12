@@ -32,7 +32,7 @@ public:
     virtual ~GlobalPermissionsWatcher() override;
 
     virtual nx::vms::api::GlobalPermissions ownGlobalPermissions(
-        const QnUuid& subjectId) const override;
+        const nx::Uuid& subjectId) const override;
 
 protected:
     virtual void beforeUpdate() override;

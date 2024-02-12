@@ -16,7 +16,7 @@ namespace nx::vms::common {
 
 struct PredefinedUserGroups::Private
 {
-    static QString name(const QnUuid& groupId)
+    static QString name(const nx::Uuid& groupId)
     {
         if (groupId == kAdministratorsGroupId)
             return tr("Administrators");
@@ -40,7 +40,7 @@ struct PredefinedUserGroups::Private
         return {};
     }
 
-    static QString description(const QnUuid& groupId)
+    static QString description(const nx::Uuid& groupId)
     {
         if (groupId == kAdministratorsGroupId)
             return tr("Members of this group have unlimited Site privileges. Administrators can "
@@ -74,7 +74,7 @@ struct PredefinedUserGroups::Private
         return {};
     }
 
-    static GlobalPermissions globalPermissions(const QnUuid& groupId)
+    static GlobalPermissions globalPermissions(const nx::Uuid& groupId)
     {
         if (groupId == kAdministratorsGroupId)
         {
@@ -106,7 +106,7 @@ struct PredefinedUserGroups::Private
         return {};
     };
 
-    static const std::map<QnUuid, AccessRights>& accessRights(const QnUuid& groupId)
+    static const std::map<nx::Uuid, AccessRights>& accessRights(const nx::Uuid& groupId)
     {
         static constexpr AccessRights kViewerAccessRights = AccessRight::view
             | AccessRight::viewArchive
@@ -119,7 +119,7 @@ struct PredefinedUserGroups::Private
 
         if (groupId == kAdministratorsGroupId || groupId == kPowerUsersGroupId)
         {
-            static const std::map<QnUuid, AccessRights> kPowerUserResourceAccessMap{
+            static const std::map<nx::Uuid, AccessRights> kPowerUserResourceAccessMap{
                 {kAllDevicesGroupId, kFullAccessRights},
                 {kAllWebPagesGroupId, AccessRight::view},
                 {kAllServersGroupId, AccessRight::view},
@@ -130,7 +130,7 @@ struct PredefinedUserGroups::Private
 
         if (groupId == kAdvancedViewersGroupId)
         {
-            static const std::map<QnUuid, AccessRights> kAdvancedViewerResourceAccessMap{
+            static const std::map<nx::Uuid, AccessRights> kAdvancedViewerResourceAccessMap{
                 {kAllDevicesGroupId, kAdvancedViewerAccessRights},
                 {kAllWebPagesGroupId, AccessRight::view},
                 {kAllServersGroupId, AccessRight::view}};
@@ -140,7 +140,7 @@ struct PredefinedUserGroups::Private
 
         if (groupId == kViewersGroupId)
         {
-            static const std::map<QnUuid, AccessRights> kViewerResourceAccessMap{
+            static const std::map<nx::Uuid, AccessRights> kViewerResourceAccessMap{
                 {kAllDevicesGroupId, kViewerAccessRights},
                 {kAllWebPagesGroupId, AccessRight::view},
                 {kAllServersGroupId, AccessRight::view}};
@@ -150,7 +150,7 @@ struct PredefinedUserGroups::Private
 
         if (groupId == kLiveViewersGroupId)
         {
-            static const std::map<QnUuid, AccessRights> kLiveViewerResourceAccessMap{
+            static const std::map<nx::Uuid, AccessRights> kLiveViewerResourceAccessMap{
                 {kAllDevicesGroupId, AccessRight::view},
                 {kAllWebPagesGroupId, AccessRight::view},
                 {kAllServersGroupId, AccessRight::view}};
@@ -160,23 +160,23 @@ struct PredefinedUserGroups::Private
 
         if (groupId == kSystemHealthViewersGroupId)
         {
-            static const std::map<QnUuid, AccessRights> kSystemHealthViewerResourceAccessMap{
+            static const std::map<nx::Uuid, AccessRights> kSystemHealthViewerResourceAccessMap{
                 {kAllServersGroupId, AccessRight::view}};
 
             return kSystemHealthViewerResourceAccessMap;
         }
 
         NX_ASSERT(false, "Not a predefined user group: %1", groupId);
-        static const std::map<QnUuid, AccessRights> kEmpty;
+        static const std::map<nx::Uuid, AccessRights> kEmpty;
         return kEmpty;
     }
 
-    static const std::unordered_map<QnUuid, UserGroupData>& dataById()
+    static const std::unordered_map<nx::Uuid, UserGroupData>& dataById()
     {
         static const auto kDataById =
             []()
             {
-                std::unordered_map<QnUuid, UserGroupData> result;
+                std::unordered_map<nx::Uuid, UserGroupData> result;
                 for (const auto groupId: PredefinedUserGroups::ids())
                 {
                     UserGroupData group(groupId, name(groupId), globalPermissions(groupId));
@@ -196,12 +196,12 @@ struct PredefinedUserGroups::Private
 // ------------------------------------------------------------------------------------------------
 // PredefinedUserGroups
 
-bool PredefinedUserGroups::contains(const QnUuid& groupId)
+bool PredefinedUserGroups::contains(const nx::Uuid& groupId)
 {
     return Private::dataById().contains(groupId);
 }
 
-std::optional<UserGroupData> PredefinedUserGroups::find(const QnUuid& predefinedGroupId)
+std::optional<UserGroupData> PredefinedUserGroups::find(const nx::Uuid& predefinedGroupId)
 {
     if (const auto it = Private::dataById().find(predefinedGroupId);
         it != Private::dataById().end())
@@ -226,12 +226,12 @@ const UserGroupDataList& PredefinedUserGroups::list()
     return kPredefinedUserGroupList;
 }
 
-const QList<QnUuid>& PredefinedUserGroups::ids()
+const QList<nx::Uuid>& PredefinedUserGroups::ids()
 {
-    static const QList<QnUuid> kIds =
+    static const QList<nx::Uuid> kIds =
         []()
         {
-            QList<QnUuid> result{kPredefinedGroupIds.cbegin(), kPredefinedGroupIds.cend()};
+            QList<nx::Uuid> result{kPredefinedGroupIds.cbegin(), kPredefinedGroupIds.cend()};
             std::sort(result.begin(), result.end());
             return result;
         }();

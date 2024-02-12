@@ -98,23 +98,23 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnAbstractTransaction,
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ApiTransactionData,
     (json)(ubjson)(xml)(csv_record), ApiTransactionData_Fields, (optional, true))
 
-QnUuid QnAbstractTransaction::makeHash(const QByteArray& data1, const QByteArray& data2)
+nx::Uuid QnAbstractTransaction::makeHash(const QByteArray& data1, const QByteArray& data2)
 {
     QCryptographicHash hash(QCryptographicHash::Md5);
     hash.addData(data1);
     if (!data2.isEmpty())
         hash.addData(data2);
-    return QnUuid::fromRfc4122(hash.result());
+    return nx::Uuid::fromRfc4122(hash.result());
 }
 
-QnUuid QnAbstractTransaction::makeHash(
+nx::Uuid QnAbstractTransaction::makeHash(
     const QByteArray& extraData, const nx::vms::api::DiscoveryData& data)
 {
     QCryptographicHash hash(QCryptographicHash::Md5);
     hash.addData(extraData);
     hash.addData(data.url.toUtf8());
     hash.addData(data.id.toString().toUtf8());
-    return QnUuid::fromRfc4122(hash.result());
+    return nx::Uuid::fromRfc4122(hash.result());
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ApiTranLogFilter,

@@ -77,7 +77,7 @@ public:
     Q_INVOKABLE bool isExtraInfoForced(QnResource* resource) const;
 
     QSet<QnResourcePtr> selectedResources() const;
-    QSet<QnUuid> selectedResourceIds() const;
+    QSet<nx::Uuid> selectedResourceIds() const;
     QModelIndex resourceIndex(const QnResourcePtr& resource) const;
 
     virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;

@@ -43,8 +43,8 @@ public:
 
     nx::vms::common::SystemContext* systemContext() const;
 
-    QnUuid peerId() const;
-    QnUuid sessionId() const;
+    nx::Uuid peerId() const;
+    nx::Uuid sessionId() const;
 
     QnLicensePool* licensePool() const;
     QnRuntimeInfoManager* runtimeInfoManager() const;

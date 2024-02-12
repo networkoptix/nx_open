@@ -34,7 +34,7 @@ class EventListModel: public AbstractEventListModel
 public:
     struct EventData
     {
-        QnUuid id;
+        nx::Uuid id;
         QString title;
         QString description;
         QString toolTip;
@@ -46,7 +46,7 @@ public:
         int helpId = -1;
         QnNotificationLevel::Value level = QnNotificationLevel::Value::NoNotification;
         std::chrono::microseconds previewTime{0}; //< The latest thumbnail's used if previewTime <= 0.
-        QnUuid ruleId;
+        nx::Uuid ruleId;
         bool forcePreviewLoader = false; //< Display loader on tile preview.
 
         // Resource data.
@@ -62,10 +62,10 @@ public:
         CommandActionPtr extraAction;
 
         // Analytics data.
-        QnUuid objectTrackId;
+        nx::Uuid objectTrackId;
         analytics::AttributeList attributes;
 
-        QnUuid sourceId() const;
+        nx::Uuid sourceId() const;
     };
 
 public:
@@ -89,12 +89,12 @@ protected:
 
     bool addEvent(const EventData& event, Position where = Position::front);
     bool updateEvent(const EventData& event);
-    bool updateEvent(QnUuid id);
-    bool removeEvent(const QnUuid& id);
+    bool updateEvent(nx::Uuid id);
+    bool removeEvent(const nx::Uuid& id);
 
     virtual bool defaultAction(const QModelIndex& index) override;
 
-    QModelIndex indexOf(const QnUuid& id) const;
+    QModelIndex indexOf(const nx::Uuid& id) const;
     EventData getEvent(int row) const;
 
 private:

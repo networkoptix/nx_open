@@ -14,7 +14,7 @@ namespace api {
 
 struct NX_VMS_API PropertyTypeData
 {
-    QnUuid resourceTypeId;
+    nx::Uuid resourceTypeId;
     QString name;
     QString defaultValue;
 
@@ -27,7 +27,7 @@ struct NX_VMS_API ResourceTypeData: IdData
 {
     QString name;
     QString vendor;
-    std::vector<QnUuid> parentId;
+    std::vector<nx::Uuid> parentId;
     PropertyTypeDataList propertyTypes;
 
     bool operator==(const ResourceTypeData& other) const = default;

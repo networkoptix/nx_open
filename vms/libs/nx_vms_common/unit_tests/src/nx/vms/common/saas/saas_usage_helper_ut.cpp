@@ -20,19 +20,19 @@ namespace nx::vms::common::saas::test {
 struct TestPluginData
 {
     QString pluginId;
-    QnUuid engineId;
+    nx::Uuid engineId;
 };
 
 static const std::array<TestPluginData, 2> testPluginData = {
-    TestPluginData{"testAnalyticsPlugin", QnUuid("bd0c8d99-5092-4db0-8767-1ae571250be9")},
-    TestPluginData{"testAnalyticsPlugin2", QnUuid("bd0c8d99-5092-4db0-8767-1ae571250be8")},
+    TestPluginData{"testAnalyticsPlugin", nx::Uuid("bd0c8d99-5092-4db0-8767-1ae571250be9")},
+    TestPluginData{"testAnalyticsPlugin2", nx::Uuid("bd0c8d99-5092-4db0-8767-1ae571250be8")},
 };
 
-static const QnUuid kAnalyticsServiceId("94ca45f8-4859-457a-bc17-f2f9394524fe");
+static const nx::Uuid kAnalyticsServiceId("94ca45f8-4859-457a-bc17-f2f9394524fe");
 
-static const QnUuid kServiceUnlimitedMegapixels("60a18a70-452b-46a1-9bfd-e66af6fbd0dc");
-static const QnUuid kServiceTenMegapixels("60a18a70-452b-46a1-9bfd-e66af6fbd0dd");
-static const QnUuid kServiceFiveMegapixels("60a18a70-452b-46a1-9bfd-e66af6fbd0de");
+static const nx::Uuid kServiceUnlimitedMegapixels("60a18a70-452b-46a1-9bfd-e66af6fbd0dc");
+static const nx::Uuid kServiceTenMegapixels("60a18a70-452b-46a1-9bfd-e66af6fbd0dd");
+static const nx::Uuid kServiceFiveMegapixels("60a18a70-452b-46a1-9bfd-e66af6fbd0de");
 
 
 static const std::string kServiceDataJson = R"json(
@@ -252,13 +252,13 @@ TEST_F(SaasServiceUsageHelperTest, CloudRecordingServiceUsage)
     auto cameras4 = addCameras(/*size*/ 1, /* megapixels*/ 100, /*useBackup*/ true);
     ASSERT_TRUE(m_cloudeStorageHelper->isOverflow());
 
-    std::set<QnUuid> devicesToAdd;
-    std::set<QnUuid> devicesToRemove;
+    std::set<nx::Uuid> devicesToAdd;
+    std::set<nx::Uuid> devicesToRemove;
     devicesToRemove.insert(cameras4.front()->getId());
     m_cloudeStorageHelper->proposeChange(devicesToAdd, devicesToRemove);
     ASSERT_FALSE(m_cloudeStorageHelper->isOverflow());
 
-    QSet<QnUuid> devices;
+    QSet<nx::Uuid> devices;
     for (const auto& camera: cameras1)
         devices.insert(camera->getId());
     m_cloudeStorageHelper->setUsedDevices(devices);
@@ -316,13 +316,13 @@ TEST_F(SaasServiceUsageHelperTest, CloudRecordingSaasMapping)
 
     auto cameras2 = addCameras(/*size*/ 150, /* megapixels*/ 6, /*useBackup*/ true);
     auto mapping = m_cloudeStorageHelper->servicesByCameras();
-    std::map<QnUuid, int> serviceUsages;
+    std::map<nx::Uuid, int> serviceUsages;
     for (const auto& [cameraId, serviceId]: mapping)
         ++serviceUsages[serviceId];
 
-    ASSERT_EQ(0, serviceUsages[QnUuid("60a18a70-452b-46a1-9bfd-e66af6fbd0de")]);
-    ASSERT_EQ(100, serviceUsages[QnUuid("60a18a70-452b-46a1-9bfd-e66af6fbd0dd")]);
-    ASSERT_EQ(50, serviceUsages[QnUuid("60a18a70-452b-46a1-9bfd-e66af6fbd0dc")]);
+    ASSERT_EQ(0, serviceUsages[nx::Uuid("60a18a70-452b-46a1-9bfd-e66af6fbd0de")]);
+    ASSERT_EQ(100, serviceUsages[nx::Uuid("60a18a70-452b-46a1-9bfd-e66af6fbd0dd")]);
+    ASSERT_EQ(50, serviceUsages[nx::Uuid("60a18a70-452b-46a1-9bfd-e66af6fbd0dc")]);
 
     auto cameras1 = addCameras(/*size*/ 200, /* megapixels*/ 5, /*useBackup*/ true);
     m_cloudeStorageHelper->invalidateCache();
@@ -331,9 +331,9 @@ TEST_F(SaasServiceUsageHelperTest, CloudRecordingSaasMapping)
     for (const auto& [cameraId, serviceId]: mapping)
         ++serviceUsages[serviceId];
 
-    ASSERT_EQ(100, serviceUsages[QnUuid("60a18a70-452b-46a1-9bfd-e66af6fbd0de")]);
-    ASSERT_EQ(100, serviceUsages[QnUuid("60a18a70-452b-46a1-9bfd-e66af6fbd0dd")]);
-    ASSERT_EQ(150, serviceUsages[QnUuid("60a18a70-452b-46a1-9bfd-e66af6fbd0dc")]);
+    ASSERT_EQ(100, serviceUsages[nx::Uuid("60a18a70-452b-46a1-9bfd-e66af6fbd0de")]);
+    ASSERT_EQ(100, serviceUsages[nx::Uuid("60a18a70-452b-46a1-9bfd-e66af6fbd0dd")]);
+    ASSERT_EQ(150, serviceUsages[nx::Uuid("60a18a70-452b-46a1-9bfd-e66af6fbd0dc")]);
 }
 
 TEST_F(SaasServiceUsageHelperTest, CloudRecordingSaasProposeChanges)
@@ -351,7 +351,7 @@ TEST_F(SaasServiceUsageHelperTest, CloudRecordingSaasProposeChanges)
     const auto getCamerasIds =
         [](QnVirtualCameraResourceList::iterator begin, QnVirtualCameraResourceList::iterator end)
         {
-            std::set<QnUuid> idSet;
+            std::set<nx::Uuid> idSet;
             std::transform(begin, end, std::inserter(idSet, idSet.end()),
                 [](const QnVirtualCameraResourcePtr& camera){ return camera->getId(); });
             return idSet;
@@ -369,7 +369,7 @@ TEST_F(SaasServiceUsageHelperTest, CloudRecordingSaasProposeChanges)
     auto allDisabledBackupCamerasIds =
         getCamerasIds(disabledBackupCameras.begin(), disabledBackupCameras.end());
 
-    std::set<QnUuid> allCamerasIds;
+    std::set<nx::Uuid> allCamerasIds;
     allCamerasIds.merge(allEnabledBackupCamerasIds);
     allCamerasIds.merge(allDisabledBackupCamerasIds);
 
@@ -490,7 +490,7 @@ TEST_F(SaasServiceUsageHelperTest, IntegrationServiceLoaded)
 TEST_F(SaasServiceUsageHelperTest, IntegrationServiceUsage)
 {
     auto cameras = addCameras(/*size*/ 50);
-    QSet<QnUuid> engines;
+    QSet<nx::Uuid> engines;
     engines.insert(testPluginData[0].engineId);
 
     cameras[0]->setUserEnabledAnalyticsEngines(engines);
@@ -507,13 +507,13 @@ TEST_F(SaasServiceUsageHelperTest, IntegrationServiceUsage)
     ASSERT_EQ(50, info.begin()->second.inUse);
 
     std::vector<IntegrationServiceUsageHelper::Propose> propose;
-    propose.push_back(IntegrationServiceUsageHelper::Propose{cameras[0]->getId(), QSet<QnUuid>()});
+    propose.push_back(IntegrationServiceUsageHelper::Propose{cameras[0]->getId(), QSet<nx::Uuid>()});
 
     m_integrationsHelper->proposeChange(propose);
     info = m_integrationsHelper->allInfo();
     ASSERT_EQ(49, info.begin()->second.inUse);
 
-    propose.push_back(IntegrationServiceUsageHelper::Propose{cameras[1]->getId(), QSet<QnUuid>()});
+    propose.push_back(IntegrationServiceUsageHelper::Propose{cameras[1]->getId(), QSet<nx::Uuid>()});
     m_integrationsHelper->proposeChange(propose);
     info = m_integrationsHelper->allInfo();
     ASSERT_EQ(48, info.begin()->second.inUse);
@@ -522,7 +522,7 @@ TEST_F(SaasServiceUsageHelperTest, IntegrationServiceUsage)
 TEST_F(SaasServiceUsageHelperTest, camerasByService)
 {
     auto cameras = addCameras(/*size*/ 50);
-    QSet<QnUuid> engines;
+    QSet<nx::Uuid> engines;
     for (const auto& data: testPluginData)
         engines.insert(data.engineId);
 
@@ -531,10 +531,10 @@ TEST_F(SaasServiceUsageHelperTest, camerasByService)
     m_integrationsHelper->invalidateCache();
     auto info = m_integrationsHelper->camerasByService();
     ASSERT_EQ(testPluginData.size(), info.size());
-    ASSERT_EQ(QnUuid(), info.begin()->first);
+    ASSERT_EQ(nx::Uuid(), info.begin()->first);
     ASSERT_EQ(kAnalyticsServiceId, info.rbegin()->first);
     ASSERT_EQ(50, info[kAnalyticsServiceId].size());
-    ASSERT_EQ(50, info[QnUuid()].size());
+    ASSERT_EQ(50, info[nx::Uuid()].size());
 }
 
 } // nx::vms::common::saas::test

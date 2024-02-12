@@ -83,7 +83,7 @@ void ensureScheduleFps(const CameraSettingsDialogState& state, int fps)
 AnalyticsEngineInfo makeAnalyticsEngine(bool isLicenseRequired)
 {
     AnalyticsEngineInfo engineInfo;
-    engineInfo.id = QnUuid::createUuid();
+    engineInfo.id = nx::Uuid::createUuid();
     engineInfo.isLicenseRequired = isLicenseRequired;
     return engineInfo;
 };
@@ -792,7 +792,7 @@ TEST_F(CameraSettingsDialogStateReducerTest, analyzedStreamIndexAndVisibility)
     State initialState = Reducer::loadCameras({}, {createCamera()});
 
     // By default for some yet unknown device agent stream selection is considered enabled.
-    const auto testEngineId = QnUuid::createUuid();
+    const auto testEngineId = nx::Uuid::createUuid();
     ASSERT_TRUE(initialState.analyticsStreamSelectionEnabled(testEngineId));
 
     // Set analytics stream index remotely to secondary.
@@ -974,7 +974,7 @@ TEST_F(CameraSettingsDialogStateReducerTest, cameraRotationSaveLoad)
 
 TEST_F(CameraSettingsDialogStateReducerTest, resetDeviceAgentData)
 {
-    const auto engineId = QnUuid::createUuid();
+    const auto engineId = nx::Uuid::createUuid();
 
     const State::AnalyticsSettings::EngineSettings initialSettings = {
         .model = {{"name", "base model"}},

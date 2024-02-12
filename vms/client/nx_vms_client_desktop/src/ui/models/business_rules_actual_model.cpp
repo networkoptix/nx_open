@@ -49,7 +49,7 @@ void QnBusinessRulesActualModel::saveRule(const QModelIndex& index)
 
     vms::event::RulePtr rule = ruleModel->createRule();
     if (rule->id().isNull())
-        rule->setId(QnUuid::createUuid());
+        rule->setId(nx::Uuid::createUuid());
 
     nx::vms::api::EventRuleData params;
     ec2::fromResourceToApi(rule, params);
@@ -78,7 +78,7 @@ void QnBusinessRulesActualModel::at_ruleAddedOrUpdated(const vms::event::RulePtr
     emit eventRuleChanged(rule->id());
 }
 
-void QnBusinessRulesActualModel::at_ruleRemoved(const QnUuid& id)
+void QnBusinessRulesActualModel::at_ruleRemoved(const nx::Uuid& id)
 {
     deleteRule(ruleModelById(id));  //< TODO: #sivanov Ask user.
     emit eventRuleDeleted(id);

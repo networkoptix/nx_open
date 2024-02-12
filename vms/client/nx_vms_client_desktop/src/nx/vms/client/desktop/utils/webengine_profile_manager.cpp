@@ -78,7 +78,7 @@ QQuickWebEngineProfile* WebEngineProfileManager::Private::getOrCreateProfile(
 Q_INVOKABLE QQuickWebEngineProfile* WebEngineProfileManager::getProfile(
     const QString& name, bool offTheRecord, const QString& resourceId)
 {
-    QnUuid parentId;
+    nx::Uuid parentId;
 
     if (!resourceId.isEmpty())
     {
@@ -86,7 +86,7 @@ Q_INVOKABLE QQuickWebEngineProfile* WebEngineProfileManager::getProfile(
 
         const auto commonModule = qnClientCoreModule->commonModule();
 
-        const auto resourceUuid = QnUuid::fromStringSafe(resourceId);
+        const auto resourceUuid = nx::Uuid::fromStringSafe(resourceId);
         if (const auto resource = commonModule->resourcePool()->getResourceById(resourceUuid))
             parentId = resource->getParentId();
     }

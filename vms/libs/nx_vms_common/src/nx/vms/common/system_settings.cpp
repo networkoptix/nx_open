@@ -246,8 +246,8 @@ SystemSettings::AdaptorList SystemSettings::initTimeSynchronizationAdaptors()
         [] { return tr("Time synchronization enabled"); });
     timeSynchronizationAdaptors << m_timeSynchronizationEnabledAdaptor;
 
-    m_primaryTimeServerAdaptor = new QnLexicalResourcePropertyAdaptor<QnUuid>(
-        Names::primaryTimeServer, QnUuid(), this,
+    m_primaryTimeServerAdaptor = new QnLexicalResourcePropertyAdaptor<nx::Uuid>(
+        Names::primaryTimeServer, nx::Uuid(), this,
         [] { return tr("Primary time synchronization Server ID"); });
     timeSynchronizationAdaptors << m_primaryTimeServerAdaptor;
 
@@ -309,8 +309,8 @@ SystemSettings::AdaptorList SystemSettings::initCloudAdaptors()
     m_cloudAccountNameAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
         Names::cloudAccountName, QString(), this, [] { return tr("Cloud owner account"); });
 
-    m_organizationIdAdaptor = new QnLexicalResourcePropertyAdaptor<QnUuid>(
-        Names::organizationId, QnUuid(), this, [] { return tr("Organization Id"); });
+    m_organizationIdAdaptor = new QnLexicalResourcePropertyAdaptor<nx::Uuid>(
+        Names::organizationId, nx::Uuid(), this, [] { return tr("Organization Id"); });
 
     m_cloudSystemIdAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
         Names::cloudSystemID, QString(), this, [] { return tr("Cloud System ID"); });
@@ -371,8 +371,8 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
     m_systemNameAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
         Names::systemName, QString(), this, [] { return tr("System name"); });
 
-    m_localSystemIdAdaptor = new QnLexicalResourcePropertyAdaptor<QnUuid>(
-        Names::localSystemId, QnUuid(), this,
+    m_localSystemIdAdaptor = new QnLexicalResourcePropertyAdaptor<nx::Uuid>(
+        Names::localSystemId, nx::Uuid(), this,
         [] { return tr("Local System ID, null means the System is not set up yet."); });
 
     m_lastMergeMasterIdAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
@@ -1418,13 +1418,13 @@ void SystemSettings::setUpnpPortMappingEnabled(bool value)
     m_upnpPortMappingEnabledAdaptor->setValue(value);
 }
 
-QnUuid SystemSettings::localSystemId() const
+nx::Uuid SystemSettings::localSystemId() const
 {
     NX_VERBOSE(this, "Providing local System ID %1", m_localSystemIdAdaptor->value());
     return m_localSystemIdAdaptor->value();
 }
 
-void SystemSettings::setLocalSystemId(const QnUuid& value)
+void SystemSettings::setLocalSystemId(const nx::Uuid& value)
 {
     if (const auto oldValue = m_localSystemIdAdaptor->value(); oldValue != value)
     {
@@ -1433,22 +1433,22 @@ void SystemSettings::setLocalSystemId(const QnUuid& value)
     }
 }
 
-QnUuid SystemSettings::lastMergeMasterId() const
+nx::Uuid SystemSettings::lastMergeMasterId() const
 {
-    return QnUuid(m_lastMergeMasterIdAdaptor->value());
+    return nx::Uuid(m_lastMergeMasterIdAdaptor->value());
 }
 
-void SystemSettings::setLastMergeMasterId(const QnUuid& value)
+void SystemSettings::setLastMergeMasterId(const nx::Uuid& value)
 {
     m_lastMergeMasterIdAdaptor->setValue(value.toString());
 }
 
-QnUuid SystemSettings::lastMergeSlaveId() const
+nx::Uuid SystemSettings::lastMergeSlaveId() const
 {
-    return QnUuid(m_lastMergeSlaveIdAdaptor->value());
+    return nx::Uuid(m_lastMergeSlaveIdAdaptor->value());
 }
 
-void SystemSettings::setLastMergeSlaveId(const QnUuid& value)
+void SystemSettings::setLastMergeSlaveId(const nx::Uuid& value)
 {
     m_lastMergeSlaveIdAdaptor->setValue(value.toString());
 }
@@ -1498,12 +1498,12 @@ void SystemSettings::setTimeSynchronizationEnabled(bool value)
     m_timeSynchronizationEnabledAdaptor->setValue(value);
 }
 
-QnUuid SystemSettings::primaryTimeServer() const
+nx::Uuid SystemSettings::primaryTimeServer() const
 {
     return m_primaryTimeServerAdaptor->value();
 }
 
-void SystemSettings::setPrimaryTimeServer(const QnUuid& value)
+void SystemSettings::setPrimaryTimeServer(const nx::Uuid& value)
 {
     m_primaryTimeServerAdaptor->setValue(value);
 }
@@ -1560,12 +1560,12 @@ void SystemSettings::setCloudAccountName(const QString& value)
     m_cloudAccountNameAdaptor->setValue(value);
 }
 
-QnUuid SystemSettings::organizationId() const
+nx::Uuid SystemSettings::organizationId() const
 {
     return m_organizationIdAdaptor->value();
 }
 
-void SystemSettings::setOrganizationId(const QnUuid& value)
+void SystemSettings::setOrganizationId(const nx::Uuid& value)
 {
     m_organizationIdAdaptor->setValue(value);
 }
@@ -1605,7 +1605,7 @@ void SystemSettings::resetCloudParams()
     setCloudAccountName(QString());
     setCloudSystemId(QString());
     setCloudAuthKey(QString());
-    setOrganizationId(QnUuid());
+    setOrganizationId(nx::Uuid());
 }
 
 QString SystemSettings::cloudHost() const
@@ -2136,15 +2136,15 @@ void SystemSettings::setSystem2faEnabled(bool value)
     m_system2faEnabledAdaptor->setValue(value);
 }
 
-std::vector<QnUuid> SystemSettings::masterCloudSyncList() const
+std::vector<nx::Uuid> SystemSettings::masterCloudSyncList() const
 {
-    std::vector<QnUuid> result;
+    std::vector<nx::Uuid> result;
     for (const auto& value: m_masterCloudSyncAdaptor->value().split(";", Qt::SkipEmptyParts))
-        result.push_back(QnUuid(value));
+        result.push_back(nx::Uuid(value));
     return result;
 }
 
-void SystemSettings::setMasterCloudSyncList(const std::vector<QnUuid>& idList) const
+void SystemSettings::setMasterCloudSyncList(const std::vector<nx::Uuid>& idList) const
 {
     QStringList result;
     for (const auto& id: idList)

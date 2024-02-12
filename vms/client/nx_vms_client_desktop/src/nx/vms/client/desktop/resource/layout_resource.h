@@ -22,7 +22,7 @@ class NX_VMS_CLIENT_DESKTOP_API LayoutResource: public QnLayoutResource
 
 public:
     using DataHash = QHash<Qn::ItemDataRole, QVariant>;
-    using ItemsRemapHash = QHash<QnUuid, QnUuid>;
+    using ItemsRemapHash = QHash<nx::Uuid, nx::Uuid>;
 
     static qreal cellSpacingValue(Qn::CellSpacing spacing);
 
@@ -83,13 +83,13 @@ public:
     void setData(Qn::ItemDataRole role, const QVariant &value);
 
     /** Runtime data per item. */
-    QVariant itemData(const QnUuid& id, Qn::ItemDataRole role) const;
+    QVariant itemData(const nx::Uuid& id, Qn::ItemDataRole role) const;
 
     /** Store runtime data. Emits itemDataChanged if data differs from existing. */
-    void setItemData(const QnUuid& id, Qn::ItemDataRole role, const QVariant& data);
+    void setItemData(const nx::Uuid& id, Qn::ItemDataRole role, const QVariant& data);
 
     /** Remove all runtime data for the given item. Does not emit signals. */
-    void cleanupItemData(const QnUuid& id);
+    void cleanupItemData(const nx::Uuid& id);
 
     /** Remove all runtime data for all items. Does not emit signals. */
     void cleanupItemData();
@@ -133,7 +133,7 @@ public:
 
 signals:
     void dataChanged(Qn::ItemDataRole role);
-    void itemDataChanged(const QnUuid& id, Qn::ItemDataRole role, const QVariant& data);
+    void itemDataChanged(const nx::Uuid& id, Qn::ItemDataRole role, const QVariant& data);
     void layoutTypeChanged(const LayoutResourcePtr& resource);
 
 protected:
@@ -145,7 +145,7 @@ protected:
 
 private:
     /** @return Whether data value was changed. */
-    bool setItemDataUnderLock(const QnUuid& id, Qn::ItemDataRole role, const QVariant& data);
+    bool setItemDataUnderLock(const nx::Uuid& id, Qn::ItemDataRole role, const QVariant& data);
 
     LayoutType calculateLayoutType() const;
     void setLayoutType(LayoutType value);
@@ -154,7 +154,7 @@ private:
 private:
     QnTimePeriod m_localRange;
     DataHash m_data;
-    QHash<QnUuid, DataHash> m_itemData;
+    QHash<nx::Uuid, DataHash> m_itemData;
 
     /** Saved state of the layout, which can be used to rollback unapplied changes. */
     nx::vms::api::LayoutData m_snapshot;

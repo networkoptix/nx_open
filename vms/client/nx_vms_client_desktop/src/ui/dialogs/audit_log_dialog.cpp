@@ -362,7 +362,7 @@ QnAuditRecordRefList QnAuditLogDialog::applyFilter()
 
 QnAuditRecordRefList QnAuditLogDialog::filterChildDataBySessions(const QnAuditRecordRefList& checkedRows)
 {
-    QMap<QnUuid, int> selectedSessions;
+    QMap<nx::Uuid, int> selectedSessions;
     for (const QnAuditRecord* record: checkedRows)
         selectedSessions.insert(record->authSession.id, record->rangeStartSec);
 
@@ -380,7 +380,7 @@ QnAuditRecordRefList QnAuditLogDialog::filterChildDataBySessions(const QnAuditRe
 
 QnAuditRecordRefList QnAuditLogDialog::filterChildDataByCameras(const QnAuditRecordRefList& checkedRows)
 {
-    QSet<QnUuid> selectedCameras;
+    QSet<nx::Uuid> selectedCameras;
     for (const QnAuditRecord* record: checkedRows)
     {
         if (!record->resources.empty())
@@ -498,7 +498,7 @@ void QnAuditLogDialog::at_filterChanged()
 
     if (ui->mainTabWidget->currentIndex() == sessionTabIndex)
     {
-        QSet<QnUuid> filteredIdList;
+        QSet<nx::Uuid> filteredIdList;
         for (const QnAuditRecord* record: m_filteredData)
             filteredIdList << record->authSession.id;
 
@@ -513,7 +513,7 @@ void QnAuditLogDialog::at_filterChanged()
     }
     else
     {
-        QSet<QnUuid> filteredCameras;
+        QSet<nx::Uuid> filteredCameras;
         for (const QnAuditRecord* record: m_filteredData)
         {
             for (const auto& id: record->resources)
@@ -717,7 +717,7 @@ void QnAuditLogDialog::processPlaybackAction(const QnAuditRecord* record)
     /* Construct and add a new layout. */
     LayoutResourcePtr layout(new LayoutResource());
     layout->addFlags(Qn::local);
-    layout->setIdUnsafe(QnUuid::createUuid());
+    layout->setIdUnsafe(nx::Uuid::createUuid());
     layout->setName(tr("Audit trail replay"));
 
     /* Calculate size of the resulting matrix. */
@@ -950,8 +950,8 @@ void QnAuditLogDialog::at_gotdata(bool success, int requestNum, const QnAuditRec
 void QnAuditLogDialog::makeSessionData()
 {
     m_sessionData.clear();
-    QMap<QnUuid, int> activityPerSession;
-    QMap<QnUuid, QnAuditRecord> processedLogins;
+    QMap<nx::Uuid, int> activityPerSession;
+    QMap<nx::Uuid, QnAuditRecord> processedLogins;
     for (const QnAuditRecord& record: m_allData)
     {
         if (record.isLoginType())
@@ -985,12 +985,12 @@ void QnAuditLogDialog::makeSessionData()
 void QnAuditLogDialog::makeCameraData()
 {
     m_cameraData.clear();
-    QMap<QnUuid, int> activityPerCamera;
+    QMap<nx::Uuid, int> activityPerCamera;
     for (const QnAuditRecord& record: m_allData)
     {
         if (record.isPlaybackType() || record.isCameraType())
         {
-            for (const QnUuid& cameraId: record.resources)
+            for (const nx::Uuid& cameraId: record.resources)
                 activityPerCamera[cameraId]++;
         }
     }

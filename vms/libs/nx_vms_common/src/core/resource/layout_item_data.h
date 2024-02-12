@@ -20,10 +20,10 @@ struct NX_VMS_COMMON_API LayoutItemData
 {
     nx::vms::common::ResourceDescriptor resource;
 
-    QnUuid uuid;
+    nx::Uuid uuid;
     int flags = 0;
     QRectF combinedGeometry;
-    QnUuid zoomTargetUuid;
+    nx::Uuid zoomTargetUuid;
     QRectF zoomRect;
     qreal rotation = 0.0;
     bool displayInfo = false;
@@ -54,6 +54,6 @@ NX_REFLECTION_INSTRUMENT(LayoutItemData,
     (displayHotspots))
 
 using LayoutItemDataList = QList<LayoutItemData>;
-using LayoutItemDataMap = QHash<QnUuid, LayoutItemData>;
+using LayoutItemDataMap = QHash<nx::Uuid, LayoutItemData>;
 
 } // namespace nx::vms::common

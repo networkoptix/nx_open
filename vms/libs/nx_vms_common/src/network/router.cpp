@@ -17,7 +17,7 @@ namespace {
 
 QnRoute routeTo(
     SystemContext* systemContext,
-    const QnUuid& serverId,
+    const nx::Uuid& serverId,
     const QnMediaServerResourcePtr& server)
 {
     if (!server)
@@ -75,7 +75,7 @@ QnRoute routeTo(
     }
 
     result.distance = INT_MAX;
-    QnUuid routeVia = connection->routeToPeerVia(result.id, &result.distance, &result.addr);
+    nx::Uuid routeVia = connection->routeToPeerVia(result.id, &result.distance, &result.addr);
     if (!result.addr.isNull())
         return result; //< Peer has found in message bus among outgoing connections.
     if (routeVia.isNull())
@@ -117,7 +117,7 @@ QString QnRoute::toString() const
         reverseConnect ? "reverse" : addr.toString());
 }
 
-QnRoute QnRouter::routeTo(const QnUuid& serverId, SystemContext* context)
+QnRoute QnRouter::routeTo(const nx::Uuid& serverId, SystemContext* context)
 {
     if (!NX_ASSERT(context))
         return {};

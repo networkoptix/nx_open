@@ -26,10 +26,10 @@ public:
     virtual ~AbstractCertificateVerifier();
 
     virtual nx::network::ssl::AdapterFunc makeAdapterFunc(
-        const QnUuid& serverId, const nx::utils::Url& url) = 0;
+        const nx::Uuid& serverId, const nx::utils::Url& url) = 0;
 
     nx::network::ssl::AdapterFunc makeAdapterFunc(
-        const QnUuid& serverId, const nx::network::SocketAddress& endpoint)
+        const nx::Uuid& serverId, const nx::network::SocketAddress& endpoint)
     {
         nx::utils::Url url;
         url.setHost(endpoint.address.toString());

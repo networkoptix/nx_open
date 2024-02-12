@@ -33,7 +33,7 @@ Q_DECLARE_FLAGS(LoginMethods, LoginMethod)
 
 struct NX_VMS_API LoginUser
 {
-    QnUuid id;
+    nx::Uuid id;
     QString username;
     UserType type = UserType::local;
     LoginMethods methods;
@@ -97,7 +97,7 @@ struct NX_VMS_API LoginSession
     static constexpr std::string_view kTokenPrefix = "vms-";
     static constexpr std::string_view kTicketPrefix = "vmsTicket-";
 
-    QnUuid id;
+    nx::Uuid id;
     QString username;
 
     /**%apidoc The session authorization token to be used as HTTP bearer token or URL parameter. */

@@ -35,7 +35,7 @@ public:
     virtual ~VideowallLayoutWatcher() override;
 
     /** Returns all videowall layout ids. The videowall must be in the watched resource pool. */
-    QnCounterHash<QnUuid> videowallLayouts(const QnVideoWallResourcePtr& videowall) const;
+    QnCounterHash<nx::Uuid> videowallLayouts(const QnVideoWallResourcePtr& videowall) const;
 
     /**
      * Returns layout's videowall if:
@@ -46,7 +46,7 @@ public:
     QnVideoWallResourcePtr layoutVideowall(const QnLayoutResourcePtr& layout) const;
 
     /** Returns whether the specified layoutId is present in one or more videowall items. */
-    bool isVideowallItem(const QnUuid& layoutId) const;
+    bool isVideowallItem(const nx::Uuid& layoutId) const;
 
 signals:
     // These signals are sent after `videowallLayouts` are properly updated after a videowall is
@@ -58,9 +58,9 @@ signals:
     // Only layout ids are watched, but not actual layout presence in the resource pool.
     // These signals are NOT sent when a videowall is added to or removed from the resource pool.
     void videowallLayoutsAdded(
-        const QnVideoWallResourcePtr& videowall, const QVector<QnUuid>& layoutIds);
+        const QnVideoWallResourcePtr& videowall, const QVector<nx::Uuid>& layoutIds);
     void videowallLayoutsRemoved(
-        const QnVideoWallResourcePtr& videowall, const QVector<QnUuid>& layoutIds);
+        const QnVideoWallResourcePtr& videowall, const QVector<nx::Uuid>& layoutIds);
 
 private:
     class Private;

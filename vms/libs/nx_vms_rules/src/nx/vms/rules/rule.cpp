@@ -12,7 +12,7 @@
 
 namespace nx::vms::rules {
 
-Rule::Rule(const QnUuid& id, const Engine* engine): m_id(id), m_engine(engine)
+Rule::Rule(const nx::Uuid& id, const Engine* engine): m_id(id), m_engine(engine)
 {
 }
 
@@ -20,12 +20,12 @@ Rule::~Rule()
 {
 }
 
-QnUuid Rule::id() const
+nx::Uuid Rule::id() const
 {
     return m_id;
 }
 
-void Rule::setId(QnUuid id)
+void Rule::setId(nx::Uuid id)
 {
     m_id = id;
 }

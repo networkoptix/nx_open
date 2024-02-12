@@ -22,7 +22,7 @@ class NX_VMS_CLIENT_DESKTOP_API RecursiveMembersModel:
 
     Q_OBJECT
 
-    Q_PROPERTY(QnUuid groupId READ groupId WRITE setGroupId NOTIFY groupIdChanged)
+    Q_PROPERTY(nx::Uuid groupId READ groupId WRITE setGroupId NOTIFY groupIdChanged)
     Q_PROPERTY(MembersCache* membersCache
         READ membersCache
         WRITE setMembersCache
@@ -53,8 +53,8 @@ public:
 
     static void registerQmlType();
 
-    QnUuid groupId() const { return m_groupId; }
-    void setGroupId(const QnUuid& groupId);
+    nx::Uuid groupId() const { return m_groupId; }
+    void setGroupId(const nx::Uuid& groupId);
 
     MembersCache* membersCache() const { return m_cache; }
     void setMembersCache(MembersCache* cache);
@@ -70,20 +70,20 @@ signals:
 
 private:
 
-    std::pair<QnUuid, int> findGroupRow(const QList<QnUuid>& groups, int row) const;
+    std::pair<nx::Uuid, int> findGroupRow(const QList<nx::Uuid>& groups, int row) const;
 
-    QVariant getMemberData(int offset, const QnUuid& groupId, int role) const;
+    QVariant getMemberData(int offset, const nx::Uuid& groupId, int role) const;
 
-    QVariant getData(int offset, const QnUuid& groupId, int row, int role) const;
+    QVariant getData(int offset, const nx::Uuid& groupId, int row, int role) const;
 
     void loadData(bool updateAllRows = true);
 
 private:
     int m_itemCount = 0;
-    QHash<QnUuid, int> m_totalSubItems;
+    QHash<nx::Uuid, int> m_totalSubItems;
     bool m_hasCycle = false;
 
-    QnUuid m_groupId;
+    nx::Uuid m_groupId;
 
     QPointer<MembersCache> m_cache;
 };

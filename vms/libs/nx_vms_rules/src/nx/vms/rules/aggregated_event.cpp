@@ -120,7 +120,7 @@ EventPtr AggregatedEvent::initialEvent() const
     return m_aggregatedEvents.empty() ? EventPtr{} : m_aggregatedEvents.front();
 }
 
-QnUuid AggregatedEvent::id() const
+nx::Uuid AggregatedEvent::id() const
 {
     return m_id;
 }

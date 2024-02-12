@@ -30,32 +30,32 @@ public:
     virtual ~AbstractDiscoveryManager() = default;
 
     virtual int discoverPeer(
-        const QnUuid& id,
+        const nx::Uuid& id,
         const nx::utils::Url& url,
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) = 0;
 
-    ErrorCode discoverPeerSync(const QnUuid& id, const nx::utils::Url& url);
+    ErrorCode discoverPeerSync(const nx::Uuid& id, const nx::utils::Url& url);
 
     virtual int addDiscoveryInformation(
-        const QnUuid& id,
+        const nx::Uuid& id,
         const nx::utils::Url& url,
         bool ignore,
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) = 0;
 
     ErrorCode addDiscoveryInformationSync(
-        const QnUuid& id, const nx::utils::Url& url, bool ignore);
+        const nx::Uuid& id, const nx::utils::Url& url, bool ignore);
 
     virtual int removeDiscoveryInformation(
-        const QnUuid& id,
+        const nx::Uuid& id,
         const nx::utils::Url& url,
         bool ignore,
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) = 0;
 
     ErrorCode removeDiscoveryInformationSync(
-        const QnUuid& id, const nx::utils::Url& url, bool ignore);
+        const nx::Uuid& id, const nx::utils::Url& url, bool ignore);
 
     virtual int getDiscoveryData(
         Handler<nx::vms::api::DiscoveryDataList> handler,

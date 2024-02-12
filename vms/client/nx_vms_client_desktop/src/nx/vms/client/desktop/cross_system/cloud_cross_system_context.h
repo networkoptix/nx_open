@@ -71,7 +71,7 @@ public:
      */
     bool initializeConnectionWithUserInteraction();
 
-    QnVirtualCameraResourcePtr createThumbCameraResource(const QnUuid& id, const QString& name);
+    QnVirtualCameraResourcePtr createThumbCameraResource(const nx::Uuid& id, const QString& name);
 
 signals:
     void statusChanged(Status oldStatus);

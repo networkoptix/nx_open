@@ -20,7 +20,7 @@ public:
         nx::network::ssl::AdapterFunc adapterFunc,
         std::optional<nx::network::http::Credentials> credentials,
         nx::vms::common::SystemContext* systemContext,
-        const QnUuid& remoteId,
+        const nx::Uuid& remoteId,
         nx::vms::api::PeerType remotePeerType,
         const vms::api::PeerDataEx& localPeer,
         const nx::utils::Url& remotePeerUrl,

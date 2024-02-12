@@ -50,21 +50,21 @@ public:
      * Resolves indirect resource access and common access to all media and/or all videowalls.
      * No access is returned for resources that aren't in the resource pool.
      */
-    nx::vms::api::AccessRights accessRights(const QnUuid& subjectId,
+    nx::vms::api::AccessRights accessRights(const nx::Uuid& subjectId,
         const QnResourcePtr& resource) const;
 
     /**
      * Returns access rights of the specified subject to the specified resource group.
      * Currently only special resource groups (such as all devices or all videowalls) are supported.
      */
-    nx::vms::api::AccessRights accessRights(const QnUuid& subjectId,
-        const QnUuid& resourceGroupId) const;
+    nx::vms::api::AccessRights accessRights(const nx::Uuid& subjectId,
+        const nx::Uuid& resourceGroupId) const;
 
     /** Returns subject global permissions. */
-    nx::vms::api::GlobalPermissions globalPermissions(const QnUuid& subjectId) const;
+    nx::vms::api::GlobalPermissions globalPermissions(const nx::Uuid& subjectId) const;
 
     /** Returns subject's resolved access rights map. */
-    ResourceAccessMap resourceAccessMap(const QnUuid& subjectId) const;
+    ResourceAccessMap resourceAccessMap(const nx::Uuid& subjectId) const;
 
     /**
      * A combination of all access rights of the specified subject.
@@ -72,17 +72,17 @@ public:
      * is deleted its id stays in all subject access right lists it was in, so this method will
      * return a combination of access rights towards both actual and no longer actual resources.
      */
-    nx::vms::api::AccessRights availableAccessRights(const QnUuid& subjectId) const;
+    nx::vms::api::AccessRights availableAccessRights(const nx::Uuid& subjectId) const;
 
     /** Returns whether the subject has admin access rights. */
-    bool hasFullAccessRights(const QnUuid& subjectId) const;
+    bool hasFullAccessRights(const nx::Uuid& subjectId) const;
 
     /**
      * Returns all ways in which the specified subject gains specified access right to
      * the specified resource, directly and indirectly.
      */
     ResourceAccessDetails accessDetails(
-        const QnUuid& subjectId,
+        const nx::Uuid& subjectId,
         const QnResourcePtr& resource,
         nx::vms::api::AccessRight accessRight) const;
 
@@ -107,7 +107,7 @@ class NX_VMS_COMMON_API AccessRightsResolver::Notifier: public QObject
 {
     Q_OBJECT
     Q_PROPERTY(AccessRightsResolver* source READ source WRITE setSource NOTIFY sourceChanged)
-    Q_PROPERTY(QnUuid subjectId READ subjectId WRITE setSubjectId NOTIFY subjectIdChanged)
+    Q_PROPERTY(nx::Uuid subjectId READ subjectId WRITE setSubjectId NOTIFY subjectIdChanged)
 
 public:
     explicit Notifier(QObject* parent = nullptr);
@@ -119,8 +119,8 @@ public:
     void setSource(AccessRightsResolver* value);
 
     /** A subject to watch access rights changes. */
-    QnUuid subjectId() const;
-    void setSubjectId(const QnUuid& value);
+    nx::Uuid subjectId() const;
+    void setSubjectId(const nx::Uuid& value);
 
 signals:
     /**
@@ -128,7 +128,7 @@ signals:
      * It's not sent when all subjects access rights are reset.
      * `subjectId` argument is provided for additional convenience.
      */
-    void resourceAccessChanged(const QnUuid& subjectId, QPrivateSignal);
+    void resourceAccessChanged(const nx::Uuid& subjectId, QPrivateSignal);
 
     // Property notification signals.
     void sourceChanged();

@@ -25,8 +25,8 @@ signals:
      */
     void addedOrUpdated(const nx::vms::api::UserData& user, ec2::NotificationSource source);
     void userRoleAddedOrUpdated(const nx::vms::api::UserGroupData& userRole);
-    void removed(const QnUuid& id, ec2::NotificationSource source);
-    void userRoleRemoved(const QnUuid& id);
+    void removed(const nx::Uuid& id, ec2::NotificationSource source);
+    void userRoleRemoved(const nx::Uuid& id);
     void accessRightsChanged(const nx::vms::api::AccessRightsDataDeprecated& access);
 };
 
@@ -59,11 +59,11 @@ public:
     ErrorCode saveSync(const nx::vms::api::UserDataList& dataList);
 
     virtual int remove(
-        const QnUuid& id,
+        const nx::Uuid& id,
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) = 0;
 
-    ErrorCode removeSync(const QnUuid& id);
+    ErrorCode removeSync(const nx::Uuid& id);
 
     virtual int getUserRoles(
         Handler<nx::vms::api::UserGroupDataList> handler,
@@ -79,11 +79,11 @@ public:
     ErrorCode saveUserRoleSync(const nx::vms::api::UserGroupData& data);
 
     virtual int removeUserRole(
-        const QnUuid& id,
+        const nx::Uuid& id,
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) = 0;
 
-    ErrorCode removeUserRoleSync(const QnUuid& id);
+    ErrorCode removeUserRoleSync(const nx::Uuid& id);
 };
 
 } // namespace ec2

@@ -92,7 +92,7 @@ QJsonValue getJsonValue(const T& t)
         #member, \
         getJsonValue<&std::decay_t<decltype(value)>::member>(value))
 
-static QJsonObject paramsWithId(const QnUuid& id, QJsonObject params = {})
+static QJsonObject paramsWithId(const nx::Uuid& id, QJsonObject params = {})
 {
     params.insert("id", id.toString());
     return params;
@@ -226,25 +226,25 @@ public:
     template <typename T>
     const T* getRequestData() const;
 
-    nx::vms::api::UserGroupModel fromGroupId(const QnUuid& groupId);
-    nx::vms::api::UserModelV3 fromUserId(const QnUuid& userId);
+    nx::vms::api::UserGroupModel fromGroupId(const nx::Uuid& groupId);
+    nx::vms::api::UserModelV3 fromUserId(const nx::Uuid& userId);
 
     void applyGroup(
-        const QnUuid& groupId,
-        const std::vector<QnUuid>& prev,
-        const std::vector<QnUuid>& next);
+        const nx::Uuid& groupId,
+        const std::vector<nx::Uuid>& prev,
+        const std::vector<nx::Uuid>& next);
 
     void applyUser(
-        const QnUuid& userId,
-        const std::vector<QnUuid>& prev,
-        const std::vector<QnUuid>& next);
+        const nx::Uuid& userId,
+        const std::vector<nx::Uuid>& prev,
+        const std::vector<nx::Uuid>& next);
 
     void applyUser(
-        const QnUuid& userId,
+        const nx::Uuid& userId,
         bool enabled,
         bool enableDigest);
 
-    void patchRequests(int startFrom, const QnUuid& oldId, const QnUuid& newId)
+    void patchRequests(int startFrom, const nx::Uuid& oldId, const nx::Uuid& newId)
     {
         for (int i = startFrom; (size_t)i < q->size(); ++i)
         {
@@ -506,7 +506,7 @@ void UserGroupRequestChain::makeRequest()
 
 void UserGroupRequestChain::updateLayoutSharing(
     nx::vms::client::desktop::SystemContext* systemContext,
-    const std::map<QnUuid, nx::vms::api::AccessRights>& accessRights)
+    const std::map<nx::Uuid, nx::vms::api::AccessRights>& accessRights)
 {
     const auto resourcePool = systemContext->resourcePool();
 
@@ -526,7 +526,7 @@ void UserGroupRequestChain::updateLayoutSharing(
 
     for (const auto& layout: layouts)
     {
-        layout->setParentId(QnUuid());
+        layout->setParentId(nx::Uuid());
         auto resourceSystemContext = SystemContext::fromResource(layout);
         if (!NX_ASSERT(resourceSystemContext))
             continue;
@@ -535,7 +535,7 @@ void UserGroupRequestChain::updateLayoutSharing(
     }
 }
 
-nx::vms::api::UserGroupModel UserGroupRequestChain::Private::fromGroupId(const QnUuid& groupId)
+nx::vms::api::UserGroupModel UserGroupRequestChain::Private::fromGroupId(const nx::Uuid& groupId)
 {
     const auto userGroup = q->systemContext()->userGroupManager()->find(groupId);
     if (!userGroup)
@@ -557,7 +557,7 @@ nx::vms::api::UserGroupModel UserGroupRequestChain::Private::fromGroupId(const Q
     return groupData;
 }
 
-nx::vms::api::UserModelV3 UserGroupRequestChain::Private::fromUserId(const QnUuid& userId)
+nx::vms::api::UserModelV3 UserGroupRequestChain::Private::fromUserId(const nx::Uuid& userId)
 {
     const auto user = q->systemContext()->resourcePool()->getResourceById<QnUserResource>(userId);
     if (!user)
@@ -587,9 +587,9 @@ nx::vms::api::UserModelV3 UserGroupRequestChain::Private::fromUserId(const QnUui
 }
 
 void UserGroupRequestChain::Private::applyGroup(
-    const QnUuid& groupId,
-    const std::vector<QnUuid>& prev,
-    const std::vector<QnUuid>& next)
+    const nx::Uuid& groupId,
+    const std::vector<nx::Uuid>& prev,
+    const std::vector<nx::Uuid>& next)
 {
     auto userGroup = q->systemContext()->userGroupManager()->find(groupId);
     if (!userGroup)
@@ -603,9 +603,9 @@ void UserGroupRequestChain::Private::applyGroup(
 }
 
 void UserGroupRequestChain::Private::applyUser(
-    const QnUuid& userId,
-    const std::vector<QnUuid>& prev,
-    const std::vector<QnUuid>& next)
+    const nx::Uuid& userId,
+    const std::vector<nx::Uuid>& prev,
+    const std::vector<nx::Uuid>& next)
 {
     auto user = q->systemContext()->resourcePool()->getResourceById<QnUserResource>(userId);
     if (!user)
@@ -618,7 +618,7 @@ void UserGroupRequestChain::Private::applyUser(
 }
 
 void UserGroupRequestChain::Private::applyUser(
-    const QnUuid& userId,
+    const nx::Uuid& userId,
     bool enabled,
     bool enableDigest)
 {

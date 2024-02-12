@@ -33,12 +33,12 @@ TextFilterSetup* AnalyticsSearchListModel::textFilter() const
     return d->textFilter.get();
 }
 
-QnUuid AnalyticsSearchListModel::selectedEngine() const
+nx::Uuid AnalyticsSearchListModel::selectedEngine() const
 {
     return d->selectedEngine();
 }
 
-void AnalyticsSearchListModel::setSelectedEngine(const QnUuid& value)
+void AnalyticsSearchListModel::setSelectedEngine(const nx::Uuid& value)
 {
     d->setSelectedEngine(value);
 }

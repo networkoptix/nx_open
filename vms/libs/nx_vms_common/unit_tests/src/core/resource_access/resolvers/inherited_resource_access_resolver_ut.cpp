@@ -195,7 +195,7 @@ TEST_F(InheritedResourceAccessResolverTest, notificationSignals)
     resolver->notifier()->subscribeSubjects(subjects->ids({
         "Group 1", "Group 2", "Group 3", "User 1"})); //< "User 2" is not included intentionally.
 
-    qRegisterMetaType<QnUuidSet>();
+    qRegisterMetaType<UuidSet>();
     QSignalSpy spy(resolver->notifier(), &Notifier::resourceAccessChanged);
 
     const auto lastNames =
@@ -206,7 +206,7 @@ TEST_F(InheritedResourceAccessResolverTest, notificationSignals)
             const auto args = spy.takeLast();
             if (args.size() != 1)
                 return {};
-            return subjects->names(args[0].value<QnUuidSet>());
+            return subjects->names(args[0].value<UuidSet>());
         };
 
     manager->setOwnResourceAccessMap(subjects->id("Group 1"),

@@ -108,7 +108,7 @@ protected:
     {
         DeviceAgentSettingsResponse data(other);
         data.session.sequenceNumber = other.session.sequenceNumber - 1;
-        data.settingsModelId = QnUuid::createUuid(); //< Make sure this will cause model change.
+        data.settingsModelId = nx::Uuid::createUuid(); //< Make sure this will cause model change.
         return data;
     }
 
@@ -116,7 +116,7 @@ protected:
     {
         DeviceAgentSettingsResponse data(other);
         data.session.sequenceNumber = other.session.sequenceNumber + 1;
-        data.settingsModelId = QnUuid::createUuid(); //< Make sure this will cause model change.
+        data.settingsModelId = nx::Uuid::createUuid(); //< Make sure this will cause model change.
         return data;
     }
 

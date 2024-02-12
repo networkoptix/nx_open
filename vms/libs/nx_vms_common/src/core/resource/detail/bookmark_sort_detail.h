@@ -31,7 +31,7 @@ namespace detail {
 
 template<typename BookmarkType>
 inline BookmarkType createBookmarkAtTimePoint(
-    const QnUuid& id, const std::chrono::milliseconds& time)
+    const nx::Uuid& id, const std::chrono::milliseconds& time)
 {
     BookmarkType result;
     result.setId(id);
@@ -41,7 +41,7 @@ inline BookmarkType createBookmarkAtTimePoint(
 
 template<>
 inline CameraBookmark createBookmarkAtTimePoint<CameraBookmark>(
-    const QnUuid& id, const std::chrono::milliseconds& time)
+    const nx::Uuid& id, const std::chrono::milliseconds& time)
 {
     CameraBookmark result;
     result.guid = id;

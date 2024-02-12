@@ -58,7 +58,7 @@ public:
     void setSignOpacity(float opacity, QColor color);
 
     /** Return initial signature as filler */
-    static QByteArray getSignPattern(QnLicensePool* licensePool, const QnUuid& serverId);
+    static QByteArray getSignPattern(QnLicensePool* licensePool, const nx::Uuid& serverId);
     static char getSignPatternDelim();
 
     static QByteArray getSignMagic();

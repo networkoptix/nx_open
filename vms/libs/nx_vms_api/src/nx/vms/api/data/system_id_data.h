@@ -16,7 +16,7 @@ struct NX_VMS_API SystemIdData
     SystemIdData() = default;
     SystemIdData(const QString& systemId): systemId(systemId) {}
 
-    QnUuid systemId;
+    nx::Uuid systemId;
     qint64 sysIdTime = 0;
     Timestamp tranLogTime;
 };

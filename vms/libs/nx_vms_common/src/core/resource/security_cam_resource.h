@@ -38,7 +38,7 @@ protected:
 
 public:
     static constexpr int kDefaultMaxFps = 15;
-    static QnUuid makeCameraIdFromPhysicalId(const QString& physicalId);
+    static nx::Uuid makeCameraIdFromPhysicalId(const QString& physicalId);
 
     using StreamIndex = nx::vms::api::StreamIndex;
 
@@ -274,14 +274,14 @@ public:
     /**
      * @return ID of device which used as audio input override for the camera.
      */
-    QnUuid audioInputDeviceId() const;
+    nx::Uuid audioInputDeviceId() const;
 
     /**
      * Sets ID of device which will be used as audio input override for the camera.
      * @param deviceId Valid another device ID expected. Null ID should be set if this device's
      *     own audio input is intended to be used.
      */
-    void setAudioInputDeviceId(const QnUuid& deviceId);
+    void setAudioInputDeviceId(const nx::Uuid& deviceId);
 
     /**
      * @returns True if the audio transmitting is enabled. Enabled state doesn't guarantee
@@ -297,7 +297,7 @@ public:
     /**
      * @return ID of device which used as audio output override for the camera.
      */
-    QnUuid audioOutputDeviceId() const;
+    nx::Uuid audioOutputDeviceId() const;
 
     /**
      * @return Redirected audio output (if any) or self.
@@ -309,7 +309,7 @@ public:
      * @param deviceId Valid another device ID expected. Null ID should be set if this device's
      *     own audio output is intended to be used.
      */
-    void setAudioOutputDeviceId(const QnUuid& deviceId);
+    void setAudioOutputDeviceId(const nx::Uuid& deviceId);
 
     bool isManuallyAdded() const;
     void setManuallyAdded(bool value);
@@ -443,8 +443,8 @@ public:
     int recordAfterMotionSec() const;
     void setRecordAfterMotionSec(int value);
 
-    void setPreferredServerId(const QnUuid& value);
-    QnUuid preferredServerId() const;
+    void setPreferredServerId(const nx::Uuid& value);
+    nx::Uuid preferredServerId() const;
 
     void setRemoteArchiveSynchronizationMode(
         nx::vms::common::RemoteArchiveSyncronizationMode mode);

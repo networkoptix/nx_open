@@ -173,7 +173,7 @@ void QnBusinessRuleItemDelegate::setEditorData(QWidget* editor, const QModelInde
             if (QnSelectResourcesDialogButton* button =
                 dynamic_cast<QnSelectResourcesDialogButton*>(editor))
             {
-                button->setResources(index.data(Qn::EventResourcesRole).value<QnUuidSet>());
+                button->setResources(index.data(Qn::EventResourcesRole).value<UuidSet>());
                 button->setText(index.data(Qn::ShortTextRole).toString());
                 return;
             }
@@ -184,7 +184,7 @@ void QnBusinessRuleItemDelegate::setEditorData(QWidget* editor, const QModelInde
             if (QnSelectResourcesDialogButton* button =
                 dynamic_cast<QnSelectResourcesDialogButton*>(editor))
             {
-                button->setResources(index.data(Qn::ActionResourcesRole).value<QnUuidSet>());
+                button->setResources(index.data(Qn::ActionResourcesRole).value<UuidSet>());
                 button->setText(index.data(Qn::ShortTextRole).toString());
                 return;
             }

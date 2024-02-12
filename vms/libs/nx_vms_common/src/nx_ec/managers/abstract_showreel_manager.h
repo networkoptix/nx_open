@@ -18,7 +18,7 @@ class NX_VMS_COMMON_API AbstractShowreelNotificationManager: public QObject
 
 signals:
     void addedOrUpdated(const nx::vms::api::ShowreelData& tour, ec2::NotificationSource source);
-    void removed(const QnUuid& id);
+    void removed(const nx::Uuid& id);
 };
 
 /*!
@@ -43,11 +43,11 @@ public:
     ErrorCode saveSync(const nx::vms::api::ShowreelData& data);
 
     virtual int remove(
-        const QnUuid& tourId,
+        const nx::Uuid& tourId,
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) = 0;
 
-    ErrorCode removeSync(const QnUuid& tourId);
+    ErrorCode removeSync(const nx::Uuid& tourId);
 };
 
 } // namespace ec2

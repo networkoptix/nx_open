@@ -16,7 +16,7 @@ class NX_VMS_RULES_API AnalyticsEvent: public AnalyticsEngineEvent
 
     FIELD(QString, eventTypeId, setEventTypeId)
     FIELD(nx::common::metadata::Attributes, attributes, setAttributes)
-    FIELD(QnUuid, objectTrackId, setObjectTrackId)
+    FIELD(nx::Uuid, objectTrackId, setObjectTrackId)
     FIELD(QString, key, setKey)
 
 public:
@@ -27,11 +27,11 @@ public:
         State state,
         const QString &caption,
         const QString &description,
-        QnUuid cameraId,
-        QnUuid engineId,
+        nx::Uuid cameraId,
+        nx::Uuid engineId,
         const QString& eventTypeId,
         const nx::common::metadata::Attributes& attributes,
-        QnUuid objectTrackId,
+        nx::Uuid objectTrackId,
         const QString& key);
 
     virtual QString subtype() const override;

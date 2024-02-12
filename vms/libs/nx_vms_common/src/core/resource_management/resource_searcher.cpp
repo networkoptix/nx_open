@@ -56,7 +56,7 @@ void QnAbstractResourceSearcher::setLocal(bool l) noexcept
     m_isLocal = l;
 }
 
-bool QnAbstractResourceSearcher::isResourceTypeSupported(QnUuid resourceTypeId) const
+bool QnAbstractResourceSearcher::isResourceTypeSupported(nx::Uuid resourceTypeId) const
 {
     QnResourceTypePtr resourceType = qnResTypePool->getResourceType(resourceTypeId);
     if (resourceType.isNull())

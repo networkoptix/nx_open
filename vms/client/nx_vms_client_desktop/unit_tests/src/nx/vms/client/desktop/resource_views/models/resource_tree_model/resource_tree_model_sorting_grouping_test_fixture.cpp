@@ -95,7 +95,7 @@ bool ResourceTreeModelSortingGroupingTest::checkGrouping(
 }
 
 void ResourceTreeModelSortingGroupingTest::createAllKindsOfResources(
-    const QnUuid& parentUserId) const
+    const nx::Uuid& parentUserId) const
 {
     createSharedLayouts();
     createFileLayouts();
@@ -126,7 +126,7 @@ void ResourceTreeModelSortingGroupingTest::createAllKindsOfResources(
         + proxiedIntegrations);
 }
 
-void ResourceTreeModelSortingGroupingTest::createShowreels(const QnUuid& parentUserId) const
+void ResourceTreeModelSortingGroupingTest::createShowreels(const nx::Uuid& parentUserId) const
 {
     for (const auto showreelName: sortingSignificantStrings())
         addShowreel(showreelName, parentUserId);
@@ -157,7 +157,7 @@ void ResourceTreeModelSortingGroupingTest::createSharedLayouts() const
         addLayout(sharedLayoutName);
 }
 
-void ResourceTreeModelSortingGroupingTest::createRecorders(const QnUuid& parentServerId) const
+void ResourceTreeModelSortingGroupingTest::createRecorders(const nx::Uuid& parentServerId) const
 {
     for (const auto recorderName: sortingSignificantStrings())
     {
@@ -167,7 +167,7 @@ void ResourceTreeModelSortingGroupingTest::createRecorders(const QnUuid& parentS
 }
 
 void ResourceTreeModelSortingGroupingTest::createMultisensorCameras(
-    const QnUuid& parentServerId) const
+    const nx::Uuid& parentServerId) const
 {
     for (const auto multisensorCameraName: sortingSignificantStrings())
     {
@@ -218,7 +218,7 @@ QnResourceList ResourceTreeModelSortingGroupingTest::createIntegrations() const
 }
 
 QnResourceList ResourceTreeModelSortingGroupingTest::createProxiedWebResources(
-    const QnUuid& parentServerId) const
+    const nx::Uuid& parentServerId) const
 {
     QnResourceList result;
     for (const auto proxiedWebResourceName: sortingSignificantStrings())
@@ -230,7 +230,7 @@ QnResourceList ResourceTreeModelSortingGroupingTest::createProxiedWebResources(
 }
 
 QnResourceList ResourceTreeModelSortingGroupingTest::createProxiedIntegrations(
-    const QnUuid& parentServerId) const
+    const nx::Uuid& parentServerId) const
 {
     QnResourceList result;
     for (const auto proxiedIntegrationName: sortingSignificantStrings())
@@ -258,7 +258,7 @@ QnResourceList ResourceTreeModelSortingGroupingTest::createLocalVideos() const
 }
 
 QnResourceList ResourceTreeModelSortingGroupingTest::createCameras(
-    const QnUuid& parentServerId) const
+    const nx::Uuid& parentServerId) const
 {
     QnResourceList result;
     for (const auto cameraName: sortingSignificantStrings())
@@ -267,7 +267,7 @@ QnResourceList ResourceTreeModelSortingGroupingTest::createCameras(
 }
 
 QnResourceList ResourceTreeModelSortingGroupingTest::createIoModules(
-    const QnUuid& parentServerId) const
+    const nx::Uuid& parentServerId) const
 {
     QnResourceList result;
     for (const auto ioModuleName: sortingSignificantStrings())
@@ -276,7 +276,7 @@ QnResourceList ResourceTreeModelSortingGroupingTest::createIoModules(
 }
 
 QnResourceList ResourceTreeModelSortingGroupingTest::createVirtualCameras(
-    const QnUuid& parentServerId) const
+    const nx::Uuid& parentServerId) const
 {
     QnResourceList result;
     for (const auto virtualCameraName: sortingSignificantStrings())
@@ -285,7 +285,7 @@ QnResourceList ResourceTreeModelSortingGroupingTest::createVirtualCameras(
 }
 
 QnLayoutResourceList ResourceTreeModelSortingGroupingTest::createLayouts(
-    const QnUuid& parentUserId) const
+    const nx::Uuid& parentUserId) const
 {
     QnLayoutResourceList result;
     for (const auto layoutName: sortingSignificantStrings())

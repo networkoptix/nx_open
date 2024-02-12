@@ -19,7 +19,7 @@ const QString kAutoSendPtzStopCommandProperty("autoSendPtzStopCommand");
 
 } // namespace
 
-QnClientCameraResource::QnClientCameraResource(const QnUuid& resourceTypeId):
+QnClientCameraResource::QnClientCameraResource(const nx::Uuid& resourceTypeId):
     base_type(resourceTypeId),
     m_isIntercom(
         [this]()

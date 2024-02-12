@@ -33,7 +33,7 @@ static bool defaultVerificatation(
 {
     const auto serverName = socket->serverName();
     const bool isServerNameUuid =
-        QnUuid::isUuidString(serverName) && !QnUuid(serverName).isNull();
+        nx::Uuid::isUuidString(serverName) && !nx::Uuid(serverName).isNull();
     const auto& effectiveServerName = isServerNameUuid ? std::string() : serverName;
     std::string errorMessage;
     if (verifyBySystemCertificates(chain, effectiveServerName, &errorMessage))

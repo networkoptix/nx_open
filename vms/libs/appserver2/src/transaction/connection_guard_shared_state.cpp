@@ -4,7 +4,7 @@
 
 namespace ec2 {
 
-    bool ConnectionGuardSharedState::contains(const QnUuid& id) const
+    bool ConnectionGuardSharedState::contains(const nx::Uuid& id) const
     {
         NX_MUTEX_LOCKER lock(&m_mutex);
         return m_connectedList.contains(id);

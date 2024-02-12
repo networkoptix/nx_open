@@ -7,12 +7,12 @@
 namespace nx::vms::rules {
 
 /** Stores single layout. Displayed as a layout selection button. */
-class NX_VMS_RULES_API LayoutField: public SimpleTypeActionField<QnUuid, LayoutField>
+class NX_VMS_RULES_API LayoutField: public SimpleTypeActionField<nx::Uuid, LayoutField>
 {
     Q_OBJECT
     Q_CLASSINFO("metatype", "nx.actions.fields.layout")
 
-    Q_PROPERTY(QnUuid value READ value WRITE setValue NOTIFY valueChanged)
+    Q_PROPERTY(nx::Uuid value READ value WRITE setValue NOTIFY valueChanged)
 
 public:
     LayoutField() = default;

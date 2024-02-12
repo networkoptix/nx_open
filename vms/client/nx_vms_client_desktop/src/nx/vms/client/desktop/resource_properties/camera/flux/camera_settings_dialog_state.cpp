@@ -16,9 +16,9 @@ bool CameraSettingsDialogState::isSingleVirtualCamera() const
     return isSingleCamera() && devicesDescription.isVirtualCamera == CombinedValue::All;
 }
 
-QnUuid CameraSettingsDialogState::singleCameraId() const
+nx::Uuid CameraSettingsDialogState::singleCameraId() const
 {
-    return isSingleCamera() ? singleCameraProperties.id : QnUuid();
+    return isSingleCamera() ? singleCameraProperties.id : nx::Uuid();
 }
 
 int CameraSettingsDialogState::maxRecordingBrushFps() const
@@ -91,7 +91,7 @@ bool CameraSettingsDialogState::supportsVideoStreamControl() const
         && devicesDescription.supportsVideo == CombinedValue::All;
 }
 
-bool CameraSettingsDialogState::analyticsStreamSelectionEnabled(const QnUuid& engineId) const
+bool CameraSettingsDialogState::analyticsStreamSelectionEnabled(const nx::Uuid& engineId) const
 {
     return analytics.streamByEngineId.value(engineId)() != StreamIndex::undefined;
 }

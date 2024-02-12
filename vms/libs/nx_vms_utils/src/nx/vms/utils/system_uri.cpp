@@ -70,7 +70,7 @@ const QMap<SystemUri::ReferralContext, QString> referralContextToString
     {SystemUri::ReferralContext::CloudMenu,     "menu"}
 };
 
-QString resourceIdsToString(const QList<QnUuid>& ids)
+QString resourceIdsToString(const QList<nx::Uuid>& ids)
 {
     QStringList result;
     for (const auto& id: ids)
@@ -79,13 +79,13 @@ QString resourceIdsToString(const QList<QnUuid>& ids)
     return result.join(':');
 }
 
-QList<QnUuid> resourceIdsFromString(const QString& string)
+QList<nx::Uuid> resourceIdsFromString(const QString& string)
 {
-    QList<QnUuid> result;
+    QList<nx::Uuid> result;
     const auto values = string.split(':');
     for (const auto& value: values)
     {
-        const auto uuid = QnUuid::fromStringSafe(value);
+        const auto uuid = nx::Uuid::fromStringSafe(value);
         if (!uuid.isNull())
             result.push_back(uuid);
     }
@@ -115,7 +115,7 @@ bool isCloudHostname(const QString& hostname)
     if (cloudSystemId.length() != kUuidLength)
         return false;
 
-    QnUuid uuid = QnUuid::fromStringSafe(cloudSystemId);
+    nx::Uuid uuid = nx::Uuid::fromStringSafe(cloudSystemId);
     return !uuid.isNull();
 }
 

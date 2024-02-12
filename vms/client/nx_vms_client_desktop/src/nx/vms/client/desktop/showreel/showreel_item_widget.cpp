@@ -280,7 +280,7 @@ void ShowreelItemWidget::initOverlay()
     connect(layoutResource().get(),
         &LayoutResource::itemDataChanged,
         this,
-        [this, delayEdit](const QnUuid& id, Qn::ItemDataRole role, const QVariant& data)
+        [this, delayEdit](const nx::Uuid& id, Qn::ItemDataRole role, const QVariant& data)
         {
             if (m_updating || role != Qn::ShowreelItemDelayMsRole || id != item()->uuid())
                 return;

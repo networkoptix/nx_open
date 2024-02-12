@@ -25,7 +25,7 @@ public:
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
 
     virtual int remove(
-        const QnUuid& tourId,
+        const nx::Uuid& tourId,
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
 
@@ -52,9 +52,9 @@ int ShowreelManager<QueryProcessorType>::getShowreels(
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
     const int requestId = generateRequestID();
-    processor().template processQueryAsync<const QnUuid&, nx::vms::api::ShowreelDataList>(
+    processor().template processQueryAsync<const nx::Uuid&, nx::vms::api::ShowreelDataList>(
         ApiCommand::getShowreels,
-        QnUuid(),
+        nx::Uuid(),
         [requestId, handler = handlerExecutor.bind(std::move(handler))](auto&&... args) mutable
         {
             handler(requestId, std::move(args)...);
@@ -81,7 +81,7 @@ int ShowreelManager<QueryProcessorType>::save(
 
 template<class QueryProcessorType>
 int ShowreelManager<QueryProcessorType>::remove(
-    const QnUuid& tourId,
+    const nx::Uuid& tourId,
     Handler<> handler,
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {

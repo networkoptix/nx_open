@@ -20,8 +20,8 @@ class NX_VMS_RULES_API PushNotificationAction: public nx::vms::rules::BasicActio
     FIELD(QString, description, setDescription)
     FIELD(bool, addSource, setAddSource)
 
-    FIELD(QnUuid, serverId, setServerId)
-    FIELD(QnUuidList, deviceIds, setDeviceIds)
+    FIELD(nx::Uuid, serverId, setServerId)
+    FIELD(UuidList, deviceIds, setDeviceIds)
     FIELD(nx::vms::event::Level, level, setLevel)
 
 public:

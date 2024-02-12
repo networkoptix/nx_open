@@ -219,8 +219,8 @@ public:
     void reset();
     bool isEmpty() const;
 
-    QVector<QString> hardwareIds(const QnUuid& serverId) const;
-    QString currentHardwareId(const QnUuid& serverId) const;
+    QVector<QString> hardwareIds(const nx::Uuid& serverId) const;
+    QString currentHardwareId(const nx::Uuid& serverId) const;
 
 signals:
     void licensesChanged();

@@ -4,7 +4,7 @@
 
 namespace {
 
-const QnUuid kThumbCameraTypeId("{72d232d7-0c67-4d8e-b5a8-a0d5075ff3a4}");
+const nx::Uuid kThumbCameraTypeId("{72d232d7-0c67-4d8e-b5a8-a0d5075ff3a4}");
 
 } // namespace
 
@@ -14,7 +14,7 @@ ClientCameraResourceStub::ClientCameraResourceStub()
     :
     base_type(kThumbCameraTypeId)
 {
-    setIdUnsafe(QnUuid::createUuid());
+    setIdUnsafe(nx::Uuid::createUuid());
     forceUsingLocalProperties();
 }
 

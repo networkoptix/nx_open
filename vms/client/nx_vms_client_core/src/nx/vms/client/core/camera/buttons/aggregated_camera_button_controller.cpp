@@ -19,7 +19,7 @@ struct AggregatedCameraButtonController::Private
     bool initialized = false;
 
     QHash<int, ControllerPtr> controllers;
-    std::unordered_map<QnUuid, ControllerPtr> activeActions;
+    std::unordered_map<nx::Uuid, ControllerPtr> activeActions;
 
     Private(AggregatedCameraButtonController * const q);
 };
@@ -75,7 +75,7 @@ void AggregatedCameraButtonController::addController(int group, const Controller
         this, &AbstractCameraButtonController::buttonChanged);
 
     connect(controller.get(), &AbstractCameraButtonController::actionStarted, this,
-        [this, controller](const QnUuid& buttonId, bool success)
+        [this, controller](const nx::Uuid& buttonId, bool success)
         {
             const auto& button = controller->button(buttonId);
             if (!button->instant() && !success)
@@ -85,14 +85,14 @@ void AggregatedCameraButtonController::addController(int group, const Controller
         });
 
     connect(controller.get(), &AbstractCameraButtonController::actionStopped, this,
-        [this](const QnUuid& buttonId, bool success)
+        [this](const nx::Uuid& buttonId, bool success)
         {
             if (d->activeActions.erase(buttonId))
                 safeEmitActionStopped(buttonId, success);
         });
 
     connect(controller.get(), &AbstractCameraButtonController::actionCancelled, this,
-        [this](const QnUuid& buttonId)
+        [this](const nx::Uuid& buttonId)
         {
             if (d->activeActions.erase(buttonId))
                 safeEmitActionCancelled(buttonId);
@@ -112,7 +112,7 @@ CameraButtons AggregatedCameraButtonController::buttons() const
     return result;
 }
 
-OptionalCameraButton AggregatedCameraButtonController::button(const QnUuid& id) const
+OptionalCameraButton AggregatedCameraButtonController::button(const nx::Uuid& id) const
 {
     for (const auto& controller: d->controllers)
     {
@@ -124,7 +124,7 @@ OptionalCameraButton AggregatedCameraButtonController::button(const QnUuid& id) 
     return {};
 }
 
-bool AggregatedCameraButtonController::startAction(const QnUuid& buttonId)
+bool AggregatedCameraButtonController::startAction(const nx::Uuid& buttonId)
 {
     if (actionIsActive(buttonId))
         return false;
@@ -145,7 +145,7 @@ bool AggregatedCameraButtonController::startAction(const QnUuid& buttonId)
     return false;
 }
 
-bool AggregatedCameraButtonController::stopAction(const QnUuid& buttonId)
+bool AggregatedCameraButtonController::stopAction(const nx::Uuid& buttonId)
 {
     const auto it = d->activeActions.find(buttonId);
     if (it == d->activeActions.end())
@@ -171,7 +171,7 @@ bool AggregatedCameraButtonController::stopAction(const QnUuid& buttonId)
     return false;
 }
 
-bool AggregatedCameraButtonController::cancelAction(const QnUuid& buttonId)
+bool AggregatedCameraButtonController::cancelAction(const nx::Uuid& buttonId)
 {
     const auto it = d->activeActions.find(buttonId);
     if (it == d->activeActions.end())
@@ -198,7 +198,7 @@ bool AggregatedCameraButtonController::cancelAction(const QnUuid& buttonId)
     return false;
 }
 
-bool AggregatedCameraButtonController::actionIsActive(const QnUuid& buttonId) const
+bool AggregatedCameraButtonController::actionIsActive(const nx::Uuid& buttonId) const
 {
     return d->activeActions.contains(buttonId);
 }

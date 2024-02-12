@@ -41,7 +41,7 @@ protected:
 
 TEST_F(DistributedFileDownloaderPeerManagerTest, invalidPeerRequest)
 {
-    const auto& peer = QnUuid::createUuid();
+    const auto& peer = nx::Uuid::createUuid();
     auto request = peerManager->requestFileInfo(peer, "test", nx::utils::Url());
     ASSERT_FALSE(request->future.valid());
 }
@@ -59,7 +59,7 @@ TEST_F(DistributedFileDownloaderPeerManagerTest, cancellingRequest)
 
 TEST_F(DistributedFileDownloaderPeerManagerTest, fileInfo)
 {
-    const auto& peer = QnUuid::createUuid();
+    const auto& peer = nx::Uuid::createUuid();
 
     peerManager->addPeer(peer);
 
@@ -72,7 +72,7 @@ TEST_F(DistributedFileDownloaderPeerManagerTest, fileInfo)
 
 TEST_F(DistributedFileDownloaderPeerManagerTest, emptyFileInfo)
 {
-    const auto& peer = QnUuid::createUuid();
+    const auto& peer = nx::Uuid::createUuid();
 
     peerManager->addPeer(peer);
 
@@ -83,7 +83,7 @@ TEST_F(DistributedFileDownloaderPeerManagerTest, emptyFileInfo)
 
 TEST_F(DistributedFileDownloaderPeerManagerTest, invalidChunk)
 {
-    const auto& peer = QnUuid::createUuid();
+    const auto& peer = nx::Uuid::createUuid();
 
     peerManager->addPeer(peer);
 
@@ -168,7 +168,7 @@ TEST_F(DistributedFileDownloaderPeerManagerTest, calculateDistances)
     QString groupD("D");
 
     ProxyTestPeerManager testPeerManager(peerManager.data());
-    const auto& peerA = QnUuid();
+    const auto& peerA = nx::Uuid();
     peerManager->setPeerGroups(peerA, { groupA });
     const auto& peerA2 = peerManager->addPeer();
     peerManager->setPeerGroups(peerA2, { groupA });

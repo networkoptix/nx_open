@@ -27,8 +27,8 @@ public:
     DesktopCameraConnection(
         DesktopResourcePtr owner,
         const QnMediaServerResourcePtr& server,
-        const QnUuid& userId,
-        const QnUuid& moduleGuid,
+        const nx::Uuid& userId,
+        const nx::Uuid& moduleGuid,
         const nx::network::http::Credentials& credentials);
     virtual ~DesktopCameraConnection();
 

@@ -19,10 +19,10 @@ public:
     void setMessageProcessor(QnCommonMessageProcessor* messageProcessor);
 
 signals:
-    void deviceAgentSettingsMaybeChanged(QnUuid deviceId, QnUuid engineId);
-    void deviceFootageChanged(const std::vector<QnUuid>& deviceIds);
-    void analyticsStorageParametersChanged(QnUuid serverId);
-    void deviceAdvancedSettingsManifestChanged(const std::set<QnUuid>& deviceIds);
+    void deviceAgentSettingsMaybeChanged(nx::Uuid deviceId, nx::Uuid engineId);
+    void deviceFootageChanged(const std::vector<nx::Uuid>& deviceIds);
+    void analyticsStorageParametersChanged(nx::Uuid serverId);
+    void deviceAdvancedSettingsManifestChanged(const std::set<nx::Uuid>& deviceIds);
 
 private:
     void at_serverRuntimeEventOccurred(const nx::vms::api::ServerRuntimeEventData& eventData);

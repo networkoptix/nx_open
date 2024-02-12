@@ -87,7 +87,7 @@ ActionParameters getActionParameters(
 
     if (nodeType == NodeType::videoWallItem)
     {
-        const auto uuid = index.data(Qn::UuidRole).value<QnUuid>();
+        const auto uuid = index.data(Qn::UuidRole).value<nx::Uuid>();
         QnVideoWallItemIndex itemIndex = resourcePool->getVideoWallItemByUuid(uuid);
         if (!itemIndex.isNull())
         {
@@ -99,7 +99,7 @@ ActionParameters getActionParameters(
 
     if (nodeType == NodeType::videoWallMatrix)
     {
-        const auto uuid = index.data(Qn::UuidRole).value<QnUuid>();
+        const auto uuid = index.data(Qn::UuidRole).value<nx::Uuid>();
         QnVideoWallMatrixIndex matrixIndex = resourcePool->getVideoWallMatrixByUuid(uuid);
         if (!matrixIndex.isNull())
         {
@@ -129,7 +129,7 @@ ActionParameters getActionParameters(
     }
 
     if (nodeType == NodeType::showreel)
-        return ActionParameters(Qn::UuidRole, index.data(Qn::UuidRole).value<QnUuid>());
+        return ActionParameters(Qn::UuidRole, index.data(Qn::UuidRole).value<nx::Uuid>());
 
     return ActionParameters();
 }

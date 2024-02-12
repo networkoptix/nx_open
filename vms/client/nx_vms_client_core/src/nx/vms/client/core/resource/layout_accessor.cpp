@@ -46,7 +46,7 @@ QString LayoutAccessor::layoutId() const
 void LayoutAccessor::setLayoutId(const QString& id)
 {
     const auto layout =
-        resourcePool()->getResourceById<QnLayoutResource>(QnUuid::fromStringSafe(id));
+        resourcePool()->getResourceById<QnLayoutResource>(nx::Uuid::fromStringSafe(id));
     setLayout(layout);
 }
 

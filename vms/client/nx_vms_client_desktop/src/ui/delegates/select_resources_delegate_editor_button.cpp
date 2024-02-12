@@ -13,12 +13,12 @@ QnSelectResourcesDialogButton::~QnSelectResourcesDialogButton()
 {
 }
 
-QnUuidSet QnSelectResourcesDialogButton::getResources() const
+UuidSet QnSelectResourcesDialogButton::getResources() const
 {
     return m_resources;
 }
 
-void QnSelectResourcesDialogButton::setResources(const QnUuidSet& resources)
+void QnSelectResourcesDialogButton::setResources(const UuidSet& resources)
 {
     m_resources = resources;
 }

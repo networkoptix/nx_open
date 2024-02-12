@@ -44,7 +44,7 @@ public:
 
     std::shared_ptr<RemoteSession> session() const;
     void setSession(std::shared_ptr<RemoteSession> session);
-    QnUuid currentServerId() const;
+    nx::Uuid currentServerId() const;
 
     void reinitializeCertificateStorage();
 

@@ -320,13 +320,13 @@ void QnSendEmailActionDelegate::init(QWidget* parent)
     parent->layout()->addWidget(m_warningLabel);
 }
 
-QString QnSendEmailActionDelegate::validationMessage(const QSet<QnUuid>& selected) const
+QString QnSendEmailActionDelegate::validationMessage(const QSet<nx::Uuid>& selected) const
 {
     const bool valid = isValidList(selected, QString()); // TODO: FIXME! Why additional is empty?
     return valid ? QString() : getText(selected, true, QString());
 }
 
-bool QnSendEmailActionDelegate::isValid(const QnUuid& resourceId) const
+bool QnSendEmailActionDelegate::isValid(const nx::Uuid& resourceId) const
 {
     if (resourceId.isNull()) //< custom permissions "Custom" role is not accepted.
         return false;
@@ -339,12 +339,12 @@ bool QnSendEmailActionDelegate::isValid(const QnUuid& resourceId) const
     return userGroupManager()->contains(resourceId);
 }
 
-bool QnSendEmailActionDelegate::isValidList(const QSet<QnUuid>& ids, const QString& additional)
+bool QnSendEmailActionDelegate::isValidList(const QSet<nx::Uuid>& ids, const QString& additional)
 {
     auto context = appContext()->currentSystemContext();
 
     QnUserResourceList users;
-    QList<QnUuid> groupIds;
+    QList<nx::Uuid> groupIds;
     nx::vms::common::getUsersAndGroups(context, ids, users, groupIds);
 
     if (!std::all_of(users.cbegin(), users.cend(), &isValidUser))
@@ -367,7 +367,7 @@ bool QnSendEmailActionDelegate::isValidList(const QSet<QnUuid>& ids, const QStri
     return countEnabledUsers(users) != 0 || !groupIds.empty() || !additionalRecipients.empty();
 }
 
-QString QnSendEmailActionDelegate::getText(const QSet<QnUuid>& ids, const bool detailed,
+QString QnSendEmailActionDelegate::getText(const QSet<nx::Uuid>& ids, const bool detailed,
     const QString& additionalList)
 {
     auto context = appContext()->currentSystemContext();
@@ -411,7 +411,7 @@ QString QnSendEmailActionDelegate::getText(const QSet<QnUuid>& ids, const bool d
     }
 
     int total = users.size();
-    QSet<QnUuid> groupIds;
+    QSet<nx::Uuid> groupIds;
 
     for (const auto& group: groups)
     {
@@ -532,10 +532,10 @@ QnSubjectValidationPolicy::~QnSubjectValidationPolicy()
 
 void QnSubjectValidationPolicy::analyze(
     bool allUsers,
-    const QSet<QnUuid>& subjects,
-    QVector<QnUuid>& validRoles,
-    QVector<QnUuid>& invalidRoles,
-    QVector<QnUuid>& intermediateRoles,
+    const QSet<nx::Uuid>& subjects,
+    QVector<nx::Uuid>& validRoles,
+    QVector<nx::Uuid>& invalidRoles,
+    QVector<nx::Uuid>& intermediateRoles,
     QVector<QnUserResourcePtr>& validUsers,
     QVector<QnUserResourcePtr>& invalidUsers) const
 {
@@ -546,7 +546,7 @@ void QnSubjectValidationPolicy::analyze(
     invalidUsers.clear();
 
     QnUserResourceList users;
-    QList<QnUuid> groupIds;
+    QList<nx::Uuid> groupIds;
 
     if (allUsers)
         users = resourcePool()->getResources<QnUserResource>();
@@ -587,13 +587,13 @@ bool QnSubjectValidationPolicy::isEmptySelectionAllowed() const
 
 // This function is generally faster than QnSubjectValidationPolicy::analyze.
 QValidator::State QnSubjectValidationPolicy::validity(bool allUsers,
-    const QSet<QnUuid>& subjects) const
+    const QSet<nx::Uuid>& subjects) const
 {
     if (!allUsers && subjects.empty() && !m_allowEmptySelection)
         return QValidator::Invalid;
 
     QnUserResourceList users;
-    QList<QnUuid> groupIds;
+    QList<nx::Uuid> groupIds;
 
     if (allUsers)
         users = resourcePool()->getResources<QnUserResource>();
@@ -649,7 +649,7 @@ QValidator::State QnSubjectValidationPolicy::validity(bool allUsers,
 }
 
 QString QnSubjectValidationPolicy::calculateAlert(
-    bool allUsers, const QSet<QnUuid>& subjects) const
+    bool allUsers, const QSet<nx::Uuid>& subjects) const
 {
     return !allUsers && subjects.empty() && !m_allowEmptySelection
         ? nx::vms::common::html::document(nx::vms::event::StringsHelper::needToSelectUserText())
@@ -664,7 +664,7 @@ QnDefaultSubjectValidationPolicy::QnDefaultSubjectValidationPolicy(bool allowEmp
 {
 }
 
-QValidator::State QnDefaultSubjectValidationPolicy::roleValidity(const QnUuid& /*roleId*/) const
+QValidator::State QnDefaultSubjectValidationPolicy::roleValidity(const nx::Uuid& /*roleId*/) const
 {
     return QValidator::Acceptable;
 }
@@ -691,7 +691,7 @@ bool QnRequiredAccessRightPolicy::userValidity(const QnUserResourcePtr& user) co
     return isSubjectValid(user);
 }
 
-QValidator::State QnRequiredAccessRightPolicy::roleValidity(const QnUuid& groupId) const
+QValidator::State QnRequiredAccessRightPolicy::roleValidity(const nx::Uuid& groupId) const
 {
     const auto group = userGroupManager()->find(groupId);
     if (!group)
@@ -744,7 +744,7 @@ bool QnRequiredAccessRightPolicy::isSubjectValid(
 }
 
 QString QnRequiredAccessRightPolicy::calculateAlert(bool allUsers,
-    const QSet<QnUuid>& subjects) const
+    const QSet<nx::Uuid>& subjects) const
 {
     using namespace nx::vms::common;
 
@@ -752,9 +752,9 @@ QString QnRequiredAccessRightPolicy::calculateAlert(bool allUsers,
     if (!alert.isEmpty())
         return alert;
 
-    QVector<QnUuid> validRoles;
-    QVector<QnUuid> invalidRoles;
-    QVector<QnUuid> intermediateRoles;
+    QVector<nx::Uuid> validRoles;
+    QVector<nx::Uuid> invalidRoles;
+    QVector<nx::Uuid> intermediateRoles;
     QVector<QnUserResourcePtr> validUsers;
     QVector<QnUserResourcePtr> invalidUsers;
 
@@ -816,7 +816,7 @@ QString QnRequiredAccessRightPolicy::calculateAlert(bool allUsers,
 //-------------------------------------------------------------------------------------------------
 // QnLayoutAccessValidationPolicy
 
-QValidator::State QnLayoutAccessValidationPolicy::roleValidity(const QnUuid& roleId) const
+QValidator::State QnLayoutAccessValidationPolicy::roleValidity(const nx::Uuid& roleId) const
 {
     const auto group = userGroupManager()->find(roleId);
     if (!group)
@@ -870,7 +870,7 @@ void QnLayoutAccessValidationPolicy::setLayout(const QnLayoutResourcePtr& layout
 //-------------------------------------------------------------------------------------------------
 // QnCloudUsersValidationPolicy
 
-QValidator::State QnCloudUsersValidationPolicy::roleValidity(const QnUuid& roleId) const
+QValidator::State QnCloudUsersValidationPolicy::roleValidity(const nx::Uuid& roleId) const
 {
     const auto& users = accessSubjectHierarchy()->usersInGroups({roleId});
     bool hasCloud = false;
@@ -895,13 +895,13 @@ bool QnCloudUsersValidationPolicy::userValidity(const QnUserResourcePtr& user) c
 
 QString QnCloudUsersValidationPolicy::calculateAlert(
     bool allUsers,
-    const QSet<QnUuid>& subjects) const
+    const QSet<nx::Uuid>& subjects) const
 {
     const auto buildUserList =
-        [this](const QSet<QnUuid>& subjects) -> QnUserResourceList
+        [this](const QSet<nx::Uuid>& subjects) -> QnUserResourceList
         {
             QnUserResourceList users;
-            QnUuidList groupIds;
+            UuidList groupIds;
             nx::vms::common::getUsersAndGroups(systemContext(), subjects, users, groupIds);
 
             for (const auto& user: accessSubjectHierarchy()->usersInGroups(
@@ -954,7 +954,7 @@ QString QnCloudUsersValidationPolicy::calculateAlert(
 //-------------------------------------------------------------------------------------------------
 // QnUserWithEmailValidationPolicy
 
-QValidator::State QnUserWithEmailValidationPolicy::roleValidity(const QnUuid& roleId) const
+QValidator::State QnUserWithEmailValidationPolicy::roleValidity(const nx::Uuid& roleId) const
 {
     bool hasValid{false};
     bool hasInvalid{false};

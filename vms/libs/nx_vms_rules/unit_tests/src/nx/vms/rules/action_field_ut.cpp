@@ -214,7 +214,7 @@ TEST_F(ActionFieldTest, EventTimeProlongedEvent)
     textWithFieldsField->setText(
         QString{"{event.time.start}%1{event.time}%1{event.time.end}"}.arg("|"));
 
-    auto rule = std::make_unique<Rule>(QnUuid::createUuid(), engine.get());
+    auto rule = std::make_unique<Rule>(nx::Uuid::createUuid(), engine.get());
     rule->addEventFilter(std::move(eventFilter));
     rule->addActionBuilder(std::move(actionBuilder));
 
@@ -443,7 +443,7 @@ INSTANTIATE_TEST_SUITE_P(CommonSet,
 TEST_F(ActionFieldTest, TargetUserField)
 {
     UuidSelection selection;
-    selection.ids << QnUuid::createUuid() << QnUuid::createUuid();
+    selection.ids << nx::Uuid::createUuid() << nx::Uuid::createUuid();
     selection.all = true;
 
     TargetUserField field(systemContext());
@@ -470,14 +470,14 @@ TEST_F(ActionFieldTest, EventIdField)
     ASSERT_FALSE(aggEvent->id().isNull());
     ASSERT_TRUE(value.isValid());
     ASSERT_FALSE(value.isNull());
-    ASSERT_EQ(value.value<QnUuid>(), aggEvent->id());
+    ASSERT_EQ(value.value<nx::Uuid>(), aggEvent->id());
 }
 
 TEST_F(ActionFieldTest, TargetSingleDeviceTest)
 {
     const auto event = QSharedPointer<TestEvent>::create();
-    event->m_cameraId = QnUuid::createUuid();
-    event->m_deviceIds = {QnUuid::createUuid(), QnUuid::createUuid()};
+    event->m_cameraId = nx::Uuid::createUuid();
+    event->m_deviceIds = {nx::Uuid::createUuid(), nx::Uuid::createUuid()};
     const auto aggEvent = AggregatedEventPtr::create(event);
 
     TargetSingleDeviceField field;
@@ -486,15 +486,15 @@ TEST_F(ActionFieldTest, TargetSingleDeviceTest)
     auto value = field.build(aggEvent);
     ASSERT_TRUE(value.isValid());
     ASSERT_FALSE(value.isNull());
-    ASSERT_EQ(value.value<QnUuid>(), event->m_deviceIds.last());
+    ASSERT_EQ(value.value<nx::Uuid>(), event->m_deviceIds.last());
 
     field.setUseSource(false);
-    field.setId(QnUuid::createUuid());
+    field.setId(nx::Uuid::createUuid());
 
     value = field.build(aggEvent);
     ASSERT_TRUE(value.isValid());
     ASSERT_FALSE(value.isNull());
-    ASSERT_EQ(value.value<QnUuid>(), field.id());
+    ASSERT_EQ(value.value<nx::Uuid>(), field.id());
 }
 
 void containsParametersForAllEvents(

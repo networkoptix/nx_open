@@ -42,8 +42,8 @@ class NX_VMS_COMMON_API Manager:
 public:
     struct ServerModeInfo
     {
-        QnUuid peerId;
-        QnUuid sessionId;
+        nx::Uuid peerId;
+        nx::Uuid sessionId;
         bool multicastDiscoveryAllowed = true;
     };
 
@@ -80,9 +80,9 @@ public:
     void stop();
 
     std::list<ModuleEndpoint> getAll() const; //< All accessible modules.
-    std::optional<nx::network::SocketAddress> getEndpoint(const QnUuid& id) const; //< Reachable endpoint.
-    std::optional<ModuleEndpoint> getModule(const QnUuid& id) const;
-    void forgetModule(const QnUuid& id);
+    std::optional<nx::network::SocketAddress> getEndpoint(const nx::Uuid& id) const; //< Reachable endpoint.
+    std::optional<ModuleEndpoint> getModule(const nx::Uuid& id) const;
+    void forgetModule(const nx::Uuid& id);
 
     /**
      * Try to find module on the specified endpoint.
@@ -93,8 +93,8 @@ public:
      *     address in use is disconnected. If expectedId is not specified, the endpoint will be
      *     pinged just once.
      */
-    void checkEndpoint(nx::network::SocketAddress endpoint, QnUuid expectedId = QnUuid());
-    void checkEndpoint(const nx::utils::Url &url, QnUuid expectedId = QnUuid());
+    void checkEndpoint(nx::network::SocketAddress endpoint, nx::Uuid expectedId = nx::Uuid());
+    void checkEndpoint(const nx::utils::Url &url, nx::Uuid expectedId = nx::Uuid());
 
     template<typename Ptr, typename Found, typename Changed, typename Lost>
     void onSignals(Ptr ptr, Found foundSlot, Changed changedSlot, Lost lostSlot)
@@ -115,7 +115,7 @@ signals:
     void changed(nx::vms::discovery::ModuleEndpoint module);
 
     /** Module connection is lost and could not be restored. */
-    void lost(QnUuid information);
+    void lost(nx::Uuid information);
 
     /** Found the module with the same UUID as we are. */
     void conflict(

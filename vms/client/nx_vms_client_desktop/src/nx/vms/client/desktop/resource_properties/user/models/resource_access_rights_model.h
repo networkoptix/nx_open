@@ -39,9 +39,9 @@ public:
 
     ProvidedVia providedVia{ProvidedVia::none};
     ProvidedVia inheritedFrom{ProvidedVia::none};
-    QVector<QnUuid> providerUserGroups;
+    QVector<nx::Uuid> providerUserGroups;
     QVector<QnResourcePtr> indirectProviders;
-    QnUuid parentResourceGroupId; //< Filled only if access is granted through it.
+    nx::Uuid parentResourceGroupId; //< Filled only if access is granted through it.
     int checkedChildCount = 0;
     int checkedAndInheritedChildCount = 0;
     int totalChildCount = 0;

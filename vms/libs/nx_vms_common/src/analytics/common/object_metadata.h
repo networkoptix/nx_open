@@ -145,7 +145,7 @@ struct NX_VMS_COMMON_API ObjectMetadata
     QString typeId;
 
     /**%apidoc Unique track Id. */
-    QnUuid trackId;
+    nx::Uuid trackId;
 
     /**%apidoc Bounding box of the object. JSON object containing top-left corner (fields `x`
      * and `y`), `width` and `height`. Relative coordinates are in range [0;1].
@@ -158,7 +158,7 @@ struct NX_VMS_COMMON_API ObjectMetadata
     ObjectMetadataType objectMetadataType;
 
     /**%apidoc Unique Id of the analytics engine. */
-    QnUuid analyticsEngineId;
+    nx::Uuid analyticsEngineId;
 
     /**%apidoc Image url, only for Best Shot packets. */
     QString imageUrl;
@@ -204,7 +204,7 @@ NX_REFLECTION_INSTRUMENT(ObjectMetadata, ObjectMetadata_Fields)
 struct NX_VMS_COMMON_API ObjectMetadataPacket
 {
     /**%apidoc Device id. */
-    QnUuid deviceId;
+    nx::Uuid deviceId;
 
     /**%apidoc UTC timestamp in microseconds. */
     qint64 timestampUs = 0;

@@ -179,7 +179,7 @@ void CachingCameraDataLoader::setAnalyticsFilter(const AnalyticsFilter& value)
         return;
 
     const auto deviceId = m_analyticsFilter.deviceIds.empty()
-        ? QnUuid()
+        ? nx::Uuid()
         : *m_analyticsFilter.deviceIds.cbegin();
 
     using DeviceIds = decltype(value.deviceIds);

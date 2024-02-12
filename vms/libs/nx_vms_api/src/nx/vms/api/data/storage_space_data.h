@@ -29,7 +29,7 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(StorageStatuses)
 struct NX_VMS_API StorageSpaceDataBase
 {
     QString url;
-    QnUuid storageId;
+    nx::Uuid storageId;
     qint64 totalSpace = -1;
     qint64 freeSpace = -1;
     qint64 reservedSpace = 0;
@@ -82,7 +82,7 @@ using StorageSpaceDataList = StorageSpaceDataListV3;
 
 struct NX_VMS_API StorageSpaceDataWithDbInfoV1: StorageSpaceDataV1
 {
-    QnUuid serverId;
+    nx::Uuid serverId;
     QString name;
 
     StorageSpaceDataWithDbInfoV1(StorageSpaceDataV1&& base): StorageSpaceDataV1(base) {}
@@ -98,7 +98,7 @@ using StorageSpaceDataWithDbInfoListV1 = std::vector<StorageSpaceDataWithDbInfoV
 
 struct NX_VMS_API StorageSpaceDataWithDbInfoV3: StorageSpaceDataV3
 {
-    QnUuid serverId;
+    nx::Uuid serverId;
     QString name;
 
     StorageSpaceDataWithDbInfoV3(StorageSpaceDataV3&& base): StorageSpaceDataV3(base) {}

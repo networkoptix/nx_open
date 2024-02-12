@@ -22,7 +22,7 @@ struct Config
      * Root GUID.
      * Used as a base for persistent GUID generator across multiple client's processes.
      */
-    QnUuid rootGuid;
+    nx::Uuid rootGuid;
     /** Prefix is used to generate shared memory file. */
     QString sharedPrefix;
     /** Path to state storage. */
@@ -134,7 +134,7 @@ public:
      * @param forceNewInstance - forces manager find a new instance without any stored data.
      * If forceNewInstance is true, manager can occupy lost session.
      */
-    bool acquireSessionInstance(const QnUuid& systemId, const QnUuid& userId, bool forceNewInstance);
+    bool acquireSessionInstance(const nx::Uuid& systemId, const nx::Uuid& userId, bool forceNewInstance);
 
     /**
      * Releases data for acquired instance.
@@ -199,15 +199,15 @@ signals:
     void settingsChanged();
 
     /** Signal is emitted when the current session has started. */
-    void sessionStarted(const QnUuid& systemId, const QnUuid& user, SessionFlags flags);
+    void sessionStarted(const nx::Uuid& systemId, const nx::Uuid& user, SessionFlags flags);
 
     /**
      * Signal is emitted when the current session is being closed.
      * It is still possible to save state inside signal handler.
      */
     void sessionEnding(
-        const QnUuid& systemId,
-        const QnUuid& user);
+        const nx::Uuid& systemId,
+        const nx::Uuid& user);
 
     /**
      * Signal is emitted when the current session is closed.
@@ -215,15 +215,15 @@ signals:
      * It can be used to track client's offline status.
      */
     void sessionEnded(
-        const QnUuid& systemId,
-        const QnUuid& user);
+        const nx::Uuid& systemId,
+        const nx::Uuid& user);
 
     /**
      * Signal is emitted when another client has disconnected from the same session.
      */
     void exitRequestedByAnotherClient(
-        const QnUuid& systemId,
-        const QnUuid& user);
+        const nx::Uuid& systemId,
+        const nx::Uuid& user);
 
 protected:
     /** Initializes connection to shared memory. */

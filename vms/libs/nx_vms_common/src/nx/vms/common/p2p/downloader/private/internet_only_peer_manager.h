@@ -14,21 +14,21 @@ public:
     InternetOnlyPeerManager();
     virtual ~InternetOnlyPeerManager() override;
 
-    virtual QString peerString(const QnUuid& peerId) const override;
-    virtual QList<QnUuid> getAllPeers() const override;
-    virtual QList<QnUuid> peers() const override;
-    virtual int distanceTo(const QnUuid& peerId) const override;
+    virtual QString peerString(const nx::Uuid& peerId) const override;
+    virtual QList<nx::Uuid> getAllPeers() const override;
+    virtual QList<nx::Uuid> peers() const override;
+    virtual int distanceTo(const nx::Uuid& peerId) const override;
 
     virtual RequestContextPtr<FileInformation> requestFileInfo(
-        const QnUuid& peerId,
+        const nx::Uuid& peerId,
         const QString& fileName,
         const nx::utils::Url& url) override;
 
     virtual RequestContextPtr<QVector<QByteArray>> requestChecksums(
-        const QnUuid& peerId, const QString& fileName) override;
+        const nx::Uuid& peerId, const QString& fileName) override;
 
     virtual RequestContextPtr<nx::Buffer> downloadChunk(
-        const QnUuid& peerId,
+        const nx::Uuid& peerId,
         const QString& fileName,
         const nx::utils::Url &url,
         int chunkIndex,

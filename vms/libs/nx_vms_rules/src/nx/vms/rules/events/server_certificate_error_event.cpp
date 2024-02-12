@@ -11,7 +11,7 @@ namespace nx::vms::rules {
 
 ServerCertificateErrorEvent::ServerCertificateErrorEvent(
     std::chrono::microseconds timestamp,
-    QnUuid serverId)
+    nx::Uuid serverId)
     :
     base_type(timestamp),
     m_serverId(serverId)

@@ -34,7 +34,7 @@ struct NX_VMS_CLIENT_DESKTOP_API UpdateItem
         client,
     };
 
-    QnUuid id;
+    nx::Uuid id;
     StatusCode state = StatusCode::offline;
     int progress = -1;
 
@@ -116,7 +116,7 @@ public:
      */
     bool setResourceFeed(QnResourcePool* pool);
 
-    UpdateItemPtr findItemById(QnUuid id) const;
+    UpdateItemPtr findItemById(nx::Uuid id) const;
     UpdateItemPtr findItemByRow(int row) const;
 
     int peersCount() const;
@@ -127,12 +127,12 @@ public:
     QnMediaServerResourcePtr getServer(const UpdateItemPtr& item) const;
 
     /**
-     * Get pointer to mediaserver from QnUuid.
+     * Get pointer to mediaserver from nx::Uuid.
      * It will return nullptr if the item is not a server.
      */
-    QnMediaServerResourcePtr getServer(QnUuid id) const;
+    QnMediaServerResourcePtr getServer(nx::Uuid id) const;
 
-    QnUuid getClientPeerId(nx::vms::common::SystemContext* context) const;
+    nx::Uuid getClientPeerId(nx::vms::common::SystemContext* context) const;
 
     nx::utils::SoftwareVersion lowestInstalledVersion();
     void setUpdateTarget(const nx::utils::SoftwareVersion& version);
@@ -140,9 +140,9 @@ public:
      * Update internal data using response from mediaservers.
      * It will return number if peers with changed data.
      */
-    int setUpdateStatus(const std::map<QnUuid, nx::vms::common::update::Status>& statusAll);
+    int setUpdateStatus(const std::map<nx::Uuid, nx::vms::common::update::Status>& statusAll);
 
-    void markStatusUnknown(const QSet<QnUuid>& targets);
+    void markStatusUnknown(const QSet<nx::Uuid>& targets);
     /**
      * Forcing update for mediaserver versions.
      * We have used direct api call to get this module information.
@@ -153,14 +153,14 @@ public:
      * whether servers are installing anything or not, so client should speculate about it when
      * 'Install update' button is clicked.
      */
-    void setPeersInstalling(const QSet<QnUuid>& targets, bool installing);
-    void resetOfflinePackagesInformation(const QSet<QnUuid>& targets);
+    void setPeersInstalling(const QSet<nx::Uuid>& targets, bool installing);
+    void resetOfflinePackagesInformation(const QSet<nx::Uuid>& targets);
     void clearState();
 
     /** Set update check error for specified set of peers. */
-    void setVerificationError(const QMap<QnUuid, QString>& errors);
+    void setVerificationError(const QMap<nx::Uuid, QString>& errors);
 
-    void setVerificationError(const QSet<QnUuid>& targets, const QString& message);
+    void setVerificationError(const QSet<nx::Uuid>& targets, const QString& message);
 
     /** Clear update check errors for all the peers. */
     void clearVerificationErrors();
@@ -173,7 +173,7 @@ public:
     struct ErrorReport
     {
         QString message;
-        QSet<QnUuid> peers;
+        QSet<nx::Uuid> peers;
     };
 
     /**
@@ -183,24 +183,24 @@ public:
     bool getErrorReport(ErrorReport& report) const;
 
 public:
-    std::map<QnUuid, nx::vms::common::update::Status::Code> allPeerStates() const;
-    std::map<QnUuid, QnMediaServerResourcePtr> activeServers() const;
+    std::map<nx::Uuid, nx::vms::common::update::Status::Code> allPeerStates() const;
+    std::map<nx::Uuid, QnMediaServerResourcePtr> activeServers() const;
 
     QList<UpdateItemPtr> allItems() const;
-    QSet<QnUuid> allPeers() const;
-    QSet<QnUuid> peersInState(StatusCode state, bool withClient = true) const;
-    QSet<QnUuid> legacyServers() const;
-    QSet<QnUuid> offlineServers() const;
-    QSet<QnUuid> offlineAndInState(StatusCode state) const;
-    QSet<QnUuid> onlineAndInState(StatusCode state) const;
-    QSet<QnUuid> peersInstalling() const;
-    QSet<QnUuid> peersCompleteInstall() const;
-    QSet<QnUuid> serversWithChangedProtocol() const;
-    QSet<QnUuid> peersWithUnknownStatus() const;
-    QSet<QnUuid> peersWithDownloaderError() const;
-    QSet<QnUuid> peersWithOfflinePackages() const;
-    QSet<QnUuid> peersCompletedOfflinePackagesDownload() const;
-    QSet<QnUuid> peersWithOfflinePackageDownloadError() const;
+    QSet<nx::Uuid> allPeers() const;
+    QSet<nx::Uuid> peersInState(StatusCode state, bool withClient = true) const;
+    QSet<nx::Uuid> legacyServers() const;
+    QSet<nx::Uuid> offlineServers() const;
+    QSet<nx::Uuid> offlineAndInState(StatusCode state) const;
+    QSet<nx::Uuid> onlineAndInState(StatusCode state) const;
+    QSet<nx::Uuid> peersInstalling() const;
+    QSet<nx::Uuid> peersCompleteInstall() const;
+    QSet<nx::Uuid> serversWithChangedProtocol() const;
+    QSet<nx::Uuid> peersWithUnknownStatus() const;
+    QSet<nx::Uuid> peersWithDownloaderError() const;
+    QSet<nx::Uuid> peersWithOfflinePackages() const;
+    QSet<nx::Uuid> peersCompletedOfflinePackagesDownload() const;
+    QSet<nx::Uuid> peersWithOfflinePackageDownloadError() const;
 
     /**
      * Process unknown or offline states. It will change item states.
@@ -224,23 +224,23 @@ public:
      */
 
     /** Get a set of peers that completed current action. */
-    QSet<QnUuid> peersComplete() const;
+    QSet<nx::Uuid> peersComplete() const;
     /** Get a set of peers that are currently active. */
-    QSet<QnUuid> peersActive() const;
+    QSet<nx::Uuid> peersActive() const;
     /** Get a set of peers that are participating in current action. */
-    QSet<QnUuid> peersIssued() const;
+    QSet<nx::Uuid> peersIssued() const;
     /** Get a set of peers that have failed current action. */
-    QSet<QnUuid> peersFailed() const;
+    QSet<nx::Uuid> peersFailed() const;
 
     /**
      * We call it every time we start or stop next task, like ready->downloading,
      * readyToInstall->installing or when we cancel current action.
      * It will reset all internal task sets.
      */
-    void setTask(const QSet<QnUuid>& targets, bool reset = true);
-    void setTaskError(const QSet<QnUuid>& targets, const QString& error);
-    void addToTask(QnUuid id);
-    void removeFromTask(QnUuid id);
+    void setTask(const QSet<nx::Uuid>& targets, bool reset = true);
+    void setTaskError(const QSet<nx::Uuid>& targets, const QString& error);
+    void addToTask(nx::Uuid id);
+    void removeFromTask(nx::Uuid id);
 
     static QString errorString(nx::vms::common::update::Status::ErrorCode code);
 
@@ -304,13 +304,13 @@ private:
      * This sets are changed every time we are initiating some update action.
      * Set of peers that are currently active.
      */
-    QSet<QnUuid> m_peersActive;
+    QSet<nx::Uuid> m_peersActive;
     /** Set of peers that are used for the current task. */
-    QSet<QnUuid> m_peersIssued;
+    QSet<nx::Uuid> m_peersIssued;
     /** A set of peers that have completed current task. */
-    QSet<QnUuid> m_peersComplete;
+    QSet<nx::Uuid> m_peersComplete;
     /** A set of peers that have failed current task. */
-    QSet<QnUuid> m_peersFailed;
+    QSet<nx::Uuid> m_peersFailed;
 
     /**
      * Time for server to become online. We will remove this server from the task set after

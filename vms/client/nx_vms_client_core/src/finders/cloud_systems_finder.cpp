@@ -112,7 +112,7 @@ struct CloudSystemsFinder::Private
         if (ini().doNotPingCloudSystems)
             return;
 
-        static const QnUuid kAdapterFuncId = QnUuid::createUuid();
+        static const nx::Uuid kAdapterFuncId = nx::Uuid::createUuid();
         NX_VERBOSE(this, "Cloud system <%1>: send moduleInformation request", cloudSystemId);
 
         ClientPool::Request request;
@@ -305,7 +305,7 @@ struct CloudSystemsFinder::Private
 
         const auto newIds = nx::utils::toQSet(updatedSystems.keys());
 
-        QHash<QString, QnUuid> removedTargetIds;
+        QHash<QString, nx::Uuid> removedTargetIds;
 
         {
             NX_MUTEX_LOCKER lock(&mutex);

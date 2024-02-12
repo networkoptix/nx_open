@@ -35,7 +35,7 @@ LayoutSnapshotManager::LayoutSnapshotManager(SystemContext* systemContext, QObje
     onResourcesAdded(resourcePool()->getResources<LayoutResource>());
 
     connect(this, &core::SaveStateManager::flagsChanged, this,
-        [this](const QnUuid& id, SaveStateFlags /*flags*/)
+        [this](const nx::Uuid& id, SaveStateFlags /*flags*/)
         {
             if (const auto layout = resourcePool()->getResourceById<LayoutResource>(id))
                 emit layoutFlagsChanged(layout);

@@ -56,7 +56,7 @@ NX_REFLECTION_INSTRUMENT(LogSettings, LogSettings_Fields)
 struct NX_VMS_API ServerLogSettings
 {
     /**%apidoc[readonly] Server id. */
-    QnUuid id;
+    nx::Uuid id;
 
     /**%apidoc[readonly] Log directory on the filesystem. */
     QString directory;
@@ -82,7 +82,7 @@ struct NX_VMS_API ServerLogSettings
     /**%apidoc[opt] HWID log settings. */
     LogSettings systemLog;
 
-    QnUuid getId() const { return id; }
+    nx::Uuid getId() const { return id; }
 
     LogSettings& logSettings(nx::log::LogName logName)
     {
@@ -104,6 +104,6 @@ struct NX_VMS_API ServerLogSettings
 QN_FUSION_DECLARE_FUNCTIONS(ServerLogSettings, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(ServerLogSettings, ServerLogSettings_Fields)
 
-using ServerLogSettingsMap = Map<QnUuid, nx::vms::api::ServerLogSettings>;
+using ServerLogSettingsMap = Map<nx::Uuid, nx::vms::api::ServerLogSettings>;
 
 } // namespace nx::vms::api

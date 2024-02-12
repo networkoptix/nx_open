@@ -61,20 +61,20 @@ private:
     void addVideowallUnsafe(const QnVideoWallResourcePtr& videowall, nx::MutexLocker&);
 
     void handleVideowallLayoutsChanged(const QnVideoWallResourcePtr& videowall,
-        QSet<QnUuid> addedLayoutIds, QSet<QnUuid> removedLayoutIds);
+        QSet<nx::Uuid> addedLayoutIds, QSet<nx::Uuid> removedLayoutIds);
 
-    QSet<QnUuid> itemIds(const QnVideoWallResourcePtr& videowall) const;
+    QSet<nx::Uuid> itemIds(const QnVideoWallResourcePtr& videowall) const;
 
 public:
     struct VideowallData
     {
-        QnCounterHash<QnUuid> layouts; //< All, active & inactive.
-        QSet<QnUuid> itemIds; //< Saved item ids, required for proper matrix item tracking.
+        QnCounterHash<nx::Uuid> layouts; //< All, active & inactive.
+        QSet<nx::Uuid> itemIds; //< Saved item ids, required for proper matrix item tracking.
     };
 
     const QPointer<QnResourcePool> resourcePool;
     QHash<QnVideoWallResourcePtr, VideowallData> videowallData;
-    QnCounterHash<QnUuid> allVideowallLayouts;
+    QnCounterHash<nx::Uuid> allVideowallLayouts;
     mutable nx::Mutex mutex;
 
 public:
@@ -125,7 +125,7 @@ QnVideoWallResourcePtr VideowallLayoutWatcher::layoutVideowall(
         : QnVideoWallResourcePtr();
 }
 
-QnCounterHash<QnUuid> VideowallLayoutWatcher::videowallLayouts(
+QnCounterHash<nx::Uuid> VideowallLayoutWatcher::videowallLayouts(
     const QnVideoWallResourcePtr& videowall) const
 {
     if (!NX_ASSERT(videowall)
@@ -139,7 +139,7 @@ QnCounterHash<QnUuid> VideowallLayoutWatcher::videowallLayouts(
     return d->videowallData.value(videowall).layouts;
 }
 
-bool VideowallLayoutWatcher::isVideowallItem(const QnUuid& layoutId) const
+bool VideowallLayoutWatcher::isVideowallItem(const nx::Uuid& layoutId) const
 {
     NX_MUTEX_LOCKER lk(&d->mutex);
     return d->allVideowallLayouts.contains(layoutId);
@@ -240,12 +240,12 @@ void VideowallLayoutWatcher::Private::handleVideowallItemChanged(
         return;
 
     const auto addedLayoutIds = newItem.layout.isNull()
-        ? QSet<QnUuid>()
-        : QSet<QnUuid>({newItem.layout});
+        ? QSet<nx::Uuid>()
+        : QSet<nx::Uuid>({newItem.layout});
 
     const auto removedLayoutIds = oldItem.layout.isNull()
-        ? QSet<QnUuid>()
-        : QSet<QnUuid>({oldItem.layout});
+        ? QSet<nx::Uuid>()
+        : QSet<nx::Uuid>({oldItem.layout});
 
     handleVideowallLayoutsChanged(videowall, addedLayoutIds, removedLayoutIds);
 }
@@ -270,8 +270,8 @@ void VideowallLayoutWatcher::Private::handleVideowallMatrixChanged(
     if (!NX_ASSERT(videowall))
         return;
 
-    QSet<QnUuid> addedLayoutIds;
-    QSet<QnUuid> removedLayoutIds;
+    QSet<nx::Uuid> addedLayoutIds;
+    QSet<nx::Uuid> removedLayoutIds;
 
     const auto itemIds = this->itemIds(videowall);
     for (const auto& itemId: itemIds)
@@ -288,8 +288,8 @@ void VideowallLayoutWatcher::Private::handleVideowallMatrixChanged(
 
 void VideowallLayoutWatcher::Private::handleVideowallLayoutsChanged(
     const QnVideoWallResourcePtr& videowall,
-    QSet<QnUuid> addedLayoutIds,
-    QSet<QnUuid> removedLayoutIds)
+    QSet<nx::Uuid> addedLayoutIds,
+    QSet<nx::Uuid> removedLayoutIds)
 {
     const auto unchanged = addedLayoutIds & removedLayoutIds;
     addedLayoutIds -= unchanged;
@@ -301,8 +301,8 @@ void VideowallLayoutWatcher::Private::handleVideowallLayoutsChanged(
     NX_MUTEX_LOCKER lk(&mutex);
     auto& data = videowallData[videowall];
 
-    QSet<QnUuid> actuallyRemoved;
-    QSet<QnUuid> actuallyAdded;
+    QSet<nx::Uuid> actuallyRemoved;
+    QSet<nx::Uuid> actuallyAdded;
 
     for (const auto removedLayoutId: removedLayoutIds)
     {
@@ -388,7 +388,7 @@ void VideowallLayoutWatcher::Private::addVideowallUnsafe(
         layoutsToLogString(data.layouts.keys()));
 }
 
-QSet<QnUuid> VideowallLayoutWatcher::Private::itemIds(const QnVideoWallResourcePtr& videowall) const
+QSet<nx::Uuid> VideowallLayoutWatcher::Private::itemIds(const QnVideoWallResourcePtr& videowall) const
 {
     NX_MUTEX_LOCKER lk(&mutex);
     return videowallData.value(videowall).itemIds;

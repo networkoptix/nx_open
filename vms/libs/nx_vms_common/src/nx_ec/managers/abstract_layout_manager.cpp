@@ -25,7 +25,7 @@ ErrorCode AbstractLayoutManager::saveSync(const nx::vms::api::LayoutData& data)
         });
 }
 
-ErrorCode AbstractLayoutManager::removeSync(const QnUuid& layoutId)
+ErrorCode AbstractLayoutManager::removeSync(const nx::Uuid& layoutId)
 {
     return detail::callSync(
         [&](auto handler)

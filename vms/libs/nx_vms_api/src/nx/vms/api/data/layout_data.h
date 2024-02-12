@@ -49,7 +49,7 @@ struct NX_VMS_API LayoutItemData: IdData
     float rotation = 0;
 
     /**%apidoc Device unique id.*/
-    QnUuid resourceId;
+    nx::Uuid resourceId;
 
     /**%apidoc [opt] If the item represents a local file - the URL of the file. For cross-Site
      * layouts, contains the special URL of the Device. Otherwise is empty. Can be filled with the
@@ -78,7 +78,7 @@ struct NX_VMS_API LayoutItemData: IdData
     float zoomBottom = 0;
 
     /**%apidoc [opt] Unique id of the original layout item for which the zoom window was created.*/
-    QnUuid zoomTargetId;
+    nx::Uuid zoomTargetId;
 
     /**%apidoc [opt] Image enhancement parameters.*/
     ImageCorrectionData contrastParams;
@@ -124,7 +124,7 @@ struct NX_VMS_API LayoutData: ResourceData
     bool operator==(const LayoutData& other) const;
 
     static const QString kResourceTypeName;
-    static const QnUuid kResourceTypeId;
+    static const nx::Uuid kResourceTypeId;
 
     static constexpr float kDefaultCellAspectRatio = 16.0f / 9.0f;
     static constexpr float kDefaultCellSpacing = 0.05f;
@@ -166,12 +166,12 @@ struct NX_VMS_API LayoutData: ResourceData
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(LayoutData)
 NX_REFLECTION_INSTRUMENT(LayoutData, LayoutData_Fields)
 
-class NX_VMS_API LayoutItemId: public QnUuid
+class NX_VMS_API LayoutItemId: public nx::Uuid
 {
 public:
     LayoutItemId() = default;
-    LayoutItemId(const QnUuid& id, const QnUuid& layoutId): QnUuid(id), layoutId(layoutId) {}
-    QnUuid layoutId;
+    LayoutItemId(const nx::Uuid& id, const nx::Uuid& layoutId): nx::Uuid(id), layoutId(layoutId) {}
+    nx::Uuid layoutId;
 };
 
 /**%apidoc
@@ -184,7 +184,7 @@ struct NX_VMS_API LayoutItemFilter: IdData
     LayoutItemFilter(const LayoutItemId& id): IdData(id), layoutId(id.layoutId) {}
 
     /**%apidoc Layout unique id.*/
-    QnUuid layoutId;
+    nx::Uuid layoutId;
 };
 #define LayoutItemFilter_Fields (id)(layoutId)
 QN_FUSION_DECLARE_FUNCTIONS(LayoutItemFilter, (json), NX_VMS_API)
@@ -192,10 +192,10 @@ QN_FUSION_DECLARE_FUNCTIONS(LayoutItemFilter, (json), NX_VMS_API)
 struct NX_VMS_API LayoutItemModel: LayoutItemData
 {
     /**%apidoc [readonly] Layout unique id.*/
-    QnUuid layoutId;
+    nx::Uuid layoutId;
 
     LayoutItemModel() = default;
-    LayoutItemModel(LayoutItemData data, QnUuid layoutId_);
+    LayoutItemModel(LayoutItemData data, nx::Uuid layoutId_);
 
     LayoutItemId getId() const { return {id, layoutId}; }
 };

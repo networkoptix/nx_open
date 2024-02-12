@@ -34,7 +34,7 @@ struct NX_VMS_CLIENT_CORE_API ReconnectHelper: public SystemContextAware
 private:
     QnMediaServerResourceList m_servers;
     int m_currentIndex = -1;
-    const QnUuid m_originalServerId;
+    const nx::Uuid m_originalServerId;
 };
 
 } // namespace nx::vms::client::core

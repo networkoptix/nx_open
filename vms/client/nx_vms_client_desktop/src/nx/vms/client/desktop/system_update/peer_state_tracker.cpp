@@ -26,7 +26,7 @@ template<class Type> bool compareAndSet(const Type& from, Type& to)
     return true;
 }
 
-const auto kDebugSampleUuid = QnUuid("cccccccc-cccc-cccc-cccc-cccccccccccc");
+const auto kDebugSampleUuid = nx::Uuid("cccccccc-cccc-cccc-cccc-cccccccccccc");
 
 } // anonymous namespace
 
@@ -112,7 +112,7 @@ bool PeerStateTracker::setResourceFeed(QnResourcePool* pool)
     return true;
 }
 
-UpdateItemPtr PeerStateTracker::findItemById(QnUuid id) const
+UpdateItemPtr PeerStateTracker::findItemById(nx::Uuid id) const
 {
     for (const auto& item: m_items)
     {
@@ -141,12 +141,12 @@ QnMediaServerResourcePtr PeerStateTracker::getServer(const UpdateItemPtr& item) 
     return m_resourcePool->getResourceById<QnMediaServerResource>(item->id);
 }
 
-QnMediaServerResourcePtr PeerStateTracker::getServer(QnUuid id) const
+QnMediaServerResourcePtr PeerStateTracker::getServer(nx::Uuid id) const
 {
     return getServer(findItemById(id));
 }
 
-QnUuid PeerStateTracker::getClientPeerId(nx::vms::common::SystemContext* context) const
+nx::Uuid PeerStateTracker::getClientPeerId(nx::vms::common::SystemContext* context) const
 {
     // This ID is much more easy to distinguish.
     if (ini().massSystemUpdateDebugInfo)
@@ -155,7 +155,7 @@ QnUuid PeerStateTracker::getClientPeerId(nx::vms::common::SystemContext* context
     if (NX_ASSERT(context))
         return context->globalSettings()->localSystemId();
 
-    return QnUuid();
+    return nx::Uuid();
 }
 
 nx::utils::SoftwareVersion PeerStateTracker::lowestInstalledVersion()
@@ -220,7 +220,7 @@ void PeerStateTracker::setUpdateTarget(const nx::utils::SoftwareVersion& version
         emit itemChanged(item);
 }
 
-void PeerStateTracker::setVerificationError(const QSet<QnUuid>& targets, const QString& message)
+void PeerStateTracker::setVerificationError(const QSet<nx::Uuid>& targets, const QString& message)
 {
     QList<UpdateItemPtr> itemsChanged;
     {
@@ -238,7 +238,7 @@ void PeerStateTracker::setVerificationError(const QSet<QnUuid>& targets, const Q
         emit itemChanged(item);
 }
 
-void PeerStateTracker::setVerificationError(const QMap<QnUuid, QString>& errors)
+void PeerStateTracker::setVerificationError(const QMap<nx::Uuid, QString>& errors)
 {
     QList<UpdateItemPtr> itemsChanged;
     {
@@ -323,7 +323,7 @@ bool PeerStateTracker::getErrorReport(ErrorReport& report) const
     return true;
 }
 
-int PeerStateTracker::setUpdateStatus(const std::map<QnUuid, nx::vms::common::update::Status>& statusAll)
+int PeerStateTracker::setUpdateStatus(const std::map<nx::Uuid, nx::vms::common::update::Status>& statusAll)
 {
     auto getComponentName =
         [this](const UpdateItemPtr& item) -> QString
@@ -468,7 +468,7 @@ int PeerStateTracker::setUpdateStatus(const std::map<QnUuid, nx::vms::common::up
     return itemsChanged.size();
 }
 
-void PeerStateTracker::markStatusUnknown(const QSet<QnUuid>& targets)
+void PeerStateTracker::markStatusUnknown(const QSet<nx::Uuid>& targets)
 {
     for (const auto& uid: targets)
     {
@@ -528,7 +528,7 @@ void PeerStateTracker::setVersionInformation(
         emit itemChanged(item);
 }
 
-void PeerStateTracker::setPeersInstalling(const QSet<QnUuid>& targets, bool installing)
+void PeerStateTracker::setPeersInstalling(const QSet<nx::Uuid>& targets, bool installing)
 {
     QList<UpdateItemPtr> itemsChanged;
     {
@@ -551,7 +551,7 @@ void PeerStateTracker::setPeersInstalling(const QSet<QnUuid>& targets, bool inst
         emit itemChanged(item);
 }
 
-void PeerStateTracker::resetOfflinePackagesInformation(const QSet<QnUuid>& targets)
+void PeerStateTracker::resetOfflinePackagesInformation(const QSet<nx::Uuid>& targets)
 {
     QList<UpdateItemPtr> itemsChanged;
     {
@@ -595,21 +595,21 @@ void PeerStateTracker::clearState()
         emit itemChanged(item);
 }
 
-std::map<QnUuid, nx::vms::common::update::Status::Code> PeerStateTracker::allPeerStates() const
+std::map<nx::Uuid, nx::vms::common::update::Status::Code> PeerStateTracker::allPeerStates() const
 {
     NX_MUTEX_LOCKER locker(&m_dataLock);
-    std::map<QnUuid, nx::vms::common::update::Status::Code> result;
+    std::map<nx::Uuid, nx::vms::common::update::Status::Code> result;
 
     for (const auto& item: m_items)
         result.emplace(item->id, item->state);
     return result;
 }
 
-std::map<QnUuid, QnMediaServerResourcePtr> PeerStateTracker::activeServers() const
+std::map<nx::Uuid, QnMediaServerResourcePtr> PeerStateTracker::activeServers() const
 {
     NX_MUTEX_LOCKER locker(&m_dataLock);
 
-    std::map<QnUuid, QnMediaServerResourcePtr> result;
+    std::map<nx::Uuid, QnMediaServerResourcePtr> result;
     auto filter = m_peersIssued;
     for (const auto& item: m_items)
     {
@@ -631,19 +631,19 @@ QList<UpdateItemPtr> PeerStateTracker::allItems() const
     return m_items;
 }
 
-QSet<QnUuid> PeerStateTracker::allPeers() const
+QSet<nx::Uuid> PeerStateTracker::allPeers() const
 {
     NX_MUTEX_LOCKER locker(&m_dataLock);
-    QSet<QnUuid> result;
+    QSet<nx::Uuid> result;
     for (const auto& item: m_items)
         result.insert(item->id);
     return result;
 }
 
-QSet<QnUuid> PeerStateTracker::peersInState(StatusCode state, bool withClient) const
+QSet<nx::Uuid> PeerStateTracker::peersInState(StatusCode state, bool withClient) const
 {
     NX_MUTEX_LOCKER locker(&m_dataLock);
-    QSet<QnUuid> result;
+    QSet<nx::Uuid> result;
     for (const auto& item: m_items)
     {
         if (!withClient && item->component == UpdateItem::Component::client)
@@ -654,10 +654,10 @@ QSet<QnUuid> PeerStateTracker::peersInState(StatusCode state, bool withClient) c
     return result;
 }
 
-QSet<QnUuid> PeerStateTracker::offlineServers() const
+QSet<nx::Uuid> PeerStateTracker::offlineServers() const
 {
     NX_MUTEX_LOCKER locker(&m_dataLock);
-    QSet<QnUuid> result;
+    QSet<nx::Uuid> result;
     for (const auto& item: m_items)
     {
         if (item->offline)
@@ -666,10 +666,10 @@ QSet<QnUuid> PeerStateTracker::offlineServers() const
     return result;
 }
 
-QSet<QnUuid> PeerStateTracker::onlineAndInState(StatusCode state) const
+QSet<nx::Uuid> PeerStateTracker::onlineAndInState(StatusCode state) const
 {
     NX_MUTEX_LOCKER locker(&m_dataLock);
-    QSet<QnUuid> result;
+    QSet<nx::Uuid> result;
     for (const auto& item: m_items)
     {
         if (!item->offline && item->state == state)
@@ -678,10 +678,10 @@ QSet<QnUuid> PeerStateTracker::onlineAndInState(StatusCode state) const
     return result;
 }
 
-QSet<QnUuid> PeerStateTracker::offlineAndInState(StatusCode state) const
+QSet<nx::Uuid> PeerStateTracker::offlineAndInState(StatusCode state) const
 {
     NX_MUTEX_LOCKER locker(&m_dataLock);
-    QSet<QnUuid> result;
+    QSet<nx::Uuid> result;
     for (const auto& item: m_items)
     {
         if (item->offline && item->state == state)
@@ -690,10 +690,10 @@ QSet<QnUuid> PeerStateTracker::offlineAndInState(StatusCode state) const
     return result;
 }
 
-QSet<QnUuid> PeerStateTracker::legacyServers() const
+QSet<nx::Uuid> PeerStateTracker::legacyServers() const
 {
     NX_MUTEX_LOCKER locker(&m_dataLock);
-    QSet<QnUuid> result;
+    QSet<nx::Uuid> result;
     for (const auto& item: m_items)
     {
         if (!getServer(item))
@@ -704,31 +704,31 @@ QSet<QnUuid> PeerStateTracker::legacyServers() const
     return result;
 }
 
-QSet<QnUuid> PeerStateTracker::peersInstalling() const
+QSet<nx::Uuid> PeerStateTracker::peersInstalling() const
 {
     NX_MUTEX_LOCKER locker(&m_dataLock);
-    QSet<QnUuid> result;
+    QSet<nx::Uuid> result;
     for (const auto& item: m_items)
         if (item->installing && !item->installed)
             result.insert(item->id);
     return result;
 }
 
-QSet<QnUuid> PeerStateTracker::peersCompleteInstall() const
+QSet<nx::Uuid> PeerStateTracker::peersCompleteInstall() const
 {
     NX_MUTEX_LOCKER locker(&m_dataLock);
-    QSet<QnUuid> result;
+    QSet<nx::Uuid> result;
     for (const auto& item: m_items)
         if (item->installed || item->state == StatusCode::latestUpdateInstalled)
             result.insert(item->id);
     return result;
 }
 
-QSet<QnUuid> PeerStateTracker::serversWithChangedProtocol() const
+QSet<nx::Uuid> PeerStateTracker::serversWithChangedProtocol() const
 {
     int protocol = nx::vms::api::protocolVersion();
     NX_MUTEX_LOCKER locker(&m_dataLock);
-    QSet<QnUuid> result;
+    QSet<nx::Uuid> result;
     for (const auto& item: m_items)
     {
         if (!getServer(item))
@@ -739,9 +739,9 @@ QSet<QnUuid> PeerStateTracker::serversWithChangedProtocol() const
     return result;
 }
 
-QSet<QnUuid> PeerStateTracker::peersWithUnknownStatus() const
+QSet<nx::Uuid> PeerStateTracker::peersWithUnknownStatus() const
 {
-    QSet<QnUuid> result;
+    QSet<nx::Uuid> result;
     NX_MUTEX_LOCKER locker(&m_dataLock);
     for (const auto& item: m_items)
     {
@@ -751,7 +751,7 @@ QSet<QnUuid> PeerStateTracker::peersWithUnknownStatus() const
     return result;
 }
 
-QSet<QnUuid> PeerStateTracker::peersWithDownloaderError() const
+QSet<nx::Uuid> PeerStateTracker::peersWithDownloaderError() const
 {
     QSet<UpdateItem::ErrorCode> errorTypes =
     {
@@ -761,7 +761,7 @@ QSet<QnUuid> PeerStateTracker::peersWithDownloaderError() const
         UpdateItem::ErrorCode::noFreeSpaceToExtract,
         UpdateItem::ErrorCode::noFreeSpaceToInstall,
     };
-    QSet<QnUuid> result;
+    QSet<nx::Uuid> result;
     NX_MUTEX_LOCKER locker(&m_dataLock);
     for (const auto& item: m_items)
     {
@@ -773,9 +773,9 @@ QSet<QnUuid> PeerStateTracker::peersWithDownloaderError() const
     return result;
 }
 
-QSet<QnUuid> PeerStateTracker::peersWithOfflinePackages() const
+QSet<nx::Uuid> PeerStateTracker::peersWithOfflinePackages() const
 {
-    QSet<QnUuid> result;
+    QSet<nx::Uuid> result;
     NX_MUTEX_LOCKER locker(&m_dataLock);
     for (const auto& item: m_items)
     {
@@ -786,9 +786,9 @@ QSet<QnUuid> PeerStateTracker::peersWithOfflinePackages() const
     return result;
 }
 
-QSet<QnUuid> PeerStateTracker::peersCompletedOfflinePackagesDownload() const
+QSet<nx::Uuid> PeerStateTracker::peersCompletedOfflinePackagesDownload() const
 {
-    QSet<QnUuid> result;
+    QSet<nx::Uuid> result;
     NX_MUTEX_LOCKER locker(&m_dataLock);
     for (const auto& item: m_items)
     {
@@ -802,9 +802,9 @@ QSet<QnUuid> PeerStateTracker::peersCompletedOfflinePackagesDownload() const
     return result;
 }
 
-QSet<QnUuid> PeerStateTracker::peersWithOfflinePackageDownloadError() const
+QSet<nx::Uuid> PeerStateTracker::peersWithOfflinePackageDownloadError() const
 {
-    QSet<QnUuid> result;
+    QSet<nx::Uuid> result;
     NX_MUTEX_LOCKER locker(&m_dataLock);
     for (const auto& item: m_items)
     {
@@ -1127,30 +1127,30 @@ void PeerStateTracker::processInstallTaskSet()
     }
 }
 
-QSet<QnUuid> PeerStateTracker::peersComplete() const
+QSet<nx::Uuid> PeerStateTracker::peersComplete() const
 {
     return m_peersComplete;
 }
 
-QSet<QnUuid> PeerStateTracker::peersActive() const
+QSet<nx::Uuid> PeerStateTracker::peersActive() const
 {
     NX_MUTEX_LOCKER locker(&m_dataLock);
     return m_peersActive;
 }
 
-QSet<QnUuid> PeerStateTracker::peersIssued() const
+QSet<nx::Uuid> PeerStateTracker::peersIssued() const
 {
     NX_MUTEX_LOCKER locker(&m_dataLock);
     return m_peersIssued;
 }
 
-QSet<QnUuid> PeerStateTracker::peersFailed() const
+QSet<nx::Uuid> PeerStateTracker::peersFailed() const
 {
     NX_MUTEX_LOCKER locker(&m_dataLock);
     return m_peersFailed;
 }
 
-void PeerStateTracker::setTask(const QSet<QnUuid> &targets, bool reset)
+void PeerStateTracker::setTask(const QSet<nx::Uuid> &targets, bool reset)
 {
     NX_MUTEX_LOCKER locker(&m_dataLock);
     m_peersActive = targets;
@@ -1163,7 +1163,7 @@ void PeerStateTracker::setTask(const QSet<QnUuid> &targets, bool reset)
     }
 }
 
-void PeerStateTracker::setTaskError(const QSet<QnUuid>& targets, const QString& /*error*/)
+void PeerStateTracker::setTaskError(const QSet<nx::Uuid>& targets, const QString& /*error*/)
 {
     NX_MUTEX_LOCKER locker(&m_dataLock);
     for (const auto& id: targets)
@@ -1173,13 +1173,13 @@ void PeerStateTracker::setTaskError(const QSet<QnUuid>& targets, const QString& 
     }
 }
 
-void PeerStateTracker::addToTask(QnUuid id)
+void PeerStateTracker::addToTask(nx::Uuid id)
 {
     m_peersIssued.insert(id);
     m_peersActive.insert(id);
 }
 
-void PeerStateTracker::removeFromTask(QnUuid id)
+void PeerStateTracker::removeFromTask(nx::Uuid id)
 {
     m_peersIssued.remove(id);
     m_peersActive.remove(id);

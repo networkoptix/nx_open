@@ -578,7 +578,7 @@ QString StringsHelper::eventTimestampTime(const EventParameters &params) const
 
 QnResourcePtr StringsHelper::eventSource(const EventParameters &params) const
 {
-    QnUuid id = params.eventResourceId;
+    nx::Uuid id = params.eventResourceId;
     return !id.isNull()
         ? resourcePool()->getResourceById(id)
         : QnResourcePtr();
@@ -781,7 +781,7 @@ QStringList StringsHelper::aggregatedEventDetails(
 }
 
 QString StringsHelper::urlForCamera(
-    const QnUuid& id,
+    const nx::Uuid& id,
     std::chrono::milliseconds timestamp,
     Url urlType,
     const std::optional<nx::network::SocketAddress>& proxyAddress) const
@@ -836,7 +836,7 @@ QString StringsHelper::urlForCamera(
             }
             case Url::cloud:
             {
-                const auto sId = QnUuid::fromStringSafe(systemSettings()->cloudSystemId());
+                const auto sId = nx::Uuid::fromStringSafe(systemSettings()->cloudSystemId());
                 return builder.setHost(nx::network::SocketGlobals::cloud().cloudHost())
                     .setPath(NX_FMT("/systems/%1/view/%2", sId.toSimpleString(), id.toSimpleString()))
                     .setQuery(NX_FMT("time=%1", timestamp.count()))

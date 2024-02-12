@@ -10,7 +10,7 @@ namespace {
     const size_t defaultPoolSize = 256;
 }
 
-QnUuidPool::QnUuidPool(const QnUuid &baseId, offset_type size /* = std::numeric_limits<uint>::max()*/):
+UuidPool::UuidPool(const nx::Uuid &baseId, offset_type size /* = std::numeric_limits<uint>::max()*/):
     m_baseid(baseId.getQUuid()),
     m_size(size)
 {
@@ -20,7 +20,7 @@ QnUuidPool::QnUuidPool(const QnUuid &baseId, offset_type size /* = std::numeric_
     m_usageData.resize(defaultPoolSize, false);
 }
 
-void QnUuidPool::markAsUsed(const QnUuid &id) {
+void UuidPool::markAsUsed(const nx::Uuid &id) {
     if (!belongsToPool(id))
         return;
 
@@ -31,7 +31,7 @@ void QnUuidPool::markAsUsed(const QnUuid &id) {
     m_usageData[i] = true;
 }
 
-void QnUuidPool::markAsFree(const QnUuid &id) {
+void UuidPool::markAsFree(const nx::Uuid &id) {
     if (!belongsToPool(id))
         return;
 
@@ -43,24 +43,24 @@ void QnUuidPool::markAsFree(const QnUuid &id) {
 }
 
 
-QnUuid QnUuidPool::getFreeId() const {
+nx::Uuid UuidPool::getFreeId() const {
     auto iter = m_usageData.cbegin();
     while (iter != m_usageData.cend() && *iter)
         ++iter;
 
     offset_type i = std::distance(m_usageData.cbegin(), iter);
-    QnUuid result(QnUuid::createUuidFromPool(m_baseid, i));
+    nx::Uuid result(nx::Uuid::createUuidFromPool(m_baseid, i));
     NX_ASSERT(belongsToPool(result), "Make sure returned id is valid");
 
     return result;
 }
 
-QnUuidPool::offset_type QnUuidPool::offset(const QnUuid &id) const {
+UuidPool::offset_type UuidPool::offset(const nx::Uuid &id) const {
     return static_cast<offset_type>(id.getQUuid().data1 - m_baseid.data1);
 }
 
 
-bool QnUuidPool::belongsToPool(const QnUuid &id) const {
+bool UuidPool::belongsToPool(const nx::Uuid &id) const {
     const QUuid uuid(id.getQUuid());
 
     if (offset(id) > m_size)

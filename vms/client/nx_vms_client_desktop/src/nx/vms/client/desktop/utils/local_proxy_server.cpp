@@ -67,13 +67,13 @@ private:
 
     std::unique_ptr<AsyncClient> m_httpClient;
 
-    QnUuid m_exitNodeId;
-    QnUuid m_resourceId;
+    nx::Uuid m_exitNodeId;
+    nx::Uuid m_resourceId;
 };
 
 bool VmsServerConnector::auth(const std::string& user, const std::string& password)
 {
-    const auto resourceId = QnUuid::fromStringSafe(user);
+    const auto resourceId = nx::Uuid::fromStringSafe(user);
 
     const auto resource = resourcePool()->getResourceById(resourceId);
 
@@ -143,7 +143,7 @@ void VmsServerConnector::connectTo(const SocketAddress& address, DoneCallback on
         });
 }
 
-LocalProxyServer::LocalProxyServer(): m_password(QnUuid::createUuid().toSimpleStdString())
+LocalProxyServer::LocalProxyServer(): m_password(nx::Uuid::createUuid().toSimpleStdString())
 {
     m_server = std::make_unique<nx::network::socks5::Server>(
         []

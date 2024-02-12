@@ -24,7 +24,7 @@ public:
     LookupListData smallColumnNumberExampleData()
     {
         LookupListData e2;
-        e2.id = QnUuid::createUuid();
+        e2.id = nx::Uuid::createUuid();
         e2.name = "Values";
         e2.attributeNames.push_back("Value");
         e2.entries = {{{"Value", "0"}},
@@ -41,7 +41,7 @@ public:
     {
         LookupListData e1;
         e1.objectTypeId = "base.object.type.1";
-        e1.id = QnUuid::createUuid();
+        e1.id = nx::Uuid::createUuid();
         e1.name = "Numbers";
         e1.attributeNames.push_back("Number");
         e1.attributeNames.push_back("Color");

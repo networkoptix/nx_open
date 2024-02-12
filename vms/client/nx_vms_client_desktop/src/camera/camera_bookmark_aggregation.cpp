@@ -80,7 +80,7 @@ bool QnCameraBookmarkAggregation::mergeBookmarkList(const QnCameraBookmarkList &
     return result;
 }
 
-bool QnCameraBookmarkAggregation::removeBookmark(const QnUuid &bookmarkId)
+bool QnCameraBookmarkAggregation::removeBookmark(const nx::Uuid &bookmarkId)
 {
     QN_LOG_TIME(Q_FUNC_INFO);
 

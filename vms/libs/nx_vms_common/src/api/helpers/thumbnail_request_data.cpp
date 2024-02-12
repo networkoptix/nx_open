@@ -84,7 +84,7 @@ void QnThumbnailRequestData::loadFromParams(
 
     // NOTE: Currently, there is no way to return an error from this function, thus, we use a safe
     // conversion here, and rely on the caller to properly handle the null value.
-    request.objectTrackId = QnUuid::fromStringSafe(params.value(kObjectTrackIdParam));
+    request.objectTrackId = nx::Uuid::fromStringSafe(params.value(kObjectTrackIdParam));
 }
 
 nx::network::rest::Params QnThumbnailRequestData::toParams() const

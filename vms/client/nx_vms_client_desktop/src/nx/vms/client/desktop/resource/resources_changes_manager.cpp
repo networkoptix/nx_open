@@ -48,9 +48,9 @@ namespace nx::vms::client::desktop {
 namespace {
 
 template<class ResourcePtrType>
-QList<QnUuid> idListFromResList(const QList<ResourcePtrType>& resList)
+QList<nx::Uuid> idListFromResList(const QList<ResourcePtrType>& resList)
 {
-    QList<QnUuid> idList;
+    QList<nx::Uuid> idList;
     idList.reserve(resList.size());
     for (const ResourcePtrType& resPtr: resList)
         idList.push_back(resPtr->getId());

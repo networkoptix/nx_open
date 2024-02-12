@@ -74,7 +74,7 @@ void KnownServerConnections::start()
 }
 
 void KnownServerConnections::saveConnection(
-    const QnUuid& serverId,
+    const nx::Uuid& serverId,
     nx::network::SocketAddress address)
 {
     NX_ASSERT(!address.isNull());

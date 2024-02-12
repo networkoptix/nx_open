@@ -126,7 +126,7 @@ void QnWorkbenchLayoutSynchronizer::submitPendingItems()
 
     QScopedValueRollback<bool> guard(m_update, false);
 
-    for (const QnUuid& uuid: m_pendingItems)
+    for (const nx::Uuid& uuid: m_pendingItems)
     {
         QnWorkbenchItem* item = m_layout->item(uuid);
         if (item == nullptr)

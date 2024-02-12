@@ -20,16 +20,16 @@ class UserLayoutResourceIndex: public QObject
 public:
     UserLayoutResourceIndex(const QnResourcePool* resourcePool);
 
-    QVector<QnResourcePtr> layoutsWithParentUserId(const QnUuid& parentId) const;
+    QVector<QnResourcePtr> layoutsWithParentUserId(const nx::Uuid& parentId) const;
 
 signals:
-    void layoutAdded(const QnResourcePtr& layout, const QnUuid& parentId);
-    void layoutRemoved(const QnResourcePtr& layout, const QnUuid& parentId);
+    void layoutAdded(const QnResourcePtr& layout, const nx::Uuid& parentId);
+    void layoutRemoved(const QnResourcePtr& layout, const nx::Uuid& parentId);
 
 private:
     void onResourceAdded(const QnResourcePtr& resource);
     void onResourceRemoved(const QnResourcePtr& resource);
-    void onLayoutParentIdChanged(const QnResourcePtr& resource, const QnUuid& previousParentId);
+    void onLayoutParentIdChanged(const QnResourcePtr& resource, const nx::Uuid& previousParentId);
 
 private:
     void indexAllLayouts();
@@ -37,7 +37,7 @@ private:
 
 private:
     const QnResourcePool* m_resourcePool;
-    QHash<QnUuid, QSet<QnResourcePtr>> m_layoutsByParentUserId;
+    QHash<nx::Uuid, QSet<QnResourcePtr>> m_layoutsByParentUserId;
 };
 
 } // namespace entity_resource_tree

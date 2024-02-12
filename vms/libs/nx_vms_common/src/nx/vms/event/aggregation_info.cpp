@@ -119,7 +119,7 @@ void AggregationInfo::append(
     const AggregationInfo& subAggregationData,
     bool oneRecordPerKey)
 {
-    QnUuid key = runtimeParams.getParamsHash();
+    nx::Uuid key = runtimeParams.getParamsHash();
     InfoDetail& info = m_details[key];
     if (info.count() == 0) //not initialized
     {

@@ -38,7 +38,7 @@ bool checkCloudHost(
     SystemContext* systemContext,
     nx::utils::SoftwareVersion targetVersion,
     QString cloudUrl,
-    const QSet<QnUuid>& peers);
+    const QSet<nx::Uuid>& peers);
 
 struct ClientVerificationData
 {
@@ -47,7 +47,7 @@ struct ClientVerificationData
     /** Current client version, */
     nx::utils::SoftwareVersion currentVersion;
     /** Peer id for a client. Verification will ignore client if clientId is null. */
-    QnUuid clientId;
+    nx::Uuid clientId;
 
     /** Fills in systemInfo and currentVersion. */
     void fillDefault();
@@ -76,7 +76,7 @@ struct VerificationOptions
  */
 NX_VMS_CLIENT_DESKTOP_API bool verifyUpdateContents(
     client::desktop::UpdateContents& contents,
-    const std::map<QnUuid, QnMediaServerResourcePtr>& servers,
+    const std::map<nx::Uuid, QnMediaServerResourcePtr>& servers,
     const ClientVerificationData& clientData, const VerificationOptions& options);
 
 } // namespace nx::vms::client::desktop

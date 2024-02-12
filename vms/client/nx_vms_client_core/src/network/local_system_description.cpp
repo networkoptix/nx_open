@@ -11,7 +11,7 @@ QnLocalSystemDescriptionPtr QnLocalSystemDescription::createFactory(const QStrin
 
 QnLocalSystemDescriptionPtr QnLocalSystemDescription::create(
     const QString& systemId,
-    const QnUuid& localSystemId,
+    const nx::Uuid& localSystemId,
     const QString& systemName)
 {
     return QnLocalSystemDescriptionPtr(new QnLocalSystemDescription(
@@ -19,7 +19,7 @@ QnLocalSystemDescriptionPtr QnLocalSystemDescription::create(
 }
 
 QnLocalSystemDescription::QnLocalSystemDescription(const QString& systemId):
-    base_type(systemId, QnUuid::fromStringSafe(systemId), tr("New Server")),
+    base_type(systemId, nx::Uuid::fromStringSafe(systemId), tr("New Server")),
     m_isNewSystem(true)
 {
     init();
@@ -27,7 +27,7 @@ QnLocalSystemDescription::QnLocalSystemDescription(const QString& systemId):
 
 QnLocalSystemDescription::QnLocalSystemDescription(
     const QString& systemId,
-    const QnUuid& localSystemId,
+    const nx::Uuid& localSystemId,
     const QString& systemName)
     :
     base_type(systemId, localSystemId, systemName),

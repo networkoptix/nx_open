@@ -69,7 +69,7 @@ MessageProcessorMock* ContextBasedTest::createMessageProcessor()
 QnLayoutResourcePtr ContextBasedTest::createLayout()
 {
     LayoutResourcePtr layout(new LayoutResource());
-    layout->setIdUnsafe(QnUuid::createUuid());
+    layout->setIdUnsafe(nx::Uuid::createUuid());
     return layout;
 }
 

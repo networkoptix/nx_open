@@ -15,7 +15,7 @@ replaceMap = {
     "QString": "String",
     "ResourceUniqueId": "String",
     "QUuid": "String",
-    "QnUuid": "String",
+    "nx::Uuid": "String",
     "Q_INVOKABLE": "",
     "double": "Number",
     "int": "Number",

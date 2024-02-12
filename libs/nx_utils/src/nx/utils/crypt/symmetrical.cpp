@@ -54,7 +54,7 @@ KeyType keyFromByteArray(const QByteArray& data)
 
 QByteArray generateAesExtraKey()
 {
-    return QnUuid::createUuid().toRfc4122();
+    return nx::Uuid::createUuid().toRfc4122();
 }
 
 QByteArray encodeSimple(const QByteArray& data, const QByteArray& extraKey)

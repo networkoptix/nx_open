@@ -39,7 +39,7 @@ public:
 private:
     QnVirtualCameraResourceList availableCameras() const;
 
-    QnVirtualCameraResourcePtr availableCameraById(const QnUuid &cameraId) const;
+    QnVirtualCameraResourcePtr availableCameraById(const nx::Uuid &cameraId) const;
 
     void resetToAllAvailableCameras();
 

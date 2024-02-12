@@ -31,21 +31,21 @@ class AnalyticsSettingsStore:
 public:
     AnalyticsSettingsStore(QWidget* parent = nullptr);
 
-    Q_INVOKABLE QnUuid getCurrentEngineId() const { return m_currentEngineId; }
-    Q_INVOKABLE void setCurrentEngineId(const QnUuid& engineId);
+    Q_INVOKABLE nx::Uuid getCurrentEngineId() const { return m_currentEngineId; }
+    Q_INVOKABLE void setCurrentEngineId(const nx::Uuid& engineId);
 
-    Q_INVOKABLE QJsonObject settingsValues(const QnUuid& engineId);
+    Q_INVOKABLE QJsonObject settingsValues(const nx::Uuid& engineId);
 
     Q_INVOKABLE QVariant requestParameters(const QJsonObject& model);
 
     Q_INVOKABLE void setSettingsValues(
-        const QnUuid& engineId,
+        const nx::Uuid& engineId,
         const QString& activeElement,
         const QJsonObject& values,
         const QJsonObject& parameters);
 
-    Q_INVOKABLE QJsonObject settingsModel(const QnUuid& engineId);
-    Q_INVOKABLE QJsonObject errors(const QnUuid& engineId) { return m_errors[engineId]; }
+    Q_INVOKABLE QJsonObject settingsModel(const nx::Uuid& engineId);
+    Q_INVOKABLE QJsonObject errors(const nx::Uuid& engineId) { return m_errors[engineId]; }
 
     QVariant analyticsEngines() const { return m_engines; }
     bool isEmpty() const { return m_engines.empty(); }
@@ -55,9 +55,9 @@ public:
     bool loading() const { return m_settingsLoading; }
     void setLoading(bool loading);
 
-    void refreshSettings(const QnUuid& engineId);
+    void refreshSettings(const nx::Uuid& engineId);
     void activeElementChanged(
-        const QnUuid& engineId,
+        const nx::Uuid& engineId,
         const QString& activeElement,
         const QJsonObject& parameters);
 
@@ -88,12 +88,12 @@ private:
     };
 
 private:
-    void addEngine(const QnUuid& engineId, const AnalyticsEngineInfo& engineInfo);
-    void removeEngine(const QnUuid& engineId);
-    void updateEngine(const QnUuid& engineId);
-    void setErrors(const QnUuid& engineId, const QJsonObject& errors);
+    void addEngine(const nx::Uuid& engineId, const AnalyticsEngineInfo& engineInfo);
+    void removeEngine(const nx::Uuid& engineId);
+    void updateEngine(const nx::Uuid& engineId);
+    void setErrors(const nx::Uuid& engineId, const QJsonObject& errors);
     void resetSettings(
-        const QnUuid& engineId,
+        const nx::Uuid& engineId,
         const QJsonObject& model,
         const QJsonObject& values,
         const QJsonObject& errors,
@@ -108,11 +108,11 @@ private:
     QList<rest::Handle> m_pendingRefreshRequests;
     QList<rest::Handle> m_pendingApplyRequests;
 
-    QnUuid m_currentEngineId;
+    nx::Uuid m_currentEngineId;
 
-    QHash<QnUuid, QJsonObject> m_errors;
-    QHash<QnUuid, SettingsValues> m_settingsValuesByEngineId;
-    QHash<QnUuid, QJsonObject> m_settingsModelByEngineId;
+    QHash<nx::Uuid, QJsonObject> m_errors;
+    QHash<nx::Uuid, SettingsValues> m_settingsValuesByEngineId;
+    QHash<nx::Uuid, QJsonObject> m_settingsModelByEngineId;
 };
 
 } // namespace nx::vms::client::desktop

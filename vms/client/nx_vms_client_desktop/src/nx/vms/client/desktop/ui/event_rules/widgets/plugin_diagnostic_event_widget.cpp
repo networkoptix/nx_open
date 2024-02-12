@@ -138,13 +138,13 @@ void PluginDiagnosticEventWidget::updatePluginDiagnosticEventTypesModel()
 
 void PluginDiagnosticEventWidget::updateSelectedEventType()
 {
-    QnUuid pluginId = model()->eventParams().eventResourceId;
+    nx::Uuid pluginId = model()->eventParams().eventResourceId;
 
     if (pluginId.isNull())
     {
         pluginId = ui->pirComboBox->itemData(
             0,
-            PluginDiagnosticEventModel::PluginIdRole).value<QnUuid>();
+            PluginDiagnosticEventModel::PluginIdRole).value<nx::Uuid>();
 
         model()->setEventParams(createEventParameters());
     }
@@ -168,7 +168,7 @@ nx::vms::event::EventParameters PluginDiagnosticEventWidget::createEventParamete
     auto eventParams = model()->eventParams();
 
     eventParams.eventResourceId = ui->pirComboBox->currentData(
-        PluginDiagnosticEventModel::PluginIdRole).value<QnUuid>();
+        PluginDiagnosticEventModel::PluginIdRole).value<nx::Uuid>();
     eventParams.caption = ui->captionEdit->text();
     eventParams.description = ui->descriptionEdit->text();
 

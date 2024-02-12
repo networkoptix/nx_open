@@ -22,8 +22,8 @@
 
 namespace {
 
-static const QnUuid kSystemId1("{A85E63C4-D2F2-4CF4-BA6C-C7480ADCDD7F}");
-static const QnUuid kSystemId2("{B647474A-8354-4E7F-B98E-D5718B695F55}");
+static const nx::Uuid kSystemId1("{A85E63C4-D2F2-4CF4-BA6C-C7480ADCDD7F}");
+static const nx::Uuid kSystemId2("{B647474A-8354-4E7F-B98E-D5718B695F55}");
 
 } // namespace
 
@@ -55,7 +55,7 @@ protected:
         m_manager.reset(new RadassResourceManager());
         m_manager->setCacheDirectory(testDataDir());
         m_layout.reset(new LayoutResource());
-        m_layout->setIdUnsafe(QnUuid::createUuid());
+        m_layout->setIdUnsafe(nx::Uuid::createUuid());
         systemContext()->resourcePool()->addResource(m_layout);
     }
 
@@ -75,7 +75,7 @@ protected:
         camera->setHasDualStreaming(hasDualStreaming);
 
         common::LayoutItemData item;
-        item.uuid = QnUuid::createUuid();
+        item.uuid = nx::Uuid::createUuid();
         item.resource.id = camera->getId();
 
         m_layout->addItem(item);
@@ -94,7 +94,7 @@ protected:
         camera->setHasDualStreaming(true);
 
         common::LayoutItemData item;
-        item.uuid = QnUuid::createUuid();
+        item.uuid = nx::Uuid::createUuid();
         item.resource.id = camera->getId();
         item.zoomRect = QRectF(0.1, 0.1, 0.5, 0.5);
 

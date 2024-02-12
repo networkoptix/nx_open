@@ -93,7 +93,7 @@ NotificationActionHandler::NotificationActionHandler(
         &NotificationActionHandler::at_businessActionReceived);
 
     connect(messageProcessor, &QnClientMessageProcessor::hardwareIdMappingRemoved, this,
-        [this](const QnUuid& id)
+        [this](const nx::Uuid& id)
         {
             const auto resource = system()->resourcePool()->getResourceById(id);
             setSystemHealthEventVisible(MessageType::replacedDeviceDiscovered, resource, false);

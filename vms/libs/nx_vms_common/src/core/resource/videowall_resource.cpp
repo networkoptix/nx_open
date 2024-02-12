@@ -189,9 +189,9 @@ Qn::Notifier QnVideoWallResource::storedItemChanged(
     return [r = toSharedPointer(this), item, oldItem]{ emit r->matrixChanged(r, item, oldItem); };
 }
 
-QList<QnUuid> QnVideoWallResource::onlineItems() const
+QList<nx::Uuid> QnVideoWallResource::onlineItems() const
 {
-    QList<QnUuid> result;
+    QList<nx::Uuid> result;
     const auto items = m_items->getItems();
     for (const QnVideoWallItem& item: items)
     {

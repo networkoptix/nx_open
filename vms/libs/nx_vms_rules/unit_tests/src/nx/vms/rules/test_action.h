@@ -31,7 +31,7 @@ class TestProlongedAction: public nx::vms::rules::BasicAction
     Q_OBJECT
     Q_CLASSINFO("type", "nx.actions.test.prolonged")
 
-    Q_PROPERTY(QnUuidList deviceIds MEMBER m_deviceIds)
+    Q_PROPERTY(UuidList deviceIds MEMBER m_deviceIds)
 
 public:
     static ItemDescriptor manifest()
@@ -46,7 +46,7 @@ public:
     }
 
 public:
-    QnUuidList m_deviceIds;
+    UuidList m_deviceIds;
 };
 
 class TestActionWithInterval: public nx::vms::rules::BasicAction
@@ -55,7 +55,7 @@ class TestActionWithInterval: public nx::vms::rules::BasicAction
     Q_CLASSINFO("type", "nx.actions.test.withInterval")
 
     Q_PROPERTY(std::chrono::microseconds interval MEMBER m_interval)
-    Q_PROPERTY(QnUuid cameraId MEMBER m_cameraId)
+    Q_PROPERTY(nx::Uuid cameraId MEMBER m_cameraId)
 
 public:
     static ItemDescriptor manifest()
@@ -70,7 +70,7 @@ public:
     }
 
 public:
-    QnUuid m_cameraId;
+    nx::Uuid m_cameraId;
     std::chrono::microseconds m_interval;
 };
 
@@ -80,8 +80,8 @@ class TestActionWithTargetUsers: public nx::vms::rules::BasicAction
     Q_CLASSINFO("type", "nx.actions.test.withTargetUsers")
 
     Q_PROPERTY(nx::vms::rules::UuidSelection users MEMBER m_users)
-    Q_PROPERTY(QnUuid cameraId MEMBER m_cameraId)
-    Q_PROPERTY(QnUuidList deviceIds MEMBER m_deviceIds)
+    Q_PROPERTY(nx::Uuid cameraId MEMBER m_cameraId)
+    Q_PROPERTY(UuidList deviceIds MEMBER m_deviceIds)
 
 public:
     static ItemDescriptor manifest()
@@ -97,8 +97,8 @@ public:
 
 public:
     nx::vms::rules::UuidSelection m_users;
-    QnUuid m_cameraId;
-    QnUuidList m_deviceIds;
+    nx::Uuid m_cameraId;
+    UuidList m_deviceIds;
 };
 
 class TestActionWithPermissions: public TestActionWithTargetUsers

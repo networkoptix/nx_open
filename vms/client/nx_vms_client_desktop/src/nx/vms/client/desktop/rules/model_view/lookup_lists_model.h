@@ -29,7 +29,7 @@ public:
 
 private:
     std::optional<QString> m_objectTypeId;
-    std::vector<std::pair</*list id*/ QnUuid, /*list name*/ QString>> m_lookupLists;
+    std::vector<std::pair</*list id*/ nx::Uuid, /*list name*/ QString>> m_lookupLists;
 };
 
 } // namespace nx::vms::client::desktop::rules

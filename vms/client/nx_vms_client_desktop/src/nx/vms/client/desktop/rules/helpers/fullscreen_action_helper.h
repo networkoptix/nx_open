@@ -27,18 +27,18 @@ public:
     static QIcon tableCellIcon(const QnBusinessRuleViewModel* model);
 
     static QnVirtualCameraResourcePtr camera(const QnBusinessRuleViewModel* model);
-    static QSet<QnUuid> cameraIds(const QnBusinessRuleViewModel* model);
-    static QSet<QnUuid> setCamera(const QnBusinessRuleViewModel* model,
+    static QSet<nx::Uuid> cameraIds(const QnBusinessRuleViewModel* model);
+    static QSet<nx::Uuid> setCamera(const QnBusinessRuleViewModel* model,
         const QnVirtualCameraResourcePtr& camera);
-    static QSet<QnUuid> setCameraIds(const QnBusinessRuleViewModel* model,
-        const QSet<QnUuid>& cameraIds);
+    static QSet<nx::Uuid> setCameraIds(const QnBusinessRuleViewModel* model,
+        const QSet<nx::Uuid>& cameraIds);
 
     static QnLayoutResourceList layouts(const QnBusinessRuleViewModel* model);
-    static QSet<QnUuid> layoutIds(const QnBusinessRuleViewModel* model);
-    static QSet<QnUuid> setLayouts(const QnBusinessRuleViewModel* model,
+    static QSet<nx::Uuid> layoutIds(const QnBusinessRuleViewModel* model);
+    static QSet<nx::Uuid> setLayouts(const QnBusinessRuleViewModel* model,
         const QnLayoutResourceList& layouts);
-    static QSet<QnUuid> setLayoutIds(const QnBusinessRuleViewModel* model,
-        const QSet<QnUuid>& layoutIds);
+    static QSet<nx::Uuid> setLayoutIds(const QnBusinessRuleViewModel* model,
+        const QSet<nx::Uuid>& layoutIds);
 
     static bool cameraExistOnLayouts(const QnBusinessRuleViewModel* model);
 };

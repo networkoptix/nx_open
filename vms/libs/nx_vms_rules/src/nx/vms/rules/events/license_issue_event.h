@@ -12,15 +12,15 @@ class NX_VMS_RULES_API LicenseIssueEvent: public BasicEvent
     Q_OBJECT
     Q_CLASSINFO("type", "nx.events.licenseIssue")
 
-    FIELD(QnUuid, serverId, setServerId)
-    FIELD(QnUuidList, deviceIds, deviceIds)
+    FIELD(nx::Uuid, serverId, setServerId)
+    FIELD(UuidList, deviceIds, deviceIds)
 
 public:
     LicenseIssueEvent() = default;
     LicenseIssueEvent(
         std::chrono::microseconds timestamp,
-        QnUuid serverId,
-        const QnUuidSet& disabledCameras);
+        nx::Uuid serverId,
+        const UuidSet& disabledCameras);
 
     virtual QString resourceKey() const override;
     virtual QVariantMap details(common::SystemContext* context) const override;

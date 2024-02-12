@@ -21,8 +21,8 @@ SearchAddressManager::SearchAddressManager(QObject* parent):
 }
 
 void SearchAddressManager::updateServerRemoteAddresses(
-    const QnUuid& localSystemId,
-    const QnUuid& serverId,
+    const nx::Uuid& localSystemId,
+    const nx::Uuid& serverId,
     const QSet<QString>& remoteAddresses)
 {
     m_searchAddressesInfo[localSystemId][serverId] = remoteAddresses;
@@ -42,7 +42,7 @@ void SearchAddressManager::update()
 
     auto searchAddresses = appContext()->coreSettings()->searchAddresses();
 
-    for (const QnUuid& searchSystemId: searchAddresses.keys())
+    for (const nx::Uuid& searchSystemId: searchAddresses.keys())
     {
         if (!connections.contains(searchSystemId))
             searchAddresses.remove(searchSystemId);

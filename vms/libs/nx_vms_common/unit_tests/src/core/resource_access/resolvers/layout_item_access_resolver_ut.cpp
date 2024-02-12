@@ -438,7 +438,7 @@ TEST_F(LayoutItemAccessResolverTest, cameraDroppedOnVideoWall_3_1)
     auto videowall = addVideoWall();
 
     QnVideoWallItem vwitem;
-    vwitem.uuid = QnUuid::createUuid();
+    vwitem.uuid = nx::Uuid::createUuid();
     videowall->items()->addItem(vwitem);
 
     manager->setOwnResourceAccessMap(
@@ -638,7 +638,7 @@ TEST_F(LayoutItemAccessResolverTest, videowallMatrixLayouts)
     ASSERT_EQ(resolver->accessRights(kTestSubjectId, cameras[2]), AccessRight::view);
 
     QnVideoWallMatrix matrix;
-    matrix.uuid = QnUuid::createUuid();
+    matrix.uuid = nx::Uuid::createUuid();
     matrix.layoutByItem[item1] = layout1->getId();
     matrix.layoutByItem[item2] = layout2->getId();
     matrix.layoutByItem[item3] = layout3->getId();

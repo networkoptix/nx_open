@@ -385,7 +385,7 @@ bool CommonObjectSearchSetup::Private::chooseCustomCameras()
     if (!NX_ASSERT(m_context && m_model))
         return false;
 
-    QnUuidSet chosenIds;
+    UuidSet chosenIds;
     if (m_cameraSelection == RightPanel::CameraSelection::custom)
     {
         for (const auto& camera: m_model->cameras())

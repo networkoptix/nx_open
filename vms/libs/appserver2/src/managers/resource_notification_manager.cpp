@@ -22,7 +22,7 @@ void QnResourceNotificationManager::triggerNotification(
     NX_VERBOSE(this, "%1 Emit statusChanged signal for resource %2",
         QString::fromLatin1(Q_FUNC_INFO),
         tran.params.id.toString());
-    emit statusChanged(QnUuid(tran.params.id), tran.params.status, source);
+    emit statusChanged(nx::Uuid(tran.params.id), tran.params.status, source);
 }
 
 void QnResourceNotificationManager::triggerNotification(

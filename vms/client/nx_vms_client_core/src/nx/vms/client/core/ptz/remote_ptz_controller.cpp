@@ -25,7 +25,7 @@ static constexpr Options kDefaultOptions = {Type::operational};
 RemotePtzController::RemotePtzController(const QnVirtualCameraResourcePtr& camera):
     base_type(camera),
     m_camera(camera),
-    m_sequenceId(QnUuid::createUuid()),
+    m_sequenceId(nx::Uuid::createUuid()),
     m_sequenceNumber(1)
 {
 }

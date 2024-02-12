@@ -19,7 +19,7 @@ public:
     explicit RulesSortFilterProxyModel(QObject* parent = nullptr);
 
     /** Returns rule ids for the given rows. */
-    Q_INVOKABLE QnUuidList getRuleIds(const QList<int>& rows) const;
+    Q_INVOKABLE UuidList getRuleIds(const QList<int>& rows) const;
 
     static void registerQmlType();
 

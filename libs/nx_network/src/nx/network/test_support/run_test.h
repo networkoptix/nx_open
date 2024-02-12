@@ -62,7 +62,7 @@ inline int runTest(
             nx::utils::DetachedThreads detachedThreadsGuard;
 
             auto sgGuard = std::make_unique<SocketGlobalsHolder>(args, socketGlobalsFlags);
-            SocketGlobals::cloud().outgoingTunnelPool().assignOwnPeerId("ut", QnUuid::createUuid());
+            SocketGlobals::cloud().outgoingTunnelPool().assignOwnPeerId("ut", nx::Uuid::createUuid());
             cloud::OutgoingTunnelPool::ignoreOwnPeerIdChange();
 
             utils::test::DeinitFunctions deinitFunctions;

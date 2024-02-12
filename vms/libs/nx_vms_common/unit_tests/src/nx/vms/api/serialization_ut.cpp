@@ -16,7 +16,7 @@ TEST(ConfigureSystemData, deserialization)
 {
     ConfigureSystemData data1;
 
-    data1.localSystemId = QnUuid::createUuid();
+    data1.localSystemId = nx::Uuid::createUuid();
     data1.wholeSystem = true;
     data1.sysIdTime = 12345;
     data1.tranLogTime = nx::vms::api::Timestamp(1, 2);
@@ -66,7 +66,7 @@ TEST(QnAuditRecord, serialization)
 {
     QnAuditRecord record;
     record.addParam("name", "value");
-    record.resources.push_back(QnUuid());
+    record.resources.push_back(nx::Uuid());
     nx::network::rest::JsonReflectResult<QnAuditRecordList> result;
     result.reply.push_back(record);
     const std::string expected = /*suppress newline*/ 1 + R"json(

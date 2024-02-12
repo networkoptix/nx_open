@@ -19,12 +19,12 @@ UserResource::UserResource(UserModelV1 data):
     setAttributes(data.attributes);
 
     GlobalPermissions permissions;
-    std::vector<QnUuid> groupIds;
-    std::map<QnUuid, AccessRights> resourceAccessRights;
+    std::vector<nx::Uuid> groupIds;
+    std::map<nx::Uuid, AccessRights> resourceAccessRights;
     std::tie(permissions, groupIds, resourceAccessRights) =
         migrateAccessRights(
             data.permissions,
-            data.accessibleResources.value_or(std::vector<QnUuid>()),
+            data.accessibleResources.value_or(std::vector<nx::Uuid>()),
             data.isOwner);
 
     setRawPermissions(permissions);

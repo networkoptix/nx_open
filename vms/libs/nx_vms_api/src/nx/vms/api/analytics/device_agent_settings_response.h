@@ -22,7 +22,7 @@ struct NX_VMS_API DeviceAgentSettingsSession
     /**%apidoc
      * Session id is generated every time when the Device is assigned to a Server.
      */
-    QnUuid id;
+    nx::Uuid id;
 
     /**%apidoc
      * The sequence number is stored on the Server and increased on each values or Model change.
@@ -67,7 +67,7 @@ struct NX_VMS_API DeviceAgentSettingsResponse
     /**%apidoc
      * Current id of the Settings Model. Such ids are used to check that values match the Model.
      */
-    QnUuid settingsModelId;
+    nx::Uuid settingsModelId;
 
     DeviceAgentSettingsSession session;
 };

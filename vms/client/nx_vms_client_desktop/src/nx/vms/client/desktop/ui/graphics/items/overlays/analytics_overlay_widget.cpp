@@ -212,15 +212,15 @@ public:
 
     void resetFigureItem(Area& area);
 
-    void setHighlightedArea(const QnUuid& areaId);
+    void setHighlightedArea(const nx::Uuid& areaId);
     void updateArea(Area& area);
-    void updateArea(const QnUuid& areaId);
+    void updateArea(const nx::Uuid& areaId);
     void updateAreas();
     void ensureRotation();
     void handleContentUpdated();
 
-    QHash<QnUuid, Area> areaById;
-    QnUuid highlightedAreaId;
+    QHash<nx::Uuid, Area> areaById;
+    nx::Uuid highlightedAreaId;
     bool highlightAreasOnHover = true;
     QPointer<QGraphicsRotation> rotation;
     int angle = 0;
@@ -243,7 +243,7 @@ void AnalyticsOverlayWidget::Private::handleContentUpdated()
     // Calls to update() are useless here and lead to increased CPU/GPU consumption.
 }
 
-void AnalyticsOverlayWidget::Private::setHighlightedArea(const QnUuid& areaId)
+void AnalyticsOverlayWidget::Private::setHighlightedArea(const nx::Uuid& areaId)
 {
     if (areaId == highlightedAreaId)
         return;
@@ -296,7 +296,7 @@ void AnalyticsOverlayWidget::Private::updateArea(Area& area)
         : QColor());
 }
 
-void AnalyticsOverlayWidget::Private::updateArea(const QnUuid& areaId)
+void AnalyticsOverlayWidget::Private::updateArea(const nx::Uuid& areaId)
 {
     if (areaId.isNull())
         return;
@@ -388,7 +388,7 @@ void AnalyticsOverlayWidget::addOrUpdateArea(
                 if (item->containsMouse())
                     d->setHighlightedArea(areaId);
                 else if (d->highlightedAreaId == areaId)
-                    d->setHighlightedArea(QnUuid());
+                    d->setHighlightedArea(nx::Uuid());
             });
 
         connect(area.figureItem.data(), &FigureItem::clicked, this,
@@ -421,12 +421,12 @@ void AnalyticsOverlayWidget::addOrUpdateArea(
     d->handleContentUpdated();
 }
 
-void AnalyticsOverlayWidget::removeArea(const QnUuid& areaId)
+void AnalyticsOverlayWidget::removeArea(const nx::Uuid& areaId)
 {
     if (d->areaById.remove(areaId))
     {
         if (d->highlightedAreaId == areaId)
-            d->setHighlightedArea(QnUuid());
+            d->setHighlightedArea(nx::Uuid());
         NX_VERBOSE(this, "Area was removed, total %1 left", d->areaById.size());
         d->handleContentUpdated();
     }

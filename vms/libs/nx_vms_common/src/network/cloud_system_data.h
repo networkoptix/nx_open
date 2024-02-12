@@ -8,7 +8,7 @@
 struct NX_VMS_COMMON_API QnCloudSystem
 {
     QString cloudId;
-    QnUuid localId;
+    nx::Uuid localId;
     QString name;
     QString ownerAccountEmail;
     QString ownerFullName;

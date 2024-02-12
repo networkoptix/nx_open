@@ -271,7 +271,7 @@ void SystemHealthState::Private::updateServersWithoutStorages()
     const auto calculateServersWithoutStorages =
         [this](auto flag) -> QSet<QnResourcePtr>
         {
-            QSet<QnUuid> serverIds;
+            QSet<nx::Uuid> serverIds;
             const auto items = runtimeInfoManager()->items()->getItems();
             for (const auto& item: items)
             {

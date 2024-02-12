@@ -82,7 +82,7 @@ QString getNewGroupSubId(const QnResourcePool* resourcePool)
                 usedGroupIds.insert(groupId.toLower()); //< Case insensitive.
         };
 
-    const auto allCameras = resourcePool->getAllCameras(QnUuid(), /*ignoreDesktopCameras*/ true);
+    const auto allCameras = resourcePool->getAllCameras(nx::Uuid(), /*ignoreDesktopCameras*/ true);
     const auto allWebPages = resourcePool->getResources<QnWebPageResource>();
 
     for (const auto& camera: allCameras)

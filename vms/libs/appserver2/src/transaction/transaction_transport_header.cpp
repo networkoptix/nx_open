@@ -10,8 +10,8 @@ namespace ec2
     static QAtomicInt qn_transportHeader_sequence(1);
 
     void QnTransactionTransportHeader::fillSequence(
-        const QnUuid& moduleId,
-        const QnUuid& runningInstanceGUID)
+        const nx::Uuid& moduleId,
+        const nx::Uuid& runningInstanceGUID)
     {
         if (sequence == 0)
         {

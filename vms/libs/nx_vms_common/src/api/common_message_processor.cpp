@@ -71,8 +71,8 @@ using namespace nx::vms::common;
 
 struct QnCommonMessageProcessor::Private
 {
-    std::unordered_map<QnUuid, CameraAttributesData> cameraUserAttributesCache;
-    std::unordered_map<QnUuid, MediaServerUserAttributesData> serverUserAttributesCache;
+    std::unordered_map<nx::Uuid, CameraAttributesData> cameraUserAttributesCache;
+    std::unordered_map<nx::Uuid, MediaServerUserAttributesData> serverUserAttributesCache;
 };
 
 QnCommonMessageProcessor::QnCommonMessageProcessor(
@@ -135,7 +135,7 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
         [this](const auto& hardwareIdMapping) { addHardwareIdMapping(hardwareIdMapping); };
 
     const auto on_hardwareIdMappingRemoved =
-        [this](const QnUuid& id) { removeHardwareIdMapping(id); };
+        [this](const nx::Uuid& id) { removeHardwareIdMapping(id); };
 
     const auto connectionType = handlerConnectionType();
 
@@ -596,20 +596,20 @@ void QnCommonMessageProcessor::on_gotDiscoveryData(
     server->setIgnoredUrls(ignoredUrls);
 }
 
-void QnCommonMessageProcessor::on_remotePeerFound(QnUuid data, PeerType peerType)
+void QnCommonMessageProcessor::on_remotePeerFound(nx::Uuid data, PeerType peerType)
 {
     handleRemotePeerFound(data, peerType);
     emit remotePeerFound(data, peerType);
 }
 
-void QnCommonMessageProcessor::on_remotePeerLost(QnUuid data, PeerType peerType)
+void QnCommonMessageProcessor::on_remotePeerLost(nx::Uuid data, PeerType peerType)
 {
     handleRemotePeerLost(data, peerType);
     emit remotePeerLost(data, peerType);
 }
 
 void QnCommonMessageProcessor::on_resourceStatusChanged(
-    const QnUuid& resourceId,
+    const nx::Uuid& resourceId,
     ResourceStatus status,
     ec2::NotificationSource source)
 {
@@ -676,7 +676,7 @@ void QnCommonMessageProcessor::on_resourceParamRemoved(
 }
 
 void QnCommonMessageProcessor::on_resourceRemoved(
-    const QnUuid& resourceId, ec2::NotificationSource source)
+    const nx::Uuid& resourceId, ec2::NotificationSource source)
 {
     if (canRemoveResource(resourceId, source))
     {
@@ -689,7 +689,7 @@ void QnCommonMessageProcessor::on_resourceRemoved(
 }
 
 void QnCommonMessageProcessor::on_resourceStatusRemoved(
-    const QnUuid& resourceId, ec2::NotificationSource source)
+    const nx::Uuid& resourceId, ec2::NotificationSource source)
 {
     if (!canRemoveResource(resourceId, source))
     {
@@ -713,7 +713,7 @@ void QnCommonMessageProcessor::on_accessRightsChanged(
     static constexpr AccessRights kAdvancedViewerAccessRights =
         kViewerAccessRights | AccessRight::manageBookmarks | AccessRight::userInput;
 
-    std::map<QnUuid, AccessRights> resourceAccessRights;
+    std::map<nx::Uuid, AccessRights> resourceAccessRights;
     std::optional<UserGroupData> group;
     auto user =
         m_context->resourcePool()->getResourceById<QnUserResource>(accessRightsDeprecated.userId);
@@ -766,7 +766,7 @@ void QnCommonMessageProcessor::on_userGroupChanged(const UserGroupData& userGrou
         {userGroup.resourceAccessRights.begin(), userGroup.resourceAccessRights.end()});
 }
 
-void QnCommonMessageProcessor::on_userGroupRemoved(const QnUuid& userGroupId)
+void QnCommonMessageProcessor::on_userGroupRemoved(const nx::Uuid& userGroupId)
 {
     m_context->userGroupManager()->remove(userGroupId);
 
@@ -800,7 +800,7 @@ void QnCommonMessageProcessor::on_cameraUserAttributesChanged(
     }
 }
 
-void QnCommonMessageProcessor::on_cameraUserAttributesRemoved(const QnUuid& cameraId)
+void QnCommonMessageProcessor::on_cameraUserAttributesRemoved(const nx::Uuid& cameraId)
 {
     // It is OK if the Camera is missing.
     if (auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(cameraId))
@@ -821,7 +821,7 @@ void QnCommonMessageProcessor::on_mediaServerUserAttributesChanged(
         d->serverUserAttributesCache[attrs.serverId] = attrs;
 }
 
-void QnCommonMessageProcessor::on_mediaServerUserAttributesRemoved(const QnUuid& serverId)
+void QnCommonMessageProcessor::on_mediaServerUserAttributesRemoved(const nx::Uuid& serverId)
 {
     // It is OK if the Server is missing.
     if (auto server = resourcePool()->getResourceById<QnMediaServerResource>(serverId))
@@ -855,7 +855,7 @@ void QnCommonMessageProcessor::on_eventRuleAddedOrUpdated(const nx::vms::api::Ev
     m_context->eventRuleManager()->addOrUpdateRule(eventRule);
 }
 
-void QnCommonMessageProcessor::on_businessEventRemoved(const QnUuid& id)
+void QnCommonMessageProcessor::on_businessEventRemoved(const nx::Uuid& id)
 {
     m_context->eventRuleManager()->removeRule(id);
 }
@@ -881,7 +881,7 @@ void QnCommonMessageProcessor::resetResourceTypes(const ResourceTypeDataList& re
 void QnCommonMessageProcessor::resetResources(const FullInfoData& fullData)
 {
     // Store all remote resources id to clean them if they are not in the list anymore.
-    QHash<QnUuid, QnResourcePtr> remoteResources;
+    QHash<nx::Uuid, QnResourcePtr> remoteResources;
     for (const QnResourcePtr& resource: resourcePool()->getResourcesWithFlag(Qn::remote))
     {
         remoteResources.insert(resource->getId(), resource);
@@ -952,31 +952,31 @@ void QnCommonMessageProcessor::resetUserGroups(const UserGroupDataList& userGrou
     }
 }
 
-bool QnCommonMessageProcessor::canRemoveResource(const QnUuid&, ec2::NotificationSource)
+bool QnCommonMessageProcessor::canRemoveResource(const nx::Uuid&, ec2::NotificationSource)
 {
     return true;
 }
 
-void QnCommonMessageProcessor::removeResourceIgnored(const QnUuid&)
+void QnCommonMessageProcessor::removeResourceIgnored(const nx::Uuid&)
 {
 }
 
 bool QnCommonMessageProcessor::canRemoveResourceProperty(
-    const QnUuid& /*resourceId*/, const QString& /*propertyName*/)
+    const nx::Uuid& /*resourceId*/, const QString& /*propertyName*/)
 {
     return true;
 }
 
 void QnCommonMessageProcessor::refreshIgnoredResourceProperty(
-    const QnUuid& /*resourceId*/, const QString& /*propertyName*/)
+    const nx::Uuid& /*resourceId*/, const QString& /*propertyName*/)
 {
 }
 
-void QnCommonMessageProcessor::handleRemotePeerFound(QnUuid /*data*/, PeerType /*peerType*/)
+void QnCommonMessageProcessor::handleRemotePeerFound(nx::Uuid /*data*/, PeerType /*peerType*/)
 {
 }
 
-void QnCommonMessageProcessor::handleRemotePeerLost(QnUuid /*data*/, PeerType /*peerType*/)
+void QnCommonMessageProcessor::handleRemotePeerLost(nx::Uuid /*data*/, PeerType /*peerType*/)
 {
 }
 
@@ -1023,7 +1023,7 @@ void QnCommonMessageProcessor::resetPropertyList(const ResourceParamWithRefDataL
     // Clean values that are not in the list anymore.
     for (auto iter = existingProperties.constBegin(); iter != existingProperties.constEnd(); ++iter)
     {
-        QnUuid resourceId = iter.key();
+        nx::Uuid resourceId = iter.key();
         for (auto paramName: iter.value())
         {
             on_resourceParamChanged(
@@ -1037,7 +1037,7 @@ void QnCommonMessageProcessor::resetStatusList(const ResourceStatusDataList& par
 {
     auto keys = m_context->resourceStatusDictionary()->values().keys();
     m_context->resourceStatusDictionary()->clear();
-    for(const QnUuid& id: keys)
+    for(const nx::Uuid& id: keys)
     {
         if (QnResourcePtr resource = resourcePool()->getResourceById(id))
         {

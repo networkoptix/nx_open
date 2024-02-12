@@ -39,7 +39,7 @@ void ServerPrimaryInterfaceWatcher::onConnectionChanged(nx::vms::discovery::Modu
     onConnectionChangedById(module.id);
 }
 
-void ServerPrimaryInterfaceWatcher::onConnectionChangedById(QnUuid id)
+void ServerPrimaryInterfaceWatcher::onConnectionChangedById(nx::Uuid id)
 {
     if (const auto server = resourcePool()->getResourceById<QnMediaServerResource>(id))
         updatePrimaryInterface(server);

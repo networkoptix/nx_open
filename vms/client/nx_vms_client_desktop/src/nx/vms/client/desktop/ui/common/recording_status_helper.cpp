@@ -83,12 +83,12 @@ void RecordingStatusHelper::initialize()
         &RecordingStatusHelper::updateRecordingMode);
 }
 
-QnUuid RecordingStatusHelper::cameraId() const
+nx::Uuid RecordingStatusHelper::cameraId() const
 {
-    return m_camera ? m_camera->getId() : QnUuid();
+    return m_camera ? m_camera->getId() : nx::Uuid();
 }
 
-void RecordingStatusHelper::setCameraId(const QnUuid& id)
+void RecordingStatusHelper::setCameraId(const nx::Uuid& id)
 {
     initialize();
     setCamera(resourcePool()->getResourceById<QnVirtualCameraResource>(id));

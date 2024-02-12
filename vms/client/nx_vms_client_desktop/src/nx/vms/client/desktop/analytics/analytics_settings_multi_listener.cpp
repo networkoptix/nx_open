@@ -18,11 +18,11 @@ class AnalyticsSettingsMultiListener::Private: public QObject
 public:
     AnalyticsSettingsManager* const settingsManager;
     const ListenPolicy listenPolicy;
-    QnUuid deviceId;
+    nx::Uuid deviceId;
     QnVirtualCameraResourcePtr camera;
-    QHash<QnUuid, AnalyticsSettingsListenerPtr> listeners;
-    QSet<QnUuid> compatibleEngines;
-    QSet<QnUuid> enabledEngines;
+    QHash<nx::Uuid, AnalyticsSettingsListenerPtr> listeners;
+    QSet<nx::Uuid> compatibleEngines;
+    QSet<nx::Uuid> enabledEngines;
 
 public:
     Private(
@@ -34,7 +34,7 @@ public:
     void handleResourceRemoved(const QnResourcePtr& resource);
     void resubscribe();
     void handleDevicePropertyChanged(const QnResourcePtr& resource, const QString& key);
-    void addListener(const QnUuid& engineId);
+    void addListener(const nx::Uuid& engineId);
 };
 
 AnalyticsSettingsMultiListener::Private::Private(
@@ -75,7 +75,7 @@ void AnalyticsSettingsMultiListener::Private::handleResourceRemoved(const QnReso
 void AnalyticsSettingsMultiListener::Private::resubscribe()
 {
     // Store listeners to prevent cache from wiping their data.
-    QHash<QnUuid, AnalyticsSettingsListenerPtr> oldListeners = listeners;
+    QHash<nx::Uuid, AnalyticsSettingsListenerPtr> oldListeners = listeners;
     listeners.clear();
 
     const auto engines = camera->resourcePool()->getResources<common::AnalyticsEngineResource>();
@@ -115,7 +115,7 @@ void AnalyticsSettingsMultiListener::Private::handleDevicePropertyChanged(
     }
 }
 
-void AnalyticsSettingsMultiListener::Private::addListener(const QnUuid& engineId)
+void AnalyticsSettingsMultiListener::Private::addListener(const nx::Uuid& engineId)
 {
     auto listener = settingsManager->getListener(DeviceAgentId{camera->getId(), engineId});
     listeners.insert(engineId, listener);
@@ -166,14 +166,14 @@ AnalyticsSettingsMultiListener::~AnalyticsSettingsMultiListener()
 {
 }
 
-DeviceAgentData AnalyticsSettingsMultiListener::data(const QnUuid& engineId) const
+DeviceAgentData AnalyticsSettingsMultiListener::data(const nx::Uuid& engineId) const
 {
     if (const auto& listener = d->listeners.value(engineId))
         return listener->data();
     return {};
 }
 
-QSet<QnUuid> AnalyticsSettingsMultiListener::engineIds() const
+QSet<nx::Uuid> AnalyticsSettingsMultiListener::engineIds() const
 {
     return nx::utils::toQSet(d->listeners.keys());
 }

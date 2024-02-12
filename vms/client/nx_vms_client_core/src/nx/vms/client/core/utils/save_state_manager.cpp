@@ -11,13 +11,13 @@ SaveStateManager::SaveStateManager(QObject* parent):
 
 }
 
-SaveStateManager::SaveStateFlags SaveStateManager::flags(const QnUuid& id) const
+SaveStateManager::SaveStateFlags SaveStateManager::flags(const nx::Uuid& id) const
 {
     NX_MUTEX_LOCKER lk(&m_mutex);
     return m_flags.value(id);
 }
 
-void SaveStateManager::setFlags(const QnUuid& id, SaveStateFlags flags)
+void SaveStateManager::setFlags(const nx::Uuid& id, SaveStateFlags flags)
 {
     {
         NX_MUTEX_LOCKER lk(&m_mutex);
@@ -29,29 +29,29 @@ void SaveStateManager::setFlags(const QnUuid& id, SaveStateFlags flags)
     emit flagsChanged(id, flags);
 }
 
-void SaveStateManager::clean(const QnUuid& id)
+void SaveStateManager::clean(const nx::Uuid& id)
 {
     NX_MUTEX_LOCKER lk(&m_mutex);
     m_flags.remove(id);
     m_saveRequests.remove(id);
 }
 
-bool SaveStateManager::isBeingSaved(const QnUuid& id) const
+bool SaveStateManager::isBeingSaved(const nx::Uuid& id) const
 {
     return flags(id).testFlag(IsBeingSaved);
 }
 
-bool SaveStateManager::isChanged(const QnUuid& id) const
+bool SaveStateManager::isChanged(const nx::Uuid& id) const
 {
     return flags(id).testFlag(IsChanged);
 }
 
-bool SaveStateManager::isSaveable(const QnUuid& id) const
+bool SaveStateManager::isSaveable(const nx::Uuid& id) const
 {
     return (flags(id) & (IsChanged | IsBeingSaved)) == IsChanged;
 }
 
-void SaveStateManager::markBeingSaved(const QnUuid& id, bool saved)
+void SaveStateManager::markBeingSaved(const nx::Uuid& id, bool saved)
 {
     if (saved)
         setFlags(id, flags(id) | IsBeingSaved);
@@ -59,7 +59,7 @@ void SaveStateManager::markBeingSaved(const QnUuid& id, bool saved)
         setFlags(id, flags(id) & ~IsBeingSaved);
 }
 
-void SaveStateManager::markChanged(const QnUuid& id, bool changed)
+void SaveStateManager::markChanged(const nx::Uuid& id, bool changed)
 {
     if (changed)
         setFlags(id, flags(id) | IsChanged);
@@ -67,19 +67,19 @@ void SaveStateManager::markChanged(const QnUuid& id, bool changed)
         setFlags(id, flags(id) & ~IsChanged);
 }
 
-bool SaveStateManager::hasSaveRequests(const QnUuid& id) const
+bool SaveStateManager::hasSaveRequests(const nx::Uuid& id) const
 {
     NX_MUTEX_LOCKER lk(&m_mutex);
     return !m_saveRequests.value(id).empty();
 }
 
-void SaveStateManager::addSaveRequest(const QnUuid& id, int reqId)
+void SaveStateManager::addSaveRequest(const nx::Uuid& id, int reqId)
 {
     NX_MUTEX_LOCKER lk(&m_mutex);
     m_saveRequests[id].insert(reqId);
 }
 
-void SaveStateManager::removeSaveRequest(const QnUuid& id, int reqId)
+void SaveStateManager::removeSaveRequest(const nx::Uuid& id, int reqId)
 {
     NX_MUTEX_LOCKER lk(&m_mutex);
     if (!m_saveRequests.contains(id))

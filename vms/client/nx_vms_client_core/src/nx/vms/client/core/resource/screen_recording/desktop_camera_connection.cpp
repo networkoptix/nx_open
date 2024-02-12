@@ -234,8 +234,8 @@ struct DesktopCameraConnection::Private
 {
     DesktopResourcePtr owner;
     QnMediaServerResourcePtr server;
-    QnUuid userId;
-    QnUuid moduleGuid;
+    nx::Uuid userId;
+    nx::Uuid moduleGuid;
     nx::network::http::Credentials credentials;
     std::shared_ptr<DesktopCameraConnectionProcessor> processor;
     std::unique_ptr<nx::network::http::HttpClient> httpClient;
@@ -245,8 +245,8 @@ struct DesktopCameraConnection::Private
 DesktopCameraConnection::DesktopCameraConnection(
     DesktopResourcePtr owner,
     const QnMediaServerResourcePtr& server,
-    const QnUuid& userId,
-    const QnUuid& moduleGuid,
+    const nx::Uuid& userId,
+    const nx::Uuid& moduleGuid,
     const nx::network::http::Credentials& credentials)
     :
     QnLongRunnable(),

@@ -30,7 +30,7 @@ public:
         registerSerializer<QString>();
 
         registerSerializer<QColor>();
-        registerSerializer<QnUuid>();
+        registerSerializer<nx::Uuid>();
         registerSerializer<QUrl>();
         registerSerializer<nx::utils::Url>();
 

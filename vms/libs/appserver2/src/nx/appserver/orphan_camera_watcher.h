@@ -35,7 +35,7 @@ signals:
     void doChangeInterval(std::chrono::milliseconds interval);
 
 private:
-    using Uuids=std::set<QnUuid>;
+    using Uuids=std::set<nx::Uuid>;
     Uuids m_previousOrphanCameras;
     QTimer m_timer;
     std::chrono::milliseconds m_updateInterval;

@@ -22,7 +22,7 @@ public:
         watcher = VideowallLayoutWatcher::instance(resourcePool());
 
         QObject::connect(watcher.get(), &VideowallLayoutWatcher::videowallLayoutsAdded,
-            [this](const QnVideoWallResourcePtr& videowall, const QVector<QnUuid>& layoutIds)
+            [this](const QnVideoWallResourcePtr& videowall, const QVector<nx::Uuid>& layoutIds)
             {
                 lastSignals.push_back("videowallLayoutsAdded");
                 lastLayoutIds.append(layoutIds);
@@ -30,7 +30,7 @@ public:
             });
 
         QObject::connect(watcher.get(), &VideowallLayoutWatcher::videowallLayoutsRemoved,
-            [this](const QnVideoWallResourcePtr& videowall, const QVector<QnUuid>& layoutIds)
+            [this](const QnVideoWallResourcePtr& videowall, const QVector<nx::Uuid>& layoutIds)
             {
                 lastSignals.push_back("videowallLayoutsRemoved");
                 lastLayoutIds.append(layoutIds);
@@ -66,9 +66,9 @@ public:
         return lastSignals.empty() ? QString() : lastSignals.takeFirst();
     }
 
-    QnUuid popNextLayoutId()
+    nx::Uuid popNextLayoutId()
     {
-        return lastLayoutIds.empty() ? QnUuid() : lastLayoutIds.takeFirst();
+        return lastLayoutIds.empty() ? nx::Uuid() : lastLayoutIds.takeFirst();
     }
 
     QnVideoWallResourcePtr popNextVideowall()
@@ -76,9 +76,9 @@ public:
         return lastVideowalls.empty() ? QnVideoWallResourcePtr() : lastVideowalls.takeFirst();
     }
 
-    QnUuidSet toSet(const QnCounterHash<QnUuid>& ids)
+    UuidSet toSet(const QnCounterHash<nx::Uuid>& ids)
     {
-        return QnUuidSet(ids.keyBegin(), ids.keyEnd());
+        return UuidSet(ids.keyBegin(), ids.keyEnd());
     }
 
 public:
@@ -86,7 +86,7 @@ public:
 
 private:
     QStringList lastSignals;
-    QList<QnUuid> lastLayoutIds;
+    QList<nx::Uuid> lastLayoutIds;
     QList<QnVideoWallResourcePtr> lastVideowalls;
 };
 
@@ -112,7 +112,7 @@ TEST_F(VideowallLayoutWatcherTest, addRemoveVideowallLayout)
     ASSERT_EQ(popNextLayoutId(), layout1->getId());
     ASSERT_EQ(popNextVideowall(), videowall);
     ASSERT_EQ(watcher->layoutVideowall(layout1), videowall);
-    ASSERT_EQ(toSet(watcher->videowallLayouts(videowall)), QnUuidSet({layout1->getId()}));
+    ASSERT_EQ(toSet(watcher->videowallLayouts(videowall)), UuidSet({layout1->getId()}));
 
     const auto layout2 = addLayout();
     const auto item2 = addVideoWallItem(videowall, layout2);
@@ -124,7 +124,7 @@ TEST_F(VideowallLayoutWatcherTest, addRemoveVideowallLayout)
     ASSERT_EQ(popNextSignal(), QString());
     ASSERT_EQ(watcher->layoutVideowall(layout2), videowall);
     ASSERT_EQ(toSet(watcher->videowallLayouts(videowall)),
-        QnUuidSet({layout1->getId(), layout2->getId()}));
+        UuidSet({layout1->getId(), layout2->getId()}));
 
     videowall->items()->removeItem(item1);
     ASSERT_EQ(popNextSignal(), QString("videowallLayoutsRemoved"));
@@ -132,19 +132,19 @@ TEST_F(VideowallLayoutWatcherTest, addRemoveVideowallLayout)
     ASSERT_EQ(popNextVideowall(), videowall);
     ASSERT_EQ(watcher->layoutVideowall(layout1), QnVideoWallResourcePtr());
     ASSERT_EQ(watcher->layoutVideowall(layout2), videowall);
-    ASSERT_EQ(toSet(watcher->videowallLayouts(videowall)), QnUuidSet({layout2->getId()}));
+    ASSERT_EQ(toSet(watcher->videowallLayouts(videowall)), UuidSet({layout2->getId()}));
 
     videowall->items()->removeItem(item2);
     ASSERT_EQ(popNextSignal(), QString());
     ASSERT_EQ(watcher->layoutVideowall(layout2), videowall);
-    ASSERT_EQ(toSet(watcher->videowallLayouts(videowall)), QnUuidSet({layout2->getId()}));
+    ASSERT_EQ(toSet(watcher->videowallLayouts(videowall)), UuidSet({layout2->getId()}));
 
     videowall->items()->removeItem(item3);
     ASSERT_EQ(popNextSignal(), QString("videowallLayoutsRemoved"));
     ASSERT_EQ(popNextLayoutId(), layout2->getId());
     ASSERT_EQ(popNextVideowall(), videowall);
     ASSERT_EQ(watcher->layoutVideowall(layout2), QnVideoWallResourcePtr());
-    ASSERT_EQ(toSet(watcher->videowallLayouts(videowall)), QnUuidSet());
+    ASSERT_EQ(toSet(watcher->videowallLayouts(videowall)), UuidSet());
 }
 
 TEST_F(VideowallLayoutWatcherTest, addRemoveVideowall)
@@ -158,7 +158,7 @@ TEST_F(VideowallLayoutWatcherTest, addRemoveVideowall)
     ASSERT_EQ(popNextSignal(), QString());
     ASSERT_EQ(watcher->layoutVideowall(layout1), QnVideoWallResourcePtr());
     ASSERT_EQ(watcher->layoutVideowall(layout2), QnVideoWallResourcePtr());
-    ASSERT_EQ(toSet(watcher->videowallLayouts(videowall)), QnUuidSet());
+    ASSERT_EQ(toSet(watcher->videowallLayouts(videowall)), UuidSet());
 
     resourcePool()->addResource(videowall);
     ASSERT_EQ(popNextSignal(), QString("videowallAdded"));
@@ -166,14 +166,14 @@ TEST_F(VideowallLayoutWatcherTest, addRemoveVideowall)
     ASSERT_EQ(watcher->layoutVideowall(layout1), videowall);
     ASSERT_EQ(watcher->layoutVideowall(layout2), videowall);
     ASSERT_EQ(toSet(watcher->videowallLayouts(videowall)),
-        QnUuidSet({layout1->getId(), layout2->getId()}));
+        UuidSet({layout1->getId(), layout2->getId()}));
 
     resourcePool()->removeResource(videowall);
     ASSERT_EQ(popNextSignal(), QString("videowallRemoved"));
     ASSERT_EQ(popNextVideowall(), videowall);
     ASSERT_EQ(watcher->layoutVideowall(layout1), QnVideoWallResourcePtr());
     ASSERT_EQ(watcher->layoutVideowall(layout2), QnVideoWallResourcePtr());
-    ASSERT_EQ(toSet(watcher->videowallLayouts(videowall)), QnUuidSet());
+    ASSERT_EQ(toSet(watcher->videowallLayouts(videowall)), UuidSet());
 }
 
 TEST_F(VideowallLayoutWatcherTest, videowallMatrices)
@@ -189,7 +189,7 @@ TEST_F(VideowallLayoutWatcherTest, videowallMatrices)
     ASSERT_EQ(popNextLayoutId(), layout1->getId());
     ASSERT_EQ(popNextVideowall(), videowall);
     ASSERT_EQ(watcher->layoutVideowall(layout1), videowall);
-    ASSERT_EQ(toSet(watcher->videowallLayouts(videowall)), QnUuidSet({layout1->getId()}));
+    ASSERT_EQ(toSet(watcher->videowallLayouts(videowall)), UuidSet({layout1->getId()}));
 
     const auto item2 = addVideoWallItem(videowall, layout2);
     ASSERT_EQ(popNextSignal(), QString("videowallLayoutsAdded"));
@@ -197,18 +197,18 @@ TEST_F(VideowallLayoutWatcherTest, videowallMatrices)
     ASSERT_EQ(popNextVideowall(), videowall);
     ASSERT_EQ(watcher->layoutVideowall(layout2), videowall);
     ASSERT_EQ(toSet(watcher->videowallLayouts(videowall)),
-        QnUuidSet({layout1->getId(), layout2->getId()}));
+        UuidSet({layout1->getId(), layout2->getId()}));
 
     QnVideoWallMatrix matrix1;
-    matrix1.uuid = QnUuid::createUuid();
+    matrix1.uuid = nx::Uuid::createUuid();
     matrix1.layoutByItem[item1] = layout1->getId();
     matrix1.layoutByItem[item2] = layout2->getId();
     videowall->matrices()->addItem(matrix1);
 
     QnVideoWallMatrix matrix2;
-    matrix2.uuid = QnUuid::createUuid();
+    matrix2.uuid = nx::Uuid::createUuid();
     matrix2.layoutByItem[item1] = layout1->getId();
-    matrix2.layoutByItem[item2] = QnUuid{};
+    matrix2.layoutByItem[item2] = nx::Uuid{};
     videowall->matrices()->addItem(matrix2);
 
     // Saved matrices cause no change in videowall layout resolution.
@@ -222,16 +222,16 @@ TEST_F(VideowallLayoutWatcherTest, videowallMatrices)
     ASSERT_EQ(watcher->layoutVideowall(layout1), videowall);
     ASSERT_EQ(watcher->layoutVideowall(layout2), videowall);
     ASSERT_EQ(toSet(watcher->videowallLayouts(videowall)),
-        QnUuidSet({layout1->getId(), layout2->getId()}));
+        UuidSet({layout1->getId(), layout2->getId()}));
 
     // Remove layout2 from matrix1; layout2 will be removed from the videowall resolution.
-    matrix1.layoutByItem[item2] = QnUuid{};
+    matrix1.layoutByItem[item2] = nx::Uuid{};
     videowall->matrices()->addOrUpdateItem(matrix1);
     ASSERT_EQ(popNextSignal(), QString("videowallLayoutsRemoved"));
     ASSERT_EQ(popNextLayoutId(), layout2->getId());
     ASSERT_EQ(popNextVideowall(), videowall);
     ASSERT_EQ(watcher->layoutVideowall(layout2), QnVideoWallResourcePtr{});
-    ASSERT_EQ(toSet(watcher->videowallLayouts(videowall)), QnUuidSet({layout1->getId()}));
+    ASSERT_EQ(toSet(watcher->videowallLayouts(videowall)), UuidSet({layout1->getId()}));
 
     // Remove item1 from the videowall; layout1 will be removed from the videowall resolution.
     videowall->items()->removeItem(item1);
@@ -248,7 +248,7 @@ TEST_F(VideowallLayoutWatcherTest, videowallMatrices)
     ASSERT_EQ(popNextLayoutId(), layout1->getId());
     ASSERT_EQ(popNextVideowall(), videowall);
     ASSERT_EQ(watcher->layoutVideowall(layout1), videowall);
-    ASSERT_EQ(toSet(watcher->videowallLayouts(videowall)), QnUuidSet({layout1->getId()}));
+    ASSERT_EQ(toSet(watcher->videowallLayouts(videowall)), UuidSet({layout1->getId()}));
 }
 
 TEST_F(VideowallLayoutWatcherTest, videowallAddedWithItemAndMatrix)
@@ -260,7 +260,7 @@ TEST_F(VideowallLayoutWatcherTest, videowallAddedWithItemAndMatrix)
     const auto item = addVideoWallItem(videowall, layout1);
 
     QnVideoWallMatrix matrix;
-    matrix.uuid = QnUuid::createUuid();
+    matrix.uuid = nx::Uuid::createUuid();
     matrix.layoutByItem[item] = layout2->getId();
     layout2->setParentId(videowall->getId());
     videowall->matrices()->addItem(matrix);
@@ -274,7 +274,7 @@ TEST_F(VideowallLayoutWatcherTest, videowallAddedWithItemAndMatrix)
     ASSERT_EQ(watcher->layoutVideowall(layout1), videowall);
     ASSERT_EQ(watcher->layoutVideowall(layout2), videowall);
     ASSERT_EQ(toSet(watcher->videowallLayouts(videowall)),
-        QnUuidSet({layout1->getId(), layout2->getId()}));
+        UuidSet({layout1->getId(), layout2->getId()}));
 }
 
 } // namespace test

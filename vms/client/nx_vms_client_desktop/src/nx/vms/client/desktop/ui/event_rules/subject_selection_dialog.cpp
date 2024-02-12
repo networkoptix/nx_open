@@ -304,7 +304,7 @@ void SubjectSelectionDialog::setValidationPolicy(QnSubjectValidationPolicy* poli
         return;
 
     const auto roleValidator =
-        [this](const QnUuid& roleId) { return m_policy->roleValidity(roleId); };
+        [this](const nx::Uuid& roleId) { return m_policy->roleValidity(roleId); };
 
     const auto userValidator =
         [this](const QnUserResourcePtr& user) { return m_policy->userValidity(user); };
@@ -352,13 +352,13 @@ std::vector<QnResourceAccessSubject> SubjectSelectionDialog::allSubjects() const
     return result;
 }
 
-void SubjectSelectionDialog::setCheckedSubjects(const QSet<QnUuid>& ids)
+void SubjectSelectionDialog::setCheckedSubjects(const QSet<nx::Uuid>& ids)
 {
     QnUserResourceList users;
-    QList<QnUuid> groupIds;
+    QList<nx::Uuid> groupIds;
     nx::vms::common::getUsersAndGroups(system(), ids, users, groupIds);
 
-    QSet<QnUuid> userIds;
+    QSet<nx::Uuid> userIds;
     bool nonCustomUsers = false;
 
     for (const auto& user: users)
@@ -374,17 +374,17 @@ void SubjectSelectionDialog::setCheckedSubjects(const QSet<QnUuid>& ids)
         ui->showAllUsers->setChecked(true);
 }
 
-QSet<QnUuid> SubjectSelectionDialog::checkedSubjects() const
+QSet<nx::Uuid> SubjectSelectionDialog::checkedSubjects() const
 {
     return m_users->checkedUsers().unite(m_roles->checkedRoles());
 }
 
-QSet<QnUuid> SubjectSelectionDialog::totalCheckedUsers() const
+QSet<nx::Uuid> SubjectSelectionDialog::totalCheckedUsers() const
 {
     if (!allUsers())
         return m_users->checkedUsers().unite(m_roles->checkedUsers());
 
-    QSet<QnUuid> allUserIds;
+    QSet<nx::Uuid> allUserIds;
     for (const auto& subject: allSubjects())
     {
         if (const auto& user = subject.user())

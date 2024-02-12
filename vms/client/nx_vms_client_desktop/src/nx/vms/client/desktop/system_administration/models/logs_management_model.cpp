@@ -255,7 +255,7 @@ void LogsManagementModel::onItemsListChanged()
 
 void LogsManagementModel::onItemsChanged(QList<LogsManagementUnitPtr> items)
 {
-    QList<QnUuid> ids;
+    QList<nx::Uuid> ids;
     for (const auto& item: items)
     {
         ids << item->id();

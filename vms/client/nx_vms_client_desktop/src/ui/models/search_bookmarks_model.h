@@ -41,9 +41,9 @@ public:
 
     void setFilterText(const QString& text);
 
-    void setCameras(const std::set<QnUuid>& cameras);
+    void setCameras(const std::set<nx::Uuid>& cameras);
 
-    const std::set<QnUuid>& cameras() const;
+    const std::set<nx::Uuid>& cameras() const;
 
     void cancelUpdateOperation();
 

@@ -22,7 +22,7 @@ struct NX_VMS_API DeviceAgentSettingsRequest
     /**%apidoc
      * Unique id of an Analytics Engine.
      */
-    QnUuid analyticsEngineId;
+    nx::Uuid analyticsEngineId;
 
     /**%apidoc
      * Index of the stream that should be used for the analytics purposes.
@@ -37,7 +37,7 @@ struct NX_VMS_API DeviceAgentSettingsRequest
     /**%apidoc
      * Id of the Settings Model the values supposed to be applied to.
      */
-    QnUuid settingsModelId;
+    nx::Uuid settingsModelId;
 };
 #define nx_vms_api_analytics_DeviceAgentSettingsRequest_Fields \
     (deviceId) \

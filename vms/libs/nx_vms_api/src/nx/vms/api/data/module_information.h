@@ -32,7 +32,7 @@ NX_REFLECTION_ENUM_CLASS(HwPlatform,
 struct NX_VMS_API ServerPortInformation
 {
     int port = 0;
-    QnUuid id;
+    nx::Uuid id;
     bool operator==(const ServerPortInformation& other) const = default;
 };
 #define ServerPortInformation_Fields (port)(id)
@@ -49,22 +49,22 @@ struct NX_VMS_API ModuleInformation: ServerPortInformation
     QString name;
     bool sslAllowed = true;
     int protoVersion = 0;
-    QnUuid runtimeId;
+    nx::Uuid runtimeId;
     ServerFlags serverFlags = {};
     QString realm;
     bool ecDbReadOnly = false;
     QString cloudSystemId;
     QString cloudPortalUrl;
     QString cloudHost;
-    QnUuid localSystemId;
+    nx::Uuid localSystemId;
     HwPlatform hwPlatform;
 
     /**%apidoc Current time synchronized with the VMS Site, in milliseconds since epoch. */
     std::chrono::milliseconds synchronizedTimeMs{0};
 
     /**%apidoc Presented if the Site is bound to the Cloud. */
-    std::optional<QnUuid> cloudOwnerId;
-    std::optional<QnUuid> organizationId;
+    std::optional<nx::Uuid> cloudOwnerId;
+    std::optional<nx::Uuid> organizationId;
     nx::vms::api::SaasState saasState = nx::vms::api::SaasState::uninitialized;
 
     void fixRuntimeId();
@@ -162,7 +162,7 @@ struct NX_VMS_API ServerInformation: ModuleInformationWithAddresses
     ServerInformation(const ServerInformation& rhs) = default;
     ServerInformation(const ModuleInformationWithAddresses& rhs): ModuleInformationWithAddresses(rhs) {}
 
-    QnUuid getId() const { return id; }
+    nx::Uuid getId() const { return id; }
 };
 
 #define ServerInformation_Fields ModuleInformationWithAddresses_Fields \
@@ -190,7 +190,7 @@ struct NX_VMS_API ServerRuntimeInformation: ServerPortInformation, ServerTimeZon
     ServerRuntimeInformation() = default;
     ServerRuntimeInformation(const ServerRuntimeInformation& rhs) = default;
 
-    QnUuid getId() const { return id; }
+    nx::Uuid getId() const { return id; }
 };
 
 #define ServerRuntimeInformation_Fields \

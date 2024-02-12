@@ -17,7 +17,7 @@ NX_REFLECTION_INSTRUMENT(CrossSystemLayoutItemData, CrossSystemLayoutItemData_Fi
 
 struct CrossSystemLayoutData
 {
-    QnUuid id;
+    nx::Uuid id;
     QString name;
     float cellAspectRatio = 0;
     float cellSpacing = nx::vms::api::LayoutData::kDefaultCellSpacing;

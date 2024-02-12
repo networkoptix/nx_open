@@ -107,7 +107,7 @@ Worker::Worker(
     const QString& fileName,
     Storage* storage,
     const QList<AbstractPeerManager*>& peerManagers,
-    const QnUuid& selfId)
+    const nx::Uuid& selfId)
     :
     m_selfId(selfId),
     m_storage(storage),
@@ -831,7 +831,7 @@ QSet<Worker::Peer> Worker::getPeersToCheckInfo() const
         if (!manager->capabilities.testFlag(AbstractPeerManager::Capability::FileInfo))
             continue;
 
-        for (const QnUuid& peerId: manager->peers())
+        for (const nx::Uuid& peerId: manager->peers())
         {
             const Peer peer{peerId, manager};
 
@@ -872,7 +872,7 @@ QList<Worker::Peer> Worker::getPeersToGetCheksums() const
         if (!manager->capabilities.testFlag(AbstractPeerManager::Capability::Checksums))
             continue;
 
-        for (const QnUuid& peerId: manager->peers())
+        for (const nx::Uuid& peerId: manager->peers())
         {
             const Peer peer{peerId, manager};
 

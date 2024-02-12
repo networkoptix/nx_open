@@ -48,10 +48,10 @@ protected:
     }
 
     QnLayoutResourcePtr createLayout(
-        Qn::ResourceFlags flags, bool locked = false, const QnUuid& parentId = QnUuid())
+        Qn::ResourceFlags flags, bool locked = false, const nx::Uuid& parentId = nx::Uuid())
     {
         QnLayoutResourcePtr layout(new QnLayoutResource());
-        layout->setIdUnsafe(QnUuid::createUuid());
+        layout->setIdUnsafe(nx::Uuid::createUuid());
         layout->addFlags(flags);
         layout->setLocked(locked);
 
@@ -63,7 +63,7 @@ protected:
         return layout;
     }
 
-    void setOwnAccessRights(const QnUuid& subjectId, const ResourceAccessMap accessRights)
+    void setOwnAccessRights(const nx::Uuid& subjectId, const ResourceAccessMap accessRights)
     {
         systemContext()->accessRightsManager()->setOwnResourceAccessMap(subjectId, accessRights);
     }
@@ -89,7 +89,7 @@ protected:
         logout();
         auto user = addUser(groupIds);
         ASSERT_EQ(user->isAdministrator(),
-            (groupIds.data == std::vector<QnUuid>{kAdministratorsGroupId}));
+            (groupIds.data == std::vector<nx::Uuid>{kAdministratorsGroupId}));
         m_currentUser = user;
     }
 
@@ -166,7 +166,7 @@ protected:
     }
 
     void checkCanGrantPowerUserPermissionsViaInheritance(const QnUserResourcePtr& source,
-        QnUserResourcePtr target, const QnUuid& powerUserGroupId, bool allowed)
+        QnUserResourcePtr target, const nx::Uuid& powerUserGroupId, bool allowed)
     {
         UserData data;
         ec2::fromResourceToApi(target, data);
@@ -300,7 +300,7 @@ TEST_F(ResourceAccessManagerTest, checkUnknownUsersLayoutAsPowerUser)
 {
     loginAs(kPowerUsersGroupId);
 
-    const auto layout = createLayout(Qn::remote, false, QnUuid::createUuid());
+    const auto layout = createLayout(Qn::remote, false, nx::Uuid::createUuid());
     resourcePool()->addResource(layout);
 
     ASSERT_EQ(permissions(layout), Qn::FullLayoutPermissions);
@@ -327,7 +327,7 @@ TEST_F(ResourceAccessManagerTest, checkSharedLayoutAsViewer)
     loginAs(kLiveViewersGroupId);
 
     const auto layout = createLayout(Qn::remote);
-    layout->setParentId(QnUuid());
+    layout->setParentId(nx::Uuid());
     resourcePool()->addResource(layout);
 
     ASSERT_TRUE(layout->isShared());
@@ -340,7 +340,7 @@ TEST_F(ResourceAccessManagerTest, checkSharedLayoutAsPowerUser)
     loginAs(kPowerUsersGroupId);
 
     const auto layout = createLayout(Qn::remote);
-    layout->setParentId(QnUuid());
+    layout->setParentId(nx::Uuid());
     resourcePool()->addResource(layout);
 
     // PowerUser has full access to shared layouts.
@@ -548,7 +548,7 @@ TEST_F(ResourceAccessManagerTest, canPushMyScreenOnExistingLayout)
     ec2::fromResourceToApi(layout, layoutData);
 
     nx::vms::api::LayoutItemData item;
-    item.id = QnUuid::createUuid();
+    item.id = nx::Uuid::createUuid();
     item.resourceId = ownScreen->getId();
     layoutData.items.push_back(item);
 
@@ -587,7 +587,7 @@ TEST_F(ResourceAccessManagerTest, cannotPushMyScreenOnExistingLayoutNotOnVideowa
     ec2::fromResourceToApi(layout, layoutData);
 
     nx::vms::api::LayoutItemData item;
-    item.id = QnUuid::createUuid();
+    item.id = nx::Uuid::createUuid();
     item.resourceId = ownScreen->getId();
     layoutData.items.push_back(item);
 
@@ -626,7 +626,7 @@ TEST_F(ResourceAccessManagerTest, viewerCannotPushOwnScreenOnExistingLayout)
     ec2::fromResourceToApi(layout, layoutData);
 
     nx::vms::api::LayoutItemData item;
-    item.id = QnUuid::createUuid();
+    item.id = nx::Uuid::createUuid();
     item.resourceId = ownScreen->getId();
     layoutData.items.push_back(item);
 
@@ -671,7 +671,7 @@ TEST_F(ResourceAccessManagerTest, cannotPushOtherUsersScreenOnExistingLayout)
     ec2::fromResourceToApi(layout, layoutData);
 
     nx::vms::api::LayoutItemData item;
-    item.id = QnUuid::createUuid();
+    item.id = nx::Uuid::createUuid();
     item.resourceId = otherScreen->getId();
     layoutData.items.push_back(item);
 
@@ -714,13 +714,13 @@ TEST_F(ResourceAccessManagerTest, cannotPushScreenWithCamerasOnExistingLayout)
 
     {
         nx::vms::api::LayoutItemData item;
-        item.id = QnUuid::createUuid();
+        item.id = nx::Uuid::createUuid();
         item.resourceId = ownScreen->getId();
         layoutData.items.push_back(item);
     }
     {
         nx::vms::api::LayoutItemData item;
-        item.id = QnUuid::createUuid();
+        item.id = nx::Uuid::createUuid();
         item.resourceId = camera->getId();
         layoutData.items.push_back(item);
     }
@@ -742,7 +742,7 @@ TEST_F(ResourceAccessManagerTest, checkCameraAccessViaVideoWall)
     const auto itemId = addVideoWallItem(videoWall, layout1);
 
     QnVideoWallMatrix matrix;
-    matrix.uuid = QnUuid::createUuid();
+    matrix.uuid = nx::Uuid::createUuid();
     const auto layout2 = addLayout();
     addToLayout(layout2, camera2);
     layout2->setParentId(videoWall->getId());
@@ -1014,8 +1014,8 @@ TEST_F(ResourceAccessManagerTest, checkParentGroupsValidity)
     const auto predefinedId = kViewersGroupId;
     const auto customId = createUserGroup("Advanced viewer group", kAdvancedViewersGroupId).id;
 
-    const auto zeroId = QnUuid{};
-    const auto unknownId = QnUuid::createUuid();
+    const auto zeroId = nx::Uuid{};
+    const auto unknownId = nx::Uuid::createUuid();
 
     ASSERT_TRUE(resourceAccessManager()->canCreateUser(m_currentUser, GlobalPermission::none,
         {predefinedId, customId}));
@@ -1098,7 +1098,7 @@ TEST_F(ResourceAccessManagerTest, checkAccessToLdapGroups)
 {
     loginAsAdministrator();
 
-    nx::vms::api::UserGroupData ldapGroup(QnUuid::createUuid(),
+    nx::vms::api::UserGroupData ldapGroup(nx::Uuid::createUuid(),
         "group name",
         GlobalPermission::none,
         {kPowerUsersGroupId});
@@ -1455,7 +1455,7 @@ TEST_F(ResourceAccessManagerTest, checkShareLayoutToRole)
     layout->addItem(item);
 
     // Share layout to `role`
-    layout->setParentId(QnUuid());
+    layout->setParentId(nx::Uuid());
 
     // Make sure user got permissions
     ASSERT_TRUE(hasPermissions(user, target, Qn::ReadPermission));
@@ -1485,7 +1485,7 @@ TEST_F(ResourceAccessManagerTest, checkShareLayoutToParentRole)
     layout->addItem(item);
 
     // Share layout to `parentGroup`
-    layout->setParentId(QnUuid());
+    layout->setParentId(nx::Uuid());
 
     // Make sure user got permissions
     ASSERT_TRUE(hasPermissions(user, target, Qn::ReadPermission));

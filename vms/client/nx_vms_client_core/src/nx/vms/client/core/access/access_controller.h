@@ -47,7 +47,7 @@ public:
     Qn::Permissions permissions(const UserGroupData& targetUserGroup) const;
     bool hasPermissions(const QnResourcePtr& targetResource, Qn::Permissions desired) const;
     bool hasPermissions(const UserGroupData& targetUserGroup, Qn::Permissions desired) const;
-    bool hasPermissions(const QnUuid& subjectId, Qn::Permissions desired) const;
+    bool hasPermissions(const nx::Uuid& subjectId, Qn::Permissions desired) const;
     bool hasAnyPermission(const QnResourcePtr& targetResource, Qn::Permissions desired) const;
 
     /** Get current user's global permissions. */

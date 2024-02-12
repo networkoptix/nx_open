@@ -21,7 +21,7 @@ NX_REFLECTION_INSTRUMENT(LocalConnectionData, (systemName)(urls))
 
 struct NX_VMS_CLIENT_CORE_API WeightData
 {
-    QnUuid localId;
+    nx::Uuid localId;
     qreal weight;
     qint64 lastConnectedUtcMs;
     bool realConnection; //< Shows if it was real connection or just record for new system.

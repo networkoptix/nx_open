@@ -88,7 +88,7 @@ protected:
 private:
     class DataIndex;
 
-    static QString getResourceNameById(const QnUuid &id);
+    static QString getResourceNameById(const nx::Uuid &id);
     QString htmlData(const Column& column,const QnAuditRecord* data, int row, bool hovered) const;
     QString formatDateTime(int timestampSecs, bool showDate = true, bool showTime = true) const;
     static QString formatDateTime(const QDateTime& dateTime, bool showDate = true, bool showTime = true);
@@ -97,8 +97,8 @@ private:
     QVariant colorForType(Qn::AuditRecordType actionType) const;
     QString textData(const Column& column,const QnAuditRecord* action) const;
     bool skipDate(const QnAuditRecord *record, int row) const;
-    static QString getResourcesString(const std::vector<QnUuid>& resources);
-    static QnVirtualCameraResourceList getCameras(const std::vector<QnUuid>& resources);
+    static QString getResourcesString(const std::vector<nx::Uuid>& resources);
+    static QnVirtualCameraResourceList getCameras(const std::vector<nx::Uuid>& resources);
     bool matches(const Column& column, const QnAuditRecord* data, const QString& keyword) const;
     QString descriptionTooltip(const QnAuditRecord *record) const;
     bool isDetailDataSupported(const QnAuditRecord *record) const;

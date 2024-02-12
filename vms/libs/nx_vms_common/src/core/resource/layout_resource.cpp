@@ -35,7 +35,7 @@ void QnLayoutResource::setItems(const LayoutItemDataList& items)
     {
         // Workaround against corrupted layouts in the database
         if (item.uuid.isNull())
-            item.uuid = QnUuid::createUuid();
+            item.uuid = nx::Uuid::createUuid();
         map[item.uuid] = item;
     }
     setItems(map);
@@ -71,7 +71,7 @@ void QnLayoutResource::setUrl(const QString& value)
     }
 }
 
-LayoutItemData QnLayoutResource::getItem(const QnUuid &itemUuid) const
+LayoutItemData QnLayoutResource::getItem(const nx::Uuid &itemUuid) const
 {
     return m_items->getItem(itemUuid);
 }
@@ -162,7 +162,7 @@ void QnLayoutResource::removeItem(const LayoutItemData &item)
     m_items->removeItem(item);
 }
 
-void QnLayoutResource::removeItem(const QnUuid &itemUuid)
+void QnLayoutResource::removeItem(const nx::Uuid &itemUuid)
 {
     m_items->removeItem(itemUuid);
 }

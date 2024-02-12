@@ -15,7 +15,7 @@ class TimeSyncManager: public nx::vms::time::TimeSyncManager
     Q_OBJECT
     using base_type = nx::vms::time::TimeSyncManager;
 public:
-    TimeSyncManager(SystemContext* systemContext, const QnUuid& serverId);
+    TimeSyncManager(SystemContext* systemContext, const nx::Uuid& serverId);
     virtual ~TimeSyncManager() override;
 
     virtual void resync() override;
@@ -25,7 +25,7 @@ protected:
 
 private:
     nx::utils::ElapsedTimer m_lastSyncTimeInterval;
-    QnUuid m_serverId;
+    nx::Uuid m_serverId;
 };
 
 } // namespace nx::vms::client::core

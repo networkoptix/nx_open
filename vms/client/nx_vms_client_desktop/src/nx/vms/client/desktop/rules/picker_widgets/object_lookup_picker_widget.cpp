@@ -123,7 +123,7 @@ ObjectLookupPicker::ObjectLookupPicker(SystemContext* context, ParamsWidget* par
         this,
         [this](int index)
         {
-            theField()->setValue(m_lookupListComboBox->itemData(index).value<QnUuid>().toString());
+            theField()->setValue(m_lookupListComboBox->itemData(index).value<nx::Uuid>().toString());
         });
 
     connect(
@@ -148,7 +148,7 @@ void ObjectLookupPicker::updateUi()
 
     if (theField()->checkType() == LookupCheckType::hasAttributes)
     {
-        if (QnUuid::isUuidString(theField()->value()))
+        if (nx::Uuid::isUuidString(theField()->value()))
             theField()->setValue({});
 
         m_stackedWidget->setCurrentIndex(0);
@@ -156,7 +156,7 @@ void ObjectLookupPicker::updateUi()
     }
     else
     {
-        if (!QnUuid::isUuidString(theField()->value()))
+        if (!nx::Uuid::isUuidString(theField()->value()))
             theField()->setValue({});
 
         if (m_fieldDescriptor->linkedFields.contains(vms::rules::utils::kObjectTypeIdFieldName))
@@ -173,7 +173,7 @@ void ObjectLookupPicker::updateUi()
         const auto matches = m_lookupListComboBox->model()->match(
             m_lookupListComboBox->model()->index(0, 0),
             LookupListsModel::LookupListIdRole,
-            QVariant::fromValue(QnUuid{theField()->value()}),
+            QVariant::fromValue(nx::Uuid{theField()->value()}),
             /*hits*/ 1,
             Qt::MatchExactly);
 

@@ -133,7 +133,7 @@ std::map<QString, LicenseSummaryDataEx> IntegrationServiceUsageHelper::allInfo()
 }
 
 void IntegrationServiceUsageHelper::proposeChange(
-    const QnUuid& resourceId, const QSet<QnUuid>& integrations)
+    const nx::Uuid& resourceId, const QSet<nx::Uuid>& integrations)
 {
     std::vector<Propose> data;
     data.push_back(Propose{resourceId, integrations});
@@ -191,12 +191,12 @@ bool IntegrationServiceUsageHelper::isOverflow() const
     return false;
 }
 
-std::map<QnUuid, std::set<QString>> IntegrationServiceUsageHelper::camerasByService() const
+std::map<nx::Uuid, std::set<QString>> IntegrationServiceUsageHelper::camerasByService() const
 {
-    std::map<QnUuid, std::set<QString>> result;
+    std::map<nx::Uuid, std::set<QString>> result;
 
     // Update integration info
-    QMap<QString, QnUuid> serviceByIntegration;
+    QMap<QString, nx::Uuid> serviceByIntegration;
     for (const auto& [serviceId, integration]: m_context->saasServiceManager()->analyticsIntegrations())
         serviceByIntegration[integration.integrationId] = serviceId;
 
@@ -287,14 +287,14 @@ void CloudStorageServiceUsageHelper::countCameraAsUsedUnsafe(
     const QnVirtualCameraResourcePtr& camera) const
 {
     const int megapixels = getMegapixels(camera);
-    ServiceInfo key{megapixels, QnUuid()};
+    ServiceInfo key{megapixels, nx::Uuid()};
     auto it = m_cache->lower_bound(key);
     if (it == m_cache->end())
         it = m_cache->emplace(key, LicenseSummaryData()).first;
     ++it->second.inUse;
 }
 
-void CloudStorageServiceUsageHelper::setUsedDevices(const QSet<QnUuid>& devices)
+void CloudStorageServiceUsageHelper::setUsedDevices(const QSet<nx::Uuid>& devices)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
 
@@ -313,8 +313,8 @@ void CloudStorageServiceUsageHelper::setUsedDevices(const QSet<QnUuid>& devices)
 }
 
 void CloudStorageServiceUsageHelper::proposeChange(
-    const std::set<QnUuid>& devicesToAdd,
-    const std::set<QnUuid>& devicesToRemove)
+    const std::set<nx::Uuid>& devicesToAdd,
+    const std::set<nx::Uuid>& devicesToRemove)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
 
@@ -325,7 +325,7 @@ void CloudStorageServiceUsageHelper::proposeChange(
         /*server*/ QnResourcePtr(),
         /*ignoreDesktopCameras*/ true);
 
-    std::map<QnUuid, QnVirtualCameraResourcePtr> backupEnabledCamerasById;
+    std::map<nx::Uuid, QnVirtualCameraResourcePtr> backupEnabledCamerasById;
     for (const auto& camera: cameras)
     {
         if (camera->isBackupEnabled())
@@ -422,23 +422,23 @@ LicenseSummaryData CloudStorageServiceUsageHelper::allInfoForResolution(int mega
     return result;
 }
 
-std::map<QnUuid, LicenseSummaryData> CloudStorageServiceUsageHelper::allInfoByService() const
+std::map<nx::Uuid, LicenseSummaryData> CloudStorageServiceUsageHelper::allInfoByService() const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     if (!m_cache)
         updateCacheUnsafe();
-    std::map<QnUuid, LicenseSummaryData> result;
+    std::map<nx::Uuid, LicenseSummaryData> result;
     for (const auto& [key, value]: *m_cache)
         result.emplace(key.serviceId, value);
     return result;
 }
 
-std::map<QString, QnUuid> CloudStorageServiceUsageHelper::servicesByCameras() const
+std::map<QString, nx::Uuid> CloudStorageServiceUsageHelper::servicesByCameras() const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
 
-    std::map<QString, QnUuid> result;
-    using Data = std::pair<QnUuid, int>; //< ServiceId and channels.
+    std::map<QString, nx::Uuid> result;
+    using Data = std::pair<nx::Uuid, int>; //< ServiceId and channels.
     const auto saasData = m_context->saasServiceManager()->data();
     std::multimap<int, Data> availableChannels;
     if (saasData.state == SaasState::active)
@@ -463,7 +463,7 @@ std::map<QString, QnUuid> CloudStorageServiceUsageHelper::servicesByCameras() co
         auto it = availableChannels.lower_bound(megapixels);
         if (it == availableChannels.end())
         {
-            result.emplace(camera->getPhysicalId(), QnUuid()); //< No service available.
+            result.emplace(camera->getPhysicalId(), nx::Uuid()); //< No service available.
             continue;
         }
 
@@ -496,12 +496,12 @@ LocalRecordingUsageHelper::LocalRecordingUsageHelper(
 {
 }
 
-std::map<QnUuid, std::set<QString>> LocalRecordingUsageHelper::camerasByService() const
+std::map<nx::Uuid, std::set<QString>> LocalRecordingUsageHelper::camerasByService() const
 {
-    std::map<QnUuid, std::set<QString>> result;
+    std::map<nx::Uuid, std::set<QString>> result;
 
     // Update integration info
-    std::map<QnUuid, int> channelsByService;
+    std::map<nx::Uuid, int> channelsByService;
     for (const auto& [serviceId, params]: m_context->saasServiceManager()->localRecording())
     {
         if (params.totalChannelNumber > 0)
@@ -512,7 +512,7 @@ std::map<QnUuid, std::set<QString>> LocalRecordingUsageHelper::camerasByService(
     {
         if (!camera->isScheduleEnabled())
             continue;
-        QnUuid serviceId;
+        nx::Uuid serviceId;
         if (!channelsByService.empty())
         {
             const auto it = channelsByService.begin();

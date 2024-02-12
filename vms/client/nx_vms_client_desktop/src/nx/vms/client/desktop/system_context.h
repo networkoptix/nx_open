@@ -58,7 +58,7 @@ public:
      */
     SystemContext(
         Mode mode,
-        QnUuid peerId,
+        nx::Uuid peerId,
         nx::core::access::Mode resourceAccessMode = nx::core::access::Mode::cached,
         QObject* parent = nullptr);
     virtual ~SystemContext() override;
@@ -96,7 +96,7 @@ public:
     QnMediaServerStatisticsManager* mediaServerStatisticsManager() const;
     SystemSpecificLocalSettings* localSettings() const;
     RestApiHelper* restApiHelper() const;
-    QnUuid localSystemId() const;
+    nx::Uuid localSystemId() const;
     Q_INVOKABLE nx::vms::client::desktop::analytics::TaxonomyManager* taxonomyManager() const;
     OtherServersManager* otherServersManager() const;
     virtual nx::vms::common::SessionTokenHelperPtr getSessionTokenHelper() const override;

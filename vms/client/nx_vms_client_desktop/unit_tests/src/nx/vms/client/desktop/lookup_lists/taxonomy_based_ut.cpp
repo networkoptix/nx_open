@@ -13,10 +13,10 @@ using namespace nx::vms::client::desktop::analytics::taxonomy;
 namespace nx::vms::client::desktop {
 
 
-static std::map<QString, std::set<QnUuid>> toDescriptorAttributeSupportInfo(
+static std::map<QString, std::set<nx::Uuid>> toDescriptorAttributeSupportInfo(
     const InputData::AttributeSupportInfo& inputDataAttributeSupportInfo)
 {
-    std::map<QString, std::set<QnUuid>> result;
+    std::map<QString, std::set<nx::Uuid>> result;
     for (const auto& [attributeName, supportInfoByEngineAndDevice]: inputDataAttributeSupportInfo)
     {
         for (const auto& [engineId, deviceIds]: supportInfoByEngineAndDevice)

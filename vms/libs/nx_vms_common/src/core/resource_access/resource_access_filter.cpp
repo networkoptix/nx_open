@@ -107,12 +107,12 @@ QnResourceList QnResourceAccessFilter::filteredResources(Filter filter, const Qn
     return QnResourceList();
 }
 
-QSet<QnUuid> QnResourceAccessFilter::filteredResources(
+QSet<nx::Uuid> QnResourceAccessFilter::filteredResources(
     QnResourcePool* resPool,
     Filter filter,
-    const QSet<QnUuid>& source)
+    const QSet<nx::Uuid>& source)
 {
-    QSet<QnUuid> result;
+    QSet<nx::Uuid> result;
     for (const auto& resource : filteredResources(filter, resPool->getResourcesByIds(source)))
         result << resource->getId();
     return result;

@@ -170,9 +170,9 @@ public:
 
     QnScrollableTextItemsWidget* bookmarksContainer();
 
-    void hideTextOverlay(const QnUuid& id);
+    void hideTextOverlay(const nx::Uuid& id);
     void showTextOverlay(
-        const QnUuid& id,
+        const nx::Uuid& id,
         const QString& text,
         const QnHtmlTextItemOptions& options);
 
@@ -372,7 +372,7 @@ private slots:
     void at_videoLayoutChanged();
 
 private:
-    void handleItemDataChanged(const QnUuid& id, Qn::ItemDataRole role, const QVariant& data);
+    void handleItemDataChanged(const nx::Uuid& id, Qn::ItemDataRole role, const QVariant& data);
     void handleDewarpingParamsChanged();
 
     void setDisplay(const QnResourceDisplayPtr& display);
@@ -407,7 +407,7 @@ private:
     void setupHud();
 
     void setTextOverlayParameters(
-        const QnUuid& id,
+        const nx::Uuid& id,
         bool visible,
         const QString& text,
         const QnHtmlTextItemOptions& options);
@@ -421,7 +421,7 @@ private:
 private:
     struct SoftwareTriggerInfo
     {
-        QnUuid ruleId;
+        nx::Uuid ruleId;
         QString name;
         QString icon;
         bool enabled = false;
@@ -504,7 +504,7 @@ private:
     AreaType m_areaSelectionType{AreaType::none};
     QRectF m_analyticsFilterRect;
 
-    QnUuid m_itemId;
+    nx::Uuid m_itemId;
 
     QAction* const m_toggleImageEnhancementAction;
     std::unique_ptr<nx::vms::client::desktop::CameraButtonManager> m_buttonManager;

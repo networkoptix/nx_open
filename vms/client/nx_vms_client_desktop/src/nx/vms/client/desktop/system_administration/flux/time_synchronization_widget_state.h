@@ -29,10 +29,10 @@ struct TimeSynchronizationWidgetState: AbstractFluxState
     bool readOnly = false;
 
     bool enabled = true;
-    QnUuid primaryServer;
+    nx::Uuid primaryServer;
 
     // Previous selected time server.
-    QnUuid lastPrimaryServer;
+    nx::Uuid lastPrimaryServer;
 
     milliseconds baseTime = 0ms;
     milliseconds elapsedTime = 0ms;
@@ -42,7 +42,7 @@ struct TimeSynchronizationWidgetState: AbstractFluxState
 
     struct ServerInfo
     {
-        QnUuid id;
+        nx::Uuid id;
         QString name;
         QString ipAddress;
         bool online = true;

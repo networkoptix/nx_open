@@ -47,7 +47,7 @@ struct CameraHotspotsOverlayWidget::Private
     QnWorkbenchContext* workbenchContext() const;
 
     QnVirtualCameraResourcePtr resourceWidgetCamera() const;
-    QnUuidSet resourceWidgetCameraHotspotsIds() const;
+    UuidSet resourceWidgetCameraHotspotsIds() const;
 
     void initHotspotItems();
     void updateHotspotItem(CameraHotspotItem* hotspotItem) const;
@@ -72,14 +72,14 @@ QnVirtualCameraResourcePtr CameraHotspotsOverlayWidget::Private::resourceWidgetC
     return parentMediaResourceWidget->resource().dynamicCast<QnVirtualCameraResource>();
 }
 
-QnUuidSet CameraHotspotsOverlayWidget::Private::resourceWidgetCameraHotspotsIds() const
+UuidSet CameraHotspotsOverlayWidget::Private::resourceWidgetCameraHotspotsIds() const
 {
     const auto camera = resourceWidgetCamera();
     if (!NX_ASSERT(camera))
         return {};
 
     const auto hotspots = camera->cameraHotspots();
-    QnUuidSet hospotsTargetsIds;
+    UuidSet hospotsTargetsIds;
     for (const auto& hotspot: hotspots)
         hospotsTargetsIds.insert(hotspot.targetResourceId);
 
@@ -241,7 +241,7 @@ CameraHotspotsOverlayWidget::CameraHotspotsOverlayWidget(QnMediaResourceWidget* 
         [this](const QnResourceList& resources)
         {
             const auto resourcesIds = resources.ids();
-            QnUuidSet resourcesIdsSet(resourcesIds.cbegin(), resourcesIds.cend());
+            UuidSet resourcesIdsSet(resourcesIds.cbegin(), resourcesIds.cend());
             if (resourcesIdsSet.intersects(d->resourceWidgetCameraHotspotsIds()))
                 d->initHotspotItems();
         };

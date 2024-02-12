@@ -70,7 +70,7 @@ BearerAuthToken::BearerAuthToken(const std::string_view& token)
     setBearerToken(token);
 }
 
-VideoWallAuthToken::VideoWallAuthToken(const QnUuid& videoWallId)
+VideoWallAuthToken::VideoWallAuthToken(const nx::Uuid& videoWallId)
 {
     setBearerToken(prefix + videoWallId.toStdString());
 }
@@ -580,7 +580,7 @@ std::string generateNonce(const std::string& eTag)
     const auto now = std::chrono::high_resolution_clock::now();
     return nx::utils::buildString(
         now.time_since_epoch().count(), ":",
-        eTag.empty() ? QnUuid::createUuid().toSimpleStdString() : eTag, ":",
+        eTag.empty() ? nx::Uuid::createUuid().toSimpleStdString() : eTag, ":",
         nx::utils::random::generateName(
             nx::utils::random::CryptographicDevice::instance(),
             secretDataLength));

@@ -29,7 +29,7 @@ public:
         entity_item_model::AbstractItemPtr sourceItem,
         Permissions permissions,
         ResourceTree::NodeType nodeType,
-        const std::optional<QnUuid>& itemUuid = std::optional<QnUuid>());
+        const std::optional<nx::Uuid>& itemUuid = std::optional<nx::Uuid>());
 
     virtual QVariant data(int role) const override;
     virtual Qt::ItemFlags flags() const override;
@@ -38,7 +38,7 @@ private:
     entity_item_model::AbstractItemPtr m_sourceItem;
     Permissions m_permissions;
     ResourceTree::NodeType m_nodeType;
-    std::optional<QnUuid> m_itemUuid;
+    std::optional<nx::Uuid> m_itemUuid;
 };
 
 } // namespace entity_resource_tree
