@@ -10,6 +10,8 @@
 #include <QtWidgets/QApplication>
 
 #include <nx/utils/string.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <ui/workaround/sharp_pixmap_painting.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/scoped_painter_rollback.h>
@@ -30,6 +32,7 @@ public:
      *  the center of the widget.
      */
     QPixmap iconPixmap;
+    QPixmap shadowIconPixmap;
 
     /** Cached contents of the item. */
     QPixmap pixmap;
@@ -142,6 +145,10 @@ void PlaybackPositionIconTextWidget::Private::updatePixmap()
     {
         auto offset = (height - iconSize.height()) / 2;
         painter.translate(0, offset);
+        // If it is a pause, then draw shadow, and do not draw otherwise
+        if (text.isEmpty())
+            painter.drawPixmap(0, 1, shadowIconPixmap); // Draw Shadow
+
         painter.drawPixmap(0, 0, iconPixmap);
         painter.translate(options.horSpacing + iconSize.width(), -offset);
     }
@@ -149,6 +156,20 @@ void PlaybackPositionIconTextWidget::Private::updatePixmap()
     if (!text.isEmpty())
     {
         painter.translate(0, options.vertPadding);
+
+        painter.setPen(Qt::SolidLine);
+        // Shadow
+        QTextDocument shadow;
+        painter.translate(0, 1);
+        shadow.setDefaultStyleSheet("body { font-weight: bold; color: #000; opacity: 25}");
+        shadow.setDefaultFont(kDefaultFont);
+        shadow.setDocumentMargin(0);
+        shadow.setIndentWidth(0);
+        shadow.setHtml("<body>" + td.toRawText() + "</body>");
+        shadow.drawContents(&painter);
+
+        // Main text
+        painter.translate(0, -1);
         td.drawContents(&painter);
     }
     q->setMinimumSize(baseSize);
@@ -197,6 +218,9 @@ void PlaybackPositionIconTextWidget::setIcon(const QPixmap& icon)
     // may lead to a lot of warnings reported which even may cause significant performance drop.
     if (d->iconPixmap.isNull() && icon.isNull())
         return;
+
+    d->shadowIconPixmap =
+        qnSkin->colorize(icon, nx::vms::client::core::colorTheme()->color("dark1", 60));
     d->iconPixmap = icon;
     d->updatePixmap();
 }
