@@ -582,7 +582,7 @@ void RightPanelModelsAdapter::addCameraToLayout()
         static bool multiChoiceListIsValid() { return false; }
     };
 
-    QnUuidSet chosenIds;
+    UuidSet chosenIds;
     if (!CameraSelectionDialog::selectCameras<Policy>(chosenIds, d->context()->mainWindowWidget()))
         return;
 
@@ -1344,7 +1344,7 @@ void RightPanelModelsAdapter::Private::updatePreviewProvider(int row)
     const bool precisePreview = !highlightRect.isEmpty()
         || index.data(Qn::ForcePrecisePreviewRole).toBool();
 
-    const auto objectTrackId = index.data(Qn::ObjectTrackIdRole).value<QnUuid>();
+    const auto objectTrackId = index.data(Qn::ObjectTrackIdRole).value<nx::Uuid>();
 
     nx::api::ResourceImageRequest request;
     request.resource = previewResource->toSharedPointer();
@@ -1737,7 +1737,7 @@ void RightPanelModelsAdapter::Private::ensureAnalyticsRowVisible(int row)
         return;
 
     const auto timestamp = index.data(Qn::TimestampRole).value<microseconds>();
-    const auto trackId = index.data(Qn::ObjectTrackIdRole).value<QnUuid>();
+    const auto trackId = index.data(Qn::ObjectTrackIdRole).value<nx::Uuid>();
     synchronizer->ensureVisible(duration_cast<milliseconds>(timestamp), trackId,
         m_analyticsSetup->model()->fetchedTimeWindow());
 }

@@ -17,7 +17,7 @@ namespace nx::vms::api {
 /**%apidoc User Group information object. */
 struct NX_VMS_API UserGroupModel
 {
-    QnUuid id;
+    nx::Uuid id;
 
     /**%apidoc
      * %example User Group 1
@@ -43,14 +43,14 @@ struct NX_VMS_API UserGroupModel
     GlobalPermissions permissions = GlobalPermission::none;
 
     /**%apidoc[opt] List of User Groups to inherit permissions. */
-    std::vector<QnUuid> parentGroupIds;
+    std::vector<nx::Uuid> parentGroupIds;
 
     /**%apidoc[opt]
      * Access rights per Resource (can be obtained from `/rest/v{3-}/devices`,
      * `/rest/v{3-}/servers`, etc.) or Resource Group (can be obtained from
      * `/rest/v{3-}/resourceGroups`).
      */
-    std::map<QnUuid, AccessRights> resourceAccessRights;
+    std::map<nx::Uuid, AccessRights> resourceAccessRights;
 
     /**%apidoc[readonly] */
     nx::vms::api::UserAttributes attributes{};
@@ -61,8 +61,8 @@ struct NX_VMS_API UserGroupModel
     using DbUpdateTypes = std::tuple<UserGroupData>;
     using DbListTypes = std::tuple<UserGroupDataList>;
 
-    QnUuid getId() const { return id; }
-    void setId(QnUuid id_) { id = std::move(id_); }
+    nx::Uuid getId() const { return id; }
+    void setId(nx::Uuid id_) { id = std::move(id_); }
 
     static_assert(isCreateModelV<UserGroupModel>);
     static_assert(isUpdateModelV<UserGroupModel>);

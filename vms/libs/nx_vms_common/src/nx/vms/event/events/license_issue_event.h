@@ -15,10 +15,10 @@ public:
         const QnResourcePtr& resource,
         qint64 timeStamp,
         EventReason reasonCode,
-        const QnUuidSet& disabledCameras);
+        const UuidSet& disabledCameras);
 
-    static QString encodeCameras(const QnUuidSet& cameras);
-    static QnUuidSet decodeCameras(const EventParameters& params);
+    static QString encodeCameras(const UuidSet& cameras);
+    static UuidSet decodeCameras(const EventParameters& params);
 };
 
 } // namespace nx::vms::event

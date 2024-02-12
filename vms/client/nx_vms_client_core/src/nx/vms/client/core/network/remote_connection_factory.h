@@ -42,7 +42,7 @@ public:
     using Process = RemoteConnectionProcess;
     using ProcessPtr = std::shared_ptr<Process>;
 
-    using AuditIdProvider = std::function<QnUuid()>;
+    using AuditIdProvider = std::function<nx::Uuid()>;
 
     struct CloudCredentialsProvider
     {

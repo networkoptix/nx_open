@@ -131,7 +131,7 @@ QMimeData* ResourceTreeDragDropDecoratorModel::mimeData(const QModelIndexList& i
     // if and only if they are dragged from tree (not from layouts).
     bool pureTreeResourcesOnly = true;
 
-    QSet<QnUuid> entities;
+    QSet<nx::Uuid> entities;
     QSet<QnResourcePtr> resources;
     ui::action::Parameters::ArgumentHash arguments;
 
@@ -185,7 +185,7 @@ QMimeData* ResourceTreeDragDropDecoratorModel::mimeData(const QModelIndexList& i
             }
             case NodeType::videoWallItem:
             case NodeType::showreel:
-                entities.insert(index.data(Qn::UuidRole).value<QnUuid>());
+                entities.insert(index.data(Qn::UuidRole).value<nx::Uuid>());
                 break;
 
             case NodeType::layoutItem:
@@ -286,7 +286,7 @@ bool ResourceTreeDragDropDecoratorModel::dropMimeData(const QMimeData* mimeData,
             videoWallItems.empty() ? Parameters(data.resources()) : Parameters(videoWallItems);
 
         parameters.setArgument(Qn::VideoWallItemGuidRole,
-            index.data(Qn::UuidRole).value<QnUuid>());
+            index.data(Qn::UuidRole).value<nx::Uuid>());
 
         actionManager()->trigger(DropOnVideoWallItemAction, parameters);
 

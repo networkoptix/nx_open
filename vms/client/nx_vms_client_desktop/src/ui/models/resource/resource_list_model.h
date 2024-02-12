@@ -42,8 +42,8 @@ public:
     void addResource(const QnResourcePtr &resource);
     void removeResource(const QnResourcePtr &resource);
 
-    QSet<QnUuid> checkedResources() const;
-    void setCheckedResources(const QSet<QnUuid>& ids);
+    QSet<nx::Uuid> checkedResources() const;
+    void setCheckedResources(const QSet<nx::Uuid>& ids);
 
     bool isReadOnly() const;
     void setReadOnly(bool readOnly);
@@ -96,7 +96,7 @@ private:
     bool m_singlePick = false;
     Options m_options;
     QnResourceList m_resources;
-    QSet<QnUuid> m_checkedResources;
+    QSet<nx::Uuid> m_checkedResources;
 
     QMap<int, ColumnDataAccessor> m_customAccessors;
 };

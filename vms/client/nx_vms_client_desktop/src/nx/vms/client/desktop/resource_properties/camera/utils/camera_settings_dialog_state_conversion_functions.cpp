@@ -410,7 +410,7 @@ void setAudioEnabled(bool value, const Cameras& cameras)
         if (!camera->isAudioForced())
             camera->setAudioEnabled(value);
         if (!value && !camera->audioInputDeviceId().isNull())
-            camera->setAudioInputDeviceId(QnUuid());
+            camera->setAudioInputDeviceId(nx::Uuid());
     }
 
     if (!skippedCameras.empty())
@@ -445,7 +445,7 @@ void setTwoWayAudioEnabled(bool value, const Cameras& cameras)
 
         camera->setTwoWayAudioEnabled(value);
         if (!value && !camera->audioOutputDeviceId().isNull())
-            camera->setAudioOutputDeviceId(QnUuid());
+            camera->setAudioOutputDeviceId(nx::Uuid());
     }
 
     if (!skippedCameras.empty())
@@ -462,13 +462,13 @@ void setTwoWayAudioEnabled(bool value, const Cameras& cameras)
     }
 }
 
-void setAudioInputDeviceId(const QnUuid& deviceId, const QnVirtualCameraResourcePtr& camera)
+void setAudioInputDeviceId(const nx::Uuid& deviceId, const QnVirtualCameraResourcePtr& camera)
 {
     if (camera->audioInputDeviceId() != deviceId)
         camera->setAudioInputDeviceId(deviceId);
 }
 
-void setAudioOutputDeviceId(const QnUuid& deviceId, const QnVirtualCameraResourcePtr& camera)
+void setAudioOutputDeviceId(const nx::Uuid& deviceId, const QnVirtualCameraResourcePtr& camera)
 {
     if (camera->audioOutputDeviceId() != deviceId)
         camera->setAudioOutputDeviceId(deviceId);

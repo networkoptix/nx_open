@@ -18,7 +18,7 @@ class ResourceHelper: public QObject, public SystemContextAware
     // Resource status should be int for correct interaction within QML code/enums.
     Q_PROPERTY(int resourceStatus READ resourceStatus NOTIFY resourceStatusChanged)
 
-    Q_PROPERTY(QnUuid resourceId READ resourceId WRITE setResourceId NOTIFY resourceIdChanged)
+    Q_PROPERTY(nx::Uuid resourceId READ resourceId WRITE setResourceId NOTIFY resourceIdChanged)
     Q_PROPERTY(QnResource* resource READ rawResource WRITE setRawResource NOTIFY resourceChanged)
     Q_PROPERTY(QString resourceName READ resourceName NOTIFY resourceNameChanged)
     Q_PROPERTY(bool hasDefaultCameraPassword READ hasDefaultCameraPassword
@@ -39,8 +39,8 @@ public:
     ResourceHelper(SystemContext* systemContext, QObject* parent = nullptr);
     ResourceHelper(); //< QML constructor.
 
-    QnUuid resourceId() const;
-    void setResourceId(const QnUuid& id);
+    nx::Uuid resourceId() const;
+    void setResourceId(const nx::Uuid& id);
 
     QnResourcePtr resource() const;
     void setResource(const QnResourcePtr& value);

@@ -14,7 +14,7 @@ class NX_VMS_RULES_API StorageIssueEvent: public BasicEvent
     Q_OBJECT
     Q_CLASSINFO("type", "nx.events.storageIssue")
 
-    FIELD(QnUuid, serverId, setServerId)
+    FIELD(nx::Uuid, serverId, setServerId)
     FIELD(nx::vms::api::EventReason, reason, setReason)
     FIELD(QString, reasonText, setReasonText)
 
@@ -22,7 +22,7 @@ public:
     StorageIssueEvent() = default;
     StorageIssueEvent(
         std::chrono::microseconds timestamp,
-        QnUuid serverId,
+        nx::Uuid serverId,
         nx::vms::api::EventReason reason,
         const QString& reasonText);
 

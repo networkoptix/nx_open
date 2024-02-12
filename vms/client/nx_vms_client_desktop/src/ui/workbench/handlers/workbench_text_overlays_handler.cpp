@@ -120,11 +120,11 @@ public:
 
     void showTextOverlays(
         const QnResourcePtr& resource,
-        QnUuid id,
+        nx::Uuid id,
         const QString& text,
         std::chrono::milliseconds timeout);
 
-    void hideTextOverlays(const QnResourcePtr& resource, const QnUuid& id);
+    void hideTextOverlays(const QnResourcePtr& resource, const nx::Uuid& id);
 
     void handleNewWidget(QnResourceWidget* widget);
 
@@ -137,19 +137,19 @@ private:
         QTimer* autohideTimer = nullptr;
     };
 
-    void hideImmediately(const QnResourcePtr& resource, const QnUuid& id);
+    void hideImmediately(const QnResourcePtr& resource, const nx::Uuid& id);
 
     void setupAutohideTimer(
         OverlayData& data,
         const QnResourcePtr& resource,
-        QnUuid id,
+        nx::Uuid id,
         std::chrono::milliseconds timeout);
 
-    OverlayData* findData(const QnResourcePtr& resource, const QnUuid& id);
-    void removeData(const QnResourcePtr& resource, const QnUuid& id);
+    OverlayData* findData(const QnResourcePtr& resource, const nx::Uuid& id);
+    void removeData(const QnResourcePtr& resource, const nx::Uuid& id);
 
 private:
-    using ResourceOverlays = QHash<QnUuid, OverlayData>;
+    using ResourceOverlays = QHash<nx::Uuid, OverlayData>;
     using AllOverlays = QHash<QnResourcePtr, ResourceOverlays>;
 
     AllOverlays m_overlays;
@@ -288,7 +288,7 @@ void QnWorkbenchTextOverlaysHandler::execute(const nx::vms::rules::ActionPtr& ac
 
 void QnWorkbenchTextOverlaysHandlerPrivate::showTextOverlays(
     const QnResourcePtr& resource,
-    QnUuid id,
+    nx::Uuid id,
     const QString& text,
     std::chrono::milliseconds timeout)
 {
@@ -309,7 +309,7 @@ void QnWorkbenchTextOverlaysHandlerPrivate::showTextOverlays(
 }
 
 void QnWorkbenchTextOverlaysHandlerPrivate::hideTextOverlays(
-    const QnResourcePtr& resource, const QnUuid& id)
+    const QnResourcePtr& resource, const nx::Uuid& id)
 {
     auto data = findData(resource, id);
     if (!data)
@@ -347,7 +347,7 @@ void QnWorkbenchTextOverlaysHandlerPrivate::handleNewWidget(QnResourceWidget* wi
 }
 
 void QnWorkbenchTextOverlaysHandlerPrivate::hideImmediately(
-    const QnResourcePtr& resource, const QnUuid& id)
+    const QnResourcePtr& resource, const nx::Uuid& id)
 {
     Q_Q(QnWorkbenchTextOverlaysHandler);
     for (auto widget: q->display()->widgets(resource))
@@ -362,7 +362,7 @@ void QnWorkbenchTextOverlaysHandlerPrivate::hideImmediately(
 void QnWorkbenchTextOverlaysHandlerPrivate::setupAutohideTimer(
     OverlayData& data,
     const QnResourcePtr& resource,
-    QnUuid id,
+    nx::Uuid id,
     std::chrono::milliseconds timeout)
 {
     Q_Q(QnWorkbenchTextOverlaysHandler);
@@ -385,7 +385,7 @@ void QnWorkbenchTextOverlaysHandlerPrivate::setupAutohideTimer(
 QnWorkbenchTextOverlaysHandlerPrivate::OverlayData*
     QnWorkbenchTextOverlaysHandlerPrivate::findData(
         const QnResourcePtr& resource,
-        const QnUuid& id)
+        const nx::Uuid& id)
 {
     auto resourceIter = m_overlays.find(resource);
     if (resourceIter == m_overlays.end())
@@ -401,7 +401,7 @@ QnWorkbenchTextOverlaysHandlerPrivate::OverlayData*
 }
 
 void QnWorkbenchTextOverlaysHandlerPrivate::removeData(
-    const QnResourcePtr& resource, const QnUuid& id)
+    const QnResourcePtr& resource, const nx::Uuid& id)
 {
     auto resourceIter = m_overlays.find(resource);
     if (resourceIter == m_overlays.end())

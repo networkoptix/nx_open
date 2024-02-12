@@ -46,12 +46,12 @@ void DetectableObjectTypeComboBox::setSelectedMainObjectTypeId(const QString& ob
         setCurrentIndex(index);
 }
 
-void DetectableObjectTypeComboBox::setDevices(const QnUuidSet& devices)
+void DetectableObjectTypeComboBox::setDevices(const UuidSet& devices)
 {
     if (auto objectTypeModel = dynamic_cast<DetectableObjectTypeModel*>(model()))
     {
         objectTypeModel->sourceModel()->setSelectedDevices(
-            std::set<QnUuid>{devices.begin(), devices.end()});
+            std::set<nx::Uuid>{devices.begin(), devices.end()});
     }
 }
 

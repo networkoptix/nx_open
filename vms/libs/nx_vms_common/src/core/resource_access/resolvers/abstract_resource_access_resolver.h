@@ -37,7 +37,7 @@ public:
      * Resolves possible "global" access to all media and/or all videowalls.
      * No access is returned for resources that aren't in the resource pool.
      */
-    virtual AccessRights accessRights(const QnUuid& subjectId,
+    virtual AccessRights accessRights(const nx::Uuid& subjectId,
         const QnResourcePtr& resource) const;
 
     /**
@@ -45,7 +45,7 @@ public:
      * the specified resource, directly and indirectly.
      */
     virtual ResourceAccessDetails accessDetails(
-        const QnUuid& subjectId,
+        const nx::Uuid& subjectId,
         const QnResourcePtr& resource,
         AccessRight accessRight) const = 0;
 
@@ -54,13 +54,13 @@ public:
      * Actual resource types, state and availability is not taken into account.
      * This is a primary overridable that resolves indirect resource access in derived classes.
      */
-    virtual ResourceAccessMap resourceAccessMap(const QnUuid& subjectId) const = 0;
+    virtual ResourceAccessMap resourceAccessMap(const nx::Uuid& subjectId) const = 0;
 
     /** Returns subject global permissions. */
-    virtual nx::vms::api::GlobalPermissions globalPermissions(const QnUuid& subjectId) const = 0;
+    virtual nx::vms::api::GlobalPermissions globalPermissions(const nx::Uuid& subjectId) const = 0;
 
     /** Returns whether the subject has admin access rights. */
-    bool hasFullAccessRights(const QnUuid& subjectId) const;
+    bool hasFullAccessRights(const nx::Uuid& subjectId) const;
 
     /** An interface to subscribe to access rights change signals. */
     class Notifier;
@@ -68,14 +68,14 @@ public:
 
 protected:
     /** Notification sink to be called when access rights of particular subjects are changed. */
-    void notifyAccessChanged(const QSet<QnUuid>& subjectIds);
+    void notifyAccessChanged(const QSet<nx::Uuid>& subjectIds);
 
     /** Notification sink to be called when access rights of all subjects are reset. */
     void notifyAccessReset();
 
     /** Log pretty formatting functions. */
-    static QString toLogString(const QnUuid& resourceId, QnResourcePool* resourcePool);
-    static QString affectedCacheToLogString(const QSet<QnUuid>& affectedSubjectIds);
+    static QString toLogString(const nx::Uuid& resourceId, QnResourcePool* resourcePool);
+    static QString affectedCacheToLogString(const QSet<nx::Uuid>& affectedSubjectIds);
 
 private:
     const std::unique_ptr<Notifier> m_notifier;
@@ -102,7 +102,7 @@ public:
      * Subscriptions are reference-counted, `subscribeSubjects` increases reference
      * counters associated with specified subject ids.
      */
-    void subscribeSubjects(const QSet<QnUuid>& subjectIds);
+    void subscribeSubjects(const QSet<nx::Uuid>& subjectIds);
 
     /**
      * Unsubscribe from notifications about specified subjects access rights changes.
@@ -110,20 +110,20 @@ public:
      * associated with specified subject ids; those subjects whose counters reach zero
      * are stopped being watched.
      */
-    void releaseSubjects(const QSet<QnUuid>& subjectIds);
+    void releaseSubjects(const QSet<nx::Uuid>& subjectIds);
 
     /** Returns which subjects access rights changes are watched and reported. */
-    QSet<QnUuid> watchedSubjectIds() const;
+    QSet<nx::Uuid> watchedSubjectIds() const;
 
 signals:
     /** Access rights of watched subjects have been changed. */
-    void resourceAccessChanged(const QSet<QnUuid>& subjectIds);
+    void resourceAccessChanged(const QSet<nx::Uuid>& subjectIds);
 
     /** All subjects access rights have been reset. */
     void resourceAccessReset();
 
-    void subjectsSubscribed(const QSet<QnUuid>& subjectIds);
-    void subjectsReleased(const QSet<QnUuid>& subjectIds);
+    void subjectsSubscribed(const QSet<nx::Uuid>& subjectIds);
+    void subjectsReleased(const QSet<nx::Uuid>& subjectIds);
 
 private:
     struct Private;

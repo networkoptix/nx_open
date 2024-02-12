@@ -23,18 +23,18 @@ public:
     // Querying access rights.
 
     /** Returns specified subject's own access rights map. */
-    virtual ResourceAccessMap ownResourceAccessMap(const QnUuid& subjectId) const override;
+    virtual ResourceAccessMap ownResourceAccessMap(const nx::Uuid& subjectId) const override;
 
     // Setting access rights.
 
     /** Reset all access rights. */
-    void resetAccessRights(const QHash<QnUuid /*subjectId*/, ResourceAccessMap>& accessRights);
+    void resetAccessRights(const QHash<nx::Uuid /*subjectId*/, ResourceAccessMap>& accessRights);
 
     /** Sets specified access rights for the specified subject. */
-    bool setOwnResourceAccessMap(const QnUuid& subjectId, const ResourceAccessMap& value);
+    bool setOwnResourceAccessMap(const nx::Uuid& subjectId, const ResourceAccessMap& value);
 
     /** Removes access rights information for specified subjects. */
-    bool removeSubjects(const QSet<QnUuid>& subjectIds);
+    bool removeSubjects(const QSet<nx::Uuid>& subjectIds);
 
     /** Clears all access rights for all subjects. */
     void clear();

@@ -67,7 +67,7 @@ void QnSelectUsersDialogButton::handleButtonClicked()
     else
     {
         dialog->setRoleValidator(
-            [this](const QnUuid& roleId)
+            [this](const nx::Uuid& roleId)
             {
                 return m_subjectValidation
                     ? m_subjectValidation->roleValidity(roleId)
@@ -109,7 +109,7 @@ void QnSelectUsersDialogButton::handleButtonClicked()
         return;
 
     if (dialog->allUsers())
-        setResources(QSet<QnUuid>({QnBusinessRuleViewModel::kAllUsersId}));
+        setResources(QSet<nx::Uuid>({QnBusinessRuleViewModel::kAllUsersId}));
     else
         setResources(dialog->checkedSubjects());
 

@@ -13,7 +13,7 @@ using Old = GlobalPermissionDeprecated;
 struct PermissionsV1
 {
     GlobalPermissionsDeprecated permissions = Old::none;
-    std::optional<std::vector<QnUuid>> accessibleResources;
+    std::optional<std::vector<nx::Uuid>> accessibleResources;
     bool isOwner = false;
     GlobalPermissions newPermissions{};
 };
@@ -21,7 +21,7 @@ NX_REFLECTION_INSTRUMENT(PermissionsV1, (permissions)(accessibleResources))
 
 TEST(Permissions, BackwardCompatibility)
 {
-    const auto resourceId = QnUuid::createUuid();
+    const auto resourceId = nx::Uuid::createUuid();
     const std::vector<PermissionsV1> deprecatedPermissions{
         {Old::customUser | Old::editCameras | Old::accessAllMedia, {}, false, {}},
         {Old::customUser | Old::editCameras, {{resourceId}}, false, {}},
@@ -38,14 +38,14 @@ TEST(Permissions, BackwardCompatibility)
         {Old::customUser | Old::controlVideowall, {}, false, {}},
         {Old::accessAllMedia, {}, false, {}},
     };
-    const auto userId = QnUuid::createUuid();
+    const auto userId = nx::Uuid::createUuid();
     for (const auto& origin: deprecatedPermissions)
     {
         GlobalPermissions permissions;
-        std::vector<QnUuid> groups;
-        std::map<QnUuid, AccessRights> resourceAccessRights;
+        std::vector<nx::Uuid> groups;
+        std::map<nx::Uuid, AccessRights> resourceAccessRights;
         std::tie(permissions, groups, resourceAccessRights) = migrateAccessRights(
-            origin.permissions, origin.accessibleResources.value_or(std::vector<QnUuid>{}));
+            origin.permissions, origin.accessibleResources.value_or(std::vector<nx::Uuid>{}));
         ASSERT_EQ(permissions, origin.newPermissions);
         PermissionsV1 convertedBack;
         std::tie(
@@ -68,10 +68,10 @@ TEST(Permissions, CasesNotPreservingBackwardCompatibility)
     for (const auto& origin: deprecatedPermissions)
     {
         GlobalPermissions permissions;
-        std::vector<QnUuid> groups;
-        std::map<QnUuid, AccessRights> resourceAccessRights;
+        std::vector<nx::Uuid> groups;
+        std::map<nx::Uuid, AccessRights> resourceAccessRights;
         std::tie(permissions, groups, resourceAccessRights) = migrateAccessRights(
-            origin.permissions, origin.accessibleResources.value_or(std::vector<QnUuid>{}));
+            origin.permissions, origin.accessibleResources.value_or(std::vector<nx::Uuid>{}));
         ASSERT_EQ(permissions, origin.newPermissions);
         PermissionsV1 convertedBack;
         std::tie(

@@ -11,7 +11,7 @@ namespace layout_id_helper {
 QnLayoutResourcePtr findLayoutByFlexibleId(
     const QnResourcePool* resourcePool, const QString& flexibleId)
 {
-    if (const QnUuid uuid = QnUuid::fromStringSafe(flexibleId); !uuid.isNull())
+    if (const nx::Uuid uuid = nx::Uuid::fromStringSafe(flexibleId); !uuid.isNull())
         return resourcePool->getResourceById<QnLayoutResource>(uuid);
 
     if (const int logicalId = flexibleId.toInt(); logicalId > 0)
@@ -24,10 +24,10 @@ QnLayoutResourcePtr findLayoutByFlexibleId(
     return QnLayoutResourcePtr();
 }
 
-QnUuid flexibleIdToId(const QnResourcePool* resourcePool, const QString& flexibleId)
+nx::Uuid flexibleIdToId(const QnResourcePool* resourcePool, const QString& flexibleId)
 {
     const auto layout = findLayoutByFlexibleId(resourcePool, flexibleId);
-    return layout ? layout->getId() : QnUuid();
+    return layout ? layout->getId() : nx::Uuid();
 }
 
 } // namespace layout_id_helper

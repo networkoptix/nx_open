@@ -25,7 +25,7 @@ QVariantMap StorageIssueEvent::details(common::SystemContext* context) const
 
 StorageIssueEvent::StorageIssueEvent(
     std::chrono::microseconds timestamp,
-    QnUuid serverId,
+    nx::Uuid serverId,
     nx::vms::api::EventReason reason,
     const QString& reasonText)
     :

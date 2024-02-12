@@ -105,7 +105,7 @@ struct StartupActionsHandler::Private
     struct
     {
         QByteArray raw;
-        QList<QnUuid> resourceIds;
+        QList<nx::Uuid> resourceIds;
         qint64 timeStampMs = 0;
         QString layoutRef;
 
@@ -450,7 +450,7 @@ void StartupActionsHandler::handleAcsModeResources(
         windowStart = maxTime - kAcsModeTimelineWindowSize;
 
     LayoutResourcePtr layout(new LayoutResource());
-    layout->setIdUnsafe(QnUuid::createUuid());
+    layout->setIdUnsafe(nx::Uuid::createUuid());
     layout->setCellSpacing(0);
     layout->addFlags(Qn::local);
     if (const auto user = context()->user())

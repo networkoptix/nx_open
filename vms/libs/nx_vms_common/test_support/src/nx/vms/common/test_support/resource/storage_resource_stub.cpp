@@ -7,7 +7,7 @@ namespace nx {
 StorageResourceStub::StorageResourceStub():
     base_type()
 {
-    setIdUnsafe(QnUuid::createUuid());
+    setIdUnsafe(nx::Uuid::createUuid());
 }
 
 StorageResourceStub::~StorageResourceStub()

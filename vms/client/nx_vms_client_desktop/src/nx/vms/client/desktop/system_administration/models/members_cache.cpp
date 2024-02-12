@@ -17,16 +17,16 @@ namespace {
 
 class ComparableId: public ComparableMember<ComparableId>
 {
-    const QnUuid& infoId;
+    const nx::Uuid& infoId;
     const MembersCache::Info& info;
 
 public:
-    ComparableId(const QnUuid& infoId, const MembersCache::Info& info):
+    ComparableId(const nx::Uuid& infoId, const MembersCache::Info& info):
         infoId(infoId), info(info)
     {
     }
 
-    QnUuid id() const { return infoId; }
+    nx::Uuid id() const { return infoId; }
     bool isGroup() const { return info.isGroup; }
     nx::vms::api::UserType userType() const { return info.userType; }
     QString name() const { return info.name; }
@@ -42,14 +42,14 @@ MembersCache::~MembersCache()
 {
 }
 
-MembersCache::Info MembersCache::info(const QnUuid& id) const
+MembersCache::Info MembersCache::info(const nx::Uuid& id) const
 {
     return m_info.value(id);
 }
 
 MembersCache::Info MembersCache::infoFromContext(
     nx::vms::common::SystemContext* systemContext,
-    const QnUuid& id)
+    const nx::Uuid& id)
 {
     if (const auto group = systemContext->userGroupManager()->find(id))
     {
@@ -112,20 +112,20 @@ void MembersCache::loadInfo(nx::vms::common::SystemContext* systemContext)
     sortSubjects(members.users);
     sortSubjects(members.groups);
 
-    m_sortedCache.insert(QnUuid{}, members);
+    m_sortedCache.insert(nx::Uuid{}, members);
 
     updateStats(nx::utils::toQSet(members.groups), {});
 }
 
-std::function<bool(const QnUuid&, const QnUuid&)> MembersCache::lessFunc() const
+std::function<bool(const nx::Uuid&, const nx::Uuid&)> MembersCache::lessFunc() const
 {
-    return [info = m_info](const QnUuid& l, const QnUuid& r)
+    return [info = m_info](const nx::Uuid& l, const nx::Uuid& r)
         {
             return ComparableId(l, info.value(l)) < ComparableId(r, info.value(r));
         };
 }
 
-void MembersCache::sortSubjects(QList<QnUuid>& subjects) const
+void MembersCache::sortSubjects(QList<nx::Uuid>& subjects) const
 {
     if (!m_subjectContext)
         return;
@@ -133,7 +133,7 @@ void MembersCache::sortSubjects(QList<QnUuid>& subjects) const
     std::sort(subjects.begin(), subjects.end(), lessFunc());
 }
 
-MembersCache::Members MembersCache::sortedSubjects(const QSet<QnUuid>& subjectSet) const
+MembersCache::Members MembersCache::sortedSubjects(const QSet<nx::Uuid>& subjectSet) const
 {
     Members result;
 
@@ -146,7 +146,7 @@ MembersCache::Members MembersCache::sortedSubjects(const QSet<QnUuid>& subjectSe
     return result;
 }
 
-MembersCache::Members MembersCache::sorted(const QnUuid& groupId) const
+MembersCache::Members MembersCache::sorted(const nx::Uuid& groupId) const
 {
     const auto it = m_sortedCache.constFind(groupId);
     if (it != m_sortedCache.end())
@@ -159,22 +159,22 @@ MembersCache::Members MembersCache::sorted(const QnUuid& groupId) const
     return result;
 }
 
-int MembersCache::indexIn(const QList<QnUuid>& list, const QnUuid& id) const
+int MembersCache::indexIn(const QList<nx::Uuid>& list, const nx::Uuid& id) const
 {
     auto it = std::lower_bound(list.begin(), list.end(), id, lessFunc());
     return std::distance(list.begin(), it);
 }
 
 void MembersCache::modify(
-    const QSet<QnUuid>& added,
-    const QSet<QnUuid>& removed,
-    const QSet<QnUuid>& groupsWithChangedMembers,
-    const QSet<QnUuid>& subjectsWithChangedParents)
+    const QSet<nx::Uuid>& added,
+    const QSet<nx::Uuid>& removed,
+    const QSet<nx::Uuid>& groupsWithChangedMembers,
+    const QSet<nx::Uuid>& subjectsWithChangedParents)
 {
     const auto removeFrom =
-        [this](const QnUuid& groupId, const QnUuid& id, const Info& idInfo)
+        [this](const nx::Uuid& groupId, const nx::Uuid& id, const Info& idInfo)
         {
-            QList<QnUuid>& idList = idInfo.isGroup
+            QList<nx::Uuid>& idList = idInfo.isGroup
                 ? m_sortedCache[groupId].groups
                 : m_sortedCache[groupId].users;
 
@@ -191,9 +191,9 @@ void MembersCache::modify(
         };
 
     const auto addTo =
-        [this](const QnUuid& groupId, const QnUuid& id, const Info& idInfo)
+        [this](const nx::Uuid& groupId, const nx::Uuid& id, const Info& idInfo)
         {
-            QList<QnUuid>& idList = idInfo.isGroup
+            QList<nx::Uuid>& idList = idInfo.isGroup
                 ? m_sortedCache[groupId].groups
                 : m_sortedCache[groupId].users;
 
@@ -257,7 +257,7 @@ void MembersCache::modify(
     updateStats(added, removed);
 }
 
-void MembersCache::addTmpUser(const QnUuid& groupId, const QnUuid& userId)
+void MembersCache::addTmpUser(const nx::Uuid& groupId, const nx::Uuid& userId)
 {
     if (groupId.isNull())
     {
@@ -269,7 +269,7 @@ void MembersCache::addTmpUser(const QnUuid& groupId, const QnUuid& userId)
     m_tmpUsersInGroup[groupId] = count;
 }
 
-void MembersCache::removeTmpUser(const QnUuid& groupId, const QnUuid& userId)
+void MembersCache::removeTmpUser(const nx::Uuid& groupId, const nx::Uuid& userId)
 {
     if (groupId.isNull())
     {
@@ -301,12 +301,12 @@ QList<int> MembersCache::temporaryUserIndexes() const
     return result;
 }
 
-void MembersCache::updateStats(const QSet<QnUuid>& added, const QSet<QnUuid>& removed)
+void MembersCache::updateStats(const QSet<nx::Uuid>& added, const QSet<nx::Uuid>& removed)
 {
     bool statsModified = false;
 
     const auto countGroups =
-        [this, &statsModified](const QnUuid& id, int diff)
+        [this, &statsModified](const nx::Uuid& id, int diff)
         {
             const auto group = m_subjectContext->systemContext()->userGroupManager()->find(id);
             if (!group || group->attributes.testFlag(nx::vms::api::UserAttribute::readonly))

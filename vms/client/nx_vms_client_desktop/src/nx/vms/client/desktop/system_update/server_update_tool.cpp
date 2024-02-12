@@ -121,7 +121,7 @@ ServerUpdateTool::~ServerUpdateTool()
     NX_VERBOSE(this) << "~ServerUpdateTool() done";
 }
 
-void ServerUpdateTool::onConnectToSystem(QnUuid systemId)
+void ServerUpdateTool::onConnectToSystem(nx::Uuid systemId)
 {
     m_systemId = systemId;
     if (!branding::customReleaseListUrl().isEmpty())
@@ -470,7 +470,7 @@ void ServerUpdateTool::startManualDownloads(const UpdateContents& contents)
     m_manualPackages = contents.manualPackages;
 
     bool havePersistentServerWithoutInternet = false;
-    for (const QnUuid& serverId: m_persistentStorageServers)
+    for (const nx::Uuid& serverId: m_persistentStorageServers)
     {
         if (const auto server = resourcePool()->getResourceById<QnMediaServerResource>(serverId))
         {
@@ -550,9 +550,9 @@ bool ServerUpdateTool::hasManualDownloads() const
     return !m_issuedDownloads.empty();
 }
 
-QSet<QnUuid> ServerUpdateTool::getTargetsForPackage(const update::Package& package) const
+QSet<nx::Uuid> ServerUpdateTool::getTargetsForPackage(const update::Package& package) const
 {
-    QSet<QnUuid> result = m_packageProperties[package.file].targets;
+    QSet<nx::Uuid> result = m_packageProperties[package.file].targets;
     if (package.component == update::Component::client)
         result.unite(m_persistentStorageServers);
     return result;
@@ -592,7 +592,7 @@ int ServerUpdateTool::uploadPackageToRecipients(
     return toUpload;
 }
 
-bool ServerUpdateTool::uploadPackageToServer(const QnUuid& serverId,
+bool ServerUpdateTool::uploadPackageToServer(const nx::Uuid& serverId,
     const nx::vms::update::Package& package, QDir storageDir)
 {
     NX_VERBOSE(this, "%1(%2): Starting...", __func__, package.file);
@@ -642,7 +642,7 @@ bool ServerUpdateTool::uploadPackageToServer(const QnUuid& serverId,
     return false;
 }
 
-void ServerUpdateTool::atUploadWorkerState(QnUuid serverId, const UploadState& state)
+void ServerUpdateTool::atUploadWorkerState(nx::Uuid serverId, const UploadState& state)
 {
     if (!m_uploadStateById.count(state.id))
     {
@@ -687,7 +687,7 @@ void ServerUpdateTool::markUploadCompleted(const QString& uploadId)
         changeUploadState(OfflineUpdateState::done);
 }
 
-bool ServerUpdateTool::hasActiveUploadsTo(const QnUuid& id) const
+bool ServerUpdateTool::hasActiveUploadsTo(const nx::Uuid& id) const
 {
     return std::any_of(m_uploadStateById.begin(), m_uploadStateById.end(),
         [id](const std::pair<QString, nx::vms::client::desktop::UploadState>& pair)
@@ -754,7 +754,7 @@ void ServerUpdateTool::stopAllUploads()
     changeUploadState(OfflineUpdateState::ready);
 }
 
-void ServerUpdateTool::startUploadsToServer(const UpdateContents& contents, const QnUuid &peer)
+void ServerUpdateTool::startUploadsToServer(const UpdateContents& contents, const nx::Uuid &peer)
 {
     bool started = false;
 
@@ -772,7 +772,7 @@ void ServerUpdateTool::startUploadsToServer(const UpdateContents& contents, cons
         NX_VERBOSE(this, "startUploadsToServer(%1) - not uploading anything", peer);
 }
 
-void ServerUpdateTool::stopUploadsToServer(const QnUuid &peer)
+void ServerUpdateTool::stopUploadsToServer(const nx::Uuid &peer)
 {
     QStringList idsToRemove;
     for (const auto& record: m_uploadStateById)
@@ -801,13 +801,13 @@ bool ServerUpdateTool::verifyUpdateManifest(
     bool checkClient) const
 {
     NX_ASSERT(m_stateTracker);
-    std::map<QnUuid, QnMediaServerResourcePtr> activeServers = m_stateTracker->activeServers();
+    std::map<nx::Uuid, QnMediaServerResourcePtr> activeServers = m_stateTracker->activeServers();
 
     ClientVerificationData clientData;
     clientData.fillDefault();
     clientData.clientId = checkClient
         ? m_stateTracker->getClientPeerId(systemContext())
-        : QnUuid();
+        : nx::Uuid();
     clientData.installedVersions = clientVersions;
     VerificationOptions options;
     options.systemContext = systemContext();
@@ -1028,11 +1028,11 @@ bool ServerUpdateTool::requestFinishUpdate(bool skipActivePeers)
 
 bool ServerUpdateTool::requestStartUpdate(
     const nx::vms::common::update::Information& info,
-    const QSet<QnUuid>& targets)
+    const QSet<nx::Uuid>& targets)
 {
     NX_VERBOSE(this, "%1(%2) - sending /ec2/startUpdate command", __func__, info.version);
 
-    QSet<QnUuid> servers;
+    QSet<nx::Uuid> servers;
     for (const auto& id: targets)
     {
         auto item = m_stateTracker->findItemById(id);
@@ -1088,10 +1088,10 @@ bool ServerUpdateTool::requestStartUpdate(
 }
 
 bool ServerUpdateTool::requestInstallAction(
-    const QSet<QnUuid>& targets)
+    const QSet<nx::Uuid>& targets)
 {
     // Filtering out only 'server' components.
-    QSet<QnUuid> servers;
+    QSet<nx::Uuid> servers;
     for (const auto& id: targets)
     {
         auto item = m_stateTracker->findItemById(id);
@@ -1346,7 +1346,7 @@ std::shared_ptr<PeerStateTracker> ServerUpdateTool::getStateTracker()
     return m_stateTracker;
 }
 
-QSet<QnUuid> ServerUpdateTool::getServersInstalling() const
+QSet<nx::Uuid> ServerUpdateTool::getServersInstalling() const
 {
     return m_serversAreInstalling;
 }

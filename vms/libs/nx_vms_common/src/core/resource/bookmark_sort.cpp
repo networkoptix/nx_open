@@ -25,7 +25,7 @@ struct BookmarkSort //< Just a context for translation functions.
 {
     Q_DECLARE_TR_FUNCTIONS(BookmarkSort)
 protected:
-    static QString creatorName(const QnUuid& creatorId, QnResourcePool* resourcePool)
+    static QString creatorName(const nx::Uuid& creatorId, QnResourcePool* resourcePool)
     {
         if (creatorId.isNull())
             return QString();
@@ -59,7 +59,7 @@ struct BookmarkFacade: BookmarkSort
 
     static QString creatorName(const Bookmark& bookmark, QnResourcePool* resourcePool)
     {
-        return BookmarkSort::creatorName(bookmark.creatorUserId.value_or(QnUuid()), resourcePool);
+        return BookmarkSort::creatorName(bookmark.creatorUserId.value_or(nx::Uuid()), resourcePool);
     }
 
     static QString cameraName(const Bookmark& bookmark, QnResourcePool* resourcePool)

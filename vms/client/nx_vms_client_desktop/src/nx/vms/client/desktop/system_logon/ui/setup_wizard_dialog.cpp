@@ -45,7 +45,7 @@ QUrl constructUrl(const nx::network::SocketAddress& address)
 
 SetupWizardDialog::SetupWizardDialog(
     nx::network::SocketAddress address,
-    const QnUuid& serverId,
+    const nx::Uuid& serverId,
     QWidget* parent)
     :
     base_type(parent, Qt::MSWindowsFixedSizeDialogHint),

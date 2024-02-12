@@ -46,9 +46,9 @@ int IntercomResourceWidget::calculateButtonsVisibility() const
 
     if (nx::vms::common::isIntercomOnIntercomLayout(intecomResource, layoutResource()))
     {
-        const QnUuid intercomToDeleteId = intecomResource->getId();
+        const nx::Uuid intercomToDeleteId = intecomResource->getId();
 
-        QSet<QnUuid> otherIntercomLayoutItemIds; // Other intercom item copies on the layout.
+        QSet<nx::Uuid> otherIntercomLayoutItemIds; // Other intercom item copies on the layout.
 
         const auto intercomLayoutItems = layoutResource()->getItems();
         for (const common::LayoutItemData& intercomLayoutItem: intercomLayoutItems)

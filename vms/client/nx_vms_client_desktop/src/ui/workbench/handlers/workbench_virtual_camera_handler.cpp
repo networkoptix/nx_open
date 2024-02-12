@@ -115,14 +115,14 @@ QnWorkbenchVirtualCameraHandler::QnWorkbenchVirtualCameraHandler(QObject* parent
 
     const auto& manager = context()->instance<nx::vms::client::desktop::workbench::LocalNotificationsManager>();
     connect(manager, &nx::vms::client::desktop::workbench::LocalNotificationsManager::cancelRequested, this,
-        [this](const QnUuid& progressId)
+        [this](const nx::Uuid& progressId)
         {
             if (const auto camera = cameraByProgressId(progressId))
                 context()->menu()->trigger(ui::action::CancelVirtualCameraUploadsAction, camera);
         });
 
     connect(manager, &nx::vms::client::desktop::workbench::LocalNotificationsManager::interactionRequested, this,
-        [this](const QnUuid& progressId)
+        [this](const nx::Uuid& progressId)
         {
             if (const auto camera = cameraByProgressId(progressId))
                 context()->menu()->trigger(ui::action::CameraSettingsAction, camera);
@@ -142,7 +142,7 @@ void QnWorkbenchVirtualCameraHandler::maybeOpenCurrentSettings()
     if (!camera)
         return;
 
-    m_currentCameraUuid = QnUuid();
+    m_currentCameraUuid = nx::Uuid();
     menu()->trigger(action::CameraSettingsAction,
         action::Parameters(camera, {{Qn::FocusTabRole, (int)CameraSettingsTab::general}}));
 }
@@ -574,7 +574,7 @@ void QnWorkbenchVirtualCameraHandler::at_virtualCameraManager_stateChanged(const
     }
 }
 
-QnUuid QnWorkbenchVirtualCameraHandler::ensureProgress(const QnUuid& cameraId)
+nx::Uuid QnWorkbenchVirtualCameraHandler::ensureProgress(const nx::Uuid& cameraId)
 {
     const auto iter = m_currentProgresses.find(cameraId);
     if (iter != m_currentProgresses.end())
@@ -588,7 +588,7 @@ QnUuid QnWorkbenchVirtualCameraHandler::ensureProgress(const QnUuid& cameraId)
     return progressId;
 }
 
-void QnWorkbenchVirtualCameraHandler::removeProgress(const QnUuid& cameraId)
+void QnWorkbenchVirtualCameraHandler::removeProgress(const nx::Uuid& cameraId)
 {
     const auto iter = m_currentProgresses.find(cameraId);
     if (iter == m_currentProgresses.end())
@@ -599,7 +599,7 @@ void QnWorkbenchVirtualCameraHandler::removeProgress(const QnUuid& cameraId)
 }
 
 QnSecurityCamResourcePtr QnWorkbenchVirtualCameraHandler::cameraByProgressId(
-    const QnUuid& progressId) const
+    const nx::Uuid& progressId) const
 {
     const auto cameraId = m_currentProgresses.key(progressId); //< No need of extra performance here.
     return cameraId.isNull()

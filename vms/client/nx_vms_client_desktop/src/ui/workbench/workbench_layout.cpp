@@ -80,7 +80,7 @@ struct QnWorkbenchLayout::Private
     QHash<QnResourcePtr, QSet<QnWorkbenchItem*>> itemsByResource;
 
     /** Map from item's universally unique identifier to item. */
-    QHash<QnUuid, QnWorkbenchItem*> itemByUuid;
+    QHash<nx::Uuid, QnWorkbenchItem*> itemByUuid;
 
     /** Empty item list, to return a reference to. */
     const QSet<QnWorkbenchItem*> noItems;
@@ -157,10 +157,10 @@ void QnWorkbenchLayout::setFlags(QnLayoutFlags value)
     emit flagsChanged();
 }
 
-QnUuid QnWorkbenchLayout::resourceId() const
+nx::Uuid QnWorkbenchLayout::resourceId() const
 {
     const auto& layout = resource();
-    return layout ? layout->getId() : QnUuid();
+    return layout ? layout->getId() : nx::Uuid();
 }
 
 LayoutResourcePtr QnWorkbenchLayout::resource() const
@@ -222,7 +222,7 @@ bool QnWorkbenchLayout::update(const LayoutResourcePtr& resource)
     for (auto item: d->items)
         item->setPinned(false);
 
-    QSet<QnUuid> removed;
+    QSet<nx::Uuid> removed;
 
     for (auto item: items())
         removed.insert(item->uuid());
@@ -655,7 +655,7 @@ QnWorkbenchItem* QnWorkbenchLayout::item(const QPoint& position) const
     return d->itemMap.value(position, nullptr);
 }
 
-QnWorkbenchItem* QnWorkbenchLayout::item(const QnUuid& uuid) const
+QnWorkbenchItem* QnWorkbenchLayout::item(const nx::Uuid& uuid) const
 {
     return d->itemByUuid.value(uuid, nullptr);
 }
@@ -665,10 +665,10 @@ QnWorkbenchItem* QnWorkbenchLayout::zoomTargetItem(QnWorkbenchItem* item) const
     return d->zoomTargetItemByItem.value(item, nullptr);
 }
 
-QnUuid QnWorkbenchLayout::zoomTargetUuidInternal(QnWorkbenchItem* item) const
+nx::Uuid QnWorkbenchLayout::zoomTargetUuidInternal(QnWorkbenchItem* item) const
 {
     QnWorkbenchItem* zoomTargetItem = this->zoomTargetItem(item);
-    return zoomTargetItem ? zoomTargetItem->uuid() : QnUuid();
+    return zoomTargetItem ? zoomTargetItem->uuid() : nx::Uuid();
 }
 
 QList<QnWorkbenchItem*> QnWorkbenchLayout::zoomItems(QnWorkbenchItem* zoomTargetItem) const

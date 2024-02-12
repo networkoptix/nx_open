@@ -47,7 +47,7 @@ struct VirtualCameraWorker::Private
     QnUserResourcePtr user;
 
     VirtualCameraState state;
-    QnUuid lockToken;
+    nx::Uuid lockToken;
 
     ServerRequestStorage requests;
     bool waitingForStatusReply = false;
@@ -304,7 +304,7 @@ void VirtualCameraWorker::handleStatusFinished(bool success, const QnVirtualCame
         if (d->state.status == VirtualCameraState::LockedByOtherClient)
         {
             d->state.status = VirtualCameraState::Unlocked;
-            d->state.lockUserId = QnUuid();
+            d->state.lockUserId = nx::Uuid();
 
             emit stateChanged(d->state);
         }

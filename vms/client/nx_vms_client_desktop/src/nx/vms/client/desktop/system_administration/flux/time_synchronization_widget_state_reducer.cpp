@@ -24,7 +24,7 @@ bool hasInternet(const State& state)
 State TimeSynchronizationWidgetReducer::initialize(
     State state,
     bool isTimeSynchronizationEnabled,
-    const QnUuid& primaryTimeServer,
+    const nx::Uuid& primaryTimeServer,
     const QList<State::ServerInfo>& servers)
 {
     state.enabled = isTimeSynchronizationEnabled;
@@ -81,7 +81,7 @@ Result TimeSynchronizationWidgetReducer::setSyncTimeWithInternet(
         state.enabled = true;
         // Overwrite last primary server
         state.lastPrimaryServer = state.primaryServer;
-        state.primaryServer = QnUuid();
+        state.primaryServer = nx::Uuid();
         state.status = hasInternet(state)
             ? State::Status::synchronizedWithInternet
             : State::Status::noInternetConnection;
@@ -103,7 +103,7 @@ Result TimeSynchronizationWidgetReducer::setSyncTimeWithInternet(
     else
     {
         state.enabled = false;
-        state.primaryServer = QnUuid();
+        state.primaryServer = nx::Uuid();
         state.status = State::Status::notSynchronized;
     }
     state.hasChanges = true;
@@ -117,13 +117,13 @@ Result TimeSynchronizationWidgetReducer::disableSync(State state)
 
     state.lastPrimaryServer = state.primaryServer;
     state.enabled = false;
-    state.primaryServer = QnUuid();
+    state.primaryServer = nx::Uuid();
     state.status = State::Status::notSynchronized;
     state.hasChanges = true;
     return {true, std::move(state)};
 }
 
-Result TimeSynchronizationWidgetReducer::selectServer(State state, const QnUuid& serverId)
+Result TimeSynchronizationWidgetReducer::selectServer(State state, const nx::Uuid& serverId)
 {
     if (state.primaryServer == serverId)
         return {false, std::move(state)};
@@ -155,7 +155,7 @@ Result TimeSynchronizationWidgetReducer::addServer(State state, const State::Ser
     return {false, std::move(state)};
 }
 
-Result TimeSynchronizationWidgetReducer::removeServer(State state, const QnUuid& id)
+Result TimeSynchronizationWidgetReducer::removeServer(State state, const nx::Uuid& id)
 {
     auto& servers = state.servers;
     auto it = std::find_if(servers.begin(), servers.end(),
@@ -177,7 +177,7 @@ Result TimeSynchronizationWidgetReducer::removeServer(State state, const QnUuid&
 
 Result TimeSynchronizationWidgetReducer::setServerOnline(
     State state,
-    const QnUuid& serverId,
+    const nx::Uuid& serverId,
     bool isOnline)
 {
     for (auto& server: state.servers)
@@ -200,7 +200,7 @@ Result TimeSynchronizationWidgetReducer::setServerOnline(
 
 Result TimeSynchronizationWidgetReducer::setServerHasInternet(
     State state,
-    const QnUuid& serverId,
+    const nx::Uuid& serverId,
     bool hasInternet)
 {
     for (auto& server: state.servers)

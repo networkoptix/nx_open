@@ -100,7 +100,7 @@ LayoutResourcePtr layoutFromBookmarks(const QnCameraBookmarkList& bookmarks, QnR
 
     // First we must count unique cameras to get the matrix size.
     QnVirtualCameraResourceList cameras;
-    QSet<QnUuid> placedCameras;
+    QSet<nx::Uuid> placedCameras;
     for (const auto& bookmark: bookmarks)
     {
         if (placedCameras.contains(bookmark.cameraId))
@@ -177,7 +177,7 @@ struct WorkbenchExportHandler::Private
             return std::visit([](auto&& settings) { return settings.transcodingSettings; }, settings);
         }
     };
-    QHash<QnUuid, ExportContext> runningExports;
+    QHash<nx::Uuid, ExportContext> runningExports;
 
     QScopedPointer<QnMessageBox> startingExportMessageBox;
 
@@ -189,7 +189,7 @@ struct WorkbenchExportHandler::Private
         NX_ASSERT(manager);
 
         connect(manager, &workbench::LocalNotificationsManager::interactionRequested, q,
-            [this](const QnUuid& exportProcessId)
+            [this](const nx::Uuid& exportProcessId)
             {
                 if (const auto dialog = runningExports.value(exportProcessId).progressDialog)
                     dialog->show();
@@ -206,7 +206,7 @@ struct WorkbenchExportHandler::Private
         return false;
     }
 
-    QnUuid createExportContext(Settings settings,
+    nx::Uuid createExportContext(Settings settings,
         const QnResourcePtr& resource, bool saveExistingLayout, bool forceTranscoding)
     {
         const auto& manager = q->context()->instance<workbench::LocalNotificationsManager>();
@@ -590,7 +590,7 @@ void WorkbenchExportHandler::handleExportBookmarksAction()
 
 void WorkbenchExportHandler::runExport(ExportToolInstance&& context)
 {
-    QnUuid exportProcessId;
+    nx::Uuid exportProcessId;
     std::unique_ptr<AbstractExportTool> exportTool;
 
     std::tie(exportProcessId, exportTool) = std::move(context);
@@ -669,7 +669,7 @@ WorkbenchExportHandler::ExportToolInstance WorkbenchExportHandler::prepareExport
 WorkbenchExportHandler::ExportToolInstance WorkbenchExportHandler::prepareExportTool(
     const ExportSettingsDialog& dialog)
 {
-    QnUuid exportId;
+    nx::Uuid exportId;
     std::unique_ptr<AbstractExportTool> tool;
 
     switch (dialog.mode())
@@ -850,7 +850,7 @@ void WorkbenchExportHandler::at_saveLocalLayoutAction_triggered()
     std::unique_ptr<nx::vms::client::desktop::AbstractExportTool> exportTool;
     exportTool.reset(new ExportLayoutTool(layoutSettings, layout));
 
-    QnUuid exportId = d->createExportContext(layoutSettings, layout,
+    nx::Uuid exportId = d->createExportContext(layoutSettings, layout,
         /*saveExistingLayout*/ true, /*forceTranscoding*/ false);
 
     runExport(std::make_pair(exportId, std::move(exportTool)));

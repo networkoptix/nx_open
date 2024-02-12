@@ -52,14 +52,14 @@ public:
      * @param uuid Unique instance id, e.g. Hardware id.
      * NOTE: This method generates peer id in internal format using supplied information (name & uuid).
      */
-    void assignOwnPeerId(const std::string& name, const QnUuid& uuid);
+    void assignOwnPeerId(const std::string& name, const nx::Uuid& uuid);
 
     /**
      * NOTE: This method just sets already prepared peerId.
      *   E.g., received from OutgoingTunnelPool::ownPeerId().
      */
     void setOwnPeerId(const std::string& peerId);
-    void clearOwnPeerIdIfEqual(const std::string& name, const QnUuid& uuid);
+    void clearOwnPeerIdIfEqual(const std::string& name, const nx::Uuid& uuid);
 
     void removeAllTunnelsSync();
 

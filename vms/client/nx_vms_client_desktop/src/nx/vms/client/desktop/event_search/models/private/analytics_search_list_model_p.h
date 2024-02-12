@@ -60,8 +60,8 @@ public:
     QRectF filterRect() const;
     void setFilterRect(const QRectF& relativeRect);
 
-    QnUuid selectedEngine() const;
-    void setSelectedEngine(const QnUuid& value);
+    nx::Uuid selectedEngine() const;
+    void setSelectedEngine(const nx::Uuid& value);
 
     QStringList selectedObjectTypes() const;
     void setSelectedObjectTypes(const QStringList& value);
@@ -137,11 +137,11 @@ private:
     struct Storage
     {
         std::deque<nx::analytics::db::ObjectTrack> items; //< Descending sort order.
-        QHash<QnUuid, std::chrono::milliseconds> idToTimestamp;
+        QHash<nx::Uuid, std::chrono::milliseconds> idToTimestamp;
 
         int size() const { return (int)items.size(); }
         bool empty() const { return items.empty(); }
-        int indexOf(const QnUuid& trackId) const;
+        int indexOf(const nx::Uuid& trackId) const;
         nx::analytics::db::ObjectTrack take(int index);
         void clear();
 
@@ -156,7 +156,7 @@ private:
 
 private:
     QRectF m_filterRect;
-    QnUuid m_selectedEngine;
+    nx::Uuid m_selectedEngine;
     QStringList m_selectedObjectTypes;
     std::set<QString> m_relevantObjectTypes; //< Empty for all types.
     mutable QHash<QString, bool> m_objectTypeAcceptanceCache; //< Used in metadata processing.
@@ -173,9 +173,9 @@ private:
     nx::analytics::db::LookupResult m_prefetch;
 
     Storage m_data;
-    QSet<QnUuid> m_externalBestShotTracks;
+    QSet<nx::Uuid> m_externalBestShotTracks;
 
-    QSet<QnUuid> m_dataChangedTrackIds; //< For which tracks delayed dataChanged is queued.
+    QSet<nx::Uuid> m_dataChangedTrackIds; //< For which tracks delayed dataChanged is queued.
 
     LiveProcessingMode m_liveProcessingMode = LiveProcessingMode::automaticAdd;
 

@@ -67,7 +67,7 @@ void QnPtzPresetDialog::loadData(const QnPtzData &data)
 
 void QnPtzPresetDialog::saveData() {
     // TODO: #sivanov Ask to replace if there is a preset with the same name?
-    QString presetId = QnUuid::createUuid().toString();
+    QString presetId = nx::Uuid::createUuid().toString();
     createPreset(QnPtzPreset(presetId, ui->nameEdit->text()));
 
     if (!m_hotkeysDelegate || hotkey() < 0)

@@ -22,7 +22,7 @@ public:
     // @return Returns true if bookmarks list has changed
     bool mergeBookmarkList(const QnCameraBookmarkList &bookmarkList);
 
-    bool removeBookmark(const QnUuid &bookmarkId);
+    bool removeBookmark(const nx::Uuid &bookmarkId);
 
     void setBookmarkList(const QnCameraBookmarkList &bookmarkList);
     const QnCameraBookmarkList &bookmarkList() const;
@@ -31,5 +31,5 @@ public:
 
 private:
     QnCameraBookmarkList m_bookmarkList;
-    QSet<QnUuid> m_bookmarkIds;
+    QSet<nx::Uuid> m_bookmarkIds;
 };

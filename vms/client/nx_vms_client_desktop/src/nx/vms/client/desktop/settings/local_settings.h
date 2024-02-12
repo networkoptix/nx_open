@@ -69,7 +69,7 @@ public:
     Property<bool> logArchivingEnabled{this, nx::utils::log::kLogArchivingEnabledSymbolicName,
         nx::utils::log::kDefaultLogArchivingEnabled};
 
-    Property<QnUuid> pcUuid{this, "pcUuid", {},
+    Property<nx::Uuid> pcUuid{this, "pcUuid", {},
         "Unique id for this PC for videowall construction."};
 
     Property<Qn::ResourceInfoLevel> resourceInfoLevel{this, "resourceInfoLevel", Qn::RI_NameOnly,

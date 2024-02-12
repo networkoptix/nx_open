@@ -207,7 +207,7 @@ TestOptions::TemporaryDirectory& TestOptions::tmpDirInstance()
 TestOptions::TemporaryDirectory::TemporaryDirectory()
 {
     const auto kModuleSubdirectory =
-        QString("nx_unit_tests/%1").arg(QnUuid::createUuid().toSimpleString());
+        QString("nx_unit_tests/%1").arg(nx::Uuid::createUuid().toSimpleString());
 
     const auto root = QDir(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation));
     m_path = root.absoluteFilePath(kModuleSubdirectory);
@@ -243,7 +243,7 @@ std::atomic<bool> TestOptions::s_disableTimeAsserts(false);
 std::atomic<bool> TestOptions::s_keepTemporaryDirectory(false);
 std::atomic<size_t> TestOptions::s_loadMode(1);
 
-QString TestOptions::s_moduleName(QnUuid::createUuid().toSimpleString());
+QString TestOptions::s_moduleName(nx::Uuid::createUuid().toSimpleString());
 
 } // namespace utils
 } // namespace nx

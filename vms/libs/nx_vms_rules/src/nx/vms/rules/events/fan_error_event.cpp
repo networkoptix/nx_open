@@ -11,7 +11,7 @@
 
 namespace nx::vms::rules {
 
-FanErrorEvent::FanErrorEvent(QnUuid serverId, std::chrono::microseconds timestamp):
+FanErrorEvent::FanErrorEvent(nx::Uuid serverId, std::chrono::microseconds timestamp):
     base_type(timestamp),
     m_serverId(serverId)
 {

@@ -251,7 +251,7 @@ void ClientStateHandler::createNewWindow(
         state.insert(delegateId, value);
     }
 
-    const auto temporaryName = QnUuid::createUuid().toString();
+    const auto temporaryName = nx::Uuid::createUuid().toString();
     d->clientStateStorage.putTemporaryState(temporaryName, state);
 
     StartupParameters params{
@@ -353,7 +353,7 @@ void ClientStateHandler::clientRequestedToSaveState()
     if (!NX_ASSERT(d->sessionId != SessionId()))
         return;
 
-    const QString randomFilename = QnUuid::createUuid().toString() + ".json";
+    const QString randomFilename = nx::Uuid::createUuid().toString() + ".json";
     const auto state = serializeState(ClientStateDelegate::Substate::allParameters);
     d->clientStateStorage.writeSessionState(d->sessionId, randomFilename, state);
 }

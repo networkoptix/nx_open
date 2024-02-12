@@ -20,14 +20,14 @@ public:
         nx::vms::common::SystemContext* systemContext,
         const RulePtr& rule,
         const AbstractEventPtr& event,
-        const QnUuid& moduleGuid,
+        const nx::Uuid& moduleGuid,
         EventState state);
 
     static AbstractActionPtr instantiateAction(
         nx::vms::common::SystemContext* systemContext,
         const RulePtr& rule,
         const AbstractEventPtr& event,
-        const QnUuid& moduleGuid,
+        const nx::Uuid& moduleGuid,
         const AggregationInfo& aggregationInfo);
 
     static AbstractActionPtr createAction(const ActionType actionType,

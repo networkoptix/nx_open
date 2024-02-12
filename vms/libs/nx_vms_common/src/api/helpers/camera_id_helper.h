@@ -65,7 +65,7 @@ QnVirtualCameraResourceList findCamerasByFlexibleId(
  * @param resourcePool Resources pool where the search will occur.
  * @return Camera id, or null if not found.
  */
-NX_VMS_COMMON_API QnUuid flexibleIdToId(
+NX_VMS_COMMON_API nx::Uuid flexibleIdToId(
     const QnResourcePool* resourcePool,
     const QString& flexibleId);
 

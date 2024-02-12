@@ -52,8 +52,8 @@ public:
 
     Q_INVOKABLE bool ensureFlickableChildVisible(QQuickItem* item);
 
-    Q_INVOKABLE QnUuid uuid(const QString& uuid) const;
-    Q_INVOKABLE QnUuid generateUuid() const;
+    Q_INVOKABLE nx::Uuid uuid(const QString& uuid) const;
+    Q_INVOKABLE nx::Uuid generateUuid() const;
 
     Q_INVOKABLE nx::vms::client::core::DateRange dateRange(
         const QDateTime& start, const QDateTime& end) const;

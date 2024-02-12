@@ -149,7 +149,7 @@ public:
         if (!NX_ASSERT(resourcePool == q->resourcePool()))
             return;
 
-        const QnUuid intercomLayoutId = nx::vms::common::calculateIntercomLayoutId(intercomCamera);
+        const nx::Uuid intercomLayoutId = nx::vms::common::calculateIntercomLayoutId(intercomCamera);
         auto layoutResource = q->resourcePool()->getResourceById(intercomLayoutId);
 
         if (!layoutResource)
@@ -173,7 +173,7 @@ public:
         if (!NX_ASSERT(resourcePool == q->resourcePool()))
             return;
 
-        const QnUuid intercomLayoutId = nx::vms::common::calculateIntercomLayoutId(intercomCamera);
+        const nx::Uuid intercomLayoutId = nx::vms::common::calculateIntercomLayoutId(intercomCamera);
         QnResourcePtr layoutResource = resourcePool->getResourceById(intercomLayoutId);
 
         if (layoutResource && !layoutResource->hasFlags(Qn::removed))

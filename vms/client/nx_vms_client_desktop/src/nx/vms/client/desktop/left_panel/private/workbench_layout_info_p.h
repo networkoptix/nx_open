@@ -35,9 +35,9 @@ class WorkbenchLayoutInfo:
         NOTIFY currentLayoutChanged)
     Q_PROPERTY(QnVideoWallResource* controlledVideoWall READ controlledVideoWall
         NOTIFY currentLayoutChanged)
-    Q_PROPERTY(QnUuid controlledVideoWallItemId READ controlledVideoWallItemId
+    Q_PROPERTY(nx::Uuid controlledVideoWallItemId READ controlledVideoWallItemId
         NOTIFY currentLayoutChanged)
-    Q_PROPERTY(QnUuid reviewedShowreelId READ reviewedShowreelId NOTIFY currentLayoutChanged)
+    Q_PROPERTY(nx::Uuid reviewedShowreelId READ reviewedShowreelId NOTIFY currentLayoutChanged)
     Q_PROPERTY(int itemCount READ itemCount NOTIFY itemCountChanged)
     Q_PROPERTY(int maximumItemCount READ maximumItemCount CONSTANT)
     Q_PROPERTY(bool isLocked READ isLocked NOTIFY isLockedChanged)
@@ -50,10 +50,10 @@ public:
     QnLayoutResource* currentLayout() const;
     QnResource* currentResource() const;
     AbstractResourceContainer* resources() const;
-    QnUuid reviewedShowreelId() const;
+    nx::Uuid reviewedShowreelId() const;
     QnVideoWallResource* reviewedVideoWall() const;
     QnVideoWallResource* controlledVideoWall() const;
-    QnUuid controlledVideoWallItemId() const;
+    nx::Uuid controlledVideoWallItemId() const;
 
     int itemCount() const;
     int maximumItemCount() const;

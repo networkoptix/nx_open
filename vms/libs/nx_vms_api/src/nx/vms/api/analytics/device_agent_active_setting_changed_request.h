@@ -22,7 +22,7 @@ struct NX_VMS_API DeviceAgentActiveSettingChangedRequest
     /**%apidoc
      * Unique id of an Analytics Engine.
      */
-    QnUuid analyticsEngineId;
+    nx::Uuid analyticsEngineId;
 
     /**%apidoc
      * Name of a setting which triggered the notification.

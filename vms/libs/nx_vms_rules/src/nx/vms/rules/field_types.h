@@ -16,7 +16,7 @@ namespace nx::vms::rules {
 struct UuidSelection
 {
     /** Manually selected ids.*/
-    QSet<QnUuid> ids;
+    QSet<nx::Uuid> ids;
 
     /** Accept/target all flag. */
     bool all = false;

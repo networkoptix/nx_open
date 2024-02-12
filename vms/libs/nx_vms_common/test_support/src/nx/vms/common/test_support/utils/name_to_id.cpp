@@ -4,28 +4,28 @@
 
 namespace nx::vms::common::test {
 
-QString NameToId::name(const QnUuid& id) const
+QString NameToId::name(const nx::Uuid& id) const
 {
     return m_idToName.value(id);
 }
 
-QnUuid NameToId::id(const QString& name) const
+nx::Uuid NameToId::id(const QString& name) const
 {
     return m_nameToId.value(name);
 }
 
-void NameToId::setId(const QString& name, const QnUuid& id)
+void NameToId::setId(const QString& name, const nx::Uuid& id)
 {
     m_nameToId[name] = id;
     m_idToName[id] = name;
 }
 
-QnUuid NameToId::ensureId(const QString& name) const
+nx::Uuid NameToId::ensureId(const QString& name) const
 {
     if (m_nameToId.contains(name))
         return id(name);
 
-    const auto id = QnUuid::createUuid();
+    const auto id = nx::Uuid::createUuid();
     m_nameToId[name] = id;
     m_idToName[id] = name;
     return id;

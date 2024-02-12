@@ -38,12 +38,12 @@ public:
      * Read pinned certificate for the given server from it's file.
      * @return nullopt if no certificate is pinned, public key otherwise.
      */
-    std::optional<std::string> pinnedCertificate(const QnUuid& serverId) const;
+    std::optional<std::string> pinnedCertificate(const nx::Uuid& serverId) const;
 
     /**
      * Store given certificate's public key, replacing existing if present.
      */
-    void pinCertificate(const QnUuid& serverId, const std::string& publicKey);
+    void pinCertificate(const nx::Uuid& serverId, const std::string& publicKey);
 
     /**
      * Clears the storage, then initializes it with the given settings.

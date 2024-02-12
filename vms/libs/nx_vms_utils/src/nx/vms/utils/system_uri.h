@@ -106,7 +106,7 @@ public:
 
     SystemAction systemAction = SystemAction::View;
     Referral referral;
-    QList<QnUuid> resourceIds;
+    QList<nx::Uuid> resourceIds;
     qint64 timestamp = -1;
     nx::network::http::Credentials credentials;
 

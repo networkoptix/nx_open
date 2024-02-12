@@ -67,7 +67,7 @@ private:
     workbench::LocalNotificationsManager* m_notificationsManager = nullptr;
     CommandActionPtr m_updateAction;
     CommandActionPtr m_skipAction;
-    QnUuid updateNotificationId;
+    nx::Uuid updateNotificationId;
 
     struct Private;
     std::unique_ptr<Private> m_private;

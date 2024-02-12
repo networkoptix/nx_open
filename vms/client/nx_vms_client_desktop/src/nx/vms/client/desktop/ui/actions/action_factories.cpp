@@ -65,7 +65,7 @@ Factory::ActionList OpenCurrentUserLayoutFactory::newActions(const Parameters& /
     QObject* parent)
 {
     /* Multi-videos and shared layouts will go here. */
-    auto layouts = resourcePool()->getResourcesByParentId(QnUuid()).filtered<LayoutResource>();
+    auto layouts = resourcePool()->getResourcesByParentId(nx::Uuid()).filtered<LayoutResource>();
     if (context()->user())
     {
         layouts.append(resourcePool()->getResourcesByParentId(context()->user()->getId())
@@ -269,12 +269,12 @@ Factory::ActionList ShowreelSettingsFactory::newActions(
     auto actionGroup = new QActionGroup(parent);
     actionGroup->setExclusive(true);
 
-    auto id = parameters.argument<QnUuid>(Qn::UuidRole);
+    auto id = parameters.argument<nx::Uuid>(Qn::UuidRole);
     const bool isCurrentShowreel = id.isNull();
     NX_ASSERT(!isCurrentShowreel || workbench()->currentLayout()->isShowreelReviewLayout());
 
     if (isCurrentShowreel)
-        id = workbench()->currentLayout()->data(Qn::ShowreelUuidRole).value<QnUuid>();
+        id = workbench()->currentLayout()->data(Qn::ShowreelUuidRole).value<nx::Uuid>();
 
     auto showreelManager = systemContext()->showreelManager();
     const auto showreel = showreelManager->showreel(id);

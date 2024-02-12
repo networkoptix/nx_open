@@ -42,7 +42,7 @@ AbstractResourceAccessResolver::~AbstractResourceAccessResolver()
 }
 
 AccessRights AbstractResourceAccessResolver::accessRights(
-    const QnUuid& subjectId,
+    const nx::Uuid& subjectId,
     const QnResourcePtr& resource) const
 {
     if (!NX_ASSERT(resource) || !resource->resourcePool() || resource->hasFlags(Qn::removed))
@@ -84,7 +84,7 @@ AccessRights AbstractResourceAccessResolver::accessRights(
     return {};
 }
 
-bool AbstractResourceAccessResolver::hasFullAccessRights(const QnUuid& subjectId) const
+bool AbstractResourceAccessResolver::hasFullAccessRights(const nx::Uuid& subjectId) const
 {
     return globalPermissions(subjectId).testFlag(GlobalPermission::powerUser);
 }
@@ -94,7 +94,7 @@ AbstractResourceAccessResolver::Notifier* AbstractResourceAccessResolver::notifi
     return m_notifier.get();
 }
 
-void AbstractResourceAccessResolver::notifyAccessChanged(const QSet<QnUuid>& subjectIds)
+void AbstractResourceAccessResolver::notifyAccessChanged(const QSet<nx::Uuid>& subjectIds)
 {
     if (const auto ids = subjectIds & notifier()->watchedSubjectIds(); !ids.empty())
     {
@@ -110,7 +110,7 @@ void AbstractResourceAccessResolver::notifyAccessReset()
 }
 
 QString AbstractResourceAccessResolver::toLogString(
-    const QnUuid& resourceId, QnResourcePool* resourcePool)
+    const nx::Uuid& resourceId, QnResourcePool* resourcePool)
 {
     if (resourceId.isNull())
         return "none";
@@ -123,7 +123,7 @@ QString AbstractResourceAccessResolver::toLogString(
 }
 
 QString AbstractResourceAccessResolver::affectedCacheToLogString(
-    const QSet<QnUuid>& affectedSubjectIds)
+    const QSet<nx::Uuid>& affectedSubjectIds)
 {
     if (affectedSubjectIds.empty())
         return "cached subjects weren't affected";
@@ -137,8 +137,8 @@ QString AbstractResourceAccessResolver::affectedCacheToLogString(
 
 struct AbstractResourceAccessResolver::Notifier::Private
 {
-    QnCounterHash<QnUuid> watchedSubjectCounters;
-    QSet<QnUuid> watchedSubjectIds;
+    QnCounterHash<nx::Uuid> watchedSubjectCounters;
+    QSet<nx::Uuid> watchedSubjectIds;
     mutable nx::Mutex mutex;
 };
 
@@ -153,7 +153,7 @@ AbstractResourceAccessResolver::Notifier::~Notifier()
     // Required here for forward-declared scoped pointer destruction.
 }
 
-void AbstractResourceAccessResolver::Notifier::subscribeSubjects(const QSet<QnUuid>& subjectIds)
+void AbstractResourceAccessResolver::Notifier::subscribeSubjects(const QSet<nx::Uuid>& subjectIds)
 {
     if (subjectIds.empty())
         return;
@@ -172,7 +172,7 @@ void AbstractResourceAccessResolver::Notifier::subscribeSubjects(const QSet<QnUu
     emit subjectsSubscribed(subjectIds);
 }
 
-void AbstractResourceAccessResolver::Notifier::releaseSubjects(const QSet<QnUuid>& subjectIds)
+void AbstractResourceAccessResolver::Notifier::releaseSubjects(const QSet<nx::Uuid>& subjectIds)
 {
     if (subjectIds.empty())
         return;
@@ -191,7 +191,7 @@ void AbstractResourceAccessResolver::Notifier::releaseSubjects(const QSet<QnUuid
     emit subjectsReleased(subjectIds);
 }
 
-QSet<QnUuid> AbstractResourceAccessResolver::Notifier::watchedSubjectIds() const
+QSet<nx::Uuid> AbstractResourceAccessResolver::Notifier::watchedSubjectIds() const
 {
     NX_MUTEX_LOCKER lk(&d->mutex);
     return d->watchedSubjectIds;

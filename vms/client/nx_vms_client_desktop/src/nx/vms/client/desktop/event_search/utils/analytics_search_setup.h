@@ -15,7 +15,7 @@ class AnalyticsSearchListModel;
 class AnalyticsSearchSetup: public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(QnUuid engine READ engine WRITE setEngine NOTIFY engineChanged)
+    Q_PROPERTY(nx::Uuid engine READ engine WRITE setEngine NOTIFY engineChanged)
     Q_PROPERTY(QStringList objectTypes
         READ objectTypes WRITE setObjectTypes NOTIFY objectTypesChanged)
 
@@ -35,8 +35,8 @@ public:
     explicit AnalyticsSearchSetup(AnalyticsSearchListModel* model, QObject* parent = nullptr);
     virtual ~AnalyticsSearchSetup() override;
 
-    QnUuid engine() const;
-    void setEngine(const QnUuid& value);
+    nx::Uuid engine() const;
+    void setEngine(const nx::Uuid& value);
 
     QStringList objectTypes() const;
     void setObjectTypes(const QStringList& value);
@@ -74,7 +74,7 @@ signals:
     void availableNewTracksChanged();
     void attributeFiltersChanged();
     void engineChanged();
-    void ensureVisibleRequested(std::chrono::milliseconds timestamp, const QnUuid& trackId,
+    void ensureVisibleRequested(std::chrono::milliseconds timestamp, const nx::Uuid& trackId,
         const QnTimePeriod& proposedTimeWindow);
 
 private:

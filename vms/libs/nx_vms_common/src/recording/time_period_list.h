@@ -271,7 +271,7 @@ QnTimePeriodList timePeriodListFromRange(
 struct NX_VMS_COMMON_API MultiServerPeriodData
 {
     /** Guid of the server, owning this periods. */
-    QnUuid guid;
+    nx::Uuid guid;
     QnTimePeriodList periods;
 
     bool operator==(const MultiServerPeriodData& other) const = default;

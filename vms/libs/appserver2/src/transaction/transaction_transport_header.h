@@ -29,8 +29,8 @@ namespace ec2 {
             distance(0) {}
 
         void fillSequence(
-            const QnUuid& moduleId,
-            const QnUuid& runningInstanceGUID);
+            const nx::Uuid& moduleId,
+            const nx::Uuid& runningInstanceGUID);
         /** Calls previous method passing it value from \a commonModule(). */
 
         bool isNull() const;
@@ -38,8 +38,8 @@ namespace ec2 {
         nx::vms::api::PeerSet processedPeers;
         nx::vms::api::PeerSet dstPeers;
         int sequence;
-        QnUuid sender;
-        QnUuid senderRuntimeID;
+        nx::Uuid sender;
+        nx::Uuid senderRuntimeID;
         int flags; //< TTHeaderFlags actually but declaring as int to simplify json representation.
         int distance;
     };

@@ -34,7 +34,7 @@ private:
 
 TEST_F(CloudAddressResolver, resolves_guid_as_a_cloud_address)
 {
-    auto guidStr = QnUuid::createUuid().toSimpleStdString();
+    auto guidStr = nx::Uuid::createUuid().toSimpleStdString();
     assertResolved(guidStr);
 
     nx::utils::toLower(&guidStr);
@@ -44,7 +44,7 @@ TEST_F(CloudAddressResolver, resolves_guid_as_a_cloud_address)
     assertResolved(guidStr);
 
     assertNotResolved(nx::utils::buildString(
-        "raz-", QnUuid::createUuid().toSimpleStdString(), "-raz"));
+        "raz-", nx::Uuid::createUuid().toSimpleStdString(), "-raz"));
     assertNotResolved("nxms.com");
 }
 

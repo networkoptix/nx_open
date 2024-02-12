@@ -20,16 +20,16 @@ protected:
     QnMediaServerResourcePtr createServerResource() const
     {
         QnMediaServerResourcePtr server(new QnMediaServerResource());
-        server->setIdUnsafe(QnUuid::createUuid());
+        server->setIdUnsafe(nx::Uuid::createUuid());
         server->setName("server");
         systemContext()->resourcePool()->addResource(server);
         return server;
     }
 
-    QnVirtualCameraResourcePtr createCameraResource(const QnUuid& parentId) const
+    QnVirtualCameraResourcePtr createCameraResource(const nx::Uuid& parentId) const
     {
         QnVirtualCameraResourcePtr camera(new CameraResourceStub());
-        camera->setIdUnsafe(QnUuid::createUuid());
+        camera->setIdUnsafe(nx::Uuid::createUuid());
         camera->setName("camera");
         camera->setParentId(parentId);
         systemContext()->resourcePool()->addResource(camera);
@@ -49,10 +49,10 @@ TEST_F(MimeDataTest, mimeDataConversionsAreCorrect)
         serverResource,
         cameraResource});
 
-    QnUuidList entities({
-        QnUuid::createUuid(),
-        QnUuid::createUuid(),
-        QnUuid::createUuid()});
+    UuidList entities({
+        nx::Uuid::createUuid(),
+        nx::Uuid::createUuid(),
+        nx::Uuid::createUuid()});
 
     ui::action::Parameters::ArgumentHash arguments({
         {0, 9000},

@@ -219,7 +219,7 @@ void AsyncSqlQueryExecutor::fetchNextRecordFromCursorImpl(
     m_cursorTaskQueue.push(std::move(executor));
 }
 
-void AsyncSqlQueryExecutor::removeCursor(QnUuid id)
+void AsyncSqlQueryExecutor::removeCursor(nx::Uuid id)
 {
     m_cursorProcessorContexts.front()->cursorContextPool.markCursorForDeletion(id);
     auto task = std::make_unique<detail::CleanUpDroppedCursorsExecutor>(

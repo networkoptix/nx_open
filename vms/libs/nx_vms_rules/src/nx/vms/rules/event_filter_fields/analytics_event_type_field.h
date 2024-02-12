@@ -18,7 +18,7 @@ class NX_VMS_RULES_API AnalyticsEventTypeField:
 
     Q_CLASSINFO("metatype", "nx.events.fields.analyticsEventType")
 
-    Q_PROPERTY(QnUuid engineId READ engineId WRITE setEngineId NOTIFY engineIdChanged)
+    Q_PROPERTY(nx::Uuid engineId READ engineId WRITE setEngineId NOTIFY engineIdChanged)
     Q_PROPERTY(QString typeId READ typeId WRITE setTypeId NOTIFY typeIdChanged)
 
 public:
@@ -26,8 +26,8 @@ public:
 
     virtual bool match(const QVariant& value) const override;
 
-    QnUuid engineId() const;
-    void setEngineId(QnUuid id);
+    nx::Uuid engineId() const;
+    void setEngineId(nx::Uuid id);
 
     QString typeId() const;
     void setTypeId(const QString& id);
@@ -37,7 +37,7 @@ signals:
     void typeIdChanged();
 
 private:
-    QnUuid m_engineId;
+    nx::Uuid m_engineId;
     QString m_typeId;
 };
 

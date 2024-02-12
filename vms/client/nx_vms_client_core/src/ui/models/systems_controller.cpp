@@ -46,13 +46,13 @@ QnAbstractSystemsFinder::SystemDescriptionList SystemsController::systemsList() 
 }
 
 nx::vms::client::core::welcome_screen::TileVisibilityScope SystemsController::visibilityScope(
-    const QnUuid& localId) const
+    const nx::Uuid& localId) const
 {
     return qnSystemsVisibilityManager->scope(localId);
 }
 
 bool SystemsController::setScopeInfo(
-    const QnUuid& localId,
+    const nx::Uuid& localId,
     const QString& name,
     nx::vms::client::core::welcome_screen::TileVisibilityScope visibilityScope)
 {

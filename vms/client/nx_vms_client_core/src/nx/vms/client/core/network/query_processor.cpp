@@ -16,8 +16,8 @@ namespace nx::vms::client::core {
 struct QueryProcessor::Private
 {
     Private(
-        const QnUuid& serverId,
-        const QnUuid& runningInstanceId,
+        const nx::Uuid& serverId,
+        const nx::Uuid& runningInstanceId,
         AbstractCertificateVerifier* certificateVerifier,
         nx::network::SocketAddress address,
         nx::network::http::Credentials credentials,
@@ -63,8 +63,8 @@ struct QueryProcessor::Private
 
     mutable nx::Mutex mutex;
 
-    const QnUuid serverId;
-    QnUuid runningInstanceId;
+    const nx::Uuid serverId;
+    nx::Uuid runningInstanceId;
     AbstractCertificateVerifier* certificateVerifier;
     nx::network::SocketAddress address;
     nx::network::http::Credentials credentials;
@@ -73,8 +73,8 @@ struct QueryProcessor::Private
 };
 
 QueryProcessor::QueryProcessor(
-    const QnUuid& serverId,
-    const QnUuid& runningInstanceId,
+    const nx::Uuid& serverId,
+    const nx::Uuid& runningInstanceId,
     AbstractCertificateVerifier* certificateVerifier,
     nx::network::SocketAddress address,
     nx::network::http::Credentials credentials,
@@ -90,7 +90,7 @@ QueryProcessor::QueryProcessor(
 {
 }
 
-void QueryProcessor::updateSessionId(const QnUuid& sessionId)
+void QueryProcessor::updateSessionId(const nx::Uuid& sessionId)
 {
     d->runningInstanceId = sessionId;
 }
@@ -129,7 +129,7 @@ void QueryProcessor::updateCredentials(nx::network::http::Credentials value)
     d->credentials = std::move(value);
 }
 
-nx::network::ssl::AdapterFunc QueryProcessor::adapterFunc(const QnUuid& serverId) const
+nx::network::ssl::AdapterFunc QueryProcessor::adapterFunc(const nx::Uuid& serverId) const
 {
     return d->certificateVerifier->makeAdapterFunc(serverId, d->address);
 }

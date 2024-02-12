@@ -8,9 +8,9 @@ namespace nx::vms::client::desktop::test {
 
 namespace {
 
-const auto kId1 = QnUuid::createUuid();
-const auto kId2 = QnUuid::createUuid();
-const auto kId3 = QnUuid::createUuid();
+const auto kId1 = nx::Uuid::createUuid();
+const auto kId2 = nx::Uuid::createUuid();
+const auto kId3 = nx::Uuid::createUuid();
 const QString kName1 = "name1";
 const QString kName2 = "name2";
 const QString kName3 = "name3";

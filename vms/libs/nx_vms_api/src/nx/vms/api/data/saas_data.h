@@ -93,7 +93,7 @@ struct NX_VMS_API SaasService
     static const QString kCloudRecordingType;
 
     /**%apidoc Internal service identifier */
-    QnUuid id;
+    nx::Uuid id;
 
     /**%apidoc service type. Service parameters depends on service type. */
     QString type;
@@ -108,7 +108,7 @@ struct NX_VMS_API SaasService
     QString description;
 
     /**%apidoc Identifier of Brand owner or Channel partner issuing the service. */
-    QnUuid createdByChannelPartner;
+    nx::Uuid createdByChannelPartner;
 
     /**%apidoc Configurable service parameters.  Different block for each service type. */
     SaasServiceParameters parameters;
@@ -230,7 +230,7 @@ NX_REFLECTION_INSTRUMENT(ChannelPartnerSupportInformation, ChannelPartnerSupport
 struct NX_VMS_API ChannelPartner
 {
     /**%apidoc Channel partner id */
-    QnUuid id;
+    nx::Uuid id;
 
     /**%apidoc Channel partner name */
     QString name;
@@ -247,7 +247,7 @@ NX_REFLECTION_INSTRUMENT(ChannelPartner, ChannelPartner_fields)
 struct NX_VMS_API Organization
 {
     /**%apidoc Organization id */
-    QnUuid id;
+    nx::Uuid id;
 
     /**%apidoc Organization name */
     QString name;
@@ -287,7 +287,7 @@ NX_REFLECTION_INSTRUMENT(SaasSecurity, SaasSecurity_fields)
 struct NX_VMS_API SaasData
 {
     /**%apidoc Cloud system Id */
-    QnUuid cloudSystemId;
+    nx::Uuid cloudSystemId;
 
     /**%apidoc Channel partner information */
     ChannelPartner channelPartner;
@@ -299,7 +299,7 @@ struct NX_VMS_API SaasData
     SaasState state = SaasState::uninitialized;
 
     /**%apidoc The list of purchased services */
-    std::map<QnUuid, SaasPurshase> services;
+    std::map<nx::Uuid, SaasPurshase> services;
 
     /**%apidoc Security data. It is used to validate saas data*/
     SaasSecurity security;

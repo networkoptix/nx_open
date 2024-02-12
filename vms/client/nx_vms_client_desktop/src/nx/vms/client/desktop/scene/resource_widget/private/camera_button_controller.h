@@ -30,7 +30,7 @@ class CameraButtonController: public ButtonController, public WindowContextAware
     struct IntercomMuteButtonData
     {
         SoftwareTriggerButton* button = nullptr;
-        QnUuid id;
+        nx::Uuid id;
         IntercomButtonState state = IntercomButtonState::unmute;
 
         std::unique_ptr<TwoWayAudioManager> twoWayAudioManager;
@@ -76,11 +76,11 @@ private:
 
 private:
     QnTwoWayAudioWidget* m_twoWayAudioWidget = nullptr;
-    QnUuid m_twoWayAudioWidgetId;
+    nx::Uuid m_twoWayAudioWidgetId;
 
     std::optional<IntercomMuteButtonData> m_intercomMuteButtonData;
 
-    QnUuid m_intercomOpenDoorId;
+    nx::Uuid m_intercomOpenDoorId;
 };
 
 } // namespace nx::vms::client::desktop

@@ -18,6 +18,6 @@ struct SettingsDescription: public std::map<QString, nx::utils::SettingInfo>
 {
 };
 
-using ServerSettingsManifestValues = Map<QnUuid, SettingsDescription>;
+using ServerSettingsManifestValues = Map<nx::Uuid, SettingsDescription>;
 
 } // nx::vms::api

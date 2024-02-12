@@ -20,17 +20,17 @@ class NX_VMS_RULES_API NotificationActionBase: public nx::vms::rules::BasicActio
     Q_CLASSINFO("type", "nx.actions.notificationBase")
 
     // Common fields.
-    FIELD(QnUuid, id, setId)
+    FIELD(nx::Uuid, id, setId)
     FIELD(QString, caption, setCaption)
     FIELD(QString, description, setDescription)
     FIELD(QString, tooltip, setTooltip)
     FIELD(nx::vms::rules::UuidSelection, users, setUsers)
-    FIELD(QnUuid, serverId, setServerId)
-    FIELD(QnUuidList, deviceIds, setDeviceIds)
+    FIELD(nx::Uuid, serverId, setServerId)
+    FIELD(UuidList, deviceIds, setDeviceIds)
 
     // Analytics data fields.
     FIELD(QString, objectTypeId, setObjectTypeId)
-    FIELD(QnUuid, objectTrackId, setObjectTrackId)
+    FIELD(nx::Uuid, objectTrackId, setObjectTrackId)
     FIELD(nx::common::metadata::Attributes, attributes, setAttributes)
 
     // Notification look and feel fields.

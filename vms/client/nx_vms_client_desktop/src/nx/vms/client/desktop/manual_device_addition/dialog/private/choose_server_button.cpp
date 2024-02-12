@@ -48,7 +48,7 @@ bool QnChooseServerButton::setCurrentServer(const QnMediaServerResourcePtr& serv
 
     const auto previous = m_server;
     m_server = server;
-    setCurrentAction(actionForServer(m_server ? m_server->getId() : QnUuid()));
+    setCurrentAction(actionForServer(m_server ? m_server->getId() : nx::Uuid()));
 
     emit currentServerChanged(m_server);
     return true;
@@ -70,7 +70,7 @@ void QnChooseServerButton::addServer(const QnMediaServerResourcePtr& server)
     addMenuItemForServer(server);
 }
 
-void QnChooseServerButton::removeServer(const QnUuid& id)
+void QnChooseServerButton::removeServer(const nx::Uuid& id)
 {
     if (const auto action = actionForServer(id))
         menu()->removeAction(action);
@@ -104,7 +104,7 @@ QAction* QnChooseServerButton::addMenuItemForServer(const QnMediaServerResourceP
     return action;
 }
 
-QAction* QnChooseServerButton::actionForServer(const QnUuid& id)
+QAction* QnChooseServerButton::actionForServer(const nx::Uuid& id)
 {
     const auto currentMenu = menu();
     const auto actions = currentMenu->actions();

@@ -29,7 +29,7 @@ public:
     virtual bool tryClose(bool force) override;
     virtual void forcedUpdate() override;
 
-    void start(const QnUuid& targetId);
+    void start(const nx::Uuid& targetId);
 
     /** Get name of the server being merged. */
     QString getServerName() const;
@@ -74,10 +74,10 @@ private:
         const nx::vms::api::ModuleInformation& moduleInformation);
 
 private:
-    QnUuid m_targetId;
-    QnUuid m_originalTargetId;
+    nx::Uuid m_targetId;
+    nx::Uuid m_originalTargetId;
     QString m_serverName;
-    QnUuid m_mergeContextId;
+    nx::Uuid m_mergeContextId;
 
     QPointer<MergeSystemsTool> m_mergeTool;
     std::unique_ptr<Delegate> m_delegate;

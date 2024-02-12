@@ -9,7 +9,7 @@ void LookupListNotificationManager::triggerNotification(
     NotificationSource /*source*/)
 {
     NX_ASSERT(tran.command == ApiCommand::removeLookupList);
-    emit removed(QnUuid(tran.params.id));
+    emit removed(nx::Uuid(tran.params.id));
 }
 
 void LookupListNotificationManager::triggerNotification(

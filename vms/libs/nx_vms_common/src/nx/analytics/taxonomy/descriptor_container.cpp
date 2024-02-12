@@ -32,7 +32,7 @@ DescriptorContainer::DescriptorContainer(
         });
 }
 
-Descriptors DescriptorContainer::descriptors(const QnUuid& serverId)
+Descriptors DescriptorContainer::descriptors(const nx::Uuid& serverId)
 {
     {
         NX_MUTEX_LOCKER lock(&m_mutex);
@@ -44,7 +44,7 @@ Descriptors DescriptorContainer::descriptors(const QnUuid& serverId)
     if (serverId.isNull())
     {
         const auto servers = resourcePool->servers();
-        std::map<QnUuid, Descriptors> descriptorsByServer;
+        std::map<nx::Uuid, Descriptors> descriptorsByServer;
 
         Descriptors result;
         for (const QnMediaServerResourcePtr& server: servers)

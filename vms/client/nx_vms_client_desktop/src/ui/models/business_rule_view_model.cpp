@@ -60,17 +60,17 @@ QString braced(const QString& source)
     return '<' + source + '>';
 };
 
-QVector<QnUuid> toIdList(const QSet<QnUuid>& src)
+QVector<nx::Uuid> toIdList(const QSet<nx::Uuid>& src)
 {
-    return QVector<QnUuid>(src.begin(), src.end());
+    return QVector<nx::Uuid>(src.begin(), src.end());
 }
 
-QSet<QnUuid> toIds(const QnResourceList& resources)
+QSet<nx::Uuid> toIds(const QnResourceList& resources)
 {
     return nx::utils::toQSet(resources.ids());
 }
 
-QSet<QnUuid> filterEventResources(const QSet<QnUuid>& ids, vms::api::EventType eventType)
+QSet<nx::Uuid> filterEventResources(const QSet<nx::Uuid>& ids, vms::api::EventType eventType)
 {
     auto resourcePool = appContext()->currentSystemContext()->resourcePool();
 
@@ -80,14 +80,14 @@ QSet<QnUuid> filterEventResources(const QSet<QnUuid>& ids, vms::api::EventType e
     if (vms::event::requiresServerResource(eventType))
         return toIds(resourcePool->getResourcesByIds<QnMediaServerResource>(ids));
 
-    return QSet<QnUuid>();
+    return QSet<nx::Uuid>();
 }
 
 template<class IDList>
-QSet<QnUuid> filterSubjectIds(const IDList& ids)
+QSet<nx::Uuid> filterSubjectIds(const IDList& ids)
 {
     QnUserResourceList users;
-    QList<QnUuid> groupIds;
+    QList<nx::Uuid> groupIds;
 
     nx::vms::common::getUsersAndGroups(appContext()->currentSystemContext(),
         ids, users, groupIds);
@@ -95,9 +95,9 @@ QSet<QnUuid> filterSubjectIds(const IDList& ids)
     return toIds(users).unite(nx::utils::toQSet(groupIds));
 }
 
-QSet<QnUuid> filterActionResources(
+QSet<nx::Uuid> filterActionResources(
     const QnBusinessRuleViewModel* model,
-    const QSet<QnUuid>& ids,
+    const QSet<nx::Uuid>& ids,
     vms::api::ActionType actionType)
 {
     auto resourcePool = model->resourcePool();
@@ -121,7 +121,7 @@ QSet<QnUuid> filterActionResources(
     if (vms::event::requiresServerResource(actionType))
         return toIds(resourcePool->getResourcesByIds<QnMediaServerResource>(ids));
 
-    return QSet<QnUuid>();
+    return QSet<nx::Uuid>();
 }
 
 /**
@@ -156,12 +156,12 @@ QList<QnBusinessRuleViewModel::Column> QnBusinessRuleViewModel::allColumns()
     return result;
 }
 
-const QnUuid QnBusinessRuleViewModel::kAllUsersId;
+const nx::Uuid QnBusinessRuleViewModel::kAllUsersId;
 
 QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    m_id(QnUuid::createUuid()),
+    m_id(nx::Uuid::createUuid()),
     m_modified(false),
     m_eventType(EventType::cameraDisconnectEvent),
     m_eventState(vms::api::EventState::undefined),
@@ -365,12 +365,12 @@ bool QnBusinessRuleViewModel::setData(Column column, const QVariant& value, int 
             return true;
 
         case Column::source:
-            setEventResources(value.value<QSet<QnUuid>>());
+            setEventResources(value.value<QSet<nx::Uuid>>());
             return true;
 
         case Column::target:
         {
-            auto subjects = value.value<QSet<QnUuid>>();
+            auto subjects = value.value<QSet<nx::Uuid>>();
             const bool allUsers = subjects.remove(kAllUsersId);
 
             if (allUsers != m_actionParams.allUsers)
@@ -468,7 +468,7 @@ vms::event::RulePtr QnBusinessRuleViewModel::createRule() const
 // setters and getters
 
 
-QnUuid QnBusinessRuleViewModel::id() const
+nx::Uuid QnBusinessRuleViewModel::id() const
 {
     return m_id;
 }
@@ -523,7 +523,7 @@ void QnBusinessRuleViewModel::setEventType(const vms::api::EventType value)
             }
 
             case EventType::softwareTriggerEvent:
-                eventParams.inputPortId = QnUuid::createUuid().toSimpleString();
+                eventParams.inputPortId = nx::Uuid::createUuid().toSimpleString();
                 eventParams.description = SoftwareTriggerPixmaps::defaultPixmapName();
                 break;
 
@@ -621,7 +621,7 @@ QIcon QnBusinessRuleViewModel::iconForAction() const
                 return qnSkin->icon("tree/user_alert.svg", colorSubs);
 
             QnUserResourceList users;
-            QList<QnUuid> groupIds;
+            QList<nx::Uuid> groupIds;
             nx::vms::common::getUsersAndGroups(systemContext(),
                 m_actionParams.additionalResources, users, groupIds);
             users = users.filtered(
@@ -675,12 +675,12 @@ QIcon QnBusinessRuleViewModel::iconForAction() const
     return qnResIconCache->icon(QnResourceIconCache::CurrentSystem);
 }
 
-QSet<QnUuid> QnBusinessRuleViewModel::eventResources() const
+QSet<nx::Uuid> QnBusinessRuleViewModel::eventResources() const
 {
     return filterEventResources(m_eventResources, m_eventType);
 }
 
-void QnBusinessRuleViewModel::setEventResources(const QSet<QnUuid>& value)
+void QnBusinessRuleViewModel::setEventResources(const QSet<nx::Uuid>& value)
 {
     auto filtered = filterEventResources(value, m_eventType);
     auto oldFiltered = filterEventResources(m_eventResources, m_eventType);
@@ -769,7 +769,7 @@ void QnBusinessRuleViewModel::setActionType(const vms::api::ActionType value)
         actionParams.allUsers = false;
         actionParams.additionalResources = additionalUserIsRequired
             ? nx::toStdVector(nx::vms::api::kAllPowerUserGroupIds)
-            : std::vector<QnUuid>();
+            : std::vector<nx::Uuid>();
 
         switch (m_actionType)
         {
@@ -842,12 +842,12 @@ void QnBusinessRuleViewModel::setActionType(const vms::api::ActionType value)
     emit dataChanged(fields);
 }
 
-QSet<QnUuid> QnBusinessRuleViewModel::actionResources() const
+QSet<nx::Uuid> QnBusinessRuleViewModel::actionResources() const
 {
     return filterActionResources(this, m_actionResources, m_actionType);
 }
 
-void QnBusinessRuleViewModel::setActionResources(const QSet<QnUuid>& value)
+void QnBusinessRuleViewModel::setActionResources(const QSet<nx::Uuid>& value)
 {
     auto filtered = filterActionResources(this, value, m_actionType);
     auto oldFiltered = filterActionResources(this, m_actionResources, m_actionType);
@@ -858,12 +858,12 @@ void QnBusinessRuleViewModel::setActionResources(const QSet<QnUuid>& value)
     setActionResourcesRaw(value);
 }
 
-QSet<QnUuid> QnBusinessRuleViewModel::actionResourcesRaw() const
+QSet<nx::Uuid> QnBusinessRuleViewModel::actionResourcesRaw() const
 {
     return m_actionResources;
 }
 
-void QnBusinessRuleViewModel::setActionResourcesRaw(const QSet<QnUuid>& value)
+void QnBusinessRuleViewModel::setActionResourcesRaw(const QSet<nx::Uuid>& value)
 {
     m_actionResources = value;
     m_modified = true;
@@ -1295,7 +1295,7 @@ bool QnBusinessRuleViewModel::isValid(Column column) const
                     layoutAccessPolicy.setLayout(layout);
 
                     // TODO: use iterator-based constructor after update to Qt 5.14.
-                    QSet<QnUuid> subjects;
+                    QSet<nx::Uuid> subjects;
                     for (const auto& v: m_actionParams.additionalResources)
                         subjects << v;
 

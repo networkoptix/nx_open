@@ -21,7 +21,7 @@ struct NX_VMS_API SystemMergeData
     std::string remoteCertificatePem;
 
     /**%apidoc[opt] */
-    QnUuid remoteServerId;
+    nx::Uuid remoteServerId;
 
     /**%apidoc[opt] Whether remote System settings should be taken. */
     bool takeRemoteSettings = false;

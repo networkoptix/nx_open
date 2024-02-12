@@ -619,21 +619,21 @@ AbstractItemPtr ResourceTreeItemFactory::createCloudSystemItem(const QString& sy
         .withFlags(cloudSystemFlagsProvider(systemId));
 }
 
-AbstractItemPtr ResourceTreeItemFactory::createShowreelItem(const QnUuid& showreelId)
+AbstractItemPtr ResourceTreeItemFactory::createShowreelItem(const nx::Uuid& showreelId)
 {
     return std::make_unique<ShowreelItem>(systemContext()->showreelManager(), showreelId);
 }
 
 AbstractItemPtr ResourceTreeItemFactory::createVideoWallScreenItem(
     const QnVideoWallResourcePtr& videoWall,
-    const QnUuid& screenUuid)
+    const nx::Uuid& screenUuid)
 {
     return std::make_unique<VideoWallScreenItem>(videoWall, screenUuid);
 }
 
 AbstractItemPtr ResourceTreeItemFactory::createVideoWallMatrixItem(
     const QnVideoWallResourcePtr& videoWall,
-    const QnUuid& matrixUuid)
+    const nx::Uuid& matrixUuid)
 {
     return std::make_unique<VideoWallMatrixItem>(videoWall, matrixUuid);
 }

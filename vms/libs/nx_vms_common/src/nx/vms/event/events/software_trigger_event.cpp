@@ -11,7 +11,7 @@ namespace event {
 SoftwareTriggerEvent::SoftwareTriggerEvent(
     const QnResourcePtr& resource,
     const QString& triggerId,
-    const QnUuid& userId,
+    const nx::Uuid& userId,
     qint64 timeStampUs,
     EventState toggleState,
     const QString& triggerName,
@@ -30,7 +30,7 @@ const QString& SoftwareTriggerEvent::triggerId() const
     return m_triggerId;
 }
 
-const QnUuid& SoftwareTriggerEvent::userId() const
+const nx::Uuid& SoftwareTriggerEvent::userId() const
 {
     return m_userId;
 }

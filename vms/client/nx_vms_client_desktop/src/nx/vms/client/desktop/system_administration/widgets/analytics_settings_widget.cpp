@@ -68,7 +68,7 @@ bool AnalyticsSettingsWidget::activate(const QUrl& url)
 {
     const QUrlQuery urlQuery(url);
 
-    const auto& engineId = QnUuid::fromStringSafe(urlQuery.queryItemValue("engineId"));
+    const auto& engineId = nx::Uuid::fromStringSafe(urlQuery.queryItemValue("engineId"));
     if (!engineId.isNull())
         d->activateEngine(engineId);
 

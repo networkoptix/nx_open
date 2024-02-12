@@ -12,35 +12,35 @@ namespace nx::core::access {
 
 struct SubjectHierarchy::Private
 {
-    QHash<QnUuid /*subject*/, QSet<QnUuid> /*groups*/> directParents;
-    QHash<QnUuid /*group*/, QSet<QnUuid> /*subjects*/> directMembers;
+    QHash<nx::Uuid /*subject*/, QSet<nx::Uuid> /*groups*/> directParents;
+    QHash<nx::Uuid /*group*/, QSet<nx::Uuid> /*subjects*/> directMembers;
 
     mutable nx::Mutex mutex;
 
-    bool exists(const QnUuid& subject) const { return directParents.contains(subject); }
+    bool exists(const nx::Uuid& subject) const { return directParents.contains(subject); }
 
-    QSet<QnUuid> recursiveParents(const QSet<QnUuid>& subjects) const;
-    QSet<QnUuid> recursiveMembers(const QSet<QnUuid>& subjects) const;
-    bool isRecursiveMember(const QnUuid& subject, const QSet<QnUuid>& groups) const;
+    QSet<nx::Uuid> recursiveParents(const QSet<nx::Uuid>& subjects) const;
+    QSet<nx::Uuid> recursiveMembers(const QSet<nx::Uuid>& subjects) const;
+    bool isRecursiveMember(const nx::Uuid& subject, const QSet<nx::Uuid>& groups) const;
 
     struct DfsContext
     {
-        QStack<QnUuid> stack;
-        QSet<QnUuid> onStack;
-        QHash<QnUuid, int> indexes;
-        QHash<QnUuid, int> lowLink;
+        QStack<nx::Uuid> stack;
+        QSet<nx::Uuid> onStack;
+        QHash<nx::Uuid, int> indexes;
+        QHash<nx::Uuid, int> lowLink;
 
-        QList<QSet<QnUuid>> cycledGroupSets;
+        QList<QSet<nx::Uuid>> cycledGroupSets;
     };
 
-    void findCycledGroupSetRecurse(const QnUuid& id, DfsContext& context) const;
+    void findCycledGroupSetRecurse(const nx::Uuid& id, DfsContext& context) const;
 
 private:
-    void calculateRecursiveParents(const QnUuid& group, QSet<QnUuid>& result) const;
-    void calculateRecursiveMembers(const QnUuid& group, QSet<QnUuid>& result) const;
+    void calculateRecursiveParents(const nx::Uuid& group, QSet<nx::Uuid>& result) const;
+    void calculateRecursiveMembers(const nx::Uuid& group, QSet<nx::Uuid>& result) const;
 
     bool isRecursiveMember(
-        const QnUuid& subject, const QSet<QnUuid>& groups, QSet<QnUuid>& alreadyVisited) const;
+        const nx::Uuid& subject, const QSet<nx::Uuid>& groups, QSet<nx::Uuid>& alreadyVisited) const;
 };
 
 SubjectHierarchy::SubjectHierarchy(QObject* parent):
@@ -54,27 +54,27 @@ SubjectHierarchy::~SubjectHierarchy()
     // Required here for forward-declared scoped pointer destruction.
 }
 
-QSet<QnUuid> SubjectHierarchy::directParents(const QnUuid& subject) const
+QSet<nx::Uuid> SubjectHierarchy::directParents(const nx::Uuid& subject) const
 {
     NX_MUTEX_LOCKER lk(&d->mutex);
     return d->directParents.value(subject);
 }
 
-QSet<QnUuid> SubjectHierarchy::directMembers(const QnUuid& group) const
+QSet<nx::Uuid> SubjectHierarchy::directMembers(const nx::Uuid& group) const
 {
     NX_MUTEX_LOCKER lk(&d->mutex);
     return d->directMembers.value(group);
 }
 
-QSet<QnUuid> SubjectHierarchy::recursiveParents(const QSet<QnUuid>& subjects) const
+QSet<nx::Uuid> SubjectHierarchy::recursiveParents(const QSet<nx::Uuid>& subjects) const
 {
     NX_MUTEX_LOCKER lk(&d->mutex);
     return d->recursiveParents(subjects);
 }
 
-QSet<QnUuid> SubjectHierarchy::Private::recursiveParents(const QSet<QnUuid>& subjects) const
+QSet<nx::Uuid> SubjectHierarchy::Private::recursiveParents(const QSet<nx::Uuid>& subjects) const
 {
-    QSet<QnUuid> result;
+    QSet<nx::Uuid> result;
     for (const auto subject: subjects)
         calculateRecursiveParents(subject, result);
 
@@ -82,7 +82,7 @@ QSet<QnUuid> SubjectHierarchy::Private::recursiveParents(const QSet<QnUuid>& sub
 }
 
 void SubjectHierarchy::Private::calculateRecursiveParents(
-    const QnUuid& group, QSet<QnUuid>& result) const
+    const nx::Uuid& group, QSet<nx::Uuid>& result) const
 {
     for (const auto parent: directParents.value(group))
     {
@@ -94,15 +94,15 @@ void SubjectHierarchy::Private::calculateRecursiveParents(
     }
 }
 
-QSet<QnUuid> SubjectHierarchy::recursiveMembers(const QSet<QnUuid>& subjects) const
+QSet<nx::Uuid> SubjectHierarchy::recursiveMembers(const QSet<nx::Uuid>& subjects) const
 {
     NX_MUTEX_LOCKER lk(&d->mutex);
     return d->recursiveMembers(subjects);
 }
 
-QSet<QnUuid> SubjectHierarchy::Private::recursiveMembers(const QSet<QnUuid>& subjects) const
+QSet<nx::Uuid> SubjectHierarchy::Private::recursiveMembers(const QSet<nx::Uuid>& subjects) const
 {
-    QSet<QnUuid> result;
+    QSet<nx::Uuid> result;
     for (const auto subject: subjects)
         calculateRecursiveMembers(subject, result);
 
@@ -110,7 +110,7 @@ QSet<QnUuid> SubjectHierarchy::Private::recursiveMembers(const QSet<QnUuid>& sub
 }
 
 void SubjectHierarchy::Private::calculateRecursiveMembers(
-    const QnUuid& group, QSet<QnUuid>& result) const
+    const nx::Uuid& group, QSet<nx::Uuid>& result) const
 {
     for (const auto member: directMembers.value(group))
     {
@@ -122,23 +122,23 @@ void SubjectHierarchy::Private::calculateRecursiveMembers(
     }
 }
 
-bool SubjectHierarchy::isDirectMember(const QnUuid& subject, const QnUuid& group) const
+bool SubjectHierarchy::isDirectMember(const nx::Uuid& subject, const nx::Uuid& group) const
 {
     return directParents(subject).contains(group);
 }
 
-bool SubjectHierarchy::isRecursiveMember(const QnUuid& subject, const QSet<QnUuid>& parents) const
+bool SubjectHierarchy::isRecursiveMember(const nx::Uuid& subject, const QSet<nx::Uuid>& parents) const
 {
     NX_MUTEX_LOCKER lk(&d->mutex);
     return d->isRecursiveMember(subject, parents);
 }
 
-bool SubjectHierarchy::isWithin(const QnUuid& subject, const QSet<QnUuid>& subjects) const
+bool SubjectHierarchy::isWithin(const nx::Uuid& subject, const QSet<nx::Uuid>& subjects) const
 {
     return subjects.contains(subject) || isRecursiveMember(subject, subjects);
 }
 
-QList<QSet<QnUuid>> SubjectHierarchy::findCycledGroupSets() const
+QList<QSet<nx::Uuid>> SubjectHierarchy::findCycledGroupSets() const
 {
     Private::DfsContext context;
 
@@ -151,8 +151,8 @@ QList<QSet<QnUuid>> SubjectHierarchy::findCycledGroupSets() const
     return context.cycledGroupSets;
 }
 
-QList<QSet<QnUuid>> SubjectHierarchy::findCycledGroupSetsForSpecificGroups(
-    const QSet<QnUuid>& groups) const
+QList<QSet<nx::Uuid>> SubjectHierarchy::findCycledGroupSetsForSpecificGroups(
+    const QSet<nx::Uuid>& groups) const
 {
     Private::DfsContext context;
 
@@ -163,14 +163,14 @@ QList<QSet<QnUuid>> SubjectHierarchy::findCycledGroupSetsForSpecificGroups(
 }
 
 bool SubjectHierarchy::Private::isRecursiveMember(
-    const QnUuid& subject, const QSet<QnUuid>& groups) const
+    const nx::Uuid& subject, const QSet<nx::Uuid>& groups) const
 {
-    QSet<QnUuid> alreadyVisited;
+    QSet<nx::Uuid> alreadyVisited;
     return isRecursiveMember(subject, groups, alreadyVisited);
 }
 
 void SubjectHierarchy::Private::findCycledGroupSetRecurse(
-    const QnUuid& id, DfsContext& context) const
+    const nx::Uuid& id, DfsContext& context) const
 {
     // This is an implementation of Tarjan's strongly connected components algorithm.
 
@@ -180,7 +180,7 @@ void SubjectHierarchy::Private::findCycledGroupSetRecurse(
     context.stack.push(id);
     context.onStack.insert(id);
 
-    for (const QnUuid& parentId: directParents.value(id))
+    for (const nx::Uuid& parentId: directParents.value(id))
     {
         if (!context.indexes.contains(parentId))
         {
@@ -195,9 +195,9 @@ void SubjectHierarchy::Private::findCycledGroupSetRecurse(
 
     if (context.lowLink[id] == context.indexes[id])
     {
-        QSet<QnUuid> cycledGroupSet;
+        QSet<nx::Uuid> cycledGroupSet;
 
-        QnUuid id1;
+        nx::Uuid id1;
         do
         {
             id1 = context.stack.pop();
@@ -214,7 +214,7 @@ void SubjectHierarchy::Private::findCycledGroupSetRecurse(
 }
 
 bool SubjectHierarchy::Private::isRecursiveMember(
-    const QnUuid& subject, const QSet<QnUuid>& groups, QSet<QnUuid>& alreadyVisited) const
+    const nx::Uuid& subject, const QSet<nx::Uuid>& groups, QSet<nx::Uuid>& alreadyVisited) const
 {
     alreadyVisited.insert(subject);
 
@@ -233,7 +233,7 @@ bool SubjectHierarchy::Private::isRecursiveMember(
     return false;
 }
 
-bool SubjectHierarchy::exists(const QnUuid& subject) const
+bool SubjectHierarchy::exists(const nx::Uuid& subject) const
 {
     NX_MUTEX_LOCKER lk(&d->mutex);
     return d->exists(subject);
@@ -264,7 +264,7 @@ SubjectHierarchy& SubjectHierarchy::operator=(const SubjectHierarchy& other)
     return *this;
 }
 
-bool SubjectHierarchy::addOrUpdate(const QnUuid& subject, const QSet<QnUuid>& parents)
+bool SubjectHierarchy::addOrUpdate(const nx::Uuid& subject, const QSet<nx::Uuid>& parents)
 {
     NX_MUTEX_LOCKER lk(&d->mutex);
     const bool existing = d->exists(subject);
@@ -288,7 +288,7 @@ bool SubjectHierarchy::addOrUpdate(const QnUuid& subject, const QSet<QnUuid>& pa
     if (existing && removedFrom.empty() && addedTo.empty())
         return false; //< No actual change.
 
-    const QSet<QnUuid> subjectAsSet{subject};
+    const QSet<nx::Uuid> subjectAsSet{subject};
     for (const auto& id: parents)
     {
         if (id == subject || d->isRecursiveMember(id, subjectAsSet))
@@ -300,7 +300,7 @@ bool SubjectHierarchy::addOrUpdate(const QnUuid& subject, const QSet<QnUuid>& pa
     for (const auto& group: removedFrom)
         d->directMembers[group].remove(subject);
 
-    QSet<QnUuid> newlyAdded;
+    QSet<nx::Uuid> newlyAdded;
     for (const auto& group: addedTo)
     {
         if (!d->exists(group))
@@ -312,7 +312,7 @@ bool SubjectHierarchy::addOrUpdate(const QnUuid& subject, const QSet<QnUuid>& pa
         d->directMembers[group].insert(subject);
     }
 
-    const auto subjectsWithChangedParents = existing ? subjectAsSet : QSet<QnUuid>();
+    const auto subjectsWithChangedParents = existing ? subjectAsSet : QSet<nx::Uuid>();
     const auto groupsWithChangedMembers = removedFrom + (addedTo - newlyAdded);
     if (!existing)
         newlyAdded.insert(subject);
@@ -333,7 +333,7 @@ bool SubjectHierarchy::addOrUpdate(const QnUuid& subject, const QSet<QnUuid>& pa
 }
 
 bool SubjectHierarchy::addOrUpdate(
-    const QnUuid& subject, const QSet<QnUuid>& parents, const QSet<QnUuid>& members)
+    const nx::Uuid& subject, const QSet<nx::Uuid>& parents, const QSet<nx::Uuid>& members)
 {
     NX_MUTEX_LOCKER lk(&d->mutex);
     const bool existing = d->exists(subject);
@@ -379,7 +379,7 @@ bool SubjectHierarchy::addOrUpdate(
     for (const auto& group: memberRemovedFrom)
         d->directMembers[group].remove(subject);
 
-    QSet<QnUuid> newlyAddedParents;
+    QSet<nx::Uuid> newlyAddedParents;
     for (const auto& group: memberAddedTo)
     {
         if (!d->exists(group))
@@ -394,7 +394,7 @@ bool SubjectHierarchy::addOrUpdate(
     for (const auto& member: parentRemovedFrom)
         d->directParents[member].remove(subject);
 
-    QSet<QnUuid> newlyAddedMembers;
+    QSet<nx::Uuid> newlyAddedMembers;
     for (const auto& member: parentAddedTo)
     {
         if (!d->exists(member))
@@ -411,7 +411,7 @@ bool SubjectHierarchy::addOrUpdate(
 
     lk.unlock();
 
-    const auto changedSubjectItself = existing ? QSet<QnUuid>{subject} : QSet<QnUuid>();
+    const auto changedSubjectItself = existing ? QSet<nx::Uuid>{subject} : QSet<nx::Uuid>();
 
     const auto subjectsWithChangedParents = parentRemovedFrom + (parentAddedTo - newlyAddedMembers)
         + changedSubjectItself;
@@ -437,15 +437,15 @@ bool SubjectHierarchy::addOrUpdate(
     return true;
 }
 
-bool SubjectHierarchy::remove(const QSet<QnUuid>& subjects)
+bool SubjectHierarchy::remove(const QSet<nx::Uuid>& subjects)
 {
     NX_DEBUG(this, "Removing %1 from the hierarchy", subjects);
 
     NX_MUTEX_LOCKER lk(&d->mutex);
 
-    QSet<QnUuid> groupsWithChangedMembers;
-    QSet<QnUuid> subjectsWithChangedParents;
-    QSet<QnUuid> removed;
+    QSet<nx::Uuid> groupsWithChangedMembers;
+    QSet<nx::Uuid> subjectsWithChangedParents;
+    QSet<nx::Uuid> removed;
 
     for (const auto subject: subjects)
     {
@@ -486,9 +486,9 @@ bool SubjectHierarchy::remove(const QSet<QnUuid>& subjects)
     return true;
 }
 
-bool SubjectHierarchy::remove(const QnUuid& subject)
+bool SubjectHierarchy::remove(const nx::Uuid& subject)
 {
-    return remove(QSet<QnUuid>({subject}));
+    return remove(QSet<nx::Uuid>({subject}));
 }
 
 } // namespace nx::core::access

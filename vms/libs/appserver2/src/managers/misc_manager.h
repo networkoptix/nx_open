@@ -18,7 +18,7 @@ public:
     QnMiscManager(QueryProcessorType* queryProcessor, const Qn::UserSession& userSession);
 
     virtual int changeSystemId(
-        const QnUuid& systemId,
+        const nx::Uuid& systemId,
         qint64 sysIdTime,
         nx::vms::api::Timestamp tranLogTime,
         Handler<> handler,
@@ -90,7 +90,7 @@ QnMiscManager<QueryProcessorType>::QnMiscManager(
 
 template<class QueryProcessorType>
 int QnMiscManager<QueryProcessorType>::changeSystemId(
-    const QnUuid& systemId,
+    const nx::Uuid& systemId,
     qint64 sysIdTime,
     nx::vms::api::Timestamp tranLogTime,
     Handler<> handler,

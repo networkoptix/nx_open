@@ -17,7 +17,7 @@
 
 using namespace nx::vms::client::desktop;
 
-QnWorkbenchItem::QnWorkbenchItem(const QnResourcePtr& resource, const QnUuid& uuid, QObject* parent):
+QnWorkbenchItem::QnWorkbenchItem(const QnResourcePtr& resource, const nx::Uuid& uuid, QObject* parent):
     QObject(parent),
     m_uuid(uuid),
     m_resource(resource)
@@ -74,7 +74,7 @@ void QnWorkbenchItem::setLayout(QnWorkbenchLayout* value)
     if (m_layout)
     {
         connect(m_layout->resource().get(), &LayoutResource::itemDataChanged, this,
-            [this](const QnUuid& itemId, Qn::ItemDataRole role, const QVariant& /*value*/)
+            [this](const nx::Uuid& itemId, Qn::ItemDataRole role, const QVariant& /*value*/)
             {
                 if (itemId == m_uuid)
                     emit dataChanged(role);
@@ -132,7 +132,7 @@ void QnWorkbenchItem::submit(nx::vms::common::LayoutItemData& data) const
     data.zoomRect = zoomRect();
     data.contrastParams = imageEnhancement();
     data.dewarpingParams = dewarpingParams();
-    data.zoomTargetUuid = zoomTargetItem() ? zoomTargetItem()->uuid() : QnUuid();
+    data.zoomTargetUuid = zoomTargetItem() ? zoomTargetItem()->uuid() : nx::Uuid();
     data.combinedGeometry = combinedGeometry();
     data.displayInfo = displayInfo();
     data.controlPtz = controlPtz();
@@ -414,7 +414,7 @@ QVariant QnWorkbenchItem::data(Qn::ItemDataRole role) const
     switch (role)
     {
         case Qn::ItemUuidRole:
-            return QVariant::fromValue<QnUuid>(uuid());
+            return QVariant::fromValue<nx::Uuid>(uuid());
         case Qn::ItemGeometryRole:
             return geometry();
         case Qn::ItemGeometryDeltaRole:
@@ -459,7 +459,7 @@ void QnWorkbenchItem::setData(Qn::ItemDataRole role, const QVariant &value)
     switch (role)
     {
         case Qn::ItemUuidRole:
-            NX_ASSERT(value.value<QnUuid>() == uuid());
+            NX_ASSERT(value.value<nx::Uuid>() == uuid());
             break;
         case Qn::ItemGeometryRole:
             NX_ASSERT(value.canConvert<QRect>());

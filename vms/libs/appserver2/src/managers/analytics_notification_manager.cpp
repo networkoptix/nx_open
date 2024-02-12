@@ -27,10 +27,10 @@ void AnalyticsNotificationManager::triggerNotification(
     switch (tran.command)
     {
         case ApiCommand::removeAnalyticsPlugin:
-            emit analyticsPluginRemoved(QnUuid(tran.params.id), source);
+            emit analyticsPluginRemoved(nx::Uuid(tran.params.id), source);
             break;
         case ApiCommand::removeAnalyticsEngine:
-            emit analyticsEngineRemoved(QnUuid(tran.params.id), source);
+            emit analyticsEngineRemoved(nx::Uuid(tran.params.id), source);
             break;
         default:
             NX_ASSERT(false, "Wrong transaction type");

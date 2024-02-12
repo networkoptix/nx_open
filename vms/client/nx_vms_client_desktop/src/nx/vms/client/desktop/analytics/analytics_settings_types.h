@@ -9,8 +9,8 @@ namespace nx::vms::client::desktop {
 
 struct DeviceAgentId
 {
-    QnUuid device;
-    QnUuid engine;
+    nx::Uuid device;
+    nx::Uuid engine;
 
     inline bool operator==(const DeviceAgentId& other) const
     {
@@ -36,7 +36,7 @@ struct NX_VMS_CLIENT_DESKTOP_API DeviceAgentData
     nx::vms::api::analytics::SettingsModel model;
     nx::vms::api::analytics::SettingsValues values;
     QJsonObject errors;
-    QnUuid modelId;
+    nx::Uuid modelId;
     Status status = Status::initial;
 };
 

@@ -18,29 +18,29 @@ struct UserGroupRequest
     // A request to remove user by id.
     struct RemoveUser
     {
-        QnUuid id;
+        nx::Uuid id;
     };
 
     // A request to remove group by id.
     struct RemoveGroup
     {
-        QnUuid id;
+        nx::Uuid id;
     };
 
     // A request to modify user parents.
     struct ModifyUserParents
     {
-        QnUuid id;
-        std::vector<QnUuid> prevParents;
-        std::vector<QnUuid> newParents;
+        nx::Uuid id;
+        std::vector<nx::Uuid> prevParents;
+        std::vector<nx::Uuid> newParents;
     };
 
     // A request to modify group parents.
     struct ModifyGroupParents
     {
-        QnUuid id;
-        std::vector<QnUuid> prevParents;
-        std::vector<QnUuid> newParents;
+        nx::Uuid id;
+        std::vector<nx::Uuid> prevParents;
+        std::vector<nx::Uuid> newParents;
     };
 
     // A request to add or modify group data.
@@ -48,13 +48,13 @@ struct UserGroupRequest
     {
         api::UserGroupModel groupData;
         bool newGroup = false;
-        std::vector<QnUuid> originalParents;
+        std::vector<nx::Uuid> originalParents;
     };
 
     // Update user enabled and digest authentication.
     struct UpdateUser
     {
-        QnUuid id;
+        nx::Uuid id;
         bool enabled = true;
         bool enableDigest = false;
     };
@@ -94,7 +94,7 @@ public:
 
     static void updateLayoutSharing(
         nx::vms::client::desktop::SystemContext* systemContext,
-        const std::map<QnUuid, nx::vms::api::AccessRights>& accessRights);
+        const std::map<nx::Uuid, nx::vms::api::AccessRights>& accessRights);
 
 protected:
     virtual void makeRequest() override;

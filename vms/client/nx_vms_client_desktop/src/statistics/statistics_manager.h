@@ -24,7 +24,7 @@ public:
 public:
     bool registerStatisticsModule(const QString& alias, QnAbstractStatisticsModule* module);
 
-    void setClientId(const QnUuid& clientID);
+    void setClientId(const nx::Uuid& clientID);
 
     void setStorage(QnStatisticsStoragePtr storage);
 
@@ -51,8 +51,8 @@ private:
     typedef QPointer<QnAbstractStatisticsModule> ModulePtr;
     typedef QHash<QString, ModulePtr> ModulesMap;
 
-    QnUuid m_clientId;
-    QnUuid m_sessionId;
+    nx::Uuid m_clientId;
+    nx::Uuid m_sessionId;
 
     QnStatisticsStoragePtr m_storage;
 

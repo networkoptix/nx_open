@@ -21,7 +21,7 @@ namespace nx::vms::client::desktop {
 
 class SystemContext;
 
-/* Wrapper for a QList<QnUuid> to enable implicit sharing when passing through QML. */
+/* Wrapper for a QList<nx::Uuid> to enable implicit sharing when passing through QML. */
 struct NX_VMS_CLIENT_DESKTOP_API MembersListWrapper
 {
     Q_GADGET
@@ -30,23 +30,23 @@ struct NX_VMS_CLIENT_DESKTOP_API MembersListWrapper
 
 public:
     MembersListWrapper() {}
-    MembersListWrapper(const QList<QnUuid>& members): m_members(members) {}
+    MembersListWrapper(const QList<nx::Uuid>& members): m_members(members) {}
     bool operator==(const MembersListWrapper& other) const { return m_members == other.m_members; }
-    bool operator==(const QList<QnUuid>& other) const { return m_members == other; }
-    operator QList<QnUuid>() const { return m_members; }
+    bool operator==(const QList<nx::Uuid>& other) const { return m_members == other; }
+    operator QList<nx::Uuid>() const { return m_members; }
 
     qsizetype length() const { return m_members.size(); }
-    QList<QnUuid> list() const { return m_members; }
+    QList<nx::Uuid> list() const { return m_members; }
 
 private:
-    QList<QnUuid> m_members;
+    QList<nx::Uuid> m_members;
 };
 
 struct NX_VMS_CLIENT_DESKTOP_API MembersModelGroup
 {
     Q_GADGET
 
-    Q_PROPERTY(QnUuid id MEMBER id)
+    Q_PROPERTY(nx::Uuid id MEMBER id)
     Q_PROPERTY(QString text MEMBER text)
     Q_PROPERTY(QString description MEMBER description)
     Q_PROPERTY(bool isLdap MEMBER isLdap)
@@ -55,13 +55,13 @@ struct NX_VMS_CLIENT_DESKTOP_API MembersModelGroup
 public:
     bool operator==(const MembersModelGroup&) const = default;
     bool operator<(const MembersModelGroup& other) const { return id < other.id; }
-    QnUuid id;
+    nx::Uuid id;
     QString text;
     QString description;
     bool isLdap = false;
     bool isPredefined = false;
 
-    static MembersModelGroup fromId(SystemContext* systemContext, const QnUuid& id);
+    static MembersModelGroup fromId(SystemContext* systemContext, const nx::Uuid& id);
 };
 
 class NX_VMS_CLIENT_DESKTOP_API MembersModel: public QAbstractListModel, public SystemContextAware
@@ -70,14 +70,14 @@ class NX_VMS_CLIENT_DESKTOP_API MembersModel: public QAbstractListModel, public 
 
     Q_OBJECT
 
-    Q_PROPERTY(QnUuid groupId READ groupId WRITE setGroupId NOTIFY groupIdChanged)
-    Q_PROPERTY(QnUuid userId READ userId WRITE setUserId NOTIFY userIdChanged)
+    Q_PROPERTY(nx::Uuid groupId READ groupId WRITE setGroupId NOTIFY groupIdChanged)
+    Q_PROPERTY(nx::Uuid userId READ userId WRITE setUserId NOTIFY userIdChanged)
     Q_PROPERTY(bool temporary READ temporary WRITE setTemporary NOTIFY temporaryChanged)
     Q_PROPERTY(QList<nx::vms::client::desktop::MembersModelGroup> parentGroups
         READ parentGroups
         WRITE setParentGroups
         NOTIFY parentGroupsChanged)
-    Q_PROPERTY(QList<QnUuid> groups READ groups WRITE setGroups NOTIFY groupsChanged)
+    Q_PROPERTY(QList<nx::Uuid> groups READ groups WRITE setGroups NOTIFY groupsChanged)
     Q_PROPERTY(MembersListWrapper users READ users WRITE setUsers NOTIFY usersChanged)
     Q_PROPERTY(nx::core::access::ResourceAccessMap sharedResources
         READ ownSharedResources
@@ -132,11 +132,11 @@ public:
     QList<MembersModelGroup> parentGroups() const;
     void setParentGroups(const QList<MembersModelGroup>& groups);
 
-    QnUuid groupId() const { return m_subjectIsUser ? QnUuid{} : m_subjectId; }
-    void setGroupId(const QnUuid& groupId);
+    nx::Uuid groupId() const { return m_subjectIsUser ? nx::Uuid{} : m_subjectId; }
+    void setGroupId(const nx::Uuid& groupId);
 
-    QnUuid userId() const { return m_subjectIsUser ? m_subjectId : QnUuid{}; }
-    void setUserId(const QnUuid& userId);
+    nx::Uuid userId() const { return m_subjectIsUser ? m_subjectId : nx::Uuid{}; }
+    void setUserId(const nx::Uuid& userId);
 
     bool temporary() const { return m_temporary; }
     void setTemporary(bool value);
@@ -147,21 +147,21 @@ public:
     MembersListWrapper users() const;
     void setUsers(const MembersListWrapper& users);
 
-    QList<QnUuid> groups() const;
-    void setGroups(const QList<QnUuid>& groups);
+    QList<nx::Uuid> groups() const;
+    void setGroups(const QList<nx::Uuid>& groups);
 
     int customGroupCount() const;
 
     AccessSubjectEditingContext* editingContext() const { return m_subjectContext.get(); }
 
     // Sort a list of subjects.
-    void sortSubjects(QList<QnUuid>& subjects) const;
+    void sortSubjects(QList<nx::Uuid>& subjects) const;
 
     MembersCache* membersCache() const { return m_cache.get(); }
 
-    bool canEditMembers(const QnUuid& id) const;
+    bool canEditMembers(const nx::Uuid& id) const;
 
-    Q_INVOKABLE void removeParent(const QnUuid& groupId);
+    Q_INVOKABLE void removeParent(const nx::Uuid& groupId);
 
     bool isCycledGroup() const;
 
@@ -182,11 +182,11 @@ signals:
 private:
     void loadModelData();
 
-    bool isAllowed(const QnUuid& parentId, const QnUuid& childId) const;
+    bool isAllowed(const nx::Uuid& parentId, const nx::Uuid& childId) const;
 
-    void addParent(const QnUuid& groupId);
-    void addMember(const QnUuid& memberId);
-    void removeMember(const QnUuid& memberId);
+    void addParent(const nx::Uuid& groupId);
+    void addMember(const nx::Uuid& memberId);
+    void removeMember(const nx::Uuid& memberId);
 
     void subscribeToUser(const QnUserResourcePtr& user);
     void unsubscribeFromUser(const QnUserResourcePtr& user);
@@ -201,18 +201,18 @@ private:
 
 private:
     nx::utils::ScopedConnections m_connections;
-    std::unordered_map<QnUuid, nx::utils::ScopedConnections> m_userConnections;
+    std::unordered_map<nx::Uuid, nx::utils::ScopedConnections> m_userConnections;
 
     std::unique_ptr<AccessSubjectEditingContext, DeleteLater> m_subjectContext;
 
-    QnUuid m_subjectId;
+    nx::Uuid m_subjectId;
     bool m_subjectIsUser = false;
     bool m_temporary = false; //< m_subjectId is a temporary user, implies m_subjectIsUser == true.
 
     MembersCache::Members m_subjectMembers; //< Sorted by id so states can be matched.
 
     QScopedPointer<MembersCache> m_cache;
-    QSet<QnUuid> m_groupsWithCycles;
+    QSet<nx::Uuid> m_groupsWithCycles;
 };
 
 } // namespace nx::vms::client::desktop

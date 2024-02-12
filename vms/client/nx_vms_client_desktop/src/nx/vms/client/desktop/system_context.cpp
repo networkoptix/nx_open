@@ -86,7 +86,7 @@ struct SystemContext::Private
 
 SystemContext::SystemContext(
     Mode mode,
-    QnUuid peerId,
+    nx::Uuid peerId,
     nx::core::access::Mode resourceAccessMode,
     QObject* parent)
     :

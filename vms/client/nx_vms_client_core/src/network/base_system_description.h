@@ -43,7 +43,7 @@ public:
 
     virtual QString id() const = 0;
 
-    virtual QnUuid localId() const = 0;
+    virtual nx::Uuid localId() const = 0;
 
     virtual QString name() const = 0;
 
@@ -62,18 +62,18 @@ public:
     typedef QList<nx::vms::api::ModuleInformationWithAddresses> ServersList;
     virtual ServersList servers() const = 0;
 
-    virtual bool containsServer(const QnUuid &serverId) const = 0;
+    virtual bool containsServer(const nx::Uuid &serverId) const = 0;
 
-    virtual nx::vms::api::ModuleInformationWithAddresses getServer(const QnUuid& serverId) const = 0;
+    virtual nx::vms::api::ModuleInformationWithAddresses getServer(const nx::Uuid& serverId) const = 0;
 
-    virtual bool isReachableServer(const QnUuid& serverId) const = 0;
+    virtual bool isReachableServer(const nx::Uuid& serverId) const = 0;
 
     // TODO: #ynikitenkov Rename host "field" to appropriate
-    virtual nx::utils::Url getServerHost(const QnUuid& serverId) const = 0;
+    virtual nx::utils::Url getServerHost(const nx::Uuid& serverId) const = 0;
 
-    virtual QSet<nx::utils::Url> getServerRemoteAddresses(const QnUuid& serverId) const = 0;
+    virtual QSet<nx::utils::Url> getServerRemoteAddresses(const nx::Uuid& serverId) const = 0;
 
-    virtual qint64 getServerLastUpdatedMs(const QnUuid& serverId) const = 0;
+    virtual qint64 getServerLastUpdatedMs(const nx::Uuid& serverId) const = 0;
 
     /**
      * We can successfully establish network connection with this system from the current machine.
@@ -96,9 +96,9 @@ public:
     virtual nx::utils::SoftwareVersion version() const = 0;
 
 signals:
-    void serverAdded(const QnUuid& serverId);
-    void serverChanged(const QnUuid& serverId, QnServerFields flags);
-    void serverRemoved(const QnUuid& serverId);
+    void serverAdded(const nx::Uuid& serverId);
+    void serverChanged(const nx::Uuid& serverId, QnServerFields flags);
+    void serverRemoved(const nx::Uuid& serverId);
 
     void isCloudSystemChanged();
     void system2faEnabledChanged();

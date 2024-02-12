@@ -24,13 +24,13 @@ using nx::analytics::taxonomy::AbstractScope;
 
 AnalyticsSdkEvent::AnalyticsSdkEvent(
     QnResourcePtr resource,
-    QnUuid engineId,
+    nx::Uuid engineId,
     QString eventTypeId,
     EventState toggleState,
     QString caption,
     QString description,
     nx::common::metadata::Attributes attributes,
-    QnUuid objectTrackId,
+    nx::Uuid objectTrackId,
     QString key,
     qint64 timeStampUsec)
     :
@@ -45,7 +45,7 @@ AnalyticsSdkEvent::AnalyticsSdkEvent(
 {
 }
 
-QnUuid AnalyticsSdkEvent::engineId() const
+nx::Uuid AnalyticsSdkEvent::engineId() const
 {
     return m_engineId;
 }
@@ -132,7 +132,7 @@ const std::optional<QString> AnalyticsSdkEvent::attribute(const QString& attribu
     return std::nullopt;
 }
 
-const QnUuid AnalyticsSdkEvent::objectTrackId() const
+const nx::Uuid AnalyticsSdkEvent::objectTrackId() const
 {
     return m_objectTrackId;
 }

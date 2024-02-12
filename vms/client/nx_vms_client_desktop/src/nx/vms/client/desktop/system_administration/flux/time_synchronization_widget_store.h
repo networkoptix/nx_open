@@ -22,7 +22,7 @@ public:
 
     struct TimeOffsetInfo
     {
-        QnUuid serverId;
+        nx::Uuid serverId;
         milliseconds osTimeOffset = 0ms;
         milliseconds vmsTimeOffset = 0ms;
         milliseconds timeZoneOffset = 0ms;
@@ -36,19 +36,19 @@ public:
 
     void initialize(
         bool isTimeSynchronizationEnabled,
-        const QnUuid& primaryTimeServer,
+        const nx::Uuid& primaryTimeServer,
         const QList<State::ServerInfo>& servers);
 
     void addServer(const State::ServerInfo& serverInfo);
-    void removeServer(const QnUuid& id);
-    void setServerOnline(const QnUuid &id, bool isOnline);
-    void setServerHasInternet(const QnUuid &id, bool hasInternet);
+    void removeServer(const nx::Uuid& id);
+    void setServerOnline(const nx::Uuid &id, bool isOnline);
+    void setServerHasInternet(const nx::Uuid &id, bool hasInternet);
 
     void applyChanges();
     void setReadOnly(bool value);
     void setSyncTimeWithInternet(bool value);
     void disableSync();
-    void selectServer(const QnUuid& serverId);
+    void selectServer(const nx::Uuid& serverId);
 
     void setBaseTime(milliseconds time);
     void setElapsedTime(milliseconds time);

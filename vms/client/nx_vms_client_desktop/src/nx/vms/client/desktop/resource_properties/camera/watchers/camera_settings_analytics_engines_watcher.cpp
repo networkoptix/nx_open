@@ -37,12 +37,12 @@ public:
     void at_initialResourcesReceived();
     void at_connectionClosed();
 
-    nx::vms::api::StreamIndex analyzedStreamIndex(const QnUuid& engineId) const;
+    nx::vms::api::StreamIndex analyzedStreamIndex(const nx::Uuid& engineId) const;
 
 public:
     const QPointer<CameraSettingsDialogStore> store;
     QnVirtualCameraResourcePtr camera;
-    QHash<QnUuid, AnalyticsEngineInfo> engines;
+    QHash<nx::Uuid, AnalyticsEngineInfo> engines;
     bool m_online = false;
 };
 
@@ -162,7 +162,7 @@ void CameraSettingsAnalyticsEnginesWatcher::Private::updateStore()
 }
 
 nx::vms::api::StreamIndex CameraSettingsAnalyticsEnginesWatcher::Private::analyzedStreamIndex(
-    const QnUuid& engineId) const
+    const nx::Uuid& engineId) const
 {
     if (!camera)
         return nx::vms::api::StreamIndex::undefined;
@@ -261,7 +261,7 @@ QList<AnalyticsEngineInfo> CameraSettingsAnalyticsEnginesWatcher::engineInfoList
 }
 
 nx::vms::api::StreamIndex CameraSettingsAnalyticsEnginesWatcher::analyzedStreamIndex(
-    const QnUuid& engineId) const
+    const nx::Uuid& engineId) const
 {
     return d->analyzedStreamIndex(engineId);
 }

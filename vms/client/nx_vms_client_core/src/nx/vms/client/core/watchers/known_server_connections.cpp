@@ -54,7 +54,7 @@ public:
     void start();
 
 private:
-    void saveConnection(const QnUuid& serverId, nx::network::SocketAddress address);
+    void saveConnection(const nx::Uuid& serverId, nx::network::SocketAddress address);
 
 private:
     nx::vms::discovery::Manager* m_discoveryManager = nullptr;
@@ -91,7 +91,7 @@ void KnownServerConnections::Private::start()
 }
 
 void KnownServerConnections::Private::saveConnection(
-    const QnUuid& serverId,
+    const nx::Uuid& serverId,
     nx::network::SocketAddress address)
 {
     NX_ASSERT(!address.isNull());

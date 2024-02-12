@@ -49,7 +49,7 @@ VideoWallOnlineScreensWatcher::VideoWallOnlineScreensWatcher(
         setItemOnline(info, true);
 }
 
-std::set<QnUuid> VideoWallOnlineScreensWatcher::onlineScreens() const
+std::set<nx::Uuid> VideoWallOnlineScreensWatcher::onlineScreens() const
 {
     return m_onlineScreens;
 }

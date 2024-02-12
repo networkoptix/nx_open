@@ -18,7 +18,7 @@ public:
     void setResourcePolicy()
     {
         m_selectCamerasFunction =
-            [this](QnUuidSet& resources)
+            [this](UuidSet& resources)
             {
                 using namespace nx::vms::client::desktop;
                 return CameraSelectionDialog::selectCameras<ResourcePolicy>(resources, this);
@@ -29,5 +29,5 @@ protected:
     virtual void handleButtonClicked() override;
 
 private:
-    std::function<bool(QnUuidSet& camerasIds)> m_selectCamerasFunction;
+    std::function<bool(UuidSet& camerasIds)> m_selectCamerasFunction;
 };

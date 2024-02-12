@@ -313,7 +313,7 @@ SystemInfo createSystem(
 {
     return SystemInfo{
         systemName,
-        QnUuid::createUuid().toSimpleString(),
+        nx::Uuid::createUuid().toSimpleString(),
         searchAddrPart,
         bool(flags & SystemFlags::isNew),
         bool(flags & SystemFlags::isCloud),

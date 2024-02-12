@@ -170,7 +170,7 @@ LayoutItemCreator layoutItemCreator(
     bool hasPowerUserPermissions)
 {
     return
-        [=](const QnUuid& itemId) -> AbstractItemPtr
+        [=](const nx::Uuid& itemId) -> AbstractItemPtr
         {
             const auto itemData = layout->getItem(itemId);
 
@@ -289,7 +289,7 @@ std::function<AbstractItemPtr(const QString&)> parentServerItemCreator(
         [resourcePool, factory](const QString& serverId) -> AbstractItemPtr
         {
             const auto serverResource =
-                resourcePool->getResourceById(QnUuid::fromStringSafe(serverId));
+                resourcePool->getResourceById(nx::Uuid::fromStringSafe(serverId));
             return factory->createResourceItem(serverResource);
         };
 }
@@ -765,7 +765,7 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createLayoutsGroupEntity() const
 AbstractEntityPtr ResourceTreeEntityBuilder::createShowreelsGroupEntity() const
 {
     const auto showreelItemCreator =
-        [this](const QnUuid& id) { return m_itemFactory->createShowreelItem(id); };
+        [this](const nx::Uuid& id) { return m_itemFactory->createShowreelItem(id); };
 
     const auto showreelManager = systemContext()->showreelManager();
 
@@ -858,13 +858,13 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createVideowallsEntity() const
             const auto videoWall = resource.dynamicCast<QnVideoWallResource>();
 
             const auto videoWallScreenCreator =
-                [this, videoWall](const QnUuid& id)
+                [this, videoWall](const nx::Uuid& id)
                 {
                     return m_itemFactory->createVideoWallScreenItem(videoWall, id);
                 };
 
             const auto videoWallMatrixCreator =
-                [this, videoWall](const QnUuid& id)
+                [this, videoWall](const nx::Uuid& id)
                 {
                     return m_itemFactory->createVideoWallMatrixItem(videoWall, id);
                 };

@@ -15,7 +15,7 @@ class NX_VMS_CLIENT_CORE_API SoftwareTriggersController: public QObject, public 
     Q_OBJECT
     using base_type = QObject;
 
-    Q_PROPERTY(QnUuid resourceId READ resourceId WRITE setResourceId
+    Q_PROPERTY(nx::Uuid resourceId READ resourceId WRITE setResourceId
         NOTIFY resourceIdChanged)
 
 public:
@@ -25,20 +25,20 @@ public:
 
     static void registerQmlType();
 
-    QnUuid resourceId() const;
-    void setResourceId(const QnUuid& id);
+    nx::Uuid resourceId() const;
+    void setResourceId(const nx::Uuid& id);
 
-    Q_INVOKABLE bool activateTrigger(const QnUuid& ruleId);
+    Q_INVOKABLE bool activateTrigger(const nx::Uuid& ruleId);
     Q_INVOKABLE bool deactivateTrigger();
-    Q_INVOKABLE QnUuid activeTriggerId() const;
+    Q_INVOKABLE nx::Uuid activeTriggerId() const;
     Q_INVOKABLE bool hasActiveTrigger() const;
 
 signals:
     void resourceIdChanged();
 
-    void triggerActivated(const QnUuid& ruleId, bool success);
-    void triggerDeactivated(const QnUuid& ruleId, bool success);
-    void triggerCancelled(const QnUuid& ruleId);
+    void triggerActivated(const nx::Uuid& ruleId, bool success);
+    void triggerDeactivated(const nx::Uuid& ruleId, bool success);
+    void triggerCancelled(const nx::Uuid& ruleId);
 
 private:
     void cancelTriggerAction();

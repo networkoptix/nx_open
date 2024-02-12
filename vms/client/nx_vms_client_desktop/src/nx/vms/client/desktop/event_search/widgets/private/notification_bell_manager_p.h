@@ -39,7 +39,7 @@ private:
     NotificationBellWidget* m_widget = nullptr;
 
     bool m_isActive = false;
-    std::set<QnUuid> m_activeNotifications;
+    std::set<nx::Uuid> m_activeNotifications;
 };
 
 } // nx::vms::client::desktop

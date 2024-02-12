@@ -33,33 +33,33 @@ class AnalyticsSettingsWidget::Private:
 public:
     explicit Private(AnalyticsSettingsWidget* q);
 
-    Q_INVOKABLE QnUuid getCurrentEngineId() const { return currentEngineId; }
-    Q_INVOKABLE void setCurrentEngineId(const QnUuid& engineId);
+    Q_INVOKABLE nx::Uuid getCurrentEngineId() const { return currentEngineId; }
+    Q_INVOKABLE void setCurrentEngineId(const nx::Uuid& engineId);
 
-    Q_INVOKABLE QJsonObject settingsValues(const QnUuid& engineId);
+    Q_INVOKABLE QJsonObject settingsValues(const nx::Uuid& engineId);
 
     Q_INVOKABLE QVariant requestParameters(const QJsonObject& model);
 
     Q_INVOKABLE void setSettingsValues(
-        const QnUuid& engineId,
+        const nx::Uuid& engineId,
         const QString& activeElement,
         const QJsonObject& values,
         const QJsonObject& parameters);
 
-    Q_INVOKABLE QJsonObject settingsModel(const QnUuid& engineId);
-    Q_INVOKABLE QJsonObject errors(const QnUuid& engineId) { return m_errors[engineId]; }
+    Q_INVOKABLE QJsonObject settingsModel(const nx::Uuid& engineId);
+    Q_INVOKABLE QJsonObject errors(const nx::Uuid& engineId) { return m_errors[engineId]; }
 
     QVariant analyticsEngines() const { return engines; }
 
     void updateEngines();
-    void activateEngine(const QnUuid& engineId);
+    void activateEngine(const nx::Uuid& engineId);
 
     bool loading() const { return settingsLoading; }
     void setLoading(bool loading);
 
-    void refreshSettings(const QnUuid& engineId);
+    void refreshSettings(const nx::Uuid& engineId);
     void activeElementChanged(
-        const QnUuid& engineId,
+        const nx::Uuid& engineId,
         const QString& activeElement,
         const QJsonObject& parameters);
 
@@ -87,11 +87,11 @@ public:
     QList<rest::Handle> pendingRefreshRequests;
     QList<rest::Handle> pendingApplyRequests;
 
-    QnUuid currentEngineId;
+    nx::Uuid currentEngineId;
 
-    QHash<QnUuid, QJsonObject> m_errors;
-    QHash<QnUuid, SettingsValues> settingsValuesByEngineId;
-    QHash<QnUuid, QJsonObject> settingsModelByEngineId;
+    QHash<nx::Uuid, QJsonObject> m_errors;
+    QHash<nx::Uuid, SettingsValues> settingsValuesByEngineId;
+    QHash<nx::Uuid, QJsonObject> settingsModelByEngineId;
     QVariant requests;
 
 signals:
@@ -102,12 +102,12 @@ signals:
     void licenseSummariesChanged();
 
 private:
-    void addEngine(const QnUuid& engineId, const AnalyticsEngineInfo& engineInfo);
-    void removeEngine(const QnUuid& engineId);
-    void updateEngine(const QnUuid& engineId);
-    void setErrors(const QnUuid& engineId, const QJsonObject& errors);
+    void addEngine(const nx::Uuid& engineId, const AnalyticsEngineInfo& engineInfo);
+    void removeEngine(const nx::Uuid& engineId);
+    void updateEngine(const nx::Uuid& engineId);
+    void setErrors(const nx::Uuid& engineId, const QJsonObject& errors);
     void resetSettings(
-        const QnUuid& engineId,
+        const nx::Uuid& engineId,
         const QJsonObject& model,
         const QJsonObject& values,
         const QJsonObject& errors,

@@ -159,9 +159,9 @@ bool QnCameraBookmark::isCreatedBySystem() const
     return creatorId == systemUserId();
 }
 
-QnUuid QnCameraBookmark::systemUserId()
+nx::Uuid QnCameraBookmark::systemUserId()
 {
-    return QnUuid::fromStringSafe("{51723d00-51bd-4420-8116-75e5f85dfcf4}");
+    return nx::Uuid::fromStringSafe("{51723d00-51bd-4420-8116-75e5f85dfcf4}");
 }
 
 QnCameraBookmark::QnCameraBookmark():

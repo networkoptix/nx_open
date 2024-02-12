@@ -90,11 +90,11 @@ namespace QnLayoutProto {
         return true;
     }
 
-    bool deserialize(const QnProtoValue &value, QnUuid *target) {
+    bool deserialize(const QnProtoValue &value, nx::Uuid *target) {
         if(value.type() != QnProtoValue::Bytes)
             return false;
 
-        *target = QnUuid(value.toBytes()); /* We don't check for error here because we don't care. */
+        *target = nx::Uuid(value.toBytes()); /* We don't check for error here because we don't care. */
         return true;
     }
 

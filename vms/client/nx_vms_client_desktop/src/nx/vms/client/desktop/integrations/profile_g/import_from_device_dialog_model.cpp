@@ -68,7 +68,7 @@ struct ImportFromDeviceDialogModel::Private
 {
     ImportFromDeviceDialogModel* const q;
 
-    std::map<QnUuid, DeviceData> deviceData;
+    std::map<nx::Uuid, DeviceData> deviceData;
 
     FilteredResourceProxyModel* const resourceModel = nullptr;
     QnResourceIconCache* const resourceIconCache = nullptr;
@@ -76,7 +76,7 @@ struct ImportFromDeviceDialogModel::Private
 public:
     Private(ImportFromDeviceDialogModel* parent);
 
-    std::map<QnUuid, DeviceData>::const_iterator getDeviceDataIter(const QModelIndex& index) const;
+    std::map<nx::Uuid, DeviceData>::const_iterator getDeviceDataIter(const QModelIndex& index) const;
 
     QString getNameText(const QModelIndex& index) const;
     QString getImportedUpToText(const QModelIndex& index) const;
@@ -92,7 +92,7 @@ ImportFromDeviceDialogModel::Private::Private(ImportFromDeviceDialogModel* paren
 {
 }
 
-std::map<QnUuid, DeviceData>::const_iterator
+std::map<nx::Uuid, DeviceData>::const_iterator
     ImportFromDeviceDialogModel::Private::getDeviceDataIter(const QModelIndex& index) const
 {
     const auto sourceIndex = q->mapToSource(q->createIndex(index.row(), 0));

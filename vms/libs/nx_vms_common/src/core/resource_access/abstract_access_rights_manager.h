@@ -16,15 +16,15 @@ public:
     explicit AbstractAccessRightsManager(QObject* parent = nullptr): QObject(parent) {}
 
     /** Returns specified subject's own access rights map. */
-    virtual ResourceAccessMap ownResourceAccessMap(const QnUuid& subjectId) const = 0;
+    virtual ResourceAccessMap ownResourceAccessMap(const nx::Uuid& subjectId) const = 0;
 
     /** Returns specified subject's own access rights to the specified resource. */
     nx::vms::api::AccessRights ownAccessRights(
-        const QnUuid& subjectId, const QnUuid& targetId) const;
+        const nx::Uuid& subjectId, const nx::Uuid& targetId) const;
 
 signals:
     /** Emitted when subjects' access rights map is changed. */
-    void ownAccessRightsChanged(const QSet<QnUuid>& subjectIds);
+    void ownAccessRightsChanged(const QSet<nx::Uuid>& subjectIds);
 
     /** Emitted when all subjects' access maps are reset. */
     void accessRightsReset();

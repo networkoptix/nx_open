@@ -34,7 +34,7 @@ TEST(StorageSpaceData, Conversions)
     v3Data.runtimeFlags = StorageRuntimeFlag::beingChecked | StorageRuntimeFlag::used;
     v3Data.persistentFlags = StoragePersistentFlag::dbReady | StoragePersistentFlag::system;
     v3Data.isUsedForWriting = true;
-    v3Data.storageId = QnUuid::createUuid();
+    v3Data.storageId = nx::Uuid::createUuid();
     v3Data.freeSpace = 42;
     v3Data.storageType = "some_type";
     v3Data.totalSpace = 43;
@@ -83,7 +83,7 @@ TEST(StorageSpaceDataWithDbInfo, Conversions)
     v3Data.runtimeFlags = StorageRuntimeFlag::beingChecked | StorageRuntimeFlag::used;
     v3Data.persistentFlags = StoragePersistentFlag::dbReady | StoragePersistentFlag::system;
     v3Data.isUsedForWriting = true;
-    v3Data.storageId = QnUuid::createUuid();
+    v3Data.storageId = nx::Uuid::createUuid();
     v3Data.freeSpace = 42;
     v3Data.storageType = "some_type";
     v3Data.totalSpace = 43;
@@ -92,7 +92,7 @@ TEST(StorageSpaceDataWithDbInfo, Conversions)
     v3Data.isOnline = true;
     v3Data.isWritable = true;
     v3Data.reservedSpace = 44;
-    v3Data.serverId = QnUuid::createUuid();
+    v3Data.serverId = nx::Uuid::createUuid();
     v3Data.name = "name";
 
     const auto v1Data = v3Data.toV1();

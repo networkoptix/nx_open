@@ -55,18 +55,18 @@ struct UserGroupListModel::Private
     QString syncId;
 
     UserGroupDataList orderedGroups;
-    QSet<QnUuid> checkedGroupIds;
-    QList<QSet<QnUuid>> cycledGroupSets;
-    QSet<QnUuid> cycledGroups;
+    QSet<nx::Uuid> checkedGroupIds;
+    QList<QSet<nx::Uuid>> cycledGroupSets;
+    QSet<nx::Uuid> cycledGroups;
     bool ldapServerOnline = true;
-    QSet<QnUuid> notFoundGroups;
+    QSet<nx::Uuid> notFoundGroups;
 
     Private(UserGroupListModel* q): q(q), syncId(q->globalSettings()->ldap().syncId())
     {
         connect(q->systemContext()->nonEditableUsersAndGroups(),
             &NonEditableUsersAndGroups::groupModified,
             q,
-            [q, this](const QnUuid &id)
+            [q, this](const nx::Uuid &id)
             {
                 const int row = q->groupRow(id);
                 if (row == -1)
@@ -237,19 +237,19 @@ struct UserGroupListModel::Private
         }
     }
 
-    UserGroupDataList::iterator findPosition(const QnUuid& groupId)
+    UserGroupDataList::iterator findPosition(const nx::Uuid& groupId)
     {
         return std::lower_bound(orderedGroups.begin(), orderedGroups.end(), groupId,
-            [](const UserGroupData& left, const QnUuid& right) { return left.id < right; });
+            [](const UserGroupData& left, const nx::Uuid& right) { return left.id < right; });
     }
 
-    UserGroupDataList::const_iterator findPosition(const QnUuid& groupId) const
+    UserGroupDataList::const_iterator findPosition(const nx::Uuid& groupId) const
     {
         return std::lower_bound(orderedGroups.cbegin(), orderedGroups.cend(), groupId,
-            [](const UserGroupData& left, const QnUuid& right) { return left.id < right; });
+            [](const UserGroupData& left, const nx::Uuid& right) { return left.id < right; });
     }
 
-    UserGroupDataList::iterator findGroup(const QnUuid& groupId)
+    UserGroupDataList::iterator findGroup(const nx::Uuid& groupId)
     {
         const auto position = findPosition(groupId);
         return position != orderedGroups.end() && position->id == groupId
@@ -257,7 +257,7 @@ struct UserGroupListModel::Private
             : orderedGroups.end();
     }
 
-    UserGroupDataList::const_iterator findGroup(const QnUuid& groupId) const
+    UserGroupDataList::const_iterator findGroup(const nx::Uuid& groupId) const
     {
         const auto position = findPosition(groupId);
         return position != orderedGroups.cend() && position->id == groupId
@@ -265,7 +265,7 @@ struct UserGroupListModel::Private
             : orderedGroups.cend();
     }
 
-    void refreshCycledGroupSets(const QSet<QnUuid>& groupsToCheck = {})
+    void refreshCycledGroupSets(const QSet<nx::Uuid>& groupsToCheck = {})
     {
         if (groupsToCheck.isEmpty())
         {
@@ -279,7 +279,7 @@ struct UserGroupListModel::Private
 
             while (!groups.empty())
             {
-                const QnUuid group = *groups.begin();
+                const nx::Uuid group = *groups.begin();
                 groups.erase(groups.begin());
                 for (auto it = cycledGroupSets.begin(); it != cycledGroupSets.end();
                     /*no increment*/)
@@ -302,14 +302,14 @@ struct UserGroupListModel::Private
         const auto oldCycledGroups = cycledGroups;
 
         cycledGroups.clear();
-        for (const QSet<QnUuid>& cycledGroupSet: cycledGroupSets)
+        for (const QSet<nx::Uuid>& cycledGroupSet: cycledGroupSets)
             cycledGroups.unite(cycledGroupSet);
 
         if (oldCycledGroups != cycledGroups)
             emit q->cycledGroupsChanged();
     }
 
-    void markGroupNotFound(const QnUuid& groupId, bool notFound = true)
+    void markGroupNotFound(const nx::Uuid& groupId, bool notFound = true)
     {
         if (notFound)
         {
@@ -602,38 +602,38 @@ const UserGroupListModel::UserGroupDataList& UserGroupListModel::groups() const
     return d->orderedGroups;
 }
 
-QSet<QnUuid> UserGroupListModel::groupIds() const
+QSet<nx::Uuid> UserGroupListModel::groupIds() const
 {
-    QSet<QnUuid> result;
+    QSet<nx::Uuid> result;
     for (const auto& group: d->orderedGroups)
         result.insert(group.id);
 
     return result;
 }
 
-std::optional<api::UserGroupData> UserGroupListModel::findGroup(const QnUuid& groupId) const
+std::optional<api::UserGroupData> UserGroupListModel::findGroup(const nx::Uuid& groupId) const
 {
     const auto it = d->findGroup(groupId);
     return it == d->orderedGroups.cend() ? std::nullopt : std::make_optional(*it);
 }
 
-int UserGroupListModel::groupRow(const QnUuid& groupId) const
+int UserGroupListModel::groupRow(const nx::Uuid& groupId) const
 {
     const auto it = d->findGroup(groupId);
     return it == d->orderedGroups.end() ? -1 : std::distance(d->orderedGroups.begin(), it);
 }
 
-QSet<QnUuid> UserGroupListModel::checkedGroupIds() const
+QSet<nx::Uuid> UserGroupListModel::checkedGroupIds() const
 {
     return d->checkedGroupIds;
 }
 
-QSet<QnUuid> UserGroupListModel::nonEditableGroupIds() const
+QSet<nx::Uuid> UserGroupListModel::nonEditableGroupIds() const
 {
     return systemContext()->nonEditableUsersAndGroups()->groups();
 }
 
-void UserGroupListModel::setCheckedGroupIds(const QSet<QnUuid>& value)
+void UserGroupListModel::setCheckedGroupIds(const QSet<nx::Uuid>& value)
 {
     d->checkedGroupIds.clear();
     const auto allGroups = groupIds();
@@ -652,22 +652,22 @@ void UserGroupListModel::setCheckedGroupIds(const QSet<QnUuid>& value)
         {Qt::CheckStateRole});
 }
 
-QSet<QnUuid> UserGroupListModel::notFoundGroups() const
+QSet<nx::Uuid> UserGroupListModel::notFoundGroups() const
 {
     return d->notFoundGroups;
 }
 
-QSet<QnUuid> UserGroupListModel::nonUniqueGroups() const
+QSet<nx::Uuid> UserGroupListModel::nonUniqueGroups() const
 {
     return systemContext()->nonEditableUsersAndGroups()->nonUniqueGroups().nonUniqueNameIds();
 }
 
-QSet<QnUuid> UserGroupListModel::cycledGroups() const
+QSet<nx::Uuid> UserGroupListModel::cycledGroups() const
 {
     return d->cycledGroups;
 }
 
-void UserGroupListModel::setChecked(const QnUuid& groupId, bool checked)
+void UserGroupListModel::setChecked(const nx::Uuid& groupId, bool checked)
 {
     const int row = groupRow(groupId);
     if (row < 0)
@@ -711,7 +711,7 @@ void UserGroupListModel::reset(const UserGroupDataList& groups)
     emit nonUniqueGroupsChanged();
 }
 
-bool UserGroupListModel::canDeleteGroup(const QnUuid& groupId) const
+bool UserGroupListModel::canDeleteGroup(const nx::Uuid& groupId) const
 {
     return systemContext()->accessController()->hasPermissions(groupId, Qn::RemovePermission);
 }
@@ -749,7 +749,7 @@ bool UserGroupListModel::addOrUpdateGroup(const UserGroupData& group)
     return false;
 }
 
-bool UserGroupListModel::removeGroup(const QnUuid& groupId)
+bool UserGroupListModel::removeGroup(const nx::Uuid& groupId)
 {
     const auto it = d->findGroup(groupId);
     if (it == d->orderedGroups.end())

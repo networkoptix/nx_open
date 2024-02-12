@@ -58,7 +58,7 @@ NX_REFLECTION_INSTRUMENT(QnIOPortData, QnIOPortData_Fields)
 
 struct NX_VMS_COMMON_API QnCameraPortsData
 {
-    QnUuid id;
+    nx::Uuid id;
     QnIOPortDataList ports;
 };
 #define QnCameraPortsData_Fields (id)(ports)
@@ -91,7 +91,7 @@ typedef std::vector<QnIOStateData> QnIOStateDataList;
 
 struct NX_VMS_COMMON_API QnCameraIOStateData
 {
-    QnUuid id;
+    nx::Uuid id;
     QnIOStateDataList state;
 };
 typedef std::vector<QnCameraIOStateData> QnCameraIOStateDataList;

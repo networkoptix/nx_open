@@ -10,7 +10,7 @@ QnVideoWallMatrixIndex::QnVideoWallMatrixIndex()
 
 QnVideoWallMatrixIndex::QnVideoWallMatrixIndex(
     const QnVideoWallResourcePtr& videowall,
-    const QnUuid& uuid)
+    const nx::Uuid& uuid)
     :
     m_videowall(videowall),
     m_uuid(uuid)
@@ -27,12 +27,12 @@ void QnVideoWallMatrixIndex::setVideoWall(const QnVideoWallResourcePtr& videowal
     m_videowall = videowall;
 }
 
-QnUuid QnVideoWallMatrixIndex::uuid() const
+nx::Uuid QnVideoWallMatrixIndex::uuid() const
 {
     return m_uuid;
 }
 
-void QnVideoWallMatrixIndex::setUuid(const QnUuid& uuid)
+void QnVideoWallMatrixIndex::setUuid(const nx::Uuid& uuid)
 {
     m_uuid = uuid;
 }

@@ -44,7 +44,7 @@ ErrorCode AbstractCameraManager::addCamerasSync(const nx::vms::api::CameraDataLi
         });
 }
 
-ErrorCode AbstractCameraManager::removeSync(const QnUuid& id)
+ErrorCode AbstractCameraManager::removeSync(const nx::Uuid& id)
 {
     return detail::callSync(
         [&](auto handler)
@@ -65,7 +65,7 @@ Result AbstractCameraManager::getServerFootageDataSync(
 }
 
 ErrorCode AbstractCameraManager::setServerFootageDataSync(
-    const QnUuid& serverGuid, const std::vector<QnUuid>& cameraIds)
+    const nx::Uuid& serverGuid, const std::vector<nx::Uuid>& cameraIds)
 {
     return detail::callSync(
         [&](auto handler)
@@ -106,7 +106,7 @@ ErrorCode AbstractCameraManager::addHardwareIdMappingSync(
 }
 
 ErrorCode AbstractCameraManager::removeHardwareIdMappingSync(
-    const QnUuid& id)
+    const nx::Uuid& id)
 {
     return detail::callSync(
         [&](auto handler)

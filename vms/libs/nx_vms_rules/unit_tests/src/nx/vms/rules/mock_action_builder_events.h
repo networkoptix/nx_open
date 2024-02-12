@@ -19,8 +19,8 @@ class MockActionBuilderEvents: public QObject
 public:
     MOCK_METHOD(void, actionReceived, ());
     MOCK_METHOD(void, targetedUsers, (const UuidSelection& selection));
-    MOCK_METHOD(void, targetedCameraId, (QnUuid id));
-    MOCK_METHOD(void, targetedDeviceIds, (QnUuidList ids));
+    MOCK_METHOD(void, targetedCameraId, (nx::Uuid id));
+    MOCK_METHOD(void, targetedDeviceIds, (UuidList ids));
 
     MockActionBuilderEvents(ActionBuilder* builder):
         m_builder(builder)
@@ -58,8 +58,8 @@ class MockPermissionsActionEvents: public QObject
     Q_OBJECT
 
 public:
-    MOCK_METHOD(void, multiDeviceAction, (const QnUuidSet& usersIds, const QnUuidSet& devices));
-    MOCK_METHOD(void, singleDeviceAction, (const QnUuidSet& usersIds, QnUuid device));
+    MOCK_METHOD(void, multiDeviceAction, (const UuidSet& usersIds, const UuidSet& devices));
+    MOCK_METHOD(void, singleDeviceAction, (const UuidSet& usersIds, nx::Uuid device));
 
     MockPermissionsActionEvents(ActionBuilder* builder):
         m_builder(builder)

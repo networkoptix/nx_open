@@ -95,7 +95,7 @@ QNetworkProxy QnNetworkProxyFactory::proxyToResource(
     const auto& connection = context->messageBusConnection();
     if (server && connection)
     {
-        const QnUuid id = server->getOriginalGuid();
+        const nx::Uuid id = server->getOriginalGuid();
         QnRoute route = QnRouter::routeTo(id, context);
         if (!route.gatewayId.isNull() || camera)
         {

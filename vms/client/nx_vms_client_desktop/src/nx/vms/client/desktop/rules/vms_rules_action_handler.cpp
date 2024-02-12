@@ -155,7 +155,7 @@ void VmsRulesActionHandler::openEventLogDialog()
     if (!eventType.isEmpty() || !actionType.isEmpty() || !eventDevices.isEmpty())
     {
         const auto now = QDateTime::currentMSecsSinceEpoch();
-        QnUuidSet eventDeviceIds;
+        UuidSet eventDeviceIds;
         for (const auto& device: eventDevices)
             eventDeviceIds.insert(device->getId());
 

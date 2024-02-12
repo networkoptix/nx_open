@@ -25,7 +25,7 @@ public:
 
     void setLayout(const QnLayoutResourcePtr& newLayout);
 
-    int itemIndex(const QnUuid& itemId) const;
+    int itemIndex(const nx::Uuid& itemId) const;
 
     void updateGridBoundingRect();
 
@@ -37,10 +37,10 @@ private:
     void setGridBoundingRect(const QRect& rect);
 
 public:
-    QnUuid layoutId;
+    nx::Uuid layoutId;
     QnLayoutResourcePtr layout;
-    QList<QnUuid> itemIds;
-    QHash<QnUuid, ItemAdaptorPtr> adaptorById;
+    QList<nx::Uuid> itemIds;
+    QHash<nx::Uuid, ItemAdaptorPtr> adaptorById;
     QRect gridBoundingRect;
 };
 
@@ -75,7 +75,7 @@ void LayoutModel::Private::setLayout(const QnLayoutResourcePtr& newLayout)
     updateGridBoundingRect();
 }
 
-int LayoutModel::Private::itemIndex(const QnUuid& itemId) const
+int LayoutModel::Private::itemIndex(const nx::Uuid& itemId) const
 {
     const auto it = std::lower_bound(itemIds.begin(), itemIds.end(), itemId);
     if (it != itemIds.end() && *it == itemId)
@@ -171,12 +171,12 @@ LayoutModel::~LayoutModel()
 {
 }
 
-QnUuid LayoutModel::layoutId() const
+nx::Uuid LayoutModel::layoutId() const
 {
     return d->layoutId;
 }
 
-void LayoutModel::setLayoutId(const QnUuid& id)
+void LayoutModel::setLayoutId(const nx::Uuid& id)
 {
     if (d->layoutId == id)
         return;

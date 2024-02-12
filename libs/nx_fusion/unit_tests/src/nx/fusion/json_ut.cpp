@@ -14,10 +14,10 @@ QByteArray str(const QString& source)
     return "\"" + source.toUtf8() + "\"";
 }
 
-static const QnUuid kFirstUuid("0adc055b-3507-4c00-b1c7-d2a789b08d64");
-static const QnUuid kSecondUuid("251c6b73-674c-4773-a8fc-2577d7a0ecf6");
+static const nx::Uuid kFirstUuid("0adc055b-3507-4c00-b1c7-d2a789b08d64");
+static const nx::Uuid kSecondUuid("251c6b73-674c-4773-a8fc-2577d7a0ecf6");
 
-static const QnUuid kTestId("b4a5d7ec-1952-4225-96ed-a08eaf34d97a");
+static const nx::Uuid kTestId("b4a5d7ec-1952-4225-96ed-a08eaf34d97a");
 static const QString kHelloWorld("hello world");
 
 struct IntMockData
@@ -110,10 +110,10 @@ static bool operator<(const MockDataWithStringMaps& first, const MockDataWithStr
 
 struct BriefMockData
 {
-    QnUuid id;
+    nx::Uuid id;
     QString str;
     BriefMockData() = default;
-    BriefMockData(const QnUuid& id, const QString& str): id(id), str(str) {}
+    BriefMockData(const nx::Uuid& id, const QString& str): id(id), str(str) {}
 
     bool operator==(const BriefMockData& other) const
     {
@@ -205,7 +205,7 @@ struct BriefMockWithDefaults
 
 struct MapKey
 {
-    QnUuid uuidField;
+    nx::Uuid uuidField;
     int integerField = 0;
     QString stringField;
 };
@@ -425,7 +425,7 @@ TEST_F(QnJsonTextFixture, stdStringTypes)
 
 TEST_F(QnJsonTextFixture, deserializeSpecialUuids)
 {
-    QnUuid uuid;
+    nx::Uuid uuid;
     ASSERT_TRUE(QJson::deserialize(QByteArray("null"), &uuid));
     ASSERT_TRUE(uuid.isNull());
     ASSERT_TRUE(QJson::deserialize(QByteArray("\"\""), &uuid));
@@ -580,7 +580,7 @@ TEST_F(QnJsonTextFixture, deserializeStructWithDeprecatedFields)
 
 TEST_F(QnJsonTextFixture, serializeStructBriefId)
 {
-    BriefMockData data{QnUuid(), kHelloWorld};
+    BriefMockData data{nx::Uuid(), kHelloWorld};
     const QByteArray jsonStr = QString(R"json({"str":"%1"})json").arg(kHelloWorld).toUtf8();
     ASSERT_EQ(jsonStr, QJson::serialized(data));
     ASSERT_EQ(data, QJson::deserialized<BriefMockData>(jsonStr));
@@ -605,9 +605,9 @@ TEST_F(QnJsonTextFixture, serializeStructBriefBoth)
 TEST_F(QnJsonTextFixture, serializeStructListBrief)
 {
     std::vector<BriefMockData> data;
-    data.emplace_back(QnUuid(), kHelloWorld);
+    data.emplace_back(nx::Uuid(), kHelloWorld);
     data.emplace_back(kTestId, QString());
-    data.emplace_back(QnUuid(), QString());
+    data.emplace_back(nx::Uuid(), QString());
     const QByteArray jsonStr = QString(R"json([{"str":"%1"},{"id":"%2"},{}])json")
         .arg(kHelloWorld)
         .arg(kTestId.toString())
@@ -802,7 +802,7 @@ TEST_F(QnJsonTextFixture, briefWithDefaultsNotNullsSimetry)
 
 TEST_F(QnJsonTextFixture, serializeMapToObjects)
 {
-    static const std::map<QnUuid, int> data = {
+    static const std::map<nx::Uuid, int> data = {
         {kFirstUuid, 1},
         {kSecondUuid, 2}
     };
@@ -847,11 +847,11 @@ TEST_F(QnJsonTextFixture, deserializeMapFromArray)
 
 TEST_F(QnJsonTextFixture, deserializeMapWithUuidAsKey)
 {
-    static const std::map<QnUuid, int> kExpectedMap = {{kFirstUuid, 1}, {kSecondUuid, 2}};
+    static const std::map<nx::Uuid, int> kExpectedMap = {{kFirstUuid, 1}, {kSecondUuid, 2}};
     static const QByteArray kSerializedMap =
         nx::format(R"json({"%1":1,"%2":2})json").args(kFirstUuid, kSecondUuid).toUtf8();
 
-    std::map<QnUuid, int> actualMap;
+    std::map<nx::Uuid, int> actualMap;
     ASSERT_TRUE(QJson::deserialize(kSerializedMap, &actualMap));
     ASSERT_EQ(actualMap, kExpectedMap);
 }
@@ -901,7 +901,7 @@ class QnJsonBoostOptionalField:
 TEST_F(QnJsonBoostOptionalField, serialize_optional_field_present)
 {
     TestDataWithOptionalField test;
-    test.optionalField = BriefMockData{QnUuid(), "test"};
+    test.optionalField = BriefMockData{nx::Uuid(), "test"};
 
     ASSERT_EQ(
         "{\"optionalField\":{\"str\":\"test\"}}",

@@ -54,7 +54,7 @@ void SingleTargetLayoutPicker::onSelectButtonClicked()
 
     LayoutSelectionDialog::LocalLayoutSelection selectionMode = LayoutSelectionDialog::ModeFull;
 
-    QSet<QnUuid> selection;
+    QSet<nx::Uuid> selection;
     if (!theField()->value().isNull())
         selection.insert(theField()->value());
 
@@ -124,7 +124,7 @@ void SingleTargetLayoutPicker::onSelectButtonClicked()
         return;
 
     const auto selectedLayouts = dialog.checkedLayouts();
-    theField()->setValue(selectedLayouts.empty() ? QnUuid{} : *selectedLayouts.begin());
+    theField()->setValue(selectedLayouts.empty() ? nx::Uuid{} : *selectedLayouts.begin());
 }
 
 } // namespace nx::vms::client::desktop::rules

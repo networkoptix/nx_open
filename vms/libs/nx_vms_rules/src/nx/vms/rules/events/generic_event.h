@@ -16,8 +16,8 @@ class NX_VMS_RULES_API GenericEvent: public DescribedEvent
     Q_CLASSINFO("type", "nx.events.generic")
 
     FIELD(QString, source, setSource)
-    FIELD(QnUuid, serverId, setServerId)
-    FIELD(QnUuidList, deviceIds, setDeviceIds)
+    FIELD(nx::Uuid, serverId, setServerId)
+    FIELD(UuidList, deviceIds, setDeviceIds)
     FIELD(bool, omitLogging, setOmitLogging)
 
 public:
@@ -28,8 +28,8 @@ public:
         const QString& caption,
         const QString& description,
         const QString& source,
-        QnUuid serverId,
-        const QnUuidList& deviceIds);
+        nx::Uuid serverId,
+        const UuidList& deviceIds);
 
     virtual QString resourceKey() const override;
     virtual QVariantMap details(common::SystemContext* context) const override;

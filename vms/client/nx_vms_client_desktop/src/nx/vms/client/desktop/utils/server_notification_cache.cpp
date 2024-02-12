@@ -53,7 +53,7 @@ bool ServerNotificationCache::storeSound(const QString &filePath, int maxLengthM
     if (!isConnectedToServer())
         return false;
 
-    QString uuid = QnUuid::createUuid().toString();
+    QString uuid = nx::Uuid::createUuid().toString();
     QString newFilename = uuid.mid(1, uuid.size() - 2) + QLatin1String(".mp3");
 
     QString title = customTitle;

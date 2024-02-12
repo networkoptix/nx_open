@@ -47,7 +47,7 @@ std::chrono::milliseconds MessageBus::DelayIntervals::minInterval() const
     return *std::min_element(data.begin(), data.end());
 }
 
-QString MessageBus::peerName(const QnUuid& id)
+QString MessageBus::peerName(const nx::Uuid& id)
 {
     return qnStaticCommon->moduleDisplayName(id);
 }
@@ -211,7 +211,7 @@ void MessageBus::stop()
 }
 
 void MessageBus::addOutgoingConnectionToPeer(
-    const QnUuid& peer,
+    const nx::Uuid& peer,
     nx::vms::api::PeerType peerType,
     const utils::Url &_url,
     std::optional<nx::network::http::Credentials> credentials,
@@ -243,7 +243,7 @@ void MessageBus::addOutgoingConnectionToPeer(
     executeInThread(m_thread, [this]() {doPeriodicTasks();});
 }
 
-void MessageBus::deleteRemoveUrlById(const QnUuid& id)
+void MessageBus::deleteRemoveUrlById(const nx::Uuid& id)
 {
     for (decltype(m_remoteUrls.size()) i = 0; i < m_remoteUrls.size(); ++i)
     {
@@ -255,7 +255,7 @@ void MessageBus::deleteRemoveUrlById(const QnUuid& id)
     }
 }
 
-void MessageBus::removeOutgoingConnectionFromPeer(const QnUuid& id)
+void MessageBus::removeOutgoingConnectionFromPeer(const nx::Uuid& id)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     deleteRemoveUrlById(id);
@@ -279,7 +279,7 @@ void MessageBus::removeOutgoingConnectionFromPeer(const QnUuid& id)
 }
 
 void MessageBus::updateOutgoingConnection(
-    const QnUuid& id, nx::network::http::Credentials credentials)
+    const nx::Uuid& id, nx::network::http::Credentials credentials)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     auto remoteUrl = std::find_if(m_remoteUrls.begin(), m_remoteUrls.end(),
@@ -423,13 +423,13 @@ bool MessageBus::needStartConnection(
 }
 
 bool MessageBus::needStartConnection(
-    const QnUuid& peerId,
+    const nx::Uuid& peerId,
     const QMap<PersistentIdData, P2pConnectionPtr>& currentSubscription) const
 {
     const RouteToPeerMap& allPeerDistances = m_peers->allPeerDistances;
 
     bool result = true;
-    auto itr = allPeerDistances.lowerBound(PersistentIdData(peerId, QnUuid()));
+    auto itr = allPeerDistances.lowerBound(PersistentIdData(peerId, nx::Uuid()));
     for (; itr != allPeerDistances.end() && itr.key().id == peerId; ++itr)
     {
         result &= needStartConnection(itr.key(), currentSubscription);
@@ -1144,7 +1144,7 @@ void MessageBus::cleanupRuntimeInfo(const PersistentIdData& peer)
     // As soon as 'old' record will be removed resend runtime notification
     // to make sure we emit later runtime version.
     m_lastRuntimeInfo.remove(peer);
-    auto itr = m_lastRuntimeInfo.lowerBound(PersistentIdData(peer.id, QnUuid()));
+    auto itr = m_lastRuntimeInfo.lowerBound(PersistentIdData(peer.id, nx::Uuid()));
     if (itr != m_lastRuntimeInfo.end() && itr.key().id == peer.id)
     {
         if (m_handler)
@@ -1229,7 +1229,7 @@ void MessageBus::gotUnicastTransaction(
     if (nx::utils::log::isToBeLogged(nx::utils::log::Level::verbose, this))
         printTran(connection, tran, Connection::Direction::incoming);
 
-    std::set<QnUuid> unprocessedPeers;
+    std::set<nx::Uuid> unprocessedPeers;
     for (auto& peer: header.dstPeers)
     {
         if (peer == localPeer().id)
@@ -1250,7 +1250,7 @@ void MessageBus::gotUnicastTransaction(
     {
         QVector<PersistentIdData> via;
         int distance = kMaxDistance;
-        QnUuid dstPeerId = routeToPeerVia(dstPeer, &distance, /*address*/ nullptr);
+        nx::Uuid dstPeerId = routeToPeerVia(dstPeer, &distance, /*address*/ nullptr);
         if (distance > kMaxOnlineDistance || dstPeerId.isNull())
         {
             NX_WARNING(this, nx::format("Drop unicast transaction because no route found"));
@@ -1335,7 +1335,7 @@ qint32 MessageBus::distanceTo(const PersistentIdData& peer) const
     return m_peers->distanceTo(peer);
 }
 
-QMap<QnUuid, P2pConnectionPtr> MessageBus::connections() const
+QMap<nx::Uuid, P2pConnectionPtr> MessageBus::connections() const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     return m_connections;
@@ -1347,10 +1347,10 @@ int MessageBus::connectionTries() const
     return m_connectionTries;
 }
 
-QSet<QnUuid> MessageBus::directlyConnectedClientPeers() const
+QSet<nx::Uuid> MessageBus::directlyConnectedClientPeers() const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
-    QSet<QnUuid> result;
+    QSet<nx::Uuid> result;
     for (const auto& connection: m_connections)
     {
         if (connection->remotePeer().isClient())
@@ -1359,14 +1359,14 @@ QSet<QnUuid> MessageBus::directlyConnectedClientPeers() const
     return result;
 }
 
-QSet<QnUuid> MessageBus::directlyConnectedServerPeers() const
+QSet<nx::Uuid> MessageBus::directlyConnectedServerPeers() const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     return nx::utils::toQSet(m_connections.keys());
 }
 
-QnUuid MessageBus::routeToPeerVia(
-    const QnUuid& peerId, int* distance, nx::network::SocketAddress* knownPeerAddress) const
+nx::Uuid MessageBus::routeToPeerVia(
+    const nx::Uuid& peerId, int* distance, nx::network::SocketAddress* knownPeerAddress) const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     if (knownPeerAddress)
@@ -1385,15 +1385,15 @@ QnUuid MessageBus::routeToPeerVia(
     if (localPeer().id == peerId)
     {
         *distance = 0;
-        return QnUuid();
+        return nx::Uuid();
     }
 
     RoutingInfo via;
     *distance = m_peers->distanceTo(peerId, &via);
-    return via.isEmpty() ? QnUuid() : via.begin().key().id;
+    return via.isEmpty() ? nx::Uuid() : via.begin().key().id;
 }
 
-int MessageBus::distanceToPeer(const QnUuid& peerId) const
+int MessageBus::distanceToPeer(const nx::Uuid& peerId) const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     if (localPeer().id == peerId)
@@ -1413,7 +1413,7 @@ ConnectionInfos MessageBus::connectionInfos() const
 
     auto remoteUrls = m_remoteUrls;
 
-    auto addDataToResult = [&](const QMap<QnUuid, P2pConnectionPtr>& connections)
+    auto addDataToResult = [&](const QMap<nx::Uuid, P2pConnectionPtr>& connections)
     {
         for (const auto& connection: connections)
         {
@@ -1516,7 +1516,7 @@ void MessageBus::emitPeerFoundLostSignals()
     {
         cleanupRuntimeInfo(peer);
 
-        vms::api::PeerData samePeer(PersistentIdData(peer.id, QnUuid()), peer.peerType);
+        vms::api::PeerData samePeer(PersistentIdData(peer.id, nx::Uuid()), peer.peerType);
         auto samePeerItr = newAlivePeers.lower_bound(samePeer);
         bool hasSimilarPeer = samePeerItr != newAlivePeers.end() && samePeerItr->id == peer.id;
         if (!hasSimilarPeer)
@@ -1533,7 +1533,7 @@ void MessageBus::emitPeerFoundLostSignals()
     m_lastAlivePeers = newAlivePeers;
 }
 
-void MessageBus::sendRuntimeInfoRemovedToClients(const QnUuid& id)
+void MessageBus::sendRuntimeInfoRemovedToClients(const nx::Uuid& id)
 {
     QnTransaction<nx::vms::api::IdData> tran(ApiCommand::runtimeInfoRemoved, id);
     tran.params.id = id;

@@ -20,6 +20,6 @@ struct SystemVisibilityScopeInfo
 };
 NX_REFLECTION_INSTRUMENT(SystemVisibilityScopeInfo, (name)(visibilityScope))
 
-using SystemVisibilityScopeInfoHash = QHash<QnUuid, SystemVisibilityScopeInfo>;
+using SystemVisibilityScopeInfoHash = QHash<nx::Uuid, SystemVisibilityScopeInfo>;
 
 } // namespace nx::vms::client::core

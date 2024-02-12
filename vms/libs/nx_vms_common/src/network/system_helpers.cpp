@@ -19,18 +19,18 @@ struct SystemHelpers
     Q_DECLARE_TR_FUNCTIONS(SystemHelpers)
 };
 
-QnUuid getFactorySystemIdImpl(const QnUuid& serverId)
+nx::Uuid getFactorySystemIdImpl(const nx::Uuid& serverId)
 {
     return serverId;
 }
 
 QString generateTargetId(const QString& cloudSystemId,
-    const QnUuid& localSystemId)
+    const nx::Uuid& localSystemId)
 {
     return (cloudSystemId.isEmpty() ? localSystemId.toSimpleString() : cloudSystemId);
 }
 
-QnUuid getLocalSystemIdImpl(const QnUuid& localSystemId, const QnUuid& serverId)
+nx::Uuid getLocalSystemIdImpl(const nx::Uuid& localSystemId, const nx::Uuid& serverId)
 {
     if (localSystemId.isNull())
         return getFactorySystemIdImpl(serverId);  //< New System id
@@ -40,8 +40,8 @@ QnUuid getLocalSystemIdImpl(const QnUuid& localSystemId, const QnUuid& serverId)
 
 QString getTargetSystemIdImpl(
     const QString& cloudSystemId,
-    const QnUuid& localSystemId,
-    const QnUuid& serverId)
+    const nx::Uuid& localSystemId,
+    const nx::Uuid& serverId)
 {
     const auto fixedLocalId = getLocalSystemIdImpl(
         localSystemId, serverId);
@@ -62,7 +62,7 @@ QString getTargetSystemId(const QnCloudSystem& cloudSystem)
     return generateTargetId(cloudSystem.cloudId, cloudSystem.localId);
 }
 
-QnUuid getLocalSystemId(const nx::vms::api::ModuleInformation& info)
+nx::Uuid getLocalSystemId(const nx::vms::api::ModuleInformation& info)
 {
     return getLocalSystemIdImpl(info.localSystemId, info.id);
 }
@@ -89,10 +89,10 @@ QString getSystemName(const nx::vms::api::ModuleInformation& info)
         : info.systemName;
 }
 
-QnUuid currentSystemLocalId(const nx::vms::common::SystemContext* context)
+nx::Uuid currentSystemLocalId(const nx::vms::common::SystemContext* context)
 {
     if (!context)
-        return QnUuid();
+        return nx::Uuid();
 
     return context->globalSettings()->localSystemId();
 }
@@ -115,7 +115,7 @@ bool currentSystemIsNew(const nx::vms::common::SystemContext* context)
     return settings->localSystemId().isNull();
 }
 
-QString serverCloudHost(const QString& systemId, const QnUuid& serverId)
+QString serverCloudHost(const QString& systemId, const nx::Uuid& serverId)
 {
     return QString("%1.%2").arg(serverId.toSimpleString(), systemId);
 }

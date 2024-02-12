@@ -18,7 +18,7 @@ class NX_VMS_COMMON_API AbstractLayoutNotificationManager: public QObject
 
 signals:
     void addedOrUpdated(const nx::vms::api::LayoutData& layout, ec2::NotificationSource source);
-    void removed(const QnUuid& id, ec2::NotificationSource source);
+    void removed(const nx::Uuid& id, ec2::NotificationSource source);
 };
 
 /*!
@@ -43,11 +43,11 @@ public:
     ErrorCode saveSync(const nx::vms::api::LayoutData& data);
 
     virtual int remove(
-        const QnUuid& layoutId,
+        const nx::Uuid& layoutId,
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) = 0;
 
-    ErrorCode removeSync(const QnUuid& layoutId);
+    ErrorCode removeSync(const nx::Uuid& layoutId);
 };
 
 } // namespace ec2

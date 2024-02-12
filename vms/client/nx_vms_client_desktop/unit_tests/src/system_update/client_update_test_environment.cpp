@@ -28,7 +28,7 @@ ClientVerificationData ClientUpdateTestEnvironment::makeClientData(nx::utils::So
     ClientVerificationData data;
     data.osInfo = os::windows;
     data.currentVersion = version;
-    data.clientId = QnUuid("cccccccc-cccc-cccc-cccc-cccccccccccc");
+    data.clientId = nx::Uuid("cccccccc-cccc-cccc-cccc-cccccccccccc");
     return data;
 }
 
@@ -39,7 +39,7 @@ QnMediaServerResourcePtr ClientUpdateTestEnvironment::makeServer(
 {
     QnMediaServerResourcePtr server(new nx::vms::client::desktop::ServerResource());
     server->setVersion(version);
-    server->setIdUnsafe(QnUuid::createUuid());
+    server->setIdUnsafe(nx::Uuid::createUuid());
     server->setOsInfo(os::windows);
     resourcePool()->addResource(
         server,
@@ -53,9 +53,9 @@ QnMediaServerResourcePtr ClientUpdateTestEnvironment::makeServer(
     return server;
 }
 
-std::map<QnUuid, QnMediaServerResourcePtr> ClientUpdateTestEnvironment::getAllServers()
+std::map<nx::Uuid, QnMediaServerResourcePtr> ClientUpdateTestEnvironment::getAllServers()
 {
-    std::map<QnUuid, QnMediaServerResourcePtr> result;
+    std::map<nx::Uuid, QnMediaServerResourcePtr> result;
     for (auto server: resourcePool()->servers())
         result[server->getId()] = server;
     return result;

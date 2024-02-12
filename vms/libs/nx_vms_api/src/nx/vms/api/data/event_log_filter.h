@@ -32,7 +32,7 @@ struct NX_VMS_API EventLogFilter: ServerTimePeriod
     ActionType actionType = ActionType::undefinedAction;
 
     /**%apidoc[opt] VMS Rule id. */
-    QnUuid ruleId;
+    nx::Uuid ruleId;
 
     /**%apidoc[opt] Event description lookup string. */
     QString text;

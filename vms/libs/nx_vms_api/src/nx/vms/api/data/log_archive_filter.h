@@ -22,7 +22,7 @@ NX_REFLECTION_ENUM_CLASS(LogName,
 
 struct NX_VMS_API LogArchiveFilter
 {
-    QnUuid id;
+    nx::Uuid id;
 
     /**%apidoc Indicates if the archive includes (and how many) rotated files. */
     std::optional<int> rotated;

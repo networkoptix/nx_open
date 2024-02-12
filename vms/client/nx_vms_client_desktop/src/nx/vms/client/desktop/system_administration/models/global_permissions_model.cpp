@@ -101,7 +101,7 @@ QVariant GlobalPermissionsModel::data(const QModelIndex& index, int role) const
 
             using namespace nx::vms::common;
 
-            const QSet<QnUuid> groupIds =
+            const QSet<nx::Uuid> groupIds =
                 m_context->globalPermissionSource(permissions.at(index.row()).first);
 
             std::vector<nx::vms::api::UserGroupData> groupsData;

@@ -25,7 +25,7 @@ public:
     UserPickerHelper(
         SystemContext* context,
         bool acceptAll,
-        const QnUuidSet& ids,
+        const UuidSet& ids,
         const QnSubjectValidationPolicy* policy,
         bool isIntermediateStateValid = true,
         const UserPickerHelperParameters& parameters = {});

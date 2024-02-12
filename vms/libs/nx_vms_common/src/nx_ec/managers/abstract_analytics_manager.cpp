@@ -46,7 +46,7 @@ ErrorCode AbstractAnalyticsManager::saveSync(const nx::vms::api::AnalyticsEngine
         });
 }
 
-ErrorCode AbstractAnalyticsManager::removeAnalyticsPluginSync(const QnUuid& id)
+ErrorCode AbstractAnalyticsManager::removeAnalyticsPluginSync(const nx::Uuid& id)
 {
     return detail::callSync(
         [&](auto handler)
@@ -55,7 +55,7 @@ ErrorCode AbstractAnalyticsManager::removeAnalyticsPluginSync(const QnUuid& id)
         });
 }
 
-ErrorCode AbstractAnalyticsManager::removeAnalyticsEngineSync(const QnUuid& id)
+ErrorCode AbstractAnalyticsManager::removeAnalyticsEngineSync(const nx::Uuid& id)
 {
     return detail::callSync(
         [&](auto handler)

@@ -9,7 +9,7 @@ namespace vms {
 namespace api {
 
 const QString VideowallData::kResourceTypeName = lit("Videowall");
-const QnUuid VideowallData::kResourceTypeId =
+const nx::Uuid VideowallData::kResourceTypeId =
     ResourceData::getFixedTypeId(VideowallData::kResourceTypeName);
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(

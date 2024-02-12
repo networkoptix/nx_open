@@ -352,8 +352,8 @@ int BackupSettingsDecoratorModel::Private::availableCloudStorageServices(
 
 void BackupSettingsDecoratorModel::Private::proposeServicesUsageChange()
 {
-    std::set<QnUuid> toAdd;
-    std::set<QnUuid> toRemove;
+    std::set<nx::Uuid> toAdd;
+    std::set<nx::Uuid> toRemove;
     for (auto i = changedEnabledState.begin(); i != changedEnabledState.end(); ++i)
     {
         if (i.value())

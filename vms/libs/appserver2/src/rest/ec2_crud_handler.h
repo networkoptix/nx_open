@@ -216,7 +216,7 @@ protected:
     QueryProcessor* const m_queryProcessor;
 
 private:
-    bool isValidType(const QnUuid& id) const
+    bool isValidType(const nx::Uuid& id) const
     {
         const auto objectType = m_queryProcessor->getAccess(Qn::kSystemAccess).getObjectType(id);
         return objectType == ApiObject_NotDefined || objectType == m_objectType;

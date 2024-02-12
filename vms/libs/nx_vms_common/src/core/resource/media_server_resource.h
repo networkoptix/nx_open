@@ -143,15 +143,15 @@ public:
      * along with the reference to the original Id. So, the overridden method for the fake Server
      * returns its own non-original Id.
      */
-    virtual QnUuid getOriginalGuid() const { return getId(); }
+    virtual nx::Uuid getOriginalGuid() const { return getId(); }
 
     /**
      * @return Ids of Analytics Engines which are actually running on the server.
      */
-    QSet<QnUuid> activeAnalyticsEngineIds() const;
+    QSet<nx::Uuid> activeAnalyticsEngineIds() const;
 
-    QnUuid metadataStorageId() const;
-    void setMetadataStorageId(const QnUuid& value);
+    nx::Uuid metadataStorageId() const;
+    void setMetadataStorageId(const nx::Uuid& value);
 
     static constexpr qint64 kMinFailoverTimeoutMs = 1000 * 3;
     nx::vms::api::MediaServerUserAttributesData userAttributes() const;

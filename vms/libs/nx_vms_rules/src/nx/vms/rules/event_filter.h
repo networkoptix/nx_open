@@ -28,10 +28,10 @@ class NX_VMS_RULES_API /*FieldBased*/EventFilter: public QObject
     Q_OBJECT
 
 public:
-    EventFilter(const QnUuid& id, const QString& eventType);
+    EventFilter(const nx::Uuid& id, const QString& eventType);
     virtual ~EventFilter();
 
-    QnUuid id() const;
+    nx::Uuid id() const;
     QString eventType() const;
 
     const Rule* rule() const;
@@ -126,7 +126,7 @@ private:
         return {};
     }
 
-    QnUuid m_id;
+    nx::Uuid m_id;
     QString m_eventType;
     const Rule* m_rule = {};
     std::map<QString, std::unique_ptr<EventFilterField>> m_fields;

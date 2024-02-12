@@ -94,7 +94,7 @@ const char* const QnTransactionTransportBase::TUNNEL_MULTIPART_BOUNDARY = "ec2bo
 const char* const QnTransactionTransportBase::TUNNEL_CONTENT_TYPE = "multipart/mixed; boundary=ec2boundary";
 
 QnTransactionTransportBase::QnTransactionTransportBase(
-    const QnUuid& localSystemId,
+    const nx::Uuid& localSystemId,
     ConnectionGuardSharedState* const connectionGuardSharedState,
     const api::PeerData& localPeer,
     PeerRole peerRole,
@@ -138,7 +138,7 @@ QnTransactionTransportBase::QnTransactionTransportBase(
 }
 
 QnTransactionTransportBase::QnTransactionTransportBase(
-    const QnUuid& localSystemId,
+    const nx::Uuid& localSystemId,
     const std::string& connectionGuid,
     ConnectionLockGuard connectionLockGuard,
     const api::PeerData& localPeer,
@@ -226,7 +226,7 @@ QnTransactionTransportBase::QnTransactionTransportBase(
 }
 
 QnTransactionTransportBase::QnTransactionTransportBase(
-    const QnUuid& localSystemId,
+    const nx::Uuid& localSystemId,
     ConnectionGuardSharedState* const connectionGuardSharedState,
     const api::PeerData& localPeer,
     std::chrono::milliseconds tcpKeepAliveTimeout,
@@ -250,7 +250,7 @@ QnTransactionTransportBase::QnTransactionTransportBase(
         ConnectionType::incoming
 #endif
         ;
-    m_connectionGuid = QnUuid::createUuid().toSimpleString().toStdString();
+    m_connectionGuid = nx::Uuid::createUuid().toSimpleString().toStdString();
 #ifdef ENCODE_TO_BASE64
     m_base64EncodeOutgoingTransactions = true;
 #endif
@@ -1246,7 +1246,7 @@ void QnTransactionTransportBase::at_responseReceived(
         }
         else
         {
-            QnUuid guid(nx::network::http::getHeaderValue(client->response()->headers, Qn::EC2_SERVER_GUID_HEADER_NAME));
+            nx::Uuid guid(nx::network::http::getHeaderValue(client->response()->headers, Qn::EC2_SERVER_GUID_HEADER_NAME));
             if (!guid.isNull())
             {
                 emit peerIdDiscovered(remoteAddr(), guid);
@@ -1306,9 +1306,9 @@ void QnTransactionTransportBase::at_responseReceived(
         }
     }
 
-    m_remotePeer.id = QnUuid(itrGuid->second);
+    m_remotePeer.id = nx::Uuid(itrGuid->second);
     if (itrRuntimeGuid != client->response()->headers.end())
-        m_remotePeer.instanceId = QnUuid(itrRuntimeGuid->second);
+        m_remotePeer.instanceId = nx::Uuid(itrRuntimeGuid->second);
 
     NX_ASSERT(!m_remotePeer.instanceId.isNull());
     if (m_remotePeer.id == kCloudPeerId)

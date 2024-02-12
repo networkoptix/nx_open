@@ -444,7 +444,7 @@ bool ResourceStatusHelper::Private::isVideoWallLicenseValid() const
 
     const QnPeerRuntimeInfo localInfo = systemContext->runtimeInfoManager()->localInfo();
     NX_ASSERT(localInfo.data.peer.peerType == nx::vms::api::PeerType::videowallClient);
-    QnUuid currentScreenId = localInfo.data.videoWallInstanceGuid;
+    nx::Uuid currentScreenId = localInfo.data.videoWallInstanceGuid;
 
     // Gather all online screen ids.
     // The order of screens should be the same across all client instances.

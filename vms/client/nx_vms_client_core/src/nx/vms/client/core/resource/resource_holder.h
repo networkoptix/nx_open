@@ -16,15 +16,15 @@ class ResourceHolder: public CommonModuleAware
     using ResourcePtr = QnSharedResourcePointer<ResourceType>;
 public:
     ResourceHolder();
-    ResourceHolder(const QnUuid& resourceId);
+    ResourceHolder(const nx::Uuid& resourceId);
 
-    bool setResourceId(QnUuid value);
-    QnUuid resourceId() const;
+    bool setResourceId(nx::Uuid value);
+    nx::Uuid resourceId() const;
 
     ResourcePtr resource();
 
 private:
-    QnUuid m_resourceId;
+    nx::Uuid m_resourceId;
     ResourcePtr m_resource;
 };
 
@@ -34,13 +34,13 @@ ResourceHolder<ResourceType>::ResourceHolder()
 }
 
 template<typename ResourceType>
-ResourceHolder<ResourceType>::ResourceHolder(const QnUuid& resourceId)
+ResourceHolder<ResourceType>::ResourceHolder(const nx::Uuid& resourceId)
 {
     setResourceId(resourceId);
 }
 
 template<typename ResourceType>
-bool ResourceHolder<ResourceType>::setResourceId(QnUuid value)
+bool ResourceHolder<ResourceType>::setResourceId(nx::Uuid value)
 {
     if (m_resourceId == value)
         return false;
@@ -53,7 +53,7 @@ bool ResourceHolder<ResourceType>::setResourceId(QnUuid value)
     NX_ASSERT(value.isNull() || target, "Can't find any resource with specified id and type!");
 
     if (!target)
-        value = QnUuid();
+        value = nx::Uuid();
 
     if (m_resourceId == value)
         return false;
@@ -65,7 +65,7 @@ bool ResourceHolder<ResourceType>::setResourceId(QnUuid value)
 }
 
 template<typename ResourceType>
-QnUuid ResourceHolder<ResourceType>::resourceId() const
+nx::Uuid ResourceHolder<ResourceType>::resourceId() const
 {
     return m_resourceId;
 }

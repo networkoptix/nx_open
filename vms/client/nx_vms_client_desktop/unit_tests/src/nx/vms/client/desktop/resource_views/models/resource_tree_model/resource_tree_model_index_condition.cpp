@@ -255,7 +255,7 @@ Condition mimeDataContainsResource(const QnResourcePtr& resource)
         };
 }
 
-Condition mimeDataContainsEntity(const QnUuid& entityId)
+Condition mimeDataContainsEntity(const nx::Uuid& entityId)
 {
     return
         [entityId](const QModelIndex& index)

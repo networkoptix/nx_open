@@ -21,14 +21,14 @@ public:
     using ServerFilter = std::function<bool(const QnMediaServerResourcePtr&)>;
 
     static bool selectServers(
-        QnUuidSet& selectedServers,
+        UuidSet& selectedServers,
         ServerFilter filterFunctor,
         const QString& infoMessage,
         QWidget* parent);
 
 private:
     ServerSelectionDialog(
-        const QnUuidSet& selectedServersIds,
+        const UuidSet& selectedServersIds,
         ServerFilter filterFunctor,
         const QString& infoMessage,
         QWidget* parent = nullptr);

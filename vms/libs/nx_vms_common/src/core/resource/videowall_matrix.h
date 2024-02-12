@@ -13,9 +13,9 @@ class QnVideoWallMatrix
 public:
     QnVideoWallMatrix() {}
 
-    QnUuid uuid;
+    nx::Uuid uuid;
     QString name;
-    QHash<QnUuid, QnUuid> layoutByItem;
+    QHash<nx::Uuid, nx::Uuid> layoutByItem;
 
     friend bool operator==(const QnVideoWallMatrix &l, const QnVideoWallMatrix &r) {
         return (l.uuid == r.uuid &&
@@ -26,7 +26,7 @@ public:
 
 
 typedef QList<QnVideoWallMatrix> QnVideoWallMatrixList;
-typedef QHash<QnUuid, QnVideoWallMatrix> QnVideoWallMatrixMap;
+typedef QHash<nx::Uuid, QnVideoWallMatrix> QnVideoWallMatrixMap;
 
 
 #endif // VIDEO_WALL_MATRIX_H

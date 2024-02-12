@@ -29,16 +29,16 @@ public:
     void initialize(nx::vms::api::LookupListDataList initialData);
     void deinitialize();
 
-    nx::vms::api::LookupListData lookupList(const QnUuid& id) const;
+    nx::vms::api::LookupListData lookupList(const nx::Uuid& id) const;
     const nx::vms::api::LookupListDataList& lookupLists() const;
 
     void addOrUpdate(nx::vms::api::LookupListData list);
-    void remove(const QnUuid& id);
+    void remove(const nx::Uuid& id);
 
 signals:
     void initialized();
-    void addedOrUpdated(QnUuid id);
-    void removed(QnUuid id);
+    void addedOrUpdated(nx::Uuid id);
+    void removed(nx::Uuid id);
 
 private:
     struct Private;

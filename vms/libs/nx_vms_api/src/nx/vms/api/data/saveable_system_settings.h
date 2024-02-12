@@ -29,7 +29,7 @@ struct SaveableSystemSettings
     std::optional<EmailSettings> emailSettings;
 
     std::optional<bool> timeSynchronizationEnabled;
-    std::optional<QnUuid> primaryTimeServer;
+    std::optional<nx::Uuid> primaryTimeServer;
 
     std::optional<WatermarkSettings> watermarkSettings;
     std::optional<bool> auditTrailEnabled;

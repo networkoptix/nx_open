@@ -9,11 +9,11 @@ namespace nx::common::metadata {
 struct ObjectMetadataV0
 {
     QString typeId;
-    QnUuid trackId;
+    nx::Uuid trackId;
     QRectF boundingBox;
     Attributes attributes;
     bool bestShot = false;
-    QnUuid analyticsEngineId;
+    nx::Uuid analyticsEngineId;
 };
 
 #define ObjectMetadataV0_Fields \
@@ -28,7 +28,7 @@ QN_FUSION_DECLARE_FUNCTIONS(ObjectMetadataV0, (json)(ubjson));
 
 struct ObjectMetadataPacketV0
 {
-    QnUuid deviceId;
+    nx::Uuid deviceId;
     qint64 timestampUs = 0;
     qint64 durationUs = 0;
     std::vector<ObjectMetadataV0> objectMetadataList;

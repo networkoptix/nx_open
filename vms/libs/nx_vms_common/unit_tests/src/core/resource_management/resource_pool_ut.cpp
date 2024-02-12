@@ -35,8 +35,8 @@ public:
             });
     }
 
-    QnUuidList removedBySingleSignal;
-    QnUuidList removedByGroupSignal;
+    UuidList removedBySingleSignal;
+    UuidList removedByGroupSignal;
 };
 
 } // namespace
@@ -51,7 +51,7 @@ TEST_F(QnResourcePoolTest, removeCameraFromLayoutById)
     auto layout = addLayout();
 
     LayoutItemData item;
-    item.uuid = QnUuid::createUuid();
+    item.uuid = nx::Uuid::createUuid();
     item.resource.id = camera->getId();
     layout->addItem(item);
 
@@ -66,7 +66,7 @@ TEST_F(QnResourcePoolTest, removeCameraFromLayoutByUniqueId)
     auto layout = addLayout();
 
     LayoutItemData item;
-    item.uuid = QnUuid::createUuid();
+    item.uuid = nx::Uuid::createUuid();
     item.resource.path = camera->getPhysicalId();
     layout->addItem(item);
 

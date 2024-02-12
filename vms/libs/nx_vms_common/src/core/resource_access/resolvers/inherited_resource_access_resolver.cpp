@@ -26,7 +26,7 @@ public:
 
     const QPointer<AbstractResourceAccessResolver> baseResolver;
     const QPointer<SubjectHierarchy> subjectHierarchy;
-    QSet<QnUuid> watchedSubjectParents;
+    QSet<nx::Uuid> watchedSubjectParents;
 
     struct ResourceAccessData
     {
@@ -35,32 +35,32 @@ public:
     };
 
     ResourceAccessData ensureResourceAccessDataUnsafe(
-        const QnUuid& subjectId, QSet<QnUuid>& visitedSubjectIds) const;
+        const nx::Uuid& subjectId, QSet<nx::Uuid>& visitedSubjectIds) const;
 
-    QSet<QnUuid> invalidateCache(); //< Returns all subject ids that were cached.
+    QSet<nx::Uuid> invalidateCache(); //< Returns all subject ids that were cached.
 
     GlobalPermissions globalPermissions(
-        const QnUuid& subjectId, QSet<QnUuid>& visitedSubjectIds) const;
+        const nx::Uuid& subjectId, QSet<nx::Uuid>& visitedSubjectIds) const;
 
     ResourceAccessDetails accessDetails(
-        const QnUuid& subjectId,
+        const nx::Uuid& subjectId,
         const QnResourcePtr& resource,
         nx::vms::api::AccessRight accessRight,
-        QSet<QnUuid>& visitedSubjectIds) const;
+        QSet<nx::Uuid>& visitedSubjectIds) const;
 
-    mutable QHash<QnUuid, ResourceAccessData> cachedAccessData;
+    mutable QHash<nx::Uuid, ResourceAccessData> cachedAccessData;
     mutable nx::Mutex mutex;
     mutable nx::Mutex watchedParentsMutex;
 
 private:
-    void handleBaseAccessChanged(const QSet<QnUuid>& subjectIds);
+    void handleBaseAccessChanged(const QSet<nx::Uuid>& subjectIds);
     void handleReset();
 
     void handleSubjectHierarchyChanged(
-        const QSet<QnUuid>& added,
-        const QSet<QnUuid>& removed,
-        const QSet<QnUuid>& groupsWithChangedMembers,
-        const QSet<QnUuid>& subjectsWithChangedParents);
+        const QSet<nx::Uuid>& added,
+        const QSet<nx::Uuid>& removed,
+        const QSet<nx::Uuid>& groupsWithChangedMembers,
+        const QSet<nx::Uuid>& subjectsWithChangedParents);
 
     void updateWatchedSubset();
 };
@@ -83,20 +83,20 @@ InheritedResourceAccessResolver::~InheritedResourceAccessResolver()
     // Required here for forward-declared scoped pointer destruction.
 }
 
-GlobalPermissions InheritedResourceAccessResolver::globalPermissions(const QnUuid& subjectId) const
+GlobalPermissions InheritedResourceAccessResolver::globalPermissions(const nx::Uuid& subjectId) const
 {
-    QSet<QnUuid> visitedSubjectIds;
+    QSet<nx::Uuid> visitedSubjectIds;
     return d->globalPermissions(subjectId, visitedSubjectIds);
 }
 
-AccessRights InheritedResourceAccessResolver::availableAccessRights(const QnUuid& subjectId) const
+AccessRights InheritedResourceAccessResolver::availableAccessRights(const nx::Uuid& subjectId) const
 {
     if (!d->subjectHierarchy || !d->baseResolver)
         return {};
 
     NX_MUTEX_LOCKER lk(&d->mutex);
 
-    QSet<QnUuid> visitedSubjectIds;
+    QSet<nx::Uuid> visitedSubjectIds;
     const auto data = d->ensureResourceAccessDataUnsafe(subjectId, visitedSubjectIds);
 
     if (data.availableAccessRights)
@@ -105,7 +105,7 @@ AccessRights InheritedResourceAccessResolver::availableAccessRights(const QnUuid
     const auto result = std::accumulate(
         data.accessMap.constKeyValueBegin(), data.accessMap.constKeyValueEnd(),
         AccessRights{},
-        [](AccessRights sum, const std::pair<QnUuid, AccessRights>& item)
+        [](AccessRights sum, const std::pair<nx::Uuid, AccessRights>& item)
         {
             return sum | item.second;
         });
@@ -114,26 +114,26 @@ AccessRights InheritedResourceAccessResolver::availableAccessRights(const QnUuid
     return result;
 }
 
-ResourceAccessMap InheritedResourceAccessResolver::resourceAccessMap(const QnUuid& subjectId) const
+ResourceAccessMap InheritedResourceAccessResolver::resourceAccessMap(const nx::Uuid& subjectId) const
 {
     if (!d->subjectHierarchy || !d->baseResolver)
         return {};
 
     NX_MUTEX_LOCKER lk(&d->mutex);
 
-    QSet<QnUuid> visitedSubjectIds;
+    QSet<nx::Uuid> visitedSubjectIds;
     return d->ensureResourceAccessDataUnsafe(subjectId, visitedSubjectIds).accessMap;
 }
 
 ResourceAccessDetails InheritedResourceAccessResolver::accessDetails(
-    const QnUuid& subjectId,
+    const nx::Uuid& subjectId,
     const QnResourcePtr& resource,
     nx::vms::api::AccessRight accessRight) const
 {
     if (!d->subjectHierarchy || !d->baseResolver)
         return {};
 
-    QSet<QnUuid> visitedSubjectIds;
+    QSet<nx::Uuid> visitedSubjectIds;
     return d->accessDetails(subjectId, resource, accessRight, visitedSubjectIds);
 }
 
@@ -175,7 +175,7 @@ InheritedResourceAccessResolver::Private::Private(
 
 InheritedResourceAccessResolver::Private::ResourceAccessData
     InheritedResourceAccessResolver::Private::ensureResourceAccessDataUnsafe(
-        const QnUuid& subjectId, QSet<QnUuid>& visitedSubjectIds) const
+        const nx::Uuid& subjectId, QSet<nx::Uuid>& visitedSubjectIds) const
 {
     // Both optimization and circular dependency protection.
     if (visitedSubjectIds.contains(subjectId))
@@ -198,7 +198,7 @@ InheritedResourceAccessResolver::Private::ResourceAccessData
 
     ResourceAccessData& cachedAccessDataRef = cachedAccessData[subjectId];
     cachedAccessDataRef.accessMap += inheritedAccessMap;
-    cachedAccessDataRef.accessMap.remove(QnUuid{}); //< For compatibility with intermediate version.
+    cachedAccessDataRef.accessMap.remove(nx::Uuid{}); //< For compatibility with intermediate version.
 
     NX_DEBUG(q, "Resolved and cached an access map for %1", subjectId);
     NX_VERBOSE(q, toString(cachedAccessDataRef.accessMap));
@@ -206,10 +206,10 @@ InheritedResourceAccessResolver::Private::ResourceAccessData
     return cachedAccessDataRef;
 }
 
-QSet<QnUuid> InheritedResourceAccessResolver::Private::invalidateCache()
+QSet<nx::Uuid> InheritedResourceAccessResolver::Private::invalidateCache()
 {
     NX_MUTEX_LOCKER lk(&mutex);
-    const auto cachedSubjectIds = QSet<QnUuid>(
+    const auto cachedSubjectIds = QSet<nx::Uuid>(
         cachedAccessData.keyBegin(), cachedAccessData.keyEnd());
 
     cachedAccessData.clear();
@@ -217,7 +217,7 @@ QSet<QnUuid> InheritedResourceAccessResolver::Private::invalidateCache()
 }
 
 GlobalPermissions InheritedResourceAccessResolver::Private::globalPermissions(
-    const QnUuid& subjectId, QSet<QnUuid>& visitedSubjectIds) const
+    const nx::Uuid& subjectId, QSet<nx::Uuid>& visitedSubjectIds) const
 {
     if (visitedSubjectIds.contains(subjectId))
         return {};
@@ -242,10 +242,10 @@ GlobalPermissions InheritedResourceAccessResolver::Private::globalPermissions(
 }
 
 ResourceAccessDetails InheritedResourceAccessResolver::Private::accessDetails(
-    const QnUuid& subjectId,
+    const nx::Uuid& subjectId,
     const QnResourcePtr& resource,
     nx::vms::api::AccessRight accessRight,
-    QSet<QnUuid>& visitedSubjectIds) const
+    QSet<nx::Uuid>& visitedSubjectIds) const
 {
     if (visitedSubjectIds.contains(subjectId))
         return {};
@@ -261,10 +261,10 @@ ResourceAccessDetails InheritedResourceAccessResolver::Private::accessDetails(
 }
 
 void InheritedResourceAccessResolver::Private::handleBaseAccessChanged(
-    const QSet<QnUuid>& subjectIds)
+    const QSet<nx::Uuid>& subjectIds)
 {
     NX_DEBUG(q, "Base resolution changed for %1 subjects: %2", subjectIds.size(), subjectIds);
-    QSet<QnUuid> affectedCachedSubjectIds;
+    QSet<nx::Uuid> affectedCachedSubjectIds;
 
     {
         NX_MUTEX_LOCKER lk(&mutex);
@@ -286,7 +286,7 @@ void InheritedResourceAccessResolver::Private::handleBaseAccessChanged(
         affectedCachedSubjectIds.size(), affectedCachedSubjectIds);
 
     const auto watchedSubjectIds = q->notifier()->watchedSubjectIds();
-    QSet<QnUuid> affectedWatchedSubjectIds;
+    QSet<nx::Uuid> affectedWatchedSubjectIds;
 
     for (const auto subjectId: watchedSubjectIds)
     {
@@ -317,10 +317,10 @@ void InheritedResourceAccessResolver::Private::handleReset()
 }
 
 void InheritedResourceAccessResolver::Private::handleSubjectHierarchyChanged(
-    const QSet<QnUuid>& /*added*/,
-    const QSet<QnUuid>& /*removed*/,
-    const QSet<QnUuid>& /*groupsWithChangedMembers*/,
-    const QSet<QnUuid>& subjectsWithChangedParents)
+    const QSet<nx::Uuid>& /*added*/,
+    const QSet<nx::Uuid>& /*removed*/,
+    const QSet<nx::Uuid>& /*groupsWithChangedMembers*/,
+    const QSet<nx::Uuid>& subjectsWithChangedParents)
 {
     if (subjectsWithChangedParents.empty())
         return;

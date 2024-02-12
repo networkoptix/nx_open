@@ -69,7 +69,7 @@ void DeviceAgentSettingsAdapter::setCamera(const QnVirtualCameraResourcePtr& cam
                 d->settingsListener.get(),
                 &AnalyticsSettingsMultiListener::dataChanged,
                 this,
-                [this](const QnUuid& engineId, const DeviceAgentData& data)
+                [this](const nx::Uuid& engineId, const DeviceAgentData& data)
                 {
                     d->store->resetDeviceAgentData(engineId, data);
                 });
@@ -78,7 +78,7 @@ void DeviceAgentSettingsAdapter::setCamera(const QnVirtualCameraResourcePtr& cam
                 d->settingsListener.get(),
                 &AnalyticsSettingsMultiListener::previewDataReceived,
                 this,
-                [this](const QnUuid& engineId, const DeviceAgentData& data)
+                [this](const nx::Uuid& engineId, const DeviceAgentData& data)
                 {
                     d->store->resetDeviceAgentData(engineId, data, /*replaceUser*/ true);
                 });
@@ -87,7 +87,7 @@ void DeviceAgentSettingsAdapter::setCamera(const QnVirtualCameraResourcePtr& cam
                 d->settingsListener.get(),
                 &AnalyticsSettingsMultiListener::actionResultReceived,
                 this,
-                [this, camera](const QnUuid& engineId, const AnalyticsActionResult& result)
+                [this, camera](const nx::Uuid& engineId, const AnalyticsActionResult& result)
                 {
                     const CameraSettingsDialogState& state = d->store->state();
                     std::shared_ptr<CameraWebAuthenticator> authenticator = std::make_shared<CameraWebAuthenticator>(
@@ -120,7 +120,7 @@ void DeviceAgentSettingsAdapter::applySettings()
     if (!d->camera)
         return;
 
-    const QnUuid& cameraId = d->camera->getId();
+    const nx::Uuid& cameraId = d->camera->getId();
 
     const auto& settingsByEngineId = d->store->state().analytics.settingsByEngineId;
     QHash<DeviceAgentId, QJsonObject> valuesToSet;
@@ -145,14 +145,14 @@ void DeviceAgentSettingsAdapter::refreshSettings()
     if (!d->camera)
         return;
 
-    const QnUuid& cameraId = d->camera->getId();
-    for (const QnUuid& engineId: d->store->state().analytics.enabledEngines())
+    const nx::Uuid& cameraId = d->camera->getId();
+    for (const nx::Uuid& engineId: d->store->state().analytics.enabledEngines())
         d->settingsManager->refreshSettings(DeviceAgentId{cameraId, engineId});
 }
 
-std::unordered_map<QnUuid, DeviceAgentData> DeviceAgentSettingsAdapter::dataByEngineId() const
+std::unordered_map<nx::Uuid, DeviceAgentData> DeviceAgentSettingsAdapter::dataByEngineId() const
 {
-    std::unordered_map<QnUuid, DeviceAgentData> result;
+    std::unordered_map<nx::Uuid, DeviceAgentData> result;
     if (!d->settingsListener)
         return result;
 

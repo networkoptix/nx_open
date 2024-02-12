@@ -35,7 +35,7 @@ void QnRuntimeInfoManager::setMessageProcessor(QnCommonMessageProcessor* message
             });
 
         connect(messageProcessor, &QnCommonMessageProcessor::remotePeerLost, this,
-            [this](QnUuid peer, nx::vms::api::PeerType peerType)
+            [this](nx::Uuid peer, nx::vms::api::PeerType peerType)
             {
                 NX_DEBUG(this, "Remote peer lost: id %1, type %2", peer, peerType);
                 m_items->removeItem(peer);
@@ -81,12 +81,12 @@ QnPeerRuntimeInfo QnRuntimeInfoManager::localInfo() const
     return m_localInfo;
 }
 
-QnPeerRuntimeInfo QnRuntimeInfoManager::item(const QnUuid& id) const
+QnPeerRuntimeInfo QnRuntimeInfoManager::item(const nx::Uuid& id) const
 {
     return m_items->getItem(id);
 }
 
-bool QnRuntimeInfoManager::hasItem(const QnUuid& id)
+bool QnRuntimeInfoManager::hasItem(const nx::Uuid& id)
 {
     return m_items->hasItem(id);
 }

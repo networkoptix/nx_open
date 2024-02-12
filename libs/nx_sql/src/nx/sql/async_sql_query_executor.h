@@ -277,7 +277,7 @@ public:
     void createCursor(
         nx::utils::MoveOnlyFunc<void(SqlQuery*)> prepareCursorFunc,
         nx::utils::MoveOnlyFunc<void(SqlQuery*, Record*)> readRecordFunc,
-        nx::utils::MoveOnlyFunc<void(DBResult, QnUuid /*cursorId*/)> completionHandler)
+        nx::utils::MoveOnlyFunc<void(DBResult, nx::Uuid /*cursorId*/)> completionHandler)
     {
         auto cursorHandler = std::make_unique<detail::CursorHandler<Record>>(
             std::move(prepareCursorFunc),
@@ -296,7 +296,7 @@ public:
      */
     template<typename Record>
     void fetchNextRecordFromCursor(
-        QnUuid id,
+        nx::Uuid id,
         nx::utils::MoveOnlyFunc<void(DBResult, Record)> completionHandler)
     {
         auto task = std::make_unique<detail::FetchNextRecordFromCursorTask<Record>>(
@@ -308,7 +308,7 @@ public:
     /**
      * @param id Provided by createCursor.
      */
-    virtual void removeCursor(QnUuid id) = 0;
+    virtual void removeCursor(nx::Uuid id) = 0;
 
     virtual int openCursorCount() const = 0;
 
@@ -379,7 +379,7 @@ public:
     virtual void fetchNextRecordFromCursorImpl(
         std::unique_ptr<detail::AbstractFetchNextRecordFromCursorTask> executor) override;
 
-    virtual void removeCursor(QnUuid id) override;
+    virtual void removeCursor(nx::Uuid id) override;
 
     virtual int openCursorCount() const override;
 

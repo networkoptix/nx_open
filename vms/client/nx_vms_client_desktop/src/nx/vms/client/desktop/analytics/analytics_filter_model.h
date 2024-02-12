@@ -71,7 +71,7 @@ public:
     /**
      * Sets selected devices.
      */
-    void setSelectedDevices(const std::set<QnUuid>& devices);
+    void setSelectedDevices(const std::set<nx::Uuid>& devices);
 
     /**
      * Sets selected attribute values.
@@ -123,7 +123,7 @@ private:
     void rebuild();
     void update(
         nx::analytics::taxonomy::AbstractEngine* engine,
-        const std::set<QnUuid>& devices,
+        const std::set<nx::Uuid>& devices,
         const QVariantMap& attributeValues,
         bool liveTypesExcluded,
         bool force = false);
@@ -135,7 +135,7 @@ private:
     std::vector<nx::analytics::taxonomy::AbstractEngine*> m_engines;
 
     QPointer<nx::analytics::taxonomy::AbstractEngine> m_engine;
-    std::set<QnUuid> m_devices;
+    std::set<nx::Uuid> m_devices;
     QVariantMap m_attributeValues;
     bool m_liveTypesExcluded = false;
 

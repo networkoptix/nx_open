@@ -87,7 +87,7 @@ void QnAttachToVideowallDialog::updateLicencesUsage()
     }
 
     /* Calculate how many screens are proposed to be added or removed on local PC. */
-    QnUuid pcUuid = appContext()->localSettings()->pcUuid();
+    nx::Uuid pcUuid = appContext()->localSettings()->pcUuid();
     int used = pcUuid.isNull() || m_videowall.isNull()
         ? 0
         : boost::count_if(

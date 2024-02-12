@@ -117,7 +117,7 @@ private:
         BaseModelItem(
             const QRect& geometry,
             ItemType itemType,
-            const QnUuid& id,
+            const nx::Uuid& id,
             QnVideowallManageWidget* q);
         virtual ~BaseModelItem();
 
@@ -140,7 +140,7 @@ private:
         bool hasFlag(StateFlags flag) const;
         bool isPartOfScreen() const;
 
-        QnUuid id;
+        nx::Uuid id;
         ItemType itemType;
 
         QRect geometry;
@@ -160,7 +160,7 @@ private:
     {
         typedef BaseModelItem base_type;
 
-        ModelItem(ItemType itemType, const QnUuid& id, QnVideowallManageWidget* q);
+        ModelItem(ItemType itemType, const nx::Uuid& id, QnVideowallManageWidget* q);
 
         virtual bool free() const override;
         virtual void setFree(bool value) override;

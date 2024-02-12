@@ -76,7 +76,7 @@ public:
 
     void at_serverChanged(
             const QnSystemDescriptionPtr& systemDescription,
-            const QnUuid &serverId,
+            const nx::Uuid &serverId,
             QnServerFields fields);
 
     void emitDataChanged(
@@ -351,7 +351,7 @@ void QnSystemsModelPrivate::addSystem(const QnSystemDescriptionPtr& systemDescri
 
     data->connections
         << connect(systemDescription.get(), &QnBaseSystemDescription::serverChanged, this,
-            [this, systemDescription] (const QnUuid &serverId, QnServerFields fields)
+            [this, systemDescription] (const nx::Uuid &serverId, QnServerFields fields)
             {
                 searchServerNamesHostsCache.remove(systemDescription->id());
 
@@ -377,7 +377,7 @@ void QnSystemsModelPrivate::addSystem(const QnSystemDescriptionPtr& systemDescri
             });
 
     const auto serverAction =
-        [this, systemDescription](const QnUuid& id)
+        [this, systemDescription](const nx::Uuid& id)
         {
             Q_UNUSED(id);
 
@@ -510,7 +510,7 @@ void QnSystemsModelPrivate::emitDataChanged(const QnSystemDescriptionPtr& system
 
 void QnSystemsModelPrivate::at_serverChanged(
         const QnSystemDescriptionPtr& systemDescription,
-        const QnUuid& serverId,
+        const nx::Uuid& serverId,
         QnServerFields fields)
 {
     Q_UNUSED(serverId)

@@ -25,7 +25,7 @@ struct NX_VMS_API ServerMergeData
     )
 
     /**%apidoc Server Id. */
-    QnUuid serverId;
+    nx::Uuid serverId;
 
     /**%apidoc Server name. */
     QString serverName;

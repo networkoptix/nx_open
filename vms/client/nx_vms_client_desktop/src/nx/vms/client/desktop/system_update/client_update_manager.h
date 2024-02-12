@@ -56,7 +56,7 @@ public:
     static UpdateDate calculateUpdateDate(
         std::chrono::milliseconds currentDateTime,
         const common::update::Information& updateInfo,
-        const QnUuid& localSystemId,
+        const nx::Uuid& localSystemId,
         std::chrono::milliseconds minimumAllowedUpdateDate);
 
 signals:

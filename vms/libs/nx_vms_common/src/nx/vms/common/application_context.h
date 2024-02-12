@@ -51,9 +51,9 @@ public:
     /** Set application language locale code (in form `en_US`). */
     void setLocale(const QString& value);
 
-    void setModuleShortId(const QnUuid& id, int number);
-    int moduleShortId(const QnUuid& id) const;
-    QString moduleDisplayName(const QnUuid& id) const;
+    void setModuleShortId(const nx::Uuid& id, int number);
+    int moduleShortId(const nx::Uuid& id) const;
+    QString moduleDisplayName(const nx::Uuid& id) const;
 
     QnStoragePluginFactory* storagePluginFactory() const;
     QnLongRunableCleanup* longRunableCleanup() const;

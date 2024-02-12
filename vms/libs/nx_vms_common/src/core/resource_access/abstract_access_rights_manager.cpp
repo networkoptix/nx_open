@@ -5,7 +5,7 @@
 namespace nx::core::access {
 
 nx::vms::api::AccessRights AbstractAccessRightsManager::ownAccessRights(
-    const QnUuid& subjectId, const QnUuid& targetId) const
+    const nx::Uuid& subjectId, const nx::Uuid& targetId) const
 {
     return ownResourceAccessMap(subjectId).value(targetId);
 }

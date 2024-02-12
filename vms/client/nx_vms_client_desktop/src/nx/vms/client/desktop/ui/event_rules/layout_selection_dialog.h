@@ -52,12 +52,12 @@ public:
 
     // Invalid ids are filtered out. Disabled users are kept, but hidden.
     void setLocalLayouts(const QnResourceList& layouts,
-        const QSet<QnUuid>& selection, LocalLayoutSelection mode);
+        const QSet<nx::Uuid>& selection, LocalLayoutSelection mode);
 
-    void setSharedLayouts(const QnResourceList& layouts, const QSet<QnUuid>& selection);
+    void setSharedLayouts(const QnResourceList& layouts, const QSet<nx::Uuid>& selection);
 
     // Explicitly checked subjects, regardless of allUsers value.
-    QSet<QnUuid> checkedLayouts() const;
+    QSet<nx::Uuid> checkedLayouts() const;
 
 signals:
     // Selection or contents were changed. Potential alert must be re-evaluated.

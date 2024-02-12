@@ -4,7 +4,7 @@
 
 namespace nx::vms::client::desktop {
 
-bool NonUniqueNameTracker::update(const QnUuid& id, const QString& name)
+bool NonUniqueNameTracker::update(const nx::Uuid& id, const QString& name)
 {
     bool changed = false;
 
@@ -18,12 +18,12 @@ bool NonUniqueNameTracker::update(const QnUuid& id, const QString& name)
 
     m_nameById[id] = name;
 
-    QSet<QnUuid>& ids = m_idsByName[name];
+    QSet<nx::Uuid>& ids = m_idsByName[name];
     ids.insert(id);
 
     if (ids.size() == 2)
     {
-        for (const QnUuid& id: ids)
+        for (const nx::Uuid& id: ids)
             m_nonUniqueNameIds.insert(id);
         changed = true;
     }
@@ -36,7 +36,7 @@ bool NonUniqueNameTracker::update(const QnUuid& id, const QString& name)
     return changed;
 }
 
-bool NonUniqueNameTracker::remove(const QnUuid& id)
+bool NonUniqueNameTracker::remove(const nx::Uuid& id)
 {
     auto nameIt = m_nameById.find(id);
     if (nameIt == m_nameById.end())
@@ -54,7 +54,7 @@ bool NonUniqueNameTracker::remove(const QnUuid& id)
             m_idsByName.erase(it);
             break;
         case 2:
-            for (const QnUuid& id: *it)
+            for (const nx::Uuid& id: *it)
                 m_nonUniqueNameIds.remove(id);
             [[fallthrough]];
         default:
@@ -66,7 +66,7 @@ bool NonUniqueNameTracker::remove(const QnUuid& id)
     return changed;
 }
 
-QSet<QnUuid> NonUniqueNameTracker::idsByName(const QString& name) const
+QSet<nx::Uuid> NonUniqueNameTracker::idsByName(const QString& name) const
 {
     return m_idsByName.value(name.toLower());
 }

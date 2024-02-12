@@ -26,7 +26,7 @@ struct NX_VMS_API StorageData: ResourceData
     StorageData(): ResourceData(kResourceTypeId) {}
 
     static const QString kResourceTypeName;
-    static const QnUuid kResourceTypeId;
+    static const nx::Uuid kResourceTypeId;
 
     /**%apidoc[opt]
      * Free space to maintain on the Storage, in bytes. Recommended value is 10 gigabytes for local
@@ -75,7 +75,7 @@ struct NX_VMS_API MediaServerData: ResourceData
     bool operator==(const MediaServerData& other) const = default;
 
     static const QString kResourceTypeName;
-    static const QnUuid kResourceTypeId;
+    static const nx::Uuid kResourceTypeId;
 
     QString networkAddresses;
     ServerFlags flags = SF_None;
@@ -162,7 +162,7 @@ nx::reflect::DeserializationResult NX_VMS_API deserialize(
 struct NX_VMS_API MediaServerUserAttributesData
 {
     /**%apidoc Server unique id. */
-    QnUuid serverId;
+    nx::Uuid serverId;
 
     /**%apidoc Server name. */
     QString serverName;
@@ -183,8 +183,8 @@ struct NX_VMS_API MediaServerUserAttributesData
     /** Used by ...Model::toDbTypes() and transaction-description-modify checkers. */
     CheckResourceExists checkResourceExists = CheckResourceExists::yes; /**<%apidoc[unused] */
 
-    QnUuid getIdForMerging() const { return serverId; } //< See IdData::getIdForMerging().
-    QnUuid getId() const { return serverId; }
+    nx::Uuid getIdForMerging() const { return serverId; } //< See IdData::getIdForMerging().
+    nx::Uuid getId() const { return serverId; }
 
     bool operator==(const MediaServerUserAttributesData& other) const = default;
 
@@ -239,22 +239,22 @@ NX_REFLECTION_INSTRUMENT(MediaServerDataEx, MediaServerDataEx_Fields)
 /**
  * Wrapper to be used for overloading as a distinct type for StorageData api requests.
  */
-class StorageParentId: public QnUuid
+class StorageParentId: public nx::Uuid
 {
 public:
     StorageParentId() = default;
-    StorageParentId(const QnUuid& id): QnUuid(id) {}
-    StorageParentId(const QString& id): QnUuid(id) {}
+    StorageParentId(const nx::Uuid& id): nx::Uuid(id) {}
+    StorageParentId(const QString& id): nx::Uuid(id) {}
 };
 
 struct StorageFilter: IdData
 {
     using IdData::IdData;
-    StorageFilter(const QnUuid& id, const QnUuid& serverId): IdData(id), serverId(serverId) {}
+    StorageFilter(const nx::Uuid& id, const nx::Uuid& serverId): IdData(id), serverId(serverId) {}
     StorageFilter getId() const { return *this; }
     bool operator==(const StorageFilter& origin) const = default;
 
-    QnUuid serverId;
+    nx::Uuid serverId;
 };
 
 QN_FUSION_DECLARE_FUNCTIONS(StorageFilter, (csv_record)(json)(ubjson)(xml), NX_VMS_API)

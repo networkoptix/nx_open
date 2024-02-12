@@ -24,7 +24,7 @@ public:
 private:
     void mapResource(const QnResourcePtr& resource);
     void unmapResource(const QnResourcePtr& resource, const QnResourcePtr& parentResource);
-    void onResourceParentIdChanged(const QnResourcePtr& resource, const QnUuid& previousParentId);
+    void onResourceParentIdChanged(const QnResourcePtr& resource, const nx::Uuid& previousParentId);
 
 private:
     std::unique_ptr<AbstractResourceSource> m_resourceSource;

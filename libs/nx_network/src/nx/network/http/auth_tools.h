@@ -75,7 +75,7 @@ class NX_NETWORK_API VideoWallAuthToken:
 public:
     static inline const std::string prefix = "videoWall-";
 
-    VideoWallAuthToken(const QnUuid& videoWallId);
+    VideoWallAuthToken(const nx::Uuid& videoWallId);
 };
 
 class NX_NETWORK_API Credentials

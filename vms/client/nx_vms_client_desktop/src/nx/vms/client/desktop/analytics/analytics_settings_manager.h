@@ -49,7 +49,7 @@ public:
         const QnVirtualCameraResourcePtr& device,
         const nx::vms::common::AnalyticsEngineResourcePtr& engine,
         const QJsonObject& settings,
-        const QnUuid& settingsModelId,
+        const nx::Uuid& settingsModelId,
         AnalyticsSettingsCallback callback) = 0;
     virtual rest::Handle activeSettingsChanged(
         const QnVirtualCameraResourcePtr& device,

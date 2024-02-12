@@ -63,7 +63,7 @@ struct NX_VMS_API UserData: ResourceData
     void fillId();
 
     static const QString kResourceTypeName;
-    static const QnUuid kResourceTypeId;
+    static const nx::Uuid kResourceTypeId;
 
     static constexpr const char* kCloudPasswordStub = "password_is_in_cloud";
     static constexpr const char* kHttpIsDisabledStub = "http_is_disabled";
@@ -84,10 +84,10 @@ struct NX_VMS_API UserData: ResourceData
     GlobalPermissions permissions = GlobalPermission::none;
 
     /**%apidoc[opt] List of groups to inherit permissions. */
-    std::vector<QnUuid> groupIds;
+    std::vector<nx::Uuid> groupIds;
 
     /**%apidoc[opt] Access rights per Resource or Resource Group. */
-    std::map<QnUuid, AccessRights> resourceAccessRights;
+    std::map<nx::Uuid, AccessRights> resourceAccessRights;
 
     /** Checks if this user is a member of the Administrators group. */
     bool isAdministrator() const;

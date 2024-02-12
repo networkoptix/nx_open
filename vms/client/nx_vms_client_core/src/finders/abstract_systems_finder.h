@@ -26,5 +26,5 @@ signals:
 
     void systemLost(const QString &id);
 
-    void systemLostInternal(const QString &id, const QnUuid& localId);
+    void systemLostInternal(const QString &id, const nx::Uuid& localId);
 };

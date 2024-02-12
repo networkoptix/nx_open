@@ -24,23 +24,23 @@ public:
     ~NameToId() = default;
 
     void clear();
-    QnUuid ensureId(const QString& name) const;
+    nx::Uuid ensureId(const QString& name) const;
 
-    QString name(const QnUuid& id) const;
-    QnUuid id(const QString& name) const;
+    QString name(const nx::Uuid& id) const;
+    nx::Uuid id(const QString& name) const;
 
-    void setId(const QString& name, const QnUuid& id);
+    void setId(const QString& name, const nx::Uuid& id);
 
     using Names = std::set<QString>;
-    using Ids = QSet<QnUuid>;
+    using Ids = QSet<nx::Uuid>;
 
     Ids ensureIds(const Names& names) const;
     Ids ids(const Names& names) const;
     Names names(const Ids& ids) const;
 
 private:
-    mutable QHash<QString, QnUuid> m_nameToId;
-    mutable QHash<QnUuid, QString> m_idToName;
+    mutable QHash<QString, nx::Uuid> m_nameToId;
+    mutable QHash<nx::Uuid, QString> m_idToName;
 };
 
 } // namespace nx::vms::common::test

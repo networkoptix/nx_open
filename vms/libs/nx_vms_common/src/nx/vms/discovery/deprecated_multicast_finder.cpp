@@ -52,7 +52,7 @@ using namespace nx::network;
 // DeprecatedMulticastFinder::RevealRequest
 
 DeprecatedMulticastFinder::RevealRequest::RevealRequest(
-    const QnUuid& moduleGuid,
+    const nx::Uuid& moduleGuid,
     nx::vms::api::PeerType peerType)
     :
     m_moduleGuid(moduleGuid),
@@ -129,16 +129,16 @@ bool DeprecatedMulticastFinder::RevealResponse::deserialize(
     realm = map.value("realm").toString();
     systemName = map.value("systemName").toString();
     name = map.value("name").toString();
-    id = QnUuid::fromStringSafe(map.value("seed").toString());
+    id = nx::Uuid::fromStringSafe(map.value("seed").toString());
     sslAllowed = map.value("sslAllowed").toBool();
     port = static_cast<quint16>(map.value("port").toUInt());
     protoVersion = map.value("protoVersion", nx::vms::api::kInitialProtocolVersion).toInt();
-    runtimeId = QnUuid::fromStringSafe(map.value("runtimeId").toString());
+    runtimeId = nx::Uuid::fromStringSafe(map.value("runtimeId").toString());
     serverFlags = nx::reflect::fromString<nx::vms::api::ServerFlags>(
         map.value("flags").toString().toStdString(), nx::vms::api::SF_None);
     cloudSystemId = map.value("cloudSystemId").toString();
     cloudHost = map.value("cloudHost").toString();
-    localSystemId = QnUuid(map.value("localSystemId").toByteArray());
+    localSystemId = nx::Uuid(map.value("localSystemId").toByteArray());
     fixRuntimeId();
 
     return !type.isEmpty() && !version.isNull();

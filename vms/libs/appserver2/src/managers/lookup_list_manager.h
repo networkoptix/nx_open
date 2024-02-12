@@ -25,7 +25,7 @@ public:
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
 
     virtual int remove(
-        const QnUuid& id,
+        const nx::Uuid& id,
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
 
@@ -52,9 +52,9 @@ int LookupListManager<QueryProcessorType>::getLookupLists(
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
     const int requestId = generateRequestID();
-    processor().template processQueryAsync<const QnUuid&, nx::vms::api::LookupListDataList>(
+    processor().template processQueryAsync<const nx::Uuid&, nx::vms::api::LookupListDataList>(
         ApiCommand::getLookupLists,
-        QnUuid(),
+        nx::Uuid(),
         [requestId, handler = handlerExecutor.bind(std::move(handler))](auto&&... args) mutable
         {
             handler(requestId, std::move(args)...);
@@ -81,7 +81,7 @@ int LookupListManager<QueryProcessorType>::save(
 
 template<class QueryProcessorType>
 int LookupListManager<QueryProcessorType>::remove(
-    const QnUuid& id,
+    const nx::Uuid& id,
     Handler<> handler,
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {

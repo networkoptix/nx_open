@@ -67,7 +67,7 @@ bool isValidFigureRectangle(const QRectF& rect)
 
 struct ObjectInfo
 {
-    QnUuid trackId;
+    nx::Uuid trackId;
     QColor color;
     QRectF rectangle;
     microseconds startTimestamp = 0us;
@@ -282,17 +282,17 @@ public:
 
 public:
     QnMediaResourceWidget* mediaResourceWidget = nullptr;
-    QnUuid layoutId;
+    nx::Uuid layoutId;
 
     core::AbstractAnalyticsMetadataProviderPtr metadataProvider;
     QPointer<AnalyticsOverlayWidget> analyticsWidget;
-    QHash<QnUuid, ObjectInfo> objectInfoByTrackId;
+    QHash<nx::Uuid, ObjectInfo> objectInfoByTrackId;
 
     std::unique_ptr<nx::analytics::MetadataLogger> logger;
 
     Filter filter;
     microseconds lastTimestamp{};
-    QSet<QnUuid> relevantCameraIds;
+    QSet<nx::Uuid> relevantCameraIds;
 
     const nx::analytics::taxonomy::ObjectTypeDictionary objectTypeDictionary;
 };
@@ -435,7 +435,7 @@ std::vector<Track> WidgetAnalyticsController::Private::fetchTracks(
     microseconds timestamp) const
 {
     // Left only objects which are to be displayed right now, store tracks for others.
-    QHash<QnUuid, Track> objectTrackByTrackId;
+    QHash<nx::Uuid, Track> objectTrackByTrackId;
     for (const auto& objectPacket: objectMetadataPackets)
     {
         if (logger)
@@ -491,7 +491,7 @@ WidgetAnalyticsController::WidgetAnalyticsController(QnMediaResourceWidget* medi
         d->logger = std::make_unique<nx::analytics::MetadataLogger>(
             "widget_analytics_controller_",
             d->mediaResourceWidget->resource()->toResourcePtr()->getId(),
-            /*engineId*/ QnUuid());
+            /*engineId*/ nx::Uuid());
     }
 }
 

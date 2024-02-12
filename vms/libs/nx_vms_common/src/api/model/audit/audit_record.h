@@ -28,7 +28,7 @@ struct NX_VMS_COMMON_API QnAuditRecord
     int rangeEndSec = 0; // payload range start end. Viewed archive range for playback or session time for login.
     Qn::AuditRecordType eventType = Qn::AR_NotDefined;
 
-    std::vector<QnUuid> resources;
+    std::vector<nx::Uuid> resources;
 
     /**%apidoc
      * JSON object serialized using the Latin-1 encoding, even though it may contain other Unicode

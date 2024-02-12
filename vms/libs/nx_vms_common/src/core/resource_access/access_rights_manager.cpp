@@ -16,7 +16,7 @@ using namespace nx::vms::common;
 
 struct AccessRightsManager::Private
 {
-    QHash<QnUuid, ResourceAccessMap> ownAccessMaps;
+    QHash<nx::Uuid, ResourceAccessMap> ownAccessMaps;
     mutable nx::Mutex mutex;
 };
 
@@ -34,7 +34,7 @@ AccessRightsManager::~AccessRightsManager()
     // Required here for forward-declared scoped pointer destruction.
 }
 
-ResourceAccessMap AccessRightsManager::ownResourceAccessMap(const QnUuid& subjectId) const
+ResourceAccessMap AccessRightsManager::ownResourceAccessMap(const nx::Uuid& subjectId) const
 {
     if (auto predefinedGroup = PredefinedUserGroups::find(subjectId))
     {
@@ -47,7 +47,7 @@ ResourceAccessMap AccessRightsManager::ownResourceAccessMap(const QnUuid& subjec
     return d->ownAccessMaps.value(subjectId);
 }
 
-void AccessRightsManager::resetAccessRights(const QHash<QnUuid, ResourceAccessMap>& accessRights)
+void AccessRightsManager::resetAccessRights(const QHash<nx::Uuid, ResourceAccessMap>& accessRights)
 {
     {
         NX_MUTEX_LOCKER lk(&d->mutex);
@@ -61,7 +61,7 @@ void AccessRightsManager::resetAccessRights(const QHash<QnUuid, ResourceAccessMa
     emit accessRightsReset();
 }
 
-bool AccessRightsManager::setOwnResourceAccessMap(const QnUuid& subjectId,
+bool AccessRightsManager::setOwnResourceAccessMap(const nx::Uuid& subjectId,
     const ResourceAccessMap& value)
 {
     if (PredefinedUserGroups::contains(subjectId))
@@ -83,9 +83,9 @@ bool AccessRightsManager::setOwnResourceAccessMap(const QnUuid& subjectId,
     return true;
 }
 
-bool AccessRightsManager::removeSubjects(const QSet<QnUuid>& subjectIds)
+bool AccessRightsManager::removeSubjects(const QSet<nx::Uuid>& subjectIds)
 {
-    QSet<QnUuid> removedSubjectIds;
+    QSet<nx::Uuid> removedSubjectIds;
 
     {
         NX_MUTEX_LOCKER lk(&d->mutex);

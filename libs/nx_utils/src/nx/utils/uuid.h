@@ -131,12 +131,10 @@ struct hash<nx::Uuid>
 
 } // namespace std
 
-// TODO: Remove and replace all over the code.
-using QnUuid = nx::Uuid;
-using QnUuidSet = QSet<nx::Uuid>;
-using QnUuidList = QList<nx::Uuid>;
+using UuidSet = QSet<nx::Uuid>;
+using UuidList = QList<nx::Uuid>;
 
-inline size_t qHash(const QnUuid& id, size_t seed = 0)
+inline size_t qHash(const nx::Uuid& id, size_t seed = 0)
 {
     return qHash(id.getQUuid(), seed);
 }

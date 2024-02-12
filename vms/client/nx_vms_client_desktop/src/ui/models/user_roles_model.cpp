@@ -160,9 +160,9 @@ bool QnUserRolesModel::setData(const QModelIndex& index, const QVariant& value, 
     return true;
 }
 
-QSet<QnUuid> QnUserRolesModel::checkedRoles() const
+QSet<nx::Uuid> QnUserRolesModel::checkedRoles() const
 {
-    QSet<QnUuid> result;
+    QSet<nx::Uuid> result;
 
     for (const auto& index: d->checked)
         result.insert(d->id(index.row()));
@@ -170,11 +170,11 @@ QSet<QnUuid> QnUserRolesModel::checkedRoles() const
     return result;
 }
 
-void QnUserRolesModel::setCheckedRoles(const QSet<QnUuid>& ids)
+void QnUserRolesModel::setCheckedRoles(const QSet<nx::Uuid>& ids)
 {
     d->checked.clear();
 
-    QHash<QnUuid, int> rowById;
+    QHash<nx::Uuid, int> rowById;
     for (int row = 0; row < d->count(); ++row)
         rowById[d->id(row)] = row;
 

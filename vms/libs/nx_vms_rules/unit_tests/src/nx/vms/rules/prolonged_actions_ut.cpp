@@ -22,9 +22,9 @@
 
 namespace nx::vms::rules::test {
 
-static const auto resourceA = QnUuid("00000000-0000-0000-0001-00000000000A");
-static const auto resourceB = QnUuid("00000000-0000-0000-0001-00000000000B");
-static const auto resourceC = QnUuid("00000000-0000-0000-0001-00000000000C");
+static const auto resourceA = nx::Uuid("00000000-0000-0000-0001-00000000000A");
+static const auto resourceB = nx::Uuid("00000000-0000-0000-0001-00000000000B");
+static const auto resourceC = nx::Uuid("00000000-0000-0000-0001-00000000000C");
 
 class ProlongedActionsTest: public ::testing::Test
 {
@@ -37,7 +37,7 @@ protected:
         engine->addEventConnector(&connector);
         engine->addActionExecutor(utils::type<TestProlongedAction>(), &executor);
 
-        auto rule = std::make_unique<Rule>(QnUuid::createUuid(), engine.get());
+        auto rule = std::make_unique<Rule>(nx::Uuid::createUuid(), engine.get());
         rule->setEnabled(true);
 
         auto filter = engine->buildEventFilter(utils::type<TestEvent>());
@@ -63,7 +63,7 @@ protected:
         engine.reset();
     }
 
-    void whenTestEventFired(State state, QnUuid cameraId = resourceA)
+    void whenTestEventFired(State state, nx::Uuid cameraId = resourceA)
     {
         auto startEvent = QSharedPointer<TestEvent>::create();
         startEvent->setState(state);
@@ -93,10 +93,10 @@ protected:
         return executor.actions.back().staticCast<TestProlongedAction>();
     }
 
-    void thenActionExecuted(size_t index, State state, QnUuid resourceId)
+    void thenActionExecuted(size_t index, State state, nx::Uuid resourceId)
     {
         thenProlongedActionExecuted(index, state);
-        EXPECT_EQ(lastAction()->m_deviceIds, QnUuidList{resourceId});
+        EXPECT_EQ(lastAction()->m_deviceIds, UuidList{resourceId});
     }
 
     std::unique_ptr<Engine> engine;
@@ -112,7 +112,7 @@ TEST_F(ProlongedActionsTest, sanity)
 {
     whenTestEventFired(State::started);
     thenProlongedActionExecuted(0, State::started);
-    ASSERT_EQ(lastAction()->m_deviceIds, QnUuidList{resourceC});
+    ASSERT_EQ(lastAction()->m_deviceIds, UuidList{resourceC});
 
     whenTestEventFired(State::stopped);
     thenProlongedActionExecuted(1, State::stopped);

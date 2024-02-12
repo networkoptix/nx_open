@@ -107,7 +107,7 @@ void QnLayoutFileStorageResource::setUrl(const QString& value)
 {
     NX_ASSERT(!value.startsWith(kLayoutProtocol), "Only file links must have layout protocol.");
 
-    setIdUnsafe(QnUuid::createUuid());
+    setIdUnsafe(nx::Uuid::createUuid());
     QnStorageResource::setUrl(value);
 
     readIndexHeader();

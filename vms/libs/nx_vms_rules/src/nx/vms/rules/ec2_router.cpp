@@ -32,7 +32,7 @@ Ec2Router::~Ec2Router()
 {
 }
 
-void Ec2Router::init(const QnUuid& id)
+void Ec2Router::init(const nx::Uuid& id)
 {
     m_id = id;
 
@@ -49,10 +49,10 @@ void Ec2Router::init(const QnUuid& id)
 
 void Ec2Router::routeEvent(
         const EventData& eventData,
-        const QSet<QnUuid>& triggeredRules,
-        const QSet<QnUuid>& affectedResources)
+        const QSet<nx::Uuid>& triggeredRules,
+        const QSet<nx::Uuid>& affectedResources)
 {
-    QSet<QnUuid> peers;
+    QSet<nx::Uuid> peers;
     for (const auto& id: affectedResources)
     {
         const auto& ptr = resourcePool()->getResourceById(id);

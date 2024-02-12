@@ -11,7 +11,7 @@ class NX_VMS_CLIENT_CORE_API MediaPlayer: public nx::media::Player
 {
     Q_OBJECT
 
-    Q_PROPERTY(QnUuid resourceId READ resourceId WRITE setResourceId NOTIFY resourceIdChanged)
+    Q_PROPERTY(nx::Uuid resourceId READ resourceId WRITE setResourceId NOTIFY resourceIdChanged)
     Q_PROPERTY(bool loading READ loading NOTIFY loadingChanged)
     Q_PROPERTY(bool playing READ playing NOTIFY playingChanged)
     Q_PROPERTY(bool failed READ failed NOTIFY failedChanged)
@@ -23,8 +23,8 @@ public:
     MediaPlayer(QObject* parent = nullptr);
     ~MediaPlayer();
 
-    QnUuid resourceId() const;
-    void setResourceId(const QnUuid& resourceId);
+    nx::Uuid resourceId() const;
+    void setResourceId(const nx::Uuid& resourceId);
 
     Q_INVOKABLE void playLive();
 
@@ -46,7 +46,7 @@ signals:
     void noVideoStreamsChanged();
 
 private:
-    QnUuid m_resourceId;
+    nx::Uuid m_resourceId;
     bool m_loading = false;
     bool m_playing = false;
     bool m_failed = false;

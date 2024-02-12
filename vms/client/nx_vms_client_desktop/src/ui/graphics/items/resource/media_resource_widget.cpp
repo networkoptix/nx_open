@@ -536,7 +536,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(
     updateHotspotsState();
 
     const auto triggerActionHandler =
-        [this](const QnUuid& ruleId, bool success)
+        [this](const nx::Uuid& ruleId, bool success)
         {
             const auto button = static_cast<SoftwareTriggerButton*>(
                 m_triggersContainer->item(ruleId));
@@ -576,7 +576,7 @@ void QnMediaResourceWidget::beforeDestroy()
 }
 
 void QnMediaResourceWidget::handleItemDataChanged(
-    const QnUuid& id,
+    const nx::Uuid& id,
     Qn::ItemDataRole role,
     const QVariant& data)
 {
@@ -1266,18 +1266,18 @@ void QnMediaResourceWidget::suspendHomePtzController()
         homePtzController->suspend();
 }
 
-void QnMediaResourceWidget::hideTextOverlay(const QnUuid& id)
+void QnMediaResourceWidget::hideTextOverlay(const nx::Uuid& id)
 {
     setTextOverlayParameters(id, false, QString(), QnHtmlTextItemOptions());
 }
 
-void QnMediaResourceWidget::showTextOverlay(const QnUuid& id, const QString& text,
+void QnMediaResourceWidget::showTextOverlay(const nx::Uuid& id, const QString& text,
     const QnHtmlTextItemOptions& options)
 {
     setTextOverlayParameters(id, true, text, options);
 }
 
-void QnMediaResourceWidget::setTextOverlayParameters(const QnUuid& id, bool visible,
+void QnMediaResourceWidget::setTextOverlayParameters(const nx::Uuid& id, bool visible,
     const QString& text, const QnHtmlTextItemOptions& options)
 {
     if (!m_textOverlayWidget)
@@ -3612,7 +3612,7 @@ void QnMediaResourceWidget::configureTriggerButton(SoftwareTriggerButton* button
         });
 }
 
-int QnMediaResourceWidget::triggerIndex(const QnUuid& ruleId) const
+int QnMediaResourceWidget::triggerIndex(const nx::Uuid& ruleId) const
 {
     const auto it = std::find_if(m_triggers.cbegin(), m_triggers.cend(),
         [ruleId](const auto& val) { return val.ruleId == ruleId; });
@@ -3629,13 +3629,13 @@ void QnMediaResourceWidget::removeTrigger(int index)
     m_triggers.removeAt(index);
 }
 
-void QnMediaResourceWidget::at_triggerRemoved(QnUuid id)
+void QnMediaResourceWidget::at_triggerRemoved(nx::Uuid id)
 {
     removeTrigger(triggerIndex(id));
 }
 
 void QnMediaResourceWidget::at_triggerAdded(
-    QnUuid id,
+    nx::Uuid id,
     const QString& iconPath,
     const QString& name,
     bool prolonged,
@@ -3654,7 +3654,7 @@ void QnMediaResourceWidget::at_triggerAdded(
 }
 
 void QnMediaResourceWidget::at_triggerFieldsChanged(
-    QnUuid id,
+    nx::Uuid id,
     SoftwareTriggersWatcher::TriggerFields fields)
 {
     if (!fields)

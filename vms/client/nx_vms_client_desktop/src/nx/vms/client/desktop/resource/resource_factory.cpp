@@ -19,7 +19,7 @@ QnMediaServerResourcePtr ResourceFactory::createServer() const
 }
 
 QnResourcePtr ResourceFactory::createResource(
-    const QnUuid& resourceTypeId,
+    const nx::Uuid& resourceTypeId,
     const QnResourceParams& /*params*/)
 {
     using namespace nx::vms::common;

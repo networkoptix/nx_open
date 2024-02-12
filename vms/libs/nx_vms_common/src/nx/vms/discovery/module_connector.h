@@ -28,7 +28,7 @@ public:
         nx::network::SocketAddress /*resolvedEndpoint*/
     )> ConnectedHandler;
 
-    typedef nx::utils::MoveOnlyFunc<void(QnUuid)> DisconnectedHandler;
+    typedef nx::utils::MoveOnlyFunc<void(nx::Uuid)> DisconnectedHandler;
     typedef nx::utils::MoveOnlyFunc<void(api::ModuleInformation, api::ModuleInformation)> ConflictHandler;
 
     ModuleConnector(nx::network::aio::AbstractAioThread* thread = nullptr);
@@ -40,9 +40,9 @@ public:
     void setDisconnectHandler(DisconnectedHandler handler);
     void setConflictHandler(ConflictHandler handler);
 
-    void forgetModule(const QnUuid& id);
-    void newEndpoints(std::set<nx::network::SocketAddress> endpoints, const QnUuid& id = QnUuid());
-    void setForbiddenEndpoints(std::set<nx::network::SocketAddress> endpoints, const QnUuid& id);
+    void forgetModule(const nx::Uuid& id);
+    void newEndpoints(std::set<nx::network::SocketAddress> endpoints, const nx::Uuid& id = nx::Uuid());
+    void setForbiddenEndpoints(std::set<nx::network::SocketAddress> endpoints, const nx::Uuid& id);
 
     void activate();
     void deactivate();
@@ -82,7 +82,7 @@ private:
     class Module
     {
     public:
-        Module(ModuleConnector* parent, const QnUuid& id);
+        Module(ModuleConnector* parent, const nx::Uuid& id);
         ~Module();
 
         void addEndpoints(std::set<nx::network::SocketAddress> endpoints);
@@ -107,7 +107,7 @@ private:
 
     private:
         ModuleConnector* const m_parent;
-        const QnUuid m_id;
+        const nx::Uuid m_id;
         Endpoints m_endpoints;
         std::set<nx::String> m_forbiddenEndpoints;
         nx::network::RetryTimer m_reconnectTimer;
@@ -116,7 +116,7 @@ private:
         nx::network::aio::Timer m_disconnectTimer;
     };
 
-    Module* getModule(const QnUuid& id);
+    Module* getModule(const nx::Uuid& id);
 
 private:
     bool m_isPassiveMode = true;
@@ -126,7 +126,7 @@ private:
     ConnectedHandler m_connectedHandler;
     DisconnectedHandler m_disconnectedHandler;
     ConflictHandler m_conflictHandler;
-    std::map<QnUuid, std::unique_ptr<Module>> m_modules;
+    std::map<nx::Uuid, std::unique_ptr<Module>> m_modules;
 };
 
 } // namespace discovery

@@ -15,7 +15,7 @@ class NX_VMS_RULES_API MotionEvent: public CameraEvent
 
 public:
     MotionEvent() = default;
-    MotionEvent(std::chrono::microseconds timestamp, State state, QnUuid deviceId);
+    MotionEvent(std::chrono::microseconds timestamp, State state, nx::Uuid deviceId);
 
     virtual QVariantMap details(common::SystemContext* context) const override;
 

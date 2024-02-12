@@ -154,7 +154,7 @@ TEST(ToString, Custom)
 
 TEST(ToString, NxTypes)
 {
-    const auto uuid = QnUuid::createUuid();
+    const auto uuid = nx::Uuid::createUuid();
     assertToString(uuid, uuid.toStdString().c_str());
 
     // TODO: Add some more Nx types.

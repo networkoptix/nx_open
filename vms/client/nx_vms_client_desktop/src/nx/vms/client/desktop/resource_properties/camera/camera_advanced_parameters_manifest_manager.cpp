@@ -15,7 +15,7 @@ namespace nx::vms::client::desktop {
 struct CameraAdvancedParametersManifestManager::Private
 {
     // Store manifests based on camera id, knowing id will not differ between various systems.
-    QHash<QnUuid, QnCameraAdvancedParams> manifestsByCameraId;
+    QHash<nx::Uuid, QnCameraAdvancedParams> manifestsByCameraId;
 };
 
 CameraAdvancedParametersManifestManager::CameraAdvancedParametersManifestManager(QObject* parent):

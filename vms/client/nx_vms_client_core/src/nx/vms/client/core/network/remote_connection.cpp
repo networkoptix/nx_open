@@ -96,14 +96,14 @@ public:
         return {};
     }
 
-    virtual std::set<QnUuid> getRemovedObjects() const override
+    virtual std::set<nx::Uuid> getRemovedObjects() const override
     {
         NX_ASSERT(false, "Not implemented");
-        return std::set<QnUuid>();
+        return std::set<nx::Uuid>();
     }
 
     virtual bool resyncTransactionLog(
-        const std::set<QnUuid>& /*filter*/) override
+        const std::set<nx::Uuid>& /*filter*/) override
     {
         NX_ASSERT(false, "Not implemented");
         return false;
@@ -174,7 +174,7 @@ struct RemoteConnection::Private
         std::optional<std::chrono::microseconds> sessionTokenExpirationTime,
         std::shared_ptr<CertificateCache> certificateCache,
         Qn::SerializationFormat serializationFormat,
-        QnUuid sessionId)
+        nx::Uuid sessionId)
         :
         peerType(peerType),
         moduleInformation(moduleInformation),
@@ -206,7 +206,7 @@ RemoteConnection::RemoteConnection(
     std::optional<std::chrono::microseconds> sessionTokenExpirationTime,
     std::shared_ptr<CertificateCache> certificateCache,
     Qn::SerializationFormat serializationFormat,
-    QnUuid sessionId,
+    nx::Uuid sessionId,
     QObject* parent)
     :
     QObject(parent),
@@ -221,7 +221,7 @@ RemoteConnection::RemoteConnection(
 {
 }
 
-void RemoteConnection::updateSessionId(const QnUuid& sessionId)
+void RemoteConnection::updateSessionId(const nx::Uuid& sessionId)
 {
     d->serverApi->updateSessionId(sessionId);
     d->queryProcessor->updateSessionId(sessionId);

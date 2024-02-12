@@ -64,7 +64,7 @@ void QnVideowallManageWidget::paintEvent(QPaintEvent* /*event*/)
 void QnVideowallManageWidget::loadFromResource(const QnVideoWallResourcePtr& videowall)
 {
     videowall::Model model;
-    const QnUuid pcUuid = appContext()->localSettings()->pcUuid();
+    const nx::Uuid pcUuid = appContext()->localSettings()->pcUuid();
     for (const QnVideoWallItem& item: videowall->items()->getItems())
     {
         if (item.pcUuid != pcUuid)
@@ -93,14 +93,14 @@ void QnVideowallManageWidget::submitToResource(const QnVideoWallResourcePtr& vid
         localScreens << screen;
     }
 
-    QnUuid pcUuid = appContext()->localSettings()->pcUuid();
+    nx::Uuid pcUuid = appContext()->localSettings()->pcUuid();
     QnVideoWallPcData pcData;
     pcData.uuid = pcUuid;
     pcData.screens = localScreens;
     videowall->pcs()->addOrUpdateItem(pcData);
 
     /* Form list of items currently attached to this PC. */
-    QSet<QnUuid> existingIds;
+    QSet<nx::Uuid> existingIds;
     for (const QnVideoWallItem& item: videowall->items()->getItems())
     {
         if (item.pcUuid == pcUuid)
@@ -137,7 +137,7 @@ void QnVideowallManageWidget::submitToResource(const QnVideoWallResourcePtr& vid
     }
 
     /* Delete other items. */
-    for (const QnUuid& toDelete: existingIds)
+    for (const nx::Uuid& toDelete: existingIds)
         videowall->items()->removeItem(toDelete);
 }
 

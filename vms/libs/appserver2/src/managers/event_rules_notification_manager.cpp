@@ -27,7 +27,7 @@ void QnBusinessEventNotificationManager::triggerNotification(
     NotificationSource /*source*/)
 {
     NX_ASSERT(tran.command == ApiCommand::removeEventRule);
-    emit removed(QnUuid(tran.params.id));
+    emit removed(nx::Uuid(tran.params.id));
 }
 
 void QnBusinessEventNotificationManager::triggerNotification(

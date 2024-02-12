@@ -45,7 +45,7 @@ public:
 
     virtual bool hasEverBeenSupported() const override;
 
-    virtual bool isSupported(QnUuid engineId, QnUuid deviceId) const override;
+    virtual bool isSupported(nx::Uuid engineId, nx::Uuid deviceId) const override;
 
     virtual bool isReachable() const override;
 

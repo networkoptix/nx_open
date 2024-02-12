@@ -7,25 +7,25 @@
 #include <nx/utils/uuid.h>
 
 /** Class for generating uuid's from the fixed pool. */
-class QnUuidPool {
+class UuidPool {
     typedef uint offset_type;
 public:
-    QnUuidPool(const QnUuid &baseId, offset_type size = std::numeric_limits<offset_type>::max());
+    UuidPool(const nx::Uuid &baseId, offset_type size = std::numeric_limits<offset_type>::max());
 
     /** Mark id as used. */
-    void markAsUsed(const QnUuid &id);
+    void markAsUsed(const nx::Uuid &id);
 
     /** Mark id as free. */
-    void markAsFree(const QnUuid &id);
+    void markAsFree(const nx::Uuid &id);
 
     /** Get next free id. */
-    QnUuid getFreeId() const;
+    nx::Uuid getFreeId() const;
 
 private:
-    offset_type offset(const QnUuid &id) const;
+    offset_type offset(const nx::Uuid &id) const;
 
     /** Check if id belongs to given pool. */
-    bool belongsToPool(const QnUuid &id) const;
+    bool belongsToPool(const nx::Uuid &id) const;
 
 private:
     const QUuid m_baseid;

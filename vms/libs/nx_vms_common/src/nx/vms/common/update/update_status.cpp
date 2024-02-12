@@ -10,7 +10,7 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Status, (json), UpdateStatus_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(PackageDownloadStatus, (json), PackageDownloadStatus_Fields)
 
 Status::Status(
-    const QnUuid& serverId,
+    const nx::Uuid& serverId,
     Status::Code code,
     Status::ErrorCode errorCode,
     int progress)

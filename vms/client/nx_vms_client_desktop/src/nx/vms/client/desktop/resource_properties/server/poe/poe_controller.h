@@ -16,7 +16,7 @@ class PoeController: public QObject, public nx::vms::client::core::CommonModuleA
     Q_OBJECT
     using base_type = QObject;
 
-    Q_PROPERTY(QnUuid resourceId READ resourceId WRITE setResourceId
+    Q_PROPERTY(nx::Uuid resourceId READ resourceId WRITE setResourceId
         NOTIFY resourceIdChanged)
     Q_PROPERTY(bool autoUpdate READ autoUpdate WRITE setAutoUpdate
         NOTIFY autoUpdateChanged)
@@ -28,8 +28,8 @@ public:
     PoeController(QObject* parent = nullptr);
     virtual ~PoeController();
 
-    void setResourceId(const QnUuid& value);
-    QnUuid resourceId() const;
+    void setResourceId(const nx::Uuid& value);
+    nx::Uuid resourceId() const;
 
     void setAutoUpdate(bool value);
     bool autoUpdate() const;

@@ -84,7 +84,7 @@ TEST_F(ActionFieldTest, CreateGuid)
     TextWithFields field(systemContext());
     field.setText("{@CreateGuid}");
     EXPECT_TRUE(
-        QnUuid::isUuidString(field.build(AggregatedEventPtr::create(makeEvent())).toString()));
+        nx::Uuid::isUuidString(field.build(AggregatedEventPtr::create(makeEvent())).toString()));
 }
 
 TEST_F(ActionFieldTest, EventType)
@@ -199,7 +199,7 @@ INSTANTIATE_TEST_SUITE_P(CommonSet,
 TEST_F(ActionFieldTest, TargetUserField)
 {
     UuidSelection selection;
-    selection.ids << QnUuid::createUuid() << QnUuid::createUuid();
+    selection.ids << nx::Uuid::createUuid() << nx::Uuid::createUuid();
     selection.all = true;
 
     TargetUserField field(systemContext());
@@ -226,14 +226,14 @@ TEST_F(ActionFieldTest, EventIdField)
     ASSERT_FALSE(aggEvent->id().isNull());
     ASSERT_TRUE(value.isValid());
     ASSERT_FALSE(value.isNull());
-    ASSERT_EQ(value.value<QnUuid>(), aggEvent->id());
+    ASSERT_EQ(value.value<nx::Uuid>(), aggEvent->id());
 }
 
 TEST_F(ActionFieldTest, TargetSingleDeviceTest)
 {
     const auto event = QSharedPointer<TestEvent>::create();
-    event->m_cameraId = QnUuid::createUuid();
-    event->m_deviceIds = {QnUuid::createUuid(), QnUuid::createUuid()};
+    event->m_cameraId = nx::Uuid::createUuid();
+    event->m_deviceIds = {nx::Uuid::createUuid(), nx::Uuid::createUuid()};
     const auto aggEvent = AggregatedEventPtr::create(event);
 
     TargetSingleDeviceField field;
@@ -242,15 +242,15 @@ TEST_F(ActionFieldTest, TargetSingleDeviceTest)
     auto value = field.build(aggEvent);
     ASSERT_TRUE(value.isValid());
     ASSERT_FALSE(value.isNull());
-    ASSERT_EQ(value.value<QnUuid>(), event->m_deviceIds.last());
+    ASSERT_EQ(value.value<nx::Uuid>(), event->m_deviceIds.last());
 
     field.setUseSource(false);
-    field.setId(QnUuid::createUuid());
+    field.setId(nx::Uuid::createUuid());
 
     value = field.build(aggEvent);
     ASSERT_TRUE(value.isValid());
     ASSERT_FALSE(value.isNull());
-    ASSERT_EQ(value.value<QnUuid>(), field.id());
+    ASSERT_EQ(value.value<nx::Uuid>(), field.id());
 }
 
 } // namespace nx::vms::rules::test

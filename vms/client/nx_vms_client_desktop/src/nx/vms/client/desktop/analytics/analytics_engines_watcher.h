@@ -20,14 +20,14 @@ public:
     AnalyticsEnginesWatcher(QObject* parent = nullptr);
     virtual ~AnalyticsEnginesWatcher() override;
 
-    QHash<QnUuid, AnalyticsEngineInfo> engineInfos() const;
-    AnalyticsEngineInfo engineInfo(const QnUuid& engineId) const;
+    QHash<nx::Uuid, AnalyticsEngineInfo> engineInfos() const;
+    AnalyticsEngineInfo engineInfo(const nx::Uuid& engineId) const;
 
 signals:
-    void engineAdded(const QnUuid& engineId, const AnalyticsEngineInfo& info);
-    void engineRemoved(const QnUuid& engineId);
-    void engineUpdated(const QnUuid& engineId);
-    void engineSettingsModelChanged(const QnUuid& engineId);
+    void engineAdded(const nx::Uuid& engineId, const AnalyticsEngineInfo& info);
+    void engineRemoved(const nx::Uuid& engineId);
+    void engineUpdated(const nx::Uuid& engineId);
+    void engineSettingsModelChanged(const nx::Uuid& engineId);
 
 private:
     class Private;

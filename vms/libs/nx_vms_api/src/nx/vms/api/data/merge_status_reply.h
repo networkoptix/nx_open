@@ -13,7 +13,7 @@ namespace nx::vms::api {
 struct NX_VMS_API MergeStatusReply
 {
     /**%apidoc Id of the last Merge operation. */
-    QnUuid mergeId;
+    nx::Uuid mergeId;
 
     /**%apidoc Whether the last Merge operation is in progress. */
     bool mergeInProgress = false;

@@ -12,7 +12,7 @@ struct ServerListModel::Private
 {
     ServerListModel* q;
     std::unique_ptr<CurrentSystemServers> servers;
-    std::unordered_map<QnUuid, nx::utils::ScopedConnections> connections;
+    std::unordered_map<nx::Uuid, nx::utils::ScopedConnections> connections;
 
     Private(ServerListModel* parent):
         q(parent),
@@ -55,7 +55,7 @@ ServerListModel::ServerListModel():
         });
 
     connect(d->servers.get(), &CurrentSystemServers::serverRemoved,
-        [this](const QnUuid& serverId)
+        [this](const nx::Uuid& serverId)
         {
             d->connections.erase(serverId);
             beginRemoveRows({}, 0, d->servers->serversCount() + 1);
@@ -97,7 +97,7 @@ QVariant ServerListModel::data(const QModelIndex& index, int role) const
                 return tr("Auto");
 
             case idRole:
-                return QVariant::fromValue(QnUuid{});
+                return QVariant::fromValue(nx::Uuid{});
 
             case onlineRole:
                 return true;
@@ -127,7 +127,7 @@ QVariant ServerListModel::data(const QModelIndex& index, int role) const
     return {};
 }
 
-int ServerListModel::indexOf(const QnUuid& serverId)
+int ServerListModel::indexOf(const nx::Uuid& serverId)
 {
     const auto servers = d->servers->servers();
     for (int i = 0; i < servers.size(); ++i)
@@ -139,9 +139,9 @@ int ServerListModel::indexOf(const QnUuid& serverId)
     return 0;
 }
 
-QnUuid ServerListModel::serverIdAt(int row) const
+nx::Uuid ServerListModel::serverIdAt(int row) const
 {
-    return data(index(row), idRole).value<QnUuid>();
+    return data(index(row), idRole).value<nx::Uuid>();
 }
 
 QString ServerListModel::serverName(int row) const

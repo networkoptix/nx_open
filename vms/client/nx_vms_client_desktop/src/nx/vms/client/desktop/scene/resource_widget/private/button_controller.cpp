@@ -47,7 +47,7 @@ void ButtonController::setButtonContainer(QnScrollableItemsWidget* buttonsContai
 
 void ButtonController::removeButtons()
 {
-    for (const QnUuid& id: m_outputTypeToButtonId)
+    for (const nx::Uuid& id: m_outputTypeToButtonId)
     {
         if (!id.isNull())
             m_buttonsContainer->deleteItem(id);

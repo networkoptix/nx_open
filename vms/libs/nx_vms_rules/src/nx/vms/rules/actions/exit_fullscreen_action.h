@@ -13,7 +13,7 @@ class NX_VMS_RULES_API ExitFullscreenAction: public nx::vms::rules::BasicAction
     Q_CLASSINFO("type", "nx.actions.exitFullscreen")
 
     FIELD(nx::vms::rules::UuidSelection, users, setUsers)
-    FIELD(QnUuidSet, layoutIds, setLayoutIds)
+    FIELD(UuidSet, layoutIds, setLayoutIds)
 
 public:
     static const ItemDescriptor& manifest();

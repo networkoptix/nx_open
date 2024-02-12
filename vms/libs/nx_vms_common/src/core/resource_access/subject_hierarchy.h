@@ -30,34 +30,34 @@ public:
     virtual ~SubjectHierarchy() override;
 
     /** Check whether the specified subject exists in the hierarchy. */
-    bool exists(const QnUuid& subject) const;
+    bool exists(const nx::Uuid& subject) const;
 
     /** Returns direct parents of the specified subject. */
-    QSet<QnUuid> directParents(const QnUuid& subject) const;
+    QSet<nx::Uuid> directParents(const nx::Uuid& subject) const;
 
     /** Returns direct members of the specified group. */
-    QSet<QnUuid> directMembers(const QnUuid& group) const;
+    QSet<nx::Uuid> directMembers(const nx::Uuid& group) const;
 
     /** Returns direct and indirect parents of specified subjects. */
-    QSet<QnUuid> recursiveParents(const QSet<QnUuid>& subjects) const;
+    QSet<nx::Uuid> recursiveParents(const QSet<nx::Uuid>& subjects) const;
 
     /** Returns direct and indirect members of specified subjects. */
-    QSet<QnUuid> recursiveMembers(const QSet<QnUuid>& subjects) const;
+    QSet<nx::Uuid> recursiveMembers(const QSet<nx::Uuid>& subjects) const;
 
     /** Checks whether the specified subject is a direct member of the specified group. */
-    bool isDirectMember(const QnUuid& subject, const QnUuid& group) const;
+    bool isDirectMember(const nx::Uuid& subject, const nx::Uuid& group) const;
 
     /** Checks whether the subject is a direct or indirect member of any of specified parents. */
-    bool isRecursiveMember(const QnUuid& subject, const QSet<QnUuid>& parents) const;
+    bool isRecursiveMember(const nx::Uuid& subject, const QSet<nx::Uuid>& parents) const;
 
     /**
      * Checks whether the subject belongs to a set of specified subjects and their direct and
      * indirect members.
      */
-    bool isWithin(const QnUuid& subject, const QSet<QnUuid>& subjects) const;
+    bool isWithin(const nx::Uuid& subject, const QSet<nx::Uuid>& subjects) const;
 
-    QList<QSet<QnUuid>> findCycledGroupSets() const;
-    QList<QSet<QnUuid>> findCycledGroupSetsForSpecificGroups(const QSet<QnUuid>& groups) const;
+    QList<QSet<nx::Uuid>> findCycledGroupSets() const;
+    QList<QSet<nx::Uuid>> findCycledGroupSetsForSpecificGroups(const QSet<nx::Uuid>& groups) const;
 
     /** Clears the entire hierarchy. Emits `reset` signal. */
     void clear();
@@ -68,10 +68,10 @@ public:
 signals:
     /** Emitted after the hierarchy has been changed. */
     void changed(
-        const QSet<QnUuid>& added,
-        const QSet<QnUuid>& removed,
-        const QSet<QnUuid>& groupsWithChangedMembers,
-        const QSet<QnUuid>& subjectsWithChangedParents);
+        const QSet<nx::Uuid>& added,
+        const QSet<nx::Uuid>& removed,
+        const QSet<nx::Uuid>& groupsWithChangedMembers,
+        const QSet<nx::Uuid>& subjectsWithChangedParents);
 
     /** Emitted after the hierarchy has been completely replaced. */
     void reset();
@@ -82,7 +82,7 @@ protected:
      * If any of the specified parents doesn't exist in the hierarchy, then it's added along.
      * Returns false if nothing was changed, or true if the subject was added or updated.
      */
-    bool addOrUpdate(const QnUuid& subject, const QSet<QnUuid>& parents);
+    bool addOrUpdate(const nx::Uuid& subject, const QSet<nx::Uuid>& parents);
 
     /**
      * Adds the specified subject to the hierarchy or updates its parents and members if it exists.
@@ -90,15 +90,15 @@ protected:
      * Returns false if nothing was changed, or true if the subject was added or updated.
      */
     bool addOrUpdate(
-        const QnUuid& subject, const QSet<QnUuid>& parents, const QSet<QnUuid>& members);
+        const nx::Uuid& subject, const QSet<nx::Uuid>& parents, const QSet<nx::Uuid>& members);
 
     /**
      * Removes the specified subjects from the hierarchy.
      * If each removed subject has members, it stops being their parent.
      * Returns true if any subject was removed, or false if the hierarchy hasn't changed.
      */
-    bool remove(const QSet<QnUuid>& subjects);
-    bool remove(const QnUuid& subject);
+    bool remove(const QSet<nx::Uuid>& subjects);
+    bool remove(const nx::Uuid& subject);
 
 private:
     struct Private;

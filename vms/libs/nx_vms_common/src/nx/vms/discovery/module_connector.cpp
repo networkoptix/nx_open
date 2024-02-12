@@ -56,13 +56,13 @@ void ModuleConnector::setConflictHandler(ConflictHandler handler)
     m_conflictHandler = std::move(handler);
 }
 
-void ModuleConnector::forgetModule(const QnUuid& id)
+void ModuleConnector::forgetModule(const nx::Uuid& id)
 {
     dispatch(
         [this, id]() { m_modules.erase(id); });
 }
 
-void ModuleConnector::newEndpoints(std::set<nx::network::SocketAddress> endpoints, const QnUuid& id)
+void ModuleConnector::newEndpoints(std::set<nx::network::SocketAddress> endpoints, const nx::Uuid& id)
 {
     NX_ASSERT(endpoints.size());
     validateEndpoints(&endpoints);
@@ -76,7 +76,7 @@ void ModuleConnector::newEndpoints(std::set<nx::network::SocketAddress> endpoint
         });
 }
 
-void ModuleConnector::setForbiddenEndpoints(std::set<nx::network::SocketAddress> endpoints, const QnUuid& id)
+void ModuleConnector::setForbiddenEndpoints(std::set<nx::network::SocketAddress> endpoints, const nx::Uuid& id)
 {
     validateEndpoints(&endpoints);
     dispatch(
@@ -271,7 +271,7 @@ void ModuleConnector::InformationReader::readUntilError()
         });
 }
 
-ModuleConnector::Module::Module(ModuleConnector* parent, const QnUuid& id):
+ModuleConnector::Module::Module(ModuleConnector* parent, const nx::Uuid& id):
     m_parent(parent),
     m_id(id),
     m_reconnectTimer(parent->m_retryPolicy, parent->getAioThread()),
@@ -570,7 +570,7 @@ bool ModuleConnector::Module::saveConnection(
     return true;
 }
 
-ModuleConnector::Module* ModuleConnector::getModule(const QnUuid& id)
+ModuleConnector::Module* ModuleConnector::getModule(const nx::Uuid& id)
 {
     auto& module = m_modules[id];
     if (!module)

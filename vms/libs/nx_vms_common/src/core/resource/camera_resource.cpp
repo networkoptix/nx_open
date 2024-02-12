@@ -46,7 +46,7 @@ bool storeUrlForRole(Qn::ConnectionRole role)
 
 } // namespace
 
-using AnalyzedStreamIndexMap = QMap<QnUuid, nx::vms::api::StreamIndex>;
+using AnalyzedStreamIndexMap = QMap<nx::Uuid, nx::vms::api::StreamIndex>;
 using AnalyticsEntitiesByEngine = QnVirtualCameraResource::AnalyticsEntitiesByEngine;
 
 const QString QnVirtualCameraResource::kCompatibleAnalyticsEnginesProperty(
@@ -295,7 +295,7 @@ void QnVirtualCameraResource::emitPropertyChanged(
     base_type::emitPropertyChanged(key, prevValue, newValue);
 }
 
-QSet<QnUuid> QnVirtualCameraResource::enabledAnalyticsEngines() const
+QSet<nx::Uuid> QnVirtualCameraResource::enabledAnalyticsEngines() const
 {
     return nx::utils::toQSet(enabledAnalyticsEngineResources().ids());
 }
@@ -312,19 +312,19 @@ const nx::vms::common::AnalyticsEngineResourceList
         });
 }
 
-QSet<QnUuid> QnVirtualCameraResource::userEnabledAnalyticsEngines() const
+QSet<nx::Uuid> QnVirtualCameraResource::userEnabledAnalyticsEngines() const
 {
     return m_cachedUserEnabledAnalyticsEngines.get();
 }
 
-void QnVirtualCameraResource::setUserEnabledAnalyticsEngines(const QSet<QnUuid>& engines)
+void QnVirtualCameraResource::setUserEnabledAnalyticsEngines(const QSet<nx::Uuid>& engines)
 {
     const auto p = serializeUserEnabledAnalyticsEngines(engines);
     setProperty(p.name, p.value);
 }
 
 nx::vms::api::ResourceParamData QnVirtualCameraResource::serializeUserEnabledAnalyticsEngines(
-    const QSet<QnUuid>& engines)
+    const QSet<nx::Uuid>& engines)
 {
     return nx::vms::api::ResourceParamData(
         kUserEnabledAnalyticsEnginesProperty,
@@ -332,7 +332,7 @@ nx::vms::api::ResourceParamData QnVirtualCameraResource::serializeUserEnabledAna
     );
 }
 
-const QSet<QnUuid> QnVirtualCameraResource::compatibleAnalyticsEngines() const
+const QSet<nx::Uuid> QnVirtualCameraResource::compatibleAnalyticsEngines() const
 {
     return m_cachedCompatibleAnalyticsEngines.get();
 }
@@ -348,7 +348,7 @@ nx::vms::common::AnalyticsEngineResourceList
         compatibleAnalyticsEngines());
 }
 
-void QnVirtualCameraResource::setCompatibleAnalyticsEngines(const QSet<QnUuid>& engines)
+void QnVirtualCameraResource::setCompatibleAnalyticsEngines(const QSet<nx::Uuid>& engines)
 {
     auto ensureEnginesAreActive =
         [this, engines]
@@ -367,7 +367,7 @@ void QnVirtualCameraResource::setCompatibleAnalyticsEngines(const QSet<QnUuid>& 
 
 AnalyticsEntitiesByEngine QnVirtualCameraResource::filterByEngineIds(
     AnalyticsEntitiesByEngine entitiesByEngine,
-    const QSet<QnUuid>& engineIds)
+    const QSet<nx::Uuid>& engineIds)
 {
     for (auto it = entitiesByEngine.cbegin(); it != entitiesByEngine.cend();)
     {
@@ -394,19 +394,19 @@ AnalyticsEntitiesByEngine QnVirtualCameraResource::supportedObjectTypes(
         : m_cachedSupportedObjectTypes.get();
 }
 
-QSet<QnUuid> QnVirtualCameraResource::calculateUserEnabledAnalyticsEngines() const
+QSet<nx::Uuid> QnVirtualCameraResource::calculateUserEnabledAnalyticsEngines() const
 {
     return calculateUserEnabledAnalyticsEngines(getProperty(kUserEnabledAnalyticsEnginesProperty));
 }
 
-QSet<QnUuid> QnVirtualCameraResource::calculateUserEnabledAnalyticsEngines(const QString& value)
+QSet<nx::Uuid> QnVirtualCameraResource::calculateUserEnabledAnalyticsEngines(const QString& value)
 {
-    return QJson::deserialized<QSet<QnUuid>>(value.toUtf8());
+    return QJson::deserialized<QSet<nx::Uuid>>(value.toUtf8());
 }
 
-QSet<QnUuid> QnVirtualCameraResource::calculateCompatibleAnalyticsEngines() const
+QSet<nx::Uuid> QnVirtualCameraResource::calculateCompatibleAnalyticsEngines() const
 {
-    return QJson::deserialized<QSet<QnUuid>>(
+    return QJson::deserialized<QSet<nx::Uuid>>(
         getProperty(kCompatibleAnalyticsEnginesProperty).toUtf8());
 }
 
@@ -478,7 +478,7 @@ QnVirtualCameraResource::DeviceAgentManifestMap
 }
 
 std::optional<nx::vms::api::analytics::DeviceAgentManifest>
-    QnVirtualCameraResource::deviceAgentManifest(const QnUuid& engineId) const
+    QnVirtualCameraResource::deviceAgentManifest(const nx::Uuid& engineId) const
 {
     const auto manifests = m_cachedDeviceAgentManifests.get();
     auto it = manifests.find(engineId);
@@ -489,7 +489,7 @@ std::optional<nx::vms::api::analytics::DeviceAgentManifest>
 }
 
 void QnVirtualCameraResource::setDeviceAgentManifest(
-    const QnUuid& engineId,
+    const nx::Uuid& engineId,
     const nx::vms::api::analytics::DeviceAgentManifest& manifest)
 {
     auto manifests = m_cachedDeviceAgentManifests.get();
@@ -501,7 +501,7 @@ void QnVirtualCameraResource::setDeviceAgentManifest(
 }
 
 std::optional<nx::vms::api::StreamIndex>
-    QnVirtualCameraResource::obtainUserChosenAnalyzedStreamIndex(QnUuid engineId) const
+    QnVirtualCameraResource::obtainUserChosenAnalyzedStreamIndex(nx::Uuid engineId) const
 {
     using nx::vms::api::analytics::DeviceAgentManifest;
 
@@ -539,7 +539,7 @@ std::optional<nx::vms::api::StreamIndex>
     return std::nullopt;
 }
 
-nx::vms::api::StreamIndex QnVirtualCameraResource::analyzedStreamIndex(QnUuid engineId) const
+nx::vms::api::StreamIndex QnVirtualCameraResource::analyzedStreamIndex(nx::Uuid engineId) const
 {
     auto cachedAnalyzedStreamIndex = m_cachedAnalyzedStreamIndex.lock();
     auto it = cachedAnalyzedStreamIndex->find(engineId);
@@ -550,7 +550,7 @@ nx::vms::api::StreamIndex QnVirtualCameraResource::analyzedStreamIndex(QnUuid en
     return result;
 }
 
-nx::vms::api::StreamIndex QnVirtualCameraResource::analyzedStreamIndexInternal(const QnUuid& engineId) const
+nx::vms::api::StreamIndex QnVirtualCameraResource::analyzedStreamIndexInternal(const nx::Uuid& engineId) const
 {
     const std::optional<nx::vms::api::StreamIndex> userChosenAnalyzedStreamIndex =
         obtainUserChosenAnalyzedStreamIndex(engineId);
@@ -574,7 +574,7 @@ nx::vms::api::StreamIndex QnVirtualCameraResource::analyzedStreamIndexInternal(c
 }
 
 void QnVirtualCameraResource::setAnalyzedStreamIndex(
-    QnUuid engineId, nx::vms::api::StreamIndex streamIndex)
+    nx::Uuid engineId, nx::vms::api::StreamIndex streamIndex)
 {
     const QString serializedProperty = getProperty(kAnalyzedStreamIndexes);
 

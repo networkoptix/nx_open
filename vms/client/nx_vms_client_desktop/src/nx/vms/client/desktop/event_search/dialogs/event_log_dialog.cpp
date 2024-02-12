@@ -687,12 +687,12 @@ void EventLogDialog::setDateRange(qint64 startTimeMs, qint64 endTimeMs)
     ui->dateRangeWidget->setRange(startTimeMs, endTimeMs);
 }
 
-const QnUuidSet& EventLogDialog::eventDevices() const
+const UuidSet& EventLogDialog::eventDevices() const
 {
     return m_eventDevices;
 }
 
-void EventLogDialog::setEventDevices(const QnUuidSet& ids)
+void EventLogDialog::setEventDevices(const UuidSet& ids)
 {
     if (ids == m_eventDevices)
         return;
@@ -732,7 +732,7 @@ void EventLogDialog::at_filterAction_triggered()
     if (parentEventType != EventType::anyEvent && parentEventType != EventType::undefinedEvent)
         eventType = parentEventType;
 */
-    QSet<QnUuid> camList;
+    QSet<nx::Uuid> camList;
     const auto cameraResource =
         m_model->eventResource(idx.row()).dynamicCast<QnVirtualCameraResource>();
     if (cameraResource)

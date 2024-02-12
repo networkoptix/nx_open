@@ -97,7 +97,7 @@ QString extendedEventDescription(
         eventAggregator->initialEvent()->timestamp(), static_cast<int>(eventAggregator->count()));
 
     if (const auto it = eventDetails.find(utils::kPluginIdDetailName); it != eventDetails.end())
-        extendedDescription << TextWithFields::tr("Plugin: %1").arg(stringHelper.plugin(it->value<QnUuid>()));
+        extendedDescription << TextWithFields::tr("Plugin: %1").arg(stringHelper.plugin(it->value<nx::Uuid>()));
 
     if (const auto it = eventDetails.find(utils::kExtraCaptionDetailName); it != eventDetails.end())
         extendedDescription << TextWithFields::tr("Caption: %1").arg(it->toString());

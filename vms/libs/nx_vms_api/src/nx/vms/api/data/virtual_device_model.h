@@ -34,10 +34,10 @@ NX_REFLECTION_INSTRUMENT(VirtualDeviceCreate, VirtualDeviceCreate_Fields);
 struct NX_VMS_API VirtualDeviceLockInfo
 {
     /**%apidoc User who owns the lock. */
-    QnUuid userId;
+    nx::Uuid userId;
 
     /**%apidoc Lock token. */
-    QnUuid token;
+    nx::Uuid token;
 
     /**%apidoc Lock timeout in milliseconds. */
     std::chrono::milliseconds ttlMs;
@@ -102,7 +102,7 @@ NX_REFLECTION_INSTRUMENT(VirtualDevicePrepareReply, VirtualDevicePrepareReply_Fi
 struct NX_VMS_API VirtualDeviceConsume: FlexibleId
 {
     /**%apidoc Token acquired when the virtual Device was locked. */
-    QnUuid token;
+    nx::Uuid token;
 
     /**%apidoc Name of the previously uploaded file. */
     QString uploadId;
@@ -125,7 +125,7 @@ struct NX_VMS_API VirtualDeviceLock: FlexibleId
     std::chrono::milliseconds ttlMs;
 
     /**%apidoc Id of a user to acquire the lock for. Should only be used by an admininstrator. */
-    std::optional<QnUuid> userId;
+    std::optional<nx::Uuid> userId;
 };
 #define VirtualDeviceLock_Fields FlexibleId_Fields(ttlMs)(userId)
 QN_FUSION_DECLARE_FUNCTIONS(VirtualDeviceLock, (json), NX_VMS_API)
@@ -135,7 +135,7 @@ NX_REFLECTION_INSTRUMENT(VirtualDeviceLock, VirtualDeviceLock_Fields);
 struct NX_VMS_API VirtualDeviceExtend: VirtualDeviceLock
 {
     /**%apidoc Token acquired when the virtual Device was locked. */
-    QnUuid token;
+    nx::Uuid token;
 };
 #define VirtualDeviceExtend_Fields VirtualDeviceLock_Fields(token)
 QN_FUSION_DECLARE_FUNCTIONS(VirtualDeviceExtend, (json), NX_VMS_API)
@@ -144,7 +144,7 @@ NX_REFLECTION_INSTRUMENT(VirtualDeviceExtend, VirtualDeviceExtend_Fields);
 struct NX_VMS_API VirtualDeviceRelease: FlexibleId
 {
     /**%apidoc Token acquired when the virtual Device was locked. */
-    QnUuid token;
+    nx::Uuid token;
 };
 #define VirtualDeviceRelease_Fields FlexibleId_Fields(token)
 QN_FUSION_DECLARE_FUNCTIONS(VirtualDeviceRelease, (json), NX_VMS_API)

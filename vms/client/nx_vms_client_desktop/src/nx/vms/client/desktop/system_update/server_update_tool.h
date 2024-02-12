@@ -52,7 +52,7 @@ public:
     bool hasRemoteChanges() const;
     bool hasOfflineUpdateChanges() const;
 
-    void onConnectToSystem(QnUuid systemId);
+    void onConnectToSystem(nx::Uuid systemId);
     void onDisconnectFromSystem();
 
     bool hasInitiatedThisUpdate() const;
@@ -64,7 +64,7 @@ public:
      */
     void requestRemoteUpdateStateAsync();
 
-    using RemoteStatus = std::map<QnUuid, nx::vms::common::update::Status>;
+    using RemoteStatus = std::map<nx::Uuid, nx::vms::common::update::Status>;
 
     std::future<RemoteStatus> requestRemoteUpdateState();
 
@@ -81,7 +81,7 @@ public:
      * @param info - update manifest
      */
     bool requestStartUpdate(
-        const nx::vms::common::update::Information& info, const QSet<QnUuid>& targets);
+        const nx::vms::common::update::Information& info, const QSet<nx::Uuid>& targets);
 
     /**
      * Asks mediaservers to stop the update process.
@@ -104,7 +104,7 @@ public:
     /**
      * Asks mediaservers to start installation process.
      */
-    bool requestInstallAction(const QSet<QnUuid>& targets);
+    bool requestInstallAction(const QSet<nx::Uuid>& targets);
 
     /**
      * Send request for moduleInformation from the server.
@@ -151,7 +151,7 @@ public:
      * @param id server uid
      * @return true if there are active uploads
      */
-    bool hasActiveUploadsTo(const QnUuid& id) const;
+    bool hasActiveUploadsTo(const nx::Uuid& id) const;
 
     /**
      * Start uploading local update packages to the servers.
@@ -205,13 +205,13 @@ public:
 
     OfflineUpdateState getUploaderState() const;
 
-    void startUploadsToServer(const UpdateContents& contents, const QnUuid& peer);
-    void stopUploadsToServer(const QnUuid& peer);
+    void startUploadsToServer(const UpdateContents& contents, const nx::Uuid& peer);
+    void stopUploadsToServer(const nx::Uuid& peer);
 
     bool haveActiveUpdate() const;
 
     /** Get recipients for upload for specified update package. */
-    QSet<QnUuid> getTargetsForPackage(const nx::vms::update::Package& package) const;
+    QSet<nx::Uuid> getTargetsForPackage(const nx::vms::update::Package& package) const;
 
     std::shared_ptr<PeerStateTracker> getStateTracker();
 
@@ -244,7 +244,7 @@ public:
      * Get a set of servers participating in the installation process.
      * This data is extracted from /ec2/updateInformation
      */
-    QSet<QnUuid> getServersInstalling() const;
+    QSet<nx::Uuid> getServersInstalling() const;
 
     static QString toString(InternalError errorCode);
 
@@ -264,7 +264,7 @@ signals:
 
 private:
     void atUpdateStatusResponse(bool success, rest::Handle handle, const std::vector<nx::vms::common::update::Status>& response);
-    void atUploadWorkerState(QnUuid serverId, const nx::vms::client::desktop::UploadState& state);
+    void atUploadWorkerState(nx::Uuid serverId, const nx::vms::client::desktop::UploadState& state);
     // Called by nx::zip::Extractor when the offline update package is unpacked.
     void atExtractFilesFinished(nx::zip::Extractor::Error code);
 
@@ -291,7 +291,7 @@ private:
     const nx::vms::update::Package* findPackageForFile(const QString& fileName) const;
 
     void dropAllRequests(const QString& reason);
-    bool uploadPackageToServer(const QnUuid& serverId,
+    bool uploadPackageToServer(const nx::Uuid& serverId,
         const nx::vms::update::Package& package, QDir storageDir);
 
 private:
@@ -357,10 +357,10 @@ private:
      * A set of servers that were participating in update.
      * This information is extracted from ec2/updateInformation request.
      */
-    QSet<QnUuid> m_serversAreInstalling;
-    QnUuid m_systemId;
+    QSet<nx::Uuid> m_serversAreInstalling;
+    nx::Uuid m_systemId;
 
-    QSet<QnUuid> m_persistentStorageServers;
+    QSet<nx::Uuid> m_persistentStorageServers;
 
     rest::Handle m_settingsRequest = 0;
 };

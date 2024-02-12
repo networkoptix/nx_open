@@ -192,7 +192,7 @@ void UploadWorker::start()
 {
     NX_ASSERT(d->upload.status == UploadState::Initial);
 
-    d->upload.id = "tmp-" + QnUuid::createUuid().toSimpleString();
+    d->upload.id = "tmp-" + nx::Uuid::createUuid().toSimpleString();
     QFileInfo info(d->file->fileName());
     if (!info.suffix().isEmpty())
         d->upload.id += '.' + info.suffix();

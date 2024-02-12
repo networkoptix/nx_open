@@ -8,7 +8,7 @@
 
 namespace {
 
-static const QnUuid kTestId("b4a5d7ec-1952-4225-96ed-a08eaf34d97a");
+static const nx::Uuid kTestId("b4a5d7ec-1952-4225-96ed-a08eaf34d97a");
 static const QString kHelloWorld("hello world");
 
 } // namespace

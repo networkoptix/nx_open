@@ -58,7 +58,7 @@ struct DiagnosticResult
     Status status = Status::notStarted;
     std::optional<RemoteConnectionError> error;
     RemoteConnectionPtr connection;
-    QnUuid newServerId;
+    nx::Uuid newServerId;
 };
 
 HelpTopic::Id helpTopicId(RemoteConnectionErrorCode errorCode)

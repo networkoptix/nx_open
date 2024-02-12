@@ -41,10 +41,10 @@ public:
 protected:
     std::unique_ptr<UserGroupManager> manager;
 
-    const UserGroupData group1{QnUuid::createUuid(), "group1"};
-    const UserGroupData group2{QnUuid::createUuid(), "group2", {}, {kViewersGroupId}};
-    const UserGroupData group3{QnUuid::createUuid(), "group3", {}, {kPowerUsersGroupId}};
-    const UserGroupData group4{QnUuid::createUuid(), "group4", {}, {group1.id, group2.id}};
+    const UserGroupData group1{nx::Uuid::createUuid(), "group1"};
+    const UserGroupData group2{nx::Uuid::createUuid(), "group2", {}, {kViewersGroupId}};
+    const UserGroupData group3{nx::Uuid::createUuid(), "group3", {}, {kPowerUsersGroupId}};
+    const UserGroupData group4{nx::Uuid::createUuid(), "group4", {}, {group1.id, group2.id}};
 
     const UserGroupDataList testGroups{{group1, group2, group3, group4}};
 };
@@ -54,14 +54,14 @@ TEST_F(UserGroupManagerTest, ids)
     EXPECT_EQ(manager->ids(), PredefinedUserGroups::ids());
     EXPECT_EQ(manager->ids(UserGroupManager::Selection::predefined),
         PredefinedUserGroups::ids());
-    EXPECT_EQ(manager->ids(UserGroupManager::Selection::custom), QList<QnUuid>{});
+    EXPECT_EQ(manager->ids(UserGroupManager::Selection::custom), QList<nx::Uuid>{});
 
     ASSERT_TRUE(manager->addOrUpdate(group1));
 
-    EXPECT_EQ(manager->ids(), PredefinedUserGroups::ids() + QList<QnUuid>{group1.id});
+    EXPECT_EQ(manager->ids(), PredefinedUserGroups::ids() + QList<nx::Uuid>{group1.id});
     EXPECT_EQ(manager->ids(UserGroupManager::Selection::predefined),
         PredefinedUserGroups::ids());
-    EXPECT_EQ(manager->ids(UserGroupManager::Selection::custom), QList<QnUuid>{group1.id});
+    EXPECT_EQ(manager->ids(UserGroupManager::Selection::custom), QList<nx::Uuid>{group1.id});
 
     EXPECT_EQ(manager->ids(), manager->ids(UserGroupManager::Selection::all));
 }
@@ -111,8 +111,8 @@ TEST_F(UserGroupManagerTest, find)
         EXPECT_EQ(group, *found);
     }
 
-    EXPECT_FALSE((bool) manager->find(QnUuid{}));
-    EXPECT_FALSE((bool)manager->find(QnUuid::createUuid()));
+    EXPECT_FALSE((bool) manager->find(nx::Uuid{}));
+    EXPECT_FALSE((bool)manager->find(nx::Uuid::createUuid()));
 }
 
 TEST_F(UserGroupManagerTest, contains)
@@ -128,8 +128,8 @@ TEST_F(UserGroupManagerTest, contains)
     for (const auto& group: testGroups)
         EXPECT_TRUE(manager->contains(group.id));
 
-    EXPECT_FALSE(manager->contains(QnUuid{}));
-    EXPECT_FALSE(manager->contains(QnUuid::createUuid()));
+    EXPECT_FALSE(manager->contains(nx::Uuid{}));
+    EXPECT_FALSE(manager->contains(nx::Uuid::createUuid()));
 }
 
 TEST_F(UserGroupManagerTest, addAndUpdate)
@@ -163,7 +163,7 @@ TEST_F(UserGroupManagerTest, addAndUpdate)
 
     // Cannot add an invalid group.
     EXPECT_FALSE(manager->addOrUpdate(UserGroupData{}));
-    EXPECT_FALSE(manager->contains(QnUuid{}));
+    EXPECT_FALSE(manager->contains(nx::Uuid{}));
     ASSERT_TRUE(spy.empty());
 }
 
@@ -178,11 +178,11 @@ TEST_F(UserGroupManagerTest, remove)
     ASSERT_TRUE(spy.empty());
 
     // Cannot remove an invalid group.
-    EXPECT_FALSE(manager->remove(QnUuid{}));
+    EXPECT_FALSE(manager->remove(nx::Uuid{}));
     ASSERT_TRUE(spy.empty());
 
     // Cannot remove a non-existing group.
-    EXPECT_FALSE(manager->remove(QnUuid::createUuid()));
+    EXPECT_FALSE(manager->remove(nx::Uuid::createUuid()));
     ASSERT_TRUE(spy.empty());
 
     manager->resetAll(testGroups);
@@ -200,20 +200,20 @@ TEST_F(UserGroupManagerTest, remove)
 
 TEST_F(UserGroupManagerTest, getGroupsByIds)
 {
-    const std::vector<QnUuid> requestedIds{{
-        QnUuid::createUuid(),
-        QnUuid::createUuid(),
+    const std::vector<nx::Uuid> requestedIds{{
+        nx::Uuid::createUuid(),
+        nx::Uuid::createUuid(),
         group1.id,
-        QnUuid{},
-        QnUuid::createUuid(),
+        nx::Uuid{},
+        nx::Uuid::createUuid(),
         group3.id,
         kViewersGroupId,
-        QnUuid::createUuid(),
-        QnUuid::createUuid(),
+        nx::Uuid::createUuid(),
+        nx::Uuid::createUuid(),
         kAdministratorsGroupId,
         group4.id,
-        QnUuid{},
-        QnUuid::createUuid()}};
+        nx::Uuid{},
+        nx::Uuid::createUuid()}};
 
     const UserGroupDataList expectedPredefinedGroups{{
         *PredefinedUserGroups::find(kViewersGroupId),

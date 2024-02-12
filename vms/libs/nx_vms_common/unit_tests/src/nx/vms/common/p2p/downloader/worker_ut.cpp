@@ -139,7 +139,7 @@ protected:
 
     struct Peer;
     Peer* createPeer(
-        const QString& peerName = QString(), const QnUuid& peerId = QnUuid::createUuid())
+        const QString& peerName = QString(), const nx::Uuid& peerId = nx::Uuid::createUuid())
     {
         auto peer = new Peer();
         peer->id = peerId;
@@ -150,7 +150,7 @@ protected:
         return peer;
     }
 
-    QnUuid addPeerWithFile(const TestPeerManager::FileInformation& fileInformation)
+    nx::Uuid addPeerWithFile(const TestPeerManager::FileInformation& fileInformation)
     {
         const auto peerId = commonPeerManager->addPeer();
         commonPeerManager->setFileInformation(peerId, fileInformation);
@@ -159,11 +159,11 @@ protected:
 
     QDir workingDirectory;
     QScopedPointer<TestPeerManager> commonPeerManager;
-    QnUuid selfId = QnUuid::createUuid();
+    nx::Uuid selfId = nx::Uuid::createUuid();
 
     struct Peer
     {
-        QnUuid id;
+        nx::Uuid id;
         ProxyTestPeerManager* peerManager = nullptr;
         Storage* storage = nullptr;
         std::shared_ptr<TestWorker> worker;
@@ -176,7 +176,7 @@ protected:
         }
     };
 
-    QHash<QnUuid, Peer*> peerById;
+    QHash<nx::Uuid, Peer*> peerById;
     Peer* defaultPeer = nullptr;
     int step = 0;
 };
@@ -185,7 +185,7 @@ TEST_F(DistributedFileDownloaderWorkerTest, requestingFileInfo)
 {
     const auto& fileInfo = createTestFile();
 
-    const QnUuid& peerId = addPeerWithFile(fileInfo);
+    const nx::Uuid& peerId = addPeerWithFile(fileInfo);
     defaultPeer->storage->addFile(fileInfo.name);
 
     std::promise<void> readyPromise;

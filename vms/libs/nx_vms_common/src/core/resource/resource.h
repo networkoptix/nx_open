@@ -65,7 +65,7 @@ class NX_VMS_COMMON_API QnResource: public QObject, public QnFromThisToShared<Qn
     Q_OBJECT
 
     Q_FLAGS(Qn::ResourceFlags)
-    Q_PROPERTY(QnUuid id READ getId CONSTANT)
+    Q_PROPERTY(nx::Uuid id READ getId CONSTANT)
     Q_PROPERTY(QString name READ getName WRITE setName NOTIFY nameChanged)
     Q_PROPERTY(Qn::ResourceFlags flags READ flags WRITE setFlags NOTIFY flagsChanged)
     Q_PROPERTY(nx::vms::api::ResourceStatus status READ getStatus WRITE setStatus
@@ -148,13 +148,13 @@ public:
      * Primary resource identifier. Must never be changed after the Resource is used, so it is not
      * guarded by a mutex.
      */
-    const QnUuid& getId() const { return m_id; }
+    const nx::Uuid& getId() const { return m_id; }
 
     /**
      * Updates the Resource id. The function is not protected by the mutex, as the existing
      * Resource id must never be changed after the Resource is added to a Resource Pool.
      */
-    void setIdUnsafe(const QnUuid& id);
+    void setIdUnsafe(const nx::Uuid& id);
 
     /**
      * Id of the "parent" Resource. This relation can be used by different types of Resources with
@@ -163,10 +163,10 @@ public:
      * - Storage's parent is a Server which uses it;
      * - Layout's parent can be a User who privately owns it, or a Video Wall Resource.
      */
-    QnUuid getParentId() const;
+    nx::Uuid getParentId() const;
 
     // TODO: #sivanov Make this method non-virtual, listen to the corresponding signal instead.
-    virtual void setParentId(const QnUuid& parent);
+    virtual void setParentId(const nx::Uuid& parent);
 
     /**
      * Helper function to find the parent Resource in the same Resource Pool.
@@ -181,13 +181,13 @@ public:
      * reads it, updates the internal values and provides them to the connecting Clients. See
      * QnResourceType.
      */
-    QnUuid getTypeId() const;
+    nx::Uuid getTypeId() const;
 
     /**
      * Updates the Resource type id. Actual only for Cameras, when the same Camera is found by a
      * new more actual driver, or when a new Resource type is added to the Resource Type Pool.
      */
-    void setTypeId(const QnUuid& id);
+    void setTypeId(const nx::Uuid& id);
 
     /**
      * Availability of the Resource. Actual mostly for the network Resources: Devices, Servers, Web
@@ -344,7 +344,7 @@ public:
 signals:
     void statusChanged(const QnResourcePtr& resource, Qn::StatusChangeReason reason);
     void nameChanged(const QnResourcePtr& resource);
-    void parentIdChanged(const QnResourcePtr& resource, const QnUuid& previousParentId);
+    void parentIdChanged(const QnResourcePtr& resource, const nx::Uuid& previousParentId);
     void flagsChanged(const QnResourcePtr& resource);
     void urlChanged(const QnResourcePtr& resource);
     void logicalIdChanged(const QnResourcePtr& resource);
@@ -408,7 +408,7 @@ protected:
     /**
      * Identifier of the parent Resource. Use Resource Pool to retrieve the actual parent Resource.
      */
-    QnUuid m_parentId;
+    nx::Uuid m_parentId;
 
     /** Name of this Resource. */
     QString m_name;
@@ -421,10 +421,10 @@ protected:
 
 private:
     /** Identifier of this Resource. */
-    QnUuid m_id;
+    nx::Uuid m_id;
 
     /** Identifier of the type of this Resource. */
-    QnUuid m_typeId;
+    nx::Uuid m_typeId;
 
     /** Flags of this Resource that determine its type. */
     Qn::ResourceFlags m_flags;

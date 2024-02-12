@@ -139,7 +139,7 @@ void CameraButtonController::removeTwoWayAudioButton()
 
     m_buttonsContainer->deleteItem(m_twoWayAudioWidgetId);
     m_twoWayAudioWidget = nullptr;
-    m_twoWayAudioWidgetId = QnUuid();
+    m_twoWayAudioWidgetId = nx::Uuid();
 }
 
 void CameraButtonController::createIntercomButtons()

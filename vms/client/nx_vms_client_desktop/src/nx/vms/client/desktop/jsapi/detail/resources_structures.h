@@ -29,7 +29,7 @@ ResourceType resourceType(const QnResourcePtr& resource);
 /** Resource description. */
 struct Resource
 {
-    QnUuid id;
+    nx::Uuid id;
     QString name;
     ResourceType type = ResourceType::undefined;
     int logicalId = 0;

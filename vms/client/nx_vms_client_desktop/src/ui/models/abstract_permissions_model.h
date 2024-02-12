@@ -12,8 +12,8 @@ public:
     virtual GlobalPermissions rawPermissions() const = 0;
     virtual void setRawPermissions(GlobalPermissions value) = 0;
 
-    virtual QSet<QnUuid> accessibleResources() const = 0;
-    virtual void setAccessibleResources(const QSet<QnUuid>& value) = 0;
+    virtual QSet<nx::Uuid> accessibleResources() const = 0;
+    virtual void setAccessibleResources(const QSet<nx::Uuid>& value) = 0;
 
     virtual QnResourceAccessSubject subject() const = 0;
 };

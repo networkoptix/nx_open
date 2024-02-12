@@ -135,7 +135,7 @@ public:
     MockServer():
         QnMediaServerResource()
     {
-        setIdUnsafe(QnUuid::createUuid());
+        setIdUnsafe(nx::Uuid::createUuid());
     }
 
     void setSupportsTranscoding(bool supportsTranscoding)
@@ -186,10 +186,10 @@ private:
 class MockCamera: public QnVirtualCameraResource
 {
 public:
-    MockCamera(QnUuid parentId):
+    MockCamera(nx::Uuid parentId):
         m_cameraType(Qn::LC_Professional)
     {
-        setIdUnsafe(QnUuid::createUuid());
+        setIdUnsafe(nx::Uuid::createUuid());
         setParentId(parentId);
 
         addFlags(Qn::server_live_cam);

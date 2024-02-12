@@ -43,7 +43,7 @@ private:
     void handleExportBookmarkAction(const ui::action::Parameters& parameters);
 
     void handleExportBookmarksAction();
-    typedef std::pair<QnUuid, std::unique_ptr<AbstractExportTool>> ExportToolInstance;
+    typedef std::pair<nx::Uuid, std::unique_ptr<AbstractExportTool>> ExportToolInstance;
     // Extracts selected parameters from the dialog and prepares appropriate export tool.
     ExportToolInstance prepareExportTool(const ExportSettingsDialog& dialog);
     ExportToolInstance prepareExportTool(

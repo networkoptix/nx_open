@@ -29,12 +29,12 @@ namespace test {
 namespace {
 
 static const StartupParameters kEmptyStartupParameters{};
-static const QString kExampleSystemId = QnUuid::createUuid().toSimpleString();
+static const QString kExampleSystemId = nx::Uuid::createUuid().toSimpleString();
 static const QString kExampleUserName = "SomeUser@someSystem.com";
 static const SessionId kSessionId(kExampleSystemId, kExampleUserName);
-static const QString kDelegateId = "unit_test_" + QnUuid::createUuid().toSimpleString();
+static const QString kDelegateId = "unit_test_" + nx::Uuid::createUuid().toSimpleString();
 static const int kNumberOfDelegates = 2;
-static const QString kRandomFilenameBase = QnUuid::createUuid().toSimpleString();
+static const QString kRandomFilenameBase = nx::Uuid::createUuid().toSimpleString();
 static const core::LogonData kLogonData;
 
 /**
@@ -44,8 +44,8 @@ static const core::LogonData kLogonData;
  */
 struct MockStatefulElement
 {
-    QnUuid independent;
-    QnUuid specific;
+    nx::Uuid independent;
+    nx::Uuid specific;
 
     bool operator==(const MockStatefulElement& other) const
     {
@@ -85,7 +85,7 @@ struct Session
     }
 };
 
-using SessionSubstate = std::array<QnUuid, kNumberOfDelegates>;
+using SessionSubstate = std::array<nx::Uuid, kNumberOfDelegates>;
 
 class MockStatefulDelegate: public ClientStateDelegate
 {
@@ -102,10 +102,10 @@ public:
         const StartupParameters& params) override
     {
         if (flags.testFlag(ClientStateDelegate::Substate::systemIndependentParameters))
-            data().independent = QnUuid(state.value(kIndependentKey).toString());
+            data().independent = nx::Uuid(state.value(kIndependentKey).toString());
 
         if (flags.testFlag(ClientStateDelegate::Substate::systemSpecificParameters))
-            data().specific = QnUuid(state.value(kSpecificKey).toString());
+            data().specific = nx::Uuid(state.value(kSpecificKey).toString());
 
         return true;
     }
@@ -135,8 +135,8 @@ Session randomData()
     Session session;
     for (int i = 0; i < kNumberOfDelegates; ++i)
     {
-        session.data[i].independent = QnUuid::createUuid();
-        session.data[i].specific = QnUuid::createUuid();
+        session.data[i].independent = nx::Uuid::createUuid();
+        session.data[i].specific = nx::Uuid::createUuid();
     }
     return session;
 }
@@ -258,12 +258,12 @@ protected:
         if (!NX_ASSERT(!m_commonState.has_value()))
             return;
 
-        m_commonState = std::array<QnUuid, kNumberOfDelegates>();
+        m_commonState = std::array<nx::Uuid, kNumberOfDelegates>();
 
         Session temp;
         for (int i = 0; i < kNumberOfDelegates; ++i)
         {
-            temp.data[i].independent = (*m_commonState)[i] = QnUuid::createUuid();
+            temp.data[i].independent = (*m_commonState)[i] = nx::Uuid::createUuid();
         }
 
         createFile(
@@ -278,13 +278,13 @@ protected:
         if (!NX_ASSERT(!m_systemState.has_value()))
             return;
 
-        m_systemState = std::array<QnUuid, kNumberOfDelegates>();
+        m_systemState = std::array<nx::Uuid, kNumberOfDelegates>();
 
         Session temp;
         for (int i = 0; i < kNumberOfDelegates; ++i)
         {
-            temp.data[i].independent = QnUuid::createUuid();
-            temp.data[i].specific = (*m_systemState)[i] = QnUuid::createUuid();
+            temp.data[i].independent = nx::Uuid::createUuid();
+            temp.data[i].specific = (*m_systemState)[i] = nx::Uuid::createUuid();
         }
 
         // Store all parameters just to check that system-independent parameters are ignored on loading.
@@ -431,7 +431,7 @@ TEST_F(ClientStateHandlerTest, defaultStateOnStartup)
     for (const auto& state: currentSession().data)
     {
         // State should be set to default, so e.g. window geometry will be correct on clean startup.
-        ASSERT_EQ(state.independent, QnUuid());
+        ASSERT_EQ(state.independent, nx::Uuid());
     }
 }
 

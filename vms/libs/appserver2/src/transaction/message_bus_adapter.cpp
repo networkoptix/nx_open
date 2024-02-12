@@ -49,31 +49,31 @@ void TransactionMessageBusAdapter::stop()
     m_bus->stop();
 }
 
-QSet<QnUuid> TransactionMessageBusAdapter::directlyConnectedClientPeers() const
+QSet<nx::Uuid> TransactionMessageBusAdapter::directlyConnectedClientPeers() const
 {
     return m_bus->directlyConnectedClientPeers();
 }
 
-QSet<QnUuid> TransactionMessageBusAdapter::directlyConnectedServerPeers() const
+QSet<nx::Uuid> TransactionMessageBusAdapter::directlyConnectedServerPeers() const
 {
     return m_bus->directlyConnectedServerPeers();
 }
 
-QnUuid TransactionMessageBusAdapter::routeToPeerVia(
-    const QnUuid& dstPeer, int* distance, nx::network::SocketAddress* knownPeerAddress) const
+nx::Uuid TransactionMessageBusAdapter::routeToPeerVia(
+    const nx::Uuid& dstPeer, int* distance, nx::network::SocketAddress* knownPeerAddress) const
 {
     // This method can be called asynchronously after connection has been closed from the
     // QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer (QtConcurrent call).
-    return m_bus ? m_bus->routeToPeerVia(dstPeer, distance, knownPeerAddress) : QnUuid();
+    return m_bus ? m_bus->routeToPeerVia(dstPeer, distance, knownPeerAddress) : nx::Uuid();
 }
 
-int TransactionMessageBusAdapter::distanceToPeer(const QnUuid& dstPeer) const
+int TransactionMessageBusAdapter::distanceToPeer(const nx::Uuid& dstPeer) const
 {
     return m_bus->distanceToPeer(dstPeer);
 }
 
 void TransactionMessageBusAdapter::addOutgoingConnectionToPeer(
-    const QnUuid& id,
+    const nx::Uuid& id,
     nx::vms::api::PeerType peerType,
     const nx::utils::Url &url,
     std::optional<nx::network::http::Credentials> credentials,
@@ -83,13 +83,13 @@ void TransactionMessageBusAdapter::addOutgoingConnectionToPeer(
         id, peerType, url, std::move(credentials), std::move(adapterFunc));
 }
 
-void TransactionMessageBusAdapter::removeOutgoingConnectionFromPeer(const QnUuid& id)
+void TransactionMessageBusAdapter::removeOutgoingConnectionFromPeer(const nx::Uuid& id)
 {
     m_bus->removeOutgoingConnectionFromPeer(id);
 }
 
 void TransactionMessageBusAdapter::updateOutgoingConnection(
-    const QnUuid& id, nx::network::http::Credentials credentials)
+    const nx::Uuid& id, nx::network::http::Credentials credentials)
 {
     m_bus->updateOutgoingConnection(id, credentials);
 }

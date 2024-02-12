@@ -6,12 +6,12 @@
 
 namespace nx::vms::rules {
 
-class NX_VMS_RULES_API ExpectedUuidField: public SimpleTypeEventField<QnUuid, ExpectedUuidField>
+class NX_VMS_RULES_API ExpectedUuidField: public SimpleTypeEventField<nx::Uuid, ExpectedUuidField>
 {
     Q_OBJECT
     Q_CLASSINFO("metatype", "nx.events.fields.expectedUuid")
 
-    Q_PROPERTY(QnUuid value READ value WRITE setValue NOTIFY valueChanged)
+    Q_PROPERTY(nx::Uuid value READ value WRITE setValue NOTIFY valueChanged)
 
 public:
     ExpectedUuidField() = default;

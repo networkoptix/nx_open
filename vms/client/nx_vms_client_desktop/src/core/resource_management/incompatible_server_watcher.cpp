@@ -43,9 +43,9 @@ struct QnIncompatibleServerWatcher::Private
 
     QnIncompatibleServerWatcher* const q;
     mutable nx::Mutex mutex;
-    QHash<QnUuid, QnUuid> fakeUuidByServerUuid;
-    QHash<QnUuid, QnUuid> serverUuidByFakeUuid;
-    QHash<QnUuid, DiscoveredServerItem> discoveredServerItemById;
+    QHash<nx::Uuid, nx::Uuid> fakeUuidByServerUuid;
+    QHash<nx::Uuid, nx::Uuid> serverUuidByFakeUuid;
+    QHash<nx::Uuid, DiscoveredServerItem> discoveredServerItemById;
     nx::utils::ScopedConnections connections;
 
     void at_resourcePool_statusChanged(const QnResourcePtr& resource)
@@ -54,7 +54,7 @@ struct QnIncompatibleServerWatcher::Private
         if (!server)
             return;
 
-        QnUuid id = server->getId();
+        nx::Uuid id = server->getId();
 
         {
             NX_MUTEX_LOCKER lock(&mutex);
@@ -165,7 +165,7 @@ struct QnIncompatibleServerWatcher::Private
             server->setDetached(serverData.status == nx::vms::api::ResourceStatus::unauthorized);
         }
 
-        QnUuid id = getFakeId(serverData.id);
+        nx::Uuid id = getFakeId(serverData.id);
 
         if (id.isNull())
         {
@@ -210,7 +210,7 @@ struct QnIncompatibleServerWatcher::Private
         }
     }
 
-    void removeResource(const QnUuid &id)
+    void removeResource(const nx::Uuid &id)
     {
         if (id.isNull())
             return;
@@ -222,7 +222,7 @@ struct QnIncompatibleServerWatcher::Private
             server->setDetached(false);
         }
 
-        QnUuid serverId;
+        nx::Uuid serverId;
         {
             NX_MUTEX_LOCKER lock(&mutex);
             serverId = serverUuidByFakeUuid.take(id);
@@ -242,7 +242,7 @@ struct QnIncompatibleServerWatcher::Private
         }
     }
 
-    QnUuid getFakeId(const QnUuid &realId) const
+    nx::Uuid getFakeId(const nx::Uuid &realId) const
     {
         NX_MUTEX_LOCKER lock(&mutex);
         return fakeUuidByServerUuid.value(realId);
@@ -331,7 +331,7 @@ void QnIncompatibleServerWatcher::stop()
 {
     d->connections.reset();
 
-    QList<QnUuid> ids;
+    QList<nx::Uuid> ids;
 
     {
         NX_MUTEX_LOCKER lock(&d->mutex);
@@ -342,7 +342,7 @@ void QnIncompatibleServerWatcher::stop()
     }
 
     QnResourceList servers;
-    for (const QnUuid& id: ids)
+    for (const nx::Uuid& id: ids)
     {
         if (auto server = resourcePool()->getIncompatibleServerById(id))
             servers.push_back(server);
@@ -353,7 +353,7 @@ void QnIncompatibleServerWatcher::stop()
         resourcePool()->removeResources(servers);
 }
 
-void QnIncompatibleServerWatcher::keepServer(const QnUuid &id, bool keep)
+void QnIncompatibleServerWatcher::keepServer(const nx::Uuid &id, bool keep)
 {
     NX_MUTEX_LOCKER lock(&d->mutex);
 

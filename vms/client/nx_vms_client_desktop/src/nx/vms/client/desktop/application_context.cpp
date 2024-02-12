@@ -492,8 +492,8 @@ struct ApplicationContext::Private
 
     void initializeSystemContext()
     {
-        const QnUuid peerId = mode == Mode::unitTests
-            ? QnUuid::createUuid()
+        const nx::Uuid peerId = mode == Mode::unitTests
+            ? nx::Uuid::createUuid()
             : q->peerId();
         NX_ASSERT(!peerId.isNull());
 
@@ -853,14 +853,14 @@ void ApplicationContext::removeWindowContext(WindowContext* windowContext)
         d->windowContexts.erase(iter);
 }
 
-QnUuid ApplicationContext::peerId() const
+nx::Uuid ApplicationContext::peerId() const
 {
     return d->runningInstancesManager
         ? d->runningInstancesManager->currentInstanceGuid()
-        : QnUuid();
+        : nx::Uuid();
 }
 
-QnUuid ApplicationContext::videoWallInstanceId() const
+nx::Uuid ApplicationContext::videoWallInstanceId() const
 {
     return d->startupParameters.videoWallItemGuid;
 }

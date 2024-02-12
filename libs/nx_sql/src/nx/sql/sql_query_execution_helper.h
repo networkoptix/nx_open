@@ -43,7 +43,7 @@ public:
     /** Bind uuid to a query parameter. By default, null id is bound as NULL (param: optional). */
     static void bindId(QSqlQuery* query,
         const QString& parameter,
-        const QnUuid& id,
+        const nx::Uuid& id,
         bool optional = true);
 };
 

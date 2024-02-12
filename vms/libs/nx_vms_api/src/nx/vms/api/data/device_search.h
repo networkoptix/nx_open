@@ -44,7 +44,7 @@ NX_REFLECTION_INSTRUMENT(DeviceSearchStatus, DeviceSearchStatus_Fields)
 struct NX_VMS_API DeviceSearchBase
 {
     /**%apidoc[readonly] Id of the search to get the status. */
-    QnUuid id;
+    nx::Uuid id;
 
     /**%apidoc Target port to search Device(s) on. */
     std::optional<int> port;
@@ -70,8 +70,8 @@ struct NX_VMS_API DeviceSearchBase
     /**%apidoc Already found Devices. */
     std::optional<std::vector<DeviceModelForSearch>> devices;
 
-    QnUuid getId() const { return id; }
-    void setId(QnUuid value) { id = std::move(value); }
+    nx::Uuid getId() const { return id; }
+    void setId(nx::Uuid value) { id = std::move(value); }
     static_assert(nx::vms::api::isCreateModelV<DeviceSearchBase>);
 };
 #define DeviceSearchBase_Fields (id)(port)(credentials)(mode)(status)(devices)

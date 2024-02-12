@@ -74,7 +74,7 @@ private:
 private:
     QScopedPointer<Ui::LogSettingsDialog> ui;
 
-    QList<QnUuid> m_ids;
+    QList<nx::Uuid> m_ids;
     ConfigurableLogSettings m_initialSettings;
 };
 

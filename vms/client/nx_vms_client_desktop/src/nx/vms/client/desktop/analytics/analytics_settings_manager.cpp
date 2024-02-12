@@ -95,9 +95,9 @@ public:
 
     struct Subscription
     {
-        QHash<QnUuid, SettingsData> settingsByEngineId;
+        QHash<nx::Uuid, SettingsData> settingsByEngineId;
     };
-    QHash<QnUuid, Subscription> subscriptionByDeviceId;
+    QHash<nx::Uuid, Subscription> subscriptionByDeviceId;
 
     SettingsData& dataByAgentIdRef(const DeviceAgentId& id)
     {
@@ -134,7 +134,7 @@ void AnalyticsSettingsManager::Private::setContext(
     auto updateEngineSettings =
         [this](const AnalyticsEngineResourcePtr& engine)
         {
-            const QnUuid& engineId = engine->getId();
+            const nx::Uuid& engineId = engine->getId();
             for (auto it = subscriptionByDeviceId.begin(); it != subscriptionByDeviceId.end(); ++it)
             {
                 if (it->settingsByEngineId.contains(engineId))

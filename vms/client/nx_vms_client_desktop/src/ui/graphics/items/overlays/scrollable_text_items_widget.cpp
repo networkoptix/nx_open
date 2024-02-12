@@ -20,17 +20,17 @@ QnScrollableTextItemsWidget::~QnScrollableTextItemsWidget()
 {
 }
 
-QnUuid QnScrollableTextItemsWidget::addItem(const QString& text,
-    const QnHtmlTextItemOptions& options, const QnUuid& externalId)
+nx::Uuid QnScrollableTextItemsWidget::addItem(const QString& text,
+    const QnHtmlTextItemOptions& options, const nx::Uuid& externalId)
 {
     return insertItem(count(), text, options, externalId);
 }
 
-QnUuid QnScrollableTextItemsWidget::insertItem(int index, const QString& text,
-    const QnHtmlTextItemOptions& options, const QnUuid& externalId)
+nx::Uuid QnScrollableTextItemsWidget::insertItem(int index, const QString& text,
+    const QnHtmlTextItemOptions& options, const nx::Uuid& externalId)
 {
     if (!externalId.isNull() && item(externalId))
-        return QnUuid();
+        return nx::Uuid();
 
     const auto item = new QnHtmlTextItem(text, options, this);
     const auto id = base_type::insertItem(index, item, externalId);

@@ -36,7 +36,7 @@ OwnResourceAccessResolver::OwnResourceAccessResolver(
         this, &OwnResourceAccessResolver::notifyAccessReset, Qt::DirectConnection);
 
     connect(globalPermissionsWatcher, &AbstractGlobalPermissionsWatcher::ownGlobalPermissionsChanged,
-        this, [this](const QnUuid& subjectId) { notifyAccessChanged({subjectId}); },
+        this, [this](const nx::Uuid& subjectId) { notifyAccessChanged({subjectId}); },
         Qt::DirectConnection);
 
     connect(globalPermissionsWatcher, &AbstractGlobalPermissionsWatcher::globalPermissionsReset,
@@ -48,7 +48,7 @@ OwnResourceAccessResolver::~OwnResourceAccessResolver()
     // Required here for forward-declared scoped pointer destruction.
 }
 
-ResourceAccessMap OwnResourceAccessResolver::resourceAccessMap(const QnUuid& subjectId) const
+ResourceAccessMap OwnResourceAccessResolver::resourceAccessMap(const nx::Uuid& subjectId) const
 {
     if (!NX_ASSERT(d->accessRightsManager))
         return {};
@@ -59,7 +59,7 @@ ResourceAccessMap OwnResourceAccessResolver::resourceAccessMap(const QnUuid& sub
     return d->accessRightsManager->ownResourceAccessMap(subjectId);
 }
 
-AccessRights OwnResourceAccessResolver::accessRights(const QnUuid& subjectId,
+AccessRights OwnResourceAccessResolver::accessRights(const nx::Uuid& subjectId,
     const QnResourcePtr& resource) const
 {
     return resource && resource->hasFlags(Qn::desktop_camera)
@@ -67,7 +67,7 @@ AccessRights OwnResourceAccessResolver::accessRights(const QnUuid& subjectId,
         : base_type::accessRights(subjectId, resource);
 }
 
-GlobalPermissions OwnResourceAccessResolver::globalPermissions(const QnUuid& subjectId) const
+GlobalPermissions OwnResourceAccessResolver::globalPermissions(const nx::Uuid& subjectId) const
 {
     if (!NX_ASSERT(d->globalPermissionsWatcher))
         return {};
@@ -84,7 +84,7 @@ GlobalPermissions OwnResourceAccessResolver::globalPermissions(const QnUuid& sub
 }
 
 ResourceAccessDetails OwnResourceAccessResolver::accessDetails(
-    const QnUuid& subjectId,
+    const nx::Uuid& subjectId,
     const QnResourcePtr& resource,
     nx::vms::api::AccessRight accessRight) const
 {

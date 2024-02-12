@@ -81,7 +81,7 @@ UserModelV1::DbUpdateTypes UserModelV1::toDbTypes() &&
 {
     auto user = std::move(*this).toUserData();
     std::tie(user.permissions, user.groupIds, user.resourceAccessRights) = migrateAccessRights(
-        permissions, accessibleResources.value_or(std::vector<QnUuid>{}), isOwner);
+        permissions, accessibleResources.value_or(std::vector<nx::Uuid>{}), isOwner);
     if (!userRoleId.isNull())
         user.groupIds.push_back(std::move(userRoleId));
 

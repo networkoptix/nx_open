@@ -75,7 +75,7 @@ LogsManagementWatcher::State watcherState(Qt::CheckState state)
 QString makeFileName(QnMediaServerResourcePtr server)
 {
     const auto name = server ? server->getName() : "client";
-    const auto id = server ? server->getId().toSimpleString() : QnUuid().toSimpleString();
+    const auto id = server ? server->getId().toSimpleString() : nx::Uuid().toSimpleString();
     const auto time = QDateTime::currentDateTime().toString("yyyy-MM-dd-hh-mm-ss");
     return server
         ? nx::format("%1_%2_%3%4.zip", name, id, time)
@@ -419,10 +419,10 @@ struct LogsManagementWatcher::Unit::Private
         return unit;
     }
 
-    QnUuid id() const
+    nx::Uuid id() const
     {
         NX_MUTEX_LOCKER lock(&m_mutex);
-        return m_server ? m_server->getId() : QnUuid();
+        return m_server ? m_server->getId() : nx::Uuid();
     }
 
     bool isChecked() const
@@ -759,7 +759,7 @@ private:
 
 };
 
-QnUuid LogsManagementWatcher::Unit::id() const
+nx::Uuid LogsManagementWatcher::Unit::id() const
 {
     return d->id();
 }
@@ -819,9 +819,9 @@ struct LogsManagementWatcher::Private
     QList<LogsManagementUnitPtr> servers;
 
     QPointer<workbench::LocalNotificationsManager> notificationManager;
-    QnUuid clientLogLevelWarning;
-    QnUuid serverLogLevelWarning;
-    QnUuid logsDownloadNotification;
+    nx::Uuid clientLogLevelWarning;
+    nx::Uuid serverLogLevelWarning;
+    nx::Uuid logsDownloadNotification;
 
     double speed{0};
     double progress{0};
@@ -872,7 +872,7 @@ struct LogsManagementWatcher::Private
 
         q->connect(
             notificationManager, &workbench::LocalNotificationsManager::cancelRequested, q,
-            [this](const QnUuid& notificationId)
+            [this](const nx::Uuid& notificationId)
             {
                 NX_MUTEX_LOCKER lock(&mutex);
                 hideNotification(notificationId);
@@ -880,7 +880,7 @@ struct LogsManagementWatcher::Private
 
         q->connect(
             notificationManager, &workbench::LocalNotificationsManager::interactionRequested, q,
-            [this, context](const QnUuid& notificationId)
+            [this, context](const nx::Uuid& notificationId)
             {
                 if (notificationId == clientLogLevelWarning
                     || notificationId == serverLogLevelWarning
@@ -1087,7 +1087,7 @@ struct LogsManagementWatcher::Private
         }
     }
 
-    void hideNotification(const QnUuid& notificationId)
+    void hideNotification(const nx::Uuid& notificationId)
     {
         if (notificationId == clientLogLevelWarning)
         {
@@ -1161,7 +1161,7 @@ struct LogsManagementWatcher::Private
                 api->getRawResult("/rest/v2/servers/*/logSettings", {}, callback, q->thread());
         }
 
-        void loadServerSettings(const QnUuid& serverId)
+        void loadServerSettings(const nx::Uuid& serverId)
         {
             auto callback = nx::utils::guarded(q,
                 [this](bool success, rest::Handle requestId, QByteArray result, auto headers)
@@ -1237,7 +1237,7 @@ LogsManagementWatcher::LogsManagementWatcher(SystemContext* context, QObject* pa
     connect(resourcePool(), &QnResourcePool::resourcesAdded, this,
         [this](const QnResourceList& resources)
         {
-            QList<QnUuid> addedServers;
+            QList<nx::Uuid> addedServers;
 
             {
                 NX_MUTEX_LOCKER lock(&d->mutex);
@@ -1298,7 +1298,7 @@ LogsManagementWatcher::LogsManagementWatcher(SystemContext* context, QObject* pa
         });
 
     connect(context, &SystemContext::remoteIdChanged, this,
-        [this](const QnUuid& id)
+        [this](const nx::Uuid& id)
         {
             if (!id.isNull())
                 d->reinit();
@@ -1604,7 +1604,7 @@ LogsManagementWatcher::State LogsManagementWatcher::state() const
 }
 
 void LogsManagementWatcher::onReceivedServerLogSettings(
-    const QnUuid& serverId,
+    const nx::Uuid& serverId,
     const nx::vms::api::ServerLogSettings& settings)
 {
     NX_MUTEX_LOCKER lock(&d->mutex);
@@ -1624,7 +1624,7 @@ void LogsManagementWatcher::onReceivedServerLogSettings(
 }
 
 void LogsManagementWatcher::onSentServerLogSettings(
-    const QnUuid& serverId,
+    const nx::Uuid& serverId,
     bool success)
 {
     NX_MUTEX_LOCKER lock(&d->mutex);

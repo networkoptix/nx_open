@@ -42,7 +42,7 @@ void ScopeLocalSystemsFinder::updateSystems()
         static const int kVeryFarPriority = 100000;
 
         nx::vms::api::ModuleInformation fakeServerInfo;
-        fakeServerInfo.id = QnUuid::createUuid(); // It must be new unique id.
+        fakeServerInfo.id = nx::Uuid::createUuid(); // It must be new unique id.
         fakeServerInfo.systemName = system->name();
         fakeServerInfo.realm = QString::fromStdString(nx::network::AppInfo::realm());
         fakeServerInfo.version = kSystemVersionIsUnknown;

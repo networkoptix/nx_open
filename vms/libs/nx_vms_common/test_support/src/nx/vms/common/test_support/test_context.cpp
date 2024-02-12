@@ -21,8 +21,8 @@ Context::Context(nx::core::access::Mode resourceAccessMode):
 {
     d->systemContext = std::make_unique<SystemContext>(
         SystemContext::Mode::unitTests,
-        /*peerId*/ QnUuid::createUuid(),
-        /*sessionId*/ QnUuid::createUuid(),
+        /*peerId*/ nx::Uuid::createUuid(),
+        /*sessionId*/ nx::Uuid::createUuid(),
         resourceAccessMode);
     d->commonModule = std::make_unique<QnCommonModule>(d->systemContext.get());
 }

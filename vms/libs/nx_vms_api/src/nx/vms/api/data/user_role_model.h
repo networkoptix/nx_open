@@ -16,7 +16,7 @@ namespace nx::vms::api {
 /**%apidoc User Role information object. */
 struct NX_VMS_API UserRoleModel
 {
-    QnUuid id;
+    nx::Uuid id;
 
     /**%apidoc
      * %example User Group 1
@@ -30,15 +30,15 @@ struct NX_VMS_API UserRoleModel
     GlobalPermissionsDeprecated permissions;
 
     /**%apidoc[opt] List of User Roles to inherit permissions. */
-    std::vector<QnUuid> parentGroupIds;
+    std::vector<nx::Uuid> parentGroupIds;
 
     /**%apidoc[opt] List of accessible resource ids for this User Group. */
-    std::optional<std::vector<QnUuid>> accessibleResources;
+    std::optional<std::vector<nx::Uuid>> accessibleResources;
 
     bool operator==(const UserRoleModel& other) const = default;
 
-    QnUuid getId() const { return id; }
-    void setId(QnUuid id_) { id = std::move(id_); }
+    nx::Uuid getId() const { return id; }
+    void setId(nx::Uuid id_) { id = std::move(id_); }
 
     using DbReadTypes = std::tuple<UserGroupData>;
     using DbUpdateTypes = std::tuple<UserGroupData>;

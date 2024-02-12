@@ -25,7 +25,7 @@ struct NX_VMS_API IntegrationModel
     /**%apidoc
      * Id of the Integration Resource, as a UUID.
      */
-    QnUuid id;
+    nx::Uuid id;
 
     /**%apidoc
      * Id provided by the Integration, in a human-readable format.
@@ -62,7 +62,7 @@ struct NX_VMS_API IntegrationModel
      */
     IntegrationType type = IntegrationType::sdk;
 
-    QnUuid getId() const { return id; }
+    nx::Uuid getId() const { return id; }
 
     IntegrationModel() = default;
     explicit IntegrationModel(AnalyticsPluginData data);

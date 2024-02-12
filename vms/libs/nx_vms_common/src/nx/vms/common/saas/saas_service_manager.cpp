@@ -24,8 +24,8 @@ void setJsonToDictionary(
     const QString& propertyKey,
     const std::string_view& json)
 {
-    if (dictionary->setValue(QnUuid(), propertyKey, QString::fromUtf8(json)))
-        dictionary->saveParamsAsync(QnUuid());
+    if (dictionary->setValue(nx::Uuid(), propertyKey, QString::fromUtf8(json)))
+        dictionary->saveParamsAsync(nx::Uuid());
 }
 
 template <typename T>
@@ -33,7 +33,7 @@ std::optional<T> getObjectFromDictionary(
     QnResourcePropertyDictionary* dictionary,
     const QString& propertyKey)
 {
-    const auto array = dictionary->value(QnUuid(), propertyKey).toUtf8();
+    const auto array = dictionary->value(nx::Uuid(), propertyKey).toUtf8();
     T result;
     return nx::reflect::json::deserialize(std::string_view(array.data(), array.size()), &result)
         ? result
@@ -51,7 +51,7 @@ ServiceManager::ServiceManager(SystemContext* context, QObject* parent):
     using namespace nx::vms::api;
 
     connect(context->resourcePropertyDictionary(), &QnResourcePropertyDictionary::propertyChanged,
-        [this](const QnUuid& resourceId, const QString& key)
+        [this](const nx::Uuid& resourceId, const QString& key)
         {
             if (!resourceId.isNull())
                 return;
@@ -80,7 +80,7 @@ ServiceManager::ServiceManager(SystemContext* context, QObject* parent):
         });
 
     connect(context->resourcePropertyDictionary(), &QnResourcePropertyDictionary::propertyRemoved,
-        [this](const QnUuid& resourceId, const QString& key)
+        [this](const nx::Uuid& resourceId, const QString& key)
         {
             if (!resourceId.isNull())
                 return;
@@ -103,7 +103,7 @@ void ServiceManager::loadSaasData(const std::string_view& saasDataJson)
 QByteArray ServiceManager::rawData() const
 {
     return systemContext()->resourcePropertyDictionary()->value(
-        QnUuid(), kSaasDataPropertyKey).toUtf8();
+        nx::Uuid(), kSaasDataPropertyKey).toUtf8();
 }
 
 void ServiceManager::loadServiceData(const std::string_view& servicesJson)
@@ -120,7 +120,7 @@ nx::vms::api::SaasData ServiceManager::data() const
     return m_data;
 }
 
-std::map<QnUuid, nx::vms::api::SaasService> ServiceManager::services() const
+std::map<nx::Uuid, nx::vms::api::SaasService> ServiceManager::services() const
 {
     NX_MUTEX_LOCKER mutexLocker(&m_mutex);
     return m_services;
@@ -154,7 +154,7 @@ void ServiceManager::setSaasStateInternal(api::SaasState saasState, bool waitFor
             promise = std::make_unique<std::promise<void>>();
 
         nx::vms::api::ResourceParamWithRefData data(
-            QnUuid(),
+            nx::Uuid(),
             kSaasDataPropertyKey,
             QString::fromStdString(nx::reflect::json::serialize(d)));
         nx::vms::api::ResourceParamWithRefDataList dataList;
@@ -171,19 +171,19 @@ void ServiceManager::setSaasStateInternal(api::SaasState saasState, bool waitFor
     }
 }
 
-std::map<QnUuid, nx::vms::api::SaasAnalyticsParameters> ServiceManager::analyticsIntegrations() const
+std::map<nx::Uuid, nx::vms::api::SaasAnalyticsParameters> ServiceManager::analyticsIntegrations() const
 {
     using namespace nx::vms::api;
     return purchasedServices<SaasAnalyticsParameters>(SaasService::kAnalyticsIntegrationServiceType);
 }
 
-std::map<QnUuid, nx::vms::api::SaasLocalRecordingParameters> ServiceManager::localRecording() const
+std::map<nx::Uuid, nx::vms::api::SaasLocalRecordingParameters> ServiceManager::localRecording() const
 {
     using namespace nx::vms::api;
     return purchasedServices<SaasLocalRecordingParameters>(SaasService::kLocalRecordingServiceType);
 }
 
-std::map<QnUuid, nx::vms::api::SaasCloudStorageParameters> ServiceManager::cloudStorageData() const
+std::map<nx::Uuid, nx::vms::api::SaasCloudStorageParameters> ServiceManager::cloudStorageData() const
 {
     using namespace nx::vms::api;
     return purchasedServices<SaasCloudStorageParameters>(SaasService::kCloudRecordingType);
@@ -262,7 +262,7 @@ void ServiceManager::setServices(const std::vector<nx::vms::api::SaasService>& s
 {
     {
         NX_MUTEX_LOCKER mutexLocker(&m_mutex);
-        std::map<QnUuid, nx::vms::api::SaasService> servicesMap;
+        std::map<nx::Uuid, nx::vms::api::SaasService> servicesMap;
         for (const auto& service: services)
             servicesMap.emplace(service.id, service);
 
@@ -329,12 +329,12 @@ void ServiceManager::updateLocalRecordingLicenseV1Unsafe()
 }
 
 template <typename ServiceParamsType>
-std::map<QnUuid, ServiceParamsType> ServiceManager::purchasedServices(
+std::map<nx::Uuid, ServiceParamsType> ServiceManager::purchasedServices(
     const QString& serviceType) const
 {
     NX_MUTEX_LOCKER mutexLocker(&m_mutex);
 
-    std::map<QnUuid, ServiceParamsType> result;
+    std::map<nx::Uuid, ServiceParamsType> result;
 
     for (const auto& [serviceId, purshase]: m_data.services)
     {

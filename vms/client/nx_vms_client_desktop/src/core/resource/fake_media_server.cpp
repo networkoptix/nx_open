@@ -8,11 +8,11 @@
 QnFakeMediaServerResource::QnFakeMediaServerResource():
     base_type()
 {
-    setIdUnsafe(QnUuid::createUuid());
+    setIdUnsafe(nx::Uuid::createUuid());
     addFlags(Qn::fake_server);
 }
 
-QnUuid QnFakeMediaServerResource::getOriginalGuid() const
+nx::Uuid QnFakeMediaServerResource::getOriginalGuid() const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     return m_serverData.id;

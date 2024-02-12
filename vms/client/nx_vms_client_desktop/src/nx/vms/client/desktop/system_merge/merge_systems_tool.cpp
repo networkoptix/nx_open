@@ -51,7 +51,7 @@ namespace nx::vms::client::desktop {
 
 struct MergeSystemsTool::Context
 {
-    QnUuid id; //< Merge context id, can be used for merge after ping.
+    nx::Uuid id; //< Merge context id, can be used for merge after ping.
     QnMediaServerResourcePtr proxy; //< Proxy for target requests.
     nx::network::SocketAddress target; //< Target server address.
     std::string targetUser;
@@ -86,13 +86,13 @@ MergeSystemsTool::~MergeSystemsTool()
 {
 }
 
-QnUuid MergeSystemsTool::pingSystem(
+nx::Uuid MergeSystemsTool::pingSystem(
     const QnMediaServerResourcePtr& proxy,
     const nx::utils::Url& targetUrl,
     const nx::network::http::Credentials& targetCredentials,
     std::optional<DryRunSettings> dryRunSettings)
 {
-    auto ctxId = QnUuid::createUuid();
+    auto ctxId = nx::Uuid::createUuid();
 
     Context ctx;
     ctx.id = ctxId;
@@ -200,7 +200,7 @@ void MergeSystemsTool::mergeSystemDryRun(const Context& ctx)
 }
 
 bool MergeSystemsTool::mergeSystem(
-    const QnUuid& ctxId,
+    const nx::Uuid& ctxId,
     const std::string& ownerSessionToken,
     bool ownSettings,
     bool oneServer,
@@ -242,7 +242,7 @@ bool MergeSystemsTool::mergeSystem(
     return true;
 }
 
-MergeSystemsTool::Context* MergeSystemsTool::findContext(const QnUuid& target)
+MergeSystemsTool::Context* MergeSystemsTool::findContext(const nx::Uuid& target)
 {
     auto it = m_contextMap.find(target);
     return (it != m_contextMap.end()) ? &it->second : nullptr;

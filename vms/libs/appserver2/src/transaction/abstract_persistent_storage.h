@@ -12,7 +12,7 @@ class AbstractPersistentStorage
 public:
     ~AbstractPersistentStorage() {}
 
-    virtual bool isServer(const QnUuid&) = 0;
+    virtual bool isServer(const nx::Uuid&) = 0;
 };
 
 } // namespace ec2

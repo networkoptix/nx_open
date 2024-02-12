@@ -61,7 +61,7 @@ QString toString(ConnectionBase::State value)
 }
 
 ConnectionBase::ConnectionBase(
-    const QnUuid& remoteId,
+    const nx::Uuid& remoteId,
     nx::vms::api::PeerType remotePeerType,
     const vms::api::PeerDataEx& localPeer,
     const nx::utils::Url& remotePeerUrl,
@@ -410,7 +410,7 @@ void ConnectionBase::startConnection()
         nx::network::websocket::addClientHeaders(
             &headers, kP2pProtoName, nx::network::websocket::CompressionType::perMessageDeflate);
     }
-    m_connectionGuid = QnUuid::createUuid().toByteArray();
+    m_connectionGuid = nx::Uuid::createUuid().toByteArray();
     headers.emplace(Qn::EC2_CONNECTION_GUID_HEADER_NAME, m_connectionGuid);
     if (!s_noPingSupportClientHeader)
         headers.emplace(Qn::EC2_PING_ENABLED_HEADER_NAME, "true");

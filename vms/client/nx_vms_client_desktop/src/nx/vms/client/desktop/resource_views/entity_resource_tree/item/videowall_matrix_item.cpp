@@ -14,7 +14,7 @@ namespace entity_resource_tree {
 
 VideoWallMatrixItem::VideoWallMatrixItem(
     const QnVideoWallResourcePtr& videoWall,
-    const QnUuid& matrixId)
+    const nx::Uuid& matrixId)
     :
     base_type(),
     m_matrix(videoWall->matrices()->getItem(matrixId))

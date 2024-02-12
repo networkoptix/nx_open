@@ -77,7 +77,7 @@ ObjectLookupField::ObjectLookupField(common::SystemContext* context):
         {
             if (m_checkType != ObjectLookupCheckType::hasAttributes)
             {
-                if (NX_ASSERT(QnUuid::isUuidString(m_value)) && QnUuid{m_value} == data.id)
+                if (NX_ASSERT(nx::Uuid::isUuidString(m_value)) && nx::Uuid{m_value} == data.id)
                     m_listOrMatcher.reset();
             }
         });
@@ -120,7 +120,7 @@ bool ObjectLookupField::match(const QVariant& eventValue) const
         if (m_checkType == ObjectLookupCheckType::hasAttributes)
         {
             if (!NX_ASSERT(m_value.isEmpty()
-                || !QnUuid::isUuidString(m_value), "Check type and value aren't compatible"))
+                || !nx::Uuid::isUuidString(m_value), "Check type and value aren't compatible"))
             {
                 return false;
             }
@@ -132,10 +132,10 @@ bool ObjectLookupField::match(const QVariant& eventValue) const
         }
         else
         {
-            if (!NX_ASSERT(QnUuid::isUuidString(m_value), "Check type and value aren't compatible"))
+            if (!NX_ASSERT(nx::Uuid::isUuidString(m_value), "Check type and value aren't compatible"))
                 return false;
 
-            m_listOrMatcher = lookupListManager()->lookupList(QnUuid{m_value});
+            m_listOrMatcher = lookupListManager()->lookupList(nx::Uuid{m_value});
         }
     }
 

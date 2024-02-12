@@ -31,7 +31,7 @@ public:
 
     virtual ~AnalyticsSearchSynchronizer() override;
 
-    void ensureVisible(std::chrono::milliseconds timestamp, const QnUuid& trackId,
+    void ensureVisible(std::chrono::milliseconds timestamp, const nx::Uuid& trackId,
         const QnTimePeriod& proposedTimeWindow);
 
 private:

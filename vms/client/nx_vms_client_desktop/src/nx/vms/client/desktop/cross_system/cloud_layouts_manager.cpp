@@ -159,7 +159,7 @@ struct CloudLayoutsManager::Private
         NX_ASSERT(!user && cloudStatusWatcher);
 
         user = QnUserResourcePtr(new QnUserResource(api::UserType::cloud, /*externalId*/ {}));
-        user->setIdUnsafe(QnUuid::createUuid());
+        user->setIdUnsafe(nx::Uuid::createUuid());
         user->setName(cloudStatusWatcher->cloudLogin());
         user->setGroupIds({api::kAdministratorsGroupId}); //< Avoid resources access calculation.
 
@@ -249,7 +249,7 @@ struct CloudLayoutsManager::Private
                 }));
     }
 
-    void sendDeleteLayoutRequest(const QnUuid& id)
+    void sendDeleteLayoutRequest(const nx::Uuid& id)
     {
         Request request = makeRequest();
         auto url = endpoint;
@@ -282,8 +282,8 @@ struct CloudLayoutsManager::Private
 
         auto cloudLayout = CrossSystemLayoutResourcePtr(new CrossSystemLayoutResource());
         layout->cloneTo(cloudLayout);
-        cloudLayout->setIdUnsafe(QnUuid::createUuid());
-        cloudLayout->setParentId(QnUuid());
+        cloudLayout->setIdUnsafe(nx::Uuid::createUuid());
+        cloudLayout->setParentId(nx::Uuid());
         cloudLayout->addFlags(Qn::local);
 
         // Reset background if it is set.

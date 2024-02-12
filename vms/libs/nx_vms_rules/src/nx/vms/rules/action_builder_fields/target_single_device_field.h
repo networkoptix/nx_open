@@ -14,14 +14,14 @@ class NX_VMS_RULES_API TargetSingleDeviceField: public ActionBuilderField
     Q_OBJECT
     Q_CLASSINFO("metatype", "nx.actions.fields.device")
 
-    Q_PROPERTY(QnUuid id READ id WRITE setId NOTIFY idChanged)
+    Q_PROPERTY(nx::Uuid id READ id WRITE setId NOTIFY idChanged)
     Q_PROPERTY(bool useSource READ useSource WRITE setUseSource NOTIFY useSourceChanged)
 
 public:
     TargetSingleDeviceField() = default;
 
-    QnUuid id() const;
-    void setId(QnUuid id);
+    nx::Uuid id() const;
+    void setId(nx::Uuid id);
     bool useSource() const;
     void setUseSource(bool value);
 
@@ -32,7 +32,7 @@ signals:
     void useSourceChanged();
 
 private:
-    QnUuid m_id;
+    nx::Uuid m_id;
     bool m_useSource{false};
 };
 

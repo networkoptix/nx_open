@@ -46,7 +46,7 @@ public:
     /// @param callback         Callback with operation result.
     void addAcknowledge(
         const QnCameraBookmark &bookmark,
-        const QnUuid& eventRuleId,
+        const nx::Uuid& eventRuleId,
         OperationCallbackType callback = OperationCallbackType());
 
     /// @brief                  Update the existing bookmark on the camera.
@@ -57,7 +57,7 @@ public:
     /// @brief                  Delete the existing bookmark from the camera.
     /// @param bookmark         Target bookmark id.
     /// @param callback         Callback with operation result.
-    void deleteCameraBookmark(const QnUuid &bookmarkId, OperationCallbackType callback = OperationCallbackType());
+    void deleteCameraBookmark(const nx::Uuid &bookmarkId, OperationCallbackType callback = OperationCallbackType());
 
     /* Queries API section */
 
@@ -99,7 +99,7 @@ signals:
     void bookmarkUpdated(const QnCameraBookmark &bookmark);
     /// @brief                  This signal is emitted when the bookmark was removed.
     /// @param                  The removed bookmark GUID.
-    void bookmarkRemoved(const QnUuid &bookmarkId);
+    void bookmarkRemoved(const nx::Uuid &bookmarkId);
 
 private:
     nx::utils::ImplPtr<QnCameraBookmarksManagerPrivate> d;

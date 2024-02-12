@@ -804,9 +804,9 @@ ActionVisibility LayoutItemRemovalCondition::check(
 
         if (nx::vms::common::isIntercomOnIntercomLayout(resource, item.layout()))
         {
-            const QnUuid intercomToDeleteId = resource->getId();
+            const nx::Uuid intercomToDeleteId = resource->getId();
 
-            QSet<QnUuid> intercomLayoutItemIds; // Other intercom item copies on the layout.
+            QSet<nx::Uuid> intercomLayoutItemIds; // Other intercom item copies on the layout.
 
             const auto intercomLayoutItems = item.layout()->getItems();
             for (const common::LayoutItemData& intercomLayoutItem: intercomLayoutItems)
@@ -1048,7 +1048,7 @@ ActionVisibility StartCurrentShowreelCondition::check(
     QnWorkbenchContext* context)
 {
     const auto showreelId = context->workbench()->currentLayoutResource()->data()
-        .value(Qn::ShowreelUuidRole).value<QnUuid>();
+        .value(Qn::ShowreelUuidRole).value<nx::Uuid>();
     const auto showreel = context->systemContext()->showreelManager()->showreel(showreelId);
     if (showreel.isValid() && showreel.items.size() > 0)
         return EnabledAction;
@@ -1532,7 +1532,7 @@ ActionVisibility StartVideowallCondition::check(
     const QnResourceList& resources,
     QnWorkbenchContext* /*context*/)
 {
-    QnUuid pcUuid = appContext()->localSettings()->pcUuid();
+    nx::Uuid pcUuid = appContext()->localSettings()->pcUuid();
     if (pcUuid.isNull())
         return InvisibleAction;
 
@@ -2337,7 +2337,7 @@ ConditionWrapper currentLayoutIsVideowallScreen()
         [](const Parameters& /*parameters*/, QnWorkbenchContext* context)
         {
             const auto layout = context->workbench()->currentLayout();
-            return layout && !layout->data(Qn::VideoWallItemGuidRole).value<QnUuid>().isNull();
+            return layout && !layout->data(Qn::VideoWallItemGuidRole).value<nx::Uuid>().isNull();
         });
 }
 

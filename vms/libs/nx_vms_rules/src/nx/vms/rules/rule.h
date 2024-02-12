@@ -25,11 +25,11 @@ class NX_VMS_RULES_API Rule: public QObject
     Q_OBJECT
 
 public:
-    explicit Rule(const QnUuid& id, const Engine* engine);
+    explicit Rule(const nx::Uuid& id, const Engine* engine);
     ~Rule();
 
-    QnUuid id() const;
-    void setId(QnUuid id);
+    nx::Uuid id() const;
+    void setId(nx::Uuid id);
 
     const Engine* engine() const;
 
@@ -75,7 +75,7 @@ private:
     void updateState();
 
 private:
-    QnUuid m_id;
+    nx::Uuid m_id;
     const Engine* m_engine;
 
     // TODO: #spanasenko and-or logic

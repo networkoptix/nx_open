@@ -16,7 +16,7 @@ class NX_VMS_CLIENT_DESKTOP_API QnClientCameraResource:
     using base_type = nx::vms::client::core::Camera;
 
 public:
-    explicit QnClientCameraResource(const QnUuid& resourceTypeId);
+    explicit QnClientCameraResource(const nx::Uuid& resourceTypeId);
 
     virtual QnConstResourceVideoLayoutPtr getVideoLayout(
         const QnAbstractStreamDataProvider* dataProvider = nullptr) override;

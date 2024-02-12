@@ -13,7 +13,7 @@ namespace nx::vms::client::desktop {
 
 namespace {
 
-const QnUuid kThumbCameraTypeId("{72d232d7-0c67-4d8e-b5a8-a0d5075ff3a4}");
+const nx::Uuid kThumbCameraTypeId("{72d232d7-0c67-4d8e-b5a8-a0d5075ff3a4}");
 
 } // namespace
 
@@ -59,7 +59,7 @@ CrossSystemCameraResource::CrossSystemCameraResource(
 
 CrossSystemCameraResource::CrossSystemCameraResource(
     const QString& systemId,
-    const QnUuid& id,
+    const nx::Uuid& id,
     const QString& name)
     :
     QnClientCameraResource(kThumbCameraTypeId),

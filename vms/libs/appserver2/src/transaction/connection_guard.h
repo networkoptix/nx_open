@@ -35,12 +35,12 @@ namespace ec2
         };
 
         ConnectionLockGuard(
-            const QnUuid& localId,
+            const nx::Uuid& localId,
             ConnectionGuardSharedState* const sharedState);
         ConnectionLockGuard(
-            const QnUuid& localId,
+            const nx::Uuid& localId,
             ConnectionGuardSharedState* const sharedState,
-            const QnUuid& peerGuid,
+            const nx::Uuid& peerGuid,
             Direction direction);
         ConnectionLockGuard(ConnectionLockGuard&&);
         ConnectionLockGuard& operator=(ConnectionLockGuard&&);
@@ -51,9 +51,9 @@ namespace ec2
         bool isNull() const;
 
     private:
-        QnUuid m_localId;
+        nx::Uuid m_localId;
         ConnectionGuardSharedState* const m_sharedState;
-        QnUuid m_peerGuid;
+        nx::Uuid m_peerGuid;
         Direction m_direction;
         State m_state;
 

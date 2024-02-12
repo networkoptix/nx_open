@@ -60,13 +60,13 @@ private:
 
     void onResourceAdded(const QnResourcePtr& resource);
     void onResourceRemoved(const QnResourcePtr& resource);
-    void onCameraParentIdChanged(const QnResourcePtr& resource, const QnUuid& previousParentId);
+    void onCameraParentIdChanged(const QnResourcePtr& resource, const nx::Uuid& previousParentId);
     void onCoupledCameraNameChanged(const QnResourcePtr& resource);
 
 private:
     QnMediaServerResource* m_edgeServer;
-    QnUuidSet m_childCamerasIds;
-    QnUuidSet m_coupledCamerasIds;
+    UuidSet m_childCamerasIds;
+    UuidSet m_coupledCamerasIds;
 
     bool m_camerasTrackingInitialized = false;
 

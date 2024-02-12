@@ -23,7 +23,7 @@ class NX_VMS_COMMON_API DescriptorContainer:
 public:
     DescriptorContainer(nx::vms::common::SystemContext* context, QObject* parent = nullptr);
 
-    nx::vms::api::analytics::Descriptors descriptors(const QnUuid& serverId = QnUuid());
+    nx::vms::api::analytics::Descriptors descriptors(const nx::Uuid& serverId = nx::Uuid());
 
     // Server-only method.
     void updateDescriptors(nx::vms::api::analytics::Descriptors descriptors);

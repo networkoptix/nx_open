@@ -624,7 +624,7 @@ void UserListWidget::Private::setupUi()
     const auto updateCurrentUserId =
         [this]()
         {
-            const QnUuid userId = q->context()->settingsDialogManager()->currentEditedUserId();
+            const nx::Uuid userId = q->context()->settingsDialogManager()->currentEditedUserId();
             if (userId.isNull())
             {
                 ui->usersTable->clearSelection();

@@ -14,7 +14,7 @@ namespace nx::vms::common {
 struct ResourceDescriptor
 {
     /** Resource id in the System Context. */
-    QnUuid id;
+    nx::Uuid id;
 
     /**
      * Custom resource path. Contains different values depending on resource types:

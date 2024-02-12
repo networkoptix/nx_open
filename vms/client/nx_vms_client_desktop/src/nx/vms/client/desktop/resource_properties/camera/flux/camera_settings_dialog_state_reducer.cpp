@@ -707,7 +707,7 @@ bool canForcePanTiltCapabilities(const Camera& camera)
         Ptz::Capability::ContinuousPanTiltCapabilities;
 };
 
-bool analyticsEngineIsPresentInList(const QnUuid& id, const State& state)
+bool analyticsEngineIsPresentInList(const nx::Uuid& id, const State& state)
 {
     const auto& engines = state.analytics.engines;
     return std::any_of(engines.cbegin(), engines.cend(),
@@ -2151,7 +2151,7 @@ State CameraSettingsDialogStateReducer::setAudioEnabled(State state, bool value)
     return state;
 }
 
-State CameraSettingsDialogStateReducer::setAudioInputDeviceId(State state, const QnUuid& deviceId)
+State CameraSettingsDialogStateReducer::setAudioInputDeviceId(State state, const nx::Uuid& deviceId)
 {
     NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, deviceId);
 
@@ -2172,7 +2172,7 @@ State CameraSettingsDialogStateReducer::setTwoWayAudioEnabled(State state, bool 
     return state;
 }
 
-State CameraSettingsDialogStateReducer::setAudioOutputDeviceId(State state, const QnUuid& deviceId)
+State CameraSettingsDialogStateReducer::setAudioOutputDeviceId(State state, const nx::Uuid& deviceId)
 {
     NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, deviceId);
 
@@ -2707,7 +2707,7 @@ std::pair<bool, State> CameraSettingsDialogStateReducer::setAnalyticsEngines(
 
     state.analytics.engines = value;
 
-    QnUuid currentEngineId = state.analytics.currentEngineId;
+    nx::Uuid currentEngineId = state.analytics.currentEngineId;
     if (value.empty() || !analyticsEngineIsPresentInList(state.analytics.currentEngineId, state))
         currentEngineId = {};
 
@@ -2725,7 +2725,7 @@ std::pair<bool, State> CameraSettingsDialogStateReducer::setAnalyticsEngines(
 }
 
 State CameraSettingsDialogStateReducer::handleOverusedEngines(
-    State state, const QSet<QnUuid>& overusedEngines)
+    State state, const QSet<nx::Uuid>& overusedEngines)
 {
     NX_VERBOSE(NX_SCOPE_TAG, "%1 for %2", __func__, overusedEngines);
 
@@ -2750,7 +2750,7 @@ State CameraSettingsDialogStateReducer::handleOverusedEngines(
 }
 
 std::pair<bool, State> CameraSettingsDialogStateReducer::setCurrentAnalyticsEngineId(
-    State state, const QnUuid& value)
+    State state, const nx::Uuid& value)
 {
     NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
 
@@ -2768,14 +2768,14 @@ std::pair<bool, State> CameraSettingsDialogStateReducer::setCurrentAnalyticsEngi
 }
 
 State CameraSettingsDialogStateReducer::setUserEnabledAnalyticsEngines(
-    State state, const QSet<QnUuid>& value)
+    State state, const QSet<nx::Uuid>& value)
 {
     NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
 
     NX_ASSERT(state.isSingleCamera());
 
     // Filter out engines which are not available anymore.
-    QSet<QnUuid> actualValue;
+    QSet<nx::Uuid> actualValue;
     for (const auto& id: value)
     {
         if (analyticsEngineIsPresentInList(id, state))
@@ -2793,7 +2793,7 @@ State CameraSettingsDialogStateReducer::setUserEnabledAnalyticsEngines(
 }
 
 State CameraSettingsDialogStateReducer::setAnalyticsStreamIndex(
-    State state, const QnUuid& engineId, StreamIndex value, ModificationSource source)
+    State state, const nx::Uuid& engineId, StreamIndex value, ModificationSource source)
 {
     if (source == ModificationSource::local)
     {
@@ -2816,7 +2816,7 @@ State CameraSettingsDialogStateReducer::setAnalyticsStreamIndex(
 
 std::pair<bool, State> CameraSettingsDialogStateReducer::setDeviceAgentSettingsValues(
     State state,
-    const QnUuid& engineId,
+    const nx::Uuid& engineId,
     const QString& activeElement,
     const QJsonObject& values,
     const QJsonObject& paramValues)
@@ -2852,7 +2852,7 @@ std::pair<bool, State> CameraSettingsDialogStateReducer::setDeviceAgentSettingsV
 }
 
 State CameraSettingsDialogStateReducer::refreshDeviceAgentSettings(
-    State state, const QnUuid& engineId)
+    State state, const nx::Uuid& engineId)
 {
     if (!NX_ASSERT(state.isSingleCamera()))
         return state;
@@ -2869,7 +2869,7 @@ State CameraSettingsDialogStateReducer::refreshDeviceAgentSettings(
 
 std::pair<bool, State> CameraSettingsDialogStateReducer::resetDeviceAgentData(
     State state,
-    const QnUuid& engineId,
+    const nx::Uuid& engineId,
     const DeviceAgentData& data,
     bool replaceUser)
 {

@@ -31,7 +31,7 @@ namespace nx::analytics::db {
 struct ObjectPosition
 {
     /**%apidoc Id of a Device the Object has been detected on. */
-    QnUuid deviceId;
+    nx::Uuid deviceId;
 
     qint64 timestampUs = 0;
     qint64 durationUs = 0;
@@ -106,7 +106,7 @@ NX_REFLECTION_INSTRUMENT(BestShot, BestShot_analytics_storage_Fields)
 
 struct BestShotEx: public BestShot
 {
-    QnUuid deviceId;
+    nx::Uuid deviceId;
 
     BestShotEx() = default;
 
@@ -121,10 +121,10 @@ NX_REFLECTION_INSTRUMENT(BestShotEx, BestShotEx_analytics_storage_Fields)
 
 struct ObjectTrack
 {
-    QnUuid id;
+    nx::Uuid id;
 
     /**%apidoc Id of a Device the Object has been detected on. */
-    QnUuid deviceId;
+    nx::Uuid deviceId;
 
     /**%apidoc
      * %// TODO: #rvasilenko Rename to bestShotObjectTypeId.
@@ -144,7 +144,7 @@ struct ObjectTrack
 
     BestShot bestShot;
 
-    QnUuid analyticsEngineId;
+    nx::Uuid analyticsEngineId;
 
     /**%apidoc
      * Groups the data under the specified value. I.e., it allows to store multiple independent
@@ -197,12 +197,12 @@ struct NX_VMS_COMMON_API Filter
     std::string storageId;
 
     /** If empty, any device is matched. */
-    std::set<QnUuid> deviceIds;
+    std::set<nx::Uuid> deviceIds;
 
     // TODO: #mshevchenko Why 'Id' and not `Ids`? And why not `nx::analytics::ObjectTypeId`?
     std::set<QString> objectTypeId;
 
-    QnUuid objectTrackId;
+    nx::Uuid objectTrackId;
     QnTimePeriod timePeriod;
 
     /** Coordinates in range [0;1]. */
@@ -225,7 +225,7 @@ struct NX_VMS_COMMON_API Filter
     Qt::SortOrder sortOrder = Qt::SortOrder::DescendingOrder;
 
     /** Null value treated as any engine. */
-    QnUuid analyticsEngineId;
+    nx::Uuid analyticsEngineId;
     Options options{};
     std::chrono::milliseconds maxAnalyticsDetails{};
 
@@ -233,7 +233,7 @@ struct NX_VMS_COMMON_API Filter
 
     bool empty() const;
 
-    bool acceptsMetadata(const QnUuid& deviceId,
+    bool acceptsMetadata(const nx::Uuid& deviceId,
         const nx::common::metadata::ObjectMetadata& metadata,
         const AbstractObjectTypeDictionary& objectTypeDictionary,
         bool checkBoundingBox = true) const;
@@ -293,7 +293,7 @@ QN_FUSION_DECLARE_FUNCTIONS(Region, (json), NX_VMS_COMMON_API);
 struct NX_VMS_COMMON_API MotionFilter
 {
     /** If empty, any device is matched. */
-    std::set<QnUuid> deviceIds;
+    std::set<nx::Uuid> deviceIds;
 
     QnTimePeriod timePeriod;
 

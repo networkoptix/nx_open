@@ -148,15 +148,15 @@ void QnResource::update(const QnResourcePtr& source)
         notifier();
 }
 
-QnUuid QnResource::getParentId() const
+nx::Uuid QnResource::getParentId() const
 {
     NX_MUTEX_LOCKER locker(&m_mutex);
     return m_parentId;
 }
 
-void QnResource::setParentId(const QnUuid& parent)
+void QnResource::setParentId(const nx::Uuid& parent)
 {
-    QnUuid previousParentId;
+    nx::Uuid previousParentId;
     {
         NX_MUTEX_LOCKER locker(&m_mutex);
         if (m_parentId == parent)
@@ -241,13 +241,13 @@ QnResourcePtr QnResource::getParentResource() const
     return QnResourcePtr();
 }
 
-QnUuid QnResource::getTypeId() const
+nx::Uuid QnResource::getTypeId() const
 {
     NX_MUTEX_LOCKER mutexLocker(&m_mutex);
     return m_typeId;
 }
 
-void QnResource::setTypeId(const QnUuid& id)
+void QnResource::setTypeId(const nx::Uuid& id)
 {
     if (!NX_ASSERT(!id.isNull()))
         return;
@@ -292,7 +292,7 @@ void QnResource::setStatus(ResourceStatus newStatus, Qn::StatusChangeReason reas
     if (!NX_ASSERT(context))
         return;
 
-    QnUuid id = getId();
+    nx::Uuid id = getId();
     ResourceStatus oldStatus = context->resourceStatusDictionary()->value(id);
     if (oldStatus == newStatus)
     {
@@ -319,7 +319,7 @@ void QnResource::setStatus(ResourceStatus newStatus, Qn::StatusChangeReason reas
     }
 }
 
-void QnResource::setIdUnsafe(const QnUuid& id)
+void QnResource::setIdUnsafe(const nx::Uuid& id)
 {
     m_id = id;
 }

@@ -53,7 +53,7 @@ NX_REFLECTION_INSTRUMENT(ItemParams,(selected)(focused)(geometry)(media))
 /** Represent workbench item. Consist of the bound resource and parameters of the item. */
 struct Item
 {
-    QnUuid id;
+    nx::Uuid id;
 
     Resource resource;
     ItemParams params;

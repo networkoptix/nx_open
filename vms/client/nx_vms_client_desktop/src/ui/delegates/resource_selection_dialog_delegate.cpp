@@ -21,28 +21,28 @@ void QnResourceSelectionDialogDelegate::init(QWidget* /*parent*/)
 {
 }
 
-bool QnResourceSelectionDialogDelegate::validate(const QSet<QnUuid>& /*selectedResources*/)
+bool QnResourceSelectionDialogDelegate::validate(const QSet<nx::Uuid>& /*selectedResources*/)
 {
     return true;
 }
 
 QString QnResourceSelectionDialogDelegate::validationMessage(
-    const QSet<QnUuid>& /*selectedResources*/) const
+    const QSet<nx::Uuid>& /*selectedResources*/) const
 {
     return QString();
 }
 
-bool QnResourceSelectionDialogDelegate::isValid(const QnUuid& /*resource*/) const
+bool QnResourceSelectionDialogDelegate::isValid(const nx::Uuid& /*resource*/) const
 {
     return true;
 }
 
-QnResourcePtr QnResourceSelectionDialogDelegate::getResource(const QnUuid& resource) const
+QnResourcePtr QnResourceSelectionDialogDelegate::getResource(const nx::Uuid& resource) const
 {
     return resourcePool()->getResourceById(resource);
 }
 
-QnResourceList QnResourceSelectionDialogDelegate::getResources(const QSet<QnUuid>& resources) const
+QnResourceList QnResourceSelectionDialogDelegate::getResources(const QSet<nx::Uuid>& resources) const
 {
     return resourcePool()->getResourcesByIds(resources);
 }

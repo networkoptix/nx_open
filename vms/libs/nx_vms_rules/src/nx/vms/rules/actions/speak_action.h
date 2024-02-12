@@ -12,7 +12,7 @@ class NX_VMS_RULES_API SpeakAction: public nx::vms::rules::BasicAction
     Q_OBJECT
     Q_CLASSINFO("type", "nx.actions.speak")
 
-    FIELD(QnUuidList, deviceIds, setDeviceIds)
+    FIELD(UuidList, deviceIds, setDeviceIds)
     FIELD(nx::vms::rules::UuidSelection, users, setUsers)
     FIELD(std::chrono::microseconds, interval, setInterval)
     FIELD(QString, text, setText)

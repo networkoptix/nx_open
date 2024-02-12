@@ -266,7 +266,7 @@ void QnAuditLogModel::clear() {
     endResetModel();
 }
 
-QString QnAuditLogModel::getResourceNameById(const QnUuid &id)
+QString QnAuditLogModel::getResourceNameById(const nx::Uuid &id)
 {
     auto resourcePool = qnClientCoreModule->resourcePool();
     return QnResourceDisplayInfo(resourcePool->getResourceById(id)).toString(
@@ -395,7 +395,7 @@ QnVirtualCameraResourceList QnAuditLogModel::getCameras(const QnAuditRecord* rec
     return record ? getCameras(record->resources) : QnVirtualCameraResourceList();
 }
 
-QnVirtualCameraResourceList QnAuditLogModel::getCameras(const std::vector<QnUuid>& resources)
+QnVirtualCameraResourceList QnAuditLogModel::getCameras(const std::vector<nx::Uuid>& resources)
 {
     auto resourcePool = qnClientCoreModule->resourcePool();
     QnVirtualCameraResourceList result;
@@ -405,7 +405,7 @@ QnVirtualCameraResourceList QnAuditLogModel::getCameras(const std::vector<QnUuid
     return result;
 }
 
-QString QnAuditLogModel::getResourcesString(const std::vector<QnUuid>& resources)
+QString QnAuditLogModel::getResourcesString(const std::vector<nx::Uuid>& resources)
 {
     QString result;
     for (const auto& res : resources)
@@ -984,7 +984,7 @@ void QnAuditLogModel::setColumns(const QList<Column> &columns)
 
 void QnAuditLogModel::calcColorInterleaving()
 {
-    QnUuid prevSessionId;
+    nx::Uuid prevSessionId;
     int colorIndex = 0;
     m_interleaveInfo.resize(m_index->size());
     for (int i = 0; i < m_index->size(); ++i)

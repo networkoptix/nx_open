@@ -23,11 +23,11 @@ public:
     static QIcon tableCellIcon(const QnBusinessRuleViewModel* model);
 
     static QnLayoutResourceList layouts(const QnBusinessRuleViewModel* model);
-    static QSet<QnUuid> layoutIds(const QnBusinessRuleViewModel* model);
-    static QSet<QnUuid> setLayouts(const QnBusinessRuleViewModel* model,
+    static QSet<nx::Uuid> layoutIds(const QnBusinessRuleViewModel* model);
+    static QSet<nx::Uuid> setLayouts(const QnBusinessRuleViewModel* model,
         const QnLayoutResourceList& layouts);
-    static QSet<QnUuid> setLayoutIds(const QnBusinessRuleViewModel* model,
-        const QSet<QnUuid>& layoutIds);
+    static QSet<nx::Uuid> setLayoutIds(const QnBusinessRuleViewModel* model,
+        const QSet<nx::Uuid>& layoutIds);
 };
 
 } // namespace nx::vms::client::desktop

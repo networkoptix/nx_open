@@ -29,7 +29,7 @@ protected:
     {
         startCollector();
 
-        m_sessionId = QnUuid::createUuid().toSimpleStdString();
+        m_sessionId = nx::Uuid::createUuid().toSimpleStdString();
 
         nx::utils::log::LevelSettings filter;
         filter.primary = nx::utils::log::Level::verbose;

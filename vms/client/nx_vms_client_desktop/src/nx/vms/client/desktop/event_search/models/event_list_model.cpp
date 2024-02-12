@@ -12,9 +12,9 @@ namespace nx::vms::client::desktop {
 
 using namespace std::chrono;
 
-QnUuid EventListModel::EventData::sourceId() const
+nx::Uuid EventListModel::EventData::sourceId() const
 {
-    return source ? source->getId() : QnUuid();
+    return source ? source->getId() : nx::Uuid();
 }
 
 EventListModel::EventListModel(QnWorkbenchContext* context, QObject* parent):
@@ -146,12 +146,12 @@ bool EventListModel::updateEvent(const EventData& event)
     return d->updateEvent(event);
 }
 
-bool EventListModel::updateEvent(QnUuid id)
+bool EventListModel::updateEvent(nx::Uuid id)
 {
     return d->updateEvent(id);
 }
 
-QModelIndex EventListModel::indexOf(const QnUuid& id) const
+QModelIndex EventListModel::indexOf(const nx::Uuid& id) const
 {
     return index(d->indexOf(id));
 }
@@ -166,7 +166,7 @@ void EventListModel::clear()
     d->clear();
 }
 
-bool EventListModel::removeEvent(const QnUuid& id)
+bool EventListModel::removeEvent(const nx::Uuid& id)
 {
     return d->removeEvent(id);
 }

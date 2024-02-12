@@ -75,7 +75,7 @@ public:
             remote,
         };
 
-        QnUuid id() const;
+        nx::Uuid id() const;
         bool isChecked() const;
         QnMediaServerResourcePtr server() const;
         std::optional<nx::vms::api::ServerLogSettings> settings() const;
@@ -136,11 +136,11 @@ signals:
 
 private:
     void onReceivedServerLogSettings(
-        const QnUuid& serverId,
+        const nx::Uuid& serverId,
         const nx::vms::api::ServerLogSettings& settings);
 
     void onSentServerLogSettings(
-        const QnUuid& serverId,
+        const nx::Uuid& serverId,
         bool success);
 
     void downloadClientLogs(const QString& folder, UnitPtr unit);

@@ -61,7 +61,7 @@ private:
 private:
     milliseconds m_vmsTime = milliseconds(0);
     QList<State::ServerInfo> m_servers;
-    QnUuid m_selectedServer;
+    nx::Uuid m_selectedServer;
 };
 
 } // namespace nx::vms::client::desktop

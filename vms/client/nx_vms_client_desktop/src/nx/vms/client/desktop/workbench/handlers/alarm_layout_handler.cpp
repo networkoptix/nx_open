@@ -70,7 +70,7 @@ QnVirtualCameraResourceList sortedCameras(QnVirtualCameraResourceList cameraList
 
 struct ActionKey
 {
-    QnUuid ruleId;
+    nx::Uuid ruleId;
     qint64 timestampUs = 0;
 
     bool operator==(const ActionKey& other) const = default;
@@ -315,7 +315,7 @@ QnWorkbenchLayout* AlarmLayoutHandler::findOrCreateAlarmLayout()
     {
         d->alarmLayout.reset(new LayoutResource());
         d->alarmLayout->addFlags(Qn::local);
-        d->alarmLayout->setIdUnsafe(QnUuid::createUuid());
+        d->alarmLayout->setIdUnsafe(nx::Uuid::createUuid());
         d->alarmLayout->setName(tr("Alarms"));
         d->alarmLayout->setPredefinedCellSpacing(Qn::CellSpacing::Small);
         d->alarmLayout->setData(Qn::LayoutIconRole, qnSkin->icon("layouts/alarm.png"));
@@ -399,9 +399,9 @@ bool AlarmLayoutHandler::currentInstanceIsMain() const
     if (runningInstances.isEmpty())
         return true;
 
-    QnUuid localUserId = runtimeInfoManager()->localInfo().data.userId;
+    nx::Uuid localUserId = runtimeInfoManager()->localInfo().data.userId;
 
-    QSet<QnUuid> connectedInstances;
+    QSet<nx::Uuid> connectedInstances;
     for (const QnPeerRuntimeInfo &info: runtimeInfoManager()->items()->getItems())
     {
         if (info.data.userId == localUserId)

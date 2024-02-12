@@ -216,7 +216,7 @@ protected:
     QnLayoutResourcePtr addLayout(const QString& name, int logicalId = 0)
     {
         auto layout = QnLayoutResourcePtr(new LayoutResource());
-        layout->setIdUnsafe(QnUuid::createUuid());
+        layout->setIdUnsafe(nx::Uuid::createUuid());
         layout->setName(name);
         layout->setLogicalId(logicalId);
         systemContext()->resourcePool()->addResource(layout);

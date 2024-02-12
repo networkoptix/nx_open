@@ -33,7 +33,7 @@ signals:
 private:
     void onResourceAdded(const QnResourcePtr& resource);
     void onResourceRemoved(const QnResourcePtr& resource);
-    void onCameraParentIdChanged(const QnResourcePtr& resource, const QnUuid& previousParentId);
+    void onCameraParentIdChanged(const QnResourcePtr& resource, const nx::Uuid& previousParentId);
 
 private:
     void indexAllCameras();
@@ -41,7 +41,7 @@ private:
 
 private:
     const QnResourcePool* m_resourcePool;
-    QHash<QnUuid, QSet<QnResourcePtr>> m_camerasByServer;
+    QHash<nx::Uuid, QSet<QnResourcePtr>> m_camerasByServer;
 };
 
 } // namespace entity_resource_tree

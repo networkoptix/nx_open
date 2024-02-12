@@ -53,7 +53,7 @@ class QnResourceWidget:
     Q_PROPERTY(qreal frameOpacity READ frameOpacity WRITE setFrameOpacity)
     Q_PROPERTY(QColor frameDistinctionColor READ frameDistinctionColor WRITE setFrameDistinctionColor)
     Q_PROPERTY(bool localActive READ isLocalActive WRITE setLocalActive)
-    Q_PROPERTY(QnUuid uuid READ uuid)
+    Q_PROPERTY(nx::Uuid uuid READ uuid)
     Q_PROPERTY(QString uuidString READ uuidString)
     Q_PROPERTY(bool isZoomWindow READ isZoomWindow)
     Q_FLAGS(Options Option)
@@ -301,7 +301,7 @@ public:
     using base_type::mapRectToScene;
 
     /** Returns corresponding workbench item id. */
-    QnUuid uuid() const;
+    nx::Uuid uuid() const;
 
     /** Returns corresponding workbench item id as a string. */
     QString uuidString() const;

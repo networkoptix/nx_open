@@ -17,7 +17,7 @@ LookupListsModel::LookupListsModel(QnWorkbenchContext* context, QObject* parent)
         lookupListManager,
         &common::LookupListManager::addedOrUpdated,
         this,
-        [this](QnUuid id)
+        [this](nx::Uuid id)
         {
             const auto affectedList = systemContext()->lookupListManager()->lookupList(id);
 
@@ -27,7 +27,7 @@ LookupListsModel::LookupListsModel(QnWorkbenchContext* context, QObject* parent)
             auto lookupListIt = std::find_if(
                 m_lookupLists.begin(),
                 m_lookupLists.end(),
-                [&affectedList](const std::pair<QnUuid, QString>& listEntry)
+                [&affectedList](const std::pair<nx::Uuid, QString>& listEntry)
                 {
                     return listEntry.first == affectedList.id;
                 });
@@ -52,12 +52,12 @@ LookupListsModel::LookupListsModel(QnWorkbenchContext* context, QObject* parent)
         lookupListManager,
         &common::LookupListManager::removed,
         this,
-        [this](QnUuid id)
+        [this](nx::Uuid id)
         {
             const auto lookupListIt = std::find_if(
                 m_lookupLists.cbegin(),
                 m_lookupLists.cend(),
-                [id](const std::pair<QnUuid, QString>& listEntry)
+                [id](const std::pair<nx::Uuid, QString>& listEntry)
                 {
                     return listEntry.first == id;
                 });

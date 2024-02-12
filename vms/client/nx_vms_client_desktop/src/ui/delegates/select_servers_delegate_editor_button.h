@@ -21,7 +21,7 @@ public:
     void setResourcePolicy()
     {
         m_selectServersFunction =
-            [this](QnUuidSet& serverIds)
+            [this](UuidSet& serverIds)
             {
                 return ServerSelectionDialog::selectServers(
                     serverIds,
@@ -35,7 +35,7 @@ protected:
     virtual void handleButtonClicked() override;
 
 private:
-    std::function<bool(QnUuidSet& serverIds)> m_selectServersFunction;
+    std::function<bool(UuidSet& serverIds)> m_selectServersFunction;
 };
 
 } // namespace ui

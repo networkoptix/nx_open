@@ -77,13 +77,13 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(BackupContentTypes)
 /**%apidoc Additional device attributes. */
 struct NX_VMS_API CameraAttributesData
 {
-    QnUuid getIdForMerging() const { return cameraId; } //< See IdData::getIdForMerging().
-    QnUuid getId() const { return cameraId; }
+    nx::Uuid getIdForMerging() const { return cameraId; } //< See IdData::getIdForMerging().
+    nx::Uuid getId() const { return cameraId; }
     bool operator==(const CameraAttributesData& other) const = default;
 
     static DeprecatedFieldNames* getDeprecatedFieldNames();
 
-    QnUuid cameraId;
+    nx::Uuid cameraId;
 
     /**%apidoc[opt] Device name. */
     QString cameraName;
@@ -136,7 +136,7 @@ struct NX_VMS_API CameraAttributesData
     /**%apidoc[opt] Unique id of a server which has the highest priority of hosting the device for
      * failover (if the current server fails).
      */
-    QnUuid preferredServerId;
+    nx::Uuid preferredServerId;
 
     /**%apidoc[opt] Priority for the device to be moved to another server for failover (if the
      * current server fails).

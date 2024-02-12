@@ -15,19 +15,19 @@ public:
     static State initialize(
         State state,
         bool isTimeSynchronizationEnabled,
-        const QnUuid& primaryTimeServer,
+        const nx::Uuid& primaryTimeServer,
         const QList<State::ServerInfo>& servers);
 
     static Result applyChanges(State state);
     static Result setReadOnly(State state, bool value);
     static Result setSyncTimeWithInternet(State state, bool value);
     static Result disableSync(State state);
-    static Result selectServer(State state, const QnUuid& serverId);
+    static Result selectServer(State state, const nx::Uuid& serverId);
 
     static Result addServer(State state, const State::ServerInfo& serverInfo);
-    static Result removeServer(State state, const QnUuid& id);
-    static Result setServerOnline(State state, const QnUuid& serverId, bool isOnline);
-    static Result setServerHasInternet(State state, const QnUuid& serverId, bool hasInternet);
+    static Result removeServer(State state, const nx::Uuid& id);
+    static Result setServerOnline(State state, const nx::Uuid& serverId, bool isOnline);
+    static Result setServerHasInternet(State state, const nx::Uuid& serverId, bool hasInternet);
 
     // Utility methods.
     static State::ServerInfo actualPrimaryServer(const State& state);

@@ -53,7 +53,7 @@ NX_REFLECTION_INSTRUMENT(StaticWebContentUpdateInfo, StaticWebContentUpdateInfo_
 /**%apidoc Information about the static web content. */
 struct NX_VMS_API StaticWebContentInfo
 {
-    QnUuid id;
+    nx::Uuid id;
 
     /**%apidoc[readonly] The origin of the web content archive. */
     QString source;

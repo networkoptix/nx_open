@@ -41,7 +41,7 @@ QnAviResource::QnAviResource(const QString& file)
         addFlags(Qn::still_image);
         m_imageAspectRatio = getAspectRatioFromImage(file);
     }
-    setIdUnsafe(QnUuid::fromArbitraryData(getUrl()));
+    setIdUnsafe(nx::Uuid::fromArbitraryData(getUrl()));
 }
 
 QnAviResource::~QnAviResource()

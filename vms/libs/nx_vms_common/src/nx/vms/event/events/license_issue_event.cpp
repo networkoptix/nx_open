@@ -14,7 +14,7 @@ LicenseIssueEvent::LicenseIssueEvent(
     const QnResourcePtr& resource,
     qint64 timeStamp,
     EventReason reasonCode,
-    const QnUuidSet& disabledCameras)
+    const UuidSet& disabledCameras)
     :
     base_type(
         EventType::licenseIssueEvent,
@@ -25,7 +25,7 @@ LicenseIssueEvent::LicenseIssueEvent(
 {
 }
 
-QString LicenseIssueEvent::encodeCameras(const QnUuidSet& cameras)
+QString LicenseIssueEvent::encodeCameras(const UuidSet& cameras)
 {
     QStringList stringList;
     for (const auto id : cameras)
@@ -34,12 +34,12 @@ QString LicenseIssueEvent::encodeCameras(const QnUuidSet& cameras)
     return stringList.join(kDelimiter);
 }
 
-QnUuidSet LicenseIssueEvent::decodeCameras(const EventParameters& params)
+UuidSet LicenseIssueEvent::decodeCameras(const EventParameters& params)
 {
-    QnUuidSet result;
+    UuidSet result;
 
     for (const auto& str: params.description.split(kDelimiter))
-        result.insert(QnUuid(str));
+        result.insert(nx::Uuid(str));
 
     return result;
 }

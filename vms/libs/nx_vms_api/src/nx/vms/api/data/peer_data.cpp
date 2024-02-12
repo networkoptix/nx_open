@@ -12,7 +12,7 @@ namespace api {
 //-------------------------------------------------------------------------------------------------
 // PersistentIdData.
 
-PersistentIdData::PersistentIdData(const QnUuid& id, const QnUuid& persistentId):
+PersistentIdData::PersistentIdData(const nx::Uuid& id, const nx::Uuid& persistentId):
     IdData(id),
     persistentId(persistentId)
 {
@@ -33,12 +33,12 @@ PeerData::PeerData(): peerType(PeerType::notDefined)
 }
 
 PeerData::PeerData(
-    const QnUuid& id,
-    const QnUuid& instanceId,
+    const nx::Uuid& id,
+    const nx::Uuid& instanceId,
     PeerType peerType,
     Qn::SerializationFormat dataFormat)
     :
-    PeerData(id, instanceId, QnUuid(), peerType, dataFormat)
+    PeerData(id, instanceId, nx::Uuid(), peerType, dataFormat)
 {
 }
 
@@ -47,14 +47,14 @@ PeerData::PeerData(
     PeerType peerType,
     Qn::SerializationFormat dataFormat)
     :
-    PeerData(peer.id, QnUuid(), peer.persistentId, peerType, dataFormat)
+    PeerData(peer.id, nx::Uuid(), peer.persistentId, peerType, dataFormat)
 {
 }
 
 PeerData::PeerData(
-    const QnUuid& id,
-    const QnUuid& instanceId,
-    const QnUuid& persistentId,
+    const nx::Uuid& id,
+    const nx::Uuid& instanceId,
+    const nx::Uuid& persistentId,
     PeerType peerType,
     Qn::SerializationFormat dataFormat)
     :

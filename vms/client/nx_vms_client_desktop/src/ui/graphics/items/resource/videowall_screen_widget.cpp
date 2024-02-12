@@ -151,7 +151,7 @@ void QnVideowallScreenWidget::updateLayout(bool force)
         delete item;
     }
 
-    auto createItem = [this](const QnUuid &id)
+    auto createItem = [this](const nx::Uuid &id)
         {
             auto itemWidget = new QnVideowallItemWidget(m_videowall, id, this, m_mainOverlayWidget);
             connect(itemWidget, &QnClickableWidget::clicked, this,

@@ -23,9 +23,9 @@ namespace action {
 namespace
 {
 
-QnUuid showreelId(const Parameters& parameters)
+nx::Uuid showreelId(const Parameters& parameters)
 {
-    return parameters.argument(Qn::UuidRole).value<QnUuid>();
+    return parameters.argument(Qn::UuidRole).value<nx::Uuid>();
 }
 
 bool showreelIsRunning(QnWorkbenchContext* context)
@@ -95,7 +95,7 @@ QString ShowreelTextFactory::text(const Parameters& parameters,
     {
         // TODO: #sivanov Code duplication.
         const auto reviewTourId = context->workbench()->currentLayout()->data(
-            Qn::ShowreelUuidRole).value<QnUuid>();
+            Qn::ShowreelUuidRole).value<nx::Uuid>();
 
         if (reviewTourId.isNull())
             return tr("Start Tour");

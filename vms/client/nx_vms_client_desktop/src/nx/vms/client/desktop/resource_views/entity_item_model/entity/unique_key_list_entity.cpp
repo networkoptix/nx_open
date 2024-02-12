@@ -411,7 +411,7 @@ void UniqueKeyListEntity<Key>::recoverItemSequenceOrder(int index)
 //-------------------------------------------------------------------------------------------------
 
 template class NX_VMS_CLIENT_DESKTOP_API UniqueKeyListEntity<QnResourcePtr>;
-template class NX_VMS_CLIENT_DESKTOP_API UniqueKeyListEntity<QnUuid>;
+template class NX_VMS_CLIENT_DESKTOP_API UniqueKeyListEntity<nx::Uuid>;
 template class NX_VMS_CLIENT_DESKTOP_API UniqueKeyListEntity<QString>;
 template class NX_VMS_CLIENT_DESKTOP_API UniqueKeyListEntity<int>;
 

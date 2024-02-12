@@ -12,18 +12,18 @@ namespace nx::vms::client::desktop {
 class NX_VMS_CLIENT_DESKTOP_API NonUniqueNameTracker
 {
 public:
-    QSet<QnUuid> nonUniqueNameIds() const { return m_nonUniqueNameIds; }
-    bool isUnique(const QnUuid& id) const { return !m_nonUniqueNameIds.contains(id); }
+    QSet<nx::Uuid> nonUniqueNameIds() const { return m_nonUniqueNameIds; }
+    bool isUnique(const nx::Uuid& id) const { return !m_nonUniqueNameIds.contains(id); }
 
-    bool update(const QnUuid& id, const QString& name);
-    bool remove(const QnUuid& id);
+    bool update(const nx::Uuid& id, const QString& name);
+    bool remove(const nx::Uuid& id);
 
-    QSet<QnUuid> idsByName(const QString& name) const;
+    QSet<nx::Uuid> idsByName(const QString& name) const;
 
 private:
-    QSet<QnUuid> m_nonUniqueNameIds;
-    QHash<QString, QSet<QnUuid>> m_idsByName;
-    QHash<QnUuid, QString> m_nameById;
+    QSet<nx::Uuid> m_nonUniqueNameIds;
+    QHash<QString, QSet<nx::Uuid>> m_idsByName;
+    QHash<nx::Uuid, QString> m_nameById;
 };
 
 } // namespace nx::vms::client::desktop

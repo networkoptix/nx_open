@@ -14,7 +14,7 @@ namespace entity_resource_tree {
 
 using namespace nx::vms::api;
 
-ShowreelItem::ShowreelItem(const common::ShowreelManager* showreelManager, const QnUuid& id):
+ShowreelItem::ShowreelItem(const common::ShowreelManager* showreelManager, const nx::Uuid& id):
     base_type()
 {
     m_showreel = showreelManager->showreel(id);

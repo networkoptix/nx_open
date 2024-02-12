@@ -15,7 +15,7 @@ struct TestStruct
 
 struct TestStructEx: public TestStruct
 {
-    QnUuid additionalField;
+    nx::Uuid additionalField;
 };
 
 #define TestStructEx_Fields TestStruct_Fields (additionalField)
@@ -199,7 +199,7 @@ TEST(UbJsonTest, customStructAncestorFromDescendant)
         2,
         "some text data",
         3.1,
-        QnUuid::createUuid()
+        nx::Uuid::createUuid()
     };
 
     const QByteArray data = QnUbjson::serialized(testStruct);
@@ -213,9 +213,9 @@ TEST(UbJsonTest, customStructAncestorFromDescendant)
 TEST(UbJsonTest, customStructVectorAncestorFromDescendant)
 {
     std::vector<TestStructEx> testStructures = {
-        {2, "some text data_1", 3.1, QnUuid::createUuid()},
-        {1, "some text data_2", 4.1, QnUuid::createUuid()},
-        {5, "some text data_3", 5.1, QnUuid::createUuid()}
+        {2, "some text data_1", 3.1, nx::Uuid::createUuid()},
+        {1, "some text data_2", 4.1, nx::Uuid::createUuid()},
+        {5, "some text data_3", 5.1, nx::Uuid::createUuid()}
     };
 
     const QByteArray data = QnUbjson::serialized(testStructures);

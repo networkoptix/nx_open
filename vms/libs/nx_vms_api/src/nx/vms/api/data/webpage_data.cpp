@@ -9,7 +9,7 @@ namespace vms {
 namespace api {
 
 const QString WebPageData::kResourceTypeName = lit("WebPage");
-const QnUuid WebPageData::kResourceTypeId =
+const nx::Uuid WebPageData::kResourceTypeId =
     ResourceData::getFixedTypeId(WebPageData::kResourceTypeName);
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(

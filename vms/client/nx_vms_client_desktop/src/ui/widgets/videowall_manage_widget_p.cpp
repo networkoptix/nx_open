@@ -76,7 +76,7 @@ static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubst
 QnVideowallManageWidgetPrivate::BaseModelItem::BaseModelItem(
     const QRect& geometry,
     ItemType itemType,
-    const QnUuid& id,
+    const nx::Uuid& id,
     QnVideowallManageWidget* q):
     id(id),
     itemType(itemType),
@@ -355,7 +355,7 @@ QnVideowallManageWidgetPrivate::FreeSpaceItem::FreeSpaceItem(
     const QRect& rect,
     ItemType itemType,
     QnVideowallManageWidget* q):
-    base_type(rect, itemType, QnUuid::createUuid(), q)
+    base_type(rect, itemType, nx::Uuid::createUuid(), q)
 {
 }
 
@@ -510,7 +510,7 @@ void QnVideowallManageWidgetPrivate::ModelScreen::paintProposed(
 
 QnVideowallManageWidgetPrivate::ModelItem::ModelItem(
     ItemType itemType,
-    const QnUuid& id,
+    const nx::Uuid& id,
     QnVideowallManageWidget* q):
     BaseModelItem(QRect(), itemType, id, q)
 {
@@ -811,7 +811,7 @@ void QnVideowallManageWidgetPrivate::mouseClickAt(const QPoint& pos, Qt::MouseBu
             if (!item.geometry.contains(pos) || !item.free())
                 return;
 
-            ModelItem added(ItemType::Added, QnUuid::createUuid(), q);
+            ModelItem added(ItemType::Added, nx::Uuid::createUuid(), q);
             added.name = tr("New Item");
             added.geometry = item.geometry;
             added.snaps = item.snaps;

@@ -13,7 +13,7 @@ namespace api {
 /** Request to open count proxy connections to @var target server. */
 struct NX_VMS_API ReverseConnectionData
 {
-    QnUuid targetServer;
+    nx::Uuid targetServer;
     int socketCount = 0;
 };
 #define ReverseConnectionData_Fields (targetServer)(socketCount)

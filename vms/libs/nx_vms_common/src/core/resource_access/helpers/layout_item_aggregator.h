@@ -35,11 +35,11 @@ public:
     QSet<QnLayoutResourcePtr> watchedLayouts() const;
 
     bool hasLayout(const QnLayoutResourcePtr& layout) const;
-    bool hasItem(const QnUuid& id) const;
+    bool hasItem(const nx::Uuid& id) const;
 
 signals:
-    void itemAdded(const QnUuid& resourceId);
-    void itemRemoved(const QnUuid& resourceId);
+    void itemAdded(const nx::Uuid& resourceId);
+    void itemRemoved(const nx::Uuid& resourceId);
 
 private:
     void handleItemAdded(const nx::vms::common::LayoutItemData& item);
@@ -48,5 +48,5 @@ private:
 private:
     mutable nx::Mutex m_mutex;
     QSet<QnLayoutResourcePtr> m_watchedLayouts;
-    QnCounterHash<QnUuid> m_items;
+    QnCounterHash<nx::Uuid> m_items;
 };

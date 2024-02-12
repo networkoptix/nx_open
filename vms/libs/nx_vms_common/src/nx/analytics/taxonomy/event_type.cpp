@@ -98,7 +98,7 @@ bool EventType::hasEverBeenSupported() const
     return m_impl->hasEverBeenSupported();
 }
 
-bool EventType::isSupported(QnUuid engineId, QnUuid deviceId) const
+bool EventType::isSupported(nx::Uuid engineId, nx::Uuid deviceId) const
 {
     return m_impl->isSupported(engineId, deviceId);
 }

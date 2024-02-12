@@ -10,7 +10,7 @@ QnVideoWallItemIndex::QnVideoWallItemIndex()
 
 QnVideoWallItemIndex::QnVideoWallItemIndex(
     const QnVideoWallResourcePtr& videowall,
-    const QnUuid& uuid)
+    const nx::Uuid& uuid)
     :
     m_videowall(videowall),
     m_uuid(uuid)
@@ -22,7 +22,7 @@ QnVideoWallResourcePtr QnVideoWallItemIndex::videowall() const
     return m_videowall;
 }
 
-QnUuid QnVideoWallItemIndex::uuid() const
+nx::Uuid QnVideoWallItemIndex::uuid() const
 {
     return m_uuid;
 }

@@ -25,13 +25,13 @@ class NX_VMS_COMMON_API AbstractCameraNotificationManager: public QObject
 signals:
     void addedOrUpdated(const nx::vms::api::CameraData& camera, ec2::NotificationSource source);
     void cameraHistoryChanged(const nx::vms::api::ServerFootageData& cameraHistory);
-    void removed(const QnUuid& id, ec2::NotificationSource source);
+    void removed(const nx::Uuid& id, ec2::NotificationSource source);
 
     void userAttributesChanged(const nx::vms::api::CameraAttributesData& attributes);
-    void userAttributesRemoved(const QnUuid& id);
+    void userAttributesRemoved(const nx::Uuid& id);
 
     void hardwareIdMappingAdded(const nx::vms::api::HardwareIdMapping& hardwareIdMapping);
-    void hardwareIdMappingRemoved(const QnUuid& id);
+    void hardwareIdMappingRemoved(const nx::Uuid& id);
 };
 
 /*!
@@ -67,11 +67,11 @@ public:
     ErrorCode addHardwareIdMappingSync(const nx::vms::api::HardwareIdMapping& hardwareIdMapping);
 
     virtual int removeHardwareIdMapping(
-        const QnUuid& id,
+        const nx::Uuid& id,
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) = 0;
 
-    ErrorCode removeHardwareIdMappingSync(const QnUuid& id);
+    ErrorCode removeHardwareIdMappingSync(const nx::Uuid& id);
 
     virtual int getHardwareIdMappings(
         Handler<nx::vms::api::HardwareIdMappingList> handler,
@@ -89,11 +89,11 @@ public:
     ErrorCode addCamerasSync(const nx::vms::api::CameraDataList& dataList);
 
     virtual int remove(
-        const QnUuid& id,
+        const nx::Uuid& id,
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) = 0;
 
-    ErrorCode removeSync(const QnUuid& id);
+    ErrorCode removeSync(const nx::Uuid& id);
 
     virtual int getServerFootageData(
         Handler<nx::vms::api::ServerFootageDataList> handler,
@@ -102,13 +102,13 @@ public:
     Result getServerFootageDataSync(nx::vms::api::ServerFootageDataList* outDataList);
 
     virtual int setServerFootageData(
-        const QnUuid& serverGuid,
-        const std::vector<QnUuid>& cameraIds,
+        const nx::Uuid& serverGuid,
+        const std::vector<nx::Uuid>& cameraIds,
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) = 0;
 
     ErrorCode setServerFootageDataSync(
-        const QnUuid& serverGuid, const std::vector<QnUuid>& cameraIds);
+        const nx::Uuid& serverGuid, const std::vector<nx::Uuid>& cameraIds);
 
     virtual int getUserAttributes(
         Handler<nx::vms::api::CameraAttributesDataList> handler,

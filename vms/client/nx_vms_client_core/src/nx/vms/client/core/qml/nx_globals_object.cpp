@@ -227,14 +227,14 @@ bool NxGlobalsObject::ensureFlickableChildVisible(QQuickItem* item)
     return true;
 }
 
-QnUuid NxGlobalsObject::uuid(const QString& uuid) const
+nx::Uuid NxGlobalsObject::uuid(const QString& uuid) const
 {
-    return QnUuid::fromStringSafe(uuid);
+    return nx::Uuid::fromStringSafe(uuid);
 }
 
-QnUuid NxGlobalsObject::generateUuid() const
+nx::Uuid NxGlobalsObject::generateUuid() const
 {
-    return QnUuid::createUuid();
+    return nx::Uuid::createUuid();
 }
 
 DateRange NxGlobalsObject::dateRange(const QDateTime& start, const QDateTime& end) const

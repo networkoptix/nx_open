@@ -69,7 +69,7 @@ private:
 
     void updateRebuildUi(QnServerStoragesPool pool, const nx::vms::api::StorageScanInfo& reply);
 
-    void confirmNewMetadataStorage(const QnUuid& storageId);
+    void confirmNewMetadataStorage(const nx::Uuid& storageId);
 
     void startRebuid(bool isMain);
     void cancelRebuild(bool isMain);

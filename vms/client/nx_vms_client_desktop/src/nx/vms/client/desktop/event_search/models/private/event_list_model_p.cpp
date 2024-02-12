@@ -47,7 +47,7 @@ bool EventListModel::Private::addBack(const EventData& data)
     return true;
 }
 
-bool EventListModel::Private::removeEvent(const QnUuid& id)
+bool EventListModel::Private::removeEvent(const nx::Uuid& id)
 {
     const auto index = m_events.index_of(id);
     if (index < 0)
@@ -72,7 +72,7 @@ void EventListModel::Private::removeEvents(int first, int count)
         m_events.removeAt(first);
 }
 
-int EventListModel::Private::indexOf(const QnUuid& id) const
+int EventListModel::Private::indexOf(const nx::Uuid& id) const
 {
     return m_events.index_of(id);
 }
@@ -97,7 +97,7 @@ bool EventListModel::Private::updateEvent(const EventData& data)
     return true;
 }
 
-bool EventListModel::Private::updateEvent(QnUuid id)
+bool EventListModel::Private::updateEvent(nx::Uuid id)
 {
     const auto index = m_events.index_of(id);
     if (index < 0)

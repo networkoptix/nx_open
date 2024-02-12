@@ -17,7 +17,7 @@ AbstractActionPtr ActionFactory::instantiateAction(
     SystemContext* systemContext,
     const RulePtr& rule,
     const AbstractEventPtr& event,
-    const QnUuid& moduleGuid,
+    const nx::Uuid& moduleGuid,
     EventState state)
 {
     EventParameters runtimeParams = event->getRuntimeParamsEx(rule->eventParams());
@@ -43,7 +43,7 @@ AbstractActionPtr ActionFactory::instantiateAction(
     SystemContext* systemContext,
     const RulePtr& rule,
     const AbstractEventPtr& event,
-    const QnUuid& moduleGuid,
+    const nx::Uuid& moduleGuid,
     const AggregationInfo& aggregationInfo)
 {
     auto result =

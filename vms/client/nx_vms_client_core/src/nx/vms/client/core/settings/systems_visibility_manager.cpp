@@ -8,7 +8,7 @@
 
 namespace {
 
-const QnUuid cloudTileId = QnUuid::fromString("cloudWelcomeScreenTile");
+const nx::Uuid cloudTileId = nx::Uuid::fromString("cloudWelcomeScreenTile");
 
 } // namespace
 
@@ -38,7 +38,7 @@ SystemsVisibilityManager* SystemsVisibilityManager::instance()
     return s_instance;
 }
 
-void SystemsVisibilityManager::removeSystemData(const QnUuid& localId)
+void SystemsVisibilityManager::removeSystemData(const nx::Uuid& localId)
 {
     m_visibilityScopes.remove(localId);
     appContext()->coreSettings()->tileScopeInfo = m_visibilityScopes;
@@ -54,13 +54,13 @@ void SystemsVisibilityManager::setCloudTileScope(welcome_screen::TileVisibilityS
     appContext()->coreSettings()->cloudTileScope = visibilityScope;
 }
 
-QString SystemsVisibilityManager::systemName(const QnUuid& localId) const
+QString SystemsVisibilityManager::systemName(const nx::Uuid& localId) const
 {
     auto it = m_visibilityScopes.find(localId);
     return it != m_visibilityScopes.end() ? it->name : QString();
 }
 
-welcome_screen::TileVisibilityScope SystemsVisibilityManager::scope(const QnUuid& localId) const
+welcome_screen::TileVisibilityScope SystemsVisibilityManager::scope(const nx::Uuid& localId) const
 {
     auto it = m_visibilityScopes.find(localId);
     return it != m_visibilityScopes.end()
@@ -69,7 +69,7 @@ welcome_screen::TileVisibilityScope SystemsVisibilityManager::scope(const QnUuid
 }
 
 bool SystemsVisibilityManager::setScopeInfo(
-    const QnUuid& localId,
+    const nx::Uuid& localId,
     const QString& name,
     welcome_screen::TileVisibilityScope visibilityScope)
 {

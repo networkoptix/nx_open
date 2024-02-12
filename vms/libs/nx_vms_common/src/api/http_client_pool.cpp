@@ -230,7 +230,7 @@ struct HttpConnection
     std::unique_ptr<AsyncClient> client;
     QElapsedTimer idleTimeout;
     QSharedPointer<ClientPool::Context> context;
-    QnUuid lastAdapterFuncId;
+    nx::Uuid lastAdapterFuncId;
 };
 
 //--------------------------------------------------------------------------------------------------
@@ -317,7 +317,7 @@ struct ClientPool::Private
 
     void setAdapterFuncToConnection(
         HttpConnection* connection,
-        const QnUuid& adapterFuncId,
+        const nx::Uuid& adapterFuncId,
         const ssl::AdapterFunc& adapterFunc)
     {
         if (adapterFuncId == connection->lastAdapterFuncId)
@@ -329,7 +329,7 @@ struct ClientPool::Private
             if (NX_ASSERT(!adapterFuncId.isNull()))
                 connection->lastAdapterFuncId = adapterFuncId;
             else
-                connection->lastAdapterFuncId = QnUuid::createUuid();
+                connection->lastAdapterFuncId = nx::Uuid::createUuid();
             connection->client->setAdapterFunc(adapterFunc);
         }
     }
@@ -502,7 +502,7 @@ bool ClientPool::terminate(int handle)
                         NX_VERBOSE(this, "terminate(%1) - terminating orphaned connection", handle);
 
                     connection->client = d->createHttpConnection();
-                    connection->lastAdapterFuncId = QnUuid();
+                    connection->lastAdapterFuncId = nx::Uuid();
                     break;
                 }
             }

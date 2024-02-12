@@ -112,13 +112,13 @@ private:
 
     void setupDeviceSelection();
 
-    bool ensureVisible(milliseconds timestamp, const QnUuid& trackId);
+    bool ensureVisible(milliseconds timestamp, const nx::Uuid& trackId);
     void ensureVisibleAndFetchIfNeeded(
-        milliseconds timestamp, const QnUuid& trackId, const QnTimePeriod& proposedTimeWindow);
+        milliseconds timestamp, const nx::Uuid& trackId, const QnTimePeriod& proposedTimeWindow);
 
-    AbstractEngine* engineById(const QnUuid& id) const;
+    AbstractEngine* engineById(const nx::Uuid& id) const;
 
-    QAction* addEngineMenuAction(QMenu* menu, const QString& title, const QnUuid& engineId);
+    QAction* addEngineMenuAction(QMenu* menu, const QString& title, const nx::Uuid& engineId);
     QAction* addObjectMenuAction(
         QMenu* menu,
         const QString& title,
@@ -136,7 +136,7 @@ private:
     ItemModelMenu* const m_objectTypeMenu;
     QCollator m_collator;
 
-    std::optional<std::pair<milliseconds, QnUuid>> m_ensureVisibleRequest;
+    std::optional<std::pair<milliseconds, nx::Uuid>> m_ensureVisibleRequest;
 };
 
 // ------------------------------------------------------------------------------------------------
@@ -408,7 +408,7 @@ void AnalyticsSearchWidget::Private::updateTaxonomy()
 
     for (const auto& engine: relevantEngines)
     {
-        const QnUuid id(engine->id());
+        const nx::Uuid id(engine->id());
         addEngineMenuAction(m_engineMenu, engine->name(), id);
 
         if (!currentSelectionStillAvailable && currentSelection == id)
@@ -482,7 +482,7 @@ std::vector<AbstractEngine*> AnalyticsSearchWidget::Private::engines() const
     return m_filterModel->engines();
 }
 
-AbstractEngine* AnalyticsSearchWidget::Private::engineById(const QnUuid& id) const
+AbstractEngine* AnalyticsSearchWidget::Private::engineById(const nx::Uuid& id) const
 {
     if (id.isNull())
         return nullptr;
@@ -490,13 +490,13 @@ AbstractEngine* AnalyticsSearchWidget::Private::engineById(const QnUuid& id) con
     const auto relevantEngines = m_filterModel->engines();
 
     const auto it = std::find_if(relevantEngines.cbegin(), relevantEngines.cend(),
-        [id](AbstractEngine* engine) { return QnUuid(engine->id()) == id; });
+        [id](AbstractEngine* engine) { return nx::Uuid(engine->id()) == id; });
 
     return it != relevantEngines.cend() ? *it : nullptr;
 }
 
 QAction* AnalyticsSearchWidget::Private::addEngineMenuAction(
-    QMenu* menu, const QString& title, const QnUuid& engineId)
+    QMenu* menu, const QString& title, const nx::Uuid& engineId)
 {
     auto action = menu->addAction(title);
     connect(action, &QAction::triggered, this,
@@ -516,7 +516,7 @@ QAction* AnalyticsSearchWidget::Private::addObjectMenuAction(
 }
 
 void AnalyticsSearchWidget::Private::ensureVisibleAndFetchIfNeeded(
-    milliseconds timestamp, const QnUuid& trackId, const QnTimePeriod& proposedTimeWindow)
+    milliseconds timestamp, const nx::Uuid& trackId, const QnTimePeriod& proposedTimeWindow)
 {
     if (ensureVisible(timestamp, trackId))
         return;
@@ -529,13 +529,13 @@ void AnalyticsSearchWidget::Private::ensureVisibleAndFetchIfNeeded(
     m_model->fetchWindow(proposedTimeWindow);
 }
 
-bool AnalyticsSearchWidget::Private::ensureVisible(milliseconds timestamp, const QnUuid& trackId)
+bool AnalyticsSearchWidget::Private::ensureVisible(milliseconds timestamp, const nx::Uuid& trackId)
 {
     const auto range = m_model->find(timestamp);
     for (int row = range.first; row < range.second; ++row)
     {
         const auto currentIndex = m_model->index(row);
-        if (currentIndex.data(Qn::ObjectTrackIdRole).value<QnUuid>() == trackId)
+        if (currentIndex.data(Qn::ObjectTrackIdRole).value<nx::Uuid>() == trackId)
         {
             q->view()->ensureVisible(row);
             return true;

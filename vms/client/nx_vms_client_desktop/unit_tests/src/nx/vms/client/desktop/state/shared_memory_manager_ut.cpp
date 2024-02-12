@@ -248,7 +248,7 @@ TEST_F(SharedMemoryManagerTest, assignStatesUnderfilled)
     givenAnotherRunningInstance(kAnotherSessionId);
     givenAnotherRunningInstance(SessionId());
 
-    auto stateName = QnUuid::createUuid().toString();
+    auto stateName = nx::Uuid::createUuid().toString();
     QStringList files{ stateName };
     sharedMemoryManager()->assignStatesToOtherInstances(&files);
 
@@ -276,9 +276,9 @@ TEST_F(SharedMemoryManagerTest, assignStatesOverflown)
     givenAnotherRunningInstance(kAnotherSessionId);
     givenAnotherRunningInstance(SessionId());
 
-    auto stateName1 = QnUuid::createUuid().toString();
-    auto stateName2 = QnUuid::createUuid().toString();
-    auto stateName3 = QnUuid::createUuid().toString();
+    auto stateName1 = nx::Uuid::createUuid().toString();
+    auto stateName2 = nx::Uuid::createUuid().toString();
+    auto stateName3 = nx::Uuid::createUuid().toString();
     QStringList files{ stateName1, stateName2, stateName3 };
     sharedMemoryManager()->assignStatesToOtherInstances(&files);
 

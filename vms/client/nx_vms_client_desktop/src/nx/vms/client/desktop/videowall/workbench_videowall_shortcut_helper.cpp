@@ -106,7 +106,7 @@ bool VideoWallShortcutHelper::deleteShortcut(const QnVideoWallResourcePtr& video
 }
 
 void VideoWallShortcutHelper::setVideoWallAutorunEnabled(
-    const QnUuid& videowallUuid,
+    const nx::Uuid& videowallUuid,
     bool value,
     const nx::utils::Url& serverUrl)
 {
@@ -130,7 +130,7 @@ void VideoWallShortcutHelper::setVideoWallAutorunEnabled(
 
 bool VideoWallShortcutHelper::canStartVideoWall(const QnVideoWallResourcePtr& videowall)
 {
-    QnUuid pcUuid = appContext()->localSettings()->pcUuid();
+    nx::Uuid pcUuid = appContext()->localSettings()->pcUuid();
     if (pcUuid.isNull())
     {
         NX_ERROR(NX_SCOPE_TAG, "Pc UUID is null, cannot start Video Wall on this pc");

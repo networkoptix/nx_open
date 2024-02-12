@@ -52,7 +52,7 @@ struct ServerApiErrors
     Q_DECLARE_TR_FUNCTIONS(ServerApiErrors);
 };
 
-GlobalPermissions getGlobalPermissions(const SystemContext& context, const QnUuid& id)
+GlobalPermissions getGlobalPermissions(const SystemContext& context, const nx::Uuid& id)
 {
     return context.resourceAccessManager()
         ->globalPermissions(context.accessSubjectHierarchy()->subjectById(id));
@@ -61,7 +61,7 @@ GlobalPermissions getGlobalPermissions(const SystemContext& context, const QnUui
 // Access and User info of the caller. Unlike `Qn::UserAccessData` can't represent 'Access::System'.
 struct UserAccessorInfo
 {
-    QnUuid id;
+    nx::Uuid id;
     QString name;
     GlobalPermissions permissions;
 };
@@ -80,7 +80,7 @@ auto userAccessorInfo(const SystemContext& context, const Qn::UserAccessData& ac
 
     // TODO: Regardless of the mutex locks getting these properties is not atomic,
     //  hence a data race is possible.
-    const QnUuid id = existingUser->getId();
+    const nx::Uuid id = existingUser->getId();
     QString name = existingUser->getName();
     const GlobalPermissions permissions = getGlobalPermissions(context, id);
 
@@ -105,18 +105,18 @@ public:
     // Input type for User info.
     struct UserInfo
     {
-        QnUuid id;
+        nx::Uuid id;
         QString name;
-        std::vector<QnUuid> parentGroups;
+        std::vector<nx::Uuid> parentGroups;
     };
 
     // Input type for User Group info.
     struct UserGroupInfo
     {
-        QnUuid id;
+        nx::Uuid id;
         QString name;
         api::UserType type;
-        std::vector<QnUuid> parentGroups;
+        std::vector<nx::Uuid> parentGroups;
     };
 
     /**
@@ -131,7 +131,7 @@ public:
     [[nodiscard]] Result operator()(const SystemContext& context,
         const UserAccessorInfo& accessor,
         UserInfo user,
-        std::vector<QnUuid> parentGroups) const
+        std::vector<nx::Uuid> parentGroups) const
     {
         return canAddOrRemove(context, accessor, std::move(user), std::move(parentGroups));
     }
@@ -148,7 +148,7 @@ public:
     [[nodiscard]] Result operator()(const SystemContext& context,
         const UserAccessorInfo& accessor,
         UserGroupInfo group,
-        std::vector<QnUuid> parentGroups) const
+        std::vector<nx::Uuid> parentGroups) const
     {
         return canAddOrRemove(context, accessor, std::move(group), std::move(parentGroups));
     }
@@ -156,7 +156,7 @@ public:
 private:
     struct SelectedGroupProps
     {
-        QnUuid id;
+        nx::Uuid id;
         QString name;
         api::UserType type;
     };
@@ -165,7 +165,7 @@ private:
     [[nodiscard]] Result canAddOrRemove(const nx::vms::common::SystemContext& context,
         const UserAccessorInfo& accessor,
         UserOrGroup child,
-        std::vector<QnUuid> parentIds) const
+        std::vector<nx::Uuid> parentIds) const
     {
         static_assert(
             std::is_same_v<UserOrGroup, UserInfo> || std::is_same_v<UserOrGroup, UserGroupInfo>,
@@ -176,7 +176,7 @@ private:
         const auto setDifference =
             [](const auto& rangeToSearch, const auto& rangeContaining)
             {
-                std::vector<QnUuid> notFound;
+                std::vector<nx::Uuid> notFound;
                 std::set_difference(rangeToSearch.cbegin(), rangeToSearch.cend(),
                     rangeContaining.cbegin(), rangeContaining.cend(),
                     std::back_inserter(notFound));
@@ -216,7 +216,7 @@ private:
         const auto [removeParents, removeNotFound] =
             groupManager.mapGroupsByIds(setDifference(existing, updated), selectGroupProps);
 
-        for (const QnUuid& id: removeNotFound)
+        for (const nx::Uuid& id: removeNotFound)
         {
             NX_WARNING(this,
                 "User '%1(%2)' has requested to remove from non-existing User Group '%3'.",
@@ -303,9 +303,9 @@ private:
 
     static Result checkForCircularDependencies(const SystemContext& context,
         const UserGroupInfo& group,
-        const std::vector<QnUuid>& parents)
+        const std::vector<nx::Uuid>& parents)
     {
-        QSet<QnUuid> parentIds = nx::utils::toQSet(parents);
+        QSet<nx::Uuid> parentIds = nx::utils::toQSet(parents);
         parentIds += context.accessSubjectHierarchy()->recursiveParents(parentIds);
 
         if (parentIds.contains(group.id) && group.type != nx::vms::api::UserType::ldap)
@@ -463,10 +463,10 @@ private:
 struct InvalidGetHashHelper
 {
     template<typename Param>
-    QnUuid operator ()(const Param &)
+    nx::Uuid operator ()(const Param &)
     {
         // NX_ASSERT(0, "Invalid transaction for hash!");
-        return QnUuid();
+        return nx::Uuid();
     }
 };
 
@@ -482,12 +482,12 @@ struct InvalidTriggerNotificationHelper
 struct CreateHashByIdHelper
 {
     template<typename Param>
-    QnUuid operator ()(const Param &param) { return param.id; }
+    nx::Uuid operator ()(const Param &param) { return param.id; }
 };
 
 struct HardwareIdMappingHashHelper
 {
-    QnUuid operator()(const nx::vms::api::HardwareIdMapping& params)
+    nx::Uuid operator()(const nx::vms::api::HardwareIdMapping& params)
     {
         return QnAbstractTransaction::makeHash(
             params.physicalIdGuid.toRfc4122(), "hardwareid_mapping");
@@ -504,7 +504,7 @@ struct CreateHashFromCustomField
     CreateHashFromCustomField(MemberPointer memberPointer):
         memberPointer(memberPointer) {}
 
-    QnUuid operator ()(const ClassType& param)
+    nx::Uuid operator ()(const ClassType& param)
     {
         return guidFromArbitraryData(param.*memberPointer);
     }
@@ -520,7 +520,7 @@ CreateHashFromCustomField<ClassType, FieldType> makeCreateHashFromCustomFieldHel
 struct CreateHashByUserIdHelper
 {
     template<typename Param>
-    QnUuid operator ()(const Param &param) { return param.userId; }
+    nx::Uuid operator ()(const Param &param) { return param.userId; }
 };
 
 struct CreateHashByIdRfc4122Helper
@@ -530,7 +530,7 @@ struct CreateHashByIdRfc4122Helper
     {}
 
     template<typename Param>
-    QnUuid operator ()(const Param &param) \
+    nx::Uuid operator ()(const Param &param) \
     {
         if (m_additionalData.isNull())
             return QnAbstractTransaction::makeHash(param.id.toRfc4122());
@@ -543,13 +543,13 @@ private:
 
 struct CreateHashForResourceParamWithRefDataHelper
 {
-    QnUuid operator ()(const nx::vms::api::ResourceParamWithRefData& param)
+    nx::Uuid operator ()(const nx::vms::api::ResourceParamWithRefData& param)
     {
         QCryptographicHash hash(QCryptographicHash::Md5);
         hash.addData("res_params");
         hash.addData(param.resourceId.toRfc4122());
         hash.addData(param.name.toUtf8());
-        return QnUuid::fromRfc4122(hash.result());
+        return nx::Uuid::fromRfc4122(hash.result());
     }
 };
 
@@ -625,33 +625,33 @@ void apiIdDataTriggerNotificationHelper(
     }
 }
 
-QnUuid createHashForServerFootageDataHelper(const nx::vms::api::ServerFootageData& params)
+nx::Uuid createHashForServerFootageDataHelper(const nx::vms::api::ServerFootageData& params)
 {
     return QnAbstractTransaction::makeHash(params.serverGuid.toRfc4122(), "history");
 }
 
-QnUuid createHashForApiCameraAttributesDataHelper(const nx::vms::api::CameraAttributesData& params)
+nx::Uuid createHashForApiCameraAttributesDataHelper(const nx::vms::api::CameraAttributesData& params)
 {
     return QnAbstractTransaction::makeHash(params.cameraId.toRfc4122(), "camera_attributes");
 }
 
-QnUuid createHashForApiLicenseDataHelper(const nx::vms::api::LicenseData& params)
+nx::Uuid createHashForApiLicenseDataHelper(const nx::vms::api::LicenseData& params)
 {
     return QnAbstractTransaction::makeHash(params.key, "ApiLicense");
 }
 
-QnUuid createHashForApiMediaServerUserAttributesDataHelper(
+nx::Uuid createHashForApiMediaServerUserAttributesDataHelper(
     const api::MediaServerUserAttributesData &params)
 {
     return QnAbstractTransaction::makeHash(params.serverId.toRfc4122(), "server_attributes");
 }
 
-QnUuid createHashForApiStoredFileDataHelper(const nx::vms::api::StoredFileData& params)
+nx::Uuid createHashForApiStoredFileDataHelper(const nx::vms::api::StoredFileData& params)
 {
     return QnAbstractTransaction::makeHash(params.path.toUtf8());
 }
 
-QnUuid createHashForApiDiscoveryDataHelper(const nx::vms::api::DiscoveryData& params)
+nx::Uuid createHashForApiDiscoveryDataHelper(const nx::vms::api::DiscoveryData& params)
 {
     return QnAbstractTransaction::makeHash("discovery_data", params);
 }
@@ -894,7 +894,7 @@ struct AllowForAllAccessOut
 static Result checkExistingResourceAccess(
     SystemContext* systemContext,
     const Qn::UserAccessData& accessData,
-    const QnUuid& resourceId,
+    const nx::Uuid& resourceId,
     Qn::Permissions permissions)
 {
     const auto resPool = systemContext->resourcePool();
@@ -925,7 +925,7 @@ static Result checkExistingResourceAccess(
 }
 
 static Result checkReadResourceAccess(
-    SystemContext* systemContext, const Qn::UserAccessData& accessData, const QnUuid& resourceId)
+    SystemContext* systemContext, const Qn::UserAccessData& accessData, const nx::Uuid& resourceId)
 {
     if (hasSystemAccess(accessData))
         return Result();
@@ -937,7 +937,7 @@ static Result checkReadResourceAccess(
 }
 
 static Result checkSaveResourceAccess(
-    SystemContext* systemContext, const Qn::UserAccessData& accessData, const QnUuid& resourceId)
+    SystemContext* systemContext, const Qn::UserAccessData& accessData, const nx::Uuid& resourceId)
 {
     if (hasSystemAccess(accessData))
         return Result();
@@ -1652,7 +1652,7 @@ struct ModifyResourceParamAccess
         const nx::vms::api::ResourceParamWithRefData& param)
     {
         const auto resPool = systemContext->resourcePool();
-        QSet<QnUuid> newEngines = QnVirtualCameraResource::calculateUserEnabledAnalyticsEngines(param.value);
+        QSet<nx::Uuid> newEngines = QnVirtualCameraResource::calculateUserEnabledAnalyticsEngines(param.value);
         nx::vms::common::saas::IntegrationServiceUsageHelper helper(systemContext);
         helper.proposeChange(param.resourceId, newEngines);
         if (helper.isOverflow())
@@ -1670,7 +1670,7 @@ struct ModifyResourceParamAccess
         const nx::vms::api::ResourceParamWithRefData& param)
     {
         const auto resPool = systemContext->resourcePool();
-        const auto metadataStorageId = QnUuid::fromStringSafe(param.value);
+        const auto metadataStorageId = nx::Uuid::fromStringSafe(param.value);
         const auto server = resPool->getResourceById<QnMediaServerResource>(param.resourceId);
         if (!NX_ASSERT(server))
         {
@@ -1975,7 +1975,7 @@ private:
 
             nx::vms::common::saas::CloudStorageServiceUsageHelper helper(systemContext);
             helper.proposeChange(
-                /*devicesToAdd*/ {param.cameraId}, /*devicesToRemove*/ std::set<QnUuid>());
+                /*devicesToAdd*/ {param.cameraId}, /*devicesToRemove*/ std::set<nx::Uuid>());
             if (helper.isOverflow())
             {
                 NX_DEBUG(
@@ -2166,7 +2166,7 @@ static Result userHasGlobalAccess(
 static Result userHasAccess(
     SystemContext* systemContext,
     const Qn::UserAccessData& accessData,
-    const QnUuid& targetResourceOrGroupId,
+    const nx::Uuid& targetResourceOrGroupId,
     nx::vms::api::AccessRights requiredAccess)
 {
     if (hasSystemAccess(accessData))
@@ -2341,7 +2341,7 @@ struct SaveUserRoleAccess
                 UserGroupInfo{.id = existing ? existing->id : param.id,
                     .name = existing ? existing->name : param.name,
                     .type = existing ? existing->type : param.type,
-                    .parentGroups = existing ? existing->parentGroupIds : std::vector<QnUuid>()},
+                    .parentGroups = existing ? existing->parentGroupIds : std::vector<nx::Uuid>()},
                 param.parentGroupIds);
             !r)
         {

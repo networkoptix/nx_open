@@ -141,7 +141,7 @@ ResourceAccessSubjectHierarchy::~ResourceAccessSubjectHierarchy()
     // Required here for forward-declared scoped pointer destruction.
 }
 
-QnResourceAccessSubject ResourceAccessSubjectHierarchy::subjectById(const QnUuid& id) const
+QnResourceAccessSubject ResourceAccessSubjectHierarchy::subjectById(const nx::Uuid& id) const
 {
     if (!NX_ASSERT(d->resourcePool && d->userGroupManager))
         return {};
@@ -152,7 +152,7 @@ QnResourceAccessSubject ResourceAccessSubjectHierarchy::subjectById(const QnUuid
     return {d->userGroupManager->find(id).value_or(nx::vms::api::UserGroupData{})};
 }
 
-QnUserResourceList ResourceAccessSubjectHierarchy::usersInGroups(const QSet<QnUuid>& groupIds) const
+QnUserResourceList ResourceAccessSubjectHierarchy::usersInGroups(const QSet<nx::Uuid>& groupIds) const
 {
     if (!NX_ASSERT(d->resourcePool))
         return {};

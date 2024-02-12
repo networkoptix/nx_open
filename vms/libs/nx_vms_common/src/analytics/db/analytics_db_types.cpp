@@ -136,7 +136,7 @@ bool Filter::empty() const
     return *this == Filter();
 }
 
-bool Filter::acceptsMetadata(const QnUuid& deviceId,
+bool Filter::acceptsMetadata(const nx::Uuid& deviceId,
     const nx::common::metadata::ObjectMetadata& metadata,
     const AbstractObjectTypeDictionary& objectTypeDictionary,
     bool checkBoundingBox) const
@@ -389,11 +389,11 @@ bool deserializeFromParams(
     for (const auto& deviceIdStr: params.values(lit("deviceId")))
     {
         // Convert flexibleId to UUID
-        QnUuid uuid;
+        nx::Uuid uuid;
         if (resourcePool)
             uuid = nx::camera_id_helper::flexibleIdToId(resourcePool, deviceIdStr);
         if (uuid.isNull())
-            uuid = QnUuid::fromStringSafe(deviceIdStr); //< Not have camera in resourcePool.
+            uuid = nx::Uuid::fromStringSafe(deviceIdStr); //< Not have camera in resourcePool.
         if (!uuid.isNull())
             filter->deviceIds.insert(uuid);
     }
@@ -409,7 +409,7 @@ bool deserializeFromParams(
     }
 
     if (params.contains(lit("objectTrackId")))
-        filter->objectTrackId = QnUuid::fromStringSafe(params.value(lit("objectTrackId")));
+        filter->objectTrackId = nx::Uuid::fromStringSafe(params.value(lit("objectTrackId")));
 
     filter->timePeriod.setStartTime(
         std::chrono::milliseconds(params.value("startTime").toLongLong()));
@@ -439,7 +439,7 @@ bool deserializeFromParams(
     }
 
     if (params.contains("analyticsEngineId"))
-        filter->analyticsEngineId = QnUuid::fromStringSafe(params.value("analyticsEngineId"));
+        filter->analyticsEngineId = nx::Uuid::fromStringSafe(params.value("analyticsEngineId"));
 
     if (params.contains(lit("limit")))
         filter->maxObjectTracksToSelect = params.value(lit("limit")).toInt();

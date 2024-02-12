@@ -103,18 +103,18 @@ QSizeF QnScrollableItemsWidgetPrivate::contentSizeHint(Qt::SizeHint which,
     return m_scrollArea->contentWidget()->effectiveSizeHint(which, constraint);
 }
 
-QnUuid QnScrollableItemsWidgetPrivate::insertItem(int index, QGraphicsWidget* item, const QnUuid& externalId)
+nx::Uuid QnScrollableItemsWidgetPrivate::insertItem(int index, QGraphicsWidget* item, const nx::Uuid& externalId)
 {
     NX_ASSERT(item);
     if (!item)
-        return QnUuid();
+        return nx::Uuid();
 
-    const QnUuid id = externalId.isNull()
-        ? QnUuid::createUuid()
+    const nx::Uuid id = externalId.isNull()
+        ? nx::Uuid::createUuid()
         : externalId;
 
     if (m_items.contains(id))
-        return QnUuid();
+        return nx::Uuid();
 
     item->setParent(m_scrollArea->contentWidget());
     item->setParentItem(m_scrollArea->contentWidget());
@@ -138,7 +138,7 @@ QnUuid QnScrollableItemsWidgetPrivate::insertItem(int index, QGraphicsWidget* it
     return id;
 }
 
-QGraphicsWidget* QnScrollableItemsWidgetPrivate::takeItem(const QnUuid& id)
+QGraphicsWidget* QnScrollableItemsWidgetPrivate::takeItem(const nx::Uuid& id)
 {
     auto iter = m_items.find(id);
     if (iter == m_items.end())
@@ -184,7 +184,7 @@ QGraphicsWidget* QnScrollableItemsWidgetPrivate::item(int index) const
     return qgraphicsitem_cast<QGraphicsWidget*>(m_contentLayout->itemAt(index)->graphicsItem());
 }
 
-QGraphicsWidget* QnScrollableItemsWidgetPrivate::item(const QnUuid& id) const
+QGraphicsWidget* QnScrollableItemsWidgetPrivate::item(const nx::Uuid& id) const
 {
     const auto iter = m_items.find(id);
     return iter != m_items.end() ? iter.value() : nullptr;

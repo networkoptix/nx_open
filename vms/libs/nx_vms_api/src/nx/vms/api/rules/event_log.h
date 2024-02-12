@@ -39,7 +39,7 @@ struct NX_VMS_API EventLogFilter: public nx::vms::api::ServerTimePeriod
     std::optional<nx::vms::api::json::ValueOrArray<QString>> actionType;
 
     /**%apidoc[opt] VMS Rule id. */
-    QnUuid ruleId;
+    nx::Uuid ruleId;
 
     /**%apidoc[opt] Event description lookup string. */
     QString text;
@@ -91,7 +91,7 @@ struct NX_VMS_API EventLogRecord
     size_t aggregationCount = 0;
 
     /**%apidoc[opt] VMS rule id. */
-    QnUuid ruleId;
+    nx::Uuid ruleId;
 };
 
 #define EventLogRecord_Fields \

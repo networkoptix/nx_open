@@ -32,7 +32,7 @@ public:
 signals:
     void connectRequested(nx::vms::client::core::RemoteConnectionPtr connection);
     void loginToCloudRequested();
-    void setupNewServerRequested(QnUuid expectedServerId);
+    void setupNewServerRequested(nx::Uuid expectedServerId);
 
 private:
     void tick();

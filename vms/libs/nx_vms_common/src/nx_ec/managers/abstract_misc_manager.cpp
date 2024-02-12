@@ -7,7 +7,7 @@
 namespace ec2 {
 
 ErrorCode AbstractMiscManager::changeSystemIdSync(
-    const QnUuid& systemId, qint64 sysIdTime, nx::vms::api::Timestamp tranLogTime)
+    const nx::Uuid& systemId, qint64 sysIdTime, nx::vms::api::Timestamp tranLogTime)
 {
     return detail::callSync(
         [&](auto handler)

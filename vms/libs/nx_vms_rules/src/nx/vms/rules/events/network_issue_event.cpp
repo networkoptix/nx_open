@@ -17,7 +17,7 @@ namespace nx::vms::rules {
 
 NetworkIssueEvent::NetworkIssueEvent(
     std::chrono::microseconds timestamp,
-    QnUuid cameraId,
+    nx::Uuid cameraId,
     nx::vms::api::EventReason reason,
     const NetworkIssueInfo& info)
     :

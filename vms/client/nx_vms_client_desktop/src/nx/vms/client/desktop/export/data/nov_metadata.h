@@ -24,7 +24,7 @@ struct NovItemProperties
     using Flags = QFlags<Flag>;
     Flags flags = Flag::empty;
 };
-using NovItemPropertiesMap = std::unordered_map<QnUuid, NovItemProperties>;
+using NovItemPropertiesMap = std::unordered_map<nx::Uuid, NovItemProperties>;
 NX_REFLECTION_INSTRUMENT(NovItemProperties, (name)(timeZoneOffset)(timeZoneId)(flags))
 
 /** Metadata file, describing exported nov-file contents. */

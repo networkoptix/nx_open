@@ -21,7 +21,7 @@ class NX_VMS_CLIENT_DESKTOP_API QnFakeMediaServerResource: public QnMediaServerR
 public:
     QnFakeMediaServerResource();
 
-    virtual QnUuid getOriginalGuid() const override;
+    virtual nx::Uuid getOriginalGuid() const override;
     void setFakeServerModuleInformation(const nx::vms::api::DiscoveredServerData& serverData);
     virtual nx::vms::api::ModuleInformation getModuleInformation() const override;
 

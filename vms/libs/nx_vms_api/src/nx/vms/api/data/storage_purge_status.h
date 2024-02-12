@@ -27,7 +27,7 @@ struct NX_VMS_API StoragePurgeStatusData
         bool isNull() const { return started.time_since_epoch() == std::chrono::milliseconds(-1); }
     };
 
-    QnUuid id;
+    nx::Uuid id;
 
     State state = State::idle;
     /**%apidoc:any */

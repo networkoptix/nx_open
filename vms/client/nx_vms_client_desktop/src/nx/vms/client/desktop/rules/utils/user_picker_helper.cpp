@@ -36,7 +36,7 @@ QString makeText(const QString& base, const QString& additional)
 UserPickerHelper::UserPickerHelper(
     SystemContext* context,
     bool acceptAll,
-    const QnUuidSet& ids,
+    const UuidSet& ids,
     const QnSubjectValidationPolicy* policy,
     bool isIntermediateStateValid,
     const UserPickerHelperParameters& parameters)

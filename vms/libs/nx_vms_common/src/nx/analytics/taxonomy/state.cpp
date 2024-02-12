@@ -29,7 +29,7 @@ ResultMap serializeEntityMap(const EntityMap& entityMap)
         if constexpr (std::is_same_v<KeyType, QString>)
             result[id] = entity->serialize();
         else
-            result[QnUuid::fromStringSafe(id)] = entity->serialize();
+            result[nx::Uuid::fromStringSafe(id)] = entity->serialize();
     }
 
     return result;

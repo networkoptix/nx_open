@@ -61,7 +61,7 @@ struct NX_VMS_COMMON_API Status
         installationError
     )
 
-    QnUuid serverId;
+    nx::Uuid serverId;
     Code code = Code::idle;
     ErrorCode errorCode = ErrorCode::noError;
     QString message;
@@ -71,7 +71,7 @@ struct NX_VMS_COMMON_API Status
 
     Status() = default;
     Status(
-        const QnUuid& serverId,
+        const nx::Uuid& serverId,
         Code code,
         ErrorCode errorCode = ErrorCode::noError,
         int progress = 0);

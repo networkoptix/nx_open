@@ -15,7 +15,7 @@ struct NX_VMS_API StoragePurgeControlData
         backup
     )
 
-    QnUuid id;
+    nx::Uuid id;
     Pool pool;
 
     const StoragePurgeControlData& getId() const { return *this; }

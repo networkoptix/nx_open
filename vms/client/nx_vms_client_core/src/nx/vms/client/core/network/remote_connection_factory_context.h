@@ -63,7 +63,7 @@ struct NX_VMS_CLIENT_CORE_API RemoteConnectionFactoryContext: public QObject
     const nx::network::SocketAddress& address() const { return logonData.address; }
     const nx::network::http::Credentials& credentials() const { return logonData.credentials; }
     nx::vms::api::UserType userType() const { return logonData.userType; }
-    std::optional<QnUuid> expectedServerId() const { return logonData.expectedServerId; }
+    std::optional<nx::Uuid> expectedServerId() const { return logonData.expectedServerId; }
 
     std::optional<nx::utils::SoftwareVersion> expectedServerVersion() const
     {

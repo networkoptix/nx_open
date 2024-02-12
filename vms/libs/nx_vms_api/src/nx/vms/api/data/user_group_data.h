@@ -37,10 +37,10 @@ struct NX_VMS_API UserGroupData: IdData
     GlobalPermissions permissions = GlobalPermission::none;
 
     /**%apidoc[opt] Access rights per Resource or Resource Group. */
-    std::map<QnUuid, AccessRights> resourceAccessRights;
+    std::map<nx::Uuid, AccessRights> resourceAccessRights;
 
     /**%apidoc[opt] List of roles to inherit permissions. */
-    std::vector<QnUuid> parentGroupIds;
+    std::vector<nx::Uuid> parentGroupIds;
 
     /**%apidoc[readonly] */
     nx::vms::api::UserAttributes attributes{};
@@ -50,8 +50,8 @@ struct NX_VMS_API UserGroupData: IdData
 
     UserGroupData() = default;
     UserGroupData(
-        const QnUuid& id, const QString& name,
-        GlobalPermissions permissions = {}, std::vector<QnUuid> parentGroupIds = {});
+        const nx::Uuid& id, const QString& name,
+        GlobalPermissions permissions = {}, std::vector<nx::Uuid> parentGroupIds = {});
 
     bool operator==(const UserGroupData& other) const = default;
     QString toString() const;
@@ -68,17 +68,17 @@ struct NX_VMS_API UserGroupData: IdData
     (resourceAccessRights)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(UserGroupData)
 
-NX_VMS_API extern const QnUuid kAdministratorsGroupId; //< ex-Owners.
-NX_VMS_API extern const QnUuid kPowerUsersGroupId; //< ex-Administrators.
-NX_VMS_API extern const QnUuid kAdvancedViewersGroupId;
-NX_VMS_API extern const QnUuid kViewersGroupId;
-NX_VMS_API extern const QnUuid kLiveViewersGroupId;
-NX_VMS_API extern const QnUuid kSystemHealthViewersGroupId;
+NX_VMS_API extern const nx::Uuid kAdministratorsGroupId; //< ex-Owners.
+NX_VMS_API extern const nx::Uuid kPowerUsersGroupId; //< ex-Administrators.
+NX_VMS_API extern const nx::Uuid kAdvancedViewersGroupId;
+NX_VMS_API extern const nx::Uuid kViewersGroupId;
+NX_VMS_API extern const nx::Uuid kLiveViewersGroupId;
+NX_VMS_API extern const nx::Uuid kSystemHealthViewersGroupId;
 
-NX_VMS_API extern const std::set<QnUuid> kPredefinedGroupIds;
-NX_VMS_API extern const std::set<QnUuid> kAllPowerUserGroupIds;
+NX_VMS_API extern const std::set<nx::Uuid> kPredefinedGroupIds;
+NX_VMS_API extern const std::set<nx::Uuid> kAllPowerUserGroupIds;
 
 // Predefined id for LDAP Default user group in VMS DB.
-NX_VMS_API extern const QnUuid kDefaultLdapGroupId;
+NX_VMS_API extern const nx::Uuid kDefaultLdapGroupId;
 
 } // namespace nx::vms::api

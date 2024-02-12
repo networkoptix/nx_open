@@ -49,7 +49,7 @@ public:
     QList<InfoDetail> toList() const;
 
 private:
-    QMap<QnUuid, InfoDetail> m_details;
+    QMap<nx::Uuid, InfoDetail> m_details;
 };
 
 } // namespace event

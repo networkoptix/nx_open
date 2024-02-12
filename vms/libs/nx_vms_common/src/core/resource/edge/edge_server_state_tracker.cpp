@@ -148,7 +148,7 @@ void EdgeServerStateTracker::onResourceRemoved(const QnResourcePtr& resource)
 }
 
 void EdgeServerStateTracker::onCameraParentIdChanged(const QnResourcePtr& resource,
-    const QnUuid& previousParentId)
+    const nx::Uuid& previousParentId)
 {
     const auto camera = resource.staticCast<QnVirtualCameraResource>();
     if (camera->hasFlags(Qn::desktop_camera))

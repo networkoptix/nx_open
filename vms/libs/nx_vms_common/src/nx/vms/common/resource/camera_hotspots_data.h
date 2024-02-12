@@ -17,7 +17,7 @@ struct NX_VMS_COMMON_API CameraHotspotData
     /**
      * The Id of the camera that the hotspot refers to.
      */
-    QnUuid targetResourceId;
+    nx::Uuid targetResourceId;
 
     /**
      * Hotspot item relative position on the camera item. (0.0, 0.0) and (1.0, 1.0) values stand

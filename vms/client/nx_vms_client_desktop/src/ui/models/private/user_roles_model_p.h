@@ -23,14 +23,14 @@ public:
     nx::vms::api::UserGroupData roleByRow(int row) const;
     int count() const;
 
-    QnUuid id(int row) const;
+    nx::Uuid id(int row) const;
 
     void setCustomRoleStrings(const QString& name, const QString& description);
 
 private:
     bool updateUserRole(const nx::vms::api::UserGroupData& userRole);
     bool removeUserRole(const nx::vms::api::UserGroupData& userRole);
-    bool removeUserRoleById(const QnUuid& roleId);
+    bool removeUserRoleById(const nx::Uuid& roleId);
 
 public:
     bool hasCheckBoxes = false;

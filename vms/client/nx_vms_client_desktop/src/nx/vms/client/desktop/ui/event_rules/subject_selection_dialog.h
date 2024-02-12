@@ -68,15 +68,15 @@ public:
     void setValidationPolicy(QnSubjectValidationPolicy* policy);
 
     // Invalid ids are filtered out. Disabled users are kept, but hidden.
-    void setCheckedSubjects(const QSet<QnUuid>& ids);
+    void setCheckedSubjects(const QSet<nx::Uuid>& ids);
 
     // Explicitly checked subjects, regardless of allUsers value.
-    QSet<QnUuid> checkedSubjects() const;
+    QSet<nx::Uuid> checkedSubjects() const;
 
     // Explicitly checked users + users from checked roles.
     // If allUsers is set, returns all enabled users in the system.
     // Used mostly for entire selection validation and calculating alert text.
-    QSet<QnUuid> totalCheckedUsers() const;
+    QSet<nx::Uuid> totalCheckedUsers() const;
 
     bool allUsers() const; //< Whether all possible users are selected.
     void setAllUsers(bool value);

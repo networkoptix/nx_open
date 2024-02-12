@@ -336,7 +336,7 @@ QHash<int, QVariant> TileInteractionHandler::setupDropActionParameters(
 }
 
 void TileInteractionHandler::executePluginAction(
-    const QnUuid& engineId,
+    const nx::Uuid& engineId,
     const QString& actionTypeId,
     const nx::analytics::db::ObjectTrack& track,
     const QnVirtualCameraResourcePtr& camera) const
@@ -787,7 +787,7 @@ void TileInteractionHandler::showMessage(const QString& text)
     m_messages.insert(id);
 
     connect(SceneBanners::instance(), &SceneBanners::removed, this,
-        [this](const QnUuid& id) { m_messages.remove(id); });
+        [this](const nx::Uuid& id) { m_messages.remove(id); });
 }
 
 void TileInteractionHandler::showMessageDelayed(const QString& text, milliseconds delay)

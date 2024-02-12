@@ -33,7 +33,7 @@ public:
 
     void loadState(const CameraSettingsDialogState& state);
 
-    void setSelectedServer(const QnUuid& serverId);
+    void setSelectedServer(const nx::Uuid& serverId);
     void setPtzInterface(std::unique_ptr<core::ptz::RemotePtzController> controller);
 
     void saveValues();

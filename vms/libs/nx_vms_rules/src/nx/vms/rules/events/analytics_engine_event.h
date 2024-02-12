@@ -10,8 +10,8 @@ class NX_VMS_RULES_API AnalyticsEngineEvent: public DescribedEvent
 {
     Q_OBJECT
 
-    Q_PROPERTY(QnUuid cameraId READ cameraId WRITE setCameraId)
-    Q_PROPERTY(QnUuid engineId READ engineId WRITE setEngineId)
+    Q_PROPERTY(nx::Uuid cameraId READ cameraId WRITE setCameraId)
+    Q_PROPERTY(nx::Uuid engineId READ engineId WRITE setEngineId)
 
 public:
     AnalyticsEngineEvent() = default;
@@ -19,13 +19,13 @@ public:
         std::chrono::microseconds timestamp,
         const QString& caption,
         const QString& description,
-        QnUuid cameraId,
-        QnUuid engineId);
+        nx::Uuid cameraId,
+        nx::Uuid engineId);
 
-    QnUuid cameraId() const;
-    void setCameraId(QnUuid cameraId);
-    QnUuid engineId() const;
-    void setEngineId(QnUuid engineId);
+    nx::Uuid cameraId() const;
+    void setCameraId(nx::Uuid cameraId);
+    nx::Uuid engineId() const;
+    void setEngineId(nx::Uuid engineId);
 
     virtual QString resourceKey() const override;
     virtual QVariantMap details(common::SystemContext* context) const override;
@@ -34,8 +34,8 @@ protected:
     QString detailing() const;
 
 private:
-    QnUuid m_cameraId;
-    QnUuid m_engineId;
+    nx::Uuid m_cameraId;
+    nx::Uuid m_engineId;
 };
 
 } // namespace nx::vms::rules

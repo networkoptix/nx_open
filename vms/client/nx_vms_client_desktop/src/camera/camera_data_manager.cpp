@@ -96,7 +96,7 @@ QnCameraDataManager::QnCameraDataManager(SystemContext* systemContext, QObject* 
         connect(serverRuntimeEventConnector,
             &ServerRuntimeEventConnector::deviceFootageChanged,
             this,
-            [this](const std::vector<QnUuid>& deviceIds)
+            [this](const std::vector<nx::Uuid>& deviceIds)
             {
                 const auto devices =
                     resourcePool()->getResourcesByIds<QnVirtualCameraResource>(deviceIds);

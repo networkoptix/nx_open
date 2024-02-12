@@ -88,8 +88,8 @@ public:
      */
     SystemContext(
         Mode mode,
-        QnUuid peerId,
-        QnUuid sessionId,
+        nx::Uuid peerId,
+        nx::Uuid sessionId,
         nx::core::access::Mode resourceAccessMode,
         QObject* parent = nullptr);
     virtual ~SystemContext();
@@ -101,13 +101,13 @@ public:
      * and on the number of the running client instance, so different Client windows have different
      * peer ids.
      */
-    const QnUuid& peerId() const;
+    const nx::Uuid& peerId() const;
 
     /**
      * Id of the connection session. On the server side it is randomly generated on the server
      * start. On the client side it is generated separately for each connection.
      */
-    const QnUuid& sessionId() const;
+    const nx::Uuid& sessionId() const;
 
     /** Temporary method to simplify refactor. */
     void updateRunningInstanceGuid();

@@ -49,7 +49,7 @@ private:
     void blockReconnect();
     void unblockReconnect();
 
-    QSet<QnUuid> allParentGroups() const;
+    QSet<nx::Uuid> allParentGroups() const;
     bool updateParentGroups();
 
 private:
@@ -58,7 +58,7 @@ private:
     QByteArray m_userDigest;
     QnUserResourcePtr m_user;
     bool m_reconnectOnPasswordChange = true;
-    QSet<QnUuid> m_allParentGroups;
+    QSet<nx::Uuid> m_allParentGroups;
 
     int m_blockReconnectCounter = 0;
     bool m_reconnectPending = false;

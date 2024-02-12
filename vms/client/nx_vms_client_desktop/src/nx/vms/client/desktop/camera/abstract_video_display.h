@@ -15,7 +15,7 @@ class AbstractVideoDisplay
 public:
     virtual ~AbstractVideoDisplay() = default;
 
-    typedef QnUuid CameraID;
+    typedef nx::Uuid CameraID;
     virtual CameraID getCameraID() const = 0;
 
     virtual bool isFullScreen() const = 0;

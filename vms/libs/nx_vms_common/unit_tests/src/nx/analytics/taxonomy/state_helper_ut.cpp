@@ -28,9 +28,9 @@ static const QString kTaxonomyKey = "taxonomy";
 static const QString kTestsKey = "tests";
 static const QString kIdKey = "id";
 
-static QnUuid toUuid(const QString& str)
+static nx::Uuid toUuid(const QString& str)
 {
-    return QnUuid::fromArbitraryData(str);
+    return nx::Uuid::fromArbitraryData(str);
 }
 
 struct TestScope
@@ -78,7 +78,7 @@ struct TestDescriptors
             for (const auto& testScope: testEventTypeDescriptor.scopes)
             {
                 nx::vms::api::analytics::DescriptorScope scope;
-                scope.engineId = QnUuid::fromArbitraryData(testScope.engineId);
+                scope.engineId = nx::Uuid::fromArbitraryData(testScope.engineId);
                 scope.groupId = testScope.groupId;
                 descriptor.scopes.insert(std::move(scope));
             }
@@ -96,7 +96,7 @@ struct TestDescriptors
             for (const auto& testScope: testObjectTypeDescriptor.scopes)
             {
                 nx::vms::api::analytics::DescriptorScope scope;
-                scope.engineId = QnUuid::fromArbitraryData(testScope.engineId);
+                scope.engineId = nx::Uuid::fromArbitraryData(testScope.engineId);
                 scope.groupId = testScope.groupId;
                 descriptor.scopes.insert(std::move(scope));
             }
@@ -269,7 +269,7 @@ protected:
         QJson::deserialize(
             deviceParameters[kEnabledAnalyticsEnginesKey], &enabledAnalyticsEngineStringIds);
 
-        QnUuidSet enabledAnalyticsEngineIds;
+        UuidSet enabledAnalyticsEngineIds;
         for (const QString& stringId: enabledAnalyticsEngineStringIds)
             enabledAnalyticsEngineIds.insert(toUuid(stringId));
 
@@ -295,7 +295,7 @@ protected:
         for (auto& [stringId, eventTypeIds]: eventTypesByEngineStringId)
             eventTypesByEngine.emplace(toUuid(stringId), std::move(eventTypeIds));
 
-        device->setSupportedEventTypes(QMap<QnUuid, std::set<QString>>(eventTypesByEngine));
+        device->setSupportedEventTypes(QMap<nx::Uuid, std::set<QString>>(eventTypesByEngine));
 
         std::map<QString, std::set<QString>> objectTypesByEngineStringId;
         QJson::deserialize(
@@ -305,7 +305,7 @@ protected:
         for (auto& [stringId, objectTypeIds]: objectTypesByEngineStringId)
             objectTypesByEngine.emplace(toUuid(stringId), std::move(objectTypeIds));
 
-        device->setSupportedObjectTypes(QMap<QnUuid, std::set<QString>>(objectTypesByEngine));
+        device->setSupportedObjectTypes(QMap<nx::Uuid, std::set<QString>>(objectTypesByEngine));
 
         s_devices[deviceStringId] = device;
     }
@@ -377,7 +377,7 @@ private:
             const TestEngineScope expectedEngineScope = m_expectedEntityTree[i];
 
             ASSERT_EQ(
-                QnUuid::fromStringSafe(actualEngineScope.engine->id()),
+                nx::Uuid::fromStringSafe(actualEngineScope.engine->id()),
                 toUuid(m_expectedEntityTree[i].engine));
 
             ASSERT_EQ(actualEngineScope.groups.size(), expectedEngineScope.groups.size());

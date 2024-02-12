@@ -13,8 +13,8 @@ class MockEngineEvents: public QObject
     Q_OBJECT
 
 public:
-    MOCK_METHOD(void, onRuleAddedOrUpdated, (QnUuid ruleId, bool added));
-    MOCK_METHOD(void, onRuleRemoved, (QnUuid ruleId));
+    MOCK_METHOD(void, onRuleAddedOrUpdated, (nx::Uuid ruleId, bool added));
+    MOCK_METHOD(void, onRuleRemoved, (nx::Uuid ruleId));
     MOCK_METHOD(void, onRulesReset, ());
 
     MOCK_METHOD(void, onActionBuilt, (

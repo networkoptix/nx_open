@@ -51,16 +51,16 @@ public:
     void setServerFootageData(const nx::vms::api::ServerFootageData& serverFootageData);
 
     /** Update information about camera footage presence on a single server. */
-    void setServerFootageData(const QnUuid& serverGuid, const std::vector<QnUuid>& cameras);
+    void setServerFootageData(const nx::Uuid& serverGuid, const std::vector<nx::Uuid>& cameras);
 
     /** \return set of camera id's that have footage on the selected server. */
-    QSet<QnUuid> getServerFootageData(const QnUuid& serverGuid) const;
+    QSet<nx::Uuid> getServerFootageData(const nx::Uuid& serverGuid) const;
 
     /** \return list of camera id's that have footage on the selected server. */
     QnSecurityCamResourceList getServerFootageCameras(const QnMediaServerResourcePtr &server) const;
 
     /** \return server list where the selected camera has footage. */
-    QnMediaServerResourceList getCameraFootageData(const QnUuid &cameraId, bool filterOnlineServers = false) const;
+    QnMediaServerResourceList getCameraFootageData(const nx::Uuid &cameraId, bool filterOnlineServers = false) const;
 
     /** \return server list where the selected camera has footage. */
     QnMediaServerResourceList getCameraFootageData(const QnSecurityCamResourcePtr &camera, bool filterOnlineServers = false) const;
@@ -124,14 +124,14 @@ public:
      */
     bool updateCameraHistorySync(const QnSecurityCamResourcePtr& camera);
 
-    nx::vms::api::CameraHistoryItemDataList getHistoryDetails(const QnUuid& cameraId, bool* isValid);
+    nx::vms::api::CameraHistoryItemDataList getHistoryDetails(const nx::Uuid& cameraId, bool* isValid);
 
     /**
      * \brief                       Set camera history details if provided server list in historyDetails still actual.
      *                              Otherwise don't change data and returns false.
      */
     bool testAndSetHistoryDetails(
-        const QnUuid& cameraId,
+        const nx::Uuid& cameraId,
         const nx::vms::api::CameraHistoryItemDataList& historyDetails);
 
     void setHistoryCheckDelay(int value);
@@ -158,7 +158,7 @@ signals:
 private:
     struct AsyncRequestInfo
     {
-        QnUuid serverId;
+        nx::Uuid serverId;
         ::rest::Handle handle;
 
         bool operator==(const AsyncRequestInfo& other) const = default;
@@ -167,8 +167,8 @@ private:
     nx::vms::api::CameraHistoryItemDataList filterOnlineServers(
         const nx::vms::api::CameraHistoryItemDataList& dataList) const;
 
-    QnSecurityCamResourcePtr toCamera(const QnUuid& guid) const;
-    QnMediaServerResourcePtr toMediaServer(const QnUuid& guid) const;
+    QnSecurityCamResourcePtr toCamera(const nx::Uuid& guid) const;
+    QnMediaServerResourcePtr toMediaServer(const nx::Uuid& guid) const;
 
     void at_cameraPrepared(
         bool success,
@@ -177,34 +177,34 @@ private:
         callbackFunction callback);
 
     /** Mark camera history as dirty and subject to update. */
-    void invalidateCameraHistory(const QnUuid &cameraId);
+    void invalidateCameraHistory(const nx::Uuid &cameraId);
 
 private:
     void checkCameraHistoryDelayed(QnSecurityCamResourcePtr cam);
     QnMediaServerResourceList dtsCamFootageData(const QnSecurityCamResourcePtr &camera
         , bool filterOnlineServers = false) const;
     QnMediaServerResourceList getCameraFootageDataUnsafe(
-        const QnUuid &cameraId,
+        const nx::Uuid &cameraId,
         bool filterOnlineServers = false) const;
     bool isValidHistoryDetails(
-        const QnUuid& cameraId,
+        const nx::Uuid& cameraId,
         const nx::vms::api::CameraHistoryItemDataList& historyDetails) const;
 private:
     int m_historyCheckDelay;
     mutable nx::Mutex m_mutex;
-    QMap<QnUuid, QSet<QnUuid>> m_archivedCamerasByServer; // archived cameras by server
+    QMap<nx::Uuid, QSet<nx::Uuid>> m_archivedCamerasByServer; // archived cameras by server
 
-    typedef QMap<QnUuid, nx::vms::api::CameraHistoryItemDataList> DetailHistoryMap;
+    typedef QMap<nx::Uuid, nx::vms::api::CameraHistoryItemDataList> DetailHistoryMap;
     DetailHistoryMap m_historyDetail; // camera move detail by camera
 
     /** Set of cameras which have the data loaded and actual. */
-    QSet<QnUuid> m_historyValidCameras;
+    QSet<nx::Uuid> m_historyValidCameras;
 
-    std::map<QnUuid, AsyncRequestInfo> m_asyncRunningRequests;
+    std::map<nx::Uuid, AsyncRequestInfo> m_asyncRunningRequests;
 
-    QSet<QnUuid> m_syncRunningRequests;
+    QSet<nx::Uuid> m_syncRunningRequests;
     mutable nx::Mutex m_syncLoadMutex;
     nx::WaitCondition m_syncLoadWaitCond;
-    QSet<QnUuid> m_camerasToCheck;
+    QSet<nx::Uuid> m_camerasToCheck;
     QnCommonMessageProcessor* m_messageProcessor = nullptr;
 };

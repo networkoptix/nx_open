@@ -11,9 +11,9 @@ namespace nx::vms::common {
 NX_VMS_COMMON_API bool checkIntercomCallPortExists(const QnVirtualCameraResourcePtr& camera);
 
 // Calculates intercom child layout id. It is unique for the intercom.
-NX_VMS_COMMON_API QnUuid calculateIntercomLayoutId(const QnResourcePtr& intercom);
+NX_VMS_COMMON_API nx::Uuid calculateIntercomLayoutId(const QnResourcePtr& intercom);
 
-NX_VMS_COMMON_API QnUuid calculateIntercomLayoutId(const QnUuid& intercomId);
+NX_VMS_COMMON_API nx::Uuid calculateIntercomLayoutId(const nx::Uuid& intercomId);
 
 // Checks if the resource is an intercom.
 // WARNING: It can return false negative result if an intercom is in removing process.

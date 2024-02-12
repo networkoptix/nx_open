@@ -74,7 +74,7 @@ bool UuidMover::move(const FieldMap& fields, QnJsonContext* ctx)
             for (auto& pathItem: path)
                 pathItem->isModified = true;
         }
-        else if (QnUuid(id->toString()) != QnUuid(bodyId->toString()))
+        else if (nx::Uuid(id->toString()) != nx::Uuid(bodyId->toString()))
         {
             setFailedKeyValue(ctx, field.second, *bodyId);
             return false;

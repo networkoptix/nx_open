@@ -28,21 +28,21 @@ public:
     RuleList rules() const;
 
  // Returns event rule by id.
-    RulePtr rule(const QnUuid& id) const;
+    RulePtr rule(const nx::Uuid& id) const;
 
  // These methods are called by common message processor.
     void resetRules(const RuleList& rules);
     void addOrUpdateRule(const RulePtr& rule);
-    void removeRule(const QnUuid& id);
+    void removeRule(const nx::Uuid& id);
 
 signals:
     void rulesReset(const nx::vms::event::RuleList& rules);
     void ruleAddedOrUpdated(const nx::vms::event::RulePtr& rule, bool added);
-    void ruleRemoved(const QnUuid& id);
+    void ruleRemoved(const nx::Uuid& id);
 
 private:
     mutable nx::Mutex m_mutex;
-    QHash<QnUuid, RulePtr> m_rules;
+    QHash<nx::Uuid, RulePtr> m_rules;
 };
 
 } // namespace event

@@ -49,8 +49,8 @@ public:
     bool hasCheckBoxes() const;
     void setHasCheckBoxes(bool value);
 
-    QSet<QnUuid> checkedRoles() const; //< Returns predefined and user role ids.
-    void setCheckedRoles(const QSet<QnUuid>& ids);
+    QSet<nx::Uuid> checkedRoles() const; //< Returns predefined and user role ids.
+    void setCheckedRoles(const QSet<nx::Uuid>& ids);
 
     /* QAbstractItemModel implementation. */
 

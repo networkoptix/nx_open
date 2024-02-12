@@ -35,7 +35,7 @@ public:
         int row, int count, const QModelIndex& parent = QModelIndex()) override;
 
 private:
-    nx::utils::KeyList<QnUuid> m_notifications;
+    nx::utils::KeyList<nx::Uuid> m_notifications;
 };
 
 } // nx::vms::client::desktop

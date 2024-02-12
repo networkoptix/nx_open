@@ -84,5 +84,5 @@ private:
      *
      * It is needed to prevent races when two concurrent changes to the same
      * item are synchronized there-and-back many times until finally converging. */
-    QSet<QnUuid> m_pendingItems;
+    QSet<nx::Uuid> m_pendingItems;
 };

@@ -24,7 +24,7 @@ public:
     /** Resource thumb constructor, used to create temporary camera replacement. */
     CrossSystemCameraResource(
         const QString& systemId,
-        const QnUuid& id,
+        const nx::Uuid& id,
         const QString& name);
     ~CrossSystemCameraResource() override;
 

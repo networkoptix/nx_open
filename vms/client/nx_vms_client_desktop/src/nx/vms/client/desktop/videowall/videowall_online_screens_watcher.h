@@ -21,13 +21,13 @@ public:
         nx::vms::common::SystemContext* systemContext,
         QObject* parent = nullptr);
 
-    std::set<QnUuid> onlineScreens() const;
+    std::set<nx::Uuid> onlineScreens() const;
 
 signals:
     void onlineScreensChanged();
 
 private:
-    std::set<QnUuid> m_onlineScreens;
+    std::set<nx::Uuid> m_onlineScreens;
 };
 
 } // namespace nx::vms::client::desktop

@@ -20,9 +20,9 @@ public:
     virtual QString cloudLogin() const = 0;
     virtual QnAbstractSystemsFinder::SystemDescriptionList systemsList() const = 0;
     virtual nx::vms::client::core::welcome_screen::TileVisibilityScope visibilityScope(
-        const QnUuid& localId) const = 0;
+        const nx::Uuid& localId) const = 0;
     virtual bool setScopeInfo(
-        const QnUuid& localId,
+        const nx::Uuid& localId,
         const QString& name,
         nx::vms::client::core::welcome_screen::TileVisibilityScope visibilityScope) = 0;
 

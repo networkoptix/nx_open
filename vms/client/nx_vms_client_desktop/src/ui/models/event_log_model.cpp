@@ -294,7 +294,7 @@ QnResourcePtr QnEventLogModel::getResource(
     return QnResourcePtr();
 }
 
-QString QnEventLogModel::getSubjectsText(const std::vector<QnUuid>& ids) const
+QString QnEventLogModel::getSubjectsText(const std::vector<nx::Uuid>& ids) const
 {
     QnUserResourceList users;
     nx::vms::api::UserGroupDataList groups;
@@ -311,14 +311,14 @@ QString QnEventLogModel::getSubjectsText(const std::vector<QnUuid>& ids) const
         : m_stringsHelper->actionSubjects(users, groups, false) + lit(", ") + removedSubjectsText;
 }
 
-QString QnEventLogModel::getSubjectNameById(const QnUuid& id) const
+QString QnEventLogModel::getSubjectNameById(const nx::Uuid& id) const
 {
     static const auto kRemovedUserName = '<' + tr("Subject removed") + '>';
 
     QnUserResourceList users;
     nx::vms::api::UserGroupDataList groups;
     nx::vms::common::getUsersAndGroups(
-        systemContext(), QVector<QnUuid>{id}, users, groups);
+        systemContext(), QVector<nx::Uuid>{id}, users, groups);
 
     return users.empty() && groups.empty()
         ? kRemovedUserName
@@ -327,7 +327,7 @@ QString QnEventLogModel::getSubjectNameById(const QnUuid& id) const
 
 QVariant QnEventLogModel::iconData(Column column, const vms::event::ActionData& action) const
 {
-    QnUuid resId;
+    nx::Uuid resId;
     switch (column)
     {
         case EventCameraColumn:
@@ -355,7 +355,7 @@ QVariant QnEventLogModel::iconData(Column column, const vms::event::ActionData& 
                   || actionType == ActionType::showOnAlarmLayoutAction)
             {
                 QnUserResourceList users;
-                QList<QnUuid> groups;
+                QList<nx::Uuid> groups;
                 nx::vms::common::getUsersAndGroups(systemContext(),
                     action.actionParams.additionalResources, users, groups);
                 const bool multiple = action.actionParams.additionalResources.empty()
@@ -376,7 +376,7 @@ QVariant QnEventLogModel::iconData(Column column, const vms::event::ActionData& 
     return qnResIconCache->icon(resourcePool->getResourceById(resId));
 }
 
-QString QnEventLogModel::getResourceNameString(const QnUuid& id) const
+QString QnEventLogModel::getResourceNameString(const nx::Uuid& id) const
 {
     return QnResourceDisplayInfo(resourcePool()->getResourceById(id)).toString(
         appContext()->localSettings()->resourceInfoLevel());
@@ -574,7 +574,7 @@ QString QnEventLogModel::tooltip(Column column, const vms::event::ActionData& ac
         QStringList disabledCameras;
         for (const QString& stringId: action.eventParams.description.split(';'))
         {
-            QnUuid id = QnUuid::fromStringSafe(stringId);
+            nx::Uuid id = nx::Uuid::fromStringSafe(stringId);
             NX_ASSERT(!id.isNull());
             if (auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(id))
                 disabledCameras << QnResourceDisplayInfo(camera).toString(Qn::RI_WithUrl);
@@ -594,7 +594,7 @@ QString QnEventLogModel::tooltip(Column column, const vms::event::ActionData& ac
 }
 
 
-bool QnEventLogModel::hasAccessToCamera(const QnUuid& cameraId) const
+bool QnEventLogModel::hasAccessToCamera(const nx::Uuid& cameraId) const
 {
     const auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(cameraId);
     NX_ASSERT(camera, "Resource is not a camera");
@@ -604,7 +604,7 @@ bool QnEventLogModel::hasAccessToCamera(const QnUuid& cameraId) const
     return systemContext()->accessController()->hasPermissions(camera, Qn::ReadPermission);
 }
 
-bool QnEventLogModel::hasAccessToArchive(const QnUuid& cameraId) const
+bool QnEventLogModel::hasAccessToArchive(const nx::Uuid& cameraId) const
 {
     const auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(cameraId);
     NX_ASSERT(camera, "Resource is not a camera");

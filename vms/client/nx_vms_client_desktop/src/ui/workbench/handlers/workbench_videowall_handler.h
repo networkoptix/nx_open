@@ -24,7 +24,7 @@ class QnWorkbenchItem;
 class QnWorkbenchLayout;
 class QnResourceWidget;
 class QTimer;
-class QnUuidPool;
+class UuidPool;
 
 namespace nx::vms::api { struct VideowallControlMessageData; }
 
@@ -73,18 +73,18 @@ private:
         const nx::vms::client::desktop::LayoutResourcePtr& secondLayout);
 
     /** Updates item's layout with provided value. Provided layout should be saved. */
-    void updateItemsLayout(const QnVideoWallItemIndexList& items, const QnUuid& layoutId);
+    void updateItemsLayout(const QnVideoWallItemIndexList& items, const nx::Uuid& layoutId);
 
     bool canStartVideowall(const QnVideoWallResourcePtr& videowall) const;
 
     void switchToVideoWallMode(const QnVideoWallResourcePtr& videoWall);
 
-    void openNewWindow(QnUuid videoWallId, const QnVideoWallItem& item);
+    void openNewWindow(nx::Uuid videoWallId, const QnVideoWallItem& item);
     void openVideoWallItem(const QnVideoWallResourcePtr& videoWall);
     void closeInstanceDelayed();
 
     /** Check if current client instance can start controlling the given videowall layout. */
-    bool canStartControlMode(const QnUuid& layoutId) const;
+    bool canStartControlMode(const nx::Uuid& layoutId) const;
 
     /** Enable/disable videowall direct control mode on the currently opened layout. */
     void setControlMode(bool active);
@@ -95,15 +95,15 @@ private:
 
     void handleMessage(
         const QnVideoWallControlMessage& message,
-        const QnUuid& controllerUuid = QnUuid(),
+        const nx::Uuid& controllerUuid = nx::Uuid(),
         qint64 sequence = -1);
 
     void storeMessage(
         const QnVideoWallControlMessage& message,
-        const QnUuid& controllerUuid,
+        const nx::Uuid& controllerUuid,
         qint64 sequence);
 
-    void restoreMessages(const QnUuid& controllerUuid, qint64 sequence);
+    void restoreMessages(const nx::Uuid& controllerUuid, qint64 sequence);
 
     /** Returns list of target videowall items for current layout. */
     QnVideoWallItemIndexList targetList() const;
@@ -112,8 +112,8 @@ private:
         const QnResourceList& resources) const;
     void cleanupUnusedLayouts(const QnVideoWallResourceList& videowalls = {});
 
-    void setItemOnline(const QnUuid& instanceGuid, bool online);
-    void setItemControlledBy(const QnUuid& layoutId, const QnUuid& controllerId, bool on);
+    void setItemOnline(const nx::Uuid& instanceGuid, bool online);
+    void setItemControlledBy(const nx::Uuid& layoutId, const nx::Uuid& controllerId, bool on);
     void updateMainWindowGeometry(const QnScreenSnaps& screenSnaps);
 
     void updateControlLayout(const QnVideoWallItem& item, ItemAction action);
@@ -134,7 +134,7 @@ private:
     void showLicensesErrorDialog(const QString& detail) const;
 
     /** Returns id of the running client that is currently controlling provided layout. */
-    QnUuid getLayoutController(const QnUuid& layoutId);
+    nx::Uuid getLayoutController(const nx::Uuid& layoutId);
 
     /** Check if user will not lose access to resources if remove them from layout. */
     bool confirmRemoveResourcesFromLayout(
@@ -254,10 +254,10 @@ private:
         bool active; /**< Client is run in videowall mode. */
         bool ready; /**< Resources are loaded. */
         bool opening; /**< We are currently opening videowall. */
-        QnUuid guid;
-        QnUuid instanceGuid; /**< Guid of the videowall item we are currently displaying. */
-        QHash<QnUuid, qint64> sequenceByPcUuid;
-        QHash<QnUuid, StoredMessagesHash> storedMessages;
+        nx::Uuid guid;
+        nx::Uuid instanceGuid; /**< Guid of the videowall item we are currently displaying. */
+        QHash<nx::Uuid, qint64> sequenceByPcUuid;
+        QHash<nx::Uuid, StoredMessagesHash> storedMessages;
     } m_videoWallMode;
 
     struct
@@ -271,6 +271,6 @@ private:
     } m_controlMode;
 
     nx::vms::license::VideoWallLicenseUsageHelper* m_licensesHelper;
-    QScopedPointer<QnUuidPool> m_uuidPool;
+    QScopedPointer<UuidPool> m_uuidPool;
     QScopedPointer<MultiscreenWidgetGeometrySetter> m_geometrySetter;
 };

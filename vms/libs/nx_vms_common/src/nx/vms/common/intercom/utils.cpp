@@ -26,12 +26,12 @@ bool checkIntercomCallPortExists(const QnVirtualCameraResourcePtr& camera)
         });
 }
 
-QnUuid calculateIntercomLayoutId(const QnResourcePtr& intercom)
+nx::Uuid calculateIntercomLayoutId(const QnResourcePtr& intercom)
 {
     return calculateIntercomLayoutId(intercom->getId());
 }
 
-QnUuid calculateIntercomLayoutId(const QnUuid& intercomId)
+nx::Uuid calculateIntercomLayoutId(const nx::Uuid& intercomId)
 {
     return guidFromArbitraryData(intercomId.toString() + "layout");
 }

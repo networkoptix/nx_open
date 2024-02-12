@@ -41,7 +41,7 @@ struct UploadState
     qint64 uploaded = 0;
 
     // UUID of the mediaserver we are uploading this file to.
-    QnUuid uuid;
+    nx::Uuid uuid;
 
     // Current status of the upload.
     Status status = Initial;
