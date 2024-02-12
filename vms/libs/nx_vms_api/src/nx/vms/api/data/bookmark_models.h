@@ -260,26 +260,35 @@ QN_FUSION_DECLARE_FUNCTIONS(BookmarkTagFilter, (json), NX_VMS_API)
 
 struct NX_VMS_API BookmarkProtection
 {
-    static QString getDigest(nx::Uuid bookmarkId, const QString& password);
+    static QString getDigest(const QString& bookmarkId, const QString& password);
     static QString getProtection(const QString& digest, std::chrono::milliseconds syncTime);
     static std::chrono::milliseconds getSyncTime(const QString& protection);
 
     /**%apidoc[opt]
      * Password protection used to authenticate the request if the Bookmark is password protected.
-     * Should be set to:
-     *   synchronizedTimeMs + ":" +
-     *      BASE64(SHA256(BASE64(SHA256(bookmarkId + password)) + synchronizedTimeMs))
-     *   Where synchronizedTimeMs should be obtained from /rest/v4/site/info
-     * Call will fail with
+     * Should be calculated as
+     * `synchronizedTimeMs + ":" + sha256hex(sha256hex(bookmarkId + password) + synchronizedTimeMs))`
+     * where `synchronizedTimeMs` should be obtained from `/rest/v{4-}/site/info`. Example:
+     * ```
+     * bookmarkId = '997d0166-0479-473f-8578-9b1c5aee14c6_00000000-8aeb-7d56-2bc7-67afae00335c'
+     * password = 'password123'
+     * synchronizedTimeMs = 1707754215123
+     * sha256hex(997d0166-0479-473f-8578-9b1c5aee14c6_00000000-8aeb-7d56-2bc7-67afae00335cpassword123)
+     * -- adad72a3a64631cfdbe5726b3c7a314df664f34905fae81266d302a91135b8c7
+     * sha256hex(adad72a3a64631cfdbe5726b3c7a314df664f34905fae81266d302a91135b8c71707754215123)
+     * -- 0e91c8bb106a4fcf1a407d896a21c6a96a7ed40c6161403af99985c3f1d405f7
+     * ?passwordProtection=1707754215123:0e91c8bb106a4fcf1a407d896a21c6a96a7ed40c6161403af99985c3f1d405f7
+     * ```
      */
     QString passwordProtection;
 };
+#define BookmarkProtection_Fields (passwordProtection)
 
 struct NX_VMS_API BookmarkDescriptionRequest: BookmarkIdV3, BookmarkProtection
 {
     using BookmarkIdV3::BookmarkIdV3;
 };
-#define BookmarkDescriptionRequest_Fields BookmarkIdV3_Fields (passwordProtection)
+#define BookmarkDescriptionRequest_Fields BookmarkIdV3_Fields BookmarkProtection_Fields
 NX_REFLECTION_INSTRUMENT(BookmarkDescriptionRequest, BookmarkDescriptionRequest_Fields);
 QN_FUSION_DECLARE_FUNCTIONS(BookmarkDescriptionRequest, (json), NX_VMS_API)
 
