@@ -92,7 +92,7 @@ void QnStreamRecorder::flushPrebuffer()
         m_prebuffer.pop(d);
         if (needSaveData(d))
             saveData(d);
-        else
+        else if (d->dataType == QnAbstractMediaData::VIDEO)
             markNeedKeyData();
     }
     m_nextIFrameTime = m_lastPrimaryTime = AV_NOPTS_VALUE;
