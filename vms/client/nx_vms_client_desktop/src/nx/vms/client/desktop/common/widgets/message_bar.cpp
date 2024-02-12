@@ -177,10 +177,11 @@ void CommonMessageBar::hideInFuture()
 void CommonMessageBar::init(const BarDescription& barDescription)
 {
     d->closeButton->setVisible(barDescription.isClosable || !barDescription.isEnabledProperty.isNull());
-    setPaletteColor(this, QPalette::Text,
-        (barDescription.level == BarDescription::BarLevel::Error
-            ? core::colorTheme()->color("red_l1")
-            : core::colorTheme()->color("light4")));
+    const auto& color = barDescription.level == BarDescription::BarLevel::Error
+        ? core::colorTheme()->color("red_l1")
+        : core::colorTheme()->color("light4");
+    setPaletteColor(this, QPalette::Text, color);
+    setPaletteColor(this, QPalette::Link, color);
 
     d->closeButton->setIcon(barDescription.level == BarDescription::BarLevel::Error
         ? qnSkin->icon("banners/close.svg", kErrorTextButtonColors)
