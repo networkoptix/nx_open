@@ -1337,9 +1337,6 @@ enum IDType
 
     VxGlobalDebugAction,
 
-    VxStartTalkdownAction,
-    VxStopTalkdownAction,
-
     /**
      * Opens the Audit Log dialog.
      */
