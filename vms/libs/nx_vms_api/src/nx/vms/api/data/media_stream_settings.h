@@ -7,6 +7,7 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 
+#include "bookmark_models.h"
 #include "media_settings.h"
 
 namespace nx::vms::api {
@@ -117,18 +118,12 @@ struct NX_VMS_API MediaStreamSettings: public StreamSettings
 QN_FUSION_DECLARE_FUNCTIONS(MediaStreamSettings, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(MediaStreamSettings, MediaStreamSettings_Fields)
 
-struct NX_VMS_API BookmarkStreamSettings: public StreamSettings
+struct NX_VMS_API BookmarkStreamSettings: public StreamSettings, public BookmarkProtection
 {
+    /** Can be obtained from `/rest/v{4-}/devices/&ast;/bookmarks`. */
     QString bookmarkId;
-    /**%apidoc[opt]
-     * Password protection used to authenticate the request if the Bookmark is password protected.
-     * Should be set to:
-     *   synchronizedTimeMs + ":" + SHA256(SHA256(bookmarkId + password) + synchronizedTimeMs)
-     *   Where synchronizedTimeMs should be obtained from /rest/v4/site/info
-     */
-    QString passwordProtection;
 };
-#define BookmarkStreamSettings_Fields StreamSettings_Fields(bookmarkId)(passwordProtection)
+#define BookmarkStreamSettings_Fields StreamSettings_Fields BookmarkProtection_Fields (bookmarkId)
 QN_FUSION_DECLARE_FUNCTIONS(BookmarkStreamSettings, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(BookmarkStreamSettings, BookmarkStreamSettings_Fields)
 

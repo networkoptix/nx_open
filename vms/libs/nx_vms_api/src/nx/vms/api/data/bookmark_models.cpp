@@ -93,19 +93,17 @@ QString BookmarkProtection::getProtection(
     hasher.addData(digest.toUtf8());
     hasher.addData(QByteArray().setNum(synchronizedMs.count()));
 
-    nx::Buffer hashResult(hasher.result());
-    return QString::number(synchronizedMs.count()) + ":"
-        + QString::fromStdString(hashResult.toBase64());
+    return QString::number(synchronizedMs.count()) + ":" + hasher.result().toHex();
 }
 
-QString BookmarkProtection::getDigest(nx::Uuid bookmarkId, const QString& password)
+QString BookmarkProtection::getDigest(const QString& bookmarkId, const QString& password)
 {
     nx::utils::QnCryptographicHash hasher(nx::utils::QnCryptographicHash::Algorithm::Sha256);
 
-    hasher.addData(bookmarkId.toString().toUtf8());
+    hasher.addData(bookmarkId.toUtf8());
     hasher.addData(password.toUtf8());
 
-    return QString::fromStdString(nx::Buffer(hasher.result()).toBase64());
+    return hasher.result().toHex();
 }
 
 } // namespace nx::vms::api
