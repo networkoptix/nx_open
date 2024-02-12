@@ -17,8 +17,8 @@ GenericEvent::GenericEvent(
     const QString& caption,
     const QString& description,
     const QString& source,
-    QnUuid serverId,
-    const QnUuidList& deviceIds)
+    nx::Uuid serverId,
+    const UuidList& deviceIds)
     :
     base_type(timestamp, caption, description),
     m_source(source),

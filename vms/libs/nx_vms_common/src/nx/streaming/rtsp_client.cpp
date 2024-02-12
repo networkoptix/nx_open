@@ -1024,7 +1024,7 @@ void QnRtspClient::addRangeHeader( nx::network::http::Request* const request, qi
 QByteArray QnRtspClient::getGuid()
 {
     // client guid. used in proprietary extension.
-    static QByteArray s_guid(QnUuid::createUuid().toString().toUtf8());
+    static QByteArray s_guid(nx::Uuid::createUuid().toString().toUtf8());
     return s_guid;
 }
 

@@ -25,7 +25,7 @@ public:
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
 
     virtual int deleteRule(
-        const QnUuid& ruleId,
+        const nx::Uuid& ruleId,
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
 
@@ -61,9 +61,9 @@ int EventRulesManager<T>::getEventRules(
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
     const int requestId = generateRequestID();
-    processor().template processQueryAsync<QnUuid, nx::vms::api::EventRuleDataList>(
+    processor().template processQueryAsync<nx::Uuid, nx::vms::api::EventRuleDataList>(
         ApiCommand::getEventRules,
-        QnUuid(),
+        nx::Uuid(),
         [requestId, handler = handlerExecutor.bind(std::move(handler))](auto&&... args) mutable
         {
             handler(requestId, std::move(args)...);
@@ -90,7 +90,7 @@ int EventRulesManager<T>::save(
 
 template<class T>
 int EventRulesManager<T>::deleteRule(
-    const QnUuid& ruleId,
+    const nx::Uuid& ruleId,
     Handler<> handler,
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {

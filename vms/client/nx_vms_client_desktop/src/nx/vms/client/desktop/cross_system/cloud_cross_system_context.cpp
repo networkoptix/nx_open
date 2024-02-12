@@ -296,7 +296,7 @@ struct CloudCrossSystemContext::Private
             return;
         }
 
-        const QnUuid serverId = connection->moduleInformation().id;
+        const nx::Uuid serverId = connection->moduleInformation().id;
         server = CrossSystemServerResourcePtr(new CrossSystemServerResource(connection));
         server->setIdUnsafe(serverId);
 
@@ -456,7 +456,7 @@ struct CloudCrossSystemContext::Private
         }
     }
 
-    QnVirtualCameraResourcePtr createThumbCameraResource(const QnUuid& id, const QString& name)
+    QnVirtualCameraResourcePtr createThumbCameraResource(const nx::Uuid& id, const QString& name)
     {
         const auto camera = CrossSystemCameraResourcePtr(
             new CrossSystemCameraResource(systemDescription->id(), id, name));
@@ -605,7 +605,7 @@ bool CloudCrossSystemContext::initializeConnectionWithUserInteraction()
 }
 
 QnVirtualCameraResourcePtr CloudCrossSystemContext::createThumbCameraResource(
-    const QnUuid& id,
+    const nx::Uuid& id,
     const QString& name)
 {
     return d->createThumbCameraResource(id, name);

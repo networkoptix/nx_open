@@ -28,8 +28,8 @@ void Metatypes::initialize()
 
     qRegisterMetaType<Url>();
 
-    qRegisterMetaType<QnUuid>();
-    qRegisterMetaType<QSet<QnUuid>>("QSet<QnUuid>");
+    qRegisterMetaType<nx::Uuid>();
+    qRegisterMetaType<QSet<nx::Uuid>>("QSet<nx::Uuid>");
 
     qRegisterMetaType<SharedGuardPtr>();
     qRegisterMetaType<SoftwareVersion>();

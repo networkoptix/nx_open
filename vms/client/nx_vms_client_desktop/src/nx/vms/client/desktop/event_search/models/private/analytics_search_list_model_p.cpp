@@ -97,7 +97,7 @@ void subtractKeysFromSet(Set& minuend, const Hash& subtrahend)
 
 } // namespace
 
-int AnalyticsSearchListModel::Private::Storage::indexOf(const QnUuid& trackId) const
+int AnalyticsSearchListModel::Private::Storage::indexOf(const nx::Uuid& trackId) const
 {
     const auto timestampIter = idToTimestamp.find(trackId);
     if (timestampIter == idToTimestamp.end())
@@ -106,7 +106,7 @@ int AnalyticsSearchListModel::Private::Storage::indexOf(const QnUuid& trackId) c
     const auto iter = std::lower_bound(
         items.cbegin(), items.cend(),
         std::make_pair(*timestampIter, trackId),
-        [](const ObjectTrack& left, std::pair<milliseconds, QnUuid> right)
+        [](const ObjectTrack& left, std::pair<milliseconds, nx::Uuid> right)
         {
             const auto leftTime = startTime(left);
             return leftTime > right.first || (leftTime == right.first && left.id > right.second);
@@ -392,12 +392,12 @@ void AnalyticsSearchListModel::Private::setSelectedObjectTypes(const QStringList
     updateRelevantObjectTypes();
 }
 
-QnUuid AnalyticsSearchListModel::Private::selectedEngine() const
+nx::Uuid AnalyticsSearchListModel::Private::selectedEngine() const
 {
     return m_selectedEngine;
 }
 
-void AnalyticsSearchListModel::Private::setSelectedEngine(const QnUuid& value)
+void AnalyticsSearchListModel::Private::setSelectedEngine(const nx::Uuid& value)
 {
     if (m_selectedEngine == value)
         return;
@@ -1013,7 +1013,7 @@ void AnalyticsSearchListModel::Private::processMetadata()
     };
 
     const auto findObject =
-        [this](const QnUuid& trackId) -> FoundObjectTrack
+        [this](const nx::Uuid& trackId) -> FoundObjectTrack
         {
             int index = m_newTracks.indexOf(trackId);
             if (index >= 0)

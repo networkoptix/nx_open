@@ -40,7 +40,7 @@ bool parseHttpRequestParams(
     nx::vms::common::SystemContext* systemContext,
     const QString& command,
     const nx::network::rest::Params& params,
-    QnUuid* id);
+    nx::Uuid* id);
 
 bool parseHttpRequestParams(
     nx::vms::common::SystemContext* systemContext,
@@ -54,7 +54,7 @@ bool parseHttpRequestParams(
     const nx::network::rest::Params& params,
     QnLayoutUuid* id);
 
-void toUrlParams(const QnUuid& id, QUrlQuery* query);
+void toUrlParams(const nx::Uuid& id, QUrlQuery* query);
 
 bool parseHttpRequestParams(
     nx::vms::common::SystemContext* systemContext,

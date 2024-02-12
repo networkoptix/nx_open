@@ -10,7 +10,7 @@
 namespace nx::vms::api {
 
 const QString UserData::kResourceTypeName = lit("User");
-const QnUuid UserData::kResourceTypeId =
+const nx::Uuid UserData::kResourceTypeId =
     ResourceData::getFixedTypeId(UserData::kResourceTypeName);
 
 constexpr const char* UserData::kCloudPasswordStub;
@@ -21,13 +21,13 @@ void UserData::fillId()
     if (type == UserType::cloud)
     {
         if (!email.isEmpty())
-            id = QnUuid::fromArbitraryData(email);
+            id = nx::Uuid::fromArbitraryData(email);
         else
-            id = QnUuid();
+            id = nx::Uuid();
     }
     else
     {
-        id = QnUuid::createUuid();
+        id = nx::Uuid::createUuid();
     }
 }
 

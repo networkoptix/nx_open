@@ -84,7 +84,7 @@ public:
 
 signals:
     void itemAdded(const Item& item);
-    void itemRemoved(const QnUuid& itemId);
+    void itemRemoved(const nx::Uuid& itemId);
     void itemChanged(const Item& item);
 
     /** @} */ // group vms-tab

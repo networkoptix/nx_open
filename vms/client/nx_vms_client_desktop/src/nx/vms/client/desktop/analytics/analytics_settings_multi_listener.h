@@ -32,15 +32,15 @@ public:
         QObject* parent = nullptr);
     virtual ~AnalyticsSettingsMultiListener() override;
 
-    DeviceAgentData data(const QnUuid& engineId) const;
+    DeviceAgentData data(const nx::Uuid& engineId) const;
 
-    QSet<QnUuid> engineIds() const;
+    QSet<nx::Uuid> engineIds() const;
 
 signals:
     void enginesChanged();
-    void dataChanged(const QnUuid& engineId, const DeviceAgentData& data);
-    void previewDataReceived(const QnUuid& engineId, const DeviceAgentData& data);
-    void actionResultReceived(const QnUuid& engineId, const AnalyticsActionResult& result);
+    void dataChanged(const nx::Uuid& engineId, const DeviceAgentData& data);
+    void previewDataReceived(const nx::Uuid& engineId, const DeviceAgentData& data);
+    void actionResultReceived(const nx::Uuid& engineId, const AnalyticsActionResult& result);
 
 private:
     class Private;

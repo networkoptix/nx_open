@@ -65,7 +65,7 @@ void QnEventLogFilterData::loadFromParams(
         params.value(kActionTypeParam).toStdString(),
         actionType);
 
-    ruleId = QnLexical::deserialized<QnUuid>(params.value(kRuleIdParam));
+    ruleId = QnLexical::deserialized<nx::Uuid>(params.value(kRuleIdParam));
     text = params.value(kTextParam);
     eventsOnly = params.contains(kEventsOnlyParam);
     if (eventsOnly)

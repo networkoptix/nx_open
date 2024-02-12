@@ -14,7 +14,7 @@ class VideoWallMatrixItem: public entity_item_model::AbstractItem
 {
     using base_type = entity_item_model::AbstractItem;
 public:
-    VideoWallMatrixItem(const QnVideoWallResourcePtr& videoWall, const QnUuid& matrixId);
+    VideoWallMatrixItem(const QnVideoWallResourcePtr& videoWall, const nx::Uuid& matrixId);
 
     /**
      * Implements AbstractItem::data().

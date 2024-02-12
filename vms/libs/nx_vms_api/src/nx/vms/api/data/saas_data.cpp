@@ -39,8 +39,8 @@ void assignField(const SaasServiceParameters& parameters, const Field<T>& field)
     {
         if (auto it = parameters.find(field.name); it != parameters.end())
         {
-            if constexpr (std::is_same<T, QnUuid>::value)
-                *field.value = QnUuid(std::get<std::string>(it->second));
+            if constexpr (std::is_same<T, nx::Uuid>::value)
+                *field.value = nx::Uuid(std::get<std::string>(it->second));
             else
                 *field.value = std::get<T>(it->second);
         }

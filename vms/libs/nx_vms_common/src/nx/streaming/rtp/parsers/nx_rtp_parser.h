@@ -16,7 +16,7 @@ class NX_VMS_COMMON_API QnNxRtpParser
 {
 public:
     /** @param tag Human-readable tag for logging. */
-    QnNxRtpParser(QnUuid deviceId, const QString& tag);
+    QnNxRtpParser(nx::Uuid deviceId, const QString& tag);
 
     Result processData(const uint8_t* data, int size, bool& gotData);
     QnAbstractMediaDataPtr nextData();
@@ -35,7 +35,7 @@ private:
 
 private:
     nx::utils::SoftwareVersion m_serverVersion;
-    const QnUuid m_deviceId;
+    const nx::Uuid m_deviceId;
     CodecParametersConstPtr m_context;
     QnAbstractMediaDataPtr m_mediaData;
     QnAbstractMediaDataPtr m_nextDataPacket;

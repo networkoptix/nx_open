@@ -25,16 +25,16 @@ struct NX_VMS_COMMON_API UserAccessData
     using TimePoint = Clock::time_point;
     using Duration = std::chrono::milliseconds;
 
-    QnUuid userId;
+    nx::Uuid userId;
     Access access = Access::Default;
 
     explicit UserAccessData(
-        QnUuid userId, Access access = Access::Default);
+        nx::Uuid userId, Access access = Access::Default);
     explicit UserAccessData(
-        QnUuid userId, Token token,
+        nx::Uuid userId, Token token,
         Duration duration, TimePoint issued = nx::utils::monotonicTime());
     explicit UserAccessData(
-        QnUuid userId, Token token,
+        nx::Uuid userId, Token token,
         Duration age, Duration expiresIn, TimePoint now = nx::utils::monotonicTime());
 
     UserAccessData() = default;

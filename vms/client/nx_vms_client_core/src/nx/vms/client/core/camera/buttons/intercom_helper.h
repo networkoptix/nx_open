@@ -12,7 +12,7 @@ struct IntercomHelper
 {
     static constexpr std::chrono::milliseconds kOpenedDoorDuration = std::chrono::seconds(6);
 
-    static QnUuid intercomOpenDoorRuleId(const QnUuid& cameraId);
+    static nx::Uuid intercomOpenDoorRuleId(const nx::Uuid& cameraId);
 };
 
 } // namespace nx::vms::client::core

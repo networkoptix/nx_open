@@ -562,7 +562,7 @@ void QnMediaResourceWidget::beforeDestroy()
 }
 
 void QnMediaResourceWidget::handleItemDataChanged(
-    const QnUuid& id,
+    const nx::Uuid& id,
     Qn::ItemDataRole role,
     const QVariant& data)
 {
@@ -1234,18 +1234,18 @@ void QnMediaResourceWidget::suspendHomePtzController()
         homePtzController->suspend();
 }
 
-void QnMediaResourceWidget::hideTextOverlay(const QnUuid& id)
+void QnMediaResourceWidget::hideTextOverlay(const nx::Uuid& id)
 {
     setTextOverlayParameters(id, false, QString(), QnHtmlTextItemOptions());
 }
 
-void QnMediaResourceWidget::showTextOverlay(const QnUuid& id, const QString& text,
+void QnMediaResourceWidget::showTextOverlay(const nx::Uuid& id, const QString& text,
     const QnHtmlTextItemOptions& options)
 {
     setTextOverlayParameters(id, true, text, options);
 }
 
-void QnMediaResourceWidget::setTextOverlayParameters(const QnUuid& id, bool visible,
+void QnMediaResourceWidget::setTextOverlayParameters(const nx::Uuid& id, bool visible,
     const QString& text, const QnHtmlTextItemOptions& options)
 {
     if (!m_textOverlayWidget)

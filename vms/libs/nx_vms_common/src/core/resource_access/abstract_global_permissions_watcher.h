@@ -20,10 +20,10 @@ class NX_VMS_COMMON_API AbstractGlobalPermissionsWatcher: public QObject
 public:
     explicit AbstractGlobalPermissionsWatcher(QObject* parent = nullptr): QObject(parent) {}
 
-    virtual nx::vms::api::GlobalPermissions ownGlobalPermissions(const QnUuid& subjectId) const = 0;
+    virtual nx::vms::api::GlobalPermissions ownGlobalPermissions(const nx::Uuid& subjectId) const = 0;
 
 signals:
-    void ownGlobalPermissionsChanged(const QnUuid& subjectId);
+    void ownGlobalPermissionsChanged(const nx::Uuid& subjectId);
     void globalPermissionsReset();
 };
 

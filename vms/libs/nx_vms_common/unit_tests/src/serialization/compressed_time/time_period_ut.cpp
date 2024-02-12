@@ -172,7 +172,7 @@ TEST( TimePeriodCompressedSerializationTest, SerializeCompressedMultiServerPerio
     MultiServerPeriodDataList srcData;
 
     MultiServerPeriodData data;
-    data.guid = QnUuid::createUuid();
+    data.guid = nx::Uuid::createUuid();
 
     data.periods.push_back(QnTimePeriod(1429889084026, 1353727));
     data.periods.push_back(QnTimePeriod(1429891331259, 864863));

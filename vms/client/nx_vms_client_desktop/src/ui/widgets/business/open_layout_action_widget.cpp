@@ -156,7 +156,7 @@ void OpenLayoutActionWidget::checkWarnings()
 
     QnResourcePtr layout = getSelectedLayout();
     QnUserResourceList users;
-    QList<QnUuid> roles;
+    QList<nx::Uuid> roles;
     std::tie(users, roles) = getSelectedUsersAndRoles();
 
     bool foundUserWarning = false;
@@ -221,10 +221,10 @@ QnLayoutResourcePtr OpenLayoutActionWidget::getSelectedLayout()
     return m_selectedLayout;
 }
 
-std::pair<QnUserResourceList, QList<QnUuid>> OpenLayoutActionWidget::getSelectedUsersAndRoles()
+std::pair<QnUserResourceList, QList<nx::Uuid>> OpenLayoutActionWidget::getSelectedUsersAndRoles()
 {
     QnUserResourceList users;
-    QList<QnUuid> groupIds;
+    QList<nx::Uuid> groupIds;
     if (model())
     {
         const auto params = model()->actionParams();
@@ -301,13 +301,13 @@ void OpenLayoutActionWidget::openLayoutSelectionDialog()
     LayoutSelectionDialog dialog(singlePick, this);
 
     QnUserResourceList users;
-    QList<QnUuid> roles;
+    QList<nx::Uuid> roles;
     std::tie(users, roles) = getSelectedUsersAndRoles();
 
     LayoutSelectionDialog::LocalLayoutSelection selectionMode =
         LayoutSelectionDialog::ModeFull;
 
-    QSet<QnUuid> selection;
+    QSet<nx::Uuid> selection;
     if (auto layout = getSelectedLayout())
         selection.insert(layout->getId());
 
@@ -383,7 +383,7 @@ void OpenLayoutActionWidget::openLayoutSelectionDialog()
         auto selection = dialog.checkedLayouts();
         if (selection.empty())
         {
-            params.actionResourceId = QnUuid();
+            params.actionResourceId = nx::Uuid();
         }
         else
         {

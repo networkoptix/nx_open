@@ -270,7 +270,7 @@ void AnalyticsSearchSynchronizer::updateAreaSelection()
 
 void AnalyticsSearchSynchronizer::updateCachedDevices()
 {
-    std::map<SystemContext*, QnUuidSet> cachedDevicesByContext;
+    std::map<SystemContext*, UuidSet> cachedDevicesByContext;
     if (active() && m_commonSetup)
     {
         for (const auto& camera: m_commonSetup->selectedCameras())
@@ -389,7 +389,7 @@ void AnalyticsSearchSynchronizer::setAreaSelectionActive(bool value)
     updateAllMediaResourceWidgetsAnalyticsMode();
 }
 
-void AnalyticsSearchSynchronizer::ensureVisible(milliseconds timestamp, const QnUuid& trackId,
+void AnalyticsSearchSynchronizer::ensureVisible(milliseconds timestamp, const nx::Uuid& trackId,
     const QnTimePeriod& proposedTimeWindow)
 {
     for (auto instance: instances())

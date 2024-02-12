@@ -300,7 +300,7 @@ bool QnSearchBookmarksDialogPrivate::fillActionParameters(menu::Parameters &para
 
     QnCameraBookmarkList bookmarks;
     QnResourceList resourcesList;
-    QSet<QnUuid> bookmarkIds;   /*< Make sure we will have no duplicates in all cases. */
+    QSet<nx::Uuid> bookmarkIds;   /*< Make sure we will have no duplicates in all cases. */
     for (const QModelIndex &index: selection)
     {
         const auto bookmark = bookmarkFromIndex(index);
@@ -394,7 +394,7 @@ QnVirtualCameraResourceList QnSearchBookmarksDialogPrivate::availableCameras() c
 }
 
 QnVirtualCameraResourcePtr QnSearchBookmarksDialogPrivate::availableCameraById(
-    const QnUuid& cameraId) const
+    const nx::Uuid& cameraId) const
 {
     const auto cameras = availableCameras();
 
@@ -415,7 +415,7 @@ void QnSearchBookmarksDialogPrivate::setCameras(const QnVirtualCameraResourceLis
     const auto &correctCameras = (m_allCamerasChoosen
         ? availableCameras() : cameras);
 
-    std::set<QnUuid> cameraIds;
+    std::set<nx::Uuid> cameraIds;
     for (const auto& camera: correctCameras)
         cameraIds.insert(camera->getId());
     m_model->setCameras(cameraIds);
@@ -428,7 +428,7 @@ void QnSearchBookmarksDialogPrivate::setCameras(const QnVirtualCameraResourceLis
 
 void QnSearchBookmarksDialogPrivate::chooseCamera()
 {
-    QnUuidSet cameraIds;
+    UuidSet cameraIds;
     if (!m_allCamerasChoosen)
     {
         for (auto id: m_model->cameras())

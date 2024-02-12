@@ -43,9 +43,9 @@ QString propertyToString(const AggregatedEventPtr& event, const char* key)
     return value.isValid() && value.canConvert<QString>() ? value.toString() : QString();
 }
 
-QnUuid eventSourceId(const AggregatedEventPtr& eventAggregator)
+nx::Uuid eventSourceId(const AggregatedEventPtr& eventAggregator)
 {
-    return eventAggregator ? sourceId(eventAggregator->initialEvent().get()) : QnUuid();
+    return eventAggregator ? sourceId(eventAggregator->initialEvent().get()) : nx::Uuid();
 }
 
 } // namespace
@@ -120,7 +120,7 @@ QString extendedEventDescription(
         eventAggregator->initialEvent()->timestamp(), static_cast<int>(eventAggregator->count()));
 
     if (const auto it = eventDetails.find(utils::kPluginIdDetailName); it != eventDetails.end())
-        extendedDescription << QString("Plugin: %1").arg(stringHelper.plugin(it->value<QnUuid>()));
+        extendedDescription << QString("Plugin: %1").arg(stringHelper.plugin(it->value<nx::Uuid>()));
 
     if (const auto it = eventDetails.find(utils::kExtraCaptionDetailName);
         it != eventDetails.end())

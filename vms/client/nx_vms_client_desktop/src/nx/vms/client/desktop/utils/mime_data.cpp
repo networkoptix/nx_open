@@ -60,7 +60,7 @@ namespace nx::vms::client::desktop {
 struct MimeData::Private
 {
     QHash<QString, QByteArray> data;
-    QList<QnUuid> entities;
+    QList<nx::Uuid> entities;
     QnResourceList resources;
     QHash<int, QVariant> arguments;
 
@@ -142,7 +142,7 @@ struct MimeData::Private
         {
             QString sid;
             stream >> sid;
-            const QnUuid id(sid);
+            const nx::Uuid id(sid);
 
             if (auto resource = resourcePool->getResourceById(id))
             {
@@ -204,7 +204,7 @@ struct MimeData::Private
 
             for (int i = 0; i < entitiesCount; i++)
             {
-                QnUuid id;
+                nx::Uuid id;
                 stream >> id;
                 entities.push_back(id);
             }
@@ -348,12 +348,12 @@ void MimeData::setResources(const QnResourceList& resources)
     d->updateInternalStorage();
 }
 
-QList<QnUuid> MimeData::entities() const
+QList<nx::Uuid> MimeData::entities() const
 {
     return d->entities;
 }
 
-void MimeData::setEntities(const QList<QnUuid>& ids)
+void MimeData::setEntities(const QList<nx::Uuid>& ids)
 {
     d->entities = ids;
     d->updateInternalStorage();
@@ -420,7 +420,7 @@ bool MimeData::allowedInWindowContext(const WindowContext* context) const
         return true; //< Allow to drag'n'drop local files.
 
     const auto user = context->system()->user();
-    if (!user || user->getId() != QnUuid::fromString(userId.data()))
+    if (!user || user->getId() != nx::Uuid::fromString(userId.data()))
         return false;
 
     if (user->isCloud())

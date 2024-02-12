@@ -69,7 +69,7 @@ struct NX_VMS_COMMON_API ActionData
     EventParameters eventParams;
 
     /**%apidoc Id of the Event Rule. */
-    QnUuid businessRuleId; //< TODO: Should be renamed to eventRuleId, considering compatibility.
+    nx::Uuid businessRuleId; //< TODO: Should be renamed to eventRuleId, considering compatibility.
 
     /**%apidoc Number of identical Events grouped into one. */
     int aggregationCount;
@@ -105,12 +105,12 @@ public:
      * see: requiresCameraResource()
      * see: requiresUserResource()
      */
-    void setResources(const QVector<QnUuid>& resources);
+    void setResources(const QVector<nx::Uuid>& resources);
 
-    const QVector<QnUuid>& getResources() const;
+    const QVector<nx::Uuid>& getResources() const;
 
     /** Source resource of the action (including custom for generic events). */
-    QVector<QnUuid> getSourceResources(const QnResourcePool* resourcePool) const;
+    QVector<nx::Uuid> getSourceResources(const QnResourcePool* resourcePool) const;
 
     void setParams(const ActionParameters& params);
     const ActionParameters& getParams() const;
@@ -120,8 +120,8 @@ public:
     const EventParameters& getRuntimeParams() const;
     EventParameters& getRuntimeParams();
 
-    void setRuleId(const QnUuid& value);
-    QnUuid getRuleId() const;
+    void setRuleId(const nx::Uuid& value);
+    nx::Uuid getRuleId() const;
 
     void setToggleState(EventState value);
     EventState getToggleState() const;
@@ -148,10 +148,10 @@ protected:
     ActionType m_actionType;
     EventState m_toggleState;
     bool m_receivedFromRemoteHost;
-    QVector<QnUuid> m_resources;
+    QVector<nx::Uuid> m_resources;
     ActionParameters m_params;
     EventParameters m_runtimeParams;
-    QnUuid m_ruleId; // event rule that generated this action
+    nx::Uuid m_ruleId; // event rule that generated this action
     int m_aggregationCount;
 };
 

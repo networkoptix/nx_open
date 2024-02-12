@@ -50,7 +50,7 @@ void VmsRulesDialog::addRule()
 {
     auto engine = systemContext()->vmsRulesEngine();
 
-    auto newRule = std::make_shared<vms::rules::Rule>(QnUuid::createUuid(), engine);
+    auto newRule = std::make_shared<vms::rules::Rule>(nx::Uuid::createUuid(), engine);
 
     auto eventFilter = engine->buildEventFilter(vms::rules::GenericEvent::manifest().id);
     auto actionBuilder = engine->buildActionBuilder(vms::rules::NotificationAction::manifest().id);
@@ -71,7 +71,7 @@ void VmsRulesDialog::addRule()
     saveRuleImpl(newRule);
 }
 
-void VmsRulesDialog::editSchedule(const QnUuidList& ids)
+void VmsRulesDialog::editSchedule(const UuidList& ids)
 {
     if (!NX_ASSERT(!ids.empty()))
         return;
@@ -100,7 +100,7 @@ void VmsRulesDialog::editSchedule(const QnUuidList& ids)
     }
 }
 
-void VmsRulesDialog::duplicateRule(QnUuid id)
+void VmsRulesDialog::duplicateRule(nx::Uuid id)
 {
     auto engine = systemContext()->vmsRulesEngine();
 
@@ -108,9 +108,9 @@ void VmsRulesDialog::duplicateRule(QnUuid id)
     if (!NX_ASSERT(clone))
         return;
 
-    clone->setId(QnUuid::createUuid()); //< Change id to prevent rule override on save request.
+    clone->setId(nx::Uuid::createUuid()); //< Change id to prevent rule override on save request.
     if (auto uniqueIdField = clone->eventFilters().at(0)->fieldByType<vms::rules::UniqueIdField>())
-        uniqueIdField->setId(QnUuid::createUuid()); //< Fix field uniqueness after cloning. TODO: #mmalofeev fix this workaround.
+        uniqueIdField->setId(nx::Uuid::createUuid()); //< Fix field uniqueness after cloning. TODO: #mmalofeev fix this workaround.
 
     EditVmsRuleDialog editVmsRuleDialog(m_parentWidget);
 
@@ -122,7 +122,7 @@ void VmsRulesDialog::duplicateRule(QnUuid id)
     saveRuleImpl(clone);
 }
 
-void VmsRulesDialog::editRule(QnUuid id)
+void VmsRulesDialog::editRule(nx::Uuid id)
 {
     auto engine = systemContext()->vmsRulesEngine();
 
@@ -148,7 +148,7 @@ void VmsRulesDialog::editRule(QnUuid id)
     saveRuleImpl(clone);
 }
 
-void VmsRulesDialog::deleteRules(const QnUuidList& ids)
+void VmsRulesDialog::deleteRules(const UuidList& ids)
 {
     if (ConfirmationDialogs::confirmDelete(m_parentWidget, ids.size()))
         deleteRulesImpl(ids);
@@ -165,7 +165,7 @@ void VmsRulesDialog::openEventLogDialog()
     action(menu::OpenEventLogAction)->trigger();
 }
 
-void VmsRulesDialog::deleteRulesImpl(const QnUuidList& ids)
+void VmsRulesDialog::deleteRulesImpl(const UuidList& ids)
 {
     auto connection = messageBusConnection();
     if (!connection)

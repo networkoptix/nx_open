@@ -86,7 +86,7 @@ Rule management (and a part of rule processing) is implemented using ec2 transac
 
 In order to transfer data between servers and clients, it's been serialized / deserialized via fromResourceToApi() / fromApiToResource() calls:
 - [EventRuleData](@ref ec2::EventRuleData) class represents instances of Rules, it's used to create or update existing rules;
-- QnUuid (RuleId) is used to remove existing rules;
+- nx::Uuid (RuleId) is used to remove existing rules;
 - [ResetEventRulesData](@ref ec2::ResetEventRulesData) class is used to send 'Reset rules' transaction, it contains no useful data, but currently is required for template matching;
 - [EventActionData](@ref ec2::EventActionData) class is used to send executing Actions (in sendAction() / broadcastAction() methods);
 

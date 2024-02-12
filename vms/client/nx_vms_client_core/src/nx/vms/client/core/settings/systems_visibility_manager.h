@@ -22,15 +22,15 @@ public:
 
     static SystemsVisibilityManager* instance();
 
-    void removeSystemData(const QnUuid& localId);
+    void removeSystemData(const nx::Uuid& localId);
 
     welcome_screen::TileVisibilityScope cloudTileScope() const;
     void setCloudTileScope(welcome_screen::TileVisibilityScope visibilityScope);
 
-    QString systemName(const QnUuid& localId) const;
-    welcome_screen::TileVisibilityScope scope(const QnUuid& localId) const;
+    QString systemName(const nx::Uuid& localId) const;
+    welcome_screen::TileVisibilityScope scope(const nx::Uuid& localId) const;
 
-    bool setScopeInfo(const QnUuid& localId, const QString& name,
+    bool setScopeInfo(const nx::Uuid& localId, const QString& name,
         welcome_screen::TileVisibilityScope visibilityScope);
 
 private:

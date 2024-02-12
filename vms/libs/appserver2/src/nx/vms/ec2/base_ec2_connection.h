@@ -96,18 +96,18 @@ public:
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
 
     virtual void addRemotePeer(
-        const QnUuid& id,
+        const nx::Uuid& id,
         nx::vms::api::PeerType peerType,
         const nx::utils::Url& url,
         nx::network::ssl::AdapterFunc adapterFunc) override;
 
-    virtual void deleteRemotePeer(const QnUuid& id) override;
+    virtual void deleteRemotePeer(const nx::Uuid& id) override;
 
     QueryProcessorType* queryProcessor() const { return m_queryProcessor; }
     virtual ECConnectionNotificationManager* notificationManager() override;
 
-    virtual QnUuid routeToPeerVia(
-        const QnUuid& dstPeer,
+    virtual nx::Uuid routeToPeerVia(
+        const nx::Uuid& dstPeer,
         int* distance,
         nx::network::SocketAddress* knownPeerAddress) const override;
 
@@ -517,7 +517,7 @@ int BaseEc2Connection<QueryProcessorType>::restoreDatabase(
 
 template<class QueryProcessorType>
 void BaseEc2Connection<QueryProcessorType>::addRemotePeer(
-    const QnUuid& id,
+    const nx::Uuid& id,
     nx::vms::api::PeerType peerType,
     const nx::utils::Url &_url,
     nx::network::ssl::AdapterFunc adapterFunc)
@@ -530,17 +530,17 @@ void BaseEc2Connection<QueryProcessorType>::addRemotePeer(
 }
 
 template<class QueryProcessorType>
-void BaseEc2Connection<QueryProcessorType>::deleteRemotePeer(const QnUuid& id)
+void BaseEc2Connection<QueryProcessorType>::deleteRemotePeer(const nx::Uuid& id)
 {
     messageBus()->removeOutgoingConnectionFromPeer(id);
 }
 
 template<class QueryProcessorType>
-QnUuid BaseEc2Connection<QueryProcessorType>::routeToPeerVia(
-    const QnUuid& dstPeer, int* distance, nx::network::SocketAddress* knownPeerAddress) const
+nx::Uuid BaseEc2Connection<QueryProcessorType>::routeToPeerVia(
+    const nx::Uuid& dstPeer, int* distance, nx::network::SocketAddress* knownPeerAddress) const
 {
     auto messageBus = this->messageBus();
-    return messageBus ? messageBus->routeToPeerVia(dstPeer, distance, knownPeerAddress) : QnUuid();
+    return messageBus ? messageBus->routeToPeerVia(dstPeer, distance, knownPeerAddress) : nx::Uuid();
 }
 
 } // namespace ec2

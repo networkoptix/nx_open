@@ -78,8 +78,8 @@ struct BidirectionRoutingInfo;
 
 struct TransportHeader
 {
-    std::set<QnUuid> via;
-    std::vector<QnUuid> dstPeers;
+    std::set<nx::Uuid> via;
+    std::vector<nx::Uuid> dstPeers;
 };
 #define TransportHeader_Fields (via)
 

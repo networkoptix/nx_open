@@ -17,18 +17,18 @@ public:
     Ec2Router(nx::vms::common::SystemContext* context);
     virtual ~Ec2Router();
 
-    virtual void init(const QnUuid& id) override;
+    virtual void init(const nx::Uuid& id) override;
 
     virtual void routeEvent(
         const EventData& eventData,
-        const QSet<QnUuid>& triggeredRules,
-        const QSet<QnUuid>& affectedResources) override;
+        const QSet<nx::Uuid>& triggeredRules,
+        const QSet<nx::Uuid>& affectedResources) override;
 
 private:
     void onEventReceived(const nx::vms::api::rules::EventInfo& eventInfo);
 
 private:
-    QnUuid m_id;
+    nx::Uuid m_id;
     bool m_connected = false;
 };
 

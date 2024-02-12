@@ -25,7 +25,7 @@ QString formatValue(double value)
 PoeOverBudgetEvent::PoeOverBudgetEvent(
     std::chrono::microseconds timestamp,
     State state,
-    QnUuid serverId,
+    nx::Uuid serverId,
     double currentConsumptionW,
     double upperLimitW,
     double lowerLimitW)

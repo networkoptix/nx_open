@@ -179,12 +179,12 @@ public:
 
     void init(QWidget* parent) override;
 
-    QString validationMessage(const QSet<QnUuid>& selected) const override;
-    bool isValid(const QnUuid& resourceId) const override;
+    QString validationMessage(const QSet<nx::Uuid>& selected) const override;
+    bool isValid(const nx::Uuid& resourceId) const override;
 
-    static bool isValidList(const QSet<QnUuid>& ids, const QString& additional);
+    static bool isValidList(const QSet<nx::Uuid>& ids, const QString& additional);
 
-    static QString getText(const QSet<QnUuid>& ids, const bool detailed,
+    static QString getText(const QSet<nx::Uuid>& ids, const bool detailed,
         const QString& additional);
 private:
     static QStringList parseAdditional(const QString& additional);
@@ -200,16 +200,16 @@ public:
     explicit QnSubjectValidationPolicy(bool allowEmptySelection = false);
     virtual ~QnSubjectValidationPolicy();
 
-    virtual QValidator::State roleValidity(const QnUuid& roleId) const = 0;
+    virtual QValidator::State roleValidity(const nx::Uuid& roleId) const = 0;
     virtual bool userValidity(const QnUserResourcePtr& user) const = 0;
 
-    virtual QValidator::State validity(bool allUsers, const QSet<QnUuid>& subjects) const;
-    virtual QString calculateAlert(bool allUsers, const QSet<QnUuid>& subjects) const;
+    virtual QValidator::State validity(bool allUsers, const QSet<nx::Uuid>& subjects) const;
+    virtual QString calculateAlert(bool allUsers, const QSet<nx::Uuid>& subjects) const;
 
-    void analyze(bool allUsers, const QSet<QnUuid>& subjects,
-        QVector<QnUuid>& validRoles,
-        QVector<QnUuid>& invalidRoles,
-        QVector<QnUuid>& intermediateRoles,
+    void analyze(bool allUsers, const QSet<nx::Uuid>& subjects,
+        QVector<nx::Uuid>& validRoles,
+        QVector<nx::Uuid>& invalidRoles,
+        QVector<nx::Uuid>& intermediateRoles,
         QVector<QnUserResourcePtr>& validUsers,
         QVector<QnUserResourcePtr>& invalidUsers) const;
 
@@ -227,7 +227,7 @@ class QnDefaultSubjectValidationPolicy: public QnSubjectValidationPolicy
 public:
     QnDefaultSubjectValidationPolicy(bool allowEmptySelection = false);
 
-    virtual QValidator::State roleValidity(const QnUuid& roleId) const override;
+    virtual QValidator::State roleValidity(const nx::Uuid& roleId) const override;
     virtual bool userValidity(const QnUserResourcePtr& user) const override;
 };
 
@@ -242,9 +242,9 @@ public:
         nx::vms::api::AccessRight requiredAccessRight,
         bool allowEmptySelection = false);
 
-    virtual QValidator::State roleValidity(const QnUuid& groupId) const override;
+    virtual QValidator::State roleValidity(const nx::Uuid& groupId) const override;
     virtual bool userValidity(const QnUserResourcePtr& user) const override;
-    virtual QString calculateAlert(bool allUsers, const QSet<QnUuid>& subjects) const override;
+    virtual QString calculateAlert(bool allUsers, const QSet<nx::Uuid>& subjects) const override;
 
     QnSharedResourcePointerList<QnVirtualCameraResource> cameras() const;
     void setCameras(const QnSharedResourcePointerList<QnVirtualCameraResource>& cameras);
@@ -264,7 +264,7 @@ class QnLayoutAccessValidationPolicy: public QnSubjectValidationPolicy
     using base_type = QnSubjectValidationPolicy;
 
 public:
-    virtual QValidator::State roleValidity(const QnUuid& roleId) const override;
+    virtual QValidator::State roleValidity(const nx::Uuid& roleId) const override;
     virtual bool userValidity(const QnUserResourcePtr& user) const override;
 
     void setLayout(const QnLayoutResourcePtr& layout);
@@ -279,9 +279,9 @@ class QnCloudUsersValidationPolicy: public QnSubjectValidationPolicy
     using base_type = QnSubjectValidationPolicy;
 
 public:
-    virtual QValidator::State roleValidity(const QnUuid& roleId) const override;
+    virtual QValidator::State roleValidity(const nx::Uuid& roleId) const override;
     virtual bool userValidity(const QnUserResourcePtr& user) const override;
-    virtual QString calculateAlert(bool allUsers, const QSet<QnUuid>& subjects) const override;
+    virtual QString calculateAlert(bool allUsers, const QSet<nx::Uuid>& subjects) const override;
 };
 
 class QnUserWithEmailValidationPolicy: public QnSubjectValidationPolicy
@@ -290,7 +290,7 @@ class QnUserWithEmailValidationPolicy: public QnSubjectValidationPolicy
     using base_type = QnSubjectValidationPolicy;
 
 public:
-    virtual QValidator::State roleValidity(const QnUuid& roleId) const override;
+    virtual QValidator::State roleValidity(const nx::Uuid& roleId) const override;
     virtual bool userValidity(const QnUserResourcePtr& user) const override;
 };
 

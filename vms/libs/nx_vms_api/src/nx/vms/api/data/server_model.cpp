@@ -118,7 +118,7 @@ std::vector<ServerModel> ServerModel::fromDbTypes(DbListTypes all)
         std::get<std::vector<MediaServerUserAttributesData>>(std::move(all)), lessById);
     auto statuses = nx::utils::unique_sorted(
         std::get<std::vector<ResourceStatusData>>(std::move(all)), lessById);
-    std::unordered_map<QnUuid, std::vector<ResourceParamData>> parametersPerServer =
+    std::unordered_map<nx::Uuid, std::vector<ResourceParamData>> parametersPerServer =
         toParameterMap(std::get<std::vector<ResourceParamWithRefData>>(std::move(all)));
     auto storages =
         [](std::vector<StorageData> list)

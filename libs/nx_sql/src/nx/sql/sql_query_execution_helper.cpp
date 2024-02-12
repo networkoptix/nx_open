@@ -169,7 +169,7 @@ void SqlQueryExecutionHelper::execSQLScript(
 
 void SqlQueryExecutionHelper::bindId(QSqlQuery* query,
     const QString& parameter,
-    const QnUuid& id,
+    const nx::Uuid& id,
     bool optional)
 {
     if (optional && id.isNull())

@@ -20,11 +20,11 @@ const auto kValueAttributeName = "value";
 } // namespace
 
 const QString StorageData::kResourceTypeName = lit("Storage");
-const QnUuid StorageData::kResourceTypeId =
+const nx::Uuid StorageData::kResourceTypeId =
     ResourceData::getFixedTypeId(StorageData::kResourceTypeName);
 
 const QString MediaServerData::kResourceTypeName = lit("Server");
-const QnUuid MediaServerData::kResourceTypeId =
+const nx::Uuid MediaServerData::kResourceTypeId =
     ResourceData::getFixedTypeId(MediaServerData::kResourceTypeName);
 
 void serialize(

@@ -32,7 +32,7 @@ public:
     }
 
     bool isRemotePeerSubscribedTo(const vms::api::PersistentIdData& peer) const;
-    bool isRemotePeerSubscribedTo(const QnUuid& peer) const;
+    bool isRemotePeerSubscribedTo(const nx::Uuid& peer) const;
     bool isLocalPeerSubscribedTo(const vms::api::PersistentIdData& peer) const;
     UpdateSequenceResult updateSequence(const ec2::QnAbstractTransaction& tran);
 

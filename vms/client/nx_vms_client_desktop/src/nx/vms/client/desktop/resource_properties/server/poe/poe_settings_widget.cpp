@@ -156,7 +156,7 @@ bool PoeSettingsWidget::isNetworkRequestRunning() const
     return d->controller.updatingPoweringModes();
 }
 
-void PoeSettingsWidget::setServerId(const QnUuid& value)
+void PoeSettingsWidget::setServerId(const nx::Uuid& value)
 {
     d->controller.setResourceId(value);
 }

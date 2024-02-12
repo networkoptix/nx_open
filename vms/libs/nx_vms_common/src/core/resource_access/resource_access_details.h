@@ -12,7 +12,7 @@
 namespace nx::core::access {
 
 using ResourceAccessDetails = QHash<
-    QnUuid /** Id of the subject the access is gained in. */,
+    nx::Uuid /** Id of the subject the access is gained in. */,
     QSet<QnResourcePtr> /** Indirect providers, the resource itself if it's accessed directly. */>;
 
 /** Merges two resource access detail sets. */

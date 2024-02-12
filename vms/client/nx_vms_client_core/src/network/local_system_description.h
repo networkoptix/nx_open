@@ -16,7 +16,7 @@ public:
 
     static SystemDescriptionPtr create(
         const QString& systemId,
-        const QnUuid& localSystemId,
+        const nx::Uuid& localSystemId,
         const QString& systemName);
 
 public: // Overrides
@@ -39,7 +39,7 @@ private:
     // Ctor for regular local system
     QnLocalSystemDescription(
         const QString& systemId,
-        const QnUuid& localSystemId,
+        const nx::Uuid& localSystemId,
         const QString& systemName);
 
     void init();

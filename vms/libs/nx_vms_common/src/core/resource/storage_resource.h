@@ -53,7 +53,7 @@ public:
     QString urlWithoutCredentials() const;
 
     void fillID();
-    static QnUuid fillID(const QnUuid& mserverId, const QString& url);
+    static nx::Uuid fillID(const nx::Uuid& mserverId, const QString& url);
     bool isExternal() const;
     virtual bool isSystem() const { return false; }
 

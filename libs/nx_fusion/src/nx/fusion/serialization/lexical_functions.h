@@ -215,7 +215,7 @@ NX_FUSION_API bool serialize(const QJsonValue::Type& value, QString* target);
 NX_FUSION_API bool deserialize(const QString& value, QJsonValue::Type* target);
 
 QN_FUSION_DECLARE_FUNCTIONS(bool, (lexical), NX_FUSION_API)
-QN_FUSION_DECLARE_FUNCTIONS(QnUuid, (lexical), NX_FUSION_API)
+QN_FUSION_DECLARE_FUNCTIONS(nx::Uuid, (lexical), NX_FUSION_API)
 QN_FUSION_DECLARE_FUNCTIONS(QUrl, (lexical), NX_FUSION_API)
 QN_FUSION_DECLARE_FUNCTIONS(nx::utils::Url, (lexical), NX_FUSION_API)
 QN_FUSION_DECLARE_FUNCTIONS(QColor, (lexical), NX_FUSION_API)

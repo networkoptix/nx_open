@@ -38,10 +38,10 @@ public:
     void setCacheDirectory(const QString& value);
 
     /** Load stored settings for the given system, drop other. */
-    void switchLocalSystemId(const QnUuid& localSystemId);
+    void switchLocalSystemId(const nx::Uuid& localSystemId);
 
     /** Save items for the local system, cleanup non-existing. */
-    void saveData(const QnUuid& localSystemId, QnResourcePool* resourcePool) const;
+    void saveData(const nx::Uuid& localSystemId, QnResourcePool* resourcePool) const;
 
 signals:
     void modeChanged(const LayoutItemIndex& item, RadassMode value);

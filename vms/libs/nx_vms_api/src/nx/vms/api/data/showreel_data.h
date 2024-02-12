@@ -10,13 +10,13 @@ namespace nx::vms::api {
 
 struct NX_VMS_API ShowreelItemData
 {
-    QnUuid resourceId;
+    nx::Uuid resourceId;
 
     /**%apidoc[opt] */
     int delayMs = 0;
 
     ShowreelItemData() = default;
-    ShowreelItemData(const QnUuid& resourceId, int delayMs):
+    ShowreelItemData(const nx::Uuid& resourceId, int delayMs):
         resourceId(resourceId), delayMs(delayMs) {}
 
     bool operator==(const ShowreelItemData& other) const = default;
@@ -35,7 +35,7 @@ NX_VMS_API_DECLARE_STRUCT(ShowreelSettings)
 
 struct NX_VMS_API ShowreelData: IdData
 {
-    QnUuid parentId;
+    nx::Uuid parentId;
 
     /**%apidoc
      * %example Showreel

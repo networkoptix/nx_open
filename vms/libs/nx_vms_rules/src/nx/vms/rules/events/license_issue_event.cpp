@@ -18,8 +18,8 @@ namespace nx::vms::rules {
 
 LicenseIssueEvent::LicenseIssueEvent(
     std::chrono::microseconds timestamp,
-    QnUuid serverId,
-    const QnUuidSet& disabledCameras)
+    nx::Uuid serverId,
+    const UuidSet& disabledCameras)
     :
     BasicEvent(timestamp),
     m_serverId(serverId),

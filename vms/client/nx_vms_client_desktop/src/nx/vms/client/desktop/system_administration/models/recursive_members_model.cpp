@@ -36,7 +36,7 @@ QHash<int, QByteArray> RecursiveMembersModel::roleNames() const
     return roles;
 }
 
-QVariant RecursiveMembersModel::getMemberData(int offset, const QnUuid& id, int role) const
+QVariant RecursiveMembersModel::getMemberData(int offset, const nx::Uuid& id, int role) const
 {
     switch (role)
     {
@@ -60,7 +60,7 @@ QVariant RecursiveMembersModel::getMemberData(int offset, const QnUuid& id, int 
     return {};
 }
 
-QVariant RecursiveMembersModel::getData(int offset, const QnUuid& groupId, int row, int role) const
+QVariant RecursiveMembersModel::getData(int offset, const nx::Uuid& groupId, int row, int role) const
 {
     if (row == -1)
         return {};
@@ -92,13 +92,13 @@ QVariant RecursiveMembersModel::getData(int offset, const QnUuid& groupId, int r
  *
  * Then for the arguments (groups = [group1, group2], row = 3) the result would be <group2, 1>.
  */
-std::pair<QnUuid, int> RecursiveMembersModel::findGroupRow(
-    const QList<QnUuid>& groups,
+std::pair<nx::Uuid, int> RecursiveMembersModel::findGroupRow(
+    const QList<nx::Uuid>& groups,
     int row) const
 {
     int currentRow = 0;
 
-    for (const QnUuid& groupId: groups)
+    for (const nx::Uuid& groupId: groups)
     {
         const int itemsInGroup = 1 + m_totalSubItems.value(groupId, 0);
         const int rowOffsetInGroup = row - currentRow;
@@ -147,7 +147,7 @@ void RecursiveMembersModel::registerQmlType()
     qmlRegisterType<RecursiveMembersModel>("nx.vms.client.desktop", 1, 0, "RecursiveMembersModel");
 }
 
-void RecursiveMembersModel::setGroupId(const QnUuid& groupId)
+void RecursiveMembersModel::setGroupId(const nx::Uuid& groupId)
 {
     if (m_groupId == groupId)
         return;
@@ -170,7 +170,7 @@ void RecursiveMembersModel::setMembersCache(MembersCache* cache)
     emit membersCacheChanged();
 
     const auto onCacheChanged =
-        [this](int, const QnUuid&, const QnUuid &parentId)
+        [this](int, const nx::Uuid&, const nx::Uuid &parentId)
         {
             if (parentId.isNull())
                 return; //< Ignore top level updates.
@@ -219,13 +219,13 @@ void RecursiveMembersModel::loadData(bool updateAllRows)
         return;
     }
 
-    QHash<QnUuid, int> totalSubItems;
+    QHash<nx::Uuid, int> totalSubItems;
 
     static constexpr int kCycleGuardValue = -1;
     static constexpr int kEmptyValue = -2;
 
-    const std::function<int(QnUuid)> subItemsCount =
-        [this, &totalSubItems, &subItemsCount](QnUuid id) -> int
+    const std::function<int(nx::Uuid)> subItemsCount =
+        [this, &totalSubItems, &subItemsCount](nx::Uuid id) -> int
         {
             const int visitedSubItems = totalSubItems.value(id, kEmptyValue);
             if (visitedSubItems == kCycleGuardValue)

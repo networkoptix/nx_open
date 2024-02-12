@@ -16,12 +16,12 @@ namespace nx::vms::api::analytics {
 struct NX_VMS_API IntegrationRequestIdentity
 {
     /**%apidoc Integration request id. */
-    QnUuid requestId;
+    nx::Uuid requestId;
 
     IntegrationRequestIdentity() = default;
-    IntegrationRequestIdentity(const QnUuid& requestId): requestId(requestId) {}
+    IntegrationRequestIdentity(const nx::Uuid& requestId): requestId(requestId) {}
 
-    QnUuid getId() { return requestId; }
+    nx::Uuid getId() { return requestId; }
 
     bool operator==(const IntegrationRequestIdentity& other) const = default;
 };

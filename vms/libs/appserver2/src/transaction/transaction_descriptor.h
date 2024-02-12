@@ -132,7 +132,7 @@ using GetTransactionTypeFuncType = std::function<ec2::TransactionType(
     AbstractPersistentStorage*)>;
 
 template<typename ParamType>
-using GetHashFuncType = std::function<QnUuid(ParamType const &)>;
+using GetHashFuncType = std::function<nx::Uuid(ParamType const &)>;
 
 template<typename ParamType>
 using CreateTransactionFromAbstractTransactionFuncType = std::function<QnTransaction<ParamType>(const QnAbstractTransaction& tran)>;
@@ -290,13 +290,13 @@ detail::TransactionDescriptor<Param>* getTransactionDescriptorByTransaction(cons
  * Obviously, transactionHash() is not needed for the non-persistent transaction.
  */
 template<typename Param>
-QnUuid transactionHash(ApiCommand::Value command, const Param &param)
+nx::Uuid transactionHash(ApiCommand::Value command, const Param &param)
 {
     auto td = ec2::getActualTransactionDescriptorByValue<Param>(command);
     if (!td)
     {
         NX_ASSERT(0, "Transaction descriptor for the given param not found");
-        return QnUuid();
+        return nx::Uuid();
     }
 
     return td->getHashFunc(param);

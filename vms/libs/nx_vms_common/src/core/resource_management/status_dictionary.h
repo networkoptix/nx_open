@@ -9,13 +9,13 @@
 class NX_VMS_COMMON_API QnResourceStatusDictionary
 {
 public:
-    nx::vms::api::ResourceStatus value(const QnUuid& resourceId) const;
-    void setValue(const QnUuid& resourceId, nx::vms::api::ResourceStatus status);
+    nx::vms::api::ResourceStatus value(const nx::Uuid& resourceId) const;
+    void setValue(const nx::Uuid& resourceId, nx::vms::api::ResourceStatus status);
     void clear();
-    void clear(const QVector<QnUuid>& idList);
-    void remove(const QnUuid& id);
-    QMap<QnUuid, nx::vms::api::ResourceStatus> values() const;
+    void clear(const QVector<nx::Uuid>& idList);
+    void remove(const nx::Uuid& id);
+    QMap<nx::Uuid, nx::vms::api::ResourceStatus> values() const;
 private:
-    QMap<QnUuid, nx::vms::api::ResourceStatus> m_items;
+    QMap<nx::Uuid, nx::vms::api::ResourceStatus> m_items;
     mutable nx::Mutex m_mutex;
 };

@@ -20,10 +20,10 @@ class NX_VMS_COMMON_API AbstractMediaServerNotificationManager: public QObject
 signals:
     void addedOrUpdated(const nx::vms::api::MediaServerData& server, ec2::NotificationSource source);
     void storageChanged(const nx::vms::api::StorageData& storage, ec2::NotificationSource source);
-    void removed(const QnUuid& id, ec2::NotificationSource source);
-    void storageRemoved(const QnUuid& id, ec2::NotificationSource source);
+    void removed(const nx::Uuid& id, ec2::NotificationSource source);
+    void storageRemoved(const nx::Uuid& id, ec2::NotificationSource source);
     void userAttributesChanged(const nx::vms::api::MediaServerUserAttributesData& attributes);
-    void userAttributesRemoved(const QnUuid& id);
+    void userAttributesRemoved(const nx::Uuid& id);
 };
 
 class NX_VMS_COMMON_API AbstractMediaServerManager
@@ -51,11 +51,11 @@ public:
     Result saveSync(const nx::vms::api::MediaServerData& data);
 
     virtual int remove(
-        const QnUuid& id,
+        const nx::Uuid& id,
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) = 0;
 
-    ErrorCode removeSync(const QnUuid& id);
+    ErrorCode removeSync(const nx::Uuid& id);
 
     virtual int saveUserAttributes(
         const nx::vms::api::MediaServerUserAttributesDataList& dataList,
@@ -84,7 +84,7 @@ public:
     corresponding to \a mediaServerId. If NULL, returned list contains data of all known servers.
     */
     virtual int getUserAttributes(
-        const QnUuid& mediaServerId,
+        const nx::Uuid& mediaServerId,
         Handler<nx::vms::api::MediaServerUserAttributesDataList> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) = 0;
 
@@ -93,14 +93,14 @@ public:
     corresponding to \a mediaServerId. If NULL, returned list contains data of all known servers.
     */
     Result getUserAttributesSync(
-        const QnUuid& mediaServerId, nx::vms::api::MediaServerUserAttributesDataList* outDataList);
+        const nx::Uuid& mediaServerId, nx::vms::api::MediaServerUserAttributesDataList* outDataList);
 
     /*!
     \param mediaServerId if not NULL, returned list contains at most one element: the one
     corresponding to \a mediaServerId. If NULL, returned list contains data of all known servers.
     */
     virtual int getStorages(
-        const QnUuid& mediaServerId,
+        const nx::Uuid& mediaServerId,
         Handler<nx::vms::api::StorageDataList> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) = 0;
 
@@ -109,7 +109,7 @@ public:
     corresponding to \a mediaServerId. If NULL, returned list contains data of all known servers.
     */
     ErrorCode getStoragesSync(
-        const QnUuid& mediaServerId, nx::vms::api::StorageDataList* outDataList);
+        const nx::Uuid& mediaServerId, nx::vms::api::StorageDataList* outDataList);
 };
 
 } // namespace ec2

@@ -14,7 +14,7 @@ QnResourceType::~QnResourceType()
 {
 }
 
-void QnResourceType::setParentId(const QnUuid &value)
+void QnResourceType::setParentId(const nx::Uuid &value)
 {
     m_parentId = value;
 }
@@ -32,7 +32,7 @@ bool QnResourceType::isCamera() const
         return m_isCamera;
     }
 
-    for (const QnUuid& parentId: allParentList())
+    for (const nx::Uuid& parentId: allParentList())
     {
         if (!parentId.isNull())
         {
@@ -59,7 +59,7 @@ void QnResourceType::setIsCamera()
     m_isCameraSet = true;
 }
 
-void QnResourceType::addAdditionalParent(const QnUuid& parent)
+void QnResourceType::addAdditionalParent(const nx::Uuid& parent)
 {
     if (parent.isNull())
     {
@@ -71,9 +71,9 @@ void QnResourceType::addAdditionalParent(const QnUuid& parent)
         m_additionalParentList << parent;
 }
 
-QList<QnUuid> QnResourceType::allParentList() const
+QList<nx::Uuid> QnResourceType::allParentList() const
 {
-    QList<QnUuid> result;
+    QList<nx::Uuid> result;
     if (!m_parentId.isNull())
         result << m_parentId;
     result << m_additionalParentList;
@@ -111,7 +111,7 @@ const QnResourceType::ParamTypeMap& QnResourceType::paramTypeListUnsafe() const
         QSharedPointer<ParamTypeMap> allParamTypeListCache(new ParamTypeMap());
         *allParamTypeListCache = m_paramTypeList;
 
-        for (const QnUuid& parentId: allParentList())
+        for (const nx::Uuid& parentId: allParentList())
         {
             if (parentId.isNull())
             {
@@ -168,7 +168,7 @@ QnResourceTypePtr QnResourceTypePool::getResourceTypeByName(const QString& name)
     return QnResourceTypePtr();
 }
 
-QnResourceTypePtr QnResourceTypePool::getResourceType(QnUuid id) const
+QnResourceTypePtr QnResourceTypePool::getResourceType(nx::Uuid id) const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     auto itr = m_resourceTypeMap.find(id);
@@ -191,7 +191,7 @@ void QnResourceTypePool::addResourceType(QnResourceTypePtr resourceType)
     m_resourceTypeMap.insert(resourceType->getId(), resourceType);
 }
 
-QnUuid QnResourceTypePool::getResourceTypeId(const QString& manufacturer, const QString& name, bool showWarning) const
+nx::Uuid QnResourceTypePool::getResourceTypeId(const QString& manufacturer, const QString& name, bool showWarning) const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     for (const QnResourceTypePtr& rt: m_resourceTypeMap)
@@ -206,14 +206,14 @@ QnUuid QnResourceTypePool::getResourceTypeId(const QString& manufacturer, const 
             manufacturer, name);
     }
 
-    return QnUuid();
+    return nx::Uuid();
 }
 
-QnUuid QnResourceTypePool::getLikeResourceTypeId(
+nx::Uuid QnResourceTypePool::getLikeResourceTypeId(
     const QString& manufacturer, const QString& name) const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
-    QnUuid result;
+    nx::Uuid result;
     int bestLen = -1;
     for (const QnResourceTypePtr& rt: m_resourceTypeMap)
     {

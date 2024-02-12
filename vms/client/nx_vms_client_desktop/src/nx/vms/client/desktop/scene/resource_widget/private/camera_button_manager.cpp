@@ -42,7 +42,7 @@ static constexpr int kTriggerButtonSize = 40;
 static constexpr int kTriggersMargin = 8;
 static constexpr int kScrollLineHeight = 8;
 
-QnUuid getCameraResourceId(QnMediaResourceWidget* widget)
+nx::Uuid getCameraResourceId(QnMediaResourceWidget* widget)
 {
     if (!NX_ASSERT(widget))
         return {};
@@ -50,7 +50,7 @@ QnUuid getCameraResourceId(QnMediaResourceWidget* widget)
     const auto camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
     return camera
         ? camera->toResource()->getId()
-        : QnUuid{};
+        : nx::Uuid{};
 }
 
 QnScrollableItemsWidget* createContainer(QnMediaResourceWidget* mediaResourceWidget)
@@ -133,7 +133,7 @@ QString getToolTip(const CameraButton& data)
     }
 };
 
-AggregatedControllerPtr createController(const QnUuid& cameraResourceId,
+AggregatedControllerPtr createController(const nx::Uuid& cameraResourceId,
     QnMediaResourceWidget* mediaResourceWidget)
 {
     if (cameraResourceId.isNull())
@@ -175,7 +175,7 @@ struct CameraButtonManager::Private: public QObject
 
     Private(
         CameraButtonManager* q,
-        const QnUuid& cameraResourceId,
+        const nx::Uuid& cameraResourceId,
         QnMediaResourceWidget* mediaResourceWidget);
 
     void addObjectTrackingButton(const CameraButton& data);
@@ -185,18 +185,18 @@ struct CameraButtonManager::Private: public QObject
 
     void handleButtonAdded(const CameraButton& data);
     void handleButtonChanged(const CameraButton& button, CameraButton::Fields fields);
-    void handleButtonRemoved(const QnUuid& buttonId);
+    void handleButtonRemoved(const nx::Uuid& buttonId);
 
-    void handleActionCompletion(const QnUuid& buttonId, bool success);
-    void handleActionCancelled(const QnUuid& buttonId);
+    void handleActionCompletion(const nx::Uuid& buttonId, bool success);
+    void handleActionCancelled(const nx::Uuid& buttonId);
 
-    bool isObjectTrackingButton(const QnUuid& buttonId);
+    bool isObjectTrackingButton(const nx::Uuid& buttonId);
     bool isObjectTrackingButton(const core::OptionalCameraButton& data);
 };
 
 CameraButtonManager::Private::Private(
     CameraButtonManager* q,
-    const QnUuid& cameraResourceId,
+    const nx::Uuid& cameraResourceId,
     QnMediaResourceWidget* mediaResourceWidget)
     :
     q(q),
@@ -383,12 +383,12 @@ void CameraButtonManager::Private::handleButtonChanged(
     }
 }
 
-void CameraButtonManager::Private::handleButtonRemoved(const QnUuid& buttonId)
+void CameraButtonManager::Private::handleButtonRemoved(const nx::Uuid& buttonId)
 {
     container->deleteItem(buttonId);
 }
 
-void CameraButtonManager::Private::handleActionCompletion(const QnUuid& buttonId, bool success)
+void CameraButtonManager::Private::handleActionCompletion(const nx::Uuid& buttonId, bool success)
 {
     const auto data = controller->button(buttonId);
     if (!NX_ASSERT(data))
@@ -412,7 +412,7 @@ void CameraButtonManager::Private::handleActionCompletion(const QnUuid& buttonId
         : SoftwareTriggerButton::State::Success);
 }
 
-void CameraButtonManager::Private::handleActionCancelled(const QnUuid& buttonId)
+void CameraButtonManager::Private::handleActionCancelled(const nx::Uuid& buttonId)
 {
     if (isObjectTrackingButton(buttonId))
         return;
@@ -422,7 +422,7 @@ void CameraButtonManager::Private::handleActionCancelled(const QnUuid& buttonId)
         button->setState(SoftwareTriggerButton::State::Failure);
 }
 
-bool CameraButtonManager::Private::isObjectTrackingButton(const QnUuid& buttonId)
+bool CameraButtonManager::Private::isObjectTrackingButton(const nx::Uuid& buttonId)
 {
     return isObjectTrackingButton(controller->button(buttonId));
 }

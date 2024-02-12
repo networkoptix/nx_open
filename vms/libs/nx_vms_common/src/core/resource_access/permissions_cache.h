@@ -27,7 +27,7 @@ class NX_VMS_COMMON_API PermissionsCache
 {
 public:
     using OptionalPermissions = std::optional<Qn::Permissions>;
-    using ResourceIdsWithPermissions = std::vector<std::pair<QnUuid, OptionalPermissions>>;
+    using ResourceIdsWithPermissions = std::vector<std::pair<nx::Uuid, OptionalPermissions>>;
 
     /**
      * Accessor for stored resource permissions. Method has O(1) complexity. Storage access is
@@ -38,7 +38,7 @@ public:
      * @returns Resource Permissions for given Access Subject if such were set, std::nullopt
      *     otherwise.
      */
-    OptionalPermissions permissions(const QnUuid& subjectId, const QnUuid& resourceId) const;
+    OptionalPermissions permissions(const nx::Uuid& subjectId, const nx::Uuid& resourceId) const;
 
     /**
      * Stores resource permissions for given resource access subject. Currently, since
@@ -46,7 +46,7 @@ public:
      * unless storage grow occurs, however, timings difference is marginally low.
      * @returns True if stored value actually has been changed.
      */
-    bool setPermissions(const QnUuid& subjectId, const QnUuid& resourceId,
+    bool setPermissions(const nx::Uuid& subjectId, const nx::Uuid& resourceId,
         Qn::Permissions permissions);
 
     /**
@@ -55,7 +55,7 @@ public:
      * value is no more valid and should be recalculated. Method has O(1) complexity.
      * @returns True if there was actual not null value stored, even if it was Qn::NoPermissions.
      */
-    bool removePermissions(const QnUuid& subjectId, const QnUuid& resourceId);
+    bool removePermissions(const nx::Uuid& subjectId, const nx::Uuid& resourceId);
 
     /**
      * Returns all stored resource permissions for access subject. If storage kept dense and
@@ -66,7 +66,7 @@ public:
      * @returns Stored data as is for given subject as pairs Id/Permission for given Id, if such
      *     exists.
      */
-    ResourceIdsWithPermissions permissionsForSubject(const QnUuid& subjectId) const;
+    ResourceIdsWithPermissions permissionsForSubject(const nx::Uuid& subjectId) const;
 
     /**
      * Removes resource access subject and all associated resource permissions. If subject was
@@ -78,7 +78,7 @@ public:
      * @param  subjectId User Role or User resource Id. Passing nonexistent access subject Id
      *     leads to nothing, null Id considered as invalid input data.
      */
-    void removeSubject(const QnUuid& subjectId);
+    void removeSubject(const nx::Uuid& subjectId);
 
     /**
      * Removes permissions for given resource for any stored resource access subject. If the
@@ -90,7 +90,7 @@ public:
      * @param  resourceId Any Id. Passing nonexistent Resource Id leads to nothing, null Id
      *     considered as invalid input data.
      */
-    void removeResource(const QnUuid& resourceId);
+    void removeResource(const nx::Uuid& resourceId);
 
     /**
      * Clears storage to its blank/initial state.
@@ -99,9 +99,9 @@ public:
 
 private:
     using StorageTableRow = std::vector<OptionalPermissions>;
-    std::unordered_map<QnUuid, StorageTableRow> m_storage;
-    std::vector<QnUuid> m_resourcesOrder;
-    std::unordered_map<QnUuid, int> m_indexOfResource;
+    std::unordered_map<nx::Uuid, StorageTableRow> m_storage;
+    std::vector<nx::Uuid> m_resourcesOrder;
+    std::unordered_map<nx::Uuid, int> m_indexOfResource;
     std::deque<int> m_sparseColumns;
 };
 

@@ -9,7 +9,7 @@ void QnLayoutNotificationManager::triggerNotification(
     NotificationSource source)
 {
     NX_ASSERT(tran.command == ApiCommand::removeLayout);
-    emit removed(QnUuid(tran.params.id), source);
+    emit removed(nx::Uuid(tran.params.id), source);
 }
 
 void QnLayoutNotificationManager::triggerNotification(

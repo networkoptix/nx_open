@@ -100,7 +100,7 @@ public:
     */
     virtual void checkIfOnlineAsync( std::function<void(bool)> completionHandler );
 
-    static QnUuid physicalIdToId(const QString& uniqId);
+    static nx::Uuid physicalIdToId(const QString& uniqId);
 
     virtual QString idForToStringFromPtr() const override;
 

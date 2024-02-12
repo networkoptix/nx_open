@@ -297,7 +297,7 @@ ConnectActionsHandler::ConnectActionsHandler(WindowContext* windowContext, QObje
         [this](const QnUserResourcePtr &user)
         {
             QnPeerRuntimeInfo localInfo = system()->runtimeInfoManager()->localInfo();
-            localInfo.data.userId = user ? user->getId() : QnUuid();
+            localInfo.data.userId = user ? user->getId() : nx::Uuid();
             system()->runtimeInfoManager()->updateLocalItem(localInfo);
         });
 
@@ -601,7 +601,7 @@ void ConnectActionsHandler::establishConnection(RemoteConnectionPtr connection)
     session->setStickyReconnect(appContext()->localSettings()->stickReconnectToServer());
     LogonData logonData = connection->createLogonData();
     const auto serverModuleInformation = connection->moduleInformation();
-    QnUuid systemId(::helpers::getTargetSystemId(serverModuleInformation));
+    nx::Uuid systemId(::helpers::getTargetSystemId(serverModuleInformation));
 
     connect(session.get(), &RemoteSession::stateChanged, this,
         [this, logonData, systemId](RemoteSession::State state)
@@ -764,7 +764,7 @@ void ConnectActionsHandler::storeConnectionRecord(
         nx::network::url::Builder builder;
         builder.setHost(info.cloudHost);
         appContext()->localSettings()->lastUsedConnection =
-            {builder.toUrl(), QnUuid(info.cloudSystemId)};
+            {builder.toUrl(), nx::Uuid(info.cloudSystemId)};
     }
     else if (storePassword)
     {
@@ -870,7 +870,7 @@ void ConnectActionsHandler::connectToServerInNonDesktopMode(const LogonData& log
                         SceneBanner::show(
                             tr("Video Wall is removed on the server and will be closed."),
                             kCloseTimeout);
-                        const QnUuid videoWallId(
+                        const nx::Uuid videoWallId(
                             QString::fromStdString(logonData.credentials.username));
                         VideoWallShortcutHelper::setVideoWallAutorunEnabled(videoWallId, false);
                     }
@@ -1382,7 +1382,7 @@ void ConnectActionsHandler::clearConnection()
 
     system()->resourceAccessManager()->beginUpdate();
 
-    QVector<QnUuid> idList;
+    QVector<nx::Uuid> idList;
     idList.reserve(resourcesToRemove.size());
     for (const auto& res: resourcesToRemove)
         idList.push_back(res->getId());

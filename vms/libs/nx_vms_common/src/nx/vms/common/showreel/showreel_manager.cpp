@@ -24,7 +24,7 @@ const ShowreelDataList& ShowreelManager::showreels() const
     return m_showreels;
 }
 
-ShowreelDataList ShowreelManager::showreels(const QList<QnUuid>& ids) const
+ShowreelDataList ShowreelManager::showreels(const QList<nx::Uuid>& ids) const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
 
@@ -41,7 +41,7 @@ ShowreelDataList ShowreelManager::showreels(const QList<QnUuid>& ids) const
 void ShowreelManager::resetShowreels(const ShowreelDataList& showreels)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
-    QHash<QnUuid, ShowreelData> backup;
+    QHash<nx::Uuid, ShowreelData> backup;
     for (auto showreel: m_showreels)
         backup.insert(showreel.id, std::move(showreel));
     m_showreels = showreels;
@@ -66,7 +66,7 @@ void ShowreelManager::resetShowreels(const ShowreelDataList& showreels)
         emit showreelRemoved(old.id);
 }
 
-ShowreelData ShowreelManager::showreel(const QnUuid& id) const
+ShowreelData ShowreelManager::showreel(const nx::Uuid& id) const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     auto iter = std::find_if(m_showreels.cbegin(), m_showreels.cend(),
@@ -100,7 +100,7 @@ void ShowreelManager::addOrUpdateShowreel(const ShowreelData& showreel)
     emit showreelAdded(showreel);
 }
 
-void ShowreelManager::removeShowreel(const QnUuid& showreelId)
+void ShowreelManager::removeShowreel(const nx::Uuid& showreelId)
 {
     if (showreelId.isNull())
         NX_WARNING(this, "Removing showreel with empty Id will not take effect");

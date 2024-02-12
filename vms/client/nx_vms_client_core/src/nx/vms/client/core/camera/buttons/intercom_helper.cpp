@@ -4,10 +4,10 @@
 
 namespace nx::vms::client::core {
 
-QnUuid IntercomHelper::intercomOpenDoorRuleId(const QnUuid& cameraId)
+nx::Uuid IntercomHelper::intercomOpenDoorRuleId(const nx::Uuid& cameraId)
 {
     static const std::string kOpenDoorRuleIdBase = "nx.sys.IntercomIntegrationOpenDoor";
-    return QnUuid::fromArbitraryData(kOpenDoorRuleIdBase + cameraId.toStdString());
+    return nx::Uuid::fromArbitraryData(kOpenDoorRuleIdBase + cameraId.toStdString());
 }
 
 } // namespace nx::vms::client::core

@@ -19,7 +19,7 @@ namespace entity_resource_tree {
 
 class NX_VMS_CLIENT_DESKTOP_API OtherServersSource:
     public QObject,
-    public entity_item_model::UniqueKeySource<QnUuid>
+    public entity_item_model::UniqueKeySource<nx::Uuid>
 {
     Q_OBJECT
 
@@ -32,7 +32,7 @@ private:
     nx::utils::ScopedConnections m_connectionsGuard;
 };
 
-using UniqueUuidSourcePtr = std::shared_ptr<entity_item_model::UniqueKeySource<QnUuid>>;
+using UniqueUuidSourcePtr = std::shared_ptr<entity_item_model::UniqueKeySource<nx::Uuid>>;
 
 } // namespace entity_resource_tree
 } // namespace nx::vms::client::desktop

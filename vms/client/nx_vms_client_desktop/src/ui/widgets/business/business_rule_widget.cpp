@@ -52,7 +52,7 @@ void updateEventCameras(
     const QnBusinessRuleViewModelPtr model,
     QWidget* parent)
 {
-    QnUuidSet selectedCameras = model->eventResources();
+    UuidSet selectedCameras = model->eventResources();
     if (CameraSelectionDialog::selectCameras<Policy>(selectedCameras, parent))
         model->setEventResources(selectedCameras);
 }
@@ -555,7 +555,7 @@ void QnBusinessRuleWidget::at_eventResourcesHolder_clicked()
     else if (vms::event::requiresServerResource(eventType))
     {
         bool dialogAccepted = false;
-        QnUuidSet selectedServers = m_model->eventResources();
+        UuidSet selectedServers = m_model->eventResources();
 
         switch (eventType)
         {
@@ -627,7 +627,7 @@ void QnBusinessRuleWidget::at_actionResourcesHolder_clicked()
     else if (vms::event::requiresCameraResource(m_model->actionType()))
     {
         bool dialogAccepted = false;
-        QnUuidSet selectedCameras = m_model->actionResources();
+        UuidSet selectedCameras = m_model->actionResources();
 
         switch (m_model->actionType())
         {
@@ -665,7 +665,7 @@ void QnBusinessRuleWidget::at_actionResourcesHolder_clicked()
     else if (vms::event::requiresServerResource(m_model->actionType()))
     {
         bool dialogAccepted = false;
-        QnUuidSet selectedServers = m_model->actionResources();
+        UuidSet selectedServers = m_model->actionResources();
 
         switch (m_model->actionType())
         {

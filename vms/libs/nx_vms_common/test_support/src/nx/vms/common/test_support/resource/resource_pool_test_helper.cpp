@@ -24,11 +24,11 @@ QnUserResourcePtr QnResourcePoolTestHelper::createUser(
     const QString& name,
     UserType userType,
     GlobalPermissions globalPermissions,
-    const std::map<QnUuid, nx::vms::api::AccessRights>& resourceAccessRights,
+    const std::map<nx::Uuid, nx::vms::api::AccessRights>& resourceAccessRights,
     const QString& ldapDn)
 {
     QnUserResourcePtr user(new QnUserResource(userType, {ldapDn}));
-    user->setIdUnsafe(QnUuid::createUuid());
+    user->setIdUnsafe(nx::Uuid::createUuid());
     user->setName(name);
     user->setPasswordAndGenerateHash(name);
     user->setGroupIds(parentGroupIds.data);
@@ -43,7 +43,7 @@ QnUserResourcePtr QnResourcePoolTestHelper::addUser(
     const QString& name,
     UserType userType,
     GlobalPermissions globalPermissions,
-    const std::map<QnUuid, nx::vms::api::AccessRights>& resourceAccessRights,
+    const std::map<nx::Uuid, nx::vms::api::AccessRights>& resourceAccessRights,
     const QString& ldapDn)
 {
     const auto user = createUser(
@@ -55,7 +55,7 @@ QnUserResourcePtr QnResourcePoolTestHelper::addUser(
 QnLayoutResourcePtr QnResourcePoolTestHelper::createLayout()
 {
     QnLayoutResourcePtr layout(new QnLayoutResource());
-    layout->setIdUnsafe(QnUuid::createUuid());
+    layout->setIdUnsafe(nx::Uuid::createUuid());
     return layout;
 }
 
@@ -66,12 +66,12 @@ QnLayoutResourcePtr QnResourcePoolTestHelper::addLayout()
     return layout;
 }
 
-QnUuid QnResourcePoolTestHelper::addToLayout(
+nx::Uuid QnResourcePoolTestHelper::addToLayout(
     const QnLayoutResourcePtr& layout,
     const QnResourcePtr& resource)
 {
     nx::vms::common::LayoutItemData item;
-    item.uuid = QnUuid::createUuid();
+    item.uuid = nx::Uuid::createUuid();
     item.resource.id = resource->getId();
     layout->addItem(item);
     return item.uuid;
@@ -109,7 +109,7 @@ nx::CameraResourceStubPtr QnResourcePoolTestHelper::createDesktopCamera(
     camera->setModel("virtual desktop camera"); //< TODO: #sivanov Globalize the constant.
     camera->setName(user->getName());
     camera->setPhysicalId(
-        QnUuid::createUuid().toString() //< Running client instance id must be here.
+        nx::Uuid::createUuid().toString() //< Running client instance id must be here.
         + user->getId().toString());
     return camera;
 }
@@ -157,7 +157,7 @@ QnLayoutResourcePtr QnResourcePoolTestHelper::addIntercomLayout(
 QnWebPageResourcePtr QnResourcePoolTestHelper::addWebPage()
 {
     QnWebPageResourcePtr webPage(new QnWebPageResource());
-    webPage->setIdUnsafe(QnUuid::createUuid());
+    webPage->setIdUnsafe(nx::Uuid::createUuid());
     webPage->setUrl("http://www.ru");
     webPage->setName(QnWebPageResource::nameForUrl(webPage->getUrl()));
     resourcePool()->addResource(webPage);
@@ -167,7 +167,7 @@ QnWebPageResourcePtr QnResourcePoolTestHelper::addWebPage()
 QnVideoWallResourcePtr QnResourcePoolTestHelper::createVideoWall()
 {
     QnVideoWallResourcePtr videoWall(new QnVideoWallResource());
-    videoWall->setIdUnsafe(QnUuid::createUuid());
+    videoWall->setIdUnsafe(nx::Uuid::createUuid());
     return videoWall;
 }
 
@@ -178,11 +178,11 @@ QnVideoWallResourcePtr QnResourcePoolTestHelper::addVideoWall()
     return videoWall;
 }
 
-QnUuid QnResourcePoolTestHelper::addVideoWallItem(const QnVideoWallResourcePtr& videoWall,
+nx::Uuid QnResourcePoolTestHelper::addVideoWallItem(const QnVideoWallResourcePtr& videoWall,
     const QnLayoutResourcePtr& itemLayout)
 {
     QnVideoWallItem vwitem;
-    vwitem.uuid = QnUuid::createUuid();
+    vwitem.uuid = nx::Uuid::createUuid();
 
     if (itemLayout)
     {
@@ -196,7 +196,7 @@ QnUuid QnResourcePoolTestHelper::addVideoWallItem(const QnVideoWallResourcePtr& 
 
 bool QnResourcePoolTestHelper::changeVideoWallItem(
     const QnVideoWallResourcePtr& videoWall,
-    const QnUuid& itemId,
+    const nx::Uuid& itemId,
     const QnLayoutResourcePtr& itemLayout)
 {
     auto vwitem = videoWall->items()->getItem(itemId);
@@ -230,7 +230,7 @@ QnLayoutResourcePtr QnResourcePoolTestHelper::addLayoutForVideoWall(
 QnMediaServerResourcePtr QnResourcePoolTestHelper::addServer(ServerFlags additionalFlags)
 {
     QnMediaServerResourcePtr server(new QnMediaServerResource());
-    server->setIdUnsafe(QnUuid::createUuid());
+    server->setIdUnsafe(nx::Uuid::createUuid());
     server->setUrl("http://localhost:7001");
     resourcePool()->addResource(server);
     server->setStatus(ResourceStatus::online);
@@ -249,10 +249,10 @@ QnStorageResourcePtr QnResourcePoolTestHelper::addStorage(const QnMediaServerRes
 UserGroupData QnResourcePoolTestHelper::createUserGroup(
     QString name,
     Ids parentGroupIds,
-    const std::map<QnUuid, nx::vms::api::AccessRights>& resourceAccessRights,
+    const std::map<nx::Uuid, nx::vms::api::AccessRights>& resourceAccessRights,
     GlobalPermissions permissions)
 {
-    UserGroupData group{QnUuid::createUuid(), name, permissions, parentGroupIds.data};
+    UserGroupData group{nx::Uuid::createUuid(), name, permissions, parentGroupIds.data};
     group.resourceAccessRights = resourceAccessRights;
     addOrUpdateUserGroup(group);
     return group;
@@ -265,7 +265,7 @@ void QnResourcePoolTestHelper::addOrUpdateUserGroup(const UserGroupData& group)
         group.id, {group.resourceAccessRights.begin(), group.resourceAccessRights.end()});
 }
 
-void QnResourcePoolTestHelper::removeUserGroup(const QnUuid& groupId)
+void QnResourcePoolTestHelper::removeUserGroup(const nx::Uuid& groupId)
 {
     systemContext()->userGroupManager()->remove(groupId);
 }

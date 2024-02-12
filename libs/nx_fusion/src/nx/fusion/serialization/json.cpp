@@ -268,7 +268,7 @@ public:
         registerSerializer<QVector2D>();
         registerSerializer<QVector3D>();
         registerSerializer<QVector4D>();
-        registerSerializer<QnUuid>();
+        registerSerializer<nx::Uuid>();
         registerSerializer<QUrl>();
         registerSerializer<nx::utils::Url>();
         registerSerializer<QFont>();

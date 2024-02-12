@@ -15,7 +15,7 @@ public:
 
     /** Server for video direct access if possible. */
     CrossSystemServerResource(
-        const QnUuid& id,
+        const nx::Uuid& id,
         nx::network::SocketAddress endpoint,
         core::RemoteConnectionPtr connection);
 

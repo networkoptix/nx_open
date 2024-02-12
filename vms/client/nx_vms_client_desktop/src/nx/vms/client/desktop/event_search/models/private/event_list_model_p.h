@@ -27,14 +27,14 @@ public:
     bool addFront(const EventData& data);
     bool addBack(const EventData& data);
 
-    bool removeEvent(const QnUuid& id);
+    bool removeEvent(const nx::Uuid& id);
     void removeEvents(int first, int count);
 
     // Event index lookup by id. Logarithmic complexity.
-    int indexOf(const QnUuid& id) const;
+    int indexOf(const nx::Uuid& id) const;
 
     bool updateEvent(const EventData& data);
-    bool updateEvent(QnUuid id);
+    bool updateEvent(nx::Uuid id);
 
     const EventData& getEvent(int index) const;
 
@@ -43,7 +43,7 @@ public:
 
 private:
     EventListModel* const q = nullptr;
-    utils::KeyedList<QnUuid, EventData> m_events;
+    utils::KeyedList<nx::Uuid, EventData> m_events;
 };
 
 } // namespace nx::vms::client::desktop

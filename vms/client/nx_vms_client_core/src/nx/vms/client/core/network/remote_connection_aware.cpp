@@ -90,12 +90,12 @@ RemoteConnectionAwareMock* RemoteConnectionAware::mockImplementation() const
     return m_mockImplementation.get();
 }
 
-QnUuid RemoteConnectionAware::serverId() const
+nx::Uuid RemoteConnectionAware::serverId() const
 {
     if (auto currentConnection = connection())
         return currentConnection->moduleInformation().id;
 
-    return QnUuid();
+    return nx::Uuid();
 }
 
 QnMediaServerResourcePtr RemoteConnectionAware::currentServer() const

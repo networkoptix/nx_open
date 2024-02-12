@@ -49,7 +49,7 @@ Condition resourceExtraStatusFlagsMatch(ResourceExtraStatus flags);
 Condition dataMatch(int role, const QVariant& data);
 Condition nodeTypeDataMatch(ResourceTree::NodeType nodeType);
 Condition mimeDataContainsResource(const QnResourcePtr& resource);
-Condition mimeDataContainsEntity(const QnUuid& entityId);
+Condition mimeDataContainsEntity(const nx::Uuid& entityId);
 
 // Resource nodes lookup conditions.
 Condition serverIconTypeCondition();

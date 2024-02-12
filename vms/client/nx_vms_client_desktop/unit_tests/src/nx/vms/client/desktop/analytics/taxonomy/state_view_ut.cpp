@@ -81,7 +81,7 @@ struct InputData
 {
     using AttributeSupportInfo = std::map<
         QString /*attributeName*/,
-        std::map<QnUuid /*engineId*/, std::set<QnUuid /*deviceId*/>>
+        std::map<nx::Uuid /*engineId*/, std::set<nx::Uuid /*deviceId*/>>
     >;
 
     std::vector<QString> objectTypes;
@@ -102,7 +102,7 @@ NX_REFLECTION_INSTRUMENT(TestCase, TestCase_Fields);
 struct MultiengineTestCase
 {
     InputData input;
-    std::map</*engineId*/ QnUuid, ExpectedData> expected;
+    std::map</*engineId*/ nx::Uuid, ExpectedData> expected;
 };
 #define MultiengineTestCase_Fields (input)(expected)
 NX_REFLECTION_INSTRUMENT(MultiengineTestCase, MultiengineTestCase_Fields);
@@ -212,7 +212,7 @@ protected:
         for (const AbstractStateViewFilter* engineFilter: engineFilters)
         {
             const auto itr = m_multiengineTestCase.expected.find(
-                QnUuid::fromStringSafe(engineFilter->id()));
+                nx::Uuid::fromStringSafe(engineFilter->id()));
             ASSERT_FALSE(itr == m_multiengineTestCase.expected.cend())
                 << engineFilter->id().toStdString();
 
@@ -225,14 +225,14 @@ protected:
         const StateView* stateView = m_stateViewBuilder->stateView();
         std::vector<ObjectType*> objectTypes = stateView->objectTypes();
 
-        validateObjectTypes(objectTypes, m_multiengineTestCase.expected[QnUuid()].objectTypes);
+        validateObjectTypes(objectTypes, m_multiengineTestCase.expected[nx::Uuid()].objectTypes);
     }
 
 private:
-    static std::map<QString, std::set<QnUuid>> toDescriptorAttributeSupportInfo(
+    static std::map<QString, std::set<nx::Uuid>> toDescriptorAttributeSupportInfo(
         const InputData::AttributeSupportInfo& inputDataAttributeSupportInfo)
     {
-        std::map<QString, std::set<QnUuid>> result;
+        std::map<QString, std::set<nx::Uuid>> result;
         for (const auto& [attributeName, supportInfoByEngineAndDevice]: inputDataAttributeSupportInfo)
         {
             for (const auto& [engineId, deviceIds]: supportInfoByEngineAndDevice)

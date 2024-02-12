@@ -41,7 +41,7 @@ void QnCameraBookmarksManager::addCameraBookmark(const QnCameraBookmark &bookmar
 
 void QnCameraBookmarksManager::addAcknowledge(
     const QnCameraBookmark &bookmark,
-    const QnUuid& eventRuleId,
+    const nx::Uuid& eventRuleId,
     OperationCallbackType callback)
 {
     NX_ASSERT(bookmark.isValid(), "Invalid bookmark");
@@ -58,7 +58,7 @@ void QnCameraBookmarksManager::updateCameraBookmark(const QnCameraBookmark &book
     emit bookmarkUpdated(bookmark);
 }
 
-void QnCameraBookmarksManager::deleteCameraBookmark(const QnUuid &bookmarkId, OperationCallbackType callback)
+void QnCameraBookmarksManager::deleteCameraBookmark(const nx::Uuid &bookmarkId, OperationCallbackType callback)
 {
     d->deleteCameraBookmark(bookmarkId, callback);
 

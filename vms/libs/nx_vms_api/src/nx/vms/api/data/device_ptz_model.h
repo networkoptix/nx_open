@@ -32,7 +32,7 @@ struct NX_VMS_API PtzPositionFilter
      * Device id (can be obtained from "id", "physicalId" or "logicalId"
      * field via `GET /rest/v{1-}/devices`) or MAC address (not supported for certain cameras).
      */
-    QnUuid deviceId;
+    nx::Uuid deviceId;
 
     /**%apidoc[opt] Type of the position to be returned. */
     PtzPositionType type = PtzPositionType::absolute;
@@ -102,7 +102,7 @@ struct NX_VMS_API PtzPresetFilter
      * Device id (can be obtained from "id", "physicalId" or "logicalId"
      * field via `GET /rest/v{1-}/devices`) or MAC address (not supported for certain cameras).
      */
-    QnUuid deviceId;
+    nx::Uuid deviceId;
 
     const PtzPresetFilter& getId() const { return *this; }
     bool operator==(const PtzPresetFilter&) const = default;

@@ -26,8 +26,8 @@ public:
 
     // Call in case of a server is found or updated.
     void updateServerRemoteAddresses(
-        const QnUuid& localSystemId,
-        const QnUuid& serverId,
+        const nx::Uuid& localSystemId,
+        const nx::Uuid& serverId,
         const QSet<QString>& remoteAddresses);
 
 private:

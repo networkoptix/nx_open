@@ -23,18 +23,18 @@ public:
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
 
     virtual int setResourceStatus(
-        const QnUuid& resourceId,
+        const nx::Uuid& resourceId,
         nx::vms::api::ResourceStatus status,
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
 
     virtual int getKvPairs(
-        const QnUuid& resourceId,
+        const nx::Uuid& resourceId,
         Handler<nx::vms::api::ResourceParamWithRefDataList> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
 
     virtual int getStatusList(
-        const QnUuid& resourceId,
+        const nx::Uuid& resourceId,
         Handler<nx::vms::api::ResourceStatusDataList> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
 
@@ -44,12 +44,12 @@ public:
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
 
     virtual int remove(
-        const QnUuid& resourceId,
+        const nx::Uuid& resourceId,
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
 
     virtual int remove(
-        const QVector<QnUuid>& resourceIds,
+        const QVector<nx::Uuid>& resourceIds,
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
 
@@ -60,7 +60,7 @@ public:
 
     // TODO: #vbreus Temporary implementation, remove as REST API request will be implemented.
     virtual int removeHardwareIdMapping(
-        const QnUuid& resourceId,
+        const nx::Uuid& resourceId,
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
 
@@ -103,7 +103,7 @@ int QnResourceManager<T>::getResourceTypes(
 
 template<class T>
 int QnResourceManager<T>::setResourceStatus(
-    const QnUuid& resourceId,
+    const nx::Uuid& resourceId,
     nx::vms::api::ResourceStatus status,
     Handler<> handler,
     nx::utils::AsyncHandlerExecutor handlerExecutor)
@@ -125,12 +125,12 @@ int QnResourceManager<T>::setResourceStatus(
 
 template<class T>
 int QnResourceManager<T>::getKvPairs(
-    const QnUuid& resourceId,
+    const nx::Uuid& resourceId,
     Handler<nx::vms::api::ResourceParamWithRefDataList> handler,
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
     const int requestId = generateRequestID();
-    processor().template processQueryAsync<QnUuid, nx::vms::api::ResourceParamWithRefDataList>(
+    processor().template processQueryAsync<nx::Uuid, nx::vms::api::ResourceParamWithRefDataList>(
         ApiCommand::getResourceParams,
         resourceId,
         [requestId, handler = handlerExecutor.bind(std::move(handler))](auto&&... args) mutable
@@ -142,12 +142,12 @@ int QnResourceManager<T>::getKvPairs(
 
 template<class T>
 int QnResourceManager<T>::getStatusList(
-    const QnUuid& resourceId,
+    const nx::Uuid& resourceId,
     Handler<nx::vms::api::ResourceStatusDataList> handler,
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
     const int requestId = generateRequestID();
-    processor().template processQueryAsync<QnUuid, nx::vms::api::ResourceStatusDataList>(
+    processor().template processQueryAsync<nx::Uuid, nx::vms::api::ResourceStatusDataList>(
         ApiCommand::getStatusList,
         resourceId,
         [requestId, handler = handlerExecutor.bind(std::move(handler))](auto&&... args) mutable
@@ -176,7 +176,7 @@ int QnResourceManager<T>::save(
 
 template<class T>
 int QnResourceManager<T>::remove(
-    const QnUuid& resourceId,
+    const nx::Uuid& resourceId,
     Handler<> handler,
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
@@ -210,12 +210,12 @@ int QnResourceManager<T>::remove(
 
 template<class T>
 int QnResourceManager<T>::remove(
-    const QVector<QnUuid>& resourceIds,
+    const QVector<nx::Uuid>& resourceIds,
     Handler<> handler,
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
     nx::vms::api::IdDataList params;
-    for (const QnUuid& id: resourceIds)
+    for (const nx::Uuid& id: resourceIds)
         params.push_back(id);
 
     const int requestId = generateRequestID();
@@ -231,7 +231,7 @@ int QnResourceManager<T>::remove(
 
 template<class T>
 int QnResourceManager<T>::removeHardwareIdMapping(
-    const QnUuid& resourceId,
+    const nx::Uuid& resourceId,
     Handler<> handler,
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {

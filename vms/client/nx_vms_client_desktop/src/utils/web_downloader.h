@@ -59,7 +59,7 @@ private:
     State m_state = State::Init;
     QElapsedTimer m_downloadTimer;
     QFileInfo m_fileInfo;
-    QnUuid m_notificationId;
+    nx::Uuid m_notificationId;
     bool m_cancelRequested = false;
     bool m_hasWriteError = false;
     QPointer<QObject> m_item;

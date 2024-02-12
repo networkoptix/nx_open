@@ -16,7 +16,7 @@ namespace nx::core::access {
 using AccessRight = nx::vms::api::AccessRight;
 using AccessRights = nx::vms::api::AccessRights;
 
-using ResourceAccessMap = QHash<QnUuid /*resourceId*/, AccessRights>;
+using ResourceAccessMap = QHash<nx::Uuid /*resourceId*/, AccessRights>;
 
 /** Merges two resource access maps. */
 NX_VMS_COMMON_API ResourceAccessMap& operator+=(

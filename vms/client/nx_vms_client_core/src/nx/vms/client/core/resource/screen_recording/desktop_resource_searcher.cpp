@@ -38,13 +38,13 @@ QnResourceList DesktopResourceSearcher::findResources()
     return m_impl->findResources();
 }
 
-bool DesktopResourceSearcher::isResourceTypeSupported(QnUuid /*resourceTypeId*/) const
+bool DesktopResourceSearcher::isResourceTypeSupported(nx::Uuid /*resourceTypeId*/) const
 {
     return false;
 }
 
 QnResourcePtr DesktopResourceSearcher::createResource(
-    const QnUuid& /*resourceTypeId*/,
+    const nx::Uuid& /*resourceTypeId*/,
     const QnResourceParams& /*params*/)
 {
     return QnResourcePtr();

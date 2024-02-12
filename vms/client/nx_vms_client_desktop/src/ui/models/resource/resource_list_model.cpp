@@ -126,12 +126,12 @@ void QnResourceListModel::removeResource(const QnResourcePtr &resource)
     m_resources.removeAt(row);
 }
 
-QSet<QnUuid> QnResourceListModel::checkedResources() const
+QSet<nx::Uuid> QnResourceListModel::checkedResources() const
 {
     return m_checkedResources;
 }
 
-void QnResourceListModel::setCheckedResources(const QSet<QnUuid>& ids)
+void QnResourceListModel::setCheckedResources(const QSet<nx::Uuid>& ids)
 {
     if (m_checkedResources == ids)
         return;
@@ -143,7 +143,7 @@ void QnResourceListModel::setCheckedResources(const QSet<QnUuid>& ids)
     // Need to filter out IDs that are not in this resource list.
     // We will gather all resource ids to a separate set, and then check ids
     // from selection with this set. O(NlogM) is here.
-    QSet<QnUuid> contained_ids;
+    QSet<nx::Uuid> contained_ids;
     for (const auto& resource: m_resources)
     {
         auto id = resource->getId();
@@ -286,7 +286,7 @@ bool QnResourceListModel::setData(const QModelIndex &index, const QVariant &valu
             {
                 ScopedReset resetModel(this);
                 // TODO: Notify all other elements about the changes
-                m_checkedResources = checked ? QSet<QnUuid>{id} : QSet<QnUuid>{};
+                m_checkedResources = checked ? QSet<nx::Uuid>{id} : QSet<nx::Uuid>{};
             }
         }
         else

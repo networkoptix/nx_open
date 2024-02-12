@@ -11,7 +11,7 @@ struct NX_VMS_API WebPageData: ResourceData
     WebPageData(): ResourceData(kResourceTypeId) {}
 
     static const QString kResourceTypeName;
-    static const QnUuid kResourceTypeId;
+    static const nx::Uuid kResourceTypeId;
 };
 #define WebPageData_Fields ResourceData_Fields
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(WebPageData)

@@ -22,18 +22,18 @@ public:
 
 private:
     void updateServerData(const nx::vms::discovery::ModuleEndpoint& module);
-    void removeServer(QnUuid id);
+    void removeServer(nx::Uuid id);
 
     typedef QHash<QString, QnSystemDescription::PointerType> SystemsHash;
     void updateServerInternal(
         SystemsHash::iterator systemIt, const nx::vms::discovery::ModuleEndpoint& module);
 
     void updatePrimaryAddress(const nx::vms::discovery::ModuleEndpoint& module);
-    SystemsHash::iterator getSystemItByServer(const QnUuid &serverId);
+    SystemsHash::iterator getSystemItByServer(const nx::Uuid &serverId);
     void removeSystem(SystemsHash::iterator it);
 
 private:
-    typedef QHash<QnUuid, QString> ServerToSystemHash;
+    typedef QHash<nx::Uuid, QString> ServerToSystemHash;
 
     SystemsHash m_systems;
     ServerToSystemHash m_serverToSystem;

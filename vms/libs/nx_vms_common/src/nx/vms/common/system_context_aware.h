@@ -59,7 +59,7 @@ public:
      * and on the number of the running client instance, so different Client windows have different
      * peer ids.
      */
-    QnUuid peerId() const;
+    nx::Uuid peerId() const;
 
     /**
      * Interface for the Message Bus connection.

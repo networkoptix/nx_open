@@ -17,7 +17,7 @@ class NX_VMS_RULES_API NetworkIssueEvent: public BasicEvent
     Q_OBJECT
     Q_CLASSINFO("type", "nx.events.networkIssue")
 
-    FIELD(QnUuid, cameraId, setCameraId)
+    FIELD(nx::Uuid, cameraId, setCameraId)
     FIELD(nx::vms::api::EventReason, reason, setReason)
     FIELD(nx::vms::rules::NetworkIssueInfo, info, setInfo)
 
@@ -25,7 +25,7 @@ public:
     NetworkIssueEvent() = default;
     NetworkIssueEvent(
         std::chrono::microseconds timestamp,
-        QnUuid cameraId,
+        nx::Uuid cameraId,
         nx::vms::api::EventReason reason,
         const NetworkIssueInfo& info);
 

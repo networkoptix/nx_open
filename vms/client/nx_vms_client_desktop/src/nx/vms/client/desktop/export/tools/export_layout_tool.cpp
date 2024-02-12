@@ -161,7 +161,7 @@ ExportLayoutTool::ExportLayoutTool(
 
     // If exporting layout, create new guid. If layout just renamed or saved, keep guid.
     if (d->settings.mode != ExportLayoutSettings::Mode::LocalSave)
-        d->layout->setIdUnsafe(QnUuid::createUuid());
+        d->layout->setIdUnsafe(nx::Uuid::createUuid());
 
     m_isExportToExe = nx::build_info::isWindows()
         && FileExtensionUtils::isExecutable(d->settings.fileName.extension);
@@ -201,7 +201,7 @@ NovMetadata ExportLayoutTool::prepareLayoutAndMetadata()
 {
     NovMetadata metadata{.version = NovMetadata::kCurrentVersion};
 
-    QSet<QnUuid> idList;
+    QSet<nx::Uuid> idList;
     common::LayoutItemDataMap items;
 
     for (const auto& item: d->layout->getItems())

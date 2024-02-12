@@ -21,10 +21,10 @@ public:
     void setError(const QString& error);
 
     Q_INVOKABLE void addRule();
-    Q_INVOKABLE void editSchedule(const QnUuidList& ids);
-    Q_INVOKABLE void duplicateRule(QnUuid id);
-    Q_INVOKABLE void editRule(QnUuid id);
-    Q_INVOKABLE void deleteRules(const QnUuidList& ids);
+    Q_INVOKABLE void editSchedule(const UuidList& ids);
+    Q_INVOKABLE void duplicateRule(nx::Uuid id);
+    Q_INVOKABLE void editRule(nx::Uuid id);
+    Q_INVOKABLE void deleteRules(const UuidList& ids);
     Q_INVOKABLE void resetToDefaults();
     Q_INVOKABLE void openEventLogDialog();
 
@@ -32,7 +32,7 @@ private:
     QWidget* m_parentWidget{nullptr};
     RulesTableModel* m_rulesTableModel{nullptr};
 
-    void deleteRulesImpl(const QnUuidList& ids);
+    void deleteRulesImpl(const UuidList& ids);
     void saveRuleImpl(const std::shared_ptr<vms::rules::Rule>& rule);
     void resetToDefaultsImpl();
 };

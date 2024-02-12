@@ -38,16 +38,16 @@ inline bool fromQVariant(const QVariant& value, QString* result)
     return true;
 }
 
-inline bool fromQVariant(const QVariant& value, QnUuid* result)
+inline bool fromQVariant(const QVariant& value, nx::Uuid* result)
 {
     if (!value.isValid())
         return false;
 
-    *result = QnUuid::fromStringSafe(value.toString());
+    *result = nx::Uuid::fromStringSafe(value.toString());
     return true;
 }
 
-inline QVariant toQVariant(const QnUuid& value)
+inline QVariant toQVariant(const nx::Uuid& value)
 {
     return QVariant::fromValue(value.toString());
 }

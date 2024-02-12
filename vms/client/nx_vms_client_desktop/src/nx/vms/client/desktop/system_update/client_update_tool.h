@@ -167,8 +167,8 @@ public:
 
     struct SystemServersInfo
     {
-        QnUuidList serversWithInternet;
-        QnUuidList persistentStorageServers;
+        UuidList serversWithInternet;
+        UuidList persistentStorageServers;
     };
 
     /**

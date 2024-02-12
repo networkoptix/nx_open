@@ -11,7 +11,7 @@ class TestSystemsController: public AbstractSystemsController
 {
     struct ScopeInfo
     {
-        QnUuid localId;
+        nx::Uuid localId;
         QString name;
         nx::vms::client::core::welcome_screen::TileVisibilityScope visibilityScope;
     };
@@ -25,9 +25,9 @@ public:
     virtual QString cloudLogin() const override;
     virtual QnAbstractSystemsFinder::SystemDescriptionList systemsList() const override;
     virtual nx::vms::client::core::welcome_screen::TileVisibilityScope visibilityScope(
-        const QnUuid& localId) const override;
+        const nx::Uuid& localId) const override;
     virtual bool setScopeInfo(
-        const QnUuid& localId,
+        const nx::Uuid& localId,
         const QString& name,
         nx::vms::client::core::welcome_screen::TileVisibilityScope visibilityScope) override;
 
@@ -39,7 +39,7 @@ public:
 
 private:
     QnAbstractSystemsFinder::SystemDescriptionList m_systems;
-    QHash<QnUuid, ScopeInfo> m_scopeInfoHash;
+    QHash<nx::Uuid, ScopeInfo> m_scopeInfoHash;
 };
 
 } // namespace test

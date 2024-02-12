@@ -16,7 +16,7 @@ struct NX_VMS_API ConnectedDevicesRequest
      * refer to the current Server.
      * %example this
      */
-    QnUuid serverId;
+    nx::Uuid serverId;
     std::vector<QString> deviceIds;
 };
 #define ConnectedDevicesRequest_Fields (serverId)(deviceIds)

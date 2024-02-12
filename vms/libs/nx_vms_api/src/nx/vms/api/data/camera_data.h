@@ -27,10 +27,10 @@ struct NX_VMS_API CameraData: ResourceData
      */
     void fillId();
 
-    static QnUuid physicalIdToId(const QString& physicalId);
+    static nx::Uuid physicalIdToId(const QString& physicalId);
 
-    static const QnUuid kDesktopCameraTypeId;
-    static const QnUuid kVirtualCameraTypeId;
+    static const nx::Uuid kDesktopCameraTypeId;
+    static const nx::Uuid kVirtualCameraTypeId;
 
     /**%apidoc[readonly] Device MAC address. */
     QnLatin1Array mac;

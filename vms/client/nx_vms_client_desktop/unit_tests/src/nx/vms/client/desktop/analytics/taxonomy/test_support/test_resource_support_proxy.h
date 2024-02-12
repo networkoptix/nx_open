@@ -14,7 +14,7 @@ class TestResourceSupportProxy: public nx::analytics::taxonomy::AbstractResource
 public:
     using TypeSupportInfo = std::map<
         QString /*attributeName*/,
-        std::map<QnUuid /*engineId*/, std::set<QnUuid /*deviceId*/>>
+        std::map<nx::Uuid /*engineId*/, std::set<nx::Uuid /*deviceId*/>>
     >;
 
 public:
@@ -23,15 +23,15 @@ public:
     virtual bool isEntityTypeSupported(
         nx::analytics::taxonomy::EntityType entityType,
         const QString& entityTypeId,
-        QnUuid deviceId,
-        QnUuid engineId) const override;
+        nx::Uuid deviceId,
+        nx::Uuid engineId) const override;
 
     virtual bool isEntityTypeAttributeSupported(
         nx::analytics::taxonomy::EntityType entityType,
         const QString& entityTypeId,
         const QString& fullAttributeName,
-        QnUuid deviceId,
-        QnUuid engineId) const override;
+        nx::Uuid deviceId,
+        nx::Uuid engineId) const override;
 
 private:
     std::map<QString, TypeSupportInfo> m_typeSupportInfo;

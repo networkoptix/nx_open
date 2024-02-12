@@ -50,7 +50,7 @@ QVector<QnResourcePtr> ParentServersProxySource::getResources()
 
 void ParentServersProxySource::onResourceParentIdChanged(
     const QnResourcePtr& resource,
-    const QnUuid& previousParentId)
+    const nx::Uuid& previousParentId)
 {
     unmapResource(resource, resource->resourcePool()->getResourceById(previousParentId));
     mapResource(resource);

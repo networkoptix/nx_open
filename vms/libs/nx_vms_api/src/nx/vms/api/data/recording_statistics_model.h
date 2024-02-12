@@ -23,7 +23,7 @@ struct NX_VMS_API RecordingStatisticsData
      * Device id (can be obtained from "id", "physicalId" or "logicalId" field via
      * `GET /rest/v{1-}/devices`) or MAC address (not supported for certain cameras).
      */
-    QnUuid deviceId;
+    nx::Uuid deviceId;
 
     /**%apidoc:integer Recorded archive in bytes. */
     double recordedBytes = 0.0;
@@ -41,7 +41,7 @@ struct NX_VMS_API RecordingStatisticsData
     double averageDensity = 0.0;
 
     /**%apidoc Additional details about the recorded bytes. */
-    std::map<QnUuid, qint64> recordedBytesPerStorage;
+    std::map<nx::Uuid, qint64> recordedBytesPerStorage;
 
     void operator+=(const RecordingStatisticsData& other)
     {
@@ -54,7 +54,7 @@ struct NX_VMS_API RecordingStatisticsData
     (archiveDurationS)(averageBitrate)(averageDensity)(recordedBytesPerStorage)
 QN_FUSION_DECLARE_FUNCTIONS(RecordingStatisticsData, (json), NX_VMS_API)
 
-using RecordingStatisticsValues = Map<QnUuid /*id*/,
+using RecordingStatisticsValues = Map<nx::Uuid /*id*/,
     std::vector<api::RecordingStatisticsData> /*statistics*/>;
 
 } // namespace nx::vms::api

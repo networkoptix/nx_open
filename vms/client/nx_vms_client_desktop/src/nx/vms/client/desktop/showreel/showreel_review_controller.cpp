@@ -146,7 +146,7 @@ void ShowreelReviewController::handleShowreelChanged(const nx::vms::api::Showree
     updateButtons(reviewLayout);
 }
 
-void ShowreelReviewController::handleShowreelRemoved(const QnUuid& showreelId)
+void ShowreelReviewController::handleShowreelRemoved(const nx::Uuid& showreelId)
 {
     m_saveShowreelsQueue.remove(showreelId);
 
@@ -198,7 +198,7 @@ void ShowreelReviewController::reviewShowreel(const nx::vms::api::ShowreelData& 
     static const float kCellAspectRatio{16.0f / 9.0f};
 
     const auto layout = LayoutResourcePtr(new LayoutResource());
-    layout->setIdUnsafe(QnUuid::createUuid()); //< Layout is never saved to server.
+    layout->setIdUnsafe(nx::Uuid::createUuid()); //< Layout is never saved to server.
     layout->addFlags(Qn::local);
     layout->setParentId(showreel.id);
     layout->setName(showreel.name);
@@ -223,9 +223,9 @@ void ShowreelReviewController::reviewShowreel(const nx::vms::api::ShowreelData& 
     menu()->trigger(menu::OpenInNewTabAction, layout);
 }
 
-QnUuid ShowreelReviewController::currentShowreelId() const
+nx::Uuid ShowreelReviewController::currentShowreelId() const
 {
-    return workbench()->currentLayout()->data(Qn::ShowreelUuidRole).value<QnUuid>();
+    return workbench()->currentLayout()->data(Qn::ShowreelUuidRole).value<nx::Uuid>();
 }
 
 bool ShowreelReviewController::isShowreelReviewMode() const
@@ -457,7 +457,7 @@ void ShowreelReviewController::addItemToReviewLayout(
         return;
 
     common::LayoutItemData itemData;
-    itemData.uuid = QnUuid::createUuid();
+    itemData.uuid = nx::Uuid::createUuid();
     itemData.combinedGeometry = QRectF(position, kCellSize);
     if (pinItem)
         itemData.flags = Qn::Pinned;
@@ -514,7 +514,7 @@ bool ShowreelReviewController::fillShowreelItems(nx::vms::api::ShowreelItemDataL
 }
 
 void ShowreelReviewController::handleItemDataChanged(
-    const QnUuid& id,
+    const nx::Uuid& id,
     Qn::ItemDataRole role,
     const QVariant& data)
 {
@@ -529,7 +529,7 @@ void ShowreelReviewController::handleItemDataChanged(
     if (!item)
         return;
 
-    QSet<QnUuid> selectedItems;
+    QSet<nx::Uuid> selectedItems;
     for (const auto widget: display()->widgets())
     {
         if (widget->isSelected())
@@ -549,7 +549,7 @@ void ShowreelReviewController::handleItemDataChanged(
 void ShowreelReviewController::at_reviewShowreelAction_triggered()
 {
     const auto parameters = menu()->currentParameters(sender());
-    auto id = parameters.argument<QnUuid>(Qn::UuidRole);
+    auto id = parameters.argument<nx::Uuid>(Qn::UuidRole);
     reviewShowreel(systemContext()->showreelManager()->showreel(id));
 }
 

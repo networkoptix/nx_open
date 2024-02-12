@@ -14,7 +14,7 @@ TEST(RunningEventWatcherTest, eventWatcherProperlyHandlesDifferentEventsWithTheS
     auto simpleEvent = SimpleEventPtr::create(startTime, State::started);
     auto testEvent = TestEventPtr::create(startTime, State::started);
 
-    const auto cameraId = QnUuid::createUuid();
+    const auto cameraId = nx::Uuid::createUuid();
     simpleEvent->m_cameraId = cameraId;
     testEvent->m_cameraId = cameraId;
 

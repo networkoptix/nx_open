@@ -152,7 +152,7 @@ class UserListModel::Private:
 public:
     QString syncId;
     boost::container::flat_set<QnUserResourcePtr> users;
-    QSet<QnUuid> notFoundUsers;
+    QSet<nx::Uuid> notFoundUsers;
     QSet<QnUserResourcePtr> checkedUsers;
     QHash<QnUserResourcePtr, bool> enableChangedUsers;
     QHash<QnUserResourcePtr, bool> digestChangedUsers;
@@ -941,12 +941,12 @@ bool UserListModel::isInteractiveColumn(int column)
     return column == CheckBoxColumn;
 }
 
-QSet<QnUuid> UserListModel::notFoundUsers() const
+QSet<nx::Uuid> UserListModel::notFoundUsers() const
 {
     return d->notFoundUsers;
 }
 
-QSet<QnUuid> UserListModel::nonUniqueUsers() const
+QSet<nx::Uuid> UserListModel::nonUniqueUsers() const
 {
     return d->systemContext()->nonEditableUsersAndGroups()->nonUniqueUsers().nonUniqueNameIds();
 }

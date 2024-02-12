@@ -87,12 +87,12 @@ public:
     /**
      * @return Set containing selected resources IDs.
      */
-    QnUuidSet selectedResourcesIds() const;
+    UuidSet selectedResourcesIds() const;
 
     /**
      * @param  resourcesIds List of identifiers for the resources.
      */
-    void setSelectedResourcesIds(const QnUuidSet& resourcesIds);
+    void setSelectedResourcesIds(const UuidSet& resourcesIds);
 
     /**
      * Convenience getter which may be used instead of <tt>selectedResources()</tt> if
@@ -113,14 +113,14 @@ public:
      * <tt>ResourceSelectionMode::SingleSelection</tt> or
      * <tt>ResourceSelectionMode::ExclusiveSelection</tt> selection mode used.
      */
-    QnUuid selectedResourceId() const;
+    nx::Uuid selectedResourceId() const;
 
     /**
      * Convenience setter which may be used instead of <tt>setSelectedResourcesIds()</tt> if
      * <tt>ResourceSelectionMode::SingleSelection</tt> or
      * <tt>ResourceSelectionMode::ExclusiveSelection</tt> selection mode used.
      */
-    void setSelectedResourceId(const QnUuid& resourceId);
+    void setSelectedResourceId(const nx::Uuid& resourceId);
 
 signals:
     void selectionModeChanged(ResourceSelectionMode mode);

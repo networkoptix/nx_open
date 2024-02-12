@@ -160,7 +160,7 @@ public:
 
     QnResourceWidget *widget(Qn::ItemRole role) const;
 
-    QnResourceWidget *widget(const QnUuid &uuid) const;
+    QnResourceWidget *widget(const nx::Uuid &uuid) const;
 
     QList<QnResourceWidget *> widgets(const QnResourcePtr &resource) const;
 

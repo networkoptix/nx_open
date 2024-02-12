@@ -13,7 +13,7 @@ namespace nx::vms::rules {
 
 ServerConflictEvent::ServerConflictEvent(
     std::chrono::microseconds timestamp,
-    QnUuid serverId,
+    nx::Uuid serverId,
     const CameraConflictList& conflicts)
     :
     BasicEvent(timestamp),

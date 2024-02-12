@@ -165,7 +165,7 @@ QnServerStorageManager::QnServerStorageManager(
     connect(systemContext->serverRuntimeEventConnector(),
         &ServerRuntimeEventConnector::analyticsStorageParametersChanged,
         this,
-        [this](const QnUuid& serverId)
+        [this](const nx::Uuid& serverId)
         {
             const auto server = resourcePool()->getResourceById<QnMediaServerResource>(serverId);
             if (server && isServerValid(server))

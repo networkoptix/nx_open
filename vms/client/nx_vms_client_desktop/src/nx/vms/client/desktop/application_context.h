@@ -147,12 +147,12 @@ public:
      *     stored persistent id and on the number of the running client instance, so different
      *     Client windows have different peer ids.
      */
-    QnUuid peerId() const;
+    nx::Uuid peerId() const;
 
     /**
      * @return Id of the current Video Wall instance if the client was run in the Video Wall mode.
      */
-    QnUuid videoWallInstanceId() const;
+    nx::Uuid videoWallInstanceId() const;
 
     /**
      * Temporary accessor until QnClientCoreModule contents is moved to the corresponding

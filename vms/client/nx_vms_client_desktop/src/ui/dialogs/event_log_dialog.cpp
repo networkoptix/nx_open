@@ -130,7 +130,7 @@ QModelIndex analyticsEventsRoot(QStandardItemModel* model)
 
 const int kQueryTimeoutMs = 15000;
 
-QnVirtualCameraResourceList cameras(const QSet<QnUuid>& ids)
+QnVirtualCameraResourceList cameras(const QSet<nx::Uuid>& ids)
 {
     auto resourcePool = qnClientCoreModule->resourcePool();
     return resourcePool->getResourcesByIds<QnVirtualCameraResource>(ids);
@@ -443,7 +443,7 @@ void QnEventLogDialog::reset()
 {
     disableUpdateData();
     setEventType(EventType::anyEvent);
-    setCameraList(QSet<QnUuid>());
+    setCameraList(QSet<nx::Uuid>());
     setActionType(ActionType::undefinedAction);
     setText(QString());
     ui->dateRangeWidget->reset();
@@ -470,7 +470,7 @@ void QnEventLogDialog::updateData()
         || eventType == EventType::anyServerEvent;
     ui->cameraButton->setEnabled(!serverIssue);
     if (serverIssue)
-        setCameraList(QSet<QnUuid>());
+        setCameraList(QSet<nx::Uuid>());
 
     bool istantOnly = !hasToggleState(eventType, vms::event::EventParameters(), system())
         && eventType != EventType::undefinedEvent;
@@ -698,12 +698,12 @@ void QnEventLogDialog::setDateRange(qint64 startTimeMs, qint64 endTimeMs)
     ui->dateRangeWidget->setRange(startTimeMs, endTimeMs);
 }
 
-QnUuidSet QnEventLogDialog::getCameraList() const
+UuidSet QnEventLogDialog::getCameraList() const
 {
     return m_filterCameraList;
 }
 
-void QnEventLogDialog::setCameraList(const QnUuidSet& ids)
+void QnEventLogDialog::setCameraList(const UuidSet& ids)
 {
     if (ids == m_filterCameraList)
         return;
@@ -742,7 +742,7 @@ void QnEventLogDialog::at_filterAction_triggered()
     if (parentEventType != EventType::anyEvent && parentEventType != EventType::undefinedEvent)
         eventType = parentEventType;
 
-    QSet<QnUuid> camList;
+    QSet<nx::Uuid> camList;
     const auto cameraResource =
         m_model->eventResource(idx.row()).dynamicCast<QnVirtualCameraResource>();
     if (cameraResource)

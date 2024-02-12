@@ -24,10 +24,10 @@ public:
 protected:
     using ResourceController::add;
     ResourceType* add(ResourceType resource, QString id, Scope scope);
-    ResourceType* add(ResourceType resource, const QnUuid& id, Scope scope);
+    ResourceType* add(ResourceType resource, const nx::Uuid& id, Scope scope);
 
     using ResourceController::remove;
-    bool remove(const QnUuid& id);
+    bool remove(const nx::Uuid& id);
 
 private:
     std::unique_ptr<ResourceProvider<Resource>> m_provider;
@@ -100,13 +100,13 @@ ResourceType* ResourceControllerImpl<ResourceType>::add(
 
 template<typename ResourceType>
 ResourceType* ResourceControllerImpl<ResourceType>::add(
-    ResourceType resource, const QnUuid& id, Scope scope)
+    ResourceType resource, const nx::Uuid& id, Scope scope)
 {
     return add(std::move(resource), id.toSimpleString(), scope);
 }
 
 template<typename ResourceType>
-bool ResourceControllerImpl<ResourceType>::remove(const QnUuid& id)
+bool ResourceControllerImpl<ResourceType>::remove(const nx::Uuid& id)
 {
     return remove(id.toSimpleString());
 }

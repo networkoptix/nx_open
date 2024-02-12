@@ -16,8 +16,8 @@ public:
     explicit QnSelectResourcesDialogButton(QWidget* parent = nullptr);
     virtual ~QnSelectResourcesDialogButton() override;
 
-    QnUuidSet getResources() const;
-    void setResources(const QnUuidSet& resources);
+    UuidSet getResources() const;
+    void setResources(const UuidSet& resources);
 
 protected:
     virtual void handleButtonClicked() = 0;
@@ -26,5 +26,5 @@ signals:
     void commit();
 
 private:
-    QnUuidSet m_resources;
+    UuidSet m_resources;
 };

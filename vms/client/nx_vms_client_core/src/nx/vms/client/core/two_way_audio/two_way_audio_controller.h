@@ -24,7 +24,7 @@ class NX_VMS_CLIENT_CORE_API TwoWayAudioController: public QObject, public Syste
 
     Q_PROPERTY(bool available READ available NOTIFY availabilityChanged)
     Q_PROPERTY(bool started READ started NOTIFY startedChanged)
-    Q_PROPERTY(QnUuid resourceId READ resourceId WRITE setResourceId NOTIFY resourceIdChanged)
+    Q_PROPERTY(nx::Uuid resourceId READ resourceId WRITE setResourceId NOTIFY resourceIdChanged)
 
 public:
     TwoWayAudioController(SystemContext* systemContext, QObject* parent = nullptr);
@@ -43,8 +43,8 @@ public:
 
     bool available() const;
 
-    QnUuid resourceId() const;
-    void setResourceId(const QnUuid& value);
+    nx::Uuid resourceId() const;
+    void setResourceId(const nx::Uuid& value);
     void setCamera(const QnVirtualCameraResourcePtr& camera);
 
 signals:

@@ -19,7 +19,7 @@ typedef QVector<ScreenGeometry> Screens;
 
 struct Item
 {
-    QnUuid id;
+    nx::Uuid id;
     QString name;
     QnScreenSnaps snaps;
     bool isAdded = false;

@@ -78,11 +78,11 @@ void Metatypes::initialize()
     qRegisterMetaType<nx::vms::rules::UuidSelection>();
     QnJsonSerializer::registerSerializer<nx::vms::rules::UuidSelection>();
 
-    qRegisterMetaType<QnUuidList>("QnUuidList");
-    QnJsonSerializer::registerSerializer<QnUuidList>();
+    qRegisterMetaType<UuidList>("UuidList");
+    QnJsonSerializer::registerSerializer<UuidList>();
 
-    qRegisterMetaType<QnUuidSet>("QnUuidSet");
-    QnJsonSerializer::registerSerializer<QnUuidSet>();
+    qRegisterMetaType<UuidSet>("UuidSet");
+    QnJsonSerializer::registerSerializer<UuidSet>();
 
     QnJsonSerializer::registerSerializer<std::chrono::seconds>();
     QnJsonSerializer::registerSerializer<std::chrono::microseconds>();

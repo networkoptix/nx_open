@@ -24,7 +24,7 @@ QnClientMessageProcessor* SystemContextAware::clientMessageProcessor() const
     return systemContext()->clientMessageProcessor();
 }
 
-QnUuid SystemContextAware::currentServerId() const
+nx::Uuid SystemContextAware::currentServerId() const
 {
     return systemContext()->currentServerId();
 }

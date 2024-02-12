@@ -20,7 +20,7 @@ class ScopeStateViewFilter: public AbstractStateViewFilter
 public:
     ScopeStateViewFilter(
         nx::analytics::taxonomy::AbstractEngine* engine = nullptr,
-        const std::set<QnUuid>& devices = {},
+        const std::set<nx::Uuid>& devices = {},
         QObject* parent = nullptr);
 
     virtual ~ScopeStateViewFilter() override;

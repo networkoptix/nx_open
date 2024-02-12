@@ -12,7 +12,7 @@ namespace api {
 
 struct NX_VMS_API CloudSystemData
 {
-    QnUuid localSystemId;
+    nx::Uuid localSystemId;
 };
 #define CloudSystemData_Fields (localSystemId)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(CloudSystemData)

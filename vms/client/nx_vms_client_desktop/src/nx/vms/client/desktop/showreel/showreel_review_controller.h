@@ -40,7 +40,7 @@ public:
 
 private:
     void handleShowreelChanged(const nx::vms::api::ShowreelData& showreel);
-    void handleShowreelRemoved(const QnUuid& showreelId);
+    void handleShowreelRemoved(const nx::Uuid& showreelId);
 
     /** Handle current layout changes to update the Showreel review. */
     void startListeningLayout();
@@ -50,7 +50,7 @@ private:
 
     void reviewShowreel(const nx::vms::api::ShowreelData& showreel);
 
-    QnUuid currentShowreelId() const;
+    nx::Uuid currentShowreelId() const;
     bool isShowreelReviewMode() const;
 
     void connectToLayout(QnWorkbenchLayout* layout);
@@ -76,7 +76,7 @@ private:
     /** Calculate items from the review layout. */
     bool fillShowreelItems(nx::vms::api::ShowreelItemDataList* items);
 
-    void handleItemDataChanged(const QnUuid& id, Qn::ItemDataRole role, const QVariant& data);
+    void handleItemDataChanged(const nx::Uuid& id, Qn::ItemDataRole role, const QVariant& data);
 
 // Actions handlers
 private:
@@ -88,9 +88,9 @@ private:
 
 private:
     nx::utils::ScopedConnections m_connections;
-    QHash<QnUuid, LayoutResourcePtr> m_reviewLayouts;
+    QHash<nx::Uuid, LayoutResourcePtr> m_reviewLayouts;
     QHash<QPoint, QSharedPointer<ShowreelDropPlaceholder>> m_dropPlaceholders;
-    QSet<QnUuid> m_saveShowreelsQueue;
+    QSet<nx::Uuid> m_saveShowreelsQueue;
     nx::utils::PendingOperation* m_saveShowreelsOperation = nullptr;
     nx::utils::PendingOperation* m_updateItemsLayoutOperation = nullptr;
     bool m_updating = false;

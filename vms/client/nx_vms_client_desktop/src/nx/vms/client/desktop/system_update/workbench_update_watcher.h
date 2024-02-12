@@ -60,7 +60,7 @@ private:
 
     CommandActionPtr m_updateAction;
     CommandActionPtr m_skipAction;
-    QnUuid updateNotificationId;
+    nx::Uuid updateNotificationId;
 
     struct Private;
     nx::utils::ImplPtr<Private> m_private;

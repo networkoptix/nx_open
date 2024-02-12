@@ -28,7 +28,7 @@ protected:
 private:
     struct WatchedResource
     {
-        QnUuid resourceId;
+        nx::Uuid resourceId;
         std::future<nx::vms::api::ResourceStatus> statusFuture;
         std::function<nx::vms::api::ResourceStatus()> statusEvaluator;
     };

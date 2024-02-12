@@ -50,7 +50,7 @@ AttributeType toDescriptorAttributeType(AbstractAttribute::Type attributeType)
     }
 }
 
-std::set<QnUuid> propagateOwnSupport(AttributeSupportInfoTree* inOutAttributeSupportInfoTree)
+std::set<nx::Uuid> propagateOwnSupport(AttributeSupportInfoTree* inOutAttributeSupportInfoTree)
 {
     if (inOutAttributeSupportInfoTree->nestedAttributeSupportInfo.empty())
         return inOutAttributeSupportInfoTree->supportByEngine;
@@ -58,7 +58,7 @@ std::set<QnUuid> propagateOwnSupport(AttributeSupportInfoTree* inOutAttributeSup
     for (auto& [nestedAttributeName, nestedAttributeSupportInfoTree]:
         inOutAttributeSupportInfoTree->nestedAttributeSupportInfo)
     {
-        const std::set<QnUuid> descendantSupportByEngine =
+        const std::set<nx::Uuid> descendantSupportByEngine =
             propagateOwnSupport(&nestedAttributeSupportInfoTree);
 
         inOutAttributeSupportInfoTree->supportByEngine.insert(
@@ -70,7 +70,7 @@ std::set<QnUuid> propagateOwnSupport(AttributeSupportInfoTree* inOutAttributeSup
 
 std::map<QString, AttributeSupportInfoTree> buildAttributeSupportInfoTree(
     const std::vector<AbstractAttribute*>& attributes,
-    std::map<QString, std::set<QnUuid /*engineId*/>> supportInfo)
+    std::map<QString, std::set<nx::Uuid /*engineId*/>> supportInfo)
 {
     std::map<QString, AttributeSupportInfoTree> result;
 
@@ -99,7 +99,7 @@ std::map<QString, AttributeSupportInfoTree> buildAttributeSupportInfoTree(
         const QString prefix = objectTypeAttribute->name() + ".";
         auto lowerBoundIt = supportInfo.lower_bound(prefix);
 
-        std::map<QString, std::set<QnUuid>> nestedSupportInfo;
+        std::map<QString, std::set<nx::Uuid>> nestedSupportInfo;
         while (lowerBoundIt != supportInfo.cend() && lowerBoundIt->first.startsWith(prefix))
         {
             nestedSupportInfo[lowerBoundIt->first.mid(prefix.length())] =
@@ -122,7 +122,7 @@ std::map<QString, AttributeSupportInfoTree> buildAttributeSupportInfoTree(
 
 std::vector<AbstractAttribute*> makeSupportedAttributes(
     const std::vector<AbstractAttribute*>& attributes,
-    std::map<QString, std::set<QnUuid /*engineId*/>> supportInfo,
+    std::map<QString, std::set<nx::Uuid /*engineId*/>> supportInfo,
     AbstractResourceSupportProxy* resourceSupportProxy,
     QString rootParentTypeId,
     EntityType rootEntityType)

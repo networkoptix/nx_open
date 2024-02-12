@@ -30,7 +30,7 @@ static inline int userTypeSortOrder(nx::vms::api::UserType userType)
  * Adds operator< to Derived based on sorting order for users and groups. Requires to implement
  * certain functions in Derived class:
  *
- *   QnUuid id() const;
+ *   nx::Uuid id() const;
  *   bool isGroup() const;
  *   nx::vms::api::UserType userType() const;
  *   QString name() const;
@@ -96,7 +96,7 @@ public:
     {
     }
 
-    QnUuid id() const { return group.id; }
+    nx::Uuid id() const { return group.id; }
     bool isGroup() const { return true; }
     nx::vms::api::UserType userType() const { return group.type; }
     QString name() const { return group.name; }

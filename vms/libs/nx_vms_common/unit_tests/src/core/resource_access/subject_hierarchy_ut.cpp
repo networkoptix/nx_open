@@ -24,10 +24,10 @@ protected:
     {
         connect(this, &TestSubjectHierarchy::changed,
             [this](
-                const QSet<QnUuid>& added,
-                const QSet<QnUuid>& removed,
-                const QSet<QnUuid>& groupsWithChangedMembers,
-                const QSet<QnUuid>& subjectsWithChangedParents)
+                const QSet<nx::Uuid>& added,
+                const QSet<nx::Uuid>& removed,
+                const QSet<nx::Uuid>& groupsWithChangedMembers,
+                const QSet<nx::Uuid>& subjectsWithChangedParents)
             {
                 lastAdded = names(added);
                 lastRemoved = names(removed);

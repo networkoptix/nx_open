@@ -125,9 +125,9 @@ public:
         return result;
     }
 
-    QList<QnUuid> ids() const
+    QList<nx::Uuid> ids() const
     {
-        QList<QnUuid> result;
+        QList<nx::Uuid> result;
         for (const auto& resource: *this)
             result.push_back(resource->getId());
         return result;

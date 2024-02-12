@@ -24,7 +24,7 @@ struct NX_VMS_API EngineSettingsResponse
     /**%apidoc
      * Current id of the Settings Model. Such ids are used to check that values match the Model.
      */
-    QnUuid settingsModelId;
+    nx::Uuid settingsModelId;
 
     /**%apidoc
      * Name-value map with errors that occurred while performing the current settings operation.
@@ -78,12 +78,12 @@ struct NX_VMS_API EngineSettingsRequest
     /**%apidoc
      * Unique id of an Analytics Engine.
      */
-    QnUuid analyticsEngineId;
+    nx::Uuid analyticsEngineId;
 
     /**%apidoc
      * Id of the Settings Model the values supposed to be applied to.
      */
-    QnUuid settingsModelId;
+    nx::Uuid settingsModelId;
 
     /**%apidoc
      * Name-value map with setting values, using JSON types corresponding to each setting type.
@@ -103,7 +103,7 @@ struct NX_VMS_API EngineActiveSettingChangedRequest
     /**%apidoc
      * Unique id of an Analytics Engine.
      */
-    QnUuid analyticsEngineId;
+    nx::Uuid analyticsEngineId;
 
     /**%apidoc
      * Name of a setting which triggered the notification.

@@ -20,7 +20,7 @@ struct ConnectionData
      * Id of the system. Used as the credentials storage key.
      * For the cloud systems cloud id is used, local id for others.
      */
-    QnUuid systemId;
+    nx::Uuid systemId;
 
     bool operator==(const ConnectionData& other) const = default;
 

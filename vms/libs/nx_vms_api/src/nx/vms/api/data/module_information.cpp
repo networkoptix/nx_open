@@ -35,7 +35,7 @@ void ModuleInformation::fixRuntimeId()
         hash += hash;
 
     hash.resize(16);
-    runtimeId = QnUuid::fromRfc4122(hash);
+    runtimeId = nx::Uuid::fromRfc4122(hash);
 }
 
 QString ModuleInformation::cloudId() const
@@ -43,7 +43,7 @@ QString ModuleInformation::cloudId() const
     if (cloudSystemId.isEmpty())
         return QString();
 
-    const auto tmpCloudSystemId = QnUuid::fromStringSafe(cloudSystemId);
+    const auto tmpCloudSystemId = nx::Uuid::fromStringSafe(cloudSystemId);
     return id.toSimpleString() + "." +
         (tmpCloudSystemId.isNull() ? cloudSystemId : tmpCloudSystemId.toSimpleString());
 }

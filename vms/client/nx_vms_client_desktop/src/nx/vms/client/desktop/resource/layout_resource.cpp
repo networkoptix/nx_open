@@ -61,12 +61,12 @@ common::LayoutItemDataList LayoutResource::cloneItems(
     ItemsRemapHash newUuidByOldUuid;
     for (int i = 0; i < items.size(); i++)
     {
-        QnUuid newUuid = QnUuid::createUuid();
+        nx::Uuid newUuid = nx::Uuid::createUuid();
         newUuidByOldUuid[items[i].uuid] = newUuid;
         items[i].uuid = newUuid;
     }
     for (int i = 0; i < items.size(); i++)
-        items[i].zoomTargetUuid = newUuidByOldUuid.value(items[i].zoomTargetUuid, QnUuid());
+        items[i].zoomTargetUuid = newUuidByOldUuid.value(items[i].zoomTargetUuid, nx::Uuid());
     if (remapHash)
         *remapHash = newUuidByOldUuid;
     return items;
@@ -81,7 +81,7 @@ void LayoutResource::cloneTo(LayoutResourcePtr target, ItemsRemapHash* remapHash
 {
     {
         NX_MUTEX_LOCKER locker(&m_mutex);
-        target->setIdUnsafe(QnUuid::createUuid());
+        target->setIdUnsafe(nx::Uuid::createUuid());
         target->setUrl(m_url);
         target->setName(m_name);
         target->setParentId(m_parentId);
@@ -186,13 +186,13 @@ void LayoutResource::setData(Qn::ItemDataRole role, const QVariant &value)
     emit dataChanged(role);
 }
 
-QVariant LayoutResource::itemData(const QnUuid& id, Qn::ItemDataRole role) const
+QVariant LayoutResource::itemData(const nx::Uuid& id, Qn::ItemDataRole role) const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     return m_itemData.value(id).value(role);
 }
 
-void LayoutResource::setItemData(const QnUuid& id, Qn::ItemDataRole role, const QVariant& data)
+void LayoutResource::setItemData(const nx::Uuid& id, Qn::ItemDataRole role, const QVariant& data)
 {
     bool notify = false;
     {
@@ -204,7 +204,7 @@ void LayoutResource::setItemData(const QnUuid& id, Qn::ItemDataRole role, const 
          emit itemDataChanged(id, role, data);
 }
 
-void LayoutResource::cleanupItemData(const QnUuid& id)
+void LayoutResource::cleanupItemData(const nx::Uuid& id)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     m_itemData.remove(id);
@@ -245,7 +245,7 @@ bool LayoutResource::isCrossSystem() const
 }
 
 bool LayoutResource::setItemDataUnderLock(
-    const QnUuid& id,
+    const nx::Uuid& id,
     Qn::ItemDataRole role,
     const QVariant& data)
 {

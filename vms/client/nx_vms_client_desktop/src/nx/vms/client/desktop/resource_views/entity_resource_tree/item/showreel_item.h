@@ -16,7 +16,7 @@ class ShowreelItem: public entity_item_model::AbstractItem
     using base_type = entity_item_model::AbstractItem;
 
 public:
-    ShowreelItem(const common::ShowreelManager* showreelManager, const QnUuid& id);
+    ShowreelItem(const common::ShowreelManager* showreelManager, const nx::Uuid& id);
 
     /**
      * Implements AbstractItem::data().

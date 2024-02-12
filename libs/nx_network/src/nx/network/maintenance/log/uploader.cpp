@@ -377,7 +377,7 @@ std::string UploaderManager::start(
     if (m_sessionId.empty())
     {
         m_sessionId = forceSessionId.empty()
-            ? QnUuid::createUuid().toSimpleStdString()
+            ? nx::Uuid::createUuid().toSimpleStdString()
             : forceSessionId;
         m_aioBinder.post([this, sessionId = m_sessionId, timeLimit]() {
             startLogUpload(sessionId, timeLimit);

@@ -27,8 +27,8 @@ struct NX_VMS_API UserDataDeprecated: ResourceData
 
     bool isAdmin = false;
     GlobalPermissionsDeprecated permissions = GlobalPermissionDeprecated::none;
-    QnUuid userRoleId;
-    std::vector<QnUuid> userRoleIds;
+    nx::Uuid userRoleId;
+    std::vector<nx::Uuid> userRoleIds;
     QString email;
     QnLatin1Array digest;
     QnLatin1Array hash;
@@ -39,8 +39,8 @@ struct NX_VMS_API UserDataDeprecated: ResourceData
     bool isCloud = false;
     QString fullName;
 
-    static std::optional<QnUuid> permissionPresetToGroupId(GlobalPermissionsDeprecated preset);
-    static GlobalPermissionsDeprecated groupIdToPermissionPreset(const QnUuid& id);
+    static std::optional<nx::Uuid> permissionPresetToGroupId(GlobalPermissionsDeprecated preset);
+    static GlobalPermissionsDeprecated groupIdToPermissionPreset(const nx::Uuid& id);
 };
 #define UserDataDeprecated_Fields \
     ResourceData_Fields \

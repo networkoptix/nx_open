@@ -53,7 +53,7 @@ QVector<QnResourcePtr> WebpageResourceSource::getResources()
 {
     QVector<QnResourcePtr> webPages = m_includeProxied
         ? m_webPagesIndex->allWebPages()
-        : m_webPagesIndex->webPagesOnServer(QnUuid());
+        : m_webPagesIndex->webPagesOnServer(nx::Uuid());
 
     if (m_subtype)
     {

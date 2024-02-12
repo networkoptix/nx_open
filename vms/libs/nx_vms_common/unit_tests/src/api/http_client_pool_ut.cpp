@@ -59,7 +59,7 @@ public:
         const nx::utils::Url& url,
         std::function<void (QSharedPointer<ClientPool::Context> context)> completionFunc)
     {
-        ClientPool::ContextPtr context(new ClientPool::Context(QnUuid(), nullptr));
+        ClientPool::ContextPtr context(new ClientPool::Context(nx::Uuid(), nullptr));
         context->request.method = Method::get;
         context->request.url = url;
         context->completionFunc = completionFunc;

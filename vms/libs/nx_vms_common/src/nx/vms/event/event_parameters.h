@@ -36,7 +36,7 @@ struct EventMetaData
     std::vector<QString> cameraRefs;
 
     //! Users that can generate this event.
-    std::vector<QnUuid> instigators;
+    std::vector<nx::Uuid> instigators;
     bool allUsers = false;
     nx::vms::api::EventLevel level = nx::vms::api::EventLevel::undefined;
 
@@ -71,7 +71,7 @@ struct NX_VMS_COMMON_API EventParameters
     qint64 eventTimestampUsec = 0;
 
     /**%apidoc[opt] Event source - id of a Device, or a Server, or a PIR. */
-    QnUuid eventResourceId;
+    nx::Uuid eventResourceId;
 
     /**%apidoc[opt]
      * Name of the Device which has triggered the Event. It can be used
@@ -81,7 +81,7 @@ struct NX_VMS_COMMON_API EventParameters
     QString resourceName;
 
     /**%apidoc[opt] Id of a Server that generated the Event. */
-    QnUuid sourceServerId;
+    nx::Uuid sourceServerId;
 
     /**%apidoc[opt] Used for Reasoned Events as reason code. */
     EventReason reasonCode = EventReason::none;
@@ -116,13 +116,13 @@ struct NX_VMS_COMMON_API EventParameters
     QString analyticsPluginId; //< #spanasenko: It's unused (?!).
 
     /**%apidoc[opt] */
-    QnUuid analyticsEngineId;
+    nx::Uuid analyticsEngineId;
 
     /**%apidoc[opt]
      * Used for Analytics Events.
      * Takes part in ExternalUniqueKey along with EventTypeId.
      */
-    QnUuid objectTrackId;
+    nx::Uuid objectTrackId;
 
     /**%apidoc[opt]
      * Used for Analytics Events.
@@ -147,8 +147,8 @@ struct NX_VMS_COMMON_API EventParameters
     QString getAnalyticsObjectTypeId() const;
     void setAnalyticsObjectTypeId(const QString& id);
 
-    QnUuid getAnalyticsEngineId() const;
-    void setAnalyticsEngineId(const QnUuid& id);
+    nx::Uuid getAnalyticsEngineId() const;
+    void setAnalyticsEngineId(const nx::Uuid& id);
 
     QString getTriggerName() const;
     void setTriggerName(const QString& name);
@@ -159,7 +159,7 @@ struct NX_VMS_COMMON_API EventParameters
     void setDiagnosticEventLevels(nx::vms::api::EventLevels levels);
 
     /** Hash for events aggregation. */
-    QnUuid getParamsHash() const;
+    nx::Uuid getParamsHash() const;
 };
 
 #define EventParameters_Fields \

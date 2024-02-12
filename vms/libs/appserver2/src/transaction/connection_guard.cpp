@@ -10,7 +10,7 @@ namespace ec2
 *************************************************************/
 
 ConnectionLockGuard::ConnectionLockGuard(
-    const QnUuid& localId,
+    const nx::Uuid& localId,
     ConnectionGuardSharedState* const sharedState)
     :
     m_localId(localId),
@@ -20,9 +20,9 @@ ConnectionLockGuard::ConnectionLockGuard(
 }
 
 ConnectionLockGuard::ConnectionLockGuard(
-    const QnUuid& localId,
+    const nx::Uuid& localId,
     ConnectionGuardSharedState* const sharedState,
-    const QnUuid& peerGuid,
+    const nx::Uuid& peerGuid,
     Direction direction)
     :
     m_localId(localId),
@@ -38,10 +38,10 @@ ConnectionLockGuard::ConnectionLockGuard(ConnectionLockGuard&& rhs):
 {
 
     m_localId = std::move(rhs.m_localId);
-    rhs.m_localId = QnUuid();
+    rhs.m_localId = nx::Uuid();
 
     m_peerGuid = std::move(rhs.m_peerGuid);
-    rhs.m_peerGuid = QnUuid();
+    rhs.m_peerGuid = nx::Uuid();
 
     m_direction = rhs.m_direction;
     m_state = rhs.m_state;
@@ -55,10 +55,10 @@ ConnectionLockGuard& ConnectionLockGuard::operator=(ConnectionLockGuard&& rhs)
     NX_CRITICAL(m_sharedState == rhs.m_sharedState);
 
     m_localId = std::move(rhs.m_localId);
-    rhs.m_localId = QnUuid();
+    rhs.m_localId = nx::Uuid();
 
     m_peerGuid = std::move(rhs.m_peerGuid);
-    rhs.m_peerGuid = QnUuid();
+    rhs.m_peerGuid = nx::Uuid();
 
     m_direction = rhs.m_direction;
     m_state = rhs.m_state;

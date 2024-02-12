@@ -43,22 +43,22 @@ namespace ec2 {
         virtual void start() override;
         virtual void stop() override;
 
-        virtual QSet<QnUuid> directlyConnectedClientPeers() const override;
-        virtual QSet<QnUuid> directlyConnectedServerPeers() const override;
+        virtual QSet<nx::Uuid> directlyConnectedClientPeers() const override;
+        virtual QSet<nx::Uuid> directlyConnectedServerPeers() const override;
 
-        virtual QnUuid routeToPeerVia(
-            const QnUuid& dstPeer, int* distance, nx::network::SocketAddress* knownPeerAddress) const override;
-        virtual int distanceToPeer(const QnUuid& dstPeer) const override;
+        virtual nx::Uuid routeToPeerVia(
+            const nx::Uuid& dstPeer, int* distance, nx::network::SocketAddress* knownPeerAddress) const override;
+        virtual int distanceToPeer(const nx::Uuid& dstPeer) const override;
 
         virtual void addOutgoingConnectionToPeer(
-            const QnUuid& id,
+            const nx::Uuid& id,
             nx::vms::api::PeerType peerType,
             const nx::utils::Url& url,
             std::optional<nx::network::http::Credentials> credentials = std::nullopt,
             nx::network::ssl::AdapterFunc adapterFunc = nx::network::ssl::kDefaultCertificateCheck) override;
-        virtual void removeOutgoingConnectionFromPeer(const QnUuid& id) override;
+        virtual void removeOutgoingConnectionFromPeer(const nx::Uuid& id) override;
         virtual void updateOutgoingConnection(
-            const QnUuid& id, nx::network::http::Credentials credentials) override;
+            const nx::Uuid& id, nx::network::http::Credentials credentials) override;
 
         virtual void dropConnections() override;
 
@@ -95,7 +95,7 @@ namespace ec2 {
         template<class T>
         void sendTransaction(
             const QnTransaction<T>& tran,
-            const QnUuid& peer)
+            const nx::Uuid& peer)
         {
             if (auto p2pBus = dynamicCast<nx::p2p::MessageBus*>())
                 p2pBus->sendTransaction(tran, {peer});

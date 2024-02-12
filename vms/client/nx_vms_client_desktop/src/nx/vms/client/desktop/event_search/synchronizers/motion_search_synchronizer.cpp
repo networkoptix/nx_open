@@ -113,7 +113,7 @@ void MotionSearchSynchronizer::updateAreaSelection()
 
 void MotionSearchSynchronizer::updateCachedDevices()
 {
-    std::map<SystemContext*, QnUuidSet> cachedDevicesByContext;
+    std::map<SystemContext*, UuidSet> cachedDevicesByContext;
     if (active() && m_commonSetup)
     {
         for (const auto& camera: m_commonSetup->selectedCameras())

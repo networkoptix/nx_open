@@ -17,12 +17,12 @@ public:
     ServerCertificateError(QnMediaServerResourcePtr server, std::chrono::microseconds timestamp);
 
     /** Use when there is no Server Resource for the serverId. */
-    ServerCertificateError(const QnUuid& serverId, std::chrono::microseconds timestamp);
+    ServerCertificateError(const nx::Uuid& serverId, std::chrono::microseconds timestamp);
 
     virtual EventParameters getRuntimeParams() const override;
 
 private:
-    const QnUuid m_serverId;
+    const nx::Uuid m_serverId;
 };
 
 } // namespace nx::vms::event

@@ -13,7 +13,7 @@
 
 namespace nx::vms::rules {
 
-CameraEvent::CameraEvent(std::chrono::microseconds timestamp, State state, QnUuid deviceId):
+CameraEvent::CameraEvent(std::chrono::microseconds timestamp, State state, nx::Uuid deviceId):
     BasicEvent(timestamp, state),
     m_cameraId(deviceId)
 {

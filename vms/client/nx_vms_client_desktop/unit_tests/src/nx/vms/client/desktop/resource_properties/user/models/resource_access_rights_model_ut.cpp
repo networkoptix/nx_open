@@ -90,7 +90,7 @@ public:
     }
 
 protected:
-    QnUuid customGroupId;
+    nx::Uuid customGroupId;
     QnUserResourcePtr testUser;
 
     std::unique_ptr<ResourceAccessRightsModel> accessRightsModel;
@@ -122,7 +122,7 @@ TEST_F(ResourceAccessRightsModelTest, ownPermissions)
     EXPECT_EQ(info.providedVia, ResourceAccessInfo::ProvidedVia::own);
     EXPECT_EQ(info.inheritedFrom, ResourceAccessInfo::ProvidedVia::parentUserGroup);
     EXPECT_TRUE(info.parentResourceGroupId.isNull());
-    EXPECT_EQ(toQSet(info.providerUserGroups), QnUuidSet({kLiveViewersGroupId, customGroupId}));
+    EXPECT_EQ(toQSet(info.providerUserGroups), UuidSet({kLiveViewersGroupId, customGroupId}));
     EXPECT_TRUE(info.indirectProviders.empty());
 }
 
@@ -143,7 +143,7 @@ TEST_F(ResourceAccessRightsModelTest, inheritanceFromOwnResourceGroup)
     EXPECT_EQ(info.providedVia, ResourceAccessInfo::ProvidedVia::ownResourceGroup);
     EXPECT_EQ(info.inheritedFrom, ResourceAccessInfo::ProvidedVia::parentUserGroup);
     EXPECT_EQ(info.parentResourceGroupId, kAllDevicesGroupId);
-    EXPECT_EQ(toQSet(info.providerUserGroups), QnUuidSet({kLiveViewersGroupId, customGroupId}));
+    EXPECT_EQ(toQSet(info.providerUserGroups), UuidSet({kLiveViewersGroupId, customGroupId}));
     EXPECT_TRUE(info.indirectProviders.empty());
 }
 
@@ -164,7 +164,7 @@ TEST_F(ResourceAccessRightsModelTest, inheritanceFromLayout)
     EXPECT_EQ(info.providedVia, ResourceAccessInfo::ProvidedVia::layout);
     EXPECT_EQ(info.inheritedFrom, ResourceAccessInfo::ProvidedVia::layout);
     EXPECT_TRUE(info.parentResourceGroupId.isNull());
-    EXPECT_EQ(toQSet(info.providerUserGroups), QnUuidSet({kLiveViewersGroupId, customGroupId}));
+    EXPECT_EQ(toQSet(info.providerUserGroups), UuidSet({kLiveViewersGroupId, customGroupId}));
     EXPECT_EQ(info.indirectProviders, QVector<QnResourcePtr>({resource("Layout1")}));
 }
 
@@ -178,7 +178,7 @@ TEST_F(ResourceAccessRightsModelTest, inheritanceFromVideoWall)
     EXPECT_EQ(info.providedVia, ResourceAccessInfo::ProvidedVia::videowall);
     EXPECT_EQ(info.inheritedFrom, ResourceAccessInfo::ProvidedVia::videowall);
     EXPECT_TRUE(info.parentResourceGroupId.isNull());
-    EXPECT_EQ(toQSet(info.providerUserGroups), QnUuidSet({kLiveViewersGroupId, customGroupId}));
+    EXPECT_EQ(toQSet(info.providerUserGroups), UuidSet({kLiveViewersGroupId, customGroupId}));
     EXPECT_EQ(info.indirectProviders, QVector<QnResourcePtr>({resource("VideoWall1")}));
 }
 
@@ -190,14 +190,14 @@ TEST_F(ResourceAccessRightsModelTest, inheritanceFromGroups)
     EXPECT_EQ(info.providedVia, ResourceAccessInfo::ProvidedVia::parentUserGroup);
     EXPECT_EQ(info.inheritedFrom, ResourceAccessInfo::ProvidedVia::parentUserGroup);
     EXPECT_TRUE(info.parentResourceGroupId.isNull());
-    EXPECT_EQ(toQSet(info.providerUserGroups), QnUuidSet({kLiveViewersGroupId, customGroupId}));
+    EXPECT_EQ(toQSet(info.providerUserGroups), UuidSet({kLiveViewersGroupId, customGroupId}));
     EXPECT_TRUE(info.indirectProviders.empty());
 
     info = accessRightsModel->info()[indexOf(AccessRight::viewArchive)];
     EXPECT_EQ(info.providedVia, ResourceAccessInfo::ProvidedVia::parentUserGroup);
     EXPECT_EQ(info.inheritedFrom, ResourceAccessInfo::ProvidedVia::parentUserGroup);
     EXPECT_TRUE(info.parentResourceGroupId.isNull());
-    EXPECT_EQ(toQSet(info.providerUserGroups), QnUuidSet({customGroupId}));
+    EXPECT_EQ(toQSet(info.providerUserGroups), UuidSet({customGroupId}));
     EXPECT_TRUE(info.indirectProviders.empty());
 
     info = accessRightsModel->info()[indexOf(AccessRight::edit)];
@@ -224,7 +224,7 @@ TEST_F(ResourceAccessRightsModelTest, multipleInheritance)
     EXPECT_EQ(info.providedVia, ResourceAccessInfo::ProvidedVia::own);
     EXPECT_EQ(info.inheritedFrom, ResourceAccessInfo::ProvidedVia::layout);
     EXPECT_TRUE(info.parentResourceGroupId.isNull());
-    EXPECT_EQ(toQSet(info.providerUserGroups), QnUuidSet({kLiveViewersGroupId, customGroupId}));
+    EXPECT_EQ(toQSet(info.providerUserGroups), UuidSet({kLiveViewersGroupId, customGroupId}));
     EXPECT_EQ(toQSet(info.indirectProviders),
         QSet<QnResourcePtr>({resource("Layout1"), resource("VideoWall1")}));
 
@@ -232,14 +232,14 @@ TEST_F(ResourceAccessRightsModelTest, multipleInheritance)
     EXPECT_EQ(info.providedVia, ResourceAccessInfo::ProvidedVia::ownResourceGroup);
     EXPECT_EQ(info.inheritedFrom, ResourceAccessInfo::ProvidedVia::layout);
     EXPECT_EQ(info.parentResourceGroupId, kAllDevicesGroupId);
-    EXPECT_EQ(info.providerUserGroups, QVector<QnUuid>({customGroupId}));
+    EXPECT_EQ(info.providerUserGroups, QVector<nx::Uuid>({customGroupId}));
     EXPECT_EQ(info.indirectProviders, QVector<QnResourcePtr>({resource("Layout1")}));
 
     info = accessRightsModel->info()[indexOf(AccessRight::exportArchive)];
     EXPECT_EQ(info.providedVia, ResourceAccessInfo::ProvidedVia::parentUserGroup);
     EXPECT_EQ(info.inheritedFrom, ResourceAccessInfo::ProvidedVia::parentUserGroup);
     EXPECT_TRUE(info.parentResourceGroupId.isNull());
-    EXPECT_EQ(info.providerUserGroups, QVector<QnUuid>({customGroupId}));
+    EXPECT_EQ(info.providerUserGroups, QVector<nx::Uuid>({customGroupId}));
     EXPECT_TRUE(info.indirectProviders.empty());
 
     info = accessRightsModel->info()[indexOf(AccessRight::userInput)];
@@ -276,7 +276,7 @@ TEST_F(ResourceAccessRightsModelTest, specialResourceGroup)
     EXPECT_EQ(info.providedVia, ResourceAccessInfo::ProvidedVia::parentUserGroup);
     EXPECT_EQ(info.inheritedFrom, ResourceAccessInfo::ProvidedVia::parentUserGroup);
     EXPECT_TRUE(info.parentResourceGroupId.isNull());
-    EXPECT_EQ(toQSet(info.providerUserGroups), QnUuidSet({kLiveViewersGroupId, customGroupId}));
+    EXPECT_EQ(toQSet(info.providerUserGroups), UuidSet({kLiveViewersGroupId, customGroupId}));
     EXPECT_TRUE(info.indirectProviders.empty());
     EXPECT_EQ(info.totalChildCount, 5);
     EXPECT_EQ(info.checkedChildCount, 0);
@@ -289,7 +289,7 @@ TEST_F(ResourceAccessRightsModelTest, specialResourceGroup)
     EXPECT_EQ(info.providedVia, ResourceAccessInfo::ProvidedVia::own);
     EXPECT_EQ(info.inheritedFrom, ResourceAccessInfo::ProvidedVia::parentUserGroup);
     EXPECT_TRUE(info.parentResourceGroupId.isNull());
-    EXPECT_EQ(toQSet(info.providerUserGroups), QnUuidSet({kLiveViewersGroupId, customGroupId}));
+    EXPECT_EQ(toQSet(info.providerUserGroups), UuidSet({kLiveViewersGroupId, customGroupId}));
     EXPECT_TRUE(info.indirectProviders.empty());
     EXPECT_EQ(info.totalChildCount, 5);
     EXPECT_EQ(info.checkedChildCount, 0); //< Children aren't explicitly checked.
@@ -324,7 +324,7 @@ TEST_F(ResourceAccessRightsModelTest, specialResourceGroup)
     EXPECT_EQ(info.providedVia, ResourceAccessInfo::ProvidedVia::parentUserGroup);
     EXPECT_EQ(info.inheritedFrom, ResourceAccessInfo::ProvidedVia::parentUserGroup);
     EXPECT_TRUE(info.parentResourceGroupId.isNull());
-    EXPECT_EQ(toQSet(info.providerUserGroups), QnUuidSet({kLiveViewersGroupId, customGroupId}));
+    EXPECT_EQ(toQSet(info.providerUserGroups), UuidSet({kLiveViewersGroupId, customGroupId}));
     EXPECT_TRUE(info.indirectProviders.empty());
     EXPECT_EQ(info.totalChildCount, 5);
     EXPECT_EQ(info.checkedChildCount, 1);

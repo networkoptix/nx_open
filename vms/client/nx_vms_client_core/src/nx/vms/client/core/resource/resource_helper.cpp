@@ -46,12 +46,12 @@ void ResourceHelper::initialize()
         });
 }
 
-QnUuid ResourceHelper::resourceId() const
+nx::Uuid ResourceHelper::resourceId() const
 {
-    return m_resource ? m_resource->getId() : QnUuid();
+    return m_resource ? m_resource->getId() : nx::Uuid();
 }
 
-void ResourceHelper::setResourceId(const QnUuid& id)
+void ResourceHelper::setResourceId(const nx::Uuid& id)
 {
     initialize();
     if (resourceId() != id)

@@ -48,7 +48,7 @@ CredentialsManager::CredentialsManager(QObject* parent):
 }
 
 void CredentialsManager::storeCredentials(
-    const QnUuid& localSystemId,
+    const nx::Uuid& localSystemId,
     const Credentials& credentials)
 {
     NX_ASSERT(!credentials.username.empty());
@@ -71,7 +71,7 @@ void CredentialsManager::storeCredentials(
     appContext()->coreSettings()->systemAuthenticationData = credentialsHash;
 }
 
-void CredentialsManager::removeCredentials(const QnUuid& localSystemId, const std::string& user)
+void CredentialsManager::removeCredentials(const nx::Uuid& localSystemId, const std::string& user)
 {
     NX_DEBUG(NX_SCOPE_TAG, "Removing credentials of %1 to the system %2", user, localSystemId);
 
@@ -93,7 +93,7 @@ void CredentialsManager::removeCredentials(const QnUuid& localSystemId, const st
     }
 }
 
-void CredentialsManager::removeCredentials(const QnUuid& localSystemId)
+void CredentialsManager::removeCredentials(const nx::Uuid& localSystemId)
 {
     NX_DEBUG(NX_SCOPE_TAG, "Removing all credentials for the system %1", localSystemId);
 
@@ -106,7 +106,7 @@ void CredentialsManager::removeCredentials(const QnUuid& localSystemId)
     appContext()->coreSettings()->systemAuthenticationData = systemAuthenticationData;
 }
 
-void CredentialsManager::forgetStoredPassword(const QnUuid& localSystemId, const std::string& user)
+void CredentialsManager::forgetStoredPassword(const nx::Uuid& localSystemId, const std::string& user)
 {
     NX_DEBUG(NX_SCOPE_TAG, "Forget password of %1 to the system %2", user, localSystemId);
 
@@ -137,7 +137,7 @@ void CredentialsManager::forgetStoredPasswords()
     appContext()->coreSettings()->systemAuthenticationData = cleanData;
 }
 
-std::vector<Credentials> CredentialsManager::credentials(const QnUuid& localSystemId)
+std::vector<Credentials> CredentialsManager::credentials(const nx::Uuid& localSystemId)
 {
     const auto systemAuthenticationData = appContext()->coreSettings()->systemAuthenticationData();
     const auto credentialsIter = systemAuthenticationData.find(localSystemId);
@@ -154,7 +154,7 @@ std::vector<Credentials> CredentialsManager::credentials(const QnUuid& localSyst
 }
 
 std::optional<Credentials> CredentialsManager::credentials(
-    const QnUuid& localSystemId,
+    const nx::Uuid& localSystemId,
     const std::string& user)
 {
     const auto systemAuthenticationData = appContext()->coreSettings()->systemAuthenticationData();

@@ -20,25 +20,25 @@ protected:
     bool checkGrouping(const std::vector<index_condition::Condition>& conditionsInOrder) const;
 
 protected:
-    void createAllKindsOfResources(const QnUuid& parentUserId) const;
-    void createShowreels(const QnUuid& parentUserId) const;
+    void createAllKindsOfResources(const nx::Uuid& parentUserId) const;
+    void createShowreels(const nx::Uuid& parentUserId) const;
     void createVideoWallsWithScreensAndMatrices() const;
     void createFileLayouts() const;
     void createSharedLayouts() const;
-    void createRecorders(const QnUuid& parentServerId) const;
-    void createMultisensorCameras(const QnUuid& parentServerId) const;
+    void createRecorders(const nx::Uuid& parentServerId) const;
+    void createMultisensorCameras(const nx::Uuid& parentServerId) const;
     QnResourceList createIncompatibleServers() const;
     QnResourceList createCompatibleServers() const;
     QnResourceList createWebPages() const;
     QnResourceList createIntegrations() const;
     QnResourceList createLocalImages() const;
     QnResourceList createLocalVideos() const;
-    QnResourceList createCameras(const QnUuid& parentServerId) const;
-    QnResourceList createIoModules(const QnUuid& parentServerId) const;
-    QnResourceList createVirtualCameras(const QnUuid& parentServerId) const;
-    QnResourceList createProxiedWebResources(const QnUuid& parentServerId) const;
-    QnResourceList createProxiedIntegrations(const QnUuid& parentServerId) const;
-    QnLayoutResourceList createLayouts(const QnUuid& parentUserId) const;
+    QnResourceList createCameras(const nx::Uuid& parentServerId) const;
+    QnResourceList createIoModules(const nx::Uuid& parentServerId) const;
+    QnResourceList createVirtualCameras(const nx::Uuid& parentServerId) const;
+    QnResourceList createProxiedWebResources(const nx::Uuid& parentServerId) const;
+    QnResourceList createProxiedIntegrations(const nx::Uuid& parentServerId) const;
+    QnLayoutResourceList createLayouts(const nx::Uuid& parentUserId) const;
 };
 
 } // namespace test

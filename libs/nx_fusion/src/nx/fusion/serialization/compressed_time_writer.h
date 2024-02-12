@@ -44,7 +44,7 @@ public:
         m_lastValue = value.startTimeMs + value.durationMs;
     }
 
-    void writeQnUuid(const QnUuid& value)
+    void writeUuid(const nx::Uuid& value)
     {
         const QByteArray tmp(value.toRfc4122());
         m_stream.write(tmp.data(), tmp.size());

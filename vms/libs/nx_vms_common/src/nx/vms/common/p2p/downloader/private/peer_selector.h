@@ -13,14 +13,14 @@ class PeerSelector
 public:
     struct PeerInformation
     {
-        QnUuid id;
+        nx::Uuid id;
         nx::utils::OsInfo osInfo;
     };
 
     PeerSelector(
         FileInformation::PeerSelectionPolicy peerSelectionPolicy = FileInformation::all,
         const nx::utils::OsInfo& osInfo = {},
-        const QList<QnUuid>& additionalPeers = {})
+        const QList<nx::Uuid>& additionalPeers = {})
         :
         peerSelectionPolicy(peerSelectionPolicy),
         osInfo(osInfo),
@@ -30,9 +30,9 @@ public:
 
     FileInformation::PeerSelectionPolicy peerSelectionPolicy;
     nx::utils::OsInfo osInfo;
-    QList<QnUuid> additionalPeers;
+    QList<nx::Uuid> additionalPeers;
 
-    QList<QnUuid> selectPeers(const QList<PeerInformation>& peers);
+    QList<nx::Uuid> selectPeers(const QList<PeerInformation>& peers);
 };
 
 } // namespace nx::vms::common::p2p::downloader

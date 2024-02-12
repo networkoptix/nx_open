@@ -28,7 +28,7 @@ public:
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
 
     virtual int remove(
-        const QnUuid& id,
+        const nx::Uuid& id,
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
 
@@ -42,7 +42,7 @@ public:
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
 
     virtual int removeUserRole(
-        const QnUuid& id,
+        const nx::Uuid& id,
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
 
@@ -69,9 +69,9 @@ int QnUserManager<QueryProcessorType>::getUsers(
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
     const int requestId = generateRequestID();
-    processor().template processQueryAsync<QnUuid, nx::vms::api::UserDataList>(
+    processor().template processQueryAsync<nx::Uuid, nx::vms::api::UserDataList>(
         ApiCommand::getUsers,
-        QnUuid(),
+        nx::Uuid(),
         [requestId, handler = handlerExecutor.bind(std::move(handler))](auto&&... args) mutable
         {
             handler(requestId, std::move(args)...);
@@ -117,7 +117,7 @@ int QnUserManager<QueryProcessorType>::save(
 
 template<class QueryProcessorType>
 int QnUserManager<QueryProcessorType>::remove(
-    const QnUuid& id,
+    const nx::Uuid& id,
     Handler<> handler,
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
@@ -138,9 +138,9 @@ int QnUserManager<QueryProcessorType>::getUserRoles(
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
     const int requestId = generateRequestID();
-    processor().template processQueryAsync<QnUuid, nx::vms::api::UserGroupDataList>(
+    processor().template processQueryAsync<nx::Uuid, nx::vms::api::UserGroupDataList>(
         ApiCommand::getUserGroups,
-        QnUuid(),
+        nx::Uuid(),
         [requestId, handler = handlerExecutor.bind(std::move(handler))](auto&&... args) mutable
         {
             handler(requestId, std::move(args)...);
@@ -167,7 +167,7 @@ int QnUserManager<QueryProcessorType>::saveUserRole(
 
 template<class QueryProcessorType>
 int QnUserManager<QueryProcessorType>::removeUserRole(
-    const QnUuid& id,
+    const nx::Uuid& id,
     Handler<> handler,
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {

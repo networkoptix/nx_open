@@ -24,7 +24,7 @@ public:
 
 signals:
     void serverAdded(const QnMediaServerResourcePtr& server);
-    void serverRemoved(const QnUuid& id);
+    void serverRemoved(const nx::Uuid& id);
     void serversCountChanged();
 
 private:

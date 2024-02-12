@@ -14,7 +14,7 @@ const QString kFormatTemplate = "%1 (%2)";
 namespace nx::vms::client::desktop {
 
 OtherServerDisplayInfo::OtherServerDisplayInfo(
-    const QnUuid& serverId,
+    const nx::Uuid& serverId,
     const OtherServersManager* otherServersManager)
     :
     m_otherServerManager(otherServersManager),

@@ -40,7 +40,7 @@ public:
 
     QnVideoWallPcData() {}
 
-    QnUuid uuid;
+    nx::Uuid uuid;
     QList<PcScreen> screens;
 
     friend bool operator==(const QnVideoWallPcData &l, const QnVideoWallPcData &r) {
@@ -54,7 +54,7 @@ Q_DECLARE_TYPEINFO(QnVideoWallPcData::PcScreen, Q_MOVABLE_TYPE);
 Q_DECLARE_TYPEINFO(QnVideoWallPcData, Q_MOVABLE_TYPE);
 
 typedef QList<QnVideoWallPcData> QnVideoWallPcDataList;
-typedef QHash<QnUuid, QnVideoWallPcData> QnVideoWallPcDataMap;
+typedef QHash<nx::Uuid, QnVideoWallPcData> QnVideoWallPcDataMap;
 
 
 #endif // VIDEO_WALL_PC_DATA_H

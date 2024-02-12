@@ -13,12 +13,12 @@ namespace nx::vms::common::p2p::downloader {
 
 namespace {
 
-static const auto kNullGuid = QnUuid();
+static const auto kNullGuid = nx::Uuid();
 static constexpr int kDefaultRequestTime = 200;
 
 template<typename SharedPromise>
 std::function<void()> makeCanceller(
-    TestPeerManager* manager, const QnUuid& peerId, rest::Handle handle, SharedPromise promise)
+    TestPeerManager* manager, const nx::Uuid& peerId, rest::Handle handle, SharedPromise promise)
 {
     return [manager, peerId, handle, promise]()
         {
@@ -34,7 +34,7 @@ TestPeerManager::TestPeerManager():
 {
 }
 
-void TestPeerManager::addPeer(const QnUuid& peerId, const QString& peerName)
+void TestPeerManager::addPeer(const nx::Uuid& peerId, const QString& peerName)
 {
     if (!m_peers.contains(peerId))
     {
@@ -44,21 +44,21 @@ void TestPeerManager::addPeer(const QnUuid& peerId, const QString& peerName)
     }
 }
 
-QnUuid TestPeerManager::addPeer(const QString& peerName)
+nx::Uuid TestPeerManager::addPeer(const QString& peerName)
 {
-    const auto peerId = QnUuid::createUuid();
+    const auto peerId = nx::Uuid::createUuid();
     addPeer(peerId, peerName);
     return peerId;
 }
 
 void TestPeerManager::setFileInformation(
-    const QnUuid& peerId, const FileInformation& fileInformation)
+    const nx::Uuid& peerId, const FileInformation& fileInformation)
 {
     m_peers[peerId].fileInformationByName[fileInformation.name] = fileInformation;
 }
 
 TestPeerManager::FileInformation TestPeerManager::fileInformation(
-    const QnUuid& peerId, const QString& fileName) const
+    const nx::Uuid& peerId, const QString& fileName) const
 {
     auto& peerInfo = m_peers[peerId];
     if (!peerInfo.storage)
@@ -71,32 +71,32 @@ TestPeerManager::FileInformation TestPeerManager::fileInformation(
     return fileInfo;
 }
 
-void TestPeerManager::setPeerStorage(const QnUuid& peerId, Storage* storage)
+void TestPeerManager::setPeerStorage(const nx::Uuid& peerId, Storage* storage)
 {
     m_peers[peerId].storage = storage;
 }
 
-void TestPeerManager::setHasInternetConnection(const QnUuid& peerId, bool hasInternetConnection)
+void TestPeerManager::setHasInternetConnection(const nx::Uuid& peerId, bool hasInternetConnection)
 {
     m_peers[peerId].hasInternetConnection = hasInternetConnection;
 }
 
-bool TestPeerManager::hasInternetConnection(const QnUuid& peerId) const
+bool TestPeerManager::hasInternetConnection(const nx::Uuid& peerId) const
 {
     return m_peers[peerId].hasInternetConnection;
 }
 
-QStringList TestPeerManager::peerGroups(const QnUuid& peerId) const
+QStringList TestPeerManager::peerGroups(const nx::Uuid& peerId) const
 {
     return m_peers[peerId].groups;
 }
 
-QList<QnUuid> TestPeerManager::peersInGroup(const QString& group) const
+QList<nx::Uuid> TestPeerManager::peersInGroup(const QString& group) const
 {
     return m_peersByGroup.values(group);
 }
 
-void TestPeerManager::setPeerGroups(const QnUuid& peerId, const QStringList& groups)
+void TestPeerManager::setPeerGroups(const nx::Uuid& peerId, const QStringList& groups)
 {
     m_peers[peerId].groups = groups;
     for (const auto& group: groups)
@@ -108,7 +108,7 @@ void TestPeerManager::addInternetFile(const nx::utils::Url& url, const QString& 
     m_fileByUrl[url] = fileName;
 }
 
-QString TestPeerManager::peerString(const QnUuid& peerId) const
+QString TestPeerManager::peerString(const nx::Uuid& peerId) const
 {
     auto result = m_peers[peerId].name;
     if (result.isEmpty())
@@ -117,18 +117,18 @@ QString TestPeerManager::peerString(const QnUuid& peerId) const
     return result;
 }
 
-QList<QnUuid> TestPeerManager::getAllPeers() const
+QList<nx::Uuid> TestPeerManager::getAllPeers() const
 {
     return m_peers.keys();
 }
 
-int TestPeerManager::distanceTo(const QnUuid& /*peerId*/) const
+int TestPeerManager::distanceTo(const nx::Uuid& /*peerId*/) const
 {
     return std::numeric_limits<int>::max();
 }
 
 AbstractPeerManager::RequestContextPtr<FileInformation> TestPeerManager::requestFileInfo(
-    const QnUuid& peerId,
+    const nx::Uuid& peerId,
     const QString& fileName,
     const nx::utils::Url& url)
 {
@@ -169,7 +169,7 @@ AbstractPeerManager::RequestContextPtr<FileInformation> TestPeerManager::request
 }
 
 AbstractPeerManager::RequestContextPtr<QVector<QByteArray>> TestPeerManager::requestChecksums(
-    const QnUuid& peerId, const QString& fileName)
+    const nx::Uuid& peerId, const QString& fileName)
 {
     m_requestCounter.incrementCounters(peerId, RequestCounter::ChecksumsRequest);
 
@@ -201,7 +201,7 @@ AbstractPeerManager::RequestContextPtr<QVector<QByteArray>> TestPeerManager::req
 }
 
 AbstractPeerManager::RequestContextPtr<nx::Buffer> TestPeerManager::downloadChunk(
-    const QnUuid& peerId,
+    const nx::Uuid& peerId,
     const QString& fileName,
     const utils::Url &url,
     int chunkIndex,
@@ -316,7 +316,7 @@ void TestPeerManager::setDelayBeforeRequest(qint64 delay)
     m_delayBeforeRequest = delay;
 }
 
-void TestPeerManager::cancelRequest(const QnUuid& peerId, rest::Handle handle)
+void TestPeerManager::cancelRequest(const nx::Uuid& peerId, rest::Handle handle)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     auto it = std::remove_if(m_requestsQueue.begin(), m_requestsQueue.end(),
@@ -343,7 +343,7 @@ rest::Handle TestPeerManager::getRequestHandle()
 }
 
 rest::Handle TestPeerManager::enqueueRequest(
-    const QnUuid& peerId, qint64 time, RequestCallback callback)
+    const nx::Uuid& peerId, qint64 time, RequestCallback callback)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     const auto handle = getRequestHandle();
@@ -413,12 +413,12 @@ QByteArray TestPeerManager::readFileChunk(
 //-------------------------------------------------------------------------------------------------
 
 ProxyTestPeerManager::ProxyTestPeerManager(TestPeerManager* peerManager, const QString& peerName):
-    ProxyTestPeerManager(peerManager, QnUuid::createUuid(), peerName)
+    ProxyTestPeerManager(peerManager, nx::Uuid::createUuid(), peerName)
 {
 }
 
 ProxyTestPeerManager::ProxyTestPeerManager(
-    TestPeerManager* peerManager, const QnUuid& id, const QString& peerName)
+    TestPeerManager* peerManager, const nx::Uuid& id, const QString& peerName)
     :
     AbstractPeerManager(AllCapabilities),
     m_peerManager(peerManager)
@@ -432,8 +432,8 @@ void ProxyTestPeerManager::calculateDistances()
     for (const auto& peerId: m_peerManager->getAllPeers())
         m_distances[peerId] = std::numeric_limits<int>::max();
 
-    QList<QnUuid> peersToCheck{QnUuid()};
-    QSet<QnUuid> checkedPeers{QnUuid()};
+    QList<nx::Uuid> peersToCheck{nx::Uuid()};
+    QSet<nx::Uuid> checkedPeers{nx::Uuid()};
 
     int distance = 0;
     while (!peersToCheck.isEmpty())
@@ -466,23 +466,23 @@ const RequestCounter* ProxyTestPeerManager::requestCounter() const
     return &m_requestCounter;
 }
 
-QString ProxyTestPeerManager::peerString(const QnUuid& peerId) const
+QString ProxyTestPeerManager::peerString(const nx::Uuid& peerId) const
 {
     return m_peerManager->peerString(peerId);
 }
 
-QList<QnUuid> ProxyTestPeerManager::getAllPeers() const
+QList<nx::Uuid> ProxyTestPeerManager::getAllPeers() const
 {
     return m_peerManager->getAllPeers();
 }
 
-int ProxyTestPeerManager::distanceTo(const QnUuid& peerId) const
+int ProxyTestPeerManager::distanceTo(const nx::Uuid& peerId) const
 {
     return m_distances.value(peerId, std::numeric_limits<int>::max());
 }
 
 AbstractPeerManager::RequestContextPtr<FileInformation> ProxyTestPeerManager::requestFileInfo(
-    const QnUuid& peer,
+    const nx::Uuid& peer,
     const QString& fileName,
     const nx::utils::Url& url)
 {
@@ -491,14 +491,14 @@ AbstractPeerManager::RequestContextPtr<FileInformation> ProxyTestPeerManager::re
 }
 
 AbstractPeerManager::RequestContextPtr<QVector<QByteArray>> ProxyTestPeerManager::requestChecksums(
-    const QnUuid& peer, const QString& fileName)
+    const nx::Uuid& peer, const QString& fileName)
 {
     m_requestCounter.incrementCounters(peer, RequestCounter::ChecksumsRequest);
     return m_peerManager->requestChecksums(peer, fileName);
 }
 
 AbstractPeerManager::RequestContextPtr<nx::Buffer> ProxyTestPeerManager::downloadChunk(
-    const QnUuid& peerId,
+    const nx::Uuid& peerId,
     const QString& fileName,
     const utils::Url &url,
     int chunkIndex,
@@ -517,7 +517,7 @@ TestPeerManager::FileInformation::FileInformation(const downloader::FileInformat
 //-------------------------------------------------------------------------------------------------
 
 void RequestCounter::incrementCounters(
-    const QnUuid& peerId, RequestCounter::RequestType requestType)
+    const nx::Uuid& peerId, RequestCounter::RequestType requestType)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     ++counters[requestType][peerId];

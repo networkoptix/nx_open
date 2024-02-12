@@ -18,7 +18,7 @@ struct NX_VMS_API DeviceReplacementRequest
 {
     /**%apidoc Id of the Device which is going to be replaced.
      */
-    QnUuid id;
+    nx::Uuid id;
 
     /**%apidoc
      * Device id to replace with. Can be obtained from "id", "physicalId" or "logicalId" field via

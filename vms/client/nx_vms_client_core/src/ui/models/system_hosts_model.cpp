@@ -26,7 +26,7 @@ constexpr int kLowestServerPriority = std::numeric_limits<int>::max();
 
 QSet<nx::utils::Url> formAdditionalUrlsSet(
     const QnSystemDescriptionPtr& systemDescription,
-    const QnUuid& serverId)
+    const nx::Uuid& serverId)
 {
     const auto mainServerUrl = systemDescription->getServerHost(serverId);
 
@@ -61,7 +61,7 @@ class QnSystemHostsModel::HostsModel: public QAbstractListModel
 
     struct ServerUrlData
     {
-        QnUuid id;
+        nx::Uuid id;
         nx::utils::Url mainUrl;
         QSet<nx::utils::Url> additionalUrls;
         bool compatible = true;
@@ -102,22 +102,22 @@ private:
 
     void addServer(
         const QnSystemDescriptionPtr& systemDescription,
-        const QnUuid& serverId);
+        const nx::Uuid& serverId);
     void updateServerHost(
         const QnSystemDescriptionPtr& systemDescription,
-        const QnUuid& serverId);
+        const nx::Uuid& serverId);
     bool updateServerHostInternal(
         const ServerUrlDataList::iterator& it,
         const QnSystemDescriptionPtr& systemDescription);
 
     void removeServer(
         const QnSystemDescriptionPtr& systemDescription,
-        const QnUuid& serverId);
+        const nx::Uuid& serverId);
     void removeServerInternal(const ServerUrlDataList::iterator& it);
 
     void forceResort();
 
-    ServerUrlDataList::iterator getDataIt(const QnUuid& serverId);
+    ServerUrlDataList::iterator getDataIt(const nx::Uuid& serverId);
 
 private:
     QnSystemHostsModel* const m_owner;
@@ -299,13 +299,13 @@ void QnSystemHostsModel::HostsModel::reloadHosts()
                 addServer(system, server.id);
 
             m_connections << connect(system.get(), &QnBaseSystemDescription::serverAdded, this,
-                [this, system](const QnUuid& id) { addServer(system, id); });
+                [this, system](const nx::Uuid& id) { addServer(system, id); });
 
             m_connections << connect(system.get(), &QnBaseSystemDescription::serverRemoved, this,
-                [this, system](const QnUuid& id) { removeServer(system, id); });
+                [this, system](const nx::Uuid& id) { removeServer(system, id); });
 
             m_connections << connect(system.get(), &QnBaseSystemDescription::serverChanged, this,
-                [this, system](const QnUuid& id, QnServerFields fields)
+                [this, system](const nx::Uuid& id, QnServerFields fields)
                 {
                     if (fields.testFlag(QnServerField::Host))
                         updateServerHost(system, id);
@@ -325,7 +325,7 @@ void QnSystemHostsModel::HostsModel::reloadHosts()
 
 void QnSystemHostsModel::HostsModel::addServer(
     const QnSystemDescriptionPtr& systemDescription,
-    const QnUuid& serverId)
+    const nx::Uuid& serverId)
 {
     if (systemDescription->id() != m_systemId)
         return;
@@ -352,7 +352,7 @@ void QnSystemHostsModel::HostsModel::addServer(
 
 void QnSystemHostsModel::HostsModel::updateServerHost(
     const QnSystemDescriptionPtr& systemDescription,
-    const QnUuid& serverId)
+    const nx::Uuid& serverId)
 {
     if (systemDescription->id() != m_systemId)
         return;
@@ -392,7 +392,7 @@ bool QnSystemHostsModel::HostsModel::updateServerHostInternal(
 
 void QnSystemHostsModel::HostsModel::removeServer(
     const QnSystemDescriptionPtr& systemDescription,
-    const QnUuid& serverId)
+    const nx::Uuid& serverId)
 {
     if (systemDescription->id() != m_systemId)
         return;
@@ -415,7 +415,7 @@ void QnSystemHostsModel::HostsModel::removeServerInternal(const ServerUrlDataLis
 }
 
 QnSystemHostsModel::HostsModel::ServerUrlDataList::iterator
-QnSystemHostsModel::HostsModel::getDataIt(const QnUuid& serverId)
+QnSystemHostsModel::HostsModel::getDataIt(const nx::Uuid& serverId)
 {
     return std::find_if(m_serversUrlData.begin(), m_serversUrlData.end(),
         [serverId](const ServerUrlData& value)

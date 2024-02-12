@@ -22,9 +22,9 @@ bool ConnectionContext::isRemotePeerSubscribedTo(const vms::api::PersistentIdDat
     return remoteSubscription.values.contains(peer);
 }
 
-bool ConnectionContext::isRemotePeerSubscribedTo(const QnUuid& id) const
+bool ConnectionContext::isRemotePeerSubscribedTo(const nx::Uuid& id) const
 {
-    nx::vms::api::PersistentIdData peer(id, QnUuid());
+    nx::vms::api::PersistentIdData peer(id, nx::Uuid());
     auto itr = remoteSubscription.values.lowerBound(peer);
     return itr != remoteSubscription.values.end() && itr.key().id == id;
 }

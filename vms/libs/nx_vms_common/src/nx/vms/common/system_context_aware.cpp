@@ -73,7 +73,7 @@ SystemContext* SystemContextAware::systemContext() const
     return d->systemContext.data();
 }
 
-QnUuid SystemContextAware::peerId() const
+nx::Uuid SystemContextAware::peerId() const
 {
     return systemContext()->peerId();
 }

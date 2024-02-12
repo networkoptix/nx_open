@@ -20,12 +20,12 @@ class LayoutItemAdaptor: public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QnLayoutResource* layout READ layoutPlainPointer CONSTANT)
-    Q_PROPERTY(QnUuid itemId READ itemId CONSTANT)
-    Q_PROPERTY(QnUuid resourceId READ resourceId CONSTANT)
+    Q_PROPERTY(nx::Uuid itemId READ itemId CONSTANT)
+    Q_PROPERTY(nx::Uuid resourceId READ resourceId CONSTANT)
     Q_PROPERTY(QnResource* resource READ resourcePlainPointer CONSTANT)
     Q_PROPERTY(int flags READ flags WRITE setFlags NOTIFY flagsChanged)
     Q_PROPERTY(QRect geometry READ geometry WRITE setGeometry NOTIFY geometryChanged)
-    Q_PROPERTY(QnUuid zoomTargetId
+    Q_PROPERTY(nx::Uuid zoomTargetId
         READ zoomTargetId WRITE setZoomTargetId NOTIFY zoomTargetIdChanged)
     Q_PROPERTY(QRectF zoomRect READ zoomRect WRITE setZoomRect NOTIFY zoomRectChanged)
     Q_PROPERTY(qreal rotation READ rotation WRITE setRotation NOTIFY rotationChanged)
@@ -40,15 +40,15 @@ class LayoutItemAdaptor: public QObject
         READ displayHotspots WRITE setDisplayHotspots NOTIFY displayHotspotsChanged)
 
 public:
-    LayoutItemAdaptor(const QnLayoutResourcePtr& layout, const QnUuid& itemId);
+    LayoutItemAdaptor(const QnLayoutResourcePtr& layout, const nx::Uuid& itemId);
     virtual ~LayoutItemAdaptor() override;
 
     QnLayoutResourcePtr layout() const;
     QnLayoutResource* layoutPlainPointer() const;
 
-    QnUuid itemId() const;
+    nx::Uuid itemId() const;
 
-    QnUuid resourceId() const;
+    nx::Uuid resourceId() const;
     QnResourcePtr resource() const;
     QnResource* resourcePlainPointer() const;
 
@@ -58,8 +58,8 @@ public:
     QRect geometry() const;
     void setGeometry(const QRect& geometry);
 
-    QnUuid zoomTargetId() const;
-    void setZoomTargetId(const QnUuid& id);
+    nx::Uuid zoomTargetId() const;
+    void setZoomTargetId(const nx::Uuid& id);
 
     QRectF zoomRect() const;
     void setZoomRect(const QRectF& zoomRect);

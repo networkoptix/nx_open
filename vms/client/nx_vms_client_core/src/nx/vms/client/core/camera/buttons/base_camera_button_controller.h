@@ -39,12 +39,12 @@ public:
     virtual ~BaseCameraButtonController() override;
 
     virtual CameraButtons buttons() const override;
-    virtual OptionalCameraButton button(const QnUuid& buttonId) const override;
+    virtual OptionalCameraButton button(const nx::Uuid& buttonId) const override;
 
-    virtual bool startAction(const QnUuid& buttonId) override;
-    virtual bool stopAction(const QnUuid& buttonId) override;
-    virtual bool cancelAction(const QnUuid& buttonId) override;
-    virtual bool actionIsActive(const QnUuid& buttonId) const override;
+    virtual bool startAction(const nx::Uuid& buttonId) override;
+    virtual bool stopAction(const nx::Uuid& buttonId) override;
+    virtual bool cancelAction(const nx::Uuid& buttonId) override;
+    virtual bool actionIsActive(const nx::Uuid& buttonId) const override;
 
 protected:
     enum class ActionState
@@ -64,16 +64,16 @@ protected:
     bool addOrUpdateButton(const CameraButton& button);
 
     /** Removes specified button. */
-    bool removeButton(const QnUuid& buttonId);
+    bool removeButton(const nx::Uuid& buttonId);
 
     /** Convenient function to return first button (if any).*/
     OptionalCameraButton firstButton() const;
 
     /** Adds specified action in the active actions list. */
-    void addActiveAction(const QnUuid& buttonId);
+    void addActiveAction(const nx::Uuid& buttonId);
 
     /** Removes specified action from the active actions list. */
-    void removeActiveAction(const QnUuid& buttonId);
+    void removeActiveAction(const nx::Uuid& buttonId);
 
     /**
      *  Virtual function to be imple,emted in subclasses which is used to activate or deactivate

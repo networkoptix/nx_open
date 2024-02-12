@@ -51,7 +51,7 @@ public:
     virtual QHash<int, QByteArray> roleNames() const override;
 
     /** Returns list of the rule ids for the given indexes. */
-    QnUuidList getRuleIds(const QModelIndexList& indexes) const;
+    UuidList getRuleIds(const QModelIndexList& indexes) const;
 
     static void registerQmlType();
 
@@ -59,10 +59,10 @@ private:
     using ConstRulePtr = std::shared_ptr<const vms::rules::Rule>;
 
     vms::rules::Engine* m_engine{nullptr};
-    std::vector<QnUuid> m_ruleIds;
+    std::vector<nx::Uuid> m_ruleIds;
 
-    void onRuleAddedOrUpdated(QnUuid ruleId, bool added);
-    void onRuleRemoved(QnUuid ruleId);
+    void onRuleAddedOrUpdated(nx::Uuid ruleId, bool added);
+    void onRuleRemoved(nx::Uuid ruleId);
     void onRulesReset();
 
     void initialise();

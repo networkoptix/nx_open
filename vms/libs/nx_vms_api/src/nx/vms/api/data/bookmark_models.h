@@ -106,14 +106,14 @@ QN_FUSION_DECLARE_FUNCTIONS(BookmarkSharingSettings, (json), NX_VMS_API)
 struct NX_VMS_API BookmarkIdV1
 {
     /**%apidoc[opt] Bookmark id. */
-    QnUuid id;
+    nx::Uuid id;
 
-    BookmarkIdV1(QnUuid id = {}): id(id) {}
-    const QnUuid& bookmarkId() const { return id; }
-    QnUuid serverId() const { return {}; }
+    BookmarkIdV1(nx::Uuid id = {}): id(id) {}
+    const nx::Uuid& bookmarkId() const { return id; }
+    nx::Uuid serverId() const { return {}; }
 
-    const QnUuid& getId() const { return id; }
-    void setId(QnUuid id_) { id = id_; }
+    const nx::Uuid& getId() const { return id; }
+    void setId(nx::Uuid id_) { id = id_; }
     QString toString() const { return id.toSimpleString(); }
 };
 #define BookmarkIdV1_Fields (id)
@@ -124,16 +124,16 @@ struct NX_VMS_API BookmarkIdV3
     /**%apidoc[opt] Combined Bookmark and Server ids `{bookmarkId}_{serverId}`. */
     QString id;
 
-    static QnUuid bookmarkIdFromCombined(const QString& id);
-    static QnUuid serverIdFromCombined(const QString& id);
+    static nx::Uuid bookmarkIdFromCombined(const QString& id);
+    static nx::Uuid serverIdFromCombined(const QString& id);
 
     BookmarkIdV3(QString id = {}): id(std::move(id)) {}
-    QnUuid bookmarkId() const;
-    QnUuid serverId() const;
-    void setIds(const QnUuid& bookmarkId, const QnUuid& serverId);
+    nx::Uuid bookmarkId() const;
+    nx::Uuid serverId() const;
+    void setIds(const nx::Uuid& bookmarkId, const nx::Uuid& serverId);
 
     QString getId() const { return id; }
-    void setId(const QnUuid& id_) { id = id_.toSimpleString(); }
+    void setId(const nx::Uuid& id_) { id = id_.toSimpleString(); }
     const QString& toString() const { return id; }
 };
 #define BookmarkIdV3_Fields (id)
@@ -156,7 +156,7 @@ QN_FUSION_DECLARE_FUNCTIONS(BookmarkFilterV3, (json), NX_VMS_API)
 struct NX_VMS_API BookmarkBase
 {
     /**%apidoc Device id. */
-    QnUuid deviceId;
+    nx::Uuid deviceId;
 
     /**%apidoc Caption of the Bookmark.
      * %example Bookmark
@@ -178,7 +178,7 @@ struct NX_VMS_API BookmarkBase
     std::set<QString> tags;
 
     /**%apidoc[readonly] Id of the User created this bookmark. */
-    std::optional<QnUuid> creatorUserId;
+    std::optional<nx::Uuid> creatorUserId;
 
     /**%apidoc[readonly]
      * Time of the Bookmark creation in milliseconds since epoch. Equals to startTimeMs field if
@@ -203,10 +203,10 @@ QN_FUSION_DECLARE_FUNCTIONS(BookmarkBase, (json), NX_VMS_API)
 struct NX_VMS_API BookmarkV1: BookmarkBase, BookmarkIdV1
 {
     /**%apidoc[immutable] Server id where Bookmark is stored. */
-    QnUuid serverId;
+    nx::Uuid serverId;
 
     using BookmarkIdV1::BookmarkIdV1;
-    void setIds(QnUuid bookmarkId, QnUuid serverId_)
+    void setIds(nx::Uuid bookmarkId, nx::Uuid serverId_)
     {
         id = bookmarkId;
         serverId = serverId_;
@@ -217,7 +217,7 @@ QN_FUSION_DECLARE_FUNCTIONS(BookmarkV1, (json), NX_VMS_API)
 
 struct NX_VMS_API BookmarkWithRuleV1: BookmarkV1
 {
-    std::optional<QnUuid> eventRuleId;
+    std::optional<nx::Uuid> eventRuleId;
 
     using Bookmark = BookmarkV1;
     using Filter = BookmarkFilterV1;
@@ -241,7 +241,7 @@ using Bookmark = BookmarkV3;
 
 struct NX_VMS_API BookmarkWithRuleV3: BookmarkV3
 {
-    std::optional<QnUuid> eventRuleId;
+    std::optional<nx::Uuid> eventRuleId;
 
     using Bookmark = BookmarkV3;
     using Filter = BookmarkFilterV3;
@@ -260,7 +260,7 @@ QN_FUSION_DECLARE_FUNCTIONS(BookmarkTagFilter, (json), NX_VMS_API)
 
 struct NX_VMS_API BookmarkProtection
 {
-    static QString getDigest(QnUuid bookmarkId, const QString& password);
+    static QString getDigest(nx::Uuid bookmarkId, const QString& password);
     static QString getProtection(const QString& digest, std::chrono::milliseconds syncTime);
     static std::chrono::milliseconds getSyncTime(const QString& protection);
 

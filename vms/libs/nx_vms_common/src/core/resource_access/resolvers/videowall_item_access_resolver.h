@@ -25,12 +25,12 @@ public:
 
     virtual ~VideowallItemAccessResolver() override;
 
-    virtual ResourceAccessMap resourceAccessMap(const QnUuid& subjectId) const override;
+    virtual ResourceAccessMap resourceAccessMap(const nx::Uuid& subjectId) const override;
 
-    virtual nx::vms::api::GlobalPermissions globalPermissions(const QnUuid& subjectId) const override;
+    virtual nx::vms::api::GlobalPermissions globalPermissions(const nx::Uuid& subjectId) const override;
 
     virtual ResourceAccessDetails accessDetails(
-        const QnUuid& subjectId,
+        const nx::Uuid& subjectId,
         const QnResourcePtr& resource,
         nx::vms::api::AccessRight accessRight) const override;
 

@@ -766,7 +766,7 @@ QnResourceWidget *QnWorkbenchDisplay::widget(Qn::ItemRole role) const
     return m_widgetByRole[role];
 }
 
-QnResourceWidget *QnWorkbenchDisplay::widget(const QnUuid &uuid) const
+QnResourceWidget *QnWorkbenchDisplay::widget(const nx::Uuid &uuid) const
 {
     return widget(workbench()->currentLayout()->item(uuid));
 }
@@ -2083,13 +2083,13 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutAboutToBeChanged()
     auto streamSynchronizer = workbench()->windowContext()->streamSynchronizer();
     layout->setStreamSynchronizationState(streamSynchronizer->state());
 
-    QVector<QnUuid> selectedUuids;
+    QVector<nx::Uuid> selectedUuids;
     foreach(QnResourceWidget *widget, widgets())
     {
         if (widget->isSelected())
             selectedUuids.push_back(widget->item()->uuid());
     }
-    layout->setData(Qn::LayoutSelectionRole, QVariant::fromValue<QVector<QnUuid> >(selectedUuids));
+    layout->setData(Qn::LayoutSelectionRole, QVariant::fromValue<QVector<nx::Uuid> >(selectedUuids));
 
     foreach(QnResourceWidget *widget, widgets())
     {
@@ -2269,7 +2269,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged()
         }
     }
 
-    const auto selectedUuids = workbenchLayout->data(Qn::LayoutSelectionRole).value<QVector<QnUuid>>();
+    const auto selectedUuids = workbenchLayout->data(Qn::LayoutSelectionRole).value<QVector<nx::Uuid>>();
     for (const auto& selectedUuid: selectedUuids)
     {
         if (auto resourceWidget = widget(selectedUuid))

@@ -26,9 +26,9 @@ namespace {
 
 // Returns updates function if resource exists and requires an update.
 template<class T>
-std::function<void()> insertOrUpdateResource(const T& resource, QHash<QnUuid, T>* const resourcePool)
+std::function<void()> insertOrUpdateResource(const T& resource, QHash<nx::Uuid, T>* const resourcePool)
 {
-    QnUuid id = resource->getId();
+    nx::Uuid id = resource->getId();
     auto itr = resourcePool->constFind(id);
     if (itr == resourcePool->cend())
     {
@@ -109,7 +109,7 @@ void QnResourcePool::addResources(const QnResourceList& resources, AddResourceFl
 
     NX_WRITE_LOCKER resourcesLock(&m_resourcesMutex);
 
-    QMap<QnUuid, QnResourcePtr> newResources; // Sort by id.
+    QMap<nx::Uuid, QnResourcePtr> newResources; // Sort by id.
     std::vector<std::function<void()>> updateExistingResources;
     for (const QnResourcePtr& resource: resources)
     {
@@ -199,7 +199,7 @@ void QnResourcePool::removeResources(const QnResourceList& resources)
     {
         // Have to remove by id, since physicalId can be MAC and, as a result, not unique among
         // friend and foreign resources.
-        const QnUuid resId = resource->getId();
+        const nx::Uuid resId = resource->getId();
         if (m_adminResource && resId == m_adminResource->getId())
             m_adminResource.clear();
 
@@ -227,7 +227,7 @@ void QnResourcePool::removeResources(const QnResourceList& resources)
     lk.unlock();
 
     // Remove layout resources from the videowalls
-    QSet<QnUuid> removedLayoutsIds;
+    QSet<nx::Uuid> removedLayoutsIds;
     for (const auto& layout: std::as_const(removedLayouts))
         removedLayoutsIds.insert(layout->getId());
 
@@ -239,14 +239,14 @@ void QnResourcePool::removeResources(const QnResourceList& resources)
             if (removedLayoutsIds.contains(item.layout))
             {
                 QnVideoWallItem updatedItem(item);
-                updatedItem.layout = QnUuid();
+                updatedItem.layout = nx::Uuid();
                 videowall->items()->updateItem(updatedItem);
             }
         }
     }
 
     // Remove other resources from layouts.
-    QSet<QnUuid> removedResourcesIds;
+    QSet<nx::Uuid> removedResourcesIds;
     QSet<QString> removedResourcesPhysicalIds;
     for (const auto& resource: std::as_const(removedOtherResources))
     {
@@ -289,7 +289,7 @@ QnResourceList QnResourcePool::getResources() const
     return m_resources.values();
 }
 
-QnResourcePtr QnResourcePool::getResourceById(const QnUuid& id) const
+QnResourcePtr QnResourcePool::getResourceById(const nx::Uuid& id) const
 {
     NX_READ_LOCKER locker(&m_resourcesMutex);
     return m_resources.value(id, QnResourcePtr());
@@ -312,7 +312,7 @@ QnResourceList QnResourcePool::getResourcesByLogicalId(int value) const
 }
 
 QnResourcePtr QnResourcePool::getResourceByUrl(
-    const QString& url, const QnUuid& parentServerId) const
+    const QString& url, const nx::Uuid& parentServerId) const
 {
     return getResource(
         [&url, &parentServerId](const QnResourcePtr& resource)
@@ -343,7 +343,7 @@ QnNetworkResourcePtr QnResourcePool::getResourceByMacAddress(const QString& mac)
 }
 
 QnVirtualCameraResourceList QnResourcePool::getAllCameras(
-    const QnUuid& parentId, bool ignoreDesktopCameras) const
+    const nx::Uuid& parentId, bool ignoreDesktopCameras) const
 {
     QnVirtualCameraResourceList result;
     NX_READ_LOCKER locker(&m_resourcesMutex);
@@ -363,7 +363,7 @@ QnVirtualCameraResourceList QnResourcePool::getAllCameras(
 QnVirtualCameraResourceList QnResourcePool::getAllCameras(
     const QnResourcePtr& server, bool ignoreDesktopCameras) const
 {
-    return getAllCameras(server ? server->getId() : QnUuid(), ignoreDesktopCameras);
+    return getAllCameras(server ? server->getId() : nx::Uuid(), ignoreDesktopCameras);
 }
 
 QnMediaServerResourcePtr QnResourcePool::serverWithInternetAccess() const
@@ -411,7 +411,7 @@ QnMediaServerResourceList QnResourcePool::getAllServers(nx::vms::api::ResourceSt
     return result;
 }
 
-QnResourceList QnResourcePool::getResourcesByParentId(const QnUuid& parentId) const
+QnResourceList QnResourcePool::getResourcesByParentId(const nx::Uuid& parentId) const
 {
     return getResources(
         [&parentId](const QnResourcePtr& resource)
@@ -513,7 +513,7 @@ bool QnResourcePool::containsIoModules() const
     return d->hasIoModules;
 }
 
-QnVideoWallItemIndex QnResourcePool::getVideoWallItemByUuid(const QnUuid& uuid) const
+QnVideoWallItemIndex QnResourcePool::getVideoWallItemByUuid(const nx::Uuid& uuid) const
 {
     NX_READ_LOCKER lk(&m_resourcesMutex);
     for (const QnResourcePtr& resource: m_resources)
@@ -526,10 +526,10 @@ QnVideoWallItemIndex QnResourcePool::getVideoWallItemByUuid(const QnUuid& uuid) 
     return QnVideoWallItemIndex();
 }
 
-QnVideoWallItemIndexList QnResourcePool::getVideoWallItemsByUuid(const QList<QnUuid>& uuids) const
+QnVideoWallItemIndexList QnResourcePool::getVideoWallItemsByUuid(const QList<nx::Uuid>& uuids) const
 {
     QnVideoWallItemIndexList result;
-    for (const QnUuid& uuid: uuids)
+    for (const nx::Uuid& uuid: uuids)
     {
         QnVideoWallItemIndex index = getVideoWallItemByUuid(uuid);
         if (!index.isNull())
@@ -538,7 +538,7 @@ QnVideoWallItemIndexList QnResourcePool::getVideoWallItemsByUuid(const QList<QnU
     return result;
 }
 
-QnVideoWallMatrixIndex QnResourcePool::getVideoWallMatrixByUuid(const QnUuid& uuid) const
+QnVideoWallMatrixIndex QnResourcePool::getVideoWallMatrixByUuid(const nx::Uuid& uuid) const
 {
     NX_READ_LOCKER lk(&m_resourcesMutex);
     for (const QnResourcePtr& resource: m_resources)
@@ -552,10 +552,10 @@ QnVideoWallMatrixIndex QnResourcePool::getVideoWallMatrixByUuid(const QnUuid& uu
 }
 
 QnVideoWallMatrixIndexList QnResourcePool::getVideoWallMatricesByUuid(
-    const QList<QnUuid>& uuids) const
+    const QList<nx::Uuid>& uuids) const
 {
     QnVideoWallMatrixIndexList result;
-    for (const QnUuid& uuid: uuids)
+    for (const nx::Uuid& uuid: uuids)
     {
         QnVideoWallMatrixIndex index = getVideoWallMatrixByUuid(uuid);
         if (!index.isNull())

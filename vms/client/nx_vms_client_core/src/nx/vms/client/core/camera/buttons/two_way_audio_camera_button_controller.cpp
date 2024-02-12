@@ -41,7 +41,7 @@ void TwoWayAudioCameraButtonController::Private::updateButton()
                 return {};
 
             static const auto kTwoWayAudioButtonId =
-                QnUuid::fromArbitraryData(std::string_view("two_way_camera_button_id"));
+                nx::Uuid::fromArbitraryData(std::string_view("two_way_camera_button_id"));
 
             using Mode = TwoWayAudioCameraButtonController::IntercomButtonMode;
             if (common::isIntercom(q->camera().staticCast<QnResource>())
@@ -140,7 +140,7 @@ TwoWayAudioCameraButtonController::TwoWayAudioCameraButtonController(
         [this, context, accessController]()
     {
         const auto user = accessController->user();
-        const auto userId = user ? user->getId() : QnUuid();
+        const auto userId = user ? user->getId() : nx::Uuid();
         const auto sourceId = DesktopResource::calculateUniqueId(context->peerId(), userId);
         d->controller->setSourceId(sourceId);
     };

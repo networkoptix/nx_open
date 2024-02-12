@@ -80,11 +80,11 @@ void OrphanCameraWatcher::update()
     for (const QnVirtualCameraResourcePtr &cam: cameraResourceList)
     {
         ++idx;
-        QnUuid parentId = cam->getParentId();
+        nx::Uuid parentId = cam->getParentId();
         auto res = pool->getResourceById(parentId);
         if (res == nullptr)
         {
-            QnUuid uuid = cam->getId();
+            nx::Uuid uuid = cam->getId();
             currentOrphanCameras.insert(uuid);
             NX_DEBUG(this, nx::format("%01 x %2 | %3 | %4 | %5")
                 .args(QString::number(idx).rightJustified(2, '0'),
@@ -107,7 +107,7 @@ void OrphanCameraWatcher::update()
         currentOrphanCameras.begin(), currentOrphanCameras.end(),
         std::inserter(longlivedOrphanCameras, longlivedOrphanCameras.begin()));
 
-    for (const QnUuid& CameraId: longlivedOrphanCameras)
+    for (const nx::Uuid& CameraId: longlivedOrphanCameras)
     {
         ec2::AbstractCameraManagerPtr cameraManagerPtr = connectionPtr->getCameraManager(Qn::kSystemAccess);
         cameraManagerPtr->remove(CameraId, [](int /*requestId*/, ec2::ErrorCode) {});

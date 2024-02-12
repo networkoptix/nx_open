@@ -67,7 +67,7 @@ struct NX_VMS_API LookupListData: IdData
 
 private:
     Q_GADGET
-    Q_PROPERTY(QnUuid id MEMBER id)
+    Q_PROPERTY(nx::Uuid id MEMBER id)
     Q_PROPERTY(QString name MEMBER name)
     Q_PROPERTY(QString objectTypeId MEMBER objectTypeId)
     Q_PROPERTY(std::vector<QString> attributeNames MEMBER attributeNames)

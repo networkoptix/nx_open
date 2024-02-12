@@ -30,9 +30,9 @@ public:
 protected:
     virtual void SetUp() override
     {
-        m_cloudSystemId = QnUuid::createUuid().toSimpleStdString();
+        m_cloudSystemId = nx::Uuid::createUuid().toSimpleStdString();
 
-        m_moduleInformation.id = QnUuid::createUuid();
+        m_moduleInformation.id = nx::Uuid::createUuid();
         m_moduleInformation.realm = nx::network::AppInfo::realm().c_str();
         m_moduleInformation.cloudHost = nx::network::SocketGlobals::cloud().cloudHost().c_str();
         m_moduleInformation.cloudSystemId = m_cloudSystemId.c_str();
@@ -52,12 +52,12 @@ protected:
 
     void setRandomCloudSystemIdInModuleInformation()
     {
-        m_moduleInformation.cloudSystemId = QnUuid::createUuid().toSimpleString();
+        m_moduleInformation.cloudSystemId = nx::Uuid::createUuid().toSimpleString();
     }
 
     void setRandomIdInModuleInformation()
     {
-        m_moduleInformation.id = QnUuid::createUuid();
+        m_moduleInformation.id = nx::Uuid::createUuid();
     }
 
     void verifyByCloudSystemId()

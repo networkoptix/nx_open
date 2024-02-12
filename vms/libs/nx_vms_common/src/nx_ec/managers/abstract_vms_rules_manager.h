@@ -19,7 +19,7 @@ class NX_VMS_COMMON_API AbstractVmsRulesNotificationManager: public QObject
 
 signals:
     void ruleUpdated(const nx::vms::api::rules::Rule& rule, ec2::NotificationSource source);
-    void ruleRemoved(const QnUuid& id);
+    void ruleRemoved(const nx::Uuid& id);
     void reset();
     void eventReceived(const nx::vms::api::rules::EventInfo& eventInfo);
 };
@@ -46,11 +46,11 @@ public:
     ErrorCode saveSync(const nx::vms::api::rules::Rule& rule);
 
     virtual int deleteRule(
-        const QnUuid& id,
+        const nx::Uuid& id,
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) = 0;
 
-    ErrorCode deleteRuleSync(const QnUuid& id);
+    ErrorCode deleteRuleSync(const nx::Uuid& id);
 
     virtual int broadcastEvent(
         const nx::vms::api::rules::EventInfo& info,

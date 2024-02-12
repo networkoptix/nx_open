@@ -26,7 +26,7 @@ public:
     /*
      * @brief Setup resource list to cache.
      */
-    void setCachedDevices(intptr_t consumerId, const QSet<QnUuid>& value);
+    void setCachedDevices(intptr_t consumerId, const QSet<nx::Uuid>& value);
 
     /*
      * @brief Find image in the video cache.
@@ -36,22 +36,22 @@ public:
      * @return Cached image or empty QImage if not found.
      */
     QImage image(
-        const QnUuid& resourceId,
+        const nx::Uuid& resourceId,
         std::chrono::microseconds timestamp,
         std::chrono::microseconds* outImageTimestamp = nullptr) const;
 
-    void add(const QnUuid& resourceId, const CLConstVideoDecoderOutputPtr& frame);
+    void add(const nx::Uuid& resourceId, const CLConstVideoDecoderOutputPtr& frame);
 
     void setCacheSize(std::chrono::microseconds value);
     std::chrono::microseconds cacheSize() const;
 
 private:
-    void setCachedDevices(const QSet<QnUuid>& value);
+    void setCachedDevices(const QSet<nx::Uuid>& value);
 
 private:
     mutable nx::Mutex m_mutex;
-    QMap<intptr_t, QSet<QnUuid>> m_cachedDevices;
-    QMap<QnUuid, std::deque<CLConstVideoDecoderOutputPtr>> m_cache;
+    QMap<intptr_t, QSet<nx::Uuid>> m_cachedDevices;
+    QMap<nx::Uuid, std::deque<CLConstVideoDecoderOutputPtr>> m_cache;
     std::chrono::microseconds m_cacheSize{};
 };
 

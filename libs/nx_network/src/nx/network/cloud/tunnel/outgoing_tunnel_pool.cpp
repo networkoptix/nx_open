@@ -13,7 +13,7 @@ namespace nx::network::cloud {
 
 OutgoingTunnelPool::OutgoingTunnelPool():
     m_isOwnPeerIdAssigned(false),
-    m_ownPeerId(QnUuid::createUuid().toSimpleString().toUtf8()),
+    m_ownPeerId(nx::Uuid::createUuid().toSimpleString().toUtf8()),
     m_terminated(false),
     m_stopping(false)
 {
@@ -99,7 +99,7 @@ std::string OutgoingTunnelPool::ownPeerId() const
     return m_ownPeerId;
 }
 
-void OutgoingTunnelPool::assignOwnPeerId(const std::string& name, const QnUuid& uuid)
+void OutgoingTunnelPool::assignOwnPeerId(const std::string& name, const nx::Uuid& uuid)
 {
     NX_ASSERT(!uuid.isNull());
     const auto id = nx::utils::buildString(
@@ -128,7 +128,7 @@ void OutgoingTunnelPool::setOwnPeerId(const std::string& peerId)
     }
 }
 
-void OutgoingTunnelPool::clearOwnPeerIdIfEqual(const std::string& name, const QnUuid& uuid)
+void OutgoingTunnelPool::clearOwnPeerIdIfEqual(const std::string& name, const nx::Uuid& uuid)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
 

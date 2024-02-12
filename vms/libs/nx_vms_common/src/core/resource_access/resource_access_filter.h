@@ -57,8 +57,8 @@ public:
     static QList<QnResourceAccessFilter::Filter> allFilters();
 
     static QnResourceList filteredResources(Filter filter, const QnResourceList& source);
-    static QSet<QnUuid> filteredResources(
+    static QSet<nx::Uuid> filteredResources(
         QnResourcePool* resPool,
         Filter filter,
-        const QSet<QnUuid>& source);
+        const QSet<nx::Uuid>& source);
 };

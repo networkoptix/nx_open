@@ -9,9 +9,9 @@ namespace nx {
 namespace vms {
 namespace api {
 
-QnUuid ResourceData::getFixedTypeId(const QString& typeName)
+nx::Uuid ResourceData::getFixedTypeId(const QString& typeName)
 {
-    return QnUuid::fromArbitraryData(typeName.toUtf8() + QByteArray("-"));
+    return nx::Uuid::fromArbitraryData(typeName.toUtf8() + QByteArray("-"));
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
@@ -23,7 +23,7 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     ResourceStatusData, (ubjson)(xml)(json)(sql_record)(csv_record), ResourceStatusData_Fields)
 
-ResourceParamWithRefDataList ResourceWithParameters::asList(const QnUuid& id) const
+ResourceParamWithRefDataList ResourceWithParameters::asList(const nx::Uuid& id) const
 {
     ResourceParamWithRefDataList list;
     if (!parameters.empty())
@@ -53,7 +53,7 @@ void ResourceWithParameters::setFromList(const ResourceParamWithRefDataList& lis
         setFromParameter(parameter);
 }
 
-void ResourceWithParameters::extractFromList(const QnUuid& id, ResourceParamWithRefDataList* list)
+void ResourceWithParameters::extractFromList(const nx::Uuid& id, ResourceParamWithRefDataList* list)
 {
     nx::utils::erase_if(
         *list,
@@ -81,10 +81,10 @@ std::optional<QJsonValue> ResourceWithParameters::parameter(const QString& key) 
     return std::nullopt;
 }
 
-std::unordered_map<QnUuid, std::vector<ResourceParamData>> toParameterMap(
+std::unordered_map<nx::Uuid, std::vector<ResourceParamData>> toParameterMap(
     std::vector<ResourceParamWithRefData> parametersWithIds)
 {
-    std::unordered_map<QnUuid, std::vector<ResourceParamData>> result;
+    std::unordered_map<nx::Uuid, std::vector<ResourceParamData>> result;
     std::sort(parametersWithIds.begin(),
         parametersWithIds.end(),
         [](const auto& lhs, const auto& rhs) { return lhs.getId() < rhs.getId(); });

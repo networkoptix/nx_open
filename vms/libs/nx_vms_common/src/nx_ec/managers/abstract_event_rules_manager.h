@@ -19,7 +19,7 @@ class NX_VMS_COMMON_API AbstractBusinessEventNotificationManager: public QObject
 
 signals:
     void addedOrUpdated(const nx::vms::api::EventRuleData& rule, ec2::NotificationSource source);
-    void removed(const QnUuid& id);
+    void removed(const nx::Uuid& id);
     void businessRuleReset(const nx::vms::api::EventRuleDataList& rules);
     void gotBroadcastAction(const QSharedPointer<nx::vms::event::AbstractAction>& action);
 };
@@ -46,11 +46,11 @@ public:
     ErrorCode saveSync(const nx::vms::api::EventRuleData& data);
 
     virtual int deleteRule(
-        const QnUuid& ruleId,
+        const nx::Uuid& ruleId,
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) = 0;
 
-    ErrorCode deleteRuleSync(const QnUuid& ruleId);
+    ErrorCode deleteRuleSync(const nx::Uuid& ruleId);
 
     virtual int broadcastEventAction(
         const nx::vms::api::EventActionData& data,

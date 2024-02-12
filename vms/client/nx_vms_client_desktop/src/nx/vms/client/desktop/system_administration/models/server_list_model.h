@@ -38,8 +38,8 @@ public:
     QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
     int rowCount(const QModelIndex& parent = QModelIndex()) const override;
 
-    Q_INVOKABLE QnUuid serverIdAt(int row) const;
-    Q_INVOKABLE int indexOf(const QnUuid& serverId);
+    Q_INVOKABLE nx::Uuid serverIdAt(int row) const;
+    Q_INVOKABLE int indexOf(const nx::Uuid& serverId);
     Q_INVOKABLE QString serverName(int row) const;
 
 signals:

@@ -15,9 +15,9 @@ namespace
     QnCameraBookmark createValidBookmark(milliseconds startTimeMs = 0ms)
     {
         QnCameraBookmark result;
-        result.guid = QnUuid::createUuid();
+        result.guid = nx::Uuid::createUuid();
         result.name = "Bookmark";
-        result.cameraId = QnUuid::fromArbitraryData(QByteArray("testcamera"));
+        result.cameraId = nx::Uuid::fromArbitraryData(QByteArray("testcamera"));
         result.startTimeMs = startTimeMs;
         result.durationMs = kDefaultBookmarkDuration;
         NX_ASSERT(result.isValid(), "This function must create valid bookmarks");

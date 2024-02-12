@@ -20,7 +20,7 @@ struct QnPtzTourItemModel {
     {}
 
     QnPtzTourItemModel(const QString &name):
-        tour(QnUuid::createUuid().toString(), name, QnPtzTourSpotList()),
+        tour(nx::Uuid::createUuid().toString(), name, QnPtzTourSpotList()),
         modified(true),
         local(true)
     {}
@@ -45,7 +45,7 @@ struct QnPtzPresetItemModel {
     {}
 
     QnPtzPresetItemModel(const QString &name):
-        preset(QnUuid::createUuid().toString(), name),
+        preset(nx::Uuid::createUuid().toString(), name),
         initialName(name),
         modified(true),
         local(true)

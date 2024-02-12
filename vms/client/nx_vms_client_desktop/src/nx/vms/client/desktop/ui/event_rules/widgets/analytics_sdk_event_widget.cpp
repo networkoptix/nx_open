@@ -96,7 +96,7 @@ void AnalyticsSdkEventWidget::paramsChanged()
 
     model()->setEventParams(createEventParameters(
         ui->sdkEventTypeComboBox->currentData(
-            AnalyticsSdkEventModel::EngineIdRole).value<QnUuid>(),
+            AnalyticsSdkEventModel::EngineIdRole).value<nx::Uuid>(),
         ui->sdkEventTypeComboBox->currentData(
             AnalyticsSdkEventModel::EventTypeIdRole).value<QString>()));
 }
@@ -113,7 +113,7 @@ void AnalyticsSdkEventWidget::updateSdkEventTypesModel()
 
 void AnalyticsSdkEventWidget::updateSelectedEventType()
 {
-    QnUuid engineId = model()->eventParams().getAnalyticsEngineId();
+    nx::Uuid engineId = model()->eventParams().getAnalyticsEngineId();
     QString eventTypeId = model()->eventParams().getAnalyticsEventTypeId();
 
     auto analyticsModel = ui->sdkEventTypeComboBox->model();
@@ -133,7 +133,7 @@ void AnalyticsSdkEventWidget::updateSelectedEventType()
             ui->sdkEventTypeComboBox->setCurrentIndex(selectableItems.front());
 
             engineId = ui->sdkEventTypeComboBox->currentData(
-                AnalyticsSdkEventModel::EngineIdRole).value<QnUuid>();
+                AnalyticsSdkEventModel::EngineIdRole).value<nx::Uuid>();
 
             eventTypeId = ui->sdkEventTypeComboBox->currentData(
                 AnalyticsSdkEventModel::EventTypeIdRole).value<QString>();
@@ -156,7 +156,7 @@ void AnalyticsSdkEventWidget::updateSelectedEventType()
 }
 
 nx::vms::event::EventParameters AnalyticsSdkEventWidget::createEventParameters(
-    const QnUuid& engineId,
+    const nx::Uuid& engineId,
     const QString& analyticsEventTypeId)
 {
     auto eventParams = model()->eventParams();

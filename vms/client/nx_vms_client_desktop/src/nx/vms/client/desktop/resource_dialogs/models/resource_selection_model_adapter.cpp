@@ -275,7 +275,7 @@ QSet<QnResourcePtr> ResourceSelectionModelAdapter::selectedResources() const
     return d->selectionDecoratorModel->selectedResources();
 }
 
-QSet<QnUuid> ResourceSelectionModelAdapter::selectedResourceIds() const
+QSet<nx::Uuid> ResourceSelectionModelAdapter::selectedResourceIds() const
 {
     return d->selectionDecoratorModel->selectedResourcesIds();
 }

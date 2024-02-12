@@ -26,7 +26,7 @@ ErrorCode AbstractVideowallManager::saveSync(const nx::vms::api::VideowallData& 
         });
 }
 
-ErrorCode AbstractVideowallManager::removeSync(const QnUuid& id)
+ErrorCode AbstractVideowallManager::removeSync(const nx::Uuid& id)
 {
     return detail::callSync(
         [&](auto handler)

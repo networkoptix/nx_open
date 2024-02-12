@@ -21,7 +21,7 @@ class NX_VMS_COMMON_API AbstractResourceNotificationManager: public QObject
 
 signals:
     void statusChanged(
-        const QnUuid& resourceId, nx::vms::api::ResourceStatus status,
+        const nx::Uuid& resourceId, nx::vms::api::ResourceStatus status,
         ec2::NotificationSource source);
 
     void resourceParamChanged(
@@ -29,8 +29,8 @@ signals:
         ec2::NotificationSource source);
 
     void resourceParamRemoved(const nx::vms::api::ResourceParamWithRefData& param);
-    void resourceRemoved(const QnUuid& resourceId, ec2::NotificationSource source);
-    void resourceStatusRemoved(const QnUuid& resourceId, ec2::NotificationSource source);
+    void resourceRemoved(const nx::Uuid& resourceId, ec2::NotificationSource source);
+    void resourceStatusRemoved(const nx::Uuid& resourceId, ec2::NotificationSource source);
 };
 
 /*!
@@ -48,28 +48,28 @@ public:
     ErrorCode getResourceTypesSync(QnResourceTypeList* outTypeList);
 
     virtual int setResourceStatus(
-        const QnUuid& resourceId,
+        const nx::Uuid& resourceId,
         nx::vms::api::ResourceStatus status,
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) = 0;
 
-    ErrorCode setResourceStatusSync(const QnUuid& resourceId, nx::vms::api::ResourceStatus status);
+    ErrorCode setResourceStatusSync(const nx::Uuid& resourceId, nx::vms::api::ResourceStatus status);
 
     virtual int getKvPairs(
-        const QnUuid& resourceId,
+        const nx::Uuid& resourceId,
         Handler<nx::vms::api::ResourceParamWithRefDataList> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) = 0;
 
     ErrorCode getKvPairsSync(
-        const QnUuid& resourceId, nx::vms::api::ResourceParamWithRefDataList* outDataList);
+        const nx::Uuid& resourceId, nx::vms::api::ResourceParamWithRefDataList* outDataList);
 
     virtual int getStatusList(
-        const QnUuid& resourceId,
+        const nx::Uuid& resourceId,
         Handler<nx::vms::api::ResourceStatusDataList> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) = 0;
 
     ErrorCode getStatusListSync(
-        const QnUuid& resourceId, nx::vms::api::ResourceStatusDataList* outDataList);
+        const nx::Uuid& resourceId, nx::vms::api::ResourceStatusDataList* outDataList);
 
     virtual int save(
         const nx::vms::api::ResourceParamWithRefDataList& dataList,
@@ -79,23 +79,23 @@ public:
     ErrorCode saveSync(const nx::vms::api::ResourceParamWithRefDataList& dataList);
 
     int save(
-        const QnUuid& resourceId,
+        const nx::Uuid& resourceId,
         const nx::vms::api::ResourceParamDataList& dataList,
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {});
 
     ErrorCode saveSync(
-        const QnUuid& resourceId, const nx::vms::api::ResourceParamDataList& dataList);
+        const nx::Uuid& resourceId, const nx::vms::api::ResourceParamDataList& dataList);
 
     virtual int remove(
-        const QnUuid& resourceId,
+        const nx::Uuid& resourceId,
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) = 0;
 
-    ErrorCode removeSync(const QnUuid& resourceId);
+    ErrorCode removeSync(const nx::Uuid& resourceId);
 
     virtual int remove(
-        const QVector<QnUuid>& resourceIds,
+        const QVector<nx::Uuid>& resourceIds,
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) = 0;
 
@@ -105,13 +105,13 @@ public:
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) = 0;
 
     virtual int removeHardwareIdMapping(
-        const QnUuid& resourceId,
+        const nx::Uuid& resourceId,
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) = 0;
 
-    ErrorCode removeSync(const QVector<QnUuid>& resourceIds);
+    ErrorCode removeSync(const QVector<nx::Uuid>& resourceIds);
     ErrorCode removeSync(const nx::vms::api::ResourceParamWithRefData& data);
-    ErrorCode removeHardwareIdMappingSync(const QnUuid& resourceId);
+    ErrorCode removeHardwareIdMappingSync(const nx::Uuid& resourceId);
 };
 
 } // namespace ec2

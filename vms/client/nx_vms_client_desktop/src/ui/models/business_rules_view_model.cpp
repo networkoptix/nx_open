@@ -185,7 +185,7 @@ QSize QnBusinessRulesViewModel::columnSizeHint(Column column) const
 
 int QnBusinessRulesViewModel::addRuleModelInternal(const QnBusinessRuleViewModelPtr& ruleModel)
 {
-    QnUuid id = ruleModel->id();
+    nx::Uuid id = ruleModel->id();
     connect(ruleModel.get(), &QnBusinessRuleViewModel::dataChanged, this,
         [this, id](Fields fields)
         {
@@ -255,7 +255,7 @@ void QnBusinessRulesViewModel::deleteRule(const QnBusinessRuleViewModelPtr& rule
     endRemoveRows();
 }
 
-QnBusinessRuleViewModelPtr QnBusinessRulesViewModel::ruleModelById(const QnUuid& id) const
+QnBusinessRuleViewModelPtr QnBusinessRulesViewModel::ruleModelById(const nx::Uuid& id) const
 {
     for (const auto& rule: m_rules)
     {
@@ -281,10 +281,10 @@ QnBusinessRuleViewModelPtr QnBusinessRulesViewModel::rule(const QModelIndex& ind
             : QnBusinessRuleViewModelPtr();
     }
 
-    return ruleModelById(index.data(Qn::UuidRole).value<QnUuid>());
+    return ruleModelById(index.data(Qn::UuidRole).value<nx::Uuid>());
 }
 
-void QnBusinessRulesViewModel::at_rule_dataChanged(const QnUuid &id, Fields fields)
+void QnBusinessRulesViewModel::at_rule_dataChanged(const nx::Uuid &id, Fields fields)
 {
     auto model = ruleModelById(id);
     if (!model)

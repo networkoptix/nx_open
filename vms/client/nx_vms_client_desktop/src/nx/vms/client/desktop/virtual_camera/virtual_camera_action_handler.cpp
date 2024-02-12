@@ -110,14 +110,14 @@ VirtualCameraActionHandler::VirtualCameraActionHandler(
 
     const auto& manager = windowContext->localNotificationsManager();
     connect(manager, &nx::vms::client::desktop::workbench::LocalNotificationsManager::cancelRequested, this,
-        [this](const QnUuid& progressId)
+        [this](const nx::Uuid& progressId)
         {
             if (const auto camera = cameraByProgressId(progressId))
                 menu()->trigger(menu::CancelVirtualCameraUploadsAction, camera);
         });
 
     connect(manager, &nx::vms::client::desktop::workbench::LocalNotificationsManager::interactionRequested, this,
-        [this](const QnUuid& progressId)
+        [this](const nx::Uuid& progressId)
         {
             if (const auto camera = cameraByProgressId(progressId))
                 menu()->trigger(menu::CameraSettingsAction, camera);
@@ -138,7 +138,7 @@ void VirtualCameraActionHandler::maybeOpenCurrentSettings()
     if (!camera)
         return;
 
-    m_currentCameraUuid = QnUuid();
+    m_currentCameraUuid = nx::Uuid();
     menu()->trigger(menu::CameraSettingsAction,
         menu::Parameters(camera, {{Qn::FocusTabRole, (int)CameraSettingsTab::general}}));
 }
@@ -564,7 +564,7 @@ void VirtualCameraActionHandler::at_virtualCameraManager_stateChanged(const Virt
     }
 }
 
-QnUuid VirtualCameraActionHandler::ensureProgress(const QnUuid& cameraId)
+nx::Uuid VirtualCameraActionHandler::ensureProgress(const nx::Uuid& cameraId)
 {
     const auto iter = m_currentProgresses.find(cameraId);
     if (iter != m_currentProgresses.end())
@@ -577,7 +577,7 @@ QnUuid VirtualCameraActionHandler::ensureProgress(const QnUuid& cameraId)
     return progressId;
 }
 
-void VirtualCameraActionHandler::removeProgress(const QnUuid& cameraId)
+void VirtualCameraActionHandler::removeProgress(const nx::Uuid& cameraId)
 {
     const auto iter = m_currentProgresses.find(cameraId);
     if (iter == m_currentProgresses.end())
@@ -588,7 +588,7 @@ void VirtualCameraActionHandler::removeProgress(const QnUuid& cameraId)
 }
 
 QnSecurityCamResourcePtr VirtualCameraActionHandler::cameraByProgressId(
-    const QnUuid& progressId) const
+    const nx::Uuid& progressId) const
 {
     const auto cameraId = m_currentProgresses.key(progressId); //< No need of extra performance here.
     return cameraId.isNull()

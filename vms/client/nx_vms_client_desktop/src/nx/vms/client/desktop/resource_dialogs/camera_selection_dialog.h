@@ -79,7 +79,7 @@ public:
     };
 
     template<typename ResourcePolicy>
-    static bool selectCameras(QnUuidSet& selectedCameras, QWidget* parent);
+    static bool selectCameras(UuidSet& selectedCameras, QWidget* parent);
 
 protected:
     virtual void showEvent(QShowEvent* event) override;
@@ -98,7 +98,7 @@ private:
 
 template<typename ResourcePolicy>
 bool CameraSelectionDialog::selectCameras(
-    QnUuidSet& selectedCameras,
+    UuidSet& selectedCameras,
     QWidget* parent)
 {
     const auto resourceValidator =

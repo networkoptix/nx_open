@@ -43,7 +43,7 @@ ContextCurrentUserWatcher::ContextCurrentUserWatcher(QObject *parent):
     connect(systemContext()->globalPermissionsWatcher(),
         &nx::core::access::GlobalPermissionsWatcher::ownGlobalPermissionsChanged,
         this,
-        [this](const QnUuid& subjectId)
+        [this](const nx::Uuid& subjectId)
         {
             if (!m_user || m_user->hasFlags(Qn::removed))
                 return;
@@ -55,10 +55,10 @@ ContextCurrentUserWatcher::ContextCurrentUserWatcher(QObject *parent):
     connect(systemContext()->accessSubjectHierarchy(),
         &nx::core::access::SubjectHierarchy::changed, this,
         [this](
-            const QSet<QnUuid>& /*added*/,
-            const QSet<QnUuid>& /*removed*/,
-            const QSet<QnUuid>& groupsWithChangedMembers,
-            const QSet<QnUuid>& subjectsWithChangedParents)
+            const QSet<nx::Uuid>& /*added*/,
+            const QSet<nx::Uuid>& /*removed*/,
+            const QSet<nx::Uuid>& groupsWithChangedMembers,
+            const QSet<nx::Uuid>& subjectsWithChangedParents)
         {
             if (!m_user || m_user->hasFlags(Qn::removed))
                 return;
@@ -97,13 +97,13 @@ bool ContextCurrentUserWatcher::updateParentGroups()
     return true;
 }
 
-QSet<QnUuid> ContextCurrentUserWatcher::allParentGroups() const
+QSet<nx::Uuid> ContextCurrentUserWatcher::allParentGroups() const
 {
     if (!m_user)
         return {};
 
     const auto directParents = m_user->groupIds();
-    QSet<QnUuid> parentIds = {directParents.begin(), directParents.end()};
+    QSet<nx::Uuid> parentIds = {directParents.begin(), directParents.end()};
     parentIds += systemContext()->accessSubjectHierarchy()->recursiveParents(parentIds);
     parentIds.insert(m_user->getId());
 

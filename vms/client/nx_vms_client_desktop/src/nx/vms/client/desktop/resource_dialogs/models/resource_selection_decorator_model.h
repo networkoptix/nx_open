@@ -65,7 +65,7 @@ public:
     QSet<QnResourcePtr> selectedResources() const;
     void setSelectedResources(const QSet<QnResourcePtr>& resources);
 
-    QnUuidSet selectedResourcesIds() const;
+    UuidSet selectedResourcesIds() const;
 
     ResourceSelectionMode selectionMode() const;
     void setSelectionMode(ResourceSelectionMode mode);

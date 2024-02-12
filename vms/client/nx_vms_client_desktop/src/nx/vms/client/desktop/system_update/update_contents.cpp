@@ -20,7 +20,7 @@ void UpdateContents::resetVerification()
     packagesGenerated = false;
 }
 
-bool UpdateContents::peerHasUpdate(const QnUuid& id) const
+bool UpdateContents::peerHasUpdate(const nx::Uuid& id) const
 {
     for (const auto& props: packageProperties)
     {

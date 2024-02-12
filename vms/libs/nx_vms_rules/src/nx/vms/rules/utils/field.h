@@ -148,9 +148,9 @@ T getFieldValue(const E& event, const char* fieldName, T&& defaultValue = T())
 }
 
 // TODO: #amalov Consider moving to resource.h.
-NX_VMS_RULES_API QnUuidList getDeviceIds(const AggregatedEventPtr& event);
-NX_VMS_RULES_API QnUuidList getResourceIds(const AggregatedEventPtr& event);
-NX_VMS_RULES_API QnUuidList getResourceIds(const ActionPtr& action);
+NX_VMS_RULES_API UuidList getDeviceIds(const AggregatedEventPtr& event);
+NX_VMS_RULES_API UuidList getResourceIds(const AggregatedEventPtr& event);
+NX_VMS_RULES_API UuidList getResourceIds(const ActionPtr& action);
 
 } // namespace utils
 } // namespace nx::vms::rules

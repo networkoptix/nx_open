@@ -18,7 +18,7 @@ struct NX_VMS_COMMON_API ActionParameters
     /**%apidoc
       * Identifier of the Action - used in "Show/Hide Popup" Action.
       */
-    QnUuid actionId;
+    nx::Uuid actionId;
 
     /**%apidoc
       * Shows if the Action should be confirmed by the user. Currently used for Bookmarks confirmation.
@@ -28,7 +28,7 @@ struct NX_VMS_COMMON_API ActionParameters
     /**%apidoc
      *  Additional parameter for Event Log convenience. Is not filled when the Action actually occurs.
      */
-    QnUuid actionResourceId;
+    nx::Uuid actionResourceId;
 
     /**%apidoc Used for "Play Sound" / "Exec HTTP" Actions. */
     QString url;
@@ -76,7 +76,7 @@ struct NX_VMS_COMMON_API ActionParameters
      * - For "Show On Alarm Layout": contains the users.
      * - For "Acknowledge": contains the user that confirms the popup.
      */
-    std::vector<QnUuid> additionalResources;
+    std::vector<nx::Uuid> additionalResources;
 
     /**%apidoc When set, signals that all users must be targeted by the Action. */
     bool allUsers = false;

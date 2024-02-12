@@ -36,7 +36,7 @@ const TimeSynchronizationWidgetState& TimeSynchronizationWidgetStore::state() co
 
 void TimeSynchronizationWidgetStore::initialize(
     bool isTimeSynchronizationEnabled,
-    const QnUuid& primaryTimeServer,
+    const nx::Uuid& primaryTimeServer,
     const QList<State::ServerInfo>& servers)
 {
     d->executeAction(
@@ -56,19 +56,19 @@ void TimeSynchronizationWidgetStore::addServer(const State::ServerInfo &serverIn
         [&](State state) { return Reducer::addServer(std::move(state), serverInfo); });
 }
 
-void TimeSynchronizationWidgetStore::removeServer(const QnUuid& id)
+void TimeSynchronizationWidgetStore::removeServer(const nx::Uuid& id)
 {
     d->executeAction(
         [&](State state) { return Reducer::removeServer(std::move(state), id); });
 }
 
-void TimeSynchronizationWidgetStore::setServerOnline(const QnUuid &id, bool isOnline)
+void TimeSynchronizationWidgetStore::setServerOnline(const nx::Uuid &id, bool isOnline)
 {
     d->executeAction(
         [&](State state) { return Reducer::setServerOnline(std::move(state), id, isOnline); });
 }
 
-void TimeSynchronizationWidgetStore::setServerHasInternet(const QnUuid &id, bool hasInternet)
+void TimeSynchronizationWidgetStore::setServerHasInternet(const nx::Uuid &id, bool hasInternet)
 {
     d->executeAction(
         [&](State state) { return Reducer::setServerHasInternet(std::move(state), id, hasInternet);
@@ -97,7 +97,7 @@ void TimeSynchronizationWidgetStore::disableSync()
         [&](State state) { return Reducer::disableSync(std::move(state)); });
 }
 
-void TimeSynchronizationWidgetStore::selectServer(const QnUuid& serverId)
+void TimeSynchronizationWidgetStore::selectServer(const nx::Uuid& serverId)
 {
     d->executeAction(
         [&](State state) { return Reducer::selectServer(std::move(state), serverId); });

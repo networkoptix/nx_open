@@ -14,13 +14,13 @@ class NX_VMS_RULES_API ServerConflictEvent: public BasicEvent
     Q_OBJECT
     Q_CLASSINFO("type", "nx.events.serverConflict")
 
-    FIELD(QnUuid, serverId, setServerId)
+    FIELD(nx::Uuid, serverId, setServerId)
     FIELD(nx::vms::rules::CameraConflictList, conflicts, setConflicts)
 
 public:
     ServerConflictEvent(
         std::chrono::microseconds timestamp,
-        QnUuid serverId,
+        nx::Uuid serverId,
         const CameraConflictList& conflicts);
 
     ServerConflictEvent() = default;

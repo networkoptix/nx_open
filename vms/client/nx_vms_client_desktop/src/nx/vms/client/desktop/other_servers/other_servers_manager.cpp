@@ -45,10 +45,10 @@ struct OtherServersManager::Private
     };
 
     OtherServersManager* const q;
-    QHash<QnUuid, DiscoveredServerItem> discoveredServerItemById;
+    QHash<nx::Uuid, DiscoveredServerItem> discoveredServerItemById;
     nx::utils::ScopedConnections connections;
 
-    QSet<QnUuid> otherServers;
+    QSet<nx::Uuid> otherServers;
 
     void at_resourcePool_statusChanged(const QnResourcePtr& resource)
     {
@@ -174,7 +174,7 @@ struct OtherServersManager::Private
         }
     }
 
-    void removeOtherServer(const QnUuid& serverId)
+    void removeOtherServer(const nx::Uuid& serverId)
     {
         if (!NX_ASSERT(!serverId.isNull()))
             return;
@@ -200,7 +200,7 @@ struct OtherServersManager::Private
             at_discoveredServerChanged(discoveredServer);
     }
 
-    nx::network::SocketAddress getPrimaryAddress(const QnUuid& serverId) const
+    nx::network::SocketAddress getPrimaryAddress(const nx::Uuid& serverId) const
     {
         if (!NX_ASSERT(otherServers.contains(serverId)))
             return {};
@@ -287,18 +287,18 @@ void OtherServersManager::stop()
     d->otherServers.clear();
 }
 
-QnUuidList OtherServersManager::getServers() const
+UuidList OtherServersManager::getServers() const
 {
     return d->otherServers.values();
 }
 
-bool OtherServersManager::containsServer(const QnUuid& serverId) const
+bool OtherServersManager::containsServer(const nx::Uuid& serverId) const
 {
     return d->otherServers.contains(serverId);
 }
 
 nx::vms::api::ModuleInformationWithAddresses OtherServersManager::getModuleInformationWithAddresses(
-    const QnUuid& serverId) const
+    const nx::Uuid& serverId) const
 {
     if (!NX_ASSERT(d->otherServers.contains(serverId)))
         return {};
@@ -310,7 +310,7 @@ nx::vms::api::ModuleInformationWithAddresses OtherServersManager::getModuleInfor
     return {};
 }
 
-nx::utils::Url OtherServersManager::getUrl(const QnUuid& serverId) const
+nx::utils::Url OtherServersManager::getUrl(const nx::Uuid& serverId) const
 {
     return nx::network::url::Builder()
         .setScheme(nx::network::http::kSecureUrlSchemeName)

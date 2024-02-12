@@ -87,7 +87,7 @@ Engine::~Engine()
     m_rules.clear();
 }
 
-void Engine::setId(QnUuid id)
+void Engine::setId(nx::Uuid id)
 {
     if (m_id == id)
         return;
@@ -142,7 +142,7 @@ Engine::ConstRuleSet Engine::rules() const
     return result;
 }
 
-Engine::ConstRulePtr Engine::rule(const QnUuid& id) const
+Engine::ConstRulePtr Engine::rule(const nx::Uuid& id) const
 {
     NX_MUTEX_LOCKER lock(&m_ruleMutex);
     if (const auto it = m_rules.find(id); it != m_rules.end())
@@ -151,7 +151,7 @@ Engine::ConstRulePtr Engine::rule(const QnUuid& id) const
     return {};
 }
 
-Engine::RulePtr Engine::cloneRule(const QnUuid& id) const
+Engine::RulePtr Engine::cloneRule(const nx::Uuid& id) const
 {
     auto rule = this->rule(id);
     if (!rule)
@@ -183,7 +183,7 @@ void Engine::updateRule(const api::Rule& ruleData)
     emit ruleAddedOrUpdated(ruleId, result.second);
 }
 
-void Engine::removeRule(QnUuid ruleId)
+void Engine::removeRule(nx::Uuid ruleId)
 {
     NX_MUTEX_LOCKER lock(&m_ruleMutex);
     const auto erasedCount = m_rules.erase(ruleId);
@@ -577,7 +577,7 @@ std::unique_ptr<EventFilter> Engine::buildEventFilter(const ItemDescriptor& desc
     return filter;
 }
 
-std::unique_ptr<EventFilter> Engine::buildEventFilter(QnUuid id, const QString& type) const
+std::unique_ptr<EventFilter> Engine::buildEventFilter(nx::Uuid id, const QString& type) const
 {
     auto filter = std::make_unique<EventFilter>(id, type);
     filter->moveToThread(thread());
@@ -635,7 +635,7 @@ std::unique_ptr<ActionBuilder> Engine::buildActionBuilder(const QString& actionT
 
 std::unique_ptr<ActionBuilder> Engine::buildActionBuilder(const ItemDescriptor& descriptor) const
 {
-    auto builder = buildActionBuilder(QnUuid::createUuid(), descriptor.id);
+    auto builder = buildActionBuilder(nx::Uuid::createUuid(), descriptor.id);
     if (!builder)
         return {};
 
@@ -660,7 +660,7 @@ std::unique_ptr<ActionBuilder> Engine::buildActionBuilder(const ItemDescriptor& 
     return builder;
 }
 
-std::unique_ptr<ActionBuilder> Engine::buildActionBuilder(QnUuid id, const QString& type) const
+std::unique_ptr<ActionBuilder> Engine::buildActionBuilder(nx::Uuid id, const QString& type) const
 {
     ActionConstructor ctor = m_actionTypes.value(type);
     if (!NX_ASSERT(ctor, "Action constructor absent: %1", type))
@@ -752,7 +752,7 @@ size_t Engine::processEvent(const EventPtr& event)
 
     EventData eventData;
     QSet<QByteArray> eventFields; // TODO: #spanasenko Cache data.
-    QSet<QnUuid> ruleIds, resources;
+    QSet<nx::Uuid> ruleIds, resources;
 
     {
         NX_MUTEX_LOCKER lock(&m_ruleMutex);
@@ -825,7 +825,7 @@ size_t Engine::processAnalyticsEvents(const std::vector<EventPtr>& events)
 }
 
 // TODO: #spanasenko Use a wrapper with additional checks instead of QHash.
-void Engine::processAcceptedEvent(const QnUuid& ruleId, const EventData& eventData)
+void Engine::processAcceptedEvent(const nx::Uuid& ruleId, const EventData& eventData)
 {
     checkOwnThread();
     NX_DEBUG(this, "Processing accepted event, rule id: %1", ruleId);

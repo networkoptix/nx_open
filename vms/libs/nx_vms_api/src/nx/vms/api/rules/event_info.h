@@ -13,7 +13,7 @@ namespace nx::vms::api::rules {
 
 struct NX_VMS_API EventInfo
 {
-    QnUuid ruleId;
+    nx::Uuid ruleId;
 
     QMap<QString, QJsonValue> props;
 };

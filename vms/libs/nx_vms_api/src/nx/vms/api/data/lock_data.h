@@ -16,7 +16,7 @@ namespace api {
 struct NX_VMS_API LockData
 {
     QString name;
-    QnUuid peer;
+    nx::Uuid peer;
     qint64 timestamp = 0;
     QByteArray userData;
 };

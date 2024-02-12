@@ -58,12 +58,12 @@ void QnCameraBookmarksQuery::setActive(bool active)
     emit queryChanged();
 }
 
-const std::set<QnUuid>& QnCameraBookmarksQuery::cameras() const
+const std::set<nx::Uuid>& QnCameraBookmarksQuery::cameras() const
 {
     return m_filter.cameras;
 }
 
-void QnCameraBookmarksQuery::setCameras(const std::set<QnUuid>& value)
+void QnCameraBookmarksQuery::setCameras(const std::set<nx::Uuid>& value)
 {
     if (m_filter.cameras == value)
         return;
@@ -72,12 +72,12 @@ void QnCameraBookmarksQuery::setCameras(const std::set<QnUuid>& value)
     emit queryChanged();
 }
 
-void QnCameraBookmarksQuery::setCamera(const QnUuid& value)
+void QnCameraBookmarksQuery::setCamera(const nx::Uuid& value)
 {
     setCameras({value});
 }
 
-bool QnCameraBookmarksQuery::addCamera(const QnUuid& value)
+bool QnCameraBookmarksQuery::addCamera(const nx::Uuid& value)
 {
     if (!NX_ASSERT(!value.isNull()))
         return false;
@@ -90,7 +90,7 @@ bool QnCameraBookmarksQuery::addCamera(const QnUuid& value)
     return true;
 }
 
-bool QnCameraBookmarksQuery::removeCamera(const QnUuid& value)
+bool QnCameraBookmarksQuery::removeCamera(const nx::Uuid& value)
 {
     if (!m_filter.cameras.contains(value))
         return false;

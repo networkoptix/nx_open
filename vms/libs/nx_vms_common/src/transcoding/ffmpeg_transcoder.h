@@ -51,7 +51,7 @@ public:
     bool inMiddleOfStream() const { return m_inMiddleOfStream; }
     void setStartTimeOffset(qint64 value) { m_startTimeOffset = value; }
 
-    QByteArray getSignature(QnLicensePool* licensePool, const QnUuid& serverId);
+    QByteArray getSignature(QnLicensePool* licensePool, const nx::Uuid& serverId);
 
     struct PacketTimestamp
     {

@@ -56,7 +56,7 @@ void NotificationBellManager::countNotification(
 
     auto action = params.value<vms::event::AbstractActionPtr>();
     const auto& runtimeParameters = action->getRuntimeParams();
-    const QnUuid intercomId = runtimeParameters.eventResourceId;
+    const nx::Uuid intercomId = runtimeParameters.eventResourceId;
 
     if (add)
         m_activeNotifications.insert(intercomId);

@@ -24,7 +24,7 @@ NX_VMS_COMMON_API QnLayoutResourcePtr findLayoutByFlexibleId(
  * @param flexibleId Id or logical id in the string form.
  * @return Layout id, or null if not found.
  */
-NX_VMS_COMMON_API QnUuid flexibleIdToId(const QnResourcePool* resourcePool, const QString& flexibleId);
+NX_VMS_COMMON_API nx::Uuid flexibleIdToId(const QnResourcePool* resourcePool, const QString& flexibleId);
 
 } // namespace layout_id_helper
 } // namespace nx

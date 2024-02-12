@@ -63,7 +63,7 @@ public:
     WelcomeScreen(WindowContext* context, QWidget* parent = nullptr);
     virtual ~WelcomeScreen() override;
 
-    void connectionToSystemEstablished(const QnUuid& systemId);
+    void connectionToSystemEstablished(const nx::Uuid& systemId);
 
 public: // Properties
     QObject* systemModel();
@@ -115,7 +115,7 @@ public: // Properties
     Q_INVOKABLE void abortConnectionProcess();
 
 public:
-    void setupFactorySystem(const nx::network::SocketAddress& address, const QnUuid& serverId);
+    void setupFactorySystem(const nx::network::SocketAddress& address, const nx::Uuid& serverId);
 
 public slots:
     /** QML overload. */
@@ -200,7 +200,7 @@ private:
     void createSystemModel();
     void connectToSystemInternal(
         const QString& systemId,
-        const std::optional<QnUuid>& serverId,
+        const std::optional<nx::Uuid>& serverId,
         const nx::network::SocketAddress& address,
         const nx::network::http::Credentials& credentials,
         bool storePassword,

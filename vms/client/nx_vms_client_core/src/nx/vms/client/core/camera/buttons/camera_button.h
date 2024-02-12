@@ -14,7 +14,7 @@ namespace nx::vms::client::core {
 struct NX_VMS_CLIENT_CORE_API CameraButton
 {
     Q_GADGET
-    Q_PROPERTY(QnUuid id MEMBER id)
+    Q_PROPERTY(nx::Uuid id MEMBER id)
     Q_PROPERTY(QString name MEMBER name)
     Q_PROPERTY(QString hint MEMBER hint)
     Q_PROPERTY(QString iconName MEMBER iconName)
@@ -49,7 +49,7 @@ public:
 
     using Group = int;
 
-    QnUuid id;
+    nx::Uuid id;
     QString name;
     QString checkedName;
     QString hint;

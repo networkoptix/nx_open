@@ -22,7 +22,7 @@ public:
     bool isUser() const { return !m_user.isNull(); }
     bool isRole() const { return m_user.isNull(); }
 
-    const QnUuid& id() const { return m_id; }
+    const nx::Uuid& id() const { return m_id; }
     QString toString() const;
 
     void operator=(const QnResourceAccessSubject& other);
@@ -33,7 +33,7 @@ public:
 
 private:
     QnUserResourcePtr m_user;
-    QnUuid m_id;
+    nx::Uuid m_id;
 };
 
 NX_VMS_COMMON_API QDebug operator<<(QDebug dbg, const QnResourceAccessSubject& subject);
@@ -43,7 +43,7 @@ namespace std {
 template<>
 struct hash<QnResourceAccessSubject>
 {
-    size_t operator()(const QnResourceAccessSubject& s) const { return hash<QnUuid>()(s.id()); }
+    size_t operator()(const QnResourceAccessSubject& s) const { return hash<nx::Uuid>()(s.id()); }
 };
 
 } // namepsace std

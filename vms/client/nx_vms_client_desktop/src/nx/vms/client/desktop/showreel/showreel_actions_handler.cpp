@@ -56,7 +56,7 @@ ShowreelActionsHandler::ShowreelActionsHandler(QObject* parent):
                 usedNames << showreel.name;
 
             nx::vms::api::ShowreelData showreel;
-            showreel.id = QnUuid::createUuid();
+            showreel.id = nx::Uuid::createUuid();
             showreel.parentId = system()->user()->getId();
             showreel.name = nx::utils::generateUniqueString(
                 usedNames, tr("Showreel"), tr("Showreel %1"));
@@ -80,7 +80,7 @@ ShowreelActionsHandler::ShowreelActionsHandler(QObject* parent):
         [this]()
         {
             const auto parameters = menu()->currentParameters(sender());
-            auto id = parameters.argument<QnUuid>(Qn::UuidRole);
+            auto id = parameters.argument<nx::Uuid>(Qn::UuidRole);
             auto showreel = system()->showreelManager()->showreel(id);
             if (!showreel.isValid())
                 return;
@@ -118,7 +118,7 @@ ShowreelActionsHandler::ShowreelActionsHandler(QObject* parent):
         [this]()
         {
             const auto parameters = menu()->currentParameters(sender());
-            auto id = parameters.argument<QnUuid>(Qn::UuidRole);
+            auto id = parameters.argument<nx::Uuid>(Qn::UuidRole);
             NX_ASSERT(!id.isNull());
 
             const auto showreel = system()->showreelManager()->showreel(id);
@@ -142,7 +142,7 @@ ShowreelActionsHandler::ShowreelActionsHandler(QObject* parent):
         [this](bool toggled)
         {
             const auto parameters = menu()->currentParameters(sender());
-            auto id = parameters.argument<QnUuid>(Qn::UuidRole);
+            auto id = parameters.argument<nx::Uuid>(Qn::UuidRole);
 
             if (!toggled)
             {
@@ -153,7 +153,7 @@ ShowreelActionsHandler::ShowreelActionsHandler(QObject* parent):
             if (toggled && id.isNull())
             {
                 const auto reviewShowreelId = workbench()->currentLayout()->data(
-                    Qn::ShowreelUuidRole).value<QnUuid>();
+                    Qn::ShowreelUuidRole).value<nx::Uuid>();
 
                 // Start Showreel on a review layout must start the layout showreel.
                 if (!reviewShowreelId.isNull())
@@ -193,7 +193,7 @@ ShowreelActionsHandler::ShowreelActionsHandler(QObject* parent):
         [this]
         {
             const auto parameters = menu()->currentParameters(sender());
-            auto id = parameters.argument<QnUuid>(Qn::UuidRole);
+            auto id = parameters.argument<nx::Uuid>(Qn::UuidRole);
             auto showreel = system()->showreelManager()->showreel(id);
             if (!showreel.isValid())
                 return;
@@ -234,7 +234,7 @@ bool ShowreelActionsHandler::tryClose(bool /*force*/)
     return true;
 }
 
-QnUuid ShowreelActionsHandler::runningShowreel() const
+nx::Uuid ShowreelActionsHandler::runningShowreel() const
 {
     return m_executor->runningShowreel();
 }
@@ -270,7 +270,7 @@ void ShowreelActionsHandler::saveShowreelToServer(const nx::vms::api::ShowreelDa
     };
 }
 
-void ShowreelActionsHandler::removeShowreelFromServer(const QnUuid& showreelId)
+void ShowreelActionsHandler::removeShowreelFromServer(const nx::Uuid& showreelId)
 {
     if (const auto connection = system()->messageBusConnection())
     {

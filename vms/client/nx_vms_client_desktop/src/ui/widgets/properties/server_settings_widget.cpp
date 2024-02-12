@@ -103,7 +103,7 @@ public:
         requests.clear();
     }
 
-    void query(const QnUuid& serverId)
+    void query(const nx::Uuid& serverId)
     {
         using nx::network::rest::UbjsonResult;
 
@@ -148,7 +148,7 @@ public:
         }
     }
 
-    std::string certificate(const QnUuid& serverId) const
+    std::string certificate(const nx::Uuid& serverId) const
     {
         return NX_ASSERT(m_serverId == serverId) ? m_result : "";
     }
@@ -176,7 +176,7 @@ private:
             if (record.eventType != Qn::AR_MitmAttack)
                 continue;
 
-            QnUuid id(record.extractParam("serverId"));
+            nx::Uuid id(record.extractParam("serverId"));
             if (id != m_serverId)
                 continue;
 
@@ -201,7 +201,7 @@ private:
     QnAuditRecordList m_data;
 
     std::string m_result;
-    QnUuid m_serverId;
+    nx::Uuid m_serverId;
 };
 
 QnServerSettingsWidget::QnServerSettingsWidget(QWidget* parent /* = 0*/) :

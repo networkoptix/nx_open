@@ -18,7 +18,7 @@ namespace nx::vms::rules {
 
 DeviceDisconnectedEvent::DeviceDisconnectedEvent(
     std::chrono::microseconds timestamp,
-    QnUuid deviceId)
+    nx::Uuid deviceId)
     :
     base_type(timestamp),
     m_cameraId(deviceId)

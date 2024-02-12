@@ -33,7 +33,7 @@ public:
 
     UdpSocket(int ipVersion):
         m_ipVersion(ipVersion),
-        m_testMessage(QnUuid::createUuid().toSimpleString().toUtf8())
+        m_testMessage(nx::Uuid::createUuid().toSimpleString().toUtf8())
     {
         SocketGlobals::addressResolver().dnsResolver().blockHost(
             kUnknownHostName);

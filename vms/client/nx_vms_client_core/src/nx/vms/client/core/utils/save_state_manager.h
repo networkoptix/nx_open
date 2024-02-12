@@ -30,33 +30,33 @@ public:
 
     SaveStateManager(QObject* parent = nullptr);
 
-    SaveStateFlags flags(const QnUuid& id) const;
-    void setFlags(const QnUuid& id, SaveStateFlags flags);
+    SaveStateFlags flags(const nx::Uuid& id) const;
+    void setFlags(const nx::Uuid& id, SaveStateFlags flags);
 
-    void clean(const QnUuid& id);
+    void clean(const nx::Uuid& id);
 
-    bool isBeingSaved(const QnUuid& id) const;
-    bool isChanged(const QnUuid& id) const;
+    bool isBeingSaved(const nx::Uuid& id) const;
+    bool isChanged(const nx::Uuid& id) const;
 
     /**
      * Check if item is changed and is not being saved right now.
      */
-    bool isSaveable(const QnUuid& id) const;
+    bool isSaveable(const nx::Uuid& id) const;
 
-    void markBeingSaved(const QnUuid& id, bool saved);
-    void markChanged(const QnUuid& id, bool changed);
+    void markBeingSaved(const nx::Uuid& id, bool saved);
+    void markChanged(const nx::Uuid& id, bool changed);
 
-    bool hasSaveRequests(const QnUuid& id) const;
-    void addSaveRequest(const QnUuid& id, int reqId);
-    void removeSaveRequest(const QnUuid& id, int reqId);
+    bool hasSaveRequests(const nx::Uuid& id) const;
+    void addSaveRequest(const nx::Uuid& id, int reqId);
+    void removeSaveRequest(const nx::Uuid& id, int reqId);
 
 signals:
-    void flagsChanged(const QnUuid& id, SaveStateFlags flags);
+    void flagsChanged(const nx::Uuid& id, SaveStateFlags flags);
 
 private:
     mutable nx::Mutex m_mutex;
-    QHash<QnUuid, SaveStateFlags> m_flags;
-    QHash<QnUuid, QSet<int>> m_saveRequests;
+    QHash<nx::Uuid, SaveStateFlags> m_flags;
+    QHash<nx::Uuid, QSet<int>> m_saveRequests;
 };
 
 } // namespace nx::vms::client::core

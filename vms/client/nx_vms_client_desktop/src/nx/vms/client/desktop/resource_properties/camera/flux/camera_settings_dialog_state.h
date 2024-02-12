@@ -45,7 +45,7 @@ namespace camera_settings_detail {
 
 struct SingleCameraProperties
 {
-    QnUuid id;
+    nx::Uuid id;
     UserEditable<QString> name;
     QString firmware;
     QString model;
@@ -73,7 +73,7 @@ struct SingleCameraProperties
     std::optional<QnCameraAdvancedParams> advancedSettingsManifest;
 
     /** Camera's supported object types, not filtered by engines. */
-    std::map<QnUuid, std::set<QString>> supportedAnalyicsObjectTypes;
+    std::map<nx::Uuid, std::set<QString>> supportedAnalyicsObjectTypes;
 };
 
 NX_REFLECTION_INSTRUMENT(SingleCameraProperties,
@@ -259,8 +259,8 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractFluxState
 
         UserEditable<int> logicalId;
 
-        QnUuid audioInputDeviceId;
-        QnUuid audioOutputDeviceId;
+        nx::Uuid audioInputDeviceId;
+        nx::Uuid audioOutputDeviceId;
 
         UserEditable<bool> cameraHotspotsEnabled;
         UserEditable<nx::vms::common::CameraHotspotDataList> cameraHotspots;
@@ -406,12 +406,12 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractFluxState
         QList<AnalyticsEngineInfo> engines;
 
         // Engines, which are enabled by the user.
-        UserEditable<QSet<QnUuid>> userEnabledEngines;
+        UserEditable<QSet<nx::Uuid>> userEnabledEngines;
 
         // All Engines which are actually enabled for the Camera. Includes device-dependent Engines.
-        QSet<QnUuid> enabledEngines() const
+        QSet<nx::Uuid> enabledEngines() const
         {
-            QSet<QnUuid> result;
+            QSet<nx::Uuid> result;
             for (const auto& engine: engines)
             {
                 if (engine.isDeviceDependent || userEnabledEngines().contains(engine.id))
@@ -427,14 +427,14 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractFluxState
             QJsonObject errors;
             bool loading = false;
         };
-        QHash<QnUuid /*engineId*/, EngineSettings> settingsByEngineId;
+        QHash<nx::Uuid /*engineId*/, EngineSettings> settingsByEngineId;
 
-        QnUuid currentEngineId;
+        nx::Uuid currentEngineId;
 
         // This dictionary may contain engine ids that are no longer valid.
         // Don't iterate through all 'streamByEngineId' kv-pairs, iterate through 'engines' instead
         // and use 'engine.id' as a key. StreamIndex::undefined means there should be no selection.
-        QHash<QnUuid /*engineId*/, UserEditable<StreamIndex> /*streamIndex*/> streamByEngineId;
+        QHash<nx::Uuid /*engineId*/, UserEditable<StreamIndex> /*streamIndex*/> streamByEngineId;
     };
     AnalyticsSettings analytics;
 
@@ -453,7 +453,7 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractFluxState
 
     bool isSingleCamera() const;
     bool isSingleVirtualCamera() const;
-    QnUuid singleCameraId() const;
+    nx::Uuid singleCameraId() const;
     int maxRecordingBrushFps() const;
     bool isMotionDetectionEnabled() const;
 
@@ -472,7 +472,7 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractFluxState
     bool isDualStreamingEnabled() const;
     bool supportsSchedule() const;
     bool supportsVideoStreamControl() const;
-    bool analyticsStreamSelectionEnabled(const QnUuid& engineId) const;
+    bool analyticsStreamSelectionEnabled(const nx::Uuid& engineId) const;
     bool canSwitchPtzPresetTypes() const;
     bool canForcePanTiltCapabilities() const;
     bool canForceZoomCapability() const;

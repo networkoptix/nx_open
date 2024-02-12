@@ -49,7 +49,7 @@ public:
     bool isExportedLayout = false;
     bool isPreviewSearchLayout = false;
     bool isAnalyticsSupported = false;
-    QnUuid twoWayAudioWidgetId;
+    nx::Uuid twoWayAudioWidgetId;
 
     core::IOModuleMonitorPtr ioModuleMonitor;
 

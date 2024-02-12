@@ -64,7 +64,7 @@ public:
     /** Returns mock implementation currently set. */
     RemoteConnectionAwareMock* mockImplementation() const;
 
-    QnUuid serverId() const;
+    nx::Uuid serverId() const;
     QnMediaServerResourcePtr currentServer() const;
 
 private:

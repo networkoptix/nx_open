@@ -30,8 +30,8 @@ IntegrationModel::DbUpdateTypes IntegrationModel::toDbTypes() &&
 
 std::vector<IntegrationModel> IntegrationModel::fromDbTypes(DbListTypes data)
 {
-    std::map<QnUuid, analytics::PluginManifest> manifests;
-    std::map<QnUuid, IntegrationType> integrationTypes;
+    std::map<nx::Uuid, analytics::PluginManifest> manifests;
+    std::map<nx::Uuid, IntegrationType> integrationTypes;
     for (const auto& property: std::get<1>(data))
     {
         if (property.name == kPluginManifestProperty)

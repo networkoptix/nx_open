@@ -27,7 +27,7 @@ void QnMediaServerStatisticsManager::registerConsumer(
     if (!NX_ASSERT(resource->systemContext() == systemContext()))
         return;
 
-    QnUuid id = resource->getId();
+    nx::Uuid id = resource->getId();
     if (!m_statistics.contains(id))
     {
         m_statistics[id] = new QnMediaServerStatisticsStorage(
@@ -48,7 +48,7 @@ void QnMediaServerStatisticsManager::unregisterConsumer(
 {
     NX_ASSERT(resource->systemContext() == systemContext());
 
-    QnUuid id = resource->getId();
+    nx::Uuid id = resource->getId();
     if (!m_statistics.contains(id))
         return;
 
@@ -58,7 +58,7 @@ void QnMediaServerStatisticsManager::unregisterConsumer(
 QnStatisticsHistory QnMediaServerStatisticsManager::history(
     const QnMediaServerResourcePtr& resource) const
 {
-    QnUuid id = resource->getId();
+    nx::Uuid id = resource->getId();
     if (!m_statistics.contains(id))
         return QnStatisticsHistory();
 
@@ -67,7 +67,7 @@ QnStatisticsHistory QnMediaServerStatisticsManager::history(
 
 qint64 QnMediaServerStatisticsManager::uptimeMs(const QnMediaServerResourcePtr& resource) const
 {
-    QnUuid id = resource->getId();
+    nx::Uuid id = resource->getId();
     if (!m_statistics.contains(id))
         return 0;
 
@@ -76,7 +76,7 @@ qint64 QnMediaServerStatisticsManager::uptimeMs(const QnMediaServerResourcePtr& 
 
 qint64 QnMediaServerStatisticsManager::historyId(const QnMediaServerResourcePtr& resource) const
 {
-    QnUuid id = resource->getId();
+    nx::Uuid id = resource->getId();
     if (!m_statistics.contains(id))
         return -1;
 
@@ -85,7 +85,7 @@ qint64 QnMediaServerStatisticsManager::historyId(const QnMediaServerResourcePtr&
 
 int QnMediaServerStatisticsManager::updatePeriod(const QnMediaServerResourcePtr& resource) const
 {
-    QnUuid id = resource->getId();
+    nx::Uuid id = resource->getId();
     if (!m_statistics.contains(id))
         return -1;
 

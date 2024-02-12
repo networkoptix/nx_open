@@ -132,13 +132,13 @@ void NetworkModule::setSession(std::shared_ptr<RemoteSession> session)
         d->sessionTimeoutWatcher->sessionStarted(session);
 }
 
-QnUuid NetworkModule::currentServerId() const
+nx::Uuid NetworkModule::currentServerId() const
 {
     NX_MUTEX_LOCKER lock(&d->mutex);
     if (d->session && d->session->connection())
         return d->session->connection()->moduleInformation().id;
 
-    return QnUuid();
+    return nx::Uuid();
 }
 
 RemoteConnectionFactory* NetworkModule::connectionFactory() const

@@ -25,8 +25,8 @@ public:
         std::chrono::microseconds timestamp,
         const QString &caption,
         const QString &description,
-        QnUuid cameraId,
-        QnUuid engineId,
+        nx::Uuid cameraId,
+        nx::Uuid engineId,
         nx::vms::api::EventLevel level);
 
     virtual QVariantMap details(common::SystemContext* context) const override;

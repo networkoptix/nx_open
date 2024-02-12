@@ -51,7 +51,7 @@ namespace
 
     struct QnOverlayTextItemData
     {
-        QnUuid id;
+        nx::Uuid id;
         QString text;
         QnHtmlTextItemOptions options;
     };

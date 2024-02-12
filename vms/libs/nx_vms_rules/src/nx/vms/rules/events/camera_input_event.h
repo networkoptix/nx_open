@@ -19,7 +19,7 @@ public:
     CameraInputEvent(
         std::chrono::microseconds timestamp,
         State state,
-        QnUuid cameraId,
+        nx::Uuid cameraId,
         const QString& inputPortId);
 
     CameraInputEvent() = default;

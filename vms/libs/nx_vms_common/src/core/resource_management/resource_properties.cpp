@@ -17,7 +17,7 @@ QnResourcePropertyDictionary::QnResourcePropertyDictionary(
 {
 }
 
-bool QnResourcePropertyDictionary::saveParams(const QnUuid& resourceId)
+bool QnResourcePropertyDictionary::saveParams(const nx::Uuid& resourceId)
 {
     nx::vms::api::ResourceParamWithRefDataList params;
     {
@@ -47,7 +47,7 @@ bool QnResourcePropertyDictionary::saveParams(const QnUuid& resourceId)
 }
 
 void QnResourcePropertyDictionary::fromModifiedDataToSavedData(
-    const QnUuid& resourceId,
+    const nx::Uuid& resourceId,
     nx::vms::api::ResourceParamWithRefDataList& outData)
 {
     auto itr = m_modifiedItems.find(resourceId);
@@ -77,7 +77,7 @@ int QnResourcePropertyDictionary::saveData(const nx::vms::api::ResourceParamWith
     return requestId;
 }
 
-int QnResourcePropertyDictionary::saveParamsAsync(const QnUuid& resourceId)
+int QnResourcePropertyDictionary::saveParamsAsync(const nx::Uuid& resourceId)
 {
     nx::vms::api::ResourceParamWithRefDataList data;
     {
@@ -88,13 +88,13 @@ int QnResourcePropertyDictionary::saveParamsAsync(const QnUuid& resourceId)
     return saveData(std::move(data));
 }
 
-int QnResourcePropertyDictionary::saveParamsAsync(const QList<QnUuid>& idList)
+int QnResourcePropertyDictionary::saveParamsAsync(const QList<nx::Uuid>& idList)
 {
     nx::vms::api::ResourceParamWithRefDataList data;
     {
         NX_MUTEX_LOCKER lock( &m_mutex );
         //TODO #rvasilenko is it correct to mark property as saved before it has been actually saved to ec?
-        for(const QnUuid& resourceId: idList)
+        for(const nx::Uuid& resourceId: idList)
             fromModifiedDataToSavedData(resourceId, data);
     }
     return saveData(std::move(data));
@@ -105,7 +105,7 @@ void QnResourcePropertyDictionary::onRequestDone( int reqID, ec2::ErrorCode erro
     emit asyncSaveDone(reqID, errorCode);
 }
 
-QString QnResourcePropertyDictionary::value(const QnUuid& resourceId, const QString& key) const
+QString QnResourcePropertyDictionary::value(const nx::Uuid& resourceId, const QString& key) const
 {
     NX_MUTEX_LOCKER lock( &m_mutex );
     auto itr = m_items.find(resourceId);
@@ -119,10 +119,10 @@ void QnResourcePropertyDictionary::clear()
     m_modifiedItems.clear();
 }
 
-void QnResourcePropertyDictionary::clear(const QVector<QnUuid>& idList)
+void QnResourcePropertyDictionary::clear(const QVector<nx::Uuid>& idList)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
-    for (const QnUuid& id: idList)
+    for (const nx::Uuid& id: idList)
     {
         m_items.remove(id);
         m_modifiedItems.remove(id);
@@ -130,7 +130,7 @@ void QnResourcePropertyDictionary::clear(const QVector<QnUuid>& idList)
 }
 
 void QnResourcePropertyDictionary::markAllParamsDirty(
-    const QnUuid& resourceId,
+    const nx::Uuid& resourceId,
     nx::utils::MoveOnlyFunc<bool(const QString& paramName, const QString& paramValue)> filter)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
@@ -150,7 +150,7 @@ void QnResourcePropertyDictionary::markAllParamsDirty(
     }
 }
 
-bool QnResourcePropertyDictionary::setValue(const QnUuid& resourceId, const QString& key,
+bool QnResourcePropertyDictionary::setValue(const nx::Uuid& resourceId, const QString& key,
     const QString& value, bool markDirty)
 {
     NX_MUTEX_LOCKER lock( &m_mutex );
@@ -185,7 +185,7 @@ bool QnResourcePropertyDictionary::setValue(const QnUuid& resourceId, const QStr
     return true;
 }
 
-bool QnResourcePropertyDictionary::hasProperty(const QnUuid& resourceId, const QString& key) const
+bool QnResourcePropertyDictionary::hasProperty(const nx::Uuid& resourceId, const QString& key) const
 {
     NX_MUTEX_LOCKER lock( &m_mutex );
     auto itr = m_items.find(resourceId);
@@ -225,8 +225,8 @@ nx::vms::api::ResourceParamWithRefDataList QnResourcePropertyDictionary::allProp
 namespace
 {
     bool removePropertyFromDictionary(
-        QMap<QnUuid, QMap<QString, QString>>* const dict,
-        const QnUuid& resourceId,
+        QMap<nx::Uuid, QMap<QString, QString>>* const dict,
+        const nx::Uuid& resourceId,
         const QString& key )
     {
         auto resIter = dict->find( resourceId );
@@ -243,7 +243,7 @@ namespace
 }
 
 bool QnResourcePropertyDictionary::on_resourceParamRemoved(
-    const QnUuid& resourceId,
+    const nx::Uuid& resourceId,
     const QString& key)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
@@ -260,7 +260,7 @@ bool QnResourcePropertyDictionary::on_resourceParamRemoved(
 }
 
 nx::vms::api::ResourceParamDataList QnResourcePropertyDictionary::allProperties(
-    const QnUuid& resourceId) const
+    const nx::Uuid& resourceId) const
 {
     nx::vms::api::ResourceParamDataList result;
 
@@ -276,20 +276,20 @@ nx::vms::api::ResourceParamDataList QnResourcePropertyDictionary::allProperties(
 }
 
 QMap<QString, QString> QnResourcePropertyDictionary::modifiedProperties(
-    const QnUuid& resourceId) const
+    const nx::Uuid& resourceId) const
 {
     NX_MUTEX_LOCKER lock( &m_mutex );
 
     return m_modifiedItems[resourceId];
 }
 
-QHash<QnUuid, QSet<QString>> QnResourcePropertyDictionary::allPropertyNamesByResource() const
+QHash<nx::Uuid, QSet<QString>> QnResourcePropertyDictionary::allPropertyNamesByResource() const
 {
-    QHash<QnUuid, QSet<QString>> result;
+    QHash<nx::Uuid, QSet<QString>> result;
 
     NX_MUTEX_LOCKER lock( &m_mutex );
     for (auto iter = m_items.constBegin(); iter != m_items.constEnd(); ++iter) {
-        QnUuid id = iter.key();
+        nx::Uuid id = iter.key();
         result.insert(id, nx::utils::toQSet(iter.value().keys()));
     }
     return result;

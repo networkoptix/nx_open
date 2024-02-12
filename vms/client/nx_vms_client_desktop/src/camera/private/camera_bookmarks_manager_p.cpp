@@ -37,7 +37,7 @@ static constexpr auto kInvalidRequestId = rest::Handle();
 /** Cache of bookmarks we have just added or removed. */
 static constexpr int kPendingDiscardTimeoutMs = 30000;
 
-QnCameraBookmarkList::iterator findBookmark(QnCameraBookmarkList &list, const QnUuid &bookmarkId)
+QnCameraBookmarkList::iterator findBookmark(QnCameraBookmarkList &list, const nx::Uuid &bookmarkId)
 {
     return std::find_if(list.begin(), list.end(), [&bookmarkId](const QnCameraBookmark &bookmark)
     {
@@ -109,7 +109,7 @@ QnCameraBookmarksManagerPrivate::OperationInfo::OperationInfo()
 
 QnCameraBookmarksManagerPrivate::OperationInfo::OperationInfo(
     OperationType operation,
-    const QnUuid &bookmarkId,
+    const nx::Uuid &bookmarkId,
     OperationCallbackType callback)
     : operation(operation)
     , callback(callback)
@@ -146,7 +146,7 @@ QnCameraBookmarksManagerPrivate::PendingInfo::PendingInfo(const QnCameraBookmark
     discardTimer.invalidate();
 }
 
-QnCameraBookmarksManagerPrivate::PendingInfo::PendingInfo(const QnUuid &bookmarkId, Type type)
+QnCameraBookmarksManagerPrivate::PendingInfo::PendingInfo(const nx::Uuid &bookmarkId, Type type)
     : type(type)
 {
     bookmark.guid = bookmarkId;
@@ -188,7 +188,7 @@ QnCameraBookmarksManagerPrivate::QnCameraBookmarksManagerPrivate(
 QnCameraBookmarksManagerPrivate::~QnCameraBookmarksManagerPrivate()
 {}
 
-std::optional<QnUuid> QnCameraBookmarksManagerPrivate::getServerForBookmark(
+std::optional<nx::Uuid> QnCameraBookmarksManagerPrivate::getServerForBookmark(
     const QnCameraBookmark& bookmark)
 {
     QnVirtualCameraResourcePtr camera =
@@ -216,7 +216,7 @@ void QnCameraBookmarksManagerPrivate::startOperationsTimer()
 int QnCameraBookmarksManagerPrivate::sendPostRequest(
     const QString& path,
     QnMultiserverRequestData &request,
-    std::optional<QnUuid> serverId)
+    std::optional<nx::Uuid> serverId)
 {
     auto serverApi = connectedServerApi();
 
@@ -296,12 +296,12 @@ void QnCameraBookmarksManagerPrivate::addCameraBookmark(
     const QnCameraBookmark &bookmark,
     OperationCallbackType callback)
 {
-    addCameraBookmarkInternal(bookmark, QnUuid(), callback);
+    addCameraBookmarkInternal(bookmark, nx::Uuid(), callback);
 }
 
 void QnCameraBookmarksManagerPrivate::acknowledgeEvent(
     const QnCameraBookmark& bookmark,
-    const QnUuid& eventRuleId,
+    const nx::Uuid& eventRuleId,
     OperationCallbackType callback)
 {
     addCameraBookmarkInternal(bookmark, eventRuleId, callback);
@@ -309,7 +309,7 @@ void QnCameraBookmarksManagerPrivate::acknowledgeEvent(
 
 void QnCameraBookmarksManagerPrivate::addCameraBookmarkInternal(
     const QnCameraBookmark& bookmark,
-    const QnUuid& eventRuleId,
+    const nx::Uuid& eventRuleId,
     OperationCallbackType callback)
 {
     NX_ASSERT(bookmark.isValid(), "Invalid bookmark must not be added");
@@ -362,7 +362,7 @@ void QnCameraBookmarksManagerPrivate::updateCameraBookmark(
 }
 
 void QnCameraBookmarksManagerPrivate::deleteCameraBookmark(
-    const QnUuid &bookmarkId,
+    const nx::Uuid &bookmarkId,
     OperationCallbackType callback)
 {
     QnDeleteBookmarkRequestData request(bookmarkId);
@@ -663,7 +663,7 @@ void QnCameraBookmarksManagerPrivate::addUpdatePendingBookmark(const QnCameraBoo
     }
 }
 
-void QnCameraBookmarksManagerPrivate::addRemovePendingBookmark(const QnUuid& bookmarkId)
+void QnCameraBookmarksManagerPrivate::addRemovePendingBookmark(const nx::Uuid& bookmarkId)
 {
     m_pendingBookmarks.insert(bookmarkId, PendingInfo(bookmarkId, PendingInfo::RemoveBookmark));
     startOperationsTimer();
@@ -734,7 +734,7 @@ void QnCameraBookmarksManagerPrivate::removeCameraFromQueries(const QnResourcePt
     if (!camera)
         return;
 
-    QnUuid cameraId = camera->getId();
+    nx::Uuid cameraId = camera->getId();
 
     for (QueryInfo& info: m_queries)
     {

@@ -28,7 +28,7 @@ struct WatermarkData
     bool operator==(const WatermarkData& /*other*/) const = default;
 };
 
-using WatermarkDataHash = std::unordered_map<QnUuid, WatermarkData>;
+using WatermarkDataHash = std::unordered_map<nx::Uuid, WatermarkData>;
 
 } // namespace
 
@@ -102,7 +102,7 @@ WatermarkWatcher::~WatermarkWatcher()
 }
 
 void WatermarkWatcher::addWatermarkImageUrlWatcher(
-    const QnUuid& id,
+    const nx::Uuid& id,
     const QSize& size)
 {
     const auto it = d->data.find(id);
@@ -120,7 +120,7 @@ void WatermarkWatcher::addWatermarkImageUrlWatcher(
         emit watermarkImageUrlChanged(id);
 }
 
-void WatermarkWatcher::removeWatermarkImageUrlWatcher(const QnUuid& id)
+void WatermarkWatcher::removeWatermarkImageUrlWatcher(const nx::Uuid& id)
 {
     const auto it = d->data.find(id);
     if (it == d->data.cend())
@@ -130,7 +130,7 @@ void WatermarkWatcher::removeWatermarkImageUrlWatcher(const QnUuid& id)
     emit watermarkImageUrlChanged(id);
 }
 
-QUrl WatermarkWatcher::watermarkImageUrl(const QnUuid& id) const
+QUrl WatermarkWatcher::watermarkImageUrl(const nx::Uuid& id) const
 {
     if (!d->watermark.visible())
         return {};
@@ -149,7 +149,7 @@ QUrl WatermarkWatcher::watermarkImageUrl(const QnUuid& id) const
 }
 
 void WatermarkWatcher::updateWatermarkImageUrlSize(
-    const QnUuid& id,
+    const nx::Uuid& id,
     const QSize& size)
 {
     const auto it = d->data.find(id);

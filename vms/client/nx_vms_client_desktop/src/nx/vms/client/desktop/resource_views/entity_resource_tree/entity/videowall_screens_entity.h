@@ -10,14 +10,14 @@ namespace nx::vms::client::desktop {
 namespace entity_resource_tree {
 
 using VideoWallScreenItemCreator =
-    std::function<entity_item_model::AbstractItemPtr(const QnUuid&)>;
+    std::function<entity_item_model::AbstractItemPtr(const nx::Uuid&)>;
 
 /**
  * Entity which represents list of Video Wall Screens taken directly from given resource.
  */
-class VideoWallScreensEntity: public entity_item_model::UniqueKeyListEntity<QnUuid>
+class VideoWallScreensEntity: public entity_item_model::UniqueKeyListEntity<nx::Uuid>
 {
-    using base_type = entity_item_model::UniqueKeyListEntity<QnUuid>;
+    using base_type = entity_item_model::UniqueKeyListEntity<nx::Uuid>;
 
 public:
     VideoWallScreensEntity(

@@ -33,22 +33,22 @@ public:
      * @param size Size of the target watermark frame.
      */
     Q_INVOKABLE void addWatermarkImageUrlWatcher(
-        const QnUuid& id,
+        const nx::Uuid& id,
         const QSize& size);
 
     /** Release watermark image url resources. */
-    Q_INVOKABLE void removeWatermarkImageUrlWatcher(const QnUuid& id);
+    Q_INVOKABLE void removeWatermarkImageUrlWatcher(const nx::Uuid& id);
 
     /** Return source url for the watermark image. May be used with the watermark provider. */
-    Q_INVOKABLE QUrl watermarkImageUrl(const QnUuid& id) const;
+    Q_INVOKABLE QUrl watermarkImageUrl(const nx::Uuid& id) const;
 
     /** Update target size for the watermark image url with the specified id. */
     Q_INVOKABLE void updateWatermarkImageUrlSize(
-        const QnUuid& id,
+        const nx::Uuid& id,
         const QSize& size);
 
 signals:
-    void watermarkImageUrlChanged(const QnUuid& id);
+    void watermarkImageUrlChanged(const nx::Uuid& id);
 
 private:
     struct Private;

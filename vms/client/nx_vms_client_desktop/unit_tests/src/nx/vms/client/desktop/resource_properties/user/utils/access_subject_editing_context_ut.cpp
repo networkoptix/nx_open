@@ -84,10 +84,10 @@ TEST(AccessSubjectEditingContextStaticTest, specialResourceGroup)
         NodeType::videoWalls), kAllVideoWallsGroupId);
 
     EXPECT_EQ(AccessSubjectEditingContext::specialResourceGroup(
-        NodeType::layouts), QnUuid{});
+        NodeType::layouts), nx::Uuid{});
 
     EXPECT_EQ(AccessSubjectEditingContext::specialResourceGroup(
-        NodeType::resource), QnUuid{});
+        NodeType::resource), nx::Uuid{});
 }
 
 TEST(AccessSubjectEditingContextStaticTest, modifyResourceAccessMap)
@@ -195,7 +195,7 @@ TEST_F(AccessSubjectEditingContextTest, specialResourceGroupFor)
     EXPECT_EQ(AccessSubjectEditingContext::specialResourceGroupFor(resource("Camera1")),
         kAllDevicesGroupId);
 
-    EXPECT_EQ(AccessSubjectEditingContext::specialResourceGroupFor(resource("Layout1")), QnUuid{});
+    EXPECT_EQ(AccessSubjectEditingContext::specialResourceGroupFor(resource("Layout1")), nx::Uuid{});
 
     EXPECT_EQ(AccessSubjectEditingContext::specialResourceGroupFor(resource("Server1")),
         kAllServersGroupId);
@@ -222,7 +222,7 @@ TEST_F(AccessSubjectEditingContextTest, resourceAccessTreeItemInfo)
     info = AccessSubjectEditingContext::resourceAccessTreeItemInfo(index);
     EXPECT_EQ(info.type, ResourceAccessTreeItem::Type::resource);
     EXPECT_EQ(info.target.resource(), resource("Layout1"));
-    EXPECT_EQ(info.outerSpecialResourceGroupId, QnUuid{});
+    EXPECT_EQ(info.outerSpecialResourceGroupId, nx::Uuid{});
     EXPECT_EQ(info.relevantAccessRights, kFullAccessRights);
 
     index = indexOf(resource("WebPage1"));
@@ -252,28 +252,28 @@ TEST_F(AccessSubjectEditingContextTest, resourceAccessTreeItemInfo)
     info = AccessSubjectEditingContext::resourceAccessTreeItemInfo(index);
     EXPECT_EQ(info.type, ResourceAccessTreeItem::Type::specialResourceGroup);
     EXPECT_EQ(info.target.groupId(), kAllDevicesGroupId);
-    EXPECT_EQ(info.outerSpecialResourceGroupId, QnUuid{});
+    EXPECT_EQ(info.outerSpecialResourceGroupId, nx::Uuid{});
     EXPECT_EQ(info.relevantAccessRights, kFullAccessRights);
 
     index = indexOf(NodeType::webPages);
     info = AccessSubjectEditingContext::resourceAccessTreeItemInfo(index);
     EXPECT_EQ(info.type, ResourceAccessTreeItem::Type::specialResourceGroup);
     EXPECT_EQ(info.target.groupId(), kAllWebPagesGroupId);
-    EXPECT_EQ(info.outerSpecialResourceGroupId, QnUuid{});
+    EXPECT_EQ(info.outerSpecialResourceGroupId, nx::Uuid{});
     EXPECT_EQ(info.relevantAccessRights, AccessRight::view);
 
     index = indexOf(NodeType::servers);
     info = AccessSubjectEditingContext::resourceAccessTreeItemInfo(index);
     EXPECT_EQ(info.type, ResourceAccessTreeItem::Type::specialResourceGroup);
     EXPECT_EQ(info.target.groupId(), kAllServersGroupId);
-    EXPECT_EQ(info.outerSpecialResourceGroupId, QnUuid{});
+    EXPECT_EQ(info.outerSpecialResourceGroupId, nx::Uuid{});
     EXPECT_EQ(info.relevantAccessRights, AccessRight::view);
 
     index = indexOf(NodeType::videoWalls);
     info = AccessSubjectEditingContext::resourceAccessTreeItemInfo(index);
     EXPECT_EQ(info.type, ResourceAccessTreeItem::Type::specialResourceGroup);
     EXPECT_EQ(info.target.groupId(), kAllVideoWallsGroupId);
-    EXPECT_EQ(info.outerSpecialResourceGroupId, QnUuid{});
+    EXPECT_EQ(info.outerSpecialResourceGroupId, nx::Uuid{});
     EXPECT_EQ(info.relevantAccessRights, AccessRight::edit);
 
     // Grouping nodes.
@@ -283,7 +283,7 @@ TEST_F(AccessSubjectEditingContextTest, resourceAccessTreeItemInfo)
     EXPECT_EQ(info.type, ResourceAccessTreeItem::Type::groupingNode);
     EXPECT_FALSE(info.target.isValid());
     EXPECT_EQ(info.nodeType, NodeType::layouts);
-    EXPECT_EQ(info.outerSpecialResourceGroupId, QnUuid{});
+    EXPECT_EQ(info.outerSpecialResourceGroupId, nx::Uuid{});
     EXPECT_EQ(info.relevantAccessRights, kFullAccessRights);
 
     index = indexOf("Group1");

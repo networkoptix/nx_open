@@ -256,7 +256,7 @@ public:
     /** Generates update report for a picked update contents. */
     static VersionReport calculateUpdateVersionReport(
         const UpdateContents& contents,
-        QnUuid clientId);
+        nx::Uuid clientId);
 
     bool checkSpaceRequirements(const UpdateContents& contents) const;
 
@@ -397,7 +397,7 @@ private:
     void closePanelNotifications();
 
     /** Advances UI FSM towards selected state. */
-    void setTargetState(WidgetUpdateState state, const QSet<QnUuid>& targets = {},
+    void setTargetState(WidgetUpdateState state, const QSet<nx::Uuid>& targets = {},
         bool runCommands = true);
     void completeClientInstallation(bool clientUpdated);
     static bool stateHasProgress(WidgetUpdateState state);
@@ -410,7 +410,7 @@ private:
      */
     void setUpdateTarget(const UpdateContents& contents, bool activeUpdate);
 
-    QnUuid clientPeerId() const;
+    nx::Uuid clientPeerId() const;
 
     void setDayWarningVisible(bool visible);
     void updateAlertBlock();
@@ -485,7 +485,7 @@ private:
     qint64 m_lastAutoUpdateCheck = 0;
 
     /** Id of the progress notification at the right panel. */
-    QnUuid m_rightPanelDownloadProgress;
+    nx::Uuid m_rightPanelDownloadProgress;
 
     bool m_dayWarningVisible = false;
 };

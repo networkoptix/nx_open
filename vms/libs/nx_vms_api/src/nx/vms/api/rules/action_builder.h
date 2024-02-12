@@ -11,7 +11,7 @@ struct NX_VMS_API ActionBuilder
     Q_GADGET
 
 public:
-    QnUuid id;
+    nx::Uuid id;
     QString type;
 
     std::map<QString, Field> fields;

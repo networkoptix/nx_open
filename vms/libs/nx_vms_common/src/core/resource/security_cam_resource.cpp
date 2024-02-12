@@ -63,7 +63,7 @@ QString boolToPropertyStr(bool value)
     return value ? lit("1") : lit("0");
 }
 
-bool cameraExists(QnResourcePool* resourcePool, const QnUuid& uuid)
+bool cameraExists(QnResourcePool* resourcePool, const nx::Uuid& uuid)
 {
     return resourcePool && resourcePool->getResourceById<QnSecurityCamResource>(uuid);
 }
@@ -80,11 +80,11 @@ bool QnSecurityCamResource::MotionStreamIndex::operator!=(const MotionStreamInde
     return !(*this == other);
 }
 
-QnUuid QnSecurityCamResource::makeCameraIdFromPhysicalId(const QString& physicalId)
+nx::Uuid QnSecurityCamResource::makeCameraIdFromPhysicalId(const QString& physicalId)
 {
     // ATTENTION: This logic is similar to the one in nx::vms::api::CameraData::fillId().
     if (physicalId.isEmpty())
-        return QnUuid();
+        return nx::Uuid();
     return guidFromArbitraryData(physicalId);
 }
 
@@ -367,7 +367,7 @@ QnSecurityCamResource::~QnSecurityCamResource()
 
 void QnSecurityCamResource::updateAudioRequiredOnDevice(const QString& deviceId)
 {
-    auto prevDevice = QnUuid(deviceId);
+    auto prevDevice = nx::Uuid(deviceId);
     if (!prevDevice.isNull())
     {
         auto resource = systemContext()->resourcePool()->getResourceById<QnSecurityCamResource>(
@@ -1152,13 +1152,13 @@ std::chrono::seconds QnSecurityCamResource::maxPeriod() const
     return m_userAttributes.maxArchivePeriodS;
 }
 
-void QnSecurityCamResource::setPreferredServerId(const QnUuid& value)
+void QnSecurityCamResource::setPreferredServerId(const nx::Uuid& value)
 {
     NX_MUTEX_LOCKER lock(&m_attributesMutex);
     m_userAttributes.preferredServerId = value;
 }
 
-QnUuid QnSecurityCamResource::preferredServerId() const
+nx::Uuid QnSecurityCamResource::preferredServerId() const
 {
     NX_MUTEX_LOCKER lock(&m_attributesMutex);
     return m_userAttributes.preferredServerId;
@@ -1326,12 +1326,12 @@ void QnSecurityCamResource::setAudioEnabled(bool enabled)
         emit audioEnabledChanged(::toSharedPointer(this));
 }
 
-QnUuid QnSecurityCamResource::audioInputDeviceId() const
+nx::Uuid QnSecurityCamResource::audioInputDeviceId() const
 {
-    return QnUuid::fromStringSafe(getProperty(ResourcePropertyKey::kAudioInputDeviceId));
+    return nx::Uuid::fromStringSafe(getProperty(ResourcePropertyKey::kAudioInputDeviceId));
 }
 
-void QnSecurityCamResource::setAudioInputDeviceId(const QnUuid& deviceId)
+void QnSecurityCamResource::setAudioInputDeviceId(const nx::Uuid& deviceId)
 {
     if (!NX_ASSERT(deviceId != getId(), "Only another device may act as audio input override"))
         return;
@@ -1347,7 +1347,7 @@ void QnSecurityCamResource::setAudioInputDeviceId(const QnUuid& deviceId)
 
     if (deviceId.isNull())
     {
-        // Null QString is always stored instead of string representation of null QnUuid to
+        // Null QString is always stored instead of string representation of null nx::Uuid to
         // prevent false property change notifications.
         setProperty(ResourcePropertyKey::kAudioInputDeviceId, QString());
         return;
@@ -1382,9 +1382,9 @@ void QnSecurityCamResource::setTwoWayAudioEnabled(bool enabled)
         setProperty(ResourcePropertyKey::kTwoWayAudioEnabled, QnLexical::serialized(enabled));
 }
 
-QnUuid QnSecurityCamResource::audioOutputDeviceId() const
+nx::Uuid QnSecurityCamResource::audioOutputDeviceId() const
 {
-    return QnUuid::fromStringSafe(getProperty(ResourcePropertyKey::kAudioOutputDeviceId));
+    return nx::Uuid::fromStringSafe(getProperty(ResourcePropertyKey::kAudioOutputDeviceId));
 }
 
 QnSecurityCamResourcePtr QnSecurityCamResource::audioOutputDevice() const
@@ -1398,7 +1398,7 @@ QnSecurityCamResourcePtr QnSecurityCamResource::audioOutputDevice() const
     return toSharedPointer(this);
 }
 
-void QnSecurityCamResource::setAudioOutputDeviceId(const QnUuid& deviceId)
+void QnSecurityCamResource::setAudioOutputDeviceId(const nx::Uuid& deviceId)
 {
     if (!NX_ASSERT(deviceId != getId(), "Only another device may act as audio output override"))
         return;
@@ -1414,7 +1414,7 @@ void QnSecurityCamResource::setAudioOutputDeviceId(const QnUuid& deviceId)
 
     if (deviceId.isNull())
     {
-        // Null QString is always stored instead of string representation of null QnUuid to prevent
+        // Null QString is always stored instead of string representation of null nx::Uuid to prevent
         // false property change notifications.
         setProperty(ResourcePropertyKey::kAudioOutputDeviceId, QString());
         return;

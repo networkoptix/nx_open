@@ -31,7 +31,7 @@ TextLookupField::TextLookupField(common::SystemContext* context):
             if (m_checkType == TextLookupCheckType::inList
                 || m_checkType == TextLookupCheckType::notInList)
             {
-                if (NX_ASSERT(QnUuid::isUuidString(m_value)) && QnUuid{m_value} == data.id)
+                if (NX_ASSERT(nx::Uuid::isUuidString(m_value)) && nx::Uuid{m_value} == data.id)
                     m_list.reset();
             }
         });
@@ -75,7 +75,7 @@ bool TextLookupField::match(const QVariant& eventValue) const
             || m_checkType == TextLookupCheckType::doesNotContainKeywords)
         {
             if (!NX_ASSERT(m_value.isEmpty()
-                || !QnUuid::isUuidString(m_value), "Check type and value aren't compatible"))
+                || !nx::Uuid::isUuidString(m_value), "Check type and value aren't compatible"))
             {
                 return {};
             }
@@ -84,10 +84,10 @@ bool TextLookupField::match(const QVariant& eventValue) const
         }
         else
         {
-            if (!NX_ASSERT(QnUuid::isUuidString(m_value), "Check type and value aren't compatible"))
+            if (!NX_ASSERT(nx::Uuid::isUuidString(m_value), "Check type and value aren't compatible"))
                 return {};
 
-            const auto lookupList = lookupListManager()->lookupList(QnUuid{m_value});
+            const auto lookupList = lookupListManager()->lookupList(nx::Uuid{m_value});
             if (!NX_ASSERT(lookupList.objectTypeId.isEmpty(), "Supports only generic lists"))
                 return {};
 

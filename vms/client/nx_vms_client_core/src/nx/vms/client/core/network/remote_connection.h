@@ -48,7 +48,7 @@ public:
         std::optional<std::chrono::microseconds> sessionTokenExpirationTime,
         std::shared_ptr<CertificateCache> certificateCache,
         Qn::SerializationFormat serializationFormat,
-        QnUuid sessionId,
+        nx::Uuid sessionId,
         QObject* parent = nullptr);
     virtual ~RemoteConnection() override;
 
@@ -94,7 +94,7 @@ public:
     ec2::AbstractECConnectionPtr messageBusConnection() const;
     common::AbstractTimeSyncManagerPtr timeSynchronizationManager() const;
 
-    void updateSessionId(const QnUuid& sessionId);
+    void updateSessionId(const nx::Uuid& sessionId);
 
     std::shared_ptr<CertificateCache> certificateCache() const;
 

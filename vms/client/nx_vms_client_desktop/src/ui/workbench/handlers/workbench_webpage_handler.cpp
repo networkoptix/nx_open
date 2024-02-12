@@ -134,7 +134,7 @@ void QnWorkbenchWebPageHandler::addNewWebPage(nx::vms::api::WebPageSubtype subty
         return;
 
     QnWebPageResourcePtr webPage(new QnWebPageResource());
-    webPage->setIdUnsafe(QnUuid::createUuid());
+    webPage->setIdUnsafe(nx::Uuid::createUuid());
     webPage->setUrl(dialog->url().toString());
     webPage->setName(dialog->name());
     resourcePool()->addResource(webPage);

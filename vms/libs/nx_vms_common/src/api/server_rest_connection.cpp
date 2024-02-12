@@ -252,7 +252,7 @@ void invoke(network::http::ClientPool::ContextPtr context,
 
 void proxyRequestUsingServer(
     nx::network::http::ClientPool::Request& request,
-    const QnUuid& proxyServerId)
+    const nx::Uuid& proxyServerId)
 {
     nx::network::http::HttpHeader header(Qn::SERVER_GUID_HEADER_NAME, proxyServerId.toByteArray());
     nx::network::http::insertOrReplaceHeader(&request.headers, header);
@@ -291,7 +291,7 @@ static bool isSessionExpiredError(const nx::vms::api::JsonRpcResponse& response)
 }
 
 // Returns '*' on null id.
-QString formatRestId(QnUuid id)
+QString formatRestId(nx::Uuid id)
 {
     return id.isNull() ? QString("*") : id.toSimpleString();
 }
@@ -325,7 +325,7 @@ struct ServerConnection::Private
 {
     Private(
         nx::vms::common::SystemContext* systemContext,
-        const QnUuid& serverId,
+        const nx::Uuid& serverId,
         const nx::utils::log::Tag& logTag)
         :
         systemContext(systemContext),
@@ -337,7 +337,7 @@ struct ServerConnection::Private
     }
 
     const nx::vms::common::SystemContext* systemContext = nullptr;
-    const QnUuid serverId;
+    const nx::Uuid serverId;
     const nx::utils::log::Tag logTag;
     const QScopedPointer<nx::network::http::ClientPool> httpClientPool;
 
@@ -347,12 +347,12 @@ struct ServerConnection::Private
 
     struct DirectConnect
     {
-        QnUuid sessionId;
+        nx::Uuid sessionId;
         nx::vms::common::AbstractCertificateVerifier* certificateVerifier = nullptr;
         nx::network::SocketAddress address;
         nx::network::http::Credentials credentials;
     };
-    QnUuid userId;
+    nx::Uuid userId;
     std::optional<DirectConnect> directConnect;
 
     using ResendRequestFunc = std::function<void(std::optional<nx::network::http::AuthToken>)>;
@@ -391,7 +391,7 @@ struct ServerConnection::Private
 
 ServerConnection::ServerConnection(
     nx::vms::common::SystemContext* systemContext,
-    const QnUuid& serverId)
+    const nx::Uuid& serverId)
     :
     QObject(),
     d(new Private(
@@ -406,8 +406,8 @@ ServerConnection::ServerConnection(
 }
 
 ServerConnection::ServerConnection(
-    const QnUuid& serverId,
-    const QnUuid& sessionId,
+    const nx::Uuid& serverId,
+    const nx::Uuid& sessionId,
     AbstractCertificateVerifier* certificateVerifier,
     nx::network::SocketAddress address,
     nx::network::http::Credentials credentials)
@@ -421,7 +421,7 @@ ServerConnection::ServerConnection(
     d->directConnect->credentials = std::move(credentials);
 }
 
-void ServerConnection::updateSessionId(const QnUuid& sessionId)
+void ServerConnection::updateSessionId(const nx::Uuid& sessionId)
 {
     NX_MUTEX_LOCKER lock(&d->mutex);
 
@@ -452,7 +452,7 @@ void ServerConnection::updateCredentials(nx::network::http::Credentials credenti
         d->directConnect->credentials = std::move(credentials);
 }
 
-void ServerConnection::setUserId(const QnUuid& id)
+void ServerConnection::setUserId(const nx::Uuid& id)
 {
     NX_MUTEX_LOCKER lock(&d->mutex);
     d->userId = id;
@@ -471,8 +471,8 @@ Handle ServerConnection::cameraHistoryAsync(
     return executeGet(lit("/ec2/cameraHistory"), request.toParams(), callback, targetThread);
 }
 
-Handle ServerConnection::backupPositionAsync(const QnUuid& serverId,
-    const QnUuid& deviceId,
+Handle ServerConnection::backupPositionAsync(const nx::Uuid& serverId,
+    const nx::Uuid& deviceId,
     Result<nx::vms::api::BackupPositionEx>::type callback,
     QThread* targetThread)
 {
@@ -481,8 +481,8 @@ Handle ServerConnection::backupPositionAsync(const QnUuid& serverId,
     return executeGet(requestStr, nx::network::rest::Params(), callback, targetThread);
 }
 
-Handle ServerConnection::setBackupPositionAsync(const QnUuid& serverId,
-    const QnUuid& deviceId,
+Handle ServerConnection::setBackupPositionAsync(const nx::Uuid& serverId,
+    const nx::Uuid& deviceId,
     const nx::vms::api::BackupPosition& backupPosition,
     Result<nx::vms::api::BackupPosition>::type callback,
     QThread* targetThread)
@@ -498,7 +498,7 @@ Handle ServerConnection::setBackupPositionAsync(const QnUuid& serverId,
         targetThread);
 }
 
-Handle ServerConnection::setBackupPositionsAsync(const QnUuid& serverId,
+Handle ServerConnection::setBackupPositionsAsync(const nx::Uuid& serverId,
     const nx::vms::api::BackupPosition& backupPosition,
     ServerConnection::Result<nx::vms::api::BackupPosition>::type callback,
     QThread* targetThread)
@@ -514,7 +514,7 @@ Handle ServerConnection::setBackupPositionsAsync(const QnUuid& serverId,
 }
 
 Handle ServerConnection::getServerLocalTime(
-    const QnUuid& serverId,
+    const nx::Uuid& serverId,
     Result<nx::network::rest::JsonResult>::type callback,
     QThread* targetThread)
 {
@@ -556,7 +556,7 @@ Handle ServerConnection::createGenericEvent(
 }
 
 Handle ServerConnection::sendStatisticsUsingServer(
-    const QnUuid& proxyServerId,
+    const nx::Uuid& proxyServerId,
     const QnSendStatisticsRequestData& statisticsData,
     PostCallback callback,
     QThread* targetThread)
@@ -730,7 +730,7 @@ Handle ServerConnection::restoreDatabase(
 
 Handle ServerConnection::putServerLogSettings(
     nx::vms::common::SessionTokenHelperPtr helper,
-    const QnUuid& serverId,
+    const nx::Uuid& serverId,
     const nx::vms::api::ServerLogSettings& settings,
     Result<ErrorOrEmpty>::type callback,
     QThread* targetThread)
@@ -798,7 +798,7 @@ Handle ServerConnection::addFileDownload(
 }
 
 Handle ServerConnection::addCamera(
-    const QnUuid& targetServerId,
+    const nx::Uuid& targetServerId,
     const nx::vms::api::DeviceModelForSearch& device,
     nx::vms::common::SessionTokenHelperPtr helper,
     Result<ErrorOrData<nx::vms::api::DeviceModelForSearch>>::type&& callback,
@@ -822,7 +822,7 @@ Handle ServerConnection::addCamera(
 }
 
 Handle ServerConnection::searchCamera(
-    const QnUuid& targetServerId,
+    const nx::Uuid& targetServerId,
     const nx::vms::api::DeviceSearch& deviceSearchData,
     nx::vms::common::SessionTokenHelperPtr helper,
     Result<ErrorOrData<nx::vms::api::DeviceSearch>>::type&& callback,
@@ -846,8 +846,8 @@ Handle ServerConnection::searchCamera(
 }
 
 Handle ServerConnection::searchCameraStatus(
-    const QnUuid& targetServerId,
-    const QnUuid& searchId,
+    const nx::Uuid& targetServerId,
+    const nx::Uuid& searchId,
     nx::vms::common::SessionTokenHelperPtr helper,
     Result<ErrorOrData<nx::vms::api::DeviceSearch>>::type&& callback,
     QThread* targetThread)
@@ -868,8 +868,8 @@ Handle ServerConnection::searchCameraStatus(
 }
 
 Handle ServerConnection::searchCameraStop(
-    const QnUuid& targetServerId,
-    const QnUuid& searchId,
+    const nx::Uuid& targetServerId,
+    const nx::Uuid& searchId,
     nx::vms::common::SessionTokenHelperPtr helper,
     Result<ErrorOrEmpty>::type callback,
     QThread* targetThread)
@@ -963,7 +963,7 @@ Handle ServerConnection::executeEventAction(
     const nx::vms::api::EventActionData& action,
     Result<nx::network::rest::Result>::type callback,
     QThread* targetThread,
-    std::optional<QnUuid> proxyToServer)
+    std::optional<nx::Uuid> proxyToServer)
 {
     return executePost(
         "/api/executeEventAction",
@@ -974,7 +974,7 @@ Handle ServerConnection::executeEventAction(
 }
 
 Handle ServerConnection::addFileUpload(
-    const QnUuid& serverId,
+    const nx::Uuid& serverId,
     const QString& fileName,
     qint64 size,
     qint64 chunkSize,
@@ -1003,7 +1003,7 @@ Handle ServerConnection::addFileUpload(
 }
 
 Handle ServerConnection::removeFileDownload(
-    const QnUuid& serverId,
+    const nx::Uuid& serverId,
     const QString& fileName,
     bool deleteData,
     PostCallback callback,
@@ -1018,7 +1018,7 @@ Handle ServerConnection::removeFileDownload(
 }
 
 Handle ServerConnection::fileChunkChecksums(
-    const QnUuid& serverId,
+    const nx::Uuid& serverId,
     const QString& fileName,
     GetCallback callback,
     QThread* targetThread)
@@ -1032,7 +1032,7 @@ Handle ServerConnection::fileChunkChecksums(
 }
 
 Handle ServerConnection::downloadFileChunk(
-    const QnUuid& serverId,
+    const nx::Uuid& serverId,
     const QString& fileName,
     int chunkIndex,
     Result<QByteArray>::type callback,
@@ -1047,7 +1047,7 @@ Handle ServerConnection::downloadFileChunk(
 }
 
 Handle ServerConnection::downloadFileChunkFromInternet(
-    const QnUuid& serverId,
+    const nx::Uuid& serverId,
     const QString& fileName,
     const nx::utils::Url& url,
     int chunkIndex,
@@ -1069,7 +1069,7 @@ Handle ServerConnection::downloadFileChunkFromInternet(
 }
 
 Handle ServerConnection::uploadFileChunk(
-    const QnUuid& serverId,
+    const nx::Uuid& serverId,
     const QString& fileName,
     int index,
     const QByteArray& data,
@@ -1098,7 +1098,7 @@ Handle ServerConnection::downloadsStatus(
 }
 
 Handle ServerConnection::fileDownloadStatus(
-    const QnUuid& serverId,
+    const nx::Uuid& serverId,
     const QString& fileName,
     GetCallback callback,
     QThread* targetThread)
@@ -1119,7 +1119,7 @@ Handle ServerConnection::getTimeOfServersAsync(
 }
 
 Handle ServerConnection::addVirtualCamera(
-    const QnUuid& serverId,
+    const nx::Uuid& serverId,
     const QString& name,
     GetCallback callback,
     QThread* targetThread)
@@ -1183,7 +1183,7 @@ Handle ServerConnection::lockVirtualCamera(
 Handle ServerConnection::extendVirtualCameraLock(
     const QnNetworkResourcePtr& camera,
     const QnUserResourcePtr& user,
-    const QnUuid& token,
+    const nx::Uuid& token,
     qint64 ttl,
     GetCallback callback,
     QThread* targetThread)
@@ -1202,7 +1202,7 @@ Handle ServerConnection::extendVirtualCameraLock(
 
 Handle ServerConnection::releaseVirtualCameraLock(
     const QnNetworkResourcePtr& camera,
-    const QnUuid& token,
+    const nx::Uuid& token,
     GetCallback callback,
     QThread* targetThread)
 {
@@ -1218,7 +1218,7 @@ Handle ServerConnection::releaseVirtualCameraLock(
 
 Handle ServerConnection::consumeVirtualCameraFile(
     const QnNetworkResourcePtr& camera,
-    const QnUuid& token,
+    const nx::Uuid& token,
     const QString& uploadId,
     qint64 startTimeMs,
     PostCallback callback,
@@ -1237,7 +1237,7 @@ Handle ServerConnection::consumeVirtualCameraFile(
 }
 
 Handle ServerConnection::getStatistics(
-    const QnUuid& serverId,
+    const nx::Uuid& serverId,
     ServerConnection::GetCallback callback,
     QThread* targetThread)
 {
@@ -1249,7 +1249,7 @@ Handle ServerConnection::getAuditLogRecords(
     std::chrono::milliseconds to,
     UbJsonResultCallback callback,
     QThread* targetThread,
-    std::optional<QnUuid> proxyToServer)
+    std::optional<nx::Uuid> proxyToServer)
 {
     return getUbJsonResult(
         "/api/auditLog",
@@ -1263,7 +1263,7 @@ Handle ServerConnection::getAuditLogRecords(
 }
 
 Handle ServerConnection::getEvents(
-    const QnUuid& serverId,
+    const nx::Uuid& serverId,
     QnEventLogRequestData request,
     Result<EventLogData>::type callback,
     QThread* targetThread)
@@ -1298,7 +1298,7 @@ Handle ServerConnection::eventLog(
 }
 
 Handle ServerConnection::getCameraCredentials(
-    const QnUuid& deviceId,
+    const nx::Uuid& deviceId,
     Result<QAuthenticator>::type callback,
     QThread* targetThread)
 {
@@ -1359,7 +1359,7 @@ Handle ServerConnection::changeCameraPassword(
 }
 
 int ServerConnection::checkCameraList(
-    const QnUuid& serverId,
+    const nx::Uuid& serverId,
     const QnNetworkResourceList& cameras,
     Result<QnCameraListReply>::type callback,
     QThread* targetThread)
@@ -1382,7 +1382,7 @@ Handle ServerConnection::lookupObjectTracks(
     bool isLocal,
     Result<nx::analytics::db::LookupResult>::type callback,
     QThread* targetThread,
-    std::optional<QnUuid> proxyToServer)
+    std::optional<nx::Uuid> proxyToServer)
 {
     nx::network::rest::Params queryParams;
     nx::analytics::db::serializeToParams(request, &queryParams);
@@ -1475,7 +1475,7 @@ Handle ServerConnection::setDeviceAnalyticsSettings(
     const QnVirtualCameraResourcePtr& device,
     const nx::vms::common::AnalyticsEngineResourcePtr& engine,
     const QJsonObject& settings,
-    const QnUuid& settingsModelId,
+    const nx::Uuid& settingsModelId,
     Result<nx::vms::api::analytics::DeviceAgentSettingsResponse>::type&& callback,
     QThread* targetThread)
 {
@@ -1518,7 +1518,7 @@ Handle ServerConnection::deviceAnalyticsActiveSettingsChanged(
         targetThread);
 }
 
-Handle ServerConnection::startArchiveRebuild(const QnUuid& serverId,
+Handle ServerConnection::startArchiveRebuild(const nx::Uuid& serverId,
     const QString pool,
     Result<ErrorOrData<nx::vms::api::StorageScanInfoFull>>::type&& callback,
     QThread* targetThread)
@@ -1528,7 +1528,7 @@ Handle ServerConnection::startArchiveRebuild(const QnUuid& serverId,
     return executePost(endpoint, nx::network::rest::Params(), std::move(callback), targetThread);
 }
 
-Handle ServerConnection::getArchiveRebuildProgress(const QnUuid& serverId,
+Handle ServerConnection::getArchiveRebuildProgress(const nx::Uuid& serverId,
     const QString pool,
     Result<ErrorOrData<nx::vms::api::StorageScanInfoFull>>::type&& callback,
     QThread* targetThread)
@@ -1541,7 +1541,7 @@ Handle ServerConnection::getArchiveRebuildProgress(const QnUuid& serverId,
         targetThread);
 }
 
-Handle ServerConnection::stopArchiveRebuild(const QnUuid& serverId,
+Handle ServerConnection::stopArchiveRebuild(const nx::Uuid& serverId,
     const QString pool,
     Result<ErrorOrEmpty>::type&& callback,
     QThread* targetThread)
@@ -1558,7 +1558,7 @@ Handle ServerConnection::postJsonResult(
     JsonResultCallback&& callback,
     QThread* targetThread,
     std::optional<Timeouts> timeouts,
-    std::optional<QnUuid> proxyToServer)
+    std::optional<nx::Uuid> proxyToServer)
 {
     const auto contentType = Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json);
     return executePost<nx::network::rest::JsonResult>(
@@ -1769,7 +1769,7 @@ Handle ServerConnection::postEmptyResult(
     const QByteArray& body,
     PostCallback&& callback,
     QThread* targetThread,
-    std::optional<QnUuid> proxyToServer,
+    std::optional<nx::Uuid> proxyToServer,
     std::optional<Qn::SerializationFormat> contentType)
 {
     const auto contentTypeString
@@ -1792,7 +1792,7 @@ Handle ServerConnection::putEmptyResult(
     const QByteArray& body,
     PostCallback&& callback,
     QThread* targetThread,
-    std::optional<QnUuid> proxyToServer)
+    std::optional<nx::Uuid> proxyToServer)
 {
     const auto contentType = Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json);
     return executePut<EmptyResponseType>(
@@ -1874,7 +1874,7 @@ Handle ServerConnection::getUbJsonResult(
     nx::network::rest::Params params,
     UbJsonResultCallback&& callback,
     QThread* targetThread,
-    std::optional<QnUuid> proxyToServer)
+    std::optional<nx::Uuid> proxyToServer)
 {
     if (!params.contains("format"))
         params.insert("format", "ubjson");
@@ -1886,7 +1886,7 @@ Handle ServerConnection::getJsonResult(
     nx::network::rest::Params params,
     JsonResultCallback&& callback,
     QThread* targetThread,
-    std::optional<QnUuid> proxyToServer)
+    std::optional<nx::Uuid> proxyToServer)
 {
     if (!params.contains("format"))
         params.insert("format", "json");
@@ -1952,7 +1952,7 @@ Handle ServerConnection::postUbJsonResult(
 }
 
 Handle ServerConnection::getPluginInformation(
-    const QnUuid& serverId,
+    const nx::Uuid& serverId,
     GetCallback callback,
     QThread* targetThread)
 {
@@ -1963,7 +1963,7 @@ Handle ServerConnection::testEmailSettings(
     const nx::vms::api::EmailSettings& settings,
     Result<RestResultWithData<QnTestEmailSettingsReply>>::type&& callback,
     QThread* targetThread,
-    std::optional<QnUuid> proxyToServer)
+    std::optional<nx::Uuid> proxyToServer)
 {
     return executePost(
         "/api/testEmailSettings",
@@ -1976,7 +1976,7 @@ Handle ServerConnection::testEmailSettings(
 Handle ServerConnection::testEmailSettings(
     Result<RestResultWithData<QnTestEmailSettingsReply>>::type&& callback,
     QThread* targetThread,
-    std::optional<QnUuid> proxyToServer)
+    std::optional<nx::Uuid> proxyToServer)
 {
     return executePost(
         "/api/testEmailSettings",
@@ -1987,7 +1987,7 @@ Handle ServerConnection::testEmailSettings(
 }
 
 Handle ServerConnection::getStorageStatus(
-    const QnUuid& serverId,
+    const nx::Uuid& serverId,
     const QString& path,
     Result<RestResultWithData<StorageStatusReply>>::type&& callback,
     QThread* targetThread)
@@ -2017,7 +2017,7 @@ Handle ServerConnection::setStorageEncryptionPassword(
 }
 
 Handle ServerConnection::getSystemIdFromServer(
-    const QnUuid& serverId,
+    const nx::Uuid& serverId,
     Result<QString>::type&& callback,
     QThread* targetThread)
 {
@@ -2032,8 +2032,8 @@ Handle ServerConnection::getSystemIdFromServer(
 }
 
 Handle ServerConnection::doCameraDiagnosticsStep(
-    const QnUuid& serverId,
-    const QnUuid& cameraId,
+    const nx::Uuid& serverId,
+    const nx::Uuid& cameraId,
     CameraDiagnostics::Step::Value previousStep,
     Result<RestResultWithData<QnCameraDiagnosticsReply>>::type&& callback,
     QThread* targetThread)
@@ -2051,7 +2051,7 @@ std::function<void(ServerConnection::ContextPtr context)> makeCallbackWithErrorM
         bool success,
         Handle requestId,
         const ResultType& result,
-        const QString& message)> callback, QnUuid serverId)
+        const QString& message)> callback, nx::Uuid serverId)
 {
     return [callback, serverId](ServerConnection::ContextPtr context)
         {
@@ -2291,7 +2291,7 @@ Handle ServerConnection::saveUserAsync(
 }
 
 Handle ServerConnection::removeUserAsync(
-    const QnUuid& userId,
+    const nx::Uuid& userId,
     nx::vms::common::SessionTokenHelperPtr helper,
     Result<ErrorOrEmpty>::type&& callback,
     QThread* targetThread)
@@ -2338,7 +2338,7 @@ Handle ServerConnection::saveGroupAsync(
 }
 
 Handle ServerConnection::removeGroupAsync(
-    const QnUuid& groupId,
+    const nx::Uuid& groupId,
     nx::vms::common::SessionTokenHelperPtr helper,
     Result<ErrorOrEmpty>::type&& callback,
     QThread* targetThread)
@@ -2384,7 +2384,7 @@ Handle ServerConnection::loginAsync(
 }
 
 Handle ServerConnection::replaceDevice(
-    const QnUuid& deviceToBeReplacedId,
+    const nx::Uuid& deviceToBeReplacedId,
     const QString& replacementDevicePhysicalId,
     bool returnReportOnly,
     Result<nx::vms::api::DeviceReplacementResponse>::type&& callback,
@@ -2423,7 +2423,7 @@ Handle ServerConnection::replaceDevice(
 }
 
 Handle ServerConnection::undoReplaceDevice(
-    const QnUuid& deviceId,
+    const nx::Uuid& deviceId,
     PostCallback&& callback,
     QThread* targetThread)
 {
@@ -2517,7 +2517,7 @@ Handle ServerConnection::executeGet(
     const nx::network::rest::Params& params,
     CallbackType callback,
     QThread* targetThread,
-    std::optional<QnUuid> proxyToServer,
+    std::optional<nx::Uuid> proxyToServer,
     std::optional<Timeouts> timeouts)
 {
     auto request = this->prepareRequest(nx::network::http::Method::get, prepareUrl(path, params));
@@ -2538,7 +2538,7 @@ Handle ServerConnection::executePost(
     const nx::network::rest::Params& params,
     Callback<ResultType> callback,
     QThread* targetThread,
-    std::optional<QnUuid> proxyToServer)
+    std::optional<nx::Uuid> proxyToServer)
 {
     return executePost(
         path,
@@ -2554,7 +2554,7 @@ Handle ServerConnection::executePost(
     const nx::String& messageBody,
     Callback<ResultType>&& callback,
     QThread* targetThread,
-    std::optional<QnUuid> proxyToServer)
+    std::optional<nx::Uuid> proxyToServer)
 {
     return executePost(
         path,
@@ -2576,7 +2576,7 @@ Handle ServerConnection::executePost(
     Callback<ResultType> callback,
     QThread* targetThread,
     std::optional<Timeouts> timeouts,
-    std::optional<QnUuid> proxyToServer)
+    std::optional<nx::Uuid> proxyToServer)
 {
     auto request = this->prepareRequest(
         nx::network::http::Method::post, prepareUrl(path, params), contentType, messageBody);
@@ -2600,7 +2600,7 @@ Handle ServerConnection::executePut(
     const nx::String& messageBody,
     Callback<ResultType> callback,
     QThread* targetThread,
-    std::optional<QnUuid> proxyToServer)
+    std::optional<nx::Uuid> proxyToServer)
 {
     auto request = prepareRequest(
         nx::network::http::Method::put, prepareUrl(path, params), contentType, messageBody);
@@ -2640,7 +2640,7 @@ Handle ServerConnection::executeDelete(
     const nx::network::rest::Params& params,
     Callback<ResultType> callback,
     QThread* targetThread,
-    std::optional<QnUuid> proxyToServer)
+    std::optional<nx::Uuid> proxyToServer)
 {
     auto request = prepareRequest(nx::network::http::Method::delete_, prepareUrl(path, params));
     if (proxyToServer)
@@ -3242,10 +3242,10 @@ nx::network::http::Credentials getRequestCredentials(
 
 bool setupAuth(
     const nx::vms::common::SystemContext* systemContext,
-    const QnUuid& serverId,
+    const nx::Uuid& serverId,
     nx::network::http::ClientPool::Request& request,
     const QUrl& url,
-    const QnUuid& userId)
+    const nx::Uuid& userId)
 {
     if (!NX_ASSERT(systemContext))
         return false;
@@ -3326,7 +3326,7 @@ bool setupAuth(
 
 void setupAuthDirect(
     nx::network::http::ClientPool::Request& request,
-    const QnUuid& auditId,
+    const nx::Uuid& auditId,
     nx::network::SocketAddress address,
     nx::network::http::Credentials credentials,
     QString path,

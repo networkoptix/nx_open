@@ -14,13 +14,13 @@ class NX_VMS_COMMON_API QnVideoWallMatrixIndex
 {
 public:
     QnVideoWallMatrixIndex();
-    QnVideoWallMatrixIndex(const QnVideoWallResourcePtr& videowall, const QnUuid& uuid);
+    QnVideoWallMatrixIndex(const QnVideoWallResourcePtr& videowall, const nx::Uuid& uuid);
 
     QnVideoWallResourcePtr videowall() const;
     void setVideoWall(const QnVideoWallResourcePtr& videowall);
 
-    QnUuid uuid() const;
-    void setUuid(const QnUuid& uuid);
+    nx::Uuid uuid() const;
+    void setUuid(const nx::Uuid& uuid);
 
     /** \return true if the index is not initialized. */
     bool isNull() const;
@@ -35,5 +35,5 @@ public:
 
 private:
     QnVideoWallResourcePtr m_videowall;
-    QnUuid m_uuid;
+    nx::Uuid m_uuid;
 };

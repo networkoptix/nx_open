@@ -24,7 +24,7 @@ public:
 
 private:
     void onConnectionChanged(nx::vms::discovery::ModuleEndpoint module);
-    void onConnectionChangedById(QnUuid id);
+    void onConnectionChangedById(nx::Uuid id);
     void onResourcePoolStatusChanged(const QnResourcePtr& resource);
     void onResourcesAdded(const QnResourceList& resources);
 

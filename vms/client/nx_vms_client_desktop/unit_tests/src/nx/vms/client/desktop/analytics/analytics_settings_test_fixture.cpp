@@ -33,7 +33,7 @@ rest::Handle AnalyticsSettingsMockApiInterface::applySettings(
     const QnVirtualCameraResourcePtr& device,
     const AnalyticsEngineResourcePtr& engine,
     const QJsonObject& /*settings*/,
-    const QnUuid& /*settingsModelId*/,
+    const nx::Uuid& /*settingsModelId*/,
     AnalyticsSettingsCallback callback)
 {
     return makeRequest(RequestInfo::Type::apply, device, engine, callback).handle;
@@ -123,7 +123,7 @@ void AnalyticsSettingsTestFixture::TearDown()
 AnalyticsEngineResourcePtr AnalyticsSettingsTestFixture::addEngine()
 {
     AnalyticsEngineResourcePtr engine(new AnalyticsEngineResource());
-    engine->setIdUnsafe(QnUuid::createUuid());
+    engine->setIdUnsafe(nx::Uuid::createUuid());
     resourcePool()->addResource(engine);
     return engine;
 }

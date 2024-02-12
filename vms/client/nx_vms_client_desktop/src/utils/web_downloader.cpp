@@ -270,7 +270,7 @@ void WebDownloader::startDownload()
     connect(notificationsManager,
         &workbench::LocalNotificationsManager::removed,
         this,
-        [this](const QnUuid& notificationId) {
+        [this](const nx::Uuid& notificationId) {
             if (notificationId != m_notificationId)
                 return;
             this->deleteLater();
@@ -292,7 +292,7 @@ void WebDownloader::startDownload()
     connect(notificationsManager,
         &workbench::LocalNotificationsManager::interactionRequested,
         this,
-        [this](const QnUuid& notificationId) {
+        [this](const nx::Uuid& notificationId) {
             if (notificationId != m_notificationId)
                 return;
 
@@ -315,7 +315,7 @@ void WebDownloader::startDownload()
     connect(notificationsManager,
         &workbench::LocalNotificationsManager::cancelRequested,
         this,
-        [this](const QnUuid& notificationId) {
+        [this](const nx::Uuid& notificationId) {
             if (notificationId != m_notificationId)
                 return;
             cancel();

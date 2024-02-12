@@ -83,11 +83,11 @@ class LookupFieldTestBase: public nx::vms::common::test::ContextBasedTest
 protected:
     using Attributes = nx::common::metadata::Attributes;
 
-    QnUuid makeAndRegisterList(
+    nx::Uuid makeAndRegisterList(
         std::vector<QString> attributes = {},
         std::vector<std::map<QString, QString>> entries = {})
     {
-        const auto id = QnUuid::createUuid();
+        const auto id = nx::Uuid::createUuid();
 
         api::LookupListData lookupList;
         lookupList.id = id;
@@ -293,7 +293,7 @@ TEST_F(ObjectLookupFieldTest, lookupInListWorksProperly)
 TEST(EventFieldTest, SimpleTypes)
 {
     testSimpleTypeField<EventFlagField>({true, false});
-    testSimpleTypeField<ExpectedUuidField>({QnUuid(), QnUuid::createUuid()});
+    testSimpleTypeField<ExpectedUuidField>({nx::Uuid(), nx::Uuid::createUuid()});
     testSimpleTypeField<IntField>({-1, 0, 60, 300, 86400});
     testSimpleTypeField<EventTextField>({ "", "Hello", "\\/!@#$%^&*()_+" }, true);
 }

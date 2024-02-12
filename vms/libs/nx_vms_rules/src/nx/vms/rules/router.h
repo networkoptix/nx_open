@@ -25,15 +25,15 @@ public:
     Router();
     virtual ~Router();
 
-    virtual void init(const QnUuid& id);
+    virtual void init(const nx::Uuid& id);
 
     virtual void routeEvent(
         const EventData& eventData,
-        const QSet<QnUuid>& triggeredRules, //< TODO: #spanasenko Use filter IDs instead.
-        const QSet<QnUuid>& affectedResources) = 0;
+        const QSet<nx::Uuid>& triggeredRules, //< TODO: #spanasenko Use filter IDs instead.
+        const QSet<nx::Uuid>& affectedResources) = 0;
 
 signals:
-    void eventReceived(const QnUuid& ruleId, const EventData& eventData);
+    void eventReceived(const nx::Uuid& ruleId, const EventData& eventData);
 };
 
 } // namespace nx::vms::rules

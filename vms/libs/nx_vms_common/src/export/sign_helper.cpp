@@ -369,7 +369,7 @@ char QnSignHelper::getSignPatternDelim()
     return SIGN_TEXT_DELIMITER;
 }
 
-QByteArray QnSignHelper::getSignPattern(QnLicensePool* licensePool, const QnUuid& serverId)
+QByteArray QnSignHelper::getSignPattern(QnLicensePool* licensePool, const nx::Uuid& serverId)
 {
     QByteArray result;
     result.append(INITIAL_SIGNATURE_MAGIC);

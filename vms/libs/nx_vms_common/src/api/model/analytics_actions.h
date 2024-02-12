@@ -19,14 +19,14 @@ struct NX_VMS_COMMON_API AnalyticsActionResult
 struct NX_VMS_COMMON_API AnalyticsAction
 {
     /** Id of an Engine which should handle the Action. */
-    QnUuid engineId;
+    nx::Uuid engineId;
 
     QString actionId;
 
     /** Id of an Analytics Object Track to which the Action is applied. */
-    QnUuid objectTrackId;
+    nx::Uuid objectTrackId;
 
-    QnUuid deviceId;
+    nx::Uuid deviceId;
 
     qint64 timestampUs;
 
@@ -37,7 +37,7 @@ struct NX_VMS_COMMON_API AnalyticsAction
 
 struct NX_VMS_COMMON_API AvailableAnalyticsActionsOfEngine
 {
-    QnUuid engineId;
+    nx::Uuid engineId;
 
     QStringList actionIds;
 };

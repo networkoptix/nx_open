@@ -12,7 +12,7 @@ Router::~Router()
 {
 }
 
-void Router::init(const QnUuid& /*id*/)
+void Router::init(const nx::Uuid& /*id*/)
 {
 }
 

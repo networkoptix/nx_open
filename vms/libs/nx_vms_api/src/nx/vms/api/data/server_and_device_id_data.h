@@ -12,8 +12,8 @@ namespace nx::vms::api {
 struct NX_VMS_API ServerAndDeviceIdData
 {
     QString toString() const { return NX_FMT("deviceId: %1, serverId: %2", deviceId, serverId); }
-    QnUuid deviceId;
-    QnUuid serverId;
+    nx::Uuid deviceId;
+    nx::Uuid serverId;
 
     bool operator==(const ServerAndDeviceIdData& other) const = default;
 };

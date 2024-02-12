@@ -60,10 +60,10 @@ NX_REFLECTION_INSTRUMENT(BookmarkShareableParams, BookmarkShareableParams_Fields
 struct NX_VMS_COMMON_API CameraBookmark
 {
     /**%apidoc[readonly] Id of the Bookmark. */
-    QnUuid guid;
+    nx::Uuid guid;
 
     /**%apidoc[readonly] Identifier of the user who created this Bookmark. */
-    QnUuid creatorId;
+    nx::Uuid creatorId;
 
     /**%apidoc[opt] Time of the Bookmark creation in milliseconds since epoch. */
     std::chrono::milliseconds creationTimeStampMs{0ms};
@@ -93,7 +93,7 @@ struct NX_VMS_COMMON_API CameraBookmark
     QnCameraBookmarkTags tags;
 
     /**%apidoc Device id. */
-    QnUuid cameraId;
+    nx::Uuid cameraId;
 
     BookmarkShareableParams share;
 
@@ -125,7 +125,7 @@ struct NX_VMS_COMMON_API CameraBookmark
         const std::optional<std::chrono::milliseconds>& minVisibleLength = std::nullopt,
         int limit = std::numeric_limits<int>::max());
 
-    static QnUuid systemUserId();
+    static nx::Uuid systemUserId();
 
     static const QString kGuidParam;
     static const QString kCreationStartTimeParam;
@@ -178,11 +178,11 @@ struct NX_VMS_COMMON_API CameraBookmarkSearchFilter
 
     BookmarkSortOrder orderBy = BookmarkSortOrder::defaultOrder;
 
-    std::optional<QnUuid> id;
+    std::optional<nx::Uuid> id;
 
     std::chrono::milliseconds creationStartTimeMs{};
     std::chrono::milliseconds creationEndTimeMs{};
-    std::set<QnUuid> cameras;
+    std::set<nx::Uuid> cameras;
 
     bool operator==(const CameraBookmarkSearchFilter& other) const = default;
 

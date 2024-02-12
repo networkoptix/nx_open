@@ -20,7 +20,7 @@ QnCameraNamesWatcher::~QnCameraNamesWatcher()
 {
 }
 
-QString QnCameraNamesWatcher::getCameraName(const QnUuid& cameraId)
+QString QnCameraNamesWatcher::getCameraName(const nx::Uuid& cameraId)
 {
     const auto it = m_names.find(cameraId);
     if (it != m_names.end())

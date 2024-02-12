@@ -37,7 +37,7 @@ void AnalyticsSdkEventModel::loadFromCameras(
 
 void AnalyticsSdkEventModel::loadFromCameras(
         const QnVirtualCameraResourceList& cameras,
-        QnUuid engineId,
+        nx::Uuid engineId,
         QString eventTypeId)
 {
     auto addItem =

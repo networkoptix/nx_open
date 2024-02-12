@@ -33,7 +33,7 @@ private:
 
 private:
     QPointer<workbench::LocalNotificationsManager> m_notificationManager;
-    std::optional<QnUuid> m_notification;
+    std::optional<nx::Uuid> m_notification;
     QTimer m_timer;
 };
 

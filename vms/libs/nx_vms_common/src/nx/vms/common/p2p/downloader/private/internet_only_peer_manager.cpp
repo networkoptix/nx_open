@@ -22,28 +22,28 @@ InternetOnlyPeerManager::~InternetOnlyPeerManager()
 {
 }
 
-QString InternetOnlyPeerManager::peerString(const QnUuid& peerId) const
+QString InternetOnlyPeerManager::peerString(const nx::Uuid& peerId) const
 {
     return peerId.isNull() ? QStringLiteral("Internet") : peerId.toString();
 }
 
-QList<QnUuid> InternetOnlyPeerManager::getAllPeers() const
+QList<nx::Uuid> InternetOnlyPeerManager::getAllPeers() const
 {
-    return {QnUuid()};
+    return {nx::Uuid()};
 }
 
-QList<QnUuid> InternetOnlyPeerManager::peers() const
+QList<nx::Uuid> InternetOnlyPeerManager::peers() const
 {
-    return {QnUuid()};
+    return {nx::Uuid()};
 }
 
-int InternetOnlyPeerManager::distanceTo(const QnUuid& /*peerId*/) const
+int InternetOnlyPeerManager::distanceTo(const nx::Uuid& /*peerId*/) const
 {
     return 0;
 }
 
 AbstractPeerManager::RequestContextPtr<FileInformation> InternetOnlyPeerManager::requestFileInfo(
-    const QnUuid& peerId,
+    const nx::Uuid& peerId,
     const QString& fileName,
     const nx::utils::Url& url)
 {
@@ -61,13 +61,13 @@ AbstractPeerManager::RequestContextPtr<FileInformation> InternetOnlyPeerManager:
 }
 
 AbstractPeerManager::RequestContextPtr<QVector<QByteArray>> InternetOnlyPeerManager::requestChecksums(
-    const QnUuid& /*peerId*/, const QString& /*fileName*/)
+    const nx::Uuid& /*peerId*/, const QString& /*fileName*/)
 {
     return std::make_unique<InternetRequestContext<QVector<QByteArray>>>();
 }
 
 AbstractPeerManager::RequestContextPtr<nx::Buffer> InternetOnlyPeerManager::downloadChunk(
-    const QnUuid& peerId,
+    const nx::Uuid& peerId,
     const QString& /*fileName*/,
     const utils::Url& url,
     int chunkIndex,

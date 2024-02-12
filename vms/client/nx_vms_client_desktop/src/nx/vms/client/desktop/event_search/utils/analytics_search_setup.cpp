@@ -69,12 +69,12 @@ AnalyticsSearchSetup::~AnalyticsSearchSetup()
     // Required here for forward-declared scoped pointer destruction.
 }
 
-QnUuid AnalyticsSearchSetup::engine() const
+nx::Uuid AnalyticsSearchSetup::engine() const
 {
-    return d->model ? d->model->selectedEngine() : QnUuid();
+    return d->model ? d->model->selectedEngine() : nx::Uuid();
 }
 
-void AnalyticsSearchSetup::setEngine(const QnUuid& value)
+void AnalyticsSearchSetup::setEngine(const nx::Uuid& value)
 {
     if (NX_ASSERT(d->model))
         d->model->setSelectedEngine(value);

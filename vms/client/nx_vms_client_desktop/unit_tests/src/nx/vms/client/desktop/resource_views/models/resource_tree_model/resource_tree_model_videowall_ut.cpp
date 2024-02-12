@@ -215,7 +215,7 @@ TEST_F(ResourceTreeModelTest, videoWallScreenIconStatus)
         (uniqueMatchingIndex(kUniqueVideoWallScreenNameCondition)));
 
     // When video wall screen is online and have "controlled by" UUID not same as common module GUID.
-    setVideoWallScreenRuntimeStatus(videoWall, videoWallScreen, true, QnUuid::createUuid());
+    setVideoWallScreenRuntimeStatus(videoWall, videoWallScreen, true, nx::Uuid::createUuid());
 
     // Then icon has Locked decoration.
     ASSERT_TRUE(iconStatusMatch(QnResourceIconCache::Locked)
@@ -480,9 +480,9 @@ TEST_F(ResourceTreeModelTest, videoWallScreenNodeProvidesUuid)
 
     // TODO: #vbreus Remove redundant data role.
     // And that node provides video wall Item UUID by both Qn::UuidRole and ItemUuidRole roles.
-    ASSERT_TRUE(dataMatch(Qn::UuidRole, QVariant::fromValue<QnUuid>(videoWallScreen.uuid))(
+    ASSERT_TRUE(dataMatch(Qn::UuidRole, QVariant::fromValue<nx::Uuid>(videoWallScreen.uuid))(
         videoWallScreenIndex));
-    ASSERT_TRUE(dataMatch(Qn::ItemUuidRole, QVariant::fromValue<QnUuid>(videoWallScreen.uuid))(
+    ASSERT_TRUE(dataMatch(Qn::ItemUuidRole, QVariant::fromValue<nx::Uuid>(videoWallScreen.uuid))(
         videoWallScreenIndex));
 }
 
@@ -502,9 +502,9 @@ TEST_F(ResourceTreeModelTest, videoWallMatrixNodeProvidesUuid)
 
     // TODO: #vbreus Remove redundant data role.
     // And that node provides video wall Matrix UUID by both Qn::UuidRole and ItemUuidRole roles.
-    ASSERT_TRUE(dataMatch(Qn::UuidRole, QVariant::fromValue<QnUuid>(videoWallMatrix.uuid))(
+    ASSERT_TRUE(dataMatch(Qn::UuidRole, QVariant::fromValue<nx::Uuid>(videoWallMatrix.uuid))(
         videoWallMatrixIndex));
-    ASSERT_TRUE(dataMatch(Qn::ItemUuidRole, QVariant::fromValue<QnUuid>(videoWallMatrix.uuid))(
+    ASSERT_TRUE(dataMatch(Qn::ItemUuidRole, QVariant::fromValue<nx::Uuid>(videoWallMatrix.uuid))(
         videoWallMatrixIndex));
 }
 

@@ -7,11 +7,11 @@
 namespace nx::vms::api {
 
 const QString AnalyticsPluginData::kResourceTypeName("AnalyticsPlugin");
-const QnUuid AnalyticsPluginData::kResourceTypeId =
+const nx::Uuid AnalyticsPluginData::kResourceTypeId =
     ResourceData::getFixedTypeId(AnalyticsPluginData::kResourceTypeName);
 
 const QString AnalyticsEngineData::kResourceTypeName("AnalyticsEngine");
-const QnUuid AnalyticsEngineData::kResourceTypeId =
+const nx::Uuid AnalyticsEngineData::kResourceTypeId =
     ResourceData::getFixedTypeId(AnalyticsEngineData::kResourceTypeName);
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(AnalyticsPluginData,

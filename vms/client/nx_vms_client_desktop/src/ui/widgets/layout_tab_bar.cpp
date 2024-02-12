@@ -246,7 +246,7 @@ QString QnLayoutTabBar::layoutText(QnWorkbenchLayout* layout) const
     QString baseName = nx::utils::escapeMnemonics(layout->name());
 
     // videowall control mode
-    QnUuid videoWallInstanceGuid = layout->data(Qn::VideoWallItemGuidRole).value<QnUuid>();
+    nx::Uuid videoWallInstanceGuid = layout->data(Qn::VideoWallItemGuidRole).value<nx::Uuid>();
     if (!videoWallInstanceGuid.isNull())
     {
         QnVideoWallItemIndex idx =
@@ -286,7 +286,7 @@ QIcon QnLayoutTabBar::layoutIcon(QnWorkbenchLayout* layout) const
         return qnResIconCache->icon(QnResourceIconCache::VideoWall);
 
     // videowall control mode
-    QnUuid videoWallInstanceGuid = layout->data(Qn::VideoWallItemGuidRole).value<QnUuid>();
+    nx::Uuid videoWallInstanceGuid = layout->data(Qn::VideoWallItemGuidRole).value<nx::Uuid>();
     if (!videoWallInstanceGuid.isNull())
     {
         QnVideoWallItemIndex idx = system()->resourcePool()->getVideoWallItemByUuid(videoWallInstanceGuid);

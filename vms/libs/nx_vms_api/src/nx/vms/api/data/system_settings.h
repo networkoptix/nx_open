@@ -46,7 +46,7 @@ struct SystemSettings
     EmailSettings emailSettings;
 
     bool timeSynchronizationEnabled = true;
-    QnUuid primaryTimeServer;
+    nx::Uuid primaryTimeServer;
     nx::utils::Url customReleaseListUrl;
 
     ClientUpdateSettings clientUpdateSettings;

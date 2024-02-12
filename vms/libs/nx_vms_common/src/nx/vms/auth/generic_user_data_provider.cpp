@@ -32,7 +32,7 @@ std::pair<QnResourcePtr, bool> GenericUserDataProvider::findResByName(
         return r;
 
     auto server = resourcePool()->getResourceById<QnMediaServerResource>(
-        QnUuid::fromStringSafe(nxUserName));
+        nx::Uuid::fromStringSafe(nxUserName));
     if (server)
         return {server, /*hasClash*/ false};
 

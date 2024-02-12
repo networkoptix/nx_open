@@ -13,7 +13,7 @@ namespace ec2
             return false;
 
 #ifdef _DEBUG
-        for (const QnUuid& peer: transportHeader.dstPeers)
+        for (const nx::Uuid& peer: transportHeader.dstPeers)
             NX_ASSERT(!peer.isNull());
 #endif
 

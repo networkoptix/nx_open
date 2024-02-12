@@ -46,10 +46,10 @@ struct VirtualCameraState
     Error error = NoError;
 
     /** Id of the camera. */
-    QnUuid cameraId;
+    nx::Uuid cameraId;
 
     /** Id of the user that has locked this camera. */
-    QnUuid lockUserId;
+    nx::Uuid lockUserId;
 
     /** Upload queue. */
     QVector<EnqueuedFile> queue;

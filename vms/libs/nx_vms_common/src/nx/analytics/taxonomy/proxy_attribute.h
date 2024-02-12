@@ -45,14 +45,14 @@ public:
 
     virtual QVariant maxValue() const override;
 
-    virtual bool isSupported(QnUuid engineId, QnUuid deviceId) const override;
+    virtual bool isSupported(nx::Uuid engineId, nx::Uuid deviceId) const override;
 
     virtual QString condition() const override;
 
 private:
     AbstractAttribute* m_proxiedAttribute = nullptr;
     AbstractObjectType* m_proxyObjectType = nullptr;
-    std::set<QnUuid> m_supportByEngine;
+    std::set<nx::Uuid> m_supportByEngine;
     QString m_prefix;
     QString m_rootParentTypeId;
     EntityType m_rootEntityType;

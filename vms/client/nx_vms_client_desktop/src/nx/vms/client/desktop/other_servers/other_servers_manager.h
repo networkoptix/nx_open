@@ -34,16 +34,16 @@ public:
     void start();
     void stop();
 
-    QnUuidList getServers() const;
-    bool containsServer(const QnUuid& serverId) const;
+    UuidList getServers() const;
+    bool containsServer(const nx::Uuid& serverId) const;
     nx::vms::api::ModuleInformationWithAddresses getModuleInformationWithAddresses(
-        const QnUuid& serverId) const;
-    nx::utils::Url getUrl(const QnUuid& serverId) const;
+        const nx::Uuid& serverId) const;
+    nx::utils::Url getUrl(const nx::Uuid& serverId) const;
 
 signals:
-    void serverAdded(const QnUuid& serverId);
-    void serverRemoved(const QnUuid& serverId);
-    void serverUpdated(const QnUuid& serverId);
+    void serverAdded(const nx::Uuid& serverId);
+    void serverRemoved(const nx::Uuid& serverId);
+    void serverUpdated(const nx::Uuid& serverId);
 
 private:
     struct Private;

@@ -66,7 +66,7 @@ private:
     // Can return nullptr.
     QnLayoutResourcePtr getSelectedLayout();
 
-    std::pair<QnUserResourceList, QList<QnUuid>> getSelectedUsersAndRoles();
+    std::pair<QnUserResourceList, QList<nx::Uuid>> getSelectedUsersAndRoles();
 
     // Updates button state according to selected layouts.
     void updateLayoutsButton();

@@ -74,15 +74,15 @@ public:
     AbstractItemPtr createCloudSystemItem(const QString& systemId);
 
     // Resource Tree showreel item.
-    AbstractItemPtr createShowreelItem(const QnUuid& showreelUuid);
+    AbstractItemPtr createShowreelItem(const nx::Uuid& showreelUuid);
 
     // Resource Tree video wall screen item.
     AbstractItemPtr createVideoWallScreenItem(const QnVideoWallResourcePtr& videoWall,
-        const QnUuid& screenUuid);
+        const nx::Uuid& screenUuid);
 
     // Resource Tree video wall matrix item.
     AbstractItemPtr createVideoWallMatrixItem(const QnVideoWallResourcePtr& videoWall,
-        const QnUuid& matrixUuid);
+        const nx::Uuid& matrixUuid);
 
     // Resource Tree Cross-System Resources status preloader for the Cloud System.
     AbstractItemPtr createCloudSystemStatusItem(const QString& systemId);
@@ -90,7 +90,7 @@ public:
     // Resource Tree Cloud Layout item.
     AbstractItemPtr createCloudLayoutItem(const QnLayoutResourcePtr& layout);
 
-    AbstractItemPtr createOtherServerItem(const QnUuid& serverId);
+    AbstractItemPtr createOtherServerItem(const nx::Uuid& serverId);
 
 private:
     QHash<QnResourcePtr, entity_item_model::SharedItemOriginPtr> m_resourceItemCache;

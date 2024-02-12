@@ -27,25 +27,25 @@ struct NX_VMS_API SiteInformation
     QString cloudHost;
 
     /**%apidoc If not present, the Site is new. */
-    std::optional<QnUuid> localId;
+    std::optional<nx::Uuid> localId;
 
     /**%apidoc If present, the Site is bound to the Cloud. */
     std::optional<QString> cloudId;
 
     /**%apidoc Presented if the Site is bound to the Cloud. */
-    std::optional<QnUuid> cloudOwnerId;
+    std::optional<nx::Uuid> cloudOwnerId;
 
     /**%apidoc Presented if the Site is bound to the Cloud and belongs to the Organization. */
-    std::optional<QnUuid> organizationId;
+    std::optional<nx::Uuid> organizationId;
 
     /**%apidoc For local Site only. */
-    std::optional<std::vector<QnUuid>> servers;
+    std::optional<std::vector<nx::Uuid>> servers;
 
     /**%apidoc Amount of edge Servers in the Site. */
     int edgeServerCount = 0;
 
     /**%apidoc For local Site only. */
-    std::optional<std::vector<QnUuid>> devices;
+    std::optional<std::vector<nx::Uuid>> devices;
 
     /**%apidoc For remote Sites only. */
     std::optional<QString> endpoint; //< TODO: SocketAddress?

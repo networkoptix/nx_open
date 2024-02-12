@@ -93,7 +93,7 @@ protected:
         std::optional<QPointF> position;
         std::optional<QSizeF> size;
         QRectF zoomWindow;
-        QnUuid zoomUuid;
+        nx::Uuid zoomUuid;
         std::chrono::milliseconds time = -1ms;
         bool paused = false;
         qreal speed = 0.0;

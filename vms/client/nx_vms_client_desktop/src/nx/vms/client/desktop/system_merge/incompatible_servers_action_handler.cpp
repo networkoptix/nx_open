@@ -59,12 +59,12 @@ void IncompatibleServersActionHandler::at_connectToCurrentSystemAction_triggered
     }
 
     const auto serverId =
-        menu()->currentParameters(sender()).argument(Qn::UuidRole).value<QnUuid>();
+        menu()->currentParameters(sender()).argument(Qn::UuidRole).value<nx::Uuid>();
 
     connectToCurrentSystem(serverId);
 }
 
-void IncompatibleServersActionHandler::connectToCurrentSystem(const QnUuid& serverId)
+void IncompatibleServersActionHandler::connectToCurrentSystem(const nx::Uuid& serverId)
 {
     if (!NX_ASSERT(!serverId.isNull()) || !NX_ASSERT(!m_connectTool))
         return;

@@ -32,7 +32,7 @@ QnLayoutResourceList getLayoutsInternal(const QnBusinessRuleViewModel* model)
         model->actionResourcesRaw());
 }
 
-QSet<QnUuid> toIds(const QnResourceList& resources)
+QSet<nx::Uuid> toIds(const QnResourceList& resources)
 {
     return nx::utils::toQSet(resources.ids());
 }
@@ -85,21 +85,21 @@ QnLayoutResourceList ExitFullscreenActionHelper::layouts(const QnBusinessRuleVie
     return getLayoutsInternal(model);
 }
 
-QSet<QnUuid> ExitFullscreenActionHelper::layoutIds(const QnBusinessRuleViewModel* model)
+QSet<nx::Uuid> ExitFullscreenActionHelper::layoutIds(const QnBusinessRuleViewModel* model)
 {
     return toIds(getLayoutsInternal(model));
 }
 
-QSet<QnUuid> ExitFullscreenActionHelper::setLayouts(
+QSet<nx::Uuid> ExitFullscreenActionHelper::setLayouts(
     const QnBusinessRuleViewModel* model,
     const QnLayoutResourceList& layouts)
 {
     return setLayoutIds(model, toIds(layouts));
 }
 
-QSet<QnUuid> ExitFullscreenActionHelper::setLayoutIds(
+QSet<nx::Uuid> ExitFullscreenActionHelper::setLayoutIds(
     const QnBusinessRuleViewModel* model,
-    const QSet<QnUuid>& layoutIds)
+    const QSet<nx::Uuid>& layoutIds)
 {
     return layoutIds;
 }

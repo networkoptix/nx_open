@@ -18,9 +18,9 @@ TEST(UuidMover, moveTwoIds)
     general.insert("key", "value");
     QJsonObject value;
     value.insert("general", general);
-    const QString id = QnUuid::createUuid().toString();
+    const QString id = nx::Uuid::createUuid().toString();
     value.insert("id", id);
-    const QString parentId = QnUuid::createUuid().toString();
+    const QString parentId = nx::Uuid::createUuid().toString();
     value.insert("serverId", parentId);
     json::UuidMover mover;
     QnJsonContext ctx;
@@ -37,7 +37,7 @@ TEST(UuidMover, createField)
         {"id", {"general", "id"}}
     };
     QJsonObject value;
-    const QString id = QnUuid::createUuid().toString();
+    const QString id = nx::Uuid::createUuid().toString();
     value.insert("id", id);
     json::UuidMover mover;
     QnJsonContext ctx;

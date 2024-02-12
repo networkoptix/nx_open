@@ -56,8 +56,8 @@ public:
     /**
      * Get list of dragged entities (not resources), e.g. Showreels or videowall items.
      */
-    QList<QnUuid> entities() const;
-    void setEntities(const QList<QnUuid>& ids);
+    QList<nx::Uuid> entities() const;
+    void setEntities(const QList<nx::Uuid>& ids);
 
     QHash<int, QVariant> arguments() const;
     void setArguments(const QHash<int, QVariant>& value);

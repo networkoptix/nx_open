@@ -7,26 +7,26 @@
 
 /**
  * Wrapper to be used for overloading as a distinct type for camera-related API requests.
- * Flexible camera id string is converted to QnUuid from the HTTP request parameter during
+ * Flexible camera id string is converted to nx::Uuid from the HTTP request parameter during
  * deserialization.
  */
-class QnCameraUuid: public QnUuid
+class QnCameraUuid: public nx::Uuid
 {
 public:
     QnCameraUuid() = default;
-    QnCameraUuid(const QnUuid& id): QnUuid(id) {}
+    QnCameraUuid(const nx::Uuid& id): nx::Uuid(id) {}
 };
 
 /**
  * Wrapper to be used for overloading as a distinct type for layout-related API requests.
- * Flexible layout id string is converted to QnUuid from the HTTP request parameter during
+ * Flexible layout id string is converted to nx::Uuid from the HTTP request parameter during
  * deserialization.
  */
-class QnLayoutUuid: public QnUuid
+class QnLayoutUuid: public nx::Uuid
 {
 public:
     QnLayoutUuid() = default;
-    QnLayoutUuid(const QnUuid& id): QnUuid(id) {}
+    QnLayoutUuid(const nx::Uuid& id): nx::Uuid(id) {}
 };
 
 /**

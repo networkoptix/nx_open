@@ -22,11 +22,11 @@ AnalyticsEvent::AnalyticsEvent(
     State state,
     const QString& caption,
     const QString& description,
-    QnUuid cameraId,
-    QnUuid engineId,
+    nx::Uuid cameraId,
+    nx::Uuid engineId,
     const QString& eventTypeId,
     const nx::common::metadata::Attributes& attributes,
-    QnUuid objectTrackId,
+    nx::Uuid objectTrackId,
     const QString& key)
     :
     AnalyticsEngineEvent(timestamp, caption, description, cameraId, engineId),

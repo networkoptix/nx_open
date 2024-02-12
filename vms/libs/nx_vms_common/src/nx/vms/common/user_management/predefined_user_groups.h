@@ -20,10 +20,10 @@ class NX_VMS_COMMON_API PredefinedUserGroups
 
 public:
     /** Checks whether a specified id identifies a predefined user group. */
-    static bool contains(const QnUuid& groupId);
+    static bool contains(const nx::Uuid& groupId);
 
     /** Returns information structure for a predefined user group, if exists. */
-    static std::optional<nx::vms::api::UserGroupData> find(const QnUuid& predefinedGroupId);
+    static std::optional<nx::vms::api::UserGroupData> find(const nx::Uuid& predefinedGroupId);
 
     /** Returns list of all predefined user group information structures. */
     static const nx::vms::api::UserGroupDataList& list();
@@ -34,7 +34,7 @@ public:
      * not relying on nx::vms::api::kPredefinedGroupIds type & order.
      * PredefinedUserGroups::list() keeps the same order.
      */
-    static const QList<QnUuid>& ids();
+    static const QList<nx::Uuid>& ids();
 };
 
 } // namespace nx::vms::common

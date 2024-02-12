@@ -105,7 +105,7 @@ bool isValid(const LayoutItemIndex& value)
     return !value.isNull();
 }
 
-bool isValid(const QnUuid& value)
+bool isValid(const nx::Uuid& value)
 {
     return !value.isNull();
 }

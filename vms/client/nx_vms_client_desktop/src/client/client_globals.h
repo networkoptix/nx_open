@@ -72,8 +72,8 @@ namespace Qn
 
         ResourceExtraStatusRole,                    /**< Custom resource status (recording, buggy, etc). Value of ResourceExtraStatus. */
 
-        VideoWallGuidRole,                          /**< Role for videowall resource unique id. Value of type QnUuid. */
-        VideoWallItemGuidRole,                      /**< Role for videowall item unique id. Value of type QnUuid. */
+        VideoWallGuidRole,                          /**< Role for videowall resource unique id. Value of type nx::Uuid. */
+        VideoWallItemGuidRole,                      /**< Role for videowall item unique id. Value of type nx::Uuid. */
         VideoWallItemIndicesRole,                   /**< Role for videowall item indices list. Value of type QnVideoWallItemIndexList. */
 
         /** Id role for Showreel review layout. */
@@ -93,12 +93,12 @@ namespace Qn
         LayoutSearchStateRole,                      /**< Role for 'Preview Search' layout parameters. */
         LayoutTimeLabelsRole,                       /**< Role for layout's time label display. Value of type bool. */
         LayoutPermissionsRole,                      /**< Role for overriding layout's permissions. Value of type int (Qn::Permissions). */
-        LayoutSelectionRole,                        /**< Role for layout's selected items. Value of type QVector<QnUuid>. */
-        LayoutActiveItemRole,                       /**< Role for layout active item. Value of type QnUuid. */
+        LayoutSelectionRole,                        /**< Role for layout's selected items. Value of type QVector<nx::Uuid>. */
+        LayoutActiveItemRole,                       /**< Role for layout active item. Value of type nx::Uuid. */
         LayoutWatermarkRole,                        /**< Role for layout watermark (when loaded from file). */
 
         /* Item-based. */
-        ItemUuidRole,                               /**< Role for item's UUID. Value of type QnUuid. */
+        ItemUuidRole,                               /**< Role for item's UUID. Value of type nx::Uuid. */
         ItemGeometryRole,                           /**< Role for item's integer geometry. Value of type QRect. */
         ItemGeometryDeltaRole,                      /**< Role for item's floating point geometry delta. Value of type QRectF. */
         ItemCombinedGeometryRole,                   /**< Role for item's floating point combined geometry. Value of type QRectF. */
@@ -216,9 +216,9 @@ namespace Qn
         PriorityRole,                               /**< Role for priority value. Value of type quint64. */
 
         EventTypeRole,                              /**< Role for business event type. Value of type nx::vms::api::EventType. */
-        EventResourcesRole,                         /**< Role for business event resources list. Value of type QSet<QnUuid>. */
+        EventResourcesRole,                         /**< Role for business event resources list. Value of type QSet<nx::Uuid>. */
         ActionTypeRole,                             /**< Role for business action type. Value of type nx::vms::api::ActionType. */
-        ActionResourcesRole,                        /**< Role for business action resources list. Value of type QSet<QnUuid>. */
+        ActionResourcesRole,                        /**< Role for business action resources list. Value of type QSet<nx::Uuid>. */
         ActionDataRole,                             /**< Role for business action. Value of type vms::event::AbstractActionPtr. */
         RuleModelRole, /* #deprecate #3.2 */        /**< Role for business rule caching model. Value of type QnBusinessRuleViewModelPtr. */
         EventParametersRole,                            /**< Role for business event parameters. Value of type nx::vms::event::EventParameters. */

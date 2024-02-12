@@ -31,7 +31,7 @@ public:
         nx::utils::SoftwareVersion version,
         bool online = true);
 
-    std::map<QnUuid, QnMediaServerResourcePtr> getAllServers();
+    std::map<nx::Uuid, QnMediaServerResourcePtr> getAllServers();
 
     void removeAllServers();
 

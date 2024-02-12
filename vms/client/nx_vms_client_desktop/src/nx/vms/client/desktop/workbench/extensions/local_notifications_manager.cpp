@@ -9,28 +9,28 @@ LocalNotificationsManager::LocalNotificationsManager(QObject* parent):
 {
 }
 
-QList<QnUuid> LocalNotificationsManager::notifications() const
+QList<nx::Uuid> LocalNotificationsManager::notifications() const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     return m_ids;
 }
 
-QnUuid LocalNotificationsManager::add(
+nx::Uuid LocalNotificationsManager::add(
     const QString& title, const QString& description, bool cancellable)
 {
     return add(State(title, description, cancellable, /*progress*/ std::nullopt));
 }
 
-QnUuid LocalNotificationsManager::addProgress(
+nx::Uuid LocalNotificationsManager::addProgress(
     const QString& title, const QString& description, bool cancellable)
 {
     return add(State(title, description, cancellable, /*progress*/ 0));
 }
 
-QnUuid LocalNotificationsManager::add(State state)
+nx::Uuid LocalNotificationsManager::add(State state)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
-    const auto notificationId = QnUuid::createUuid();
+    const auto notificationId = nx::Uuid::createUuid();
     m_lookup.insert(notificationId, std::move(state));
     m_ids.push_back(notificationId);
     lock.unlock();
@@ -39,7 +39,7 @@ QnUuid LocalNotificationsManager::add(State state)
     return notificationId;
 }
 
-void LocalNotificationsManager::remove(const QnUuid& notificationId)
+void LocalNotificationsManager::remove(const nx::Uuid& notificationId)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     auto iter = m_lookup.find(notificationId);
@@ -53,13 +53,13 @@ void LocalNotificationsManager::remove(const QnUuid& notificationId)
     emit removed(notificationId);
 }
 
-QString LocalNotificationsManager::title(const QnUuid& notificationId) const
+QString LocalNotificationsManager::title(const nx::Uuid& notificationId) const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     return m_lookup.value(notificationId).title;
 }
 
-void LocalNotificationsManager::setTitle(const QnUuid& notificationId, const QString& value)
+void LocalNotificationsManager::setTitle(const nx::Uuid& notificationId, const QString& value)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     auto iter = m_lookup.find(notificationId);
@@ -72,13 +72,13 @@ void LocalNotificationsManager::setTitle(const QnUuid& notificationId, const QSt
     emit titleChanged(notificationId, value);
 }
 
-QString LocalNotificationsManager::description(const QnUuid& notificationId) const
+QString LocalNotificationsManager::description(const nx::Uuid& notificationId) const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     return m_lookup.value(notificationId).description;
 }
 
-void LocalNotificationsManager::setDescription(const QnUuid& notificationId, const QString& value)
+void LocalNotificationsManager::setDescription(const nx::Uuid& notificationId, const QString& value)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     auto iter = m_lookup.find(notificationId);
@@ -91,13 +91,13 @@ void LocalNotificationsManager::setDescription(const QnUuid& notificationId, con
     emit descriptionChanged(notificationId, value);
 }
 
-QPixmap LocalNotificationsManager::icon(const QnUuid& notificationId) const
+QPixmap LocalNotificationsManager::icon(const nx::Uuid& notificationId) const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     return m_lookup.value(notificationId).icon;
 }
 
-void LocalNotificationsManager::setIcon(const QnUuid& notificationId, const QPixmap& value)
+void LocalNotificationsManager::setIcon(const nx::Uuid& notificationId, const QPixmap& value)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     auto iter = m_lookup.find(notificationId);
@@ -111,14 +111,14 @@ void LocalNotificationsManager::setIcon(const QnUuid& notificationId, const QPix
 }
 
 std::optional<ProgressState> LocalNotificationsManager::progress(
-    const QnUuid& notificationId) const
+    const nx::Uuid& notificationId) const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     return m_lookup.value(notificationId).progress;
 }
 
 void LocalNotificationsManager::setProgress(
-    const QnUuid& notificationId, std::optional<ProgressState> value)
+    const nx::Uuid& notificationId, std::optional<ProgressState> value)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     auto iter = m_lookup.find(notificationId);
@@ -131,14 +131,14 @@ void LocalNotificationsManager::setProgress(
     emit progressChanged(notificationId, value);
 }
 
-QString LocalNotificationsManager::progressFormat(const QnUuid& notificationId) const
+QString LocalNotificationsManager::progressFormat(const nx::Uuid& notificationId) const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     return m_lookup.value(notificationId).format;
 }
 
 void LocalNotificationsManager::setProgressFormat(
-    const QnUuid& notificationId, const QString& value)
+    const nx::Uuid& notificationId, const QString& value)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     auto iter = m_lookup.find(notificationId);
@@ -151,13 +151,13 @@ void LocalNotificationsManager::setProgressFormat(
     emit progressFormatChanged(notificationId, value);
 }
 
-bool LocalNotificationsManager::isCancellable(const QnUuid& notificationId) const
+bool LocalNotificationsManager::isCancellable(const nx::Uuid& notificationId) const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     return m_lookup.value(notificationId).cancellable;
 }
 
-void LocalNotificationsManager::setCancellable(const QnUuid& notificationId, bool value)
+void LocalNotificationsManager::setCancellable(const nx::Uuid& notificationId, bool value)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     auto iter = m_lookup.find(notificationId);
@@ -170,13 +170,13 @@ void LocalNotificationsManager::setCancellable(const QnUuid& notificationId, boo
     emit cancellableChanged(notificationId, value);
 }
 
-CommandActionPtr LocalNotificationsManager::action(const QnUuid& notificationId) const
+CommandActionPtr LocalNotificationsManager::action(const nx::Uuid& notificationId) const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     return m_lookup.value(notificationId).action;
 }
 
-void LocalNotificationsManager::setAction(const QnUuid& notificationId, CommandActionPtr value)
+void LocalNotificationsManager::setAction(const nx::Uuid& notificationId, CommandActionPtr value)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     auto iter = m_lookup.find(notificationId);
@@ -189,13 +189,13 @@ void LocalNotificationsManager::setAction(const QnUuid& notificationId, CommandA
     emit actionChanged(notificationId, value);
 }
 
-CommandActionPtr LocalNotificationsManager::additionalAction(const QnUuid& notificationId) const
+CommandActionPtr LocalNotificationsManager::additionalAction(const nx::Uuid& notificationId) const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     return m_lookup.value(notificationId).additionalAction;
 }
 
-void LocalNotificationsManager::setAdditionalAction(const QnUuid& notificationId, CommandActionPtr value)
+void LocalNotificationsManager::setAdditionalAction(const nx::Uuid& notificationId, CommandActionPtr value)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     auto iter = m_lookup.find(notificationId);
@@ -208,14 +208,14 @@ void LocalNotificationsManager::setAdditionalAction(const QnUuid& notificationId
     emit additionalActionChanged(notificationId, value);
 }
 
-QnNotificationLevel::Value LocalNotificationsManager::level(const QnUuid& notificationId) const
+QnNotificationLevel::Value LocalNotificationsManager::level(const nx::Uuid& notificationId) const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     return m_lookup.value(notificationId).level;
 }
 
 void LocalNotificationsManager::setLevel(
-    const QnUuid& notificationId, QnNotificationLevel::Value level)
+    const nx::Uuid& notificationId, QnNotificationLevel::Value level)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     const auto iter = m_lookup.find(notificationId);
@@ -228,14 +228,14 @@ void LocalNotificationsManager::setLevel(
     emit levelChanged(notificationId, level);
 }
 
-QString LocalNotificationsManager::additionalText(const QnUuid& notificationId) const
+QString LocalNotificationsManager::additionalText(const nx::Uuid& notificationId) const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     return m_lookup[notificationId].additionalText;
 }
 
 void LocalNotificationsManager::setAdditionalText(
-    const QnUuid& notificationId, QString additionalText)
+    const nx::Uuid& notificationId, QString additionalText)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     const auto iter = m_lookup.find(notificationId);
@@ -248,14 +248,14 @@ void LocalNotificationsManager::setAdditionalText(
     emit additionalTextChanged(notificationId, additionalText);
 }
 
-QString LocalNotificationsManager::tooltip(const QnUuid& notificationId) const
+QString LocalNotificationsManager::tooltip(const nx::Uuid& notificationId) const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     return m_lookup[notificationId].tooltip;
 }
 
 void LocalNotificationsManager::setTooltip(
-    const QnUuid& notificationId, QString tooltip)
+    const nx::Uuid& notificationId, QString tooltip)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     const auto iter = m_lookup.find(notificationId);
@@ -268,7 +268,7 @@ void LocalNotificationsManager::setTooltip(
     emit tooltipChanged(notificationId, tooltip);
 }
 
-void LocalNotificationsManager::cancel(const QnUuid& notificationId)
+void LocalNotificationsManager::cancel(const nx::Uuid& notificationId)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     const auto iter = m_lookup.find(notificationId);
@@ -279,7 +279,7 @@ void LocalNotificationsManager::cancel(const QnUuid& notificationId)
     emit cancelRequested(notificationId);
 }
 
-void LocalNotificationsManager::interact(const QnUuid& notificationId)
+void LocalNotificationsManager::interact(const nx::Uuid& notificationId)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     if (!m_lookup.contains(notificationId))

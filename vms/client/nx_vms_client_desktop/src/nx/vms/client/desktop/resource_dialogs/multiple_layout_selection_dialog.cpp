@@ -23,7 +23,7 @@ AbstractEntityPtr createTreeEntity(const ResourceTreeEntityBuilder* builder)
 
 namespace nx::vms::client::desktop {
 
-bool MultipleLayoutSelectionDialog::selectLayouts(QnUuidSet& selectedLayoutsIds, QWidget* parent)
+bool MultipleLayoutSelectionDialog::selectLayouts(UuidSet& selectedLayoutsIds, QWidget* parent)
 {
     MultipleLayoutSelectionDialog dialog(selectedLayoutsIds, parent);
 
@@ -43,7 +43,7 @@ bool MultipleLayoutSelectionDialog::selectLayouts(QnUuidSet& selectedLayoutsIds,
 }
 
 MultipleLayoutSelectionDialog::MultipleLayoutSelectionDialog(
-    const QnUuidSet& selectedLayoutsIds,
+    const UuidSet& selectedLayoutsIds,
     QWidget* parent)
     :
     base_type(parent),

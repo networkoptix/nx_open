@@ -86,7 +86,7 @@ struct NX_VMS_API ThumbnailFilter
     static constexpr int kMaximumSize = 4096;
 
     /**%apidoc Device id. */
-    QnUuid id;
+    nx::Uuid id;
 
     /**%apidoc[opt] Timestamp of the image. A negative value means "latest".
      * %example 1000

@@ -22,11 +22,11 @@ public:
     virtual ~ProxyAccessRightsManager() override;
 
     /** A current subject being edited. */
-    QnUuid currentSubjectId() const;
-    void setCurrentSubjectId(const QnUuid& value);
+    nx::Uuid currentSubjectId() const;
+    void setCurrentSubjectId(const nx::Uuid& value);
 
     virtual nx::core::access::ResourceAccessMap ownResourceAccessMap(
-        const QnUuid & subjectId) const override;
+        const nx::Uuid & subjectId) const override;
 
     /** Overrides current subject access rights map. */
     void setOwnResourceAccessMap(const nx::core::access::ResourceAccessMap& value);

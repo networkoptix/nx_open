@@ -21,16 +21,16 @@ public:
     const nx::vms::api::ShowreelDataList& showreels() const;
     void resetShowreels(const nx::vms::api::ShowreelDataList& showreels = {});
 
-    nx::vms::api::ShowreelData showreel(const QnUuid& id) const;
-    nx::vms::api::ShowreelDataList showreels(const QList<QnUuid>& ids) const;
+    nx::vms::api::ShowreelData showreel(const nx::Uuid& id) const;
+    nx::vms::api::ShowreelDataList showreels(const QList<nx::Uuid>& ids) const;
 
     void addOrUpdateShowreel(const nx::vms::api::ShowreelData& showreel);
-    void removeShowreel(const QnUuid& showreelId);
+    void removeShowreel(const nx::Uuid& showreelId);
 
 signals:
     void showreelAdded(const nx::vms::api::ShowreelData& showreel);
     void showreelChanged(const nx::vms::api::ShowreelData& showreel);
-    void showreelRemoved(const QnUuid& showreelId);
+    void showreelRemoved(const nx::Uuid& showreelId);
 
 private:
     mutable nx::Mutex m_mutex;

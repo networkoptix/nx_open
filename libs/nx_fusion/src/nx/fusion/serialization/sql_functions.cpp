@@ -2,7 +2,7 @@
 
 #include "sql_functions.h"
 
-void serialize_field(const std::vector<QnUuid>&value, QVariant *target)
+void serialize_field(const std::vector<nx::Uuid>&value, QVariant *target)
 {
     QByteArray result;
     for (const auto& id: value)
@@ -10,7 +10,7 @@ void serialize_field(const std::vector<QnUuid>&value, QVariant *target)
     serialize_field(result, target);
 }
 
-void deserialize_field(const QVariant &value, std::vector<QnUuid> *target)
+void deserialize_field(const QVariant &value, std::vector<nx::Uuid> *target)
 {
     QByteArray tmp;
     deserialize_field(value, &tmp);
@@ -18,5 +18,5 @@ void deserialize_field(const QVariant &value, std::vector<QnUuid> *target)
     const char* data = tmp.data();
     const char* dataEnd = data + tmp.size();
     for(; data < dataEnd; data += 16)
-        target->push_back(QnUuid::fromRfc4122(QByteArray::fromRawData(data, 16)));
+        target->push_back(nx::Uuid::fromRfc4122(QByteArray::fromRawData(data, 16)));
 }

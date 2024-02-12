@@ -114,7 +114,7 @@ void TemporaryKeyKeeper<Value>::setOptions(TemporaryKeyOptions options)
 template<typename Value>
 typename TemporaryKeyKeeper<Value>::Key TemporaryKeyKeeper<Value>::make(Value value, Binding binding)
 {
-    const auto key = QnUuid::createUuid().toSimpleStdString();
+    const auto key = nx::Uuid::createUuid().toSimpleStdString();
     const auto result = addNew(key, std::move(value), std::move(binding));
     NX_CRITICAL(result, nx::format("Random UUID %1 clashed with existing").arg(key));
     return key;

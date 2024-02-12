@@ -39,24 +39,24 @@ void QnScrollableItemsWidget::setAlignment(Qt::Alignment alignment)
     d->setAlignment(alignment);
 }
 
-QnUuid QnScrollableItemsWidget::addItem(QGraphicsWidget* item, const QnUuid& externalId)
+nx::Uuid QnScrollableItemsWidget::addItem(QGraphicsWidget* item, const nx::Uuid& externalId)
 {
     return insertItem(count(), item, externalId);
 }
 
-QnUuid QnScrollableItemsWidget::insertItem(int index, QGraphicsWidget* item, const QnUuid& externalId)
+nx::Uuid QnScrollableItemsWidget::insertItem(int index, QGraphicsWidget* item, const nx::Uuid& externalId)
 {
     Q_D(QnScrollableItemsWidget);
     return d->insertItem(index, item, externalId);
 }
 
-QGraphicsWidget* QnScrollableItemsWidget::takeItem(const QnUuid& id)
+QGraphicsWidget* QnScrollableItemsWidget::takeItem(const nx::Uuid& id)
 {
     Q_D(QnScrollableItemsWidget);
     return d->takeItem(id);
 }
 
-bool QnScrollableItemsWidget::deleteItem(const QnUuid& id)
+bool QnScrollableItemsWidget::deleteItem(const nx::Uuid& id)
 {
     Q_D(QnScrollableItemsWidget);
     auto item = d->takeItem(id);
@@ -79,7 +79,7 @@ int QnScrollableItemsWidget::count() const
     return d->count();
 }
 
-QnUuid QnScrollableItemsWidget::itemId(int index) const
+nx::Uuid QnScrollableItemsWidget::itemId(int index) const
 {
     Q_D(const QnScrollableItemsWidget);
     return d->itemId(index);
@@ -91,7 +91,7 @@ QGraphicsWidget* QnScrollableItemsWidget::item(int index) const
     return d->item(index);
 }
 
-QGraphicsWidget* QnScrollableItemsWidget::item(const QnUuid& id) const
+QGraphicsWidget* QnScrollableItemsWidget::item(const nx::Uuid& id) const
 {
     Q_D(const QnScrollableItemsWidget);
     return d->item(id);

@@ -25,7 +25,7 @@ UserLayoutResourceIndex::UserLayoutResourceIndex(const QnResourcePool* resourceP
         this, &UserLayoutResourceIndex::onResourceRemoved);
 }
 
-QVector<QnResourcePtr> UserLayoutResourceIndex::layoutsWithParentUserId(const QnUuid& parentId) const
+QVector<QnResourcePtr> UserLayoutResourceIndex::layoutsWithParentUserId(const nx::Uuid& parentId) const
 {
     const auto layoutSet = m_layoutsByParentUserId.value(parentId);
     return QVector<QnResourcePtr>(layoutSet.cbegin(), layoutSet.cend());
@@ -58,14 +58,14 @@ void UserLayoutResourceIndex::onResourceRemoved(const QnResourcePtr& resource)
     if (!resource->hasFlags(Qn::layout) || resource->hasFlags(Qn::exported))
         return;
 
-    const QnUuid parentId = resource->getParentId();
+    const nx::Uuid parentId = resource->getParentId();
     m_layoutsByParentUserId[parentId].remove(resource);
     emit layoutRemoved(resource, parentId);
 }
 
 void UserLayoutResourceIndex::onLayoutParentIdChanged(
     const QnResourcePtr& layout,
-    const QnUuid& previousParentId)
+    const nx::Uuid& previousParentId)
 {
     m_layoutsByParentUserId[previousParentId].remove(layout);
     emit layoutRemoved(layout, previousParentId);
@@ -88,7 +88,7 @@ void UserLayoutResourceIndex::indexLayout(const QnResourcePtr& layout)
     connect(layout.get(), &QnResource::parentIdChanged,
         this, &UserLayoutResourceIndex::onLayoutParentIdChanged);
 
-    const QnUuid parentId = layout->getParentId();
+    const nx::Uuid parentId = layout->getParentId();
     m_layoutsByParentUserId[parentId].insert(layout);
     emit layoutAdded(layout, parentId);
 }

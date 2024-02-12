@@ -72,7 +72,7 @@ struct ResourceSupportProxy::Private:
     public SystemContextAware
 {
     ResourceSupportProxy* q = nullptr;
-    mutable std::map<QnUuid, std::map<QnUuid, SupportInfo>> supportInfoCache;
+    mutable std::map<nx::Uuid, std::map<nx::Uuid, SupportInfo>> supportInfoCache;
     mutable nx::Mutex mutex;
 
     Private(ResourceSupportProxy* q, SystemContext* systemContext):
@@ -94,7 +94,7 @@ struct ResourceSupportProxy::Private:
         directDisconnectAll();
     }
 
-    void manifestsMaybeUpdated(const QnUuid& resourceId, const QString& key)
+    void manifestsMaybeUpdated(const nx::Uuid& resourceId, const QString& key)
     {
         {
             NX_MUTEX_LOCKER lock(&mutex);
@@ -106,7 +106,7 @@ struct ResourceSupportProxy::Private:
         emit q->manifestsMaybeUpdated();
     }
 
-    void fillCacheIfNeeded(QnUuid deviceId) const
+    void fillCacheIfNeeded(nx::Uuid deviceId) const
     {
         if (supportInfoCache.contains(deviceId))
             return;
@@ -124,7 +124,7 @@ struct ResourceSupportProxy::Private:
         }
     }
 
-    bool isEventTypeSupported(const QString& eventTypeId, QnUuid deviceId, QnUuid engineId) const
+    bool isEventTypeSupported(const QString& eventTypeId, nx::Uuid deviceId, nx::Uuid engineId) const
     {
         if (!NX_ASSERT(!deviceId.isNull()))
             return false;
@@ -141,7 +141,7 @@ struct ResourceSupportProxy::Private:
         return supportInfoCache[deviceId][engineId].eventTypeSupport.contains(eventTypeId);
     }
 
-    bool isObjectTypeSupported(const QString& objectTypeId, QnUuid deviceId, QnUuid engineId) const
+    bool isObjectTypeSupported(const QString& objectTypeId, nx::Uuid deviceId, nx::Uuid engineId) const
     {
         if (!NX_ASSERT(!deviceId.isNull()))
             return false;
@@ -168,8 +168,8 @@ struct ResourceSupportProxy::Private:
     bool isEventTypeAttributeSupported(
         const QString& eventTypeId,
         const QString& fullAttributeName,
-        QnUuid deviceId,
-        QnUuid engineId) const
+        nx::Uuid deviceId,
+        nx::Uuid engineId) const
     {
         if (!isEventTypeSupported(eventTypeId, deviceId, engineId))
             return false;
@@ -191,8 +191,8 @@ struct ResourceSupportProxy::Private:
     bool isObjectTypeAttributeSupported(
         const QString& objectTypeId,
         const QString& fullAttributeName,
-        QnUuid deviceId,
-        QnUuid engineId) const
+        nx::Uuid deviceId,
+        nx::Uuid engineId) const
     {
         if (!isObjectTypeSupported(objectTypeId, deviceId, engineId))
             return false;
@@ -222,7 +222,7 @@ ResourceSupportProxy::~ResourceSupportProxy()
 }
 
 bool ResourceSupportProxy::isEntityTypeSupported(
-    EntityType entityType, const QString& entityTypeId, QnUuid deviceId, QnUuid engineId) const
+    EntityType entityType, const QString& entityTypeId, nx::Uuid deviceId, nx::Uuid engineId) const
 {
     NX_MUTEX_LOCKER lock(&d->mutex);
 
@@ -263,8 +263,8 @@ bool ResourceSupportProxy::isEntityTypeAttributeSupported(
     EntityType entityType,
     const QString& entityTypeId,
     const QString& fullAttributeName,
-    QnUuid deviceId,
-    QnUuid engineId) const
+    nx::Uuid deviceId,
+    nx::Uuid engineId) const
 {
     NX_MUTEX_LOCKER lock(&d->mutex);
 

@@ -14,7 +14,7 @@ protected:
     {
         aggregator.reset(new QnLayoutItemAggregator());
         QObject::connect(aggregator.data(), &QnLayoutItemAggregator::itemAdded,
-            [this](const QnUuid& resourceId)
+            [this](const nx::Uuid& resourceId)
             {
                 if (!m_awaiting)
                     return;
@@ -23,7 +23,7 @@ protected:
                 m_awaitedAddedItems.remove(resourceId);
             });
         QObject::connect(aggregator.data(), &QnLayoutItemAggregator::itemRemoved,
-            [this](const QnUuid& resourceId)
+            [this](const nx::Uuid& resourceId)
             {
                 if (!m_awaiting)
                     return;
@@ -44,29 +44,29 @@ protected:
         }
     }
 
-    QnLayoutResourcePtr createLayout(const QnUuid& id = QnUuid::createUuid())
+    QnLayoutResourcePtr createLayout(const nx::Uuid& id = nx::Uuid::createUuid())
     {
         QnLayoutResourcePtr layout(new QnLayoutResource());
         layout->setIdUnsafe(id);
         return layout;
     }
 
-    QnUuid addItem(const QnLayoutResourcePtr& layout, const QnUuid& resourceId = QnUuid::createUuid())
+    nx::Uuid addItem(const QnLayoutResourcePtr& layout, const nx::Uuid& resourceId = nx::Uuid::createUuid())
     {
         nx::vms::common::LayoutItemData item;
-        item.uuid = QnUuid::createUuid();
+        item.uuid = nx::Uuid::createUuid();
         item.resource.id = resourceId;
         layout->addItem(item);
         return resourceId;
     }
 
-    void awaitItemAdded(const QnUuid& resourceId)
+    void awaitItemAdded(const nx::Uuid& resourceId)
     {
         m_awaiting = true;
         m_awaitedAddedItems.insert(resourceId);
     }
 
-    void awaitItemRemoved(const QnUuid& resourceId)
+    void awaitItemRemoved(const nx::Uuid& resourceId)
     {
         m_awaiting = true;
         m_awaitedRemovedItems.insert(resourceId);
@@ -81,8 +81,8 @@ protected:
 
 private:
     bool m_awaiting = false;
-    QSet<QnUuid> m_awaitedAddedItems;
-    QSet<QnUuid> m_awaitedRemovedItems;
+    QSet<nx::Uuid> m_awaitedAddedItems;
+    QSet<nx::Uuid> m_awaitedRemovedItems;
 };
 
 TEST_F(QnLayoutItemAggregatorTest, checkInit)
@@ -115,17 +115,17 @@ TEST_F(QnLayoutItemAggregatorTest, checkLayoutItem)
 
 TEST_F(QnLayoutItemAggregatorTest, checkLayoutItemAbsent)
 {
-    auto targetId = QnUuid::createUuid();
+    auto targetId = nx::Uuid::createUuid();
     ASSERT_FALSE(aggregator->hasItem(targetId));
 }
 
 TEST_F(QnLayoutItemAggregatorTest, checkLayoutItemRemoved)
 {
-    auto targetId = QnUuid::createUuid();
+    auto targetId = nx::Uuid::createUuid();
     auto layout = createLayout();
 
     nx::vms::common::LayoutItemData item;
-    item.uuid = QnUuid::createUuid();
+    item.uuid = nx::Uuid::createUuid();
     item.resource.id = targetId;
     layout->addItem(item);
 
@@ -145,9 +145,9 @@ TEST_F(QnLayoutItemAggregatorTest, checkLayoutItemAdded)
 TEST_F(QnLayoutItemAggregatorTest, checkNullIdIgnored)
 {
     auto layout = createLayout();
-    addItem(layout, QnUuid());
+    addItem(layout, nx::Uuid());
     aggregator->addWatchedLayout(layout);
-    ASSERT_FALSE(aggregator->hasItem(QnUuid()));
+    ASSERT_FALSE(aggregator->hasItem(nx::Uuid()));
 }
 
 TEST_F(QnLayoutItemAggregatorTest, checkItemIfLayoutRemoved)
@@ -202,7 +202,7 @@ TEST_F(QnLayoutItemAggregatorTest, awaitItemAdded)
 {
     auto layout = createLayout();
     aggregator->addWatchedLayout(layout);
-    auto targetId = QnUuid::createUuid();
+    auto targetId = nx::Uuid::createUuid();
     awaitItemAdded(targetId);
     addItem(layout, targetId);
 }
@@ -219,7 +219,7 @@ TEST_F(QnLayoutItemAggregatorTest, doNotRepeatItemAdded)
 {
     auto layout = createLayout();
     aggregator->addWatchedLayout(layout);
-    auto targetId = QnUuid::createUuid();
+    auto targetId = nx::Uuid::createUuid();
     awaitItemAdded(targetId);
     addItem(layout, targetId);
     addItem(layout, targetId);
@@ -238,7 +238,7 @@ TEST_F(QnLayoutItemAggregatorTest, awaitItemRemoved)
 TEST_F(QnLayoutItemAggregatorTest, ignoreNullIdItemRemoved)
 {
     auto layout = createLayout();
-    addItem(layout, QnUuid());
+    addItem(layout, nx::Uuid());
     aggregator->addWatchedLayout(layout);
     setAwaiting(true);
     layout->setItems(nx::vms::common::LayoutItemDataList{});
@@ -257,7 +257,7 @@ TEST_F(QnLayoutItemAggregatorTest, awaitItemRemovedOnRemovingLayout)
 TEST_F(QnLayoutItemAggregatorTest, ignoreNullIdOnLayoutRemoved)
 {
     auto layout = createLayout();
-    addItem(layout, QnUuid());
+    addItem(layout, nx::Uuid());
     aggregator->addWatchedLayout(layout);
     setAwaiting(true);
     aggregator->removeWatchedLayout(layout);

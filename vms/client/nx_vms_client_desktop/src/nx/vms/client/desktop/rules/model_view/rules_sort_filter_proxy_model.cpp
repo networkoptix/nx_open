@@ -18,7 +18,7 @@ namespace nx::vms::client::desktop::rules {
 namespace {
 
 /** Returns whether any of the given camera resources match the given pattern. */
-bool matches(const QString& pattern, const QnUuidSet& ids)
+bool matches(const QString& pattern, const UuidSet& ids)
 {
     const auto resources = appContext()->currentSystemContext()->resourcePool()
         ->getResourcesByIds<QnVirtualCameraResource>(ids);
@@ -72,21 +72,21 @@ bool RulesSortFilterProxyModel::filterAcceptsRow(int sourceRow, const QModelInde
         || eventColumnIndex.data().toString().contains(filterRegExp)
         || commentColumnIndex.data().toString().contains(filterRegExp)
         || matches(filterRegExp.pattern(),
-            sourceColumnIndex.data(RulesTableModel::ResourceIdsRole).value<QnUuidSet>())
+            sourceColumnIndex.data(RulesTableModel::ResourceIdsRole).value<UuidSet>())
         || matches(filterRegExp.pattern(),
-            targetColumnIndex.data(RulesTableModel::ResourceIdsRole).value<QnUuidSet>());
+            targetColumnIndex.data(RulesTableModel::ResourceIdsRole).value<UuidSet>());
 }
 
-QnUuidList RulesSortFilterProxyModel::getRuleIds(const QList<int>& rows) const
+UuidList RulesSortFilterProxyModel::getRuleIds(const QList<int>& rows) const
 {
-    QnUuidList result;
+    UuidList result;
     for (const auto row: rows)
     {
         const auto ruleId =
            sourceModel()->data(mapToSource(index(row, 0)), RulesTableModel::RuleIdRole);
 
         if (ruleId.isValid())
-            result.push_back(ruleId.value<QnUuid>());
+            result.push_back(ruleId.value<nx::Uuid>());
     }
 
     return result;

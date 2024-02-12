@@ -16,7 +16,7 @@ class NX_VMS_COMMON_API PluginDiagnosticEvent: public InstantEvent
 public:
     explicit PluginDiagnosticEvent(
         qint64 timeStamp,
-        const QnUuid& engineResourceId,
+        const nx::Uuid& engineResourceId,
         const QString& caption,
         const QString& description,
         nx::vms::api::EventLevel level,
@@ -27,11 +27,11 @@ public:
 
     const QString& caption() const { return m_caption; }
     const QString& description() const { return m_description; }
-    QnUuid engineId() const { return m_engineResourceId; }
-    QnUuid deviceId() const
+    nx::Uuid engineId() const { return m_engineResourceId; }
+    nx::Uuid deviceId() const
     {
         if (!m_metadata.cameraRefs.empty())
-            return QnUuid(m_metadata.cameraRefs.front());
+            return nx::Uuid(m_metadata.cameraRefs.front());
 
         return {};
     }
@@ -39,7 +39,7 @@ public:
     nx::vms::api::EventLevel level() const { return m_metadata.level; }
 
 private:
-    const QnUuid m_engineResourceId;
+    const nx::Uuid m_engineResourceId;
     const QString m_caption;
     const QString m_description;
     /*const*/ EventMetaData m_metadata;

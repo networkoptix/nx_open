@@ -9,7 +9,7 @@ SelectServersDialogButton::SelectServersDialogButton(QWidget* parent):
     base_type(parent)
 {
     m_selectServersFunction =
-        [this](QnUuidSet& serverIds)
+        [this](UuidSet& serverIds)
         {
             return ServerSelectionDialog::selectServers(serverIds,
                 ServerSelectionDialog::ServerFilter(), QString(), this);

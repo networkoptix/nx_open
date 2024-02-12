@@ -13,10 +13,10 @@ namespace nx::vms::client::core {
 namespace {
 
 const auto lowerBound =
-    [](auto& buttons, const QnUuid& id)
+    [](auto& buttons, const nx::Uuid& id)
     {
         return std::lower_bound(buttons.begin(), buttons.end(), id,
-            [](const CameraButton& left, const QnUuid& id)
+            [](const CameraButton& left, const nx::Uuid& id)
             {
                 return left.id < id;
             });
@@ -31,7 +31,7 @@ struct BaseCameraButtonController::Private
 
     CameraButtons buttons;
     QnVirtualCameraResourcePtr camera;
-    QnUuidSet activeActions;
+    UuidSet activeActions;
 
     AccessController::NotifierPtr accessNotifier;
     Qn::Permissions requiredPermissions = Qn::NoPermissions;
@@ -138,7 +138,7 @@ CameraButtons BaseCameraButtonController::buttons() const
     return d->buttons;
 }
 
-OptionalCameraButton BaseCameraButtonController::button(const QnUuid& buttonId) const
+OptionalCameraButton BaseCameraButtonController::button(const nx::Uuid& buttonId) const
 {
     const auto it = lowerBound(d->buttons, buttonId);
     return it != d->buttons.end() && it->id == buttonId
@@ -146,7 +146,7 @@ OptionalCameraButton BaseCameraButtonController::button(const QnUuid& buttonId) 
         : OptionalCameraButton();
 }
 
-bool BaseCameraButtonController::startAction(const QnUuid& buttonId)
+bool BaseCameraButtonController::startAction(const nx::Uuid& buttonId)
 {
     const auto& targetButton = button(buttonId);
     if (!NX_ASSERT(targetButton, "Can't find button to activate!"))
@@ -158,7 +158,7 @@ bool BaseCameraButtonController::startAction(const QnUuid& buttonId)
     return setButtonActionState(*targetButton, ActionState::active);
 }
 
-bool BaseCameraButtonController::stopAction(const QnUuid& buttonId)
+bool BaseCameraButtonController::stopAction(const nx::Uuid& buttonId)
 {
     const auto& targetButton = button(buttonId);
     if (!NX_ASSERT(targetButton, "Can't find a button to activate an action!"))
@@ -170,7 +170,7 @@ bool BaseCameraButtonController::stopAction(const QnUuid& buttonId)
     return setButtonActionState(*targetButton, ActionState::inactive);
 }
 
-bool BaseCameraButtonController::cancelAction(const QnUuid& buttonId)
+bool BaseCameraButtonController::cancelAction(const nx::Uuid& buttonId)
 {
     const auto& targetButton = button(buttonId);
     if (!NX_ASSERT(targetButton, "Can't find a button to activate an action!"))
@@ -185,7 +185,7 @@ bool BaseCameraButtonController::cancelAction(const QnUuid& buttonId)
     return true;
 }
 
-bool BaseCameraButtonController::actionIsActive(const QnUuid& buttonId) const
+bool BaseCameraButtonController::actionIsActive(const nx::Uuid& buttonId) const
 {
     return d->activeActions.contains(buttonId);
 }
@@ -223,7 +223,7 @@ bool BaseCameraButtonController::addOrUpdateButton(const CameraButton& sourceBut
     return buttonIsMissing;
 }
 
-bool BaseCameraButtonController::removeButton(const QnUuid& buttonId)
+bool BaseCameraButtonController::removeButton(const nx::Uuid& buttonId)
 {
     const auto it = lowerBound(d->buttons, buttonId);
     if (it == d->buttons.end() || it->id != buttonId)
@@ -244,13 +244,13 @@ OptionalCameraButton BaseCameraButtonController::firstButton() const
         : OptionalCameraButton(currentButtons.front());
 }
 
-void BaseCameraButtonController::addActiveAction(const QnUuid& buttonId)
+void BaseCameraButtonController::addActiveAction(const nx::Uuid& buttonId)
 {
     if (NX_ASSERT(!actionIsActive(buttonId), "Can't activate button twice!"))
         d->activeActions.insert(buttonId);
 }
 
-void BaseCameraButtonController::removeActiveAction(const QnUuid& buttonId)
+void BaseCameraButtonController::removeActiveAction(const nx::Uuid& buttonId)
 {
     NX_ASSERT(d->activeActions.remove(buttonId), "Can't find active action");
 }

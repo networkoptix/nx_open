@@ -12,7 +12,7 @@ struct GeneralData
 {
     bool booleanValue = false;
     Flag flag = Flag::SomeFlag;
-    QnUuid id;
+    nx::Uuid id;
     QString someString;
 };
 

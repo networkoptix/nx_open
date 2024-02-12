@@ -56,8 +56,8 @@ NX_REFLECTION_INSTRUMENT(ServerRuntimeEventData, nx_vms_api_ServerRuntimeEventDa
 
 struct NX_VMS_API DeviceAgentSettingsMaybeChangedData
 {
-    QnUuid deviceId;
-    QnUuid engineId;
+    nx::Uuid deviceId;
+    nx::Uuid engineId;
 
     analytics::DeviceAgentSettingsResponse settingsData;
 };
@@ -70,7 +70,7 @@ NX_REFLECTION_INSTRUMENT(DeviceAgentSettingsMaybeChangedData,
 
 struct NX_VMS_API DeviceFootageChangedData
 {
-    std::vector<QnUuid> deviceIds;
+    std::vector<nx::Uuid> deviceIds;
 };
 
 #define nx_vms_api_DeviceFootageChangedData_Fields (deviceIds)
@@ -80,7 +80,7 @@ NX_REFLECTION_INSTRUMENT(DeviceFootageChangedData,
 
 struct NX_VMS_API AnalyticsStorageParametersChangedData
 {
-    QnUuid serverId;
+    nx::Uuid serverId;
 };
 
 #define nx_vms_api_AnalyticsStorageParametersChangedData_Fields (serverId)
@@ -90,7 +90,7 @@ NX_REFLECTION_INSTRUMENT(AnalyticsStorageParametersChangedData,
 
 struct NX_VMS_API DeviceAdvancedSettingsManifestChangedData
 {
-    std::set<QnUuid> deviceIds;
+    std::set<nx::Uuid> deviceIds;
 };
 #define nx_vms_api_DeviceAdvancedSettingsManifestChangedData_Fields (deviceIds)
 QN_FUSION_DECLARE_FUNCTIONS(DeviceAdvancedSettingsManifestChangedData, (json), NX_VMS_API)

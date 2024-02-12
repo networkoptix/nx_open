@@ -98,7 +98,7 @@ void LocalResourceProducer::createLocalResources(const QStringList& pathList)
         if (resource->getId().isNull() && !resourcePath.isEmpty())
         {
             // Create same IDs for the same files.
-            resource->setIdUnsafe(QnUuid::fromArbitraryData(resourcePath));
+            resource->setIdUnsafe(nx::Uuid::fromArbitraryData(resourcePath));
         }
 
         // Some resources can already be added to the Resource Pool.
@@ -257,7 +257,7 @@ QnFileLayoutResourcePtr ResourceDirectoryBrowser::layoutFromFile(
         return QnFileLayoutResourcePtr();
 
     // Check that the layout does not exist yet.
-    QnUuid layoutId = QnUuid::fromArbitraryData(layoutUrl);
+    nx::Uuid layoutId = nx::Uuid::fromArbitraryData(layoutUrl);
     if (resourcePool)
     {
         auto existingLayout = resourcePool->getResourceById<QnFileLayoutResource>(layoutId);

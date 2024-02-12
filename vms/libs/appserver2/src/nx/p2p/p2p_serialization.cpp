@@ -275,10 +275,10 @@ vms::api::TranState deserializeSubscribeAllRequest(const QByteArray& _response, 
     {
         if (in.readRawData(tmpBuffer.data(), tmpBuffer.size()) != kGuidSize)
             return result; //< Error.
-        fullId.id = QnUuid::fromRfc4122(tmpBuffer);
+        fullId.id = nx::Uuid::fromRfc4122(tmpBuffer);
         if (in.readRawData(tmpBuffer.data(), tmpBuffer.size()) != kGuidSize)
             return result; //< Error.
-        fullId.persistentId = QnUuid::fromRfc4122(tmpBuffer);
+        fullId.persistentId = nx::Uuid::fromRfc4122(tmpBuffer);
         in >> sequence;
 
         result.values.insert(fullId, sequence);
@@ -379,10 +379,10 @@ const QVector<PeerNumberResponseRecord> deserializeResolvePeerNumberResponse(con
         in >> shortPeerNumber;
         if (in.readRawData(tmpBuffer.data(), tmpBuffer.size()) != kGuidSize)
             return result;
-        fullId.id = QnUuid::fromRfc4122(tmpBuffer);
+        fullId.id = nx::Uuid::fromRfc4122(tmpBuffer);
         if (in.readRawData(tmpBuffer.data(), tmpBuffer.size()) != kGuidSize)
             return result;
-        fullId.persistentId = QnUuid::fromRfc4122(tmpBuffer);
+        fullId.persistentId = nx::Uuid::fromRfc4122(tmpBuffer);
 
         result.push_back(PeerNumberResponseRecord(shortPeerNumber, fullId));
     }
@@ -430,7 +430,7 @@ TransportHeader deserializeTransportHeader(const QByteArray& response, int* byte
     {
         if (in.readRawData(tmpBuffer.data(), tmpBuffer.size()) != kGuidSize)
             return result; //< Error
-        result.via.insert(QnUuid::fromRfc4122(tmpBuffer));
+        result.via.insert(nx::Uuid::fromRfc4122(tmpBuffer));
         --size;
     }
 
@@ -441,7 +441,7 @@ TransportHeader deserializeTransportHeader(const QByteArray& response, int* byte
     {
         if (in.readRawData(tmpBuffer.data(), tmpBuffer.size()) != kGuidSize)
             return result; //< Error
-        result.dstPeers.push_back(QnUuid::fromRfc4122(tmpBuffer));
+        result.dstPeers.push_back(nx::Uuid::fromRfc4122(tmpBuffer));
         --size;
     }
 
@@ -472,7 +472,7 @@ vms::api::PeerDataEx deserializePeerData(
 
     const auto guidHeaderIt = headers.find(Qn::EC2_CONNECTION_GUID_HEADER_NAME);
     if (guidHeaderIt != headers.cend())
-        peer.connectionGuid = QnUuid::fromStringSafe(guidHeaderIt->second);
+        peer.connectionGuid = nx::Uuid::fromStringSafe(guidHeaderIt->second);
 
     return peer;
 }
@@ -489,12 +489,12 @@ vms::api::PeerDataEx deserializePeerData(const network::http::Request& request)
     if (result.id.isNull())
     {
         if (query.hasQueryItem("guid"))
-            result.id = QnUuid(query.queryItemValue("guid"));
+            result.id = nx::Uuid(query.queryItemValue("guid"));
         if (query.hasQueryItem("runtime-guid"))
-            result.instanceId = QnUuid(query.queryItemValue("runtime-guid"));
+            result.instanceId = nx::Uuid(query.queryItemValue("runtime-guid"));
     }
     if (query.hasQueryItem(Qn::EC2_CONNECTION_GUID_HEADER_NAME))
-        result.connectionGuid = QnUuid(query.queryItemValue(Qn::EC2_CONNECTION_GUID_HEADER_NAME));
+        result.connectionGuid = nx::Uuid(query.queryItemValue(Qn::EC2_CONNECTION_GUID_HEADER_NAME));
 
 
     if (result.peerType == nx::vms::api::PeerType::notDefined)
@@ -505,9 +505,9 @@ vms::api::PeerDataEx deserializePeerData(const network::http::Request& request)
     }
 
     if (result.id.isNull())
-        result.id = QnUuid::createUuid();
+        result.id = nx::Uuid::createUuid();
     if (result.connectionGuid.isNull())
-        result.connectionGuid = QnUuid::createUuid();
+        result.connectionGuid = nx::Uuid::createUuid();
 
     result.dataFormat = dataFormat;
 

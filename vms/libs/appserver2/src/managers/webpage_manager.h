@@ -24,7 +24,7 @@ public:
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
 
     virtual int remove(
-        const QnUuid& id,
+        const nx::Uuid& id,
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
 
@@ -52,9 +52,9 @@ int QnWebPageManager<QueryProcessorType>::getWebPages(
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
     const int requestId = generateRequestID();
-    processor().template processQueryAsync<QnUuid, nx::vms::api::WebPageDataList>(
+    processor().template processQueryAsync<nx::Uuid, nx::vms::api::WebPageDataList>(
         ApiCommand::getWebPages,
-        QnUuid(),
+        nx::Uuid(),
         [requestId, handler = handlerExecutor.bind(std::move(handler))](auto&&... args) mutable
         {
             handler(requestId, std::move(args)...);
@@ -81,7 +81,7 @@ int QnWebPageManager<QueryProcessorType>::save(
 
 template<class QueryProcessorType>
 int QnWebPageManager<QueryProcessorType>::remove(
-    const QnUuid& id,
+    const nx::Uuid& id,
     Handler<> handler,
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {

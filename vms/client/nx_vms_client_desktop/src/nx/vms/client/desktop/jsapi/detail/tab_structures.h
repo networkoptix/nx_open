@@ -78,7 +78,7 @@ NX_REFLECTION_INSTRUMENT(ItemParams,(selected)(focused)(geometry)(media))
 struct Item
 {
     /** Unique item identifier. */
-    QnUuid id;
+    nx::Uuid id;
 
     /** Resource connected to the item. */
     Resource resource;

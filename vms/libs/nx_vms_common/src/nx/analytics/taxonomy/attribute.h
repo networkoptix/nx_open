@@ -48,7 +48,7 @@ public:
 
     virtual QVariant maxValue() const override;
 
-    virtual bool isSupported(QnUuid engineId, QnUuid deviceId) const override;
+    virtual bool isSupported(nx::Uuid engineId, nx::Uuid deviceId) const override;
 
     virtual QString condition() const override;
 

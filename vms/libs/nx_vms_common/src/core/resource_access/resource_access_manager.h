@@ -53,12 +53,12 @@ public:
         const QnResourceAccessSubject& subject, const QnResourcePtr& resource) const;
 
     nx::vms::api::AccessRights accessRights(
-        const QnResourceAccessSubject& subject, const QnUuid& resourceGroupId) const;
+        const QnResourceAccessSubject& subject, const nx::Uuid& resourceGroupId) const;
 
     bool hasAccessRights(const QnResourceAccessSubject& subject, const QnResourcePtr& resource,
         nx::vms::api::AccessRights requiredAccessRights) const;
 
-    bool hasAccessRights(const QnResourceAccessSubject& subject, const QnUuid& resourceGroupId,
+    bool hasAccessRights(const QnResourceAccessSubject& subject, const nx::Uuid& resourceGroupId,
         nx::vms::api::AccessRights requiredAccessRights) const;
 
     nx::core::access::ResourceAccessMap resourceAccessMap(
@@ -109,7 +109,7 @@ public:
      * @returns Permissions that user have for the given resource.
      */
     Qn::Permissions permissions(const QnResourceAccessSubject& subject,
-        const QnUuid& targetId) const;
+        const nx::Uuid& targetId) const;
 
     /**
      * @param subject User or group that should have permissions.
@@ -141,7 +141,7 @@ public:
      */
     bool hasPermission(
         const QnResourceAccessSubject& subject,
-        const QnUuid& targetId,
+        const nx::Uuid& targetId,
         Qn::Permissions requiredPermissions) const;
 
     /**
@@ -160,7 +160,7 @@ public:
      * the specified resource, directly and indirectly.
      */
     nx::core::access::ResourceAccessDetails accessDetails(
-        const QnUuid& subjectId,
+        const nx::Uuid& subjectId,
         const QnResourcePtr& resource,
         nx::vms::api::AccessRight accessRight) const;
 
@@ -209,7 +209,7 @@ public:
     }
 
     bool hasAccessToAllCameras(
-        const QnUuid& userId,
+        const nx::Uuid& userId,
         nx::vms::api::AccessRights accessRights) const;
 
     bool hasAccessToAllCameras(
@@ -238,7 +238,7 @@ public:
         const nx::vms::api::StorageData& data) const;
     bool canCreateStorage(
         const QnResourceAccessSubject& subject,
-        const QnUuid& storageParentId) const;
+        const nx::Uuid& storageParentId) const;
     bool canModifyStorage(
         const QnResourceAccessSubject& subject,
         const QnResourcePtr& target,
@@ -253,7 +253,7 @@ public:
     bool canCreateUser(
         const QnResourceAccessSubject& subject,
         GlobalPermissions targetPermissions,
-        const std::vector<QnUuid>& targetGroups) const;
+        const std::vector<nx::Uuid>& targetGroups) const;
     bool canModifyUser(
         const QnResourceAccessSubject& subject,
         const QnResourcePtr& target,
@@ -292,7 +292,7 @@ private:
         const QnResourcePtr& target) const;
 
     nx::vms::api::GlobalPermissions accumulatePermissions(nx::vms::api::GlobalPermissions own,
-        const std::vector<QnUuid>& parentGroups) const;
+        const std::vector<nx::Uuid>& parentGroups) const;
 
     Qn::Permissions calculatePermissions(const QnResourceAccessSubject& subject,
         const QnResourcePtr& target) const;

@@ -45,7 +45,7 @@ public:
         std::optional<nx::network::http::Credentials> credentials;
 
         /** Server id if request is being proxied through another server. */
-        std::optional<QnUuid> gatewayId;
+        std::optional<nx::Uuid> gatewayId;
     };
 
     // TODO: Should be merged with nx::network::http::Response
@@ -77,7 +77,7 @@ public:
     public:
         using milliseconds = std::chrono::milliseconds;
 
-        Context(const QnUuid& adapterFuncId, ssl::AdapterFunc adapterFunc):
+        Context(const nx::Uuid& adapterFuncId, ssl::AdapterFunc adapterFunc):
             adapterFuncId(adapterFuncId), adapterFunc(std::move(adapterFunc))
         {
         }
@@ -97,7 +97,7 @@ public:
             canceled,
         };
 
-        QnUuid adapterFuncId;
+        nx::Uuid adapterFuncId;
         ssl::AdapterFunc adapterFunc;
         Request request;
         Response response;

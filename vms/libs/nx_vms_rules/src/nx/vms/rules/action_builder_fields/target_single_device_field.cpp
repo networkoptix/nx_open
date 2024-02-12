@@ -11,12 +11,12 @@
 
 namespace nx::vms::rules {
 
-QnUuid TargetSingleDeviceField::id() const
+nx::Uuid TargetSingleDeviceField::id() const
 {
     return m_id;
 }
 
-void TargetSingleDeviceField::setId(QnUuid id)
+void TargetSingleDeviceField::setId(nx::Uuid id)
 {
     if (m_id == id)
         return;

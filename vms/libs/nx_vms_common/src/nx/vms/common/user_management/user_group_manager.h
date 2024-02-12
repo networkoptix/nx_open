@@ -28,23 +28,23 @@ public:
         all
     };
 
-    std::unordered_map<QnUuid, nx::vms::api::UserGroupData> customGroups(
+    std::unordered_map<nx::Uuid, nx::vms::api::UserGroupData> customGroups(
         std::function<bool(const nx::vms::api::UserGroupData&)> predicate) const;
 
-    std::vector<QnUuid> customGroupIds(
+    std::vector<nx::Uuid> customGroupIds(
         std::function<bool(const nx::vms::api::UserGroupData&)> predicate) const;
 
     /** Returns list of all user groups of specified types. */
     nx::vms::api::UserGroupDataList groups(Selection types = Selection::all) const;
 
     /** Returns list of all user group ids of specified types. */
-    QList<QnUuid> ids(Selection types = Selection::all) const;
+    QList<nx::Uuid> ids(Selection types = Selection::all) const;
 
     /** Returns whether a predefined or custom user group specified by id exists. */
-    bool contains(const QnUuid& groupId) const;
+    bool contains(const nx::Uuid& groupId) const;
 
     /** Returns predefined or custom user group data by specified id, if exists. */
-    std::optional<nx::vms::api::UserGroupData> find(const QnUuid& groupId) const;
+    std::optional<nx::vms::api::UserGroupData> find(const nx::Uuid& groupId) const;
 
     /** Returns predefined or custom user group data list by specified id list. */
     template<class IDList>
@@ -60,7 +60,7 @@ public:
      *
      * @return A structure with two vectors:
      *         - `.groups`: Results of calling `f` with `UserGroupData`.
-     *         - `.notFound`: `QnUuid`s of IDs not found.
+     *         - `.notFound`: `nx::Uuid`s of IDs not found.
      *
      * \code{.cpp}
      * auto [groups, notFound] = manager.mapGroupsByIds(groupIds,
@@ -68,7 +68,7 @@ public:
      *     {
      *         struct SelectedProps
      *         {
-     *             QnUuid id;
+     *             nx::Uuid id;
      *             UserType type;
      *         };
      *         return SelectedProps{data.id, data.type};
@@ -88,7 +88,7 @@ public:
     bool addOrUpdate(const nx::vms::api::UserGroupData& group);
 
     /** Removes specified custom user group. */
-    bool remove(const QnUuid& groupId);
+    bool remove(const nx::Uuid& groupId);
 
 signals:
     void reset();
@@ -124,7 +124,7 @@ auto UserGroupManager::mapGroupsByIds(const IDList& ids, UnaryFunction f) const
     struct
     {
         std::vector<result_value_type> groups;
-        std::vector<QnUuid> notFound;
+        std::vector<nx::Uuid> notFound;
     } result;
 
     result.groups.reserve(ids.size());

@@ -48,7 +48,7 @@ struct LdapSettings
     Q_PROPERTY(QString groupObjectClass MEMBER groupObjectClass)
     Q_PROPERTY(QString memberAttribute MEMBER memberAttribute)
 
-    Q_PROPERTY(QnUuid preferredSyncServer MEMBER preferredSyncServer)
+    Q_PROPERTY(nx::Uuid preferredSyncServer MEMBER preferredSyncServer)
     Q_PROPERTY(bool isHttpDigestEnabledOnImport MEMBER isHttpDigestEnabledOnImport)
     Q_PROPERTY(bool isHttpDigestEnabledOnImportInitial MEMBER isHttpDigestEnabledOnImportInitial)
 
@@ -69,7 +69,7 @@ public:
     QString groupObjectClass;
     QString memberAttribute;
 
-    QnUuid preferredSyncServer;
+    nx::Uuid preferredSyncServer;
     bool isHttpDigestEnabledOnImport = false;
     bool isHttpDigestEnabledOnImportInitial = false;
 };

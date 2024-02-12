@@ -83,7 +83,7 @@ public:
      * @return Ids of Analytics Engines which are actually compatible with the Device, enabled by
      *     the user and active (running on the current server). Includes device-dependent Engines.
      */
-    virtual QSet<QnUuid> enabledAnalyticsEngines() const;
+    virtual QSet<nx::Uuid> enabledAnalyticsEngines() const;
 
     /**
      * @return Analytics Engines which are actually compatible with the Device, enabled by the user
@@ -95,13 +95,13 @@ public:
      * @return Ids of Analytics Engines which are explicitly enabled by the user. Not validated for
      *     compatibility with the Device or if the engine is active (running on the current server).
      */
-    QSet<QnUuid> userEnabledAnalyticsEngines() const;
+    QSet<nx::Uuid> userEnabledAnalyticsEngines() const;
 
     /**
      * Set ids of Analytics Engines which are explicitly enabled by the user. Not validated for
      * compatibility with the Device or if the Engine is active (running on the current server).
      */
-    void setUserEnabledAnalyticsEngines(const QSet<QnUuid>& engines);
+    void setUserEnabledAnalyticsEngines(const QSet<nx::Uuid>& engines);
 
     /**
      * Set ids of Analytics Engines which are explicitly enabled by the user.
@@ -109,13 +109,13 @@ public:
      * it to the resource properties.
      */
     nx::vms::api::ResourceParamData serializeUserEnabledAnalyticsEngines(
-        const QSet<QnUuid>& engines);
+        const QSet<nx::Uuid>& engines);
 
     /**
      * @return Ids of Analytics Engines which can be potentially used with the Device. Only active
      *     (running on the current server) Engines are included.
      */
-    virtual const QSet<QnUuid> compatibleAnalyticsEngines() const;
+    virtual const QSet<nx::Uuid> compatibleAnalyticsEngines() const;
 
     /**
      * @return Analytics Engines which can be potentially used with the Device. Only active
@@ -127,16 +127,16 @@ public:
      * Set ids of Analytics Engines which can be potentially used with the Device. Only active
      * (running on the current server) Engines must be included.
      */
-    void setCompatibleAnalyticsEngines(const QSet<QnUuid>& engines);
+    void setCompatibleAnalyticsEngines(const QSet<nx::Uuid>& engines);
 
-    using AnalyticsEntitiesByEngine = std::map<QnUuid, std::set<QString>>;
+    using AnalyticsEntitiesByEngine = std::map<nx::Uuid, std::set<QString>>;
 
     /**
      * Utility function to filter only those entities, which are supported by the provided engines.
      */
     static AnalyticsEntitiesByEngine filterByEngineIds(
         AnalyticsEntitiesByEngine entitiesByEngine,
-        const QSet<QnUuid>& engineIds);
+        const QSet<nx::Uuid>& engineIds);
 
     /**
      * @return Map of supported Event types by the Engine id. Only actually compatible with the
@@ -153,15 +153,15 @@ public:
         bool filterByEngines = true) const;
 
     std::optional<nx::vms::api::analytics::DeviceAgentManifest> deviceAgentManifest(
-        const QnUuid& engineId) const;
+        const nx::Uuid& engineId) const;
 
     void setDeviceAgentManifest(
-        const QnUuid& engineId,
+        const nx::Uuid& engineId,
         const nx::vms::api::analytics::DeviceAgentManifest& manifest);
 
-    nx::vms::api::StreamIndex analyzedStreamIndex(QnUuid engineId) const;
+    nx::vms::api::StreamIndex analyzedStreamIndex(nx::Uuid engineId) const;
 
-    void setAnalyzedStreamIndex(QnUuid engineId, nx::vms::api::StreamIndex streamIndex);
+    void setAnalyzedStreamIndex(nx::Uuid engineId, nx::vms::api::StreamIndex streamIndex);
 
     virtual bool hasDualStreamingInternal() const override;
 
@@ -238,9 +238,9 @@ public:
      */
     QString forcedProfile(nx::vms::api::StreamIndex index) const;
 
-    static QSet<QnUuid> calculateUserEnabledAnalyticsEngines(const QString& value);
+    static QSet<nx::Uuid> calculateUserEnabledAnalyticsEngines(const QString& value);
 
-    using DeviceAgentManifestMap = std::map<QnUuid, nx::vms::api::analytics::DeviceAgentManifest>;
+    using DeviceAgentManifestMap = std::map<nx::Uuid, nx::vms::api::analytics::DeviceAgentManifest>;
     DeviceAgentManifestMap deviceAgentManifests() const;
 
 signals:
@@ -263,27 +263,27 @@ private:
         std::function<std::set<QString>(const nx::vms::api::analytics::DeviceAgentManifest&)>;
 
 private:
-    QSet<QnUuid> calculateUserEnabledAnalyticsEngines() const;
+    QSet<nx::Uuid> calculateUserEnabledAnalyticsEngines() const;
 
-    QSet<QnUuid> calculateCompatibleAnalyticsEngines() const;
+    QSet<nx::Uuid> calculateCompatibleAnalyticsEngines() const;
 
-    std::map<QnUuid, std::set<QString>> calculateSupportedEntities(
+    std::map<nx::Uuid, std::set<QString>> calculateSupportedEntities(
         ManifestItemIdsFetcher fetcher) const;
-    std::map<QnUuid, std::set<QString>> calculateSupportedEventTypes() const;
-    std::map<QnUuid, std::set<QString>> calculateSupportedObjectTypes() const;
+    std::map<nx::Uuid, std::set<QString>> calculateSupportedEventTypes() const;
+    std::map<nx::Uuid, std::set<QString>> calculateSupportedObjectTypes() const;
 
 
     std::optional<nx::vms::api::StreamIndex> obtainUserChosenAnalyzedStreamIndex(
-        QnUuid engineId) const;
-    nx::vms::api::StreamIndex analyzedStreamIndexInternal(const QnUuid& engineId) const;
+        nx::Uuid engineId) const;
+    nx::vms::api::StreamIndex analyzedStreamIndexInternal(const nx::Uuid& engineId) const;
 
 private:
-    nx::utils::CachedValue<QSet<QnUuid>> m_cachedUserEnabledAnalyticsEngines;
-    nx::utils::CachedValue<QSet<QnUuid>> m_cachedCompatibleAnalyticsEngines;
+    nx::utils::CachedValue<QSet<nx::Uuid>> m_cachedUserEnabledAnalyticsEngines;
+    nx::utils::CachedValue<QSet<nx::Uuid>> m_cachedCompatibleAnalyticsEngines;
     nx::utils::CachedValue<DeviceAgentManifestMap> m_cachedDeviceAgentManifests;
-    nx::utils::CachedValue<std::map<QnUuid, std::set<QString>>> m_cachedSupportedEventTypes;
-    nx::utils::CachedValue<std::map<QnUuid, std::set<QString>>> m_cachedSupportedObjectTypes;
-    mutable nx::utils::Lockable<std::map<QnUuid, nx::vms::api::StreamIndex>> m_cachedAnalyzedStreamIndex;
+    nx::utils::CachedValue<std::map<nx::Uuid, std::set<QString>>> m_cachedSupportedEventTypes;
+    nx::utils::CachedValue<std::map<nx::Uuid, std::set<QString>>> m_cachedSupportedObjectTypes;
+    mutable nx::utils::Lockable<std::map<nx::Uuid, nx::vms::api::StreamIndex>> m_cachedAnalyzedStreamIndex;
 };
 
 constexpr QSize EMPTY_RESOLUTION_PAIR(0, 0);

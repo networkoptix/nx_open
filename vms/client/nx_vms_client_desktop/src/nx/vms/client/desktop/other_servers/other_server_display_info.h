@@ -17,7 +17,7 @@ class OtherServersManager;
 class NX_VMS_CLIENT_DESKTOP_API OtherServerDisplayInfo
 {
 public:
-    OtherServerDisplayInfo(const QnUuid& serverId, const OtherServersManager* otherServersManager);
+    OtherServerDisplayInfo(const nx::Uuid& serverId, const OtherServersManager* otherServersManager);
 
     QString name() const;
     QString host() const;
@@ -29,7 +29,7 @@ public:
 private:
     const OtherServersManager* m_otherServerManager;
 
-    const QnUuid m_serverId;
+    const nx::Uuid m_serverId;
 
     /** How detailed the info should be constructed. */
     mutable Qn::ResourceInfoLevel m_detailLevel = Qn::RI_Invalid;

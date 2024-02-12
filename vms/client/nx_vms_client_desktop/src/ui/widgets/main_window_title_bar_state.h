@@ -27,14 +27,14 @@ struct MainWindowTitleBarState
 
     bool expanded = false;
     bool homeTabActive = false;
-    QnUuid currentSystemId;
+    nx::Uuid currentSystemId;
     int activeSystemTab = -1;
     ConnectActionsHandler::LogicalState connectState =
         ConnectActionsHandler::LogicalState::disconnected;
     QList<SystemData> systems;
     bool systemUpdating = false;
 
-    int findSystemIndex(const QnUuid& systemId) const;
+    int findSystemIndex(const nx::Uuid& systemId) const;
 };
 
 class MainWindowTitleBarStateStore: public QObject, public FluxStateStore<MainWindowTitleBarState>
@@ -49,14 +49,14 @@ public:
 
     void setExpanded(bool value);
     void setHomeTabActive(bool value);
-    void setCurrentSystemId(QnUuid value);
+    void setCurrentSystemId(nx::Uuid value);
     void setActiveSystemTab(int value);
     void setConnectionState(ConnectActionsHandler::LogicalState value);
 
     void addSystem(const QnSystemDescriptionPtr& systemDescription, const LogonData& logonData);
     void insertSystem(int index, const State::SystemData systemData);
     void removeSystem(const QnSystemDescriptionPtr& systemDescription);
-    void removeSystem(const QnUuid& systemId);
+    void removeSystem(const nx::Uuid& systemId);
     void removeSystem(int index);
     void removeCurrentSystem();
     void changeCurrentSystem(QnSystemDescriptionPtr systemDescription);
@@ -70,8 +70,8 @@ public:
     bool isHomeTabActive() const;
     bool isLayoutPanelHidden() const;
     int activeSystemTab() const;
-    QnUuid currentSystemId() const;
-    WorkbenchState workbenchState(const QnUuid& systemId) const;
+    nx::Uuid currentSystemId() const;
+    WorkbenchState workbenchState(const nx::Uuid& systemId) const;
     bool isTitleBarEnabled() const;
 
 signals:

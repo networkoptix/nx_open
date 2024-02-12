@@ -27,7 +27,7 @@ TEST(TemporaryKeyKeeper, MakeExpiration)
     TemporaryKeyKeeper<std::string> keeper({5min, /*prolongLifeOnUse*/ false});
     ASSERT_EQ(0, keeper.size());
 
-    const auto key0 = QnUuid::createUuid().toSimpleStdString();
+    const auto key0 = nx::Uuid::createUuid().toSimpleStdString();
     ASSERT_FALSE((bool) keeper.get(key0));
 
     const auto key1 = keeper.make(*kUser1);
@@ -50,7 +50,7 @@ TEST(TemporaryKeyKeeper, AddExpiration)
 {
     utils::test::ScopedSyntheticMonotonicTime timeShift;
     TemporaryKeyKeeper<std::string> keeper({5min, /*prolongLifeOnUse*/ false});
-    const auto key = QnUuid::createUuid().toSimpleStdString();
+    const auto key = nx::Uuid::createUuid().toSimpleStdString();
     ASSERT_FALSE((bool) keeper.get(key));
 
     ASSERT_TRUE(keeper.addNew(key, *kUser1));

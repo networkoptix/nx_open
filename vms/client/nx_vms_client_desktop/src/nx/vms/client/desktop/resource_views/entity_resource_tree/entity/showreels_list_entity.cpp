@@ -19,7 +19,7 @@ ShowreelsListEntity::ShowreelsListEntity(
 {
     const auto showreels = showreelManager->showreels();
 
-    QVector<QnUuid> showreelIds;
+    QVector<nx::Uuid> showreelIds;
     for (const auto& showreel: showreels)
         showreelIds.push_back(showreel.id);
 
@@ -31,7 +31,7 @@ ShowreelsListEntity::ShowreelsListEntity(
 
     m_connectionsGuard.add(
         showreelManager->connect(showreelManager, &common::ShowreelManager::showreelRemoved,
-        [this](const QnUuid& showreelId) { removeItem(showreelId); }));
+        [this](const nx::Uuid& showreelId) { removeItem(showreelId); }));
 }
 
 } // namespace entity_resource_tree

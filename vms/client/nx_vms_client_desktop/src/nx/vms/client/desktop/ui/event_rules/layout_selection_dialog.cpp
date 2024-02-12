@@ -201,7 +201,7 @@ void LayoutSelectionDialog::at_sharedLayoutSelected()
 }
 
 void LayoutSelectionDialog::setLocalLayouts(const QnResourceList& layouts,
-    const QSet<QnUuid>& selection, LocalLayoutSelection mode)
+    const QSet<nx::Uuid>& selection, LocalLayoutSelection mode)
 {
     NX_ASSERT(m_localLayoutsModel);
 
@@ -226,7 +226,7 @@ void LayoutSelectionDialog::setLocalLayouts(const QnResourceList& layouts,
     }
 }
 
-void LayoutSelectionDialog::setSharedLayouts(const QnResourceList& layouts, const QSet<QnUuid>& selection)
+void LayoutSelectionDialog::setSharedLayouts(const QnResourceList& layouts, const QSet<nx::Uuid>& selection)
 {
     NX_ASSERT(m_sharedLayoutsModel);
 
@@ -234,9 +234,9 @@ void LayoutSelectionDialog::setSharedLayouts(const QnResourceList& layouts, cons
     m_sharedLayoutsModel->setCheckedResources(selection);
 }
 
-QSet<QnUuid> LayoutSelectionDialog::checkedLayouts() const
+QSet<nx::Uuid> LayoutSelectionDialog::checkedLayouts() const
 {
-    QSet<QnUuid> result;
+    QSet<nx::Uuid> result;
 
     auto local = m_localLayoutsModel->checkedResources();
     auto shared = m_sharedLayoutsModel->checkedResources();
@@ -244,9 +244,9 @@ QSet<QnUuid> LayoutSelectionDialog::checkedLayouts() const
     if (m_singlePick)
     {
         if (!local.empty())
-            return QSet<QnUuid>{*local.begin()};
+            return QSet<nx::Uuid>{*local.begin()};
         if (!shared.empty())
-            return QSet<QnUuid>{*shared.begin()};
+            return QSet<nx::Uuid>{*shared.begin()};
     }
     result |= local;
     result |= shared;

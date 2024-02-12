@@ -60,7 +60,7 @@ RulesTableModel::RulesTableModel(QObject* parent):
     connect(m_engine, &vms::rules::Engine::rulesReset, this, &RulesTableModel::onRulesReset);
 }
 
-void RulesTableModel::onRuleAddedOrUpdated(QnUuid ruleId, bool added)
+void RulesTableModel::onRuleAddedOrUpdated(nx::Uuid ruleId, bool added)
 {
     NX_VERBOSE(this, "Rule %1 is %2", ruleId, (added ? "added" : "updated"));
 
@@ -81,7 +81,7 @@ void RulesTableModel::onRuleAddedOrUpdated(QnUuid ruleId, bool added)
     }
 };
 
-void RulesTableModel::onRuleRemoved(QnUuid ruleId)
+void RulesTableModel::onRuleRemoved(nx::Uuid ruleId)
 {
     NX_VERBOSE(this, "Rule %1 is removed", ruleId);
 
@@ -436,7 +436,7 @@ QVariant RulesTableModel::targetCameraData(const vms::rules::ActionBuilder* acti
     else if (const auto targetSingleDeviceField = actionBuilder->fieldByType<vms::rules::TargetSingleDeviceField>())
     {
         useSource = targetSingleDeviceField->useSource();
-        resources = resourcePool->getResourcesByIds<QnVirtualCameraResource>(QnUuidSet{targetSingleDeviceField->id()});
+        resources = resourcePool->getResourcesByIds<QnVirtualCameraResource>(UuidSet{targetSingleDeviceField->id()});
     }
     else
     {

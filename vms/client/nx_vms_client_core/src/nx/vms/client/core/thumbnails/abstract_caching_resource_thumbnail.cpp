@@ -61,7 +61,7 @@ std::unique_ptr<AsyncImageResult> AbstractCachingResourceThumbnail::getImageAsyn
 
 QString AbstractCachingResourceThumbnail::thumbnailId() const
 {
-    const auto resourceId = (resource() ? resource()->getId() : QnUuid()).toSimpleString();
+    const auto resourceId = (resource() ? resource()->getId() : nx::Uuid()).toSimpleString();
     if (maximumSize() <= 0)
         return resourceId;
 

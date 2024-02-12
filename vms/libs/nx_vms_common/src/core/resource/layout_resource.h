@@ -44,13 +44,13 @@ public:
 
     nx::vms::common::LayoutItemDataMap getItems() const;
 
-    nx::vms::common::LayoutItemData getItem(const QnUuid& itemUuid) const;
+    nx::vms::common::LayoutItemData getItem(const nx::Uuid& itemUuid) const;
 
     void addItem(const nx::vms::common::LayoutItemData& item);
 
     void removeItem(const nx::vms::common::LayoutItemData& item);
 
-    Q_INVOKABLE void removeItem(const QnUuid &itemUuid);
+    Q_INVOKABLE void removeItem(const nx::Uuid &itemUuid);
 
     /**
      * @note Resource replacement is not supported for item.

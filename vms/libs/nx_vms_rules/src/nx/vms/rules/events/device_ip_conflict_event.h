@@ -15,8 +15,8 @@ class NX_VMS_RULES_API DeviceIpConflictEvent: public BasicEvent
     Q_CLASSINFO("type", "nx.events.deviceIpConflict")
     using base_type = BasicEvent;
 
-    FIELD(QnUuid, serverId, setServerId)
-    FIELD(QnUuidList, deviceIds, setDeviceIds)
+    FIELD(nx::Uuid, serverId, setServerId)
+    FIELD(UuidList, deviceIds, setDeviceIds)
     FIELD(QString, ipAddress, setIpAddress)
     FIELD(QStringList, macAddresses, setMacAddresses)
 
@@ -24,8 +24,8 @@ public:
     DeviceIpConflictEvent() = default;
     DeviceIpConflictEvent(
         std::chrono::microseconds timestamp,
-        QnUuid serverId,
-        QnUuidList deviceIds,
+        nx::Uuid serverId,
+        UuidList deviceIds,
         const QHostAddress& address,
         const QStringList& macAddrList);
 

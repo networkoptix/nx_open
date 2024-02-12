@@ -101,7 +101,7 @@ struct SystemContext::Private
 
 SystemContext::SystemContext(
     Mode mode,
-    QnUuid peerId,
+    nx::Uuid peerId,
     nx::core::access::Mode resourceAccessMode,
     QObject* parent)
     :
@@ -280,10 +280,10 @@ RestApiHelper* SystemContext::restApiHelper() const
     return d->restApiHelper.get();
 }
 
-QnUuid SystemContext::localSystemId() const
+nx::Uuid SystemContext::localSystemId() const
 {
     const auto& currentConnection = connection();
-    return currentConnection ? currentConnection->moduleInformation().localSystemId : QnUuid();
+    return currentConnection ? currentConnection->moduleInformation().localSystemId : nx::Uuid();
 }
 
 analytics::TaxonomyManager* SystemContext::taxonomyManager() const

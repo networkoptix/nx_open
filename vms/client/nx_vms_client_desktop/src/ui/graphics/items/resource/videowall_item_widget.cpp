@@ -78,7 +78,7 @@ class QnVideowallItemWidgetHoverProgressAccessor: public AbstractAccessor
 
 QnVideowallItemWidget::QnVideowallItemWidget(
     const QnVideoWallResourcePtr &videowall,
-    const QnUuid &itemUuid,
+    const nx::Uuid &itemUuid,
     QnVideowallScreenWidget *parent,
     QGraphicsWidget* parentWidget,
     Qt::WindowFlags windowFlags)

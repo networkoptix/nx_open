@@ -21,7 +21,7 @@ class AnalyticsOverlayWidget: public GraphicsWidget
 public:
     struct AreaInfo
     {
-        QnUuid id;
+        nx::Uuid id;
         QString text;
         QString hoverText;
     };
@@ -32,7 +32,7 @@ public:
     void addOrUpdateArea(
         const AreaInfo& info,
         const figure::FigurePtr& figure);
-    void removeArea(const QnUuid& areaId);
+    void removeArea(const nx::Uuid& areaId);
 
     void setZoomRect(const QRectF& valueRect);
 
@@ -44,8 +44,8 @@ public:
     virtual bool event(QEvent* event) override;
 
 signals:
-    void highlightedAreaChanged(const QnUuid& areaId);
-    void areaClicked(const QnUuid& areaId);
+    void highlightedAreaChanged(const nx::Uuid& areaId);
+    void areaClicked(const nx::Uuid& areaId);
 
 private:
     struct Private;

@@ -39,12 +39,12 @@ void BasicAction::setState(State state)
     m_state = state;
 }
 
-QnUuid BasicAction::ruleId() const
+nx::Uuid BasicAction::ruleId() const
 {
     return m_ruleId;
 }
 
-void BasicAction::setRuleId(const QnUuid& ruleId)
+void BasicAction::setRuleId(const nx::Uuid& ruleId)
 {
     m_ruleId = ruleId;
 }

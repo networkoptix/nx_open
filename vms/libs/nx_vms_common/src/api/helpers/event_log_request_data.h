@@ -19,7 +19,7 @@ struct NX_VMS_COMMON_API QnEventLogFilterData
     std::vector<nx::vms::api::EventType> eventTypeList;
     QString eventSubtype;
     nx::vms::api::ActionType actionType = nx::vms::api::ActionType::undefinedAction;
-    QnUuid ruleId;
+    nx::Uuid ruleId;
     QString text;
     bool eventsOnly = false;
 

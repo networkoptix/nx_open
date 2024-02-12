@@ -342,13 +342,13 @@ QUrl QnWebpageDialog::url() const
     return QUrl::fromUserInput(ui->urlInputField->text().trimmed());
 }
 
-QnUuid QnWebpageDialog::proxyId() const
+nx::Uuid QnWebpageDialog::proxyId() const
 {
     if (!ui->proxyViaServerCheckBox->isChecked())
         return {};
 
     const auto server = ui->selectServerMenuButton->currentServer();
-    return server ? server->getId() : QnUuid();
+    return server ? server->getId() : nx::Uuid();
 }
 
 void QnWebpageDialog::setName(const QString& name)
@@ -361,7 +361,7 @@ void QnWebpageDialog::setUrl(const QUrl& url)
     ui->urlInputField->setText(url.toString());
 }
 
-void QnWebpageDialog::setProxyId(QnUuid id)
+void QnWebpageDialog::setProxyId(nx::Uuid id)
 {
     const auto server =
         m_serversWatcher.commonModule()->resourcePool()->getResourceById<QnMediaServerResource>(id);
@@ -461,7 +461,7 @@ void QnWebpageDialog::setRefreshInterval(seconds interval)
     ui->spinBoxRefreshPeriod->setValue(spinBoxValue);
 }
 
-void QnWebpageDialog::setResourceId(QnUuid id)
+void QnWebpageDialog::setResourceId(nx::Uuid id)
 {
     m_resourceId = id;
 }

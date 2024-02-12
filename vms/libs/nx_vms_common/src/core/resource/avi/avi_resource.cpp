@@ -42,7 +42,7 @@ QnAviResource::QnAviResource(const QString& file)
         removeFlags(Qn::video | Qn::audio);
         m_imageAspectRatio = getAspectRatioFromImage(file);
     }
-    setIdUnsafe(QnUuid::fromArbitraryData(getUrl()));
+    setIdUnsafe(nx::Uuid::fromArbitraryData(getUrl()));
 }
 
 QnAviResource::~QnAviResource()

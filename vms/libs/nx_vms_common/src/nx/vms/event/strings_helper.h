@@ -79,7 +79,7 @@ public:
      * @param proxyAddress Force proxy address to be used. Actual for the client side only.
      */
     QString urlForCamera(
-        const QnUuid& id,
+        const nx::Uuid& id,
         std::chrono::milliseconds timestamp,
         Url urlType,
         const std::optional<nx::network::SocketAddress>& proxyAddress = std::nullopt) const;

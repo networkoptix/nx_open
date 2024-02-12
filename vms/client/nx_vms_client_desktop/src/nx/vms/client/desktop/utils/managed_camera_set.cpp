@@ -56,7 +56,7 @@ void ManagedCameraSet::setAllCameras()
 
     m_notFilteredCameras = NX_ASSERT(m_resourcePool)
         ? nx::utils::toQSet(
-            m_resourcePool->getAllCameras(/*parentId*/ QnUuid(), /*ignoreDesktopCameras*/ true))
+            m_resourcePool->getAllCameras(/*parentId*/ nx::Uuid(), /*ignoreDesktopCameras*/ true))
         : QnVirtualCameraResourceSet();
 
     setCameras(Type::all, filteredCameras());

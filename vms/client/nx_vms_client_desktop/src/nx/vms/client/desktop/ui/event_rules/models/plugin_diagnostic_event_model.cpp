@@ -16,7 +16,7 @@ void PluginDiagnosticEventModel::filterByCameras(
 
     if (!cameras.isEmpty())
     {
-        QSet<QnUuid> compatibleEngineIds = cameras[0]->compatibleAnalyticsEngines();
+        QSet<nx::Uuid> compatibleEngineIds = cameras[0]->compatibleAnalyticsEngines();
         for (int i = 1; i < cameras.size(); ++i)
             compatibleEngineIds.intersect(cameras[i]->compatibleAnalyticsEngines());
 
@@ -30,7 +30,7 @@ void PluginDiagnosticEventModel::filterByCameras(
     static const QString kAnyPlugin = tr("Any Plugin");
 
     const auto addItem =
-        [this](const QnUuid& id, const QString& name)
+        [this](const nx::Uuid& id, const QString& name)
         {
             auto item = new QStandardItem(name);
             item->setData(QVariant::fromValue(id), PluginIdRole);
@@ -41,7 +41,7 @@ void PluginDiagnosticEventModel::filterByCameras(
     clear();
 
     if (cameras.isEmpty())
-        addItem(QnUuid(), kAnyPlugin);
+        addItem(nx::Uuid(), kAnyPlugin);
 
     for (const auto& engine: engines)
         addItem(engine->getId(), engine->getName());

@@ -32,18 +32,18 @@ public:
         QnResourcePool* resourcePool,
         bool subjectEditingMode);
 
-    ResourceAccessMap ensureAccessMap(const QnUuid& subjectId) const;
+    ResourceAccessMap ensureAccessMap(const nx::Uuid& subjectId) const;
     bool isRelevantLayout(const QnLayoutResourcePtr& layout) const;
     bool isVideowallLayout(const QnLayoutResourcePtr& layout) const;
     bool isSharedLayout(const QnLayoutResourcePtr& layout) const;
 
 private:
-    void handleBaseAccessChanged(const QSet<QnUuid>& subjectIds);
+    void handleBaseAccessChanged(const QSet<nx::Uuid>& subjectIds);
     void handleReset();
 
     void handleLayoutAdded(const QnLayoutResourcePtr& layout);
     void handleLayoutRemoved(const QnLayoutResourcePtr& layout);
-    void handleLayoutParentChanged(const QnResourcePtr& layoutResource, const QnUuid& oldParentId);
+    void handleLayoutParentChanged(const QnResourcePtr& layoutResource, const nx::Uuid& oldParentId);
     void handleLayoutSharingMaybeChanged(const QnLayoutResourcePtr& layout);
     void handleLayoutShared(const QnLayoutResourcePtr& layout);
     void handleLayoutUnshared(const QnLayoutResourcePtr& layout);
@@ -51,17 +51,17 @@ private:
     void handleCameraRemoved(const QnVirtualCameraResourcePtr& camera);
 
     void handleVideowallLayoutsAdded(const QnVideoWallResourcePtr& videowall,
-        const QVector<QnUuid>& layoutIds);
+        const QVector<nx::Uuid>& layoutIds);
 
     void handleLayoutItemAddedOrRemoved(
-        const QnUuid& resourceId, const QnLayoutResourcePtr& storedLayout);
+        const nx::Uuid& resourceId, const QnLayoutResourcePtr& storedLayout);
 
-    void invalidateSubjects(const QSet<QnUuid>& subjectIds);
+    void invalidateSubjects(const QSet<nx::Uuid>& subjectIds);
 
-    QSet<QnUuid> invalidateCache(); //< Returns all subject ids that were cached.
+    QSet<nx::Uuid> invalidateCache(); //< Returns all subject ids that were cached.
 
     void notifyResolutionChanged(const QnLayoutResourcePtr& layout,
-        const QSet<QnUuid>& knownAffectedSubjectIds,
+        const QSet<nx::Uuid>& knownAffectedSubjectIds,
         bool fromLayoutItem);
 
     // For logging.
@@ -73,11 +73,11 @@ public:
     const QPointer<QnResourcePool> resourcePool;
     const bool subjectEditingMode;
     const std::shared_ptr<VideowallLayoutWatcher> videowallWatcher;
-    mutable QHash<QnUuid, ResourceAccessMap> cachedAccessMaps;
-    mutable QHash<QnLayoutResourcePtr, QSet<QnUuid>> layoutSubjects;
-    mutable QHash<QnUuid, QSet<QnLayoutResourcePtr>> subjectLayouts;
+    mutable QHash<nx::Uuid, ResourceAccessMap> cachedAccessMaps;
+    mutable QHash<QnLayoutResourcePtr, QSet<nx::Uuid>> layoutSubjects;
+    mutable QHash<nx::Uuid, QSet<QnLayoutResourcePtr>> subjectLayouts;
     mutable nx::core::access::LayoutItemWatcher sharedLayoutItemsWatcher;
-    QSet<QnUuid> desktopCameraIds;
+    QSet<nx::Uuid> desktopCameraIds;
     mutable nx::Mutex mutex;
 };
 
@@ -100,7 +100,7 @@ LayoutItemAccessResolver::~LayoutItemAccessResolver()
     // Required here for forward-declared scoped pointer destruction.
 }
 
-ResourceAccessMap LayoutItemAccessResolver::resourceAccessMap(const QnUuid& subjectId) const
+ResourceAccessMap LayoutItemAccessResolver::resourceAccessMap(const nx::Uuid& subjectId) const
 {
     return d->baseResolver && d->resourcePool
         ? d->ensureAccessMap(subjectId)
@@ -108,7 +108,7 @@ ResourceAccessMap LayoutItemAccessResolver::resourceAccessMap(const QnUuid& subj
 }
 
 AccessRights LayoutItemAccessResolver::accessRights(
-    const QnUuid& subjectId, const QnResourcePtr& resource) const
+    const nx::Uuid& subjectId, const QnResourcePtr& resource) const
 {
     if (!NX_ASSERT(resource) || !resource->resourcePool() || resource->hasFlags(Qn::removed))
         return {};
@@ -139,7 +139,7 @@ AccessRights LayoutItemAccessResolver::accessRights(
     return result & kAllowedRights;
 }
 
-GlobalPermissions LayoutItemAccessResolver::globalPermissions(const QnUuid& subjectId) const
+GlobalPermissions LayoutItemAccessResolver::globalPermissions(const nx::Uuid& subjectId) const
 {
     return d->baseResolver
         ? d->baseResolver->globalPermissions(subjectId)
@@ -147,7 +147,7 @@ GlobalPermissions LayoutItemAccessResolver::globalPermissions(const QnUuid& subj
 }
 
 ResourceAccessDetails LayoutItemAccessResolver::accessDetails(
-    const QnUuid& subjectId,
+    const nx::Uuid& subjectId,
     const QnResourcePtr& resource,
     AccessRight accessRight) const
 {
@@ -254,7 +254,7 @@ LayoutItemAccessResolver::Private::Private(
         handleLayoutAdded(layout);
 }
 
-ResourceAccessMap LayoutItemAccessResolver::Private::ensureAccessMap(const QnUuid& subjectId) const
+ResourceAccessMap LayoutItemAccessResolver::Private::ensureAccessMap(const nx::Uuid& subjectId) const
 {
     NX_MUTEX_LOCKER lk(&mutex);
 
@@ -331,16 +331,16 @@ bool LayoutItemAccessResolver::Private::isSharedLayout(const QnLayoutResourcePtr
         && !videowallWatcher->isVideowallItem(layout->getId());
 }
 
-void LayoutItemAccessResolver::Private::handleBaseAccessChanged(const QSet<QnUuid>& subjectIds)
+void LayoutItemAccessResolver::Private::handleBaseAccessChanged(const QSet<nx::Uuid>& subjectIds)
 {
     NX_DEBUG(q, "Base resolution changed for %1 subjects: %2", subjectIds.size(), subjectIds);
     invalidateSubjects(subjectIds);
     q->notifyAccessChanged(subjectIds);
 }
 
-void LayoutItemAccessResolver::Private::invalidateSubjects(const QSet<QnUuid>& subjectIds)
+void LayoutItemAccessResolver::Private::invalidateSubjects(const QSet<nx::Uuid>& subjectIds)
 {
-    QSet<QnUuid> affectedCachedSubjectIds;
+    QSet<nx::Uuid> affectedCachedSubjectIds;
     {
         NX_MUTEX_LOCKER lk(&mutex);
 
@@ -371,7 +371,7 @@ void LayoutItemAccessResolver::Private::invalidateSubjects(const QSet<QnUuid>& s
 }
 
 void LayoutItemAccessResolver::Private::notifyResolutionChanged(const QnLayoutResourcePtr& layout,
-    const QSet<QnUuid>& knownAffectedSubjectIds, bool fromLayoutItem)
+    const QSet<nx::Uuid>& knownAffectedSubjectIds, bool fromLayoutItem)
 {
     if (!fromLayoutItem && isVideowallLayout(layout))
     {
@@ -380,7 +380,7 @@ void LayoutItemAccessResolver::Private::notifyResolutionChanged(const QnLayoutRe
     }
 
     const auto watchedSubjectIds = q->notifier()->watchedSubjectIds();
-    QSet<QnUuid> affectedWatchedSubjectIds;
+    QSet<nx::Uuid> affectedWatchedSubjectIds;
 
     for (const auto id: watchedSubjectIds)
     {
@@ -391,11 +391,11 @@ void LayoutItemAccessResolver::Private::notifyResolutionChanged(const QnLayoutRe
     q->notifyAccessChanged(affectedWatchedSubjectIds);
 }
 
-QSet<QnUuid> LayoutItemAccessResolver::Private::invalidateCache()
+QSet<nx::Uuid> LayoutItemAccessResolver::Private::invalidateCache()
 {
     NX_MUTEX_LOCKER lk(&mutex);
 
-    const QSet<QnUuid> cachedSubjectIds(cachedAccessMaps.keyBegin(), cachedAccessMaps.keyEnd());
+    const QSet<nx::Uuid> cachedSubjectIds(cachedAccessMaps.keyBegin(), cachedAccessMaps.keyEnd());
 
     cachedAccessMaps.clear();
     layoutSubjects.clear();
@@ -459,7 +459,7 @@ void LayoutItemAccessResolver::Private::handleLayoutRemoved(const QnLayoutResour
 }
 
 void LayoutItemAccessResolver::Private::handleLayoutParentChanged(
-    const QnResourcePtr& layoutResource, const QnUuid& oldParentId)
+    const QnResourcePtr& layoutResource, const nx::Uuid& oldParentId)
 {
     const auto layout = layoutResource.objectCast<QnLayoutResource>();
     if (!NX_ASSERT(layout))
@@ -474,7 +474,7 @@ void LayoutItemAccessResolver::Private::handleLayoutParentChanged(
 }
 
 void LayoutItemAccessResolver::Private::handleVideowallLayoutsAdded(
-    const QnVideoWallResourcePtr& videowall, const QVector<QnUuid>& layoutIds)
+    const QnVideoWallResourcePtr& videowall, const QVector<nx::Uuid>& layoutIds)
 {
     for (const auto& layoutId: layoutIds)
     {
@@ -512,7 +512,7 @@ void LayoutItemAccessResolver::Private::handleLayoutShared(const QnLayoutResourc
     const QSignalBlocker signalBlocker(&sharedLayoutItemsWatcher);
     sharedLayoutItemsWatcher.addWatchedLayout(layout->storedLayout());
 
-    QSet<QnUuid> affectedCachedSubjectIds;
+    QSet<nx::Uuid> affectedCachedSubjectIds;
     {
         NX_MUTEX_LOCKER lk(&mutex);
 
@@ -542,7 +542,7 @@ void LayoutItemAccessResolver::Private::handleLayoutUnshared(const QnLayoutResou
     sharedLayoutItemsWatcher.removeWatchedLayout(layout->storedLayout());
 
     const auto invalidateLayoutData =
-        [this](const QnLayoutResourcePtr& layout) -> QSet<QnUuid> /*layoutSubjectIds*/
+        [this](const QnLayoutResourcePtr& layout) -> QSet<nx::Uuid> /*layoutSubjectIds*/
         {
             NX_MUTEX_LOCKER lk(&mutex);
             const auto subjectIds = layoutSubjects.take(layout);
@@ -576,7 +576,7 @@ void LayoutItemAccessResolver::Private::handleCameraAdded(const QnVirtualCameraR
     const auto cameraId = camera->getId();
     NX_DEBUG(q, "Added desktop camera %1", camera);
 
-    QSet<QnUuid> affectedSubjectIds;
+    QSet<nx::Uuid> affectedSubjectIds;
     {
         NX_MUTEX_LOCKER lk(&mutex);
         desktopCameraIds.insert(cameraId);
@@ -607,7 +607,7 @@ void LayoutItemAccessResolver::Private::handleCameraRemoved(const QnVirtualCamer
 }
 
 void LayoutItemAccessResolver::Private::handleLayoutItemAddedOrRemoved(
-    const QnUuid& /*resourceId*/, const QnLayoutResourcePtr& storedLayout)
+    const nx::Uuid& /*resourceId*/, const QnLayoutResourcePtr& storedLayout)
 {
     const auto layout = storedLayout->transientLayout();
 
@@ -615,7 +615,7 @@ void LayoutItemAccessResolver::Private::handleLayoutItemAddedOrRemoved(
         return;
 
     const auto invalidateLayoutSubjects =
-        [this](const QnLayoutResourcePtr& layout) -> QSet<QnUuid> /*layoutSubjectIds*/
+        [this](const QnLayoutResourcePtr& layout) -> QSet<nx::Uuid> /*layoutSubjectIds*/
         {
             NX_MUTEX_LOCKER lk(&mutex);
             const auto subjectIds = layoutSubjects.take(layout);

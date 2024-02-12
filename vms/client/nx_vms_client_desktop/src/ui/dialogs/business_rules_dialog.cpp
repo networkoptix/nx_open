@@ -135,7 +135,7 @@ protected:
         auto resourcePassText = [this](const QnResourcePtr& resource)
         { return resources::search_helper::matches(m_filterText, resource); };
 
-        auto passText = [this, resourcePassText](const QnUuid& id)
+        auto passText = [this, resourcePassText](const nx::Uuid& id)
         {
             auto resource = resourcePool()->getResourceById(id);
             if (resource)
@@ -149,7 +149,7 @@ protected:
         vms::api::EventType eventType = idx.data(Qn::EventTypeRole).value<vms::api::EventType>();
         if (vms::event::requiresCameraResource(eventType))
         {
-            auto eventResources = idx.data(Qn::EventResourcesRole).value<QSet<QnUuid>>();
+            auto eventResources = idx.data(Qn::EventResourcesRole).value<QSet<nx::Uuid>>();
 
             // rule supports any camera (assuming there is any camera that passing filter)
             if (eventResources.isEmpty() && anyCameraPassFilter)
@@ -164,7 +164,7 @@ protected:
             idx.data(Qn::ActionTypeRole).value<vms::api::ActionType>();
         if (vms::event::requiresCameraResource(actionType))
         {
-            auto actionResources = idx.data(Qn::ActionResourcesRole).value<QSet<QnUuid>>();
+            auto actionResources = idx.data(Qn::ActionResourcesRole).value<QSet<nx::Uuid>>();
             if (std::any_of(actionResources.begin(), actionResources.end(), passText))
                 return true;
         }
@@ -206,7 +206,7 @@ private:
 
         if (rule->eventType() == nx::vms::api::EventType::pluginDiagnosticEvent)
         {
-            QnUuid engineId = rule->eventParams().eventResourceId;
+            nx::Uuid engineId = rule->eventParams().eventResourceId;
 
             if (engineId.isNull())
             {
@@ -523,7 +523,7 @@ void QnBusinessRulesDialog::at_beforeModelChanged() {
     updateControlButtons();
 }
 
-void QnBusinessRulesDialog::at_message_ruleDeleted(const QnUuid &id) {
+void QnBusinessRulesDialog::at_message_ruleDeleted(const nx::Uuid &id) {
     m_pendingDeleteRules.removeOne(id); //< TODO: #sivanov Ask user.
 }
 
@@ -610,7 +610,7 @@ void QnBusinessRulesDialog::at_tableView_currentRowChanged(const QModelIndex &cu
     const QModelIndex& /*previous*/)
 {
     QnBusinessRuleViewModelPtr ruleModel = m_rulesViewModel->rule(current);
-    QnUuid id = ruleModel ? ruleModel->id() : QnUuid();
+    nx::Uuid id = ruleModel ? ruleModel->id() : nx::Uuid();
 
     const auto handleRowChanged =
         [this, id]()
@@ -696,7 +696,7 @@ bool QnBusinessRulesDialog::saveAll()
         m_rulesViewModel->saveRule(idx);
     }
 
-    foreach (const QnUuid& id, m_pendingDeleteRules)
+    foreach (const nx::Uuid& id, m_pendingDeleteRules)
     {
         int handle = connection->getEventRulesManager(Qn::kSystemAccess)->deleteRule(
             id,

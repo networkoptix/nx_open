@@ -39,7 +39,7 @@ public:
     /**
      * Id of the server which was used to establish the Remote Session (if it is present).
      */
-    QnUuid currentServerId() const;
+    nx::Uuid currentServerId() const;
 
     /**
      * The server which was used to establish the Remote Session (if it is present).

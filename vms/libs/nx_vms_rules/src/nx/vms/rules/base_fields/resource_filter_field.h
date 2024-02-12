@@ -24,8 +24,8 @@ public:
         }
     };
 
-    QSet<QnUuid> ids() const { return m_ids; }
-    void setIds(const QSet<QnUuid>& ids)
+    QSet<nx::Uuid> ids() const { return m_ids; }
+    void setIds(const QSet<nx::Uuid>& ids)
     {
         if (m_ids != ids)
         {
@@ -40,7 +40,7 @@ protected:
 
 private:
     bool m_acceptAll = false;
-    QSet<QnUuid> m_ids;
+    QSet<nx::Uuid> m_ids;
 };
 
 class NX_VMS_RULES_API ResourceFilterEventField:
@@ -50,7 +50,7 @@ class NX_VMS_RULES_API ResourceFilterEventField:
     Q_OBJECT
 
     Q_PROPERTY(bool acceptAll READ acceptAll WRITE setAcceptAll NOTIFY acceptAllChanged)
-    Q_PROPERTY(QnUuidSet ids READ ids WRITE setIds NOTIFY idsChanged)
+    Q_PROPERTY(UuidSet ids READ ids WRITE setIds NOTIFY idsChanged)
 
 signals:
     void acceptAllChanged();
@@ -67,7 +67,7 @@ class NX_VMS_RULES_API ResourceFilterActionField:
     Q_OBJECT
 
     Q_PROPERTY(bool acceptAll READ acceptAll WRITE setAcceptAll NOTIFY acceptAllChanged)
-    Q_PROPERTY(QnUuidSet ids READ ids WRITE setIds NOTIFY idsChanged)
+    Q_PROPERTY(UuidSet ids READ ids WRITE setIds NOTIFY idsChanged)
 
 signals:
     void acceptAllChanged();

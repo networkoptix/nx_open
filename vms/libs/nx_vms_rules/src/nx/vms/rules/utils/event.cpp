@@ -30,12 +30,12 @@ bool hasSourceServer(const vms::rules::ItemDescriptor& eventDescriptor)
         });
 }
 
-QnUuid sourceId(const BasicEvent* event)
+nx::Uuid sourceId(const BasicEvent* event)
 {
     const auto getId =
         [event](const char* propName)
         {
-            return event->property(propName).value<QnUuid>();
+            return event->property(propName).value<nx::Uuid>();
         };
 
     if (const auto cameraId = getId(utils::kCameraIdFieldName); !cameraId.isNull())

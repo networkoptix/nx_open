@@ -28,71 +28,71 @@ public:
     LocalNotificationsManager(QObject* parent = nullptr);
     virtual ~LocalNotificationsManager() override = default;
 
-    QList<QnUuid> notifications() const;
+    QList<nx::Uuid> notifications() const;
 
-    QnUuid add(
+    nx::Uuid add(
         const QString& title, const QString& description = QString(), bool cancellable = false);
-    QnUuid addProgress(
+    nx::Uuid addProgress(
         const QString& title, const QString& description = QString(), bool cancellable = false);
-    void remove(const QnUuid& notificationId);
+    void remove(const nx::Uuid& notificationId);
 
-    QString title(const QnUuid& notificationId) const;
-    void setTitle(const QnUuid& notificationId, const QString& value);
+    QString title(const nx::Uuid& notificationId) const;
+    void setTitle(const nx::Uuid& notificationId, const QString& value);
 
-    QString description(const QnUuid& notificationId) const;
-    void setDescription(const QnUuid& notificationId, const QString& value);
+    QString description(const nx::Uuid& notificationId) const;
+    void setDescription(const nx::Uuid& notificationId, const QString& value);
 
-    QPixmap icon(const QnUuid& notificationId) const;
-    void setIcon(const QnUuid& notificationId, const QPixmap& value);
+    QPixmap icon(const nx::Uuid& notificationId) const;
+    void setIcon(const nx::Uuid& notificationId, const QPixmap& value);
 
-    std::optional<ProgressState> progress(const QnUuid& notificationId) const;
-    void setProgress(const QnUuid& notificationId, std::optional<ProgressState> value);
+    std::optional<ProgressState> progress(const nx::Uuid& notificationId) const;
+    void setProgress(const nx::Uuid& notificationId, std::optional<ProgressState> value);
 
-    QString progressFormat(const QnUuid& notificationId) const;
-    void setProgressFormat(const QnUuid& notificationId, const QString& value);
+    QString progressFormat(const nx::Uuid& notificationId) const;
+    void setProgressFormat(const nx::Uuid& notificationId, const QString& value);
 
-    bool isCancellable(const QnUuid& notificationId) const;
-    void setCancellable(const QnUuid& notificationId, bool value);
+    bool isCancellable(const nx::Uuid& notificationId) const;
+    void setCancellable(const nx::Uuid& notificationId, bool value);
 
-    CommandActionPtr action(const QnUuid& notificationId) const;
-    void setAction(const QnUuid& notificationId, CommandActionPtr value);
+    CommandActionPtr action(const nx::Uuid& notificationId) const;
+    void setAction(const nx::Uuid& notificationId, CommandActionPtr value);
 
-    CommandActionPtr additionalAction(const QnUuid& notificationId) const;
-    void setAdditionalAction(const QnUuid& notificationId, CommandActionPtr value);
+    CommandActionPtr additionalAction(const nx::Uuid& notificationId) const;
+    void setAdditionalAction(const nx::Uuid& notificationId, CommandActionPtr value);
 
-    QnNotificationLevel::Value level(const QnUuid& notificationId) const;
-    void setLevel(const QnUuid& notificationId, QnNotificationLevel::Value level);
+    QnNotificationLevel::Value level(const nx::Uuid& notificationId) const;
+    void setLevel(const nx::Uuid& notificationId, QnNotificationLevel::Value level);
 
-    QString additionalText(const QnUuid& notificationId) const;
-    void setAdditionalText(const QnUuid& notificationId, QString additionalText);
+    QString additionalText(const nx::Uuid& notificationId) const;
+    void setAdditionalText(const nx::Uuid& notificationId, QString additionalText);
 
-    QString tooltip(const QnUuid& notificationId) const;
-    void setTooltip(const QnUuid& notificationId, QString tooltip);
+    QString tooltip(const nx::Uuid& notificationId) const;
+    void setTooltip(const nx::Uuid& notificationId, QString tooltip);
 
     // Common UI should call this function to request activity cancellation.
     // Just emits cancelRequested after validity check.
-    void cancel(const QnUuid& notificationId);
+    void cancel(const nx::Uuid& notificationId);
 
     // Common UI should call this function to request dedicated UI to pop.
     // Just emits interactionRequested after validity check.
-    void interact(const QnUuid& notificationId);
+    void interact(const nx::Uuid& notificationId);
 
 signals:
-    void added(const QnUuid& notificationId);
-    void removed(const QnUuid& notificationId);
-    void cancelRequested(const QnUuid& notificationId);
-    void interactionRequested(const QnUuid& notificationId);
-    void progressChanged(const QnUuid& notificationId, std::optional<ProgressState> progress);
-    void progressFormatChanged(const QnUuid& notificationId, const QString& format);
-    void cancellableChanged(const QnUuid& notificationId, bool isCancellable);
-    void titleChanged(const QnUuid& notificationId, const QString& title);
-    void descriptionChanged(const QnUuid& notificationId, const QString& description);
-    void iconChanged(const QnUuid& notificationId, const QIcon& icon);
-    void actionChanged(const QnUuid& notificationId, CommandActionPtr action);
-    void levelChanged(const QnUuid& notificationId, QnNotificationLevel::Value level);
-    void additionalTextChanged(const QnUuid& notificationId, const QString& additionalText);
-    void tooltipChanged(const QnUuid& notificationId, const QString& tooltip);
-    void additionalActionChanged(const QnUuid& notificationId, CommandActionPtr action);
+    void added(const nx::Uuid& notificationId);
+    void removed(const nx::Uuid& notificationId);
+    void cancelRequested(const nx::Uuid& notificationId);
+    void interactionRequested(const nx::Uuid& notificationId);
+    void progressChanged(const nx::Uuid& notificationId, std::optional<ProgressState> progress);
+    void progressFormatChanged(const nx::Uuid& notificationId, const QString& format);
+    void cancellableChanged(const nx::Uuid& notificationId, bool isCancellable);
+    void titleChanged(const nx::Uuid& notificationId, const QString& title);
+    void descriptionChanged(const nx::Uuid& notificationId, const QString& description);
+    void iconChanged(const nx::Uuid& notificationId, const QIcon& icon);
+    void actionChanged(const nx::Uuid& notificationId, CommandActionPtr action);
+    void levelChanged(const nx::Uuid& notificationId, QnNotificationLevel::Value level);
+    void additionalTextChanged(const nx::Uuid& notificationId, const QString& additionalText);
+    void tooltipChanged(const nx::Uuid& notificationId, const QString& tooltip);
+    void additionalActionChanged(const nx::Uuid& notificationId, CommandActionPtr action);
 
 private:
     struct State
@@ -124,10 +124,10 @@ private:
         }
     };
 
-    QnUuid add(State state);
+    nx::Uuid add(State state);
 
-    QList<QnUuid> m_ids; //< Sorted by insertion order.
-    QHash<QnUuid, State> m_lookup;
+    QList<nx::Uuid> m_ids; //< Sorted by insertion order.
+    QHash<nx::Uuid, State> m_lookup;
     mutable Mutex m_mutex;
 };
 

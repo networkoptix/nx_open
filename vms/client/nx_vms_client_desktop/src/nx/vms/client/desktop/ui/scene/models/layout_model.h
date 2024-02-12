@@ -15,7 +15,7 @@ class LayoutModel: public QAbstractListModel
     using base_type = QAbstractListModel;
 
     Q_OBJECT
-    Q_PROPERTY(QnUuid layoutId READ layoutId WRITE setLayoutId NOTIFY layoutIdChanged)
+    Q_PROPERTY(nx::Uuid layoutId READ layoutId WRITE setLayoutId NOTIFY layoutIdChanged)
     Q_PROPERTY(QRect gridBoundingRect READ gridBoundingRect NOTIFY gridBoundingRectChanged)
 
 public:
@@ -28,8 +28,8 @@ public:
     explicit LayoutModel(QObject* parent = nullptr);
     virtual ~LayoutModel() override;
 
-    QnUuid layoutId() const;
-    void setLayoutId(const QnUuid& id);
+    nx::Uuid layoutId() const;
+    void setLayoutId(const nx::Uuid& id);
 
     QRect gridBoundingRect() const;
 

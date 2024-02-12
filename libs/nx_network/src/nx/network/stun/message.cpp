@@ -119,7 +119,7 @@ void Message::insertIntegrity(const std::string& userName, const std::string& ke
 {
     newAttribute< attrs::UserName >(userName);
     if (findAttr(attrs::nonce) == m_attributes.end())
-        newAttribute< attrs::Nonce >(nx::Buffer(QnUuid::createUuid().toSimpleByteArray()));
+        newAttribute< attrs::Nonce >(nx::Buffer(nx::Uuid::createUuid().toSimpleByteArray()));
 
     newAttribute< attrs::MessageIntegrity >(nx::Buffer(
         attrs::MessageIntegrity::SIZE, 0));

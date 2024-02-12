@@ -257,7 +257,7 @@ void QnCommonMetaTypes::initialize()
     qRegisterMetaType<Qn::StatusChangeReason>("Qn::StatusChangeReason");
     qRegisterMetaType<nx::vms::api::CameraTraits>();
 
-    qRegisterMetaType<std::map<QnUuid, nx::vms::api::AccessRights>>();
+    qRegisterMetaType<std::map<nx::Uuid, nx::vms::api::AccessRights>>();
     qRegisterMetaType<nx::core::access::ResourceAccessMap>();
 
     QnJsonSerializer::registerSerializer<QnPtzMapperPtr>();

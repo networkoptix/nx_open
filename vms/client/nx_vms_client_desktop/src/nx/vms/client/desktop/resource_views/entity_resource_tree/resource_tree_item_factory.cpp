@@ -324,7 +324,7 @@ GenericItem::FlagsProvider cloudLayoutFlagsProvider(const QnLayoutResourcePtr& l
         };
 }
 
-GenericItem::DataProvider otherServerNameProvider(const QnUuid& serverId, SystemContext* systemContext)
+GenericItem::DataProvider otherServerNameProvider(const nx::Uuid& serverId, SystemContext* systemContext)
 {
     return [serverId, systemContext]
         {
@@ -333,14 +333,14 @@ GenericItem::DataProvider otherServerNameProvider(const QnUuid& serverId, System
         };
 }
 
-InvalidatorPtr otherServerNameInvalidator(const QnUuid& id, SystemContext* systemContext)
+InvalidatorPtr otherServerNameInvalidator(const nx::Uuid& id, SystemContext* systemContext)
 {
     auto result = std::make_shared<Invalidator>();
 
     result->connections()->add(QObject::connect(
         systemContext->otherServersManager(),
         &OtherServersManager::serverUpdated,
-        [invalidator = result.get(), id](const QnUuid& serverId)
+        [invalidator = result.get(), id](const nx::Uuid& serverId)
         {
             if (id == serverId)
                 invalidator->invalidate();
@@ -658,21 +658,21 @@ AbstractItemPtr ResourceTreeItemFactory::createCloudSystemItem(const QString& sy
         .withFlags(cloudSystemFlagsProvider(systemId));
 }
 
-AbstractItemPtr ResourceTreeItemFactory::createShowreelItem(const QnUuid& showreelId)
+AbstractItemPtr ResourceTreeItemFactory::createShowreelItem(const nx::Uuid& showreelId)
 {
     return std::make_unique<ShowreelItem>(systemContext()->showreelManager(), showreelId);
 }
 
 AbstractItemPtr ResourceTreeItemFactory::createVideoWallScreenItem(
     const QnVideoWallResourcePtr& videoWall,
-    const QnUuid& screenUuid)
+    const nx::Uuid& screenUuid)
 {
     return std::make_unique<VideoWallScreenItem>(videoWall, screenUuid);
 }
 
 AbstractItemPtr ResourceTreeItemFactory::createVideoWallMatrixItem(
     const QnVideoWallResourcePtr& videoWall,
-    const QnUuid& matrixUuid)
+    const nx::Uuid& matrixUuid)
 {
     return std::make_unique<VideoWallMatrixItem>(videoWall, matrixUuid);
 }
@@ -701,7 +701,7 @@ AbstractItemPtr ResourceTreeItemFactory::createCloudLayoutItem(const QnLayoutRes
         .withFlags(flagsProvider);
 }
 
-AbstractItemPtr ResourceTreeItemFactory::createOtherServerItem(const QnUuid& serverId)
+AbstractItemPtr ResourceTreeItemFactory::createOtherServerItem(const nx::Uuid& serverId)
 {
     const auto nameProvider = otherServerNameProvider(serverId, systemContext());
     const auto nameInvalidator = otherServerNameInvalidator(serverId, systemContext());

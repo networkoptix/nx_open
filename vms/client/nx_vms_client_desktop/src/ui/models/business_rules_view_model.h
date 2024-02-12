@@ -53,7 +53,7 @@ public:
 
     QnBusinessRuleViewModelPtr rule(const QModelIndex &index) const;
 
-    QnBusinessRuleViewModelPtr ruleModelById(const QnUuid &id) const;
+    QnBusinessRuleViewModelPtr ruleModelById(const nx::Uuid &id) const;
 
 private:
     bool isIndexValid(const QModelIndex &index) const;
@@ -68,7 +68,7 @@ private:
     int addRuleModelInternal(const QnBusinessRuleViewModelPtr &ruleModel);
 
 private slots:
-    void at_rule_dataChanged(const QnUuid &id, QnBusinessRuleViewModel::Fields fields);
+    void at_rule_dataChanged(const nx::Uuid &id, QnBusinessRuleViewModel::Fields fields);
     void at_soundModel_listChanged();
     void at_soundModel_itemChanged(const QString &filename);
 

@@ -110,7 +110,7 @@ NonEditableUsersAndGroups::NonEditableUsersAndGroups(SystemContext* systemContex
 NonEditableUsersAndGroups::~NonEditableUsersAndGroups()
 {}
 
-void NonEditableUsersAndGroups::modifyGroups(const QSet<QnUuid>& ids, int diff)
+void NonEditableUsersAndGroups::modifyGroups(const QSet<nx::Uuid>& ids, int diff)
 {
     for (const auto& id: ids)
     {
@@ -153,7 +153,7 @@ bool NonEditableUsersAndGroups::canChangeAuthentication(const QnUserResourcePtr&
         Qn::WritePermission | Qn::WriteDigestPermission | Qn::SavePermission);
 }
 
-bool NonEditableUsersAndGroups::canEditParents(const QnUuid& id) const
+bool NonEditableUsersAndGroups::canEditParents(const nx::Uuid& id) const
 {
     if (const auto user = systemContext()->resourcePool()->getResourceById<QnUserResource>(id))
     {
@@ -180,12 +180,12 @@ bool NonEditableUsersAndGroups::canMassEdit(const QnUserResourcePtr& user) const
         || canChangeAuthentication(user);
 }
 
-QSet<QnUuid> NonEditableUsersAndGroups::nonUniqueWithEditableParents()
+QSet<nx::Uuid> NonEditableUsersAndGroups::nonUniqueWithEditableParents()
 {
     const auto nonUniqueIds = m_nonUniqueUserTracker.nonUniqueNameIds();
-    QSet<QnUuid> result;
+    QSet<nx::Uuid> result;
 
-    for (const QnUuid& nonUniqueId: nonUniqueIds)
+    for (const nx::Uuid& nonUniqueId: nonUniqueIds)
     {
         const auto nonUniqueUser =
             systemContext()->resourcePool()->getResourceById<QnUserResource>(nonUniqueId);
@@ -196,7 +196,7 @@ QSet<QnUuid> NonEditableUsersAndGroups::nonUniqueWithEditableParents()
         const auto idsWithTheSameName =
             m_nonUniqueUserTracker.idsByName(nonUniqueUser->getName().toLower());
 
-        QSet<QnUuid> enabled;
+        QSet<nx::Uuid> enabled;
 
         if (idsWithTheSameName.size() > 1)
         {
@@ -241,10 +241,10 @@ void NonEditableUsersAndGroups::addOrUpdateUser(const QnUserResourcePtr& user)
 
     m_usersWithUnchangableParents = newUsersWithUnchangableParents;
 
-    QSet<QnUuid> changedUsers = added + removed;
+    QSet<nx::Uuid> changedUsers = added + removed;
     changedUsers << user->getId();
 
-    for (const QnUuid& changedUserId: changedUsers)
+    for (const nx::Uuid& changedUserId: changedUsers)
     {
         const auto changedUser =
             systemContext()->resourcePool()->getResourceById<QnUserResource>(changedUserId);
@@ -281,7 +281,7 @@ void NonEditableUsersAndGroups::addOrUpdateGroup(const nx::vms::api::UserGroupDa
     const auto added = nonUniqueGroups - prevNonUniqueGroups;
     const auto removed = prevNonUniqueGroups - nonUniqueGroups;
 
-    QSet<QnUuid> changedGroups = added + removed;
+    QSet<nx::Uuid> changedGroups = added + removed;
     changedGroups << group.id;
 
     for (const auto& changedGroupId: changedGroups)
@@ -299,9 +299,9 @@ void NonEditableUsersAndGroups::addOrUpdateGroup(const nx::vms::api::UserGroupDa
     }
 }
 
-void NonEditableUsersAndGroups::updateMembers(const QnUuid& groupId)
+void NonEditableUsersAndGroups::updateMembers(const nx::Uuid& groupId)
 {
-    const QSet<QnUuid> members =
+    const QSet<nx::Uuid> members =
         systemContext()->accessSubjectHierarchy()->recursiveMembers({groupId});
 
     const auto context = systemContext();
@@ -318,11 +318,11 @@ void NonEditableUsersAndGroups::updateMembers(const QnUuid& groupId)
 bool NonEditableUsersAndGroups::addUser(const QnUserResourcePtr& user)
 {
     const auto ids = user->groupIds();
-    QSet<QnUuid> parentIds(ids.begin(), ids.end());
+    QSet<nx::Uuid> parentIds(ids.begin(), ids.end());
 
     const bool newUser = !m_nonEditableUsers.contains(user);
 
-    const QSet<QnUuid> prevGroupIds = m_nonEditableUsers.value(user);
+    const QSet<nx::Uuid> prevGroupIds = m_nonEditableUsers.value(user);
 
     const auto removed = prevGroupIds - parentIds;
     const auto added = parentIds - prevGroupIds;
@@ -364,23 +364,23 @@ bool NonEditableUsersAndGroups::containsUser(const QnUserResourcePtr& user) cons
     return m_nonMassEditableUsers.contains(user);
 }
 
-bool NonEditableUsersAndGroups::addGroup(const QnUuid& id)
+bool NonEditableUsersAndGroups::addGroup(const nx::Uuid& id)
 {
     const auto group = systemContext()->userGroupManager()->find(id);
     if (!group)
         return false;
 
-    const QSet<QnUuid> groupIds(group->parentGroupIds.begin(), group->parentGroupIds.end());
+    const QSet<nx::Uuid> groupIds(group->parentGroupIds.begin(), group->parentGroupIds.end());
 
     const bool newGroup = !m_nonEditableGroups.contains(id);
 
-    const QSet<QnUuid> prevGroupIds = m_nonEditableGroups.value(id);
+    const QSet<nx::Uuid> prevGroupIds = m_nonEditableGroups.value(id);
 
     auto removed = prevGroupIds - groupIds;
     auto added = groupIds - prevGroupIds;
 
     const auto isLdap =
-        [this](const QnUuid& id)
+        [this](const nx::Uuid& id)
         {
             const auto group = systemContext()->userGroupManager()->find(id);
             return group && group->type == api::UserType::ldap;
@@ -408,7 +408,7 @@ bool NonEditableUsersAndGroups::addGroup(const QnUuid& id)
     return true;
 }
 
-bool NonEditableUsersAndGroups::removeGroup(const QnUuid& id)
+bool NonEditableUsersAndGroups::removeGroup(const nx::Uuid& id)
 {
     if (!m_nonEditableGroups.contains(id))
         return false;
@@ -427,13 +427,13 @@ bool NonEditableUsersAndGroups::removeGroup(const QnUuid& id)
     return true;
 }
 
-bool NonEditableUsersAndGroups::containsGroup(const QnUuid& groupId) const
+bool NonEditableUsersAndGroups::containsGroup(const nx::Uuid& groupId) const
 {
     return m_nonRemovableGroups.contains(groupId)
         || m_groupsWithNonEditableMembers.contains(groupId);
 }
 
-QSet<QnUuid> NonEditableUsersAndGroups::groups() const
+QSet<nx::Uuid> NonEditableUsersAndGroups::groups() const
 {
     return m_nonRemovableGroups + nx::utils::toQSet(m_groupsWithNonEditableMembers.keys());
 }
@@ -443,7 +443,7 @@ qsizetype NonEditableUsersAndGroups::groupCount() const
     return groups().size();
 }
 
-QString NonEditableUsersAndGroups::tooltip(const QnUuid& id) const
+QString NonEditableUsersAndGroups::tooltip(const nx::Uuid& id) const
 {
     if (const auto user = systemContext()->resourcePool()->getResourceById<QnUserResource>(id))
     {

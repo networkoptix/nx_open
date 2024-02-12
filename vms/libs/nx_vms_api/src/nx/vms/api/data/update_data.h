@@ -28,7 +28,7 @@ NX_VMS_API_DECLARE_STRUCT(UpdateUploadData)
 
 struct NX_VMS_API UpdateUploadResponseData
 {
-    QnUuid id;
+    nx::Uuid id;
     QString updateId;
     int chunks = 0;
 };

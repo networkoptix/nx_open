@@ -13,11 +13,11 @@ class NX_VMS_RULES_API ServerCertificateErrorEvent: public BasicEvent
     Q_CLASSINFO("type", "nx.events.serverCertificateError")
     using base_type = BasicEvent;
 
-    FIELD(QnUuid, serverId, setServerId)
+    FIELD(nx::Uuid, serverId, setServerId)
 
 public:
     ServerCertificateErrorEvent() = default;
-    ServerCertificateErrorEvent(std::chrono::microseconds timestamp, QnUuid serverId);
+    ServerCertificateErrorEvent(std::chrono::microseconds timestamp, nx::Uuid serverId);
 
     virtual QString resourceKey() const override;
     virtual QVariantMap details(common::SystemContext* context) const override;

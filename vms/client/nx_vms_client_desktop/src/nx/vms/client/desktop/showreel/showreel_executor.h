@@ -34,7 +34,7 @@ public:
     void updateShowreel(const nx::vms::api::ShowreelData& showreel);
 
     /** Stop Showreel with given id if it is running. */
-    void stopShowreel(const QnUuid& id);
+    void stopShowreel(const nx::Uuid& id);
 
     /** Start Showreel over single layout. */
     void startSingleLayoutShowreel();
@@ -46,7 +46,7 @@ public:
     void suspendCurrentShowreel();
     void resumeCurrentShowreel();
 
-    QnUuid runningShowreel() const;
+    nx::Uuid runningShowreel() const;
 
     void prevShowreelStep();
     void nextShowreelStep();
@@ -59,7 +59,7 @@ private:
     void processShowreelStepInternal(bool forward, bool force);
 
     void clearWorkbenchState();
-    void restoreWorkbenchState(const QnUuid& showreelId);
+    void restoreWorkbenchState(const nx::Uuid& showreelId);
 
     void setHintVisible(bool visible);
 
@@ -90,7 +90,7 @@ private:
     struct
     {
         // Section for Showreel only
-        QnUuid id;
+        nx::Uuid id;
         std::vector<Item> items;
         int currentIndex{0};
 

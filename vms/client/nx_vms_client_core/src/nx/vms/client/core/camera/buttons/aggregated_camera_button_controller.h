@@ -39,12 +39,12 @@ public:
     void addController(ButtonGroupType group, SystemContext* context, Args... args);
 
     virtual CameraButtons buttons() const override;
-    virtual OptionalCameraButton button(const QnUuid& id) const override;
+    virtual OptionalCameraButton button(const nx::Uuid& id) const override;
 
-    virtual bool startAction(const QnUuid& buttonId) override;
-    virtual bool stopAction(const QnUuid& buttonId) override;
-    virtual bool cancelAction(const QnUuid& buttonId) override;
-    virtual bool actionIsActive(const QnUuid& buttonId) const override;
+    virtual bool startAction(const nx::Uuid& buttonId) override;
+    virtual bool stopAction(const nx::Uuid& buttonId) override;
+    virtual bool cancelAction(const nx::Uuid& buttonId) override;
+    virtual bool actionIsActive(const nx::Uuid& buttonId) const override;
 
 private:
     struct Private;

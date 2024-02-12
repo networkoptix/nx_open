@@ -421,13 +421,13 @@ void CameraSettingsDialogStore::setTwoWayAudioEnabled(bool value)
         [&](State state) { return Reducer::setTwoWayAudioEnabled(std::move(state), value); });
 }
 
-void CameraSettingsDialogStore::setAudioInputDeviceId(const QnUuid& deviceId)
+void CameraSettingsDialogStore::setAudioInputDeviceId(const nx::Uuid& deviceId)
 {
     d->executeAction(
         [&](State state) { return Reducer::setAudioInputDeviceId(std::move(state), deviceId); });
 }
 
-void CameraSettingsDialogStore::setAudioOutputDeviceId(const QnUuid& deviceId)
+void CameraSettingsDialogStore::setAudioOutputDeviceId(const nx::Uuid& deviceId)
 {
     d->executeAction(
         [&](State state) { return Reducer::setAudioOutputDeviceId(std::move(state), deviceId); });
@@ -711,7 +711,7 @@ void CameraSettingsDialogStore::resetExpertSettings()
         [&](State state) { return Reducer::resetExpertSettings(std::move(state)); });
 }
 
-QnUuid CameraSettingsDialogStore::resourceId() const
+nx::Uuid CameraSettingsDialogStore::resourceId() const
 {
     return d->state.singleCameraId();
 }
@@ -735,7 +735,7 @@ QVariantList CameraSettingsDialogStore::userEnabledAnalyticsEngines() const
     return nx::utils::toQVariantList(d->state.analytics.userEnabledEngines.get());
 }
 
-void CameraSettingsDialogStore::setUserEnabledAnalyticsEngines(const QSet<QnUuid>& value)
+void CameraSettingsDialogStore::setUserEnabledAnalyticsEngines(const QSet<nx::Uuid>& value)
 {
     d->executeAction(
         [&](State state)
@@ -744,12 +744,12 @@ void CameraSettingsDialogStore::setUserEnabledAnalyticsEngines(const QSet<QnUuid
         });
 }
 
-QnUuid CameraSettingsDialogStore::currentAnalyticsEngineId() const
+nx::Uuid CameraSettingsDialogStore::currentAnalyticsEngineId() const
 {
     return d->state.analytics.currentEngineId;
 }
 
-void CameraSettingsDialogStore::setCurrentAnalyticsEngineId(const QnUuid& value)
+void CameraSettingsDialogStore::setCurrentAnalyticsEngineId(const nx::Uuid& value)
 {
     d->executeAction(
         [&](State state)
@@ -765,15 +765,15 @@ bool CameraSettingsDialogStore::analyticsSettingsLoading() const
 
 void CameraSettingsDialogStore::setUserEnabledAnalyticsEngines(const QVariantList& value)
 {
-    setUserEnabledAnalyticsEngines(nx::utils::toQSet(nx::utils::toTypedQList<QnUuid>(value)));
+    setUserEnabledAnalyticsEngines(nx::utils::toQSet(nx::utils::toTypedQList<nx::Uuid>(value)));
 }
 
-int CameraSettingsDialogStore::analyticsStreamIndex(const QnUuid& engineId) const
+int CameraSettingsDialogStore::analyticsStreamIndex(const nx::Uuid& engineId) const
 {
     return int(d->state.analytics.streamByEngineId.value(engineId)());
 }
 
-void CameraSettingsDialogStore::setAnalyticsStreamIndex(const QnUuid& engineId, int value)
+void CameraSettingsDialogStore::setAnalyticsStreamIndex(const nx::Uuid& engineId, int value)
 {
     if (!NX_ASSERT(value <= 1))
         value = std::clamp(value, 0, 1);
@@ -782,7 +782,7 @@ void CameraSettingsDialogStore::setAnalyticsStreamIndex(const QnUuid& engineId, 
 }
 
 void CameraSettingsDialogStore::setAnalyticsStreamIndex(
-    const QnUuid& engineId, nx::vms::api::StreamIndex value, ModificationSource source)
+    const nx::Uuid& engineId, nx::vms::api::StreamIndex value, ModificationSource source)
 {
     d->executeAction(
         [&](State state)
@@ -792,18 +792,18 @@ void CameraSettingsDialogStore::setAnalyticsStreamIndex(
         });
 }
 
-QJsonObject CameraSettingsDialogStore::deviceAgentSettingsModel(const QnUuid& engineId) const
+QJsonObject CameraSettingsDialogStore::deviceAgentSettingsModel(const nx::Uuid& engineId) const
 {
     return d->state.analytics.settingsByEngineId.value(engineId).model;
 }
 
-QJsonObject CameraSettingsDialogStore::deviceAgentSettingsValues(const QnUuid& engineId) const
+QJsonObject CameraSettingsDialogStore::deviceAgentSettingsValues(const nx::Uuid& engineId) const
 {
     return d->state.analytics.settingsByEngineId.value(engineId).values.get();
 }
 
 void CameraSettingsDialogStore::setDeviceAgentSettingsValues(
-    const QnUuid& engineId,
+    const nx::Uuid& engineId,
     const QString& activeElement,
     const QJsonObject& values,
     const QJsonObject& paramValues)
@@ -815,7 +815,7 @@ void CameraSettingsDialogStore::setDeviceAgentSettingsValues(
                 std::move(state), engineId, activeElement, values, paramValues);
         });
 }
-void CameraSettingsDialogStore::handleOverusedEngines(const QSet<QnUuid>& overusedEngines)
+void CameraSettingsDialogStore::handleOverusedEngines(const QSet<nx::Uuid>& overusedEngines)
 {
     d->executeAction(
         [&](State state)
@@ -824,7 +824,7 @@ void CameraSettingsDialogStore::handleOverusedEngines(const QSet<QnUuid>& overus
         });
 }
 
-void CameraSettingsDialogStore::refreshDeviceAgentSettings(const QnUuid& engineId)
+void CameraSettingsDialogStore::refreshDeviceAgentSettings(const nx::Uuid& engineId)
 {
     d->executeAction(
         [&](State state)
@@ -834,7 +834,7 @@ void CameraSettingsDialogStore::refreshDeviceAgentSettings(const QnUuid& engineI
 }
 
 void CameraSettingsDialogStore::resetDeviceAgentData(
-    const QnUuid& engineId, const DeviceAgentData& data, bool resetUser)
+    const nx::Uuid& engineId, const DeviceAgentData& data, bool resetUser)
 {
     d->executeAction(
         [&](State state)
@@ -843,7 +843,7 @@ void CameraSettingsDialogStore::resetDeviceAgentData(
         });
 }
 
-QJsonObject CameraSettingsDialogStore::deviceAgentSettingsErrors(const QnUuid& engineId) const
+QJsonObject CameraSettingsDialogStore::deviceAgentSettingsErrors(const nx::Uuid& engineId) const
 {
     return d->state.analytics.settingsByEngineId[engineId].errors;
 }

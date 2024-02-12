@@ -9,7 +9,7 @@
 
 namespace nx::vms::rules {
 
-ServerStartedEvent::ServerStartedEvent(std::chrono::microseconds timestamp, QnUuid serverId):
+ServerStartedEvent::ServerStartedEvent(std::chrono::microseconds timestamp, nx::Uuid serverId):
     base_type(timestamp),
     m_serverId(serverId)
 {

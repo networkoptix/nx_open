@@ -169,7 +169,7 @@ public:
         std::vector<AbstractAttribute*> result;
         for (const AttributeContext& context: m_attributes)
         {
-            if (context.attribute->isSupported(/*any Engine*/ QnUuid(), /*any Device*/ QnUuid()))
+            if (context.attribute->isSupported(/*any Engine*/ nx::Uuid(), /*any Device*/ nx::Uuid()))
                 result.push_back(context.attribute);
         }
 
@@ -182,7 +182,7 @@ public:
         for (const AttributeContext& context: m_attributes)
         {
             if (context.isOwn && context.attribute->isSupported(
-                /*any Engine*/ QnUuid(), /*any Device*/ QnUuid()))
+                /*any Engine*/ nx::Uuid(), /*any Device*/ nx::Uuid()))
             {
                 result.push_back(context.attribute);
             }
@@ -196,7 +196,7 @@ public:
         return m_descriptor.hasEverBeenSupported;
     }
 
-    bool isSupported(QnUuid engineId, QnUuid deviceId) const
+    bool isSupported(nx::Uuid engineId, nx::Uuid deviceId) const
     {
         return m_resourceSupportProxy->isEntityTypeSupported(
             m_entityType, m_descriptor.id, deviceId, engineId);

@@ -91,7 +91,7 @@ void SystemTabBarStateHandler::at_currentSystemChanged(QnSystemDescriptionPtr sy
 void SystemTabBarStateHandler::at_systemDisconnected()
 {
     const auto parameters = menu()->currentParameters(sender());
-    const auto systemId = parameters.argument(Qn::LocalSystemIdRole).value<QnUuid>();
+    const auto systemId = parameters.argument(Qn::LocalSystemIdRole).value<nx::Uuid>();
     m_store->removeSystem(systemId);
 }
 

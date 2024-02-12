@@ -278,7 +278,7 @@ void QnNetworkResource::checkIfOnlineAsync( std::function<void(bool)> completion
     nx::network::SocketGlobals::aioService().post(std::bind(completionHandler, false));
 }
 
-QnUuid QnNetworkResource::physicalIdToId(const QString& physicalId)
+nx::Uuid QnNetworkResource::physicalIdToId(const QString& physicalId)
 {
     return nx::vms::api::CameraData::physicalIdToId(physicalId);
 }

@@ -60,12 +60,12 @@ private:
     void updateCloudItems(const QString& systemId);
     void removeCloudItems(const QString& systemId);
 
-    void setupAcknowledgeAction(EventData& eventData, const QnUuid& cameraId,
+    void setupAcknowledgeAction(EventData& eventData, const nx::Uuid& cameraId,
         const nx::vms::event::AbstractActionPtr& action);
 
     void setupIntercomAcknowledgeAction(
         EventData& eventData,
-        const QnUuid& cameraId,
+        const nx::Uuid& cameraId,
         const nx::vms::event::AbstractActionPtr& action);
 
     QString caption(const nx::vms::event::EventParameters& parameters,
@@ -89,7 +89,7 @@ private:
 
     void truncateToMaximumCount();
 
-    void removeAllItems(QnUuid ruleId);
+    void removeAllItems(nx::Uuid ruleId);
 
 private:
     NotificationListModel* const q = nullptr;
@@ -97,12 +97,12 @@ private:
     QScopedPointer<vms::event::StringsHelper> m_helper;
 
     // Used for deduplication of alarm layout tiles.
-    QHash<QnUuid/*ruleId*/, QHash<QnUuid /*sourceId*/, QSet<QnUuid /*itemId*/>>> m_uuidHashes;
+    QHash<nx::Uuid/*ruleId*/, QHash<nx::Uuid /*sourceId*/, QSet<nx::Uuid /*itemId*/>>> m_uuidHashes;
 
-    QMultiHash<QString, QnUuid> m_itemsByLoadingSound;
-    QHash<QnUuid /*item id*/, QSharedPointer<AudioPlayer>> m_players;
+    QMultiHash<QString, nx::Uuid> m_itemsByLoadingSound;
+    QHash<nx::Uuid /*item id*/, QSharedPointer<AudioPlayer>> m_players;
 
-    QMultiHash<QString /*system id*/, QnUuid /*item id*/> m_itemsByCloudSystem;
+    QMultiHash<QString /*system id*/, nx::Uuid /*item id*/> m_itemsByCloudSystem;
 };
 
 } // namespace nx::vms::client::desktop

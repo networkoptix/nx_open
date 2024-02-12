@@ -12,7 +12,7 @@ OtherServersSource::OtherServersSource(
     QObject* parent)
     :
     QObject(parent),
-    entity_item_model::UniqueKeySource<QnUuid>(),
+    entity_item_model::UniqueKeySource<nx::Uuid>(),
     m_otherServerManager(otherServersManager)
 {
     if (!NX_ASSERT(m_otherServerManager))

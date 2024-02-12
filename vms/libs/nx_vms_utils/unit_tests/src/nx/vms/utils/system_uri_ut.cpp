@@ -745,7 +745,7 @@ TEST_F(SystemUriTest, openCameraAtTimestampSupport)
     m_uri.cloudHost = kCloudHost;
     m_uri.systemAddress = kLocalSystemAddress;
     m_uri.credentials = kPasswordCredentials;
-    m_uri.resourceIds = {QnUuid::fromStringSafe(kResourceId)};
+    m_uri.resourceIds = {nx::Uuid::fromStringSafe(kResourceId)};
     m_uri.timestamp = kTimestamp;
     m_uri.userAuthType = SystemUri::UserAuthType::local;
 
@@ -772,8 +772,8 @@ TEST_F(SystemUriTest, openTwoCameras)
     m_uri.credentials = kPasswordCredentials;
     m_uri.userAuthType = SystemUri::UserAuthType::local;
     m_uri.resourceIds = {
-        QnUuid::fromStringSafe(kResourceId1),
-        QnUuid::fromStringSafe(kResourceId2)
+        nx::Uuid::fromStringSafe(kResourceId1),
+        nx::Uuid::fromStringSafe(kResourceId2)
     };
 
     // Note: auth parameter must be the last as it contain %3.

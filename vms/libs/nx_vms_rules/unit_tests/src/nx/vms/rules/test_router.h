@@ -14,8 +14,8 @@ class TestRouter: public nx::vms::rules::Router
 public:
     virtual void routeEvent(
         const EventData& eventData,
-        const QSet<QnUuid>& triggeredRules,
-        const QSet<QnUuid>& /*affectedResources*/) override
+        const QSet<nx::Uuid>& triggeredRules,
+        const QSet<nx::Uuid>& /*affectedResources*/) override
     {
         for (const auto ruleId: triggeredRules)
         {

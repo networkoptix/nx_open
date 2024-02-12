@@ -11,7 +11,7 @@ namespace nx::vms::rules {
 
 ServerFailureEvent::ServerFailureEvent(
     std::chrono::microseconds timestamp,
-    QnUuid serverId,
+    nx::Uuid serverId,
     nx::vms::api::EventReason reason)
     :
     BasicEvent(timestamp),

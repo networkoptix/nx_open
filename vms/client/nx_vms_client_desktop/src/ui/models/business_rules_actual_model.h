@@ -28,15 +28,15 @@ signals:
     void beforeModelChanged();
     void afterModelChanged(QnBusinessRulesActualModelChange change, bool ok);
 
-    void eventRuleChanged(const QnUuid& id);
-    void eventRuleDeleted(const QnUuid& id);
+    void eventRuleChanged(const nx::Uuid& id);
+    void eventRuleDeleted(const nx::Uuid& id);
 
 public slots:
     void saveRule(const QModelIndex& index);
 
 private slots:
     void at_ruleAddedOrUpdated(const nx::vms::event::RulePtr& rule);
-    void at_ruleRemoved(const QnUuid& id);
+    void at_ruleRemoved(const nx::Uuid& id);
     void at_rulesReset(const nx::vms::event::RuleList& rules);
 
 private:

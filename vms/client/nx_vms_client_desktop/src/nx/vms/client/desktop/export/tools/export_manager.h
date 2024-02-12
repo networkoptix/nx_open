@@ -11,12 +11,12 @@ namespace nx::vms::client::desktop {
 
 struct ExportProcessInfo
 {
-    explicit ExportProcessInfo(const QnUuid& id):
+    explicit ExportProcessInfo(const nx::Uuid& id):
         id(id)
     {
     }
 
-    const QnUuid id;
+    const nx::Uuid id;
     int rangeStart = 0;
     int rangeEnd = 100;
     int progressValue = 0;
@@ -33,7 +33,7 @@ class ExportProcess: public QObject
     Q_OBJECT
 
 public:
-    ExportProcess(const QnUuid& id, std::unique_ptr<AbstractExportTool>&& tool, QObject* parent = nullptr);
+    ExportProcess(const nx::Uuid& id, std::unique_ptr<AbstractExportTool>&& tool, QObject* parent = nullptr);
     virtual ~ExportProcess() override;
 
     const ExportProcessInfo& info() const;
@@ -45,7 +45,7 @@ public:
 
 signals:
     void infoChanged(const ExportProcessInfo& info);
-    void finished(const QnUuid& id);
+    void finished(const nx::Uuid& id);
 
 protected:
     ExportProcessInfo m_info;
@@ -69,10 +69,10 @@ public:
      * Start export process using specified tool.
      * Manager will take care of removing the tool
      */
-    QnUuid startExport(const QnUuid& id, std::unique_ptr<AbstractExportTool>&& tool);
-    void stopExport(const QnUuid& exportProcessId);
+    nx::Uuid startExport(const nx::Uuid& id, std::unique_ptr<AbstractExportTool>&& tool);
+    void stopExport(const nx::Uuid& exportProcessId);
 
-    ExportProcessInfo info(const QnUuid& exportProcessId) const;
+    ExportProcessInfo info(const nx::Uuid& exportProcessId) const;
 
 signals:
     void processUpdated(const ExportProcessInfo& info);

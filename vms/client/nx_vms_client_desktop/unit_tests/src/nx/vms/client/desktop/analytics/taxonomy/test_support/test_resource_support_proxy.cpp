@@ -14,8 +14,8 @@ TestResourceSupportProxy::TestResourceSupportProxy(
 bool TestResourceSupportProxy::isEntityTypeSupported(
     nx::analytics::taxonomy::EntityType entityType,
     const QString& entityTypeId,
-    QnUuid deviceId,
-    QnUuid engineId) const
+    nx::Uuid deviceId,
+    nx::Uuid engineId) const
 {
     if (entityType != nx::analytics::taxonomy::EntityType::objectType)
         return false;
@@ -63,8 +63,8 @@ bool TestResourceSupportProxy::isEntityTypeAttributeSupported(
     nx::analytics::taxonomy::EntityType entityType,
     const QString& entityTypeId,
     const QString& fullAttributeName,
-    QnUuid deviceId,
-    QnUuid engineId) const
+    nx::Uuid deviceId,
+    nx::Uuid engineId) const
 {
     if (entityType != nx::analytics::taxonomy::EntityType::objectType)
         return false;

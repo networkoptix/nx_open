@@ -15,13 +15,13 @@ using ImageRequest = nx::vms::api::ThumbnailFilter;
 
 struct ResourceImageRequest: ImageRequest
 {
-    QnUuid objectTrackId;
+    nx::Uuid objectTrackId;
     QnResourcePtr resource;
 };
 
 struct NX_VMS_COMMON_API CameraImageRequest: ImageRequest
 {
-    QnUuid objectTrackId;
+    nx::Uuid objectTrackId;
     QnVirtualCameraResourcePtr camera;
 
     CameraImageRequest() = default;
@@ -29,7 +29,7 @@ struct NX_VMS_COMMON_API CameraImageRequest: ImageRequest
     CameraImageRequest(
         const QnVirtualCameraResourcePtr& camera,
         const ImageRequest& request,
-        const QnUuid& objectTrackId = {})
+        const nx::Uuid& objectTrackId = {})
         :
         ImageRequest(request),
         objectTrackId(objectTrackId),

@@ -34,18 +34,18 @@ public:
         ContextBasedTest::TearDown();
     }
 
-    virtual ResourceAccessMap resourceAccessMap(const QnUuid& /*subjectId*/) const override
+    virtual ResourceAccessMap resourceAccessMap(const nx::Uuid& /*subjectId*/) const override
     {
         return testAccessMap;
     }
 
-    virtual GlobalPermissions globalPermissions(const QnUuid& /*subjectId*/) const override
+    virtual GlobalPermissions globalPermissions(const nx::Uuid& /*subjectId*/) const override
     {
         return {};
     }
 
     virtual ResourceAccessDetails accessDetails(
-        const QnUuid& /*subjectId*/,
+        const nx::Uuid& /*subjectId*/,
         const QnResourcePtr& /*resource*/,
         AccessRight /*accessRight*/) const override
     {

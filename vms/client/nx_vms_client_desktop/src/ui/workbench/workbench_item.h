@@ -26,7 +26,7 @@ class QnWorkbenchLayout;
 class QnWorkbenchItem: public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(QnUuid uuid READ uuid)
+    Q_PROPERTY(nx::Uuid uuid READ uuid)
     Q_PROPERTY(qreal rotation READ rotation WRITE setRotation)
 
 public:
@@ -37,7 +37,7 @@ public:
      * \param uuid                      Universally unique identifier of this item.
      * \param parent                    Parent of this object.
      */
-    QnWorkbenchItem(const QnResourcePtr& resource, const QnUuid& uuid, QObject* parent = nullptr);
+    QnWorkbenchItem(const QnResourcePtr& resource, const nx::Uuid& uuid, QObject* parent = nullptr);
 
     /**
      * Constructor.
@@ -97,7 +97,7 @@ public:
     /**
      * \returns                         Universally unique identifier of this item.
      */
-    const QnUuid &uuid() const
+    const nx::Uuid &uuid() const
     {
         return m_uuid;
     }
@@ -355,7 +355,7 @@ private:
     QnWorkbenchLayout* m_layout = nullptr;
 
     /** Universal unique identifier of this item. */
-    const QnUuid m_uuid;
+    const nx::Uuid m_uuid;
 
     const QnResourcePtr m_resource;
 

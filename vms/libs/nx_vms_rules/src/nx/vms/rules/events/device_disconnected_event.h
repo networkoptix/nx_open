@@ -13,11 +13,11 @@ class NX_VMS_RULES_API DeviceDisconnectedEvent: public BasicEvent
     Q_CLASSINFO("type", "nx.events.deviceDisconnected")
     using base_type = BasicEvent;
 
-    FIELD(QnUuid, cameraId, setCameraId)
+    FIELD(nx::Uuid, cameraId, setCameraId)
 
 public:
     DeviceDisconnectedEvent() = default;
-    DeviceDisconnectedEvent(std::chrono::microseconds timestamp, QnUuid deviceId);
+    DeviceDisconnectedEvent(std::chrono::microseconds timestamp, nx::Uuid deviceId);
 
     virtual QString uniqueName() const override;
     virtual QString resourceKey() const override;

@@ -32,7 +32,7 @@ CameraButton button(const QString& name, const QString& iconName)
     static const QString kAdvancedCameraButtonPrefix = "advanced_camera_button";
 
     return {
-        .id = QnUuid::fromArbitraryData(kAdvancedCameraButtonPrefix + name + iconName),
+        .id = nx::Uuid::fromArbitraryData(kAdvancedCameraButtonPrefix + name + iconName),
         .name = name,
         .iconName = iconName,
         .enabled = true
@@ -52,7 +52,7 @@ static const std::map<ExtendedCameraOutput, CameraButton> supportedOutputTypeToB
 static const auto supportedButtonToOutputType =
     []()
     {
-        std::map<QnUuid, ExtendedCameraOutput> result;
+        std::map<nx::Uuid, ExtendedCameraOutput> result;
         for (const auto& [outputType, button]: supportedOutputTypeToButtons)
             result.emplace(button.id, outputType);
         return result;

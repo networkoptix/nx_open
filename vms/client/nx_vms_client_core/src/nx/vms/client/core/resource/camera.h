@@ -14,7 +14,7 @@ class NX_VMS_CLIENT_CORE_API Camera: public QnVirtualCameraResource
     using base_type = QnVirtualCameraResource;
 
 public:
-    explicit Camera(const QnUuid& resourceTypeId);
+    explicit Camera(const nx::Uuid& resourceTypeId);
 
     /**
      * @return User-defined camera name if it is present, default name otherwise.
@@ -29,7 +29,7 @@ public:
     virtual nx::vms::api::ResourceStatus getStatus() const override;
 
     virtual Qn::ResourceFlags flags() const override;
-    virtual void setParentId(const QnUuid& parent) override;
+    virtual void setParentId(const nx::Uuid& parent) override;
 
     bool isPtzSupported() const;
     bool isPtzRedirected() const;

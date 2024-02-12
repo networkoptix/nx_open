@@ -66,13 +66,13 @@ public:
      * Create AdapterFunc that uses the active connection certificate cache.
      */
     virtual nx::network::ssl::AdapterFunc makeAdapterFunc(
-        const QnUuid& serverId, const nx::utils::Url& url = {}) override;
+        const nx::Uuid& serverId, const nx::utils::Url& url = {}) override;
 
     /**
      * Check certificate chain using certificate keys in persistent storage.
      */
     Status verifyCertificate(
-        const QnUuid& serverId,
+        const nx::Uuid& serverId,
         const nx::network::ssl::CertificateChain& chain,
         bool acceptExpired = false) const;
 
@@ -82,12 +82,12 @@ public:
      * Store given certificate's public key, replacing existing if present.
      */
     void pinCertificate(
-        const QnUuid& serverId,
+        const nx::Uuid& serverId,
         const std::string& publicKey,
         CertificateType certType = CertificateType::connection);
 
     std::optional<std::string> pinnedCertificate(
-        const QnUuid& serverId,
+        const nx::Uuid& serverId,
         CertificateType certType);
 
     /**
@@ -95,11 +95,11 @@ public:
      * of the server before the call, updates the pinned certificate too.
      */
     void updateCertificate(
-        const QnUuid& serverId,
+        const nx::Uuid& serverId,
         const std::string& publicKey,
         CertificateType certType);
 
-    void removeCertificatesFromCache(const QnUuid& serverId);
+    void removeCertificatesFromCache(const nx::Uuid& serverId);
 
     void setSession(std::weak_ptr<RemoteSession> session);
 
@@ -121,18 +121,18 @@ public:
     virtual ~CertificateCache() override;
 
     void addCertificate(
-        const QnUuid& serverId,
+        const nx::Uuid& serverId,
         const std::string& publicKey,
         CertificateVerifier::CertificateType certType);
 
     std::optional<std::string> certificate(
-        const QnUuid& serverId,
+        const nx::Uuid& serverId,
         CertificateVerifier::CertificateType certType) const;
 
-    void removeCertificates(const QnUuid& serverId);
+    void removeCertificates(const nx::Uuid& serverId);
 
     virtual nx::network::ssl::AdapterFunc makeAdapterFunc(
-        const QnUuid& serverId, const nx::utils::Url& url = {}) override;
+        const nx::Uuid& serverId, const nx::utils::Url& url = {}) override;
 
 private:
     struct Private;

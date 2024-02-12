@@ -123,7 +123,7 @@ struct SystemSettingNames
     };
 };
 
-using FileToPeerList = QMap<QString, QList<QnUuid>>;
+using FileToPeerList = QMap<QString, QList<nx::Uuid>>;
 
 class NX_VMS_COMMON_API SystemSettings:
     public QObject,
@@ -254,18 +254,18 @@ public:
     void setUpnpPortMappingEnabled(bool value);
 
     /** local systemId. Media servers connect if this value equal */
-    QnUuid localSystemId() const;
-    void setLocalSystemId(const QnUuid& value);
+    nx::Uuid localSystemId() const;
+    void setLocalSystemId(const nx::Uuid& value);
 
     /**
      *
      * Last merge operation id. It set same value for master and slave hosts during merge
      */
-    QnUuid lastMergeMasterId() const;
-    void setLastMergeMasterId(const QnUuid& value);
+    nx::Uuid lastMergeMasterId() const;
+    void setLastMergeMasterId(const nx::Uuid& value);
 
-    QnUuid lastMergeSlaveId() const;
-    void setLastMergeSlaveId(const QnUuid& value);
+    nx::Uuid lastMergeSlaveId() const;
+    void setLastMergeSlaveId(const nx::Uuid& value);
 
     nx::utils::Url clientStatisticsSettingsUrl() const;
 
@@ -283,8 +283,8 @@ public:
     bool isTimeSynchronizationEnabled() const;
     void setTimeSynchronizationEnabled(bool value);
 
-    QnUuid primaryTimeServer() const;
-    void setPrimaryTimeServer(const QnUuid& value);
+    nx::Uuid primaryTimeServer() const;
+    void setPrimaryTimeServer(const nx::Uuid& value);
 
     std::chrono::milliseconds maxDifferenceBetweenSynchronizedAndInternetTime() const;
     std::chrono::milliseconds maxDifferenceBetweenSynchronizedAndLocalTime() const;
@@ -307,8 +307,8 @@ public:
     QString cloudAccountName() const;
     void setCloudAccountName(const QString& value);
 
-    QnUuid organizationId() const;
-    void setOrganizationId(const QnUuid& value);
+    nx::Uuid organizationId() const;
+    void setOrganizationId(const nx::Uuid& value);
 
     QString cloudSystemId() const;
     void setCloudSystemId(const QString& value);
@@ -489,8 +489,8 @@ public:
     bool system2faEnabled() const;
     void setSystem2faEnabled(bool value);
 
-    std::vector<QnUuid> masterCloudSyncList() const;
-    void setMasterCloudSyncList(const std::vector<QnUuid>& idList) const;
+    std::vector<nx::Uuid> masterCloudSyncList() const;
+    void setMasterCloudSyncList(const std::vector<nx::Uuid>& idList) const;
 
     std::chrono::seconds cloudPollingInterval() const;
     void setCloudPollingInterval(std::chrono::seconds value);
@@ -581,7 +581,7 @@ private:
     QnResourcePropertyAdaptor<bool>* m_updateNotificationsEnabledAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* m_timeSynchronizationEnabledAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* m_synchronizeTimeWithInternetAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QnUuid> *m_primaryTimeServerAdaptor = nullptr;
+    QnResourcePropertyAdaptor<nx::Uuid> *m_primaryTimeServerAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_masterCloudSyncAdaptor = nullptr;
     QnResourcePropertyAdaptor<int>* m_maxDifferenceBetweenSynchronizedAndInternetTimeAdaptor = nullptr;
     QnResourcePropertyAdaptor<int>* m_maxDifferenceBetweenSynchronizedAndLocalTimeAdaptor = nullptr;
@@ -598,7 +598,7 @@ private:
     QnResourcePropertyAdaptor<QString>* m_statisticsReportTimeCycleAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_statisticsReportUpdateDelayAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* m_upnpPortMappingEnabledAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QnUuid>* m_localSystemIdAdaptor = nullptr;
+    QnResourcePropertyAdaptor<nx::Uuid>* m_localSystemIdAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_lastMergeMasterIdAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_lastMergeSlaveIdAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_statisticsReportServerApiAdaptor = nullptr;
@@ -616,7 +616,7 @@ private:
 
     // set of cloud adaptors
     QnResourcePropertyAdaptor<QString>* m_cloudAccountNameAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QnUuid>* m_organizationIdAdaptor = nullptr;
+    QnResourcePropertyAdaptor<nx::Uuid>* m_organizationIdAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_cloudSystemIdAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_cloudAuthKeyAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* m_system2faEnabledAdaptor = nullptr;

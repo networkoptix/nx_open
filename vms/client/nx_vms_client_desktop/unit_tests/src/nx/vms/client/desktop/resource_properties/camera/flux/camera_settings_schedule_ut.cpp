@@ -62,7 +62,7 @@ protected:
 
     void whenUserDisablesAnalyticsEngine()
     {
-        dispatch(Reducer::setUserEnabledAnalyticsEngines, QSet<QnUuid>());
+        dispatch(Reducer::setUserEnabledAnalyticsEngines, QSet<nx::Uuid>());
     }
 
     QnScheduleTaskList getFilledSchedule(

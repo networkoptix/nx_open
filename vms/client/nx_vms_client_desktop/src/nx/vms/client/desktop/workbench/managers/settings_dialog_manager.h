@@ -30,16 +30,16 @@ public:
      * Returns an ID of the user which is currently opened in the user settings dialog. If the
      * dialog has not been created yet, it returns the latest ID set by setCurrentEditedUserId.
      */
-    QnUuid currentEditedUserId() const;
+    nx::Uuid currentEditedUserId() const;
     /**
      * Opens the specified user in the user settings dialog. If the dialog has not been created
      * yet, simply stores the value. The opened dialog is not brought to front and not activated.
      */
-    void setCurrentEditedUserId(const QnUuid& userId);
+    void setCurrentEditedUserId(const nx::Uuid& userId);
     /**
      * Opens the specified user in the user settings dialog.
      */
-    void editUser(const QnUuid& userId, int tab = -1, QWidget* parent = nullptr);
+    void editUser(const nx::Uuid& userId, int tab = -1, QWidget* parent = nullptr);
 
     bool isEditUserDialogVisible() const;
 
@@ -53,17 +53,17 @@ public:
      * Returns an ID of the group which is currently opened in the group settings dialog. If the
      * dialog has not been created yet, it returns the latest ID set by setCurrentEditedGroupId.
      */
-    QnUuid currentEditedGroupId() const;
+    nx::Uuid currentEditedGroupId() const;
     /**
      * Opens the specified group in the group settings dialog. If the dialog has not been created
      * yet, simply stores the value. The opened dialog is not brought to front and not activated.
      */
-    void setCurrentEditedGroupId(const QnUuid& groupId);
+    void setCurrentEditedGroupId(const nx::Uuid& groupId);
     /**
      * Opens the specified group in the group settings dialog. If the dialog has not been created
      * yet, simply stores the value. The opened dialog is not brought to front and not activated.
      */
-    void editGroup(const QnUuid& groupId, QWidget* parent = nullptr);
+    void editGroup(const nx::Uuid& groupId, QWidget* parent = nullptr);
 
     bool isEditGroupDialogVisible() const;
 

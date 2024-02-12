@@ -14,7 +14,7 @@ struct NX_VMS_API ServerInfoFilter
      * refer to the current Server.
      * %example this
      */
-    QnUuid id;
+    nx::Uuid id;
 
     /**%apidoc[opt] Flag to filter out Server Info from offline Servers. Use this flag
      *     together with "_local" flag to control request propagation and response details.

@@ -20,7 +20,7 @@ enum class FigureType
     point
 };
 
-using EngineId = QnUuid;
+using EngineId = nx::Uuid;
 
 class Figure;
 using FigureId = QString;

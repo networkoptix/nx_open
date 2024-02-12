@@ -57,7 +57,7 @@ public:
 
     struct UnresolvedEntity
     {
-        QnUuid engineId;
+        nx::Uuid engineId;
         QString entityId;
     };
 

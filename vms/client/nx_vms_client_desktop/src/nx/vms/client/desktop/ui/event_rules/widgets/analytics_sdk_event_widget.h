@@ -34,7 +34,7 @@ private:
     void updateSdkEventTypesModel();
     void updateSelectedEventType();
     nx::vms::event::EventParameters createEventParameters(
-        const QnUuid& engineId,
+        const nx::Uuid& engineId,
         const QString& analyticsEventTypeId);
 
 private:

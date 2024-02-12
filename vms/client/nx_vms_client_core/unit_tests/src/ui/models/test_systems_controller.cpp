@@ -34,7 +34,7 @@ QnAbstractSystemsFinder::SystemDescriptionList TestSystemsController::systemsLis
     return m_systems;
 }
 
-TileVisibilityScope TestSystemsController::visibilityScope(const QnUuid& localId) const
+TileVisibilityScope TestSystemsController::visibilityScope(const nx::Uuid& localId) const
 {
     if (m_scopeInfoHash.contains(localId))
         return m_scopeInfoHash[localId].visibilityScope;
@@ -42,7 +42,7 @@ TileVisibilityScope TestSystemsController::visibilityScope(const QnUuid& localId
 }
 
 bool TestSystemsController::setScopeInfo(
-    const QnUuid& localId,
+    const nx::Uuid& localId,
     const QString& name,
     TileVisibilityScope visibilityScope)
 {
@@ -79,7 +79,7 @@ void TestSystemsController::emitSystemLost(const QString& systemId)
 {
     auto iter = std::find_if(m_systems.begin(), m_systems.end(),
         [systemId](QnSystemDescriptionPtr system){
-            return system->localId() == QnUuid(systemId);
+            return system->localId() == nx::Uuid(systemId);
         });
 
     if (iter != m_systems.end())

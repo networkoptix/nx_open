@@ -293,20 +293,20 @@ ActionType AbstractAction::actionType() const
     return m_actionType;
 }
 
-void AbstractAction::setResources(const QVector<QnUuid>& resources)
+void AbstractAction::setResources(const QVector<nx::Uuid>& resources)
 {
     m_resources = resources;
 }
 
-const QVector<QnUuid>& AbstractAction::getResources() const
+const QVector<nx::Uuid>& AbstractAction::getResources() const
 {
     return m_resources;
 }
 
-QVector<QnUuid> AbstractAction::getSourceResources(const QnResourcePool* resourcePool) const
+QVector<nx::Uuid> AbstractAction::getSourceResources(const QnResourcePool* resourcePool) const
 {
     NX_ASSERT(m_params.useSource, "Method should be called only when corresponding parameter is set.");
-    QVector<QnUuid> result;
+    QVector<nx::Uuid> result;
     result << m_runtimeParams.eventResourceId;
     for (const auto& flexibleId: m_runtimeParams.metadata.cameraRefs)
     {
@@ -347,12 +347,12 @@ EventParameters& AbstractAction::getRuntimeParams()
     return m_runtimeParams;
 }
 
-void AbstractAction::setRuleId(const QnUuid& value)
+void AbstractAction::setRuleId(const nx::Uuid& value)
 {
     m_ruleId = value;
 }
 
-QnUuid AbstractAction::getRuleId() const
+nx::Uuid AbstractAction::getRuleId() const
 {
     return m_ruleId;
 }

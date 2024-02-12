@@ -53,7 +53,7 @@ namespace nx::vms::api {
  */
 struct NX_VMS_API ServerModel: ResourceWithParameters
 {
-    QnUuid id;
+    nx::Uuid id;
 
     /**%apidoc
      * %example Server 1
@@ -121,8 +121,8 @@ struct NX_VMS_API ServerModel: ResourceWithParameters
         ResourceParamWithRefDataList,
         StorageDataList>;
 
-    QnUuid getId() const { return id; }
-    void setId(QnUuid id_) { id = std::move(id_); }
+    nx::Uuid getId() const { return id; }
+    void setId(nx::Uuid id_) { id = std::move(id_); }
     static_assert(isCreateModelV<ServerModel>);
     static_assert(isUpdateModelV<ServerModel>);
     static_assert(isFlexibleIdModelV<ServerModel>);

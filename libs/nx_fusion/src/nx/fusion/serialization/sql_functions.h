@@ -91,12 +91,12 @@ inline void deserialize_field(const QVariant &value, std::string *target) {
     *target = value.value<QString>().toStdString();
 }
 
-inline void serialize_field(const QnUuid &value, QVariant *target) {
+inline void serialize_field(const nx::Uuid &value, QVariant *target) {
     *target = QVariant::fromValue<QByteArray>(value.toRfc4122());
 }
 
-inline void deserialize_field(const QVariant &value, QnUuid *target) {
-    *target = QnUuid::fromRfc4122(value.value<QByteArray>());
+inline void deserialize_field(const QVariant &value, nx::Uuid *target) {
+    *target = nx::Uuid::fromRfc4122(value.value<QByteArray>());
 }
 
 inline void serialize_field(const std::chrono::milliseconds &value, QVariant *target) {
@@ -215,7 +215,7 @@ inline void deserialize_field(const QVariant& value, std::optional<T>* target)
 }
 
 
-NX_FUSION_API void serialize_field(const std::vector<QnUuid>&value, QVariant *target);
-NX_FUSION_API void deserialize_field(const QVariant &value, std::vector<QnUuid> *target);
+NX_FUSION_API void serialize_field(const std::vector<nx::Uuid>&value, QVariant *target);
+NX_FUSION_API void deserialize_field(const QVariant &value, std::vector<nx::Uuid> *target);
 
 #endif // QN_SERIALIZATION_SQL_FUNCTIONS_H
