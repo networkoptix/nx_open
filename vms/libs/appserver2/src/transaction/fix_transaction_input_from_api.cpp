@@ -80,7 +80,7 @@ Result fixRequestDataIfNeeded(nx::vms::api::LayoutData* paramData)
     for (auto& item: paramData->items)
     {
         if (item.id.isNull())
-            item.id = QnUuid::createUuid();
+            item.id = nx::Uuid::createUuid();
     }
     return Result();
 }

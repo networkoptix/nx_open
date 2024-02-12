@@ -20,7 +20,7 @@ public:
         watcher.reset(new LayoutItemWatcher());
 
         QObject::connect(watcher.get(), &LayoutItemWatcher::addedToLayout,
-            [this](const QnUuid& resourceId, const QnLayoutResourcePtr& layout)
+            [this](const nx::Uuid& resourceId, const QnLayoutResourcePtr& layout)
             {
                 lastSignals.push_back("addedToLayout");
                 lastResourceIds.push_back(resourceId);
@@ -28,7 +28,7 @@ public:
             });
 
         QObject::connect(watcher.get(), &LayoutItemWatcher::removedFromLayout,
-            [this](const QnUuid& resourceId, const QnLayoutResourcePtr& layout)
+            [this](const nx::Uuid& resourceId, const QnLayoutResourcePtr& layout)
             {
                 lastSignals.push_back("removedFromLayout");
                 lastResourceIds.push_back(resourceId);
@@ -36,14 +36,14 @@ public:
             });
 
         QObject::connect(watcher.get(), &LayoutItemWatcher::resourceAdded,
-            [this](const QnUuid& resourceId)
+            [this](const nx::Uuid& resourceId)
             {
                 lastSignals.push_back("resourceAdded");
                 lastResourceIds.push_back(resourceId);
             });
 
         QObject::connect(watcher.get(), &LayoutItemWatcher::resourceRemoved,
-            [this](const QnUuid& resourceId)
+            [this](const nx::Uuid& resourceId)
             {
                 lastSignals.push_back("resourceRemoved");
                 lastResourceIds.push_back(resourceId);
@@ -64,9 +64,9 @@ public:
         return lastSignals.empty() ? QString() : lastSignals.takeFirst();
     }
 
-    QnUuid popNextResourceId()
+    nx::Uuid popNextResourceId()
     {
-        return lastResourceIds.empty() ? QnUuid() : lastResourceIds.takeFirst();
+        return lastResourceIds.empty() ? nx::Uuid() : lastResourceIds.takeFirst();
     }
 
     QnLayoutResourcePtr popNextLayout()
@@ -85,7 +85,7 @@ public:
 
 private:
     QStringList lastSignals;
-    QList<QnUuid> lastResourceIds;
+    QList<nx::Uuid> lastResourceIds;
     QList<QnLayoutResourcePtr> lastLayouts;
 };
 

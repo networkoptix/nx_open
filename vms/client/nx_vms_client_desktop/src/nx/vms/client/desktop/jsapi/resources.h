@@ -37,7 +37,7 @@ public:
 
 signals:
     void added(const QJsonObject& resource);
-    void removed(const QnUuid& resourceId);
+    void removed(const nx::Uuid& resourceId);
 
 private:
     nx::utils::ImplPtr<detail::ResourcesApiBackend> d;

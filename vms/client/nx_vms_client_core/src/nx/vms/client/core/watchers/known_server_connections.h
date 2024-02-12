@@ -24,7 +24,7 @@ class NX_VMS_CLIENT_CORE_API KnownServerConnections: public QObject
 public:
     struct Connection
     {
-        QnUuid serverId;
+        nx::Uuid serverId;
         nx::utils::Url url;
 
         bool operator==(const Connection& other) const = default;

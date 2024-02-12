@@ -194,7 +194,7 @@ protected:
     template<typename AttributeType>
     bool readUuidAttributeValue(
         const nx::network::stun::Message& message,
-        QnUuid* const value)
+        nx::Uuid* const value)
     {
         const auto attribute = message.getAttribute< AttributeType >();
         if (!attribute)
@@ -204,7 +204,7 @@ protected:
                 network::stun::extension::attrs::toString(AttributeType::TYPE)));
             return false;
         }
-        *value = QnUuid::fromStringSafe(attribute->getString());
+        *value = nx::Uuid::fromStringSafe(attribute->getString());
         return true;
     }
 

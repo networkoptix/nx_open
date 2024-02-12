@@ -11,13 +11,13 @@ namespace nx::vms::client::desktop::analytics::taxonomy {
 struct ScopeStateViewFilter::Private
 {
     nx::analytics::taxonomy::AbstractEngine* engine = nullptr;
-    std::set<QnUuid> devices;
+    std::set<nx::Uuid> devices;
     QString id;
 };
 
 ScopeStateViewFilter::ScopeStateViewFilter(
     nx::analytics::taxonomy::AbstractEngine* engine,
-    const std::set<QnUuid>& devices,
+    const std::set<nx::Uuid>& devices,
     QObject* parent)
     :
     AbstractStateViewFilter(parent),
@@ -25,7 +25,7 @@ ScopeStateViewFilter::ScopeStateViewFilter(
 {
     QStringList ids = {engine ? engine->id() : ""};
 
-    for (const QnUuid& id: devices)
+    for (const nx::Uuid& id: devices)
         ids.push_back(id.toString());
 
     d->id = ids.join(" ");
@@ -56,8 +56,8 @@ bool ScopeStateViewFilter::matches(
         return false;
 
 
-    const QnUuid engineId = d->engine ? QnUuid::fromStringSafe(d->engine->id()) : QnUuid();
-    for (const QnUuid& deviceId: d->devices)
+    const nx::Uuid engineId = d->engine ? nx::Uuid::fromStringSafe(d->engine->id()) : nx::Uuid();
+    for (const nx::Uuid& deviceId: d->devices)
     {
         if (objectType->isSupported(engineId, deviceId))
             return true;
@@ -69,13 +69,13 @@ bool ScopeStateViewFilter::matches(
 bool ScopeStateViewFilter::matches(
     const nx::analytics::taxonomy::AbstractAttribute* attribute) const
 {
-    const auto engine = d->engine ? QnUuid{d->engine->id()} : QnUuid{};
+    const auto engine = d->engine ? nx::Uuid{d->engine->id()} : nx::Uuid{};
 
     if (d->devices.empty())
         return attribute->isSupported(engine, /*deviceId*/ {});
 
     return std::any_of(d->devices.begin(), d->devices.end(),
-        [&](const QnUuid& device) { return attribute->isSupported(engine, device); });
+        [&](const nx::Uuid& device) { return attribute->isSupported(engine, device); });
 }
 
 } // namespace nx::vms::client::desktop::analytics::taxonomy

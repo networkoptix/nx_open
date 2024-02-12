@@ -96,10 +96,10 @@ qint32 BidirectionRoutingInfo::distanceTo(
 }
 
 qint32 BidirectionRoutingInfo::distanceTo(
-    const QnUuid& peerId,
+    const nx::Uuid& peerId,
     RoutingInfo* outVia) const
 {
-    PersistentIdData peer(peerId, QnUuid());
+    PersistentIdData peer(peerId, nx::Uuid());
 
     qint32 result = kMaxDistance;
     for (auto itr = allPeerDistances.lowerBound(peer);

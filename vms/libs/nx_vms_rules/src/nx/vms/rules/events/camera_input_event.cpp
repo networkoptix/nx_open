@@ -14,7 +14,7 @@ namespace nx::vms::rules {
 CameraInputEvent::CameraInputEvent(
     std::chrono::microseconds timestamp,
     State state,
-    QnUuid cameraId,
+    nx::Uuid cameraId,
     const QString& inputPortId)
     :
     base_type(timestamp, state, cameraId),

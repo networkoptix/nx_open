@@ -137,7 +137,7 @@ private:
 
 private:
     QnVirtualCameraResourcePtr m_camera;
-    QnUuid m_sequenceId;
+    nx::Uuid m_sequenceId;
     QAtomicInt m_sequenceNumber;
 
     mutable nx::Mutex m_mutex;

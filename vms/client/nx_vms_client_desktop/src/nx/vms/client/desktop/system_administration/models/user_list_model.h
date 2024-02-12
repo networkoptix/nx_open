@@ -65,8 +65,8 @@ public:
 
     static bool isInteractiveColumn(int column);
 
-    QSet<QnUuid> notFoundUsers() const;
-    QSet<QnUuid> nonUniqueUsers() const;
+    QSet<nx::Uuid> notFoundUsers() const;
+    QSet<nx::Uuid> nonUniqueUsers() const;
     qsizetype ldapUserCount() const;
 
 signals:

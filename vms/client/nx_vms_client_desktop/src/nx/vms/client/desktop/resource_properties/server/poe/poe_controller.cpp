@@ -32,7 +32,7 @@ struct PoeController::Private:
 
     void setInitialUpdateInProgress(bool value);
     void setBlockData(const BlockData& data);
-    void updateTargetResource(const QnUuid& value);
+    void updateTargetResource(const nx::Uuid& value);
     void handleReply(
         bool success, rest::Handle currentHandle, const nx::network::rest::JsonResult& result);
     void update();
@@ -86,7 +86,7 @@ void PoeController::Private::setBlockData(const BlockData& data)
     emit q->updated();
 }
 
-void PoeController::Private::updateTargetResource(const QnUuid& value)
+void PoeController::Private::updateTargetResource(const nx::Uuid& value)
 {
     if (!serverHolder.setResourceId(value))
         return;
@@ -196,12 +196,12 @@ PoeController::~PoeController()
     d->cancelRequest();
 }
 
-void PoeController::setResourceId(const QnUuid& value)
+void PoeController::setResourceId(const nx::Uuid& value)
 {
     d->updateTargetResource(value);
 }
 
-QnUuid PoeController::resourceId() const
+nx::Uuid PoeController::resourceId() const
 {
     return d->serverHolder.resourceId();
 }

@@ -17,9 +17,9 @@ namespace nx::vms::rules {
 SoftTriggerEvent::SoftTriggerEvent(
     std::chrono::microseconds timestamp,
     State state,
-    QnUuid triggerId,
-    QnUuid cameraId,
-    QnUuid userId,
+    nx::Uuid triggerId,
+    nx::Uuid cameraId,
+    nx::Uuid userId,
     const QString& name,
     const QString& icon)
     :
@@ -35,7 +35,7 @@ SoftTriggerEvent::SoftTriggerEvent(
 QString SoftTriggerEvent::uniqueName() const
 {
     // All the soft trigger events must be considered as unique events.
-    return QnUuid::createUuid().toString();
+    return nx::Uuid::createUuid().toString();
 }
 
 QString SoftTriggerEvent::resourceKey() const

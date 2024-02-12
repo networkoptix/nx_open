@@ -27,7 +27,7 @@
 #include <utils/common/id.h>
 #include <utils/common/synctime.h>
 
-const QnUuid QnUserResource::kAdminGuid("99cbc715-539b-4bfe-856f-799b45b69b1e");
+const nx::Uuid QnUserResource::kAdminGuid("99cbc715-539b-4bfe-856f-799b45b69b1e");
 
 QByteArray QnUserHash::toString(const Type& type)
 {
@@ -446,15 +446,15 @@ bool QnUserResource::isAdministrator() const
     return m_isAdministratorCache;
 }
 
-std::vector<QnUuid> QnUserResource::groupIds() const
+std::vector<nx::Uuid> QnUserResource::groupIds() const
 {
     NX_MUTEX_LOCKER locker(&m_mutex);
     return m_groupIds;
 }
 
-void QnUserResource::setGroupIds(const std::vector<QnUuid>& value)
+void QnUserResource::setGroupIds(const std::vector<nx::Uuid>& value)
 {
-    std::vector<QnUuid> previousValue;
+    std::vector<nx::Uuid> previousValue;
     {
         NX_MUTEX_LOCKER locker(&m_mutex);
         if (m_groupIds == value)
@@ -473,7 +473,7 @@ void QnUserResource::setGroupIds(const std::vector<QnUuid>& value)
 }
 
 void QnUserResource::setResourceAccessRights(
-    const std::map<QnUuid, nx::vms::api::AccessRights>& value)
+    const std::map<nx::Uuid, nx::vms::api::AccessRights>& value)
 {
     {
         NX_MUTEX_LOCKER locker(&m_mutex);
@@ -582,7 +582,7 @@ void QnUserResource::setAttributes(nx::vms::api::UserAttributes value)
     emit attributesChanged(::toSharedPointer(this));
 }
 
-std::map<QnUuid, nx::vms::api::AccessRights> QnUserResource::ownResourceAccessRights() const
+std::map<nx::Uuid, nx::vms::api::AccessRights> QnUserResource::ownResourceAccessRights() const
 {
     NX_MUTEX_LOCKER locker(&m_mutex);
     return m_resourceAccessRights;
@@ -733,7 +733,7 @@ void QnUserResource::fillIdUnsafe()
 {
     // ATTENTION: This logic is similar to UserData::fillId().
     NX_ASSERT(!(isCloud() && getEmail().isEmpty()));
-    QnUuid id = isCloud() ? guidFromArbitraryData(getEmail()) : QnUuid::createUuid();
+    nx::Uuid id = isCloud() ? guidFromArbitraryData(getEmail()) : nx::Uuid::createUuid();
     setIdUnsafe(id);
 }
 

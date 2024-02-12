@@ -88,7 +88,7 @@ QnFileLayoutResourcePtr layout::layoutFromFile(
         apiLayout.items = {};
 
     apiLayout.id = guidFromArbitraryData(layoutUrl);
-    apiLayout.parentId = QnUuid();
+    apiLayout.parentId = nx::Uuid();
     apiLayout.url = layoutUrl;
     apiLayout.name = QFileInfo(layoutUrl).fileName();
 

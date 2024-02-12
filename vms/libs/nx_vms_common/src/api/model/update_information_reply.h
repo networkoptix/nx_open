@@ -9,7 +9,7 @@
 
 struct QnUpdateFreeSpaceReply
 {
-    QHash<QnUuid, qint64> freeSpaceByServerId;
+    QHash<nx::Uuid, qint64> freeSpaceByServerId;
 };
 
 #define QnUpdateFreeSpaceReply_Fields (freeSpaceByServerId)
@@ -17,7 +17,7 @@ struct QnUpdateFreeSpaceReply
 struct QnCloudHostCheckReply
 {
     QString cloudHost;
-    QList<QnUuid> failedServers;
+    QList<nx::Uuid> failedServers;
 };
 
 #define QnCloudHostCheckReply_Fields (cloudHost)(failedServers)

@@ -14,14 +14,14 @@ class RoiCameraThumbnail: public LiveCameraThumbnail
     Q_OBJECT
     using base_type = LiveCameraThumbnail;
 
-    Q_PROPERTY(QnUuid cameraId READ cameraId WRITE setCameraId NOTIFY resourceChanged)
+    Q_PROPERTY(nx::Uuid cameraId READ cameraId WRITE setCameraId NOTIFY resourceChanged)
 
 public:
     RoiCameraThumbnail(QObject* parent = nullptr);
     virtual ~RoiCameraThumbnail() override;
 
-    QnUuid cameraId() const;
-    void setCameraId(const QnUuid& value);
+    nx::Uuid cameraId() const;
+    void setCameraId(const nx::Uuid& value);
 
     static void registerQmlType();
 

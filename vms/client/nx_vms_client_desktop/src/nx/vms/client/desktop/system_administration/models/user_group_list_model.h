@@ -46,25 +46,25 @@ public:
     virtual Qt::ItemFlags flags(const QModelIndex& index) const override;
 
     const UserGroupDataList& groups() const;
-    QSet<QnUuid> groupIds() const;
-    std::optional<UserGroupData> findGroup(const QnUuid& groupId) const;
-    int groupRow(const QnUuid& groupId) const;
+    QSet<nx::Uuid> groupIds() const;
+    std::optional<UserGroupData> findGroup(const nx::Uuid& groupId) const;
+    int groupRow(const nx::Uuid& groupId) const;
 
-    QSet<QnUuid> nonEditableGroupIds() const;
+    QSet<nx::Uuid> nonEditableGroupIds() const;
 
-    QSet<QnUuid> checkedGroupIds() const;
-    void setCheckedGroupIds(const QSet<QnUuid>& value);
-    void setChecked(const QnUuid& groupId, bool checked);
+    QSet<nx::Uuid> checkedGroupIds() const;
+    void setCheckedGroupIds(const QSet<nx::Uuid>& value);
+    void setChecked(const nx::Uuid& groupId, bool checked);
 
-    QSet<QnUuid> notFoundGroups() const;
-    QSet<QnUuid> nonUniqueGroups() const;
-    QSet<QnUuid> cycledGroups() const;
+    QSet<nx::Uuid> notFoundGroups() const;
+    QSet<nx::Uuid> nonUniqueGroups() const;
+    QSet<nx::Uuid> cycledGroups() const;
 
     void reset(const UserGroupDataList& groups);
     bool addOrUpdateGroup(const UserGroupData& group);
-    bool removeGroup(const QnUuid& groupId);
+    bool removeGroup(const nx::Uuid& groupId);
 
-    bool canDeleteGroup(const QnUuid& groupId) const;
+    bool canDeleteGroup(const nx::Uuid& groupId) const;
 
 signals:
     void notFoundGroupsChanged();

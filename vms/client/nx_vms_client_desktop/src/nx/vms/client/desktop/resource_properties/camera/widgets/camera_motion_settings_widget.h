@@ -47,7 +47,7 @@ private:
     const QScopedPointer<core::CameraMotionHelper> m_motionHelper;
     QButtonGroup* const m_sensitivityButtons = nullptr;
     QQuickWidget* const m_motionWidget = nullptr;
-    QnUuid m_cameraId;
+    nx::Uuid m_cameraId;
 };
 
 } // namespace nx::vms::client::desktop

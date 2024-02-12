@@ -28,7 +28,7 @@ RoiCameraThumbnail::~RoiCameraThumbnail()
     // Required here for forward-declared scoped pointer destruction.
 }
 
-QnUuid RoiCameraThumbnail::cameraId() const
+nx::Uuid RoiCameraThumbnail::cameraId() const
 {
     if (const auto camera = resource().objectCast<QnVirtualCameraResource>())
         return camera->getId();
@@ -36,7 +36,7 @@ QnUuid RoiCameraThumbnail::cameraId() const
     return {};
 }
 
-void RoiCameraThumbnail::setCameraId(const QnUuid& value)
+void RoiCameraThumbnail::setCameraId(const nx::Uuid& value)
 {
     setResource(qnClientCoreModule->resourcePool()
         ->getResourceById<QnVirtualCameraResource>(value));

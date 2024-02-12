@@ -24,12 +24,12 @@ public:
 
     virtual QnResourceList findResources() override;
 
-    virtual bool isResourceTypeSupported(QnUuid resourceTypeId) const override;
+    virtual bool isResourceTypeSupported(nx::Uuid resourceTypeId) const override;
 
     virtual bool isVirtualResource() const override { return true; }
 
 protected:
-    virtual QnResourcePtr createResource(const QnUuid& resourceTypeId,
+    virtual QnResourcePtr createResource(const nx::Uuid& resourceTypeId,
         const QnResourceParams& params) override;
 
 private:

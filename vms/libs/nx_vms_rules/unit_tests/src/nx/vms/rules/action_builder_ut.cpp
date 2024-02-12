@@ -69,13 +69,13 @@ public:
         registerAction<TestActionWithPermissions>();
         registerAction<TestActionForUserAndServer>();
 
-        mockRule = std::make_unique<Rule>(QnUuid::createUuid(), engine.get());
+        mockRule = std::make_unique<Rule>(nx::Uuid::createUuid(), engine.get());
     }
 
     QSharedPointer<ActionBuilder> makeSimpleBuilder() const
     {
         auto builder = QSharedPointer<ActionBuilder>::create(
-            QnUuid::createUuid(),
+            nx::Uuid::createUuid(),
             utils::type<TestAction>(),
             []{ return new TestAction; });
         builder->setRule(mockRule.get());
@@ -90,7 +90,7 @@ public:
         NX_ASSERT(action);
 
         auto builder = QSharedPointer<TestActionBuilder>::create(
-            QnUuid::createUuid(),
+            nx::Uuid::createUuid(),
             action->type(),
             actionConstructor);
         builder->setRule(mockRule.get());
@@ -113,7 +113,7 @@ public:
 
     QSharedPointer<TestActionBuilder> makeBuilderWithPermissions(
         const UuidSelection& selection,
-        const QnUuidSet& devices = {},
+        const UuidSet& devices = {},
         bool useSource = false) const
     {
         auto builder = makeTestActionBuilder([]{ return new TestActionWithPermissions; });
@@ -151,14 +151,14 @@ public:
         return SimpleEventPtr::create(syncTime.currentTimePoint());
     }
 
-    SimpleEventPtr makeSimpleEventWithCamera(QnUuid cameraId) const
+    SimpleEventPtr makeSimpleEventWithCamera(nx::Uuid cameraId) const
     {
         auto event = makeSimpleEvent();
         event->m_cameraId = cameraId;
         return event;
     }
 
-    SimpleEventPtr makeSimpleEventWithDevices(const QnUuidList& deviceIds) const
+    SimpleEventPtr makeSimpleEventWithDevices(const UuidList& deviceIds) const
     {
         auto event = makeSimpleEvent();
         event->m_deviceIds = deviceIds;
@@ -170,14 +170,14 @@ public:
         return TestEventPtr::create(syncTime.currentTimePoint());
     }
 
-    TestEventPtr makeEventWithCameraId(const QnUuid& cameraId) const
+    TestEventPtr makeEventWithCameraId(const nx::Uuid& cameraId) const
     {
         auto event = makeTestEvent();
         event->m_cameraId = cameraId;
         return event;
     }
 
-    TestEventPtr makeEventWithDeviceIds(const QnUuidList& deviceIds) const
+    TestEventPtr makeEventWithDeviceIds(const UuidList& deviceIds) const
     {
         auto event = makeTestEvent();
         event->m_deviceIds = deviceIds;
@@ -434,13 +434,13 @@ TEST_F(ActionBuilderTest, eventDevicesAreFiltered)
         .ids = {user1->getId()},
         .all = false};
     EXPECT_CALL(mock, targetedUsers(expectedSelection1)).Times(1);
-    EXPECT_CALL(mock, targetedDeviceIds(QnUuidList{cameraOfUser1->getId()})).Times(1);
+    EXPECT_CALL(mock, targetedDeviceIds(UuidList{cameraOfUser1->getId()})).Times(1);
 
     UuidSelection expectedSelection2{
         .ids = {user2->getId()},
         .all = false};
     EXPECT_CALL(mock, targetedUsers(expectedSelection2)).Times(1);
-    EXPECT_CALL(mock, targetedDeviceIds(QnUuidList{cameraOfUser2->getId()})).Times(1);
+    EXPECT_CALL(mock, targetedDeviceIds(UuidList{cameraOfUser2->getId()})).Times(1);
 
     auto eventAggregator = AggregatedEventPtr::create(
         makeEventWithDeviceIds({cameraOfUser1->getId(), cameraOfUser2->getId()}));
@@ -505,9 +505,9 @@ TEST_F(ActionBuilderTest, userEventFilterPropertyWorks)
     EXPECT_CALL(mock, targetedUsers(selection)).Times(1);
 
     builder->process(AggregatedEventPtr::create(EventPtr(
-        new ServerStartedEvent(0ms, QnUuid()))));
+        new ServerStartedEvent(0ms, nx::Uuid()))));
     builder->process(AggregatedEventPtr::create(EventPtr(
-        new ServerFailureEvent(0ms, QnUuid(), EventReason::none))));
+        new ServerFailureEvent(0ms, nx::Uuid(), EventReason::none))));
 }
 
 TEST_F(ActionBuilderTest, actionPermissionGlobal)
@@ -575,14 +575,14 @@ TEST_F(ActionBuilderTest, actionPermissionResourceFiltration)
         {{cameraB->getId(), AccessRight::edit}, {cameraC->getId(), AccessRight::edit}});
 
     UuidSelection selection{ .all = true };
-    const auto devices = QnUuidSet{cameraA->getId(), cameraB->getId(), cameraC->getId()};
+    const auto devices = UuidSet{cameraA->getId(), cameraB->getId(), cameraC->getId()};
     auto builder = makeBuilderWithPermissions(selection, devices);
     MockPermissionsActionEvents mock{builder.get()};
 
     EXPECT_CALL(mock, multiDeviceAction(
-        QnUuidSet{user1->getId()}, QnUuidSet{cameraA->getId(), cameraB->getId()})).Times(1);
+        UuidSet{user1->getId()}, UuidSet{cameraA->getId(), cameraB->getId()})).Times(1);
     EXPECT_CALL(mock, multiDeviceAction(
-        QnUuidSet{user2->getId()}, QnUuidSet{cameraB->getId(), cameraC->getId()})).Times(1);
+        UuidSet{user2->getId()}, UuidSet{cameraB->getId(), cameraC->getId()})).Times(1);
 
     auto eventAggregator = AggregatedEventPtr::create(makeSimpleEvent());
     builder->process(eventAggregator);
@@ -618,11 +618,11 @@ TEST_F(ActionBuilderTest, actionPermissionUserGrouping)
     MockPermissionsActionEvents mock{builder.get()};
 
     EXPECT_CALL(mock, multiDeviceAction(
-        QnUuidSet{user1->getId(), user2->getId()}, QnUuidSet{cameraA->getId()})).Times(1);
+        UuidSet{user1->getId(), user2->getId()}, UuidSet{cameraA->getId()})).Times(1);
     EXPECT_CALL(mock, multiDeviceAction(
-        QnUuidSet{user3->getId()}, QnUuidSet{cameraB->getId()})).Times(1);
+        UuidSet{user3->getId()}, UuidSet{cameraB->getId()})).Times(1);
     EXPECT_CALL(mock, multiDeviceAction(
-        QnUuidSet{user4->getId()}, QnUuidSet{cameraA->getId(), cameraB->getId()})).Times(1);
+        UuidSet{user4->getId()}, UuidSet{cameraA->getId(), cameraB->getId()})).Times(1);
 
     auto eventAggregator = AggregatedEventPtr::create(makeSimpleEvent());
     builder->process(eventAggregator);

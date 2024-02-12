@@ -69,8 +69,8 @@ typename detail::ValueExtractor<typename BookmarksContainer::value_type>::value_
         nx::vms::api::BookmarkSortField::startTime, order, resourcePool);
 
     const auto edgeUuid = ascending
-        ? QnUuid::fromString("{FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF}") //< Maximum value.
-        : QnUuid(); //< Minimum value.
+        ? nx::Uuid::fromString("{FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF}") //< Maximum value.
+        : nx::Uuid(); //< Minimum value.
 
     const detail::ValueExtractor<ContainerValueType> valueExtractor;
     const auto splitBookmark = detail::createBookmarkAtTimePoint<BookmarkType>(

@@ -124,7 +124,7 @@ class HttpAsyncClient:
 {
 public:
     HttpAsyncClient():
-        m_proxyHost(nx::format("%1.com").args(QnUuid::createUuid().toSimpleString()).toStdString())
+        m_proxyHost(nx::format("%1.com").args(nx::Uuid::createUuid().toSimpleString()).toStdString())
     {
         m_credentials = Credentials("username", PasswordAuthToken("password"));
 
@@ -1204,7 +1204,7 @@ private:
 
         http::RequestResult result(StatusCode::unauthorized);
 
-        const auto nonce = QnUuid::createUuid().toSimpleStdString();
+        const auto nonce = nx::Uuid::createUuid().toSimpleStdString();
         m_generatedNonces.emplace(nonce, 0);
 
         header::WWWAuthenticate wwwAuthenticate;

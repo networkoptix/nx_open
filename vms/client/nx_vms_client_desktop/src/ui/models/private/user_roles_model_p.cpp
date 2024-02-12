@@ -124,7 +124,7 @@ bool QnUserRolesModel::Private::updateUserRole(const UserGroupData& userRole)
     return false;
 }
 
-bool QnUserRolesModel::Private::removeUserRoleById(const QnUuid& roleId)
+bool QnUserRolesModel::Private::removeUserRoleById(const nx::Uuid& roleId)
 {
     const auto roleIterator = std::find_if(m_userRoles.begin(), m_userRoles.end(),
         [&roleId](const UserGroupData& role)
@@ -189,7 +189,7 @@ void QnUserRolesModel::Private::setCustomRoleStrings(const QString& name, const 
     emit q->dataChanged(customRoleIndex, customRoleIndex);
 }
 
-QnUuid QnUserRolesModel::Private::id(int row) const
+nx::Uuid QnUserRolesModel::Private::id(int row) const
 {
     return roleByRow(row).id;
 }

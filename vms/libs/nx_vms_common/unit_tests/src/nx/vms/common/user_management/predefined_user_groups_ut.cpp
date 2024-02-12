@@ -19,15 +19,15 @@ TEST(PredefinedUserGroups, contains)
     for (const auto& id: kPredefinedGroupIds)
         EXPECT_TRUE(PredefinedUserGroups::contains(id));
 
-    EXPECT_FALSE(PredefinedUserGroups::contains(QnUuid{}));
-    EXPECT_FALSE(PredefinedUserGroups::contains(QnUuid::createUuid()));
+    EXPECT_FALSE(PredefinedUserGroups::contains(nx::Uuid{}));
+    EXPECT_FALSE(PredefinedUserGroups::contains(nx::Uuid::createUuid()));
 }
 
 TEST(PredefinedUserGroups, ids)
 {
     const auto ids = PredefinedUserGroups::ids();
     EXPECT_EQ(ids.size(), kPredefinedGroupIds.size());
-    EXPECT_EQ(std::set<QnUuid>(ids.begin(), ids.end()), kPredefinedGroupIds);
+    EXPECT_EQ(std::set<nx::Uuid>(ids.begin(), ids.end()), kPredefinedGroupIds);
 }
 
 TEST(PredefinedUserGroups, list)
@@ -55,8 +55,8 @@ TEST(PredefinedUserGroups, find)
         EXPECT_EQ(group, *found);
     }
 
-    EXPECT_FALSE((bool) PredefinedUserGroups::find(QnUuid{}));
-    EXPECT_FALSE((bool) PredefinedUserGroups::find(QnUuid::createUuid()));
+    EXPECT_FALSE((bool) PredefinedUserGroups::find(nx::Uuid{}));
+    EXPECT_FALSE((bool) PredefinedUserGroups::find(nx::Uuid::createUuid()));
 }
 
 TEST(PredefinedUserGroups, globalPermissions)
@@ -89,13 +89,13 @@ TEST(PredefinedUserGroups, globalPermissions)
 
 TEST(PredefinedUserGroups, accessRights)
 {
-    static const std::map<QnUuid, AccessRights> kPowerUserResourceAccessMap{
+    static const std::map<nx::Uuid, AccessRights> kPowerUserResourceAccessMap{
         {kAllDevicesGroupId, kFullAccessRights},
         {kAllWebPagesGroupId, AccessRight::view},
         {kAllServersGroupId, AccessRight::view},
         {kAllVideoWallsGroupId, AccessRight::edit}};
 
-    static const std::map<QnUuid, AccessRights> kAdvancedViewersResourceAccessMap{
+    static const std::map<nx::Uuid, AccessRights> kAdvancedViewersResourceAccessMap{
         {kAllDevicesGroupId, AccessRight::view
             | AccessRight::viewArchive
             | AccessRight::exportArchive
@@ -105,7 +105,7 @@ TEST(PredefinedUserGroups, accessRights)
         {kAllWebPagesGroupId, AccessRight::view},
         {kAllServersGroupId, AccessRight::view}};
 
-    static const std::map<QnUuid, AccessRights> kViewersResourceAccessMap{
+    static const std::map<nx::Uuid, AccessRights> kViewersResourceAccessMap{
         {kAllDevicesGroupId, AccessRight::view
             | AccessRight::viewArchive
             | AccessRight::exportArchive
@@ -113,12 +113,12 @@ TEST(PredefinedUserGroups, accessRights)
         {kAllWebPagesGroupId, AccessRight::view},
         {kAllServersGroupId, AccessRight::view}};
 
-    static const std::map<QnUuid, AccessRights> kLiveViewersResourceAccessMap{
+    static const std::map<nx::Uuid, AccessRights> kLiveViewersResourceAccessMap{
         {kAllDevicesGroupId, AccessRight::view},
         {kAllWebPagesGroupId, AccessRight::view},
         {kAllServersGroupId, AccessRight::view}};
 
-    static const std::map<QnUuid, AccessRights> kHealthViewersResourceAccessMap{
+    static const std::map<nx::Uuid, AccessRights> kHealthViewersResourceAccessMap{
         {kAllServersGroupId, AccessRight::view}};
 
     EXPECT_EQ(PredefinedUserGroups::find(kAdministratorsGroupId)->resourceAccessRights,

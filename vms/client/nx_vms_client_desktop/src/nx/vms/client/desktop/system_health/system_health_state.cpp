@@ -137,7 +137,7 @@ SystemHealthState::Private::Private(SystemHealthState* q):
     // replacedDeviceDiscovered.
 
     connect(messageProcessor, &QnClientMessageProcessor::hardwareIdMappingRemoved, q,
-        [this](const QnUuid& id)
+        [this](const nx::Uuid& id)
         {
             const auto resource = this->q->resourcePool()->getResourceById(id);
             const auto notificationsHandler =
@@ -294,7 +294,7 @@ void SystemHealthState::Private::updateServersWithoutStorages()
             if (!NX_ASSERT(runtimeInfoManager))
                 return {};
 
-            QSet<QnUuid> serverIds;
+            QSet<nx::Uuid> serverIds;
             const auto items = runtimeInfoManager->items()->getItems();
             for (const auto& item: items)
             {

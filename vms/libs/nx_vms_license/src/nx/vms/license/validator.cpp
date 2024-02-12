@@ -43,7 +43,7 @@ QnLicenseErrorCode Validator::validate(const QnLicensePtr& license, ValidationMo
     if (!license->isValidSignature() && mode != VM_CanActivate)
         return QnLicenseErrorCode::InvalidSignature;
 
-    QnUuid currentServerId;
+    nx::Uuid currentServerId;
     auto connection = messageBusConnection();
     if (connection)
         currentServerId = connection->moduleInformation().id;
@@ -139,7 +139,7 @@ QString Validator::errorMessage(QnLicenseErrorCode errCode, Qn::LicenseType lice
     return QString();
 }
 
-QnUuid Validator::serverId(const QnLicensePtr& license) const
+nx::Uuid Validator::serverId(const QnLicensePtr& license) const
 {
     const auto items = m_context->runtimeInfoManager()->items()->getItems();
     for (const QnPeerRuntimeInfo& info: items)
@@ -152,7 +152,7 @@ QnUuid Validator::serverId(const QnLicensePtr& license) const
         if (hwKeyOK && brandOK)
             return info.uuid;
     }
-    return QnUuid();
+    return nx::Uuid();
 }
 
 QnLicenseErrorCode Validator::isValidUniqueLicense(const QnLicensePtr& license,

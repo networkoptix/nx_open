@@ -145,8 +145,8 @@ private:
 
         ASSERT_TRUE(m_hlsServer.bindAndListen());
 
-        m_cloudSystemId = QnUuid::createUuid().toSimpleStdString();
-        m_cloudServerId = QnUuid::createUuid().toSimpleStdString();
+        m_cloudSystemId = nx::Uuid::createUuid().toSimpleStdString();
+        m_cloudServerId = nx::Uuid::createUuid().toSimpleStdString();
         m_hlsServerFullCloudName = nx::format("%1.%2").arg(m_cloudServerId).arg(m_cloudSystemId).toStdString();
         nx::network::SocketGlobals::addressResolver().addFixedAddress(
             m_hlsServerFullCloudName,

@@ -119,7 +119,7 @@ QnAbstractResourceSearcher* QnResourceDiscoveryManager::searcherByManufacturer(
     return nullptr;
 }
 
-QnResourcePtr QnResourceDiscoveryManager::createResource(const QnUuid &resourceTypeId, const QnResourceParams& params)
+QnResourcePtr QnResourceDiscoveryManager::createResource(const nx::Uuid &resourceTypeId, const QnResourceParams& params)
 {
     QnResourcePtr result;
 

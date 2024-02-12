@@ -19,15 +19,15 @@ public:
     virtual bool isEntityTypeSupported(
         EntityType entityType,
         const QString& entityTypeId,
-        QnUuid deviceId,
-        QnUuid engineId) const = 0;
+        nx::Uuid deviceId,
+        nx::Uuid engineId) const = 0;
 
     virtual bool isEntityTypeAttributeSupported(
         EntityType entityType,
         const QString& entityTypeId,
         const QString& fullAttributeName,
-        QnUuid deviceId,
-        QnUuid engineId) const = 0;
+        nx::Uuid deviceId,
+        nx::Uuid engineId) const = 0;
 
 signals:
     void manifestsMaybeUpdated();

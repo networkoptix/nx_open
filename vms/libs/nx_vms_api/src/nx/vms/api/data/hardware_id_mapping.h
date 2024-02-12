@@ -16,7 +16,7 @@ struct HardwareIdMapping
 {
     QString hardwareId;
     QString physicalId;
-    QnUuid physicalIdGuid;
+    nx::Uuid physicalIdGuid;
 };
 
 #define HardwareIdMapping_Fields (hardwareId)(physicalId)(physicalIdGuid)

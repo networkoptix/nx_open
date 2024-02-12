@@ -50,14 +50,14 @@ protected:
         const QnTimePeriod& period, GetCallback callback, Qt::SortOrder order, int limit) const;
 
 private:
-    int indexOf(const QnUuid& guid) const; //< Logarithmic complexity.
+    int indexOf(const nx::Uuid& guid) const; //< Logarithmic complexity.
 
     QnVirtualCameraResourcePtr camera(const QnCameraBookmark& bookmark) const;
 
     void watchBookmarkChanges();
     void addBookmark(const QnCameraBookmark& bookmark);
     void updateBookmark(const QnCameraBookmark& bookmark);
-    void removeBookmark(const QnUuid& id);
+    void removeBookmark(const nx::Uuid& id);
     void updatePeriod(const QnTimePeriod& period, const QnCameraBookmarkList& bookmarks);
 
     template<typename Iter>
@@ -71,7 +71,7 @@ private:
 private:
     QnCameraBookmarkList m_prefetch;
     std::deque<QnCameraBookmark> m_data;
-    QHash<QnUuid, std::chrono::milliseconds> m_guidToTimestamp;
+    QHash<nx::Uuid, std::chrono::milliseconds> m_guidToTimestamp;
     QHash<rest::Handle, QnTimePeriod> m_updateRequests;
 };
 

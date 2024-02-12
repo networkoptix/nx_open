@@ -26,11 +26,11 @@ public:
     virtual bool tryClose(bool force) override;
     virtual void forcedUpdate() override;
 
-    QnUuid runningShowreel() const;
+    nx::Uuid runningShowreel() const;
 
 private:
     void saveShowreelToServer(const nx::vms::api::ShowreelData& showreel);
-    void removeShowreelFromServer(const QnUuid& showreelId);
+    void removeShowreelFromServer(const nx::Uuid& showreelId);
 
 private:
     ShowreelExecutor* m_executor;

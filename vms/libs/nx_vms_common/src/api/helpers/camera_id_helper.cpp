@@ -80,21 +80,21 @@ QnVirtualCameraResourcePtr findCameraByFlexibleIds(
     return camera;
 }
 
-QnUuid flexibleIdToId(
+nx::Uuid flexibleIdToId(
     const QnResourcePool* resourcePool,
     const QString& flexibleId)
 {
     if (!resourcePool)
-        return QnUuid();
+        return nx::Uuid();
     auto camera = findCameraByFlexibleId(resourcePool, flexibleId);
-    return camera ? camera->getId() : QnUuid();
+    return camera ? camera->getId() : nx::Uuid();
 }
 
 QnVirtualCameraResourcePtr findCameraByFlexibleId(
     const QnResourcePool* resourcePool,
     const QString& flexibleId)
 {
-    if (const QnUuid uuid = QnUuid::fromStringSafe(flexibleId); !uuid.isNull())
+    if (const nx::Uuid uuid = nx::Uuid::fromStringSafe(flexibleId); !uuid.isNull())
     {
         if (auto camera = resourcePool->getResourceById<QnVirtualCameraResource>(uuid))
             return camera;

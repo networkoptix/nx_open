@@ -21,7 +21,7 @@ void VmsRulesNotificationManager::triggerNotification(
     NotificationSource /*source*/)
 {
     NX_ASSERT(tran.command == ApiCommand::removeVmsRule);
-    emit ruleRemoved(QnUuid(tran.params.id));
+    emit ruleRemoved(nx::Uuid(tran.params.id));
 }
 
 void VmsRulesNotificationManager::triggerNotification(

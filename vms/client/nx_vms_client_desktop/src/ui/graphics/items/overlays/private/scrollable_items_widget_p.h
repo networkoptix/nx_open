@@ -29,15 +29,15 @@ public:
 
     QSizeF contentSizeHint(Qt::SizeHint which, const QSizeF& constraint) const;
 
-    QnUuid insertItem(int index, QGraphicsWidget* item, const QnUuid& externalId = QnUuid());
-    QGraphicsWidget* takeItem(const QnUuid& id);
+    nx::Uuid insertItem(int index, QGraphicsWidget* item, const nx::Uuid& externalId = nx::Uuid());
+    QGraphicsWidget* takeItem(const nx::Uuid& id);
 
     void clear();
 
     int count() const;
 
     QGraphicsWidget* item(int index) const;
-    QGraphicsWidget* item(const QnUuid& id) const;
+    QGraphicsWidget* item(const nx::Uuid& id) const;
 
     qreal spacing() const;
     void setSpacing(qreal value);
@@ -53,6 +53,6 @@ private:
     QnGraphicsScrollArea* const m_scrollArea;
     QGraphicsLinearLayout* const m_contentLayout;
     QGraphicsLinearLayout* m_mainLayout{nullptr};
-    QHash<QnUuid, QGraphicsWidget*> m_items;
+    QHash<nx::Uuid, QGraphicsWidget*> m_items;
     bool m_ignoreMinimumHeight = true;
 };

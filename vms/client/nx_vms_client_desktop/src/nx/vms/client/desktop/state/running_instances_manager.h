@@ -20,8 +20,8 @@ public:
     explicit RunningInstancesManager(LocalSettings* settings, SharedMemoryManager* memory);
     virtual ~RunningInstancesManager();
 
-    QnUuid currentInstanceGuid() const;
-    QList<QnUuid> runningInstancesGuids() const;
+    nx::Uuid currentInstanceGuid() const;
+    QList<nx::Uuid> runningInstancesGuids() const;
 
 private:
     struct Private;

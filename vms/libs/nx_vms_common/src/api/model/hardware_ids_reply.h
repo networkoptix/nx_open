@@ -9,7 +9,7 @@
 
 struct ApiServerHardwareIdsData
 {
-    QnUuid serverId;
+    nx::Uuid serverId;
     QStringList hardwareIds;
 };
 #define ApiServerHardwareIdsData_Fields (serverId)(hardwareIds)

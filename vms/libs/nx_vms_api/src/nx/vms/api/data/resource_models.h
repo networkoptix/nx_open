@@ -11,7 +11,7 @@ namespace nx::vms::api {
 
 struct NX_VMS_API ResourceGroup
 {
-    QnUuid id;
+    nx::Uuid id;
 
     /**%apidoc
      * %example All Devices
@@ -26,8 +26,8 @@ struct NX_VMS_API ResourceGroup
     /**%apidoc Whether this group comes with the System and can not be removed. */
     bool isPredefined = false;
 
-    QnUuid getId() const { return id; }
-    void setId(QnUuid id_) { id = std::move(id_); }
+    nx::Uuid getId() const { return id; }
+    void setId(nx::Uuid id_) { id = std::move(id_); }
 };
 #define ResourceGroup_Fields \
     (id) \

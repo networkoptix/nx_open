@@ -32,7 +32,7 @@ struct RequestCounter
         RequestTypesCount
     };
 
-    void incrementCounters(const QnUuid& peerId, RequestType requestType);
+    void incrementCounters(const nx::Uuid& peerId, RequestType requestType);
 
     int totalRequests() const;
 
@@ -41,7 +41,7 @@ struct RequestCounter
     static QString requestTypeShortName(RequestType requestType);
 
 private:
-    std::array<QHash<QnUuid, int>, RequestTypesCount> counters;
+    std::array<QHash<nx::Uuid, int>, RequestTypesCount> counters;
     mutable nx::Mutex m_mutex;
 };
 
@@ -61,20 +61,20 @@ public:
     TestPeerManager();
     virtual ~TestPeerManager() override { stop(); }
 
-    void setPeerList(const QList<QnUuid>& peerList) { m_peerList = peerList; }
-    void addPeer(const QnUuid& peerId, const QString& peerName = QString());
-    QnUuid addPeer(const QString& peerName = QString());
+    void setPeerList(const QList<nx::Uuid>& peerList) { m_peerList = peerList; }
+    void addPeer(const nx::Uuid& peerId, const QString& peerName = QString());
+    nx::Uuid addPeer(const QString& peerName = QString());
 
-    void setFileInformation(const QnUuid& peerId, const FileInformation& fileInformation);
-    FileInformation fileInformation(const QnUuid& peerId, const QString& fileName) const;
+    void setFileInformation(const nx::Uuid& peerId, const FileInformation& fileInformation);
+    FileInformation fileInformation(const nx::Uuid& peerId, const QString& fileName) const;
 
-    void setPeerStorage(const QnUuid& peerId, Storage* storage);
-    void setHasInternetConnection(const QnUuid& peerId, bool hasInternetConnection = true);
-    bool hasInternetConnection(const QnUuid& peerId) const;
+    void setPeerStorage(const nx::Uuid& peerId, Storage* storage);
+    void setHasInternetConnection(const nx::Uuid& peerId, bool hasInternetConnection = true);
+    bool hasInternetConnection(const nx::Uuid& peerId) const;
 
-    QStringList peerGroups(const QnUuid& peerId) const;
-    QList<QnUuid> peersInGroup(const QString& group) const;
-    void setPeerGroups(const QnUuid& peerId, const QStringList& groups);
+    QStringList peerGroups(const nx::Uuid& peerId) const;
+    QList<nx::Uuid> peersInGroup(const QString& group) const;
+    void setPeerGroups(const nx::Uuid& peerId, const QStringList& groups);
 
     void addInternetFile(const nx::utils::Url& url, const QString& fileName);
 
@@ -85,28 +85,28 @@ public:
     void setIndirectInternetRequestsAllowed(bool allow);
 
     // AbstractPeerManager implementation
-    virtual QString peerString(const QnUuid& peerId) const override;
-    virtual QList<QnUuid> getAllPeers() const override;
-    virtual QList<QnUuid> peers() const override { return m_peerList; }
-    virtual int distanceTo(const QnUuid&) const override;
+    virtual QString peerString(const nx::Uuid& peerId) const override;
+    virtual QList<nx::Uuid> getAllPeers() const override;
+    virtual QList<nx::Uuid> peers() const override { return m_peerList; }
+    virtual int distanceTo(const nx::Uuid&) const override;
 
     virtual RequestContextPtr<downloader::FileInformation> requestFileInfo(
-        const QnUuid& peer,
+        const nx::Uuid& peer,
         const QString& fileName,
         const nx::utils::Url& url) override;
 
     virtual RequestContextPtr<QVector<QByteArray>> requestChecksums(
-        const QnUuid& peerId, const QString& fileName) override;
+        const nx::Uuid& peerId, const QString& fileName) override;
 
     virtual RequestContextPtr<nx::Buffer> downloadChunk(
-        const QnUuid& peerId,
+        const nx::Uuid& peerId,
         const QString& fileName,
         const nx::utils::Url& url,
         int chunkIndex,
         int chunkSize,
         qint64 fileSize) override;
 
-    virtual void cancelRequest(const QnUuid& peerId, rest::Handle handle);
+    virtual void cancelRequest(const nx::Uuid& peerId, rest::Handle handle);
 
     virtual void pleaseStop() override;
     virtual void run() override;
@@ -119,7 +119,7 @@ private:
     using RequestCallback = std::function<void(rest::Handle)>;
 
     rest::Handle getRequestHandle();
-    rest::Handle enqueueRequest(const QnUuid& peerId, qint64 time, RequestCallback callback);
+    rest::Handle enqueueRequest(const nx::Uuid& peerId, qint64 time, RequestCallback callback);
 
     static QByteArray readFileChunk(const FileInformation& fileInformation, int chunkIndex);
 
@@ -132,18 +132,18 @@ private:
         bool hasInternetConnection = false;
     };
 
-    QHash<QnUuid, PeerInfo> m_peers;
-    QMultiHash<QString, QnUuid> m_peersByGroup;
+    QHash<nx::Uuid, PeerInfo> m_peers;
+    QMultiHash<QString, nx::Uuid> m_peersByGroup;
     int m_requestIndex = 0;
 
     QHash<nx::utils::Url, QString> m_fileByUrl;
-    QList<QnUuid> m_peerList;
+    QList<nx::Uuid> m_peerList;
 
     bool m_allowIndirectInternetRequests = false;
 
     struct Request
     {
-        QnUuid peerId;
+        nx::Uuid peerId;
         rest::Handle handle;
         RequestCallback callback;
         qint64 timeToReply;
@@ -164,30 +164,30 @@ class ProxyTestPeerManager: public AbstractPeerManager
 public:
     ProxyTestPeerManager(TestPeerManager* peerManager, const QString& peerName = QString());
     ProxyTestPeerManager(
-        TestPeerManager* peerManager, const QnUuid& id, const QString& peerName = QString());
+        TestPeerManager* peerManager, const nx::Uuid& id, const QString& peerName = QString());
 
     void calculateDistances();
 
     const RequestCounter* requestCounter() const;
 
-    void setPeerList(const QList<QnUuid>& peerList) { m_peerList = peerList; }
+    void setPeerList(const QList<nx::Uuid>& peerList) { m_peerList = peerList; }
 
     // AbstractPeerManager implementation
-    virtual QString peerString(const QnUuid& peerId) const override;
-    virtual QList<QnUuid> getAllPeers() const override;
-    virtual QList<QnUuid> peers() const override { return m_peerList; }
-    virtual int distanceTo(const QnUuid&) const override;
+    virtual QString peerString(const nx::Uuid& peerId) const override;
+    virtual QList<nx::Uuid> getAllPeers() const override;
+    virtual QList<nx::Uuid> peers() const override { return m_peerList; }
+    virtual int distanceTo(const nx::Uuid&) const override;
 
     virtual RequestContextPtr<FileInformation> requestFileInfo(
-        const QnUuid& peer,
+        const nx::Uuid& peer,
         const QString& fileName,
         const nx::utils::Url& url) override;
 
     virtual RequestContextPtr<QVector<QByteArray>> requestChecksums(
-        const QnUuid& peer, const QString& fileName) override;
+        const nx::Uuid& peer, const QString& fileName) override;
 
     virtual RequestContextPtr<nx::Buffer> downloadChunk(
-        const QnUuid& peerId,
+        const nx::Uuid& peerId,
         const QString& fileName,
         const nx::utils::Url& url,
         int chunkIndex,
@@ -196,9 +196,9 @@ public:
 
 private:
     TestPeerManager* m_peerManager;
-    QHash<QnUuid, int> m_distances;
+    QHash<nx::Uuid, int> m_distances;
     RequestCounter m_requestCounter;
-    QList<QnUuid> m_peerList;
+    QList<nx::Uuid> m_peerList;
 };
 
 } // namespace nx::vms::common::p2p::downloader

@@ -10,11 +10,11 @@
 namespace nx::vms::client::desktop {
 namespace entity_resource_tree {
 
-using LayoutItemCreator = std::function<entity_item_model::AbstractItemPtr(const QnUuid&)>;
+using LayoutItemCreator = std::function<entity_item_model::AbstractItemPtr(const nx::Uuid&)>;
 
-class LayoutItemListEntity: public entity_item_model::UniqueKeyListEntity<QnUuid>
+class LayoutItemListEntity: public entity_item_model::UniqueKeyListEntity<nx::Uuid>
 {
-    using base_type = entity_item_model::UniqueKeyListEntity<QnUuid>;
+    using base_type = entity_item_model::UniqueKeyListEntity<nx::Uuid>;
 
 public:
     LayoutItemListEntity(

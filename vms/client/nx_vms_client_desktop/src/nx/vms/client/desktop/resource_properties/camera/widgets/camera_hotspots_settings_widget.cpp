@@ -62,7 +62,7 @@ struct CameraHotspotsSettingsWidget::Private
     const std::unique_ptr<CameraHotspotsItemModel> hotspotsModel;
     const std::unique_ptr<CameraHotspotsItemDelegate> hotspotsDelegate;
 
-    QnUuid cameraId;
+    nx::Uuid cameraId;
 
     void setupUi() const;
 
@@ -157,7 +157,7 @@ CameraSelectionDialog::ResourceFilter
     CameraHotspotsSettingsWidget::Private::hotspotCameraSelectionResourceFilter(
         int hotspotIndex) const
 {
-    QnUuidSet usedHotspotCamerasIds;
+    UuidSet usedHotspotCamerasIds;
     for (int i = 0; i < ui->hotspotsEditorWidget->hotspotsCount(); ++i)
     {
         if (i == hotspotIndex)

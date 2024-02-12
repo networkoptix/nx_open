@@ -22,7 +22,7 @@ struct QnRecordingStatsData
     qint64 averageBitrate = 0;   // average bitrate (= bytes / sum of chunk duration in seconds)
     qint64 averageDensity = 0;   // average density (= bytes / requested period in seconds)
 
-    QMap<QnUuid, qint64> recordedBytesPerStorage; // more detail data about recorded bytes
+    QMap<nx::Uuid, qint64> recordedBytesPerStorage; // more detail data about recorded bytes
 
     void operator +=(const QnRecordingStatsData& right)
     {

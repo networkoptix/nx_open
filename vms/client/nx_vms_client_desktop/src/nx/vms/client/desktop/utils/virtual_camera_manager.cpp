@@ -16,7 +16,7 @@ namespace nx::vms::client::desktop {
 struct VirtualCameraManager::Private
 {
     QnUserResourcePtr currentUser;
-    QHash<QnUuid, VirtualCameraWorker*> workers;
+    QHash<nx::Uuid, VirtualCameraWorker*> workers;
 };
 
 VirtualCameraManager::VirtualCameraManager(SystemContext* systemContext, QObject* parent):
@@ -99,7 +99,7 @@ bool VirtualCameraManager::addUpload(const QnSecurityCamResourcePtr& camera, con
 
 void VirtualCameraManager::cancelUploads(const QnSecurityCamResourcePtr& camera)
 {
-    QnUuid cameraId = camera->getId();
+    nx::Uuid cameraId = camera->getId();
 
     if (!d->workers.contains(cameraId))
         return;
@@ -120,7 +120,7 @@ VirtualCameraWorker* VirtualCameraManager::cameraWorker(const QnSecurityCamResou
     if (!camera->getParentServer())
         return nullptr;
 
-    QnUuid cameraId = camera->getId();
+    nx::Uuid cameraId = camera->getId();
 
     auto pos = d->workers.find(cameraId);
     if (pos != d->workers.end())

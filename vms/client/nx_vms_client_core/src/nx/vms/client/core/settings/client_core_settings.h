@@ -47,7 +47,7 @@ public:
     using SerializableCredentials = nx::network::http::SerializableCredentials;
     // Order is important as we are listing users by the last usage time.
     using SerializableCredentialsList = std::vector<SerializableCredentials>;
-    using SystemAuthenticationData = std::unordered_map<QnUuid, SerializableCredentialsList>;
+    using SystemAuthenticationData = std::unordered_map<nx::Uuid, SerializableCredentialsList>;
 
     // System credentials by local system id.
     SecureProperty<SystemAuthenticationData> systemAuthenticationData{
@@ -72,7 +72,7 @@ public:
     Property<ValidationLevel> certificateValidationLevel{
         this, "certificateValidationLevel", ValidationLevel::recommended};
 
-    Property<QHash<QnUuid, LocalConnectionData>>
+    Property<QHash<nx::Uuid, LocalConnectionData>>
         recentLocalConnections{this, "recentLocalConnections"};
 
     Property<QList<WeightData>> localSystemWeightsData{this, "localSystemWeightsData"};
@@ -103,21 +103,21 @@ public:
     void setCloudAuthData(const CloudAuthData& value);
 
     /** Adapter for the preferredCloudServers property. */
-    std::optional<QnUuid> preferredCloudServer(const QString& systemId);
+    std::optional<nx::Uuid> preferredCloudServer(const QString& systemId);
 
     /** Adapter for the preferredCloudServers property. */
-    void setPreferredCloudServer(const QString& systemId, const QnUuid& serverId);
+    void setPreferredCloudServer(const QString& systemId, const nx::Uuid& serverId);
 
     void storeRecentConnection(
-        const QnUuid& localSystemId,
+        const nx::Uuid& localSystemId,
         const QString& systemName,
         const nx::utils::SoftwareVersion& version,
         const nx::utils::Url& url);
 
-    void removeRecentConnection(const QnUuid& localSystemId);
+    void removeRecentConnection(const nx::Uuid& localSystemId);
 
     /** Update weight data as if client just logged in to the system. */
-    void updateWeightData(const QnUuid& localId);
+    void updateWeightData(const nx::Uuid& localId);
 
 private:
     void migrateOldSettings();
@@ -135,7 +135,7 @@ private:
 struct Settings::PreferredCloudServer
 {
     QString systemId;
-    QnUuid serverId;
+    nx::Uuid serverId;
     bool operator==(const PreferredCloudServer& other) const = default;
 };
 NX_REFLECTION_INSTRUMENT(Settings::PreferredCloudServer, (systemId)(serverId))

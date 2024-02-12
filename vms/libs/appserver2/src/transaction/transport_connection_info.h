@@ -14,8 +14,8 @@ namespace ec2
 {
 struct QnTransportConnectionInfo
 {
-    QnUuid remotePeerId;
-    QnUuid remotePeerDbId;
+    nx::Uuid remotePeerId;
+    nx::Uuid remotePeerDbId;
     /**%apidoc:string */
     nx::utils::Url url;
     QString state;
@@ -48,7 +48,7 @@ NX_REFLECTION_INSTRUMENT(ConnectionInfos, ConnectionInfos_Fields)
 
 struct P2pStats
 {
-    QnUuid serverId;
+    nx::Uuid serverId;
     nx::vms::api::P2pStatisticsData data;
     ConnectionInfos connections;
 };

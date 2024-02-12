@@ -46,11 +46,11 @@ private slots:
 
 private:
     QString calculateExtendedErrorMessage(const nx::vms::client::desktop::VirtualCameraPayload& upload);
-    QnSecurityCamResourcePtr cameraByProgressId(const QnUuid& progressId) const;
-    QnUuid ensureProgress(const QnUuid& cameraId);
-    void removeProgress(const QnUuid& cameraId);
+    QnSecurityCamResourcePtr cameraByProgressId(const nx::Uuid& progressId) const;
+    nx::Uuid ensureProgress(const nx::Uuid& cameraId);
+    void removeProgress(const nx::Uuid& cameraId);
 
 private:
-    QnUuid m_currentCameraUuid;
-    QHash<QnUuid, QnUuid> m_currentProgresses; //< Camera id -> progress id.
+    nx::Uuid m_currentCameraUuid;
+    QHash<nx::Uuid, nx::Uuid> m_currentProgresses; //< Camera id -> progress id.
 };

@@ -27,15 +27,15 @@ class QueryProcessor: public QObject
 
 public:
     QueryProcessor(
-        const QnUuid& serverId,
-        const QnUuid& runningInstanceId,
+        const nx::Uuid& serverId,
+        const nx::Uuid& runningInstanceId,
         AbstractCertificateVerifier* certificateVerifier,
         nx::network::SocketAddress address,
         nx::network::http::Credentials credentials,
         Qn::SerializationFormat serializationFormat);
     virtual ~QueryProcessor() override;
 
-    void updateSessionId(const QnUuid& sessionId);
+    void updateSessionId(const nx::Uuid& sessionId);
 
     QueryProcessor& getAccess(const Qn::UserSession& /*session*/) { return *this; }
 
@@ -49,7 +49,7 @@ public:
     nx::network::http::Credentials credentials() const;
     void updateCredentials(nx::network::http::Credentials value);
 
-    nx::network::ssl::AdapterFunc adapterFunc(const QnUuid& serverId) const;
+    nx::network::ssl::AdapterFunc adapterFunc(const nx::Uuid& serverId) const;
 
     using PostRequestHandler = nx::utils::MoveOnlyFunc<void(ec2::ErrorCode)>;
 

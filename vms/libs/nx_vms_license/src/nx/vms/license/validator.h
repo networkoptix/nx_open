@@ -66,7 +66,7 @@ public:
     static QString errorMessage(QnLicenseErrorCode errCode, Qn::LicenseType licenseType);
 
     /** Id of the server this license attached to (if it is present in the current system). */
-    QnUuid serverId(const QnLicensePtr& license) const;
+    nx::Uuid serverId(const QnLicensePtr& license) const;
 
 protected:
     /**

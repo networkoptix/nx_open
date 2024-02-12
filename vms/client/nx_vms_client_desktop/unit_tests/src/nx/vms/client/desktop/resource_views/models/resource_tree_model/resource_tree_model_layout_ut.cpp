@@ -154,7 +154,7 @@ TEST_F(ResourceTreeModelTest, sharedLayoutIsEditableByAdmin)
     loginAsPowerUser("power_user");
 
     // When shared layout with unique name is added to the resource pool.
-    const auto layout = addLayout(kUniqueLayoutName, QnUuid());
+    const auto layout = addLayout(kUniqueLayoutName, nx::Uuid());
 
     // Then exactly one node with corresponding display text appears in the resource tree.
     const auto layoutIndex = uniqueMatchingIndex(kUniqueLayoutNameCondition);
@@ -169,7 +169,7 @@ TEST_F(ResourceTreeModelTest, sharedLayoutIsNotEditableByNonAdmin)
     const auto liveViewerUser = loginAsLiveViewer("live_viever");
 
     // When shared layout with unique name is added to the resource pool.
-    const auto layout = addLayout(kUniqueLayoutName, QnUuid());
+    const auto layout = addLayout(kUniqueLayoutName, nx::Uuid());
 
     // And access to the shared layout is granted to the logged in user.
     setupAccessToResourceForUser(liveViewerUser, layout, true);

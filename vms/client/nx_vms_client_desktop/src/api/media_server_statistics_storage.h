@@ -30,7 +30,7 @@ public:
     /** Construct a storage for the giver serverId. */
     QnMediaServerStatisticsStorage(
         nx::vms::client::desktop::SystemContext* systemContext,
-        const QnUuid& serverId,
+        const nx::Uuid& serverId,
         int pointsLimit,
         QObject* parent);
 
@@ -68,7 +68,7 @@ private:
         bool success, rest::Handle handle, const nx::network::rest::JsonResult& result);
 
 private:
-    QnUuid m_serverId;
+    nx::Uuid m_serverId;
 
     /** Number of update requests. Increased with every update period. */
     int m_updateRequests = 0;

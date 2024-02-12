@@ -31,12 +31,12 @@ Rule::~Rule()
 {
 }
 
-QnUuid Rule::id() const
+nx::Uuid Rule::id() const
 {
     return m_id;
 }
 
-void Rule::setId(const QnUuid& value)
+void Rule::setId(const nx::Uuid& value)
 {
     m_id = value;
 }
@@ -51,12 +51,12 @@ void Rule::setEventType(EventType eventType)
     m_eventType = eventType;
 }
 
-QVector<QnUuid> Rule::eventResources() const
+QVector<nx::Uuid> Rule::eventResources() const
 {
     return m_eventResources;
 }
 
-void Rule::setEventResources(const QVector<QnUuid>& value)
+void Rule::setEventResources(const QVector<nx::Uuid>& value)
 {
     m_eventResources = value;
 }
@@ -92,12 +92,12 @@ void Rule::setActionType(ActionType actionType)
     // TODO: #sivanov Fill action params with default values? Filter action resources?
 }
 
-QVector<QnUuid> Rule::actionResources() const
+QVector<nx::Uuid> Rule::actionResources() const
 {
     return m_actionResources;
 }
 
-void Rule::setActionResources(const QVector<QnUuid>& value)
+void Rule::setActionResources(const QVector<nx::Uuid>& value)
 {
     m_actionResources = value;
 }
@@ -192,7 +192,7 @@ bool Rule::isScheduleMatchTime(const QDateTime& datetime) const
 
 Rule::Rule(
     int internalId, int aggregationPeriod, bool isSystem, ActionType bActionType,
-    EventType bEventType, const QList<QnUuid>& subjectIds, bool allUsers)
+    EventType bEventType, const QList<nx::Uuid>& subjectIds, bool allUsers)
 {
     m_disabled = false;
     m_eventState = EventState::undefined;
@@ -234,7 +234,7 @@ Rule* Rule::clone()
     return newRule;
 }
 
-void Rule::removeResource(const QnUuid& resId)
+void Rule::removeResource(const nx::Uuid& resId)
 {
     for (int i = m_actionResources.size() - 1; i >= 0; --i)
     {
@@ -248,7 +248,7 @@ void Rule::removeResource(const QnUuid& resId)
     }
 }
 
-QMap<QnUuid, QnUuid> Rule::remappedGuidsToFix()
+QMap<nx::Uuid, nx::Uuid> Rule::remappedGuidsToFix()
 {
     static const QMap<int, int> intValues =
     {
@@ -256,7 +256,7 @@ QMap<QnUuid, QnUuid> Rule::remappedGuidsToFix()
         { 22, 10022 },
         { 23, 10023 }
     };
-    QMap<QnUuid, QnUuid> result;
+    QMap<nx::Uuid, nx::Uuid> result;
     for (auto itr = intValues.begin(); itr != intValues.end(); ++itr)
     {
         result.insert(
@@ -291,7 +291,7 @@ RuleList Rule::getDefaultRules()
         << getServerCertificateErrorRules()
         << getLdapSyncIssueRules();
 
-    std::set<QnUuid> ruleIds;
+    std::set<nx::Uuid> ruleIds;
     for (const auto& rule: result)
         NX_ASSERT(ruleIds.insert(rule->id()).second, "Default rule id conflict: %1", rule->id());
 

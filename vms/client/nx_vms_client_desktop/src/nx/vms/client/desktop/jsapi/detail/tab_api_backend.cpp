@@ -76,10 +76,10 @@ struct TabApiBackend::Private: public QObject
     QnWorkbenchDisplay* const display;
     QnWorkbenchNavigator* const navigator;
 
-    QnUuidSet selectedItems;
-    QnUuid focusedItem;
+    UuidSet selectedItems;
+    nx::Uuid focusedItem;
 
-    QSet<QnUuid> availableItems;
+    QSet<nx::Uuid> availableItems;
 
     Private(
         TabApiBackend* q,
@@ -387,7 +387,7 @@ std::optional<MediaParams> TabApiBackend::Private::itemMediaParams(QnWorkbenchIt
         };
 
     const auto tryFillFromItemData =
-        [this, &result](const QnUuid& itemId)
+        [this, &result](const nx::Uuid& itemId)
         {
             auto layoutResource = layout->resource();
             if (!NX_ASSERT(layoutResource))
@@ -541,7 +541,7 @@ ItemVector TabApiBackend::Private::allItemStates() const
     if (!layout)
         return detail::ItemVector();
 
-    QnUuidList itemIds;
+    UuidList itemIds;
     for (const auto& item: layout->items())
         itemIds.append(item->uuid());
     return itemStatesFromIds(itemIds);
@@ -602,7 +602,7 @@ void TabApiBackend::Private::handleResourceWidgetAdded(QnResourceWidget* widget)
                 hasChanges = true;
                 focusedItem = focused
                     ? itemId
-                    : QnUuid();
+                    : nx::Uuid();
             }
 
             if (hasChanges)

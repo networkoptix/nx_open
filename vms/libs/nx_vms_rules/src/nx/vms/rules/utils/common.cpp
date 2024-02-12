@@ -13,7 +13,7 @@
 
 namespace nx::vms::rules::utils {
 
-bool isLoggingAllowed(const Engine* engine, QnUuid ruleId)
+bool isLoggingAllowed(const Engine* engine, nx::Uuid ruleId)
 {
     const auto rule = engine->rule(ruleId);
     if (!NX_ASSERT(rule))

@@ -100,7 +100,7 @@ struct ServerSelectionDialog::Private: public QObject
 {
     Private(
         const ServerSelectionDialog* owner,
-        const QnUuidSet& selectedServersIds,
+        const UuidSet& selectedServersIds,
         ServerSelectionDialog::ServerFilter filterFunctor);
     ~Private();
 
@@ -108,7 +108,7 @@ struct ServerSelectionDialog::Private: public QObject
 
     const ServerSelectionDialog* q = nullptr;
     const QnUserResourcePtr currentUser;
-    QnUuidSet selectedServersIds;
+    UuidSet selectedServersIds;
     ServerSelectionDialog::ServerFilter filterFunctor;
 
     AbstractEntityPtr serversEntity;
@@ -119,7 +119,7 @@ struct ServerSelectionDialog::Private: public QObject
 
 ServerSelectionDialog::Private::Private(
     const ServerSelectionDialog* owner,
-    const QnUuidSet& selectedServersIds,
+    const UuidSet& selectedServersIds,
     ServerSelectionDialog::ServerFilter filterFunctor)
     :
     q(owner),
@@ -159,7 +159,7 @@ void ServerSelectionDialog::Private::onItemClicked(const QModelIndex& index)
 }
 
 bool ServerSelectionDialog::selectServers(
-    QnUuidSet& selectedServers,
+    UuidSet& selectedServers,
     ServerFilter filterFunctor,
     const QString& infoMessage,
     QWidget* parent)
@@ -181,7 +181,7 @@ bool ServerSelectionDialog::selectServers(
 }
 
 ServerSelectionDialog::ServerSelectionDialog(
-    const QnUuidSet& selectedServers,
+    const UuidSet& selectedServers,
     ServerFilter filterFunctor,
     const QString& infoMessage,
     QWidget* parent)

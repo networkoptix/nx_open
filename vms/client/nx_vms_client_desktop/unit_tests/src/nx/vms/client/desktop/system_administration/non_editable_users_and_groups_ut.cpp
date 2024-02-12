@@ -28,7 +28,7 @@ public:
     {
     }
 
-    void loginAs(const QnUuid& userId)
+    void loginAs(const nx::Uuid& userId)
     {
         auto resourcePool = systemContext()->resourcePool();
         auto user = resourcePool->getResourceById<QnUserResource>(userId);
@@ -48,7 +48,7 @@ public:
 
         QObject::connect(systemContext()->nonEditableUsersAndGroups(),
             &NonEditableUsersAndGroups::groupModified,
-            [this](const QnUuid& groupId)
+            [this](const nx::Uuid& groupId)
             {
                 const auto action =
                     systemContext()->nonEditableUsersAndGroups()->containsGroup(groupId)
@@ -62,14 +62,14 @@ public:
             });
     }
 
-    QnUuid addUser(
+    nx::Uuid addUser(
         const QString& name,
-        const std::vector<QnUuid>& parents,
+        const std::vector<nx::Uuid>& parents,
         const api::UserType& userType = api::UserType::local)
     {
         QnUserResourcePtr user(
             new QnUserResource(userType, /*externalId*/ {}));
-        user->setIdUnsafe(QnUuid::createUuid());
+        user->setIdUnsafe(nx::Uuid::createUuid());
         user->setName(name);
         user->addFlags(Qn::remote);
         user->setGroupIds(parents);
@@ -77,13 +77,13 @@ public:
         return user->getId();
     }
 
-    QnUuid addGroup(
+    nx::Uuid addGroup(
         const QString& name,
-        const std::vector<QnUuid>& parents,
+        const std::vector<nx::Uuid>& parents,
         nx::vms::api::UserType type = nx::vms::api::UserType::local)
     {
         api::UserGroupData group;
-        group.setId(QnUuid::createUuid());
+        group.setId(nx::Uuid::createUuid());
         group.name = name;
         group.type = type;
         group.parentGroupIds = parents;
@@ -91,7 +91,7 @@ public:
         return group.id;
     }
 
-    void removeUser(const QnUuid& id)
+    void removeUser(const nx::Uuid& id)
     {
         auto resourcePool = systemContext()->resourcePool();
         auto resource = resourcePool->getResourceById<QnUserResource>(id);
@@ -99,12 +99,12 @@ public:
         resourcePool->removeResource(resource);
     }
 
-    void removeGroup(const QnUuid& id)
+    void removeGroup(const nx::Uuid& id)
     {
         const auto allUsers = systemContext()->resourcePool()->getResources<QnUserResource>();
         for (const auto& user: allUsers)
         {
-            std::vector<QnUuid> ids = user->groupIds();
+            std::vector<nx::Uuid> ids = user->groupIds();
             if (nx::utils::erase_if(ids, [&user](auto id){ return id == user->getId(); }))
                 user->setGroupIds(ids);
         }
@@ -119,7 +119,7 @@ public:
         systemContext()->userGroupManager()->remove(id);
     }
 
-    void updateUser(const QnUuid& id, const std::vector<QnUuid>& parents)
+    void updateUser(const nx::Uuid& id, const std::vector<nx::Uuid>& parents)
     {
         auto resourcePool = systemContext()->resourcePool();
         auto user = resourcePool->getResourceById<QnUserResource>(id);
@@ -127,7 +127,7 @@ public:
         user->setGroupIds(parents);
     }
 
-    void updateGroup(const QnUuid& id, const std::vector<QnUuid>& parents)
+    void updateGroup(const nx::Uuid& id, const std::vector<nx::Uuid>& parents)
     {
         auto group = systemContext()->userGroupManager()->find(id).value_or(api::UserGroupData{});
         ASSERT_EQ(id, group.id);
@@ -135,18 +135,18 @@ public:
         systemContext()->userGroupManager()->addOrUpdate(group);
     }
 
-    bool isUserEditable(const QnUuid& id)
+    bool isUserEditable(const nx::Uuid& id)
     {
         return !systemContext()->nonEditableUsersAndGroups()->containsUser(
             systemContext()->resourcePool()->getResourceById<QnUserResource>(id));
     }
 
-    bool canEditParents(const QnUuid& id)
+    bool canEditParents(const nx::Uuid& id)
     {
         return systemContext()->nonEditableUsersAndGroups()->canEditParents(id);
     }
 
-    bool isGroupRemovable(const QnUuid& id)
+    bool isGroupRemovable(const nx::Uuid& id)
     {
         return !systemContext()->nonEditableUsersAndGroups()->containsGroup(id);
     }
@@ -160,7 +160,7 @@ public:
         return result;
     }
 
-    void renameUser(const QnUuid& id, const QString& name)
+    void renameUser(const nx::Uuid& id, const QString& name)
     {
         auto resourcePool = systemContext()->resourcePool();
         auto resource = resourcePool->getResourceById<QnUserResource>(id);
@@ -168,7 +168,7 @@ public:
         resource->setName(name);
     }
 
-    void enableUser(const QnUuid& id, bool enable)
+    void enableUser(const nx::Uuid& id, bool enable)
     {
         auto resourcePool = systemContext()->resourcePool();
         auto resource = resourcePool->getResourceById<QnUserResource>(id);
@@ -176,7 +176,7 @@ public:
         resource->setEnabled(enable);
     }
 
-    void renameGroup(const QnUuid& id, const QString& name)
+    void renameGroup(const nx::Uuid& id, const QString& name)
     {
         auto group = systemContext()->userGroupManager()->find(id).value_or(api::UserGroupData{});
         ASSERT_EQ(id, group.id);
@@ -184,7 +184,7 @@ public:
         systemContext()->userGroupManager()->addOrUpdate(group);
     }
 
-    const QSet<QnUuid> kPredefinedGroups = nx::utils::toQSet(api::kPredefinedGroupIds);
+    const QSet<nx::Uuid> kPredefinedGroups = nx::utils::toQSet(api::kPredefinedGroupIds);
     QList<QString> signalLog;
 };
 

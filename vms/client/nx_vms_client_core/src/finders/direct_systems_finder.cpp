@@ -92,7 +92,7 @@ void QnDirectSystemsFinder::removeSystem(SystemsHash::iterator it)
 
 void QnDirectSystemsFinder::updateServerData(const nx::vms::discovery::ModuleEndpoint& module)
 {
-    const QnUuid localSystemId = helpers::getLocalSystemId(module);
+    const nx::Uuid localSystemId = helpers::getLocalSystemId(module);
     const QString systemId = helpers::getTargetSystemId(module);
 
     m_searchAddressManager->updateServerRemoteAddresses(
@@ -167,7 +167,7 @@ void QnDirectSystemsFinder::updateServerData(const nx::vms::discovery::ModuleEnd
     }
 }
 
-void QnDirectSystemsFinder::removeServer(QnUuid id)
+void QnDirectSystemsFinder::removeServer(nx::Uuid id)
 {
     const auto systemIt = getSystemItByServer(id);
     const auto serverIsInKnownSystem = (systemIt != m_systems.end());
@@ -259,7 +259,7 @@ void QnDirectSystemsFinder::updatePrimaryAddress(const nx::vms::discovery::Modul
 }
 
 QnDirectSystemsFinder::SystemsHash::iterator
-QnDirectSystemsFinder::getSystemItByServer(const QnUuid &serverId)
+QnDirectSystemsFinder::getSystemItByServer(const nx::Uuid &serverId)
 {
     const auto it = m_serverToSystem.find(serverId);
     if (it == m_serverToSystem.end())

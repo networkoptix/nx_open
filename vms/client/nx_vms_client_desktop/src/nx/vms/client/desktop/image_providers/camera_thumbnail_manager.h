@@ -49,7 +49,7 @@ public:
     QImage thumbnailForCamera(const QnVirtualCameraResourcePtr& camera) const;
 
 signals:
-    void thumbnailReady(const QnUuid& resourceId, const QPixmap& thumbnail);
+    void thumbnailReady(const nx::Uuid& resourceId, const QPixmap& thumbnail);
 
 protected:
     virtual void doLoadAsync() override;

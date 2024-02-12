@@ -14,7 +14,7 @@ class NX_VMS_CLIENT_CORE_API QnCloudSystemDescription: public QnSystemDescriptio
 public:
     static QSharedPointer<QnCloudSystemDescription> create(
         const QString& systemId,
-        const QnUuid& localSystemId,
+        const nx::Uuid& localSystemId,
         const QString& systemName,
         const QString& ownerEmail,
         const QString& ownerFullName,
@@ -53,7 +53,7 @@ public: // Overrides
 private:
     QnCloudSystemDescription(
         const QString& systemId,
-        const QnUuid& localSystemId,
+        const nx::Uuid& localSystemId,
         const QString& systemName,
         const QString& ownerEmail,
         const QString& ownerFullName,

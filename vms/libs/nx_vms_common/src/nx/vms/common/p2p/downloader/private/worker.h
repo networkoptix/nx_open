@@ -40,7 +40,7 @@ public:
 
     struct Peer
     {
-        QnUuid id;
+        nx::Uuid id;
         AbstractPeerManager* manager = nullptr;
 
         QString toString() const { return manager ? manager->peerString(id) : QString(); }
@@ -66,7 +66,7 @@ public:
         const QString& fileName,
         Storage* storage,
         const QList<AbstractPeerManager*>& peerManagers,
-        const QnUuid& selfId);
+        const nx::Uuid& selfId);
     virtual ~Worker() override;
 
     State state() const;
@@ -155,7 +155,7 @@ protected:
     void reDownload();
 
 private:
-    QnUuid m_selfId;
+    nx::Uuid m_selfId;
     Storage* m_storage = nullptr;
     QList<AbstractPeerManager*> m_peerManagers;
     const QString m_fileName;

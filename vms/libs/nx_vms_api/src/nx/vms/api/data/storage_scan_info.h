@@ -35,6 +35,6 @@ QN_FUSION_DECLARE_FUNCTIONS(StorageScanInfo, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(StorageScanInfo, StorageScanInfo_Fields)
 
 using StorageScanInfoFull = Map<QString, StorageScanInfo>;
-using StorageScanInfoFullMap = Map<QnUuid, StorageScanInfoFull>;
+using StorageScanInfoFullMap = Map<nx::Uuid, StorageScanInfoFull>;
 
 } // namespace nx::vms::api

@@ -26,7 +26,7 @@ public:
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
 
     virtual int remove(
-        const QnUuid& id,
+        const nx::Uuid& id,
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
 
@@ -59,9 +59,9 @@ int QnVideowallManager<QueryProcessorType>::getVideowalls(
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
     const int requestId = generateRequestID();
-    processor().template processQueryAsync<QnUuid, nx::vms::api::VideowallDataList>(
+    processor().template processQueryAsync<nx::Uuid, nx::vms::api::VideowallDataList>(
         ApiCommand::getVideowalls,
-        QnUuid(),
+        nx::Uuid(),
         [requestId, handler = handlerExecutor.bind(std::move(handler))](auto&&... args) mutable
         {
             handler(requestId, std::move(args)...);
@@ -88,7 +88,7 @@ int QnVideowallManager<T>::save(
 
 template<class T>
 int QnVideowallManager<T>::remove(
-    const QnUuid& id,
+    const nx::Uuid& id,
     Handler<> handler,
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {

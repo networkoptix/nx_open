@@ -17,12 +17,12 @@ public:
      * first - true if connecting to remove peer in progress,
      * second - true if getting connection from remove peer in progress
      */
-    typedef QMap<QnUuid, QPair<bool, bool>> ConnectingInfoMap;
+    typedef QMap<nx::Uuid, QPair<bool, bool>> ConnectingInfoMap;
 
-    bool contains(const QnUuid& id) const;
+    bool contains(const nx::Uuid& id) const;
 
     ConnectingInfoMap m_connectingList;
-    QSet<QnUuid> m_connectedList;
+    QSet<nx::Uuid> m_connectedList;
     mutable nx::Mutex m_mutex;
 };
 

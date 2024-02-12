@@ -17,10 +17,10 @@ struct NX_VMS_COMMON_API QnRoute
     nx::network::SocketAddress addr;
 
     /** Target Server Id. */
-    QnUuid id;
+    nx::Uuid id;
 
     /** Proxy Server Id. */
-    QnUuid gatewayId;
+    nx::Uuid gatewayId;
 
     /** Whether direct connection is not available. */
     bool reverseConnect = false;
@@ -35,7 +35,7 @@ struct NX_VMS_COMMON_API QnRoute
 class NX_VMS_COMMON_API QnRouter
 {
 public:
-    static QnRoute routeTo(const QnUuid& serverId, nx::vms::common::SystemContext* context);
+    static QnRoute routeTo(const nx::Uuid& serverId, nx::vms::common::SystemContext* context);
     static QnRoute routeTo(const QnMediaServerResourcePtr& server);
 
 private:

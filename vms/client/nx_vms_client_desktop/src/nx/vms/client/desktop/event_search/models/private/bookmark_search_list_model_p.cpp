@@ -369,7 +369,7 @@ void BookmarkSearchListModel::Private::updateBookmark(const QnCameraBookmark& bo
     }
 }
 
-void BookmarkSearchListModel::Private::removeBookmark(const QnUuid& id)
+void BookmarkSearchListModel::Private::removeBookmark(const nx::Uuid& id)
 {
     const auto index = indexOf(id);
     if (index < 0)
@@ -396,7 +396,7 @@ void BookmarkSearchListModel::Private::updatePeriod(
         std::upper_bound(m_data.begin(), m_data.end(), effectivePeriod.startTime(),
             upperBoundPredicate));
 
-    std::vector<QnUuid> old;
+    std::vector<nx::Uuid> old;
     old.resize(oldRange.end() - oldRange.begin());
     std::transform(oldRange.begin(), oldRange.end(), old.begin(),
         [](const QnCameraBookmark& bookmark) { return bookmark.guid; });
@@ -412,7 +412,7 @@ void BookmarkSearchListModel::Private::updatePeriod(
     int numRemoved = 0;
 
     // Update existing and add new bookmarks.
-    QSet<QnUuid> toKeep;
+    QSet<nx::Uuid> toKeep;
     for (const auto& bookmark: newRange)
     {
         const int index = indexOf(bookmark.guid);
@@ -470,7 +470,7 @@ void BookmarkSearchListModel::Private::dynamicUpdate(const QnTimePeriod& period)
         m_updateRequests[requestId] = effectivePeriod;
 }
 
-int BookmarkSearchListModel::Private::indexOf(const QnUuid& guid) const
+int BookmarkSearchListModel::Private::indexOf(const nx::Uuid& guid) const
 {
     const auto iter = m_guidToTimestamp.find(guid);
     if (iter == m_guidToTimestamp.end())

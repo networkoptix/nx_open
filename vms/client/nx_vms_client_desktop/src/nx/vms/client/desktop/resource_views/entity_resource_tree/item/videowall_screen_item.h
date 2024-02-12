@@ -15,7 +15,7 @@ class VideoWallScreenItem: public entity_item_model::AbstractItem
     using base_type = entity_item_model::AbstractItem;
 
 public:
-    VideoWallScreenItem(const QnVideoWallResourcePtr& videoWall, const QnUuid& screenId);
+    VideoWallScreenItem(const QnVideoWallResourcePtr& videoWall, const nx::Uuid& screenId);
 
     /**
      * Implements AbstractItem::data().

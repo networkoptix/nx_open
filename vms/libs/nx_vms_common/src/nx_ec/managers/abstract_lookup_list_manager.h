@@ -18,7 +18,7 @@ class NX_VMS_COMMON_API AbstractLookupListNotificationManager: public QObject
 
 signals:
     void addedOrUpdated(const nx::vms::api::LookupListData& data, ec2::NotificationSource source);
-    void removed(const QnUuid& id);
+    void removed(const nx::Uuid& id);
 };
 
 /*!
@@ -43,11 +43,11 @@ public:
     Result saveSync(const nx::vms::api::LookupListData& data);
 
     virtual int remove(
-        const QnUuid& id,
+        const nx::Uuid& id,
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) = 0;
 
-    Result removeSync(const QnUuid& id);
+    Result removeSync(const nx::Uuid& id);
 };
 
 } // namespace ec2

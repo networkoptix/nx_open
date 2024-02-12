@@ -11,18 +11,18 @@ namespace nx::vms::api {
 QN_FUSION_ADAPT_STRUCT(PermissionsModel, PermissionsModel_Fields)
 QN_FUSION_DEFINE_FUNCTIONS(PermissionsModel, (json))
 
-const QnUuid kAllDevicesGroupId{"00000000-0000-0000-0000-200000000001"};
-const QnUuid kAllWebPagesGroupId{"00000000-0000-0000-0000-200000000002"};
-const QnUuid kAllServersGroupId{"00000000-0000-0000-0000-200000000003"};
-const QnUuid kAllVideoWallsGroupId{"00000000-0000-0000-0000-200000000004"};
+const nx::Uuid kAllDevicesGroupId{"00000000-0000-0000-0000-200000000001"};
+const nx::Uuid kAllWebPagesGroupId{"00000000-0000-0000-0000-200000000002"};
+const nx::Uuid kAllServersGroupId{"00000000-0000-0000-0000-200000000003"};
+const nx::Uuid kAllVideoWallsGroupId{"00000000-0000-0000-0000-200000000004"};
 
-const std::map<QnUuid, SpecialResourceGroup> kSpecialResourceGroupIds{
+const std::map<nx::Uuid, SpecialResourceGroup> kSpecialResourceGroupIds{
     {kAllDevicesGroupId, SpecialResourceGroup::allDevices},
     {kAllWebPagesGroupId, SpecialResourceGroup::allWebPages},
     {kAllServersGroupId, SpecialResourceGroup::allServers},
     {kAllVideoWallsGroupId, SpecialResourceGroup::allVideowalls}};
 
-std::optional<SpecialResourceGroup> specialResourceGroup(const QnUuid& id)
+std::optional<SpecialResourceGroup> specialResourceGroup(const nx::Uuid& id)
 {
     if (const auto it = kSpecialResourceGroupIds.find(id); it != kSpecialResourceGroupIds.cend())
         return it->second;
@@ -30,18 +30,18 @@ std::optional<SpecialResourceGroup> specialResourceGroup(const QnUuid& id)
     return std::nullopt;
 }
 
-QnUuid specialResourceGroupId(SpecialResourceGroup group)
+nx::Uuid specialResourceGroupId(SpecialResourceGroup group)
 {
-    static const std::map<SpecialResourceGroup, QnUuid> reverseLookup = []()
+    static const std::map<SpecialResourceGroup, nx::Uuid> reverseLookup = []()
     {
-        std::map<SpecialResourceGroup, QnUuid> result;
+        std::map<SpecialResourceGroup, nx::Uuid> result;
         for (const auto& [groupId, group]: kSpecialResourceGroupIds)
             result.emplace(group, groupId);
         return result;
     }();
 
     const auto it = reverseLookup.find(group);
-    return NX_ASSERT(it != reverseLookup.end()) ? it->second : QnUuid();
+    return NX_ASSERT(it != reverseLookup.end()) ? it->second : nx::Uuid();
 }
 
 void PrintTo(GlobalPermission value, std::ostream* os)

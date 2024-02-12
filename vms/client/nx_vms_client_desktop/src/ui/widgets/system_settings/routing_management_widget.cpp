@@ -183,7 +183,7 @@ private:
 
 class RoutingManagementChanges {
 public:
-    QHash<QnUuid, RoutingChange> changes;
+    QHash<nx::Uuid, RoutingChange> changes;
 };
 
 QnRoutingManagementWidget::QnRoutingManagementWidget(QWidget *parent) :
@@ -297,7 +297,7 @@ void QnRoutingManagementWidget::applyChanges() {
         });
 
     for (auto it = m_changes->changes.begin(); it != m_changes->changes.end(); ++it) {
-        QnUuid serverId = it.key();
+        nx::Uuid serverId = it.key();
         QnMediaServerResourcePtr server = resourcePool()->getResourceById<QnMediaServerResource>(serverId);
         if (!server)
             continue;
@@ -399,7 +399,7 @@ void QnRoutingManagementWidget::updateModel() {
         return;
     }
 
-    QnUuid serverId = m_server->getId();
+    nx::Uuid serverId = m_server->getId();
 
     QSet<nx::utils::Url> autoUrls;
     QSet<nx::utils::Url> additionalUrls;
@@ -432,7 +432,7 @@ void QnRoutingManagementWidget::updateFromModel() {
     if (!m_server)
         return;
 
-    QnUuid serverId = m_server->getId();
+    nx::Uuid serverId = m_server->getId();
 
     QSet<nx::utils::Url> autoUrls;
     QSet<nx::utils::Url> additionalUrls;

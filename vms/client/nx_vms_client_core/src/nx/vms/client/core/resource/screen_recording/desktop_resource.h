@@ -20,17 +20,17 @@ public:
     DesktopResource();
     virtual ~DesktopResource();
 
-    static QnUuid getDesktopResourceUuid();
+    static nx::Uuid getDesktopResourceUuid();
 
     bool isConnected() const;
-    void initializeConnection(const QnMediaServerResourcePtr& server, const QnUuid& userId);
+    void initializeConnection(const QnMediaServerResourcePtr& server, const nx::Uuid& userId);
     void disconnectFromServer();
 
     virtual bool isRendererSlow() const = 0;
     virtual AudioLayoutConstPtr getAudioLayout(
         const QnAbstractStreamDataProvider* dataProvider) const override;
 
-    static QString calculateUniqueId(const QnUuid& moduleId, const QnUuid& userId);
+    static QString calculateUniqueId(const nx::Uuid& moduleId, const nx::Uuid& userId);
 
 private:
     std::unique_ptr<DesktopCameraConnection> m_connection;

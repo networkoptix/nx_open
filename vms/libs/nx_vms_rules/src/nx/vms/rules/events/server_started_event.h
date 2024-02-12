@@ -13,13 +13,13 @@ class NX_VMS_RULES_API ServerStartedEvent: public BasicEvent
     Q_CLASSINFO("type", "nx.events.serverStarted")
     using base_type = BasicEvent;
 
-    FIELD(QnUuid, serverId, setServerId)
+    FIELD(nx::Uuid, serverId, setServerId)
 
 public:
     static const ItemDescriptor& manifest();
 
     ServerStartedEvent() = default;
-    ServerStartedEvent(std::chrono::microseconds timestamp, QnUuid serverId);
+    ServerStartedEvent(std::chrono::microseconds timestamp, nx::Uuid serverId);
 
     virtual QString resourceKey() const override;
     virtual QVariantMap details(common::SystemContext* context) const override;

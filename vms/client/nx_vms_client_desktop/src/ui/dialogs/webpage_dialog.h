@@ -36,11 +36,11 @@ public:
 
     QString name() const;
     void setName(const QString& name);
-    QnUuid proxyId() const;
+    nx::Uuid proxyId() const;
 
     QUrl url() const;
     void setUrl(const QUrl& url);
-    void setProxyId(QnUuid id);
+    void setProxyId(nx::Uuid id);
 
     nx::vms::api::WebPageSubtype subtype() const;
     void setSubtype(nx::vms::api::WebPageSubtype value);
@@ -48,7 +48,7 @@ public:
     QStringList proxyDomainAllowList() const;
     void setProxyDomainAllowList(const QStringList& allowList);
 
-    void setResourceId(QnUuid id);
+    void setResourceId(nx::Uuid id);
 
     bool isCertificateCheckEnabled() const;
     void setCertificateCheckEnabled(bool value);
@@ -68,8 +68,8 @@ private:
 
     QScopedPointer<Ui::WebpageDialog> ui;
     bool m_initialProxyAll = false;
-    QnUuid m_initialProxyId;
-    QnUuid m_resourceId;
+    nx::Uuid m_initialProxyId;
+    nx::Uuid m_resourceId;
 };
 
 } // namespace nx::vms::client::desktop

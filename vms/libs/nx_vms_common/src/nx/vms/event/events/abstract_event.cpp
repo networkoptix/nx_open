@@ -464,7 +464,7 @@ EventParameters AbstractEvent::getRuntimeParams() const
     EventParameters params;
     params.eventType = m_eventType;
     params.eventTimestampUsec = m_timeStamp.count();
-    params.eventResourceId = m_resource ? m_resource->getId() : QnUuid();
+    params.eventResourceId = m_resource ? m_resource->getId() : nx::Uuid();
     return params;
 }
 

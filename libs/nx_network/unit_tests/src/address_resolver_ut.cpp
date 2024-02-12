@@ -154,8 +154,8 @@ TEST_F(AddressResolverDeprecatedTests, cancellation)
         nx::network::HostAddress("example.com"),
         nx::network::HostAddress("7C6BA51F-317E-461E-B47D-17A14CB751B0.com"),
         nx::network::HostAddress(nx::format("%1.%2").args(
-            QnUuid::createUuid().toSimpleString(),
-            QnUuid::createUuid().toSimpleString()).toStdString()),
+            nx::Uuid::createUuid().toSimpleString(),
+            nx::Uuid::createUuid().toSimpleString()).toStdString()),
     };
 
     for (size_t timeout = 0; timeout <= 500; timeout *= 2)
@@ -427,7 +427,7 @@ TEST_F(AddressResolver, localhost_is_resolved_properly_ipv6)
 
 TEST_F(AddressResolver, cloud_address_is_not_reported_if_not_asked)
 {
-    const auto cloudHostname = QnUuid::createUuid().toSimpleStdString();
+    const auto cloudHostname = nx::Uuid::createUuid().toSimpleStdString();
 
     whenResolveWithCloudEnabled(cloudHostname);
     thenResolveSucceeded();
@@ -471,8 +471,8 @@ TEST_F(AddressResolver, dns_record_update_is_seen)
 
 TEST_F(AddressResolver, isCloudHostname)
 {
-    const auto guid1 = QnUuid::createUuid().toSimpleStdString();
-    const auto guid2 = QnUuid::createUuid().toSimpleStdString();
+    const auto guid1 = nx::Uuid::createUuid().toSimpleStdString();
+    const auto guid2 = nx::Uuid::createUuid().toSimpleStdString();
 
     ASSERT_TRUE(resolver().isCloudHostname(guid1));
     ASSERT_TRUE(resolver().isCloudHostname(guid1 + "." + guid2));

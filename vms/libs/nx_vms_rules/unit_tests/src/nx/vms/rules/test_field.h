@@ -14,8 +14,8 @@ class TestEventField: public nx::vms::rules::EventFilterField
     Q_OBJECT
     Q_CLASSINFO("metatype", "nx.events.field.test")
 
-    Q_PROPERTY(QnUuid id MEMBER id)
-    Q_PROPERTY(QnUuidSet idSet MEMBER idSet)
+    Q_PROPERTY(nx::Uuid id MEMBER id)
+    Q_PROPERTY(UuidSet idSet MEMBER idSet)
     Q_PROPERTY(QString string MEMBER string)
     Q_PROPERTY(QStringList strings MEMBER strings)
     Q_PROPERTY(bool flag MEMBER flag)
@@ -27,8 +27,8 @@ public:
     virtual bool match(const QVariant&) const override { return false; };
 
 public:
-    QnUuid id;
-    QnUuidSet idSet;
+    nx::Uuid id;
+    UuidSet idSet;
 
     QString string;
     QStringList strings;

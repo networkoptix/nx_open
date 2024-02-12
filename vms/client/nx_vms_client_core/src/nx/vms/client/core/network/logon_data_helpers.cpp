@@ -54,7 +54,7 @@ std::optional<LogonData> cloudLogonData(const QnSystemDescriptionPtr& system)
     const bool systemHasInitialServer = std::any_of(servers.cbegin(), servers.cend(),
         [system](const nx::vms::api::ModuleInformationWithAddresses& server)
         {
-            return server.id.isNull() && isCloudUrl(system->getServerHost(QnUuid()));
+            return server.id.isNull() && isCloudUrl(system->getServerHost(nx::Uuid()));
         });
     const bool systemHasInitialServerOnly = systemHasInitialServer && servers.size() == 1;
 
@@ -63,7 +63,7 @@ std::optional<LogonData> cloudLogonData(const QnSystemDescriptionPtr& system)
 
     if (systemHasInitialServerOnly)
     {
-        url = system->getServerHost(QnUuid());
+        url = system->getServerHost(nx::Uuid());
         NX_DEBUG(NX_SCOPE_TAG, "Connecting to the cloud system which was not pinged yet: %1", url);
     }
 
@@ -141,7 +141,7 @@ std::optional<LogonData> cloudLogonData(const QnSystemDescriptionPtr& system)
             }
             else if (systemHasInitialServer)
             {
-                url = system->getServerHost(QnUuid());
+                url = system->getServerHost(nx::Uuid());
                 NX_DEBUG(NX_SCOPE_TAG,
                     "Connecting to the cloud system which was not pinged yet: %1",
                     url);

@@ -96,7 +96,7 @@ public:
     void setResourceProcessor(QnResourceProcessor* processor);
     QnAbstractResourceSearcher* searcherByManufacturer(const QString& manufacturer) const;
 
-    virtual QnResourcePtr createResource(const QnUuid &resourceTypeId, const QnResourceParams& params) override;
+    virtual QnResourcePtr createResource(const nx::Uuid &resourceTypeId, const QnResourceParams& params) override;
 
     virtual void stop() override;
     virtual void pleaseStop() override;
@@ -198,8 +198,8 @@ protected:
     // Ignore resources for 1 discovery loop.
     QSet<QString> m_resourcesToIgnore;
 
-    QHash<QnUuid, QnManualResourceSearchStatus> m_searchProcessStatuses;
-    QHash<QnUuid, QnManualResourceSearchEntryList> m_searchProcessResults; // TODO: #virtualCamera unused!!!
+    QHash<nx::Uuid, QnManualResourceSearchStatus> m_searchProcessStatuses;
+    QHash<nx::Uuid, QnManualResourceSearchEntryList> m_searchProcessResults; // TODO: #virtualCamera unused!!!
 
     mutable nx::Mutex m_resListMutex;
     std::array<QnResourceList, 6> m_lastDiscoveredResources;

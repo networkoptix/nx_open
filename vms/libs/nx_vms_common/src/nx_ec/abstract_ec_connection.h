@@ -61,17 +61,17 @@ public:
     virtual void stopReceivingNotifications() = 0;
 
     virtual void addRemotePeer(
-        const QnUuid& id,
+        const nx::Uuid& id,
         nx::vms::api::PeerType peerType,
         const nx::utils::Url& url,
         nx::network::ssl::AdapterFunc adapterFunc = nx::network::ssl::kDefaultCertificateCheck) = 0;
 
-    virtual void deleteRemotePeer(const QnUuid& id) = 0;
+    virtual void deleteRemotePeer(const nx::Uuid& id) = 0;
 
     virtual nx::vms::api::Timestamp getTransactionLogTime() const = 0;
     virtual void setTransactionLogTime(nx::vms::api::Timestamp value) = 0;
-    virtual std::set<QnUuid> getRemovedObjects() const = 0;
-    virtual bool resyncTransactionLog(const std::set<QnUuid>& filter = std::set<QnUuid>()) = 0;
+    virtual std::set<nx::Uuid> getRemovedObjects() const = 0;
+    virtual bool resyncTransactionLog(const std::set<nx::Uuid>& filter = std::set<nx::Uuid>()) = 0;
 
     virtual AbstractResourceManagerPtr getResourceManager(
         const Qn::UserSession& userSession) = 0;
@@ -124,8 +124,8 @@ public:
     virtual AbstractUserNotificationManagerPtr userNotificationManager() = 0;
     virtual AbstractLookupListNotificationManagerPtr lookupListNotificationManager() = 0;
 
-    virtual QnUuid routeToPeerVia(
-        const QnUuid& dstPeer,
+    virtual nx::Uuid routeToPeerVia(
+        const nx::Uuid& dstPeer,
         int* distance,
         nx::network::SocketAddress* knownPeerAddress) const = 0;
 
@@ -161,9 +161,9 @@ signals:
 
     void reverseConnectionRequested(const nx::vms::api::ReverseConnectionData& reverseConnetionData);
 
-    void remotePeerFound(QnUuid data, nx::vms::api::PeerType peerType);
-    void remotePeerLost(QnUuid data, nx::vms::api::PeerType peerType);
-    void remotePeerUnauthorized(const QnUuid& id);
+    void remotePeerFound(nx::Uuid data, nx::vms::api::PeerType peerType);
+    void remotePeerLost(nx::Uuid data, nx::vms::api::PeerType peerType);
+    void remotePeerUnauthorized(const nx::Uuid& id);
     void newDirectConnectionEstablished(QnAbstractTransactionTransport* transport);
 
     void settingsChanged(nx::vms::api::ResourceParamDataList settings);

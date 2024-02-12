@@ -61,7 +61,7 @@ private:
 private:
     void handleResourcesAdded(const QnResourceList& resources);
     void handleResourcesRemoved(const QnResourceList& resources);
-    void handleAccessChanged(const QnUuid& subjectId);
+    void handleAccessChanged(const nx::Uuid& subjectId);
 
     void emitChanges(const QHash<QnResourcePtr, ChangeData>& changes);
 };
@@ -105,7 +105,7 @@ void AccessController::setUser(const QnUserResourcePtr& value)
     d->user = newUser;
 
     if (d->resourceAccessNotifier)
-        d->resourceAccessNotifier->setSubjectId(newUser ? newUser->getId() : QnUuid{});
+        d->resourceAccessNotifier->setSubjectId(newUser ? newUser->getId() : nx::Uuid{});
 
     d->updateAllPermissions();
     emit userChanged();
@@ -148,7 +148,7 @@ bool AccessController::hasPermissions(
     return (permissions(targetUserGroup) & desired) == desired;
 }
 
-bool AccessController::hasPermissions(const QnUuid& subjectId, Qn::Permissions desired) const
+bool AccessController::hasPermissions(const nx::Uuid& subjectId, Qn::Permissions desired) const
 {
     if (const auto group = systemContext()->userGroupManager()->find(subjectId))
         return hasPermissions(*group, desired);
@@ -185,7 +185,7 @@ bool AccessController::isDeviceAccessRelevant(AccessRights requiredAccessRights)
         return true;
 
     const auto devices = systemContext()->resourcePool()->getAllCameras(
-        /*parentId*/ QnUuid{}, /*ignoreDesktopCameras*/ true);
+        /*parentId*/ nx::Uuid{}, /*ignoreDesktopCameras*/ true);
 
     return std::any_of(devices.begin(), devices.end(),
         [this, accessManager, requiredAccessRights](const QnVirtualCameraResourcePtr& device)
@@ -401,7 +401,7 @@ void AccessController::Private::handleResourcesRemoved(const QnResourceList& res
     emit q->permissionsMaybeChanged(resources, AccessController::QPrivateSignal{});
 }
 
-void AccessController::Private::handleAccessChanged(const QnUuid& subjectId)
+void AccessController::Private::handleAccessChanged(const nx::Uuid& subjectId)
 {
     if (user && subjectId == user->getId())
         updateAllPermissions();

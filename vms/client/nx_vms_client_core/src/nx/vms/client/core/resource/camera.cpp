@@ -8,7 +8,7 @@
 
 namespace nx::vms::client::core {
 
-Camera::Camera(const QnUuid& resourceTypeId):
+Camera::Camera(const nx::Uuid& resourceTypeId):
     base_type()
 {
     setTypeId(resourceTypeId);
@@ -53,9 +53,9 @@ nx::vms::api::ResourceStatus Camera::getStatus() const
     return QnResource::getStatus();
 }
 
-void Camera::setParentId(const QnUuid& parent)
+void Camera::setParentId(const nx::Uuid& parent)
 {
-    QnUuid oldValue = getParentId();
+    nx::Uuid oldValue = getParentId();
     if (oldValue != parent)
     {
         base_type::setParentId(parent);

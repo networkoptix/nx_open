@@ -18,7 +18,7 @@ namespace nx::vms::client::desktop::rules {
 namespace {
 
 /** Returns whether any of the given camera resources match the given pattern. */
-bool matches(const QString& pattern, const QnUuidSet& ids)
+bool matches(const QString& pattern, const UuidSet& ids)
 {
     const auto resources = appContext()->currentSystemContext()->resourcePool()
         ->getResourcesByIds<QnVirtualCameraResource>(ids);
@@ -71,9 +71,9 @@ bool RulesSortFilterProxyModel::filterAcceptsRow(int sourceRow, const QModelInde
         || eventColumnIndex.data().toString().contains(filterRegExp)
         || commentColumnIndex.data().toString().contains(filterRegExp)
         || matches(filterRegExp.pattern(),
-            sourceColumnIndex.data(RulesTableModel::ResourceIdsRole).value<QnUuidSet>())
+            sourceColumnIndex.data(RulesTableModel::ResourceIdsRole).value<UuidSet>())
         || matches(filterRegExp.pattern(),
-            targetColumnIndex.data(RulesTableModel::ResourceIdsRole).value<QnUuidSet>());
+            targetColumnIndex.data(RulesTableModel::ResourceIdsRole).value<UuidSet>());
 }
 
 void RulesSortFilterProxyModel::registerQmlType()

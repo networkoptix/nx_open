@@ -55,7 +55,7 @@ public:
         const QnVirtualCameraResourcePtr& device,
         const nx::vms::common::AnalyticsEngineResourcePtr& engine,
         const QJsonObject& settings,
-        const QnUuid& settingsModelId,
+        const nx::Uuid& settingsModelId,
         AnalyticsSettingsCallback callback) override
     {
         if (!NX_ASSERT(device) || !NX_ASSERT(engine) || !NX_ASSERT(m_owner))

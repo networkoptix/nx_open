@@ -34,12 +34,12 @@ public:
 
     ResourceAccessTarget(const QnResourcePtr& resource);
     ResourceAccessTarget(nx::vms::api::SpecialResourceGroup group);
-    ResourceAccessTarget(const QnUuid& specialResourceGroupId);
-    ResourceAccessTarget(QnResourcePool* resourcePool, const QnUuid& resourceOrGroupId);
+    ResourceAccessTarget(const nx::Uuid& specialResourceGroupId);
+    ResourceAccessTarget(QnResourcePool* resourcePool, const nx::Uuid& resourceOrGroupId);
 
-    QnUuid id() const { return m_id; }
+    nx::Uuid id() const { return m_id; }
     QnResourcePtr resource() const { return m_resource; }
-    QnUuid groupId() const { return m_group ? m_id : QnUuid{}; }
+    nx::Uuid groupId() const { return m_group ? m_id : nx::Uuid{}; }
     std::optional<nx::vms::api::SpecialResourceGroup> group() const { return m_group; }
 
     bool isValid() const { return m_resource || m_group; }
@@ -53,10 +53,10 @@ private:
 private:
     QnResourcePtr m_resource;
     std::optional<nx::vms::api::SpecialResourceGroup> m_group;
-    QnUuid m_id;
+    nx::Uuid m_id;
 
     Q_GADGET
-    Q_PROPERTY(QnUuid id READ id CONSTANT)
+    Q_PROPERTY(nx::Uuid id READ id CONSTANT)
     Q_PROPERTY(bool isValid READ isValid CONSTANT)
     Q_PROPERTY(bool isResource READ isResource CONSTANT)
     Q_PROPERTY(bool isGroup READ isGroup CONSTANT)
@@ -75,7 +75,7 @@ struct NX_VMS_CLIENT_DESKTOP_API ResourceAccessTreeItem
     Type type{};
     ResourceAccessTarget target;
     ResourceTree::NodeType nodeType;
-    QnUuid outerSpecialResourceGroupId;
+    nx::Uuid outerSpecialResourceGroupId;
     nx::vms::api::AccessRights relevantAccessRights;
 
     Q_GADGET
@@ -99,7 +99,7 @@ public:
     virtual ~AccessSubjectEditingContext() override;
 
     /** A current subject being edited. */
-    QnUuid currentSubjectId() const;
+    nx::Uuid currentSubjectId() const;
 
     enum class SubjectType
     {
@@ -109,12 +109,12 @@ public:
     Q_ENUM(SubjectType);
 
     Q_INVOKABLE SubjectType currentSubjectType() const;
-    void setCurrentSubject(const QnUuid& subjectId, SubjectType type);
+    void setCurrentSubject(const nx::Uuid& subjectId, SubjectType type);
 
     nx::core::access::ResourceAccessMap ownResourceAccessMap() const;
 
     bool hasOwnAccessRight(
-        const QnUuid& resourceOrGroupId, nx::vms::api::AccessRight accessRight) const;
+        const nx::Uuid& resourceOrGroupId, nx::vms::api::AccessRight accessRight) const;
 
     /** Overrides current subject access rights. */
     void setOwnResourceAccessMap(const nx::core::access::ResourceAccessMap& resourceAccessMap);
@@ -137,8 +137,8 @@ public:
      * Returns direct parent user groups from which a specified access right to a specified
      * resource group is inherited.
      */
-    QList<QnUuid> resourceGroupAccessProviders(
-        const QnUuid& resourceGroupId,
+    QList<nx::Uuid> resourceGroupAccessProviders(
+        const nx::Uuid& resourceGroupId,
         nx::vms::api::AccessRight accessRight) const;
 
     /**
@@ -149,7 +149,7 @@ public:
     Q_INVOKABLE void resetAccessibleByPermissionsFilter();
 
     /** Edit current subject relations with other subjects. */
-    void setRelations(const QSet<QnUuid>& parents, const QSet<QnUuid>& members);
+    void setRelations(const QSet<nx::Uuid>& parents, const QSet<nx::Uuid>& members);
 
     /** Revert current subject relations with other subjects to original values. */
     void resetRelations();
@@ -166,7 +166,7 @@ public:
     nx::vms::api::GlobalPermissions globalPermissions() const;
     nx::vms::api::AccessRights availableAccessRights() const;
 
-    QSet<QnUuid> globalPermissionSource(nx::vms::api::GlobalPermission perm) const;
+    QSet<nx::Uuid> globalPermissionSource(nx::vms::api::GlobalPermission perm) const;
 
     static Q_INVOKABLE nx::vms::api::AccessRights relevantAccessRights(
         const ResourceAccessTarget& target);
@@ -175,7 +175,7 @@ public:
         const QModelIndexList& indexes) const;
 
     static void modifyAccessRightMap(nx::core::access::ResourceAccessMap& accessRightMap,
-        const QnUuid& resourceOrGroupId,
+        const nx::Uuid& resourceOrGroupId,
         nx::vms::api::AccessRights modifiedRightsMask,
         bool value,
         bool withDependent = false,
@@ -200,11 +200,11 @@ public:
     static Q_INVOKABLE bool isDependingOn(int /*AccessRight*/ what, nx::vms::api::AccessRights on);
     static Q_INVOKABLE bool isRequiredFor(int /*AccessRight*/ what, nx::vms::api::AccessRights for_);
 
-    QnResourceList getGroupResources(const QnUuid& resourceGroupId) const;
+    QnResourceList getGroupResources(const nx::Uuid& resourceGroupId) const;
     static QnResourceList getChildResources(const QModelIndex& parentTreeNodeIndex);
 
-    static QnUuid specialResourceGroupFor(const QnResourcePtr& resource);
-    static QnUuid specialResourceGroup(ResourceTree::NodeType nodeType);
+    static nx::Uuid specialResourceGroupFor(const QnResourcePtr& resource);
+    static nx::Uuid specialResourceGroup(ResourceTree::NodeType nodeType);
 
     static ResourceAccessTreeItem resourceAccessTreeItemInfo(
         const QModelIndex& resourceTreeModelIndex);
@@ -214,7 +214,7 @@ signals:
     void hierarchyChanged();
     void currentSubjectRemoved();
     void resourceAccessChanged();
-    void resourceGroupsChanged(const QSet<QnUuid>& resourceGroupIds);
+    void resourceGroupsChanged(const QSet<nx::Uuid>& resourceGroupIds);
     void accessibleByPermissionsFilterChanged();
 
 private:

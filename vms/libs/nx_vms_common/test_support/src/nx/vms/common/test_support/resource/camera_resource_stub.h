@@ -37,17 +37,17 @@ public:
     /** Emulate camera ability to produce analytics objects. */
     void setAnalyticsObjectsEnabled(
         bool value = true,
-        const QnUuid& engineId = QnUuid::createUuid());
+        const nx::Uuid& engineId = nx::Uuid::createUuid());
 
     virtual AnalyticsEntitiesByEngine supportedObjectTypes(
         bool filterByEngines = true) const override;
-    void setSupportedObjectTypes(const QMap<QnUuid, std::set<QString>>& supportedObjectTypes);
+    void setSupportedObjectTypes(const QMap<nx::Uuid, std::set<QString>>& supportedObjectTypes);
 
     virtual AnalyticsEntitiesByEngine supportedEventTypes() const override;
-    void setSupportedEventTypes(const QMap<QnUuid, std::set<QString>>& eventTypesByEngine);
+    void setSupportedEventTypes(const QMap<nx::Uuid, std::set<QString>>& eventTypesByEngine);
 
-    virtual QnUuidSet enabledAnalyticsEngines() const override;
-    void setEnabledAnalyticsEngines(QnUuidSet engines);
+    virtual UuidSet enabledAnalyticsEngines() const override;
+    void setEnabledAnalyticsEngines(UuidSet engines);
 
     virtual nx::vms::common::AnalyticsEngineResourceList
         compatibleAnalyticsEngineResources() const override;

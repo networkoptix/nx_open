@@ -7,13 +7,13 @@
 namespace nx::sql::detail {
 
 void CursorHandlerPool::add(
-    QnUuid id,
+    nx::Uuid id,
     std::unique_ptr<AbstractCursorHandler> cursorHandler)
 {
     m_cursors.emplace(id, std::move(cursorHandler));
 }
 
-AbstractCursorHandler* CursorHandlerPool::cursorHander(QnUuid id)
+AbstractCursorHandler* CursorHandlerPool::cursorHander(nx::Uuid id)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     auto it = m_cursors.find(id);
@@ -26,7 +26,7 @@ int CursorHandlerPool::cursorCount() const
     return (int) m_cursors.size();
 }
 
-void CursorHandlerPool::remove(QnUuid id)
+void CursorHandlerPool::remove(nx::Uuid id)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     m_cursors.erase(id);
@@ -53,7 +53,7 @@ void CursorHandlerPool::cleanupDroppedCursors()
     cursorsToDrop.clear();
 }
 
-void CursorHandlerPool::markCursorForDeletion(QnUuid id)
+void CursorHandlerPool::markCursorForDeletion(nx::Uuid id)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     m_cursorsMarkedForDeletion.push_back(id);

@@ -26,7 +26,7 @@ Result AbstractLookupListManager::saveSync(const nx::vms::api::LookupListData& d
         });
 }
 
-Result AbstractLookupListManager::removeSync(const QnUuid& id)
+Result AbstractLookupListManager::removeSync(const nx::Uuid& id)
 {
     return detail::callSync(
         [&](auto handler)

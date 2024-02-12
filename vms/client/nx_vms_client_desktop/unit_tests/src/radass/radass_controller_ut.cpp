@@ -48,7 +48,7 @@ public:
         {
             TestCamDisplayPtr camDisplay(new TestCamDisplay());
             camDisplay->name = QString("Camera %1").arg(i);
-            camDisplay->cameraID = QnUuid::createUuid();
+            camDisplay->cameraID = nx::Uuid::createUuid();
             controller->registerConsumer(camDisplay.data());
             cameras.push_back(camDisplay);
         }

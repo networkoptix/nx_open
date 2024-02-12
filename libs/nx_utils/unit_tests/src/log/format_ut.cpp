@@ -48,7 +48,7 @@ TEST(Formatter, argCustom)
     testCustom(QLatin1String("hello"), QByteArray("hello"));
     testCustom(QLatin1String("positive"), std::string("positive"));
     testCustom(QLatin1String("{fbc94ac6-c305-11e6-9583-4b520c3a522d}"),
-        QnUuid("fbc94ac6-c305-11e6-9583-4b520c3a522d"));
+        nx::Uuid("fbc94ac6-c305-11e6-9583-4b520c3a522d"));
 
     testCustom(QLatin1String("234s"), std::chrono::seconds(234));
     testCustom(QLatin1String("342332ms"), std::chrono::milliseconds(342332));

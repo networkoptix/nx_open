@@ -25,7 +25,7 @@ ErrorCode AbstractVmsRulesManager::saveSync(const nx::vms::api::rules::Rule& rul
         });
 }
 
-ErrorCode AbstractVmsRulesManager::deleteRuleSync(const QnUuid& id)
+ErrorCode AbstractVmsRulesManager::deleteRuleSync(const nx::Uuid& id)
 {
     return detail::callSync(
         [&](auto handler)

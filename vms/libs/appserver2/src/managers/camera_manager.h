@@ -34,7 +34,7 @@ public:
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
 
     virtual int remove(
-        const QnUuid& id,
+        const nx::Uuid& id,
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
 
@@ -43,8 +43,8 @@ public:
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
 
     virtual int setServerFootageData(
-        const QnUuid& serverGuid,
-        const std::vector<QnUuid>& cameraIds,
+        const nx::Uuid& serverGuid,
+        const std::vector<nx::Uuid>& cameraIds,
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
 
@@ -63,7 +63,7 @@ public:
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
 
     virtual int removeHardwareIdMapping(
-        const QnUuid& id,
+        const nx::Uuid& id,
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
 
@@ -94,9 +94,9 @@ int QnCameraManager<QueryProcessorType>::getCameras(
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
     const int requestId = generateRequestID();
-    processor().template processQueryAsync<QnUuid, nx::vms::api::CameraDataList>(
+    processor().template processQueryAsync<nx::Uuid, nx::vms::api::CameraDataList>(
         ApiCommand::getCameras,
-        QnUuid(),
+        nx::Uuid(),
         [requestId, handler = handlerExecutor.bind(std::move(handler))](auto&&... args) mutable
         {
             handler(requestId, std::move(args)...);
@@ -164,7 +164,7 @@ int QnCameraManager<QueryProcessorType>::addCameras(
 
 template<class QueryProcessorType>
 int QnCameraManager<QueryProcessorType>::remove(
-    const QnUuid& id,
+    const nx::Uuid& id,
     Handler<> handler,
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
@@ -197,8 +197,8 @@ int QnCameraManager<QueryProcessorType>::getServerFootageData(
 
 template<class QueryProcessorType>
 int QnCameraManager<QueryProcessorType>::setServerFootageData(
-    const QnUuid& serverGuid,
-    const std::vector<QnUuid>& cameraIds,
+    const nx::Uuid& serverGuid,
+    const std::vector<nx::Uuid>& cameraIds,
     Handler<> handler,
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
@@ -218,9 +218,9 @@ int QnCameraManager<QueryProcessorType>::getUserAttributes(
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
     const int requestId = generateRequestID();
-    processor().template processQueryAsync<QnUuid, nx::vms::api::CameraAttributesDataList>(
+    processor().template processQueryAsync<nx::Uuid, nx::vms::api::CameraAttributesDataList>(
         ApiCommand::getCameraUserAttributesList,
-        QnUuid(),
+        nx::Uuid(),
         [requestId, handler = handlerExecutor.bind(std::move(handler))](auto&&... args) mutable
         {
             handler(requestId, std::move(args)...);
@@ -264,7 +264,7 @@ int QnCameraManager<QueryProcessorType>::addHardwareIdMapping(
 
 template<class QueryProcessorType>
 int QnCameraManager<QueryProcessorType>::removeHardwareIdMapping(
-    const QnUuid& id,
+    const nx::Uuid& id,
     Handler<> handler,
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {

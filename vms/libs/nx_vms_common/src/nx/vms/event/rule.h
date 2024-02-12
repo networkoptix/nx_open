@@ -25,14 +25,14 @@ public:
 
     QString getUniqueId() const;
 
-    QnUuid id() const;
-    void setId(const QnUuid& value);
+    nx::Uuid id() const;
+    void setId(const nx::Uuid& value);
 
     EventType eventType() const;
     void setEventType(EventType eventType);
 
-    QVector<QnUuid> eventResources() const;
-    void setEventResources(const QVector<QnUuid> &value);
+    QVector<nx::Uuid> eventResources() const;
+    void setEventResources(const QVector<nx::Uuid> &value);
 
     EventParameters eventParams() const;
     void setEventParams(const EventParameters& params);
@@ -43,8 +43,8 @@ public:
     ActionType actionType() const;
     void setActionType(ActionType actionType);
 
-    QVector<QnUuid> actionResources() const;
-    void setActionResources(const QVector<QnUuid> &value);
+    QVector<nx::Uuid> actionResources() const;
+    void setActionResources(const QVector<nx::Uuid> &value);
 
     ActionParameters actionParams() const;
     void setActionParams(const ActionParameters& params);
@@ -84,25 +84,25 @@ public:
      * but an old database could has these invalid guids.
      * @returns Map of valid guids by old (invalid) guids.
      */
-    static QMap<QnUuid, QnUuid> remappedGuidsToFix();
+    static QMap<nx::Uuid, nx::Uuid> remappedGuidsToFix();
     static RuleList getDisabledRulesUpd43();
 
     Rule* clone();
-    void removeResource(const QnUuid& resId);
+    void removeResource(const nx::Uuid& resId);
 
 private:
     Rule(int internalId, int aggregationPeriod,  bool isSystem, ActionType bActionType,
-        EventType bEventType, const QList<QnUuid>& subjectIds = {}, bool allUsers = false);
+        EventType bEventType, const QList<nx::Uuid>& subjectIds = {}, bool allUsers = false);
 
-    QnUuid m_id;
+    nx::Uuid m_id;
 
     EventType m_eventType;
-    QVector<QnUuid> m_eventResources;
+    QVector<nx::Uuid> m_eventResources;
     EventParameters m_eventParams;
     EventState m_eventState;
 
     ActionType m_actionType;
-    QVector<QnUuid> m_actionResources;
+    QVector<nx::Uuid> m_actionResources;
     ActionParameters m_actionParams;
 
     int m_aggregationPeriod;

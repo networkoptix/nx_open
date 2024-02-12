@@ -9,7 +9,7 @@ namespace nx::vms::api {
 
 struct NX_VMS_API IniConfigModel
 {
-    QnUuid serverId;
+    nx::Uuid serverId;
     QString iniConfigDir;
 };
 #define IniConfigModel_Fields (serverId)(iniConfigDir)

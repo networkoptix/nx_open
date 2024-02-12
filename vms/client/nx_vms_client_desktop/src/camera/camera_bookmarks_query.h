@@ -72,28 +72,28 @@ public:
      * Query loads bookmarks only for the given set of cameras.
      * @return List of cameras.
      */
-    const std::set<QnUuid>& cameras() const;
+    const std::set<nx::Uuid>& cameras() const;
 
     /**
      * Set cameras for which the bookmarks should be loaded. Actual data will be forcefully
      * updated if the new value differs from current.
      * @param value Set of cameras. If it is empty, query will become invalid.
      */
-    void setCameras(const std::set<QnUuid>& value);
+    void setCameras(const std::set<nx::Uuid>& value);
 
     /**
      * Set camera for which the bookmarks should be loaded. Actual data will be forcefully
      * updated if the new camera set value differs from current.
      * @param value Single camera. If it is empty, query will become invalid.
      */
-    void setCamera(const QnUuid& value);
+    void setCamera(const nx::Uuid& value);
 
     /**
      * Adds camera to the stored set of cameras for which the bookmarks should be loaded.
      * @param value Single camera.
      * @return True if camera actually was added, i.e it wasn't already in the stored set.
      */
-    bool addCamera(const QnUuid& value);
+    bool addCamera(const nx::Uuid& value);
 
     /**
      * Remove camera from the target cameras set. Actual data will be forcefully updated if the
@@ -101,7 +101,7 @@ public:
      * @param value Single camera. If the resulting set is empty, query will become invalid.
      * @return True if camera was really removed, false otherwise.
      */
-    bool removeCamera(const QnUuid& value);
+    bool removeCamera(const nx::Uuid& value);
 
     /**
      * Query loads bookmarks filtered by the given filter.

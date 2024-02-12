@@ -11,7 +11,7 @@ namespace ec2 {
 
 // TODO: #vkutin #muskov Think where to put these globals.
 nx::vms::api::DiscoveryData toApiDiscoveryData(
-    const QnUuid &id, const nx::utils::Url &url, bool ignore);
+    const nx::Uuid &id, const nx::utils::Url &url, bool ignore);
 
 template<class QueryProcessorType>
 class QnDiscoveryManager: public AbstractDiscoveryManager
@@ -20,20 +20,20 @@ public:
     QnDiscoveryManager(QueryProcessorType* queryProcessor, const Qn::UserSession& userSession);
 
     virtual int discoverPeer(
-        const QnUuid& id,
+        const nx::Uuid& id,
         const nx::utils::Url& url,
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
 
     virtual int addDiscoveryInformation(
-        const QnUuid& id,
+        const nx::Uuid& id,
         const nx::utils::Url& url,
         bool ignore,
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
 
     virtual int removeDiscoveryInformation(
-        const QnUuid& id,
+        const nx::Uuid& id,
         const nx::utils::Url& url,
         bool ignore,
         Handler<> handler,
@@ -62,7 +62,7 @@ QnDiscoveryManager<QueryProcessorType>::QnDiscoveryManager(
 
 template<class QueryProcessorType>
 int QnDiscoveryManager<QueryProcessorType>::discoverPeer(
-    const QnUuid& id,
+    const nx::Uuid& id,
     const nx::utils::Url& url,
     Handler<> handler,
     nx::utils::AsyncHandlerExecutor handlerExecutor)
@@ -84,7 +84,7 @@ int QnDiscoveryManager<QueryProcessorType>::discoverPeer(
 
 template<class QueryProcessorType>
 int QnDiscoveryManager<QueryProcessorType>::addDiscoveryInformation(
-    const QnUuid& id,
+    const nx::Uuid& id,
     const nx::utils::Url& url,
     bool ignore,
     Handler<> handler,
@@ -104,7 +104,7 @@ int QnDiscoveryManager<QueryProcessorType>::addDiscoveryInformation(
 
 template<class QueryProcessorType>
 int QnDiscoveryManager<QueryProcessorType>::removeDiscoveryInformation(
-    const QnUuid& id,
+    const nx::Uuid& id,
     const nx::utils::Url& url,
     bool ignore,
     Handler<> handler,
@@ -127,9 +127,9 @@ int QnDiscoveryManager<QueryProcessorType>::getDiscoveryData(
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
     const int requestId = generateRequestID();
-    processor().template processQueryAsync<QnUuid, nx::vms::api::DiscoveryDataList>(
+    processor().template processQueryAsync<nx::Uuid, nx::vms::api::DiscoveryDataList>(
         ApiCommand::getDiscoveryData,
-        QnUuid(),
+        nx::Uuid(),
         [requestId, handler = handlerExecutor.bind(std::move(handler))](auto&&... args) mutable
         {
             handler(requestId, std::move(args)...);

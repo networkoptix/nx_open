@@ -18,7 +18,7 @@ CrossSystemServerResource::CrossSystemServerResource(core::RemoteConnectionPtr c
 }
 
 CrossSystemServerResource::CrossSystemServerResource(
-    const QnUuid& id,
+    const nx::Uuid& id,
     nx::network::SocketAddress endpoint,
     core::RemoteConnectionPtr connection)
 {
@@ -27,7 +27,7 @@ CrossSystemServerResource::CrossSystemServerResource(
     setPrimaryAddress(std::move(endpoint));
     m_restConnection = rest::ServerConnectionPtr(new rest::ServerConnection(
         id,
-        /*auditId*/ QnUuid::createUuid(),
+        /*auditId*/ nx::Uuid::createUuid(),
         connection->certificateCache().get(),
         getPrimaryAddress(),
         connection->credentials()));

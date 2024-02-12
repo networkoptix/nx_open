@@ -17,7 +17,7 @@ ErrorCode AbstractResourceManager::getResourceTypesSync(QnResourceTypeList* outT
 }
 
 ErrorCode AbstractResourceManager::setResourceStatusSync(
-    const QnUuid& resourceId, nx::vms::api::ResourceStatus status)
+    const nx::Uuid& resourceId, nx::vms::api::ResourceStatus status)
 {
     return detail::callSync(
         [&](auto handler)
@@ -27,7 +27,7 @@ ErrorCode AbstractResourceManager::setResourceStatusSync(
 }
 
 ErrorCode AbstractResourceManager::getKvPairsSync(
-    const QnUuid& resourceId, nx::vms::api::ResourceParamWithRefDataList* outDataList)
+    const nx::Uuid& resourceId, nx::vms::api::ResourceParamWithRefDataList* outDataList)
 {
     return detail::callSync(
         [&](auto handler)
@@ -38,7 +38,7 @@ ErrorCode AbstractResourceManager::getKvPairsSync(
 }
 
 ErrorCode AbstractResourceManager::getStatusListSync(
-    const QnUuid& resourceId, nx::vms::api::ResourceStatusDataList* outDataList)
+    const nx::Uuid& resourceId, nx::vms::api::ResourceStatusDataList* outDataList)
 {
     return detail::callSync(
         [&](auto handler)
@@ -59,7 +59,7 @@ ErrorCode AbstractResourceManager::saveSync(
 }
 
 int AbstractResourceManager::save(
-    const QnUuid& resourceId,
+    const nx::Uuid& resourceId,
     const nx::vms::api::ResourceParamDataList& dataList,
     Handler<> handler,
     nx::utils::AsyncHandlerExecutor handlerExecutor)
@@ -71,7 +71,7 @@ int AbstractResourceManager::save(
 }
 
 ErrorCode AbstractResourceManager::saveSync(
-    const QnUuid& resourceId, const nx::vms::api::ResourceParamDataList& dataList)
+    const nx::Uuid& resourceId, const nx::vms::api::ResourceParamDataList& dataList)
 {
     return detail::callSync(
         [&](auto handler)
@@ -80,7 +80,7 @@ ErrorCode AbstractResourceManager::saveSync(
         });
 }
 
-ErrorCode AbstractResourceManager::removeSync(const QnUuid& resourceId)
+ErrorCode AbstractResourceManager::removeSync(const nx::Uuid& resourceId)
 {
     return detail::callSync(
         [&](auto handler)
@@ -89,7 +89,7 @@ ErrorCode AbstractResourceManager::removeSync(const QnUuid& resourceId)
         });
 }
 
-ErrorCode AbstractResourceManager::removeSync(const QVector<QnUuid>& resourceIds)
+ErrorCode AbstractResourceManager::removeSync(const QVector<nx::Uuid>& resourceIds)
 {
     return detail::callSync(
         [&](auto handler)
@@ -107,7 +107,7 @@ ErrorCode AbstractResourceManager::removeSync(const nx::vms::api::ResourceParamW
         });
 }
 
-ErrorCode AbstractResourceManager::removeHardwareIdMappingSync(const QnUuid& resourceId)
+ErrorCode AbstractResourceManager::removeHardwareIdMappingSync(const nx::Uuid& resourceId)
 {
     return detail::callSync(
         [&](auto handler)

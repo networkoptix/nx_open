@@ -18,7 +18,7 @@ class NX_VMS_COMMON_API AbstractWebPageNotificationManager: public QObject
 
 signals:
     void addedOrUpdated(const nx::vms::api::WebPageData& webpage, ec2::NotificationSource source);
-    void removed(const QnUuid& id, ec2::NotificationSource source);
+    void removed(const nx::Uuid& id, ec2::NotificationSource source);
 };
 
 /*!
@@ -43,11 +43,11 @@ public:
     ErrorCode saveSync(const nx::vms::api::WebPageData& data);
 
     virtual int remove(
-        const QnUuid& id,
+        const nx::Uuid& id,
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) = 0;
 
-    ErrorCode removeSync(const QnUuid& id);
+    ErrorCode removeSync(const nx::Uuid& id);
 };
 
 } // namespace ec2

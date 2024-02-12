@@ -53,7 +53,7 @@ TemporaryUserExpirationWatcher::TemporaryUserExpirationWatcher(QObject* parent):
 
     connect(m_notificationManager,
         &workbench::LocalNotificationsManager::cancelRequested,
-        [this](QnUuid notificationId)
+        [this](nx::Uuid notificationId)
         {
             if (notificationId != m_notification)
                 return;

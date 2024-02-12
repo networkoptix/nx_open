@@ -26,7 +26,7 @@ ErrorCode AbstractEventRulesManager::saveSync(const nx::vms::api::EventRuleData&
         });
 }
 
-ErrorCode AbstractEventRulesManager::deleteRuleSync(const QnUuid& ruleId)
+ErrorCode AbstractEventRulesManager::deleteRuleSync(const nx::Uuid& ruleId)
 {
     return detail::callSync(
         [&](auto handler)

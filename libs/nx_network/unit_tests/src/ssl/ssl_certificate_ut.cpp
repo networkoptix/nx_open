@@ -381,7 +381,7 @@ TEST(SslCertificate, Hosts)
     ASSERT_TRUE(certificate.parsePem(kPublicPem));
     ASSERT_EQ(std::set<std::string>{"cloud-test.hdw.mx"}, certificate.hosts());
 
-    const auto kHostName = QnUuid::createUuid().toSimpleStdString();
+    const auto kHostName = nx::Uuid::createUuid().toSimpleStdString();
     const auto kPem = makeCertificateAndKey(kCertificateNameA, kHostName);
     Pem pem;
     ASSERT_TRUE(pem.parse(kPem));

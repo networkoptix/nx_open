@@ -42,40 +42,40 @@ public:
 
     virtual ~SoftwareTriggersWatcher() override;
 
-    void setResourceId(const QnUuid& resourceId);
+    void setResourceId(const nx::Uuid& resourceId);
 
     void updateTriggersAvailability();
-    void updateTriggerAvailability(QnUuid id);
+    void updateTriggerAvailability(nx::Uuid id);
 
-    bool triggerEnabled(const QnUuid& id) const;
-    bool prolongedTrigger(const QnUuid& id) const;
-    QString triggerName(const QnUuid& id) const;
-    QString triggerIcon(const QnUuid& id) const;
+    bool triggerEnabled(const nx::Uuid& id) const;
+    bool prolongedTrigger(const nx::Uuid& id) const;
+    QString triggerName(const nx::Uuid& id) const;
+    QString triggerIcon(const nx::Uuid& id) const;
 
 signals:
     void resourceIdChanged();
 
-    void triggerRemoved(const QnUuid& id);
+    void triggerRemoved(const nx::Uuid& id);
     void triggerAdded(
-        const QnUuid& id,
+        const nx::Uuid& id,
         const QString& iconPath,
         const QString& name,
         bool prolonged,
         bool enabled);
 
-    void triggerFieldsChanged(const QnUuid& id, TriggerFields fields);
+    void triggerFieldsChanged(const nx::Uuid& id, TriggerFields fields);
 
 private:
     struct Description;
     using DescriptionPtr = QSharedPointer<Description>;
-    using DescriptionsHash = QHash<QnUuid, DescriptionPtr>;
+    using DescriptionsHash = QHash<nx::Uuid, DescriptionPtr>;
 
 private:
-    DescriptionPtr findTrigger(QnUuid id) const;
-    void tryRemoveTrigger(const QnUuid& id);
+    DescriptionPtr findTrigger(nx::Uuid id) const;
+    void tryRemoveTrigger(const nx::Uuid& id);
 
     void updateTriggers();
-    void updateTriggerByData(QnUuid id, const DescriptionPtr& newData);
+    void updateTriggerByData(nx::Uuid id, const DescriptionPtr& newData);
 
     void updateTriggerByRule(const nx::vms::event::RulePtr& rule);
 

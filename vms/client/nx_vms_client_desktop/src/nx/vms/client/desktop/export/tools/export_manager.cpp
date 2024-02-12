@@ -10,7 +10,7 @@
 
 namespace nx::vms::client::desktop {
 
-ExportProcess::ExportProcess(const QnUuid& id, std::unique_ptr<AbstractExportTool>&& tool, QObject* parent):
+ExportProcess::ExportProcess(const nx::Uuid& id, std::unique_ptr<AbstractExportTool>&& tool, QObject* parent):
     base_type(parent),
     m_info(id),
     m_tool(std::move(tool))
@@ -68,18 +68,18 @@ void ExportProcess::stop()
 struct ExportManager::Private
 {
     ExportManager* const q;
-    QMap<QnUuid, QPointer<ExportProcess>> exportProcesses;
+    QMap<nx::Uuid, QPointer<ExportProcess>> exportProcesses;
 
     explicit Private(ExportManager* owner):
         q(owner)
     {
     }
 
-    QnUuid startExport(ExportProcess* process)
+    nx::Uuid startExport(ExportProcess* process)
     {
         connect(process, &ExportProcess::infoChanged, q, &ExportManager::processUpdated);
         connect(process, &ExportProcess::finished, q,
-            [this](const QnUuid& id)
+            [this](const nx::Uuid& id)
             {
                 if (auto process = exportProcesses.take(id))
                 {
@@ -92,17 +92,17 @@ struct ExportManager::Private
         return process->info().id;
     }
 
-    void stopExport(const QnUuid& exportProcessId)
+    void stopExport(const nx::Uuid& exportProcessId)
     {
         if (const auto process = exportProcesses.value(exportProcessId))
             process->stop();
     }
 
-    ExportProcessInfo info(const QnUuid& exportProcessId) const
+    ExportProcessInfo info(const nx::Uuid& exportProcessId) const
     {
         if (const auto process = exportProcesses.value(exportProcessId))
             return process->info();
-        return ExportProcessInfo(QnUuid());
+        return ExportProcessInfo(nx::Uuid());
     }
 };
 
@@ -122,17 +122,17 @@ ExportManager::~ExportManager()
     }
 }
 
-QnUuid ExportManager::startExport(const QnUuid& id, std::unique_ptr<AbstractExportTool>&& tool)
+nx::Uuid ExportManager::startExport(const nx::Uuid& id, std::unique_ptr<AbstractExportTool>&& tool)
 {
     return d->startExport(new ExportProcess(id, std::move(tool), this));
 }
 
-void ExportManager::stopExport(const QnUuid& exportProcessId)
+void ExportManager::stopExport(const nx::Uuid& exportProcessId)
 {
     d->stopExport(exportProcessId);
 }
 
-ExportProcessInfo ExportManager::info(const QnUuid& exportProcessId) const
+ExportProcessInfo ExportManager::info(const nx::Uuid& exportProcessId) const
 {
     return d->info(exportProcessId);
 }

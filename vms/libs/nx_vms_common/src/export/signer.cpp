@@ -23,7 +23,7 @@ void MediaSigner::processMedia(AVCodecParameters* avCodecParams, const uint8_t* 
         QnSignHelper::updateDigest(avCodecParams, m_audioHash, data, size);
 }
 
-QByteArray MediaSigner::buildSignature(QnLicensePool* licensePool, const QnUuid& serverId)
+QByteArray MediaSigner::buildSignature(QnLicensePool* licensePool, const nx::Uuid& serverId)
 {
     QByteArray signature = QnSignHelper::getSignPattern(licensePool, serverId);
     m_signatureHash.addData(m_audioHash.result());

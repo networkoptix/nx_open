@@ -39,6 +39,6 @@ using ValidatorsList = QList<TextValidateFunction>;
 TextValidateFunction validatorsConcatenator(const ValidatorsList& validators);
 
 using UserValidator = std::function<bool (const QnUserResourcePtr&)>;
-using RoleValidator = std::function<QValidator::State (const QnUuid&)>;
+using RoleValidator = std::function<QValidator::State (const nx::Uuid&)>;
 
 } // namespace nx::vms::client::desktop

@@ -94,9 +94,9 @@ std::vector<nx::analytics::taxonomy::AbstractEngine*> enginesFromFilters(
     return engines;
 }
 
-std::set<QnUuid> deviceIds(const QnVirtualCameraResourceSet& devices)
+std::set<nx::Uuid> deviceIds(const QnVirtualCameraResourceSet& devices)
 {
-    std::set<QnUuid> ids;
+    std::set<nx::Uuid> ids;
     for (const QnVirtualCameraResourcePtr& device: devices)
         ids.insert(device->getId());
 
@@ -178,7 +178,7 @@ void AnalyticsFilterModel::setEngines(
 
 void AnalyticsFilterModel::update(
     nx::analytics::taxonomy::AbstractEngine* engine,
-    const std::set<QnUuid>& devices,
+    const std::set<nx::Uuid>& devices,
     const QVariantMap& attributeValues,
     bool liveTypesExcluded,
     bool force)
@@ -224,7 +224,7 @@ void AnalyticsFilterModel::setSelectedDevices(const QnVirtualCameraResourceSet& 
     setSelectedDevices(deviceIds(devices));
 }
 
-void AnalyticsFilterModel::setSelectedDevices(const std::set<QnUuid>& devices)
+void AnalyticsFilterModel::setSelectedDevices(const std::set<nx::Uuid>& devices)
 {
     update(m_engine, devices, m_attributeValues, m_liveTypesExcluded);
 }

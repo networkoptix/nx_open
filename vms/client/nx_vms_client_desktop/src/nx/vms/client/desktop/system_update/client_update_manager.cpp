@@ -48,7 +48,7 @@ namespace {
 milliseconds kClientUpdateRolloutPeriod = 4h;
 
 QRandomGenerator64 getRandomGenerator(
-    const QnUuid& localSystemId, const nx::utils::SoftwareVersion& version)
+    const nx::Uuid& localSystemId, const nx::utils::SoftwareVersion& version)
 {
     // We need a seeded random generator to ensure that all clients of one system pick the same
     // date. So we seed it with the localSystemId. The update version is also fed to the generator
@@ -123,9 +123,9 @@ public:
 
     UpdateContents updateContents;
     QString updateVerificationError;
-    QnUuid installationNotificationId;
-    QnUuid autoUpdateFeatureNotificationId;
-    QnUuid errorNotificationId;
+    nx::Uuid installationNotificationId;
+    nx::Uuid autoUpdateFeatureNotificationId;
+    nx::Uuid errorNotificationId;
     rest::Handle currentRequest = 0;
 };
 
@@ -188,7 +188,7 @@ ClientUpdateManager::Private::Private(ClientUpdateManager* q):
     connect(notificationsManager,
         &workbench::LocalNotificationsManager::cancelRequested,
         this,
-        [this](const QnUuid& notificationId)
+        [this](const nx::Uuid& notificationId)
         {
             if (notificationId == installationNotificationId)
                 hideSuccessfulInstallationNotification();
@@ -199,7 +199,7 @@ ClientUpdateManager::Private::Private(ClientUpdateManager* q):
     connect(notificationsManager,
         &workbench::LocalNotificationsManager::interactionRequested,
         this,
-        [this](const QnUuid& notificationId)
+        [this](const nx::Uuid& notificationId)
         {
             if (!systemContext()->accessController()->hasPowerUserPermissions())
                 return;
@@ -538,7 +538,7 @@ void ClientUpdateManager::Private::handleUpdateContents(UpdateContents newConten
     if (!newContents.isEmpty())
     {
         ClientVerificationData clientData;
-        clientData.clientId = QnUuid::createUuid(); //< Any unique ID is OK.
+        clientData.clientId = nx::Uuid::createUuid(); //< Any unique ID is OK.
         clientData.fillDefault();
         VerificationOptions options;
         options.compatibilityMode = true;
@@ -785,7 +785,7 @@ QUrl ClientUpdateManager::releaseNotesUrl() const
 ClientUpdateManager::UpdateDate ClientUpdateManager::calculateUpdateDate(
     milliseconds currentDateTime,
     const common::update::Information& updateInfo,
-    const QnUuid& localSystemId,
+    const nx::Uuid& localSystemId,
     milliseconds minimumAllowedUpdateDate)
 {
     // IMPORTANT! This function must generate the same timestamp on all Clients in the system

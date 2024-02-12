@@ -12,10 +12,10 @@ namespace nx::vms::client::desktop {
 class SettingsDialogManager::Private
 {
 public:
-    QnUuid currentUserId;
+    nx::Uuid currentUserId;
     QPointer<UserSettingsDialog> userSettingsDialog;
 
-    QnUuid currentGroupId;
+    nx::Uuid currentGroupId;
     QPointer<GroupSettingsDialog> groupSettingsDialog;
 };
 
@@ -30,12 +30,12 @@ SettingsDialogManager::~SettingsDialogManager()
 {
 }
 
-QnUuid SettingsDialogManager::currentEditedUserId() const
+nx::Uuid SettingsDialogManager::currentEditedUserId() const
 {
     return d->currentUserId;
 }
 
-void SettingsDialogManager::setCurrentEditedUserId(const QnUuid& userId)
+void SettingsDialogManager::setCurrentEditedUserId(const nx::Uuid& userId)
 {
     if (!d->userSettingsDialog)
     {
@@ -59,7 +59,7 @@ void SettingsDialogManager::setCurrentEditedUserId(const QnUuid& userId)
     emit currentEditedUserIdChanged();
 }
 
-void SettingsDialogManager::editUser(const QnUuid& userId, int tab, QWidget* parent)
+void SettingsDialogManager::editUser(const nx::Uuid& userId, int tab, QWidget* parent)
 {
     setCurrentEditedUserId(userId);
 
@@ -100,12 +100,12 @@ void SettingsDialogManager::createUser(QWidget* parent)
     dialog->exec(Qt::ApplicationModal);
 }
 
-QnUuid SettingsDialogManager::currentEditedGroupId() const
+nx::Uuid SettingsDialogManager::currentEditedGroupId() const
 {
     return d->currentGroupId;
 }
 
-void SettingsDialogManager::setCurrentEditedGroupId(const QnUuid& groupId)
+void SettingsDialogManager::setCurrentEditedGroupId(const nx::Uuid& groupId)
 {
     if (!d->groupSettingsDialog)
     {
@@ -128,7 +128,7 @@ void SettingsDialogManager::setCurrentEditedGroupId(const QnUuid& groupId)
     emit currentEditedGroupIdChanged();
 }
 
-void SettingsDialogManager::editGroup(const QnUuid& groupId, QWidget* parent)
+void SettingsDialogManager::editGroup(const nx::Uuid& groupId, QWidget* parent)
 {
     setCurrentEditedGroupId(groupId);
 

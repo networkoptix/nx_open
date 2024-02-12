@@ -9,8 +9,8 @@ namespace nx::vms::api::analytics {
 using ActionTypeId = QString;
 using AttributeListId = QString;
 using ColorTypeId = QString;
-using DeviceId = QnUuid;
-using EngineId = QnUuid;
+using DeviceId = nx::Uuid;
+using EngineId = nx::Uuid;
 using EnumTypeId = QString;
 using EventTypeId = QString;
 using GroupId = QString;

@@ -332,7 +332,7 @@ struct UserSettingsDialog::Private
 
         if (createCloudUser)
         {
-            userData.id = QnUuid::fromArbitraryData(state.email);
+            userData.id = nx::Uuid::fromArbitraryData(state.email);
             userData.name = state.email;
         }
         else
@@ -519,7 +519,7 @@ UserSettingsDialog::UserSettingsDialog(
         systemContext->accessRightsManager(),
         &nx::core::access::AbstractAccessRightsManager::ownAccessRightsChanged,
         this,
-        [this](const QSet<QnUuid>& subjectIds)
+        [this](const QSet<nx::Uuid>& subjectIds)
         {
             if (d->user && subjectIds.contains(d->user->getId()))
                 updateStateFrom(d->user);
@@ -896,7 +896,7 @@ QString UserSettingsDialog::warningForTemporaryUser(
         | AccessRight::viewArchive | AccessRight::exportArchive | AccessRight::viewBookmarks;
 
     const auto hasGroups =
-        [this, &parentGroups](const QSet<QnUuid>& permissionGroups)
+        [this, &parentGroups](const QSet<nx::Uuid>& permissionGroups)
         {
             const auto hierarchy = systemContext()->accessSubjectHierarchy();
 
@@ -984,7 +984,7 @@ UserSettingsDialogState UserSettingsDialog::createState(const QnUserResourcePtr&
         if (d->dialogType == CreateUser)
         {
             // We need non-null uuid to make editingContext happy.
-            state.userId = QnUuid::createUuid();
+            state.userId = nx::Uuid::createUuid();
             if (isConnectedToCloud())
                 state.userType = UserSettingsGlobal::CloudUser;
 
@@ -1026,7 +1026,7 @@ UserSettingsDialogState UserSettingsDialog::createState(const QnUserResourcePtr&
         && user->fullName().isEmpty();
 
     // List of groups.
-    for (const QnUuid& groupId: user->groupIds())
+    for (const nx::Uuid& groupId: user->groupIds())
         state.parentGroups.insert(MembersModelGroup::fromId(systemContext(), groupId));
 
     state.sharedResources = systemContext()->accessRightsManager()->ownResourceAccessMap(

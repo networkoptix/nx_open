@@ -63,7 +63,7 @@ protected:
 
     QnVirtualCameraResourcePtr m_camera;
 
-    QMap<nx::vms::api::ExtendedCameraOutput, QnUuid> m_outputTypeToButtonId;
+    QMap<nx::vms::api::ExtendedCameraOutput, nx::Uuid> m_outputTypeToButtonId;
 
 private:
     QMap<QString, QString> m_outputNameToId;

@@ -19,7 +19,7 @@ inline bool aggregateByType(
 }
 
 /** Returns whether logging is allowed for the given rule. */
-NX_VMS_RULES_API bool isLoggingAllowed(const Engine* engine, QnUuid ruleId);
+NX_VMS_RULES_API bool isLoggingAllowed(const Engine* engine, nx::Uuid ruleId);
 
 /** Returns whether any of the given servers support given event or action. */
 NX_VMS_RULES_API bool hasItemSupportedServer(

@@ -116,7 +116,7 @@ QVariant ProxyAttribute::maxValue() const
     return QVariant();
 }
 
-bool ProxyAttribute::isSupported(QnUuid engineId, QnUuid deviceId) const
+bool ProxyAttribute::isSupported(nx::Uuid engineId, nx::Uuid deviceId) const
 {
     if (m_supportByEngine.empty())
         return false;

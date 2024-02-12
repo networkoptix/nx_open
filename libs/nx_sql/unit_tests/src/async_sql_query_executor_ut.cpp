@@ -641,7 +641,7 @@ private:
         query->prepare("SELECT * FROM company");
     }
 
-    void saveCursor(DBResult /*resultCode*/, QnUuid cursorId)
+    void saveCursor(DBResult /*resultCode*/, nx::Uuid cursorId)
     {
         m_cursorsCreated.push(std::make_unique<CompanyCursor>(&asyncSqlQueryExecutor(), cursorId));
     }

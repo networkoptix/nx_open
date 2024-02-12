@@ -213,7 +213,7 @@ void QnServerSettingsDialog::setServer(const QnMediaServerResourcePtr& server)
     d->generalPage->setServer(server);
     d->statisticsPage->setServer(server);
     d->storagesPage->setServer(server);
-    d->poeSettingsPage->setServerId(server ? server->getId() : QnUuid());
+    d->poeSettingsPage->setServerId(server ? server->getId() : nx::Uuid());
     d->backupPage->setServer(server);
 
     if (d->server)

@@ -21,8 +21,8 @@ namespace nx::vms::api {
  */
 struct NX_VMS_API StorageModel: ResourceWithParameters
 {
-    QnUuid id;
-    QnUuid serverId;
+    nx::Uuid id;
+    nx::Uuid serverId;
 
     /**%apidoc
      * %example Storage 1
@@ -57,8 +57,8 @@ struct NX_VMS_API StorageModel: ResourceWithParameters
     using DbUpdateTypes =
         std::tuple<StorageData, std::optional<ResourceStatusData>, ResourceParamWithRefDataList>;
 
-    QnUuid getId() const { return id; }
-    void setId(QnUuid id_) { id = std::move(id_); }
+    nx::Uuid getId() const { return id; }
+    void setId(nx::Uuid id_) { id = std::move(id_); }
     static_assert(isCreateModelV<StorageModel>);
     static_assert(isUpdateModelV<StorageModel>);
 

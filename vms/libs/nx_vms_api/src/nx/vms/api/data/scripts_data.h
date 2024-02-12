@@ -17,7 +17,7 @@ struct NX_VMS_API ScriptInfo
      * refer to the current Server.
      * %example this
      */
-    QnUuid id;
+    nx::Uuid id;
 
     std::string name;
     std::vector<std::string> args;

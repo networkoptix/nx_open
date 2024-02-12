@@ -19,10 +19,10 @@ namespace nx::vms::rules {
 
 AnalyticsObjectEvent::AnalyticsObjectEvent(
     std::chrono::microseconds timestamp,
-    QnUuid cameraId,
-    QnUuid engineId,
+    nx::Uuid cameraId,
+    nx::Uuid engineId,
     const QString& objectTypeId,
-    QnUuid objectTrackId,
+    nx::Uuid objectTrackId,
     const nx::common::metadata::Attributes& attributes)
     :
     AnalyticsEngineEvent(timestamp, QString(), QString(), cameraId, engineId), // TODO: #mmalofeev Should AnalyticsObjectEvent has a caption like an AnalyticsEvent?

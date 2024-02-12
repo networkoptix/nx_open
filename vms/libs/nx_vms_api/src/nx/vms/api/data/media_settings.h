@@ -22,7 +22,7 @@ struct NX_VMS_API MediaSettings
      * Device id (can be obtained from "id", "physicalId" or "logicalId" field via
      * /rest/v{1-}/devices) or MAC address (not supported for certain Devices).
      */
-    QnUuid id;
+    nx::Uuid id;
 
     /**%apidoc[opt]
      * %value undefined The Server auto-detects the preferred stream index based on the destination

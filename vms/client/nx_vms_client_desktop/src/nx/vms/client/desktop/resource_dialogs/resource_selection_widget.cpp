@@ -267,18 +267,18 @@ void ResourceSelectionWidget::setSelectedResources(const QSet<QnResourcePtr>& re
     emit selectionChanged();
 }
 
-QnUuidSet ResourceSelectionWidget::selectedResourcesIds() const
+UuidSet ResourceSelectionWidget::selectedResourcesIds() const
 {
     const auto resources = selectedResources();
 
-    QnUuidSet result;
+    UuidSet result;
     for (const auto& resource: resources)
         result.insert(resource->getId());
 
     return result;
 }
 
-void ResourceSelectionWidget::setSelectedResourcesIds(const QnUuidSet& resourcesIds)
+void ResourceSelectionWidget::setSelectedResourcesIds(const UuidSet& resourcesIds)
 {
     const auto resourcesList = resourcePool()->getResourcesByIds(resourcesIds);
     setSelectedResources({std::cbegin(resourcesList), std::cend(resourcesList)});
@@ -301,18 +301,18 @@ void ResourceSelectionWidget::setSelectedResource(const QnResourcePtr& resource)
     setSelectedResources(resources);
 }
 
-QnUuid ResourceSelectionWidget::selectedResourceId() const
+nx::Uuid ResourceSelectionWidget::selectedResourceId() const
 {
     NX_ASSERT(selectionMode() != ResourceSelectionMode::MultiSelection,
         "Inappropriate getter for multi selection");
 
     const auto resourcesIds = selectedResourcesIds();
-    return resourcesIds.isEmpty() ? QnUuid() : *resourcesIds.cbegin();
+    return resourcesIds.isEmpty() ? nx::Uuid() : *resourcesIds.cbegin();
 }
 
-void ResourceSelectionWidget::setSelectedResourceId(const QnUuid& resourceId)
+void ResourceSelectionWidget::setSelectedResourceId(const nx::Uuid& resourceId)
 {
-    QnUuidSet resourcesIds;
+    UuidSet resourcesIds;
     if (!resourceId.isNull())
         resourcesIds.insert(resourceId);
     setSelectedResourcesIds(resourcesIds);

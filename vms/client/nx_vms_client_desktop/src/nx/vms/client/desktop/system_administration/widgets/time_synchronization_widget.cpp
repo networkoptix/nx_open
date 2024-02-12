@@ -127,7 +127,7 @@ TimeSynchronizationWidget::TimeSynchronizationWidget(
     const auto selectServer =
         [this](const QModelIndex& index)
         {
-            const QnUuid& serverId = index.data(Model::ServerIdRole).value<QnUuid>();
+            const nx::Uuid& serverId = index.data(Model::ServerIdRole).value<nx::Uuid>();
             // volatile: index is updated when we call m_store->selectServer,
             // so we need to be sure that compiler won't move .row() call below
             volatile const int row = index.row();

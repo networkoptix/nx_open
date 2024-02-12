@@ -78,7 +78,7 @@ void AudioRedirectPickerWidget::setup(StreamDirection streamDirection)
             ui->devicePickerButton->setVisible(false);
             if (!m_audioRedirectDeviceId.isNull())
             {
-                m_audioRedirectDeviceId = QnUuid();
+                m_audioRedirectDeviceId = nx::Uuid();
                 emit audioRedirectDeviceIdChanged(m_audioRedirectDeviceId);
             }
         });
@@ -241,13 +241,13 @@ bool AudioRedirectPickerWidget::sameServerCheck(const QnResourcePtr& redirectDev
         && device->getParentId() == redirectDevice->getParentId();
 }
 
-QnUuid AudioRedirectPickerWidget::getRedirectDeviceId(const CameraSettingsDialogState& state) const
+nx::Uuid AudioRedirectPickerWidget::getRedirectDeviceId(const CameraSettingsDialogState& state) const
 {
     if (!NX_ASSERT(m_streamDirection, "Audio redirect picker not initialized"))
-        return QnUuid();
+        return nx::Uuid();
 
     if (!state.isSingleCamera())
-        return QnUuid();
+        return nx::Uuid();
 
     return *m_streamDirection == Input
         ? state.singleCameraSettings.audioInputDeviceId

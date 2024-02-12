@@ -6,7 +6,7 @@
 
 QnCloudSystemDescriptionPtr QnCloudSystemDescription::create(
     const QString& systemId,
-    const QnUuid& localSystemId,
+    const nx::Uuid& localSystemId,
     const QString& systemName,
     const QString& ownerEmail,
     const QString& ownerFullName,
@@ -20,7 +20,7 @@ QnCloudSystemDescriptionPtr QnCloudSystemDescription::create(
 
 QnCloudSystemDescription::QnCloudSystemDescription(
     const QString& systemId,
-    const QnUuid& localSystemId,
+    const nx::Uuid& localSystemId,
     const QString& systemName,
     const QString& ownerEmail,
     const QString& ownerFullName,

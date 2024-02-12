@@ -36,11 +36,11 @@ private:
 private:
     using SystemsFinderList = QMap<QnAbstractSystemsFinder*, nx::utils::ScopedConnectionsPtr>;
     using AggregatorPtr = QSharedPointer<QnSystemDescriptionAggregator>;
-    using AggregatorsList = QHash<QnUuid, AggregatorPtr>;
+    using AggregatorsList = QHash<nx::Uuid, AggregatorPtr>;
 
     SystemsFinderList m_finders;
     AggregatorsList m_systems;
-    QHash<QString, QnUuid> m_systemToLocalId;
+    QHash<QString, nx::Uuid> m_systemToLocalId;
 };
 
 #define qnSystemsFinder QnSystemsFinder::instance()

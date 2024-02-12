@@ -48,7 +48,7 @@ QnCameraBookmark helpers::bookmarkFromAction(
 
     QnCameraBookmark bookmark;
 
-    bookmark.guid = QnUuid::createUuid();
+    bookmark.guid = nx::Uuid::createUuid();
     bookmark.startTimeMs = milliseconds(startTimeMs - recordBeforeMs);
     bookmark.durationMs = milliseconds(fixedDurationMs > 0
         ? fixedDurationMs

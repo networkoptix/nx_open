@@ -15,7 +15,7 @@ ServerCertificateError::ServerCertificateError(
 }
 
 ServerCertificateError::ServerCertificateError(
-    const QnUuid& serverId, std::chrono::microseconds timestamp)
+    const nx::Uuid& serverId, std::chrono::microseconds timestamp)
     :
     base_type(EventType::serverCertificateError, /*resource*/ {}, timestamp.count()),
     m_serverId(serverId)

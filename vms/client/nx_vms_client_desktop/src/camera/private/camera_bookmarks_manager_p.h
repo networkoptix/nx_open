@@ -50,7 +50,7 @@ public:
 
     void acknowledgeEvent(
         const QnCameraBookmark& bookmark,
-        const QnUuid& eventRuleId,
+        const nx::Uuid& eventRuleId,
         OperationCallbackType callback = OperationCallbackType());
 
     /// @brief                  Update the existing bookmark on the camera.
@@ -61,7 +61,7 @@ public:
     /// @brief                  Delete the existing bookmark from the camera.
     /// @param bookmarkId       Target bookmark id.
     /// @param callback         Callback with operation result.
-    void deleteCameraBookmark(const QnUuid &bookmarkId, OperationCallbackType callback = OperationCallbackType());
+    void deleteCameraBookmark(const nx::Uuid &bookmarkId, OperationCallbackType callback = OperationCallbackType());
 
     /* Queries API section */
 
@@ -128,7 +128,7 @@ private:
      */
     void addUpdatePendingBookmark(const QnCameraBookmark &bookmark);
     /// @brief                  Add removed bookmark to the pending bookmarks list.
-    void addRemovePendingBookmark(const QnUuid &bookmarkId);
+    void addRemovePendingBookmark(const nx::Uuid &bookmarkId);
     /// @brief                  Merge the pending bookmarks with the given bookmarks list.
     /// @param query            The query for with merge operation is performed. The query specifies filters and cameras list.
     void mergeWithPendingBookmarks(const QnCameraBookmarksQueryPtr query, QnCameraBookmarkList &bookmarks);
@@ -141,18 +141,18 @@ private:
 
     void addCameraBookmarkInternal(
         const QnCameraBookmark& bookmark,
-        const QnUuid& eventRuleId,
+        const nx::Uuid& eventRuleId,
         OperationCallbackType callback = OperationCallbackType());
 
     int sendPostRequest(
         const QString& path,
         QnMultiserverRequestData& request,
-        std::optional<QnUuid> serverId = {});
+        std::optional<nx::Uuid> serverId = {});
 
     int sendGetRequest(const QString& path, QnMultiserverRequestData& request,
         RawResponseType callback);
 
-    std::optional<QnUuid> getServerForBookmark(const QnCameraBookmark& bookmark);
+    std::optional<nx::Uuid> getServerForBookmark(const QnCameraBookmark& bookmark);
 
     void startOperationsTimer();
 
@@ -169,10 +169,10 @@ private:
 
         OperationType operation;
         OperationCallbackType callback;
-        QnUuid bookmarkId;
+        nx::Uuid bookmarkId;
 
         OperationInfo();
-        OperationInfo(OperationType operation, const QnUuid &bookmarkId, OperationCallbackType callback);
+        OperationInfo(OperationType operation, const nx::Uuid &bookmarkId, OperationCallbackType callback);
     };
 
     QMap<int, OperationInfo> m_operations;
@@ -202,12 +202,12 @@ private:
         Type type;
 
         PendingInfo(const QnCameraBookmark &bookmark, Type type);
-        PendingInfo(const QnUuid &bookmarkId, Type type);
+        PendingInfo(const nx::Uuid &bookmarkId, Type type);
     };
 
     /**
      * Cache for case when we have sent getBookmarks request and THEN added/removed a bookmark
      * locally. So when we've got reply for getBookmarks, we may fix it correspondingly.
      */
-    QHash<QnUuid, PendingInfo> m_pendingBookmarks;
+    QHash<nx::Uuid, PendingInfo> m_pendingBookmarks;
 };

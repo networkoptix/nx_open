@@ -13,7 +13,7 @@
 
 namespace ec2 {
 
-    static const QnUuid kCloudPeerId("674BAFD7-4EEC-4BBA-84AA-A1BAEA7FC6DB");
+    static const nx::Uuid kCloudPeerId("674BAFD7-4EEC-4BBA-84AA-A1BAEA7FC6DB");
 
     /**
      * This base class is used for both old TransactionTransport and new P2pConnection classes.

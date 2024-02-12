@@ -52,7 +52,7 @@ public:
      */
     SystemContext(
         Mode mode,
-        QnUuid peerId,
+        nx::Uuid peerId,
         nx::core::access::Mode resourceAccessMode = nx::core::access::Mode::cached,
         QObject* parent = nullptr);
     virtual ~SystemContext() override;

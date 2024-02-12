@@ -20,7 +20,7 @@ class AccessHelper:
     public SystemContextAware
 {
     Q_OBJECT
-    Q_PROPERTY(QnUuid resourceId READ resourceId WRITE setResourceId NOTIFY resourceChanged)
+    Q_PROPERTY(nx::Uuid resourceId READ resourceId WRITE setResourceId NOTIFY resourceChanged)
     Q_PROPERTY(QnResource* resource READ rawResource WRITE setRawResource NOTIFY resourceChanged)
     Q_PROPERTY(bool canViewContent READ canViewContent NOTIFY permissionsChanged)
     Q_PROPERTY(bool canViewLive READ canViewLive NOTIFY permissionsChanged)
@@ -39,8 +39,8 @@ public:
     explicit AccessHelper(); //< Constructor for QML.
     virtual ~AccessHelper() override;
 
-    QnUuid resourceId() const;
-    void setResourceId(const QnUuid& value);
+    nx::Uuid resourceId() const;
+    void setResourceId(const nx::Uuid& value);
 
     QnResourcePtr resource() const;
     void setResource(const QnResourcePtr& value);

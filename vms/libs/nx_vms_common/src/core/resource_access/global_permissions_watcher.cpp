@@ -138,7 +138,7 @@ public:
         emit q->globalPermissionsReset();
     }
 
-    void handleSubjectChanged(const QnUuid& subjectId, GlobalPermissions permissions)
+    void handleSubjectChanged(const nx::Uuid& subjectId, GlobalPermissions permissions)
     {
         NX_MUTEX_LOCKER lk(&mutex);
         if (permissions == globalPermissions.value(subjectId))
@@ -153,7 +153,7 @@ public:
         emit q->ownGlobalPermissionsChanged(subjectId);
     }
 
-    void handleSubjectRemoved(const QnUuid& subjectId)
+    void handleSubjectRemoved(const nx::Uuid& subjectId)
     {
         NX_MUTEX_LOCKER lk(&mutex);
         if (!globalPermissions.remove(subjectId) || q->isUpdating())
@@ -164,7 +164,7 @@ public:
     }
 
 public:
-    QHash<QnUuid, GlobalPermissions> globalPermissions;
+    QHash<nx::Uuid, GlobalPermissions> globalPermissions;
     mutable nx::Mutex mutex;
 };
 
@@ -186,7 +186,7 @@ GlobalPermissionsWatcher::~GlobalPermissionsWatcher()
     // Required here for forward-declared scoped pointer destruction.
 }
 
-GlobalPermissions GlobalPermissionsWatcher::ownGlobalPermissions(const QnUuid& subjectId) const
+GlobalPermissions GlobalPermissionsWatcher::ownGlobalPermissions(const nx::Uuid& subjectId) const
 {
     NX_MUTEX_LOCKER lk(&d->mutex);
     return d->globalPermissions.value(subjectId);

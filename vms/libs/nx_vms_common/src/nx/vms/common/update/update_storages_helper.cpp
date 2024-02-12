@@ -28,10 +28,10 @@ std::optional<nx::vms::api::StorageSpaceData> selectOne(
         : std::optional<nx::vms::api::StorageSpaceData>(filtered[0]);
 }
 
-QList<QnUuid> selectServers(
+QList<nx::Uuid> selectServers(
     const ServerToStoragesList  & serverToStorages, int64_t minStorageTotalSpaceGb)
 {
-    std::vector<std::pair<QnUuid, int64_t>> serverToMaxStorageSpace;
+    std::vector<std::pair<nx::Uuid, int64_t>> serverToMaxStorageSpace;
     for (const auto& p: serverToStorages)
     {
         const auto bestStorage = selectOne(p.second, minStorageTotalSpaceGb);
@@ -42,13 +42,13 @@ QList<QnUuid> selectServers(
     }
 
     if (serverToMaxStorageSpace.empty())
-        return QList<QnUuid>();
+        return QList<nx::Uuid>();
 
     std::sort(
         serverToMaxStorageSpace.begin(), serverToMaxStorageSpace.end(),
         [](const auto& p1, const auto& p2) { return p1.second > p2.second; });
 
-    QList<QnUuid> result;
+    QList<nx::Uuid> result;
     for (size_t i = 0; i < std::max<size_t>(1, serverToMaxStorageSpace.size() / 10); ++i)
         result.push_back(serverToMaxStorageSpace[i].first);
 

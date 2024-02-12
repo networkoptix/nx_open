@@ -201,7 +201,7 @@ void MergeSystemsDialog::at_testConnectionButton_clicked()
     if (!NX_ASSERT(context()->user()->isAdministrator()))
         return;
 
-    m_mergeContextId = QnUuid();
+    m_mergeContextId = nx::Uuid();
     m_url.clear();
     m_targetModule.reset();
     m_remoteOwnerCredentials = nx::network::http::Credentials();

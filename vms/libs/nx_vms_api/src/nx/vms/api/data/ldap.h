@@ -124,7 +124,7 @@ struct NX_VMS_API LdapSettings
      * Preferred Server in the System that will be used to execute synchronization with the LDAP
      * Server if it is online and has connection with the LDAP Server.
      */
-    QnUuid preferredMasterSyncServer;
+    nx::Uuid preferredMasterSyncServer;
 
     /**%apidoc[opt]
      * %example 10

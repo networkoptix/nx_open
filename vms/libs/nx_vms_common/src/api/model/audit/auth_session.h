@@ -12,7 +12,7 @@ namespace nx::network::http { class Request; }
 
 struct NX_VMS_COMMON_API QnAuthSession
 {
-    QnUuid id;
+    nx::Uuid id;
     QString userName;
     QString userHost;
     QString userAgent;

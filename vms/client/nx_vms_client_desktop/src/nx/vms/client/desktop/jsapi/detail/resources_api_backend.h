@@ -31,7 +31,7 @@ public:
 
 signals:
     void added(const Resource& resource);
-    void removed(const QnUuid& resourceId);
+    void removed(const nx::Uuid& resourceId);
 };
 
 } // namespace nx::vms::client::desktop::jsapi::detail

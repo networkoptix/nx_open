@@ -11,7 +11,7 @@ using namespace nx::vms::common;
 
 namespace nx::vms::client::core {
 
-TimeSyncManager::TimeSyncManager(SystemContext* systemContext, const QnUuid& serverId):
+TimeSyncManager::TimeSyncManager(SystemContext* systemContext, const nx::Uuid& serverId):
     base_type(systemContext),
     m_serverId(serverId)
 {

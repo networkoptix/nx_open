@@ -68,7 +68,7 @@ public:
 
     virtual QString condition() const = 0;
 
-    Q_INVOKABLE virtual bool isSupported(QnUuid engineId, QnUuid deviceId) const = 0;
+    Q_INVOKABLE virtual bool isSupported(nx::Uuid engineId, nx::Uuid deviceId) const = 0;
 };
 
 } // namespace nx::analytics::taxonomy

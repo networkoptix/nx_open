@@ -18,13 +18,13 @@ struct NX_VMS_API BackupSettings
      * %param id Server id.
      */
 
-    QnUuid id;
+    nx::Uuid id;
     CameraBackupQuality quality = CameraBackupQuality::CameraBackupBoth;
     bool backupNewCameras = false;
 
     bool operator==(const BackupSettings& other) const = default;
 
-    QnUuid getId() const { return id; }
+    nx::Uuid getId() const { return id; }
 };
 
 #define BackupSettings_Fields \

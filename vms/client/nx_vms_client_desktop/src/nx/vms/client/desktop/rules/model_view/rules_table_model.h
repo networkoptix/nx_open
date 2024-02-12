@@ -55,10 +55,10 @@ private:
     using ConstRulePtr = std::shared_ptr<const vms::rules::Rule>;
 
     vms::rules::Engine* m_engine{nullptr};
-    std::vector<QnUuid> m_ruleIds;
+    std::vector<nx::Uuid> m_ruleIds;
 
-    void onRuleAddedOrUpdated(QnUuid ruleId, bool added);
-    void onRuleRemoved(QnUuid ruleId);
+    void onRuleAddedOrUpdated(nx::Uuid ruleId, bool added);
+    void onRuleRemoved(nx::Uuid ruleId);
     void onRulesReset();
 
     void initialise();

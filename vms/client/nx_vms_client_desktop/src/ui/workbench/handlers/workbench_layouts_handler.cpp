@@ -92,7 +92,7 @@ namespace {
 LayoutResourceList alreadyExistingLayouts(
     QnResourcePool* resourcePool,
     const QString& name,
-    const QnUuid& parentId,
+    const nx::Uuid& parentId,
     const LayoutResourcePtr& layout = LayoutResourcePtr())
 {
     LayoutResourceList result;
@@ -716,7 +716,7 @@ void LayoutsHandler::removeLayoutItems(const LayoutItemIndexList& items, bool au
             return;
     }
 
-    QList<QnUuid> orphanedUuids;
+    QList<nx::Uuid> orphanedUuids;
     QSet<LayoutResourcePtr> layouts;
     for (const LayoutItemIndex &index : items)
     {
@@ -736,7 +736,7 @@ void LayoutsHandler::removeLayoutItems(const LayoutItemIndexList& items, bool au
     {
         QList<QnWorkbenchLayout *> layouts;
         layouts.push_front(workbench()->currentLayout());
-        for (const QnUuid &uuid : orphanedUuids)
+        for (const nx::Uuid &uuid : orphanedUuids)
         {
             for (QnWorkbenchLayout* layout : layouts)
             {
@@ -922,7 +922,7 @@ void LayoutsHandler::openLayouts(
             }
         }
         // Explicitly set that we do not control videowall through this layout.
-        wbLayout->setData(Qn::VideoWallItemGuidRole, QVariant::fromValue(QnUuid()));
+        wbLayout->setData(Qn::VideoWallItemGuidRole, QVariant::fromValue(nx::Uuid()));
 
         lastLayout = wbLayout;
     }
@@ -932,7 +932,7 @@ void LayoutsHandler::openLayouts(
 QString LayoutsHandler::generateUniqueLayoutName(const QnUserResourcePtr& user) const
 {
     QStringList usedNames;
-    QnUuid parentId = user ? user->getId() : QnUuid();
+    nx::Uuid parentId = user ? user->getId() : nx::Uuid();
     for (const auto& layout: resourcePool()->getResources<LayoutResource>())
     {
         if (layout->isShared() || layout->getParentId() == parentId)
@@ -994,7 +994,7 @@ void LayoutsHandler::at_newUserLayoutAction_triggered()
     }
 
     LayoutResourcePtr layout(new LayoutResource());
-    layout->setIdUnsafe(QnUuid::createUuid());
+    layout->setIdUnsafe(nx::Uuid::createUuid());
     layout->setName(dialog->name());
     layout->setParentId(user->getId());
     resourcePool()->addResource(layout);
@@ -1065,7 +1065,7 @@ void LayoutsHandler::at_removeFromServerAction_triggered()
 void LayoutsHandler::at_openNewTabAction_triggered()
 {
     auto resource = LayoutResourcePtr(new LayoutResource());
-    resource->setIdUnsafe(QnUuid::createUuid());
+    resource->setIdUnsafe(nx::Uuid::createUuid());
     resource->addFlags(Qn::local);
     resource->setName(generateUniqueLayoutName(context()->user()));
     if (context()->user())
@@ -1177,7 +1177,7 @@ void LayoutsHandler::at_openInNewTabAction_triggered()
     auto layout = hasCrossSystemResources
         ? LayoutResourcePtr(new CrossSystemLayoutResource())
         : LayoutResourcePtr(new LayoutResource());
-    layout->setIdUnsafe(QnUuid::createUuid());
+    layout->setIdUnsafe(nx::Uuid::createUuid());
     layout->addFlags(Qn::local);
 
     if (hasCrossSystemResources)

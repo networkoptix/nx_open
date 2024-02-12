@@ -17,7 +17,7 @@ public:
     bool deleteShortcut(const QnVideoWallResourcePtr& videowall) const;
 
     static void setVideoWallAutorunEnabled(
-        const QnUuid& videowallUuid,
+        const nx::Uuid& videowallUuid,
         bool value,
         const nx::utils::Url& serverUrl = {});
 

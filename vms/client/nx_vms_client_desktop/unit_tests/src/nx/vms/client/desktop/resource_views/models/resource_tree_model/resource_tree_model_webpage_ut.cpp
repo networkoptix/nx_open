@@ -354,7 +354,7 @@ TEST_P(ResourceTreeModelTest, webPageDisableProxy)
     auto page = addProxiedWebPage(kUniqueWebPageName, /*subtype*/ GetParam(), server->getId());
 
     // And proxy is disabled.
-    page->setProxyId(QnUuid());
+    page->setProxyId(nx::Uuid());
 
     // Then exactly one node with corresponding display text appears in the resource tree.
     const auto webPageIndex = uniqueMatchingIndex(kUniqueWebPageNameCondition);

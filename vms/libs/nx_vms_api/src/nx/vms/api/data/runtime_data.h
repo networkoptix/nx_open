@@ -30,10 +30,10 @@ struct NX_VMS_API RuntimeData
     qint64 prematureLicenseExperationDate = 0;
 
     /**%apidoc Guid of the videowall instance for the running videowall clients. */
-    QnUuid videoWallInstanceGuid;
+    nx::Uuid videoWallInstanceGuid;
 
     /**%apidoc Videowall layout id, governed by the current client instance's control session. */
-    QnUuid videoWallControlSession;
+    nx::Uuid videoWallControlSession;
 
     QVector<QString> hardwareIds;
 
@@ -43,12 +43,12 @@ struct NX_VMS_API RuntimeData
     bool updateStarted = false;
 
     /**%apidoc Id of the user, under which peer is logged in (for client peers only). */
-    QnUuid userId;
+    nx::Uuid userId;
 
     RuntimeFlags flags = {};
 
     /**%apidoc:uuidArray */
-    QSet<QnUuid> activeAnalyticsEngines;
+    QSet<nx::Uuid> activeAnalyticsEngines;
 
     qint64 prematureVideoWallLicenseExpirationDate = 0;
 

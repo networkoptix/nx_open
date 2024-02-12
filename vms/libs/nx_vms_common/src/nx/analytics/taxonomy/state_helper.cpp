@@ -15,7 +15,7 @@ using SupportedEntityTypesFetcher =
     std::function<std::map<QString, EntityType*>(const QnVirtualCameraResourcePtr&)>;
 
 using SupportedEntityTypeIdsFetcher =
-    std::function<std::map<QnUuid, std::set<QString>>(const QnVirtualCameraResourcePtr&)>;
+    std::function<std::map<nx::Uuid, std::set<QString>>(const QnVirtualCameraResourcePtr&)>;
 
 template<typename EntityType>
 using EntityTypeFetcher = std::function<EntityType*(const QString&)>;

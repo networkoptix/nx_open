@@ -146,13 +146,13 @@ void TwoWayAudioController::setSourceId(const QString& value)
     d->sourceId = value;
 }
 
-QnUuid TwoWayAudioController::resourceId() const
+nx::Uuid TwoWayAudioController::resourceId() const
 {
     const auto camera = d->availabilityWatcher->camera();
-    return camera ? camera->getId() : QnUuid();
+    return camera ? camera->getId() : nx::Uuid();
 }
 
-void TwoWayAudioController::setResourceId(const QnUuid& id)
+void TwoWayAudioController::setResourceId(const nx::Uuid& id)
 {
     const auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(id);
     d->availabilityWatcher->setCamera(camera);

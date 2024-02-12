@@ -32,7 +32,7 @@ public:
         bool online = true,
         bool compatibleServer = true);
 
-    std::map<QnUuid, QnMediaServerResourcePtr> getAllServers();
+    std::map<nx::Uuid, QnMediaServerResourcePtr> getAllServers();
 
     void removeAllServers();
 

@@ -113,7 +113,7 @@ bool deserialize(QnCompressedTimeReader<Input> *stream, TYPE *target) {         
 
 //QN_DEFINE_DIRECT_COMPRESSED_TIME_SERIALIZATION_FUNCTIONS(qint64,        readInt64,      writeInt64)
 QN_DEFINE_DIRECT_COMPRESSED_TIME_SERIALIZATION_FUNCTIONS(QnTimePeriod,  readQnTimePeriod, writeQnTimePeriod)
-QN_DEFINE_DIRECT_COMPRESSED_TIME_SERIALIZATION_FUNCTIONS(QnUuid,        readQnUuid,       writeQnUuid)
+QN_DEFINE_DIRECT_COMPRESSED_TIME_SERIALIZATION_FUNCTIONS(nx::Uuid,        readUuid,       writeUuid)
 #undef QN_DEFINE_DIRECT_COMPRESSED_TIME_SERIALIZATION_FUNCTIONS
 
 

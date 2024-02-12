@@ -38,7 +38,7 @@ namespace {
 struct TriggerInfo
 {
     int version = 0; // Using 0 version for old event engine, and 1 for new one.
-    QnUuid ruleId;
+    nx::Uuid ruleId;
     bool prolonged = false;
 
     bool isValid() const { return !ruleId.isNull(); }
@@ -54,14 +54,14 @@ struct SoftwareTriggersController::Private
     bool setEventTriggerState(const TriggerInfo& trigger, vms::event::EventState state);
     bool setVmsTriggerState(const TriggerInfo& trigger, vms::event::EventState state);
 
-    TriggerInfo triggerInfo(QnUuid ruleId) const;
-    void setActiveTrigger(QnUuid ruleId, vms::event::EventState state, bool success);
+    TriggerInfo triggerInfo(nx::Uuid ruleId) const;
+    void setActiveTrigger(nx::Uuid ruleId, vms::event::EventState state, bool success);
 
     SoftwareTriggersController* const q;
     OrderedRequestsHelper orderedRequestsHelper;
 
-    QnUuid resourceId;
-    QnUuid activeTriggerRuleId;
+    nx::Uuid resourceId;
+    nx::Uuid activeTriggerRuleId;
 };
 
 SoftwareTriggersController::Private::Private(SoftwareTriggersController* q):
@@ -98,7 +98,7 @@ bool SoftwareTriggersController::Private::setTriggerState(
     {
         activeTriggerRuleId = (state == vms::event::EventState::active)
             ? trigger.ruleId
-            : QnUuid();
+            : nx::Uuid();
     }
 
     return result;
@@ -176,7 +176,7 @@ bool SoftwareTriggersController::Private::setVmsTriggerState(
 }
 
 void SoftwareTriggersController::Private::setActiveTrigger(
-    QnUuid ruleId,
+    nx::Uuid ruleId,
     vms::event::EventState state,
     bool success)
 {
@@ -186,7 +186,7 @@ void SoftwareTriggersController::Private::setActiveTrigger(
         emit q->triggerActivated(ruleId, success);
 }
 
-TriggerInfo SoftwareTriggersController::Private::triggerInfo(QnUuid ruleId) const
+TriggerInfo SoftwareTriggersController::Private::triggerInfo(nx::Uuid ruleId) const
 {
     if (const auto rule = q->systemContext()->eventRuleManager()->rule(ruleId))
         return TriggerInfo{/*version*/ 0, ruleId, rule->isActionProlonged()};
@@ -230,12 +230,12 @@ void SoftwareTriggersController::registerQmlType()
     qmlRegisterType<SoftwareTriggersController>("nx.client.mobile", 1, 0, "SoftwareTriggersController");
 }
 
-QnUuid SoftwareTriggersController::resourceId() const
+nx::Uuid SoftwareTriggersController::resourceId() const
 {
     return d->resourceId;
 }
 
-void SoftwareTriggersController::setResourceId(const QnUuid& id)
+void SoftwareTriggersController::setResourceId(const nx::Uuid& id)
 {
     if (d->resourceId == id)
         return;
@@ -243,7 +243,7 @@ void SoftwareTriggersController::setResourceId(const QnUuid& id)
     const auto pool = systemContext()->resourcePool();
     d->resourceId = pool->getResourceById<QnVirtualCameraResource>(id)
         ? id
-        : QnUuid();
+        : nx::Uuid();
 
     if (d->resourceId.isNull())
         NX_ASSERT(false, "Resource is not camera");
@@ -252,7 +252,7 @@ void SoftwareTriggersController::setResourceId(const QnUuid& id)
     emit resourceIdChanged();
 }
 
-QnUuid SoftwareTriggersController::activeTriggerId() const
+nx::Uuid SoftwareTriggersController::activeTriggerId() const
 {
     return d->activeTriggerRuleId;
 }
@@ -262,7 +262,7 @@ bool SoftwareTriggersController::hasActiveTrigger() const
     return !d->activeTriggerRuleId.isNull();
 }
 
-bool SoftwareTriggersController::activateTrigger(const QnUuid& ruleId)
+bool SoftwareTriggersController::activateTrigger(const nx::Uuid& ruleId)
 {
     if (!d->activeTriggerRuleId.isNull())
     {
@@ -309,7 +309,7 @@ void SoftwareTriggersController::cancelTriggerAction()
         deactivateTrigger();
 
     const auto currentTriggerId = d->activeTriggerRuleId;
-    d->activeTriggerRuleId = QnUuid();
+    d->activeTriggerRuleId = nx::Uuid();
     emit triggerCancelled(currentTriggerId);
 }
 

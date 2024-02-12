@@ -26,7 +26,7 @@ struct NX_VMS_API StorageForecast
      * Device id (can be obtained from "id", "physicalId" or "logicalId" field via
      * `GET /rest/v{1-}/devices`) or MAC address (not supported for certain cameras).
      */
-    QnUuid deviceId;
+    nx::Uuid deviceId;
 
     /**%apidoc:integer Size of the recorded archive in bytes. */
     double recordedBytes = 0.0;
@@ -44,7 +44,7 @@ struct NX_VMS_API StorageForecast
     double averageDensity = 0.0;
 
     /**%apidoc Additional details about the recorded bytes. */
-    std::map<QnUuid, qint64> recordedBytesPerStorage;
+    std::map<nx::Uuid, qint64> recordedBytesPerStorage;
 
     void operator+=(const StorageForecast& other)
     {
@@ -58,6 +58,6 @@ struct NX_VMS_API StorageForecast
     (recordedS)(archiveDurationForecastS)(averageBitrate)(averageDensity)(recordedBytesPerStorage)
 QN_FUSION_DECLARE_FUNCTIONS(StorageForecast, (json), NX_VMS_API)
 
-using StorageForecastValues = Map<QnUuid /*id*/, std::vector<api::StorageForecast> /*forecast*/>;
+using StorageForecastValues = Map<nx::Uuid /*id*/, std::vector<api::StorageForecast> /*forecast*/>;
 
 } // namespace nx::vms::api

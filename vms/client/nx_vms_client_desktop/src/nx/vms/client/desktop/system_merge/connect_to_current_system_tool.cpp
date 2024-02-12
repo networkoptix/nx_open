@@ -39,7 +39,7 @@ static const int kAlmostDoneProgress = 75;
 static const milliseconds kWaitTimeout = 2min;
 
 QnFakeMediaServerResourcePtr incompatibleServerForOriginalId(
-    const QnUuid& id, const QnResourcePool* resourcePool)
+    const nx::Uuid& id, const QnResourcePool* resourcePool)
 {
     for (const auto& server: resourcePool->getIncompatibleServers())
     {
@@ -81,7 +81,7 @@ void ConnectToCurrentSystemTool::forcedUpdate()
 {
 }
 
-void ConnectToCurrentSystemTool::start(const QnUuid& targetId)
+void ConnectToCurrentSystemTool::start(const nx::Uuid& targetId)
 {
     NX_DEBUG(this, "Try to connect server with id: %1", targetId);
 

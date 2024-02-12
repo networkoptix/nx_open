@@ -21,17 +21,17 @@ public:
     /**
      * @brief layout                        Id of this item's layout resource (if any).
      */
-    QnUuid layout;
+    nx::Uuid layout;
 
     /**
      * @brief uuid                          Id of this item instance.
      */
-    QnUuid uuid;
+    nx::Uuid uuid;
 
     /**
      * @brief pcUuid                        Id of the real system (PC) instance.
      */
-    QnUuid pcUuid;
+    nx::Uuid pcUuid;
 
     /**
      * @brief name                          Display name of the item.
@@ -44,7 +44,7 @@ public:
     struct
     {
         bool online = false;
-        QnUuid controlledBy;
+        nx::Uuid controlledBy;
     } runtimeStatus;
 
     friend bool operator==(const QnVideoWallItem& l, const QnVideoWallItem& r)
@@ -63,4 +63,4 @@ public:
 NX_VMS_COMMON_API QDebug operator<<(QDebug dbg, const QnVideoWallItem& item);
 
 typedef QList<QnVideoWallItem> QnVideoWallItemList;
-typedef QHash<QnUuid, QnVideoWallItem> QnVideoWallItemMap;
+typedef QHash<nx::Uuid, QnVideoWallItem> QnVideoWallItemMap;

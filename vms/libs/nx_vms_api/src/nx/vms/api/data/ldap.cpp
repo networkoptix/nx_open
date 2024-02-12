@@ -39,7 +39,7 @@ QString LdapSettings::syncId() const
     QString data = uri.toString() + adminDn + loginAttribute + groupObjectClass + memberAttribute;
     for (const auto& filter: nx::utils::unique_sorted(filters, cmpFilters))
         data += filter.base + filter.filter;
-    return QnUuid::fromArbitraryData(data.toUtf8()).toSimpleString();
+    return nx::Uuid::fromArbitraryData(data.toUtf8()).toSimpleString();
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(LdapSettingSearchFilter, (json), LdapSettingSearchFilter_Fields)

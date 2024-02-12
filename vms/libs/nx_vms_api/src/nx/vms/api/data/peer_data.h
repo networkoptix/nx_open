@@ -17,10 +17,10 @@ namespace api {
 struct NX_VMS_API PersistentIdData: IdData
 {
     /** Unique persistent Db ID of the peer. Empty for clients. */
-    QnUuid persistentId;
+    nx::Uuid persistentId;
 
     PersistentIdData() = default;
-    PersistentIdData(const QnUuid& id, const QnUuid& persistentId);
+    PersistentIdData(const nx::Uuid& id, const nx::Uuid& persistentId);
 
     bool operator==(const PersistentIdData& other) const = default;
 
@@ -39,8 +39,8 @@ struct NX_VMS_API PeerData: PersistentIdData
     PeerData();
 
     PeerData(
-        const QnUuid& id,
-        const QnUuid& instanceId,
+        const nx::Uuid& id,
+        const nx::Uuid& instanceId,
         PeerType peerType,
         Qn::SerializationFormat dataFormat = Qn::SerializationFormat::ubjson);
 
@@ -50,9 +50,9 @@ struct NX_VMS_API PeerData: PersistentIdData
         Qn::SerializationFormat dataFormat = Qn::SerializationFormat::ubjson);
 
     PeerData(
-        const QnUuid& id,
-        const QnUuid& instanceId,
-        const QnUuid& persistentId,
+        const nx::Uuid& id,
+        const nx::Uuid& instanceId,
+        const nx::Uuid& persistentId,
         PeerType peerType,
         Qn::SerializationFormat dataFormat = Qn::SerializationFormat::ubjson);
 
@@ -69,7 +69,7 @@ struct NX_VMS_API PeerData: PersistentIdData
     static bool isCloudServer(PeerType peerType);
 
     /**%apidoc Unique running instance ID of the peer. */
-    QnUuid instanceId;
+    nx::Uuid instanceId;
 
     /**%apidoc Type of the peer. */
     PeerType peerType{PeerType::notDefined};
@@ -94,16 +94,16 @@ struct NX_VMS_API PeerData: PersistentIdData
     (dataFormat)
 NX_VMS_API_DECLARE_STRUCT(PeerData)
 
-using PeerSet = QSet<QnUuid>;
+using PeerSet = QSet<nx::Uuid>;
 
 struct PeerDataEx: public PeerData
 {
-    QnUuid systemId;
+    nx::Uuid systemId;
     QString cloudHost;
     qint64 identityTime = 0;
     int aliveUpdateIntervalMs = 0;
     int protoVersion = 0;
-    QnUuid connectionGuid;
+    nx::Uuid connectionGuid;
 
     bool operator==(const PeerDataEx& other) const = default;
     void assign(const PeerData& data) { PeerData::operator=(data); }

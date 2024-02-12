@@ -127,7 +127,7 @@ QnResourcePtr stringToResource(const QString& s)
     const auto resourcePool = qnClientCoreModule->resourcePool();
     if (acceptedFiles.empty())
     {
-        return resourcePool->getResourceById(QnUuid::fromStringSafe(s));
+        return resourcePool->getResourceById(nx::Uuid::fromStringSafe(s));
     }
     const auto resources = QnFileProcessor::createResourcesForFiles(acceptedFiles, resourcePool);
     if (resources.empty())
@@ -142,7 +142,7 @@ QnResourceList stringToResourceList(const QString& s)
     const auto resourcePool = qnClientCoreModule->resourcePool();
     if (acceptedFiles.empty())
     {
-        const auto resource = resourcePool->getResourceById(QnUuid::fromStringSafe(s));
+        const auto resource = resourcePool->getResourceById(nx::Uuid::fromStringSafe(s));
         if (!resource)
             return {};
         return {resource};
@@ -158,7 +158,7 @@ QString resourceListToString(const QnResourceList& list)
     return ids.join(',');
 }
 
-QString uuidToString(const QnUuid& uuid)
+QString uuidToString(const nx::Uuid& uuid)
 {
     return uuid.toString();
 }
@@ -219,7 +219,7 @@ void QnClientMetaTypes::initialize()
     QMetaType::registerConverter<QString, QnResourcePtr>(stringToResource);
     QMetaType::registerConverter<QString, QnResourceList>(stringToResourceList);
     QMetaType::registerConverter<QnResourceList, QString>(resourceListToString);
-    QMetaType::registerConverter<QnUuid, QString>(uuidToString);
+    QMetaType::registerConverter<nx::Uuid, QString>(uuidToString);
     QMetaType::registerConverter<QnCameraBookmarkList, QVariantList>(bookmarkListToVariantList);
     QMetaType::registerConverter<QVariantList, QnCameraBookmarkList>(variantListToBookmarkList);
     QMetaType::registerConverter<QnCameraBookmark, QString>(bookmarkToString);

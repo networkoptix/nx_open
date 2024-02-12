@@ -18,51 +18,51 @@ public:
         nx::vms::common::SystemContext* context,
         QObject* parent = nullptr);
 
-    bool saveParams(const QnUuid& resourceId);
-    int saveParamsAsync(const QnUuid& resourceId);
-    int saveParamsAsync(const QList<QnUuid>& resourceId);
+    bool saveParams(const nx::Uuid& resourceId);
+    int saveParamsAsync(const nx::Uuid& resourceId);
+    int saveParamsAsync(const QList<nx::Uuid>& resourceId);
 
-    QString value(const QnUuid& resourceId, const QString& key) const;
+    QString value(const nx::Uuid& resourceId, const QString& key) const;
 
     /** @return Whether the stored value has been modified by this call. */
     bool setValue(
-        const QnUuid& resourceId,
+        const nx::Uuid& resourceId,
         const QString& key,
         const QString& value,
         bool markDirty = true);
 
-    bool hasProperty(const QnUuid& resourceId, const QString& key) const;
+    bool hasProperty(const nx::Uuid& resourceId, const QString& key) const;
     bool hasProperty(const QString& key, const QString& value) const;
-    nx::vms::api::ResourceParamDataList allProperties(const QnUuid& resourceId) const;
+    nx::vms::api::ResourceParamDataList allProperties(const nx::Uuid& resourceId) const;
     nx::vms::api::ResourceParamWithRefDataList allProperties() const;
-    QMap<QString, QString> modifiedProperties(const QnUuid& resourceId) const;
+    QMap<QString, QString> modifiedProperties(const nx::Uuid& resourceId) const;
 
     /**
      * Mark all params for resource as unsaved
      **/
     void markAllParamsDirty(
-        const QnUuid& resourceId,
+        const nx::Uuid& resourceId,
         nx::utils::MoveOnlyFunc<bool(const QString& paramName, const QString& paramValue)> filter = nullptr);
 
-    QHash<QnUuid, QSet<QString> > allPropertyNamesByResource() const;
+    QHash<nx::Uuid, QSet<QString> > allPropertyNamesByResource() const;
 
     void clear();
-    void clear(const QVector<QnUuid>& idList);
+    void clear(const QVector<nx::Uuid>& idList);
 public slots:
-    bool on_resourceParamRemoved(const QnUuid& resourceId, const QString& key);
+    bool on_resourceParamRemoved(const nx::Uuid& resourceId, const QString& key);
 signals:
     void asyncSaveDone(int recId, ec2::ErrorCode);
-    void propertyChanged(const QnUuid& resourceId, const QString& key);
-    void propertyRemoved(const QnUuid& resourceId, const QString& key);
+    void propertyChanged(const nx::Uuid& resourceId, const QString& key);
+    void propertyRemoved(const nx::Uuid& resourceId, const QString& key);
 private:
     void onRequestDone(int reqID, ec2::ErrorCode errorCode);
     void fromModifiedDataToSavedData(
-        const QnUuid& resourceId,
+        const nx::Uuid& resourceId,
         nx::vms::api::ResourceParamWithRefDataList& outData);
     int saveData(const nx::vms::api::ResourceParamWithRefDataList&& data);
 private:
     using QnResourcePropertyList = QMap<QString, QString>;
-    QMap<QnUuid, QnResourcePropertyList> m_items;
-    QMap<QnUuid, QnResourcePropertyList> m_modifiedItems;
+    QMap<nx::Uuid, QnResourcePropertyList> m_items;
+    QMap<nx::Uuid, QnResourcePropertyList> m_modifiedItems;
     mutable nx::Mutex m_mutex;
 };

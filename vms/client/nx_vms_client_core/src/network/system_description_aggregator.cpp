@@ -30,7 +30,7 @@ bool isSameSystem(
     const QnBaseSystemDescription& first,
     const QnBaseSystemDescription& second)
 {
-    typedef QSet<QnUuid> ServerIdsSet;
+    typedef QSet<nx::Uuid> ServerIdsSet;
     static const auto extractServerIds =
         [](const QnBaseSystemDescription::ServersList& servers) -> ServerIdsSet
         {
@@ -158,7 +158,7 @@ void QnSystemDescriptionAggregator::emitSystemChanged()
     emit saasStateChanged();
 }
 
-void QnSystemDescriptionAggregator::handleServerChanged(const QnUuid& serverId,
+void QnSystemDescriptionAggregator::handleServerChanged(const nx::Uuid& serverId,
     QnServerFields fields)
 {
     const auto it = std::find_if(m_servers.begin(), m_servers.end(),
@@ -221,9 +221,9 @@ QString QnSystemDescriptionAggregator::id() const
     return (isEmptyAggregator() ? QString() : m_systems.first()->id());
 }
 
-QnUuid QnSystemDescriptionAggregator::localId() const
+nx::Uuid QnSystemDescriptionAggregator::localId() const
 {
-    return (isEmptyAggregator() ? QnUuid() : m_systems.first()->localId());
+    return (isEmptyAggregator() ? nx::Uuid() : m_systems.first()->localId());
 }
 
 QString QnSystemDescriptionAggregator::name() const
@@ -281,7 +281,7 @@ nx::vms::api::SaasState QnSystemDescriptionAggregator::saasState() const
         : m_systems.first()->saasState();
 }
 
-bool QnSystemDescriptionAggregator::isReachableServer(const QnUuid& serverId) const
+bool QnSystemDescriptionAggregator::isReachableServer(const nx::Uuid& serverId) const
 {
     if (isEmptyAggregator())
         return false;
@@ -347,7 +347,7 @@ QnBaseSystemDescription::ServersList QnSystemDescriptionAggregator::gatherServer
     return m_systems.first()->servers();
 }
 
-bool QnSystemDescriptionAggregator::containsServer(const QnUuid& serverId) const
+bool QnSystemDescriptionAggregator::containsServer(const nx::Uuid& serverId) const
 {
     for (const auto& systemDescription: m_systems)
     {
@@ -358,7 +358,7 @@ bool QnSystemDescriptionAggregator::containsServer(const QnUuid& serverId) const
 }
 
 nx::vms::api::ModuleInformationWithAddresses QnSystemDescriptionAggregator::getServer(
-    const QnUuid& serverId) const
+    const nx::Uuid& serverId) const
 {
     for (const auto& systemDescription: m_systems)
     {
@@ -368,7 +368,7 @@ nx::vms::api::ModuleInformationWithAddresses QnSystemDescriptionAggregator::getS
     return {};
 }
 
-nx::utils::Url QnSystemDescriptionAggregator::getServerHost(const QnUuid& serverId) const
+nx::utils::Url QnSystemDescriptionAggregator::getServerHost(const nx::Uuid& serverId) const
 {
     for (const auto& systemDescription: m_systems)
     {
@@ -387,7 +387,7 @@ nx::utils::Url QnSystemDescriptionAggregator::getServerHost(const QnUuid& server
 }
 
 QSet<nx::utils::Url> QnSystemDescriptionAggregator::getServerRemoteAddresses(
-    const QnUuid& serverId) const
+    const nx::Uuid& serverId) const
 {
     for (const auto& systemDescription: m_systems)
     {
@@ -398,7 +398,7 @@ QSet<nx::utils::Url> QnSystemDescriptionAggregator::getServerRemoteAddresses(
     return {};
 }
 
-qint64 QnSystemDescriptionAggregator::getServerLastUpdatedMs(const QnUuid& serverId) const
+qint64 QnSystemDescriptionAggregator::getServerLastUpdatedMs(const nx::Uuid& serverId) const
 {
     qint64 result = 0;
 

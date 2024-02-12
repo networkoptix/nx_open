@@ -60,7 +60,7 @@ AccessController::~AccessController()
     // Required here for forward declared scoped pointer destruction.
 }
 
-bool AccessController::canCreateStorage(const QnUuid& serverId) const
+bool AccessController::canCreateStorage(const nx::Uuid& serverId) const
 {
     return user() && systemContext()->resourceAccessManager()->canCreateStorage(user(), serverId);
 }
@@ -73,7 +73,7 @@ bool AccessController::canCreateLayout(const nx::vms::api::LayoutData& layoutDat
 
 bool AccessController::canCreateUser(
     GlobalPermissions targetPermissions,
-    const std::vector<QnUuid>& targetGroups) const
+    const std::vector<nx::Uuid>& targetGroups) const
 {
     return user() && systemContext()->resourceAccessManager()->canCreateUser(
         user(), targetPermissions, targetGroups);

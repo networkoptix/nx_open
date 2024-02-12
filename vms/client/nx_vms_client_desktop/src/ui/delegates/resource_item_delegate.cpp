@@ -562,7 +562,7 @@ QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemStateForLayoutItem
     if (!owningLayout || owningLayout != currentLayout)
         return ItemState::normal;
 
-    const auto uuid = index.data(Qn::ItemUuidRole).value<QnUuid>();
+    const auto uuid = index.data(Qn::ItemUuidRole).value<nx::Uuid>();
     const auto centralItem = workbench()->item(Qn::CentralRole);
 
     if (centralItem && centralItem->uuid() == uuid)
@@ -583,7 +583,7 @@ QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemStateForVideoWall(
         return ItemState::normal;
 
     auto layout = workbench()->currentLayout();
-    auto videoWallControlModeUuid = layout->data(Qn::VideoWallItemGuidRole).value<QnUuid>();
+    auto videoWallControlModeUuid = layout->data(Qn::VideoWallItemGuidRole).value<nx::Uuid>();
     if (!videoWallControlModeUuid.isNull())
     {
         return videowall->items()->hasItem(videoWallControlModeUuid)
@@ -610,11 +610,11 @@ QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemStateForVideoWallI
     if (!owningVideoWall)
         return ItemState::normal;
 
-    QnUuid uuid = index.data(Qn::ItemUuidRole).value<QnUuid>();
+    nx::Uuid uuid = index.data(Qn::ItemUuidRole).value<nx::Uuid>();
     NX_ASSERT(!uuid.isNull());
 
     auto layout = workbench()->currentLayout();
-    auto videoWallControlModeUuid = layout->data(Qn::VideoWallItemGuidRole).value<QnUuid>();
+    auto videoWallControlModeUuid = layout->data(Qn::VideoWallItemGuidRole).value<nx::Uuid>();
     if (!videoWallControlModeUuid.isNull())
     {
         return videoWallControlModeUuid == uuid
@@ -648,10 +648,10 @@ QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemStateForShowreel(
     const QModelIndex& index) const
 {
     /* Showreels are Selected when they are opened on the scene. */
-    const QnUuid currentShowreelId = workbench()->currentLayout()->data(Qn::ShowreelUuidRole)
-        .value<QnUuid>();
+    const nx::Uuid currentShowreelId = workbench()->currentLayout()->data(Qn::ShowreelUuidRole)
+        .value<nx::Uuid>();
     if (!currentShowreelId.isNull()
-        && index.data(Qn::UuidRole).value<QnUuid>() == currentShowreelId)
+        && index.data(Qn::UuidRole).value<nx::Uuid>() == currentShowreelId)
     {
         return ItemState::selected;
     }

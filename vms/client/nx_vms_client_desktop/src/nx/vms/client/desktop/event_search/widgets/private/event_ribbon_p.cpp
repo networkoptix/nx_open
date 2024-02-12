@@ -408,7 +408,7 @@ void EventRibbon::Private::updateTilePreview(int index)
     const bool precisePreview = !previewCropRect.isEmpty()
         || modelIndex.data(Qn::ForcePrecisePreviewRole).toBool();
 
-    const auto objectTrackId = modelIndex.data(Qn::ObjectTrackIdRole).value<QnUuid>();
+    const auto objectTrackId = modelIndex.data(Qn::ObjectTrackIdRole).value<nx::Uuid>();
 
     nx::api::ResourceImageRequest request;
     request.resource = previewResource;

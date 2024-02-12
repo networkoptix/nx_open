@@ -39,7 +39,7 @@ struct NX_VMS_API ServerTimePeriod
     /**%apidoc[opt]
      * %// Appeared starting from /rest/v2/devices/{id}/footage.
      */
-    QnUuid serverId;
+    nx::Uuid serverId;
 
     /**%apidoc[opt] Start time in milliseconds. */
     std::chrono::milliseconds startTimeMs{0};
@@ -58,7 +58,7 @@ struct NX_VMS_API ServerTimePeriod
 };
 
 using ServerTimePeriodList = std::vector<ServerTimePeriod>;
-using ServerTimePeriodMap = Map<QnUuid, ServerTimePeriodList>;
+using ServerTimePeriodMap = Map<nx::Uuid, ServerTimePeriodList>;
 
 constexpr bool operator<(std::chrono::milliseconds timeMs, const ServerTimePeriod& other)
 {

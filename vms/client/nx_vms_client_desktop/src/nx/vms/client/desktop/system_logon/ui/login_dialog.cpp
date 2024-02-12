@@ -432,7 +432,7 @@ void LoginDialog::at_testButton_clicked()
 
     nx::vms::client::core::RemoteConnectionPtr requestedConnection;
     bool setupNewServerRequested = false;
-    QnUuid expectedNewServerId;
+    nx::Uuid expectedNewServerId;
 
     auto dialog = std::make_unique<ConnectionTestingDialog>(this);
     connect(dialog.get(), &ConnectionTestingDialog::connectRequested, this,
@@ -441,7 +441,7 @@ void LoginDialog::at_testButton_clicked()
             requestedConnection = connection;
         });
     connect(dialog.get(), &ConnectionTestingDialog::setupNewServerRequested, this,
-        [&setupNewServerRequested, &expectedNewServerId](QnUuid expectedServerId)
+        [&setupNewServerRequested, &expectedNewServerId](nx::Uuid expectedServerId)
         {
             setupNewServerRequested = true;
             expectedNewServerId = expectedServerId;

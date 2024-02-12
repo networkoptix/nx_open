@@ -11,7 +11,7 @@ namespace test {
 
 namespace {
 
-static const QString kExampleSystemId = QnUuid::createUuid().toSimpleString();
+static const QString kExampleSystemId = nx::Uuid::createUuid().toSimpleString();
 static const QString kExampleUserName = "SomeUser@someSystem.com";
 
 } // namespace

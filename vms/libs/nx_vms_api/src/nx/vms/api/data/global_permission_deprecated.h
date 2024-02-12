@@ -148,17 +148,17 @@ Q_DECLARE_FLAGS(GlobalPermissionsDeprecated, GlobalPermissionDeprecated)
 Q_DECLARE_OPERATORS_FOR_FLAGS(GlobalPermissionsDeprecated)
 
 /** Returns modernPermissions, groupIds, resourceAccessRights. */
-NX_VMS_API std::tuple<GlobalPermissions, std::vector<QnUuid>, std::map<QnUuid, AccessRights>>
+NX_VMS_API std::tuple<GlobalPermissions, std::vector<nx::Uuid>, std::map<nx::Uuid, AccessRights>>
     migrateAccessRights(
         GlobalPermissionsDeprecated permissions,
-        const std::vector<QnUuid>& accessibleResources,
+        const std::vector<nx::Uuid>& accessibleResources,
         bool isOwner = false);
 
 /** Returns deprecatedPermissions, groupId, isOwner. */
-NX_VMS_API std::tuple<GlobalPermissionsDeprecated, std::optional<std::vector<QnUuid>>, bool>
+NX_VMS_API std::tuple<GlobalPermissionsDeprecated, std::optional<std::vector<nx::Uuid>>, bool>
     extractFromResourceAccessRights(
         GlobalPermissions permissions,
-        std::vector<QnUuid>* groups,
-        const std::map<QnUuid, AccessRights>& resourceAccessRights);
+        std::vector<nx::Uuid>* groups,
+        const std::map<nx::Uuid, AccessRights>& resourceAccessRights);
 
 } // namespace nx::vms::api

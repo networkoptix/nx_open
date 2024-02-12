@@ -28,7 +28,7 @@ public:
     void setAutoUpdate(bool value);
 
 public:
-    void setServerId(const QnUuid& value);
+    void setServerId(const nx::Uuid& value);
 
 private:
     struct Private;

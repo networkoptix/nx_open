@@ -35,7 +35,7 @@ public:
     void loadState(const CameraSettingsDialogState& state);
 
 signals:
-    void audioRedirectDeviceIdChanged(const QnUuid& deviceId);
+    void audioRedirectDeviceIdChanged(const nx::Uuid& deviceId);
 
 protected:
     virtual void showEvent(QShowEvent* event) override;
@@ -48,7 +48,7 @@ private:
     bool capabilityCheck(const QnResourcePtr& resource) const;
     bool sameServerCheck(const QnResourcePtr& resource) const;
 
-    QnUuid getRedirectDeviceId(const CameraSettingsDialogState& state) const;
+    nx::Uuid getRedirectDeviceId(const CameraSettingsDialogState& state) const;
 
     QString activeRedirectLabelText() const;
     QString inactiveRedirectLabelText() const;
@@ -70,8 +70,8 @@ private:
     std::unique_ptr<QMenu> m_inactiveRedirectDropdownMenu;
     QAction* m_inactiveRedirectDropdownAction = nullptr;
 
-    QnUuid m_deviceId;
-    QnUuid m_audioRedirectDeviceId;
+    nx::Uuid m_deviceId;
+    nx::Uuid m_audioRedirectDeviceId;
 };
 
 } // namespace nx::vms::client::desktop

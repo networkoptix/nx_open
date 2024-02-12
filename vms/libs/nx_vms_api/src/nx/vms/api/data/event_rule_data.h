@@ -19,7 +19,7 @@ namespace api {
 struct NX_VMS_API EventRuleData: IdData
 {
     EventType eventType = EventType::undefinedEvent;
-    std::vector<QnUuid> eventResourceIds;
+    std::vector<nx::Uuid> eventResourceIds;
 
     /**%apidoc
      * JSON object serialized using the Latin-1 encoding, even though it may contain other Unicode
@@ -29,7 +29,7 @@ struct NX_VMS_API EventRuleData: IdData
 
     EventState eventState = EventState::undefined;
     ActionType actionType = ActionType::undefinedAction;
-    std::vector<QnUuid> actionResourceIds;
+    std::vector<nx::Uuid> actionResourceIds;
 
     /**%apidoc
      * JSON object serialized using the Latin-1 encoding, even though it may contain other Unicode
@@ -57,10 +57,10 @@ struct NX_VMS_API EventActionData
     ActionType actionType = ActionType::undefinedAction;
     EventState toggleState = EventState::undefined;
     bool receivedFromRemoteHost = false;
-    std::vector<QnUuid> resourceIds;
+    std::vector<nx::Uuid> resourceIds;
     QByteArray params;
     QByteArray runtimeParams;
-    QnUuid ruleId;
+    nx::Uuid ruleId;
     qint32 aggregationCount = 0;
 
     bool operator==(const EventActionData& other) const = default;

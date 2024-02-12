@@ -21,17 +21,17 @@ struct NX_VMS_API ResourceData: IdData
 {
     using base_type = IdData;
 
-    QnUuid parentId;
+    nx::Uuid parentId;
     QString name;
     QString url;
-    QnUuid typeId;
+    nx::Uuid typeId;
 
     ResourceData() = default;
-    ResourceData(const QnUuid& typeId): typeId(typeId) {}
+    ResourceData(const nx::Uuid& typeId): typeId(typeId) {}
 
     bool operator==(const ResourceData& other) const = default;
 
-    static QnUuid getFixedTypeId(const QString& typeName);
+    static nx::Uuid getFixedTypeId(const QString& typeName);
 };
 #define ResourceData_Fields IdData_Fields (parentId)(name)(url)(typeId)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(ResourceData)
@@ -40,7 +40,7 @@ NX_REFLECTION_INSTRUMENT(ResourceData, ResourceData_Fields);
 struct NX_VMS_API ResourceStatusData: IdData
 {
     ResourceStatusData() = default;
-    ResourceStatusData(const QnUuid& id, ResourceStatus status): IdData(id), status(status) {}
+    ResourceStatusData(const nx::Uuid& id, ResourceStatus status): IdData(id), status(status) {}
 
     ResourceStatus status = ResourceStatus::offline;
 
@@ -70,14 +70,14 @@ NX_REFLECTION_INSTRUMENT(ResourceParamData, ResourceParamData_Fields)
 
 // REFACTORME:
 // Apparently, this type exists for mapping named parameters to ids.
-// Instead of a list of {.id, .value, .name} it can be done with a simple `std::map<QnUuid, ResourceParamData>`.
+// Instead of a list of {.id, .value, .name} it can be done with a simple `std::map<nx::Uuid, ResourceParamData>`.
 // In this case, mapping between API and DB types can be done in a straightforward loop without convoluted indirections.
 struct NX_VMS_API ResourceParamWithRefData: ResourceParamData
 {
     ResourceParamWithRefData() = default;
 
     ResourceParamWithRefData(
-        const QnUuid& resourceId,
+        const nx::Uuid& resourceId,
         const QString& name,
         const QString& value,
         CheckResourceExists checkResourceExists = CheckResourceExists::yes)
@@ -89,9 +89,9 @@ struct NX_VMS_API ResourceParamWithRefData: ResourceParamData
     }
 
     bool operator==(const ResourceParamWithRefData& other) const = default;
-    QnUuid getId() const { return resourceId; }
+    nx::Uuid getId() const { return resourceId; }
 
-    QnUuid resourceId;
+    nx::Uuid resourceId;
 
     /** Used by ...Model::toDbTypes() and transaction-description-modify checkers. */
     CheckResourceExists checkResourceExists = CheckResourceExists::yes; /**<%apidoc[unused] */
@@ -100,15 +100,15 @@ struct NX_VMS_API ResourceParamWithRefData: ResourceParamData
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(ResourceParamWithRefData)
 
 // This can and should be done by QueryProcessor.
-std::unordered_map<QnUuid, std::vector<ResourceParamData>> NX_VMS_API toParameterMap(
+std::unordered_map<nx::Uuid, std::vector<ResourceParamData>> NX_VMS_API toParameterMap(
     std::vector<ResourceParamWithRefData> parametersWithIds);
 
 struct NX_VMS_API ResourceWithParameters
 {
-    ResourceParamWithRefDataList asList(const QnUuid& id) const;
+    ResourceParamWithRefDataList asList(const nx::Uuid& id) const;
     void setFromList(const ResourceParamDataList& list);
     void setFromList(const ResourceParamWithRefDataList& list);
-    void extractFromList(const QnUuid& id, ResourceParamWithRefDataList* list);
+    void extractFromList(const nx::Uuid& id, ResourceParamWithRefDataList* list);
     void setFromParameter(const ResourceParamData& parameter);
     std::optional<QJsonValue> parameter(const QString& key) const;
 

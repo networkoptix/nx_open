@@ -44,18 +44,18 @@ AbstractCertificateVerifier* QnCommonModule::certificateVerifier() const
     return d->systemContext->certificateVerifier();
 }
 
-QnUuid QnCommonModule::peerId() const
+nx::Uuid QnCommonModule::peerId() const
 {
     return NX_ASSERT(d->systemContext)
         ? d->systemContext->peerId()
-        : QnUuid();
+        : nx::Uuid();
 }
 
-QnUuid QnCommonModule::sessionId() const
+nx::Uuid QnCommonModule::sessionId() const
 {
     return NX_ASSERT(d->systemContext)
         ? d->systemContext->sessionId()
-        : QnUuid();
+        : nx::Uuid();
 }
 
 QnLicensePool* QnCommonModule::licensePool() const

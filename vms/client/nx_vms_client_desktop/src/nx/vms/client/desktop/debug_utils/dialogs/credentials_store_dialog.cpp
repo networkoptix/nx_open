@@ -74,7 +74,7 @@ CredentialsStoreDialog::CredentialsStoreDialog(QWidget *parent):
         {
             using namespace nx::network::http;
 
-            const QnUuid randomSystemId = QnUuid::createUuid();
+            const nx::Uuid randomSystemId = nx::Uuid::createUuid();
             Credentials emptyCredentials("empty", {});
             PasswordCredentials passwordCredentials("password", "password");
             Credentials ha1Credentials("ha1", Ha1AuthToken("ha1"));
@@ -98,7 +98,7 @@ CredentialsStoreDialog::CredentialsStoreDialog(QWidget *parent):
 
             for (const auto& idx: selectionModel->selectedIndexes())
             {
-                const auto systemId = idx.data(SystemIdRole).value<QnUuid>();
+                const auto systemId = idx.data(SystemIdRole).value<nx::Uuid>();
                 CredentialsManager::removeCredentials(systemId);
             }
             d->rebuildModel();

@@ -51,8 +51,8 @@ public:
     QnMediaServerResourcePtr server() const;
     void setServer(const QnMediaServerResourcePtr& server);
 
-    QnUuid metadataStorageId() const;
-    void setMetadataStorageId(const QnUuid &id);
+    nx::Uuid metadataStorageId() const;
+    void setMetadataStorageId(const nx::Uuid &id);
 
     QnStorageModelInfo storage(const QModelIndex& index) const;
     QnStorageModelInfoList storages() const;
@@ -114,9 +114,9 @@ private:
 private:
     QnMediaServerResourcePtr m_server;
     QnStorageModelInfoList m_storages;
-    QSet<QnUuid> m_checkedStorages;
+    QSet<nx::Uuid> m_checkedStorages;
     std::array<nx::vms::api::StorageScanInfo, static_cast<int>(QnServerStoragesPool::Count)> m_rebuildStatus;
-    QnUuid m_metadataStorageId;
+    nx::Uuid m_metadataStorageId;
 
     bool m_readOnly;
     QBrush m_linkBrush;

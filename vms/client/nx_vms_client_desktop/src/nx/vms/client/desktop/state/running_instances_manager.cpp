@@ -28,17 +28,17 @@ struct RunningInstancesManager::Private
         pcUuid = settings->pcUuid();
         if (pcUuid.isNull())
         {
-            pcUuid = QnUuid::createUuid();
+            pcUuid = nx::Uuid::createUuid();
             settings->pcUuid = pcUuid;
         }
     }
 
-    QnUuid instanceGuidForIndex(int index) const
+    nx::Uuid instanceGuidForIndex(int index) const
     {
-        return QnUuid::createUuidFromPool(pcUuid.getQUuid(), static_cast<uint>(index));
+        return nx::Uuid::createUuidFromPool(pcUuid.getQUuid(), static_cast<uint>(index));
     }
 
-    QnUuid pcUuid = QnUuid::createUuid();
+    nx::Uuid pcUuid = nx::Uuid::createUuid();
     QPointer<SharedMemoryManager> memory;
 };
 
@@ -54,20 +54,20 @@ RunningInstancesManager::~RunningInstancesManager()
 {
 }
 
-QnUuid RunningInstancesManager::currentInstanceGuid() const
+nx::Uuid RunningInstancesManager::currentInstanceGuid() const
 {
     if (NX_ASSERT(d->memory))
         return d->instanceGuidForIndex(d->memory->currentInstanceIndex());
     return d->pcUuid;
 }
 
-QList<QnUuid> RunningInstancesManager::runningInstancesGuids() const
+QList<nx::Uuid> RunningInstancesManager::runningInstancesGuids() const
 {
     if (!NX_ASSERT(d->memory))
-        return QList<QnUuid>{d->pcUuid};
+        return QList<nx::Uuid>{d->pcUuid};
 
     QList<int> runningInstancesIndices = d->memory->runningInstancesIndices();
-    QList<QnUuid> result;
+    QList<nx::Uuid> result;
     for (auto index: runningInstancesIndices)
         result.push_back(d->instanceGuidForIndex(index));
     return result;

@@ -94,7 +94,7 @@ QN_FUSION_DECLARE_FUNCTIONS(DeviceFootageRequest, (json), NX_VMS_API);
 struct DeviceDiagnosis
 {
     /**%apidoc Device id. */
-    QnUuid id;
+    nx::Uuid id;
 
     /**%apidoc Device status. */
     ResourceStatus status = ResourceStatus::undefined;

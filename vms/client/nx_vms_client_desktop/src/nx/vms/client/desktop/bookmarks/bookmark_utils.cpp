@@ -28,7 +28,7 @@ public:
 
 namespace nx::vms::client::desktop {
 
-QString getBookmarkCreatorName(const QnUuid& creatorId, SystemContext* systemContext)
+QString getBookmarkCreatorName(const nx::Uuid& creatorId, SystemContext* systemContext)
 {
     const auto currentUser = systemContext->userWatcher()->user();
 

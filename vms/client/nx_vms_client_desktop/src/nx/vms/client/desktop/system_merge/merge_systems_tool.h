@@ -66,7 +66,7 @@ public:
      * @return Ping id which can be used for subsequent merge.
      */
     [[nodiscard]]
-    QnUuid pingSystem(
+    nx::Uuid pingSystem(
         const QnMediaServerResourcePtr& proxy,
         const nx::utils::Url& targetUrl,
         const nx::network::http::Credentials& targetCredentials,
@@ -81,7 +81,7 @@ public:
      * @param ignoreIncompatible Ignore incompatible servers while merge.
      */
     bool mergeSystem(
-        const QnUuid& ctxId,
+        const nx::Uuid& ctxId,
         const std::string& ownerSessionToken,
         bool ownSettings,
         bool oneServer = false,
@@ -105,7 +105,7 @@ signals:
 private:
     struct Context;
 
-    Context* findContext(const QnUuid& ctxId);
+    Context* findContext(const nx::Uuid& ctxId);
 
     static bool checkServerCertificateEquality(const Context& ctx);
     MergeSystemsStatus verifyTargetCertificate(const Context& ctx);
@@ -138,7 +138,7 @@ private:
 
 private:
     std::unique_ptr<MergeSystemRequestsManager> m_requestManager;
-    std::map<QnUuid, Context> m_contextMap;
+    std::map<nx::Uuid, Context> m_contextMap;
     CertificateVerifier* m_certificateVerifier;
     Delegate* m_delegate;
 };

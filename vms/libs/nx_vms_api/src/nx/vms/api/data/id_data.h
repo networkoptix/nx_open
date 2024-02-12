@@ -13,7 +13,7 @@ namespace nx::vms::api {
 struct NX_VMS_API IdData
 {
     IdData() = default;
-    IdData(const QnUuid& id): id(id) {}
+    IdData(const nx::Uuid& id): id(id) {}
     IdData(const QString& id): id(id) {}
 
     bool operator==(const IdData& other) const = default;
@@ -25,7 +25,7 @@ struct NX_VMS_API IdData
      * Used for merging with the existing object in POST requests.
      * @return Value of a field holding object guid.
      */
-    QnUuid getIdForMerging() const { return id; }
+    nx::Uuid getIdForMerging() const { return id; }
 
     /**
      * Subclasses can (re)define this method when needed. It is called by name from templates
@@ -35,13 +35,13 @@ struct NX_VMS_API IdData
      * Used for generating omitted id in POST requests which create new objects. Can set id to
      * a null guid if generating is not possible.
      */
-    void fillId() { id = QnUuid::createUuid(); }
+    void fillId() { id = nx::Uuid::createUuid(); }
 
-    QnUuid getId() const { return id; }
-    void setId(QnUuid value) { id = std::move(value); }
+    nx::Uuid getId() const { return id; }
+    void setId(nx::Uuid value) { id = std::move(value); }
     static_assert(isFlexibleIdModelV<IdData>);
 
-    QnUuid id;
+    nx::Uuid id;
 };
 #define IdData_Fields (id)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(IdData)

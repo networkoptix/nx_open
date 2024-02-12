@@ -12,7 +12,7 @@ class NX_VMS_RULES_API PoeOverBudgetEvent: public BasicEvent
     Q_OBJECT
     Q_CLASSINFO("type", "nx.events.poeOverBudget")
 
-    FIELD(QnUuid, serverId, setServerId)
+    FIELD(nx::Uuid, serverId, setServerId)
     FIELD(double, currentConsumptionW, setCurrentConsumptionW)
     FIELD(double, upperLimitW, setUpperLimitW)
     FIELD(double, lowerLimitW, setLowerLimitW)
@@ -23,7 +23,7 @@ public:
     PoeOverBudgetEvent(
         std::chrono::microseconds timestamp,
         State state,
-        QnUuid serverId,
+        nx::Uuid serverId,
         double currentConsumptionW,
         double upperLimitW,
         double lowerLimitW);

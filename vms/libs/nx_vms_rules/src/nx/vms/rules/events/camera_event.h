@@ -13,7 +13,7 @@ class NX_VMS_RULES_API CameraEvent: public BasicEvent
 {
     Q_OBJECT
 
-    FIELD(QnUuid, cameraId, setCameraId)
+    FIELD(nx::Uuid, cameraId, setCameraId)
 
 public:
     virtual QString resourceKey() const override;
@@ -21,7 +21,7 @@ public:
 
 protected:
     CameraEvent() = default;
-    CameraEvent(std::chrono::microseconds timestamp, State state, QnUuid id);
+    CameraEvent(std::chrono::microseconds timestamp, State state, nx::Uuid id);
 
 private:
     nx::vms::api::ResourceStatus sourceStatus(common::SystemContext* context) const;

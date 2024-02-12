@@ -20,8 +20,8 @@ class NX_VMS_COMMON_API MetadataLogger
 public:
     MetadataLogger(
         const QString& logFilePrefix,
-        QnUuid deviceId,
-        QnUuid engineId,
+        nx::Uuid deviceId,
+        nx::Uuid engineId,
         nx::vms::api::StreamIndex = nx::vms::api::StreamIndex::undefined);
 
     ~MetadataLogger();

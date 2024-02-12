@@ -326,18 +326,18 @@ bool deserialize(QnUbjsonReader<T> *stream, nx::utils::Url *target)
 
 
 template <class Output>
-void serialize(const QnUuid &value, QnUbjsonWriter<Output> *stream) {
+void serialize(const nx::Uuid &value, QnUbjsonWriter<Output> *stream) {
     QnUbjson::serialize(value.toRfc4122(), stream);
 }
 
 
 template <class Input>
-bool deserialize(QnUbjsonReader<Input> *stream, QnUuid *target)
+bool deserialize(QnUbjsonReader<Input> *stream, nx::Uuid *target)
 {
     std::array<char, 16> tmp;
     if(!stream->template readBinaryData<>(&tmp))
         return false;
-    *target = QnUuid::fromRfc4122(QByteArray::fromRawData(tmp.data(), static_cast<int>(tmp.size())));
+    *target = nx::Uuid::fromRfc4122(QByteArray::fromRawData(tmp.data(), static_cast<int>(tmp.size())));
     return true;
 }
 

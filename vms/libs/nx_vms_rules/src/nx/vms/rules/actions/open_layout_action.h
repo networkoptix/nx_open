@@ -15,7 +15,7 @@ class NX_VMS_RULES_API OpenLayoutAction: public nx::vms::rules::BasicAction
     FIELD(nx::vms::rules::UuidSelection, users, setUsers)
     FIELD(std::chrono::microseconds, playbackTime, setPlaybackTime)
     FIELD(std::chrono::microseconds, interval, setInterval)
-    FIELD(QnUuid, layoutId, setLayoutId)
+    FIELD(nx::Uuid, layoutId, setLayoutId)
 
 public:
     static const ItemDescriptor& manifest();

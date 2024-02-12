@@ -88,7 +88,7 @@ std::optional<std::string> publicKey(const std::string& pem)
     return chain[0].publicKey();
 };
 
-std::optional<QnUuid> deductServerId(const std::vector<nx::vms::api::ServerInformation>& info)
+std::optional<nx::Uuid> deductServerId(const std::vector<nx::vms::api::ServerInformation>& info)
 {
     if (info.size() == 1)
         return info.begin()->id;

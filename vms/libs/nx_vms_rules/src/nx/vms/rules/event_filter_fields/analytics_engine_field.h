@@ -7,12 +7,12 @@
 namespace nx::vms::rules {
 
 class NX_VMS_RULES_API AnalyticsEngineField:
-    public SimpleTypeEventField<QnUuid, AnalyticsEngineField>
+    public SimpleTypeEventField<nx::Uuid, AnalyticsEngineField>
 {
     Q_OBJECT
     Q_CLASSINFO("metatype", "nx.events.fields.analyticsEngine")
 
-    Q_PROPERTY(QnUuid value READ value WRITE setValue NOTIFY valueChanged)
+    Q_PROPERTY(nx::Uuid value READ value WRITE setValue NOTIFY valueChanged)
 
 public:
     virtual bool match(const QVariant& eventValue) const override;

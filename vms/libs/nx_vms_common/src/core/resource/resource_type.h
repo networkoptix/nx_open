@@ -18,11 +18,11 @@ public:
 
     virtual ~QnResourceType();
 
-    void setId(const QnUuid& value) { m_id = value; }
-    const QnUuid& getId() const { return m_id;}
+    void setId(const nx::Uuid& value) { m_id = value; }
+    const nx::Uuid& getId() const { return m_id;}
 
-    void setParentId(const QnUuid &value);
-    const QnUuid& getParentId() const { return m_parentId;}
+    void setParentId(const nx::Uuid &value);
+    const nx::Uuid& getParentId() const { return m_parentId;}
 
     void setName(const QString& value) { m_name = value; }
     const QString& getName() const { return m_name;}
@@ -33,8 +33,8 @@ public:
     bool isCamera() const;
     void setIsCamera(); //< For tests.
 
-    void addAdditionalParent(const QnUuid& parent);
-    QList<QnUuid> allParentList() const;
+    void addAdditionalParent(const nx::Uuid& parent);
+    QList<nx::Uuid> allParentList() const;
 
     void addParamType(const QString& name, const QString& defaultValue);
     bool hasParam(const QString& name) const;
@@ -45,11 +45,11 @@ public:
     QString defaultValue(const QString& key) const;
 
 private:
-    QnUuid m_id;
-    QnUuid m_parentId;
+    nx::Uuid m_id;
+    nx::Uuid m_parentId;
     QString m_name;
     QString m_manufacture;
-    QList<QnUuid> m_additionalParentList;
+    QList<nx::Uuid> m_additionalParentList;
 
     ParamTypeMap m_paramTypeList;
 
@@ -63,7 +63,7 @@ private:
 class NX_VMS_COMMON_API QnResourceTypePool
 {
 public:
-    typedef QMap<QnUuid, QnResourceTypePtr> QnResourceTypeMap;
+    typedef QMap<nx::Uuid, QnResourceTypePtr> QnResourceTypeMap;
 
     static const QString kC2pCameraTypeId;
 
@@ -71,15 +71,15 @@ public:
 
     QnResourceTypePool();
     QnResourceTypePtr getResourceTypeByName(const QString& name) const;
-    QnResourceTypePtr getResourceType(QnUuid id) const;
+    QnResourceTypePtr getResourceType(nx::Uuid id) const;
     void addResourceType(QnResourceTypePtr resourceType);
     void replaceResourceTypeList(const QnResourceTypeList& resourceType);
 
     /* exact match name */
-    QnUuid getResourceTypeId(const QString& manufacturer, const QString& name, bool showWarning = true) const;
+    nx::Uuid getResourceTypeId(const QString& manufacturer, const QString& name, bool showWarning = true) const;
 
     /* match name using like operation */
-    QnUuid getLikeResourceTypeId(const QString& manufacturer, const QString& name) const;
+    nx::Uuid getLikeResourceTypeId(const QString& manufacturer, const QString& name) const;
 
     QnResourceTypeMap getResourceTypeMap() const;
 

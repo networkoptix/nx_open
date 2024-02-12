@@ -44,7 +44,7 @@ class QnVideowallItemWidget:
 public:
     explicit QnVideowallItemWidget(
         const QnVideoWallResourcePtr& videowall,
-        const QnUuid& itemUuid,
+        const nx::Uuid& itemUuid,
         QnVideowallScreenWidget* parent,
         QGraphicsWidget* parentWidget,
         Qt::WindowFlags windowFlags = {});
@@ -98,7 +98,7 @@ private:
     const QnVideoWallResourcePtr m_videowall;
 
     /** Uuid of the current screen instance. */
-    const QnUuid m_itemUuid;
+    const nx::Uuid m_itemUuid;
 
     /** Cached field to be used as action parameters source. */
     const QnVideoWallItemIndexList m_indices;

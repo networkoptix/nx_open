@@ -20,7 +20,7 @@
 
 namespace nx::vms::client::desktop {
 
-using ModeByIdHash = QHash<QnUuid, RadassMode>;
+using ModeByIdHash = QHash<nx::Uuid, RadassMode>;
 
 NX_REFLECTION_INSTRUMENT_ENUM(RadassMode, Auto, High, Low)
 
@@ -31,7 +31,7 @@ namespace {
 
 ModeByIdHash filtered(ModeByIdHash source, QnResourcePool* resourcePool)
 {
-    QSet<QnUuid> existingItems;
+    QSet<nx::Uuid> existingItems;
     for (const auto& layout: resourcePool->getResources<QnLayoutResource>())
         existingItems.unite(nx::utils::toQSet(layout->getItems().keys()));
 
@@ -78,7 +78,7 @@ struct RadassResourceManager::Private
         if (!data.open(QIODevice::ReadOnly))
             return;
 
-        m_modes = QnUbjson::deserialized<QHash<QnUuid, RadassMode>>(data.readAll());
+        m_modes = QnUbjson::deserialized<QHash<nx::Uuid, RadassMode>>(data.readAll());
         data.close();
     }
 
@@ -201,12 +201,12 @@ void RadassResourceManager::setCacheDirectory(const QString& value)
     d->cacheDirectory = value;
 }
 
-void RadassResourceManager::switchLocalSystemId(const QnUuid& localSystemId)
+void RadassResourceManager::switchLocalSystemId(const nx::Uuid& localSystemId)
 {
     d->loadFromFile(localSystemId.toString());
 }
 
-void RadassResourceManager::saveData(const QnUuid& localSystemId,
+void RadassResourceManager::saveData(const nx::Uuid& localSystemId,
     QnResourcePool* resourcePool) const
 {
     d->saveToFile(localSystemId.toString(), resourcePool);

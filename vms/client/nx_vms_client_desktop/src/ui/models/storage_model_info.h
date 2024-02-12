@@ -9,7 +9,7 @@
 
 struct QnStorageModelInfo
 {
-    QnUuid id;
+    nx::Uuid id;
     bool isUsed;
     QString url;
     QString storageType;

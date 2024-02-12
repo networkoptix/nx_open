@@ -16,14 +16,14 @@ void ThreadsafeMessageBusAdapter::stop()
     base_type::stop();
 }
 
-QSet<QnUuid> ThreadsafeMessageBusAdapter::directlyConnectedClientPeers() const
+QSet<nx::Uuid> ThreadsafeMessageBusAdapter::directlyConnectedClientPeers() const
 {
     NX_MUTEX_LOCKER guard(&m_mutex);
     return base_type::directlyConnectedClientPeers();
 }
 
-QnUuid ThreadsafeMessageBusAdapter::routeToPeerVia(
-    const QnUuid& dstPeer,
+nx::Uuid ThreadsafeMessageBusAdapter::routeToPeerVia(
+    const nx::Uuid& dstPeer,
     int* distance,
     nx::network::SocketAddress* knownPeerAddress) const
 {
@@ -31,14 +31,14 @@ QnUuid ThreadsafeMessageBusAdapter::routeToPeerVia(
     return base_type::routeToPeerVia(dstPeer, distance, knownPeerAddress);
 }
 
-int ThreadsafeMessageBusAdapter::distanceToPeer(const QnUuid& dstPeer) const
+int ThreadsafeMessageBusAdapter::distanceToPeer(const nx::Uuid& dstPeer) const
 {
     NX_MUTEX_LOCKER guard(&m_mutex);
     return base_type::distanceToPeer(dstPeer);
 }
 
 void ThreadsafeMessageBusAdapter::addOutgoingConnectionToPeer(
-    const QnUuid& id,
+    const nx::Uuid& id,
     nx::vms::api::PeerType peerType,
     const nx::utils::Url& url,
     std::optional<nx::network::http::Credentials> credentials,
@@ -49,14 +49,14 @@ void ThreadsafeMessageBusAdapter::addOutgoingConnectionToPeer(
         id, peerType, url, std::move(credentials), std::move(adapterFunc));
 }
 
-void ThreadsafeMessageBusAdapter::removeOutgoingConnectionFromPeer(const QnUuid& id)
+void ThreadsafeMessageBusAdapter::removeOutgoingConnectionFromPeer(const nx::Uuid& id)
 {
     NX_MUTEX_LOCKER guard(&m_mutex);
     base_type::removeOutgoingConnectionFromPeer(id);
 }
 
 void ThreadsafeMessageBusAdapter::updateOutgoingConnection(
-    const QnUuid& id, nx::network::http::Credentials credentials)
+    const nx::Uuid& id, nx::network::http::Credentials credentials)
 {
     NX_MUTEX_LOCKER guard(&m_mutex);
     base_type::updateOutgoingConnection(id, credentials);

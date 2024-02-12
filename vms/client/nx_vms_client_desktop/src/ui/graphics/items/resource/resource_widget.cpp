@@ -193,7 +193,7 @@ QnResourceWidget::QnResourceWidget(
         &LayoutResource::itemDataChanged,
         this,
         [this, itemId = item->uuid()](
-            const QnUuid& id, Qn::ItemDataRole role, const QVariant& /*data*/)
+            const nx::Uuid& id, Qn::ItemDataRole role, const QVariant& /*data*/)
         {
             if (id != itemId)
                 return;
@@ -762,7 +762,7 @@ bool QnResourceWidget::isVideoWallLicenseValid() const
 
     const QnPeerRuntimeInfo localInfo = m_resource->systemContext()->runtimeInfoManager()->localInfo();
     NX_ASSERT(localInfo.data.peer.peerType == nx::vms::api::PeerType::videowallClient);
-    QnUuid currentScreenId = localInfo.data.videoWallInstanceGuid;
+    nx::Uuid currentScreenId = localInfo.data.videoWallInstanceGuid;
 
     // Gather all online screen ids.
     // The order of screens should be the same across all client instances.
@@ -822,9 +822,9 @@ void QnResourceWidget::clearActionText(std::chrono::milliseconds after)
     m_hudOverlay->clearActionText(after);
 }
 
-QnUuid QnResourceWidget::uuid() const
+nx::Uuid QnResourceWidget::uuid() const
 {
-    return item() ? item()->uuid() : QnUuid();
+    return item() ? item()->uuid() : nx::Uuid();
 }
 
 QString QnResourceWidget::uuidString() const

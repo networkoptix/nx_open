@@ -65,7 +65,7 @@ std::vector<Model> fromDbTypes(typename Model::DbListTypes all)
     // `std::get` moves only the requested element.
 
     std::vector<Model> pages = fromData<Model>(std::get<std::vector<WebPageData>>(std::move(all)));
-    std::unordered_map<QnUuid, std::vector<ResourceParamData>> parameters =
+    std::unordered_map<nx::Uuid, std::vector<ResourceParamData>> parameters =
         toParameterMap(std::get<std::vector<ResourceParamWithRefData>>(std::move(all)));
 
     for (auto& p: pages)

@@ -329,7 +329,7 @@ void validateType(const auto& processor, const T& data, ApiObjectType requiredTy
     if constexpr (idExists<T>::value)
     {
         const auto& id = data.id;
-        if constexpr (std::is_same_v<std::decay_t<decltype(id)>, QnUuid>)
+        if constexpr (std::is_same_v<std::decay_t<decltype(id)>, nx::Uuid>)
         {
             if (requiredType == ApiObject_NotDefined)
                 return;

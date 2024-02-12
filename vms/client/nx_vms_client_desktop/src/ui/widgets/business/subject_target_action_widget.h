@@ -47,9 +47,9 @@ protected:
 private:
     void selectSubjects();
 
-    QValidator::State roleValidity(const QnUuid& roleId) const;
+    QValidator::State roleValidity(const nx::Uuid& roleId) const;
     bool userValidity(const QnUserResourcePtr& user) const;
-    QString calculateAlert(bool allUsers, const QSet<QnUuid>& subjects) const;
+    QString calculateAlert(bool allUsers, const QSet<nx::Uuid>& subjects) const;
 
 private:
     QPushButton* m_subjectsButton = nullptr;

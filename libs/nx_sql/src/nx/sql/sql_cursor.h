@@ -24,7 +24,7 @@ class Cursor:
     public BaseCursor
 {
 public:
-    Cursor(AbstractAsyncSqlQueryExecutor* asyncSqlQueryExecutor, QnUuid id):
+    Cursor(AbstractAsyncSqlQueryExecutor* asyncSqlQueryExecutor, nx::Uuid id):
         m_asyncSqlQueryExecutor(asyncSqlQueryExecutor),
         m_id(id)
     {
@@ -54,7 +54,7 @@ public:
 
 private:
     AbstractAsyncSqlQueryExecutor* m_asyncSqlQueryExecutor;
-    const QnUuid m_id;
+    const nx::Uuid m_id;
 };
 
 } // namespace nx::sql

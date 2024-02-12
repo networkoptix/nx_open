@@ -30,10 +30,10 @@ public:
     using ActionConstructor = std::function<BasicAction*()>;
     using Actions = std::vector<ActionPtr>;
 
-    ActionBuilder(const QnUuid& id, const QString& actionType, const ActionConstructor& ctor);
+    ActionBuilder(const nx::Uuid& id, const QString& actionType, const ActionConstructor& ctor);
     virtual ~ActionBuilder();
 
-    QnUuid id() const;
+    nx::Uuid id() const;
     QString actionType() const;
 
     const Rule* rule() const;
@@ -67,7 +67,7 @@ public:
     const QHash<QString, ActionBuilderField*> fields() const;
 
     QSet<QString> requiredEventFields() const;
-    QSet<QnUuid> affectedResources(const EventPtr& event) const;
+    QSet<nx::Uuid> affectedResources(const EventPtr& event) const;
 
     /**
      * Process the event and emits action() signal whenever appropriate action is
@@ -131,7 +131,7 @@ private:
     Engine* engine() const;
 
 
-    QnUuid m_id;
+    nx::Uuid m_id;
     QString m_actionType;
     ActionConstructor m_constructor;
     const Rule* m_rule = {};

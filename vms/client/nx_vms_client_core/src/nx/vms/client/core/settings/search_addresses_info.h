@@ -9,7 +9,7 @@
 
 namespace nx::vms::client::core {
 
-using ServerSearchAddressesHash = QHash<QnUuid, QSet<QString>>;
-using SystemSearchAddressesHash = QHash<QnUuid, ServerSearchAddressesHash>;
+using ServerSearchAddressesHash = QHash<nx::Uuid, QSet<QString>>;
+using SystemSearchAddressesHash = QHash<nx::Uuid, ServerSearchAddressesHash>;
 
 } // namespace nx::vms::client::core

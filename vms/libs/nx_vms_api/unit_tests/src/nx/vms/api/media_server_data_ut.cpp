@@ -19,7 +19,7 @@ namespace nx::vms::api::test {
 StorageData storageData(QString path = "/mnt")
 {
     StorageData storage;
-    storage.id = QnUuid::createUuid();
+    storage.id = nx::Uuid::createUuid();
     storage.name = path;
     storage.url = path;
     storage.spaceLimit = 77777;
@@ -33,7 +33,7 @@ StorageData storageData(QString path = "/mnt")
 MediaServerData serverData()
 {
     MediaServerData server;
-    server.id = QnUuid::createUuid();
+    server.id = nx::Uuid::createUuid();
     server.name = "server";
     server.networkAddresses = "123.45.67.89";
     server.url = "http://" + server.networkAddresses;
@@ -47,7 +47,7 @@ MediaServerData serverData()
 MediaServerDataEx serverDataEx()
 {
     MediaServerDataEx server;
-    server.id = QnUuid::createUuid();
+    server.id = nx::Uuid::createUuid();
     server.name = "some server";
     server.networkAddresses = "123.45.67.89";
     server.url = "http://" + server.networkAddresses;

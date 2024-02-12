@@ -87,7 +87,7 @@ public:
     QnLayoutFlags flags() const;
     void setFlags(QnLayoutFlags value);
 
-    QnUuid resourceId() const;
+    nx::Uuid resourceId() const;
 
     /**
      * @return Name of this layout.
@@ -219,7 +219,7 @@ public:
      * @return Item for the given universally unique identifier, or nullptr if no such item exists in
      *     this layout.
      */
-    QnWorkbenchItem* item(const QnUuid& uuid) const;
+    QnWorkbenchItem* item(const nx::Uuid& uuid) const;
 
     /**
      * @param region Region to get pinned items at.
@@ -408,7 +408,7 @@ private:
     void removeZoomLinkInternal(QnWorkbenchItem* item, QnWorkbenchItem* zoomTargetItem,
         bool notifyItem);
 
-    QnUuid zoomTargetUuidInternal(QnWorkbenchItem* item) const;
+    nx::Uuid zoomTargetUuidInternal(QnWorkbenchItem* item) const;
 
     /** Check that item belongs to the current layout. */
     bool own(QnWorkbenchItem* item) const;

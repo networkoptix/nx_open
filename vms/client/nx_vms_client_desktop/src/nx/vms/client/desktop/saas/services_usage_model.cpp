@@ -21,18 +21,18 @@ struct ServicesUsageModel::Private
 
     // Cached data obtained from serviceManager.
     nx::vms::api::SaasData saasData;
-    std::map<QnUuid, nx::vms::api::SaasService> servicesInfo;
+    std::map<nx::Uuid, nx::vms::api::SaasService> servicesInfo;
     void updateUsedServicesData();
 
     // Ids of displayed services.
-    std::vector<QnUuid> purchasedServicesIds() const;
+    std::vector<nx::Uuid> purchasedServicesIds() const;
 
     // Displayed values for the given service.
-    QString serviceName(const QnUuid& serviceId) const;
-    QString serviceType(const QnUuid& serviceId) const; //< As in license server replies.
-    QString serviceTypeDisplay(const QnUuid& serviceId) const;
-    int totalServiceQuantity(const QnUuid& serviceId) const;
-    int usedServiceQuantity(const QnUuid& serviceId) const;
+    QString serviceName(const nx::Uuid& serviceId) const;
+    QString serviceType(const nx::Uuid& serviceId) const; //< As in license server replies.
+    QString serviceTypeDisplay(const nx::Uuid& serviceId) const;
+    int totalServiceQuantity(const nx::Uuid& serviceId) const;
+    int usedServiceQuantity(const nx::Uuid& serviceId) const;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -46,9 +46,9 @@ void ServicesUsageModel::Private::updateUsedServicesData()
     q->endResetModel();
 }
 
-std::vector<QnUuid> ServicesUsageModel::Private::purchasedServicesIds() const
+std::vector<nx::Uuid> ServicesUsageModel::Private::purchasedServicesIds() const
 {
-    std::vector<QnUuid> servicesIds;
+    std::vector<nx::Uuid> servicesIds;
 
     for (const auto [serviceId, _]: saasData.services)
         servicesIds.push_back(serviceId);
@@ -56,7 +56,7 @@ std::vector<QnUuid> ServicesUsageModel::Private::purchasedServicesIds() const
     return servicesIds;
 }
 
-QString ServicesUsageModel::Private::serviceName(const QnUuid& serviceId) const
+QString ServicesUsageModel::Private::serviceName(const nx::Uuid& serviceId) const
 {
     if (!NX_ASSERT(servicesInfo.contains(serviceId)))
         return {};
@@ -64,7 +64,7 @@ QString ServicesUsageModel::Private::serviceName(const QnUuid& serviceId) const
     return servicesInfo.at(serviceId).displayName;
 }
 
-QString ServicesUsageModel::Private::serviceType(const QnUuid& serviceId) const
+QString ServicesUsageModel::Private::serviceType(const nx::Uuid& serviceId) const
 {
     if (!NX_ASSERT(servicesInfo.contains(serviceId)))
         return {};
@@ -72,7 +72,7 @@ QString ServicesUsageModel::Private::serviceType(const QnUuid& serviceId) const
     return servicesInfo.at(serviceId).type;
 }
 
-QString ServicesUsageModel::Private::serviceTypeDisplay(const QnUuid& serviceId) const
+QString ServicesUsageModel::Private::serviceTypeDisplay(const nx::Uuid& serviceId) const
 {
     if (!NX_ASSERT(servicesInfo.contains(serviceId)))
         return {};
@@ -80,7 +80,7 @@ QString ServicesUsageModel::Private::serviceTypeDisplay(const QnUuid& serviceId)
     return ServiceTypeDisplayHelper::serviceTypeDisplayString(servicesInfo.at(serviceId).type);
 }
 
-int ServicesUsageModel::Private::totalServiceQuantity(const QnUuid& serviceId) const
+int ServicesUsageModel::Private::totalServiceQuantity(const nx::Uuid& serviceId) const
 {
     if (!NX_ASSERT(saasData.services.contains(serviceId)))
         return {};
@@ -88,7 +88,7 @@ int ServicesUsageModel::Private::totalServiceQuantity(const QnUuid& serviceId) c
     return saasData.services.at(serviceId).quantity;
 }
 
-int ServicesUsageModel::Private::usedServiceQuantity(const QnUuid& serviceId) const
+int ServicesUsageModel::Private::usedServiceQuantity(const nx::Uuid& serviceId) const
 {
     // TODO: #vbreus Track changes in used services quantities.
 

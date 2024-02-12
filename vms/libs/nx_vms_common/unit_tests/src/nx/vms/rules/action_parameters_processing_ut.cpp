@@ -41,7 +41,7 @@ EventParameters createGenericEvent(
 }
 
 EventParameters createAnalyticsEvent(
-    const QnUuid& cameraId,
+    const nx::Uuid& cameraId,
     const QString& caption,
     const QString& description,
     const QString& eventType)
@@ -68,7 +68,7 @@ EventParameters createRandomEvent()
     result.resourceName = "Some source";
     result.caption = "Some caption";
     result.description = "Some description";
-    result.eventResourceId = QnUuid::createUuid();
+    result.eventResourceId = nx::Uuid::createUuid();
     result.setAnalyticsEventTypeId("Some event type");
     return result;
 }
@@ -215,7 +215,7 @@ TEST_F(ActionParametersProcessingTest, analyticsEvent)
 TEST_F(ActionParametersProcessingTest, analyticsEventWithKeywords)
 {
     using Placeholder = nx::vms::rules::SubstitutionKeywords::Event;
-    static const auto id = QnUuid::createUuid();
+    static const auto id = nx::Uuid::createUuid();
     const auto actionParameters = nx::vms::rules::actualActionParameters(
         ActionType::execHttpRequestAction,
         createActionParams(),

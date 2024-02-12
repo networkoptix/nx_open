@@ -12,18 +12,18 @@ class NX_VMS_RULES_API UniqueIdField: public EventFilterField
     Q_OBJECT
     Q_CLASSINFO("metatype", "nx.events.fields.uniqueId")
 
-    Q_PROPERTY(QnUuid id READ id WRITE setId)
+    Q_PROPERTY(nx::Uuid id READ id WRITE setId)
 
 public:
     UniqueIdField() = default;
 
-    QnUuid id() const;
-    void setId(QnUuid id);
+    nx::Uuid id() const;
+    void setId(nx::Uuid id);
 
     bool match(const QVariant& eventValue) const override;
 
 private:
-    mutable QnUuid m_id;
+    mutable nx::Uuid m_id;
 };
 
 } // namespace nx::vms::rules

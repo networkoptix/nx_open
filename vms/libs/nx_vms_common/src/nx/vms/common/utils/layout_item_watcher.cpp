@@ -23,7 +23,7 @@ public:
 
 public:
     QSet<QnLayoutResourcePtr> watchedLayouts;
-    QHash<QnUuid, QnCounterHash<QnLayoutResourcePtr>> itemLayouts;
+    QHash<nx::Uuid, QnCounterHash<QnLayoutResourcePtr>> itemLayouts;
     mutable nx::Mutex mutex;
 };
 
@@ -97,14 +97,14 @@ bool LayoutItemWatcher::isWatched(const QnLayoutResourcePtr& layout) const
     return d->watchedLayouts.contains(layout);
 }
 
-bool LayoutItemWatcher::hasResource(const QnUuid& resourceId) const
+bool LayoutItemWatcher::hasResource(const nx::Uuid& resourceId) const
 {
     NX_MUTEX_LOCKER lk(&d->mutex);
     return d->itemLayouts.contains(resourceId);
 }
 
 QnCounterHash<QnLayoutResourcePtr> LayoutItemWatcher::resourceLayouts(
-    const QnUuid& resourceId) const
+    const nx::Uuid& resourceId) const
 {
     NX_MUTEX_LOCKER lk(&d->mutex);
     return d->itemLayouts.value(resourceId);

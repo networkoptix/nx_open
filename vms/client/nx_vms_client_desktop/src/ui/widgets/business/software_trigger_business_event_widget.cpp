@@ -128,12 +128,12 @@ void QnSoftwareTriggerBusinessEventWidget::at_usersButton_clicked()
     SubjectSelectionDialog dialog(this);
     auto params = model()->eventParams();
 
-    QSet<QnUuid> selected;
+    QSet<nx::Uuid> selected;
     for (const auto& id: params.metadata.instigators)
         selected.insert(id);
 
     const auto roleValidator =
-        [this](const QnUuid& roleId) { return m_validationPolicy->roleValidity(roleId); };
+        [this](const nx::Uuid& roleId) { return m_validationPolicy->roleValidity(roleId); };
 
     const auto userValidator =
         [this](const QnUserResourcePtr& user) { return m_validationPolicy->userValidity(user); };

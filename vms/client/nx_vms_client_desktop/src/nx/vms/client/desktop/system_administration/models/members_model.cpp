@@ -27,14 +27,14 @@ namespace nx::vms::client::desktop {
 
 namespace {
 
-static const QSet<QnUuid> kRestrictedForTemp = {
+static const QSet<nx::Uuid> kRestrictedForTemp = {
     nx::vms::api::kAdministratorsGroupId,
     nx::vms::api::kPowerUsersGroupId
 };
 
 } // namespace
 
-MembersModelGroup MembersModelGroup::fromId(SystemContext* systemContext, const QnUuid& id)
+MembersModelGroup MembersModelGroup::fromId(SystemContext* systemContext, const nx::Uuid& id)
 {
     const auto group = systemContext->userGroupManager()->find(id).value_or(api::UserGroupData{});
 
@@ -88,7 +88,7 @@ void MembersModel::loadModelData()
     emit sharedResourcesChanged();
 }
 
-void addToSorted(QList<QnUuid>& list, const QnUuid& id)
+void addToSorted(QList<nx::Uuid>& list, const nx::Uuid& id)
 {
     auto it = std::lower_bound(list.begin(), list.end(), id);
     if (it != list.end() && *it == id)
@@ -97,7 +97,7 @@ void addToSorted(QList<QnUuid>& list, const QnUuid& id)
     list.insert(it, id);
 }
 
-void removeFromSorted(QList<QnUuid>& list, const QnUuid& id)
+void removeFromSorted(QList<nx::Uuid>& list, const nx::Uuid& id)
 {
     auto it = std::lower_bound(list.begin(), list.end(), id);
 
@@ -110,7 +110,7 @@ void removeFromSorted(QList<QnUuid>& list, const QnUuid& id)
 void MembersModel::subscribeToUser(const QnUserResourcePtr& user)
 {
     const auto updateUser =
-        [this](const QnUuid& id)
+        [this](const nx::Uuid& id)
         {
             m_cache->modify({id}, {id}, {}, {});
         };
@@ -126,7 +126,7 @@ void MembersModel::subscribeToUser(const QnUserResourcePtr& user)
     userConnections << connect(user.get(), &QnUserResource::userGroupsChanged, this,
         [updateUser](
             const QnUserResourcePtr& user,
-            const std::vector<QnUuid>&)
+            const std::vector<nx::Uuid>&)
         {
             updateUser(user->getId());
         });
@@ -145,7 +145,7 @@ void MembersModel::checkCycles()
         return;
 
     // Check direct parents.
-    QSet<QnUuid> groupsWithCycles;
+    QSet<nx::Uuid> groupsWithCycles;
     const auto parents = m_subjectContext->subjectHierarchy()->directParents(m_subjectId);
     for (const auto& parent: parents)
     {
@@ -200,7 +200,7 @@ void MembersModel::readUsersAndGroups()
         emit membersCacheChanged();
 
         connect(m_cache.get(), &MembersCache::beginInsert, this,
-            [this](int at, const QnUuid& id, const QnUuid& parentId)
+            [this](int at, const nx::Uuid& id, const nx::Uuid& parentId)
             {
                 if (!parentId.isNull())
                 {
@@ -216,7 +216,7 @@ void MembersModel::readUsersAndGroups()
             });
 
         connect(m_cache.get(), &MembersCache::endInsert, this,
-            [this](int, const QnUuid& id, const QnUuid& parentId)
+            [this](int, const nx::Uuid& id, const nx::Uuid& parentId)
             {
                 if (parentId.isNull())
                 {
@@ -247,7 +247,7 @@ void MembersModel::readUsersAndGroups()
             });
 
         connect(m_cache.get(), &MembersCache::beginRemove, this,
-            [this](int at, const QnUuid& id, const QnUuid& parentId)
+            [this](int at, const nx::Uuid& id, const nx::Uuid& parentId)
             {
                 if (!parentId.isNull())
                 {
@@ -263,7 +263,7 @@ void MembersModel::readUsersAndGroups()
             });
 
         connect(m_cache.get(), &MembersCache::endRemove, this,
-            [this](int, const QnUuid& id, const QnUuid& parentId)
+            [this](int, const nx::Uuid& id, const nx::Uuid& parentId)
             {
                 if (parentId.isNull())
                 {
@@ -314,7 +314,7 @@ void MembersModel::readUsersAndGroups()
                 if (!m_cache)
                     return;
 
-                const QSet<QnUuid> groupsWithChangedMembers =
+                const QSet<nx::Uuid> groupsWithChangedMembers =
                     {userGroup.parentGroupIds.begin(), userGroup.parentGroupIds.end()};
 
                 m_cache->modify({}, {userGroup.id}, groupsWithChangedMembers, {});
@@ -338,14 +338,14 @@ void MembersModel::readUsersAndGroups()
 
                 const QnUserResourceList users = resources.filtered<QnUserResource>();
 
-                QSet<QnUuid> addedIds;
-                QSet<QnUuid> modifiedGroups;
+                QSet<nx::Uuid> addedIds;
+                QSet<nx::Uuid> modifiedGroups;
 
                 for (const auto& user: users)
                 {
                     addedIds.insert(user->getId());
                     const auto groupIds = user->groupIds();
-                    modifiedGroups += QSet<QnUuid>{groupIds.begin(), groupIds.end()};
+                    modifiedGroups += QSet<nx::Uuid>{groupIds.begin(), groupIds.end()};
 
                     subscribeToUser(user);
                 }
@@ -362,15 +362,15 @@ void MembersModel::readUsersAndGroups()
 
                 const QnUserResourceList users = resources.filtered<QnUserResource>();
 
-                QSet<QnUuid> removedIds;
-                QSet<QnUuid> modifiedGroups;
+                QSet<nx::Uuid> removedIds;
+                QSet<nx::Uuid> modifiedGroups;
 
                 for (const auto& user: users)
                 {
                     unsubscribeFromUser(user);
                     removedIds.insert(user->getId());
                     const auto groupIds = user->groupIds();
-                    modifiedGroups += QSet<QnUuid>{groupIds.begin(), groupIds.end()};
+                    modifiedGroups += QSet<nx::Uuid>{groupIds.begin(), groupIds.end()};
                 }
 
                 m_cache->modify({}, removedIds, modifiedGroups, {});
@@ -379,10 +379,10 @@ void MembersModel::readUsersAndGroups()
         m_connections << connect(
             m_subjectContext->subjectHierarchy(), &nx::core::access::SubjectHierarchy::changed,
             this, [this](
-                const QSet<QnUuid>& added,
-                const QSet<QnUuid>& removed,
-                const QSet<QnUuid>& groupsWithChangedMembers,
-                const QSet<QnUuid>& subjectsWithChangedParents)
+                const QSet<nx::Uuid>& added,
+                const QSet<nx::Uuid>& removed,
+                const QSet<nx::Uuid>& groupsWithChangedMembers,
+                const QSet<nx::Uuid>& subjectsWithChangedParents)
             {
                 if (!m_cache)
                     return;
@@ -431,7 +431,7 @@ void MembersModel::readUsersAndGroups()
             systemContext()->nonEditableUsersAndGroups(),
             &NonEditableUsersAndGroups::groupModified,
             this,
-            [this](const QnUuid& groupId)
+            [this](const nx::Uuid& groupId)
             {
                 const auto groupsStart = m_cache->sorted().users.size();
                 const int row = groupsStart + m_cache->indexIn(m_cache->sorted().groups, groupId);
@@ -512,7 +512,7 @@ void MembersModel::setUsers(const MembersListWrapper& users)
     auto parents = m_subjectContext->subjectHierarchy()->directParents(m_subjectId);
     auto members = m_subjectContext->subjectHierarchy()->directMembers(m_subjectId);
 
-    QSet<QnUuid> newMembers;
+    QSet<nx::Uuid> newMembers;
 
     // Copy groups.
     for (const auto& id: members)
@@ -528,7 +528,7 @@ void MembersModel::setUsers(const MembersListWrapper& users)
     m_subjectContext->setRelations(parents, members);
 }
 
-QList<QnUuid> MembersModel::groups() const
+QList<nx::Uuid> MembersModel::groups() const
 {
     if (!m_subjectContext)
         return {};
@@ -536,7 +536,7 @@ QList<QnUuid> MembersModel::groups() const
     return m_subjectMembers.groups;
 }
 
-void MembersModel::setGroups(const QList<QnUuid>& groups)
+void MembersModel::setGroups(const QList<nx::Uuid>& groups)
 {
     if (!m_subjectContext)
         return;
@@ -544,7 +544,7 @@ void MembersModel::setGroups(const QList<QnUuid>& groups)
     auto parents = m_subjectContext->subjectHierarchy()->directParents(m_subjectId);
     auto members = m_subjectContext->subjectHierarchy()->directMembers(m_subjectId);
 
-    QSet<QnUuid> newMembers;
+    QSet<nx::Uuid> newMembers;
 
     // Copy users.
     for (const auto& id: members)
@@ -560,7 +560,7 @@ void MembersModel::setGroups(const QList<QnUuid>& groups)
     m_subjectContext->setRelations(parents, members);
 }
 
-void MembersModel::addParent(const QnUuid& groupId)
+void MembersModel::addParent(const nx::Uuid& groupId)
 {
     auto parents = m_subjectContext->subjectHierarchy()->directParents(m_subjectId);
     auto members = m_subjectContext->subjectHierarchy()->directMembers(m_subjectId);
@@ -568,7 +568,7 @@ void MembersModel::addParent(const QnUuid& groupId)
     m_subjectContext->setRelations(parents, members);
 }
 
-void MembersModel::removeParent(const QnUuid& groupId)
+void MembersModel::removeParent(const nx::Uuid& groupId)
 {
     auto parents = m_subjectContext->subjectHierarchy()->directParents(m_subjectId);
     auto members = m_subjectContext->subjectHierarchy()->directMembers(m_subjectId);
@@ -581,7 +581,7 @@ bool MembersModel::isCycledGroup() const
     return !m_groupsWithCycles.isEmpty();
 }
 
-void MembersModel::addMember(const QnUuid& memberId)
+void MembersModel::addMember(const nx::Uuid& memberId)
 {
     auto parents = m_subjectContext->subjectHierarchy()->directParents(m_subjectId);
     auto members = m_subjectContext->subjectHierarchy()->directMembers(m_subjectId);
@@ -589,7 +589,7 @@ void MembersModel::addMember(const QnUuid& memberId)
     m_subjectContext->setRelations(parents, members);
 }
 
-void MembersModel::removeMember(const QnUuid& memberId)
+void MembersModel::removeMember(const nx::Uuid& memberId)
 {
     auto parents = m_subjectContext->subjectHierarchy()->directParents(m_subjectId);
     auto members = m_subjectContext->subjectHierarchy()->directMembers(m_subjectId);
@@ -620,7 +620,7 @@ QHash<int, QByteArray> MembersModel::roleNames() const
     return roles;
 }
 
-bool MembersModel::isAllowed(const QnUuid& parentId, const QnUuid& childId) const
+bool MembersModel::isAllowed(const nx::Uuid& parentId, const nx::Uuid& childId) const
 {
     // Unable to include into itself.
     if (parentId == childId)
@@ -710,7 +710,7 @@ void MembersModel::setTemporary(bool value)
         auto parents = hierarchy->directParents(m_subjectId);
         auto members = hierarchy->directMembers(m_subjectId);
 
-        QSet<QnUuid> parentsToRemove;
+        QSet<nx::Uuid> parentsToRemove;
         for (const auto& groupId: parents)
         {
             if (kRestrictedForTemp.contains(groupId)
@@ -827,7 +827,7 @@ QVariant MembersModel::data(const QModelIndex& index, int role) const
     }
 }
 
-bool MembersModel::canEditMembers(const QnUuid& id) const
+bool MembersModel::canEditMembers(const nx::Uuid& id) const
 {
     const auto accessController = qobject_cast<AccessController*>(
         systemContext()->accessController());
@@ -850,7 +850,7 @@ bool MembersModel::setData(const QModelIndex& index, const QVariant& value, int 
         return false;
 
     const bool isUser = data(index, IsUserRole).toBool();
-    const auto selectedId = data(index, IdRole).value<QnUuid>();
+    const auto selectedId = data(index, IdRole).value<nx::Uuid>();
 
     if (role == IsMemberRole)
     {
@@ -921,14 +921,14 @@ void MembersModel::setParentGroups(const QList<MembersModelGroup>& groups)
 
     const auto members = m_subjectContext->subjectHierarchy()->directMembers(m_subjectId);
 
-    QSet<QnUuid> groupIds;
+    QSet<nx::Uuid> groupIds;
     for (const auto& group: groups)
         groupIds.insert(group.id);
 
     m_subjectContext->setRelations(groupIds, members);
 }
 
-void MembersModel::setGroupId(const QnUuid& groupId)
+void MembersModel::setGroupId(const nx::Uuid& groupId)
 {
     // Setting a group or a user forces reload of model data.
     const bool groupChanged = groupId != m_subjectId;
@@ -946,7 +946,7 @@ void MembersModel::setGroupId(const QnUuid& groupId)
         emit groupIdChanged();
 }
 
-void MembersModel::setUserId(const QnUuid& userId)
+void MembersModel::setUserId(const nx::Uuid& userId)
 {
     const bool userChanged = userId != m_subjectId;
 

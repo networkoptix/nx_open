@@ -24,26 +24,26 @@ struct NX_VMS_CLIENT_CORE_API CredentialsManager: public QObject
     CredentialsManager(QObject* parent = nullptr);
 
     /** Store provided credentials to persistent settings. */
-    static void storeCredentials(const QnUuid& localSystemId, const Credentials& credentials);
+    static void storeCredentials(const nx::Uuid& localSystemId, const Credentials& credentials);
 
     /** Remove credentials of the single user. */
-    static void removeCredentials(const QnUuid& localSystemId, const std::string& user);
+    static void removeCredentials(const nx::Uuid& localSystemId, const std::string& user);
 
     /** Remove all stored credentials for the system. */
-    static void removeCredentials(const QnUuid& localSystemId);
+    static void removeCredentials(const nx::Uuid& localSystemId);
 
     /** Cleanup stored user password, leaving user intact. */
-    static void forgetStoredPassword(const QnUuid& localSystemId, const std::string& user);
+    static void forgetStoredPassword(const nx::Uuid& localSystemId, const std::string& user);
 
     /** Cleanup all stored user passwords, leaving users intact. */
     static void forgetStoredPasswords();
 
     /** Find all stored credentials for the given system.*/
-    static std::vector<Credentials> credentials(const QnUuid& localSystemId);
+    static std::vector<Credentials> credentials(const nx::Uuid& localSystemId);
 
     /** Find stored credentials for the given user in the given system. */
     static std::optional<Credentials> credentials(
-        const QnUuid& localSystemId,
+        const nx::Uuid& localSystemId,
         const std::string& user);
 
 private:

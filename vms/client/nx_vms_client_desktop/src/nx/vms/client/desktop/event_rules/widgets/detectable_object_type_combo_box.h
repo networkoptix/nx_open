@@ -20,7 +20,7 @@ class DetectableObjectTypeComboBox: public QnTreeComboBox
 public:
     DetectableObjectTypeComboBox(QWidget* parent = nullptr);
 
-    void setDevices(const QnUuidSet& devices);
+    void setDevices(const UuidSet& devices);
 
     QStringList selectedObjectTypeIds() const;
     void setSelectedObjectTypeIds(const QStringList& objectTypeIds);

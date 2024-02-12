@@ -36,8 +36,8 @@ TEST(VmsRulesSerialization, EventField)
         [](){ return new TestEvent; });
 
     auto field = std::make_unique<TestEventField>();
-    field->id = QnUuid::createUuid();
-    field->idSet << QnUuid::createUuid() << QnUuid::createUuid();
+    field->id = nx::Uuid::createUuid();
+    field->idSet << nx::Uuid::createUuid() << nx::Uuid::createUuid();
     field->string = "test string";
     field->strings << "string 1" << "string 2";
     field->flag = true;
@@ -45,7 +45,7 @@ TEST(VmsRulesSerialization, EventField)
     field->state = State::started;
     field->levels = nx::vms::api::EventLevel::info;
 
-    nx::vms::rules::EventFilter filter(QnUuid::createUuid(), kEventType);
+    nx::vms::rules::EventFilter filter(nx::Uuid::createUuid(), kEventType);
     filter.addField(kFieldName, std::move(field));
 
     auto sourceField = dynamic_cast<TestEventField*>(filter.fields()[kFieldName]);

@@ -58,19 +58,19 @@ protected:
 
 TEST_F(UserManagementHelpersTest, getUsersAndGroups)
 {
-    const std::vector<QnUuid> requestedIds{{
-        QnUuid::createUuid(),
-        QnUuid::createUuid(),
+    const std::vector<nx::Uuid> requestedIds{{
+        nx::Uuid::createUuid(),
+        nx::Uuid::createUuid(),
         d.powerUser->getId(),
-        QnUuid{},
-        QnUuid::createUuid(),
+        nx::Uuid{},
+        nx::Uuid::createUuid(),
         d.specialPowerUsers.id,
         kPowerUsersGroupId,
-        QnUuid::createUuid(),
-        QnUuid::createUuid(),
+        nx::Uuid::createUuid(),
+        nx::Uuid::createUuid(),
         d.specialPowerUser->getId(),
-        QnUuid{},
-        QnUuid::createUuid()}};
+        nx::Uuid{},
+        nx::Uuid::createUuid()}};
 
     QnUserResourceList users;
     UserGroupDataList groups;
@@ -79,31 +79,31 @@ TEST_F(UserManagementHelpersTest, getUsersAndGroups)
     EXPECT_EQ(groups, UserGroupDataList(
         {d.specialPowerUsers, *PredefinedUserGroups::find(kPowerUsersGroupId)}));
 
-    QList<QnUuid> groupIds;
+    QList<nx::Uuid> groupIds;
     getUsersAndGroups(systemContext(), requestedIds, users, groupIds);
     EXPECT_EQ(users, QnUserResourceList({d.powerUser, d.specialPowerUser}));
-    EXPECT_EQ(groupIds, QList<QnUuid>({d.specialPowerUsers.id, kPowerUsersGroupId}));
+    EXPECT_EQ(groupIds, QList<nx::Uuid>({d.specialPowerUsers.id, kPowerUsersGroupId}));
 }
 
 TEST_F(UserManagementHelpersTest, allGroupsExist)
 {
-    EXPECT_TRUE(allUserGroupsExist(systemContext(), std::initializer_list<QnUuid>({
+    EXPECT_TRUE(allUserGroupsExist(systemContext(), std::initializer_list<nx::Uuid>({
         kLiveViewersGroupId, kAdministratorsGroupId, d.specialPowerUsers.id, d.specialViewers.id})));
 
-    EXPECT_FALSE(allUserGroupsExist(systemContext(), std::initializer_list<QnUuid>({
-        d.specialPowerUsers.id, /*invalid*/ QnUuid{}})));
+    EXPECT_FALSE(allUserGroupsExist(systemContext(), std::initializer_list<nx::Uuid>({
+        d.specialPowerUsers.id, /*invalid*/ nx::Uuid{}})));
 
-    EXPECT_FALSE(allUserGroupsExist(systemContext(), std::initializer_list<QnUuid>({
-        d.specialPowerUsers.id, /*unknown*/ QnUuid::createUuid()})));
+    EXPECT_FALSE(allUserGroupsExist(systemContext(), std::initializer_list<nx::Uuid>({
+        d.specialPowerUsers.id, /*unknown*/ nx::Uuid::createUuid()})));
 
-    EXPECT_FALSE(allUserGroupsExist(systemContext(), std::initializer_list<QnUuid>({
+    EXPECT_FALSE(allUserGroupsExist(systemContext(), std::initializer_list<nx::Uuid>({
         d.specialPowerUsers.id, /*user*/ d.specialViewer->getId()})));
 }
 
 TEST_F(UserManagementHelpersTest, groupNames)
 {
-    EXPECT_EQ(userGroupNames(systemContext(), std::initializer_list<QnUuid>({
-        d.specialWorkers.id, /*invalid*/ QnUuid{}, d.specialPowerUsers.id, d.specialViewers.id})),
+    EXPECT_EQ(userGroupNames(systemContext(), std::initializer_list<nx::Uuid>({
+        d.specialWorkers.id, /*invalid*/ nx::Uuid{}, d.specialPowerUsers.id, d.specialViewers.id})),
         QStringList({d.specialWorkers.name, d.specialPowerUsers.name, d.specialViewers.name}));
 
     EXPECT_EQ(userGroupNames(d.specialAdministrator), QStringList(
@@ -132,13 +132,13 @@ TEST_F(UserManagementHelpersTest, groupsWithParents)
     const auto group5 = createUserGroup("Group 5", group3.id);
 
     EXPECT_EQ(userGroupsWithParents(systemContext(),
-        std::initializer_list<QnUuid>({group4.id, d.specialPowerUsers.id})),
-        QSet<QnUuid>({group4.id, group3.id, group2.id, group1.id,
+        std::initializer_list<nx::Uuid>({group4.id, d.specialPowerUsers.id})),
+        QSet<nx::Uuid>({group4.id, group3.id, group2.id, group1.id,
             d.specialPowerUsers.id, d.specialWorkers.id, kPowerUsersGroupId}));
 
     EXPECT_EQ(userGroupsWithParents(systemContext(),
-        std::initializer_list<QnUuid>({group5.id, d.specialViewers.id})),
-        QSet<QnUuid>({group5.id, group3.id, group1.id,
+        std::initializer_list<nx::Uuid>({group5.id, d.specialViewers.id})),
+        QSet<nx::Uuid>({group5.id, group3.id, group1.id,
             d.specialViewers.id, d.specialWorkers.id, kViewersGroupId}));
 }
 

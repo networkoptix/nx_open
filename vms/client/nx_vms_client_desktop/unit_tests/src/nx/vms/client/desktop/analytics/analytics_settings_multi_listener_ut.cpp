@@ -44,7 +44,7 @@ protected:
 
     void whenDeviceAgentEnabled(const AnalyticsEngineResourcePtr& engine, bool value = true)
     {
-        QnUuidSet enabledEngines = m_camera->enabledAnalyticsEngines();
+        UuidSet enabledEngines = m_camera->enabledAnalyticsEngines();
         if (value)
             enabledEngines.insert(engine->getId());
         else
@@ -55,7 +55,7 @@ protected:
     AnalyticsEngineResourcePtr givenCompatibleEngine()
     {
         auto engine = addEngine();
-        QnUuidSet compatibleEngines = m_camera->compatibleAnalyticsEngines();
+        UuidSet compatibleEngines = m_camera->compatibleAnalyticsEngines();
         compatibleEngines.insert(engine->getId());
         m_camera->setCompatibleAnalyticsEngines(compatibleEngines);
         return engine;

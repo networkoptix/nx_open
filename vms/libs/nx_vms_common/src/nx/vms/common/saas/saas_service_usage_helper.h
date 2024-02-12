@@ -53,25 +53,25 @@ public:
      */
     bool isOverflow() const;
 
-    //std::set<QnUuid> usedDevices() const;
+    //std::set<nx::Uuid> usedDevices() const;
 
     /*
      * @return Information about cameras which consume SAAS integration services.
      * key - serviceId, value - the physicalId list of consumed cameras.
      */
-    std::map<QnUuid, std::set<QString>> camerasByService() const;
+    std::map<nx::Uuid, std::set<QString>> camerasByService() const;
 
     struct Propose
     {
-        QnUuid resourceId;
-        QSet<QnUuid> integrations;
+        nx::Uuid resourceId;
+        QSet<nx::Uuid> integrations;
     };
 
     /* Propose change in integration usage for some resource.
      *  @param resourceId Resource Id.
      *  @param integrations Set of used integration.
      */
-    void proposeChange(const QnUuid& resourceId, const QSet<QnUuid>& integrations);
+    void proposeChange(const nx::Uuid& resourceId, const QSet<nx::Uuid>& integrations);
 
     void proposeChange(const std::vector<Propose>& data);
 
@@ -116,27 +116,27 @@ public:
      * @return Information about available license usages per service.
      *     key - serviceId, value - service usage info.
      */
-    std::map<QnUuid, nx::vms::api::LicenseSummaryData> allInfoByService() const;
+    std::map<nx::Uuid, nx::vms::api::LicenseSummaryData> allInfoByService() const;
 
     /*
      * @return Information about cameras which consumes SAAS services.
      * key - camera physicalId, value - serviceId. If there is not enough services for some camera
      * then the service value is an empty UUID.
      */
-    std::map<QString, QnUuid> servicesByCameras() const;
+    std::map<QString, nx::Uuid> servicesByCameras() const;
 
     /* Propose change that resources are used for cloud storage.
      *  @param devices New full set of resources that is going to be used.
      */
-    void setUsedDevices(const QSet<QnUuid>& devices);
+    void setUsedDevices(const QSet<nx::Uuid>& devices);
 
     /* Propose change that resources are used for cloud storage. Contains delta only.
      *  @param devicesToAdd New devices to  add to the list.
      *  @param devicesToRemove Devices to  remove from the list.
      */
     void proposeChange(
-        const std::set<QnUuid>& devicesToAdd,
-        const std::set<QnUuid>& devicesToRemove);
+        const std::set<nx::Uuid>& devicesToAdd,
+        const std::set<nx::Uuid>& devicesToRemove);
 
     void invalidateCache();
 
@@ -154,7 +154,7 @@ private:
         bool operator<(const ServiceInfo& other) const;
 
         int megapixels = 0;
-        QnUuid serviceId;
+        nx::Uuid serviceId;
     };
 
     //Summary by megapixels and serviceId.
@@ -177,7 +177,7 @@ public:
      *     key - serviceId, value - camera physicalId list. If there is not enough services for some camera
      *     then the service value is an empty UUID.
      */
-    std::map<QnUuid, std::set<QString>> camerasByService() const;
+    std::map<nx::Uuid, std::set<QString>> camerasByService() const;
 
 };
 

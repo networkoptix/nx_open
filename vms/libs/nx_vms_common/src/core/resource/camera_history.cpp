@@ -122,7 +122,7 @@ void QnCameraHistoryPool::checkCameraHistoryDelayed(QnSecurityCamResourcePtr cam
         return;
     }
 
-    QnUuid id = cam->getId();
+    nx::Uuid id = cam->getId();
     if (m_camerasToCheck.contains(id))
         return;
     m_camerasToCheck << cam->getId();
@@ -167,7 +167,7 @@ void QnCameraHistoryPool::setMessageProcessor(QnCommonMessageProcessor* messageP
                         || healthMessage == MessageType::remoteArchiveSyncError)
                     {
                         auto eventParams = businessAction->getRuntimeParams();
-                        QSet<QnUuid> cameras;
+                        QSet<nx::Uuid> cameras;
 
                         if (healthMessage == MessageType::remoteArchiveSyncError)
                         {
@@ -213,7 +213,7 @@ bool QnCameraHistoryPool::isCameraHistoryValid(const QnSecurityCamResourcePtr& c
     return m_historyValidCameras.contains(camera->getId());
 }
 
-void QnCameraHistoryPool::invalidateCameraHistory(const QnUuid &cameraId) {
+void QnCameraHistoryPool::invalidateCameraHistory(const nx::Uuid &cameraId) {
     bool notify = false;
 
     std::optional<AsyncRequestInfo> requestToTerminate;
@@ -265,7 +265,7 @@ QnCameraHistoryPool::StartResult QnCameraHistoryPool::updateCameraHistoryAsync(
 
     // TODO: #sivanov Resource context should have access to the corresponding rest connection.
     // Message bus connection exists on the server side and in the main client context.
-    const QnUuid serverId = m_context->messageBusConnection()
+    const nx::Uuid serverId = m_context->messageBusConnection()
         ? m_context->messageBusConnection()->moduleInformation().id
         : camera->getParentId();
     auto server = resourcePool()->getResourceById<QnMediaServerResource>(serverId);
@@ -359,7 +359,7 @@ void QnCameraHistoryPool::at_cameraPrepared(
     if (!requestFound)
         return; //< request has been canceled
 
-    QSet<QnUuid> loadedCamerasIds;
+    QSet<nx::Uuid> loadedCamerasIds;
     if (success) {
         for (const auto &detail: periods)
         {
@@ -373,18 +373,18 @@ void QnCameraHistoryPool::at_cameraPrepared(
     if (callback)
         callback(success);
 
-    for (const QnUuid &cameraId: loadedCamerasIds)
+    for (const nx::Uuid &cameraId: loadedCamerasIds)
         if (QnSecurityCamResourcePtr camera = toCamera(cameraId))
             emit cameraHistoryChanged(camera);
 }
 
-QnMediaServerResourceList QnCameraHistoryPool::getCameraFootageData(const QnUuid &cameraId, bool filterOnlineServers) const
+QnMediaServerResourceList QnCameraHistoryPool::getCameraFootageData(const nx::Uuid &cameraId, bool filterOnlineServers) const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     return getCameraFootageDataUnsafe(cameraId, filterOnlineServers);
 }
 
-QnMediaServerResourceList QnCameraHistoryPool::getCameraFootageDataUnsafe(const QnUuid &cameraId, bool filterOnlineServers) const
+QnMediaServerResourceList QnCameraHistoryPool::getCameraFootageDataUnsafe(const nx::Uuid &cameraId, bool filterOnlineServers) const
 {
     QnMediaServerResourceList result;
     for (const auto& [serverId, cameraIds]: nx::utils::keyValueRange(m_archivedCamerasByServer))
@@ -477,12 +477,12 @@ nx::vms::api::CameraHistoryItemDataList QnCameraHistoryPool::filterOnlineServers
     return result;
 }
 
-QnSecurityCamResourcePtr QnCameraHistoryPool::toCamera(const QnUuid& guid) const
+QnSecurityCamResourcePtr QnCameraHistoryPool::toCamera(const nx::Uuid& guid) const
 {
     return resourcePool()->getResourceById<QnSecurityCamResource>(guid);
 }
 
-QnMediaServerResourcePtr QnCameraHistoryPool::toMediaServer(const QnUuid& guid) const
+QnMediaServerResourcePtr QnCameraHistoryPool::toMediaServer(const nx::Uuid& guid) const
 {
     return resourcePool()->getResourceById<QnMediaServerResource>(guid);
 }
@@ -571,7 +571,7 @@ QnMediaServerResourcePtr QnCameraHistoryPool::getNextMediaServerAndPeriodOnTime(
     return toMediaServer(detailItr->serverGuid);
 }
 
-nx::vms::api::CameraHistoryItemDataList QnCameraHistoryPool::getHistoryDetails(const QnUuid& cameraId, bool* isValid)
+nx::vms::api::CameraHistoryItemDataList QnCameraHistoryPool::getHistoryDetails(const nx::Uuid& cameraId, bool* isValid)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     *isValid = m_historyValidCameras.contains(cameraId) &&
@@ -580,7 +580,7 @@ nx::vms::api::CameraHistoryItemDataList QnCameraHistoryPool::getHistoryDetails(c
 }
 
 bool QnCameraHistoryPool::isValidHistoryDetails(
-    const QnUuid& cameraId,
+    const nx::Uuid& cameraId,
     const nx::vms::api::CameraHistoryItemDataList& historyDetails) const
 {
     QnSecurityCamResourcePtr camera = toCamera(cameraId);
@@ -597,16 +597,16 @@ bool QnCameraHistoryPool::isValidHistoryDetails(
 }
 
 bool QnCameraHistoryPool::testAndSetHistoryDetails(
-    const QnUuid& cameraId,
+    const nx::Uuid& cameraId,
     const nx::vms::api::CameraHistoryItemDataList& historyDetails)
 {
-    QSet<QnUuid> serverList;
+    QSet<nx::Uuid> serverList;
     for (const auto& value: historyDetails)
         serverList.insert(value.serverGuid);
 
     NX_MUTEX_LOCKER lock( &m_mutex );
 
-    QSet<QnUuid> currentServerList;
+    QSet<nx::Uuid> currentServerList;
     for (const auto& server: getCameraFootageDataUnsafe(cameraId, true))
         currentServerList.insert(server->getId());
     if (currentServerList != serverList)
@@ -627,8 +627,8 @@ bool QnCameraHistoryPool::testAndSetHistoryDetails(
 void QnCameraHistoryPool::resetServerFootageData(
     const nx::vms::api::ServerFootageDataList& cameraHistoryList)
 {
-    QSet<QnUuid> localHistoryValidCameras;
-    QSet<QnUuid> allCameras;
+    QSet<nx::Uuid> localHistoryValidCameras;
+    QSet<nx::Uuid> allCameras;
     {
         NX_MUTEX_LOCKER lock(&m_mutex);
         m_archivedCamerasByServer.clear();
@@ -657,7 +657,7 @@ void QnCameraHistoryPool::resetServerFootageData(
 }
 
 void QnCameraHistoryPool::setServerFootageData(
-    const QnUuid& serverGuid, const std::vector<QnUuid>& cameras)
+    const nx::Uuid& serverGuid, const std::vector<nx::Uuid>& cameras)
 {
     {
         NX_MUTEX_LOCKER lock(&m_mutex);
@@ -683,7 +683,7 @@ void QnCameraHistoryPool::setServerFootageData(
     setServerFootageData(serverFootageData.serverGuid, serverFootageData.archivedCameras);
 }
 
-QSet<QnUuid> QnCameraHistoryPool::getServerFootageData(const QnUuid& serverGuid) const
+QSet<nx::Uuid> QnCameraHistoryPool::getServerFootageData(const nx::Uuid& serverGuid) const
 {
     NX_MUTEX_LOCKER lock( &m_mutex );
     return m_archivedCamerasByServer.value(serverGuid);

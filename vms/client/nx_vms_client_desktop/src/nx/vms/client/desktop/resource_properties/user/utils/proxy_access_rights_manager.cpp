@@ -17,7 +17,7 @@ using namespace nx::core::access;
 struct ProxyAccessRightsManager::Private
 {
     const QPointer<AbstractAccessRightsManager> sourceManager;
-    QnUuid currentSubjectId;
+    nx::Uuid currentSubjectId;
     std::optional<ResourceAccessMap> accessMapOverride;
 };
 
@@ -32,7 +32,7 @@ ProxyAccessRightsManager::ProxyAccessRightsManager(
         return;
 
     connect(d->sourceManager, &AbstractAccessRightsManager::ownAccessRightsChanged, this,
-        [this](QSet<QnUuid> subjectIds)
+        [this](QSet<nx::Uuid> subjectIds)
         {
             NX_VERBOSE(this, "Access rights changed remotely for subject %1", subjectIds);
 
@@ -66,12 +66,12 @@ ProxyAccessRightsManager::~ProxyAccessRightsManager()
     // Required here for forward-declared scoped pointer destruction.
 }
 
-QnUuid ProxyAccessRightsManager::currentSubjectId() const
+nx::Uuid ProxyAccessRightsManager::currentSubjectId() const
 {
     return d->currentSubjectId;
 }
 
-void ProxyAccessRightsManager::setCurrentSubjectId(const QnUuid& value)
+void ProxyAccessRightsManager::setCurrentSubjectId(const nx::Uuid& value)
 {
     if (d->currentSubjectId == value)
         return;
@@ -86,7 +86,7 @@ void ProxyAccessRightsManager::setCurrentSubjectId(const QnUuid& value)
         emit ownAccessRightsChanged({oldSubjectId});
 }
 
-ResourceAccessMap ProxyAccessRightsManager::ownResourceAccessMap(const QnUuid& subjectId) const
+ResourceAccessMap ProxyAccessRightsManager::ownResourceAccessMap(const nx::Uuid& subjectId) const
 {
     if (subjectId == d->currentSubjectId && d->accessMapOverride)
         return *d->accessMapOverride;

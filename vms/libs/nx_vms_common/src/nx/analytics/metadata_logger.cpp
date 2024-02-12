@@ -23,8 +23,8 @@ static const QString kIndent = "    ";
 /** @return Empty string on error, having logged the error message. */
 QString makeLogFileName(
     const QString& logFilePrefix,
-    QnUuid deviceId,
-    QnUuid engineId,
+    nx::Uuid deviceId,
+    nx::Uuid engineId,
     nx::vms::api::StreamIndex streamIndex)
 {
     const QString analyticsLoggingPath = loggingIni().analyticsLogPath;
@@ -155,8 +155,8 @@ static QString buildAdditionalInfoStr(const char* const func, const QString& add
 
 MetadataLogger::MetadataLogger(
     const QString& logFilePrefix,
-    QnUuid deviceId,
-    QnUuid engineId,
+    nx::Uuid deviceId,
+    nx::Uuid engineId,
     nx::vms::api::StreamIndex streamIndex)
 {
     if (!loggingIni().isLoggingEnabled())

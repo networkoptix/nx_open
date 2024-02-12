@@ -15,13 +15,13 @@ void UserDataDeprecated::fillId()
     if (isCloud)
     {
         if (!email.isEmpty())
-            id = QnUuid::fromArbitraryData(email);
+            id = nx::Uuid::fromArbitraryData(email);
         else
-            id = QnUuid();
+            id = nx::Uuid();
     }
     else
     {
-        id = QnUuid::createUuid();
+        id = nx::Uuid::createUuid();
     }
 }
 
@@ -56,7 +56,7 @@ UserData UserDataDeprecated::toUserData() const
     return {std::move(newUserData)};
 }
 
-std::optional<QnUuid> UserDataDeprecated::permissionPresetToGroupId(GlobalPermissionsDeprecated preset)
+std::optional<nx::Uuid> UserDataDeprecated::permissionPresetToGroupId(GlobalPermissionsDeprecated preset)
 {
     if (preset == GlobalPermissionDeprecated::admin
         || preset == GlobalPermissionDeprecated::adminPermissions)
@@ -76,7 +76,7 @@ std::optional<QnUuid> UserDataDeprecated::permissionPresetToGroupId(GlobalPermis
     return std::nullopt;
 }
 
-GlobalPermissionsDeprecated UserDataDeprecated::groupIdToPermissionPreset(const QnUuid& id)
+GlobalPermissionsDeprecated UserDataDeprecated::groupIdToPermissionPreset(const nx::Uuid& id)
 {
     if (id == kPowerUsersGroupId)
         return GlobalPermissionDeprecated::adminPermissions;

@@ -76,7 +76,7 @@ private:
     QString getResourceName(const QnResourcePtr& resource) const;
 
     bool hasVideoLink(const EventLogModelData& data) const;
-    bool hasAccessToArchive(const QnUuid& cameraId) const;
+    bool hasAccessToArchive(const nx::Uuid& cameraId) const;
 
 private:
     QList<Column> m_columns;

@@ -91,7 +91,7 @@ protected:
     * Returns event source to display in notification tile and tooltip.
     * Keep in sync with AbstractEvent.getResource().
     */
-    QnUuid sourceId() const;
+    nx::Uuid sourceId() const;
 
 private:
     std::chrono::microseconds m_timestamp = std::chrono::microseconds::zero();

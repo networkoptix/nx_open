@@ -23,7 +23,7 @@ public:
     QnMediaServerResourcePtr currentServer() const;
 
     void addServer(const QnMediaServerResourcePtr& currentServer);
-    void removeServer(const QnUuid& id);
+    void removeServer(const nx::Uuid& id);
 
 signals:
     void currentServerChanged(const QnMediaServerResourcePtr& previousServer);
@@ -33,7 +33,7 @@ private:
 
     QAction* addMenuItemForServer(const QnMediaServerResourcePtr& server);
 
-    QAction* actionForServer(const QnUuid& id);
+    QAction* actionForServer(const nx::Uuid& id);
 
     void handleSelectedServerOnlineStatusChanged();
 

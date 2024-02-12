@@ -96,7 +96,7 @@ void ShowreelExecutor::updateShowreel(const nx::vms::api::ShowreelData& showreel
         m_showreel.currentIndex = 0;
 }
 
-void ShowreelExecutor::stopShowreel(const QnUuid& id)
+void ShowreelExecutor::stopShowreel(const nx::Uuid& id)
 {
     if (m_mode == Mode::multipleLayouts && m_showreel.id == id)
     {
@@ -112,11 +112,11 @@ void ShowreelExecutor::startSingleLayoutShowreel()
     startTimer();
 }
 
-QnUuid ShowreelExecutor::runningShowreel() const
+nx::Uuid ShowreelExecutor::runningShowreel() const
 {
     if (m_mode == Mode::multipleLayouts)
         return m_showreel.id;
-    return QnUuid();
+    return nx::Uuid();
 }
 
 void ShowreelExecutor::prevShowreelStep()
@@ -160,10 +160,10 @@ void ShowreelExecutor::stopCurrentShowreel()
             setHintVisible(false);
             m_showreel.currentIndex = 0;
             NX_ASSERT(!m_showreel.id.isNull());
-            const QnUuid showreelId = m_showreel.id;
-            m_showreel.id = QnUuid();
+            const nx::Uuid showreelId = m_showreel.id;
+            m_showreel.id = nx::Uuid();
             // We don't want to restart Showreel cyclically.
-            m_lastState.runningTourId = QnUuid();
+            m_lastState.runningTourId = nx::Uuid();
             resetShowreelItems({});
             restoreWorkbenchState(showreelId);
             break;
@@ -332,7 +332,7 @@ void ShowreelExecutor::clearWorkbenchState()
     workbench()->clear();
 }
 
-void ShowreelExecutor::restoreWorkbenchState(const QnUuid& tourId)
+void ShowreelExecutor::restoreWorkbenchState(const nx::Uuid& tourId)
 {
     workbench()->clear();
 

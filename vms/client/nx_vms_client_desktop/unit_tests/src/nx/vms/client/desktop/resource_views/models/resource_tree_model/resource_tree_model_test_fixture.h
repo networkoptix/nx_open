@@ -55,7 +55,7 @@ protected:
     void setSystemName(const QString& name) const;
 
     QnUserResourcePtr addUser(const QString& name,
-        const std::optional<QnUuid>& groupId = std::nullopt) const;
+        const std::optional<nx::Uuid>& groupId = std::nullopt) const;
     ServerResourcePtr addServer(const QString& name) const;
     QnMediaServerResourcePtr addEdgeServer(const QString& name, const QString& address) const;
     QnMediaServerResourcePtr addFakeServer(const QString& name) const;
@@ -63,13 +63,13 @@ protected:
     QnFileLayoutResourcePtr addFileLayout(const QString& path,
         bool isEncrypted = false) const;
     LayoutResourcePtr addLayout(const QString& name,
-        const QnUuid& parentId = QnUuid()) const;
+        const nx::Uuid& parentId = nx::Uuid()) const;
 
     QnWebPageResourcePtr addWebPage(const QString& name, WebPageSubtype subtype) const;
     QnWebPageResourcePtr addProxiedWebPage(
         const QString& name,
         WebPageSubtype subtype,
-        const QnUuid& serverId) const;
+        const nx::Uuid& serverId) const;
 
     QnVideoWallResourcePtr addVideoWall(const QString& name) const;
     QnVideoWallItem addVideoWallScreen(
@@ -86,28 +86,28 @@ protected:
         const QnVideoWallMatrix& matrix) const;
 
     nx::vms::api::ShowreelData addShowreel(const QString& name,
-        const QnUuid& parentId = QnUuid()) const;
+        const nx::Uuid& parentId = nx::Uuid()) const;
     QnVirtualCameraResourcePtr addCamera(
         const QString& name,
-        const QnUuid& parentId = QnUuid(),
+        const nx::Uuid& parentId = nx::Uuid(),
         const QString& hostAddress = QString()) const;
     QnVirtualCameraResourcePtr addEdgeCamera(
         const QString& name, const QnMediaServerResourcePtr& edgeServer) const;
     QnVirtualCameraResourcePtr addVirtualCamera(const QString& name,
-        const QnUuid& parentId = QnUuid()) const;
+        const nx::Uuid& parentId = nx::Uuid()) const;
     QnVirtualCameraResourcePtr addIOModule(const QString& name,
-        const QnUuid& parentId = QnUuid()) const;
+        const nx::Uuid& parentId = nx::Uuid()) const;
     QnVirtualCameraResourcePtr addRecorderCamera(const QString& name,
-        const QString& groupId, const QnUuid& parentId = QnUuid()) const;
+        const QString& groupId, const nx::Uuid& parentId = nx::Uuid()) const;
     QnVirtualCameraResourcePtr addMultisensorSubCamera(const QString& name,
-        const QString& groupId, const QnUuid& parentId = QnUuid()) const;
+        const QString& groupId, const nx::Uuid& parentId = nx::Uuid()) const;
     QnVirtualCameraResourcePtr addIntercomCamera(
         const QString& name,
-        const QnUuid& parentId = QnUuid(),
+        const nx::Uuid& parentId = nx::Uuid(),
         const QString& hostAddress = QString()) const;
     LayoutResourcePtr addIntercomLayout(
         const QString& name,
-        const QnUuid& parentId = QnUuid()) const;
+        const nx::Uuid& parentId = nx::Uuid()) const;
     void removeCamera(const QnVirtualCameraResourcePtr& camera) const;
 
     void addToLayout(const QnLayoutResourcePtr& layout, const QnResourceList& resources) const;
@@ -115,7 +115,7 @@ protected:
         const QnVideoWallResourcePtr& videoWall,
         const QnVideoWallItem& videoWallScreen,
         bool isOnline,
-        const QnUuid& controlledBy = QnUuid());
+        const nx::Uuid& controlledBy = nx::Uuid());
 
     void setupAccessToResourceForUser(
         const QnUserResourcePtr& user,
@@ -129,7 +129,7 @@ protected:
 
     void setupAccessToObjectForUser(
         const QnUserResourcePtr& user,
-        const QnUuid& resourceOrGroupId,
+        const nx::Uuid& resourceOrGroupId,
         nx::vms::api::AccessRights accessRights) const;
 
     void setupAllMediaAccess(
@@ -138,7 +138,7 @@ protected:
     void setupControlAllVideoWallsAccess(const QnUserResourcePtr& user) const;
 
     QnUserResourcePtr loginAs(const QString& name,
-        const std::optional<QnUuid>& groupId = std::nullopt) const;
+        const std::optional<nx::Uuid>& groupId = std::nullopt) const;
     QnUserResourcePtr loginAsAdministrator(const QString& name) const;
     QnUserResourcePtr loginAsPowerUser(const QString& name) const;
     QnUserResourcePtr loginAsLiveViewer(const QString& name) const;

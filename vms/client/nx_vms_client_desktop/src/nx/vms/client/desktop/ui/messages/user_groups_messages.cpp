@@ -52,7 +52,7 @@ QIcon iconForGroup(const nx::vms::api::UserGroupData& group)
     }
 }
 
-QWidget* createGroupListWidget(QnSessionAwareMessageBox* parent, const QSet<QnUuid>& groups)
+QWidget* createGroupListWidget(QnSessionAwareMessageBox* parent, const QSet<nx::Uuid>& groups)
 {
     auto groupList = new GroupListWidget(parent);
 
@@ -82,7 +82,7 @@ QWidget* createGroupListWidget(QnSessionAwareMessageBox* parent, const QSet<QnUu
 
 namespace nx::vms::client::desktop::ui::messages {
 
-bool UserGroups::removeGroups(QWidget* parent, const QSet<QnUuid>& groups, bool allowSilent)
+bool UserGroups::removeGroups(QWidget* parent, const QSet<nx::Uuid>& groups, bool allowSilent)
 {
     if (allowSilent)
     {

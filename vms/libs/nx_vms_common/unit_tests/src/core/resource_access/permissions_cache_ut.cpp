@@ -33,11 +33,11 @@ protected:
     {
         // Generate predefined set of Access Subjects Ids.
         std::generate_n(std::back_inserter(subjectIdPool),
-            kOverallSubjectsCount, QnUuid::createUuid);
+            kOverallSubjectsCount, nx::Uuid::createUuid);
 
         // Generate predefined set of resource Ids.
         std::generate_n(std::back_inserter(resourceIdPool),
-            kResourcesCount - kUserSubjectsCount, QnUuid::createUuid);
+            kResourcesCount - kUserSubjectsCount, nx::Uuid::createUuid);
 
         // Where some Ids are supposed to be User resource Ids, i.e are Access Subjects too.
         std::copy_n(subjectIdPool.cbegin(), kUserSubjectsCount,
@@ -56,12 +56,12 @@ protected:
         resourceIdPool.resize(0);
     }
 
-    static std::vector<QnUuid> subjectIdPool;
-    static std::vector<QnUuid> resourceIdPool;
+    static std::vector<nx::Uuid> subjectIdPool;
+    static std::vector<nx::Uuid> resourceIdPool;
 };
 
-std::vector<QnUuid> PermissionsCacheTest::subjectIdPool = {};
-std::vector<QnUuid> PermissionsCacheTest::resourceIdPool = {};
+std::vector<nx::Uuid> PermissionsCacheTest::subjectIdPool = {};
+std::vector<nx::Uuid> PermissionsCacheTest::resourceIdPool = {};
 
 TEST_F(PermissionsCacheTest, fillPerItemSubjectFirst)
 {
@@ -134,8 +134,8 @@ TEST_F(PermissionsCacheTest, returnsNullValueByDefault)
 {
     PermissionsCache cache;
 
-    const auto subjectId = QnUuid::createUuid();
-    const auto resourceId = QnUuid::createUuid();
+    const auto subjectId = nx::Uuid::createUuid();
+    const auto resourceId = nx::Uuid::createUuid();
 
     ASSERT_FALSE(bool(cache.permissions(subjectId, resourceId)));
 }
@@ -144,8 +144,8 @@ TEST_F(PermissionsCacheTest, returnsValueThatWasStored)
 {
     PermissionsCache cache;
 
-    const auto subjectId = QnUuid::createUuid();
-    const auto resourceId = QnUuid::createUuid();
+    const auto subjectId = nx::Uuid::createUuid();
+    const auto resourceId = nx::Uuid::createUuid();
 
     Permissions permissions = {Permission::RemovePermission, Permission::ViewContentPermission};
     cache.setPermissions(subjectId, resourceId, permissions);
@@ -157,8 +157,8 @@ TEST_F(PermissionsCacheTest, returnsTrueIfValueModifiedFalseIfNot)
 {
     PermissionsCache cache;
 
-    const auto subjectId = QnUuid::createUuid();
-    const auto resourceId = QnUuid::createUuid();
+    const auto subjectId = nx::Uuid::createUuid();
+    const auto resourceId = nx::Uuid::createUuid();
 
     const Permissions permissions =
         {Permission::RemovePermission, Permission::ViewContentPermission};
@@ -182,8 +182,8 @@ TEST_F(PermissionsCacheTest, returnsTrueOnlyIfSomethingWasRemoved)
 {
     PermissionsCache cache;
 
-    const auto subjectId = QnUuid::createUuid();
-    const auto resourceId = QnUuid::createUuid();
+    const auto subjectId = nx::Uuid::createUuid();
+    const auto resourceId = nx::Uuid::createUuid();
 
     const Permissions permissions =
         {Permission::RemovePermission, Permission::ViewContentPermission};
@@ -200,8 +200,8 @@ TEST_F(PermissionsCacheTest, noPermissionsIsNotNullValue)
 {
     PermissionsCache cache;
 
-    const auto subjectId = QnUuid::createUuid();
-    const auto resourceId = QnUuid::createUuid();
+    const auto subjectId = nx::Uuid::createUuid();
+    const auto resourceId = nx::Uuid::createUuid();
 
     // Store new with NoPermissions (0) value, setter returns true.
     ASSERT_TRUE(cache.setPermissions(subjectId, resourceId, NoPermissions));

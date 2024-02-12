@@ -196,7 +196,7 @@ void QnWorkbenchResourcesSettingsHandler::at_userGroupsAction_triggered()
 {
     const auto parameters = menu()->currentParameters(sender());
     const auto parent = utils::extractParentWidget(parameters, mainWindowWidget());
-    const auto groupId = parameters.argument(Qn::UuidRole).value<QnUuid>();
+    const auto groupId = parameters.argument(Qn::UuidRole).value<nx::Uuid>();
 
     if (groupId.isNull())
         context()->settingsDialogManager()->createGroup(parent);

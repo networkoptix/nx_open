@@ -89,8 +89,8 @@ public:
             return false;
 
         // We can't restore Workbench state until all resources are loaded.
-        m_state.currentLayoutId = QnUuid(state.value(kCurrentLayoutId).toString());
-        m_state.runningTourId = QnUuid(state.value(kRunningTourId).toString());
+        m_state.currentLayoutId = nx::Uuid(state.value(kCurrentLayoutId).toString());
+        m_state.runningTourId = nx::Uuid(state.value(kRunningTourId).toString());
         QJson::deserialize(state.value(kLayoutUuids), &m_state.layoutUuids);
         return true;
     }
@@ -490,7 +490,7 @@ void Workbench::setCurrentLayoutIndex(int index)
     setCurrentLayout(d->layouts[std::clamp<int>(0, index, d->layouts.size())].get());
 }
 
-void Workbench::addSystem(QnUuid systemId, const LogonData& logonData)
+void Workbench::addSystem(nx::Uuid systemId, const LogonData& logonData)
 {
     if (!ini().enableMultiSystemTabBar)
         return;
@@ -601,7 +601,7 @@ void Workbench::setCurrentLayout(QnWorkbenchLayout* layout)
     }
 
     // Set up a new layout.
-    const auto activeItemUuid = d->currentLayout->data(Qn::LayoutActiveItemRole).value<QnUuid>();
+    const auto activeItemUuid = d->currentLayout->data(Qn::LayoutActiveItemRole).value<nx::Uuid>();
     if (!activeItemUuid.isNull())
         setItem(Qn::ActiveRole, d->currentLayout->item(activeItemUuid));
 
@@ -827,7 +827,7 @@ void Workbench::update(const WorkbenchState& state)
     if (!state.currentLayoutId.isNull())
     {
         auto restoreCurrentLayout =
-            [this](const QnResourcePool* pool, const QnUuid id)
+            [this](const QnResourcePool* pool, const nx::Uuid id)
             {
                 const LayoutResourcePtr& layout = pool->getResourceById<LayoutResource>(id);
                 if (!layout)
@@ -890,7 +890,7 @@ void Workbench::submit(WorkbenchState& state)
             return videoWall->getId();
         }
 
-        const auto tourId = layout->data(Qn::ShowreelUuidRole).value<QnUuid>();
+        const auto tourId = layout->data(Qn::ShowreelUuidRole).value<nx::Uuid>();
         return tourId.isNull() ? layout->getId() : tourId;
     };
 

@@ -16,7 +16,7 @@ public:
 
     ResourceAccessResolverTestFixture()
     {
-        qRegisterMetaType<QSet<QnUuid>>();
+        qRegisterMetaType<QSet<nx::Uuid>>();
     }
 
     virtual AbstractResourceAccessResolver* createResolver() const = 0;
@@ -44,7 +44,7 @@ public:
     }
 
 public:
-    const QnUuid kTestSubjectId = QnUuid::createUuid();
+    const nx::Uuid kTestSubjectId = nx::Uuid::createUuid();
     std::unique_ptr<AccessRightsManager> manager;
     std::unique_ptr<AbstractResourceAccessResolver> resolver;
     std::unique_ptr<QSignalSpy> resourceAccessReset;
@@ -66,10 +66,10 @@ public:
     ASSERT_EQ(signalSpy->size(), 1); \
     const auto args = signalSpy->takeFirst(); \
     ASSERT_EQ(args.size(), 1); \
-    ASSERT_EQ(args[0].value<QSet<QnUuid>>(), subjectIds); }
+    ASSERT_EQ(args[0].value<QSet<nx::Uuid>>(), subjectIds); }
 
 #define NX_ASSERT_TEST_SUBJECT_CHANGED() \
-    NX_ASSERT_SIGNAL_ARGS(resourceAccessChanged, QSet<QnUuid>({kTestSubjectId}))
+    NX_ASSERT_SIGNAL_ARGS(resourceAccessChanged, QSet<nx::Uuid>({kTestSubjectId}))
 
 } // namespace test
 } // namespace nx::core::access

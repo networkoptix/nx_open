@@ -35,10 +35,10 @@ std::chrono::microseconds VideoCache::cacheSize() const
     return m_cacheSize;
 }
 
-void VideoCache::setCachedDevices(intptr_t consumerId, const QSet<QnUuid>& value)
+void VideoCache::setCachedDevices(intptr_t consumerId, const QSet<nx::Uuid>& value)
 {
     m_cachedDevices[consumerId] = value;
-    QSet<QnUuid> totalCachedDevices;
+    QSet<nx::Uuid> totalCachedDevices;
 
     for (const auto& subset: m_cachedDevices)
         totalCachedDevices += subset;
@@ -46,7 +46,7 @@ void VideoCache::setCachedDevices(intptr_t consumerId, const QSet<QnUuid>& value
     setCachedDevices(totalCachedDevices);
 }
 
-void VideoCache::setCachedDevices(const QSet<QnUuid>& value)
+void VideoCache::setCachedDevices(const QSet<nx::Uuid>& value)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     for (auto itr = m_cache.begin(); itr != m_cache.end();)
@@ -61,7 +61,7 @@ void VideoCache::setCachedDevices(const QSet<QnUuid>& value)
 }
 
 QImage VideoCache::image(
-    const QnUuid& resourceId,
+    const nx::Uuid& resourceId,
     std::chrono::microseconds timestamp,
     std::chrono::microseconds* outImageTimestamp) const
 {
@@ -98,7 +98,7 @@ QImage VideoCache::image(
     return (*itr)->toImage();
 }
 
-void VideoCache::add(const QnUuid& resourceId, const CLConstVideoDecoderOutputPtr& frame)
+void VideoCache::add(const nx::Uuid& resourceId, const CLConstVideoDecoderOutputPtr& frame)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     auto itr = m_cache.find(resourceId);

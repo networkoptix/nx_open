@@ -16,7 +16,7 @@ nx::vms::common::LayoutItemData layoutItemFromResource(
 {
     nx::vms::common::LayoutItemData data;
 
-    data.uuid = QnUuid::createUuid();
+    data.uuid = nx::Uuid::createUuid();
     data.resource = descriptor(resource, forceCloud);
 
     if (auto mediaResource = resource.dynamicCast<QnMediaResource>())

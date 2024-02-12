@@ -40,7 +40,7 @@ namespace {
 bool appropriateSoftwareTriggerRule(
     const nx::vms::event::RulePtr& rule,
     const QnUserResourcePtr& currentUser,
-    const QnUuid& resourceId)
+    const nx::Uuid& resourceId)
 {
     if (rule->isDisabled() || rule->eventType() != nx::vms::api::softwareTriggerEvent)
         return false;
@@ -68,7 +68,7 @@ bool appropriateSoftwareTriggerRule(
 bool appropriateSoftwareTriggerRule(
     const nx::vms::rules::Rule* rule,
     const QnUserResourcePtr& currentUser,
-    QnUuid resourceId)
+    nx::Uuid resourceId)
 {
     if (!rule->enabled())
         return false;
@@ -148,7 +148,7 @@ SoftwareTriggersWatcher::DescriptionPtr SoftwareTriggersWatcher::Description::cr
 
 struct SoftwareTriggersWatcher::Private
 {
-    QnUuid resourceId;
+    nx::Uuid resourceId;
     ServerResourcePtr server;
     DescriptionsHash data;
     AccessController::NotifierHelper accessNotifier;
@@ -180,7 +180,7 @@ SoftwareTriggersWatcher::SoftwareTriggersWatcher(
         connect(rulesEngine, &nx::vms::rules::Engine::rulesReset,
             this, &SoftwareTriggersWatcher::updateTriggers);
         connect(rulesEngine, &nx::vms::rules::Engine::ruleAddedOrUpdated, this,
-            [this, rulesEngine](QnUuid id)
+            [this, rulesEngine](nx::Uuid id)
             {
                 updateTriggerByVmsRule(rulesEngine->rule(id).get());
             });
@@ -204,7 +204,7 @@ SoftwareTriggersWatcher::~SoftwareTriggersWatcher()
     // Required here for forward declared scoped pointer destruction.
 }
 
-void SoftwareTriggersWatcher::setResourceId(const QnUuid& resourceId)
+void SoftwareTriggersWatcher::setResourceId(const nx::Uuid& resourceId)
 {
     if (resourceId == d->resourceId)
         return;
@@ -224,7 +224,7 @@ void SoftwareTriggersWatcher::setResourceId(const QnUuid& resourceId)
     emit resourceIdChanged();
 }
 
-QString SoftwareTriggersWatcher::triggerName(const QnUuid& id) const
+QString SoftwareTriggersWatcher::triggerName(const nx::Uuid& id) const
 {
     if (const auto trigger = findTrigger(id))
         return trigger->name;
@@ -233,7 +233,7 @@ QString SoftwareTriggersWatcher::triggerName(const QnUuid& id) const
     return QString();
 }
 
-bool SoftwareTriggersWatcher::prolongedTrigger(const QnUuid& id) const
+bool SoftwareTriggersWatcher::prolongedTrigger(const nx::Uuid& id) const
 {
     if (const auto trigger = findTrigger(id))
         return trigger->prolonged;
@@ -242,7 +242,7 @@ bool SoftwareTriggersWatcher::prolongedTrigger(const QnUuid& id) const
     return false;
 }
 
-bool SoftwareTriggersWatcher::triggerEnabled(const QnUuid& id) const
+bool SoftwareTriggersWatcher::triggerEnabled(const nx::Uuid& id) const
 {
     if (const auto trigger = findTrigger(id))
         return trigger->enabled;
@@ -251,7 +251,7 @@ bool SoftwareTriggersWatcher::triggerEnabled(const QnUuid& id) const
     return false;
 }
 
-QString SoftwareTriggersWatcher::triggerIcon(const QnUuid& id) const
+QString SoftwareTriggersWatcher::triggerIcon(const nx::Uuid& id) const
 {
     if (const auto trigger = findTrigger(id))
         return trigger->icon;
@@ -260,7 +260,7 @@ QString SoftwareTriggersWatcher::triggerIcon(const QnUuid& id) const
     return QString();
 }
 
-void SoftwareTriggersWatcher::tryRemoveTrigger(const QnUuid& id)
+void SoftwareTriggersWatcher::tryRemoveTrigger(const nx::Uuid& id)
 {
     if (d->data.remove(id))
         emit triggerRemoved(id);
@@ -333,7 +333,7 @@ void SoftwareTriggersWatcher::updateTriggerByVmsRule(const nx::vms::rules::Rule*
     updateTriggerByData(rule->id(), newData);
 }
 
-void SoftwareTriggersWatcher::updateTriggerByData(QnUuid id, const DescriptionPtr& newData)
+void SoftwareTriggersWatcher::updateTriggerByData(nx::Uuid id, const DescriptionPtr& newData)
 {
     if (!newData)
     {
@@ -369,7 +369,7 @@ void SoftwareTriggersWatcher::updateTriggerByData(QnUuid id, const DescriptionPt
     updateTriggerAvailability(id);
 }
 
-void SoftwareTriggersWatcher::updateTriggerAvailability(QnUuid id)
+void SoftwareTriggersWatcher::updateTriggerAvailability(nx::Uuid id)
 {
     const auto description = findTrigger(id);
     if (!description)
@@ -408,7 +408,7 @@ void SoftwareTriggersWatcher::updateTriggerAvailability(QnUuid id)
     emit triggerFieldsChanged(id, EnabledField);
 }
 
-SoftwareTriggersWatcher::DescriptionPtr SoftwareTriggersWatcher::findTrigger(QnUuid id) const
+SoftwareTriggersWatcher::DescriptionPtr SoftwareTriggersWatcher::findTrigger(nx::Uuid id) const
 {
     const auto it = d->data.find(id);
     return (it == d->data.end()) ? DescriptionPtr() : it.value();

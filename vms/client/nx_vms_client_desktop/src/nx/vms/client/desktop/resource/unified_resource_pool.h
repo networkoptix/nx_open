@@ -24,7 +24,7 @@ public:
     QnResourceList resources(ResourceFilter filter = {}) const;
 
     /** Find first matching resource with given id. */
-    QnResourcePtr resource(const QnUuid& id) const;
+    QnResourcePtr resource(const nx::Uuid& id) const;
 
 signals:
     /**

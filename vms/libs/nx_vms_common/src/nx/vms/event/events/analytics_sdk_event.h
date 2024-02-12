@@ -17,17 +17,17 @@ class NX_VMS_COMMON_API AnalyticsSdkEvent: public ProlongedEvent
 public:
     AnalyticsSdkEvent(
         QnResourcePtr resource,
-        QnUuid engineId,
+        nx::Uuid engineId,
         QString eventTypeId,
         EventState toggleState,
         QString caption,
         QString description,
         nx::common::metadata::Attributes attributes,
-        QnUuid objectTrackId,
+        nx::Uuid objectTrackId,
         QString key,
         qint64 timeStampUsec);
 
-    QnUuid engineId() const;
+    nx::Uuid engineId() const;
     const QString& eventTypeId() const;
 
     QString caption() const { return m_caption; }
@@ -44,16 +44,16 @@ public:
     const nx::common::metadata::Attributes& attributes() const;
     const std::optional<QString> attribute(const QString& attributeName) const;
 
-    const QnUuid objectTrackId() const;
+    const nx::Uuid objectTrackId() const;
     const QString& key() const;
 
 private:
-    const QnUuid m_engineId;
+    const nx::Uuid m_engineId;
     const QString m_eventTypeId;
     const QString m_caption;
     const QString m_description;
     const nx::common::metadata::Attributes m_attributes;
-    const QnUuid m_objectTrackId;
+    const nx::Uuid m_objectTrackId;
     const QString m_key;
 };
 

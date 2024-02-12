@@ -19,9 +19,9 @@ namespace {
 static const QString kCloudScheme = "cloud://";
 
 /** System Id placeholder for resources, not bound to any System (e.g. cloud layouts). */
-static const QString kGenericCloudSystemId = QnUuid().toSimpleString();
+static const QString kGenericCloudSystemId = nx::Uuid().toSimpleString();
 
-QString resourcePath(const QnUuid& resourceId, const QString& cloudSystemId)
+QString resourcePath(const nx::Uuid& resourceId, const QString& cloudSystemId)
 {
     if (NX_ASSERT(!cloudSystemId.isEmpty()))
         return nx::format(kCloudScheme + "%1.%2", cloudSystemId, resourceId.toSimpleString());

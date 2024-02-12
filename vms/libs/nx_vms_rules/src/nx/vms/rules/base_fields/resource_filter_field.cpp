@@ -8,7 +8,7 @@ bool ResourceFilterEventField::match(const QVariant& value) const
 {
     return acceptAll()
         ? true
-        : ids().contains(value.value<QnUuid>());
+        : ids().contains(value.value<nx::Uuid>());
 }
 
 QVariant ResourceFilterActionField::build(const AggregatedEventPtr& /*eventData*/) const

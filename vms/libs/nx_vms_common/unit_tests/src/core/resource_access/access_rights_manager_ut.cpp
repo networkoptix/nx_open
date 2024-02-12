@@ -55,13 +55,13 @@ protected:
     std::unique_ptr<QSignalSpy> resetSpy;
     std::unique_ptr<QSignalSpy> changeSpy;
 
-    const QnUuid subject1 = QnUuid::createUuid();
-    const QnUuid subject2 = QnUuid::createUuid();
-    const QnUuid subject3 = QnUuid::createUuid();
+    const nx::Uuid subject1 = nx::Uuid::createUuid();
+    const nx::Uuid subject2 = nx::Uuid::createUuid();
+    const nx::Uuid subject3 = nx::Uuid::createUuid();
 
-    const QnUuid resource1 = QnUuid::createUuid();
-    const QnUuid resource2 = QnUuid::createUuid();
-    const QnUuid resource3 = QnUuid::createUuid();
+    const nx::Uuid resource1 = nx::Uuid::createUuid();
+    const nx::Uuid resource2 = nx::Uuid::createUuid();
+    const nx::Uuid resource3 = nx::Uuid::createUuid();
 
     const ResourceAccessMap testRights1{{resource1, AccessRight::view}};
     const ResourceAccessMap testRights2{{resource2, AccessRight::view | AccessRight::viewArchive},
@@ -110,14 +110,14 @@ TEST_F(AccessRightsManagerTest, set)
     EXPECT_EQ(manager->ownResourceAccessMap(subject1), testRights1);
     EXPECT_TRUE(resetSpy->empty());
     ASSERT_EQ(changeSpy->size(), 1);
-    EXPECT_EQ(changeSpy->takeLast(), makeQVariantList(QSet<QnUuid>{subject1}));
+    EXPECT_EQ(changeSpy->takeLast(), makeQVariantList(QSet<nx::Uuid>{subject1}));
 
     // Modify resource access map for a subject.
     EXPECT_TRUE(manager->setOwnResourceAccessMap(subject1, testRights2));
     EXPECT_EQ(manager->ownResourceAccessMap(subject1), testRights2);
     EXPECT_TRUE(resetSpy->empty());
     ASSERT_EQ(changeSpy->size(), 1);
-    EXPECT_EQ(changeSpy->takeLast(), makeQVariantList(QSet<QnUuid>{subject1}));
+    EXPECT_EQ(changeSpy->takeLast(), makeQVariantList(QSet<nx::Uuid>{subject1}));
 
     // Set the same resource access map for a subject.
     EXPECT_FALSE(manager->setOwnResourceAccessMap(subject1, testRights2));
@@ -153,7 +153,7 @@ TEST_F(AccessRightsManagerTest, remove)
     EXPECT_EQ(manager->ownResourceAccessMap(subject3), ResourceAccessMap());
     EXPECT_TRUE(resetSpy->empty());
     ASSERT_EQ(changeSpy->size(), 1);
-    EXPECT_EQ(changeSpy->takeLast(), makeQVariantList(QSet<QnUuid>{subject1, subject3}));
+    EXPECT_EQ(changeSpy->takeLast(), makeQVariantList(QSet<nx::Uuid>{subject1, subject3}));
 
     // Try to remove subject1 and subject2, but subject1 is already removed. Remove some.
     EXPECT_TRUE(manager->removeSubjects({subject1, subject2}));
@@ -162,7 +162,7 @@ TEST_F(AccessRightsManagerTest, remove)
     EXPECT_EQ(manager->ownResourceAccessMap(subject3), ResourceAccessMap());
     EXPECT_TRUE(resetSpy->empty());
     ASSERT_EQ(changeSpy->size(), 1);
-    EXPECT_EQ(changeSpy->takeLast(), makeQVariantList(QSet<QnUuid>{subject2}));
+    EXPECT_EQ(changeSpy->takeLast(), makeQVariantList(QSet<nx::Uuid>{subject2}));
 
     // Try to remove subject1 and subject2, but both are already removed. Remove none.
     EXPECT_FALSE(manager->removeSubjects({subject1, subject2}));

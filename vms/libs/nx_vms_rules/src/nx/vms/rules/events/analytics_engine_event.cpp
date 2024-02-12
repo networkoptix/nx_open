@@ -11,8 +11,8 @@ AnalyticsEngineEvent::AnalyticsEngineEvent(
     std::chrono::microseconds timestamp,
     const QString& caption,
     const QString& description,
-    QnUuid cameraId,
-    QnUuid engineId)
+    nx::Uuid cameraId,
+    nx::Uuid engineId)
     :
     DescribedEvent(timestamp, caption, description),
     m_cameraId(cameraId),
@@ -20,22 +20,22 @@ AnalyticsEngineEvent::AnalyticsEngineEvent(
 {
 }
 
-QnUuid AnalyticsEngineEvent::cameraId() const
+nx::Uuid AnalyticsEngineEvent::cameraId() const
 {
     return m_cameraId;
 }
 
-void AnalyticsEngineEvent::setCameraId(QnUuid cameraId)
+void AnalyticsEngineEvent::setCameraId(nx::Uuid cameraId)
 {
     m_cameraId = cameraId;
 }
 
-QnUuid AnalyticsEngineEvent::engineId() const
+nx::Uuid AnalyticsEngineEvent::engineId() const
 {
     return m_engineId;
 }
 
-void AnalyticsEngineEvent::setEngineId(QnUuid engineId)
+void AnalyticsEngineEvent::setEngineId(nx::Uuid engineId)
 {
     m_engineId = engineId;
 }

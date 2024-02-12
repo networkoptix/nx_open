@@ -107,8 +107,8 @@ public:
 
             const auto prop = meta.property(propIndex);
             EXPECT_TRUE(prop.isValid());
-            EXPECT_TRUE(prop.userType() == qMetaTypeId<QnUuid>()
-                || prop.userType() == qMetaTypeId<QnUuidList>());
+            EXPECT_TRUE(prop.userType() == qMetaTypeId<nx::Uuid>()
+                || prop.userType() == qMetaTypeId<UuidList>());
         }
     }
 

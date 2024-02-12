@@ -255,7 +255,7 @@ void ClientUpdateTool::setServerUrl(
     nx::vms::common::AbstractCertificateVerifier* certificateVerifier)
 {
     const auto serverId =
-        NX_ASSERT(logonData.expectedServerId) ? *logonData.expectedServerId : QnUuid();
+        NX_ASSERT(logonData.expectedServerId) ? *logonData.expectedServerId : nx::Uuid();
 
     m_serverConnection.reset(
         new rest::ServerConnection(
@@ -815,7 +815,7 @@ QString ClientUpdateTool::downloaderErrorToString(
 
 struct ServerInfo
 {
-    QnUuid id;
+    nx::Uuid id;
     nx::vms::api::ServerFlags flags;
 };
 NX_REFLECTION_INSTRUMENT(ServerInfo, (id)(flags))
@@ -836,13 +836,13 @@ ClientUpdateTool::SystemServersInfo ClientUpdateTool::getSystemServersInfo(
 
     SystemServersInfo result;
 
-    std::vector<std::future<std::optional<QnUuidList>>*> futureList;
+    std::vector<std::future<std::optional<UuidList>>*> futureList;
 
-    std::promise<std::optional<QnUuidList>> installedVersionStorageServersPromise;
+    std::promise<std::optional<UuidList>> installedVersionStorageServersPromise;
     auto installedVersionStorageServersFuture = installedVersionStorageServersPromise.get_future();
-    std::promise<std::optional<QnUuidList>> targetVersionStorageServersPromise;
+    std::promise<std::optional<UuidList>> targetVersionStorageServersPromise;
     auto targetVersionStorageServersFuture = targetVersionStorageServersPromise.get_future();
-    std::promise<std::optional<QnUuidList>> serversWithInternetPromise;
+    std::promise<std::optional<UuidList>> serversWithInternetPromise;
     auto serversWithInternetFuture = serversWithInternetPromise.get_future();
 
     if (targetVersion >= kPersistentStorageIntroducedVersion)
@@ -850,7 +850,7 @@ ClientUpdateTool::SystemServersInfo ClientUpdateTool::getSystemServersInfo(
         NX_VERBOSE(this, "Requesting info about persistent storage servers.");
 
         auto handlePersistentStorageInfo =
-            [](bool success, const QByteArray& data) -> std::optional<QnUuidList>
+            [](bool success, const QByteArray& data) -> std::optional<UuidList>
             {
                 common::update::PersistentUpdateStorage storage;
                 if (success && QJson::deserialize(data, &storage))
@@ -909,7 +909,7 @@ ClientUpdateTool::SystemServersInfo ClientUpdateTool::getSystemServersInfo(
                     std::vector<ServerInfo> servers;
                     if (reflect::json::deserialize(data.data(), &servers))
                     {
-                        QnUuidList result;
+                        UuidList result;
                         for (const auto& server: servers)
                         {
                             if (server.flags.testFlag(vms::api::SF_HasPublicIP))
@@ -935,20 +935,20 @@ ClientUpdateTool::SystemServersInfo ClientUpdateTool::getSystemServersInfo(
 
     if (targetVersion >= kPersistentStorageIntroducedVersion)
     {
-        QnUuidSet persistentStorageServers;
+        UuidSet persistentStorageServers;
 
         if (auto list = installedVersionStorageServersFuture.get())
-            persistentStorageServers = QnUuidSet(list->begin(), list->end());
+            persistentStorageServers = UuidSet(list->begin(), list->end());
         else
             NX_WARNING(this, "Failed to get information about the installed update.");
 
         if (auto list = targetVersionStorageServersFuture.get())
-            persistentStorageServers.unite(QnUuidSet(list->begin(), list->end()));
+            persistentStorageServers.unite(UuidSet(list->begin(), list->end()));
         else
             NX_WARNING(this, "Failed to get information about the installing update.");
 
         result.persistentStorageServers =
-            QnUuidList(persistentStorageServers.begin(), persistentStorageServers.end());
+            UuidList(persistentStorageServers.begin(), persistentStorageServers.end());
     }
 
     if (targetVersion >= kProxyRequestsSupportedVersion)

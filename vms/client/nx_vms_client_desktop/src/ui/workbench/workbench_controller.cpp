@@ -1369,7 +1369,7 @@ void QnWorkbenchController::at_zoomTargetChanged(
 
     // Create new layout item inplace of existing one.
     nx::vms::common::LayoutItemData data = existing;
-    data.uuid = QnUuid::createUuid();
+    data.uuid = nx::Uuid::createUuid();
     data.resource = descriptor(resource);
     data.zoomTargetUuid = zoomTargetWidget->item()->uuid();
     data.rotation = zoomTargetWidget->item()->rotation();

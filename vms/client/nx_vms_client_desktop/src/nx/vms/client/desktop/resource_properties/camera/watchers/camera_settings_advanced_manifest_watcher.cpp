@@ -99,7 +99,7 @@ CameraSettingsAdvancedManifestWatcher::CameraSettingsAdvancedManifestWatcher(
         serverRuntimeEventConnector,
         &ServerRuntimeEventConnector::deviceAdvancedSettingsManifestChanged,
         this,
-        [this](const std::set<QnUuid>& deviceIds)
+        [this](const std::set<nx::Uuid>& deviceIds)
         {
             if (d->camera && deviceIds.contains(d->camera->getId()))
             {

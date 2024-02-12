@@ -174,9 +174,9 @@ public:
 
     QnScrollableTextItemsWidget* bookmarksContainer();
 
-    void hideTextOverlay(const QnUuid& id);
+    void hideTextOverlay(const nx::Uuid& id);
     void showTextOverlay(
-        const QnUuid& id,
+        const nx::Uuid& id,
         const QString& text,
         const QnHtmlTextItemOptions& options);
 
@@ -374,21 +374,21 @@ private slots:
     void at_item_imageEnhancementChanged();
     void at_videoLayoutChanged();
 
-    void at_triggerRemoved(QnUuid id);
+    void at_triggerRemoved(nx::Uuid id);
 
     void at_triggerAdded(
-        QnUuid id,
+        nx::Uuid id,
         const QString& iconPath,
         const QString& name,
         bool prolonged,
         bool enabled);
 
     void at_triggerFieldsChanged(
-        QnUuid id,
+        nx::Uuid id,
         nx::vms::client::core::SoftwareTriggersWatcher::TriggerFields fields);
 
 private:
-    void handleItemDataChanged(const QnUuid& id, Qn::ItemDataRole role, const QVariant& data);
+    void handleItemDataChanged(const nx::Uuid& id, Qn::ItemDataRole role, const QVariant& data);
     void handleDewarpingParamsChanged();
 
     void setDisplay(const QnResourceDisplayPtr& display);
@@ -423,7 +423,7 @@ private:
     void setupHud();
 
     void setTextOverlayParameters(
-        const QnUuid& id,
+        const nx::Uuid& id,
         bool visible,
         const QString& text,
         const QnHtmlTextItemOptions& options);
@@ -442,7 +442,7 @@ private:
 private:
     struct SoftwareTriggerInfo
     {
-        QnUuid ruleId;
+        nx::Uuid ruleId;
         QString name;
         QString icon;
         bool enabled = false;
@@ -465,7 +465,7 @@ private:
         nx::vms::client::desktop::SoftwareTriggerButton* button,
         const SoftwareTriggerInfo& info);
 
-    int triggerIndex(const QnUuid& ruleId) const;
+    int triggerIndex(const nx::Uuid& ruleId) const;
 
     void removeTrigger(int index);
 
@@ -542,7 +542,7 @@ private:
     AreaType m_areaSelectionType{AreaType::none};
     QRectF m_analyticsFilterRect;
 
-    QnUuid m_itemId;
+    nx::Uuid m_itemId;
 
     QList<SoftwareTriggerInfo> m_triggers;
     nx::vms::client::core::SoftwareTriggersWatcher* m_triggerWatcher = nullptr;

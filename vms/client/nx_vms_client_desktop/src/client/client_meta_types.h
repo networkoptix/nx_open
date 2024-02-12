@@ -27,7 +27,7 @@ private:
 };
 
 Q_DECLARE_METATYPE(Qt::KeyboardModifiers)
-Q_DECLARE_METATYPE(QVector<QnUuid>)
+Q_DECLARE_METATYPE(QVector<nx::Uuid>)
 Q_DECLARE_METATYPE(QVector<QColor>)
 Q_DECLARE_METATYPE(QMargins)
 Q_DECLARE_METATYPE(QValidator::State) //< For Qn::ValidationStateRole QVariant conversion.

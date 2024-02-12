@@ -72,7 +72,7 @@ public:
      * \param resourceTypeId            Identifier of the type to check.
      * \returns                         Whether this factory can be used to create resources of the given type.
      */
-    virtual bool isResourceTypeSupported(QnUuid resourceTypeId) const;
+    virtual bool isResourceTypeSupported(nx::Uuid resourceTypeId) const;
 
     /**
      * \returns                         Name of the manufacturer for the resources this searcher adds.

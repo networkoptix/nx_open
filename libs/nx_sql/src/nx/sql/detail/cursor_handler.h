@@ -19,7 +19,7 @@ class AbstractCursorHandler
 public:
     virtual ~AbstractCursorHandler() = default;
 
-    virtual QnUuid id() const = 0;
+    virtual nx::Uuid id() const = 0;
     virtual void initialize(AbstractDbConnection* const connection) = 0;
     virtual void reportErrorWithoutExecution(DBResult errorCode) = 0;
 };
@@ -31,21 +31,21 @@ class CursorHandler:
 public:
     using PrepareCursorFunc = nx::utils::MoveOnlyFunc<void(SqlQuery*)>;
     using ReadRecordFunc = nx::utils::MoveOnlyFunc<void(SqlQuery*, Record*)>;
-    using CursorCreatedHandler = nx::utils::MoveOnlyFunc<void(DBResult, QnUuid /*cursorId*/)>;
+    using CursorCreatedHandler = nx::utils::MoveOnlyFunc<void(DBResult, nx::Uuid /*cursorId*/)>;
 
     CursorHandler(
         PrepareCursorFunc prepareCursorFunc,
         ReadRecordFunc readRecordFunc,
         CursorCreatedHandler cursorCreatedHandler)
         :
-        m_id(QnUuid::createUuid()),
+        m_id(nx::Uuid::createUuid()),
         m_prepareCursorFunc(std::move(prepareCursorFunc)),
         m_readRecordFunc(std::move(readRecordFunc)),
         m_cursorCreatedHandler(std::move(cursorCreatedHandler))
     {
     }
 
-    virtual QnUuid id() const override
+    virtual nx::Uuid id() const override
     {
         return m_id;
     }
@@ -62,7 +62,7 @@ public:
         }
         catch (const Exception& e)
         {
-            nx::utils::swapAndCall(m_cursorCreatedHandler, e.dbResult(), QnUuid());
+            nx::utils::swapAndCall(m_cursorCreatedHandler, e.dbResult(), nx::Uuid());
             throw;
         }
     }
@@ -79,11 +79,11 @@ public:
     virtual void reportErrorWithoutExecution(DBResult errorCode) override
     {
         if (m_cursorCreatedHandler)
-            nx::utils::swapAndCall(m_cursorCreatedHandler, errorCode, QnUuid());
+            nx::utils::swapAndCall(m_cursorCreatedHandler, errorCode, nx::Uuid());
     }
 
 private:
-    QnUuid m_id;
+    nx::Uuid m_id;
     PrepareCursorFunc m_prepareCursorFunc;
     ReadRecordFunc m_readRecordFunc;
     CursorCreatedHandler m_cursorCreatedHandler;
@@ -95,17 +95,17 @@ private:
 class NX_SQL_API CursorHandlerPool
 {
 public:
-    void add(QnUuid id, std::unique_ptr<AbstractCursorHandler> cursorHandler);
-    AbstractCursorHandler* cursorHander(QnUuid id);
+    void add(nx::Uuid id, std::unique_ptr<AbstractCursorHandler> cursorHandler);
+    AbstractCursorHandler* cursorHander(nx::Uuid id);
     int cursorCount() const;
-    void remove(QnUuid id);
+    void remove(nx::Uuid id);
     void cleanupDroppedCursors();
-    void markCursorForDeletion(QnUuid id);
+    void markCursorForDeletion(nx::Uuid id);
 
 private:
     mutable nx::Mutex m_mutex;
-    std::map<QnUuid, std::unique_ptr<AbstractCursorHandler>> m_cursors;
-    std::vector<QnUuid> m_cursorsMarkedForDeletion;
+    std::map<nx::Uuid, std::unique_ptr<AbstractCursorHandler>> m_cursors;
+    std::vector<nx::Uuid> m_cursorsMarkedForDeletion;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -158,7 +158,7 @@ class AbstractFetchNextRecordFromCursorTask
 public:
     virtual ~AbstractFetchNextRecordFromCursorTask() = default;
 
-    virtual QnUuid cursorId() const = 0;
+    virtual nx::Uuid cursorId() const = 0;
     virtual void fetchNextRecordFrom(AbstractCursorHandler* cursorHandler) = 0;
     virtual void reportError(DBResult resultCode) = 0;
     virtual void reportRecord() = 0;
@@ -170,7 +170,7 @@ class FetchNextRecordFromCursorTask:
 {
 public:
     FetchNextRecordFromCursorTask(
-        QnUuid cursorId,
+        nx::Uuid cursorId,
         nx::utils::MoveOnlyFunc<void(DBResult, Record)> completionHandler)
         :
         m_cursorId(std::move(cursorId)),
@@ -178,7 +178,7 @@ public:
     {
     }
 
-    virtual QnUuid cursorId() const override
+    virtual nx::Uuid cursorId() const override
     {
         return m_cursorId;
     }
@@ -202,7 +202,7 @@ public:
     }
 
 private:
-    const QnUuid m_cursorId;
+    const nx::Uuid m_cursorId;
     nx::utils::MoveOnlyFunc<void(DBResult, Record)> m_completionHandler;
     std::optional<Record> m_record;
 };

@@ -12,8 +12,8 @@ namespace nx::vms::api {
 
 struct NX_VMS_API AccessRightsDataDeprecated
 {
-    QnUuid userId;
-    std::vector<QnUuid> resourceIds;
+    nx::Uuid userId;
+    std::vector<nx::Uuid> resourceIds;
 };
 #define AccessRightsDataDeprecated_Fields (userId)(resourceIds)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST_EX(AccessRightsDataDeprecated, (ubjson)(json))

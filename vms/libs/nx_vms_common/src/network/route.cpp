@@ -26,8 +26,8 @@ bool QnOldRoute::addPoint(const QnRoutePoint &point, int weight) {
     return true;
 }
 
-bool QnOldRoute::containsConnection(const QnUuid &first, const QnUuid &from, const QnRoutePoint &point) const {
-    QnUuid prevId = first;
+bool QnOldRoute::containsConnection(const nx::Uuid &first, const nx::Uuid &from, const QnRoutePoint &point) const {
+    nx::Uuid prevId = first;
     for (auto it = points.begin(); it != points.end(); ++it) {
         if (prevId == from)
             return *it == point;
@@ -36,7 +36,7 @@ bool QnOldRoute::containsConnection(const QnUuid &first, const QnUuid &from, con
     return false;
 }
 
-bool QnOldRoute::containsPoint(const QnUuid &id) const {
+bool QnOldRoute::containsPoint(const nx::Uuid &id) const {
     for (const QnRoutePoint &point: points) {
         if (point.peerId == id)
             return true;

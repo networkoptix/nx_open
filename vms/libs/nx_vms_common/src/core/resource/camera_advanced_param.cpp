@@ -492,8 +492,8 @@ void QnCameraAdvancedParameterDependency::autoFillId(const QString& prefix)
     for (const auto& condition: conditions)
         hash += kDelimiter + condition.paramId + kDelimiter + condition.value;
     id = prefix.isEmpty()
-        ? QnUuid::fromArbitraryData(hash).toSimpleString()
-        : prefix + "_" + QnUuid::fromArbitraryData(hash).toSimpleString();
+        ? nx::Uuid::fromArbitraryData(hash).toSimpleString()
+        : prefix + "_" + nx::Uuid::fromArbitraryData(hash).toSimpleString();
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(

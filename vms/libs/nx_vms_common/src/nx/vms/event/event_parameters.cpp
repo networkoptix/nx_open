@@ -15,7 +15,7 @@ namespace nx {
 namespace vms {
 namespace event {
 
-QnUuid EventParameters::getParamsHash() const
+nx::Uuid EventParameters::getParamsHash() const
 {
     QByteArray paramKey(QByteArray::number(eventType));
     switch (eventType)
@@ -38,7 +38,7 @@ QnUuid EventParameters::getParamsHash() const
             break;
 
         case EventType::softwareTriggerEvent:
-            return QnUuid::createUuid(); //< Warning: early return.
+            return nx::Uuid::createUuid(); //< Warning: early return.
             break;
 
         case EventType::cameraInputEvent:
@@ -85,12 +85,12 @@ void EventParameters::setAnalyticsObjectTypeId(const QString& id)
     inputPortId = id;
 }
 
-QnUuid EventParameters::getAnalyticsEngineId() const
+nx::Uuid EventParameters::getAnalyticsEngineId() const
 {
     return analyticsEngineId;
 }
 
-void EventParameters::setAnalyticsEngineId(const QnUuid& id)
+void EventParameters::setAnalyticsEngineId(const nx::Uuid& id)
 {
     analyticsEngineId = id;
 }

@@ -31,7 +31,7 @@ public:
     /* notify new playback was started from position timestamp
     *  return internal ID of started session
     */
-    virtual AuditHandle notifyPlaybackStarted(const QnAuthSession& session, const QnUuid& id, qint64 timestampUsec, bool isExport = false) = 0;
+    virtual AuditHandle notifyPlaybackStarted(const QnAuthSession& session, const nx::Uuid& id, qint64 timestampUsec, bool isExport = false) = 0;
     virtual void notifyPlaybackInProgress(const AuditHandle& handle, qint64 timestampUsec) = 0;
     virtual void notifySettingsChanged(const QnAuthSession& authInfo, std::map<QString, QString> settings) = 0;
 

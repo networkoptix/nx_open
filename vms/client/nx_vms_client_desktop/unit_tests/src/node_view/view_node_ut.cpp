@@ -27,8 +27,8 @@ enum TestColumn
     fourthTestColumn
 };
 
-static const auto kTestId = QnUuid::createUuid();
-static const auto kAnotherTestId = QnUuid::createUuid();
+static const auto kTestId = nx::Uuid::createUuid();
+static const auto kAnotherTestId = nx::Uuid::createUuid();
 static const auto kTestText = QString("testText");
 static const auto kAnotherText = QString("anotherText");
 static constexpr int kTestGroupSortOrder = 101;
@@ -48,7 +48,7 @@ TEST(ViewNodeTest, generic_data_test)
 
     // Checks value presence and equality to the set one.
     ASSERT_TRUE(data.hasData(firstTestColumn, testIdRole));
-    ASSERT_TRUE(data.data(firstTestColumn, testIdRole).value<QnUuid>() == kTestId);
+    ASSERT_TRUE(data.data(firstTestColumn, testIdRole).value<nx::Uuid>() == kTestId);
 
     // Checks that other data is not set.
     ASSERT_TRUE(data.data(firstTestColumn, otherRole).isNull());
@@ -71,7 +71,7 @@ TEST(ViewNodeTest, generic_data_test)
 
     // Checks property presence and value.
     ASSERT_TRUE(data.hasProperty(testIdRole));
-    ASSERT_TRUE(data.property(testIdRole).value<QnUuid>() == kTestId);
+    ASSERT_TRUE(data.property(testIdRole).value<nx::Uuid>() == kTestId);
 
     data.removeProperty(testIdRole);
     // Checks if property is cleaned up.
@@ -145,7 +145,7 @@ TEST(ViewNodeTest, apply_data_test)
 
     // Checks if all data is applied correctly after apply operation.
     ASSERT_TRUE(target.hasData(firstTestColumn, testIdRole));
-    ASSERT_TRUE(target.data(firstTestColumn, testIdRole).value<QnUuid>() == kTestId);
+    ASSERT_TRUE(target.data(firstTestColumn, testIdRole).value<nx::Uuid>() == kTestId);
 
     ASSERT_TRUE(target.hasProperty(otherRole));
     ASSERT_TRUE(target.property(otherRole).toString() == kTestText);

@@ -15,7 +15,7 @@ class NX_VMS_RULES_API AnalyticsObjectEvent: public AnalyticsEngineEvent
     Q_CLASSINFO("type", "nx.events.analyticsObject")
 
     FIELD(QString, objectTypeId, setObjectTypeId)
-    FIELD(QnUuid, objectTrackId, setObjectTrackId)
+    FIELD(nx::Uuid, objectTrackId, setObjectTrackId)
     FIELD(nx::common::metadata::Attributes, attributes, setAttributes)
 
 public:
@@ -23,10 +23,10 @@ public:
 
     AnalyticsObjectEvent(
         std::chrono::microseconds timestamp,
-        QnUuid cameraId,
-        QnUuid engineId,
+        nx::Uuid cameraId,
+        nx::Uuid engineId,
         const QString& objectTypeId,
-        QnUuid objectTrackId,
+        nx::Uuid objectTrackId,
         const nx::common::metadata::Attributes& attributes);
 
     virtual QString subtype() const override;

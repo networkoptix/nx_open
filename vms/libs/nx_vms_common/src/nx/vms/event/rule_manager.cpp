@@ -24,7 +24,7 @@ RuleList RuleManager::rules() const
     return m_rules.values();
 }
 
-RulePtr RuleManager::rule(const QnUuid& id) const
+RulePtr RuleManager::rule(const nx::Uuid& id) const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     return m_rules[id];
@@ -57,7 +57,7 @@ void RuleManager::addOrUpdateRule(const RulePtr& rule)
     emit ruleAddedOrUpdated(rule, added);
 }
 
-void RuleManager::removeRule(const QnUuid& id)
+void RuleManager::removeRule(const nx::Uuid& id)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     const auto iter = m_rules.find(id);

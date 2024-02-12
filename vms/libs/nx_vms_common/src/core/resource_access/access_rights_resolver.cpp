@@ -75,14 +75,14 @@ AccessRightsResolver::~AccessRightsResolver()
     // Required here for forward-declared scoped pointer destruction.
 }
 
-nx::vms::api::AccessRights AccessRightsResolver::accessRights(const QnUuid& subjectId,
+nx::vms::api::AccessRights AccessRightsResolver::accessRights(const nx::Uuid& subjectId,
     const QnResourcePtr& resource) const
 {
     return d->inheritedResourceAccessResolver->accessRights(subjectId, resource);
 }
 
-nx::vms::api::AccessRights AccessRightsResolver::accessRights(const QnUuid& subjectId,
-    const QnUuid& resourceGroupId) const
+nx::vms::api::AccessRights AccessRightsResolver::accessRights(const nx::Uuid& subjectId,
+    const nx::Uuid& resourceGroupId) const
 {
     if (!NX_ASSERT(nx::vms::api::specialResourceGroup(resourceGroupId)))
         return {};
@@ -90,30 +90,30 @@ nx::vms::api::AccessRights AccessRightsResolver::accessRights(const QnUuid& subj
     return d->inheritedResourceAccessResolver->resourceAccessMap(subjectId).value(resourceGroupId);
 }
 
-ResourceAccessMap AccessRightsResolver::resourceAccessMap(const QnUuid& subjectId) const
+ResourceAccessMap AccessRightsResolver::resourceAccessMap(const nx::Uuid& subjectId) const
 {
     return d->inheritedResourceAccessResolver->resourceAccessMap(subjectId);
 }
 
 nx::vms::api::GlobalPermissions AccessRightsResolver::globalPermissions(
-    const QnUuid& subjectId) const
+    const nx::Uuid& subjectId) const
 {
     return d->inheritedResourceAccessResolver->globalPermissions(subjectId);
 }
 
 nx::vms::api::AccessRights AccessRightsResolver::availableAccessRights(
-    const QnUuid& subjectId) const
+    const nx::Uuid& subjectId) const
 {
     return d->inheritedResourceAccessResolver->availableAccessRights(subjectId);
 }
 
-bool AccessRightsResolver::hasFullAccessRights(const QnUuid& subjectId) const
+bool AccessRightsResolver::hasFullAccessRights(const nx::Uuid& subjectId) const
 {
     return d->inheritedResourceAccessResolver->hasFullAccessRights(subjectId);
 }
 
 ResourceAccessDetails AccessRightsResolver::accessDetails(
-    const QnUuid& subjectId,
+    const nx::Uuid& subjectId,
     const QnResourcePtr& resource,
     nx::vms::api::AccessRight accessRight) const
 {
@@ -132,7 +132,7 @@ struct AccessRightsResolver::Notifier::Private
 {
     QPointer<AccessRightsResolver> source;
     QPointer<AbstractResourceAccessResolver::Notifier> notifier;
-    QnUuid subjectId;
+    nx::Uuid subjectId;
 
     void subscribe()
     {
@@ -185,7 +185,7 @@ void AccessRightsResolver::Notifier::setSource(AccessRightsResolver* value)
     if (d->notifier)
     {
         connect(d->notifier, &AbstractResourceAccessResolver::Notifier::resourceAccessChanged, this,
-            [this](const QSet<QnUuid>& changedSubjectIds)
+            [this](const QSet<nx::Uuid>& changedSubjectIds)
             {
                 if (changedSubjectIds.contains(d->subjectId))
                     emit resourceAccessChanged(d->subjectId, QPrivateSignal());
@@ -195,12 +195,12 @@ void AccessRightsResolver::Notifier::setSource(AccessRightsResolver* value)
     emit sourceChanged();
 }
 
-QnUuid AccessRightsResolver::Notifier::subjectId() const
+nx::Uuid AccessRightsResolver::Notifier::subjectId() const
 {
     return d->subjectId;
 }
 
-void AccessRightsResolver::Notifier::setSubjectId(const QnUuid& value)
+void AccessRightsResolver::Notifier::setSubjectId(const nx::Uuid& value)
 {
     if (d->subjectId == value)
         return;

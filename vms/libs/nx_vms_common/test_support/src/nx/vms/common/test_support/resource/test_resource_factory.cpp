@@ -15,7 +15,7 @@ namespace nx::vms::common::test {
 using namespace nx::vms::api;
 
 QnResourcePtr TestResourceFactory::createResource(
-    const QnUuid& resourceTypeId,
+    const nx::Uuid& resourceTypeId,
     const QnResourceParams&)
 {
     if (resourceTypeId == StorageData::kResourceTypeId)

@@ -19,7 +19,7 @@ public:
     MediaSigner();
     void processMedia(AVCodecParameters* context, const uint8_t* data, int size);
 
-    QByteArray buildSignature(QnLicensePool* licensePool, const QnUuid& serverId);
+    QByteArray buildSignature(QnLicensePool* licensePool, const nx::Uuid& serverId);
     QByteArray buildSignature(const QByteArray& signPattern);
     QByteArray currentResult();
     void reset();

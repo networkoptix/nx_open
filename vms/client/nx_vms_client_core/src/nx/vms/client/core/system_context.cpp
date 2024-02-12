@@ -77,14 +77,14 @@ struct SystemContext::Private
 
 SystemContext::SystemContext(
     Mode mode,
-    QnUuid peerId,
+    nx::Uuid peerId,
     nx::core::access::Mode resourceAccessMode,
     QObject* parent)
     :
     base_type(
         mode,
         std::move(peerId),
-        /*sessionId*/ QnUuid::createUuid(),
+        /*sessionId*/ nx::Uuid::createUuid(),
         resourceAccessMode,
         parent),
     d(new Private())
@@ -182,7 +182,7 @@ void SystemContext::setConnection(RemoteConnectionPtr connection)
     d->connection = connection;
 }
 
-QnUuid SystemContext::currentServerId() const
+nx::Uuid SystemContext::currentServerId() const
 {
     return moduleInformation().id;
 }

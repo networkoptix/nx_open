@@ -398,7 +398,7 @@ void OutgoingMailSettingsWidget::Private::testSmtpConfiguration()
     if (!q->currentServer())
         return;
 
-    std::optional<QnUuid> proxyServerId;
+    std::optional<nx::Uuid> proxyServerId;
     const auto serverUrl = nx::utils::Url::fromUserInput(ui->serverAddressInput->text().trimmed());
 
     if (!network::HostAddress(serverUrl.host()).isLoopback()

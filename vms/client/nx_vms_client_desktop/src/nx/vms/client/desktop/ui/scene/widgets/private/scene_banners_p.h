@@ -57,7 +57,7 @@ public:
 
     Q_SLOT void handleRemoved(const QVariant& uuid)
     {
-        emit q->removed(uuid.value<QnUuid>());
+        emit q->removed(uuid.value<nx::Uuid>());
     }
 };
 

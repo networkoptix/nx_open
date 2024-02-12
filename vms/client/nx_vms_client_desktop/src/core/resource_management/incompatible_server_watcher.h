@@ -29,7 +29,7 @@ public:
      * @param keep true to keep the resource (if present), false to not keep. In case when the
      *     resource was removed when was having 'keep' flag on, it will be removed in this method.
      */
-    void keepServer(const QnUuid& id, bool keep);
+    void keepServer(const nx::Uuid& id, bool keep);
 
 private:
     struct Private;

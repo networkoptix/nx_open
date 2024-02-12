@@ -72,7 +72,7 @@ struct NX_VMS_API EmailSettingsRequest
      * refer to the current Server.
      * %example this
      */
-    QnUuid serverId;
+    nx::Uuid serverId;
 
     std::optional<EmailSettings> settings;
 };

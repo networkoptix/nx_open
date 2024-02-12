@@ -7,13 +7,13 @@
 #include <nx/utils/uuid.h>
 
 struct QnRoutePoint {
-    QnUuid peerId;
+    nx::Uuid peerId;
     QString host;
     quint16 port;
 
     QnRoutePoint() {}
 
-    QnRoutePoint(const QnUuid &peerId, const QString &host, quint16 port) :
+    QnRoutePoint(const nx::Uuid &peerId, const QString &host, quint16 port) :
         peerId(peerId), host(host), port(port)
     {}
 
@@ -33,8 +33,8 @@ struct QnOldRoute
     int length() const;
 
     bool addPoint(const QnRoutePoint &point, int weight);
-    bool containsConnection(const QnUuid &first, const QnUuid &from, const QnRoutePoint &point) const;
-    bool containsPoint(const QnUuid &id) const;
+    bool containsConnection(const nx::Uuid &first, const nx::Uuid &from, const QnRoutePoint &point) const;
+    bool containsPoint(const nx::Uuid &id) const;
 
     bool operator <(const QnOldRoute &other) const;
     QnOldRoute operator +(const QnOldRoute &other) const;

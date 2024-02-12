@@ -23,9 +23,9 @@ const QString kFilePrefix = "file://";
 
 namespace nx::vms::client::desktop {
 
-QSet<QnUuid> getServersLinkedToCloud(SystemContext* systemContext, const QSet<QnUuid>& peers)
+QSet<nx::Uuid> getServersLinkedToCloud(SystemContext* systemContext, const QSet<nx::Uuid>& peers)
 {
-    QSet<QnUuid> result;
+    QSet<nx::Uuid> result;
 
     const auto moduleManager = appContext()->moduleDiscoveryManager();
     if (!moduleManager)
@@ -63,7 +63,7 @@ bool checkCloudHost(
     SystemContext* systemContext,
     nx::utils::SoftwareVersion targetVersion,
     QString cloudUrl,
-    const QSet<QnUuid>& peers)
+    const QSet<nx::Uuid>& peers)
 {
     NX_ASSERT(systemContext);
     /* Ignore cloud host for versions lower than 3.0. */
@@ -142,7 +142,7 @@ QString UpdateStrings::getReportForUnsupportedOs(const nx::utils::OsInfo& info)
 
 bool verifyUpdateContents(
     client::desktop::UpdateContents& contents,
-    const std::map<QnUuid, QnMediaServerResourcePtr>& activeServers,
+    const std::map<nx::Uuid, QnMediaServerResourcePtr>& activeServers,
     const ClientVerificationData& clientData,
     const VerificationOptions& options)
 {
@@ -292,14 +292,14 @@ bool verifyUpdateContents(
 
     QHash<nx::utils::OsInfo, update::Package> serverPackages;
 
-    QSet<QnUuid> allServers;
+    QSet<nx::Uuid> allServers;
 
     // We store here a set of packages that should be downloaded manually by the client.
     // We will convert it to a list of values later.
     QSet<nx::vms::update::Package> manualPackages;
 
-    QSet<QnUuid> serversWithNewerVersion;
-    QSet<QnUuid> serversWithExactVersion;
+    QSet<nx::Uuid> serversWithNewerVersion;
+    QSet<nx::Uuid> serversWithExactVersion;
 
     // TODO: Should reverse this verification: get all platform configurations and find packages for them.
     // Checking if all servers have update packages.

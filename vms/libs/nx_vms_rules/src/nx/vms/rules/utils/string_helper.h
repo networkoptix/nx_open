@@ -31,15 +31,15 @@ public:
         bool html = false) const;
     QString timestampDate(std::chrono::microseconds eventTimestamp) const;
     QString timestampTime(std::chrono::microseconds eventTimestamp) const;
-    QString plugin(QnUuid pluginId) const;
+    QString plugin(nx::Uuid pluginId) const;
 
     QString resource(
-        QnUuid resourceId,
+        nx::Uuid resourceId,
         Qn::ResourceInfoLevel detailLevel = Qn::ResourceInfoLevel::RI_NameOnly) const;
     QString resource(
         const QnResourcePtr& resource,
         Qn::ResourceInfoLevel detailLevel = Qn::ResourceInfoLevel::RI_NameOnly) const;
-    QString resourceIp(QnUuid resourceId) const;
+    QString resourceIp(nx::Uuid resourceId) const;
 
     enum Url { localIp, publicIp, cloud };
 
@@ -51,7 +51,7 @@ public:
      * @param proxyAddress Force proxy address to be used. Actual for the client side only.
      */
     QString urlForCamera(
-        QnUuid id,
+        nx::Uuid id,
         std::chrono::microseconds timestamp,
         Url urlType,
         const std::optional<nx::network::SocketAddress>& proxyAddress = std::nullopt) const;

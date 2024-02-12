@@ -35,7 +35,7 @@ struct Manager::Private
     std::optional<ServerModeInfo> serverModeInfo;
     std::atomic<bool> isRunning;
     mutable nx::Mutex mutex;
-    std::map<QnUuid, ModuleEndpoint> modules;
+    std::map<nx::Uuid, ModuleEndpoint> modules;
     std::unique_ptr<ModuleConnector> moduleConnector;
     std::unique_ptr<UdpMulticastFinder> multicastFinder;
     std::unique_ptr<DeprecatedMulticastFinder> legacyMulticastFinder;
@@ -120,7 +120,7 @@ struct Manager::Private
             });
 
         moduleConnector->setDisconnectHandler(
-            [this](QnUuid id)
+            [this](nx::Uuid id)
             {
                 NX_MUTEX_LOCKER lock(&mutex);
                 const auto it = modules.find(id);
@@ -316,7 +316,7 @@ std::list<ModuleEndpoint> Manager::getAll() const
     return list;
 }
 
-std::optional<nx::network::SocketAddress> Manager::getEndpoint(const QnUuid& id) const
+std::optional<nx::network::SocketAddress> Manager::getEndpoint(const nx::Uuid& id) const
 {
     NX_MUTEX_LOCKER lock(&d->mutex);
     const auto it = d->modules.find(id);
@@ -326,7 +326,7 @@ std::optional<nx::network::SocketAddress> Manager::getEndpoint(const QnUuid& id)
     return it->second.endpoint;
 }
 
-std::optional<ModuleEndpoint> Manager::getModule(const QnUuid& id) const
+std::optional<ModuleEndpoint> Manager::getModule(const nx::Uuid& id) const
 {
     NX_MUTEX_LOCKER lock(&d->mutex);
     const auto it = d->modules.find(id);
@@ -336,12 +336,12 @@ std::optional<ModuleEndpoint> Manager::getModule(const QnUuid& id) const
     return it->second;
 }
 
-void Manager::forgetModule(const QnUuid& id)
+void Manager::forgetModule(const nx::Uuid& id)
 {
     d->moduleConnector->forgetModule(id);
 }
 
-void Manager::checkEndpoint(nx::network::SocketAddress endpoint, QnUuid expectedId)
+void Manager::checkEndpoint(nx::network::SocketAddress endpoint, nx::Uuid expectedId)
 {
     NX_ASSERT(ModuleConnector::isValidForConnect(endpoint), "Invalid endpoint: %1", endpoint);
     d->moduleConnector->dispatch(
@@ -351,7 +351,7 @@ void Manager::checkEndpoint(nx::network::SocketAddress endpoint, QnUuid expected
         });
 }
 
-void Manager::checkEndpoint(const nx::utils::Url& url, QnUuid expectedId)
+void Manager::checkEndpoint(const nx::utils::Url& url, nx::Uuid expectedId)
 {
     checkEndpoint(
         nx::network::url::getEndpoint(url),

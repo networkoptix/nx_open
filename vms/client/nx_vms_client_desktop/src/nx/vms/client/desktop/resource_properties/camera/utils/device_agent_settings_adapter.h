@@ -41,7 +41,7 @@ public:
     /**
      * Actual data for the currently selected camera.
      */
-    std::unordered_map<QnUuid, DeviceAgentData> dataByEngineId() const;
+    std::unordered_map<nx::Uuid, DeviceAgentData> dataByEngineId() const;
 
 private:
     class Private;

@@ -59,12 +59,12 @@ MediaPlayer::~MediaPlayer()
 {
 }
 
-QnUuid MediaPlayer::resourceId() const
+nx::Uuid MediaPlayer::resourceId() const
 {
     return m_resourceId;
 }
 
-void MediaPlayer::setResourceId(const QnUuid& resourceId)
+void MediaPlayer::setResourceId(const nx::Uuid& resourceId)
 {
     if (m_resourceId == resourceId)
         return;

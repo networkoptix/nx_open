@@ -30,7 +30,7 @@ public:
     void at_pluginPropertyChanged(const QnResourcePtr& resource, const QString& key);
 
 public:
-    QHash<QnUuid, AnalyticsEngineInfo> engines;
+    QHash<nx::Uuid, AnalyticsEngineInfo> engines;
 };
 
 AnalyticsEnginesWatcher::Private::Private(AnalyticsEnginesWatcher* q):
@@ -149,12 +149,12 @@ AnalyticsEnginesWatcher::~AnalyticsEnginesWatcher()
 {
 }
 
-AnalyticsEngineInfo AnalyticsEnginesWatcher::engineInfo(const QnUuid& engineId) const
+AnalyticsEngineInfo AnalyticsEnginesWatcher::engineInfo(const nx::Uuid& engineId) const
 {
     return d->engines.value(engineId);
 }
 
-QHash<QnUuid, AnalyticsEngineInfo> AnalyticsEnginesWatcher::engineInfos() const
+QHash<nx::Uuid, AnalyticsEngineInfo> AnalyticsEnginesWatcher::engineInfos() const
 {
     return d->engines;
 }

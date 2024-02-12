@@ -20,8 +20,8 @@ public:
         Qn::TimePeriodContent contentType,
         ChunkProvider* owner);
 
-    QnUuid resourceId() const;
-    void setResourceId(const QnUuid& id);
+    nx::Uuid resourceId() const;
+    void setResourceId(const nx::Uuid& id);
 
     const QnTimePeriodList& periods() const;
 
@@ -38,7 +38,7 @@ private:
     void cleanLoader();
     void setLoading(bool value);
     void notifyAboutTimePeriodsChange();
-    QnVirtualCameraResourcePtr getCamera(const QnUuid& id);
+    QnVirtualCameraResourcePtr getCamera(const nx::Uuid& id);
 
 private:
     ChunkProvider* const q;
@@ -58,9 +58,9 @@ ChunkProvider::ChunkProviderInternal::ChunkProviderInternal(
 {
 }
 
-QnUuid ChunkProvider::ChunkProviderInternal::resourceId() const
+nx::Uuid ChunkProvider::ChunkProviderInternal::resourceId() const
 {
-    return m_loader ? m_loader->resource()->getId() : QnUuid();
+    return m_loader ? m_loader->resource()->getId() : nx::Uuid();
 }
 
 void ChunkProvider::ChunkProviderInternal::cleanLoader()
@@ -73,7 +73,7 @@ void ChunkProvider::ChunkProviderInternal::cleanLoader()
     m_loader.reset();
 }
 
-void ChunkProvider::ChunkProviderInternal::setResourceId(const QnUuid& id)
+void ChunkProvider::ChunkProviderInternal::setResourceId(const nx::Uuid& id)
 {
     if (id == resourceId())
         return;
@@ -173,7 +173,7 @@ void ChunkProvider::ChunkProviderInternal::notifyAboutTimePeriodsChange()
     emit q->bottomBoundChanged();
 }
 
-QnVirtualCameraResourcePtr ChunkProvider::ChunkProviderInternal::getCamera(const QnUuid& id)
+QnVirtualCameraResourcePtr ChunkProvider::ChunkProviderInternal::getCamera(const nx::Uuid& id)
 {
     return q->resourcePool()->getResourceById<QnVirtualCameraResource>(id);
 }
@@ -211,12 +211,12 @@ void ChunkProvider::registerQmlType()
     qmlRegisterType<ChunkProvider>("nx.vms.client.core", 1, 0, "ChunkProvider");
 }
 
-QnUuid ChunkProvider::resourceId() const
+nx::Uuid ChunkProvider::resourceId() const
 {
     return m_providers[Qn::RecordingContent]->resourceId();
 }
 
-void ChunkProvider::setResourceId(const QnUuid& id)
+void ChunkProvider::setResourceId(const nx::Uuid& id)
 {
     for (const auto& provider: m_providers)
         provider->setResourceId(id);

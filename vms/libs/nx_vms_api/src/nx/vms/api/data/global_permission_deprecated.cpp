@@ -20,16 +20,16 @@ constexpr std::array<std::pair<AccessRight, GlobalPermissionDeprecated>, 6> kLut
     {AccessRight::edit, GlobalPermissionDeprecated::editCameras},
 }};
 
-std::tuple<GlobalPermissions, std::vector<QnUuid>, std::map<QnUuid, AccessRights>>
+std::tuple<GlobalPermissions, std::vector<nx::Uuid>, std::map<nx::Uuid, AccessRights>>
     migrateAccessRights(
         GlobalPermissionsDeprecated permissions,
-        const std::vector<QnUuid>& accessibleResources,
+        const std::vector<nx::Uuid>& accessibleResources,
         bool isOwner)
 {
     if (isOwner || permissions.testFlag(GlobalPermissionDeprecated::admin))
         return {GlobalPermission::none, {isOwner ? kAdministratorsGroupId : kPowerUsersGroupId}, {}};
 
-    std::vector<QnUuid> groups;
+    std::vector<nx::Uuid> groups;
     if (permissions.testFlag(GlobalPermissionDeprecated::advancedViewerPermissions))
         groups = {kAdvancedViewersGroupId};
     else if (permissions.testFlag(GlobalPermissionDeprecated::viewerPermissions))
@@ -44,7 +44,7 @@ std::tuple<GlobalPermissions, std::vector<QnUuid>, std::map<QnUuid, AccessRights
             accessRights.setFlag(accessRight);
     }
 
-    std::map<QnUuid, AccessRights> accessMap;
+    std::map<nx::Uuid, AccessRights> accessMap;
     if (permissions.testFlag(GlobalPermissionDeprecated::accessAllMedia))
     {
         accessMap.emplace(kAllDevicesGroupId, accessRights);
@@ -78,11 +78,11 @@ static GlobalPermissionsDeprecated accessRightsToGlobalPermissions(AccessRights 
     return result;
 }
 
-std::tuple<GlobalPermissionsDeprecated, std::optional<std::vector<QnUuid>>, bool>
+std::tuple<GlobalPermissionsDeprecated, std::optional<std::vector<nx::Uuid>>, bool>
     extractFromResourceAccessRights(
         GlobalPermissions permissions,
-        std::vector<QnUuid>* groups,
-        const std::map<QnUuid, AccessRights>& resourceAccessRights)
+        std::vector<nx::Uuid>* groups,
+        const std::map<nx::Uuid, AccessRights>& resourceAccessRights)
 {
     GlobalPermissionsDeprecated deprecatedPermissions;
 
@@ -124,7 +124,7 @@ std::tuple<GlobalPermissionsDeprecated, std::optional<std::vector<QnUuid>>, bool
         }
     }
 
-    std::vector<QnUuid> temporaryAccessibleResources;
+    std::vector<nx::Uuid> temporaryAccessibleResources;
     temporaryAccessibleResources.reserve(resourceAccessRights.size());
     for (const auto& [id, resourceRight]: resourceAccessRights)
     {
@@ -168,7 +168,7 @@ std::tuple<GlobalPermissionsDeprecated, std::optional<std::vector<QnUuid>>, bool
         deprecatedPermissions,
         temporaryAccessibleResources.empty()
             ? std::nullopt
-            : std::optional<std::vector<QnUuid>>(std::move(temporaryAccessibleResources)),
+            : std::optional<std::vector<nx::Uuid>>(std::move(temporaryAccessibleResources)),
         /*isOwner*/ false};
 }
 

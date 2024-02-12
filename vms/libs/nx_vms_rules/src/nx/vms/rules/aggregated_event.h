@@ -31,7 +31,7 @@ public:
     State state() const;
 
     /** Event id, may be used for action deduplication.*/
-    QnUuid id() const;
+    nx::Uuid id() const;
 
     /** Returns initial event details plus aggregated details. */
     QVariantMap details(common::SystemContext* context) const;
@@ -55,7 +55,7 @@ public:
     EventPtr initialEvent() const;
 
 private:
-    QnUuid m_id = QnUuid::createUuid(); //< TODO: #amalov Get from initial event if needed.
+    nx::Uuid m_id = nx::Uuid::createUuid(); //< TODO: #amalov Get from initial event if needed.
     std::vector<EventPtr> m_aggregatedEvents;
 
     AggregatedEvent() = default;

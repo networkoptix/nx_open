@@ -40,26 +40,26 @@ SceneBanners::~SceneBanners()
     delete d->container; //< It may be already deleted.
 }
 
-QnUuid SceneBanners::add(const QString& text,
+nx::Uuid SceneBanners::add(const QString& text,
     std::optional<milliseconds> timeout,
     std::optional<QFont> font)
 {
     if (!d->container || !d->container->rootObject())
         return {};
 
-    return invokeQmlMethod<QnUuid>(d->container->rootObject(), "add", text,
+    return invokeQmlMethod<nx::Uuid>(d->container->rootObject(), "add", text,
         timeout.has_value() ? QVariant::fromValue(timeout->count()) : QVariant(),
         font.has_value() ? QVariant::fromValue(*font) : QVariant());
 }
 
-bool SceneBanners::remove(const QnUuid& id, bool immediately)
+bool SceneBanners::remove(const nx::Uuid& id, bool immediately)
 {
     return d->container && d->container->rootObject()
         ? invokeQmlMethod<bool>(d->container->rootObject(), "remove", id, immediately)
         : false;
 }
 
-bool SceneBanners::changeText(const QnUuid& id, const QString& newText)
+bool SceneBanners::changeText(const nx::Uuid& id, const QString& newText)
 {
     return d->container && d->container->rootObject()
         ? invokeQmlMethod<bool>(d->container->rootObject(), "changeText", id, newText)
@@ -69,12 +69,12 @@ bool SceneBanners::changeText(const QnUuid& id, const QString& newText)
 // ------------------------------------------------------------------------------------------------
 // SceneBanner
 
-SceneBanner::SceneBanner(const QnUuid& id, QObject* parent):
+SceneBanner::SceneBanner(const nx::Uuid& id, QObject* parent):
     QObject(parent),
     m_id(id)
 {
     connect(SceneBanners::instance(), &SceneBanners::removed, this,
-        [this](const QnUuid& removedId)
+        [this](const nx::Uuid& removedId)
         {
             if (m_id != removedId)
                 return;

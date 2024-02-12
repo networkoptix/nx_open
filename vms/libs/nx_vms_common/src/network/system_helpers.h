@@ -25,7 +25,7 @@ static const QString kFactorySystemPassword = "admin";
 NX_VMS_COMMON_API QString getTargetSystemId(const nx::vms::api::ModuleInformation& info);
 NX_VMS_COMMON_API QString getTargetSystemId(const QnCloudSystem& cloudSystem);
 
-NX_VMS_COMMON_API QnUuid getLocalSystemId(const nx::vms::api::ModuleInformation& info);
+NX_VMS_COMMON_API nx::Uuid getLocalSystemId(const nx::vms::api::ModuleInformation& info);
 
 NX_VMS_COMMON_API bool isNewSystem(const nx::vms::api::ModuleInformation& info);
 NX_VMS_COMMON_API bool isNewSystem(const QnCloudSystem& info);
@@ -34,7 +34,7 @@ NX_VMS_COMMON_API bool isCloudSystem(const nx::vms::api::ModuleInformation& info
 
 NX_VMS_COMMON_API QString getSystemName(const nx::vms::api::ModuleInformation& info);
 
-NX_VMS_COMMON_API QnUuid currentSystemLocalId(const nx::vms::common::SystemContext* context);
+NX_VMS_COMMON_API nx::Uuid currentSystemLocalId(const nx::vms::common::SystemContext* context);
 
 NX_VMS_COMMON_API bool currentSystemIsNew(const nx::vms::common::SystemContext* context);
 
@@ -45,6 +45,6 @@ NX_VMS_COMMON_API bool serverBelongsToCurrentSystem(
 NX_VMS_COMMON_API bool serverBelongsToCurrentSystem(const QnMediaServerResourcePtr& server);
 
 /** Server address to access it using cloud sockets. */
-NX_VMS_COMMON_API QString serverCloudHost(const QString& systemId, const QnUuid& serverId);
+NX_VMS_COMMON_API QString serverCloudHost(const QString& systemId, const nx::Uuid& serverId);
 
 } // helpers

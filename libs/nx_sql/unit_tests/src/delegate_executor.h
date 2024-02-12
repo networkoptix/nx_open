@@ -256,7 +256,7 @@ public:
         m_delegate->fetchNextRecordFromCursorImpl(std::move(task));
     }
 
-    virtual void removeCursor(QnUuid id) override
+    virtual void removeCursor(nx::Uuid id) override
     {
         m_delegate->removeCursor(id);
     }

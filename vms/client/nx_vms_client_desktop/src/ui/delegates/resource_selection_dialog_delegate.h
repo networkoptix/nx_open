@@ -31,10 +31,10 @@ public:
      * @param selectedResources     List of selected resources.
      * @return                      True if selection is valid and OK button can be pressed.
      */
-    virtual bool validate(const QSet<QnUuid>& selectedResources);
-    virtual QString validationMessage(const QSet<QnUuid>& selectedResources) const;
+    virtual bool validate(const QSet<nx::Uuid>& selectedResources);
+    virtual QString validationMessage(const QSet<nx::Uuid>& selectedResources) const;
 
-    virtual bool isValid(const QnUuid& resource) const;
+    virtual bool isValid(const nx::Uuid& resource) const;
 
     /**
      * @brief isMultiChoiceAllowed  Check if the delegate allows to select several resources in the list.
@@ -42,6 +42,6 @@ public:
     virtual bool isMultiChoiceAllowed() const;
 
 protected:
-    QnResourcePtr getResource(const QnUuid& resource) const;
-    QnResourceList getResources(const QSet<QnUuid>& resources) const;
+    QnResourcePtr getResource(const nx::Uuid& resource) const;
+    QnResourceList getResources(const QSet<nx::Uuid>& resources) const;
 };

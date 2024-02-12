@@ -57,12 +57,12 @@ public:
         return true;
     }
 
-    bool readQnUuid(QnUuid* value)
+    bool readUuid(nx::Uuid* value)
     {
         char tmp[16];
         if (m_stream.read(tmp, sizeof(tmp)) != sizeof(tmp))
             return false;
-        *value = QnUuid::fromRfc4122(QByteArray::fromRawData(tmp, sizeof(tmp)));
+        *value = nx::Uuid::fromRfc4122(QByteArray::fromRawData(tmp, sizeof(tmp)));
         return true;
     }
 

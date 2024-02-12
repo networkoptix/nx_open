@@ -28,8 +28,8 @@ QVariant TargetDeviceField::build(const AggregatedEventPtr& event) const
         deviceIds << utils::getDeviceIds(event);
 
     // Removing duplicates and maintaining order.
-    QnUuidSet uniqueIds;
-    QnUuidList result;
+    UuidSet uniqueIds;
+    UuidList result;
     for (const auto id : deviceIds)
     {
         if (!uniqueIds.contains(id))

@@ -330,12 +330,12 @@ struct NX_VMS_COMMON_API QnCameraAdvancedParams
 };
 #define QnCameraAdvancedParams_Fields (name)(version)(pluginUniqueId)(packet_mode)(groups)
 
-struct QnCameraAdvancedParamsMap: std::map<QnUuid, QnCameraAdvancedParams>
+struct QnCameraAdvancedParamsMap: std::map<nx::Uuid, QnCameraAdvancedParams>
 {
-    using base_type = std::map<QnUuid, QnCameraAdvancedParams>;
+    using base_type = std::map<nx::Uuid, QnCameraAdvancedParams>;
     using base_type::base_type;
     const QnCameraAdvancedParams& front() const { return begin()->second; }
-    QnUuid getId() const { return (size() == 1) ? begin()->first : QnUuid(); }
+    nx::Uuid getId() const { return (size() == 1) ? begin()->first : nx::Uuid(); }
 };
 
 struct NX_VMS_COMMON_API QnCameraAdvancedParamsPostBody

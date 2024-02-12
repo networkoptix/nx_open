@@ -20,8 +20,8 @@ struct WorkbenchState
 public:
     struct UnsavedLayout
     {
-        QnUuid id;
-        QnUuid parentId;
+        nx::Uuid id;
+        nx::Uuid parentId;
         QString name;
         qreal cellSpacing = 0.0;
         float cellAspectRatio = 0.0;
@@ -32,11 +32,11 @@ public:
         bool isCrossSystem = false;
     };
 
-    QnUuid userId; //< Id of a User. Works as the first part of the key.
-    QnUuid localSystemId; //< Id of a System. Works as the second part of the key.
-    QnUuid currentLayoutId;
-    QnUuid runningTourId;
-    QList<QnUuid> layoutUuids;
+    nx::Uuid userId; //< Id of a User. Works as the first part of the key.
+    nx::Uuid localSystemId; //< Id of a System. Works as the second part of the key.
+    nx::Uuid currentLayoutId;
+    nx::Uuid runningTourId;
+    QList<nx::Uuid> layoutUuids;
     QList<UnsavedLayout> unsavedLayouts;
 };
 

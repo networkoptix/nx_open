@@ -64,9 +64,9 @@ public:
             {
                 return str;
             }
-            else if constexpr (std::is_same_v<T, QnUuid>)
+            else if constexpr (std::is_same_v<T, nx::Uuid>)
             {
-                QnUuid val = QnUuid::fromStringSafe(*str);
+                nx::Uuid val = nx::Uuid::fromStringSafe(*str);
                 if (!val.isNull())
                     return val;
             }

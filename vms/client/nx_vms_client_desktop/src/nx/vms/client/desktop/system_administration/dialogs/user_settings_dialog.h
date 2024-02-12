@@ -19,7 +19,7 @@ struct UserSettingsDialogState
     Q_GADGET
 
     // Subject ID should go first for correct AccessSubjectEditingContext initialization.
-    Q_PROPERTY(QnUuid userId MEMBER userId)
+    Q_PROPERTY(nx::Uuid userId MEMBER userId)
 
     Q_PROPERTY(nx::vms::client::desktop::UserSettingsGlobal::UserType userType MEMBER userType)
     Q_PROPERTY(bool isSelf MEMBER isSelf)
@@ -55,7 +55,7 @@ public:
 
     UserSettingsGlobal::UserType userType = UserSettingsGlobal::LocalUser;
     bool isSelf = false;
-    QnUuid userId;
+    nx::Uuid userId;
 
     bool deleteAvailable = true;
     bool auditAvailable = true;

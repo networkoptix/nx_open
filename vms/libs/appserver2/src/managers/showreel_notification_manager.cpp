@@ -9,7 +9,7 @@ void ShowreelNotificationManager::triggerNotification(
     NotificationSource /*source*/)
 {
     NX_ASSERT(tran.command == ApiCommand::removeShowreel);
-    emit removed(QnUuid(tran.params.id));
+    emit removed(nx::Uuid(tran.params.id));
 }
 
 void ShowreelNotificationManager::triggerNotification(

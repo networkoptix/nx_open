@@ -43,14 +43,14 @@ public:
     QSet<QnLayoutResourcePtr> watchedLayouts() const;
     bool isWatched(const QnLayoutResourcePtr& layout) const;
 
-    bool hasResource(const QnUuid& resourceId) const;
-    QnCounterHash<QnLayoutResourcePtr> resourceLayouts(const QnUuid& resourceId) const;
+    bool hasResource(const nx::Uuid& resourceId) const;
+    QnCounterHash<QnLayoutResourcePtr> resourceLayouts(const nx::Uuid& resourceId) const;
 
 signals:
-    void addedToLayout(const QnUuid& resourceId, const QnLayoutResourcePtr& layout);
-    void removedFromLayout(const QnUuid& resourceId, const QnLayoutResourcePtr& layout);
-    void resourceAdded(const QnUuid& resourceId);
-    void resourceRemoved(const QnUuid& resourceId);
+    void addedToLayout(const nx::Uuid& resourceId, const QnLayoutResourcePtr& layout);
+    void removedFromLayout(const nx::Uuid& resourceId, const QnLayoutResourcePtr& layout);
+    void resourceAdded(const nx::Uuid& resourceId);
+    void resourceRemoved(const nx::Uuid& resourceId);
 
 private:
     class Private;

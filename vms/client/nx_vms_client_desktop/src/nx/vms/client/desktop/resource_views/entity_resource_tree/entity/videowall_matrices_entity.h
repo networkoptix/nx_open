@@ -10,14 +10,14 @@ namespace nx::vms::client::desktop {
 namespace entity_resource_tree {
 
 using VideowallMatrixItemCreator =
-    std::function<entity_item_model::AbstractItemPtr(const QnUuid&)>;
+    std::function<entity_item_model::AbstractItemPtr(const nx::Uuid&)>;
 
 /**
  * Entity which represents list of Video Wall Matrices taken directly from given resource.
  */
-class VideowallMatricesEntity: public entity_item_model::UniqueKeyListEntity<QnUuid>
+class VideowallMatricesEntity: public entity_item_model::UniqueKeyListEntity<nx::Uuid>
 {
-    using base_type = entity_item_model::UniqueKeyListEntity<QnUuid>;
+    using base_type = entity_item_model::UniqueKeyListEntity<nx::Uuid>;
 
 public:
     VideowallMatricesEntity(

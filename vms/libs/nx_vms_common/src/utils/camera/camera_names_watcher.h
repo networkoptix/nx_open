@@ -19,11 +19,11 @@ class NX_VMS_COMMON_API QnCameraNamesWatcher:
 public:
     explicit QnCameraNamesWatcher(nx::vms::common::SystemContext* systemContext);
     ~QnCameraNamesWatcher();
-    QString getCameraName(const QnUuid& cameraId);
+    QString getCameraName(const nx::Uuid& cameraId);
 
 signals:
-    void cameraNameChanged(const QnUuid& cameraId);
+    void cameraNameChanged(const nx::Uuid& cameraId);
 
 public:
-    QHash<QnUuid, QString> m_names;
+    QHash<nx::Uuid, QString> m_names;
 };

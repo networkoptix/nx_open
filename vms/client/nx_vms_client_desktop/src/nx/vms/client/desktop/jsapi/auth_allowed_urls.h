@@ -26,7 +26,7 @@ struct AuthAllowedUrls
 
     bool operator==(const AuthAllowedUrls&) const = default;
 
-    static Key key(const QnUuid& systemId, const QString& username)
+    static Key key(const nx::Uuid& systemId, const QString& username)
     {
         return systemId.toString() + username;
     }

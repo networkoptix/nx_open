@@ -52,7 +52,7 @@ enum class FiltrationAction
 struct FiltrationResult
 {
     FiltrationAction action;
-    std::map<std::string, QnUuidList> resourceMap;
+    std::map<std::string, UuidList> resourceMap;
     QByteArray hash;
 };
 
@@ -65,12 +65,12 @@ QByteArray permissionHash(const PermissionsDescriptor& permissions, const T& obj
     for (const auto& [fieldName, _] : permissions.resourcePermissions)
     {
         const auto property = object->property(fieldName.c_str());
-        if (property.template canConvert<QnUuid>())
-            result.push_back(property.template value<QnUuid>().toRfc4122());
+        if (property.template canConvert<nx::Uuid>())
+            result.push_back(property.template value<nx::Uuid>().toRfc4122());
 
-        if (property.template canConvert<QnUuidList>())
+        if (property.template canConvert<UuidList>())
         {
-            for (const auto id: property.template value<QnUuidList>())
+            for (const auto id: property.template value<UuidList>())
                 result.push_back(id.toRfc4122());
         }
     }
@@ -106,9 +106,9 @@ FiltrationResult filterResourcesByPermission(
     {
         const QVariant value = object->property(fieldName.c_str());
 
-        if (value.canConvert<QnUuid>())
+        if (value.canConvert<nx::Uuid>())
         {
-            const auto resourceId = value.value<QnUuid>();
+            const auto resourceId = value.value<nx::Uuid>();
             const auto resource = context->resourcePool()->getResourceById(resourceId);
 
             if (resource &&
@@ -122,13 +122,13 @@ FiltrationResult filterResourcesByPermission(
             }
             result.hash.push_back(resourceId.toRfc4122());
         }
-        else if (value.canConvert<QnUuidList>())
+        else if (value.canConvert<UuidList>())
         {
-            const auto resourceIds = value.value<QnUuidList>();
+            const auto resourceIds = value.value<UuidList>();
             if (resourceIds.isEmpty())
                 continue;
 
-            QnUuidList filteredResourceIds;
+            UuidList filteredResourceIds;
 
             for (const auto resourceId: resourceIds)
             {
@@ -200,7 +200,7 @@ ActionBuilder::Actions filterActionPermissions(
     struct ActionUsers
     {
         ActionPtr action;
-        QnUuidSet userIds;
+        UuidSet userIds;
     };
     std::unordered_map<QByteArray, ActionUsers> actionUsersMap;
 
@@ -253,7 +253,7 @@ ActionBuilder::Actions filterActionPermissions(
 
 using namespace std::chrono;
 
-ActionBuilder::ActionBuilder(const QnUuid& id, const QString& actionType, const ActionConstructor& ctor):
+ActionBuilder::ActionBuilder(const nx::Uuid& id, const QString& actionType, const ActionConstructor& ctor):
     m_id(id),
     m_actionType(actionType),
     m_constructor(ctor)
@@ -266,7 +266,7 @@ ActionBuilder::~ActionBuilder()
     toggleAggregationTimer(false);
 }
 
-QnUuid ActionBuilder::id() const
+nx::Uuid ActionBuilder::id() const
 {
     return m_id;
 }
@@ -380,7 +380,7 @@ QSet<QString> ActionBuilder::requiredEventFields() const
     return result;
 }
 
-QSet<QnUuid> ActionBuilder::affectedResources(const EventPtr& /*event*/) const
+QSet<nx::Uuid> ActionBuilder::affectedResources(const EventPtr& /*event*/) const
 {
     NX_ASSERT(false, "Not implemented");
     return {};
@@ -561,7 +561,7 @@ ActionBuilder::Actions ActionBuilder::buildActionsForTargetUsers(
     struct EventUsers
     {
         AggregatedEventPtr event;
-        QnUuidSet userIds;
+        UuidSet userIds;
     };
 
     std::unordered_map<QByteArray, EventUsers> eventUsersMap;
@@ -635,7 +635,7 @@ ActionPtr ActionBuilder::buildAction(const AggregatedEventPtr& aggregatedEvent)
     if (!action)
         return {};
 
-    action->setRuleId(m_rule ? m_rule->id() : QnUuid());
+    action->setRuleId(m_rule ? m_rule->id() : nx::Uuid());
 
     const auto propertyNames =
         nx::utils::propertyNames(action.get(), nx::utils::PropertyAccess::writable);

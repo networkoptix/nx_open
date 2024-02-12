@@ -251,15 +251,15 @@ public:
 
 private:
     void createGroup();
-    void deleteGroups(const QSet<QnUuid>& groupsToDelete);
-    void editGroup(const QnUuid& groupId, bool raiseDialog = true);
+    void deleteGroups(const QSet<nx::Uuid>& groupsToDelete);
+    void editGroup(const nx::Uuid& groupId, bool raiseDialog = true);
     void deleteSelected();
     void deleteNotFoundLdapGroups();
 
     void setupPlaceholder();
 
-    QSet<QnUuid> visibleGroupIds() const;
-    QSet<QnUuid> visibleSelectedGroupIds() const;
+    QSet<nx::Uuid> visibleGroupIds() const;
+    QSet<nx::Uuid> visibleSelectedGroupIds() const;
 };
 
 // -----------------------------------------------------------------------------------------------
@@ -349,7 +349,7 @@ UserGroupsWidget::Private::Private(UserGroupsWidget* q, UserGroupManager* manage
     const auto updateCurrentGroupId =
         [this, q]()
         {
-            const QnUuid groupId = q->context()->settingsDialogManager()->currentEditedGroupId();
+            const nx::Uuid groupId = q->context()->settingsDialogManager()->currentEditedGroupId();
             if (groupId.isNull())
             {
                 ui->groupsTable->clearSelection();
@@ -412,7 +412,7 @@ void UserGroupsWidget::Private::setupUi()
 
             groupsModel->setCheckedGroupIds(checkState == Qt::Checked
                 ? visibleGroupIds()
-                : QSet<QnUuid>());
+                : QSet<nx::Uuid>());
         });
 
     ui->groupsTable->sortByColumn(UserGroupListModel::GroupTypeColumn, Qt::AscendingOrder);
@@ -444,7 +444,7 @@ void UserGroupsWidget::Private::setupUi()
             if (!selectionFlags.testFlag(QItemSelectionModel::Select))
                 return;
 
-            const auto groupId = index.data(Qn::UuidRole).value<QnUuid>();
+            const auto groupId = index.data(Qn::UuidRole).value<nx::Uuid>();
             if (groupId.isNull())
                 return;
 
@@ -536,7 +536,7 @@ void UserGroupsWidget::Private::setupUi()
             if (!index.isValid())
                 return;
 
-            const auto groupId = index.data(Qn::UuidRole).value<QnUuid>();
+            const auto groupId = index.data(Qn::UuidRole).value<nx::Uuid>();
             if (groupsModel->canDeleteGroup(groupId))
                 deleteGroups({groupId});
         });
@@ -650,7 +650,7 @@ void UserGroupsWidget::Private::handleSelectionChanged()
 
     const bool canDelete = !checkedGroupIds.empty()
         && std::any_of(checkedGroupIds.cbegin(), checkedGroupIds.cend(),
-            [this](const QnUuid& groupId) { return groupsModel->canDeleteGroup(groupId); });
+            [this](const nx::Uuid& groupId) { return groupsModel->canDeleteGroup(groupId); });
 
     deleteSelectedButton->setVisible(canDelete);
     selectionControls->setDisplayed(canDelete);
@@ -658,7 +658,7 @@ void UserGroupsWidget::Private::handleSelectionChanged()
 
 void UserGroupsWidget::Private::handleCellTriggered(const QModelIndex& index)
 {
-    const auto groupId = index.data(Qn::UuidRole).value<QnUuid>();
+    const auto groupId = index.data(Qn::UuidRole).value<nx::Uuid>();
 
     if (index.column() == UserGroupListModel::CheckBoxColumn)
     {
@@ -675,7 +675,7 @@ void UserGroupsWidget::Private::createGroup()
     q->context()->settingsDialogManager()->createGroup(q);
 }
 
-void UserGroupsWidget::Private::editGroup(const QnUuid& groupId, bool raiseDialog)
+void UserGroupsWidget::Private::editGroup(const nx::Uuid& groupId, bool raiseDialog)
 {
     if (raiseDialog)
         q->context()->settingsDialogManager()->editGroup(groupId, q);
@@ -683,7 +683,7 @@ void UserGroupsWidget::Private::editGroup(const QnUuid& groupId, bool raiseDialo
         q->context()->settingsDialogManager()->setCurrentEditedGroupId(groupId);
 }
 
-void UserGroupsWidget::Private::deleteGroups(const QSet<QnUuid>& groupsToDelete)
+void UserGroupsWidget::Private::deleteGroups(const QSet<nx::Uuid>& groupsToDelete)
 {
     if (groupsToDelete.isEmpty())
         return;
@@ -727,15 +727,15 @@ void UserGroupsWidget::Private::deleteGroups(const QSet<QnUuid>& groupsToDelete)
 
 void UserGroupsWidget::Private::deleteSelected()
 {
-    QSet<QnUuid> toDelete = visibleSelectedGroupIds();
-    toDelete.removeIf([this](const QnUuid& id) { return !groupsModel->canDeleteGroup(id); });
+    QSet<nx::Uuid> toDelete = visibleSelectedGroupIds();
+    toDelete.removeIf([this](const nx::Uuid& id) { return !groupsModel->canDeleteGroup(id); });
     deleteGroups(toDelete);
 }
 
 void UserGroupsWidget::Private::deleteNotFoundLdapGroups()
 {
-    QSet<QnUuid> toDelete = groupsModel->notFoundGroups();
-    toDelete.removeIf([this](const QnUuid& id) { return !groupsModel->canDeleteGroup(id); });
+    QSet<nx::Uuid> toDelete = groupsModel->notFoundGroups();
+    toDelete.removeIf([this](const nx::Uuid& id) { return !groupsModel->canDeleteGroup(id); });
     deleteGroups(toDelete);
 }
 
@@ -744,13 +744,13 @@ nx::vms::api::UserGroupDataList UserGroupsWidget::Private::userGroups() const
     return manager->groups();
 }
 
-QSet<QnUuid> UserGroupsWidget::Private::visibleGroupIds() const
+QSet<nx::Uuid> UserGroupsWidget::Private::visibleGroupIds() const
 {
-    QSet<QnUuid> result;
+    QSet<nx::Uuid> result;
     for (int row = 0; row < sortModel->rowCount(); ++row)
     {
         const auto index = sortModel->index(row, 0);
-        const auto groupId = index.data(Qn::UuidRole).value<QnUuid>();
+        const auto groupId = index.data(Qn::UuidRole).value<nx::Uuid>();
         if (NX_ASSERT(!groupId.isNull()))
             result.insert(groupId);
     }
@@ -758,7 +758,7 @@ QSet<QnUuid> UserGroupsWidget::Private::visibleGroupIds() const
     return result;
 }
 
-QSet<QnUuid> UserGroupsWidget::Private::visibleSelectedGroupIds() const
+QSet<nx::Uuid> UserGroupsWidget::Private::visibleSelectedGroupIds() const
 {
     return visibleGroupIds() & groupsModel->checkedGroupIds();
 }

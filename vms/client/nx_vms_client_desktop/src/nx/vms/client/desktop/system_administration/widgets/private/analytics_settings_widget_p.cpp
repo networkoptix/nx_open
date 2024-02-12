@@ -76,7 +76,7 @@ AnalyticsSettingsWidget::Private::Private(AnalyticsSettingsWidget* q):
         this, &Private::updateEngine);
 
     connect(enginesWatcher.get(), &AnalyticsEnginesWatcher::engineSettingsModelChanged, this,
-        [this](const QnUuid& engineId)
+        [this](const nx::Uuid& engineId)
         {
             if (engineId == currentEngineId)
                 emit currentSettingsStateChanged();
@@ -103,14 +103,14 @@ void AnalyticsSettingsWidget::Private::updateEngines()
     }
 }
 
-void AnalyticsSettingsWidget::Private::setCurrentEngineId(const QnUuid& engineId)
+void AnalyticsSettingsWidget::Private::setCurrentEngineId(const nx::Uuid& engineId)
 {
     currentEngineId = engineId;
     emit currentSettingsStateChanged();
     refreshSettings(currentEngineId);
 }
 
-QJsonObject AnalyticsSettingsWidget::Private::settingsValues(const QnUuid& engineId)
+QJsonObject AnalyticsSettingsWidget::Private::settingsValues(const nx::Uuid& engineId)
 {
     return settingsValuesByEngineId.value(engineId).values;
 }
@@ -122,7 +122,7 @@ QVariant AnalyticsSettingsWidget::Private::requestParameters(const QJsonObject& 
 }
 
 void AnalyticsSettingsWidget::Private::setSettingsValues(
-    const QnUuid& engineId,
+    const nx::Uuid& engineId,
     const QString& activeElement,
     const QJsonObject& values,
     const QJsonObject& parameters)
@@ -135,13 +135,13 @@ void AnalyticsSettingsWidget::Private::setSettingsValues(
     updateHasChanges();
 }
 
-QJsonObject AnalyticsSettingsWidget::Private::settingsModel(const QnUuid& engineId)
+QJsonObject AnalyticsSettingsWidget::Private::settingsModel(const nx::Uuid& engineId)
 {
     return settingsModelByEngineId.value(engineId);
 }
 
 void AnalyticsSettingsWidget::Private::addEngine(
-    const QnUuid& /*engineId*/, const AnalyticsEngineInfo& engineInfo)
+    const nx::Uuid& /*engineId*/, const AnalyticsEngineInfo& engineInfo)
 {
     // Hide device-dependent engines without settings on the model level.
     if (!isEngineVisible(engineInfo))
@@ -158,12 +158,12 @@ void AnalyticsSettingsWidget::Private::addEngine(
     emit analyticsEnginesChanged();
 }
 
-void AnalyticsSettingsWidget::Private::removeEngine(const QnUuid& engineId)
+void AnalyticsSettingsWidget::Private::removeEngine(const nx::Uuid& engineId)
 {
     auto it = std::find_if(engines.begin(), engines.end(),
         [&engineId](const auto& item)
         {
-            return item.toMap().value("id").template value<QnUuid>() == engineId;
+            return item.toMap().value("id").template value<nx::Uuid>() == engineId;
         });
 
     if (it == engines.end())
@@ -174,7 +174,7 @@ void AnalyticsSettingsWidget::Private::removeEngine(const QnUuid& engineId)
     emit analyticsEnginesChanged();
 }
 
-void AnalyticsSettingsWidget::Private::setErrors(const QnUuid& engineId, const QJsonObject& errors)
+void AnalyticsSettingsWidget::Private::setErrors(const nx::Uuid& engineId, const QJsonObject& errors)
 {
     if (m_errors.value(engineId) == errors)
         return;
@@ -186,7 +186,7 @@ void AnalyticsSettingsWidget::Private::setErrors(const QnUuid& engineId, const Q
 }
 
 void AnalyticsSettingsWidget::Private::resetSettings(
-    const QnUuid& engineId,
+    const nx::Uuid& engineId,
     const QJsonObject& model,
     const QJsonObject& values,
     const QJsonObject& errors,
@@ -202,12 +202,12 @@ void AnalyticsSettingsWidget::Private::resetSettings(
     updateHasChanges();
 }
 
-void AnalyticsSettingsWidget::Private::updateEngine(const QnUuid& engineId)
+void AnalyticsSettingsWidget::Private::updateEngine(const nx::Uuid& engineId)
 {
     auto it = std::find_if(engines.begin(), engines.end(),
         [&engineId](const auto& item)
         {
-            return item.toMap().value("id").template value<QnUuid>() == engineId;
+            return item.toMap().value("id").template value<nx::Uuid>() == engineId;
         });
 
     if (it == engines.end())
@@ -223,7 +223,7 @@ void AnalyticsSettingsWidget::Private::updateEngine(const QnUuid& engineId)
     emit analyticsEnginesChanged();
 }
 
-void AnalyticsSettingsWidget::Private::activateEngine(const QnUuid& engineId)
+void AnalyticsSettingsWidget::Private::activateEngine(const nx::Uuid& engineId)
 {
     if (enginesWatcher->engineInfo(engineId).id.isNull())
         return;
@@ -241,7 +241,7 @@ void AnalyticsSettingsWidget::Private::setLoading(bool loading)
     emit loadingChanged();
 }
 
-void AnalyticsSettingsWidget::Private::refreshSettings(const QnUuid& engineId)
+void AnalyticsSettingsWidget::Private::refreshSettings(const nx::Uuid& engineId)
 {
     if (engineId.isNull())
         return;
@@ -344,7 +344,7 @@ void AnalyticsSettingsWidget::Private::applySettingsValues()
 }
 
 void AnalyticsSettingsWidget::Private::activeElementChanged(
-    const QnUuid& engineId,
+    const nx::Uuid& engineId,
     const QString& activeElement,
     const QJsonObject& parameters)
 {

@@ -15,7 +15,7 @@ struct NX_VMS_API RebuildArchiveFilter
      * refer to the current Server.
      * %example this
      */
-    QnUuid id;
+    nx::Uuid id;
 
     /**%apidoc[opt] Storage location. */
     StorageLocation location = StorageLocation::both;

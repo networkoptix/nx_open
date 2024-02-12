@@ -17,7 +17,7 @@ UserRoleModel::DbUpdateTypes UserRoleModel::toDbTypes() &&
     userRole.name = std::move(name);
     userRole.description = std::move(description);
     std::tie(userRole.permissions, userRole.parentGroupIds, userRole.resourceAccessRights) =
-        migrateAccessRights(permissions, accessibleResources.value_or(std::vector<QnUuid>{}));
+        migrateAccessRights(permissions, accessibleResources.value_or(std::vector<nx::Uuid>{}));
     userRole.parentGroupIds.insert(
         userRole.parentGroupIds.end(), parentGroupIds.begin(), parentGroupIds.end());
     return {std::move(userRole)};

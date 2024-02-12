@@ -123,15 +123,15 @@ void QnStorageListModel::setServer(const QnMediaServerResourcePtr& server)
     m_server = server;
     m_metadataStorageId = server
         ? server->metadataStorageId()
-        : QnUuid();
+        : nx::Uuid();
 }
 
-QnUuid QnStorageListModel::metadataStorageId() const
+nx::Uuid QnStorageListModel::metadataStorageId() const
 {
     return m_metadataStorageId;
 }
 
-void QnStorageListModel::setMetadataStorageId(const QnUuid &id)
+void QnStorageListModel::setMetadataStorageId(const nx::Uuid &id)
 {
     if (m_metadataStorageId == id)
         return;

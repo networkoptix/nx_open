@@ -26,7 +26,7 @@ ErrorCode AbstractShowreelManager::saveSync(const nx::vms::api::ShowreelData& da
         });
 }
 
-ErrorCode AbstractShowreelManager::removeSync(const QnUuid& tourId)
+ErrorCode AbstractShowreelManager::removeSync(const nx::Uuid& tourId)
 {
     return detail::callSync(
         [&](auto handler)

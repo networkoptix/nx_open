@@ -46,7 +46,7 @@ public:
      * @return SaaS services available to the system from Channel Partners, indexed by
      *     the service ID.
      */
-    std::map<QnUuid, nx::vms::api::SaasService> services() const;
+    std::map<nx::Uuid, nx::vms::api::SaasService> services() const;
 
     /**
      * @return State of SaaS licensing for the system.
@@ -65,17 +65,17 @@ public:
     /**
      * @return Parameters of purchased analytics integration services, indexed by service ID.
      */
-    std::map<QnUuid, nx::vms::api::SaasAnalyticsParameters> analyticsIntegrations() const;
+    std::map<nx::Uuid, nx::vms::api::SaasAnalyticsParameters> analyticsIntegrations() const;
 
     /**
      * @return Parameters of purchased local recording services, indexed by service ID.
      */
-    std::map<QnUuid, nx::vms::api::SaasLocalRecordingParameters> localRecording() const;
+    std::map<nx::Uuid, nx::vms::api::SaasLocalRecordingParameters> localRecording() const;
 
     /**
      * @return Parameters of purchased cloud storage services, indexed by service ID.
      */
-    std::map<QnUuid, nx::vms::api::SaasCloudStorageParameters> cloudStorageData() const;
+    std::map<nx::Uuid, nx::vms::api::SaasCloudStorageParameters> cloudStorageData() const;
 
     /**
      * @return Whether Saas is in active state.
@@ -135,13 +135,13 @@ private:
     void setServices(const std::vector<nx::vms::api::SaasService>& services);
 
     template <typename ServiceParamsType>
-    std::map<QnUuid, ServiceParamsType> purchasedServices(const QString& serviceType) const;
+    std::map<nx::Uuid, ServiceParamsType> purchasedServices(const QString& serviceType) const;
     void setSaasStateInternal(api::SaasState saasState, bool waitForDone);
 
 private:
     mutable nx::Mutex m_mutex;
     nx::vms::api::SaasData m_data;
-    std::map<QnUuid, nx::vms::api::SaasService> m_services;
+    std::map<nx::Uuid, nx::vms::api::SaasService> m_services;
     std::atomic<bool> m_enabled{false};
 };
 

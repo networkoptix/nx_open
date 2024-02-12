@@ -41,7 +41,7 @@ const QString kTestActionFieldId = "nx.events.field.test";
 
 api::Rule makeEmptyRuleData()
 {
-    return {{QnUuid::createUuid()}};
+    return {{nx::Uuid::createUuid()}};
 }
 
 } // namespace
@@ -72,7 +72,7 @@ TEST_F(EngineTest, ruleAddedSuccessfully)
     // No rules at the moment the engine is just created.
     ASSERT_EQ(0, engine->rules().size());
 
-    auto rule = std::make_unique<Rule>(QnUuid::createUuid(), engine.get());
+    auto rule = std::make_unique<Rule>(nx::Uuid::createUuid(), engine.get());
     engine->updateRule(serialize(rule.get()));
 
     ASSERT_EQ(engine->rules().size(), 1);
@@ -81,7 +81,7 @@ TEST_F(EngineTest, ruleAddedSuccessfully)
 
 TEST_F(EngineTest, ruleClonedSuccessfully)
 {
-    auto rule = std::make_unique<Rule>(QnUuid::createUuid(), engine.get());
+    auto rule = std::make_unique<Rule>(nx::Uuid::createUuid(), engine.get());
     engine->updateRule(serialize(rule.get()));
 
     auto clonedRule = engine->cloneRule(rule->id());
@@ -359,7 +359,7 @@ TEST_F(EngineTest, cloneEvent)
         std::chrono::microseconds(123456),
         State::instant);
 
-    original->m_cameraId = QnUuid::createUuid();
+    original->m_cameraId = nx::Uuid::createUuid();
     original->m_text = "Test text";
     original->m_intField = 42;
     original->m_floatField = 3.14f;
@@ -419,7 +419,7 @@ TEST_F(EngineTest, defaultFieldBuiltForAbsentInManifest)
     // Received serialized event filter and action builder both have only one field each.
 
     vms::api::rules::EventFilter serializedEventFilter {
-        .id = QnUuid::createUuid(),
+        .id = nx::Uuid::createUuid(),
         .type = eventType,
         .fields = {
             { "testField1", {.type = eventFieldType} }
@@ -427,7 +427,7 @@ TEST_F(EngineTest, defaultFieldBuiltForAbsentInManifest)
     };
 
     vms::api::rules::ActionBuilder serializedActionBuilder {
-        .id = QnUuid::createUuid(),
+        .id = nx::Uuid::createUuid(),
         .type = actionType,
         .fields = {
             { "testField1", {.type = actionFieldType} }
@@ -489,7 +489,7 @@ TEST_F(EngineTest, cacheKey)
 {
     engine->registerEvent(TestEvent::manifest(), testEventConstructor);
 
-    auto rule = std::make_unique<Rule>(QnUuid::createUuid(), engine.get());
+    auto rule = std::make_unique<Rule>(nx::Uuid::createUuid(), engine.get());
     rule->addEventFilter(engine->buildEventFilter(utils::type<TestEvent>()));
     engine->updateRule(serialize(rule.get()));
 
@@ -516,7 +516,7 @@ TEST_F(EngineTest, cacheTimeout)
 
     engine->registerEvent(TestEvent::manifest(), testEventConstructor);
 
-    auto rule = std::make_unique<Rule>(QnUuid::createUuid(), engine.get());
+    auto rule = std::make_unique<Rule>(nx::Uuid::createUuid(), engine.get());
     rule->addEventFilter(engine->buildEventFilter(utils::type<TestEvent>()));
     engine->updateRule(serialize(rule.get()));
 
@@ -539,11 +539,11 @@ TEST_F(EngineTest, cacheState)
     engine->registerEvent(TestEvent::manifest(), testEventConstructor);
 
     // Both rules accept any event.
-    auto rule1 = std::make_unique<Rule>(QnUuid::createUuid(), engine.get());
+    auto rule1 = std::make_unique<Rule>(nx::Uuid::createUuid(), engine.get());
     rule1->addEventFilter(engine->buildEventFilter(utils::type<TestEvent>()));
     engine->updateRule(serialize(rule1.get()));
 
-    auto rule2 = std::make_unique<Rule>(QnUuid::createUuid(), engine.get());
+    auto rule2 = std::make_unique<Rule>(nx::Uuid::createUuid(), engine.get());
     rule2->addEventFilter(engine->buildEventFilter(utils::type<TestEvent>()));
     engine->updateRule(serialize(rule2.get()));
 
@@ -571,7 +571,7 @@ TEST_F(EngineTest, notStartedEventIsNotProcessed)
     engine->registerEvent(TestEvent::manifest(), testEventConstructor);
 
     // The rule accept any event.
-    auto rule1 = std::make_unique<Rule>(QnUuid::createUuid(), engine.get());
+    auto rule1 = std::make_unique<Rule>(nx::Uuid::createUuid(), engine.get());
     rule1->addEventFilter(engine->buildEventFilter(utils::type<TestEvent>()));
     engine->updateRule(serialize(rule1.get()));
 
@@ -593,7 +593,7 @@ TEST_F(EngineTest, timerThread)
     thread.start();
     engine->moveToThread(&thread);
 
-    auto ruleId = QnUuid::createUuid();
+    auto ruleId = nx::Uuid::createUuid();
     {
         auto rule1 = std::make_unique<Rule>(ruleId, engine.get());
         rule1->addEventFilter(engine->buildEventFilter(utils::type<TestEvent>()));

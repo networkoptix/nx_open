@@ -120,10 +120,10 @@ QnResourceAccessManager::QnResourceAccessManager(
 
     connect(systemContext()->accessSubjectHierarchy(), &SubjectHierarchy::changed, this,
         [this](
-            const QSet<QnUuid>& /*added*/,
-            const QSet<QnUuid>& /*removed*/,
-            const QSet<QnUuid>& /*groupsWithChangedMembers*/,
-            const QSet<QnUuid>& subjectsWithChangedParents)
+            const QSet<nx::Uuid>& /*added*/,
+            const QSet<nx::Uuid>& /*removed*/,
+            const QSet<nx::Uuid>& /*groupsWithChangedMembers*/,
+            const QSet<nx::Uuid>& subjectsWithChangedParents)
         {
             const auto affectedUsers = resourcePool()->getResourcesByIds<QnUserResource>(
                 subjectsWithChangedParents + systemContext()->accessSubjectHierarchy()->
@@ -159,7 +159,7 @@ AccessRights QnResourceAccessManager::accessRights(
 }
 
 AccessRights QnResourceAccessManager::accessRights(
-    const QnResourceAccessSubject& subject, const QnUuid& resourceGroupId) const
+    const QnResourceAccessSubject& subject, const nx::Uuid& resourceGroupId) const
 {
     return subject.isValid() && (subject.isRole() || subject.user()->isEnabled())
         ? m_accessRightsResolver->accessRights(subject.id(), resourceGroupId)
@@ -174,7 +174,7 @@ bool QnResourceAccessManager::hasAccessRights(const QnResourceAccessSubject& sub
 }
 
 bool QnResourceAccessManager::hasAccessRights(const QnResourceAccessSubject& subject,
-    const QnUuid& resourceGroupId, AccessRights requiredAccessRights) const
+    const nx::Uuid& resourceGroupId, AccessRights requiredAccessRights) const
 {
     return requiredAccessRights == AccessRights{}
         || accessRights(subject, resourceGroupId).testFlags(requiredAccessRights);
@@ -284,7 +284,7 @@ Qn::Permissions QnResourceAccessManager::permissions(const QnResourceAccessSubje
 }
 
 Qn::Permissions QnResourceAccessManager::permissions(
-    const QnResourceAccessSubject& subject, const QnUuid& targetId) const
+    const QnResourceAccessSubject& subject, const nx::Uuid& targetId) const
 {
     if (const auto targetResource = resourcePool()->getResourceById(targetId))
         return permissions(subject, targetResource);
@@ -311,7 +311,7 @@ bool QnResourceAccessManager::hasPermission(
 
 bool QnResourceAccessManager::hasPermission(
     const QnResourceAccessSubject& subject,
-    const QnUuid& targetId,
+    const nx::Uuid& targetId,
     Qn::Permissions requiredPermissions) const
 {
     return (permissions(subject, targetId) & requiredPermissions) == requiredPermissions;
@@ -339,7 +339,7 @@ bool QnResourceAccessManager::hasPermission(
 }
 
 ResourceAccessDetails QnResourceAccessManager::accessDetails(
-    const QnUuid& subjectId, const QnResourcePtr& resource, AccessRight accessRight) const
+    const nx::Uuid& subjectId, const QnResourcePtr& resource, AccessRight accessRight) const
 {
     return m_accessRightsResolver->accessDetails(subjectId, resource, accessRight);
 }
@@ -956,7 +956,7 @@ bool QnResourceAccessManager::canModifyLayout(
     {
         const auto layoutAccessRights = accessRights(subject, layout);
 
-        QSet<QnUuid> oldResourceIds;
+        QSet<nx::Uuid> oldResourceIds;
         for (const auto& item: layout->getItems())
             oldResourceIds.insert(item.resource.id);
 
@@ -992,7 +992,7 @@ bool QnResourceAccessManager::canCreateStorage(const QnResourceAccessSubject& su
 }
 
 bool QnResourceAccessManager::canCreateStorage(const QnResourceAccessSubject& subject,
-    const QnUuid& storageParentId) const
+    const nx::Uuid& storageParentId) const
 {
     if (!subject.isValid())
         return false;
@@ -1032,7 +1032,7 @@ bool QnResourceAccessManager::canCreateUser(const QnResourceAccessSubject& subje
 bool QnResourceAccessManager::canCreateUser(
     const QnResourceAccessSubject& subject,
     GlobalPermissions newPermissions,
-    const std::vector<QnUuid>& targetGroups) const
+    const std::vector<nx::Uuid>& targetGroups) const
 {
     if (!subject.isValid())
         return false;
@@ -1084,7 +1084,7 @@ bool QnResourceAccessManager::canModifyUser(
         || userResource->getRawPermissions() != update.permissions
         || nx::utils::toQSet(userResource->groupIds()) != nx::utils::toQSet(update.groupIds)
         || userResource->isEnabled() != update.isEnabled
-        || accessRightMap != QHash<QnUuid, AccessRights>{
+        || accessRightMap != QHash<nx::Uuid, AccessRights>{
             update.resourceAccessRights.begin(), update.resourceAccessRights.end()};
 
     // Cannot modify own permissions.
@@ -1144,10 +1144,10 @@ bool QnResourceAccessManager::canModifyUser(
 }
 
 GlobalPermissions QnResourceAccessManager::accumulatePermissions(GlobalPermissions own,
-    const std::vector<QnUuid>& parentGroups) const
+    const std::vector<nx::Uuid>& parentGroups) const
 {
     return std::accumulate(parentGroups.cbegin(), parentGroups.cend(), own,
-        [this](GlobalPermissions result, const QnUuid& groupId) -> GlobalPermissions
+        [this](GlobalPermissions result, const nx::Uuid& groupId) -> GlobalPermissions
         {
             return result | m_accessRightsResolver->globalPermissions(groupId);
         });
@@ -1224,7 +1224,7 @@ bool QnResourceAccessManager::canCreateWebPage(const QnResourceAccessSubject& su
 }
 
 bool QnResourceAccessManager::hasAccessToAllCameras(
-    const QnUuid& userId,
+    const nx::Uuid& userId,
     nx::vms::api::AccessRights accessRights) const
 {
     const auto user = resourcePool()->getResourceById<QnUserResource>(userId);

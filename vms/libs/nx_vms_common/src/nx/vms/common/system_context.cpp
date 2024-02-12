@@ -40,8 +40,8 @@ using namespace nx::core::access;
 struct SystemContext::Private
 {
     const Mode mode;
-    const QnUuid peerId;
-    /*const*/ QnUuid sessionId; //< FIXME: #sivanov Make separate sessions with own ids.
+    const nx::Uuid peerId;
+    /*const*/ nx::Uuid sessionId; //< FIXME: #sivanov Make separate sessions with own ids.
     QnCommonMessageProcessor* messageProcessor = nullptr;
 
     std::unique_ptr<QnLicensePool> licensePool;
@@ -76,8 +76,8 @@ struct SystemContext::Private
 
 SystemContext::SystemContext(
     Mode mode,
-    QnUuid peerId,
-    QnUuid sessionId,
+    nx::Uuid peerId,
+    nx::Uuid sessionId,
     nx::core::access::Mode resourceAccessMode,
     QObject* parent)
     :
@@ -148,19 +148,19 @@ SystemContext::~SystemContext()
     d->resourcePool->threadPool()->waitForDone();
 }
 
-const QnUuid& SystemContext::peerId() const
+const nx::Uuid& SystemContext::peerId() const
 {
     return d->peerId;
 }
 
-const QnUuid& SystemContext::sessionId() const
+const nx::Uuid& SystemContext::sessionId() const
 {
     return d->sessionId;
 }
 
 void SystemContext::updateRunningInstanceGuid()
 {
-    d->sessionId = QnUuid::createUuid();
+    d->sessionId = nx::Uuid::createUuid();
     auto data = runtimeInfoManager()->localInfo();
     data.data.peer.instanceId = d->sessionId;
     runtimeInfoManager()->updateLocalItem(data);

@@ -55,7 +55,7 @@ void QnSubjectTargetActionWidget::selectSubjects()
     auto params = model()->actionParams();
 
     dialog.setRoleValidator(
-        [this](const QnUuid& roleId) { return roleValidity(roleId); });
+        [this](const nx::Uuid& roleId) { return roleValidity(roleId); });
 
     dialog.setUserValidator(
         [this](const QnUserResourcePtr& user) { return userValidity(user); });
@@ -63,7 +63,7 @@ void QnSubjectTargetActionWidget::selectSubjects()
     if (m_options)
         dialog.setOptions(m_options.value());
 
-    QSet<QnUuid> selected;
+    QSet<nx::Uuid> selected;
     for (auto id: params.additionalResources)
         selected << id;
 
@@ -195,7 +195,7 @@ void QnSubjectTargetActionWidget::setDialogOptions(const CustomizableOptions& op
     m_options.emplace(options);
 }
 
-QValidator::State QnSubjectTargetActionWidget::roleValidity(const QnUuid& roleId) const
+QValidator::State QnSubjectTargetActionWidget::roleValidity(const nx::Uuid& roleId) const
 {
     return m_validationPolicy ? m_validationPolicy->roleValidity(roleId) : QValidator::Acceptable;
 }
@@ -206,7 +206,7 @@ bool QnSubjectTargetActionWidget::userValidity(const QnUserResourcePtr& user) co
 }
 
 QString QnSubjectTargetActionWidget::calculateAlert(
-    bool allUsers, const QSet<QnUuid>& subjects) const
+    bool allUsers, const QSet<nx::Uuid>& subjects) const
 {
     return m_validationPolicy
         ? m_validationPolicy->calculateAlert(allUsers, subjects)

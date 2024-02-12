@@ -37,7 +37,7 @@ Result AbstractMediaServerManager::saveSync(const nx::vms::api::MediaServerData&
         });
 }
 
-ErrorCode AbstractMediaServerManager::removeSync(const QnUuid& id)
+ErrorCode AbstractMediaServerManager::removeSync(const nx::Uuid& id)
 {
     return detail::callSync(
         [&](auto handler)
@@ -76,7 +76,7 @@ ErrorCode AbstractMediaServerManager::removeStoragesSync(const nx::vms::api::IdD
 }
 
 Result AbstractMediaServerManager::getUserAttributesSync(
-    const QnUuid& mediaServerId, nx::vms::api::MediaServerUserAttributesDataList* outDataList)
+    const nx::Uuid& mediaServerId, nx::vms::api::MediaServerUserAttributesDataList* outDataList)
 {
     return detail::callSync(
         [&](auto handler)
@@ -87,7 +87,7 @@ Result AbstractMediaServerManager::getUserAttributesSync(
 }
 
 ErrorCode AbstractMediaServerManager::getStoragesSync(
-    const QnUuid& mediaServerId, nx::vms::api::StorageDataList* outDataList)
+    const nx::Uuid& mediaServerId, nx::vms::api::StorageDataList* outDataList)
 {
     return detail::callSync(
         [&](auto handler)

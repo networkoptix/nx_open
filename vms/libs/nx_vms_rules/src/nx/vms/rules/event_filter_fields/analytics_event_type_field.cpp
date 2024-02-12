@@ -29,12 +29,12 @@ bool AnalyticsEventTypeField::match(const QVariant& value) const
         || nx::analytics::taxonomy::eventBelongsToGroup(eventType, m_typeId);
 }
 
-QnUuid AnalyticsEventTypeField::engineId() const
+nx::Uuid AnalyticsEventTypeField::engineId() const
 {
     return m_engineId;
 }
 
-void AnalyticsEventTypeField::setEngineId(QnUuid id)
+void AnalyticsEventTypeField::setEngineId(nx::Uuid id)
 {
     if (m_engineId != id)
     {

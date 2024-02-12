@@ -33,12 +33,12 @@ public:
      * Creates a resource access subject by trying to look up a user in the system resource pool
      * or a user group in the system user groups manager.
      */
-    QnResourceAccessSubject subjectById(const QnUuid& id) const;
+    QnResourceAccessSubject subjectById(const nx::Uuid& id) const;
 
     /**
      * List of users belonging to a given set of groups or any of their child groups, recursively.
      */
-    QnUserResourceList usersInGroups(const QSet<QnUuid>& groupIds) const;
+    QnUserResourceList usersInGroups(const QSet<nx::Uuid>& groupIds) const;
 
 private:
     class Private;

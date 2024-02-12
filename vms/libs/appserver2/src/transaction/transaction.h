@@ -1675,7 +1675,7 @@ NX_REFLECTION_ENUM_CLASS(TransactionType,
 struct HistoryAttributes
 {
     /** Id of user or entity who created transaction. */
-    QnUuid author;
+    nx::Uuid author;
 
     bool operator==(const HistoryAttributes& other) const
     {
@@ -1693,7 +1693,7 @@ struct TransactionPersistentInfo
     TransactionPersistentInfo(): timestamp(TimestampType::fromInteger(0)) {}
     bool isNull() const { return dbID.isNull(); }
 
-    QnUuid dbID;
+    nx::Uuid dbID;
     qint32 sequence = 0;
     nx::vms::api::Timestamp timestamp;
 
@@ -1714,8 +1714,8 @@ struct TransactionPersistentInfo
 
 struct QnAbstractTransaction
 {
-    static QnUuid makeHash(const QByteArray& data1, const QByteArray& data2 = QByteArray());
-    static QnUuid makeHash(const QByteArray& extraData, const nx::vms::api::DiscoveryData& data);
+    static nx::Uuid makeHash(const QByteArray& data1, const QByteArray& data2 = QByteArray());
+    static nx::Uuid makeHash(const QByteArray& extraData, const nx::vms::api::DiscoveryData& data);
 
     /**
      * Sets QnAbstractTransaction::peerID to commonModule()->peerId().
@@ -1726,14 +1726,14 @@ struct QnAbstractTransaction
     {
     }
 
-    explicit QnAbstractTransaction(QnUuid _peerID):
+    explicit QnAbstractTransaction(nx::Uuid _peerID):
         command(ApiCommand::NotDefined),
         peerID(_peerID),
         transactionType(TransactionType::Regular)
     {
     }
 
-    QnAbstractTransaction(ApiCommand::Value value, QnUuid _peerID):
+    QnAbstractTransaction(ApiCommand::Value value, nx::Uuid _peerID):
         command(value),
         peerID(_peerID),
         transactionType(TransactionType::Regular)
@@ -1745,7 +1745,7 @@ struct QnAbstractTransaction
     ApiCommand::Value command;
 
     /** Id of peer that generated transaction. */
-    QnUuid peerID;
+    nx::Uuid peerID;
 
     TransactionPersistentInfo persistentInfo;
 
@@ -1780,7 +1780,7 @@ public:
     using base_type = QnAbstractTransaction;
 
     QnTransaction(): QnAbstractTransaction() {}
-    QnTransaction(QnUuid _peerID):
+    QnTransaction(nx::Uuid _peerID):
         QnAbstractTransaction(_peerID)
     {
     }
@@ -1792,7 +1792,7 @@ public:
 
     QnTransaction(
         ApiCommand::Value command,
-        QnUuid _peerID,
+        nx::Uuid _peerID,
         const T& params = T())
         :
         QnAbstractTransaction(command, _peerID),
@@ -1868,12 +1868,12 @@ QN_FUSION_DECLARE_FUNCTIONS(ApiTranLogFilter, (json)(ubjson)(xml)(csv_record))
 
 struct ApiTransactionData
 {
-    QnUuid tranGuid;
+    nx::Uuid tranGuid;
     QnAbstractTransaction tran;
     int dataSize = 0;
 
     ApiTransactionData() = default;
-    explicit ApiTransactionData(const QnUuid& peerGuid): tran(peerGuid) {}
+    explicit ApiTransactionData(const nx::Uuid& peerGuid): tran(peerGuid) {}
 
     ApiTransactionData(const ApiTransactionData&) = default;
     ApiTransactionData& operator=(const ApiTransactionData&) = default;
@@ -1889,7 +1889,7 @@ NX_REFLECTION_INSTRUMENT(ApiTransactionData, ApiTransactionData_Fields)
 
 struct TransactionModel
 {
-    QnUuid id;
+    nx::Uuid id;
     QnAbstractTransaction info;
     int binaryDataSizeB = 0;
     std::optional<QJsonValue> data;

@@ -17,7 +17,7 @@ public:
     common::LayoutItemData itemData;
 };
 
-LayoutItemAdaptor::LayoutItemAdaptor(const QnLayoutResourcePtr& layout, const QnUuid& itemId):
+LayoutItemAdaptor::LayoutItemAdaptor(const QnLayoutResourcePtr& layout, const nx::Uuid& itemId):
     d(new Private())
 {
     NX_ASSERT(layout);
@@ -95,12 +95,12 @@ QnLayoutResource* LayoutItemAdaptor::layoutPlainPointer() const
     return d->layout.data();
 }
 
-QnUuid LayoutItemAdaptor::itemId() const
+nx::Uuid LayoutItemAdaptor::itemId() const
 {
     return d->itemData.uuid;
 }
 
-QnUuid LayoutItemAdaptor::resourceId() const
+nx::Uuid LayoutItemAdaptor::resourceId() const
 {
     return d->itemData.resource.id;
 }
@@ -147,12 +147,12 @@ void LayoutItemAdaptor::setGeometry(const QRect& geometry)
     emit geometryChanged();
 }
 
-QnUuid LayoutItemAdaptor::zoomTargetId() const
+nx::Uuid LayoutItemAdaptor::zoomTargetId() const
 {
     return d->itemData.zoomTargetUuid;
 }
 
-void LayoutItemAdaptor::setZoomTargetId(const QnUuid& id)
+void LayoutItemAdaptor::setZoomTargetId(const nx::Uuid& id)
 {
     if (d->itemData.zoomTargetUuid == id)
         return;

@@ -116,7 +116,7 @@ void External::Private::resetC2pLayout(
     const QnTimePeriod sliderWindow(timestamp - kSliderWindow/2, kSliderWindow);
 
     // Select camera as an active item to display timeline.
-    QnUuid activeItemId;
+    nx::Uuid activeItemId;
     const auto allItems = currentLayout->getItems();
     for (const auto& item: allItems)
     {

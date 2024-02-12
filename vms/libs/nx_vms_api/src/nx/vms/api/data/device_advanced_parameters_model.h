@@ -15,7 +15,7 @@ struct NX_VMS_API DeviceAdvancedFilter
      * "logicalId" field via `GET /rest/v{1-}/devices`) or MAC address (not supported for certain
      * cameras).
      */
-    QnUuid deviceId;
+    nx::Uuid deviceId;
 
     /**%apidoc[opt] Parameter id to read. */
     QString id;

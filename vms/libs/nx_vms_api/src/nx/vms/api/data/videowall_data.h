@@ -16,9 +16,9 @@ namespace api {
 
 struct NX_VMS_API VideowallItemData
 {
-    QnUuid guid;
-    QnUuid pcGuid;
-    QnUuid layoutGuid;
+    nx::Uuid guid;
+    nx::Uuid pcGuid;
+    nx::Uuid layoutGuid;
 
     /**%apidoc
      * %example Video Wall item 1
@@ -45,7 +45,7 @@ NX_VMS_API_DECLARE_STRUCT_AND_LIST(VideowallItemData)
 
 struct NX_VMS_API VideowallScreenData
 {
-    QnUuid pcGuid;
+    nx::Uuid pcGuid;
 
     /**%apidoc[opt] */
     int pcIndex = 0;
@@ -83,8 +83,8 @@ NX_VMS_API_DECLARE_STRUCT_AND_LIST(VideowallScreenData)
 
 struct NX_VMS_API VideowallMatrixItemData
 {
-    QnUuid itemGuid;
-    QnUuid layoutGuid;
+    nx::Uuid itemGuid;
+    nx::Uuid layoutGuid;
 
     bool operator==(const VideowallMatrixItemData& other) const = default;
 };
@@ -120,7 +120,7 @@ struct NX_VMS_API VideowallData: ResourceData
     bool operator==(const VideowallData& other) const = default;
 
     static const QString kResourceTypeName;
-    static const QnUuid kResourceTypeId;
+    static const nx::Uuid kResourceTypeId;
 
     /**%apidoc[opt] */
     bool autorun = false;
@@ -138,8 +138,8 @@ NX_VMS_API_DECLARE_STRUCT_AND_LIST(VideowallData)
 struct NX_VMS_API VideowallControlMessageData
 {
     int operation = 0;
-    QnUuid videowallGuid;
-    QnUuid instanceGuid;
+    nx::Uuid videowallGuid;
+    nx::Uuid instanceGuid;
     std::map<QString, QString> params;
 };
 #define VideowallControlMessageData_Fields (operation)(videowallGuid)(instanceGuid)(params)

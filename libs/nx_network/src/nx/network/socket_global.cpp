@@ -485,7 +485,7 @@ void SocketGlobalsHolder::initialize(bool initializePeerId)
     // TODO: #akolesnikov It is not clear why following call is in reinitialize,
     // but not in initial initialization. Remove it from here.
     if (initializePeerId)
-        SocketGlobals::cloud().outgoingTunnelPool().assignOwnPeerId("re", QnUuid::createUuid());
+        SocketGlobals::cloud().outgoingTunnelPool().assignOwnPeerId("re", nx::Uuid::createUuid());
 }
 
 void SocketGlobalsHolder::uninitialize()

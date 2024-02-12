@@ -96,7 +96,7 @@ void appendMandatoryFilters(QnStringsSet* filters)
 
 QnStatisticsManager::QnStatisticsManager(QObject* parent):
     base_type(parent),
-    m_sessionId(QnUuid::createUuid())
+    m_sessionId(nx::Uuid::createUuid())
 {
 }
 
@@ -129,7 +129,7 @@ void QnStatisticsManager::unregisterModule(const QString& alias)
     m_modules.remove(alias);
 }
 
-void QnStatisticsManager::setClientId(const QnUuid& clientID)
+void QnStatisticsManager::setClientId(const nx::Uuid& clientID)
 {
     m_clientId = clientID;
 }
@@ -238,7 +238,7 @@ void QnStatisticsManager::saveCurrentStatistics()
 
 void QnStatisticsManager::resetStatistics()
 {
-    m_sessionId = QnUuid::createUuid();
+    m_sessionId = nx::Uuid::createUuid();
     for (const auto module: m_modules)
     {
         if (module)

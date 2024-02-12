@@ -14,7 +14,7 @@ namespace {
 
 QString randomString()
 {
-    return QnUuid::createUuid().toSimpleString();
+    return nx::Uuid::createUuid().toSimpleString();
 }
 
 SharedMemoryData generateRandomData()
@@ -38,7 +38,7 @@ SharedMemoryData generateRandomData()
             SharedMemoryData::Command::saveWindowState,
             SharedMemoryData::Command::restoreWindowState});
         if (data.command == SharedMemoryData::Command::restoreWindowState)
-            data.commandData = QnUuid::createUuid().toString().toLatin1();
+            data.commandData = nx::Uuid::createUuid().toString().toLatin1();
     }
 
     std::transform(sessionsToAdd.begin(), sessionsToAdd.end(), result.sessions.begin(),

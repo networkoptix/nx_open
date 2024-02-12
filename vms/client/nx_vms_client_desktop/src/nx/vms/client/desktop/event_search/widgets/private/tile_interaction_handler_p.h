@@ -66,7 +66,7 @@ private:
         const QnResourceList& resources, const QVariant& timestamp) const;
 
     void executePluginAction(
-        const QnUuid& engineId,
+        const nx::Uuid& engineId,
         const QString& actionTypeId,
         const nx::analytics::db::ObjectTrack& track,
         const QnVirtualCameraResourcePtr& camera) const;
@@ -94,7 +94,7 @@ private:
 
 private:
     const QScopedPointer<nx::utils::PendingOperation> m_showPendingMessages;
-    QSet<QnUuid> m_messages;
+    QSet<nx::Uuid> m_messages;
     QStringList m_pendingMessages;
 };
 

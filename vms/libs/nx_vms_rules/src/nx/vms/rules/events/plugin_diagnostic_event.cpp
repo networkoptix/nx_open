@@ -40,8 +40,8 @@ PluginDiagnosticEvent::PluginDiagnosticEvent(
     std::chrono::microseconds timestamp,
     const QString& caption,
     const QString& description,
-    QnUuid cameraId,
-    QnUuid engineId,
+    nx::Uuid cameraId,
+    nx::Uuid engineId,
     nx::vms::api::EventLevel level)
     :
     AnalyticsEngineEvent(timestamp, caption, description, cameraId, engineId),

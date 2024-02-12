@@ -84,7 +84,7 @@ void IncompatibleServersActionHandler::connectToCurrentSystem(
         return;
 
     const auto moduleInformation = server->getModuleInformation();
-    QnUuid target = server->getId();
+    nx::Uuid target = server->getId();
     if (target.isNull())
         return;
 

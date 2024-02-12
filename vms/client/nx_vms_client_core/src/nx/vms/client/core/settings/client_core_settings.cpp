@@ -56,7 +56,7 @@ NX_REFLECTION_INSTRUMENT(SerializableCredentials_v42, (user)(password));
 
 struct SystemAuthenticationData_v42
 {
-    QnUuid key;
+    nx::Uuid key;
     std::vector<SerializableCredentials_v42> value;
     bool operator==(const SystemAuthenticationData_v42& other) const = default;
 };
@@ -136,7 +136,7 @@ void Settings::setCloudAuthData(const CloudAuthData& authData)
         nx::network::http::BearerAuthToken(authData.refreshToken));
 }
 
-std::optional<QnUuid> Settings::preferredCloudServer(const QString& systemId)
+std::optional<nx::Uuid> Settings::preferredCloudServer(const QString& systemId)
 {
     const auto preferredServers = preferredCloudServers();
     const auto iter = std::find_if(preferredServers.cbegin(), preferredServers.cend(),
@@ -148,7 +148,7 @@ std::optional<QnUuid> Settings::preferredCloudServer(const QString& systemId)
     return iter->serverId;
 }
 
-void Settings::setPreferredCloudServer(const QString& systemId, const QnUuid& serverId)
+void Settings::setPreferredCloudServer(const QString& systemId, const nx::Uuid& serverId)
 {
     static constexpr int kMaxStoredPreferredCloudServers = 100;
 
@@ -171,7 +171,7 @@ void Settings::setPreferredCloudServer(const QString& systemId, const QnUuid& se
 }
 
 void Settings::storeRecentConnection(
-    const QnUuid& localSystemId,
+    const nx::Uuid& localSystemId,
     const QString& systemName,
     const nx::utils::SoftwareVersion& version,
     const nx::utils::Url& url)
@@ -192,7 +192,7 @@ void Settings::storeRecentConnection(
     recentLocalConnections = connections;
 }
 
-void Settings::removeRecentConnection(const QnUuid& localSystemId)
+void Settings::removeRecentConnection(const nx::Uuid& localSystemId)
 {
     NX_VERBOSE(NX_SCOPE_TAG, "Removing recent system connection id: %1", localSystemId);
 
@@ -202,7 +202,7 @@ void Settings::removeRecentConnection(const QnUuid& localSystemId)
         recentLocalConnections = connections;
 }
 
-void Settings::updateWeightData(const QnUuid& localId)
+void Settings::updateWeightData(const nx::Uuid& localId)
 {
     auto weightData = localSystemWeightsData();
     const auto itWeightData = std::find_if(weightData.begin(), weightData.end(),
@@ -299,7 +299,7 @@ void Settings::migrateSystemAuthenticationDataFrom_v42(Settings* oldSettings)
     const auto oldData = systemAuthenticationData_v42();
     for (const SystemAuthenticationData_v42& authData: oldData)
     {
-        const QnUuid& localSystemId = authData.key;
+        const nx::Uuid& localSystemId = authData.key;
         for (const SerializableCredentials_v42& credentials: authData.value)
             migratedData[localSystemId].push_back(credentials);
     }
@@ -329,7 +329,7 @@ void Settings::migrateWelcomeScreenSettingsFrom_v51(Settings* oldSettings)
     // values.
     if (!recentLocalConnections.exists())
     {
-        QHash<QnUuid, LocalConnectionData> value;
+        QHash<nx::Uuid, LocalConnectionData> value;
         if (QJson::deserialize(oldQSettings->value(
             kClientCorePrefix + recentLocalConnections.name).toString(), &value))
         {

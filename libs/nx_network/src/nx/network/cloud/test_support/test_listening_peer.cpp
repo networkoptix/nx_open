@@ -37,7 +37,7 @@ struct VmsApiModuleInformation
 {
     std::string realm;
     std::string cloudHost;
-    QnUuid id;
+    nx::Uuid id;
     std::string cloudSystemId;
 };
 
@@ -77,7 +77,7 @@ public:
 
             restResult.reply->realm = nx::network::AppInfo::realm();
             restResult.reply->cloudHost = nx::network::SocketGlobals::cloud().cloudHost();
-            restResult.reply->id = QnUuid::fromStringSafe(*m_serverIdForModuleInformation);
+            restResult.reply->id = nx::Uuid::fromStringSafe(*m_serverIdForModuleInformation);
             if (m_cloudSystemId)
                 restResult.reply->cloudSystemId = *m_cloudSystemId;
         }
@@ -111,7 +111,7 @@ TestListeningPeer::TestListeningPeer(
     m_systemData(std::move(systemData)),
     m_serverId(
         serverName.empty()
-        ? QnUuid::createUuid().toSimpleStdString()
+        ? nx::Uuid::createUuid().toSimpleStdString()
         : std::move(serverName)),
     m_mediatorUdpEndpoint(mediatorUdpEndpoint),
     m_mediatorUdpClient(

@@ -4,21 +4,21 @@
 
 #include <nx/utils/uuid.h>
 
-NX_VMS_COMMON_API QnUuid intToGuid(qint32 value, const QByteArray& postfix);
+NX_VMS_COMMON_API nx::Uuid intToGuid(qint32 value, const QByteArray& postfix);
 
-NX_VMS_COMMON_API QString guidToSqlString(const QnUuid& guid);
+NX_VMS_COMMON_API QString guidToSqlString(const nx::Uuid& guid);
 
-inline QnUuid guidFromArbitraryData(const QByteArray& data)
+inline nx::Uuid guidFromArbitraryData(const QByteArray& data)
 {
-    return QnUuid::fromArbitraryData(data);
+    return nx::Uuid::fromArbitraryData(data);
 }
 
-inline QnUuid guidFromArbitraryData(const QString& data)
+inline nx::Uuid guidFromArbitraryData(const QString& data)
 {
-    return QnUuid::fromArbitraryData(data);
+    return nx::Uuid::fromArbitraryData(data);
 }
 
-inline QnUuid guidFromArbitraryData(const std::string& data)
+inline nx::Uuid guidFromArbitraryData(const std::string& data)
 {
-    return QnUuid::fromArbitraryData(data);
+    return nx::Uuid::fromArbitraryData(data);
 }

@@ -44,7 +44,7 @@ class QnThreadsafeItemStorage
 
 public:
     typedef QList<T> ItemList;
-    typedef QHash<QnUuid, T> ItemMap;
+    typedef QHash<nx::Uuid, T> ItemMap;
 
     QnThreadsafeItemStorage(nx::Mutex *mutex, QnThreadsafeItemStorageNotifier<T>* notifier):
         m_mutex(mutex),
@@ -76,13 +76,13 @@ public:
         return m_itemByUuid;
     }
 
-    T getItem(const QnUuid &uuid) const
+    T getItem(const nx::Uuid &uuid) const
     {
         NX_MUTEX_LOCKER locker(m_mutex);
         return m_itemByUuid.value(uuid);
     }
 
-    bool hasItem(const QnUuid &uuid) const
+    bool hasItem(const nx::Uuid &uuid) const
     {
         NX_MUTEX_LOCKER locker(m_mutex);
         return m_itemByUuid.contains(uuid);
@@ -104,7 +104,7 @@ public:
         removeItem(item.uuid);
     }
 
-    void removeItem(const QnUuid &uuid)
+    void removeItem(const nx::Uuid &uuid)
     {
         Qn::NotifierList notifiers;
         {
@@ -200,7 +200,7 @@ private:
             notifiers << m_notifier->storedItemChanged(item, oldItem);
     }
 
-    void removeItemUnderLock(const QnUuid &uuid, Qn::NotifierList& notifiers)
+    void removeItemUnderLock(const nx::Uuid &uuid, Qn::NotifierList& notifiers)
     {
         typename ItemMap::iterator pos = m_itemByUuid.find(uuid);
         if (pos == m_itemByUuid.end())

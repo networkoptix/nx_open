@@ -31,7 +31,7 @@ public:
 
     void loadFromCameras(
         const QnVirtualCameraResourceList& cameras,
-        QnUuid engineId,
+        nx::Uuid engineId,
         QString eventTypeId);
 
     bool isValid() const;

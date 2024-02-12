@@ -46,7 +46,7 @@ void LookupListManager::deinitialize()
     d->initialized = false;
 }
 
-nx::vms::api::LookupListData LookupListManager::lookupList(const QnUuid& id) const
+nx::vms::api::LookupListData LookupListManager::lookupList(const nx::Uuid& id) const
 {
     NX_MUTEX_LOCKER lk(&d->mutex);
     if (!d->initialized)
@@ -87,7 +87,7 @@ void LookupListManager::addOrUpdate(nx::vms::api::LookupListData list)
     emit addedOrUpdated(id);
 }
 
-void LookupListManager::remove(const QnUuid& id)
+void LookupListManager::remove(const nx::Uuid& id)
 {
     {
         NX_MUTEX_LOCKER lock(&d->mutex);

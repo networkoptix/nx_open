@@ -49,7 +49,7 @@ void VmsRulesDialog::addRule()
 {
     auto engine = systemContext()->vmsRulesEngine();
 
-    auto newRule = std::make_shared<vms::rules::Rule>(QnUuid::createUuid(), engine);
+    auto newRule = std::make_shared<vms::rules::Rule>(nx::Uuid::createUuid(), engine);
 
     auto eventFilter = engine->buildEventFilter(vms::rules::GenericEvent::manifest().id);
     auto actionBuilder = engine->buildActionBuilder(vms::rules::NotificationAction::manifest().id);
@@ -70,7 +70,7 @@ void VmsRulesDialog::addRule()
     saveRuleImpl(newRule);
 }
 
-void VmsRulesDialog::duplicateRule(QnUuid id)
+void VmsRulesDialog::duplicateRule(nx::Uuid id)
 {
     auto engine = systemContext()->vmsRulesEngine();
 
@@ -78,9 +78,9 @@ void VmsRulesDialog::duplicateRule(QnUuid id)
     if (!NX_ASSERT(clone))
         return;
 
-    clone->setId(QnUuid::createUuid()); //< Change id to prevent rule override on save request.
+    clone->setId(nx::Uuid::createUuid()); //< Change id to prevent rule override on save request.
     if (auto uniqueIdField = clone->eventFilters().at(0)->fieldByType<vms::rules::UniqueIdField>())
-        uniqueIdField->setId(QnUuid::createUuid()); //< Fix field uniqueness after cloning. TODO: #mmalofeev fix this workaround.
+        uniqueIdField->setId(nx::Uuid::createUuid()); //< Fix field uniqueness after cloning. TODO: #mmalofeev fix this workaround.
 
     EditVmsRuleDialog editVmsRuleDialog{m_parentWidget};
 
@@ -92,7 +92,7 @@ void VmsRulesDialog::duplicateRule(QnUuid id)
     saveRuleImpl(clone);
 }
 
-void VmsRulesDialog::editRule(QnUuid id)
+void VmsRulesDialog::editRule(nx::Uuid id)
 {
     auto engine = systemContext()->vmsRulesEngine();
 
@@ -118,7 +118,7 @@ void VmsRulesDialog::editRule(QnUuid id)
     saveRuleImpl(clone);
 }
 
-void VmsRulesDialog::deleteRule(QnUuid id)
+void VmsRulesDialog::deleteRule(nx::Uuid id)
 {
     if (ConfirmationDialogs::confirmDelete(m_parentWidget))
         deleteRuleImpl(id);
@@ -135,7 +135,7 @@ void VmsRulesDialog::openEventLogDialog()
     action(ui::action::OpenEventLogAction)->trigger();
 }
 
-void VmsRulesDialog::deleteRuleImpl(QnUuid id)
+void VmsRulesDialog::deleteRuleImpl(nx::Uuid id)
 {
     auto connection = messageBusConnection();
     if (!connection)

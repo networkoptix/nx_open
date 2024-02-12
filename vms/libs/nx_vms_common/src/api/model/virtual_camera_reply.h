@@ -7,7 +7,7 @@
 
 struct QnVirtualCameraReply
 {
-    QnUuid id;
+    nx::Uuid id;
 };
 #define QnVirtualCameraReply_Fields (id)
 

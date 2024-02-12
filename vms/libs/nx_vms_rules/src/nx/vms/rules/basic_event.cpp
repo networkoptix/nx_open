@@ -97,9 +97,9 @@ QString BasicEvent::extendedCaption(common::SystemContext* context) const
     return tr("%1 event has occurred").arg(name(context));
 }
 
-QnUuid BasicEvent::sourceId() const
+nx::Uuid BasicEvent::sourceId() const
 {
-    const auto getId = [this](const char* propName){ return property(propName).value<QnUuid>(); };
+    const auto getId = [this](const char* propName){ return property(propName).value<nx::Uuid>(); };
 
     if (const auto cameraId = getId(utils::kCameraIdFieldName); !cameraId.isNull())
         return cameraId;

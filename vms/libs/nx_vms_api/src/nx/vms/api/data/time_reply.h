@@ -50,7 +50,7 @@ NX_REFLECTION_INSTRUMENT(TimeReply, TimeReply_Fields);
 
 struct NX_VMS_API ServerTimeReply : public TimeReplyCore
 {
-    QnUuid serverId;
+    nx::Uuid serverId;
 };
 #define ServerTimeReply_Fields (osTime)(vmsTime)(timeZoneOffset)(serverId)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(ServerTimeReply)

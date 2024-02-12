@@ -86,17 +86,17 @@ public:
     ec2::ErrorCode getUsers(std::vector<nx::vms::api::UserModel>* result);
 
     void getUser(
-        const QnUuid& id,
+        const nx::Uuid& id,
         std::function<void(ec2::ErrorCode, nx::vms::api::UserModel)> completionHandler);
-    ec2::ErrorCode getUser(const QnUuid& id, nx::vms::api::UserModel* result);
+    ec2::ErrorCode getUser(const nx::Uuid& id, nx::vms::api::UserModel* result);
 
     void saveUser(
         const nx::vms::api::UserModel& request,
         std::function<void(ec2::ErrorCode)> completionHandler);
     ec2::ErrorCode saveUser(const nx::vms::api::UserModel& request);
 
-    void removeUser(const QnUuid& id, std::function<void(ec2::ErrorCode)> completionHandler);
-    ec2::ErrorCode removeUser(const QnUuid& id);
+    void removeUser(const nx::Uuid& id, std::function<void(ec2::ErrorCode)> completionHandler);
+    ec2::ErrorCode removeUser(const nx::Uuid& id);
 
     //---------------------------------------------------------------------------------------------
     // /api/ requests
@@ -124,11 +124,11 @@ public:
     ec2::ErrorCode ec2SaveMediaServer(const nx::vms::api::MediaServerData& request);
 
     void ec2GetStorages(
-        const std::optional<QnUuid>& serverId,
+        const std::optional<nx::Uuid>& serverId,
         std::function<void(ec2::ErrorCode, nx::vms::api::StorageDataList)> completionHandler);
 
     ec2::ErrorCode ec2GetStorages(
-        const std::optional<QnUuid>& serverId,
+        const std::optional<nx::Uuid>& serverId,
         nx::vms::api::StorageDataList* result);
 
     void ec2GetSettings(
@@ -143,10 +143,10 @@ public:
     ec2::ErrorCode ec2SetResourceParams(const nx::vms::api::ResourceParamWithRefDataList& request);
 
     void ec2GetResourceParams(
-        const QnUuid& resourceId,
+        const nx::Uuid& resourceId,
         std::function<void(ec2::ErrorCode, nx::vms::api::ResourceParamDataList)> completionHandler);
     ec2::ErrorCode ec2GetResourceParams(
-        const QnUuid& resourceId,
+        const nx::Uuid& resourceId,
         nx::vms::api::ResourceParamDataList* result);
 
     void ec2GetSystemMergeHistory(std::function<

@@ -56,7 +56,7 @@ protected:
     QnVideoWallItem addItem(const QnVideoWallResourcePtr& videowall)
     {
         QnVideoWallItem item;
-        item.uuid = QnUuid::createUuid();
+        item.uuid = nx::Uuid::createUuid();
         item.runtimeStatus.online = true;
         videowall->items()->addItem(item);
         return item;

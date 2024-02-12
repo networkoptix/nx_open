@@ -97,9 +97,9 @@ AbstractResourceContainer* WorkbenchLayoutInfo::resources() const
     return m_resources;
 }
 
-QnUuid WorkbenchLayoutInfo::reviewedShowreelId() const
+nx::Uuid WorkbenchLayoutInfo::reviewedShowreelId() const
 {
-    return workbench()->currentLayout()->data(Qn::ShowreelUuidRole).value<QnUuid>();
+    return workbench()->currentLayout()->data(Qn::ShowreelUuidRole).value<nx::Uuid>();
 }
 
 QnVideoWallResource* WorkbenchLayoutInfo::reviewedVideoWall() const
@@ -126,9 +126,9 @@ QnVideoWallResource* WorkbenchLayoutInfo::controlledVideoWall() const
     return m_controlledVideoWall->get();
 }
 
-QnUuid WorkbenchLayoutInfo::controlledVideoWallItemId() const
+nx::Uuid WorkbenchLayoutInfo::controlledVideoWallItemId() const
 {
-    return workbench()->currentLayout()->data(Qn::VideoWallItemGuidRole).value<QnUuid>();
+    return workbench()->currentLayout()->data(Qn::VideoWallItemGuidRole).value<nx::Uuid>();
 }
 
 int WorkbenchLayoutInfo::itemCount() const
