@@ -131,6 +131,7 @@ def create_client_update_file(config, output_file):
         zip.write(os.path.join(binaries_dir, 'bytedance_iconpark.dat'), 'bytedance_iconpark.dat')
         translations_dir = os.path.join(binaries_dir, 'translations')
         zip.write(os.path.join(translations_dir, 'nx_vms_common.dat'), 'translations/nx_vms_common.dat')
+        zip.write(os.path.join(translations_dir, 'nx_vms_license.dat'), 'translations/nx_vms_license.dat')
         zip.write(os.path.join(translations_dir, 'nx_vms_rules.dat'), 'translations/nx_vms_rules.dat')
         zip.write(os.path.join(translations_dir, 'nx_vms_client_core.dat'), 'translations/nx_vms_client_core.dat')
         zip.write(os.path.join(translations_dir, 'nx_vms_client_desktop.dat'), 'translations/nx_vms_client_desktop.dat')
