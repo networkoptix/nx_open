@@ -355,7 +355,7 @@ std::vector<QnResourceAccessSubject> SubjectSelectionDialog::allSubjects() const
 void SubjectSelectionDialog::setCheckedSubjects(const QSet<nx::Uuid>& ids)
 {
     QnUserResourceList users;
-    QList<nx::Uuid> groupIds;
+    QSet<nx::Uuid> groupIds;
     nx::vms::common::getUsersAndGroups(system(), ids, users, groupIds);
 
     QSet<nx::Uuid> userIds;
@@ -368,7 +368,7 @@ void SubjectSelectionDialog::setCheckedSubjects(const QSet<nx::Uuid>& ids)
     }
 
     m_users->setCheckedUsers(userIds);
-    m_roles->setCheckedRoles({groupIds.cbegin(), groupIds.cend()});
+    m_roles->setCheckedRoles(groupIds);
 
     if (nonCustomUsers)
         ui->showAllUsers->setChecked(true);

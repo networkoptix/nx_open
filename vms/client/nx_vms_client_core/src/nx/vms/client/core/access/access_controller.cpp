@@ -237,8 +237,19 @@ AccessController::Private::Private(AccessController* q):
     connect(resourceAccessManager, &QnResourceAccessManager::resourceAccessReset,
         this, &Private::updateAllPermissions);
 
-    connect(resourceAccessManager, &QnResourceAccessManager::permissionsDependencyChanged,
-        this, &Private::updatePermissions);
+    connect(resourceAccessManager,
+        qOverload<const QnResourceList&>(&QnResourceAccessManager::permissionsDependencyChanged),
+        this,
+        &Private::updatePermissions);
+
+    connect(resourceAccessManager,
+        qOverload<const QSet<nx::Uuid>&>(&QnResourceAccessManager::permissionsDependencyChanged),
+        this,
+        [this](const QSet<nx::Uuid>& targetGroupIds)
+        {
+            emit this->q->permissionsForGroupsMaybeChanged(targetGroupIds,
+                AccessController::QPrivateSignal{});
+        });
 }
 
 Qn::Permissions AccessController::Private::permissions(const QnResourcePtr& targetResource) const

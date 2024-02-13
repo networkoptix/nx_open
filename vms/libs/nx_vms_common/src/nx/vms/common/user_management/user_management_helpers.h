@@ -36,7 +36,7 @@ void getUsersAndGroups(
     const SystemContext* systemContext,
     const IdList& idList,
     QnUserResourceList& users,
-    QList<nx::Uuid>& groupIds)
+    QSet<nx::Uuid>& groupIds)
 {
     nx::vms::api::UserGroupDataList groups;
     getUsersAndGroups(systemContext, idList, users, groups);
@@ -45,20 +45,19 @@ void getUsersAndGroups(
     groupIds.reserve(groups.size());
 
     for (const auto& group: groups)
-        groupIds.push_back(group.id);
+        groupIds.insert(group.id);
 }
 
 template<class IdList>
 QnUserResourceSet allUsers(const SystemContext* context, const IdList& ids)
 {
     QnUserResourceList users;
-    UuidList groupIds;
+    QSet<nx::Uuid> groupIds;
     nx::vms::common::getUsersAndGroups(context, ids, users, groupIds);
 
     auto result = nx::utils::toQSet(users);
 
-    const auto groupUsers = context->accessSubjectHierarchy()->usersInGroups(
-        nx::utils::toQSet(groupIds));
+    const auto groupUsers = context->accessSubjectHierarchy()->usersInGroups(groupIds);
 
     for (const auto& user: groupUsers)
         result.insert(user);
