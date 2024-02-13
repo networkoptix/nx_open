@@ -139,6 +139,7 @@ const std::set<QString> kWriteOnlyNames{
 // Storage
 const QString kPersistentStorageStatusFlagsKey("persistentStorageStatusFlags");
 const QString kStorageArchiveMode("storageArchiveMode");
+const QString kCloudStorageCapabilities("cloudStorageCapabilities");
 
 } // namespace ResourcePropertyKey
 
