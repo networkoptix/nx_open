@@ -83,6 +83,16 @@ NonEditableUsersAndGroups::NonEditableUsersAndGroups(SystemContext* systemContex
             removeGroup(group.id);
         });
 
+    connect(accessController(), &core::AccessController::permissionsForGroupsMaybeChanged, this,
+        [this, systemContext](const QSet<nx::Uuid>& groupIdsHint)
+        {
+            for (const auto& id: groupIdsHint)
+            {
+                if (const auto group = systemContext->userGroupManager()->find(id))
+                    addOrUpdateGroup(*group);
+            }
+        });
+
     connect(manager, &nx::vms::common::UserGroupManager::reset, this,
         [this, manager]()
         {
@@ -445,6 +455,19 @@ qsizetype NonEditableUsersAndGroups::groupCount() const
 
 QString NonEditableUsersAndGroups::tooltip(const nx::Uuid& id) const
 {
+    const auto kNonEditableMembers = tr("You may not have permissions to modify certain members "
+        "of this group, or it includes users with duplicate logins");
+
+    if (id == nx::vms::api::kDefaultLdapGroupId && m_nonRemovableGroups.contains(id))
+    {
+        const auto result = tr("LDAP Default group cannot be deleted as long as the system is "
+            "connected to LDAP server");
+
+        return m_groupsWithNonEditableMembers.contains(id)
+            ? result + "<br>" + kNonEditableMembers
+            : result;
+    }
+
     if (const auto user = systemContext()->resourcePool()->getResourceById<QnUserResource>(id))
     {
         if (user->attributes().testFlag(api::UserAttribute::readonly))
@@ -459,8 +482,7 @@ QString NonEditableUsersAndGroups::tooltip(const nx::Uuid& id) const
     }
     else if (m_groupsWithNonEditableMembers.contains(id))
     {
-        return tr("You may not have permissions to modify certain members of this group, or it "
-            "includes users with duplicate logins");
+        return kNonEditableMembers;
     }
     else if (m_nonEditableGroups.contains(id))
     {

@@ -1780,8 +1780,10 @@ protected:
     {
         ResourceAccessManagerTest::SetUp();
 
-        permissionsDependencyChanged.reset(new QSignalSpy(resourceAccessManager(),
-            &QnResourceAccessManager::permissionsDependencyChanged));
+        permissionsDependencyChanged.reset(new QSignalSpy(
+            resourceAccessManager(),
+            qOverload<const QnResourceList&>(
+                &QnResourceAccessManager::permissionsDependencyChanged)));
     }
 
     virtual void TearDown() override

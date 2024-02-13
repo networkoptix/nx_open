@@ -87,12 +87,12 @@ template<class IDList>
 QSet<nx::Uuid> filterSubjectIds(const IDList& ids)
 {
     QnUserResourceList users;
-    QList<nx::Uuid> groupIds;
+    QSet<nx::Uuid> groupIds;
 
     nx::vms::common::getUsersAndGroups(appContext()->currentSystemContext(),
         ids, users, groupIds);
 
-    return toIds(users).unite(nx::utils::toQSet(groupIds));
+    return toIds(users).unite(groupIds);
 }
 
 QSet<nx::Uuid> filterActionResources(
@@ -621,7 +621,7 @@ QIcon QnBusinessRuleViewModel::iconForAction() const
                 return qnSkin->icon("tree/user_alert.svg", colorSubs);
 
             QnUserResourceList users;
-            QList<nx::Uuid> groupIds;
+            QSet<nx::Uuid> groupIds;
             nx::vms::common::getUsersAndGroups(systemContext(),
                 m_actionParams.additionalResources, users, groupIds);
             users = users.filtered(

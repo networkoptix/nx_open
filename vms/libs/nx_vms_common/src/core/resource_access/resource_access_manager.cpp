@@ -29,6 +29,7 @@
 #include <nx/vms/api/data/analytics_data.h>
 #include <nx/vms/api/data/camera_data.h>
 #include <nx/vms/api/data/layout_data.h>
+#include <nx/vms/api/data/ldap.h>
 #include <nx/vms/api/data/media_server_data.h>
 #include <nx/vms/api/data/user_data.h>
 #include <nx/vms/api/data/videowall_data.h>
@@ -38,6 +39,7 @@
 #include <nx/vms/common/resource/analytics_plugin_resource.h>
 #include <nx/vms/common/showreel/showreel_manager.h>
 #include <nx/vms/common/system_context.h>
+#include <nx/vms/common/system_settings.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
 #include <nx_ec/data/api_conversion_functions.h>
 
@@ -125,14 +127,28 @@ QnResourceAccessManager::QnResourceAccessManager(
             const QSet<nx::Uuid>& /*groupsWithChangedMembers*/,
             const QSet<nx::Uuid>& subjectsWithChangedParents)
         {
-            const auto affectedUsers = resourcePool()->getResourcesByIds<QnUserResource>(
-                subjectsWithChangedParents + systemContext()->accessSubjectHierarchy()->
-                    recursiveMembers(subjectsWithChangedParents));
+            const QSet<nx::Uuid> recursiveSubjectsWithChangedParents = subjectsWithChangedParents
+                + systemContext()->accessSubjectHierarchy()->recursiveMembers(
+                    subjectsWithChangedParents);
+
+            QnUserResourceList affectedUsers;
+            QSet<nx::Uuid> affectedGroupIds;
+
+            getUsersAndGroups(systemContext(), recursiveSubjectsWithChangedParents, affectedUsers,
+                affectedGroupIds);
 
             if (!affectedUsers.empty())
                 emit permissionsDependencyChanged(affectedUsers);
 
+            if (!affectedGroupIds.empty())
+                emit permissionsDependencyChanged(affectedGroupIds);
+
         }, Qt::DirectConnection);
+
+    connect(systemContext()->globalSettings(),
+        &nx::vms::common::SystemSettings::ldapSettingsChanged,
+        this,
+        [this]() { emit permissionsDependencyChanged(QSet<nx::Uuid>({kDefaultLdapGroupId})); });
 }
 
 bool QnResourceAccessManager::hasPowerUserPermissions(const Qn::UserAccessData& accessData) const
@@ -863,10 +879,18 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
         }
     }
 
-    // LDAP Default is similar to predefined groups and cannot be deleted, but it can be included in
-    // other groups or its description can be modified.
+    // When LDAP is configured, the LDAP Default is similar to predefined groups and cannot be
+    // deleted, but it can be included in other groups or its description can be modified.
     if (targetGroup.id == kDefaultLdapGroupId)
-        result.setFlag(Qn::RemovePermission, false);
+    {
+        const auto ldap = systemSettings()->ldap();
+        const bool hasConfig = !ldap.uri.isEmpty()
+            || !ldap.adminDn.isEmpty()
+            || !ldap.filters.empty();
+
+        if (hasConfig)
+            result.setFlag(Qn::RemovePermission, false);
+    }
 
     if (targetGroup.attributes.testFlag(UserAttribute::readonly))
         return result & Qn::ReadPermission;

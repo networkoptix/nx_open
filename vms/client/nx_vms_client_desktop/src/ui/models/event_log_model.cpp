@@ -355,7 +355,7 @@ QVariant QnEventLogModel::iconData(Column column, const vms::event::ActionData& 
                   || actionType == ActionType::showOnAlarmLayoutAction)
             {
                 QnUserResourceList users;
-                QList<nx::Uuid> groups;
+                QSet<nx::Uuid> groups;
                 nx::vms::common::getUsersAndGroups(systemContext(),
                     action.actionParams.additionalResources, users, groups);
                 const bool multiple = action.actionParams.additionalResources.empty()
