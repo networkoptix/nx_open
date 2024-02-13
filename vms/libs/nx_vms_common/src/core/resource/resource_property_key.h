@@ -193,6 +193,7 @@ NX_VMS_COMMON_API extern const std::set<QString> kWriteOnlyNames;
 // Storage
 NX_VMS_COMMON_API extern const QString kPersistentStorageStatusFlagsKey;
 NX_VMS_COMMON_API extern const QString kStorageArchiveMode;
+NX_VMS_COMMON_API extern const QString kCloudStorageCapabilities;
 
 } // namespace ResourcePropertyKey
 
