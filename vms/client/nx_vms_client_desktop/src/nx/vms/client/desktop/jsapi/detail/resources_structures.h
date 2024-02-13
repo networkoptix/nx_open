@@ -38,7 +38,10 @@ NX_REFLECTION_ENUM_CLASS(ResourceType,
     local_video,
 
     /** Image file Resource. */
-    local_image
+    local_image,
+
+    /** Layout Resource. */
+    layout
 )
 
 struct ResourceUniqueId

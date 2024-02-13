@@ -87,6 +87,11 @@ public:
      */
     Q_INVOKABLE QJsonObject remove(const QString& id);
 
+    /**
+     * Opens a layout in a new tab.
+     */
+    Q_INVOKABLE QJsonObject open(const QString& layoutResourceId);
+
 signals:
     void tabsChanged();
     void currentChanged();

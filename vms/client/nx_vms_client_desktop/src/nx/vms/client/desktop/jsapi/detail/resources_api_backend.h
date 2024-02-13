@@ -34,7 +34,7 @@ public:
      *     const handleResourceAdded =
      *         function(resource)
      *         {
-     *             if (resource.type = 'io_module')
+     *             if (resource.type === 'io_module')
      *                 vms.log.info(`Resource "${resource.name}" is IO module`)
      *
      *             if (vms.resources.hasMediaStream(resource.id))

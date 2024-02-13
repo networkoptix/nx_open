@@ -30,6 +30,8 @@ ResourceType resourceType(const QnResourcePtr& resource)
         return ResourceType::server;
     if (flags.testFlag(Qn::live_cam))
         return ResourceType::camera;
+    if (flags.testFlag(Qn::layout))
+        return ResourceType::layout;
 
     return detail::ResourceType::undefined;
 }
