@@ -143,6 +143,19 @@ namespace detail
         }
     };
 
+    struct PainterCompositionModeAccessor
+    {
+        void operator()(QPainter* painter, QPainter::CompositionMode compositionMode) const
+        {
+            painter->setCompositionMode(compositionMode);
+        }
+
+        QPainter::CompositionMode operator()(QPainter* painter) const
+        {
+            return painter->compositionMode();
+        }
+    };
+
 } // namespace detail
 
 using QnScopedPainterPenRollback = QnGenericScopedPainterRollback<QPen,
@@ -163,3 +176,5 @@ using QnScopedPainterAntialiasingRollback = QnGenericScopedPainterRollback<bool,
     detail::PainterRenderHintAccessor<QPainter::Antialiasing>>;
 using QnScopedPainterSmoothPixmapTransformRollback = QnGenericScopedPainterRollback<bool,
     detail::PainterRenderHintAccessor<QPainter::SmoothPixmapTransform>>;
+using QnScopedPainterCompositionModeRollback = QnGenericScopedPainterRollback<
+    QPainter::CompositionMode, detail::PainterCompositionModeAccessor>;

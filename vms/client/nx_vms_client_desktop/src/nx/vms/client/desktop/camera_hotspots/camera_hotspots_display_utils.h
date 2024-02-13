@@ -45,13 +45,8 @@ struct CameraHotspotDisplayOption
     };
     State state = State::none;
 
-    enum class TargetState
-    {
-        noCamera,
-        valid,
-        invalid,
-    };
-    TargetState targetState = TargetState::noCamera;
+    /** A hotspot is considered invalid if it refers to a nonexistent resource. */
+    bool isValid = true;
 
     enum class Component
     {
