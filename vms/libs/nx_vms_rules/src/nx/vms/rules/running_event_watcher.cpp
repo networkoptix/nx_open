@@ -35,8 +35,8 @@ void RunningEventWatcher::add(const EventPtr& event)
 void RunningEventWatcher::erase(const EventPtr& event)
 {
     if (!event
-        || !NX_ASSERT(isRunning(event), "Given event was not added to the watcher")
-        || !NX_ASSERT(event->state() == State::stopped, "Only stopped events might be erased"))
+        || !NX_ASSERT(event->state() == State::stopped, "Only stopped events might be erased")
+        || !isRunning(event))
     {
         return;
     }
