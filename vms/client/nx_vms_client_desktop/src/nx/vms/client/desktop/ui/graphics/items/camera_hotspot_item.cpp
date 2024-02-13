@@ -333,7 +333,6 @@ CameraHotspotDisplayOption CameraHotspotItem::Private::hotspotDisplayOption() co
 {
     CameraHotspotDisplayOption hotspotOption;
 
-    hotspotOption.targetState = CameraHotspotDisplayOption::TargetState::valid;
     hotspotOption.state = q->isUnderMouse()
         ? CameraHotspotDisplayOption::State::hovered
         : CameraHotspotDisplayOption::State::none;

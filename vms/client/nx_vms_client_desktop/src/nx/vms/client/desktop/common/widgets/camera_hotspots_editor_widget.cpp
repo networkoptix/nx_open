@@ -511,12 +511,11 @@ void CameraHotspotsEditorWidget::paintEvent(QPaintEvent* event)
 
         if (!hotspot.targetResourceId.isNull())
         {
-            option.targetState = CameraHotspotDisplayOption::TargetState::valid;
             const auto resourcePool = systemContext->resourcePool();
             const auto targetResource = resourcePool->getResourceById(hotspot.targetResourceId);
 
             if (!targetResource)
-                option.targetState = CameraHotspotDisplayOption::TargetState::invalid;
+                option.isValid = false;
         }
 
         if (!isEnabled())
