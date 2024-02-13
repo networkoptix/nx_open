@@ -530,6 +530,9 @@ QString EventSearchListModel::Private::iconPath(const vms::event::EventParameter
         case EventType::analyticsSdkObjectDetected:
             return "tree/camera.svg";
 
+        case EventType::ldapSyncIssueEvent:
+            return "events/alert_yellow.png";
+
         default:
             return {};
     }
