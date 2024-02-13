@@ -120,7 +120,7 @@ Item
 
         settingsViewPlaceholder
         {
-            header: qsTr("This plugin has no settings at the System level.")
+            header: qsTr("This plugin has no settings at the Site level.")
             description: qsTr("Check Camera Settings to configure this plugin.")
             loading: !!store && store.loading
         }

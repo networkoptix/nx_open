@@ -338,7 +338,7 @@ QString LogsManagementModel::logLevelTooltip(nx::utils::log::Level level) const
             return tr("Non-default Logging level. We recommend setting it to \"info\"");
         case nx::utils::log::Level::debug:
         case nx::utils::log::Level::verbose:
-            return tr("Logging level degrades the performance of the system");
+            return tr("Logging level degrades performance");
     }
 
     NX_ASSERT(false, "Unexpected value (%1)", level);

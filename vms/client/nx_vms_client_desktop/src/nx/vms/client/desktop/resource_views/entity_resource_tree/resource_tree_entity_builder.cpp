@@ -916,7 +916,7 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createLocalOtherSystemsEntity() con
                 systemContext()->otherServersManager()->getModuleInformationWithAddresses(serverId);
 
             return moduleInformation.isNewSystem()
-                ? tr("New System")
+                ? tr("New Site")
                 : moduleInformation.systemName;
         };
 

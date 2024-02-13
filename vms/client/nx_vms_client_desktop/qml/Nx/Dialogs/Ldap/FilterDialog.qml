@@ -121,7 +121,7 @@ Dialog
 
             hint: ContextHintButton
             {
-                toolTipText: qsTr("Filters help control access to the system and synchronization"
+                toolTipText: qsTr("Filters help control access to the site and synchronization"
                     + " by specifying which users and/or groups from the Base DN are allowed.")
             }
 

@@ -249,7 +249,7 @@ QString SystemHealthListModel::Private::text(int index) const
                 getResourceSet(item.message).size());
 
         case MessageType::metadataOnSystemStorage:
-            return tr("System storage is used for analytics data on %n Servers", "",
+            return tr("System partition is used for analytics data on %n Servers", "",
                 getResourceSet(item.message).size());
 
         default:

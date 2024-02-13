@@ -254,9 +254,9 @@ void ConnectToCurrentSystemTool::systemFound(
 
     auto sessionTokenHelper = FreshSessionTokenHelper::makeHelper(
         mainWindowWidget(),
-        tr("Merge Server to the System", "Dialog title"),
-        tr("Enter your account password to merge Server to the System"),
-        tr("Merge", "Merge Server to the current System (dialog button text)"),
+        tr("Merge Server to the Site", "Dialog title"),
+        tr("Enter your account password to merge Server to the Site"),
+        tr("Merge", "Merge Server to the current Site (dialog button text)"),
         FreshSessionTokenHelper::ActionType::merge);
 
     auto ownerSessionToken = sessionTokenHelper->refreshToken();

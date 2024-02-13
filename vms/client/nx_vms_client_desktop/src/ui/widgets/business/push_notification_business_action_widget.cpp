@@ -75,8 +75,8 @@ PushNotificationBusinessActionWidget::PushNotificationBusinessActionWidget(
     ui->setupUi(this);
 
     ui->notConnectedLabel->setText(
-        tr("The system is not connected to %1. "
-            "Mobile notifications work only when the system is connected to %1.",
+        tr("The site is not connected to %1. "
+            "Mobile notifications work only when the site is connected to %1.",
             "%1 here will be substituted with cloud name e.g. 'Nx Cloud'.")
             .arg(nx::branding::cloudName()));
 

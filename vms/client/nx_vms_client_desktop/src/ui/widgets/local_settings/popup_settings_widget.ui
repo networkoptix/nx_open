@@ -86,7 +86,7 @@
        <item>
         <widget class="QGroupBox" name="systemHealthGroupBox">
          <property name="title">
-          <string>System Notifications</string>
+          <string>Site Notifications</string>
          </property>
          <property name="flat">
           <bool>true</bool>

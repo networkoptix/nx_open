@@ -173,7 +173,7 @@ void QnSystemAdministrationDialog::applyChanges()
                 NX_DEBUG(this, "Can't save system settings, code: %1, error: %2",
                     error->error, error->errorString);
                 QnSessionAwareMessageBox::critical(
-                    this, tr("Failed to save system settings"), error->errorString);
+                    this, tr("Failed to save site settings"), error->errorString);
             }
         });
 

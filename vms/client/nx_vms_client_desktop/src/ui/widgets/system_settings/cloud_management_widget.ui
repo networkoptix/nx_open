@@ -176,7 +176,7 @@
          <item>
           <widget class="QPushButton" name="linkButton">
            <property name="text">
-            <string notr="true">&lt;Connect this system to the Cloud&gt;</string>
+            <string notr="true">&lt;Connect this site to the Cloud&gt;</string>
            </property>
           </widget>
          </item>
@@ -236,7 +236,7 @@
           <item>
            <widget class="QLabel" name="linkedHintLabel">
             <property name="text">
-             <string>This system is connected to</string>
+             <string>This site is connected to</string>
             </property>
            </widget>
           </item>

@@ -123,7 +123,7 @@ int CompatibilityVersionInstallationDialog::exec()
                 {
                     QnMessageBox::critical(
                         this,
-                        tr("Cannot connect to the System"),
+                        tr("Cannot connect to the Site"),
                         core::shortErrorDescription(error->code));
 
                     m_installationResult = InstallResult::failedDownload;

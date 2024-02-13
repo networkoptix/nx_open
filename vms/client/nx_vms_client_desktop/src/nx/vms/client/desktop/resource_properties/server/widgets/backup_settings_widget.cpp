@@ -186,9 +186,9 @@ void BackupSettingsWidget::loadState(const ServerSettingsDialogState& state)
         if (ServiceManager::saasShutDown(saasState) && cloudBackupStorage)
         {
             ui->stackedWidget->setCurrentWidget(ui->genericPlaceholderPage);
-            ui->genericPlaceholderCaptionLabel->setText(tr("System shut down"));
+            ui->genericPlaceholderCaptionLabel->setText(tr("Site shut down"));
             ui->genericPlaceholderMessageLabel->setText(
-                tr("To perform backup to a cloud storage, the System should be in active state. %1")
+                tr("To perform backup to a cloud storage, the Site should be in active state. %1")
                     .arg(StringsHelper::recommendedAction(saasState)).trimmed());
 
             m_backupSettingsViewWidget->setTreeEntityFactoryFunction({});
@@ -224,8 +224,8 @@ void BackupSettingsWidget::loadState(const ServerSettingsDialogState& state)
         QString alertBarMessage;
         if (cloudBackupStorage && saasState == nx::vms::api::SaasState::suspended)
         {
-            alertBarMessage = tr("System suspended. To make changes to backup configuration, the "
-                "System should be in active state. %1")
+            alertBarMessage = tr("Site suspended. To make changes to backup configuration, the "
+                "Site should be in active state. %1")
                     .arg(nx::vms::common::saas::StringsHelper::recommendedAction(saasState));
             m_backupSettingsViewWidget->resourceViewWidget()->footerWidget()->setHidden(true);
         }

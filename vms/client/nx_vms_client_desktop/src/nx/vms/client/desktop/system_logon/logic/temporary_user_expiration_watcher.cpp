@@ -112,7 +112,7 @@ void TemporaryUserExpirationWatcher::updateNotification()
         const auto timeWatcher = systemContext()->serverTimeWatcher();
         timeStr = nx::vms::time::toString(timeWatcher->displayTime(expirationTimestampMs).date());
         notificationText =
-            tr("Your access to the System expires %1", /*comment*/ "%1 is a date").arg(timeStr);
+            tr("Your access to the Site expires %1", /*comment*/ "%1 is a date").arg(timeStr);
     }
     else if (const auto minutes = duration_cast<std::chrono::minutes>(timeLeft); minutes < 1min)
     {
@@ -122,7 +122,7 @@ void TemporaryUserExpirationWatcher::updateNotification()
     if (notificationText.isEmpty())
     {
         notificationText =
-            tr("Your access to the System expires in %1", /*comment*/ "%1 is a duration")
+            tr("Your access to the Site expires in %1", /*comment*/ "%1 is a duration")
                 .arg(timeStr);
     }
 

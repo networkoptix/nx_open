@@ -186,7 +186,7 @@ TEST_F(ResourceTreeModelTest, topLevelNodesOrder)
         "Showreels",
         kVideowallName,
         "Web Pages",
-        "Other Systems",
+        "Other Sites",
         "Local Files"};
 
     // Check tree.

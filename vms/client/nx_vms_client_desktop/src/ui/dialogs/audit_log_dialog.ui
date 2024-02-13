@@ -216,7 +216,7 @@
              </size>
             </property>
             <property name="text">
-             <string>System actions</string>
+             <string>Site actions</string>
             </property>
             <property name="checked">
              <bool>true</bool>

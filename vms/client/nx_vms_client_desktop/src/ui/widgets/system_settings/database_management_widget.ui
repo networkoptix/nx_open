@@ -50,7 +50,7 @@
       <item>
        <widget class="QLabel" name="backupOrRestoreLabel">
         <property name="text">
-         <string>Create a backup of System management data, or restore System management data from an existing backup</string>
+         <string>Create a backup of Site management data, or restore Site management data from an existing backup</string>
         </property>
         <property name="wordWrap">
          <bool>true</bool>

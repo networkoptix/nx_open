@@ -20,22 +20,22 @@ DialogBanner
         if (saasServiceManager.saasSuspended)
         {
             return deviceSpecific
-                ? qsTr("System has been suspended. To enable/disable the integration usage for"
-                    + " current device the System must be in active state. Contact your channel"
+                ? qsTr("Site has been suspended. To enable/disable the integration usage for"
+                    + " current device the Site must be in active state. Contact your channel"
                     + " partner for details")
-                : qsTr("System has been suspended. To enable/disable the integration usage for"
-                    + " some device the System must be in active state. Contact your channel"
+                : qsTr("Site has been suspended. To enable/disable the integration usage for"
+                    + " some device the Site must be in active state. Contact your channel"
                     + " partner for details")
         }
 
         if (saasServiceManager.saasShutDown)
         {
             return deviceSpecific
-                ? qsTr("System has been shut down. To enable this integration usage for current"
-                    + " device the System must be in active state. Contact your channel partner"
+                ? qsTr("Site has been shut down. To enable this integration usage for current"
+                    + " device the Site must be in active state. Contact your channel partner"
                     + " for details")
-                : qsTr("System has been shut down. To activate this integration usage for some"
-                    + " device the System must be in active state. Contact your channel partner"
+                : qsTr("Site has been shut down. To activate this integration usage for some"
+                    + " device the Site must be in active state. Contact your channel partner"
                     + " for details")
         }
 

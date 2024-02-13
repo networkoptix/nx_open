@@ -118,7 +118,7 @@
      <item>
       <widget class="QCheckBox" name="autoSettingsCheckBox">
        <property name="text">
-        <string notr="true">&lt;Allow system to optimize camera settings&gt;</string>
+        <string notr="true">&lt;Allow optimize camera settings&gt;</string>
        </property>
       </widget>
      </item>

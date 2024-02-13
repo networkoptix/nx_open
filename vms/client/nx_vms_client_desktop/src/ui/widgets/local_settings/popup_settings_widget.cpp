@@ -42,7 +42,7 @@ QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget* parent):
     setHelpTopic(this, HelpTopic::Id::SystemSettings_Notifications);
 
     ui->deprecationMessageBar->init(
-        {.text = tr("These settings apply only to the system you are logged in."
+        {.text = tr("These settings apply only to the site you are logged in."
             " They will be removed in future versions."),
         .isEnabledProperty = &messageBarSettings()->notificationsDeprecationInfo});
 

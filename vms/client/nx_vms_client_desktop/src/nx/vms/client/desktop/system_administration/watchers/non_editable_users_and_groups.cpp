@@ -473,7 +473,7 @@ QString NonEditableUsersAndGroups::tooltip(const nx::Uuid& id) const
         if (user->attributes().testFlag(api::UserAttribute::readonly))
         {
             return tr("User management for organization users is available only at the "
-                "organization level, not the system level");
+                "organization level, not the site level");
         }
         if (!canEnableDisable(user))
             return tr("You do not have permissions to modify this user");

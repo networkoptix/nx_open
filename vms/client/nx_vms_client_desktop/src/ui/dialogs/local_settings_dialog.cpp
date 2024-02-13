@@ -93,7 +93,7 @@ QnLocalSettingsDialog::QnLocalSettingsDialog(QWidget *parent):
     setWarningStyle(ui->readOnlyWarningLabel);
     ui->readOnlyWarningWidget->setVisible(!appContext()->localSettings()->isWritable());
     ui->readOnlyWarningLabel->setText(
-        tr("Settings are read-only. Please contact your system administrator. "
+        tr("Settings are read-only. Please contact your site administrator. "
             "All changes will be lost after program exit.")
     );
 

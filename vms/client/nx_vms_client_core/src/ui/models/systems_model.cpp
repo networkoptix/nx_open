@@ -218,7 +218,7 @@ QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
             return searchText;
         }
         case SystemNameRoleId:
-            return system->isNewSystem() ? tr("New System") : system->name();
+            return system->isNewSystem() ? tr("New Site") : system->name();
         case SystemIdRoleId:
             return systemId;
         case LocalIdRoleId:
@@ -232,7 +232,7 @@ QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
                 (d->controller->cloudStatus() != CloudStatusWatcher::LoggedOut);
             if (isLoggedIn && (d->controller->cloudLogin() == system->ownerAccountEmail()))
             {
-                return tr("Your System");
+                return tr("Your Site");
             }
 
             const auto fullName = system->ownerFullName();

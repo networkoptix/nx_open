@@ -172,7 +172,7 @@ LogSettingsDialog::LogSettingsDialog(QWidget* parent):
         .isEnabledProperty = &messageBarSettings()->detailsLoggingWarning});
 
     ui->performanceWarning->init(
-        {.text = tr("The selected Logging Level may degrade your system's performance.\n"
+        {.text = tr("The selected Logging Level may degrade performance.\n"
         "Remember to return the Logging Level to its default setting "
         "after you have collected enough logs."),
         .level = BarDescription::BarLevel::Warning,

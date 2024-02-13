@@ -1370,7 +1370,7 @@ QString QnBusinessRuleViewModel::getSourceText(bool detailed) const
         return QnCameraAnalyticsPolicy::getText(resources, detailed);
 
     if (!vms::event::isResourceRequired(m_eventType))
-        return braced(tr("System"));
+        return braced(tr("Site"));
 
     if (resources.size() == 1)
     {
@@ -1513,7 +1513,7 @@ QString QnBusinessRuleViewModel::getTargetText(bool detailed) const
         return braced(tr("User"));
     }
 
-    return braced(tr("System"));
+    return braced(tr("Site"));
 }
 
 QString QnBusinessRuleViewModel::getAggregationText() const

@@ -67,10 +67,10 @@ void DefaultPasswordAlertBar::updateState()
     static const auto kMultipleCameraAdminAlertText =
         tr("Some of selected cameras require password to be set up");
     static const auto kSingleCameraAlertText =
-        tr("This camera requires password to be set up. Ask your system administrator to do it.");
+        tr("This camera requires password to be set up. Ask your site administrator to do it.");
     static const auto kMultipleCameraAlertText = tr(
         "Some of selected cameras require password to be set up."
-        " Ask your system administrator to do it.");
+        " Ask your site administrator to do it.");
 
     const bool hasAdminAccess = systemContext()->accessController()->hasGlobalPermissions(
         GlobalPermission::powerUser);

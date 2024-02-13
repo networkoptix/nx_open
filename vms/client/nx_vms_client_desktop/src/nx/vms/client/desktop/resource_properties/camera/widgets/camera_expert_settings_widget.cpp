@@ -309,7 +309,7 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(
         store, &CameraSettingsDialogStore::resetExpertSettings);
 
     ui->generalWarningAlertBar->init({.text = tr("Do not change these settings unless you are"
-        " absolutely sure of their potential impact on your system performance"),
+        " absolutely sure of their potential impact on performance"),
         .level = BarDescription::BarLevel::Warning});
 
     ui->motionImplicitlyDisabledAlertBar->init({.level = BarDescription::BarLevel::Error});
@@ -398,7 +398,7 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(
         tr("Custom number that can be assigned to a camera for quick identification and access"));
 
     ui->enableImportFromDeviceRadioButton->setHint(tr("Only camera or server offline periods after "
-        "the first addition to the system will be imported automatically."));
+        "the first addition to the site will be imported automatically."));
 
     ui->alertLabel->setText(tr("Quality and frame rate (FPS) settings in the Recording Schedule"
                                " will become irrelevant"));

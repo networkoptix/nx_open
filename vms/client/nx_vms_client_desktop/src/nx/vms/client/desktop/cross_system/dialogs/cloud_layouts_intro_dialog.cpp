@@ -36,8 +36,8 @@ CloudLayoutsIntroDialog::CloudLayoutsIntroDialog(
         "Introducing %1 Layouts",
         "%1 is the short cloud name (like Cloud)").arg(nx::branding::shortCloudName()));
     ui->descriptionLabel->setText(tr(
-        "%1 Layouts are <b>cross-system layouts</b> that allow you to work with devices from "
-        "different Systems. Currently, only some features of regular layouts are available, but "
+        "%1 Layouts are <b>cross-site layouts</b> that allow you to work with devices from "
+        "different Sites. Currently, only some features of regular layouts are available, but "
         "we will continue to expand the capabilities of %1 Layouts in future versions")
         .arg(nx::branding::shortCloudName()));
     ui->helpIconLabel->setPixmap(

@@ -34,7 +34,7 @@ struct PredefinedUserGroups::Private
             return tr("Live Viewers");
 
         if (groupId == kSystemHealthViewersGroupId)
-            return tr("System Health Viewers");
+            return tr("Site Health Viewers");
 
         NX_ASSERT(false, "Not a predefined user group: %1", groupId);
         return {};

@@ -162,7 +162,7 @@ void MergeSystemsDialog::updateKnownSystems()
         system()->globalSettings()->systemName(), kMaxSystemNameLength);
 
     ui->currentSystemLabel->setText(
-        tr("You are about to merge the current System %1 with System")
+        tr("You are about to merge the current Site %1 with Site")
         .arg(displayName));
 
     ui->currentSystemRadioButton->setText(tr("%1 (current)").arg(displayName));
@@ -257,9 +257,9 @@ void MergeSystemsDialog::at_mergeButton_clicked()
 
     auto sessionTokenHelper = FreshSessionTokenHelper::makeHelper(
         this,
-        tr("Merge Systems"),
-        tr("Enter your account password to merge Systems"),
-        tr("Merge", "Merge two Systems together (dialog button text)"),
+        tr("Merge Sites"),
+        tr("Enter your account password to merge Sites"),
+        tr("Merge", "Merge two Sites together (dialog button text)"),
         FreshSessionTokenHelper::ActionType::merge);
 
     const auto ownerSessionToken = sessionTokenHelper->refreshToken();
@@ -274,7 +274,7 @@ void MergeSystemsDialog::at_mergeButton_clicked()
         workbenchContext()->instance<ContextCurrentUserWatcher>()->setReconnectOnPasswordChange(false);
 
     if (m_mergeTool->mergeSystem(m_mergeContextId, ownerSessionToken->value, ownSettings))
-        ui->buttonBox->showProgress(tr("Merging Systems..."));
+        ui->buttonBox->showProgress(tr("Merging Sites..."));
 }
 
 void MergeSystemsDialog::at_mergeTool_systemFound(
@@ -324,7 +324,7 @@ void MergeSystemsDialog::at_mergeTool_systemFound(
         }
         else
         {
-            updateErrorLabel(tr("This is the current System URL."));
+            updateErrorLabel(tr("This is the current Site URL."));
         }
 
         return;
@@ -376,14 +376,14 @@ void MergeSystemsDialog::at_mergeTool_mergeFinished(
     {
         const bool reconnectNeeded = ui->remoteSystemRadioButton->isChecked();
         QString successMessage = tr(
-            "Servers from the other System will appear in the resource "
+            "Servers from the other Site will appear in the resource "
             "tree when the database synchronization is finished.");
         if (reconnectNeeded)
             successMessage.append('\n').append(tr("You will be reconnected."));
 
         auto messageBox = new QnMessageBox(
             QnMessageBox::Icon::Information,
-            tr("Systems will be merged shortly"),
+            tr("Sites will be merged shortly"),
             successMessage,
             QnDialogButtonBox::StandardButton::Ok,
             QnDialogButtonBox::StandardButton::Ok,
@@ -412,7 +412,7 @@ void MergeSystemsDialog::at_mergeTool_mergeFinished(
         if (!message.isEmpty())
             message.prepend(lit("\n"));
 
-        QnSessionAwareMessageBox::critical(this, tr("Failed to merge Systems"), message);
+        QnSessionAwareMessageBox::critical(this, tr("Failed to merge Sites"), message);
 
         updateConfigurationBlock();
     }

@@ -20,7 +20,7 @@ struct BookmarkUtilStrings
 public:
     static QString systemEvent()
     {
-        return tr("System Event", "Shows that the bookmark was created by a system event");
+        return tr("Site Event", "Shows that the bookmark was created by a site event");
     }
 };
 

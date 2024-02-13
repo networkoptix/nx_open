@@ -55,7 +55,7 @@ SecuritySettingsWidget::SecuritySettingsWidget(
 
     m_archiveEncryptionPasswordDialog->setWindowTitle(tr("Archive encryption password"));
     m_archiveEncryptionPasswordDialog->setHeaderText(tr(
-        "The encryption password will be required to restore the archive on another system."
+        "The encryption password will be required to restore the archive."
         "\nCaution: This password cannot be reset. If you lose it, the archive will be unrecoverable."));
 
     setHelpTopic(ui->useHttpsOnlyCamerasCheckBox, HelpTopic::Id::ConnectToCamerasOverOnlyHttps);
@@ -86,9 +86,9 @@ SecuritySettingsWidget::SecuritySettingsWidget(
     setHelpTopic(ui->archiveEncryptionGroupBox, HelpTopic::Id::EnableArchiveEncryption);
     const auto archiveEncryptionHint = HintButton::createGroupBoxHint(ui->archiveEncryptionGroupBox);
     archiveEncryptionHint->setHintText(tr(
-        "Encrypts archive data to prevent it from being viewed outside of the system. "
+        "Encrypts archive data to prevent it from being viewed outside of the site. "
         "You will not be required to enter the encryption password to view the video archive "
-        "within this system."));
+        "within this site."));
 
     connect(ui->watermarkSettingsButton, &QPushButton::pressed, this,
         [this]
@@ -130,7 +130,7 @@ SecuritySettingsWidget::SecuritySettingsWidget(
         std::chrono::duration_cast<std::chrono::days>(kSessionLengthAlertLimit).count());
 
     ui->limitSessionAlertLabel->setText(tr("Unlimited user session lifetime threatens overall"
-        " System security and may lead to degradation in System performance"));
+        " Site security and may lead to performance degradation"));
     ui->limitSessionLengthAlertLabel->setText(tr(
         "The recommended maximum user session lifetime is %1",
         "%1 is the time span with time units")

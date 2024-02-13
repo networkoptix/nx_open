@@ -336,7 +336,7 @@ void BackupStatusWidget::onBackupTimePointCalculated(
 
     const auto backupTimePointLabelText =
         tr("Footage from these cameras is backed up through to %1 %2",
-            "%1 and %2 will be replaced respectively by the date and time in the system format.");
+            "%1 and %2 will be replaced respectively by the date and time in the site format.");
 
     const auto formatDateTime =
         [](const QString& text)

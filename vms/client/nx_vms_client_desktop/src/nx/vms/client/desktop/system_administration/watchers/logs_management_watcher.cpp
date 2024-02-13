@@ -924,7 +924,7 @@ struct LogsManagementWatcher::Private
                     QnNotificationLevel::Value::ImportantNotification);
 
                 notificationManager->setTooltip(clientLogLevelWarning,
-                    tr("Debug logging is enabled, resulting in degraded system performance."));
+                    tr("Debug logging is enabled, resulting in degraded performance."));
             }
         }
         else
@@ -964,7 +964,7 @@ struct LogsManagementWatcher::Private
             notificationManager->setAdditionalText(serverLogLevelWarning, shortList(resList));
 
             notificationManager->setTooltip(serverLogLevelWarning,
-                tr("Debug logging is enabled, resulting in degraded system performance."));
+                tr("Debug logging is enabled, resulting in degraded performance."));
         }
         else
         {

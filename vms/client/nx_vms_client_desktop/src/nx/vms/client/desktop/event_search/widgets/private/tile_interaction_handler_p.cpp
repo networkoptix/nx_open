@@ -212,7 +212,7 @@ void TileInteractionHandler::handleClick(
         }
 
         case ActionSupport::crossSystem:
-            showMessage(tr("This action is not supported for notifications from other Systems"));
+            showMessage(tr("This action is not supported for notifications from other Sites"));
             return;
 
         default:

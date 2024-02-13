@@ -191,7 +191,7 @@
          </sizepolicy>
         </property>
         <property name="title">
-         <string>System Servers</string>
+         <string>Site Servers</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>

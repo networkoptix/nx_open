@@ -112,7 +112,7 @@ public:
 
     Property<core::ConnectionData> lastUsedConnection{this, "lastUsedConnection"};
     Property<QString> lastLocalConnectionUrl{this, "lastLocalConnectionUrl", {},
-        "Last system we successfully connected to."};
+        "Last site we successfully connected to."};
     Property<bool> autoLogin{this, "autoLogin", false, "Auto-login to the last connected server."};
     Property<bool> saveCredentialsAllowed{this, "saveCredentialsAllowed", true};
     Property<bool> stickReconnectToServer{this, "stickReconnectToServer", false,

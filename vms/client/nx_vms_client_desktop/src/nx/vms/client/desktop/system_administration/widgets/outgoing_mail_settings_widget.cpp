@@ -220,7 +220,7 @@ void OutgoingMailSettingsWidget::Private::setupDialogControls()
 
     // Setup placeholders.
 
-    ui->systemSignatureInput->setPlaceholderText(tr("Enter a short System description here."));
+    ui->systemSignatureInput->setPlaceholderText(tr("Enter a short Site description here."));
     ui->supportSignatureInput->setPlaceholderText(nx::branding::supportAddress());
     ui->defaultSignatureInput->setText(nx::branding::supportAddress());
     ui->defaultSignatureInput->setVisible(false);

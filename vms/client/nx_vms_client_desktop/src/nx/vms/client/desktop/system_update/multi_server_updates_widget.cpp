@@ -709,7 +709,7 @@ MultiServerUpdatesWidget::VersionReport MultiServerUpdatesWidget::calculateUpdat
                     else
                     {
                         packageErrors << tr("OS versions of some components are no longer supported. "
-                            "Please remove them from the System or update their OS to a supported version.");
+                            "Please remove them from the Site or update their OS to a supported version.");
                     }
                 }
 
@@ -731,7 +731,7 @@ MultiServerUpdatesWidget::VersionReport MultiServerUpdatesWidget::calculateUpdat
 
     if (!contents.cloudIsCompatible)
     {
-        report.statusMessages << tr("Incompatible %1 instance. To update disconnect System from %1 first.",
+        report.statusMessages << tr("Incompatible %1 instance. To update disconnect Site from %1 first.",
             "%1 here will be substituted with cloud name e.g. 'Nx Cloud'.")
             .arg(nx::branding::cloudName());
     }
@@ -812,7 +812,7 @@ void MultiServerUpdatesWidget::updateAlertBlock()
     if (m_dayWarningVisible)
     {
         messages.push_back(
-            {.text = tr("Applying System updates at the end of the week is not recommended"),
+            {.text = tr("Applying updates at the end of the week is not recommended"),
                 .level = BarDescription::BarLevel::Warning,
                 .isEnabledProperty = &messageBarSettings()->multiServerUpdateWeekendWarning});
     }
@@ -2642,7 +2642,7 @@ void MultiServerUpdatesWidget::syncRemoteUpdateStateToUi()
             updateTitle = tr("Updating to ...");
             break;
         case WidgetUpdateState::complete:
-            updateTitle = tr("System updated to");
+            updateTitle = tr("Site updated to");
             break;
         default:
             break;
@@ -2888,7 +2888,7 @@ void MultiServerUpdatesWidget::discardChanges()
     if (m_serverUpdateTool->getUploaderState() == ServerUpdateTool::OfflineUpdateState::push)
     {
         QnMessageBox dialog(QnMessageBoxIcon::Information,
-            tr("System update in process"), QString(),
+            tr("Site update in process"), QString(),
             QDialogButtonBox::NoButton, QDialogButtonBox::NoButton,
             this);
 

@@ -75,7 +75,7 @@ void QnAttachToVideowallDialog::updateLicencesUsage()
         {
             const auto saasState = systemContext->saasServiceManager()->saasState();
             ui->licensesLabel->setText(
-                tr("System shut down. To attach to a Video Wall, the System should be in active "
+                tr("Site shut down. To attach to a Video Wall, the Site should be in active "
                    "state. %1").arg(saas::StringsHelper::recommendedAction(saasState)));
 
             setWarningStyle(ui->licensesLabel);

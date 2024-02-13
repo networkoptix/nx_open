@@ -62,7 +62,7 @@ std::tuple<nx::network::rest::Result::Error, QString> extractError(
         case JsonRpcError::applicationError:
             return {kRestApiError, UserGroupRequestChain::tr("Application Error")};
         case JsonRpcError::systemError:
-            return {kRestApiError, UserGroupRequestChain::tr("System Error")};
+            return {kRestApiError, UserGroupRequestChain::tr("Site Error")};
         case JsonRpcError::transportError:
             return {kRestApiError, UserGroupRequestChain::tr("Transport Error")};
     }

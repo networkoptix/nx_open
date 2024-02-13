@@ -700,7 +700,7 @@ void UserSettingsDialog::onAuditTrailRequested()
 void UserSettingsDialog::onTerminateLink()
 {
     const QString mainText = tr("Are you sure you want to terminate access link?");
-    const QString infoText = tr("This will instantly remove an access to the system for this user");
+    const QString infoText = tr("This will instantly remove an access to the site for this user");
 
     QnSessionAwareMessageBox messageBox(d->parentWidget);
 

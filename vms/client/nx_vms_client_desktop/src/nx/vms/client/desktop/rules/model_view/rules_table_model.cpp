@@ -612,7 +612,7 @@ QVariant RulesTableModel::targetServerData(
 QVariant RulesTableModel::systemData(int role) const
 {
     if (role == Qt::DisplayRole)
-        return tr("System");
+        return tr("Site");
 
     if (role == Qt::DecorationRole)
         return iconPath(QnResourceIconCache::CurrentSystem);

@@ -84,7 +84,7 @@
       <item row="0" column="0" colspan="2">
        <widget class="QGroupBox" name="systemSettingsGroupBox">
         <property name="title">
-         <string>System Settings</string>
+         <string>Site Settings</string>
         </property>
         <property name="flat">
          <bool>true</bool>

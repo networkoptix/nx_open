@@ -40,13 +40,13 @@ QString QnSystemHealthStringsHelper::messageTitle(MessageType messageType)
         case MessageType::archiveIntegrityFailed:
             return tr("Archive integrity problem detected");
         case MessageType::noInternetForTimeSync:
-            return tr("The System has no internet access for time synchronization");
+            return tr("The Site has no internet access for time synchronization");
         case MessageType::cameraRecordingScheduleIsInvalid:
             return tr("Camera recording schedule is invalid");
         case MessageType::metadataStorageNotSet:
             return tr("Storage for analytics data is not set");
         case MessageType::metadataOnSystemStorage:
-            return tr("System storage is used for analytics data");
+            return tr("System partition is used for analytics data");
         case MessageType::saasLocalRecordingServicesOverused:
             return tr("Local recording services overused");
         case MessageType::saasCloudStorageServicesOverused:
@@ -54,9 +54,9 @@ QString QnSystemHealthStringsHelper::messageTitle(MessageType messageType)
         case MessageType::saasIntegrationServicesOverused:
             return tr("Paid integrations services overused");
         case MessageType::saasInSuspendedState:
-            return tr("System suspended");
+            return tr("Site suspended");
         case MessageType::saasInShutdownState:
-            return tr("System shut down");
+            return tr("Site shut down");
         case MessageType::showIntercomInformer:
             return tr("Intercom call");
         case MessageType::showMissedCallInformer:
@@ -90,9 +90,9 @@ QString QnSystemHealthStringsHelper::messageText(MessageType messageType,
 
             const QString kCloudNameText = html::bold(nx::branding::cloudName());
             const QString kMessage = isLoggedIntoCloud
-                ? tr("Connect your System to %1 &mdash; make it accessible from anywhere!",
+                ? tr("Connect your Site to %1 &mdash; make it accessible from anywhere!",
                     "%1 is the cloud name (like Nx Cloud)").arg(kCloudNameText)
-                : tr("Check out %1 &mdash; connect to your System from anywhere!",
+                : tr("Check out %1 &mdash; connect to your Site from anywhere!",
                     "%1 is the cloud name (like Nx Cloud)").arg(kCloudNameText);
 
             using nx::vms::utils::SystemUri;
@@ -148,16 +148,19 @@ QString QnSystemHealthStringsHelper::messageTooltip(MessageType messageType,
             return QString(); //< Server list is displayed separately.
 
         case MessageType::noInternetForTimeSync:
-            return tr("No online server in the System has internet access for time synchronization.");
+            return tr("Unable to synchronize time: No internet connection available.");
 
         case MessageType::emailIsEmpty:
-            messageParts << tr("Email address is not set.") << tr("You cannot receive System notifications by email.");
+            messageParts << tr("Email address is not set.")
+                << tr("You cannot receive notifications by email.");
             break;
         case MessageType::smtpIsNotSet:
-            messageParts << tr("Email server is not set.") << tr("You cannot receive System notifications by email.");
+            messageParts << tr("Email server is not set.")
+                << tr("You cannot receive notifications by email.");
             break;
         case MessageType::usersEmailIsEmpty:
-            messageParts << tr("Some users have not set their email addresses.") << tr("They cannot receive System notifications by email.");
+            messageParts << tr("Some users have not set their email addresses.")
+                << tr("They cannot receive notifications by email.");
             break;
         case MessageType::archiveIntegrityFailed:
             messageParts << resourceName;

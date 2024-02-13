@@ -22,7 +22,7 @@ class RemoteConnectionErrorStrings
 
     static QString contactAdministrator()
     {
-        return tr("If this error persists, please contact your system administrator.");
+        return tr("If this error persists, please contact your site administrator.");
     }
 
     static QString clientCloudIsNotReady()
@@ -154,10 +154,10 @@ public:
                 {
                     const auto shortCloudName = nx::branding::shortCloudName();
                     auto message = saas::ServiceManager::saasShutDown(moduleInformation.saasState)
-                        ? tr("Log in as a %1 user to the system in a shutdown state "
+                        ? tr("Log in as a %1 user to the site in a shutdown state "
                             "is forbidden. You can still connect as local user.",
                                 "%1 is the short cloud name (like Cloud)").arg(shortCloudName)
-                        : tr("Log in as a %1 user to the system in a suspended state "
+                        : tr("Log in as a %1 user to the site in a suspended state "
                             "is forbidden. You can still connect as local user.",
                                 "%1 is the short cloud name (like Cloud)").arg(shortCloudName);
 
@@ -178,21 +178,21 @@ public:
             {
                 return {
                     tr("Session expired. Re-enter your password."),
-                    tr("Session duration limit can be changed by a system administrator.")
+                    tr("Session duration limit can be changed by a site administrator.")
                 };
             }
 
             case RemoteConnectionErrorCode::temporaryTokenExpired:
             {
                 return {
-                    tr("Your access to this system has expired."),
-                    tr("Please contact the system administrator to regain access.")
+                    tr("Your access to this site has expired."),
+                    tr("Please contact the site administrator to regain access.")
                 };
             }
 
             case RemoteConnectionErrorCode::systemIsNotCompatibleWith2Fa:
             {
-                const QString message = tr("To log in to this System, disable \"Ask for a "
+                const QString message = tr("To log in to this site, disable \"Ask for a "
                     "verification code on every login with your %1 account\" in your %2.",
                     "%1 is the cloud name (like Nx Cloud),"
                     "%2 is link that leads to /account/security section of Nx Cloud")
@@ -225,7 +225,7 @@ public:
             {
                 return {
                     tr("User is disabled"),
-                    tr("This user has been disabled by a system administrator.")
+                    tr("This user has been disabled by a site administrator.")
                 };
             }
 

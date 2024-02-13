@@ -590,7 +590,7 @@ QVariant UserListModel::data(const QModelIndex& index, int role) const
                     if (!d->systemContext()->nonEditableUsersAndGroups()->nonUniqueUsers()
                         .isUnique(user->getId()))
                     {
-                        lines << tr("There is already a user with the same login in the system. "
+                        lines << tr("There is another user with this login. "
                             "To avoid issues it is required for all users to have a unique login.");
                     }
 
