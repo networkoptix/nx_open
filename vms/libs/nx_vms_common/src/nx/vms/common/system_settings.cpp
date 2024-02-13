@@ -1627,7 +1627,7 @@ void SystemSettings::resetCloudParamsWithLowPriority()
         params.emplace_back(std::move(param));
     }
 
-    auto ec2Connection = systemContext()->ec2Connection();
+    auto ec2Connection = systemContext()->messageBusConnection();
     auto manager = ec2Connection->getMiscManager(Qn::kSystemAccess);
     manager->updateKvPairsWithLowPrioritySync(std::move(params));
 }
