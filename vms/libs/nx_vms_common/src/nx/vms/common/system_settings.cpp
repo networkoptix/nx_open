@@ -1724,11 +1724,10 @@ void SystemSettings::resetCloudParams()
 
 void SystemSettings::resetCloudParamsWithLowPriority()
 {
-    const std::array<QString, 4> names = {
+    const std::array<QString, 3> names = {
         Names::cloudAccountName,
         Names::cloudSystemID,
-        Names::cloudAuthKey,
-        Names::organizationId};
+        Names::cloudAuthKey};
 
     nx::vms::api::ResourceParamWithRefDataList params;
     for (const auto& name: names)
