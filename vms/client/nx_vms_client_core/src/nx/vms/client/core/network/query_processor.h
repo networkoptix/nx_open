@@ -135,6 +135,15 @@ public:
         sendGetRequest(cmdCode, std::move(query), internalHandler);
     }
 
+    template<class InputData, class HandlerType>
+    void processLowPriorityUpdateAsync(
+        ec2::ApiCommand::Value cmdCode,
+        InputData input,
+        HandlerType handler)
+    {
+        NX_ASSERT(false, "Not implemented");
+    }
+
 private:
     Qn::SerializationFormat serializationFormat() const;
 

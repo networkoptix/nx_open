@@ -1661,7 +1661,8 @@ NX_REFLECTION_ENUM_CLASS(TransactionType,
     Unknown = -1,
     Regular = 0,
     Local = 1, //< Do not propagate transactions to other Server peers or Cloud.
-    Cloud = 2 //< Sync transaction to Cloud.
+    Cloud = 2, //< Sync transaction to Cloud.
+    LowPriorityRegular = 3 //< Generate minimal possible timestamp for transaction
 )
 
 struct HistoryAttributes

@@ -328,6 +328,12 @@ public:
 
     void resetCloudParams();
 
+    /**
+     * Should be used instead of `resetCloudParams()` for automatically triggered actions
+     * so User actions override them.
+     */
+    void resetCloudParamsWithLowPriority();
+
     // -- Misc settings
 
     bool isNewSystem() const { return localSystemId().isNull(); }

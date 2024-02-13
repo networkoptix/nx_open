@@ -8,6 +8,8 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
 #include <nx/branding.h>
+#include <nx_ec/abstract_ec_connection.h>
+#include <nx_ec/managers/abstract_misc_manager.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/api/data/backup_settings.h>
 #include <nx/vms/api/data/resource_data.h>
@@ -1718,6 +1720,28 @@ void SystemSettings::resetCloudParams()
     setCloudAccountName(QString());
     setCloudSystemId(QString());
     setCloudAuthKey(QString());
+}
+
+void SystemSettings::resetCloudParamsWithLowPriority()
+{
+    const std::array<QString, 4> names = {
+        Names::cloudAccountName,
+        Names::cloudSystemID,
+        Names::cloudAuthKey,
+        Names::organizationId};
+
+    nx::vms::api::ResourceParamWithRefDataList params;
+    for (const auto& name: names)
+    {
+        nx::vms::api::ResourceParamWithRefData param;
+        param.resourceId = QnUserResource::kAdminGuid;
+        param.name = name;
+        params.emplace_back(std::move(param));
+    }
+
+    auto ec2Connection = systemContext()->ec2Connection();
+    auto manager = ec2Connection->getMiscManager(Qn::kSystemAccess);
+    manager->updateKvPairsWithLowPrioritySync(std::move(params));
 }
 
 QString SystemSettings::cloudHost() const
