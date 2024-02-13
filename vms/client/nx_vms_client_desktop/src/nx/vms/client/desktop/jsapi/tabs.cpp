@@ -5,10 +5,13 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/guarded_callback.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/jsapi/detail/helpers.h>
+#include <nx/vms/client/desktop/jsapi/detail/resources_structures.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
+#include <nx/vms/client/desktop/resource/unified_resource_pool.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/window_context_aware.h>
@@ -35,6 +38,7 @@ struct Tabs::Private:
     Error setCurrent(Tab* tab);
     Tab* add(const QString& name);
     Error remove(Tab* tab);
+    Error open(const detail::ResourceUniqueId& id);
 };
 
 Tabs::Private::Private(Tabs* q, WindowContext* context):
@@ -152,6 +156,16 @@ Error Tabs::Private::remove(Tab* tab)
     return Error::success();
 }
 
+Error Tabs::Private::open(const detail::ResourceUniqueId& id)
+{
+    const auto resource = appContext()->unifiedResourcePool()->resource(id.id, id.localSystemId);
+    if (!resource || !resource->hasFlags(Qn::layout))
+        return Error::failed();
+
+    menu()->trigger(menu::OpenInNewTabAction, resource);
+    return Error::success();
+}
+
 Tabs::Tabs(WindowContext* context, QObject* parent):
     QObject(parent),
     d(new Private(this, context))
@@ -201,6 +215,11 @@ QJsonObject Tabs::remove(const QString& id)
 {
     Tab* tab = d->tabs.value(nx::Uuid{id}).get();
     return detail::toJsonObject(d->remove(tab));
+}
+
+QJsonObject Tabs::open(const QString& layoutResourceId)
+{
+    return detail::toJsonObject(d->open(layoutResourceId));
 }
 
 } // namespace nx::vms::client::desktop::jsapi
