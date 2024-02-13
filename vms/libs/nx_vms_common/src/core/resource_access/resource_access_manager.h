@@ -281,7 +281,8 @@ public:
 
 signals:
     void resourceAccessReset();
-    void permissionsDependencyChanged(const QnResourceList& resources);
+    void permissionsDependencyChanged(const QnResourceList& targetResources);
+    void permissionsDependencyChanged(const QSet<nx::Uuid>& targetGroupIds);
 
 protected:
     virtual void afterUpdate() override;

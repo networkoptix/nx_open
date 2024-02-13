@@ -99,6 +99,7 @@ signals:
      * affected.
      */
     void permissionsMaybeChanged(const QnResourceList& resourcesHint, QPrivateSignal);
+    void permissionsForGroupsMaybeChanged(const QSet<nx::Uuid>& groupIdsHint, QPrivateSignal);
 
     void globalPermissionsChanged(GlobalPermissions current, GlobalPermissions old, QPrivateSignal);
 

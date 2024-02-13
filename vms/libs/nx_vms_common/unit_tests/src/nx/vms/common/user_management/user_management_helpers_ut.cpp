@@ -79,10 +79,10 @@ TEST_F(UserManagementHelpersTest, getUsersAndGroups)
     EXPECT_EQ(groups, UserGroupDataList(
         {d.specialPowerUsers, *PredefinedUserGroups::find(kPowerUsersGroupId)}));
 
-    QList<nx::Uuid> groupIds;
+    QSet<nx::Uuid> groupIds;
     getUsersAndGroups(systemContext(), requestedIds, users, groupIds);
     EXPECT_EQ(users, QnUserResourceList({d.powerUser, d.specialPowerUser}));
-    EXPECT_EQ(groupIds, QList<nx::Uuid>({d.specialPowerUsers.id, kPowerUsersGroupId}));
+    EXPECT_EQ(groupIds, QSet<nx::Uuid>({d.specialPowerUsers.id, kPowerUsersGroupId}));
 }
 
 TEST_F(UserManagementHelpersTest, allGroupsExist)

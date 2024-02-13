@@ -321,7 +321,7 @@ QVariant EventLogModel::iconData(Column column, const EventLogModelData& data) c
             else
             {
                 QnUserResourceList users;
-                QList<nx::Uuid> groups;
+                QSet<nx::Uuid> groups;
                 nx::vms::common::getUsersAndGroups(systemContext(), selection.ids, users, groups);
                 userCount += (users.size() + groups.size());
             }
