@@ -113,6 +113,7 @@ copyTranslations()
 
     local -r TRANSLATIONS=(
         nx_vms_common.dat
+        nx_vms_license.dat
         nx_vms_client_core.dat
         nx_vms_client_desktop.dat
         nx_vms_rules.dat
