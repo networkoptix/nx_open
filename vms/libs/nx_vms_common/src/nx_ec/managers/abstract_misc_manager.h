@@ -7,6 +7,7 @@
 #include <nx/utils/async_handler_executor.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/data/misc_data.h>
+#include <nx/vms/api/data/resource_data.h>
 #include <nx/vms/api/data/runtime_data.h>
 #include <nx/vms/api/data/system_merge_history_record.h>
 #include <nx/vms/api/data/timestamp.h>
@@ -100,6 +101,13 @@ public:
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) = 0;
 
     ErrorCode getSystemMergeHistorySync(nx::vms::api::SystemMergeHistoryRecordList* outData);
+
+    virtual int updateKvPairsWithLowPriority(
+        nx::vms::api::ResourceParamWithRefDataList params,
+        Handler<> handler,
+        nx::utils::AsyncHandlerExecutor handlerExecutor = {}) = 0;
+    ErrorCode updateKvPairsWithLowPrioritySync(nx::vms::api::ResourceParamWithRefDataList params);
+
 };
 
 } // namespace ec2

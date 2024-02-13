@@ -94,4 +94,15 @@ ErrorCode AbstractMiscManager::getSystemMergeHistorySync(
         outData);
 }
 
+ErrorCode AbstractMiscManager::updateKvPairsWithLowPrioritySync(
+    nx::vms::api::ResourceParamWithRefDataList params)
+{
+    return detail::callSync(
+        [&](auto handler)
+        {
+            updateKvPairsWithLowPriority(std::move(params), std::move(handler));
+        });
+}
+
+
 } // namespace ec2
