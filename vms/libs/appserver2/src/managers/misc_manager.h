@@ -66,6 +66,11 @@ public:
         Handler<nx::vms::api::SystemMergeHistoryRecordList> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
 
+    virtual int updateKvPairsWithLowPriority(
+        nx::vms::api::ResourceParamWithRefDataList params,
+        Handler<> handler,
+        nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
+
 private:
     decltype(auto) processor() { return m_queryProcessor->getAccess(m_userSession); }
 
@@ -251,6 +256,22 @@ int QnMiscManager<T>::getSystemMergeHistory(
     processor().template processQueryAsync<std::nullptr_t, SystemMergeHistoryRecordList>(
         ApiCommand::getSystemMergeHistory,
         nullptr,
+        [requestId, handler = handlerExecutor.bind(std::move(handler))](auto&&... args) mutable
+        {
+            handler(requestId, std::move(args)...);
+        });
+    return requestId;
+}
+
+template<class T>
+int QnMiscManager<T>::updateKvPairsWithLowPriority(
+    nx::vms::api::ResourceParamWithRefDataList params,
+    Handler<> handler,
+    nx::utils::AsyncHandlerExecutor handlerExecutor)
+{
+    const int requestId = generateRequestID();
+    processor().processLowPriorityUpdateAsync(ApiCommand::setResourceParams,
+        params,
         [requestId, handler = handlerExecutor.bind(std::move(handler))](auto&&... args) mutable
         {
             handler(requestId, std::move(args)...);
