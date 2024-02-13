@@ -224,7 +224,7 @@ QnLayoutResourcePtr OpenLayoutActionWidget::getSelectedLayout()
 std::pair<QnUserResourceList, QList<nx::Uuid>> OpenLayoutActionWidget::getSelectedUsersAndRoles()
 {
     QnUserResourceList users;
-    QList<nx::Uuid> groupIds;
+    QSet<nx::Uuid> groupIds;
     if (model())
     {
         const auto params = model()->actionParams();
@@ -238,7 +238,7 @@ std::pair<QnUserResourceList, QList<nx::Uuid>> OpenLayoutActionWidget::getSelect
         users = users.filtered([](const QnUserResourcePtr& user) { return user->isEnabled(); });
     }
 
-    return std::pair(users, groupIds);
+    return std::pair(users, QList<nx::Uuid>{groupIds.begin(), groupIds.end()});
 }
 
 void OpenLayoutActionWidget::updateLayoutsButton()

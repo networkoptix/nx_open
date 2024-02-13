@@ -205,6 +205,13 @@ GroupSettingsDialog::GroupSettingsDialog(
                 if (groupsWithChangedMembers.contains(d->groupId))
                     updateStateFrom(d->groupId);
             });
+
+        connect(accessController(), &core::AccessController::permissionsForGroupsMaybeChanged, this,
+            [this](const QSet<nx::Uuid>& groupIdsHint)
+            {
+                if (groupIdsHint.contains(d->groupId))
+                    updateStateFrom(d->groupId);
+            });
     }
 
     connect(systemContext->userGroupManager(), &common::UserGroupManager::addedOrUpdated, this,

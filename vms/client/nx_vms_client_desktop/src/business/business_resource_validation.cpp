@@ -344,7 +344,7 @@ bool QnSendEmailActionDelegate::isValidList(const QSet<nx::Uuid>& ids, const QSt
     auto context = appContext()->currentSystemContext();
 
     QnUserResourceList users;
-    QList<nx::Uuid> groupIds;
+    QSet<nx::Uuid> groupIds;
     nx::vms::common::getUsersAndGroups(context, ids, users, groupIds);
 
     if (!std::all_of(users.cbegin(), users.cend(), &isValidUser))
@@ -546,7 +546,7 @@ void QnSubjectValidationPolicy::analyze(
     invalidUsers.clear();
 
     QnUserResourceList users;
-    QList<nx::Uuid> groupIds;
+    QSet<nx::Uuid> groupIds;
 
     if (allUsers)
         users = resourcePool()->getResources<QnUserResource>();
@@ -593,7 +593,7 @@ QValidator::State QnSubjectValidationPolicy::validity(bool allUsers,
         return QValidator::Invalid;
 
     QnUserResourceList users;
-    QList<nx::Uuid> groupIds;
+    QSet<nx::Uuid> groupIds;
 
     if (allUsers)
         users = resourcePool()->getResources<QnUserResource>();
@@ -901,11 +901,10 @@ QString QnCloudUsersValidationPolicy::calculateAlert(
         [this](const QSet<nx::Uuid>& subjects) -> QnUserResourceList
         {
             QnUserResourceList users;
-            UuidList groupIds;
+            QSet<nx::Uuid> groupIds;
             nx::vms::common::getUsersAndGroups(systemContext(), subjects, users, groupIds);
 
-            for (const auto& user: accessSubjectHierarchy()->usersInGroups(
-                nx::utils::toQSet(groupIds)))
+            for (const auto& user: accessSubjectHierarchy()->usersInGroups(groupIds))
             {
                 if (std::find_if(users.begin(), users.end(),
                     [user](const QnUserResourcePtr& existing)
