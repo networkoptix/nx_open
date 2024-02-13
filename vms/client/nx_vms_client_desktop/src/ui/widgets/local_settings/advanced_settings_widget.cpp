@@ -77,7 +77,6 @@ QnAdvancedSettingsWidget::QnAdvancedSettingsWidget(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ui->alertLabel->setText(tr("NVIDIA hardware acceleration is in beta mode"));
     ui->dialogContentsLayout->setContentsMargins(nx::style::Metrics::kDefaultTopLevelMargins);
     ui->dialogContentsLayout->setSpacing(nx::style::Metrics::kDefaultLayoutSpacing.height());
 
@@ -144,11 +143,7 @@ QnAdvancedSettingsWidget::QnAdvancedSettingsWidget(QWidget *parent) :
         &QnAbstractPreferencesWidget::hasChangesChanged);
 
     connect(ui->useHardwareDecodingCheckbox, &QCheckBox::toggled, this,
-        [this]
-        {
-            emit hasChangesChanged();
-            updateNvidiaHardwareAccelerationWarning();
-        });
+        &QnAbstractPreferencesWidget::hasChangesChanged);
 
     // Live buffer lengths slider/spin logic.
     connect(ui->maximumLiveBufferLengthSlider, &QSlider::valueChanged, this,
@@ -367,7 +362,6 @@ void QnAdvancedSettingsWidget::loadDataToUi()
     setHardwareDecodingEnabled(appContext()->localSettings()->hardwareDecodingEnabled());
     setCertificateValidationLevel(appContext()->coreSettings()->certificateValidationLevel());
     updateCertificateValidationLevelDescription();
-    updateNvidiaHardwareAccelerationWarning();
 }
 
 bool QnAdvancedSettingsWidget::hasChanges() const
@@ -565,11 +559,4 @@ void QnAdvancedSettingsWidget::updateLogsManagementWidgetsState()
         ? tr("Failed to save logs to the selected folder")
         : tr("Download complete!"));
     setWarningStyleOn(ui->logsDownloadStatusLabel, hasErrors);
-}
-void QnAdvancedSettingsWidget::updateNvidiaHardwareAccelerationWarning()
-{
-    const auto isNvidiaAcceleration =
-        nx::media::getHardwareAccelerationType() == nx::media::HardwareAccelerationType::nvidia;
-
-    ui->alertLabel->setVisible(ui->useHardwareDecodingCheckbox->isChecked() && isNvidiaAcceleration);
 }
