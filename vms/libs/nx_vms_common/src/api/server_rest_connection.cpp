@@ -1289,7 +1289,7 @@ Handle ServerConnection::eventLog(
     QJson::serialize(filter, &value);
     NX_ASSERT(value.isObject());
     return executeGet(
-        "rest/v3/events/log",
+        "rest/v4/events/log",
         nx::network::rest::Params::fromJson(value.toObject()),
         std::move(callback),
         targetThread,
