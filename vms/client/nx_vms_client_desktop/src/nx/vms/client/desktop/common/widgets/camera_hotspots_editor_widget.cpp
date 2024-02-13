@@ -511,13 +511,12 @@ void CameraHotspotsEditorWidget::paintEvent(QPaintEvent* event)
 
         if (!hotspot.targetResourceId.isNull())
         {
-            option.cameraState = CameraHotspotDisplayOption::CameraState::valid;
             const auto resourcePool = systemContext->resourcePool();
             const auto camera =
                 resourcePool->getResourceById<QnVirtualCameraResource>(hotspot.targetResourceId);
 
             if (!camera)
-                option.cameraState = CameraHotspotDisplayOption::CameraState::invalid;
+                option.isValid = false;
         }
 
         if (!isEnabled())
