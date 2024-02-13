@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Merge Systems...</string>
+   <string>Merge Sites...</string>
   </property>
   <property name="modal">
    <bool>true</bool>
@@ -189,7 +189,7 @@
         <item>
          <widget class="QLabel" name="currentSystemLabel">
           <property name="text">
-           <string notr="true">&lt;You are about to merge the current system &lt;system name&gt; with the system&gt;</string>
+           <string notr="true">&lt;You are about to merge the current site &lt;system name&gt; with the site&gt;</string>
           </property>
          </widget>
         </item>
@@ -212,7 +212,7 @@
         <item>
          <widget class="QLabel" name="newSystemLabel">
           <property name="text">
-           <string>Take system name and settings from:</string>
+           <string>Take site name and settings from:</string>
           </property>
          </widget>
         </item>

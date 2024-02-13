@@ -58,15 +58,15 @@ QString CertificateWarning::details(Reason reason, int numberOfServers)
                 ? tr("Review the certificate to ensure you trust the "
                 "server you are connecting to.")
                 : tr("Review the certificates of the servers to ensure you trust the "
-                "system you are connecting to.");
+                "site you are connecting to.");
             return message;
         }
         case Reason::invalidCertificate:
         case Reason::serverCertificateChanged:
         {
             return tr(
-                "This might be due to an expired server certificate or an invalid certificate. "
-                "Contact your system administrator for further investigation.");
+                "This might be due to an expired server certificate or someone trying "
+                "Contact your site administrator for further investigation.");
         }
         default:
             NX_ASSERT(false, "Unreachable");

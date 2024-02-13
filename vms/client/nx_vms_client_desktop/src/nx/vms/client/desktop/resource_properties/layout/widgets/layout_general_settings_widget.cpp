@@ -62,7 +62,7 @@ void LayoutGeneralSettingsWidget::setupUi()
         tr("Custom number that can be assigned to a layout for quick identification and access"));
 
     setWarningStyleOn(ui->logicalIdWarningLabel);
-    ui->logicalIdWarningLabel->setText(tr("This ID is already used in the System. "
+    ui->logicalIdWarningLabel->setText(tr("This ID is already in use. "
         "Use Generate button to find a free ID."));
 }
 

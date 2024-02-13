@@ -1492,8 +1492,8 @@ void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered()
         {
             const auto saasState = context()->systemContext()->saasServiceManager()->saasState();
 
-            const auto caption = tr("System shut down");
-            const auto text = tr("To add a Video Wall, the System should be in active state. %1")
+            const auto caption = tr("Site shut down");
+            const auto text = tr("To add a Video Wall, the Site should be in active state. %1")
                 .arg(nx::vms::common::saas::StringsHelper::recommendedAction(saasState)).trimmed();
 
             QnMessageBox::critical(mainWindowWidget(), caption, text);

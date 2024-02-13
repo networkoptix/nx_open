@@ -71,9 +71,9 @@ Item
                 case TileGridPlaceholder.Mode.NoSystemsFound:
                     return qsTr("Nothing Found")
                 case TileGridPlaceholder.Mode.NoFavorites:
-                    return qsTr("No Favorite Systems")
+                    return qsTr("No Favorite Sites")
                 case TileGridPlaceholder.Mode.NoHidden:
-                    return qsTr("No Hidden Systems")
+                    return qsTr("No Hidden Sites")
                 default:
                     return ""
             }
@@ -102,9 +102,9 @@ Item
             switch (parent.mode)
             {
                 case TileGridPlaceholder.Mode.NoFavorites:
-                    return qsTr("You can add system to the favorites from the context menu")
+                    return qsTr("You can add site to the favorites from the context menu")
                 case TileGridPlaceholder.Mode.NoHidden:
-                    return qsTr("You can hide systems from the main list from the context menu")
+                    return qsTr("You can hide sites from the main list from the context menu")
                 case TileGridPlaceholder.Mode.NoSystemsFound:
                 default:
                     return ""

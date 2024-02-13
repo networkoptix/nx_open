@@ -250,7 +250,7 @@ void DeviceAdditionDialog::initializeControls()
     ui->httpsOnlyBar->init(
         {.text = tr("Searching for devices on the network is restricted to cameras that"
                     " support HTTPS connections. This can be changed in %1 settings.")
-                     .arg(nx::vms::common::html::localLink(tr("System Administration"))),
+                     .arg(nx::vms::common::html::localLink(tr("Site Administration"))),
             .level = BarDescription::BarLevel::Info,
             .isOpenExternalLinks = false,
             .isEnabledProperty = &messageBarSettings()->httpsOnlyBarInfo});

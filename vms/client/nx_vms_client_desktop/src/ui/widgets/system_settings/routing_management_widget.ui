@@ -205,7 +205,7 @@
        <item>
         <widget class="QLabel" name="warningLabel">
          <property name="text">
-          <string>Removing this connection option could lead to System malfunction.</string>
+          <string>Removing this connection option could lead to Site malfunction.</string>
          </property>
          <property name="textFormat">
           <enum>Qt::RichText</enum>

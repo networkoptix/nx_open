@@ -34,8 +34,8 @@ Item
             text: control.model.context
                 && control.model.context.currentSubjectType() ===
                     AccessSubjectEditingContext.SubjectType.group
-                ? qsTr("At the system level, group members have permissions to:")
-                : qsTr("At the system level, the user has permissions to:")
+                ? qsTr("At the site level, group members have permissions to:")
+                : qsTr("At the site level, the user has permissions to:")
 
             font: Qt.font({pixelSize: 14, weight: Font.Normal})
             color: ColorTheme.colors.light16

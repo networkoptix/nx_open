@@ -524,7 +524,7 @@ QString MergeSystemsTool::getErrorMessage(
     const nx::vms::api::ModuleInformation& moduleInformation)
 {
     const auto systemName = helpers::isNewSystem(moduleInformation)
-            ? '"' + tr("New System") + '"'
+            ? '"' + tr("New Site") + '"'
             : moduleInformation.systemName;
 
     switch (value)
@@ -532,15 +532,15 @@ QString MergeSystemsTool::getErrorMessage(
         case MergeSystemsStatus::ok:
             return QString();
         case MergeSystemsStatus::notFound:
-            return tr("System was not found.");
+            return tr("Site was not found.");
         case MergeSystemsStatus::incompatibleVersion:
-            return tr("The discovered System %1 has an incompatible version %2.",
-                "%1 is name of System, %2 is version information")
+            return tr("The discovered Site %1 has an incompatible version %2.",
+                "%1 is name of Site, %2 is version information")
                 .arg(systemName).arg(moduleInformation.version.toString());
         case MergeSystemsStatus::incompatibleInternal:
             // System info is absent in this case.
-            return tr("Selected System has an older software version that is incompatible with"
-                " the current System. Update selected System to the latest build to merge it with"
+            return tr("Selected Site has an older software version that is incompatible with"
+                " the current Site. Update selected Site to the latest build to merge it with"
                 " the current one.");
         case MergeSystemsStatus::unauthorized:
             return tr("The password or user name is invalid.");
@@ -549,37 +549,37 @@ QString MergeSystemsTool::getErrorMessage(
         case MergeSystemsStatus::backupFailed:
             return tr("Cannot create database backup.");
         case MergeSystemsStatus::starterLicense:
-            return tr("You are about to merge Systems with Starter licenses.")
-                + '\n' + tr("Only one Starter license is allowed per System,"
+            return tr("You are about to merge Sites with Starter licenses.")
+                + '\n' + tr("Only one Starter license is allowed per Site,"
                     " so the second license will be deactivated.")
                 + '\n' + tr("Merge anyway?");
         case MergeSystemsStatus::nvrLicense:
-            return tr("You are about to merge Systems with NVR licenses.")
-                + '\n' + tr("Only one NVR license is allowed per System,"
+            return tr("You are about to merge Sites with NVR licenses.")
+                + '\n' + tr("Only one NVR license is allowed per Site,"
                     " so the second license will be deactivated.")
                 + '\n' + tr("Merge anyway?");
         case MergeSystemsStatus::configurationFailed:
-            return tr("Could not configure the remote System %1.",
-                "%1 is name of System")
+            return tr("Could not configure the remote Site %1.",
+                "%1 is name of the Site")
                 .arg(systemName);
         case MergeSystemsStatus::dependentSystemBoundToCloud:
-            return tr("%1 System can only be merged with non-%1. "
-                "System name and password are taken from %1 System.",
+            return tr("%1 Site can only be merged with non-%1. "
+                "Site name and password are taken from %1 Site.",
                 "%1 is the short cloud name (like Cloud)")
                 .arg(nx::branding::shortCloudName());
         case MergeSystemsStatus::bothSystemBoundToCloud:
-            return tr("Both Systems are connected to %1. Merge is not allowed.",
+            return tr("Both Sites are connected to %1. Merge is not allowed.",
                 "%1 is the cloud name (like Nx Cloud)")
                 .arg(nx::branding::cloudName());
         case MergeSystemsStatus::cloudSystemsHaveDifferentOwners:
-            return tr("%1 systems have different owners. Merge is not allowed.",
+            return tr("%1 sites have different owners. Merge is not allowed.",
                 "%1 is the cloud name (like Nx Cloud)")
                 .arg(nx::branding::cloudName());
         case MergeSystemsStatus::duplicateMediaServerFound:
-            return tr("Cannot merge Systems because they have at least one server with the "
+            return tr("Cannot merge Sites because they have at least one server with the "
                 "same ID. Please remove this server and try again.");
         case MergeSystemsStatus::unconfiguredSystem:
-            return tr("System name is not configured yet.");
+            return tr("Site name is not configured yet.");
         case MergeSystemsStatus::certificateInvalid:
             return tr("Connection to Server could not be established."
                 " The Server's certificate is invalid.");

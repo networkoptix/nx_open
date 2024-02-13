@@ -62,7 +62,7 @@ bool ConnectToCloudTool::start()
 {
     if (!NX_ASSERT(system()->resourcePool()->getAdministrator()))
     {
-        showFailure(tr("Local System owner is absent or disabled."));
+        showFailure(tr("Local Site owner is absent or disabled."));
         return false;
     }
 
@@ -92,8 +92,9 @@ void ConnectToCloudTool::showSuccess(const QString& /*cloudLogin*/)
 {
     showOnceSettings()->cloudPromo = true;
 
-    QnSessionAwareMessageBox::success(getTopWidget(),
-        tr("System connected to %1", "%1 is the cloud name (like Nx Cloud)")
+    QnSessionAwareMessageBox::success(
+        getTopWidget(),
+        tr("Site connected to %1", "%1 is the cloud name (like Nx Cloud)")
             .arg(nx::branding::cloudName()));
 
     m_localLoginDialog->accept();
@@ -104,8 +105,9 @@ void ConnectToCloudTool::showSuccess(const QString& /*cloudLogin*/)
 
 void ConnectToCloudTool::showFailure(const QString& message)
 {
-    QnSessionAwareMessageBox::critical(getTopWidget(),
-        tr("Failed to connect System to %1", "%1 is the cloud name (like Nx Cloud)")
+    QnSessionAwareMessageBox::critical(
+        getTopWidget(),
+        tr("Failed to connect Site to %1", "%1 is the cloud name (like Nx Cloud)")
             .arg(nx::branding::cloudName()),
         message);
 
@@ -125,8 +127,8 @@ QWidget* ConnectToCloudTool::getTopWidget() const
 
 void ConnectToCloudTool::requestCloudAuthData()
 {
-    const QString title = tr("Connect System to %1", "%1 is the cloud name (like Nx Cloud)")
-                              .arg(nx::branding::cloudName());
+    const QString title = tr("Connect Site to %1", "%1 is the cloud name (like Nx Cloud)")
+        .arg(nx::branding::cloudName());
 
     m_oauthLoginDialog = new OauthLoginDialog(m_parent, core::OauthClientType::connect);
     m_oauthLoginDialog->setWindowTitle(title);
@@ -265,9 +267,10 @@ void ConnectToCloudTool::onBindFinished(nx::cloud::db::api::SystemData systemDat
 
 void ConnectToCloudTool::requestLocalSessionToken()
 {
-    const QString title = tr("Connect System to %1?", "%1 is the cloud name (like Nx Cloud)")
-                              .arg(nx::branding::cloudName());
-    const QString mainText = tr("Enter your account password to connect System to %1",
+    const QString title = tr("Connect Site to %1?", "%1 is the cloud name (like Nx Cloud)")
+        .arg(nx::branding::cloudName());
+    const QString mainText = tr(
+        "Enter your account password to connect Site to %1",
         "%1 is the cloud name (like Nx Cloud)")
                                  .arg(nx::branding::cloudName());
 
@@ -275,7 +278,7 @@ void ConnectToCloudTool::requestLocalSessionToken()
         title,
         mainText,
         /*infoText*/ QString(),
-        tr("Connect", "Connect current System to cloud"),
+        tr("Connect", "Connect current Site to cloud"),
         /*warningStyledAction*/ false);
 
     connect(m_localLoginDialog,

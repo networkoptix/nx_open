@@ -212,7 +212,7 @@ SystemSettings::AdaptorList SystemSettings::initConnectionAdaptors()
     m_ec2AliveUpdateIntervalAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
         "ec2AliveUpdateIntervalSec", 60,
         [](auto v) { return v >= 1 && v <= 60 * 60; }, this,
-        [] { return tr("System alive update interval (seconds, 1s-1h)"); });
+        [] { return tr("Site alive update interval (seconds, 1s-1h)"); });
     ec2Adaptors << m_ec2AliveUpdateIntervalAdaptor;
 
     m_proxyConnectTimeoutAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
@@ -315,13 +315,13 @@ SystemSettings::AdaptorList SystemSettings::initCloudAdaptors()
         Names::organizationId, nx::Uuid(), this, [] { return tr("Organization Id"); });
 
     m_cloudSystemIdAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
-        Names::cloudSystemID, QString(), this, [] { return tr("Cloud System ID"); });
+        Names::cloudSystemID, QString(), this, [] { return tr("Cloud Site ID"); });
 
     m_cloudAuthKeyAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
         Names::cloudAuthKey, QString(), this, [] { return tr("Cloud authorization key"); });
 
     m_system2faEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
-        Names::system2faEnabled, false, this, [] { return tr("Enable 2FA for the System"); });
+        Names::system2faEnabled, false, this, [] { return tr("Enable 2FA for the Site"); });
 
     m_masterCloudSyncAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
         "masterCloudSyncList", QString(), this,
@@ -371,17 +371,17 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
     using namespace std::chrono;
 
     m_systemNameAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
-        Names::systemName, QString(), this, [] { return tr("System name"); });
+        Names::systemName, QString(), this, [] { return tr("Site name"); });
 
     m_localSystemIdAdaptor = new QnLexicalResourcePropertyAdaptor<nx::Uuid>(
         Names::localSystemId, nx::Uuid(), this,
-        [] { return tr("Local System ID, null means the System is not set up yet."); });
+        [] { return tr("Local Site ID, null means the Site is not set up yet."); });
 
     m_lastMergeMasterIdAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
-        Names::lastMergeMasterId, QString(), this, [] { return tr("Last master System merge ID"); });
+        Names::lastMergeMasterId, QString(), this, [] { return tr("Last master Site merge ID"); });
 
     m_lastMergeSlaveIdAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
-        Names::lastMergeSlaveId, QString(), this, [] { return tr("Last slave System merge ID"); });
+        Names::lastMergeSlaveId, QString(), this, [] { return tr("Last slave Site merge ID"); });
 
     m_disabledVendorsAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
         Names::disabledVendors, QString(), this, [] { return tr("Disable Device vendors"); });

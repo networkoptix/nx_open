@@ -421,7 +421,7 @@ QVariant UserGroupListModel::data(const QModelIndex& index, int role) const
                     if (!systemContext()->nonEditableUsersAndGroups()->nonUniqueGroups().isUnique(
                         group.id))
                     {
-                        lines << tr("There are multiple groups with this name in the system. To "
+                        lines << tr("There are multiple groups with this name. To "
                             "maintain a clear and organized structure, we suggest providing "
                             "unique names for each group.");
                     }

@@ -198,7 +198,7 @@ Rectangle
         anchors.verticalCenterOffset: -32
         imageSource: "image://svg/skin/user_settings/ldap_not_configured.svg"
         text: qsTr("Not configured yet")
-        additionalText: qsTr("Connect your System to an LDAP server for easier user management")
+        additionalText: qsTr("Connect your Site to an LDAP server for easier user management")
 
         maxWidth: 250
 
@@ -749,9 +749,9 @@ Rectangle
 
                 style: DialogBanner.Style.Info
 
-                text: qsTr("Continuous sync with LDAP server is disabled for this system. " +
-                    "Updates to groups and users and groups membership will occur solely " +
-                    "through manual synchronization.")
+                text: qsTr("Continuous import from LDAP server is disabled for this site. Updates "
+                    + "to groups and user and groups membership will occur solely through manual "
+                    + "synchronization.")
 
                 Layout.fillWidth: true
             }
@@ -762,9 +762,9 @@ Rectangle
 
                 style: DialogBanner.Style.Warning
 
-                text: qsTr("No users or groups match synchronization settings and are added to "
-                    + "the system DB. Make sure LDAP server parameters and search bases are "
-                    + "configured correctly.")
+                text: qsTr("No users or groups match synchronization settings and are added to the "
+                    + "site DB. Make sure LDAP server parameters and filters are configured "
+                    + "correctly.")
 
                 Layout.fillWidth: true
 
@@ -776,7 +776,7 @@ Rectangle
                 style: DialogBanner.Style.Warning
 
                 text: qsTr("Please use care when altering LDAP settings. Incorrect configuration "
-                    + "could disrupt system availability for a large number of users simultaneously.")
+                    + "could disrupt site availability for a large number of users simultaneously.")
 
                 visible: control.showEditingWarning && !control.hideEditingWarning && !closed
                 closeable: true

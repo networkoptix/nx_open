@@ -593,7 +593,7 @@ void CameraReplacementDialog::updateHeader()
 
             //: %1 will be substituted with the camera's name.
             ui->headerDetailsLabel->setText(
-                tr("%1 will be removed from the System and replaced by the selected camera")
+                tr("%1 will be removed from the Site and replaced by the selected camera")
                     .arg(makeCameraNameRichText(d->cameraToBeReplaced->getName())));
 
             ui->headerDetailsLabel->setHidden(false);

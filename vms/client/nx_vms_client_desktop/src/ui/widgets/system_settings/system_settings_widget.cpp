@@ -27,14 +27,14 @@ QnSystemSettingsWidget::QnSystemSettingsWidget(
     ui->setupUi(this);
 
     setHelpTopic(ui->autoDiscoveryCheckBox, HelpTopic::Id::SystemSettings_Server_CameraAutoDiscovery);
-    ui->autodiscoveryHint->addHintLine(tr("When enabled, the system continuously discovers new cameras and servers, "
-        "and sends discovery requests to cameras for status update."));
+    ui->autodiscoveryHint->addHintLine(tr("When enabled, new cameras and servers are continuously "
+        "discovered and discovery requests are sent to cameras for status updates."));
     ui->autodiscoveryHint->addHintLine(
         tr("If Failover is enabled, server may still request camera status updates regardless of this setting."));
     setHelpTopic(ui->autodiscoveryHint, HelpTopic::Id::SystemSettings_Server_CameraAutoDiscovery);
 
     setHelpTopic(ui->statisticsReportCheckBox, HelpTopic::Id::SystemSettings_General_AnonymousUsage);
-    ui->statisticsReportHint->addHintLine(tr("Includes information about system, such as cameras models and firmware versions, number of servers, etc."));
+    ui->statisticsReportHint->addHintLine(tr("Includes information about site, such as cameras models and firmware versions, number of servers, etc."));
     ui->statisticsReportHint->addHintLine(tr("Does not include any personal information and is completely anonymous."));
     setHelpTopic(ui->statisticsReportHint, HelpTopic::Id::SystemSettings_General_AnonymousUsage);
 
@@ -100,8 +100,8 @@ void QnSystemSettingsWidget::retranslateUi()
 
     ui->autoSettingsCheckBox->setText(QnDeviceDependentStrings::getDefaultNameFromSet(
         resourcePool(),
-        tr("Allow System to optimize device settings"),
-        tr("Allow System to optimize camera settings")));
+        tr("Allow optimize device settings"),
+        tr("Allow optimize camera settings")));
 }
 
 void QnSystemSettingsWidget::loadDataToUi()

@@ -330,10 +330,10 @@ void QnConnectionDiagnosticsHelper::showConnectionErrorMessage(
             title = getShortErrorDescriptionText();
             break;
         case RemoteConnectionErrorCode::systemIsNotCompatibleWith2Fa:
-            title = tr("System is not compatible with two-factor authentication");
+            title = tr("Site is not compatible with two-factor authentication");
             break;
         case RemoteConnectionErrorCode::twoFactorAuthOfCloudUserIsDisabled:
-            title = tr("Failed to log in to System \"%1\"").arg(moduleInformation.systemName);
+            title = tr("Failed to log in to Site \"%1\"").arg(moduleInformation.systemName);
             break;
 
         default:

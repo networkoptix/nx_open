@@ -269,7 +269,7 @@ QString QnStatusOverlayController::captionText(Qn::ResourceStatusOverlay overlay
         { Qn::OldFirmwareOverlay, tr("UNSUPPORTED FIRMWARE VERSION") },
         { Qn::CannotDecryptMediaOverlay, tr("ARCHIVE ENCRYPTED") },
         { Qn::InformationRequiredOverlay, tr("INFORMATION REQUIRED") },
-        { Qn::SaasShutDown, tr("SYSTEM SHUT DOWN") },
+        { Qn::SaasShutDown, tr("SITE SHUT DOWN") },
     };
     return extractValue(overlay, kCaptions);
 }
@@ -295,7 +295,7 @@ QString QnStatusOverlayController::suggestionText(Qn::ResourceStatusOverlay over
             if (buttonPresent)
                 return QString();
 
-            return tr("Ask your system administrator to enter the encryption password to decrypt this archive");
+            return tr("Ask your site administrator to enter the encryption password to decrypt this archive");
 
         default:
             break;

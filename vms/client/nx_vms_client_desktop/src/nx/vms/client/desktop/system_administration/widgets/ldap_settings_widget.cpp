@@ -370,7 +370,7 @@ bool LdapSettingsWidget::requestLdapReset()
 {
     const QString mainText = tr("Disconnect LDAP server?");
     const QString extraText =
-        tr("All LDAP users and groups will be deleted from the system.<br><br>"
+        tr("All LDAP users and groups will be deleted.<br><br>"
         "LDAP settings will be also deleted.");
 
     QnMessageBox messageBox(

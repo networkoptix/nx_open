@@ -3033,7 +3033,7 @@ void ActionHandler::at_versionMismatchMessageAction_triggered()
     QScopedPointer<QnSessionAwareMessageBox> messageBox(
         new QnSessionAwareMessageBox(mainWindowWidget()));
     messageBox->setIcon(QnMessageBoxIcon::Warning);
-    messageBox->setText(tr("Components of System have different versions:"));
+    messageBox->setText(tr("Components of Site have different versions:"));
 
     const QString extras = tr("Please update all components to the version %1").arg(latestMsVersion.toString());
     messageBox->setInformativeText(extras);
@@ -3195,7 +3195,7 @@ void ActionHandler::confirmAnalyticsStorageLocation()
                         "Once a location to store analytics data is selected,"
                         " it cannot be easily changed without losing existing data. "
                         "We recommend to choose the location carefully and to avoid using"
-                        " the system partition as it may cause severe system malfunction."
+                        " the system partition as it may cause severe malfunction."
                         "\n"
                         "By default analytics data will be stored on %1."
                         "\n"

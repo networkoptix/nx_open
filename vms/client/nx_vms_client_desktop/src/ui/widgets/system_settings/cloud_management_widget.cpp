@@ -89,24 +89,20 @@ QnCloudManagementWidget::QnCloudManagementWidget(QWidget *parent):
     setPaletteColor(ui->accountLabel, QPalette::WindowText, palette().color(QPalette::BrightText));
     ui->accountLabelLayout->setSpacing(nx::style::Metrics::kInterSpace);
 
-    ui->unlinkButton->setText(tr("Disconnect System from %1",
+    ui->unlinkButton->setText(tr("Disconnect Site from %1",
         "%1 is the cloud name (like Nx Cloud)").arg(nx::branding::cloudName()));
 
     ui->goToCloudButton->setText(tr("Open %1 Portal",
         "%1 is the cloud name (like Nx Cloud)").arg(nx::branding::cloudName()));
 
-    ui->linkButton->setText(tr("Connect System to %1...",
+    ui->linkButton->setText(tr("Connect Site to %1...",
         "%1 is the cloud name (like Nx Cloud)").arg(nx::branding::cloudName()));
-
-    const auto placeholderTextsColor = core::colorTheme()->color("dark17");
-    setPaletteColor(ui->placeholderCaptionLabel, QPalette::WindowText, placeholderTextsColor);
-    setPaletteColor(ui->placeholderDescriptionLabel, QPalette::WindowText, placeholderTextsColor);
 
     ui->placeholderCaptionLabel->setFont(placeholderCaptionFont());
     ui->placeholderDescriptionLabel->setFont(placeholderDescriptionFont());
 
     ui->placeholderDescriptionLabel->setText(
-        tr("There is currently no connection between your system and %1.",
+        tr("There is currently no connection between your site and %1.",
             "%1 is the cloud name (like Nx Cloud)").arg(nx::branding::cloudName()));
 
     ui->notLinkedPlaceholderImageLabel->setPixmap(
@@ -224,10 +220,10 @@ void QnCloudManagementWidget::disconnectFromCloud()
     if (!confirmCloudDisconnect())
         return;
 
-    const QString title = tr("Disconnect System from %1", "%1 is the cloud name (like Nx Cloud)")
+    const QString title = tr("Disconnect Site from %1", "%1 is the cloud name (like Nx Cloud)")
         .arg(nx::branding::cloudName());
     const QString mainText = tr(
-        "Enter your account password to disconnect System from %1",
+        "Enter your account password to disconnect Site from %1",
         "%1 is the cloud name (like Nx Cloud)")
             .arg(nx::branding::cloudName());
 
@@ -270,7 +266,7 @@ void QnCloudManagementWidget::disconnectFromCloud()
             }
 
             QnSessionAwareMessageBox::critical(this,
-                tr("Cannot disconnect the System from %1",
+                tr("Cannot disconnect the Site from %1",
                     "%1 is the cloud name (like Nx Cloud)")
                     .arg(nx::branding::cloudName()),
                 errorString);
@@ -294,7 +290,7 @@ void QnCloudManagementWidget::onDisconnectSuccess()
     auto messageBox = new QnMessageBox(isCloudUser ? mainWindowWidget() : this);
     messageBox->setIcon(QnMessageBox::Icon::Success);
     messageBox->setText(
-        tr("System disconnected from %1", "%1 is the cloud name (like Nx Cloud)")
+        tr("Site disconnected from %1", "%1 is the cloud name (like Nx Cloud)")
             .arg(nx::branding::cloudName()));
     messageBox->setStandardButtons(QDialogButtonBox::Ok);
     messageBox->setDefaultButton(QDialogButtonBox::Ok);
@@ -311,7 +307,7 @@ bool QnCloudManagementWidget::confirmCloudDisconnect()
     QnSessionAwareMessageBox messageBox(this);
     messageBox.setIcon(QnMessageBox::Icon::Question);
     messageBox.setText(tr(
-        "Disconnect system from %1?",
+        "Disconnect site from %1?",
         "%1 is the cloud name, like Nx Cloud"
     ).arg(nx::branding::cloudName()));
 
@@ -319,7 +315,7 @@ bool QnCloudManagementWidget::confirmCloudDisconnect()
         "All %1 users will be deleted from the system.", "%1 is the short cloud name (like Cloud)"
     ).arg(nx::branding::shortCloudName()));
     infoText.append("\n");
-    infoText.append(tr("System will be accessible only through local network."));
+    infoText.append(tr("Site will be accessible only through local network."));
     messageBox.setInformativeText(infoText);
 
     messageBox.addButton(

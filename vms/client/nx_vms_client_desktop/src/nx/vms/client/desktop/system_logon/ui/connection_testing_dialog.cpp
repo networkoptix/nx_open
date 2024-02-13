@@ -340,7 +340,7 @@ void ConnectionTestingDialog::updateUi()
         }
         case DiagnosticResult::Status::factoryServer:
         {
-            d->ui->statusLabel->setText(tr("New System"));
+            d->ui->statusLabel->setText(tr("New Site"));
             d->setupNewServerButton->setVisible(true);
             d->ui->descriptionLabel->setVisible(false);
             setHelpTopic(this, HelpTopic::Id::Setup_Wizard);

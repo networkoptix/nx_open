@@ -342,9 +342,9 @@ QString QnAuditLogModel::eventTypeToString(Qn::LegacyAuditRecordType eventType)
                 tr("Camera added")
                 );
         case Qn::AR_SystemNameChanged:
-            return tr("System name changed");
+            return tr("Site name changed");
         case Qn::AR_SystemmMerge:
-            return tr("System merge");
+            return tr("Site merge");
         case Qn::AR_SettingsChange:
             return tr("General settings updated");
         case Qn::AR_ServerUpdate:
@@ -452,7 +452,7 @@ QString QnAuditLogModel::eventDescriptionText(const QnLegacyAuditRecord* data) c
         case Qn::AR_UpdateInstall:
         {
             QString version = QString(data->extractParam("version"));
-            result += QString("System has been updated to version %1").arg(version);
+            result += tr("Site has been updated to version %1").arg(version);
             break;
         }
         // TODO: add more info from certificates, like fingerprints.

@@ -206,7 +206,7 @@ void QnDatabaseManagementWidget::restoreDb()
     const auto button = QnSessionAwareMessageBox::question(
         this,
         tr("Restore database?"),
-        tr("System configuration will be restored from backup,"
+        tr("Site configuration will be restored from backup,"
             " Server application will be restarted."),
         QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
         QDialogButtonBox::Ok);
@@ -247,7 +247,7 @@ void QnDatabaseManagementWidget::restoreDb()
     auto sessionTokenHelper = FreshSessionTokenHelper::makeHelper(
         this,
         tr("Restore from Database Backup"),
-        tr("Enter your account password to restore System from backup"),
+        tr("Enter your account password to restore Site from backup"),
         tr("Restore"),
         FreshSessionTokenHelper::ActionType::restore);
 

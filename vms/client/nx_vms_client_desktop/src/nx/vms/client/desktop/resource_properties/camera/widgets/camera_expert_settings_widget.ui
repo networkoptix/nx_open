@@ -549,7 +549,7 @@
                    <item>
                     <widget class="QRadioButton" name="prefferedPtzPresetTypeSystemRadioButton">
                      <property name="text">
-                      <string>Use system presets</string>
+                      <string>Use site presets</string>
                      </property>
                     </widget>
                    </item>

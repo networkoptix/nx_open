@@ -216,8 +216,8 @@ void NotificationListWidget::Private::setupFilterSystemsButton()
             return action;
         };
 
-    addMenuAction(tr("Current System"), RightPanel::SystemSelection::current);
-    addMenuAction(tr("All Systems"), RightPanel::SystemSelection::all);
+    addMenuAction(tr("Current Site"), RightPanel::SystemSelection::current);
+    addMenuAction(tr("All Sites"), RightPanel::SystemSelection::all);
 
     connect(m_filterSystemsButton, &SelectableTextButton::stateChanged, this,
         [this](SelectableTextButton::State state)

@@ -143,7 +143,7 @@ void initialize(Manager* manager, Action* root)
 
     factory(ConnectToCloudSystemAction)
         .flags(Tree | NoTarget)
-        .text(ContextMenu::tr("Connect to System"))
+        .text(ContextMenu::tr("Connect to Site"))
         .condition(condition::treeNodeType(ResourceTree::NodeType::cloudSystem));
 
     factory(ConnectToCloudSystemWithUserInteractionAction)
@@ -616,7 +616,7 @@ void initialize(Manager* manager, Action* root)
     factory(SystemAdministrationAction)
         .flags(Main | GlobalHotkey)
         .mode(DesktopMode)
-        .text(ContextMenu::tr("System Administration..."))
+        .text(ContextMenu::tr("Site Administration..."))
         .shortcut("Ctrl+Alt+A")
         .requiredPowerUserPermissions()
         .condition(
@@ -627,7 +627,7 @@ void initialize(Manager* manager, Action* root)
 
     factory(SystemUpdateAction)
         .flags(NoTarget)
-        .text(ContextMenu::tr("System Update..."))
+        .text(ContextMenu::tr("Site Update..."))
         .requiredPowerUserPermissions();
 
     factory(AdvancedUpdateSettingsAction)
@@ -809,7 +809,7 @@ void initialize(Manager* manager, Action* root)
 
     factory(MergeSystems)
         .flags(Main | Tree)
-        .text(ContextMenu::tr("Merge Systems..."))
+        .text(ContextMenu::tr("Merge Sites..."))
         .condition(
             condition::treeNodeType({ResourceTree::NodeType::currentSystem,
                 ResourceTree::NodeType::servers, ResourceTree::NodeType::camerasAndDevices})
@@ -1811,7 +1811,7 @@ void initialize(Manager* manager, Action* root)
     factory(ConnectToCurrentSystem)
         // Actually, it is single-target, but the target type is not registered in Parameters.
         .flags(Tree | NoTarget)
-        .text(ContextMenu::tr("Merge to Currently Connected System..."))
+        .text(ContextMenu::tr("Merge to Currently Connected Site..."))
         .condition(
             condition::treeNodeType(ResourceTree::NodeType::otherSystemServer)
             && ConditionWrapper(new RequiresAdministratorCondition()));

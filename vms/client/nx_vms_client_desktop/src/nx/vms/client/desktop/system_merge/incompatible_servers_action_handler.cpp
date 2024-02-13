@@ -53,8 +53,8 @@ void IncompatibleServersActionHandler::at_connectToCurrentSystemAction_triggered
     if (m_connectTool)
     {
         QnMessageBox::information(mainWindowWidget(),
-            tr("Systems will be merged shortly"),
-            tr("Servers from the other System will appear in the resource tree."));
+            tr("Sites will be merged shortly"),
+            tr("Servers from the other Site will appear in the resource tree."));
         return;
     }
 
@@ -79,7 +79,7 @@ void IncompatibleServersActionHandler::connectToCurrentSystem(const nx::Uuid& se
 
     auto progressDialog = new ProgressDialog(mainWindowWidget());
     progressDialog->setAttribute(Qt::WA_DeleteOnClose);
-    progressDialog->setWindowTitle(tr("Connecting to the current System..."));
+    progressDialog->setWindowTitle(tr("Connecting to the current Site..."));
     progressDialog->show();
 
     connect(m_connectTool, &ConnectToCurrentSystemTool::finished,
@@ -155,7 +155,7 @@ void IncompatibleServersActionHandler::at_connectTool_finished(
     if (mergeStatus == MergeSystemsStatus::ok)
     {
         QnMessageBox::success(mainWindowWidget(),
-            tr("Server will be connected to System shortly"),
+            tr("Server will be connected to Site shortly"),
             tr("It will appear in the resource tree when the database synchronization"
                " is finished."));
     }
@@ -168,7 +168,7 @@ void IncompatibleServersActionHandler::at_connectTool_finished(
         auto serverName = m_connectTool->getServerName();
         QnMessageBox::critical(
             mainWindowWidget(),
-            tr("Failed to merge %1 to our system.").arg(serverName),
+            tr("Failed to merge %1 to our site.").arg(serverName),
             message);
     }
 }

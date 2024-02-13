@@ -515,7 +515,7 @@ AbstractItemPtr ResourceTreeItemFactory::createUsersItem() const
 AbstractItemPtr ResourceTreeItemFactory::createOtherSystemsItem() const
 {
     return GenericItemBuilder()
-        .withRole(Qt::DisplayRole, tr("Other Systems"))
+        .withRole(Qt::DisplayRole, tr("Other Sites"))
         .withRole(Qn::ResourceIconKeyRole, static_cast<int>(IconCache::OtherSystems))
         .withRole(Qn::NodeTypeRole, QVariant::fromValue(NodeType::otherSystems))
         .withRole(Qn::HelpTopicIdRole, static_cast<int>(HelpTopic::Id::OtherSystems));

@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>System Administration</string>
+   <string>Site Administration</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0">
    <property name="spacing">

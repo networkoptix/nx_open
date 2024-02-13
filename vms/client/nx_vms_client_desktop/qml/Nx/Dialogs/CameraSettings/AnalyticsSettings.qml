@@ -199,7 +199,7 @@ Item
         settingsViewPlaceholder
         {
             header: qsTr("This plugin has no settings for this camera.")
-            description: qsTr("Check System Administration settings to configure this plugin.")
+            description: qsTr("Check Site Administration settings to configure this plugin.")
             loading: analyticsSettings.loading
         }
     }

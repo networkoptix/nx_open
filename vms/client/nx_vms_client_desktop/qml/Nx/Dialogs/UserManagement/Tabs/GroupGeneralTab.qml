@@ -245,7 +245,7 @@ Item
                 watchToReopen: control.groupId
                 Layout.fillWidth: true
 
-                text: qsTr("Another group with the same name exists in the system. "
+                text: qsTr("Another group with the same name exists. "
                     + "It is recommended to assign unique names to the groups.")
             }
 

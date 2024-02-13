@@ -19,7 +19,7 @@ DropdownMenu
             case WelcomeScreen.HiddenTileScopeFilter:
                 return qsTr("Hidden")
             case WelcomeScreen.AllSystemsTileScopeFilter:
-                return qsTr("All Systems")
+                return qsTr("All Sites")
             case WelcomeScreen.FavoritesTileScopeFilter:
                 return qsTr("Favorites")
         }

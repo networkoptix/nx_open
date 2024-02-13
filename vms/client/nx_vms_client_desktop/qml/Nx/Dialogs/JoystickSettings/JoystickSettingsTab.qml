@@ -182,7 +182,7 @@ Item
 
             visible: false
 
-            label.text: qsTr("Log in to the system to configure how to open layouts")
+            label.text: qsTr("Log in to the site to configure how to open layouts")
         }
     }
 

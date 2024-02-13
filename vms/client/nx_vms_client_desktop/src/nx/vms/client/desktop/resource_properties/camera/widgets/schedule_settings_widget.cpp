@@ -281,8 +281,8 @@ void ScheduleSettingsWidget::loadState(const CameraSettingsDialogState& state)
             if (!state.settingsOptimizationEnabled)
             {
                 return tr("Quality and FPS settings are disabled because of the "
-                    "\"Allow system to optimize camera settings\" option in the "
-                    "\"System Administration\" dialog.\n"
+                    "\"Allow optimize camera settings\" option in the "
+                    "\"Site Administration\" dialog.\n"
                     "You can still change quality and FPS directly on the camera.");
             }
 

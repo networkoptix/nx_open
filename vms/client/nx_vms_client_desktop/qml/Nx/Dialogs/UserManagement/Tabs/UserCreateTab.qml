@@ -366,9 +366,9 @@ Item
                     color: ColorTheme.colors.light16
                     text: qsTr("You need to specify only user's email address.")
                         + "\n\n"
-                        + qsTr("If user already has an account, he will see this system and will"
+                        + qsTr("If user already has an account, he will see this site and will"
                         + " be able to log in to it. If not, we'll send an invitation to this"
-                        + " address and user will see this system right after he creates an"
+                        + " address and user will see this site right after he creates an"
                         + " account.")
                 }
             }
