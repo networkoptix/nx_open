@@ -12,7 +12,6 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ResourceDetails, (ubjson)(json), ResourceDetail
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DescriptionDetails, (ubjson)(json), DescriptionDetails_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(MitmDetails, (ubjson)(json), MitmDetails_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(UpdateDetails, (ubjson)(json), UpdateDetails_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(CloudDetails, (ubjson)(json), CloudDetails_Fields)
 
 void serialize_field(const AllAuditDetails::type& data, QVariant* target)
 {
