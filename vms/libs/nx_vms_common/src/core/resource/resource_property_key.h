@@ -317,6 +317,12 @@ NX_VMS_COMMON_API extern const QString kGsoapAdditionalFlags;
 // Force disable ONVIF PullPoint Notification timestamp validation.
 NX_VMS_COMMON_API extern const QString kOnvifIgnoreOutdatedNotifications;
 
+// For some devices, if all Onvif recording events in the GetEventSearchResultsResponse message
+// have the same time, this may indicate that the device has not processed the
+// GetEventSearchResults request correctly and has only sent a subset of its events in the
+// response.
+NX_VMS_COMMON_API extern const QString kReRequestOnvifRecordingEventsIfAllEventsHaveSameTime;
+
 } // namespace ResourceDataKey
 
 //-------------------------------------------------------------------------------------------------

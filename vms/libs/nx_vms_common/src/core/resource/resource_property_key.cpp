@@ -240,6 +240,9 @@ const QString kGsoapAdditionalFlags("gsoapAdditionalFlags");
 
 const QString kOnvifIgnoreOutdatedNotifications("onvifIgnoreOutdatedNotifications");
 
+const QString kReRequestOnvifRecordingEventsIfAllEventsHaveSameTime(
+    "reRequestOnvifRecordingEventsIfAllEventsHaveSameTime");
+
 } // namespace ResourceDataKey
 
 //-------------------------------------------------------------------------------------------------
