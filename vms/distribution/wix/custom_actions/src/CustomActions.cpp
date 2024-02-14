@@ -99,9 +99,13 @@ UINT __stdcall GenerateSystemName(MSIHANDLE hInstall)
     CAtlString registryPath = GetProperty(hInstall, L"OLDEC_REGISTRY_PATH");
 
     CRegKey RegKey;
-    if (RegKey.Open(HKEY_LOCAL_MACHINE, registryPath, KEY_READ | KEY_WOW64_64KEY) != ERROR_SUCCESS)
+    if (const auto status = RegKey.Open(
+        HKEY_LOCAL_MACHINE, registryPath, KEY_READ | KEY_WOW64_64KEY)
+        ;
+        status != ERROR_SUCCESS)
     {
-        WcaLog(LOGMSG_STANDARD, "Couldn't open registry key: %S", (LPCWSTR)registryPath);
+        WcaLog(LOGMSG_STANDARD, "Couldn't open registry key: %S. Error code: %d",
+            (LPCWSTR) registryPath, status);
         return wca.failure();
     }
 
@@ -131,10 +135,13 @@ UINT __stdcall DeleteOldMediaserverSettings(MSIHANDLE hInstall)
     CAtlString registryPath = GetProperty(hInstall, L"CustomActionData");
 
     CRegKey RegKey;
-    if (RegKey.Open(
-        HKEY_LOCAL_MACHINE, registryPath, KEY_READ | KEY_WRITE | KEY_WOW64_64KEY) != ERROR_SUCCESS)
+    if (const auto status = RegKey.Open(
+        HKEY_LOCAL_MACHINE, registryPath, KEY_READ | KEY_WRITE | KEY_WOW64_64KEY)
+        ;
+        status != ERROR_SUCCESS)
     {
-        WcaLog(LOGMSG_STANDARD, "Couldn't open registry key: %S", (LPCWSTR)registryPath);
+        WcaLog(LOGMSG_STANDARD, "Couldn't open registry key: %S. Error code: %d",
+            (LPCWSTR) registryPath, status);
         return wca.failure();
     }
 
@@ -289,10 +296,13 @@ UINT __stdcall DeleteRegistryKeys(MSIHANDLE hInstall)
     CAtlString registryPath = GetProperty(hInstall, L"CustomActionData");
 
     CRegKey RegKey;
-    if (RegKey.Open(
-        HKEY_LOCAL_MACHINE, registryPath, KEY_READ | KEY_WRITE | KEY_WOW64_64KEY) != ERROR_SUCCESS)
+    if (const auto status = RegKey.Open(
+        HKEY_LOCAL_MACHINE, registryPath, KEY_READ | KEY_WRITE | KEY_WOW64_64KEY)
+        ;
+        status != ERROR_SUCCESS)
     {
-        WcaLog(LOGMSG_STANDARD, "Couldn't open registry key: %S", (LPCWSTR)registryPath);
+        WcaLog(LOGMSG_STANDARD, "Couldn't open registry key: %S. Error code: %d",
+            (LPCWSTR) registryPath, status);
         return wca.failure();
     }
 
@@ -315,10 +325,13 @@ UINT __stdcall DeleteAllRegistryKeys(MSIHANDLE hInstall)
     CAtlString keyParent = registryPath.Mid(0, lastSlashPos);
     CAtlString keyName = registryPath.Mid(lastSlashPos + 1);
 
-    if (RegKey.Open(
-        HKEY_LOCAL_MACHINE, keyParent, KEY_READ | KEY_WRITE | KEY_WOW64_64KEY) != ERROR_SUCCESS)
+    if (const auto status = RegKey.Open(
+        HKEY_LOCAL_MACHINE, keyParent, KEY_READ | KEY_WRITE | KEY_WOW64_64KEY)
+        ;
+        status != ERROR_SUCCESS)
     {
-        WcaLog(LOGMSG_STANDARD, "Couldn't open registry key: %S", (LPCWSTR)keyParent);
+        WcaLog(LOGMSG_STANDARD, "Couldn't open registry key: %S. Error code: %d",
+            (LPCWSTR) keyParent, status);
         return wca.failure();
     }
 
@@ -393,14 +406,17 @@ UINT __stdcall CleanAutorunRegistryKeys(MSIHANDLE hInstall)
 
     CAtlString registryPath(L"Software\\Microsoft\\Windows\\CurrentVersion\\Run");
     CAtlString keyPrefix = GetProperty(hInstall, L"CLIENT_NAME");
-    WcaLog(LOGMSG_STANDARD, "Key Prefix is: %S", (LPCWSTR)keyPrefix);
+    WcaLog(LOGMSG_STANDARD, "Key Prefix is: %S", (LPCWSTR) keyPrefix);
 
     CRegKey RegKey;
 
-    if (RegKey.Open(
-        HKEY_CURRENT_USER, registryPath, KEY_READ | KEY_WRITE | KEY_WOW64_64KEY) != ERROR_SUCCESS)
+    if (const auto status = RegKey.Open(
+        HKEY_CURRENT_USER, registryPath, KEY_READ | KEY_WRITE | KEY_WOW64_64KEY)
+        ;
+        status != ERROR_SUCCESS)
     {
-        WcaLog(LOGMSG_STANDARD, "Couldn't open registry key: %S", (LPCWSTR)registryPath);
+        WcaLog(LOGMSG_STANDARD, "Couldn't open registry key: %S. Error code: %d",
+            (LPCWSTR) registryPath, status);
         return wca.failure();
     }
 
@@ -455,17 +471,18 @@ UINT __stdcall CleanClientRegistryKeys(MSIHANDLE hInstall)
     const CAtlString keyName = registryPath.Mid(lastSlashPos + 1);
 
     CRegKey regKey;
-    if(regKey.Open(HKEY_CURRENT_USER,
-        keyParent,
-        KEY_READ | KEY_WRITE | KEY_WOW64_64KEY) == ERROR_SUCCESS)
+    if(const auto status = regKey.Open(
+        HKEY_CURRENT_USER, keyParent, KEY_READ | KEY_WRITE | KEY_WOW64_64KEY)
+        ;
+        status == ERROR_SUCCESS)
     {
         regKey.RecurseDeleteKey(keyName);
         regKey.Close();
     }
     else
     {
-        WcaLog(LOGMSG_STANDARD, "Couldn't open registry key `%S` for `%S` deletion. Skipping operation.",
-            (LPCWSTR)keyParent, (LPCWSTR)keyName);
+        WcaLog(LOGMSG_STANDARD, "Couldn't open registry key `%S` for `%S` deletion. Skipping operation. Error code: %d",
+            (LPCWSTR) keyParent, (LPCWSTR) keyName, status);
     }
     return wca.success();
 }
