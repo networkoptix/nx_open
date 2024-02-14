@@ -4,10 +4,16 @@
 
 #include <chrono>
 
-#include <QtCore/QBuffer>
+extern "C" {
+#include <libavcodec/avcodec.h>
+#include <libavformat/avformat.h>
+#include <libavutil/imgutils.h>
+#include <libavutil/opt.h>
+} // extern "C"
+
+#include <QtCore/QByteArray>
 #include <QtCore/QScopedValueRollback>
 #include <QtCore/QString>
-#include <QtGui/QImage>
 
 #include <nx/kit/debug.h>
 #include <nx/network/http/buffer_source.h>
@@ -19,6 +25,7 @@
 #include <nx/sdk/analytics/helpers/event_metadata_packet.h>
 #include <nx/sdk/analytics/helpers/pixel_format.h>
 #include <nx/sdk/helpers/error.h>
+#include <nx/utils/scope_guard.h>
 
 #include "engine.h"
 #include "ini.h"
@@ -31,24 +38,6 @@ using namespace nx::sdk::analytics;
 namespace {
 
 constexpr auto kOpenAiApiPath = "https://api.openai.com/v1/chat/completions";
-
-open_ai::QueryPayload::Message::Content::ImageUrl encodeImage(
-    const IUncompressedVideoFrame* videoFrame,
-    std::string format = "jpg")
-{
-    QBuffer buffer;
-    buffer.open(QIODevice::WriteOnly);
-
-    QImage img(
-        (uchar*) videoFrame->data(0),
-        videoFrame->width(),
-        videoFrame->height(),
-        QImage::Format::Format_RGB888);
-
-    img.save(&buffer, format.c_str());
-    std::string imageData = buffer.data().toBase64().toStdString();
-    return {.url = "data:image/" + format + ";base64," + std::move(imageData)};
-}
 
 struct Manifest
 {
@@ -117,10 +106,14 @@ bool DeviceAgent::pushUncompressedVideoFrame(const IUncompressedVideoFrame* vide
 
     m_lastQueryTimestamp = videoFrameTimestamp;
 
+    auto imageUrl = encodeImage(videoFrame);
+    if (imageUrl.url.empty())
+        return true;
+
     open_ai::QueryPayload payload{.messages = {
         {.content = {
             {.type = "text", .text = m_queryText},
-            {.type = "image_url", .image_url = encodeImage(videoFrame)}
+            {.type = "image_url", .image_url = std::move(imageUrl)}
         }}
     }};
 
@@ -150,6 +143,102 @@ bool DeviceAgent::pushUncompressedVideoFrame(const IUncompressedVideoFrame* vide
     }
 
     return true; //< There were no errors while processing the video frame.
+}
+
+open_ai::QueryPayload::Message::Content::ImageUrl DeviceAgent::encodeImage(
+    const IUncompressedVideoFrame* videoFrame,
+    std::string format) const
+{
+    // TODO: #sivanov Support other frame pixel formats.
+    if (videoFrame->pixelFormat() != IUncompressedVideoFrame::PixelFormat::yuv420)
+    {
+        showErrorMessage(NX_FMT(
+            "Internal plugin error: unexpected frame format %1.",
+            (int) videoFrame->pixelFormat()
+        ).toStdString());
+        return {};
+    }
+
+    AVCodec* codec = avcodec_find_encoder_by_name(
+        (format == "jpg" || format == "jpeg") ? "mjpeg" : format.c_str());
+    if (!codec)
+    {
+        showErrorMessage(NX_FMT(
+            "Internal plugin error: codec %1 cannot be found.",
+            format
+        ).toStdString());
+        return {};
+    }
+
+    AVCodecContext* context = avcodec_alloc_context3(codec);
+    if (!context)
+    {
+        showErrorMessage("Internal plugin error: cannot initialize encoder context.");
+        return {};
+    }
+    auto contextGuard = nx::utils::makeScopeGuard([&context]() {avcodec_free_context(&context); });
+
+    context->pix_fmt = AV_PIX_FMT_YUVJ420P;
+    context->width = videoFrame->width();
+    context->height = videoFrame->height();
+    context->bit_rate = videoFrame->width() * videoFrame->height();
+    context->time_base.num = 1;
+    context->time_base.den = 30;
+
+    if (int error = avcodec_open2(context, codec, nullptr); error < 0)
+    {
+        showErrorMessage(NX_FMT(
+            "Internal plugin error %1: cannot initialize encoder %2 to encode image of %3x%4.",
+            error,
+            format,
+            videoFrame->width(),
+            videoFrame->height()
+        ).toStdString());
+        return {};
+    }
+    auto codecGuard = nx::utils::makeScopeGuard([context]() {avcodec_close(context); });
+
+    AVPacket* packet = av_packet_alloc();
+    if (!packet)
+    {
+        showErrorMessage("Internal plugin error: cannot allocate ffmpeg packet.");
+        return {};
+    }
+    auto packetGuard = nx::utils::makeScopeGuard([&packet]() {av_packet_free(&packet); });
+
+    AVFrame* frame = av_frame_alloc();
+    if (!frame)
+    {
+        showErrorMessage("Internal plugin error: cannot allocate video frame.");
+        return {};
+    }
+    auto frameGuard = nx::utils::makeScopeGuard([&frame]() {av_frame_free(&frame); });
+    frame->width = videoFrame->width();
+    frame->height = videoFrame->height();
+    frame->format = AV_PIX_FMT_YUVJ420P;
+    for (int i = 0; i < videoFrame->planeCount(); ++i)
+    {
+        frame->linesize[i] = videoFrame->lineSize(i);
+        frame->data[i] = (uint8_t*) (videoFrame->data(i));
+    }
+
+    int gotFrame = 0;
+    if (int error = avcodec_encode_video2(context, packet, frame, &gotFrame); error < 0)
+    {
+        showErrorMessage(NX_FMT(
+            "Internal plugin error %1: cannot use %2 to encode image of %3x%4.",
+            error,
+            format,
+            videoFrame->width(),
+            videoFrame->height()
+        ).toStdString());
+        return {};
+    }
+
+    QByteArray buffer;
+    buffer.append((const char*) packet->data, packet->size);
+    std::string imageData = buffer.toBase64().toStdString();
+    return {.url = "data:image/" + format + ";base64," + std::move(imageData)};
 }
 
 std::optional<open_ai::Response> DeviceAgent::sendVideoFrameToOpenAi(
@@ -211,7 +300,7 @@ nx::sdk::Result<const nx::sdk::ISettingsResponse*> DeviceAgent::settingsReceived
     return nullptr;
 }
 
-void DeviceAgent::showErrorMessage(const std::string& message)
+void DeviceAgent::showErrorMessage(const std::string& message) const
 {
     pushPluginDiagnosticEvent(IPluginDiagnosticEvent::Level::error, "GPT 4 Vision Error", message);
 }
