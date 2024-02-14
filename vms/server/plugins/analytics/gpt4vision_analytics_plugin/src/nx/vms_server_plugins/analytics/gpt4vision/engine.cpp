@@ -23,7 +23,7 @@ std::string Engine::manifestString() const
 {
     return /*suppress newline*/ 1 + (const char*) R"json(
 {
-    "capabilities": "needUncompressedVideoFrames_rgb",
+    "capabilities": "needUncompressedVideoFrames_yuv420",
     "deviceAgentSettingsModel":
     {
         "type": "Settings",
