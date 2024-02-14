@@ -9,6 +9,8 @@
 #include <nx/vms/api/data/module_information.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/network/server_compatibility_validator.h>
+#include <nx/vms/common/saas/saas_service_manager.h>
+#include <nx/vms/common/saas/saas_utils.h>
 
 #include "remote_connection_error.h"
 
@@ -33,7 +35,7 @@ class RemoteConnectionErrorStrings
     static QString serverCloudIsNotReady()
     {
         return tr("Connection to %1 is not ready yet. "
-            "Check the server’s internet connection or try again later.",
+            "Check the server's internet connection or try again later.",
             "%1 is the cloud name (like Nx Cloud)").arg(nx::branding::cloudName());
     }
 
@@ -147,6 +149,24 @@ public:
 
             case RemoteConnectionErrorCode::loginAsCloudUserForbidden:
             {
+                if (moduleInformation.isSaasSystem()
+                    && saas::ServiceManager::saasSuspendedOrShutDown(moduleInformation.saasState))
+                {
+                    const auto shortCloudName = nx::branding::shortCloudName();
+                    auto message = saas::ServiceManager::saasShutDown(moduleInformation.saasState)
+                        ? tr("Log in as a %1 user to the system in a shutdown state "
+                            "is forbidden. You can still connect as local user.",
+                                "%1 is the short cloud name (like Cloud)").arg(shortCloudName)
+                        : tr("Log in as a %1 user to the system in a suspended state "
+                            "is forbidden. You can still connect as local user.",
+                                "%1 is the short cloud name (like Cloud)").arg(shortCloudName);
+
+                    message += html::kLineBreak;
+                    message += saas::StringsHelper::recommendedAction(moduleInformation.saasState);
+
+                    return {message, message};
+                }
+
                 const QString message = tr("Log in to %1 to log in to this system with %2 user",
                     "%1 is the cloud name (like Nx Cloud), %2 is the short cloud name (like Cloud)")
                         .arg(html::localLink(nx::branding::cloudName(), "#cloud"), nx::branding::shortCloudName());
@@ -172,8 +192,8 @@ public:
 
             case RemoteConnectionErrorCode::systemIsNotCompatibleWith2Fa:
             {
-                const QString message = tr("To log in to this System, disable “Ask for a "
-                    "verification code on every login with your %1 account” in your %2.",
+                const QString message = tr("To log in to this System, disable \"Ask for a "
+                    "verification code on every login with your %1 account\" in your %2.",
                     "%1 is the cloud name (like Nx Cloud),"
                     "%2 is link that leads to /account/security section of Nx Cloud")
                     .arg(nx::branding::cloudName(),
