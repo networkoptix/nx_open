@@ -24,6 +24,7 @@
 #include <nx/vms/api/data/server_model.h>
 #include <nx/vms/auth/auth_result.h>
 #include <nx/vms/client/core/utils/cloud_session_token_updater.h>
+#include <nx/vms/common/saas/saas_service_manager.h>
 #include <nx_ec/ec_api_common.h>
 
 #include "../certificate_verifier.h"
@@ -523,8 +524,17 @@ nx::vms::api::LoginSession RemoteConnectionFactoryRequestsManager::getCurrentSes
 
     if (context->isCloudConnection())
     {
+        using namespace nx::vms::common;
+
         expectedErrors[StatusCode::serviceUnavailable] =
             RemoteConnectionErrorCode::cloudUnavailableOnServer;
+
+        if (context->moduleInformation.isSaasSystem()
+            && saas::ServiceManager::saasSuspendedOrShutDown(context->moduleInformation.saasState))
+        {
+            expectedErrors[StatusCode::unprocessableEntity] =
+                RemoteConnectionErrorCode::loginAsCloudUserForbidden;
+        }
     }
 
     return d->doGet<nx::vms::api::LoginSession>(
