@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "system_network_headers.h"
+#include <nx/utils/system_network_headers.h>
 
 #ifdef _WIN32
     #include <in6addr.h>
