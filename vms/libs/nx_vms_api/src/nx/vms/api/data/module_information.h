@@ -70,6 +70,7 @@ struct NX_VMS_API ModuleInformation: ServerPortInformation
     void fixRuntimeId();
     QString cloudId() const;
     bool isNewSystem() const;
+    bool isSaasSystem() const;
 
     bool operator==(const ModuleInformation& other) const = default;
 

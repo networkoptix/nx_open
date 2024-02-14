@@ -2,8 +2,8 @@
 
 #include "module_information.h"
 
-#include <QtNetwork/QNetworkInterface>
 #include <QtCore/QCryptographicHash>
+#include <QtNetwork/QNetworkInterface>
 
 #include <nx/fusion/model_functions.h>
 
@@ -51,6 +51,11 @@ QString ModuleInformation::cloudId() const
 bool ModuleInformation::isNewSystem() const
 {
     return localSystemId.isNull();
+}
+
+bool ModuleInformation::isSaasSystem() const
+{
+    return organizationId && saasState != nx::vms::api::SaasState::uninitialized;
 }
 
 QString ModuleInformation::mediaServerId()
