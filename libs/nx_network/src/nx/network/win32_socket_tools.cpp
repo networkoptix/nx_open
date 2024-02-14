@@ -4,7 +4,7 @@
 
 #include <memory>
 
-#include "system_network_headers.h"
+#include <nx/utils/system_network_headers.h>
 
 #include <Tcpestats.h>
 #include <tcpmib.h>

@@ -6,7 +6,7 @@
 #include <memory>
 #include <sstream>
 
-#include "system_network_headers.h"
+#include <nx/utils/system_network_headers.h>
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QElapsedTimer>

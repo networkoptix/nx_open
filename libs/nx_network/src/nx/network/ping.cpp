@@ -2,7 +2,7 @@
 
 #include "ping.h"
 
-#include "system_network_headers.h"
+#include <nx/utils/system_network_headers.h>
 
 #ifndef Q_OS_WIN
     #include <stdlib.h>
