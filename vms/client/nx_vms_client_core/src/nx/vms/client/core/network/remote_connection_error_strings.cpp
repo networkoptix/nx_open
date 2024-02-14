@@ -9,6 +9,8 @@
 #include <nx/vms/api/data/module_information.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/network/server_compatibility_validator.h>
+#include <nx/vms/common/saas/saas_service_manager.h>
+#include <nx/vms/common/saas/saas_utils.h>
 
 #include "remote_connection_error.h"
 
@@ -147,6 +149,24 @@ public:
 
             case RemoteConnectionErrorCode::loginAsCloudUserForbidden:
             {
+                if (moduleInformation.isSaasSystem()
+                    && saas::ServiceManager::saasSuspendedOrShutDown(moduleInformation.saasState))
+                {
+                    const auto shortCloudName = nx::branding::shortCloudName();
+                    auto message = saas::ServiceManager::saasShutDown(moduleInformation.saasState)
+                        ? tr("Log in as a %1 user to the system in a shutdown state "
+                            "is forbidden. You can still connect as local user.",
+                                "%1 is the short cloud name (like Cloud)").arg(shortCloudName)
+                        : tr("Log in as a %1 user to the system in a suspended state "
+                            "is forbidden. You can still connect as local user.",
+                                "%1 is the short cloud name (like Cloud)").arg(shortCloudName);
+
+                    message += html::kLineBreak;
+                    message += saas::StringsHelper::recommendedAction(moduleInformation.saasState);
+
+                    return {message, message};
+                }
+
                 const QString message = tr("Log in to %1 to log in to this system with %2 user",
                     "%1 is the cloud name (like Nx Cloud), %2 is the short cloud name (like Cloud)")
                         .arg(html::localLink(nx::branding::cloudName(), "#cloud"), nx::branding::shortCloudName());
