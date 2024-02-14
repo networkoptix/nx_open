@@ -5012,6 +5012,14 @@ License Key: %2</translation>
       <source>The certificate received from the Server does not match the pinned certificate.</source>
       <translation type="unfinished">The certificate received from the Server does not match the pinned certificate.</translation>
     </message>
+    <message>
+      <source>Certificate details are not available</source>
+      <translation>Детали сертификата недоступны</translation>
+    </message>
+    <message>
+      <source>To access certificate details, enable the Audit Trail feature.</source>
+      <translation type="unfinished">To access certificate details, enable the Audit Trail feature.</translation>
+    </message>
   </context>
   <context>
     <name>QnShowTextOverlayActionWidget</name>

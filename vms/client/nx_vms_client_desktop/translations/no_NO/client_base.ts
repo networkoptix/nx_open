@@ -4884,6 +4884,14 @@ Lisensnøkkel: %2</translation>
       <source>The certificate received from the Server does not match the pinned certificate.</source>
       <translation>Sertifikatet mottatt fra serveren samsvarer ikke med det festede sertifikatet.</translation>
     </message>
+    <message>
+      <source>Certificate details are not available</source>
+      <translation>Sertifikatdetaljer er ikke tilgjengelige</translation>
+    </message>
+    <message>
+      <source>To access certificate details, enable the Audit Trail feature.</source>
+      <translation>For å få tilgang til sertifikatdetaljer, aktiver Audit Trail-funksjonen.</translation>
+    </message>
   </context>
   <context>
     <name>QnShowTextOverlayActionWidget</name>

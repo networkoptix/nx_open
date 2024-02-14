@@ -4820,6 +4820,14 @@ License Key: %2</source>
       <source>The certificate received from the Server does not match the pinned certificate.</source>
       <translation>伺服器所提供的憑證與目前綁定的憑證並不相同</translation>
     </message>
+    <message>
+      <source>Certificate details are not available</source>
+      <translation type="unfinished">Certificate details are not available</translation>
+    </message>
+    <message>
+      <source>To access certificate details, enable the Audit Trail feature.</source>
+      <translation type="unfinished">To access certificate details, enable the Audit Trail feature.</translation>
+    </message>
   </context>
   <context>
     <name>QnShowTextOverlayActionWidget</name>
