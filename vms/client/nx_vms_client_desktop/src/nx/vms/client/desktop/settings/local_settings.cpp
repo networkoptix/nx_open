@@ -284,14 +284,7 @@ void LocalSettings::reload()
 
 bool LocalSettings::hardwareDecodingEnabled()
 {
-    static auto hardwareAccelerationType = nx::media::getHardwareAccelerationType();
-    if (!ini().nvidiaHardwareDecoding
-        && hardwareAccelerationType == nx::media::HardwareAccelerationType::nvidia)
-    {
-        hardwareAccelerationType = nx::media::HardwareAccelerationType::none;
-    }
-
-    if (hardwareAccelerationType == nx::media::HardwareAccelerationType::none)
+    if (nx::media::getHardwareAccelerationType() == nx::media::HardwareAccelerationType::none)
         return false;
 
     return hardwareDecodingEnabledProperty();
