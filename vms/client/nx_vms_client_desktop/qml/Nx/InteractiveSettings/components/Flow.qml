@@ -23,4 +23,6 @@ LabeledItem
             id: layout
         }
     }
+
+    function updateFilled() { group.updateFilled() }
 }
