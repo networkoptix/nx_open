@@ -5,7 +5,7 @@
 #include <string>
 #include <type_traits>
 
-#include "system_network_headers.h"
+#include <nx/utils/system_network_headers.h>
 
 #ifndef _WIN32
     #include <netinet/in.h>
