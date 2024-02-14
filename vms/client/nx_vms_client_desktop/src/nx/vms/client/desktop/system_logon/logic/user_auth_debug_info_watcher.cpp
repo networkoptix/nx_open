@@ -17,6 +17,8 @@ namespace {
 
 static const QString kDigestDebugInfoKey = "userDigest";
 static const QString kTokenDebugInfoKey = "userToken";
+static const QString kElideString = "...";
+static constexpr int kMaxTokenLength = 50;
 
 } // namespace
 
@@ -40,8 +42,16 @@ public:
                 const auto token = session->connection()->credentials().authToken;
                 if (token.isBearerToken())
                 {
-                    DebugInfoStorage::instance()->setValue(
-                        kTokenDebugInfoKey, "Token: " + QString::fromStdString(token.value));
+                    QString displayToken = QString::fromStdString(token.value);
+                    if (displayToken.length() > kMaxTokenLength)
+                    {
+                        const int partLength = (kMaxTokenLength - kElideString.length()) / 2;
+                        displayToken = displayToken.left(partLength)
+                            + kElideString
+                            + displayToken.right(partLength);
+                    }
+                    DebugInfoStorage::instance()->setValue(kTokenDebugInfoKey,
+                        "Token: " + displayToken);
                 }
                 else
                 {
