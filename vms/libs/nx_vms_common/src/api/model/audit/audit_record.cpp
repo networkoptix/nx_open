@@ -89,10 +89,7 @@ const auto description =
 const auto cloud =
     [](const QnAuditRecord& record, QnLegacyAuditRecord& legacyRecord)
     {
-        const auto details = record.get<CloudDetails>();
-
-        if (!details->userAgent.isEmpty())
-            legacyRecord.addParam("userAgent", details->userAgent.toLatin1());
+        legacyRecord.addParam("userAgent", record.authSession.userAgent.toUtf8());
     };
 const auto nothing =
     [](const QnAuditRecord& record, QnLegacyAuditRecord& legacyRecord)
@@ -150,7 +147,7 @@ const auto description =
 const auto cloud =
     [](const QnLegacyAuditRecord& legacyRecord, QnAuditRecord& record)
     {
-        record.details = CloudDetails{QByteArray(legacyRecord.extractParam("userAgent"))};
+        record.details = nullptr;
     };
 const auto nothing =
     [](const QnLegacyAuditRecord& legacyRecord, QnAuditRecord& record)

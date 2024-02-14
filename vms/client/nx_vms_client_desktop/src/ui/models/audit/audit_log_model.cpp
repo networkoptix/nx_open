@@ -466,7 +466,7 @@ QString QnAuditLogModel::eventDescriptionText(const QnLegacyAuditRecord* data) c
                     "%2 is a description of the agent used for establishing the connection "
                     "(like Nx Witness Desktop Client 6.0.0.0)"),
                 nx::branding::cloudName(),
-                data->extractParam("userAgent"));
+                data->authSession.userAgent);
             break;
         case Qn::AR_CloudUnbind:
             result = nx::format(
@@ -475,7 +475,7 @@ QString QnAuditLogModel::eventDescriptionText(const QnLegacyAuditRecord* data) c
                     "%2 is a description of the agent used for establishing the connection "
                     "(like Nx Witness Desktop Client 6.0.0.0)"),
                 nx::branding::cloudName(),
-                data->extractParam("userAgent"));
+                data->authSession.userAgent);
             break;
         default:
             result = getResourcesString(data->resources);

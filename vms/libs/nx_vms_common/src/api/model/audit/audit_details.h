@@ -108,16 +108,6 @@ struct NX_VMS_COMMON_API UpdateDetails
 QN_FUSION_DECLARE_FUNCTIONS(UpdateDetails, (ubjson)(json), NX_VMS_COMMON_API)
 NX_REFLECTION_INSTRUMENT(UpdateDetails, UpdateDetails_Fields)
 
-struct NX_VMS_COMMON_API CloudDetails
-{
-    /**%apidoc User Agent of the client. */
-    QString userAgent;
-    bool operator==(const CloudDetails& other) const = default;
-};
-#define CloudDetails_Fields (userAgent)
-QN_FUSION_DECLARE_FUNCTIONS(CloudDetails, (ubjson)(json), NX_VMS_COMMON_API)
-NX_REFLECTION_INSTRUMENT(CloudDetails, CloudDetails_Fields)
-
 namespace details
 {
     template<nx::vms::api::AuditRecordType type, typename Details>
@@ -235,8 +225,8 @@ using AllAuditDetails =
         details::map<nx::vms::api::AuditRecordType::databaseRestore, std::nullptr_t>,
         details::map<nx::vms::api::AuditRecordType::updateInstall, UpdateDetails>,
         details::map<nx::vms::api::AuditRecordType::mitmAttack, MitmDetails>,
-        details::map<nx::vms::api::AuditRecordType::cloudBind, CloudDetails>,
-        details::map<nx::vms::api::AuditRecordType::cloudUnbind, CloudDetails>>;
+        details::map<nx::vms::api::AuditRecordType::cloudBind, std::nullptr_t>,
+        details::map<nx::vms::api::AuditRecordType::cloudUnbind, std::nullptr_t>>;
 
 void serialize_field(const AllAuditDetails::type& data, QVariant* target);
 void deserialize_field(const QVariant& value, AllAuditDetails::type* target);
