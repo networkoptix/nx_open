@@ -2074,10 +2074,6 @@ License Key: %2</source>
         <source>Download complete!</source>
         <translation></translation>
     </message>
-    <message>
-        <source>NVIDIA hardware acceleration is in beta mode</source>
-        <translation></translation>
-    </message>
 </context>
 <context>
     <name>QnAttachToVideowallDialog</name>
