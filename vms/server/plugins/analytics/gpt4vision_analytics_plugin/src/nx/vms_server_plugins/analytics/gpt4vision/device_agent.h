@@ -39,9 +39,13 @@ protected:
 private:
     const std::string kEventType = "nx.gpt4vision.response";
 
+    open_ai::QueryPayload::Message::Content::ImageUrl encodeImage(
+        const nx::sdk::analytics::IUncompressedVideoFrame* videoFrame,
+        std::string format = "jpg") const;
+
     std::optional<open_ai::Response> sendVideoFrameToOpenAi(const open_ai::QueryPayload& payload);
 
-    void showErrorMessage(const std::string& message);
+    void showErrorMessage(const std::string& message) const;
 
 private:
     const Engine* const m_engine;
