@@ -6856,6 +6856,33 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
 </context>
 <context>
+    <name>nx</name>
+    <message>
+        <source>Saving layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exporting video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop Saving</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop Export</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transcoding is required. Export session restarted.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Minimize</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>nx::vms::client::desktop::AbstractPreferencesDialog</name>
     <message>
         <source>OK</source>
@@ -9529,11 +9556,11 @@ Remember to return the Logging Level to its default setting after you have colle
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Non-default Logging level. We recommend setting it to “info”</source>
+        <source>Logging level degrades the performance of the system</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Logging level degrades the performance of the system</source>
+        <source>Non-default Logging level. We recommend setting it to &quot;info&quot;</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -12184,18 +12211,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
         </translation>
     </message>
     <message>
-        <source>Exporting video</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Stop Export</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Minimize</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Cannot write file</source>
         <translation></translation>
     </message>
@@ -12233,14 +12248,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
         <translation></translation>
     </message>
     <message>
-        <source>Saving layout</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Stop Saving</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Saving failed</source>
         <translation></translation>
     </message>
@@ -12250,10 +12257,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
         <source>We are preparing files for the export process. Please wait for a few seconds.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Transcoding is required. Export session restarted.</source>
         <translation></translation>
     </message>
 </context>
