@@ -178,7 +178,7 @@ if(NOT appleTeamId)
     )
 endif()
 
-if(developerBuild)
+if(developerBuild AND (IOS OR MACOSX))
     nx_execute_process_or_fail(
         COMMAND ${PYTHON_EXECUTABLE} ${open_source_root}/build_utils/macos/team.py
             isfree ${appleTeamId}
