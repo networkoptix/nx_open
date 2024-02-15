@@ -110,4 +110,25 @@ void OauthManager::issueStunToken(
         std::move(completionHandler));
 }
 
+void OauthManager::getJwtPublicKeys(
+    nx::utils::MoveOnlyFunc<void(api::ResultCode, std::vector<nx::network::jwk::Key>)> completionHandler)
+{
+    m_requestsExecutor->makeAsyncCall<std::vector<nx::network::jwk::Key>>(
+        nx::network::http::Method::get,
+        kOauthJwksPath,
+        {}, //query
+        std::move(completionHandler));
+}
+
+void OauthManager::getJwtPublicKeyByKid(
+    const std::string& kid,
+    nx::utils::MoveOnlyFunc<void(api::ResultCode, nx::network::jwk::Key)> completionHandler)
+{
+    m_requestsExecutor->makeAsyncCall<nx::network::jwk::Key>(
+        nx::network::http::Method::get,
+        nx::network::http::rest::substituteParameters(kOauthJwkByIdPath, {kid}),
+        {}, //query
+        std::move(completionHandler));
+}
+
 } // namespace nx::cloud::db::client

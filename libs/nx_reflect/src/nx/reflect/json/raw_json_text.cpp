@@ -14,13 +14,13 @@ DeserializationResult deserialize(const DeserializationContext& ctx, RawJsonText
     rapidjson::StringBuffer buffer;
     rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
     ctx.value.Accept(writer);
-    data->text = buffer.GetString();
+    data->jsonText = buffer.GetString();
     return DeserializationResult(true);
 }
 
 void serialize(SerializationContext* ctx, const RawJsonText& data)
 {
-    ctx->composer.writeRawString(data.text);
+    ctx->composer.writeRawString(data.jsonText);
 }
 
 } // namespace nx::reflect::json

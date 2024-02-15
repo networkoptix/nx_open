@@ -498,6 +498,10 @@ struct CustomSerializable
     bool operator==(const CustomSerializable& right) const { return y == right.y; }
 };
 
+// Also checking that the custom serialization/deserialization functions have greater priority
+// than reflection with NX_REFLECTION_INSTRUMENT.
+NX_REFLECTION_INSTRUMENT(CustomSerializable, (y))
+
 // Serializes value to a string representation of y instead of "{"y": 12}" produced by reflect::json.
 static void serialize(
     json::SerializationContext* ctx,
@@ -516,7 +520,7 @@ static DeserializationResult deserialize(
 using FooCustomSerializable = Foo<CustomSerializable>;
 NX_REFLECTION_INSTRUMENT(FooCustomSerializable, (num)(t))
 
-TEST_F(Json, custom_functions_are_invoked)
+TEST_F(Json, custom_functions_are_invoked_and_have_greater_priority_than_reflection)
 {
     testSerialization(
         R"({"num":12,"t":23})",
@@ -862,11 +866,11 @@ NX_REFLECTION_INSTRUMENT(WithRawJsonText, (foo))
 
 TEST_F(Json, RawJsonText)
 {
-    testSerialization("{\"foo\":123}", WithRawJsonText{.foo = {.text = "123"}});
-    testSerialization("{\"foo\":[\"bar\"]}", WithRawJsonText{.foo = {.text = "[\"bar\"]"}});
+    testSerialization("{\"foo\":123}", WithRawJsonText{.foo = {.jsonText = "123"}});
+    testSerialization("{\"foo\":[\"bar\"]}", WithRawJsonText{.foo = {.jsonText = "[\"bar\"]"}});
 
-    testSerialization("123", json::RawJsonText{.text = "123"});
-    testSerialization("{\"foo\":[\"bar\"]}", json::RawJsonText{.text = "{\"foo\":[\"bar\"]}"});
+    testSerialization("123", json::RawJsonText{.jsonText = "123"});
+    testSerialization("{\"foo\":[\"bar\"]}", json::RawJsonText{.jsonText = "{\"foo\":[\"bar\"]}"});
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -881,7 +885,7 @@ TEST_F(Json, JsonObject)
 
     {
         json::Object value;
-        value.set("bar", FooBuiltInTypes{ .n = 321, .b = false, .d = 1.5 });
+        value.set("bar", FooBuiltInTypes{.n = 321, .b = false, .d = 1.5});
         testSerialization("{\"bar\":{\"n\":321,\"b\":false,\"d\":1.5}}", value);
     }
 
@@ -899,16 +903,6 @@ class DerivedFromJsonObject:
     public json::Object
 {
 };
-
-DeserializationResult deserialize(const json::DeserializationContext& ctx, DerivedFromJsonObject* data)
-{
-    return deserialize(ctx, (json::Object*) data);
-}
-
-void serialize(json::SerializationContext* ctx, const DerivedFromJsonObject& data)
-{
-    serialize(ctx, (const json::Object&) data);
-}
 
 TEST_F(Json, DerivedFromJsonObject)
 {
