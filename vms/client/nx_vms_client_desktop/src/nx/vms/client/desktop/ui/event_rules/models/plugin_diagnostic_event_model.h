@@ -6,8 +6,7 @@
 
 #include <core/resource/resource_fwd.h>
 
-namespace nx::vms::client::desktop {
-namespace ui {
+namespace nx::vms::client::desktop::ui {
 
 class PluginDiagnosticEventModel: public QStandardItemModel
 {
@@ -27,5 +26,4 @@ public:
     bool isValid() const;
 };
 
-} // namespace ui
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::desktop::ui

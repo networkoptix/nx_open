@@ -84,7 +84,7 @@ const ItemDescriptor& PluginDiagnosticEvent::manifest()
                 utils::kCameraIdFieldName,
                 tr("Occurs at"),
                 {},
-                {{"acceptAll", true}}),
+                {{"acceptAll", false}}),
             makeFieldDescriptor<AnalyticsEngineField>(
                 "engineId", tr("For Plugin"), {}, {}, {utils::kCameraIdFieldName}),
             makeFieldDescriptor<TextLookupField>(utils::kCaptionFieldName, tr("And Caption")),
