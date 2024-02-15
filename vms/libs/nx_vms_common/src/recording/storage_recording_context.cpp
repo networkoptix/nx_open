@@ -61,8 +61,7 @@ StorageRecordingContext::StorageRecordingContext()
 {
 }
 
-void StorageRecordingContext::initializeRecordingContext(
-    const QnConstAbstractMediaDataPtr& mediaData)
+void StorageRecordingContext::initializeRecordingContext(int64_t startTimeUs)
 {
     if (m_recordingContext.fileName.isEmpty())
         throw ErrorEx(Error::Code::fileCreate, "No output file has been provided");
@@ -84,7 +83,7 @@ void StorageRecordingContext::initializeRecordingContext(
             m_recordingContext.storage);
     }
 
-    m_recordingContext.formatCtx->start_time = mediaData->timestamp;
+    m_recordingContext.formatCtx->start_time = startTimeUs;
 }
 
 int StorageRecordingContext::streamCount() const
@@ -433,7 +432,7 @@ bool StorageRecordingContext::doPrepareToStart(
     {
         auto& ctx = m_recordingContext;
         m_lastError = std::nullopt;
-        initializeRecordingContext(mediaData);
+        initializeRecordingContext(metadata.startTimeMs * 1000);
         ctx.metadata = metadata;
         if (!ctx.metadata.saveToFile(ctx.formatCtx, ctx.fileFormat))
         {

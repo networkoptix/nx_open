@@ -73,7 +73,7 @@ protected:
 
     virtual void initMetadataStream(StorageContext& context) = 0;
     virtual void initIoContext(StorageContext& context);
-    virtual void initializeRecordingContext(const QnConstAbstractMediaDataPtr& mediaData);
+    virtual void initializeRecordingContext(int64_t startTimeUs);
     virtual void onFlush(StorageContext& /*context*/) {};
     virtual void beforeIoClose(StorageContext& context) = 0;
     virtual void onSuccessfulPacketWrite(
