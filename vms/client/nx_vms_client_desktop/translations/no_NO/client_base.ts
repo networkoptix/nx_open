@@ -2075,10 +2075,6 @@ Lisensnøkkel: %2</translation>
       <source>Download complete!</source>
       <translation>Nedlasting ferdig!</translation>
     </message>
-    <message>
-      <source>NVIDIA hardware acceleration is in beta mode</source>
-      <translation>NVIDIA maskinvareakselerasjon er i betamodus</translation>
-    </message>
   </context>
   <context>
     <name>QnAttachToVideowallDialog</name>

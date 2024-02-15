@@ -867,7 +867,7 @@
     <name>nx::vms::rules::ShowOnAlarmLayoutAction</name>
     <message>
       <source>Show on Alarm Layout</source>
-      <translation>アラームレイアウトに表示</translation>
+      <translation>アラームレイアウト表示</translation>
     </message>
     <message>
       <source>Alarm: %1</source>

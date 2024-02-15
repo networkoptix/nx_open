@@ -2055,10 +2055,6 @@ License Key: %2</source>
       <source>Download complete!</source>
       <translation>下載已完成！</translation>
     </message>
-    <message>
-      <source>NVIDIA hardware acceleration is in beta mode</source>
-      <translation>NVIDIA 硬體加速功能目前仍為beta測試模式</translation>
-    </message>
   </context>
   <context>
     <name>QnAttachToVideowallDialog</name>

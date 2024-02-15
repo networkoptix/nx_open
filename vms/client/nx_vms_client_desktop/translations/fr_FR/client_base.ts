@@ -2075,10 +2075,6 @@ Clé de licence : %2</translation>
       <source>Download complete!</source>
       <translation>Téléchargement terminé!</translation>
     </message>
-    <message>
-      <source>NVIDIA hardware acceleration is in beta mode</source>
-      <translation>L'accélération matérielle NVIDIA est en mode bêta</translation>
-    </message>
   </context>
   <context>
     <name>QnAttachToVideowallDialog</name>
