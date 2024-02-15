@@ -4,7 +4,6 @@
 #include "ui_plugin_diagnostic_event_widget.h"
 
 #include <QtCore/QScopedValueRollback>
-#include <QtCore/QSortFilterProxyModel>
 
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -15,8 +14,7 @@
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
-namespace nx::vms::client::desktop {
-namespace ui {
+namespace nx::vms::client::desktop::ui {
 
 PluginDiagnosticEventWidget::PluginDiagnosticEventWidget(
     SystemContext* systemContext,
@@ -28,10 +26,7 @@ PluginDiagnosticEventWidget::PluginDiagnosticEventWidget(
 {
     ui->setupUi(this);
 
-    auto sortModel = new QSortFilterProxyModel(this);
-    sortModel->setDynamicSortFilter(true);
-    sortModel->setSourceModel(m_pluginDiagnosticEventModel);
-    ui->pirComboBox->setModel(sortModel);
+    ui->pirComboBox->setModel(m_pluginDiagnosticEventModel);
 
     connect(ui->pirComboBox, QnComboboxCurrentIndexChanged, this,
         &PluginDiagnosticEventWidget::paramsChanged);
@@ -133,7 +128,6 @@ void PluginDiagnosticEventWidget::updatePluginDiagnosticEventTypesModel()
         cameras);
 
     ui->pirComboBox->setEnabled(m_pluginDiagnosticEventModel->isValid());
-    ui->pirComboBox->model()->sort(0);
 }
 
 void PluginDiagnosticEventWidget::updateSelectedEventType()
@@ -190,5 +184,4 @@ nx::vms::event::EventParameters PluginDiagnosticEventWidget::createEventParamete
     return eventParams;
 }
 
-} // namespace ui
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::desktop::ui

@@ -5,8 +5,7 @@
 #include <core/resource/camera_resource.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 
-namespace nx::vms::client::desktop {
-namespace ui {
+namespace nx::vms::client::desktop::ui {
 
 void PluginDiagnosticEventModel::filterByCameras(
     nx::vms::common::AnalyticsEngineResourceList engines,
@@ -41,10 +40,20 @@ void PluginDiagnosticEventModel::filterByCameras(
     clear();
 
     if (cameras.isEmpty())
-        addItem(nx::Uuid(), kAnyPlugin);
+        addItem(nx::Uuid(), kAnyPlugin); //< By default should be the first item in the model.
+
+    // All the engines should be sorted by the name.
+    std::sort(
+        engines.begin(),
+        engines.end(),
+        [](const AnalyticsEngineResourcePtr& l, const AnalyticsEngineResourcePtr& r)
+        {
+            return l->getName() < r->getName();
+        });
 
     for (const auto& engine: engines)
         addItem(engine->getId(), engine->getName());
+
     endResetModel();
 }
 
@@ -53,5 +62,4 @@ bool PluginDiagnosticEventModel::isValid() const
     return rowCount() > 0;
 }
 
-} // namespace ui
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::desktop::ui
