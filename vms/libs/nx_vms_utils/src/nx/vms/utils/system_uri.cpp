@@ -340,10 +340,10 @@ SystemUri::SystemUri(const QString& uri)
 
 bool SystemUri::hasCloudSystemAddress() const
 {
-    return isValid() && isCloudHostname(systemAddress);
+    return isCloudHostname(systemAddress);
 }
 
-bool SystemUri::isValid() const
+bool SystemUri::isValid(bool requireAuthForCloudSystemConnection) const
 {
     if (scope == Scope::generic)
     {
@@ -371,9 +371,15 @@ bool SystemUri::isValid() const
             if (!hasSystemAddress || !isValidSystemAddress)
                 return !hasValidAuth;
 
-            // Login to a Cloud System is allowed only by using auth code.
-            if (isCloudHostname(systemAddress) && !hasValidBearerAuth(*this))
-                return !authCode.isEmpty();
+            // Login to a Cloud System is allowed only by using auth code (if auth is required).
+            if (isCloudHostname(systemAddress))
+            {
+                if (!requireAuthForCloudSystemConnection)
+                    return true;
+
+                if (!hasValidBearerAuth(*this))
+                    return !authCode.isEmpty();
+            }
 
             return hasValidAuth;
         }
