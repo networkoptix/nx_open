@@ -120,7 +120,7 @@ public:
 
     bool hasCloudSystemAddress() const;
 
-    bool isValid() const;
+    bool isValid(bool requireAuthForCloudSystemConnection = true) const;
 
     /** Bearer token or encoded password credentials. */
     QString authKey() const;

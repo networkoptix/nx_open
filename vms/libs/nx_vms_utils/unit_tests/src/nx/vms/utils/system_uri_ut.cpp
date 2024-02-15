@@ -211,8 +211,13 @@ TEST_F(SystemUriTest, genericSystemValidAuth)
     m_uri.cloudHost = kCloudHost;
     EXPECT_TRUE(m_uri.isValid()) << m_uri;
 
+    m_uri.systemAddress = kCloudSystemAddress;
+    EXPECT_FALSE(m_uri.isValid());
+    EXPECT_TRUE(m_uri.isValid(/*requireAuthForCloudSystemConnection*/ false));
+
     m_uri.systemAddress = kLocalSystemAddress;
     EXPECT_FALSE(m_uri.isValid()) << m_uri;
+    EXPECT_FALSE(m_uri.isValid(/*requireAuthForCloudSystemConnection*/ false));
 
     m_uri.credentials = PasswordCredentials(kEmptyUser, kPassword);
     m_uri.userAuthType = SystemUri::UserAuthType::local;
