@@ -5,6 +5,7 @@
 #include <functional>
 
 #include <nx/network/http/http_types.h>
+#include <nx/network/jose/jwk.h>
 #include <nx/utils/move_only_func.h>
 
 #include "oauth_data.h"
@@ -49,6 +50,13 @@ public:
 
     virtual void issueStunToken(const IssueStunTokenRequest& request,
         nx::utils::MoveOnlyFunc<void(ResultCode, IssueStunTokenResponse)> completionHandler) = 0;
+
+    virtual void getJwtPublicKeys(
+        nx::utils::MoveOnlyFunc<void(ResultCode, std::vector<nx::network::jwk::Key>)> completionHandler) = 0;
+
+    virtual void getJwtPublicKeyByKid(
+        const std::string& kid,
+        nx::utils::MoveOnlyFunc<void(ResultCode, nx::network::jwk::Key)> completionHandler) = 0;
 };
 
 } // namespace nx::cloud::db::api

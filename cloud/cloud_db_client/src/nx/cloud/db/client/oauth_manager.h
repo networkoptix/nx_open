@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <nx/network/jose/jwk.h>
+
 #include "async_http_requests_executor.h"
 #include "include/nx/cloud/db/api/oauth_manager.h"
 
@@ -47,6 +49,15 @@ public:
     void issueStunToken(
         const api::IssueStunTokenRequest& request,
         nx::utils::MoveOnlyFunc<void(api::ResultCode, api::IssueStunTokenResponse)>
+            completionHandler) override;
+
+    virtual void getJwtPublicKeys(
+        nx::utils::MoveOnlyFunc<void(api::ResultCode, std::vector<nx::network::jwk::Key>)>
+            completionHandler) override;
+
+    virtual void getJwtPublicKeyByKid(
+        const std::string& kid,
+        nx::utils::MoveOnlyFunc<void(api::ResultCode, nx::network::jwk::Key)>
             completionHandler) override;
 
 private:

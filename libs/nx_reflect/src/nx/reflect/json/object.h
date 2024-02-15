@@ -13,25 +13,24 @@ namespace detail {
 
 /**
  * Regular JSON object.
+ * It extends std::unordered_map by adding a way to use any reflectable type as value.
+ * Note: inheriting std::unordered_map is needed to make the class reflectable since
+ * NX_REFLECTION_INSTRUMENT macro requires a type with strictly defined fields.
  */
-class NX_REFLECT_API Object
+class NX_REFLECT_API Object:
+    public std::unordered_map<std::string, RawJsonText>
 {
-    friend NX_REFLECT_API DeserializationResult deserialize(const DeserializationContext& ctx, Object* data);
-    friend NX_REFLECT_API void serialize(SerializationContext* ctx, const Object& data);
-
 public:
-    bool contains(const std::string& attrName) const;
-
     /**
      * T MUST be deserialize-able from JSON.
      */
     template<typename T>
     std::optional<T> get(const std::string& attrName) const
     {
-        if (!m_attrs.contains(attrName))
+        if (!contains(attrName))
             return std::nullopt;
 
-        auto [data, result] = nx::reflect::json::deserialize<T>(m_attrs.at(attrName).text);
+        auto [data, result] = nx::reflect::json::deserialize<T>(at(attrName).jsonText);
         if (!result.success)
             return std::nullopt;
         return std::make_optional(std::move(data));
@@ -44,17 +43,9 @@ public:
     template<typename T>
     void set(const std::string& attrName, const T& value)
     {
-        m_attrs[attrName].text = nx::reflect::json::serialize(value);
+        (*this)[attrName].jsonText = nx::reflect::json::serialize(value);
     }
-
-    bool operator==(const Object& rhs) const = default;
-
-private:
-    std::unordered_map<std::string, RawJsonText> m_attrs;
 };
-
-NX_REFLECT_API DeserializationResult deserialize(const DeserializationContext& ctx, Object* data);
-NX_REFLECT_API void serialize(SerializationContext* ctx, const Object& data);
 
 } // namespace detail
 
