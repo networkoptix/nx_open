@@ -85,6 +85,8 @@ ExportStorageStreamRecorder::~ExportStorageStreamRecorder()
 void ExportStorageStreamRecorder::setPreciseStartPosition(int64_t startTimeUs)
 {
     m_preciseStartTimeUs = startTimeUs;
+    if (isTranscodingEnabled())
+        setPreciseStartDateTime(m_preciseStartTimeUs);
 }
 
 void ExportStorageStreamRecorder::setTranscodeFilters(const FilterChain& filters)
@@ -222,7 +224,6 @@ CodecParametersPtr ExportStorageStreamRecorder::getVideoCodecParameters(
             m_dstVideoCodec);
 
         m_videoTranscoder->setPreciseStartPosition(m_preciseStartTimeUs);
-        setPreciseStartDateTime(m_preciseStartTimeUs);
         m_videoTranscoder->setUseMultiThreadEncode(true);
         m_videoTranscoder->setUseMultiThreadDecode(true);
         m_videoTranscoder->setQuality(m_transcodeQuality);

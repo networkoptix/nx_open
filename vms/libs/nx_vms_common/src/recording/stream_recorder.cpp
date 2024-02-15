@@ -226,7 +226,9 @@ bool QnStreamRecorder::isAudioRecorded() const
 
 bool QnStreamRecorder::prepareToStart(const QnConstAbstractMediaDataPtr& mediaData)
 {
-    m_endDateTimeUs = m_startDateTimeUs = mediaData->timestamp;
+    m_endDateTimeUs = mediaData->timestamp;
+    if (m_startDateTimeUs == (int64_t)AV_NOPTS_VALUE)
+        m_startDateTimeUs = mediaData->timestamp;
     m_interleavedStream = m_videoLayout && m_videoLayout->channelCount() > 1;
     m_isAudioPresent = m_audioLayout && !m_audioLayout->tracks().empty() && isAudioRecorded();
     const auto audioLayout = m_isAudioPresent ? m_audioLayout : AudioLayoutConstPtr();
@@ -242,11 +244,11 @@ bool QnStreamRecorder::prepareToStart(const QnConstAbstractMediaDataPtr& mediaDa
 
 bool QnStreamRecorder::dataHoleDetected(const QnConstAbstractMediaDataPtr& md)
 {
-    if (m_startDateTimeUs != (int64_t) AV_NOPTS_VALUE && md->timestamp < m_startDateTimeUs - 1000LL * 1000)
+    if (m_endDateTimeUs != (int64_t) AV_NOPTS_VALUE && md->timestamp < m_endDateTimeUs - 1000LL * 1000)
     {
         NX_DEBUG(
-            this, "Time translated into the past for %1 s. Closing file",
-            (md->timestamp - m_startDateTimeUs) / 1'000'000);
+            this, "Time translated into the past for %1 s(%2 - %3).  Closing file",
+            (md->timestamp - m_endDateTimeUs) / 1'000'000, md->timestamp, m_endDateTimeUs);
 
         return true;
     }
@@ -260,7 +262,7 @@ QnAviArchiveMetadata QnStreamRecorder::prepareMetaData(
     QnAviArchiveMetadata result;
     result.version = QnAviArchiveMetadata::kVersionBeforeTheIntegrityCheck;
     if (isUtcOffsetAllowed())
-        result.startTimeMs = mediaData->timestamp / 1000LL;
+        result.startTimeMs = m_startDateTimeUs / 1000LL;
 
     result.dewarpingParams = m_mediaDevice->getDewarpingParams();
     result.encryptionData = prepareEncryptor((quint64) result.startTimeMs);
