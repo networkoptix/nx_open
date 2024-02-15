@@ -29,6 +29,7 @@
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/instrument.h>
 #include <nx/utils/system_error.h>
+#include <nx/utils/system_network_headers.h>
 
 NX_NETWORK_API bool operator==(const in_addr& left, const in_addr& right);
 NX_NETWORK_API bool operator==(const in6_addr& left, const in6_addr& right);

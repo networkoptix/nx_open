@@ -24,6 +24,7 @@ NX_VMS_COMMON_API bool fillExtraData(
 NX_VMS_COMMON_API std::vector<uint8_t> buildExtraDataAnnexB(const QnConstCompressedVideoDataPtr& frame);
 
 NX_VMS_COMMON_API QString fromVideoCodectoMimeType(AVCodecID codecId);
+NX_VMS_COMMON_API AVCodecID fromMimeTypeToVideoCodec(const std::string& mime);
 
 } // namespace nx::media
 

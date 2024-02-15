@@ -5,37 +5,40 @@
 #include <vector>
 
 #if defined(_WIN32)
-// Needed for UTF-8 -> UTF-16 conversion for WinAPI calls on filenames.
-#include <codecvt>
-#include <iostream>
-#include <locale>
-#include <windows.h>
+    // Needed for UTF-8 -> UTF-16 conversion for WinAPI calls on filenames.
+    #include <codecvt>
+    #include <iostream>
+    #include <locale>
+
+    #include <windows.h>
 #else
-#include <dlfcn.h>
-#include <unistd.h>
+    #include <unistd.h>
+    #include <dlfcn.h>
 #endif
 
 #include <nx/kit/debug.h>
-#include <nx/kit/json.h>
 #include <nx/kit/test.h>
+#include <nx/kit/json.h>
+
+#include <nx/sdk/interface.h>
+#include <nx/sdk/helpers/ref_countable.h>
+#include <nx/sdk/helpers/to_string.h>
+#include <nx/sdk/ptr.h>
+#include <nx/sdk/helpers/string_map.h>
+#include <nx/sdk/helpers/device_info.h>
+#include <nx/sdk/helpers/string.h>
+#include <nx/sdk/helpers/error.h>
+#include <nx/sdk/helpers/settings_response.h>
+#include <nx/sdk/helpers/lib_context.h>
 #include <nx/sdk/analytics/helpers/metadata_types.h>
-#include <nx/sdk/analytics/i_compressed_video_packet.h>
+#include <nx/sdk/uuid.h>
+#include <nx/sdk/i_utility_provider.h>
+
 #include <nx/sdk/analytics/i_consuming_device_agent.h>
+#include <nx/sdk/analytics/i_uncompressed_video_frame.h>
+#include <nx/sdk/analytics/i_compressed_video_packet.h>
 #include <nx/sdk/analytics/i_engine.h>
 #include <nx/sdk/analytics/i_plugin.h>
-#include <nx/sdk/analytics/i_uncompressed_video_frame.h>
-#include <nx/sdk/helpers/device_info.h>
-#include <nx/sdk/helpers/error.h>
-#include <nx/sdk/helpers/lib_context.h>
-#include <nx/sdk/helpers/ref_countable.h>
-#include <nx/sdk/helpers/settings_response.h>
-#include <nx/sdk/helpers/string.h>
-#include <nx/sdk/helpers/string_map.h>
-#include <nx/sdk/helpers/to_string.h>
-#include <nx/sdk/i_utility_provider.h>
-#include <nx/sdk/interface.h>
-#include <nx/sdk/ptr.h>
-#include <nx/sdk/uuid.h>
 
 namespace nx {
 namespace vms_server_plugins {
@@ -273,8 +276,9 @@ public:
         const char* requestBody,
         IHttpRequestCompletionHandler* callback) const override
     {
-        NX_PRINT << "Making HTTP request with HttpDomainName = " << (int) requestDomain << " path = " << path << ", httpMethod = " << httpMethod
-                 << ", mimeType = " << mimeType << ", requestBody = " << requestBody;
+        NX_PRINT << "Making HTTP request with HttpDomainName = " << (int) requestDomain
+            << " path = " << path << ", httpMethod = " << httpMethod
+            << ", mimeType = " << mimeType << ", requestBody = " << requestBody;
         callback->execute({new nx::sdk::String()});
     }
 

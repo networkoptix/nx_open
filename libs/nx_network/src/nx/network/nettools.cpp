@@ -1,8 +1,8 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include <iostream>
-#include <sstream>
 #include <memory>
+#include <sstream>
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QElapsedTimer>
@@ -13,6 +13,7 @@
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/string.h>
+#include <nx/utils/system_network_headers.h>
 
 #include "nettools.h"
 #include "ping.h"

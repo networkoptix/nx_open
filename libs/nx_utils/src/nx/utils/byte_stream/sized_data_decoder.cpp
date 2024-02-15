@@ -4,11 +4,7 @@
 
 #include <cstring>
 
-#ifdef _WIN32
-    #include <Winsock2.h>
-#else
-    #include <arpa/inet.h>
-#endif
+#include <nx/utils/system_network_headers.h>
 
 namespace nx {
 namespace utils {

@@ -30,6 +30,17 @@ public:
 
     virtual void init() = 0;
     virtual bool isEof() const = 0;
+
+    virtual void setMtu(int mtu) = 0;
+
+    void setSsrc(uint32_t ssrc) { m_ssrc = ssrc; }
+    void setCName(const std::string& cname) { m_cname = cname; }
+    std::optional<uint32_t> ssrc() const { return m_ssrc; }
+    std::optional<std::string> cname() const { return m_cname; }
+
+protected:
+    std::optional<uint32_t> m_ssrc;
+    std::optional<std::string> m_cname;
 };
 
 using AbstractRtspEncoderPtr = std::shared_ptr<AbstractRtspEncoder>;
