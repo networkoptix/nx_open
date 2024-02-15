@@ -2075,10 +2075,6 @@ Chave de licença: %2</translation>
       <source>Download complete!</source>
       <translation type="unfinished">Download complete!</translation>
     </message>
-    <message>
-      <source>NVIDIA hardware acceleration is in beta mode</source>
-      <translation type="unfinished">NVIDIA hardware acceleration is in beta mode</translation>
-    </message>
   </context>
   <context>
     <name>QnAttachToVideowallDialog</name>

@@ -2055,10 +2055,6 @@ Khóa giấy phép: %2</translation>
       <source>Download complete!</source>
       <translation>Tải xuống hoàn tất!</translation>
     </message>
-    <message>
-      <source>NVIDIA hardware acceleration is in beta mode</source>
-      <translation>Tăng tốc phần cứng NVIDIA đang ở chế độ beta</translation>
-    </message>
   </context>
   <context>
     <name>QnAttachToVideowallDialog</name>
