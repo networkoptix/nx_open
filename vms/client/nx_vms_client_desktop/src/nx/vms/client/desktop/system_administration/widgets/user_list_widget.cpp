@@ -648,6 +648,7 @@ void UserListWidget::Private::setupUi()
         &Private::updateBanners);
     connect(usersModel, &UserListModel::notFoundUsersChanged, this, &Private::updateBanners);
     connect(usersModel, &UserListModel::nonUniqueUsersChanged, this, &Private::updateBanners);
+    connect(usersModel, &UserListModel::dataChanged, this, &Private::updateBanners);
 
     updateSelection();
     updateBanners();
