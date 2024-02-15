@@ -6,8 +6,7 @@
 
 namespace Ui { class PluginDiagnosticEventWidget; }
 
-namespace nx::vms::client::desktop {
-namespace ui {
+namespace nx::vms::client::desktop::ui {
 
 class PluginDiagnosticEventModel;
 
@@ -36,8 +35,6 @@ private:
 private:
     QScopedPointer<Ui::PluginDiagnosticEventWidget> ui;
     PluginDiagnosticEventModel* m_pluginDiagnosticEventModel;
-
 };
 
-} // namespace ui
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::desktop::ui

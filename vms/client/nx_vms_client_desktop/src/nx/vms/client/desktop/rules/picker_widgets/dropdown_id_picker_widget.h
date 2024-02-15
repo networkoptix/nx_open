@@ -81,14 +81,10 @@ class AnalyticsEnginePicker:
 {
 public:
     AnalyticsEnginePicker(QnWorkbenchContext* context, CommonParamsWidget* parent):
-        DropdownIdPickerWidgetBase<vms::rules::AnalyticsEngineField, QnTreeComboBox>(context, parent)
+        DropdownIdPickerWidgetBase<vms::rules::AnalyticsEngineField, QnTreeComboBox>(context, parent),
+        m_pluginDiagnosticEventModel{new ui::PluginDiagnosticEventModel(this)}
     {
-        m_pluginDiagnosticEventModel = new ui::PluginDiagnosticEventModel(this);
-        auto sortModel = new QSortFilterProxyModel(this);
-        sortModel->setDynamicSortFilter(true);
-        sortModel->setSourceModel(m_pluginDiagnosticEventModel);
-
-        m_comboBox->setModel(sortModel);
+        m_comboBox->setModel(m_pluginDiagnosticEventModel);
     }
 
 protected:
@@ -107,7 +103,6 @@ protected:
             getCameras());
 
         m_comboBox->setEnabled(m_pluginDiagnosticEventModel->isValid());
-        m_comboBox->model()->sort(0);
 
         nx::Uuid pluginId = theField()->value();
         if (pluginId.isNull())
