@@ -280,7 +280,7 @@ void DeviceSearcher::onSomeBytesRead(
             descriptionUrl.setPort(DEFAULT_HTTPS_PORT);
     }
     uuidStr += descriptionUrl.toStdString();
-    if (descriptionUrl.isValid())
+    if (descriptionUrl.isValid() && !descriptionUrl.host().isEmpty())
         startFetchDeviceXml(QByteArray::fromStdString(uuidStr), descriptionUrl, remoteHost);
 }
 
