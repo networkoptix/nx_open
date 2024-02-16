@@ -98,7 +98,7 @@ struct NX_VMS_API BookmarkSharingSettings
     std::chrono::milliseconds expirationTimeMs{0};
 
     /**%apidoc[opt] Password required to access the Bookmark. */
-    std::optional<QString> password;
+    QString password;
 };
 #define BookmarkSharingSettings_Fields (expirationTimeMs)(password)
 QN_FUSION_DECLARE_FUNCTIONS(BookmarkSharingSettings, (json), NX_VMS_API)
@@ -232,7 +232,7 @@ QN_FUSION_DECLARE_FUNCTIONS(BookmarkWithRuleV1, (json), NX_VMS_API)
 struct NX_VMS_API BookmarkV3: BookmarkBase, BookmarkIdV3
 {
     using BookmarkIdV3::BookmarkIdV3;
-    std::optional<BookmarkSharingSettings> share;
+    std::optional<std::variant<std::nullptr_t, BookmarkSharingSettings>> share = std::nullopt;
 };
 #define BookmarkV3_Fields BookmarkBase_Fields BookmarkIdV3_Fields (share)
 QN_FUSION_DECLARE_FUNCTIONS(BookmarkV3, (json), NX_VMS_API)
