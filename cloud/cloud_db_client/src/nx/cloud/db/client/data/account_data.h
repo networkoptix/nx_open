@@ -47,7 +47,8 @@ NX_REFLECTION_INSTRUMENT(AccountRegistrationData, AccountRegistrationData_Fields
 
 #define AccountData_Fields \
     (id)(email)(fullName)(customization)(statusCode)(registrationTime)(activationTime)\
-    (httpDigestAuthEnabled)(account2faEnabled)(authSessionLifetime)(accountBelongsToOrganization)
+    (httpDigestAuthEnabled)(account2faEnabled)(authSessionLifetime)(accountBelongsToOrganization)\
+    (securitySequence)
 
 NX_REFLECTION_INSTRUMENT(AccountData, AccountData_Fields)
 
