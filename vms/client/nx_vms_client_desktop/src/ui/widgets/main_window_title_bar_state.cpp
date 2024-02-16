@@ -2,9 +2,25 @@
 
 #include "main_window_title_bar_state.h"
 
+#include <finders/systems_finder.h>
 #include <network/system_description.h>
+#include <network/system_helpers.h>
+#include <nx/fusion/serialization/json_functions.h>
+#include <nx/vms/client/core/network/credentials_manager.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/state/client_state_handler.h>
+
+namespace {
+
+const QString kSystemTabBarStateDelegate = "systemTabBar";
+const QString kSystemsKey = "systems";
+
+} // namespace
 
 namespace nx::vms::client::desktop {
+
+//-------------------------------------------------------------------------------------------------
+// struct MainWindowTitleBarState
 
 bool MainWindowTitleBarState::SystemData::operator==(const SystemData& other) const
 {
@@ -24,6 +40,8 @@ int MainWindowTitleBarState::findSystemIndex(const nx::Uuid& systemId) const
 
     return std::distance(systems.cbegin(), it);
 }
+//-------------------------------------------------------------------------------------------------
+// struct MainWindowTitleBarStateReducer
 
 struct MainWindowTitleBarStateReducer
 {
@@ -43,6 +61,7 @@ struct MainWindowTitleBarStateReducer
     static State changeCurrentSystem(State&& state, QnSystemDescriptionPtr systemDescription);
     static State moveSystem(State&& state, int indexFrom, int IndexTo);
     static State setSystemUpdating(State&& state, bool value);
+    static State setSystems(State&& state, QList<State::SystemData> systems);
 };
 
 MainWindowTitleBarStateReducer::State MainWindowTitleBarStateReducer::setExpanded(
@@ -176,8 +195,92 @@ MainWindowTitleBarStateReducer::State MainWindowTitleBarStateReducer::setSystemU
     return state;
 }
 
+MainWindowTitleBarStateReducer::State MainWindowTitleBarStateReducer::setSystems(
+    State&& state, QList<MainWindowTitleBarState::SystemData> systems)
+{
+    state.systems = std::move(systems);
+    return state;
+}
+
+//-------------------------------------------------------------------------------------------------
+// class MainWindowTitleBarStateStore::StateDelegate
+
+class MainWindowTitleBarStateStore::StateDelegate: public ClientStateDelegate
+{
+    using base_type = ClientStateDelegate;
+    using Store = MainWindowTitleBarStateStore;
+
+public:
+    StateDelegate(Store* store): m_store(store)
+    {
+    }
+
+    virtual bool loadState(
+        const DelegateState& state,
+        SubstateFlags flags,
+        const StartupParameters& /*params*/) override
+    {
+        if (!flags.testFlag(Substate::systemIndependentParameters))
+            return false;
+
+        QList<nx::Uuid> systemIds;
+        QJson::deserialize(state.value(kSystemsKey), &systemIds);
+        QList<State::SystemData> systems;
+        for (const auto systemId: systemIds)
+        {
+            auto system = appContext()->systemsFinder()->getSystem(systemId.toSimpleString());
+
+            LogonData logonData;
+            const auto servers = system->servers();
+            const auto it = std::find_if(servers.cbegin(), servers.cend(),
+                [system](const api::ModuleInformation& server)
+                {
+                    return !server.id.isNull();
+                });
+            if (it != servers.cend())
+            {
+                auto url = system->getServerHost(it->id);
+                if (url.isEmpty())
+                    url = system->getServerHost({});
+                logonData.address = nx::network::SocketAddress(
+                    url.host(),
+                    url.port(helpers::kDefaultConnectionPort));
+                logonData.connectScenario = ConnectScenario::autoConnect;
+            }
+
+            const auto credentials = core::CredentialsManager::credentials(systemId);
+            if (!credentials.empty())
+                logonData.credentials = credentials[0];
+
+            systems << State::SystemData{
+                .systemDescription = system,
+                .logonData = logonData};
+        }
+        m_store->setSystems(std::move(systems));
+        return true;
+    }
+
+    virtual void saveState(DelegateState* state, SubstateFlags flags) override
+    {
+        if (flags.testFlag(Substate::systemIndependentParameters))
+        {
+            DelegateState result;
+            QJson::serialize(m_store->systemsIds(), &result[kSystemsKey]);
+            *state = result;
+        }
+    }
+
+private:
+    QPointer<Store> m_store;
+};
+
+//-------------------------------------------------------------------------------------------------
+// class MainWindowTitleBarStateStore
+
 MainWindowTitleBarStateStore::MainWindowTitleBarStateStore()
 {
+    appContext()->clientStateHandler()->registerDelegate(
+        kSystemTabBarStateDelegate, std::make_unique<StateDelegate>(this));
     subscribe([this](const State& state)
         {
             emit stateChanged(state);
@@ -283,6 +386,11 @@ void MainWindowTitleBarStateStore::setSystemUpdating(bool value)
     dispatch(Reducer::setSystemUpdating, value);
 }
 
+void MainWindowTitleBarStateStore::setSystems(QList<MainWindowTitleBarState::SystemData> systems)
+{
+    dispatch(Reducer::setSystems, systems);
+}
+
 int MainWindowTitleBarStateStore::systemCount() const
 {
     return state().systems.count();
@@ -336,6 +444,15 @@ bool MainWindowTitleBarStateStore::isTitleBarEnabled() const
 {
     return !state().systemUpdating
         && state().connectState != ConnectActionsHandler::LogicalState::connecting;
+}
+
+QList<nx::Uuid> MainWindowTitleBarStateStore::systemsIds() const
+{
+    QList<nx::Uuid> result;
+    result.reserve(state().systems.count());
+    for (const auto& system: state().systems)
+        result.append(system.systemDescription->localId());
+    return result;
 }
 
 } // nx::vms::client::desktop

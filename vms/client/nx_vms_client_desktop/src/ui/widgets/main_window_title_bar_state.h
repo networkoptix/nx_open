@@ -63,6 +63,7 @@ public:
     void moveSystem(int indexFrom, int indexTo);
     void activateHomeTab();
     void setSystemUpdating(bool value);
+    void setSystems(QList<State::SystemData> systems);
 
     int systemCount() const;
     std::optional<State::SystemData> systemData(int index) const;
@@ -73,10 +74,14 @@ public:
     nx::Uuid currentSystemId() const;
     WorkbenchState workbenchState(const nx::Uuid& systemId) const;
     bool isTitleBarEnabled() const;
+    QList<nx::Uuid> systemsIds() const;
 
 signals:
     void stateChanged(const State& state);
     void systemNameChanged(int index, const QString& name);
+
+private:
+    class StateDelegate;
 };
 
 } // nx::vms::client::desktop
