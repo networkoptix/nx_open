@@ -5488,7 +5488,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>System suspended</source>
-      <translation>システムが一時停止されました</translation>
+      <translation>システムがサスペンドされました</translation>
     </message>
     <message>
       <source>System shut down</source>
@@ -6751,6 +6751,33 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
   </context>
   <context>
+    <name>nx</name>
+    <message>
+      <source>Saving layout</source>
+      <translation>レイアウトを保存</translation>
+    </message>
+    <message>
+      <source>Exporting video</source>
+      <translation>映像のエクスポート</translation>
+    </message>
+    <message>
+      <source>Stop Saving</source>
+      <translation>保存を停止</translation>
+    </message>
+    <message>
+      <source>Stop Export</source>
+      <translation>エクスポートを停止</translation>
+    </message>
+    <message>
+      <source>Transcoding is required. Export session restarted.</source>
+      <translation>トランスコーディングが必要です。エクスポートセッションを再起動しました。</translation>
+    </message>
+    <message>
+      <source>Minimize</source>
+      <translation>最小化</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::AbstractPreferencesDialog</name>
     <message>
       <source>OK</source>
@@ -7255,7 +7282,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>System suspended. To make changes to backup configuration, the System should be in active state. %1</source>
-      <translation>システムが一時停止されました。バックアップ設定を変更するには、システムがアクティブな状態である必要があります。 %1</translation>
+      <translation>システムがサスペンドされました。バックアップ設定を変更するには、システムがアクティブな状態である必要があります。 %1</translation>
     </message>
   </context>
   <context>
@@ -8217,7 +8244,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Administrator password</source>
-      <translation>管理者のパスワード</translation>
+      <translation>管理者パスワード</translation>
     </message>
     <message>
       <source>Merge Server to the System</source>
@@ -9391,12 +9418,12 @@ Remember to return the Logging Level to its default setting after you have colle
       <translation>デフォルトのログレベル</translation>
     </message>
     <message>
-      <source>Non-default Logging level. We recommend setting it to “info”</source>
-      <translation>デフォルトではないログレベルです。「情報」に設定することをお勧めします</translation>
-    </message>
-    <message>
       <source>Logging level degrades the performance of the system</source>
       <translation>ログレベルによりシステムのパフォーマンスが低下します</translation>
+    </message>
+    <message>
+      <source>Non-default Logging level. We recommend setting it to &quot;info&quot;</source>
+      <translation>デフォルトではないログレベルです。「情報」に設定することをお勧めします</translation>
     </message>
   </context>
   <context>
@@ -10710,7 +10737,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Suspended</source>
-      <translation>一時停止中</translation>
+      <translation>サスペンド</translation>
     </message>
     <message>
       <source>Shut down</source>
@@ -12027,18 +12054,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
       </translation>
     </message>
     <message>
-      <source>Exporting video</source>
-      <translation>映像のエクスポート</translation>
-    </message>
-    <message>
-      <source>Stop Export</source>
-      <translation>エクスポートを停止</translation>
-    </message>
-    <message>
-      <source>Minimize</source>
-      <translation>最小化</translation>
-    </message>
-    <message>
       <source>Cannot write file</source>
       <translation>ファイルを書き込めません</translation>
     </message>
@@ -12076,14 +12091,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
       <translation>エクスポートを開始しています...</translation>
     </message>
     <message>
-      <source>Saving layout</source>
-      <translation>レイアウトを保存</translation>
-    </message>
-    <message>
-      <source>Stop Saving</source>
-      <translation>保存を停止</translation>
-    </message>
-    <message>
       <source>Saving failed</source>
       <translation>保存できませんでした</translation>
     </message>
@@ -12094,10 +12101,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
       <translation>エクスポート処理用のファイルを準備中です。しばらくお待ちください。</translation>
-    </message>
-    <message>
-      <source>Transcoding is required. Export session restarted.</source>
-      <translation>トランスコーディングが必要です。エクスポートセッションを再起動しました。</translation>
     </message>
   </context>
   <context>

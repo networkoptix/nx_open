@@ -6864,6 +6864,33 @@ Vi anbefaler at du ikke åpner denne integrasjonen. Hvis du forstår risikoen, k
     </message>
   </context>
   <context>
+    <name>nx</name>
+    <message>
+      <source>Saving layout</source>
+      <translation>Lagrer visning</translation>
+    </message>
+    <message>
+      <source>Exporting video</source>
+      <translation>Eksporter video</translation>
+    </message>
+    <message>
+      <source>Stop Saving</source>
+      <translation>Stopp lagring</translation>
+    </message>
+    <message>
+      <source>Stop Export</source>
+      <translation>Stopp eksport</translation>
+    </message>
+    <message>
+      <source>Transcoding is required. Export session restarted.</source>
+      <translation>Transkoding er nødvendig. Eksporter økten må startes på nytt.</translation>
+    </message>
+    <message>
+      <source>Minimize</source>
+      <translation>Minimer</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::AbstractPreferencesDialog</name>
     <message>
       <source>OK</source>
@@ -9539,12 +9566,12 @@ Husk å tilbakestille loggingsnivået til standardinnstillingen etter at du har 
       <translation>Standard loggingsnivå</translation>
     </message>
     <message>
-      <source>Non-default Logging level. We recommend setting it to “info”</source>
-      <translation>Ikke-standard loggingsnivå. Vi anbefaler å sette den til "info"</translation>
-    </message>
-    <message>
       <source>Logging level degrades the performance of the system</source>
       <translation>Loggingsnivå forringer ytelsen til systemet</translation>
+    </message>
+    <message>
+      <source>Non-default Logging level. We recommend setting it to &quot;info&quot;</source>
+      <translation>Ikke-standard loggingsnivå. Vi anbefaler å sette den til &quot;info&quot;</translation>
     </message>
   </context>
   <context>
@@ -12201,18 +12228,6 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
       </translation>
     </message>
     <message>
-      <source>Exporting video</source>
-      <translation>Eksporter video</translation>
-    </message>
-    <message>
-      <source>Stop Export</source>
-      <translation>Stopp eksport</translation>
-    </message>
-    <message>
-      <source>Minimize</source>
-      <translation>Minimer</translation>
-    </message>
-    <message>
       <source>Cannot write file</source>
       <translation>Kan ikke skrive fil</translation>
     </message>
@@ -12250,14 +12265,6 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
       <translation>Starter eksport...</translation>
     </message>
     <message>
-      <source>Saving layout</source>
-      <translation>Lagrer visning</translation>
-    </message>
-    <message>
-      <source>Stop Saving</source>
-      <translation>Stopp lagring</translation>
-    </message>
-    <message>
       <source>Saving failed</source>
       <translation>Lagring mislyktes</translation>
     </message>
@@ -12268,10 +12275,6 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
       <translation>Vi forbereder filer for eksportprosessen. Vent noen sekunder.</translation>
-    </message>
-    <message>
-      <source>Transcoding is required. Export session restarted.</source>
-      <translation>Transkoding er nødvendig. Eksporter økten må startes på nytt.</translation>
     </message>
   </context>
   <context>

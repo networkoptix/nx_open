@@ -7086,6 +7086,33 @@ Zalecamy nie otwierać tej integracji. Jeśli rozumiesz ryzyko, możesz otworzy�
     </message>
   </context>
   <context>
+    <name>nx</name>
+    <message>
+      <source>Saving layout</source>
+      <translation>Zapisywanie układu</translation>
+    </message>
+    <message>
+      <source>Exporting video</source>
+      <translation>Eksportowanie wideo</translation>
+    </message>
+    <message>
+      <source>Stop Saving</source>
+      <translation>Zatrzymaj zapisywanie</translation>
+    </message>
+    <message>
+      <source>Stop Export</source>
+      <translation>Zatrzymaj eksport</translation>
+    </message>
+    <message>
+      <source>Transcoding is required. Export session restarted.</source>
+      <translation>Transkodowanie jest wymagane. Sesja eksportu została zrestartowana.</translation>
+    </message>
+    <message>
+      <source>Minimize</source>
+      <translation>Minimalizuj</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::AbstractPreferencesDialog</name>
     <message>
       <source>OK</source>
@@ -9833,12 +9860,12 @@ Pamiętaj, aby zwrócić poziom logowania do ustawień domyślnych po zebraniu w
       <translation type="unfinished">Default Logging level</translation>
     </message>
     <message>
-      <source>Non-default Logging level. We recommend setting it to “info”</source>
-      <translation type="unfinished">Non-default Logging level. We recommend setting it to “info”</translation>
-    </message>
-    <message>
       <source>Logging level degrades the performance of the system</source>
       <translation type="unfinished">Logging level degrades the performance of the system</translation>
+    </message>
+    <message>
+      <source>Non-default Logging level. We recommend setting it to &quot;info&quot;</source>
+      <translation type="unfinished">Non-default Logging level. We recommend setting it to &quot;info&quot;</translation>
     </message>
   </context>
   <context>
@@ -12555,18 +12582,6 @@ Nie przypinaj tego certyfikatu, jeśli nie zmodyfikowałeś %2 certyfikatu SSL s
       </translation>
     </message>
     <message>
-      <source>Exporting video</source>
-      <translation>Eksportowanie wideo</translation>
-    </message>
-    <message>
-      <source>Stop Export</source>
-      <translation>Zatrzymaj eksport</translation>
-    </message>
-    <message>
-      <source>Minimize</source>
-      <translation>Minimalizuj</translation>
-    </message>
-    <message>
       <source>Cannot write file</source>
       <translation>Nie można zapisać pliku</translation>
     </message>
@@ -12604,14 +12619,6 @@ Nie przypinaj tego certyfikatu, jeśli nie zmodyfikowałeś %2 certyfikatu SSL s
       <translation>Rozpoczęcie eksportu...</translation>
     </message>
     <message>
-      <source>Saving layout</source>
-      <translation>Zapisywanie układu</translation>
-    </message>
-    <message>
-      <source>Stop Saving</source>
-      <translation>Zatrzymaj zapisywanie</translation>
-    </message>
-    <message>
       <source>Saving failed</source>
       <translation>Wystąpił błąd podczas zapisywania</translation>
     </message>
@@ -12622,10 +12629,6 @@ Nie przypinaj tego certyfikatu, jeśli nie zmodyfikowałeś %2 certyfikatu SSL s
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
       <translation>Przygotowujemy pliki do eksportu. Proszę zaczekać kilka sekund.</translation>
-    </message>
-    <message>
-      <source>Transcoding is required. Export session restarted.</source>
-      <translation>Transkodowanie jest wymagane. Sesja eksportu została zrestartowana.</translation>
     </message>
   </context>
   <context>

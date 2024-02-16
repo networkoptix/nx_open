@@ -137,11 +137,6 @@
       <translation>Anslutningen till %1 är inte klar ännu. Kontrollera din internetanslutning eller försök igen senare.</translation>
     </message>
     <message>
-      <source>Connection to %1 is not ready yet. Check the server’s internet connection or try again later.</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Anslutningen till %1 är inte klar ännu. Kontrollera serverns internetanslutning eller försök igen senare.</translation>
-    </message>
-    <message>
       <source>Connection to the server could not be established. Try again later.</source>
       <translation>Anslutning till servern kunde inte upprättas. Försök igen senare.</translation>
     </message>
@@ -172,11 +167,6 @@
       <translation>Alltför många försök. Försök igen om någon minut.</translation>
     </message>
     <message>
-      <source>To log in to this System, disable “Ask for a verification code on every login with your %1 account” in your %2.</source>
-      <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation>För att logga in på detta system, inaktivera "Be om en verifieringskod vid varje inloggning med ditt %1 -konto" i din %2.</translation>
-    </message>
-    <message>
       <source>Two-factor authentication is required.</source>
       <translation>Tvåfaktorsautentisering krävs.</translation>
     </message>
@@ -196,6 +186,26 @@
     <message>
       <source>Please contact the system administrator to regain access.</source>
       <translation>Kontakta systemadministratören för att återfå åtkomst.</translation>
+    </message>
+    <message>
+      <source>Connection to %1 is not ready yet. Check the server&apos;s internet connection or try again later.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Anslutningen till %1 är inte klar ännu. Kontrollera serverns internetanslutning eller försök igen senare.</translation>
+    </message>
+    <message>
+      <source>Log in as a %1 user to the system in a shutdown state is forbidden. You can still connect as local user.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>Logga in som %1 användare till systemet i ett avstängningstillstånd är förbjudet. Du kan fortfarande ansluta som lokal användare.</translation>
+    </message>
+    <message>
+      <source>Log in as a %1 user to the system in a suspended state is forbidden. You can still connect as local user.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>Logga in som %1 användare till systemet i ett avstängningstillstånd är förbjudet. Du kan fortfarande ansluta som lokal användare.</translation>
+    </message>
+    <message>
+      <source>To log in to this System, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</source>
+      <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
+      <translation>För att logga in på detta system, inaktivera &quot;Be om en verifieringskod vid varje inloggning med ditt %1 konto&quot; i ditt %2.</translation>
     </message>
   </context>
   <context>

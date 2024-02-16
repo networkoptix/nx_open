@@ -6753,6 +6753,33 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
   </context>
   <context>
+    <name>nx</name>
+    <message>
+      <source>Saving layout</source>
+      <translation>레이아웃 저장중</translation>
+    </message>
+    <message>
+      <source>Exporting video</source>
+      <translation>영상 내보내기</translation>
+    </message>
+    <message>
+      <source>Stop Saving</source>
+      <translation>저장 중지</translation>
+    </message>
+    <message>
+      <source>Stop Export</source>
+      <translation>내보내기 중지</translation>
+    </message>
+    <message>
+      <source>Transcoding is required. Export session restarted.</source>
+      <translation>트랜스 코딩이 필요합니다. 내보내기 세션이 다시 시작되었습니다.</translation>
+    </message>
+    <message>
+      <source>Minimize</source>
+      <translation>최소화</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::AbstractPreferencesDialog</name>
     <message>
       <source>OK</source>
@@ -9392,12 +9419,12 @@ Remember to return the Logging Level to its default setting after you have colle
       <translation type="unfinished">Default Logging level</translation>
     </message>
     <message>
-      <source>Non-default Logging level. We recommend setting it to “info”</source>
-      <translation type="unfinished">Non-default Logging level. We recommend setting it to “info”</translation>
-    </message>
-    <message>
       <source>Logging level degrades the performance of the system</source>
       <translation type="unfinished">Logging level degrades the performance of the system</translation>
+    </message>
+    <message>
+      <source>Non-default Logging level. We recommend setting it to &quot;info&quot;</source>
+      <translation type="unfinished">Non-default Logging level. We recommend setting it to &quot;info&quot;</translation>
     </message>
   </context>
   <context>
@@ -12028,18 +12055,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       </translation>
     </message>
     <message>
-      <source>Exporting video</source>
-      <translation>영상 내보내기</translation>
-    </message>
-    <message>
-      <source>Stop Export</source>
-      <translation>내보내기 중지</translation>
-    </message>
-    <message>
-      <source>Minimize</source>
-      <translation>최소화</translation>
-    </message>
-    <message>
       <source>Cannot write file</source>
       <translation>파일을 쓸 수 없습니다.</translation>
     </message>
@@ -12077,14 +12092,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <translation>내보내기 시작 중...</translation>
     </message>
     <message>
-      <source>Saving layout</source>
-      <translation>레이아웃 저장중</translation>
-    </message>
-    <message>
-      <source>Stop Saving</source>
-      <translation>저장 중지</translation>
-    </message>
-    <message>
       <source>Saving failed</source>
       <translation>저장 실패</translation>
     </message>
@@ -12095,10 +12102,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
       <translation>내보내기 프로세스를 위해 파일을 준비 중입니다. 몇 초 정도 기다리십시오.</translation>
-    </message>
-    <message>
-      <source>Transcoding is required. Export session restarted.</source>
-      <translation>트랜스 코딩이 필요합니다. 내보내기 세션이 다시 시작되었습니다.</translation>
     </message>
   </context>
   <context>
