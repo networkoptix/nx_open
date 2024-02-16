@@ -154,39 +154,58 @@ endif()
 
 set(appleTeamId "" CACHE STRING "Custom team id for signing a developer build.")
 
-if(NOT appleTeamId)
-    if(IOS)
-        set(identityFromCustomization "${customization.mobile.ios.signIdentity}")
-    else()
-        set(identityFromCustomization "${customization.desktop.macos.signIdentity}")
+if(IOS OR MACOSX)
+    # If appleTeamId is not passed via command line:
+
+    # 1. Figure out sign identity from customization.
+    if(NOT appleTeamId)
+        if(IOS)
+            set(identityFromCustomization "${customization.mobile.ios.signIdentity}")
+        else()
+            set(identityFromCustomization "${customization.desktop.macos.signIdentity}")
+        endif()
+
+        if(identityFromCustomization)
+            string(REGEX REPLACE "^.*\\(([^\\)]+)\\)$" "\\1" appleTeamId "${identityFromCustomization}")
+        endif()
     endif()
 
-    if(identityFromCustomization)
-        string(REGEX REPLACE "^.*\\(([^\\)]+)\\)$" "\\1" appleTeamId "${identityFromCustomization}")
+    # 2. For a developer build try autoselect the identity from Xcode settings - select the first
+    # non-free team id. If no non-free team id is found, select the first encountered free team id.
+    # This is similar to how Qt does the auto selection.
+    if(NOT appleTeamId)
+        if(developerBuild)
+            nx_execute_process_or_fail(
+                COMMAND ${PYTHON_EXECUTABLE} ${open_source_root}/build_utils/macos/team.py
+                    select
+                OUTPUT_VARIABLE appleTeamId
+                OUTPUT_STRIP_TRAILING_WHITESPACE
+                ERROR_MESSAGE
+                    "Cannot determine the developer team id automatically. "
+                    "Please specify it manually via -DappleTeamId"
+            )
+        else()
+            # For non-developer builds avoid autoselection and just fail with an informative
+            # message about invalid customization file.
+            if(IOS)
+                set(missingProperty "customization.mobile.ios.signIdentity")
+            else()
+                set(missingProperty "customization.desktop.macos.signIdentity")
+            endif()
+            message(FATAL_ERROR "Customization file is missing ${missingProperty} property")
+        endif()
     endif()
-endif()
 
-if(NOT appleTeamId)
-    nx_execute_process_or_fail(
-        COMMAND ${PYTHON_EXECUTABLE} ${open_source_root}/build_utils/macos/team.py
-            select
-        OUTPUT_VARIABLE appleTeamId
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-        ERROR_MESSAGE
-            "Cannot determine the developer team id automatically. "
-            "Please specify it manually via -DappleTeamId"
-    )
-endif()
-
-if(developerBuild AND (IOS OR MACOSX))
-    nx_execute_process_or_fail(
-        COMMAND ${PYTHON_EXECUTABLE} ${open_source_root}/build_utils/macos/team.py
-            isfree ${appleTeamId}
-        OUTPUT_VARIABLE appleTeamIdIsFreeString
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-        ERROR_MESSAGE
-            "Cannot determine the developer team ${appleTeamId} capabilities."
-    )
+    if(developerBuild AND IOS)
+        nx_execute_process_or_fail(
+            COMMAND ${PYTHON_EXECUTABLE} ${open_source_root}/build_utils/macos/team.py
+                isfree ${appleTeamId}
+            OUTPUT_VARIABLE appleTeamIdIsFreeString
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+            ERROR_MESSAGE
+                "Cannot determine the developer team ${appleTeamId} capabilities."
+        )
+    endif()
 endif()
 
 if(appleTeamIdIsFreeString STREQUAL "True")
