@@ -104,6 +104,11 @@ struct AccountData
 
     /**%apidoc[readonly] Shows if this account belongs to an organization. */
     std::optional<bool> accountBelongsToOrganization;
+
+    /**%apidoc[readonly] Incremented each time critical security attributes are changed.
+     * E.g., user password was changed, or user has chosen to log out from all devices.
+     */
+    int securitySequence = 0;
 };
 
 struct AccountStatusData
