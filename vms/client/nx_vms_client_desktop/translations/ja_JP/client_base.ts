@@ -8102,7 +8102,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Administrator password</source>
-      <translation>管理者のパスワード</translation>
+      <translation>管理者パスワード</translation>
     </message>
     <message>
       <source>Merge Server to the System</source>
@@ -8188,7 +8188,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Ask your system administrator to do it.</source>
-      <translation>システム管理者に依頼してください</translation>
+      <translation>システム管理者に依頼してください。</translation>
     </message>
     <message>
       <source>Set Password</source>
