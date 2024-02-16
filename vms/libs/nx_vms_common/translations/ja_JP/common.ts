@@ -1296,7 +1296,7 @@
     </message>
     <message>
       <source>SaaS suspended</source>
-      <translation>SaaS は一時停止されました</translation>
+      <translation>SaaS はサスペンドされました</translation>
     </message>
     <message>
       <source>SaaS shut down</source>
