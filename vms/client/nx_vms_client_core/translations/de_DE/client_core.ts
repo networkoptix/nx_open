@@ -137,11 +137,6 @@
       <translation>Die Verbindung zu %1 ist noch nicht bereit. Überprüfen Sie Ihre Internetverbindung oder versuchen Sie es später noch einmal.</translation>
     </message>
     <message>
-      <source>Connection to %1 is not ready yet. Check the server’s internet connection or try again later.</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Die Verbindung zu %1 ist noch nicht bereit. Überprüfen Sie die Internetverbindung des Servers oder versuchen Sie es später erneut.</translation>
-    </message>
-    <message>
       <source>Connection to the server could not be established. Try again later.</source>
       <translation>Die Verbindung zum Server konnte nicht hergestellt werden. Versuchen Sie es später noch einmal.</translation>
     </message>
@@ -172,11 +167,6 @@
       <translation>Zu viele Anmeldeversuche. Versuchen Sie es in einer Minute erneut.</translation>
     </message>
     <message>
-      <source>To log in to this System, disable “Ask for a verification code on every login with your %1 account” in your %2.</source>
-      <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation>Um sich bei diesem System anzumelden, deaktivieren Sie "Bei jeder Anmeldung mit Ihrem %1-Konto nach einem Bestätigungscode fragen" in Ihrem %2.</translation>
-    </message>
-    <message>
       <source>Two-factor authentication is required.</source>
       <translation>Eine Zwei-Faktor-Authentifizierung ist erforderlich.</translation>
     </message>
@@ -196,6 +186,26 @@
     <message>
       <source>Please contact the system administrator to regain access.</source>
       <translation type="unfinished">Please contact the system administrator to regain access.</translation>
+    </message>
+    <message>
+      <source>Connection to %1 is not ready yet. Check the server&apos;s internet connection or try again later.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">Connection to %1 is not ready yet. Check the server&apos;s internet connection or try again later.</translation>
+    </message>
+    <message>
+      <source>Log in as a %1 user to the system in a shutdown state is forbidden. You can still connect as local user.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation type="unfinished">Log in as a %1 user to the system in a shutdown state is forbidden. You can still connect as local user.</translation>
+    </message>
+    <message>
+      <source>Log in as a %1 user to the system in a suspended state is forbidden. You can still connect as local user.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation type="unfinished">Log in as a %1 user to the system in a suspended state is forbidden. You can still connect as local user.</translation>
+    </message>
+    <message>
+      <source>To log in to this System, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</source>
+      <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
+      <translation type="unfinished">To log in to this System, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</translation>
     </message>
   </context>
   <context>

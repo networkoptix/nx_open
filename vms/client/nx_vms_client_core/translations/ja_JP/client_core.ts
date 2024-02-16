@@ -137,11 +137,6 @@
       <translation>%1 への接続はまだ準備ができていません。インターネット接続を確認するか、後でもう一度お試しください。</translation>
     </message>
     <message>
-      <source>Connection to %1 is not ready yet. Check the server’s internet connection or try again later.</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>%1 への接続はまだ準備ができていません。サーバーのインターネット接続を確認するか、後でもう一度お試しください。</translation>
-    </message>
-    <message>
       <source>Connection to the server could not be established. Try again later.</source>
       <translation>サーバーへの接続を確立できませんでした。後でもう一度お試しください。</translation>
     </message>
@@ -172,11 +167,6 @@
       <translation>ログイン試行回数が多すぎます。しばらくしてからもう一度お試しください。</translation>
     </message>
     <message>
-      <source>To log in to this System, disable “Ask for a verification code on every login with your %1 account” in your %2.</source>
-      <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation>このシステムにログインするには、 %2 で「%1 アカウントでログインするたびに確認コードを要求する」を無効にししてください。</translation>
-    </message>
-    <message>
       <source>Two-factor authentication is required.</source>
       <translation>二要素認証が必要です。</translation>
     </message>
@@ -196,6 +186,26 @@
     <message>
       <source>Please contact the system administrator to regain access.</source>
       <translation>アクセスを回復するには、システム管理者に連絡してください。</translation>
+    </message>
+    <message>
+      <source>Connection to %1 is not ready yet. Check the server&apos;s internet connection or try again later.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>%1 への接続はまだ準備ができていません。サーバーのインターネット接続を確認するか、後でもう一度お試しください。</translation>
+    </message>
+    <message>
+      <source>Log in as a %1 user to the system in a shutdown state is forbidden. You can still connect as local user.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>シャットダウン状態のシステムに %1 ユーザーとしてログインすることは禁止されています。ローカルユーザーとしては引き続き接続できます。</translation>
+    </message>
+    <message>
+      <source>Log in as a %1 user to the system in a suspended state is forbidden. You can still connect as local user.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>サスペンド状態のシステムに %1 ユーザーとしてログインすることは禁止されています。ローカルユーザーとしては引き続き接続できます。</translation>
+    </message>
+    <message>
+      <source>To log in to this System, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</source>
+      <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
+      <translation>このシステムにログインするには、 %2 で &quot;%1 アカウントでログインするたびに確認コードを要求する&quot; を無効にしてください。</translation>
     </message>
   </context>
   <context>

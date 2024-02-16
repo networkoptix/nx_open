@@ -462,7 +462,7 @@
     </message>
     <message>
       <source>Suspended</source>
-      <translation>一時停止中</translation>
+      <translation>サスペンド</translation>
     </message>
     <message>
       <source>Shut Down</source>
@@ -2010,11 +2010,11 @@ Alt + クリックでオブジェクトを追跡します。</translation>
     <name>SaasBanner</name>
     <message>
       <source>System has been suspended. To enable/disable the integration usage for current device the System must be in active state. Contact your channel partner for details</source>
-      <translation>システムは一時停止しています。現在のデバイスに対してインテグレーションの使用を有効化/無効化するには、システムがアクティブな状態である必要があります。詳細については、チャネルパートナーにお問い合わせください</translation>
+      <translation>システムはサスペンドしています。現在のデバイスに対してインテグレーションの使用を有効化/無効化するには、システムがアクティブな状態である必要があります。詳細については、チャネルパートナーにお問い合わせください</translation>
     </message>
     <message>
       <source>System has been suspended. To enable/disable the integration usage for some device the System must be in active state. Contact your channel partner for details</source>
-      <translation>システムは一時停止しています。一部のデバイスに対してインテグレーションの使用を有効化/無効化するには、システムがアクティブな状態である必要があります。詳細については、チャネルパートナーにお問い合わせください</translation>
+      <translation>システムはサスペンドしています。一部のデバイスに対してインテグレーションの使用を有効化/無効化するには、システムがアクティブな状態である必要があります。詳細については、チャネルパートナーにお問い合わせください</translation>
     </message>
     <message>
       <source>System has been shut down. To enable this integration usage for current device the System must be in active state. Contact your channel partner for details</source>

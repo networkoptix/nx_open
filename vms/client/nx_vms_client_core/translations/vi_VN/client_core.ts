@@ -137,11 +137,6 @@
       <translation>Kết nối với %1 chưa sẵn sàng. Kiểm tra kết nối mạng hoặc thử lại sau.</translation>
     </message>
     <message>
-      <source>Connection to %1 is not ready yet. Check the server’s internet connection or try again later.</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Kết nối với %1 chưa sẵn sàng. Kiểm tra kết nối mạng của máy chủ hoặc thử lại sau.</translation>
-    </message>
-    <message>
       <source>Connection to the server could not be established. Try again later.</source>
       <translation>Không thể thiết lập kết nối với máy chủ. Thử lại sau.</translation>
     </message>
@@ -172,11 +167,6 @@
       <translation>Quá nhiều lần thử đăng nhập. Hãy thử lại sau một phút.</translation>
     </message>
     <message>
-      <source>To log in to this System, disable “Ask for a verification code on every login with your %1 account” in your %2.</source>
-      <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation>Để đăng nhập vào Hệ thống này, hãy tắt “Yêu cầu mã xác minh trên mỗi lần đăng nhập bằng tài khoản %1” trong %2.</translation>
-    </message>
-    <message>
       <source>Two-factor authentication is required.</source>
       <translation>Yêu cầu xác thực hai yếu tố.</translation>
     </message>
@@ -196,6 +186,26 @@
     <message>
       <source>Please contact the system administrator to regain access.</source>
       <translation>Vui lòng liên hệ với quản trị viên hệ thống để lấy lại quyền truy cập.</translation>
+    </message>
+    <message>
+      <source>Connection to %1 is not ready yet. Check the server&apos;s internet connection or try again later.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Kết nối với %1 chưa sẵn sàng. Hãy kiểm tra kết nối internet của máy chủ hoặc thử lại sau.</translation>
+    </message>
+    <message>
+      <source>Log in as a %1 user to the system in a shutdown state is forbidden. You can still connect as local user.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation type="unfinished">Log in as a %1 user to the system in a shutdown state is forbidden. You can still connect as local user.</translation>
+    </message>
+    <message>
+      <source>Log in as a %1 user to the system in a suspended state is forbidden. You can still connect as local user.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation type="unfinished">Log in as a %1 user to the system in a suspended state is forbidden. You can still connect as local user.</translation>
+    </message>
+    <message>
+      <source>To log in to this System, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</source>
+      <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
+      <translation>Để đăng nhập vào Hệ thống này, hãy tắt &quot;Yêu cầu mã xác minh mỗi lần đăng nhập bằng tài khoản %1&quot; trong %2 của bạn.</translation>
     </message>
   </context>
   <context>

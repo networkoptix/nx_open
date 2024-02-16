@@ -6865,6 +6865,33 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
   </context>
   <context>
+    <name>nx</name>
+    <message>
+      <source>Saving layout</source>
+      <translation>Salvando layout</translation>
+    </message>
+    <message>
+      <source>Exporting video</source>
+      <translation>A Exportar vídeo</translation>
+    </message>
+    <message>
+      <source>Stop Saving</source>
+      <translation>Parar de salvar</translation>
+    </message>
+    <message>
+      <source>Stop Export</source>
+      <translation>Parar Exportação</translation>
+    </message>
+    <message>
+      <source>Transcoding is required. Export session restarted.</source>
+      <translation>A transcodificação é necessária. Sessão de exportação reiniciada.</translation>
+    </message>
+    <message>
+      <source>Minimize</source>
+      <translation>Minimizar</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::AbstractPreferencesDialog</name>
     <message>
       <source>OK</source>
@@ -9540,12 +9567,12 @@ Remember to return the Logging Level to its default setting after you have colle
       <translation type="unfinished">Default Logging level</translation>
     </message>
     <message>
-      <source>Non-default Logging level. We recommend setting it to “info”</source>
-      <translation type="unfinished">Non-default Logging level. We recommend setting it to “info”</translation>
-    </message>
-    <message>
       <source>Logging level degrades the performance of the system</source>
       <translation type="unfinished">Logging level degrades the performance of the system</translation>
+    </message>
+    <message>
+      <source>Non-default Logging level. We recommend setting it to &quot;info&quot;</source>
+      <translation type="unfinished">Non-default Logging level. We recommend setting it to &quot;info&quot;</translation>
     </message>
   </context>
   <context>
@@ -12205,18 +12232,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       </translation>
     </message>
     <message>
-      <source>Exporting video</source>
-      <translation>A Exportar vídeo</translation>
-    </message>
-    <message>
-      <source>Stop Export</source>
-      <translation>Parar Exportação</translation>
-    </message>
-    <message>
-      <source>Minimize</source>
-      <translation>Minimizar</translation>
-    </message>
-    <message>
       <source>Cannot write file</source>
       <translation>Não é possível escrever no ficheiro</translation>
     </message>
@@ -12254,14 +12269,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <translation>Iniciando exportação...</translation>
     </message>
     <message>
-      <source>Saving layout</source>
-      <translation>Salvando layout</translation>
-    </message>
-    <message>
-      <source>Stop Saving</source>
-      <translation>Parar de salvar</translation>
-    </message>
-    <message>
       <source>Saving failed</source>
       <translation>Falha ao salvar</translation>
     </message>
@@ -12272,10 +12279,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
       <translation>Estamos preparando arquivos para o processo de exportação. Por favor, aguarde alguns segundos.</translation>
-    </message>
-    <message>
-      <source>Transcoding is required. Export session restarted.</source>
-      <translation>A transcodificação é necessária. Sessão de exportação reiniciada.</translation>
     </message>
   </context>
   <context>

@@ -6865,6 +6865,33 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     </message>
   </context>
   <context>
+    <name>nx</name>
+    <message>
+      <source>Saving layout</source>
+      <translation>Spara layout</translation>
+    </message>
+    <message>
+      <source>Exporting video</source>
+      <translation>Exportera video</translation>
+    </message>
+    <message>
+      <source>Stop Saving</source>
+      <translation>Sluta spara</translation>
+    </message>
+    <message>
+      <source>Stop Export</source>
+      <translation>Stoppa export</translation>
+    </message>
+    <message>
+      <source>Transcoding is required. Export session restarted.</source>
+      <translation>Omkodning krävs. Exportera sessionen startas om.</translation>
+    </message>
+    <message>
+      <source>Minimize</source>
+      <translation>Minimera</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::AbstractPreferencesDialog</name>
     <message>
       <source>OK</source>
@@ -9540,12 +9567,12 @@ Kom ihåg att återställa loggningsnivån till standardinställningen efter att
       <translation>Standard Loggningsnivå</translation>
     </message>
     <message>
-      <source>Non-default Logging level. We recommend setting it to “info”</source>
-      <translation>Loggningsnivå som inte är standard. Vi rekommenderar att du ställer in den till ”info”</translation>
-    </message>
-    <message>
       <source>Logging level degrades the performance of the system</source>
       <translation>Loggningsnivån försämrar systemets prestanda</translation>
+    </message>
+    <message>
+      <source>Non-default Logging level. We recommend setting it to &quot;info&quot;</source>
+      <translation>Loggningsnivå som inte är standard. Vi rekommenderar att du ställer in den till &quot;info&quot;</translation>
     </message>
   </context>
   <context>
@@ -12204,18 +12231,6 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
       </translation>
     </message>
     <message>
-      <source>Exporting video</source>
-      <translation>Exportera video</translation>
-    </message>
-    <message>
-      <source>Stop Export</source>
-      <translation>Stoppa export</translation>
-    </message>
-    <message>
-      <source>Minimize</source>
-      <translation>Minimera</translation>
-    </message>
-    <message>
       <source>Cannot write file</source>
       <translation>Kan inte skriva filen</translation>
     </message>
@@ -12253,14 +12268,6 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
       <translation>Börjar exportera...</translation>
     </message>
     <message>
-      <source>Saving layout</source>
-      <translation>Spara layout</translation>
-    </message>
-    <message>
-      <source>Stop Saving</source>
-      <translation>Sluta spara</translation>
-    </message>
-    <message>
       <source>Saving failed</source>
       <translation>Misslyckades att spara</translation>
     </message>
@@ -12271,10 +12278,6 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
       <translation>Vi förbereder filer för exportprocessen. Vänta några sekunder.</translation>
-    </message>
-    <message>
-      <source>Transcoding is required. Export session restarted.</source>
-      <translation>Omkodning krävs. Exportera sessionen startas om.</translation>
     </message>
   </context>
   <context>
