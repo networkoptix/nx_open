@@ -153,7 +153,11 @@ struct CloudLayoutsManager::Private
 
     void ensureUser()
     {
-        NX_ASSERT(!user && cloudStatusWatcher);
+        if (user)
+            return;
+
+        if (!NX_ASSERT(cloudStatusWatcher))
+            return;
 
         user = QnUserResourcePtr(new QnUserResource(nx::vms::api::UserType::cloud));
         user->setIdUnsafe(QnUuid::createUuid());
