@@ -2926,7 +2926,7 @@
     </message>
     <message>
       <source>Rule will work only for prolonged events</source>
-      <translation>ルールは延長イベントのみ適用</translation>
+      <translation>ルールは期間が定義されるイベントでのみ機能します</translation>
     </message>
   </context>
   <context>
