@@ -210,7 +210,7 @@
     </message>
     <message>
       <source>Save Current Layout As...</source>
-      <translation>名前を付けてレイアウトを保存...</translation>
+      <translation>現在のレイアウトに名前を付けて保存...</translation>
     </message>
     <message>
       <source>Save Video Wall View</source>
@@ -409,7 +409,7 @@
     </message>
     <message>
       <source>Load Matrix</source>
-      <translation>マトリックスのロード</translation>
+      <translation>マトリックスをロード</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -509,7 +509,7 @@
     </message>
     <message>
       <source>Set as Layout Background</source>
-      <translation>レイアウト背景として保存</translation>
+      <translation>レイアウト背景として設定</translation>
     </message>
     <message>
       <source>User Settings...</source>
@@ -4651,7 +4651,7 @@ to %1</source>
     <name>QnResourceItemDelegate</name>
     <message>
       <source>Health Monitor</source>
-      <translation>ヘルスモニタ</translation>
+      <translation>ヘルスモニター</translation>
     </message>
   </context>
   <context>
@@ -6053,7 +6053,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>QnWorkbenchController</name>
     <message>
       <source>To switch between cameras press Shift + Arrow</source>
-      <translation>カメラを切り替えるには、Shift +矢印を押します</translation>
+      <translation>カメラを切り替えるには、Shift + 矢印キーを押してください</translation>
     </message>
   </context>
   <context>
@@ -9959,7 +9959,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Health Monitor</source>
-      <translation>ヘルスモニタ</translation>
+      <translation>ヘルスモニター</translation>
     </message>
   </context>
   <context>

@@ -1592,7 +1592,7 @@
     </message>
     <message>
       <source>Crop to monitor aspect ratio</source>
-      <translation>モニターのアスペクト比に合わせる</translation>
+      <translation>モニターのアスペクト比に合わせてトリミング</translation>
     </message>
   </context>
   <context>
