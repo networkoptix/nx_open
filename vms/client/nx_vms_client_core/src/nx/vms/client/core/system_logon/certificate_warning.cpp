@@ -34,7 +34,14 @@ QString CertificateWarning::header(
                 .arg(nx::utils::elideString(helpers::getSystemName(info), kMaxDisplayNameLength));
         case Reason::invalidCertificate:
         case Reason::serverCertificateChanged:
+        {
+            if (numberOfServers == 1)
+            {
+                return tr("Cannot verify the identity of %1")
+                    .arg(utils::elideString(info.name, kMaxDisplayNameLength));
+            }
             return tr("Cannot verify the identity of %n servers", "", numberOfServers);
+        }
         default:
             NX_ASSERT(false, "Unreachable");
             return {};
