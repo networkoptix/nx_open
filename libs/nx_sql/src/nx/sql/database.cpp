@@ -22,4 +22,10 @@ void Database::removeDatabase(const QString& connectionName)
     QSqlDatabase::removeDatabase(connectionName);
 }
 
+bool Database::openDatabase(QSqlDatabase* database)
+{
+    NX_MUTEX_LOCKER lock(&mutex());
+    return database->open();
+}
+
 } // namespace nx::sql
