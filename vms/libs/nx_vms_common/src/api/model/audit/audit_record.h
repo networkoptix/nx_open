@@ -40,6 +40,11 @@ struct NX_VMS_COMMON_API QnLegacyAuditRecord
 
     QnAuthSession authSession;
 
+    QnLegacyAuditRecord(QnAuthSession authSession = nx::Uuid{}):
+        authSession(std::move(authSession))
+    {
+    }
+
     explicit operator QnAuditRecord() const;
 };
 #define QnLegacyAuditRecord_Fields \
@@ -66,6 +71,8 @@ struct NX_VMS_COMMON_API QnAuditRecord
 
     /**%apidoc Detailed information about what's happened. */
     AllAuditDetails::type details = nullptr;
+
+    QnAuditRecord(QnAuthSession authSession): authSession(std::move(authSession)) {}
 
     template<typename T>
     T* get()
@@ -101,7 +108,6 @@ NX_REFLECTION_INSTRUMENT(QnAuditRecord, QnAuditRecord_Fields)
 
 struct NX_VMS_COMMON_API QnAuditRecordModel: QnAuditRecord
 {
-    QnAuditRecordModel() = default;
     QnAuditRecordModel(const QnAuditRecord& record);
 
     void setRangeStartSec(int value);

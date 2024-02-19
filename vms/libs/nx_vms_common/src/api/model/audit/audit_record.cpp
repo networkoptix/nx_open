@@ -274,10 +274,9 @@ QnLegacyAuditRecord::operator QnAuditRecord() const
     return visitAllConversions(
         [this](auto&&... items)
         {
-            ::QnAuditRecord record;
+            QnAuditRecord record(authSession);
             record.eventType = static_cast<nx::vms::api::AuditRecordType>(eventType);
             record.createdTimeS = std::chrono::seconds(createdTimeSec);
-            record.authSession = authSession;
             switchByRecordType(record.eventType,
                 [this, &record](auto&& conversion)
                 {
@@ -341,10 +340,9 @@ QnAuditRecord::operator QnLegacyAuditRecord() const
     return visitAllConversions(
         [this](auto&&... items)
         {
-            QnLegacyAuditRecord record;
+            QnLegacyAuditRecord record(authSession);
             record.eventType = static_cast<Qn::LegacyAuditRecordType>(eventType);
             record.createdTimeSec = createdTimeS.count();
-            record.authSession = authSession;
             switchByRecordType(eventType,
                 [this, &record](auto&& conversion)
                 {
@@ -355,11 +353,11 @@ QnAuditRecord::operator QnLegacyAuditRecord() const
         });
 }
 
-QnAuditRecord QnAuditRecord::prepareRecord(nx::vms::api::AuditRecordType type, const QnAuthSession& authInfo)
+QnAuditRecord QnAuditRecord::prepareRecord(
+    nx::vms::api::AuditRecordType type, const QnAuthSession& authSession)
 {
-    QnAuditRecord result;
+    QnAuditRecord result(authSession);
     result.eventType = type;
-    result.authSession = authInfo;
     result.createdTimeS = std::chrono::seconds(qnSyncTime->currentMSecsSinceEpoch() / 1000);
     return result;
 }

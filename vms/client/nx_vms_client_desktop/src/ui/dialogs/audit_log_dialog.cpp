@@ -985,20 +985,24 @@ void QnAuditLogDialog::makeSessionData()
 void QnAuditLogDialog::makeCameraData()
 {
     m_cameraData.clear();
-    QMap<nx::Uuid, int> activityPerCamera;
+    QMap<nx::Uuid, std::pair<int, const QnAuthSession*>> activityPerCamera;
     for (const QnLegacyAuditRecord& record: m_allData)
     {
         if (record.isPlaybackType() || record.isCameraType())
         {
             for (const nx::Uuid& cameraId: record.resources)
-                activityPerCamera[cameraId]++;
+            {
+                auto& [count, session] = activityPerCamera[cameraId];
+                ++count;
+                session = &record.authSession;
+            }
         }
     }
     for (auto itr = activityPerCamera.begin(); itr != activityPerCamera.end(); ++itr)
     {
-        QnLegacyAuditRecord cameraRecord;
+        QnLegacyAuditRecord cameraRecord{*itr.value().second};
         cameraRecord.resources.push_back(itr.key());
-        cameraRecord.addParam(QnAuditLogModel::ChildCntParamName, QByteArray::number(itr.value())); // used for "user activity" column
+        cameraRecord.addParam(QnAuditLogModel::ChildCntParamName, QByteArray::number(itr.value().first)); // used for "user activity" column
         cameraRecord.addParam(QnAuditLogModel::CheckedParamName, "1");
         m_cameraData.push_back(cameraRecord);
     }
