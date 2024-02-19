@@ -216,89 +216,54 @@ TEST(debug, disabledTime)
     NX_TIME_END(testTag);
 }
 
-/**
- * Call pathSeparator(), converting its argument to use platform-dependent
- * slashes, and its result to use forward slashes.
- * @param file Path with either back or forward slashes.
- */
-static std::string relativeSrcFilenameTest(const std::string& file)
+TEST(debug, normalizePathToSlashes)
 {
-    ASSERT_TRUE(pathSeparator() != '\0');
-
-    std::string platformDependentFile = file;
-    std::replace(platformDependentFile.begin(), platformDependentFile.end(),
-        '/', pathSeparator());
-
-    const char* const filePtr = platformDependentFile.c_str();
-    const char* r = relativeSrcFilename(filePtr);
-
-    // Test that the returned pointer points inside the string supplied to the function.
-    bool pointsInside = false;
-    for (const char* p = filePtr; *p != '\0'; ++p)
-    {
-        if (p == r)
+    const auto testEqual =
+        [](const char* s)
         {
-            pointsInside = true;
-            break;
-        }
-    }
-    ASSERT_TRUE(pointsInside);
-
-    std::string result = r;
-    std::replace(result.begin(), result.end(), pathSeparator(), '/');
-    return result;
-}
-
-static bool stringEndsWithSuffix(const std::string& str, const std::string& suffix)
-{
-    if (str.length() < suffix.length())
-        return false;
-    return (str.compare(str.length() - suffix.length(), suffix.length(), suffix) == 0);
-}
-
-static std::string thisFileFolder()
-{
-    ASSERT_TRUE(pathSeparator() != '\0');
-    const char* const file = __FILE__;
-    const char* const separator2 = strrchr(file, pathSeparator());
-    ASSERT_TRUE(separator2 != nullptr);
-    const char* afterSeparator1 = separator2;
-    while (afterSeparator1 > file && *(afterSeparator1 - 1) != pathSeparator())
-        --afterSeparator1;
-    // afterSeparator1 points after the previous separator or at the beginning of file.
-    return std::string(afterSeparator1, separator2 - afterSeparator1);
-}
-
-static std::string thisFileExt()
-{
-    const char* const dot = strrchr(__FILE__, '.');
-    if (!dot)
-        return "";
-    else
-        return std::string(dot + 1);
+            ASSERT_EQ(s, normalizePathToSlashes(s));
+        };
+    
+    testEqual("");
+    testEqual("abc");
+    testEqual("/");
+    testEqual("a/");
+    testEqual("/a");
+    testEqual("a/b");
+    testEqual("a//c");
+    
+    #if defined(_WIN32)
+        ASSERT_EQ("a/b", normalizePathToSlashes("a\\b"));
+        ASSERT_EQ("/b", normalizePathToSlashes("\\b"));
+        ASSERT_EQ("a/", normalizePathToSlashes("a\\"));
+        ASSERT_EQ("0/a/b/c", normalizePathToSlashes("0/a\\b\\c"));
+    #else
+        testEqual("a\\b");
+        testEqual("\\b");
+        testEqual("a\\");
+        testEqual("0/a\\b\\c");
+    #endif
 }
 
 TEST(debug, relativeSrcFilename)
 {
     static const std::string kIrrelevantPath = "irrelevant/path/and/file.cpp";
-    ASSERT_EQ(kIrrelevantPath, relativeSrcFilenameTest(kIrrelevantPath));
+    ASSERT_EQ(kIrrelevantPath, relativeSrcFilename(kIrrelevantPath));
 
     static const std::string kAnyEnding = "nx/any/ending/file.cpp";
-    ASSERT_EQ(kAnyEnding, relativeSrcFilenameTest("/any/starting/src/" + kAnyEnding));
+    ASSERT_EQ(kAnyEnding, relativeSrcFilename("/any/starting/src/" + kAnyEnding));
 
     // debug.cpp: <commonPrefix>src/nx/kit/debug.cpp
     // __FILE__:  <commonPrefix>unit_tests/src/debug_ut.cpp
     //            <commonPrefix>toBeOmitted/dir/file.cpp
 
-    std::string thisFile = __FILE__;
-    std::replace(thisFile.begin(), thisFile.end(), pathSeparator(), '/');
-
-    static const std::string suffix =
-        thisFileFolder() + "/" + fileBaseNameWithoutExt(__FILE__) + "." + thisFileExt();
-    ASSERT_TRUE(stringEndsWithSuffix(thisFile, suffix));
+    const std::string thisFile = normalizePathToSlashes(__FILE__);
+    
+    static const std::string suffix = "src/debug_ut.cpp";
+    ASSERT_EQ(suffix, thisFile.substr(thisFile.size() - suffix.size(), suffix.size()));
 
     const std::string commonPrefix = std::string(thisFile, 0, thisFile.size() - suffix.size());
-    ASSERT_EQ("dir/file.cpp", relativeSrcFilenameTest(commonPrefix + "dir/file.cpp"));
+    ASSERT_EQ("dir/file.cpp", relativeSrcFilename(commonPrefix + "dir/file.cpp"));
 }
 
 } // namespace test

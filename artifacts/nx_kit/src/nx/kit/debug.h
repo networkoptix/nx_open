@@ -28,18 +28,17 @@ namespace debug {
 //-------------------------------------------------------------------------------------------------
 // Tools
 
-/** @return Separator in __FILE__ - slash or backslash, or '\0' if unknown. Cached in static. */
-NX_KIT_API char pathSeparator();
-
 NX_KIT_API size_t commonPrefixSize(const std::string& s1, const std::string& s2);
 
 /**
  * Extracts part of the source code filename which follows the uninteresting common part.
- * @return Pointer to some char inside the given string.
  */
-NX_KIT_API const char* relativeSrcFilename(const char* file);
+NX_KIT_API std::string relativeSrcFilename(const std::string& file);
 
 NX_KIT_API std::string fileBaseNameWithoutExt(const char* file);
+
+/** On Windows, replace backslashes with slashes. On other OSes, do nothing. */
+NX_KIT_API std::string normalizePathToSlashes(std::string path);
 
 //-------------------------------------------------------------------------------------------------
 // Output
