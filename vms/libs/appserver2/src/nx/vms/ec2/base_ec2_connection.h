@@ -463,7 +463,7 @@ int BaseEc2Connection<QueryProcessorType>::dumpDatabase(
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
     const int requestId = generateRequestID();
-    m_queryProcessor->getAccess(Qn::kSystemAccess)
+    m_queryProcessor->getAccess(Qn::kSystemSession)
         .template processQueryAsync<std::nullptr_t, nx::vms::api::DatabaseDumpData>(
             ApiCommand::dumpDatabase,
             nullptr,
@@ -485,7 +485,7 @@ int BaseEc2Connection<QueryProcessorType>::dumpDatabaseToFile(
     dumpFilePathData.path = dumpFilePath;
 
     const int requestId = generateRequestID();
-    m_queryProcessor->getAccess(Qn::kSystemAccess)
+    m_queryProcessor->getAccess(Qn::kSystemSession)
         .template processQueryAsync<
             nx::vms::api::StoredFilePath, nx::vms::api::DatabaseDumpToFileData>(
                 ApiCommand::dumpDatabaseToFile,
@@ -505,7 +505,7 @@ int BaseEc2Connection<QueryProcessorType>::restoreDatabase(
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
     const int requestId = generateRequestID();
-    m_queryProcessor->getAccess(Qn::kSystemAccess).processUpdateAsync(
+    m_queryProcessor->getAccess(Qn::kSystemSession).processUpdateAsync(
         ApiCommand::restoreDatabase,
         data,
         [requestId, handler = handlerExecutor.bind(std::move(handler))](auto&&... args) mutable

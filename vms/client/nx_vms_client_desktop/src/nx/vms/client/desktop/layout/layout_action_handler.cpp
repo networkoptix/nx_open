@@ -1260,7 +1260,7 @@ void LayoutActionHandler::at_openIntercomLayoutAction_triggered()
 
     if (const auto connection = system()->messageBusConnection())
     {
-        const auto manager = connection->getEventRulesManager(Qn::kSystemAccess);
+        const auto manager = connection->getEventRulesManager(Qn::kSystemSession);
         nx::vms::api::EventActionData actionData;
         ec2::fromResourceToApi(broadcastAction, actionData);
         manager->broadcastEventAction(actionData, [](int /*handle*/, ec2::ErrorCode) {});

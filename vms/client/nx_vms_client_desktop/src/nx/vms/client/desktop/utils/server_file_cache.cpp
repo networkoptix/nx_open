@@ -118,7 +118,7 @@ void ServerFileCache::getFileList() {
 
     // FIXME: #sivanov Replace calls using connectedServerApi()
     auto connection = systemContext()->session()->messageBusConnection();
-    connection->getStoredFileManager(Qn::kSystemAccess)->listDirectory(
+    connection->getStoredFileManager(Qn::kSystemSession)->listDirectory(
         m_folderName,
         [this](int /*requestId*/, ec2::ErrorCode errorCode, const QStringList& filenames)
         {
@@ -156,7 +156,7 @@ void ServerFileCache::downloadFile(const QString &filename) {
       return;
 
     auto connection = systemContext()->session()->messageBusConnection();
-    int handle = connection->getStoredFileManager(Qn::kSystemAccess)->getStoredFile(
+    int handle = connection->getStoredFileManager(Qn::kSystemSession)->getStoredFile(
         m_folderName + QLatin1Char('/') + filename,
         [this](int requestId, ec2::ErrorCode errorCode, const QByteArray& fileData)
         {
@@ -219,7 +219,7 @@ void ServerFileCache::uploadFile(const QString &filename) {
     file.close();
 
     auto connection = systemContext()->session()->messageBusConnection();
-    int handle = connection->getStoredFileManager(Qn::kSystemAccess)->addStoredFile(
+    int handle = connection->getStoredFileManager(Qn::kSystemSession)->addStoredFile(
         m_folderName + QLatin1Char('/') + filename,
         data,
         [this](int requestId, ec2::ErrorCode errorCode)
@@ -271,7 +271,7 @@ void ServerFileCache::deleteFile(const QString &filename) {
       return;
 
     auto connection = systemContext()->session()->messageBusConnection();
-    int handle = connection->getStoredFileManager(Qn::kSystemAccess)->deleteStoredFile(
+    int handle = connection->getStoredFileManager(Qn::kSystemSession)->deleteStoredFile(
         m_folderName + QLatin1Char('/') + filename,
         [this](int requestId, ec2::ErrorCode errorCode)
         {

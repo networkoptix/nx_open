@@ -109,7 +109,7 @@ void OrphanCameraWatcher::update()
 
     for (const nx::Uuid& CameraId: longlivedOrphanCameras)
     {
-        ec2::AbstractCameraManagerPtr cameraManagerPtr = connectionPtr->getCameraManager(Qn::kSystemAccess);
+        ec2::AbstractCameraManagerPtr cameraManagerPtr = connectionPtr->getCameraManager(Qn::kSystemSession);
         cameraManagerPtr->remove(CameraId, [](int /*requestId*/, ec2::ErrorCode) {});
         currentOrphanCameras.erase(CameraId);
     }

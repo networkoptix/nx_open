@@ -217,7 +217,7 @@ void ResourcesChangesManager::saveCamerasBatch(const QnVirtualCameraResourceList
     for (const auto& camera: cameras)
         changes.push_back(camera->getUserAttributes());
 
-    connection->getCameraManager(Qn::kSystemAccess)->saveUserAttributes(changes, handler, this);
+    connection->getCameraManager(Qn::kSystemSession)->saveUserAttributes(changes, handler, this);
 
     // TODO: #sivanov Values are not rolled back in case of failure.
     auto idList = idListFromResList(cameras);
@@ -278,7 +278,7 @@ void ResourcesChangesManager::saveCamerasCore(
 
     nx::vms::api::CameraDataList apiCameras;
     ec2::fromResourceListToApi(cameras, apiCameras);
-    connection->getCameraManager(Qn::kSystemAccess)->addCameras(apiCameras, handler, this);
+    connection->getCameraManager(Qn::kSystemSession)->addCameras(apiCameras, handler, this);
 }
 
 // Descendant of nx::vms::api::ServerModel structure that serializes partially to be used as body
@@ -378,7 +378,7 @@ void ResourcesChangesManager::saveVideoWall(
     nx::vms::api::VideowallData apiVideowall;
     ec2::fromResourceToApi(videoWall, apiVideowall);
 
-    connection->getVideowallManager(Qn::kSystemAccess)->save(apiVideowall, handler, this);
+    connection->getVideowallManager(Qn::kSystemSession)->save(apiVideowall, handler, this);
 }
 
 void ResourcesChangesManager::saveWebPage(
@@ -415,7 +415,7 @@ void ResourcesChangesManager::saveWebPage(
 
     nx::vms::api::WebPageData apiWebpage;
     ec2::fromResourceToApi(webPage, apiWebpage);
-    connection->getWebPageManager(Qn::kSystemAccess)->save(apiWebpage, handler, this);
+    connection->getWebPageManager(Qn::kSystemSession)->save(apiWebpage, handler, this);
 }
 
 } // namespace nx::vms::client::desktop

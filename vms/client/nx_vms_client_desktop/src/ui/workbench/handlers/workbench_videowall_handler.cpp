@@ -738,7 +738,7 @@ void QnWorkbenchVideoWallHandler::sendMessage(const QnVideoWallControlMessage& m
     if (!NX_ASSERT(connection))
         return;
 
-    auto videoWallManager = connection->getVideowallManager(Qn::kSystemAccess);
+    auto videoWallManager = connection->getVideowallManager(Qn::kSystemSession);
 
     if (cached)
     {
@@ -1695,7 +1695,7 @@ void QnWorkbenchVideoWallHandler::at_stopVideoWallAction_triggered()
     if (!NX_ASSERT(connection))
         return;
 
-    auto videoWallManager = connection->getVideowallManager(Qn::kSystemAccess);
+    auto videoWallManager = connection->getVideowallManager(Qn::kSystemSession);
 
     auto videoWall = menu()->currentParameters(sender()).resource().dynamicCast<QnVideoWallResource>();
     if (videoWall.isNull())
@@ -1813,7 +1813,7 @@ void QnWorkbenchVideoWallHandler::at_identifyVideoWallAction_triggered()
     if (!NX_ASSERT(connection))
         return;
 
-    auto videoWallManager = connection->getVideowallManager(Qn::kSystemAccess);
+    auto videoWallManager = connection->getVideowallManager(Qn::kSystemSession);
 
     const auto parameters = menu()->currentParameters(sender());
 
@@ -3072,7 +3072,7 @@ bool QnWorkbenchVideoWallHandler::saveReviewLayout(
     if (!NX_ASSERT(connection))
         return false;
 
-    auto videoWallManager = connection->getVideowallManager(Qn::kSystemAccess);
+    auto videoWallManager = connection->getVideowallManager(Qn::kSystemSession);
 
     QSet<QnVideoWallResourcePtr> videowalls;
     for (QnWorkbenchItem* workbenchItem : layout->items())
