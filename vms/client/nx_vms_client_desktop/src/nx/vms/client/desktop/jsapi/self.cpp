@@ -20,7 +20,8 @@ public:
     Private(Self* q, QnWorkbenchItem* item):
         CurrentSystemContextAware(item->layout()->windowContext()),
         q(q),
-        m_item(item)
+        m_item(item),
+        m_tab(std::make_unique<Tab>(windowContext(), item->layout()))
     {
     }
 
@@ -43,9 +44,12 @@ public:
 
     /** @} */ // group self
 
+    Tab* tab() const { return m_tab.get(); }
+
 private:
     Self* const q = nullptr;
     QnWorkbenchItem* const m_item = nullptr;
+    std::unique_ptr<Tab> m_tab;
 };
 
 Error Self::Private::setMinimalInterfaceMode(bool value)
@@ -96,6 +100,11 @@ QJsonObject Self::setMinimalInterfaceMode(bool value)
 QJsonObject Self::setPreventDefaultContextMenu(bool value)
 {
     return detail::toJsonObject(d->setPreventDefaultContextMenu(value));
+}
+
+Tab* Self::tab() const
+{
+    return d->tab();
 }
 
 } // namespace nx::vms::client::desktop::jsapi

@@ -16,6 +16,7 @@ The API consist of some global objects injected to the client JavaScript code. T
 | @ref vms           | Contains global constants.                                    |
 | @ref vms-log       | Allows to log messages using the standard VMS logging system. |
 | @ref vms-resources | Object for the Resource management purposes.                  |
+| @ref vms-tabs      | Contains methods to work with multiple tabs.                  |
 | @ref vms-tab       | Objects for the currently opened tab management.              |
 | @ref vms-self      | Contains methods to control the current web-page widget.      |
 | @ref vms-auth      | Allows to get the authentication data.                        |
@@ -46,6 +47,7 @@ The API supports **signals**. These objects are used like event handlers and hav
 @defgroup vms vms
 @defgroup vms-log vms.log
 @defgroup vms-resources vms.resources
+@defgroup vms-tabs vms.tabs
 @defgroup vms-tab vms.tab
 @defgroup vms-self vms.self
 @defgroup vms-auth vms.auth

@@ -82,6 +82,9 @@ public:
     /** Saves the Layout. */
     Error saveLayout();
 
+    /** @private */
+    QnWorkbenchLayout* layout() const;
+
 signals:
     void itemAdded(const Item& item);
     void itemRemoved(const nx::Uuid& itemId);

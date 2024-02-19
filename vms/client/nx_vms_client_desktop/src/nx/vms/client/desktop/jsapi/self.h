@@ -7,6 +7,8 @@
 
 #include <nx/utils/impl_ptr.h>
 
+#include "tab.h"
+
 class QnWorkbenchItem;
 
 namespace nx::vms::client::desktop { class WindowContext; }
@@ -21,6 +23,12 @@ class Self: public QObject
 {
     Q_OBJECT
 
+    /**
+     * @ingroup vms-self
+     * Tab that contains current web page.
+     */
+    Q_PROPERTY(Tab* tab READ tab CONSTANT)
+
 public:
     Self(QnWorkbenchItem* item, QObject* parent = nullptr);
     virtual ~Self() override;
@@ -30,6 +38,8 @@ public:
 
     /** Prevent showing default context menu. */
     Q_INVOKABLE QJsonObject setPreventDefaultContextMenu(bool value);
+
+    Tab* tab() const;
 
 private:
     class Private;
