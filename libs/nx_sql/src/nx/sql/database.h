@@ -19,6 +19,8 @@ public:
     static QSqlDatabase addDatabase(const QString& type, const QString& connectionName);
 
     static void removeDatabase(const QString& connectionName);
+
+    static bool openDatabase(QSqlDatabase* database);
 };
 
 } // namespace nx::sql
