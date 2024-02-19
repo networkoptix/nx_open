@@ -163,6 +163,9 @@ public:
     Property<std::map<QString, QString>> webPageIcons{this, "webPageIcons", {},
         "Web Page icon paths."};
 
+    Property<bool> showTimestampOnLiveCamera{this, "showTimestampOnLiveCamera", false,
+        "Show timestamp on live cameras (instead of text \"LIVE\")."};
+
 public:
     void migrateOldSettings();
     void setDefaults();

@@ -47,6 +47,7 @@ private:
     int selectedTourCycleTimeMs() const;
     Qn::ImageBehavior selectedImageMode() const;
     bool isPtzAimOverlayEnabled() const;
+    bool isShowTimestampOnLiveCameraEnabled() const;
 
 private:
     QScopedPointer<Ui::LookAndFeelPreferencesWidget> ui;

@@ -84,6 +84,9 @@ QnLookAndFeelPreferencesWidget::QnLookAndFeelPreferencesWidget(QWidget *parent) 
 
     connect(ui->usePtzAimOverlayCheckBox, &QCheckBox::clicked,
         this, &QnAbstractPreferencesWidget::hasChangesChanged);
+
+    connect(ui->showTimestampInsteadOnLiveCameraCheckBox, &QCheckBox::clicked,
+        this, &QnAbstractPreferencesWidget::hasChangesChanged);
 }
 
 QnLookAndFeelPreferencesWidget::~QnLookAndFeelPreferencesWidget()
@@ -97,6 +100,7 @@ void QnLookAndFeelPreferencesWidget::applyChanges()
     appContext()->localSettings()->timeMode = selectedTimeMode();
     appContext()->localSettings()->locale = selectedTranslation();
     appContext()->localSettings()->ptzAimOverlayEnabled = isPtzAimOverlayEnabled();
+    appContext()->localSettings()->showTimestampOnLiveCamera = isShowTimestampOnLiveCameraEnabled();
 
     /* Background changes are applied instantly. */
     if (backgroundAllowed())
@@ -115,6 +119,9 @@ void QnLookAndFeelPreferencesWidget::loadDataToUi()
 
     ui->usePtzAimOverlayCheckBox->setChecked(
         appContext()->localSettings()->ptzAimOverlayEnabled());
+
+    ui->showTimestampInsteadOnLiveCameraCheckBox->setChecked(
+        appContext()->localSettings()->showTimestampOnLiveCamera());
 
     int defaultLanguageIndex = -1;
     int currentLanguage = -1;
@@ -167,7 +174,9 @@ bool QnLookAndFeelPreferencesWidget::hasChanges() const
         || appContext()->localSettings()->timeMode() != selectedTimeMode()
         || appContext()->localSettings()->resourceInfoLevel() != selectedInfoLevel()
         || appContext()->localSettings()->tourCycleTimeMs() != selectedTourCycleTimeMs()
-        || appContext()->localSettings()->ptzAimOverlayEnabled() != isPtzAimOverlayEnabled();
+        || appContext()->localSettings()->ptzAimOverlayEnabled() != isPtzAimOverlayEnabled()
+        || (appContext()->localSettings()->showTimestampOnLiveCamera()
+            != isShowTimestampOnLiveCameraEnabled());
 }
 
 
@@ -274,6 +283,11 @@ Qn::ResourceInfoLevel QnLookAndFeelPreferencesWidget::selectedInfoLevel() const
 bool QnLookAndFeelPreferencesWidget::isPtzAimOverlayEnabled() const
 {
     return ui->usePtzAimOverlayCheckBox->isChecked();
+}
+
+bool QnLookAndFeelPreferencesWidget::isShowTimestampOnLiveCameraEnabled() const
+{
+    return ui->showTimestampInsteadOnLiveCameraCheckBox->isChecked();
 }
 
 int QnLookAndFeelPreferencesWidget::selectedTourCycleTimeMs() const
