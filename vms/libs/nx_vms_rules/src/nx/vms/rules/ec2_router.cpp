@@ -76,7 +76,7 @@ void Ec2Router::routeEvent(
 
         if (nx::vms::rules::ini().fullSupport)
         {
-            messageBusConnection()->getVmsRulesManager(Qn::kSystemAccess)
+            messageBusConnection()->getVmsRulesManager(Qn::kSystemSession)
                 ->broadcastEvent(info, kFakeHandler);
         }
         else // Execute locally.

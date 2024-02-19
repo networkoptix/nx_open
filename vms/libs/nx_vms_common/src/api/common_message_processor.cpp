@@ -697,7 +697,7 @@ void QnCommonMessageProcessor::on_resourceStatusRemoved(
         {
             if (auto connection = messageBusConnection())
             {
-                connection->getResourceManager(Qn::kSystemAccess)->setResourceStatus(
+                connection->getResourceManager(Qn::kSystemSession)->setResourceStatus(
                     resourceId, res->getStatus(), [](int /*requestId*/, ec2::ErrorCode) {});
             }
         }

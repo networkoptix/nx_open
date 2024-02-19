@@ -579,7 +579,7 @@ void QnBusinessRulesDialog::at_resetDefaultsButton_clicked()
 
     if (auto connection = system()->messageBusConnection())
     {
-        connection->getEventRulesManager(Qn::kSystemAccess)->resetBusinessRules(
+        connection->getEventRulesManager(Qn::kSystemSession)->resetBusinessRules(
             [](int /*requestId*/, ec2::ErrorCode) {});
     }
 }
@@ -699,7 +699,7 @@ bool QnBusinessRulesDialog::saveAll()
 
     foreach (const nx::Uuid& id, m_pendingDeleteRules)
     {
-        int handle = connection->getEventRulesManager(Qn::kSystemAccess)->deleteRule(
+        int handle = connection->getEventRulesManager(Qn::kSystemSession)->deleteRule(
             id,
             [this](int requestId, ec2::ErrorCode errorCode)
             {

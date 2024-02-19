@@ -66,15 +66,6 @@ private:
 
 struct UserSession
 {
-    UserSession(
-        const UserAccessData& access,
-        const QnAuthSession& session = QnAuthSession(nx::Uuid::createUuid()))
-        :
-        access(access),
-        session(session)
-    {
-    }
-
     UserAccessData access;
     QnAuthSession session;
 };
@@ -91,6 +82,7 @@ inline bool operator != (const UserAccessData &lhs, const UserAccessData &rhs)
     return ! operator == (lhs, rhs);
 }
 
+NX_VMS_COMMON_API extern const UserSession kSystemSession;
 NX_VMS_COMMON_API extern const UserAccessData kSystemAccess;
 NX_VMS_COMMON_API extern const UserAccessData kVideowallUserAccess;
 

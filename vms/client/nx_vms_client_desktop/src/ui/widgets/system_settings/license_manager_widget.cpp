@@ -398,7 +398,7 @@ void LicenseManagerWidget::removeLicense(const QnLicensePtr& license, ForceRemov
     if (!connection)
         return;
 
-    const auto manager = connection->getLicenseManager(Qn::kSystemAccess);
+    const auto manager = connection->getLicenseManager(Qn::kSystemSession);
     manager->removeLicense(license,
         [this, license](int /*requestId*/, ec2::ErrorCode errorCode)
         {

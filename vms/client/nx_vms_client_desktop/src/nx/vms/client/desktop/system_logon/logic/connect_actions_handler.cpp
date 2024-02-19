@@ -378,7 +378,7 @@ ConnectActionsHandler::ConnectActionsHandler(WindowContext* windowContext, QObje
 
             if (auto connection = system()->messageBusConnection())
             {
-                connection->getMiscManager(Qn::kSystemAccess)->saveRuntimeInfo(
+                connection->getMiscManager(Qn::kSystemSession)->saveRuntimeInfo(
                     info.data, [](int /*requestId*/, ec2::ErrorCode) {});
             }
         });

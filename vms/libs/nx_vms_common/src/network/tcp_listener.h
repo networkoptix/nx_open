@@ -82,8 +82,6 @@ public:
 
     virtual void applyModToRequest(nx::network::http::Request* /*request*/) {}
     virtual void stop() override;
-signals:
-    void portChanged();
 
 public slots:
     virtual void pleaseStop() override;
