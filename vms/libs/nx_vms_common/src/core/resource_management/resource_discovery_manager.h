@@ -30,13 +30,18 @@ class QnAbstractResourceSearcher;
 
 struct NX_VMS_COMMON_API QnManualCameraInfo
 {
-    QnManualCameraInfo() = default;
-    QnManualCameraInfo(const nx::utils::Url& url, const QAuthenticator& auth, const QString& resType, const QString& physicalId);
+    QnManualCameraInfo(Qn::UserSession userSession): userSession(std::move(userSession)) {}
+    QnManualCameraInfo(
+        const nx::utils::Url& url,
+        const QAuthenticator& auth,
+        const QString& resType,
+        const QString& physicalId,
+        Qn::UserSession userSession);
 
     nx::utils::Url url;
     QnResourceTypePtr resType;
     QAuthenticator auth;
-    QnAbstractResourceSearcher* searcher;
+    QnAbstractResourceSearcher* searcher = nullptr;
     QString physicalId;
     bool isUpdated = false;
     Qn::UserSession userSession;
@@ -104,11 +109,10 @@ public:
     void setReady(bool ready);
 
     /** Returns number of cameras that were successfully added. */
-    QSet<QString> registerManualCameras(
-        const std::vector<QnManualCameraInfo>& cameras,
-        Qn::UserSession userSession = Qn::UserSession());
+    QSet<QString> registerManualCameras(const std::vector<QnManualCameraInfo>& cameras);
     bool isManuallyAdded(const QnSecurityCamResourcePtr& camera) const;
-    QnManualCameraInfo manualCameraInfo(const QnSecurityCamResourcePtr& camera) const;
+    QnManualCameraInfo manualCameraInfo(
+        const QnSecurityCamResourcePtr& camera, const Qn::UserSession& userSession) const;
 
     ResourceSearcherList plugins() const;
 
@@ -128,7 +132,8 @@ public slots:
 
 protected:
     virtual void run() override;
-    QnManualCameraInfo manualCameraInfoUnsafe(const QnSecurityCamResourcePtr& camera) const;
+    QnManualCameraInfo manualCameraInfoUnsafe(
+        const QnSecurityCamResourcePtr& camera, const Qn::UserSession& userSession) const;
 
 signals:
     void localSearchDone();

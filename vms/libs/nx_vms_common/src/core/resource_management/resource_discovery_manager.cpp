@@ -36,14 +36,19 @@ using namespace nx::vms::common;
 
 // ------------------------------------ QnManualCameraInfo -----------------------------
 
-QnManualCameraInfo::QnManualCameraInfo(const nx::utils::Url& url, const QAuthenticator& auth, const QString& resType, const QString& physicalId)
+QnManualCameraInfo::QnManualCameraInfo(
+    const nx::utils::Url& url,
+    const QAuthenticator& auth,
+    const QString& resType,
+    const QString& physicalId,
+    Qn::UserSession userSession)
+    :
+    url(url),
+    resType(qnResTypePool->getResourceTypeByName(resType)),
+    auth(auth),
+    physicalId(physicalId),
+    userSession(std::move(userSession))
 {
-    QString urlStr = url.toString();
-    this->url = url;
-    this->auth = auth;
-    this->resType = qnResTypePool->getResourceTypeByName(resType);
-    this->searcher = 0;
-    this->physicalId = physicalId;
 }
 
 QnResourceDiscoveryManagerTimeoutDelegate::QnResourceDiscoveryManagerTimeoutDelegate( QnResourceDiscoveryManager* discoveryManager)
@@ -527,13 +532,15 @@ bool QnResourceDiscoveryManager::processDiscoveredResources(QnResourceList& reso
     return !resources.isEmpty();
 }
 
-QnManualCameraInfo QnResourceDiscoveryManager::manualCameraInfo(const QnSecurityCamResourcePtr& camera) const
+QnManualCameraInfo QnResourceDiscoveryManager::manualCameraInfo(
+    const QnSecurityCamResourcePtr& camera, const Qn::UserSession& userSession) const
 {
     NX_MUTEX_LOCKER lock(&m_searchersListMutex);
-    return manualCameraInfoUnsafe(camera);
+    return manualCameraInfoUnsafe(camera, userSession);
 }
 
-QnManualCameraInfo QnResourceDiscoveryManager::manualCameraInfoUnsafe(const QnSecurityCamResourcePtr& camera) const
+QnManualCameraInfo QnResourceDiscoveryManager::manualCameraInfoUnsafe(
+    const QnSecurityCamResourcePtr& camera, const Qn::UserSession& userSession) const
 {
     const auto resourceTypeId = camera->getTypeId();
     QnResourceTypePtr resourceType = qnResTypePool->getResourceType(resourceTypeId);
@@ -543,7 +550,7 @@ QnManualCameraInfo QnResourceDiscoveryManager::manualCameraInfoUnsafe(const QnSe
         ? resourceType->getName()
         : camera->getModel();
     QnManualCameraInfo info(
-        nx::utils::Url(camera->getUrl()), camera->getAuth(), model, camera->getPhysicalId());
+        nx::utils::Url(camera->getUrl()), camera->getAuth(), model, camera->getPhysicalId(), userSession);
 
     for (const auto& searcher: m_searchersList)
     {
@@ -555,8 +562,7 @@ QnManualCameraInfo QnResourceDiscoveryManager::manualCameraInfoUnsafe(const QnSe
 }
 
 QSet<QString> QnResourceDiscoveryManager::registerManualCameras(
-    const std::vector<QnManualCameraInfo>& cameras,
-    Qn::UserSession userSession)
+    const std::vector<QnManualCameraInfo>& cameras)
 {
     NX_MUTEX_LOCKER lock(&m_searchersListMutex);
     QSet<QString> registeredUniqueIds;
@@ -576,7 +582,6 @@ QSet<QString> QnResourceDiscoveryManager::registerManualCameras(
                 .args(camera.physicalId, typeid(*searcher), camera.url));
 
             QnManualCameraInfo updatedManualCameraInfo = camera;
-            updatedManualCameraInfo.userSession = userSession;
             if (m_manualCameraByUniqueId.contains(camera.physicalId))
                 updatedManualCameraInfo.isUpdated = true;
 

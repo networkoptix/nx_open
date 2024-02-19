@@ -67,8 +67,8 @@ private:
 struct UserSession
 {
     UserSession(
-        const UserAccessData& access = UserAccessData(),
-        const QnAuthSession& session = QnAuthSession())
+        const UserAccessData& access,
+        const QnAuthSession& session = QnAuthSession(nx::Uuid::createUuid()))
         :
         access(access),
         session(session)
