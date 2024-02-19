@@ -80,6 +80,7 @@
 #include <nx/vms/client/desktop/scene/resource_widget/overlays/rewind_overlay.h>
 #include <nx/vms/client/desktop/scene/resource_widget/private/camera_button_manager.h>
 #include <nx/vms/client/desktop/scene/resource_widget/private/media_resource_widget_p.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/skin/font_config.h>
 #include <nx/vms/client/desktop/statistics/context_statistics_module.h>
 #include <nx/vms/client/desktop/style/style.h>
@@ -2308,9 +2309,12 @@ QString QnMediaResourceWidget::calculatePositionText() const
             return result;
         };
 
-    const QString timeString = (d->display()->camDisplay()->isRealTimeSource()
+    const bool showLiveText = !appContext()->localSettings()->showTimestampOnLiveCamera()
+        && d->display()->camDisplay()->isRealTimeSource();
+
+    const QString timeString = showLiveText
             ? tr("LIVE")
-            : extractTime(getUtcCurrentTimeUsec()));
+            : extractTime(getUtcCurrentTimeUsec());
 
     static const int kPositionTextPixelSize = 12;
 

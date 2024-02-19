@@ -39,7 +39,7 @@
         </property>
        </widget>
       </item>
-      <item row="5" column="0">
+      <item row="6" column="0">
        <widget class="nx::vms::client::desktop::LabelWithHint" name="tourCycleTimeLabel">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -137,7 +137,7 @@
         </item>
        </layout>
       </item>
-      <item row="5" column="1">
+      <item row="6" column="1">
        <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,1">
         <item>
          <widget class="QSpinBox" name="tourCycleTimeSpinBox">
@@ -171,6 +171,19 @@
         </property>
         <property name="text">
          <string>Show aim overlay for PTZ cameras</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="1">
+       <widget class="QCheckBox" name="showTimestampInsteadOnLiveCameraCheckBox">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Show timestamp on LIVE</string>
         </property>
        </widget>
       </item>
