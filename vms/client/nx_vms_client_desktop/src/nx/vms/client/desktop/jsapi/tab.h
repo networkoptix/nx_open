@@ -10,6 +10,8 @@
 
 #include "globals.h"
 
+class QnWorkbenchLayout;
+
 namespace nx::vms::client::desktop {
 
 class WindowContext;
@@ -24,8 +26,18 @@ class Tab: public QObject
     Q_OBJECT
     using base_type = QObject;
 
+    /**
+     * Name of the tab.
+     */
+    Q_PROPERTY(QString name READ name CONSTANT)
+
+    /**
+     * Id of the tab.
+     */
+    Q_PROPERTY(QString id READ id CONSTANT)
+
 public:
-    Tab(WindowContext* context, QObject* parent = nullptr);
+    Tab(WindowContext* context, QnWorkbenchLayout* layout = nullptr, QObject* parent = nullptr);
     virtual ~Tab() override;
 
     /** State of the tab, including all items and layout information. */
@@ -54,6 +66,10 @@ public:
 
     /** Save layout. */
     Q_INVOKABLE QJsonObject saveLayout();
+
+    QString id() const;
+    QString name() const;
+    QnWorkbenchLayout* layout() const;
 
 signals:
     void itemAdded(const QJsonObject& item);

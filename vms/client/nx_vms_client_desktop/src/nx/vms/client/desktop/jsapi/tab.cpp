@@ -11,15 +11,17 @@
 #include "detail/helpers.h"
 #include "detail/tab_api_backend.h"
 #include "detail/tab_structures.h"
+#include "ui/workbench/workbench_layout.h"
 
 namespace nx::vms::client::desktop::jsapi {
 
 Tab::Tab(
     WindowContext* context,
+    QnWorkbenchLayout* layout,
     QObject* parent)
     :
     base_type(parent),
-    d(new detail::TabApiBackend(context, context->workbench()->currentLayout()))
+    d(new detail::TabApiBackend(context, layout))
 {
     using namespace detail;
 
@@ -94,6 +96,21 @@ QJsonObject Tab::setLayoutProperties(const QJsonObject& properties)
 QJsonObject Tab::saveLayout()
 {
     return detail::toJsonObject(d->saveLayout());
+}
+
+QString Tab::id() const
+{
+    return d->layout() ? d->layout()->resourceId().toSimpleString() : QString{};
+}
+
+QString Tab::name() const
+{
+    return d->layout() ? d->layout()->name() : QString{};
+}
+
+QnWorkbenchLayout* Tab::layout() const
+{
+    return d->layout();
 }
 
 } // namespace nx::vms::client::desktop::jsapi

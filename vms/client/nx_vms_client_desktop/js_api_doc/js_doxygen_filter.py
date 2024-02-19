@@ -13,6 +13,8 @@ defaultValue = re.compile(" = [^;()]+;")
 
 replaceMap = {
     "QString": "String",
+    "QJsonObject": "Object",
+    "QVariantMap": "Object",
     "ResourceUniqueId": "String",
     "QUuid": "String",
     "nx::Uuid": "String",

@@ -178,6 +178,9 @@ TabApiBackend::Private::Private(
 
 void TabApiBackend::Private::handleSliderChanged()
 {
+    if (!layout)
+        return;
+
     if (isSyncedLayout())
     {
         // Windows for all items of synced layout are changed simultaneously.
@@ -818,6 +821,11 @@ Error TabApiBackend::saveLayout()
     return success
         ? Error::success()
         : Error::failed();
+}
+
+QnWorkbenchLayout* TabApiBackend::layout() const
+{
+    return d->layout;
 }
 
 } // namespace nx::vms::client::desktop::jsapi::detail

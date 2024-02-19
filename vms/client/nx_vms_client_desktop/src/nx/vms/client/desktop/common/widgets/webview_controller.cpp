@@ -40,9 +40,11 @@
 #include <nx/vms/client/desktop/jsapi/resources.h>
 #include <nx/vms/client/desktop/jsapi/self.h>
 #include <nx/vms/client/desktop/jsapi/tab.h>
+#include <nx/vms/client/desktop/jsapi/tabs.h>
 #include <nx/vms/client/desktop/resource_properties/camera/utils/camera_web_page_workarounds.h>
 #include <nx/vms/client/desktop/ui/image_providers/web_page_icon_cache.h>
 #include <nx/vms/client/desktop/window_context.h>
+#include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/dialogs/common/certificate_selection_dialog.h>
 #include <ui/dialogs/common/password_dialog.h>
 #include <ui/graphics/items/standard/graphics_qml_view.h>
@@ -979,10 +981,16 @@ void WebViewController::initClientApiSupport(
     if (!NX_ASSERT(context))
         return;
 
+    registerApiObjectWithFactory("vms.tabs",
+        [=](QObject* parent) -> QObject*
+        {
+            return new jsapi::Tabs(context, parent);
+        });
+
     registerApiObjectWithFactory("vms.tab",
         [=](QObject* parent) -> QObject*
         {
-            return new jsapi::Tab(context, parent);
+            return new jsapi::Tab(context, context->workbench()->currentLayout(), parent);
         });
 
     registerApiObjectWithFactory("vms.resources",
