@@ -22,13 +22,6 @@ using namespace nx::kit::utils;
 //-------------------------------------------------------------------------------------------------
 // Tools
 
-char pathSeparator()
-{
-    static const char separator =
-        (char) (strchr(__FILE__, '/') ? '/' : (strchr(__FILE__, '\\') ? '\\' : '\0'));
-    return separator;
-}
-
 size_t commonPrefixSize(const std::string& s1, const std::string& s2)
 {
     const std::string& shorter = (s1.size() < s2.size()) ? s1 : s2;
@@ -40,43 +33,58 @@ size_t commonPrefixSize(const std::string& s1, const std::string& s2)
     return (size_t) (afterCommonPrefix.first - shorter.cbegin());
 }
 
-const char* relativeSrcFilename(const char* file)
+std::string relativeSrcFilename(const std::string& file)
 {
-    if (!pathSeparator()) //< Unable to detect path separator - return original file name.
-        return file;
-
-    const std::string fileString = file;
+    std::string fileString = normalizePathToSlashes(file);
 
     // If the path contains "/src/nx/", return starting with "nx/".
     {
-        static const std::string srcPath = pathSeparator() + std::string("src") + pathSeparator();
-        const auto pos = fileString.find(srcPath + "nx" + pathSeparator());
+        static const std::string srcPath = "/src/";
+        const auto pos = fileString.find(srcPath + "nx/");
         if (pos != std::string::npos)
-            return file + pos + srcPath.size();
+            return fileString.substr(pos + srcPath.size());
     }
 
     // Trim a prefix common with this cpp file, and one subsequent directory (if any).
     {
-        size_t filesCommonPrefixSize = commonPrefixSize(__FILE__, fileString);
-        if (filesCommonPrefixSize == 0) //< No common prefix - return the original file.
-            return file;
+        const std::string thisFile = normalizePathToSlashes(__FILE__);
 
-        const auto pos = fileString.find(pathSeparator(), filesCommonPrefixSize);
-        if (pos == std::string::npos) //< No separator - return file after the common prefix.
-             return file + filesCommonPrefixSize;
-        return file + pos + sizeof(pathSeparator());
+        const size_t filesCommonPrefixSize = commonPrefixSize(thisFile, fileString);
+        if (filesCommonPrefixSize == 0) //< No common prefix - use the original path.
+            return fileString;
+
+        const auto pos = fileString.find('/', filesCommonPrefixSize);
+        if (pos == std::string::npos) //< No separator - return the path after the common prefix.
+             return fileString.substr(filesCommonPrefixSize);
+             
+        return fileString.substr(pos + /*slash*/ 1);
     }
 }
 
 std::string fileBaseNameWithoutExt(const char* file)
 {
-    const char* const sep = pathSeparator() ? strrchr(file, pathSeparator()) : nullptr;
+    constexpr char kPathSeparator =
+        #if defined(_WIN32)
+            '\\';
+        #else
+            '/';
+        #endif
+
+    const char* const sep = strrchr(file, kPathSeparator);
     const char* const first = sep ? sep + 1 : file;
     const char* const ext = strrchr(file, '.');
     if (ext)
         return std::string(first, ext - first);
     else
         return std::string(first);
+}
+
+std::string normalizePathToSlashes(std::string path)
+{
+    #if defined(_WIN32)
+        stringReplaceAllChars(&path, '\\', '/');
+    #endif
+    return path;
 }
 
 //-------------------------------------------------------------------------------------------------
