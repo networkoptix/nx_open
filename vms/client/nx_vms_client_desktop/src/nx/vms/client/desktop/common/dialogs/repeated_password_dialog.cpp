@@ -20,9 +20,6 @@ RepeatedPasswordDialog::RepeatedPasswordDialog(QWidget *parent):
 {
     ui->setupUi(this);
     setModal(true);
-    setHeaderText("");
-    setPaletteColor(ui->headerLabel, QPalette::WindowText, core::colorTheme()->color("light4"));
-    setPaletteColor(ui->headerBackgroundWidget, QPalette::Window, core::colorTheme()->color("brand_d5"));
     setWarningStyle(ui->doNotMatchLabel);
     updateMatching();
 
@@ -38,13 +35,12 @@ RepeatedPasswordDialog::~RepeatedPasswordDialog()
 
 void RepeatedPasswordDialog::setHeaderText(const QString& text)
 {
-    ui->headerLabel->setText(text);
-    ui->headerBackgroundWidget->setVisible(!text.isEmpty());
+    ui->headerInfoBar->setText(text);
 }
 
 QString RepeatedPasswordDialog::headerText() const
 {
-    return ui->headerLabel->text();
+    return ui->headerInfoBar->text();
 }
 
 QString RepeatedPasswordDialog::password() const
