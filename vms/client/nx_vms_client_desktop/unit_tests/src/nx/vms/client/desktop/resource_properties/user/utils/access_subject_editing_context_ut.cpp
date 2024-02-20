@@ -23,6 +23,7 @@ TEST(AccessSubjectEditingContextStaticTest, dependentAccessRights)
 {
     EXPECT_EQ(AccessSubjectEditingContext::dependentAccessRights(AccessRight::view),
         AccessRight::viewArchive
+        | AccessRight::audio
         | AccessRight::exportArchive
         | AccessRight::viewBookmarks
         | AccessRight::manageBookmarks
@@ -54,6 +55,9 @@ TEST(AccessSubjectEditingContextStaticTest, requiredAccessRights)
         AccessRights{});
 
     EXPECT_EQ(AccessSubjectEditingContext::requiredAccessRights(AccessRight::viewArchive),
+        AccessRight::view);
+
+    EXPECT_EQ(AccessSubjectEditingContext::requiredAccessRights(AccessRight::audio),
         AccessRight::view);
 
     EXPECT_EQ(AccessSubjectEditingContext::requiredAccessRights(AccessRight::exportArchive),

@@ -42,6 +42,7 @@ using AccessRightInt = std::make_unsigned_t<std::underlying_type_t<AccessRight>>
 
 static const QHash<AccessRight, AccessRights> kRequiredAccessRights{
     {AccessRight::viewArchive, AccessRight::view},
+    {AccessRight::audio, AccessRight::view},
     {AccessRight::exportArchive, AccessRight::view | AccessRight::viewArchive},
     {AccessRight::viewBookmarks, AccessRight::view | AccessRight::viewArchive},
     {AccessRight::manageBookmarks,

@@ -895,8 +895,11 @@ QString UserSettingsDialog::warningForTemporaryUser(
     static constexpr GlobalPermissions kUserPermissions =
         GlobalPermission::viewLogs | GlobalPermission::generateEvents;
 
-    static constexpr AccessRights kTemporaryUserViewAccesRights = AccessRight::view
-        | AccessRight::viewArchive | AccessRight::exportArchive | AccessRight::viewBookmarks;
+    static constexpr AccessRights kTemporaryUserViewAccessRights = AccessRight::view
+        | AccessRight::audio
+        | AccessRight::viewArchive
+        | AccessRight::exportArchive
+        | AccessRight::viewBookmarks;
 
     const auto hasGroups =
         [this, &parentGroups](const QSet<nx::Uuid>& permissionGroups)
@@ -923,7 +926,7 @@ QString UserSettingsDialog::warningForTemporaryUser(
                 sharedResources.end(),
                 [](const AccessRights& accessRights)
                 {
-                    return accessRights & ~kTemporaryUserViewAccesRights;
+                    return accessRights & ~kTemporaryUserViewAccessRights;
                 });
         };
 

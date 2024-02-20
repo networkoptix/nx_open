@@ -138,6 +138,7 @@ bool AccessController::isDeviceAccessRelevant(AccessRights requiredAccessRights)
     {
         const auto kVideoWallModeAccessRights =
             AccessRight::view
+            | AccessRight::audio
             | AccessRight::viewArchive
             | AccessRight::viewBookmarks
             | AccessRight::userInput;
@@ -149,6 +150,7 @@ bool AccessController::isDeviceAccessRelevant(AccessRights requiredAccessRights)
     {
         const auto kAcsModeAccessRights =
             AccessRight::view
+            | AccessRight::audio
             | AccessRight::viewArchive
             | AccessRight::exportArchive
             | AccessRight::viewBookmarks

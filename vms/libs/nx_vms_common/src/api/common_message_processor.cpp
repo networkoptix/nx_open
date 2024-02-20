@@ -708,7 +708,8 @@ void QnCommonMessageProcessor::on_accessRightsChanged(
     const AccessRightsDataDeprecated& accessRightsDeprecated)
 {
     using namespace nx::vms::api;
-    static constexpr AccessRights kViewerAccessRights = AccessRight::view
+    static constexpr AccessRights kLiveViewerAccessRights = AccessRight::view | AccessRight::audio;
+    static constexpr AccessRights kViewerAccessRights = kLiveViewerAccessRights
         | AccessRight::viewArchive | AccessRight::exportArchive | AccessRight::viewBookmarks;
     static constexpr AccessRights kAdvancedViewerAccessRights =
         kViewerAccessRights | AccessRight::manageBookmarks | AccessRight::userInput;
@@ -744,7 +745,7 @@ void QnCommonMessageProcessor::on_accessRightsChanged(
         else if (groupId == kViewersGroupId)
             accessRights = kViewerAccessRights;
         else if (groupId == kLiveViewersGroupId)
-            accessRights = AccessRight::view;
+            accessRights = kLiveViewerAccessRights;
     }
     for (const auto& r: accessRightsDeprecated.resourceIds)
         resourceAccessRights[r] = accessRights;
