@@ -94,7 +94,7 @@ bool InstanceController::configureDb()
     auto future = cacheFilledPromise.get_future();
 
     m_queryExecutor->executeUpdateWithoutTran(
-        std::bind(&InstanceController::configureSqliteInstance, this, _1),
+        &InstanceController::configureSqliteInstance,
         [&](DBResult dbResult)
         {
             cacheFilledPromise.set_value(dbResult);
@@ -110,7 +110,7 @@ DBResult InstanceController::configureSqliteInstance(QueryContext* queryContext)
     if (!enableAutoVacuumQuery.exec())
     {
         NX_WARNING(
-            this,
+            NX_SCOPE_TAG,
             nx::format("Failed to enable auto vacuum mode. %1")
                 .arg(enableAutoVacuumQuery.lastError().text()));
         return DBResult::ioError;
@@ -120,7 +120,7 @@ DBResult InstanceController::configureSqliteInstance(QueryContext* queryContext)
     enableWalQuery.prepare("PRAGMA journal_mode = WAL");
     if (!enableWalQuery.exec())
     {
-        NX_WARNING(this, nx::format("Failed to enable WAL mode. %1")
+        NX_WARNING(NX_SCOPE_TAG, nx::format("Failed to enable WAL mode. %1")
             .arg(enableWalQuery.lastError().text()));
         return DBResult::ioError;
     }
@@ -129,7 +129,7 @@ DBResult InstanceController::configureSqliteInstance(QueryContext* queryContext)
     enableFKQuery.prepare("PRAGMA foreign_keys = ON");
     if (!enableFKQuery.exec())
     {
-        NX_WARNING(this, nx::format("Failed to enable foreign keys. %1")
+        NX_WARNING(NX_SCOPE_TAG, nx::format("Failed to enable foreign keys. %1")
             .arg(enableFKQuery.lastError().text()));
         return DBResult::ioError;
     }
