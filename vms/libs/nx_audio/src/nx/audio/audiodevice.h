@@ -5,8 +5,12 @@
 #include <QtCore/QList>
 #include <QtCore/QObject>
 
-typedef struct ALCdevice_struct ALCdevice;
-typedef struct ALCcontext_struct ALCcontext;
+#if defined(Q_OS_WINDOWS)
+    #include <AL/alc.h>
+#else
+    typedef struct ALCdevice_struct ALCdevice;
+    typedef struct ALCcontext_struct ALCcontext;
+#endif
 
 namespace nx::media::audio { struct Format; }
 
@@ -52,8 +56,15 @@ public:
 private:
     friend class Sound;
 
-    static int internalBufferInSamples(ALCdevice* device);
-    void initDeviceInternal();
+    #if defined(Q_OS_ANDROID)
+        static int internalBufferInSamples(ALCdevice* device);
+        void initDeviceInternal();
+    #endif
+
+private:
+    #if defined(Q_OS_WINDOWS)
+        void setupReopenCallback();
+    #endif
 
 signals:
     void volumeChanged(float value);

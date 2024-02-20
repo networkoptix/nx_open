@@ -7,27 +7,31 @@
 #include "audio.h"
 #include "sound.h"
 
-#ifdef Q_OS_MAC
-#include <openal/al.h>
-#include <openal/alc.h>
+#if defined(Q_OS_MAC)
+    #include <openal/al.h>
+    #include <openal/alc.h>
 #else
-#include <AL/al.h>
-#include <AL/alc.h>
+    #include <AL/al.h>
+    #include <AL/alc.h>
+    #if defined(Q_OS_WINDOWS)
+        #include <AL/alext.h>
+    #endif
 #endif
 #include <nx/utils/log/log.h>
 
-#ifdef OPENAL_STATIC
-extern "C"
-{
-void alc_init(void);
-void alc_deinit(void);
-#pragma comment(lib, "winmm.lib")
-}
+#if defined(OPENAL_STATIC)
+    extern "C"
+    {
+    void alc_init(void);
+    void alc_deinit(void);
+    #pragma comment(lib, "winmm.lib")
+    }
 #endif
 
 #include <nx/media/audio/format.h>
+#include <nx/utils/guarded_callback.h>
 #include <nx/utils/ios_device_info.h>
-#include <nx/utils/software_version.h>
+#include <utils/common/delayed.h>
 
 namespace nx {
 namespace audio {
@@ -46,34 +50,19 @@ struct ALCdevice_struct
     ALuint       NumUpdates;
 };
 
+#if defined(Q_OS_WINDOWS)
+    static LPALCREOPENDEVICESOFT alcReopenDeviceSOFT = nullptr;
+#endif
+
 } // unnamed namespace
 
-int AudioDevice::internalBufferInSamples(ALCdevice* device)
-{
-    #if defined(Q_OS_MACX) || defined(Q_OS_IOS)
-        /**
-         * Looks like Mac OS has a bug in the standard OpenAL implementation.
-         * It returns invalid pointer with alcOpenDevice (0x18) and alcCreateContext(0x19).
-         * As it is invalid pointer, we can't use it accessing ALCdevice_struct' fields.
-         * From the other side we can continue to use it as opaque handle for OpenAL functions.
-         *
-         * Problem is known:
-         * https://github.com/hajimehoshi/ebiten/issues/195
-         * https://groups.google.com/forum/#!topic/golang-bugs/nARJpJCYum4
-         *
-         * Possible workarounds are:
-         * 1. Fix OpenAL sources and rebuild it for Mac OS;
-         * 2. Do not use direct access to ALCdevice_struct' fields.
-         *
-         * Since we have correct handling of zero return value, it was decided to
-         * workaround it with second option.
-         */
-        return 0;
-    #else
+#if defined(Q_OS_ANDROID)
+    int AudioDevice::internalBufferInSamples(ALCdevice* device)
+    {
         const ALCdevice_struct* devicePriv = (const ALCdevice_struct*) device;
         return devicePriv->UpdateSize;
-    #endif
-}
+    }
+#endif
 
 AudioDevice *AudioDevice::instance()
 {
@@ -81,21 +70,21 @@ AudioDevice *AudioDevice::instance()
     return &audioDevice;
 }
 
-void AudioDevice::initDeviceInternal()
-{
-#ifdef Q_OS_ANDROID
-    // Android opensl backend has quite big audio jitter and current position epsilon.
-    // Update buffer to smaller size to reduce they. Default value is 1024
-    ALCdevice_struct* devicePriv = (ALCdevice_struct*) m_device;
-    static const qint64 kOpenAlBufferSize = 512;
-    devicePriv->UpdateSize = kOpenAlBufferSize;
+#if defined(Q_OS_ANDROID)
+    void AudioDevice::initDeviceInternal()
+    {
+        // Android opensl backend has quite big audio jitter and current position epsilon.
+        // Update buffer to smaller size to reduce they. Default value is 1024
+        ALCdevice_struct* devicePriv = (ALCdevice_struct*) m_device;
+        static const qint64 kOpenAlBufferSize = 512;
+        devicePriv->UpdateSize = kOpenAlBufferSize;
+    }
 #endif
-}
 
 AudioDevice::AudioDevice(QObject* parent):
     QObject(parent)
 {
-    #ifdef OPENAL_STATIC
+    #if defined(OPENAL_STATIC)
         alc_init();
         NX_DEBUG(this, "OpenAL init");
     #endif
@@ -103,13 +92,19 @@ AudioDevice::AudioDevice(QObject* parent):
     nx::audio::setupAudio();
 
     m_device = alcOpenDevice(nullptr);
-    initDeviceInternal();
+    #if defined(Q_OS_ANDROID)
+        initDeviceInternal();
+    #endif
 
     if (!m_device)
     {
         NX_ERROR(this, "Unable to open device");
         return;
     }
+
+    #if defined(Q_OS_WINDOWS)
+        setupReopenCallback();
+    #endif
 
     m_context = alcCreateContext(m_device, nullptr);
     if (!m_context)
@@ -221,6 +216,56 @@ Sound* AudioDevice::createSound(const nx::media::audio::Format& format) const
 
     return nullptr;
 }
+
+#if defined(Q_OS_WINDOWS)
+    void AudioDevice::setupReopenCallback()
+    {
+        LPALCEVENTCONTROLSOFT alcEventControlSOFT;
+        LPALCEVENTCALLBACKSOFT alcEventCallbackSOFT;
+
+        alcReopenDeviceSOFT = reinterpret_cast<LPALCREOPENDEVICESOFT>(
+            alcGetProcAddress(m_device, "alcReopenDeviceSOFT"));
+        alcEventControlSOFT = reinterpret_cast<LPALCEVENTCONTROLSOFT>(
+            alGetProcAddress("alcEventControlSOFT"));
+        alcEventCallbackSOFT = reinterpret_cast<LPALCEVENTCALLBACKSOFT>(
+            alGetProcAddress("alcEventCallbackSOFT"));
+
+        if (alcReopenDeviceSOFT && alcEventControlSOFT && alcEventCallbackSOFT)
+        {
+            const std::array<ALenum,1> evt_types{{ALC_EVENT_TYPE_DEFAULT_DEVICE_CHANGED_SOFT}};
+            alcEventControlSOFT(static_cast<ALsizei>(evt_types.size()), evt_types.data(), AL_TRUE);
+
+            alcEventCallbackSOFT(
+                [](
+                    ALCenum eventType,
+                    ALCenum,
+                    ALCdevice*,
+                    ALCsizei,
+                    const ALCchar*,
+                    void* userParam
+                ) noexcept -> void
+                {
+                    if (eventType != ALC_EVENT_TYPE_DEFAULT_DEVICE_CHANGED_SOFT)
+                        return;
+
+                    auto audioDevice = reinterpret_cast<AudioDevice*>(userParam);
+
+                    auto reopenDevice = nx::utils::guarded(audioDevice,
+                        [audioDevice]()
+                        {
+                            alcReopenDeviceSOFT(audioDevice->m_device, nullptr, nullptr);
+                        });
+
+                    executeLaterInThread(reopenDevice, audioDevice->thread());
+                },
+                reinterpret_cast<void*>(this));
+        }
+        else
+        {
+            NX_WARNING(this, "Reopen or default device changing detection is not supported.");
+        }
+    }
+#endif
 
 } // namespace audio
 } // namespace nx
