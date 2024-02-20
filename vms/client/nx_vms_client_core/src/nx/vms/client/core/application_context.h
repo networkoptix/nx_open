@@ -116,6 +116,8 @@ protected:
 
     void storeFontConfig(FontConfig* config);
 
+    void resetEngine();
+
 private:
     struct Private;
     nx::utils::ImplPtr<Private> d;
