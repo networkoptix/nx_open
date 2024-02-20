@@ -6,6 +6,7 @@
 
 #include <QtCore/QTimer>
 
+#include <finders/systems_finder.h>
 #include <nx/network/address_resolver.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/network/url/url_parse_helper.h>
@@ -98,6 +99,29 @@ void KnownServerConnections::saveConnection(
     if (d->discoveryManager)
         d->discoveryManager->checkEndpoint(connection.url, connection.serverId);
     appContext()->coreSettings()->knownServerConnections = d->connections;
+}
+
+void KnownServerConnections::removeSystem(const QString& systemId)
+{
+    if (const auto system = qnSystemsFinder->getSystem(systemId))
+    {
+        auto knownConnections = appContext()->coreSettings()->knownServerConnections();
+        const auto moduleManager = appContext()->moduleDiscoveryManager();
+        const auto servers = system->servers();
+        for (const auto& info: servers)
+        {
+            const auto moduleId = info.id;
+            moduleManager->forgetModule(moduleId);
+
+            const auto itEnd = std::remove_if(knownConnections.begin(), knownConnections.end(),
+                [moduleId](const auto& connection)
+                {
+                    return moduleId == connection.serverId;
+                });
+            knownConnections.erase(itEnd, knownConnections.end());
+        }
+        appContext()->coreSettings()->knownServerConnections = knownConnections;
+    }
 }
 
 } // namespace watchers

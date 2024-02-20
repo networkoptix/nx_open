@@ -33,6 +33,7 @@ public:
 
     void start();
     void saveConnection(const nx::Uuid& serverId, nx::network::SocketAddress address);
+    void removeSystem(const QString& systemId);
 
 private:
     struct Private;

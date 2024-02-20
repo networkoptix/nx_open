@@ -678,26 +678,7 @@ void WelcomeScreen::deleteSystem(const QString& systemId, const QString& localSy
     CredentialsManager::removeCredentials(localSystemUuid);
     appContext()->coreSettings()->removeRecentConnection(localSystemUuid);
     qnSystemsVisibilityManager->removeSystemData(localSystemUuid);
-
-    if (const auto system = qnSystemsFinder->getSystem(systemId))
-    {
-        auto knownConnections = appContext()->coreSettings()->knownServerConnections();
-        const auto moduleManager = appContext()->moduleDiscoveryManager();
-        const auto servers = system->servers();
-        for (const auto& info: servers)
-        {
-            const auto moduleId = info.id;
-            moduleManager->forgetModule(moduleId);
-
-            const auto itEnd = std::remove_if(knownConnections.begin(), knownConnections.end(),
-                [moduleId](const auto& connection)
-                {
-                    return moduleId == connection.serverId;
-                });
-            knownConnections.erase(itEnd, knownConnections.end());
-        }
-        appContext()->coreSettings()->knownServerConnections = knownConnections;
-    }
+    core::appContext()->knownServerConnectionsWatcher()->removeSystem(systemId);
 }
 
 bool WelcomeScreen::saveCredentialsAllowed() const
