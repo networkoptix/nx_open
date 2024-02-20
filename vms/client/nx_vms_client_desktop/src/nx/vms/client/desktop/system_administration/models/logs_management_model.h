@@ -3,6 +3,7 @@
 #pragma once
 
 #include <QtCore/QAbstractTableModel>
+#include <QtCore/QString>
 
 #include <client/client_globals.h>
 #include <nx/utils/thread/mutex.h>
@@ -10,8 +11,6 @@
 #include <nx/vms/client/desktop/system_administration/watchers/logs_management_watcher.h>
 
 namespace nx::vms::client::desktop {
-
-class LogsManagementWatcher;
 
 class LogsManagementModel: public QAbstractTableModel
 {
@@ -24,6 +23,7 @@ public:
         CheckBoxColumn,
         NameColumn,
         LogLevelColumn,
+        RetryColumn,
         StatusColumn,
         ColumnCount
     };
@@ -32,6 +32,9 @@ public:
     {
         IpAddressRole = Qt::UserRole + 1,
         EnabledRole,
+        RetryRole,
+        DownloadingRole,
+        QnUuidRole,
     };
 
     explicit LogsManagementModel(QObject* parent, LogsManagementWatcher* watcher);
@@ -42,6 +45,8 @@ public:
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
     virtual QVariant data(const QModelIndex& index, int role) const override;
     virtual bool setData(const QModelIndex& index, const QVariant& value, int role) override;
+
+    void setFilterText(const QString& text);
 
     static QList<nx::utils::log::Level> logLevels();
     static QString logLevelName(nx::utils::log::Level level);
@@ -54,6 +59,8 @@ private:
 private:
     QPointer<LogsManagementWatcher> m_watcher;
     QList<LogsManagementUnitPtr> m_items;
+
+    QString m_filterText = {};
 };
 
 } // namespace nx::vms::client::desktop

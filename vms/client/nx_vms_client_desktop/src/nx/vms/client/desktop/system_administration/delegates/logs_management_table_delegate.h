@@ -5,6 +5,7 @@
 #include <QtCore/QObject>
 #include <QtWidgets/QStyledItemDelegate>
 
+#include <nx/vms/client/desktop/system_administration/widgets/logs_management_widget.h>
 #include <ui/common/text_pixmap_cache.h>
 
 namespace nx::vms::client::desktop {
@@ -14,7 +15,7 @@ class LogsManagementTableDelegate: public QStyledItemDelegate
     using base_type = QStyledItemDelegate;
 
 public:
-    explicit LogsManagementTableDelegate(QObject* parent = nullptr);
+    explicit LogsManagementTableDelegate(LogsManagementWidget* parent = nullptr);
 
     virtual void paint(
         QPainter* painter,
@@ -41,6 +42,7 @@ private:
 
 private:
     mutable QnTextPixmapCache m_textPixmapCache;
+    LogsManagementWidget* parentWidget = nullptr;
 };
 
 } // namespace nx::vms::client::desktop

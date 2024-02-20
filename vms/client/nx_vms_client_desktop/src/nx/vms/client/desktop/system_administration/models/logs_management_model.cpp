@@ -6,7 +6,9 @@
 #include <core/resource/resource_display_info.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/desktop/common/widgets/busy_indicator_button.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
+#include <nx/vms/client/desktop/system_administration/watchers/logs_management_watcher.h>
 
 namespace nx::vms::client::desktop {
 
@@ -35,8 +37,7 @@ QIcon statusIcon(LogsManagementUnitPtr unit)
     {
         case State::pending:
         case State::loading:
-            // TODO: @pprivalov use proper icon, probably it should be gif
-            return qnSkin->icon("text_buttons/rapid_review_20.svg", kIconSubstitutions); //< FIXME: #spanasenko Use a separate icon.
+            return {};
 
         case State::complete:
             return qnSkin->icon("text_buttons/yes_20x20.svg", kIconSubstitutions);
@@ -146,7 +147,14 @@ QVariant LogsManagementModel::data(const QModelIndex& index, int role) const
         }
 
         case EnabledRole:
-            return isOnline(unit);
+            if (index.column() == CheckBoxColumn)
+                break;
+
+            return isOnline(unit)
+                && unit->state() != LogsManagementWatcher::Unit::DownloadState::complete;
+
+        case QnUuidRole:
+            return unit->id().toString();
     }
 
     switch (index.column())
@@ -184,6 +192,9 @@ QVariant LogsManagementModel::data(const QModelIndex& index, int role) const
             {
                 case Qt::CheckStateRole:
                     return unit->isChecked() ? Qt::Checked : Qt::Unchecked;
+
+                case EnabledRole:
+                    return unit->state() == LogsManagementWatcher::Unit::DownloadState::none;
             }
             break;
 
@@ -192,6 +203,20 @@ QVariant LogsManagementModel::data(const QModelIndex& index, int role) const
             {
                 case Qt::DecorationRole:
                     return statusIcon(unit);
+                case DownloadingRole:
+                {
+                    auto state = unit->state();
+                    return state == LogsManagementWatcher::Unit::DownloadState::pending
+                        || state == LogsManagementWatcher::Unit::DownloadState::loading;
+                }
+            }
+            break;
+
+        case RetryColumn:
+            switch (role)
+            {
+                case RetryRole:
+                    return unit->state() == LogsManagementWatcher::Unit::DownloadState::error;
             }
             break;
 
@@ -250,6 +275,26 @@ void LogsManagementModel::onItemsListChanged()
 {
     beginResetModel();
     m_items = m_watcher->items();
+    if (!m_filterText.isEmpty())
+    {
+        for (int i = 0; i < m_items.size();)
+        {
+            if (m_items[i]->server().isNull())
+            {
+                if (QString{"client"}.contains(m_filterText.toLower()))
+                    ++i;
+                else
+                    m_items.remove(i);
+            }
+            else
+            {
+                if (m_items[i]->server()->getName().toLower().contains(m_filterText.toLower()))
+                    ++i;
+                else
+                    m_items.remove(i);
+            }
+        }
+    }
     endResetModel();
 }
 
@@ -298,6 +343,12 @@ QString LogsManagementModel::logLevelTooltip(nx::utils::log::Level level) const
 
     NX_ASSERT(false, "Unexpected value (%1)", level);
     return {};
+}
+
+void LogsManagementModel::setFilterText(const QString& text)
+{
+    m_filterText = text;
+    onItemsListChanged();
 }
 
 } // namespace nx::vms::client::desktop

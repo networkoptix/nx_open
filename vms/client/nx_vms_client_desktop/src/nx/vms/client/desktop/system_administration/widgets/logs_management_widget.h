@@ -2,6 +2,9 @@
 
 #pragma once
 
+#include <QTimer>
+
+#include <nx/vms/client/desktop/common/widgets/table_view.h>
 #include <nx/vms/client/desktop/system_administration/watchers/logs_management_watcher.h>
 #include <nx/vms/client/desktop/system_context_aware.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
@@ -32,10 +35,17 @@ private:
     void setupUi();
     void updateWidgets(LogsManagementWatcher::State state);
 
+    void updateData();
+    void updateDataDelayed();
+
+    void addTableWidgets(const QModelIndex& from, const QModelIndex& to);
+
 private:
     QScopedPointer<Ui::LogsManagementWidget> ui;
     QPointer<LogsManagementWatcher> m_watcher;
     bool needUpdateBeforeClosing = false;
+
+    QTimer m_delayUpdateTimer;
 };
 
 } // namespace nx::vms::client::desktop
