@@ -19,15 +19,15 @@ Rectangle
         {
             case DialogBanner.Style.Error:
                 return {
-                    "color": ColorTheme.colors.red_attention,
-                    "background": ColorTheme.colors.dark9,
+                    "color": ColorTheme.colors.red_l,
+                    "background": ColorTheme.colors.dark10,
                     "icon": "image://svg/skin/banners/error.svg"
                 }
 
             case DialogBanner.Style.Warning:
                 return {
                     "color": ColorTheme.colors.light4,
-                    "background": ColorTheme.colors.dark9,
+                    "background": ColorTheme.colors.dark10,
                     "icon": "image://svg/skin/banners/warning.svg"
                 }
 
@@ -35,7 +35,7 @@ Rectangle
             default:
                 return {
                     "color": ColorTheme.colors.light4,
-                    "background": ColorTheme.colors.dark9,
+                    "background": ColorTheme.colors.dark10,
                     "icon": "image://svg/skin/banners/info.svg"
                 }
         }
