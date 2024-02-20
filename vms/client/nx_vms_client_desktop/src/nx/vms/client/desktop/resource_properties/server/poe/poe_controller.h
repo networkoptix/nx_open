@@ -18,8 +18,6 @@ class PoeController: public QObject, public nx::vms::client::core::CommonModuleA
 
     Q_PROPERTY(nx::Uuid resourceId READ resourceId WRITE setResourceId
         NOTIFY resourceIdChanged)
-    Q_PROPERTY(bool autoUpdate READ autoUpdate WRITE setAutoUpdate
-        NOTIFY autoUpdateChanged)
     Q_PROPERTY(bool initialUpdateInProgress READ initialUpdateInProgress
         NOTIFY initialUpdateInProgressChanged)
     Q_PROPERTY(bool updatingPoweringModes READ updatingPoweringModes
@@ -32,7 +30,6 @@ public:
     nx::Uuid resourceId() const;
 
     void setAutoUpdate(bool value);
-    bool autoUpdate() const;
 
     using BlockData = nx::vms::api::NetworkBlockData;
     const BlockData& blockData() const;
@@ -47,7 +44,6 @@ public:
 
 signals:
     void resourceIdChanged();
-    void autoUpdateChanged();
     void updated();
     void updatingPoweringModesChanged();
     void initialUpdateInProgressChanged();
