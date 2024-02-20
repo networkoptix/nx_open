@@ -328,7 +328,9 @@ void Manager::removeUnpluggedJoysticks(const QSet<QString>& foundDevicePaths)
 
 void Manager::initializeDevice(const DevicePtr& device, const JoystickDescriptor& description)
 {
-    auto factory = ActionFactoryPtr(new ActionFactory(description, this));
+    // ActionFactory is used in multiple threads, so it should be deleted only with deleteLater,
+    // otherwise it can put an event in the loop and be deleted before the event is processed.
+    auto factory = ActionFactoryPtr(new ActionFactory(description, this), &QObject::deleteLater);
 
     d->deviceConnections[device->path()] <<
         connect(device.get(), &Device::stateChanged, this,
@@ -340,7 +342,7 @@ void Manager::initializeDevice(const DevicePtr& device, const JoystickDescriptor
 
     d->deviceConnections[device->path()] <<
         connect(factory.get(), &ActionFactory::actionReady, this,
-            [this](menu::IDType id, const menu::Parameters& parameters)
+            [](menu::IDType id, const menu::Parameters& parameters)
             {
                 if (auto context = appContext()->mainWindowContext())
                     context->menu()->triggerIfPossible(id, parameters);
