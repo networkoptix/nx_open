@@ -14,8 +14,14 @@ public:
     AdvancedUpdateSettingsDialog(QWidget* parent = nullptr);
 
     const QmlProperty<bool> advancedMode{rootObjectHolder(), "advancedMode"};
+    const QmlProperty<bool> notifyAboutUpdates{rootObjectHolder(), "notifyAboutUpdates"};
+    const QmlProperty<bool> offlineUpdatesEnabled{rootObjectHolder(), "offlineUpdatesEnabled"};
 
     virtual bool tryClose(bool force) override;
+
+private:
+    void loadSettings();
+    void saveSettings();
 
 private:
     rest::Handle m_currentRequest = 0;

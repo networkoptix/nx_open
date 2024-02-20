@@ -102,6 +102,13 @@ public:
 
     QMetaObject::Connection connectNotifySignal(QObject* receiver, const char* slot) const;
 
+    template<typename Receiver, typename Func>
+    QMetaObject::Connection connectNotifySignal(Receiver receiver, Func method) const
+    {
+        return QObject::connect(connection(), &detail::QmlPropertyConnection::valueChanged,
+            receiver, method);
+    }
+
     template<typename Func>
     QMetaObject::Connection connectNotifySignal(QObject* receiver, Func method) const
     {

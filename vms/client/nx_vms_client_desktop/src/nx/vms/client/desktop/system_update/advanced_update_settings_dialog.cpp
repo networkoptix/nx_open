@@ -27,39 +27,16 @@ AdvancedUpdateSettingsDialog::AdvancedUpdateSettingsDialog(QWidget* parent):
 {
     QmlProperty<ClientUpdateManager*>(rootObjectHolder(), "clientUpdateManager") =
         workbenchContext()->findInstance<ClientUpdateManager>();
-    QmlProperty<bool> notifyAboutUpdates(rootObjectHolder(), "notifyAboutUpdates");
 
-    notifyAboutUpdates = systemSettings()->isUpdateNotificationsEnabled();
+    loadSettings();
 
-    notifyAboutUpdates.connectNotifySignal(
-        this,
-        [this, notifyAboutUpdates]()
-        {
-            NX_ASSERT(m_currentRequest == 0);
+    connect(systemSettings(), &SystemSettings::updateNotificationsChanged,
+        this, &AdvancedUpdateSettingsDialog::loadSettings);
+    notifyAboutUpdates.connectNotifySignal(this, &AdvancedUpdateSettingsDialog::saveSettings);
 
-            auto callback =
-                [this](bool /*success*/,
-                    rest::Handle requestId,
-                    rest::ServerConnection::ErrorOrEmpty)
-                {
-                    NX_ASSERT(m_currentRequest == requestId || m_currentRequest == 0);
-                    m_currentRequest = 0;
-                };
-
-            m_currentRequest = connectedServerApi()->patchSystemSettings(
-                systemContext()->getSessionTokenHelper(),
-                api::SaveableSystemSettings{.updateNotificationsEnabled = notifyAboutUpdates},
-                callback,
-                this);
-        });
-
-    connect(systemSettings(),
-        &SystemSettings::updateNotificationsChanged,
-        this,
-        [this, notifyAboutUpdates]()
-        {
-            notifyAboutUpdates = systemSettings()->isUpdateNotificationsEnabled();
-        });
+    connect(systemSettings(), &SystemSettings::targetPersistentUpdateStorageChanged,
+        this, &AdvancedUpdateSettingsDialog::loadSettings);
+    offlineUpdatesEnabled.connectNotifySignal(this, &AdvancedUpdateSettingsDialog::saveSettings);
 }
 
 bool AdvancedUpdateSettingsDialog::tryClose(bool /*force*/)
@@ -70,6 +47,37 @@ bool AdvancedUpdateSettingsDialog::tryClose(bool /*force*/)
 
     reject();
     return true;
+}
+
+void AdvancedUpdateSettingsDialog::loadSettings()
+{
+    notifyAboutUpdates = systemSettings()->isUpdateNotificationsEnabled();
+    const update::PersistentUpdateStorage storage =
+        systemSettings()->targetPersistentUpdateStorage();
+    offlineUpdatesEnabled = storage.autoSelection || !storage.servers.isEmpty();
+}
+
+void AdvancedUpdateSettingsDialog::saveSettings()
+{
+    auto callback =
+        [this](bool /*success*/,
+            rest::Handle requestId,
+            rest::ServerConnection::ErrorOrEmpty)
+        {
+            NX_ASSERT(m_currentRequest == requestId || m_currentRequest == 0);
+            m_currentRequest = 0;
+        };
+
+    m_currentRequest = connectedServerApi()->patchSystemSettings(
+        systemContext()->getSessionTokenHelper(),
+        api::SaveableSystemSettings{
+            .updateNotificationsEnabled = notifyAboutUpdates,
+            .targetPersistentUpdateStorage = update::PersistentUpdateStorage{
+                .autoSelection = offlineUpdatesEnabled
+            }
+        },
+        callback,
+        this);
 }
 
 } // namespace nx::vms::client::desktop

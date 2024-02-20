@@ -17,9 +17,11 @@ Dialog
     height: 400
     minimumWidth: 300
     minimumHeight: 300
+    modality: Qt.ApplicationModal
 
     property ClientUpdateManager clientUpdateManager: null
     property alias notifyAboutUpdates: notifyAboutUpdatesCheckbox.checked
+    property bool offlineUpdatesEnabled: false
     property bool advancedMode: false
 
     contentItem: Column
@@ -39,7 +41,7 @@ Dialog
 
         Panel
         {
-            id: clientUpdatesPanel
+            id: autoClientUpdatesPanel
 
             width: parent.width
             title: qsTr("Automatic client updates")
@@ -47,7 +49,7 @@ Dialog
 
             Binding
             {
-                target: clientUpdatesPanel
+                target: autoClientUpdatesPanel
                 property: "checked"
                 value: clientUpdateManager && clientUpdateManager.clientUpdateEnabled
             }
@@ -144,7 +146,7 @@ Dialog
                 Label
                 {
                     width: parent.width
-                    text: clientUpdatesPanel.uiState.text
+                    text: autoClientUpdatesPanel.uiState.text
                     wrapMode: Text.WordWrap
                     textFormat: Text.RichText
                     visible: !!text
@@ -155,7 +157,7 @@ Dialog
                 Label
                 {
                     width: parent.width
-                    text: clientUpdatesPanel.uiState.errorMessage ?? ""
+                    text: autoClientUpdatesPanel.uiState.errorMessage ?? ""
                     wrapMode: Text.WordWrap
                     color: ColorTheme.colors.red_core
                     visible: !!text
@@ -165,7 +167,7 @@ Dialog
                 {
                     text: qsTr("Check for updates")
                     icon.source: "image://svg/skin/text_buttons/reload_20.svg"
-                    visible: !!clientUpdatesPanel.uiState.checkUpdatesButton
+                    visible: !!autoClientUpdatesPanel.uiState.checkUpdatesButton
 
                     onClicked:
                     {
@@ -178,7 +180,7 @@ Dialog
                 {
                     text: qsTr("Speed up this update")
                     icon.source: "image://svg/skin/text_buttons/shopping_cart.svg"
-                    visible: advancedMode && !!clientUpdatesPanel.uiState.speedUpButton
+                    visible: advancedMode && !!autoClientUpdatesPanel.uiState.speedUpButton
 
                     onClicked:
                     {
@@ -192,6 +194,52 @@ Dialog
             {
                 if (clientUpdateManager)
                     clientUpdateManager.clientUpdateEnabled = checked
+            }
+        }
+
+        Panel
+        {
+            id: offlineUpdatesPanel
+
+            width: parent.width
+            title: qsTr("Offline client updates")
+            checkable: true
+
+            Binding on checked { value: offlineUpdatesEnabled }
+
+            contentItem: Label
+            {
+                width: parent.width
+                wrapMode: Text.WordWrap
+
+                text: offlineUpdatesPanel.checked
+                    ? qsTr("Offline updates are enabled and files are stored on servers.")
+                    : qsTr("Turning this option on will enable downloading of additional files to "
+                        + "servers which can be used to update connecting clients even without "
+                        + "internet access.")
+            }
+
+            onTriggered: checked =>
+            {
+                if (!checked)
+                {
+                    const result = MessageBox.exec(
+                        MessageBox.Icon.Question,
+                        qsTr("This will delete all update files on servers.") + "\n"
+                            + qsTr("Proceed anyway?"),
+                        "",
+                        MessageBox.Cancel,
+                        {"text": qsTr("Yes"), "role": DialogButtonBox.YesRole}
+                    )
+
+                    if (result === MessageBox.Cancel)
+                    {
+                        offlineUpdatesPanel.checked = true
+                        return
+                    }
+                }
+
+                offlineUpdatesEnabled = checked
             }
         }
     }

@@ -1755,8 +1755,7 @@ void ActionHandler::at_advancedUpdateSettingsAction_triggered()
 
     m_advancedUpdateSettingsDialog->advancedMode =
         menu()->currentParameters(sender()).argument(Qn::AdvancedModeRole).toBool();
-    m_advancedUpdateSettingsDialog->open();
-    m_advancedUpdateSettingsDialog->raise();
+    m_advancedUpdateSettingsDialog->exec();
 }
 
 void ActionHandler::at_jumpToTimeAction_triggered()
