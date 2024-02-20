@@ -55,7 +55,17 @@ Params Params::fromJson(const QJsonObject& value)
 {
     Params params;
     for (auto it = value.begin(); it != value.end(); ++it)
-        params.insert(it.key(), valueToString(std::move(it.value())));
+    {
+        if (it->isArray())
+        {
+            for (const auto& arrayItem: it->toArray())
+                params.insert(it.key(), valueToString(arrayItem));
+        }
+        else
+        {
+            params.insert(it.key(), valueToString(it.value()));
+        }
+    }
 
     return params;
 }
