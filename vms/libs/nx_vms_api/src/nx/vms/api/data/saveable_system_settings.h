@@ -12,6 +12,7 @@
 #include <nx/vms/api/data/client_update_settings.h>
 #include <nx/vms/api/data/email_settings.h>
 #include <nx/vms/api/data/watermark_settings.h>
+#include <nx/vms/common/update/persistent_update_storage.h>
 
 namespace nx::vms::api {
 
@@ -46,6 +47,8 @@ struct SaveableSystemSettings
 
     std::optional<BackupSettings> backupSettings;
     std::optional<MetadataStorageChangePolicy> metadataStorageChangePolicy;
+
+    std::optional<common::update::PersistentUpdateStorage> targetPersistentUpdateStorage;
 };
 
 NX_REFLECTION_INSTRUMENT(SaveableSystemSettings,
@@ -54,7 +57,7 @@ NX_REFLECTION_INSTRUMENT(SaveableSystemSettings,
     (watermarkSettings)(auditTrailEnabled)(trafficEncryptionForced)(useHttpsOnlyForCameras)
     (videoTrafficEncryptionForced)(sessionLimitS)(storageEncryption)(showServersInTreeForNonAdmins)
     (updateNotificationsEnabled)(customReleaseListUrl)(clientUpdateSettings)
-    (backupSettings)(metadataStorageChangePolicy))
+    (backupSettings)(metadataStorageChangePolicy)(targetPersistentUpdateStorage))
 
 NX_REFLECTION_TAG_TYPE(SaveableSystemSettings, jsonSerializeChronoDurationAsNumber)
 
