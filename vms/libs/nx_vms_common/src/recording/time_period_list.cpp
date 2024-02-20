@@ -334,6 +334,7 @@ QnTimePeriodList QnTimePeriodList::aggregateTimePeriodsUnconstrained(
     if (periods.isEmpty())
         return result;
 
+    const qint64 detailLevelMs = std::max((qint64) detailLevel.count(), 1LL);
     result.push_back(*periods.begin());
 
     for (const QnTimePeriod& p: periods)
@@ -342,7 +343,7 @@ QnTimePeriodList QnTimePeriodList::aggregateTimePeriodsUnconstrained(
         if (last.isInfinite())
             break;
 
-        if (last.startTimeMs + last.durationMs + detailLevel.count() > p.startTimeMs)
+        if (last.startTimeMs + last.durationMs + detailLevelMs > p.startTimeMs)
         {
             if (p.isInfinite())
             {
