@@ -739,7 +739,7 @@ Rectangle
 
         ColumnLayout
         {
-            spacing: 0
+            spacing: 2
 
             Layout.fillHeight: false
 
