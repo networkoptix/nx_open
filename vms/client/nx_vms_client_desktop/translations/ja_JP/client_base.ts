@@ -333,7 +333,7 @@
     </message>
     <message>
       <source>Zoom to Selection</source>
-      <translation>選択エリアのズーム</translation>
+      <translation>選択範囲にズーム</translation>
     </message>
     <message>
       <source>Add Bookmark...</source>
@@ -393,7 +393,7 @@
     </message>
     <message>
       <source>Attach to Video Wall...</source>
-      <translation>ビデオウォールに接続...</translation>
+      <translation>ビデオウォールに割り当て...</translation>
     </message>
     <message>
       <source>Switch to Video Wall mode...</source>
@@ -1823,7 +1823,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Adjust to smallest value that does not degrade live view. Bigger buffer makes playback smoother but increases delay between real time and live view; smaller buffer decreases delay but can cause stutters.</source>
-      <translation>ライブビューを劣化させない最小値に調整してください。バッファが大きいほど再生はスムーズになりますが、リアルタイムとライブビューの間の遅延が増えます。バッファを小さくすると遅延は減少しますが、スタッターが発生する可能性があります。</translation>
+      <translation>ライブビューを劣化させない最小値に調整してください。バッファーが大きいほど再生はスムーズになりますが、リアルタイムとライブビューの間の遅延が増えます。バッファーを小さくすると遅延は減少しますが、カクつきが発生する可能性があります。</translation>
     </message>
     <message>
       <source>Warning! This is an experimental option that saves CPU but may affect animation.</source>
@@ -6851,7 +6851,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Keep</source>
-      <translation>維持</translation>
+      <translation>維持する</translation>
     </message>
     <message>
       <source>Local files cannot be placed on Video Wall Screen attached to another computer</source>
