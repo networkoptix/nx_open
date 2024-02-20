@@ -4,6 +4,7 @@
 
 #include <QtCore/QCoreApplication>
 #include <QtQml/QQmlEngine>
+#include <QtQml/QQmlContext>
 #include <QtQml/private/qv4engine_p.h>
 
 #include <client_core/client_core_meta_types.h>
@@ -96,7 +97,7 @@ struct ApplicationContext::Private
                 return buildInfoQmlProxy;
             });
 
-        qmlEngine = new QQmlEngine(q);
+        qmlEngine.reset(new QQmlEngine());
 
         const auto thumbnailProvider = new ThumbnailImageProvider();
         // QQmlEngine takes ownership of thumbnailProvider.
@@ -128,7 +129,7 @@ struct ApplicationContext::Private
     const ApplicationContext::Mode mode;
     const bool ignoreCustomization = false;
 
-    QQmlEngine* qmlEngine = nullptr;
+    std::unique_ptr<QQmlEngine> qmlEngine;
     std::unique_ptr<Settings> settings;
     std::unique_ptr<CloudStatusWatcher> cloudStatusWatcher;
     std::unique_ptr<QnSystemsFinder> systemsFinder;
@@ -228,7 +229,7 @@ void ApplicationContext::initializeNetworkModules()
 
 QQmlEngine* ApplicationContext::qmlEngine() const
 {
-    return d->qmlEngine;
+    return d->qmlEngine.get();
 }
 
 CloudStatusWatcher* ApplicationContext::cloudStatusWatcher() const
@@ -264,6 +265,12 @@ void ApplicationContext::storeFontConfig(FontConfig* config)
 FontConfig* ApplicationContext::fontConfig() const
 {
     return d->fontConfig.get();
+}
+
+void ApplicationContext::resetEngine()
+{
+    d->qmlEngine->rootContext()->setContextObject(nullptr);
+    d->qmlEngine.reset();
 }
 
 watchers::KnownServerConnections* ApplicationContext::knownServerConnectionsWatcher() const
