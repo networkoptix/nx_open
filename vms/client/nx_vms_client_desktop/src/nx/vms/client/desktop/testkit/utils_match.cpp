@@ -18,6 +18,8 @@ namespace nx::vms::client::desktop::testkit::utils {
 
 namespace {
 
+const QString kRegexPrefix = "re:";
+
 QString stripShortcuts(QString title)
 {
     // Replace: &A -> A
@@ -53,10 +55,23 @@ bool valueIsTrue(const QJSValue& value)
     return value.toString() == "yes" || value.toInt() == 1 || value.toBool();
 }
 
+bool hasRegexPreffix(const QString& str)
+{
+    return str.contains(kRegexPrefix);
+}
+
+QString extractRegex(const QString& str)
+{
+    return str.mid(kRegexPrefix.size());
+}
+
 } // namespace
 
 bool textMatches(QString itemText, QString text)
 {
+    if (hasRegexPreffix(text))
+        return itemText.contains(QRegularExpression(extractRegex(text)));
+
     return itemText == text || stripShortcuts(itemText) == text;
 }
 
