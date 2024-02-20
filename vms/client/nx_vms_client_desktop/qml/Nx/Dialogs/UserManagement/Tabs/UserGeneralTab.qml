@@ -809,64 +809,69 @@ Item
             }
         }
 
-        DialogBanner
+        ColumnLayout
         {
-            id: bannerUserNotFound
+            spacing: 2
 
-            style: DialogBanner.Style.Error
-            closeable: true
-            watchToReopen: control.userId
-            visible: control.ldapError && !closed && !control.isSelf
-            Layout.fillWidth: true
+            DialogBanner
+            {
+                id: bannerUserNotFound
 
-            text: qsTr("This user is not found in LDAP database and is not able to log in.")
+                style: DialogBanner.Style.Error
+                closeable: true
+                watchToReopen: control.userId
+                visible: control.ldapError && !closed && !control.isSelf
+                Layout.fillWidth: true
 
-            buttonText: control.deleteAvailable && control.enabled ? qsTr("Delete") : ""
-            buttonIcon: "image://svg/skin/user_settings/trash.svg"
+                text: qsTr("This user is not found in LDAP database and is not able to log in.")
 
-            onButtonClicked: control.deleteRequested()
-        }
+                buttonText: control.deleteAvailable && control.enabled ? qsTr("Delete") : ""
+                buttonIcon: "image://svg/skin/user_settings/trash.svg"
 
-        DialogBanner
-        {
-            id: ldapServerIsOffline
+                onButtonClicked: control.deleteRequested()
+            }
 
-            style: DialogBanner.Style.Error
-            closeable: true
-            watchToReopen: control.userId
-            visible: control.ldapOffline && !closed && !control.isSelf
-            Layout.fillWidth: true
+            DialogBanner
+            {
+                id: ldapServerIsOffline
 
-            text: qsTr("LDAP server is offline. User is not able to log in.")
-        }
+                style: DialogBanner.Style.Error
+                closeable: true
+                watchToReopen: control.userId
+                visible: control.ldapOffline && !closed && !control.isSelf
+                Layout.fillWidth: true
 
-        DialogBanner
-        {
-            style: DialogBanner.Style.Error
-            visible: !control.nameIsUnique && control.userEnabled && !closed && !control.isSelf
-            closeable: true
-            watchToReopen: control.userId
-            Layout.fillWidth: true
+                text: qsTr("LDAP server is offline. User is not able to log in.")
+            }
 
-            text: qsTr("This user’s login duplicates the login of another user. None of them is "
-                + "able to log in. To resolve this issue you can change user’s login or disable "
-                + "or delete users with duplicating logins.")
-        }
+            DialogBanner
+            {
+                style: DialogBanner.Style.Error
+                visible: !control.nameIsUnique && control.userEnabled && !closed && !control.isSelf
+                closeable: true
+                watchToReopen: control.userId
+                Layout.fillWidth: true
 
-        DialogBanner
-        {
-            style: DialogBanner.Style.Warning
-            closeable: true
-            watchToReopen: control.userId
-            Layout.fillWidth: true
+                text: qsTr("This user’s login duplicates the login of another user. None of them is "
+                    + "able to log in. To resolve this issue you can change user’s login or disable "
+                    + "or delete users with duplicating logins.")
+            }
 
-            visible: control.userType === UserSettingsGlobal.LdapUser
-                && control.continuousSync === LdapSettings.Sync.disabled
-                && !closed
+            DialogBanner
+            {
+                style: DialogBanner.Style.Warning
+                closeable: true
+                watchToReopen: control.userId
+                Layout.fillWidth: true
 
-            text: qsTr("When continuous sync with LDAP server is disabled, user membership in " +
-                "groups does not synchronize automatically. To update this information, " +
-                "initiate a manual sync.")
+                visible: control.userType === UserSettingsGlobal.LdapUser
+                    && control.continuousSync === LdapSettings.Sync.disabled
+                    && !closed
+
+                text: qsTr("When continuous sync with LDAP server is disabled, user membership in " +
+                    "groups does not synchronize automatically. To update this information, " +
+                    "initiate a manual sync.")
+            }
         }
     }
 }

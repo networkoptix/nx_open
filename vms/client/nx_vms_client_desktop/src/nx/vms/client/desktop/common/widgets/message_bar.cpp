@@ -26,14 +26,10 @@
 namespace {
 
 static const QString kCrossColor = "#E1E7EA";
-static const QString kErrorIconColor = "#E1E7EA";
 static const QString kCertificateWarningIconColor = "#698796";
 static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kTextButtonColors = {
     {QIcon::Normal, {{kCrossColor, "light4"}, {kCertificateWarningIconColor, "light4"}}},
     {QIcon::Active, {{kCrossColor, "light3"}}}};
-static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kErrorIconColors = {
-    {QIcon::Normal, {{kErrorIconColor, "red_l1"}}}};
-
 } // namespace
 
 namespace nx::vms::client::desktop {
@@ -205,7 +201,7 @@ void CommonMessageBar::init(const BarDescription& barDescription)
             break;
         case BarDescription::BarLevel::Error:
             backgroundColor = "dark10";
-            icon = qnSkin->icon("banners/error.svg", kErrorIconColors);
+            icon = qnSkin->icon("banners/error.svg");
             break;
     }
 
