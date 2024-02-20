@@ -212,6 +212,14 @@ void initialize(Manager* manager, Action* root)
             condition::hasPermissionsForResources(Qn::ManageBookmarksPermission)
             && condition::hasFlags(Qn::live_cam, MatchMode::all));
 
+    factory(AcknowledgeNotificationAction)
+        .mode(DesktopMode)
+        .flags(NoTarget | SingleTarget | ResourceTarget)
+        .condition(
+            condition::hasPermissionsForResources(Qn::ManageBookmarksPermission)
+            && condition::hasFlags(Qn::live_cam, MatchMode::all)
+            && condition::hasNewEventRulesEngine());
+
     factory(StartVideoWallControlAction)
         .flags(Tree | VideoWallReviewScene | SingleTarget | MultiTarget | VideoWallItemTarget)
         .text(ContextMenu::tr("Control Video Wall"))

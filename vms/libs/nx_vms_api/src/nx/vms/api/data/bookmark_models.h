@@ -8,7 +8,7 @@
 #include <set>
 
 #include <nx/fusion/model_functions_fwd.h>
-#include <nx/reflect/enum_instrument.h>
+#include <nx/reflect/instrument.h>
 #include <nx/utils/serialization/qt_core_types.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/json/value_or_array.h>
@@ -214,6 +214,7 @@ struct NX_VMS_API BookmarkV1: BookmarkBase, BookmarkIdV1
 };
 #define BookmarkV1_Fields BookmarkBase_Fields BookmarkIdV1_Fields (serverId)
 QN_FUSION_DECLARE_FUNCTIONS(BookmarkV1, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(BookmarkV1, BookmarkV1_Fields)
 
 struct NX_VMS_API BookmarkWithRuleV1: BookmarkV1
 {

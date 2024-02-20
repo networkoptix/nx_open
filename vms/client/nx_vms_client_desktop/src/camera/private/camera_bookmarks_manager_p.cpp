@@ -299,6 +299,15 @@ void QnCameraBookmarksManagerPrivate::addCameraBookmark(
     addCameraBookmarkInternal(bookmark, nx::Uuid(), callback);
 }
 
+void QnCameraBookmarksManagerPrivate::addExistingBookmark(const QnCameraBookmark& bookmark)
+{
+    addUpdatePendingBookmark(bookmark);
+
+    const auto it = m_pendingBookmarks.find(bookmark.guid);
+    if (NX_ASSERT(it != m_pendingBookmarks.end()))
+        it->discardTimer.start();
+}
+
 void QnCameraBookmarksManagerPrivate::acknowledgeEvent(
     const QnCameraBookmark& bookmark,
     const nx::Uuid& eventRuleId,

@@ -57,7 +57,7 @@
 #include <nx/vms/api/data/user_data.h>
 #include <nx/vms/api/data/user_group_model.h>
 #include <nx/vms/api/data/user_model.h>
-#include <nx/vms/api/rules/event_log_fwd.h>
+#include <nx/vms/api/rules/acknowledge.h>
 #include <nx/vms/auth/auth_result.h>
 #include <nx/vms/event/event_fwd.h>
 #include <nx/vms/utils/abstract_session_token_helper.h>
@@ -403,6 +403,15 @@ public:
         Result<ErrorOrData<nx::vms::api::rules::EventLogRecordList>>::type callback,
         QThread* targetThread = nullptr,
         std::optional<Timeouts> timeouts = std::nullopt);
+
+    Handle getEventsToAcknowledge(
+        Result<ErrorOrData<nx::vms::api::rules::EventLogRecordList>>::type callback,
+        QThread* targetThread = nullptr);
+
+    Handle acknowledge(
+        const nx::vms::api::rules::AcknowledgeBookmark& bookmark,
+        Result<ErrorOrData<nx::vms::api::BookmarkV1>>::type callback,
+        QThread* targetThread = nullptr);
 
     /* Get camera credentials. */
     Handle getCameraCredentials(

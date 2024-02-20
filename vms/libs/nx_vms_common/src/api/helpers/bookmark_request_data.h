@@ -6,7 +6,6 @@
 #include <api/helpers/request_helpers_fwd.h>
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/resource_fwd.h>
-#include <nx/vms/event/event_fwd.h>
 
 struct NX_VMS_COMMON_API QnGetBookmarksRequestData: public QnMultiserverRequestData
 {

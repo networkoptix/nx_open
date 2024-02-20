@@ -201,6 +201,14 @@ void fillEventData(
         action->attributes());
 }
 
+nx::Uuid actionSourceId(const nx::vms::rules::NotificationActionBasePtr& action)
+{
+    if (!action->deviceIds().empty())
+        return action->deviceIds().front();
+
+    return action->serverId();
+}
+
 } // namespace
 
 NotificationListModel::Private::Private(NotificationListModel* q):
@@ -213,7 +221,7 @@ NotificationListModel::Private::Private(NotificationListModel* q):
     connect(handler, &NotificationActionHandler::notificationAdded,
         this, &Private::addNotification);
     connect(handler, &NotificationActionHandler::notificationRemoved,
-        this, &Private::removeNotification);
+        this, &Private::onNotificationRemoved);
 
     connect(q, &EventListModel::modelReset, this,
         [this]()
@@ -338,6 +346,13 @@ void NotificationListModel::Private::onNotificationActionBase(
     NX_VERBOSE(this, "Received action: %1, state: %2, id: %3",
         actionType, action->state(), action->id());
 
+    if (action->state() == State::stopped)
+    {
+        removeNotification(action);
+
+        return;
+    }
+
     if (actionType == vms::rules::utils::type<NotificationAction>())
         onNotificationAction(action.dynamicCast<NotificationAction>(), cloudSystemId);
     else if (actionType == vms::rules::utils::type<RepeatSoundAction>())
@@ -346,6 +361,37 @@ void NotificationListModel::Private::onNotificationActionBase(
         onAlarmLayoutAction(action.dynamicCast<ShowOnAlarmLayoutAction>());
     else
         NX_ASSERT(false, "Unexpected action type: %1", actionType);
+
+    truncateToMaximumCount();
+}
+
+void NotificationListModel::Private::removeNotification(
+    const nx::vms::rules::NotificationActionBasePtr& action)
+{
+    // TODO: #amalov Consider splitting removal logic by action handlers.
+
+    if (const auto actionId = action->id(); !actionId.isNull())
+    {
+        q->removeEvent(actionId);
+        return;
+    }
+
+    const auto ruleId = action->ruleId();
+
+    if (action->type() == nx::vms::rules::utils::type<nx::vms::rules::RepeatSoundAction>())
+    {
+        removeAllItems(ruleId);
+        return;
+    }
+
+    const auto iter = m_uuidHashes.find(ruleId);
+    if (iter == m_uuidHashes.end())
+        return;
+
+    const auto resourceId = actionSourceId(action);
+
+    for (const auto id: iter->value(resourceId)) //< Must iterate a copy of the list.
+        q->removeEvent(id);
 }
 
 void NotificationListModel::Private::onNotificationAction(
@@ -376,15 +422,13 @@ void NotificationListModel::Private::onNotificationAction(
     eventData.cloudSystemId = cloudSystemId;
     fillEventData(action.get(), eventData);
 
-    setupClientAction(action.get(), eventData);
+    setupClientAction(action, eventData);
 
     if (!this->q->addEvent(eventData))
         return;
 
     if (!cloudSystemId.isEmpty() && eventData.previewCamera)
         m_itemsByCloudSystem.insert(cloudSystemId, eventData.id);
-
-    truncateToMaximumCount();
 }
 
 void NotificationListModel::Private::onRepeatSoundAction(
@@ -408,9 +452,7 @@ void NotificationListModel::Private::onRepeatSoundAction(
 
         m_itemsByLoadingSound.insert(soundUrl, eventData.id);
 
-        m_uuidHashes[action->ruleId()][eventData.sourceId()].insert(eventData.id);
-
-        truncateToMaximumCount();
+        m_uuidHashes[action->ruleId()][actionSourceId(action)].insert(eventData.id);
     }
     else if (action->state() == nx::vms::rules::State::stopped)
     {
@@ -447,7 +489,7 @@ void NotificationListModel::Private::onAlarmLayoutAction(
         return;
 
     // TODO: #amalov Check the need of using m_uuidHashes for this action.
-    truncateToMaximumCount();
+    m_uuidHashes[action->ruleId()][actionSourceId(action)].insert(eventData.id);
 }
 
 void NotificationListModel::Private::addNotification(const vms::event::AbstractActionPtr& action)
@@ -649,14 +691,14 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
 }
 
 void NotificationListModel::Private::setupClientAction(
-    const nx::vms::rules::NotificationAction* action,
-    EventData& eventData) const
+    const nx::vms::rules::NotificationActionPtr& action,
+    EventData& eventData)
 {
     using nx::vms::rules::ClientAction;
 
     const auto server = getResource(action->serverId(), eventData.cloudSystemId)
         .dynamicCast<QnMediaServerResource>();
-    const auto devices = getActionDevices(action, eventData.cloudSystemId);
+    const auto devices = getActionDevices(action.get(), eventData.cloudSystemId);
     const auto camera = (devices.count() == 1) ? devices.front() : QnVirtualCameraResourcePtr();
 
     eventData.source = camera ? camera.staticCast<QnResource>() : server.staticCast<QnResource>();
@@ -710,9 +752,12 @@ void NotificationListModel::Private::setupClientAction(
             NX_ASSERT(false, "Unsupported client action");
             break;
     }
+
+    setupAcknowledgeAction(action, camera, eventData);
 }
 
-void NotificationListModel::Private::removeNotification(const vms::event::AbstractActionPtr& action)
+void NotificationListModel::Private::onNotificationRemoved(
+    const vms::event::AbstractActionPtr& action)
 {
     if (const auto actionId = action->getParams().actionId; !actionId.isNull())
     {
@@ -801,6 +846,43 @@ void NotificationListModel::Private::setupAcknowledgeAction(EventData& eventData
                 params.setResources({camera});
             params.setArgument(Qn::ActionDataRole, action);
             menu()->trigger(menu::AcknowledgeEventAction, params);
+        };
+
+    connect(eventData.extraAction.data(), &QAction::triggered,
+        [this, actionHandler]() { executeLater(actionHandler, this); });
+}
+
+void NotificationListModel::Private::setupAcknowledgeAction(
+    const nx::vms::rules::NotificationActionPtr& action,
+    const QnResourcePtr& camera,
+    EventData& eventData)
+{
+    if (!camera || !action->acknowledge())
+        return;
+
+    if (!system()->accessController()->hasPermissions(camera, Qn::ManageBookmarksPermission))
+    {
+        NX_VERBOSE(this, "Can't setup acknowledge action id: %1, lacking bookmark permissions",
+            action->id());
+        return;
+    }
+
+    NX_VERBOSE(this, "Setting up acknowledge action id: %1", action->id());
+
+    eventData.removable = false;
+    eventData.level = QnNotificationLevel::Value::CriticalNotification;
+
+    eventData.extraAction = CommandActionPtr::create();
+    eventData.extraAction->setIcon(qnSkin->icon("buttons/acknowledge_24.svg", kIconSubstitutions));
+    eventData.extraAction->setText(tr("Acknowledge"));
+
+    const auto actionHandler =
+        [this, camera, action]()
+        {
+            menu::Parameters params;
+            params.setResources({camera});
+            params.setArgument(Qn::ActionDataRole, action);
+            menu()->trigger(menu::AcknowledgeNotificationAction, params);
         };
 
     connect(eventData.extraAction.data(), &QAction::triggered,

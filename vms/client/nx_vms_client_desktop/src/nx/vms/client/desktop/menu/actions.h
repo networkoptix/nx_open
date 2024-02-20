@@ -1515,6 +1515,12 @@ enum IDType
     /** Open Event Log dialog. Should replace OpenBusinessLogAction. */
     OpenEventLogAction,
 
+    /**
+     * Create bookmark, event log record & hide notification.
+     * Should replace AcknowledgeEventAction.
+     */
+    AcknowledgeNotificationAction,
+
     ActionCount,
 
     NoAction = -1

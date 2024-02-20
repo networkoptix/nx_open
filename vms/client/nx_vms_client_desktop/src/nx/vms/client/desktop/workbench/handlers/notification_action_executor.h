@@ -2,10 +2,10 @@
 
 #pragma once
 
+#include <nx/vms/api/rules/acknowledge.h>
 #include <nx/vms/rules/action_executor.h>
+#include <nx/vms/rules/actions/actions_fwd.h>
 #include <ui/workbench/workbench_context_aware.h>
-
-namespace nx::vms::rules { class NotificationActionBase; }
 
 namespace nx::vms::client::desktop {
 
@@ -21,6 +21,8 @@ public:
     explicit NotificationActionExecutor(QObject* parent);
     ~NotificationActionExecutor();
 
+    void setAcknowledge(nx::vms::api::rules::EventLogRecordList&& records);
+
 signals:
     void notificationActionReceived(
         const QSharedPointer<nx::vms::rules::NotificationActionBase>& notificationAction,
@@ -30,6 +32,9 @@ private:
     virtual void execute(const nx::vms::rules::ActionPtr& action) override;
 
     void onContextUserChanged();
+    void handleAcknowledgeAction();
+
+    void removeNotification(const nx::vms::rules::NotificationActionBasePtr& action);
 
 private:
     std::unique_ptr<CrossSystemNotificationsListener> m_listener;

@@ -11,7 +11,7 @@ namespace nx::vms::rules::utils {
 
 QnUserResourceSet users(
     const UuidSelection& selection,
-    common::SystemContext* context,
+    const common::SystemContext* context,
     bool activeOnly)
 {
     auto result = selection.all
@@ -24,6 +24,26 @@ QnUserResourceSet users(
         erase_if(result, [](const auto& user) { return !user->isEnabled(); });
 
     return result;
+}
+
+bool isUserSelected(
+    const UuidSelection& selection,
+    const common::SystemContext* context,
+    nx::Uuid userId)
+{
+    if (selection.all)
+        return true;
+
+    if (selection.ids.contains(userId))
+        return true;
+
+    for (const auto& user: nx::vms::common::allUsers(context, selection.ids))
+    {
+        if (user->getId() == userId)
+            return true;
+    };
+
+    return false;
 }
 
 } // namespace nx::vms::rules::utils

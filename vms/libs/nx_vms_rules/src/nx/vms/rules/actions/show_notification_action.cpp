@@ -20,7 +20,7 @@ const ItemDescriptor& NotificationAction::manifest()
         .displayName = tr("Show Desktop Notification"),
         .description = "",
         .fields = {
-            makeFieldDescriptor<EventIdField>("id", "Event ID"),
+            makeFieldDescriptor<EventIdField>(utils::kIdFieldName, "Event ID"),
             utils::makeTargetUserFieldDescriptor(tr("To")),
             makeFieldDescriptor<ActionFlagField>(utils::kAcknowledgeFieldName, tr("Force Acknowledgement")),
             utils::makeIntervalFieldDescriptor(tr("Interval of Action")),
@@ -47,6 +47,7 @@ const ItemDescriptor& NotificationAction::manifest()
             utils::makeExtractDetailFieldDescriptor("customIcon", utils::kCustomIconDetailName),
             utils::makeExtractDetailFieldDescriptor("clientAction", utils::kClientActionDetailName),
             utils::makeExtractDetailFieldDescriptor("url", utils::kUrlDetailName),
+            utils::makeExtractDetailFieldDescriptor("extendedCaption", utils::kExtendedCaptionDetailName),
         }
     };
     return kDescriptor;

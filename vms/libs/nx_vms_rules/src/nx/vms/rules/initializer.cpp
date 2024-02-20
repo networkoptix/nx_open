@@ -47,6 +47,7 @@ void Initializer::registerEvents() const
 void Initializer::registerActions() const
 {
     // Register built-in actions.
+    registerAction<AcknowledgeAction>();
     registerAction<BuzzerAction>();
     registerAction<BookmarkAction>();
     registerAction<DeviceOutputAction>();

@@ -41,6 +41,7 @@ static constexpr auto kDurationFieldName = "duration";
 static constexpr auto kEmailsFieldName = "emails";
 static constexpr auto kEventTypeIdFieldName = "eventTypeId";
 static constexpr auto kEngineIdFieldName = "engineId";
+static constexpr auto kIdFieldName = "id";
 static constexpr auto kIntervalFieldName = "interval";
 static constexpr auto kLayoutIdsFieldName = "layoutIds";
 static constexpr auto kObjectTypeIdFieldName = "objectTypeId";
