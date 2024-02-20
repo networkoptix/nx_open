@@ -7,6 +7,7 @@
 #include <QtCore/QSharedPointer>
 
 #include <nx/vms/event/event_fwd.h>
+#include <nx/vms/rules/actions/actions_fwd.h>
 
 #include "../notification_list_model.h"
 
@@ -52,8 +53,10 @@ private:
     void onAlarmLayoutAction(
         const QSharedPointer<nx::vms::rules::ShowOnAlarmLayoutAction>& action);
 
+    void removeNotification(const nx::vms::rules::NotificationActionBasePtr& action);
+
     void addNotification(const vms::event::AbstractActionPtr& action);
-    void removeNotification(const vms::event::AbstractActionPtr& action);
+    void onNotificationRemoved(const vms::event::AbstractActionPtr& action);
 
     void onRowsAboutToBeRemoved(const QModelIndex& parent, int first, int last);
 
@@ -84,8 +87,12 @@ private:
         const QColor& color) const;
 
     void setupClientAction(
-        const nx::vms::rules::NotificationAction* action,
-        EventData& eventData) const;
+        const nx::vms::rules::NotificationActionPtr& action,
+        EventData& eventData);
+    void setupAcknowledgeAction(
+        const nx::vms::rules::NotificationActionPtr& action,
+        const QnResourcePtr& device,
+        EventData& eventData);
 
     void truncateToMaximumCount();
 

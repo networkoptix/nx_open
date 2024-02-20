@@ -39,6 +39,9 @@ public:
     /// @param callback         Callback with operation result.
     void addCameraBookmark(const QnCameraBookmark &bookmark, OperationCallbackType callback = OperationCallbackType());
 
+    /** Add already created bookmark, e.g. from standalone API call. */
+    void addExistingBookmark(const QnCameraBookmark& bookmark);
+
     /// @brief                  Add the bookmark to the camera and stores record in event log
     ///                         for the specified event.
     /// @param bookmark         Target bookmark.

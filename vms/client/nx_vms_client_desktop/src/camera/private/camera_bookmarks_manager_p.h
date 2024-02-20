@@ -48,6 +48,8 @@ public:
     /// @param callback         Callback with operation result.
     void addCameraBookmark(const QnCameraBookmark &bookmark, OperationCallbackType callback = OperationCallbackType());
 
+    void addExistingBookmark(const QnCameraBookmark& bookmark);
+
     void acknowledgeEvent(
         const QnCameraBookmark& bookmark,
         const nx::Uuid& eventRuleId,

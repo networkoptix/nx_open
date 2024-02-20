@@ -39,6 +39,14 @@ void QnCameraBookmarksManager::addCameraBookmark(const QnCameraBookmark &bookmar
     emit bookmarkAdded(bookmark);
 }
 
+void QnCameraBookmarksManager::addExistingBookmark(const QnCameraBookmark& bookmark)
+{
+    NX_ASSERT(bookmark.isValid(), "Invalid bookmark");
+    d->addExistingBookmark(bookmark);
+
+    emit bookmarkAdded(bookmark);
+}
+
 void QnCameraBookmarksManager::addAcknowledge(
     const QnCameraBookmark &bookmark,
     const nx::Uuid& eventRuleId,

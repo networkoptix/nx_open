@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "acknowledge_action.h"
 #include "bookmark_action.h"
 #include "buzzer_action.h"
 #include "device_output_action.h"

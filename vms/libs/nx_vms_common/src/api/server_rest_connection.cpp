@@ -1297,6 +1297,28 @@ Handle ServerConnection::eventLog(
         timeouts);
 }
 
+Handle ServerConnection::getEventsToAcknowledge(
+    Result<ErrorOrData<nx::vms::api::rules::EventLogRecordList>>::type callback,
+    QThread* targetThread)
+{
+    return executeGet("rest/v4/events/acknowledges", {}, std::move(callback), targetThread);
+}
+
+Handle ServerConnection::acknowledge(
+    const nx::vms::api::rules::AcknowledgeBookmark& bookmark,
+    Result<ErrorOrData<nx::vms::api::BookmarkV1>>::type callback,
+    QThread* targetThread)
+{
+    if (!NX_ASSERT(!bookmark.serverId.isNull()))
+        return {};
+
+    return executePost(
+        "rest/v4/events/acknowledges",
+        nx::reflect::json::serialize(bookmark),
+        std::move(callback),
+        targetThread);
+}
+
 Handle ServerConnection::getCameraCredentials(
     const nx::Uuid& deviceId,
     Result<QAuthenticator>::type callback,

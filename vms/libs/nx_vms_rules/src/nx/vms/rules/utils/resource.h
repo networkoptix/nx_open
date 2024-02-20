@@ -12,10 +12,15 @@ struct UuidSelection;
 
 namespace utils {
 
-QnUserResourceSet users(
+NX_VMS_RULES_API QnUserResourceSet users(
     const UuidSelection& selection,
-    common::SystemContext* context,
+    const common::SystemContext* context,
     bool activeOnly = false);
+
+NX_VMS_RULES_API bool isUserSelected(
+    const UuidSelection& selection,
+    const common::SystemContext* context,
+    nx::Uuid userId);
 
 } // namespace utils
 } // namespace nx::vms::rules

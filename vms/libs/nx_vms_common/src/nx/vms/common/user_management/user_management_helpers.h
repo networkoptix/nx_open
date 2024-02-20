@@ -19,7 +19,7 @@ namespace nx::vms::common {
 
 template<class IdList>
 void getUsersAndGroups(
-    SystemContext* systemContext,
+    const SystemContext* systemContext,
     const IdList& idList,
     QnUserResourceList& users,
     nx::vms::api::UserGroupDataList& groups)
@@ -33,7 +33,7 @@ void getUsersAndGroups(
 
 template<class IdList>
 void getUsersAndGroups(
-    SystemContext* systemContext,
+    const SystemContext* systemContext,
     const IdList& idList,
     QnUserResourceList& users,
     QList<nx::Uuid>& groupIds)
@@ -49,7 +49,7 @@ void getUsersAndGroups(
 }
 
 template<class IdList>
-QnUserResourceSet allUsers(SystemContext* context, const IdList& ids)
+QnUserResourceSet allUsers(const SystemContext* context, const IdList& ids)
 {
     QnUserResourceList users;
     UuidList groupIds;

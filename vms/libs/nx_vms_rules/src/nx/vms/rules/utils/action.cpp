@@ -69,6 +69,11 @@ bool hasTargetServer(const vms::rules::ItemDescriptor& actionDescriptor)
         });
 }
 
+bool needAcknowledge(const ActionPtr& action)
+{
+    return action->property(utils::kAcknowledgeFieldName).toBool();
+}
+
 bool checkUserPermissions(const QnUserResourcePtr& user, const ActionPtr& action)
 {
     if (!user)

@@ -6,10 +6,17 @@
 #include <client/client_message_processor.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/api/data/lookup_list_data.h>
+#include <nx/vms/api/rules/event_log.h>
 #include <nx/vms/client/core/access/access_controller.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/window_context.h>
+#include <nx/vms/client/desktop/workbench/handlers/notification_action_executor.h>
 #include <nx/vms/common/lookup_lists/lookup_list_manager.h>
+#include <nx/vms/rules/engine.h>
+#include <nx/vms/rules/ini.h>
+#include <ui/workbench/workbench_context.h>
 
 namespace nx::vms::client::desktop {
 
@@ -18,13 +25,55 @@ using nx::vms::client::core::AccessController;
 struct DelayedDataLoader::Private
 {
     DelayedDataLoader* const q;
-    std::optional<rest::Handle> requestId;
+    QSet<rest::Handle> requestIds;
 
-    void cancelRequest()
+    void cancelRequests()
     {
-        if (requestId)
-            q->connectedServerApi()->cancelRequest(*requestId);
-        requestId = {};
+        if (auto serverApi = q->connectedServerApi())
+        {
+            for (const auto id: requestIds)
+                serverApi->cancelRequest(id);
+        }
+
+        requestIds.clear();
+    }
+
+    void loadAcknowledge()
+    {
+        using namespace nx::vms::api::rules;
+
+        auto callback = nx::utils::guarded(
+            q,
+            [this](
+                bool /*success*/,
+                rest::Handle requestId,
+                const rest::ErrorOrData<EventLogRecordList>& result)
+            {
+                if (!requestIds.remove(requestId))
+                    return;
+
+                if (auto restResult = std::get_if<network::rest::Result>(&result))
+                {
+                    NX_WARNING(
+                        this,
+                        "Acknowledge request %1 failed, error: %2, string: %3",
+                        requestId, restResult->error, restResult->errorString);
+                    return;
+                }
+
+                auto records = std::get<EventLogRecordList>(result);
+                NX_VERBOSE(this, "Received %1 acknowledge actions", records.size());
+
+                appContext()->mainWindowContext()->workbenchContext()
+                    ->instance<NotificationActionExecutor>()->setAcknowledge(std::move(records));
+            });
+
+        if (auto serverApi = q->connectedServerApi())
+        {
+            auto requestId = serverApi->getEventsToAcknowledge(std::move(callback), q->thread());
+            requestIds.insert(requestId);
+            NX_VERBOSE(this, "Send get lookup lists request (%1)", requestId);
+        }
     }
 
     void loadLookupLists()
@@ -38,18 +87,15 @@ struct DelayedDataLoader::Private
                 rest::Handle requestId,
                 const rest::ErrorOrData<LookupListDataList>& result)
             {
-                if (this->requestId != requestId)
+                if (!requestIds.remove(requestId))
                     return;
 
-                this->requestId = std::nullopt;
-
-                if (std::holds_alternative<network::rest::Result>(result))
+                if (auto restResult = std::get_if<network::rest::Result>(&result))
                 {
-                    auto restResult = std::get<network::rest::Result>(result);
                     NX_WARNING(
                         this,
-                        "Lookup Lists request %1 failed: %2",
-                        requestId, restResult.errorString);
+                        "Lookup Lists request %1 failed, error: %2, string: %2",
+                        requestId, restResult->error, restResult->errorString);
                     return;
                 }
 
@@ -59,8 +105,12 @@ struct DelayedDataLoader::Private
                 q->lookupListManager()->initialize(std::move(lookupLists));
             });
 
-        requestId = q->connectedServerApi()->getLookupLists(std::move(callback), q->thread());
-        NX_VERBOSE(this, "Send get lookup lists request (%1)", *requestId);
+        if (auto serverApi = q->connectedServerApi())
+        {
+            auto requestId = serverApi->getLookupLists(std::move(callback), q->thread());
+            requestIds.insert(requestId);
+            NX_VERBOSE(this, "Send get lookup lists request (%1)", requestId);
+        }
     }
 
     void loadData()
@@ -70,6 +120,9 @@ struct DelayedDataLoader::Private
 
         if (ini().lookupLists && q->accessController()->hasPowerUserPermissions())
             loadLookupLists();
+
+        if (q->systemContext()->vmsRulesEngine()->isEnabled() && nx::vms::rules::ini().fullSupport)
+            loadAcknowledge();
     }
 };
 
@@ -81,7 +134,7 @@ DelayedDataLoader::DelayedDataLoader(SystemContext* systemContext, QObject* pare
     connect(accessController(), &AccessController::userChanged, this,
         [this]()
         {
-            d->cancelRequest();
+            d->cancelRequests();
             if (accessController()->user())
                 d->loadData();
         });
@@ -89,7 +142,7 @@ DelayedDataLoader::DelayedDataLoader(SystemContext* systemContext, QObject* pare
 
 DelayedDataLoader::~DelayedDataLoader()
 {
-    d->cancelRequest();
+    d->cancelRequests();
 }
 
 } // namespace nx::vms::client::desktop

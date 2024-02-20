@@ -526,6 +526,7 @@ std::unique_ptr<EventFilter> Engine::buildEventFilter(const api::EventFilter& se
         else //< As the field isn't present in the received serialized filter, make a default one.
         {
             field = buildEventField(fieldDescriptor.id);
+            field->setProperties(fieldDescriptor.properties);
         }
 
         if (!field)
@@ -607,6 +608,7 @@ std::unique_ptr<ActionBuilder> Engine::buildActionBuilder(const api::ActionBuild
         else //< As the field isn't present in the received serialized builder, make a default one.
         {
             field = buildActionField(fieldDescriptor.id);
+            field->setProperties(fieldDescriptor.properties);
         }
 
         if (!field)

@@ -35,7 +35,9 @@ NX_REFLECTION_ENUM_CLASS(ItemFlag,
      * must be used by the event type.
      */
     aggregationByTypeSupported = 1 << 3,
-    omitLogging = 1 << 4
+    omitLogging = 1 << 4,
+    /** The action may be displayed in event log, but not in rule editor. */
+    system = 1 << 5
 )
 
 Q_DECLARE_FLAGS(ItemFlags, ItemFlag)

@@ -13,6 +13,14 @@
 
 namespace nx::vms::api::rules {
 
+NX_REFLECTION_ENUM_CLASS(EventLogFlag,
+    noFlags = 0,
+
+    /**%apidoc The notification requires user acknowledge. */
+    acknowledge = 1 << 0
+)
+Q_DECLARE_FLAGS(EventLogFlags, EventLogFlag)
+
 struct NX_VMS_API EventLogFilter: public nx::vms::api::ServerTimePeriod
 {
     /**%apidoc:stringArray List of event resource flexible ids. */
@@ -57,6 +65,9 @@ struct NX_VMS_API EventLogFilter: public nx::vms::api::ServerTimePeriod
     /**%apidoc[opt] Event log record limit, zero value is no limit. */
     size_t limit = 0;
 
+    /**%apidoc[opt] Event log record required flags. */
+    EventLogFlags flags;
+
     EventLogFilter():
         ServerTimePeriod(ServerTimePeriod::infinite())
     {}
@@ -75,7 +86,7 @@ QN_FUSION_DECLARE_FUNCTIONS(EventLogFilter, (json), NX_VMS_API)
 struct NX_VMS_API EventLogRecord
 {
     /**%apidoc Event timestamp. Used for sorting multiserver response.*/
-    std::chrono::milliseconds timestampMs;
+    std::chrono::milliseconds timestampMs = {};
 
     /**%apidoc Event data. Key is 'fieldName' from event manifest and value is serialized field
      * data. See /rest/v{4-}/events/manifest/events for event manifests.
@@ -92,10 +103,16 @@ struct NX_VMS_API EventLogRecord
 
     /**%apidoc[opt] VMS rule id. */
     nx::Uuid ruleId;
+
+    /**%apidoc[opt] Event log record flags. */
+    EventLogFlags flags;
+
+    /**%apidoc[opt] Id of the Server that stores the record. */
+    Uuid serverId;
 };
 
 #define EventLogRecord_Fields \
-    (timestampMs)(eventData)(actionData)(aggregationCount)(ruleId)
+    (timestampMs)(eventData)(actionData)(aggregationCount)(ruleId)(flags)(serverId)
 
 NX_REFLECTION_INSTRUMENT(EventLogRecord, EventLogRecord_Fields)
 QN_FUSION_DECLARE_FUNCTIONS(EventLogRecord, (json)(sql_record), NX_VMS_API)

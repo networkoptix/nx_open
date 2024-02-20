@@ -23,6 +23,7 @@ class NX_VMS_RULES_API NotificationAction: public NotificationActionBase
     FIELD(QString, customIcon, setCustomIcon)
     FIELD(nx::vms::rules::ClientAction, clientAction, setClientAction)
     FIELD(QString, url, setUrl)
+    FIELD(QString, extendedCaption, setExtendedCaption);
 
 public:
     NotificationAction() = default;

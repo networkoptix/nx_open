@@ -4,20 +4,19 @@
 
 #include <chrono>
 
+#include <api/helpers/camera_id_helper.h>
 #include <common/common_globals.h>
-
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
-
 #include <nx/fusion/model_functions.h>
-#include <nx/reflect/string_conversion.h>
-#include <utils/common/util.h>
-#include <nx/utils/string.h>
-#include <nx/utils/qt_helpers.h>
 #include <nx/network/rest/params.h>
+#include <nx/reflect/string_conversion.h>
+#include <nx/utils/qt_helpers.h>
+#include <nx/utils/std_helpers.h>
+#include <nx/utils/string.h>
+#include <nx/vms/api/data/bookmark_models.h>
 #include <nx/vms/event/actions/abstract_action.h>
-
-#include <api/helpers/camera_id_helper.h>
+#include <utils/common/util.h>
 
 using std::chrono::milliseconds;
 
