@@ -129,8 +129,6 @@ void QnRecordingBusinessActionWidget::at_model_dataChanged(Fields fields)
 
         const bool kFixedDuration = ui->fixedDurationCheckBox->isChecked();
 
-        ui->beforeSpinBox->setEnabled(!kFixedDuration);
-        ui->beforeLabel->setEnabled(!kFixedDuration);
         ui->afterSpinBox->setEnabled(!kFixedDuration);
         ui->afterLabel->setEnabled(!kFixedDuration);
     }
