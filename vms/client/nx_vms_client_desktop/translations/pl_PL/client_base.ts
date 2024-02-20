@@ -1502,7 +1502,7 @@ Klucz licencyjny: %2</translation>
     </message>
     <message>
       <source>License has already been activated</source>
-      <translation type="unfinished">License has already been activated</translation>
+      <translation>Ta licencja została już aktywowana</translation>
     </message>
   </context>
   <context>
@@ -2016,11 +2016,11 @@ Klucz licencyjny: %2</translation>
     </message>
     <message>
       <source>Graphics API</source>
-      <translation type="unfinished">Graphics API</translation>
+      <translation>API graficzne</translation>
     </message>
     <message>
       <source>Unable to get GPU information for %1</source>
-      <translation type="unfinished">Unable to get GPU information for %1</translation>
+      <translation>Nie można uzyskać informacji o GPU dla %1</translation>
     </message>
   </context>
   <context>
@@ -2120,7 +2120,7 @@ Klucz licencyjny: %2</translation>
     <name>QnAttachToVideowallDialog</name>
     <message>
       <source>System shut down. To attach to a Video Wall, the System should be in active state. %1</source>
-      <translation type="unfinished">System shut down. To attach to a Video Wall, the System should be in active state. %1</translation>
+      <translation>System wyłączony. Aby dołączyć do ściany wideo, system powinien być w stanie aktywnym. %1</translation>
     </message>
   </context>
   <context>
@@ -3174,7 +3174,7 @@ Klucz licencyjny: %2</translation>
     <message>
       <source>There is currently no connection between your system and %1.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">There is currently no connection between your system and %1.</translation>
+      <translation>Obecnie nie ma połączenia pomiędzy Twoim systemem a %1.</translation>
     </message>
   </context>
   <context>
@@ -4344,7 +4344,7 @@ Klucz licencyjny: %2</translation>
     <name>QnPopupSettingsWidget</name>
     <message>
       <source>These settings apply only to the system you are logged in. They will be removed in future versions.</source>
-      <translation type="unfinished">These settings apply only to the system you are logged in. They will be removed in future versions.</translation>
+      <translation>Te ustawienia dotyczą tylko systemu, do którego jesteś zalogowany i zostaną usunięte w przyszłych wersjach.</translation>
     </message>
   </context>
   <context>
@@ -4590,22 +4590,22 @@ Klucz licencyjny: %2</translation>
     <message>
       <source>%1 group does not have %2 permission for some of selected cameras</source>
       <comment>%1 is the name of selected user group, %2 is permission name</comment>
-      <translation type="unfinished">%1 group does not have %2 permission for some of selected cameras</translation>
+      <translation>Grupa %1 nie ma uprawnień %2 do niektórych wybranych kamer</translation>
     </message>
     <message>
       <source>%1 groups and %2 users do not have %3 permission for some of selected cameras</source>
       <comment>%1 is number of selected user groups, %2 is number of users, %3 is permission name</comment>
-      <translation type="unfinished">%1 groups and %2 users do not have %3 permission for some of selected cameras</translation>
+      <translation>Grupy %1 i %2 użytkowników nie mają %3 uprawnień do niektórych wybranych kamer</translation>
     </message>
     <message>
       <source>%1 user does not have %2 permission for some of selected cameras</source>
       <comment>%1 is the name of the selected user, %2 is the permission name</comment>
-      <translation type="unfinished">%1 user does not have %2 permission for some of selected cameras</translation>
+      <translation>Użytkownik %1 nie ma %2 uprawnień do niektórych wybranych kamer</translation>
     </message>
     <message>
       <source>%1 users do not have %2 permission for some of selected cameras</source>
       <comment>%1 is number of selected users, %2 is permission name</comment>
-      <translation type="unfinished">%1 users do not have %2 permission for some of selected cameras</translation>
+      <translation>%1 użytkowników nie ma %2 uprawnień dla niektórych wybranych kamer</translation>
     </message>
   </context>
   <context>
@@ -5010,11 +5010,11 @@ Klucz licencyjny: %2</translation>
     </message>
     <message>
       <source>Certificate details are not available</source>
-      <translation type="unfinished">Certificate details are not available</translation>
+      <translation>Szczegóły certyfikatu nie są dostępne</translation>
     </message>
     <message>
       <source>To access certificate details, enable the Audit Trail feature.</source>
-      <translation type="unfinished">To access certificate details, enable the Audit Trail feature.</translation>
+      <translation>Aby uzyskać dostęp do szczegółów certyfikatu, włącz funkcję Audytu.</translation>
     </message>
   </context>
   <context>
@@ -5151,7 +5151,7 @@ Klucz licencyjny: %2</translation>
     </message>
     <message>
       <source>SYSTEM SHUT DOWN</source>
-      <translation type="unfinished">SYSTEM SHUT DOWN</translation>
+      <translation>ZAMKNIĘCIE SYSTEMU</translation>
     </message>
   </context>
   <context>

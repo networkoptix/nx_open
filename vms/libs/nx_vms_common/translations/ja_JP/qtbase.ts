@@ -299,11 +299,11 @@ Press ESC to cancel</source>
     <name>QComboBox</name>
     <message>
       <source>False</source>
-      <translation>偽</translation>
+      <translation>False</translation>
     </message>
     <message>
       <source>True</source>
-      <translation>真</translation>
+      <translation>True</translation>
     </message>
     <message>
       <source>Open the combo box selection popup</source>

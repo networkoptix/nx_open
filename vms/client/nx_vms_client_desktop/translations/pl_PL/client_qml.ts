@@ -56,11 +56,11 @@
     </message>
     <message>
       <source>Synchronize Users</source>
-      <translation type="unfinished">Synchronize Users</translation>
+      <translation>Synchronizuj użytkowników</translation>
     </message>
     <message>
       <source>Sync Interval</source>
-      <translation type="unfinished">Sync Interval</translation>
+      <translation>Interwał synchronizacji</translation>
     </message>
     <message>
       <source>Proxy LDAP requests %1 via server</source>
