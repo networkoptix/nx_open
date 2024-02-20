@@ -94,7 +94,7 @@ bool InstanceController::configureDb()
     auto future = cacheFilledPromise.get_future();
 
     m_queryExecutor->executeUpdateWithoutTran(
-        std::bind(&InstanceController::configureSqliteInstance, this, _1),
+        &InstanceController::configureSqliteInstance,
         [&](DBResult dbResult)
         {
             cacheFilledPromise.set_value(dbResult);
@@ -113,7 +113,7 @@ DBResult InstanceController::configureSqliteInstance(QueryContext* queryContext)
     }
     catch (const Exception& e)
     {
-        NX_WARNING(this, "Failed to enable auto vacuum mode. %1", e.what());
+        NX_WARNING(NX_SCOPE_TAG, "Failed to enable auto vacuum mode. %1", e.what());
         return e.dbResult();
     }
 
@@ -125,7 +125,7 @@ DBResult InstanceController::configureSqliteInstance(QueryContext* queryContext)
     }
     catch (const Exception& e)
     {
-        NX_WARNING(this, "Failed to enable WAL mode. %1", e.what());
+        NX_WARNING(NX_SCOPE_TAG, "Failed to enable WAL mode. %1", e.what());
         return e.dbResult();
     }
 
@@ -137,7 +137,7 @@ DBResult InstanceController::configureSqliteInstance(QueryContext* queryContext)
     }
     catch (const Exception& e)
     {
-        NX_WARNING(this, "Failed to enable foreign keys. %1", e.what());
+        NX_WARNING(NX_SCOPE_TAG, "Failed to enable foreign keys. %1", e.what());
         return e.dbResult();
     }
 
