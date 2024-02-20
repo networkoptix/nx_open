@@ -195,12 +195,12 @@
     <message>
       <source>Log in as a %1 user to the system in a shutdown state is forbidden. You can still connect as local user.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">Log in as a %1 user to the system in a shutdown state is forbidden. You can still connect as local user.</translation>
+      <translation>Logowanie się jako użytkownik %1 do systemu w stanie wyłączenia jest zabronione. Nadal możesz połączyć się jako użytkownik lokalny.</translation>
     </message>
     <message>
       <source>Log in as a %1 user to the system in a suspended state is forbidden. You can still connect as local user.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">Log in as a %1 user to the system in a suspended state is forbidden. You can still connect as local user.</translation>
+      <translation>Logowanie się jako użytkownik %1 do systemu w stanie wyłączenia jest zabronione. Nadal możesz połączyć się jako użytkownik lokalny.</translation>
     </message>
     <message>
       <source>To log in to this System, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</source>
@@ -230,7 +230,7 @@
     <message numerus="yes">
       <source>Cannot verify the identity of %n servers</source>
       <translation type="unfinished">
-        <numerusform>Cannot verify the identity of %n servers</numerusform>
+        <numerusform>Nie można zweryfikować tożsamości serwerów %n</numerusform>
         <numerusform>Cannot verify the identity of %n servers</numerusform>
         <numerusform>Cannot verify the identity of %n servers</numerusform>
         <numerusform>Cannot verify the identity of %n servers</numerusform>
@@ -238,16 +238,16 @@
     </message>
     <message>
       <source>Review the certificates of the servers from this system.</source>
-      <translation type="unfinished">Review the certificates of the servers from this system.</translation>
+      <translation>Przejrzyj certyfikaty serwerów z tego systemu.</translation>
     </message>
     <message>
       <source>To learn more about the current problem read this %1.</source>
       <comment>%1 is &lt;help article&gt; link</comment>
-      <translation type="unfinished">To learn more about the current problem read this %1.</translation>
+      <translation>Aby dowiedzieć się więcej o bieżącym problemie, przeczytaj %1.</translation>
     </message>
     <message>
       <source>This might be due to an expired server certificate or an invalid certificate. Contact your system administrator for further investigation.</source>
-      <translation type="unfinished">This might be due to an expired server certificate or an invalid certificate. Contact your system administrator for further investigation.</translation>
+      <translation>Może to wynikać z wygaśnięcia certyfikatu serwera lub nieprawidłowego certyfikatu. Skontaktuj się z administratorem systemu w celu dalszego zbadania problemu.</translation>
     </message>
   </context>
   <context>
