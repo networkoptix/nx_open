@@ -148,7 +148,7 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
     NX_INI_FLAG(false, virtualJoystick,
         "[Dev] Enables joystick emulator (works only on MacOS).");
 
-    NX_INI_FLAG(false, joystickPollingInSeparateThread,
+    NX_INI_FLAG(true, joystickPollingInSeparateThread,
         "[Dev] Joystick manager on Windows with polling in the separate thread.");
 
     NX_INI_INT(200, maxSeverRequestCountPerMinunte,
