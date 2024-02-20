@@ -14,6 +14,11 @@ OauthManager::OauthManager(ApiRequestsExecutor* requestsExecutor):
 {
 }
 
+std::chrono::seconds OauthManager::lastServerTime() const
+{
+    return std::chrono::ceil<std::chrono::seconds>(m_requestsExecutor->lastResponseTime());
+}
+
 void OauthManager::issueToken(
     const api::IssueTokenRequest& request,
     nx::utils::MoveOnlyFunc<void(api::ResultCode, api::IssueTokenResponse)> completionHandler)

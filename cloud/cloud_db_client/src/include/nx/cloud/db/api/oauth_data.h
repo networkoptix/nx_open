@@ -14,18 +14,16 @@ namespace nx::cloud::db::api {
 
 // Code style violated in fields names to match RFC
 // and support correct API documentation generation
-enum class GrantType
-{
+NX_REFLECTION_ENUM_CLASS(GrantType,
     password,
     refresh_token,
-    authorization_code,
-};
+    authorization_code
+);
 
-enum class ResponseType
-{
+NX_REFLECTION_ENUM_CLASS(ResponseType,
     token,
-    code,
-};
+    code
+);
 
 struct IssueTokenRequest
 {
@@ -58,10 +56,9 @@ struct IssueTokenRequest
     std::optional<std::string> code;
 };
 
-enum class TokenType
-{
-    bearer,
-};
+NX_REFLECTION_ENUM_CLASS(TokenType,
+    bearer
+);
 
 struct TokenInfo
 {

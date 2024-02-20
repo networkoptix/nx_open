@@ -15,6 +15,8 @@ class OauthManager:
 public:
     OauthManager(ApiRequestsExecutor* requestsExecutor);
 
+    virtual std::chrono::seconds lastServerTime() const override;
+
     virtual void issueToken(
         const api::IssueTokenRequest& request,
         nx::utils::MoveOnlyFunc<void(api::ResultCode, api::IssueTokenResponse)> completionHandler)

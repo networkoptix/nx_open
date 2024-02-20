@@ -22,6 +22,8 @@ public:
 
     virtual ~OauthManager() = default;
 
+    virtual std::chrono::seconds lastServerTime() const = 0;
+
     virtual void issueToken(
         const IssueTokenRequest& request,
         nx::utils::MoveOnlyFunc<void(ResultCode, IssueTokenResponse)> completionHandler) = 0;
