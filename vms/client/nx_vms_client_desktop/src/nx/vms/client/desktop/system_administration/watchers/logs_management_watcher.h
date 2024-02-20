@@ -98,6 +98,7 @@ public:
 
     QList<UnitPtr> items() const;
     QList<UnitPtr> checkedItems() const;
+    QList<UnitPtr> itemsWithErrors() const;
 
     QString path() const;
 
@@ -109,6 +110,7 @@ public:
     void startDownload(const QString& path);
     void cancelDownload();
     void restartFailed();
+    void restartById(const nx::Uuid& id);
     void completeDownload();
 
     void setUpdatesEnabled(bool enabled);

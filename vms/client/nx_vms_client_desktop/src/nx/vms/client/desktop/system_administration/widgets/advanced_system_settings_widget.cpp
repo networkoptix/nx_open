@@ -63,7 +63,7 @@ AdvancedSystemSettingsWidget::Private::Private(AdvancedSystemSettingsWidget* q):
     hBox->setSpacing(0);
 
     auto vBox = new QVBoxLayout();
-    vBox->setContentsMargins(16, 16, 16, 16);
+    vBox->setContentsMargins(0, 0, 0, 0);
     vBox->addWidget(m_stack);
 
     hBox->addWidget(m_menu);

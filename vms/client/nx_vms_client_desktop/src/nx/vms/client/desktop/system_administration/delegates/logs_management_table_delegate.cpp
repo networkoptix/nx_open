@@ -11,6 +11,7 @@
 #include <nx/vms/client/desktop/style/helper.h>
 
 #include "../models/logs_management_model.h"
+#include "../widgets/logs_management_widget.h"
 
 namespace nx::vms::client::desktop {
 
@@ -23,9 +24,10 @@ static constexpr qreal kOpacityForDisabledCheckbox = 0.3;
 
 using Model = LogsManagementModel;
 
-LogsManagementTableDelegate::LogsManagementTableDelegate(QObject* parent):
+LogsManagementTableDelegate::LogsManagementTableDelegate(LogsManagementWidget* parent):
     base_type(parent)
 {
+    parentWidget = parent;
 }
 
 void LogsManagementTableDelegate::paint(

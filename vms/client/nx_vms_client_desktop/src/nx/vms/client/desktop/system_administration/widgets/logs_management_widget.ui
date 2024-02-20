@@ -1,260 +1,321 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>LogsManagementWidget</class>
- <widget class="QWidget" name="LogsManagementWidget">
-  <property name="geometry">
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>451</width>
-    <height>607</height>
-   </rect>
-  </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
-   <property name="spacing">
-    <number>8</number>
-   </property>
-   <property name="leftMargin">
-    <number>0</number>
-   </property>
-   <property name="topMargin">
-    <number>0</number>
-   </property>
-   <property name="rightMargin">
-    <number>0</number>
-   </property>
-   <property name="bottomMargin">
-    <number>0</number>
-   </property>
-   <item>
-    <widget class="nx::vms::client::desktop::TableView" name="unitsTable">
-     <property name="frameShape">
-      <enum>QFrame::NoFrame</enum>
-     </property>
-     <property name="sizeAdjustPolicy">
-      <enum>QAbstractScrollArea::AdjustToContents</enum>
-     </property>
-     <property name="selectionMode">
-      <enum>QAbstractItemView::NoSelection</enum>
-     </property>
-     <property name="selectionBehavior">
-      <enum>QAbstractItemView::SelectRows</enum>
-     </property>
-     <property name="horizontalScrollMode">
-      <enum>QAbstractItemView::ScrollPerPixel</enum>
-     </property>
-     <property name="showGrid">
-      <bool>false</bool>
-     </property>
-     <property name="cornerButtonEnabled">
-      <bool>false</bool>
-     </property>
-     <attribute name="verticalHeaderVisible">
-      <bool>false</bool>
-     </attribute>
+<class>LogsManagementWidget</class>
+    <widget class="QWidget" name="LogsManagementWidget">
+        <property name="geometry">
+            <rect>
+                <x>0</x>
+                <y>0</y>
+                <width>451</width>
+                <height>607</height>
+            </rect>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout">
+            <property name="spacing">
+                <number>8</number>
+            </property>
+            <property name="leftMargin">
+                <number>0</number>
+            </property>
+            <property name="topMargin">
+                <number>0</number>
+            </property>
+            <property name="rightMargin">
+                <number>0</number>
+            </property>
+            <property name="bottomMargin">
+                <number>0</number>
+            </property>
+            <item>
+                <widget class="QStackedWidget" name="stackedWidget">
+                    <property name="sizePolicy">
+                        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="currentIndex">
+                        <number>0</number>
+                    </property>
+                    <widget class="QWidget" name="defaultPage">
+                        <layout class="QVBoxLayout" name="verticalLayout_2">
+                            <property name="spacing">
+                                <number>2</number>
+                            </property>
+                            <property name="leftMargin">
+                                <number>16</number>
+                            </property>
+                            <property name="topMargin">
+                                <number>16</number>
+                            </property>
+                            <property name="rightMargin">
+                                <number>16</number>
+                            </property>
+                            <property name="bottomMargin">
+                                <number>40</number>
+                            </property>
+                            <item>
+                                <layout class="QHBoxLayout" name="horizontalLayout">
+                                    <property name="spacing">
+                                        <number>8</number>
+                                    </property>
+                                    <item>
+                                        <widget class="QPushButton" name="selectedButton"/>
+                                    </item>
+                                    <item>
+                                        <widget class="QPushButton" name="downloadButton">
+                                            <property name="text">
+                                                <string>Download</string>
+                                            </property>
+                                        </widget>
+                                    </item>
+                                    <item>
+                                        <widget class="QPushButton" name="settingsButton">
+                                            <property name="text">
+                                                <string>Settings</string>
+                                            </property>
+                                        </widget>
+                                    </item>
+                                    <item>
+                                        <widget class="QPushButton" name="resetButton">
+                                            <property name="text">
+                                                <string>Reset to Default</string>
+                                            </property>
+                                        </widget>
+                                    </item>
+                                    <item>
+                                        <spacer name="horizontalSpacer">
+                                            <property name="orientation">
+                                                <enum>Qt::Horizontal</enum>
+                                            </property>
+                                            <property name="sizeHint" stdset="0">
+                                                <size>
+                                                    <width>40</width>
+                                                    <height>1</height>
+                                                </size>
+                                            </property>
+                                        </spacer>
+                                    </item>
+                                    <item>
+                                        <widget class="nx::vms::client::desktop::SearchLineEdit" name="searchLineEdit" native="true">
+                                            <property name="minimumSize">
+                                                <size>
+                                                    <width>200</width>
+                                                    <height>30</height>
+                                                </size>
+                                            </property>
+                                        </widget>
+                                    </item>
+                                </layout>
+                            </item>
+                            <item>
+                                <spacer name="verticalSpacer_2">
+                                    <property name="orientation">
+                                        <enum>Qt::Vertical</enum>
+                                    </property>
+                                </spacer>
+                            </item>
+                        </layout>
+                    </widget>
+                    <widget class="QWidget" name="activePage">
+                        <layout class="QVBoxLayout" name="verticalLayout_3">
+                            <property name="spacing">
+                                <number>0</number>
+                            </property>
+                            <property name="leftMargin">
+                                <number>16</number>
+                            </property>
+                            <property name="topMargin">
+                                <number>16</number>
+                            </property>
+                            <property name="rightMargin">
+                                <number>16</number>
+                            </property>
+                            <item>
+                                <spacer name="verticalSpacer_3_1">
+                                    <property name="orientation">
+                                        <enum>Qt::Vertical</enum>
+                                    </property>
+                                </spacer>
+                            </item>
+                            <item>
+                                <layout class="QHBoxLayout" name="horizontalLayout_labels">
+                                    <item>
+                                        <widget class="QLabel" name="finishedLabel"/>
+                                    </item>
+                                    <item>
+                                        <widget class="QLabel" name="errorLabel"/>
+                                    </item>
+                                    <item>
+                                        <widget class="QLabel" name="downloadingLabel"/>
+                                    </item>
+                                    <item>
+                                        <spacer name="horizontalSpacer_labels">
+                                            <property name="orientation">
+                                                <enum>Qt::Horizontal</enum>
+                                            </property>
+                                            <property name="sizeHint" stdset="0">
+                                                <size>
+                                                    <width>40</width>
+                                                    <height>4</height>
+                                                </size>
+                                            </property>
+                                        </spacer>
+                                    </item>
+                                    <item>
+                                        <widget class="QLabel" name="downloadingPercentageLabel"/>
+                                    </item>
+                                    <item>
+                                        <widget class="QPushButton" name="finishedIconButton">
+                                            <property name="sizeHint" stdset="0">
+                                                <size>
+                                                    <width>16</width>
+                                                    <height>16</height>
+                                                </size>
+                                            </property>
+                                        </widget>
+                                    </item>
+                                </layout>
+                            </item>
+                            <item>
+                                <widget class="QProgressBar" name="progressBar">
+                                    <property name="value">
+                                        <number>24</number>
+                                    </property>
+                                    <property name="textVisible">
+                                        <bool>false</bool>
+                                    </property>
+                                </widget>
+                            </item>
+                            <item>
+                                <spacer name="verticalSpacer_3_2">
+                                    <property name="orientation">
+                                        <enum>Qt::Vertical</enum>
+                                    </property>
+                                    <property name="sizeHint" stdset="0">
+                                        <size>
+                                            <width>40</width>
+                                            <height>12</height>
+                                        </size>
+                                    </property>
+                                </spacer>
+                            </item>
+                            <item>
+                                <layout class="QHBoxLayout" name="horizontalLayout_2">
+                                    <item>
+                                        <widget class="QPushButton" name="cancelButton">
+                                            <property name="text">
+                                                <string>Cancel</string>
+                                            </property>
+                                        </widget>
+                                    </item>
+                                    <item>
+                                        <widget class="QPushButton" name="doneButton">
+                                            <property name="text">
+                                                <string>Done</string>
+                                            </property>
+                                        </widget>
+                                    </item>
+                                    <item>
+                                        <widget class="QPushButton" name="retryButton">
+                                            <property name="text">
+                                                <string>Retry</string>
+                                            </property>
+                                        </widget>
+                                    </item>
+                                    <item>
+                                        <spacer name="horizontalSpacer_2">
+                                            <property name="orientation">
+                                                <enum>Qt::Horizontal</enum>
+                                            </property>
+                                            <property name="sizeHint" stdset="0">
+                                                <size>
+                                                    <width>40</width>
+                                                    <height>4</height>
+                                                </size>
+                                            </property>
+                                        </spacer>
+                                    </item>
+                                    <item>
+                                        <widget class="QPushButton" name="openFolderButton">
+                                            <property name="text">
+                                                <string>Open Files Folder</string>
+                                            </property>
+                                        </widget>
+                                    </item>
+                                </layout>
+                            </item>
+                            <item>
+                                <spacer name="verticalSpacer_3_3">
+                                    <property name="orientation">
+                                        <enum>Qt::Vertical</enum>
+                                    </property>
+                                </spacer>
+                            </item>
+                        </layout>
+                    </widget>
+                </widget>
+            </item>
+            <item>
+                <layout class="QVBoxLayout" name="verticalLayout_4">
+                    <property name="spacing">
+                        <number>0</number>
+                    </property>
+                    <property name="leftMargin">
+                        <number>16</number>
+                    </property>
+                    <property name="rightMargin">
+                        <number>16</number>
+                    </property>
+                    <property name="bottomMargin">
+                        <number>16</number>
+                    </property>
+                    <item>
+                        <widget class="nx::vms::client::desktop::TableView" name="unitsTable">
+                            <property name="frameShape">
+                                <enum>QFrame::NoFrame</enum>
+                            </property>
+                            <property name="sizeAdjustPolicy">
+                                <enum>QAbstractScrollArea::AdjustToContents</enum>
+                            </property>
+                            <property name="selectionMode">
+                                <enum>QAbstractItemView::NoSelection</enum>
+                            </property>
+                            <property name="selectionBehavior">
+                                <enum>QAbstractItemView::SelectRows</enum>
+                            </property>
+                            <property name="horizontalScrollMode">
+                                <enum>QAbstractItemView::ScrollPerPixel</enum>
+                            </property>
+                            <property name="showGrid">
+                                <bool>false</bool>
+                            </property>
+                            <property name="cornerButtonEnabled">
+                                <bool>false</bool>
+                            </property>
+                            <attribute name="verticalHeaderVisible">
+                                <bool>false</bool>
+                            </attribute>
+                        </widget>
+                    </item>
+                </layout>
+            </item>
+        </layout>
     </widget>
-   </item>
-   <item>
-    <widget class="QStackedWidget" name="stackedWidget">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="currentIndex">
-      <number>0</number>
-     </property>
-     <widget class="QWidget" name="defaultPage">
-      <layout class="QVBoxLayout" name="verticalLayout_2">
-       <property name="spacing">
-        <number>8</number>
-       </property>
-       <property name="leftMargin">
-        <number>0</number>
-       </property>
-       <property name="topMargin">
-        <number>0</number>
-       </property>
-       <property name="rightMargin">
-        <number>0</number>
-       </property>
-       <property name="bottomMargin">
-        <number>0</number>
-       </property>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout">
-         <property name="spacing">
-          <number>8</number>
-         </property>
-         <item>
-          <widget class="QPushButton" name="downloadButton">
-           <property name="text">
-            <string>Download</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="settingsButton">
-           <property name="text">
-            <string>Settings</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <spacer name="horizontalSpacer">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item>
-          <widget class="QPushButton" name="resetButton">
-           <property name="text">
-            <string>Reset to Default</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="activePage">
-      <layout class="QVBoxLayout" name="verticalLayout_3">
-       <property name="spacing">
-        <number>8</number>
-       </property>
-       <property name="leftMargin">
-        <number>0</number>
-       </property>
-       <property name="topMargin">
-        <number>0</number>
-       </property>
-       <property name="rightMargin">
-        <number>0</number>
-       </property>
-       <property name="bottomMargin">
-        <number>0</number>
-       </property>
-       <item>
-        <widget class="QProgressBar" name="progressBar">
-         <property name="value">
-          <number>24</number>
-         </property>
-         <property name="textVisible">
-          <bool>false</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_2">
-         <item>
-          <widget class="QPushButton" name="cancelButton">
-           <property name="text">
-            <string>Cancel</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="finishedLabel">
-           <property name="text">
-            <string>Download complete!</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="errorLabel">
-           <property name="text">
-            <string>Failed to save logs to the selected folder</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <spacer name="horizontalSpacer_2">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item>
-          <widget class="QPushButton" name="openFolderButton">
-           <property name="text">
-            <string>Open Files Folder</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_3">
-         <item>
-          <widget class="QPushButton" name="doneButton">
-           <property name="text">
-            <string>Done</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="retryButton">
-           <property name="text">
-            <string>Retry</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <spacer name="horizontalSpacer_3">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-        </layout>
-       </item>
-      </layout>
-     </widget>
-    </widget>
-   </item>
-  </layout>
- </widget>
- <customwidgets>
-  <customwidget>
-   <class>nx::vms::client::desktop::TableView</class>
-   <extends>QTableView</extends>
-   <header location="global">nx/vms/client/desktop/common/widgets/table_view.h</header>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
- <resources/>
- <connections/>
+    <customwidgets>
+        <customwidget>
+            <class>nx::vms::client::desktop::TableView</class>
+            <extends>QTableView</extends>
+            <header location="global">nx/vms/client/desktop/common/widgets/table_view.h</header>
+            <container>1</container>
+        </customwidget>
+        <customwidget>
+            <class>nx::vms::client::desktop::SearchLineEdit</class>
+            <extends>QWidget</extends>
+            <header location="global">nx/vms/client/desktop/common/widgets/search_line_edit.h</header>
+            <container>1</container>
+        </customwidget>
+    </customwidgets>
+    <resources/>
+    <connections/>
 </ui>

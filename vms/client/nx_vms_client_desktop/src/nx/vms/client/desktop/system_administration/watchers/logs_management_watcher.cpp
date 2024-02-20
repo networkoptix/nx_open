@@ -851,6 +851,22 @@ struct LogsManagementWatcher::Private
         return result;
     }
 
+    QList<LogsManagementUnitPtr> itemsWithErrors() const
+    {
+        QList<LogsManagementUnitPtr> result;
+
+        if (client->state() == LogsManagementWatcher::Unit::DownloadState::error)
+            result << client;
+
+        for (auto& server: servers)
+        {
+            if (server->state() == LogsManagementWatcher::Unit::DownloadState::error)
+                result << server;
+        }
+
+        return result;
+    }
+
     Qt::CheckState selectionState() const
     {
         const auto allItems = items();
@@ -1335,6 +1351,12 @@ QList<LogsManagementUnitPtr> LogsManagementWatcher::checkedItems() const
     return d->checkedItems();
 }
 
+QList<LogsManagementUnitPtr> LogsManagementWatcher::itemsWithErrors() const
+{
+    NX_MUTEX_LOCKER lock(&d->mutex);
+    return d->itemsWithErrors();
+}
+
 QString LogsManagementWatcher::path() const
 {
     NX_MUTEX_LOCKER lock(&d->mutex);
@@ -1449,6 +1471,39 @@ void LogsManagementWatcher::cancelDownload()
     emit stateChanged(newState);
 }
 
+void LogsManagementWatcher::restartById(const nx::Uuid& id)
+{
+    NX_MUTEX_LOCKER lock(&d->mutex);
+    NX_ASSERT(d->state == State::hasLocalErrors || d->state == State::hasErrors);
+    const auto newState = State::loading;
+
+    auto path = d->path;
+    LogsManagementUnitPtr unit =
+        [this, id]()
+    {
+        for (auto item : d->items())
+        {
+            if (item->id() == id)
+                return item;
+        }
+        NX_ASSERT(false, "Failed to find unit by Id");
+        return LogsManagementUnitPtr(nullptr);
+    }();
+
+    d->state = newState;
+    d->cancelled = false;
+
+    lock.unlock();
+
+    emit stateChanged(newState);
+    emit progressChanged(0);
+
+    if (unit->server())
+        downloadServerLogs(path, unit);
+    else
+        downloadClientLogs(path, unit);
+}
+
 void LogsManagementWatcher::restartFailed()
 {
     NX_MUTEX_LOCKER lock(&d->mutex);
@@ -1488,7 +1543,7 @@ void LogsManagementWatcher::completeDownload()
 {
     NX_MUTEX_LOCKER lock(&d->mutex);
     NX_ASSERT(d->state == State::finished || d->state == State::hasLocalErrors
-        || d->state == State::hasErrors);
+        || d->state == State::hasErrors || d->state == State::hasSelection);
     const auto newState = watcherState(d->selectionState());
 
     //TODO: #spanasenko Clean-up.
