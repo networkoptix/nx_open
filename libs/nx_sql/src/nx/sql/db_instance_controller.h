@@ -25,6 +25,8 @@ public:
 
     void stop();
 
+    static DBResult configureSqliteInstance(QueryContext* queryContext);
+
 protected:
     DbStructureUpdater& dbStructureUpdater();
 
@@ -35,7 +37,6 @@ private:
 
     bool updateDbStructure();
     bool configureDb();
-    DBResult configureSqliteInstance(QueryContext* queryContext);
 };
 
 } // namespace nx::sql
