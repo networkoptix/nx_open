@@ -108,7 +108,10 @@ struct PredefinedUserGroups::Private
 
     static const std::map<nx::Uuid, AccessRights>& accessRights(const nx::Uuid& groupId)
     {
-        static constexpr AccessRights kViewerAccessRights = AccessRight::view
+        static constexpr AccessRights kLiveViewerAccessRights = AccessRight::view
+            | AccessRight::audio;
+
+        static constexpr AccessRights kViewerAccessRights = kLiveViewerAccessRights
             | AccessRight::viewArchive
             | AccessRight::exportArchive
             | AccessRight::viewBookmarks;
@@ -151,7 +154,7 @@ struct PredefinedUserGroups::Private
         if (groupId == kLiveViewersGroupId)
         {
             static const std::map<nx::Uuid, AccessRights> kLiveViewerResourceAccessMap{
-                {kAllDevicesGroupId, AccessRight::view},
+                {kAllDevicesGroupId, kLiveViewerAccessRights},
                 {kAllWebPagesGroupId, AccessRight::view},
                 {kAllServersGroupId, AccessRight::view}};
 

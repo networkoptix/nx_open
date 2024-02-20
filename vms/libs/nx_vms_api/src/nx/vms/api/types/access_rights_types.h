@@ -86,6 +86,9 @@ NX_REFLECTION_ENUM_CLASS(AccessRight,
     /**%apidoc Can see a resource. Can access live footage from a media resource. */
     view = 1 << 0,
 
+    /**%apidoc Can access an audio stream from a Device. */
+    audio = 1 << 1,
+
     /**%apidoc Can view archive. */
     viewArchive = 1 << 2,
 
@@ -113,6 +116,7 @@ static constexpr AccessRights kViewAccessRights{AccessRight::view};
 
 static constexpr AccessRights kFullAccessRights{
     AccessRight::view
+    | AccessRight::audio
     | AccessRight::viewArchive
     | AccessRight::exportArchive
     | AccessRight::viewBookmarks

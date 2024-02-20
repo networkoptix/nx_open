@@ -366,6 +366,9 @@ void QnResourceAccessManager::handleResourcesAdded(const QnResourceList& resourc
 
             connect(camera.get(), &QnVirtualCameraResource::capabilitiesChanged,
                 this, &QnResourceAccessManager::handleResourceUpdated, Qt::DirectConnection);
+
+            connect(camera.get(), &QnVirtualCameraResource::audioInputDeviceIdChanged,
+                this, &QnResourceAccessManager::handleResourceUpdated, Qt::DirectConnection);
         }
 
         if (const auto& layout = resource.objectCast<QnLayoutResource>())
@@ -559,6 +562,25 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
 
     if (isFootageAllowed)
         result |= Qn::ViewFootagePermission;
+
+    if ((isLiveAllowed || isFootageAllowed) && accessRights.testFlag(AccessRight::audio))
+    {
+        const auto externalSourceId = camera->audioInputDeviceId();
+        if (externalSourceId.isNull())
+        {
+            result |= Qn::PlayAudioPermission;
+        }
+        else
+        {
+            const auto externalSource = camera->resourcePool()->getResourceById(externalSourceId);
+            const auto sourceAccessRights = externalSource
+                ? this->accessRights(subject, externalSource)
+                : AccessRights{};
+
+            if (sourceAccessRights.testFlag(AccessRight::audio))
+                result |= Qn::PlayAudioPermission;
+        }
+    }
 
     if (isExportAllowed)
         result |= Qn::ExportPermission;

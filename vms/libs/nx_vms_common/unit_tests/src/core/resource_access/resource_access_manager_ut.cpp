@@ -1579,6 +1579,76 @@ TEST_F(ResourceAccessManagerTest, checkDefaultAuthCameraNonChangeable)
     ASSERT_TRUE(hasPermissions(user, camera, Qn::ExportPermission));
 }
 
+TEST_F(ResourceAccessManagerTest, checkAudioPermissions)
+{
+    loginAsCustom();
+    const auto user = m_currentUser;
+    const auto cameraWithNoAudioPermission = addCamera();
+    const auto cameraWithNoViewPermissions = addCamera();
+    const auto cameraWithLivePermission = addCamera();
+    const auto cameraWithArchivePermission = addCamera();
+    const auto cameraWithAllPermissions = addCamera();
+
+    setOwnAccessRights(user->getId(), {
+        {cameraWithNoAudioPermission->getId(), AccessRight::view | AccessRight::viewArchive},
+        {cameraWithNoViewPermissions->getId(), AccessRight::audio},
+        {cameraWithLivePermission->getId(), AccessRight::view | AccessRight::audio},
+        {cameraWithArchivePermission->getId(), AccessRight::viewArchive | AccessRight::audio},
+        {cameraWithAllPermissions->getId(),
+            AccessRight::viewArchive | AccessRight::view | AccessRight::audio}});
+
+    EXPECT_FALSE(hasPermissions(user, cameraWithNoAudioPermission, Qn::PlayAudioPermission));
+    EXPECT_FALSE(hasPermissions(user, cameraWithNoViewPermissions, Qn::PlayAudioPermission));
+    EXPECT_TRUE(hasPermissions(user, cameraWithLivePermission, Qn::PlayAudioPermission));
+    EXPECT_TRUE(hasPermissions(user, cameraWithArchivePermission, Qn::PlayAudioPermission));
+    EXPECT_TRUE(hasPermissions(user, cameraWithAllPermissions, Qn::PlayAudioPermission));
+}
+
+TEST_F(ResourceAccessManagerTest, checkPredefinedGroupAudioPermissions)
+{
+    const auto camera = addCamera();
+
+    EXPECT_FALSE(hasPermissions(
+        addUser(kSystemHealthViewersGroupId), camera, Qn::PlayAudioPermission));
+
+    EXPECT_TRUE(hasPermissions(addUser(kLiveViewersGroupId), camera, Qn::PlayAudioPermission));
+    EXPECT_TRUE(hasPermissions(addUser(kViewersGroupId), camera, Qn::PlayAudioPermission));
+    EXPECT_TRUE(hasPermissions(addUser(kAdvancedViewersGroupId), camera, Qn::PlayAudioPermission));
+    EXPECT_TRUE(hasPermissions(addUser(kPowerUsersGroupId), camera, Qn::PlayAudioPermission));
+    EXPECT_TRUE(hasPermissions(addUser(kAdministratorsGroupId), camera, Qn::PlayAudioPermission));
+}
+
+TEST_F(ResourceAccessManagerTest, checkExternalSourceAudioPermissions)
+{
+    loginAsCustom();
+    const auto user = m_currentUser;
+
+    const auto camera = addCamera();
+    const auto source = addCamera();
+    camera->setAudioInputDeviceId(source->getId());
+
+    EXPECT_FALSE(hasPermissions(user, camera, Qn::PlayAudioPermission));
+
+    setOwnAccessRights(user->getId(), {{camera->getId(), AccessRight::view | AccessRight::audio}});
+    EXPECT_FALSE(hasPermissions(user, camera, Qn::PlayAudioPermission));
+
+    setOwnAccessRights(user->getId(), {{source->getId(), AccessRight::audio}});
+    EXPECT_FALSE(hasPermissions(user, camera, Qn::PlayAudioPermission));
+
+    setOwnAccessRights(user->getId(), {
+        {camera->getId(), AccessRight::view | AccessRight::audio},
+        {source->getId(), AccessRight::audio}});
+
+    EXPECT_TRUE(hasPermissions(user, camera, Qn::PlayAudioPermission));
+
+    const auto source2 = addCamera();
+    source->setAudioInputDeviceId(source2->getId());
+    // Audio sources don't make transitive chains.
+    // `source`'s microphone is still `camera`'s audio source, not `source2`.
+    // Thus the lack of permissions for `source2` is irrelevant.
+    EXPECT_TRUE(hasPermissions(user, camera, Qn::PlayAudioPermission));
+}
+
 // ------------------------------------------------------------------------------------------------
 // Checking servers access rights
 

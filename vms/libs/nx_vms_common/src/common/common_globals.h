@@ -545,6 +545,10 @@ namespace Qn {
         // Permission to use two-way audio.
         TwoWayAudioPermission = 1 << 21,
 
+        // Permission to play sound from a camera
+        // (used in combination with ViewLivePermission and/or ViewFootagePermission).
+        PlayAudioPermission = 1 << 22,
+
         // Permission granted by userInput access right.
         UserInputPermissions = WritePtzPermission
             | DeviceInputPermission

@@ -98,6 +98,7 @@ TEST(PredefinedUserGroups, accessRights)
     static const std::map<nx::Uuid, AccessRights> kAdvancedViewersResourceAccessMap{
         {kAllDevicesGroupId, AccessRight::view
             | AccessRight::viewArchive
+            | AccessRight::audio
             | AccessRight::exportArchive
             | AccessRight::viewBookmarks
             | AccessRight::manageBookmarks
@@ -108,13 +109,14 @@ TEST(PredefinedUserGroups, accessRights)
     static const std::map<nx::Uuid, AccessRights> kViewersResourceAccessMap{
         {kAllDevicesGroupId, AccessRight::view
             | AccessRight::viewArchive
+            | AccessRight::audio
             | AccessRight::exportArchive
             | AccessRight::viewBookmarks},
         {kAllWebPagesGroupId, AccessRight::view},
         {kAllServersGroupId, AccessRight::view}};
 
     static const std::map<nx::Uuid, AccessRights> kLiveViewersResourceAccessMap{
-        {kAllDevicesGroupId, AccessRight::view},
+        {kAllDevicesGroupId, AccessRight::view | AccessRight::audio},
         {kAllWebPagesGroupId, AccessRight::view},
         {kAllServersGroupId, AccessRight::view}};
 
