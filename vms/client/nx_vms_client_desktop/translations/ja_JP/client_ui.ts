@@ -1251,7 +1251,7 @@
     </message>
     <message>
       <source>Apply Filters</source>
-      <translation>フィルタの適用</translation>
+      <translation>フィルターを適用する</translation>
     </message>
     <message>
       <source>Rotation, Dewarping, Image Enhancement etc.</source>
@@ -1259,7 +1259,7 @@
     </message>
     <message>
       <source>Applying filters and adding overlays require transcoding which will increase CPU usage and may take significant time.</source>
-      <translation>フィルタを適用してオーバーレイを追加するにはトランスコードが必要です。これにより、CPU使用率が高くなり、時間がかかることがあります。</translation>
+      <translation>フィルターの適用とオーバーレイの追加にはトランスコーディングが必要です。これにより CPU 使用率が増加し、長い時間がかかる場合があります。</translation>
     </message>
   </context>
   <context>
@@ -1379,7 +1379,7 @@
     </message>
     <message>
       <source>Local Media Folders</source>
-      <translation>ローカル メディア フォルダー</translation>
+      <translation>ローカルメディアフォルダー</translation>
     </message>
     <message>
       <source>Audio Input</source>
