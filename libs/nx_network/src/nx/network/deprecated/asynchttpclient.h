@@ -405,16 +405,6 @@ void NX_NETWORK_API downloadFileAsync(
     AuthType authType = AuthType::authBasicAndDigest,
     AsyncHttpClient::Timeouts timeouts = {});
 
-/**
- * Calls previous function and waits for completion.
- */
-SystemError::ErrorCode NX_NETWORK_API downloadFileSync(
-    ssl::AdapterFunc adapterFunc,
-    const nx::utils::Url& url,
-    int* const statusCode,
-    nx::Buffer* const msgBody,
-    AsyncHttpClient::Timeouts timeouts = {});
-
 using DownloadCompletionHandlerEx = std::function<void(SystemError::ErrorCode, int /*statusCode*/,
     std::string /*content type*/, nx::Buffer /*message body*/,
     nx::network::http::HttpHeaders /*response headers*/)>;

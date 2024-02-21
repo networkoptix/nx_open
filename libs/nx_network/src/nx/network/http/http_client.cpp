@@ -209,7 +209,8 @@ nx::Buffer HttpClient::fetchMessageBodyBuffer()
 }
 
 std::optional<nx::Buffer> HttpClient::fetchEntireMessageBody(
-    std::optional<std::chrono::milliseconds> timeout)
+    std::optional<std::chrono::milliseconds> timeout,
+    std::optional<int> messageSizeLimit)
 {
     nx::Buffer buffer;
     nx::utils::ElapsedTimer timer;
@@ -219,7 +220,8 @@ std::optional<nx::Buffer> HttpClient::fetchEntireMessageBody(
     while (!eof())
     {
         buffer += fetchMessageBodyBuffer();
-        if (hasTimeout && timer.hasExpired(*timeout))
+        if ((hasTimeout && timer.hasExpired(*timeout))
+            || (messageSizeLimit && (int)buffer.size() >= messageSizeLimit.value()))
         {
             m_error = true;
             break;
@@ -399,13 +401,37 @@ bool HttpClient::fetchResource(
     nx::network::http::HttpClient client(std::move(adapterFunc));
     if (customResponseReadTimeout)
         client.setResponseReadTimeout(*customResponseReadTimeout);
+
     if (!client.doGet(url))
         return false;
 
     while (!client.eof())
         *msgBody += client.fetchMessageBodyBuffer();
 
-    *contentType = getHeaderValue(client.response()->headers, "Content-Type");
+    if (contentType)
+        *contentType = getHeaderValue(client.response()->headers, "Content-Type");
+
+    return true;
+}
+
+bool HttpClient::fetchResource(
+    const nx::utils::Url& url,
+    nx::network::http::StatusCode::Value* const statusCode,
+    nx::Buffer* const message,
+    int messageSizeLimit,
+    std::optional<AsyncClient::Timeouts> timeouts)
+{
+    nx::Buffer response;
+    nx::network::http::HttpClient client{nx::network::ssl::kAcceptAnyCertificate};
+    if (timeouts)
+        client.setTimeouts(*timeouts);
+    if (!client.doGet(url) || !client.response())
+        return false;
+
+    *statusCode = client.response()->statusLine.statusCode;
+    if (auto messageBody = client.fetchEntireMessageBody(std::nullopt, messageSizeLimit))
+        *message = *messageBody;
+
     return true;
 }
 
