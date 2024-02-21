@@ -559,44 +559,6 @@ void downloadFileAsync(
         Method::get);
 }
 
-SystemError::ErrorCode downloadFileSync(
-    ssl::AdapterFunc adapterFunc,
-    const nx::utils::Url& url,
-    int* const statusCode,
-    nx::Buffer* const msgBody,
-    AsyncHttpClient::Timeouts timeouts)
-{
-    bool done = false;
-    SystemError::ErrorCode resultingErrorCode = SystemError::noError;
-    std::mutex mtx;
-    std::condition_variable condVar;
-    downloadFileAsync(
-        std::move(adapterFunc),
-        url,
-        [&resultingErrorCode, statusCode, msgBody, &mtx, &condVar, &done](
-            SystemError::ErrorCode errorCode,
-            int _statusCode,
-            const nx::Buffer& _msgBody,
-            nx::network::http::HttpHeaders /*httpHeaders*/)
-        {
-            resultingErrorCode = errorCode;
-            *statusCode = _statusCode;
-            *msgBody = _msgBody;
-            std::unique_lock<std::mutex> lk(mtx);
-            done = true;
-            condVar.notify_all();
-        },
-        nx::network::http::HttpHeaders(),
-        AuthType::authBasicAndDigest,
-        timeouts);
-
-    std::unique_lock<std::mutex> lk(mtx);
-    while (!done)
-        condVar.wait(lk);
-
-    return resultingErrorCode;
-}
-
 void uploadDataAsync(
     ssl::AdapterFunc adapterFunc,
     const nx::utils::Url& url,
