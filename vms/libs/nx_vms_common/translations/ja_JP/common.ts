@@ -1649,7 +1649,7 @@
     </message>
     <message>
       <source>Invalid resource type for data export.</source>
-      <translation>データ エクスポートに無効なリソースタイプ</translation>
+      <translation>データのエクスポートには無効なリソースタイプです。</translation>
     </message>
     <message>
       <source>No data exported.</source>

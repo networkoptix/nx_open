@@ -949,7 +949,7 @@ PTZを行います</translation>
     </message>
     <message>
       <source>Drag video files or images to the client window, or add local media folder through the Local Settings dialog</source>
-      <translation>映像ファイルまたは画像をクライアントウィンドウにドラッグするか、[ローカル設定] ダイアログからローカルメディアフォルダを追加してください</translation>
+      <translation>動画ファイルまたは画像をクライアントウィンドウにドラッグするか、[ローカル設定] ダイアログからローカルメディアフォルダーを追加してください</translation>
     </message>
     <message>
       <source>Try searching for something else</source>

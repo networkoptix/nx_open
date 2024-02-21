@@ -341,7 +341,7 @@
     </message>
     <message>
       <source>Edit Bookmark...</source>
-      <translation>ブックマーク編集...</translation>
+      <translation>ブックマークを編集...</translation>
     </message>
     <message>
       <source>Preview Search...</source>
@@ -2673,11 +2673,11 @@ License Key: %2</source>
     </message>
     <message>
       <source>Export selected devices to a file.</source>
-      <translation>エクスポート.</translation>
+      <translation>選択したデバイスをファイルにエクスポートします。</translation>
     </message>
     <message>
       <source>Export selected cameras to a file.</source>
-      <translation>エクスポート.</translation>
+      <translation>選択したカメラをファイルにエクスポートします。</translation>
     </message>
     <message numerus="yes">
       <source>%n I/O modules found</source>
@@ -4099,7 +4099,7 @@ to %1</source>
     </message>
     <message>
       <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
-      <translation>ツアー表示中のレイアウト切り替え間隔。</translation>
+      <translation>ツアー表示中のカメラ1台あたりの表示時間。</translation>
     </message>
   </context>
   <context>
@@ -4738,7 +4738,7 @@ to %1</source>
     </message>
     <message>
       <source>Start time</source>
-      <translation>開始時間</translation>
+      <translation>開始日時</translation>
     </message>
     <message>
       <source>Length</source>
@@ -5678,7 +5678,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Spread Sheet (CSV) File</source>
-      <translation>スプレッドシート（CSV）ファイル</translation>
+      <translation>スプレッドシート (CSV) ファイル</translation>
     </message>
   </context>
   <context>
@@ -6036,7 +6036,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Bookmarks can only be edited on an online Server.</source>
-      <translation>ブックマークは、オンライン サーバーでのみ編集できます</translation>
+      <translation>ブックマークは、オンラインサーバーでのみ編集できます。</translation>
     </message>
     <message>
       <source>Delete bookmark?</source>
@@ -8386,7 +8386,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::ExportProcess</name>
     <message>
       <source>Unsupported media for data export.</source>
-      <translation>データのエクスポートにサポートされていないメディア</translation>
+      <translation>データのエクスポートがサポートされていないメディアです。</translation>
     </message>
     <message>
       <source>Selected format is not supported by FFMPEG library.</source>
@@ -8394,7 +8394,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>FFMPEG library error.</source>
-      <translation>FFMPEG libraryエラー</translation>
+      <translation>FFMPEGライブラリエラー。</translation>
     </message>
     <message>
       <source>Video or audio codec is incompatible with selected format.</source>
@@ -8402,7 +8402,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>File write error.</source>
-      <translation>ファイル書き込みエラー</translation>
+      <translation>ファイル書き込みエラー。</translation>
     </message>
     <message>
       <source>No data exported.</source>
@@ -8445,7 +8445,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Delete Timestamp</source>
-      <translation>タイムスタンプの削除</translation>
+      <translation>タイムスタンプを削除</translation>
     </message>
     <message>
       <source>Timestamp</source>
@@ -8477,15 +8477,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Reset Speed</source>
-      <translation>スピードリセット</translation>
+      <translation>スピードをリセット</translation>
     </message>
     <message>
       <source>Add Bookmark Info</source>
-      <translation>ブックマーク情報追加</translation>
+      <translation>ブックマーク情報を追加</translation>
     </message>
     <message>
       <source>Delete Bookmark Info</source>
-      <translation>ブックマーク情報削除</translation>
+      <translation>ブックマーク情報を削除</translation>
     </message>
     <message>
       <source>Bookmark Info</source>
@@ -8497,7 +8497,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Chosen settings require transcoding. It will increase CPU usage and may take significant time.</source>
-      <translation>選択した設定にはトランスコードが必要です。CPU使用量が増加し、時間がかかることがあります。</translation>
+      <translation>選択した設定にはトランスコーディングが必要です。これにより CPU 使用率が増加し、長い時間がかかる場合があります。</translation>
     </message>
     <message>
       <source>We recommend to export video from this camera as &quot;Multi Video&quot; to avoid downscaling.</source>
@@ -10670,7 +10670,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Start time</source>
-      <translation>開始時間</translation>
+      <translation>開始日時</translation>
     </message>
     <message>
       <source>Length</source>
@@ -11040,12 +11040,12 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Cannot write file</source>
-      <translation>ファイルを書き込めません</translation>
+      <translation>ファイルの書き込みができません</translation>
     </message>
     <message>
       <source>%1 is in use by another export.</source>
       <comment>%1 is file name</comment>
-      <translation>%1は別のエクスポートによって使用されています。</translation>
+      <translation>%1 は別のエクスポートで使用されています。</translation>
     </message>
     <message>
       <source>Export completed</source>
@@ -11053,11 +11053,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Export failed</source>
-      <translation>エクスポート失敗</translation>
+      <translation>エクスポートに失敗しました</translation>
     </message>
     <message>
       <source>Selected period cannot be exported for the current camera.</source>
-      <translation>選択した期間は現在のカメラではエクスポートできません</translation>
+      <translation>選択した期間は現在のカメラではエクスポートできません。</translation>
     </message>
     <message>
       <source>Several bookmarks can be exported as layout only.</source>
@@ -11069,7 +11069,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Please remove all local files from the layout and try again.</source>
-      <translation>レイアウトからすべてのローカル ファイルを削除して、もう一度やり直してください</translation>
+      <translation>レイアウトからすべてのローカルファイルを削除して、もう一度やり直してください。</translation>
     </message>
     <message>
       <source>Starting export...</source>
@@ -11085,7 +11085,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Saving failed</source>
-      <translation>保存できませんでした</translation>
+      <translation>保存に失敗しました</translation>
     </message>
     <message>
       <source>Starting saving...</source>
@@ -11963,15 +11963,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Play bookmark from the beginning</source>
-      <translation>ブックマークを最初から再生する</translation>
+      <translation>ブックマークを最初から再生</translation>
     </message>
     <message>
       <source>Edit bookmark</source>
-      <translation>ブックマークの編集</translation>
+      <translation>ブックマークを編集</translation>
     </message>
     <message>
       <source>Export bookmark</source>
-      <translation>ブックマークをエクスポートします</translation>
+      <translation>ブックマークをエクスポート</translation>
     </message>
     <message>
       <source>Delete bookmark</source>
