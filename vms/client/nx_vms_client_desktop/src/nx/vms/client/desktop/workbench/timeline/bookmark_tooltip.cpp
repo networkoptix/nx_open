@@ -93,7 +93,20 @@ BookmarkTooltip::BookmarkTooltip(
         QVBoxLayout* nameLayout = new QVBoxLayout();
         nameLayout->setSpacing(4);
 
-        nameLayout->addWidget(createNameLabel(bookmark.name));
+        QHBoxLayout* titleLayout = new QHBoxLayout();
+        titleLayout->addWidget(createNameLabel(bookmark.name));
+
+        if (bookmark.shareable())
+        {
+            titleLayout->addStretch();
+            auto shareableLabel = new QLabel();
+            shareableLabel->setPixmap(
+                qnSkin->icon("bookmark/tooltip/bookmarks_shared.svg").pixmap(30, 30));
+            shareableLabel->setToolTip(tr("Shared by link"));
+            titleLayout->addWidget(shareableLabel);
+        }
+
+        nameLayout->addLayout(titleLayout);
 
         if (!bookmark.description.isEmpty())
         {
