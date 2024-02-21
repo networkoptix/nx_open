@@ -133,14 +133,11 @@ struct TokenIntrospectionRequest
     /**%apidoc The token to introspect.*/
     std::string token;
 
-    /**%apidoc The token type hint. It may be used to speed up the introspection process. */
-    std::optional<std::string> token_type_hint;
-
     /**%apidoc Ids of systems to fetch user roles from. */
     std::optional<std::vector<std::string>> system_ids;
 };
 
-NX_REFLECTION_INSTRUMENT(TokenIntrospectionRequest, (token)(token_type_hint)(system_ids))
+NX_REFLECTION_INSTRUMENT(TokenIntrospectionRequest, (token)(system_ids))
 
 struct TokenIntrospectionResponse
 {
