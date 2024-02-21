@@ -108,7 +108,8 @@ public:
 
     /** Blocks until entire message body is available or timeout expired if it is specified. */
     std::optional<nx::Buffer> fetchEntireMessageBody(
-        std::optional<std::chrono::milliseconds> timeout = std::nullopt);
+        std::optional<std::chrono::milliseconds> timeout = std::nullopt,
+        std::optional<int> messageSizeLimit = std::nullopt);
 
     void addAdditionalHeader(const std::string& key, const std::string& value);
     void removeAdditionalHeader(const std::string& key);
@@ -166,6 +167,16 @@ public:
         std::string* contentType,
         std::optional<std::chrono::milliseconds> customResponseReadTimeout,
         ssl::AdapterFunc adapterFunc);
+
+    /**
+     * Fetch entire resource data to message.
+     */
+    static bool fetchResource(
+        const nx::utils::Url& url,
+        nx::network::http::StatusCode::Value* const statusCode,
+        nx::Buffer* const message,
+        int messageSizeLimit = 1024 * 64,
+        std::optional<AsyncClient::Timeouts> timeouts = std::nullopt);
 
     int totalRequestsSentViaCurrentConnection() const;
     int totalRequestsSent() const;
