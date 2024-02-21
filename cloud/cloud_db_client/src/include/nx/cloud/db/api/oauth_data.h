@@ -8,6 +8,7 @@
 #include <string>
 
 #include <nx/reflect/instrument.h>
+#include <nx/network/jose/jwt.h>
 
 namespace nx::cloud::db::api {
 
@@ -209,5 +210,33 @@ struct IssueStunTokenResponse
     /**%apidoc Error code.*/
     std::optional<std::string> error;
 };
+
+/**
+ * JWT claims set. Field names extended with field from RFC 9068
+ */
+class ClaimSet: public nx::network::jwt::ClaimSet
+{
+public:
+    std::optional<std::string> clientId() const;
+    void setClientId(const std::string& val);
+
+    // The session Id is defined by refresh token
+    std::optional<std::string> sid() const;
+    void setSid(const std::string& val);
+
+    // Seconds. Time that passed since this token was confirmed with a password entry
+    // either explicitly or implicitly
+    std::optional<std::chrono::seconds> passwordTime() const;
+    void setPasswordTime(const std::chrono::seconds& val);
+
+    // Oauth token type. MUST be one of accessToken, refreshToken, authCode
+    std::optional<std::string> typ() const;
+    void setTyp(const std::string& val);
+
+    std::optional<int> securitySequence() const;
+    void setSecuritySequence(int val);
+};
+
+using Token = nx::network::jws::Token<ClaimSet>;
 
 } // namespace nx::cloud::db::api
