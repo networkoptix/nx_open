@@ -330,7 +330,7 @@ void ShowreelReviewController::updatePlaceholders()
         for (int y = boundingRect.top(); y <= boundingRect.bottom(); ++y)
         {
             const QPoint cell(x, y);
-            const bool isFree = layout->isFreeSlot(cell, kCellSize);
+            const bool isFree = layout->isFreeSlot(cell);
             const bool placeholderExists = m_dropPlaceholders.contains(cell);
             const bool mustBePlaceholder = isFree;
 
