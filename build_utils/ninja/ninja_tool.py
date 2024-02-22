@@ -77,7 +77,10 @@ def clean_build_directory(build_dir: Path,
     build_files = build_file_processor.get_known_files()
     known_files = get_files_from_list_file(build_dir / KNOWN_FILES_FILE_NAME)
     persistent_known_files = get_files_from_list_file(build_dir / PERSISTENT_KNOWN_FILES_FILE_NAME)
-    conan_files = get_files_from_conan_manifest(build_dir / "conan_imports_manifest.txt")
+    if (build_dir / "conan_imported_files.txt").exists():
+        conan_files = get_files_from_conan_manifest(build_dir / "conan_imported_files.txt")
+    else:
+        conan_files = get_files_from_conan_manifest(build_dir / "conan_imports_manifest.txt")
 
     all_known_files = additional_known_files if additional_known_files else set()
     for file_name in build_files | known_files | persistent_known_files | conan_files:
@@ -136,7 +139,7 @@ def get_files_from_conan_manifest(conan_manifest_file_name: Path) -> set:
     try:
         with open(conan_manifest_file_name) as manifest:
             for line in manifest:
-                sep = line.rfind(':')
+                sep = line.find(': ')
                 if sep > 0:
                     file_name = line[:sep]
                     result.add(str(Path(file_name).as_posix()))
@@ -179,6 +182,7 @@ def find_extra_files(build_dir: Path, known_files: set) -> list:
         "conaninfo.txt",
         "conan.lock",
         "conan_imports_manifest.txt",
+        "conan_imported_files.txt",
         "graph_info.json",
         "pre_build.log",
     }
