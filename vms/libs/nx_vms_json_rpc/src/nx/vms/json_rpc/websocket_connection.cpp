@@ -63,6 +63,13 @@ WebSocketConnection::WebSocketConnection(
     m_onDone(std::move(onDone)),
     m_socket(std::move(socket))
 {
+    base_type::bindToAioThread(m_socket->getAioThread());
+    m_socket->executeInAioThreadSync(
+        [this]()
+        {
+            if (auto socket = m_socket->socket())
+                m_address = socket->getForeignAddress();
+        });
     if (requestHandler)
     {
         m_incomingProcessor = std::make_unique<IncomingProcessor>(
@@ -87,7 +94,6 @@ WebSocketConnection::WebSocketConnection(
     }
     m_outgoingProcessor =
         std::make_unique<OutgoingProcessor>([this](auto value) { send(std::move(value)); });
-    base_type::bindToAioThread(m_socket->getAioThread());
     m_socket->start();
 }
 
@@ -165,7 +171,7 @@ void WebSocketConnection::readNextMessage()
 
 void WebSocketConnection::readHandler(const nx::Buffer& buffer)
 {
-    logMessage("receive from", m_socket->socket()->getForeignAddress(), buffer);
+    logMessage("receive from", m_address, buffer);
     try
     {
         QJsonValue data;
@@ -209,7 +215,7 @@ void WebSocketConnection::send(QByteArray data)
 {
     auto buffer = std::make_unique<nx::Buffer>(std::move(data));
     auto bufferPtr = buffer.get();
-    logMessage("send to", m_socket->socket()->getForeignAddress(), *bufferPtr);
+    logMessage("send to", m_address, *bufferPtr);
     m_socket->sendAsync(bufferPtr,
         [buffer = std::move(buffer), this](auto errorCode, auto /*bytesTransferred*/)
         {
