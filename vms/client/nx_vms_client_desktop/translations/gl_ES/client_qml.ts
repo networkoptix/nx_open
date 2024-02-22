@@ -2542,7 +2542,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Account Settings</source>
-      <translation type="unfinished">Account Settings</translation>
+      <translation>Axustes de conta</translation>
     </message>
     <message>
       <source>Email</source>

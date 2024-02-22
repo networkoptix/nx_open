@@ -10216,6 +10216,10 @@ Puede forzarlo, pero puede aumentar significativamente la carga de la CPU.</tran
       <source>You do not have permissions to modify this group</source>
       <translation>No tienes permiso para modificar este grupo</translation>
     </message>
+    <message>
+      <source>LDAP Default group cannot be deleted as long as the system is connected to LDAP server</source>
+      <translation type="unfinished">LDAP Default group cannot be deleted as long as the system is connected to LDAP server</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::NotificationListModel::Private</name>
