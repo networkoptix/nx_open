@@ -58,6 +58,7 @@ private:
 
 private:
     OnDone m_onDone;
+    nx::network::SocketAddress m_address;
     std::unique_ptr<IncomingProcessor> m_incomingProcessor;
     std::unique_ptr<detail::OutgoingProcessor> m_outgoingProcessor;
     std::queue<QJsonValue> m_queuedRequests;
