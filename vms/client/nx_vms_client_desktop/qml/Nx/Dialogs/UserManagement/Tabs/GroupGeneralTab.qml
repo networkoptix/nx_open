@@ -199,63 +199,68 @@ Item
             }
         }
 
-        DialogBanner
+        ColumnLayout
         {
-            id: bannerGroupNotFound
+            spacing: 2
 
-            style: DialogBanner.Style.Error
-            closeable: true
-            watchToReopen: control.groupId
-            visible: control.ldapError && !closed
-            Layout.fillWidth: true
+            DialogBanner
+            {
+                id: bannerGroupNotFound
 
-            text: qsTr("This group is not found in the LDAP database.")
+                style: DialogBanner.Style.Error
+                closeable: true
+                watchToReopen: control.groupId
+                visible: control.ldapError && !closed
+                Layout.fillWidth: true
 
-            buttonText: control.deleteAvailable && control.enabled ? qsTr("Delete") : ""
-            buttonIcon: "image://svg/skin/user_settings/trash.svg"
+                text: qsTr("This group is not found in the LDAP database.")
 
-            onButtonClicked: control.deleteRequested()
-        }
+                buttonText: control.deleteAvailable && control.enabled ? qsTr("Delete") : ""
+                buttonIcon: "image://svg/skin/user_settings/trash.svg"
 
-        DialogBanner
-        {
-            id: bannerLdapContinousSyncDisabled
+                onButtonClicked: control.deleteRequested()
+            }
 
-            style: DialogBanner.Style.Warning
-            closeable: true
-            watchToReopen: control.groupId
-            visible: control.isLdap
-                && control.continuousSync === LdapSettings.Sync.disabled
-                && !closed
-            Layout.fillWidth: true
+            DialogBanner
+            {
+                id: bannerLdapContinousSyncDisabled
 
-            text: qsTr("When continuous sync with LDAP server is disabled, groups do not " +
-                "synchronize automatically. To update this group, initiate a manual sync.")
-        }
+                style: DialogBanner.Style.Warning
+                closeable: true
+                watchToReopen: control.groupId
+                visible: control.isLdap
+                    && control.continuousSync === LdapSettings.Sync.disabled
+                    && !closed
+                Layout.fillWidth: true
 
-        DialogBanner
-        {
-            style: DialogBanner.Style.Info
-            visible: !control.nameIsUnique && !closed
-            closeable: true
-            watchToReopen: control.groupId
-            Layout.fillWidth: true
+                text: qsTr("When continuous sync with LDAP server is disabled, groups do not " +
+                    "synchronize automatically. To update this group, initiate a manual sync.")
+            }
 
-            text: qsTr("Another group with the same name exists in the system. "
-                + "It is recommended to assign unique names to the groups.")
-        }
+            DialogBanner
+            {
+                style: DialogBanner.Style.Info
+                visible: !control.nameIsUnique && !closed
+                closeable: true
+                watchToReopen: control.groupId
+                Layout.fillWidth: true
 
-        DialogBanner
-        {
-            style: DialogBanner.Style.Error
-            visible: control.cycledGroup && !closed
-            closeable: true
-            watchToReopen: control.groupId
-            Layout.fillWidth: true
+                text: qsTr("Another group with the same name exists in the system. "
+                    + "It is recommended to assign unique names to the groups.")
+            }
 
-            text: qsTr("The group has another group as both its parent, and as a child member, or "
-                + "is a part of such a circular reference chain. Resolve this chain to prevent "
-                + "incorrect calculation of permissions.")
+            DialogBanner
+            {
+                style: DialogBanner.Style.Error
+                visible: control.cycledGroup && !closed
+                closeable: true
+                watchToReopen: control.groupId
+                Layout.fillWidth: true
+
+                text: qsTr("The group has another group as both its parent, and as a child member, or "
+                    + "is a part of such a circular reference chain. Resolve this chain to prevent "
+                    + "incorrect calculation of permissions.")
+            }
         }
     }
 }
