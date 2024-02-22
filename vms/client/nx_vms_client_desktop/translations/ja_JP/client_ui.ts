@@ -383,7 +383,7 @@
     </message>
     <message>
       <source>Area Width</source>
-      <translation>エリア幅</translation>
+      <translation>領域の幅</translation>
     </message>
     <message>
       <source>Font Size</source>
@@ -1250,7 +1250,7 @@
     </message>
     <message>
       <source>Make read-only</source>
-      <translation>読取り専用</translation>
+      <translation>読み取り専用にする</translation>
     </message>
   </context>
   <context>
@@ -1291,7 +1291,7 @@
     </message>
     <message>
       <source>Single Camera</source>
-      <translation>単一のカメラ</translation>
+      <translation>単一カメラ</translation>
     </message>
     <message>
       <source>Export Settings</source>
@@ -3131,7 +3131,7 @@
     </message>
     <message>
       <source>Area Width</source>
-      <translation>エリア幅</translation>
+      <translation>領域の幅</translation>
     </message>
   </context>
   <context>
