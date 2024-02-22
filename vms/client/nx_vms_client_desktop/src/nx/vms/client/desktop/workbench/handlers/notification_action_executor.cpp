@@ -153,7 +153,6 @@ void NotificationActionExecutor::handleAcknowledgeAction()
     auto acknowledgeBookmark =
         nx::vms::common::bookmarkToApi<nx::vms::api::rules::AcknowledgeBookmark>(
             std::move(bookmark), notification->serverId());
-    acknowledgeBookmark.id = nx::Uuid();
     acknowledgeBookmark.eventId = notification->id();
 
     auto callback = nx::utils::guarded(
@@ -161,7 +160,7 @@ void NotificationActionExecutor::handleAcknowledgeAction()
         [this, id = notification->id(), camera](
             rest::Handle,
             bool /*success*/,
-            rest::ErrorOrData<nx::vms::api::BookmarkV1>&& response)
+            rest::ErrorOrData<nx::vms::api::BookmarkV3>&& response)
         {
             if (const auto error = std::get_if<nx::network::rest::Result>(&response))
             {
@@ -170,7 +169,7 @@ void NotificationActionExecutor::handleAcknowledgeAction()
                 return;
             }
 
-            auto& bookmark = std::get<nx::vms::api::BookmarkV1>(response);
+            auto& bookmark = std::get<nx::vms::api::BookmarkV3>(response);
             NX_VERBOSE(this, "Acknowledged action id: %1, bookmark id: %2", id, bookmark.id);
 
             const auto systemContext = SystemContext::fromResource(camera);

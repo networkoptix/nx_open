@@ -410,7 +410,7 @@ public:
 
     Handle acknowledge(
         const nx::vms::api::rules::AcknowledgeBookmark& bookmark,
-        Result<ErrorOrData<nx::vms::api::BookmarkV1>>::type callback,
+        Result<ErrorOrData<nx::vms::api::BookmarkV3>>::type callback,
         QThread* targetThread = nullptr);
 
     /* Get camera credentials. */

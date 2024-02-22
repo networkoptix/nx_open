@@ -8,16 +8,19 @@
 
 namespace nx::vms::api::rules {
 
-struct NX_VMS_API AcknowledgeBookmark: BookmarkV1
+struct NX_VMS_API AcknowledgeBookmark: BookmarkBase
 {
     /**%apidoc ID of the event to acknowledge. */
     nx::Uuid eventId;
 
-    AcknowledgeBookmark() = default;
-    AcknowledgeBookmark(BookmarkV1&& book): BookmarkV1(std::move(book)) {};
+    /**%apidoc ID of the server holding event log record to acknowledge. */
+    nx::Uuid eventServerId;
+
+    void setIds(nx::Uuid /*bookmarkId*/, nx::Uuid serverId) { eventServerId = serverId; };
+    nx::Uuid bookmarkId() const { return nx::Uuid::createUuid(); };
 };
 
-#define AcknowledgeBookmark_Fields BookmarkV1_Fields (eventId)
+#define AcknowledgeBookmark_Fields BookmarkBase_Fields (eventId)(eventServerId)
 QN_FUSION_DECLARE_FUNCTIONS(AcknowledgeBookmark, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(AcknowledgeBookmark, AcknowledgeBookmark_Fields)
 

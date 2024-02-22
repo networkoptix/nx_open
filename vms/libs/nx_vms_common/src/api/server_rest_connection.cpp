@@ -1306,10 +1306,10 @@ Handle ServerConnection::getEventsToAcknowledge(
 
 Handle ServerConnection::acknowledge(
     const nx::vms::api::rules::AcknowledgeBookmark& bookmark,
-    Result<ErrorOrData<nx::vms::api::BookmarkV1>>::type callback,
+    Result<ErrorOrData<nx::vms::api::BookmarkV3>>::type callback,
     QThread* targetThread)
 {
-    if (!NX_ASSERT(!bookmark.serverId.isNull()))
+    if (!NX_ASSERT(!bookmark.eventServerId.isNull()))
         return {};
 
     return executePost(
