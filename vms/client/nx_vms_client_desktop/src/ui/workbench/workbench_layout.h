@@ -293,10 +293,9 @@ public:
 
     /**
      * @param gridPos Desired position, in grid coordinates.
-     * @param size Desired slot size.
      * @return True if requested rect is not covered by pinned items.
      */
-    bool isFreeSlot(const QPointF& gridPos, const QSize& size) const;
+    bool isFreeSlot(const QPoint& gridPos) const;
 
     /**
      * @param gridPos Desired position, in grid coordinates.
