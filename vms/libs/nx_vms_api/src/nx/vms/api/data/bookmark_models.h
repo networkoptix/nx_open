@@ -102,6 +102,7 @@ struct NX_VMS_API BookmarkSharingSettings
 };
 #define BookmarkSharingSettings_Fields (expirationTimeMs)(password)
 QN_FUSION_DECLARE_FUNCTIONS(BookmarkSharingSettings, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(BookmarkSharingSettings, BookmarkSharingSettings_Fields)
 
 struct NX_VMS_API BookmarkIdV1
 {
@@ -214,7 +215,6 @@ struct NX_VMS_API BookmarkV1: BookmarkBase, BookmarkIdV1
 };
 #define BookmarkV1_Fields BookmarkBase_Fields BookmarkIdV1_Fields (serverId)
 QN_FUSION_DECLARE_FUNCTIONS(BookmarkV1, (json), NX_VMS_API)
-NX_REFLECTION_INSTRUMENT(BookmarkV1, BookmarkV1_Fields)
 
 struct NX_VMS_API BookmarkWithRuleV1: BookmarkV1
 {
@@ -237,6 +237,7 @@ struct NX_VMS_API BookmarkV3: BookmarkBase, BookmarkIdV3
 };
 #define BookmarkV3_Fields BookmarkBase_Fields BookmarkIdV3_Fields (share)
 QN_FUSION_DECLARE_FUNCTIONS(BookmarkV3, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(BookmarkV3, BookmarkV3_Fields)
 
 using Bookmark = BookmarkV3;
 
