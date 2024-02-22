@@ -717,10 +717,9 @@ QnResourceList QnWorkbenchLayout::itemResources() const
     return d->itemsByResource.keys();
 }
 
-bool QnWorkbenchLayout::isFreeSlot(const QPointF& gridPos, const QSize& size) const
+bool QnWorkbenchLayout::isFreeSlot(const QPoint& gridPos) const
 {
-    QPoint gridCell = (gridPos - Geometry::toPoint(QSizeF(size)) / 2.0).toPoint();
-    return !d->itemMap.isOccupied(QRect(gridCell, size));
+    return !d->itemMap.isOccupied(gridPos);
 }
 
 QRect QnWorkbenchLayout::closestFreeSlot(const QPointF& gridPos, const QSize& size,
