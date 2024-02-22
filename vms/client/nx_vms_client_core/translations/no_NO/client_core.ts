@@ -247,6 +247,10 @@
       <source>This might be due to an expired server certificate or an invalid certificate. Contact your system administrator for further investigation.</source>
       <translation>Dette kan skyldes et utløpt serversertifikat eller et ugyldig sertifikat. Kontakt systemadministratoren for videre undersøkelser.</translation>
     </message>
+    <message>
+      <source>Cannot verify the identity of %1</source>
+      <translation>Kan ikke verifisere identiteten til %1</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::core::DesktopAudioOnlyDataProvider</name>

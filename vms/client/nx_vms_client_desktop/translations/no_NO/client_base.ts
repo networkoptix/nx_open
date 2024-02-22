@@ -10216,6 +10216,10 @@ Du kan fremtvinge det, men det kan øke CPU-belastningen betydelig.</translation
       <source>You do not have permissions to modify this group</source>
       <translation>Du har ikke tillatelse til å endre denne gruppen</translation>
     </message>
+    <message>
+      <source>LDAP Default group cannot be deleted as long as the system is connected to LDAP server</source>
+      <translation>Standardgruppen i LDAP kan ikke slettes så lenge systemet er koblet til LDAP-serveren</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::NotificationListModel::Private</name>

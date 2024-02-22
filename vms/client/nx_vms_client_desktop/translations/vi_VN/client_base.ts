@@ -10064,6 +10064,10 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
       <source>You do not have permissions to modify this group</source>
       <translation>Bạn không có quyền sửa đổi nhóm này</translation>
     </message>
+    <message>
+      <source>LDAP Default group cannot be deleted as long as the system is connected to LDAP server</source>
+      <translation type="unfinished">LDAP Default group cannot be deleted as long as the system is connected to LDAP server</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::NotificationListModel::Private</name>

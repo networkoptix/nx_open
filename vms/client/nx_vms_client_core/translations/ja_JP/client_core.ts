@@ -246,6 +246,10 @@
       <source>This might be due to an expired server certificate or an invalid certificate. Contact your system administrator for further investigation.</source>
       <translation>期限切れまたは無効なサーバー証明書が原因である可能性があります。詳細な調査については、システム管理者にお問い合わせください。</translation>
     </message>
+    <message>
+      <source>Cannot verify the identity of %1</source>
+      <translation>%1 の識別情報を確認できません</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::core::DesktopAudioOnlyDataProvider</name>

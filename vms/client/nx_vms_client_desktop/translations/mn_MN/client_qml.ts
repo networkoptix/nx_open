@@ -920,7 +920,7 @@
     </message>
     <message>
       <source>Info</source>
-      <translation type="unfinished">Info</translation>
+      <translation>Мэдээлэл</translation>
     </message>
     <message>
       <source>Description</source>
@@ -1513,7 +1513,7 @@
     </message>
     <message>
       <source>Reject</source>
-      <translation type="unfinished">Reject</translation>
+      <translation>Татгалзах</translation>
     </message>
   </context>
   <context>
@@ -2534,7 +2534,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Info</source>
-      <translation type="unfinished">Info</translation>
+      <translation>Мэдээлэл</translation>
     </message>
     <message>
       <source>Full Name</source>
