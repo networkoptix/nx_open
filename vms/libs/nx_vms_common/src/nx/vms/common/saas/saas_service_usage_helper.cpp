@@ -501,12 +501,11 @@ std::map<nx::Uuid, std::set<QString>> LocalRecordingUsageHelper::camerasByServic
     std::map<nx::Uuid, std::set<QString>> result;
 
     // Update integration info
-    std::map<nx::Uuid, int> channelsByService;
+    std::map<nx::Uuid, int> channelsByService; // key - serviceId, value - channel count.
     for (const auto& [serviceId, params]: m_context->saasServiceManager()->localRecording())
-    {
-        if (params.totalChannelNumber > 0)
-            channelsByService[serviceId] = params.totalChannelNumber;
-    }
+        channelsByService[serviceId] = params.totalChannelNumber;
+
+    std::map<nx::Uuid, int>::iterator it = channelsByService.begin();
 
     for (const auto& camera: getAllCameras())
     {
@@ -515,10 +514,16 @@ std::map<nx::Uuid, std::set<QString>> LocalRecordingUsageHelper::camerasByServic
         nx::Uuid serviceId;
         if (!channelsByService.empty())
         {
-            const auto it = channelsByService.begin();
-            serviceId = it->first;
-            if (--it->second == 0)
-                channelsByService.erase(it);
+            for (; it != channelsByService.end() && it->second == 0; ++it);
+            if (it != channelsByService.end())
+            {
+                serviceId = it->first;
+                --it->second;
+            }
+            else
+            {
+                serviceId = channelsByService.begin()->first;
+            }
         }
         result[serviceId].insert(camera->getPhysicalId());
     }
