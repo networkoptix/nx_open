@@ -23,17 +23,19 @@ struct TestPluginData
     nx::Uuid engineId;
 };
 
-static const std::array<TestPluginData, 2> testPluginData = {
-    TestPluginData{"testAnalyticsPlugin", nx::Uuid("bd0c8d99-5092-4db0-8767-1ae571250be9")},
-    TestPluginData{"testAnalyticsPlugin2", nx::Uuid("bd0c8d99-5092-4db0-8767-1ae571250be8")},
-};
-
 static const nx::Uuid kAnalyticsServiceId("94ca45f8-4859-457a-bc17-f2f9394524fe");
+static const nx::Uuid kNotPurchasedAnalyticsServiceId("94ca45f8-4859-457a-bc17-f2f9394524ff");
+static const nx::Uuid kLocalRecordingServiceId("46fd4533-16dd-4e07-b285-ef059b4ecb31");
 
 static const nx::Uuid kServiceUnlimitedMegapixels("60a18a70-452b-46a1-9bfd-e66af6fbd0dc");
 static const nx::Uuid kServiceTenMegapixels("60a18a70-452b-46a1-9bfd-e66af6fbd0dd");
 static const nx::Uuid kServiceFiveMegapixels("60a18a70-452b-46a1-9bfd-e66af6fbd0de");
 
+static const std::array<TestPluginData, 3> testPluginData = {
+    TestPluginData{"testAnalyticsPlugin", nx::Uuid("bd0c8d99-5092-4db0-8767-1ae571250be9")},
+    TestPluginData{"testAnalyticsPlugin2", nx::Uuid("bd0c8d99-5092-4db0-8767-1ae571250be8")},
+    TestPluginData{"testAnalyticsPlugin3", kNotPurchasedAnalyticsServiceId}
+};
 
 static const std::string kServiceDataJson = R"json(
 [
@@ -42,6 +44,17 @@ static const std::string kServiceDataJson = R"json(
     "type": "local_recording",
     "state": "active",
     "displayName": "recording service",
+    "description": "",
+    "createdByChannelPartner": "5f124fdd-9fc7-43c1-898a-0dabde021894",
+    "parameters": {
+      "empty": "empty"
+    }
+  },
+  {
+    "id": "46fd4533-16dd-4e07-b285-ef059b4ecb30",
+    "type": "local_recording",
+    "state": "active",
+    "displayName": "recording service 2",
     "description": "",
     "createdByChannelPartner": "5f124fdd-9fc7-43c1-898a-0dabde021894",
     "parameters": {
@@ -97,6 +110,18 @@ static const std::string kServiceDataJson = R"json(
       "integrationId": "testAnalyticsPlugin",
       "totalChannelNumber": 5
     }
+  },
+  {
+    "id": "94ca45f8-4859-457a-bc17-f2f9394524ff",
+    "type": "analytics",
+    "state": "active",
+    "displayName": "analytics service 3",
+    "description": "",
+    "createdByChannelPartner": "5f124fdd-9fc7-43c1-898a-0dabde021894",
+    "parameters": {
+      "integrationId": "testAnalyticsPlugin3",
+      "totalChannelNumber": 5
+    }
   }
 ]
 )json";
@@ -142,6 +167,7 @@ protected:
         m_server = addServer();
         m_cloudeStorageHelper.reset(new CloudStorageServiceUsageHelper(systemContext()));
         m_integrationsHelper.reset(new IntegrationServiceUsageHelper(systemContext()));
+        m_localRecordingHelper.reset(new LocalRecordingUsageHelper(systemContext()));
 
         auto manager = systemContext()->saasServiceManager();
         manager->loadServiceData(kServiceDataJson);
@@ -197,6 +223,7 @@ protected:
     QnMediaServerResourcePtr m_server;
     QScopedPointer<CloudStorageServiceUsageHelper> m_cloudeStorageHelper;
     QScopedPointer<IntegrationServiceUsageHelper> m_integrationsHelper;
+    QScopedPointer<LocalRecordingUsageHelper> m_localRecordingHelper;
 };
 
 TEST_F(SaasServiceUsageHelperTest, CloudRecordingServicesLoaded)
@@ -483,8 +510,9 @@ TEST_F(SaasServiceUsageHelperTest, IntegrationServiceLoaded)
     using namespace nx::vms::api;
 
     auto info = m_integrationsHelper->allInfo();
-    ASSERT_EQ(1, info.size());
-    ASSERT_EQ(10, info.begin()->second.available);
+    ASSERT_EQ(2, info.size());
+    ASSERT_EQ(10, info["testAnalyticsPlugin"].available);
+    ASSERT_EQ(0, info["testAnalyticsPlugin3"].available);
 }
 
 TEST_F(SaasServiceUsageHelperTest, IntegrationServiceUsage)
@@ -519,7 +547,7 @@ TEST_F(SaasServiceUsageHelperTest, IntegrationServiceUsage)
     ASSERT_EQ(48, info.begin()->second.inUse);
 }
 
-TEST_F(SaasServiceUsageHelperTest, camerasByService)
+TEST_F(SaasServiceUsageHelperTest, IntegrationCamerasByService)
 {
     auto cameras = addCameras(/*size*/ 50);
     QSet<nx::Uuid> engines;
@@ -531,10 +559,30 @@ TEST_F(SaasServiceUsageHelperTest, camerasByService)
     m_integrationsHelper->invalidateCache();
     auto info = m_integrationsHelper->camerasByService();
     ASSERT_EQ(testPluginData.size(), info.size());
-    ASSERT_EQ(nx::Uuid(), info.begin()->first);
-    ASSERT_EQ(kAnalyticsServiceId, info.rbegin()->first);
-    ASSERT_EQ(50, info[kAnalyticsServiceId].size());
-    ASSERT_EQ(50, info[nx::Uuid()].size());
+
+    for (const auto& id: {nx::Uuid(), kAnalyticsServiceId, kNotPurchasedAnalyticsServiceId})
+    {
+        const auto it = info.find(id);
+        ASSERT_TRUE(it != info.end());
+        ASSERT_EQ(50, it->second.size());
+    }
+}
+
+TEST_F(SaasServiceUsageHelperTest, LocalRecordingUsage)
+{
+    auto manager = systemContext()->saasServiceManager();
+
+    auto cameras = addCameras(/*size*/ 50);
+    for (const auto& camera: cameras)
+        camera->setScheduleEnabled(true);
+
+    auto info = m_localRecordingHelper->camerasByService();
+    ASSERT_EQ(2, info.size());
+    ASSERT_EQ(10, info[kLocalRecordingServiceId].size());
+    int total = 0;
+    for (const auto& [id, cameras]: info)
+        total += cameras.size();
+    ASSERT_EQ(cameras.size(), total);
 }
 
 } // nx::vms::common::saas::test

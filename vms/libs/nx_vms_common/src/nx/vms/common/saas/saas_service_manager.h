@@ -134,6 +134,9 @@ private:
     void setData(const nx::vms::api::SaasData& data);
     void setServices(const std::vector<nx::vms::api::SaasService>& services);
 
+    /*
+     * @return purshase info by serviceId
+     */
     template <typename ServiceParamsType>
     std::map<nx::Uuid, ServiceParamsType> purchasedServices(const QString& serviceType) const;
     void setSaasStateInternal(api::SaasState saasState, bool waitForDone);
