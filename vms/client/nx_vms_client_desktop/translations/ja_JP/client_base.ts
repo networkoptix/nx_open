@@ -793,7 +793,7 @@
     </message>
     <message>
       <source>Forget password</source>
-      <translation>パスワードを忘れた場合</translation>
+      <translation>入力したパスワードを破棄</translation>
     </message>
     <message>
       <source>Cancel Upload...</source>
@@ -1096,7 +1096,7 @@
     </message>
     <message>
       <source>The file %1 is encrypted. Please enter the password:</source>
-      <translation>ファイル %1 は暗号化されています　パスワードを入力してください：</translation>
+      <translation>ファイル %1 は暗号化されています。パスワードを入力してください:</translation>
     </message>
     <message>
       <source>Please re-enter password for layout %1:</source>
@@ -1171,11 +1171,11 @@
     </message>
     <message>
       <source>%1 Media File</source>
-      <translation>%1メディアファイル</translation>
+      <translation>%1 メディアファイル</translation>
     </message>
     <message>
       <source>Executable %1 Media File</source>
-      <translation>実行可能な %1 メディアファイル</translation>
+      <translation>実行形式 %1 メディアファイル</translation>
     </message>
   </context>
   <context>
@@ -3555,7 +3555,7 @@ to %1</source>
     </message>
     <message>
       <source>Auto (%1)</source>
-      <translation>自動(%1)</translation>
+      <translation>自動 (%1)</translation>
     </message>
     <message>
       <source>Select Folder...</source>
@@ -5025,7 +5025,7 @@ to %1</source>
     </message>
     <message>
       <source>Invalid watermark</source>
-      <translation>無効なウォーターマーク</translation>
+      <translation>不正なウォーターマーク</translation>
     </message>
     <message>
       <source>Watermark Not Found</source>
