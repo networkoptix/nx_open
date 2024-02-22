@@ -9,12 +9,12 @@ SOURCE_DIR=$(cd "$(dirname "$0")" && pwd -P) #< NOTE: "readlink -f" does not wor
 BUILD_DIR="${SOURCE_DIR}-build"
 
 if [[ ! -f "${BUILD_DIR}/CMakeCache.txt" ]]; then
-    mkdir -p "$BUILD_DIR"
+    mkdir -p "${BUILD_DIR}"
 
     set -x #< Print commands to be executed.
 
-    # Clear the CMake cache to ensure that only the currently supplied CMake arguments are in effect.
-    rm -f "$BUILD_DIR/CMakeCache.txt"
+    # Ensure that only the currently supplied CMake arguments are in effect.
+    rm -f "${BUILD_DIR}/CMakeCache.txt"
 
     cmake "${SOURCE_DIR}" -B "${BUILD_DIR}" -GNinja "$@"
 else
