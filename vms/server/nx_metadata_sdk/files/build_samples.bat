@@ -1,6 +1,7 @@
 :: Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 @echo off
+setlocal %= Reset errorlevel and prohibit changing env vars of the parent shell. =%
 
 if [%1] == [/?] goto :show_usage
 if [%1] == [-h] goto :show_usage
@@ -9,7 +10,7 @@ goto :skip_show_usage
 :show_usage
     echo Usage: %~n0%~x0 [--no-tests] [--debug] [^<cmake-generation-args^>...]
     echo  --debug Compile using Debug configuration (without optimizations) instead of Release.
-    exit /b
+    goto :exit
 :skip_show_usage
 
 :: Make the build dir at the same level as the parent dir of this script, suffixed with "-build".
@@ -40,21 +41,21 @@ echo on
 @echo off
 
 for /d %%S in (%BASE_DIR%\samples\*) do (
-    call :build_sample %%S %1 %2 %3 %4 %5 %6 %7 %8 %9 || @goto :error
+    call :build_sample %%S %1 %2 %3 %4 %5 %6 %7 %8 %9 || goto :exit
 )
 
 :: Run unit tests if needed.
 if [%NO_TESTS%] == [1] echo NOTE: Unit tests were not run. & goto :skip_tests
 echo on
-    cd "%BUILD_DIR%/unit_tests" || @goto :error
+    cd "%BUILD_DIR%/unit_tests" || @goto :exit
 
-    ctest --output-on-failure -C %BUILD_TYPE% || @goto :error
+    ctest --output-on-failure -C %BUILD_TYPE% || @goto :exit
 @echo off
 :skip_tests
 
 echo:
 echo Samples built successfully, see the binaries in %BUILD_DIR%
-exit /b
+goto :exit
 
 :build_sample
     set SOURCE_DIR=%1
@@ -63,7 +64,7 @@ exit /b
     if /i "%SAMPLE:~0,4%" == "rpi_" exit /b
 
     set SAMPLE_BUILD_DIR=%BUILD_DIR%\%SAMPLE%
-    echo on
+    @echo on
         mkdir "%SAMPLE_BUILD_DIR%" || @exit /b
         cd "%SAMPLE_BUILD_DIR%" || @exit /b
 
@@ -85,5 +86,5 @@ exit /b
     echo Built: %ARTIFACT%
 exit /b
 
-:error
-    @exit /b %ERRORLEVEL%
+:exit
+    exit /b %ERRORLEVEL% %= Needed for a proper cmd.exe exit status. =%
