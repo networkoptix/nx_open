@@ -67,6 +67,14 @@ target_compile_definitions(nx_kit
     INTERFACE NX_KIT_API=${NX_KIT_API_IMPORT_MACRO}
 )
 
+# Use all CPU cores by MSVC.
+if(MSVC)
+    string(APPEND CMAKE_CXX_FLAGS " /MP")
+    # Do not create separate .pdb files for object files (workaround for mspdbsrv.exe bug, needed
+    # for using "/MP" flag).
+    add_compile_options("/Z7")
+endif()
+
 # Set the maximum warning level.
 if(MSVC)
     # This block covers not only Visual Studio compiler but also clang-cl, which expands /W4 to
