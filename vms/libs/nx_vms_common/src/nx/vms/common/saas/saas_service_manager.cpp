@@ -334,24 +334,24 @@ std::map<nx::Uuid, ServiceParamsType> ServiceManager::purchasedServices(
 {
     NX_MUTEX_LOCKER mutexLocker(&m_mutex);
 
+    const auto& purchases = m_data.services;
     std::map<nx::Uuid, ServiceParamsType> result;
-
-    for (const auto& [serviceId, purshase]: m_data.services)
+    for (const auto& [serviceId, service]: m_services)
     {
-        if (auto it = m_services.find(serviceId); it != m_services.end())
-        {
-            const auto& service = it->second;
-            if (service.type != serviceType)
-                continue;
+        if (service.type != serviceType)
+            continue;
 
-            ServiceParamsType params = ServiceParamsType::fromParams(service.parameters);
-            params.totalChannelNumber *= purshase.quantity;
-            const auto itResult = result.find(serviceId);
-            if (itResult == result.end())
-                result.emplace(serviceId, params);
-            else
-                itResult->second.totalChannelNumber += params.totalChannelNumber;
-        }
+        ServiceParamsType params = ServiceParamsType::fromParams(service.parameters);
+        int quantity = 0;
+        if (auto purshaseIt = purchases.find(serviceId); purshaseIt != purchases.end())
+            quantity = purshaseIt->second.quantity;
+        params.totalChannelNumber *= quantity;
+
+        const auto itResult = result.find(serviceId);
+        if (itResult == result.end())
+            result.emplace(serviceId, params);
+        else
+            itResult->second.totalChannelNumber += params.totalChannelNumber;
     }
 
     return result;
