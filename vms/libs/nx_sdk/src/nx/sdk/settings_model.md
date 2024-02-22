@@ -112,7 +112,8 @@ Text data field. Supports regex validation for the entered value.
 ---------------------------------------------------------------------------------------------------
 ## PasswordField
 
-Password data field. Supports regex validation for the entered value.
+Password data field. Supports regex validation for the entered value. The `"useShowPasswordButton"`
+field is optional (`true` by default) and is used to show or hide the button that shows password.
 
 [proprietary]
 

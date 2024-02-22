@@ -13,6 +13,8 @@ import "private"
  */
 TextFieldBase
 {
+    property bool useShowPasswordButton: true
+
     textFieldItem: TextField
     {
         id: textFieldItem
@@ -27,7 +29,7 @@ TextFieldBase
             width: 20
             height: 20
             background: null
-            visible: textFieldItem.text
+            visible: useShowPasswordButton && textFieldItem.text
 
             anchors.verticalCenter: textFieldItem.textField.verticalCenter
             anchors.right: textFieldItem.textField.right
