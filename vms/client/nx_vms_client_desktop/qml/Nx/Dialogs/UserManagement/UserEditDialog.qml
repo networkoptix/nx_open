@@ -202,7 +202,7 @@ DialogWithState
         anchors.bottom: buttonBox.top
         anchors.left: parent.left
         anchors.right: parent.right
-        spacing: 0
+        spacing: 2
         z: -1
 
         DialogBanner
