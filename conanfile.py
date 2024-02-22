@@ -11,6 +11,7 @@ from conans.model import Generator
 from conans.tools import Version
 from itertools import chain
 from pathlib import Path
+import shutil
 import sys
 import yaml
 
@@ -203,58 +204,84 @@ class NxOpenConan(ConanFile):
         if self.isArm32 or self.isArm64:
             self.requires("sse2neon/7bd15ea" "#d5c087ce33dbf1425b29d6435284d2c7")
 
-    def imports(self):
-        if self.isLinux:
-            self.copy("*.so*", "lib", "lib", root_package="qt")
-            self.copy("QtWebEngineProcess", "libexec", "libexec", root_package="qt")
+    def import_files_from_package(self, package, src, dst, glob):
+        if package not in self.deps_cpp_info.deps:
+            return
 
-        if self.isLinux and self.settings.arch == "x86_64":
-            self.copy("*.so*", "lib", "lib64/", root_package="cuda-toolkit")
+        src_dir = Path(self.deps_cpp_info[package].rootpath) / src
+        dst_dir = Path(self.install_folder) / dst
 
-        copy_packages = [
-            "openssl",
-            "hidapi",
-            "cuda-toolkit"
-        ]
+        for file in src_dir.glob(glob):
+            if not file.is_dir():
+                dst_file = dst_dir / file.relative_to(src_dir)
+                self.__imported_files[dst_file] = file
 
-        if self.isLinux:
-            if self.settings.arch == "x86_64":
-                copy_packages.append("libva")
-                copy_packages.append("intel-media-sdk")
-                copy_packages.append("intel-onevpl")
-                copy_packages.append("libvpl")
+    def import_package(self, package):
+        if self.isLinux or self.isAndroid:
+            self.import_files_from_package(package, "lib", "lib", "*.so*")
+        if self.isMacos:
+            self.import_files_from_package(package, "lib", "lib", "*.dylib")
+        if self.isWindows:
+            self.import_files_from_package(package, "bin", "bin", "*.dll")
+            self.import_files_from_package(package, "bin", "bin", "*.pdb")
 
-            if not self.isArm32:
-                copy_packages.append("ffmpeg")
-        else:
-            if self.isWindows:
-                copy_packages.append("intel-media-sdk-bin")
-                copy_packages.append("libvpl")
-                copy_packages.append("directx/JUN2010")
+    def finish_import(self):
+        for dst, src in self.__imported_files.items():
+            if dst.exists() and dst.stat().st_mtime >= src.stat().st_mtime:
+                continue
 
-            copy_packages.append("ffmpeg")
+            if not dst.parent.exists():
+                dst.parent.mkdir(parents=True)
 
-        if self.isLinux or self.isWindows or self.isAndroid:
-            copy_packages.append("openal")
-
-        self._copy_packages(copy_packages)
-
-        self.copy("*.ttf", "bin", "bin", root_package="roboto-fonts")
-        if "vms_help" in list(self.requires):
-            self.copy("*", "bin", "bin", root_package="vms_help")
-
-    def _copy_packages(self, packages):
-        for package in packages:
-            if package in self.deps_cpp_info.deps:
-                if self.isLinux or self.isAndroid:
-                    self.copy("*.so*", "lib", "lib", root_package=package)
-                if self.isMacos:
-                    self.copy("*.dylib", "lib", "lib", root_package=package)
-                if self.isWindows:
-                    self.copy("*.dll", "bin", "bin", root_package=package)
-                    self.copy("*.pdb", "bin", "bin", root_package=package)
+            shutil.copyfile(src, dst, follow_symlinks=False)
 
         self.fixLibraryPermissions()
+
+        with open(Path(self.install_folder) / "conan_imported_files.txt", "w") as file:
+            for dst, src in self.__imported_files.items():
+                file.write(f"{dst}: {src}\n")
+
+    def imports(self, finish_import=True):
+        self.__imported_files = {}
+
+        if self.isLinux:
+            self.import_files_from_package("qt", "libexec", "libexec", "QtWebEngineProcess")
+
+        if self.isLinux and self.settings.arch == "x86_64":
+            self.import_files_from_package("cuda-toolkit", "lib64", "lib", "*.so*")
+
+        self.import_files_from_package("roboto-fonts", "bin/fonts", "bin/fonts", "*.ttf")
+
+        if "vms_help" in list(self.requires):
+            self.import_files_from_package("vms_help", "help", "bin/help", "**/*")
+
+        self.import_package("openssl")
+        self.import_package("hidapi")
+        self.import_package("cuda-toolkit")
+
+        if self.isLinux:
+            self.import_package("qt")
+            if self.settings.arch == "x86_64":
+                self.import_package("libva")
+                self.import_package("intel-media-sdk")
+                self.import_package("intel-onevpl")
+                self.import_package("libvpl")
+
+            if not self.isArm32:
+                self.import_package("ffmpeg")
+        else:
+            if self.isWindows:
+                self.import_package("intel-media-sdk-bin")
+                self.import_package("libvpl")
+                self.import_package("directx/JUN2010")
+
+            self.import_package("ffmpeg")
+
+        if self.isLinux or self.isWindows or self.isAndroid:
+            self.import_package("openal")
+
+        if finish_import:
+            self.finish_import()
 
     # Temporary workaround for conan issue 6470.
     def fixLibraryPermissions(self):
