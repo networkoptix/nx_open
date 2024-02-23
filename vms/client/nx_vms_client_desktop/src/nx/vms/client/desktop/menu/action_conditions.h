@@ -612,6 +612,9 @@ ConditionWrapper isTrue(bool value);
 /** Enabled when user is logged in (or at least logging in). defaultVisibility otherwise. */
 ConditionWrapper isLoggedIn(ActionVisibility defaultVisibility = InvisibleAction);
 
+/** Visible when user is logged in as Cloud User (or at least logging in). */
+ConditionWrapper isLoggedInAsCloudUser();
+
 /** Visible when user is logged in to Cloud. */
 ConditionWrapper isLoggedInToCloud();
 

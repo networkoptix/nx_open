@@ -1984,6 +1984,16 @@ ConditionWrapper isLoggedIn(ActionVisibility defaultVisibility)
         });
 }
 
+ConditionWrapper isLoggedInAsCloudUser()
+{
+    return new CustomBoolCondition(
+        [](const Parameters& /*parameters*/, WindowContext* context)
+        {
+            return context->workbenchContext()->user()
+                && context->workbenchContext()->user()->isCloud();
+        });
+}
+
 ConditionWrapper isLoggedInToCloud()
 {
     return new CustomBoolCondition(
