@@ -62,7 +62,7 @@ ServerCertificateWarning::ServerCertificateWarning(
 
     const auto header = core::CertificateWarning::header(
         reason, certificatesInfo.first().target, certificatesInfo.size());
-    const auto details = core::CertificateWarning::details(reason);
+    const auto details = core::CertificateWarning::details(reason, certificatesInfo.size());
     const auto advice = core::CertificateWarning::advice(reason);
 
     // Load data into UI.
@@ -225,7 +225,11 @@ ServerCertificateWarning::ServerCertificateWarning(
     if (dialogIsWarning)
     {
         // Create mandatory checkbox for additional safety.
-        auto checkbox = new QCheckBox(tr("I trust these servers", "", certificatesInfo.size()));
+        const auto certificatesNumber = certificatesInfo.size();
+        const auto checkBoxText = certificatesNumber == 1
+            ? tr("I trust this server")
+            : tr("I trust these servers", "", certificatesNumber);
+        auto checkbox = new QCheckBox(checkBoxText);
         auto updateButtonState =
             [connectButton, checkbox]
             {

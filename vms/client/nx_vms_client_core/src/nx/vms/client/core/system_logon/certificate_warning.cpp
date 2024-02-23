@@ -48,13 +48,18 @@ QString CertificateWarning::header(
     }
 }
 
-QString CertificateWarning::details(Reason reason, ClientType clientType)
+QString CertificateWarning::details(Reason reason, int numberOfServers)
 {
     switch (reason)
     {
         case Reason::unknownServer:
         {
-            return tr("Review the certificates of the servers from this system.");
+            const auto message = numberOfServers == 1
+                ? tr("Review the certificate to ensure you trust the "
+                "server you are connecting to.")
+                : tr("Review the certificates of the servers to ensure you trust the "
+                "system you are connecting to.");
+            return message;
         }
         case Reason::invalidCertificate:
         case Reason::serverCertificateChanged:
