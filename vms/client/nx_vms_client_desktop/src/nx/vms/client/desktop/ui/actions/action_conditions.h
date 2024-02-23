@@ -624,6 +624,9 @@ ConditionWrapper isTrue(bool value);
 /** Visible when user is logged in (or at least logging in). */
 ConditionWrapper isLoggedIn();
 
+/** Visible when user is logged in as Cloud User (or at least logging in). */
+ConditionWrapper isLoggedInAsCloudUser();
+
 /** Visible when user is logged in to Cloud. */
 ConditionWrapper isLoggedInToCloud();
 
