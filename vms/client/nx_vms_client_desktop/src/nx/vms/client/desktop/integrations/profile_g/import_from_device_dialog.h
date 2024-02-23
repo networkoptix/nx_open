@@ -5,19 +5,21 @@
 #include <memory>
 
 #include <nx/vms/client/desktop/common/dialogs/qml_dialog_wrapper.h>
-#include <ui/workbench/workbench_context_aware.h>
+#include <ui/workbench/workbench_state_manager.h>
 
 namespace nx::vms::client::desktop::integrations {
 
 class OverlappedIdStore;
 
-class ImportFromDeviceDialog: public QmlDialogWrapper, public QnWorkbenchContextAware
+class ImportFromDeviceDialog: public QmlDialogWrapper, public QnSessionAwareDelegate
 {
     Q_OBJECT
 
 public:
     explicit ImportFromDeviceDialog(QWidget* parent = nullptr);
     virtual ~ImportFromDeviceDialog() override;
+
+    virtual bool tryClose(bool force) override;
 
 private:
     Q_INVOKABLE void updateFilter();
