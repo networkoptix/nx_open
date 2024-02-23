@@ -2023,6 +2023,15 @@ ConditionWrapper isLoggedIn()
         });
 }
 
+ConditionWrapper isLoggedInAsCloudUser()
+{
+    return new CustomBoolCondition(
+        [](const Parameters& /*parameters*/, QnWorkbenchContext* context)
+        {
+            return context->user() && context->user()->isCloud();
+        });
+}
+
 ConditionWrapper isLoggedInToCloud()
 {
     return new CustomBoolCondition(
