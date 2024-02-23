@@ -111,7 +111,7 @@ ImportFromDeviceDialog::ImportFromDeviceDialog(QWidget* parent):
         QUrl("Nx/Dialogs/ImportFromDevice/ImportFromDeviceDialog.qml"),
         {},
         parent),
-    QnWorkbenchContextAware(parent),
+    QnSessionAwareDelegate(parent),
     d(new Private(this))
 {
     QmlProperty<QObject*>(rootObjectHolder(), "model") = &d->filterModel;
@@ -121,6 +121,12 @@ ImportFromDeviceDialog::ImportFromDeviceDialog(QWidget* parent):
 
 ImportFromDeviceDialog::~ImportFromDeviceDialog()
 {
+}
+
+bool ImportFromDeviceDialog::tryClose(bool /*force*/)
+{
+    reject();
+    return true;
 }
 
 void ImportFromDeviceDialog::updateFilter()
