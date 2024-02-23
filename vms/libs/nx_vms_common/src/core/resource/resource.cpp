@@ -2,15 +2,13 @@
 
 #include "resource.h"
 
-#include <typeinfo>
-
 #include <QtCore/QMetaObject>
 
+#include <core/resource/camera_advanced_param.h>
 #include <core/resource_management/resource_management_ini.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
 #include <core/resource_management/status_dictionary.h>
-#include <core/resource/camera_advanced_param.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/api/data/resource_data.h>
@@ -30,12 +28,11 @@ QString hidePasswordIfCredentialsPropety(const QString& key, const QString& valu
     if (key == ResourcePropertyKey::kCredentials
         || key == ResourcePropertyKey::kDefaultCredentials)
     {
-        return value.left(value.indexOf(':')) + ":******";
+        return value.left(value.indexOf(':')) + ":" + nx::utils::Url::kMaskedPassword;
     }
-    else if (key == SystemSettings::Names::smtpPassword)
-    {
-        return "******";
-    }
+
+    if (key == SystemSettings::Names::smtpPassword)
+        return nx::utils::Url::kMaskedPassword;
 
     return value;
 }
@@ -50,13 +47,11 @@ QnResource::QnResource():
 {
 }
 
-QnResource::~QnResource()
-{
-}
+QnResource::~QnResource() = default;
 
 QnResourcePool* QnResource::resourcePool() const
 {
-    if (auto context = systemContext())
+    if (auto* context = systemContext())
         return context->resourcePool();
 
     return nullptr;
@@ -136,7 +131,8 @@ void QnResource::update(const QnResourcePtr& source)
     NotifierList notifiers;
     {
         // Maintain mutex lock order.
-        nx::Mutex *m1 = &m_mutex, *m2 = &source->m_mutex;
+        nx::Mutex* m1 = &m_mutex;
+        nx::Mutex* m2 = &source->m_mutex;
         if (m1 > m2)
             std::swap(m1, m2);
         NX_MUTEX_LOCKER mutexLocker1(m1);
@@ -144,7 +140,7 @@ void QnResource::update(const QnResourcePtr& source)
         updateInternal(source, notifiers);
     }
 
-    for (auto notifier: notifiers)
+    for (const auto& notifier: notifiers)
         notifier();
 }
 
@@ -235,10 +231,10 @@ void QnResource::removeFlags(Qn::ResourceFlags flags)
 
 QnResourcePtr QnResource::getParentResource() const
 {
-    if (const auto resourcePool = this->resourcePool())
+    if (auto* const resourcePool = this->resourcePool())
         return resourcePool->getResourceById(getParentId());
 
-    return QnResourcePtr();
+    return {};
 }
 
 nx::Uuid QnResource::getTypeId() const
@@ -258,10 +254,10 @@ void QnResource::setTypeId(const nx::Uuid& id)
 
 nx::vms::api::ResourceStatus QnResource::getStatus() const
 {
-    if (auto context = systemContext())
+    if (auto* context = systemContext())
     {
-        const auto statusDictionary = context->resourceStatusDictionary();
-        if (statusDictionary)
+        auto* const statusDictionary = context->resourceStatusDictionary();
+        if (statusDictionary != nullptr)
             return statusDictionary->value(getId());
     }
     return ResourceStatus::undefined;
@@ -288,7 +284,7 @@ void QnResource::setStatus(ResourceStatus newStatus, Qn::StatusChangeReason reas
         return;
     }
 
-    auto context = systemContext();
+    auto* context = systemContext();
     if (!NX_ASSERT(context))
         return;
 
@@ -362,7 +358,7 @@ QString QnResource::getProperty(const QString& key) const
             if (itr != m_locallySavedProperties.end())
                 value = itr->second;
         }
-        else if (auto context = systemContext(); context && context->resourcePropertyDictionary())
+        else if (auto* context = systemContext(); context && context->resourcePropertyDictionary())
         {
             value = context->resourcePropertyDictionary()->value(m_id, key);
         }
@@ -397,7 +393,7 @@ bool QnResource::setProperty(const QString& key, const QString& value, bool mark
     }
 
     NX_ASSERT(!getId().isNull());
-    if (const auto context = systemContext(); NX_ASSERT(context))
+    if (auto* const context = systemContext(); NX_ASSERT(context))
     {
         auto prevValue = getProperty(key);
         const bool isModified = context->resourcePropertyDictionary()->setValue(
@@ -447,7 +443,7 @@ nx::vms::api::ResourceParamDataList QnResource::getProperties() const
         return result;
     }
 
-    if (const auto context = systemContext())
+    if (auto* const context = systemContext())
         return context->resourcePropertyDictionary()->allProperties(getId());
 
     return {};
@@ -456,7 +452,7 @@ nx::vms::api::ResourceParamDataList QnResource::getProperties() const
 bool QnResource::saveProperties()
 {
     NX_ASSERT(systemContext() && !getId().isNull());
-    if (auto context = systemContext())
+    if (auto* context = systemContext())
         return context->resourcePropertyDictionary()->saveParams(getId());
     return false;
 }
@@ -464,7 +460,7 @@ bool QnResource::saveProperties()
 void QnResource::savePropertiesAsync()
 {
     NX_ASSERT(systemContext() && !getId().isNull());
-    if (auto context = systemContext())
+    if (auto* context = systemContext())
         context->resourcePropertyDictionary()->saveParamsAsync(getId());
 }
 
@@ -477,7 +473,7 @@ void QnResource::setSystemContext(nx::vms::common::SystemContext* systemContext)
 
 nx::vms::common::SystemContext* QnResource::systemContext() const
 {
-    if (auto systemContext = m_systemContext.load())
+    if (auto* systemContext = m_systemContext.load())
         return systemContext;
 
     return nullptr;

@@ -16,6 +16,8 @@ class NX_UTILS_API Url
     Q_GADGET
 
 public:
+    static constexpr const char* kMaskedPassword = "******";
+
     Url();
     Url(const QString& url);
     Url& operator=(const QString& url);
@@ -54,12 +56,13 @@ public:
         QUrl::FormattingOptions options = QUrl::FormattingOptions(QUrl::PrettyDecoded)) const;
 
     /**
-     * WARNING! URL string created by this method is not complient with RFC3986#section-4.1. This is
-     * a dirty work-around to fix some problems with web client. Please, think twice before using it!
+     * WARNING! URL string created by this method is not complient with RFC3986#section-4.1. This
+     * is a dirty work-around to fix some problems with web client. Please, think twice before
+     * using it!
      *
      * Creates string with swapped fragment and query URL fields.
-     * NOTE: Creating the Url from the string produced by this method will be parsed incorrectly, if
-     * the fragment field is non-empty.
+     * NOTE: Creating the Url from the string produced by this method will be parsed incorrectly,
+     * if the fragment field is non-empty.
      */
     QString toWebClientStandardViolatingUrl(
         QUrl::FormattingOptions options = QUrl::FormattingOptions(QUrl::PrettyDecoded)) const;
@@ -76,7 +79,6 @@ public:
     Q_INVOKABLE QUrl toQUrl() const;
 
     static Url fromQUrl(const QUrl& url);
-    static Url fromEncoded(const QByteArray &url, QUrl::ParsingMode mode = QUrl::TolerantMode);
     static Url fromUserInput(const QString &userInput);
     static Url fromUserInput(
         const QString &userInput,
