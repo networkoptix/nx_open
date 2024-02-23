@@ -34,9 +34,7 @@ public:
         const nx::vms::api::ModuleInformation& info,
         int numberOfServers);
 
-    static QString details(
-        Reason reason,
-        ClientType clientType = ClientType::desktop);
+    static QString details(Reason reason, int numberOfServers);
 
     static QString advice(
         Reason reason,
