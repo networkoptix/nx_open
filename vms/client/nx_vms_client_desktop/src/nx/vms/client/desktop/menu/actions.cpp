@@ -518,8 +518,7 @@ void initialize(Manager* manager, Action* root)
         .flags(Scene | NoTarget)
         .text(ContextMenu::tr("Save Current Layout As Cloud..."))
         .condition(
-            condition::isLoggedIn()
-            && condition::isLoggedInToCloud()
+            condition::isLoggedInAsCloudUser()
             && condition::applyToCurrentLayout(
                 condition::canSaveLayoutAs()
                 && condition::hasFlags(Qn::cross_system, MatchMode::none))
@@ -1257,7 +1256,7 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Save Layout As Cloud..."))
         .condition(
             condition::canSaveLayoutAs()
-            && condition::isLoggedInToCloud()
+            && condition::isLoggedInAsCloudUser()
             && condition::hasFlags(Qn::cross_system, MatchMode::none)
         );
 
