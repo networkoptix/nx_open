@@ -16,7 +16,6 @@ namespace nx::vms::api { struct CameraDataEx; }
 
 namespace ec2 {
 
-extern const QString kHiddenPasswordFiller;
 extern const std::set<QString> kResourceParamToAmend;
 
 // Returns true if data has been amended.

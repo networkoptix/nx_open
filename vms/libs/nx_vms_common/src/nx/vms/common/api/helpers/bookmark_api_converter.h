@@ -75,10 +75,12 @@ Bookmark bookmarkToApi(
             auto share = api::BookmarkSharingSettings{
                 .expirationTimeMs{oldBookmark.share.expirationTimeMs}};
 
-            if (includeDigest)
+            if (oldBookmark.share.digest)
             {
-                share.password =
-                    oldBookmark.share.digest ? oldBookmark.share.digest.value() : QString{};
+                if (includeDigest)
+                    share.password = oldBookmark.share.digest.value();
+                else
+                    share.password = nx::utils::Url::kMaskedPassword;
             }
 
             result.share = std::move(share);

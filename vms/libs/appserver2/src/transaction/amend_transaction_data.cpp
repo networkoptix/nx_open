@@ -35,8 +35,6 @@
 
 namespace ec2 {
 
-extern const QString kHiddenPasswordFiller("******");
-
 extern const std::set<QString> kResourceParamToAmend =
     []()
     {
@@ -144,7 +142,7 @@ bool amendOutputDataIfNeeded(
         NX_VERBOSE(
             kLogTag, "%1: Masking url '%2' password",
             __func__, url.toDisplayString(QUrl::RemovePassword));
-        url.setPassword(kHiddenPasswordFiller);
+        url.setPassword(nx::utils::Url::kMaskedPassword);
     }
 
     storageData->url = url.toString();
@@ -193,7 +191,7 @@ bool amendOutputDataIfNeeded(const Qn::UserAccessData& accessData,
 
 bool amendOutputDataIfNeeded(
     const Qn::UserAccessData& accessData,
-    QnResourceAccessManager* accessManager,
+    QnResourceAccessManager* /*accessManager*/,
     nx::vms::api::MediaServerData* mediaServerData)
 {
     if (accessData == Qn::kSystemAccess)
@@ -234,7 +232,7 @@ bool amendOutputDataIfNeeded(const Qn::UserAccessData& accessData,
     if (isGranted)
         url.setPassword(nx::crypt::decodeStringFromHexStringAES128CBC(url.password()));
     else
-        url.setPassword(kHiddenPasswordFiller);
+        url.setPassword(nx::utils::Url::kMaskedPassword);
     params.url = url.toString();
     rule->actionParams = QJson::serialized(params);
     return true;
@@ -281,7 +279,7 @@ bool amendOutputDataIfNeeded(
     return nx::utils::erase_if(paramData->archivedCameras,
         [&](auto id)
         {
-            auto resourcePool = accessManager->systemContext()->resourcePool();
+            auto* resourcePool = accessManager->systemContext()->resourcePool();
             auto camera = resourcePool->getResourceById<QnVirtualCameraResource>(id);
             return !camera
                 || !accessManager->hasPermission(accessData, camera, Qn::ViewFootagePermission);

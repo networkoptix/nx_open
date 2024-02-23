@@ -4,8 +4,6 @@
 
 #include <nx/fusion/model_functions.h>
 
-static const QString kHiddenPasswordFiller("******");
-
 namespace nx::vms::api {
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
@@ -25,8 +23,11 @@ Credentials::Credentials(const nx::utils::Url& url):
 Credentials Credentials::parseColon(const QString& value, bool hidePassword)
 {
     if (const auto colon = value.indexOf(':'); colon >= 0)
-        return {value.left(colon), hidePassword ? kHiddenPasswordFiller : value.mid(colon + 1)};
-    return {value, hidePassword ? kHiddenPasswordFiller : QString()};
+    {
+        return {value.left(colon),
+            hidePassword ? utils::Url::kMaskedPassword : value.mid(colon + 1)};
+    }
+    return {value, hidePassword ? utils::Url::kMaskedPassword : QString()};
 }
 
 bool Credentials::isEmpty() const

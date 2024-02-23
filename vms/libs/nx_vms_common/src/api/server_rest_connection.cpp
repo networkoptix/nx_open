@@ -1336,13 +1336,11 @@ Handle ServerConnection::getCameraCredentials(
             {
                 nx::vms::api::DeviceModelV1 resultObject;
 
-                static const auto kMaskedPassword = QLatin1String("******");
-
                 if (success)
                 {
                     success = QJson::deserialize(result, &resultObject)
                         && resultObject.credentials.has_value()
-                        && resultObject.credentials->password != kMaskedPassword;
+                        && resultObject.credentials->password != utils::Url::kMaskedPassword;
                 }
 
                 QAuthenticator credentials;
