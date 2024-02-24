@@ -23,6 +23,7 @@
 #include <nx/vms/api/data/layout_data.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/resource/data_loaders/caching_camera_data_loader.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/export/data/nov_metadata.h>
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
@@ -374,12 +375,14 @@ bool ExportLayoutTool::exportMetadata(const NovMetadata& metadata)
     // Layout background.
     if (!d->layout->backgroundImageFilename().isEmpty())
     {
+        auto systemContext = SystemContext::fromResource(d->layout);
+        if (!NX_ASSERT(systemContext))
+            systemContext = appContext()->currentSystemContext();
+
         bool exportedLayout = d->layout->isFile();  // we have changed background to an exported layout
-        QScopedPointer<ServerImageCache> cache;
-        if (exportedLayout)
-            cache.reset(new LocalFileCache(this));
-        else
-            cache.reset(new ServerImageCache(this));
+        ServerImageCache* cache = exportedLayout
+            ? systemContext->localFileCache()
+            : systemContext->serverImageCache();
 
         QImage background(cache->getFullPath(d->layout->backgroundImageFilename()));
         if (!background.isNull())
@@ -394,10 +397,13 @@ bool ExportLayoutTool::exportMetadata(const NovMetadata& metadata)
                 background.save(imageFile.data(), "png");
                 return true;
             }))
+            {
                 return false;
+            }
 
-            LocalFileCache localCache;
-            localCache.storeImageData(d->layout->backgroundImageFilename(), background);
+            systemContext->localFileCache()->storeImageData(
+                d->layout->backgroundImageFilename(),
+                background);
         }
     }
 

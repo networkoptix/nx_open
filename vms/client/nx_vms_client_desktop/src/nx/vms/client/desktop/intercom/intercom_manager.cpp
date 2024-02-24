@@ -37,7 +37,9 @@ namespace nx::vms::client::desktop {
 // ------------------------------------------------------------------------------------------------
 // IntercomManager::Private
 
-class IntercomManager::Private: public QObject, public SystemContextAware
+class IntercomManager::Private:
+    public QObject,
+    public SystemContextAware
 {
     Q_DECLARE_TR_FUNCTIONS(IntercomManager::Private)
 

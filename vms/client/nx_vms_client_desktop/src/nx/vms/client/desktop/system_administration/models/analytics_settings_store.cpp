@@ -40,7 +40,7 @@ AnalyticsSettingsStore::AnalyticsSettingsStore(QWidget* parent):
     QObject(parent),
     CurrentSystemContextAware(parent),
     m_parent(parent),
-    m_enginesWatcher(new AnalyticsEnginesWatcher(this))
+    m_enginesWatcher(new AnalyticsEnginesWatcher(system(), this))
 {
     connect(m_enginesWatcher.get(), &AnalyticsEnginesWatcher::engineAdded,
         this, &AnalyticsSettingsStore::addEngine);

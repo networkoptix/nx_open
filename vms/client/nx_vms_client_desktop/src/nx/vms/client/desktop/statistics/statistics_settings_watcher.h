@@ -18,7 +18,9 @@ namespace nx::vms::client::desktop {
  * `clientStatisticsSettingsUrl` global settings parameter.
  * Opensource clients have no hardcoded option.
  */
-class StatisticsSettingsWatcher: public QObject, public SystemContextAware
+class StatisticsSettingsWatcher:
+    public QObject,
+    public SystemContextAware
 {
     Q_OBJECT
 

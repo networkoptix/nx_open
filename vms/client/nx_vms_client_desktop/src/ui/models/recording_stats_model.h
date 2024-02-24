@@ -7,7 +7,7 @@
 
 #include <api/model/recording_stats_reply.h>
 #include <client/client_globals.h>
-#include <nx/vms/client/core/common/utils/common_module_aware.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
 #include <ui/models/recording_stats_adapter.h>
 #include <utils/common/id.h>
 
@@ -34,7 +34,7 @@ protected:
 
 class QnRecordingStatsModel:
     public QAbstractListModel,
-    public nx::vms::client::core::CommonModuleAware
+    public nx::vms::client::desktop::SystemContextAware
 {
     Q_OBJECT
     typedef QAbstractListModel base_type;
@@ -65,7 +65,10 @@ public:
         ColumnCount
     };
 
-    explicit QnRecordingStatsModel(bool isForecastRole, QObject* parent = 0);
+    explicit QnRecordingStatsModel(
+        nx::vms::client::desktop::SystemContext* systemContext,
+        bool isForecastRole,
+        QObject* parent = 0);
     virtual ~QnRecordingStatsModel();
 
     virtual int rowCount(const QModelIndex& parent = QModelIndex()) const override;

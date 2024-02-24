@@ -10,8 +10,6 @@
 #include <client/client_runtime_settings.h>
 #include <client/client_startup_parameters.h>
 #include <client/self_updater.h>
-#include <client_core/client_core_module.h>
-#include <common/common_module.h>
 #include <nx/branding.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/http/http_types.h>

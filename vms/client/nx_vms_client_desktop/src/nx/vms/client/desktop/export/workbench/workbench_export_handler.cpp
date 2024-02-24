@@ -469,8 +469,12 @@ void WorkbenchExportHandler::handleExportVideoAction(const menu::Parameters& par
     if (!hasPermission && !widget)
         return;
 
-    ExportSettingsDialog dialog(period, QnCameraBookmark(), d->fileNameValidator(), watermark(),
-            mainWindowWidget());
+    ExportSettingsDialog dialog(
+        period,
+        QnCameraBookmark(),
+        d->fileNameValidator(),
+        context()->watermark(),
+        mainWindowWidget());
 
     if (!hasPermission)
     {
@@ -526,7 +530,11 @@ void WorkbenchExportHandler::handleExportBookmarkAction(const menu::Parameters& 
         return;
 
     const QnTimePeriod period(bookmark.startTimeMs, bookmark.durationMs);
-    ExportSettingsDialog dialog(period, bookmark, d->fileNameValidator(), watermark(),
+    ExportSettingsDialog dialog(
+        period,
+        bookmark,
+        d->fileNameValidator(),
+        context()->watermark(),
         mainWindowWidget());
 
     if (const auto loader = initDataLoader(camera))
@@ -561,7 +569,11 @@ void WorkbenchExportHandler::handleExportBookmarksAction()
 
     const auto boundingPeriod = periods.boundingPeriod();
 
-    ExportSettingsDialog dialog(boundingPeriod, {}, d->fileNameValidator(), watermark(),
+    ExportSettingsDialog dialog(
+        boundingPeriod,
+        /*bookmark*/ {},
+        d->fileNameValidator(),
+        context()->watermark(),
         mainWindowWidget());
 
     for (const auto& camera: parameters.resources().filtered<QnVirtualCameraResource>())

@@ -8,7 +8,6 @@
 #include <QtWidgets/QPushButton>
 
 #include <api/runtime_info_manager.h>
-#include <common/common_module.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>

@@ -5,11 +5,17 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 
+using namespace nx::vms::client::desktop;
+
 // -------------------------------------------------------------------------- //
 // QnResourceSelectionDialogDelegate
 // -------------------------------------------------------------------------- //
-QnResourceSelectionDialogDelegate::QnResourceSelectionDialogDelegate(QObject* parent):
-    QObject(parent)
+QnResourceSelectionDialogDelegate::QnResourceSelectionDialogDelegate(
+    SystemContext* systemContext,
+    QObject* parent)
+    :
+    QObject(parent),
+    SystemContextAware(systemContext)
 {
 }
 

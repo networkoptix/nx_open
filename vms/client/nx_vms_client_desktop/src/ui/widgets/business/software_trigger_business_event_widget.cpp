@@ -38,7 +38,9 @@ QnSoftwareTriggerBusinessEventWidget::QnSoftwareTriggerBusinessEventWidget(
     base_type(systemContext, parent),
     ui(new Ui::SoftwareTriggerBusinessEventWidget),
     m_helper(new vms::event::StringsHelper(systemContext)),
-    m_validationPolicy(new QnRequiredAccessRightPolicy(nx::vms::api::AccessRight::userInput))
+    m_validationPolicy(new QnRequiredAccessRightPolicy(
+        systemContext,
+        nx::vms::api::AccessRight::userInput))
 {
     ui->setupUi(this);
 

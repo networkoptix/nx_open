@@ -56,42 +56,21 @@ std::pair<RecordingType, RecordingMetadataTypes> currentRecordingMode(
 
 } // namespace
 
-RecordingStatusHelper::RecordingStatusHelper(SystemContext* systemContext, QObject* parent):
-    QObject(parent),
-    SystemContextAware(systemContext)
-{
-    initialize();
-}
-
-RecordingStatusHelper::RecordingStatusHelper():
-    QObject(),
-    SystemContextAware(SystemContext::fromQmlContext(this))
+RecordingStatusHelper::RecordingStatusHelper(QObject* parent):
+    QObject(parent)
 {
 }
 
-void RecordingStatusHelper::initialize()
+QnResource* RecordingStatusHelper::rawResource() const
 {
-    if (m_initialized)
-        return;
-
-    m_initialized = true;
-
-    connect(
-        serverTimeWatcher(),
-        &core::ServerTimeWatcher::timeZoneChanged,
-        this,
-        &RecordingStatusHelper::updateRecordingMode);
+    return m_camera.data();
 }
 
-nx::Uuid RecordingStatusHelper::cameraId() const
+void RecordingStatusHelper::setRawResource(QnResource* value)
 {
-    return m_camera ? m_camera->getId() : nx::Uuid();
-}
-
-void RecordingStatusHelper::setCameraId(const nx::Uuid& id)
-{
-    initialize();
-    setCamera(resourcePool()->getResourceById<QnVirtualCameraResource>(id));
+    setCamera(value
+        ? value->toSharedPointer().dynamicCast<QnVirtualCameraResource>()
+        : QnVirtualCameraResourcePtr());
 }
 
 QnVirtualCameraResourcePtr RecordingStatusHelper::camera() const
@@ -107,25 +86,39 @@ void RecordingStatusHelper::setCamera(const QnVirtualCameraResourcePtr& camera)
     if (m_updateTimerId >= 0)
         killTimer(m_updateTimerId);
 
-    if (m_camera)
-        m_camera->disconnect(this);
+    m_connections.reset();
 
     m_camera = camera;
 
     if (m_camera)
     {
-        initialize();
+        QQmlEngine::setObjectOwnership(m_camera.get(), QQmlEngine::CppOwnership);
 
-        connect(m_camera.data(), &QnVirtualCameraResource::statusChanged, this,
+        m_connections << connect(
+            m_camera.data(),
+            &QnVirtualCameraResource::statusChanged,
+            this,
             &RecordingStatusHelper::updateRecordingMode);
-        connect(m_camera.data(), &QnVirtualCameraResource::scheduleTasksChanged, this,
+        m_connections << connect(
+            m_camera.data(),
+            &QnVirtualCameraResource::scheduleTasksChanged,
+            this,
             &RecordingStatusHelper::updateRecordingMode);
 
         m_updateTimerId = startTimer(kUpdateInterval.count());
+
+        if (auto systemContext = SystemContext::fromResource(m_camera); NX_ASSERT(systemContext))
+        {
+            m_connections << connect(
+                systemContext->serverTimeWatcher(),
+                &core::ServerTimeWatcher::timeZoneChanged,
+                this,
+                &RecordingStatusHelper::updateRecordingMode);
+        }
     }
 
     updateRecordingMode();
-    emit cameraIdChanged();
+    emit resourceChanged();
 }
 
 QString RecordingStatusHelper::tooltip() const

@@ -4,7 +4,6 @@
 
 #include <api/runtime_info_manager.h>
 #include <client_core/client_core_module.h>
-#include <common/common_module.h>
 #include <licensing/license.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>

@@ -3,8 +3,8 @@
 #pragma once
 
 #include <core/resource/webpage_resource.h>
-#include <nx/vms/client/core/network/remote_connection_aware.h>
 #include <nx/vms/client/desktop/manual_device_addition/dialog/private/current_system_servers.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
 #include <ui/dialogs/common/button_box_dialog.h>
 
 namespace nx::vms::api { enum class WebPageSubtype; }
@@ -15,7 +15,7 @@ namespace nx::vms::client::desktop {
 
 class QnWebpageDialog:
     public QnButtonBoxDialog,
-    public nx::vms::client::core::RemoteConnectionAware
+    public SystemContextAware
 {
     Q_OBJECT
     using base_type = QnButtonBoxDialog;
@@ -28,7 +28,8 @@ public:
     };
 
 public:
-    explicit QnWebpageDialog(
+    QnWebpageDialog(
+        SystemContext* systemContext,
         QWidget* parent,
         EditMode editMode);
 

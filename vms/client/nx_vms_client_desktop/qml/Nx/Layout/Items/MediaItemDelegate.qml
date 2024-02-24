@@ -20,7 +20,7 @@ ResourceItemDelegate
     {
         id: cameraDisplay
         anchors.fill: parent
-        cameraResourceId: layoutItemData ? layoutItemData.resourceId : null
+        cameraResource: layoutItemData ? layoutItemData.resource : null
         audioEnabled: true
         color: "transparent"
 
@@ -64,7 +64,7 @@ ResourceItemDelegate
         RecordingStatusIndicator
         {
             anchors.verticalCenter: parent.verticalCenter
-            cameraId: layoutItemData.resource.id
+            resource: layoutItemData.resource
         }
     ]
 

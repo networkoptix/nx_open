@@ -12,6 +12,9 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/reflect/string_conversion.h>
 #include <nx/utils/guarded_callback.h>
+#include <nx/utils/qt_helpers.h>
+#include <nx/utils/scoped_connections.h>
+#include <nx/utils/std/algorithm.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/resource/server.h>
@@ -22,21 +25,19 @@
 #include <nx/vms/event/rule_manager.h>
 #include <nx/vms/event/strings_helper.h>
 #include <nx/vms/rules/engine.h>
-#include <nx/vms/rules/event_filter_fields/unique_id_field.h>
 #include <nx/vms/rules/event_filter.h>
 #include <nx/vms/rules/event_filter_fields/customizable_icon_field.h>
 #include <nx/vms/rules/event_filter_fields/customizable_text_field.h>
 #include <nx/vms/rules/event_filter_fields/source_camera_field.h>
 #include <nx/vms/rules/event_filter_fields/source_user_field.h>
 #include <nx/vms/rules/event_filter_fields/state_field.h>
+#include <nx/vms/rules/event_filter_fields/unique_id_field.h>
 #include <nx/vms/rules/events/soft_trigger_event.h>
 #include <nx/vms/rules/ini.h>
 #include <nx/vms/rules/rule.h>
 #include <nx/vms/rules/utils.h>
 #include <nx/vms/rules/utils/action.h>
 #include <nx/vms/rules/utils/field.h>
-#include <nx/utils/std/algorithm.h>
-#include <nx/utils/qt_helpers.h>
 #include <utils/common/delayed.h>
 #include <utils/common/synctime.h>
 
@@ -205,6 +206,7 @@ struct SoftwareTriggerCameraButtonController::Private
     const HintStyle hintStyle;
 
     QSet<nx::Uuid> isVmsRuleFlags;
+    nx::utils::ScopedConnections connections;
 
     void updateButtons();
     void addOrUpdateButtonData(const CameraButton& button, bool isVmsRule);
@@ -295,6 +297,9 @@ void SoftwareTriggerCameraButtonController::Private::updateButtonAvailability(Ca
     // FIXME: #sivanov System-wide timezone should be used here when it is introduced.
 
     const auto camera = q->camera();
+    if (!camera)
+        return;
+
     const auto server = camera
         ? camera->getParentResource().objectCast<ServerResource>()
         : ServerResourcePtr{};
@@ -351,14 +356,14 @@ bool SoftwareTriggerCameraButtonController::Private::setEventTriggerState(
     params.insert("event_type",
         nx::reflect::toString(nx::vms::api::EventType::softwareTriggerEvent));
     params.insert("inputPortId", eventParams.inputPortId);
-    params.insert("eventResourceId", q->resourceId().toString());
+    params.insert("eventResourceId", q->resource()->getId().toString());
     params.insert("caption", eventParams.getTriggerName());
     params.insert("description", eventParams.getTriggerIcon());
 
     if (state != nx::vms::api::EventState::undefined)
         params.insert("state", nx::reflect::toString(state));
 
-    const auto handle = q->connectedServerApi()->postJsonResult(
+    const auto handle = q->systemContext()->connectedServerApi()->postJsonResult(
         "/api/createEvent", params, {}, callback, QThread::currentThread());
 
     return handle != -1;
@@ -385,7 +390,7 @@ bool SoftwareTriggerCameraButtonController::Private::setVmsTriggerState(
         qnSyncTime->currentTimePoint(),
         nx::vms::rules::convertEventState(state),
         idField->id(),
-        q->resourceId(),
+        q->resource()->getId(),
         q->systemContext()->accessController()->user()->getId(),
         nx::vms::event::StringsHelper::getSoftwareTriggerName(nameField->value()),
         iconField->value());
@@ -415,34 +420,13 @@ void SoftwareTriggerCameraButtonController::Private::updateActiveTrigger(
 SoftwareTriggerCameraButtonController::SoftwareTriggerCameraButtonController(
     HintStyle hintStyle,
     CameraButton::Group buttonGroup,
-    SystemContext* context,
     QObject* parent)
     :
-    base_type(buttonGroup, context, Qn::SoftTriggerPermission, parent),
+    base_type(buttonGroup, Qn::SoftTriggerPermission, parent),
     d(new Private{.q = this, .hintStyle = hintStyle})
 {
-    auto ruleManager = context->eventRuleManager();
-
-    const auto updateButtons = [this]() { d->updateButtons(); };
-    const auto tryRemoveButton = [this](const nx::Uuid& id) { d->tryRemoveButton(id); };
-    const auto updateButtonByRule = [this](auto rule) { d->updateButtonByRule(rule); };
-
-    connect(ruleManager, &vms::event::RuleManager::rulesReset, this, updateButtons);
-    connect(ruleManager, &vms::event::RuleManager::ruleRemoved, this, tryRemoveButton);
-    connect(ruleManager, &vms::event::RuleManager::ruleAddedOrUpdated, this, updateButtonByRule);
-
-    if (nx::vms::rules::ini().fullSupport)
-    {
-        auto engine = context->vmsRulesEngine();
-
-        connect(engine, &nx::vms::rules::Engine::rulesReset, this, updateButtons);
-        connect(engine, &nx::vms::rules::Engine::ruleRemoved, this, tryRemoveButton);
-        connect(engine, &nx::vms::rules::Engine::ruleAddedOrUpdated, this,
-            [engine, updateButtonByRule](auto id) { updateButtonByRule(engine->rule(id).get()); });
-    }
-
-    connect(this, &BaseCameraButtonController::hasRequiredPermissionsChanged, this, updateButtons);
-    connect(this, &BaseCameraButtonController::cameraChanged, this, updateButtons);
+    connect(this, &BaseCameraButtonController::hasRequiredPermissionsChanged, this,
+        [this]() { d->updateButtons(); });
 
     static const auto kUpdateTriggerAvailabilityInterval = std::chrono::seconds(1);
     const auto updateTimer(new QTimer(this));
@@ -458,6 +442,47 @@ SoftwareTriggerCameraButtonController::SoftwareTriggerCameraButtonController(
 
 SoftwareTriggerCameraButtonController::~SoftwareTriggerCameraButtonController()
 {
+}
+
+void SoftwareTriggerCameraButtonController::setResourceInternal(const QnResourcePtr& resource)
+{
+    d->connections.reset();
+    base_type::setResourceInternal(resource);
+
+    if (!resource)
+        return;
+
+    auto systemContext = SystemContext::fromResource(resource);
+    if (!NX_ASSERT(systemContext))
+        return;
+
+    auto ruleManager = systemContext->eventRuleManager();
+
+    const auto updateButtons = [this]() { d->updateButtons(); };
+    const auto tryRemoveButton = [this](const nx::Uuid& id) { d->tryRemoveButton(id); };
+    const auto updateButtonByRule = [this](auto rule) { d->updateButtonByRule(rule); };
+
+    d->connections << connect(
+        ruleManager, &vms::event::RuleManager::rulesReset, this, updateButtons);
+    d->connections << connect(
+        ruleManager, &vms::event::RuleManager::ruleRemoved, this, tryRemoveButton);
+    d->connections << connect(
+        ruleManager, &vms::event::RuleManager::ruleAddedOrUpdated, this, updateButtonByRule);
+
+    if (nx::vms::rules::ini().fullSupport)
+    {
+        auto engine = systemContext->vmsRulesEngine();
+
+        d->connections << connect(
+            engine, &nx::vms::rules::Engine::rulesReset, this, updateButtons);
+        d->connections << connect(
+            engine, &nx::vms::rules::Engine::ruleRemoved, this, tryRemoveButton);
+        d->connections << connect(
+            engine, &nx::vms::rules::Engine::ruleAddedOrUpdated, this,
+            [engine, updateButtonByRule](auto id) { updateButtonByRule(engine->rule(id).get()); });
+    }
+
+    d->updateButtons();
 }
 
 bool SoftwareTriggerCameraButtonController::setButtonActionState(

@@ -16,7 +16,6 @@
 #include <api/server_rest_connection.h>
 #include <camera/camera_data_manager.h>
 #include <client/client_globals.h>
-#include <common/common_module.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource_display_info.h>

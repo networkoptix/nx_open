@@ -6,6 +6,9 @@
 #include <cassert>
 #include <thread>
 
+// System network headers must be included before boost::asio to ensure no-pch build on Windows.
+#include <nx/utils/system_network_headers.h>
+
 #include <boost/asio/io_service.hpp>
 #include <boost/bind.hpp>
 

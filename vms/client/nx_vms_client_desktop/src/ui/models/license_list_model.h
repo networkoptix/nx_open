@@ -6,11 +6,11 @@
 
 #include <licensing/license.h> // TODO: #sivanov use fwd
 #include <nx/utils/scoped_model_operations.h>
-#include <nx/vms/client/core/common/utils/common_module_aware.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
 
 class QnLicenseListModel:
     public ScopedModelOperations<QAbstractListModel>,
-    public nx::vms::client::core::CommonModuleAware
+    public nx::vms::client::desktop::SystemContextAware
 {
     Q_OBJECT
     using base_type = ScopedModelOperations<QAbstractListModel>;
@@ -33,7 +33,9 @@ public:
         LicenseRole = Qt::UserRole + 1
     };
 
-    QnLicenseListModel(QObject* parent = nullptr);
+    QnLicenseListModel(
+        nx::vms::client::desktop::SystemContext* systemContext,
+        QObject* parent = nullptr);
     virtual ~QnLicenseListModel();
 
     virtual int rowCount(const QModelIndex& parent = QModelIndex()) const override;

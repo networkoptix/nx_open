@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include <nx/core/watermark/watermark.h>
 #include <nx/vms/client/desktop/system_context_aware.h>
 #include <nx/vms/client/desktop/window_context_aware.h>
 
@@ -52,8 +51,6 @@ public:
      * @returns Context associated with this context-aware object.
      */
     QnWorkbenchContext* context() const;
-
-    nx::core::Watermark watermark() const;
 };
 
 } // namespace nx::vms::client::desktop

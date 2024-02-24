@@ -9,6 +9,8 @@
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/uuid.h>
 
+class QnResourceDataPool;
+
 namespace nx::vms::common {
 
 class AbstractCertificateVerifier;

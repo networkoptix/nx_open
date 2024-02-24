@@ -231,7 +231,7 @@ void QnLookAndFeelPreferencesWidget::selectBackgroundImage()
     progressDialog->setInfiniteMode();
     progressDialog->setModal(true);
 
-    auto imgCache = new LocalFileCache(this);
+    auto imgCache = new LocalFileCache(appContext()->currentSystemContext(), this);
     connect(imgCache, &ServerFileCache::fileUploaded, this,
         [this, imgCache, progressDialog, originalFileName](const QString &storedFileName)
         {

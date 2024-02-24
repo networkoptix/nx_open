@@ -9,7 +9,6 @@
 #include <api/common_message_processor.h>
 #include <camera/camera_bookmarks_manager.h>
 #include <camera/camera_data_manager.h>
-#include <common/common_module.h>
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/camera_history.h>
 #include <core/resource/camera_resource.h>
@@ -20,6 +19,7 @@
 #include <nx/build_info.h>
 #include <nx/vms/client/core/resource/data_loaders/caching_camera_data_loader.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/bookmarks/bookmark_tags_watcher.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/menu/action_parameters.h>
@@ -35,7 +35,6 @@
 #include <ui/graphics/items/controls/time_slider.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/statistics/modules/controls_statistics_module.h>
-#include <ui/workbench/watchers/workbench_bookmark_tags_watcher.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_layout.h>
@@ -43,20 +42,20 @@
 #include <utils/common/synctime.h>
 
 using std::chrono::microseconds;
-using std::chrono::milliseconds;
 
 using namespace nx::vms::client::desktop;
 
-namespace {
-
-/* How long 'Press Ctrl-B' hint should be displayed. */
-const int kHintTimeoutMs = 5000;
-}
-
+struct QnWorkbenchBookmarksHandler::Private
+{
+    const std::unique_ptr<BookmarkTagsWatcher> tagsWatcher;
+};
 
 QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = nullptr */):
     base_type(parent),
-    QnWorkbenchContextAware(parent)
+    QnWorkbenchContextAware(parent),
+    d(new Private{
+        .tagsWatcher = std::make_unique<BookmarkTagsWatcher>(system())
+    })
 {
     connect(action(menu::AddCameraBookmarkAction),     &QAction::triggered, this,
         &QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered);
@@ -129,6 +128,10 @@ QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = nu
         });
 }
 
+QnWorkbenchBookmarksHandler::~QnWorkbenchBookmarksHandler()
+{
+}
+
 void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered()
 {
     const auto parameters = menu()->currentParameters(sender());
@@ -148,7 +151,7 @@ void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered()
     bookmark.cameraId = camera->getId();
 
     QScopedPointer<QnCameraBookmarkDialog> dialog(new QnCameraBookmarkDialog(false, mainWindowWidget()));
-    dialog->setTags(context()->instance<QnWorkbenchBookmarkTagsWatcher>()->tags());
+    dialog->setTags(d->tagsWatcher->tags());
     dialog->loadData(bookmark);
     if (!dialog->exec())
         return;
@@ -186,7 +189,7 @@ void QnWorkbenchBookmarksHandler::at_editCameraBookmarkAction_triggered()
     }
 
     QScopedPointer<QnCameraBookmarkDialog> dialog(new QnCameraBookmarkDialog(false, mainWindowWidget()));
-    dialog->setTags(context()->instance<QnWorkbenchBookmarkTagsWatcher>()->tags());
+    dialog->setTags(d->tagsWatcher->tags());
     dialog->loadData(bookmark);
     if (!dialog->exec())
         return;

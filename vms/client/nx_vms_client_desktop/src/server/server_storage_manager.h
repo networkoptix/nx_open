@@ -11,7 +11,6 @@
 #include <nx/vms/api/data/storage_scan_info.h>
 #include <nx/vms/api/data/storage_space_reply.h>
 #include <nx/vms/api/types/event_rule_types.h>
-#include <nx/vms/client/core/common/utils/common_module_aware.h>
 #include <nx/vms/client/desktop/system_context_aware.h>
 #include <server/server_storage_manager_fwd.h>
 

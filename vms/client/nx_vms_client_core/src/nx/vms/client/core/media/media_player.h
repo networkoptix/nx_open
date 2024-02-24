@@ -5,13 +5,18 @@
 #include <nx/media/media_player.h>
 #include <nx/utils/uuid.h>
 
+Q_MOC_INCLUDE("core/resource/resource.h")
+
 namespace nx::vms::client::core {
 
 class NX_VMS_CLIENT_CORE_API MediaPlayer: public nx::media::Player
 {
     Q_OBJECT
 
-    Q_PROPERTY(nx::Uuid resourceId READ resourceId WRITE setResourceId NOTIFY resourceIdChanged)
+    /**
+     * Resource to open.
+     */
+    Q_PROPERTY(QnResource* resource READ rawResource WRITE setRawResource NOTIFY resourceChanged)
     Q_PROPERTY(bool loading READ loading NOTIFY loadingChanged)
     Q_PROPERTY(bool playing READ playing NOTIFY playingChanged)
     Q_PROPERTY(bool failed READ failed NOTIFY failedChanged)
@@ -23,9 +28,6 @@ public:
     MediaPlayer(QObject* parent = nullptr);
     ~MediaPlayer();
 
-    nx::Uuid resourceId() const;
-    void setResourceId(const nx::Uuid& resourceId);
-
     Q_INVOKABLE void playLive();
 
     bool loading() const;
@@ -35,9 +37,6 @@ public:
 
     static void registerQmlTypes();
 
-protected:
-    virtual QnCommonModule* commonModule() const override;
-
 signals:
     void resourceIdChanged();
     void loadingChanged();
@@ -45,8 +44,14 @@ signals:
     void failedChanged();
     void noVideoStreamsChanged();
 
+protected:
+    virtual void setResourceInternal(const QnResourcePtr& value) override;
+
 private:
-    nx::Uuid m_resourceId;
+    QnResource* rawResource() const;
+    void setRawResource(QnResource* value);
+
+private:
     bool m_loading = false;
     bool m_playing = false;
     bool m_failed = false;

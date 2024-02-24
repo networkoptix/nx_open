@@ -11,7 +11,9 @@
 
 namespace nx::vms::client::desktop {
 
-class InvalidRecordingScheduleWatcher: public QObject, public SystemContextAware
+class InvalidRecordingScheduleWatcher:
+    public QObject,
+    public SystemContextAware
 {
     Q_OBJECT
     using base_type = QObject;

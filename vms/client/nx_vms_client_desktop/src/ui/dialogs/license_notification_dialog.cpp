@@ -5,11 +5,11 @@
 
 #include <QtCore/QSortFilterProxyModel>
 
-#include <common/common_module.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/skin/font_config.h>
 #include <nx/vms/client/desktop/style/helper.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/license/validator.h>
 #include <ui/delegates/license_list_item_delegate.h>
 #include <ui/models/license_list_model.h>
@@ -37,16 +37,14 @@ auto licenseSortPriority =
         }
     };
 
-class QnLicenseNotificationSortProxyModel:
-    public QSortFilterProxyModel,
-    public nx::vms::client::core::CommonModuleAware
+class QnLicenseNotificationSortProxyModel: public QSortFilterProxyModel
 {
     using base_type = QSortFilterProxyModel;
 
 public:
-    QnLicenseNotificationSortProxyModel(QObject* parent = nullptr) :
+    QnLicenseNotificationSortProxyModel(SystemContext* systemContext, QObject* parent = nullptr):
         base_type(parent),
-        validator(new nx::vms::license::Validator(systemContext(), this))
+        validator(new nx::vms::license::Validator(systemContext, this))
     {
     }
 
@@ -91,15 +89,18 @@ QnLicenseNotificationDialog::QnLicenseNotificationDialog(QWidget* parent, Qt::Wi
     SnappedScrollBar* scrollBar = new SnappedScrollBar(this);
     ui->treeView->setVerticalScrollBar(scrollBar->proxyScrollBar());
 
-    m_model = new QnLicenseListModel(this);
+    m_model = new QnLicenseListModel(systemContext(), this);
     m_model->setExtendedStatus(true);
 
-    auto sortModel = new QnLicenseNotificationSortProxyModel(this);
+    auto sortModel = new QnLicenseNotificationSortProxyModel(systemContext(), this);
     sortModel->setSourceModel(m_model);
     sortModel->sort(0/*unused*/);
 
     ui->treeView->setModel(sortModel);
-    ui->treeView->setItemDelegate(new QnLicenseListItemDelegate(this, false));
+    ui->treeView->setItemDelegate(new QnLicenseListItemDelegate(
+        systemContext(),
+        /*invalidLicensesDimmed*/ false,
+        this));
     ui->treeView->setColumnHidden(QnLicenseListModel::ExpirationDateColumn, true);
     ui->treeView->setColumnHidden(QnLicenseListModel::ServerColumn, true);
     ui->treeView->setProperty(nx::style::Properties::kSuppressHoverPropery, true);

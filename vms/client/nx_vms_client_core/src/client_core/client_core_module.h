@@ -14,7 +14,6 @@
 
 class QQmlEngine;
 
-class QnCommonModule;
 class QnDataProviderFactory;
 class QnPtzControllerPool;
 class QnResourcePool;
@@ -47,7 +46,6 @@ public:
 
     nx::vms::client::core::NetworkModule* networkModule() const;
 
-    QnCommonModule* commonModule() const;
     QnDataProviderFactory* dataProviderFactory() const;
     nx::vms::client::core::SessionTokenTerminator* sessionTokenTerminator() const;
 

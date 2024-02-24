@@ -14,7 +14,9 @@ namespace nx::vms::client::desktop {
  * yet. Once such resource is inserted into the pool, its children resources are initialized and
  * inserted into the pool.
  */
-class LocalResourcesInitializer: public QObject, public SystemContextAware
+class LocalResourcesInitializer:
+    public QObject,
+    public SystemContextAware
 {
     Q_OBJECT
 

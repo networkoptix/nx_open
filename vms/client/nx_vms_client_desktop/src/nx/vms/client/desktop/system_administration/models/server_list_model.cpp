@@ -16,7 +16,7 @@ struct ServerListModel::Private
 
     Private(ServerListModel* parent):
         q(parent),
-        servers(new CurrentSystemServers(parent))
+        servers(new CurrentSystemServers(q->systemContext()))
     {
     }
 };

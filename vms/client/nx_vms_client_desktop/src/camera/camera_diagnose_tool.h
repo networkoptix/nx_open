@@ -6,8 +6,7 @@
 
 #include <api/model/camera_diagnostics_reply.h>
 #include <core/resource/resource_fwd.h>
-#include <nx/vms/client/core/common/utils/common_module_aware.h>
-#include <nx/vms/client/core/network/remote_connection_aware.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
 #include <utils/camera/camera_diagnostics.h>
 #include <utils/common/id.h>
 
@@ -34,8 +33,7 @@ namespace CameraDiagnostics
     */
     class DiagnoseTool:
         public QObject,
-        public nx::vms::client::core::CommonModuleAware,
-        public nx::vms::client::core::RemoteConnectionAware
+        public nx::vms::client::desktop::SystemContextAware
     {
         Q_OBJECT
 

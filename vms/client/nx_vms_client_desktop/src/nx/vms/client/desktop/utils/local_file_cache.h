@@ -13,8 +13,10 @@ class LocalFileCache: public ServerImageCache
     Q_OBJECT
     using base_type = ServerImageCache;
 public:
-    explicit LocalFileCache(QObject* parent = nullptr);
+    explicit LocalFileCache(SystemContext* systemContext, QObject* parent = nullptr);
     virtual ~LocalFileCache() override;
+
+    static QString fullPath(const QString& filename, const QString& folder);
 
     /** Get full path to cached file with fixed filename */
     virtual QString getFullPath(const QString& filename) const override;

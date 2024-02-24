@@ -2,19 +2,21 @@
 
 #pragma once
 
-#include <nx/vms/client/core/common/utils/common_module_aware.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
 #include <nx/vms/license/license_usage_fwd.h>
 
 #include "resource_item_delegate.h"
 
 class QnLicenseListItemDelegate:
-    public QnResourceItemDelegate,
-    public nx::vms::client::core::CommonModuleAware
+    public QnResourceItemDelegate
 {
     using base_type = QnResourceItemDelegate;
 
 public:
-    explicit QnLicenseListItemDelegate(QObject* parent = nullptr, bool invalidLicensesDimmed = true);
+    explicit QnLicenseListItemDelegate(
+        nx::vms::client::desktop::SystemContext* systemContext,
+        bool invalidLicensesDimmed,
+        QObject* parent = nullptr);
     virtual ~QnLicenseListItemDelegate();
 
     bool invalidLicensesDimmed() const;

@@ -4,8 +4,6 @@
 
 #include <QtGui/QAction>
 
-#include <client_core/client_core_module.h>
-#include <common/common_module.h>
 #include <core/resource/resource.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/math/math.h>

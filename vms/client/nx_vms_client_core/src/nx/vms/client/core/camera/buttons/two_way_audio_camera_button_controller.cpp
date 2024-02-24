@@ -17,7 +17,7 @@ struct TwoWayAudioCameraButtonController::Private
 {
     TwoWayAudioCameraButtonController * const q;
     const IntercomButtonMode intercomButtonMode;
-    const std::unique_ptr<TwoWayAudioController> controller;
+    std::unique_ptr<TwoWayAudioController> controller;
     nx::utils::ScopedConnections connections;
 
     void updateButton();
@@ -128,25 +128,48 @@ void TwoWayAudioCameraButtonController::Private::setButtonChecked(
 TwoWayAudioCameraButtonController::TwoWayAudioCameraButtonController(
     IntercomButtonMode intercomButtonMode,
     CameraButton::Group buttonGroup,
-    SystemContext* context,
     QObject* parent)
     :
-    base_type(buttonGroup, context, Qn::TwoWayAudioPermission, parent),
-    d(new Private{.q = this, .intercomButtonMode = intercomButtonMode,
-        .controller = std::make_unique<TwoWayAudioController>(context)})
+    base_type(buttonGroup, Qn::TwoWayAudioPermission, parent),
+    d(new Private{.q = this, .intercomButtonMode = intercomButtonMode})
 {
-    const auto accessController = context->accessController();
+}
+
+TwoWayAudioCameraButtonController::~TwoWayAudioCameraButtonController()
+{
+}
+
+void TwoWayAudioCameraButtonController::setResourceInternal(const QnResourcePtr& resource)
+{
+    d->connections.reset();
+    d->controller.reset();
+
+    base_type::setResourceInternal(resource);
+    if (!resource)
+        return;
+
+    auto systemContext = SystemContext::fromResource(resource);
+    if (!NX_ASSERT(systemContext))
+        return;
+
+    d->controller = std::make_unique<TwoWayAudioController>(systemContext);
+
     const auto updateControllerSourceId =
-        [this, context, accessController]()
-    {
-        const auto user = accessController->user();
-        const auto userId = user ? user->getId() : nx::Uuid();
-        const auto sourceId = DesktopResource::calculateUniqueId(context->peerId(), userId);
-        d->controller->setSourceId(sourceId);
-    };
+        [this, systemContext]()
+        {
+            const auto user = systemContext->accessController()->user();
+            const auto userId = user ? user->getId() : nx::Uuid();
+            const auto sourceId = DesktopResource::calculateUniqueId(
+                systemContext->peerId(),
+                userId);
+            d->controller->setSourceId(sourceId);
+        };
 
     d->connections << connect(
-        accessController, &AccessController::userChanged, this, updateControllerSourceId);
+        systemContext->accessController(),
+        &AccessController::userChanged,
+        this,
+        updateControllerSourceId);
     updateControllerSourceId();
 
     d->connections << connect(d->controller.get(), &TwoWayAudioController::startedChanged, this,
@@ -161,25 +184,15 @@ TwoWayAudioCameraButtonController::TwoWayAudioCameraButtonController(
         });
 
     const auto updateButton = [this]() { d->updateButton(); };
-    d->connections << connect(
-        d->controller.get(), &TwoWayAudioController::availabilityChanged, this, updateButton);
-    d->connections << connect(
-        this, &BaseCameraButtonController::hasRequiredPermissionsChanged, this, updateButton);
-    d->connections << connect(this, &BaseCameraButtonController::cameraChanged, d->controller.get(),
-        [this, updateButton](const auto& camera, const auto& previousCamera)
-        {
-            if (previousCamera)
-                previousCamera->disconnect(this);
-
-            d->controller->setCamera(camera);
-
-            if (camera)
-                connect(camera.get(), &QnResource::flagsChanged, this, updateButton);
-        });
-}
-
-TwoWayAudioCameraButtonController::~TwoWayAudioCameraButtonController()
-{
+    d->connections << connect(d->controller.get(),
+        &TwoWayAudioController::availabilityChanged,
+        this,
+        updateButton);
+    d->connections << connect(this,
+        &BaseCameraButtonController::hasRequiredPermissionsChanged,
+        this,
+        updateButton);
+    d->connections << connect(resource.get(), &QnResource::flagsChanged, this, updateButton);
 }
 
 bool TwoWayAudioCameraButtonController::setButtonActionState(

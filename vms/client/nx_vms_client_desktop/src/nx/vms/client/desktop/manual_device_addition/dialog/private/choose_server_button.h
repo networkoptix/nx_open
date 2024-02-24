@@ -3,15 +3,12 @@
 #pragma once
 
 #include <core/resource/resource_fwd.h>
-#include <nx/vms/client/core/common/utils/common_module_aware.h>
-#include <nx/vms/client/desktop/common/widgets/dropdown_button.h>
 #include <nx/utils/uuid.h>
-
-#include "server_online_status_watcher.h"
+#include <nx/vms/client/desktop/common/widgets/dropdown_button.h>
 
 class QMenu;
 
-class QnChooseServerButton: public DropdownButton, public nx::vms::client::core::CommonModuleAware
+class QnChooseServerButton: public DropdownButton
 {
     Q_OBJECT
     using base_type = DropdownButton;
@@ -29,8 +26,6 @@ signals:
     void currentServerChanged(const QnMediaServerResourcePtr& previousServer);
 
 private:
-    void tryUpdateCurrentAction();
-
     QAction* addMenuItemForServer(const QnMediaServerResourcePtr& server);
 
     QAction* actionForServer(const nx::Uuid& id);
@@ -38,6 +33,5 @@ private:
     void handleSelectedServerOnlineStatusChanged();
 
 private:
-    nx::vms::client::desktop::ServerOnlineStatusWatcher m_serverStatus;
     QnMediaServerResourcePtr m_server;
 };

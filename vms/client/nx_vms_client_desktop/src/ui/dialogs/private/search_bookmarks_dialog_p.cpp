@@ -7,7 +7,6 @@
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QStyledItemDelegate>
 
-#include <common/common_module.h>
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/camera_bookmark_fwd.h>
 #include <core/resource/camera_resource.h>

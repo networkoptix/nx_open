@@ -8,7 +8,9 @@
 
 namespace nx::vms::client::desktop {
 
-class LdapStatusWatcher: public QObject, public SystemContextAware
+class LdapStatusWatcher:
+    public QObject,
+    public SystemContextAware
 {
     Q_OBJECT
 

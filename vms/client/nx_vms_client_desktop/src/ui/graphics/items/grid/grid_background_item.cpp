@@ -6,11 +6,8 @@
 #include <QtGui/QOpenGLFunctions>
 #include <QtGui/QPainter>
 
-#include <client_core/client_core_module.h>
-#include <common/common_module.h>
 #include <core/resource/user_resource.h>
 #include <nx/utils/math/math.h>
-#include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_session.h>
 #include <nx/vms/client/core/skin/color_theme.h>
@@ -19,6 +16,7 @@
 #include <nx/vms/client/desktop/image_providers/threaded_image_loader.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/utils/local_file_cache.h>
 #include <nx/vms/client/desktop/utils/server_image_cache.h>
 #include <ui/workaround/gl_native_painting.h>
@@ -198,10 +196,10 @@ QnGridBackgroundItem::QnGridBackgroundItem(QGraphicsScene* scene, QnWorkbenchCon
             at_imageLoaded(filename, status == ServerFileCache::OperationResult::ok);
         };
 
-    const auto localFilesCache = context->instance<LocalFileCache>();
+    const auto localFilesCache = system()->localFileCache();
     connect(localFilesCache, &ServerFileCache::fileDownloaded, this, imageLoaded);
 
-    const auto appServerImageCache = context->instance<ServerImageCache>();
+    const auto appServerImageCache = system()->serverImageCache();
     connect(appServerImageCache, &ServerFileCache::fileDownloaded, this, imageLoaded);
 
     connect(context,
@@ -453,8 +451,8 @@ ServerImageCache* QnGridBackgroundItem::cache()
     Q_D(const QnGridBackgroundItem);
 
     return d->imageData.isLocal
-        ? context()->instance<LocalFileCache>()
-        : context()->instance<ServerImageCache>();
+        ? system()->localFileCache()
+        : system()->serverImageCache();
 }
 
 void QnGridBackgroundItem::setImage(const QImage& image, const QString& filename)

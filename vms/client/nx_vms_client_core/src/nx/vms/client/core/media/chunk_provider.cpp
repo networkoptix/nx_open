@@ -4,24 +4,24 @@
 
 #include <QtQml/QtQml>
 
-#include <common/common_module.h>
 #include <core/resource/camera_history.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/utils/scoped_connections.h>
 #include <nx/vms/client/core/resource/data_loaders/flat_camera_data_loader.h>
 #include <nx/vms/client/core/system_context.h>
 
 namespace nx::vms::client::core {
 
-class ChunkProvider::ChunkProviderInternal: public QObject
+class ChunkProvider::ChunkProviderInternal
 {
 public:
     ChunkProviderInternal(
         Qn::TimePeriodContent contentType,
         ChunkProvider* owner);
 
-    nx::Uuid resourceId() const;
-    void setResourceId(const nx::Uuid& id);
+    QnResourcePtr resource() const;
+    void setResource(const QnResourcePtr& value);
 
     const QnTimePeriodList& periods() const;
 
@@ -35,10 +35,8 @@ public:
 private:
     void updateInternal();
 
-    void cleanLoader();
     void setLoading(bool value);
     void notifyAboutTimePeriodsChange();
-    QnVirtualCameraResourcePtr getCamera(const nx::Uuid& id);
 
 private:
     ChunkProvider* const q;
@@ -47,6 +45,7 @@ private:
     QString m_filter;
     bool m_loading = false;
     int updateTriesCount = 0;
+    nx::utils::ScopedConnections connections;
 };
 
 ChunkProvider::ChunkProviderInternal::ChunkProviderInternal(
@@ -58,44 +57,35 @@ ChunkProvider::ChunkProviderInternal::ChunkProviderInternal(
 {
 }
 
-nx::Uuid ChunkProvider::ChunkProviderInternal::resourceId() const
+QnResourcePtr ChunkProvider::ChunkProviderInternal::resource() const
 {
-    return m_loader ? m_loader->resource()->getId() : nx::Uuid();
+    return m_loader ? m_loader->resource() : QnResourcePtr();
 }
 
-void ChunkProvider::ChunkProviderInternal::cleanLoader()
+void ChunkProvider::ChunkProviderInternal::setResource(const QnResourcePtr& value)
 {
-    if (!m_loader)
+    if (resource() == value)
         return;
 
-    m_loader->disconnect(this);
-    q->cameraHistoryPool()->disconnect(m_loader.data());
+    connections.reset();
     m_loader.reset();
-}
-
-void ChunkProvider::ChunkProviderInternal::setResourceId(const nx::Uuid& id)
-{
-    if (id == resourceId())
-        return;
-
-    cleanLoader();
     notifyAboutTimePeriodsChange();
     setLoading(false);
 
-    const auto camera = getCamera(id);
+    const auto camera = value.dynamicCast<QnVirtualCameraResource>();
     if (!camera)
         return;
 
     setLoading(true);
     m_loader.reset(new FlatCameraDataLoader(camera, m_contentType));
 
-    connect(m_loader.get(), &FlatCameraDataLoader::ready, this,
+    connections << connect(m_loader.get(), &FlatCameraDataLoader::ready, q,
         [this](qint64 /*startTimeMs*/)
         {
             notifyAboutTimePeriodsChange();
             setLoading(false);
         });
-    connect(m_loader.get(), &FlatCameraDataLoader::failed, this,
+    connections << connect(m_loader.get(), &FlatCameraDataLoader::failed, q,
         [this]()
         {
             if (--updateTriesCount > 0)
@@ -104,11 +94,14 @@ void ChunkProvider::ChunkProviderInternal::setResourceId(const nx::Uuid& id)
                 setLoading(false);
         });
 
-    const auto historyPool = q->cameraHistoryPool();
-    connect(historyPool, &QnCameraHistoryPool::cameraFootageChanged, m_loader.get(),
-        [this](){ m_loader->discardCachedData(); });
-    connect(historyPool, &QnCameraHistoryPool::cameraHistoryInvalidated, this,
-        [this]() { update(); });
+    if (auto systemContext = SystemContext::fromResource(camera); NX_ASSERT(systemContext))
+    {
+        const auto historyPool = systemContext->cameraHistoryPool();
+        connections << connect(historyPool, &QnCameraHistoryPool::cameraFootageChanged, q,
+            [this](){ m_loader->discardCachedData(); });
+        connections << connect(historyPool, &QnCameraHistoryPool::cameraHistoryInvalidated, q,
+            [this]() { update(); });
+    }
 
     update();
 }
@@ -154,8 +147,11 @@ void ChunkProvider::ChunkProviderInternal::updateInternal()
 
     m_loader->load(m_filter, 1);
 
-    const auto camera = getCamera(m_loader->resource()->getId());
-    q->cameraHistoryPool()->updateCameraHistoryAsync(camera, nullptr);
+    if (const auto camera = m_loader->resource().dynamicCast<QnVirtualCameraResource>())
+    {
+        if (auto systemContext = SystemContext::fromResource(camera); NX_ASSERT(systemContext))
+            systemContext->cameraHistoryPool()->updateCameraHistoryAsync(camera, nullptr);
+    }
 }
 
 void ChunkProvider::ChunkProviderInternal::setLoading(bool value)
@@ -173,16 +169,10 @@ void ChunkProvider::ChunkProviderInternal::notifyAboutTimePeriodsChange()
     emit q->bottomBoundChanged();
 }
 
-QnVirtualCameraResourcePtr ChunkProvider::ChunkProviderInternal::getCamera(const nx::Uuid& id)
-{
-    return q->resourcePool()->getResourceById<QnVirtualCameraResource>(id);
-}
-
-//--------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 
 ChunkProvider::ChunkProvider(QObject* parent):
     base_type(parent),
-    SystemContextAware(SystemContext::fromQmlContext(this)),
     m_providers(
         [this]()
         {
@@ -211,15 +201,20 @@ void ChunkProvider::registerQmlType()
     qmlRegisterType<ChunkProvider>("nx.vms.client.core", 1, 0, "ChunkProvider");
 }
 
-nx::Uuid ChunkProvider::resourceId() const
+QnResource* ChunkProvider::rawResource() const
 {
-    return m_providers[Qn::RecordingContent]->resourceId();
+    return m_providers[Qn::RecordingContent]->resource().data();
 }
 
-void ChunkProvider::setResourceId(const nx::Uuid& id)
+void ChunkProvider::setRawResource(QnResource* value)
 {
+    if (value)
+        QQmlEngine::setObjectOwnership(value, QQmlEngine::CppOwnership);
+
+    QnResourcePtr resource = value ? value->toSharedPointer() : QnResourcePtr();
+
     for (const auto& provider: m_providers)
-        provider->setResourceId(id);
+        provider->setResource(resource);
 }
 
 qint64 ChunkProvider::bottomBound() const

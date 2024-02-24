@@ -8,7 +8,9 @@
 
 namespace nx::vms::common {
 
-class NX_VMS_COMMON_API LicenseUsageWatcher: public QObject, public SystemContextAware
+class NX_VMS_COMMON_API LicenseUsageWatcher:
+    public QObject,
+    public SystemContextAware
 {
     Q_OBJECT
     using base_type = QObject;

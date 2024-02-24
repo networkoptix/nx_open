@@ -6,7 +6,7 @@
 #include <QtCore/QScopedPointer>
 
 #include <nx/utils/impl_ptr.h>
-#include <nx/vms/client/core/common/utils/common_module_aware.h>
+#include <nx/vms/client/desktop/current_system_context_aware.h>
 #include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/menu/action_parameters.h>
 
@@ -19,7 +19,7 @@ struct JoystickDescriptor;
 
 class ActionFactory:
     public QObject,
-    public core::CommonModuleAware
+    public CurrentSystemContextAware
 {
     Q_OBJECT
 
@@ -48,9 +48,7 @@ public:
     void handleStateChanged(const Device::StickPosition& stick, const Device::ButtonStates& buttons);
 
 signals:
-    void actionReady(
-        nx::vms::client::desktop::menu::IDType id,
-        const nx::vms::client::desktop::menu::Parameters& parameters);
+    void actionReady(menu::IDType id, const menu::Parameters& parameters);
 
 private:
     struct Private;

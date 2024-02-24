@@ -593,7 +593,7 @@ void QnBusinessRuleWidget::at_actionResourcesHolder_clicked()
         if (m_model->actionType() == ActionType::sendMailAction)
         {
             QSharedPointer<QnSendEmailActionDelegate> dialogDelegate(
-                new QnSendEmailActionDelegate(this));
+                new QnSendEmailActionDelegate(systemContext(), this));
 
             dialog.setAllUsersSelectorEnabled(false); //< No spam, baby.
 

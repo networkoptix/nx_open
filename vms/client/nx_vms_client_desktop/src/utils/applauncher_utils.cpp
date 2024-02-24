@@ -2,22 +2,17 @@
 
 #include "applauncher_utils.h"
 
-#include <thread>
 #include <chrono>
+#include <thread>
 
 #include <QtGui/QScreen>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QWidget>
-#include <QtGui/QScreen>
-
-#include <common/common_module.h>
 
 #include <client/client_startup_parameters.h>
 #include <client/self_updater.h>
-
-#include <nx/vms/applauncher/api/commands.h>
-
 #include <nx/utils/log/log.h>
+#include <nx/vms/applauncher/api/commands.h>
 
 namespace nx::vms::applauncher::api {
 

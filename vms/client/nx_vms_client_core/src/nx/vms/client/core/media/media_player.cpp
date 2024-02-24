@@ -4,8 +4,7 @@
 
 #include <QtQml/QtQml>
 
-#include <client_core/client_core_module.h>
-#include <common/common_module.h>
+#include <core/resource/resource.h>
 
 #include "media_player_channel_adapter.h"
 
@@ -58,22 +57,22 @@ MediaPlayer::~MediaPlayer()
 {
 }
 
-nx::Uuid MediaPlayer::resourceId() const
+void MediaPlayer::setResourceInternal(const QnResourcePtr& value)
 {
-    return m_resourceId;
+    if (value)
+        QQmlEngine::setObjectOwnership(value.get(), QQmlEngine::CppOwnership);
+
+    base_type::setResourceInternal(value);
 }
 
-void MediaPlayer::setResourceId(const nx::Uuid& resourceId)
+QnResource* MediaPlayer::rawResource() const
 {
-    if (m_resourceId == resourceId)
-        return;
+    return resource().data();
+}
 
-    m_resourceId = resourceId;
-    emit resourceIdChanged();
-
-    setSource(!resourceId.isNull()
-        ? QUrl("camera://media/" + resourceId.toString())
-        : QString());
+void MediaPlayer::setRawResource(QnResource* value)
+{
+    setResource(value ? value->toSharedPointer() : QnResourcePtr());
 }
 
 void MediaPlayer::playLive()
@@ -107,11 +106,6 @@ void MediaPlayer::registerQmlTypes()
     qmlRegisterType<MediaPlayer>("nx.vms.client.core", 1, 0, "MediaPlayer");
     qmlRegisterType<MediaPlayerChannelAdapter>(
         "nx.vms.client.core", 1, 0, "MediaPlayerChannelAdapter");
-}
-
-QnCommonModule* MediaPlayer::commonModule() const
-{
-    return qnClientCoreModule->commonModule();
 }
 
 } // namespace nx::vms::client::core

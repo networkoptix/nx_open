@@ -2,11 +2,11 @@
 
 #include "layout_background_image_provider.h"
 
-#include <core/resource/layout_resource.h>
 #include <client/client_globals.h>
-
-#include <nx/vms/client/desktop/utils/server_image_cache.h>
+#include <core/resource/layout_resource.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/utils/local_file_cache.h>
+#include <nx/vms/client/desktop/utils/server_image_cache.h>
 
 #include "threaded_image_loader.h"
 
@@ -14,7 +14,7 @@ namespace nx::vms::client::desktop {
 
 struct LayoutBackgroundImageProvider::Private
 {
-    QScopedPointer<ServerImageCache> cache;
+    QPointer<ServerImageCache> cache;
     QSize maxImageSize;
     QScopedPointer<ThreadedImageLoader> loader;
     QImage image;
@@ -27,7 +27,7 @@ struct LayoutBackgroundImageProvider::Private
         if (!maxImageSize.isNull())
             return maxImageSize;
 
-        if (!cache.isNull())
+        if (cache)
             return cache->getMaxImageSize();
 
         return QSize();
@@ -44,9 +44,10 @@ LayoutBackgroundImageProvider::LayoutBackgroundImageProvider(const QnLayoutResou
     if (layout->backgroundImageFilename().isEmpty())
         return;
 
-    d->cache.reset(layout->isFile()
-        ? new LocalFileCache()
-        : new ServerImageCache());
+    const auto systemContext = SystemContext::fromResource(layout);
+    d->cache = layout->isFile()
+        ? systemContext->localFileCache()
+        : systemContext->serverImageCache();
     d->maxImageSize = maxImageSize;
     d->loader.reset(new ThreadedImageLoader());
     d->loader->setInput(d->cache->getFullPath(layout->backgroundImageFilename()));

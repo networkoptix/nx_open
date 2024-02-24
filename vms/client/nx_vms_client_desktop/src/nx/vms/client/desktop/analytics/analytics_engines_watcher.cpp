@@ -5,7 +5,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/vms/api/data/analytics_integration_model.h>
-#include <nx/vms/client/core/common/utils/common_module_aware.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
 #include <nx/vms/common/resource/analytics_plugin_resource.h>
 
 #include "analytics_data_helper.h"
@@ -16,7 +16,7 @@ namespace nx::vms::client::desktop {
 
 class AnalyticsEnginesWatcher::Private:
     public QObject,
-    public nx::vms::client::core::CommonModuleAware
+    public SystemContextAware
 {
     AnalyticsEnginesWatcher* const q = nullptr;
 
@@ -34,6 +34,7 @@ public:
 };
 
 AnalyticsEnginesWatcher::Private::Private(AnalyticsEnginesWatcher* q):
+    SystemContextAware(q->systemContext()),
     q(q)
 {
     connect(resourcePool(), &QnResourcePool::resourceAdded, this, &Private::at_resourceAdded);
@@ -139,8 +140,9 @@ void AnalyticsEnginesWatcher::Private::at_pluginPropertyChanged(
     }
 }
 
-AnalyticsEnginesWatcher::AnalyticsEnginesWatcher(QObject* parent):
+AnalyticsEnginesWatcher::AnalyticsEnginesWatcher(SystemContext* systemContext, QObject* parent):
     base_type(parent),
+    SystemContextAware(systemContext),
     d(new Private(this))
 {
 }

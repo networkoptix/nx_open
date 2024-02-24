@@ -5,6 +5,7 @@ import QtQuick.Window
 
 import Nx
 import Nx.Items
+import Nx.Common
 import Nx.Controls
 import Nx.Core
 import Nx.Core.Items
@@ -35,12 +36,12 @@ Window
     property bool showPalette: true
     property bool showClearButton: true
 
-    property var resourceId: NxGlobals.uuid("")
+    property Resource resource: null
 
     MediaResourceHelper
     {
         id: helper
-        resourceId: dialog.resourceId
+        resource: dialog.resource
     }
 
     TextureSizeHelper
@@ -52,12 +53,12 @@ Window
     {
         id: player
 
-        resourceId: helper.resourceId
+        resource: helper.resource
         audioEnabled: false
 
         readonly property bool loaded: mediaStatus === MediaPlayer.MediaStatus.Loaded
 
-        onSourceChanged: updatePlayingState()
+        onResourceChanged: updatePlayingState()
         maxTextureSize: textureSizeHelper.maxTextureSize
 
         tag: "FigureEditor"

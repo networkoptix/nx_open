@@ -16,7 +16,9 @@ namespace nx::vms::client::desktop {
 
 class EventLogModelData;
 
-class EventLogModel: public QAbstractItemModel, public SystemContextAware
+class EventLogModel:
+    public QAbstractItemModel,
+    public SystemContextAware
 {
     Q_OBJECT
     using base_type = QAbstractItemModel;

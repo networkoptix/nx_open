@@ -8,8 +8,6 @@
 #include <QtCore/QScopedValueRollback>
 #include <QtCore/QStandardPaths>
 
-#include <client_core/client_core_module.h>
-#include <common/common_module.h>
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_resource.h>

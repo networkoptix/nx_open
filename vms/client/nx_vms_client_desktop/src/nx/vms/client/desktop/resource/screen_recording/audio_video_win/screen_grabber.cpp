@@ -12,19 +12,11 @@
 #include <QtGui/QPainter>
 #include <QtGui/QScreen>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QWidget>
 
+#include <nx/media/sse_helper.h>
 #include <nx/utils/log/log.h>
-
-#include "nx/media/sse_helper.h"
-#include "utils/color_space/yuvconvert.h"
-
-extern "C"
-{
-#include <libavcodec/avcodec.h>
-#include <libavformat/avformat.h>
-#include <libavutil/imgutils.h>
-#include <libswscale/swscale.h>
-}
+#include <utils/color_space/yuvconvert.h>
 
 static const int LOGO_CORNER_OFFSET = 8;
 

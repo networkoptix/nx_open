@@ -2,7 +2,6 @@
 
 #include "workbench_resources_changes_watcher.h"
 
-#include <common/common_module.h>
 #include <core/resource/resource.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/help/help_topic.h>

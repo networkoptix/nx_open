@@ -6,7 +6,6 @@
 #include <QtQml/QQmlEngine>
 
 #include <api/common_message_processor.h>
-#include <common/common_module.h>
 #include <core/dataprovider/data_provider_factory.h>
 #include <nx/core/access/access_types.h>
 #include <nx/utils/app_info.h>
@@ -28,7 +27,6 @@ static QnClientCoreModule* s_instance = nullptr;
 
 struct QnClientCoreModule::Private
 {
-    std::unique_ptr<QnCommonModule> commonModule;
     std::unique_ptr<NetworkModule> networkModule;
     std::unique_ptr<QnDataProviderFactory> resourceDataProviderFactory;
     std::unique_ptr<SessionTokenTerminator> sessionTokenTerminator;
@@ -48,8 +46,6 @@ QnClientCoreModule::QnClientCoreModule(
         NX_ERROR(this, "Singleton is created more than once.");
     else
         s_instance = this;
-
-    d->commonModule = std::make_unique<QnCommonModule>(systemContext);
 
     systemContext->storeToQmlContext(appContext()->qmlEngine()->rootContext());
 
@@ -93,11 +89,6 @@ void QnClientCoreModule::initializeNetworking(
 NetworkModule* QnClientCoreModule::networkModule() const
 {
     return d->networkModule.get();
-}
-
-QnCommonModule* QnClientCoreModule::commonModule() const
-{
-    return d->commonModule.get();
 }
 
 QnDataProviderFactory* QnClientCoreModule::dataProviderFactory() const

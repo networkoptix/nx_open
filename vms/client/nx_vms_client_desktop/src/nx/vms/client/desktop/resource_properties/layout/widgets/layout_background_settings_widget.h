@@ -2,9 +2,8 @@
 
 #pragma once
 
+#include <QtCore/QPointer>
 #include <QtWidgets/QWidget>
-
-#include <nx/vms/client/core/common/utils/common_module_aware.h>
 
 namespace Ui { class LayoutBackgroundSettingsWidget; }
 
@@ -12,10 +11,9 @@ namespace nx::vms::client::desktop {
 
 struct LayoutSettingsDialogState;
 class LayoutSettingsDialogStore;
+class SystemContext;
 
-class LayoutBackgroundSettingsWidget:
-    public QWidget,
-    public nx::vms::client::core::CommonModuleAware
+class LayoutBackgroundSettingsWidget: public QWidget
 {
     Q_OBJECT
     using base_type = QWidget;
@@ -28,6 +26,8 @@ public:
 
     void uploadImage();
 
+    void initCache(SystemContext* systemContext, bool isLocalFile);
+
 signals:
     void newImageUploadedSuccessfully();
 
@@ -36,7 +36,6 @@ protected:
 
 private:
     void setupUi();
-    void initCache(bool isLocalFile);
     void loadState(const LayoutSettingsDialogState& state);
 
 private:

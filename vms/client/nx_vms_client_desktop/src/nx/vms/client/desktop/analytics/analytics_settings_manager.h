@@ -94,7 +94,9 @@ using AnalyticsSettingsListenerPtr = std::shared_ptr<AnalyticsSettingsListener>;
  * these changes to the server and notifies other listeners about it. When changes are received from
  * the server (using special transaction), actual values are re-requested.
  */
-class NX_VMS_CLIENT_DESKTOP_API AnalyticsSettingsManager: public QObject, public SystemContextAware
+class NX_VMS_CLIENT_DESKTOP_API AnalyticsSettingsManager:
+    public QObject,
+    public SystemContextAware
 {
     Q_OBJECT
 

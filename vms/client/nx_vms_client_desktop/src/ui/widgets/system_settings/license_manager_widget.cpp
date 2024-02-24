@@ -146,7 +146,7 @@ LicenseManagerWidget::LicenseManagerWidget(QWidget* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
     ui(new Ui::LicenseManagerWidget),
-    m_model(new QnLicenseListModel(this)),
+    m_model(new QnLicenseListModel(systemContext(), this)),
     m_validator(new Validator(systemContext(), this))
 {
     ui->setupUi(this);
@@ -173,7 +173,10 @@ LicenseManagerWidget::LicenseManagerWidget(QWidget* parent):
     sortModel->setSourceModel(m_model);
 
     ui->gridLicenses->setModel(sortModel);
-    ui->gridLicenses->setItemDelegate(new QnLicenseListItemDelegate(this));
+    ui->gridLicenses->setItemDelegate(new QnLicenseListItemDelegate(
+        systemContext(),
+        /*invalidLicensesDimmed*/ true,
+        this));
 
     ui->gridLicenses->header()->setSectionsMovable(false);
     ui->gridLicenses->header()->setSectionResizeMode(QHeaderView::ResizeToContents);

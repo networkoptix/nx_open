@@ -29,11 +29,12 @@ void SourceUserPicker::onDescriptorSet()
         == parentParamsWidget()->descriptor()->id)
     {
         m_validationPolicy = std::make_unique<QnRequiredAccessRightPolicy>(
+            systemContext(),
             nx::vms::api::AccessRight::userInput);
     }
     else
     {
-        m_validationPolicy = std::make_unique<QnDefaultSubjectValidationPolicy>();
+        m_validationPolicy = std::make_unique<QnDefaultSubjectValidationPolicy>(systemContext());
     }
 }
 

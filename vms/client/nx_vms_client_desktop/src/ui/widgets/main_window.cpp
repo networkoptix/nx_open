@@ -81,7 +81,6 @@
 #include <ui/workbench/handlers/workbench_videowall_handler.h>
 #include <ui/workbench/handlers/workbench_webpage_handler.h>
 #include <ui/workbench/watchers/timeline_bookmarks_watcher.h>
-#include <ui/workbench/watchers/workbench_bookmark_tags_watcher.h>
 #include <ui/workbench/watchers/workbench_item_bookmarks_watcher.h>
 #include <ui/workbench/watchers/workbench_ptz_dialog_watcher.h>
 #include <ui/workbench/watchers/workbench_resources_changes_watcher.h>
@@ -296,7 +295,6 @@ MainWindow::MainWindow(WindowContext* context, QWidget* parent, Qt::WindowFlags 
     workbenchContext()->instance<QnWorkbenchPtzDialogWatcher>();
 
     workbenchContext()->instance<QnWorkbenchResourcesChangesWatcher>();
-    workbenchContext()->instance<QnWorkbenchBookmarkTagsWatcher>();
     workbenchContext()->instance<QnWorkbenchItemBookmarksWatcher>();
     workbenchContext()->instance<QnTimelineBookmarksWatcher>();
     workbenchContext()->instance<QnWorkbenchServerPortWatcher>();

@@ -14,7 +14,6 @@
 #include <QtWidgets/QScrollBar>
 
 #include <client/client_globals.h>
-#include <common/common_module.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <nx/api/mediaserver/image_request.h>

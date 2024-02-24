@@ -14,9 +14,7 @@
 #include <api/server_rest_connection.h>
 #include <client/client_globals.h>
 #include <client/client_message_processor.h>
-#include <client_core/client_core_module.h>
 #include <common/common_globals.h>
-#include <common/common_module.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_access/access_rights_manager.h>
 #include <core/resource_access/resource_access_subject_hierarchy.h>

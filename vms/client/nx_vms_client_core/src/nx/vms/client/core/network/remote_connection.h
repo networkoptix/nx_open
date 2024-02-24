@@ -18,14 +18,13 @@
 #include "connection_info.h"
 #include "logon_data.h"
 
-class QnCommonModule;
-
 namespace rest { class ServerConnection; }
 
 namespace nx::vms::client::core {
 
 class CertificateCache;
 class CertificateVerifier;
+class SystemContext;
 
 /**
  * Actual system connection, provides access to different manager classes, which in their turn
@@ -52,8 +51,9 @@ public:
         QObject* parent = nullptr);
     virtual ~RemoteConnection() override;
 
+    // FIXME: #sivanov Make Remote Connection - System Context Aware.
     /** Initialize message bus connection. Actual for the current connection only. */
-    void initializeMessageBusConnection(QnCommonModule* commonModule);
+    void initializeMessageBusConnection(SystemContext* systemContext);
 
     const nx::vms::api::ModuleInformation& moduleInformation() const;
 

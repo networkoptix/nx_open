@@ -3,15 +3,15 @@
 #include "webengine_profile_manager.h"
 
 #include <QtCore/QHash>
-#include <QtQml/QtQml>
 #include <QtNetwork/QNetworkProxy>
+#include <QtQml/QtQml>
 #include <QtWebEngineQuick/private/qquickwebenginedownloadrequest_p.h>
 
-#include <client_core/client_core_module.h>
-#include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/resource_properties/camera/utils/camera_web_page_workarounds.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/utils/local_proxy_server.h>
 
 namespace nx::vms::client::desktop::utils {
@@ -84,10 +84,10 @@ Q_INVOKABLE QQuickWebEngineProfile* WebEngineProfileManager::getProfile(
     {
         // If we can find a parent of provided resource then we should setup a proxy.
 
-        const auto commonModule = qnClientCoreModule->commonModule();
-
+        const auto resourcePool = appContext()->currentSystemContext()->resourcePool();
         const auto resourceUuid = nx::Uuid::fromStringSafe(resourceId);
-        if (const auto resource = commonModule->resourcePool()->getResourceById(resourceUuid))
+
+        if (const auto resource = resourcePool->getResourceById(resourceUuid))
             parentId = resource->getParentId();
     }
 

@@ -18,7 +18,7 @@ namespace nx::vms::client::desktop::rules {
 
 SoundPicker::SoundPicker(WindowContext* context, ParamsWidget* parent):
     PlainFieldPickerWidget<vms::rules::SoundField>(context->system(), parent),
-    m_serverNotificationCache{context->workbenchContext()->instance<ServerNotificationCache>()}
+    m_serverNotificationCache{context->system()->serverNotificationCache()}
 {
     auto contentLayout = new QHBoxLayout;
 

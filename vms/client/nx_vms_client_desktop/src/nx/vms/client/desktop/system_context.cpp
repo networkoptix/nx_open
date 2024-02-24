@@ -17,9 +17,9 @@
 #include <nx/vms/client/desktop/access/caching_access_controller.h>
 #include <nx/vms/client/desktop/analytics/analytics_entities_tree.h>
 #include <nx/vms/client/desktop/analytics/analytics_taxonomy_manager.h>
-#include <nx/vms/client/desktop/other_servers/other_servers_manager.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/intercom/intercom_manager.h>
+#include <nx/vms/client/desktop/other_servers/other_servers_manager.h>
 #include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/resource/local_resources_initializer.h>
 #include <nx/vms/client/desktop/resource/rest_api_helper.h>
@@ -35,6 +35,9 @@
 #include <nx/vms/client/desktop/system_logon/logic/delayed_data_loader.h>
 #include <nx/vms/client/desktop/system_logon/logic/remote_session.h>
 #include <nx/vms/client/desktop/utils/ldap_status_watcher.h>
+#include <nx/vms/client/desktop/utils/local_file_cache.h>
+#include <nx/vms/client/desktop/utils/server_image_cache.h>
+#include <nx/vms/client/desktop/utils/server_notification_cache.h>
 #include <nx/vms/client/desktop/utils/video_cache.h>
 #include <nx/vms/client/desktop/videowall/desktop_camera_initializer.h>
 #include <nx/vms/client/desktop/videowall/videowall_online_screens_watcher.h>
@@ -84,6 +87,9 @@ struct SystemContext::Private
     std::unique_ptr<AnalyticsEventsSearchTreeBuilder> analyticsEventsSearchTreeBuilder;
     std::unique_ptr<SystemHealthState> systemHealthState;
     std::unique_ptr<TrafficRelayUrlWatcher> trafficRelayUrlWatcher;
+    std::unique_ptr<LocalFileCache> localFileCache;
+    std::unique_ptr<ServerImageCache> serverImageCache;
+    std::unique_ptr<ServerNotificationCache> serverNotificationCache;
 
     void initLocalRuntimeInfo()
     {
@@ -145,6 +151,9 @@ SystemContext::SystemContext(
             d->defaultPasswordCamerasWatcher = std::make_unique<DefaultPasswordCamerasWatcher>(
                 this);
             d->trafficRelayUrlWatcher = std::make_unique<TrafficRelayUrlWatcher>(this);
+            d->localFileCache = std::make_unique<LocalFileCache>(this);
+            d->serverImageCache = std::make_unique<ServerImageCache>(this);
+            d->serverNotificationCache = std::make_unique<ServerNotificationCache>(this);
             break;
 
         case Mode::crossSystem:
@@ -317,6 +326,21 @@ TrafficRelayUrlWatcher* SystemContext::trafficRelayUrlWatcher() const
     return d->trafficRelayUrlWatcher.get();
 }
 
+LocalFileCache* SystemContext::localFileCache() const
+{
+    return d->localFileCache.get();
+}
+
+ServerImageCache* SystemContext::serverImageCache() const
+{
+    return d->serverImageCache.get();
+}
+
+ServerNotificationCache* SystemContext::serverNotificationCache() const
+{
+    return d->serverNotificationCache.get();
+}
+
 void SystemContext::setMessageProcessor(QnCommonMessageProcessor* messageProcessor)
 {
     base_type::setMessageProcessor(messageProcessor);
@@ -330,6 +354,7 @@ void SystemContext::setMessageProcessor(QnCommonMessageProcessor* messageProcess
     d->otherServersManager->setMessageProcessor(clientMessageProcessor);
     d->serverRuntimeEventConnector->setMessageProcessor(clientMessageProcessor);
     d->logsManagementWatcher->setMessageProcessor(clientMessageProcessor);
+    d->serverNotificationCache->setMessageProcessor(clientMessageProcessor);
     d->intercomManager = std::make_unique<IntercomManager>(this);
     d->analyticsEventsSearchTreeBuilder = std::make_unique<AnalyticsEventsSearchTreeBuilder>(this);
     d->systemHealthState = std::make_unique<SystemHealthState>(this);

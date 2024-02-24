@@ -2,7 +2,6 @@
 
 #include <api/runtime_info_manager.h>
 #include <client/client_globals.h>
-#include <common/common_module.h>
 #include <core/resource/videowall_item.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -208,7 +207,7 @@ TEST_F(ResourceTreeModelTest, videoWallScreenIconStatus)
         (uniqueMatchingIndex(kUniqueVideoWallScreenNameCondition)));
 
     // When video wall screen is online and have "controlled by" UUID same as common module GUID.
-    setVideoWallScreenRuntimeStatus(videoWall, videoWallScreen, true, commonModule()->peerId());
+    setVideoWallScreenRuntimeStatus(videoWall, videoWallScreen, true, peerId());
 
     // Then icon has Control decoration.
     ASSERT_TRUE(iconStatusMatch(QnResourceIconCache::Control)

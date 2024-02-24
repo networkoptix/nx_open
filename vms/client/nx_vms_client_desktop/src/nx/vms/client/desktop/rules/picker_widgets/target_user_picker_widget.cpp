@@ -79,7 +79,7 @@ void TargetUserPicker::createPolicy()
     const auto actionId = parentParamsWidget()->descriptor()->id;
     if (actionId == vms::rules::utils::type<vms::rules::SendEmailAction>())
     {
-        m_policy = std::make_unique<QnUserWithEmailValidationPolicy>();
+        m_policy = std::make_unique<QnUserWithEmailValidationPolicy>(systemContext());
     }
     else if (actionId == vms::rules::utils::type<vms::rules::NotificationAction>())
     {
@@ -89,20 +89,21 @@ void TargetUserPicker::createPolicy()
         if (acknowledgeField->value() == true)
         {
             m_policy = std::make_unique<QnRequiredAccessRightPolicy>(
+                systemContext(),
                 nx::vms::api::AccessRight::manageBookmarks);
         }
         else
         {
-            m_policy = std::make_unique<QnDefaultSubjectValidationPolicy>();
+            m_policy = std::make_unique<QnDefaultSubjectValidationPolicy>(systemContext());
         }
     }
     else if (actionId == vms::rules::utils::type<vms::rules::PushNotificationAction>())
     {
-        m_policy = std::make_unique<QnCloudUsersValidationPolicy>();
+        m_policy = std::make_unique<QnCloudUsersValidationPolicy>(systemContext());
     }
     else
     {
-        m_policy = std::make_unique<QnDefaultSubjectValidationPolicy>();
+        m_policy = std::make_unique<QnDefaultSubjectValidationPolicy>(systemContext());
     }
 }
 

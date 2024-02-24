@@ -58,7 +58,7 @@ LabeledItem
             FigureEditorDialog
             {
                 figureType: figureView.figureType
-                resourceId: sharedData.resourceId
+                resource: sharedData.resource
                 player.videoQuality:
                     sharedData.analyticsStreamQuality ?? MediaPlayer.LowVideoQuality
 

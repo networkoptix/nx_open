@@ -10,7 +10,9 @@ namespace nx::vms::client::desktop {
 
 class CameraSettingsDialogStore;
 
-class CameraSettingsEngineLicenseWatcher: public QObject, public SystemContextAware
+class CameraSettingsEngineLicenseWatcher:
+    public QObject,
+    public SystemContextAware
 {
     Q_OBJECT
 

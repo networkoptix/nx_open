@@ -14,7 +14,9 @@ namespace nx::vms::client::desktop {
  * delayed (and thus not included in full info). Loading starts after full info is received, so
  * permissions can be checked on the client side before requesting.
  */
-class DelayedDataLoader: public QObject, public SystemContextAware
+class DelayedDataLoader:
+    public QObject,
+    public SystemContextAware
 {
     Q_OBJECT
 

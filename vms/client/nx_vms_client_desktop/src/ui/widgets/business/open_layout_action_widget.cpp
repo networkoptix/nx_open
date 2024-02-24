@@ -6,7 +6,6 @@
 #include <QtCore/QScopedValueRollback>
 
 #include <business/business_resource_validation.h>
-#include <common/common_module.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_access/resource_access_manager.h>
@@ -47,7 +46,7 @@ OpenLayoutActionWidget::OpenLayoutActionWidget(
 
     setSubjectsButton(ui->selectUsersButton);
 
-    m_validator = new QnLayoutAccessValidationPolicy{};
+    m_validator = new QnLayoutAccessValidationPolicy{systemContext};
     setValidationPolicy(m_validator); //< Takes ownership, so we use raw pointer here.
 
     connect(ui->rewindForWidget, &RewindForWidget::valueEdited, this,

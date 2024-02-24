@@ -22,11 +22,14 @@ class DefaultPasswordCamerasWatcher;
 class OtherServersManager;
 class LayoutSnapshotManager;
 class LdapStatusWatcher;
+class LocalFileCache;
 class LogsManagementWatcher;
 class NonEditableUsersAndGroups;
 class RemoteSession;
 class RestApiHelper;
 class ShowreelStateManager;
+class ServerImageCache;
+class ServerNotificationCache;
 class ServerRuntimeEventConnector;
 class SystemInternetAccessWatcher;
 class SystemHealthState;
@@ -103,6 +106,9 @@ public:
     DefaultPasswordCamerasWatcher* defaultPasswordCamerasWatcher() const;
     SystemHealthState* systemHealthState() const;
     TrafficRelayUrlWatcher* trafficRelayUrlWatcher() const;
+    LocalFileCache* localFileCache() const;
+    ServerImageCache* serverImageCache() const;
+    ServerNotificationCache* serverNotificationCache() const;
 
 protected:
     virtual void setMessageProcessor(QnCommonMessageProcessor* messageProcessor) override;

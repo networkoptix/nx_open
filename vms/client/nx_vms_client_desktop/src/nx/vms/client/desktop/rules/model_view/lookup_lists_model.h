@@ -8,7 +8,9 @@
 
 namespace nx::vms::client::desktop::rules {
 
-class LookupListsModel: public QAbstractListModel, public SystemContextAware
+class LookupListsModel:
+    public QAbstractListModel,
+    public SystemContextAware
 {
     Q_OBJECT
 

@@ -6,7 +6,6 @@
 #include <QtGui/QDesktopServices>
 
 #include <api/server_rest_connection.h>
-#include <common/common_module.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/core/skin/skin.h>

@@ -9,16 +9,17 @@
 #include <nx/vms/client/core/system_context_aware.h>
 #include <recording/time_period_list.h>
 
+Q_MOC_INCLUDE("core/resource/resource.h")
+
 namespace nx::vms::client::core {
 
 class NX_VMS_CLIENT_CORE_API ChunkProvider:
-    public AbstractTimePeriodStorage,
-    public SystemContextAware
+    public AbstractTimePeriodStorage
 {
     Q_OBJECT
     using base_type = AbstractTimePeriodStorage;
 
-    Q_PROPERTY(nx::Uuid resourceId READ resourceId WRITE setResourceId NOTIFY resourceIdChanged)
+    Q_PROPERTY(QnResource* resource READ rawResource WRITE setRawResource NOTIFY resourceChanged)
     Q_PROPERTY(qint64 bottomBound READ bottomBound NOTIFY bottomBoundChanged)
     Q_PROPERTY(bool loading READ isLoading NOTIFY loadingChanged)
     Q_PROPERTY(bool loadingMotion READ isLoadingMotion NOTIFY loadingMotionChanged)
@@ -26,9 +27,6 @@ class NX_VMS_CLIENT_CORE_API ChunkProvider:
 
 public:
     ChunkProvider(QObject* parent = nullptr);
-
-    nx::Uuid resourceId() const;
-    void setResourceId(const nx::Uuid& id);
 
     virtual const QnTimePeriodList& periods(Qn::TimePeriodContent type) const override;
     qint64 bottomBound() const;
@@ -47,13 +45,15 @@ public:
     static void registerQmlType();
 
 signals:
-    void resourceIdChanged();
+    void resourceChanged();
     void bottomBoundChanged();
     void loadingChanged();
     void loadingMotionChanged();
     void motionFilterChanged();
 
 private:
+    QnResource* rawResource() const;
+    void setRawResource(QnResource* value);
     void handleLoadingChanged(Qn::TimePeriodContent contentType);
 
 private:

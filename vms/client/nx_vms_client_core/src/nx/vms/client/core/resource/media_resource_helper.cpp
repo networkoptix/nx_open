@@ -2,13 +2,12 @@
 
 #include "media_resource_helper.h"
 
-#include <core/resource/camera_resource.h>
 #include <core/resource/camera_media_stream_info.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource_media_layout.h>
 #include <core/resource/resource_property_key.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/fusion/model_functions.h>
 #include <nx/vms/client/core/system_context.h>
 
 namespace nx::vms::client::core {
@@ -34,14 +33,8 @@ public:
     void handleResourceChanged();
 };
 
-MediaResourceHelper::MediaResourceHelper(SystemContext* systemContext, QObject* parent):
-    base_type(systemContext, parent),
-    d(new Private(this))
-{
-}
-
-MediaResourceHelper::MediaResourceHelper():
-    base_type(),
+MediaResourceHelper::MediaResourceHelper(QObject* parent):
+    base_type(parent),
     d(new Private(this))
 {
 }
@@ -153,7 +146,7 @@ MediaPlayer::VideoQuality MediaResourceHelper::streamQuality(
 MediaResourceHelper::Private::Private(MediaResourceHelper* q):
     q(q)
 {
-    connect(q, &ResourceHelper::resourceIdChanged, this, &Private::handleResourceChanged);
+    connect(q, &ResourceHelper::resourceChanged, this, &Private::handleResourceChanged);
 }
 
 void MediaResourceHelper::Private::handlePropertyChanged(
@@ -200,9 +193,9 @@ void MediaResourceHelper::Private::handleResourceChanged()
 {
     const auto currentResource = q->resource();
     const auto cameraResource = currentResource.dynamicCast<QnVirtualCameraResource>();
-    if (currentResource && !cameraResource)
+    if (currentResource && !NX_ASSERT(cameraResource))
     {
-        q->setResourceId(nx::Uuid()); //< We support only camera resources.
+        q->setResource({}); //< We support only camera resources.
         return;
     }
 

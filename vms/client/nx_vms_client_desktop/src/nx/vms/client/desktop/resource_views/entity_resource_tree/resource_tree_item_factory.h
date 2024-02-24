@@ -16,7 +16,9 @@ namespace entity_resource_tree {
 
 class RecorderItemDataHelper;
 
-class ResourceTreeItemFactory: public QObject, public SystemContextAware
+class ResourceTreeItemFactory:
+    public QObject,
+    public SystemContextAware
 {
     Q_OBJECT
     using base_type = QObject;

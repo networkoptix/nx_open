@@ -5,8 +5,6 @@
 
 #include <QtCore/QDateTime>
 
-#include <client_core/client_core_module.h>
-#include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/resource/server.h>

@@ -5,8 +5,8 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/scope_guard.h>
-#include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/core/access/access_controller.h>
+#include <nx/vms/client/core/system_context.h>
 
 namespace nx::vms::client::core {
 
@@ -44,10 +44,7 @@ struct BaseCameraButtonController::Private
 
 void BaseCameraButtonController::Private::setupCamera()
 {
-    const auto resourceId = q->resourceId();
-    const auto newCamera = resourceId.isNull()
-        ? QnVirtualCameraResourcePtr()
-        : q->systemContext()->resourcePool()->getResourceById<QnVirtualCameraResource>(resourceId);
+    const auto newCamera = q->resource().dynamicCast<QnVirtualCameraResource>();
 
     if (newCamera == camera)
         return;
@@ -57,7 +54,6 @@ void BaseCameraButtonController::Private::setupCamera()
     if (camera)
         camera.reset();
 
-    const auto previousCamera = camera;
     const bool hadRequiredPermissions = hasRequiredPermissions;
 
     camera = newCamera;
@@ -92,8 +88,6 @@ void BaseCameraButtonController::Private::setupCamera()
     hasRequiredPermissions = camera
         && ((accessController->permissions(camera) & requiredPermissions) == requiredPermissions);
 
-    emit q->cameraChanged(camera, previousCamera);
-
     if (hasRequiredPermissions != hadRequiredPermissions)
         emit q->hasRequiredPermissionsChanged();
 }
@@ -108,17 +102,13 @@ void BaseCameraButtonController::Private::cancelActiveActions()
 
 BaseCameraButtonController::BaseCameraButtonController(
     CameraButton::Group buttonGroup,
-    SystemContext* context,
     Qn::Permissions requiredPermissions,
     QObject* parent)
     :
-    base_type(context, parent),
+    base_type(parent),
     d(new Private{.q = this, .buttonGroup = buttonGroup,
         .requiredPermissions = requiredPermissions })
 {
-    connect(this, &AbstractCameraButtonController::resourceIdChanged, this,
-        [this]() { d->setupCamera(); });
-
     connect(this, &AbstractCameraButtonController::buttonChanged, this,
         [this](const CameraButton& button, CameraButton::Fields fields)
         {
@@ -131,6 +121,12 @@ BaseCameraButtonController::BaseCameraButtonController(
 BaseCameraButtonController::~BaseCameraButtonController()
 {
     d->cancelActiveActions();
+}
+
+void BaseCameraButtonController::setResourceInternal(const QnResourcePtr& resource)
+{
+    base_type::setResourceInternal(resource);
+    d->setupCamera();
 }
 
 CameraButtons BaseCameraButtonController::buttons() const

@@ -11,7 +11,6 @@
 #include <camera/fps_calculator.h>
 #include <client/client_module.h>
 #include <client_core/client_core_module.h>
-#include <common/common_module.h>
 #include <core/resource/camera_media_stream_info.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/client_camera.h>

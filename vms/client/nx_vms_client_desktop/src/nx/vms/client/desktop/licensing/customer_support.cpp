@@ -4,7 +4,6 @@
 
 #include <set>
 
-#include <common/common_module.h>
 #include <licensing/license.h>
 #include <nx/branding.h>
 #include <nx/utils/log/assert.h>

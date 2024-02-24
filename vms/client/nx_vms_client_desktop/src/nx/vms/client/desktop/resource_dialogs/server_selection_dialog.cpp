@@ -7,7 +7,6 @@
 
 #include <QtWidgets/QHeaderView>
 
-#include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_access/resource_access_manager.h>
@@ -91,7 +90,9 @@ namespace nx::vms::client::desktop {
 
 using namespace nx::vms::client::desktop::entity_item_model;
 
-struct ServerSelectionDialog::Private: public QObject, public SystemContextAware
+struct ServerSelectionDialog::Private:
+    public QObject,
+    public SystemContextAware
 {
     Private(
         const ServerSelectionDialog* owner,

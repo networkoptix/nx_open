@@ -5,8 +5,6 @@
 #include <chrono>
 
 #include <api/server_rest_connection.h>
-#include <client/client_module.h>
-#include <common/common_module.h>
 #include <core/resource/client_storage_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/storage_resource.h>

@@ -2,15 +2,19 @@
 
 #include "business_types_comparator.h"
 
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/event/strings_helper.h>
 
 using namespace nx;
 using namespace vms::event;
 
-QnBusinessTypesComparator::QnBusinessTypesComparator(QObject* parent):
+QnBusinessTypesComparator::QnBusinessTypesComparator(
+    SystemContext* systemContext,
+    QObject* parent)
+    :
     base_type(parent)
 {
-    initLexOrdering();
+    initLexOrdering(systemContext);
 }
 
 bool QnBusinessTypesComparator::lexicographicalLessThan(EventType left, EventType right) const
@@ -23,9 +27,9 @@ bool QnBusinessTypesComparator::lexicographicalLessThan(ActionType left, ActionT
     return toLexActionType(left) < toLexActionType(right);
 }
 
-void QnBusinessTypesComparator::initLexOrdering()
+void QnBusinessTypesComparator::initLexOrdering(SystemContext* systemContext)
 {
-    StringsHelper helper(systemContext());
+    StringsHelper helper(systemContext);
 
     // event types to lex order
     int maxType = 0;

@@ -42,17 +42,6 @@ static constexpr int kTriggerButtonSize = 40;
 static constexpr int kTriggersMargin = 8;
 static constexpr int kScrollLineHeight = 8;
 
-nx::Uuid getCameraResourceId(QnMediaResourceWidget* widget)
-{
-    if (!NX_ASSERT(widget))
-        return {};
-
-    const auto camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
-    return camera
-        ? camera->toResource()->getId()
-        : nx::Uuid{};
-}
-
 QnScrollableItemsWidget* createContainer(QnMediaResourceWidget* mediaResourceWidget)
 {
     const auto hudOverlay = mediaResourceWidget->hudOverlay();
@@ -133,32 +122,27 @@ QString getToolTip(const CameraButton& data)
     }
 };
 
-AggregatedControllerPtr createController(const nx::Uuid& cameraResourceId,
-    QnMediaResourceWidget* mediaResourceWidget)
+AggregatedControllerPtr createController()
 {
-    if (cameraResourceId.isNull())
-        return {};
-
-    const auto context = mediaResourceWidget->systemContext();
-    auto result = std::make_unique<core::AggregatedCameraButtonController>(context);
+    auto result = std::make_unique<core::AggregatedCameraButtonController>();
 
     using IntercomButtonMode = core::TwoWayAudioCameraButtonController::IntercomButtonMode;
     result->addController<core::TwoWayAudioCameraButtonController>(
-        ButtonGroup::twoWayAudio, context, IntercomButtonMode::checkable);
+        ButtonGroup::twoWayAudio, IntercomButtonMode::checkable);
 
     using HintStyle = core::SoftwareTriggerCameraButtonController::HintStyle;
     result->addController<core::SoftwareTriggerCameraButtonController>(
-        ButtonGroup::softwareTriggers, context, HintStyle::desktop);
+        ButtonGroup::softwareTriggers, HintStyle::desktop);
 
     const auto commonOutputs =
         api::ExtendedCameraOutputs(api::ExtendedCameraOutput::heater)
         | api::ExtendedCameraOutput::wiper
         | api::ExtendedCameraOutput::powerRelay;
     result->addController<core::ExtendedOutputCameraButtonController>(
-        ButtonGroup::extendedOutputs, context, commonOutputs);
+        ButtonGroup::extendedOutputs, commonOutputs);
 
     result->addController<core::ExtendedOutputCameraButtonController>(
-        ButtonGroup::objectTracking, context, api::ExtendedCameraOutput::autoTracking);
+        ButtonGroup::objectTracking, api::ExtendedCameraOutput::autoTracking);
 
     return result;
 }
@@ -175,7 +159,6 @@ struct CameraButtonManager::Private: public QObject
 
     Private(
         CameraButtonManager* q,
-        const nx::Uuid& cameraResourceId,
         QnMediaResourceWidget* mediaResourceWidget);
 
     void addObjectTrackingButton(const CameraButton& data);
@@ -196,22 +179,14 @@ struct CameraButtonManager::Private: public QObject
 
 CameraButtonManager::Private::Private(
     CameraButtonManager* q,
-    const nx::Uuid& cameraResourceId,
     QnMediaResourceWidget* mediaResourceWidget)
     :
     q(q),
     mediaResourceWidget(mediaResourceWidget),
-    controller(createController(cameraResourceId, mediaResourceWidget)),
-    container(cameraResourceId.isNull()
-        ? nullptr
-        : createContainer(mediaResourceWidget)),
-    objectTrackingContainer(cameraResourceId.isNull()
-        ? nullptr
-        : createObjectTrackingContainer(mediaResourceWidget))
+    controller(createController()),
+    container(createContainer(mediaResourceWidget)),
+    objectTrackingContainer(createObjectTrackingContainer(mediaResourceWidget))
 {
-    if (cameraResourceId.isNull())
-        return;
-
     connect(controller.get(), &core::AbstractCameraButtonController::buttonAdded,
         this, &Private::handleButtonAdded);
     connect(controller.get(), &core::AbstractCameraButtonController::buttonChanged,
@@ -226,7 +201,7 @@ CameraButtonManager::Private::Private(
     connect(controller.get(), &core::AbstractCameraButtonController::actionCancelled,
         this, &Private::handleActionCancelled);
 
-    controller->setResourceId(cameraResourceId);
+    controller->setResource(mediaResourceWidget->resource()->toResourcePtr());
 }
 
 void CameraButtonManager::Private::addObjectTrackingButton(const CameraButton& data)
@@ -440,8 +415,10 @@ CameraButtonManager::CameraButtonManager(
     :
     base_type(parent),
     WindowContextAware(mediaResourceWidget),
-    d(new Private(this, getCameraResourceId(mediaResourceWidget), mediaResourceWidget))
+    d(new Private(this, mediaResourceWidget))
 {
+    NX_ASSERT(mediaResourceWidget->resource().dynamicCast<QnVirtualCameraResource>(),
+        "Manager must not be created for non-camera resources");
 }
 
 CameraButtonManager::~CameraButtonManager()

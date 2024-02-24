@@ -7,7 +7,8 @@
 #include <core/resource/resource.h>
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/uuid.h>
-#include <nx/vms/client/core/system_context_aware.h>
+
+Q_MOC_INCLUDE("core/resource/resource.h")
 
 namespace nx::vms::client::core {
 
@@ -15,12 +16,9 @@ namespace nx::vms::client::core {
  * A QML helper that allows to check current user's essential permissions towards a specified
  * resource, and signals when those permissions change.
  */
-class AccessHelper:
-    public QObject,
-    public SystemContextAware
+class AccessHelper: public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(nx::Uuid resourceId READ resourceId WRITE setResourceId NOTIFY resourceChanged)
     Q_PROPERTY(QnResource* resource READ rawResource WRITE setRawResource NOTIFY resourceChanged)
     Q_PROPERTY(bool canViewContent READ canViewContent NOTIFY permissionsChanged)
     Q_PROPERTY(bool canViewLive READ canViewLive NOTIFY permissionsChanged)
@@ -35,18 +33,11 @@ class AccessHelper:
     Q_PROPERTY(bool passwordRequired READ passwordRequired NOTIFY permissionsChanged)
 
 public:
-    explicit AccessHelper(SystemContext* context, QObject* parent = nullptr);
-    explicit AccessHelper(); //< Constructor for QML.
+    explicit AccessHelper(QObject* parent = nullptr);
     virtual ~AccessHelper() override;
-
-    nx::Uuid resourceId() const;
-    void setResourceId(const nx::Uuid& value);
 
     QnResourcePtr resource() const;
     void setResource(const QnResourcePtr& value);
-
-    QnResource* rawResource() const;
-    void setRawResource(QnResource* value);
 
     bool canViewContent() const;
     bool canViewLive() const;
@@ -61,6 +52,10 @@ public:
     bool passwordRequired() const;
 
     static void registerQmlType();
+
+private:
+    QnResource* rawResource() const;
+    void setRawResource(QnResource* value);
 
 signals:
     void resourceChanged();

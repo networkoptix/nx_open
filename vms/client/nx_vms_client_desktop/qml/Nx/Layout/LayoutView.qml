@@ -16,7 +16,7 @@ import "Items"
 
 Control
 {
-    id: layoutView
+    id: control
 
     property var layout: null
     property var zoomedItem: null
@@ -26,7 +26,7 @@ Control
     LayoutModel
     {
         id: layoutModel
-        layoutId: layout ? layout.id : NxGlobals.uuid("")
+        layout: control.layout
     }
 
     contentItem: InteractiveGrid
@@ -79,7 +79,7 @@ Control
     }
 
     readonly property var resources:
-        { "containsResource": resource => resource && !!layoutView.getItem(resource) }
+        { "containsResource": resource => resource && !!control.getItem(resource) }
 
     function getItem(resource)
     {

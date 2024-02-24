@@ -24,9 +24,7 @@
 #include <client/client_globals.h>
 #include <client/client_module.h>
 #include <client/client_runtime_settings.h>
-#include <client_core/client_core_module.h>
 #include <common/common_globals.h>
-#include <common/common_module.h>
 #include <core/ptz/activity_ptz_controller.h>
 #include <core/ptz/fallback_ptz_controller.h>
 #include <core/ptz/fisheye_home_ptz_controller.h>
@@ -313,7 +311,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(
     :
     base_type(systemContext, windowContext, item, parent),
     d(new MediaResourceWidgetPrivate(base_type::resource())),
-    m_recordingStatusHelper(new RecordingStatusHelper(systemContext, this)),
+    m_recordingStatusHelper(new RecordingStatusHelper(this)),
     m_posUtcMs(DATETIME_INVALID),
     m_watermarkPainter(new WatermarkPainter),
     m_itemId(item->uuid()),

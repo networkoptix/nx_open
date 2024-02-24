@@ -16,6 +16,7 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/state/shared_memory_manager.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/connection_diagnostics_helper.h>
 
@@ -46,7 +47,7 @@ CloudActionsHandler::CloudActionsHandler(QObject* parent):
         openUrl(urlHelper.mainUrl()));
 
     connect(action(menu::OpenCloudViewSystemUrl), &QAction::triggered, this,
-        openUrl(urlHelper.viewSystemUrl()));
+        openUrl(urlHelper.viewSystemUrl(system())));
 
     connect(action(menu::OpenCloudManagementUrl), &QAction::triggered, this,
         openUrl(urlHelper.accountManagementUrl()));

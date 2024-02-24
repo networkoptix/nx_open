@@ -15,7 +15,9 @@ class CertificateVerifier;
  * Caches server certificates as soon as server is added to the resources pool.
  * Watches for their changes and updates cached information if needed.
  */
-class ServerCertificateWatcher: public QObject, public SystemContextAware
+class ServerCertificateWatcher:
+    public QObject,
+    public SystemContextAware
 {
     using base_type = QObject;
 

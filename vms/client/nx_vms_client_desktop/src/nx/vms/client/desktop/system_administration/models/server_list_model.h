@@ -14,7 +14,9 @@ namespace nx::vms::client::desktop {
  * A model for displaying a list of servers in the system for preffered LDAP sync server selection.
  * The first row of the model is a special value "Auto" with null server id.
  */
-class ServerListModel: public QAbstractListModel, public SystemContextAware
+class ServerListModel:
+    public QAbstractListModel,
+    public SystemContextAware
 {
     Q_OBJECT
     QML_ELEMENT

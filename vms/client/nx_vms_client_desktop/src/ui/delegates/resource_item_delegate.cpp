@@ -9,7 +9,6 @@
 
 #include <client/client_meta_types.h>
 #include <common/common_globals.h>
-#include <common/common_module.h>
 #include <core/resource/camera_history.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/network_resource.h>

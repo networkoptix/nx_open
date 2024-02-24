@@ -9,7 +9,6 @@
 #include <client/client_module.h>
 #include <client/client_runtime_settings.h>
 #include <client_core/client_core_module.h>
-#include <common/common_module.h>
 #include <core/ptz/abstract_ptz_controller.h>
 #include <core/ptz/ptz_controller_pool.h>
 #include <core/resource/camera_bookmark.h>

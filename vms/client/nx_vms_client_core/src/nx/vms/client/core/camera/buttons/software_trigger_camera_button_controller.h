@@ -8,8 +8,6 @@
 
 namespace nx::vms::client::core {
 
-class SystemContext;
-
 /** Software triggers button controller. */
 class NX_VMS_CLIENT_CORE_API SoftwareTriggerCameraButtonController:
     public BaseCameraButtonController
@@ -27,9 +25,11 @@ public:
     SoftwareTriggerCameraButtonController(
         HintStyle hintStyle,
         CameraButton::Group buttonGroup,
-        SystemContext* context,
         QObject* parent = nullptr);
     virtual ~SoftwareTriggerCameraButtonController() override;
+
+protected:
+    virtual void setResourceInternal(const QnResourcePtr& resource) override;
 
 private:
     virtual bool setButtonActionState(const CameraButton& button, ActionState state) override;

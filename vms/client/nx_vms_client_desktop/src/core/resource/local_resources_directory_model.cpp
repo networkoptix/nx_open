@@ -6,7 +6,6 @@
 #include <QtCore/QSet>
 
 #include <client_core/client_core_module.h>
-#include <common/common_module.h>
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/avi/filetypesupport.h>
 #include <core/resource/file_layout_resource.h>

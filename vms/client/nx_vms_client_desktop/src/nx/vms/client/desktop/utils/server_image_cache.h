@@ -15,7 +15,7 @@ class ServerImageCache: public ServerFileCache
 
     typedef ServerFileCache base_type;
 public:
-    explicit ServerImageCache(QObject *parent = 0);
+    explicit ServerImageCache(SystemContext* systemContext, QObject* parent = nullptr);
     virtual ~ServerImageCache();
 
     QSize getMaxImageSize() const;

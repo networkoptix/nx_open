@@ -4,7 +4,6 @@
 
 #include <api/helpers/camera_id_helper.h>
 #include <common/common_globals.h>
-#include <common/common_module.h>
 #include <nx/analytics/taxonomy/abstract_state_watcher.h>
 #include <nx/analytics/taxonomy/helpers.h>
 #include <nx/fusion/model_functions.h>

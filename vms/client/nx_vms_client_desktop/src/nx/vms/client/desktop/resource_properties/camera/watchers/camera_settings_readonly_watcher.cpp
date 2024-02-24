@@ -4,7 +4,6 @@
 
 #include <QtCore/QPointer>
 
-#include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>

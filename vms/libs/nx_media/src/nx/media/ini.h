@@ -11,7 +11,6 @@ struct NX_MEDIA_API Ini: public nx::kit::IniConfig
 {
     Ini(): IniConfig("nx_media.ini") { reload(); }
 
-    NX_INI_STRING("", substitutePlayerUrl, "Use this Url for video, e.g. file:///c:/test.MP4");
     NX_INI_FLAG(0, outputFrameDelays, "Log if frame delay is negative.");
     NX_INI_FLAG(0, enableFpsPresentNextFrame, "Measure FPS at presentNextFrame() start.");
     NX_INI_INT(-1, hwVideoX, "If not -1, override hardware video window X.");

@@ -3,6 +3,7 @@
 import QtQuick
 
 import Nx
+import Nx.Common
 import Nx.Core
 import Nx.Items
 
@@ -16,7 +17,7 @@ Item
     property int delayMs: LocalSettings.iniConfigValue("intervalPreviewDelayMs")
     property int loopDelayMs: LocalSettings.iniConfigValue("intervalPreviewLoopDelayMs")
     property bool active: false
-    property var resourceId: NxGlobals.uuid("")
+    property Resource resource: null
 
     property real timestampMs: -1
     property real durationMs: LocalSettings.iniConfigValue("intervalPreviewDurationMs")
@@ -83,7 +84,7 @@ Item
             {
                 id: cameraDisplay
 
-                cameraResourceId: preview.resourceId
+                cameraResource: preview.resource
                 forcedAspectRatio: preview.aspectRatio
                 videoQuality: MediaPlayer.LowVideoQuality
                 audioEnabled: preview.audioEnabled
@@ -95,7 +96,7 @@ Item
 
                 videoOverlayComponent: SecurityOverlay
                 {
-                    resourceId: preview.resourceId
+                    resource: preview.resource
                     mode: SecurityOverlay.Archive
                 }
 
@@ -170,7 +171,7 @@ Item
 
         readonly property bool effectivelyActive: preview.visible
             && preview.active
-            && !preview.resourceId.isNull()
+            && preview.resource
             && preview.startTimeMs >= 0
             && preview.durationMs > 0
 
@@ -203,7 +204,7 @@ Item
             loader.startPlaying()
     }
 
-    onResourceIdChanged:
+    onResourceChanged:
     {
         loader.previewState = RightPanel.PreviewState.initial
         preview.play()

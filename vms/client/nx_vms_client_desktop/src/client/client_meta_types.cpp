@@ -10,8 +10,8 @@
 #include <client/client_globals.h>
 #include <client_core/client_core_module.h>
 #include <common/common_meta_types.h>
-#include <common/common_module.h>
 #include <core/resource/camera_bookmark.h>
+#include <core/resource/client_camera.h>
 #include <core/resource/file_processor.h>
 #include <core/resource/resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -234,6 +234,7 @@ void QnClientMetaTypes::initialize()
 
     qRegisterMetaType<RecordScheduleCellData>();
     qRegisterMetaType<nx::vms::client::desktop::RecordScheduleCellData>();
+    qRegisterMetaType<QnClientCameraResource>();
 
     registerQmlTypes();
 }

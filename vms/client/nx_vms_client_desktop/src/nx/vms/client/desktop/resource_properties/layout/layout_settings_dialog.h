@@ -3,7 +3,6 @@
 #pragma once
 
 #include <core/resource/resource_fwd.h>
-#include <nx/vms/client/core/common/utils/common_module_aware.h>
 #include <nx/vms/client/desktop/common/dialogs/generic_tabbed_dialog.h>
 
 namespace Ui { class LayoutSettingsDialog; }
@@ -12,9 +11,7 @@ namespace nx::vms::client::desktop {
 
 struct LayoutSettingsDialogState;
 
-class LayoutSettingsDialog:
-    public GenericTabbedDialog,
-    public nx::vms::client::core::CommonModuleAware
+class LayoutSettingsDialog: public GenericTabbedDialog
 {
     Q_OBJECT
     using base_type = GenericTabbedDialog;

@@ -9,7 +9,7 @@ import nx.vms.client.desktop
 
 Item
 {
-    property alias cameraId: statusHelper.cameraId
+    property alias resource: statusHelper.resource
 
     implicitWidth: image.implicitWidth
     implicitHeight: image.implicitHeight

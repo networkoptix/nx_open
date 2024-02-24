@@ -4,7 +4,6 @@
 
 #include <QtGui/QAction>
 
-#include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/desktop/manual_device_addition/dialog/device_addition_dialog.h>

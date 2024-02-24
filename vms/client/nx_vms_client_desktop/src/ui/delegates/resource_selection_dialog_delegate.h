@@ -7,15 +7,17 @@
 
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/uuid.h>
-#include <nx/vms/client/core/common/utils/common_module_aware.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
 
 class QnResourceSelectionDialogDelegate:
     public QObject,
-    public nx::vms::client::core::CommonModuleAware
+    public nx::vms::client::desktop::SystemContextAware
 {
     Q_OBJECT
 public:
-    explicit QnResourceSelectionDialogDelegate(QObject* parent = nullptr);
+    explicit QnResourceSelectionDialogDelegate(
+        nx::vms::client::desktop::SystemContext* systemContext,
+        QObject* parent = nullptr);
     ~QnResourceSelectionDialogDelegate();
 
     /**

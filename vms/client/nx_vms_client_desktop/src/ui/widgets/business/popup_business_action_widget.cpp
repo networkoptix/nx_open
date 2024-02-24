@@ -127,6 +127,7 @@ void QnPopupBusinessActionWidget::updateValidationPolicy()
     if (forceAcknowledgement)
     {
         auto validationPolicy = new QnRequiredAccessRightPolicy(
+            systemContext(),
             nx::vms::api::AccessRight::manageBookmarks);
         validationPolicy->setCameras(
             resourcePool()->getResourcesByIds<QnVirtualCameraResource>(model()->eventResources()));
@@ -134,6 +135,6 @@ void QnPopupBusinessActionWidget::updateValidationPolicy()
     }
     else
     {
-        setValidationPolicy(new QnDefaultSubjectValidationPolicy());
+        setValidationPolicy(new QnDefaultSubjectValidationPolicy(systemContext()));
     }
 }

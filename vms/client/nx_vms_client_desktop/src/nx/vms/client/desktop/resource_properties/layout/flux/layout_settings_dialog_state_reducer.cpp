@@ -6,16 +6,13 @@
 
 #include <QtCore/QtMath>
 
-#include <core/resource_management/resource_pool.h>
 #include <core/resource/layout_resource.h>
-
-#include <ui/common/image_processing.h>
-
-#include <utils/common/aspect_ratio.h>
-
+#include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/optional.h>
+#include <ui/common/image_processing.h>
+#include <utils/common/aspect_ratio.h>
 
 namespace nx::vms::client::desktop {
 
@@ -237,7 +234,6 @@ State LayoutSettingsDialogStateReducer::loadLayout(State state, const QnLayoutRe
     trace(state, "loadLayout");
     state.locked = layout->locked();
     state.logicalId = layout->logicalId();
-    state.isLocalFile = layout->isFile();
     state.isCrossSystem = layout->hasFlags(Qn::cross_system);
 
     state.fixedSize = layout->fixedSize();

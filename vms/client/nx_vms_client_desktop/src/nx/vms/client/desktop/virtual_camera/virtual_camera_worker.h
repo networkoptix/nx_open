@@ -6,8 +6,7 @@
 #include <QtCore/QScopedPointer>
 
 #include <core/resource/resource_fwd.h>
-#include <nx/vms/client/core/common/utils/common_module_aware.h>
-#include <nx/vms/client/core/network/remote_connection_aware.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
 
 #include "virtual_camera_fwd.h"
 #include "virtual_camera_state.h"
@@ -20,8 +19,7 @@ struct UploadState;
 
 class VirtualCameraWorker:
     public QObject,
-    public core::CommonModuleAware,
-    public core::RemoteConnectionAware
+    public SystemContextAware
 {
     Q_OBJECT
     using base_type = QObject;

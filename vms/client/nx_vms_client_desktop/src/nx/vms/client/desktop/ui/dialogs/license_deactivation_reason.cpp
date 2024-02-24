@@ -6,7 +6,6 @@
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QVBoxLayout>
 
-#include <common/common_module.h>
 #include <core/resource/user_resource.h>
 #include <licensing/license.h>
 #include <nx/vms/api/data/system_settings.h>

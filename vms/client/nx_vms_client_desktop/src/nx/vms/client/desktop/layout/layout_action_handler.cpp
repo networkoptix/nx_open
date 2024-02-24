@@ -6,7 +6,6 @@
 
 #include <client/client_globals.h>
 #include <client/client_message_processor.h>
-#include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/file_layout_resource.h>
 #include <core/resource/layout_reader.h>

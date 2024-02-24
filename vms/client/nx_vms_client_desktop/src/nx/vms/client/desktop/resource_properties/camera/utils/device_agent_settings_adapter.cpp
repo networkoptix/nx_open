@@ -3,7 +3,6 @@
 #include "device_agent_settings_adapter.h"
 
 #include <client/client_module.h>
-#include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/log.h>

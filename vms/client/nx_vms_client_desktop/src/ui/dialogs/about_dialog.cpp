@@ -15,13 +15,12 @@
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QSpacerItem>
 
-#if QT_VERSION >= QT_VERSION_CHECK(6,6,0)
+#if QT_VERSION >= QT_VERSION_CHECK(6, 6, 0)
     #include <rhi/qrhi.h>
 #else
     #include <QtGui/private/qrhi_p.h>
 #endif
 
-#include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource_display_info.h>
 #include <core/resource/resource_type.h>

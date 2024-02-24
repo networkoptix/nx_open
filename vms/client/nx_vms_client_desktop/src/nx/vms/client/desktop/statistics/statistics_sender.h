@@ -13,7 +13,9 @@ namespace nx::vms::client::desktop {
  * As soon as corresponding System Context loaded system settings, checks if statistics can be sent
  * and sends it if allowed.
  */
-class StatisticsSender: public QObject, public SystemContextAware
+class StatisticsSender:
+    public QObject,
+    public SystemContextAware
 {
     Q_OBJECT
 

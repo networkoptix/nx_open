@@ -8,11 +8,13 @@
 #include <QtCore/QEvent>
 #include <QtCore/QUrlQuery>
 #include <QtQml/QQmlContext>
+#include <QtQml/QQmlEngine>
 #include <QtQuick/QQuickItem>
 #include <QtQuickWidgets/QQuickWidget>
 #include <QtWidgets/QApplication>
 
 #include <client_core/client_core_module.h>
+#include <core/resource/avi/avi_resource.h>
 #include <network/system_helpers.h>
 #include <nx/build_info.h>
 #include <nx/utils/guarded_callback.h>
@@ -86,6 +88,7 @@ struct LoginDialog::Private
 {
     RemoteConnectionFactory::ProcessPtr connectionProcess;
     std::shared_ptr<QnStatisticsScenarioGuard> scenarioGuard;
+    QnResourcePtr introResource;
 
     void resetConnectionProcess(bool async)
     {
@@ -190,17 +193,21 @@ void LoginDialog::setupIntroView()
     }
     else
     {
+        d->introResource.reset(new QnAviResource(QString("file:///") + introPath));
+        d->introResource->setStatus(nx::vms::api::ResourceStatus::online);
+        QQmlEngine::setObjectOwnership(d->introResource.get(), QQmlEngine::CppOwnership);
+
         const auto introWidget = new QQuickWidget(appContext()->qmlEngine(), this);
 
         connect(introWidget, &QQuickWidget::statusChanged, this,
-            [introWidget, introPath](QQuickWidget::Status status)
+            [this, introWidget](QQuickWidget::Status status)
             {
                 if (status != QQuickWidget::Ready)
                     return;
 
                 introWidget->rootObject()->setProperty(
-                    "introPath",
-                    QString("file:///") + introPath);
+                    "introResource",
+                    QVariant::fromValue(d->introResource.get()));
             });
 
         layout->addWidget(new IntroContainer(introWidget));

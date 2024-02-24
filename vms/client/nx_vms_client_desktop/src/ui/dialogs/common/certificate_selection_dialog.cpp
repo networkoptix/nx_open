@@ -10,6 +10,7 @@
 #include <QtWidgets/QPushButton>
 
 #include <nx/branding.h>
+#include <nx/utils/log/assert.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 

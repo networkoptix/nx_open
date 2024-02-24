@@ -6,8 +6,7 @@
 
 #include <QtCore/QObject>
 
-#include <core/resource/resource_fwd.h>
-#include <nx/vms/client/core/common/utils/common_module_aware.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
 
 namespace nx::vms::client::desktop {
 
@@ -15,13 +14,15 @@ class TimeSynchronizationWidgetStore;
 
 class TimeSynchronizationServerTimeWatcher:
     public QObject,
-    public core::CommonModuleAware
+    public SystemContextAware
 {
     Q_OBJECT
     using base_type = QObject;
 
 public:
-    explicit TimeSynchronizationServerTimeWatcher(TimeSynchronizationWidgetStore* store,
+    explicit TimeSynchronizationServerTimeWatcher(
+        SystemContext* systemContext,
+        TimeSynchronizationWidgetStore* store,
         QObject* parent = nullptr);
     virtual ~TimeSynchronizationServerTimeWatcher() override;
 

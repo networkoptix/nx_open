@@ -6,8 +6,6 @@
 #include <QtCore/QStandardPaths>
 
 #include <client/client_installations_manager.h>
-#include <client_core/client_core_module.h>
-#include <common/common_module.h>
 #include <core/resource/videowall_resource.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/log/log_main.h>
@@ -112,7 +110,6 @@ void VideoWallShortcutHelper::setVideoWallAutorunEnabled(
 {
     NX_ASSERT(!value || serverUrl.isValid(), "Url must be filled when enabling the autorun");
 
-    const auto commonModule = qnClientCoreModule->commonModule();
     const QString key = qApp->applicationName() + ' ' + videowallUuid.toString();
 
     const QString path = toWindowsRegistryFormat(binaryPath());

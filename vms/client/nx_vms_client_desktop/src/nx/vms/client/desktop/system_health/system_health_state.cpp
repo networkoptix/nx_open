@@ -10,8 +10,6 @@
 
 #include <api/runtime_info_manager.h>
 #include <client/client_message_processor.h>
-#include <client_core/client_core_module.h>
-#include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/storage_resource.h>

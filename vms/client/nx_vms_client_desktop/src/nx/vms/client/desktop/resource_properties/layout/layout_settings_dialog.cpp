@@ -5,10 +5,10 @@
 
 #include <QtWidgets/QPushButton>
 
-#include <common/common_module.h>
 #include <core/resource/layout_resource.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
 
 #include "flux/layout_settings_dialog_state.h"
@@ -99,6 +99,7 @@ bool LayoutSettingsDialog::setLayout(const QnLayoutResourcePtr& layout)
             d->store.data(),
             layout,
             this);
+        d->backgroundTab->initCache(SystemContext::fromResource(layout), layout->isFile());
     }
 
     d->resetChanges();

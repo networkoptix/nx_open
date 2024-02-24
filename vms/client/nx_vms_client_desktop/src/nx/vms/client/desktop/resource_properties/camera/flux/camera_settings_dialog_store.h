@@ -186,7 +186,7 @@ public:
     void generateLogicalId();
     void resetExpertSettings();
 
-    Q_INVOKABLE nx::Uuid resourceId() const;
+    Q_INVOKABLE QnResource* resource() const;
     Q_INVOKABLE QVariantList analyticsEngines() const;
     void setAnalyticsEngines(const QList<AnalyticsEngineInfo>& value);
     Q_INVOKABLE QVariantList userEnabledAnalyticsEngines() const;

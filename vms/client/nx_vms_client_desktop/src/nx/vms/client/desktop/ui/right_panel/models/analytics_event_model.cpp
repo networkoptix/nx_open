@@ -2,7 +2,6 @@
 
 #include "analytics_event_model.h"
 
-#include <common/common_module.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/pending_operation.h>
 #include <nx/utils/trace/trace.h>

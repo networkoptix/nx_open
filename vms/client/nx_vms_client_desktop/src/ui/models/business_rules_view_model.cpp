@@ -4,6 +4,7 @@
 
 #include <client/client_globals.h>
 #include <nx/utils/math/math.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/utils/server_notification_cache.h>
 #include <nx/vms/event/rule.h>
 #include <ui/models/notification_sound_model.h>
@@ -25,7 +26,7 @@ QnBusinessRulesViewModel::QnBusinessRulesViewModel(QObject *parent) :
     m_fieldsByColumn[Column::target] =
         Field::actionType | Field::actionParams | Field::actionResources;
 
-    QnNotificationSoundModel* soundModel = context()->instance<ServerNotificationCache>()->persistentGuiModel();
+    QnNotificationSoundModel* soundModel = system()->serverNotificationCache()->persistentGuiModel();
     connect(soundModel, SIGNAL(listLoaded()), this, SLOT(at_soundModel_listChanged()));
     connect(soundModel, SIGNAL(listUnloaded()), this, SLOT(at_soundModel_listChanged()));
     connect(soundModel, SIGNAL(itemChanged(QString)), this, SLOT(at_soundModel_itemChanged(QString)));

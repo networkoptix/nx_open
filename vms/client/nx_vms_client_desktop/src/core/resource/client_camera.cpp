@@ -2,7 +2,6 @@
 
 #include "client_camera.h"
 
-#include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/streaming/archive_stream_reader.h>
 #include <nx/streaming/rtsp_client_archive_delegate.h>

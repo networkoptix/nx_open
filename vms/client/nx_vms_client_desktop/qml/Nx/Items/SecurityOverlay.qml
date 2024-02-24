@@ -15,7 +15,6 @@ Rectangle
     property int mode: SecurityOverlay.Live
 
     property alias resource: accessHelper.resource
-    property alias resourceId: accessHelper.resourceId
 
     property alias font: textItem.font
     property alias textColor: textItem.color

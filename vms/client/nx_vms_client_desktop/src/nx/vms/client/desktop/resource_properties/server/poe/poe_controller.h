@@ -4,20 +4,18 @@
 
 #include <QtCore/QObject>
 
+#include <core/resource/resource_fwd.h>
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/data/network_block_data.h>
-#include <nx/vms/client/core/common/utils/common_module_aware.h>
 
 namespace nx::vms::client::desktop {
 
-class PoeController: public QObject, public nx::vms::client::core::CommonModuleAware
+class PoeController: public QObject
 {
     Q_OBJECT
     using base_type = QObject;
 
-    Q_PROPERTY(nx::Uuid resourceId READ resourceId WRITE setResourceId
-        NOTIFY resourceIdChanged)
     Q_PROPERTY(bool initialUpdateInProgress READ initialUpdateInProgress
         NOTIFY initialUpdateInProgressChanged)
     Q_PROPERTY(bool updatingPoweringModes READ updatingPoweringModes
@@ -26,8 +24,8 @@ public:
     PoeController(QObject* parent = nullptr);
     virtual ~PoeController();
 
-    void setResourceId(const nx::Uuid& value);
-    nx::Uuid resourceId() const;
+    void setServer(const QnMediaServerResourcePtr& value);
+    QnMediaServerResourcePtr server() const;
 
     void setAutoUpdate(bool value);
 
@@ -43,7 +41,6 @@ public:
     void cancelRequest();
 
 signals:
-    void resourceIdChanged();
     void updated();
     void updatingPoweringModesChanged();
     void initialUpdateInProgressChanged();

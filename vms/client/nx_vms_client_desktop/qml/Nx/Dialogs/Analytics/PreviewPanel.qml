@@ -53,12 +53,12 @@ Rectangle
 
     onSelectedItemChanged:
     {
-        intervalPreview.resourceId = NxGlobals.uuid("")
+        intervalPreview.resource = null
         intervalPreview.timestampMs = 0
 
         if (selectedItem)
         {
-            intervalPreview.resourceId = selectedItem.previewResourceId
+            intervalPreview.resource = selectedItem.previewResource
             intervalPreview.timestampMs = selectedItem.previewTimestampMs
             intervalPreview.aspectRatio = selectedItem.previewAspectRatio
         }
@@ -154,7 +154,7 @@ Rectangle
                 }
             }
 
-            onResourceIdChanged:
+            onResourceChanged:
                 previewUnavailablePlaceholder.updateState()
 
             onPreviewStateChanged:

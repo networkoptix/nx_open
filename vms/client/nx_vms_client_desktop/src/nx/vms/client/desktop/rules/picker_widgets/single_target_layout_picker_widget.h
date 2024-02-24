@@ -2,12 +2,9 @@
 
 #pragma once
 
-#include <business/business_resource_validation.h>
 #include <nx/vms/rules/action_builder_fields/layout_field.h>
 
 #include "resource_picker_widget_base.h"
-
-class QnLayoutAccessValidationPolicy;
 
 namespace nx::vms::client::desktop::rules {
 
@@ -17,13 +14,12 @@ class SingleTargetLayoutPicker:
     Q_OBJECT
 
 public:
-    SingleTargetLayoutPicker(SystemContext* context, ParamsWidget* parent);
+    SingleTargetLayoutPicker(SystemContext* systemContext, ParamsWidget* parent);
 
     void updateUi() override;
     void onSelectButtonClicked() override;
 
 private:
-    QnLayoutAccessValidationPolicy m_policy;
     bool m_hasWarning{false};
 };
 

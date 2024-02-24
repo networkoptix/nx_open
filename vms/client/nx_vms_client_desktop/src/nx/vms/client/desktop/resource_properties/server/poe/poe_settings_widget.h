@@ -28,7 +28,7 @@ public:
     void setAutoUpdate(bool value);
 
 public:
-    void setServerId(const nx::Uuid& value);
+    void setServer(const QnMediaServerResourcePtr& value);
 
 private:
     struct Private;

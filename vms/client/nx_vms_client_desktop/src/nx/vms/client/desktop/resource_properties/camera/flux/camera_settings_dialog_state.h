@@ -13,6 +13,7 @@
 #include <core/resource/camera_advanced_param.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/motion_window.h>
+#include <core/resource/resource_fwd.h>
 #include <nx/core/resource/using_media2_type.h>
 #include <nx/reflect/enum_instrument.h>
 #include <nx/reflect/instrument.h>
@@ -46,6 +47,7 @@ namespace camera_settings_detail {
 struct SingleCameraProperties
 {
     nx::Uuid id;
+
     UserEditable<QString> name;
     QString firmware;
     QString model;

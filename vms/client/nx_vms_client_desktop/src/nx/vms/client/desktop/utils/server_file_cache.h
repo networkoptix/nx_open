@@ -5,19 +5,20 @@
 #include <QtCore/QHash>
 #include <QtCore/QObject>
 
-#include <nx/vms/client/core/common/utils/common_module_aware.h>
-#include <nx/vms/client/core/network/remote_connection_aware.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
 
 namespace nx::vms::client::desktop {
 
 class ServerFileCache:
     public QObject,
-    public nx::vms::client::core::CommonModuleAware,
-    public nx::vms::client::core::RemoteConnectionAware
+    public SystemContextAware
 {
     Q_OBJECT
 public:
-    explicit ServerFileCache(const QString &folderName, QObject *parent = 0);
+    explicit ServerFileCache(
+        SystemContext* systemContext,
+        const QString& folderName,
+        QObject* parent = nullptr);
     virtual ~ServerFileCache();
 
     /** Get full path to cached file with fixed filename */

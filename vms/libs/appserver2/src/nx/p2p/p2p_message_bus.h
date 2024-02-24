@@ -6,7 +6,6 @@
 
 #include <QtCore/QTimer>
 
-#include <common/common_module_aware.h>
 #include <nx/utils/elapsed_timer.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/uuid.h>

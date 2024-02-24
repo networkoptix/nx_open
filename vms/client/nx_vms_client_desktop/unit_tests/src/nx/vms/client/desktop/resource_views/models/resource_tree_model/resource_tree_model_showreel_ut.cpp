@@ -1,7 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include <client/client_globals.h>
-#include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/api/data/showreel_data.h>
 #include <nx/vms/client/desktop/help/help_topic.h>

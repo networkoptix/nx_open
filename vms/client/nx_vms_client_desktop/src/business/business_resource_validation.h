@@ -11,7 +11,6 @@
 #include <core/resource/resource_fwd.h>
 #include <core/resource/shared_resource_pointer.h>
 #include <nx/vms/api/types/access_rights_types.h>
-#include <nx/vms/client/core/common/utils/common_module_aware.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/system_context_aware.h>
 #include <nx/vms/event/event_fwd.h>
@@ -174,7 +173,9 @@ class QnSendEmailActionDelegate: public QnResourceSelectionDialogDelegate
 {
     Q_DECLARE_TR_FUNCTIONS(QnSendEmailActionDelegate)
 public:
-    QnSendEmailActionDelegate(QWidget* parent);
+    QnSendEmailActionDelegate(
+        nx::vms::client::desktop::SystemContext* systemContext,
+        QWidget* parent);
     ~QnSendEmailActionDelegate() {}
 
     void init(QWidget* parent) override;
@@ -194,10 +195,12 @@ private:
 };
 
 // User and role validation policy.
-class QnSubjectValidationPolicy: public nx::vms::client::core::CommonModuleAware
+class QnSubjectValidationPolicy: public nx::vms::client::desktop::SystemContextAware
 {
 public:
-    explicit QnSubjectValidationPolicy(bool allowEmptySelection = false);
+    explicit QnSubjectValidationPolicy(
+        nx::vms::client::desktop::SystemContext* systemContext,
+        bool allowEmptySelection = false);
     virtual ~QnSubjectValidationPolicy();
 
     virtual QValidator::State roleValidity(const nx::Uuid& roleId) const = 0;
@@ -225,7 +228,9 @@ class QnDefaultSubjectValidationPolicy: public QnSubjectValidationPolicy
     using base_type = QnSubjectValidationPolicy;
 
 public:
-    QnDefaultSubjectValidationPolicy(bool allowEmptySelection = false);
+    QnDefaultSubjectValidationPolicy(
+        nx::vms::client::desktop::SystemContext* systemContext,
+        bool allowEmptySelection = false);
 
     virtual QValidator::State roleValidity(const nx::Uuid& roleId) const override;
     virtual bool userValidity(const QnUserResourcePtr& user) const override;
@@ -239,6 +244,7 @@ class QnRequiredAccessRightPolicy: public QnSubjectValidationPolicy
 
 public:
     explicit QnRequiredAccessRightPolicy(
+        nx::vms::client::desktop::SystemContext* systemContext,
         nx::vms::api::AccessRight requiredAccessRight,
         bool allowEmptySelection = false);
 
@@ -264,6 +270,8 @@ class QnLayoutAccessValidationPolicy: public QnSubjectValidationPolicy
     using base_type = QnSubjectValidationPolicy;
 
 public:
+    using QnSubjectValidationPolicy::QnSubjectValidationPolicy;
+
     virtual QValidator::State roleValidity(const nx::Uuid& roleId) const override;
     virtual bool userValidity(const QnUserResourcePtr& user) const override;
 
@@ -279,6 +287,8 @@ class QnCloudUsersValidationPolicy: public QnSubjectValidationPolicy
     using base_type = QnSubjectValidationPolicy;
 
 public:
+    using QnSubjectValidationPolicy::QnSubjectValidationPolicy;
+
     virtual QValidator::State roleValidity(const nx::Uuid& roleId) const override;
     virtual bool userValidity(const QnUserResourcePtr& user) const override;
     virtual QString calculateAlert(bool allUsers, const QSet<nx::Uuid>& subjects) const override;
@@ -290,6 +300,8 @@ class QnUserWithEmailValidationPolicy: public QnSubjectValidationPolicy
     using base_type = QnSubjectValidationPolicy;
 
 public:
+    using QnSubjectValidationPolicy::QnSubjectValidationPolicy;
+
     virtual QValidator::State roleValidity(const nx::Uuid& roleId) const override;
     virtual bool userValidity(const QnUserResourcePtr& user) const override;
 };

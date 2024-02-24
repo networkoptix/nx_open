@@ -8,6 +8,8 @@
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/uuid.h>
 
+Q_MOC_INCLUDE("core/resource/layout_resource.h")
+
 namespace nx::vms::client::desktop {
 
 class LayoutModel: public QAbstractListModel
@@ -15,7 +17,7 @@ class LayoutModel: public QAbstractListModel
     using base_type = QAbstractListModel;
 
     Q_OBJECT
-    Q_PROPERTY(nx::Uuid layoutId READ layoutId WRITE setLayoutId NOTIFY layoutIdChanged)
+    Q_PROPERTY(QnLayoutResource* layout READ rawLayout WRITE setRawLayout NOTIFY layoutChanged)
     Q_PROPERTY(QRect gridBoundingRect READ gridBoundingRect NOTIFY gridBoundingRectChanged)
 
 public:
@@ -28,8 +30,8 @@ public:
     explicit LayoutModel(QObject* parent = nullptr);
     virtual ~LayoutModel() override;
 
-    nx::Uuid layoutId() const;
-    void setLayoutId(const nx::Uuid& id);
+    QnLayoutResource* rawLayout() const;
+    void setRawLayout(QnLayoutResource* value);
 
     QRect gridBoundingRect() const;
 
@@ -40,7 +42,7 @@ public:
     static void registerQmlType();
 
 signals:
-    void layoutIdChanged();
+    void layoutChanged();
     void gridBoundingRectChanged();
 
 private:

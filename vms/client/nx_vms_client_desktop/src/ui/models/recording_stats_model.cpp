@@ -82,8 +82,13 @@ const QnCamRecordingStatsData& QnCameraStatsData::getStatsForRow(int row) const
     return totals;
 }
 
-QnRecordingStatsModel::QnRecordingStatsModel(bool isForecastRole, QObject *parent):
+QnRecordingStatsModel::QnRecordingStatsModel(
+    SystemContext* systemContext,
+    bool isForecastRole,
+    QObject *parent)
+    :
     base_type(parent),
+    SystemContextAware(systemContext),
     m_isForecastRole(isForecastRole)
 {
 }

@@ -16,6 +16,7 @@
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/skin/svg_icon_colorer.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/user_management/predefined_user_groups.h>
 #include <nx/vms/common/user_management/user_group_manager.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
@@ -41,8 +42,9 @@ namespace subject_selection_dialog_private {
 //-------------------------------------------------------------------------------------------------
 // subject_selection_dialog_private::RoleListModel
 
-RoleListModel::RoleListModel(QObject* parent):
-    base_type(parent, StandardRoleFlag | UserRoleFlag)
+RoleListModel::RoleListModel(SystemContext* systemContext, QObject* parent):
+    base_type(parent, StandardRoleFlag | UserRoleFlag),
+    SystemContextAware(systemContext)
 {
     setHasCheckBoxes(true);
 }
@@ -105,7 +107,7 @@ QValidator::State RoleListModel::validateRole(const nx::Uuid& roleId) const
     if (m_roleValidator)
         return m_roleValidator(roleId);
 
-    const auto users = accessSubjectHierarchy()->usersInGroups({roleId});
+    const auto users = systemContext()->accessSubjectHierarchy()->usersInGroups({roleId});
     std::vector<QnResourceAccessSubject> subjects{users.cbegin(), users.cend()};
 
     return m_userValidator
@@ -155,7 +157,7 @@ QValidator::State RoleListModel::validateUsers(
 QSet<nx::Uuid> RoleListModel::checkedUsers() const
 {
     QSet<nx::Uuid> checkedUsers;
-    for (const auto& user: accessSubjectHierarchy()->usersInGroups(checkedRoles()))
+    for (const auto& user: systemContext()->accessSubjectHierarchy()->usersInGroups(checkedRoles()))
         checkedUsers.insert(user->getId());
 
     return checkedUsers;
@@ -182,11 +184,10 @@ UserListModel::UserListModel(
     RoleListModel* rolesModel, QObject* parent)
     :
     base_type(parent),
+    SystemContextAware(rolesModel->systemContext()),
     m_usersModel(new QnResourceListModel(this)),
     m_rolesModel(rolesModel)
 {
-    NX_ASSERT(rolesModel);
-
     connect(m_rolesModel, &QnUserRolesModel::modelReset,
         this, &UserListModel::updateIndicators);
 
@@ -377,8 +378,9 @@ void UserListModel::updateIndicators()
 //-------------------------------------------------------------------------------------------------
 // subject_selection_dialog_private::GroupListDelegate
 
-GroupListDelegate::GroupListDelegate(QObject* parent):
-    base_type(parent)
+GroupListDelegate::GroupListDelegate(SystemContext* systemContext, QObject* parent):
+    base_type(parent),
+    SystemContextAware(systemContext)
 {
     setOptions(HighlightChecked | ValidateOnlyChecked);
     setCheckBoxColumn(RoleListModel::CheckColumn);
@@ -422,7 +424,8 @@ void GroupListDelegate::getDisplayInfo(const QModelIndex& index,
     QString& baseName, QString& extInfo) const
 {
     const auto roleId = index.data(Qn::UuidRole).value<nx::Uuid>();
-    const int usersInRole = countEnabledUsers(accessSubjectHierarchy()->usersInGroups({roleId}));
+    const int usersInRole = countEnabledUsers(
+        systemContext()->accessSubjectHierarchy()->usersInGroups({roleId}));
     baseName = userGroupManager()->find(roleId).value_or(api::UserGroupData{}).name;
     extInfo = QString("%1 %2").arg(nx::UnicodeChars::kEnDash, tr("%n Users", "", usersInRole));
 }

@@ -6,7 +6,6 @@
 #include <QtGui/QDesktopServices>
 
 #include <api/server_rest_connection.h>
-#include <common/common_module.h>
 #include <core/resource/user_resource.h>
 #include <nx/branding.h>
 #include <nx/utils/guarded_callback.h>

@@ -17,13 +17,13 @@
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/image_providers/threaded_image_loader.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/utils/local_file_cache.h>
 #include <nx/vms/client/desktop/utils/server_image_cache.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/image_preview_dialog.h>
 #include <ui/widgets/common/framed_label.h>
 #include <ui/workaround/widgets_signals_workaround.h>
-#include <ui/workbench/workbench_context.h>
 #include <utils/common/delayed.h>
 
 #include "../flux/layout_settings_dialog_state.h"
@@ -190,11 +190,14 @@ void LayoutBackgroundSettingsWidget::setupUi()
     ui->imageLabel->setAutoScale(true);
 }
 
-void LayoutBackgroundSettingsWidget::initCache(bool isLocalFile)
+void LayoutBackgroundSettingsWidget::initCache(SystemContext* systemContext, bool isLocalFile)
 {
+    if (d->cache)
+        d->cache->disconnect(this);
+
     d->cache = isLocalFile
-        ? new LocalFileCache(this)
-        : new ServerImageCache(this);
+        ? systemContext->localFileCache()
+        : systemContext->serverImageCache();
 
     connect(
         d->cache,
@@ -217,10 +220,6 @@ void LayoutBackgroundSettingsWidget::initCache(bool isLocalFile)
 
 void LayoutBackgroundSettingsWidget::loadState(const LayoutSettingsDialogState& state)
 {
-    // Currently this dialog is not reusable.
-    if (!d->cache)
-        initCache(state.isLocalFile);
-
     const auto& background = state.background;
 
     if (state.background.canStartDownloading())

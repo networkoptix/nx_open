@@ -6,17 +6,19 @@
 
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/uuid.h>
-#include <nx/vms/client/core/common/utils/common_module_aware.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
 
 namespace nx::vms::client::desktop {
 
-class CurrentSystemServers: public QObject, public core::CommonModuleAware
+class CurrentSystemServers:
+    public QObject,
+    public SystemContextAware
 {
     Q_OBJECT
     using base_type = QObject;
 
 public:
-    CurrentSystemServers(QObject* parent = nullptr);
+    CurrentSystemServers(SystemContext* systemContext, QObject* parent = nullptr);
 
     QnMediaServerResourceList servers() const;
 
@@ -28,11 +30,8 @@ signals:
     void serversCountChanged();
 
 private:
-    void tryAddServer(const QnResourcePtr& resource);
-    void tryRemoveServer(const QnResourcePtr& resource);
-
-private:
-    QnMediaServerResourceList m_servers;
+    void tryAddServers(const QnResourceList& resources);
+    void tryRemoveServers(const QnResourceList& resources);
 };
 
 } // namespace nx::vms::client::desktop

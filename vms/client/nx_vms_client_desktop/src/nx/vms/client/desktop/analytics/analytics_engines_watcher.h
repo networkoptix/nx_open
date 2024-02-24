@@ -7,17 +7,20 @@
 
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/desktop/resource_properties/camera/data/analytics_engine_info.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
 
 namespace nx::vms::client::desktop {
 
-class AnalyticsEnginesWatcher: public QObject
+class AnalyticsEnginesWatcher:
+    public QObject,
+    public SystemContextAware
 {
     Q_OBJECT
 
     using base_type = QObject;
 
 public:
-    AnalyticsEnginesWatcher(QObject* parent = nullptr);
+    AnalyticsEnginesWatcher(SystemContext* systemContext, QObject* parent = nullptr);
     virtual ~AnalyticsEnginesWatcher() override;
 
     QHash<nx::Uuid, AnalyticsEngineInfo> engineInfos() const;

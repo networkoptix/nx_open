@@ -7,7 +7,6 @@
 #include <client/client_runtime_settings.h>
 #include <client/client_startup_parameters.h>
 #include <client_core/client_core_module.h>
-#include <common/common_module.h>
 #include <common/static_common_module.h>
 #include <nx/branding.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -40,11 +39,6 @@ Context::~Context()
 
     QCoreApplication::setOrganizationName(QString());
     QCoreApplication::setApplicationName(QString());
-}
-
-QnCommonModule* Context::commonModule() const
-{
-    return d->appContext->clientCoreModule()->commonModule();
 }
 
 QnClientCoreModule* Context::clientCoreModule() const
