@@ -67,7 +67,13 @@ GroupBox
             MouseArea
             {
                 anchors.fill: parent
-                onClicked: checked = !checked
+                enabled: control.checkable
+
+                onClicked:
+                {
+                    checked = !checked
+                    control.triggered(checked)
+                }
             }
         }
     }
