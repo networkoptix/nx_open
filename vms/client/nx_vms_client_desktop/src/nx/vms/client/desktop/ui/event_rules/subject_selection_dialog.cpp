@@ -52,9 +52,9 @@ using namespace subject_selection_dialog_private;
 SubjectSelectionDialog::SubjectSelectionDialog(QWidget* parent, Qt::WindowFlags windowFlags):
     base_type(parent, windowFlags),
     ui(new Ui::SubjectSelectionDialog()),
-    m_roles(new RoleListModel(this)),
+    m_roles(new RoleListModel(systemContext(), this)),
     m_users(new UserListModel(m_roles, this)),
-    m_groupListDelegate(new GroupListDelegate(this)),
+    m_groupListDelegate(new GroupListDelegate(systemContext(), this)),
     m_userListDelegate(new UserListDelegate(this))
 {
     ui->setupUi(this);

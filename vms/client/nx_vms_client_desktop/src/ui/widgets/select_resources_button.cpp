@@ -8,8 +8,10 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
+#include <nx/vms/client/desktop/system_context.h>
 
 using namespace nx::vms::client;
 using namespace nx::vms::client::desktop;
@@ -94,7 +96,7 @@ QnSelectResourcesButton::Appearance QnSelectResourcesButton::appearanceForResour
             : appearanceForSelected(1).text };
 }
 
-QnSelectDevicesButton::QnSelectDevicesButton(QWidget* parent) :
+QnSelectDevicesButton::QnSelectDevicesButton(QWidget* parent):
     base_type(parent)
 {
     selectNone();
@@ -106,7 +108,10 @@ void QnSelectDevicesButton::selectDevices(const QnVirtualCameraResourceList& dev
 
     auto count = devices.size();
     if (count > 1 || (count == 1 && !singleSelectionParameters().showName))
-        setText(QnDeviceDependentStrings::getNumericName(resourcePool(), devices));
+    {
+        auto systemContext = SystemContext::fromResource(devices.first());
+        setText(QnDeviceDependentStrings::getNumericName(systemContext->resourcePool(), devices));
+    }
 }
 
 QnSelectResourcesButton::Appearance QnSelectDevicesButton::appearanceForAny() const
@@ -114,7 +119,7 @@ QnSelectResourcesButton::Appearance QnSelectDevicesButton::appearanceForAny() co
     return {
         iconHelper(QnResourceIconCache::Camera),
         QnDeviceDependentStrings::getDefaultNameFromSet(
-            resourcePool(),
+            appContext()->currentSystemContext()->resourcePool(),
             tr("Any Device"),
             tr("Any Camera")) };
 }
@@ -124,7 +129,7 @@ QnSelectResourcesButton::Appearance QnSelectDevicesButton::appearanceForAll() co
     return {
         iconHelper(QnResourceIconCache::Cameras),
         QnDeviceDependentStrings::getDefaultNameFromSet(
-            resourcePool(),
+            appContext()->currentSystemContext()->resourcePool(),
             tr("All Devices"),
             tr("All Cameras")) };
 }
@@ -136,14 +141,14 @@ QnSelectResourcesButton::Appearance QnSelectDevicesButton::appearanceForSelected
         return {
             QIcon(),
             QnDeviceDependentStrings::getDefaultNameFromSet(
-                resourcePool(),
+                appContext()->currentSystemContext()->resourcePool(),
                 tr("Select devices..."),
                 tr("Select cameras...")) };
     }
 
     return {
         iconHelper(count == 1 ? QnResourceIconCache::Camera : QnResourceIconCache::Cameras),
-        lit("<You should not see this!>") };
+        "<Internal Error>" };
 }
 
 QnSelectUsersButton::QnSelectUsersButton(QWidget* parent) :

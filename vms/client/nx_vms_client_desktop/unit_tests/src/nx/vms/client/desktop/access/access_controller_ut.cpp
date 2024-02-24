@@ -4,8 +4,6 @@
 
 #include <client/client_runtime_settings.h>
 #include <client/client_startup_parameters.h>
-#include <client_core/client_core_module.h>
-#include <common/common_module.h>
 #include <common/static_common_module.h>
 #include <core/resource/file_layout_resource.h>
 #include <core/resource/user_resource.h>

@@ -48,7 +48,9 @@ QVariant EngineLicenseSummaryProvider::licenseSummary(nx::Uuid engineId) const
 }
 
 QVariant EngineLicenseSummaryProvider::licenseSummary(
-    nx::Uuid engineId, nx::Uuid cameraId, const QVariantList& proposedEngines) const
+    nx::Uuid engineId,
+    QnResource* camera,
+    const QVariantList& proposedEngines) const
 {
     if (const auto engine =
         resourcePool()->getResourceById<common::AnalyticsEngineResource>(engineId))
@@ -57,8 +59,12 @@ QVariant EngineLicenseSummaryProvider::licenseSummary(
             return {};
 
         auto usageHelper = common::saas::IntegrationServiceUsageHelper{systemContext()};
-        usageHelper.proposeChange(
-            cameraId, nx::utils::toQSet(nx::utils::toTypedQList<nx::Uuid>(proposedEngines)));
+        if (NX_ASSERT(camera))
+        {
+            usageHelper.proposeChange(
+                camera->getId(),
+                nx::utils::toQSet(nx::utils::toTypedQList<nx::Uuid>(proposedEngines)));
+        }
 
         auto summary = usageHelper.info(engine->plugin()->manifest().id).toVariantMap();
 
@@ -77,10 +83,12 @@ QVariant EngineLicenseSummaryProvider::licenseSummary(
 }
 
 QSet<nx::Uuid> EngineLicenseSummaryProvider::overusedEngines(
-    nx::Uuid cameraId, const QSet<nx::Uuid>& proposedEngines) const
+    QnResource* camera,
+    const QSet<nx::Uuid>& proposedEngines) const
 {
     auto usageHelper = common::saas::IntegrationServiceUsageHelper{systemContext()};
-    usageHelper.proposeChange(cameraId, proposedEngines);
+    if (NX_ASSERT(camera))
+        usageHelper.proposeChange(camera->getId(), proposedEngines);
 
     if (!usageHelper.isOverflow())
         return {};

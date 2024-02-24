@@ -13,10 +13,10 @@
 
 #include <client/client_globals.h>
 #include <client/client_message_processor.h>
-#include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/webpage_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/utils/guarded_callback.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/dialogs/web_view_dialog.h>
 #include <nx/vms/client/desktop/ini.h>
@@ -24,7 +24,6 @@
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
 #include <ui/dialogs/webpage_dialog.h>
-#include "nx/utils/guarded_callback.h"
 
 using namespace nx::vms::client::desktop;
 
@@ -119,7 +118,7 @@ QnWorkbenchWebPageHandler::~QnWorkbenchWebPageHandler()
 void QnWorkbenchWebPageHandler::addNewWebPage(nx::vms::api::WebPageSubtype subtype)
 {
     QScopedPointer<QnWebpageDialog> dialog(
-        new QnWebpageDialog(mainWindowWidget(), QnWebpageDialog::AddPage));
+        new QnWebpageDialog(systemContext(), mainWindowWidget(), QnWebpageDialog::AddPage));
 
     const auto params = menu()->currentParameters(sender());
     if (params.size() > 0)
@@ -172,7 +171,7 @@ void QnWorkbenchWebPageHandler::editWebPage()
     const auto oldDialogSize = webPage->dialogSize();
 
     QScopedPointer<QnWebpageDialog> dialog(
-        new QnWebpageDialog(mainWindowWidget(), QnWebpageDialog::EditPage));
+        new QnWebpageDialog(systemContext(), mainWindowWidget(), QnWebpageDialog::EditPage));
 
     dialog->setName(oldName);
     dialog->setUrl(oldUrl);

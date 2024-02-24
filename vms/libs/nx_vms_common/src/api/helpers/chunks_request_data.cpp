@@ -4,7 +4,6 @@
 
 #include <api/helpers/camera_id_helper.h>
 #include <common/common_globals.h>
-#include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/fusion/serialization/json_functions.h>

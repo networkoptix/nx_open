@@ -7,7 +7,6 @@
 #include <QtCore/QCryptographicHash>
 #include <QtWidgets/QLayout>
 
-#include <client_core/client_core_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/layout_resource.h>
@@ -68,7 +67,7 @@ public:
     {
         const auto totalCount = total.size();
         return QnDeviceDependentStrings::getNameFromSet(
-            qnClientCoreModule->resourcePool(),
+            appContext()->currentSystemContext()->resourcePool(),
             QnCameraDeviceStringSet(
                 tr("%1 of %n devices", "", totalCount),
                 tr("%1 of %n cameras", "", totalCount),
@@ -80,7 +79,7 @@ public:
     static QString anyCamera()
     {
         return braced(QnDeviceDependentStrings::getDefaultNameFromSet(
-            qnClientCoreModule->resourcePool(),
+            appContext()->currentSystemContext()->resourcePool(),
             tr("Any Device"),
             tr("Any Camera")
         ));
@@ -89,7 +88,7 @@ public:
     static QString selectCamera()
     {
         return QnDeviceDependentStrings::getDefaultNameFromSet(
-            qnClientCoreModule->resourcePool(),
+            appContext()->currentSystemContext()->resourcePool(),
             tr("Select at least one device"),
             tr("Select at least one camera")
         );
@@ -126,7 +125,7 @@ QString genericCameraText(const QnVirtualCameraResourceList &cameras, const bool
     if (cameras.size() == 1)
         return getShortResourceName(cameras.first());
     return QnDeviceDependentStrings::getNumericName(
-        qnClientCoreModule->resourcePool(),
+        appContext()->currentSystemContext()->resourcePool(),
         cameras);
 }
 
@@ -239,12 +238,19 @@ QString QnCameraAudioTransmitPolicy::getText(const QnResourceList &resources, co
     QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
     int invalid = invalidResourcesCount<QnCameraAudioTransmitPolicy>(cameras);
     if (cameras.isEmpty())
+    {
         return QnDeviceDependentStrings::getDefaultNameFromSet(
-            qnClientCoreModule->resourcePool(),
+            appContext()->currentSystemContext()->resourcePool(),
             tr("Select device"),
             tr("Select camera"));
+    }
     else
-        return genericCameraText<QnCameraAudioTransmitPolicy>(cameras, detailed, tr("%1 does not support two-way audio", "", invalid), invalid);
+    {
+        return genericCameraText<QnCameraAudioTransmitPolicy>(
+            cameras,
+            detailed,
+            tr("%1 does not support two-way audio", "", invalid), invalid);
+    }
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -307,8 +313,11 @@ QString QnFullscreenCameraPolicy::getText(const QnResourceList& resources, const
 // QnSendEmailActionDelegate
 //-------------------------------------------------------------------------------------------------
 
-QnSendEmailActionDelegate::QnSendEmailActionDelegate(QWidget* parent):
-    QnResourceSelectionDialogDelegate(parent),
+QnSendEmailActionDelegate::QnSendEmailActionDelegate(
+    SystemContext* systemContext,
+    QWidget* parent)
+    :
+    QnResourceSelectionDialogDelegate(systemContext, parent),
     m_warningLabel(nullptr)
 {
 }
@@ -521,7 +530,11 @@ bool actionAllowedForUser(const nx::vms::event::AbstractActionPtr& action,
 //-------------------------------------------------------------------------------------------------
 // QnSubjectValidationPolicy
 
-QnSubjectValidationPolicy::QnSubjectValidationPolicy(bool allowEmptySelection):
+QnSubjectValidationPolicy::QnSubjectValidationPolicy(
+    SystemContext* systemContext,
+    bool allowEmptySelection)
+    :
+    SystemContextAware(systemContext),
     m_allowEmptySelection(allowEmptySelection)
 {
 }
@@ -659,8 +672,11 @@ QString QnSubjectValidationPolicy::calculateAlert(
 //-------------------------------------------------------------------------------------------------
 // QnDefaultSubjectValidationPolicy
 
-QnDefaultSubjectValidationPolicy::QnDefaultSubjectValidationPolicy(bool allowEmptySelection) :
-    base_type(allowEmptySelection)
+QnDefaultSubjectValidationPolicy::QnDefaultSubjectValidationPolicy(
+    SystemContext* systemContext,
+    bool allowEmptySelection)
+    :
+    base_type(systemContext, allowEmptySelection)
 {
 }
 
@@ -678,10 +694,11 @@ bool QnDefaultSubjectValidationPolicy::userValidity(const QnUserResourcePtr& /*u
 // QnRequiredAccessRightPolicy
 
 QnRequiredAccessRightPolicy::QnRequiredAccessRightPolicy(
+    SystemContext* systemContext,
     AccessRight requiredAccessRight,
     bool allowEmptySelection)
     :
-    base_type(allowEmptySelection),
+    base_type(systemContext, allowEmptySelection),
     m_requiredAccessRight(requiredAccessRight)
 {
 }
@@ -835,7 +852,8 @@ QValidator::State QnLayoutAccessValidationPolicy::roleValidity(const nx::Uuid& r
             if (resourceAccessManager()->hasPermission(*group, m_layout, Qn::ReadPermission))
                 return QValidator::Acceptable;
 
-            const auto groupUsers = accessSubjectHierarchy()->usersInGroups({roleId});
+            const auto groupUsers =
+                systemContext()->accessSubjectHierarchy()->usersInGroups({roleId});
             if (std::any_of(groupUsers.cbegin(), groupUsers.cend(),
                 [this](const auto& user) { return user->isEnabled() && userValidity(user); }))
             {
@@ -872,7 +890,7 @@ void QnLayoutAccessValidationPolicy::setLayout(const QnLayoutResourcePtr& layout
 
 QValidator::State QnCloudUsersValidationPolicy::roleValidity(const nx::Uuid& roleId) const
 {
-    const auto& users = accessSubjectHierarchy()->usersInGroups({roleId});
+    const auto& users = systemContext()->accessSubjectHierarchy()->usersInGroups({roleId});
     bool hasCloud = false;
     bool hasNonCloud = false;
 
@@ -904,7 +922,7 @@ QString QnCloudUsersValidationPolicy::calculateAlert(
             QSet<nx::Uuid> groupIds;
             nx::vms::common::getUsersAndGroups(systemContext(), subjects, users, groupIds);
 
-            for (const auto& user: accessSubjectHierarchy()->usersInGroups(groupIds))
+            for (const auto& user: systemContext()->accessSubjectHierarchy()->usersInGroups(groupIds))
             {
                 if (std::find_if(users.begin(), users.end(),
                     [user](const QnUserResourcePtr& existing)

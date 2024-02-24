@@ -6,13 +6,10 @@
 #include <QtCore/QScopedValueRollback>
 #include <QtGui/QDesktopServices>
 
-#include <client_core/client_core_module.h>
-#include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/network/url/url_builder.h>
-#include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/common/html/html.h>

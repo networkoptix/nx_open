@@ -13,7 +13,9 @@ namespace nx::vms::rules { class Engine; }
 
 namespace nx::vms::client::desktop::rules {
 
-class ActionTypePickerWidget: public QWidget, public SystemContextAware
+class ActionTypePickerWidget:
+    public QWidget,
+    public SystemContextAware
 {
     Q_OBJECT
 

@@ -2,7 +2,6 @@
 
 #include "merge_systems_validator.h"
 
-#include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <network/system_helpers.h>

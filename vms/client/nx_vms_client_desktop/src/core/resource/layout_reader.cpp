@@ -7,7 +7,6 @@
 
 #include <client/client_globals.h>
 #include <client_core/client_core_module.h>
-#include <common/common_module.h>
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/file_layout_resource.h>
 #include <core/storage/file_storage/layout_storage_resource.h>
@@ -15,6 +14,7 @@
 #include <nx/core/watermark/watermark.h>
 #include <nx/fusion/serialization/json.h>
 #include <nx/reflect/json/deserializer.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/export/data/nov_metadata.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
@@ -143,7 +143,7 @@ QnFileLayoutResourcePtr layout::layoutFromFile(
         if (backgroundFile)
         {
             QByteArray data = backgroundFile->readAll();
-            LocalFileCache cache;
+            LocalFileCache cache(appContext()->currentSystemContext());
             cache.storeImageData(layout->backgroundImageFilename(), data);
 
             backgroundFile.reset();

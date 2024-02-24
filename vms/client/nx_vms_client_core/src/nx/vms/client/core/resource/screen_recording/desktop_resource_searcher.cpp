@@ -2,8 +2,6 @@
 
 #include "desktop_resource_searcher.h"
 
-#include <client_core/client_core_module.h>
-
 #include "abstract_desktop_resource_searcher_impl.h"
 
 namespace nx::vms::client::core {
@@ -16,10 +14,11 @@ const QString kManufacturer = "Desktop camera";
 
 DesktopResourceSearcher::DesktopResourceSearcher(
     QnAbstractDesktopResourceSearcherImpl* impl,
+    common::SystemContext* systemContext,
     QObject* parent)
     :
     base_type(parent),
-    QnAbstractResourceSearcher(qnClientCoreModule->commonModule()),
+    QnAbstractResourceSearcher(systemContext),
     m_impl(impl)
 {
 }

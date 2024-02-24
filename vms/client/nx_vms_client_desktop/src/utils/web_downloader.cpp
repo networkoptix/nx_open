@@ -9,7 +9,6 @@
 #include <QtWebEngineCore/QWebEngineDownloadRequest>
 
 #include <client/client_message_processor.h>
-#include <common/common_module.h>
 #include <core/resource/file_processor.h>
 #include <core/resource/resource.h>
 #include <nx/utils/app_info.h>

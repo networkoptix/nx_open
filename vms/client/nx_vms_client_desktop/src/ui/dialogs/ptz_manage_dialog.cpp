@@ -24,6 +24,7 @@
 #include <nx/vms/client/desktop/menu/action_conditions.h>
 #include <nx/vms/client/desktop/menu/action_parameters.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/messages/ptz_messages.h>
 #include <nx/vms/client/desktop/utils/local_file_cache.h>
 #include <ui/delegates/ptz_preset_hotkey_item_delegate.h>
@@ -104,7 +105,7 @@ QnPtzManageDialog::QnPtzManageDialog(QWidget *parent):
     ui(new Ui::PtzManageDialog),
     m_model(new QnPtzManageModel(this)),
     m_hotkeysDelegate(),
-    m_cache(new LocalFileCache(this)),
+    m_cache(system()->localFileCache()),
     m_submitting(false)
 {
     ui->setupUi(this);

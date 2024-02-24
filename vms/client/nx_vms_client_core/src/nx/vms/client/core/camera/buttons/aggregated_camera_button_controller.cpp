@@ -27,30 +27,18 @@ struct AggregatedCameraButtonController::Private
 AggregatedCameraButtonController::Private::Private(AggregatedCameraButtonController * const q):
     q(q)
 {
-    connect(q, &AbstractCameraButtonController::resourceIdChanged, q,
+    connect(q, &AbstractCameraButtonController::resourceChanged, q,
         [this]()
         {
             for (const auto& controller: controllers)
-                controller->setResourceId(this->q->resourceId());
+                controller->setResource(this->q->resource());
         });
 }
 
 //-------------------------------------------------------------------------------------------------
 
-AggregatedCameraButtonController::AggregatedCameraButtonController(
-    SystemContext* context,
-    QObject* parent)
-    :
-    base_type(context, parent),
-    d(new Private(this))
-{
-}
-
-AggregatedCameraButtonController::AggregatedCameraButtonController(
-    std::unique_ptr<nx::vms::common::SystemContextInitializer> contextInitializer,
-    QObject* parent)
-    :
-    base_type(std::move(contextInitializer), parent),
+AggregatedCameraButtonController::AggregatedCameraButtonController(QObject* parent):
+    base_type(parent),
     d(new Private(this))
 {
 }
@@ -98,7 +86,7 @@ void AggregatedCameraButtonController::addController(int group, const Controller
                 safeEmitActionCancelled(buttonId);
         });
 
-    controller->setResourceId(resourceId());
+    controller->setResource(resource());
 }
 
 CameraButtons AggregatedCameraButtonController::buttons() const

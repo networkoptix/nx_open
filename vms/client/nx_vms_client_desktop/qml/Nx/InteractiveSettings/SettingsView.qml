@@ -4,6 +4,7 @@ import QtQuick
 import QtQuick.Controls
 
 import Nx
+import Nx.Common
 
 import "settings.js" as Settings
 import "components"
@@ -44,7 +45,7 @@ Item
         id: sharedData
 
         property var thumbnailSource: null
-        property var resourceId: thumbnailSource ? thumbnailSource.cameraId : NxGlobals.uuid("")
+        property Resource resource: thumbnailSource ? thumbnailSource.resource : null
         property var analyticsStreamQuality: null
     }
 

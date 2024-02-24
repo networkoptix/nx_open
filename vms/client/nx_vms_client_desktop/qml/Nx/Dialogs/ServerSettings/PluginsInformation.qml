@@ -32,7 +32,7 @@ Item
 
             function onStateModified()
             {
-                if (store.resourceId().isNull())
+                if (!store.resource())
                     return
 
                 online = store.isOnline()

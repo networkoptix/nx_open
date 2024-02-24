@@ -4,12 +4,11 @@
 
 #include <QtWidgets/QMenu>
 
-#include <nx/vms/client/core/skin/skin.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource_display_info.h>
 #include <core/resource_management/resource_pool.h>
-#include <common/common_module.h>
 #include <nx/utils/log/assert.h>
+#include <nx/vms/client/core/skin/skin.h>
 
 namespace {
 
@@ -29,8 +28,7 @@ QIcon getIcon(const QnMediaServerResourcePtr& server)
 } // namespace
 
 QnChooseServerButton::QnChooseServerButton(QWidget* parent):
-    base_type(parent),
-    m_serverStatus(this)
+    base_type(parent)
 {
     setDisplayActionIcon(true);
 }

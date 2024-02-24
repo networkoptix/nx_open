@@ -7,7 +7,9 @@
 
 namespace nx::vms::client::desktop {
 
-class ShowreelStateManager: public core::SaveStateManager, public SystemContextAware
+class ShowreelStateManager:
+    public core::SaveStateManager,
+    public SystemContextAware
 {
     Q_OBJECT
     using base_type = core::SaveStateManager;

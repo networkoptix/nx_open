@@ -100,7 +100,9 @@ public:
         const UnresolvedEntities& additionalUnresolvedEventTypes);
 };
 
-class AnalyticsEventsSearchTreeBuilder: public QObject, public SystemContextAware
+class AnalyticsEventsSearchTreeBuilder:
+    public QObject,
+    public SystemContextAware
 {
     Q_OBJECT
     using base_type = QObject;
@@ -134,7 +136,9 @@ private:
     AnalyticsEntitiesTreeBuilder::NodePtr cachedEventTypesTree;
 };
 
-class AnalyticsObjectsSearchTreeBuilder: public QObject, public SystemContextAware
+class AnalyticsObjectsSearchTreeBuilder:
+    public QObject,
+    public SystemContextAware
 {
     Q_OBJECT
     using base_type = QObject;

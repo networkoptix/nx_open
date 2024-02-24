@@ -24,9 +24,11 @@ public:
     TwoWayAudioCameraButtonController(
         IntercomButtonMode intercomButtonMode,
         CameraButton::Group buttonGroup,
-        SystemContext* context,
         QObject* parent = nullptr);
     virtual ~TwoWayAudioCameraButtonController() override;
+
+protected:
+    virtual void setResourceInternal(const QnResourcePtr& resource) override;
 
 private:
     virtual bool setButtonActionState(const CameraButton& button, ActionState state) override;

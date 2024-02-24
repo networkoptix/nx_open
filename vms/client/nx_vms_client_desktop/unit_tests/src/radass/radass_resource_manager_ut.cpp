@@ -6,7 +6,6 @@
 #include <QtCore/QStandardPaths>
 
 #include <client_core/client_core_module.h>
-#include <common/common_module.h>
 #include <common/static_common_module.h>
 #include <core/resource/layout_item_data.h>
 #include <core/resource_management/resource_pool.h>

@@ -6,8 +6,8 @@
 
 #include <common/common_globals.h>
 #include <core/resource/resource.h>
-#include <core/resource_management/resource_pool.h>
 #include <core/resource/security_cam_resource.h>
+#include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/system_context.h>
@@ -39,35 +39,16 @@ struct AccessHelper::Private
     }
 };
 
-AccessHelper::AccessHelper(
-    SystemContext* context,
-    QObject* parent)
-    :
+AccessHelper::AccessHelper(QObject* parent):
     QObject(parent),
-    SystemContextAware(context),
     d(new Private{.q = this})
 {
 }
 
-AccessHelper::AccessHelper():
-    SystemContextAware(SystemContext::fromQmlContext(this)),
-    d(new Private{.q = this})
-{
-}
 
 AccessHelper::~AccessHelper()
 {
     // Required here for forward-declared scoped pointer destruction.
-}
-
-nx::Uuid AccessHelper::resourceId() const
-{
-    return d->resource ? d->resource->getId() : nx::Uuid{};
-}
-
-void AccessHelper::setResourceId(const nx::Uuid& value)
-{
-    setResource(resourcePool()->getResourceById(value));
 }
 
 QnResourcePtr AccessHelper::resource() const

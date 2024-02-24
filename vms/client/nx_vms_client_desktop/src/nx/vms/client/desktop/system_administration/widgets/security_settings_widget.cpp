@@ -6,7 +6,6 @@
 #include <chrono>
 
 #include <api/server_rest_connection.h>
-#include <common/common_module.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/guarded_callback.h>

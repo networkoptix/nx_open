@@ -6,29 +6,34 @@
 
 #include <nx/vms/client/desktop/utils/server_file_cache.h>
 
+class QnClientMessageProcessor;
 class QnNotificationSoundModel;
 
 namespace nx::vms::client::desktop {
 
-class ServerNotificationCache : public ServerFileCache
+class ServerNotificationCache: public ServerFileCache
 {
     Q_OBJECT
 
     typedef ServerFileCache base_type;
 public:
-    explicit ServerNotificationCache(QObject *parent = 0);
+    explicit ServerNotificationCache(SystemContext* systemContext, QObject* parent = nullptr);
     ~ServerNotificationCache();
+
+    void setMessageProcessor(QnClientMessageProcessor* messageProcessor);
 
     bool storeSound(const QString &filePath, int maxLengthMSecs = -1, const QString &customTitle = QString());
     bool updateTitle(const QString &filename, const QString &title);
     virtual void clear() override;
 
     QnNotificationSoundModel* persistentGuiModel() const;
-public slots:
+
+public:
     void at_fileAddedEvent(const QString &filename);
     void at_fileUpdatedEvent(const QString &filename);
     void at_fileRemovedEvent(const QString &filename);
-private slots:
+
+private:
     void at_soundConverted(const QString &filePath);
 
     void at_fileListReceived(const QStringList &filenames, OperationResult status);

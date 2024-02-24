@@ -14,6 +14,7 @@
 #include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/utils/server_notification_cache.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/event/action_parameters.h>
@@ -31,7 +32,7 @@ QnPlaySoundBusinessActionWidget::QnPlaySoundBusinessActionWidget(
     :
     base_type(context->system(), parent),
     ui(new Ui::PlaySoundBusinessActionWidget),
-    m_serverNotificationCache(context->workbenchContext()->instance<ServerNotificationCache>())
+    m_serverNotificationCache(context->system()->serverNotificationCache())
 {
     ui->setupUi(this);
 

@@ -19,10 +19,12 @@ class RemoteConnectionFactory;
 class RemoteSessionTimeoutWatcher;
 
 /**
- * Single storage place for all network-related classes intances in the client core. Maintains their
- * lifetime, internal dependencies and construction / destruction order.
+ * Single storage place for all network-related classes intances in the client core.
+ * Maintains their lifetime, internal dependencies and construction / destruction order.
  */
-class NX_VMS_CLIENT_CORE_API NetworkModule: public QObject, public SystemContextAware
+class NX_VMS_CLIENT_CORE_API NetworkModule:
+    public QObject,
+    public SystemContextAware
 {
     Q_OBJECT
 

@@ -6,10 +6,8 @@
 
 #include <QtTest/QAbstractItemModelTester>
 
-#include <client_core/client_core_module.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_startup_parameters.h>
-#include <common/common_module.h>
 #include <common/static_common_module.h>
 #include <nx/utils/debug_helpers/model_transaction_checker.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity_item_model.h>

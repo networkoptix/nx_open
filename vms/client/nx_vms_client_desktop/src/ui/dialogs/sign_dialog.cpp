@@ -9,7 +9,6 @@
 #include <camera/gl_renderer.h>
 #include <camera/sign_dialog_display.h>
 #include <client_core/client_core_module.h>
-#include <common/common_module.h>
 #include <core/dataprovider/data_provider_factory.h>
 #include <core/resource/avi/avi_resource.h>
 #include <export/sign_helper.h>

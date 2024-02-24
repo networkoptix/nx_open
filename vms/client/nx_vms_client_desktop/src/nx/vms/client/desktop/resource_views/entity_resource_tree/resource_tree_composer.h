@@ -23,7 +23,9 @@ namespace entity_resource_tree {
 
 class ResourceTreeEntityBuilder;
 
-class NX_VMS_CLIENT_DESKTOP_API ResourceTreeComposer: public QObject, public SystemContextAware
+class NX_VMS_CLIENT_DESKTOP_API ResourceTreeComposer:
+    public QObject,
+    public SystemContextAware
 {
     Q_OBJECT
     using base_type = QObject;

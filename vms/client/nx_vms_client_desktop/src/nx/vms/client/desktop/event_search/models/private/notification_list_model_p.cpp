@@ -235,7 +235,7 @@ NotificationListModel::Private::Private(NotificationListModel* q):
     connect(q, &EventListModel::rowsAboutToBeRemoved,
         this, &Private::onRowsAboutToBeRemoved);
 
-    const auto serverNotificationCache = workbenchContext()->instance<ServerNotificationCache>();
+    const auto serverNotificationCache = system()->serverNotificationCache();
     connect(serverNotificationCache,
         &ServerNotificationCache::fileDownloaded, this,
         [this, serverNotificationCache]
@@ -448,7 +448,7 @@ void NotificationListModel::Private::onRepeatSoundAction(
 
         const auto soundUrl = action->sound();
         if (!m_itemsByLoadingSound.contains(soundUrl))
-            workbenchContext()->instance<ServerNotificationCache>()->downloadFile(soundUrl);
+            system()->serverNotificationCache()->downloadFile(soundUrl);
 
         m_itemsByLoadingSound.insert(soundUrl, eventData.id);
 
@@ -560,7 +560,7 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
     {
         const auto soundUrl = action->getParams().url;
         if (!m_itemsByLoadingSound.contains(soundUrl))
-            workbenchContext()->instance<ServerNotificationCache>()->downloadFile(soundUrl);
+            system()->serverNotificationCache()->downloadFile(soundUrl);
 
         m_itemsByLoadingSound.insert(soundUrl, eventData.id);
     }

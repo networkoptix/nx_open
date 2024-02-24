@@ -13,14 +13,9 @@
 #include <nx/utils/random.h>
 #include <nx/utils/thread/mutex.h>
 
-FileTranscoder::FileTranscoder(QnCommonModule* commonModule):
-    QnCommonModuleAware(commonModule),
-    m_transcoder(QnFfmpegTranscoder::Config(), commonModule->metrics()),
-    m_resultCode( 0 ),
-    m_state( sInit ),
-    m_transcodeDurationLimit( 0 ),
-    m_transcodedDataDuration( 0 ),
-    m_metrics(commonModule->metrics())
+FileTranscoder::FileTranscoder(std::shared_ptr<nx::metrics::Storage> metrics):
+    m_metrics(metrics),
+    m_transcoder(QnFfmpegTranscoder::Config(), metrics.get())
 {
 }
 
@@ -83,7 +78,7 @@ int FileTranscoder::resultCode() const
 }
 
 bool FileTranscoder::setTagValue(
-    QnCommonModule* commonModule,
+    std::shared_ptr<nx::metrics::Storage> metrics,
     const QString& srcFilePath,
     const QString& name,
     const QString& value )
@@ -110,7 +105,7 @@ bool FileTranscoder::setTagValue(
             formatCtx->video_codec_id = formatCtx->streams[i]->codecpar->codec_id;
     }
 
-    auto transcoder = std::make_unique<FileTranscoder>(commonModule);
+    auto transcoder = std::make_unique<FileTranscoder>(metrics);
     if( !transcoder->setSourceFile( srcFilePath ) ||
         !transcoder->setDestFile( tempFilePath ) ||
         !transcoder->setContainer( QLatin1String(formatCtx->iformat->name) ) ||

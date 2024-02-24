@@ -17,7 +17,7 @@ BubbleToolTip
 
     property alias previewState: preview.previewState
     property alias videoPreviewTimestampMs: preview.videoPreviewTimestampMs
-    property alias videoPreviewResourceId: preview.videoPreviewResourceId
+    property alias videoPreviewResource: preview.videoPreviewResource
     property alias attributeItems: attributeTable.items
     property alias previewAspectRatio: preview.previewAspectRatio
     property alias footerText: footer.text

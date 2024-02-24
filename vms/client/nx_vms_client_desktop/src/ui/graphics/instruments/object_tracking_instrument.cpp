@@ -5,7 +5,6 @@
 #include <QtWidgets/QGraphicsItem>
 
 #include <api/server_rest_connection.h>
-#include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <nx/reflect/json.h>

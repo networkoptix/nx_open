@@ -8,7 +8,6 @@
 #include <QtCore/QCryptographicHash>
 
 #include <api/runtime_info_manager.h>
-#include <common/common_module.h>
 #include <core/resource/abstract_storage_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>

@@ -107,13 +107,6 @@ nx::vms::event::RuleManager* QnCommonModuleAware::eventRuleManager() const
         : nullptr;
 }
 
-QnResourceDataPool* QnCommonModuleAware::dataPool() const
-{
-    return NX_ASSERT(m_commonModule)
-        ? m_commonModule->systemContext()->resourceDataPool()
-        : nullptr;
-}
-
 std::shared_ptr<ec2::AbstractECConnection> QnCommonModuleAware::messageBusConnection() const
 {
     return NX_ASSERT(m_commonModule) ? m_commonModule->messageBusConnection() : nullptr;

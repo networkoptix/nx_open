@@ -5,7 +5,6 @@
 #include <QtCore/QPointer>
 
 #include <client_core/client_core_module.h>
-#include <common/common_module.h>
 #include <nx/utils/log/assert.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>

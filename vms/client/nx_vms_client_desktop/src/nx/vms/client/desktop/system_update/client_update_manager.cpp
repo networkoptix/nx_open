@@ -12,7 +12,6 @@
 
 #include <api/server_rest_connection.h>
 #include <client/client_message_processor.h>
-#include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
 #include <nx/branding.h>
 #include <nx/build_info.h>

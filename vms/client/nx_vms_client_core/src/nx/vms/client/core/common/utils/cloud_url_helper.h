@@ -9,6 +9,8 @@
 
 namespace nx::vms::client::core {
 
+class SystemContext;
+
 class NX_VMS_CLIENT_CORE_API CloudUrlHelper: public QObject
 {
     Q_OBJECT
@@ -26,7 +28,7 @@ public:
     Q_INVOKABLE QUrl createAccountUrl() const;
     Q_INVOKABLE QUrl restorePasswordUrl() const;
     Q_INVOKABLE QUrl faqUrl() const;
-    Q_INVOKABLE QUrl viewSystemUrl() const;
+    Q_INVOKABLE QUrl viewSystemUrl(SystemContext* systemContext) const;
     Q_INVOKABLE QUrl cloudLinkUrl(bool withReferral) const;
 
 private:

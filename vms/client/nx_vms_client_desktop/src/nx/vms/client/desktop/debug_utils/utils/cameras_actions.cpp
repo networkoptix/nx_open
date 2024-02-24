@@ -2,8 +2,15 @@
 
 #include "cameras_actions.h"
 
+// Windows header must be included before defining DeviceCapabilities to avoid compilation failure
+// due to DeviceCapabilities define in the wingdi header (actual for no-pch build only).
+#if defined(_WIN32)
+    #include <windows.h>
+#endif
+
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/api/data/device_model.h>
 #include <ui/workbench/workbench_context.h>
 
 #include "debug_custom_actions.h"

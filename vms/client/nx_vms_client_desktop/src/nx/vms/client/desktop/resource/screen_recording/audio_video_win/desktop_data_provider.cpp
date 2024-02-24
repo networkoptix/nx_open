@@ -2,12 +2,13 @@
 
 #include "desktop_data_provider.h"
 
+#include <windows.h>
+//^ Windows header must be included first (actual for no-pch build only).
+
 #include <intrin.h>
 #include <mmsystem.h>
-#include <windows.h>
 
-extern "C"
-{
+extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
 #include <libavutil/imgutils.h>

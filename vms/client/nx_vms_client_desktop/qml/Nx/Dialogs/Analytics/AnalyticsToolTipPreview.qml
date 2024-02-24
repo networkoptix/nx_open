@@ -17,7 +17,7 @@ Control
     property int previewState
     property real previewAspectRatio: 1
 
-    property alias videoPreviewResourceId: intervalPreview.resourceId
+    property alias videoPreviewResource: intervalPreview.resource
     property alias videoPreviewTimestampMs: intervalPreview.timestampMs
 
     padding: rectangle.border.width

@@ -7,7 +7,6 @@
 #include <QtCore/QStandardPaths>
 #include <QtMultimedia/QAudioDevice>
 
-#include <common/common_module.h>
 #include <nx/build_info.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/help/help_topic.h>

@@ -5,7 +5,9 @@
 #include <type_traits>
 
 #include <QtCore/QScopedValueRollback>
+#include <QtQml/QQmlEngine>
 
+#include <core/resource/camera_resource.h>
 #include <nx/reflect/json/serializer.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
@@ -26,6 +28,9 @@ struct CameraSettingsDialogStore::Private:
     PrivateFluxStore<CameraSettingsDialogStore, State>
 {
     using PrivateFluxStore::PrivateFluxStore;
+
+    // FIXME: #sivanov Workaround for QML access. Need to create better architecture.
+    QPointer<QnResource> resource;
 };
 
 CameraSettingsDialogStore::CameraSettingsDialogStore(QObject* parent):
@@ -60,6 +65,14 @@ void CameraSettingsDialogStore::loadCameras(
     d->executeAction(
         [&](State state)
         {
+            // FIXME: #sivanov Workaround for QML access. Need to create better architecture.
+            d->resource.clear();
+            if (!cameras.empty())
+            {
+                d->resource = cameras.first().data();
+                QQmlEngine::setObjectOwnership(d->resource.get(), QQmlEngine::CppOwnership);
+            }
+
             return Reducer::loadCameras(
                 std::move(state),
                 cameras,
@@ -711,9 +724,9 @@ void CameraSettingsDialogStore::resetExpertSettings()
         [&](State state) { return Reducer::resetExpertSettings(std::move(state)); });
 }
 
-nx::Uuid CameraSettingsDialogStore::resourceId() const
+QnResource* CameraSettingsDialogStore::resource() const
 {
-    return d->state.singleCameraId();
+    return d->resource.data();
 }
 
 QVariantList CameraSettingsDialogStore::analyticsEngines() const

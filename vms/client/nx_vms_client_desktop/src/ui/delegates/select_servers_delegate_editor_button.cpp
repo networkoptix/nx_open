@@ -2,6 +2,8 @@
 
 #include "select_servers_delegate_editor_button.h"
 
+#include <nx/utils/log/assert.h>
+
 namespace nx::vms::client::desktop {
 namespace ui {
 

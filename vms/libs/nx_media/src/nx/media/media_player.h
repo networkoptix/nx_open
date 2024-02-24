@@ -9,18 +9,18 @@
 #include <QtMultimedia/QMediaPlayer>
 #include <QtMultimedia/QVideoSink>
 
+#include <core/resource/resource_fwd.h>
 #include <nx/media/abstract_metadata_consumer.h>
 #include <nx/media/media_fwd.h>
 #include <nx/reflect/enum_instrument.h>
+#include <nx/utils/impl_ptr.h>
 
 class QnTimePeriodList;
 
 // for tests
 class QnArchiveStreamReader;
-class QnResource;
-template<class Resource> class QnSharedResourcePointer;
-typedef QnSharedResourcePointer<QnResource> QnResourcePtr;
-class QnCommonModule;
+
+namespace nx::vms::common { class SystemContext; }
 
 namespace nx {
 namespace media {
@@ -48,12 +48,6 @@ class PlayerPrivate;
 class NX_MEDIA_API Player: public QObject
 {
     Q_OBJECT
-
-    /**
-     * Source url to open. In order to support multiserver archive, media player supports
-     * non-standard URL scheme 'camera'. Example to open: "camera://media/<camera_id>".
-     */
-    Q_PROPERTY(QUrl source READ source WRITE setSource NOTIFY sourceChanged)
 
     /**
      * Video source to render decoded data
@@ -187,18 +181,12 @@ public:
     Player(QObject *parent = nullptr);
     ~Player();
 
+    QnResourcePtr resource() const;
+    void setResource(const QnResourcePtr& value);
+
     State playbackState() const;
 
     MediaStatus mediaStatus() const;
-
-    QUrl source() const;
-    /**
-     * Set media source to play.
-     * Supported types of media sources (url scheme part):
-     * 'file' - local file
-     * any other scheme interpreted as a link to a resource in resourcePool. Url path is resource Id.
-     */
-    void setSource(const QUrl &source);
 
     QVideoSink *videoSurface(int channel = 0) const;
 
@@ -312,7 +300,7 @@ public slots:
 
 signals:
     void playbackStateChanged();
-    void sourceChanged();
+    void resourceChanged();
     void videoSurfaceChanged();
     void positionChanged();
     void playbackFinished();
@@ -333,18 +321,18 @@ signals:
     void cannotDecryptMediaErrorChanged();
     void audioOnlyModeChanged();
 
-protected: //< for tests
-    void testSetOwnedArchiveReader(QnArchiveStreamReader* archiveReader);
-    void testSetCamera(const QnResourcePtr& camera);
+protected:
+    virtual void setResourceInternal(const QnResourcePtr& resource);
 
-    virtual QnCommonModule* commonModule() const = 0;
+    //Function for tests.
+    void testSetOwnedArchiveReader(QnArchiveStreamReader* archiveReader);
 
 private:
     bool checkReadyToPlay();
 
 private:
-    QScopedPointer<PlayerPrivate> d_ptr;
-    Q_DECLARE_PRIVATE(Player)
+    class Private;
+    nx::utils::ImplPtr<Private> d;
 };
 
 /**

@@ -627,11 +627,10 @@ Window
 
                 const getData = name => accessor.getData(selection.index, name)
 
-                const previewResource = getData("previewResource")
+                const previewResource =
 
                 return {
-                    "previewResourceId": (previewResource && previewResource.id)
-                        || NxGlobals.uuid(""),
+                    "previewResource": getData("previewResource"),
                     "previewTimestampMs": getData("previewTimestampMs") || 0,
                     "previewAspectRatio": getData("previewAspectRatio") || 1.0,
                     "timestamp": getData("timestamp") || "",

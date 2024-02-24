@@ -4,16 +4,12 @@
 
 #include <QtCore/QFile>
 #include <QtCore/QFileInfo>
-#include <nx/utils/uuid.h>
-
-#include <common/common_module.h>
 
 #include <client/client_message_processor.h>
-
+#include <nx/utils/uuid.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <transcoding/file_transcoder.h>
-
 #include <ui/models/notification_sound_model.h>
-
 #include <utils/media/audio_player.h>
 
 namespace {
@@ -26,23 +22,33 @@ const QLatin1String titleTag("Title");  // TODO: #sivanov Replace with database 
 
 namespace nx::vms::client::desktop {
 
-ServerNotificationCache::ServerNotificationCache(QObject *parent) :
-    base_type(folder, parent),
+ServerNotificationCache::ServerNotificationCache(SystemContext* systemContext, QObject* parent):
+    base_type(systemContext, folder, parent),
     m_model(new QnNotificationSoundModel(this))
 {
-    connect(qnClientMessageProcessor,   &QnClientMessageProcessor::fileAdded,                   this,   &ServerNotificationCache::at_fileAddedEvent);
-    connect(qnClientMessageProcessor,   &QnClientMessageProcessor::fileUpdated,                 this,   &ServerNotificationCache::at_fileUpdatedEvent);
-    connect(qnClientMessageProcessor,   &QnClientMessageProcessor::fileRemoved,                 this,   &ServerNotificationCache::at_fileRemovedEvent);
-    connect(qnClientMessageProcessor,   &QnClientMessageProcessor::initialResourcesReceived,    this,   &ServerNotificationCache::getFileList);
-
     connect(this, &ServerFileCache::fileListReceived,  this,   &ServerNotificationCache::at_fileListReceived);
     connect(this, &ServerFileCache::fileDownloaded,    this,   &ServerNotificationCache::at_fileAdded);
     connect(this, &ServerFileCache::fileUploaded,      this,   &ServerNotificationCache::at_fileAdded);
     connect(this, &ServerFileCache::fileDeleted,       this,   &ServerNotificationCache::at_fileRemoved);
 }
 
-ServerNotificationCache::~ServerNotificationCache() {
+ServerNotificationCache::~ServerNotificationCache()
+{
+}
 
+void ServerNotificationCache::setMessageProcessor(QnClientMessageProcessor* messageProcessor)
+{
+    if (messageProcessor)
+    {
+        connect(messageProcessor, &QnClientMessageProcessor::fileAdded, this,
+            &ServerNotificationCache::at_fileAddedEvent);
+        connect(messageProcessor, &QnClientMessageProcessor::fileUpdated, this,
+            &ServerNotificationCache::at_fileUpdatedEvent);
+        connect(messageProcessor, &QnClientMessageProcessor::fileRemoved, this,
+            &ServerNotificationCache::at_fileRemovedEvent);
+        connect(messageProcessor, &QnClientMessageProcessor::initialResourcesReceived, this,
+            &ServerNotificationCache::getFileList);
+    }
 }
 
 QnNotificationSoundModel* ServerNotificationCache::persistentGuiModel() const {
@@ -65,7 +71,7 @@ bool ServerNotificationCache::storeSound(const QString &filePath, int maxLengthM
     }
 
     ensureCacheFolder();
-    FileTranscoder* transcoder = new FileTranscoder(commonModule());
+    FileTranscoder* transcoder = new FileTranscoder(systemContext()->metrics());
     transcoder->setSourceFile(filePath);
     transcoder->setDestFile(getFullPath(newFilename));
     transcoder->setContainer(targetContainter);
@@ -86,7 +92,7 @@ bool ServerNotificationCache::updateTitle(const QString& filename, const QString
         return false;
 
     const bool result = FileTranscoder::setTagValue(
-        commonModule(),
+        systemContext()->metrics(),
         getFullPath(filename),
         titleTag,
         title);

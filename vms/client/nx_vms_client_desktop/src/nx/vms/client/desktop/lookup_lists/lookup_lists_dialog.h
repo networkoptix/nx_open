@@ -10,7 +10,9 @@
 
 namespace nx::vms::client::desktop {
 
-class LookupListsDialog: public QmlDialogWrapper, public SystemContextAware
+class LookupListsDialog:
+    public QmlDialogWrapper,
+    public SystemContextAware
 {
     Q_OBJECT
     using base_type = QmlDialogWrapper;

@@ -201,7 +201,7 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject* parent):
     const auto accessibleEvents = NvrEventsActionsAccess::removeInacessibleNvrEvents(
         vms::event::allEvents(), resourcePool());
 
-    QnBusinessTypesComparator lexComparator;
+    QnBusinessTypesComparator lexComparator(systemContext());
 
     const auto userEvents = filterEventsBySubtype(accessibleEvents, EventSubtype::user);
     const auto failureEvents = filterEventsBySubtype(accessibleEvents, EventSubtype::failure);
@@ -1231,8 +1231,9 @@ bool QnBusinessRuleViewModel::isValid(Column column) const
 
                 case ActionType::showPopupAction:
                 {
-                    static const QnDefaultSubjectValidationPolicy defaultPolicy;
+                    const QnDefaultSubjectValidationPolicy defaultPolicy(systemContext());
                     QnRequiredAccessRightPolicy acknowledgePolicy(
+                        systemContext(),
                         nx::vms::api::AccessRight::manageBookmarks);
                     acknowledgePolicy.setCameras(
                         resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
@@ -1250,7 +1251,7 @@ bool QnBusinessRuleViewModel::isValid(Column column) const
                     if (systemSettings()->cloudSystemId().isEmpty())
                         return false;
 
-                    static const QnCloudUsersValidationPolicy cloudUsersPolicy;
+                    const QnCloudUsersValidationPolicy cloudUsersPolicy(systemContext());
                     const auto subjects = filterSubjectIds(m_actionParams.additionalResources);
                     const auto validationState = cloudUsersPolicy.validity(
                         m_actionParams.allUsers,
@@ -1291,7 +1292,7 @@ bool QnBusinessRuleViewModel::isValid(Column column) const
                     if (m_actionParams.allUsers)
                         return true;
 
-                    QnLayoutAccessValidationPolicy layoutAccessPolicy{};
+                    QnLayoutAccessValidationPolicy layoutAccessPolicy{systemContext()};
                     layoutAccessPolicy.setLayout(layout);
 
                     // TODO: use iterator-based constructor after update to Qt 5.14.

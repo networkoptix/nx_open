@@ -13,7 +13,9 @@
 namespace nx::vms::client::desktop {
 namespace entity_resource_tree {
 
-class AccessibleResourceProxySource: public AbstractResourceSource, public SystemContextAware
+class AccessibleResourceProxySource:
+    public AbstractResourceSource,
+    public SystemContextAware
 {
     Q_OBJECT
     using base_type = AbstractResourceSource;

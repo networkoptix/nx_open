@@ -264,7 +264,7 @@ ImageProvider* QnWorkbenchScreenshotHandler::getLocalScreenshotProvider(QnMediaR
     imageProcessingParams.itemDewarpingParams = parameters.itemDewarpingParams;
     imageProcessingParams.rotation = parameters.rotationAngle;
     imageProcessingParams.forcedAspectRatio = parameters.customAspectRatio;
-    imageProcessingParams.watermark = watermark();
+    imageProcessingParams.watermark = context()->watermark();
 
     QImage screenshot = display->camDisplay()->getScreenshot(imageProcessingParams, anyQuality);
     if (screenshot.isNull())
@@ -623,7 +623,7 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
         transcodeParams.cameraNameParams = parameters.sharedParameters.cameraNameParams;
         transcodeParams.rotation = parameters.rotationAngle;
         transcodeParams.zoomWindow = parameters.zoomRect;
-        transcodeParams.watermark = watermark();
+        transcodeParams.watermark = context()->watermark();
         auto filters = QnImageFilterHelper::createFilterChain(
             transcodeParams);
 

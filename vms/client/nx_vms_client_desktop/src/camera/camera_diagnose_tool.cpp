@@ -2,16 +2,16 @@
 
 #include "camera_diagnose_tool.h"
 
-#include <QtNetwork/QNetworkReply>
-
 #include <api/server_rest_connection.h>
-#include <common/common_module.h>
-#include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource_management/resource_pool.h>
 #include <nx/network/http/http_types.h>
 #include <nx/utils/guarded_callback.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/system_settings.h>
+
+using namespace nx::vms::client::desktop;
 
 namespace CameraDiagnostics {
 
@@ -34,6 +34,7 @@ QString mediaServerUnavailableResult(const QnVirtualCameraResourcePtr& camera)
 
 DiagnoseTool::DiagnoseTool(const QnVirtualCameraResourcePtr& camera, QObject* parent):
     QObject(parent),
+    SystemContextAware(SystemContext::fromResource(camera)),
     m_camera(camera),
     m_state(sInit),
     m_step(Step::mediaServerAvailability),

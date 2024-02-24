@@ -12,7 +12,9 @@ namespace nx::vms::client::desktop {
 struct CameraSettingsDialogState;
 class CameraSettingsDialogStore;
 
-class CameraAnalyticsSettingsWidget: public QQuickWidget, public SystemContextAware
+class CameraAnalyticsSettingsWidget:
+    public QQuickWidget,
+    public SystemContextAware
 {
     Q_OBJECT
     using base_type = QQuickWidget;

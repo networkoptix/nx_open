@@ -35,7 +35,9 @@ class TaxonomyManager;
 class AttributeHelper;
 } // namespace analytics
 
-class NX_VMS_CLIENT_DESKTOP_API QnClientModule: public QObject, public SystemContextAware
+class NX_VMS_CLIENT_DESKTOP_API QnClientModule:
+    public QObject,
+    public SystemContextAware
 {
     Q_OBJECT
 

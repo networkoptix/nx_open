@@ -64,13 +64,14 @@ static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kButtonsI
 
 class SortRulesProxyModel:
     public QSortFilterProxyModel,
-    public nx::vms::client::core::CommonModuleAware
+    public SystemContextAware
 {
 public:
-    explicit SortRulesProxyModel(QObject* parent = nullptr):
+    explicit SortRulesProxyModel(SystemContext* systemContext, QObject* parent = nullptr):
         QSortFilterProxyModel(parent),
+        SystemContextAware(systemContext),
         m_filterText(),
-        m_lexComparator(new QnBusinessTypesComparator())
+        m_lexComparator(new QnBusinessTypesComparator(systemContext))
     {
     }
 
@@ -356,7 +357,7 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
 
     const auto kSortColumn = Column::event;
 
-    SortRulesProxyModel* sortModel = new SortRulesProxyModel(this);
+    SortRulesProxyModel* sortModel = new SortRulesProxyModel(systemContext(), this);
     sortModel->setDynamicSortFilter(false);
     sortModel->setSourceModel(m_rulesViewModel);
     sortModel->sort(int(kSortColumn));

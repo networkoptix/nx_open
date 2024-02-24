@@ -10,7 +10,6 @@
 #include <QtQml/QtQml>
 
 #include <common/common_globals.h>
-#include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/layout_resource.h>

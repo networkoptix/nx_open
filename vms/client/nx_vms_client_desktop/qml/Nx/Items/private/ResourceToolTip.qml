@@ -160,7 +160,7 @@ BubbleToolTip
                         if (!toolTip.visible || !resourceHelper.isVideoCamera)
                             return
 
-                        videoPreview.cameraResourceId = toolTip.resource.id
+                        videoPreview.cameraResource = toolTip.resource
                         videoPreview.mediaPlayer.playLive()
                     }
                 }
@@ -193,7 +193,7 @@ BubbleToolTip
     function updateVideoPreview()
     {
         videoPreview.mediaPlayer.stop()
-        videoPreview.cameraResourceId = NxGlobals.uuid("")
+        videoPreview.cameraResource = null
         videoTimer.stop()
 
         if (visible && videoDelayMs > 0 && resourceHelper.isVideoCamera)

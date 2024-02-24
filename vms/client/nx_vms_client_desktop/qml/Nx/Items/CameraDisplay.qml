@@ -15,7 +15,7 @@ Rectangle
     id: cameraDisplay
     color: ColorTheme.window
 
-    property alias cameraResourceId: player.resourceId
+    property alias cameraResource: player.resource
     property bool audioEnabled: true
 
     property alias videoOverlayComponent: videoOverlayLoader.sourceComponent
@@ -46,6 +46,7 @@ Rectangle
     MediaPlayer
     {
         id: player
+
         audioEnabled: cameraDisplay.audioEnabled && mediaResourceHelper.audioEnabled
         maxTextureSize: textureSizeHelper.maxTextureSize
     }
@@ -53,7 +54,7 @@ Rectangle
     MediaResourceHelper
     {
         id: mediaResourceHelper
-        resourceId: player.resourceId
+        resource: player.resource
     }
 
     VideoPositioner

@@ -1,13 +1,14 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.15
+import QtQuick
 
-import Nx 1.0
-import Nx.Core 1.0
-import Nx.Controls 1.0
+import Nx
+import Nx.Common
+import Nx.Controls
+import Nx.Core
 
-import nx.vms.client.core 1.0
-import nx.vms.client.desktop 1.0
+import nx.vms.client.core
+import nx.vms.client.desktop
 
 Item
 {
@@ -23,7 +24,7 @@ Item
     property var nextCheckState: //< Not used in exclusive selection mode.
         (checkState => checkState === Qt.Checked ? Qt.Unchecked : Qt.Checked)
 
-    readonly property var resource: (model && model.resource) || null
+    readonly property Resource resource: (model && model.resource) || null
     readonly property int nodeType: (model && model.nodeType) || -1
 
     readonly property bool isSeparator: nodeType == ResourceTree.NodeType.separator

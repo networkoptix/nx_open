@@ -79,8 +79,6 @@ NotificationActionHandler::NotificationActionHandler(
     WindowContextAware(windowContext),
     m_adaptor(new nx::vms::common::BusinessEventFilterResourcePropertyAdaptor(this))
 {
-    workbenchContext()->instance<ServerNotificationCache>();
-
     connect(windowContext, &WindowContext::beforeSystemChanged,
         this, &NotificationActionHandler::clear);
 
@@ -412,9 +410,8 @@ void NotificationActionHandler::at_businessActionReceived(
 
         case vms::api::ActionType::playSoundOnceAction:
         {
-            QString filename = action->getParams().url;
-            QString filePath =
-                workbenchContext()->instance<ServerNotificationCache>()->getFullPath(filename);
+            const QString filename = action->getParams().url;
+            const QString filePath = system()->serverNotificationCache()->getFullPath(filename);
             // If file doesn't exist then it's already deleted or not downloaded yet.
             // I think it should not be played when downloaded.
             AudioPlayer::playFileAsync(filePath);

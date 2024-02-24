@@ -82,8 +82,7 @@ TileBase
 
             videoPreviewTimestampMs: (model && model.previewTimestampMs) || 0
 
-            videoPreviewResourceId: (model && model.previewResource && model.previewResource.id)
-                || NxGlobals.uuid("")
+            videoPreviewResource: model ? model.previewResource : null
         }
     }
 }

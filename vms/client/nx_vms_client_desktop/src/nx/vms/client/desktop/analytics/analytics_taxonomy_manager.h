@@ -9,7 +9,6 @@
 #include <QtCore/QObject>
 #include <QtCore/QSet>
 
-#include <common/common_module_aware.h>
 #include <nx/analytics/taxonomy/abstract_engine.h>
 #include <nx/analytics/taxonomy/abstract_object_type.h>
 #include <nx/analytics/taxonomy/abstract_state.h>

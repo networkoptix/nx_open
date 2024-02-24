@@ -5,15 +5,12 @@
 #include <QtWidgets/QPushButton>
 
 #include <core/resource/resource_fwd.h>
-#include <nx/vms/client/core/common/utils/common_module_aware.h>
 
 /**
 * Base class for push buttons displaying currently selected resources.
 * It's supposed that click on these buttons will invoke resource selection by the user.
 */
-class QnSelectResourcesButton:
-    public QPushButton,
-    public nx::vms::client::core::CommonModuleAware
+class QnSelectResourcesButton: public QPushButton
 {
     Q_OBJECT
     using base_type = QPushButton;
@@ -71,7 +68,7 @@ private:
 /**
 * Implementation for button displaying selected cameras/devices.
 */
-class QnSelectDevicesButton : public QnSelectResourcesButton
+class QnSelectDevicesButton: public QnSelectResourcesButton
 {
     Q_OBJECT
     using base_type = QnSelectResourcesButton;

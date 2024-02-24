@@ -6,7 +6,6 @@
 
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/vms/client/core/common/utils/common_module_aware.h>
 
 #include "layout_item_adaptor.h"
 
@@ -15,8 +14,7 @@ namespace nx::vms::client::desktop {
 using ItemAdaptorPtr = QSharedPointer<LayoutItemAdaptor>;
 
 class LayoutModel::Private:
-    public QObject,
-    public nx::vms::client::core::CommonModuleAware
+    public QObject
 {
     LayoutModel* const q;
 
@@ -37,7 +35,6 @@ private:
     void setGridBoundingRect(const QRect& rect);
 
 public:
-    nx::Uuid layoutId;
     QnLayoutResourcePtr layout;
     QList<nx::Uuid> itemIds;
     QHash<nx::Uuid, ItemAdaptorPtr> adaptorById;
@@ -171,25 +168,25 @@ LayoutModel::~LayoutModel()
 {
 }
 
-nx::Uuid LayoutModel::layoutId() const
+QnLayoutResource* LayoutModel::rawLayout() const
 {
-    return d->layoutId;
+    return d->layout.data();
 }
 
-void LayoutModel::setLayoutId(const nx::Uuid& id)
+void LayoutModel::setRawLayout(QnLayoutResource* value)
 {
-    if (d->layoutId == id)
+    const auto layout = value ? toSharedPointer(value) : QnLayoutResourcePtr();
+    if (layout == d->layout)
         return;
 
+    if (value)
+         QQmlEngine::setObjectOwnership(value, QQmlEngine::CppOwnership);
+
     beginResetModel();
-
-    d->layoutId = id;
-    emit layoutChanged();
-
-    const auto& layout = d->resourcePool()->getResourceById<QnLayoutResource>(id);
     d->setLayout(layout);
-
     endResetModel();
+
+    emit layoutChanged();
 }
 
 QRect LayoutModel::gridBoundingRect() const

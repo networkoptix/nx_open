@@ -1,6 +1,5 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include <common/common_module.h>
 #include <common/static_common_module.h>
 #include <nx/vms/client/desktop/system_update/multi_server_updates_widget.h>
 #include <nx/vms/common/system_context.h>
@@ -373,7 +372,7 @@ TEST_F(UpdateVerificationTest, cloudCompatibilityCheck)
 
     static const QString kCloudSystemId = "cloud_system_id";
 
-    commonModule()->globalSettings()->setCloudSystemId({});
+    globalSettings()->setCloudSystemId({});
 
     VerificationOptions options;
     options.systemContext = systemContext();
@@ -382,12 +381,12 @@ TEST_F(UpdateVerificationTest, cloudCompatibilityCheck)
     makeServer(kCurrentVersion);
     const auto clientData = makeClientData(kCurrentVersion);
 
-    commonModule()->globalSettings()->setCloudSystemId({});
+    globalSettings()->setCloudSystemId({});
     verifyUpdateContents(contents, getAllServers(), clientData, options);
     EXPECT_EQ(contents.error, common::update::InformationError::noError);
     EXPECT_TRUE(contents.cloudIsCompatible);
 
-    commonModule()->globalSettings()->setCloudSystemId(kCloudSystemId);
+    globalSettings()->setCloudSystemId(kCloudSystemId);
     verifyUpdateContents(contents, getAllServers(), clientData, options);
     EXPECT_EQ(contents.error, common::update::InformationError::incompatibleCloudHost);
     EXPECT_FALSE(contents.cloudIsCompatible);

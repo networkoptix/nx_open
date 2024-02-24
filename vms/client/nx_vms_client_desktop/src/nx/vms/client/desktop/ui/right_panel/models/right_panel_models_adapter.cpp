@@ -15,7 +15,6 @@
 #include <QtGui/QDesktopServices>
 #include <QtQml/QtQml>
 
-#include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/media_server_resource.h>

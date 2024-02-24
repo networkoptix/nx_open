@@ -6,7 +6,6 @@
 #include <QtCore/QSortFilterProxyModel>
 #include <QtCore/QTimer>
 
-#include <common/common_module.h>
 #include <core/resource/resource_display_info.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/algorithm/index_of.h>
@@ -65,8 +64,8 @@ TimeSynchronizationWidget::TimeSynchronizationWidget(
     ui(new Ui::TimeSynchronizationWidget),
     m_store(new TimeSynchronizationWidgetStore(this)),
     m_serversModel(new Model(this)),
-    m_timeWatcher(new TimeSynchronizationServerTimeWatcher(m_store, this)),
-    m_stateWatcher(new TimeSynchronizationServerStateWatcher(m_store, this)),
+    m_timeWatcher(new TimeSynchronizationServerTimeWatcher(systemContext(), m_store, this)),
+    m_stateWatcher(new TimeSynchronizationServerStateWatcher(systemContext(), m_store, this)),
     m_delegate(new TimeSynchronizationServersDelegate(this))
 {
     setupUi();

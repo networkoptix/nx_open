@@ -110,7 +110,7 @@ Item
         AccessHelper
         {
             id: accessHelper
-            resource: (preview.source && preview.source.resource) || null
+            resource: preview.source ? preview.source.resource : null
         }
 
         Item

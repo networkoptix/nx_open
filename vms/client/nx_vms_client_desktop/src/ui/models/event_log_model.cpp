@@ -11,7 +11,6 @@
 #include <business/business_types_comparator.h> //< TODO: #vkutin Think of a proper location.
 #include <client/client_runtime_settings.h>
 #include <client_core/client_core_module.h>
-#include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/resource.h>
 #include <core/resource/resource_display_info.h>
@@ -55,7 +54,7 @@ public:
         m_parent(parent),
         m_sortCol(DateTimeColumn),
         m_sortOrder(Qt::DescendingOrder),
-        m_lexComparator(new QnBusinessTypesComparator())
+        m_lexComparator(new QnBusinessTypesComparator(parent->systemContext()))
     {
     }
 

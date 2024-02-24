@@ -50,7 +50,7 @@ enum { comboBoxMaxVisibleItems = 100 };
 QnBusinessRuleItemDelegate::QnBusinessRuleItemDelegate(QObject* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    m_lexComparator(new QnBusinessTypesComparator()),
+    m_lexComparator(new QnBusinessTypesComparator(systemContext())),
     m_businessStringsHelper(new vms::event::StringsHelper(systemContext()))
 {
 }
@@ -346,13 +346,14 @@ QWidget* QnBusinessRuleItemDelegate::createTargetEditor(QWidget* parent,
     else if (actionType == ActionType::sendMailAction)
     {
         auto usersButton = new QnSelectUsersDialogButton(parent);
-        usersButton->setDialogDelegate(new QnSendEmailActionDelegate(usersButton));
+        usersButton->setDialogDelegate(
+            new QnSendEmailActionDelegate(systemContext(), usersButton));
         editorButton = usersButton;
     }
     else if (actionType == ActionType::openLayoutAction)
     {
         auto usersButton = new QnSelectUsersDialogButton(parent);
-        auto validator = new QnLayoutAccessValidationPolicy{};
+        auto validator = new QnLayoutAccessValidationPolicy{systemContext()};
         validator->setLayout(
             resourcePool()->getResourceById<QnLayoutResource>(
                 model->actionParams().actionResourceId));
@@ -365,6 +366,7 @@ QWidget* QnBusinessRuleItemDelegate::createTargetEditor(QWidget* parent,
         if (model->actionParams().needConfirmation)
         {
             auto validator = new QnRequiredAccessRightPolicy(
+                systemContext(),
                 nx::vms::api::AccessRight::manageBookmarks);
             validator->setCameras({
                 resourcePool()->getResourceById<QnVirtualCameraResource>(
@@ -373,14 +375,15 @@ QWidget* QnBusinessRuleItemDelegate::createTargetEditor(QWidget* parent,
         }
         else
         {
-            usersButton->setSubjectValidationPolicy(new QnDefaultSubjectValidationPolicy());
+            usersButton->setSubjectValidationPolicy(
+                new QnDefaultSubjectValidationPolicy(systemContext()));
         }
         editorButton = usersButton;
     }
     else if (actionType == ActionType::pushNotificationAction)
     {
         auto usersButton = new QnSelectUsersDialogButton(parent);
-        usersButton->setSubjectValidationPolicy(new QnCloudUsersValidationPolicy());
+        usersButton->setSubjectValidationPolicy(new QnCloudUsersValidationPolicy(systemContext()));
         usersButton->setDialogOptions(SubjectSelectionDialog::CustomizableOptions::cloudUsers());
         editorButton = usersButton;
     }

@@ -14,7 +14,7 @@ Rectangle
     id: intro
     color: ColorTheme.window
 
-    property alias introPath: mediaPlayer.source
+    property alias introResource: mediaPlayer.resource
     property alias aspectRatio: mediaPlayer.aspectRatio
 
     TextureSizeHelper
@@ -25,9 +25,10 @@ Rectangle
     MediaPlayer
     {
         id: mediaPlayer
+
         maxTextureSize: textureSizeHelper.maxTextureSize
         videoSurface: videoOutput.videoSink
-        onSourceChanged: updatePlayingState()
+        onResourceChanged: updatePlayingState()
         Component.onCompleted: updatePlayingState()
 
         function updatePlayingState()

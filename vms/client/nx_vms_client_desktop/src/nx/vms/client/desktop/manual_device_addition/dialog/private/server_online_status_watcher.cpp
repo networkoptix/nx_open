@@ -2,25 +2,14 @@
 
 #include "server_online_status_watcher.h"
 
-#include <common/common_module.h>
-#include <client_core/client_core_module.h>
-
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 
 namespace nx::vms::client::desktop {
 
 ServerOnlineStatusWatcher::ServerOnlineStatusWatcher(QObject* parent):
-    base_type(parent),
-    QnCommonModuleAware(qnClientCoreModule->commonModule())
+    base_type(parent)
 {
-    connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
-        [this](const QnResourcePtr& resource)
-        {
-            const auto server = resource.dynamicCast<QnMediaServerResource>();
-            if (server && server == m_server)
-                setServer(QnMediaServerResourcePtr());
-        });
 }
 
 void ServerOnlineStatusWatcher::setServer(const QnMediaServerResourcePtr& server)
@@ -28,16 +17,25 @@ void ServerOnlineStatusWatcher::setServer(const QnMediaServerResourcePtr& server
     if (m_server == server)
         return;
 
-    if (m_server)
-        m_server->disconnect(this);
+    m_connections.reset();
 
     m_server = server;
 
     if (!m_server)
         return;
 
-    connect(m_server.get(), &QnMediaServerResource::statusChanged,
+    m_connections << connect(m_server.get(), &QnMediaServerResource::statusChanged,
         this, &ServerOnlineStatusWatcher::statusChanged);
+
+    if (auto resourcePool = m_server->resourcePool(); NX_ASSERT(resourcePool))
+    {
+        m_connections << connect(resourcePool, &QnResourcePool::resourcesRemoved, this,
+            [this](const QnResourceList& resources)
+            {
+                if (resources.contains(m_server))
+                    setServer(QnMediaServerResourcePtr());
+            });
+    }
 
     emit statusChanged();
 }

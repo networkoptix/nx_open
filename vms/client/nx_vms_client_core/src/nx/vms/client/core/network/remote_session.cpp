@@ -11,7 +11,6 @@
 #include <api/server_rest_connection.h>
 #include <client/client_message_processor.h>
 #include <client_core/client_core_module.h>
-#include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
 #include <nx/reflect/json.h>
 #include <nx/utils/guarded_callback.h>
@@ -299,7 +298,7 @@ void RemoteSession::establishConnection(RemoteConnectionPtr connection)
     connection->updateSessionId(systemContext()->sessionId());
 
     // Setup message bus connection.
-    connection->initializeMessageBusConnection(qnClientCoreModule->commonModule());
+    connection->initializeMessageBusConnection(systemContext());
     qnSyncTime->setTimeSyncManager(connection->timeSynchronizationManager());
     if (NX_ASSERT(d->messageProcessor))
         d->messageProcessor->init(connection->messageBusConnection());
@@ -307,7 +306,7 @@ void RemoteSession::establishConnection(RemoteConnectionPtr connection)
     auto messageBus = connection->messageBusConnection()->messageBus();
 
     // Use for mark original server as invalid in case of message bus error.
-    auto makeServerMarkingFunction=
+    auto makeServerMarkingFunction =
         [this](RemoteConnectionErrorCode errorCode)
         {
             return

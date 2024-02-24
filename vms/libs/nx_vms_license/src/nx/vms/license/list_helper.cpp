@@ -3,8 +3,8 @@
 #include "list_helper.h"
 
 #include <licensing/license.h>
+
 #include "validator.h"
-#include <common/common_module.h>
 
 namespace nx::vms::license {
 

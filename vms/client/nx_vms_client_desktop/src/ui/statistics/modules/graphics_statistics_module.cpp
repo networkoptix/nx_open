@@ -7,6 +7,7 @@
 
 #include <nx/branding.h>
 #include <nx/build_info.h>
+#include <nx/utils/log/format.h>
 #include <statistics/base/functor_metric.h>
 #include <statistics/base/metrics_container.h>
 #include <ui/graphics/opengl/gl_functions.h>

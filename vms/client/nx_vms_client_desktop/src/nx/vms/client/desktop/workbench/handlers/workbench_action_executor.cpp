@@ -68,8 +68,7 @@ void WorkbenchActionExecutor::execute(const ActionPtr& action)
         if (!NX_ASSERT(soundAction))
             return;
 
-        QString filePath = context()->instance<ServerNotificationCache>()->getFullPath(
-            soundAction->sound());
+        QString filePath = system()->serverNotificationCache()->getFullPath(soundAction->sound());
         // If file doesn't exist then it's already deleted or not downloaded yet.
         // It should not be played when downloaded.
         AudioPlayer::playFileAsync(filePath);

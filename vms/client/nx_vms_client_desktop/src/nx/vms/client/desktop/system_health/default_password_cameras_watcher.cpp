@@ -2,7 +2,6 @@
 
 #include "default_password_cameras_watcher.h"
 
-#include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 

@@ -5,19 +5,17 @@
 #include <QtCore/QModelIndex>
 #include <QtGui/QPainter>
 
-#include "resource_node_view_constants.h"
+#include <core/resource/camera_resource.h>
+#include <core/resource/resource.h>
+#include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/desktop/resource_views/data/resource_extra_status.h>
+#include <nx/vms/client/desktop/style/resource_icon_cache.h>
+
 #include "../details/node/view_node.h"
 #include "../details/node/view_node_data.h"
 #include "../details/node/view_node_data_builder.h"
 #include "../details/node/view_node_helper.h"
-
-#include <common/common_module.h>
-#include <core/resource/resource.h>
-#include <core/resource/camera_resource.h>
-#include <core/resource_management/resource_pool.h>
-#include <client_core/client_core_module.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
-#include <nx/vms/client/desktop/resource_views/data/resource_extra_status.h>
+#include "resource_node_view_constants.h"
 
 namespace {
 

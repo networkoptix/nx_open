@@ -5,6 +5,7 @@
 
 #include <QtWidgets/QPushButton>
 
+#include <nx/utils/log/assert.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 
 QnLayoutNameDialog::QnLayoutNameDialog(const QString &caption, const QString &text, const QString &name, QDialogButtonBox::StandardButtons buttons, QWidget *parent):

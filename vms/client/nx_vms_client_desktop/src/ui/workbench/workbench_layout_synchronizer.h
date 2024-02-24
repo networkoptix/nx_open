@@ -8,7 +8,6 @@
 #include <client/client_globals.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/uuid.h>
-#include <nx/vms/client/core/common/utils/common_module_aware.h>
 #include <nx/vms/client/desktop/resource/resource_fwd.h>
 
 class QnWorkbenchItem;
@@ -18,9 +17,7 @@ class QnWorkbenchLayout;
  * This class performs bidirectional synchronization of instances of
  * <tt>QnWorkbenchLayout</tt> and <tt>QnLayoutResource</tt>.
  */
-class QnWorkbenchLayoutSynchronizer:
-    public QObject,
-    public nx::vms::client::core::CommonModuleAware
+class QnWorkbenchLayoutSynchronizer: public QObject
 {
     Q_OBJECT
     typedef QObject base_type;

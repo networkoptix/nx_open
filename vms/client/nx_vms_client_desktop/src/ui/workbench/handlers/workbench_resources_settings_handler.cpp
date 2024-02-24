@@ -4,8 +4,6 @@
 
 #include <QtGui/QAction>
 
-#include <client/client_module.h>
-#include <common/common_module.h>
 #include <core/misc/schedule_task.h>
 #include <core/resource/camera_media_stream_info.h>
 #include <core/resource/camera_resource.h>

@@ -98,7 +98,7 @@ PushNotificationBusinessActionWidget::PushNotificationBusinessActionWidget(
 
     setSubjectsButton(ui->selectUsersButton);
 
-    setValidationPolicy(new QnCloudUsersValidationPolicy());
+    setValidationPolicy(new QnCloudUsersValidationPolicy(systemContext()));
 
     setDialogOptions(ui::SubjectSelectionDialog::CustomizableOptions::cloudUsers());
 

@@ -19,13 +19,7 @@ class NX_VMS_CLIENT_CORE_API AggregatedCameraButtonController:
     using base_type = AbstractCameraButtonController;
 
 public:
-    AggregatedCameraButtonController(
-        SystemContext* context,
-        QObject* parent = nullptr);
-
-    AggregatedCameraButtonController(
-        std::unique_ptr<nx::vms::common::SystemContextInitializer> contextInitializer,
-        QObject* parent = nullptr);
+    AggregatedCameraButtonController(QObject* parent = nullptr);
 
     virtual ~AggregatedCameraButtonController() override;
 
@@ -36,7 +30,7 @@ public:
     void removeController(int group);
 
     template<typename Controller, typename ButtonGroupType, typename... Args>
-    void addController(ButtonGroupType group, SystemContext* context, Args... args);
+    void addController(ButtonGroupType group, Args... args);
 
     virtual CameraButtons buttons() const override;
     virtual OptionalCameraButton button(const nx::Uuid& id) const override;
@@ -54,11 +48,10 @@ private:
 template<typename Controller, typename ButtonGroupType, typename... Args>
 void AggregatedCameraButtonController::addController(
     ButtonGroupType group,
-    SystemContext* context,
     Args... args)
 {
     const auto controller = std::make_shared<Controller>(
-        std::forward<Args>(args)..., static_cast<int>(group), context);
+        std::forward<Args>(args)..., static_cast<int>(group));
     addController(static_cast<int>(group), controller);
 }
 

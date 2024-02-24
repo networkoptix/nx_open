@@ -11,14 +11,11 @@
 
 #include <client/client_globals.h>
 #include <client/client_runtime_settings.h>
-#include <client_core/client_core_module.h>
-#include <common/common_module.h>
 #include <core/resource/resource_directory_browser.h>
 #include <nx/build_info.h>
 #include <nx/media/hardware_acceleration_type.h>
 #include <nx/utils/app_info.h>
 #include <nx/utils/log/log_main.h>
-#include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
@@ -389,8 +386,9 @@ void QnAdvancedSettingsWidget::at_clearCacheButton_clicked()
     /* Lock background image so it will not be deleted. */
     if (!backgroundImage.isEmpty())
     {
-        nx::vms::client::desktop::LocalFileCache cache;
-        QString path = cache.getFullPath(backgroundImage);
+        QString path = nx::vms::client::desktop::LocalFileCache::fullPath(
+            backgroundImage,
+            Qn::kWallpapersFolder);
         QFile lock(path);
         lock.open(QFile::ReadWrite);
         nx::vms::client::desktop::ServerFileCache::clearLocalCache();

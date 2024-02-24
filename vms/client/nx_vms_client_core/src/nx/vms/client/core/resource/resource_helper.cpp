@@ -14,78 +14,56 @@
 
 namespace nx::vms::client::core {
 
-ResourceHelper::ResourceHelper(SystemContext* systemContext, QObject* parent):
-    QObject(parent),
-    SystemContextAware(systemContext)
+ResourceHelper::ResourceHelper(QObject* parent):
+    QObject(parent)
 {
-    initialize();
-}
-
-ResourceHelper::ResourceHelper():
-    QObject(),
-    SystemContextAware(SystemContext::fromQmlContext(this))
-{
-}
-
-void ResourceHelper::initialize()
-{
-    if (m_initialized)
-        return;
-
-    m_initialized = true;
-
-    const auto timeWatcher = systemContext()->serverTimeWatcher();
-    connect(timeWatcher, &ServerTimeWatcher::timeZoneChanged,
-        this, &ResourceHelper::displayOffsetChanged);
-
-    connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
-        [this](const QnResourcePtr& resource)
-        {
-            if (resourceId() == resource->getId())
-                emit resourceRemoved();
-        });
-}
-
-nx::Uuid ResourceHelper::resourceId() const
-{
-    return m_resource ? m_resource->getId() : nx::Uuid();
-}
-
-void ResourceHelper::setResourceId(const nx::Uuid& id)
-{
-    initialize();
-    if (resourceId() != id)
-        setResource(resourcePool()->getResourceById<QnResource>(id));
 }
 
 void ResourceHelper::setResource(const QnResourcePtr& value)
 {
-    if (m_resource)
-        m_resource->disconnect(this);
+    m_connections.reset();
 
     m_resource = value;
 
     if (m_resource)
     {
-        initialize();
         QQmlEngine::setObjectOwnership(m_resource.get(), QQmlEngine::CppOwnership);
 
-        connect(m_resource.get(), &QnResource::nameChanged,
+        m_connections << connect(m_resource.get(), &QnResource::nameChanged,
             this, &ResourceHelper::resourceNameChanged);
-        connect(m_resource.get(), &QnResource::statusChanged,
+        m_connections << connect(m_resource.get(), &QnResource::statusChanged,
             this, &ResourceHelper::resourceStatusChanged);
+
+        if (auto systemContext = SystemContext::fromResource(m_resource); NX_ASSERT(systemContext))
+        {
+            const auto timeWatcher = systemContext->serverTimeWatcher();
+            m_connections << connect(timeWatcher, &ServerTimeWatcher::timeZoneChanged,
+                this, &ResourceHelper::displayOffsetChanged);
+
+            m_connections << connect(systemContext->resourcePool(),
+                &QnResourcePool::resourcesRemoved,
+                this,
+                [this](const QnResourceList& resources)
+                {
+                    if (resources.contains(m_resource))
+                    {
+                        emit resourceRemoved();
+                        setResource({});
+                    }
+                });
+        }
     }
 
     if (const auto camera = m_resource.dynamicCast<QnSecurityCamResource>())
     {
-        connect(camera.get(), &QnSecurityCamResource::capabilitiesChanged, this,
+        m_connections << connect(camera.get(), &QnSecurityCamResource::capabilitiesChanged, this,
             [this]()
             {
                 emit defaultCameraPasswordChanged();
                 emit oldCameraFirmwareChanged();
             });
 
-        connect(camera.get(), &QnSecurityCamResource::propertyChanged, this,
+        m_connections << connect(camera.get(), &QnSecurityCamResource::propertyChanged, this,
             [this](
                 const QnResourcePtr& resource,
                 const QString& key,
@@ -100,7 +78,6 @@ void ResourceHelper::setResource(const QnResourcePtr& value)
     }
 
     emit resourceChanged();
-    emit resourceIdChanged();
     emit resourceNameChanged();
     emit resourceStatusChanged();
     emit oldCameraFirmwareChanged();
@@ -185,7 +162,14 @@ qint64 ResourceHelper::displayOffset() const
 {
     using namespace std::chrono;
 
-    if (serverTimeWatcher()->timeMode() == ServerTimeWatcher::clientTimeMode)
+    if (!m_resource)
+        return 0;
+
+    auto systemContext = SystemContext::fromResource(m_resource);
+    if (!NX_ASSERT(systemContext))
+        return 0;
+
+    if (systemContext->serverTimeWatcher()->timeMode() == ServerTimeWatcher::clientTimeMode)
         return 0;
 
     const milliseconds resourceOffset = seconds(ServerTimeWatcher::timeZone(

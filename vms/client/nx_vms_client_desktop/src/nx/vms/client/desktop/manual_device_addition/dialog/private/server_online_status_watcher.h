@@ -4,12 +4,12 @@
 
 #include <QtCore/QObject>
 
-#include <common/common_module_aware.h>
 #include <core/resource/resource_fwd.h>
+#include <nx/utils/scoped_connections.h>
 
 namespace nx::vms::client::desktop {
 
-class ServerOnlineStatusWatcher: public QObject, public QnCommonModuleAware
+class ServerOnlineStatusWatcher: public QObject
 {
     Q_OBJECT
     using base_type = QObject;
@@ -26,6 +26,7 @@ signals:
 
 private:
     QnMediaServerResourcePtr m_server;
+    nx::utils::ScopedConnections m_connections;
 };
 
 } // namespace nx::vms::client::desktop

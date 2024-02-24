@@ -366,6 +366,7 @@ ActionFactory::ActionFactory(
     QObject* parent)
     :
     base_type(parent),
+    CurrentSystemContextAware(parent),
     d(new Private(this, config))
 {
 }

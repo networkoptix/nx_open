@@ -2,10 +2,9 @@
 
 #include "user_layout_resource_index.h"
 
-#include <common/common_module.h>
-#include <core/resource_management/resource_pool.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
+#include <core/resource_management/resource_pool.h>
 
 namespace nx::vms::client::desktop {
 namespace entity_resource_tree {

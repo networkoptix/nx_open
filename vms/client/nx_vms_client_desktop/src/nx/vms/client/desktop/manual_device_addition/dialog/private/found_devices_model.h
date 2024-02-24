@@ -7,13 +7,10 @@
 #include <api/model/manual_camera_seach_reply.h>
 #include <nx/utils/scoped_model_operations.h>
 #include <nx/vms/api/data/device_model.h>
-#include <nx/vms/client/core/common/utils/common_module_aware.h>
 
 namespace nx::vms::client::desktop {
 
-class FoundDevicesModel:
-    public ScopedModelOperations<QAbstractListModel>,
-    public core::CommonModuleAware
+class FoundDevicesModel: public ScopedModelOperations<QAbstractListModel>
 {
     Q_OBJECT
     using base_type = ScopedModelOperations<QAbstractListModel>;

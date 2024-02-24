@@ -25,7 +25,6 @@ struct LayoutSettingsDialogState: AbstractFluxState
     static constexpr int kBackgroundMaxSize = 64;
 
     bool locked = false;
-    bool isLocalFile = false;
 
     /** Whether layout is cross-system one. */
     bool isCrossSystem = false;
@@ -201,7 +200,7 @@ QN_FUSION_DECLARE_FUNCTIONS(LayoutSettingsDialogState::Background,
     (debug),
     NX_VMS_CLIENT_DESKTOP_API)
 
-#define LayoutSettingsDialogState_Fields (locked)(isLocalFile)(cellAspectRatio)(logicalId)\
+#define LayoutSettingsDialogState_Fields (locked)(cellAspectRatio)(logicalId)\
     (fixedSizeEnabled)(fixedSize)(background)
 
 QN_FUSION_DECLARE_FUNCTIONS(LayoutSettingsDialogState,

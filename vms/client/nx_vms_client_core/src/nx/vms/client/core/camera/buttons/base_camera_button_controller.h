@@ -26,13 +26,11 @@ public:
     /**
      * Constructs controller with specified parameters.
      * @param buttonGroup Buttons grouping number.
-     * @param context System context to be used.
      * @param requiredPermissions Permissions reqiured for all the buttons of the controller.
      * @param parent Parent class.
      */
     BaseCameraButtonController(
         CameraButton::Group buttonGroup,
-        SystemContext* context,
         Qn::Permissions requiredPermissions = {},
         QObject* parent = nullptr);
 
@@ -52,6 +50,8 @@ protected:
         inactive,
         active
     };
+
+    virtual void setResourceInternal(const QnResourcePtr& resource) override;
 
     bool hasRequiredPermissions() const;
 
@@ -82,12 +82,6 @@ protected:
     virtual bool setButtonActionState(const CameraButton& button, ActionState state);
 
 signals:
-    /**
-     * Emitted when current camera has changed. Contains previous cameras as an argument for
-     * convenient usage.
-     */
-    void cameraChanged(const QnVirtualCameraResourcePtr& camera,
-        const QnVirtualCameraResourcePtr& previousCamera);
     void hasRequiredPermissionsChanged();
 
 private:

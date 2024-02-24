@@ -22,6 +22,10 @@ public:
 
     using ResourceFilter = std::function<bool (const QnResourcePtr& resource)>;
     QnResourceList resources(ResourceFilter filter = {}) const;
+
+    /** Find all resources with given Id. */
+    QnResourceList resources(const nx::Uuid& resourceId) const;
+
     QnResourcePtr resource(const nx::Uuid& resourceId, const nx::Uuid& localSystemId) const;
 
 signals:

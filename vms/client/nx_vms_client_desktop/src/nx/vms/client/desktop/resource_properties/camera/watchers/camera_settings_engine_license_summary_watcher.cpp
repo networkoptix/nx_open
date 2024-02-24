@@ -28,7 +28,7 @@ CameraSettingsEngineLicenseWatcher::CameraSettingsEngineLicenseWatcher(
 
             EngineLicenseSummaryProvider engineLicenseSummaryProvider{systemContext()};
             store->handleOverusedEngines(engineLicenseSummaryProvider.overusedEngines(
-                store->resourceId(), store->state().analytics.userEnabledEngines.get()));
+                store->resource(), store->state().analytics.userEnabledEngines.get()));
         });
 }
 

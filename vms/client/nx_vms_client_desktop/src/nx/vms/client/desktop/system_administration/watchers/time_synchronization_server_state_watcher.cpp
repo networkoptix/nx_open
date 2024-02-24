@@ -4,7 +4,7 @@
 
 #include <QtCore/QPointer>
 
-#include <common/common_module.h>
+#include <api/server_rest_connection.h>
 #include <core/resource/resource_display_info.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/guarded_callback.h>
@@ -102,10 +102,12 @@ private:
 };
 
 TimeSynchronizationServerStateWatcher::TimeSynchronizationServerStateWatcher(
+    SystemContext* systemContext,
     TimeSynchronizationWidgetStore* store,
     QObject* parent)
     :
     base_type(parent),
+    SystemContextAware(systemContext),
     d(new Private(this, store))
 {
 }

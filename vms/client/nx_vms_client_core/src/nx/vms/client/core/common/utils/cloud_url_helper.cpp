@@ -2,14 +2,12 @@
 
 #include "cloud_url_helper.h"
 
-#include <client_core/client_core_module.h>
-#include <common/common_module.h>
 #include <nx/branding.h>
 #include <nx/network/app_info.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
-#include <nx/vms/common/system_context.h>
+#include <nx/vms/client/core/system_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/utils/system_uri.h>
 
@@ -63,9 +61,9 @@ QUrl CloudUrlHelper::faqUrl() const
     return makeUrl("/content/faq");
 }
 
-QUrl CloudUrlHelper::viewSystemUrl() const
+QUrl CloudUrlHelper::viewSystemUrl(SystemContext* systemContext) const
 {
-    const auto systemId = qnClientCoreModule->globalSettings()->cloudSystemId();
+    const auto systemId = systemContext->globalSettings()->cloudSystemId();
     if (systemId.isEmpty())
         return mainUrl();
 

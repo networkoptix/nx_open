@@ -4,7 +4,6 @@
 #include "ui_system_settings_widget.h"
 
 #include <client/client_globals.h>
-#include <common/common_module.h>
 #include <core/resource/device_dependent_strings.h>
 #include <nx/branding.h>
 #include <nx/vms/client/desktop/help/help_topic.h>

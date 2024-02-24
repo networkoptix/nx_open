@@ -63,7 +63,7 @@ void MediaPlayerMotionProvider::setMediaPlayer(MediaPlayer* value)
                 emit mediaPlayerChanged();
             });
 
-        connect(d->mediaPlayer, &MediaPlayer::sourceChanged,
+        connect(d->mediaPlayer, &MediaPlayer::resourceChanged,
             this, &MediaPlayerMotionProvider::motionMaskChanged);
         connect(d->mediaPlayer, &MediaPlayer::positionChanged,
             this, &MediaPlayerMotionProvider::motionMaskChanged);

@@ -104,7 +104,7 @@ LabeledItem
             {
                 figureType: control.figureType
                 figureSettings: control.figureSettings
-                resourceId: sharedData.resourceId
+                resource: sharedData.resource
                 player.videoQuality:
                     sharedData.analyticsStreamQuality ?? MediaPlayer.LowVideoQuality
 

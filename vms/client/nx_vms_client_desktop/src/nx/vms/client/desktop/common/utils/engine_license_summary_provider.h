@@ -5,11 +5,14 @@
 #include <QtCore/QObject>
 #include <QtCore/QVariant>
 
+#include <core/resource/resource_fwd.h>
 #include <nx/vms/client/desktop/system_context_aware.h>
 
 namespace nx::vms::client::desktop {
 
-class EngineLicenseSummaryProvider: public QObject, public SystemContextAware
+class EngineLicenseSummaryProvider:
+    public QObject,
+    public SystemContextAware
 {
     Q_OBJECT
 
@@ -24,10 +27,13 @@ public:
      * the camera with the given id.
      */
     Q_INVOKABLE QVariant licenseSummary(
-        nx::Uuid engineId, nx::Uuid cameraId, const QVariantList& proposedEngines) const;
+        nx::Uuid engineId,
+        QnResource* camera,
+        const QVariantList& proposedEngines) const;
 
     QSet<nx::Uuid> overusedEngines(
-        nx::Uuid cameraId, const QSet<nx::Uuid>& proposedEngines) const;
+        QnResource* camera,
+        const QSet<nx::Uuid>& proposedEngines) const;
 };
 
 } // namespace nx::vms::client::desktop

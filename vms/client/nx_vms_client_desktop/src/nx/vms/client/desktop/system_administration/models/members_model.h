@@ -64,7 +64,9 @@ public:
     static MembersModelGroup fromId(SystemContext* systemContext, const nx::Uuid& id);
 };
 
-class NX_VMS_CLIENT_DESKTOP_API MembersModel: public QAbstractListModel, public SystemContextAware
+class NX_VMS_CLIENT_DESKTOP_API MembersModel:
+    public QAbstractListModel,
+    public SystemContextAware
 {
     using base_type = QAbstractListModel;
 

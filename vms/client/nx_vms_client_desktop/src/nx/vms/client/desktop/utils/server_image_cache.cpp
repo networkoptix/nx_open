@@ -5,17 +5,16 @@
 #include <QtCore/QFileInfo>
 #include <QtCore/QSet>
 
-#include <ui/graphics/opengl/gl_functions.h>
-
-#include <utils/common/id.h>
+#include <common/common_globals.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/desktop/image_providers/threaded_image_loader.h>
-#include <common/common_globals.h>
+#include <ui/graphics/opengl/gl_functions.h>
+#include <utils/common/id.h>
 
 namespace nx::vms::client::desktop {
 
-ServerImageCache::ServerImageCache(QObject *parent) :
-    base_type(Qn::kWallpapersFolder, parent)
+ServerImageCache::ServerImageCache(SystemContext* systemContext, QObject* parent):
+    base_type(systemContext, Qn::kWallpapersFolder, parent)
 {
 }
 
@@ -31,11 +30,11 @@ QSize ServerImageCache::getMaxImageSize() const {
 
 QString ServerImageCache::cachedImageFilename(const QString &sourcePath)
 {
-    static const QSet<QString> kAllowedExtensions{lit("png"), lit("jpg"), lit("jpeg")};
+    static const QSet<QString> kAllowedExtensions{"png", "jpg", "jpeg"};
 
     QString ext = QFileInfo(sourcePath).suffix();
     if (!kAllowedExtensions.contains(ext))
-        ext = lit("png");
+        ext = "png";
 
     QString uuid = guidFromArbitraryData(sourcePath.toUtf8()).toString();
     return uuid.mid(1, uuid.size() - 2) + '.' + ext;

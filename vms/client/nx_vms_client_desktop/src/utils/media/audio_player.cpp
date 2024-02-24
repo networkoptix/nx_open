@@ -5,8 +5,6 @@
 #include <QtCore/QBuffer>
 
 #include <camera/audio_stream_display.h>
-#include <client_core/client_core_module.h>
-#include <common/common_module.h>
 #include <core/resource/avi/avi_archive_delegate.h>
 #include <core/resource/resource.h>
 #include <nx/speech_synthesizer/text_to_wave_server.h>

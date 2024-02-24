@@ -8,7 +8,6 @@
 
 #include <QtGui/QStandardItemModel>
 
-#include <common/common_module.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>

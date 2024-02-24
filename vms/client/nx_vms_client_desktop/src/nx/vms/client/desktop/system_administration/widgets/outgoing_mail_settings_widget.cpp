@@ -11,8 +11,6 @@
 
 #include <api/model/test_email_settings_reply.h>
 #include <api/server_rest_connection.h>
-#include <client_core/client_core_module.h>
-#include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/branding.h>

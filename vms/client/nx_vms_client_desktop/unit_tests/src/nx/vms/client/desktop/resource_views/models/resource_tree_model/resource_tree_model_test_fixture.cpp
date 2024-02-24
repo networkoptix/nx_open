@@ -7,8 +7,6 @@
 
 #include <client/client_runtime_settings.h>
 #include <client/client_startup_parameters.h>
-#include <client_core/client_core_module.h>
-#include <common/common_module.h>
 #include <common/static_common_module.h>
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/avi/filetypesupport.h>
@@ -480,7 +478,7 @@ void ResourceTreeModelTest::setupAccessToObjectForUser(
         return;
 
     const auto userId = user->getId();
-    const auto accessRightsManager = commonModule()->systemContext()->accessRightsManager();
+    const auto accessRightsManager = systemContext()->accessRightsManager();
 
     auto accessRightsMap = accessRightsManager->ownResourceAccessMap(userId);
     if (accessRights != 0)

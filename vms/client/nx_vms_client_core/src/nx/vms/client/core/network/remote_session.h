@@ -25,7 +25,9 @@ namespace nx::vms::client::core {
  * * Watches actual cloud session and breaks current System connection in case user is logged out of
  *   cloud, being logged using cloud credentials (// TODO: #amalov).
  */
-class NX_VMS_CLIENT_CORE_API RemoteSession: public QObject, public SystemContextAware
+class NX_VMS_CLIENT_CORE_API RemoteSession:
+    public QObject,
+    public SystemContextAware
 {
     using base_type = QObject;
     Q_OBJECT

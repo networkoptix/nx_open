@@ -31,7 +31,7 @@ Control
     property real minimumAspectRatio: 16.0 / 9.0
     property bool videoPreviewEnabled: true
     property bool videoPreviewForced: false //< Always play video preview, not only on hover.
-    property alias videoPreviewResourceId: intervalPreview.resourceId
+    property alias videoPreviewResource: intervalPreview.resource
     property alias videoPreviewTimestampMs: intervalPreview.timestampMs
 
     padding: backgroundRect.border.width

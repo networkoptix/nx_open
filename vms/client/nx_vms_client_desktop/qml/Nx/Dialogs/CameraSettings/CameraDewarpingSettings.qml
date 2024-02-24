@@ -30,7 +30,7 @@ Control
 
             function onStateModified()
             {
-                if (control.store.resourceId().isNull())
+                if (!control.store.resource())
                     return
 
                 const params = control.store.dewarpingParams()

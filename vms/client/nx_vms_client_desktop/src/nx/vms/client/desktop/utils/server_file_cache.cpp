@@ -9,19 +9,25 @@
 #include <QtCore/QTimer>
 
 #include <client/client_message_processor.h>
-#include <common/common_module.h>
 #include <network/system_helpers.h>
 #include <nx/utils/string.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/system_logon/logic/remote_session.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx_ec/abstract_ec_connection.h>
 #include <nx_ec/managers/abstract_stored_file_manager.h>
-#include <utils/common/util.h> /* For removeDir. */
+#include <utils/common/util.h> //< For removeDir().
 
 namespace nx::vms::client::desktop {
 
-ServerFileCache::ServerFileCache(const QString &folderName, QObject *parent) :
+ServerFileCache::ServerFileCache(
+    SystemContext* systemContext,
+    const QString& folderName,
+    QObject* parent)
+    :
     QObject(parent),
+    SystemContextAware(systemContext),
     m_folderName(folderName)
 {
     connect(this, &ServerFileCache::delayedFileDownloaded, this,
@@ -110,7 +116,8 @@ void ServerFileCache::getFileList() {
         return;
     }
 
-    auto connection = RemoteConnectionAware::messageBusConnection();
+    // FIXME: #sivanov Replace calls using connectedServerApi()
+    auto connection = systemContext()->session()->messageBusConnection();
     connection->getStoredFileManager(Qn::kSystemAccess)->listDirectory(
         m_folderName,
         [this](int /*requestId*/, ec2::ErrorCode errorCode, const QStringList& filenames)
@@ -148,7 +155,7 @@ void ServerFileCache::downloadFile(const QString &filename) {
     if (m_loading.values().contains(filename))
       return;
 
-    auto connection = RemoteConnectionAware::messageBusConnection();
+    auto connection = systemContext()->session()->messageBusConnection();
     int handle = connection->getStoredFileManager(Qn::kSystemAccess)->getStoredFile(
         m_folderName + QLatin1Char('/') + filename,
         [this](int requestId, ec2::ErrorCode errorCode, const QByteArray& fileData)
@@ -211,7 +218,7 @@ void ServerFileCache::uploadFile(const QString &filename) {
     QByteArray data = file.readAll();
     file.close();
 
-    auto connection = RemoteConnectionAware::messageBusConnection();
+    auto connection = systemContext()->session()->messageBusConnection();
     int handle = connection->getStoredFileManager(Qn::kSystemAccess)->addStoredFile(
         m_folderName + QLatin1Char('/') + filename,
         data,
@@ -263,7 +270,7 @@ void ServerFileCache::deleteFile(const QString &filename) {
     if (m_deleting.values().contains(filename))
       return;
 
-    auto connection = RemoteConnectionAware::messageBusConnection();
+    auto connection = systemContext()->session()->messageBusConnection();
     int handle = connection->getStoredFileManager(Qn::kSystemAccess)->deleteStoredFile(
         m_folderName + QLatin1Char('/') + filename,
         [this](int requestId, ec2::ErrorCode errorCode)

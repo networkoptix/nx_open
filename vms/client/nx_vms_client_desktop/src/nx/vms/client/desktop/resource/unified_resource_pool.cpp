@@ -51,6 +51,17 @@ QnResourceList UnifiedResourcePool::resources(ResourceFilter filter) const
     return result;
 }
 
+QnResourceList UnifiedResourcePool::resources(const nx::Uuid& resourceId) const
+{
+    QnResourceList result;
+    for (const auto& systemContext: appContext()->systemContexts())
+    {
+        if (auto resource = systemContext->resourcePool()->getResourceById(resourceId))
+            result.append(resource);
+    }
+    return result;
+}
+
 QnResourcePtr UnifiedResourcePool::resource(
     const nx::Uuid& resourceId,
     const nx::Uuid& localSystemId) const

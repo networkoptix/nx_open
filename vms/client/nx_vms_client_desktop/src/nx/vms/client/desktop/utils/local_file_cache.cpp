@@ -20,8 +20,8 @@ bool isResourceFile(const QString& filename)
 
 } // namespace
 
-LocalFileCache::LocalFileCache(QObject* parent):
-    base_type(parent)
+LocalFileCache::LocalFileCache(SystemContext* systemContext, QObject* parent):
+    base_type(systemContext, parent)
 {
 }
 
@@ -29,7 +29,7 @@ LocalFileCache::~LocalFileCache()
 {
 }
 
-QString LocalFileCache::getFullPath(const QString& filename) const
+QString LocalFileCache::fullPath(const QString& filename, const QString& folder)
 {
     if (isResourceFile(filename))
         return filename;
@@ -39,11 +39,16 @@ QString LocalFileCache::getFullPath(const QString& filename) const
         cachedName = ServerImageCache::cachedImageFilename(filename);
 
     QString path = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
-    return QDir::toNativeSeparators(QString(lit("%1/cache/local/%2/%3"))
+    return QDir::toNativeSeparators(QString("%1/cache/local/%2/%3")
         .arg(path)
-        .arg(folderName())
+        .arg(folder)
         .arg(cachedName)
     );
+}
+
+QString LocalFileCache::getFullPath(const QString& filename) const
+{
+    return fullPath(filename, folderName());
 }
 
 void LocalFileCache::storeImageData(const QString& fileName, const QByteArray& imageData)

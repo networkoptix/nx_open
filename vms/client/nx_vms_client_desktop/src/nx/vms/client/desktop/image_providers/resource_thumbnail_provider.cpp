@@ -12,7 +12,6 @@
 #include <QtGui/QPainter>
 
 #include <api/server_rest_connection.h>
-#include <common/common_module.h>
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>

@@ -9,8 +9,6 @@
 
 namespace nx::vms::client::core {
 
-class SystemContext;
-
 class NX_VMS_CLIENT_CORE_API ExtendedOutputCameraButtonController:
     public BaseCameraButtonController
 {
@@ -21,9 +19,11 @@ public:
     ExtendedOutputCameraButtonController(
         nx::vms::api::ExtendedCameraOutputs allowedOutputs,
         CameraButton::Group buttonGroup,
-        SystemContext* context,
         QObject* parent = nullptr);
     virtual ~ExtendedOutputCameraButtonController() override;
+
+protected:
+    virtual void setResourceInternal(const QnResourcePtr& resource) override;
 
 private:
     virtual bool setButtonActionState(const CameraButton& button, ActionState state) override;

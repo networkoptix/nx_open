@@ -2,15 +2,17 @@
 
 #include "resource_searcher.h"
 
-#include <common/common_module.h>
 #include <core/resource/resource.h>
 #include <core/resource/resource_type.h>
 #include <nx/network/http/http_client.h>
 #include <nx/network/http/http_types.h>
+#include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
 
-QnAbstractResourceSearcher::QnAbstractResourceSearcher(QnCommonModule* commonModule) noexcept:
-    QnCommonModuleAware(commonModule),
+using namespace nx::vms::common;
+
+QnAbstractResourceSearcher::QnAbstractResourceSearcher(SystemContext* systemContext) noexcept:
+    SystemContextAware(systemContext),
     m_discoveryMode(DiscoveryMode::fullyEnabled),
     m_isLocal(false),
     m_shouldStop(false)
@@ -65,8 +67,8 @@ bool QnAbstractResourceSearcher::isResourceTypeSupported(nx::Uuid resourceTypeId
     return resourceType->getManufacturer() == manufacturer();
 }
 
-QnAbstractNetworkResourceSearcher::QnAbstractNetworkResourceSearcher(QnCommonModule* commonModule):
-    QnAbstractResourceSearcher(commonModule)
+QnAbstractNetworkResourceSearcher::QnAbstractNetworkResourceSearcher(SystemContext* systemContext):
+    QnAbstractResourceSearcher(systemContext)
 {
 }
 
@@ -86,8 +88,8 @@ nx::utils::Url QnAbstractNetworkResourceSearcher::updateUrlToHttpsIfNeed(const n
     return client.contentLocationUrl();
 }
 
-QnAbstractHttpResourceSearcher::QnAbstractHttpResourceSearcher(QnCommonModule* commonModule):
-    QnAbstractNetworkResourceSearcher(commonModule)
+QnAbstractHttpResourceSearcher::QnAbstractHttpResourceSearcher(SystemContext* systemContext):
+    QnAbstractNetworkResourceSearcher(systemContext)
 {
 }
 

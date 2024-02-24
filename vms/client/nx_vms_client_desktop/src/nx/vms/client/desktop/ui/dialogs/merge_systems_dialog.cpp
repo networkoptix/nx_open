@@ -7,7 +7,6 @@
 
 #include <api/server_rest_connection.h>
 #include <client_core/client_core_module.h>
-#include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource_display_info.h>
 #include <core/resource/user_resource.h>
@@ -22,12 +21,12 @@
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/connection_url_parser.h>
-#include <nx/vms/client/desktop/other_servers/other_server_display_info.h>
-#include <nx/vms/client/desktop/other_servers/other_servers_manager.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/licensing/customer_support.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/other_servers/other_server_display_info.h>
+#include <nx/vms/client/desktop/other_servers/other_servers_manager.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/system_context.h>

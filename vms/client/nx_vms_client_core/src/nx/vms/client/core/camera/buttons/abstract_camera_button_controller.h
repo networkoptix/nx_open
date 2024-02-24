@@ -4,40 +4,32 @@
 
 #include <memory>
 
+#include <core/resource/resource_fwd.h>
 #include <nx/utils/uuid.h>
-#include <nx/vms/client/core/system_context_aware.h>
 
 #include "camera_button.h"
 
+Q_MOC_INCLUDE("core/resource/resource.h")
+
 namespace nx::vms::client::core {
+
+class SystemContext;
 
 /**
  * Abstract camera button controller interface class. Declares the interface of the buttons,
  * related acttions and interaction rules.
  */
-class NX_VMS_CLIENT_CORE_API AbstractCameraButtonController: public QObject,
-    protected SystemContextAware
+class NX_VMS_CLIENT_CORE_API AbstractCameraButtonController: public QObject
 {
     Q_OBJECT
     using base_type = QObject;
 
-    Q_PROPERTY(nx::Uuid resourceId
-        READ resourceId
-        WRITE setResourceId
-        NOTIFY resourceIdChanged)
+    Q_PROPERTY(QnResource* resource READ rawResource WRITE setRawResource NOTIFY resourceChanged)
 
 public:
     static void registerQmlType();
 
-    AbstractCameraButtonController(
-        SystemContext* context,
-        QObject* parent = nullptr);
-    AbstractCameraButtonController(
-        std::unique_ptr<nx::vms::common::SystemContextInitializer> contextInitializer,
-        QObject* parent = nullptr);
-
-    nx::Uuid resourceId() const;
-    void setResourceId(const nx::Uuid& value);
+    AbstractCameraButtonController(QObject* parent = nullptr);
 
     /** Returns list of the available camera buttons. */
     virtual CameraButtons buttons() const = 0;
@@ -73,13 +65,25 @@ public:
     /** Returns wheter the action for the specified button is active. */
     Q_INVOKABLE virtual bool actionIsActive(const nx::Uuid& buttonId) const = 0;
 
+    QnResourcePtr resource() const;
+    void setResource(const QnResourcePtr& value);
+
 protected:
+    virtual void setResourceInternal(const QnResourcePtr& value);
+
+    /** Current System Context. Helper function. Shall not be called when resource is not set */
+    SystemContext* systemContext() const;
+
     void safeEmitActionStarted(const nx::Uuid& buttonId, bool success);
     void safeEmitActionStopped(const nx::Uuid& buttonId, bool success);
     void safeEmitActionCancelled(const nx::Uuid& buttonId);
 
+private:
+    QnResource* rawResource() const;
+    void setRawResource(QnResource* value);
+
 signals:
-    void resourceIdChanged();
+    void resourceChanged();
 
     void buttonAdded(const CameraButton& button);
     void buttonChanged(const CameraButton& button, CameraButton::Fields fields);
@@ -95,7 +99,7 @@ signals:
     void actionCancelled(const nx::Uuid& buttonId, QPrivateSignal);
 
 private:
-    nx::Uuid m_resourceId;
+    QnResourcePtr m_resource;
 };
 
 } // namespace nx::vms::client::core

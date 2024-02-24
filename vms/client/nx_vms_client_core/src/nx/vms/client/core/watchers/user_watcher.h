@@ -9,7 +9,9 @@
 
 namespace nx::vms::client::core {
 
-class NX_VMS_CLIENT_CORE_API UserWatcher: public QObject, public SystemContextAware
+class NX_VMS_CLIENT_CORE_API UserWatcher:
+    public QObject,
+    public SystemContextAware
 {
     Q_OBJECT
     /* This property should remain read-only for QML! */

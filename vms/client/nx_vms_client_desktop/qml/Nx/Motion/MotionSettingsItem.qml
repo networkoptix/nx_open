@@ -34,7 +34,7 @@ CameraDisplay
 
         parent: videoOverlay
         anchors.fill: parent
-        resourceId: motionSettingsItem.cameraResourceId
+        resource: motionSettingsItem.cameraResource
         mode: SecurityOverlay.Live
         font.pixelSize: 32
     }
@@ -114,7 +114,7 @@ CameraDisplay
     {
         target: motionSettingsItem.mediaPlayer
 
-        function onSourceChanged()
+        function onResourceChanged()
         {
             motionSettingsItem.updatePlayingState()
         }

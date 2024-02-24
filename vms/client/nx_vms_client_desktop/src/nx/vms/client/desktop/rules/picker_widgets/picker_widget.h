@@ -23,7 +23,9 @@ namespace nx::vms::client::desktop::rules {
  * Base class for the data pickers. Represents and edit Field's data according to
  * the FieldDescriptor.
  */
-class PickerWidget: public QWidget, public SystemContextAware
+class PickerWidget:
+    public QWidget,
+    public SystemContextAware
 {
     Q_OBJECT
 

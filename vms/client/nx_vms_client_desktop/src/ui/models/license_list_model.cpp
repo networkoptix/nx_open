@@ -5,7 +5,6 @@
 #include <QtGui/QBrush>
 
 #include <client/client_globals.h>
-#include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource_display_info.h>
 #include <core/resource_management/resource_pool.h>
@@ -15,6 +14,7 @@
 #include <nx/utils/string.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/license/validator.h>
 #include <nx/vms/time/formatter.h>
 #include <utils/common/synctime.h>
@@ -30,8 +30,9 @@ using namespace nx::vms::client;
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::license;
 
-QnLicenseListModel::QnLicenseListModel(QObject* parent) :
+QnLicenseListModel::QnLicenseListModel(SystemContext* systemContext, QObject* parent):
     base_type(parent),
+    SystemContextAware(systemContext),
     m_extendedStatus(false)
 {
 }

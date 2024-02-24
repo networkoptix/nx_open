@@ -9,15 +9,12 @@
 #include <QtCore/QSortFilterProxyModel>
 #include <QtWidgets/QMenu>
 
-#include <client_core/client_core_module.h>
-#include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource_display_info.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/pending_operation.h>
-#include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/desktop/common/widgets/item_view_auto_hider.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <nx/vms/client/desktop/help/help_topic.h>

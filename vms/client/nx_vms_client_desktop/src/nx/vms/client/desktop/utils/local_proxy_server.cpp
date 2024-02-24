@@ -2,8 +2,6 @@
 
 #include "local_proxy_server.h"
 
-#include <client_core/client_core_module.h>
-#include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/network_resource.h>
@@ -15,8 +13,9 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/network/websocket/websocket_handshake.h>
 #include <nx/utils/url.h>
-#include <nx/vms/client/core/common/utils/common_module_aware.h>
 #include <nx/vms/client/core/network/remote_connection_aware.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 
 template<>
@@ -34,13 +33,17 @@ using namespace nx::network::http;
  */
 class VmsServerConnector:
     public nx::network::socks5::AbstractTunnelConnector,
-    public nx::vms::client::core::CommonModuleAware,
-    public nx::vms::client::core::RemoteConnectionAware
+    public SystemContextAware,
+    public core::RemoteConnectionAware
 {
     using base_type = nx::network::socks5::AbstractTunnelConnector;
 
 public:
-    VmsServerConnector() {}
+    // FIXME: #sivanov Use actual system context.
+    VmsServerConnector():
+        SystemContextAware(appContext()->currentSystemContext())
+    {
+    }
 
     virtual bool hasAuth() const override { return true; }
     virtual bool auth(const std::string& user, const std::string& password) override;

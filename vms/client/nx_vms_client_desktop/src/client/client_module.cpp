@@ -16,7 +16,6 @@
 #include <api/network_proxy_factory.h>
 #include <client/client_runtime_settings.h>
 #include <client_core/client_core_module.h>
-#include <common/common_module.h>
 #include <core/dataprovider/data_provider_factory.h>
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/client_camera.h>

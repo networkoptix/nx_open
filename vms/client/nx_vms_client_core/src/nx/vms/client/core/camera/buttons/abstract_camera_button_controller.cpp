@@ -4,6 +4,7 @@
 
 #include <QtQml/QtQml>
 
+#include <core/resource/resource.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/client/core/system_context.h>
 #include <utils/common/delayed.h>
@@ -16,36 +17,49 @@ void AbstractCameraButtonController::registerQmlType()
         "AbstractCameraButtonController", "Can't create");
 }
 
-AbstractCameraButtonController::AbstractCameraButtonController(
-    SystemContext* context,
-    QObject* parent)
-    :
-    base_type(parent),
-    SystemContextAware(context)
+AbstractCameraButtonController::AbstractCameraButtonController(QObject* parent):
+    base_type(parent)
 {
 }
 
-AbstractCameraButtonController::AbstractCameraButtonController(
-    std::unique_ptr<nx::vms::common::SystemContextInitializer> contextInitializer,
-    QObject* parent)
-    :
-    base_type(parent),
-    SystemContextAware(std::move(contextInitializer))
+QnResourcePtr AbstractCameraButtonController::resource() const
 {
+    return m_resource;
 }
 
-nx::Uuid AbstractCameraButtonController::resourceId() const
+void AbstractCameraButtonController::setResource(const QnResourcePtr& value)
 {
-    return m_resourceId;
-}
-
-void AbstractCameraButtonController::setResourceId(const nx::Uuid& value)
-{
-    if (m_resourceId == value)
+    if (m_resource == value)
         return;
 
-    m_resourceId = value;
-    emit resourceIdChanged();
+    if (value)
+        QQmlEngine::setObjectOwnership(value.data(), QQmlEngine::CppOwnership);
+
+    // Let descendant classes process resource change before the signal is emitted.
+    setResourceInternal(value);
+
+    emit resourceChanged();
+}
+
+void AbstractCameraButtonController::setResourceInternal(const QnResourcePtr& value)
+{
+    m_resource = value;
+}
+
+SystemContext* AbstractCameraButtonController::systemContext() const
+{
+    NX_ASSERT(m_resource);
+    return SystemContext::fromResource(m_resource);
+}
+
+QnResource* AbstractCameraButtonController::rawResource() const
+{
+    return m_resource.data();
+}
+
+void AbstractCameraButtonController::setRawResource(QnResource* value)
+{
+    setResource(value ? value->toSharedPointer() : QnResourcePtr());
 }
 
 void AbstractCameraButtonController::safeEmitActionStarted(const nx::Uuid& id, bool success)

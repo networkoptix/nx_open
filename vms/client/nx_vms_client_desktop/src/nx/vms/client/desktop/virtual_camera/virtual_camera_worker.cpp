@@ -6,13 +6,13 @@
 
 #include <api/model/virtual_camera_status_reply.h>
 #include <api/server_rest_connection.h>
-#include <client/client_module.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/utils/server_request_storage.h>
 #include <nx/vms/client/desktop/utils/upload_manager.h>
 
@@ -59,6 +59,7 @@ VirtualCameraWorker::VirtualCameraWorker(
     QObject* parent)
     :
     base_type(parent),
+    SystemContextAware(SystemContext::fromResource(camera)),
     d(new Private(camera))
 {
     d->user = user;

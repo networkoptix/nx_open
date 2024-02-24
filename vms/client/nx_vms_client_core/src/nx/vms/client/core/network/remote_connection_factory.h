@@ -20,7 +20,6 @@
 #include "remote_connection_fwd.h"
 
 class QObject;
-class QnCommonModule;
 struct QnPingReply;
 
 namespace nx::vms::client::core {

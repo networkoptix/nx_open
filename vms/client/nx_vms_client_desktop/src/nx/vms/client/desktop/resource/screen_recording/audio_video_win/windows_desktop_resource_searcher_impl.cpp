@@ -2,11 +2,13 @@
 
 #include "windows_desktop_resource_searcher_impl.h"
 
+#include <windows.h>
+//^ Windows header must be included first (actual for no-pch build only).
+
 #include <commdlg.h>
 #include <d3d9.h>
 #include <d3dx9.h>
 #include <shellapi.h>
-#include <windows.h>
 
 #include <client/client_runtime_settings.h>
 

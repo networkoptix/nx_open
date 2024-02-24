@@ -65,8 +65,8 @@ bool SortModel::lessThan(const QModelIndex& source_left, const QModelIndex& sour
 
 DeviceAdditionDialog::DeviceAdditionDialog(QWidget* parent):
     base_type(parent),
-    m_serversWatcher(parent),
-    m_serverStatusWatcher(this),
+    m_serversWatcher(systemContext()),
+    m_serverStatusWatcher(),
     ui(new Ui::DeviceAdditionDialog()),
     m_sortModel(new SortModel(this))
 {

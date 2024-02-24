@@ -6,12 +6,13 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/guarded_callback.h>
+#include <nx/utils/scoped_connections.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/api/data/event_rule_data.h>
 #include <nx/vms/client/core/camera/buttons/intercom_helper.h>
 #include <nx/vms/client/core/camera/iomodule/io_module_monitor.h>
 #include <nx/vms/client/core/system_context.h>
 #include <nx/vms/event/action_parameters.h>
-#include <nx/vms/api/data/event_rule_data.h>
 
 namespace nx::vms::client::core {
 
@@ -79,6 +80,7 @@ struct ExtendedOutputCameraButtonController::Private
     OutputNameToIdMap outputNameToId;
     IOModuleMonitorPtr ioModuleMonitor;
     bool activeObjectTracking = false;
+    nx::utils::ScopedConnections connections;
 
     void updateOutputs();
     void openIoModuleConnectionIfNeeded();
@@ -192,47 +194,46 @@ QString ExtendedOutputCameraButtonController::Private::outputId(ExtendedCameraOu
 ExtendedOutputCameraButtonController::ExtendedOutputCameraButtonController(
     ExtendedCameraOutputs allowedOutputs,
     CameraButton::Group buttonGroup,
-    SystemContext* context,
     QObject* parent)
     :
-    base_type(buttonGroup, context, Qn::DeviceInputPermission, parent),
+    base_type(buttonGroup, Qn::DeviceInputPermission, parent),
     d(new Private{.q = this, .allowedOutputs = outputSetFromFlags(allowedOutputs)})
-
 {
-    connect(this, &BaseCameraButtonController::cameraChanged, this,
-        [this](const auto& camera, const auto& previousCamera)
-        {
-            d->ioModuleMonitor.reset();
-            d->setActiveObjectTracking(false);
-
-            if (previousCamera)
-                previousCamera->disconnect(this);
-
-            d->updateOutputs();
-            if (!camera)
-                return;
-
-            d->updateSupportAutoTrackingHandling();
-            connect(camera.get(), &QnResource::propertyChanged, this,
-                [this](const QnResourcePtr& /*resource*/,
-                    const QString& key,
-                    const QString& /*prevValue*/,
-                    const QString& /*newValue*/)
-                {
-                    if (key == ResourcePropertyKey::kCameraCapabilities
-                        || key == ResourcePropertyKey::kTwoWayAudioEnabled
-                        || key == ResourcePropertyKey::kAudioOutputDeviceId
-                        || key == ResourcePropertyKey::kIoSettings)
-                    {
-                        d->updateOutputs();
-                        d->updateSupportAutoTrackingHandling();
-                    }
-                });
-        });
 }
 
 ExtendedOutputCameraButtonController::~ExtendedOutputCameraButtonController()
 {
+}
+
+void ExtendedOutputCameraButtonController::setResourceInternal(const QnResourcePtr& resource)
+{
+    d->connections.reset();
+    d->ioModuleMonitor.reset();
+    d->setActiveObjectTracking(false);
+
+    base_type::setResourceInternal(resource);
+
+    d->updateOutputs();
+
+    if (!resource)
+        return;
+
+    d->updateSupportAutoTrackingHandling();
+    connect(resource.get(), &QnResource::propertyChanged, this,
+        [this](const QnResourcePtr& /*resource*/,
+            const QString& key,
+            const QString& /*prevValue*/,
+            const QString& /*newValue*/)
+        {
+            if (key == ResourcePropertyKey::kCameraCapabilities
+                || key == ResourcePropertyKey::kTwoWayAudioEnabled
+                || key == ResourcePropertyKey::kAudioOutputDeviceId
+                || key == ResourcePropertyKey::kIoSettings)
+            {
+                d->updateOutputs();
+                d->updateSupportAutoTrackingHandling();
+            }
+        });
 }
 
 bool ExtendedOutputCameraButtonController::setButtonActionState(
@@ -288,7 +289,7 @@ bool ExtendedOutputCameraButtonController::setButtonActionState(
             safeEmitActionStarted(buttonId, success);
         });
 
-    if (auto connection = connectedServerApi())
+    if (auto connection = systemContext()->connectedServerApi())
         connection->executeEventAction(actionData, callback, thread());
 
     return true;

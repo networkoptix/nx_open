@@ -8,7 +8,6 @@
 #include <QtCore/QTimer>
 #include <QtWidgets/QTabBar>
 
-#include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/storage_resource.h>
 #include <nx/vms/api/data/storage_flags.h>

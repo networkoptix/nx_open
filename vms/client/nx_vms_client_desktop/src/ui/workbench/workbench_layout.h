@@ -11,7 +11,6 @@
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/uuid.h>
-#include <nx/vms/client/core/common/utils/common_module_aware.h>
 #include <nx/vms/client/desktop/resource/resource_fwd.h>
 #include <nx/vms/client/desktop/system_context_aware.h>
 #include <nx/vms/client/desktop/window_context_aware.h>

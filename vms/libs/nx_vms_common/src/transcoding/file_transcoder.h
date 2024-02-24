@@ -10,7 +10,6 @@ extern "C" {
 
 #include <QtCore/QIODevice>
 
-#include <common/common_module_aware.h>
 #include <core/resource/avi/avi_archive_delegate.h>
 #include <nx/utils/thread/long_runnable.h>
 #include <nx/utils/thread/mutex.h>
@@ -28,14 +27,12 @@ class QnAviArchiveDelegate;
     \note Object belongs to the thread, it has been created in (not internal thread)
     \note Class methods are not thread-safe
 */
-class NX_VMS_COMMON_API FileTranscoder:
-    public QnLongRunnable,
-    public QnCommonModuleAware
+class NX_VMS_COMMON_API FileTranscoder: public QnLongRunnable
 {
     Q_OBJECT
 
 public:
-    explicit FileTranscoder(QnCommonModule* commonModule);
+    explicit FileTranscoder(std::shared_ptr<nx::metrics::Storage> metrics);
     virtual ~FileTranscoder();
 
     /*!
@@ -94,7 +91,7 @@ public:
         Creates temporary file in the same dir with \a filePath
     */
     static bool setTagValue(
-        QnCommonModule* commonModule,
+        std::shared_ptr<nx::metrics::Storage> metrics,
         const QString& filePath,
         const QString& name,
         const QString& value);
@@ -128,16 +125,16 @@ private:
     mutable nx::Mutex m_mutex;
     nx::WaitCondition m_cond;
     std::unique_ptr<QnAviArchiveDelegate> m_mediaFileReader;
+    std::shared_ptr<nx::metrics::Storage> m_metrics;
     QnFfmpegTranscoder m_transcoder;
-    int m_resultCode;
-    State m_state;
+    int m_resultCode = 0;
+    State m_state = State::sInit;
     std::unique_ptr<QIODevice> m_dest;
     //!in millis. 0 - no limit
-    unsigned int m_transcodeDurationLimit;
-    unsigned int m_transcodedDataDuration;
+    unsigned int m_transcodeDurationLimit = 0;
+    unsigned int m_transcodedDataDuration = 0;
     QString m_srcFilePath;
     QString m_dstFilePath;
-    nx::metrics::Storage* m_metrics = nullptr;
 
     /*!
         Takes ownership of \a src

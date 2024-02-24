@@ -8,11 +8,11 @@
 
 #include <api/server_rest_connection.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource_management/resource_pool.h>
 #include <nx/network/rest/params.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/scope_guard.h>
-#include <nx/vms/client/core/network/remote_connection_aware.h>
-#include <nx/vms/client/core/resource/resource_holder.h>
+#include <nx/vms/client/desktop/system_context.h>
 
 namespace {
 
@@ -24,15 +24,13 @@ namespace nx::vms::client::desktop {
 
 static constexpr int kUpdateIntervalMs = 1000;
 
-struct PoeController::Private:
-    public QObject,
-    public core::RemoteConnectionAware
+struct PoeController::Private: public QObject
 {
     Private(PoeController* q);
 
     void setInitialUpdateInProgress(bool value);
     void setBlockData(const BlockData& data);
-    void updateTargetResource(const nx::Uuid& value);
+    void setServer(const QnMediaServerResourcePtr& value);
     void handleReply(
         bool success, rest::Handle currentHandle, const nx::network::rest::JsonResult& result);
     void update();
@@ -43,7 +41,7 @@ struct PoeController::Private:
 
     QSet<rest::Handle> runningHandles;
 
-    core::ResourceHolder<QnMediaServerResource> serverHolder;
+    QnMediaServerResourcePtr server;
     bool initialUpdateInProgress = false;
     PoeController::BlockData blockData;
     QTimer updateTimer;
@@ -83,14 +81,14 @@ void PoeController::Private::setBlockData(const BlockData& data)
     emit q->updated();
 }
 
-void PoeController::Private::updateTargetResource(const nx::Uuid& value)
+void PoeController::Private::setServer(const QnMediaServerResourcePtr& value)
 {
-    if (!serverHolder.setResourceId(value))
+    if (server == value)
         return;
 
+    server = value;
     setBlockData(BlockData());
 
-    const auto server = serverHolder.resource();
     if (!server || !server->getServerFlags().testFlag(api::SF_HasPoeManagementCapability))
     {
         // Cleanup.
@@ -105,17 +103,10 @@ void PoeController::Private::updateTargetResource(const nx::Uuid& value)
 void PoeController::Private::handleReply(
     bool success, rest::Handle replyHandle, const nx::network::rest::JsonResult& result)
 {
-    auto api = connectedServerApi();
-    if (!api)
-        return;
-
     runningHandles.remove(replyHandle);
-    for (const auto handle: runningHandles)
-        api->cancelRequest(handle);
-    runningHandles.clear();
 
-    setInitialUpdateInProgress(false);
     const nx::utils::ScopeGuard handleGuard([this]() { cancelRequests(); });
+    setInitialUpdateInProgress(false);
 
     if (!success || result.error != nx::network::rest::Result::NoError)
         return;
@@ -126,8 +117,15 @@ void PoeController::Private::handleReply(
 
 void PoeController::Private::update()
 {
-    auto api = connectedServerApi();
-    if (!api || !serverHolder.resource())
+    if (!server)
+        return;
+
+    auto systemContext = SystemContext::fromResource(server);
+    if (!NX_ASSERT(systemContext))
+        return;
+
+    auto api = systemContext->connectedServerApi();
+    if (!api)
         return;
 
     runningHandles << api->getJsonResult(
@@ -135,13 +133,20 @@ void PoeController::Private::update()
         nx::network::rest::Params(),
         handleReplyCallback,
         QThread::currentThread(),
-        serverHolder.resourceId());
+        server->getId());
 }
 
 void PoeController::Private::setPowered(const PoeController::PowerModes& value)
 {
-    auto api = connectedServerApi();
-    if (!api || !serverHolder.resource())
+    if (!server)
+        return;
+
+    auto systemContext = SystemContext::fromResource(server);
+    if (!NX_ASSERT(systemContext))
+        return;
+
+    auto api = systemContext->connectedServerApi();
+    if (!api)
         return;
 
     runningHandles << api->postJsonResult(
@@ -151,7 +156,7 @@ void PoeController::Private::setPowered(const PoeController::PowerModes& value)
         handleReplyCallback,
         QThread::currentThread(),
         /*timeouts*/ {},
-        serverHolder.resourceId());
+        server->getId());
 
     q->updatingPoweringModesChanged();
 }
@@ -161,10 +166,13 @@ void PoeController::Private::cancelRequests()
     if (runningHandles.isEmpty())
         return;
 
-    if (auto api = connectedServerApi(); api)
+    if (auto systemContext = SystemContext::fromResource(server))
     {
-        for (const auto handle: runningHandles)
-            connectedServerApi()->cancelRequest(handle);
+        if (auto api = systemContext->connectedServerApi())
+        {
+            for (const auto handle: runningHandles)
+                api->cancelRequest(handle);
+        }
     }
     runningHandles.clear();
     q->updatingPoweringModesChanged();
@@ -183,14 +191,14 @@ PoeController::~PoeController()
     d->cancelRequests();
 }
 
-void PoeController::setResourceId(const nx::Uuid& value)
+void PoeController::setServer(const QnMediaServerResourcePtr& value)
 {
-    d->updateTargetResource(value);
+    d->setServer(value);
 }
 
-nx::Uuid PoeController::resourceId() const
+QnMediaServerResourcePtr PoeController::server() const
 {
-    return d->serverHolder.resourceId();
+    return d->server;
 }
 
 const PoeController::BlockData& PoeController::blockData() const

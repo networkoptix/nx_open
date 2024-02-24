@@ -10,7 +10,6 @@
 #include <nx/vms/common/test_support/test_context.h>
 
 class QnClientCoreModule;
-class QnCommonModule;
 
 namespace nx::vms::client::desktop::test {
 
@@ -22,7 +21,6 @@ public:
     Context();
     virtual ~Context();
 
-    QnCommonModule* commonModule() const;
     QnClientCoreModule* clientCoreModule() const;
     SystemContext* systemContext() const;
 
@@ -34,8 +32,6 @@ private:
 class ContextBasedTest: public nx::vms::common::test::GenericContextBasedTest<Context>
 {
 public:
-    QnCommonModule* commonModule() const { return context()->commonModule(); }
-
     /** Create and install dummy message processor. */
     MessageProcessorMock* createMessageProcessor();
 

@@ -17,7 +17,10 @@ class NX_VMS_CLIENT_CORE_API DesktopResourceSearcher:
     using base_type = QObject;
 
 public:
-    DesktopResourceSearcher(QnAbstractDesktopResourceSearcherImpl* impl, QObject* parent = nullptr);
+    DesktopResourceSearcher(
+        QnAbstractDesktopResourceSearcherImpl* impl,
+        common::SystemContext* systemContext,
+        QObject* parent = nullptr);
     virtual ~DesktopResourceSearcher();
 
     virtual QString manufacturer() const override;

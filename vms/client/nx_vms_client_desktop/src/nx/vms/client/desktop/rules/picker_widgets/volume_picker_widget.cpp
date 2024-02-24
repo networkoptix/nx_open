@@ -6,6 +6,7 @@
 
 #include <nx/audio/audiodevice.h>
 #include <nx/vms/client/desktop/style/helper.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/utils/server_notification_cache.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/rules/action_builder_fields/sound_field.h>
@@ -102,7 +103,7 @@ void VolumePicker::onTestButtonClicked()
         if (soundUrl.isEmpty())
             return;
 
-        QString filePath = workbenchContext()->instance<ServerNotificationCache>()->getFullPath(soundUrl);
+        QString filePath = system()->serverNotificationCache()->getFullPath(soundUrl);
         if (!QFileInfo(filePath).exists())
             return;
 

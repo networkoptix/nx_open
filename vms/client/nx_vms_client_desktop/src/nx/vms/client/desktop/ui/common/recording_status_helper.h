@@ -6,26 +6,24 @@
 #include <QtGui/QIcon>
 
 #include <core/resource/resource_fwd.h>
+#include <nx/utils/scoped_connections.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/types/resource_types.h>
-#include <nx/vms/client/desktop/system_context_aware.h>
+
+Q_MOC_INCLUDE("core/resource/resource.h")
 
 namespace nx::vms::client::desktop {
 
-class RecordingStatusHelper: public QObject, public SystemContextAware
+class RecordingStatusHelper: public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(nx::Uuid cameraId READ cameraId WRITE setCameraId NOTIFY cameraIdChanged)
+    Q_PROPERTY(QnResource* resource READ rawResource WRITE setRawResource NOTIFY resourceChanged)
     Q_PROPERTY(QString tooltip READ tooltip NOTIFY recordingModeChanged)
     Q_PROPERTY(QString shortTooltip READ shortTooltip NOTIFY recordingModeChanged)
     Q_PROPERTY(QString qmlIconName READ qmlIconName NOTIFY recordingModeChanged)
 
 public:
-    RecordingStatusHelper(SystemContext* systemContext, QObject* parent = nullptr);
-    RecordingStatusHelper(); //< QML constructor.
-
-    nx::Uuid cameraId() const;
-    void setCameraId(const nx::Uuid& id);
+    RecordingStatusHelper(QObject* parent = nullptr);
 
     QnVirtualCameraResourcePtr camera() const;
     void setCamera(const QnVirtualCameraResourcePtr& camera);
@@ -56,23 +54,25 @@ public:
     static void registerQmlType();
 
 signals:
-    void cameraIdChanged();
+    void resourceChanged();
     void recordingModeChanged();
 
 private:
-    void initialize();
     void updateRecordingMode();
+
+    QnResource* rawResource() const;
+    void setRawResource(QnResource* value);
 
 protected:
     virtual void timerEvent(QTimerEvent* event) override;
 
 private:
-    bool m_initialized = false;
     nx::vms::api::RecordingType m_recordingType = nx::vms::api::RecordingType::never;
     nx::vms::api::RecordingMetadataTypes m_metadataTypes = nx::vms::api::RecordingMetadataType::none;
 
     int m_updateTimerId = -1;
     QnVirtualCameraResourcePtr m_camera;
+    nx::utils::ScopedConnections m_connections;
 };
 
 } // namespace nx::vms::client::desktop

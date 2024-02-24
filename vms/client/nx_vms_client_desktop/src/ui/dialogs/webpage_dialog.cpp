@@ -3,8 +3,6 @@
 #include "webpage_dialog.h"
 #include "ui_webpage_dialog.h"
 
-#include <client_core/client_core_module.h>
-#include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/webpage_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -18,6 +16,7 @@
 #include <nx/vms/client/desktop/help/help_handler.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/settings/message_bar_settings.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/messages/resources_messages.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/text/time_strings.h>
@@ -49,9 +48,10 @@ enum DurationUnitItemRole
 
 namespace nx::vms::client::desktop {
 
-QnWebpageDialog::QnWebpageDialog(QWidget* parent, EditMode editMode):
+QnWebpageDialog::QnWebpageDialog(SystemContext* systemContext, QWidget* parent, EditMode editMode):
     base_type(parent),
-    m_serversWatcher(parent),
+    SystemContextAware(systemContext),
+    m_serversWatcher(systemContext),
     m_editMode(editMode),
     ui(new Ui::WebpageDialog)
 {
@@ -363,8 +363,7 @@ void QnWebpageDialog::setUrl(const QUrl& url)
 
 void QnWebpageDialog::setProxyId(nx::Uuid id)
 {
-    const auto server =
-        m_serversWatcher.commonModule()->resourcePool()->getResourceById<QnMediaServerResource>(id);
+    const auto server = resourcePool()->getResourceById<QnMediaServerResource>(id);
 
     ui->selectServerMenuButton->setCurrentServer(server);
     ui->proxyViaServerCheckBox->setChecked(!id.isNull());
@@ -509,9 +508,8 @@ void QnWebpageDialog::accept()
 
     if (keepProxyAll && changeProxyServer)
     {
-        const auto resourcePool = m_serversWatcher.commonModule()->resourcePool();
-        const auto server = resourcePool->getResourceById<QnMediaServerResource>(proxyId());
-        const auto page = resourcePool->getResourceById<QnWebPageResource>(m_resourceId);
+        const auto server = resourcePool()->getResourceById<QnMediaServerResource>(proxyId());
+        const auto page = resourcePool()->getResourceById<QnWebPageResource>(m_resourceId);
 
         if (!ui::messages::Resources::moveProxiedWebPages(this, {page}, server))
             return;

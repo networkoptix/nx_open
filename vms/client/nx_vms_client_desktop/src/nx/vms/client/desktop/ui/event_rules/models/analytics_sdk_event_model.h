@@ -12,7 +12,9 @@
 namespace nx::vms::client::desktop {
 namespace ui {
 
-class AnalyticsSdkEventModel: public QStandardItemModel, public SystemContextAware
+class AnalyticsSdkEventModel:
+    public QStandardItemModel,
+    public SystemContextAware
 {
 public:
     enum DataRole

@@ -6,6 +6,7 @@
 
 #include <core/resource/camera_bookmark_fwd.h>
 #include <core/resource/resource_fwd.h>
+#include <nx/utils/impl_ptr.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 /**
@@ -18,11 +19,16 @@ class QnWorkbenchBookmarksHandler: public QObject, public QnWorkbenchContextAwar
     typedef QObject base_type;
 public:
     QnWorkbenchBookmarksHandler(QObject *parent = nullptr);
+    virtual ~QnWorkbenchBookmarksHandler();
 
-private slots:
+private:
     void at_addCameraBookmarkAction_triggered();
     void at_editCameraBookmarkAction_triggered();
     void at_removeCameraBookmarkAction_triggered();
     void at_removeBookmarksAction_triggered();
     void at_bookmarksModeAction_triggered();
+
+private:
+    struct Private;
+    nx::utils::ImplPtr<Private> d;
 };

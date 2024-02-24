@@ -773,6 +773,9 @@ ApplicationContext::ApplicationContext(
 
 ApplicationContext::~ApplicationContext()
 {
+    // For now it depends on a System Context, later it will be moved to the Local System Context.
+    d->desktopResourceSearcher.reset();
+
     // Cross system manager should be destroyed before the network module.
     d->cloudCrossSystemManager.reset();
 
@@ -884,7 +887,9 @@ void ApplicationContext::initializeDesktopCamera([[maybe_unused]] QOpenGLWidget*
 #else
     auto impl = new core::DesktopAudioOnlyResourceSearcherImpl();
 #endif
-    d->desktopResourceSearcher = std::make_unique<core::DesktopResourceSearcher>(impl);
+    d->desktopResourceSearcher = std::make_unique<core::DesktopResourceSearcher>(
+        impl,
+        currentSystemContext()); //< TODO: #sivanov Use the same system context as for local files.
     d->desktopResourceSearcher->setLocal(true);
     resourceDiscoveryManager()->addDeviceSearcher(d->desktopResourceSearcher.get());
 }

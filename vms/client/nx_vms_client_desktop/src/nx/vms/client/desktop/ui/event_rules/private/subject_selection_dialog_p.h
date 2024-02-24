@@ -7,16 +7,16 @@
 #include <QtGui/QValidator>
 
 #include <core/resource_access/resource_access_subject_hierarchy.h>
-#include <nx/vms/client/core/common/utils/common_module_aware.h>
+#include <nx/utils/uuid.h>
 #include <nx/vms/client/desktop/common/delegates/customizable_item_delegate.h>
 #include <nx/vms/client/desktop/common/models/column_remap_proxy_model.h>
 #include <nx/vms/client/desktop/common/models/natural_string_sort_proxy_model.h>
 #include <nx/vms/client/desktop/common/utils/validators.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
 #include <nx/vms/client/desktop/ui/event_rules/subject_selection_dialog.h>
 #include <ui/delegates/resource_item_delegate.h>
 #include <ui/models/resource/resource_list_model.h>
 #include <ui/models/user_roles_model.h>
-#include <nx/utils/uuid.h>
 
 namespace nx::vms::client::desktop {
 namespace ui {
@@ -27,13 +27,13 @@ namespace subject_selection_dialog_private {
 
 class RoleListModel:
     public QnUserRolesModel,
-    public core::CommonModuleAware
+    public SystemContextAware
 {
     Q_OBJECT
     using base_type = QnUserRolesModel;
 
 public:
-    explicit RoleListModel(QObject* parent);
+    explicit RoleListModel(SystemContext* systemContext, QObject* parent);
 
     void setRoleValidator(RoleValidator roleValidator);
     void setUserValidator(UserValidator userValidator);
@@ -64,7 +64,7 @@ private:
 
 class UserListModel:
     public NaturalStringSortProxyModel,
-    public core::CommonModuleAware
+    public SystemContextAware
 {
     Q_OBJECT
     using base_type = NaturalStringSortProxyModel;
@@ -123,13 +123,13 @@ private:
 
 class GroupListDelegate:
     public QnResourceItemDelegate,
-    public core::CommonModuleAware
+    public SystemContextAware
 {
     Q_OBJECT
     using base_type = QnResourceItemDelegate;
 
 public:
-    explicit GroupListDelegate(QObject* parent);
+    explicit GroupListDelegate(SystemContext* systemContext, QObject* parent);
     virtual ~GroupListDelegate() override;
 
 protected:

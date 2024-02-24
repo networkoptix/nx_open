@@ -6,7 +6,6 @@
 #include <QtCore/QTimer>
 
 #include <api/server_rest_connection.h>
-#include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
 #include <nx/utils/elapsed_timer.h>
 #include <nx/utils/guarded_callback.h>
@@ -121,10 +120,12 @@ private:
 };
 
 TimeSynchronizationServerTimeWatcher::TimeSynchronizationServerTimeWatcher(
+    SystemContext* systemContext,
     TimeSynchronizationWidgetStore* store,
     QObject* parent)
     :
     base_type(parent),
+    SystemContextAware(systemContext),
     d(new Private(this, store))
 {
 }

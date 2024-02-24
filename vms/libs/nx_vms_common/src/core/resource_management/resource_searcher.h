@@ -7,10 +7,10 @@
 #include <QtCore/QStringList>
 #include <QtNetwork/QAuthenticator>
 
-#include <common/common_module_aware.h>
 #include <core/resource/resource_factory.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/url.h>
+#include <nx/vms/common/system_context_aware.h>
 
 enum class DiscoveryMode
 {
@@ -26,10 +26,10 @@ enum class DiscoveryMode
  */
 class NX_VMS_COMMON_API QnAbstractResourceSearcher:
     public QnResourceFactory,
-    public /*mixin*/ QnCommonModuleAware
+    public nx::vms::common::SystemContextAware
 {
 protected:
-    explicit QnAbstractResourceSearcher(QnCommonModule* commonModule) noexcept;
+    explicit QnAbstractResourceSearcher(nx::vms::common::SystemContext* systemContext) noexcept;
 
 public:
     virtual ~QnAbstractResourceSearcher() = default;
@@ -108,10 +108,11 @@ private:
 };
 
 // =====================================================================
-class NX_VMS_COMMON_API QnAbstractNetworkResourceSearcher: virtual public QnAbstractResourceSearcher
+class NX_VMS_COMMON_API QnAbstractNetworkResourceSearcher:
+    virtual public QnAbstractResourceSearcher
 {
 protected:
-    QnAbstractNetworkResourceSearcher(QnCommonModule* commonModule);
+    QnAbstractNetworkResourceSearcher(nx::vms::common::SystemContext* systemContext);
 
 public:
     struct AddressCheckParams
@@ -149,10 +150,11 @@ protected:
 };
 
 // =====================================================================
-class NX_VMS_COMMON_API QnAbstractHttpResourceSearcher: virtual public QnAbstractNetworkResourceSearcher
+class NX_VMS_COMMON_API QnAbstractHttpResourceSearcher:
+    virtual public QnAbstractNetworkResourceSearcher
 {
 protected:
-    QnAbstractHttpResourceSearcher(QnCommonModule* commonModule);
+    QnAbstractHttpResourceSearcher(nx::vms::common::SystemContext* systemContext);
     virtual int portForScheme(const QString& scheme) const;
 
 public:

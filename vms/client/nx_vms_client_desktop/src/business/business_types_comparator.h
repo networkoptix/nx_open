@@ -4,17 +4,19 @@
 
 #include <QtCore/QObject>
 
-#include <nx/vms/client/core/common/utils/common_module_aware.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
 #include <nx/vms/event/event_fwd.h>
 
 // TODO: #vkutin Get rid of 'business' and put this class to proper namespace.
 
 /** Helper class to sort business types lexicographically. */
-class QnBusinessTypesComparator: public QObject, public nx::vms::client::core::CommonModuleAware
+class QnBusinessTypesComparator: public QObject
 {
     using base_type = QObject;
+    using SystemContext = nx::vms::client::desktop::SystemContext;
+
 public:
-    explicit QnBusinessTypesComparator(QObject* parent = nullptr);
+    explicit QnBusinessTypesComparator(SystemContext* systemContext, QObject* parent = nullptr);
 
     bool lexicographicalLessThan(nx::vms::api::EventType left, nx::vms::api::EventType right) const;
     bool lexicographicalLessThan(nx::vms::api::ActionType left, nx::vms::api::ActionType right) const;
@@ -36,7 +38,7 @@ public:
         const QList<nx::vms::api::ActionType>& actions) const;
 
 private:
-    void initLexOrdering();
+    void initLexOrdering(SystemContext* systemContext);
 
 private:
     QVector<int> m_eventTypeToLexOrder;

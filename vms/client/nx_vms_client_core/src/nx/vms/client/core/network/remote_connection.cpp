@@ -3,7 +3,6 @@
 #include "remote_connection.h"
 
 #include <api/server_rest_connection.h>
-#include <common/common_module.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/p2p/p2p_message_bus.h>
 #include <nx/utils/thread/mutex.h>
@@ -231,13 +230,10 @@ RemoteConnection::~RemoteConnection()
 }
 
 void RemoteConnection::initializeMessageBusConnection(
-    QnCommonModule* commonModule)
+    SystemContext* systemContext)
 {
     if (!NX_ASSERT(!d->messageBus, "Connection is already initialized"))
         return;
-
-    // FIXME: #sivanov Make Remote Connection - System Context Aware.
-    auto systemContext = dynamic_cast<SystemContext*>(commonModule->systemContext());
 
     d->timeSynchronizationManager =
         std::make_shared<TimeSyncManager>(systemContext, d->moduleInformation.id);

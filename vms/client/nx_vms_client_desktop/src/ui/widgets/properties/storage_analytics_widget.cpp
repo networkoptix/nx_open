@@ -11,7 +11,6 @@
 #include <QtWidgets/QMenu>
 
 #include <client/client_globals.h>
-#include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -85,8 +84,8 @@ QnStorageAnalyticsWidget::QnStorageAnalyticsWidget(QWidget* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
     ui(new ::Ui::StorageAnalyticsWidget),
-    m_model(new QnRecordingStatsModel(false, this)),
-    m_forecastModel(new QnRecordingStatsModel(true, this)),
+    m_model(new QnRecordingStatsModel(system(), /*isForecast*/ false, this)),
+    m_forecastModel(new QnRecordingStatsModel(system(), /*isForecast*/ true, this)),
     m_selectAllAction(new QAction(tr("Select All"), this)),
     m_exportAction(new QAction(tr("Export Selection to File..."), this)),
     m_clipboardAction(new QAction(tr("Copy Selection to Clipboard"), this))

@@ -10,7 +10,6 @@
 #include <QtWidgets/QStyle>
 
 #include <api/server_rest_connection.h>
-#include <common/common_module.h>
 #include <core/resource/media_resource.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/assert.h>

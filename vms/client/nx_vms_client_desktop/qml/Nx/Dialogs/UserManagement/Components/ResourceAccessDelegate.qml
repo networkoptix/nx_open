@@ -3,6 +3,7 @@
 import QtQuick
 
 import Nx
+import Nx.Common
 import Nx.Core
 import Nx.Controls
 import Nx.Items
@@ -71,7 +72,7 @@ Item
         return false
     }
 
-    readonly property var resource: (model && model.resource) || null
+    readonly property Resource resource: (model && model.resource) || null
     readonly property var nodeType: (model && model.nodeType) || -1
 
     signal triggered(var cell)

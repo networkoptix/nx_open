@@ -1,18 +1,19 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.11
-import QtQuick.Layouts 1.11
+import QtQuick
+import QtQuick.Layouts
 
-import Nx 1.0
-import Nx.Controls 1.0
-import Nx.Controls.NavigationMenu 1.0
-import Nx.Core 1.0
-import Nx.InteractiveSettings 1.0
-import Nx.Items 1.0
-import Nx.Utils 1.0
+import Nx
+import Nx.Common
+import Nx.Controls
+import Nx.Controls.NavigationMenu
+import Nx.Core
+import Nx.InteractiveSettings
+import Nx.Items
+import Nx.Utils
 
-import nx.vms.client.core 1.0
-import nx.vms.client.desktop 1.0
+import nx.vms.client.core
+import nx.vms.client.desktop
 
 Item
 {
@@ -29,7 +30,7 @@ Item
         && viewModel.currentEngineInfo.isDeviceDependent
 
     readonly property var currentEngineId: viewModel.currentEngineId
-    property var resourceId: NxGlobals.uuid("")
+    property Resource resource: null
     property bool initialized: false
     property alias viewModel: viewModel
 
@@ -39,8 +40,8 @@ Item
 
         function onStateModified()
         {
-            const resourceId = store.resourceId()
-            if (resourceId.isNull())
+            const resource = store.resource()
+            if (!resource)
                 return
 
             loading = store.analyticsSettingsLoading()
@@ -48,15 +49,15 @@ Item
                 return
 
             supportsDualStreaming = store.dualStreamingEnabled()
-            analyticsSettings.resourceId = resourceId
+            analyticsSettings.resource = resource
             const isInitial = !store.hasChanges()
                 || !analyticsSettings.initialized
-                || analyticsSettings.resourceId !== resourceId
+                || analyticsSettings.resource !== resource
 
             const currentEngineId = store.currentAnalyticsEngineId()
             const userEnabledAnalyticsEngines = store.userEnabledAnalyticsEngines()
             const licenseSummary = engineLicenseSummaryProvider.licenseSummary(
-                currentEngineId, resourceId, userEnabledAnalyticsEngines)
+                currentEngineId, resource, userEnabledAnalyticsEngines)
             viewModel.enabledEngines = userEnabledAnalyticsEngines
             viewModel.updateState(
                 store.analyticsEngines(),
@@ -83,7 +84,7 @@ Item
     {
         id: mediaResourceHelper
 
-        resourceId: analyticsSettings.resourceId
+        resource: analyticsSettings.resource
     }
 
     AnalyticsSettingsViewModel
@@ -141,7 +142,7 @@ Item
 
             thumbnailSource: RoiCameraThumbnail
             {
-                cameraId: analyticsSettings.resourceId
+                resource: analyticsSettings.resource
                 active: visible
             }
 

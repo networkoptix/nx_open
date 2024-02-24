@@ -25,7 +25,9 @@ namespace nx::vms::client::core {
  * ready.
  */
 template<typename ResourceClass>
-class SessionResourcesSignalListener: public QObject, public SystemContextAware
+class SessionResourcesSignalListener:
+    public QObject,
+    public SystemContextAware
 {
     using base_type = QObject;
     using ResourcePtr = QnSharedResourcePointer<ResourceClass>;
