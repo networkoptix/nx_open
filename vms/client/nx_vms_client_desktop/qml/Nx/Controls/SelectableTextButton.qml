@@ -28,6 +28,8 @@ Button
     property int desiredState: SelectableTextButton.Unselected
     readonly property int state: d.state
 
+    focusPolicy: Qt.TabFocus
+
     font.pixelSize: FontConfig.normal.pixelSize
     font.weight: Font.Normal
 

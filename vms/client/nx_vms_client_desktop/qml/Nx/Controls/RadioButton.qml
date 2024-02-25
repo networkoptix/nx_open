@@ -30,6 +30,8 @@ RadioButton
     leftPadding: 20
     rightPadding: 0
 
+    focusPolicy: Qt.TabFocus
+
     font.pixelSize: FontConfig.normal.pixelSize
     font.weight: Font.Normal
 
@@ -127,8 +129,6 @@ RadioButton
         anchors.fill: control.text ? contentItem : indicator
         anchors.margins: control.text ? 1 : 0
         visible: control.visualFocus
-        color: ColorTheme.highlight
-        opacity: 0.5
     }
 
     Binding

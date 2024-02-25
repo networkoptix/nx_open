@@ -134,9 +134,8 @@ Button
         {
             anchors.fill: parent
             anchors.margins: 1
-            visible: control.activeFocus
+            visible: control.visualFocus
             color: control.isAccentButton ? ColorTheme.brightText : ColorTheme.highlight
-            opacity: 0.5
         }
     }
 

@@ -132,8 +132,6 @@ CheckBox
         anchors.fill: control.text ? contentItem : indicator
         anchors.margins: control.text ? 1 : 0
         visible: control.visualFocus
-        color: ColorTheme.highlight
-        opacity: 0.5
     }
 
     Binding

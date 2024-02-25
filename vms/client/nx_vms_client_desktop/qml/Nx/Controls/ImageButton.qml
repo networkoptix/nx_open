@@ -27,6 +27,8 @@ AbstractButton
         ? pressedForeground
         : (hovered ? hoveredForeground : normalForeground)
 
+    focusPolicy: Qt.TabFocus
+
     background: Rectangle
     {
         id: rectangle

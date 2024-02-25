@@ -61,10 +61,7 @@ TextButton
         FocusFrame
         {
             anchors.fill: switchText
-            anchors.margins: 0
             visible: button.visualFocus
-            color: ColorTheme.highlight
-            opacity: 0.5
         }
     }
 

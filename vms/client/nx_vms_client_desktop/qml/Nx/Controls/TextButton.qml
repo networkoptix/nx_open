@@ -29,6 +29,8 @@ AbstractButton
 
     baselineOffset: contentItem.y + buttonText.y + buttonText.baselineOffset
 
+    focusPolicy: Qt.TabFocus
+
     icon.width: 20
     icon.height: 20
 
@@ -72,10 +74,7 @@ AbstractButton
         FocusFrame
         {
             anchors.fill: buttonText
-            anchors.margins: 0
             visible: button.visualFocus
-            color: ColorTheme.highlight
-            opacity: 0.5
         }
     }
 }

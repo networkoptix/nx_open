@@ -136,8 +136,6 @@ Control
             anchors.fill: parent
             anchors.margins: 1
             visible: control.visualFocus
-            color: ColorTheme.highlight
-            opacity: 0.5
         }
 
         MouseArea
