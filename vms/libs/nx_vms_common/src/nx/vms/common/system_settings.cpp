@@ -926,7 +926,7 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         m_showServersInTreeForNonAdminsAdaptor,
         &QnAbstractResourcePropertyAdaptor::valueChanged,
         this,
-        &SystemSettings::showServersInTreeForNonAdmins,
+        &SystemSettings::showServersInTreeForNonAdminsChanged,
         Qt::QueuedConnection);
 
     connect(

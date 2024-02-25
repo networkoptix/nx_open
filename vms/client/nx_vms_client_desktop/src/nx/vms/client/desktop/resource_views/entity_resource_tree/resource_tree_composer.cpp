@@ -23,6 +23,8 @@ namespace entity_resource_tree {
 using namespace nx::vms::api;
 using namespace entity_item_model;
 
+using nx::vms::common::SystemSettings;
+
 ResourceTreeComposer::ResourceTreeComposer(
     SystemContext* systemContext,
     ResourceTreeSettings* resourceTreeSettings)
@@ -34,6 +36,9 @@ ResourceTreeComposer::ResourceTreeComposer(
 {
     connect(accessController(), &AccessController::userChanged,
         this, &ResourceTreeComposer::onUserChanged);
+
+    connect(systemSettings(), &SystemSettings::showServersInTreeForNonAdminsChanged,
+        this, &ResourceTreeComposer::onTreeSettingsChanged);
 
     if (m_resourceTreeSettings)
     {
