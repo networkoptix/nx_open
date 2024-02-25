@@ -18,6 +18,8 @@ Control
 
     baselineOffset: image.baselineOffset + topPadding
 
+    focusPolicy: Qt.NoFocus
+
     contentItem: SvgImage
     {
         id: image

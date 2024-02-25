@@ -103,7 +103,6 @@ ComboBox
                     anchors.margins: 1
                     visible: control.visualFocus
                     color: control.isAccentButton ? ColorTheme.brightText : ColorTheme.highlight
-                    opacity: 0.5
                 }
             }
         }

@@ -187,8 +187,6 @@ Item
 
         anchors.fill: parent
         visible: figureView.activeFocus
-        color: ColorTheme.transparent(ColorTheme.highlight, 0.5)
-        frameWidth: 1
     }
 
     // For some reason QML emits "changed" signal every time when a `var` property is assigned

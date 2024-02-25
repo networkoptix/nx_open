@@ -23,6 +23,5 @@ TextButton
     {
         anchors.fill: parent
         visible: control.pressed || control.focus
-        color: ColorTheme.transparent(ColorTheme.highlight, 0.5)
     }
 }

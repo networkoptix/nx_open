@@ -805,7 +805,6 @@ FocusScope
         {
             id: currentItemHighlight
 
-            color: ColorTheme.transparent(ColorTheme.highlight, 0.5)
             z: 10 //< Above everything.
 
             visible: treeView.activeFocus

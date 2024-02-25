@@ -48,4 +48,6 @@ AbstractButton
         .arg(iconExtension)
 
     background: Image { source: iconButton.currentIconPath }
+
+    focusPolicy: Qt.TabFocus
 }

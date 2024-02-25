@@ -107,9 +107,7 @@ Slider
         id: focusFrame
 
         anchors.fill: parent
-        visible: slider.activeFocus
-        color: ColorTheme.transparent(ColorTheme.highlight, 0.5)
-        frameWidth: 1
+        visible: slider.visualFocus
     }
 
     Keys.onPressed:
