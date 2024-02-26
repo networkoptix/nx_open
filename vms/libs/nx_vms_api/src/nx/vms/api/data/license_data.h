@@ -153,6 +153,7 @@ struct NX_VMS_API LicenseSummaryDataEx: public LicenseSummaryData
      * The list of exceed devices in case of total > available.
      */
     std::set<nx::Uuid> exceedDevices;
+    nx::Uuid serviceId;
 };
 
 #define DetailedLicenseData_Fields \

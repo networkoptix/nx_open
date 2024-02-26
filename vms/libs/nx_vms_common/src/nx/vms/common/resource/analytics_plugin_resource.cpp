@@ -45,7 +45,7 @@ AnalyticsEngineResourceList AnalyticsPluginResource::engines() const
     return resourcePool->getResources<AnalyticsEngineResource>(
         [id = getId()](const AnalyticsEngineResourcePtr& resource)
         {
-            return resource->getId() == id;
+            return resource->getParentId() == id;
         });
 }
 
