@@ -29,8 +29,7 @@ public:
     virtual ~Resources() override;
 
     /**
-     * @addtogroup vms-resources
-     * Allows user to gather Resource descriptions.
+     * @addtogroup vms-resources Allows user to gather Resource descriptions.
      *
      * Contains methods and signals to work with available resources.
      *
@@ -52,6 +51,16 @@ public:
      *     const resources = await vms.resources.resources()
      *     resources.forEach(handleResourceAdded)
      *
+     * Resource may have additional parameters.
+     *
+     * Example:
+     *
+     *     vms.resources.parameter(resourceId, "hasDualStreaming")
+     *
+     * Also a custom parameter can be added to Resource:
+     *
+     *     vms.resources.setParameter(resourceId, "example", "value")
+     *
      * @{
      */
 
@@ -70,6 +79,30 @@ public:
      * @return Description of the Resource with the specified identifier.
      */
     Q_INVOKABLE ResourceResult resource(const QString& resourceId) const;
+
+    /**
+     * @return Parameter value.
+     * @param resourceId Identifier of the Resource.
+     * @param name Name of the parameter.
+     */
+    Q_INVOKABLE ParameterResult parameter(const QString& resourceId, const QString& name) const;
+
+    /**
+     * @return All parameter names.
+     * @param resourceId Identifier of the Resource.
+     */
+    Q_INVOKABLE ParameterResult parameterNames(const QString& resourceId) const;
+
+    /**
+     * Sets the parameter value.
+     * @param resourceId Identifier of the Resource.
+     * @param name Name of the parameter.
+     * @param value Value, can be a string, an object or an array.
+     */
+    Q_INVOKABLE Error setParameter(
+        const QString& resourceId,
+        const QString& name,
+        const QJsonValue& value);
 
 signals:
     /**

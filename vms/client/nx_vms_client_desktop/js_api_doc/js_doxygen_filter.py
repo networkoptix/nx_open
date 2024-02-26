@@ -13,6 +13,7 @@ function = re.compile("([^\s]+\s[^\s]+\(.*\))( const;|;)")
 defaultValue = re.compile(" = [^;()]+;")
 
 replaceMap = {
+    "QJsonValue": "Any",
     "QString": "String",
     "QJsonObject": "Object",
     "QVariantMap": "Object",

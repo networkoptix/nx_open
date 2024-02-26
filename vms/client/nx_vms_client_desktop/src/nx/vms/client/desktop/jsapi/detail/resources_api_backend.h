@@ -26,6 +26,13 @@ public:
     QList<Resource> resources() const;
     ResourceResult resource(const ResourceUniqueId& resourceId) const;
 
+    ParameterResult parameter(const ResourceUniqueId& resourceId, const QString& name) const;
+    ParameterResult parameterNames(const ResourceUniqueId& resourceId) const;
+    Error setParameter(
+        const ResourceUniqueId& resourceId,
+        const QString& name,
+        const QJsonValue& value);
+
 signals:
     void added(const Resource& resource);
     void removed(const QString& resourceId);

@@ -40,4 +40,22 @@ ResourceResult Resources::resource(const QString& resourceId) const
     return d->resource(resourceId);
 }
 
+ParameterResult Resources::parameter(const QString& resourceId, const QString& name) const
+{
+    return d->parameter(resourceId, name);
+}
+
+ParameterResult Resources::parameterNames(const QString& resourceId) const
+{
+    return d->parameterNames(resourceId);
+}
+
+Error Resources::setParameter(
+    const QString& resourceId,
+    const QString& name,
+    const QJsonValue& value)
+{
+    return d->setParameter(resourceId, name, value);
+}
+
 } // namespace nx::vms::client::desktop::jsapi

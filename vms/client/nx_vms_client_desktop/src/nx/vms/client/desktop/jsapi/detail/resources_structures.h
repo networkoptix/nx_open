@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <QtCore/QJsonValue>
 #include <QtCore/QString>
 
 #include <core/resource/resource_fwd.h>
@@ -98,6 +99,20 @@ struct ResourceResult
     Resource resource;
 };
 NX_REFLECTION_INSTRUMENT(ResourceResult, (error)(resource))
+
+/**
+ * Resource parameter operation result.
+ * @ingroup vms
+ */
+struct ParameterResult
+{
+    /** Error description. */
+    Error error;
+
+    /** Value, can be a string, an object or an array. */
+    QJsonValue value = {};
+};
+NX_REFLECTION_INSTRUMENT(ParameterResult, (error)(value))
 
 namespace detail {
 
