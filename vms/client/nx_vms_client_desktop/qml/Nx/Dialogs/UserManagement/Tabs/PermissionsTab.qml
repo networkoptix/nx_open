@@ -192,6 +192,7 @@ Item
         }
 
         property int selectionRelevantAccessRights: 0
+        property int selectionCombinedAccessRights: 0
 
         readonly property real scrollBarWidth: scrollBarVisible ? scrollBar.width : 0
 
@@ -270,6 +271,7 @@ Item
             if (!hoveredColumnAccessRight || !control.editingContext)
             {
                 selectionRelevantAccessRights = 0
+                selectionCombinedAccessRights = 0
                 selectedLayouts = undefined
                 return
             }
@@ -284,6 +286,9 @@ Item
             nextBatchCheckState = currentCheckState === Qt.Checked
                 ? Qt.Unchecked
                 : Qt.Checked
+
+            selectionCombinedAccessRights =
+                control.editingContext.combinedAccessRights(selection)
 
             selectionRelevantAccessRights =
                 control.editingContext.combinedRelevantAccessRights(selection)
@@ -337,6 +342,7 @@ Item
             externalNextCheckState: tree.nextBatchCheckState
             externalHoverData: tree.hoverData
             externalRelevantAccessRights: tree.selectionRelevantAccessRights
+            externalGrantedAccessRights: tree.selectionCombinedAccessRights
 
             onHoveredCellChanged:
             {

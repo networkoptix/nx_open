@@ -50,11 +50,15 @@ Item
 
     property var externalHoverData //< {indexes[], accessRight, toggledOn, fromSelection}
     property int externalRelevantAccessRights: 0
+    property int externalGrantedAccessRights: 0
 
     property var externallySelectedLayouts
 
     readonly property int relevantAccessRights:
         externalRelevantAccessRights | accessRightsModel.relevantAccessRights
+
+    readonly property int grantedAccessRights:
+        externalGrantedAccessRights | accessRightsModel.grantedAccessRights
 
     property bool parentNodeSelected: false
 
@@ -211,7 +215,9 @@ Item
                         if (nextCheckState == Qt.Checked)
                         {
                             if (root.automaticDependencies
-                                && (model.requiredAccessRights & root.relevantAccessRights))
+                                && (model.requiredAccessRights
+                                    & root.relevantAccessRights
+                                    & ~root.grantedAccessRights))
                             {
                                 operation = qsTr("Add %1 and dependent permissions",
                                     "%1 will be substituted with a permission name").arg(name)
@@ -231,7 +237,9 @@ Item
                         else
                         {
                             if (root.automaticDependencies
-                                && (model.dependentAccessRights & root.relevantAccessRights))
+                                && (model.dependentAccessRights
+                                    & root.relevantAccessRights
+                                    & root.grantedAccessRights))
                             {
                                 operation = qsTr("Remove %1 and dependent permissions",
                                     "%1 will be substituted with a permission name").arg(name)
