@@ -71,6 +71,7 @@ bool updateInFile(QIODevice* file,
 ExportStorageStreamRecorder::ExportStorageStreamRecorder(
     const QnResourcePtr& dev, QnAbstractMediaStreamDataProvider* mediaProvider):
     QnStreamRecorder(dev),
+    nx::StorageRecordingContext(true),
     m_mediaProvider(mediaProvider)
 {
 }
