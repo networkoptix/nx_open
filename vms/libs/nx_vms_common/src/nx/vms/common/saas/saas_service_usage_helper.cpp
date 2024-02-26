@@ -90,9 +90,9 @@ void IntegrationServiceUsageHelper::updateCacheUnsafe() const
     for (const auto& [serviceId, integration]: m_context->saasServiceManager()->analyticsIntegrations())
     {
         auto& cacheData = (*m_cache)[integration.integrationId];
+        cacheData.serviceId = serviceId;
         cacheData.total += integration.totalChannelNumber;
-        if (saasData.state == SaasState::active)
-            cacheData.available += integration.totalChannelNumber;
+        cacheData.available += integration.totalChannelNumber;
     }
 
     for (const auto& camera: getAllCameras())
@@ -260,8 +260,7 @@ void CloudStorageServiceUsageHelper::calculateAvailableUnsafe() const
     {
         auto& cacheData = cache[{parameters.maxResolutionMp, id}];
         cacheData.total += parameters.totalChannelNumber;
-        if (saasData.state == SaasState::active)
-            cacheData.available += parameters.totalChannelNumber;
+        cacheData.available += parameters.totalChannelNumber;
     }
 }
 
