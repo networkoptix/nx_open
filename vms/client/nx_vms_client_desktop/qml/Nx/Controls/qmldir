@@ -1,5 +1,6 @@
 module Nx.Controls
 
+AbstractTabButton 1.0 AbstractTabButton.qml
 Action 1.0 Action.qml
 AdaptiveTransmission 1.0 AdaptiveTransmission.qml
 AdaptiveMouseWheelTransmission 1.0 AdaptiveMouseWheelTransmission.qml
@@ -55,6 +56,7 @@ PlatformMenuSeparator 1.0 PlatformMenuSeparator.qml
 Popup 1.0 Popup.qml
 PopupShadow 1.0 PopupShadow.qml
 PreserveAspectFitter 1.0 PreserveAspectFitter.qml
+PrimaryTabButton 1.0 PrimaryTabButton.qml
 ProgressBar 1.0 ProgressBar.qml
 PromoPage 1.0 PromoPage.qml
 PromoPages 1.0 PromoPages.qml
@@ -68,6 +70,7 @@ ScrollableTextArea 1.0 ScrollableTextArea.qml
 ScrollBar 1.0 ScrollBar.qml
 ScrollView 1.0 ScrollView.qml
 SearchField 1.0 SearchField.qml
+SecondaryTabButton 1.0 SecondaryTabButton.qml
 SelectableTextButton 1.0 SelectableTextButton.qml
 SidePanel 1.0 SidePanel.qml
 SimpleColumn 1.0 SimpleColumn.qml

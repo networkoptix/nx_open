@@ -87,7 +87,7 @@ DialogWithState
 
         Tab
         {
-            button: DialogTabButton
+            button: PrimaryTabButton
             {
                 text: qsTr("General")
             }
@@ -104,7 +104,7 @@ DialogWithState
 
         Tab
         {
-            button: DialogTabButton
+            button: PrimaryTabButton
             {
                 text: qsTr("Groups")
             }
@@ -125,7 +125,7 @@ DialogWithState
 
         Tab
         {
-            button: DialogTabButton
+            button: PrimaryTabButton
             {
                 text: qsTr("Resources")
             }
@@ -144,7 +144,7 @@ DialogWithState
 
         Tab
         {
-            button: DialogTabButton
+            button: PrimaryTabButton
             {
                 text: qsTr("Global Permissions")
             }
@@ -166,7 +166,7 @@ DialogWithState
 
         Tab
         {
-            button: DialogTabButton
+            button: PrimaryTabButton
             {
                 text: qsTr("Members")
             }

@@ -100,18 +100,15 @@ Dialog
                 width: parent.width
                 height: parent.height
 
-                tabBar.spacing: 20
+                tabBar.spacing: 16
 
                 Tab
                 {
-                    button: CompactTabButton
+                    button: SecondaryTabButton
                     {
-                        height: tabControl.tabBar.height
-
                         topPadding: 10
                         bottomPadding: 9
 
-                        compact: false
                         text: qsTr("Basic Actions")
                     }
 
@@ -135,14 +132,11 @@ Dialog
                     visible: control.buttonSettingsModel
                         && control.buttonSettingsModel.modifierButtonName
 
-                    button: CompactTabButton
+                    button: SecondaryTabButton
                     {
-                        height: tabControl.tabBar.height
-
                         topPadding: 10
                         bottomPadding: 9
 
-                        compact: false
                         text: qsTr("With Modifier")
                     }
 

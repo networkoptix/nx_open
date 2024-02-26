@@ -32,7 +32,7 @@ public:
     Private(FocusFrameItem* parent);
 
 public:
-    QColor color = core::colorTheme()->color("dark1");
+    QColor color = core::colorTheme()->color("brand_core");
     int frameWidth = 1;
 
     bool textureDirty = true;
@@ -64,6 +64,7 @@ FocusFrameItem::FocusFrameItem(QQuickItem* parent):
     d(new Private(this))
 {
     setFlag(QQuickItem::ItemHasContents);
+    setOpacity(0.5);
 }
 
 FocusFrameItem::~FocusFrameItem()

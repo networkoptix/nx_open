@@ -90,19 +90,13 @@ Window
             }
         }
 
-        component EngineButton: CompactTabButton
+        component EngineButton: PrimaryTabButton
         {
             property Analytics.Engine engine: null
-
             readonly property var engineId: NxGlobals.uuid(engine ? engine.id : "")
-            text: engine ? engine.name : qsTr("Any plugin")
-            compact: false
 
-            textHeight: 13
-            topPadding: 14
-            underlineHeight: 2
-            inactiveUnderlineColor: "transparent"
-            font: Qt.font({pixelSize: 12, weight: Font.Normal})
+            text: engine ? engine.name : qsTr("Any plugin")
+            backgroundColors.pressed: ColorTheme.colors.dark8
         }
 
         EngineButton {}

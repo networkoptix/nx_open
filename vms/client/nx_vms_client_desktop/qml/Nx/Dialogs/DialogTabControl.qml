@@ -34,21 +34,6 @@ TabControl
         }
     }
 
-    component TabButton: CompactTabButton
-    {
-        height: tabControl.tabBar.height
-
-        underlineOffset: -1
-        topPadding: 14
-        focusFrameEnabled: false
-
-        compact: false
-
-        underlineHeight: 2
-        inactiveUnderlineColor: "transparent"
-        font: Qt.font({pixelSize: 12, weight: Font.Normal})
-    }
-
     function switchTab(tabIndex, callbackAfterSwitching)
     {
         if (dialog.tabIndex === tabIndex)
