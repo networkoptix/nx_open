@@ -17,7 +17,7 @@ extern "C" {
 
 #include <nx/kit/debug.h>
 #include <nx/network/http/buffer_source.h>
-#include <nx/network/http/http_client.h>
+#include <nx/network/http/http_async_client.h>
 #include <nx/network/http/http_types.h>
 #include <nx/reflect/instrument.h>
 #include <nx/reflect/json.h>
@@ -74,6 +74,8 @@ DeviceAgent::DeviceAgent(const Engine* engine, const nx::sdk::IDeviceInfo* devic
 
 DeviceAgent::~DeviceAgent()
 {
+    if (m_client)
+        m_client->pleaseStopSync();
 }
 
 std::string DeviceAgent::manifestString() const
@@ -104,8 +106,6 @@ bool DeviceAgent::pushUncompressedVideoFrame(const IUncompressedVideoFrame* vide
     if (videoFrameTimestamp < m_lastQueryTimestamp + m_queryPeriod)
         return true;
 
-    m_lastQueryTimestamp = videoFrameTimestamp;
-
     auto imageUrl = encodeImage(videoFrame);
     if (imageUrl.url.empty())
         return true;
@@ -117,31 +117,9 @@ bool DeviceAgent::pushUncompressedVideoFrame(const IUncompressedVideoFrame* vide
         }}
     }};
 
-    if (const auto response = sendVideoFrameToOpenAi(payload))
-    {
-        if (!response->choices.empty())
-        {
-            auto eventMetadataPacket = makePtr<EventMetadataPacket>();
-            eventMetadataPacket->setTimestampUs(videoFrame->timestampUs());
-            eventMetadataPacket->setDurationUs(0);
-
-            const auto eventMetadata = makePtr<EventMetadata>();
-            eventMetadata->setTypeId(kEventType);
-            eventMetadata->setIsActive(true);
-
-            // It is better to put long texts in description as it simplifies Bookmark creation
-            // and other automatic processing.
-            eventMetadata->setCaption("GPT4");
-            eventMetadata->setDescription(response->choices[0].message.content);
-            eventMetadataPacket->addItem(eventMetadata.get());
-            pushMetadataPacket(eventMetadataPacket.releasePtr());
-        }
-        else if (!response->error.message.empty())
-        {
-            showErrorMessage(response->error.message);
-        }
-    }
-
+    m_lastQueryTimestamp = videoFrameTimestamp;
+    m_queryInProgress = true;
+    sendVideoFrameToOpenAi(payload);
     return true; //< There were no errors while processing the video frame.
 }
 
@@ -241,39 +219,70 @@ open_ai::QueryPayload::Message::Content::ImageUrl DeviceAgent::encodeImage(
     return {.url = "data:image/" + format + ";base64," + std::move(imageData)};
 }
 
-std::optional<open_ai::Response> DeviceAgent::sendVideoFrameToOpenAi(
-    const open_ai::QueryPayload& payload)
+void DeviceAgent::sendVideoFrameToOpenAi(const open_ai::QueryPayload& payload)
 {
     using namespace nx::network::http;
-
-    QScopedValueRollback<bool> guard(m_queryInProgress, true);
 
     auto messageBody = std::make_unique<BufferSource>(
         header::ContentType::kJson,
         nx::reflect::json::serialize(payload));
 
-    auto client = std::make_unique<HttpClient>(nx::network::ssl::kDefaultCertificateCheck);
-    client->setCredentials(BearerAuthToken{m_engine->apiKey()});
-    client->setTimeouts(AsyncClient::kInfiniteTimeouts);
-    const bool responseReceived = client->doPost(
-        kOpenAiApiPath,
-        std::move(messageBody));
+    auto completionHandler =
+        [this]()
+        {
+            if (m_client->response())
+            {
+                const std::string result = m_client->fetchMessageBodyBuffer().takeStdString();
+                const auto [response, success] =
+                    nx::reflect::json::deserialize<open_ai::Response>(result);
+                if (success)
+                {
+                    handleOpenAiResponse(response);
+                }
+                else
+                {
+                    showErrorMessage("Response cannot be deserialized:\n"
+                        + nx::kit::utils::toString(result));
+                }
+            }
+            else
+            {
+                showErrorMessage("Request cannot be sent: " + m_client->lastSysErrorCode());
+            }
+            m_queryInProgress = false;
+        };
 
-    if (responseReceived)
+    m_client = std::make_unique<AsyncClient>(nx::network::ssl::kDefaultCertificateCheck);
+    m_client->setOnDone(completionHandler);
+    m_client->setCredentials(BearerAuthToken{m_engine->apiKey()});
+    m_client->setRequestBody(std::move(messageBody));
+    m_client->setTimeouts(AsyncClient::kInfiniteTimeouts);
+    m_client->doPost(kOpenAiApiPath);
+}
+
+void DeviceAgent::handleOpenAiResponse(const open_ai::Response& response)
+{
+    if (!response.choices.empty())
     {
-        const std::string result = client->fetchEntireMessageBody()->takeStdString();
+        auto eventMetadataPacket = makePtr<EventMetadataPacket>();
+        eventMetadataPacket->setTimestampUs(m_lastQueryTimestamp.count());
+        eventMetadataPacket->setDurationUs(0);
 
-        const auto [response, success] = nx::reflect::json::deserialize<open_ai::Response>(result);
-        if (success)
-            return response;
+        const auto eventMetadata = makePtr<EventMetadata>();
+        eventMetadata->setTypeId(kEventType);
+        eventMetadata->setIsActive(true);
 
-        showErrorMessage("Response cannot be deserialized:\n" + result);
+        // It is better to put long texts in description as it simplifies Bookmark creation
+        // and other automatic processing.
+        eventMetadata->setCaption("GPT4");
+        eventMetadata->setDescription(response.choices[0].message.content);
+        eventMetadataPacket->addItem(eventMetadata.get());
+        pushMetadataPacket(eventMetadataPacket.releasePtr());
     }
-    else
+    else if (!response.error.message.empty())
     {
-        showErrorMessage("Request cannot be sent: " + client->lastSysErrorCode());
+        showErrorMessage(response.error.message);
     }
-    return std::nullopt;
 }
 
 void DeviceAgent::doSetNeededMetadataTypes(
