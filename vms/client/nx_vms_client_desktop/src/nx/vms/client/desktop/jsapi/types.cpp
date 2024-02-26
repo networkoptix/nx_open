@@ -2,12 +2,12 @@
 
 #include "types.h"
 
-#include <QtCore/QJsonArray>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
 #include <QtCore/QVariantMap>
 
 #include <nx/reflect/json.h>
+#include <nx/utils/serialization/qjson.h>
 #include <nx/utils/serialization/qt_core_types.h>
 
 #include "detail/globals_structures.h"
@@ -70,6 +70,7 @@ void registerTypes()
     registerType<LayoutProperties>();
     registerType<Resource>();
     registerType<ResourceResult>();
+    registerType<ParameterResult>();
 }
 
 } // namespace nx::vms::client::desktop::jsapi
