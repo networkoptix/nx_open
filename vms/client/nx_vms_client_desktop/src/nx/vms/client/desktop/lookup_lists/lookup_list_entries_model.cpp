@@ -2,6 +2,8 @@
 
 #include "lookup_list_entries_model.h"
 
+#include <range/v3/algorithm/any_of.hpp>
+#include <range/v3/algorithm/contains.hpp>
 #include <range/v3/view/reverse.hpp>
 
 #include <QtCore/QString>
@@ -253,6 +255,9 @@ LookupListModel* LookupListEntriesModel::listModel() const
 void LookupListEntriesModel::setListModel(LookupListModel* value)
 {
     beginResetModel();
+    if (d->data)
+        d->data->disconnect(this);
+
     d->data = value;
     endResetModel();
     d->initValidators();
@@ -260,6 +265,10 @@ void LookupListEntriesModel::setListModel(LookupListModel* value)
 
     if (d->data)
     {
+        connect(d->data.get(),
+            &LookupListModel::attributeNamesChanged,
+            this,
+            &LookupListEntriesModel::removeIncorrectEntries);
         emit headerDataChanged(Qt::Orientation::Horizontal, 0, columnCount() - 1);
         emit rowCountChanged();
     }
@@ -290,7 +299,7 @@ void LookupListEntriesModel::deleteEntries(const QVector<int>& rows)
     if (!NX_ASSERT(d->data))
         return;
 
-    if (!NX_ASSERT(!rows.empty()))
+    if (rows.empty())
         return;
 
     const std::set<int, std::greater<>> uniqueValuesInDescendingOrder(rows.begin(), rows.end());
@@ -330,13 +339,18 @@ bool LookupListEntriesModel::isValidValue(const QString& value, const QString& a
     if (d->validatorByAttributeName.isEmpty())
         return true; //< No validation is required.
 
+    const auto& displayedAttributes = d->data->rawData().attributeNames;
+
+    if (!ranges::contains(displayedAttributes, attributeName))
+        return false; //< There is no such attribute name in displayed columns.
+
     if (value.isEmpty())
         return true;
 
     if (const auto validator = d->validatorByAttributeName.value(attributeName))
         return validator(value);
 
-    return false; //< Incorrect attributeName is passed.
+    return false; //< There is no such attribute name in ObjectTypeId.
 }
 
 analytics::taxonomy::StateView* LookupListEntriesModel::taxonomy()
@@ -372,6 +386,41 @@ void LookupListEntriesModel::setFilter(const QString& searchText, int resultLimi
     else
         d->rowsIndexesToShow = d->data->setFilter(searchText, resultLimit);
     endResetModel();
+}
+
+void LookupListEntriesModel::removeIncorrectEntries()
+{
+    if (!NX_ASSERT(d->data, "Function must never be called on uninitialized model"))
+        return;
+
+    auto& lookuplistData = d->data->rawData();
+    QVector<int> emptyRowsToDelete;
+    for (int rowIndex = 0; rowIndex < lookuplistData.entries.size(); ++rowIndex)
+    {
+        auto& row = lookuplistData.entries[rowIndex];
+        if (row.empty())
+        {
+            emptyRowsToDelete.push_back(rowIndex);
+            continue;
+        }
+
+        std::erase_if(
+            row,
+            [&](const auto& entry) { return !isValidValue(entry.second, entry.first); });
+
+        const bool hasAtLeastOneValidValue = ranges::any_of(
+            row,
+            [&](const auto& entry)
+            {
+                return !entry.second.isEmpty() && isValidValue(entry.second, entry.first);
+            });
+
+        if (!hasAtLeastOneValidValue)
+            emptyRowsToDelete.push_back(rowIndex);
+    }
+
+    // Remove empty rows.
+    deleteEntries(emptyRowsToDelete);
 }
 
 } // namespace nx::vms::client::desktop

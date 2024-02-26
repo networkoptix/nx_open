@@ -72,6 +72,8 @@ public:
     Q_INVOKABLE void setTaxonomy(analytics::taxonomy::StateView* taxonomy);
     int columnPosOfAttribute(const QString& attributeName);
 
+    Q_INVOKABLE void removeIncorrectEntries();
+
 signals:
     void listModelChanged(LookupListModel* listModel);
     void rowCountChanged();

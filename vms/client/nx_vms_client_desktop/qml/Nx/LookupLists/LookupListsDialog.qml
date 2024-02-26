@@ -141,6 +141,11 @@ Dialog
                     text: viewModel.name,
                     value: viewModel
                 })
+
+                // Need to check all entries if column with data was removed.
+                if (columnWithDataWasRemoved)
+                    entriesModel.removeIncorrectEntries()
+
                 hasChanges = true
             }
 

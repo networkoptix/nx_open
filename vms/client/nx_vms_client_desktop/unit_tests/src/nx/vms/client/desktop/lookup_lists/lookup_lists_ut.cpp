@@ -21,7 +21,306 @@ namespace nx::vms::client::desktop {
 class LookupListTests: public TaxonomyBasedTest
 {
 public:
-    LookupListData smallColumnNumberExampleData()
+    void checkValidationOfEmptyRowWithOneIncorrect(
+        const QString& attributeName, const QString& incorrect, const QString& correct)
+    {
+        const int initialRowCount = givenImportModel(bigColumnNumberExampleData());
+
+        // Create invalid entry for Generic List and attempt to add it to the model.
+        whenAddEntriesByImportModel({{{attributeName, incorrect}}});
+
+        // Check that number of rows didn't change
+        thenImportModelRowCountIs(initialRowCount);
+
+        // Check fixup is required.
+        thenFixUpIsRequired();
+
+        // Apply fix for incorrect attribute.
+        whenApplyFixUp(attributeName, {{incorrect, correct}});
+
+        // Check that number of rows increased to one
+        thenImportModelRowCountIs(initialRowCount + 1);
+    }
+
+    void checkValidationOfRowsWithCorrectAndIncorrectValues(
+        const QString& attributeNameOfIncorrectVal)
+    {
+        std::vector<QVariantMap> entriesToAdd;
+        std::map<QString, QString> incorrectToCorrect;
+        givenRowsWithAllCorrectValuesExceptOne(
+            entriesToAdd, incorrectToCorrect, attributeNameOfIncorrectVal, 5);
+
+        const int initialRowCount = givenImportModel(bigColumnNumberExampleData());
+
+        // Attempt to add number of entries to the model
+        whenAddEntriesByImportModel(entriesToAdd);
+
+        // Check that number of rows increased, since there are valid values in row
+        const int newNumberOfRows = initialRowCount + entriesToAdd.size();
+
+        thenImportModelRowCountIs(newNumberOfRows);
+        thenFixUpIsRequired();
+
+        // Apply fixes for incorrect values
+        whenApplyFixUp(attributeNameOfIncorrectVal, incorrectToCorrect);
+
+        // Check that number of rows didn't change
+        thenImportModelRowCountIs(newNumberOfRows);
+    }
+
+    void checkRemovingOfAttribute(const QString& columnToDelete)
+    {
+        givenLookupListEntriesModel(lookupListWithAttributesAndAdditionalRows(columnToDelete));
+
+        const auto initalRowNumbers = m_entriesModel->rowCount();
+        ASSERT_GT(initalRowNumbers, 0);
+
+        // Removing one column header(attribute) from LookupListModel.
+        whenRemoveColumn(columnToDelete);
+
+        // Check that previously added entry with one column is deleted,
+        // since this row is now comletely empty.
+        const auto newRowCountNumber = initalRowNumbers - 1;
+        thenRowCountIs(newRowCountNumber, m_entriesModel.get());
+
+        // Check that entries of LookupLists doesn't contain deleted column.
+        thenModelHasNoColumn(columnToDelete);
+
+        // Return column back again.
+        whenAddColumn(columnToDelete);
+
+        // Check that number of rows didn't change.
+        thenRowCountIs(newRowCountNumber, m_entriesModel.get());
+
+        // Check that all entries has empty value of column, that was previously deleted.
+        thenColumnValuesAreEmpty(columnToDelete);
+    }
+
+    void checkBuildingLookupListPreviewModel(
+        const LookupListData& exportedData, const LookupListData& modelImportTo)
+    {
+        givenLookupListEntriesModel(exportedData);
+        givenImportModel(modelImportTo);
+
+        whenBuildTablePreview();
+        thenImportedValuesAreValid(exportedData, modelImportTo);
+    }
+
+protected:
+    int givenImportModel(const LookupListData& data, StateView* taxonomy = nullptr)
+    {
+        m_importModel = std::make_shared<LookupListImportEntriesModel>();
+        auto lookupList = new LookupListModel(data, m_importModel.get());
+        auto entriesModel = new LookupListEntriesModel(m_importModel.get());
+        entriesModel->setListModel(lookupList);
+
+        entriesModel->setTaxonomy(taxonomy ? taxonomy : stateView());
+        m_importModel->setLookupListEntriesModel(entriesModel);
+
+        return m_importModel->lookupListEntriesModel()->rowCount();
+    }
+
+    void givenRowsWithAllCorrectValuesExceptOne(std::vector<QVariantMap>& resultRows,
+        std::map<QString, QString>& resultFixes,
+        const QString& attributeName,
+        int numberOfRows)
+    {
+        // Prepare rows with all correct values, except one
+        for (int i = 0; i < numberOfRows; i++)
+        {
+            QVariantMap entry = correctRow();
+            const QString incorrectVal = QString::number(i) + "_incorrect";
+            entry[attributeName] = incorrectVal;
+            // Init fix for incorrect val.
+            resultFixes[incorrectVal] = correctRowToStdMap()[attributeName];
+            resultRows.push_back(entry);
+        }
+    }
+
+    void givenLookupListEntriesModel(LookupListModel* lookupList)
+    {
+        m_entriesModel = std::make_shared<LookupListEntriesModel>();
+        m_entriesModel->setListModel(lookupList);
+        m_entriesModel->setTaxonomy(stateView());
+    }
+
+    void givenLookupListEntriesModel(const LookupListData& data)
+    {
+        m_entriesModel = std::make_shared<LookupListEntriesModel>();
+        auto lookupList = new LookupListModel(data, m_entriesModel.get());
+        m_entriesModel->setListModel(lookupList);
+        m_entriesModel->setTaxonomy(stateView());
+        ASSERT_GT(m_entriesModel->rowCount(), 0);
+    }
+
+    void whenAddEntries(const std::vector<QVariantMap>& entries)
+    {
+        for (auto& entry: entries)
+            m_entriesModel->addEntry(entry);
+    }
+
+    void whenAddEntriesByImportModel(std::vector<QVariantMap> entries)
+    {
+        for (auto& row: entries)
+            m_importModel->addLookupListEntry(row);
+    }
+
+    void whenApplyFixUp(
+        const QString& attributeName, const std::map<QString, QString>& incorrectToFix)
+    {
+        for (auto& [incorrect, correct]: incorrectToFix)
+            m_importModel->addFixForWord(attributeName, incorrect, correct);
+        m_importModel->applyFix();
+    }
+
+    void whenRemoveColumn(const std::optional<QString>& columnToDelete = {})
+    {
+        auto columnHeaders = m_entriesModel->listModel()->attributeNames();
+        ASSERT_FALSE(columnHeaders.empty());
+        if (columnToDelete)
+            columnHeaders.removeAll(columnToDelete);
+        else
+            columnHeaders.removeFirst();
+        const auto columnCountBefore = m_entriesModel->columnCount();
+        m_entriesModel->listModel()->setAttributeNames(columnHeaders);
+        ASSERT_EQ(m_entriesModel->columnCount(), columnCountBefore - 1);
+    }
+
+    void whenAddColumn(const QString& column)
+    {
+        auto columnHeaders = m_entriesModel->listModel()->attributeNames();
+        ASSERT_FALSE(columnHeaders.empty());
+        columnHeaders.push_back(column);
+        const auto columnCountBefore = m_entriesModel->columnCount();
+        m_entriesModel->listModel()->setAttributeNames(columnHeaders);
+
+        ASSERT_EQ(m_entriesModel->columnCount(), columnCountBefore + 1);
+    }
+
+    void whenSetNewLookupListModel(const LookupListData& data)
+    {
+        auto newLookupListModel = new LookupListModel(data, m_entriesModel.get());
+        m_entriesModel->setListModel(newLookupListModel);
+    }
+
+    void whenExportModelToFile()
+    {
+        m_exportTestFile.setFileName(utils::TestOptions::temporaryDirectoryPath(true) + "/"
+            + m_entriesModel->listModel()->rawData().name + ".csv");
+
+        ASSERT_TRUE(m_exportTestFile.open(QFile::WriteOnly));
+
+        // Export LookupListEntriesModel.
+        QTextStream exportStream(&m_exportTestFile);
+        m_entriesModel->exportEntries({}, exportStream);
+        exportStream.flush();
+
+        ASSERT_GT(m_exportTestFile.size(), 0);
+
+        m_exportTestFile.close();
+    }
+
+    void whenBuildTablePreview()
+    {
+        whenExportModelToFile();
+
+        LookupListPreviewProcessor previewProcessor;
+        ASSERT_TRUE(previewProcessor.buildTablePreview(
+            m_importModel.get(), m_exportTestFile.fileName(), ",", true));
+        m_exportTestFile.remove();
+    }
+
+    void whenRevertImport() { m_importModel->revertImport(); }
+
+    void thenFixUpIsRequired() { ASSERT_TRUE(m_importModel->fixupRequired()); }
+    void thenFixUpIsNotRequired() { ASSERT_FALSE(m_importModel->fixupRequired()); }
+
+    void thenImportModelRowCountIs(int rowCount)
+    {
+        thenRowCountIs(rowCount, m_importModel->lookupListEntriesModel());
+    }
+
+    void thenRowCountIs(int rowCount, QAbstractTableModel* model)
+    {
+        ASSERT_EQ(rowCount, model->rowCount());
+    }
+
+    void thenColumnCountIs(int columnCount, QAbstractTableModel* model)
+    {
+        ASSERT_EQ(columnCount, model->columnCount());
+    }
+
+    void thenModelHasNoColumn(const QString& columnName)
+    {
+        for (auto& entry: m_entriesModel->listModel()->rawData().entries)
+            ASSERT_FALSE(entry.contains(columnName));
+    }
+
+    void thenColumnValuesAreEmpty(const QString& columnName)
+    {
+        for (auto& entry: m_entriesModel->listModel()->rawData().entries)
+            ASSERT_TRUE(entry[columnName].isEmpty());
+    }
+
+    void thenImportedValuesAreValid(
+        const LookupListData& exportedData, const LookupListData& modelImportTo)
+    {
+        // Check that preview model contains the same amount of rows as in exported model.
+        thenRowCountIs(exportedData.entries.size(), m_importModel.get());
+
+        // Check that preview model contains the same amount of columns as exported model.
+        thenColumnCountIs(exportedData.attributeNames.size(), m_importModel.get());
+
+        for (int c = 0; c < m_importModel->columnCount(); ++c)
+        {
+            auto curHeader = m_importModel->headerData(c, Qt::Horizontal);
+
+            // Check that attribute name, by position i in LookupListModel
+            // is on first position of i column
+            // OR "Do not import" text on additional columns.
+            ASSERT_TRUE(curHeader.isValid());
+            ASSERT_FALSE(curHeader.toList().empty());
+            ASSERT_EQ(curHeader.toList().front().toString(),
+                c < modelImportTo.attributeNames.size() ? modelImportTo.attributeNames[c]
+                                                        : m_importModel->doNotImportText());
+
+            for (int r = 0; r < exportedData.entries.size(); ++r)
+            {
+                // Check that data in importModel is the same as in imported file.
+                ASSERT_EQ(m_importModel->index(r, c).data(), m_entriesModel->index(r, c).data());
+            }
+        }
+    }
+
+    std::map<QString, QString> correctRowToStdMap()
+    {
+        std::map<QString, QString> result;
+        for (auto [key, value]: correctRow().asKeyValueRange())
+            result[key] = value.toString();
+        return result;
+    }
+
+    QVariantMap correctRow()
+    {
+        QVariantMap entry;
+        entry["Approved"] = "true";
+        entry["Number"] = "1";
+        entry["Color"] = "red";
+        entry["Enum"] = "base enum item 2.1";
+        return entry;
+    }
+
+    LookupListData lookupListWithAttributesAndAdditionalRows(const QString& column)
+    {
+        auto data = bigColumnNumberExampleData();
+        data.entries.push_back(correctRowToStdMap());
+        // Adding entry with only one column specified.
+        const auto correctValueOfAttribute = correctRowToStdMap()[column];
+        data.entries.push_back({{column, correctRowToStdMap()[correctValueOfAttribute]}});
+        return data;
+    }
+
+    LookupListData smallColumnNumberGenericExampleData()
     {
         LookupListData e2;
         e2.id = nx::Uuid::createUuid();
@@ -52,9 +351,9 @@ public:
                 {"Color", "red"},
                 {"Enum", "base enum item 2.1"},
                 {"Approved", "true"}},
-            {{"Number", "67890"},{"Approved", "false"}},
-            {{"Number", "67890"}},
-            {{"Color", "blue"}},
+            {{"Number", "67890"}, {"Approved", "false"}},
+            {{"Color", "blue"}, {"Number", "9876"}},
+            {{"Enum", "base enum item 2.1"}, {"Color", "blue"}},
         };
         return e1;
     }
@@ -63,152 +362,13 @@ public:
     {
         LookupListDataList result;
         result.push_back(bigColumnNumberExampleData());
-        result.push_back(smallColumnNumberExampleData());
+        result.push_back(smallColumnNumberGenericExampleData());
         return result;
     }
 
-    bool exportModelToFile(QFile& exportTestFile, LookupListEntriesModel& entriesModel)
-    {
-        if (!exportTestFile.open(QFile::WriteOnly))
-            return false;
-
-        // Export LookupListEntriesModel.
-        QTextStream exportStream(&exportTestFile);
-        entriesModel.exportEntries({}, exportStream);
-        exportStream.flush();
-
-        if (exportTestFile.size() == 0)
-            return false;
-
-        exportTestFile.close();
-
-        return true;
-    }
-
-    void checkBuildingLookupListPreviewModel(
-        const LookupListData& dataToImport, const LookupListData& modelImportTo)
-    {
-        QFile exportTestFile(nx::utils::TestOptions::temporaryDirectoryPath(true) + "/"
-            + dataToImport.name + ".csv");
-        LookupListModel exportedModel(dataToImport);
-        LookupListEntriesModel exportedEntriesModel;
-        exportedEntriesModel.setListModel(&exportedModel);
-
-        ASSERT_TRUE(exportModelToFile(exportTestFile, exportedEntriesModel));
-
-        LookupListModel lookupListModelImportTo(modelImportTo);
-        LookupListEntriesModel listEntriesImportTo;
-        listEntriesImportTo.setListModel(&lookupListModelImportTo);
-        LookupListImportEntriesModel previewModel;
-
-        previewModel.setLookupListEntriesModel(&listEntriesImportTo);
-        LookupListPreviewProcessor previewProcessor;
-        ASSERT_TRUE(previewProcessor.buildTablePreview(
-            &previewModel, exportTestFile.fileName(), ",", true));
-
-        // Check that preview model contains the same amount of rows as in exported small model.
-        ASSERT_EQ(previewModel.rowCount(), dataToImport.entries.size());
-
-        // Check that preview model contains the same amount of columns as exported model.
-        ASSERT_EQ(previewModel.columnCount(), dataToImport.attributeNames.size());
-
-        for (int c = 0; c < previewModel.columnCount(); ++c)
-        {
-            auto curHeader = previewModel.headerData(c, Qt::Horizontal);
-
-            // Check that attribute name, by position i in LookupListModel
-            // is on first position of i column
-            // OR "Do not import" text on additional columns.
-            ASSERT_TRUE(curHeader.isValid());
-            ASSERT_FALSE(curHeader.toList().empty());
-            ASSERT_EQ(curHeader.toList().front().toString(),
-                c < modelImportTo.attributeNames.size() ? modelImportTo.attributeNames[c]
-                                                        : previewModel.doNotImportText());
-
-            for (int r = 0; r < dataToImport.entries.size(); ++r)
-            {
-                // Check that data in previewModel is the same as in imported file.
-                ASSERT_EQ(
-                    previewModel.index(r, c).data(), exportedEntriesModel.index(r, c).data());
-            }
-        }
-        exportTestFile.remove();
-    }
-
-    std::shared_ptr<LookupListImportEntriesModel> prepareImportModel(
-        const LookupListData& data, StateView* taxonomy = nullptr)
-    {
-        auto importModel = std::make_shared<LookupListImportEntriesModel>();
-        auto lookupList = new LookupListModel(data, importModel.get());
-        auto entriesModel = new LookupListEntriesModel(importModel.get());
-        entriesModel->setListModel(lookupList);
-
-        entriesModel->setTaxonomy(taxonomy ? taxonomy : stateView());
-        importModel->setLookupListEntriesModel(entriesModel);
-        return importModel;
-    }
-
-    void checkValidationOfEmptyRowWithOneIncorrect(
-        const QString& attributeName, const QString& incorrect, const QString& correct)
-    {
-        auto importModel = prepareImportModel(bigColumnNumberExampleData());
-        const int rowCountBefore = importModel->lookupListEntriesModel()->rowCount();
-
-        // Create invalid entry for Generic List and attempt to add it to the model.
-        QVariantMap entry;
-        entry[attributeName] = incorrect;
-        importModel->addLookupListEntry(entry);
-
-        // Check that number of rows didn't change
-        ASSERT_EQ(rowCountBefore, importModel->lookupListEntriesModel()->rowCount());
-
-        // Check fixup is required.
-        ASSERT_TRUE(importModel->fixupRequired());
-
-        // Apply fix for incorrect attribute.
-        importModel->addFixForWord(attributeName, incorrect, correct);
-        importModel->applyFix();
-        // Check that number of rows increased to one
-        ASSERT_EQ(rowCountBefore + 1, importModel->lookupListEntriesModel()->rowCount());
-    }
-
-    QVariantMap correctRow()
-    {
-        QVariantMap entry;
-        entry["Approved"] = "true";
-        entry["Number"] = "1";
-        entry["Color"] = "red";
-        entry["Enum"] = "base enum item 2.1";
-        return entry;
-    }
-    void checkValidationOfRowsWithCorrectAndIncorrectValues(
-        const QString& attributeNameOfIncorrectVal,
-        const std::vector<QVariantMap>& entriesToAdd,
-        const std::map<QString, QString>& incorrectToCorrect)
-    {
-        auto importModel = prepareImportModel(bigColumnNumberExampleData());
-        const int rowCountBefore = importModel->lookupListEntriesModel()->rowCount();
-
-        // Attempt to add entry to the model
-        for (auto entry: entriesToAdd)
-            importModel->addLookupListEntry(entry);
-
-        // Check that number of rows increased, since there are valid values in row
-        const int newNumberOfRows = rowCountBefore + entriesToAdd.size();
-        ASSERT_EQ(newNumberOfRows, importModel->lookupListEntriesModel()->rowCount());
-
-        // Check fixup is required.
-        ASSERT_TRUE(importModel->fixupRequired());
-
-        // Apply fixes for incorrect values
-        for (auto& [incorrectWord, fix]: incorrectToCorrect)
-            importModel->addFixForWord(attributeNameOfIncorrectVal, incorrectWord, fix);
-
-        importModel->applyFix();
-
-        // Check that number of rows didn't change
-        ASSERT_EQ(newNumberOfRows, importModel->lookupListEntriesModel()->rowCount());
-    }
+    std::shared_ptr<LookupListEntriesModel> m_entriesModel;
+    std::shared_ptr<LookupListImportEntriesModel> m_importModel;
+    QFile m_exportTestFile;
 };
 
 /**
@@ -226,7 +386,7 @@ TEST_F(LookupListTests, export_build_import_preview_lookup_list)
 TEST_F(LookupListTests, import_table_with_lesser_num_columns)
 {
     checkBuildingLookupListPreviewModel(
-        smallColumnNumberExampleData(), bigColumnNumberExampleData());
+        smallColumnNumberGenericExampleData(), bigColumnNumberExampleData());
 }
 
 /**
@@ -235,7 +395,7 @@ TEST_F(LookupListTests, import_table_with_lesser_num_columns)
 TEST_F(LookupListTests, import_table_with_bigger_num_columns)
 {
     checkBuildingLookupListPreviewModel(
-        bigColumnNumberExampleData(), smallColumnNumberExampleData());
+        bigColumnNumberExampleData(), smallColumnNumberGenericExampleData());
 }
 
 /**
@@ -243,25 +403,13 @@ TEST_F(LookupListTests, import_table_with_bigger_num_columns)
  */
 TEST_F(LookupListTests, add_empty_row)
 {
-    // Initalize LookupListImportEntriesModel with required objects.
-    LookupListModel exportedModel(bigColumnNumberExampleData());
-    LookupListEntriesModel entriesModel;
-    entriesModel.setListModel(&exportedModel);
-    LookupListImportEntriesModel importModel;
-    importModel.setLookupListEntriesModel(&entriesModel);
+    const int initialRowCount = givenImportModel(bigColumnNumberExampleData());
 
-    // Create entry with empty values of columns and attempt to add it to the model.
-    QVariantMap entry;
-    entry["Number"] = {};
-    entry["Color"] = {};
-
-    const int rowCountBefore = importModel.lookupListEntriesModel()->rowCount();
-    importModel.addLookupListEntry(entry);
-    const int rowCountAfter = importModel.lookupListEntriesModel()->rowCount();
+    whenAddEntriesByImportModel({{{"Number", ""}, {"Color", ""}, {"Approved", ""}}});
 
     // The entry should not be added to the model,
     // so the number of rows before and after must be the same.
-    ASSERT_EQ(rowCountBefore, rowCountAfter);
+    thenImportModelRowCountIs(initialRowCount);
 }
 
 /**
@@ -270,20 +418,17 @@ TEST_F(LookupListTests, add_empty_row)
 TEST_F(LookupListTests, validate_generic_list)
 {
     StateView stateView({}, nullptr);
-    auto importModel = prepareImportModel(smallColumnNumberExampleData(), &stateView);
-
-    const int rowCountBefore = importModel->lookupListEntriesModel()->rowCount();
+    const int initialRowCount =
+        givenImportModel(smallColumnNumberGenericExampleData(), &stateView);
 
     // Create valid entry for Generic List and add it to the model.
-    QVariantMap entry;
-    entry["Value"] = "trulala";
-    importModel->addLookupListEntry(entry);
+    whenAddEntriesByImportModel({{{"Value", "trulala"}}});
 
     // Check that number of rows increased to one.
-    ASSERT_EQ(rowCountBefore + 1, importModel->lookupListEntriesModel()->rowCount());
+    thenImportModelRowCountIs(initialRowCount + 1);
 
     // Check that there are no fixup required.
-    ASSERT_FALSE(importModel->fixupRequired());
+    thenFixUpIsNotRequired();
 }
 
 /**
@@ -292,29 +437,25 @@ TEST_F(LookupListTests, validate_generic_list)
 TEST_F(LookupListTests, revert_import)
 {
     StateView stateView({}, nullptr);
-    auto importModel = prepareImportModel(smallColumnNumberExampleData(), &stateView);
+    const int initialRowCount =
+        givenImportModel(smallColumnNumberGenericExampleData(), &stateView);
 
     // Create valid entry for Generic List.
-    QVariantMap entry;
-    entry["Value"] = "trulala";
-
     const int countOfAdditions = 12;
-    const int rowCountBefore = importModel->lookupListEntriesModel()->rowCount();
+
     // Adding the entry `countOfAdditions` times to model.
-    for (int i = 0; i < countOfAdditions; i++)
-        importModel->addLookupListEntry(entry);
+    whenAddEntriesByImportModel({countOfAdditions, {{"Value", "trulala"}}});
 
     // Check that there are no fixup required.
-    ASSERT_FALSE(importModel->fixupRequired());
+    thenFixUpIsNotRequired();
 
     // Check that number of rows incresead.
-    ASSERT_EQ(
-        rowCountBefore + countOfAdditions, importModel->lookupListEntriesModel()->rowCount());
+    thenImportModelRowCountIs(initialRowCount + countOfAdditions);
 
-    importModel->revertImport();
+    whenRevertImport();
 
     // Check that number of rows is the same as before import.
-    ASSERT_EQ(rowCountBefore, importModel->lookupListEntriesModel()->rowCount());
+    thenImportModelRowCountIs(initialRowCount);
 }
 
 /**
@@ -323,20 +464,7 @@ TEST_F(LookupListTests, revert_import)
 TEST_F(LookupListTests, validate_bool_value)
 {
     checkValidationOfEmptyRowWithOneIncorrect("Approved", "incorrect", "true");
-
-    // Prepare rows with all correct values, except one
-    std::vector<QVariantMap> rows;
-    std::map<QString, QString> fixes;
-    const int numberOfRows = 5;
-    for (int i = 0; i < numberOfRows; i++)
-    {
-        QVariantMap entry = correctRow();
-        const QString incorrectVal = QString::number(i);
-        entry["Approved"] = incorrectVal;
-        fixes[incorrectVal] = i % 2 == 0 ? "true" : "false";
-        rows.push_back(entry);
-    }
-    checkValidationOfRowsWithCorrectAndIncorrectValues("Approved", rows, fixes);
+    checkValidationOfRowsWithCorrectAndIncorrectValues("Approved");
 }
 
 /**
@@ -345,20 +473,7 @@ TEST_F(LookupListTests, validate_bool_value)
 TEST_F(LookupListTests, validate_enum_value)
 {
     checkValidationOfEmptyRowWithOneIncorrect("Enum", "incorrect", "base enum item 1.1");
-
-    // Prepare rows with all correct values, except one
-    std::vector<QVariantMap> rows;
-    std::map<QString, QString> fixes;
-    const int numberOfRows = 5;
-    for (int i = 0; i < numberOfRows; i++)
-    {
-        QVariantMap entry = correctRow();
-        const QString incorrectVal = QString::number(i);
-        entry["Enum"] = incorrectVal;
-        fixes[incorrectVal] = "base enum item 1.2";
-        rows.push_back(entry);
-    }
-    checkValidationOfRowsWithCorrectAndIncorrectValues("Enum", rows, fixes);
+    checkValidationOfRowsWithCorrectAndIncorrectValues("Enum");
 }
 
 /**
@@ -367,20 +482,7 @@ TEST_F(LookupListTests, validate_enum_value)
 TEST_F(LookupListTests, validate_number_value)
 {
     checkValidationOfEmptyRowWithOneIncorrect("Number", "incorrect", "1");
-
-    // Prepare rows with all correct values, except one
-    std::vector<QVariantMap> rows;
-    std::map<QString, QString> fixes;
-    const int numberOfRows = 5;
-    for (int i = 0; i < numberOfRows; i++)
-    {
-        QVariantMap entry = correctRow();
-        const QString incorrectVal = "incorrect_" + QString::number(i);
-        entry["Number"] = incorrectVal;
-        fixes[incorrectVal] = QString::number(i);
-        rows.push_back(entry);
-    }
-    checkValidationOfRowsWithCorrectAndIncorrectValues("Number", rows, fixes);
+    checkValidationOfRowsWithCorrectAndIncorrectValues("Number");
 }
 
 /**
@@ -389,20 +491,66 @@ TEST_F(LookupListTests, validate_number_value)
 TEST_F(LookupListTests, validate_color_value)
 {
     checkValidationOfEmptyRowWithOneIncorrect("Color", "incorrect", "#000000");
+    checkValidationOfRowsWithCorrectAndIncorrectValues("Color");
+}
 
-    // Prepare rows with all correct values, except one
-    std::vector<QVariantMap> rows;
-    std::map<QString, QString> fixes;
-    const int numberOfRows = 5;
-    for (int i = 0; i < numberOfRows; i++)
-    {
-        QVariantMap entry = correctRow();
-        const QString incorrectVal = "incorrect_" + QString::number(i);
-        entry["Color"] = incorrectVal;
-        fixes[incorrectVal] = "#000000";
-        rows.push_back(entry);
-    }
-    checkValidationOfRowsWithCorrectAndIncorrectValues("Color", rows, fixes);
+/**
+ * Check removing of incorrect entries, after reducing of attributes from Lookup List Model.
+ * Removing of first column.
+ */
+TEST_F(LookupListTests, remove_first_column)
+{
+    checkRemovingOfAttribute(bigColumnNumberExampleData().attributeNames.front());
+}
+
+/**
+ * Check removing of incorrect entries, after reducing of attributes from Lookup List Model
+ * Removing of last column.
+ */
+TEST_F(LookupListTests, remove_last_column)
+{
+    checkRemovingOfAttribute(bigColumnNumberExampleData().attributeNames.back());
+}
+
+/**
+ * Check removing of incorrect entries, after reducing of attributes from Lookup List Model
+ * Removing column in the middle.
+ */
+TEST_F(LookupListTests, remove_middle_column)
+{
+    const auto data = bigColumnNumberExampleData();
+    const auto columnToDelete = data.attributeNames[data.attributeNames.size() / 2];
+    checkRemovingOfAttribute(columnToDelete);
+}
+
+/**
+ * Check setting of different LookupListModel to same LookupListEntriesModel
+ */
+TEST_F(LookupListTests, change_lookup_list)
+{
+    LookupListModel initialGenericLookupList(smallColumnNumberGenericExampleData());
+    const auto initialLookupListModelData = initialGenericLookupList.rawData();
+
+    givenLookupListEntriesModel(&initialGenericLookupList);
+
+    // Change LookupListModel to one with attributes.
+    whenSetNewLookupListModel(bigColumnNumberExampleData());
+
+    // Check that LookupListData of LookupListEntriesModel have changed.
+    ASSERT_NE(initialLookupListModelData, m_entriesModel->listModel()->rawData());
+
+    const int rowCountBeforeChange = m_entriesModel->rowCount();
+    // Add new correct entry.
+    whenAddEntries({correctRow()});
+
+    // Check that row was added successfuly.
+    thenRowCountIs(rowCountBeforeChange + 1, m_entriesModel.get());
+
+    // Remove one column from new model.
+    whenRemoveColumn();
+
+    // Check that previous Lookup List Model didn't change.
+    ASSERT_EQ(initialLookupListModelData, initialGenericLookupList.rawData());
 }
 
 } // namespace nx::vms::client::desktop

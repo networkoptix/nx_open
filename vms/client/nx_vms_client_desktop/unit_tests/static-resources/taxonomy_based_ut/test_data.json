@@ -92,6 +92,14 @@
             "rgb": "#000000"
           },
           {
+            "name": "blue",
+            "rgb": "#0000FF"
+          },
+          {
+            "name": "red",
+            "rgb": "#FF0000"
+          },
+          {
             "name": "base color 1.2",
             "rgb": "#111111"
           },
