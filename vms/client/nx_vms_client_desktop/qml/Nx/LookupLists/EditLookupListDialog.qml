@@ -28,6 +28,12 @@ ModalDialog
     property bool canAccept: model.isValid
     property int minimumLabelColumnWidth: 0
 
+    property bool columnWithDataWasRemoved: false
+
+    // Attributes of sourceModel, before any edit was applied to LookupListModel.
+    // Can't be alias, since sourceModel.attributeNames changes during the editing.
+    readonly property var previousAttrbutes: editMode ? sourceModel.attributeNames : []
+
     signal deleteRequested()
 
     title: editMode ? qsTr("List Settings") : qsTr("New List")
@@ -93,6 +99,8 @@ ModalDialog
             if (attributesModel.get(i).checked)
                 attributeNames.push(attributesModel.get(i).text)
         }
+
+        dialog.columnWithDataWasRemoved = editMode && previousAttrbutes.some((attr) => !attributeNames.includes(attr))
         model.attributeNames = attributeNames
     }
 
@@ -132,82 +140,99 @@ ModalDialog
         id: attributesModel
     }
 
-    contentItem: GridLayout
+    contentItem: ColumnLayout
     {
-        columns: 2
-
-        component AlignedLabel: Label
+        GridLayout
         {
-            Layout.alignment: Qt.AlignBaseline
-            Layout.minimumWidth: minimumLabelColumnWidth
-            horizontalAlignment: Text.AlignRight
-            Component.onCompleted:
+            columns: 2
+
+            component AlignedLabel: Label
             {
-                minimumLabelColumnWidth = Math.max(minimumLabelColumnWidth, implicitWidth)
+                Layout.alignment: Qt.AlignBaseline
+                Layout.minimumWidth: minimumLabelColumnWidth
+                horizontalAlignment: Text.AlignRight
+                Component.onCompleted:
+                {
+                    minimumLabelColumnWidth = Math.max(minimumLabelColumnWidth, implicitWidth)
+                }
             }
-        }
 
         AlignedLabel { text: qsTr("Name") }
 
-        TextField
-        {
-            id: nameField
-            Layout.fillWidth: true
-            text: model.name
-            onTextEdited: model.name = text
-        }
+            TextField
+            {
+                id: nameField
+                Layout.fillWidth: true
+                text: model.name
+                onTextEdited: model.name = text
+            }
 
         AlignedLabel { text: qsTr("Type") }
 
-        ComboBox
-        {
-            id: typeField
-            Layout.fillWidth: true
-            textRole: "text"
-            valueRole: "value"
-            enabled: !editMode //< Changing list type while editing is forbidden.
-            model: createListTypeModel()
-
-            onActivated:
+            ComboBox
             {
-                viewModel.objectTypeId = currentValue ? currentValue.mainTypeId : ""
-                populateAttributesModel()
+                id: typeField
+                Layout.fillWidth: true
+                textRole: "text"
+                valueRole: "value"
+                enabled: !editMode //< Changing list type while editing is forbidden.
+                model: createListTypeModel()
+
+                onActivated:
+                {
+                    viewModel.objectTypeId = currentValue ? currentValue.mainTypeId : ""
+                    populateAttributesModel()
+                }
+                Component.onCompleted:
+                {
+                    currentIndex = indexOfValue(model.listType)
+                    populateAttributesModel()
+                }
             }
-            Component.onCompleted:
+
+            AlignedLabel
             {
-                currentIndex = indexOfValue(model.listType)
-                populateAttributesModel()
+                text: qsTr("Column Name")
+                visible: model.isGeneric
+            }
+
+            TextField
+            {
+                id: columnNameField
+                Layout.fillWidth: true
+                visible: model.isGeneric
+                text: model.columnName
+                onTextEdited: model.setColumnName(text)
+            }
+
+            AlignedLabel
+            {
+                text: qsTr("Attributes")
+                visible: !model.isGeneric && attributesModel.count
+                Layout.alignment: Qt.AlignRight | Qt.AlignTop
+            }
+
+            AnalyticsObjectAttributesSelector
+            {
+                Layout.fillWidth: true
+                visible: !model.isGeneric && attributesModel.count
+                model: attributesModel
+                onSelectionChanged: updateSelectedAttributes()
             }
         }
 
-        AlignedLabel
+        DialogBanner
         {
-            text: qsTr("Column Name")
-            visible: model.isGeneric
-        }
+            id: removingAttributeWarning
 
-        TextField
-        {
-            id: columnNameField
             Layout.fillWidth: true
-            visible: model.isGeneric
-            text: model.columnName
-            onTextEdited: model.setColumnName(text)
-        }
-
-        AlignedLabel
-        {
-            text: qsTr("Attributes")
-            visible: !model.isGeneric && attributesModel.count
-            Layout.alignment: Qt.AlignRight | Qt.AlignTop
-        }
-
-        AnalyticsObjectAttributesSelector
-        {
-            Layout.fillWidth: true
-            visible: !model.isGeneric && attributesModel.count
-            model: attributesModel
-            onSelectionChanged: updateSelectedAttributes()
+            Layout.leftMargin: -16
+            Layout.rightMargin: -16
+            visible: columnWithDataWasRemoved && !closed
+            watchToReopen: columnWithDataWasRemoved
+            style: DialogBanner.Style.Warning
+            closeable: true
+            text: qsTr("Removing attributes will delete all associated data")
         }
     }
 
@@ -238,7 +263,7 @@ ModalDialog
 
     TextButton
     {
-        x: 8
+        x: 16
         anchors.verticalCenter: buttonBox.verticalCenter
         visible: editMode
         text: qsTr("Delete")

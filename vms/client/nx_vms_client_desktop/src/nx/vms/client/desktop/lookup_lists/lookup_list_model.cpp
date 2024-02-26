@@ -33,6 +33,9 @@ QList<QString> LookupListModel::attributeNames() const
 
 void LookupListModel::setAttributeNames(QList<QString> value)
 {
+    if (attributeNames() == value)
+        return;
+
     m_data.attributeNames.clear();
     for (const auto& v: value)
         m_data.attributeNames.push_back(v);
