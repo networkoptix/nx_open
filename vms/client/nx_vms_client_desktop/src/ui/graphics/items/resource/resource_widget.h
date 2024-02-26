@@ -56,6 +56,7 @@ class QnResourceWidget:
     Q_PROPERTY(nx::Uuid uuid READ uuid)
     Q_PROPERTY(QString uuidString READ uuidString)
     Q_PROPERTY(bool isZoomWindow READ isZoomWindow)
+    Q_PROPERTY(bool selected READ isSelected WRITE setSelected)
     Q_FLAGS(Options Option)
 
     using base_type = Overlayed<Animated<Instrumented<GraphicsWidget>>>;
