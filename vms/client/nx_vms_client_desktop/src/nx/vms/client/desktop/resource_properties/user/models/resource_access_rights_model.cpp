@@ -115,6 +115,8 @@ struct ResourceAccessRightsModel::Private
     QSet<QnResourcePtr> ignoredProviders;
 
     QVector<ResourceAccessInfo> info;
+    AccessRights grantedAccessRights;
+
     nx::utils::ScopedConnections contextConnections;
 
     nx::vms::client::core::RowCountWatcher rowCountWatcher{};
@@ -247,6 +249,11 @@ AccessRights ResourceAccessRightsModel::relevantAccessRights() const
     return d->item.relevantAccessRights;
 }
 
+AccessRights ResourceAccessRightsModel::grantedAccessRights() const
+{
+    return d->grantedAccessRights;
+}
+
 QVariant ResourceAccessRightsModel::data(const QModelIndex& index, int role) const
 {
     if (index.row() >= rowCount() || index.row() < 0)
@@ -364,6 +371,16 @@ void ResourceAccessRightsModel::Private::updateInfo(bool suppressSignals)
             q->index(0, 0),
             q->index(info.size() - 1, 0));
     }
+
+    if (!context)
+        return;
+
+    const auto newGrantedAccessRights = context->combinedAccessRights({resourceTreeIndex});
+    if (newGrantedAccessRights == grantedAccessRights)
+        return;
+
+    grantedAccessRights = newGrantedAccessRights;
+    emit q->grantedAccessRightsChanged();
 }
 
 QVector<ResourceAccessInfo> ResourceAccessRightsModel::Private::calculateInfo() const

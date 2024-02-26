@@ -74,6 +74,10 @@ class NX_VMS_CLIENT_DESKTOP_API ResourceAccessRightsModel: public QAbstractListM
     Q_PROPERTY(nx::vms::api::AccessRights relevantAccessRights READ relevantAccessRights
         NOTIFY resourceTreeIndexChanged)
 
+    // Access rights granted to this target, or combined access rights granted to its children.
+    Q_PROPERTY(nx::vms::api::AccessRights grantedAccessRights READ grantedAccessRights
+        NOTIFY grantedAccessRightsChanged)
+
     // Do not display inheritance from these providers.
     Q_PROPERTY(QVariant /*QnResourceList or undefined*/ ignoredProviders
         READ ignoredProviders WRITE setIgnoredProviders NOTIFY ignoredProvidersChanged)
@@ -114,6 +118,8 @@ public:
     ResourceAccessTreeItem::Type rowType() const;
     nx::vms::api::AccessRights relevantAccessRights() const;
 
+    nx::vms::api::AccessRights grantedAccessRights() const;
+
     QVector<ResourceAccessInfo> info() const;
 
     virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
@@ -132,6 +138,7 @@ signals:
     void accessRightsListChanged();
     void resourceTreeIndexChanged();
     void ignoredProvidersChanged();
+    void grantedAccessRightsChanged();
 
 private:
     struct Private;

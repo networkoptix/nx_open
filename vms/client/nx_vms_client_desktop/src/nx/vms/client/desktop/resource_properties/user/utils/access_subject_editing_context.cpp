@@ -360,6 +360,41 @@ public:
             : Qt::Checked;
     }
 
+    void combineAccessRights(
+        AccessRights& result,
+        const ResourceAccessMap& accessMap,
+        const QModelIndexList& indexes) const
+    {
+        for (const auto& index: indexes)
+        {
+            if (!index.isValid())
+                continue;
+
+            const auto target = accessTarget(index);
+
+            if (target.isValid())
+                result |= accessMap.value(target.id());
+
+            if (target.resource())
+            {
+                if (const auto groupId = specialResourceGroupFor(target.resource()); !groupId.isNull())
+                    result |= accessMap.value(groupId);
+            }
+
+            QModelIndexList children;
+            const auto model = index.model();
+            const int childCount = model->rowCount(index);
+
+            for (int i = 0; i < childCount; ++i)
+                children.push_back(model->index(i, 0, index));
+
+            combineAccessRights(result, accessMap, children);
+
+            if (result == kFullAccessRights)
+                break;
+        }
+    }
+
     void modifyAccessRight(ResourceAccessMap& accessMap, const QModelIndex& objectIndex,
         AccessRight accessRight, bool value, bool withDependentAccessRights) const
     {
@@ -782,6 +817,14 @@ AccessRights AccessSubjectEditingContext::relevantAccessRights(const ResourceAcc
 
     NX_ASSERT(false, "Unexpected resource type: %1", target.resource());
     return {};
+}
+
+AccessRights AccessSubjectEditingContext::combinedAccessRights(
+    const QModelIndexList& indexes) const
+{
+    AccessRights result{};
+    d->combineAccessRights(result, ownResourceAccessMap(), indexes);
+    return result;
 }
 
 AccessRights AccessSubjectEditingContext::combinedRelevantAccessRights(
