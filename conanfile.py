@@ -59,6 +59,7 @@ class NxOpenConan(ConanFile):
         "skipCustomizationPackage": (True, False),
         "customization": "ANY",
         "installRuntimeDependencies": (True, False),
+        "onlyUnrevisionedPackages": (True, False),
     }
     default_options = {
         "targetDevice": None,
@@ -67,17 +68,10 @@ class NxOpenConan(ConanFile):
         "customization": "default",
         "installRuntimeDependencies": True,
         "quick_start_guide:format": "pdf",
+        "onlyUnrevisionedPackages": False,
     }
 
     ffmpeg_version_and_revision = "4.4#4c7f0faf1d4c81bbd06e5ec02d05c89d"
-    requires = (
-        f"ffmpeg/{ffmpeg_version_and_revision}",
-        "openssl/1.1.1q" "#a23bd98469b500b2d658a17351fa279c",
-        "qt/5.15.6" "#48b4cf4fa89839127f1cb92179c426ff",
-        "roboto-fonts/1.0" "#a1d64ec2d6a2e16f8f476b2b47162123",
-        "vms_help/5.1.0",
-        "quick_start_guide/5.1.0",
-    )
 
     def configure(self):
         # The open-source Customization Package coming from Conan has the name "opensource-meta",
@@ -156,7 +150,16 @@ class NxOpenConan(ConanFile):
     def requirements(self):
         if not self.options.skipCustomizationPackage:
             self.requires("customization/1.0")  #< Always use the latest revision.
+        self.requires("vms_help/5.1.0")
+        self.requires("quick_start_guide/5.1.0")
 
+        if self.options.onlyUnrevisionedPackages:
+            return
+
+        self.requires(f"ffmpeg/{self.ffmpeg_version_and_revision}")
+        self.requires("openssl/1.1.1q" "#a23bd98469b500b2d658a17351fa279c")
+        self.requires("qt/5.15.6" "#48b4cf4fa89839127f1cb92179c426ff")
+        self.requires("roboto-fonts/1.0" "#a1d64ec2d6a2e16f8f476b2b47162123")
         self.requires("boost/1.78.0" "#298dce0adb40278309cc5f76fc92b47a")
 
         # Until we have arm64 macs in CI to build native tools, run x86_64 tools using Rosetta 2.

@@ -91,6 +91,7 @@ function(nx_run_conan)
     cmake_parse_arguments(CONAN "" "BUILD_TYPE;PROFILE;HOME_DIR" "FLAGS" ${ARGN})
 
     set(flags)
+    set(remoteInaccessible FALSE)
 
     if(NOT offline)
         file(
@@ -101,8 +102,7 @@ function(nx_run_conan)
         list(GET accessibility_status 0 status_code)
         if(NOT status_code STREQUAL "0")
             message(WARNING "Conan remote URL ${conanNxRemote} is not accessible.")
-        else()
-            list(APPEND flags "--update")
+            set(remoteInaccessible TRUE)
         endif()
     endif()
 
@@ -116,6 +116,15 @@ function(nx_run_conan)
 
     list(APPEND flags ${CONAN_FLAGS})
 
+    # In a developer build, we are running two conan install commands: one, with a reduced set
+    # of dependencies (onlyUnrevisionedPackages=True), and we pass the --update flag to this
+    # invocation. For the second invocation, we are not passing --update in order to speed up the
+    # process. In CI builds, we only have the second invocation, and we always pass the --update
+    # flag there.
+    if(NOT (${remoteInaccessible} OR ${developerBuild}))
+        list(APPEND flags "--update")
+    endif()
+
     list(APPEND flags ${extraConanArgs})
 
     list(TRANSFORM flags PREPEND "        " OUTPUT_VARIABLE flags)
@@ -126,6 +135,29 @@ function(nx_run_conan)
         "#!/usr/bin/env -S cmake -P"
         ""
         "set(ENV{CONAN_USER_HOME} $ENV{CONAN_USER_HOME})"
+    )
+    if (NOT ${remoteInaccessible} AND ${developerBuild})
+        list(APPEND run_conan_script_contents
+            "execute_process("
+            "    COMMAND"
+            "        ${CONAN_EXECUTABLE} install ${CMAKE_SOURCE_DIR}"
+            "        --install-folder conan_tmp_install"
+            "        -o onlyUnrevisionedPackages=True"
+            "        --update"
+            "        --no-imports"
+            ${flags}
+            @raw_flags@
+            "    COMMAND_ECHO STDERR"
+            "    RESULT_VARIABLE result"
+            ")"
+            "if(NOT result EQUAL 0)"
+            "    message(FATAL_ERROR \"Conan failed to update the unrevisioned packages.\")"
+            "endif()"
+            "file(REMOVE_RECURSE conan_tmp_install)"
+            ""
+        )
+    endif()
+    list(APPEND run_conan_script_contents
         "execute_process("
         "    COMMAND"
         "        ${CONAN_EXECUTABLE} install ${CMAKE_SOURCE_DIR}"
