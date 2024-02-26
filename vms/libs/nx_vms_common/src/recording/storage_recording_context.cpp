@@ -58,7 +58,8 @@ bool convertExtraDataToMp4(
 
 } // namespace
 
-StorageRecordingContext::StorageRecordingContext()
+StorageRecordingContext::StorageRecordingContext(bool exportMode):
+    m_exportMode(exportMode)
 {
 }
 
@@ -129,7 +130,11 @@ void StorageRecordingContext::allocateFfmpegObjects(
                 auto codecParams = getVideoCodecParameters(videoData);
                 if (!codecParams)
                     throw ErrorEx(Error::Code::incompatibleCodec, "No video codec parameters");
-                if (m_container == "matroska")
+
+                // Do not convert to annexB when client export mode, as we can not convert extra
+                // data without possibly transcoded frame. Server do not transcode video, so we
+                // can use this videoData as video format that will be used on write data.
+                if (!m_exportMode && m_container == "matroska")
                 {
                     if (!convertExtraDataToMp4(videoData.get(), codecParams))
                         throw ErrorEx(Error::Code::incompatibleCodec, "Failed to convert codec parameters");
@@ -242,7 +247,7 @@ void StorageRecordingContext::writeData(const QnConstAbstractMediaDataPtr& media
 {
     auto md = mediaData;
     auto videoData = dynamic_cast<const QnCompressedVideoData*>(mediaData.get());
-    if (m_container == "matroska" && videoData && nx::media::isAnnexb(videoData))
+    if (!m_exportMode && m_container == "matroska" && videoData && nx::media::isAnnexb(videoData))
     {
         md = m_annexbToMp4.process(videoData);
         if (!md)

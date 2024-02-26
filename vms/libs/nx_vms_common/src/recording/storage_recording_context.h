@@ -46,7 +46,7 @@ protected:
     };
 
 public:
-    StorageRecordingContext();
+    StorageRecordingContext(bool exportMode = false);
     void setContainer(const QString& container);
     void setLastError(nx::recording::Error::Code code);
 
@@ -85,6 +85,7 @@ protected:
     virtual bool fileStarted(qint64 startTimeMs, int timeZone, const QString& fileName) = 0;
 
 private:
+    const bool m_exportMode;
     QString m_container = "matroska";
     bool m_packetWritten = false;
     std::optional<nx::recording::Error> m_lastError;
@@ -99,8 +100,6 @@ private:
         const QnConstResourceVideoLayoutPtr& videoLayout,
         const AudioLayoutConstPtr& audioLayout,
         StorageContext& context);
-
-
 };
 
 } // namespace nx
