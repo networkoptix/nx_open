@@ -59,6 +59,7 @@ class NxOpenConan(ConanFile):
         "skipCustomizationPackage": (True, False),
         "customization": "ANY",
         "installRuntimeDependencies": (True, False),
+        "onlyUnrevisionedPackages": (True, False),
     }
     default_options = {
         "targetDevice": None,
@@ -67,17 +68,10 @@ class NxOpenConan(ConanFile):
         "customization": "default",
         "installRuntimeDependencies": True,
         "quick_start_guide:format": "pdf",
+        "onlyUnrevisionedPackages": False,
     }
 
     ffmpeg_version_and_revision = "4.4#1edf014620e091c2d51dca81685f092b"
-    requires = (
-        f"ffmpeg/{ffmpeg_version_and_revision}",
-        "openssl/1.1.1q" "#a23bd98469b500b2d658a17351fa279c",
-        "qt/6.5.3" "#11dd688b8a075726c3bf92a1c67c3d33",
-        "roboto-fonts/1.0" "#a1d64ec2d6a2e16f8f476b2b47162123",
-        "vms_help/6.0.0",
-        "quick_start_guide/6.0.0",
-    )
 
     def configure(self):
         # The open-source Customization Package coming from Conan has the name "opensource-meta",
@@ -158,7 +152,16 @@ class NxOpenConan(ConanFile):
     def requirements(self):
         if not self.options.skipCustomizationPackage:
             self.requires("customization/1.0")  #< Always use the latest revision.
+        self.requires("vms_help/6.0.0")
+        self.requires("quick_start_guide/6.0.0")
 
+        if self.options.onlyUnrevisionedPackages:
+            return
+
+        self.requires(f"ffmpeg/{self.ffmpeg_version_and_revision}")
+        self.requires("openssl/1.1.1q" "#a23bd98469b500b2d658a17351fa279c")
+        self.requires("qt/6.5.3" "#11dd688b8a075726c3bf92a1c67c3d33")
+        self.requires("roboto-fonts/1.0" "#a1d64ec2d6a2e16f8f476b2b47162123")
         self.requires("boost/1.83.0" "#e0be85c6f8107d7e960246e31cbbf7ab")
         self.requires("rapidjson/cci.20230929" "#624c0094d741e6a3749d2e44d834b96c")
 
