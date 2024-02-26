@@ -42,7 +42,7 @@ Dialog
 
         Tab
         {
-            button: DialogTabButton
+            button: PrimaryTabButton
             {
                 text: qsTr("Integrations")
             }
@@ -57,7 +57,7 @@ Dialog
 
         Tab
         {
-            button: DialogTabButton
+            button: PrimaryTabButton
             {
                 text: qsTr("Settings")
             }

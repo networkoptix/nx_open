@@ -16,11 +16,6 @@ TabControl
 
         component RightPanelTabButton: CompactTabButton
         {
-            leftPadding: 0
-            rightPadding: 0
-            focusFrameEnabled: false
-            icon.width: 20
-            icon.height: 20
             font.capitalization: Font.AllUppercase
         }
 
