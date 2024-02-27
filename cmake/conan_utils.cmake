@@ -17,8 +17,6 @@ cmake_language(DEFER
     CALL set installSystemRequirements OFF CACHE BOOL ${installSystemRequirementsDoc} FORCE
 )
 
-set(CONAN_DOWNLOAD_TIMEOUT_S 3)
-
 function(nx_init_conan)
     find_program(CONAN_EXECUTABLE NAMES conan NO_CMAKE_SYSTEM_PATH NO_CMAKE_PATH)
     if(NOT CONAN_EXECUTABLE)
@@ -94,20 +92,6 @@ function(nx_run_conan)
     cmake_parse_arguments(CONAN "" "BUILD_TYPE;PROFILE;HOME_DIR" "FLAGS" ${ARGN})
 
     set(flags)
-    set(remoteInaccessible FALSE)
-
-    if(NOT offline)
-        file(
-            DOWNLOAD ${conanNxRemote}
-            STATUS accessibility_status
-            TIMEOUT ${CONAN_DOWNLOAD_TIMEOUT_S}
-        )
-        list(GET accessibility_status 0 status_code)
-        if(NOT status_code STREQUAL "0")
-            message(WARNING "Conan remote URL ${conanNxRemote} is not accessible.")
-            set(remoteInaccessible TRUE)
-        endif()
-    endif()
 
     if("${conanLockFile}" STREQUAL "")
         if(CONAN_BUILD_TYPE)
@@ -127,69 +111,12 @@ function(nx_run_conan)
         list(APPEND flags "--lockfile-out \"${CMAKE_BINARY_DIR}/conan.lock\"")
     endif()
 
-    # In a developer build, we are running two conan install commands: one, with a reduced set
-    # of dependencies (onlyUnrevisionedPackages=True), and we pass the --update flag to this
-    # invocation. For the second invocation, we are not passing --update in order to speed up the
-    # process. In CI builds, we only have the second invocation, and we always pass the --update
-    # flag there.
-    if(NOT (${remoteInaccessible} OR ${developerBuild}))
-        list(APPEND flags "--update")
-    endif()
-
-    set(raw_flags "        \$ENV{NX_TEMPORARY_CONAN_ARGS}")
-
     list(APPEND flags ${extraConanArgs})
 
-    list(TRANSFORM flags PREPEND "        " OUTPUT_VARIABLE flags)
+    set(CONAN_USER_HOME $ENV{CONAN_USER_HOME})
 
-    set(run_conan_script_contents
-        "#!/usr/bin/env -S cmake -P"
-        ""
-        "set(ENV{CONAN_USER_HOME} $ENV{CONAN_USER_HOME})"
-    )
-    if (NOT ${remoteInaccessible} AND ${developerBuild})
-        list(APPEND run_conan_script_contents
-            "execute_process("
-            "    COMMAND"
-            "        ${CONAN_EXECUTABLE} install ${CMAKE_SOURCE_DIR}"
-            "        --install-folder conan_tmp_install"
-            "        -o onlyUnrevisionedPackages=True"
-            "        --update"
-            "        --no-imports"
-            ${flags}
-            @raw_flags@
-            "    COMMAND_ECHO STDERR"
-            "    RESULT_VARIABLE result"
-            ")"
-            "if(NOT result EQUAL 0)"
-            "    message(FATAL_ERROR \"Conan failed to update the unrevisioned packages.\")"
-            "endif()"
-            "file(REMOVE_RECURSE conan_tmp_install)"
-            ""
-        )
-    endif()
-    list(APPEND run_conan_script_contents
-        "execute_process("
-        "    COMMAND"
-        "        ${CONAN_EXECUTABLE} install ${CMAKE_SOURCE_DIR}"
-        "        --install-folder ${CMAKE_BINARY_DIR}"
-        ${flags}
-        @raw_flags@
-        "    COMMAND_ECHO STDERR"
-        "    RESULT_VARIABLE result"
-        ")"
-        "if(NOT result EQUAL 0)"
-        "    message(FATAL_ERROR \"Conan failed to install the dependencies.\")"
-        "endif()"
-        "file(COPY \"${CMAKE_BINARY_DIR}/conan.lock\" DESTINATION \"${distribution_output_dir}/\")"
-        ""
-    )
-    string(JOIN "\n" run_conan_script_contents ${run_conan_script_contents})
     set(run_conan_script ${CMAKE_BINARY_DIR}/run_conan.cmake)
-    file(CONFIGURE OUTPUT ${run_conan_script} CONTENT ${run_conan_script_contents})
-    file(CHMOD ${run_conan_script} PERMISSIONS
-        OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
-    nx_store_known_file(${run_conan_script})
+    nx_configure_file(${open_source_root}/cmake/run_conan.cmake.in ${run_conan_script} @ONLY)
 
     if(runConanAutomatically OR NOT EXISTS ${CMAKE_BINARY_DIR}/conan_paths.cmake)
         if(installSystemRequirements)
