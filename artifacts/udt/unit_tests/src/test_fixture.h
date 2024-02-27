@@ -30,7 +30,7 @@ public:
 
     void givenListeningServerSocket();
     void startAcceptingAsync();
-    void whenAcceptConnection();
+    UDTSOCKET whenAcceptConnection();
     void thenConnectionIsAccepted();
     void thenServerReceives(const std::string& data);
     detail::SocketAddress serverAddress() const;
@@ -49,6 +49,7 @@ public:
     void givenTwoConnectedSockets();
 
     UDTSOCKET clientSocket() { return m_clientSocket; }
+    UDTSOCKET serverSocket() { return m_serverSocket; }
 
     void installReorderingChannel();
 
