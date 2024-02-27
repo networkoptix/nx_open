@@ -221,9 +221,10 @@ int QnFfmpegHelper::getDefaultFrameSize(AVCodecParameters* avCodecParams)
         encoderContext->sample_fmt = avCodec->sample_fmts[0];
     encoderContext->channels = avCodecParams->channels;
     encoderContext->sample_rate = avCodecParams->sample_rate;
-    auto res = avcodec_open2(encoderContext, avCodec, nullptr) >= 0
-        ? encoderContext->frame_size
-        : 0;
+    encoderContext->channel_layout = av_get_default_channel_layout(encoderContext->channels);
+    encoderContext->bit_rate = 64'000;
+    auto status = avcodec_open2(encoderContext, avCodec, nullptr);
+    auto res = status >= 0 ? encoderContext->frame_size : 0;
     avcodec_free_context(&encoderContext);
     return res;
 }

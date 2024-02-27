@@ -61,6 +61,13 @@ bool addStream(const CodecParametersConstPtr& codecParameters, AVFormatContext* 
             stream->codecpar->frame_size = QnFfmpegHelper::getDefaultFrameSize(stream->codecpar);
     }
 
+    // TODO: #lbusygin Add frame_size to serialization/deserialization functions for CodecParameters.
+    if (stream->codecpar->codec_id == AV_CODEC_ID_AAC)
+    {
+        if (stream->codecpar->frame_size == 0)
+            stream->codecpar->frame_size = QnFfmpegHelper::getDefaultFrameSize(stream->codecpar);
+    }
+
     stream->codecpar->codec_tag = 0;
     // Force video tag due to ffmpeg missing it out for h265 in AVI.
     if (stream->codecpar->codec_id == AV_CODEC_ID_H265 && strcmp(formatContext->oformat->name, "avi") == 0)
