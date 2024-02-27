@@ -189,7 +189,6 @@ void ExportStorageStreamRecorder::updateSignatureAttr(StorageContext* context)
 void ExportStorageStreamRecorder::onSuccessfulPacketWrite(
     AVCodecParameters* avCodecParams, const uint8_t* data, int size)
 {
-    NX_VERBOSE(this, "SignVideo: add packet of size %1, type: %2", size, avCodecParams->codec_type);
     m_signer.processMedia(avCodecParams, data, size);
 }
 
