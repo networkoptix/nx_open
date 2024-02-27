@@ -919,6 +919,7 @@ void ConnectActionsHandler::updatePreloaderVisibility()
             // Show welcome screen, hide preloader.
             resourceModeAction->setChecked(false);
             welcomeScreen->setConnectingToSystem(/*systemId*/ {});
+            welcomeScreen->setGlobalPreloaderVisible(false);
             break;
         }
         case LogicalState::connecting:
