@@ -133,9 +133,16 @@ QnWorkbenchLayout::QnWorkbenchLayout(const LayoutResourcePtr& resource):
 
 QnWorkbenchLayout::~QnWorkbenchLayout()
 {
-    // Synchronizer must be stopped here to avoid removing layout items.
+    // Synchronizer must be stopped here to submit pending items before destroying.
     d->synchronizer.reset();
-    clear();
+
+    for (QnWorkbenchItem* item: d->items)
+    {
+        // Avoid unneeded `removeItem()` processing and signals sending.
+        item->setLayout(nullptr);
+        delete item;
+    }
+    d->items.clear();
 }
 
 QnLayoutFlags QnWorkbenchLayout::flags() const
@@ -442,14 +449,6 @@ void QnWorkbenchLayout::removeZoomLinkInternal(QnWorkbenchItem* item,
     emit zoomLinkRemoved(item, zoomTargetItem);
     if (notifyItem)
         emit item->zoomTargetItemChanged();
-}
-
-void QnWorkbenchLayout::clear()
-{
-    // QnWorkbenchItem destructor will remove an item from d->items, so iterating over copy.
-    foreach(QnWorkbenchItem *item, d->items)
-        delete item;
-    d->items.clear();
 }
 
 bool QnWorkbenchLayout::canMoveItem(QnWorkbenchItem* item, const QRect& geometry,

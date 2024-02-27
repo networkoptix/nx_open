@@ -241,6 +241,9 @@ Workbench::Workbench(QObject* parent):
 {
     setCurrentLayout(d->dummyLayout.get());
 
+    connect(d->dummyLayout.get(), &QnWorkbenchLayout::itemAdded, this,
+        [this]() { NX_ASSERT(false, "Items cannot be added to dummy layout"); });
+
     d->stateDelegate = std::make_shared<StateDelegate>(this);
     appContext()->clientStateHandler()->registerDelegate(kWorkbenchDataKey, d->stateDelegate);
 
@@ -596,7 +599,8 @@ void Workbench::setCurrentLayout(QnWorkbenchLayout* layout)
     d->currentLayout = layout;
     if (!d->currentLayout)
     {
-        d->dummyLayout->clear();
+        // Safety measure: ensure dummy layout is always empty.
+        d->dummyLayout->resource()->setItems(common::LayoutItemDataMap());
         d->currentLayout = d->dummyLayout.get();
     }
 
