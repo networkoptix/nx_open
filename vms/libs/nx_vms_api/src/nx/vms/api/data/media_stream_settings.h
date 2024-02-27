@@ -95,7 +95,6 @@ struct NX_VMS_API StreamSettings: MediaSettings
     bool download = false;
 
     ValidationResult validateStreamSettings() const;
-    QString getStreamingFormat() const;
 
     static QByteArray getMimeType(const QString& format);
 };
