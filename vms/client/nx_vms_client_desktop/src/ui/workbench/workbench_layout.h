@@ -206,11 +206,6 @@ public:
     void removeItems(const QnResourcePtr& resource);
 
     /**
-     * Clears this layout by removing all its items.
-     */
-    Q_SLOT void clear();
-
-    /**
      * @param position Position to get item at.
      * @return Pinned item at the given position, or nullptr if the given position is empty.
      */
