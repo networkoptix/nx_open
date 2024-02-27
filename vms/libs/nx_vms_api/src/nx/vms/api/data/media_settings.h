@@ -20,7 +20,7 @@ struct NX_VMS_API MediaSettings
 {
     /**%apidoc
      * Device id (can be obtained from "id", "physicalId" or "logicalId" field via
-     * /rest/v{1-}/devices) or MAC address (not supported for certain Devices).
+     * `GET /rest/v{1-}/devices`) or MAC address (not supported for certain Devices).
      */
     nx::Uuid id;
 
