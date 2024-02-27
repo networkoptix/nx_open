@@ -228,6 +228,23 @@ TEST_F(RowCheckModelTest, ResetCheck)
         {Qt::Unchecked, Qt::Unchecked, Qt::Unchecked, Qt::Unchecked});
 }
 
+TEST_F(RowCheckModelTest, SetAllCheckedStateCheck)
+{
+    auto whenCheckStateSetForNumberOfRows =
+        [&](int rowCount)
+        {
+            for (int r = 0; r < rowCount; ++r)
+                model->setData(model->index(r, 0), Qt::Checked, Qt::CheckStateRole);
+        };
+
+    whenSourceModelIsReset({1, 2, 3});
+
+    whenCheckStateSetForNumberOfRows(1);
+    whenCheckStateSetForNumberOfRows(model->rowCount());
+
+    thenCheckStatesAreUpdated({static_cast<size_t>(model->rowCount()), Qt::Checked});
+}
+
 TEST_F(RowCheckModelTest, InsertRemoveMoveCheck)
 {
     auto checkStateIsSet = [&]()

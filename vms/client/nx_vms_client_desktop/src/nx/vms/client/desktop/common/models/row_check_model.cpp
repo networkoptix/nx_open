@@ -221,10 +221,16 @@ bool RowCheckModel::setData(const QModelIndex& index, const QVariant& value, int
     if (index.column() == 0 && role == Qt::CheckStateRole)
     {
         const QModelIndex checkboxIndex = sourceModel()->index(index.row(), 0);
-        if (m_checkedRows.count(checkboxIndex) > 0)
-            m_checkedRows.erase(QPersistentModelIndex(checkboxIndex));
-        else
+        // If value is correct Qt::CheckState, set this value as checked state of index,
+        // otherwise invert current checked state of index.
+        const bool needToCheckIndex = value.canConvert<Qt::CheckState>()
+            ? value.value<Qt::CheckState>() == Qt::Checked
+            : !m_checkedRows.contains(checkboxIndex);
+
+        if (needToCheckIndex)
             m_checkedRows.insert(QPersistentModelIndex(checkboxIndex));
+        else
+            m_checkedRows.erase(QPersistentModelIndex(checkboxIndex));
 
         emit checkedRowsChanged();
 
