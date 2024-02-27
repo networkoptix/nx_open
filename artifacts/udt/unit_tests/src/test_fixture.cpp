@@ -166,12 +166,13 @@ void BasicFixture::startAcceptingAsync()
     UDT::accept(m_serverSocket, (struct sockaddr*) &acceptedAddress, &len);
 }
 
-void BasicFixture::whenAcceptConnection()
+UDTSOCKET BasicFixture::whenAcceptConnection()
 {
     struct sockaddr_in acceptedAddress;
     memset(&acceptedAddress, 0, sizeof(acceptedAddress));
     int len = sizeof(acceptedAddress);
     m_acceptedConnection = UDT::accept(m_serverSocket, (struct sockaddr*) &acceptedAddress, &len);
+    return m_acceptedConnection;
 }
 
 void BasicFixture::thenConnectionIsAccepted()

@@ -2,8 +2,12 @@
 
 #include <thread>
 
+#include <nx/network/socket_global.h>
+#include <nx/network/system_socket_address.h>
 #include <nx/utils/thread/sync_queue.h>
 #include <nx/utils/system_error.h>
+
+#include "udp_proxy.h"
 
 namespace udt::test {
 
@@ -301,6 +305,146 @@ TEST_F(Connect, no_timeout_by_default)
     std::this_thread::sleep_for(std::chrono::seconds(5));
 
     thenConnectIsStillRunning();
+}
+
+//-------------------------------------------------------------------------------------------------
+
+class IoThroughMalfunctingChannel:
+    public BasicFixture
+{
+    using base_type = BasicFixture;
+
+public:
+    IoThroughMalfunctingChannel()
+    {
+    }
+
+    ~IoThroughMalfunctingChannel()
+    {
+        m_stopped = true;
+        for (auto& t: m_ioThreads)
+            t.join();
+    }
+
+protected:
+    virtual void SetUp() override
+    {
+        base_type::SetUp();
+
+        givenListeningServerSocket();
+
+        m_serverAddress = nx::network::SystemSocketAddress(AF_INET);
+        ASSERT_EQ(0, UDT::getsockname(serverSocket(), m_serverAddress.get(),
+            reinterpret_cast<int*>(&m_serverAddress.length())));
+
+        ASSERT_TRUE(m_proxy.start());
+        m_proxy.setBeforeSendingPacketCallback([this](auto&&... args) {
+            return alterUdtTraffic(std::forward<decltype(args)>(args)...);
+        });
+    }
+
+    void givenClientSocketConnectedThroughProxy()
+    {
+        givenClientSocket();
+
+        const nx::network::SystemSocketAddress anyAddr(
+            nx::network::SocketAddress::anyPrivateAddressV4, AF_INET);
+
+        ASSERT_EQ(0, UDT::bind(clientSocket(), anyAddr.get(), anyAddr.length()));
+
+        nx::network::SystemSocketAddress addr(AF_INET);
+        ASSERT_EQ(0, UDT::getsockname(clientSocket(), addr.get(), reinterpret_cast<int*>(&addr.length())));
+
+        m_proxy.addProxyRoute(addr.toSocketAddress(), m_serverAddress.toSocketAddress());
+        m_proxy.addProxyRoute(m_serverAddress.toSocketAddress(), addr.toSocketAddress());
+
+        nx::network::SystemSocketAddress proxyAddr(m_proxy.getProxyAddress(), AF_INET);
+        ASSERT_EQ(0, UDT::connect(clientSocket(), proxyAddr.get(), proxyAddr.length()));
+        m_serverConnection = whenAcceptConnection();
+        ASSERT_NE(UDT::INVALID_SOCK, m_serverConnection);
+    }
+
+    void setPacketCorruptionRate(double rate)
+    {
+        m_corruptionRate = rate;
+    }
+
+    void setPacketLossRate(double rate)
+    {
+        m_packetLossRate = rate;
+    }
+
+    void startTwoWayDataExchange()
+    {
+        int timeoutMs = 500;
+
+        UDT::setsockopt(m_serverConnection, 0, UDT_RCVTIMEO, &timeoutMs, sizeof(timeoutMs));
+        UDT::setsockopt(clientSocket(), 0, UDT_RCVTIMEO, &timeoutMs, sizeof(timeoutMs));
+
+        m_ioThreads.push_back(std::thread([this]() {
+            dataExchangeThreadMain(m_serverConnection, clientSocket());
+        }));
+
+        m_ioThreads.push_back(std::thread([this]() {
+            dataExchangeThreadMain(clientSocket(), m_serverConnection);
+        }));
+    }
+
+private:
+    bool alterUdtTraffic(char* buf, std::size_t len)
+    {
+        if ((rand() % 100) < 100 * m_packetLossRate)
+            return false;
+
+        if ((rand() % 100) < 100 * m_corruptionRate)
+        {
+            const int corruptedBytesCnt = (rand() % 7) + 1;
+            int pos = 0;
+            for (int i = 0; i < corruptedBytesCnt; ++i)
+            {
+                pos = (pos + (rand() % len)) % len;
+                buf[pos] ^= buf[pos];
+            }
+        }
+
+        return true;
+    }
+
+    void dataExchangeThreadMain(UDTSOCKET from, UDTSOCKET to)
+    {
+        char buf[4096];
+        while (!m_stopped)
+        {
+            UDT::send(to, buf, sizeof(buf) / 2, 0);
+            int cnt = UDT::recv(from, buf, sizeof(buf), 0);
+            if (cnt > 0)
+                m_totalBytesTransferred += cnt;
+        }
+    }
+
+private:
+    nx::network::SystemSocketAddress m_serverAddress;
+    nx::network::SocketGlobalsHolder m_socketInitializer;
+    UdpProxy m_proxy;
+    UDTSOCKET m_serverConnection = UDT::INVALID_SOCK;
+    bool m_stopped = false;
+    std::vector<std::thread> m_ioThreads;
+    std::atomic<int64_t> m_totalBytesTransferred = 0;
+    double m_corruptionRate = 0.0;
+    double m_packetLossRate = 0.0;
+};
+
+TEST_F(IoThroughMalfunctingChannel, corrupted_packets_do_not_crash_the_process)
+{
+    givenClientSocketConnectedThroughProxy();
+
+    setPacketCorruptionRate(0.3);
+    setPacketLossRate(0.1);
+
+    startTwoWayDataExchange();
+
+    std::this_thread::sleep_for(std::chrono::seconds(7));
+    // the process does not crash.
 }
 
 } // namespace udt::test
