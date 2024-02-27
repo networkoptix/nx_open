@@ -1,0 +1,93 @@
+#!/usr/bin/env -S cmake -P"
+
+cmake_minimum_required(VERSION 3.20)
+
+set(ENV{CONAN_USER_HOME} "@CONAN_USER_HOME@")
+set(CONAN_EXECUTABLE "@CONAN_EXECUTABLE@")
+set(CMAKE_SOURCE_DIR "@CMAKE_SOURCE_DIR@")
+set(CMAKE_BINARY_DIR "@CMAKE_BINARY_DIR@")
+
+set(developerBuild @developerBuild@)
+set(offlineMode @offline@)
+set(conanNxRemote "@conanNxRemote@")
+set(conanLockExportDir "@distribution_output_dir@")
+set(conanFlags @flags@ $ENV{NX_TEMPORARY_CONAN_ARGS})
+
+
+if("--update" IN_LIST conanFlags)
+    set(updateForced TRUE)
+else()
+    set(updateForced FALSE)
+endif()
+
+set(updateAllowed TRUE)
+
+if(NOT offlineMode AND NOT updateForced)
+    if(developerBuild)
+        file(
+            DOWNLOAD ${conanNxRemote}
+            STATUS status
+            TIMEOUT 3 #< Seconds.
+        )
+        list(GET status 0 status_code)
+        if(NOT status_code STREQUAL "0")
+            message(WARNING "Conan remote URL ${conanNxRemote} is not accessible.")
+            set(updateAllowed FALSE)
+        endif()
+    else()
+        set(updateForced TRUE)
+        list(APPEND conanFlags "--update")
+    endif()
+endif()
+
+macro(run_conan)
+    execute_process(
+        COMMAND
+            ${CONAN_EXECUTABLE} install ${CMAKE_SOURCE_DIR}
+            ${conanFlags} ${ARGV}
+        COMMAND_ECHO STDERR
+        RESULT_VARIABLE result
+    )
+endmacro()
+
+# In a developer build, we run conan install multiple times.
+# First invocation checks updates for requirements which do not have revisions. We pass the
+# `--update` flag and set the option `onlyUnrevisionedPackages`.
+# Second invocation tries to generate build files using package revisions from the local cache. We
+# do not pass `--update` this time, what speeds up things a lot. This invocation may fail if a
+# newer recipe revision for a package was requested. Conan cannot download it because updates are
+# disabled.
+# In this case we retry `conan install`, passing `--update` flag to it.
+
+# CI builds do not use these optimizations, so we run `conan install` only once with updates
+# enabled. This ensures that Conan will download an updated package which differs from the package
+# in the local cache by only its *package revision*. This happens when a binary package was rebuilt
+# for some reason. E.g. the previous binary package was built in an incorrectly configured build
+# environment.
+
+if(updateAllowed AND NOT updateForced)
+    run_conan(
+        --install-folder conan_tmp_install
+        --update
+        --no-imports
+        -o onlyUnrevisionedPackages=True
+    )
+
+    if(NOT result EQUAL 0)
+        message(FATAL_ERROR "Conan failed to update the unrevisioned packages.")
+    endif()
+
+    file(REMOVE_RECURSE conan_tmp_install)
+endif()
+
+run_conan(--install-folder ${CMAKE_BINARY_DIR})
+if(NOT result EQUAL 0 AND updateAllowed AND NOT updateForced)
+    message(WARNING "Conan failed to install dependencies. Retrying with `--update`.")
+    run_conan(--install-folder ${CMAKE_BINARY_DIR} --update)
+endif()
+
+if(NOT result EQUAL 0)
+    message(FATAL_ERROR "Conan failed to install the dependencies.")
+endif()
+
+file(COPY "${CMAKE_BINARY_DIR}/conan.lock" DESTINATION "${conanLockExportDir}/")
