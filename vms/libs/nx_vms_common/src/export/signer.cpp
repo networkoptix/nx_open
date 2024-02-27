@@ -16,6 +16,7 @@ MediaSigner::MediaSigner():
 
 void MediaSigner::processMedia(AVCodecParameters* avCodecParams, const uint8_t* data, int size)
 {
+    NX_VERBOSE(this, "Add packet of size %1, type: %2", size, avCodecParams->codec_type);
     // Audio/video order can be broken after muxing/demuxing so use separate hash for audio
     if (avCodecParams->codec_type == AVMEDIA_TYPE_VIDEO)
         QnSignHelper::updateDigest(avCodecParams, m_signatureHash, data, size);
