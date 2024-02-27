@@ -15,32 +15,68 @@ import nx.vms.client.desktop
 Control
 {
     id: control
-    background: Rectangle { color: ColorTheme.colors.dark6 }
+
+    enum SelectionState { Nothing, Partial, All }
     padding: 4
 
     signal selectionChanged
 
     property alias model: visualModel.model
+    property var selectionState: AnalyticsObjectAttributesSelector.SelectionState.Partial
 
     contentItem: Column
     {
-        spacing: 4
+        spacing: 6
 
-        SearchField
+        Rectangle
         {
-            id: searchField
             width: parent.width
-            onTextChanged: visualModel.updateVisibleItems()
+            height: selector.height + searchField.height + selector.anchors.topMargin + searchField.y
+            color: ColorTheme.colors.dark6
+            radius: 1
+            border.color: ColorTheme.colors.dark5
+            border.width: 1
+
+            SearchField
+            {
+                id: searchField
+
+                x: 4
+                y: 4
+                width: parent.width - x - selector.x
+
+                onTextChanged: visualModel.updateVisibleItems()
+            }
+
+            Scrollable
+            {
+                id: selector
+
+                x: 4
+                width: parent.width - x
+                height: 200
+                anchors.top: searchField.bottom
+                anchors.topMargin: 4
+                scrollView.ScrollBar.vertical.width: 4
+
+                contentItem: Column
+                {
+                    Repeater
+                    {
+                        model: visualModel
+                    }
+                }
+            }
         }
 
-        Scrollable
+        TextButton
         {
-            height: 200
-            width: parent.width
-
-            contentItem: Column
+            text: qsTr("Select / Deselect All")
+            onClicked:
             {
-                Repeater { model: visualModel }
+                selectionState = selectionState === AnalyticsObjectAttributesSelector.SelectionState.All
+                    ? AnalyticsObjectAttributesSelector.SelectionState.Nothing
+                    : AnalyticsObjectAttributesSelector.SelectionState.All
             }
         }
     }
@@ -53,10 +89,23 @@ Control
         {
             text: model.text
             font.pixelSize: 14
-            checked: model.checked
+            checked: selectionState === AnalyticsObjectAttributesSelector.SelectionState.Partial
+                ? model.checked
+                : selectionState === AnalyticsObjectAttributesSelector.SelectionState.All
+
+            onCheckedChanged:
+            {
+                if (selectionState !== AnalyticsObjectAttributesSelector.SelectionState.Partial)
+                {
+                    model.checked = checked
+                    selectionChanged()
+                }
+            }
+
             onClicked:
             {
                 model.checked = checked
+                control.selectionState = AnalyticsObjectAttributesSelector.SelectionState.Partial
                 selectionChanged()
             }
         }
