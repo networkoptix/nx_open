@@ -69,8 +69,8 @@ struct RemoteArchiveChunk
  */
 struct RemoteArchiveSynchronizationSettings
 {
-    std::chrono::milliseconds waitBeforeSync{std::chrono::milliseconds::zero()};
-    std::chrono::milliseconds waitBetweenChunks{std::chrono::milliseconds::zero()};
+    std::optional<std::chrono::milliseconds> waitBeforeSync;
+    std::optional<std::chrono::milliseconds> waitBetweenChunks;
     int syncCyclesNumber{1};
 };
 
@@ -80,7 +80,6 @@ inline bool operator==(const RemoteArchiveChunk& lhs, const RemoteArchiveChunk& 
         && lhs.startTimeMs == rhs.startTimeMs
         && lhs.durationMs == rhs.durationMs;
 }
-
 
 using RemoteChunks = std::vector<RemoteArchiveChunk>;
 using OverlappedRemoteChunks = std::map<OverlappedId, RemoteChunks>;
