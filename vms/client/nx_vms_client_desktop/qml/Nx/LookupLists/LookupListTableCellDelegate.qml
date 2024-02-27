@@ -66,6 +66,7 @@ FocusScope
     MouseArea
     {
         anchors.fill: parent
+        acceptedButtons: Qt.LeftButton
         onClicked: control.edit()
         visible: !control.isEditing
     }
