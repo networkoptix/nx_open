@@ -1,4 +1,4 @@
-#!/usr/bin/env -S cmake -P"
+#!/usr/bin/env -S cmake -P
 
 cmake_minimum_required(VERSION 3.20)
 
