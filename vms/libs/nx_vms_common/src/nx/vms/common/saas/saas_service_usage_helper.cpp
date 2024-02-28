@@ -501,8 +501,15 @@ std::map<nx::Uuid, std::set<QString>> LocalRecordingUsageHelper::camerasByServic
 
     // Update integration info
     std::map<nx::Uuid, int> channelsByService; // key - serviceId, value - channel count.
+    nx::Uuid defaultServiceId;
     for (const auto& [serviceId, params]: m_context->saasServiceManager()->localRecording())
+    {
         channelsByService[serviceId] = params.totalChannelNumber;
+        if (defaultServiceId.isNull() && params.totalChannelNumber > 0)
+            defaultServiceId = serviceId;
+    }
+    if (defaultServiceId.isNull() && !channelsByService.empty())
+        defaultServiceId = channelsByService.begin()->first;
 
     std::map<nx::Uuid, int>::iterator it = channelsByService.begin();
 
@@ -521,7 +528,7 @@ std::map<nx::Uuid, std::set<QString>> LocalRecordingUsageHelper::camerasByServic
             }
             else
             {
-                serviceId = channelsByService.begin()->first;
+                serviceId = defaultServiceId;
             }
         }
         result[serviceId].insert(camera->getPhysicalId());

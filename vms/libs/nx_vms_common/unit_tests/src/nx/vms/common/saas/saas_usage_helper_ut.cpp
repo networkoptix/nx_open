@@ -577,8 +577,8 @@ TEST_F(SaasServiceUsageHelperTest, LocalRecordingUsage)
         camera->setScheduleEnabled(true);
 
     auto info = m_localRecordingHelper->camerasByService();
-    ASSERT_EQ(2, info.size());
-    ASSERT_EQ(10, info[kLocalRecordingServiceId].size());
+    ASSERT_EQ(1, info.size());
+    ASSERT_EQ(50, info[kLocalRecordingServiceId].size());
     int total = 0;
     for (const auto& [id, cameras]: info)
         total += cameras.size();
