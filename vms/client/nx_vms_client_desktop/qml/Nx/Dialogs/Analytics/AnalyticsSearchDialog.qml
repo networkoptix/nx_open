@@ -621,8 +621,6 @@ Window
 
                 const getData = name => accessor.getData(selection.index, name)
 
-                const previewResource =
-
                 return {
                     "previewResource": getData("previewResource"),
                     "previewTimestampMs": getData("previewTimestampMs") || 0,
