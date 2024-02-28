@@ -37,6 +37,7 @@ struct PoeController::Private:
         bool success, rest::Handle currentHandle, const nx::network::rest::JsonResult& result);
     void update();
     void setPowered(const PoeController::PowerModes& value);
+    void stopUpdating();
     void cancelRequests();
 
     PoeController* const q;
@@ -94,7 +95,7 @@ void PoeController::Private::updateTargetResource(const nx::Uuid& value)
     if (!server || !server->getServerFlags().testFlag(api::SF_HasPoeManagementCapability))
     {
         // Cleanup.
-        cancelRequests();
+        stopUpdating();
         return;
     }
 
@@ -105,23 +106,19 @@ void PoeController::Private::updateTargetResource(const nx::Uuid& value)
 void PoeController::Private::handleReply(
     bool success, rest::Handle replyHandle, const nx::network::rest::JsonResult& result)
 {
-    auto api = connectedServerApi();
-    if (!api)
+    if (!runningHandles.contains(replyHandle))
         return;
-
-    runningHandles.remove(replyHandle);
-    for (const auto handle: runningHandles)
-        api->cancelRequest(handle);
-    runningHandles.clear();
 
     setInitialUpdateInProgress(false);
-    const nx::utils::ScopeGuard handleGuard([this]() { cancelRequests(); });
 
-    if (!success || result.error != nx::network::rest::Result::NoError)
-        return;
+    if (success && result.error == nx::network::rest::Result::NoError)
+        setBlockData(result.deserialized<BlockData>());
 
-    BlockData data;
-    setBlockData(QJson::deserialize(result.reply, &data) ? data : BlockData());
+    runningHandles.remove(replyHandle);
+
+    cancelRequests();
+
+    emit q->updatingPoweringModesChanged();
 }
 
 void PoeController::Private::update()
@@ -153,21 +150,27 @@ void PoeController::Private::setPowered(const PoeController::PowerModes& value)
         /*timeouts*/ {},
         serverHolder.resourceId());
 
-    q->updatingPoweringModesChanged();
+    emit q->updatingPoweringModesChanged();
 }
 
-void PoeController::Private::cancelRequests()
+void PoeController::Private::stopUpdating()
 {
     if (runningHandles.isEmpty())
         return;
 
+    cancelRequests();
+
+    emit q->updatingPoweringModesChanged();
+}
+
+void PoeController::Private::cancelRequests()
+{
     if (auto api = connectedServerApi(); api)
     {
         for (const auto handle: runningHandles)
             connectedServerApi()->cancelRequest(handle);
     }
     runningHandles.clear();
-    q->updatingPoweringModesChanged();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -228,7 +231,7 @@ bool PoeController::updatingPoweringModes() const
 
 void PoeController::cancelRequest()
 {
-    d->cancelRequests();
+    d->stopUpdating();
 }
 
 } // namespace nx::vms::client::desktop
