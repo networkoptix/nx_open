@@ -1,0 +1,16 @@
+cloud: True
+api_token: '020a56254990156297f655e593_399be5e5f6b9859241db00b3203fa5d1e71aab567324ecd963a8f9ab9ddac339'
+client_cert: 'Certificate_pkcs12.p12'
+client_cert_password: 'ABCDEU7MR6w4'
+keypair_alias: 'key_452255808'
+certificate: 'cert_452255808.crt'
+timestamp_servers:
+    - http://timestamp.digicert.com
+    - http://timestamp.globalsign.com/tsa/r6advanced1
+    - http://rfc3161timestamp.globalsign.com/advanced
+    - http://timestamp.sectigo.com
+    - http://timestamp.apple.com/ts01
+    - http://tsa.mesign.com
+    - http://time.certum.pl
+    - http://zeitstempel.dfn.de
+    - http://timestamp.entrust.net/TSS/RFC3161sha2TS
