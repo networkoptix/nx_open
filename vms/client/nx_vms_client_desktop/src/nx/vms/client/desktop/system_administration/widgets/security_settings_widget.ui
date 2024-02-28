@@ -322,11 +322,7 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="QLabel" name="archiveEncryptionWarning">
-           <property name="text">
-            <string>Archive encryption increases CPU usage</string>
-           </property>
-          </widget>
+          <widget class="nx::vms::client::desktop::AlertLabel" name="archiveEncryptionWarning"/>
          </item>
          <item>
           <widget class="QPushButton" name="changeArchivePasswordButton">

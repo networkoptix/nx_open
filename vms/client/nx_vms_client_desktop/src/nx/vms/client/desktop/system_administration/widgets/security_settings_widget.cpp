@@ -51,7 +51,7 @@ SecuritySettingsWidget::SecuritySettingsWidget(
 
     ui->setupUi(this);
     resetWarnings();
-    setWarningStyle(ui->archiveEncryptionWarning);
+    ui->archiveEncryptionWarning->setText(tr("Archive encryption increases CPU usage"));
 
     m_archiveEncryptionPasswordDialog->setWindowTitle(tr("Archive encryption password"));
     m_archiveEncryptionPasswordDialog->setHeaderText(tr(
