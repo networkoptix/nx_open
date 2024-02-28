@@ -41,6 +41,9 @@ ActionVisibility IsNvrNodeCondition::check(
     for (const auto& resource: resources)
     {
         const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
+        if (!camera)
+            return InvisibleAction;
+
         if (camera->isNvr())
             isNvr = true;
 
