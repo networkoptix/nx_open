@@ -309,32 +309,21 @@ void QnCloudManagementWidget::onDisconnectSuccess()
 bool QnCloudManagementWidget::confirmCloudDisconnect()
 {
     QnSessionAwareMessageBox messageBox(this);
-    messageBox.setIcon(QnMessageBox::Icon::Critical);
+    messageBox.setIcon(QnMessageBox::Icon::Question);
     messageBox.setText(tr(
-        "You are about to disconnect System from %1",
+        "Disconnect system from %1?",
         "%1 is the cloud name, like Nx Cloud"
     ).arg(nx::branding::cloudName()));
 
     QString infoText = setWarningStyleHtml(tr(
-        "All %1 users will be deleted.", "%1 is the short cloud name (like Cloud)"
+        "All %1 users will be deleted from the system.", "%1 is the short cloud name (like Cloud)"
     ).arg(nx::branding::shortCloudName()));
     infoText.append("\n");
-
-    if (connection()->connectionInfo().isCloud())
-    {
-        infoText.append(tr("You will be logged out."))
-            .append("\n")
-            .append(tr("System will be accessible through local network with"
-                " a local administrator account."));
-    }
-    else
-    {
-        infoText.append(tr("System will be accessible only through local network."));
-    }
+    infoText.append(tr("System will be accessible only through local network."));
     messageBox.setInformativeText(infoText);
 
     messageBox.addButton(
-        tr("Continue"), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
+        tr("Disconnect"), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
 
     messageBox.setStandardButtons({QDialogButtonBox::Cancel});
     messageBox.button(QDialogButtonBox::Cancel)->setFocus();
