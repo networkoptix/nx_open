@@ -5,6 +5,7 @@
 import argparse
 from dataclasses import dataclass
 import logging
+import os
 from pathlib import Path
 import random
 import shutil
@@ -65,12 +66,6 @@ def sign_file(
     else:
         timestamp_server = None
 
-    certificate_file = (config_file.parent / config.get('file')).resolve()
-    sign_password = config.get('password')
-
-    logging.info(f'Using certificate file: {certificate_file!s}')
-    print_certificate_info(certificate_file, sign_password)
-
     command = [
         'signtool',
         'sign',
@@ -78,19 +73,45 @@ def sign_file(
         '/v']
     if timestamp_server:
         command += ['/td', 'sha256', '/tr', timestamp_server]
-    command += ['/f', str(certificate_file)]
-    command += ['/p', sign_password]
+
+    env_overload = os.environ.copy()
+    if config.get('cloud'):
+        logging.info(f'Using cloud certificate')
+        api_token = config.get('api_token')
+        client_certificate = (config_file.parent /  config.get('client_cert')).resolve()
+        client_certificate_password = config.get('client_cert_password')
+        env_overload["SM_API_KEY"] = api_token
+        env_overload["SM_HOST"] = "https://clientauth.one.digicert.com"
+        env_overload["SM_CLIENT_CERT_FILE"] = str(client_certificate)
+        env_overload["SM_CLIENT_CERT_PASSWORD"] = client_certificate_password
+        certificate = (config_file.parent / config.get('certificate')).resolve()
+        keypair_alias = config.get('keypair_alias')
+        command += ['/csp', 'DigiCert Signing Manager KSP']
+        command += ['/f', str(certificate)]
+        command += ['/kc', keypair_alias]
+    else:
+        logging.info(f'Using certificate file: {certificate_file!s}')
+        certificate_file = (config_file.parent / config.get('file')).resolve()
+        sign_password = config.get('password')
+        print_certificate_info(certificate_file, sign_password)
+        command += ['/f', str(certificate_file)]
+        command += ['/p', sign_password]
+
     command += [str(file_to_sign)]
 
-    return execute_command(command, timeout_s=sign_timeout_s)
+    return execute_command(command, timeout_s=sign_timeout_s, env=env_overload)
 
 
-def execute_command(command: List[str], timeout_s: int = 0) -> ExecuteCommandResult:
+def execute_command(command: List[str], timeout_s: int = 0, env=None) -> ExecuteCommandResult:
     try:
         logging.debug(
             f'Running "{" ".join(command)}"'
             f'{" with timeout " + str(timeout_s) + " seconds" if timeout_s else ""}')
-        execution_result = subprocess.run(command, capture_output=True, timeout=timeout_s)
+        execution_result = subprocess.run(
+            command,
+            capture_output=True,
+            timeout=timeout_s,
+            env=env)
 
     except FileNotFoundError as e:
         logging.warning(e)
