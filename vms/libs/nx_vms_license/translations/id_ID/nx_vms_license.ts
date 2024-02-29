@@ -65,7 +65,7 @@
     </message>
     <message>
       <source>Only one NVR license is allowed per System.</source>
-      <translation type="unfinished">Only one NVR license is allowed per System.</translation>
+      <translation>Hanya satu lisensi NVR yang diperbolehkan per Sistem.</translation>
     </message>
     <message>
       <source>You already have one active NVR license.</source>

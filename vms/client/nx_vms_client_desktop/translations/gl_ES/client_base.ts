@@ -1034,7 +1034,7 @@
     </message>
     <message>
       <source>Add</source>
-      <translation type="unfinished">Add</translation>
+      <translation>Engadir</translation>
     </message>
     <message>
       <source>Device...</source>
@@ -1042,7 +1042,7 @@
     </message>
     <message>
       <source>Add User...</source>
-      <translation type="unfinished">Add User...</translation>
+      <translation>Engadir usuario/a...</translation>
     </message>
     <message>
       <source>Integration...</source>
@@ -1350,7 +1350,7 @@
     <name>Groups</name>
     <message>
       <source>Delete group?</source>
-      <translation type="unfinished">Delete group?</translation>
+      <translation>Eliminar grupo?</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n groups?</source>
@@ -2992,7 +2992,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Passwords do not match</source>
-      <translation type="unfinished">Passwords do not match</translation>
+      <translation>Os contrasinais non coinciden</translation>
     </message>
   </context>
   <context>
@@ -3018,7 +3018,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Passwords do not match</source>
-      <translation type="unfinished">Passwords do not match</translation>
+      <translation>Os contrasinais non coinciden</translation>
     </message>
     <message>
       <source>To modify your password please enter the existing one</source>
@@ -5267,7 +5267,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>cloud</source>
-      <translation type="unfinished">cloud</translation>
+      <translation>nube</translation>
     </message>
     <message>
       <source>Path</source>
@@ -5388,11 +5388,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Integrations</source>
-      <translation type="unfinished">Integrations</translation>
+      <translation>Integracións</translation>
     </message>
     <message>
       <source>Services</source>
-      <translation type="unfinished">Services</translation>
+      <translation>Servizos</translation>
     </message>
     <message>
       <source>Failed to save system settings</source>
@@ -6422,7 +6422,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Delete layout?</source>
-      <translation type="unfinished">Delete layout?</translation>
+      <translation>Eliminar deseño?</translation>
     </message>
     <message numerus="yes">
       <source>These layouts are shared with other users, so they will be deleted for their accounts as well.</source>
@@ -6442,7 +6442,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Delete user?</source>
-      <translation type="unfinished">Delete user?</translation>
+      <translation>Eliminar usuario/a?</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n users?</source>
@@ -7384,7 +7384,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Server is offline</source>
-      <translation type="unfinished">Server is offline</translation>
+      <translation>O servidor está sen conexión</translation>
     </message>
     <message>
       <source>Backup settings are not available</source>
@@ -8010,7 +8010,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Integrations</source>
-      <translation type="unfinished">Integrations</translation>
+      <translation>Integracións</translation>
     </message>
   </context>
   <context>
@@ -9119,7 +9119,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Discard</source>
-      <translation type="unfinished">Discard</translation>
+      <translation>Descartar</translation>
     </message>
     <message>
       <source>New Group</source>
@@ -9139,7 +9139,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Save</source>
-      <translation type="unfinished">Save</translation>
+      <translation>Gardar</translation>
     </message>
     <message>
       <source>Failed to apply changes</source>
@@ -9756,7 +9756,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>support</source>
-      <translation type="unfinished">support</translation>
+      <translation>axuda</translation>
     </message>
     <message>
       <source>It is recommended to contact %1 before proceeding.</source>
@@ -10829,7 +10829,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Confirm</source>
-      <translation type="unfinished">Confirm</translation>
+      <translation>Confirmar</translation>
     </message>
   </context>
   <context>
@@ -11974,7 +11974,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Save</source>
-      <translation type="unfinished">Save</translation>
+      <translation>Gardar</translation>
     </message>
     <message>
       <source>Failed to apply changes</source>
@@ -11986,7 +11986,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Discard</source>
-      <translation type="unfinished">Discard</translation>
+      <translation>Descartar</translation>
     </message>
     <message>
       <source>Copy Access Link</source>
@@ -12002,7 +12002,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Login cannot be empty</source>
-      <translation type="unfinished">Login cannot be empty</translation>
+      <translation>O inicio de sesión non pode estar baleiro</translation>
     </message>
     <message>
       <source>Only letters, numbers and symbols %1 are allowed</source>
@@ -12197,7 +12197,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Developer Tools</source>
-      <translation type="unfinished">Developer Tools</translation>
+      <translation>Ferramentas para programadores</translation>
     </message>
   </context>
   <context>
@@ -12301,7 +12301,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Release Notes...</source>
-      <translation type="unfinished">Release Notes...</translation>
+      <translation>Notas da versión...</translation>
     </message>
     <message>
       <source>%1 Version is available</source>
@@ -12417,7 +12417,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Integrations</source>
-      <translation type="unfinished">Integrations</translation>
+      <translation>Integracións</translation>
     </message>
     <message>
       <source>Web Pages &amp; Integrations</source>
@@ -12439,7 +12439,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::integrations::ImportFromDeviceDialogModel</name>
     <message>
       <source>No data</source>
-      <translation type="unfinished">No data</translation>
+      <translation>Sen datos</translation>
     </message>
     <message>
       <source>All imported</source>
@@ -12675,7 +12675,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>From</source>
-      <translation type="unfinished">From</translation>
+      <translation>De:</translation>
     </message>
   </context>
   <context>
@@ -12686,7 +12686,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>For</source>
-      <translation type="unfinished">For</translation>
+      <translation>Para</translation>
     </message>
     <message>
       <source>Value</source>
@@ -12851,7 +12851,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>From</source>
-      <translation type="unfinished">From</translation>
+      <translation>De:</translation>
     </message>
   </context>
   <context>

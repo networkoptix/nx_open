@@ -231,7 +231,7 @@
     </message>
     <message>
       <source>Device</source>
-      <translation type="unfinished">Device</translation>
+      <translation>Dispositivo</translation>
     </message>
   </context>
   <context>
@@ -292,11 +292,11 @@
     <name>nx::vms::rules::DeviceRecordingAction</name>
     <message>
       <source>Quality</source>
-      <translation type="unfinished">Quality</translation>
+      <translation>Calidade</translation>
     </message>
     <message>
       <source>FPS</source>
-      <translation type="unfinished">FPS</translation>
+      <translation>FPS</translation>
     </message>
     <message>
       <source>Pre-recording</source>
@@ -427,11 +427,11 @@
     </message>
     <message>
       <source>URL</source>
-      <translation type="unfinished">URL</translation>
+      <translation>URL</translation>
     </message>
     <message>
       <source>Content</source>
-      <translation type="unfinished">Content</translation>
+      <translation>Contido</translation>
     </message>
     <message>
       <source>Method</source>
@@ -737,7 +737,7 @@
     </message>
     <message>
       <source>Header</source>
-      <translation type="unfinished">Header</translation>
+      <translation>Cabeceira</translation>
     </message>
     <message>
       <source>Body</source>

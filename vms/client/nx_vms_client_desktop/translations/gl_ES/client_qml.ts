@@ -52,7 +52,7 @@
     </message>
     <message>
       <source>General</source>
-      <translation type="unfinished">General</translation>
+      <translation>Xeral</translation>
     </message>
     <message>
       <source>Synchronize Users</source>
@@ -306,7 +306,7 @@
     </message>
     <message>
       <source>Remove</source>
-      <translation type="unfinished">Remove</translation>
+      <translation>Eliminar</translation>
     </message>
     <message>
       <source>Remove Request</source>
@@ -321,7 +321,7 @@
     </message>
     <message>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>Auto</translation>
     </message>
   </context>
   <context>
@@ -351,7 +351,7 @@
     </message>
     <message>
       <source>Disabled</source>
-      <translation type="unfinished">Disabled</translation>
+      <translation>Desactivado</translation>
     </message>
     <message>
       <source>Insecure (digest) authentication</source>
@@ -612,7 +612,7 @@
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nome</translation>
     </message>
     <message>
       <source>Column Name</source>
@@ -624,7 +624,7 @@
     </message>
     <message>
       <source>Create</source>
-      <translation type="unfinished">Create</translation>
+      <translation>Crear</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -636,7 +636,7 @@
     </message>
     <message>
       <source>Type</source>
-      <translation type="unfinished">Type</translation>
+      <translation>Tipo</translation>
     </message>
     <message>
       <source>Attributes</source>
@@ -707,7 +707,7 @@
     <name>FilterDialog</name>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nome</translation>
     </message>
     <message>
       <source>Base DN</source>
@@ -843,7 +843,7 @@
     </message>
     <message>
       <source>General</source>
-      <translation type="unfinished">General</translation>
+      <translation>Xeral</translation>
     </message>
     <message>
       <source>Groups</source>
@@ -874,15 +874,15 @@
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nome</translation>
     </message>
     <message>
       <source>Description</source>
-      <translation type="unfinished">Description</translation>
+      <translation>Descrición</translation>
     </message>
     <message>
       <source>Permission Groups</source>
-      <translation type="unfinished">Permission Groups</translation>
+      <translation>Grupos de permisos</translation>
     </message>
   </context>
   <context>
@@ -893,7 +893,7 @@
     </message>
     <message>
       <source>General</source>
-      <translation type="unfinished">General</translation>
+      <translation>Xeral</translation>
     </message>
     <message>
       <source>Groups</source>
@@ -920,11 +920,11 @@
     </message>
     <message>
       <source>Info</source>
-      <translation type="unfinished">Info</translation>
+      <translation>Info</translation>
     </message>
     <message>
       <source>Description</source>
-      <translation type="unfinished">Description</translation>
+      <translation>Descrición</translation>
     </message>
     <message>
       <source>Groups</source>
@@ -940,7 +940,7 @@
     </message>
     <message>
       <source>Permission Groups</source>
-      <translation type="unfinished">Permission Groups</translation>
+      <translation>Grupos de permisos</translation>
     </message>
     <message>
       <source>Another group with the same name exists in the system. It is recommended to assign unique names to the groups.</source>
@@ -1049,7 +1049,7 @@
     <name>IntegrationHeader</name>
     <message>
       <source>OFFLINE</source>
-      <translation type="unfinished">OFFLINE</translation>
+      <translation>DESCONECTADO</translation>
     </message>
     <message>
       <source>Refresh</source>
@@ -1215,7 +1215,7 @@
     </message>
     <message>
       <source>OFFLINE</source>
-      <translation type="unfinished">OFFLINE</translation>
+      <translation>DESCONECTADO</translation>
     </message>
     <message>
       <source>Users</source>
@@ -1239,7 +1239,7 @@
     </message>
     <message>
       <source>Disconnect</source>
-      <translation type="unfinished">Disconnect</translation>
+      <translation>Desconectar</translation>
     </message>
     <message>
       <source>Add</source>
@@ -1404,11 +1404,11 @@
     </message>
     <message>
       <source>Import</source>
-      <translation type="unfinished">Import</translation>
+      <translation>Importar</translation>
     </message>
     <message>
       <source>Export</source>
-      <translation type="unfinished">Export</translation>
+      <translation>Exportar</translation>
     </message>
     <message>
       <source>Create New...</source>
@@ -1442,7 +1442,7 @@
     </message>
     <message>
       <source>Create</source>
-      <translation type="unfinished">Create</translation>
+      <translation>Crear</translation>
     </message>
   </context>
   <context>
@@ -1513,7 +1513,7 @@
     </message>
     <message>
       <source>Reject</source>
-      <translation type="unfinished">Reject</translation>
+      <translation>Rexeitar</translation>
     </message>
   </context>
   <context>
@@ -1524,7 +1524,7 @@
     </message>
     <message>
       <source>Custom</source>
-      <translation type="unfinished">Custom</translation>
+      <translation>Personalizado</translation>
     </message>
     <message>
       <source>No custom groups yet</source>
@@ -1564,7 +1564,7 @@
     <message>
       <source>Custom</source>
       <comment>Section name in a list of items: &apos;Custom groups&apos;</comment>
-      <translation type="unfinished">Custom</translation>
+      <translation>Personalizado</translation>
     </message>
   </context>
   <context>
@@ -1583,15 +1583,15 @@
     </message>
     <message>
       <source>New password</source>
-      <translation type="unfinished">New password</translation>
+      <translation>Novo contrasinal</translation>
     </message>
     <message>
       <source>Confirm password</source>
-      <translation type="unfinished">Confirm password</translation>
+      <translation>Confirmar contrasinal</translation>
     </message>
     <message>
       <source>Passwords do not match</source>
-      <translation type="unfinished">Passwords do not match</translation>
+      <translation>Os contrasinais non coinciden</translation>
     </message>
   </context>
   <context>
@@ -1980,7 +1980,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Integrations</source>
-      <translation type="unfinished">Integrations</translation>
+      <translation>Integracións</translation>
     </message>
   </context>
   <context>
@@ -2393,7 +2393,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>General</source>
-      <translation type="unfinished">General</translation>
+      <translation>Xeral</translation>
     </message>
     <message>
       <source>Groups</source>
@@ -2409,7 +2409,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Add User</source>
-      <translation type="unfinished">Add User</translation>
+      <translation>Engadir usuario/a</translation>
     </message>
   </context>
   <context>
@@ -2420,15 +2420,15 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Type</source>
-      <translation type="unfinished">Type</translation>
+      <translation>Tipo</translation>
     </message>
     <message>
       <source>Local</source>
-      <translation type="unfinished">Local</translation>
+      <translation>Local</translation>
     </message>
     <message>
       <source>Cloud</source>
-      <translation type="unfinished">Cloud</translation>
+      <translation>Nube</translation>
     </message>
     <message>
       <source>Login</source>
@@ -2440,7 +2440,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>Correo electronico</translation>
     </message>
     <message>
       <source>Password</source>
@@ -2464,7 +2464,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Permission Groups</source>
-      <translation type="unfinished">Permission Groups</translation>
+      <translation>Grupos de permisos</translation>
     </message>
     <message>
       <source>Access</source>
@@ -2480,7 +2480,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Passwords do not match</source>
-      <translation type="unfinished">Passwords do not match</translation>
+      <translation>Os contrasinais non coinciden</translation>
     </message>
   </context>
   <context>
@@ -2491,7 +2491,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>General</source>
-      <translation type="unfinished">General</translation>
+      <translation>Xeral</translation>
     </message>
     <message>
       <source>Groups</source>
@@ -2534,7 +2534,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Info</source>
-      <translation type="unfinished">Info</translation>
+      <translation>Info</translation>
     </message>
     <message>
       <source>Full Name</source>
@@ -2546,11 +2546,11 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>Correo electronico</translation>
     </message>
     <message>
       <source>Change password</source>
-      <translation type="unfinished">Change password</translation>
+      <translation>Cambiar contrasinal</translation>
     </message>
     <message>
       <source>Set password to enable insecure authentication</source>
@@ -2566,7 +2566,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Permission Groups</source>
-      <translation type="unfinished">Permission Groups</translation>
+      <translation>Grupos de permisos</translation>
     </message>
     <message>
       <source>Access expires</source>

@@ -5323,11 +5323,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Integrations</source>
-      <translation type="unfinished">Integrations</translation>
+      <translation>Integrasi</translation>
     </message>
     <message>
       <source>Services</source>
-      <translation type="unfinished">Services</translation>
+      <translation>Layanan</translation>
     </message>
     <message>
       <source>Failed to save system settings</source>
@@ -7882,7 +7882,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Integrations</source>
-      <translation type="unfinished">Integrations</translation>
+      <translation>Integrasi</translation>
     </message>
   </context>
   <context>
@@ -8977,7 +8977,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Discard</source>
-      <translation type="unfinished">Discard</translation>
+      <translation>Batalkan</translation>
     </message>
     <message>
       <source>New Group</source>
@@ -11811,7 +11811,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Discard</source>
-      <translation type="unfinished">Discard</translation>
+      <translation>Batalkan</translation>
     </message>
     <message>
       <source>Copy Access Link</source>
@@ -12021,7 +12021,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Developer Tools</source>
-      <translation type="unfinished">Developer Tools</translation>
+      <translation>Perangkat Developer</translation>
     </message>
   </context>
   <context>
@@ -12240,7 +12240,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Integrations</source>
-      <translation type="unfinished">Integrations</translation>
+      <translation>Integrasi</translation>
     </message>
     <message>
       <source>Web Pages &amp; Integrations</source>
