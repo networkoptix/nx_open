@@ -575,7 +575,6 @@ TEST(utils, wideCharToStdString)
     // Incorrect string ("truth" in Old Persian, high surrogate in the middle is missed).
     const wchar_t highSurrogateMissedInTheMiddle[] = {0xDFAB, 0xD800, 0xDFA0};
     ASSERT_EQ(u8"\uFFFD\U000103A0", wideCharToStdString(highSurrogateMissedInTheMiddle));
-
 }
 
 #endif
