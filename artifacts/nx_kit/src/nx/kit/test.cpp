@@ -429,8 +429,7 @@ static std::string baseTempDir()
             value = parsedCmdLineArgs().explicitBaseTempDir;
 
             // Append a path separator if needed.
-            const char lastChar = value[value.size() - 1];
-            if (lastChar != '/' && lastChar != '\\')
+            if (value.back() != '/' && value.back() != '\\')
                 value.append(kPathSeparator);
         }
     }

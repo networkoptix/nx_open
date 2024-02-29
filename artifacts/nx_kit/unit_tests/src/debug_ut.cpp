@@ -79,8 +79,10 @@ TEST(debug, overrideStreamPreproc)
     #undef NX_DEBUG_STREAM
     #define NX_DEBUG_STREAM *stream()
 
-    ASSERT_EQ("[" + fileBaseNameWithoutExt(__FILE__) + "] TEST\n", stringStream.str());
+    ASSERT_EQ("[debug_ut] TEST\n", stringStream.str());
 }
+
+// TODO: Rework unit tests to check the captured actual output.
 
 TEST(debug, assertSuccess)
 {
@@ -90,11 +92,11 @@ TEST(debug, assertSuccess)
     NX_KIT_ASSERT(trueCondition,
         "This assertion with a message should not fail."); //< Test NX_KIT_ASSERT() with message.
 
-    //< Test NX_KIT_ASSERT() without message inside `if`.
+    // Test NX_KIT_ASSERT() without message inside `if`.
     if (!NX_KIT_ASSERT(trueCondition))
         ASSERT_TRUE(false);
 
-    //< Test NX_KIT_ASSERT() with message inside `if`.
+    // Test NX_KIT_ASSERT() with message inside `if`.
     if (!NX_KIT_ASSERT(trueCondition, "This assertion should not fail."))
         ASSERT_TRUE(false);
 }

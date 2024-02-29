@@ -104,7 +104,7 @@ std::string printPrefix(const char* file)
     static std::map<std::string, std::string> cache;
     const std::lock_guard<std::mutex> lock(mutex);
 
-    auto& result = cache[file]; //< Ref to either newly created or existing entry.
+    std::string& result = cache[file]; //< Ref to either a newly created or existing entry.
     if (result.empty()) //< Newly created entry.
         result = "[" + fileBaseNameWithoutExt(file) + "] ";
     return result;

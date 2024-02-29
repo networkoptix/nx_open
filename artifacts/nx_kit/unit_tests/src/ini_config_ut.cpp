@@ -6,10 +6,11 @@
  * both of the two compilations should produce a dynamic library.
  */
 
-#include <iostream>
-#include <fstream>
 #include <cstring>
 #include <ctime>
+#include <fstream>
+#include <iostream>
+#include <string>
 
 #include <nx/kit/test.h>
 #include <nx/kit/ini_config.h>
