@@ -45,19 +45,14 @@ std::string relativeSrcFilename(const std::string& file)
             return fileString.substr(pos + srcPath.size());
     }
 
-    // Trim a prefix common with this cpp file, and one subsequent directory (if any).
+    // Trim a prefix common with this cpp file.
     {
         const std::string thisFile = normalizePathToSlashes(__FILE__);
 
         const size_t filesCommonPrefixSize = commonPrefixSize(thisFile, fileString);
         if (filesCommonPrefixSize == 0) //< No common prefix - use the original path.
             return fileString;
-
-        const auto pos = fileString.find('/', filesCommonPrefixSize);
-        if (pos == std::string::npos) //< No separator - return the path after the common prefix.
-             return fileString.substr(filesCommonPrefixSize);
-             
-        return fileString.substr(pos + /*slash*/ 1);
+        return fileString.substr(filesCommonPrefixSize);
     }
 }
 
