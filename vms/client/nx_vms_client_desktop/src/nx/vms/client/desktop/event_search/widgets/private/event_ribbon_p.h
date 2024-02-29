@@ -238,6 +238,7 @@ private:
     QHash<QnMediaServerResourcePtr, ServerLoadData> m_loadingByServer;
     ResourceThumbnailProvider* m_providerLoadingFromCache = nullptr;
     nx::utils::ImplPtr<nx::utils::PendingOperation> m_layoutUpdate;
+    const std::unique_ptr<QObject> m_hoverWatcher;
 };
 
 } // namespace nx::vms::client::desktop
