@@ -33,10 +33,14 @@ void WebSocketConnections::executeAsync(
             executor.reset();
             if (auto connection = weakConnection.lock())
             {
-                handler(std::move(response));
                 NX_MUTEX_LOCKER lock(&m_mutex);
                 if (auto c = m_connections.find(connection.get()); c != m_connections.end())
                 {
+                    c->second.connection->post(
+                        [handler = std::move(handler), response = std::move(response)]() mutable
+                        {
+                            handler(std::move(response));
+                        });
                     threadIt->detach();
                     c->second.threads.erase(threadIt);
                 }
