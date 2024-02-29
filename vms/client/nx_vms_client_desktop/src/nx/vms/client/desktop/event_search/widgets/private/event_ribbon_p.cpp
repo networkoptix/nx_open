@@ -125,7 +125,10 @@ EventRibbon::Private::Private(EventRibbon* q):
     m_viewport(new QWidget(q)),
     m_autoCloseTimer(new QTimer()),
     m_previewLoad(new nx::utils::PendingOperation()),
-    m_layoutUpdate(new nx::utils::PendingOperation())
+    m_layoutUpdate(new nx::utils::PendingOperation()),
+    m_hoverWatcher(installEventHandler(q,
+        {QEvent::Enter, QEvent::Leave, QEvent::HoverEnter, QEvent::HoverLeave, QEvent::HoverMove},
+        this, &Private::updateHover))
 {
     NX_ASSERT(Importance() == Importance::NoNotification);
 

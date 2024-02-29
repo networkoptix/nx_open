@@ -143,31 +143,14 @@ QSize EventRibbon::sizeHint() const
 
 bool EventRibbon::event(QEvent* event)
 {
-    switch (event->type())
-    {
-        case QEvent::Wheel:
-        {
-            // TODO: #vkutin Implement smooth animated scroll.
-            if (d->scrollBar()->isVisible())
-                d->scrollBar()->event(event);
+    if (event->type() != QEvent::Wheel)
+        return base_type::event(event);
 
-            event->accept();
-            return true;
-        }
+    if (d->scrollBar()->isVisible())
+        d->scrollBar()->event(event);
 
-        case QEvent::Enter:
-        case QEvent::Leave:
-        case QEvent::HoverEnter:
-        case QEvent::HoverLeave:
-        case QEvent::HoverMove:
-            d->updateHover();
-            break;
-
-        default:
-            break;
-    }
-
-    return base_type::event(event);
+    event->accept();
+    return true;
 }
 
 int EventRibbon::count() const
