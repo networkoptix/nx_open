@@ -143,8 +143,8 @@ NX_KIT_API void intentionallyCrash(const char* message);
  */
 #define LL \
     NX_PRINT << "####### LL line " + ::nx::kit::utils::toString(__LINE__) \
-        + NX_KIT_DEBUG_DETAIL_THREAD_ID() \
-        + ", file " + ::nx::kit::debug::relativeSrcFilename(__FILE__) \
+        + NX_KIT_DEBUG_DETAIL_THREAD_ID \
+        + ", " + ::nx::kit::debug::relativeSrcFilename(__FILE__) \
         /* The final semicolon allows to use this macro as a line prefix. */;
 
 /**
@@ -335,15 +335,21 @@ NX_KIT_API void saveBin(
 } // namespace kit
 } // namespace nx
 
+// Define NX_KIT_DEBUG_DETAIL_THREAD_ID.
 #if defined(__linux__)
-    #include <pthread.h>
-    #define NX_KIT_DEBUG_DETAIL_THREAD_ID() \
-        ::nx::kit::utils::format(", thread %llx", (long long) pthread_self())
+    #if defined(__has_include) //< This C++17 feature was available in GCC/Clang long before.
+        #if __has_include(<pthread.h>)
+            #include <pthread.h>
+            #define NX_KIT_DEBUG_DETAIL_THREAD_ID \
+                ::nx::kit::utils::format(", thread %llx", (long long) pthread_self())
+        #endif
+    #endif
 #elif defined(QT_CORE_LIB)
     #include <QtCore/QThread>
-    #define NX_KIT_DEBUG_DETAIL_THREAD_ID() \
+    #define NX_KIT_DEBUG_DETAIL_THREAD_ID \
         ::nx::kit::utils::format(", thread %llx", (long long) QThread::currentThreadId())
-#else
+#endif
+#if !defined(NX_KIT_DEBUG_DETAIL_THREAD_ID)
     // No threading libs available - do not print thread id.
-    #define NX_KIT_DEBUG_DETAIL_THREAD_ID() ""
+    #define NX_KIT_DEBUG_DETAIL_THREAD_ID ""
 #endif
