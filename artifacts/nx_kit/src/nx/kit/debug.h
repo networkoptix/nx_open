@@ -144,7 +144,8 @@ NX_KIT_API void intentionallyCrash(const char* message);
 #define LL \
     NX_PRINT << "####### LL line " + ::nx::kit::utils::toString(__LINE__) \
         + NX_KIT_DEBUG_DETAIL_THREAD_ID() \
-        + ", file " + ::nx::kit::debug::relativeSrcFilename(__FILE__);
+        + ", file " + ::nx::kit::debug::relativeSrcFilename(__FILE__) \
+        /* The final semicolon allows to use this macro as a line prefix. */;
 
 /**
  * Prints the expression text and its value via toString().
