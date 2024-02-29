@@ -79,7 +79,7 @@
     </message>
     <message>
       <source>Wrong password</source>
-      <translation type="unfinished">Wrong password</translation>
+      <translation>Contrasinal incorrecto</translation>
     </message>
   </context>
   <context>
@@ -1457,7 +1457,7 @@
     </message>
     <message>
       <source>RTP timeout (milliseconds)</source>
-      <translation type="unfinished">RTP timeout (milliseconds)</translation>
+      <translation>Tempo de espera RTP (milisegundos)</translation>
     </message>
     <message>
       <source>Max RTSP connection duration (seconds)</source>

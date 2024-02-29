@@ -69,7 +69,7 @@
     </message>
     <message>
       <source>Only one NVR license is allowed per System.</source>
-      <translation type="unfinished">Only one NVR license is allowed per System.</translation>
+      <translation>Só se permite unha licenza NVR por sistema.</translation>
     </message>
     <message>
       <source>You already have one active NVR license.</source>

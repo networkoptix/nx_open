@@ -966,7 +966,7 @@
     </message>
     <message>
       <source>No connection</source>
-      <translation type="unfinished">No connection</translation>
+      <translation>Sen conexión</translation>
     </message>
   </context>
   <context>
@@ -2949,7 +2949,7 @@
     </message>
     <message>
       <source>Add User</source>
-      <translation type="unfinished">Add User</translation>
+      <translation>Engadir usuario/a</translation>
     </message>
     <message>
       <source>Ctrl+F</source>
