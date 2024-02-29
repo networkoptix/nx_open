@@ -265,7 +265,7 @@ TEST(debug, relativeSrcFilename)
     ASSERT_EQ(suffix, thisFile.substr(thisFile.size() - suffix.size(), suffix.size()));
 
     const std::string commonPrefix = std::string(thisFile, 0, thisFile.size() - suffix.size());
-    ASSERT_EQ("dir/file.cpp", relativeSrcFilename(commonPrefix + "dir/file.cpp"));
+    ASSERT_EQ("unit_tests/dir/file.cpp", relativeSrcFilename(commonPrefix + "dir/file.cpp"));
 }
 
 } // namespace test
