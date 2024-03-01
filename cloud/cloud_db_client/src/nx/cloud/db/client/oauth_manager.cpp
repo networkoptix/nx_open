@@ -14,6 +14,11 @@ OauthManager::OauthManager(ApiRequestsExecutor* requestsExecutor):
 {
 }
 
+std::chrono::seconds OauthManager::lastServerTime() const
+{
+    return std::chrono::ceil<std::chrono::seconds>(m_requestsExecutor->lastResponseTime());
+}
+
 void OauthManager::issueToken(
     const api::IssueTokenRequest& request,
     nx::utils::MoveOnlyFunc<void(api::ResultCode, api::IssueTokenResponse)> completionHandler)
@@ -75,7 +80,7 @@ void OauthManager::deleteToken(
         std::move(completionHandler));
 }
 
-void OauthManager::deleteTokens(
+void OauthManager::deleteTokensByClientId(
     const std::string& clientId,
     nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler)
 {
@@ -107,6 +112,27 @@ void OauthManager::issueStunToken(
         kOauthStunTokenPath,
         {}, //query
         request,
+        std::move(completionHandler));
+}
+
+void OauthManager::getJwtPublicKeys(
+    nx::utils::MoveOnlyFunc<void(api::ResultCode, std::vector<nx::network::jwk::Key>)> completionHandler)
+{
+    m_requestsExecutor->makeAsyncCall<std::vector<nx::network::jwk::Key>>(
+        nx::network::http::Method::get,
+        kOauthJwksPath,
+        {}, //query
+        std::move(completionHandler));
+}
+
+void OauthManager::getJwtPublicKeyByKid(
+    const std::string& kid,
+    nx::utils::MoveOnlyFunc<void(api::ResultCode, nx::network::jwk::Key)> completionHandler)
+{
+    m_requestsExecutor->makeAsyncCall<nx::network::jwk::Key>(
+        nx::network::http::Method::get,
+        nx::network::http::rest::substituteParameters(kOauthJwkByIdPath, {kid}),
+        {}, //query
         std::move(completionHandler));
 }
 

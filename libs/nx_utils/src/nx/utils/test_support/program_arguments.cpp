@@ -47,6 +47,11 @@ char** ProgramArguments::argv()
     return m_args.data();
 }
 
+const char** ProgramArguments::constArgv() const
+{
+    return const_cast<const char **>(m_args.data());
+}
+
 } // namespace test
 } // namespace utils
 } // namespace nx

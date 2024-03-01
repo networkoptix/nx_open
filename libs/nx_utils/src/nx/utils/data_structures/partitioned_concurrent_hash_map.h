@@ -68,6 +68,10 @@ public:
     // requires std::is_invocable_v<Func, value_type>
     void forEach(Func func);
 
+    template<typename Func>
+    // requires std::is_invocable_v<Func, const value_type&>
+    void forEach(Func func) const;
+
 private:
     size_type partition(const key_type& key) const;
 
@@ -238,6 +242,19 @@ void PartitionedConcurrentHashMap<Key, T, Hash>::forEach(Func func)
         {
             NX_MUTEX_LOCKER locker(&ctx.mtx);
             std::for_each(ctx.dict.begin(), ctx.dict.end(), func);
+        });
+}
+
+template<typename Key, typename T, typename Hash>
+template<typename Func>
+void PartitionedConcurrentHashMap<Key, T, Hash>::forEach(Func func) const
+{
+    std::for_each(
+        m_partitions.begin(), m_partitions.end(),
+        [&func](const auto& ctx)
+        {
+            NX_MUTEX_LOCKER locker(&ctx.mtx);
+            std::for_each(ctx.dict.cbegin(), ctx.dict.cend(), func);
         });
 }
 

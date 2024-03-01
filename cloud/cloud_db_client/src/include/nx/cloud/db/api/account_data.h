@@ -6,6 +6,7 @@
 #include <optional>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 namespace nx::cloud::db::api {
 
@@ -100,6 +101,14 @@ struct AccountData
 
     /**%apidoc Maximum authentication session lifetime. */
     std::optional<std::chrono::seconds> authSessionLifetime;
+
+    /**%apidoc[readonly] Shows if this account belongs to an organization. */
+    std::optional<bool> accountBelongsToOrganization;
+
+    /**%apidoc[readonly] Incremented each time critical security attributes are changed.
+     * E.g., user password was changed, or user has chosen to log out from all devices.
+     */
+    int securitySequence = 0;
 };
 
 struct AccountStatusData
@@ -140,6 +149,12 @@ struct AccountUpdateData
 
     /**%apidoc One-time password from the authenticator app or any other source. */
     std::optional<std::string> mfaCode;
+};
+
+struct AccountOrganizationAttrs
+{
+    /**%apidoc Shows if this account belongs to an organization. */
+    bool belongsToSomeOrganization = false;
 };
 
 // Holder structure to send just email in a response.

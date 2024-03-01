@@ -3,28 +3,27 @@
 #pragma once
 
 #include <chrono>
-#include <optional>
 #include <map>
+#include <optional>
 #include <string>
 
 #include <nx/reflect/instrument.h>
+#include <nx/network/jose/jwt.h>
 
 namespace nx::cloud::db::api {
 
 // Code style violated in fields names to match RFC
 // and support correct API documentation generation
-enum class GrantType
-{
+NX_REFLECTION_ENUM_CLASS(GrantType,
     password,
     refresh_token,
-    authorization_code,
-};
+    authorization_code
+);
 
-enum class ResponseType
-{
+NX_REFLECTION_ENUM_CLASS(ResponseType,
     token,
-    code,
-};
+    code
+);
 
 struct IssueTokenRequest
 {
@@ -57,10 +56,9 @@ struct IssueTokenRequest
     std::optional<std::string> code;
 };
 
-enum class TokenType
-{
-    bearer,
-};
+NX_REFLECTION_ENUM_CLASS(TokenType,
+    bearer
+);
 
 struct TokenInfo
 {
@@ -79,6 +77,9 @@ struct TokenInfo
      * authorization code).
      */
     std::string scope;
+
+    /**%apidoc A session is identified by a refresh token. It is used to track 2fa state.*/
+    std::string session;
 };
 
 struct IssueTokenResponse: public TokenInfo
@@ -130,14 +131,11 @@ struct TokenIntrospectionRequest
     /**%apidoc The token to introspect.*/
     std::string token;
 
-    /**%apidoc The token type hint. It may be used to speed up the introspection process. */
-    std::optional<std::string> token_type_hint;
-
     /**%apidoc Ids of systems to fetch user roles from. */
     std::optional<std::vector<std::string>> system_ids;
 };
 
-NX_REFLECTION_INSTRUMENT(TokenIntrospectionRequest, (token)(token_type_hint)(system_ids))
+NX_REFLECTION_INSTRUMENT(TokenIntrospectionRequest, (token)(system_ids))
 
 struct TokenIntrospectionResponse
 {
@@ -209,5 +207,33 @@ struct IssueStunTokenResponse
     /**%apidoc Error code.*/
     std::optional<std::string> error;
 };
+
+/**
+ * JWT claims set. Field names extended with field from RFC 9068
+ */
+class ClaimSet: public nx::network::jwt::ClaimSet
+{
+public:
+    std::optional<std::string> clientId() const;
+    void setClientId(const std::string& val);
+
+    // The session Id is defined by refresh token
+    std::optional<std::string> sid() const;
+    void setSid(const std::string& val);
+
+    // Seconds. Time that passed since this token was confirmed with a password entry
+    // either explicitly or implicitly
+    std::optional<std::chrono::seconds> passwordTime() const;
+    void setPasswordTime(const std::chrono::seconds& val);
+
+    // Oauth token type. MUST be one of accessToken, refreshToken, authCode
+    std::optional<std::string> typ() const;
+    void setTyp(const std::string& val);
+
+    std::optional<int> securitySequence() const;
+    void setSecuritySequence(int val);
+};
+
+using Token = nx::network::jws::Token<ClaimSet>;
 
 } // namespace nx::cloud::db::api

@@ -8,19 +8,6 @@
 
 namespace nx::cloud::db::api {
 
-NX_REFLECTION_INSTRUMENT_ENUM(GrantType,
-    authorization_code,
-    password,
-    refresh_token
-)
-
-NX_REFLECTION_INSTRUMENT_ENUM(ResponseType,
-    token,
-    code
-)
-
-NX_REFLECTION_INSTRUMENT_ENUM(TokenType, bearer)
-
 #define Token_request_Fields \
     (grant_type)(response_type)(client_id)(scope)(password)(username)(refresh_token)(code)( \
         refresh_token_lifetime)

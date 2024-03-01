@@ -66,6 +66,18 @@ inline std::string toBase64Url(const std::string_view& str)
     return result;
 }
 
+// Appends base64Url(str) to out.
+inline void toBase64Url(const std::string_view& str, std::string* out)
+{
+    const auto len = (std::size_t) toBase64Url(str.data(), (int) str.size(), nullptr, 0);
+    const auto pos = out->size();
+    out->resize(out->size() + len);
+    const auto actualLen = (std::size_t) toBase64Url(str.data(), (int) str.size(), out->data() + pos, len);
+
+    if (actualLen < len)
+        out->resize(out->size() - (len - actualLen));
+}
+
 inline std::string fromBase64(const std::string_view& str)
 {
     std::string result;

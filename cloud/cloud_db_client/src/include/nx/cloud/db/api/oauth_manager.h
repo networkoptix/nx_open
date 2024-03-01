@@ -5,6 +5,7 @@
 #include <functional>
 
 #include <nx/network/http/http_types.h>
+#include <nx/network/jose/jwk.h>
 #include <nx/utils/move_only_func.h>
 
 #include "oauth_data.h"
@@ -20,6 +21,8 @@ public:
     static constexpr std::string_view k2faDisabledForUserError = "2fa_disabled_for_the_user";
 
     virtual ~OauthManager() = default;
+
+    virtual std::chrono::seconds lastServerTime() const = 0;
 
     virtual void issueToken(
         const IssueTokenRequest& request,
@@ -41,7 +44,7 @@ public:
     virtual void deleteToken(
         const std::string& token, nx::utils::MoveOnlyFunc<void(ResultCode)> completionHandler) = 0;
 
-    virtual void deleteTokens(
+    virtual void deleteTokensByClientId(
         const std::string& clientId,
         nx::utils::MoveOnlyFunc<void(ResultCode)> completionHandler) = 0;
 
@@ -49,6 +52,13 @@ public:
 
     virtual void issueStunToken(const IssueStunTokenRequest& request,
         nx::utils::MoveOnlyFunc<void(ResultCode, IssueStunTokenResponse)> completionHandler) = 0;
+
+    virtual void getJwtPublicKeys(
+        nx::utils::MoveOnlyFunc<void(ResultCode, std::vector<nx::network::jwk::Key>)> completionHandler) = 0;
+
+    virtual void getJwtPublicKeyByKid(
+        const std::string& kid,
+        nx::utils::MoveOnlyFunc<void(ResultCode, nx::network::jwk::Key)> completionHandler) = 0;
 };
 
 } // namespace nx::cloud::db::api

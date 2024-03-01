@@ -66,6 +66,8 @@ inline QByteArray sha1(const QByteArray& data)
     return QnCryptographicHash::hash(data, QnCryptographicHash::Sha1);
 }
 
+NX_UTILS_API std::string sha1(const std::string_view& data);
+
 NX_UTILS_API QByteArray sha3_256(const QByteArray& data);
 NX_UTILS_API std::string sha3_256(const std::string_view& data);
 

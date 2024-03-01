@@ -8,6 +8,8 @@
 #include <nx/network/socket_common.h>
 #include <nx/reflect/instrument.h>
 
+#include "../http_types.h"
+
 class SettingsReader;
 
 namespace nx::network::http::server {
@@ -74,19 +76,23 @@ public:
 
     Ssl ssl;
 
-    Settings(const char* groupName = "http");
+    /**
+     * HTTP headers to be included in every response sent by the server. They are parsed
+     * under the "<groupName>/extraResponseHeaders/<headerName>" section of the settings, e.g.
+     * "http/extraResponseHeaders/Server" will add a "Server" header.
+     */
+    HttpHeaders extraResponseHeaders;
 
-    void load(const SettingsReader& settings);
+    void load(const SettingsReader& settings, const char * groupName = "http");
 
 private:
-    std::string m_groupName;
-
     void loadEndpoints(
         const SettingsReader& settings,
         const char* paramFullName,
         std::vector<SocketAddress>* endpoints);
 
     void loadSsl(const SettingsReader& settings);
+    void loadHeaders(const SettingsReader& settings);
 };
 
 NX_REFLECTION_INSTRUMENT(Settings::Ssl,
