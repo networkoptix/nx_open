@@ -60,8 +60,11 @@ std::string getMimeType(const AVCodecParameters* codecpar)
                     codecpar->extradata,
                     codecpar->extradata + codecpar->extradata_size);
             }
-            const auto nalu = NALUnit::findNextNAL(&*data.begin(), &*data.end());
-            if (nalu && &*data.end() - nalu >= 4 && (nalu[0] & 0x1F) == NALUnitType::nuSPS)
+
+            const uint8_t* dataStart = (const uint8_t*) &data[0];
+            const uint8_t* dataEnd = dataStart + data.size();
+            const auto nalu = NALUnit::findNextNAL(dataStart, dataEnd);
+            if (nalu && dataEnd - nalu >= 4 && (nalu[0] & 0x1F) == NALUnitType::nuSPS)
             {
                 constexpr size_t kAvc1BufferSize = 12;
                 result.resize(kAvc1BufferSize);
