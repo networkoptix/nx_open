@@ -92,6 +92,8 @@ public:
      */
     void setCacheEnabled(bool enabled) { this->m_cacheEnabled = enabled; }
 
+    std::chrono::milliseconds lastResponseTime() const { return this->m_lastResponseTime; }
+
 protected:
     /**
      * @param ResponseFetchers 0 or more fetchers applied to the HTTP response object.
@@ -150,14 +152,18 @@ private:
         virtual ~BaseCacheEntry() = default;
     };
 
-    template<typename T>
+    // The second template parameter here is to use a partial specialization instead of an explicit
+    // one for the case when reply type is "void".
+    template<typename T, typename Dummy = void>
     struct CacheEntry: BaseCacheEntry
     {
         T reply;
     };
 
-    template<>
-    struct CacheEntry<void>: BaseCacheEntry
+    // Special case - reply type is "void". Use partial specialization to avoid GCC error
+    // "explicit specialization in non-namespace scope".
+    template<typename Dummy>
+    struct CacheEntry<void, Dummy>: BaseCacheEntry
     {
     };
 
@@ -172,6 +178,7 @@ private:
     bool m_cacheEnabled = false;
     // Actual value has type CacheEntry<T> where T is passed via OutputData template parameter.
     std::unordered_map<std::string /*GET <path>*/, std::shared_ptr<const BaseCacheEntry>> m_cache;
+    std::chrono::milliseconds m_lastResponseTime{0};
 
     template<typename Output, typename SerializationLibWrapper, typename... Args>
     auto createHttpClient(const nx::utils::Url& url, Args&&... args);
@@ -466,7 +473,7 @@ std::string GenericApiClient<ApiResultCodeDescriptor, Base>::makeCacheKey(
 
 template<HasResultCodeT ApiResultCodeDescriptor, typename Base>
 template<typename CachedType>
-std::shared_ptr<const typename GenericApiClient<ApiResultCodeDescriptor, Base>::template CacheEntry<CachedType>>
+std::shared_ptr<const typename GenericApiClient<ApiResultCodeDescriptor, Base>::template CacheEntry<CachedType, void>>
     GenericApiClient<ApiResultCodeDescriptor, Base>::findCacheEntry(
         const network::http::Method& method,
         const std::string& requestPath)
@@ -515,6 +522,10 @@ void GenericApiClient<ApiResultCodeDescriptor, Base>::processResponse(
 
     const auto resultCode =
         getResultCode(error, response, requestPtr->lastFusionRequestResult(), output...);
+    const auto date = http::getHeaderValue(
+        response ? response->headers : network::http::HttpHeaders(), "Date");
+    m_lastResponseTime = std::chrono::milliseconds(
+        date.empty() ? 0 : parseDate(date).currentMSecsSinceEpoch());
 
     if constexpr (!std::is_void_v<CachedType>)
     {
@@ -537,8 +548,8 @@ void GenericApiClient<ApiResultCodeDescriptor, Base>::processResponse(
         }
     }
 
-    handler(resultCode, std::move(output)...,
-        ResponseFetchers()(response ? *response : network::http::Response())...);
+    handler(resultCode, std::move(output)..., ResponseFetchers()(
+        response ? *response : network::http::Response())...);
 }
 
 template<HasResultCodeT ApiResultCodeDescriptor, typename Base>

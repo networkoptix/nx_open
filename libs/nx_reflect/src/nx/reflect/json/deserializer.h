@@ -80,6 +80,15 @@ template<
 >
 DeserializationResult deserialize(const DeserializationContext& ctx, Data* data)
 {
+    if (!ctx.value.IsObject())
+    {
+        *data = Data();
+        return {
+            false,
+            "Object value expected",
+            getStringRepresentation(ctx.value)};
+    }
+
     Deserializer deserializer(ctx, data);
     nx::reflect::visitAllFields<Data>(deserializer);
     return deserializer.ok();
@@ -289,16 +298,8 @@ DeserializationResult deserializeValue(const DeserializationContext& ctx, T* dat
 
     if constexpr (nx::reflect::IsInstrumentedV<T>)
     {
-        if (!ctx.value.IsObject())
-        {
-            *data = T();
-            return {
-                false,
-                "Object value expected",
-                getStringRepresentation(ctx.value)};
-        }
-
-        // ADL. Custom deserialize() overload will be invoked here if present.
+        // ADL. Custom deserialize() overload will be invoked here if present despite the fact
+        // that the type was instrumented.
         return deserialize(ctx, data);
     }
     if constexpr (std::is_same_v<T, std::string>)

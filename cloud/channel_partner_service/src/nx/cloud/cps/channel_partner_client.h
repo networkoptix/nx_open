@@ -8,6 +8,7 @@
 #include <nx/cloud/db/api/result_code.h>
 #include <nx/network/http/generic_api_client.h>
 
+#include "api/organization.h"
 #include "api/system_data.h"
 #include "api/user_data.h"
 
@@ -19,6 +20,10 @@ using Result = nx::cloud::db::api::Result;
 
 } // namespace api
 
+/**
+ * Descriptor for the channel partner API client class. See nx::network::http::GenericApiClient
+ * for details.
+ */
 struct ApiResultCodeDescriptor
 {
     using ResultCode = api::Result;
@@ -47,6 +52,15 @@ private:
         const nx::network::http::ApiRequestResult& fusionRequestResult);
 };
 
+//-------------------------------------------------------------------------------------------------
+
+/**
+ * Client for Channel Partner Service API.
+ * Requests must be authorized with an OAUTH2 token issued by the cloud authorization server.
+ * In most cases, it is cloud user's token.
+ * All users mentioned here are cloud accounts registered in the CDB and added to an organization
+ * or a channel partner.
+ */
 class ChannelPartnerClient:
     public nx::network::http::GenericApiClient<ApiResultCodeDescriptor>
 {
@@ -65,7 +79,7 @@ public:
         nx::utils::MoveOnlyFunc<void(api::Result)> handler);
 
     /**
-     * The request must be authorized using valid user's OAUTH2 token.
+     * Returns user access rights on a system. Note that these are organization-provided rights.
      */
     void getSystemUser(
         const std::string& systemId,
@@ -73,15 +87,26 @@ public:
         nx::utils::MoveOnlyFunc<void(api::Result, api::User)> handler);
 
     /**
-     * The request must be authorized using valid user's OAUTH2 token.
+     * Get users of a system as specified by an organization owning the system or channel partner.
+     * Note that local VMS users and regular Cloud users added via CDB API are not included here.
      */
     void getSystemUsers(
         const std::string& systemId,
         nx::utils::MoveOnlyFunc<void(api::Result, std::vector<api::User>)> handler);
 
+    /**
+     * Get organization-owned or channel partner-accessible systems a specified user has access to.
+     */
     void getUserSystems(
         const std::string& email,
         nx::utils::MoveOnlyFunc<void(api::Result, std::vector<api::SystemAllowance>)> handler);
+
+    /**
+     * Get organization attributes by id. Provides requesting user rights on the organization.
+     */
+    void getOrganization(
+        const std::string& organizationId,
+        nx::utils::MoveOnlyFunc<void(api::Result, api::Organization)> handler);
 };
 
 } // namespace nx::cloud::cps

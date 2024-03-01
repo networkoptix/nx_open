@@ -15,7 +15,12 @@ static constexpr char kAccountSelfPath[] = "/cdb/account/self";
 static constexpr char kAccountStatusPath[] = "/cdb/account/{accountEmail}/status";
 
 static constexpr char kAccountSecuritySettingsPath[] = "/cdb/account/{accountEmail}/settings/security";
-static constexpr char kAccountForSharingPath[] = "/cdb/account/{accountEmail}/sharing-data";
+static constexpr char kAccountForSharingPath[] = "/cdb/internal/v0/account/{accountEmail}/sharing-data";
+
+static constexpr char kAccountOrganizationAttrsPath[] =
+    "/cdb/internal/v0/account/{accountEmail}/organization-attrs";
+static constexpr char kInternalGetAccountsInfo[] =
+    "/cdb/internal/accounts/info";
 
 static constexpr char kAccountEmailParam[] = "accountEmail";
 
@@ -56,8 +61,12 @@ static constexpr char kOauthIntrospectPath[] = "/cdb/oauth2/introspect";
 static constexpr char kOauthTokensDeletePath[] = "/cdb/oauth2/user/self/client/{clientId}";
 static constexpr char kOauthLogoutPath[] = "/cdb/oauth2/user/self";
 static constexpr char kOauthStunTokenPath[] = "/cdb/oauth2/stun-token";
+static constexpr char kOauthJwksPath[] = "/cdb/oauth2/jwks";
+static constexpr char kOauthJwkByIdPath[] = "/cdb/oauth2/jwks/{kid}";
+
 static constexpr char kTokenParam[] = "token";
 static constexpr char kClientIdParam[] = "clientId";
+static constexpr char kKidParam[] = "kid";
 
 static constexpr char kTwoFactorAuthGetKey[] = "/cdb/account/self/2fa/totp/key";
 static constexpr char kTwoFactorAuthValidateKey[] = "/cdb/account/self/2fa/totp/key/{key}";

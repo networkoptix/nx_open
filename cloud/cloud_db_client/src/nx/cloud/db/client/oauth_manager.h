@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <nx/network/jose/jwk.h>
+
 #include "async_http_requests_executor.h"
 #include "include/nx/cloud/db/api/oauth_manager.h"
 
@@ -12,6 +14,8 @@ class OauthManager:
 {
 public:
     OauthManager(ApiRequestsExecutor* requestsExecutor);
+
+    virtual std::chrono::seconds lastServerTime() const override;
 
     virtual void issueToken(
         const api::IssueTokenRequest& request,
@@ -38,7 +42,7 @@ public:
         const std::string& token,
         nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler) override;
 
-    virtual void deleteTokens(
+    virtual void deleteTokensByClientId(
         const std::string& clientId,
         nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler) override;
 
@@ -47,6 +51,15 @@ public:
     void issueStunToken(
         const api::IssueStunTokenRequest& request,
         nx::utils::MoveOnlyFunc<void(api::ResultCode, api::IssueStunTokenResponse)>
+            completionHandler) override;
+
+    virtual void getJwtPublicKeys(
+        nx::utils::MoveOnlyFunc<void(api::ResultCode, std::vector<nx::network::jwk::Key>)>
+            completionHandler) override;
+
+    virtual void getJwtPublicKeyByKid(
+        const std::string& kid,
+        nx::utils::MoveOnlyFunc<void(api::ResultCode, nx::network::jwk::Key)>
             completionHandler) override;
 
 private:
