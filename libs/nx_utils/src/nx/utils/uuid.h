@@ -116,6 +116,11 @@ NX_UTILS_API QDataStream& operator<<(QDataStream& s, const Uuid& id);
 NX_UTILS_API QDebug operator<<(QDebug dbg, const Uuid& id);
 NX_UTILS_API QDataStream& operator>>(QDataStream& s, Uuid& id);
 
+inline size_t qHash(const Uuid& id, size_t seed = 0)
+{
+    return qHash(id.getQUuid(), seed);
+}
+
 } // namespace nx
 
 namespace std {
