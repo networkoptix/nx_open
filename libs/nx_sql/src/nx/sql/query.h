@@ -24,6 +24,9 @@ public:
     virtual void setForwardOnly(bool val) = 0;
     virtual void prepare(const std::string_view& query) = 0;
 
+    template<typename... Params>
+    void prepareWithValues(const std::string_view& query, Params&&... params);
+
     virtual void addBindValue(const QVariant& value) noexcept = 0;
     virtual void addBindValue(const std::string_view& value) noexcept = 0;
     virtual void bindValue(const QString& placeholder, const QVariant& value) noexcept = 0;
@@ -69,6 +72,13 @@ template<typename T> T AbstractSqlQuery::value(const char* name) const
 template<> inline std::string AbstractSqlQuery::value<std::string>(const char* name) const
 {
     return value(name).toString().toStdString();
+}
+
+template<typename... Params>
+inline void AbstractSqlQuery::prepareWithValues(const std::string_view& query, Params&&... params)
+{
+    prepare(query);
+    (addBindValue(std::forward<Params>(params)), ...);
 }
 
 //-------------------------------------------------------------------------------------------------
