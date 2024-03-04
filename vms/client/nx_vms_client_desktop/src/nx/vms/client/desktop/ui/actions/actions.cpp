@@ -1113,6 +1113,8 @@ void initialize(Manager* manager, Action* root)
         .autoRepeat(false)
         .condition(new OpenInFolderCondition());
 
+    vx::registerOpenReportLayoutForResourceAction(factory);
+
     factory(IdentifyVideoWallAction)
         .flags(Tree | Scene | SingleTarget | MultiTarget | ResourceTarget | VideoWallItemTarget)
         .requiredGlobalPermission(GlobalPermission::controlVideowall)

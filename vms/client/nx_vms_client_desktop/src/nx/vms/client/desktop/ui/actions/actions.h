@@ -1104,6 +1104,11 @@ enum IDType
     VxOpenReportLayoutAction,
 
     /**
+     * Opens a report layout for the system that the provided camera belongs to.
+     */
+    VxOpenReportLayoutForCameraAction,
+
+    /**
      * Dismisses all alerting from a system, provided a system id.
      */
     VxDismissSystemAlertAction,

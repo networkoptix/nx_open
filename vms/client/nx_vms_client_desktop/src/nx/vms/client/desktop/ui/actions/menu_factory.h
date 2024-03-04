@@ -26,6 +26,10 @@ public:
     Builder operator()(IDType id);
     Builder operator()();
 
+    Manager* manager() const {
+        return m_manager;
+    }
+
 private:
     Manager* m_manager;
     int m_lastFreeActionId;
