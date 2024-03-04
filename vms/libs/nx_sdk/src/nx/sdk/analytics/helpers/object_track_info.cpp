@@ -48,6 +48,32 @@ const char* ObjectTrackInfo::bestShotImageDataFormat() const
     return m_bestShotImageDataFormat.c_str();
 }
 
+const char* ObjectTrackInfo::titleText() const
+{
+    if (m_titleText.empty())
+        return nullptr;
+
+    return m_titleText.data();
+}
+
+const char* ObjectTrackInfo::titleImageData() const
+{
+    if (m_titleImageData.empty())
+        return nullptr;
+
+    return m_titleImageData.data();
+}
+
+int ObjectTrackInfo::titleImageDataSize() const
+{
+    return (int) m_titleImageData.size();
+}
+
+const char* ObjectTrackInfo::titleImageDataFormat() const
+{
+    return m_titleImageDataFormat.c_str();
+}
+
 void ObjectTrackInfo::setTrack(IList<ITimestampedObjectMetadata>* track)
 {
     if (!NX_KIT_ASSERT(track))

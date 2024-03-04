@@ -26,6 +26,11 @@ public:
     virtual int bestShotImageDataSize() const override;
     virtual const char* bestShotImageDataFormat() const override;
 
+    virtual const char* titleText() const override;
+    virtual const char* titleImageData() const override;
+    virtual int titleImageDataSize() const override;
+    virtual const char* titleImageDataFormat() const override;
+
 protected:
     virtual IList<ITimestampedObjectMetadata>* getTrack() const override;
     virtual IUncompressedVideoFrame* getBestShotVideoFrame() const override;
@@ -37,6 +42,10 @@ private:
 
     std::vector<char> m_bestShotImageData;
     std::string m_bestShotImageDataFormat;
+
+    std::string m_titleText;
+    std::vector<char> m_titleImageData;
+    std::string m_titleImageDataFormat;
 };
 
 } // namespace nx::sdk::analytics

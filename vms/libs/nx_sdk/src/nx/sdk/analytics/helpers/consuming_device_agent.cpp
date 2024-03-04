@@ -17,6 +17,7 @@
 #include <nx/sdk/analytics/i_event_metadata_packet.h>
 #include <nx/sdk/analytics/i_object_metadata_packet.h>
 #include <nx/sdk/analytics/i_object_track_best_shot_packet.h>
+#include <nx/sdk/analytics/i_object_track_title_packet.h>
 #include <nx/sdk/analytics/i_plugin.h>
 
 namespace nx::sdk::analytics {
@@ -272,7 +273,11 @@ void ConsumingDeviceAgent::logMetadataPacketIfNeeded(
     }
     else if (metadataPacket->queryInterface<const IObjectTrackBestShotPacket>())
     {
-        packetName = "Best shot";
+        packetName = "Best Shot";
+    }
+    else if (metadataPacket->queryInterface<const IObjectTrackTitlePacket>())
+    {
+        packetName = "Title";
     }
     else
     {
