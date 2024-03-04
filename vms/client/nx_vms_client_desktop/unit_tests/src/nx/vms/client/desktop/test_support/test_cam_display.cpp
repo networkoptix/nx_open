@@ -9,6 +9,12 @@ TestCamDisplay::TestCamDisplay(const QString& name, CameraID cameraID):
 {
 }
 
+void TestCamDisplay::setDualStreamingEnabled(bool value)
+{
+    radassSupported = value;
+    executeStreamChangedCallback();
+}
+
 void TestCamDisplay::setQuality(MediaQuality quality, bool fastSwitch)
 {
     qualityValue = quality;

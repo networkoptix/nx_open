@@ -20,8 +20,26 @@
 using namespace std::chrono;
 
 namespace nx::vms::client::desktop {
-
 using namespace radass;
+
+void PrintTo(RadassMode value, ::std::ostream* os)
+{
+    switch (value)
+    {
+        case RadassMode::Auto:
+            *os << "Auto";
+            break;
+        case RadassMode::Low:
+            *os << "Low";
+            break;
+        case RadassMode::High:
+            *os << "High";
+            break;
+        case RadassMode::Custom:
+            *os << "Custom";
+            break;
+    }
+}
 
 namespace test {
 
@@ -149,6 +167,35 @@ TEST_F(RadassControllerTest, Fullscreencamera_FT392_C20113)
     cameras[1]->fullScreen = false;
     passIteration();
     ASSERT_EQ(cameras[1]->qualityValue, MEDIA_Quality_Low);
+}
+
+/**
+ * Issue description:
+ *
+ * Open camera  on Scene
+ * Right click on camera -> Resolution -> Low
+ * Open Camera Settings -> Expert -> Disable 2d stream
+ * Open Camera Settings -> Expert -> Enable 2d stream
+ * Expected: Resolution should change to Low
+ * Actual: Resolution remains in High
+ */
+TEST_F(RadassControllerTest, CameraStreamsDisabling)
+{
+    givenCameras(/*count*/ 1);
+    auto camera = cameras[0].data();
+
+    controller->setMode(camera, RadassMode::Low);
+    passIteration();
+    EXPECT_EQ(camera->qualityValue, MEDIA_Quality_Low);
+
+    camera->setDualStreamingEnabled(false);
+    passIteration();
+    EXPECT_EQ(controller->mode(camera), RadassMode::Custom);
+
+    camera->setDualStreamingEnabled(true);
+    passIteration();
+    EXPECT_EQ(controller->mode(camera), RadassMode::Low);
+    EXPECT_EQ(camera->qualityValue, MEDIA_Quality_Low);
 }
 
 } // namespace test
