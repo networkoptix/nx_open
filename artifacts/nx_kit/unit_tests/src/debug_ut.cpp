@@ -60,7 +60,7 @@ TEST(debug, overrideStreamStatic)
     NX_PRINT << "TEST";
 
     stream() = oldStream;
-    ASSERT_EQ("[" + fileBaseNameWithoutExt(__FILE__) + "] TEST\n", stringStream.str());
+    ASSERT_EQ("[debug_ut] TEST\n", stringStream.str());
 }
 
 TEST(debug, overrideStreamPreproc)
@@ -218,54 +218,48 @@ TEST(debug, disabledTime)
     NX_TIME_END(testTag);
 }
 
-TEST(debug, normalizePathToSlashes)
+TEST(debug, srcFileBaseNameWithoutExt)
 {
-    const auto testEqual =
-        [](const char* s)
-        {
-            ASSERT_EQ(s, normalizePathToSlashes(s));
-        };
+    static const std::string s(1, nx::kit::utils::kPathSeparator);    
     
-    testEqual("");
-    testEqual("abc");
-    testEqual("/");
-    testEqual("a/");
-    testEqual("/a");
-    testEqual("a/b");
-    testEqual("a//c");
-    
-    #if defined(_WIN32)
-        ASSERT_EQ("a/b", normalizePathToSlashes("a\\b"));
-        ASSERT_EQ("/b", normalizePathToSlashes("\\b"));
-        ASSERT_EQ("a/", normalizePathToSlashes("a\\"));
-        ASSERT_EQ("0/a/b/c", normalizePathToSlashes("0/a\\b\\c"));
-    #else
-        testEqual("a\\b");
-        testEqual("\\b");
-        testEqual("a\\");
-        testEqual("0/a\\b\\c");
-    #endif
+    ASSERT_EQ("", srcFileBaseNameWithoutExt(""));
+    ASSERT_EQ("", srcFileBaseNameWithoutExt(s));
+    ASSERT_EQ("", srcFileBaseNameWithoutExt("path" + s));
+
+    ASSERT_EQ("name-no-ext", srcFileBaseNameWithoutExt("name-no-ext"));
+    ASSERT_EQ("name-no-ext", srcFileBaseNameWithoutExt(s + "name-no-ext"));
+    ASSERT_EQ("name-no-ext", srcFileBaseNameWithoutExt("path" + s + "name-no-ext"));
+
+    ASSERT_EQ("name", srcFileBaseNameWithoutExt("name.ext"));
+    ASSERT_EQ("name", srcFileBaseNameWithoutExt(s + "name.ext"));
+    ASSERT_EQ("name", srcFileBaseNameWithoutExt("path" + s + "name.ext"));
+
+    ASSERT_EQ("name", srcFileBaseNameWithoutExt("dir.bak" + s + "name.ext"));
+    ASSERT_EQ("name", srcFileBaseNameWithoutExt("dir1" + s + "dir2" + s + "name.ext"));
+    ASSERT_EQ("name.ext1", srcFileBaseNameWithoutExt("path" + s + "name.ext1.ext2"));
 }
 
-TEST(debug, relativeSrcFilename)
+TEST(debug, srcFileRelativePath)
 {
-    static const std::string kIrrelevantPath = "irrelevant/path/and/file.cpp";
-    ASSERT_EQ(kIrrelevantPath, relativeSrcFilename(kIrrelevantPath));
+    static const std::string s(1, nx::kit::utils::kPathSeparator);
 
-    static const std::string kAnyEnding = "nx/any/ending/file.cpp";
-    ASSERT_EQ(kAnyEnding, relativeSrcFilename("/any/starting/src/" + kAnyEnding));
+    static const std::string kIrrelevantPath = "irrelevant" + s + "path" + s + "file.cpp";
+    ASSERT_EQ(kIrrelevantPath, srcFileRelativePath(kIrrelevantPath));
+
+    // Test that if a path contains `/src/nx/`, it's relative path starts with that `nx/`.
+    static const std::string kNxEnding = "nx" + s + "any_ending" + s + "file.cpp";
+    ASSERT_EQ(kNxEnding, srcFileRelativePath(s + "any_starting" + s + "src" + s + kNxEnding));
 
     // debug.cpp: <commonPrefix>src/nx/kit/debug.cpp
     // __FILE__:  <commonPrefix>unit_tests/src/debug_ut.cpp
-    //            <commonPrefix>toBeOmitted/dir/file.cpp
 
-    const std::string thisFile = normalizePathToSlashes(__FILE__);
+    const std::string thisFile = __FILE__;
     
-    static const std::string suffix = "src/debug_ut.cpp";
+    static const std::string suffix = "unit_tests" + s + "src" + s + "debug_ut.cpp";
     ASSERT_EQ(suffix, thisFile.substr(thisFile.size() - suffix.size(), suffix.size()));
 
     const std::string commonPrefix = std::string(thisFile, 0, thisFile.size() - suffix.size());
-    ASSERT_EQ("unit_tests/dir/file.cpp", relativeSrcFilename(commonPrefix + "dir/file.cpp"));
+    ASSERT_EQ("dir" + s + "file.cpp", srcFileRelativePath(commonPrefix + "dir" + s + "file.cpp"));
 }
 
 } // namespace test
