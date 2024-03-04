@@ -25,6 +25,8 @@ namespace test {
 
 bool verbose = true;
 
+using nx::kit::utils::kPathSeparator;
+
 namespace detail {
 
 struct TestFailure: std::exception
@@ -342,12 +344,6 @@ void assertMultilineTextEquals(
 //-------------------------------------------------------------------------------------------------
 // Temp dir.
 
-#if defined(_WIN32)
-    static constexpr char kPathSeparator[] = "\\";
-#else
-    static constexpr char kPathSeparator[] = "/";
-#endif
-
 /** @return Empty string if the variable is empty, is longer than 1024 bytes, or does not exist. */
 static std::string getEnvVar(const std::string& envVarName)
 {
@@ -430,7 +426,7 @@ static std::string baseTempDir()
 
             // Append a path separator if needed.
             if (value.back() != '/' && value.back() != '\\')
-                value.append(kPathSeparator);
+                value.push_back(kPathSeparator);
         }
     }
     return value;

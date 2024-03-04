@@ -28,17 +28,15 @@ namespace debug {
 //-------------------------------------------------------------------------------------------------
 // Tools
 
-NX_KIT_API size_t commonPrefixSize(const std::string& s1, const std::string& s2);
+/**
+ * Extracts the part of the supplied __FILE__ which follows the uninteresting common part.
+ */
+NX_KIT_API std::string srcFileRelativePath(const std::string& file);
 
 /**
- * Extracts part of the source code filename which follows the uninteresting common part.
+ * Extracts the basa name without extension from the supplied __FILE__.
  */
-NX_KIT_API std::string relativeSrcFilename(const std::string& file);
-
-NX_KIT_API std::string fileBaseNameWithoutExt(const char* file);
-
-/** On Windows, replace backslashes with slashes. On other OSes, do nothing. */
-NX_KIT_API std::string normalizePathToSlashes(std::string path);
+NX_KIT_API std::string srcFileBaseNameWithoutExt(const std::string& file);
 
 //-------------------------------------------------------------------------------------------------
 // Output
@@ -144,7 +142,7 @@ NX_KIT_API void intentionallyCrash(const char* message);
 #define LL \
     NX_PRINT << "####### LL line " + ::nx::kit::utils::toString(__LINE__) \
         + NX_KIT_DEBUG_DETAIL_THREAD_ID \
-        + ", " + ::nx::kit::debug::relativeSrcFilename(__FILE__) \
+        + ", " + ::nx::kit::debug::srcFileRelativePath(__FILE__) \
         /* The final semicolon allows to use this macro as a line prefix. */;
 
 /**
