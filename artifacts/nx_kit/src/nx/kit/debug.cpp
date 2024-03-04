@@ -22,64 +22,31 @@ using namespace nx::kit::utils;
 //-------------------------------------------------------------------------------------------------
 // Tools
 
-size_t commonPrefixSize(const std::string& s1, const std::string& s2)
+std::string srcFileRelativePath(const std::string& file)
 {
-    const std::string& shorter = (s1.size() < s2.size()) ? s1 : s2;
-    const std::string& longer = (s1.size() < s2.size()) ? s2 : s1;
+    // If the path contains "/src/nx/", return the path starting with "nx/".
+    static const std::string srcPath = kPathSeparator + std::string("src") + kPathSeparator;
+    const auto pos = file.find(srcPath + "nx" + kPathSeparator);
+    if (pos != std::string::npos)
+        return file.substr(pos + srcPath.size());
 
-    const auto afterCommonPrefix = std::mismatch(
-        shorter.cbegin(), shorter.cend(), longer.cbegin());
-
-    return (size_t) (afterCommonPrefix.first - shorter.cbegin());
-}
-
-std::string relativeSrcFilename(const std::string& file)
-{
-    std::string fileString = normalizePathToSlashes(file);
-
-    // If the path contains "/src/nx/", return starting with "nx/".
-    {
-        static const std::string srcPath = "/src/";
-        const auto pos = fileString.find(srcPath + "nx/");
-        if (pos != std::string::npos)
-            return fileString.substr(pos + srcPath.size());
-    }
+    const std::string thisFile = __FILE__;
 
     // Trim a prefix common with this cpp file.
-    {
-        const std::string thisFile = normalizePathToSlashes(__FILE__);
-
-        const size_t filesCommonPrefixSize = commonPrefixSize(thisFile, fileString);
-        if (filesCommonPrefixSize == 0) //< No common prefix - use the original path.
-            return fileString;
-        return fileString.substr(filesCommonPrefixSize);
-    }
+    int p = 0;
+    while (file[p] && file[p] == thisFile[p])
+        ++p;
+    return file.substr(p);
 }
 
-std::string fileBaseNameWithoutExt(const char* file)
+std::string srcFileBaseNameWithoutExt(const std::string& file)
 {
-    constexpr char kPathSeparator =
-        #if defined(_WIN32)
-            '\\';
-        #else
-            '/';
-        #endif
-
-    const char* const sep = strrchr(file, kPathSeparator);
-    const char* const first = sep ? sep + 1 : file;
-    const char* const ext = strrchr(file, '.');
-    if (ext)
-        return std::string(first, ext - first);
-    else
-        return std::string(first);
-}
-
-std::string normalizePathToSlashes(std::string path)
-{
-    #if defined(_WIN32)
-        stringReplaceAllChars(&path, '\\', '/');
-    #endif
-    return path;
+    const size_t separatorPos = file.rfind(kPathSeparator);
+    const int baseNamePos = (separatorPos != std::string::npos) ? ((int) separatorPos + 1) : 0;
+    const size_t  extPos = file.rfind('.');
+    if (extPos == std::string::npos)
+        return file.substr(baseNamePos);
+    return file.substr(baseNamePos, extPos - baseNamePos);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -101,7 +68,7 @@ std::string printPrefix(const char* file)
 
     std::string& result = cache[file]; //< Ref to either a newly created or existing entry.
     if (result.empty()) //< Newly created entry.
-        result = "[" + fileBaseNameWithoutExt(file) + "] ";
+        result = "[" + srcFileBaseNameWithoutExt(file) + "] ";
     return result;
 }
 
@@ -132,7 +99,7 @@ void assertionFailed(
 {
     printFunc((std::string("\n")
         + ">>> ASSERTION FAILED: "
-        + relativeSrcFilename(file) + ":" + toString(line)
+        + srcFileRelativePath(file) + ":" + toString(line)
         + " (" + conditionStr + ") " + message
     ).c_str());
 

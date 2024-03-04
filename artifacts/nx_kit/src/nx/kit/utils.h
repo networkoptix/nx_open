@@ -97,6 +97,13 @@ NX_KIT_API std::string trimString(const std::string& s);
 //-------------------------------------------------------------------------------------------------
 // OS support.
 
+constexpr char kPathSeparator =
+    #if defined(_WIN32)
+        '\\';
+    #else
+        '/';
+    #endif
+
 /**
  * @return Last path component: text after the last path separator. On Windows, possible `<drive>:`
  * prefix is excluded and both `/` and `\` are supported. If path is empty, the result is empty.
