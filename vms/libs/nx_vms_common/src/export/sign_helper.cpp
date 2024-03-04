@@ -104,50 +104,24 @@ void QnSignHelper::doUpdateDigestNoCodec(QnCryptographicHash &ctx, const quint8*
 
 void QnSignHelper::doUpdateDigest(AVCodecID codecId, const quint8* extradata, int extradataSize, QnCryptographicHash &ctx, const quint8* data, int size)
 {
-    if (codecId != AV_CODEC_ID_H264)
+    if (codecId != AV_CODEC_ID_H264 && codecId != AV_CODEC_ID_H265)
     {
         doUpdateDigestNoCodec(ctx, data, size);
         return;
     }
 
-    // skip nal prefixes (sometimes it is 00 00 01 code, sometimes unitLen)
-    const quint8* dataEnd = data + size;
+    bool isAnnexB = true;
+    if (extradata && extradataSize && !nx::media::nal::isStartCode(extradata, extradataSize))
+        isAnnexB = false;
 
-    if (extradataSize >= 7 && extradata[0] == 1)
-    {
-        // prefix is unit len
-        int reqUnitSize = (extradata[4] & 0x03) + 1;
-
-        // Data pointer can be completely empty sometimes.
-        if (const quint8* curNal = data)
-        {
-            while (curNal < dataEnd - reqUnitSize)
-            {
-                uint32_t curSize = 0;
-                for (int i = 0; i < reqUnitSize; ++i)
-                    curSize = (curSize << 8) + curNal[i];
-                curNal += reqUnitSize;
-                curSize = qMin(curSize, (uint32_t) (dataEnd - curNal));
-                ctx.addData((const char*) curNal, (int) curSize);
-
-                curNal += curSize;
-            }
-        }
-    }
+    std::vector<nx::media::nal::NalUnitInfo> nalUnits;
+    if (isAnnexB)
+        nalUnits = nx::media::nal::findNalUnitsAnnexB(data, size);
     else
-    {
-        // prefix is 00 00 01 code
-        if (const quint8* curNal = NALUnit::findNextNAL(data, dataEnd))
-        {
-            while (curNal < dataEnd)
-            {
-                const quint8* nextNal = NALUnit::findNALWithStartCode(curNal, dataEnd, true);
-                ctx.addData((const char*)curNal, nextNal - curNal);
+        nalUnits = nx::media::nal::findNalUnitsMp4(data, size);
 
-                curNal = NALUnit::findNextNAL(nextNal, dataEnd);
-            }
-        }
-    }
+    for (const auto& nalUnit: nalUnits)
+        ctx.addData((const char*)nalUnit.data, nalUnit.size);
 }
 
 QByteArray QnSignHelper::getSign(const AVFrame* frame, int signLen)
