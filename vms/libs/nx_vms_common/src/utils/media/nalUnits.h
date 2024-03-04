@@ -557,6 +557,8 @@ struct NX_VMS_COMMON_API NalUnitInfo
     const uint8_t* data = nullptr;
     int size = 0;
 };
+NX_VMS_COMMON_API std::vector<NalUnitInfo> findNalUnitsMp4(
+    const uint8_t* data, int32_t size);
 
 NX_VMS_COMMON_API std::vector<NalUnitInfo> findNalUnitsAnnexB(const uint8_t* data, int32_t size);
 
@@ -565,6 +567,8 @@ NX_VMS_COMMON_API std::vector<uint8_t> convertStartCodesToSizes(
 
 static const std::array<uint8_t, 4> kStartCode = { 0, 0, 0, 1 };
 static const std::array<uint8_t, 3> kStartCode3B = { 0, 0, 1 };
+
+static constexpr int kNalUnitSizeLength = 4;
 
 NX_VMS_COMMON_API bool isStartCode(const void* data, size_t size);
 NX_VMS_COMMON_API void convertToStartCodes(uint8_t* const data, const int size);
