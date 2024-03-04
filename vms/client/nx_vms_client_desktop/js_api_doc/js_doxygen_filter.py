@@ -6,7 +6,8 @@ import argparse
 import re
 
 comment = re.compile("^\s+\*")
-args = re.compile("const (\w+)& ")
+array = re.compile("QList<(\w+)[&*]?>")
+args = re.compile("(const )?([\w]+)[&*] ")
 optional = re.compile("std::optional<(.*?)>")
 function = re.compile("([^\s]+\s[^\s]+\(.*\))( const;|;)")
 defaultValue = re.compile(" = [^;()]+;")
@@ -18,20 +19,20 @@ replaceMap = {
     "ResourceUniqueId": "String",
     "QUuid": "String",
     "nx::Uuid": "String",
+    "Uuid": "String",
     "Q_INVOKABLE": "",
     "double": "Number",
     "int": "Number",
     "void": "",
     "std::chrono::milliseconds": "Number",
-    "Resource::List": "Array[Resource]",
-    "ItemVector": "Array[Item]",
 }
 
 def transform(line):
     if comment.search(line):
         return line
 
-    result = args.sub("\\1 ", line)
+    result = array.sub("Array<\\1>", line)
+    result = args.sub("\\2 ", result)
     result = optional.sub("\\1", result)
     result = defaultValue.sub(";", result)
     result = function.sub("async \\1;", result)

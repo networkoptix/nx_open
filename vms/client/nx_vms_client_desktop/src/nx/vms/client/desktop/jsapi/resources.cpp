@@ -4,8 +4,8 @@
 
 #include <nx/reflect/json.h>
 
-#include "detail/helpers.h"
 #include "detail/resources_api_backend.h"
+#include "types.h"
 
 namespace nx::vms::client::desktop::jsapi {
 
@@ -14,11 +14,9 @@ Resources::Resources(QObject* parent)
     base_type(parent),
     d(new detail::ResourcesApiBackend(this))
 {
-    connect(d.data(), &detail::ResourcesApiBackend::added, this,
-        [this](const detail::Resource& resource)
-        {
-            emit added(detail::toJsonObject(resource));
-        });
+    registerTypes();
+
+    connect(d.data(), &detail::ResourcesApiBackend::added, this, &Resources::added);
     connect(d.data(), &detail::ResourcesApiBackend::removed, this, &Resources::removed);
 }
 
@@ -32,14 +30,14 @@ bool Resources::hasMediaStream(const QString& resourceId) const
     return result.error.code == Globals::success && detail::hasMediaStream(result.resource.type);
 }
 
-QJsonArray Resources::resources() const
+QList<Resource> Resources::resources() const
 {
-    return detail::toJsonArray(d->resources());
+    return d->resources();
 }
 
-QJsonObject Resources::resource(const QString& resourceId) const
+ResourceResult Resources::resource(const QString& resourceId) const
 {
-    return detail::toJsonObject(d->resource(resourceId));
+    return d->resource(resourceId);
 }
 
 } // namespace nx::vms::client::desktop::jsapi

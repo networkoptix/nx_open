@@ -39,58 +39,30 @@ public:
 
     virtual ~TabApiBackend() override;
 
-    /**
-     * @addtogroup vms-tab
-     * Contains methods and signals to work with the tab containing the current web page.
-     * @{
-     */
+    QString name() const;
 
-    /** @return Complete tab state. */
     State state() const;
-
-    /** @return Description of an item with the specified identifier. */
     ItemResult item(const QUuid& itemId) const;
-
-    /**
-      * Adds an item from the Resource with the specified identifier and item parameters.
-      * @return Item description on success.
-     */
     ItemResult addItem(
         const ResourceUniqueId& resourceId,
         const ItemParams& params);
 
-    /** Sets parameters for the item with the specified identifier. */
     Error setItemParams(
         const QUuid& itemId,
         const ItemParams& params);
 
-    /** Removes the item with the specified identifier. */
     Error removeItem(const QUuid& itemId);
-
-    /**
-     * Makes all items synced with the specified item. All items on the tab will have the same
-     * timestamp / playing state and speed.
-     */
     Error syncWith(const QUuid& itemId);
-
-    /** Stops syncing of the corresponding Layout. */
     Error stopSyncPlay();
-
-    /** Sets the specified properties for the corresponding Layout. */
     Error setLayoutProperties(const LayoutProperties& properties);
-
-    /** Saves the Layout. */
     Error saveLayout();
 
-    /** @private */
     QnWorkbenchLayout* layout() const;
 
 signals:
     void itemAdded(const Item& item);
     void itemRemoved(const nx::Uuid& itemId);
     void itemChanged(const Item& item);
-
-    /** @} */ // group vms-tab
 
 private:
     struct Private;

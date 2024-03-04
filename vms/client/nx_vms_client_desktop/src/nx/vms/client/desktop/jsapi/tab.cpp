@@ -4,14 +4,16 @@
 
 #include <QtCore/QJsonDocument>
 
+#include <nx/utils/log/assert.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
 
-#include "detail/helpers.h"
 #include "detail/tab_api_backend.h"
 #include "detail/tab_structures.h"
 #include "ui/workbench/workbench_layout.h"
+
+#include "types.h"
 
 namespace nx::vms::client::desktop::jsapi {
 
@@ -23,79 +25,60 @@ Tab::Tab(
     base_type(parent),
     d(new detail::TabApiBackend(context, layout))
 {
-    using namespace detail;
+    registerTypes();
 
-    connect(d.get(), &TabApiBackend::itemAdded, this,
-        [this](const Item& item)
-        {
-            emit itemAdded(toJsonObject(item));
-        });
-
+    connect(d.get(), &detail::TabApiBackend::itemAdded, this, &Tab::itemAdded);
     connect(d.get(), &detail::TabApiBackend::itemRemoved, this, &Tab::itemRemoved);
-
-    connect(d.get(), &detail::TabApiBackend::itemChanged, this,
-        [this](const Item& item)
-        {
-            emit itemChanged(toJsonObject(item));
-        });
+    connect(d.get(), &detail::TabApiBackend::itemChanged, this, &Tab::itemChanged);
 }
 
 Tab::~Tab()
 {
 }
 
-QJsonObject Tab::state() const
+State Tab::state() const
 {
-    return toJsonObject(d->state());
+    return d->state();
 }
 
-QJsonObject Tab::item(const QUuid& itemId) const
+ItemResult Tab::item(const QUuid& itemId) const
 {
-    return toJsonObject(d->item(itemId));
+    return d->item(itemId);
 }
 
-QJsonObject Tab::addItem(const QString& resourceId, const QJsonObject& params)
+ItemResult Tab::addItem(const QString& resourceId, const ItemParams& params)
 {
-    detail::ItemParams itemParams;
-    return detail::toJsonObject(fromJsonObject(params, itemParams)
-        ? d->addItem(resourceId, itemParams)
-        : detail::ItemResult{Error::invalidArguments(), {}});
+    return d->addItem(resourceId, params);
 }
 
-QJsonObject Tab::setItemParams(const QUuid& itemId, const QJsonObject& params)
+Error Tab::setItemParams(const QUuid& itemId, const ItemParams& params)
 {
-    detail::ItemParams itemParams;
-    return detail::toJsonObject(fromJsonObject(params, itemParams)
-        ? d->setItemParams(itemId, itemParams)
-        : Error::invalidArguments());
+    return d->setItemParams(itemId, params);
 }
 
-QJsonObject Tab::removeItem(const QUuid& itemId)
+Error Tab::removeItem(const QUuid& itemId)
 {
-    return detail::toJsonObject(d->removeItem(itemId));
+    return d->removeItem(itemId);
 }
 
-QJsonObject Tab::syncWith(const QUuid& itemId)
+Error Tab::syncWith(const QUuid& itemId)
 {
-    return detail::toJsonObject(d->syncWith(itemId));
+    return d->syncWith(itemId);
 }
 
-QJsonObject Tab::stopSyncPlay()
+Error Tab::stopSyncPlay()
 {
-    return detail::toJsonObject(d->stopSyncPlay());
+    return d->stopSyncPlay();
 }
 
-QJsonObject Tab::setLayoutProperties(const QJsonObject& properties)
+Error Tab::setLayoutProperties(const LayoutProperties& properties)
 {
-    detail::LayoutProperties layoutProperties;
-    return detail::toJsonObject(fromJsonObject(properties, layoutProperties)
-        ? d->setLayoutProperties(layoutProperties)
-        : Error::invalidArguments());
+    return d->setLayoutProperties(properties);
 }
 
-QJsonObject Tab::saveLayout()
+Error Tab::saveLayout()
 {
-    return detail::toJsonObject(d->saveLayout());
+    return d->saveLayout();
 }
 
 QString Tab::id() const

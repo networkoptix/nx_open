@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include <QtCore/QJsonObject>
 #include <QtCore/QObject>
 
 #include <nx/utils/impl_ptr.h>
@@ -33,11 +32,24 @@ public:
     Self(QnWorkbenchItem* item, QObject* parent = nullptr);
     virtual ~Self() override;
 
-    /** Sets the web page widget minimal interface mode. */
-    Q_INVOKABLE QJsonObject setMinimalInterfaceMode(bool value);
+    /**
+     * @addtogroup vms-self
+     * Contains methods to control the current web-page widget.
+     * @{
+    */
 
-    /** Prevent showing default context menu. */
-    Q_INVOKABLE QJsonObject setPreventDefaultContextMenu(bool value);
+    /**
+     * Sets the web-page widget minimal interface mode. In this mode only the close button is
+     * visible.
+     */
+    Q_INVOKABLE Error setMinimalInterfaceMode(bool value);
+
+    /**
+     * Prevents showing the default context menu.
+     */
+    Q_INVOKABLE Error setPreventDefaultContextMenu(bool value);
+
+    /** @} */ // group self
 
     Tab* tab() const;
 

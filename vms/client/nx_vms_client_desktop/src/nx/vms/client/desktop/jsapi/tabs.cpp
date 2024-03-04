@@ -6,7 +6,6 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/jsapi/detail/helpers.h>
 #include <nx/vms/client/desktop/jsapi/detail/resources_structures.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/menu/actions.h>
@@ -20,7 +19,7 @@
 #include <utils/common/delayed.h>
 
 #include "detail/globals_structures.h"
-#include "tab.h"
+#include "types.h"
 
 namespace nx::vms::client::desktop::jsapi {
 
@@ -38,7 +37,7 @@ struct Tabs::Private:
     Error setCurrent(Tab* tab);
     Tab* add(const QString& name);
     Error remove(Tab* tab);
-    Error open(const detail::ResourceUniqueId& id);
+    Error open(const ResourceUniqueId& id);
 };
 
 Tabs::Private::Private(Tabs* q, WindowContext* context):
@@ -85,21 +84,21 @@ Tab* Tabs::Private::addIfNeeded(QnWorkbenchLayout* layout)
         });
 
     connect(tab.get(), &Tab::itemAdded, q,
-        [this, tabId = tab->id()](const QJsonObject& item)
+        [this, tabId = tab->id()](const Item& item)
         {
-            if (current->id() == tabId)
+            if (current && current->id() == tabId)
                 emit q->currentTabItemAdded(item);
         });
     connect(tab.get(), &Tab::itemRemoved, q,
         [this, tabId = tab->id()](const nx::Uuid& itemId)
         {
-            if (current->id() == tabId)
+            if (current && current->id() == tabId)
                 emit q->currentTabItemRemoved(itemId);
         });
     connect(tab.get(), &Tab::itemChanged, q,
-        [this, tabId = tab->id()](const QJsonObject& item)
+        [this, tabId = tab->id()](const Item& item)
         {
-            if (current->id() == tabId)
+            if (current && current->id() == tabId)
                 emit q->currentTabItemChanged(item);
         });
 
@@ -156,7 +155,7 @@ Error Tabs::Private::remove(Tab* tab)
     return Error::success();
 }
 
-Error Tabs::Private::open(const detail::ResourceUniqueId& id)
+Error Tabs::Private::open(const ResourceUniqueId& id)
 {
     const auto resource = appContext()->unifiedResourcePool()->resource(id.id, id.localSystemId);
     if (!resource || !resource->hasFlags(Qn::layout))
@@ -170,6 +169,7 @@ Tabs::Tabs(WindowContext* context, QObject* parent):
     QObject(parent),
     d(new Private(this, context))
 {
+    registerTypes();
 }
 
 Tabs::~Tabs()
@@ -190,15 +190,15 @@ Tab* Tabs::current() const
     return d->current.get();
 }
 
-QJsonObject Tabs::setCurrent(Tab* tab)
+Error Tabs::setCurrent(Tab* tab)
 {
-    return detail::toJsonObject(d->setCurrent(tab));
+    return d->setCurrent(tab);
 }
 
-QJsonObject Tabs::setCurrent(const QString& id)
+Error Tabs::setCurrent(const QString& id)
 {
     Tab* tab = d->tabs.value(nx::Uuid{id}).get();
-    return detail::toJsonObject(d->setCurrent(tab));
+    return d->setCurrent(tab);
 }
 
 Tab* Tabs::add(const QString& name)
@@ -206,20 +206,20 @@ Tab* Tabs::add(const QString& name)
     return d->add(name);
 }
 
-QJsonObject Tabs::remove(Tab* tab)
+Error Tabs::remove(Tab* tab)
 {
-    return detail::toJsonObject(d->remove(tab));
+    return d->remove(tab);
 }
 
-QJsonObject Tabs::remove(const QString& id)
+Error Tabs::remove(const QString& id)
 {
     Tab* tab = d->tabs.value(nx::Uuid{id}).get();
-    return detail::toJsonObject(d->remove(tab));
+    return d->remove(tab);
 }
 
-QJsonObject Tabs::open(const QString& layoutResourceId)
+Error Tabs::open(const QString& layoutResourceId)
 {
-    return detail::toJsonObject(d->open(layoutResourceId));
+    return d->open(layoutResourceId);
 }
 
 } // namespace nx::vms::client::desktop::jsapi

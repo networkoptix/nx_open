@@ -13,7 +13,7 @@
 #include "globals_structures.h"
 #include "resources_structures.h"
 
-namespace nx::vms::client::desktop::jsapi::detail {
+namespace nx::vms::client::desktop::jsapi {
 
 /**
  * Represents some period of time.
@@ -103,8 +103,6 @@ struct ItemResult
 };
 NX_REFLECTION_INSTRUMENT(ItemResult, (error)(item))
 
-using ItemVector = std::vector<Item>;
-
 /**
  * Represents selection and focus states for the tab.
  * @ingroup vms
@@ -115,7 +113,7 @@ struct ItemSelection
     std::optional<Item> focusedItem;
 
     /** Array of selected items on the tab. */
-    std::optional<ItemVector> selectedItems;
+    std::optional<QList<Item>> selectedItems;
 };
 NX_REFLECTION_INSTRUMENT(ItemSelection, (focusedItem)(selectedItems))
 
@@ -143,7 +141,7 @@ struct State
     bool sync = false;
 
     /** Array of the all items on the tab. */
-    ItemVector items;
+    QList<Item> items;
 
     /** Current selection state. */
     ItemSelection selection;
@@ -153,4 +151,4 @@ struct State
 };
 NX_REFLECTION_INSTRUMENT(State, (sync)(items)(selection)(properties))
 
-} // namespace nx::vms::client::desktop::jsapi::detail
+} // namespace nx::vms::client::desktop::jsapi

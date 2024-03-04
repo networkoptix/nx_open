@@ -10,7 +10,7 @@
 #include <ui/workbench/workbench_layout.h>
 
 #include "detail/globals_structures.h"
-#include "detail/helpers.h"
+#include "types.h"
 
 namespace nx::vms::client::desktop::jsapi {
 
@@ -25,25 +25,8 @@ public:
     {
     }
 
-    /**
-     * @addtogroup vms-self
-     * Contains methods to control the current web-page widget.
-     * @{
-    */
-
-    /**
-     * Sets the web-page widget minimal interface mode. In this mode only the close button is
-     * visible.
-     */
     Error setMinimalInterfaceMode(bool value);
-
-    /**
-     * Prevents showing the default context menu.
-     */
     Error setPreventDefaultContextMenu(bool value);
-
-    /** @} */ // group self
-
     Tab* tab() const { return m_tab.get(); }
 
 private:
@@ -86,20 +69,21 @@ Self::Self(QnWorkbenchItem* item, QObject* parent):
     QObject(parent),
     d(new Private(this, item))
 {
+    registerTypes();
 }
 
 Self::~Self()
 {
 }
 
-QJsonObject Self::setMinimalInterfaceMode(bool value)
+Error Self::setMinimalInterfaceMode(bool value)
 {
-    return detail::toJsonObject(d->setMinimalInterfaceMode(value));
+    return d->setMinimalInterfaceMode(value);
 }
 
-QJsonObject Self::setPreventDefaultContextMenu(bool value)
+Error Self::setPreventDefaultContextMenu(bool value)
 {
-    return detail::toJsonObject(d->setPreventDefaultContextMenu(value));
+    return d->setPreventDefaultContextMenu(value);
 }
 
 Tab* Self::tab() const

@@ -7,6 +7,8 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/common/system_settings.h>
 
+#include "types.h"
+
 namespace nx::vms::client::desktop::jsapi {
 
 Auth::Auth(SystemContext* systemContext,AuthCondition authCondition, QObject* parent):
@@ -14,6 +16,7 @@ Auth::Auth(SystemContext* systemContext,AuthCondition authCondition, QObject* pa
     SystemContextAware(systemContext),
     m_checkCondition(authCondition)
 {
+    registerTypes();
 }
 
 QString Auth::sessionToken() const

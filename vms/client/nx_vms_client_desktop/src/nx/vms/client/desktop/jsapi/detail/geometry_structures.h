@@ -4,7 +4,7 @@
 
 #include <nx/reflect/instrument.h>
 
-namespace nx::vms::client::desktop::jsapi::detail {
+namespace nx::vms::client::desktop::jsapi {
 
 /**
  * @ingroup vms
@@ -46,4 +46,4 @@ struct Rect
 };
 NX_REFLECTION_INSTRUMENT(Rect, (pos)(size))
 
-} // namespace nx::vms::client::desktop::jsapi::detail
+} // namespace nx::vms::client::desktop::jsapi

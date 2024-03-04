@@ -10,7 +10,7 @@
 
 #include "globals_structures.h"
 
-namespace nx::vms::client::desktop::jsapi::detail {
+namespace nx::vms::client::desktop::jsapi {
 
 /**
  * @ingroup vms
@@ -44,6 +44,9 @@ NX_REFLECTION_ENUM_CLASS(ResourceType,
     layout
 )
 
+/**
+ * @private
+ */
 struct ResourceUniqueId
 {
     nx::Uuid id;
@@ -77,9 +80,8 @@ struct Resource
 
     /** @privatesection */
 
-    using List = QList<Resource>;
     static Resource from(const QnResourcePtr& resource);
-    static List from(const QnResourceList& resources);
+    static QList<Resource> from(const QnResourceList& resources);
 };
 NX_REFLECTION_INSTRUMENT(Resource, (id)(name)(type)(logicalId))
 
@@ -97,9 +99,12 @@ struct ResourceResult
 };
 NX_REFLECTION_INSTRUMENT(ResourceResult, (error)(resource))
 
+namespace detail {
+
 /** Check if a resource with the specified type may have media stream (at least theoretically). */
 bool hasMediaStream(const ResourceType type);
 
 ResourceType resourceType(const QnResourcePtr& resource);
 
-} // namespace nx::vms::client::desktop::jsapi::detail
+} // namespace detail
+} // namespace nx::vms::client::desktop::jsapi
