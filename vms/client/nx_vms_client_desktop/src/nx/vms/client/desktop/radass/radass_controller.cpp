@@ -131,6 +131,9 @@ struct ConsumerInfo
     // Custom mode means unsupported consumer.
     Mode mode = Mode::Auto;
 
+    /** Previous mode for scenario when support is disabled and then enabled again. */
+    Mode previousMode = Mode::Auto;
+
     // Required for std::vector resize.
     ConsumerInfo() = default;
 
@@ -820,13 +823,17 @@ struct RadassController::Private
         if (isSupported == wasSupported)
             return;
 
+        NX_ASSERT(consumer->previousMode != RadassMode::Custom, "Should never get this");
         if (isSupported)
         {
-            consumer->mode = RadassMode::Auto;
+            consumer->mode = consumer->previousMode;
             setupNewConsumer(consumer);
         }
         else
+        {
+            consumer->previousMode = consumer->mode;
             consumer->mode = RadassMode::Custom;
+        }
     }
 };
 
