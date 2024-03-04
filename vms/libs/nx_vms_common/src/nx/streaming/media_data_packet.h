@@ -127,8 +127,9 @@ public:
         // mode. They are not going to be recorded.
         MediaFlags_LiveOnly             = 0x40000,
 
-        // Packets that can be pipelined with some delay from live
-        MediaFlags_Delayed              = 0x80000,
+        // Best shot packets. They can be pipelined with some delay from live. Will not be recorded
+        // to mkv files. Will not be reordered in AbstractDataReorderer.
+        MediaFlags_MetaDataBestShot     = 0x80000,
     };
 
     Q_DECLARE_FLAGS(MediaFlags, MediaFlag)
