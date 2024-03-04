@@ -125,10 +125,10 @@ static void generateIniFile(const SavedIni& ini)
 
     // C-style-escape the string if and only if it contains a quote or a leading space.
     const auto outputStr =
-        [&content](const char* value, const char* paramName)
+        [&content](const std::string& value, const char* paramName)
         {
             content << paramName << "=";
-            if (value[0] == ' ' || strchr(value, '"') != nullptr)
+            if (value[0] == ' ' || value.find('"') != std::string::npos)
                 content << nx::kit::utils::toString(value);
             else
                 content << value;

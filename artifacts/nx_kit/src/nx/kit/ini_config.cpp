@@ -58,48 +58,31 @@ static std::string getEnv(const char* envVar)
 
 static std::string determineIniFilesDir()
 {
+    using nx::kit::utils::kPathSeparator;
+    
     #if defined(ANDROID) || defined(__ANDROID__)
         // On Android, tmpnam() returns "/tmp", which does not exist.
         return "/sdcard/";
     #else
-        #if 0 // Using system temp dir has been abandoned.
-            char iniFileDir[L_tmpnam] = "";
-            if (std::tmpnam(iniFileDir))
-            {
-                // Extract dir name from the file path - truncate after the last path separator.
-                for (int i = (int) strlen(iniFileDir) - 1; i >= 0; --i)
-                {
-                    if (iniFileDir[i] == '/' || iniFileDir[i] == '\\')
-                    {
-                        iniFileDir[i + 1] = '\0';
-                        break;
-                    }
-                }
-            }
-            return std::string(iniFileDir);
+        #if defined(_WIN32)
+            static const char* const kIniDirEnvVar = "LOCALAPPDATA";
+            static const std::string extraDir = "";
+            static const std::string defaultDir = ""; //< Current directory.
         #else
-            #if defined(_WIN32)
-                static const char kPathSeparator = '\\';
-                static const char* const kIniDirEnvVar = "LOCALAPPDATA";
-                static const std::string extraDir = "";
-                static const std::string defaultDir = ""; //< Current directory.
-            #else
-                static const char kPathSeparator = '/';
-                static const char* const kIniDirEnvVar = "HOME";
-                static const std::string extraDir = std::string(".config") + kPathSeparator;
-                static const std::string defaultDir = "/etc/nx_ini/";
-            #endif
-
-            const std::string env_NX_INI_DIR = getEnv("NX_INI_DIR");
-            if (!env_NX_INI_DIR.empty())
-                return std::string(env_NX_INI_DIR) + kPathSeparator;
-
-            const std::string env = getEnv(kIniDirEnvVar);
-            if (!env.empty())
-                return std::string(env) + kPathSeparator + extraDir + "nx_ini" + kPathSeparator;
-
-            return defaultDir;
+            static const char* const kIniDirEnvVar = "HOME";
+            static const std::string extraDir = std::string(".config") + kPathSeparator;
+            static const std::string defaultDir = "/etc/nx_ini/";
         #endif
+
+        const std::string env_NX_INI_DIR = getEnv("NX_INI_DIR");
+        if (!env_NX_INI_DIR.empty())
+            return std::string(env_NX_INI_DIR) + kPathSeparator;
+
+        const std::string env = getEnv(kIniDirEnvVar);
+        if (!env.empty())
+            return std::string(env) + kPathSeparator + extraDir + "nx_ini" + kPathSeparator;
+
+        return defaultDir;
     #endif
 }
 
