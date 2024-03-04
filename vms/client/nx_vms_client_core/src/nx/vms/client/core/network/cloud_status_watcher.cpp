@@ -141,10 +141,12 @@ struct CloudStatusWatcher::Private: public QObject
     void updateStatusFromResultCode(ResultCode result);
     void setStatus(CloudStatusWatcher::Status newStatus, CloudStatusWatcher::ErrorCode error);
 
+    void ensureCloudConnection();
     void resetCloudConnection();
     void updateConnection(bool initial, bool forced = false);
     void issueAccessToken();
-    void onAccessTokenIssued(ResultCode result, IssueTokenResponse response);
+    void onAccessTokenIssued(ResultCode result, IssueTokenResponse response,
+        const GrantType& grantTupe = GrantType::password);
     void validateAccessToken();
     void scheduleConnectionRetryIfNeeded();
 
@@ -399,9 +401,9 @@ void CloudStatusWatcher::Private::updateStatusFromResultCode(ResultCode result)
             setStatus(CloudStatusWatcher::LoggedOut, CloudStatusWatcher::AccountNotActivated);
             break;
         case ResultCode::accountBlocked:
-            setStatus(
-                CloudStatusWatcher::LoggedOut,
-                CloudStatusWatcher::UserTemporaryLockedOut);
+            setStatus(CloudStatusWatcher::LoggedOut, CloudStatusWatcher::UserTemporaryLockedOut);
+            ensureCloudConnection();
+            issueAccessToken();
             break;
         default:
             setStatus(CloudStatusWatcher::Offline, CloudStatusWatcher::UnknownError);
@@ -500,11 +502,7 @@ void CloudStatusWatcher::Private::updateConnection(bool initial, bool forced)
         return;
     }
 
-    if (!cloudConnectionFactory)
-        cloudConnectionFactory = std::make_unique<CloudConnectionFactory>();
-
-    cloudConnection = cloudConnectionFactory->createConnection();
-
+    ensureCloudConnection();
     if (credentials.authToken.empty() || forced)
     {
         issueAccessToken();
@@ -517,8 +515,7 @@ void CloudStatusWatcher::Private::updateConnection(bool initial, bool forced)
 }
 
 void CloudStatusWatcher::Private::onAccessTokenIssued(
-    ResultCode result,
-    IssueTokenResponse response)
+    ResultCode result, IssueTokenResponse response, const GrantType& grantType)
 {
     NX_DEBUG(
         this,
@@ -531,8 +528,17 @@ void CloudStatusWatcher::Private::onAccessTokenIssued(
 
     if (result != ResultCode::ok)
     {
-        updateStatusFromResultCode(result);
-        scheduleConnectionRetryIfNeeded();
+        if (grantType == GrantType::refresh_token && result == ResultCode::notAuthorized)
+        {
+            m_authData = {};
+            setStatus(CloudStatusWatcher::LoggedOut, CloudStatusWatcher::InvalidPassword);
+            emit q->loggedOutWithError();
+        }
+        else
+        {
+            updateStatusFromResultCode(result);
+            scheduleConnectionRetryIfNeeded();
+        }
         return;
     }
 
@@ -566,12 +572,6 @@ void CloudStatusWatcher::Private::onAccessTokenIssued(
 
 void CloudStatusWatcher::Private::issueAccessToken()
 {
-    auto callback =
-        [this](ResultCode result, IssueTokenResponse response)
-        {
-            onAccessTokenIssued(result, std::move(response));
-        };
-
     if (!NX_ASSERT(cloudConnection))
         return;
 
@@ -591,6 +591,12 @@ void CloudStatusWatcher::Private::issueAccessToken()
     {
         NX_ASSERT(false, "No authorization data.");
     }
+
+    auto callback =
+        [this, grant = request.grant_type](ResultCode result, IssueTokenResponse response)
+        {
+            onAccessTokenIssued(result, std::move(response), grant);
+        };
 
     m_tokenUpdater->issueToken(request, std::move(callback), this);
 }
@@ -646,6 +652,18 @@ void CloudStatusWatcher::Private::scheduleConnectionRetryIfNeeded()
         });
 }
 
+void CloudStatusWatcher::Private::ensureCloudConnection()
+{
+    if (cloudConnection)
+        return;
+
+    if (!cloudConnectionFactory)
+        cloudConnectionFactory = std::make_unique<CloudConnectionFactory>();
+    cloudConnection = cloudConnectionFactory->createConnection();
+    NX_ASSERT(cloudConnection);
+}
+
+
 void CloudStatusWatcher::Private::setStatus(
     CloudStatusWatcher::Status newStatus, CloudStatusWatcher::ErrorCode newErrorCode)
 {
@@ -679,7 +697,7 @@ void CloudStatusWatcher::Private::setStatus(
     if (isNewErrorCode && (errorCode != CloudStatusWatcher::NoError))
         emit q->errorChanged(errorCode);
 
-    if (isJustLoggedOut && errorCode != NoError)
+    if (isJustLoggedOut && errorCode != NoError && errorCode != UserTemporaryLockedOut)
         emit q->loggedOutWithError();
 }
 
