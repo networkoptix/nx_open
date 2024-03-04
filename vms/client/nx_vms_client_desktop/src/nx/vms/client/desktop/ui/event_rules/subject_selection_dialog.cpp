@@ -216,9 +216,6 @@ SubjectSelectionDialog::SubjectSelectionDialog(QWidget* parent, Qt::WindowFlags 
                 && checkState == Qt::Checked;
             ui->groupsGroupBox->setEnabled(!checked);
             ui->usersGroupBox->setEnabled(!checked);
-            ui->searchLineEdit->setEnabled(!checked);
-            if (checked)
-                ui->searchLineEdit->clear();
             m_roles->setAllUsers(checked);
             m_users->setAllUsers(checked);
             emit changed();
