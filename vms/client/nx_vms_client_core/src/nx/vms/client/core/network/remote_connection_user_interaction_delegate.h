@@ -26,6 +26,11 @@ public:
     nx::network::SocketAddress address;
     nx::network::ssl::CertificateChain chain;
 };
+inline bool operator==(const TargetCertificateInfo& a, const TargetCertificateInfo& b)
+{
+    // Address is not important since we pin certificates depending on the Server Ids.
+    return a.target == b.target && a.chain == b.chain;
+}
 
 class NX_VMS_CLIENT_CORE_API AbstractRemoteConnectionUserInteractionDelegate: public QObject
 {
