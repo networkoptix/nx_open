@@ -4,11 +4,14 @@
 
 #include <nx/utils/log/log.h>
 
+#include "types.h"
+
 namespace nx::vms::client::desktop::jsapi {
 
 Logger::Logger(QObject* parent):
     base_type(parent)
 {
+    registerTypes();
 }
 
 void Logger::error(const QString& message) const

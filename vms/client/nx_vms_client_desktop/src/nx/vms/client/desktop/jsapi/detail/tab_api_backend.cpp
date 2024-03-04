@@ -106,9 +106,9 @@ struct TabApiBackend::Private: public QObject
     bool isSyncedLayout() const;
 
     template<typename Ids>
-    ItemVector itemStatesFromIds(const Ids& ids) const;
+    QList<Item> itemStatesFromIds(const Ids& ids) const;
 
-    ItemVector allItemStates() const;
+    QList<Item> allItemStates() const;
 
     ItemResult itemOperationResult(
         const Error& result,
@@ -529,9 +529,9 @@ bool TabApiBackend::Private::isSyncedLayout() const
 }
 
 template<typename Ids>
-ItemVector TabApiBackend::Private::itemStatesFromIds(const Ids& ids) const
+QList<Item> TabApiBackend::Private::itemStatesFromIds(const Ids& ids) const
 {
-    ItemVector result;
+    QList<Item> result;
     for (const auto& id: ids)
     {
         if (const auto item = layout->item(id))
@@ -540,10 +540,10 @@ ItemVector TabApiBackend::Private::itemStatesFromIds(const Ids& ids) const
     return result;
 }
 
-ItemVector TabApiBackend::Private::allItemStates() const
+QList<Item> TabApiBackend::Private::allItemStates() const
 {
     if (!layout)
-        return detail::ItemVector();
+        return QList<Item>();
 
     UuidList itemIds;
     for (const auto& item: layout->items())
@@ -653,7 +653,7 @@ State TabApiBackend::state() const
     if (!d->layout)
         return {};
 
-    detail::State result;
+    State result;
     result.items = d->allItemStates();
     result.sync = d->isSyncedLayout();
     result.selection = ItemSelection{

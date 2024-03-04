@@ -63,12 +63,12 @@ public:
     /**
      * Sets the current tab.
      */
-    Q_INVOKABLE QJsonObject setCurrent(Tab* tab);
+    Q_INVOKABLE Error setCurrent(Tab* tab);
 
     /**
      * Sets the current tab.
      */
-    Q_INVOKABLE QJsonObject setCurrent(const QString& id);
+    Q_INVOKABLE Error setCurrent(const QString& id);
 
     /**
      * Adds a tab.
@@ -80,17 +80,17 @@ public:
     /**
      * Removes the tab.
      */
-    Q_INVOKABLE QJsonObject remove(Tab* tab);
+    Q_INVOKABLE Error remove(Tab* tab);
 
     /**
      * Removes the tab.
      */
-    Q_INVOKABLE QJsonObject remove(const QString& id);
+    Q_INVOKABLE Error remove(const QString& id);
 
     /**
      * Opens a layout in a new tab.
      */
-    Q_INVOKABLE QJsonObject open(const QString& layoutResourceId);
+    Q_INVOKABLE Error open(const QString& layoutResourceId);
 
 signals:
     void tabsChanged();
@@ -99,7 +99,7 @@ signals:
     /**
      * Current Tab signal, for convenience.
      */
-    void currentTabItemAdded(const QJsonObject& item);
+    void currentTabItemAdded(const Item& item);
 
     /**
      * Current Tab signal, for convenience.
@@ -109,7 +109,7 @@ signals:
     /**
      * Current Tab signal, for convenience.
      */
-    void currentTabItemChanged(const QJsonObject& item);
+    void currentTabItemChanged(const Item& item);
 
     /** @} */ // group vms-tabs
 

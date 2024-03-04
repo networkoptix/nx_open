@@ -5,7 +5,8 @@
 #include <core/resource/resource.h>
 #include <nx/vms/client/desktop/system_context.h>
 
-namespace nx::vms::client::desktop::jsapi::detail {
+namespace nx::vms::client::desktop::jsapi {
+namespace detail {
 
 ResourceType resourceType(const QnResourcePtr& resource)
 {
@@ -33,8 +34,18 @@ ResourceType resourceType(const QnResourcePtr& resource)
     if (flags.testFlag(Qn::layout))
         return ResourceType::layout;
 
-    return detail::ResourceType::undefined;
+    return ResourceType::undefined;
 }
+
+bool hasMediaStream(const ResourceType type)
+{
+    return type == ResourceType::camera
+        || type == ResourceType::virtual_camera
+        || type == ResourceType::io_module
+        || type == ResourceType::local_video;
+}
+
+} // namespace detail
 
 ResourceUniqueId::ResourceUniqueId(const QString& str)
 {
@@ -85,14 +96,6 @@ bool fromString(const std::string& str, ResourceUniqueId* id)
     return true;
 }
 
-bool hasMediaStream(const ResourceType type)
-{
-    return type == detail::ResourceType::camera
-        || type == detail::ResourceType::virtual_camera
-        || type == detail::ResourceType::io_module
-        || type == detail::ResourceType::local_video;
-}
-
 Resource Resource::from(const QnResourcePtr& resource)
 {
     if (!resource)
@@ -102,13 +105,13 @@ Resource Resource::from(const QnResourcePtr& resource)
     result.id = ResourceUniqueId::from(resource);
     result.name = resource->getName();
     result.logicalId = resource->logicalId();
-    result.type = resourceType(resource);
+    result.type = detail::resourceType(resource);
     return result;
 }
 
-Resource::List Resource::from(const QnResourceList& resources)
+QList<Resource> Resource::from(const QnResourceList& resources)
 {
-    List result;
+    QList<Resource> result;
     for (const auto& resource: resources)
         result.append(Resource::from(resource));
     return result;

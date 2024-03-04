@@ -11,7 +11,6 @@
 #include <nx/vms/client/desktop/system_context.h>
 #include <ui/workbench/workbench_context.h>
 
-#include "helpers.h"
 #include "resources_structures.h"
 
 namespace nx::vms::client::desktop::jsapi::detail {
@@ -23,7 +22,7 @@ namespace nx::vms::client::desktop::jsapi::detail {
 bool isResourceAvailable(const QnResourcePtr& resource)
 {
     return resource
-        && detail::resourceType(resource) != detail::ResourceType::undefined
+        && detail::resourceType(resource) != ResourceType::undefined
         && ResourceAccessManager::hasPermissions(resource, Qn::ViewContentPermission);
 }
 
@@ -42,7 +41,7 @@ ResourcesApiBackend::ResourcesApiBackend(QObject* parent):
                 });
 
             for (const auto& resource: addedResources)
-                emit added(detail::Resource::from(resource));
+                emit added(Resource::from(resource));
         };
 
     const auto removeResources =
@@ -63,14 +62,14 @@ ResourcesApiBackend::~ResourcesApiBackend()
 {
 }
 
-Resource::List ResourcesApiBackend::resources() const
+QList<Resource> ResourcesApiBackend::resources() const
 {
     const auto resources = appContext()->unifiedResourcePool()->resources(
         [](const QnResourcePtr& resource)
         {
             return isResourceAvailable(resource);
         });
-    return detail::Resource::from(resources);
+    return Resource::from(resources);
 }
 
 ResourceResult ResourcesApiBackend::resource(const ResourceUniqueId& resourceId) const
@@ -83,9 +82,9 @@ ResourceResult ResourcesApiBackend::resource(const ResourceUniqueId& resourceId)
             : resourceId.localSystemId);
 
     if (isResourceAvailable(resource))
-        return detail::ResourceResult{Error::success(), detail::Resource::from(resource)};
+        return ResourceResult{Error::success(), Resource::from(resource)};
 
-    return detail::ResourceResult{
+    return ResourceResult{
         Error::failed(tr("Resource is not available for the usage with JS API")), {}};
 }
 

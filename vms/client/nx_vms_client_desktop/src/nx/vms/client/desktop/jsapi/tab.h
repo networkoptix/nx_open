@@ -2,12 +2,12 @@
 
 #pragma once
 
-#include <QtCore/QJsonObject>
 #include <QtCore/QObject>
 
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/uuid.h>
 
+#include "detail/tab_structures.h"
 #include "globals.h"
 
 class QnWorkbenchLayout;
@@ -20,11 +20,19 @@ namespace jsapi {
 
 namespace detail { class TabApiBackend; }
 
-/** Class proxies calls from a JS script to the tab management backend. */
+/**
+ * Contains methods and signals to work with the tab containing the current web page.
+ */
 class Tab: public QObject
 {
     Q_OBJECT
     using base_type = QObject;
+
+    /**
+     * @addtogroup vms-tab
+     * Contains methods and signals to work with the tab containing the current web page.
+     * @{
+     */
 
     /**
      * Name of the tab.
@@ -37,44 +45,60 @@ class Tab: public QObject
     Q_PROPERTY(QString id READ id CONSTANT)
 
 public:
+    /** @private */
     Tab(WindowContext* context, QnWorkbenchLayout* layout = nullptr, QObject* parent = nullptr);
+
+    /** @private */
     virtual ~Tab() override;
 
-    /** State of the tab, including all items and layout information. */
-    Q_INVOKABLE QJsonObject state() const;
+    /** @return Complete tab state. */
+    Q_INVOKABLE State state() const;
 
-    /** Description of the item which includes item parameters and corresponding resource. */
-    Q_INVOKABLE QJsonObject item(const QUuid& itemId) const;
+    /** @return Description of an item with the specified identifier. */
+    Q_INVOKABLE ItemResult item(const QUuid& itemId) const;
 
-    /** Add an item with the specified resource id and parameters to the owning layout. */
-    Q_INVOKABLE QJsonObject addItem(const QString& resourceId, const QJsonObject& params);
+    /**
+      * Adds an item from the Resource with the specified identifier and item parameters.
+      * @return Item description on success.
+     */
+    Q_INVOKABLE ItemResult addItem(const QString& resourceId, const ItemParams& params);
 
-    /** Set specified parameters for the item. */
-    Q_INVOKABLE QJsonObject setItemParams(const QUuid& itemId, const QJsonObject& params);
+    /** Sets parameters for the item with the specified identifier. */
+    Q_INVOKABLE Error setItemParams(const QUuid& itemId, const ItemParams& params);
 
-    /** Remove specified item by id. */
-    Q_INVOKABLE QJsonObject removeItem(const QUuid& itemId);
+    /** Removes the item with the specified identifier. */
+    Q_INVOKABLE Error removeItem(const QUuid& itemId);
 
-    /** Start layout synchronization with the specified item, if available. */
-    Q_INVOKABLE QJsonObject syncWith(const QUuid& itemId);
+    /**
+     * Makes all items synced with the specified item. All items on the tab will have the same
+     * timestamp / playing state and speed.
+     */
+    Q_INVOKABLE Error syncWith(const QUuid& itemId);
 
-    /** Stop syncing of the corresponding layout. */
-    Q_INVOKABLE QJsonObject stopSyncPlay();
+    /** Stops syncing of the corresponding Layout. */
+    Q_INVOKABLE Error stopSyncPlay();
 
-    /** Set parameters for the current layout of the tab. */
-    Q_INVOKABLE QJsonObject setLayoutProperties(const QJsonObject& properties);
+    /** Sets the specified properties for the corresponding Layout. */
+    Q_INVOKABLE Error setLayoutProperties(const LayoutProperties& properties);
 
-    /** Save layout. */
-    Q_INVOKABLE QJsonObject saveLayout();
+    /** Saves the Layout. */
+    Q_INVOKABLE Error saveLayout();
 
+    /** @private */
     QString id() const;
+
+    /** @private */
     QString name() const;
+
+    /** @private */
     QnWorkbenchLayout* layout() const;
 
 signals:
-    void itemAdded(const QJsonObject& item);
+    void itemAdded(const Item& item);
     void itemRemoved(const nx::Uuid& itemId);
-    void itemChanged(const QJsonObject& item);
+    void itemChanged(const Item& item);
+
+    /** @} */ // group vms-tab
 
 private:
     nx::utils::ImplPtr<detail::TabApiBackend> d;
