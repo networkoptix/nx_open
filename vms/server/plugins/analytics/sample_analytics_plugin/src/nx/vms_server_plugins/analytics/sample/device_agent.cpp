@@ -44,18 +44,21 @@ std::string DeviceAgent::manifestString() const
     // See the plugin manifest for the explanation of vendor_id and plugin_id.
     return /*suppress newline*/ 1 + (const char*) R"json(
 {
-    "eventTypes": [
-        {
-            "id": ")json" + kNewTrackEventType + R"json(",
-            "name": "New track started"
-        }
-    ],
-    "objectTypes": [
-        {
-            "id": ")json" + kHelloWorldObjectType + R"json(",
-            "name": "Hello, World!"
-        }
-    ]
+    "typeLibrary":
+    {
+        "eventTypes": [
+            {
+                "id": ")json" + kNewTrackEventType + R"json(",
+                "name": "New track started"
+            }
+        ],
+        "objectTypes": [
+            {
+                "id": ")json" + kHelloWorldObjectType + R"json(",
+                "name": "Hello, World!"
+            }
+        ]
+    }
 }
 )json";
 }
