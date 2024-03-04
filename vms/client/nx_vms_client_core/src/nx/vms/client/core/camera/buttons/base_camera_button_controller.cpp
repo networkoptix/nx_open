@@ -228,6 +228,7 @@ bool BaseCameraButtonController::removeButton(const nx::Uuid& buttonId)
     if (actionIsActive(buttonId))
         cancelAction(buttonId);
 
+    d->buttons.erase(it);
     emit buttonRemoved(buttonId);
     return true;
 }
