@@ -11,6 +11,8 @@ class TestCamDisplay: public AbstractVideoDisplay
 public:
     TestCamDisplay(const QString& name = {}, CameraID cameraID = {});
 
+    void setDualStreamingEnabled(bool value);
+
     virtual CameraID getCameraID() const override { return cameraID; }
 
     virtual bool isFullScreen() const override { return fullScreen; }
