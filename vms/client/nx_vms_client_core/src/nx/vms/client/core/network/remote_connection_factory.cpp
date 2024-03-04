@@ -378,8 +378,6 @@ struct RemoteConnectionFactory::Private
 
         context->moduleInformation = *currentServerIt;
 
-        bool certificateIsUserProvided = false;
-
         // Check that the handshake certificate matches one of the targets's.
         CertificateVerificationResult certificateVerificationResult =
             verifyHandshakeCertificateChain(context->handshakeCertificateChain,
@@ -391,10 +389,58 @@ struct RemoteConnectionFactory::Private
             return;
         }
 
-        // User interaction.
-        verifyTargetCertificate(context, certificateVerificationResult.isUserProvidedCertificate);
+        // Prepare the list of mismatched certificates.
+        CertificateVerifier::Status targetStatus = verifyTargetCertificate(context);
+        QList<TargetCertificateInfo> mismatchedCertificates = collectMismatchedCertificates(context);
+        bool targetIsMismatched =
+            mismatchedCertificates.contains(getTargetCertificateInfo(context));
+
+        // If the target server certificate has been successfully validated by OS, it should be
+        // removed from the list of certificates with errors.
+        if (targetStatus == CertificateVerifier::Status::ok && targetIsMismatched)
+            mismatchedCertificates.removeAll(getTargetCertificateInfo(context));
+
+        // If the target certificate is expired, it should be added to the list of certificates
+        // with errors, even if it matches the pinned one. Note: the current implementation of
+        // CertificateVerifier reports expired certificates as "mismatch", but perhaps it should
+        // be refactored.
+        if (targetStatus == CertificateVerifier::Status::mismatch && !targetIsMismatched)
+            mismatchedCertificates.prepend(getTargetCertificateInfo(context));
+
+        bool accepted = true;
+
+        if (!mismatchedCertificates.isEmpty())
+        {
+            // There are some certificates with errors in the target System.
+            auto accept =
+                [&mismatchedCertificates]
+                    (AbstractRemoteConnectionUserInteractionDelegate* delegate)
+                {
+                    return delegate->acceptCertificatesOfServersInTargetSystem(mismatchedCertificates);
+                };
+
+            accepted = context->logonData.userInteractionAllowed
+                && executeInUiThreadSync(context, accept);
+        }
+        else if (targetStatus == CertificateVerifier::Status::notFound)
+        {
+            // There are no errors, but the target Server is unknown.
+            auto accept =
+                [this, context]
+                    (AbstractRemoteConnectionUserInteractionDelegate* delegate)
+                {
+                    return delegate->acceptNewCertificate(getTargetCertificateInfo(context));
+                };
+
+            accepted = context->logonData.userInteractionAllowed
+                && executeInUiThreadSync(context, accept);
+        }
+
+        if (!accepted)
+            context->setError(RemoteConnectionErrorCode::certificateRejected);
+
         if (!context->failed())
-            processCertificates(context);
+            storeCertificates(context);
     }
 
     bool checkCompatibility(ContextPtr context)
@@ -415,18 +461,27 @@ struct RemoteConnectionFactory::Private
         return context && !context->failed();
     }
 
-    void verifyTargetCertificate(ContextPtr context, bool certificateIsUserProvided)
+    TargetCertificateInfo getTargetCertificateInfo(ContextPtr context)
     {
-        if (!context || !nx::network::ini().verifyVmsSslCertificates)
-            return;
+        return TargetCertificateInfo{
+            context->moduleInformation,
+            context->address(),
+            context->handshakeCertificateChain};
+    }
 
-        NX_DEBUG(this, "Verify certificate");
+    CertificateVerifier::Status verifyTargetCertificate(ContextPtr context)
+    {
+        if (!nx::network::ini().verifyVmsSslCertificates)
+            return CertificateVerifier::Status::ok;
+
+        NX_DEBUG(this, "Verify target certificate");
         // Make sure factory is setup correctly.
-        if (!NX_ASSERT(certificateVerifier)
+        if (!NX_ASSERT(context)
+            || !NX_ASSERT(certificateVerifier)
             || !NX_ASSERT(userInteractionDelegate))
         {
             context->setError(RemoteConnectionErrorCode::internalError);
-            return;
+            return CertificateVerifier::Status::mismatch; //< Worst option.
         }
 
         const CertificateVerifier::Status status = certificateVerifier->verifyCertificate(
@@ -434,7 +489,31 @@ struct RemoteConnectionFactory::Private
             context->handshakeCertificateChain);
 
         if (status == CertificateVerifier::Status::ok)
-            return;
+            return status;
+
+        const auto serverName = context->address().address.toString();
+        NX_DEBUG(
+            this,
+            "New certificate has been received from %1. "
+            "Trying to verify it by system CA certificates.",
+            serverName);
+
+        std::string errorMessage;
+        if (NX_ASSERT(!context->handshakeCertificateChain.empty())
+            && nx::network::ssl::verifyBySystemCertificates(
+                context->handshakeCertificateChain, serverName, &errorMessage))
+        {
+            NX_DEBUG(this, "Certificate verification for %1 is successful.", serverName);
+            return CertificateVerifier::Status::ok;
+        }
+
+        NX_DEBUG(this, errorMessage);
+        return status;
+    }
+
+    void verifyAndAcceptTargetCertificate(ContextPtr context, bool certificateIsUserProvided)
+    {
+        auto status = verifyTargetCertificate(context);
 
         auto pinTargetServerCertificate =
             [this, context, certificateIsUserProvided]
@@ -454,34 +533,12 @@ struct RemoteConnectionFactory::Private
                         : CertificateVerifier::CertificateType::autogenerated);
             };
 
-        const auto serverName = context->address().address.toString();
-        NX_DEBUG(
-            this,
-            "New certificate has been received from %1. "
-            "Trying to verify it by system CA certificates.",
-            serverName);
-
-        std::string errorMessage;
-        if (NX_ASSERT(!context->handshakeCertificateChain.empty())
-            && nx::network::ssl::verifyBySystemCertificates(
-                context->handshakeCertificateChain, serverName, &errorMessage))
-        {
-            NX_DEBUG(this, "Certificate verification for %1 is successful.", serverName);
-            pinTargetServerCertificate();
-            return;
-        }
-
-        NX_DEBUG(this, errorMessage);
-
         auto accept =
-            [status, context](AbstractRemoteConnectionUserInteractionDelegate* delegate)
+            [this, status, context](AbstractRemoteConnectionUserInteractionDelegate* delegate)
             {
                 if (status == CertificateVerifier::Status::notFound)
                 {
-                    return delegate->acceptNewCertificate(TargetCertificateInfo{
-                        context->moduleInformation,
-                        context->address(),
-                        context->handshakeCertificateChain});
+                    return delegate->acceptNewCertificate(getTargetCertificateInfo(context));
                 }
                 else if (status == CertificateVerifier::Status::mismatch)
                 {
@@ -861,8 +918,6 @@ struct RemoteConnectionFactory::Private
         if (!nx::network::ini().verifyVmsSslCertificates)
             return {.success = true};
 
-        std::optional<RemoteConnectionErrorCode> error;
-
         if (handshakeCertificateChain.empty())
             return {.success = false};
 
@@ -912,14 +967,14 @@ struct RemoteConnectionFactory::Private
         return {.success = false};
     }
 
-    void processCertificates(ContextPtr context)
+    QList<TargetCertificateInfo> collectMismatchedCertificates(ContextPtr context)
     {
         using CertificateType = CertificateVerifier::CertificateType;
 
         if (!NX_ASSERT(context))
-            return;
+            return {};
 
-        NX_VERBOSE(this, "Process received certificates list.");
+        NX_VERBOSE(this, "Collect mismatched certificates list.");
 
         QList<TargetCertificateInfo> certificates;
 
@@ -938,7 +993,7 @@ struct RemoteConnectionFactory::Private
                     const auto chain = nx::network::ssl::Certificate::parse(pem);
 
                     if (chain.empty())
-                        return; //< The pem value is inavlid.
+                        return; //< The pem value is invalid.
 
                     const auto currentKey = chain[0].publicKey();
                     const auto pinnedKey = certificateVerifier->pinnedCertificate(serverId, type);
@@ -960,23 +1015,17 @@ struct RemoteConnectionFactory::Private
             processCertificate(server.userProvidedCertificatePem, CertificateType::connection);
         }
 
-        // Ask for User confirmation.
-        auto accept =
-            [certificates]
-                (AbstractRemoteConnectionUserInteractionDelegate* delegate)
-            {
-                return delegate->acceptCertificatesOfServersInTargetSystem(certificates);
-            };
+        return certificates;
+    }
 
-        const auto accepted = certificates.isEmpty()
-            || (context->logonData.userInteractionAllowed
-                && executeInUiThreadSync(context, accept));
+    void storeCertificates(ContextPtr context)
+    {
+        using CertificateType = CertificateVerifier::CertificateType;
 
-        if (!accepted)
-        {
-            context->setError(RemoteConnectionErrorCode::certificateRejected);
+        if (!NX_ASSERT(context))
             return;
-        }
+
+        NX_VERBOSE(this, "Storing certificate list.");
 
         // Store the certificates and fill up the cache.
         for (const auto& server: context->serversInfo)
@@ -1083,7 +1132,7 @@ struct RemoteConnectionFactory::Private
         else if (context()) //< 4.2 and older servers.
         {
             // User interaction.
-            verifyTargetCertificate(context(), /*certificateIsUserProvided*/ false);
+            verifyAndAcceptTargetCertificate(context(), /*certificateIsUserProvided*/ false);
             fixupCertificateCache(context());
         }
 
