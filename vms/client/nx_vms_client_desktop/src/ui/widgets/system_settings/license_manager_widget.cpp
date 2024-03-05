@@ -691,8 +691,7 @@ void LicenseManagerWidget::handleWidgetStateChange()
                 if (!std::holds_alternative<rest::Empty>(result))
                 {
                     auto res = std::get<nx::network::rest::Result>(result);
-                    if (res.error == nx::network::rest::Result::ServiceUnavailable
-                        || res.error == nx::network::rest::Result::CantProcessRequest)
+                    if (res.error == nx::network::rest::Result::ServiceUnavailable)
                     {
                         NX_VERBOSE(this, "Network error occured activating license key.");
                         handleDownloadError();
