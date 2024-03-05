@@ -28,7 +28,9 @@ function(nx_go_add_test target)
 
     nx_go_list_test_packages(${CMAKE_CURRENT_SOURCE_DIR} package_paths)
 
-    go_fetch_module_dependencies(TEST)
+    if(prefetchGoDependencies)
+        go_fetch_module_dependencies(TEST)
+    endif()
 
     foreach(path ${package_paths})
         if ("${path}" IN_LIST GO_TEST_EXCLUDE_FOLDERS)

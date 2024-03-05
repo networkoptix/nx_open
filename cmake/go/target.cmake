@@ -35,7 +35,9 @@ function(nx_go_add_target target)
     file(GLOB_RECURSE GO_SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR} *.go)
     set(GO_TARGET_DEPENDS ${GO_TARGET_DEPENDS} ${GO_SRC_FILES})
 
-    go_fetch_module_dependencies()
+    if(prefetchGoDependencies)
+        go_fetch_module_dependencies()
+    endif()
 
     list_subdirectories(${CMAKE_CURRENT_SOURCE_DIR}/cmd executables)
     list(REMOVE_ITEM executables internal)
