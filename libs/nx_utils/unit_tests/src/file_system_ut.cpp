@@ -22,7 +22,7 @@ class CopyTest: public ::testing::Test
 protected:
     virtual void SetUp() override
     {
-        QDir tempDir(nx::utils::TestOptions::temporaryDirectoryPath());
+        QDir tempDir(nx::TestOptions::temporaryDirectoryPath());
         QDir rootDir(tempDir.absoluteFilePath(kTestDirectoryName));
 
         rootDir.removeRecursively();
@@ -36,7 +36,7 @@ protected:
 
     virtual void TearDown() override
     {
-        QDir tempDir(nx::utils::TestOptions::temporaryDirectoryPath());
+        QDir tempDir(nx::TestOptions::temporaryDirectoryPath());
         QDir rootDir(tempDir.absoluteFilePath(kTestDirectoryName));
         ASSERT_TRUE(rootDir.removeRecursively());
     }

@@ -20,7 +20,7 @@ public:
     virtual bool isShowHelpRequested() const override;
     virtual void printCmdLineArgsHelp() override;
     virtual QString dataDir() const override;
-    virtual utils::log::Settings logging() const override;
+    virtual log::Settings logging() const override;
 
 protected:
     virtual void loadSettings() = 0;
@@ -30,7 +30,7 @@ protected:
 private:
     QnSettings m_settings;
     bool m_showHelp = false;
-    utils::log::Settings m_logging;
+    log::Settings m_logging;
     QString m_moduleName;
 };
 

@@ -10,9 +10,7 @@
 #include "format.h"
 #include "log_main.h"
 
-namespace nx {
-namespace utils {
-namespace log {
+namespace nx::log {
 
 Level levelFromString(const QString& levelString)
 {
@@ -238,7 +236,7 @@ const QChar kCloseBracket(']');
 
 QString LevelSettings::toString() const
 {
-    std::map<nx::utils::log::Level, QStringList> filersByLevel;
+    std::map<nx::log::Level, QStringList> filersByLevel;
     for (const auto& tag: filters)
         filersByLevel[tag.second] << tag.first.toString();
 
@@ -350,6 +348,4 @@ bool LevelSettings::parse(const QString& s)
     return !hasErrors;
 }
 
-} // namespace log
-} // namespace utils
-} // namespace nx
+} // namespace nx::log

@@ -146,7 +146,7 @@ bool verifyUpdateContents(
     const ClientVerificationData& clientData,
     const VerificationOptions& options)
 {
-    nx::utils::log::Tag logTag(nx::format("verifyUpdateContents(%1)", contents.info.version));
+    nx::log::Tag logTag(nx::format("verifyUpdateContents(%1)", contents.info.version));
 
     if (contents.error != nx::vms::common::update::InformationError::noError)
     {

@@ -15,7 +15,7 @@
 namespace {
 
 struct ProtocolHandlerFunctionsTag{};
-static const nx::utils::log::Tag kLogTag(typeid(ProtocolHandlerFunctionsTag));
+static const nx::log::Tag kLogTag(typeid(ProtocolHandlerFunctionsTag));
 
 const auto kAssociationsSection = QByteArray("Added Associations");
 
@@ -170,7 +170,7 @@ RegisterSystemUriProtocolHandlerResult registerSystemUriProtocolHandler(
 {
     RegisterSystemUriProtocolHandlerResult result;
 
-    static const nx::utils::log::Tag kTag(QLatin1String("registerSystemUriProtocolHandler"));
+    static const nx::log::Tag kTag(QLatin1String("registerSystemUriProtocolHandler"));
 
     const auto appsLocation = QStandardPaths::writableLocation(QStandardPaths::ApplicationsLocation);
     if (appsLocation.isEmpty())

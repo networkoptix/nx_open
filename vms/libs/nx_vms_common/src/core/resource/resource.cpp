@@ -24,7 +24,7 @@ namespace {
 
 QString hidePasswordIfCredentialsPropety(const QString& key, const QString& value)
 {
-    if (nx::utils::log::showPasswords())
+    if (nx::log::showPasswords())
         return value;
 
     if (key == ResourcePropertyKey::kCredentials

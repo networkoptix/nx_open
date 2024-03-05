@@ -16,14 +16,14 @@ public:
     Settings();
 
     virtual QString dataDir() const override;
-    virtual utils::log::Settings logging() const override;
+    virtual log::Settings logging() const override;
     const nx::network::http::server::Settings& getHttpSettings() const { return m_httpSettings; };
 
     Settings(const Settings&) = delete;
     Settings& operator=(const Settings&) = delete;
 
 private:
-    utils::log::Settings m_logging;
+    log::Settings m_logging;
     nx::network::http::server::Settings m_httpSettings;
 
 private:

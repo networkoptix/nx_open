@@ -60,7 +60,7 @@ static bool convertImageFormat(
     uint8_t* const targetSlice[],
     const int targetStride[],
     AVPixelFormat targetFormat,
-    const nx::utils::log::Tag& logTag)
+    const nx::log::Tag& logTag)
 {
     if (const auto context = sws_getContext(
         width, height, sourceFormat,

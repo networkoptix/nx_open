@@ -5,7 +5,6 @@
 #include <nx/utils/thread/mutex.h>
 
 namespace nx {
-namespace utils {
 
 template <typename Value>
 class ValueLocker
@@ -48,7 +47,7 @@ public:
     const Value& operator*() const { return *m_value; }
 
 private:
-    nx::Mutex* m_mutex;
+    Mutex* m_mutex;
     Value* m_value;
 };
 
@@ -75,10 +74,8 @@ public:
     };
 
 private:
-    mutable nx::Mutex m_mutex;
+    mutable Mutex m_mutex;
     mutable Value m_value;
 };
 
-
-} // namespace utils
 } // namespace nx

@@ -7,7 +7,7 @@
 #include <nx/utils/test_support/test_options.h>
 
 using namespace nx::core::layout;
-using nx::utils::TestOptions;
+using nx::TestOptions;
 
 static const char* dummyName = "DeleteMe.exe";
 

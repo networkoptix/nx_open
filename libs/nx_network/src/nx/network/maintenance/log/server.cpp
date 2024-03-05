@@ -17,7 +17,7 @@
 
 namespace nx::network::maintenance::log {
 
-using namespace nx::utils::log;
+using namespace nx::log;
 using namespace nx::network::http;
 
 namespace {
@@ -260,8 +260,8 @@ Loggers Server::mergeLoggers() const
 
 std::vector<Logger> Server::splitAggregateLogger(
     int id,
-    nx::utils::log::AbstractLogger* logger,
-    const std::set<nx::utils::log::Filter>& effectiveFilters) const
+    nx::log::AbstractLogger* logger,
+    const std::set<nx::log::Filter>& effectiveFilters) const
 {
     auto aggregateLogger = dynamic_cast<AggregateLogger*>(logger);
     if (!aggregateLogger)

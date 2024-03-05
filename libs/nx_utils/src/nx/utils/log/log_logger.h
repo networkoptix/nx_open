@@ -10,9 +10,7 @@
 #include "abstract_logger.h"
 #include "log_settings.h"
 
-namespace nx {
-namespace utils {
-namespace log {
+namespace nx::log {
 
 class NX_UTILS_API Logger:
     public AbstractLogger
@@ -86,6 +84,4 @@ private:
     LevelFilters m_levelFilters;
 };
 
-} // namespace log
-} // namespace utils
-} // namespace nx
+} // namespace nx::log

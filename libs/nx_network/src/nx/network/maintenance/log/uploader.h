@@ -53,7 +53,7 @@ public:
     Uploader(
         const nx::utils::Url& logCollectorUrl,
         const std::string& sessionId,
-        const nx::utils::log::LevelSettings& logFilter);
+        const nx::log::LevelSettings& logFilter);
 
     ~Uploader();
 
@@ -125,13 +125,13 @@ private:
     };
 
     const nx::utils::Url m_uploadLogFragmentUrl;
-    const nx::utils::log::LevelSettings m_logFilter;
+    const nx::log::LevelSettings m_logFilter;
     UploadResult m_progress;
     Handler m_handler;
     aio::Timer m_timer;
     aio::RepetitiveTimer m_checkBufferTimer;
-    nx::utils::log::LoggerCollection* m_loggerCollection = nullptr;
-    int m_loggerId = nx::utils::log::LoggerCollection::kInvalidId;
+    nx::log::LoggerCollection* m_loggerCollection = nullptr;
+    int m_loggerId = nx::log::LoggerCollection::kInvalidId;
     std::shared_ptr<BufferedLogWriter> m_logWriter;
     std::chrono::steady_clock::time_point m_startTime;
     std::size_t m_logBufferSize = kDefaultBufferSize;
@@ -155,7 +155,7 @@ class NX_NETWORK_API UploaderManager
 public:
     UploaderManager(
         const nx::utils::Url& logCollectorApiBaseUrl,
-        const nx::utils::log::LevelSettings& logFilter);
+        const nx::log::LevelSettings& logFilter);
 
     ~UploaderManager();
 
@@ -188,7 +188,7 @@ private:
 
 private:
     const nx::utils::Url m_logCollectorApiBaseUrl;
-    const nx::utils::log::LevelSettings m_logFilter;
+    const nx::log::LevelSettings m_logFilter;
     std::string m_sessionId;
     std::unique_ptr<Uploader> m_uploader;
     nx::network::aio::BasicPollable m_aioBinder;

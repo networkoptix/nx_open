@@ -118,7 +118,7 @@ TEST(Url, toWebClientStandardViolatingUrl)
 TEST(Url, logging)
 {
     Url url;
-    if (!nx::utils::log::showPasswords())
+    if (!nx::log::showPasswords())
     {
         url.setScheme("http");
         url.setHost("example.com");

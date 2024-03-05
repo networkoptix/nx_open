@@ -13,9 +13,9 @@ NX_REFLECTION_ENUM_CLASS(LogName,
     system
 );
 
-extern const NX_UTILS_API nx::utils::log::Tag kMainTag;
-extern const NX_UTILS_API nx::utils::log::Tag kHttpTag;
-extern const NX_UTILS_API nx::utils::log::Tag kSystemTag;
+extern const NX_UTILS_API nx::log::Tag kMainTag;
+extern const NX_UTILS_API nx::log::Tag kHttpTag;
+extern const NX_UTILS_API nx::log::Tag kSystemTag;
 
 constexpr size_t kLogNamesCount =
     nx::reflect::enumeration::visitAllItems<LogName>(
@@ -25,6 +25,6 @@ constexpr size_t kLogNamesCount =
         });
 
 NX_UTILS_API std::array<QString, kLogNamesCount> getCompatLoggerNames();
-NX_UTILS_API std::shared_ptr<nx::utils::log::AbstractLogger> getLogger(const LogName id);
+NX_UTILS_API std::shared_ptr<nx::log::AbstractLogger> getLogger(const LogName id);
 
 } // namespace nx::log

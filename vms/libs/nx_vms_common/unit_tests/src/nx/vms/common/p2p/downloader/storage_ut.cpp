@@ -49,9 +49,9 @@ protected:
 
     QString testDir(const QString& suffix = "/storage_ut") const
     {
-        return (nx::utils::TestOptions::temporaryDirectoryPath().isEmpty()
+        return (nx::TestOptions::temporaryDirectoryPath().isEmpty()
             ? QDir::homePath()
-            : nx::utils::TestOptions::temporaryDirectoryPath()) + suffix;
+            : nx::TestOptions::temporaryDirectoryPath()) + suffix;
     }
 
     void createTestFile(const QString& fileName, qint64 size)
@@ -777,7 +777,7 @@ TEST_F(DistributedFileDownloaderStorageTest, foundFileFullPath)
 TEST_F(DistributedFileDownloaderStorageTest, customDirectoryFullPath)
 {
     FileInformation fileInfo(testFileName);
-    fileInfo.absoluteDirectoryPath = nx::utils::TestOptions::temporaryDirectoryPath();
+    fileInfo.absoluteDirectoryPath = nx::TestOptions::temporaryDirectoryPath();
     fileInfo.status = FileInformation::Status::downloaded;
 
     const QString testFilePath =
@@ -793,7 +793,7 @@ TEST_F(DistributedFileDownloaderStorageTest, customDirectoryFullPath)
 TEST_F(DistributedFileDownloaderStorageTest, customDirectoryfoundFileFullPath)
 {
     FileInformation fileInfo(testFileName);
-    fileInfo.absoluteDirectoryPath = nx::utils::TestOptions::temporaryDirectoryPath();
+    fileInfo.absoluteDirectoryPath = nx::TestOptions::temporaryDirectoryPath();
     fileInfo.status = FileInformation::Status::downloaded;
 
     const QString testFilePath =

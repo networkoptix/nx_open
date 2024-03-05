@@ -28,11 +28,11 @@ const nx::Buffer kTestMessage("Ping");
 const std::chrono::milliseconds kTestTimeout(5000);
 
 struct FunctionsTag{};
-const utils::log::Tag kLogTag(typeid(FunctionsTag));
+const log::Tag kLogTag(typeid(FunctionsTag));
 
 inline size_t testClientCount()
 {
-     return nx::utils::TestOptions::applyLoadMode<size_t>(10);
+     return nx::TestOptions::applyLoadMode<size_t>(10);
 }
 
 static const bool kEnableTestDebugOutput = false;
@@ -387,7 +387,7 @@ void socketTransferFragmentation(
     // On localhost TCP connection small packets usually transferred entirely,
     // so that we expect the same behavior for all our stream sockets.
     static const Buffer kMessage(utils::random::generate(100));
-    static const size_t kTestRuns = utils::TestOptions::applyLoadMode<size_t>(5);
+    static const size_t kTestRuns = TestOptions::applyLoadMode<size_t>(5);
 
     auto server = serverMaker();
     ASSERT_TRUE(server->setReuseAddrFlag(true));

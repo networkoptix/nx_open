@@ -197,7 +197,7 @@ private:
     struct Server
     {
         // Server should be stopped before destroing the data.
-        nx::utils::Lockable<nx::vms::api::ModuleInformation> info;
+        nx::Lockable<nx::vms::api::ModuleInformation> info;
         nx::network::http::TestHttpServer http;
 
         Server(nx::Uuid id, nx::Uuid localSystemId, QString cloudSystemId)

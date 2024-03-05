@@ -13,7 +13,7 @@
 
 #include "log.h"
 
-namespace nx::utils {
+namespace nx {
 
 namespace {
 
@@ -61,9 +61,9 @@ bool assertFailure(bool isCritical, const QString& message)
     static const log::Tag kCrashTag(QLatin1String("CRASH"));
     static const log::Tag kAssertTag(QLatin1String("ASSERT"));
 
-    const bool isCrashRequired = isCritical || ini().assertCrash;
+    const bool isCrashRequired = isCritical || utils::ini().assertCrash;
     const auto& kTag = isCrashRequired ? kCrashTag : kAssertTag;
-    const auto output = g_printStackTraceOnAssert || ini().printStackTraceOnAssert
+    const auto output = g_printStackTraceOnAssert || utils::ini().printStackTraceOnAssert
         ? NX_FMT("%1\n\n%2", message, stackTrace()).toQString()
         : message;
     NX_ERROR(kTag, output);
@@ -220,4 +220,4 @@ AssertTimer::~AssertTimer()
     AssertTimer AssertTimer::instance;
 #endif
 
-} // namespace nx::utils
+} // namespace nx

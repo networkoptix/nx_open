@@ -7,9 +7,7 @@
 
 #include <nx/utils/log/to_string.h>
 
-namespace nx {
-namespace utils {
-namespace log {
+namespace nx::log {
 
 NX_REFLECTION_ENUM_CLASS(Level,
     undefined,
@@ -149,6 +147,4 @@ struct NX_UTILS_API LevelSettings
     }
 };
 
-} // namespace log
-} // namespace utils
-} // namespace nx
+} // namespace nx::log

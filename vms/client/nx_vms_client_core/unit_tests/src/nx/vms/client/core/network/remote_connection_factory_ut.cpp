@@ -127,7 +127,7 @@ public:
         constexpr auto kDefaultCertificateValidationLevel =
             network::server_certificate::ValidationLevel::recommended;
         const QString rootCertificatesPath =
-            nx::utils::TestOptions::temporaryDirectoryPath(/*canCreate*/ true) + "/certificates";
+            nx::TestOptions::temporaryDirectoryPath(/*canCreate*/ true) + "/certificates";
 
         connectionCertificatesStorage = std::make_unique<CertificateStorage>(
             rootCertificatesPath + "/connection", kDefaultCertificateValidationLevel);

@@ -6,7 +6,7 @@
 
 namespace nx::vms::api {
 
-void LogSettings::addPredefinedFilters(std::set<nx::utils::log::Filter> filters)
+void LogSettings::addPredefinedFilters(std::set<nx::log::Filter> filters)
 {
     if (filters.empty())
         return;
@@ -15,7 +15,7 @@ void LogSettings::addPredefinedFilters(std::set<nx::utils::log::Filter> filters)
         predefinedFilters.emplace_back(filter.toString());
 }
 
-void LogSettings::addCustomFilters(nx::utils::log::LevelFilters filters)
+void LogSettings::addCustomFilters(nx::log::LevelFilters filters)
 {
     if (filters.empty())
         return;
