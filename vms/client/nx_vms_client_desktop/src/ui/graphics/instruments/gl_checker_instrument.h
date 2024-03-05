@@ -15,7 +15,7 @@ public:
     virtual ~QnGLCheckerInstrument() override;
 
     // TODO: Move to separate class.
-    static void checkGLHardware();
+    static bool checkGLHardware();
 
 protected:
     virtual bool registeredNotify(QWidget *viewport) override;

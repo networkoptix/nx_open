@@ -82,7 +82,7 @@ QnGLCheckerInstrument::~QnGLCheckerInstrument()
 {
 }
 
-void QnGLCheckerInstrument::checkGLHardware()
+bool QnGLCheckerInstrument::checkGLHardware()
 {
     const auto info = QnGlFunctions::openGLInfo();
 
@@ -104,12 +104,14 @@ void QnGLCheckerInstrument::checkGLHardware()
 
     // Note that message will be shown in destructor, close to the event loop.
     if (contextIsValid)
-        return;
+        return true;
 
     QnMessageBox::warning(nullptr,
         tr("Video card drivers are outdated or not installed"),
         tr("%1 may not work properly.")
             .arg(nx::branding::desktopClientDisplayName()));
+
+    return false;
 }
 
 bool QnGLCheckerInstrument::registeredNotify(QWidget *viewport)
