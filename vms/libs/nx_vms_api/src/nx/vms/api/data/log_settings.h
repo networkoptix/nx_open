@@ -24,7 +24,7 @@ struct NX_VMS_API LevelFilter
     QString filter;
 
     /**%apidoc[opt] The highest level of matched messages to allow into the log. */
-    nx::utils::log::Level level = nx::utils::log::kDefaultLevel;
+    nx::log::Level level = nx::log::kDefaultLevel;
 };
 #define LevelFilter_Fields (filter)(level)
 QN_FUSION_DECLARE_FUNCTIONS(LevelFilter, (json), NX_VMS_API)
@@ -41,13 +41,13 @@ struct NX_VMS_API LogSettings
     /**%apidoc[opt] The highest level of messages (that don't match any customFilters) to allow
      * into the log.
      */
-    nx::utils::log::Level primaryLevel = nx::utils::log::kDefaultLevel;
+    nx::log::Level primaryLevel = nx::log::kDefaultLevel;
 
     /**%apidoc Modifiable filters and levels for the log. */
     std::vector<LevelFilter> customFilters;
 
-    void addPredefinedFilters(std::set<nx::utils::log::Filter> filters);
-    void addCustomFilters(nx::utils::log::LevelFilters filters);
+    void addPredefinedFilters(std::set<nx::log::Filter> filters);
+    void addCustomFilters(nx::log::LevelFilters filters);
 };
 #define LogSettings_Fields (fileName)(predefinedFilters)(primaryLevel)(customFilters)
 QN_FUSION_DECLARE_FUNCTIONS(LogSettings, (json), NX_VMS_API)
@@ -62,16 +62,16 @@ struct NX_VMS_API ServerLogSettings
     QString directory;
 
     /**%apidoc[opt]:integer Maximum size (in bytes) of all log files on the filesystem. */
-    double maxVolumeSizeB = nx::utils::log::kDefaultMaxLogVolumeSizeB;
+    double maxVolumeSizeB = nx::log::kDefaultMaxLogVolumeSizeB;
 
     /**%apidoc[opt]:integer Maximum size (in bytes) of a single log file. */
-    double maxFileSizeB = nx::utils::log::kDefaultMaxLogFileSizeB;
+    double maxFileSizeB = nx::log::kDefaultMaxLogFileSizeB;
 
     /**%apidoc[opt] Maximum time duration of a single log file. */
-    std::chrono::seconds maxFileTimePeriodS = nx::utils::log::kDefaultMaxLogFileTimePeriodS;
+    std::chrono::seconds maxFileTimePeriodS = nx::log::kDefaultMaxLogFileTimePeriodS;
 
     /**%apidoc[opt] Disable/enable zipping of log files on the filesystem. */
-    bool archivingEnabled = nx::utils::log::kDefaultLogArchivingEnabled;
+    bool archivingEnabled = nx::log::kDefaultLogArchivingEnabled;
 
     /**%apidoc[opt] MAIN log settings. */
     LogSettings mainLog;

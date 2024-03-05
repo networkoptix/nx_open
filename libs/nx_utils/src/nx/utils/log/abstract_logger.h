@@ -10,9 +10,7 @@
 
 #include "log_writers.h"
 
-namespace nx {
-namespace utils {
-namespace log {
+namespace nx::log {
 
 class LoggerSettings;
 
@@ -56,6 +54,4 @@ public:
     virtual void writeLogHeader() = 0;
 };
 
-} // namespace log
-} // namespace utils
-} // namespace nx
+} // namespace nx::log

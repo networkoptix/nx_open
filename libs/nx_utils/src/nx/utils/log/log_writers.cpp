@@ -20,9 +20,7 @@
 
 static constexpr int kBufferSize = 64 * 1024;
 
-namespace nx {
-namespace utils {
-namespace log {
+namespace nx::log {
 
 cf::future<cf::unit> AbstractWriter::stopArchivingAsync()
 {
@@ -533,6 +531,4 @@ void NullDevice::write(Level /*level*/, const QString& /*message*/)
 {
 }
 
-} // namespace log
-} // namespace utils
-} // namespace nx
+} // namespace nx::log

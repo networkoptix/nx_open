@@ -13,10 +13,7 @@
 #include <quazip/quazip.h>
 #include <quazip/quazipfile.h>
 
-namespace nx {
-namespace utils {
-namespace log {
-namespace test {
+namespace nx::log::test {
 
 #if defined(Q_OS_WIN)
     const QByteArray kLineSplit("\r\n");
@@ -251,7 +248,4 @@ TEST_F(LogFile, RotationZipNoZip)
     checkFile({"ddddddddd", "111"});
 }
 
-} // namespace test
-} // namespace log
-} // namespace utils
-} // namespace nx
+} // namespace nx::log::test

@@ -21,7 +21,7 @@ NX_<LEVEL>(<TAG>, <FORMAT>[, <ARGS> ... ]);
 ```
 Where:
 - **LEVEL** - One of log levels: ERROR, WARNING, INFO, DEBUG, VERBOSE.
-- **TAG** - `nx::utils::log::Tag` object. See [Tags](#tags) for details.
+- **TAG** - `nx::log::Tag` object. See [Tags](#tags) for details.
 - **FORMAT** - String text message, which can contain placeholders: %1..%9.
 - **ARGS** - List of any convertible to string objects. See [To string](#tostring) for details.
 Arguments will be substituted to the format string inplace of the placeholders.
@@ -35,7 +35,7 @@ NX_<LEVEL>(<TAG>) << <MESSAGE> [<< <MESSAGE> ... ];
 
 Where:
 - **LEVEL** - One of log levels: ERROR, WARNING, INFO, DEBUG, VERBOSE.
-- **TAG** - `nx::utils::log::Tag` object. See [Tags](#tags) for details.
+- **TAG** - `nx::log::Tag` object. See [Tags](#tags) for details.
 - **MESSAGE** - Any convertible to string object. See [To string](#tostring) for details.
 
 Standard Qt logging methods( `qDebug()`, `qWarning()`, ...) and old helper methods (`qnDebug()`,
@@ -44,14 +44,14 @@ Standard Qt logging methods( `qDebug()`, `qWarning()`, ...) and old helper metho
 ### Tags @anchor tags
 
 Tag is a log record entity, used for search and filtering. It is represented by
-`nx::utils::log::Tag` class object, which can be automatically constructed from:
+`nx::log::Tag` class object, which can be automatically constructed from:
 - `this` - in this case object's type name with all namespaces and pointer will be in a tag.
 - Smart pointers work the same way as `this`.
 - `std::type_info` - in this case type name with all namespaces will be in a tag.
 
 `NX_SCOPE_TAG` macro provides well-formed `Tag` for static functions.
 
-`nx::utils::log::Tag` can also be constructed from string explicitly, but this should be avoided in
+`nx::log::Tag` can also be constructed from string explicitly, but this should be avoided in
 most cases because type info carries a lot more information in its name and namespace, e.g.
 `nx::network::Socket(...)` points to `nx_network` module class `Socket`.
 
@@ -71,7 +71,7 @@ namespace nx::vms::utils {
 namespace {
 
 struct UtilsLog {};
-static const nx::utils::log::Tag kUtilsTag{typeid(UtilsLog)};
+static const nx::log::Tag kUtilsTag{typeid(UtilsLog)};
 
 } // namespace
 
@@ -113,12 +113,12 @@ Alternatively you can manually create a log message:
 
 ## Logging configuration and filtering
 
-All log records are dispatched in a single module `nx::utils::log::LoggerCollection`. This
-collection stores a number of different **loggers** implementing `nx::utils::log::AbstractLogger`
-interface. Logger checks record [**tag**](#tags) (`nx::utils::log::Tag`), and if it is accepted
-by its **filters** (`nx::utils::log::Filter`), record is dispatched to one or several
-**writers** (`nx::utils::log::AbstractWriter`). Default logger implementation is the
- `nx::utils::log::Logger` class
+All log records are dispatched in a single module `nx::log::LoggerCollection`. This
+collection stores a number of different **loggers** implementing `nx::log::AbstractLogger`
+interface. Logger checks record [**tag**](#tags) (`nx::log::Tag`), and if it is accepted
+by its **filters** (`nx::log::Filter`), record is dispatched to one or several
+**writers** (`nx::log::AbstractWriter`). Default logger implementation is the
+ `nx::log::Logger` class
 
 Loggers can work in *cooperative* or *exclusive* mode. First of all, each exclusive logger checks
 the record tag. If it is acceptable, no other loggers receive this record. Otherwise all other
@@ -127,39 +127,39 @@ loggers (working in cooperative mode) receive this record, and each one of them 
 ### Logger configuration
 
 Set of loggers, working in the *cooperative* mode, can be created and configured using the
-`nx::utils::log::Settings` class. Each of these loggers can have it's own writer. For now settings
+`nx::log::Settings` class. Each of these loggers can have it's own writer. For now settings
 support only two writers:
-- `nx::utils::log::StdOut` - writes logs into stdout and stderr.
-- `nx::utils::log::File` - writes logs into rotating files.
+- `nx::log::StdOut` - writes logs into stdout and stderr.
+- `nx::log::File` - writes logs into rotating files.
 
 Special value `-` can be written to the `logBaseName` settings field to initialize stdout writer,
 file writer will be used otherwise.
 
 Alternative writers can be assigned manually:
-- `nx::utils::log::Buffer` - just keeps logs inside (useful for unit tests).
-- `nx::utils::log::NullDevice` - does nothing.
+- `nx::log::Buffer` - just keeps logs inside (useful for unit tests).
+- `nx::log::NullDevice` - does nothing.
 - `TcpLogWriterOut` - writes the logs into a tcp socket.
 
 ### Creating and registering logger
 
-Loggers can be created with the helper `nx::utils::log::buildLogger()` function. This function
+Loggers can be created with the helper `nx::log::buildLogger()` function. This function
 creates set of loggers, working in the *cooperative* mode, and combines them to a single
-`nx::utils::log::AggregateLogger` instance.
+`nx::log::AggregateLogger` instance.
 
 Additional function parameters allow to define a header and also provide a set of filters,
 which will define the *exclusive* mode for this aggregate logger.
 
-Logger can be registered with `nx::utils::log::setMainLogger()` function or with
-`nx::utils::log::addLogger()` function. Only one logger can be marked as main logger. It's
+Logger can be registered with `nx::log::setMainLogger()` function or with
+`nx::log::addLogger()` function. Only one logger can be marked as main logger. It's
 difference from others is actual only for the *exclusive* mode. First, additional loggers
 are asked about their exclusive filters, and if no one handles the given log record, it is
 passed to main logger.
 
 ### Log configuration with file
 
-Logger settings (`nx::utils::log::Settings`) can be created using QSettings engine (ini file).
+Logger settings (`nx::log::Settings`) can be created using QSettings engine (ini file).
 
-It should be used by the following way: `nx::utils::log::Settings(QSettings*)`. Supported syntax is
+It should be used by the following way: `nx::log::Settings(QSettings*)`. Supported syntax is
 the following:
 ```
 [General]
@@ -186,10 +186,10 @@ containing `::discovery::` keyword in a tag and so on, and additionally `DEBUG` 
 
 ### Single-line log configuration
 
-Logger settings (`nx::utils::log::Settings`) can be created using single-line form (options are
+Logger settings (`nx::log::Settings`) can be created using single-line form (options are
 limited in terms of regular expressions as braces and comma symbols cannot be used).
 
-`nx::utils::log::Settings::load()` loads parameters from `QnSettings` that represents parsed
+`nx::log::Settings::load()` loads parameters from `QnSettings` that represents parsed
 application configuration options taken whether from command line arguments, from configuration
 file, from Windows registry or from the http handler.
 
@@ -205,7 +205,7 @@ The following parameters are supported:
 - log/maxLogVolumeSizeB={Maximum total size of log files to keep, in bytes}
 
 When using as command-line argument each parameter is prefixed with --. E.g., --log/logger=...
-When using a configuration file (`nx::utils::log::Settings::load(...) `) , then log/logger value should be specified as:
+When using a configuration file (`nx::log::Settings::load(...) `) , then log/logger value should be specified as:
 ```
 [log]
 logger=...

@@ -6,15 +6,15 @@
 
 namespace nx::network::maintenance::log::utils {
 
-using namespace nx::utils::log;
+using namespace nx::log;
 
 namespace {
 
-std::map<Level, std::vector<nx::utils::log::Filter>> getEffectiveFiltersByLevel(
-    const std::set<nx::utils::log::Filter>& effectiveFilters,
+std::map<Level, std::vector<nx::log::Filter>> getEffectiveFiltersByLevel(
+    const std::set<nx::log::Filter>& effectiveFilters,
     const LevelFilters& levelFilters)
 {
-    std::map<Level, std::vector<nx::utils::log::Filter>> effectiveFiltersByLevel;
+    std::map<Level, std::vector<nx::log::Filter>> effectiveFiltersByLevel;
     for (const auto& filter: levelFilters)
     {
         auto& tags = effectiveFiltersByLevel[filter.second];
@@ -50,9 +50,9 @@ LoggerSettings toLoggerSettings(const Logger& loggerInfo)
     return settings;
 }
 
-std::set<nx::utils::log::Filter> toFilters(const std::vector<Filter>& filters)
+std::set<nx::log::Filter> toFilters(const std::vector<Filter>& filters)
 {
-    std::set<nx::utils::log::Filter> logFilters;
+    std::set<nx::log::Filter> logFilters;
     for (const auto& filter: filters)
     {
         for (const auto& tag: filter.tags)
@@ -62,9 +62,9 @@ std::set<nx::utils::log::Filter> toFilters(const std::vector<Filter>& filters)
     return logFilters;
 }
 
-std::set<nx::utils::log::Filter> toFilters(const nx::utils::log::LevelFilters& levelFilters)
+std::set<nx::log::Filter> toFilters(const nx::log::LevelFilters& levelFilters)
 {
-    std::set<nx::utils::log::Filter> logFilters;
+    std::set<nx::log::Filter> logFilters;
     for (const auto& [filter, level]: levelFilters)
         logFilters.insert(filter);
 
@@ -78,7 +78,7 @@ LevelFilters toLevelFilters(const std::vector<Filter>& filters)
     {
         for (const auto& tag: filter.tags)
         {
-            nx::utils::log::Filter logFilter(tag);
+            nx::log::Filter logFilter(tag);
             levelFilters.emplace(
                 logFilter,
                 levelFromString(QString::fromStdString(filter.level)));
@@ -89,7 +89,7 @@ LevelFilters toLevelFilters(const std::vector<Filter>& filters)
 }
 
 std::vector<Filter> toEffectiveFilters(
-    const std::set<nx::utils::log::Filter>& effectiveFilters,
+    const std::set<nx::log::Filter>& effectiveFilters,
     const LevelFilters& levelFilters)
 {
     auto effectiveTagsByLevel = getEffectiveFiltersByLevel(effectiveFilters, levelFilters);
@@ -111,7 +111,7 @@ std::vector<Filter> toEffectiveFilters(
 
 Logger toLoggerInfo(
     const AbstractLogger* logger,
-    const std::set<nx::utils::log::Filter>& effectiveFilters,
+    const std::set<nx::log::Filter>& effectiveFilters,
     int id)
 {
     Logger loggerInfo;

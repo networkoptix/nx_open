@@ -23,7 +23,7 @@ namespace media_player_quality_chooser {
 
 namespace {
 
-static const nx::utils::log::Tag kLogTag(QString("MediaPlayerQualityChooser"));
+static const nx::log::Tag kLogTag(QString("MediaPlayerQualityChooser"));
 static const int kFallbackLowQualityLines = 360;
 static const int kHighQualityFallbackThreshold = 560;
 static const QSize kMaxTranscodingResolution(1920, 1080);

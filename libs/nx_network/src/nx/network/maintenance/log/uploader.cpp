@@ -25,11 +25,11 @@ static constexpr std::chrono::milliseconds kCheckUploadQueuePeriod = std::chrono
  * Forwards log messages to the specified functor.
  */
 class ProxyLogWriter:
-    public nx::utils::log::AbstractWriter
+    public nx::log::AbstractWriter
 {
 public:
     using Func = nx::utils::MoveOnlyFunc<void(
-        nx::utils::log::Level /*level*/,
+        nx::log::Level /*level*/,
         const QString& /*message*/)>;
 
     ProxyLogWriter(Func func):
@@ -38,7 +38,7 @@ public:
     }
 
     virtual void write(
-        nx::utils::log::Level level,
+        nx::log::Level level,
         const QString& message) override
     {
         m_func(level, message);
@@ -54,7 +54,7 @@ private:
  * Saves log messages in an internal buffer which may be taken.
  */
 class BufferedLogWriter:
-    public nx::utils::log::AbstractWriter
+    public nx::log::AbstractWriter
 {
 public:
     BufferedLogWriter(std::size_t maxBufferSize):
@@ -64,7 +64,7 @@ public:
     }
 
     virtual void write(
-        nx::utils::log::Level /*level*/,
+        nx::log::Level /*level*/,
         const QString& message) override
     {
         NX_MUTEX_LOCKER lock(&m_mutex);
@@ -102,7 +102,7 @@ private:
 Uploader::Uploader(
     const nx::utils::Url& logCollectorUrl,
     const std::string& sessionId,
-    const nx::utils::log::LevelSettings& logFilter)
+    const nx::log::LevelSettings& logFilter)
     :
     m_uploadLogFragmentUrl(url::Builder(logCollectorUrl).appendPath(
         http::rest::substituteParameters(kLogSessionFragmentsPath, {sessionId}))),
@@ -196,7 +196,7 @@ void Uploader::stopWhileInAioThread()
 
 std::optional<std::string /*error*/> Uploader::installLogger()
 {
-    using namespace nx::utils::log;
+    using namespace nx::log;
 
     if (!m_loggerCollection)
         m_loggerCollection = LoggerCollection::instance();
@@ -236,10 +236,10 @@ std::optional<std::string /*error*/> Uploader::installLogger()
 
 void Uploader::removeLogger()
 {
-    if (m_loggerId != nx::utils::log::LoggerCollection::kInvalidId)
+    if (m_loggerId != nx::log::LoggerCollection::kInvalidId)
     {
         m_loggerCollection->remove(m_loggerId);
-        m_loggerId = nx::utils::log::LoggerCollection::kInvalidId;
+        m_loggerId = nx::log::LoggerCollection::kInvalidId;
     }
 }
 
@@ -351,7 +351,7 @@ void Uploader::reportResult()
 
 UploaderManager::UploaderManager(
     const nx::utils::Url& logCollectorApiBaseUrl,
-    const nx::utils::log::LevelSettings& logFilter)
+    const nx::log::LevelSettings& logFilter)
     :
     m_logCollectorApiBaseUrl(logCollectorApiBaseUrl),
     m_logFilter(logFilter)

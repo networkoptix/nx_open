@@ -55,7 +55,7 @@ public:
      * Caller is responsible for existingSettings life time.
      */
     QnSettings(QSettings* existingSettings);
-    QnSettings(nx::utils::ArgumentParser args);
+    QnSettings(nx::ArgumentParser args);
 
     void parseArgs(int argc, const char* argv[]);
 
@@ -89,7 +89,7 @@ private:
 
     std::unique_ptr<QSettings> m_ownSettings;
     QSettings* m_systemSettings = nullptr;
-    nx::utils::ArgumentParser m_args;
+    nx::ArgumentParser m_args;
 };
 
 //-------------------------------------------------------------------------------------------------

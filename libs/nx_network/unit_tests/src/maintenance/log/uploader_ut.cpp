@@ -31,11 +31,11 @@ protected:
 
         m_sessionId = nx::Uuid::createUuid().toSimpleStdString();
 
-        nx::utils::log::LevelSettings filter;
-        filter.primary = nx::utils::log::Level::verbose;
+        nx::log::LevelSettings filter;
+        filter.primary = nx::log::Level::verbose;
         filter.filters.emplace(
             std::string("nx::network::maintenance::log::test"),
-            nx::utils::log::Level::verbose);
+            nx::log::Level::verbose);
 
         m_uploader = std::make_unique<Uploader>(collectorUrl(), m_sessionId, filter);
         m_uploader->setMinBufSizeToUpload(/*do not accumulate data before uploading*/ 0);

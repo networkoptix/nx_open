@@ -157,8 +157,8 @@ void Service::initializeLog(const AbstractServiceSettings& settings)
 {
     auto logSettings = settings.logging();
     logSettings.updateDirectoryIfEmpty(settings.dataDir() + "/log");
-    utils::log::setMainLogger(
-        nx::utils::log::buildLogger(
+    log::setMainLogger(
+        nx::log::buildLogger(
             logSettings,
             m_applicationDisplayName));
 }

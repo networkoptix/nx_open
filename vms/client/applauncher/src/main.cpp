@@ -37,15 +37,15 @@ static BOOL WINAPI stopServer_WIN(DWORD /*dwCtrlType*/)
 
 static void initLogFromArgs(const QString& logLevel, const QString& logFileBaseName)
 {
-    nx::utils::log::Settings settings;
+    nx::log::Settings settings;
     settings.loggers.resize(1);
     settings.loggers.front().level.parse(logLevel);
     settings.loggers.front().maxFileSizeB = 1024 * 1024 * 10;
     settings.loggers.front().maxVolumeSizeB = 1024 * 1024 * 50;
     settings.loggers.front().logBaseName = logFileBaseName;
 
-    nx::utils::log::setMainLogger(
-        nx::utils::log::buildLogger(
+    nx::log::setMainLogger(
+        nx::log::buildLogger(
             settings, nx::branding::applauncherInternalName()));
 }
 
@@ -57,7 +57,7 @@ static bool initLogsFromConfigFile(const QString& logsDirectory)
     if (!QFile::exists(logConfigFile))
         return false;
 
-    return nx::utils::log::initializeFromConfigFile(
+    return nx::log::initializeFromConfigFile(
         logConfigFile,
         logsDirectory,
         qApp->applicationName(),

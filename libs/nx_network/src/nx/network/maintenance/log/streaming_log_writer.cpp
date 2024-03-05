@@ -13,7 +13,7 @@ StreamingLogWriter::StreamingLogWriter(WritableMessageBody* messageBody)
     setMessageBody(messageBody);
 }
 
-void StreamingLogWriter::write(nx::utils::log::Level /*level*/, const QString& message)
+void StreamingLogWriter::write(nx::log::Level /*level*/, const QString& message)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     if (m_messageBody)

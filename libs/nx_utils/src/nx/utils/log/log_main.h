@@ -7,9 +7,7 @@
 
 #include "log_logger.h"
 
-namespace nx {
-namespace utils {
-namespace log {
+namespace nx::log {
 
 /** @return Main logger. */
 NX_UTILS_API std::shared_ptr<AbstractLogger> mainLogger();
@@ -57,11 +55,11 @@ public:
         if (!s_isEnabled || (m_level > Level::info))
             return {m_level, /*isOnLimit*/ false};
 
-        const auto limit = (uint32_t) ini().logLevelReducerPassLimit;
-        const auto windowSizeS = (uint32_t) ini().logLevelReducerWindowSizeS;
+        const auto limit = (uint32_t) nx::utils::ini().logLevelReducerPassLimit;
+        const auto windowSizeS = (uint32_t) nx::utils::ini().logLevelReducerWindowSizeS;
 
         const auto nowS = (uint32_t) std::chrono::duration_cast<std::chrono::seconds>(
-            monotonicTime().time_since_epoch()).count();
+            nx::utils::monotonicTime().time_since_epoch()).count();
 
         const auto windowStartS = m_windowStartS.load();
         if (m_passCount == 0 || windowStartS + windowSizeS <= nowS || windowStartS > nowS)
@@ -178,11 +176,11 @@ inline void setLevelReducerEnabled(bool value)
 #define NX_UTILS_LOG_MESSAGE(LEVEL, TAG, ...) do \
 { \
     struct ScopeTag{}; /*< Used by NX_SCOPE_TAG to get scope from demangled type_info::name(). */ \
-    if ((LEVEL) <= nx::utils::log::maxLevel()) \
+    if ((LEVEL) <= nx::log::maxLevel()) \
     { \
         const auto systemErrorBak = SystemError::getLastOSErrorCode(); \
-        static nx::utils::log::detail::LevelReducer levelReducer(LEVEL); \
-        if (auto helper = nx::utils::log::detail::Helper(&levelReducer, (TAG))) \
+        static nx::log::detail::LevelReducer levelReducer(LEVEL); \
+        if (auto helper = nx::log::detail::Helper(&levelReducer, (TAG))) \
             helper.log(::nx::format(__VA_ARGS__)); \
         SystemError::setLastErrorCode(systemErrorBak); \
     } \
@@ -192,10 +190,10 @@ inline void setLevelReducerEnabled(bool value)
     for (auto stream = \
             [&]() \
             { \
-                if ((LEVEL) > nx::utils::log::maxLevel()) \
-                    return nx::utils::log::detail::Stream(); \
-                static nx::utils::log::detail::LevelReducer levelReducer(LEVEL); \
-                return nx::utils::log::detail::Stream(&levelReducer, (TAG));  \
+                if ((LEVEL) > nx::log::maxLevel()) \
+                    return nx::log::detail::Stream(); \
+                static nx::log::detail::LevelReducer levelReducer(LEVEL); \
+                return nx::log::detail::Stream(&levelReducer, (TAG));  \
             }(); \
         stream; stream.flush()) \
             stream /* <<... */
@@ -204,8 +202,8 @@ inline void setLevelReducerEnabled(bool value)
  * Can be used to redirect nx_kit's NX_PRINT to log as following:
  * <pre><code>
  *     #define NX_PRINT NX_UTILS_LOG_STREAM_NO_SPACE( \
- *         nx::utils::log::Level::debug, \
- *         nx::utils::log::Tag(QStringLiteral("my_plugin")) \
+ *         nx::log::Level::debug, \
+ *         nx::log::Tag(QStringLiteral("my_plugin")) \
  *     ) << NX_PRINT_PREFIX
  * </code></pre>
  */
@@ -216,7 +214,7 @@ inline void setLevelReducerEnabled(bool value)
  * Usage:
  *     NX_<LEVEL>(TAG, MESSAGE [, VALUES...]; //< Writes MESSAGE to log if LEVEL and TAG allow.
  * or, when the log level is known only at runtime:
- *     NX_UTILS_LOG(nx::utils::log::Level::<level>, TAG, MESSAGE [, VALUES...];
+ *     NX_UTILS_LOG(nx::log::Level::<level>, TAG, MESSAGE [, VALUES...];
  *
  * Examples:
  *     NX_INFO(this, "Expected value %1", value);
@@ -246,7 +244,7 @@ inline void setLevelReducerEnabled(bool value)
  *     NX_ERROR(this, "Connection to the DB has been lost: %1", err);
  * </code></pre>
  */
-#define NX_ERROR(...) NX_UTILS_LOG(nx::utils::log::Level::error, __VA_ARGS__)
+#define NX_ERROR(...) NX_UTILS_LOG(nx::log::Level::error, __VA_ARGS__)
 
 /**
  * Prints a non-critical error/warning that may cause issues with limited impact. The message text
@@ -257,7 +255,7 @@ inline void setLevelReducerEnabled(bool value)
  *     NX_WARNING(this, "Camera %1 went offline", camera->id());
  * </code></pre>
  */
-#define NX_WARNING(...) NX_UTILS_LOG(nx::utils::log::Level::warning, __VA_ARGS__)
+#define NX_WARNING(...) NX_UTILS_LOG(nx::log::Level::warning, __VA_ARGS__)
 
 /**
  * Prints an information message about the service's state. The number of such messages must not be
@@ -268,7 +266,7 @@ inline void setLevelReducerEnabled(bool value)
  *     NX_INFO(this, "Bound to https port %1 and listening", server->port());
  * </code></pre>
  */
-#define NX_INFO(...) NX_UTILS_LOG(nx::utils::log::Level::info, __VA_ARGS__)
+#define NX_INFO(...) NX_UTILS_LOG(nx::log::Level::info, __VA_ARGS__)
 
 /**
  * Prints a message that is useful for understanding how a service is operating. Some examples are:
@@ -287,7 +285,7 @@ inline void setLevelReducerEnabled(bool value)
  *     NX_DEBUG(this, "User %1 added to a system %2 with role %3", username, systemId, role);
  * </code></pre>
  */
-#define NX_DEBUG(...) NX_UTILS_LOG(nx::utils::log::Level::debug, __VA_ARGS__)
+#define NX_DEBUG(...) NX_UTILS_LOG(nx::log::Level::debug, __VA_ARGS__)
 
 /**
  * Prints a message that is helpful to a developer for understanding the details of a service
@@ -309,7 +307,7 @@ inline void setLevelReducerEnabled(bool value)
  *         response.headers.size(), connection->getForeignAddress());
  * </code></pre>
  */
-#define NX_VERBOSE(...) NX_UTILS_LOG(nx::utils::log::Level::verbose, __VA_ARGS__)
+#define NX_VERBOSE(...) NX_UTILS_LOG(nx::log::Level::verbose, __VA_ARGS__)
 
 /**
  * Prints a message with very low-level information.
@@ -336,11 +334,9 @@ inline void setLevelReducerEnabled(bool value)
  *     NX_TRACE(this, "Read %1 bytes out of %2 requested", result, size);
  * </code></pre>
  */
-#define NX_TRACE(...) NX_UTILS_LOG(nx::utils::log::Level::trace, __VA_ARGS__)
+#define NX_TRACE(...) NX_UTILS_LOG(nx::log::Level::trace, __VA_ARGS__)
 
 /** Use as a logging tag in functions without "this". */
-#define NX_SCOPE_TAG nx::utils::log::Tag(nx::scopeOfFunction(typeid(ScopeTag), __FUNCTION__))
+#define NX_SCOPE_TAG nx::log::Tag(nx::scopeOfFunction(typeid(ScopeTag), __FUNCTION__))
 
-} // namespace log
-} // namespace utils
-} // namespace nx
+} // namespace nx::log

@@ -300,7 +300,7 @@ void LogSettingsDialog::loadDataToUi(const ConfigurableLogSettings& settings)
 ConfigurableLogSettings::Level LogSettingsDialog::loggingLevel() const
 {
     if (auto data = ui->loggingLevel->currentData(); data.isValid())
-        return (nx::utils::log::Level)data.toInt();
+        return (nx::log::Level)data.toInt();
 
     return {};
 }

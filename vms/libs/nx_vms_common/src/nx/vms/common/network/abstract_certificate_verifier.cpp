@@ -21,8 +21,8 @@ AbstractCertificateVerifier::AbstractCertificateVerifier(
     std::call_once(trustedCertificatesLoaded,
         [this, trustedCertificateFilterRegex]()
         {
-            constexpr auto kCaLogLevel = nx::utils::log::Level::verbose;
-            if (nx::utils::log::isToBeLogged(kCaLogLevel))
+            constexpr auto kCaLogLevel = nx::log::Level::verbose;
+            if (nx::log::isToBeLogged(kCaLogLevel))
             {
                 NX_UTILS_LOG(kCaLogLevel, this, "OS CA for now %1", nx::utils::utcTime());
                 NX_UTILS_LOG(kCaLogLevel, this, "Certificates:");

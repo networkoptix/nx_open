@@ -13,7 +13,7 @@ int main(int argc, char** argv)
     return nx::utils::test::runTest(
         argc,
         argv,
-        [](const nx::utils::ArgumentParser& args)
+        [](const nx::ArgumentParser& args)
         {
             nx::vms::rules::Metatypes::initialize();
 

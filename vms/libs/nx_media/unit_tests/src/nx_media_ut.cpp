@@ -252,7 +252,7 @@ protected:
 private:
     void debugLogStreams()
     {
-        if (!nx::utils::log::isToBeLogged(nx::utils::log::Level::debug))
+        if (!nx::log::isToBeLogged(nx::log::Level::debug))
             return;
 
         for (const auto& stream: mediaStreams().streams)

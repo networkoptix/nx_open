@@ -9,12 +9,12 @@ namespace nx::network::http { class WritableMessageBody; }
 namespace nx::network::maintenance::log {
 
 class NX_NETWORK_API StreamingLogWriter:
-    public nx::utils::log::AbstractWriter
+    public nx::log::AbstractWriter
 {
 public:
     StreamingLogWriter(nx::network::http::WritableMessageBody* mediator);
 
-    virtual void write(nx::utils::log::Level level, const QString& message) override;
+    virtual void write(nx::log::Level level, const QString& message) override;
 
     void setMessageBody(nx::network::http::WritableMessageBody* messageBody);
 

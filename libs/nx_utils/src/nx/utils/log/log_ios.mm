@@ -4,15 +4,11 @@
 
 #import <Foundation/Foundation.h>
 
-namespace nx {
-namespace utils {
-namespace log {
+namespace nx::log {
 
 void StdOut::writeImpl(Level /*level*/, const QString& message)
 {
     NSLog(@"%@", message.toNSString());
 }
 
-} // namespace log
-} // namespace utils
-} // namespace nx
+} // namespace nx::log

@@ -4,11 +4,11 @@
 
 #include <string>
 
-namespace nx::utils {
+namespace nx {
 
 /**
  * @return the stack trace including this function.
  */
 NX_UTILS_API std::string stackTrace();
 
-} // namespace nx::utils
+} // namespace nx

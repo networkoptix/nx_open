@@ -7,10 +7,7 @@
 
 #include <QtCore/QDateTime>
 
-namespace nx {
-namespace utils {
-namespace log {
-namespace test {
+namespace nx::log::test {
 
 TEST(LogLogger, Levels)
 {
@@ -240,7 +237,4 @@ TEST(LogLogger, log_level_trace_ignored_with_empty_level_filters)
     EXPECT_EQ(0, buffer->takeMessages().size());
 }
 
-} // namespace test
-} // namespace log
-} // namespace utils
-} // namespace nx
+} // namespace nx::log::test

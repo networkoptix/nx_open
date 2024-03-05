@@ -163,7 +163,7 @@ QString toString(const QByteArray& value)
 
 QString toString(const QUrl& value)
 {
-    if (nx::utils::log::showPasswords())
+    if (nx::log::showPasswords())
         return value.toString();
     else
         return value.toDisplayString();

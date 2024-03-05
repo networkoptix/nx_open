@@ -69,7 +69,7 @@ QString BasicServiceSettings::dataDir() const
 #endif
 }
 
-utils::log::Settings BasicServiceSettings::logging() const
+log::Settings BasicServiceSettings::logging() const
 {
     return m_logging;
 }

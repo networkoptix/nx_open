@@ -8,7 +8,7 @@ namespace test {
 
 TEST(QnSettingsGroupReader, allArgs)
 {
-    QnSettings settings(nx::utils::ArgumentParser(
+    QnSettings settings(nx::ArgumentParser(
         {"-listener/port", "22", "-listener/backlog", "1024", "-a/b", "c", "-x/y", "z"}));
 
     const std::multimap<QString, QString> expected{{"backlog", "1024"} , {"port", "22"}};

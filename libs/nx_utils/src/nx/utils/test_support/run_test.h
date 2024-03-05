@@ -74,10 +74,10 @@ inline int runTest(
     InitFunction extraInit = nullptr,
     int gtestRunFlags = 0)
 {
-    nx::utils::TestOptions::setModuleName(QFileInfo(QString::fromLocal8Bit(argv[0])).baseName());
+    nx::TestOptions::setModuleName(QFileInfo(QString::fromLocal8Bit(argv[0])).baseName());
 
-    nx::utils::setOnAssertHandler([&](const QString& m) { FAIL() << m.toStdString(); });
-    nx::utils::enableQtMessageAsserts();
+    nx::setOnAssertHandler([&](const QString& m) { FAIL() << m.toStdString(); });
+    nx::enableQtMessageAsserts();
     nx::kit::IniConfig::setOutput(nullptr);
 
     std::vector<const char*> extendedArgs;
@@ -110,8 +110,8 @@ inline int runTest(
     TestOptions::setLoadFactor(nx::utils::Ini().loadFactor);
     TestOptions::applyArguments(args);
 
-    nx::utils::log::initializeGlobally(args);
-    nx::utils::log::lockConfiguration();
+    nx::log::initializeGlobally(args);
+    nx::log::lockConfiguration();
 
     DeinitFunctions deinitFunctions;
     if (extraInit)

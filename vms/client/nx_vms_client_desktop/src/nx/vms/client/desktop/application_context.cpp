@@ -269,7 +269,7 @@ bool initializeLogFromFile(const QString& filename, const QString& suffix)
     NX_INFO(NX_SCOPE_TAG, "Log is initialized from the %1", logConfigFile);
     NX_INFO(NX_SCOPE_TAG, "Log options from settings are ignored!");
 
-    return nx::utils::log::initializeFromConfigFile(
+    return nx::log::initializeFromConfigFile(
         logConfigFile,
         QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) + "/log",
         nx::branding::desktopClientInternalName(),
@@ -461,9 +461,9 @@ struct ApplicationContext::Private
 
     void initializeLogging(const QnStartupParameters& startupParameters)
     {
-        nx::utils::enableQtMessageAsserts();
+        nx::enableQtMessageAsserts();
 
-        using namespace nx::utils::log;
+        using namespace nx::log;
 
         const auto logFileNameSuffix = calculateLogNameSuffix(
             sharedMemoryManager.get(),

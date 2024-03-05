@@ -26,7 +26,7 @@ void ServerRuntimeEventConnector::setMessageProcessor(QnCommonMessageProcessor* 
 void ServerRuntimeEventConnector::at_serverRuntimeEventOccurred(
     const ServerRuntimeEventData& eventData)
 {
-    static const nx::utils::log::Tag kLogTag(typeid(*this));
+    static const nx::log::Tag kLogTag(typeid(*this));
 
     switch (eventData.eventType)
     {

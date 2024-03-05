@@ -63,7 +63,7 @@ struct GotTransactionFuction
         const TransportHeader& transportHeader,
         nx::Locker<nx::Mutex>* lock) const
     {
-        if (nx::utils::log::isToBeLogged(nx::utils::log::Level::verbose, this))
+        if (nx::log::isToBeLogged(nx::log::Level::verbose, this))
             bus->printTran(connection, transaction, Connection::Direction::incoming);
         bus->gotTransaction(transaction, connection, transportHeader, lock);
     }
@@ -651,7 +651,7 @@ void MessageBus::at_gotMessage(
 
     if (connection->state() == Connection::State::Error)
         return; //< Connection has been closed
-    if (nx::utils::log::isToBeLogged(nx::utils::log::Level::verbose, this) &&
+    if (nx::log::isToBeLogged(nx::log::Level::verbose, this) &&
         messageType != MessageType::pushTransactionData &&
         messageType != MessageType::pushTransactionList)
     {
@@ -977,7 +977,7 @@ void MessageBus::sendTransactionImpl(
 
     NX_ASSERT(!(remotePeer == peerId)); //< loop
 
-    if (nx::utils::log::isToBeLogged(nx::utils::log::Level::debug, this))
+    if (nx::log::isToBeLogged(nx::log::Level::debug, this))
     {
         if (connection->shouldTransactionBeSentToPeer(tran) == FilterResult::allow)
             printTran(connection, tran, Connection::Direction::outgoing);
@@ -1224,7 +1224,7 @@ void MessageBus::gotUnicastTransaction(
     const TransportHeader& header,
     nx::Locker<nx::Mutex>* lock)
 {
-    if (nx::utils::log::isToBeLogged(nx::utils::log::Level::verbose, this))
+    if (nx::log::isToBeLogged(nx::log::Level::verbose, this))
         printTran(connection, tran, Connection::Direction::incoming);
 
     std::set<nx::Uuid> unprocessedPeers;

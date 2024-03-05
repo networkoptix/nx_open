@@ -222,7 +222,7 @@ static nx::Mutex& socketGlobalsMutexInstance()
 }
 
 void SocketGlobals::init(
-    const utils::ArgumentParser& arguments,
+    const ArgumentParser& arguments,
     int initializationFlags)
 {
     NX_MUTEX_LOCKER lock(&socketGlobalsMutexInstance());
@@ -252,7 +252,7 @@ void SocketGlobals::init(
     int initializationFlags,
     const std::string& customCloudHost)
 {
-    utils::ArgumentParser args;
+    ArgumentParser args;
     if (!customCloudHost.empty())
         args.parse({nx::format("--cloud-host=%1").args(customCloudHost)});
 
@@ -302,7 +302,7 @@ void SocketGlobals::printArgumentsHelp(std::ostream* outputStream)
     cloud::CloudConnectController::printArgumentsHelp(outputStream);
 }
 
-void SocketGlobals::applyArguments(const utils::ArgumentParser& arguments)
+void SocketGlobals::applyArguments(const ArgumentParser& arguments)
 {
     if (const auto value = arguments.get("ip-version", "ip"))
         SocketFactory::setIpVersion(value->toStdString());
@@ -420,7 +420,7 @@ void SocketGlobals::setDebugIniReloadTimer()
         });
 }
 
-void SocketGlobals::initializeNetworking(const utils::ArgumentParser& arguments)
+void SocketGlobals::initializeNetworking(const ArgumentParser& arguments)
 {
     if (isUdtEnabled())
         m_impl->udtInitializer = std::make_unique<UdtInitializer>();
@@ -458,7 +458,7 @@ SocketGlobalsHolder::SocketGlobalsHolder(int initializationFlags):
 }
 
 SocketGlobalsHolder::SocketGlobalsHolder(
-    const utils::ArgumentParser& arguments,
+    const ArgumentParser& arguments,
     int initializationFlags)
     :
     m_args(arguments),

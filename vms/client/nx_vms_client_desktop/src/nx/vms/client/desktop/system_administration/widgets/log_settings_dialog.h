@@ -26,7 +26,7 @@ struct ConfigurableLogSettings
 
     static ConfigurableLogSettings defaults();
 
-    using Level = std::optional<nx::utils::log::Level>;
+    using Level = std::optional<nx::log::Level>;
     using Size = std::optional<double>;
     using Time = std::optional<std::chrono::seconds>;
 

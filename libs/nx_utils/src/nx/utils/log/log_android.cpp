@@ -6,9 +6,7 @@
 
 #include <QtCore/QCoreApplication>
 
-namespace nx {
-namespace utils {
-namespace log {
+namespace nx::log {
 
 static android_LogPriority toAndroidLogLevel(Level logLevel)
 {
@@ -50,6 +48,4 @@ void StdOut::writeImpl(Level level, const QString& message)
         message.toUtf8().constData());
 }
 
-} // namespace log
-} // namespace utils
-} // namespace nx
+} // namespace nx::log

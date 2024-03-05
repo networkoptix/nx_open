@@ -12,7 +12,7 @@ static const char* dummyName = "DeleteMe.bin";
 
 static const char* thePassword = "helloworld";
 
-using nx::utils::TestOptions;
+using nx::TestOptions;
 
 static void writeTestFile(const QString& name)
 {

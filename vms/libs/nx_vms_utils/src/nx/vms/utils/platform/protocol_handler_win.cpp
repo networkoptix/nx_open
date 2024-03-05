@@ -18,7 +18,7 @@ namespace utils {
 using nx::utils::SoftwareVersion;
 
 struct ProtocolHandlerFunctionsTag{};
-static const nx::utils::log::Tag kLogTag(typeid(ProtocolHandlerFunctionsTag));
+static const nx::log::Tag kLogTag(typeid(ProtocolHandlerFunctionsTag));
 
 RegisterSystemUriProtocolHandlerResult registerSystemUriProtocolHandler(
     const QString& protocol,

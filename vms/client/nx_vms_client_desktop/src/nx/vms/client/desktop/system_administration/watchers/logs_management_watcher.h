@@ -120,7 +120,7 @@ public:
         const ConfigurableLogSettings& settings,
         QWidget* parentWidget);
 
-    static nx::utils::log::Level defaultLogLevel();
+    static nx::log::Level defaultLogLevel();
     static nx::vms::api::ServerLogSettings clientLogSettings();
 
     UnitPtr clientUnit() const;

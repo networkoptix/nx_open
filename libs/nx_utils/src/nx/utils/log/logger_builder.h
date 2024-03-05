@@ -10,9 +10,7 @@
 #include "log_settings.h"
 #include "log_writers.h"
 
-namespace nx {
-namespace utils {
-namespace log {
+namespace nx::log {
 
 class NX_UTILS_API LoggerBuilder
 {
@@ -40,6 +38,4 @@ private:
         std::unique_ptr<AbstractWriter> writer);
 };
 
-} // namespace log
-} // namespace utils
-} // namespace nx
+} // namespace nx::log

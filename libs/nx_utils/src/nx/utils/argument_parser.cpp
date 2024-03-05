@@ -5,7 +5,6 @@
 #include <nx/utils/log/log.h>
 
 namespace nx {
-namespace utils {
 
 ArgumentParser::ArgumentParser(int argc, const char* argv[])
 {
@@ -141,5 +140,4 @@ std::vector<QString> ArgumentParser::getPositionalArgs() const
     return m_positionalArgs;
 }
 
-} // namespace utils
 } // namespace nx

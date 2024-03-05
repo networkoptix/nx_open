@@ -83,7 +83,7 @@ TEST( QnTimePeriodsListTest, mergeBigData )
     const qint64 elapsed =  t.elapsed();
 
     ASSERT_EQ(resultPeriods, merged);
-    if (!nx::utils::TestOptions::areTimeAssertsDisabled())
+    if (!nx::TestOptions::areTimeAssertsDisabled())
         ASSERT_LE(elapsed, kBigDataTestsLimitMs);
 }
 
@@ -112,7 +112,7 @@ TEST( QnTimePeriodsListTest, unionBigData )
     qint64 elapsed =  t.elapsed();
 
     ASSERT_EQ(resultPeriods, lists[0]);
-    if (!nx::utils::TestOptions::areTimeAssertsDisabled())
+    if (!nx::TestOptions::areTimeAssertsDisabled())
         ASSERT_LE(elapsed, kBigDataTestsLimitMs);
 }
 

@@ -283,7 +283,7 @@ private:
     nx::utils::CachedValue<DeviceAgentManifestMap> m_cachedDeviceAgentManifests;
     nx::utils::CachedValue<std::map<nx::Uuid, std::set<QString>>> m_cachedSupportedEventTypes;
     nx::utils::CachedValue<std::map<nx::Uuid, std::set<QString>>> m_cachedSupportedObjectTypes;
-    mutable nx::utils::Lockable<std::map<nx::Uuid, nx::vms::api::StreamIndex>> m_cachedAnalyzedStreamIndex;
+    mutable nx::Lockable<std::map<nx::Uuid, nx::vms::api::StreamIndex>> m_cachedAnalyzedStreamIndex;
 };
 
 constexpr QSize EMPTY_RESOLUTION_PAIR(0, 0);

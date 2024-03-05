@@ -526,7 +526,7 @@ nx::utils::Url parseUrlFields(const QString &urlStr, QString scheme)
 
 QString hidePassword(nx::utils::Url url)
 {
-    if (nx::utils::log::showPasswords())
+    if (nx::log::showPasswords())
         return url.toString();
 
     if (url.isValid())
@@ -559,7 +559,7 @@ bool webPageHostsEqual(const nx::utils::Url& left, const nx::utils::Url& right)
 
 QString toString(const nx::utils::Url& value)
 {
-    if (nx::utils::log::showPasswords())
+    if (nx::log::showPasswords())
         return value.toString();
 
     return value.toDisplayString();

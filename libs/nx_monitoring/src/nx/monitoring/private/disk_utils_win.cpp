@@ -28,7 +28,7 @@ QVector<WCHAR> prepareDriveNameBuffer()
         return result;
     }
 
-    if (nx::utils::log::isToBeLogged(nx::utils::log::Level::verbose))
+    if (nx::log::isToBeLogged(nx::log::Level::verbose))
     {
         const auto out = QString::fromWCharArray(result.data(), result.size()).replace('\0', ' ');
         NX_VERBOSE(NX_SCOPE_TAG, "GetLogicalDriveStringsW returned '%1'", out);

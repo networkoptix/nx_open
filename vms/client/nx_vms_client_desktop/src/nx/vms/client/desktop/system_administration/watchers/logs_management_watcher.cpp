@@ -83,7 +83,7 @@ QString makeFileName(QnMediaServerResourcePtr server)
 
 nx::vms::api::ServerLogSettings loadClientSettings()
 {
-    using namespace nx::utils::log;
+    using namespace nx::log;
 
     nx::vms::api::ServerLogSettings result;
     result.mainLog.primaryLevel = levelFromString(appContext()->localSettings()->logLevel());
@@ -99,7 +99,7 @@ nx::vms::api::ServerLogSettings loadClientSettings()
 void storeAndApplyClientSettings(nx::vms::api::ServerLogSettings settings)
 {
     using namespace nx::log;
-    using namespace nx::utils::log;
+    using namespace nx::log;
 
     const auto level = settings.mainLog.primaryLevel;
     appContext()->localSettings()->logLevel = LogsManagementModel::logLevelName(level);
@@ -152,7 +152,7 @@ void ClientLogCollector::pleaseStop()
 
 void ClientLogCollector::run()
 {
-    using namespace nx::utils::log;
+    using namespace nx::log;
 
     static const QString kSelfUpdateFilter = "*self_update*.log";
 
@@ -1615,10 +1615,10 @@ void LogsManagementWatcher::applySettings(
     }
 }
 
-nx::utils::log::Level LogsManagementWatcher::defaultLogLevel()
+nx::log::Level LogsManagementWatcher::defaultLogLevel()
 {
     // We don't use the constant from logs_settings.h because it is build-type denepdent.
-    return nx::utils::log::Level::info;
+    return nx::log::Level::info;
 }
 
 nx::vms::api::ServerLogSettings LogsManagementWatcher::clientLogSettings()

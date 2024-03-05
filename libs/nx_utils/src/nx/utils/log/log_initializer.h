@@ -5,11 +5,9 @@
 #include "abstract_logger.h"
 #include "log_settings.h"
 
-namespace nx { namespace utils { class ArgumentParser; } }
+namespace nx { class ArgumentParser; }
 
-namespace nx {
-namespace utils {
-namespace log {
+namespace nx::log {
 
 /**
  * Builds logger with all filtering specified in settings.
@@ -24,7 +22,7 @@ NX_UTILS_API std::unique_ptr<AbstractLogger> buildLogger(
     std::set<Filter> filters = {},
     std::unique_ptr<AbstractWriter> customWriter = nullptr);
 
-void NX_UTILS_API initializeGlobally(const nx::utils::ArgumentParser& arguments);
+void NX_UTILS_API initializeGlobally(const nx::ArgumentParser& arguments);
 
 /*
  * Initializes loggers according to the contents of a given INI file.
@@ -39,6 +37,4 @@ bool NX_UTILS_API initializeFromConfigFile(
     const QString& binaryPath = QString(),
     const QString& logFileNameSuffix = QString());
 
-} // namespace log
-} // namespace utils
-} // namespace nx
+} // namespace nx::log

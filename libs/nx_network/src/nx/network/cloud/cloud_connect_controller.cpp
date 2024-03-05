@@ -79,7 +79,7 @@ CloudConnectController::~CloudConnectController()
 {
 }
 
-void CloudConnectController::applyArguments(const utils::ArgumentParser& arguments)
+void CloudConnectController::applyArguments(const ArgumentParser& arguments)
 {
     loadSettings(arguments);
     applySettings();
@@ -137,7 +137,7 @@ void CloudConnectController::printArgumentsHelp(std::ostream* outputStream)
         "  --cloud-connect-disable-proxy" << std::endl;
 }
 
-void CloudConnectController::loadSettings(const utils::ArgumentParser& arguments)
+void CloudConnectController::loadSettings(const ArgumentParser& arguments)
 {
     if (const auto value = arguments.get("enforce-mediator", "mediator"))
         m_impl->settings.forcedMediatorUrl = value->toStdString();

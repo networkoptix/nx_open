@@ -6,8 +6,8 @@
 #include <memory>
 #include <string>
 
+namespace nx { class ArgumentParser; }
 namespace nx::hpm::api { class MediatorConnector; }
-namespace nx::utils { class ArgumentParser; }
 namespace nx::network { class AddressResolver; }
 namespace nx::network::aio { class AIOService; }
 
@@ -28,7 +28,7 @@ public:
         AddressResolver* addressResolver);
     virtual ~CloudConnectController();
 
-    void applyArguments(const utils::ArgumentParser& arguments);
+    void applyArguments(const ArgumentParser& arguments);
 
     const std::string& cloudHost() const;
     hpm::api::MediatorConnector& mediatorConnector();
@@ -46,7 +46,7 @@ public:
 private:
     std::unique_ptr<CloudConnectControllerImpl> m_impl;
 
-    void loadSettings(const utils::ArgumentParser& arguments);
+    void loadSettings(const ArgumentParser& arguments);
     void applySettings();
 };
 

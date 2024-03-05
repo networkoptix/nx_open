@@ -383,7 +383,7 @@ bool deserializeFromParams(
     const QnResourcePool* resourcePool,
     const nx::analytics::taxonomy::AbstractStateWatcher* taxonomyStateWatcher)
 {
-    const auto kLogTag = nx::utils::log::Tag(std::string("nx::analytics::db::Filter"));
+    const auto kLogTag = nx::log::Tag(std::string("nx::analytics::db::Filter"));
 
     for (const auto& deviceIdStr: params.values(lit("deviceId")))
     {

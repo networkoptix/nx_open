@@ -99,7 +99,7 @@ public:
     Settings& operator=(const Settings&) = delete;
 
     virtual QString dataDir() const override;
-    virtual nx::utils::log::Settings logging() const override;
+    virtual nx::log::Settings logging() const override;
 
     const General& general() const;
     const Auth& auth() const;
@@ -113,7 +113,7 @@ protected:
 
 private:
     General m_general;
-    nx::utils::log::Settings m_logging;
+    nx::log::Settings m_logging;
     Auth m_auth;
     Tcp m_tcp;
     Http m_http;

@@ -230,7 +230,7 @@ void invoke(network::http::ClientPool::ContextPtr context,
     if (!context)
         return;
 
-    nx::utils::log::Tag tag(QString("%1 [%2]").arg(
+    nx::log::Tag tag(QString("%1 [%2]").arg(
         nx::toString(typeid(rest::ServerConnection)), serverId));
 
     /*
@@ -326,7 +326,7 @@ struct ServerConnection::Private
     Private(
         nx::vms::common::SystemContext* systemContext,
         const nx::Uuid& serverId,
-        const nx::utils::log::Tag& logTag)
+        const nx::log::Tag& logTag)
         :
         systemContext(systemContext),
         serverId(serverId),
@@ -338,7 +338,7 @@ struct ServerConnection::Private
 
     const nx::vms::common::SystemContext* systemContext = nullptr;
     const nx::Uuid serverId;
-    const nx::utils::log::Tag logTag;
+    const nx::log::Tag logTag;
     const QScopedPointer<nx::network::http::ClientPool> httpClientPool;
 
     // While most fields of this struct never change during struct's lifetime, some data can be
@@ -397,7 +397,7 @@ ServerConnection::ServerConnection(
     d(new Private(
         systemContext,
         serverId,
-        nx::utils::log::Tag(
+        nx::log::Tag(
             QStringLiteral("%1 [%2]").arg(nx::toString(this), serverId.toString()))))
 {
     // TODO: #sivanov Raw pointer is unsafe here as ServerConnection instance may be not deleted

@@ -15,7 +15,7 @@ TEST(ArgumentParser, common)
     const char* argv[] = {"/path/to/bin", "-a", "aaa", "--arg1=arg1", "--arg2", "-b", "-c", "ccc", "-ddd", "val_ddd", "-e", "eee", "--arg3=" };
     const auto argc = sizeof(argv) / sizeof(*argv);
 
-    nx::utils::ArgumentParser args(argc, argv);
+    nx::ArgumentParser args(argc, argv);
 
     ASSERT_TRUE((bool)args.get("a"));
     ASSERT_EQ(*args.get("a"), "aaa");

@@ -4,10 +4,7 @@
 
 #include <nx/utils/log/log_level.h>
 
-namespace nx {
-namespace utils {
-namespace log {
-namespace test {
+namespace nx::log::test {
 
 TEST(LogLevel, FromString)
 {
@@ -113,7 +110,4 @@ TEST(LogLevelSettings, Parse)
         {{"First", Level::verbose}, {"NestedBracket", Level::verbose}, {"X", Level::debug}});
 }
 
-} // namespace test
-} // namespace log
-} // namespace utils
-} // namespace nx
+} // namespace nx::log::test

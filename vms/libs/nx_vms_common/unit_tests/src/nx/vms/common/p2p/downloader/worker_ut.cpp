@@ -48,9 +48,9 @@ protected:
     virtual void SetUp() override
     {
         workingDirectory.setPath(
-            (nx::utils::TestOptions::temporaryDirectoryPath().isEmpty()
+            (nx::TestOptions::temporaryDirectoryPath().isEmpty()
                 ? QDir::homePath()
-                : nx::utils::TestOptions::temporaryDirectoryPath()) + "/worker_ut");
+                : nx::TestOptions::temporaryDirectoryPath()) + "/worker_ut");
         workingDirectory.removeRecursively();
         NX_ASSERT(QDir().mkpath(workingDirectory.absolutePath()));
 

@@ -11,7 +11,6 @@
 #include <QtCore/QString>
 
 namespace nx {
-namespace utils {
 
 /**
  * Stand-alone & simple function for parsing arguments.
@@ -96,5 +95,4 @@ std::optional<ValueType> ArgumentParser::getImpl(const char* name) const
     return get<ValueType>(QLatin1String(name));
 }
 
-} // namespace utils
 } // namespace nx

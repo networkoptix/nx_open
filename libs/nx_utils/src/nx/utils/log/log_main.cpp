@@ -8,9 +8,7 @@
 
 #include <nx/utils/nx_utils_ini.h>
 
-namespace nx {
-namespace utils {
-namespace log {
+namespace nx::log {
 
 namespace detail {
 
@@ -100,6 +98,4 @@ bool showPasswords()
     return nx::utils::ini().showPasswordsInLogs;
 }
 
-} // namespace log
-} // namespace utils
-} // namespace nx
+} // namespace nx::log

@@ -49,10 +49,10 @@ QIcon statusIcon(LogsManagementUnitPtr unit)
     return {};
 }
 
-nx::utils::log::Level logLevel(LogsManagementUnitPtr unit)
+nx::log::Level logLevel(LogsManagementUnitPtr unit)
 {
     if (!unit->settings())
-        return nx::utils::log::Level::undefined;
+        return nx::log::Level::undefined;
 
     // Currently we show MainLog level only, even if settings of other Loggers differ.
     return unit->settings()->mainLog.primaryLevel;
@@ -251,22 +251,22 @@ bool LogsManagementModel::setData(const QModelIndex& index, const QVariant& valu
     return true;
 }
 
-QList<nx::utils::log::Level> LogsManagementModel::logLevels()
+QList<nx::log::Level> LogsManagementModel::logLevels()
 {
-    using Level = nx::utils::log::Level;
+    using Level = nx::log::Level;
     return {Level::none, Level::error, Level::warning, Level::info, Level::debug, Level::verbose};
 }
 
-QString LogsManagementModel::logLevelName(nx::utils::log::Level level)
+QString LogsManagementModel::logLevelName(nx::log::Level level)
 {
     switch (level)
     {
-        case nx::utils::log::Level::none: return tr("None");
-        case nx::utils::log::Level::error: return tr("Error");
-        case nx::utils::log::Level::warning: return tr("Warning");
-        case nx::utils::log::Level::info: return tr("Info");
-        case nx::utils::log::Level::debug: return tr("Debug");
-        case nx::utils::log::Level::verbose: return tr("Verbose");
+        case nx::log::Level::none: return tr("None");
+        case nx::log::Level::error: return tr("Error");
+        case nx::log::Level::warning: return tr("Warning");
+        case nx::log::Level::info: return tr("Info");
+        case nx::log::Level::debug: return tr("Debug");
+        case nx::log::Level::verbose: return tr("Verbose");
         default: return {};
     }
 }
@@ -324,20 +324,20 @@ void LogsManagementModel::onItemsChanged(QList<LogsManagementUnitPtr> items)
     }
 }
 
-QString LogsManagementModel::logLevelTooltip(nx::utils::log::Level level) const
+QString LogsManagementModel::logLevelTooltip(nx::log::Level level) const
 {
     switch (level)
     {
-        case nx::utils::log::Level::undefined:
+        case nx::log::Level::undefined:
             return {};
-        case nx::utils::log::Level::info:
+        case nx::log::Level::info:
             return tr("Default Logging level");
-        case nx::utils::log::Level::none:
-        case nx::utils::log::Level::error:
-        case nx::utils::log::Level::warning:
+        case nx::log::Level::none:
+        case nx::log::Level::error:
+        case nx::log::Level::warning:
             return tr("Non-default Logging level. We recommend setting it to \"info\"");
-        case nx::utils::log::Level::debug:
-        case nx::utils::log::Level::verbose:
+        case nx::log::Level::debug:
+        case nx::log::Level::verbose:
             return tr("Logging level degrades performance");
     }
 

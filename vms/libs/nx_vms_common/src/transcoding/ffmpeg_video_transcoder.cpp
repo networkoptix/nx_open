@@ -28,7 +28,7 @@ const static qint64 OPTIMIZATION_MOVING_AVERAGE_RATE = 90;
 static const int kMaxDroppedFrames = 5;
 }
 
-static const nx::utils::log::Tag kLogTag(QString("Transcoding"));
+static const nx::log::Tag kLogTag(QString("Transcoding"));
 
 AVCodecID findVideoEncoder(const QString& codecName)
 {

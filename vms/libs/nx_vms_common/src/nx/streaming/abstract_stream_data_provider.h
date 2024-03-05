@@ -58,7 +58,7 @@ protected:
     virtual void putData(const QnAbstractDataPacketPtr& data);
 
 protected:
-    nx::utils::Lockable<QList<QnAbstractMediaDataReceptor*>> m_dataprocessors;
+    nx::Lockable<QList<QnAbstractMediaDataReceptor*>> m_dataprocessors;
     QnResourcePtr m_resource;
 
 private:

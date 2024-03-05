@@ -12,19 +12,17 @@
 #include "format.h"
 #include "assert.h"
 
-namespace nx {
-namespace utils {
-namespace log {
+namespace nx::log {
 
 bool LoggerSettings::parse(const QString& str)
 {
     bool parseSucceeded = true;
 
     std::multimap<std::string, std::string> params;
-    splitNameValuePairs(
+    utils::splitNameValuePairs(
         str.toStdString(), ',', '=',
         std::inserter(params, params.end()),
-        GroupToken::doubleQuotes | GroupToken::squareBrackets);
+        nx::utils::GroupToken::doubleQuotes | nx::utils::GroupToken::squareBrackets);
     for (const auto& param: params)
     {
         if (param.first == "file")
@@ -46,13 +44,13 @@ bool LoggerSettings::parse(const QString& str)
         else if (param.first == kMaxLogVolumeSizeSymbolicName)
         {
             bool ok = false;
-            maxVolumeSizeB = stringToBytes(param.second, &ok);
+            maxVolumeSizeB = nx::utils::stringToBytes(param.second, &ok);
             parseSucceeded = parseSucceeded && ok;
         }
         else if (param.first == kMaxLogFileSizeSymbolicName)
         {
             bool ok = false;
-            maxFileSizeB = stringToBytes(param.second, &ok);
+            maxFileSizeB = nx::utils::stringToBytes(param.second, &ok);
             parseSucceeded = parseSucceeded && ok;
         }
         else if (param.first == kMaxLogFileTimePeriodSymbolicName)
@@ -243,6 +241,4 @@ void Settings::loadCompatibilityLogger(
     loggers.push_back(std::move(loggerSettings));
 }
 
-} // namespace log
-} // namespace utils
-} // namespace nx
+} // namespace nx::log

@@ -13,9 +13,7 @@
 #include <nx/utils/thread/cf/cfuture.h>
 #include <nx/utils/thread/mutex.h>
 
-namespace nx {
-namespace utils {
-namespace log {
+namespace nx::log {
 
 static constexpr int kMaxLogRotation = 999;
 static constexpr qint64 kDefaultMaxLogVolumeSizeB = 250 * 1024 * 1024;
@@ -140,6 +138,4 @@ public:
     virtual void write(Level level, const QString& message) override;
 };
 
-} // namespace log
-} // namespace utils
-} // namespace nx
+} // namespace nx::log

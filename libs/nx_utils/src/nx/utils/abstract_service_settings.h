@@ -22,7 +22,7 @@ public:
      * Writable directory that service uses as a persistent storage.
      */
     virtual QString dataDir() const = 0;
-    virtual utils::log::Settings logging() const = 0;
+    virtual log::Settings logging() const = 0;
 };
 
 } // namespace utils

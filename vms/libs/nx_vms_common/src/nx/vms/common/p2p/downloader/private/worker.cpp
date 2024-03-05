@@ -114,7 +114,7 @@ Worker::Worker(
     m_peerManagers(peerManagers),
     m_fileName(fileName)
 {
-    m_logTag = nx::utils::log::Tag(QStringLiteral("%1 [%2]").arg(nx::toString(this), m_fileName));
+    m_logTag = nx::log::Tag(QStringLiteral("%1 [%2]").arg(nx::toString(this), m_fileName));
 
     NX_ASSERT(storage);
     if (!storage)
@@ -221,7 +221,7 @@ bool Worker::haveChunksToDownload()
     return false;
 }
 
-utils::log::Tag Worker::logTag() const
+log::Tag Worker::logTag() const
 {
     return m_logTag;
 }

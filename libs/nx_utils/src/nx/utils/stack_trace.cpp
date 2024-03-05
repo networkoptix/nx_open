@@ -27,7 +27,7 @@
 #include <nx/build_info.h>
 #include <nx/utils/log/format.h>
 
-namespace nx::utils {
+namespace nx {
 
 std::string stackTrace()
 {
@@ -84,4 +84,4 @@ std::string stackTrace()
     return ss.str();
 }
 
-} // namespace nx::utils
+} // namespace nx

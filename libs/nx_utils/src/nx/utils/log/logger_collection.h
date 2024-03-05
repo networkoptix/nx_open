@@ -6,9 +6,7 @@
 
 #include "log_logger.h"
 
-namespace nx {
-namespace utils {
-namespace log {
+namespace nx::log {
 
 class NX_UTILS_API LoggerCollection
 {
@@ -97,6 +95,4 @@ private:
     int m_loggerId = 0;
 };
 
-} // namespace log
-} // namespace utils
-} // namespace nx
+} // namespace nx::log

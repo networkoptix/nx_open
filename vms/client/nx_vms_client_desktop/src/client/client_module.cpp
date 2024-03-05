@@ -131,7 +131,7 @@ QnClientModule::~QnClientModule()
         longRunnablePool->stopAll();
 
     // Restoring default message handler.
-    nx::utils::disableQtMessageAsserts();
+    nx::disableQtMessageAsserts();
 
     if (s_instance == this)
         s_instance = nullptr;
