@@ -92,6 +92,31 @@ UuidList RulesSortFilterProxyModel::getRuleIds(const QList<int>& rows) const
     return result;
 }
 
+Qt::CheckState RulesSortFilterProxyModel::getRuleCheckStates(const QList<int>& rows) const
+{
+    if (rows.empty())
+        return {};
+
+    const auto getRuleState = [this](int row)
+    {
+        const auto checkState = sourceModel()->data(
+            mapToSource(index(row, RulesTableModel::StateColumn)), Qt::CheckStateRole);
+        return checkState.value<Qt::CheckState>() == Qt::CheckState::Checked;
+    };
+
+    auto rowsIt = rows.cbegin();
+    const auto isEnabled = getRuleState(*rowsIt);
+    while (rowsIt != rows.cend())
+    {
+        if (getRuleState(*rowsIt) != isEnabled)
+            return Qt::CheckState::PartiallyChecked;
+
+        ++rowsIt;
+    }
+
+    return isEnabled ? Qt::CheckState::Checked : Qt::CheckState::Unchecked;
+}
+
 void RulesSortFilterProxyModel::registerQmlType()
 {
     qmlRegisterType<rules::RulesSortFilterProxyModel>(

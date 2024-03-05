@@ -21,6 +21,9 @@ public:
     /** Returns rule ids for the given rows. */
     Q_INVOKABLE UuidList getRuleIds(const QList<int>& rows) const;
 
+    /** Returns check state for the given rules. */
+    Q_INVOKABLE Qt::CheckState getRuleCheckStates(const QList<int>& rows) const;
+
     static void registerQmlType();
 
 protected:

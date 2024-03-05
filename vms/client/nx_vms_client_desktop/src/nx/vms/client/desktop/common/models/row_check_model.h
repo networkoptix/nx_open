@@ -17,8 +17,6 @@ class NX_VMS_CLIENT_DESKTOP_API RowCheckModel: public QAbstractProxyModel
     using base_type = QAbstractProxyModel;
 
     Q_PROPERTY(QList<int> checkedRows READ checkedRows NOTIFY checkedRowsChanged)
-    Q_PROPERTY(int sortColumn READ sortColumn NOTIFY sortColumnChanged)
-    Q_PROPERTY(Qt::SortOrder sortOrder READ sortOrder NOTIFY sortOrderChanged)
 
 public:
     explicit RowCheckModel(QObject* parent = nullptr);
@@ -57,8 +55,6 @@ public:
 
 signals:
     void checkedRowsChanged();
-    void sortColumnChanged();
-    void sortOrderChanged();
 
 private:
     std::set<QPersistentModelIndex> m_checkedRows;
@@ -66,9 +62,6 @@ private:
 
     QList<QPersistentModelIndex> m_layoutChangePersistentIndexes;
     QModelIndexList m_proxyIndexes;
-
-    int m_sortColumn = -1;
-    Qt::SortOrder m_sortOrder{};
 };
 
 } // namespace nx::vms::client::desktop

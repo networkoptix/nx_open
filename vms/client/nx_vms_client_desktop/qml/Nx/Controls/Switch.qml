@@ -7,6 +7,7 @@ import Nx
 import Nx.Controls
 import Nx.Core
 
+import nx.vms.client.core
 import nx.vms.client.desktop
 
 TextButton
@@ -18,7 +19,7 @@ TextButton
     checkable: true
     spacing: 8
 
-    font.pixelSize: 14
+    font.pixelSize: FontConfig.normal.pixelSize
 
     contentItem: Item
     {

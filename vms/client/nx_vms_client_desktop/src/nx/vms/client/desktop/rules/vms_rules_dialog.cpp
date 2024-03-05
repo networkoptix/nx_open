@@ -154,6 +154,22 @@ void VmsRulesDialog::deleteRules(const UuidList& ids)
         deleteRulesImpl(ids);
 }
 
+void VmsRulesDialog::setRulesState(const UuidList& ids, bool isEnabled)
+{
+    auto engine = systemContext()->vmsRulesEngine();
+
+    for (auto id: ids)
+    {
+        auto clone = engine->cloneRule(id);
+        if (!NX_ASSERT(clone))
+            return;
+
+        clone->setEnabled(isEnabled);
+
+        saveRuleImpl(clone);
+    }
+}
+
 void VmsRulesDialog::resetToDefaults()
 {
     if (ConfirmationDialogs::confirmReset(m_parentWidget))

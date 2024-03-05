@@ -296,11 +296,6 @@ int RowCheckModel::columnCount(const QModelIndex& parent) const
 void RowCheckModel::sort(int column, Qt::SortOrder order)
 {
     base_type::sort(column - 1, order);
-
-    m_sortColumn = column;
-    m_sortOrder = order;
-    emit sortColumnChanged();
-    emit sortOrderChanged();
 }
 
 QHash<int, QByteArray> RowCheckModel::roleNames() const
@@ -308,16 +303,6 @@ QHash<int, QByteArray> RowCheckModel::roleNames() const
     auto result = base_type::roleNames();
     result[Qt::CheckStateRole] = "checkState";
     return result;
-}
-
-int RowCheckModel::sortColumn() const
-{
-    return m_sortColumn;
-}
-
-Qt::SortOrder RowCheckModel::sortOrder() const
-{
-    return m_sortOrder;
 }
 
 } // namespace nx::vms::client::desktop
