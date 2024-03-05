@@ -220,7 +220,7 @@ constexpr auto visitAllConversions(Visitor&& visitor)
             }},
         Conversion<AuditRecordType::cloudBind>{detailsToParams::cloud, paramsToDetails::cloud},
         Conversion<AuditRecordType::cloudUnbind>{detailsToParams::cloud, paramsToDetails::cloud},
-        Conversion<AuditRecordType::systemmMerge>{detailsToParams::nothing, paramsToDetails::nothing},
+        Conversion<AuditRecordType::systemMerge>{detailsToParams::nothing, paramsToDetails::nothing},
         Conversion<AuditRecordType::databaseRestore>{detailsToParams::nothing, paramsToDetails::nothing}
     );
 }

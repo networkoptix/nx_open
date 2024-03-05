@@ -220,7 +220,7 @@ using AllAuditDetails =
         details::map<nx::vms::api::AuditRecordType::systemNameChanged, DescriptionDetails>,
         details::map<nx::vms::api::AuditRecordType::settingsChange, DescriptionDetails>,
         details::map<nx::vms::api::AuditRecordType::emailSettings, DescriptionDetails>,
-        details::map<nx::vms::api::AuditRecordType::systemmMerge, std::nullptr_t>,
+        details::map<nx::vms::api::AuditRecordType::systemMerge, std::nullptr_t>,
         details::map<nx::vms::api::AuditRecordType::eventReset, std::nullptr_t>,
         details::map<nx::vms::api::AuditRecordType::databaseRestore, std::nullptr_t>,
         details::map<nx::vms::api::AuditRecordType::updateInstall, UpdateDetails>,
