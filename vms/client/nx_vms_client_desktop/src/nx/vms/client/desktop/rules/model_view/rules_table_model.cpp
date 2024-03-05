@@ -241,6 +241,9 @@ bool RulesTableModel::isRuleValid(const ConstRulePtr& rule) const
 
 QVariant RulesTableModel::stateColumnData(const ConstRulePtr& rule, int role) const
 {
+    if (role == Qt::CheckStateRole)
+        return rule->enabled() ? Qt::CheckState::Checked : Qt::CheckState::Unchecked;
+
     if (role == Qt::DecorationRole)
     {
         // TODO: #mmalofeev check if the rule has warning.

@@ -108,6 +108,30 @@ Dialog
                 }
             }
 
+            Switch
+            {
+                id: ruleStateSwitch
+                Layout.alignment: Qt.AlignVCenter
+                text: qsTr("State")
+                visible: LocalSettings.iniConfigValue("developerMode")
+                    && tableView.checkedRows.length > 0
+                onToggled:
+                {
+                    root.dialog.setRulesState(
+                        rulesSortFilterModel.getRuleIds(tableView.checkedRows), checked)
+                }
+
+                Connections
+                {
+                    target: tableView
+                    function onCheckedRowsChanged()
+                    {
+                        ruleStateSwitch.checkState =
+                            rulesSortFilterModel.getRuleCheckStates(tableView.checkedRows)
+                    }
+                }
+            }
+
             Item { Layout.fillWidth: true }
 
             SearchField

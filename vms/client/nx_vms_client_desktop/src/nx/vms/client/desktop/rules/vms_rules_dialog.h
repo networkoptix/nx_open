@@ -25,6 +25,7 @@ public:
     Q_INVOKABLE void duplicateRule(nx::Uuid id);
     Q_INVOKABLE void editRule(nx::Uuid id);
     Q_INVOKABLE void deleteRules(const UuidList& ids);
+    Q_INVOKABLE void setRulesState(const UuidList& ids, bool isEnabled);
     Q_INVOKABLE void resetToDefaults();
     Q_INVOKABLE void openEventLogDialog();
 

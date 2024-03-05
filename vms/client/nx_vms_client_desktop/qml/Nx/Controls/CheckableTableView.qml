@@ -28,6 +28,8 @@ TableView
             id: rowCheckModel
             sourceModel: root.sourceModel
         }
+
+        sortRole: root.sourceModel.sortRole ?? Qt.DisplayRole
     }
 
     headerDelegate: DelegateChooser
