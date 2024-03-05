@@ -11,12 +11,16 @@
 #include <QtWidgets/QWhatsThis>
 #include <QtWidgets/QWidget>
 
+#include <nx/build_info.h>
 #include <nx/vms/utils/external_resources.h>
 
+#include "help_dialog.h"
 #include "help_topic_accessor.h"
 
 namespace nx::vms::client::desktop {
 
+
+class HelpDialog;
 HelpHandler::HelpHandler(QObject* parent):
     QObject(parent)
 {
@@ -33,7 +37,6 @@ void HelpHandler::setHelpTopic(int topic)
 
 void HelpHandler::setHelpTopic(HelpTopic::Id topic)
 {
-    m_topic = topic;
     openHelpTopic(topic);
 }
 
@@ -44,7 +47,10 @@ void HelpHandler::openHelpTopic(int topic)
 
 void HelpHandler::openHelpTopic(HelpTopic::Id topic)
 {
-    QDesktopServices::openUrl(urlForTopic(static_cast<HelpTopic::Id>(topic)));
+    if (nx::build_info::isLinux())
+        instance().openHelpTopicInternal(topic);
+    else
+        QDesktopServices::openUrl(urlForTopic(topic));
 }
 
 QUrl HelpHandler::urlForTopic(HelpTopic::Id topic)
@@ -55,6 +61,19 @@ QUrl HelpHandler::urlForTopic(HelpTopic::Id topic)
         return QUrl::fromLocalFile(filePath);
 
     return QUrl();
+}
+
+void HelpHandler::openHelpTopicInternal(HelpTopic::Id topic)
+{
+    if (!m_helpDialog)
+        m_helpDialog.reset(new HelpDialog());
+
+    m_helpDialog->setUrl(urlForTopic(topic).toString());
+
+    if (m_helpDialog->isVisible())
+        m_helpDialog->setFocus();
+    else
+        m_helpDialog->show();
 }
 
 bool HelpHandler::eventFilter(QObject* watched, QEvent* event)
