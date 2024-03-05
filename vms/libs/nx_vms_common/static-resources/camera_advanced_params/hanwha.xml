@@ -1124,14 +1124,14 @@
                 compact="true"
                 aux="ptzCapabilities=ContinuousFocusCapability"
                 writeCmd="custom_focus"/>
-            <param id="image/lens_control/PRIMARY%SERVICE%lastSeparator"
+            <param id="image/lens_control/lastSeparator"
                     dataType="Separator"
                     name="sep"/>
             <param id="image/ptr/AutoRotate=True"
                 name="Auto Rotate"
                 dataType="Button"
                 writeCmd="control"/>
-            <param id="image/lens_control/PRIMARY%SERVICE%autoRotateButtonSeparator"
+            <param id="image/lens_control/autoRotateButtonSeparator"
                 dataType="Separator"
                 name="sep"/>
             <param id="image/focus/Mode=Reset"
