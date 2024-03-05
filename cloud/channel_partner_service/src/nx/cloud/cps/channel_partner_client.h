@@ -107,6 +107,9 @@ public:
     void getOrganization(
         const std::string& organizationId,
         nx::utils::MoveOnlyFunc<void(api::Result, api::Organization)> handler);
+
+    void getAllOrganizationsUsers(
+        nx::utils::MoveOnlyFunc<void(api::Result, api::GetUsersResponse)> handler);
 };
 
 } // namespace nx::cloud::cps

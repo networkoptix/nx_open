@@ -15,9 +15,9 @@ api::Result ApiResultCodeDescriptor::systemErrorCodeToResultCode(
     switch (systemErrorCode)
     {
         case SystemError::noError:
-            return { nx::cloud::db::api::ResultCode::ok };
+            return {nx::cloud::db::api::ResultCode::ok};
         default:
-            return { nx::cloud::db::api::ResultCode::networkError };
+            return {nx::cloud::db::api::ResultCode::networkError};
     }
 }
 
@@ -28,7 +28,7 @@ api::Result ApiResultCodeDescriptor::getResultCodeFromResponse(
     using namespace network::http;
 
     if (StatusCode::isSuccessCode(response.statusLine.statusCode))
-        return { nx::cloud::db::api::ResultCode::ok };
+        return {nx::cloud::db::api::ResultCode::ok};
 
     const auto it = fusionRequestResult.find("detail");
     std::string error = it != fusionRequestResult.end() && !it->second.empty()
@@ -134,6 +134,16 @@ void ChannelPartnerClient::getOrganization(
         nx::network::http::Method::get,
         nx::network::http::rest::substituteParameters(
             api::kOrganizationPath, {organizationId}),
+        {}, // query
+        std::move(handler));
+}
+
+void ChannelPartnerClient::getAllOrganizationsUsers(
+    nx::utils::MoveOnlyFunc<void(api::Result, api::GetUsersResponse)> handler)
+{
+    base_type::template makeAsyncCall<api::GetUsersResponse>(
+        nx::network::http::Method::get,
+        api::kAllOrganizationsUsers,
         {}, // query
         std::move(handler));
 }
