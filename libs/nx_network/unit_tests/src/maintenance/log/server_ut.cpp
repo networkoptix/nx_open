@@ -17,7 +17,7 @@
 
 namespace nx::network::maintenance::log::test {
 
-using namespace nx::utils::log;
+using namespace nx::log;
 
 namespace {
 
@@ -265,7 +265,7 @@ private:
 
         Filter f1;
         f1.level = "info";
-        f1.tags = { "nx::utils", "nx::utils::log" };
+        f1.tags = { "nx::utils", "nx::log" };
 
         Logger logger;
         logger.filters = { f, f1 };

@@ -6,9 +6,7 @@
 
 #include "abstract_logger.h"
 
-namespace nx {
-namespace utils {
-namespace log {
+namespace nx::log {
 
 /**
  * Hides multiple loggers behind itself.
@@ -52,6 +50,4 @@ private:
     std::vector<std::unique_ptr<AbstractLogger>> m_loggers;
 };
 
-} // namespace log
-} // namespace utils
-} // namespace nx
+} // namespace nx::log

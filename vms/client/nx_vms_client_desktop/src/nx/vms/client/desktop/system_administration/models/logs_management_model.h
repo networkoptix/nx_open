@@ -43,13 +43,13 @@ public:
     virtual QVariant data(const QModelIndex& index, int role) const override;
     virtual bool setData(const QModelIndex& index, const QVariant& value, int role) override;
 
-    static QList<nx::utils::log::Level> logLevels();
-    static QString logLevelName(nx::utils::log::Level level);
+    static QList<nx::log::Level> logLevels();
+    static QString logLevelName(nx::log::Level level);
 
 private:
     void onItemsListChanged();
     void onItemsChanged(QList<LogsManagementUnitPtr> items);
-    QString logLevelTooltip(nx::utils::log::Level level) const;
+    QString logLevelTooltip(nx::log::Level level) const;
 
 private:
     QPointer<LogsManagementWatcher> m_watcher;

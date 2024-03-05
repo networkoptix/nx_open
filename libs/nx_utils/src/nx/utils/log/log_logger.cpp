@@ -23,7 +23,7 @@
 
 namespace {
 
-using namespace nx::utils::log;
+using namespace nx::log;
 
 static const std::array<QString, kLevelsCount> kLevels =
     nx::reflect::enumeration::visitAllItems<Level>(
@@ -55,9 +55,7 @@ const QString& findLevel(Level level)
 }
 } // namespace
 
-namespace nx {
-namespace utils {
-namespace log {
+namespace nx::log {
 
 QString Logger::OneSecondCache::now()
 {
@@ -249,7 +247,7 @@ cf::future<cf::unit> Logger::stopArchivingAsync()
 
 void Logger::writeLogHeader()
 {
-    const nx::utils::log::Tag kStart(QLatin1String("START"));
+    const nx::log::Tag kStart(QLatin1String("START"));
     const auto write = [&](const QString& message) { log(Level::info, kStart, message); };
     write(QByteArray(80, '='));
     write(nx::format("%1 started, version: %2, revision: %3").args(
@@ -279,6 +277,4 @@ void Logger::handleLevelChange(nx::Locker<nx::Mutex>* lock) const
         onLevelChanged();
 }
 
-} // namespace log
-} // namespace utils
-} // namespace nx
+} // namespace nx::log

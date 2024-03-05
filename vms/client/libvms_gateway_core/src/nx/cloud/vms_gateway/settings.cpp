@@ -133,7 +133,7 @@ QString Settings::dataDir() const
     return m_general.dataDir;
 }
 
-nx::utils::log::Settings Settings::logging() const
+nx::log::Settings Settings::logging() const
 {
     return m_logging;
 }

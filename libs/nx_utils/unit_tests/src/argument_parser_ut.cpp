@@ -33,7 +33,7 @@ protected:
     }
 
 private:
-    utils::ArgumentParser m_argumentParser;
+    nx::ArgumentParser m_argumentParser;
 };
 
 TEST_F(ArgumentParser, parsing_args)

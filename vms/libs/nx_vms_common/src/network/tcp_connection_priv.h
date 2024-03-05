@@ -74,8 +74,8 @@ public:
 
         const auto logLevel =
             (sendDurationUs >= nx::network::ini().minSocketSendDurationUs)
-                ? nx::utils::log::Level::warning
-                : nx::utils::log::Level::verbose;
+                ? nx::log::Level::warning
+                : nx::log::Level::verbose;
 
         NX_UTILS_LOG(logLevel, this,
             "Called send(@%1, %2 bytes) -> %3, timestamp %4, duration %5 us, since last send %6%7",

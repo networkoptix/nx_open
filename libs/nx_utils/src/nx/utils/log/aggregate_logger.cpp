@@ -2,9 +2,7 @@
 
 #include "aggregate_logger.h"
 
-namespace nx {
-namespace utils {
-namespace log {
+namespace nx::log {
 
 AggregateLogger::AggregateLogger(
     std::vector<std::unique_ptr<AbstractLogger>> loggers)
@@ -149,6 +147,4 @@ const std::vector<std::unique_ptr<AbstractLogger>>& AggregateLogger::loggers() c
     return m_loggers;
 }
 
-} // namespace log
-} // namespace utils
-} // namespace nx
+} // namespace nx::log

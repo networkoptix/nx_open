@@ -60,7 +60,7 @@ public:
      * - cloud-host Cloud domain name to use
      */
     static void init(
-        const utils::ArgumentParser& arguments,
+        const ArgumentParser& arguments,
         int initializationFlags = 0);
 
     /**
@@ -82,7 +82,7 @@ public:
     static void switchCloudHost(const std::string& customCloudHost);
 
     static void printArgumentsHelp(std::ostream* outputStream);
-    static void applyArguments(const utils::ArgumentParser& arguments);
+    static void applyArguments(const ArgumentParser& arguments);
 
     bool isUdtEnabled() const;
 
@@ -117,7 +117,7 @@ public:
             init(initializationFlags);
         }
 
-        InitGuard(const utils::ArgumentParser& arguments, int initializationFlags = 0)
+        InitGuard(const ArgumentParser& arguments, int initializationFlags = 0)
         {
             init(arguments, initializationFlags);
         }
@@ -148,7 +148,7 @@ private:
     void reloadIni();
     void setDebugIniReloadTimer();
 
-    void initializeNetworking(const utils::ArgumentParser& arguments);
+    void initializeNetworking(const ArgumentParser& arguments);
 
     void initializeCloudConnectivity(const std::string& customCloudHost);
     void deinitializeCloudConnectivity();
@@ -166,7 +166,7 @@ public:
      * Invokes SocketGlobalsHolder::initialize(false).
      */
     SocketGlobalsHolder(int initializationFlags = 0);
-    SocketGlobalsHolder(const utils::ArgumentParser& arguments, int initializationFlags = 0);
+    SocketGlobalsHolder(const ArgumentParser& arguments, int initializationFlags = 0);
     ~SocketGlobalsHolder();
 
     void initialize(bool initializePeerId = true);
@@ -176,7 +176,7 @@ public:
     static SocketGlobalsHolder* instance();
 
 private:
-    const nx::utils::ArgumentParser m_args;
+    const nx::ArgumentParser m_args;
     const int m_initializationFlags;
     std::unique_ptr<SocketGlobals::InitGuard> m_socketGlobalsGuard;
 };

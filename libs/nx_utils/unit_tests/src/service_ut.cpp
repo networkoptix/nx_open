@@ -30,7 +30,7 @@ public:
 
     virtual QString dataDir() const override { return m_dataDir; }
 
-    virtual utils::log::Settings logging() const override { return utils::log::Settings(); }
+    virtual log::Settings logging() const override { return log::Settings(); }
 
 private:
     QString m_dataDir;

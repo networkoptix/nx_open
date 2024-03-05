@@ -7,7 +7,7 @@
 
 namespace nx::utils::debug_helpers {
 
-static nx::utils::log::Tag kLogTag(QString("nx::utils::DebugHelpers"));
+static nx::log::Tag kLogTag(QString("nx::utils::DebugHelpers"));
 
 QString debugFilesDirectoryPath(const QString& path)
 {

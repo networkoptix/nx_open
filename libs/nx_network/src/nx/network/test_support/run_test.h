@@ -54,7 +54,7 @@ inline int runTest(
     return utils::test::runTest(
         newArgv.size(), newArgv.data(),
         [extraInit = std::move(extraInit), socketGlobalsFlags](
-            const utils::ArgumentParser& args)
+            const ArgumentParser& args)
         {
             ::testing::UnitTest::GetInstance()->listeners().Append(
                 new EventRecordingListener());

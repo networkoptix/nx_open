@@ -5,7 +5,7 @@
 namespace nx::utils::test {
 
 TestSettingsReader::TestSettingsReader():
-    m_settings(nx::utils::ArgumentParser{})
+    m_settings(nx::ArgumentParser{})
 {
     // Do not attempt to get settings from a file, only from the args given through addArg().
     m_args.addArg("no-conf-file");

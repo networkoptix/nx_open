@@ -10,7 +10,7 @@
 
 #include <boost/stacktrace.hpp>
 
-namespace nx::utils {
+namespace nx {
 
 std::string stackTrace()
 {
@@ -19,4 +19,4 @@ std::string stackTrace()
     return ss.str();
 }
 
-} // namespace nx::utils
+} // namespace nx

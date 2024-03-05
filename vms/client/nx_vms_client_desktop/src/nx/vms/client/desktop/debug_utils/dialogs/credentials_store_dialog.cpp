@@ -21,8 +21,8 @@ namespace nx::vms::client::desktop {
 namespace {
 
 const auto SystemIdRole = Qt::UserRole + 1;
-const nx::utils::log::Filter kKeychainFilter(
-    nx::utils::log::Tag(typeid(nx::vms::client::core::KeychainBackend)));
+const nx::log::Filter kKeychainFilter(
+    nx::log::Tag(typeid(nx::vms::client::core::KeychainBackend)));
 
 } // namespace
 
@@ -105,7 +105,7 @@ CredentialsStoreDialog::CredentialsStoreDialog(QWidget *parent):
         });
     ui->buttonBox->addButton(removeButton, QDialogButtonBox::ButtonRole::HelpRole);
 
-    using namespace nx::utils::log;
+    using namespace nx::log;
     addLogger(std::make_unique<Logger>(std::set<Filter>{kKeychainFilter}, Level::verbose,
         std::make_unique<StdOut>()));
 }

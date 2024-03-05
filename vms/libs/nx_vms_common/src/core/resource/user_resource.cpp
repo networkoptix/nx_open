@@ -320,7 +320,7 @@ bool QnUserResource::setPasswordAndGenerateHash(const QString& password, DigestS
     if (isNewPassword)
     {
         NX_VERBOSE(this, "Password is changed by setting a new%1",
-            nx::utils::log::showPasswords() ? (":" + password) : QString());
+            nx::log::showPasswords() ? (":" + password) : QString());
         emit passwordChanged(::toSharedPointer(this));
     }
     if (digestHasChanged)

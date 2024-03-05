@@ -86,7 +86,7 @@ bool amendOutputDataIfNeeded(
         else
         {
             NX_DEBUG(
-                nx::utils::log::Tag(QString("AmendOutputData")),
+                nx::log::Tag(QString("AmendOutputData")),
                 "Failed to deserialize AesKey resource parameter value for '%1'",
                 paramData->name);
 
@@ -109,7 +109,7 @@ bool amendOutputDataIfNeeded(
         }
         else
         {
-            NX_DEBUG(nx::utils::log::Tag(QString("AmendOutputData")),
+            NX_DEBUG(nx::log::Tag(QString("AmendOutputData")),
                 "Failed to deserialize LDAP settings %1", paramData->value);
             paramData->value.clear();
         }
@@ -125,7 +125,7 @@ bool amendOutputDataIfNeeded(
     nx::vms::api::StorageData* storageData)
 {
     nx::utils::Url url(storageData->url);
-    const nx::utils::log::Tag kLogTag(QString("AmendStorageData"));
+    const nx::log::Tag kLogTag(QString("AmendStorageData"));
     if (url.password().isEmpty())
     {
         NX_VERBOSE(kLogTag, "%1: Url '%2' password is empty", __func__, storageData->url);

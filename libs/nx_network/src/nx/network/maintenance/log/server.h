@@ -6,7 +6,7 @@
 
 #include "logger.h"
 
-namespace nx::utils::log {
+namespace nx::log {
 
 class AbstractLogger;
 class LoggerCollection;
@@ -24,7 +24,7 @@ public:
     /**
      * @param loggerCollection If null then no the global one is used.
      */
-    Server(nx::utils::log::LoggerCollection* loggerCollection = nullptr);
+    Server(nx::log::LoggerCollection* loggerCollection = nullptr);
 
     void registerRequestHandlers(
         const std::string& basePath,
@@ -50,11 +50,11 @@ private:
     Loggers mergeLoggers() const;
     std::vector<Logger>splitAggregateLogger(
         int id,
-        nx::utils::log::AbstractLogger* logger,
-        const std::set<nx::utils::log::Filter>& effectiveFilters) const;
+        nx::log::AbstractLogger* logger,
+        const std::set<nx::log::Filter>& effectiveFilters) const;
 
 private:
-    nx::utils::log::LoggerCollection* m_loggerCollection = nullptr;
+    nx::log::LoggerCollection* m_loggerCollection = nullptr;
 };
 
 } // namespace nx::network::maintenance::log

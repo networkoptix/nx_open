@@ -7,9 +7,7 @@
 #include "aggregate_logger.h"
 #include "log_main.h"
 
-namespace nx {
-namespace utils {
-namespace log {
+namespace nx::log {
 
 namespace { static const QString kDefaultLogBaseName("log_file"); }
 
@@ -113,6 +111,4 @@ std::unique_ptr<Logger> LoggerBuilder::buildLogger(
     return logger;
 }
 
-} // namespace log
-} // namespace utils
-} // namespace nx
+} // namespace nx::log

@@ -58,7 +58,7 @@ namespace {
 static QList<QHostAddress> allowedAddresses;
 
 struct nettoolsFunctionsTag {};
-static const nx::utils::log::Tag kLogTag(typeid(nettoolsFunctionsTag));
+static const nx::log::Tag kLogTag(typeid(nettoolsFunctionsTag));
 static const std::chrono::milliseconds kCacheTimeout(5000);
 
 } // namespace
