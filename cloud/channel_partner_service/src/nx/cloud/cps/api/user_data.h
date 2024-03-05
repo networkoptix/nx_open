@@ -39,4 +39,11 @@ struct SystemAllowance
 
 NX_REFLECTION_INSTRUMENT(SystemAllowance, (system_id)(vmsRoles))
 
+struct GetUsersResponse
+{
+    std::vector<std::string> users;
+};
+
+NX_REFLECTION_INSTRUMENT(GetUsersResponse, (users))
+
 } // namespace nx::cloud::cps::api
