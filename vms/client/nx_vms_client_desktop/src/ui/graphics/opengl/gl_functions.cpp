@@ -21,6 +21,7 @@
 
 #include <nx/build_info.h>
 #include <nx/utils/log/assert.h>
+#include <nx/utils/log/log_main.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
@@ -96,7 +97,12 @@ StaticOpenGLInfo::StaticOpenGLInfo()
     surface.create();
 
     QOpenGLContext context;
-    NX_CRITICAL(context.create());
+    if (!context.create())
+    {
+        // It is possible if there aren't video drivers in the system.
+        NX_WARNING(this, "QOpenGLContext creation failure.");
+        return;
+    }
     NX_CRITICAL(context.makeCurrent(&surface));
 
     const auto functions = context.functions();

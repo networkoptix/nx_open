@@ -190,6 +190,22 @@ void initQmlGlyphCacheWorkaround()
         qputenv("QML_USE_GLYPHCACHE_WORKAROUND", "1");
 }
 
+void askForGraphicsApiSubstitution(nx::kit::IniConfig::Tweaks* iniTweaks)
+{
+    #if defined (Q_OS_WINDOWS)
+        const QDialogButtonBox::StandardButton selectedButton = QnMessageBox::question(
+            nullptr,
+            QCoreApplication::translate(
+                "runApplication",
+                "Would you like to try switching to DirectX?"),
+            "",
+            QDialogButtonBox::Yes | QDialogButtonBox::No);
+
+        if (selectedButton == QDialogButtonBox::Yes)
+            iniTweaks->set(&ini().graphicsApi, "direct3d11");
+    #endif
+}
+
 } // namespace
 
 int runApplicationInternal(QApplication* application, const QnStartupParameters& startupParams)
@@ -205,8 +221,13 @@ int runApplicationInternal(QApplication* application, const QnStartupParameters&
 
     NX_INFO(NX_SCOPE_TAG, "IniConfig iniFilesDir: %1",  nx::kit::IniConfig::iniFilesDir());
 
+    auto iniTweaks = std::make_unique<nx::kit::IniConfig::Tweaks>();
     if (QString(nx::vms::client::desktop::ini().graphicsApi) == "opengl")
-        QnGLCheckerInstrument::checkGLHardware();
+    {
+        if (!QnGLCheckerInstrument::checkGLHardware())
+            askForGraphicsApiSubstitution(iniTweaks.get());
+    }
+
     client.initWebEngine();
 
     if (startupParams.customUri.isValid())
