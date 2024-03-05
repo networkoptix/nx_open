@@ -414,6 +414,12 @@ void QnWorkbenchAccessController::at_resourcePool_resourceAdded(const QnResource
             &QnWorkbenchAccessController::updatePermissions);
     }
 
+    if (const auto& layout = resource.dynamicCast<QnLayoutResource>())
+    {
+        connect(layout.get(), &QnLayoutResource::lockedChanged, this,
+            &QnWorkbenchAccessController::updatePermissions);
+    }
+
     updatePermissions(resource);
 }
 
