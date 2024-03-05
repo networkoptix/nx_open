@@ -15,10 +15,7 @@
 #include <nx/utils/log/log_settings.h>
 #include <nx/utils/test_support/test_options.h>
 
-namespace nx {
-namespace utils {
-namespace log {
-namespace test {
+namespace nx::log::test {
 
 static const Tag kTestTag(QLatin1String("TestTag"));
 static const Filter kTestFilter(kTestTag);
@@ -125,12 +122,12 @@ TEST_F(LogMainTest, This)
     NX_VERBOSE(this, "Verbose");
     NX_TRACE(this, "Trace");
     expectMessages({
-        "* ERROR nx::utils::log::test::*LogMain*(0x*): Error",
-        "* WARNING nx::utils::log::test::*LogMain*(0x*): Warning",
-        "* INFO nx::utils::log::test::*LogMain*(0x*): Info",
-        "* DEBUG nx::utils::log::test::*LogMain*(0x*): Debug",
-        "* VERBOSE nx::utils::log::test::*LogMain*(0x*): Verbose",
-        "* TRACE nx::utils::log::test::*LogMain*(0x*): Trace"});
+        "* ERROR nx::log::test::*LogMain*(0x*): Error",
+        "* WARNING nx::log::test::*LogMain*(0x*): Warning",
+        "* INFO nx::log::test::*LogMain*(0x*): Info",
+        "* DEBUG nx::log::test::*LogMain*(0x*): Debug",
+        "* VERBOSE nx::log::test::*LogMain*(0x*): Verbose",
+        "* TRACE nx::log::test::*LogMain*(0x*): Trace"});
 
     const QSize kSize(2, 3);
     NX_ERROR(this) << "Error" << kSize;
@@ -138,20 +135,20 @@ TEST_F(LogMainTest, This)
     NX_VERBOSE(this) << "Verbose" << kSize;
     NX_TRACE(this) << "Trace" << kSize;
     expectMessages({
-        "* ERROR nx::utils::log::test::*LogMain*(0x*): Error QSize(2, 3)",
-        "* INFO nx::utils::log::test::*LogMain*(0x*): Info QSize(2, 3)",
-        "* VERBOSE nx::utils::log::test::*LogMain*(0x*): Verbose QSize(2, 3)",
-        "* TRACE nx::utils::log::test::*LogMain*(0x*): Trace QSize(2, 3)"});
+        "* ERROR nx::log::test::*LogMain*(0x*): Error QSize(2, 3)",
+        "* INFO nx::log::test::*LogMain*(0x*): Info QSize(2, 3)",
+        "* VERBOSE nx::log::test::*LogMain*(0x*): Verbose QSize(2, 3)",
+        "* TRACE nx::log::test::*LogMain*(0x*): Trace QSize(2, 3)"});
 
     NX_ERROR(this, "Value %1 = %2", "error_count", 1);
     NX_WARNING(this, "Value %1 = %2", "error_count", 2);
     NX_DEBUG(this, "Value %1 = %2", "error_count", 3);
     NX_TRACE(this, "Value %1 = %2", "error_count", 4);
     expectMessages({
-        "* ERROR nx::utils::log::test::*LogMain*(0x*): Value error_count = 1",
-        "* WARNING nx::utils::log::test::*LogMain*(0x*): Value error_count = 2",
-        "* DEBUG nx::utils::log::test::*LogMain*(0x*): Value error_count = 3",
-        "* TRACE nx::utils::log::test::*LogMain*(0x*): Value error_count = 4"});
+        "* ERROR nx::log::test::*LogMain*(0x*): Value error_count = 1",
+        "* WARNING nx::log::test::*LogMain*(0x*): Value error_count = 2",
+        "* DEBUG nx::log::test::*LogMain*(0x*): Value error_count = 3",
+        "* TRACE nx::log::test::*LogMain*(0x*): Value error_count = 4"});
 }
 
 TEST_F(LogMainTest, LevelReducer)
@@ -163,8 +160,8 @@ TEST_F(LogMainTest, LevelReducer)
     const auto logInfo = [this]() { NX_INFO(this, "Info"); };
     const auto logDebug = [this]() { NX_DEBUG(this, "Debug"); };
 
-    iniTweaks.set(&ini().logLevelReducerPassLimit, 2);
-    iniTweaks.set(&ini().logLevelReducerWindowSizeS, 60);
+    iniTweaks.set(&nx::utils::ini().logLevelReducerPassLimit, 2);
+    iniTweaks.set(&nx::utils::ini().logLevelReducerWindowSizeS, 60);
 
     for (int i = 0; i != 4; ++i)
         logWarning();
@@ -210,8 +207,8 @@ TEST_F(LogMainTest, LevelReducerWithStream)
     nx::utils::test::ScopedTimeShift timeShift(nx::utils::test::ClockType::steady);
     const auto logWarning = [this]() { NX_WARNING(this) << "Warn"; };
 
-    iniTweaks.set(&ini().logLevelReducerPassLimit, 1);
-    iniTweaks.set(&ini().logLevelReducerWindowSizeS, 60);
+    iniTweaks.set(&nx::utils::ini().logLevelReducerPassLimit, 1);
+    iniTweaks.set(&nx::utils::ini().logLevelReducerWindowSizeS, 60);
 
     logWarning();
     logWarning();
@@ -297,25 +294,25 @@ T functionTemplate([[maybe_unused]] T dummyT, [[maybe_unused]] char dummyChar = 
 TEST_F(LogMainTest, Scope)
 {
     TEST_NX_SCOPE_TAG("method");
-    expectMessages({"* VERBOSE nx::utils::log::test::LogMainTest_Scope_Test: method"});
+    expectMessages({"* VERBOSE nx::log::test::LogMainTest_Scope_Test: method"});
 
     globalFunction(/*dummyInt*/ 42, /*dummyChar*/ 'x');
-    expectMessages({"* VERBOSE nx::utils::log::test: globalFunction"});
+    expectMessages({"* VERBOSE nx::log::test: globalFunction"});
 
     StructTemplate</*T*/ std::string*, /*c*/ '@'>::staticFunction(
         /*dummyT*/ nullptr, /*dummyChar*/ 'X');
     expectMessages({
-        "* VERBOSE nx::utils::log::test::StructTemplate<*>: StructTemplate::staticFunction",
-        "* VERBOSE nx::utils::log::test::StructTemplate<*>: lambda in StructTemplate::staticFunction",
-        "* VERBOSE nx::utils::log::test::StructTemplate<*>: inner lambda in StructTemplate::staticFunction",
+        "* VERBOSE nx::log::test::StructTemplate<*>: StructTemplate::staticFunction",
+        "* VERBOSE nx::log::test::StructTemplate<*>: lambda in StructTemplate::staticFunction",
+        "* VERBOSE nx::log::test::StructTemplate<*>: inner lambda in StructTemplate::staticFunction",
     });
 
     functionTemplate</*T*/ std::string*, /*c*/ &DummyStruct::memberFunction>(
         /*dummyT*/ nullptr, /*dummyChar*/ 'X');
     expectMessages({
-        "* VERBOSE nx::utils::log::test: functionTemplate",
-        "* VERBOSE nx::utils::log::test: lambda in functionTemplate",
-        "* VERBOSE nx::utils::log::test: inner lambda in functionTemplate",
+        "* VERBOSE nx::log::test: functionTemplate",
+        "* VERBOSE nx::log::test: lambda in functionTemplate",
+        "* VERBOSE nx::log::test: inner lambda in functionTemplate",
     });
 }
 
@@ -330,7 +327,7 @@ public:
         base_type(std::make_unique<NullDevice>())
     {
         // FIXME: #mshevchenko Should we use setLevelFilters() here instead?
-        // logger->setExceptionFilters({lit("nx::utils::log::test::Enabled")});
+        // logger->setExceptionFilters({lit("nx::log::test::Enabled")});
     }
 
     template<typename Action>
@@ -372,7 +369,4 @@ template<int Id> struct DisabledTag { int i; };
 TEST_F(LogMainPerformanceTest, EnabledTag) { measureTimeForTags<EnabledTag>(); }
 TEST_F(LogMainPerformanceTest, DisabledTag) { measureTimeForTags<DisabledTag>(); }
 
-} // namespace test
-} // namespace log
-} // namespace utils
-} // namespace nx
+} // namespace nx::log::test

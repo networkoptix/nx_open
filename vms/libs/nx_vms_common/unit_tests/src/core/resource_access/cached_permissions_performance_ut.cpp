@@ -21,7 +21,7 @@ public:
     void run(const Action& action)
     {
         NX_INFO(this, "BEGIN ---------------");
-        const auto count = nx::utils::TestOptions::applyLoadMode<size_t>(10);
+        const auto count = nx::TestOptions::applyLoadMode<size_t>(10);
         for (size_t i = 0; i < count; ++i)
             action();
         NX_INFO(this, "END ---------------");

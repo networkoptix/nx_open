@@ -16,7 +16,7 @@ int main(int argc, char** argv)
 
     std::unique_ptr<QCoreApplication> application;
     return nx::network::test::runTest(argc, argv,
-        [&](const nx::utils::ArgumentParser& /*args*/)
+        [&](const nx::ArgumentParser& /*args*/)
         {
             application.reset(new QCoreApplication(argc, argv));
             return nx::utils::test::DeinitFunctions();

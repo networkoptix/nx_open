@@ -20,9 +20,9 @@ protected:
         peerManager.reset(new TestPeerManager());
 
         storageDir.setPath(
-            (nx::utils::TestOptions::temporaryDirectoryPath().isEmpty()
+            (nx::TestOptions::temporaryDirectoryPath().isEmpty()
                 ? QDir::homePath()
-                : nx::utils::TestOptions::temporaryDirectoryPath()) + "/storage");
+                : nx::TestOptions::temporaryDirectoryPath()) + "/storage");
         storageDir.removeRecursively();
         NX_ASSERT(QDir().mkpath(storageDir.absolutePath()));
 

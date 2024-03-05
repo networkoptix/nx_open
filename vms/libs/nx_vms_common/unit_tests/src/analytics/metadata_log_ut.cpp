@@ -141,7 +141,7 @@ static void testEqualRects(
 
 TEST(MetadataLog, metadataLoggerAndLogParser)
 {
-    const QString testDir = nx::utils::TestOptions::temporaryDirectoryPath(/*canCreate*/ true);
+    const QString testDir = nx::TestOptions::temporaryDirectoryPath(/*canCreate*/ true);
     const QString kMetadataLoggerFilename = testDir + "/metadata_logger.log";
     const QString kMetadataLogParserFilename = testDir + "/metadata_log_parser.log";
 

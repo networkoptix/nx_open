@@ -382,7 +382,7 @@ void QnTCPConnectionProcessor::logRequestOrResponse(
     const QByteArray& httpMessageFull,
     const nx::Buffer& httpMessageBodyOnly)
 {
-    if (!nx::utils::log::isToBeLogged(nx::utils::log::Level::debug, nx::log::kHttpTag))
+    if (!nx::log::isToBeLogged(nx::log::Level::debug, nx::log::kHttpTag))
         return;
 
     Q_D(QnTCPConnectionProcessor);
@@ -410,7 +410,7 @@ void QnTCPConnectionProcessor::logRequestOrResponse(
         bodyToPrint = uncompressDataIfNeeded();
     }
 
-    if (!nx::utils::log::isToBeLogged(nx::utils::log::Level::verbose, nx::log::kHttpTag))
+    if (!nx::log::isToBeLogged(nx::log::Level::verbose, nx::log::kHttpTag))
         bodyToPrint.truncate(1024 * 5); //< Should be enough for 5 devices.
 
     const auto headers = QByteArray::fromRawData(

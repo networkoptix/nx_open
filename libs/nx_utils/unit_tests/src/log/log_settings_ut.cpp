@@ -9,10 +9,7 @@
 #include <nx/utils/log/log_settings.h>
 #include <nx/utils/test_support/test_options.h>
 
-namespace nx {
-namespace utils {
-namespace log {
-namespace test {
+namespace nx::log::test {
 
 class LogSettings:
     public ::testing::Test
@@ -28,7 +25,7 @@ protected:
 
     void constructFromIni(const QByteArray& configData)
     {
-        QDir dir(nx::utils::TestOptions::temporaryDirectoryPath());
+        QDir dir(nx::TestOptions::temporaryDirectoryPath());
         QDir().mkpath(dir.absolutePath());
 
         const auto fileName = dir.absolutePath() + "/logs.conf";
@@ -73,7 +70,7 @@ TEST_F(LogSettings, multiple_loggers)
     ASSERT_EQ(2U, logSettings.loggers.size());
 
     LoggerSettings logger0Settings;
-    logger0Settings.level.primary = nx::utils::log::Level::warning;
+    logger0Settings.level.primary = nx::log::Level::warning;
     logger0Settings.logBaseName = "-";
     ASSERT_EQ(logger0Settings, logSettings.loggers[0]);
 
@@ -81,13 +78,13 @@ TEST_F(LogSettings, multiple_loggers)
     logger1Settings.directory = "/var/log/";
     logger1Settings.maxVolumeSizeB = 110 * 1024 * 1024;
     logger1Settings.maxFileSizeB = 100 * 1024 * 1024;
-    logger1Settings.level.primary = nx::utils::log::Level::none;
+    logger1Settings.level.primary = nx::log::Level::none;
     logger1Settings.level.filters[Filter(QString("nx::network"))] =
-        nx::utils::log::Level::warning;
+        nx::log::Level::warning;
     logger1Settings.level.filters[Filter(QString("nx::utils"))] =
-        nx::utils::log::Level::warning;
+        nx::log::Level::warning;
     logger1Settings.level.filters[Filter(QString("nx::network::http"))] =
-        nx::utils::log::Level::debug;
+        nx::log::Level::debug;
     ASSERT_EQ(logger1Settings, logSettings.loggers[1]);
 }
 
@@ -101,7 +98,7 @@ TEST_F(LogSettings, compatibility_settings)
     ASSERT_EQ(1U, logSettings.loggers.size());
 
     LoggerSettings logger0Settings;
-    logger0Settings.level.primary = nx::utils::log::Level::verbose;
+    logger0Settings.level.primary = nx::log::Level::verbose;
     logger0Settings.logBaseName = "/var/log/utils_ut";
     ASSERT_EQ(logger0Settings, logSettings.loggers[0]);
 }
@@ -186,7 +183,4 @@ debug=re:^nx::vms::discovery
     }
 }
 
-} // namespace test
-} // namespace log
-} // namespace utils
-} // namespace nx
+} // namespace nx::log::test

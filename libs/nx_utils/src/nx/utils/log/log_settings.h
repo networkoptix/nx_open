@@ -10,9 +10,7 @@
 class QSettings;
 class QnSettings;
 
-namespace nx {
-namespace utils {
-namespace log {
+namespace nx::log {
 
 static constexpr char kMaxLogVolumeSizeSymbolicName[] = "maxLogVolumeSizeB";
 static constexpr char kMaxLogFileSizeSymbolicName[] = "maxLogFileSizeB";
@@ -94,6 +92,4 @@ private:
         const QString& prefix);
 };
 
-} // namespace log
-} // namespace utils
-} // namespace nx
+} // namespace nx::log

@@ -8,7 +8,6 @@
 #include <nx/utils/thread/mutex.h>
 
 namespace nx {
-namespace utils {
 
 class NX_UTILS_API TestOptions
 {
@@ -78,5 +77,4 @@ Count TestOptions::applyLoadMode(Count count)
     return (count < 1) ? 1 : count;
 }
 
-} // namespace utils
 } // namespace nx

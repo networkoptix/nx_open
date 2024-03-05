@@ -128,7 +128,7 @@ TEST_F(DiscoveryUdpMulticastFinder, UpdateInterfacesAndModuleInformation)
             NX_VERBOSE(this, nx::format("Found module %1 on %2").args(module.id, endpoint));
         });
 
-    const auto count = nx::utils::TestOptions::applyLoadMode(100);
+    const auto count = nx::TestOptions::applyLoadMode(100);
     for (auto i = 0; i < count; ++i)
     {
         moduleFinder.multicastInformation(makeModuleInformation());

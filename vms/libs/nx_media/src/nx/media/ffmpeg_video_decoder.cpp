@@ -23,7 +23,7 @@ namespace media {
 
 namespace {
 
-static const nx::utils::log::Tag kLogTag(QString("FfmpegVideoDecoder"));
+static const nx::log::Tag kLogTag(QString("FfmpegVideoDecoder"));
 
 QVideoFrameFormat::PixelFormat toQtPixelFormat(AVPixelFormat pixFormat)
 {

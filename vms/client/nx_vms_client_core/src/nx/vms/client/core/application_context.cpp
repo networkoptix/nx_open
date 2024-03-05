@@ -176,7 +176,7 @@ ApplicationContext::ApplicationContext(
             break;
     }
 
-    nx::utils::setOnAssertHandler(
+    nx::setOnAssertHandler(
         [](const QString&)
         {
             std::cerr << "\nQML stacktrace:\n";
@@ -204,7 +204,7 @@ ApplicationContext::ApplicationContext(
 
 ApplicationContext::~ApplicationContext()
 {
-    nx::utils::setOnAssertHandler(nullptr);
+    nx::setOnAssertHandler(nullptr);
 
     if (NX_ASSERT(s_instance == this))
         s_instance = nullptr;

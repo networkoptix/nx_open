@@ -10,7 +10,7 @@
 #include <nx/branding.h>
 #include <nx/build_info.h>
 
-static const auto kLogTag = nx::utils::log::Tag(QString("nx::vms::utils::InstallationInfo"));
+static const auto kLogTag = nx::log::Tag(QString("nx::vms::utils::InstallationInfo"));
 
 namespace nx::vms::utils {
 

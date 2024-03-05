@@ -73,7 +73,7 @@ public:
 
     bool haveChunksToDownload();
 
-    nx::utils::log::Tag logTag() const;
+    nx::log::Tag logTag() const;
 
     bool isStalled() const;
 
@@ -160,7 +160,7 @@ private:
     QList<AbstractPeerManager*> m_peerManagers;
     const QString m_fileName;
 
-    nx::utils::log::Tag m_logTag;
+    nx::log::Tag m_logTag;
 
     bool m_sleeping = false;
     std::mutex m_sleepMutex;

@@ -84,7 +84,7 @@ TEST(ToString, Qt)
 
     assertToString(QUrl(QLatin1String("http://abc.xyz:8080/path")), "http://abc.xyz:8080/path");
     assertToString(QUrl(QLatin1String("http://xxx-yyy.w/path?param=3")), "http://xxx-yyy.w/path?param=3");
-    if (nx::utils::log::showPasswords())
+    if (nx::log::showPasswords())
         assertToString(QUrl(QLatin1String("http://login:password@abx-xyz.x")), "http://login:password@abx-xyz.x");
     else
         assertToString(QUrl(QLatin1String("http://login:password@abx-xyz.x")), "http://login@abx-xyz.x");

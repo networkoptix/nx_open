@@ -12,9 +12,7 @@
 #include "log_main.h"
 #include "log_logger.h"
 
-namespace nx {
-namespace utils {
-namespace log {
+namespace nx::log {
 
 std::unique_ptr<AbstractLogger> buildLogger(
     const Settings& settings,
@@ -31,7 +29,7 @@ std::unique_ptr<AbstractLogger> buildLogger(
         std::move(writer));
 }
 
-void initializeGlobally(const nx::utils::ArgumentParser& arguments)
+void initializeGlobally(const nx::ArgumentParser& arguments)
 {
     log::Settings settings;
     settings.load(QnSettings(arguments), "log"/*, deafultCompatibilityLevel "none"*/);
@@ -78,6 +76,4 @@ bool initializeFromConfigFile(
     return true;
 }
 
-} // namespace log
-} // namespace utils
-} // namespace nx
+} // namespace nx::log

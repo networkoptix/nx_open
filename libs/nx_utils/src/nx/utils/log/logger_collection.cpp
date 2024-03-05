@@ -6,9 +6,7 @@
 
 #include <QTextCodec>
 
-namespace nx {
-namespace utils {
-namespace log {
+namespace nx::log {
 
 static void stopArchivingInstance()
 {
@@ -213,6 +211,4 @@ void LoggerCollection::stopArchiving()
         future.get();
 }
 
-} // namespace nx
-} // namespace utils
-} // namespace log
+} // namespace nx::log

@@ -14,7 +14,6 @@
 #endif
 
 namespace nx {
-namespace utils {
 
 #define TEST_OPTIONS_SET_VALUE(VARIABLE, VALUE) \
     VARIABLE = VALUE; \
@@ -143,7 +142,7 @@ R"(
     #endif
 }
 
-static void showHelpAndExitIfNeeded(const utils::ArgumentParser& argumentParser)
+static void showHelpAndExitIfNeeded(const ArgumentParser& argumentParser)
 {
     // ATTENTION: The arguments which trigger the help are consistent with those of the gtest
     // itself, so that the gtest's help is printed before our help.
@@ -164,7 +163,7 @@ static void showHelpAndExitIfNeeded(const utils::ArgumentParser& argumentParser)
     }
 }
 
-void TestOptions::applyArguments(const utils::ArgumentParser& arguments)
+void TestOptions::applyArguments(const ArgumentParser& arguments)
 {
     showHelpAndExitIfNeeded(arguments);
 
@@ -245,5 +244,4 @@ std::atomic<size_t> TestOptions::s_loadMode(1);
 
 QString TestOptions::s_moduleName(nx::Uuid::createUuid().toSimpleString());
 
-} // namespace utils
 } // namespace nx

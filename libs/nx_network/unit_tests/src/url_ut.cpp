@@ -32,7 +32,7 @@ TEST(Url, joinPath)
 TEST(Url, logging)
 {
     nx::utils::Url url;
-    if (!nx::utils::log::showPasswords())
+    if (!nx::log::showPasswords())
     {
         url.setScheme("http");
         url.setHost("zorz.com");

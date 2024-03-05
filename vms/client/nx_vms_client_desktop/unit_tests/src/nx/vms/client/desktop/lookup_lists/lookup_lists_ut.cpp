@@ -205,7 +205,7 @@ protected:
 
     void whenExportModelToFile()
     {
-        m_exportTestFile.setFileName(utils::TestOptions::temporaryDirectoryPath(true) + "/"
+        m_exportTestFile.setFileName(TestOptions::temporaryDirectoryPath(true) + "/"
             + m_entriesModel->listModel()->rawData().name + ".csv");
 
         ASSERT_TRUE(m_exportTestFile.open(QFile::WriteOnly));

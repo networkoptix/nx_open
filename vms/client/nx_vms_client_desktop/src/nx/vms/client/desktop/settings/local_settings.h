@@ -59,15 +59,15 @@ public:
     Property<QString> locale{this, "locale", nx::branding::defaultLocale()};
 
     Property<QString> logLevel{this, "logLevel"};
-    Property<qint64> maxLogFileSizeB{this, nx::utils::log::kMaxLogFileSizeSymbolicName,
-        nx::utils::log::kDefaultMaxLogFileSizeB};
-    Property<qint64> maxLogVolumeSizeB{this, nx::utils::log::kMaxLogVolumeSizeSymbolicName,
-        nx::utils::log::kDefaultMaxLogVolumeSizeB};
+    Property<qint64> maxLogFileSizeB{this, nx::log::kMaxLogFileSizeSymbolicName,
+        nx::log::kDefaultMaxLogFileSizeB};
+    Property<qint64> maxLogVolumeSizeB{this, nx::log::kMaxLogVolumeSizeSymbolicName,
+        nx::log::kDefaultMaxLogVolumeSizeB};
     Property<std::chrono::seconds> maxLogFileTimePeriodS{this,
-        nx::utils::log::kMaxLogFileTimePeriodSymbolicName,
-        nx::utils::log::kDefaultMaxLogFileTimePeriodS};
-    Property<bool> logArchivingEnabled{this, nx::utils::log::kLogArchivingEnabledSymbolicName,
-        nx::utils::log::kDefaultLogArchivingEnabled};
+        nx::log::kMaxLogFileTimePeriodSymbolicName,
+        nx::log::kDefaultMaxLogFileTimePeriodS};
+    Property<bool> logArchivingEnabled{this, nx::log::kLogArchivingEnabledSymbolicName,
+        nx::log::kDefaultLogArchivingEnabled};
 
     Property<nx::Uuid> pcUuid{this, "pcUuid", {},
         "Unique id for this PC for videowall construction."};

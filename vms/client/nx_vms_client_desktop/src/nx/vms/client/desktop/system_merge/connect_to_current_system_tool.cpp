@@ -135,7 +135,7 @@ void ConnectToCurrentSystemTool::finish(
     const QString& errorText,
     const nx::vms::api::ModuleInformation& moduleInformation)
 {
-    using nx::utils::log::Level;
+    using nx::log::Level;
 
     NX_UTILS_LOG(
         mergeStatus == MergeSystemsStatus::ok ? Level::debug : Level::error,

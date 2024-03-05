@@ -167,7 +167,7 @@ All requests require authentication with predefined credentials "admin:admin".
 
         // Reading HTTP server settings.
         http::server::Settings httpSettings;
-        httpSettings.load(QnSettings(nx::utils::ArgumentParser(argc, argv)));
+        httpSettings.load(QnSettings(nx::ArgumentParser(argc, argv)));
 
         // Building the HTTP listener from settings.
         // Note: the builder will bind listener to endpoints, but won't start listening.
