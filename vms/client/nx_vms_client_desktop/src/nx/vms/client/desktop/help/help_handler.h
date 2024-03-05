@@ -2,12 +2,16 @@
 
 #pragma once
 
+#include <memory>
+
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
 
 #include "help_topic.h"
 
 namespace nx::vms::client::desktop {
+
+class HelpDialog;
 
 // This class should not depend on any singletons.
 // If it must, it should be changed to our QnSingleton descendant.
@@ -33,8 +37,10 @@ public:
 protected:
     static QUrl urlForTopic(HelpTopic::Id topic);
 
+    void openHelpTopicInternal(HelpTopic::Id topic);
+
 private:
-    HelpTopic::Id m_topic = HelpTopic::Id::Empty;
+    std::unique_ptr<HelpDialog> m_helpDialog;
 };
 
 } // namespace nx::vms::client::desktop
