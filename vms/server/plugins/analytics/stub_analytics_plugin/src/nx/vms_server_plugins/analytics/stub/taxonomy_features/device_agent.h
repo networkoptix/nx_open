@@ -59,6 +59,7 @@ private:
         std::atomic<bool> generateInstanceOfNonIndexableObjectType{true};
         std::atomic<bool> generateInstanceOfExtendedObjectType{true};
         std::atomic<bool> generateInstanceOfObjectTypeWithAttributeList{true};
+        std::atomic<bool> generateInstanceOfObjectTypeWithDependentAttributes{true};
     };
 
     Engine* const m_engine;
