@@ -89,6 +89,8 @@ Ptr<IMetadataPacket> DeviceAgent::generateObjectMetadataPacket(int64_t frameTime
         objects.push_back(generateInstanceOfExtendedObjectType());
     if (m_settings.generateInstanceOfObjectTypeWithAttributeList)
         objects.push_back(generateInstanceOfObjectTypeWithAttributeList());
+    if (m_settings.generateInstanceOfObjectTypeWithDependentAttributes)
+        objects.push_back(generateInstanceOfObjectTypeWithDependentAttributes());
 
     for (int i = 0; i < (int) objects.size(); ++i)
     {
@@ -176,6 +178,8 @@ Result<const nx::sdk::ISettingsResponse*> DeviceAgent::settingsReceived()
         toBool(settingValue("generateInstanceOfExtendedObjectType"));
     m_settings.generateInstanceOfObjectTypeWithAttributeList =
         toBool(settingValue("generateInstanceOfObjectTypeWithAttributeList"));
+    m_settings.generateInstanceOfObjectTypeWithDependentAttributes =
+        toBool(settingValue("generateInstanceOfObjectTypeWithDependentAttributes"));
 
     return nullptr;
 }

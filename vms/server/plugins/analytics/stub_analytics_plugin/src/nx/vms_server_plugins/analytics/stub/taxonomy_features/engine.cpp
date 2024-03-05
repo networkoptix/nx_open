@@ -222,6 +222,12 @@ std::string Engine::manifestString() const
                 "caption": "Object Type with Attribute List",
                 "name": "generateInstanceOfObjectTypeWithAttributeList",
                 "defaultValue": true
+            },
+            {
+                "type": "CheckBox",
+                "caption": "Object Type with dependent attributes",
+                "name": "generateInstanceOfObjectTypeWithDependentAttributes",
+                "defaultValue": true
             }
         ]
     }

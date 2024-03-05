@@ -36,6 +36,7 @@ nx::sdk::Ptr<nx::sdk::analytics::ObjectMetadata> generateInstanceOfLiveOnlyObjec
 nx::sdk::Ptr<nx::sdk::analytics::ObjectMetadata> generateInstanceOfNonIndexableObjectType();
 nx::sdk::Ptr<nx::sdk::analytics::ObjectMetadata> generateInstanceOfExtendedObjectType();
 nx::sdk::Ptr<nx::sdk::analytics::ObjectMetadata> generateInstanceOfObjectTypeWithAttributeList();
+nx::sdk::Ptr<nx::sdk::analytics::ObjectMetadata>  generateInstanceOfObjectTypeWithDependentAttributes();
 
 } // namespace taxonomy_features
 } // namespace stub
