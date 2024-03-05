@@ -227,7 +227,7 @@ namespace Qn {
         AR_ExportVideo = static_cast<int>(nx::vms::api::AuditRecordType::exportVideo),
         AR_CameraUpdate = static_cast<int>(nx::vms::api::AuditRecordType::cameraUpdate),
         AR_SystemNameChanged = static_cast<int>(nx::vms::api::AuditRecordType::systemNameChanged),
-        AR_SystemmMerge = static_cast<int>(nx::vms::api::AuditRecordType::systemmMerge),
+        AR_SystemmMerge = static_cast<int>(nx::vms::api::AuditRecordType::systemMerge),
         AR_SettingsChange = static_cast<int>(nx::vms::api::AuditRecordType::settingsChange),
         AR_ServerUpdate = static_cast<int>(nx::vms::api::AuditRecordType::serverUpdate),
         AR_BEventUpdate = static_cast<int>(nx::vms::api::AuditRecordType::eventUpdate),
