@@ -20,4 +20,6 @@ static constexpr char kInternalUserSystemsPath[] =
 
 static constexpr char kOrganizationPath[] = "/partners/api/v2/organizations/{organizationId}/";
 
+static constexpr char kAllOrganizationsUsers[] = "/partners/api/v2/internal/users/all";
+
 } // namespace nx::cloud::cps::api
