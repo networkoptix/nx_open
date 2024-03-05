@@ -2,6 +2,8 @@
 
 include_guard()
 
+option(prefetchGoDependencies "Check and download (if needed) Golang dependencies during the CMake run" OFF)
+
 set(NX_GO_COMPILER "${CONAN_GO_ROOT}/bin/go")
 
 # Get the environment with which to invoke a go command through cmake -E env. i.e:
