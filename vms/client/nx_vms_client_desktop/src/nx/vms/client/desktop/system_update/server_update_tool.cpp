@@ -1188,7 +1188,7 @@ void ServerUpdateTool::requestModuleInformation()
             // TODO: #sivanov Looks like we can take existing rest connection here.
             m_serverConnection.reset(new rest::ServerConnection(
                 moduleInformation.id,
-                /*auditId*/ systemContext()->sessionId(),
+                systemContext()->auditId(),
                 systemContext()->certificateVerifier(),
                 ec2connection->address(),
                 ec2connection->credentials()));

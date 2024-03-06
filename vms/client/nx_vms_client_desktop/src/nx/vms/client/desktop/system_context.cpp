@@ -73,7 +73,6 @@ struct SystemContext::Private
     {
         nx::vms::api::RuntimeData runtimeData;
         runtimeData.peer.id = q->peerId();
-        runtimeData.peer.instanceId = q->sessionId();
         runtimeData.peer.peerType = appContext()->localPeerType();
         runtimeData.peer.dataFormat = serializationFormat();
         runtimeData.brand = ini().developerMode ? QString() : nx::branding::brand();

@@ -61,8 +61,7 @@ struct Manager::Private
 
                 if (serverModeInfo && serverModeInfo->peerId == module.id)
                 {
-                    const auto runtimeId = serverModeInfo->sessionId;
-                    if (module.runtimeId == runtimeId)
+                    if (module.runtimeId == serverModeInfo->auditId)
                         return; // Ignore own record.
 
                     NX_DEBUG(this, "Conflicting module %1 found on %2",

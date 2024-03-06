@@ -111,6 +111,12 @@ public:
     rest::ServerConnectionPtr connectedServerApi() const;
 
     /**
+     * Id of the connection in the Audit Trail and Runtime Info Manager (taken from the remote
+     * connection if it is established).
+     */
+    virtual nx::Uuid auditId() const override;
+
+    /**
      * Established p2p connection (if any).
      */
     ec2::AbstractECConnectionPtr messageBusConnection() const;

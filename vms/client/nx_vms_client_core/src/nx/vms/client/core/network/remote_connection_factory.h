@@ -42,8 +42,6 @@ public:
     using Process = RemoteConnectionProcess;
     using ProcessPtr = std::shared_ptr<Process>;
 
-    using AuditIdProvider = std::function<nx::Uuid()>;
-
     struct CloudCredentialsProvider
     {
         std::function<nx::network::http::Credentials()> getCredentials;
@@ -56,7 +54,6 @@ public:
      * Certificate validator ownership is not taken. Its lifetime must be controlled by the caller.
      */
     RemoteConnectionFactory(
-        AuditIdProvider auditIdProvider,
         CloudCredentialsProvider cloudCredentialsProvider,
         std::shared_ptr<AbstractRemoteConnectionFactoryRequestsManager> requestsManager,
         CertificateVerifier* certificateVerifier,

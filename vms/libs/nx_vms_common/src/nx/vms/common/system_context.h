@@ -79,8 +79,6 @@ public:
     /**
      * @param peerId Id of the current peer in the Message Bus. It is persistent and is not changed
      *     between the application runs. See ::peerId() for the details.
-     * @param sessionId Id of the connection session. On the server side it is randomly generated
-     *     on the server start. On the client side it is generated separately for each connection.
      * @param resourceAccessMode Mode of the Resource permissions mechanism work. Direct mode is
      *     used on the Server side, all calculations occur on the fly. Cached mode is used for the
      *     current context on the Client side, where we need to actively listen for the changes and
@@ -89,7 +87,6 @@ public:
     SystemContext(
         Mode mode,
         nx::Uuid peerId,
-        nx::Uuid sessionId,
         nx::core::access::Mode resourceAccessMode,
         QObject* parent = nullptr);
     virtual ~SystemContext();
@@ -104,13 +101,10 @@ public:
     const nx::Uuid& peerId() const;
 
     /**
-     * Id of the connection session. On the server side it is randomly generated on the server
-     * start. On the client side it is generated separately for each connection.
+     * Id of the connection in the Audit Trail and Runtime Info Manager. Must be implemented in
+     * descendant classes.
      */
-    const nx::Uuid& sessionId() const;
-
-    /** Temporary method to simplify refactor. */
-    void updateRunningInstanceGuid();
+    virtual nx::Uuid auditId() const;
 
     /**
      * Enable network-related functionality. Can be disabled in unit tests.

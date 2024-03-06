@@ -60,6 +60,11 @@ auto safeProcedure(std::function<void(Args...)> proc)
         };
 }
 
+nx::Uuid getSessionId(ResourcesChangesManager* manager)
+{
+    return manager->connection() ? manager->connection()->auditId() : Uuid();
+};
+
 using ReplyProcessorFunction = std::function<void(int reqId, ec2::ErrorCode errorCode)>;
 using ReplyProcessorFunctionRest = std::function<void(
     bool success, rest::Handle requestId, rest::ServerConnection::ErrorOrEmpty result)>;
@@ -72,7 +77,7 @@ ReplyProcessorFunction makeReplyProcessor(ResourcesChangesManager* manager,
     ReplyProcessorFunction handler)
 {
     QPointer<ResourcesChangesManager> guard(manager);
-    const auto sessionGuid = manager->sessionId();
+    const auto sessionGuid = getSessionId(manager);
     QPointer<QThread> thread(QThread::currentThread());
     return
         [thread, guard, sessionGuid, handler](int reqID, ec2::ErrorCode errorCode)
@@ -87,7 +92,7 @@ ReplyProcessorFunction makeReplyProcessor(ResourcesChangesManager* manager,
                         return;
 
                     // Check if we have already changed session.
-                    if (guard->sessionId() != sessionGuid)
+                    if (getSessionId(guard.data()) != sessionGuid)
                         return;
 
                     handler(reqID, errorCode);
@@ -98,8 +103,10 @@ ReplyProcessorFunction makeReplyProcessor(ResourcesChangesManager* manager,
 ReplyProcessorFunctionRest makeReplyProcessorRest(ResourcesChangesManager* manager,
     ReplyProcessorFunctionRest handler)
 {
+
+
     QPointer<ResourcesChangesManager> guard(manager);
-    const auto sessionGuid = manager->sessionId();
+    const auto sessionGuid = getSessionId(manager);
     QPointer<QThread> thread(QThread::currentThread());
     return
         [thread, guard, sessionGuid, handler](
@@ -115,7 +122,7 @@ ReplyProcessorFunctionRest makeReplyProcessorRest(ResourcesChangesManager* manag
                         return;
 
                     // Check if we have already changed session.
-                    if (guard->sessionId() != sessionGuid)
+                    if (getSessionId(guard.data()) != sessionGuid)
                         return;
 
                     handler(success, requestId, result);
