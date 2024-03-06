@@ -43,9 +43,7 @@ public:
     }
     /* return internal id of inserted record. Returns <= 0 if error */
     virtual int addAuditRecord(const QnAuditRecord& record) = 0;
-    virtual int updateAuditRecord(int internalId, const QnAuditRecord& record) = 0;
     virtual void flushAuditRecords() = 0;
-    virtual QnTimePeriod playbackRange(const AuditHandle& handle) const = 0;
 
     virtual void at_connectionOpened(const QnAuthSession& session, const Qn::UserAccessData& accessRights) = 0;
     virtual void at_connectionClosed(const QnAuthSession& session) = 0;
