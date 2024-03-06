@@ -49,13 +49,6 @@ nx::Uuid QnCommonModule::peerId() const
         : nx::Uuid();
 }
 
-nx::Uuid QnCommonModule::sessionId() const
-{
-    return NX_ASSERT(d->systemContext)
-        ? d->systemContext->sessionId()
-        : nx::Uuid();
-}
-
 QnLicensePool* QnCommonModule::licensePool() const
 {
     return NX_ASSERT(d->systemContext)

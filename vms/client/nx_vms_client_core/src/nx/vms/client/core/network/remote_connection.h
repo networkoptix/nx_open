@@ -47,7 +47,7 @@ public:
         std::optional<std::chrono::microseconds> sessionTokenExpirationTime,
         std::shared_ptr<CertificateCache> certificateCache,
         Qn::SerializationFormat serializationFormat,
-        nx::Uuid sessionId,
+        nx::Uuid auditId,
         QObject* parent = nullptr);
     virtual ~RemoteConnection() override;
 
@@ -56,6 +56,9 @@ public:
     void initializeMessageBusConnection(SystemContext* systemContext);
 
     const nx::vms::api::ModuleInformation& moduleInformation() const;
+
+    /** Id of the connection in the Audit Trail. */
+    nx::Uuid auditId() const;
 
     /** Address and credentials of the server we are currently connected to. */
     ConnectionInfo connectionInfo() const;
@@ -93,8 +96,6 @@ public:
 
     ec2::AbstractECConnectionPtr messageBusConnection() const;
     common::AbstractTimeSyncManagerPtr timeSynchronizationManager() const;
-
-    void updateSessionId(const nx::Uuid& sessionId);
 
     std::shared_ptr<CertificateCache> certificateCache() const;
 

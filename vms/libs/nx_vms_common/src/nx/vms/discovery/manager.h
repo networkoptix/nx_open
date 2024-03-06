@@ -43,7 +43,7 @@ public:
     struct ServerModeInfo
     {
         nx::Uuid peerId;
-        nx::Uuid sessionId;
+        nx::Uuid auditId;
         bool multicastDiscoveryAllowed = true;
     };
 

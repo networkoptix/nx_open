@@ -41,7 +41,6 @@ struct SystemContext::Private
 {
     const Mode mode;
     const nx::Uuid peerId;
-    /*const*/ nx::Uuid sessionId; //< FIXME: #sivanov Make separate sessions with own ids.
     QnCommonMessageProcessor* messageProcessor = nullptr;
 
     std::unique_ptr<QnLicensePool> licensePool;
@@ -77,15 +76,13 @@ struct SystemContext::Private
 SystemContext::SystemContext(
     Mode mode,
     nx::Uuid peerId,
-    nx::Uuid sessionId,
     nx::core::access::Mode resourceAccessMode,
     QObject* parent)
     :
     QObject(parent),
     d(new Private{
         .mode = mode,
-        .peerId = std::move(peerId),
-        .sessionId=std::move(sessionId)
+        .peerId = std::move(peerId)
     })
 {
     d->licensePool = std::make_unique<QnLicensePool>(this);
@@ -153,17 +150,11 @@ const nx::Uuid& SystemContext::peerId() const
     return d->peerId;
 }
 
-const nx::Uuid& SystemContext::sessionId() const
+nx::Uuid SystemContext::auditId() const
 {
-    return d->sessionId;
-}
-
-void SystemContext::updateRunningInstanceGuid()
-{
-    d->sessionId = nx::Uuid::createUuid();
-    auto data = runtimeInfoManager()->localInfo();
-    data.data.peer.instanceId = d->sessionId;
-    runtimeInfoManager()->updateLocalItem(data);
+    // TODO: #sivanov Remove the base method when QnRtspClientArchiveDelegate is fixed.
+    NX_ASSERT(false, "Base class implementation has no Audit ID. Method must be overridden.");
+    return {};
 }
 
 void SystemContext::enableNetworking(AbstractCertificateVerifier* certificateVerifier)

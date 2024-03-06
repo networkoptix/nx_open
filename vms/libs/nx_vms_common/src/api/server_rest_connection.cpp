@@ -315,6 +315,12 @@ std::string prepareUserAgent()
         nx::build_info::vmsVersion()).toStdString();
 }
 
+nx::log::Tag makeLogTag(rest::ServerConnection* instance, const nx::Uuid& serverId)
+{
+    return nx::log::Tag(
+        QStringLiteral("%1 [%2]").arg(nx::toString(instance), serverId.toString()));
+}
+
 } // namespace
 
 // --------------------------- public methods -------------------------------------------
@@ -323,23 +329,12 @@ namespace rest {
 
 struct ServerConnection::Private
 {
-    Private(
-        nx::vms::common::SystemContext* systemContext,
-        const nx::Uuid& serverId,
-        const nx::log::Tag& logTag)
-        :
-        systemContext(systemContext),
-        serverId(serverId),
-        logTag(logTag),
-        httpClientPool(new nx::network::http::ClientPool()),
-        reissuedToken(new ReissuedToken())
-    {
-    }
-
-    const nx::vms::common::SystemContext* systemContext = nullptr;
+    const nx::vms::common::SystemContext* const systemContext;
+    const nx::Uuid auditId;
     const nx::Uuid serverId;
     const nx::log::Tag logTag;
-    const QScopedPointer<nx::network::http::ClientPool> httpClientPool;
+    const std::unique_ptr<nx::network::http::ClientPool> httpClientPool =
+        std::make_unique<nx::network::http::ClientPool>();
 
     // While most fields of this struct never change during struct's lifetime, some data can be
     // rarely updated. Therefore the following non-const fields should be protected by mutex.
@@ -347,7 +342,6 @@ struct ServerConnection::Private
 
     struct DirectConnect
     {
-        nx::Uuid sessionId;
         nx::vms::common::AbstractCertificateVerifier* certificateVerifier = nullptr;
         nx::network::SocketAddress address;
         nx::network::http::Credentials credentials;
@@ -386,7 +380,7 @@ struct ServerConnection::Private
     using ReissuedTokenPtr = std::shared_ptr<ReissuedToken>;
 
     // Pointer to the helper. Could be accessed in any thread and should be protected by mutex.
-    ReissuedTokenPtr reissuedToken;
+    ReissuedTokenPtr reissuedToken = std::make_shared<ReissuedToken>();
 };
 
 ServerConnection::ServerConnection(
@@ -394,11 +388,11 @@ ServerConnection::ServerConnection(
     const nx::Uuid& serverId)
     :
     QObject(),
-    d(new Private(
-        systemContext,
-        serverId,
-        nx::log::Tag(
-            QStringLiteral("%1 [%2]").arg(nx::toString(this), serverId.toString()))))
+    d(new Private{
+        .systemContext = systemContext,
+        .auditId = systemContext->auditId(),
+        .serverId = serverId,
+        .logTag = makeLogTag(this, serverId)})
 {
     // TODO: #sivanov Raw pointer is unsafe here as ServerConnection instance may be not deleted
     // after it's owning server (and context) are destroyed. Need to change
@@ -407,26 +401,22 @@ ServerConnection::ServerConnection(
 
 ServerConnection::ServerConnection(
     const nx::Uuid& serverId,
-    const nx::Uuid& sessionId,
+    const nx::Uuid& auditId,
     AbstractCertificateVerifier* certificateVerifier,
     nx::network::SocketAddress address,
     nx::network::http::Credentials credentials)
     :
-    ServerConnection(/*systemContext*/ nullptr, serverId)
+    QObject(),
+    d(new Private{
+        .systemContext = nullptr,
+        .auditId = auditId,
+        .serverId = serverId,
+        .logTag = makeLogTag(this, serverId),
+        .directConnect{Private::DirectConnect{
+            .certificateVerifier = certificateVerifier,
+            .address = std::move(address),
+            .credentials = std::move(credentials)}}})
 {
-    d->directConnect = Private::DirectConnect();
-    d->directConnect->sessionId = sessionId;
-    d->directConnect->certificateVerifier = certificateVerifier;
-    d->directConnect->address = std::move(address);
-    d->directConnect->credentials = std::move(credentials);
-}
-
-void ServerConnection::updateSessionId(const nx::Uuid& sessionId)
-{
-    NX_MUTEX_LOCKER lock(&d->mutex);
-
-    if (NX_ASSERT(d->directConnect))
-        d->directConnect->sessionId = sessionId;
 }
 
 ServerConnection::~ServerConnection()
@@ -3262,6 +3252,7 @@ nx::network::http::Credentials getRequestCredentials(
 
 bool setupAuth(
     const nx::vms::common::SystemContext* systemContext,
+    const nx::Uuid& auditId,
     const nx::Uuid& serverId,
     nx::network::http::ClientPool::Request& request,
     const QUrl& url,
@@ -3281,7 +3272,7 @@ bool setupAuth(
 
     // This header is used by the server to identify the client login session for audit.
     request.headers.emplace(
-        Qn::EC2_RUNTIME_GUID_HEADER_NAME, systemContext->sessionId().toByteArray());
+        Qn::EC2_RUNTIME_GUID_HEADER_NAME, auditId.toByteArray());
 
     const QnRoute route = QnRouter::routeTo(server);
 
@@ -3386,7 +3377,7 @@ nx::network::http::ClientPool::Request ServerConnection::prepareRequest(
         {
             setupAuthDirect(
                 request,
-                d->directConnect->sessionId,
+                d->auditId,
                 d->directConnect->address,
                 d->directConnect->credentials,
                 url.path(),
@@ -3396,7 +3387,7 @@ nx::network::http::ClientPool::Request ServerConnection::prepareRequest(
     }
 
     if (!isDirect)
-        authIsSet = setupAuth(d->systemContext, d->serverId, request, url, d->userId);
+        authIsSet = setupAuth(d->systemContext, d->auditId, d->serverId, request, url, d->userId);
 
     if (!authIsSet)
         return nx::network::http::ClientPool::Request();

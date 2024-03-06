@@ -37,6 +37,9 @@ struct NX_VMS_CLIENT_CORE_API RemoteConnectionFactoryContext: public QObject
     /** Initial data, describing where to connect and what to expect. */
     LogonData logonData;
 
+    /** Id of the connection in the Audit Trail and Runtime Info Manager. */
+    const nx::Uuid auditId = nx::Uuid::createUuid();
+
     struct CloudTokenInfo
     {
         nx::cloud::db::api::IssueTokenResponse response;

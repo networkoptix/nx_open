@@ -2,6 +2,7 @@
 
 #include "remote_connection.h"
 
+#include <api/runtime_info_manager.h>
 #include <api/server_rest_connection.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/p2p/p2p_message_bus.h>
@@ -150,6 +151,7 @@ struct RemoteConnection::Private
 {
     const nx::vms::api::PeerType peerType;
     const nx::vms::api::ModuleInformation moduleInformation;
+    const nx::Uuid auditId;
     ConnectionInfo connectionInfo;
     std::optional<std::chrono::microseconds> sessionTokenExpirationTime;
     std::shared_ptr<CertificateCache> certificateCache;
@@ -172,24 +174,25 @@ struct RemoteConnection::Private
         std::optional<std::chrono::microseconds> sessionTokenExpirationTime,
         std::shared_ptr<CertificateCache> certificateCache,
         Qn::SerializationFormat serializationFormat,
-        nx::Uuid sessionId)
+        nx::Uuid auditId)
         :
         peerType(peerType),
         moduleInformation(moduleInformation),
+        auditId(auditId),
         connectionInfo(std::move(connectionInfo)),
         sessionTokenExpirationTime(sessionTokenExpirationTime),
         certificateCache(certificateCache)
     {
         serverApi = std::make_shared<rest::ServerConnection>(
             moduleInformation.id,
-            sessionId,
+            auditId,
             certificateCache.get(),
             this->connectionInfo.address,
             this->connectionInfo.credentials);
 
         queryProcessor = std::make_shared<QueryProcessor>(
             moduleInformation.id,
-            sessionId,
+            auditId,
             certificateCache.get(),
             this->connectionInfo.address,
             this->connectionInfo.credentials,
@@ -204,7 +207,7 @@ RemoteConnection::RemoteConnection(
     std::optional<std::chrono::microseconds> sessionTokenExpirationTime,
     std::shared_ptr<CertificateCache> certificateCache,
     Qn::SerializationFormat serializationFormat,
-    nx::Uuid sessionId,
+    nx::Uuid auditId,
     QObject* parent)
     :
     QObject(parent),
@@ -215,14 +218,8 @@ RemoteConnection::RemoteConnection(
         sessionTokenExpirationTime,
         certificateCache,
         serializationFormat,
-        sessionId))
+        auditId))
 {
-}
-
-void RemoteConnection::updateSessionId(const nx::Uuid& sessionId)
-{
-    d->serverApi->updateSessionId(sessionId);
-    d->queryProcessor->updateSessionId(sessionId);
 }
 
 RemoteConnection::~RemoteConnection()
@@ -248,11 +245,20 @@ void RemoteConnection::initializeMessageBusConnection(
         d->messageBus.get(),
         d->timeSynchronizationManager);
     d->messageBusConnection->init(appContext()->moduleDiscoveryManager());
+
+    auto data = systemContext->runtimeInfoManager()->localInfo();
+    data.data.peer.instanceId = d->auditId;
+    systemContext->runtimeInfoManager()->updateLocalItem(data);
 }
 
 const nx::vms::api::ModuleInformation& RemoteConnection::moduleInformation() const
 {
     return d->moduleInformation;
+}
+
+nx::Uuid RemoteConnection::auditId() const
+{
+    return d->auditId;
 }
 
 ConnectionInfo RemoteConnection::connectionInfo() const
