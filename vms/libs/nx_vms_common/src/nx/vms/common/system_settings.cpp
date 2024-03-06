@@ -350,6 +350,13 @@ SystemSettings::AdaptorList SystemSettings::initCloudAdaptors()
     }
 
     connect(
+        m_organizationIdAdaptor,
+        &QnAbstractResourcePropertyAdaptor::valueChanged,
+        this,
+        &SystemSettings::organizationIdChanged,
+        Qt::QueuedConnection);
+
+    connect(
         m_cloudSystemIdAdaptor,
         &QnAbstractResourcePropertyAdaptor::valueChanged,
         this,
