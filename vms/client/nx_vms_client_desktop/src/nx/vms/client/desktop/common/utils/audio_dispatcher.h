@@ -57,7 +57,7 @@ signals:
     void audioEnabledChanged();
 
 private:
-    class Private;
+    struct Private;
     nx::utils::ImplPtr<Private> d;
 };
 
