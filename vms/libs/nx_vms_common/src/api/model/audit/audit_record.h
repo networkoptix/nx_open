@@ -101,6 +101,7 @@ struct NX_VMS_COMMON_API QnAuditRecord
     }
 
     static QnAuditRecord prepareRecord(nx::vms::api::AuditRecordType type, const QnAuthSession& authInfo);
+    static void setCreatedTimeForTests(std::optional<std::chrono::seconds> value);
 };
 #define QnAuditRecord_Fields (eventType)(createdTimeS)(authSession)(details)
 QN_FUSION_DECLARE_FUNCTIONS(QnAuditRecord, (ubjson)(json), NX_VMS_COMMON_API)
