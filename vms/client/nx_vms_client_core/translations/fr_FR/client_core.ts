@@ -247,14 +247,14 @@
     </message>
     <message numerus="yes">
       <source>Cannot verify the identity of %n servers</source>
-      <translation type="unfinished">
-        <numerusform>Cannot verify the identity of %n servers</numerusform>
-        <numerusform>Cannot verify the identity of %n servers</numerusform>
+      <translation>
+        <numerusform>Impossible de vérifier l'identité du serveur %n</numerusform>
+        <numerusform>Impossible de vérifier l'identité des serveurs %n</numerusform>
       </translation>
     </message>
     <message>
       <source>Review the certificates of the servers from this system.</source>
-      <translation type="unfinished">Review the certificates of the servers from this system.</translation>
+      <translation>Examinez les certificats des serveurs de ce système.</translation>
     </message>
     <message>
       <source>This might be due to an expired server certificate or or an invalid certificate. Contact your system administrator for further investigation.</source>
@@ -263,7 +263,7 @@
     <message>
       <source>To learn more about the current problem read this %1.</source>
       <comment>%1 is &lt;help article&gt; link</comment>
-      <translation type="unfinished">To learn more about the current problem read this %1.</translation>
+      <translation>Pour en savoir plus sur le problème actuel, lisez ceci %1.</translation>
     </message>
   </context>
   <context>
