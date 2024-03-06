@@ -139,12 +139,15 @@ NX_REFLECTION_ENUM_CLASS(SaasState,
 /**%apidoc SaasPurshase */
 struct NX_VMS_API SaasPurshase
 {
+    /**%apidoc Usage count of purchased service */
+    int used = 0;
+
     /**%apidoc Quantity of purchased service */
     int quantity = 0;
 
     bool operator==(const SaasPurshase&) const = default;
 };
-#define SaasPurshase_fields (quantity)
+#define SaasPurshase_fields (used)(quantity)
 NX_REFLECTION_INSTRUMENT(SaasPurshase, SaasPurshase_fields)
 
 /**%apidoc SaasState */

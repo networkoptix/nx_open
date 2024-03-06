@@ -21,6 +21,10 @@ public:
 
     virtual void loadDataToUi() override;
 
+protected:
+    virtual void showEvent(QShowEvent* event) override;
+    virtual void hideEvent(QHideEvent* event) override;
+
 private:
     struct Private;
     nx::utils::ImplPtr<Private> d;
