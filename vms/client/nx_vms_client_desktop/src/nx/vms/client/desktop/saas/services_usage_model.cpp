@@ -2,10 +2,26 @@
 
 #include "services_usage_model.h"
 
+#include <chrono>
+
+#include <QtCore/QTimer>
+
+#include <core/resource/camera_resource.h>
 #include <nx/utils/log/assert.h>
+#include <nx/vms/client/core/resource/session_resources_signal_listener.h>
+#include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/common/html/html.h>
 #include <nx/vms/common/saas/saas_service_manager.h>
 #include <nx/vms/common/saas/saas_service_type_display_helper.h>
 #include <nx/vms/common/saas/saas_service_usage_helper.h>
+#include <nx/vms/time/formatter.h>
+
+namespace {
+
+using namespace std::chrono;
+static constexpr auto kCameraSignalsAccumulationTimerInterval = 250ms;
+
+} // namespace
 
 namespace nx::vms::client::desktop::saas {
 
@@ -16,8 +32,14 @@ using namespace nx::vms::common::saas;
 
 struct ServicesUsageModel::Private
 {
+    Private(ServicesUsageModel* owner, ServiceManager* saasServiceManager);
+
     ServicesUsageModel* const q;
     ServiceManager* const serviceManager;
+
+    std::unique_ptr<core::SessionResourcesSignalListener<QnVirtualCameraResource>> camerasListener;
+    std::unique_ptr<QTimer> camerasSignalsAccumulationTimer;
+    void startCamerasSignalsAccumulationTimer();
 
     // Cached data obtained from serviceManager.
     nx::vms::api::SaasData saasData;
@@ -37,6 +59,26 @@ struct ServicesUsageModel::Private
 
 //-------------------------------------------------------------------------------------------------
 // ServicesUsageModel::Private definition.
+
+ServicesUsageModel::Private::Private(
+    ServicesUsageModel* owner,
+    ServiceManager* saasServiceManager)
+    :
+    q(owner),
+    serviceManager(saasServiceManager)
+{
+    camerasSignalsAccumulationTimer = std::make_unique<QTimer>();
+    camerasSignalsAccumulationTimer->setSingleShot(true);
+    camerasSignalsAccumulationTimer->setInterval(kCameraSignalsAccumulationTimerInterval);
+}
+
+void ServicesUsageModel::Private::startCamerasSignalsAccumulationTimer()
+{
+    if (camerasSignalsAccumulationTimer->isActive())
+        return;
+
+    camerasSignalsAccumulationTimer->start();
+}
 
 void ServicesUsageModel::Private::updateUsedServicesData()
 {
@@ -90,8 +132,6 @@ int ServicesUsageModel::Private::totalServiceQuantity(const nx::Uuid& serviceId)
 
 int ServicesUsageModel::Private::usedServiceQuantity(const nx::Uuid& serviceId) const
 {
-    // TODO: #vbreus Track changes in used services quantities.
-
     if (!NX_ASSERT(servicesInfo.contains(serviceId)))
         return 0;
 
@@ -140,6 +180,17 @@ ServicesUsageModel::ServicesUsageModel(ServiceManager* serviceManager, QObject* 
     connect(d->serviceManager, &ServiceManager::dataChanged, this,
         [this] { d->updateUsedServicesData(); });
     d->updateUsedServicesData();
+
+    connect(d->camerasSignalsAccumulationTimer.get(), &QTimer::timeout, this,
+        [this]
+        {
+            if (!rowCount())
+                return;
+
+            const auto topLeft = index(0, 0);
+            const auto bottomRight = index(rowCount() - 1, columnCount() - 1);
+            emit dataChanged(topLeft, bottomRight);
+        });
 }
 
 ServicesUsageModel::~ServicesUsageModel()
@@ -153,32 +204,74 @@ int ServicesUsageModel::columnCount(const QModelIndex& parent) const
 
 QVariant ServicesUsageModel::data(const QModelIndex& index, int role) const
 {
-    const auto rowServiceId = d->purchasedServicesIds().at(index.row());
+    const auto serviceId = d->purchasedServicesIds().at(index.row());
+    const auto serviceType = d->serviceType(serviceId);
+    const auto serviceTypeStatus = d->saasData.security.status.at(serviceType);
+
+    // Service overuse status is deduced from the actual number of services used rather than taken
+    // from SaasSecurity structure which is updated in a long intervals. It's done this way to make
+    // overused status responsive to user actions.
+    const auto serviceOverused =
+        d->usedServiceQuantity(serviceId) > d->totalServiceQuantity(serviceId);
 
     if (role == Qt::DisplayRole)
     {
         switch (index.column())
         {
             case ServiceNameColumn:
-                return d->serviceName(rowServiceId);
+                return d->serviceName(serviceId);
 
             case ServiceTypeColumn:
-                return d->serviceTypeDisplay(rowServiceId);
+                return d->serviceTypeDisplay(serviceId);
 
             case TotalQantityColumn:
-                return d->totalServiceQuantity(rowServiceId);
+                return d->totalServiceQuantity(serviceId);
 
             case UsedQantityColumn:
-                return d->usedServiceQuantity(rowServiceId);
+                return d->usedServiceQuantity(serviceId);
 
             default:
-                NX_ASSERT("Unexpected column");
                 return {};
         }
     }
 
+    if (role == Qt::ToolTipRole
+        && index.column() == ServiceOveruseWarningIconColumn
+        && serviceOverused)
+    {
+        using namespace nx::vms::common;
+
+        QStringList toolTipLines;
+        toolTipLines.push_back(html::paragraph(
+            tr("Number of devices using this service exceeds the available service quantity.")));
+
+        if (serviceTypeStatus.status == nx::vms::api::UseStatus::overUse)
+        {
+            const auto formatter = nx::vms::time::Formatter::system();
+            const auto expirationDateString =
+                formatter->toString(serviceTypeStatus.issueExpirationDate);
+
+            // TODO: #vbreus Rewording needed.
+            toolTipLines.push_back(html::paragraph(
+                tr("Please disable it for some devices or add more suitable services. "
+                   "Otherwise it will be done automatically on %1").arg(expirationDateString)));
+        }
+
+        return toolTipLines.join("");
+    }
+
+    if (role == Qt::DecorationRole
+        && index.column() == ServiceOveruseWarningIconColumn
+        && serviceOverused)
+    {
+        return qnSkin->icon("tree/buggy.svg");
+    }
+
     if (role == ServiceTypeRole)
-        return d->serviceType(rowServiceId);
+        return serviceType;
+
+    if (role == ServiceOverusedRole)
+        return serviceOverused;
 
     return {};
 }
@@ -211,7 +304,6 @@ QVariant ServicesUsageModel::headerData(
                 return tr("Used");
 
             default:
-                NX_ASSERT("Unexpected column");
                 return {};
         }
     }
@@ -224,14 +316,49 @@ QModelIndex ServicesUsageModel::index(int row, int column, const QModelIndex&) c
     return createIndex(row, column);
 }
 
+QModelIndex ServicesUsageModel::parent(const QModelIndex&) const
+{
+    return {};
+}
+
 int ServicesUsageModel::rowCount(const QModelIndex& parent) const
 {
     return parent.isValid() ? 0 : d->purchasedServicesIds().size();
 }
 
-QModelIndex ServicesUsageModel::parent(const QModelIndex&) const
+void ServicesUsageModel::setCamerasChangesTracking(bool enabled)
 {
-    return {};
+    if (isTrackingCamerasChanges() == enabled)
+        return;
+
+    if (enabled)
+    {
+        d->camerasListener
+            = std::make_unique<core::SessionResourcesSignalListener<QnVirtualCameraResource>>(this);
+
+        d->camerasListener->addOnSignalHandler(
+            &QnVirtualCameraResource::statusChanged,
+            [this](const auto&) { d->startCamerasSignalsAccumulationTimer(); });
+
+        d->camerasListener->addOnSignalHandler(
+            &QnVirtualCameraResource::backupPolicyChanged,
+            [this](const auto&) { d->startCamerasSignalsAccumulationTimer(); });
+
+        d->camerasListener->addOnSignalHandler(
+            &QnVirtualCameraResource::userEnabledAnalyticsEnginesChanged,
+            [this](const auto&) { d->startCamerasSignalsAccumulationTimer(); });
+
+        d->camerasListener->start();
+    }
+    else
+    {
+        d->camerasListener.reset();
+    }
+}
+
+bool ServicesUsageModel::isTrackingCamerasChanges() const
+{
+    return static_cast<bool>(d->camerasListener);
 }
 
 } // namespace nx::vms::client::desktop::saas

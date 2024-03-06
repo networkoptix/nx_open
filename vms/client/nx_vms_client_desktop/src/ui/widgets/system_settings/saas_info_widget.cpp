@@ -9,6 +9,7 @@
 
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/saas/services_sort_model.h>
+#include <nx/vms/client/desktop/saas/services_usage_item_delegate.h>
 #include <nx/vms/client/desktop/saas/services_usage_model.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -19,7 +20,6 @@
 namespace {
 
 static constexpr QSize kPlaceholderImageSize(64, 64);
-static constexpr int kServiceUsageTableMinimumColumnWidth = 100;
 
 static constexpr auto kSaasStateLabelFontSize = 18;
 static constexpr auto kSaasStateLabelFontWeight = QFont::Medium;
@@ -128,14 +128,17 @@ void SaasInfoWidget::Private::setupServicesUsagePageUi()
     servicesSortModel->setSourceModel(servicesUsageModel.get());
     servicesSortModel->sort(saas::ServicesUsageModel::ServiceNameColumn);
     ui->servicesUsageItemView->setModel(servicesSortModel.get());
+    ui->servicesUsageItemView->setItemDelegate(
+        new saas::ServicesUsageItemDelegate(ui->servicesUsageItemView));
 
     const auto itemViewHeader = ui->servicesUsageItemView->header();
-    itemViewHeader->setMinimumSectionSize(kServiceUsageTableMinimumColumnWidth);
     itemViewHeader->setSectionsMovable(false);
     itemViewHeader->setSectionResizeMode(
         saas::ServicesUsageModel::ServiceNameColumn, QHeaderView::Stretch);
     itemViewHeader->setSectionResizeMode(
         saas::ServicesUsageModel::ServiceTypeColumn, QHeaderView::Stretch);
+    itemViewHeader->setSectionResizeMode(
+        saas::ServicesUsageModel::ServiceOveruseWarningIconColumn, QHeaderView::ResizeToContents);
     itemViewHeader->setSectionResizeMode(
         saas::ServicesUsageModel::TotalQantityColumn, QHeaderView::ResizeToContents);
     itemViewHeader->setSectionResizeMode(
@@ -189,6 +192,16 @@ SaasInfoWidget::~SaasInfoWidget()
 void SaasInfoWidget::loadDataToUi()
 {
     d->updateUi();
+}
+
+void SaasInfoWidget::showEvent(QShowEvent*)
+{
+    d->servicesUsageModel->setCamerasChangesTracking(true);
+}
+
+void SaasInfoWidget::hideEvent(QHideEvent*)
+{
+    d->servicesUsageModel->setCamerasChangesTracking(false);
 }
 
 } // namespace nx::vms::client::desktop

@@ -23,6 +23,7 @@ public:
     {
         ServiceNameColumn,
         ServiceTypeColumn,
+        ServiceOveruseWarningIconColumn,
         TotalQantityColumn,
         UsedQantityColumn,
 
@@ -31,7 +32,8 @@ public:
 
     enum Role
     {
-        ServiceTypeRole = Qn::ItemDataRoleCount + 1
+        ServiceTypeRole = Qn::ItemDataRoleCount + 1,
+        ServiceOverusedRole,
     };
 
     ServicesUsageModel(
@@ -50,6 +52,14 @@ public:
 
     virtual QModelIndex parent(const QModelIndex& index) const override;
     virtual int rowCount(const QModelIndex& parent = QModelIndex()) const override;
+
+    /**
+     * Sets whether the model should track changes of relevant properties of camera resources to
+     * notify about services usage count changes. It's worth stopping track camera changes if
+     * there is no visible item view using this model as a source.
+     */
+    void setCamerasChangesTracking(bool enabled);
+    bool isTrackingCamerasChanges() const;
 
 private:
     struct Private;
