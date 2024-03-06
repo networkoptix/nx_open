@@ -1646,7 +1646,7 @@
     </message>
     <message>
       <source>Maximum number of consecutive RTP errors before the server reconnects the RTSP session.</source>
-      <translation type="unfinished">Maximum number of consecutive RTP errors before the server reconnects the RTSP session.</translation>
+      <translation>Nombre maximum d'erreurs RTP consécutives avant que le serveur ne reconnecte la session RTSP.</translation>
     </message>
     <message>
       <source>RTP timeout (milliseconds)</source>
