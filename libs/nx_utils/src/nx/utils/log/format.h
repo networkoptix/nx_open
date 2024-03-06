@@ -49,6 +49,14 @@ public:
         return m_str.arg(nx::toString(nx::toString(values)) ...);
     }
 
+    template<typename... Values>
+    Formatter args(const std::tuple<Values...>& values) const
+    {
+        return std::apply(
+            [this](auto&&... values) { return args(std::forward<decltype(values)>(values)...); },
+            values);
+    }
+
     template<typename ... Arguments>
     Formatter container(const Arguments& ... arguments) const
     {

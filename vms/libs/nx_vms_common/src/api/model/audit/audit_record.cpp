@@ -353,11 +353,19 @@ QnAuditRecord::operator QnLegacyAuditRecord() const
         });
 }
 
+static std::optional<std::chrono::seconds> s_createdTimeForTests;
+
 QnAuditRecord QnAuditRecord::prepareRecord(
     nx::vms::api::AuditRecordType type, const QnAuthSession& authSession)
 {
     QnAuditRecord result(authSession);
     result.eventType = type;
-    result.createdTimeS = std::chrono::seconds(qnSyncTime->currentMSecsSinceEpoch() / 1000);
+    result.createdTimeS = s_createdTimeForTests.value_or(
+        std::chrono::seconds(qnSyncTime->currentMSecsSinceEpoch() / 1000));
     return result;
+}
+
+void QnAuditRecord::setCreatedTimeForTests(std::optional<std::chrono::seconds> value)
+{
+    s_createdTimeForTests = value;
 }
