@@ -16,14 +16,16 @@
 
 namespace nx::vms::client::desktop {
 
-class AudioDispatcher::Private: public QObject
+struct AudioDispatcher::Private
 {
-public:
+    AudioDispatcher* const q;
     QSet<QWindow*> audioSources;
     QPointer<QWindow> primaryAudioSource;
     QPointer<QWindow> currentAudioSource;
-    bool audioEnabled = !nx::audio::AudioDevice::instance()->isMute();
+    std::atomic_bool audioInitialized = false;
+    bool audioEnabled = false;
 
+    void initializeAudio();
     bool updateCurrentAudioSource();
     QWindow* calculateCurrentAudioSource() const;
 };
@@ -33,9 +35,9 @@ public:
 
 AudioDispatcher::AudioDispatcher(QObject* parent):
     QObject(parent),
-    d(new Private())
+    d(new Private{.q = this})
 {
-    connect(qGuiApp, &QGuiApplication::focusWindowChanged, d.get(),
+    connect(qGuiApp, &QGuiApplication::focusWindowChanged, this,
         [this]()
         {
             if (d->updateCurrentAudioSource())
@@ -58,26 +60,16 @@ void AudioDispatcher::requestAudio(QWindow* window)
     if (d->audioSources.contains(window) || !NX_ASSERT(window))
         return;
 
+    d->initializeAudio();
     d->audioSources.insert(window);
 
-    connect(window, &QObject::destroyed, d.get(),
+    connect(window, &QObject::destroyed, this,
         [this, window]()
         {
             d->audioSources.remove(window);
 
             if (d->currentAudioSource == window && d->updateCurrentAudioSource())
                 emit currentAudioSourceChanged();
-        });
-
-    connect(nx::audio::AudioDevice::instance(), &nx::audio::AudioDevice::volumeChanged, this,
-        [this]()
-        {
-            const bool audioEnabled = !nx::audio::AudioDevice::instance()->isMute();
-            if (audioEnabled == d->audioEnabled)
-                return;
-
-            d->audioEnabled = audioEnabled;
-            emit audioEnabledChanged();
         });
 
     if (d->updateCurrentAudioSource())
@@ -90,7 +82,7 @@ void AudioDispatcher::releaseAudio(QWindow* window)
         return;
 
     d->audioSources.remove(window);
-    window->disconnect(d.get());
+    window->disconnect(this);
 
     if (d->currentAudioSource == window && d->updateCurrentAudioSource())
         emit currentAudioSourceChanged();
@@ -132,6 +124,27 @@ void AudioDispatcher::registerQmlType()
 
 // -----------------------------------------------------------------------------------------------
 // AudioDispatcher::Private
+
+void AudioDispatcher::Private::initializeAudio()
+{
+    if (audioInitialized.exchange(true))
+        return;
+
+    using nx::audio::AudioDevice;
+
+    audioEnabled = !AudioDevice::instance()->isMute();
+
+    QObject::connect(AudioDevice::instance(), &AudioDevice::volumeChanged, q,
+        [this]()
+        {
+            const bool isAudioEnabled = !AudioDevice::instance()->isMute();
+            if (isAudioEnabled == audioEnabled)
+                return;
+
+            audioEnabled = isAudioEnabled;
+            emit q->audioEnabledChanged();
+        });
+}
 
 bool AudioDispatcher::Private::updateCurrentAudioSource()
 {
