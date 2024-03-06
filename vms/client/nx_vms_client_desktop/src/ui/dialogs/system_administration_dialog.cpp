@@ -77,6 +77,11 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget* parent):
         this,
         updateLicenseAndSaasInfoPagesVisibility);
 
+    connect(systemContext()->globalSettings(),
+        &nx::vms::common::SystemSettings::organizationIdChanged,
+        this,
+        updateLicenseAndSaasInfoPagesVisibility);
+
     auto outgoingMailSettingsWidget = new OutgoingMailSettingsWidget(
         &d->editableSystemSettings, this);
     addPage(MailSettingsPage, outgoingMailSettingsWidget, tr("Email"));

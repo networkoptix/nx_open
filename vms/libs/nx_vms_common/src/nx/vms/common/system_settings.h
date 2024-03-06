@@ -528,6 +528,7 @@ signals:
     void upnpPortMappingEnabledChanged();
     void ec2ConnectionSettingsChanged(const QString& key);
     void cloudSettingsChanged();
+    void organizationIdChanged();
     void cloudCredentialsChanged();
     void timeSynchronizationSettingsChanged();
     void cloudConnectUdpHolePunchingEnabledChanged();
