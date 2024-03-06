@@ -260,6 +260,8 @@ struct RemoteConnectionFactoryRequestsManager::Private
     {
         if (!request)
             request = makeRequestWithCertificateValidation(context->handshakeCertificateChain);
+        request->addAdditionalHeader(
+            Qn::EC2_RUNTIME_GUID_HEADER_NAME, context->auditId.toStdString());
 
         std::promise<ResultType> promise;
         auto future = promise.get_future();
@@ -284,6 +286,8 @@ struct RemoteConnectionFactoryRequestsManager::Private
             Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
             std::move(data));
         request->setRequestBody(std::move(messageBody));
+        request->addAdditionalHeader(
+            Qn::EC2_RUNTIME_GUID_HEADER_NAME, context->auditId.toStdString());
 
         std::promise<ResultType> promise;
         auto future = promise.get_future();

@@ -28,14 +28,12 @@ class QueryProcessor: public QObject
 public:
     QueryProcessor(
         const nx::Uuid& serverId,
-        const nx::Uuid& runningInstanceId,
+        const nx::Uuid& auditId,
         AbstractCertificateVerifier* certificateVerifier,
         nx::network::SocketAddress address,
         nx::network::http::Credentials credentials,
         Qn::SerializationFormat serializationFormat);
     virtual ~QueryProcessor() override;
-
-    void updateSessionId(const nx::Uuid& sessionId);
 
     QueryProcessor& getAccess(const Qn::UserSession& /*session*/) { return *this; }
 

@@ -142,7 +142,6 @@ struct RemoteConnectionFactory::Private
     const nx::vms::api::PeerType peerType;
     const Qn::SerializationFormat serializationFormat;
     QPointer<CertificateVerifier> certificateVerifier;
-    AuditIdProvider auditIdProvider;
     CloudCredentialsProvider cloudCredentialsProvider;
     std::shared_ptr<RequestsManager> requestsManager;
     std::unique_ptr<AbstractRemoteConnectionUserInteractionDelegate> userInteractionDelegate;
@@ -152,7 +151,6 @@ struct RemoteConnectionFactory::Private
         nx::vms::api::PeerType peerType,
         Qn::SerializationFormat serializationFormat,
         CertificateVerifier* certificateVerifier,
-        AuditIdProvider auditIdProvider,
         CloudCredentialsProvider cloudCredentialsProvider,
         std::shared_ptr<RequestsManager> requestsManager)
         :
@@ -160,11 +158,9 @@ struct RemoteConnectionFactory::Private
         peerType(peerType),
         serializationFormat(serializationFormat),
         certificateVerifier(certificateVerifier),
-        auditIdProvider(std::move(auditIdProvider)),
         cloudCredentialsProvider(std::move(cloudCredentialsProvider)),
         requestsManager(std::move(requestsManager))
     {
-        NX_ASSERT(this->auditIdProvider);
         NX_ASSERT(this->cloudCredentialsProvider.getCredentials);
         NX_ASSERT(this->cloudCredentialsProvider.getLogin);
         NX_ASSERT(this->cloudCredentialsProvider.getDigestPassword);
@@ -186,7 +182,7 @@ struct RemoteConnectionFactory::Private
             context->sessionTokenExpirationTime,
             context->certificateCache,
             serializationFormat,
-            /*auditId*/ auditIdProvider());
+            context->auditId);
     }
 
     bool executeInUiThreadSync(
@@ -1208,7 +1204,6 @@ struct RemoteConnectionFactory::Private
 };
 
 RemoteConnectionFactory::RemoteConnectionFactory(
-    AuditIdProvider auditIdProvider,
     CloudCredentialsProvider cloudCredentialsProvider,
     std::shared_ptr<AbstractRemoteConnectionFactoryRequestsManager> requestsManager,
     CertificateVerifier* certificateVerifier,
@@ -1221,7 +1216,6 @@ RemoteConnectionFactory::RemoteConnectionFactory(
         peerType,
         serializationFormat,
         certificateVerifier,
-        std::move(auditIdProvider),
         std::move(cloudCredentialsProvider),
         std::move(requestsManager))
     )

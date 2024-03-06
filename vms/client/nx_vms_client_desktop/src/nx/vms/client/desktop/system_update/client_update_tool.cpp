@@ -287,7 +287,7 @@ void ClientUpdateTool::setServerUrl(
     m_serverConnection.reset(
         new rest::ServerConnection(
             serverId,
-            /*auditId*/ systemContext()->sessionId(),
+            systemContext()->auditId(),
             certificateVerifier,
             logonData.address,
             logonData.credentials));
