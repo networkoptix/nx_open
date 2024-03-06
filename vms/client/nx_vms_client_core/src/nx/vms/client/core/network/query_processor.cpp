@@ -2,14 +2,14 @@
 
 #include "query_processor.h"
 
-#include <nx/network/http/http_async_client.h>
-#include <nx/network/http/custom_headers.h>
 #include <nx/network/http/buffer_source.h>
-#include <nx/utils/thread/mutex.h>
+#include <nx/network/http/custom_headers.h>
+#include <nx/network/http/http_async_client.h>
 #include <nx/network/url/url_builder.h>
+#include <nx/utils/thread/mutex.h>
 
-#include "network_manager.h"
 #include "certificate_verifier.h"
+#include "network_manager.h"
 
 namespace nx::vms::client::core {
 
@@ -17,14 +17,14 @@ struct QueryProcessor::Private
 {
     Private(
         const nx::Uuid& serverId,
-        const nx::Uuid& runningInstanceId,
+        const nx::Uuid& auditId,
         AbstractCertificateVerifier* certificateVerifier,
         nx::network::SocketAddress address,
         nx::network::http::Credentials credentials,
         Qn::SerializationFormat format)
         :
         serverId(serverId),
-        runningInstanceId(runningInstanceId),
+        auditId(auditId),
         certificateVerifier(certificateVerifier),
         address(std::move(address)),
         credentials(std::move(credentials)),
@@ -41,7 +41,7 @@ struct QueryProcessor::Private
 
         // This header is used by the server to identify the client login session for audit.
         httpClient->addAdditionalHeader(
-            Qn::EC2_RUNTIME_GUID_HEADER_NAME, runningInstanceId.toStdString());
+            Qn::EC2_RUNTIME_GUID_HEADER_NAME, auditId.toStdString());
 
         httpClient->setCredentials(credentials);
 
@@ -64,7 +64,7 @@ struct QueryProcessor::Private
     mutable nx::Mutex mutex;
 
     const nx::Uuid serverId;
-    nx::Uuid runningInstanceId;
+    const nx::Uuid auditId;
     AbstractCertificateVerifier* certificateVerifier;
     nx::network::SocketAddress address;
     nx::network::http::Credentials credentials;
@@ -74,7 +74,7 @@ struct QueryProcessor::Private
 
 QueryProcessor::QueryProcessor(
     const nx::Uuid& serverId,
-    const nx::Uuid& runningInstanceId,
+    const nx::Uuid& auditId,
     AbstractCertificateVerifier* certificateVerifier,
     nx::network::SocketAddress address,
     nx::network::http::Credentials credentials,
@@ -82,17 +82,12 @@ QueryProcessor::QueryProcessor(
     :
     d(new Private(
         serverId,
-        runningInstanceId,
+        auditId,
         certificateVerifier,
         std::move(address),
         std::move(credentials),
         serializationFormat))
 {
-}
-
-void QueryProcessor::updateSessionId(const nx::Uuid& sessionId)
-{
-    d->runningInstanceId = sessionId;
 }
 
 QueryProcessor::~QueryProcessor()

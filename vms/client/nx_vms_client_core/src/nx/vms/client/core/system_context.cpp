@@ -84,7 +84,6 @@ SystemContext::SystemContext(
     base_type(
         mode,
         std::move(peerId),
-        /*sessionId*/ nx::Uuid::createUuid(),
         resourceAccessMode,
         parent),
     d(new Private())
@@ -219,6 +218,14 @@ rest::ServerConnectionPtr SystemContext::connectedServerApi() const
 {
     if (auto connection = this->connection())
         return connection->serverApi();
+
+    return {};
+}
+
+nx::Uuid SystemContext::auditId() const
+{
+    if (auto connection = this->connection(); NX_ASSERT(connection, "Connection must exist here."))
+        return connection->auditId();
 
     return {};
 }

@@ -149,6 +149,7 @@ public:
      * and ec2Connection instance, but need to send requests to the server.
      *
      * @param serverId resource Id of the VMS server.
+     * @param auditId Id of the session in the Audit Trail.
      * @param address Explicit address of the VMS server.
      * @param credentials Credentials to authorize requests.
      */
@@ -158,8 +159,6 @@ public:
         AbstractCertificateVerifier* certificateVerifier,
         nx::network::SocketAddress address,
         nx::network::http::Credentials credentials);
-
-    void updateSessionId(const nx::Uuid& sessionId);
 
     virtual ~ServerConnection();
 

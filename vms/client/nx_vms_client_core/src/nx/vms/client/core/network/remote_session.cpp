@@ -116,10 +116,6 @@ RemoteSession::RemoteSession(
     SystemContextAware(systemContext),
     d(new Private())
 {
-    // Audit id should be updated when establishing new session.
-    // TODO: #sivanov Remove global singleton storage, use session id as audit id everywhere.
-    systemContext->updateRunningInstanceGuid();
-
     d->remoteConnectionFactory = qnClientCoreModule->networkModule()->connectionFactory();
 
     d->messageProcessor = static_cast<QnClientMessageProcessor*>(
@@ -295,10 +291,6 @@ void RemoteSession::establishConnection(RemoteConnectionPtr connection)
         d->cloudTokenUpdater->onTokenUpdated(
             connection->sessionTokenExpirationTime().value_or(std::chrono::microseconds::zero()));
     }
-
-    // TODO: #sivanov Remove global singleton storage, use session id as audit id everywhere.
-    // Setup audit id.
-    connection->updateSessionId(systemContext()->sessionId());
 
     // Setup message bus connection.
     connection->initializeMessageBusConnection(qnClientCoreModule->commonModule());
