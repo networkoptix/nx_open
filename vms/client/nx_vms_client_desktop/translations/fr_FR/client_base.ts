@@ -1727,11 +1727,11 @@ Clé de licence : %2</translation>
     </message>
     <message>
       <source>Unable to test SMTP server</source>
-      <translation type="unfinished">Unable to test SMTP server</translation>
+      <translation>Impossible de tester le serveur SMTP</translation>
     </message>
     <message>
       <source>Additional info required</source>
-      <translation type="unfinished">Additional info required</translation>
+      <translation>Informations supplémentaires requises</translation>
     </message>
   </context>
   <context>
