@@ -4,15 +4,16 @@
 
 namespace nx::network::util {
 
-std::optional<std::string> getHostName(const http::RequestContext& request)
+std::optional<std::string> getHostName(
+    const http::RequestContext& request, const std::string& hostHeader /* = "Host" */)
 {
-    if (!request.request.headers.count("Host"))
+    auto headerIt = request.request.headers.find(hostHeader);
+    if (headerIt == request.request.headers.end())
         return std::nullopt;
-    auto host = request.request.headers.find("Host")->second;
-    auto colonIt = host.find(':');
+    auto colonIt = headerIt->second.find(':');
     if (colonIt == std::string::npos)
-        return host;
-    return host.substr(0, colonIt);
+        return headerIt->second;
+    return headerIt->second.substr(0, colonIt);
 }
 
 } // namespace nx::network::util
