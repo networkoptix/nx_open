@@ -12873,6 +12873,14 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
         <source>Used</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Number of devices using this service exceeds the available service quantity.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please disable it for some devices or add more suitable services. Otherwise it will be done automatically on %1</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::ui::AnalyticsSdkEventWidget</name>
@@ -13521,6 +13529,13 @@ to view more bookmarks</source>
     <message>
         <source>Cannot check Client update availability. Check your internet connection and try again.</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>runApplication</name>
+    <message>
+        <source>Would you like to try switching to DirectX?</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>
