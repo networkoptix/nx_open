@@ -18,6 +18,9 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_FLAG(0, enableOutput, "");
 
     NX_INI_FLAG(0, deviceDependent, "Respective capability in the manifest.");
+
+    NX_INI_FLAG(0, showExtraCheckBox,
+        "If set, the Engine Settings Model in the Plugin manifest lists an extra checkbox.");
 };
 
 Ini& ini();

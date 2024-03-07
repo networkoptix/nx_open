@@ -3,6 +3,7 @@
 #include "engine.h"
 
 #include <algorithm>
+#include <unordered_map>
 
 #include "actions.h"
 #include "active_settings_rules.h"
@@ -132,11 +133,26 @@ bool Engine::processActiveSettings(
 
 Result<const ISettingsResponse*> Engine::settingsReceived()
 {
-    std::string parseError;
-    Json::object model = Json::parse(kEngineSettingsModel, parseError).object_items();
-
     std::map<std::string, std::string> values = currentSettings();
-    values[kEnginePluginSideSetting] = kEnginePluginSideSettingValue;
+
+    std::string engineSettingsModel = kEngineSettingsModel;
+    std::unordered_map<std::string, std::string> substitutionMap;
+
+    if (ini().showExtraCheckBox)
+    {
+        substitutionMap.insert({kExtraCheckBoxTemplateVariableName, kExtraCheckBoxJson});
+    }
+
+    if ((values.find(kShowExtraTextField) != values.end()) &&
+        (values[kShowExtraTextField] == "true"))
+    {
+        substitutionMap.insert({kExtraTextFieldTemplateVariableName, kExtraTextFieldJson});
+    }
+
+    engineSettingsModel = substituteAllTemplateVariables(engineSettingsModel, substitutionMap);
+
+    std::string parseError;
+    Json::object model = Json::parse(engineSettingsModel, parseError).object_items();
 
     if (!processActiveSettings(&model, &values))
         return error(ErrorCode::internalError, "Unable to process the active settings section");
@@ -189,6 +205,32 @@ void Engine::doGetSettingsOnActiveSettingChange(
     response->setActionResponse(actionResponse);
 
     *outResult = response.releasePtr();
+}
+
+void Engine::doSetSettings(
+    nx::sdk::Result<const nx::sdk::ISettingsResponse*>* outResult,
+    const nx::sdk::IStringMap* settings)
+{
+    using namespace std::string_literals;
+
+    std::string engineSettingsModel = kEngineSettingsModel;
+
+    const char* value = settings->value(kShowExtraTextField.c_str());
+
+    if (value && (value == "true"s))
+    {
+        engineSettingsModel = substituteAllTemplateVariables(engineSettingsModel,
+            {{kExtraTextFieldTemplateVariableName, kExtraTextFieldJson}});
+    }
+    else
+    {
+        engineSettingsModel = substituteAllTemplateVariables(engineSettingsModel, {});
+    }
+
+    auto settingsResponse = makePtr<SettingsResponse>();
+    settingsResponse->setModel(engineSettingsModel);
+
+    *outResult = settingsResponse.releasePtr();
 }
 
 } // namespace settings

@@ -3,6 +3,7 @@
 #include "utils.h"
 
 #include <algorithm>
+#include <regex>
 #include <vector>
 #include <fstream>
 
@@ -97,6 +98,19 @@ std::map<std::string, std::string> toStdMap(const Ptr<const IStringMap>& sdkMap)
         result[sdkMap->key(i)] = sdkMap->value(i);
 
     return result;
+}
+
+std::string substituteAllTemplateVariables(const std::string& str,
+    const std::unordered_map<std::string, std::string>& templateSubstitutionMap)
+{
+    std::string result = str;
+
+    for (const auto& [templateNamePattern, substitution]: templateSubstitutionMap)
+        result = std::regex_replace(result, std::regex(templateNamePattern), substitution);
+
+    static const std::regex genericTemplateNamePattern("@.+?@");
+
+    return std::regex_replace(result, genericTemplateNamePattern, "");
 }
 
 } // namespace stub

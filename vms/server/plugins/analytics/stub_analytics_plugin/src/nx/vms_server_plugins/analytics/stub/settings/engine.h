@@ -38,6 +38,10 @@ protected:
         nx::sdk::Result<const nx::sdk::IActiveSettingChangedResponse*>* outResult,
         const nx::sdk::IActiveSettingChangedAction* activeSettingChangedAction) override;
 
+    virtual void doSetSettings(
+        nx::sdk::Result<const nx::sdk::ISettingsResponse*>* outResult,
+        const nx::sdk::IStringMap* settings) override;
+
 private:
     bool processActiveSettings(
         nx::kit::Json::object* model,

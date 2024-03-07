@@ -4,6 +4,7 @@
 
 #include <map>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include <nx/sdk/i_string_map.h>
@@ -122,6 +123,9 @@ private:
     T m_value{};
     bool m_isInitialized = false;
 };
+
+std::string substituteAllTemplateVariables(const std::string& text,
+    const std::unordered_map<std::string, std::string>& templateSubstitutionMap);
 
 } // namespace stub
 } // namespace analytics
