@@ -7,6 +7,7 @@
 
 namespace nx::network::util {
 
-std::optional<std::string> NX_NETWORK_API getHostName(const http::RequestContext& request);
+std::optional<std::string> NX_NETWORK_API getHostName(
+    const http::RequestContext& request, const std::string& hostHeader = "Host");
 
 } // namespace nx::network::util

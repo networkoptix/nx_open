@@ -79,8 +79,8 @@ public:
 };
 
 /**
- * Fetches the "Host" from the request. If the "Host" header is found and contains hostame only,
- * it is returned as-is. If "Host" haeder contains host:port, then only "host" portion is provided.
+ * Fetches the "Host" from the request. If the "Host" header is found and contains hostname only,
+ * it is returned as-is. If "Host" header contains host:port, then only "host" portion is provided.
  */
 class HostHeaderFetcher
 {
@@ -89,7 +89,7 @@ public:
 
     type operator()(const network::http::RequestContext& requestContext) const
     {
-        return nx::network::util::getHostName(requestContext);
+        return nx::network::util::getHostName(requestContext, "Host");
     }
 };
 
