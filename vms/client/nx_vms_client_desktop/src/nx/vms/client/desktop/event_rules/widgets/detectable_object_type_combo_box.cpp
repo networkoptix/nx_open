@@ -33,7 +33,11 @@ QStringList DetectableObjectTypeComboBox::selectedObjectTypeIds() const
 
 void DetectableObjectTypeComboBox::setSelectedObjectTypeIds(const QStringList& objectTypeIds)
 {
-    const auto index = findData(objectTypeIds, DetectableObjectTypeModel::IdsRole);
+    const auto index = findData(
+        objectTypeIds,
+        DetectableObjectTypeModel::IdsRole,
+        Qt::MatchRecursive | Qt::MatchExactly | Qt::MatchCaseSensitive);
+
     if (index.isValid())
         setCurrentIndex(index);
 }
@@ -45,7 +49,11 @@ QString DetectableObjectTypeComboBox::selectedMainObjectTypeId() const
 
 void DetectableObjectTypeComboBox::setSelectedMainObjectTypeId(const QString& objectTypeId)
 {
-    const auto index = findData(objectTypeId, DetectableObjectTypeModel::MainIdRole);
+    const auto index = findData(
+        objectTypeId,
+        DetectableObjectTypeModel::MainIdRole,
+        Qt::MatchRecursive | Qt::MatchExactly | Qt::MatchCaseSensitive);
+
     if (index.isValid())
         setCurrentIndex(index);
 }
