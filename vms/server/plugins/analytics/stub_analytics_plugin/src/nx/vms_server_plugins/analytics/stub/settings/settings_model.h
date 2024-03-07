@@ -78,11 +78,44 @@ static const std::string kParametersModel = /*suppress newline*/ 1 + R"json(
 // ------------------------------------------------------------------------------------------------
 static const std::string kEnginePluginSideSetting = "testPluginSideSpinBox";
 static const std::string kEnginePluginSideSettingValue = "42";
+static const std::string kShowExtraTextField = "showExtraTextField";
+static const std::string kExtraTextFieldTemplateVariableName = "@EXTRA_TEXTFIELD_TEMPLATE_VAR@";
+static const std::string kExtraCheckBoxTemplateVariableName = "@EXTRA_CHECKBOX_TEMPLATE_VAR@";
+const std::string kExtraCheckBoxJson = /*suppress newline*/ 1 + R"json(
+{
+    "type": "CheckBox",
+    "name": "extraCheckBox",
+    "caption": "Extra Check Box",
+    "defaultValue": true
+},
+)json";
+const std::string kExtraTextFieldJson = /*suppress newline*/ 1 + R"json(
+{
+    "type": "TextField",
+    "name": "extraTextField",
+    "caption": "Extra Text Field",
+    "description": "Extra Text Field",
+    "defaultValue": "some text"
+},
+)json";
 static const std::string kEngineSettingsModel = /*suppress newline*/ 1 + R"json("
 {
     "type": "Settings",
     "items":
     [
+        )json" + kExtraTextFieldTemplateVariableName + R"json(
+        )json" + kExtraCheckBoxTemplateVariableName + R"json(
+        {
+            "type": "ComboBox",
+            "name": ")json" + kShowExtraTextField + R"json(",
+            "caption": "Add extra text field on setSettings()",
+            "defaultValue": "false",
+            "range":
+            [
+                "false",
+                "true"
+            ]
+        },
         {
             "type": "GroupBox",
             "caption": "Example Stub Engine settings",
