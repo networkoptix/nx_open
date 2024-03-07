@@ -315,6 +315,8 @@ distrib_copyServerSystemLibs() # destination_path
     distrib_copySystemLibs "${fallback_lib_path}" "${fallback_libs_to_copy[@]}"
 
     echo "${fallback_libs_to_copy[@]}" > "${fallback_lib_path}/libs.txt"
+
+    install -m 755 "${SCRIPTS_DIR}/manage_fallback_libs.sh" "${fallback_lib_path}/"
 }
 
 # Copy libraries from the specified directory using copy_system_library.py.
@@ -772,6 +774,10 @@ distrib_setPermissionsInStageDir()
 
     if [[ "${SERVER_SCRIPTS_DIR-}" ]]; then
         chmod 755 "${STAGE}/${SERVER_SCRIPTS_DIR}"/*
+    fi
+
+    if [[ -f "${STAGE}/${LIB_INSTALL_PATH}/fallback/manage_fallback_libs.sh" ]]; then
+        chmod 755 "${STAGE}/${LIB_INSTALL_PATH}/fallback/manage_fallback_libs.sh"
     fi
 }
 
