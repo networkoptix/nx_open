@@ -1268,7 +1268,8 @@ void AsyncClient::prepareRequestHeaders(
 {
     nx::network::http::insertOrReplaceHeader(
         &m_request.headers,
-        HttpHeader("Date", nx::network::http::formatDateTime(QDateTime::currentDateTime())));
+        HttpHeader("Date", nx::network::http::formatDateTime(
+            QDateTime::fromMSecsSinceEpoch(nx::utils::millisSinceEpoch().count()))));
     nx::network::http::insertOrReplaceHeader(
         &m_request.headers,
         HttpHeader(
