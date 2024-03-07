@@ -406,7 +406,8 @@ void HttpServerConnection::addResponseHeaders(
 
     nx::network::http::insertOrReplaceHeader(
         &response->headers,
-        HttpHeader("Date", formatDateTime(QDateTime::currentDateTime())));
+        HttpHeader("Date", formatDateTime(QDateTime::fromMSecsSinceEpoch(
+            nx::utils::millisSinceEpoch().count()))));
 
     const auto sslSocket = dynamic_cast<AbstractEncryptedStreamSocket*>(socket().get());
     if (sslSocket && sslSocket->isEncryptionEnabled())
