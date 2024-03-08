@@ -11,7 +11,7 @@
         #define CLANG_MISSING_FEATURE_3WAY_COMPARE_STRING 1
     #endif
 
-    #if __clang_major__ < 16
+    #if __apple_build_version__ < 15000309 //< Build version for XCode 15.3.
         #define CLANG_MISSING_FEATURE_3WAY_COMPARE_CHRONO 1
         #define CLANG_MISSING_FEATURE_3WAY_COMPARE_OPTIONAL 1
         #define CLANG_MISSING_FEATURE_3WAY_COMPARE_MAP 1
