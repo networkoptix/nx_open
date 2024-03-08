@@ -237,6 +237,25 @@ void EditVmsRuleDialog::setRule(std::shared_ptr<vms::rules::Rule> rule)
     if (!NX_ASSERT(!m_rule) || !NX_ASSERT(rule))
         return;
 
+    auto engine = systemContext()->vmsRulesEngine();
+    if (rule->eventFilters().empty())
+    {
+        auto eventFilter = engine->buildEventFilter(m_eventTypePicker->eventType());
+
+        if (!NX_ASSERT(eventFilter))
+            return;
+
+        rule->addEventFilter(std::move(eventFilter));
+    }
+
+    if (rule->actionBuilders().empty())
+    {
+        auto actionBuilder = engine->buildActionBuilder(m_actionTypePicker->actionType());
+        if (!NX_ASSERT(actionBuilder))
+            return;
+        rule->addActionBuilder(std::move(actionBuilder));
+    }
+
     m_rule = std::move(rule);
 
     displayComment();

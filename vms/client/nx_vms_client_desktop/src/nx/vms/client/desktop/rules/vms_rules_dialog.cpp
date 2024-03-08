@@ -51,16 +51,6 @@ void VmsRulesDialog::addRule()
     auto engine = systemContext()->vmsRulesEngine();
 
     auto newRule = std::make_shared<vms::rules::Rule>(nx::Uuid::createUuid(), engine);
-
-    auto eventFilter = engine->buildEventFilter(vms::rules::GenericEvent::manifest().id);
-    auto actionBuilder = engine->buildActionBuilder(vms::rules::NotificationAction::manifest().id);
-
-    if (!NX_ASSERT(eventFilter) || !NX_ASSERT(actionBuilder))
-        return;
-
-    newRule->addEventFilter(std::move(eventFilter));
-    newRule->addActionBuilder(std::move(actionBuilder));
-
     EditVmsRuleDialog editVmsRuleDialog{m_parentWidget};
 
     editVmsRuleDialog.setRule(newRule);
