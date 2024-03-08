@@ -6,7 +6,7 @@
             contain 'DiskId="2"' descriptor, so bundle will strip duplicated copies.
          -->
         <ComponentGroup Id="VcrtLibrariesComponentGroup"
-                Source="${vcrt_directory}"
+                Source="${vcrt_directory}/bin"
                 Directory="InstallDirRoot">
             <Component><File Name="concrt140.dll" KeyPath="yes" DiskId="2"/></Component>
             <Component><File Name="msvcp140.dll" KeyPath="yes" DiskId="2"/></Component>
@@ -17,6 +17,7 @@
             <Component><File Name="vccorlib140.dll" KeyPath="yes" DiskId="2"/></Component>
             <Component><File Name="vcruntime140.dll" KeyPath="yes" DiskId="2"/></Component>
             <Component><File Name="vcruntime140_1.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="vcruntime140_threads.dll" KeyPath="yes" DiskId="2"/></Component>
         </ComponentGroup>
     </Fragment>
 </Wix>

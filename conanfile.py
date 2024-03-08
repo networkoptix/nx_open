@@ -202,8 +202,8 @@ class NxOpenConan(ConanFile):
         if self.isWindows:
             self.requires("directx/JUN2010" "#ca268f1b54e3874ad43524cd81447b01")
             self.requires("intel-media-sdk-bin/2019R1" "#0a123266dd20b84b16a4cc60b752fc4b")
-            self.requires("msvc-redist/14.29.30133" "#9f10aa59e4671ce0669d6181e6b0a269")
-            self.requires("winsdk-redist/10.0.20348.0" "#bf8bf6131653c35ae84474f399fe5113")
+            self.requires("msvc-redist/14.38.33135" "#716dc6c575a38ac17943d6f0f45dde6d")
+            self.requires("winsdk-redist/10.0.22621.0" "#8dfc5bcbabe971a46f78c8d2657d7ec2")
             self.requires("icu-win/70.1" "#1c50009a7165b74563ba149c315737f1")
 
         if self.isArm32 or self.isArm64:
