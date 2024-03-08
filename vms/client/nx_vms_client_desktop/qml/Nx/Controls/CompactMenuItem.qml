@@ -5,6 +5,7 @@ import QtQuick
 import Nx
 import Nx.Controls
 import Nx.Core
+
 import nx.vms.client.core
 import nx.vms.client.desktop
 
@@ -15,13 +16,13 @@ MenuItem
     height: 24
 
     leftPadding: 8
-    rightPadding: 8
+    rightPadding: 8 + ((subMenu && arrow) ? arrow.width : 0)
 
     contentItem: Text
     {
         id: label
 
-        color: menuItem.hovered ? ColorTheme.colors.brand_contrast : ColorTheme.text
+        color: menuItem.highlighted ? ColorTheme.colors.brand_contrast : ColorTheme.text
         opacity: menuItem.enabled ? 1.0 : 0.3
         verticalAlignment: Text.AlignVCenter
         font.pixelSize: FontConfig.normal.pixelSize

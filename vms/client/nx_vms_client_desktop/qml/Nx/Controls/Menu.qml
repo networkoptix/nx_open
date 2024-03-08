@@ -14,16 +14,19 @@ Menu
 {
     id: menu
 
-    modal: true
+    modal: !parentMenu //< Sub-menus MUST be modeless.
+    Overlay.modeless: Item {}
     Overlay.modal: Item {}
 
     topPadding: 2
     bottomPadding: 2
 
+    overlap: -1
+
     width: Math.max(implicitItemsWidth + leftPadding + rightPadding,
         background ? background.implicitWidth : 0)
 
-    signal triggered(Action action, MenuItem item)
+    readonly property var parentMenu: ((parent instanceof MenuItem) && parent.menu) || null
 
     readonly property real implicitItemsWidth:
     {
@@ -35,6 +38,14 @@ Menu
         return result
     }
 
+    /** Whether to translate `triggered` signal to the parent menu automatically. */
+    property bool notifiesParentMenu: true
+
+    signal triggered(Action action, MenuItem item)
+
+    onTriggered: (action, item) =>
+        notifiesParentMenu && parentMenu && parentMenu.triggered(action, item)
+
     delegate: MenuItem {}
 
     contentItem: Column
@@ -45,10 +56,22 @@ Menu
         }
     }
 
-    background: Rectangle
+    background: Item
     {
-        radius: 2
-        color: ColorTheme.midlight
+        Rectangle
+        {
+            id: backgroundRect
+
+            radius: 2
+            color: ColorTheme.midlight
+            anchors.fill: parent
+        }
+
+        PopupShadow
+        {
+            source: backgroundRect
+            visible: true
+        }
     }
 
     Connections

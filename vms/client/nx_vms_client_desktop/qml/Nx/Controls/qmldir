@@ -19,6 +19,7 @@ CheckBox 1.0 CheckBox.qml
 CheckBoxImage 1.0 CheckBoxImage.qml
 ComboBox 1.0 ComboBox.qml
 CompactTabButton 1.0 CompactTabButton.qml
+CompactMenu 1.0 CompactMenu.qml
 CompactMenuItem 1.0 CompactMenuItem.qml
 ContextMenuMouseArea 1.0 ContextMenuMouseArea.qml
 CompactMenuSeparator 1.0 CompactMenuSeparator.qml
