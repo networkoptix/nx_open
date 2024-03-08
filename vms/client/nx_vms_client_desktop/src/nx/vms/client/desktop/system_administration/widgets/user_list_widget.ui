@@ -217,7 +217,7 @@
   </layout>
   <action name="searchAction">
    <property name="shortcut">
-    <string>Ctrl+F</string>
+     <string notr="true">Ctrl+F</string>
    </property>
    <property name="autoRepeat">
     <bool>false</bool>

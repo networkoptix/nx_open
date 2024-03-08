@@ -79,7 +79,7 @@ public:
             {
                 return {
                     tr("Invalid certificate"),
-                    tr("The server&apos;s certificate was rejected.")
+                    tr("The server's certificate was rejected.")
                 };
             }
 

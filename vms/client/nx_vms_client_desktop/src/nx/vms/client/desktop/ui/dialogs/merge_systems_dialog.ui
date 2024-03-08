@@ -83,9 +83,6 @@
               <property name="insertPolicy">
                <enum>QComboBox::NoInsert</enum>
               </property>
-              <property name="sizeAdjustPolicy">
-               <enum>QComboBox::AdjustToMinimumContentsLength</enum>
-              </property>
              </widget>
             </item>
             <item row="2" column="1">
@@ -160,7 +157,7 @@
               <bool>false</bool>
              </property>
              <property name="text">
-              <string>&lt;Warning label&gt;</string>
+              <string notr="true">&lt;Warning label&gt;</string>
              </property>
              <property name="wordWrap">
               <bool>true</bool>
@@ -170,7 +167,7 @@
            <item row="1" column="1">
             <widget class="QLabel" name="contactSupportLabel">
              <property name="text">
-              <string>&lt;We recommend that you consult with support before proceeding.&gt;</string>
+              <string notr="true">&lt;We recommend that you consult with support before proceeding.&gt;</string>
              </property>
              <property name="textFormat">
               <enum>Qt::RichText</enum>
@@ -197,7 +194,6 @@
          <widget class="QLabel" name="remoteSystemLabel">
           <property name="font">
            <font>
-            <weight>75</weight>
             <bold>true</bold>
            </font>
           </property>

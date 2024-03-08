@@ -211,7 +211,8 @@ void BackupSettingsWidget::loadState(const ServerSettingsDialogState& state)
                 AbstractItemPtr newAddedCamerasItem = GenericItemBuilder()
                     .withRole(Qn::ResourceIconKeyRole, static_cast<int>(QnResourceIconCache::Cameras))
                     .withRole(Qt::DisplayRole, tr("New added cameras"))
-                    .withRole(Qn::ExtraInfoRole, QString("\u2013 ") + tr("Applies to all servers")) //< EnDash
+                    .withRole(Qn::ExtraInfoRole, QString("\u2013 ") //< EnDash
+                        + tr("Applies to all servers"))
                     .withRole(Qn::ForceExtraInfoRole, true)
                     .withRole(ResourceDialogItemRole::NewAddedCamerasItemRole, true)
                     .withFlags({Qt::ItemIsEnabled, Qt::ItemNeverHasChildren});
