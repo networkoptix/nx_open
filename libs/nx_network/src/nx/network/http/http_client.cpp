@@ -110,20 +110,24 @@ bool HttpClient::doPost(const nx::utils::Url& url)
 
 bool HttpClient::doPut(
     const nx::utils::Url& url,
-    const std::string& contentType,
-    nx::Buffer messageBody)
+    std::unique_ptr<AbstractMsgBodySource> body)
 {
-    auto body = std::make_unique<BufferSource>(
-        contentType, std::move(messageBody));
-
     return doRequest(
         [url, body = std::move(body)](
             nx::network::http::AsyncClient* client) mutable
         {
-            client->doPut(
-                url,
-                nx::utils::static_unique_ptr_cast<AbstractMsgBodySource>(std::move(body)));
+            client->doPut(url, std::move(body));
         });
+}
+
+bool HttpClient::doPut(
+    const nx::utils::Url& url,
+    const std::string& contentType,
+    nx::Buffer messageBody)
+{
+    return doPut(
+        url,
+        std::make_unique<BufferSource>(contentType, std::move(messageBody)));
 }
 
 bool HttpClient::doPatch(
