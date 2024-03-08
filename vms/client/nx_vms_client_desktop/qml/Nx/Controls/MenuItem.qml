@@ -23,7 +23,7 @@ MenuItem
 
     onTriggered:
     {
-        if (menu && menu.hasOwnProperty("triggered"))
+        if (menu && !subMenu && menu.hasOwnProperty("triggered"))
             menu.triggered(action, menuItem)
     }
 
@@ -64,11 +64,13 @@ MenuItem
 
             Text
             {
+                id: itemText
+
                 height: menuItem.contentItem.implicitHeight
 
                 verticalAlignment: Text.AlignVCenter
                 font.pixelSize: FontConfig.normal.pixelSize
-                color: hovered ? ColorTheme.highlightContrast : ColorTheme.text
+                color: menuItem.highlighted ? ColorTheme.highlightContrast : ColorTheme.text
 
                 text: menuItem.text
             }
@@ -83,7 +85,7 @@ MenuItem
 
             height: menuItem.contentItem.implicitHeight
 
-            color: menuItem.hovered
+            color: menuItem.highlighted
                 ? ColorTheme.colors.brand_contrast
                 : ColorTheme.lighter(ColorTheme.windowText, 4)
 
@@ -97,7 +99,18 @@ MenuItem
 
     background: Rectangle
     {
-        color: hovered ? ColorTheme.highlight : "transparent"
+        color: menuItem.highlighted ? ColorTheme.highlight : "transparent"
+    }
+
+    arrow: IconImage
+    {
+        anchors.right: parent.right
+        anchors.verticalCenter: parent.verticalCenter
+        visible: !!menuItem.subMenu
+
+        source: "image://svg/skin/text_buttons/arrow_right_20.svg"
+        sourceSize: Qt.size(20, 20)
+        color: itemText.color
     }
 
     indicator: null
