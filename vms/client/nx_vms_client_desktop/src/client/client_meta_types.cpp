@@ -36,6 +36,7 @@
 #include <nx/vms/client/desktop/export/settings/export_media_persistent_settings.h>
 #include <nx/vms/client/desktop/joystick/dialog/joystick_button_action_choice_model.h>
 #include <nx/vms/client/desktop/joystick/dialog/joystick_button_settings_model.h>
+#include <nx/vms/client/desktop/joystick/settings/osal/osal_device.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/resource_status_helper.h>
 #include <nx/vms/client/desktop/resource_dialogs/filtering/filtered_resource_proxy_model.h>
@@ -201,6 +202,8 @@ void QnClientMetaTypes::initialize()
     qRegisterMetaType<nx::vms::common::update::Information>();
     qRegisterMetaType<UpdateDeliveryInfo>();
     qRegisterMetaType<UpdateContents>();
+
+    qRegisterMetaType<joystick::OsalDevice::State>();
 
     QMetaType::registerConverter<QVariantMap, QnTimePeriod>(variantMapToTimePeriod);
     QMetaType::registerConverter<QString, QnResourcePtr>(stringToResource);
