@@ -585,7 +585,7 @@ QVariant RulesTableModel::targetServerData(
         if (role == Qt::DisplayRole)
         {
             if (targetServerField->acceptAll())
-                return tr("All Server");
+                return tr("All Servers");
 
             if (targetServers.isEmpty())
                 return tr("No target");

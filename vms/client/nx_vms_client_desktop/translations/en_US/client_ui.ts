@@ -24,16 +24,16 @@
         <translation></translation>
     </message>
     <message>
-        <source>System Servers</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Developer</source>
         <translation></translation>
     </message>
     <message>
         <source>Open source libraries</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Site Servers</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -236,10 +236,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>System actions</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Select all</source>
         <translation></translation>
     </message>
@@ -270,6 +266,10 @@
     <message>
         <source>Event Rules</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Site actions</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -524,10 +524,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Keep camera stream and profile settings</source>
         <translation></translation>
     </message>
@@ -608,10 +604,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Use system presets</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>PTZ Speed</source>
         <translation></translation>
     </message>
@@ -664,10 +656,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Record audio</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Import Video from Device</source>
         <translation type="unfinished"></translation>
     </message>
@@ -677,6 +665,14 @@
     </message>
     <message>
         <source>Do not send Stop PTZ command</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do not record audio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use site presets</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -965,11 +961,11 @@
 <context>
     <name>CloudManagementWidget</name>
     <message>
-        <source>This system is connected to</source>
+        <source>No connection</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>No connection</source>
+        <source>This site is connected to</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1047,20 +1043,16 @@
         <translation></translation>
     </message>
     <message>
-        <source>Create a backup of System management data, or restore System management data from an existing backup</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Cancel</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>&lt;Message&gt;</source>
         <translation></translation>
     </message>
     <message>
         <source>Open Folder</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Create a backup of Site management data, or restore Site management data from an existing backup</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1406,10 +1398,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Connect to the previous system on startup</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Automatically restore saved windows configuration</source>
         <translation></translation>
     </message>
@@ -1425,12 +1413,16 @@
         <source>Allow the computer to enter sleep mode on idle</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Connect to the previous site on startup</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>GeneralSystemAdministrationWidget</name>
     <message>
-        <source>System Settings</source>
-        <translation></translation>
+        <source>Site Settings</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1770,14 +1762,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Download complete!</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Failed to save logs to the selected folder</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Open Files Folder</source>
         <translation></translation>
     </message>
@@ -1836,13 +1820,13 @@
         <source>Show aim overlay for PTZ cameras</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Show timestamp on LIVE</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MergeSystemsDialog</name>
-    <message>
-        <source>Merge Systems...</source>
-        <translation></translation>
-    </message>
     <message>
         <source>Server URL:</source>
         <translation></translation>
@@ -1860,19 +1844,15 @@
         <translation></translation>
     </message>
     <message>
-        <source>Take system name and settings from:</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>warn icon</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;Warning label&gt;</source>
+        <source>Merge Sites...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;We recommend that you consult with support before proceeding.&gt;</source>
+        <source>Take site name and settings from:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1998,15 +1978,15 @@
         <translation></translation>
     </message>
     <message>
-        <source>System Signature</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Username</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Mail from</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Signature</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2101,12 +2081,12 @@
         <translation></translation>
     </message>
     <message>
-        <source>System Notifications</source>
+        <source>Events</source>
         <translation></translation>
     </message>
     <message>
-        <source>Events</source>
-        <translation></translation>
+        <source>Site Notifications</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2276,15 +2256,15 @@
         <translation></translation>
     </message>
     <message>
-        <source>Removing this connection option could lead to System malfunction.</source>
-        <translation></translation>
+        <source>Removing this connection option could lead to Site malfunction.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnSystemAdministrationDialog</name>
     <message>
-        <source>System Administration</source>
-        <translation></translation>
+        <source>Site Administration</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2584,10 +2564,6 @@
     </message>
     <message>
         <source>Archive encryption</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Archive encryption increases CPU usage</source>
         <translation></translation>
     </message>
     <message>
@@ -2937,10 +2913,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Ctrl+F</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Del</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2953,10 +2925,6 @@
     </message>
     <message>
         <source>Add User</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Ctrl+F</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3048,6 +3016,10 @@
     </message>
     <message>
         <source>Every</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open in a new dialog</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -194,8 +194,8 @@ void VmsRulesDialog::deleteRulesImpl(const UuidList& ids)
         id,
         [this](int /*requestId*/, ec2::ErrorCode errorCode)
         {
-            if (errorCode != ec2::ErrorCode::ok)
-                setError(tr("Delete rule error: ") + ec2::toString(errorCode)); //< TODO: #mmalofeev add error to some list.
+            if (errorCode != ec2::ErrorCode::ok) // TODO: #mmalofeev add error to some list.
+                setError(tr("Delete rule error:") + " " + ec2::toString(errorCode));
         },
         this);
     }
@@ -214,7 +214,7 @@ void VmsRulesDialog::saveRuleImpl(const std::shared_ptr<vms::rules::Rule>& rule)
         [this](int /*requestId*/, ec2::ErrorCode errorCode)
         {
             if (errorCode != ec2::ErrorCode::ok)
-                setError(tr("Save rule error: ") + ec2::toString(errorCode));
+                setError(tr("Save rule error:") + " " + ec2::toString(errorCode));
         },
         this);
 }
@@ -229,7 +229,7 @@ void VmsRulesDialog::resetToDefaultsImpl()
         [this](int /*requestId*/, ec2::ErrorCode errorCode)
         {
             if (errorCode != ec2::ErrorCode::ok)
-                setError(tr("Reset to defaults error: ") + ec2::toString(errorCode));
+                setError(tr("Reset to defaults error:") + " " + ec2::toString(errorCode));
         },
         this);
 }

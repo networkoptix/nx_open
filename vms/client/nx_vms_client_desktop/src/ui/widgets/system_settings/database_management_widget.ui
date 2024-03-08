@@ -141,7 +141,7 @@
         <item>
          <widget class="QLabel" name="labelMessage">
           <property name="text">
-           <string>&lt;Message&gt;</string>
+           <string notr="true">&lt;Message&gt;</string>
           </property>
          </widget>
         </item>
