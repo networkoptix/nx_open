@@ -1051,10 +1051,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>&lt;Message&gt;</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Open Folder</source>
         <translation></translation>
     </message>
@@ -1861,14 +1857,6 @@
     </message>
     <message>
         <source>warn icon</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;Warning label&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;We recommend that you consult with support before proceeding.&gt;</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2933,10 +2921,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Ctrl+F</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Del</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2949,10 +2933,6 @@
     </message>
     <message>
         <source>Add User</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Ctrl+F</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

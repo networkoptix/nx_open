@@ -121,7 +121,7 @@ QVariant CameraHotspotsItemModel::headerData(
         switch (section)
         {
             case IndexColumn:
-                return tr("#");
+                return "#";
 
             case Column::CameraColumn:
                 return tr("Camera");

@@ -348,7 +348,7 @@ void WorkbenchUpdateWatcher::notifyUserAboutWorkbenchUpdate(
 
     updateNotificationId = m_notificationsManager->add(
         tr("%1 Version is available").arg(toString(targetVersion)),
-        tr("%1").arg(html),
+        html,
         true);
 
     m_notificationsManager->setLevel(

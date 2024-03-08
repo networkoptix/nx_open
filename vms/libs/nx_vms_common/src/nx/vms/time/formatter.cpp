@@ -363,18 +363,18 @@ QString fromNow(std::chrono::seconds duration)
 
     const auto numMinutes = duration_cast<minutes>(duration);
     if (numMinutes.count() < 60)
-        return TimeFormat::tr("%n minute(s) ago", "", numMinutes.count());
+        return TimeFormat::tr("%n minutes ago", "", numMinutes.count());
 
     const auto numHours = duration_cast<hours>(duration);
     if (numHours.count() < 24)
-        return TimeFormat::tr("%n hour(s) ago", "", numHours.count());
+        return TimeFormat::tr("%n hours ago", "", numHours.count());
 
     const auto numDays = duration_cast<days>(duration);
     if (numDays.count() < 2)
         return TimeFormat::tr("yesterday");
 
     if (numDays.count() < 7)
-        return TimeFormat::tr("%n day(s) ago", "", numDays.count());
+        return TimeFormat::tr("%n days ago", "", numDays.count());
 
     if (numDays.count() == 7)
         return TimeFormat::tr("a week ago");
@@ -383,7 +383,7 @@ QString fromNow(std::chrono::seconds duration)
         QDateTime::currentMSecsSinceEpoch() - duration_cast<milliseconds>(duration).count();
 
     if (msecsSinceEpoch < 0) //< This should not happen but we still need to show correct time.
-        return TimeFormat::tr("%n day(s) ago", "", numDays.count());
+        return TimeFormat::tr("%n days ago", "", numDays.count());
 
     return toString(QDateTime::fromMSecsSinceEpoch(msecsSinceEpoch), Format::d_MMMM_yyyy);
 }
