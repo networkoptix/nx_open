@@ -12893,6 +12893,14 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
       <source>Used</source>
       <translation>Använt</translation>
     </message>
+    <message>
+      <source>Number of devices using this service exceeds the available service quantity.</source>
+      <translation>Antalet enheter som använder den här tjänsten överstiger det tillgängliga antalet tjänster.</translation>
+    </message>
+    <message>
+      <source>Please disable it for some devices or add more suitable services. Otherwise it will be done automatically on %1</source>
+      <translation>Inaktivera det för vissa enheter eller lägg till lämpligare tjänster. Annars kommer det att göras automatiskt på %1</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ui::AnalyticsSdkEventWidget</name>
@@ -13545,6 +13553,13 @@ om du vill visa fler bokmärken</translation>
     <message>
       <source>Cannot check Client update availability. Check your internet connection and try again.</source>
       <translation>Kan inte kontrollera tillgängligheten för klientuppdateringar. Kontrollera din internetanslutning och försök igen.</translation>
+    </message>
+  </context>
+  <context>
+    <name>runApplication</name>
+    <message>
+      <source>Would you like to try switching to DirectX?</source>
+      <translation>Vill du testa att byta till DirectX?</translation>
     </message>
   </context>
 </TS>

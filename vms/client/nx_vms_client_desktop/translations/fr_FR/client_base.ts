@@ -1046,7 +1046,7 @@
     </message>
     <message>
       <source>Integration...</source>
-      <translation type="unfinished">Integration...</translation>
+      <translation>Intégration...</translation>
     </message>
     <message>
       <source>New Integration...</source>
@@ -5750,7 +5750,7 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
     </message>
     <message>
       <source>Integration</source>
-      <translation type="unfinished">Integration</translation>
+      <translation>Intégration</translation>
     </message>
     <message>
       <source>Web Page</source>
@@ -12895,6 +12895,14 @@ N'épinglez pas ce certificat si vous n'avez pas modifié le certificat SSL du s
       <source>Used</source>
       <translation type="unfinished">Used</translation>
     </message>
+    <message>
+      <source>Number of devices using this service exceeds the available service quantity.</source>
+      <translation type="unfinished">Number of devices using this service exceeds the available service quantity.</translation>
+    </message>
+    <message>
+      <source>Please disable it for some devices or add more suitable services. Otherwise it will be done automatically on %1</source>
+      <translation type="unfinished">Please disable it for some devices or add more suitable services. Otherwise it will be done automatically on %1</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ui::AnalyticsSdkEventWidget</name>
@@ -13547,6 +13555,13 @@ pour afficher plus de signets</translation>
     <message>
       <source>Cannot check Client update availability. Check your internet connection and try again.</source>
       <translation>Impossible de vérifier la disponibilité des mises à jour du client. Vérifiez votre connexion internet et réessayez.</translation>
+    </message>
+  </context>
+  <context>
+    <name>runApplication</name>
+    <message>
+      <source>Would you like to try switching to DirectX?</source>
+      <translation type="unfinished">Would you like to try switching to DirectX?</translation>
     </message>
   </context>
 </TS>
