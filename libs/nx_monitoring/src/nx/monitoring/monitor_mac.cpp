@@ -36,6 +36,13 @@ namespace {
 
 constexpr int kDefaultInterfaceSpeedMbps = 1000;
 
+static const auto kIOPortDefault =
+#if (MAC_OS_X_VERSION_MIN_REQUIRED < 120000) //< Before macOS 12 Monterey.
+    kIOMasterPortDefault;
+#else
+    kIOMainPortDefault;
+#endif
+
 static QString dictionaryGetString(CFDictionaryRef properties, CFStringRef name)
 {
     if (const auto value = static_cast<CFStringRef>(CFDictionaryGetValue(properties, name)))
@@ -496,7 +503,7 @@ std::vector<MacMonitor::GpuLoadMonitor::GpuAccumData>
     // Iterate over all GPUs.
 
     const auto ret = IOServiceGetMatchingServices(
-        kIOMasterPortDefault,
+        kIOPortDefault,
         IOServiceMatching(kServiceName),
         &accelList);
 
@@ -651,7 +658,7 @@ QList<ActivityMonitor::HddLoad> MacMonitor::HddLoadMonitor::getTotalHddLoad()
     static constexpr auto kServiceName = "IOBlockStorageDriver";
 
     const auto ret = IOServiceGetMatchingServices(
-        kIOMasterPortDefault, IOServiceMatching(kServiceName), &driveList);
+        kIOPortDefault, IOServiceMatching(kServiceName), &driveList);
 
     if (ret != KERN_SUCCESS)
     {
