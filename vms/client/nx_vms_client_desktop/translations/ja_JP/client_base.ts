@@ -12710,6 +12710,14 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
       <source>Used</source>
       <translation>使用中</translation>
     </message>
+    <message>
+      <source>Number of devices using this service exceeds the available service quantity.</source>
+      <translation>このサービスを使用しているデバイスの数が、利用可能なサービス数を超えています。</translation>
+    </message>
+    <message>
+      <source>Please disable it for some devices or add more suitable services. Otherwise it will be done automatically on %1</source>
+      <translation>一部のデバイスで無効にするか、より適切なサービスを追加してください。それ以外の場合は %1 に自動的に実行されます</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ui::AnalyticsSdkEventWidget</name>
@@ -13352,6 +13360,13 @@ to view more bookmarks</source>
     <message>
       <source>Cannot check Client update availability. Check your internet connection and try again.</source>
       <translation>クライアントのアップデートが利用可能か確認できません。インターネット接続を確認して、もう一度お試しください。</translation>
+    </message>
+  </context>
+  <context>
+    <name>runApplication</name>
+    <message>
+      <source>Would you like to try switching to DirectX?</source>
+      <translation>DirectX に切り替えますか?</translation>
     </message>
   </context>
 </TS>
