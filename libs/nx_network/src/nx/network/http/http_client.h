@@ -69,6 +69,10 @@ public:
      */
     bool doPut(
         const nx::utils::Url& url,
+        std::unique_ptr<AbstractMsgBodySource> body);
+
+    bool doPut(
+        const nx::utils::Url& url,
         const std::string& contentType = {},
         nx::Buffer messageBody = {});
 
