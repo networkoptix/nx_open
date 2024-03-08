@@ -261,7 +261,7 @@ struct CloudLayoutsManager::Private
                     std::vector<CrossSystemLayoutData> updatedLayouts;
                     const bool parsed = nx::reflect::json::deserialize(response.messageBody,
                         &updatedLayouts);
-                    if (NX_ASSERT(parsed))
+                    if (NX_ASSERT(parsed, "Actual response is:\n%1", response.messageBody))
                         addLayoutsToResourcePool(std::move(updatedLayouts));
                 }));
     }
