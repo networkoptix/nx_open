@@ -60,7 +60,7 @@ RowLayout
                         MessageBox.Icon.Critical,
                         qsTr("Insufficient services"),
                         qsTr(
-                            "%n suitable integration service is required to turn on the integration",
+                            "%n suitable integration services are required to turn on the integration",
                             "Required integration count",
                             requiredIntegrationsCount),
                         MessageBox.Ok)
@@ -104,9 +104,9 @@ RowLayout
         sourceSize: Qt.size(20, 20)
 
         GlobalToolTip.text: licenseSummary && licenseSummary.issueExpirationDate
-            ? qsTr("There are more cameras using this integration than available
-                services. Please disable integration for some cameras or add more suitable services.
-                Otherwise, it will be done automatically on %1", "%1 will be substituted by a date")
+            ? qsTr("There are more cameras using this integration than available" +
+                   " services. Please disable integration for some cameras or add more suitable services." +
+                   " Otherwise, it will be done automatically on %1", "%1 will be substituted by a date")
                     .arg(licenseSummary.issueExpirationDate)
             : ""
     }

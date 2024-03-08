@@ -45,7 +45,7 @@ struct PredefinedUserGroups::Private
         if (groupId == kAdministratorsGroupId)
             return tr("Members of this group have unlimited System privileges. Administrators can "
                 "create and modify Power Users, merge Systems and connect or disconnect "
-                "System to  %1.", "%1 is the cloud name (like Nx Cloud)")
+                "System to %1.", "%1 is the cloud name (like Nx Cloud)")
                 .arg(nx::branding::cloudName());
 
         if (groupId == kPowerUsersGroupId)

@@ -5,11 +5,11 @@
     <name>ApiErrorStrings</name>
     <message>
         <source>Invalid JSON content.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Unsupported content type.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -63,23 +63,23 @@
     </message>
     <message>
         <source>This user does not exist or is unable to login.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>More than one user with the same login are presented.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Unable to verify LDAP server SSL/TLS certificate.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>The ticket key is invalid or expired.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Wrong password</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -87,11 +87,11 @@
     <message>
         <source>System Event</source>
         <comment>Shows that the bookmark was created by a system event</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Removed camera</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -179,52 +179,52 @@
     <name>PredefinedUserGroups</name>
     <message>
         <source>Administrators</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Power Users</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Advanced Viewers</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Viewers</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Live Viewers</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>System Health Viewers</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Members of this group can view live videos, I/O modules and web pages.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Members of this group have unlimited System privileges. Administrators can create and modify Power Users, merge Systems and connect or disconnect System to  %1.</source>
-        <comment>%1 is the cloud name (like Nx Cloud)</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the System configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Members of this group can, in addition to the permissions granted by the Viewers group, see and activate PTZ positions and PTZ tours, use 2-way audio, operate I/O module buttons, create and edit bookmarks, and view the Event Log.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Members of this group can, in addition to the permissions granted by the Live Viewers group, view and export archive and Bookmarks.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Members of this group can view System Health Monitoring information and server processor load in real-time (Server Monitoring).</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Members of this group have unlimited System privileges. Administrators can create and modify Power Users, merge Systems and connect or disconnect System to %1.</source>
+        <comment>%1 is the cloud name (like Nx Cloud)</comment>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -443,22 +443,22 @@
     </message>
     <message>
         <source>Invalid data was received from the device. Details: &quot;%1&quot;.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Invalid data was received from the camera. Details: &quot;%1&quot;.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Invalid data was received from the I/O module. Details: &quot;%1&quot;.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>QnCameraNamesWatcher</name>
     <message>
         <source>Removed camera</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -764,25 +764,25 @@
     </message>
     <message>
         <source>Local Recording</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Local Recording service</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message numerus="yes">
         <source>%n Local Recording Services</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n Local Recording Service</numerusform>
+            <numerusform>%n Local Recording Services</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n/%1 Local Recording Services</source>
         <comment>%n will be replaced by the total count</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n/%1 Local Recording Service</numerusform>
+            <numerusform>%n/%1 Local Recording Services</numerusform>
         </translation>
     </message>
 </context>
@@ -1051,105 +1051,105 @@
     <message>
         <source>Msec</source>
         <comment>Capitalized long suffix for displaying milliseconds</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Sec</source>
         <comment>Capitalized long suffix for displaying seconds</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Min</source>
         <comment>Capitalized long suffix for displaying minutes</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Hrs</source>
         <comment>Capitalized long suffix for displaying hours</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Days</source>
         <comment>Capitalized long suffix for displaying days</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Wks</source>
         <comment>Capitalized long suffix for displaying weeks</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Mos</source>
         <comment>Capitalized long suffix for displaying months</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Yrs</source>
         <comment>Capitalized long suffix for displaying years</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message numerus="yes">
         <source>Milliseconds</source>
         <comment>Capitalized full suffix for displaying milliseconds</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Millisecond</numerusform>
+            <numerusform>Milliseconds</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Seconds</source>
         <comment>Capitalized full suffix for displaying seconds</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Second</numerusform>
+            <numerusform>Seconds</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Minutes</source>
         <comment>Capitalized full suffix for displaying minutes</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Minute</numerusform>
+            <numerusform>Minutes</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Hours</source>
         <comment>Capitalized full suffix for displaying hours</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Hour</numerusform>
+            <numerusform>Hours</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Days</source>
         <comment>Capitalized fapitalized full suffix for displaying days</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Day</numerusform>
+            <numerusform>Days</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Weeks</source>
         <comment>Capitalized full suffix for displaying weeks</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Week</numerusform>
+            <numerusform>Weeks</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Months</source>
         <comment>Capitalized full suffix for displaying months</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Month</numerusform>
+            <numerusform>Months</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Years</source>
         <comment>Capitalized full suffix for displaying years</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Year</numerusform>
+            <numerusform>Years</numerusform>
         </translation>
     </message>
 </context>
@@ -1168,11 +1168,11 @@
     <name>QnUserResource</name>
     <message>
         <source>Custom</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Multiple groups</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1244,26 +1244,26 @@
     <name>ServiceTypeDisplayStringHelper</name>
     <message>
         <source>Local recording</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Integration</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Cloud storage</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>StringsHelper</name>
     <message>
         <source>Contact your channel partner for details.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Check internet connection between VMS and license server.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1653,84 +1653,84 @@
     </message>
     <message>
         <source>LDAP settings</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>SMTP settings</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Authorization Session token lifetime (seconds)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Semicolon-separated list of Servers designated to connect to the Cloud. Servers at the top of the list have higher priority. If the list is empty a Server for the Cloud connection is selected automatically.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Allow Power User editing Security Settings</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Enable deprecated API functions (insecure)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Maximum number of consecutive RTP errors before the server reconnects the RTSP session.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Enable deprecated API functions currently used by %1 software (insecure)</source>
         <comment>%1 is a company name</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Organization Id</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Interval between the Cloud polling HTTP requests to synchronize the data.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Local System ID, null means the System is not set up yet.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>TimeFormat</name>
     <message>
         <source>just now</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <source>%n minute(s) ago</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n hour(s) ago</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
+        <translation></translation>
     </message>
     <message>
         <source>yesterday</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <source>%n day(s) ago</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
+        <translation></translation>
     </message>
     <message>
         <source>a week ago</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minutes ago</source>
+        <translation>
+            <numerusform>%n minute ago</numerusform>
+            <numerusform>%n minutes ago</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n hours ago</source>
+        <translation>
+            <numerusform>%n hour ago</numerusform>
+            <numerusform>%n hours ago</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n days ago</source>
+        <translation>
+            <numerusform>%n day ago</numerusform>
+            <numerusform>%n days ago</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -1785,11 +1785,11 @@
     </message>
     <message>
         <source>Unlock this portion of the archive to export its contents.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Archive is unavailable now. Please try again later.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2410,43 +2410,43 @@
     </message>
     <message numerus="yes">
         <source>%n Groups</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n Group</numerusform>
+            <numerusform>%n Groups</numerusform>
         </translation>
     </message>
     <message>
         <source>LDAP Sync Issue</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message numerus="yes">
         <source>%1 (%n times)</source>
         <comment>%1 is description of event. Will be replaced in runtime</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1 (%n time)</numerusform>
+            <numerusform>%1 (%n times)</numerusform>
         </translation>
     </message>
     <message>
         <source>Failed to connect to the LDAP server.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Failed to complete the sync within a %1 timeout.</source>
         <comment>Timeout duration in human-readable form (ex.: 1 minute)</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Failed to complete the sync within a given timeout.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>No user accounts on LDAP server match the synchronization settings.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Some LDAP users or groups were not found in the LDAP database.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 </TS>
