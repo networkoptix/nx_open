@@ -13261,7 +13261,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Number of devices using this service exceeds the available service quantity.</source>
-      <translation type="unfinished">Number of devices using this service exceeds the available service quantity.</translation>
+      <translation>Количество устройств, использующих данный сервис, превышает доступное количество сервисов.</translation>
     </message>
     <message>
       <source>Please disable it for some devices or add more suitable services. Otherwise it will be done automatically on %1</source>
@@ -13945,7 +13945,7 @@ to view more bookmarks</source>
     <name>runApplication</name>
     <message>
       <source>Would you like to try switching to DirectX?</source>
-      <translation type="unfinished">Would you like to try switching to DirectX?</translation>
+      <translation>Хотите попробовать переключиться на DirectX?</translation>
     </message>
   </context>
 </TS>
