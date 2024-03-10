@@ -70,10 +70,7 @@ AccessRightsList::AccessRightsList(QObject* parent):
                         " or to control video wall."),
                     .icon = QUrl(kIconsDir + "edit_settings_24x20.svg")}});
 
-                if (!ini().audioPermission)
-                    result.remove(1);
-
-                return result;
+            return result;
         }()),
     m_indexLookup(
         [this]()
