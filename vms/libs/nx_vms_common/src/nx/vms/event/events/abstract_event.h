@@ -17,6 +17,7 @@ NX_VMS_COMMON_API bool hasChild(EventType eventType);
 
 NX_VMS_COMMON_API QList<EventType> childEvents(EventType eventType);
 
+/** Returns sorted list of all the events. */
 NX_VMS_COMMON_API QList<EventType> allEvents(bool includeDeprecated = false);
 
 NX_VMS_COMMON_API EventType parentEvent(EventType eventType);
