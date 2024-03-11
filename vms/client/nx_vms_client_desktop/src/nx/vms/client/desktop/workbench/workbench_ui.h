@@ -10,6 +10,7 @@
 #include <QtCore/QTimer>
 
 #include <core/resource/resource_fwd.h>
+#include <nx/utils/impl_ptr.h>
 #include <nx/utils/scoped_connections.h>
 #include <nx/vms/client/desktop/ui/actions/action_target_provider.h>
 #include <ui/animation/animation_timer_listener.h>
@@ -209,6 +210,9 @@ private:
     void at_controlsWidget_geometryChanged();
 
 private:
+    struct Private;
+    nx::utils::ImplPtr<Private> d;
+
     /* Global state. */
 
     /** Instrument manager for the scene. */
