@@ -42,31 +42,13 @@ void ActionParametersWidget::onRuleSet()
 
     m_pickers.clear();
 
-    const auto event = eventDescriptor();
-    const auto stateFieldDescriptor =
-        vms::rules::utils::fieldByName(vms::rules::utils::kStateFieldName, event.value());
-    const auto isEventInstantOnly = vms::rules::utils::isInstantOnly(event.value());
-
-    const auto action = actionDescriptor();
-    const auto hasDurationField = std::any_of(
-        action->fields.cbegin(),
-        action->fields.cend(),
-        [](const auto& fieldDescriptor)
-        {
-            return fieldDescriptor.fieldName == vms::rules::utils::kDurationFieldName;
-        });
-
-    // If the action has duration field, then state will be controlled by the duration picker widget.
-    // If the event is only instant, thus user has only one option to choose, there is no sense to
-    // show picker widget at all.
-    if (stateFieldDescriptor && !isEventInstantOnly && !hasDurationField)
+    if (auto statePicker = createStatePickerIfRequired())
     {
-        auto statePicker =
-            PickerFactory::createWidget(stateFieldDescriptor.value(), windowContext(), this);
         m_pickers.push_back(statePicker);
         layout->addWidget(statePicker);
     }
 
+    const auto action = actionDescriptor();
     bool isPreviousPlain{true};
     for (const auto& fieldDescriptor: action->fields)
     {
@@ -197,6 +179,39 @@ void ActionParametersWidget::onActionDurationChanged() const
 
     fixTimeField(vms::rules::utils::kRecordBeforeFieldName);
     fixTimeField(vms::rules::utils::kRecordAfterFieldName);
+}
+
+PickerWidget* ActionParametersWidget::createStatePickerIfRequired()
+{
+    const auto eventManifest = eventDescriptor();
+
+    if (vms::rules::utils::isInstantOnly(eventManifest.value()))
+    {
+        // If the event is only instant, thus user has only one option to choose, there is no sense
+        // to show picker widget.
+        return nullptr;
+    }
+
+    const auto stateFieldDescriptor =
+        vms::rules::utils::fieldByName(vms::rules::utils::kStateFieldName, eventManifest.value());
+
+    if (!stateFieldDescriptor)
+    {
+        // State field is not added to the event manifest.
+        return nullptr;
+    }
+
+    if (vms::rules::utils::isProlongedOnly(actionDescriptor().value()))
+    {
+        // If the action is prolonged only, there are two possible options: the first one when the
+        // action has 'duration' field, in that case state field will be controlled by the duration
+        // picker widget. The second one when the action does not have 'duration' field (action
+        // duration always equal to the event duration emitted the action), in that case user has
+        // no option to chose state.
+        return nullptr;
+    }
+
+    return PickerFactory::createWidget(stateFieldDescriptor.value(), windowContext(), this);
 }
 
 } // namespace nx::vms::client::desktop::rules

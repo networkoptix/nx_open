@@ -12,9 +12,6 @@ namespace nx::vms::rules {
 
 QString BasicAction::type() const
 {
-    //if (!m_type.isEmpty())
-    //    return m_type;
-
     return utils::type(metaObject()); //< Assert?
 }
 
@@ -54,7 +51,7 @@ QString BasicAction::uniqueKey() const
     return type();
 }
 
-QVariantMap BasicAction::details(common::SystemContext* context) const
+QVariantMap BasicAction::details(common::SystemContext* /*context*/) const
 {
     return {};
 }

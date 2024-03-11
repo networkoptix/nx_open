@@ -6,6 +6,7 @@
 #include <nx/vms/api/types/event_rule_types.h>
 #include <nx/vms/rules/basic_event.h>
 #include <nx/vms/rules/camera_conflict_list.h>
+#include <nx/vms/rules/event_filter_fields/source_camera_field.h>
 #include <nx/vms/rules/event_filter_fields/state_field.h>
 #include <nx/vms/rules/utils/event_details.h>
 #include <nx/vms/rules/utils/field.h>
@@ -28,6 +29,9 @@ public:
             .id = utils::type<SimpleEvent>(),
             .displayName = "Test event",
             .flags = {ItemFlag::instant, ItemFlag::prolonged},
+            .fields = {
+                makeFieldDescriptor<SourceCameraField>(utils::kCameraIdFieldName, "Camera id"),
+            }
         };
     }
 

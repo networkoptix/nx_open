@@ -19,8 +19,12 @@
 #include <nx/vms/rules/action_builder.h>
 #include <nx/vms/rules/engine.h>
 #include <nx/vms/rules/event_filter.h>
+#include <nx/vms/rules/event_filter_fields/state_field.h>
 #include <nx/vms/rules/events/debug_event.h>
+#include <nx/vms/rules/utils/common.h>
+#include <nx/vms/rules/utils/field.h>
 #include <ui/common/palette.h>
+#include <ui/dialogs/common/session_aware_dialog.h>
 
 #include "dialog_details/action_type_picker_widget.h"
 #include "dialog_details/event_type_picker_widget.h"
@@ -351,10 +355,32 @@ void EditVmsRuleDialog::onScheduleClicked()
 
 void EditVmsRuleDialog::onActionTypeChanged(const QString& actionType)
 {
-    m_rule->takeActionBuilder(0);
+    const auto engine = systemContext()->vmsRulesEngine();
 
-    auto actionBuilder = systemContext()->vmsRulesEngine()->buildActionBuilder(actionType);
-    // TODO: #mmalofeev correct values(at least state and duration).
+    auto actionBuilder = engine->buildActionBuilder(actionType);
+    auto eventFilter = m_rule->eventFilters().at(0);
+
+    auto actionDescriptor = engine->actionDescriptor(actionType);
+    auto eventDescriptor = engine->eventDescriptor(eventFilter->eventType());
+
+    if (!vms::rules::utils::isCompatible(eventDescriptor.value(), actionDescriptor.value()))
+    {
+        QnSessionAwareMessageBox::warning(this,
+            tr("Incompatible event-action pair is choosen."
+                " Prolonged action without duration incompatible with the instant event"));
+        return;
+    }
+
+    if (auto stateField =
+        eventFilter->fieldByName<vms::rules::StateField>(vms::rules::utils::kStateFieldName))
+    {
+        if (!vms::rules::utils::isCompatible(engine, stateField, actionBuilder.get()))
+        {
+            // TODO: #mmalofeev correct values(at least state and duration).
+        }
+    }
+
+    m_rule->takeActionBuilder(0);
     m_rule->addActionBuilder(std::move(actionBuilder));
 
     displayRule();
@@ -362,10 +388,32 @@ void EditVmsRuleDialog::onActionTypeChanged(const QString& actionType)
 
 void EditVmsRuleDialog::onEventTypeChanged(const QString& eventType)
 {
-    m_rule->takeEventFilter(0);
+    const auto engine = systemContext()->vmsRulesEngine();
 
-    auto eventFilter = systemContext()->vmsRulesEngine()->buildEventFilter(eventType);
-    // TODO: #mmalofeev correct values(at least state and duration).
+    auto eventFilter = engine->buildEventFilter(eventType);
+    auto actionBuilder = m_rule->actionBuilders().at(0);
+
+    auto actionDescriptor = engine->actionDescriptor(actionBuilder->actionType());
+    auto eventDescriptor = engine->eventDescriptor(eventType);
+
+    if (!vms::rules::utils::isCompatible(eventDescriptor.value(), actionDescriptor.value()))
+    {
+        QnSessionAwareMessageBox::warning(this,
+            tr("Incompatible event-action pair is choosen."
+                " Prolonged action without duration incompatible with the instant event"));
+        return;
+    }
+
+    if (auto stateField =
+        eventFilter->fieldByName<vms::rules::StateField>(vms::rules::utils::kStateFieldName))
+    {
+        if (!vms::rules::utils::isCompatible(engine, stateField, actionBuilder))
+        {
+            // TODO: #mmalofeev correct values(at least state and duration).
+        }
+    }
+
+    m_rule->takeEventFilter(0);
     m_rule->addEventFilter(std::move(eventFilter));
 
     displayRule();

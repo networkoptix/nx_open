@@ -12,6 +12,11 @@
 
 namespace nx::vms::rules {
 
+RepeatSoundAction::RepeatSoundAction()
+{
+    setLevel(nx::vms::event::Level::common);
+}
+
 const ItemDescriptor& RepeatSoundAction::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
@@ -34,11 +39,6 @@ const ItemDescriptor& RepeatSoundAction::manifest()
         }
     };
     return kDescriptor;
-}
-
-RepeatSoundAction::RepeatSoundAction()
-{
-    setLevel(nx::vms::event::Level::common);
 }
 
 } // namespace nx::vms::rules

@@ -219,6 +219,9 @@ private:
     */
     bool registerActionConstructor(const QString& id, const ActionConstructor& constructor);
 
+    void stopRunningActions(nx::Uuid ruleId);
+    void stopRunningAction(const ActionPtr& action);
+
 private:
     bool m_enabled = false;
     bool m_oldEngineEnabled = true;
@@ -247,6 +250,9 @@ private:
     // All the fields below should be used by Engine's thread only.
     EventCache m_eventCache;
     RunningEventWatcher m_runningEventWatcher;
+
+    // Running actions by their resources hash, grouped by rule Id.
+    QHash<nx::Uuid, QHash<size_t, ActionPtr>> m_runningActions;
 
     QTimer* m_aggregationTimer;
 };

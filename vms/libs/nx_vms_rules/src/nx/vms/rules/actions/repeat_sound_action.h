@@ -16,9 +16,9 @@ class NX_VMS_RULES_API RepeatSoundAction: public NotificationActionBase
     FIELD(float, volume, setVolume)
 
 public:
-    static const ItemDescriptor& manifest();
-
     RepeatSoundAction();
+
+    static const ItemDescriptor& manifest();
 };
 
 } // namespace nx::vms::rules

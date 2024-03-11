@@ -17,6 +17,8 @@ class NX_VMS_RULES_API DeviceOutputAction: public nx::vms::rules::BasicAction
     FIELD(QString, outputPortId, setOutputPortId)
 
 public:
+    QString uniqueKey() const override;
+
     static const ItemDescriptor& manifest();
 };
 
