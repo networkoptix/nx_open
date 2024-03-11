@@ -84,6 +84,8 @@ typedef __int64 uint64_t;
 #endif
 #endif
 
+enum UDTSockType { UDT_STREAM = 1, UDT_DGRAM };
+
 #define NO_BUSY_WAITING
 
 #ifdef _WIN32
@@ -213,6 +215,14 @@ struct CPerfMon
 // include C++ specific feature, please use the corresponding sendfile2(), etc.
 
 namespace UDT {
+
+static constexpr int kDefaultRecvWindowSize = 25600;
+
+static constexpr int kDefaultMSS = 1400;
+
+static constexpr int kMSSMax = 16 * 1024;
+
+static constexpr int kVersion = 4;
 
 enum class ProtocolError {
     none = 0,

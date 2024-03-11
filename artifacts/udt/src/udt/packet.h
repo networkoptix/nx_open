@@ -272,7 +272,7 @@ public:
     CHandShake();
 
     int serialize(char* buf, int& size) const;
-    int deserialize(const char* buf, int size);
+    [[nodiscard]] bool deserialize(const char* buf, int size);
 
 public:
     static constexpr int m_iContentSize = 48;    // Size of hand shake data
@@ -289,5 +289,12 @@ public:
     uint32_t m_piPeerIP[4];    // The IP address that the peer's UDP port is bound to
 };
 
+// ------------------------------------------------------------------------------------------------
+
+class CHandshakeValidator
+{
+public:
+    bool validate(const CHandShake& hs) const;
+};
 
 #endif

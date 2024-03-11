@@ -89,7 +89,6 @@ std::string Error::prepareErrorText()
 
         if (msgLen > 0)
         {
-            std::string text;
             const auto msgUtf8Len = WideCharToMultiByte(CP_UTF8, 0, msgBuf, msgLen, NULL, 0, NULL, NULL);
             if (msgUtf8Len > 0)
             {

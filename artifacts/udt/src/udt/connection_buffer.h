@@ -47,16 +47,13 @@ Yunhong Gu, last updated 05/05/2009
 #include "common.h"
 #include "queue.h"
 
-
-static const int kDefaultMtuSize = 1400;
-
 /**
  * Socket's send buffer.
  */
 class SendBuffer
 {
 public:
-    SendBuffer(int size = 32, int mss = kDefaultMtuSize);
+    SendBuffer(int size = 32, int mss = UDT::kDefaultMSS);
     ~SendBuffer();
 
     // Functionality:

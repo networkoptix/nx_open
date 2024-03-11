@@ -144,6 +144,7 @@ Yunhong Gu, last updated 02/12/2011
 
 
 #include <cstring>
+#include "log.h"
 #include "packet.h"
 
 std::string to_string(ControlPacketType packetType)
@@ -414,10 +415,10 @@ int CHandShake::serialize(char* buf, int& size) const
     return 0;
 }
 
-int CHandShake::deserialize(const char* buf, int size)
+bool CHandShake::deserialize(const char* buf, int size)
 {
     if (size < m_iContentSize)
-        return -1;
+        return false;
 
     int32_t* p = (int32_t*)buf;
     m_iVersion = *p++;
@@ -431,5 +432,28 @@ int CHandShake::deserialize(const char* buf, int size)
     for (int i = 0; i < 4; ++i)
         m_piPeerIP[i] = *p++;
 
-    return 0;
+    return CHandshakeValidator{}.validate(*this);
+}
+
+bool CHandshakeValidator::validate(const CHandShake& hs) const
+{
+    UDT_LOG_DBG(
+        "handshake: version: {}, type: {}, isn: {}, mss: {}, flightFlagSize: {}, reqType: {}, "
+        "ID: {}, cookie: {}, peerIP: {}.{}.{}.{}",
+        hs.m_iVersion, hs.m_iType, hs.m_iISN, hs.m_iMSS, hs.m_iFlightFlagSize, hs.m_iReqType, hs.m_iID,
+        hs.m_iCookie, hs.m_piPeerIP[0], hs.m_piPeerIP[1], hs.m_piPeerIP[2], hs.m_piPeerIP[3]);
+
+    if (hs.m_iMSS <= 0 || hs.m_iMSS > UDT::kMSSMax)
+        return false;
+
+    if (hs.m_iFlightFlagSize <= 0 || hs.m_iFlightFlagSize > UDT::kDefaultRecvWindowSize * 2)
+        return false;
+
+    if (hs.m_iVersion < 0 || hs.m_iVersion > UDT::kVersion)
+        return false;
+
+    if (hs.m_iType != 0 && hs.m_iType != UDTSockType::UDT_STREAM && hs.m_iType != UDTSockType::UDT_DGRAM)
+        return false;
+
+    return true;
 }
