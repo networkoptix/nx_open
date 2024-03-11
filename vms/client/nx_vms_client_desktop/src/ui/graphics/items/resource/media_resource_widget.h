@@ -267,6 +267,7 @@ signals:
     void licenseStatusChanged();
     void ptzControllerChanged();
     void analyticsSupportChanged();
+    void analyticsObjectsVisibleForcefullyChanged();
 
 protected:
     virtual int helpTopicAt(const QPointF& pos) const override;
@@ -409,7 +410,6 @@ private:
     void updateAnalyticsVisibility(bool animate = false);
     void handleSyncStateChanged(bool enabled);
     void updateHotspotsState();
-    void updateTimelineVisibility();
 
     void updateCompositeOverlayMode();
 

@@ -53,6 +53,7 @@
 #include <ui/graphics/items/generic/clickable_widgets.h>
 #include <ui/graphics/items/generic/edge_shadow_widget.h>
 #include <ui/graphics/items/generic/gui_elements_widget.h>
+#include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/standard/graphics_web_view.h>
 #include <ui/graphics/view/graphics_view.h>
@@ -143,6 +144,12 @@ DelegateState serializeState(const QnPaneSettingsMap& settings)
     return result;
 }
 
+bool forceTimelineVisibility(QnMediaResourceWidget* widget)
+{
+    return widget->isAnalyticsObjectsVisibleForcefully()
+        || widget->isMotionSearchModeEnabled();
+}
+
 } // namespace
 
 class WorkbenchUi::StateDelegate: public ClientStateDelegate
@@ -223,9 +230,15 @@ static void uiMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QS
     debugLabel->appendTextQueued(msg);
 }
 
+struct WorkbenchUi::Private
+{
+    nx::utils::ScopedConnections zoomedMediaWidgetConnections;
+};
+
 WorkbenchUi::WorkbenchUi(QObject *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
+    d(new Private()),
     m_instrumentManager(display()->instrumentManager())
 {
     QGraphicsLayout::setInstantInvalidatePropagation(true);
@@ -934,6 +947,8 @@ void WorkbenchUi::at_display_widgetChanged(Qn::ItemRole role)
     /* Update activity listener instrument. */
     if (role == Qn::ZoomedRole)
     {
+        d->zoomedMediaWidgetConnections.reset();
+
         updateActivityInstrumentState();
         updateViewportMargins();
 
@@ -942,12 +957,30 @@ void WorkbenchUi::at_display_widgetChanged(Qn::ItemRole role)
             if (!alreadyZoomed)
                 m_unzoomedOpenedPanels = openedPanels();
 
-            const auto panels = m_timeline->isPinnedManually()
-                || newWidget->options().testFlag(QnResourceWidget::DisplayMotion)
-                || newWidget->options().testFlag(QnResourceWidget::DisplayAnalyticsObjects)
-                    ? TimelinePanel
-                    : NoPanel;
+            bool showTimeline = m_timeline->isPinnedManually();
+            if (auto mediaWidget = dynamic_cast<QnMediaResourceWidget*>(newWidget))
+            {
+                auto showTimelineIfNeeded =
+                    [this, mediaWidget]()
+                    {
+                        if (forceTimelineVisibility(mediaWidget))
+                            setTimelineOpened(/*opened*/ true, /*animate*/ true);
+                    };
 
+                d->zoomedMediaWidgetConnections << connect(mediaWidget,
+                    &QnMediaResourceWidget::motionSearchModeEnabled,
+                    this,
+                    showTimelineIfNeeded);
+
+                d->zoomedMediaWidgetConnections << connect(mediaWidget,
+                    &QnMediaResourceWidget::analyticsObjectsVisibleForcefullyChanged,
+                    this,
+                    showTimelineIfNeeded);
+
+                showTimeline |= forceTimelineVisibility(mediaWidget);
+            }
+
+            const auto panels = showTimeline ? TimelinePanel : NoPanel;
             setOpenedPanels(panels, true);
         }
         else

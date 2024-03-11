@@ -149,7 +149,7 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
     m_pinButton->setZValue(ControlItemZOrder);
     m_pinButton->setVisible(false);
 
-    action(ui::action::ToggleTimelineAction)->setData(settings.state == Qn::PaneState::Opened);
+    action(ui::action::ToggleTimelineAction)->setChecked(settings.state == Qn::PaneState::Opened);
 
     connect(action(ui::action::ToggleTimelineAction), &QAction::toggled, this,
         [this](bool checked)

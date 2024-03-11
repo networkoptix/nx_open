@@ -2197,8 +2197,6 @@ void QnMediaResourceWidget::optionsChangedNotify(Options changedFlags)
             unsetAreaSelectionType(AreaType::motion);
         }
 
-        updateTimelineVisibility();
-
         setOption(WindowResizingForbidden, motionSearchEnabled);
 
         emit motionSearchModeEnabled(motionSearchEnabled);
@@ -2240,9 +2238,6 @@ void QnMediaResourceWidget::optionsChangedNotify(Options changedFlags)
 
     if (changedFlags.testFlag(DisplayRoi))
         setRoiVisible(options().testFlag(DisplayRoi), false);
-
-    if (changedFlags.testFlag(FullScreenMode))
-        updateTimelineVisibility();
 
     if (changedFlags.testFlags(DisplayHotspots))
     {
@@ -3048,15 +3043,6 @@ void QnMediaResourceWidget::updateHotspotsState()
         && d->camera->cameraHotspotsEnabled());
 }
 
-void QnMediaResourceWidget::updateTimelineVisibility()
-{
-    if (options().testFlag(FullScreenMode))
-    {
-        action(action::ToggleTimelineAction)->setChecked(
-            isAnalyticsObjectsVisibleForcefully() || isMotionSearchModeEnabled());
-    }
-}
-
 void QnMediaResourceWidget::processDiagnosticsRequest()
 {
     statisticsModule()->controls()->registerClick(
@@ -3304,7 +3290,7 @@ void QnMediaResourceWidget::setAnalyticsObjectsVisibleForcefully(bool visible, b
     d->analyticsObjectsVisibleForcefully = visible;
     setOption(DisplayAnalyticsObjects, visible);
     setAnalyticsModeEnabled(visible, animate);
-    updateTimelineVisibility();
+    emit analyticsObjectsVisibleForcefullyChanged();
 }
 
 bool QnMediaResourceWidget::isAnalyticsModeEnabled() const
