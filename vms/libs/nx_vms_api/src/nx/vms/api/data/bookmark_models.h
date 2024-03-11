@@ -29,6 +29,22 @@ NX_REFLECTION_ENUM_CLASS(BookmarkSortField,
     cameraName
 )
 
+/**%apidoc
+ * Flags describing filters for shareable bookmarks
+ */
+NX_REFLECTION_ENUM_CLASS(BookmarkShareFilter,
+    none = 0,
+    shareable = 1 << 0,
+    nonShareable = 1 << 1,
+    accessible = 1 << 2,
+    hasExpiration = 1 << 3,
+    expired = 1 << 4,
+    passwordProtected = 1 << 5
+)
+
+Q_DECLARE_FLAGS(BookmarkShareFilters, BookmarkShareFilter)
+Q_DECLARE_OPERATORS_FOR_FLAGS(BookmarkShareFilters)
+
 struct NX_VMS_API BookmarkFilterBase
 {
     BookmarkFilterBase(nx::vms::api::json::ValueOrArray<QString> deviceId = {}):
@@ -144,14 +160,17 @@ struct NX_VMS_API BookmarkFilterV1: BookmarkFilterBase, BookmarkIdV1
 {
     using BookmarkIdV1::BookmarkIdV1;
 };
-#define BookmarkFilterV1_Fields BookmarkFilterBase_Fields(id)
+#define BookmarkFilterV1_Fields BookmarkFilterBase_Fields BookmarkIdV1_Fields
 QN_FUSION_DECLARE_FUNCTIONS(BookmarkFilterV1, (json), NX_VMS_API)
 
 struct NX_VMS_API BookmarkFilterV3: BookmarkFilterBase, BookmarkIdV3
 {
     using BookmarkIdV3::BookmarkIdV3;
+
+    /**%apidoc[opt] */
+    BookmarkShareFilters shareFilter = BookmarkShareFilter::none;
 };
-#define BookmarkFilterV3_Fields BookmarkFilterBase_Fields(id)
+#define BookmarkFilterV3_Fields BookmarkFilterBase_Fields BookmarkIdV3_Fields(shareFilter)
 QN_FUSION_DECLARE_FUNCTIONS(BookmarkFilterV3, (json), NX_VMS_API)
 
 struct NX_VMS_API BookmarkBase

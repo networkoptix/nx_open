@@ -7,19 +7,21 @@
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/resource_fwd.h>
 
-struct NX_VMS_COMMON_API QnGetBookmarksRequestData: public QnMultiserverRequestData
+namespace nx::vms::common {
+
+struct NX_VMS_COMMON_API GetBookmarksRequestData: public QnMultiserverRequestData
 {
     virtual void loadFromParams(
         QnResourcePool* resourcePool, const nx::network::rest::Params& params) override;
     virtual nx::network::rest::Params toParams() const override;
     virtual bool isValid() const override;
 
-    QnCameraBookmarkSearchFilter filter;
+    CameraBookmarkSearchFilter filter;
 };
 
-struct NX_VMS_COMMON_API QnGetBookmarkTagsRequestData: public QnMultiserverRequestData
+struct NX_VMS_COMMON_API GetBookmarkTagsRequestData: public QnMultiserverRequestData
 {
-    explicit QnGetBookmarkTagsRequestData(int limit = unlimited());
+    explicit GetBookmarkTagsRequestData(int limit = unlimited());
 
     virtual void loadFromParams(
         QnResourcePool* resourcePool, const nx::network::rest::Params& params) override;
@@ -31,11 +33,10 @@ struct NX_VMS_COMMON_API QnGetBookmarkTagsRequestData: public QnMultiserverReque
     int limit = unlimited();
 };
 
-struct NX_VMS_COMMON_API QnUpdateBookmarkRequestData: public QnMultiserverRequestData
+struct NX_VMS_COMMON_API UpdateBookmarkRequestData: public QnMultiserverRequestData
 {
-    QnUpdateBookmarkRequestData();
-    QnUpdateBookmarkRequestData(const QnCameraBookmark& bookmark,
-        const nx::Uuid& eventRuleId = nx::Uuid());
+    UpdateBookmarkRequestData();
+    UpdateBookmarkRequestData(CameraBookmark bookmark, const nx::Uuid& eventRuleId = nx::Uuid());
 
     virtual void loadFromParams(
         QnResourcePool* resourcePool, const nx::network::rest::Params& params) override;
@@ -46,10 +47,10 @@ struct NX_VMS_COMMON_API QnUpdateBookmarkRequestData: public QnMultiserverReques
     nx::Uuid eventRuleId;
 };
 
-struct NX_VMS_COMMON_API QnDeleteBookmarkRequestData: public QnMultiserverRequestData
+struct NX_VMS_COMMON_API DeleteBookmarkRequestData: public QnMultiserverRequestData
 {
-    QnDeleteBookmarkRequestData();
-    QnDeleteBookmarkRequestData(const nx::Uuid& bookmarkId);
+    DeleteBookmarkRequestData();
+    DeleteBookmarkRequestData(const nx::Uuid& bookmarkId);
 
     virtual void loadFromParams(
         QnResourcePool* resourcePool, const nx::network::rest::Params& params) override;
@@ -58,3 +59,5 @@ struct NX_VMS_COMMON_API QnDeleteBookmarkRequestData: public QnMultiserverReques
 
     nx::Uuid bookmarkId;
 };
+
+} // namespace nx::vms::common
