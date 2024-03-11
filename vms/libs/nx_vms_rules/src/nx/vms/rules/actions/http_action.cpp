@@ -4,10 +4,8 @@
 
 #include "../action_builder_fields/content_type_field.h"
 #include "../action_builder_fields/http_auth_field.h"
-#include "../action_builder_fields/http_auth_type_field.h"
 #include "../action_builder_fields/http_method_field.h"
 #include "../action_builder_fields/optional_time_field.h"
-#include "../action_builder_fields/text_field.h"
 #include "../action_builder_fields/text_with_fields.h"
 #include "../utils/event_details.h"
 #include "../utils/field.h"

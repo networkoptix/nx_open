@@ -26,6 +26,8 @@ private:
     void onActionFieldChanged(const QString& fieldName);
     void onActionDurationChanged() const;
 
+    PickerWidget* createStatePickerIfRequired();
+
     std::vector<PickerWidget*> m_pickers;
 };
 

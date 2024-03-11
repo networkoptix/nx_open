@@ -17,8 +17,6 @@ class NX_VMS_RULES_API PanicRecordingAction: public nx::vms::rules::BasicAction
 
 public:
     static const ItemDescriptor& manifest();
-
-    PanicRecordingAction() = default;
 };
 
 } // namespace nx::vms::rules

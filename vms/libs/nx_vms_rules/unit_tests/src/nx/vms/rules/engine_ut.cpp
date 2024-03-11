@@ -59,6 +59,26 @@ protected:
         engine.reset();
     }
 
+
+    template<class Event, class Action>
+    std::unique_ptr<Rule> makeRule(
+        const Engine::EventConstructor& eventConstructor,
+        const Engine::ActionConstructor& actionConstructor)
+    {
+        if (!engine->eventDescriptor(utils::type<Event>()))
+            engine->registerEvent(Event::manifest(), eventConstructor);
+
+        if (!engine->actionDescriptor(utils::type<Action>()))
+            engine->registerAction(Action::manifest(), actionConstructor);
+
+        auto rule = std::make_unique<Rule>(nx::Uuid::createUuid(), engine.get());
+
+        rule->addEventFilter(engine->buildEventFilter(utils::type<Event>()));
+        rule->addActionBuilder(engine->buildActionBuilder(utils::type<Action>()));
+
+        return rule;
+    }
+
     QnSyncTime syncTime;
     std::unique_ptr<Engine> engine;
     Engine::EventConstructor testEventConstructor = [] { return new TestEvent; };
@@ -487,10 +507,7 @@ TEST_F(EngineTest, onlyValidProlongedActionRegistered)
 
 TEST_F(EngineTest, cacheKey)
 {
-    engine->registerEvent(TestEvent::manifest(), testEventConstructor);
-
-    auto rule = std::make_unique<Rule>(nx::Uuid::createUuid(), engine.get());
-    rule->addEventFilter(engine->buildEventFilter(utils::type<TestEvent>()));
+    auto rule = makeRule<TestEvent, TestAction>(testEventConstructor, testActionConstructor);
     engine->updateRule(serialize(rule.get()));
 
     auto event = TestEventPtr::create(std::chrono::microseconds::zero(), State::instant);
@@ -514,10 +531,7 @@ TEST_F(EngineTest, cacheTimeout)
 {
     using namespace std::chrono;
 
-    engine->registerEvent(TestEvent::manifest(), testEventConstructor);
-
-    auto rule = std::make_unique<Rule>(nx::Uuid::createUuid(), engine.get());
-    rule->addEventFilter(engine->buildEventFilter(utils::type<TestEvent>()));
+    auto rule = makeRule<TestEvent, TestAction>(testEventConstructor, testActionConstructor);
     engine->updateRule(serialize(rule.get()));
 
     auto event = TestEventPtr::create(std::chrono::microseconds::zero(), State::instant);
@@ -538,16 +552,13 @@ TEST_F(EngineTest, cacheTimeout)
 TEST_F(EngineTest, cacheState)
 {
     engine->registerEventField(fieldMetatype<StateField>(), [] { return new StateField{}; });
-    EXPECT_TRUE(engine->registerEvent(
-        TestEventWithState::manifest(), [] { return new TestEventWithState{}; }));
 
-    // Make event filter that accept only events with a started state.
-    auto eventFilter = engine->buildEventFilter(utils::type<TestEventWithState>());
-    auto stateField = eventFilter->fieldByName<StateField>(utils::kStateFieldName);
+    auto rule = makeRule<TestEventWithState, TestAction>(
+        []{ return new TestEventWithState{}; },
+        testActionConstructor);
+
+    auto stateField = rule->eventFilters().first()->fieldByName<StateField>(utils::kStateFieldName);
     stateField->setValue(State::started);
-
-    auto rule = std::make_unique<Rule>(nx::Uuid::createUuid(), engine.get());
-    rule->addEventFilter(std::move(eventFilter));
 
     // Register two identical rules.
     engine->updateRule(serialize(rule.get()));
@@ -570,11 +581,8 @@ TEST_F(EngineTest, cacheState)
 
 TEST_F(EngineTest, instantEventsAreNotAddedToRunningEventWatcher)
 {
-    engine->registerEvent(TestEvent::manifest(), testEventConstructor);
-
     // Makes rule accepted any event.
-    auto rule = std::make_unique<Rule>(nx::Uuid::createUuid(), engine.get());
-    rule->addEventFilter(engine->buildEventFilter(utils::type<TestEvent>()));
+    auto rule = makeRule<TestEvent, TestAction>(testEventConstructor, testActionConstructor);
 
     // Register two such rules.
     engine->updateRule(serialize(rule.get()));
@@ -655,6 +663,62 @@ TEST_F(EngineTest, timerThread)
         });
 
     thread.wait();
+}
+
+TEST_F(EngineTest, stopProlongedActionsIsEmittedWhenRuleIsDisabled)
+{
+    auto plugin = TestPlugin(engine.get());
+    auto executor = TestActionExecutor();
+    auto connector = TestEventConnector();
+    engine->addActionExecutor(utils::type<TestProlongedAction>(), &executor);
+    engine->addEventConnector(&connector);
+
+    engine->registerEventField(
+        fieldMetatype<SourceCameraField>(), [] { return new SourceCameraField; });
+    engine->registerActionField(
+        fieldMetatype<TargetDeviceField>(), [] { return new TargetDeviceField; });
+
+    auto rule = makeRule<SimpleEvent, TestProlongedAction>(
+        [] { return new SimpleEvent; },
+        [] { return new TestProlongedAction; });
+
+    // Event filter accepts any camera.
+    auto sourceCameraField =
+        rule->eventFilters().first()->fieldByName<SourceCameraField>(utils::kCameraIdFieldName);
+    sourceCameraField->setAcceptAll(true);
+
+    // Action builder makes action for two devices plus source.
+    UuidSet targetDevices = { Uuid::createUuid(), Uuid::createUuid() };
+    auto targetDeviceField =
+        rule->actionBuilders().first()->fieldByName<TargetDeviceField>(utils::kDeviceIdsFieldName);
+    targetDeviceField->setUseSource(true);
+    targetDeviceField->setIds(targetDevices);
+
+    engine->updateRule(serialize(rule.get()));
+
+    const auto event = SimpleEventPtr::create(syncTime.currentTimePoint(), State::started);
+    const auto sourceCamera = Uuid::createUuid();
+    event->m_cameraId = sourceCamera;
+
+    // After the event is stared.
+    connector.process(event);
+
+    // Disable rule.
+    rule->setEnabled(false);
+    engine->updateRule(serialize(rule.get()));
+
+    // And expects that auto generated stopped action contains all the required resources.
+    EXPECT_EQ(executor.actions.size(), 2);
+
+    auto testProlongedAction = dynamic_cast<TestProlongedAction*>(executor.actions.back().get());
+    ASSERT_TRUE(testProlongedAction);
+
+    EXPECT_EQ(testProlongedAction->state(), State::stopped);
+
+    UuidList expectedResources{targetDevices.cbegin(), targetDevices.cend()};
+    expectedResources << sourceCamera;
+
+    EXPECT_EQ(testProlongedAction->m_deviceIds, expectedResources);
 }
 
 } // namespace nx::vms::rules::test

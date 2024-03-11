@@ -6,6 +6,8 @@
 #include <QtCore/QMetaObject>
 #include <QtCore/QObject>
 
+#include <nx/utils/uuid.h>
+
 namespace nx::vms::rules::utils {
 
 static constexpr auto kType = "type";

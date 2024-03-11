@@ -370,17 +370,17 @@ void NotificationListModel::Private::removeNotification(
 {
     // TODO: #amalov Consider splitting removal logic by action handlers.
 
-    if (const auto actionId = action->id(); !actionId.isNull())
-    {
-        q->removeEvent(actionId);
-        return;
-    }
-
     const auto ruleId = action->ruleId();
 
     if (action->type() == nx::vms::rules::utils::type<nx::vms::rules::RepeatSoundAction>())
     {
         removeAllItems(ruleId);
+        return;
+    }
+
+    if (const auto actionId = action->id(); !actionId.isNull())
+    {
+        q->removeEvent(actionId);
         return;
     }
 

@@ -13,6 +13,7 @@
 #include <nx/vms/api/rules/rule.h>
 #include <nx/vms/common/utils/schedule.h>
 #include <nx/vms/rules/ini.h>
+#include <nx/vms/rules/utils/action.h>
 #include <nx/vms/rules/utils/event.h>
 #include <nx/vms/utils/translation/scoped_locale.h>
 #include <utils/common/delayed.h>
@@ -56,6 +57,15 @@ bool isDescriptorValid(const ItemDescriptor& descriptor)
     return true;
 }
 
+size_t qHash(const vms::rules::ActionPtr& action)
+{
+    UuidList ids = utils::getResourceIds(action);
+
+    ids << utils::getFieldValue<UuidList>(action, utils::kUsersFieldName); //< TODO: #mmalofeev remove when https://networkoptix.atlassian.net/browse/VMS-38891 will be done.
+
+    return qHash(ids);
+}
+
 } // namespace
 
 Engine::Engine(std::unique_ptr<Router> router, QObject* parent):
@@ -79,6 +89,36 @@ Engine::Engine(std::unique_ptr<Router> router, QObject* parent):
         });
 
     connect(m_router.get(), &Router::eventReceived, this, &Engine::processAcceptedEvent);
+
+    connect(
+        this,
+        &Engine::ruleAddedOrUpdated,
+        this,
+        [this](nx::Uuid ruleId, bool added)
+        {
+            if (!added && !rule(ruleId)->enabled())
+                stopRunningActions(ruleId); //< The rule was disabled.
+        });
+
+    connect(
+        this,
+        &Engine::ruleRemoved,
+        this,
+        [this](nx::Uuid ruleId)
+        {
+            stopRunningActions(ruleId);
+        });
+
+    connect(
+        this,
+        &Engine::rulesReset,
+        this,
+        [this]
+        {
+            for (const auto ruleId: m_runningActions.keys())
+                stopRunningActions(ruleId);
+        }
+    );
 }
 
 Engine::~Engine()
@@ -313,6 +353,12 @@ bool Engine::registerAction(const ItemDescriptor& descriptor, const ActionConstr
     if (m_actionDescriptors.contains(descriptor.id))
     {
         NX_ERROR(this, "Register action failed: % is already registered", descriptor.id);
+        return false;
+    }
+
+    if (descriptor.flags.testFlags({ItemFlag::instant, ItemFlag::prolonged}))
+    {
+        NX_ERROR(this, "Action cannot be instant and prolonged simultaneously.");
         return false;
     }
 
@@ -762,7 +808,7 @@ size_t Engine::processEvent(const EventPtr& event)
         // TODO: #spanasenko Add filters-by-type maps?
         for (const auto& [id, rule]: m_rules)
         {
-            if (!rule->enabled())
+            if (!rule->enabled() || !rule->isValid())
                 continue;
 
             bool matched = false;
@@ -863,10 +909,28 @@ void Engine::processAcceptedEvent(const nx::Uuid& ruleId, const EventData& event
 void Engine::processAction(const ActionPtr& action)
 {
     checkOwnThread();
-    NX_DEBUG(this, "Processing Action %1", action->type());
+    NX_DEBUG(this, "Processing Action '%1' (state %2)", action->type(), action->state());
 
     if (auto executor = m_executors.value(action->type()))
+    {
+        const auto isActionProlonged = isProlonged(action);
+        if (isActionProlonged && action->state() == State::started)
+            m_runningActions[action->ruleId()].insert(qHash(action), action);
+
         executor->execute(action);
+
+        if (isActionProlonged && action->state() == State::stopped)
+        {
+            auto runningActionIt = m_runningActions.find(action->ruleId());
+            if (runningActionIt != m_runningActions.end())
+            {
+                runningActionIt->remove(qHash(action));
+
+                if (runningActionIt->empty())
+                    m_runningActions.erase(runningActionIt);
+            }
+        }
+    }
 }
 
 bool Engine::isEventFieldRegistered(const QString& fieldId) const
@@ -958,6 +1022,30 @@ bool Engine::checkEvent(const EventPtr& event) const
     }
 
     return true;
+}
+
+void Engine::stopRunningActions(nx::Uuid ruleId)
+{
+    checkOwnThread();
+
+    auto runningActionsIt = m_runningActions.find(ruleId);
+    if (runningActionsIt == m_runningActions.end())
+        return;
+
+    for (const auto& action: runningActionsIt.value().values())
+        stopRunningAction(action);
+}
+
+void Engine::stopRunningAction(const ActionPtr& action)
+{
+    checkOwnThread();
+
+    NX_VERBOSE(this, "Stop running '%1' action", action->type());
+
+    action->setState(State::stopped);
+    action->setTimestamp(qnSyncTime->currentTimePoint());
+
+    processAction(action); //< TODO: #mmalofeev should it be written to the event log?
 }
 
 } // namespace nx::vms::rules

@@ -66,6 +66,8 @@ public:
     QByteArray schedule() const;
     bool timeInSchedule(QDateTime time) const;
 
+    bool isValid() const;
+
     void connectSignals();
 
 signals:

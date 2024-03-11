@@ -3,10 +3,17 @@
 #pragma once
 
 #include <core/resource/resource_fwd.h>
+#include <nx/vms/rules/basic_action.h>
 
 #include "../rules_fwd.h"
 
 namespace nx::vms::rules {
+
+inline bool isProlonged(const ActionPtr& action)
+{
+    const auto actionState = action->state();
+    return actionState == State::started || actionState == State::stopped;
+}
 
 NX_VMS_RULES_API bool isProlonged(const Engine* engine, const ActionBuilder* builder);
 

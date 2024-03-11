@@ -12,6 +12,11 @@ using namespace std::chrono_literals;
 
 namespace nx::vms::rules {
 
+QString DeviceOutputAction::uniqueKey() const
+{
+    return utils::makeName(BasicAction::uniqueKey(), m_outputPortId);
+}
+
 const ItemDescriptor& DeviceOutputAction::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{

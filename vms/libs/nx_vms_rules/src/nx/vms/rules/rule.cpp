@@ -9,6 +9,7 @@
 
 #include "action_builder.h"
 #include "event_filter.h"
+#include "utils/common.h"
 
 namespace nx::vms::rules {
 
@@ -164,6 +165,17 @@ QByteArray Rule::schedule() const
 bool Rule::timeInSchedule(QDateTime datetime) const
 {
     return nx::vms::common::timeInSchedule(datetime, m_schedule);
+}
+
+bool Rule::isValid() const
+{
+    if (m_filters.empty() || m_builders.empty())
+        return false;
+
+    if (!utils::isCompatible(m_engine, m_filters.front().get(), m_builders.front().get()))
+        return false;
+
+    return true;
 }
 
 void Rule::connectSignals()

@@ -24,6 +24,7 @@ public:
 
     virtual void registerFields() const override
     {
+        registerEventField<SourceCameraField>();
         registerEventField<StateField>();
         registerEventField<TestEventField>();
 
