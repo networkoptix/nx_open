@@ -687,7 +687,7 @@
     </message>
     <message>
       <source>Do not record audio</source>
-      <translation type="unfinished">Do not record audio</translation>
+      <translation>Không ghi lại âm thanh</translation>
     </message>
   </context>
   <context>
