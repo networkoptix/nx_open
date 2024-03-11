@@ -55,6 +55,7 @@ Yunhong Gu, last updated 05/05/2011
 #include "common.h"
 #include "core.h"
 #include "queue.h"
+#include "log.h"
 
 using namespace std;
 

@@ -58,6 +58,7 @@ Yunhong Gu, last updated 02/28/2012
 #include "queue.h"
 #include "core.h"
 #include "multiplexer.h"
+#include "log.h"
 
 using namespace std;
 
@@ -189,6 +190,11 @@ Result<> CUDT::setOpt(UDTOpt optName, const void* optval, int)
 
             m_iMSS = *(int*)optval;
 
+            // Restricting MSS to a max size to make it easier to detect packet
+            // corruption.
+            if (m_iMSS > UDT::kMSSMax)
+                m_iMSS = UDT::kMSSMax;
+
             // Packet size cannot be greater than UDP buffer size
             if (m_iMSS > m_iUDPSndBufSize)
                 m_iMSS = m_iUDPSndBufSize;
@@ -212,10 +218,10 @@ Result<> CUDT::setOpt(UDTOpt optName, const void* optval, int)
             if (*(int*)optval < 1)
                 return Error(OsErrorCode::invalidData);
 
-            if (*(int*)optval > kDefaultRecvWindowSize)
+            if (*(int*)optval > UDT::kDefaultRecvWindowSize)
                 m_iFlightFlagSize = *(int*)optval;
             else
-                m_iFlightFlagSize = kDefaultRecvWindowSize;
+                m_iFlightFlagSize = UDT::kDefaultRecvWindowSize;
 
             break;
 
@@ -563,7 +569,7 @@ Result<> CUDT::connect(const detail::SocketAddress& serv_addr)
         deadline ? *deadline : std::chrono::microseconds::max());
 
     // This is my current configurations
-    m_ConnReq.m_iVersion = m_iVersion;
+    m_ConnReq.m_iVersion = UDT::kVersion;
     m_ConnReq.m_iType = m_iSockType;
     m_ConnReq.m_iMSS = m_iMSS;
     m_ConnReq.m_iFlightFlagSize = (m_iRcvBufSize < m_iFlightFlagSize) ? m_iRcvBufSize : m_iFlightFlagSize;
@@ -708,7 +714,13 @@ Result<ConnectState> CUDT::connect(const CPacket& response)
         if ((PacketFlag::Control != response.getFlag()) || (ControlPacketType::Handshake != response.getType()))
             return Error(OsErrorCode::connectionRefused, UDT::ProtocolError::handshakeFailure);
 
-        m_ConnRes.deserialize(response.payload().data(), response.getLength());
+        CHandShake temp;
+        if (!temp.deserialize(response.payload().data(), response.getLength()))
+        {
+            UDT_LOG_WARN("handshake validation failed, skipping");
+            return Error(OsErrorCode::connectionRefused, UDT::ProtocolError::handshakeFailure);
+        }
+        m_ConnRes = temp;
 
         if (m_bRendezvous)
         {
@@ -1992,7 +2004,9 @@ void CUDT::processCtrl(CPacket& ctrlpkt)
         case ControlPacketType::Handshake:
         {
             CHandShake req;
-            req.deserialize(ctrlpkt.payload().data(), ctrlpkt.getLength());
+            if (!req.deserialize(ctrlpkt.payload().data(), ctrlpkt.getLength()))
+                break;
+
             if ((req.m_iReqType > 0) || (m_bRendezvous && (req.m_iReqType != -2)))
             {
                 // The peer side has not received the handshake message, so it keeps querying
@@ -2724,7 +2738,8 @@ int ServerSideConnectionAcceptor::processConnectionRequest(
         return 1004;
 
     CHandShake hs;
-    hs.deserialize(packet.payload().data(), packet.getLength());
+    if (!hs.deserialize(packet.payload().data(), packet.getLength()))
+        return 1004;
 
     // SYN cookie
     char clienthost[NI_MAXHOST];
@@ -2770,7 +2785,7 @@ int ServerSideConnectionAcceptor::processConnectionRequest(
     // When a peer side connects in...
     if ((PacketFlag::Control == packet.getFlag()) && (ControlPacketType::Handshake == packet.getType()))
     {
-        if ((hs.m_iVersion != CUDT::m_iVersion) || (hs.m_iType != m_iSockType))
+        if ((hs.m_iVersion != UDT::kVersion) || (hs.m_iType != m_iSockType))
         {
             // mismatch, reject the request
             auto response = packet;
