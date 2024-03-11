@@ -174,7 +174,7 @@
     </message>
     <message>
       <source>Received bad response from Server %1: &quot;%2&quot;.</source>
-      <translation>サーバー %1 の不正な応答: &quot;%2&quot;</translation>
+      <translation>サーバー %1 から不正な応答を受信しました: &quot;%2&quot;。</translation>
     </message>
     <message>
       <source>Check if Server is up and has the proper version.</source>
@@ -198,7 +198,7 @@
     </message>
     <message>
       <source>An input/output error has occurred. OS message: &quot;%1&quot;.</source>
-      <translation>入出力エラーが発生しました。 OSメッセージ：&quot;%1&quot;</translation>
+      <translation>入出力エラーが発生しました。 OS メッセージ: &quot;%1&quot;。</translation>
     </message>
     <message>
       <source>Parameters:</source>
@@ -306,23 +306,23 @@
     </message>
     <message>
       <source>Cannot open media URL %1. Failed to connect to media port %2.</source>
-      <translation>メディア URL %1 を開くことができません。メディア ポート %2 に接続できませんでした。</translation>
+      <translation>メディア URL %1 を開けません。メディアポート %2 への接続に失敗しました。</translation>
     </message>
     <message>
       <source>Cannot open media URL %1. Connection to port %2 was closed unexpectedly.</source>
-      <translation>メディア URL %1 を開くことができません。ポート %2 への接続は異常終了しました。</translation>
+      <translation>メディア URL %1 を開けません。ポート %2 への接続が予期せず終了しました。</translation>
     </message>
     <message>
       <source>Could not parse device response. URL %1, request name %2.</source>
-      <translation>デバイスの応答を解析できませんでした。URL %1, 要求名 %2</translation>
+      <translation>デバイスの応答を解析できませんでした。 URL %1、リクエスト名 %2。</translation>
     </message>
     <message>
       <source>Could not parse camera response. URL %1, request name %2.</source>
-      <translation>カメラの応答を解析できませんでした。URL %1, 要求名 %2</translation>
+      <translation>カメラの応答を解析できませんでした。 URL %1、リクエスト名 %2。</translation>
     </message>
     <message>
       <source>Could not parse I/O module response. URL %1, request name %2.</source>
-      <translation>I/Oモジュールの応答を解析できませんでした。URL %1, 要求名 %2</translation>
+      <translation>I/O モジュールの応答を解析できませんでした。 URL %1、リクエスト名 %2。</translation>
     </message>
     <message>
       <source>No supported media tracks at URL %1.</source>
@@ -330,11 +330,11 @@
     </message>
     <message>
       <source>Not authorized. URL %1.</source>
-      <translation>権限がありません。URL %1</translation>
+      <translation>権限がありません。URL %1。</translation>
     </message>
     <message>
       <source>Cannot open media URL %1. Unsupported media protocol %2.</source>
-      <translation>メディアURL %1 を開くことができません。メディアプロトコル %2 はサポートされていません。</translation>
+      <translation>メディア URL %1を開けません。メディアプロトコル %2 はサポートされていません。</translation>
     </message>
     <message>
       <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
@@ -342,11 +342,11 @@
     </message>
     <message>
       <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
-      <translation>ファームウェアを更新してください。サポートバージョンは %1 以上です。現在のバージョンは %2 です。</translation>
+      <translation>ファームウェアを更新してください。%1 以上のバージョンがサポートされます。現在のバージョンは %2 です。</translation>
     </message>
     <message>
       <source>Plugin error. %1</source>
-      <translation>プラグインエラー %1</translation>
+      <translation>プラグインエラー。 %1</translation>
     </message>
     <message>
       <source>Plugin is unavailable</source>
@@ -354,7 +354,7 @@
     </message>
     <message>
       <source>Internal server error. %1</source>
-      <translation>内部サーバーエラー %1</translation>
+      <translation>内部サーバーエラー。 %1</translation>
     </message>
     <message>
       <source>If disabled, try to enable Recording and decrease FPS in Device Settings (error &quot;%1&quot;).</source>
@@ -465,7 +465,7 @@
     </message>
     <message>
       <source>Edge</source>
-      <translation>Edge</translation>
+      <translation>エッジ</translation>
     </message>
     <message>
       <source>Vmax</source>
@@ -610,7 +610,7 @@
     <message numerus="yes">
       <source>%n Invalid Licenses</source>
       <translation>
-        <numerusform>%n 無効なライセンス</numerusform>
+        <numerusform>%n 個の無効なライセンス</numerusform>
       </translation>
     </message>
     <message>
@@ -634,7 +634,7 @@
       <source>%n/%1 Analog Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n/%1 アナログ ライセンス</numerusform>
+        <numerusform>%n/%1 アナログライセンス</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -655,7 +655,7 @@
       <source>%n/%1 Vmax Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n/%1 のVmaxライセンス</numerusform>
+        <numerusform>%n/%1 Vmaxライセンス</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -828,7 +828,7 @@
     </message>
     <message>
       <source>Licensed To: %1</source>
-      <translation>ライセンス: %1</translation>
+      <translation>ライセンス対象: %1</translation>
     </message>
     <message>
       <source>Watermark: %1</source>
@@ -1033,7 +1033,7 @@
     </message>
     <message>
       <source>Can view all cameras and export video.</source>
-      <translation>すべてのカメラを表示し、録画映像をエクスポートできます。</translation>
+      <translation>すべてのカメラの表示と、録画映像のエクスポートができます。</translation>
     </message>
     <message>
       <source>Can view live video from all cameras.</source>
@@ -1045,7 +1045,7 @@
     </message>
     <message>
       <source>Custom permissions.</source>
-      <translation>カスタム権限</translation>
+      <translation>カスタム権限。</translation>
     </message>
     <message>
       <source>Has access to whole System and can do everything.</source>
@@ -1053,7 +1053,7 @@
     </message>
     <message>
       <source>Has access to whole System and can manage it. Can create users.</source>
-      <translation>システム全体にアクセスでき、管理できます。ユーザーを作成できます。</translation>
+      <translation>システム全体にアクセスして管理できます。ユーザーを作成できます。</translation>
     </message>
   </context>
   <context>
@@ -1405,7 +1405,7 @@
     </message>
     <message>
       <source>Enable recording on EDGE</source>
-      <translation>EDGEでの録画を有効にする</translation>
+      <translation>エッジでの録画を有効にする</translation>
     </message>
     <message>
       <source>Target update information</source>
@@ -1653,7 +1653,7 @@
     </message>
     <message>
       <source>No data exported.</source>
-      <translation>データはエクスポートされませんでした.</translation>
+      <translation>データはエクスポートされませんでした。</translation>
     </message>
   </context>
   <context>
@@ -1855,7 +1855,7 @@
     </message>
     <message>
       <source>Server &quot;%1&quot; has a license problem</source>
-      <translation>サーバー &quot;%1&quot; はライセンスに問題があります</translation>
+      <translation>サーバー &quot;%1&quot; のライセンスに問題があります</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; has finished an archive backup</source>
@@ -1920,7 +1920,7 @@
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
       <translation>
-        <numerusform>%n 回、最初: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+        <numerusform>%n 回、初回: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
       </translation>
     </message>
     <message>
@@ -2027,11 +2027,11 @@
     </message>
     <message>
       <source>Soft Trigger %1 at %2</source>
-      <translation>%2のソフトトリガー%1</translation>
+      <translation>%2 のソフトトリガー %1</translation>
     </message>
     <message>
       <source>Soft Trigger %1 has been activated multiple times</source>
-      <translation>ソフトトリガー%1が複数回アクティブになりました</translation>
+      <translation>ソフトトリガー %1 が複数回起動されました</translation>
     </message>
     <message>
       <source>Send email</source>
@@ -2056,7 +2056,7 @@
     </message>
     <message>
       <source>Storage Issue at %1</source>
-      <translation>%1のストレージ障害</translation>
+      <translation>%1 のストレージ障害</translation>
     </message>
     <message>
       <source>Set to fullscreen</source>
@@ -2072,7 +2072,7 @@
     </message>
     <message>
       <source>Multiple %1 events have occurred</source>
-      <translation>複数の%1イベントが発生しました</translation>
+      <translation>複数の %1 イベントが発生しました</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is offline.</source>

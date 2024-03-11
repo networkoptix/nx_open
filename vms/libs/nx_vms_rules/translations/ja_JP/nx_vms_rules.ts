@@ -293,7 +293,7 @@
     <name>nx::vms::rules::LicenseIssueEvent</name>
     <message>
       <source>Server &quot;%1&quot; has a license problem</source>
-      <translation>サーバー&quot;%1&quot; にライセンスの問題があります</translation>
+      <translation>サーバー &quot;%1&quot; のライセンスに問題があります</translation>
     </message>
     <message>
       <source>License Issue</source>

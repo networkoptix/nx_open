@@ -897,7 +897,7 @@ PTZを行います</translation>
     </message>
     <message>
       <source>Click, double-click, or drag the mouse pointer while pressing the Shift key to use Advanced PTZ</source>
-      <translation>アドバンストPTZ を使用するには、Shift キーを押しながらマウスクリック、ダブルクリック、またはドラッグ操作を行います</translation>
+      <translation>アドバンストPTZ を使用するには、Shift キーを押しながらマウスクリック、ダブルクリック、ドラッグ操作を行ってください</translation>
     </message>
     <message>
       <source>Go to Local Settings to enable a drag marker over the center of the video</source>

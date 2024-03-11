@@ -3896,7 +3896,7 @@ to %1</source>
     </message>
     <message>
       <source>Expires soon</source>
-      <translation>すぐに有効期限が切れる</translation>
+      <translation>期限切れ間近</translation>
     </message>
     <message>
       <source>License expires today</source>
@@ -10653,7 +10653,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <message numerus="yes">
       <source>Double click to add cameras to the current layout or ctrl+click to open in a new tab</source>
       <translation>
-        <numerusform>現在のレイアウトにカメラを追加するにはダブルクリック、新しいタブで開くには Ctrl +クリックしてください</numerusform>
+        <numerusform>現在のレイアウトにカメラを追加するにはダブルクリック、新しいタブで開くには Ctrl + クリックしてください</numerusform>
       </translation>
     </message>
     <message>

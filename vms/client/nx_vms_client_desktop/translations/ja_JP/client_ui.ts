@@ -1749,7 +1749,7 @@
     </message>
     <message>
       <source>License issues:</source>
-      <translation>ライセンス問題:</translation>
+      <translation>ライセンス障害:</translation>
     </message>
   </context>
   <context>
