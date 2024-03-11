@@ -470,15 +470,24 @@ QString NonEditableUsersAndGroups::tooltip(const nx::Uuid& id) const
 
     if (const auto user = systemContext()->resourcePool()->getResourceById<QnUserResource>(id))
     {
-        if (user->attributes().testFlag(api::UserAttribute::readonly))
+        const auto kOrganizationOnly = tr("User management for organization users is available "
+            "only at the organization level, not the site level");
+
+        // A tooltip about management of organization users have priority over other tooltips
+        // only when the system is associated with an organization.
+        if (systemContext()->moduleInformation().organizationId
+            && user->attributes().testFlag(api::UserAttribute::readonly))
         {
-            return tr("User management for organization users is available only at the "
-                "organization level, not the site level");
+            return kOrganizationOnly;
         }
+
         if (!canEnableDisable(user))
             return tr("You do not have permissions to modify this user");
         if (!m_nonUniqueUserTracker.isUnique(id))
             return tr("You cannot modify a user with a non-unique login");
+
+        if (user->attributes().testFlag(api::UserAttribute::readonly))
+            return kOrganizationOnly;
     }
     else if (m_groupsWithNonEditableMembers.contains(id))
     {
