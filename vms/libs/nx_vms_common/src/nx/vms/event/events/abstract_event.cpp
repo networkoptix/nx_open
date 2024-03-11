@@ -31,7 +31,7 @@ namespace event {
 
 namespace {
 
-static const QList<EventType> kAllEvents{
+const std::set<EventType> kAllEvents{
     EventType::cameraMotionEvent,
     EventType::cameraInputEvent,
     EventType::cameraDisconnectEvent,
@@ -58,7 +58,7 @@ static const QList<EventType> kAllEvents{
  * User should not be able to create these events, but should be able to view them in the event
  * log.
  */
-static const QList<EventType> kDeprecatedEvents {
+const std::set<EventType> kDeprecatedEvents {
     EventType::backupFinishedEvent
 };
 
@@ -154,13 +154,12 @@ QList<EventType> childEvents(EventType eventType)
 
 QList<EventType> allEvents(bool includeDeprecated)
 {
-    if (includeDeprecated)
-        return kAllEvents;
+    QList<EventType> result{kAllEvents.cbegin(), kAllEvents.cend()};
 
-    const auto result = nx::utils::toQSet(kAllEvents)
-        .subtract(nx::utils::toQSet(kDeprecatedEvents));
+    if (!includeDeprecated)
+        result.removeIf([](EventType e){ return kDeprecatedEvents.contains(e); });
 
-    return result.values();
+    return result;
 }
 
 bool isResourceRequired(EventType eventType)
