@@ -264,7 +264,7 @@ int QnCameraBookmarksManagerPrivate::getBookmarksAsync(
     const QnCameraBookmarkSearchFilter &filter,
     BookmarksCallbackType callback)
 {
-    QnGetBookmarksRequestData requestData;
+    nx::vms::common::GetBookmarksRequestData requestData;
     requestData.filter = filter;
     requestData.format = Qn::SerializationFormat::ubjson;
     if (!NX_ASSERT(requestData.filter.startTimeMs.count() >= 0, "Invalid start time passed"))
@@ -281,7 +281,7 @@ int QnCameraBookmarksManagerPrivate::getBookmarksAsync(
 int QnCameraBookmarksManagerPrivate::getBookmarkTagsAsync(
     int maxTags, BookmarkTagsCallbackType callback)
 {
-    QnGetBookmarkTagsRequestData requestData;
+    nx::vms::common::GetBookmarkTagsRequestData requestData;
     requestData.limit = maxTags;
     requestData.format = Qn::SerializationFormat::ubjson;
 
@@ -334,12 +334,12 @@ void QnCameraBookmarksManagerPrivate::addCameraBookmarkInternal(
 
     if (operationType == OperationInfo::OperationType::Acknowledge)
     {
-        QnUpdateBookmarkRequestData request(bookmark, eventRuleId);
+        nx::vms::common::UpdateBookmarkRequestData request(bookmark, eventRuleId);
         handle = sendPostRequest("/ec2/bookmarks/acknowledge", request, serverId);
     }
     else
     {
-        QnUpdateBookmarkRequestData request(bookmark);
+        nx::vms::common::UpdateBookmarkRequestData request(bookmark);
         handle = sendPostRequest("/ec2/bookmarks/add", request, serverId);
     }
 
@@ -359,7 +359,7 @@ void QnCameraBookmarksManagerPrivate::updateCameraBookmark(
     if (!bookmark.isValid())
         return;
 
-    QnUpdateBookmarkRequestData request(bookmark);
+    nx::vms::common::UpdateBookmarkRequestData request(bookmark);
     int handle = sendPostRequest("/ec2/bookmarks/update", request);
     m_operations[handle] = OperationInfo(
         OperationInfo::OperationType::Update,
@@ -373,7 +373,7 @@ void QnCameraBookmarksManagerPrivate::deleteCameraBookmark(
     const nx::Uuid &bookmarkId,
     OperationCallbackType callback)
 {
-    QnDeleteBookmarkRequestData request(bookmarkId);
+    nx::vms::common::DeleteBookmarkRequestData request(bookmarkId);
     int handle = sendPostRequest("/ec2/bookmarks/delete", request);
     m_operations[handle] = OperationInfo(
         OperationInfo::OperationType::Delete,

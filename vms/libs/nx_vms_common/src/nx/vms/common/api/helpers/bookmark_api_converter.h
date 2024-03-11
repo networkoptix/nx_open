@@ -11,6 +11,7 @@
 namespace nx::vms::common {
 
 NX_UTILS_DECLARE_FIELD_DETECTOR_SIMPLE(hasShare, share);
+NX_UTILS_DECLARE_FIELD_DETECTOR_SIMPLE(hasShareFilter, shareFilter);
 
 template<typename BookmarkWithRule>
 common::BookmarkShareableParams shareableParams(

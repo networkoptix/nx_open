@@ -12,6 +12,7 @@
 #include <nx/vms/common/system_context.h>
 #include <utils/camera/bookmark_helpers.h>
 #include <utils/camera/camera_names_watcher.h>
+#include <utils/common/synctime.h>
 
 namespace {
 
@@ -128,6 +129,36 @@ const BookmarkSortOrder BookmarkSortOrder::defaultOrder = BookmarkSortOrder();
 const QString CameraBookmark::kGuidParam("guid");
 const QString CameraBookmark::kCreationStartTimeParam("creationStartTimeMs");
 const QString CameraBookmark::kCreationEndTimeParam("creationEndTimeMs");
+
+bool CameraBookmark::bookmarkMatchesFilter(api::BookmarkShareFilters filters) const
+{
+    // Only perform share specific filtering if the filter asks for shareable bookmarks.
+    if (!filters.testFlag(nx::vms::api::BookmarkShareFilter::shareable))
+        return true;
+
+    if (filters.testFlag(nx::vms::api::BookmarkShareFilter::hasExpiration))
+    {
+        if (share.expirationTimeMs == 0ms)
+            return false;
+    }
+    if (filters.testFlag(nx::vms::api::BookmarkShareFilter::expired))
+    {
+        if (share.expirationTimeMs != 0ms && share.expirationTimeMs >= qnSyncTime->value())
+            return false;
+    }
+    if (filters.testFlag(nx::vms::api::BookmarkShareFilter::accessible))
+    {
+        if (share.expirationTimeMs != 0ms && share.expirationTimeMs < qnSyncTime->value())
+            return false;
+    }
+    if (filters.testFlag(nx::vms::api::BookmarkShareFilter::passwordProtected))
+    {
+        if (!share.digest)
+            return false;
+    }
+
+    return true;
+}
 
 milliseconds CameraBookmark::endTime() const
 {

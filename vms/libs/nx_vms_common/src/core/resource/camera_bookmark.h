@@ -108,6 +108,8 @@ struct NX_VMS_COMMON_API CameraBookmark
 
     bool createdBySystem() const;
 
+    bool bookmarkMatchesFilter(nx::vms::api::BookmarkShareFilters filter) const;
+
     /** @return Whether the Bookmark is null. */
     bool isNull() const;
 
@@ -177,6 +179,8 @@ struct NX_VMS_COMMON_API CameraBookmarkSearchFilter
     std::optional<milliseconds> minVisibleLengthMs;
 
     BookmarkSortOrder orderBy = BookmarkSortOrder::defaultOrder;
+
+    nx::vms::api::BookmarkShareFilters shareFilter;
 
     std::optional<nx::Uuid> id;
 
