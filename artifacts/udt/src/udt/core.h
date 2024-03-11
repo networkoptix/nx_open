@@ -57,8 +57,6 @@ Yunhong Gu, last updated 02/28/2012
 #include "result.h"
 #include "queue.h"
 
-enum UDTSockType { UDT_STREAM = 1, UDT_DGRAM };
-
 class Multiplexer;
 
 /**
@@ -384,22 +382,19 @@ public: // internal API
 public:
     static constexpr UDTSOCKET INVALID_SOCK = -1;         // invalid socket descriptor
     static constexpr int ERROR = -1;                      // socket api error returned value
-    static constexpr int m_iVersion = 4;                 // UDT version, for compatibility use
 
 private: // Identification
-    static constexpr int kDefaultRecvWindowSize = 25600;
-
     // Mimimum recv buffer size is 32 packets
     static constexpr int kMinRecvBufferSize = 32;
     //Rcv buffer MUST NOT be bigger than Flight Flag size
     static constexpr int kDefaultRecvBufferSize =
-        kDefaultRecvWindowSize < 8192
-        ? kDefaultRecvWindowSize
+        UDT::kDefaultRecvWindowSize < 8192
+        ? UDT::kDefaultRecvWindowSize
         : 8192;
 
     static constexpr int kDefaultSendBufferSize =
-        kDefaultRecvWindowSize < 8192
-        ? kDefaultRecvWindowSize
+        UDT::kDefaultRecvWindowSize < 8192
+        ? UDT::kDefaultRecvWindowSize
         : 8192;
 
     UDTSOCKET m_SocketId = INVALID_SOCK;                        // UDT socket number
@@ -411,15 +406,15 @@ private: // Packet sizes
     int m_iPayloadSize = 0;                          // Maximum/regular payload size, in bytes
 
 private: // Options
-    int m_iMSS = kDefaultMtuSize;                // Maximum Segment Size, in bytes
+    int m_iMSS = UDT::kDefaultMSS;                // Maximum Segment Size, in bytes
     bool m_bSynSending = true;                          // Sending syncronization mode
     bool m_bSynRecving = true;                          // Receiving syncronization mode
-    int m_iFlightFlagSize = kDefaultRecvWindowSize;                       // Maximum number of packets in flight from the peer side
+    int m_iFlightFlagSize = UDT::kDefaultRecvWindowSize;                       // Maximum number of packets in flight from the peer side
     int m_iSndBufSize = kDefaultSendBufferSize;                           // Maximum UDT sender buffer size
     int m_iRcvBufSize = kDefaultRecvBufferSize;                           // Maximum UDT receiver buffer size
     struct linger m_Linger;                             // Linger information on close
     int m_iUDPSndBufSize = 65536;                        // UDP sending buffer size. TODO #akolesnikov why it is not calculated somehow?
-    int m_iUDPRcvBufSize = kDefaultRecvBufferSize * kDefaultMtuSize;                        // UDP receiving buffer size
+    int m_iUDPRcvBufSize = kDefaultRecvBufferSize * UDT::kDefaultMSS;                        // UDP receiving buffer size
     int m_iIPversion = AF_INET;                            // IP version
     bool m_bRendezvous = false;                          // Rendezvous connection mode
     // sending timeout in milliseconds.
