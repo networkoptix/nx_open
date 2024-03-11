@@ -195,12 +195,12 @@
     <message>
       <source>Log in as a %1 user to the system in a shutdown state is forbidden. You can still connect as local user.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">Log in as a %1 user to the system in a shutdown state is forbidden. You can still connect as local user.</translation>
+      <translation>Không thể đăng nhập với tư cách người dùng %1 vào hệ thống ở trạng thái tắt. Bạn vẫn có thể kết nối với tư cách là người dùng cục bộ.</translation>
     </message>
     <message>
       <source>Log in as a %1 user to the system in a suspended state is forbidden. You can still connect as local user.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">Log in as a %1 user to the system in a suspended state is forbidden. You can still connect as local user.</translation>
+      <translation>Không thể đăng nhập với tư cách người dùng %1 vào hệ thống ở trạng thái bị treo. Bạn vẫn có thể kết nối với tư cách là người dùng cục bộ.</translation>
     </message>
     <message>
       <source>To log in to this System, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</source>

@@ -4422,22 +4422,22 @@ Khóa giấy phép: %2</translation>
     <message>
       <source>%1 group does not have %2 permission for some of selected cameras</source>
       <comment>%1 is the name of selected user group, %2 is permission name</comment>
-      <translation type="unfinished">%1 group does not have %2 permission for some of selected cameras</translation>
+      <translation>Nhóm %1 không có quyền %2 đối với một số camera đã chọn</translation>
     </message>
     <message>
       <source>%1 groups and %2 users do not have %3 permission for some of selected cameras</source>
       <comment>%1 is number of selected user groups, %2 is number of users, %3 is permission name</comment>
-      <translation type="unfinished">%1 groups and %2 users do not have %3 permission for some of selected cameras</translation>
+      <translation>Nhóm %1 và %2 người dùng không có quyền %3 đối với một số camera đã chọn</translation>
     </message>
     <message>
       <source>%1 user does not have %2 permission for some of selected cameras</source>
       <comment>%1 is the name of the selected user, %2 is the permission name</comment>
-      <translation type="unfinished">%1 user does not have %2 permission for some of selected cameras</translation>
+      <translation>Người dùng %1 không có quyền %2 đối với một số camera đã chọn</translation>
     </message>
     <message>
       <source>%1 users do not have %2 permission for some of selected cameras</source>
       <comment>%1 is number of selected users, %2 is permission name</comment>
-      <translation type="unfinished">%1 users do not have %2 permission for some of selected cameras</translation>
+      <translation>Người dùng %1 không có quyền %2 đối với một số camera đã chọn</translation>
     </message>
   </context>
   <context>
@@ -4818,11 +4818,11 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>Certificate details are not available</source>
-      <translation type="unfinished">Certificate details are not available</translation>
+      <translation>Chi tiết chứng chỉ không có sẵn</translation>
     </message>
     <message>
       <source>To access certificate details, enable the Audit Trail feature.</source>
-      <translation type="unfinished">To access certificate details, enable the Audit Trail feature.</translation>
+      <translation>Để truy cập chi tiết chứng chỉ, hãy bật tính năng Báo cáo hành vi người dùng.</translation>
     </message>
   </context>
   <context>
@@ -9423,7 +9423,7 @@ Hãy nhớ trả lại Mức ghi nhật ký về cài đặt mặc định sau k
     </message>
     <message>
       <source>Non-default Logging level. We recommend setting it to &quot;info&quot;</source>
-      <translation type="unfinished">Non-default Logging level. We recommend setting it to &quot;info&quot;</translation>
+      <translation>Mức ghi nhật ký không mặc định. Chúng tôi khuyên bạn nên đặt thành &quot;info&quot;</translation>
     </message>
   </context>
   <context>
@@ -10066,7 +10066,7 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
     </message>
     <message>
       <source>LDAP Default group cannot be deleted as long as the system is connected to LDAP server</source>
-      <translation type="unfinished">LDAP Default group cannot be deleted as long as the system is connected to LDAP server</translation>
+      <translation>Không thể xóa nhóm mặc định LDAP khi hệ thống được kết nối với máy chủ LDAP</translation>
     </message>
   </context>
   <context>
@@ -12712,11 +12712,11 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>Number of devices using this service exceeds the available service quantity.</source>
-      <translation type="unfinished">Number of devices using this service exceeds the available service quantity.</translation>
+      <translation>Số lượng thiết bị sử dụng dịch vụ này vượt quá số lượng dịch vụ sẵn có.</translation>
     </message>
     <message>
       <source>Please disable it for some devices or add more suitable services. Otherwise it will be done automatically on %1</source>
-      <translation type="unfinished">Please disable it for some devices or add more suitable services. Otherwise it will be done automatically on %1</translation>
+      <translation>Vui lòng tắt nó cho một số thiết bị hoặc thêm các dịch vụ phù hợp hơn. Nếu không nó sẽ được thực hiện tự động vào %1</translation>
     </message>
   </context>
   <context>
@@ -13366,7 +13366,7 @@ to view more bookmarks</source>
     <name>runApplication</name>
     <message>
       <source>Would you like to try switching to DirectX?</source>
-      <translation type="unfinished">Would you like to try switching to DirectX?</translation>
+      <translation>Bạn có muốn thử chuyển sang DirectX không?</translation>
     </message>
   </context>
 </TS>
