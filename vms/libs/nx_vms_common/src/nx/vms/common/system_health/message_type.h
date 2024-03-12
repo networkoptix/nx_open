@@ -2,10 +2,14 @@
 
 #pragma once
 
+#include <functional>
 #include <set>
+#include <vector>
 
 #include <nx/reflect/enum_instrument.h>
 #include <nx/vms/event/event_fwd.h>
+
+namespace nx::vms::common { class SystemContext; }
 
 // TODO: #sivanov refactor settings storage - move to User Settings tab on server.
 namespace nx::vms::common::system_health {
@@ -80,16 +84,37 @@ NX_REFLECTION_ENUM_CLASS(MessageType,
     count
 )
 
+using MessageTypePredicate = std::function<bool(MessageType)>;
+using MessageTypePredicateList = std::vector<MessageTypePredicate>;
+
 /** Some messages are not to be displayed in any case. */
 NX_VMS_COMMON_API bool isMessageVisible(MessageType message);
-
-/** Some messages must not be displayed in settings dialog, so user cannot disable them. */
-NX_VMS_COMMON_API bool isMessageVisibleInSettings(MessageType message);
 
 /** Some messages must not be auto-hidden by timeout. */
 NX_VMS_COMMON_API bool isMessageLocked(MessageType message);
 
-NX_VMS_COMMON_API std::set<MessageType> allVisibleMessageTypes();
+/** Some messages must not be displayed in settings dialog, so user cannot disable them. */
+NX_VMS_COMMON_API bool isMessageVisibleInSettings(MessageType message);
+
+/**
+ * @return Predicate that returns true for system health message types that can be displayed
+ *     under the terms of currently applied licensing model. The system is described by the given
+ *     system context.
+ */
+NX_VMS_COMMON_API MessageTypePredicate isMessageApplicableForLicensingMode(
+    nx::vms::common::SystemContext* systemContext);
+
+/**
+ *  @return Set of system health message types for which each of the passed predicates returns
+ *      true or set that contains all message types if no predicate passed as a parameter.
+ */
+NX_VMS_COMMON_API std::set<MessageType> allMessageTypes(
+    const MessageTypePredicateList& predicates);
+
+/**
+ * Set of system health message types that used as default value for the local setting that
+ * determines system health messages visibility settings.
+ */
 NX_VMS_COMMON_API std::set<MessageType> defaultMessageTypes();
 
 } // namespace nx::vms::common::system_health

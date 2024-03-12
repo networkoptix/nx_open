@@ -30,7 +30,7 @@ void QnBusinessTypesComparator::initLexOrdering()
     // event types to lex order
     int maxType = 0;
     QMap<QString, int> eventTypes;
-    for (auto eventType: allEvents(/*includeDeprecated*/ true))
+    for (auto eventType: allEvents({})) //< Order is defined for deprecated event types as well.
     {
         eventTypes.insert(helper.eventName(eventType), eventType);
         if (maxType < eventType)

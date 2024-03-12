@@ -125,7 +125,8 @@ SystemHealthListModel::Private::Private(SystemHealthListModel* q):
     connect(systemHealthState, &SystemHealthState::stateChanged, this, &Private::toggleItem);
     connect(systemHealthState, &SystemHealthState::dataChanged, this, &Private::updateItem);
 
-    for (const auto index: nx::vms::common::system_health::allVisibleMessageTypes())
+    for (const auto index: common::system_health::allMessageTypes({
+        common::system_health::isMessageVisibleInSettings}))
     {
         if (systemHealthState->state(index))
             doAddItem(index, {}, true /*initial*/);
@@ -171,7 +172,8 @@ SystemHealthListModel::Private::Private(SystemHealthListModel* q):
             const auto filter = appContext()->localSettings()->popupSystemHealth();
             const auto systemHealthState = context()->instance<SystemHealthState>();
 
-            for (const auto index: common::system_health::allVisibleMessageTypes())
+            for (const auto index: common::system_health::allMessageTypes({
+                common::system_health::isMessageVisibleInSettings}))
             {
                 const bool wasVisible = m_popupSystemHealthFilter.contains(index);
                 const bool isVisible = filter.contains(index);
