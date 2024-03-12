@@ -3,16 +3,14 @@
 #include "event_log_request_data.h"
 
 #include <api/helpers/camera_id_helper.h>
-
-#include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
-#include <nx/vms/event/actions/abstract_action.h>
-#include <nx/vms/event/events/abstract_event.h>
-
+#include <core/resource_management/resource_pool.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/network/rest/params.h>
 #include <nx/reflect/string_conversion.h>
 #include <nx/utils/string.h>
+#include <nx/vms/event/actions/abstract_action.h>
+#include <nx/vms/event/events/abstract_event.h>
 
 namespace {
 
@@ -110,6 +108,8 @@ nx::network::rest::Params QnEventLogFilterData::toParams() const
 
 bool QnEventLogFilterData::isValid(QString* errorString) const
 {
+    using namespace nx::vms::event;
+
     auto error =
         [errorString](const QString& text)
         {
@@ -124,15 +124,15 @@ bool QnEventLogFilterData::isValid(QString* errorString) const
     for (const auto& eventType: eventTypeList)
     {
         if (eventType != nx::vms::api::EventType::undefinedEvent
-            && !nx::vms::event::allEvents(/*includeDeprecated*/ true).contains(eventType)
-            && !nx::vms::event::hasChild(eventType))
+            && !allEvents({}).contains(eventType)
+            && !hasChild(eventType))
         {
             return error(lit("Invalid event type"));
         }
     }
 
     if (actionType != nx::vms::api::ActionType::undefinedAction
-        && !nx::vms::event::allActions().contains(actionType))
+        && !allActions().contains(actionType))
     {
         return error(lit("Invalid action type"));
     }
