@@ -8,12 +8,12 @@ namespace nx::network::jws {
 
 namespace detail {
 
-std::size_t estimateSignatureLength(const jwk::Key& key)
+std::size_t estimateSignatureLength(const std::string& algorithm)
 {
     std::size_t len = 0;
-    if (key.alg() == "RS256")
+    if (algorithm == "RS256")
         len = 3072 / 8;
-    else if (key.alg() == "HS256")
+    else if (algorithm == "HS256")
         len = 64;
     else
         len = 256;
@@ -23,7 +23,7 @@ std::size_t estimateSignatureLength(const jwk::Key& key)
 
 } // namespace detail
 
-bool verifyToken(const std::string_view encodedToken, const jwk::Key& key)
+bool verifyToken(const std::string_view encodedToken, const jwk::ParsedKey& key)
 {
     const auto headerEndPos = encodedToken.find('.');
     if (headerEndPos == std::string_view::npos)
@@ -40,6 +40,15 @@ bool verifyToken(const std::string_view encodedToken, const jwk::Key& key)
 
     const auto signature = encodedToken.substr(signedMessageEndPos + 1);
     return jwk::verify(encodedToken.substr(0, signedMessageEndPos), signature, header.alg, key);
+}
+
+bool verifyToken(const std::string_view encodedToken, const jwk::Key& key)
+{
+    const auto parsedKey = jwk::parseKey(key);
+    if (!parsedKey)
+        return false;
+
+    return verifyToken(encodedToken, *parsedKey);
 }
 
 } // namespace nx::network::jws

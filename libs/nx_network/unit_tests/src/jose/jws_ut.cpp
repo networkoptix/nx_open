@@ -4,8 +4,10 @@
 
 #include <nx/reflect/json/raw_json_text.h>
 #include <nx/utils/random.h>
+#include <nx/utils/time.h>
 
 #include <nx/network/jose/jws.h>
+#include <nx/network/jose/jwt.h>
 
 namespace nx::network::jws::test {
 
@@ -123,6 +125,91 @@ TEST_F(JoseJws, decoding_trash_does_not_crash)
     auto decodedToken = decodeToken<Payload>(trash);
     // If decoding still completes somehow, the verification MUST never pass.
     ASSERT_FALSE(decodedToken.has_value() && verifyToken(trash, kp.pub));
+}
+
+//-------------------------------------------------------------------------------------------------
+
+class JoseJwsLoadTest:
+    public JoseJws
+{
+protected:
+    template<typename Key>
+    nx::utils::expected<nx::network::jws::TokenEncodeResult<jwt::ClaimSet>, std::string>
+        generateToken(const Key& key)
+    {
+        jwt::ClaimSet claimSet;
+        claimSet.setIss("cdb");
+        claimSet.setSub("test@example.com");
+        claimSet.setIat(
+            std::chrono::duration_cast<std::chrono::seconds>(nx::utils::utcTime().time_since_epoch()));
+        claimSet.setAud("/ cloudSystemId=*");
+        claimSet.setIat(std::chrono::duration_cast<std::chrono::seconds>(nx::utils::utcTime().time_since_epoch()));
+        claimSet.setExp(std::chrono::duration_cast<std::chrono::seconds>(
+            nx::utils::utcTime().time_since_epoch() + std::chrono::minutes(10)));
+
+        nx::utils::expected<nx::network::jws::TokenEncodeResult<jwt::ClaimSet>, std::string>
+            tokenEncodeResult = nx::network::jws::encodeAndSign(
+                nx::network::jwt::kJwtTokenType, claimSet, key);
+
+        return tokenEncodeResult;
+    }
+
+    template<typename Func>
+    void measurePerformance(
+        const std::string& testName,
+        Func f)
+    {
+        static constexpr auto testDuration = std::chrono::seconds(3);
+
+        const auto t0 = std::chrono::steady_clock::now();
+        std::chrono::steady_clock::time_point t1;
+        int cnt = 0;
+        while ((t1 = std::chrono::steady_clock::now()) < t0 + testDuration)
+        {
+            f();
+            cnt++;
+        }
+
+        const int rps = (cnt * 1000) / std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
+
+        std::cout<<testName<<" rate is "<< rps << " tokens per second" <<std::endl;
+    }
+};
+
+TEST_F(JoseJwsLoadTest, DISABLED_token_preparation_and_signing)
+{
+    const auto jwk = nx::network::jwk::generateKeyPairForSigning(nx::network::jwk::Algorithm::RS256);
+    ASSERT_TRUE(jwk);
+
+    const auto parsedKey = nx::network::jwk::parseKey(jwk->priv);
+    ASSERT_TRUE(parsedKey);
+
+    measurePerformance(
+        "Token preparation and signing",
+        [this, &parsedKey]()
+        {
+            const auto token = generateToken(*parsedKey);
+            ASSERT_TRUE(token);
+        });
+}
+
+TEST_F(JoseJwsLoadTest, DISABLED_verifying)
+{
+    const auto jwk = nx::network::jwk::generateKeyPairForSigning(nx::network::jwk::Algorithm::RS256);
+    ASSERT_TRUE(jwk);
+
+    const auto parsedPubKey = nx::network::jwk::parseKey(jwk->pub);
+    ASSERT_TRUE(parsedPubKey);
+
+    const auto token = generateToken(jwk->priv);
+    ASSERT_TRUE(token);
+
+    measurePerformance(
+        "Token verification",
+        [&token, &parsedPubKey]()
+        {
+            ASSERT_TRUE(verifyToken(token->encodedAndSignedToken, *parsedPubKey));
+        });
 }
 
 } // namespace nx::network::jws::test
