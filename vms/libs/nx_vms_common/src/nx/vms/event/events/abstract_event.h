@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <functional>
+
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/event/action_parameters.h>
 #include <nx/vms/event/event_fwd.h>
@@ -17,8 +19,32 @@ NX_VMS_COMMON_API bool hasChild(EventType eventType);
 
 NX_VMS_COMMON_API QList<EventType> childEvents(EventType eventType);
 
-/** Returns sorted list of all the events. */
-NX_VMS_COMMON_API QList<EventType> allEvents(bool includeDeprecated = false);
+using EventTypePredicate = std::function<bool(EventType)>;
+using EventTypePredicateList = QList<EventTypePredicate>;
+
+/**
+ * Predicate that returns true for an event that's not declared as deprecated.
+ */
+NX_VMS_COMMON_API bool isNonDeprecatedEvent(EventType eventType);
+
+/**
+ * @return Predicate that returns true for an event that is supported by the licensing model of
+ *     the system described by the given system context.
+ */
+NX_VMS_COMMON_API EventTypePredicate isApplicableForLicensingMode(
+    nx::vms::common::SystemContext* systemContext);
+
+/**
+ * @return Predicate that returns true for an event type if it's child of the given event type.
+ */
+NX_VMS_COMMON_API EventTypePredicate isChildOf(EventType parentEventType);
+
+/**
+ * @return Sorted list of event types for which each of the passed predicates returns true or list
+ *     of all known event types if no predicate passed as a parameter.
+ */
+NX_VMS_COMMON_API QList<EventType> allEvents(
+    const EventTypePredicateList& predicates = {isNonDeprecatedEvent});
 
 NX_VMS_COMMON_API EventType parentEvent(EventType eventType);
 

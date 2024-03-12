@@ -24,6 +24,27 @@ using namespace nx::vms::client::desktop;
 
 using EventType = nx::vms::api::EventType;
 
+namespace {
+
+QList<EventType> supportedEventTypes(nx::vms::common::SystemContext* systemContext)
+{
+    using namespace nx::vms::event;
+    return allEvents({
+        isNonDeprecatedEvent,
+        isApplicableForLicensingMode(systemContext)});
+}
+
+std::set<nx::vms::common::system_health::MessageType> supportedMessageTypes(
+    nx::vms::common::SystemContext* systemContext)
+{
+    using namespace nx::vms::common::system_health;
+    return allMessageTypes({
+        isMessageVisibleInSettings,
+        isMessageApplicableForLicensingMode(systemContext)});
+}
+
+} // namespace
+
 QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
@@ -46,7 +67,7 @@ QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget* parent):
             " They will be removed in future versions."),
         .isEnabledProperty = &messageBarSettings()->notificationsDeprecationInfo});
 
-    for (EventType eventType: nx::vms::event::allEvents())
+    for (const auto eventType: supportedEventTypes(systemContext()))
     {
         QCheckBox* checkbox = new QCheckBox(this);
         checkbox->setText(m_helper->eventName(eventType));
@@ -57,7 +78,7 @@ QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget* parent):
             &QnAbstractPreferencesWidget::hasChangesChanged);
     }
 
-    for (auto messageType: nx::vms::common::system_health::allVisibleMessageTypes())
+    for (auto messageType: supportedMessageTypes(systemContext()))
     {
         QCheckBox* checkbox = new QCheckBox(this);
         checkbox->setText(QnSystemHealthStringsHelper::messageTitle(messageType));
@@ -102,7 +123,7 @@ void QnPopupSettingsWidget::loadDataToUi()
     std::set<nx::vms::common::system_health::MessageType> messageTypes =
         appContext()->localSettings()->popupSystemHealth();
 
-    for (auto messageType: nx::vms::common::system_health::allVisibleMessageTypes())
+    for (auto messageType: supportedMessageTypes(systemContext()))
     {
         const bool checked = messageTypes.contains(messageType);
         m_systemHealthCheckBoxes[messageType]->setChecked(checked);
@@ -113,11 +134,13 @@ void QnPopupSettingsWidget::loadDataToUi()
     if (context()->user())
         m_adaptor->setResource(context()->user());
 
-    QList<EventType> watchedEvents = context()->user()
-        ? m_adaptor->watchedEvents()
-        : nx::vms::event::allEvents();
+    const auto eventTypes = supportedEventTypes(systemContext());
 
-    for (EventType eventType: nx::vms::event::allEvents())
+    const auto watchedEvents = context()->user()
+        ? m_adaptor->watchedEvents()
+        : eventTypes;
+
+    for (const auto eventType: eventTypes)
     {
         bool checked = watchedEvents.contains(eventType);
         m_businessRulesCheckBoxes[eventType]->setChecked(checked);
@@ -125,7 +148,6 @@ void QnPopupSettingsWidget::loadDataToUi()
     }
 
     ui->showAllCheckBox->setChecked(all);
-
     ui->businessEventsGroupBox->setEnabled((bool) context()->user());
 }
 
@@ -152,11 +174,13 @@ bool QnPopupSettingsWidget::hasChanges() const
 
 QList<EventType> QnPopupSettingsWidget::watchedEvents() const
 {
+    const auto eventTypes = supportedEventTypes(systemContext());
+
     if (ui->showAllCheckBox->isChecked())
-        return nx::vms::event::allEvents();
+        return eventTypes;
 
     QList<EventType> result;
-    for (EventType eventType: nx::vms::event::allEvents())
+    for (const auto eventType: eventTypes)
     {
         if (m_businessRulesCheckBoxes[eventType]->isChecked())
             result << eventType;
@@ -169,14 +193,10 @@ std::set<nx::vms::common::system_health::MessageType>
 {
     std::set<nx::vms::common::system_health::MessageType> result;
 
-    for (auto messageType: nx::vms::common::system_health::allVisibleMessageTypes())
+    for (auto messageType: supportedMessageTypes(systemContext()))
     {
-        if (nx::vms::common::system_health::isMessageVisibleInSettings(messageType)
-            && (m_systemHealthCheckBoxes[messageType]->isChecked()
-                || ui->showAllCheckBox->isChecked()))
-        {
+        if (m_systemHealthCheckBoxes[messageType]->isChecked() || ui->showAllCheckBox->isChecked())
             result.insert(messageType);
-        }
     }
 
     return result;

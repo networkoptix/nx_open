@@ -198,8 +198,13 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject* parent):
             model->appendRow(item);
         };
 
+    const auto supportedEventTypes = allEvents({
+        isNonDeprecatedEvent,
+        isApplicableForLicensingMode(systemContext())});
+
+    // TODO: #vbreus Implement NVR related events filtering via predicate passed to the allEvents.
     const auto accessibleEvents = NvrEventsActionsAccess::removeInacessibleNvrEvents(
-        vms::event::allEvents(), resourcePool());
+        supportedEventTypes, resourcePool());
 
     QnBusinessTypesComparator lexComparator;
 

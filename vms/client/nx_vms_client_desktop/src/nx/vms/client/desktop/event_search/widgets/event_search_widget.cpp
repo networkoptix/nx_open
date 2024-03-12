@@ -201,7 +201,11 @@ void EventSearchWidget::Private::setupTypeSelection()
     m_analyticsEventsSubmenuAction = eventFilterMenu->addMenu(analyticsEventsMenu);
     m_analyticsEventsSubmenuAction->setVisible(false);
 
-    for (const auto type: allEvents())
+    const auto supportedEventTypes = allEvents({
+        isNonDeprecatedEvent,
+        isApplicableForLicensingMode(q->systemContext())});
+
+    for (const auto type: supportedEventTypes)
     {
         if (parentEvent(type) == EventType::anyEvent && type != EventType::analyticsSdkEvent)
             addMenuAction(eventFilterMenu, helper.eventName(type), type);
@@ -286,6 +290,8 @@ QMenu* EventSearchWidget::Private::createDeviceIssuesMenu(QWidget* parent) const
 
 QMenu* EventSearchWidget::Private::createServerEventsMenu(QWidget* parent) const
 {
+    using namespace nx::vms::event;
+
     auto menu = new QMenu(parent);
     menu->setProperty(style::Properties::kMenuAsDropdown, true);
     menu->setWindowFlags(menu->windowFlags() | Qt::BypassGraphicsProxyWidget);
@@ -295,10 +301,15 @@ QMenu* EventSearchWidget::Private::createServerEventsMenu(QWidget* parent) const
     addMenuAction(menu, tr("Any server event"), EventType::anyServerEvent);
     menu->addSeparator();
 
-    const auto accessibleServerEvents = NvrEventsActionsAccess::removeInacessibleNvrEvents(
-        nx::vms::event::childEvents(EventType::anyServerEvent), q->resourcePool());
+    const auto supportedEventTypes = allEvents({
+        isNonDeprecatedEvent,
+        isApplicableForLicensingMode(q->systemContext()),
+        isChildOf(EventType::anyServerEvent)});
 
-    nx::vms::event::StringsHelper stringsHelper(q->systemContext());
+    const auto accessibleServerEvents = NvrEventsActionsAccess::removeInacessibleNvrEvents(
+        supportedEventTypes, q->resourcePool());
+
+    StringsHelper stringsHelper(q->systemContext());
     for (const auto type: accessibleServerEvents)
         addMenuAction(menu, stringsHelper.eventName(type), type);
 
