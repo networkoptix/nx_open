@@ -66,7 +66,12 @@ struct EventParametersModel::Private
 
     bool isSeparator(const QModelIndex& index) const
     {
-        return visibleElements[index.row()] == kSeparatorSymbol;
+        return isSeparator(visibleElements[index.row()]);
+    }
+
+    bool isSeparator(const QString& value) const
+    {
+        return value == kSeparatorSymbol;
     }
 };
 
@@ -149,15 +154,67 @@ void EventParametersModel::expandGroup(const QString& groupNameToExpand)
 
 void EventParametersModel::resetExpandedGroup()
 {
-    beginResetModel();
-    d->visibleElements = d->defaultVisibleElements;
+    setDefaultVisibleElements();
     d->currentExpandedGroup.clear();
-    endResetModel();
 }
 
 bool EventParametersModel::isCorrectParameter(const QString& eventParameter)
 {
     return d->allElements.contains(eventParameter);
+}
+
+void EventParametersModel::setDefaultVisibleElements()
+{
+    beginResetModel();
+    d->visibleElements = d->defaultVisibleElements;
+    endResetModel();
+}
+
+void EventParametersModel::filter(const QString& filter)
+{
+    if (filter.size() == 1 && EventParameterHelper::isStartOfEventParameter(filter.front()))
+    {
+        setDefaultVisibleElements();
+        return; //< It's begining of event parameter, no filter is required.
+    }
+
+    if (d->visibleElements.empty() || filter.isEmpty())
+        return;
+
+
+    if (!EventParameterHelper::isStartOfEventParameter(filter.front()))
+    {
+        // Filter is not correct event parameter. Set visible elements to empty value.
+        beginResetModel();
+        d->visibleElements.clear();
+        endResetModel();
+        return;
+    }
+
+    for (int i = d->visibleElements.size() - 1; i >= 0; --i)
+    {
+        const auto& value = d->visibleElements[i];
+        const bool shouldKeepSeparator = i > 0 && i < d->visibleElements.size() - 1
+            && !d->isSeparator(d->visibleElements[i + 1]);
+
+        if (d->isSeparator(value) && shouldKeepSeparator)
+            continue; //< Keep separator for grouping of the element.
+
+        if (!value.startsWith(filter))
+        {
+            beginRemoveRows({}, i, i);
+            d->visibleElements.erase(d->visibleElements.begin() + i);
+            endRemoveRows();
+        }
+    }
+
+    // Remove separator on first line, if present.
+    if (!d->visibleElements.empty() && d->isSeparator(d->visibleElements.first()))
+    {
+        beginRemoveRows({}, 0, 0);
+        d->visibleElements.removeFirst();
+        endRemoveRows();
+    }
 }
 
 } // namespace nx::vms::client::desktop::rules
