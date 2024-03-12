@@ -15,7 +15,7 @@ namespace nx::network::jws {
 
 namespace detail {
 
-NX_NETWORK_API std::size_t estimateSignatureLength(const jwk::Key& key);
+NX_NETWORK_API std::size_t estimateSignatureLength(const std::string& algorithm);
 
 } // namespace detail
 
@@ -57,23 +57,25 @@ struct TokenEncodeResult
 };
 
 /**
- * Encodes and signs token as defined by
+ * Encodes and signs token using pre-parsed key as defined by
  * https://datatracker.ietf.org/doc/html/rfc7515#appendix-A.1.
  * The token header is generated within this function to set signing 'alg' properly.
  * @param tokenType A token type. E.g., "JWT" for rfc7519 tokens.
+ * @param keyId Written to the "kid" field of the token header.
  * @return Encoded and signed token.
  */
 template<typename Payload>
 nx::utils::expected<TokenEncodeResult<std::decay_t<Payload>>, std::string /*error*/>
-    encodeAndSign(const std::string& tokenType, Payload&& tokenPayload, const jwk::Key& key)
+    encodeAndSign(
+        const std::string& tokenType,
+        Payload&& tokenPayload,
+        const jwk::ParsedKey& key)
 {
     Token<std::decay_t<Payload>> token;
     token.payload = std::forward<Payload>(tokenPayload);
     token.header.typ = tokenType;
-    auto alg = jwk::getAlgorithmForSigning(key);
-    if (!alg)
-        return nx::utils::unexpected<std::string>("Cannot sign with the given key: " + alg.error());
-    token.header.alg = *alg;
+    // Since the key was already parsed, its algorithm can be considered valid and supported.
+    token.header.alg = key.algorithm();
     token.header.kid = key.kid();
 
     const auto serializedHeader = nx::reflect::json::serialize(token.header);
@@ -84,14 +86,13 @@ nx::utils::expected<TokenEncodeResult<std::decay_t<Payload>>, std::string /*erro
         + 1 // '.'
         + (serializedPayload.size() / 3 + 1) * 4
         + 1 // '.'
-        + detail::estimateSignatureLength(key)
+        + detail::estimateSignatureLength(key.algorithm())
         + 1 // null terminator
     );
 
     nx::utils::toBase64Url(serializedHeader, &encodedToken);
     encodedToken += ".";
     nx::utils::toBase64Url(serializedPayload, &encodedToken);
-    // TODO: pass alg from token.header?
     auto signResult = jwk::sign(encodedToken, key);
     if (!signResult)
         return nx::utils::unexpected<std::string>("Signing error: " + signResult.error());
@@ -101,6 +102,24 @@ nx::utils::expected<TokenEncodeResult<std::decay_t<Payload>>, std::string /*erro
 
     return TokenEncodeResult<std::decay_t<Payload>>{
         .token = std::move(token), .encodedAndSignedToken = encodedToken};
+}
+
+/**
+ * Encodes and signs token as defined by
+ * https://datatracker.ietf.org/doc/html/rfc7515#appendix-A.1.
+ * The token header is generated within this function to set signing 'alg' properly.
+ * @param tokenType A token type. E.g., "JWT" for rfc7519 tokens.
+ * @return Encoded and signed token.
+ */
+template<typename Payload>
+nx::utils::expected<TokenEncodeResult<std::decay_t<Payload>>, std::string /*error*/>
+    encodeAndSign(const std::string& tokenType, Payload&& tokenPayload, const jwk::Key& key)
+{
+    const auto parsedKey = jwk::parseKey(key);
+    if (!parsedKey)
+        return nx::utils::unexpected<std::string>("Cannot parse key: " + parsedKey.error());
+
+    return encodeAndSign(tokenType, std::forward<Payload>(tokenPayload), *parsedKey);
 }
 
 /**
@@ -130,6 +149,7 @@ nx::utils::expected<Token<Payload>, std::string /*err*/> decodeToken(const std::
     return token;
 }
 
+NX_NETWORK_API bool verifyToken(const std::string_view encodedToken, const jwk::ParsedKey& key);
 NX_NETWORK_API bool verifyToken(const std::string_view encodedToken, const jwk::Key& key);
 
 } // namespace nx::network::jws
