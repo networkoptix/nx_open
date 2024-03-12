@@ -6,7 +6,9 @@
 
 TEST(systemHealthStringsHelper, checkMessageTitles)
 {
-    for (auto messageType: nx::vms::common::system_health::allVisibleMessageTypes())
+    using namespace nx::vms::common;
+    for (auto messageType:
+        system_health::allMessageTypes({system_health::isMessageVisibleInSettings}))
     {
         EXPECT_FALSE(QnSystemHealthStringsHelper::messageTitle(messageType).isEmpty());
     }

@@ -2,6 +2,27 @@
 
 #include "message_type.h"
 
+#include <nx/vms/common/saas/saas_utils.h>
+#include <nx/vms/common/system_context.h>
+
+namespace {
+
+using namespace nx::vms::common::system_health;
+
+static const std::set<MessageType> kMessagesNotSupportedBySaas{
+    MessageType::noLicenses
+};
+
+static const std::set<MessageType> kMessagesSpecificForSaas{
+    MessageType::saasLocalRecordingServicesOverused,
+    MessageType::saasCloudStorageServicesOverused,
+    MessageType::saasIntegrationServicesOverused,
+    MessageType::saasInSuspendedState,
+    MessageType::saasInShutdownState
+};
+
+} // namespace
+
 namespace nx::vms::common::system_health {
 
 bool isMessageVisible(MessageType message)
@@ -13,33 +34,6 @@ bool isMessageVisible(MessageType message)
 
         default:
             return nx::reflect::enumeration::isValidEnumValue(message);
-;
-    }
-}
-
-bool isMessageVisibleInSettings(MessageType message)
-{
-    // Hidden messages must not be disabled.
-    if (!isMessageVisible(message))
-        return false;
-
-    switch (message)
-    {
-        case MessageType::cloudPromo:
-        case MessageType::defaultCameraPasswords:
-        case MessageType::remoteArchiveSyncAvailable:
-
-        // TODO: Remove in VMS-7724.
-        case MessageType::remoteArchiveSyncFinished:
-        case MessageType::remoteArchiveSyncProgress:
-        case MessageType::remoteArchiveSyncError:
-        case MessageType::remoteArchiveSyncStopSchedule:
-        case MessageType::remoteArchiveSyncStopAutoMode:
-        case MessageType::replacedDeviceDiscovered:
-            return false;
-
-        default:
-            return true;
     }
 }
 
@@ -69,26 +63,68 @@ bool isMessageLocked(MessageType message)
         case MessageType::showIntercomInformer:
         case MessageType::showMissedCallInformer:
             return true;
+
         default:
             return false;
     }
 }
 
-std::set<MessageType> allVisibleMessageTypes()
+bool isMessageVisibleInSettings(MessageType message)
+{
+    // Hidden messages must not be disabled.
+    if (!isMessageVisible(message))
+        return false;
+
+    switch (message)
+    {
+        case MessageType::cloudPromo:
+        case MessageType::defaultCameraPasswords:
+        case MessageType::remoteArchiveSyncAvailable:
+
+        // TODO: Remove in VMS-7724.
+        case MessageType::remoteArchiveSyncFinished:
+        case MessageType::remoteArchiveSyncProgress:
+        case MessageType::remoteArchiveSyncError:
+        case MessageType::remoteArchiveSyncStopSchedule:
+        case MessageType::remoteArchiveSyncStopAutoMode:
+        case MessageType::replacedDeviceDiscovered:
+            return false;
+
+        default:
+            return true;
+    }
+}
+
+MessageTypePredicate isMessageApplicableForLicensingMode(SystemContext* systemContext)
+{
+    const auto isSaasSystem = nx::vms::common::saas::saasInitialized(systemContext);
+    return
+        [isSaasSystem](const MessageType messageType)
+    {
+        return isSaasSystem
+            ? !kMessagesNotSupportedBySaas.contains(messageType)
+            : !kMessagesSpecificForSaas.contains(messageType);
+    };
+}
+
+std::set<MessageType> allMessageTypes(const MessageTypePredicateList& predicates)
 {
     std::set<MessageType> result;
     for (int i = 0; i < (int) MessageType::count; ++i)
     {
         const auto messageType = static_cast<MessageType>(i);
-        if (isMessageVisibleInSettings(messageType))
+        if (std::all_of(predicates.cbegin(), predicates.cend(),
+            [messageType](const auto& predicate){ return predicate(messageType); }))
+        {
             result.insert(messageType);
+        }
     }
     return result;
 }
 
 std::set<MessageType> defaultMessageTypes()
 {
-    auto result = allVisibleMessageTypes();
+    auto result = allMessageTypes({isMessageVisibleInSettings});
     result.erase(MessageType::emailIsEmpty);
     result.erase(MessageType::usersEmailIsEmpty);
     return result;

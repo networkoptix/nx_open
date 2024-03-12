@@ -421,6 +421,8 @@ QWidget* QnBusinessRuleItemDelegate::createTargetEditor(QWidget* parent,
 QWidget* QnBusinessRuleItemDelegate::createEventEditor(QWidget* parent,
     const QModelIndex& /*index*/) const
 {
+    using namespace nx::vms::event;
+
     auto comboBox = new QComboBox(parent);
     comboBox->setMaxVisibleItems(comboBoxMaxVisibleItems);
 
@@ -430,9 +432,12 @@ QWidget* QnBusinessRuleItemDelegate::createEventEditor(QWidget* parent,
             comboBox->addItem(m_businessStringsHelper->eventName(eventType), eventType);
         };
 
+    const auto supportedEventTypes = allEvents({
+        isNonDeprecatedEvent,
+        isApplicableForLicensingMode(systemContext())});
 
     const auto accessibleEvents = NvrEventsActionsAccess::removeInacessibleNvrEvents(
-        nx::vms::event::allEvents(), resourcePool());
+        supportedEventTypes, resourcePool());
 
     const auto userEvents = filterEventsBySubtype(accessibleEvents, EventSubtype::user);
     const auto failureEvents = filterEventsBySubtype(accessibleEvents, EventSubtype::failure);

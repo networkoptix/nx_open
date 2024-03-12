@@ -16,6 +16,7 @@
 #include <nx/utils/std/algorithm.h>
 #include <nx/vms/api/analytics/descriptors.h>
 #include <nx/vms/api/analytics/engine_manifest.h>
+#include <nx/vms/common/saas/saas_utils.h>
 #include <nx/vms/common/system_context.h>
 #include <utils/common/synctime.h>
 
@@ -31,7 +32,7 @@ namespace event {
 
 namespace {
 
-const std::set<EventType> kAllEvents{
+static const std::set<EventType> kAllEvents{
     EventType::cameraMotionEvent,
     EventType::cameraInputEvent,
     EventType::cameraDisconnectEvent,
@@ -58,8 +59,12 @@ const std::set<EventType> kAllEvents{
  * User should not be able to create these events, but should be able to view them in the event
  * log.
  */
-const std::set<EventType> kDeprecatedEvents {
+static const std::set<EventType> kDeprecatedEvents{
     EventType::backupFinishedEvent
+};
+
+static const std::set<EventType> kEventsNotSupportedBySaas{
+    EventType::licenseIssueEvent
 };
 
 }
@@ -152,14 +157,42 @@ QList<EventType> childEvents(EventType eventType)
     }
 }
 
-QList<EventType> allEvents(bool includeDeprecated)
+bool isNonDeprecatedEvent(EventType eventType)
 {
-    QList<EventType> result{kAllEvents.cbegin(), kAllEvents.cend()};
+    return !kDeprecatedEvents.contains(eventType);
+}
 
-    if (!includeDeprecated)
-        result.removeIf([](EventType e){ return kDeprecatedEvents.contains(e); });
+EventTypePredicate isApplicableForLicensingMode(common::SystemContext* systemContext)
+{
+    const auto isSaasSystem = nx::vms::common::saas::saasInitialized(systemContext);
+    return [isSaasSystem](const EventType eventType)
+    {
+        // TODO: #vbreus Add service issue event as specific to the saas model as it will be
+        // implemented.
+        return isSaasSystem
+            ? !kEventsNotSupportedBySaas.contains(eventType)
+            : true;
+    };
+}
 
+QList<EventType> allEvents(const EventTypePredicateList& predicates)
+{
+    QList<EventType> result;
+    for (const auto eventType: kAllEvents)
+    {
+        if (std::all_of(predicates.cbegin(), predicates.cend(),
+            [eventType](const auto& predicate){ return predicate(eventType); }))
+        {
+            result.push_back(eventType);
+        }
+    }
     return result;
+}
+
+EventTypePredicate isChildOf(EventType parentEventType)
+{
+    return [parentEventType](const EventType eventType)
+        { return parentEvent(eventType) == parentEventType; };
 }
 
 bool isResourceRequired(EventType eventType)
