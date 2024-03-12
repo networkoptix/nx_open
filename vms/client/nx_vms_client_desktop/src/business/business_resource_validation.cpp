@@ -766,48 +766,52 @@ QString QnRequiredAccessRightPolicy::calculateAlert(bool allUsers,
 
     const auto permissionName = AccessRightsList::instance()->get(m_requiredAccessRight).name;
 
-    if (invalidRoles.size() > 0)
+    if (invalidRoles.size() > 0 && invalidUsers.size() > 0)
     {
-        if (invalidRoles.size() == 1)
-        {
-            const auto group = userGroupManager()->find(invalidRoles.front()).value_or(
-                UserGroupData{});
+        auto groups = tr("%n groups", "", invalidRoles.size());
+        auto users = tr("%n users", "", invalidUsers.size());
+        alert = tr(
+            "%1 and %2 do not have %3 permission for some of selected cameras",
+            "%1 and %2 are the numbers of user groups and users in a correct numeric form "
+                "(e.g. '2 groups and 1 user'), %3 is the permission name")
+                    .arg(groups).arg(users).arg(permissionName);
+    }
+    else if (invalidRoles.size() > 1)
+    {
+        alert = tr(
+            "%n groups do not have %1 permission for some of selected cameras",
+            "%1 is the permission name",
+            invalidRoles.size())
+                .arg(permissionName);
+    }
+    else if (invalidRoles.size() == 1)
+    {
+        const auto group = userGroupManager()->find(invalidRoles.front()).value_or(
+            UserGroupData{});
 
-            alert = tr("%1 group does not have %2 permission for some of selected cameras",
-                "%1 is the name of selected user group, %2 is permission name")
+        alert = tr(
+            "%1 group does not have %2 permission for some of selected cameras",
+            "%1 is the name of selected user group, %2 is the permission name")
                 .arg(html::bold(group.name))
                 .arg(permissionName);
-        }
-        else
-        {
-            alert = tr("%1 groups and %2 users do not have %3 permission for some of selected cameras",
-                "%1 is number of selected user groups, %2 is number of users, "
-                "%3 is permission name")
-                .arg(invalidRoles.size()).arg(invalidUsers.size()).arg(permissionName);
-        }
     }
-
-    if (invalidUsers.size() > 0)
+    else if (invalidUsers.size() > 1)
     {
-        if (!alert.isEmpty())
-            alert += html::kLineBreak;
+        alert = tr(
+            "%n users do not have %1 permission for some of selected cameras",
+            "%1 is the permission name",
+            invalidUsers.size())
+                .arg(permissionName);
+    }
+    else if (invalidUsers.size() == 1)
+    {
+        const auto& user = invalidUsers.front();
 
-        if (invalidUsers.size() == 1)
-        {
-            const auto& user = invalidUsers.front();
-            const auto kUserHasNoPermissionForSomeCamerasText =
-                tr("%1 user does not have %2 permission for some of selected cameras",
-                "%1 is the name of the selected user, %2 is the permission name")
+        alert = tr(
+            "%1 user does not have %2 permission for some of selected cameras",
+            "%1 is the name of the selected user, %2 is the permission name")
                 .arg(html::bold(user->getName()))
                 .arg(permissionName);
-            alert += kUserHasNoPermissionForSomeCamerasText;
-        }
-        else
-        {
-            alert += tr("%1 users do not have %2 permission for some of selected cameras",
-                "%1 is number of selected users, %2 is permission name")
-                .arg(invalidUsers.size()).arg(permissionName);
-        }
     }
 
     return alert.isEmpty() ? alert : html::document(alert);
