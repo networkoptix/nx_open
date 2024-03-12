@@ -164,11 +164,17 @@ void Completer::Private::updateCompleter(int cursorPosition, const QString& text
     const auto currentWordSlice =
         textBeforeCursor.sliced(currentWord.begin, cursorPosition - currentWord.begin);
 
-    if (completerModel)
-        completerModel->expandGroup(currentWordSlice.toString());
     // Completer will popup, when cursor placed after the bracket symbol (for e.g '{' is typed)
-    // Completion prefix is set up as current word with bracket.
-    completer->setCompletionPrefix(currentWordSlice.toString()); // TODO: #vbutkevich fix grouping
+    // Completion prefix or filter is set up as current word with bracket.
+    if (completerModel)
+    {
+        completerModel->expandGroup(currentWordSlice.toString());
+        completerModel->filter(currentWordSlice.toString());
+    }
+    else
+    {
+        completer->setCompletionPrefix(currentWordSlice.toString());
+    }
 }
 
 void Completer::Private::replaceCurrentWordWithCompleted(QString& text, const QString& completedText) const

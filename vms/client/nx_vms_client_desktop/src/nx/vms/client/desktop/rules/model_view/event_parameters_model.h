@@ -21,6 +21,8 @@ public:
     void resetExpandedGroup();
     bool isSubGroupName(const QString& groupName);
     bool isCorrectParameter(const QString& eventParameter);
+    void filter(const QString& filter);
+    void setDefaultVisibleElements();
 
 private:
     struct Private;

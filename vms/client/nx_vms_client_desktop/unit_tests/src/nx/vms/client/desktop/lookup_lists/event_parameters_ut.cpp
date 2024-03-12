@@ -15,125 +15,202 @@ using namespace nx::vms::rules::utils;
 using namespace nx::vms::rules;
 
 const EventParameterHelper::EventParametersNames kEvenParameterList = {
-    "event.group1", "event.group1.name", "event.group1.name2", "event.value", "group2.parameter"};
+    "group0.parameter",
+    "event.group1", "event.group1.sub_arg", "event.group1.sub_arg2", "event.value",
+    "group2.parameter"};
 
-void checkIsDefaultView(const EventParametersModel& model)
+void thenNumberOfGroupsIs(const EventParametersModel& model, int numberOfGroups)
 {
-    ASSERT_EQ(model.rowCount({}), 4);
+    int separatorNumber = 0;
+    for (int r = 0; r < model.rowCount({}); ++r)
+    {
+        const auto dataByaccessRole = model.data(model.index(r), Qt::AccessibleDescriptionRole);
+        if (dataByaccessRole.canConvert<Separator>())
+            separatorNumber += 1;
+    }
+
+    ASSERT_EQ(separatorNumber, numberOfGroups);
+}
+
+void thenRowCountIs(const EventParametersModel& model, int numberOfRows)
+{
+    ASSERT_EQ(model.rowCount({}), numberOfRows);
+}
+
+void thenModelIsInDefaultState(const EventParametersModel& model)
+{
+    ASSERT_EQ(model.rowCount({}), 6);
 
     int separatorNumber = 0;
     for (int r = 0; r < model.rowCount({}); ++r)
     {
-        auto el = model.data(model.index(r), Qt::DisplayRole);
-        ASSERT_NE(el.toString(), "event.group1.name");
-        ASSERT_NE(el.toString(), "event.group1.name2");
+        const auto el = model.data(model.index(r), Qt::DisplayRole);
+        ASSERT_NE(el.toString(), "event.group1.sub_arg");
+        ASSERT_NE(el.toString(), "event.group1.sub_arg2");
         auto accessRole = model.data(model.index(r), Qt::AccessibleDescriptionRole);
         if (accessRole.canConvert<Separator>())
             separatorNumber += 1;
     }
 
-    ASSERT_EQ(separatorNumber, 1);
+    ASSERT_EQ(separatorNumber, 2);
 }
 
-void checkIsExpanded(const EventParametersModel& model)
+void thenNumberOfRowsEqualToExpanded(const EventParametersModel& model)
 {
-    ASSERT_EQ(model.rowCount({}), 6);
+    thenRowCountIs(model, 8);
+}
+
+void thenIsExpanded(const EventParametersModel& model)
+{
+    thenNumberOfRowsEqualToExpanded(model);
 
     EventParameterHelper::EventParametersNames visibleNames;
     int separatorNumber = 0;
     for (int r = 0; r < model.rowCount({}); ++r)
     {
-        auto accessRole = model.data(model.index(r), Qt::AccessibleDescriptionRole);
-        if (accessRole.canConvert<Separator>())
+        const auto dataByaccessRole = model.data(model.index(r), Qt::AccessibleDescriptionRole);
+        if (dataByaccessRole.canConvert<Separator>())
         {
             separatorNumber += 1;
             continue;
         }
-        auto el = model.data(model.index(r), Qt::DisplayRole);
-        visibleNames.push_back(el.toString());
+        const auto data = model.data(model.index(r), Qt::DisplayRole);
+        visibleNames.push_back(data.toString());
     }
 
-    ASSERT_EQ(separatorNumber, 1);
+    ASSERT_EQ(separatorNumber, 2);
 
-    for (auto& el: kEvenParameterList)
+    for (auto& eventParameter: kEvenParameterList)
     {
-        ASSERT_TRUE(
-            visibleNames.contains(nx::vms::rules::utils::EventParameterHelper::addBrackets(el)));
+        ASSERT_TRUE(visibleNames.contains(
+            nx::vms::rules::utils::EventParameterHelper::addBrackets(eventParameter)));
     }
 }
 
+void whenExpandGroup(EventParametersModel& model, const QString& group)
+{
+    model.expandGroup(group);
+}
+
+void whenResetingExpandedGroup(EventParametersModel& model)
+{
+    model.resetExpandedGroup();
+}
+
+EventParametersModel givenEventParameterModel(
+    const std::optional<EventParameterHelper::EventParametersNames>& eventParameterList = {})
+{
+    return {eventParameterList ? eventParameterList.value() : kEvenParameterList};
+}
+
+
 TEST(EventParametersTests, EventParametersModelBuild)
 {
-    EventParametersModel model(kEvenParameterList);
+    auto model = givenEventParameterModel();
     // Check that subgroup are hidden + 1 separator line is presented.
-    checkIsDefaultView(model);
+    thenModelIsInDefaultState(model);
 }
 
 TEST(EventParametersTests, EventParametersModelExpandSubGroupName)
 {
-    EventParametersModel model(kEvenParameterList);
-    model.expandGroup("event.group1");
+    auto model = givenEventParameterModel();
+
+    whenExpandGroup(model, "event.group1");
     // Check that subgroup are expanded + 1 separator line is presented.
-    checkIsExpanded(model);
+    thenIsExpanded(model);
     // Check that after reset, the number of rows as in default example.
-    model.resetExpandedGroup();
-    checkIsDefaultView(model);
+    whenResetingExpandedGroup(model);
+    thenModelIsInDefaultState(model);
 }
 
 TEST(EventParametersTests, EventParametersModelExpandBracketOpenName)
 {
-    EventParametersModel model(kEvenParameterList);
-    model.expandGroup("{event.group1");
+    auto model = givenEventParameterModel();
+    whenExpandGroup(model,"{event.group1");
     // Check that subgroup are expanded + 1 separator line is presented.
-    checkIsExpanded(model);
+    thenIsExpanded(model);
 }
 
 TEST(EventParametersTests, EventParametersModelIsSubGroupName)
 {
-    EventParametersModel model(kEvenParameterList);
+    auto model = givenEventParameterModel();
     ASSERT_TRUE(model.isSubGroupName("{event.group1}"));
-    ASSERT_FALSE(model.isSubGroupName("{event.group1.name"));
+    ASSERT_FALSE(model.isSubGroupName("{event.group1.sub_arg"));
 }
 
 TEST(EventParametersTests, EventParametersModelExpandSubGroupValue)
 {
-    EventParametersModel model(kEvenParameterList);
-    model.expandGroup("event.group1.na");
-    ASSERT_EQ(model.rowCount({}), 6);
-    checkIsExpanded(model);
+    auto model = givenEventParameterModel();
+    whenExpandGroup(model, "event.group1.na");
+    thenNumberOfRowsEqualToExpanded(model);
+    thenIsExpanded(model);
 }
 
 TEST(EventParametersTests, EventParametersModelExpandNonSubGroup)
 {
-    EventParametersModel model(kEvenParameterList);
-    model.expandGroup("event.value");
-    ASSERT_EQ(model.rowCount({}), 4);
-    checkIsDefaultView(model);
+    auto model = givenEventParameterModel();
+    whenExpandGroup(model, "event.value");
+    thenModelIsInDefaultState(model);
 }
 
 TEST(EventParametersTests, EventParametersEmptyArgs)
 {
-    EventParametersModel model(kEvenParameterList);
-    model.expandGroup("");
-    ASSERT_EQ(model.rowCount({}), 4);
-    checkIsDefaultView(model);
+    auto model = givenEventParameterModel();
+    whenExpandGroup(model, "event.value");
+    thenModelIsInDefaultState(model);
     ASSERT_FALSE(model.isSubGroupName(""));
 }
 
 TEST(EventParametersTests, EventParametersEmptyModel)
 {
-    EventParametersModel model({});
+    auto model = givenEventParameterModel(EventParameterHelper::EventParametersNames());
     model.expandGroup("");
-    ASSERT_EQ(model.rowCount({}), 0);
+    thenRowCountIs(model, 0);
     ASSERT_FALSE(model.isSubGroupName(""));
 }
 
 TEST(EventParametersTests, EventParametersModelResetWithoutExpand)
 {
-    EventParametersModel model(kEvenParameterList);
+    auto model = givenEventParameterModel();
     const auto rowCountBefore = model.rowCount({});
-    model.resetExpandedGroup();
-    ASSERT_EQ(rowCountBefore, model.rowCount({}));
-    checkIsDefaultView(model);
+    whenResetingExpandedGroup(model);
+    thenRowCountIs(model, rowCountBefore);
+    thenModelIsInDefaultState(model);
+}
+
+TEST(EventParametersTests, EventParametersModelFilter)
+{
+    auto model = givenEventParameterModel();
+
+    auto whenSetFilter =
+        [&](const QString& filter)
+        {
+            model.setDefaultVisibleElements();
+            model.filter(filter);
+        };
+
+    // Set filter to begining of the event parameter.
+    whenSetFilter("{");
+
+    // Check that model contains default values.
+    thenModelIsInDefaultState(model);
+
+    // Setting filter to one correct value.
+    whenSetFilter("{event.value");
+
+    // Check that model contains only that value.
+    thenRowCountIs(model, 1);
+
+    // Set filter to begining of group.
+    whenSetFilter("{group");
+    thenNumberOfGroupsIs(model, 1);
+
+    // Set filter to incorrect value, starting with bracket.
+    whenSetFilter("{trulala");
+    thenRowCountIs(model, 0);
+
+    // Set filter to incorrect value, without bracket.
+    whenSetFilter("bubaba");
+    thenRowCountIs(model, 0);
 }
 } // namespace nx::vms::rules::test
