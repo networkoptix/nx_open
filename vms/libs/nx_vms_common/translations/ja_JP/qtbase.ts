@@ -43,7 +43,7 @@
     <name>QAbstractSpinBox</name>
     <message>
       <source>&amp;Select All</source>
-      <translation>すべてを選択(&amp;S)</translation>
+      <translation>すべて選択(&amp;S)</translation>
     </message>
     <message>
       <source>&amp;Step up</source>
@@ -570,8 +570,8 @@ Please verify the correct file name was given.</source>
     <message>
       <source>&apos;%1&apos; is write protected.
 Do you want to delete it anyway?</source>
-      <translation>&apos;%1&apos; は書き込み禁止です。
-削除しますか？</translation>
+      <translation>&apos;%1&apos; は書き込み保護されています。
+削除してもよろしいですか?</translation>
     </message>
     <message>
       <source>Are you sure you want to delete &apos;%1&apos;?</source>
@@ -644,15 +644,15 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Alt+Left</source>
-      <translation>Alt+Left</translation>
+      <translation>Alt+左</translation>
     </message>
     <message>
       <source>Alt+Right</source>
-      <translation>Alt+Right</translation>
+      <translation>Alt+右</translation>
     </message>
     <message>
       <source>Alt+Up</source>
-      <translation>Alt+Up</translation>
+      <translation>Alt+上</translation>
     </message>
   </context>
   <context>
