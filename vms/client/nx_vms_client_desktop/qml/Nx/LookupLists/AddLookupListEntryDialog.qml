@@ -22,7 +22,6 @@ ModalDialog
     required property LookupListModel model
 
     property Analytics.ObjectType objectType: taxonomy.objectTypeById(model.data.objectTypeId)
-    property bool isGeneric: !objectType
     property var entry: ({})
 
     function updateAddButton()
@@ -30,46 +29,60 @@ ModalDialog
         addButton.enabled = Object.keys(entry).length > 0
     }
 
+    minimumWidth: 450
+    minimumHeight: 213
     title: qsTr("Add Entry")
 
-    contentItem: Column
+    contentItem: Scrollable
     {
-        topPadding: padding / 2
-        spacing: 6
+        id: table
 
-        Repeater
+        height: 132
+        scrollView.ScrollBar.vertical.x: table.width - scrollView.ScrollBar.vertical.width + padding
+
+        contentItem: Column
         {
-            id: repeater
+            id: entries
 
-            model: dialog.model.attributeNames
+            width: parent.width
+            topPadding: padding / 2
+            spacing: 8
 
-            GridLayout
+            Repeater
             {
-                columnSpacing: 6
-                width: parent.width
-                columns: isGeneric ? 2 : 1
+                model: dialog.model.attributeNames
 
-                Label
+                RowLayout
                 {
-                    text: modelData
-                    Layout.alignment: Qt.AlignBaseline
-                    horizontalAlignment: isGeneric ? Text.AlignRight : Text.AlignLeft
-                }
-                LookupListElementEditor
-                {
-                    objectType: dialog.objectType
-                    attribute: TaxonomyUtils.findAttribute(objectType, modelData)
-
                     Layout.fillWidth: true
-                    onValueChanged:
+                    spacing: 6
+
+                    Label
                     {
-                        // Value is a string or undefined, empty string is considered invalid.
-                        // Also there is a separate check for zero numeric values.
-                        if (value || value === 0)
-                            entry[modelData] = value
-                        else
-                            delete entry[modelData]
-                        updateAddButton()
+                        Layout.preferredWidth: 70
+                        wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                        maximumLineCount: 2
+                        elide: Text.ElideRight
+                        horizontalAlignment: Text.AlignRight
+                        text: modelData
+                    }
+
+                    LookupListElementEditor
+                    {
+                        Layout.preferredWidth: 340
+                        objectType: dialog.objectType
+                        attribute: TaxonomyUtils.findAttribute(objectType, modelData)
+
+                        onValueChanged:
+                        {
+                            // Value is a string or undefined, empty string is considered invalid.
+                            // Also there is a separate check for zero numeric values.
+                            if (value || value === 0)
+                                entry[modelData] = value
+                            else
+                                delete entry[modelData]
+                            updateAddButton()
+                        }
                     }
                 }
             }
