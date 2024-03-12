@@ -206,6 +206,36 @@ void askForGraphicsApiSubstitution(nx::kit::IniConfig::Tweaks* iniTweaks)
     #endif
 }
 
+void setGraphicsSettings()
+{
+    static const QHash<QString, QSGRendererInterface::GraphicsApi> nameToApi =
+    {
+        {"software", QSGRendererInterface::Software},
+        {"openvg", QSGRendererInterface::OpenVG},
+        {"opengl", QSGRendererInterface::OpenGL},
+        {"direct3d11", QSGRendererInterface::Direct3D11},
+        {"vulkan", QSGRendererInterface::Vulkan},
+        {"metal", QSGRendererInterface::Metal},
+    };
+    QQuickWindow::setGraphicsApi(nameToApi.value(ini().graphicsApi, QSGRendererInterface::OpenGL));
+    QQuickWindow::setDefaultAlphaBuffer(true);
+
+    if (nx::build_info::isMacOsX())
+    {
+        // This should go into QnClientModule::initSurfaceFormat(),
+        // but we must set OpenGL version before creation of GUI application.
+
+        QSurfaceFormat format;
+        // Mac computers OpenGL versions:
+        //   https://support.apple.com/en-us/HT202823
+        format.setProfile(QSurfaceFormat::CoreProfile);
+        // Chromium requires OpenGL 4.1 on macOS for WebGL and other HW accelerated staff.
+        format.setVersion(4, 1);
+
+        QSurfaceFormat::setDefaultFormat(format);
+    }
+}
+
 } // namespace
 
 int runApplicationInternal(QApplication* application, const QnStartupParameters& startupParams)
@@ -227,6 +257,8 @@ int runApplicationInternal(QApplication* application, const QnStartupParameters&
         if (!QnGLCheckerInstrument::checkGLHardware())
             askForGraphicsApiSubstitution(iniTweaks.get());
     }
+
+    setGraphicsSettings();
 
     client.initWebEngine();
 
@@ -394,33 +426,6 @@ int runApplication(int argc, char** argv)
             QApplication::setHighDpiScaleFactorRoundingPolicy(
                 Qt::HighDpiScaleFactorRoundingPolicy::Round);
         }
-    }
-
-    static const QHash<QString, QSGRendererInterface::GraphicsApi> nameToApi =
-    {
-        {"software", QSGRendererInterface::Software},
-        {"openvg", QSGRendererInterface::OpenVG},
-        {"opengl", QSGRendererInterface::OpenGL},
-        {"direct3d11", QSGRendererInterface::Direct3D11},
-        {"vulkan", QSGRendererInterface::Vulkan},
-        {"metal", QSGRendererInterface::Metal},
-    };
-    QQuickWindow::setGraphicsApi(nameToApi.value(ini().graphicsApi, QSGRendererInterface::OpenGL));
-    QQuickWindow::setDefaultAlphaBuffer(true);
-
-    if (nx::build_info::isMacOsX())
-    {
-        // This should go into QnClientModule::initSurfaceFormat(),
-        // but we must set OpenGL version before creation of GUI application.
-
-        QSurfaceFormat format;
-        // Mac computers OpenGL versions:
-        //   https://support.apple.com/en-us/HT202823
-        format.setProfile(QSurfaceFormat::CoreProfile);
-        // Chromium requires OpenGL 4.1 on macOS for WebGL and other HW accelerated staff.
-        format.setVersion(4, 1);
-
-        QSurfaceFormat::setDefaultFormat(format);
     }
 
     auto application = std::make_unique<QApplication>(argc, argv);
