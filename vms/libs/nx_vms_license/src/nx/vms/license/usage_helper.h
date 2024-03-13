@@ -34,6 +34,7 @@ struct ChannelPartnerServer
     static const nx::utils::Url reportUrl(const common::SystemSettings* settings);
     static const nx::utils::Url saasServicesUrl(const common::SystemSettings* settings);
     static const nx::utils::Url saasDataUrl(const common::SystemSettings* settings);
+    static const nx::utils::Url migrateLicensesUrl(const common::SystemSettings* settings);
 
     static const QString baseUrl(const common::SystemSettings* settings);
 };
