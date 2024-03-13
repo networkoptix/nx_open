@@ -28,6 +28,12 @@ class Self: public QObject
      */
     Q_PROPERTY(Tab* tab READ tab CONSTANT)
 
+    /**
+     * @ingroup vms-self
+     * Current web page item id.
+     */
+    Q_PROPERTY(nx::Uuid itemId READ itemId CONSTANT)
+
 public:
     Self(QnWorkbenchItem* item, QObject* parent = nullptr);
     virtual ~Self() override;
@@ -52,6 +58,7 @@ public:
     /** @} */ // group self
 
     Tab* tab() const;
+    nx::Uuid itemId() const;
 
 private:
     class Private;
