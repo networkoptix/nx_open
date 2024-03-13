@@ -36,7 +36,7 @@
     </message>
     <message>
       <source>Your System</source>
-      <translation>ご利用のシステム</translation>
+      <translation>自分のシステム</translation>
     </message>
     <message>
       <source>New System</source>
