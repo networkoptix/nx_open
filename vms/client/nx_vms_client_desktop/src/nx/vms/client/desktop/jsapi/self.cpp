@@ -28,6 +28,7 @@ public:
     Error setMinimalInterfaceMode(bool value);
     Error setPreventDefaultContextMenu(bool value);
     Tab* tab() const { return m_tab.get(); }
+    QnWorkbenchItem* item() const { return m_item; }
 
 private:
     Self* const q = nullptr;
@@ -89,6 +90,11 @@ Error Self::setPreventDefaultContextMenu(bool value)
 Tab* Self::tab() const
 {
     return d->tab();
+}
+
+nx::Uuid Self::itemId() const
+{
+    return d->item() ? d->item()->uuid() : nx::Uuid{};
 }
 
 } // namespace nx::vms::client::desktop::jsapi
