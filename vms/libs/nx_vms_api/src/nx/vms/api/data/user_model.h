@@ -172,7 +172,7 @@ NX_REFLECTION_INSTRUMENT(TemporaryToken, TemporaryToken_Fields)
 using TemporaryTokenList = std::vector<TemporaryToken>;
 
 /**%apidoc User information object */
-struct NX_VMS_API UserModelV3: public UserModelBase
+struct NX_VMS_API UserModelV3: public UserModelBase, public ResourceWithParameters
 {
     /**%apidoc[opt] User group id, can be obtained from `GET /rest/v{3-}/userGroups`. */
     std::vector<nx::Uuid> groupIds;
@@ -194,9 +194,9 @@ struct NX_VMS_API UserModelV3: public UserModelBase
 
     bool operator==(const UserModelV3& other) const = default;
 
-    using DbReadTypes = std::tuple<UserData>;
-    using DbUpdateTypes = std::tuple<UserDataEx>;
-    using DbListTypes = std::tuple<UserDataList>;
+    using DbReadTypes = std::tuple<UserData, ResourceParamWithRefDataList>;
+    using DbUpdateTypes = std::tuple<UserDataEx, ResourceParamWithRefDataList>;
+    using DbListTypes = std::tuple<UserDataList, ResourceParamWithRefDataList>;
 
     DbUpdateTypes toDbTypes() &&;
     static std::vector<UserModelV3> fromDbTypes(DbListTypes data);
@@ -205,7 +205,7 @@ struct NX_VMS_API UserModelV3: public UserModelBase
     static_assert(isUpdateModelV<UserModelV3>);
 };
 #define UserModelV3_Fields UserModelBase_Fields(groupIds)(permissions)(resourceAccessRights) \
-    (temporaryToken)
+    (temporaryToken)(parameters)
 
 QN_FUSION_DECLARE_FUNCTIONS(UserModelV3, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(UserModelV3, UserModelV3_Fields)
