@@ -127,6 +127,7 @@ QN_FUSION_DEFINE_FUNCTIONS(UserModelV3, (json))
 
 UserModelV3::DbUpdateTypes UserModelV3::toDbTypes() &&
 {
+    auto parameters = asList(id);
     auto user = std::move(*this).toUserData();
     user.groupIds = std::move(groupIds);
     user.permissions = std::move(permissions);
@@ -138,24 +139,27 @@ UserModelV3::DbUpdateTypes UserModelV3::toDbTypes() &&
         QJson::serialize(&context, *temporaryToken, &user.hash);
     }
 
-    return {std::move(user)};
+    return {std::move(user), std::move(parameters)};
 }
 
 std::vector<UserModelV3> UserModelV3::fromDbTypes(DbListTypes data)
 {
     auto& baseList = std::get<std::vector<UserData>>(data);
+    std::unordered_map<nx::Uuid, std::vector<ResourceParamData>> parameters =
+        toParameterMap(std::get<std::vector<ResourceParamWithRefData>>(std::move(data)));
 
     std::vector<UserModelV3> result;
     result.reserve(baseList.size());
     for (auto& baseData: baseList)
     {
         UserModelV3 model;
-        static_cast<UserModelBase&>(model) = fromUserData(std::move(baseData));
 
         model.groupIds = std::move(baseData.groupIds);
         model.permissions = std::move(baseData.permissions);
         if (!baseData.resourceAccessRights.empty())
             model.resourceAccessRights = std::move(baseData.resourceAccessRights);
+
+        static_cast<UserModelBase&>(model) = fromUserData(std::move(baseData));
 
         if (model.type == UserType::temporaryLocal && NX_ASSERT(model.hash))
         {
@@ -164,6 +168,14 @@ std::vector<UserModelV3> UserModelV3::fromDbTypes(DbListTypes data)
             TemporaryToken temporaryToken;
             if (NX_ASSERT(QJson::deserialize(&context, *model.hash, &temporaryToken)))
                 model.temporaryToken = std::move(temporaryToken);
+        }
+
+        if (auto f = parameters.find(model.id); f != parameters.cend())
+        {
+            for (ResourceParamData& r: f->second)
+                static_cast<ResourceWithParameters&>(model).setFromParameter(r);
+
+            parameters.erase(f);
         }
 
         result.push_back(std::move(model));
