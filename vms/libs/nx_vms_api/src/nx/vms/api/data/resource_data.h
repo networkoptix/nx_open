@@ -112,6 +112,7 @@ struct NX_VMS_API ResourceWithParameters
     void setFromParameter(const ResourceParamData& parameter);
     std::optional<QJsonValue> parameter(const QString& key) const;
 
+    bool operator==(const ResourceWithParameters&) const = default;
     /**%apidoc [opt] Extended resource parameters. */
     std::map<QString, QJsonValue> parameters;
 
