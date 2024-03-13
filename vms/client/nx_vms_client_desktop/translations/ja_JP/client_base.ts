@@ -67,23 +67,23 @@
     </message>
     <message>
       <source>Installation failed</source>
-      <translation>インストールに失敗しました。</translation>
+      <translation>インストールに失敗しました</translation>
     </message>
     <message>
       <source>Installation completed</source>
-      <translation>インストール完了</translation>
+      <translation>インストールが完了しました</translation>
     </message>
     <message>
       <source>Getting update information from the server</source>
-      <translation>サーバーから更新情報を取得</translation>
+      <translation>サーバーから更新情報を取得しています</translation>
     </message>
     <message>
       <source>Downloading update package</source>
-      <translation>更新パッケージのダウンロード中</translation>
+      <translation>更新パッケージをダウンロードしています</translation>
     </message>
     <message>
       <source>Installing</source>
-      <translation>インストール中</translation>
+      <translation>インストールしています</translation>
     </message>
     <message>
       <source>Verifying update package</source>
@@ -102,7 +102,7 @@
     </message>
     <message>
       <source>Connect to System</source>
-      <translation>システムへ接続</translation>
+      <translation>システムに接続</translation>
     </message>
     <message>
       <source>Help</source>
@@ -118,11 +118,11 @@
     </message>
     <message>
       <source>Push my screen</source>
-      <translation>PC画面を表示</translation>
+      <translation>操作PCの画面を表示</translation>
     </message>
     <message>
       <source>Select Time Server</source>
-      <translation>タイムサーバー選択</translation>
+      <translation>タイムサーバーを選択</translation>
     </message>
     <message>
       <source>Fit in View</source>
@@ -138,7 +138,7 @@
     </message>
     <message>
       <source>Disconnect from Server</source>
-      <translation>接続サーバーから切断</translation>
+      <translation>サーバーから切断</translation>
     </message>
     <message>
       <source>Browse Local Files</source>
@@ -226,7 +226,7 @@
     </message>
     <message>
       <source>Stop current action</source>
-      <translation>現在をアクションを停止する</translation>
+      <translation>現在のアクションを停止</translation>
     </message>
     <message>
       <source>Go to Fullscreen</source>
@@ -9266,7 +9266,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>No update package available</source>
-      <translation>利用可能な更新パッケージはありません</translation>
+      <translation>利用可能な更新パッケージがありません</translation>
     </message>
     <message>
       <source>Select Update File...</source>
@@ -9444,7 +9444,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Some servers have no update packages available.</source>
-      <translation>利用可能な更新パッケージがないサーバもあります。</translation>
+      <translation>一部のサーバーには利用可能な更新パッケージがありません。</translation>
     </message>
     <message>
       <source>Some servers have encountered an internal error.</source>
