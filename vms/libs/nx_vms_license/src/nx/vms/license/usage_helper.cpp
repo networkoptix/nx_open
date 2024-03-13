@@ -718,6 +718,12 @@ const nx::utils::Url ChannelPartnerServer::saasServicesUrl(const common::SystemS
     return baseUrl(settings) + NX_FMT("/cloud_systems/%1/services/", systemId);
 }
 
+const nx::utils::Url ChannelPartnerServer::migrateLicensesUrl(const common::SystemSettings* settings)
+{
+    const auto systemId = settings->cloudSystemId();
+    return baseUrl(settings) + NX_FMT("/cloud_systems/%1/migrate_legacy_licenses/", systemId);
+}
+
 const nx::utils::Url ChannelPartnerServer::saasDataUrl(const common::SystemSettings* settings)
 {
     const auto systemId = settings->cloudSystemId();
