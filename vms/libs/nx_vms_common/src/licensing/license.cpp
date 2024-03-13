@@ -654,7 +654,7 @@ QString QnLicense::orderType() const
 
 bool QnLicense::isSaas() const
 {
-    return orderType() == "saas";
+    return xclass() == "saas";
 }
 
 
