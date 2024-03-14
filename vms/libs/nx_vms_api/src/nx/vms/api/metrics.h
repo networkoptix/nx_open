@@ -35,7 +35,7 @@ using ResourceValues =
 using ResourceGroupValues =
     std::map<QString /*resourceId*/, ResourceValues>;
 
-using SystemValues
+using SiteValues
     = std::map<QString /*resourceGroup*/, ResourceGroupValues>;
 
 // -----------------------------------------------------------------------------------------------
@@ -121,7 +121,7 @@ struct NX_VMS_API ResourceManifest: Label
 #define ResourceManifest_Fields (id)(name)(resource)(values)
 QN_FUSION_DECLARE_FUNCTIONS(ResourceManifest, (json), NX_VMS_API)
 
-using SystemManifest
+using SiteManifest
     = std::vector<ResourceManifest>;
 
 // -----------------------------------------------------------------------------------------------
@@ -185,7 +185,7 @@ struct NX_VMS_API ResourceRules
 #define ResourceRules_Fields (name)(resource)(values)
 QN_FUSION_DECLARE_FUNCTIONS(ResourceRules, (json), NX_VMS_API)
 
-using SystemRules
+using SiteRules
     = std::map<QString /*resourceGroupId*/, ResourceRules>;
 
 // -----------------------------------------------------------------------------------------------
@@ -210,7 +210,7 @@ using ResourceAlarms
 using ResourceGroupAlarms =
     std::map<QString /*resourceId*/, ResourceAlarms>;
 
-using SystemAlarms
+using SiteAlarms
     = std::map<QString /*resourceGroupId*/, ResourceGroupAlarms>;
 
 // -----------------------------------------------------------------------------------------------

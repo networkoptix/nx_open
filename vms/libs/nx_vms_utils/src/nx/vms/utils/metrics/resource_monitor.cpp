@@ -89,7 +89,7 @@ std::pair<api::metrics::ResourceAlarms, Scope> ResourceMonitor::alarmsWithScope(
 
 void ResourceMonitor::setRules(const api::metrics::ResourceRules& rules)
 {
-    const auto skipOnMissing = m_resource->scope == Scope::system;
+    const auto skipOnMissing = m_resource->scope == Scope::site;
     for (const auto& [id, groupRules]: rules.values)
     {
         if (const auto& it = m_monitors.find(id); it != m_monitors.end())

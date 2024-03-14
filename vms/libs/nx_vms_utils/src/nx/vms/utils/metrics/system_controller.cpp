@@ -30,13 +30,13 @@ void SystemController::start()
         controller->start();
 }
 
-api::metrics::SystemManifest SystemController::manifest() const
+api::metrics::SiteManifest SystemController::manifest() const
 {
     const auto start = std::chrono::steady_clock::now();
     NX_MUTEX_LOCKER lock(&m_mutex);
     if (!m_manifestCache)
     {
-        m_manifestCache = std::make_unique<api::metrics::SystemManifest>();
+        m_manifestCache = std::make_unique<api::metrics::SiteManifest>();
         for (const auto& controller: m_resourceControllers)
             m_manifestCache->push_back(controller->manifest());
     }
@@ -45,18 +45,18 @@ api::metrics::SystemManifest SystemController::manifest() const
     return *m_manifestCache;
 }
 
-api::metrics::SystemValues SystemController::values(Scope requestScope, bool formatted) const
+api::metrics::SiteValues SystemController::values(Scope requestScope, bool formatted) const
 {
     return valuesWithScope(requestScope, formatted).first;
 }
 
-std::pair<api::metrics::SystemValues, Scope> SystemController::valuesWithScope(Scope requestScope,
+std::pair<api::metrics::SiteValues, Scope> SystemController::valuesWithScope(Scope requestScope,
     bool formatted,
     const nx::utils::DotNotationString& filter) const
 {
     const auto start = std::chrono::steady_clock::now();
     auto actualScope = requestScope;
-    api::metrics::SystemValues systemValues;
+    api::metrics::SiteValues systemValues;
     for (const auto& controller: m_resourceControllers)
     {
         if (!filter.accepts(controller->name()))
@@ -90,16 +90,16 @@ std::pair<api::metrics::SystemValues, Scope> SystemController::valuesWithScope(S
     return {systemValues, actualScope};
 }
 
-api::metrics::SystemAlarms SystemController::alarms(Scope requestScope) const
+api::metrics::SiteAlarms SystemController::alarms(Scope requestScope) const
 {
     return alarmsWithScope(requestScope).first;
 }
 
-std::pair<api::metrics::SystemAlarms, Scope> SystemController::alarmsWithScope(Scope requestScope,
+std::pair<api::metrics::SiteAlarms, Scope> SystemController::alarmsWithScope(Scope requestScope,
     const nx::utils::DotNotationString& filter) const
 {
     auto actualScope = requestScope;
-    api::metrics::SystemAlarms systemAlarms;
+    api::metrics::SiteAlarms systemAlarms;
     for (const auto& controller: m_resourceControllers)
     {
         if (!filter.accepts(controller->name()))
@@ -122,16 +122,16 @@ std::pair<api::metrics::SystemAlarms, Scope> SystemController::alarmsWithScope(S
     return {systemAlarms, actualScope};
 }
 
-api::metrics::SystemRules SystemController::rules() const
+api::metrics::SiteRules SystemController::rules() const
 {
-    api::metrics::SystemRules rules;
+    api::metrics::SiteRules rules;
     for (const auto& controller: m_resourceControllers)
         rules[controller->name()] = controller->rules();
 
     return rules;
 }
 
-void SystemController::setRules(api::metrics::SystemRules rules, bool makePermament)
+void SystemController::setRules(api::metrics::SiteRules rules, bool makePermament)
 {
     NX_ASSERT(!m_areRulesPermanent, "Rules change was forbidden");
     if (makePermament)
@@ -147,7 +147,7 @@ void SystemController::setRules(api::metrics::SystemRules rules, bool makePermam
         rules.erase(it);
     }
 
-    NX_ASSERT(rules.empty(), "Unused rules: %1", QJson::serialized<api::metrics::SystemRules>(rules));
+    NX_ASSERT(rules.empty(), "Unused rules: %1", QJson::serialized<api::metrics::SiteRules>(rules));
     NX_MUTEX_LOCKER lock(&m_mutex);
     m_manifestCache.reset();
 }

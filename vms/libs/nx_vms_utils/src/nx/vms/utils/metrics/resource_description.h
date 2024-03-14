@@ -9,7 +9,7 @@ namespace nx::vms::utils::metrics {
 enum class Scope
 {
     local, //< The value is only monitored for local resources.
-    system //< The value is monitored for all known resources in the system.
+    site //< The value is monitored for all known resources in the site.
 };
 
 NX_VMS_UTILS_API QString toString(Scope scope);

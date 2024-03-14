@@ -3,9 +3,9 @@
 #include <gtest/gtest.h>
 
 #include <nx/fusion/model_functions.h>
-#include <nx/vms/api/metrics.h>
 #include <nx/utils/elapsed_timer.h>
 #include <nx/utils/string.h>
+#include <nx/vms/api/metrics.h>
 
 namespace nx::vms::api::metrics::test {
 
@@ -80,7 +80,7 @@ static const QByteArray kRulesExample(R"json({
 
 TEST(Metrics, Rules)
 {
-    SystemRules rules;
+    SiteRules rules;
     ASSERT_TRUE(QJson::deserialize(kRulesExample, &rules));
     EXPECT_EQ(2, rules.size());
 
@@ -185,7 +185,7 @@ static const QByteArray kManifestExample(R"json([
 
 TEST(Metrics, Manifest)
 {
-    SystemManifest manifest;
+    SiteManifest manifest;
     ASSERT_TRUE(QJson::deserialize(kManifestExample, &manifest));
     EXPECT_EQ(2, manifest.size());
 
@@ -294,7 +294,7 @@ static const QByteArray kValuesExample(R"json({
 
 TEST(Metrics, Values)
 {
-    SystemValues values;
+    SiteValues values;
     ASSERT_TRUE(QJson::deserialize(kValuesExample, &values));
     EXPECT_EQ(2, values.size());
 
@@ -347,15 +347,15 @@ TEST(Metrics, Values)
         EXPECT_EQ(c2["info"]["status"], "Offline");
     }
 
-    SystemValues serverOneValues;
+    SiteValues serverOneValues;
     serverOneValues["servers"]["SERVER_UUID_1"] = values["servers"]["SERVER_UUID_1"];
     serverOneValues["cameras"]["CAMERA_UUID_1"] = values["cameras"]["CAMERA_UUID_1"];
 
-    SystemValues serverTwoValues;
+    SiteValues serverTwoValues;
     serverOneValues["servers"]["SERVER_UUID_2"] = values["servers"]["SERVER_UUID_2"];
     serverOneValues["cameras"]["CAMERA_UUID_2"] = values["cameras"]["CAMERA_UUID_2"];
 
-    SystemValues mergedValues;
+    SiteValues mergedValues;
     merge(&mergedValues, &serverOneValues);
     merge(&mergedValues, &serverTwoValues);
     expectSerialization(kValuesExample, mergedValues);
@@ -363,13 +363,13 @@ TEST(Metrics, Values)
 
 TEST(Metrics, ValuesMerge)
 {
-    SystemValues firstValues;
+    SiteValues firstValues;
     firstValues["servers"]["SERVER_1"]["info"]["status"] = "Online";
     firstValues["servers"]["SERVER_1"]["info"]["publicIp"] = "192.168.0.1";
     firstValues["servers"]["SERVER_1"]["load"]["cpuUsageP"] = 50;
     firstValues["servers"]["SERVER_2"]["info"]["status"] = "Online";
 
-    SystemValues secondValues;
+    SiteValues secondValues;
     firstValues["servers"]["SERVER_2"]["info"]["publicIp"] = "192.168.0.2";
     firstValues["servers"]["SERVER_2"]["load"]["cpuUsageP"] = 70;
 
@@ -404,10 +404,10 @@ struct Counts
 class ValuesPerformance: public testing::TestWithParam<Counts>
 {
 protected:
-    SystemValues makeValues() const
+    SiteValues makeValues() const
     {
         const auto counts = GetParam();
-        SystemValues values;
+        SiteValues values;
         for (size_t t = 0; t < counts.types; ++t)
         {
             auto& type = values[QStringLiteral("resource_type_%1").arg(t)];
@@ -434,7 +434,7 @@ TEST_P(ValuesPerformance, Serialization)
     const auto serialized = QJson::serialized(values);
     NX_INFO(this, "Serialized %1 bytes in %2", serialized.size(), timer.elapsed());
 
-    SystemValues deserialized;
+    SiteValues deserialized;
     timer.restart();
     EXPECT_TRUE(QJson::deserialize(serialized, &deserialized));
     NX_INFO(this, "Deserialized %1 bytes in %2", serialized.size(), timer.elapsed());
@@ -449,7 +449,7 @@ INSTANTIATE_TEST_SUITE_P(Metrics, ValuesPerformance, ::testing::Values(
 
 TEST(Metrics, Alarms)
 {
-    SystemAlarms alarms;
+    SiteAlarms alarms;
     ASSERT_TRUE(QJson::deserialize(kAlarmsExample, &alarms));
     EXPECT_EQ(alarms.size(), 2);
 
