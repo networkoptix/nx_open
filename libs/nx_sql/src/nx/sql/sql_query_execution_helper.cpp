@@ -69,6 +69,8 @@ bool SqlQueryExecutionHelper::execSQLQuery(QSqlQuery *query, const char* details
 
         return false;
     }
+
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 executed SQL query:\n%2", details, query->lastQuery());
     return true;
 }
 
