@@ -321,7 +321,10 @@ Dialog
             ComboBox
             {
                 id: listComboBox
-                model: listsModel
+                model: SortFilterProxyModel
+                {
+                    sourceModel: listsModel
+                }
                 enabled: !!currentList
                 textRole: "text"
                 valueRole: "value"
