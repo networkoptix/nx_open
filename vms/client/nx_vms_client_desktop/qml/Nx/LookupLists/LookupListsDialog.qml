@@ -226,9 +226,17 @@ Dialog
                     spacing: 8
                     enabled: !editing
 
+                    Text
+                    {
+                        visible: tableView.checkedRows.length > 0
+                        color: ColorTheme.colors.light4
+                        font.pixelSize: 14
+                        text: qsTr("%1 selected:").arg(tableView.checkedRows.length)
+                    }
                     Button
                     {
                         text: qsTr("Add")
+                        visible: tableView.checkedRows.length === 0
                         iconUrl: "image://svg/skin/buttons/add_20x20_deprecated.svg"
                         onClicked: addEntryDialog.createObject(control).openNewIn(control)
                     }
