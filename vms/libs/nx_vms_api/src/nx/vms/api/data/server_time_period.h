@@ -58,7 +58,7 @@ struct NX_VMS_API ServerTimePeriod
 };
 
 using ServerTimePeriodList = std::vector<ServerTimePeriod>;
-using ServerTimePeriodMap = Map<nx::Uuid, ServerTimePeriodList>;
+using DeviceFootageMap = Map<nx::Uuid, ServerTimePeriodList>;
 
 constexpr bool operator<(std::chrono::milliseconds timeMs, const ServerTimePeriod& other)
 {
