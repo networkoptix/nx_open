@@ -231,7 +231,6 @@ void TimerManager::deleteTimer(const TimerId& timerId)
 
 void TimerManager::joinAndDeleteTimer(const TimerId& timerId)
 {
-    NX_ASSERT(timerId, nx::format("Timer id should be a positive number, 0 given."));
     if (timerId == 0)
         return;
 
