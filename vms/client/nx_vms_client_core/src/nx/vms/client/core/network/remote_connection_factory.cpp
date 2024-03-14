@@ -191,17 +191,19 @@ struct RemoteConnectionFactory::Private
     {
         using namespace std::chrono_literals;
 
-        std::promise<bool> isAccepted;
+        auto isAccepted = std::make_shared<std::promise<bool>>();
         auto delegate = context->customUserInteractionDelegate
             ? context->customUserInteractionDelegate.get()
             : userInteractionDelegate.get();
+
+        // Capture context to ensure delegate will not be destroyed by the time handler is run.
         executeInThread(delegate->thread(),
-            [&isAccepted, handler, delegate]()
+            [context, isAccepted, handler, delegate]()
             {
-                isAccepted.set_value(handler(delegate));
+                isAccepted->set_value(handler(delegate));
             });
 
-        std::future<bool> future = isAccepted.get_future();
+        std::future<bool> future = isAccepted->get_future();
         std::future_status status;
         do {
             status = future.wait_for(100ms);
@@ -409,7 +411,7 @@ struct RemoteConnectionFactory::Private
         {
             // There are some certificates with errors in the target System.
             auto accept =
-                [&mismatchedCertificates]
+                [mismatchedCertificates = std::move(mismatchedCertificates)]
                     (AbstractRemoteConnectionUserInteractionDelegate* delegate)
                 {
                     return delegate->acceptCertificatesOfServersInTargetSystem(mismatchedCertificates);
