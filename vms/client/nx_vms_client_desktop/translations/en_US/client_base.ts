@@ -4475,24 +4475,49 @@ License Key: %2</source>
 <context>
     <name>QnRequiredAccessRightPolicy</name>
     <message>
-        <source>%1 group does not have %2 permission for some of selected cameras</source>
-        <comment>%1 is the name of selected user group, %2 is permission name</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>%1 groups and %2 users do not have %3 permission for some of selected cameras</source>
-        <comment>%1 is number of selected user groups, %2 is number of users, %3 is permission name</comment>
-        <translation></translation>
-    </message>
-    <message>
         <source>%1 user does not have %2 permission for some of selected cameras</source>
         <comment>%1 is the name of the selected user, %2 is the permission name</comment>
         <translation></translation>
     </message>
+    <message numerus="yes">
+        <source>%n groups</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n users</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
     <message>
-        <source>%1 users do not have %2 permission for some of selected cameras</source>
-        <comment>%1 is number of selected users, %2 is permission name</comment>
-        <translation></translation>
+        <source>%1 and %2 do not have %3 permission for some of selected cameras</source>
+        <comment>%1 and %2 are the numbers of user groups and users in a correct numeric form (e.g. &apos;2 groups and 1 user&apos;), %3 is the permission name</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n groups do not have %1 permission for some of selected cameras</source>
+        <comment>%1 is the permission name</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>%1 group does not have %2 permission for some of selected cameras</source>
+        <comment>%1 is the name of selected user group, %2 is the permission name</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n users do not have %1 permission for some of selected cameras</source>
+        <comment>%1 is the permission name</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
