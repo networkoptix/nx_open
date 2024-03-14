@@ -6,6 +6,7 @@
 
 #include <QtCore/QJsonObject>
 
+#include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/enum_instrument.h>
 #include <nx/reflect/instrument.h>
 #include <nx/utils/uuid.h>
@@ -80,5 +81,7 @@ NX_VMS_API std::vector<ManifestError> validate(const DeviceAgentManifest& device
 NX_REFLECTION_INSTRUMENT(DeviceAgentManifest, DeviceAgentManifest_Fields);
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(DeviceAgentManifest::Capabilities)
+
+QN_FUSION_DECLARE_FUNCTIONS(DeviceAgentManifest, (json), NX_VMS_API)
 
 } // namespace nx::vms::api::analytics

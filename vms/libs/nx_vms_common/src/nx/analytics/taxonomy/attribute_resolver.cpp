@@ -78,13 +78,13 @@ void AttributeResolver::fillAttributeCandidateList(
 {
     for (const AttributeDescription& attribute: attributes)
     {
-        if (attribute.attributeList.isEmpty())
+        if (!attribute.attributeList || attribute.attributeList->isEmpty())
         {
             outAttributeCandidateList->push_back(attribute);
         }
         else
         {
-            if (!attributeLists.contains(attribute.attributeList))
+            if (!attributeLists.contains(*attribute.attributeList))
             {
                 m_errorHandler->handleError(
                     ProcessingError{NX_FMT(
@@ -93,7 +93,7 @@ void AttributeResolver::fillAttributeCandidateList(
                 continue;
             }
 
-            if (uniqueAttributeListIds.contains(attribute.attributeList))
+            if (uniqueAttributeListIds.contains(*attribute.attributeList))
             {
                 m_errorHandler->handleError(
                     ProcessingError{NX_FMT(
@@ -104,10 +104,10 @@ void AttributeResolver::fillAttributeCandidateList(
             }
 
             const std::vector<AttributeDescription> attributeList =
-                attributeLists.at(attribute.attributeList);
+                attributeLists.at(*attribute.attributeList);
 
             std::set<QString> currentUniqueAttributeListIds = uniqueAttributeListIds;
-            currentUniqueAttributeListIds.insert(attribute.attributeList);
+            currentUniqueAttributeListIds.insert(*attribute.attributeList);
             fillAttributeCandidateList(
                 attributeList,
                 attributeLists,
@@ -142,12 +142,13 @@ void AttributeResolver::resolveOwnAttributes()
             continue;
         }
 
-        if (!attribute.condition.isEmpty())
+        if (attribute.condition && !attribute.condition->isEmpty())
             conditionalAttributeNames.insert(attribute.name);
 
         if (uniqueAttributeNames.contains(attribute.name)
             && (!conditionalAttributeNames.contains(attribute.name)
-                || attribute.condition.isEmpty()))
+                || !attribute.condition
+                || attribute.condition->isEmpty()))
         {
             m_errorHandler->handleError(
                 ProcessingError{NX_FMT(
@@ -251,7 +252,7 @@ Attribute* AttributeResolver::tryToDeduceTypeFromSubtype(
     nx::vms::api::analytics::AttributeDescription* inOutAttributeDescription,
     const AbstractAttribute* baseAttribute)
 {
-    const QString& subtypeId = inOutAttributeDescription->subtype;
+    const QString& subtypeId = inOutAttributeDescription->subtype.value_or(QString());
 
     const EnumType* enumType = m_context.internalState->getTypeById<EnumType>(subtypeId);
     const ColorType* colorType = m_context.internalState->getTypeById<ColorType>(subtypeId);
@@ -323,7 +324,7 @@ bool AttributeResolver::resolveNumericSubtype(
     nx::vms::api::analytics::AttributeDescription* inOutAttributeDescription,
     const AbstractAttribute* baseAttribute)
 {
-    QString& subtype = inOutAttributeDescription->subtype;
+    const QString subtype = inOutAttributeDescription->subtype.value_or(QString());
     const QString baseAttributeSubtype = baseAttribute ? baseAttribute->subtype() : QString();
 
     if (!subtype.isEmpty())
@@ -336,7 +337,7 @@ bool AttributeResolver::resolveNumericSubtype(
                         m_context.typeName, m_context.typeId,
                         inOutAttributeDescription->name, subtype)});
 
-            subtype = QString();
+            inOutAttributeDescription->subtype.reset();
         }
         else if (baseAttribute
             && !baseAttributeSubtype.isEmpty()
@@ -349,7 +350,7 @@ bool AttributeResolver::resolveNumericSubtype(
                     m_context.typeName, m_context.typeId, subtype,
                     inOutAttributeDescription->name, m_context.baseTypeId, baseAttributeSubtype)});
 
-            subtype = QString();
+            inOutAttributeDescription->subtype.reset();
         }
     }
 
@@ -422,27 +423,25 @@ bool AttributeResolver::resolveUnit(
     if (!baseAttribute || baseAttribute->unit().isEmpty())
         return true;
 
-    QString& unit = inOutAttributeDescription->unit;
     const QString baseAttributeUnit = baseAttribute->unit();
 
-    if (!unit.isEmpty() && unit != baseAttributeUnit)
-    {
-        m_errorHandler->handleError(
-            ProcessingError{NX_FMT(
-                "%1 %2: unit (%3) is not equal to the unit (%4) of the base type (%5)",
-                m_context.typeName, m_context.typeId, unit,
-                baseAttributeUnit, m_context.baseTypeId)});
+    if (inOutAttributeDescription->unit == baseAttributeUnit)
+        return true;
 
-        unit = QString();
-    }
+    m_errorHandler->handleError(
+        ProcessingError{NX_FMT(
+            "%1 %2: unit (%3) is not equal to the unit (%4) of the base type (%5)",
+            m_context.typeName, m_context.typeId, inOutAttributeDescription->unit,
+            baseAttributeUnit, m_context.baseTypeId)});
 
+    inOutAttributeDescription->unit.reset();
     return true;
 }
 
 Attribute* AttributeResolver::resolveEnumerationAttribute(
     AttributeDescription* inOutAttributeDescription, const AbstractAttribute* baseAttribute)
 {
-    const QString enumId = inOutAttributeDescription->subtype;
+    const QString enumId = inOutAttributeDescription->subtype.value_or(QString());
     EnumType* enumType = m_context.internalState->getTypeById<EnumType>(enumId);
     if (!enumType)
     {
@@ -460,7 +459,7 @@ Attribute* AttributeResolver::resolveEnumerationAttribute(
 Attribute* AttributeResolver::resolveColorAttribute(
     AttributeDescription* inOutAttributeDescription, const AbstractAttribute* baseAttribute)
 {
-    const QString colorTypeId = inOutAttributeDescription->subtype;
+    const QString colorTypeId = inOutAttributeDescription->subtype.value_or(QString());
     ColorType* colorType = m_context.internalState->getTypeById<ColorType>(colorTypeId);
     if (!colorType)
     {
@@ -479,7 +478,7 @@ Attribute* AttributeResolver::resolveColorAttribute(
 Attribute* AttributeResolver::resolveObjectAttribute(
     AttributeDescription* inOutAttributeDescription, const AbstractAttribute* baseAttribute)
 {
-    const QString objectTypeId = inOutAttributeDescription->subtype;
+    const QString objectTypeId = inOutAttributeDescription->subtype.value_or(QString());
     ObjectType* objectType = m_context.internalState->getTypeById<ObjectType>(objectTypeId);
     if (!objectType)
     {

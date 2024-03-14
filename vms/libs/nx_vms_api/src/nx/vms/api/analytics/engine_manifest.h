@@ -113,6 +113,9 @@ struct NX_VMS_API EngineManifest
     (groups) \
     (typeLibrary)
 
+QN_FUSION_DECLARE_FUNCTIONS(EngineManifest, (json), NX_VMS_API)
+QN_FUSION_DECLARE_FUNCTIONS(EngineManifest::ObjectAction, (json), NX_VMS_API)
+
 NX_REFLECTION_INSTRUMENT(EngineManifest::ObjectAction::Requirements, nx_vms_api_analytics_Engine_ObjectAction_Requirements_Fields);
 NX_REFLECTION_INSTRUMENT(EngineManifest::ObjectAction, ObjectAction_Fields);
 NX_REFLECTION_INSTRUMENT(EngineManifest, EngineManifest_Fields);

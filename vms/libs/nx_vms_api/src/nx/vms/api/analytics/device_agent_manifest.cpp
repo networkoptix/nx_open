@@ -4,7 +4,12 @@
 
 #include <set>
 
+#include <nx/fusion/model_functions.h>
+
 namespace nx::vms::api::analytics {
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DeviceAgentManifest, (json), DeviceAgentManifest_Fields,
+    (brief, true))
 
 class ListProcessor
 {

@@ -70,13 +70,13 @@ AbstractAttribute::Type Attribute::type() const
 QString Attribute::subtype() const
 {
     if (m_attributeDescription.type == AttributeType::number
-        && m_attributeDescription.subtype.isEmpty()
+        && (!m_attributeDescription.subtype || m_attributeDescription.subtype->isEmpty())
         && m_base)
     {
         return m_base->subtype();
     }
 
-    return m_attributeDescription.subtype;
+    return m_attributeDescription.subtype.value_or(QString());
 }
 
 AbstractEnumType* Attribute::enumType() const
@@ -123,8 +123,8 @@ AbstractColorType* Attribute::colorType() const
 
 QString Attribute::unit() const
 {
-    if (!m_attributeDescription.unit.isEmpty())
-        return m_attributeDescription.unit;
+    if (m_attributeDescription.unit && !m_attributeDescription.unit->isEmpty())
+        return *m_attributeDescription.unit;
 
     if (m_base)
         return m_base->unit();
@@ -161,7 +161,7 @@ bool Attribute::isSupported(nx::Uuid engineId, nx::Uuid deviceId) const
 
 QString Attribute::condition() const
 {
-    return m_attributeDescription.condition;
+    return m_attributeDescription.condition.value_or(QString());
 }
 
 void Attribute::setBaseAttribute(AbstractAttribute* attribute)

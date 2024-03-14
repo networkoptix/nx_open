@@ -276,7 +276,7 @@ bool deserialize(
     if (pos == value.end())
     {
         if (outFound != nullptr)
-            *outFound = false;
+            *outFound = nx::utils::IsOptional<T>::value;
         return optional;
     }
 
