@@ -119,9 +119,9 @@ struct AttributeDescription
 {
     QString name;
     std::optional<AttributeType> type; /**< Can be omitted for Enum and Color attributes. */
-    QString subtype; /**< One of: empty, a Name, "integer" or "float" for Numbers. */
+    std::optional<QString> subtype; /**< One of: empty, a Name, "integer" or "float" for Numbers. */
     std::optional<std::vector<std::variant<ItemObject, QString>>> items; /**< Only for Enums. */
-    QString unit; /**< Only for Number. Can be empty. */
+    std::optional<QString> unit; /**< Only for Number. Can be empty. */
 
     /**%apidoc:integer */
     std::optional<double> minValue; /**< Only for Number. */
@@ -129,14 +129,14 @@ struct AttributeDescription
     /**%apidoc:integer */
     std::optional<double> maxValue; /**< Only for Number. */
 
-    QString attributeList; /**< If not empty, all other fields are ignored. */
+    std::optional<QString> attributeList; /**< If not empty, all other fields are ignored. */
 
     /**
      * Condition string that defines whether this Attribute makes sense for the Object or Event
      * Type depending on values of the other Attributes. Uses the same syntax as in the Object
      * Search panel.
      */
-    QString condition;
+    std::optional<QString> condition;
 
     bool operator==(const AttributeDescription& other) const = default;
 };

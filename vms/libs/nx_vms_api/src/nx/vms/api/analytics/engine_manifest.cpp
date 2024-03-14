@@ -11,6 +11,12 @@ namespace nx::vms::api::analytics {
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(EngineManifest::ObjectAction::Requirements, (json),
     nx_vms_api_analytics_Engine_ObjectAction_Requirements_Fields, (brief, true))
 
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(EngineManifest::ObjectAction, (json),
+    ObjectAction_Fields, (brief, true))
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(EngineManifest, (json),
+    EngineManifest_Fields, (brief, true))
+
 template<typename List, typename FieldValueGetter>
 void validateListByField(
     std::vector<ManifestError>* outErrorList,
