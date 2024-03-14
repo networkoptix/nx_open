@@ -11,7 +11,7 @@ QString toString(Scope scope)
     switch (scope)
     {
         case Scope::local: return "local";
-        case Scope::system: return "system";
+        case Scope::site: return "site";
     }
 
     NX_ASSERT(false, "Unexpected scope: %1", static_cast<int>(scope));

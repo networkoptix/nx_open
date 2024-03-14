@@ -74,7 +74,7 @@ public:
 
     TestResource* makeResource(int id)
     {
-        const auto scope = (id % 2 == 0) ? Scope::local : Scope::system;
+        const auto scope = (id % 2 == 0) ? Scope::local : Scope::site;
         return add(TestResource(id), "R" + QString::number(id), scope);
     }
 

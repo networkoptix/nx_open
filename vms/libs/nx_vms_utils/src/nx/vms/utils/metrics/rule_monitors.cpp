@@ -5,8 +5,8 @@
 #include <QtCore/QJsonArray>
 
 #include <nx/utils/log/log.h>
-#include <nx/utils/timer_manager.h>
 #include <nx/utils/string_template.h>
+#include <nx/utils/timer_manager.h>
 
 #include "value_group_monitor.h"
 
@@ -377,7 +377,7 @@ ValueGeneratorResult parseFormulaOrThrow(const QString& formula, const ValueMoni
 {
     FormulaBuilder builder(formula, monitors);
     auto parsed = builder.build();
-    return {std::move(parsed), builder.isLocal() ? Scope::local : Scope::system};
+    return {std::move(parsed), builder.isLocal() ? Scope::local : Scope::site};
 }
 
 TextGenerator parseTemplate(QString template_, const ValueMonitors& monitors)

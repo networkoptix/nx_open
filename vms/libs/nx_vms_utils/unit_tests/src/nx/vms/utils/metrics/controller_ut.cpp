@@ -3,8 +3,8 @@
 #include <gtest/gtest.h>
 
 #include <nx/fusion/model_functions.h>
-#include <nx/vms/utils/metrics/system_controller.h>
 #include <nx/vms/utils/metrics/resource_controller_impl.h>
+#include <nx/vms/utils/metrics/system_controller.h>
 
 #include "test_providers.h"
 
@@ -90,7 +90,7 @@ public:
 
     void setRules()
     {
-        api::metrics::SystemRules rules;
+        api::metrics::SiteRules rules;
         NX_CRITICAL(QJson::deserialize(kRules, &rules));
         m_systemController.setRules(std::move(rules));
     }
@@ -174,27 +174,27 @@ public:
             EXPECT_EQ(systemValues.size(), 1);
 
             auto testResources = systemValues["tests"];
-            ASSERT_EQ(testResources.size(), (scope == Scope::system) ? 3 : 2);
+            ASSERT_EQ(testResources.size(), (scope == Scope::site) ? 3 : 2);
 
             auto local1 = testResources["R0"];
-            ASSERT_EQ(local1.size(), (scope == Scope::system) ? 3 : 2);
+            ASSERT_EQ(local1.size(), (scope == Scope::site) ? 3 : 2);
             {
                 EXPECT_EQ(local1["_"]["name"], "TR0");
 
                 auto group1 = local1["g1"];
-                ASSERT_EQ(group1.size(), includeRules ? ((scope == Scope::system) ? 4 : 3) : 2);
+                ASSERT_EQ(group1.size(), includeRules ? ((scope == Scope::site) ? 4 : 3) : 2);
                 EXPECT_EQ(group1["i"], formatted ? Value("0 KB") : Value(1));
                 EXPECT_EQ(group1["t"], "first of 0");
                 if (includeRules)
                 {
                     EXPECT_EQ(group1["ip"], formatted ? Value("2") : Value(2));
-                    if (scope == Scope::system)
+                    if (scope == Scope::site)
                     {
                         EXPECT_EQ(group1["c"], "hello");
                     }
                 }
 
-                if (scope == Scope::system)
+                if (scope == Scope::site)
                 {
                     auto group2 = local1["g2"];
                     ASSERT_EQ(group2.size(), includeRules ? 3 : 2);
@@ -208,24 +208,24 @@ public:
             }
 
             auto local2 = testResources["R2"];
-            ASSERT_EQ(local2.size(), (scope == Scope::system) ? 3 : 2);
+            ASSERT_EQ(local2.size(), (scope == Scope::site) ? 3 : 2);
             {
                 EXPECT_EQ(local2["_"]["name"], "TR2");
 
                 auto group1 = local2["g1"];
-                ASSERT_EQ(group1.size(), includeRules ? ((scope == Scope::system) ? 4 : 3) : 2);
+                ASSERT_EQ(group1.size(), includeRules ? ((scope == Scope::site) ? 4 : 3) : 2);
                 EXPECT_EQ(group1["i"], formatted ? Value("0.02 KB") : Value(21));
                 EXPECT_EQ(group1["t"], "first of 2");
                 if (includeRules)
                 {
                     EXPECT_EQ(group1["ip"], formatted ? Value("22") : Value(22));
-                    if (scope == Scope::system)
+                    if (scope == Scope::site)
                     {
                         EXPECT_EQ(group1["c"], "hello");
                     }
                 }
 
-                if (scope == Scope::system)
+                if (scope == Scope::site)
                 {
                     auto group2 = local2["g2"];
                     EXPECT_EQ(group2["i"], formatted ? Value("22") : Value(22));
@@ -238,7 +238,7 @@ public:
             }
 
             auto remote = testResources["R1"];
-            if (scope == Scope::system)
+            if (scope == Scope::site)
             {
                 ASSERT_EQ(remote.size(), 1);
 
@@ -256,7 +256,7 @@ public:
             EXPECT_EQ(systemValues.size(), 1);
 
             auto testResources = systemValues["tests"];
-            ASSERT_EQ(testResources.size(), scope == Scope::system ? 3 : 2);
+            ASSERT_EQ(testResources.size(), scope == Scope::site ? 3 : 2);
 
             auto local1 = testResources["R0"];
             EXPECT_EQ(local1["g1"]["i"], formatted ? Value("1 KB") : Value(1024));
@@ -264,12 +264,12 @@ public:
             if (includeRules)
             {
                 EXPECT_EQ(local1["g1"]["ip"], formatted ? Value("1025") : Value(1025));
-                if (scope == Scope::system)
+                if (scope == Scope::site)
                 {
                     EXPECT_EQ(local1["g1"]["c"], "hello");
                 }
             }
-            if (scope == Scope::system)
+            if (scope == Scope::site)
             {
                 EXPECT_EQ(local1["g2"]["i"], formatted ? Value("2") : Value(2));
                 EXPECT_EQ(local1["g2"]["t"], "second of 0");
@@ -281,19 +281,19 @@ public:
             if (includeRules)
             {
                 EXPECT_EQ(local2["g1"]["ip"], formatted ? Value("22") : Value(22));
-                if (scope == Scope::system)
+                if (scope == Scope::site)
                 {
                     EXPECT_EQ(local2["g1"]["c"], "hello");
                 }
             }
-            if (scope == Scope::system)
+            if (scope == Scope::site)
             {
                 EXPECT_EQ(local2["g2"]["i"], formatted ? Value("22") : Value(22));
                 EXPECT_EQ(local2["g2"]["t"], "second of 2");
             }
 
             auto remote = testResources["R1"];
-            if (scope == Scope::system)
+            if (scope == Scope::site)
             {
                 ASSERT_EQ(remote.size(), 1);
 
@@ -365,10 +365,10 @@ public:
         if (includeRules)
         {
             EXPECT_VALUE("R0", "g1", "ip", formatted ? Value("2") : Value(2));
-            if (scope == Scope::system)
+            if (scope == Scope::site)
                 EXPECT_VALUE("R0", "g1", "c", "hello");
         }
-        if (scope == Scope::system)
+        if (scope == Scope::site)
         {
             EXPECT_VALUE("R0", "g2", "i", formatted ? Value("2") : Value(2));
             EXPECT_VALUE("R0", "g2", "t", "second of 0");
@@ -382,10 +382,10 @@ public:
         if (includeRules)
         {
             EXPECT_VALUE("R2", "g1", "ip", formatted ? Value("22") : Value(22));
-            if (scope == Scope::system)
+            if (scope == Scope::site)
                 EXPECT_VALUE("R2", "g1", "c", "hello");
         }
-        if (scope == Scope::system)
+        if (scope == Scope::site)
         {
             EXPECT_VALUE("R2", "g2", "i", formatted ? Value("22") : Value(22));
             EXPECT_VALUE("R2", "g2", "t", "second of 2");
@@ -393,7 +393,7 @@ public:
                 EXPECT_VALUE("R2", "g2", "im", formatted ? Value("21") : Value(21));
         }
 
-        if (scope == Scope::system)
+        if (scope == Scope::site)
         {
             EXPECT_VALUE("R1", "g2", "i", formatted ? Value("12") : Value(12));
             EXPECT_VALUE("R1", "g2", "t", "second of 1");
@@ -426,10 +426,10 @@ public:
         {
             auto alarms = m_systemController.alarms(scope);
             EXPECT_EQ(alarms.size(), 1);
-            EXPECT_EQ(alarms["tests"].size(), (scope == Scope::system) ? 3 : 2);
+            EXPECT_EQ(alarms["tests"].size(), (scope == Scope::site) ? 3 : 2);
 
             EXPECT_ALARM("R0", "g1", "ip", warning, "i = 0.15 KB (>100), ip = 151");
-            if (scope == Scope::system)
+            if (scope == Scope::site)
             {
                 EXPECT_ALARM("R0", "g2", "i", warning, "i is 50 (>30)");
                 EXPECT_ALARM("R1", "g2", "i", warning, "i is 70 (>30)");
@@ -446,8 +446,8 @@ public:
         m_resources[2]->update("i2", 50);
         {
             auto alarms = m_systemController.alarms(scope);
-            ASSERT_EQ(alarms.size(), (scope == Scope::system) ? 1 : 0);
-            if (scope == Scope::system)
+            ASSERT_EQ(alarms.size(), (scope == Scope::site) ? 1 : 0);
+            if (scope == Scope::site)
                 EXPECT_ALARM("R2", "g2", "i", warning, "i is 50 (>30)");
         }
 
@@ -511,7 +511,7 @@ public:
             auto [alarms, actualScope] = m_systemController.alarmsWithScope(scope, filter);
 
             EXPECT_ALARM("R0", "g1", "ip", warning, "i = 0.15 KB (>100), ip = 151");
-            if (scope == Scope::system)
+            if (scope == Scope::site)
             {
                 EXPECT_ALARM("R0", "g2", "i", warning, "i is 50 (>30)");
                 EXPECT_ALARM("R1", "g2", "i", warning, "i is 70 (>30)");
@@ -562,13 +562,13 @@ TEST_F(MetricsControllerTest, LocalValuesWithRules)
 
 TEST_F(MetricsControllerTest, SystemValues)
 {
-    testValues(Scope::system, /*includeRules*/ false, /*formatted*/ false);
+    testValues(Scope::site, /*includeRules*/ false, /*formatted*/ false);
 }
 
 TEST_F(MetricsControllerTest, SystemValuesWithRules)
 {
     setRules();
-    testValues(Scope::system, /*includeRules*/ true, /*formatted*/ false);
+    testValues(Scope::site, /*includeRules*/ true, /*formatted*/ false);
 }
 
 TEST_F(MetricsControllerTest, FormattedLocalValues)
@@ -580,53 +580,53 @@ TEST_F(MetricsControllerTest, FormattedLocalValues)
 TEST_F(MetricsControllerTest, FormattedSystemValues)
 {
     setRules();
-    testValues(Scope::system, /*includeRules*/ true, /*formatted*/ true);
+    testValues(Scope::site, /*includeRules*/ true, /*formatted*/ true);
 }
 
 TEST_F(MetricsControllerTest, ValuesScenario)
 {
     testValues(Scope::local, /*includeRules*/ false, /*formatted*/ false);
-    testValues(Scope::system, /*includeRules*/ false, /*formatted*/ false);
+    testValues(Scope::site, /*includeRules*/ false, /*formatted*/ false);
 
     setRules();
     testValues(Scope::local, /*includeRules*/ true, /*formatted*/ false);
-    testValues(Scope::system, /*includeRules*/ true, /*formatted*/ false);
+    testValues(Scope::site, /*includeRules*/ true, /*formatted*/ false);
 
     testValues(Scope::local, /*includeRules*/ true, /*formatted*/ true);
-    testValues(Scope::system, /*includeRules*/ true, /*formatted*/ true);
+    testValues(Scope::site, /*includeRules*/ true, /*formatted*/ true);
 }
 
 TEST_F(MetricsControllerTest, ValuesWithScope)
 {
     nx::utils::DotNotationString filter;
     testValuesWithScope(Scope::local, /*includeRules*/ false, /*formatted*/ false, filter);
-    testValuesWithScope(Scope::system, /*includeRules*/ false, /*formatted*/ false, filter);
+    testValuesWithScope(Scope::site, /*includeRules*/ false, /*formatted*/ false, filter);
 
     filter.add("tests.R0._.name");
     testValuesWithScope(Scope::local, /*includeRules*/ false, /*formatted*/ false, filter);
-    testValuesWithScope(Scope::system, /*includeRules*/ false, /*formatted*/ false, filter);
+    testValuesWithScope(Scope::site, /*includeRules*/ false, /*formatted*/ false, filter);
 
     filter.clear();
     filter.add("tests.R0.*.*");
     testValuesWithScope(Scope::local, /*includeRules*/ false, /*formatted*/ false, filter);
-    testValuesWithScope(Scope::system, /*includeRules*/ false, /*formatted*/ false, filter);
+    testValuesWithScope(Scope::site, /*includeRules*/ false, /*formatted*/ false, filter);
 
     filter.clear();
     filter.add("tests.R0.*.i");
     filter.add("tests.R1.*.t");
     filter.add("tests.R2.*.name");
     testValuesWithScope(Scope::local, /*includeRules*/ false, /*formatted*/ false, filter);
-    testValuesWithScope(Scope::system, /*includeRules*/ false, /*formatted*/ false, filter);
+    testValuesWithScope(Scope::site, /*includeRules*/ false, /*formatted*/ false, filter);
 
     filter.clear();
     filter.add("tests.*");
     testValuesWithScope(Scope::local, /*includeRules*/ false, /*formatted*/ false, filter);
-    testValuesWithScope(Scope::system, /*includeRules*/ false, /*formatted*/ false, filter);
+    testValuesWithScope(Scope::site, /*includeRules*/ false, /*formatted*/ false, filter);
 
     filter.clear();
     filter.add("none");
     testValuesWithScope(Scope::local, /*includeRules*/ false, /*formatted*/ false, filter);
-    testValuesWithScope(Scope::system, /*includeRules*/ false, /*formatted*/ false, filter);
+    testValuesWithScope(Scope::site, /*includeRules*/ false, /*formatted*/ false, filter);
 }
 
 TEST_F(MetricsControllerTest, LocalAlarms)
@@ -638,43 +638,43 @@ TEST_F(MetricsControllerTest, LocalAlarms)
 
 TEST_F(MetricsControllerTest, SystemAlarms)
 {
-    ASSERT_EQ(m_systemController.alarms(Scope::system).size(), 0);
+    ASSERT_EQ(m_systemController.alarms(Scope::site).size(), 0);
     setRules();
-    testAlarms(Scope::system);
+    testAlarms(Scope::site);
 }
 
 TEST_F(MetricsControllerTest, AlarmsScenario)
 {
     ASSERT_EQ(m_systemController.alarms(Scope::local).size(), 0);
-    ASSERT_EQ(m_systemController.alarms(Scope::system).size(), 0);
+    ASSERT_EQ(m_systemController.alarms(Scope::site).size(), 0);
     setRules();
     testAlarms(Scope::local);
-    testAlarms(Scope::system);
+    testAlarms(Scope::site);
 }
 
 TEST_F(MetricsControllerTest, AlarmsWithScope)
 {
     nx::utils::DotNotationString filter;
     ASSERT_EQ(m_systemController.alarms(Scope::local).size(), 0);
-    ASSERT_EQ(m_systemController.alarms(Scope::system).size(), 0);
+    ASSERT_EQ(m_systemController.alarms(Scope::site).size(), 0);
     setRules();
     testAlarmsWithScope(Scope::local, filter);
-    testAlarmsWithScope(Scope::system, filter);
+    testAlarmsWithScope(Scope::site, filter);
 
     filter.clear();
     filter.add("none");
     testAlarmsWithScope(Scope::local, filter);
-    testAlarmsWithScope(Scope::system, filter);
+    testAlarmsWithScope(Scope::site, filter);
 
     filter.clear();
     filter.add("tests.*.g1.ip");
     testAlarmsWithScope(Scope::local, filter);
-    testAlarmsWithScope(Scope::system, filter);
+    testAlarmsWithScope(Scope::site, filter);
 
     filter.clear();
     filter.add("tests.R0.g2.i");
     testAlarmsWithScope(Scope::local, filter);
-    testAlarmsWithScope(Scope::system, filter);
+    testAlarmsWithScope(Scope::site, filter);
 }
 
 } // namespace nx::vms::utils::metrics::test

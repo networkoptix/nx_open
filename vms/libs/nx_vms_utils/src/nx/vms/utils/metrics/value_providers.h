@@ -90,7 +90,7 @@ template<typename ResourceType>
 std::unique_ptr<ValueMonitor> ValueProvider<ResourceType>::monitor(
     const ResourceType& resource, Scope resourceScope) const
 {
-    if (resourceScope == Scope::system && m_scope == Scope::local)
+    if (resourceScope == Scope::site && m_scope == Scope::local)
         return nullptr;
 
     if (!m_watch)
@@ -112,7 +112,7 @@ std::unique_ptr<ValueProvider<ResourceType>> makeLocalValueProvider(Args... args
 template<typename ResourceType, typename... Args>
 std::unique_ptr<ValueProvider<ResourceType>> makeSystemValueProvider(Args... args)
 {
-    return std::make_unique<ValueProvider<ResourceType>>(Scope::system, std::forward<Args>(args)...);
+    return std::make_unique<ValueProvider<ResourceType>>(Scope::site, std::forward<Args>(args)...);
 }
 
 template<typename ResourceType>

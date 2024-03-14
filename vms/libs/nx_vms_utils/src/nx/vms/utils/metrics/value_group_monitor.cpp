@@ -29,7 +29,7 @@ std::pair<api::metrics::ValueGroup, Scope> ValueGroupMonitor::valuesWithScope(Sc
     api::metrics::ValueGroup values;
     for (const auto& [id, monitor]: m_valueMonitors)
     {
-        if (requiredScope == Scope::local && monitor->scope() == Scope::system)
+        if (requiredScope == Scope::local && monitor->scope() == Scope::site)
             continue;
 
         if (!filter.accepts(id))
@@ -66,7 +66,7 @@ std::pair<api::metrics::ValueGroupAlarms, Scope> ValueGroupMonitor::alarmsWithSc
 
         for (const auto& monitor: monitors)
         {
-            if (requiredScope == Scope::local && monitor->scope() == Scope::system)
+            if (requiredScope == Scope::local && monitor->scope() == Scope::site)
                 continue;
 
             if (auto alarm = monitor->alarm())
