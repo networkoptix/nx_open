@@ -327,7 +327,7 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
         "[Feature] Enables Integrations Management feature.");
 
     // VMS-39166
-    NX_INI_FLAG(false, javaScriptApiDocumentation,
+    NX_INI_FLAG(true, javaScriptApiDocumentation,
         "[Feature] Enables the JavaScript API documentation.");
 
     // ---------------------------------------------------------------------------------------------
