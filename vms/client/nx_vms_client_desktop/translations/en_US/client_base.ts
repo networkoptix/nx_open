@@ -4481,42 +4481,42 @@ License Key: %2</source>
     </message>
     <message numerus="yes">
         <source>%n groups</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n group</numerusform>
+            <numerusform>%n groups</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n users</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n user</numerusform>
+            <numerusform>%n users</numerusform>
         </translation>
     </message>
     <message>
         <source>%1 and %2 do not have %3 permission for some of selected cameras</source>
         <comment>%1 and %2 are the numbers of user groups and users in a correct numeric form (e.g. &apos;2 groups and 1 user&apos;), %3 is the permission name</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message numerus="yes">
         <source>%n groups do not have %1 permission for some of selected cameras</source>
         <comment>%1 is the permission name</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n group does not have %1 permission for some of selected cameras</numerusform>
+            <numerusform>%n groups do not have %1 permission for some of selected cameras</numerusform>
         </translation>
     </message>
     <message>
         <source>%1 group does not have %2 permission for some of selected cameras</source>
         <comment>%1 is the name of selected user group, %2 is the permission name</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message numerus="yes">
         <source>%n users do not have %1 permission for some of selected cameras</source>
         <comment>%1 is the permission name</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n user does not have %1 permission for some of selected cameras</numerusform>
+            <numerusform>%n users do not have %1 permission for some of selected cameras</numerusform>
         </translation>
     </message>
 </context>
@@ -12806,20 +12806,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
 </context>
 <context>
-    <name>nx::vms::client::desktop::rules::TargetLayoutPicker</name>
-    <message>
-        <source>Select layout...</source>
-        <translation></translation>
-    </message>
-    <message numerus="yes">
-        <source>%n layouts</source>
-        <translation>
-            <numerusform>%n layout</numerusform>
-            <numerusform>%n layouts</numerusform>
-        </translation>
-    </message>
-</context>
-<context>
     <name>nx::vms::client::desktop::rules::TextLookupPicker</name>
     <message>
         <source>Contains keywords</source>
@@ -12857,15 +12843,15 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <name>nx::vms::client::desktop::rules::VmsRulesDialog</name>
     <message>
         <source>Delete rule error:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Save rule error:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Reset to defaults error:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
