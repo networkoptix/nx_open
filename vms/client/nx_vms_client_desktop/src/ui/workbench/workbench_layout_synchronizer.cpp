@@ -173,7 +173,7 @@ void QnWorkbenchLayoutSynchronizer::at_resource_itemAdded(
         return;
 
     QScopedValueRollback<bool> guard(m_submit, false);
-    auto item = new QnWorkbenchItem(resource, itemData, this);
+    auto item = new QnWorkbenchItem(resource, itemData, m_layout);
     m_layout->addItem(item);
     if (auto zoomTargetItem = m_layout->item(itemData.zoomTargetUuid))
         m_layout->addZoomLink(item, zoomTargetItem);
