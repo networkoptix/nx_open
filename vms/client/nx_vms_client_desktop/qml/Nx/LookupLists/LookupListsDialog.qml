@@ -331,8 +331,7 @@ Dialog
             }
             Button
             {
-                text: qsTr("Create New...")
-                iconUrl: "image://svg/skin/buttons/add_20x20_deprecated.svg"
+                text: qsTr("New List...")
                 onClicked: createNewList()
             }
             TextButton
