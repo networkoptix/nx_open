@@ -118,6 +118,30 @@
         <source>You are using a custom client. Please contact %1 to get the update instructions.</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Offline client updates</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Offline updates are enabled and files are stored on servers.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Turning this option on will enable downloading of additional files to servers which can be used to update connecting clients even without internet access.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This will delete all update files on servers.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Proceed anyway?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>AnalyticsEventSelector</name>
@@ -593,6 +617,10 @@ Select an Integration to begin configuring its parameters.</source>
     </message>
     <message>
         <source>Removing attributes will delete all associated data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select type</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1413,10 +1441,6 @@ Select an Integration to begin configuring its parameters.</source>
         <translation></translation>
     </message>
     <message>
-        <source>Create New...</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Settings</source>
         <translation></translation>
     </message>
@@ -1434,6 +1458,14 @@ Select an Integration to begin configuring its parameters.</source>
     </message>
     <message>
         <source>Please ensure that you have access to selected folder and enough disk space</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 selected:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New List...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
