@@ -70,10 +70,6 @@
       <translation>Certificado inválido</translation>
     </message>
     <message>
-      <source>The server&amp;apos;s certificate was rejected.</source>
-      <translation>O servidor&amp;apos;s certificado foi rejeitado.</translation>
-    </message>
-    <message>
       <source>Restore the connection to %1 and try again</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Restaure a conexão para %1 e tente novamente</translation>
@@ -206,6 +202,10 @@
       <source>To log in to this System, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</source>
       <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
       <translation type="unfinished">To log in to this System, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</translation>
+    </message>
+    <message>
+      <source>The server&apos;s certificate was rejected.</source>
+      <translation type="unfinished">The server&apos;s certificate was rejected.</translation>
     </message>
   </context>
   <context>

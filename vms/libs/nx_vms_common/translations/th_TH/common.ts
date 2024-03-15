@@ -200,11 +200,6 @@
       <translation type="unfinished">Members of this group can view live videos, I/O modules and web pages.</translation>
     </message>
     <message>
-      <source>Members of this group have unlimited System privileges. Administrators can create and modify Power Users, merge Systems and connect or disconnect System to  %1.</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>สมาชิกของกลุ่มนี้ มีสิทธิ์ของระบบไม่จำกัด ผู้ดูแลระบบสามารถสร้างและแก้ไขผู้ใช้, รวมระบบ และเชื่อมต่อหรือยกเลิกการเชื่อมต่อระบบเป็น  %1</translation>
-    </message>
-    <message>
       <source>Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the System configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</source>
       <translation type="unfinished">Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the System configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</translation>
     </message>
@@ -219,6 +214,11 @@
     <message>
       <source>Members of this group can view System Health Monitoring information and server processor load in real-time (Server Monitoring).</source>
       <translation type="unfinished">Members of this group can view System Health Monitoring information and server processor load in real-time (Server Monitoring).</translation>
+    </message>
+    <message>
+      <source>Members of this group have unlimited System privileges. Administrators can create and modify Power Users, merge Systems and connect or disconnect System to %1.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">Members of this group have unlimited System privileges. Administrators can create and modify Power Users, merge Systems and connect or disconnect System to %1.</translation>
     </message>
   </context>
   <context>
@@ -1647,31 +1647,31 @@
       <source>just now</source>
       <translation type="unfinished">just now</translation>
     </message>
-    <message numerus="yes">
-      <source>%n minute(s) ago</source>
-      <translation type="unfinished">
-        <numerusform>%n minute(s) ago</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n hour(s) ago</source>
-      <translation type="unfinished">
-        <numerusform>%n hour(s) ago</numerusform>
-      </translation>
-    </message>
     <message>
       <source>yesterday</source>
       <translation type="unfinished">yesterday</translation>
     </message>
-    <message numerus="yes">
-      <source>%n day(s) ago</source>
-      <translation type="unfinished">
-        <numerusform>%n day(s) ago</numerusform>
-      </translation>
-    </message>
     <message>
       <source>a week ago</source>
       <translation type="unfinished">a week ago</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n minutes ago</source>
+      <translation type="unfinished">
+        <numerusform>%n minutes ago</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n hours ago</source>
+      <translation type="unfinished">
+        <numerusform>%n hours ago</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n days ago</source>
+      <translation type="unfinished">
+        <numerusform>%n days ago</numerusform>
+      </translation>
     </message>
   </context>
   <context>

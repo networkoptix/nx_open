@@ -1042,6 +1042,21 @@
   <context>
     <name>IntegrationHeader</name>
     <message>
+      <source>Insufficient services</source>
+      <translation>不十分なサービス</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n suitable integration services are required to turn on the integration</source>
+      <comment>Required integration count</comment>
+      <translation>
+        <numerusform>このインテグレーションを有効にするには、%n 個の適切なインテグレーションサービスが必要です</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>0 suitable services available</source>
+      <translation>利用可能な適切なサービスがありません</translation>
+    </message>
+    <message>
       <source>OFFLINE</source>
       <translation>オフライン</translation>
     </message>
@@ -1050,36 +1065,17 @@
       <translation>再読み込み</translation>
     </message>
     <message>
+      <source>Services Required</source>
+      <translation>サービスが必要です</translation>
+    </message>
+    <message>
       <source>Refreshing...</source>
       <translation>更新中...</translation>
     </message>
     <message>
-      <source>Insufficient services</source>
-      <translation>不十分なサービス</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n suitable integration service is required to turn on the integration</source>
-      <comment>Required integration count</comment>
-      <translation>
-        <numerusform>このインテグレーションを有効にするには、%n 個の適切なインテグレーションサービスが必要です</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>There are more cameras using this integration than available
-                services. Please disable integration for some cameras or add more suitable services.
-                Otherwise, it will be done automatically on %1</source>
+      <source>There are more cameras using this integration than available services. Please disable integration for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</source>
       <comment>%1 will be substituted by a date</comment>
-      <translation>利用可能なサービス数を超えるカメラがこのインテグレーションを使用しています。
-                一部カメラのインテグレーションを無効にするか、適切なサービスを追加してください。
-                対策がとられない場合、%1 に自動的に実行されます。</translation>
-    </message>
-    <message>
-      <source>0 suitable services available</source>
-      <translation>利用可能な適切なサービスがありません</translation>
-    </message>
-    <message>
-      <source>Services Required</source>
-      <translation>サービスが必要です</translation>
+      <translation>利用可能なサービス数を超えるカメラがこのインテグレーションを使用しています。一部カメラのインテグレーションを無効にするか、適切なサービスを追加してください。対策がとられない場合、%1 に自動的に実行されます。</translation>
     </message>
   </context>
   <context>

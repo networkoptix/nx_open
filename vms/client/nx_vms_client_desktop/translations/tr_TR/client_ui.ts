@@ -1051,10 +1051,6 @@
       <translation>İptal</translation>
     </message>
     <message>
-      <source>&lt;Message&gt;</source>
-      <translation>&lt;Mesaj&gt;</translation>
-    </message>
-    <message>
       <source>Open Folder</source>
       <translation>Klasör aç</translation>
     </message>
@@ -1862,14 +1858,6 @@
     <message>
       <source>warn icon</source>
       <translation>uyar simgesi</translation>
-    </message>
-    <message>
-      <source>&lt;Warning label&gt;</source>
-      <translation>&lt;Warning label&gt;</translation>
-    </message>
-    <message>
-      <source>&lt;We recommend that you consult with support before proceeding.&gt;</source>
-      <translation>&lt;Devam etmeden önce desteğe danışmanızı öneririz.&gt;</translation>
     </message>
   </context>
   <context>
@@ -2933,10 +2921,6 @@
       <translation>Grup Ekle</translation>
     </message>
     <message>
-      <source>Ctrl+F</source>
-      <translation>Ctrl+F</translation>
-    </message>
-    <message>
       <source>Del</source>
       <translation>Sil</translation>
     </message>
@@ -2950,10 +2934,6 @@
     <message>
       <source>Add User</source>
       <translation>Kullanıcı Ekle</translation>
-    </message>
-    <message>
-      <source>Ctrl+F</source>
-      <translation>Ctrl+F</translation>
     </message>
     <message>
       <source>Del</source>

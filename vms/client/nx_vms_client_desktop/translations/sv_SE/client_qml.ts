@@ -1048,6 +1048,22 @@
   <context>
     <name>IntegrationHeader</name>
     <message>
+      <source>Insufficient services</source>
+      <translation>Otillräckliga tjänster</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n suitable integration services are required to turn on the integration</source>
+      <comment>Required integration count</comment>
+      <translation>
+        <numerusform>%n lämpliga integrationstjänster krävs för att aktivera integrationen</numerusform>
+        <numerusform>%n lämpliga integrationstjänster krävs för att aktivera integrationen</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>0 suitable services available</source>
+      <translation>0 lämpliga tjänster tillgängliga</translation>
+    </message>
+    <message>
       <source>OFFLINE</source>
       <translation>FRÅNKOPPLAD</translation>
     </message>
@@ -1056,37 +1072,17 @@
       <translation>Uppdatera</translation>
     </message>
     <message>
+      <source>Services Required</source>
+      <translation>Tjänster krävs</translation>
+    </message>
+    <message>
       <source>Refreshing...</source>
       <translation>Uppdaterar...</translation>
     </message>
     <message>
-      <source>Insufficient services</source>
-      <translation>Otillräckliga tjänster</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n suitable integration service is required to turn on the integration</source>
-      <comment>Required integration count</comment>
-      <translation>
-        <numerusform>%n lämplig integrationstjänst krävs för att aktivera integrationen</numerusform>
-        <numerusform>%n lämplig integrationstjänst krävs för att aktivera integrationen</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>There are more cameras using this integration than available
-                services. Please disable integration for some cameras or add more suitable services.
-                Otherwise, it will be done automatically on %1</source>
+      <source>There are more cameras using this integration than available services. Please disable integration for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</source>
       <comment>%1 will be substituted by a date</comment>
-      <translation>Det finns fler kameror som använder denna integration än tillgängliga
-                tjänster. Vänligen inaktivera integration för vissa kameror eller lägga till mer lämpliga tjänster.
-                Annars, det kommer att göras automatiskt på %1</translation>
-    </message>
-    <message>
-      <source>0 suitable services available</source>
-      <translation>0 lämpliga tjänster tillgängliga</translation>
-    </message>
-    <message>
-      <source>Services Required</source>
-      <translation>Tjänster krävs</translation>
+      <translation>Det finns fler kameror som använder denna integration än tillgängliga tjänster. Inaktivera integrering för vissa kameror eller lägg till lämpligare tjänster. Annars kommer det att göras automatiskt på %1</translation>
     </message>
   </context>
   <context>

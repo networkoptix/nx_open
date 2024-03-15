@@ -1042,6 +1042,21 @@
   <context>
     <name>IntegrationHeader</name>
     <message>
+      <source>Insufficient services</source>
+      <translation>Dịch vụ không đầy đủ</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n suitable integration services are required to turn on the integration</source>
+      <comment>Required integration count</comment>
+      <translation>
+        <numerusform>%n cần có các dịch vụ tích hợp phù hợp để bật tính năng tích hợp</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>0 suitable services available</source>
+      <translation>0 dịch vụ phù hợp có sẵn</translation>
+    </message>
+    <message>
       <source>OFFLINE</source>
       <translation>OFFLINE</translation>
     </message>
@@ -1050,36 +1065,17 @@
       <translation>Làm mới</translation>
     </message>
     <message>
+      <source>Services Required</source>
+      <translation>Dịch vụ yêu cầu</translation>
+    </message>
+    <message>
       <source>Refreshing...</source>
       <translation>Đang làm mới...</translation>
     </message>
     <message>
-      <source>Insufficient services</source>
-      <translation>Dịch vụ không đầy đủ</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n suitable integration service is required to turn on the integration</source>
-      <comment>Required integration count</comment>
-      <translation>
-        <numerusform>%n dịch vụ tích hợp phù hợp là cần thiết để bật tích hợp</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>There are more cameras using this integration than available
-                services. Please disable integration for some cameras or add more suitable services.
-                Otherwise, it will be done automatically on %1</source>
+      <source>There are more cameras using this integration than available services. Please disable integration for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</source>
       <comment>%1 will be substituted by a date</comment>
-      <translation>Có nhiều camera sử dụng tích hợp này hơn
-                dịch vụ hiện có. Vui lòng tắt tích hợp cho một số camera hoặc thêm các dịch vụ phù hợp hơn.
-                Nếu không, nó sẽ được thực hiện tự động vào %1</translation>
-    </message>
-    <message>
-      <source>0 suitable services available</source>
-      <translation>0 dịch vụ phù hợp có sẵn</translation>
-    </message>
-    <message>
-      <source>Services Required</source>
-      <translation>Dịch vụ yêu cầu</translation>
+      <translation>Có nhiều camera sử dụng tích hợp này hơn các dịch vụ hiện có. Vui lòng tắt tích hợp cho một số camera hoặc thêm các dịch vụ phù hợp hơn. Nếu không, sẽ được thực hiện tự động tại %1</translation>
     </message>
   </context>
   <context>

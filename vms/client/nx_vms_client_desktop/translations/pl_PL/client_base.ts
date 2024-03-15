@@ -4588,24 +4588,57 @@ Klucz licencyjny: %2</translation>
   <context>
     <name>QnRequiredAccessRightPolicy</name>
     <message>
-      <source>%1 group does not have %2 permission for some of selected cameras</source>
-      <comment>%1 is the name of selected user group, %2 is permission name</comment>
-      <translation>Grupa %1 nie ma uprawnień %2 do niektórych wybranych kamer</translation>
-    </message>
-    <message>
-      <source>%1 groups and %2 users do not have %3 permission for some of selected cameras</source>
-      <comment>%1 is number of selected user groups, %2 is number of users, %3 is permission name</comment>
-      <translation>Grupy %1 i %2 użytkowników nie mają %3 uprawnień do niektórych wybranych kamer</translation>
-    </message>
-    <message>
       <source>%1 user does not have %2 permission for some of selected cameras</source>
       <comment>%1 is the name of the selected user, %2 is the permission name</comment>
       <translation>Użytkownik %1 nie ma %2 uprawnień do niektórych wybranych kamer</translation>
     </message>
+    <message numerus="yes">
+      <source>%n groups</source>
+      <translation type="unfinished">
+        <numerusform>%n groups</numerusform>
+        <numerusform>%n groups</numerusform>
+        <numerusform>%n groups</numerusform>
+        <numerusform>%n groups</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n users</source>
+      <translation type="unfinished">
+        <numerusform>%n users</numerusform>
+        <numerusform>%n users</numerusform>
+        <numerusform>%n users</numerusform>
+        <numerusform>%n users</numerusform>
+      </translation>
+    </message>
     <message>
-      <source>%1 users do not have %2 permission for some of selected cameras</source>
-      <comment>%1 is number of selected users, %2 is permission name</comment>
-      <translation>%1 użytkowników nie ma %2 uprawnień dla niektórych wybranych kamer</translation>
+      <source>%1 and %2 do not have %3 permission for some of selected cameras</source>
+      <comment>%1 and %2 are the numbers of user groups and users in a correct numeric form (e.g. &apos;2 groups and 1 user&apos;), %3 is the permission name</comment>
+      <translation type="unfinished">%1 and %2 do not have %3 permission for some of selected cameras</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n groups do not have %1 permission for some of selected cameras</source>
+      <comment>%1 is the permission name</comment>
+      <translation type="unfinished">
+        <numerusform>%n groups do not have %1 permission for some of selected cameras</numerusform>
+        <numerusform>%n groups do not have %1 permission for some of selected cameras</numerusform>
+        <numerusform>%n groups do not have %1 permission for some of selected cameras</numerusform>
+        <numerusform>%n groups do not have %1 permission for some of selected cameras</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>%1 group does not have %2 permission for some of selected cameras</source>
+      <comment>%1 is the name of selected user group, %2 is the permission name</comment>
+      <translation type="unfinished">%1 group does not have %2 permission for some of selected cameras</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n users do not have %1 permission for some of selected cameras</source>
+      <comment>%1 is the permission name</comment>
+      <translation type="unfinished">
+        <numerusform>%n users do not have %1 permission for some of selected cameras</numerusform>
+        <numerusform>%n users do not have %1 permission for some of selected cameras</numerusform>
+        <numerusform>%n users do not have %1 permission for some of selected cameras</numerusform>
+        <numerusform>%n users do not have %1 permission for some of selected cameras</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -7628,10 +7661,6 @@ Zalecamy nie otwierać tej integracji. Jeśli rozumiesz ryzyko, możesz otworzy�
       <translation>Ustawienia kopii zapasowej są niedostępne</translation>
     </message>
     <message>
-      <source>– Applies to all servers</source>
-      <translation type="unfinished">– Applies to all servers</translation>
-    </message>
-    <message>
       <source>System shut down</source>
       <translation>Zamknięcie systemu</translation>
     </message>
@@ -7642,6 +7671,10 @@ Zalecamy nie otwierać tej integracji. Jeśli rozumiesz ryzyko, możesz otworzy�
     <message>
       <source>System suspended. To make changes to backup configuration, the System should be in active state. %1</source>
       <translation type="unfinished">System suspended. To make changes to backup configuration, the System should be in active state. %1</translation>
+    </message>
+    <message>
+      <source>Applies to all servers</source>
+      <translation type="unfinished">Applies to all servers</translation>
     </message>
   </context>
   <context>
@@ -7910,10 +7943,6 @@ Zalecamy nie otwierać tej integracji. Jeśli rozumiesz ryzyko, możesz otworzy�
     <message>
       <source>Delete</source>
       <translation>Usuń</translation>
-    </message>
-    <message>
-      <source>#</source>
-      <translation type="unfinished">#</translation>
     </message>
     <message>
       <source>Camera</source>
@@ -12657,10 +12686,6 @@ Nie przypinaj tego certyfikatu, jeśli nie zmodyfikowałeś %2 certyfikatu SSL s
       <source>%1 Version is available</source>
       <translation type="unfinished">%1 Version is available</translation>
     </message>
-    <message>
-      <source>%1</source>
-      <translation>%1</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::backup_settings_view::BackupSettingsViewStrings</name>
@@ -13139,10 +13164,6 @@ Nie przypinaj tego certyfikatu, jeśli nie zmodyfikowałeś %2 certyfikatu SSL s
       </translation>
     </message>
     <message>
-      <source>All Server</source>
-      <translation type="unfinished">All Server</translation>
-    </message>
-    <message>
       <source>Source Server and %1</source>
       <translation>Serwer źródłowy i %1</translation>
     </message>
@@ -13226,16 +13247,16 @@ Nie przypinaj tego certyfikatu, jeśli nie zmodyfikowałeś %2 certyfikatu SSL s
   <context>
     <name>nx::vms::client::desktop::rules::VmsRulesDialog</name>
     <message>
-      <source>Delete rule error: </source>
-      <translation type="unfinished">Delete rule error: </translation>
+      <source>Delete rule error:</source>
+      <translation type="unfinished">Delete rule error:</translation>
     </message>
     <message>
-      <source>Save rule error: </source>
-      <translation type="unfinished">Save rule error: </translation>
+      <source>Save rule error:</source>
+      <translation type="unfinished">Save rule error:</translation>
     </message>
     <message>
-      <source>Reset to defaults error: </source>
-      <translation type="unfinished">Reset to defaults error: </translation>
+      <source>Reset to defaults error:</source>
+      <translation type="unfinished">Reset to defaults error:</translation>
     </message>
   </context>
   <context>
