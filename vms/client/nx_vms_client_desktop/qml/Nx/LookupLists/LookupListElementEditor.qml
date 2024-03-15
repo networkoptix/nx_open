@@ -19,11 +19,20 @@ Control
     required property Analytics.Attribute attribute
 
     property bool isGeneric: !objectType
+    // Displayed value. For complex types (enum, color, bool) could differ from entry value.
+    // For number and text the value is the same as entry value.
+    // If you want to check whether current control value is not defined ("Any ..."),
+    // use the corresponding `isDefinedValue()` function
     property string value
     property bool editing: false
 
     signal editingStarted
     signal editingFinished
+
+    function isDefinedValue()
+    {
+        return loader.item.isDefinedValue()
+    }
 
     function startEditing()
     {
@@ -40,19 +49,36 @@ Control
 
     component ComboBoxBasedEditor: ComboBox
     {
+        function isIndexRelatedToValue(index)
+        {
+            return index > 0
+        }
+
+        function isDefinedValue()
+        {
+            return isIndexRelatedToValue(currentIndex)
+        }
+
+        function initCurrentIndex()
+        {
+            const index = indexOfValue(control.value)
+            if (index !== -1)
+                currentIndex = index
+        }
+
         Connections
         {
             target: control
-            function onValueChanged() { currentIndex = indexOfValue(control.value) }
+            function onValueChanged() { initCurrentIndex() }
         }
 
         onActivated: (index) =>
         {
-            control.value = index ? valueAt(index) : qsTr("Any %1").arg(attribute.name)
+            control.value = isIndexRelatedToValue(index) ? valueAt(index) : qsTr("Any %1").arg(attribute.name)
             control.finishEditing()
         }
 
-        Component.onCompleted: currentIndex = indexOfValue(control.value)
+        Component.onCompleted: initCurrentIndex()
 
         onActiveFocusChanged:
         {
@@ -67,6 +93,14 @@ Control
 
         TextField
         {
+            function isDefinedValue()
+            {
+                // Considered defined if value is not null and not empty string.
+                return control.value
+            }
+
+            placeholderText: control.value ? control.value : qsTr("Any %1").arg(attribute.name)
+
             Connections
             {
                 target: control
@@ -90,6 +124,13 @@ Control
 
         NumberInput
         {
+            function isDefinedValue()
+            {
+                // Considered defined if value is not null and not empty string.
+                return control.value
+            }
+
+            placeholderText: control.value ? control.value : qsTr("Any %1").arg(attribute.name)
             minimum: attribute.minValue
             maximum: attribute.maxValue
 
@@ -103,7 +144,12 @@ Control
                 function onValueChanged() { setValue(control.value) }
             }
 
-            onValueChanged: control.value = value || ""
+            onValueChanged:
+            {
+                // Have to check explicitly on undefined, since 0 is a valid value.
+                control.value = value === undefined ? "" : value
+            }
+
             onEditingFinished:
             {
                 if (!contextMenuOpening)

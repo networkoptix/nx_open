@@ -75,9 +75,7 @@ ModalDialog
 
                         onValueChanged:
                         {
-                            // Value is a string or undefined, empty string is considered invalid.
-                            // Also there is a separate check for zero numeric values.
-                            if (value || value === 0)
+                            if (isDefinedValue())
                                 entry[modelData] = value
                             else
                                 delete entry[modelData]
