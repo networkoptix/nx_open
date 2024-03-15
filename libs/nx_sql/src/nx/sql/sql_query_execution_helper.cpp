@@ -62,7 +62,10 @@ bool SqlQueryExecutionHelper::execSQLQuery(QSqlQuery* query, const char* details
 {
     NX_ASSERT_HEAVY_CONDITION(validateParams(*query), "Failure SQL in %2: %3", details, query->lastQuery());
     if (query->exec())
+    {
+        NX_VERBOSE(NX_SCOPE_TAG, "%1 executed SQL query:\n%2", details, query->lastQuery());
         return true;
+    }
 
     auto error = query->lastError();
     // Assert only on statement error type as other errors are not our code responsibility.
