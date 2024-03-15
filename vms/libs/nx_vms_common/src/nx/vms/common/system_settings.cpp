@@ -559,6 +559,10 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         this,
         [] { return tr("Authorization Session token lifetime (seconds)"); });
 
+    m_useSessionTimeoutLimitForCloudAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
+        Names::useSessionLimitForCloud, false, this,
+        [] { return tr("Apply session limit for Cloud tokens"); });
+
     m_sessionsLimitAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
         Names::sessionsLimit, 10'0000, [](const int& value) { return value >= 0; }, this,
         [] { return tr("Session token count limit on a single Server"); });
@@ -881,6 +885,13 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         Qt::QueuedConnection);
 
     connect(
+        m_useSessionTimeoutLimitForCloudAdaptor,
+        &QnAbstractResourcePropertyAdaptor::valueChanged,
+        this,
+        &SystemSettings::sessionTimeoutChanged,
+        Qt::QueuedConnection);
+
+    connect(
         m_sessionsLimitAdaptor,
         &QnAbstractResourcePropertyAdaptor::valueChanged,
         this,
@@ -1069,6 +1080,7 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         << m_maxVirtualCameraArchiveSynchronizationThreads
         << m_watermarkSettingsAdaptor
         << m_sessionTimeoutLimitSecondsAdaptor
+        << m_useSessionTimeoutLimitForCloudAdaptor
         << m_sessionsLimitAdaptor
         << m_sessionsLimitPerUserAdaptor
         << m_remoteSessionUpdateAdaptor
@@ -1890,6 +1902,16 @@ void SystemSettings::setSessionTimeoutLimit(std::optional<std::chrono::seconds> 
     m_sessionTimeoutLimitSecondsAdaptor->setValue(seconds);
 }
 
+bool SystemSettings::useSessionTimeoutLimitForCloud() const
+{
+    return m_useSessionTimeoutLimitForCloudAdaptor->value();
+}
+
+void SystemSettings::setUseSessionTimeoutLimitForCloud(bool value)
+{
+    m_useSessionTimeoutLimitForCloudAdaptor->setValue(value);
+}
+
 int SystemSettings::sessionsLimit() const
 {
     return m_sessionsLimitAdaptor->value();
@@ -2261,6 +2283,7 @@ void SystemSettings::update(const vms::api::SystemSettings& value)
     m_useHttpsOnlyForCamerasAdaptor->setValue(value.useHttpsOnlyForCameras);
     m_videoTrafficEncryptionForcedAdaptor->setValue(value.videoTrafficEncryptionForced);
     m_sessionTimeoutLimitSecondsAdaptor->setValue(value.sessionLimitS.value_or(0s).count());
+    m_useSessionTimeoutLimitForCloudAdaptor->setValue(value.useSessionLimitForCloud);
     m_useStorageEncryptionAdaptor->setValue(value.storageEncryption);
     m_showServersInTreeForNonAdminsAdaptor->setValue(value.showServersInTreeForNonAdmins);
     m_updateNotificationsEnabledAdaptor->setValue(value.updateNotificationsEnabled);

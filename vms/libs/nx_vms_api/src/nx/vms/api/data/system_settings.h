@@ -38,6 +38,7 @@ struct SystemSettings
     bool videoTrafficEncryptionForced = false;
     std::optional<std::chrono::seconds> sessionLimitS =
         std::optional<std::chrono::seconds>(30 * 24 * 60 * 60);
+    bool useSessionLimitForCloud = false;
     bool storageEncryption = false;
     bool showServersInTreeForNonAdmins = true;
 

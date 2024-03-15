@@ -33,6 +33,7 @@ UnauthorizedException::UnauthorizedException(AuthResult authResult, QString mess
                 case AuthResult::Auth_InvalidCsrfToken: return Result::InvalidParameter;
                 case AuthResult::Auth_LockedOut: return Result::ServiceUnavailable;
                 case AuthResult::Auth_WrongSessionToken: return Result::InvalidParameter;
+                case AuthResult::Auth_TruncatedSessionToken: return Result::SessionTruncated;
                 case AuthResult::Auth_WrongTicketToken: return Result::InvalidParameter;
                 case AuthResult::Auth_DisabledBasicAndDigest: return Result::Forbidden;
                 case AuthResult::Auth_ClashedLogin: return Result::Forbidden;

@@ -67,6 +67,7 @@ struct SystemSettingNames
     DECLARE_SETTING_NAME(resourceFileUri);
     DECLARE_SETTING_NAME(securityForPowerUsers);
     DECLARE_SETTING_NAME(sessionLimitS);
+    DECLARE_SETTING_NAME(useSessionLimitForCloud);
     DECLARE_SETTING_NAME(sessionsLimit);
     DECLARE_SETTING_NAME(sessionsLimitPerUser);
     DECLARE_SETTING_NAME(smtpPassword);
@@ -112,6 +113,7 @@ struct SystemSettingNames
         resourceFileUri,
         securityForPowerUsers,
         sessionLimitS,
+        useSessionLimitForCloud,
         sessionsLimit,
         sessionsLimitPerUser,
         trafficEncryptionForced,
@@ -417,6 +419,9 @@ public:
     std::optional<std::chrono::seconds> sessionTimeoutLimit() const;
     void setSessionTimeoutLimit(std::optional<std::chrono::seconds> value);
 
+    bool useSessionTimeoutLimitForCloud() const;
+    void setUseSessionTimeoutLimitForCloud(bool value);
+
     int sessionsLimit() const;
     void setSessionsLimit(int value);
 
@@ -670,6 +675,7 @@ private:
     QnResourcePropertyAdaptor<nx::vms::api::WatermarkSettings>* m_watermarkSettingsAdaptor = nullptr;
 
     QnResourcePropertyAdaptor<int>* m_sessionTimeoutLimitSecondsAdaptor = nullptr;
+    QnResourcePropertyAdaptor<bool>* m_useSessionTimeoutLimitForCloudAdaptor = nullptr;
     QnResourcePropertyAdaptor<int>* m_sessionsLimitAdaptor = nullptr;
     QnResourcePropertyAdaptor<int>* m_sessionsLimitPerUserAdaptor = nullptr;
     QnResourcePropertyAdaptor<int>* m_remoteSessionUpdateAdaptor = nullptr;
