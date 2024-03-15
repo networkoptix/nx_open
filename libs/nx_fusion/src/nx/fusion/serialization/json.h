@@ -438,7 +438,6 @@ private:
 template<class T>
 T deserializeOrThrow(QnJsonContext* ctx, const QJsonValue& value)
 {
-    NX_ASSERT(ctx->isStrictMode());
     T result;
     if (QJson::deserialize(ctx, value, &result))
         return result;

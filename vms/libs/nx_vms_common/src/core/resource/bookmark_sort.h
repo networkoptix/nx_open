@@ -83,7 +83,7 @@ typename detail::ValueExtractor<typename BookmarksContainer::value_type>::value_
 
     // We cut front body part since we want to save more bookmarks around the reference point.
     const int sideLimit = limit.value_or(std::numeric_limits<int>::max()) / 2;
-    if (body.size() > sideLimit)
+    if ((int) body.size() > sideLimit)
         body.erase(body.begin(), body.begin() + (body.size() - sideLimit));
 
     BookmarkList tail = nx::utils::algorithm::merge_sorted_lists(
