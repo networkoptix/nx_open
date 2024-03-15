@@ -1346,19 +1346,19 @@
     </message>
     <message>
       <source>Anonymous statistics report delay after update</source>
-      <translation type="unfinished">Anonymous statistics report delay after update</translation>
+      <translation>更新後匿名統計報告延遲</translation>
     </message>
     <message>
       <source>Anonymous Statistics Report Server URL</source>
-      <translation type="unfinished">Anonymous Statistics Report Server URL</translation>
+      <translation>匿名統計報告伺服器 URL</translation>
     </message>
     <message>
       <source>Anonymous statistics report Client settings</source>
-      <translation type="unfinished">Anonymous statistics report Client settings</translation>
+      <translation>匿名統計報告用戶端設定</translation>
     </message>
     <message>
       <source>System alive update interval (seconds, 1s-1h)</source>
-      <translation type="unfinished">System alive update interval (seconds, 1s-1h)</translation>
+      <translation>系統活動更新間隔（秒，1s-1h）</translation>
     </message>
     <message>
       <source>Proxy connection timeout (seconds, 1s-1h)</source>
@@ -1370,7 +1370,7 @@
     </message>
     <message>
       <source>Primary time synchronization Server ID</source>
-      <translation type="unfinished">Primary time synchronization Server ID</translation>
+      <translation>主要時間同步伺服器ID</translation>
     </message>
     <message>
       <source>Max difference between local and source time (milliseconds)</source>
@@ -1418,7 +1418,7 @@
     </message>
     <message>
       <source>Disable Device vendors</source>
-      <translation type="unfinished">Disable Device vendors</translation>
+      <translation>停用設備供應商</translation>
     </message>
     <message>
       <source>Optimize Camera settings</source>
@@ -1426,7 +1426,7 @@
     </message>
     <message>
       <source>Thumbnails auto-update</source>
-      <translation type="unfinished">Thumbnails auto-update</translation>
+      <translation>縮圖自動更新</translation>
     </message>
     <message>
       <source>Max scene items (0 means default)</source>
@@ -1446,7 +1446,7 @@
     </message>
     <message>
       <source>Audit trail period (days, 14-730)</source>
-      <translation type="unfinished">Audit trail period (days, 14-730)</translation>
+      <translation>使用者行為記錄天數 (天，14-730)</translation>
     </message>
     <message>
       <source>Event log period (days)</source>
