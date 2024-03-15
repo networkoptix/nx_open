@@ -4484,24 +4484,49 @@ License Key: %2</source>
 <context>
     <name>QnRequiredAccessRightPolicy</name>
     <message>
-        <source>%1 group does not have %2 permission for some of selected cameras</source>
-        <comment>%1 is the name of selected user group, %2 is permission name</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>%1 groups and %2 users do not have %3 permission for some of selected cameras</source>
-        <comment>%1 is number of selected user groups, %2 is number of users, %3 is permission name</comment>
-        <translation></translation>
-    </message>
-    <message>
         <source>%1 user does not have %2 permission for some of selected cameras</source>
         <comment>%1 is the name of the selected user, %2 is the permission name</comment>
         <translation></translation>
     </message>
+    <message numerus="yes">
+        <source>%n groups</source>
+        <translation>
+            <numerusform>%n group</numerusform>
+            <numerusform>%n groups</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n users</source>
+        <translation>
+            <numerusform>%n user</numerusform>
+            <numerusform>%n users</numerusform>
+        </translation>
+    </message>
     <message>
-        <source>%1 users do not have %2 permission for some of selected cameras</source>
-        <comment>%1 is number of selected users, %2 is permission name</comment>
+        <source>%1 and %2 do not have %3 permission for some of selected cameras</source>
+        <comment>%1 and %2 are the numbers of user groups and users in a correct numeric form (e.g. &apos;2 groups and 1 user&apos;), %3 is the permission name</comment>
         <translation></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n groups do not have %1 permission for some of selected cameras</source>
+        <comment>%1 is the permission name</comment>
+        <translation>
+            <numerusform>%n group does not have %1 permission for some of selected cameras</numerusform>
+            <numerusform>%n groups do not have %1 permission for some of selected cameras</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>%1 group does not have %2 permission for some of selected cameras</source>
+        <comment>%1 is the name of selected user group, %2 is the permission name</comment>
+        <translation></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n users do not have %1 permission for some of selected cameras</source>
+        <comment>%1 is the permission name</comment>
+        <translation>
+            <numerusform>%n user does not have %1 permission for some of selected cameras</numerusform>
+            <numerusform>%n users do not have %1 permission for some of selected cameras</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -12677,6 +12702,14 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
         <source>Resource is not available for the usage with JS API</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Resource not found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Parameter not found</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::jsapi::detail::TabApiBackend</name>
@@ -12866,6 +12899,10 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
         <source>Add Title or Comment</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Incompatible event-action pair is choosen. Prolonged action without duration incompatible with the instant event</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -13106,15 +13143,15 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <name>nx::vms::client::desktop::rules::VmsRulesDialog</name>
     <message>
         <source>Delete rule error:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Save rule error:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Reset to defaults error:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -13133,6 +13170,14 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
         <source>Used</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Number of devices using this service exceeds the available service quantity.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Please disable it for some devices or add more suitable services. Otherwise it will be done automatically on %1</source>
         <translation></translation>
     </message>
 </context>
