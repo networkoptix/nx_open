@@ -1060,6 +1060,24 @@
   <context>
     <name>IntegrationHeader</name>
     <message>
+      <source>Insufficient services</source>
+      <translation type="unfinished">Insufficient services</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n suitable integration services are required to turn on the integration</source>
+      <comment>Required integration count</comment>
+      <translation type="unfinished">
+        <numerusform>%n suitable integration services are required to turn on the integration</numerusform>
+        <numerusform>%n suitable integration services are required to turn on the integration</numerusform>
+        <numerusform>%n suitable integration services are required to turn on the integration</numerusform>
+        <numerusform>%n suitable integration services are required to turn on the integration</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>0 suitable services available</source>
+      <translation type="unfinished">0 suitable services available</translation>
+    </message>
+    <message>
       <source>OFFLINE</source>
       <translation>OFFLINE</translation>
     </message>
@@ -1068,39 +1086,17 @@
       <translation>Odśwież</translation>
     </message>
     <message>
+      <source>Services Required</source>
+      <translation type="unfinished">Services Required</translation>
+    </message>
+    <message>
       <source>Refreshing...</source>
       <translation>Odświeżanie...</translation>
     </message>
     <message>
-      <source>Insufficient services</source>
-      <translation type="unfinished">Insufficient services</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n suitable integration service is required to turn on the integration</source>
-      <comment>Required integration count</comment>
-      <translation type="unfinished">
-        <numerusform>%n suitable integration service is required to turn on the integration</numerusform>
-        <numerusform>%n suitable integration service is required to turn on the integration</numerusform>
-        <numerusform>%n suitable integration service is required to turn on the integration</numerusform>
-        <numerusform>%n suitable integration service is required to turn on the integration</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>There are more cameras using this integration than available
-                services. Please disable integration for some cameras or add more suitable services.
-                Otherwise, it will be done automatically on %1</source>
+      <source>There are more cameras using this integration than available services. Please disable integration for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</source>
       <comment>%1 will be substituted by a date</comment>
-      <translation type="unfinished">There are more cameras using this integration than available
-                services. Please disable integration for some cameras or add more suitable services.
-                Otherwise, it will be done automatically on %1</translation>
-    </message>
-    <message>
-      <source>0 suitable services available</source>
-      <translation type="unfinished">0 suitable services available</translation>
-    </message>
-    <message>
-      <source>Services Required</source>
-      <translation type="unfinished">Services Required</translation>
+      <translation type="unfinished">There are more cameras using this integration than available services. Please disable integration for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</translation>
     </message>
   </context>
   <context>

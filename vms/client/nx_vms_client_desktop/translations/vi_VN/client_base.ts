@@ -4420,24 +4420,45 @@ Khóa giấy phép: %2</translation>
   <context>
     <name>QnRequiredAccessRightPolicy</name>
     <message>
-      <source>%1 group does not have %2 permission for some of selected cameras</source>
-      <comment>%1 is the name of selected user group, %2 is permission name</comment>
-      <translation>Nhóm %1 không có quyền %2 đối với một số camera đã chọn</translation>
-    </message>
-    <message>
-      <source>%1 groups and %2 users do not have %3 permission for some of selected cameras</source>
-      <comment>%1 is number of selected user groups, %2 is number of users, %3 is permission name</comment>
-      <translation>Nhóm %1 và %2 người dùng không có quyền %3 đối với một số camera đã chọn</translation>
-    </message>
-    <message>
       <source>%1 user does not have %2 permission for some of selected cameras</source>
       <comment>%1 is the name of the selected user, %2 is the permission name</comment>
       <translation>Người dùng %1 không có quyền %2 đối với một số camera đã chọn</translation>
     </message>
+    <message numerus="yes">
+      <source>%n groups</source>
+      <translation>
+        <numerusform>%n nhóm</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n users</source>
+      <translation>
+        <numerusform>%n người dùng</numerusform>
+      </translation>
+    </message>
     <message>
-      <source>%1 users do not have %2 permission for some of selected cameras</source>
-      <comment>%1 is number of selected users, %2 is permission name</comment>
-      <translation>Người dùng %1 không có quyền %2 đối với một số camera đã chọn</translation>
+      <source>%1 and %2 do not have %3 permission for some of selected cameras</source>
+      <comment>%1 and %2 are the numbers of user groups and users in a correct numeric form (e.g. &apos;2 groups and 1 user&apos;), %3 is the permission name</comment>
+      <translation>%1 và %2 không có quyền %3 đối với một số camera được chọn</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n groups do not have %1 permission for some of selected cameras</source>
+      <comment>%1 is the permission name</comment>
+      <translation>
+        <numerusform>%n các nhóm không có quyền %1 đối với một số camera đã chọn</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>%1 group does not have %2 permission for some of selected cameras</source>
+      <comment>%1 is the name of selected user group, %2 is the permission name</comment>
+      <translation>%1 nhóm không có quyền %2 đối với một số camera đã chọn</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n users do not have %1 permission for some of selected cameras</source>
+      <comment>%1 is the permission name</comment>
+      <translation>
+        <numerusform>Người dùng %n không có quyền %1 đối với một số camera đã chọn</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -7270,10 +7291,6 @@ Chúng tôi khuyên bạn không nên mở tích hợp này. Nếu bạn hiểu 
       <translation>Cài đặt sao lưu không có sẵn</translation>
     </message>
     <message>
-      <source>– Applies to all servers</source>
-      <translation>– Áp dụng cho tất cả các máy chủ</translation>
-    </message>
-    <message>
       <source>System shut down</source>
       <translation>Hệ thống tắt</translation>
     </message>
@@ -7284,6 +7301,10 @@ Chúng tôi khuyên bạn không nên mở tích hợp này. Nếu bạn hiểu 
     <message>
       <source>System suspended. To make changes to backup configuration, the System should be in active state. %1</source>
       <translation>Hệ thống bị đình chỉ. Để thực hiện các thay đổi đối với cấu hình sao lưu, Hệ thống phải ở trạng thái hoạt động. %1</translation>
+    </message>
+    <message>
+      <source>Applies to all servers</source>
+      <translation>Áp dụng cho tất cả các máy chủ</translation>
     </message>
   </context>
   <context>
@@ -7540,10 +7561,6 @@ Chúng tôi khuyên bạn không nên mở tích hợp này. Nếu bạn hiểu 
     <message>
       <source>Delete</source>
       <translation>Xóa bỏ</translation>
-    </message>
-    <message>
-      <source>#</source>
-      <translation>#</translation>
     </message>
     <message>
       <source>Camera</source>
@@ -12129,10 +12146,6 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
       <source>%1 Version is available</source>
       <translation>Phiên bản %1 có sẵn</translation>
     </message>
-    <message>
-      <source>%1</source>
-      <translation>%1</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::backup_settings_view::BackupSettingsViewStrings</name>
@@ -12596,10 +12609,6 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
       </translation>
     </message>
     <message>
-      <source>All Server</source>
-      <translation>Tất cả Máy chủ</translation>
-    </message>
-    <message>
       <source>Source Server and %1</source>
       <translation>Máy chủ nguồn và %1</translation>
     </message>
@@ -12680,16 +12689,16 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
   <context>
     <name>nx::vms::client::desktop::rules::VmsRulesDialog</name>
     <message>
-      <source>Delete rule error: </source>
-      <translation>Xóa lỗi quy tắc: </translation>
+      <source>Delete rule error:</source>
+      <translation>Xóa lỗi quy tắc:</translation>
     </message>
     <message>
-      <source>Save rule error: </source>
-      <translation>Lưu lỗi quy tắc: </translation>
+      <source>Save rule error:</source>
+      <translation>Lưu lỗi quy tắc:</translation>
     </message>
     <message>
-      <source>Reset to defaults error: </source>
-      <translation>Lỗi đặt lại về mặc định: </translation>
+      <source>Reset to defaults error:</source>
+      <translation>Lỗi đặt lại về mặc định:</translation>
     </message>
   </context>
   <context>

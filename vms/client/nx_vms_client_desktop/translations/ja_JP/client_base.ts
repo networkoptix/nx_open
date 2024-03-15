@@ -4420,24 +4420,45 @@ License Key: %2</source>
   <context>
     <name>QnRequiredAccessRightPolicy</name>
     <message>
-      <source>%1 group does not have %2 permission for some of selected cameras</source>
-      <comment>%1 is the name of selected user group, %2 is permission name</comment>
-      <translation>%1 グループには、選択したカメラの一部に対する %2 権限がありません</translation>
-    </message>
-    <message>
-      <source>%1 groups and %2 users do not have %3 permission for some of selected cameras</source>
-      <comment>%1 is number of selected user groups, %2 is number of users, %3 is permission name</comment>
-      <translation>%1 グループおよび %2 ユーザーには、選択したカメラの一部に対する %3 権限がありません</translation>
-    </message>
-    <message>
       <source>%1 user does not have %2 permission for some of selected cameras</source>
       <comment>%1 is the name of the selected user, %2 is the permission name</comment>
       <translation>%1 ユーザーには、選択したカメラの一部に対する %2 権限がありません</translation>
     </message>
+    <message numerus="yes">
+      <source>%n groups</source>
+      <translation>
+        <numerusform>%n グループ</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n users</source>
+      <translation>
+        <numerusform>%n ユーザー</numerusform>
+      </translation>
+    </message>
     <message>
-      <source>%1 users do not have %2 permission for some of selected cameras</source>
-      <comment>%1 is number of selected users, %2 is permission name</comment>
-      <translation>%1 ユーザーには、選択したカメラの一部に対する %2 権限がありません</translation>
+      <source>%1 and %2 do not have %3 permission for some of selected cameras</source>
+      <comment>%1 and %2 are the numbers of user groups and users in a correct numeric form (e.g. &apos;2 groups and 1 user&apos;), %3 is the permission name</comment>
+      <translation>%1 と %2 には、選択したカメラの一部に対する %3 権限がありません</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n groups do not have %1 permission for some of selected cameras</source>
+      <comment>%1 is the permission name</comment>
+      <translation>
+        <numerusform>%n グループには、選択したカメラの一部に対する %1 権限がありません</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>%1 group does not have %2 permission for some of selected cameras</source>
+      <comment>%1 is the name of selected user group, %2 is the permission name</comment>
+      <translation>%1 グループには、選択したカメラの一部に対する %2 権限がありません</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n users do not have %1 permission for some of selected cameras</source>
+      <comment>%1 is the permission name</comment>
+      <translation>
+        <numerusform>%n ユーザーには、選択したカメラの一部に対する %1 権限がありません</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -7269,10 +7290,6 @@ We recommend you not to open this integration. If you understand the risks, you 
       <translation>バックアップ設定は利用できません</translation>
     </message>
     <message>
-      <source>– Applies to all servers</source>
-      <translation>– すべてのサーバーに適用されます</translation>
-    </message>
-    <message>
       <source>System shut down</source>
       <translation>システムがシャットダウンしました</translation>
     </message>
@@ -7283,6 +7300,10 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message>
       <source>System suspended. To make changes to backup configuration, the System should be in active state. %1</source>
       <translation>システムがサスペンドされました。バックアップ設定を変更するには、システムがアクティブな状態である必要があります。 %1</translation>
+    </message>
+    <message>
+      <source>Applies to all servers</source>
+      <translation>すべてのサーバーに適用されます</translation>
     </message>
   </context>
   <context>
@@ -7539,10 +7560,6 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message>
       <source>Delete</source>
       <translation>削除</translation>
-    </message>
-    <message>
-      <source>#</source>
-      <translation>#</translation>
     </message>
     <message>
       <source>Camera</source>
@@ -12129,10 +12146,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
       <source>%1 Version is available</source>
       <translation>%1 バージョンが利用可能</translation>
     </message>
-    <message>
-      <source>%1</source>
-      <translation>%1</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::backup_settings_view::BackupSettingsViewStrings</name>
@@ -12596,10 +12609,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
       </translation>
     </message>
     <message>
-      <source>All Server</source>
-      <translation>すべてのサーバー</translation>
-    </message>
-    <message>
       <source>Source Server and %1</source>
       <translation>ソースサーバーと %1</translation>
     </message>
@@ -12680,16 +12689,16 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
   <context>
     <name>nx::vms::client::desktop::rules::VmsRulesDialog</name>
     <message>
-      <source>Delete rule error: </source>
-      <translation>ルール削除時エラー: </translation>
+      <source>Delete rule error:</source>
+      <translation>ルール削除時エラー:</translation>
     </message>
     <message>
-      <source>Save rule error: </source>
-      <translation>ルール保存時エラー: </translation>
+      <source>Save rule error:</source>
+      <translation>ルール保存時エラー:</translation>
     </message>
     <message>
-      <source>Reset to defaults error: </source>
-      <translation>デフォルトへのリセット時のエラー: </translation>
+      <source>Reset to defaults error:</source>
+      <translation>デフォルトへのリセット時のエラー:</translation>
     </message>
   </context>
   <context>

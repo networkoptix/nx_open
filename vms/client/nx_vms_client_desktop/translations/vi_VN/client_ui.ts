@@ -1051,10 +1051,6 @@
       <translation>Hủy bỏ</translation>
     </message>
     <message>
-      <source>&lt;Message&gt;</source>
-      <translation>&lt;Message&gt;</translation>
-    </message>
-    <message>
       <source>Open Folder</source>
       <translation>Mở thư mục</translation>
     </message>
@@ -1862,14 +1858,6 @@
     <message>
       <source>warn icon</source>
       <translation>biểu tượng cảnh báo</translation>
-    </message>
-    <message>
-      <source>&lt;Warning label&gt;</source>
-      <translation>&lt;Warning label&gt;</translation>
-    </message>
-    <message>
-      <source>&lt;We recommend that you consult with support before proceeding.&gt;</source>
-      <translation>&lt;We recommend that you consult with support before proceeding.&gt;</translation>
     </message>
   </context>
   <context>
@@ -2933,10 +2921,6 @@
       <translation>Thêm nhóm</translation>
     </message>
     <message>
-      <source>Ctrl+F</source>
-      <translation>Ctrl+F</translation>
-    </message>
-    <message>
       <source>Del</source>
       <translation>Xóa</translation>
     </message>
@@ -2950,10 +2934,6 @@
     <message>
       <source>Add User</source>
       <translation>Thêm người dùng</translation>
-    </message>
-    <message>
-      <source>Ctrl+F</source>
-      <translation>Ctrl+F</translation>
     </message>
     <message>
       <source>Del</source>

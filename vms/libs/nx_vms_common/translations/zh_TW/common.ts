@@ -200,11 +200,6 @@
       <translation type="unfinished">Members of this group can view live videos, I/O modules and web pages.</translation>
     </message>
     <message>
-      <source>Members of this group have unlimited System privileges. Administrators can create and modify Power Users, merge Systems and connect or disconnect System to  %1.</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Members of this group have unlimited System privileges. Administrators can create and modify Power Users, merge Systems and connect or disconnect System to  %1.</translation>
-    </message>
-    <message>
       <source>Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the System configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</source>
       <translation type="unfinished">Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the System configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</translation>
     </message>
@@ -219,6 +214,11 @@
     <message>
       <source>Members of this group can view System Health Monitoring information and server processor load in real-time (Server Monitoring).</source>
       <translation type="unfinished">Members of this group can view System Health Monitoring information and server processor load in real-time (Server Monitoring).</translation>
+    </message>
+    <message>
+      <source>Members of this group have unlimited System privileges. Administrators can create and modify Power Users, merge Systems and connect or disconnect System to %1.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>該群組的成員擁有無限制的系統權限。管理員可以建立和修改進階使用者、合併系統以及將系統連接到%1或從%1斷開。</translation>
     </message>
   </context>
   <context>
@@ -1241,19 +1241,19 @@
     </message>
     <message>
       <source>Anonymous statistics report delay after update</source>
-      <translation type="unfinished">Anonymous statistics report delay after update</translation>
+      <translation>更新後匿名統計報告延遲</translation>
     </message>
     <message>
       <source>Anonymous Statistics Report Server URL</source>
-      <translation type="unfinished">Anonymous Statistics Report Server URL</translation>
+      <translation>匿名統計報告伺服器 URL</translation>
     </message>
     <message>
       <source>Anonymous statistics report Client settings</source>
-      <translation type="unfinished">Anonymous statistics report Client settings</translation>
+      <translation>匿名統計報告用戶端設定</translation>
     </message>
     <message>
       <source>System alive update interval (seconds, 1s-1h)</source>
-      <translation type="unfinished">System alive update interval (seconds, 1s-1h)</translation>
+      <translation>系統活動更新間隔（秒，1s-1h）</translation>
     </message>
     <message>
       <source>Proxy connection timeout (seconds, 1s-1h)</source>
@@ -1265,7 +1265,7 @@
     </message>
     <message>
       <source>Primary time synchronization Server ID</source>
-      <translation type="unfinished">Primary time synchronization Server ID</translation>
+      <translation>主要時間同步伺服器ID</translation>
     </message>
     <message>
       <source>Max difference between local and source time (milliseconds)</source>
@@ -1309,7 +1309,7 @@
     </message>
     <message>
       <source>Disable Device vendors</source>
-      <translation type="unfinished">Disable Device vendors</translation>
+      <translation>停用設備供應商</translation>
     </message>
     <message>
       <source>Optimize Camera settings</source>
@@ -1317,7 +1317,7 @@
     </message>
     <message>
       <source>Thumbnails auto-update</source>
-      <translation type="unfinished">Thumbnails auto-update</translation>
+      <translation>縮圖自動更新</translation>
     </message>
     <message>
       <source>Max scene items (0 means default)</source>
@@ -1337,7 +1337,7 @@
     </message>
     <message>
       <source>Audit trail period (days, 14-730)</source>
-      <translation type="unfinished">Audit trail period (days, 14-730)</translation>
+      <translation>使用者行為記錄天數 (天，14-730)</translation>
     </message>
     <message>
       <source>Event log period (days)</source>
@@ -1647,31 +1647,31 @@
       <source>just now</source>
       <translation type="unfinished">just now</translation>
     </message>
-    <message numerus="yes">
-      <source>%n minute(s) ago</source>
-      <translation type="unfinished">
-        <numerusform>%n minute(s) ago</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n hour(s) ago</source>
-      <translation type="unfinished">
-        <numerusform>%n hour(s) ago</numerusform>
-      </translation>
-    </message>
     <message>
       <source>yesterday</source>
       <translation type="unfinished">yesterday</translation>
     </message>
-    <message numerus="yes">
-      <source>%n day(s) ago</source>
-      <translation type="unfinished">
-        <numerusform>%n day(s) ago</numerusform>
-      </translation>
-    </message>
     <message>
       <source>a week ago</source>
       <translation type="unfinished">a week ago</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n minutes ago</source>
+      <translation>
+        <numerusform>%n 分鐘前</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n hours ago</source>
+      <translation>
+        <numerusform>%n 小時前</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n days ago</source>
+      <translation>
+        <numerusform>%n 天前</numerusform>
+      </translation>
     </message>
   </context>
   <context>

@@ -70,10 +70,6 @@
       <translation>Ogiltigt certifikat</translation>
     </message>
     <message>
-      <source>The server&amp;apos;s certificate was rejected.</source>
-      <translation>Servern&amp;apos;s certifikat avvisades.</translation>
-    </message>
-    <message>
       <source>Restore the connection to %1 and try again</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Återställ anslutningen till %1 och försök igen</translation>
@@ -206,6 +202,10 @@
       <source>To log in to this System, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</source>
       <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
       <translation>För att logga in på detta system, inaktivera &quot;Be om en verifieringskod vid varje inloggning med ditt %1 konto&quot; i ditt %2.</translation>
+    </message>
+    <message>
+      <source>The server&apos;s certificate was rejected.</source>
+      <translation>Serverns certifikat avvisades.</translation>
     </message>
   </context>
   <context>

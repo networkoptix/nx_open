@@ -4476,24 +4476,49 @@ Licensnyckel: %2</translation>
   <context>
     <name>QnRequiredAccessRightPolicy</name>
     <message>
-      <source>%1 group does not have %2 permission for some of selected cameras</source>
-      <comment>%1 is the name of selected user group, %2 is permission name</comment>
-      <translation>%1 gruppen har inte %2 behörighet för vissa av utvalda kameror</translation>
-    </message>
-    <message>
-      <source>%1 groups and %2 users do not have %3 permission for some of selected cameras</source>
-      <comment>%1 is number of selected user groups, %2 is number of users, %3 is permission name</comment>
-      <translation>%1 grupper och %2 användare har inte %3 behörighet för några av valda kameror</translation>
-    </message>
-    <message>
       <source>%1 user does not have %2 permission for some of selected cameras</source>
       <comment>%1 is the name of the selected user, %2 is the permission name</comment>
       <translation>%1 användare har inte %2 behörighet för vissa av utvalda kameror</translation>
     </message>
+    <message numerus="yes">
+      <source>%n groups</source>
+      <translation>
+        <numerusform>%n grupper</numerusform>
+        <numerusform>%n grupper</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n users</source>
+      <translation>
+        <numerusform>%n användare</numerusform>
+        <numerusform>%n användare</numerusform>
+      </translation>
+    </message>
     <message>
-      <source>%1 users do not have %2 permission for some of selected cameras</source>
-      <comment>%1 is number of selected users, %2 is permission name</comment>
-      <translation>%1 användare har inte %2 behörighet för vissa av utvalda kameror</translation>
+      <source>%1 and %2 do not have %3 permission for some of selected cameras</source>
+      <comment>%1 and %2 are the numbers of user groups and users in a correct numeric form (e.g. &apos;2 groups and 1 user&apos;), %3 is the permission name</comment>
+      <translation>%1 och %2 har inte %3 behörighet för vissa av utvalda kameror</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n groups do not have %1 permission for some of selected cameras</source>
+      <comment>%1 is the permission name</comment>
+      <translation>
+        <numerusform>%n grupper har inte %1 behörighet för vissa av utvalda kameror</numerusform>
+        <numerusform>%n grupper har inte %1 behörighet för vissa av utvalda kameror</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>%1 group does not have %2 permission for some of selected cameras</source>
+      <comment>%1 is the name of selected user group, %2 is the permission name</comment>
+      <translation>%1 gruppen har inte %2 behörighet för vissa av utvalda kameror</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n users do not have %1 permission for some of selected cameras</source>
+      <comment>%1 is the permission name</comment>
+      <translation>
+        <numerusform>%n användare har inte %1 behörighet för vissa av utvalda kameror</numerusform>
+        <numerusform>%n användare har inte %1 behörighet för vissa av utvalda kameror</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -7391,10 +7416,6 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
       <translation>Säkerhetskopieringsinställningar är inte tillgängliga</translation>
     </message>
     <message>
-      <source>– Applies to all servers</source>
-      <translation>– Gäller för alla servrar</translation>
-    </message>
-    <message>
       <source>System shut down</source>
       <translation>System avstängt</translation>
     </message>
@@ -7405,6 +7426,10 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     <message>
       <source>System suspended. To make changes to backup configuration, the System should be in active state. %1</source>
       <translation>Systemet är avstängt. För att göra ändringar i säkerhetskopieringskonfigurationen bör systemet vara i aktivt tillstånd. %1</translation>
+    </message>
+    <message>
+      <source>Applies to all servers</source>
+      <translation>Gäller för alla servrar</translation>
     </message>
   </context>
   <context>
@@ -7665,10 +7690,6 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     <message>
       <source>Delete</source>
       <translation>Radera</translation>
-    </message>
-    <message>
-      <source>#</source>
-      <translation>#</translation>
     </message>
     <message>
       <source>Camera</source>
@@ -12306,10 +12327,6 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
       <source>%1 Version is available</source>
       <translation>%1 Version är tillgänglig</translation>
     </message>
-    <message>
-      <source>%1</source>
-      <translation>%1</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::backup_settings_view::BackupSettingsViewStrings</name>
@@ -12778,10 +12795,6 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
       </translation>
     </message>
     <message>
-      <source>All Server</source>
-      <translation>Alla servrar</translation>
-    </message>
-    <message>
       <source>Source Server and %1</source>
       <translation>Källserver och %1</translation>
     </message>
@@ -12863,16 +12876,16 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
   <context>
     <name>nx::vms::client::desktop::rules::VmsRulesDialog</name>
     <message>
-      <source>Delete rule error: </source>
-      <translation>Radera regelfel: </translation>
+      <source>Delete rule error:</source>
+      <translation>Radera regelfel:</translation>
     </message>
     <message>
-      <source>Save rule error: </source>
-      <translation>Spara regelfel: </translation>
+      <source>Save rule error:</source>
+      <translation>Spara regelfel:</translation>
     </message>
     <message>
-      <source>Reset to defaults error: </source>
-      <translation>Återställ till standardfel: </translation>
+      <source>Reset to defaults error:</source>
+      <translation>Återställ till standardvärden med fel:</translation>
     </message>
   </context>
   <context>

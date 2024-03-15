@@ -70,10 +70,6 @@
       <translation>Certificado invalido</translation>
     </message>
     <message>
-      <source>The server&amp;apos;s certificate was rejected.</source>
-      <translation>El certificado del servidor fue rechazado.</translation>
-    </message>
-    <message>
       <source>Restore the connection to %1 and try again</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Restaurar la conexión a %1 e intentarlo de nuevo</translation>
@@ -206,6 +202,10 @@
       <source>To log in to this System, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</source>
       <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
       <translation>Para iniciar sesión en este Sistema, deshabilite "Solicitar un código de verificación en cada inicio de sesión con su cuenta %1 " en su %2.</translation>
+    </message>
+    <message>
+      <source>The server&apos;s certificate was rejected.</source>
+      <translation type="unfinished">The server&apos;s certificate was rejected.</translation>
     </message>
   </context>
   <context>

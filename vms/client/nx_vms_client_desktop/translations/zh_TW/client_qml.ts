@@ -1042,6 +1042,21 @@
   <context>
     <name>IntegrationHeader</name>
     <message>
+      <source>Insufficient services</source>
+      <translation type="unfinished">Insufficient services</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n suitable integration services are required to turn on the integration</source>
+      <comment>Required integration count</comment>
+      <translation>
+        <numerusform>需要%n個合適的整合服務才能啟用整合。</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>0 suitable services available</source>
+      <translation type="unfinished">0 suitable services available</translation>
+    </message>
+    <message>
       <source>OFFLINE</source>
       <translation>離線</translation>
     </message>
@@ -1050,36 +1065,17 @@
       <translation>重新整理</translation>
     </message>
     <message>
+      <source>Services Required</source>
+      <translation type="unfinished">Services Required</translation>
+    </message>
+    <message>
       <source>Refreshing...</source>
       <translation>重新整理...</translation>
     </message>
     <message>
-      <source>Insufficient services</source>
-      <translation type="unfinished">Insufficient services</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n suitable integration service is required to turn on the integration</source>
-      <comment>Required integration count</comment>
-      <translation type="unfinished">
-        <numerusform>%n suitable integration service is required to turn on the integration</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>There are more cameras using this integration than available
-                services. Please disable integration for some cameras or add more suitable services.
-                Otherwise, it will be done automatically on %1</source>
+      <source>There are more cameras using this integration than available services. Please disable integration for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</source>
       <comment>%1 will be substituted by a date</comment>
-      <translation type="unfinished">There are more cameras using this integration than available
-                services. Please disable integration for some cameras or add more suitable services.
-                Otherwise, it will be done automatically on %1</translation>
-    </message>
-    <message>
-      <source>0 suitable services available</source>
-      <translation type="unfinished">0 suitable services available</translation>
-    </message>
-    <message>
-      <source>Services Required</source>
-      <translation type="unfinished">Services Required</translation>
+      <translation>使用此整合的攝影機數量多於可用服務。請將一些攝影機的整合停用或增加更多合適服務，否則，它將於%1自動完成。</translation>
     </message>
   </context>
   <context>

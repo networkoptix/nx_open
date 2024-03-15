@@ -206,11 +206,6 @@
       <translation>Les membres de ce groupe peuvent visionner des vidéos en direct, des modules d'E/S et des pages Web.</translation>
     </message>
     <message>
-      <source>Members of this group have unlimited System privileges. Administrators can create and modify Power Users, merge Systems and connect or disconnect System to  %1.</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Les membres de ce groupe ont des privilèges système illimités. Les administrateurs peuvent créer et modifier des utilisateurs d'énergie, fusionner des systèmes et connecter ou déconnecter le système à  %1.</translation>
-    </message>
-    <message>
       <source>Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the System configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</source>
       <translation>Les membres de ce groupe peuvent, en plus des autorisations accordées par le groupe Visionneurs avancés, contrôler la plupart de la configuration du système, mais ne sont pas autorisés à modifier les paramètres liés à l'administrateur, comme supprimer ou modifier leurs propres groupes et permissions, et ne peut pas créer ou modifier d'autres utilisateurs de puissance.</translation>
     </message>
@@ -225,6 +220,11 @@
     <message>
       <source>Members of this group can view System Health Monitoring information and server processor load in real-time (Server Monitoring).</source>
       <translation>Les membres de ce groupe peuvent consulter les informations de surveillance de la santé du système et la charge du processeur du serveur en temps réel (Server Monitoring).</translation>
+    </message>
+    <message>
+      <source>Members of this group have unlimited System privileges. Administrators can create and modify Power Users, merge Systems and connect or disconnect System to %1.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Les membres de ce groupe ont des privilèges système illimités. Les administrateurs peuvent créer et modifier des Utilisateurs Expérimentés, fusionner des systèmes et connecter ou déconnecter le système à %1.</translation>
     </message>
   </context>
   <context>
@@ -1705,34 +1705,34 @@
       <source>just now</source>
       <translation>à l’instant</translation>
     </message>
-    <message numerus="yes">
-      <source>%n minute(s) ago</source>
-      <translation>
-        <numerusform>il y a %n minute</numerusform>
-        <numerusform>il y a %n minute(s)</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n hour(s) ago</source>
-      <translation>
-        <numerusform>il y a %n heure</numerusform>
-        <numerusform>il y a %n heures</numerusform>
-      </translation>
-    </message>
     <message>
       <source>yesterday</source>
       <translation>hier</translation>
     </message>
-    <message numerus="yes">
-      <source>%n day(s) ago</source>
-      <translation>
-        <numerusform>il y a %n jour</numerusform>
-        <numerusform>il y a %n jours</numerusform>
-      </translation>
-    </message>
     <message>
       <source>a week ago</source>
       <translation>il y a une semaine</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n minutes ago</source>
+      <translation>
+        <numerusform>il y a %n minute</numerusform>
+        <numerusform>il y a %n minutes</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n hours ago</source>
+      <translation>
+        <numerusform>Il y a %n heure</numerusform>
+        <numerusform>Il y a %n heures</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n days ago</source>
+      <translation>
+        <numerusform>Il y a %n jour</numerusform>
+        <numerusform>Il y a %n jours</numerusform>
+      </translation>
     </message>
   </context>
   <context>

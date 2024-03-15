@@ -1051,10 +1051,6 @@
       <translation>Avbryt</translation>
     </message>
     <message>
-      <source>&lt;Message&gt;</source>
-      <translation>&lt;Message&gt;</translation>
-    </message>
-    <message>
       <source>Open Folder</source>
       <translation>Åpne mappe</translation>
     </message>
@@ -1862,14 +1858,6 @@
     <message>
       <source>warn icon</source>
       <translation type="unfinished">warn icon</translation>
-    </message>
-    <message>
-      <source>&lt;Warning label&gt;</source>
-      <translation>&lt;Warning label&gt;</translation>
-    </message>
-    <message>
-      <source>&lt;We recommend that you consult with support before proceeding.&gt;</source>
-      <translation>&lt;We recommend that you consult with support before proceeding.&gt;</translation>
     </message>
   </context>
   <context>
@@ -2933,10 +2921,6 @@
       <translation>Legg til gruppe</translation>
     </message>
     <message>
-      <source>Ctrl+F</source>
-      <translation type="unfinished">Ctrl+F</translation>
-    </message>
-    <message>
       <source>Del</source>
       <translation type="unfinished">Del</translation>
     </message>
@@ -2950,10 +2934,6 @@
     <message>
       <source>Add User</source>
       <translation>Legge til bruker</translation>
-    </message>
-    <message>
-      <source>Ctrl+F</source>
-      <translation type="unfinished">Ctrl+F</translation>
     </message>
     <message>
       <source>Del</source>
