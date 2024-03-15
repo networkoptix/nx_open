@@ -9,7 +9,7 @@
     </message>
     <message>
       <source>General file operation failure</source>
-      <translation>一般檔案錯誤</translation>
+      <translation>一般檔案操作錯誤</translation>
     </message>
     <message>
       <source>The file cannot be written locally, due to access restrictions</source>
