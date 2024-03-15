@@ -21,6 +21,8 @@ FocusScope
         if (textField.value === undefined)
             return undefined
 
+        // TODO: #vbutkevich. There is a bug here, when value is out of range of (min, max).
+        // The textField.value is not updated correctly, so Binding loop occurs. VMS-51810
         return textField.validator
             ? MathUtils.bound(textField.validator.bottom, textField.value, textField.validator.top)
             : textField.value
@@ -28,10 +30,26 @@ FocusScope
 
     property alias editorCursorPosition: textField.cursorPosition
 
+    function valueFromText(text)
+    {
+        return text ? Number(text) : undefined
+    }
+
+    function textFromValue(value)
+    {
+        if (isNaN(value))
+            return ""
+
+        return control.mode === NumberInput.Integer
+            ? Math.trunc(value).toString()
+            : Number(value).toString()
+    }
+
     function setValue(value)
     {
-        if (textField.value !== value)
-            textField.value = value
+        const parsedValue = valueFromText(value)
+        if (textField.value !== parsedValue)
+            textField.value = parsedValue
     }
 
     function clear()
@@ -139,7 +157,11 @@ FocusScope
         }
 
         onTextChanged:
-            value = valueFromText(text)
+        {
+            const parsedValue = valueFromText(text)
+            if (parsedValue !== value)
+                value = parsedValue
+        }
 
         onEditingFinished: control.editingFinished()
 
@@ -168,21 +190,6 @@ FocusScope
         {
             value = control.value
             control.editingFinished()
-        }
-
-        function valueFromText(text)
-        {
-            return text ? Number(text) : undefined
-        }
-
-        function textFromValue(value)
-        {
-            if (isNaN(value))
-                return ""
-
-            return control.mode === NumberInput.Integer
-                ? Math.trunc(value).toString()
-                : Number(value).toString()
         }
 
         function updateValidator()

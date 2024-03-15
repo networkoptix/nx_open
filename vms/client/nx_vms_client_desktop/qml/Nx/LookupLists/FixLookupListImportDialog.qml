@@ -159,7 +159,7 @@ ModalDialog
 
                                         onValueChanged:
                                         {
-                                            if (value || value === 0)
+                                            if (isDefinedValue())
                                             {
                                                 control.model.addFixForWord(repeaterByAttribute.attributeName,
                                                     modelData, value);

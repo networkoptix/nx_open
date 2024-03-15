@@ -24,7 +24,7 @@ function _findAttributeRecursive(objectType, nameParts)
         }
     }
 
-    console.warn(`Attribute ${attributeName} was not found in ${objectTypeId}`)
+    console.warn(`Attribute ${name} was not found in ${objectType}`)
     return null
 }
 
