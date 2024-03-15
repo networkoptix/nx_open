@@ -59,6 +59,9 @@ QString AuthResultTranslations::toErrorMessage(AuthResult value)
         case Auth_WrongSessionToken:
             return tr("The session key is invalid or expired.");
 
+        case Auth_TruncatedSessionToken:
+            return tr("The session key is to old for this Site.");
+
         case Auth_WrongTicketToken:
             return tr("The ticket key is invalid or expired.");
 

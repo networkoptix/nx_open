@@ -124,7 +124,12 @@ public:
         /**%apidoc
          * %caption 15
          */
-        Gone = 15,
+        SessionTruncated = 15,
+
+        /**%apidoc
+         * %caption 16
+         */
+        Gone = 16,
     };
 
     static QString errorToString(Result::Error value);
@@ -155,6 +160,7 @@ public:
     static Result unauthorized(std::optional<QString> customMessage = std::nullopt);
     static Result sessionExpired(std::optional<QString> customMessage = std::nullopt);
     static Result sessionRequired(std::optional<QString> customMessage = std::nullopt);
+    static Result sessionTruncated(std::optional<QString> customMessage = std::nullopt);
     static Result gone(std::optional<QString> customMessage = std::nullopt);
 
     template<typename Value>

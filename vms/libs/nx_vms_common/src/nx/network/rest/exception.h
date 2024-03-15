@@ -36,6 +36,7 @@ public:
     // NX_REST_EXCEPTION_METHOD(unauthorized) - Use UnauthorizedException with appropriate AuthResult.
     // NX_REST_EXCEPTION_METHOD(sessionExpired) - Use UnauthorizedException::sessionExpired.
     NX_REST_EXCEPTION_METHOD(sessionRequired)
+    // NX_REST_EXCEPTION_METHOD(sessionTruncated) - Use UnauthorizedException::sessionTruncated.
     NX_REST_EXCEPTION_METHOD(gone)
     #undef NX_REST_EXCEPTION_METHOD
 
@@ -60,6 +61,12 @@ public:
     {
         return UnauthorizedException(Result(Result::Error::SessionExpired, std::move(message)),
             AuthResult::Auth_WrongSessionToken);
+    }
+
+    static UnauthorizedException truncatedSessionToken(QString message = {})
+    {
+        return UnauthorizedException(Result(Result::Error::SessionTruncated, std::move(message)),
+            AuthResult::Auth_TruncatedSessionToken);
     }
 
     static UnauthorizedException wrongTicketToken(QString message = {})

@@ -25,6 +25,7 @@ NX_VMS_COMMON_API QString Result::errorToString(Result::Error value)
         case Result::Unauthorized: return "unauthorized";
         case Result::SessionExpired: return "sessionExpired";
         case Result::SessionRequired: return "sessionRequired";
+        case Result::SessionTruncated: return "sessionTruncated";
         case Result::Gone: return "gone";
     };
 
@@ -47,6 +48,7 @@ nx::network::http::StatusCode::Value Result::toHttpStatus(Error code)
         case Error::Forbidden:
         case Error::SessionExpired:
         case Error::SessionRequired:
+        case Error::SessionTruncated:
             return http::StatusCode::forbidden;
 
         case Error::Conflict:
@@ -207,6 +209,12 @@ Result Result::sessionRequired(std::optional<QString> customMessage)
 {
     return Result{SessionRequired,
         customMessage ? *customMessage : tr("Session authorization required.")};
+}
+
+Result Result::sessionTruncated(std::optional<QString> customMessage)
+{
+    return Result{SessionTruncated,
+        customMessage ? *customMessage : tr("Session is too old according to the Site config.")};
 }
 
 Result Result::gone(std::optional<QString> customMessage)
