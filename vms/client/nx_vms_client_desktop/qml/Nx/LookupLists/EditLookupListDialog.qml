@@ -25,7 +25,8 @@ ModalDialog
     // Model working as backend of the dialog.
     property alias viewModel: model
 
-    property bool canAccept: model.isValid
+    property bool typeIsSelected: false
+    property bool canAccept: model.isValid && typeIsSelected
     property int minimumLabelColumnWidth: 0
 
     property bool columnWithDataWasRemoved: false
@@ -157,50 +158,71 @@ ModalDialog
                 }
             }
 
-        AlignedLabel { text: qsTr("Name") }
+            AlignedLabel
+            {
+                text: qsTr("Name")
+            }
 
             TextField
             {
                 id: nameField
+
                 Layout.fillWidth: true
                 text: model.name
                 onTextEdited: model.name = text
+                Component.onCompleted:
+                {
+                    if (!editMode)
+                    {
+                        forceActiveFocus()
+                        selectAll()
+                    }
+                }
             }
 
-        AlignedLabel { text: qsTr("Type") }
+            AlignedLabel
+            {
+                text: qsTr("Type")
+            }
 
             ComboBox
             {
                 id: typeField
+
                 Layout.fillWidth: true
                 textRole: "text"
                 valueRole: "value"
                 enabled: !editMode //< Changing list type while editing is forbidden.
                 model: createListTypeModel()
+                placeholderText: qsTr("Select type")
 
                 onActivated:
                 {
                     viewModel.objectTypeId = currentValue ? currentValue.mainTypeId : ""
                     populateAttributesModel()
                 }
+
                 Component.onCompleted:
                 {
-                    currentIndex = indexOfValue(model.listType)
                     populateAttributesModel()
+                    currentIndex = editMode ? indexOfValue(model.listType) : -1
                 }
+
+                onCurrentIndexChanged: dialog.typeIsSelected = currentIndex !== -1
             }
 
             AlignedLabel
             {
                 text: qsTr("Column Name")
-                visible: model.isGeneric
+                visible: model.isGeneric && dialog.typeIsSelected
             }
 
             TextField
             {
                 id: columnNameField
+
                 Layout.fillWidth: true
-                visible: model.isGeneric
+                visible: model.isGeneric && dialog.typeIsSelected
                 text: model.columnName
                 onTextEdited: model.setColumnName(text)
             }
@@ -238,7 +260,7 @@ ModalDialog
 
     function accept()
     {
-        if (model.isValid)
+        if (canAccept)
         {
             dialog.accepted()
             dialog.close()
@@ -256,7 +278,7 @@ ModalDialog
             text: editMode ? qsTr("OK") : qsTr("Create")
             width: Math.max(buttonBox.standardButton(DialogButtonBox.Cancel).width, implicitWidth)
             DialogButtonBox.buttonRole: DialogButtonBox.AcceptRole
-            enabled: model.isValid
+            enabled: canAccept
             isAccentButton: true
         }
     }
