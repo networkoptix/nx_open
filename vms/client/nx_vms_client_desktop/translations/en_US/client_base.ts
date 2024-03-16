@@ -12806,6 +12806,20 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
 </context>
 <context>
+    <name>nx::vms::client::desktop::rules::TargetLayoutPicker</name>
+    <message>
+        <source>Select layout...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n layouts</source>
+        <translation type="unfinished">
+            <numerusform>%n layout</numerusform>
+            <numerusform>%n layouts</numerusform>
+        </translation>
+    </message>
+</context>
+<context>
     <name>nx::vms::client::desktop::rules::TextLookupPicker</name>
     <message>
         <source>Contains keywords</source>
