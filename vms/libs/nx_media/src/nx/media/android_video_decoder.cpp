@@ -261,6 +261,7 @@ private:
     static QMutex maxResolutionsMutex;
 
     qint64 frameNumber;
+    H2645Mp4ToAnnexB filter;
     bool initialized;
     QJniObject javaDecoder;
     RenderContextSynchronizerPtr synchronizer;
@@ -531,9 +532,8 @@ int AndroidVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frameSrc, V
     {
         // The filter keeps same frame in case of filtering is not required or
         // it is not the H264/H265 codec.
-        H2645Mp4ToAnnexB filter;
         frame = std::dynamic_pointer_cast<const QnCompressedVideoData>(
-            filter.processData(frameSrc));
+            d->filter.processData(frameSrc));
         if (!frame)
         {
             NX_WARNING(this, "Failed to convert h264/h265 video to Annex B format");
