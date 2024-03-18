@@ -18,6 +18,7 @@
 #include <nx/vms/client/core/network/certificate_verifier.h>
 #include <nx/vms/client/core/network/logon_data.h>
 #include <nx/vms/client/core/network/network_module.h>
+#include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -284,10 +285,17 @@ void ClientUpdateTool::setServerUrl(
     const auto serverId =
         NX_ASSERT(logonData.expectedServerId) ? *logonData.expectedServerId : nx::Uuid();
 
+    // If downloading a new client version in the process of system update, use existing audit ID.
+    // Otherwise (e.g. connecting to the incompatible system from the Welcome Screen or Login
+    // Dialog) generate a new random ID.
+    const nx::Uuid auditId = systemContext()->connection()
+        ? systemContext()->connection()->auditId()
+        : nx::Uuid::createUuid();
+
     m_serverConnection.reset(
         new rest::ServerConnection(
             serverId,
-            systemContext()->auditId(),
+            auditId,
             certificateVerifier,
             logonData.address,
             logonData.credentials));
