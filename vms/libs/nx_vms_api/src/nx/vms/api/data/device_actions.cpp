@@ -4,6 +4,24 @@
 
 #include <nx/fusion/model_functions.h>
 
+namespace QJson {
+
+template<>
+bool deserialize(
+    QnJsonContext* context, const QJsonValue& value, nx::vms::api::AnalyticsFilter* outTarget)
+{
+    if (value.isObject())
+        return QnSerialization::deserialize(context, value, outTarget);
+
+    if (!value.isString())
+        return false;
+
+    QByteArray serialized = value.toString().toUtf8();
+    return QJson::deserialize(context, serialized, outTarget);
+}
+
+} // namespace QJson
+
 namespace nx::vms::api {
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DevicePasswordRequest, (json), DevicePasswordRequest_Fields)

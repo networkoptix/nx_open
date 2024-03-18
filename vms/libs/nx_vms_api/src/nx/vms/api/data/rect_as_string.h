@@ -11,10 +11,9 @@ namespace nx::vms::api {
 class RectAsString: public QRectF
 {
 public:
-    RectAsString() = default;
+    using QRectF::QRectF;
     RectAsString(const QRectF& crop): QRectF(crop) {}
 };
-
-bool deserialize(QnJsonContext* context, const QJsonValue& value, RectAsString* target);
+QN_FUSION_DECLARE_FUNCTIONS(RectAsString, (json), NX_VMS_API)
 
 } // namespace nx::vms::api
