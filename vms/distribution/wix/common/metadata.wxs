@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Fragment>
+        <!--
+            These components may be shared between different installers, therefore they must
+            contain 'DiskId="2"' descriptor, so bundle will strip duplicated copies.
+         -->
+        <ComponentGroup Id="metadata_files"
+                Source="${distribution_output_dir}"
+                Directory="metadata">
+            <Component><File Name="build_info.txt" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="build_info.json" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="conan_refs.txt" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="conan.lock" KeyPath="yes" DiskId="2"/></Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>

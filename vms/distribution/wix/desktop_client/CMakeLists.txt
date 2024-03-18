@@ -55,6 +55,7 @@ nx_wix_light(${unsigned_msi_filename}
         ${common_wixobjects_path}/common_qt_libraries.wixobj
         ${common_wixobjects_path}/common_qt_platforms.wixobj
         ${common_wixobjects_path}/common_translations.wixobj
+        ${common_wixobjects_path}/metadata.wixobj
         ${common_wixobjects_path}/ffmpeg_libraries.wixobj
         ${common_wixobjects_path}/icu_libraries.wixobj
         ${common_wixobjects_path}/openssl_libraries.wixobj
