@@ -93,6 +93,7 @@
                     </Component>
 
                     <Directory Id="imageformats" Name="imageformats"/>
+                    <Directory Id="metadata" Name="metadata"/>
                     <Directory Id="plugins" Name="plugins"/>
                     <Directory Id="mediaservice" Name="mediaservice"/>
                     <Directory Id="audio" Name="audio"/>
@@ -187,11 +188,12 @@
             <Component><File Name="nx_log_viewer.html" KeyPath="yes"/></Component>
         </ComponentGroup>
 
+        <!-- Deprecated file copies are kept due to compatibility reasons. -->
         <ComponentGroup Id="build_info_files"
                 Directory="InstallDirRoot"
                 Source="${distribution_output_dir}">
-            <Component><File Name="build_info.txt" KeyPath="yes"/></Component>
-            <Component><File Name="build_info.json" KeyPath="yes"/></Component>
+            <Component><File Id="build_info.txt_deprecated" Name="build_info.txt"/></Component>
+            <Component><File Id="build_info.json_deprecated" Name="build_info.json"/></Component>
         </ComponentGroup>
 
         <Feature
@@ -244,6 +246,7 @@
             <ComponentGroupRef Id="external_resources"/>
             <ComponentGroupRef Id="client_translations"/>
             <ComponentGroupRef Id="common_translations"/>
+            <ComponentGroupRef Id="metadata_files"/>
 
             <MergeRef Id="client_help_module"/>
             <MergeRef Id="client_qml_module"/>

@@ -95,8 +95,6 @@ function(set_distribution_names)
         "${prefix}-vms_benchmark-${releaseVersion.full}-${vmsBenchmarkSuffix}" PARENT_SCOPE)
     set(ssc_analytics_plugin_distribution_name
         "${prefix}-ssc_analytics_plugin-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
-    set(conan_refs_distribution_name
-        "${prefix}-conan_refs-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
 
     if(net2Version)
         set(paxton_plugin_distribution_name

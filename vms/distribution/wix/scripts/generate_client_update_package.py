@@ -143,8 +143,15 @@ def create_client_update_file(config, output_file):
         zip.write(os.path.join(binaries_dir, launcher_version_name), launcher_version_name)
         zip.write(os.path.join(binaries_dir, minilauncher_binary_name), minilauncher_binary_name)
         zip.write(os.path.join(current_binary_dir, 'qt.conf'), 'qt.conf')
+
+        # Keep these metadata files for compatibility purposes
         zip.write(os.path.join(config['distribution_output_dir'], 'build_info.txt'), 'build_info.txt')
         zip.write(os.path.join(config['distribution_output_dir'], 'build_info.json'), 'build_info.json')
+
+        # Write metadata
+        zip.write(os.path.join(config['distribution_output_dir'], 'build_info.txt'), 'metadata/build_info.txt')
+        zip.write(os.path.join(config['distribution_output_dir'], 'build_info.json'), 'metadata/build_info.json')
+        zip.write(os.path.join(config['distribution_output_dir'], 'conan_refs.txt'), 'metadata/conan_refs.txt')
 
 
 def main():
