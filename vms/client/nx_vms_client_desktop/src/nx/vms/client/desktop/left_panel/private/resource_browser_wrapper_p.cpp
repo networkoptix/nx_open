@@ -118,7 +118,7 @@ public:
         if (!NX_ASSERT(q->resourceBrowser))
             return;
 
-        if (!q->tree.model()->isFiltering())
+        if (q->tree && q->tree.model && !q->tree.model()->isFiltering())
             q->acquireClientState();
 
         QJsonArray expandedNodes;
