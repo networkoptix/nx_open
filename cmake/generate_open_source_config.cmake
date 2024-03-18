@@ -14,8 +14,7 @@ set(SERVER_REFS_FILE_NAME "${PROJECT_BINARY_DIR}/compatible_servers.txt")
 nx_configure_file("${open_source_root}/build_info.txt" ${distribution_output_dir})
 nx_configure_file("${open_source_root}/build_info.json" ${distribution_output_dir})
 nx_configure_file("${open_source_root}/nx_log_viewer.html" ${CMAKE_BINARY_DIR} COPYONLY)
-nx_configure_file("${CMAKE_BINARY_DIR}/conan_refs.txt"
-    "${distribution_output_dir}/${conan_refs_distribution_name}.txt" COPYONLY)
+nx_configure_file("${CMAKE_BINARY_DIR}/conan_refs.txt" ${distribution_output_dir} COPYONLY)
 
 function(nx_generate_compatible_servers_txt)
     if(buildNumber STREQUAL "0")

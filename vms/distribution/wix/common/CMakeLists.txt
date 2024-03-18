@@ -17,6 +17,7 @@ nx_wix_candle(openssl_libraries)
 nx_wix_candle(ffmpeg_libraries)
 nx_wix_candle(common_nx_libraries)
 nx_wix_candle(common_translations)
+nx_wix_candle(metadata)
 nx_wix_candle(asan_libraries VARIABLES asan_library_name=${asan_library_name})
 
 add_custom_target(distribution_wix_common_resources
@@ -27,6 +28,7 @@ add_custom_target(distribution_wix_common_resources
         ${CMAKE_CURRENT_BINARY_DIR}/common_qt_libraries.wixobj
         ${CMAKE_CURRENT_BINARY_DIR}/common_qt_platforms.wixobj
         ${CMAKE_CURRENT_BINARY_DIR}/icu_libraries.wixobj
+        ${CMAKE_CURRENT_BINARY_DIR}/metadata.wixobj
         ${CMAKE_CURRENT_BINARY_DIR}/vcrt_libraries.wixobj
         ${CMAKE_CURRENT_BINARY_DIR}/ucrt_libraries.wixobj
         ${CMAKE_CURRENT_BINARY_DIR}/openssl_libraries.wixobj

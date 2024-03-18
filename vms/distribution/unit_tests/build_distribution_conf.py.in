@@ -5,7 +5,6 @@ CMAKE_SYSTEM_NAME = "@CMAKE_SYSTEM_NAME@"
 QT_DIR = "@QT_DIR@"
 PACKAGE_FILE = "@package_file@"
 LOG_FILE = "@CMAKE_BINARY_DIR@/build_logs/unit_tests_build_distribution.log"
-CONAN_REFS_FILE = "@conan_refs_distribution_name@.txt"
 WITH_CLIENT = "@withDesktopClient@"
 WITH_MEDIA_SERVER = "@withMediaServer@"
 ZIP_COMPRESSION_LEVEL = @zip_compression_level@
