@@ -98,9 +98,6 @@ function(set_distribution_names)
     set(ssc_analytics_plugin_distribution_name
         "${prefix}-ssc_analytics_plugin-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
 
-    set(conan_refs_distribution_name
-        "${prefix}-conan_refs-${suffix}" PARENT_SCOPE)
-
     if(net2Version)
         set(paxton_plugin_distribution_name
             "${prefix}-paxton_plugin-${releaseVersion.full}-${net2Version}" PARENT_SCOPE)

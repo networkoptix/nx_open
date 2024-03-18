@@ -340,7 +340,16 @@ def main():
         if os.path.islink(join(conf.BUILD_DIR, lib_dir, "ffmpeg")):
             archiveFiles(a, lib_dir, join(conf.BUILD_DIR, lib_dir), ["ffmpeg"])
 
-        archiveFiles(a, "", join(conf.BUILD_DIR, "distrib"), [conf.CONAN_REFS_FILE])
+        distrib_dir = join(conf.BUILD_DIR, "distrib")
+        # Keep this metadata file for compatibility purposes.
+        archiveFiles(a, "", distrib_dir, ["conan_refs.txt"])
+
+        # Write metadata
+        archiveFiles(
+            a,
+            target_dir=join(bin_dir, "metadata"),
+            source_dir=distrib_dir,
+            file_list=["build_info.txt", "build_info.json", "conan_refs.txt", "conan.lock"])
 
 
 if __name__ == "__main__":
