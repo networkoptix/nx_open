@@ -14,6 +14,7 @@
 #include <nx/vms/api/types/time_period_content_type.h>
 
 #include "id_data.h"
+#include "rect_as_string.h"
 
 namespace nx::vms::api {
 
@@ -36,14 +37,16 @@ struct DevicePasswordRequest: IdData
 QN_FUSION_DECLARE_FUNCTIONS(DevicePasswordRequest, (json), NX_VMS_API);
 NX_REFLECTION_INSTRUMENT(DevicePasswordRequest, DevicePasswordRequest_Fields)
 
-struct NX_VMS_API AnalyticsFilter
+struct NX_VMS_API AnalyticsFilterBase
 {
-    NX_REFLECTION_ENUM_IN_CLASS(Options,
+    NX_REFLECTION_ENUM_IN_CLASS(Option,
         none = 0x0,
         ignoreTextFilter = 0x1,
         ignoreBoundingBox = 0x2,
         ignoreTimePeriod = 0x4
     )
+
+    Q_DECLARE_FLAGS(Options, Option)
 
     // TODO: #skolesnik Remove?
     /**%apidoc[opt]
@@ -57,11 +60,6 @@ struct NX_VMS_API AnalyticsFilter
     std::vector<QString> objectTypeId;
 
     nx::Uuid objectTrackId;
-
-    /**%apidoc[opt]
-     * Coordinates in range [0:1].
-     */
-    std::optional<analytics::Rect> boundingBox;
 
     /**%apidoc[opt]
      * Set of words separated by spaces, commas, etc. The search is done across all attribute
@@ -84,8 +82,14 @@ struct NX_VMS_API AnalyticsFilter
      * Analytic details in milliseconds.
      */
     std::chrono::milliseconds maxAnalyticsDetailsMs{};
+};
 
-    static DeprecatedFieldNames const * getDeprecatedFieldNames();
+struct NX_VMS_API AnalyticsFilter: AnalyticsFilterBase
+{
+    /**%apidoc:string Coordinates in range [0:1]. The format is `{x},{y},{width}x{height}`. */
+    std::optional<RectAsString> boundingBox;
+
+    static DeprecatedFieldNames const* getDeprecatedFieldNames();
 };
 #define AnalyticsFilter_Fields \
     (storageId)(objectTypeId)(objectTrackId)(boundingBox) \
@@ -95,7 +99,11 @@ NX_REFLECTION_INSTRUMENT(AnalyticsFilter, AnalyticsFilter_Fields)
 
 struct DeviceFootageRequest
 {
-    /**%apidoc:stringArray Device ids to get Footage on. */
+    /**%apidoc:stringArray
+     * Device id(s) to get Footage on. It can be obtained from "id", "physicalId" or "logicalId"
+     * field via `GET /rest/v{1-}/devices`. MAC address can also be used but it is not supported
+     * for certain Devices.
+     */
     nx::vms::api::json::ValueOrArray<QString> id;
 
     /**%apidoc[opt]
@@ -130,7 +138,7 @@ struct DeviceFootageRequest
     /**%apidoc[opt]
      * Maximum number of chunks to return.
      */
-    size_t maxCount{INT_MAX};
+    int maxCount{INT_MAX};
 
     /**%apidoc[opt]
      * %// Appeared starting from /rest/v2/devices/{id}/footage.
@@ -142,24 +150,31 @@ struct DeviceFootageRequest
      */
     bool includeCloudData = false;
 
-    /**%apidoc[opt]
-     * Chunk type.
-     */
+    /**%apidoc[opt] Chunk type. */
     TimePeriodContentType periodType = TimePeriodContentType::recording;
 
-    /**%apidoc[opt]
-     * If `periodType` is `motion`, must be a list of `Rect` or `null`.
-     * If `periodType` is `analytics`, must be of type `AnalyticsFilter` or `null`.
-     * Otherwise is ignored.
+    // TODO: Combine motion and anayltics below to std::optional<std::variant> when query parameter
+    // with oneOf will be correctly processed by Swagger UI.
+
+    /**%apidoc:stringArray
+     * Coordinates in range [0:1]. The format is `{x},{y},{width}x{height}` per each item. Must be
+     * used with `periodType` equals to `motion` only.
+     * %// Appeared starting from /rest/v4/devices/{id}/footage.
      */
-    std::optional<std::variant<std::vector<analytics::Rect>, AnalyticsFilter>> filter;
+    std::optional<json::ValueOrArray<RectAsString>> motion;
+
+    /**%apidoc
+     * Must be used with `periodType` equals to `analytics` only.
+     * %// Appeared starting from /rest/v4/devices/{id}/footage.
+     */
+    std::optional<AnalyticsFilter> analytics;
 
     bool operator==(const DeviceFootageRequest& other) const = default;
 };
 
 #define DeviceFootageRequest_Fields \
     (id)(startTimeMs)(endTimeMs)(detailLevelMs)(keepSmallChunks)(preciseBounds)(maxCount) \
-    (storageLocation)(includeCloudData)(periodType)(filter)
+    (storageLocation)(includeCloudData)(periodType)(motion)(analytics)
 QN_FUSION_DECLARE_FUNCTIONS(DeviceFootageRequest, (json), NX_VMS_API);
 
 struct DeviceDiagnosis

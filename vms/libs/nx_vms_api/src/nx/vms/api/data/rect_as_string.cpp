@@ -6,9 +6,6 @@
 
 namespace nx::vms::api {
 
-bool deserialize(QnJsonContext*, const QJsonValue& value, RectAsString* target)
-{
-    return value.isString() && QnLexical::deserialize<QRectF>(value.toString(), target);
-}
+QN_FUSION_DEFINE_FUNCTIONS(RectAsString, (json_lexical))
 
 } // namespace nx::vms::api
