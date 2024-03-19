@@ -312,7 +312,7 @@ bool QnCloudManagementWidget::confirmCloudDisconnect()
     ).arg(nx::branding::cloudName()));
 
     QString infoText = setWarningStyleHtml(tr(
-        "All %1 users will be deleted from the system.", "%1 is the short cloud name (like Cloud)"
+        "All %1 users will be deleted from the site.", "%1 is the short cloud name (like Cloud)"
     ).arg(nx::branding::shortCloudName()));
     infoText.append("\n");
     infoText.append(tr("Site will be accessible only through local network."));

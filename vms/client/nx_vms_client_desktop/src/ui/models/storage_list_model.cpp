@@ -535,7 +535,7 @@ QVariant QnStorageListModel::storageArchiveModeWarningIconColumnData(
 
             QStringList hintParagraphs;
             hintParagraphs.push_back(html::paragraph(tr("The storage has different read-write "
-                "policies across various Servers in the System")));
+                "policies across various Servers in the Site")));
 
             hintParagraphs.push_back(html::paragraph(html::colored(
                 html::toHtmlEscaped(tr("Click on the icon to see Servers list")),

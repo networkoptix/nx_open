@@ -167,7 +167,7 @@ public:
                     return {message, message};
                 }
 
-                const QString message = tr("Log in to %1 to log in to this system with %2 user",
+                const QString message = tr("Log in to %1 to log in to this site with %2 user",
                     "%1 is the cloud name (like Nx Cloud), %2 is the short cloud name (like Cloud)")
                         .arg(html::localLink(nx::branding::cloudName(), "#cloud"), nx::branding::shortCloudName());
 
