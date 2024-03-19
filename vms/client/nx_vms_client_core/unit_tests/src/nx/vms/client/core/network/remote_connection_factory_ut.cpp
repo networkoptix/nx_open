@@ -173,7 +173,7 @@ public:
         {
             const bool isDefaultServer = (i == 0);
 
-            nx::vms::api::ServerInformation serverInfo;
+            nx::vms::api::ServerInformationV1 serverInfo;
             if (isDefaultServer)
             {
                 serverInfo.id = kExpectedServerId;

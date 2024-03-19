@@ -18,7 +18,7 @@ public:
         m_handshakeCertificateChain = handshakeCertificateChain;
     }
 
-    void addServer(nx::vms::api::ServerInformation server) { m_servers.push_back(server); }
+    void addServer(nx::vms::api::ServerInformationV1 server) { m_servers.push_back(server); }
 
     struct UserInfo
     {
@@ -52,7 +52,7 @@ public:
 private:
     mutable int m_requestsCount = 0;
     nx::network::ssl::CertificateChain m_handshakeCertificateChain;
-    std::vector<nx::vms::api::ServerInformation> m_servers;
+    std::vector<nx::vms::api::ServerInformationV1> m_servers;
     std::vector<UserInfo> m_users;
 
     struct AccessToken

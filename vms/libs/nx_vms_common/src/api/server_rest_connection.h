@@ -593,7 +593,7 @@ public:
         QThread* targetThread = nullptr);
 
     Handle getServersInfo(
-        Result<ErrorOrData<nx::vms::api::ServerInformationList>>::type&& callback,
+        Result<ErrorOrData<nx::vms::api::ServerInformationV1List>>::type&& callback,
         QThread* targetThread);
 
     Handle getEngineAnalyticsSettings(

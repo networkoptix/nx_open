@@ -125,7 +125,7 @@ private:
     void mergeSystemDryRun(const Context& ctx);
 
     void at_serverInfoReceived(
-        Context& ctx, const rest::ErrorOrData<nx::vms::api::ServerInformation>& errorOrData);
+        Context& ctx, const rest::ErrorOrData<nx::vms::api::ServerInformationV1>& errorOrData);
 
     void at_sessionCreated(
         Context& ctx, const rest::ErrorOrData<nx::vms::api::LoginSession>& errorOrData);

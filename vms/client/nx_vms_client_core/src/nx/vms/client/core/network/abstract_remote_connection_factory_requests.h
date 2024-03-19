@@ -33,7 +33,7 @@ public:
 
     struct ServersInfoReply
     {
-        std::vector<nx::vms::api::ServerInformation> serversInfo;
+        std::vector<nx::vms::api::ServerInformationV1> serversInfo;
         nx::network::ssl::CertificateChain handshakeCertificateChain;
     };
     virtual ServersInfoReply getServersInfo(ContextPtr context) const = 0;

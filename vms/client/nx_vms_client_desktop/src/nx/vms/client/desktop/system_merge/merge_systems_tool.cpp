@@ -61,7 +61,7 @@ struct MergeSystemsTool::Context
     nx::network::SocketAddress target; //< Target server address.
     std::string targetUser;
     std::string targetPassword;
-    nx::vms::api::ServerInformation targetInfo;
+    nx::vms::api::ServerInformationV1 targetInfo;
     nx::vms::api::SiteMergeData mergeData;
     nx::network::ssl::CertificateChain targetHandshakeChain;
     QnLicenseList targetLicenses;
@@ -117,7 +117,7 @@ nx::Uuid MergeSystemsTool::pingSystem(
     NX_DEBUG(this, "Starting ping server at address %1", ctx.target);
 
     auto onTargetInfo =
-        [this, ctxId](rest::ErrorOrData<nx::vms::api::ServerInformation> errorOrData)
+        [this, ctxId](rest::ErrorOrData<nx::vms::api::ServerInformationV1> errorOrData)
         {
             if (auto ctx = findContext(ctxId))
                 at_serverInfoReceived(*ctx, errorOrData);
@@ -272,7 +272,7 @@ void MergeSystemsTool::reportMergeFinished(
         }
     }
 
-    emit mergeFinished(status, errorText, targetInfo);
+    emit mergeFinished(status, errorText, targetInfo.getModuleInformation());
 }
 
 void MergeSystemsTool::reportSystemFound(
@@ -290,14 +290,13 @@ void MergeSystemsTool::reportSystemFound(
     if (removeCtx)
         m_contextMap.erase(ctx.mergeData.remoteServerId);
 
-    emit systemFound(status, errorText, targetInfo, reply);
+    emit systemFound(status, errorText, targetInfo.getModuleInformation(), reply);
 }
 
-void MergeSystemsTool::at_serverInfoReceived(
-    Context& ctx,
-    const rest::ErrorOrData<nx::vms::api::ServerInformation>& errorOrData)
+void MergeSystemsTool::at_serverInfoReceived(Context& ctx,
+    const rest::ErrorOrData<api::ServerInformationV1>& errorOrData)
 {
-    if (auto serverInfo = std::get_if<nx::vms::api::ServerInformation>(&errorOrData))
+    if (auto serverInfo = std::get_if<nx::vms::api::ServerInformationV1>(&errorOrData))
     {
         ctx.targetInfo = std::move(*serverInfo);
 
@@ -503,12 +502,12 @@ MergeSystemsStatus MergeSystemsTool::verifyTargetCertificate(const Context& ctx)
     if (status == CertificateVerifier::Status::notFound)
     {
         accepted = m_delegate->acceptNewCertificate(
-            {ctx.targetInfo, ctx.target, ctx.targetHandshakeChain});
+            {ctx.targetInfo.getModuleInformation(), ctx.target, ctx.targetHandshakeChain});
     }
     else if (status == CertificateVerifier::Status::mismatch)
     {
         accepted = m_delegate->acceptCertificateAfterMismatch(
-            {ctx.targetInfo, ctx.target, ctx.targetHandshakeChain});
+            {ctx.targetInfo.getModuleInformation(), ctx.target, ctx.targetHandshakeChain});
     }
 
     if (!accepted)

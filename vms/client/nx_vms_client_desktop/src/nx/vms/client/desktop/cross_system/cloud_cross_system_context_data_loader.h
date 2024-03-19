@@ -41,7 +41,7 @@ public:
     void start(bool requestUser);
 
     nx::vms::api::UserModel user() const;
-    nx::vms::api::ServerInformationList servers() const;
+    nx::vms::api::ServerInformationV1List servers() const;
     nx::vms::api::ServerFootageDataList serverFootageData() const;
     nx::vms::api::CameraDataExList cameras() const;
     nx::vms::api::SystemSettings systemSettings() const;

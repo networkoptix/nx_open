@@ -22,7 +22,7 @@ RemoteConnectionFactoryRequestsManager::ModuleInformationReply
     ++m_requestsCount;
     ModuleInformationReply result{.handshakeCertificateChain = m_handshakeCertificateChain};
     if (!m_servers.empty())
-        result.moduleInformation = m_servers[0];
+        result.moduleInformation = m_servers[0].getModuleInformation();
 
     return result;;
 }

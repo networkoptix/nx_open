@@ -88,7 +88,7 @@ std::optional<std::string> publicKey(const std::string& pem)
     return chain[0].publicKey();
 };
 
-std::optional<nx::Uuid> deductServerId(const std::vector<nx::vms::api::ServerInformation>& info)
+std::optional<nx::Uuid> deductServerId(const std::vector<nx::vms::api::ServerInformationV1>& info)
 {
     if (info.size() == 1)
         return info.begin()->id;
@@ -374,7 +374,7 @@ struct RemoteConnectionFactory::Private
             return;
         }
 
-        context->moduleInformation = *currentServerIt;
+        context->moduleInformation = currentServerIt->getModuleInformation();
 
         // Check that the handshake certificate matches one of the targets's.
         CertificateVerificationResult certificateVerificationResult =
@@ -910,7 +910,7 @@ struct RemoteConnectionFactory::Private
 
     CertificateVerificationResult verifyHandshakeCertificateChain(
         const nx::network::ssl::CertificateChain& handshakeCertificateChain,
-        const nx::vms::api::ServerInformation& serverInfo,
+        const nx::vms::api::ServerInformationV1& serverInfo,
         const std::string& hostName)
     {
         if (!nx::network::ini().verifyVmsSslCertificates)
@@ -1004,7 +1004,7 @@ struct RemoteConnectionFactory::Private
 
                     // Add certificate to the list of those that need User confirmation.
                     certificates << TargetCertificateInfo{
-                        server,
+                        server.getModuleInformation(),
                         nx::network::SocketAddress::fromUrl(serverUrl),
                         chain};
                 };

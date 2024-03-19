@@ -41,7 +41,7 @@ public:
         nx::network::ssl::AdapterFunc proxyAdapterFunc,
         const nx::network::SocketAddress& target,
         nx::network::ssl::AdapterFunc targetAdapterFunc,
-        Callback<nx::vms::api::ServerInformation> callback);
+        Callback<nx::vms::api::ServerInformationV1> callback);
 
     void createTargetSession(
         QnMediaServerResourcePtr proxy,

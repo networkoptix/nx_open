@@ -382,7 +382,7 @@ RemoteConnectionFactoryRequestsManager::ServersInfoReply
     NetworkManager::setDefaultTimeouts(request.get());
 
     reply.serversInfo =
-        d->doGet<std::vector<nx::vms::api::ServerInformation>>(url, context, std::move(request));
+        d->doGet<std::vector<nx::vms::api::ServerInformationV1>>(url, context, std::move(request));
 
     if (!context->failed())
     {

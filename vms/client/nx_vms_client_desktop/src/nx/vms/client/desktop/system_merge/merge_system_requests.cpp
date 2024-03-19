@@ -263,12 +263,11 @@ MergeSystemRequestsManager::~MergeSystemRequestsManager()
     d->pleaseStopSync();
 }
 
-void MergeSystemRequestsManager::getTargetInfo(
-    QnMediaServerResourcePtr proxy,
+void MergeSystemRequestsManager::getTargetInfo(QnMediaServerResourcePtr proxy,
     nx::network::ssl::AdapterFunc proxyAdapterFunc,
     const nx::network::SocketAddress& target,
     nx::network::ssl::AdapterFunc targetAdapterFunc,
-    Callback<nx::vms::api::ServerInformation> callback)
+    Callback<api::ServerInformationV1> callback)
 {
     NX_DEBUG(this, "Requesting info from %1, via %2", target, proxy);
     d->doRequest(
