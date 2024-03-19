@@ -38,7 +38,6 @@ HelpDialog::HelpDialog(QWidget* parent):
         this,
         &HelpDialog::reject);
 
-    m_webViewWidget->controller()->setRedirectLinksToDesktop(true);
     m_webViewWidget->controller()->setMenuNavigation(false);
 
     resize(kInitialDialogSize);
