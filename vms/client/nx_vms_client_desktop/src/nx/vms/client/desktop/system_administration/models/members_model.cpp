@@ -5,6 +5,7 @@
 #include <QtCore/QSortFilterProxyModel>
 #include <QtQml/QtQml>
 
+#include <client/client_globals.h>
 #include <client_core/client_core_module.h>
 #include <core/resource/resource_fwd.h>
 #include <core/resource/user_resource.h>
@@ -602,6 +603,7 @@ QHash<int, QByteArray> MembersModel::roleNames() const
     QHash<int, QByteArray> roles = base_type::roleNames();
     roles[Qt::DisplayRole] = "text";
     roles[DescriptionRole] = "description";
+    roles[Qn::DecorationPathRole] = "decorationPath";
     roles[IdRole] = "id";
     roles[IsUserRole] = "isUser";
     roles[OffsetRole] = "offset";
@@ -821,6 +823,16 @@ QVariant MembersModel::data(const QModelIndex& index, int role) const
             if (!systemContext()->nonEditableUsersAndGroups()->canEditParents(id))
                 return systemContext()->nonEditableUsersAndGroups()->tooltip(id);
             return {};
+
+        case Qn::DecorationPathRole:
+        {
+            if (index.data(MembersModel::IsPredefined).toBool())
+                return "image://svg/skin/user_settings/group_built_in.svg";
+
+            return index.data(MembersModel::IsLdap).toBool()
+                ? "image://svg/skin/user_settings/group_ldap.svg"
+                : "image://svg/skin/user_settings/group_custom.svg";
+        }
 
         default:
             return {};

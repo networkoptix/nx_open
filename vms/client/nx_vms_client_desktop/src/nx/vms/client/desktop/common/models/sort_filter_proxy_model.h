@@ -57,7 +57,7 @@ signals:
     void sortOrderChanged();
 
 private:
-    nx::utils::ScopedConnection m_rowsInsertedConnection;
+    nx::utils::ScopedConnections m_rolesUpdatingConnections;
     QString m_sortRoleName;
     QString m_filterRoleName;
 };

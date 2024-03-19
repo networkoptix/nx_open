@@ -41,6 +41,12 @@ Flow
             limit: 0
             onSourceCountChanged: repopulate()
         }
+
+        onItemAdded: (index, item) =>
+        {
+            if (index == 0)
+                control.baselineOffset = control.topPadding + item.baselineOffset
+        }
     }
 
     Item

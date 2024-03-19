@@ -41,7 +41,7 @@ Item
     property alias allowInsecure: allowInsecureCheckBox.checked
     property bool allowInsecureEditable: true
 
-    property alias model: groupsComboBox.model
+    property alias model: groupsComboBox.groupsModel
     property alias parentGroupsEditable: groupsComboBox.enabled
 
     property bool enabled: true

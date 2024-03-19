@@ -36,7 +36,7 @@ Item
     property var editingContext
     property bool nameIsUnique: true
 
-    property alias model: groupsComboBox.model
+    property alias model: groupsComboBox.groupsModel
     property alias parentGroupsEditable: groupsComboBox.enabled
 
     property var self

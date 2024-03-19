@@ -19,7 +19,7 @@ Item
     property alias description: descriptionTextArea.text
 
     property var self
-    property alias model: groupsComboBox.model
+    property alias model: groupsComboBox.groupsModel
 
     function validate()
     {
