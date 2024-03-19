@@ -1,6 +1,6 @@
 ## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-cmake_minimum_required(VERSION 3.3.2)
+cmake_minimum_required(VERSION 3.14)
 project(stub_analytics_plugin)
 
 set(metadataSdkDir "" CACHE PATH "Path to unpacked VMS Metadata SDK zip.")
