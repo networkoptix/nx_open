@@ -341,7 +341,7 @@ struct CloudCrossSystemContext::Private
         dataLoader->start(/*requestUser*/ !user);
     }
 
-    void addServersToResourcePool(nx::vms::api::ServerInformationList servers)
+    void addServersToResourcePool(nx::vms::api::ServerInformationV1List servers)
     {
         if (!NX_ASSERT(systemContext))
             return;

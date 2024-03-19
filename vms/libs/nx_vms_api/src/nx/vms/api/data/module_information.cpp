@@ -69,8 +69,61 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ModuleInformationWithAddresses,
     (ubjson)(json)(xml)(csv_record), ModuleInformationWithAddresses_Fields)
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(TransactionLogTime, (json), TransactionLogTime_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ServerInformation, (json), ServerInformation_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ServerInformationBase, (json), ServerInformationBase_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ServerInformationV1, (json), ServerInformationV1_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ServerInformationV4, (json), ServerInformationV4_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ServerRuntimeInformation, (json), ServerRuntimeInformation_Fields)
+
+ModuleInformation ServerInformationV1::getModuleInformation() const
+{
+    ModuleInformation info;
+    static_cast<ModuleInformationBase&>(info) = *this;
+    info.systemName = systemName;
+    info.localSystemId = localSystemId;
+    info.cloudSystemId = cloudSystemId;
+    return info;
+}
+
+bool ServerInformationV1::isNewSite() const
+{
+    return localSystemId.isNull();
+}
+
+ModuleInformation ServerInformationV4::getModuleInformation() const
+{
+    ModuleInformation info;
+    static_cast<ModuleInformationBase&>(info) = *this;
+    info.systemName = siteName;
+    info.localSystemId = localSiteId;
+    info.cloudSystemId = cloudSiteId;
+    return info;
+}
+
+bool ServerInformationV4::isNewSite() const
+{
+    return localSiteId.isNull();
+}
+
+ServerInformationV4::ServerInformationV4(const ModuleInformationWithAddresses& rhs):
+    ServerInformationBase(rhs),
+    siteName(rhs.systemName),
+    cloudSiteId(rhs.cloudSystemId),
+    localSiteId(rhs.localSystemId)
+{}
+
+ServerInformationV1::ServerInformationV1(ServerInformationV4&& rhs):
+    ServerInformationBase(std::move(rhs)),
+    systemName(std::move(rhs.siteName)),
+    cloudSystemId(std::move(rhs.cloudSiteId)),
+    localSystemId(std::move(rhs.localSiteId))
+{}
+
+ServerInformationV1::ServerInformationV1(const ModuleInformationWithAddresses& rhs):
+    ServerInformationBase(rhs),
+    systemName(rhs.systemName),
+    cloudSystemId(rhs.cloudSystemId),
+    localSystemId(rhs.localSystemId)
+{}
 
 } // namespace api
 } // namespace vms

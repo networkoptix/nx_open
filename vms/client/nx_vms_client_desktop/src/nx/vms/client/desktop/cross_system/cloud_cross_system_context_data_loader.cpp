@@ -34,7 +34,7 @@ struct CloudCrossSystemContextDataLoader::Private
 
     std::optional<rest::Handle> currentRequest;
     std::optional<UserModel> user;
-    std::optional<ServerInformationList> servers;
+    std::optional<ServerInformationV1List> servers;
     std::optional<ServerFootageDataList> serverFootageData;
     std::optional<SystemSettings> systemSettings;
     std::optional<LicenseDataList> licenses;
@@ -86,7 +86,7 @@ struct CloudCrossSystemContextDataLoader::Private
             [this](
                 bool success,
                 ::rest::Handle requestId,
-                ::rest::ErrorOrData<ServerInformationList> response)
+                ::rest::ErrorOrData<ServerInformationV1List> response)
             {
                 NX_ASSERT(currentRequest && *currentRequest == requestId);
                 currentRequest = std::nullopt;
@@ -103,7 +103,7 @@ struct CloudCrossSystemContextDataLoader::Private
                     return;
                 }
 
-                auto result = std::get_if<ServerInformationList>(&response);
+                auto result = std::get_if<ServerInformationV1List>(&response);
                 NX_VERBOSE(this, "Received %1 servers", result->size());
                 servers = *result;
                 requestData();
@@ -350,9 +350,9 @@ UserModel CloudCrossSystemContextDataLoader::user() const
     return d->user.value_or(UserModel());
 }
 
-ServerInformationList CloudCrossSystemContextDataLoader::servers() const
+ServerInformationV1List CloudCrossSystemContextDataLoader::servers() const
 {
-    return d->servers.value_or(ServerInformationList());
+    return d->servers.value_or(ServerInformationV1List());
 }
 
 ServerFootageDataList CloudCrossSystemContextDataLoader::serverFootageData() const

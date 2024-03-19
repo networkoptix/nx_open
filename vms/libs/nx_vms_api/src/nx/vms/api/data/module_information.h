@@ -39,13 +39,12 @@ struct NX_VMS_API ServerPortInformation
 NX_VMS_API_DECLARE_STRUCT_EX(ServerPortInformation, (ubjson)(json)(xml)(csv_record))
 NX_REFLECTION_INSTRUMENT(ServerPortInformation, ServerPortInformation_Fields);
 
-struct NX_VMS_API ModuleInformation: ServerPortInformation
+struct NX_VMS_API ModuleInformationBase: ServerPortInformation
 {
     QString type;
     QString customization;
     QString brand;
     nx::utils::SoftwareVersion version; /**<%apidoc:string */
-    QString systemName;
     QString name;
     bool sslAllowed = true;
     int protoVersion = 0;
@@ -53,10 +52,8 @@ struct NX_VMS_API ModuleInformation: ServerPortInformation
     ServerFlags serverFlags = {};
     QString realm;
     bool ecDbReadOnly = false;
-    QString cloudSystemId;
     QString cloudPortalUrl;
     QString cloudHost;
-    nx::Uuid localSystemId;
     HwPlatform hwPlatform;
 
     /**%apidoc Current time synchronized with the VMS Site, in milliseconds since epoch. */
@@ -66,6 +63,15 @@ struct NX_VMS_API ModuleInformation: ServerPortInformation
     std::optional<nx::Uuid> cloudOwnerId;
     std::optional<nx::Uuid> organizationId;
     nx::vms::api::SaasState saasState = nx::vms::api::SaasState::uninitialized;
+
+    bool operator==(const ModuleInformationBase& other) const = default;
+};
+
+struct NX_VMS_API ModuleInformation: ModuleInformationBase
+{
+    QString systemName;
+    QString cloudSystemId;
+    nx::Uuid localSystemId;
 
     void fixRuntimeId();
     QString cloudId() const;
@@ -138,8 +144,12 @@ struct NX_VMS_API TransactionLogTime
 NX_VMS_API_DECLARE_STRUCT_EX(TransactionLogTime, (json))
 NX_REFLECTION_INSTRUMENT(TransactionLogTime, TransactionLogTime_Fields);
 
-struct NX_VMS_API ServerInformation: ModuleInformationWithAddresses
+struct NX_VMS_API ServerInformationBase: ModuleInformationBase
 {
+    /**%apidoc:stringArray
+     * If any of these addresses don't contain port, port must be used.
+     */
+    QSet<QString> remoteAddresses;
     /**%apidoc
      * The content of a user-provided file `cert.pem` on the Server file system in PEM format
      * without private key. Empty if not provided or can't be loaded and parsed. It is used by
@@ -159,22 +169,105 @@ struct NX_VMS_API ServerInformation: ModuleInformationWithAddresses
 
     bool collectedByThisServer = false;
 
-    ServerInformation() = default;
-    ServerInformation(const ServerInformation& rhs) = default;
-    ServerInformation(const ModuleInformationWithAddresses& rhs): ModuleInformationWithAddresses(rhs) {}
+    ServerInformationBase() = default;
+    ServerInformationBase(const ServerInformationBase& rhs) = default;
+    ServerInformationBase& operator=(const ServerInformationBase& rhs) = default;
+    ServerInformationBase(ServerInformationBase&& rhs) = default;
+    ServerInformationBase& operator=(ServerInformationBase&& rhs) = default;
+    ServerInformationBase(const ModuleInformationWithAddresses& rhs):
+        ModuleInformationBase(rhs),
+        remoteAddresses(rhs.remoteAddresses)
+    {}
 
     nx::Uuid getId() const { return id; }
 };
-
-#define ServerInformation_Fields ModuleInformationWithAddresses_Fields \
+#define ServerInformationBase_Fields  \
+    (type) \
+    (customization) \
+    (version) \
+    (name) \
+    (port) \
+    (id) \
+    (sslAllowed) \
+    (protoVersion) \
+    (runtimeId) \
+    (serverFlags) \
+    (realm) \
+    (ecDbReadOnly) \
+    (cloudHost) \
+    (brand) \
+    (hwPlatform) \
+    (synchronizedTimeMs) \
+    (cloudOwnerId) \
+    (organizationId) \
+    (saasState)\
+    (remoteAddresses) \
     (userProvidedCertificatePem) \
     (certificatePem) \
     (systemIdentityTimeMs) \
     (transactionLogTime) \
     (collectedByThisServer)
 
-NX_VMS_API_DECLARE_STRUCT_AND_LIST_EX(ServerInformation, (json))
-NX_REFLECTION_INSTRUMENT(ServerInformation, ServerInformation_Fields);
+NX_VMS_API_DECLARE_STRUCT_AND_LIST_EX(ServerInformationBase, (json))
+NX_REFLECTION_INSTRUMENT(ServerInformationBase, ServerInformationBase_Fields);
+
+struct NX_VMS_API ServerInformationV4: ServerInformationBase
+{
+    QString siteName;
+    QString cloudSiteId;
+    nx::Uuid localSiteId;
+
+    ServerInformationV4() = default;
+    ServerInformationV4(const ServerInformationV4& rhs) = default;
+    ServerInformationV4& operator=(const ServerInformationV4& rhs) = default;
+    ServerInformationV4(ServerInformationV4&& rhs) = default;
+    ServerInformationV4& operator=(ServerInformationV4&& rhs) = default;
+
+    ServerInformationV4(const ModuleInformationWithAddresses& rhs);
+
+    ModuleInformation getModuleInformation() const;
+
+    bool isNewSite() const;
+};
+#define ServerInformationV4_Fields  \
+    ServerInformationBase_Fields \
+    (siteName) \
+    (cloudSiteId) \
+    (localSiteId)
+
+NX_VMS_API_DECLARE_STRUCT_AND_LIST_EX(ServerInformationV4, (json))
+NX_REFLECTION_INSTRUMENT(ServerInformationV4, ServerInformationV4_Fields);
+
+struct NX_VMS_API ServerInformationV1: ServerInformationBase
+{
+    QString systemName;
+    QString cloudSystemId;
+    nx::Uuid localSystemId;
+
+    ServerInformationV1() = default;
+    ServerInformationV1(const ServerInformationV1& rhs) = default;
+    ServerInformationV1& operator=(const ServerInformationV1& rhs) = default;
+    ServerInformationV1(ServerInformationV1&& rhs) = default;
+    ServerInformationV1& operator=(ServerInformationV1&& rhs) = default;
+
+    ServerInformationV1(ServerInformationV4&& rhs);
+
+    ServerInformationV1(const ModuleInformationWithAddresses& rhs);
+
+    ModuleInformation getModuleInformation() const;
+
+    bool isNewSite() const;
+};
+#define ServerInformationV1_Fields  \
+    ServerInformationBase_Fields \
+    (systemName) \
+    (cloudSystemId) \
+    (localSystemId)
+
+NX_VMS_API_DECLARE_STRUCT_AND_LIST_EX(ServerInformationV1, (json))
+NX_REFLECTION_INSTRUMENT(ServerInformationV1, ServerInformationV1_Fields);
+
+using ServerInformation = ServerInformationV4;
 
 struct NX_VMS_API ServerRuntimeInformation: ServerPortInformation, ServerTimeZoneInformation
 {

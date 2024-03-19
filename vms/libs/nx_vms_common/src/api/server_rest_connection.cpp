@@ -592,7 +592,7 @@ Handle ServerConnection::getMediaServers(
 }
 
 Handle ServerConnection::getServersInfo(
-    Result<ErrorOrData<nx::vms::api::ServerInformationList>>::type&& callback,
+    Result<ErrorOrData<nx::vms::api::ServerInformationV1List>>::type&& callback,
     QThread* targetThread)
 {
     return executeGet("/rest/v1/servers/*/info", {}, std::move(callback), targetThread);

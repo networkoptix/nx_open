@@ -54,7 +54,7 @@ struct NX_VMS_CLIENT_CORE_API RemoteConnectionFactoryContext: public QObject
     nx::vms::api::ModuleInformation moduleInformation;
 
     /** List of all Servers of the System (5.0+). */
-    std::vector<nx::vms::api::ServerInformation> serversInfo;
+    std::vector<nx::vms::api::ServerInformationV1> serversInfo;
 
     /** User info for the pre-6.0 Systems where old permissions model is implemented. */
     std::optional<nx::vms::api::UserModelV1> compatibilityUserModel;
