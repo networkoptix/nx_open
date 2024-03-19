@@ -1168,7 +1168,7 @@ void QnStorageConfigWidget::atStorageViewClicked(const QModelIndex& index)
         if (serversByArchiveAccessMode.size() > 1)
         {
             const auto messageBoxCaption =
-                tr("The System Servers have different read-write policies for the storage");
+                tr("The Site Servers have different read-write policies for the storage");
 
             const auto storageUrlDisplayString =
                 index.siblingAtColumn(QnStorageListModel::UrlColumn).data().toString();

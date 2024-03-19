@@ -460,7 +460,7 @@ QString NonEditableUsersAndGroups::tooltip(const nx::Uuid& id) const
 
     if (id == nx::vms::api::kDefaultLdapGroupId && m_nonRemovableGroups.contains(id))
     {
-        const auto result = tr("LDAP Default group cannot be deleted as long as the system is "
+        const auto result = tr("LDAP Default group cannot be deleted as long as the site is "
             "connected to LDAP server");
 
         return m_groupsWithNonEditableMembers.contains(id)
