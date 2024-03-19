@@ -230,6 +230,41 @@ Text choice data field. Items in `itemCaptions` are optional, as well as `itemCa
     "combobox1": "v2"
 
 ---------------------------------------------------------------------------------------------------
+## MultiSelectionComboBox
+
+Multiple selection data field. Items in `"itemCaptions"` are optional, as well as `"itemCaptions"`
+itself. The field `"maxItems"` is optional.
+
+[proprietary]
+
+![](doc/images/multi-selection-combo-box1.png)
+![](doc/images/multi-selection-combo-box2.png)
+
+[/proprietary]
+
+### Setting Model
+
+    {
+        "type": "MultiSelectionComboBox",
+        "name": "combobox1",
+        "caption": "Combo Box",
+        "description": "Choose one",
+        "defaultValue": ["v2"],
+        "range": ["v1", "v2", "v3"],
+        "isActive": true,
+        "maxItems": 2,
+        "itemCaptions": {
+            "v1": "value1",
+            "v2": "value2",
+            "v3": "value3"
+        }
+    }
+
+### Setting Value
+
+    "combobox1": ["v2"]
+
+---------------------------------------------------------------------------------------------------
 ## RadioButtonGroup
 
 Alternative text choice data field. Items in `itemCaptions` are optional, as well as `itemCaptions`

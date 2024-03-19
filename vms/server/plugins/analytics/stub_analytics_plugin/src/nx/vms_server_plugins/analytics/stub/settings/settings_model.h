@@ -170,6 +170,13 @@ static const std::string kEngineSettingsModel = /*suppress newline*/ 1 + R"json(
                     "range": ["value1", "value2", "value3"]
                 },
                 {
+                    "type": "MultiSelectionComboBox",
+                    "name": "testMultiSelectionComboBox",
+                    "caption": "Multi Selection Combo Box",
+                    "defaultValue": ["value1", "value2"],
+                    "range": ["value1", "value2", "value3"]
+                },
+                {
                     "type": "CheckBox",
                     "name": "testCheckBox",
                     "caption": "Check Box",
@@ -495,6 +502,19 @@ static const std::string kRegularSettingsModelPart2 = /*suppress newline*/ 1 + R
                     "name": "testComboBox",
                     "caption": "Device Agent ComboBox",
                     "defaultValue": "value2",
+                    "range": ["value1", "value2", "value3"],
+                    "itemCaptions":
+                    {
+                        "value1": "Device Agent Value #1",
+                        "value2": "Device Agent Value #2",
+                        "value3": "Device Agent Value #3"
+                    }
+                },
+                {
+                    "type": "MultiSelectionComboBox",
+                    "name": "testMultiSelectionComboBox",
+                    "caption": "Multi Selection Combo Box",
+                    "defaultValue": ["value1", "value2"],
                     "range": ["value1", "value2", "value3"],
                     "itemCaptions":
                     {
