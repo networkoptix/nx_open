@@ -7,6 +7,8 @@ nx_add_target(nx_sql LIBRARY NO_MOC
         Qt6::Sql
         nx_kit
         nx_utils
+    PRIVATE_LIBS
+        nx_fusion
     FOLDER common/libs
 )
 

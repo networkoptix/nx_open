@@ -247,6 +247,7 @@ public:
         registerSerializer<unsigned long long>();
         registerSerializer<float>();
         registerSerializer<double>();
+        registerSerializer<std::nullptr_t>();
 
         registerSerializer<QString>();
         registerSerializer<QByteArray>();
@@ -272,6 +273,7 @@ public:
         registerSerializer<QUrl>();
         registerSerializer<nx::utils::Url>();
         registerSerializer<QFont>();
+        registerSerializer<QDateTime>();
 
         registerSerializer<QnLatin1Array>();
     }
