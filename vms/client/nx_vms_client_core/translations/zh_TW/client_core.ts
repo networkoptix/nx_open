@@ -186,7 +186,7 @@
     </message>
     <message>
       <source>Your access to this system has expired.</source>
-      <translation type="unfinished">Your access to this system has expired.</translation>
+      <translation>您對該系統的存取權限已過期。</translation>
     </message>
     <message>
       <source>Please contact the system administrator to regain access.</source>
@@ -246,8 +246,8 @@
     </message>
     <message numerus="yes">
       <source>Cannot verify the identity of %n servers</source>
-      <translation type="unfinished">
-        <numerusform>Cannot verify the identity of %n servers</numerusform>
+      <translation>
+        <numerusform>無法驗證 %n 個伺服器的身份</numerusform>
       </translation>
     </message>
     <message>
