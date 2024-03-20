@@ -7,6 +7,7 @@
 #include <QtSql/QSqlError>
 #include <QtSql/QSqlQuery>
 
+#include <nx/fusion/model_functions.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/string.h>
 
@@ -39,7 +40,7 @@ QList<QByteArray> quotedSplit(const QByteArray& data)
     return result;
 }
 
-static bool validateParams(const QSqlQuery& query)
+bool validateParams(const QSqlQuery& query)
 {
     const auto values = query.boundValues();
     for (const auto& value: values)
@@ -48,6 +49,15 @@ static bool validateParams(const QSqlQuery& query)
             return false;
     }
     return true;
+}
+
+QString queryLogString(const QSqlQuery& query)
+{
+    const auto values = query.boundValues();
+    if (values.empty())
+        return query.lastQuery();
+
+    return query.lastQuery() + "\nValues: " + QJson::serialized(values);
 }
 
 } // namespace
@@ -60,20 +70,21 @@ bool SqlQueryExecutionHelper::execSQLQuery(const QString& queryStr, QSqlDatabase
 
 bool SqlQueryExecutionHelper::execSQLQuery(QSqlQuery* query, const char* details)
 {
-    NX_ASSERT_HEAVY_CONDITION(validateParams(*query), "Failure SQL in %2: %3", details, query->lastQuery());
+    NX_ASSERT_HEAVY_CONDITION(
+        validateParams(*query), "Failure SQL in %1: %2", details, queryLogString(*query));
     if (query->exec())
     {
-        NX_VERBOSE(NX_SCOPE_TAG, "%1 executed SQL query:\n%2", details, query->lastQuery());
+        NX_VERBOSE(NX_SCOPE_TAG, "%1 executed SQL query: %2", details, queryLogString(*query));
         return true;
     }
 
     auto error = query->lastError();
     // Assert only on statement error type as other errors are not our code responsibility.
     if (NX_ASSERT(error.type() != QSqlError::StatementError,
-        "%1 to execute SQL query in %2: %3", error, details, query->lastQuery()))
+        "%1 to execute SQL query in %2: %3", error, details, queryLogString(*query)))
     {
-        NX_DEBUG(NX_SCOPE_TAG, "%1 to execute SQL query in %2: %3",
-            error, details, query->lastQuery());
+        NX_DEBUG(NX_SCOPE_TAG,
+            "%1 to execute SQL query in %2: %3", error, details, queryLogString(*query));
     }
     return false;
 }

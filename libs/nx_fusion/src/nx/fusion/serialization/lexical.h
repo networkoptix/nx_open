@@ -1,7 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#ifndef QN_SERIALIZATION_LEXICAL_H
-#define QN_SERIALIZATION_LEXICAL_H
+#pragma once
 
 #include <cassert>
 #include <string>
@@ -76,6 +75,3 @@ namespace QnLexical {
     }
 
 } // namespace QnLexical
-
-
-#endif // QN_SERIALIZATION_LEXICAL_H

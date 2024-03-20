@@ -19,6 +19,7 @@
 #include <collection.h>
 
 #include <QtCore/QBitArray>
+#include <QtCore/QDateTime>
 #include <QtCore/QJsonArray>
 #include <QtCore/QPair>
 #include <QtCore/QPoint>
@@ -800,6 +801,7 @@ QN_FUSION_DECLARE_FUNCTIONS(QVector4D, (json), NX_FUSION_API)
 QN_FUSION_DECLARE_FUNCTIONS(nx::Uuid, (json), NX_FUSION_API)
 QN_FUSION_DECLARE_FUNCTIONS(QUrl, (json), NX_FUSION_API)
 QN_FUSION_DECLARE_FUNCTIONS(QFont, (json), NX_FUSION_API)
+QN_FUSION_DECLARE_FUNCTIONS(QDateTime, (json), NX_FUSION_API)
 
 #define QN_FUSION_REGISTER_DIRECT_OBJECT_KEY_SERIALIZER(TYPE)\
 template<> \

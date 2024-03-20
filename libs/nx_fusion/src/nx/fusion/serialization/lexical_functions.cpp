@@ -394,3 +394,14 @@ void serialize(const nx::utils::Url& url, QString* target)
 {
     *target = url.toString();
 }
+
+void serialize(const QDateTime& value, QString* target)
+{
+    *target = value.toString();
+}
+
+bool deserialize(const QString& value, QDateTime* target)
+{
+    *target = QDateTime::fromString(value);
+    return target->isValid();
+}

@@ -1,11 +1,11 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "lexical.h"
-#include "lexical_functions.h"
 
 #include <nx/fusion/serialization/chrono_metatypes.h>
-
 #include <nx/utils/url.h>
+
+#include "lexical_functions.h"
 
 class QnLexicalSerializerStorage: public QnSerializerStorage<QnLexicalSerializer> {
 public:
@@ -33,6 +33,7 @@ public:
         registerSerializer<nx::Uuid>();
         registerSerializer<QUrl>();
         registerSerializer<nx::utils::Url>();
+        registerSerializer<QDateTime>();
 
         registerSerializer<QnLatin1Array>();
     }

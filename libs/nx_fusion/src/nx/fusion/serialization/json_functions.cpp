@@ -42,6 +42,7 @@ QN_FUSION_DEFINE_FUNCTIONS(QnLatin1Array, (json_lexical))
 QN_FUSION_DEFINE_FUNCTIONS(QBitArray, (json_lexical))
 QN_FUSION_DEFINE_FUNCTIONS(QColor, (json_lexical))
 QN_FUSION_DEFINE_FUNCTIONS(QUrl, (json_lexical))
+QN_FUSION_DEFINE_FUNCTIONS(QDateTime, (json_lexical))
 
 QN_FUSION_DEFINE_FUNCTIONS(QSize, (json))
 QN_FUSION_DEFINE_FUNCTIONS(QSizeF, (json))
