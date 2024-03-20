@@ -6,6 +6,7 @@
 
 #include <QtWidgets/QWidget>
 
+#include <api/server_rest_connection_fwd.h>
 #include <core/resource/resource_fwd.h>
 
 namespace Ui { class BackupBandwidthSettingsWidget; }
@@ -30,6 +31,7 @@ public:
     void loadDataToUi();
     void applyChanges();
     void discardChanges();
+    bool isNetworkRequestRunning() const;
 
 signals:
     void hasChangesChanged();
@@ -46,6 +48,7 @@ private:
     const std::unique_ptr<BackupBandwidthScheduleCellPainter> m_scheduleCellPainter;
     QnMediaServerResourcePtr m_server;
     bool m_showSheduledLimitEditHint = true;
+    rest::Handle requestHandle = 0;
 };
 
 } // namespace nx::vms::client::desktop

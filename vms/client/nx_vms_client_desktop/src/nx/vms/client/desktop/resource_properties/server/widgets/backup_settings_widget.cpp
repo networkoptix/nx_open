@@ -124,8 +124,12 @@ void BackupSettingsWidget::applyChanges()
     using namespace std::chrono;
     static constexpr auto kStatusUpdateTimeout = 500ms;
 
-    m_backupSettingsViewWidget->applyChanges();
-    ui->backupBandwidthSettingsWidget->applyChanges();
+    if (m_backupSettingsViewWidget->hasChanges())
+        m_backupSettingsViewWidget->applyChanges();
+
+    if (ui->backupBandwidthSettingsWidget->hasChanges())
+        ui->backupBandwidthSettingsWidget->applyChanges();
+
     QTimer::singleShot(kStatusUpdateTimeout,
         ui->backupStatusWidget, &BackupStatusWidget::updateBackupStatus);
 }
@@ -139,7 +143,8 @@ void BackupSettingsWidget::discardChanges()
 
 bool BackupSettingsWidget::isNetworkRequestRunning() const
 {
-    return m_backupSettingsViewWidget->isNetworkRequestRunning();
+    return m_backupSettingsViewWidget->isNetworkRequestRunning()
+        || ui->backupBandwidthSettingsWidget->isNetworkRequestRunning();
 }
 
 void BackupSettingsWidget::loadState(const ServerSettingsDialogState& state)
