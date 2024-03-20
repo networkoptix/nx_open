@@ -1218,7 +1218,99 @@
     </message>
   </context>
   <context>
-    <name>SystemSettings</name>
+    <name>TimeFormat</name>
+    <message>
+      <source>just now</source>
+      <translation>ngay bây giờ</translation>
+    </message>
+    <message>
+      <source>yesterday</source>
+      <translation>hôm qua</translation>
+    </message>
+    <message>
+      <source>a week ago</source>
+      <translation>một tuần trước</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n minutes ago</source>
+      <translation>
+        <numerusform>%n phút trước</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n hours ago</source>
+      <translation>
+        <numerusform>%n giờ trước</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n days ago</source>
+      <translation>
+        <numerusform>%n ngày trước</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::recording::Error</name>
+    <message>
+      <source>Internal error</source>
+      <translation>Lỗi nội bộ</translation>
+    </message>
+    <message>
+      <source>Corresponding container in FFMPEG library was not found.</source>
+      <translation>Không tìm thấy thư mục tương ứng trong thư viện FFMPEG.</translation>
+    </message>
+    <message>
+      <source>Could not create output file for video recording.</source>
+      <translation>Không thể tạo tệp đầu ra để ghi hình.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output stream for recording.</source>
+      <translation>Không thể phân bổ luồng đầu ra để ghi.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output audio stream.</source>
+      <translation>Không thể phân bổ luồng âm thanh đầu ra.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output metadata stream.</source>
+      <translation>Không thể phân bổ luồng đầu ra siêu dữ liệu.</translation>
+    </message>
+    <message>
+      <source>Invalid audio codec information.</source>
+      <translation>Thông tin mã hóa âm thanh không hợp lệ.</translation>
+    </message>
+    <message>
+      <source>Video or audio codec is incompatible with the selected format.</source>
+      <translation>Mã hóa hình ảnh hoặc âm thanh không tương thích với định dạng đã chọn.</translation>
+    </message>
+    <message>
+      <source>Video transcoding required.</source>
+      <translation>Yêu cầu chuyển mã video.</translation>
+    </message>
+    <message>
+      <source>File write error. Not enough free space.</source>
+      <translation>Lỗi ghi tập tin. Không đủ chỗ trống.</translation>
+    </message>
+    <message>
+      <source>Invalid resource type for data export.</source>
+      <translation>Loại tài nguyên không hợp lệ để xuất dữ liệu.</translation>
+    </message>
+    <message>
+      <source>No data exported.</source>
+      <translation>Không có dữ liệu nào được xuất.</translation>
+    </message>
+    <message>
+      <source>Unlock this portion of the archive to export its contents.</source>
+      <translation>Mở khóa phần lưu trữ này để xuất nội dung.</translation>
+    </message>
+    <message>
+      <source>Archive is unavailable now. Please try again later.</source>
+      <translation>Lưu trữ hiện không có sẵn. Vui lòng thử lại sau.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::common::SystemSettings</name>
     <message>
       <source>Anonymous statistics report allowed</source>
       <translation>Cho phép báo cáo thống kê ẩn danh</translation>
@@ -1639,98 +1731,6 @@
     <message>
       <source>Local System ID, null means the System is not set up yet.</source>
       <translation>ID hệ thống cục bộ, null có nghĩa là Hệ thống chưa được thiết lập.</translation>
-    </message>
-  </context>
-  <context>
-    <name>TimeFormat</name>
-    <message>
-      <source>just now</source>
-      <translation>ngay bây giờ</translation>
-    </message>
-    <message>
-      <source>yesterday</source>
-      <translation>hôm qua</translation>
-    </message>
-    <message>
-      <source>a week ago</source>
-      <translation>một tuần trước</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n minutes ago</source>
-      <translation>
-        <numerusform>%n phút trước</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n hours ago</source>
-      <translation>
-        <numerusform>%n giờ trước</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n days ago</source>
-      <translation>
-        <numerusform>%n ngày trước</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::recording::Error</name>
-    <message>
-      <source>Internal error</source>
-      <translation>Lỗi nội bộ</translation>
-    </message>
-    <message>
-      <source>Corresponding container in FFMPEG library was not found.</source>
-      <translation>Không tìm thấy thư mục tương ứng trong thư viện FFMPEG.</translation>
-    </message>
-    <message>
-      <source>Could not create output file for video recording.</source>
-      <translation>Không thể tạo tệp đầu ra để ghi hình.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output stream for recording.</source>
-      <translation>Không thể phân bổ luồng đầu ra để ghi.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output audio stream.</source>
-      <translation>Không thể phân bổ luồng âm thanh đầu ra.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output metadata stream.</source>
-      <translation>Không thể phân bổ luồng đầu ra siêu dữ liệu.</translation>
-    </message>
-    <message>
-      <source>Invalid audio codec information.</source>
-      <translation>Thông tin mã hóa âm thanh không hợp lệ.</translation>
-    </message>
-    <message>
-      <source>Video or audio codec is incompatible with the selected format.</source>
-      <translation>Mã hóa hình ảnh hoặc âm thanh không tương thích với định dạng đã chọn.</translation>
-    </message>
-    <message>
-      <source>Video transcoding required.</source>
-      <translation>Yêu cầu chuyển mã video.</translation>
-    </message>
-    <message>
-      <source>File write error. Not enough free space.</source>
-      <translation>Lỗi ghi tập tin. Không đủ chỗ trống.</translation>
-    </message>
-    <message>
-      <source>Invalid resource type for data export.</source>
-      <translation>Loại tài nguyên không hợp lệ để xuất dữ liệu.</translation>
-    </message>
-    <message>
-      <source>No data exported.</source>
-      <translation>Không có dữ liệu nào được xuất.</translation>
-    </message>
-    <message>
-      <source>Unlock this portion of the archive to export its contents.</source>
-      <translation>Mở khóa phần lưu trữ này để xuất nội dung.</translation>
-    </message>
-    <message>
-      <source>Archive is unavailable now. Please try again later.</source>
-      <translation>Lưu trữ hiện không có sẵn. Vui lòng thử lại sau.</translation>
     </message>
   </context>
   <context>

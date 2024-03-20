@@ -1274,7 +1274,102 @@
     </message>
   </context>
   <context>
-    <name>SystemSettings</name>
+    <name>TimeFormat</name>
+    <message>
+      <source>just now</source>
+      <translation>à l’instant</translation>
+    </message>
+    <message>
+      <source>yesterday</source>
+      <translation>hier</translation>
+    </message>
+    <message>
+      <source>a week ago</source>
+      <translation>il y a une semaine</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n minutes ago</source>
+      <translation>
+        <numerusform>il y a %n minute</numerusform>
+        <numerusform>il y a %n minutes</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n hours ago</source>
+      <translation>
+        <numerusform>Il y a %n heure</numerusform>
+        <numerusform>Il y a %n heures</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n days ago</source>
+      <translation>
+        <numerusform>Il y a %n jour</numerusform>
+        <numerusform>Il y a %n jours</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::recording::Error</name>
+    <message>
+      <source>Internal error</source>
+      <translation>Erreur interne</translation>
+    </message>
+    <message>
+      <source>Corresponding container in FFMPEG library was not found.</source>
+      <translation>Aucun conteneur correspondant n'a été trouvé dans la librairie FFMPEG.</translation>
+    </message>
+    <message>
+      <source>Could not create output file for video recording.</source>
+      <translation>Ne peut pas créer un fichier de sortie pour l'enregistrement vidéo.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output stream for recording.</source>
+      <translation>Ne peut pas allouer un flux de sortie pour l'enregistrement.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output audio stream.</source>
+      <translation>Ne peut pas allouer le flux audio de sortie.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output metadata stream.</source>
+      <translation>Impossible d'allouer le flux de métadonnées de sortie.</translation>
+    </message>
+    <message>
+      <source>Invalid audio codec information.</source>
+      <translation>Information de codec audio invalide.</translation>
+    </message>
+    <message>
+      <source>Video or audio codec is incompatible with the selected format.</source>
+      <translation>Le codec vidéo ou audio est incompatible avec le format sélectionné.</translation>
+    </message>
+    <message>
+      <source>Video transcoding required.</source>
+      <translation>Transcodage vidéo requis.</translation>
+    </message>
+    <message>
+      <source>File write error. Not enough free space.</source>
+      <translation>Erreur d'écriture de fichier. Pas d'éspace libre.</translation>
+    </message>
+    <message>
+      <source>Invalid resource type for data export.</source>
+      <translation>Type de ressource invalide pour l’exportation de données.</translation>
+    </message>
+    <message>
+      <source>No data exported.</source>
+      <translation>Aucune donnée exportée.</translation>
+    </message>
+    <message>
+      <source>Unlock this portion of the archive to export its contents.</source>
+      <translation>Déverrouillez cette partie de l'archive pour exporter son contenu.</translation>
+    </message>
+    <message>
+      <source>Archive is unavailable now. Please try again later.</source>
+      <translation>Les archives sont indisponibles maintenant. Veuillez réessayer plus tard.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::common::SystemSettings</name>
     <message>
       <source>Anonymous statistics report allowed</source>
       <translation>Statistique anonyme autorisée</translation>
@@ -1697,101 +1792,6 @@
     <message>
       <source>Local System ID, null means the System is not set up yet.</source>
       <translation>ID du système local, null signifie que le système n'est pas encore configuré.</translation>
-    </message>
-  </context>
-  <context>
-    <name>TimeFormat</name>
-    <message>
-      <source>just now</source>
-      <translation>à l’instant</translation>
-    </message>
-    <message>
-      <source>yesterday</source>
-      <translation>hier</translation>
-    </message>
-    <message>
-      <source>a week ago</source>
-      <translation>il y a une semaine</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n minutes ago</source>
-      <translation>
-        <numerusform>il y a %n minute</numerusform>
-        <numerusform>il y a %n minutes</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n hours ago</source>
-      <translation>
-        <numerusform>Il y a %n heure</numerusform>
-        <numerusform>Il y a %n heures</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n days ago</source>
-      <translation>
-        <numerusform>Il y a %n jour</numerusform>
-        <numerusform>Il y a %n jours</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::recording::Error</name>
-    <message>
-      <source>Internal error</source>
-      <translation>Erreur interne</translation>
-    </message>
-    <message>
-      <source>Corresponding container in FFMPEG library was not found.</source>
-      <translation>Aucun conteneur correspondant n'a été trouvé dans la librairie FFMPEG.</translation>
-    </message>
-    <message>
-      <source>Could not create output file for video recording.</source>
-      <translation>Ne peut pas créer un fichier de sortie pour l'enregistrement vidéo.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output stream for recording.</source>
-      <translation>Ne peut pas allouer un flux de sortie pour l'enregistrement.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output audio stream.</source>
-      <translation>Ne peut pas allouer le flux audio de sortie.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output metadata stream.</source>
-      <translation>Impossible d'allouer le flux de métadonnées de sortie.</translation>
-    </message>
-    <message>
-      <source>Invalid audio codec information.</source>
-      <translation>Information de codec audio invalide.</translation>
-    </message>
-    <message>
-      <source>Video or audio codec is incompatible with the selected format.</source>
-      <translation>Le codec vidéo ou audio est incompatible avec le format sélectionné.</translation>
-    </message>
-    <message>
-      <source>Video transcoding required.</source>
-      <translation>Transcodage vidéo requis.</translation>
-    </message>
-    <message>
-      <source>File write error. Not enough free space.</source>
-      <translation>Erreur d'écriture de fichier. Pas d'éspace libre.</translation>
-    </message>
-    <message>
-      <source>Invalid resource type for data export.</source>
-      <translation>Type de ressource invalide pour l’exportation de données.</translation>
-    </message>
-    <message>
-      <source>No data exported.</source>
-      <translation>Aucune donnée exportée.</translation>
-    </message>
-    <message>
-      <source>Unlock this portion of the archive to export its contents.</source>
-      <translation>Déverrouillez cette partie de l'archive pour exporter son contenu.</translation>
-    </message>
-    <message>
-      <source>Archive is unavailable now. Please try again later.</source>
-      <translation>Les archives sont indisponibles maintenant. Veuillez réessayer plus tard.</translation>
     </message>
   </context>
   <context>

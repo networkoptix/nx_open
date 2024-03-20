@@ -1218,7 +1218,99 @@
     </message>
   </context>
   <context>
-    <name>SystemSettings</name>
+    <name>TimeFormat</name>
+    <message>
+      <source>just now</source>
+      <translation type="unfinished">just now</translation>
+    </message>
+    <message>
+      <source>yesterday</source>
+      <translation type="unfinished">yesterday</translation>
+    </message>
+    <message>
+      <source>a week ago</source>
+      <translation type="unfinished">a week ago</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n minutes ago</source>
+      <translation type="unfinished">
+        <numerusform>%n minutes ago</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n hours ago</source>
+      <translation type="unfinished">
+        <numerusform>%n hours ago</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n days ago</source>
+      <translation type="unfinished">
+        <numerusform>%n days ago</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::recording::Error</name>
+    <message>
+      <source>Internal error</source>
+      <translation>ข้อผิดพลาดภายใน</translation>
+    </message>
+    <message>
+      <source>Corresponding container in FFMPEG library was not found.</source>
+      <translation>ภาชนะที่สอดคล้องกันในสมุด FFMPEG ไม่พบ.</translation>
+    </message>
+    <message>
+      <source>Could not create output file for video recording.</source>
+      <translation>ไม่สามารถสร้างไฟล์ที่ส่งออกสำหรับการบันทึกวิดีโอ.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output stream for recording.</source>
+      <translation>ไม่สามารถจัดการส่งออกสตรีม สำหรับการบันทึก.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output audio stream.</source>
+      <translation>ไม่สามารถจัดสรรสตรีมข้อมูลเสียงเอาท์พุท.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output metadata stream.</source>
+      <translation type="unfinished">Could not allocate output metadata stream.</translation>
+    </message>
+    <message>
+      <source>Invalid audio codec information.</source>
+      <translation>ข้อมูลตัวแปลงสัญญาณเสียงไม่ถูกต้อง.</translation>
+    </message>
+    <message>
+      <source>Video or audio codec is incompatible with the selected format.</source>
+      <translation>วิดีโอหรือตัวแปลงสัญญาณเสียงไม่เข้ากันกับรูปแบบที่เลือก.</translation>
+    </message>
+    <message>
+      <source>Video transcoding required.</source>
+      <translation>จำเป็นต้องมีการแปลงรหัสวิดีโอ</translation>
+    </message>
+    <message>
+      <source>File write error. Not enough free space.</source>
+      <translation>ข้อผิดพลาดในการเขียนไฟล์ เนื้อที่ว่างไม่เพียงพอ.</translation>
+    </message>
+    <message>
+      <source>Invalid resource type for data export.</source>
+      <translation>ประเภทรีซอร์สไม่ถูกต้องสำหรับการส่งออกข้อมูล</translation>
+    </message>
+    <message>
+      <source>No data exported.</source>
+      <translation>ไม่มีข้อมูลที่ส่งออก</translation>
+    </message>
+    <message>
+      <source>Unlock this portion of the archive to export its contents.</source>
+      <translation type="unfinished">Unlock this portion of the archive to export its contents.</translation>
+    </message>
+    <message>
+      <source>Archive is unavailable now. Please try again later.</source>
+      <translation type="unfinished">Archive is unavailable now. Please try again later.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::common::SystemSettings</name>
     <message>
       <source>Anonymous statistics report allowed</source>
       <translation type="unfinished">Anonymous statistics report allowed</translation>
@@ -1639,98 +1731,6 @@
     <message>
       <source>Local System ID, null means the System is not set up yet.</source>
       <translation>Local System ID null หมายความว่าระบบยังไม่ได้ตั้งค่า</translation>
-    </message>
-  </context>
-  <context>
-    <name>TimeFormat</name>
-    <message>
-      <source>just now</source>
-      <translation type="unfinished">just now</translation>
-    </message>
-    <message>
-      <source>yesterday</source>
-      <translation type="unfinished">yesterday</translation>
-    </message>
-    <message>
-      <source>a week ago</source>
-      <translation type="unfinished">a week ago</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n minutes ago</source>
-      <translation type="unfinished">
-        <numerusform>%n minutes ago</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n hours ago</source>
-      <translation type="unfinished">
-        <numerusform>%n hours ago</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n days ago</source>
-      <translation type="unfinished">
-        <numerusform>%n days ago</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::recording::Error</name>
-    <message>
-      <source>Internal error</source>
-      <translation>ข้อผิดพลาดภายใน</translation>
-    </message>
-    <message>
-      <source>Corresponding container in FFMPEG library was not found.</source>
-      <translation>ภาชนะที่สอดคล้องกันในสมุด FFMPEG ไม่พบ.</translation>
-    </message>
-    <message>
-      <source>Could not create output file for video recording.</source>
-      <translation>ไม่สามารถสร้างไฟล์ที่ส่งออกสำหรับการบันทึกวิดีโอ.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output stream for recording.</source>
-      <translation>ไม่สามารถจัดการส่งออกสตรีม สำหรับการบันทึก.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output audio stream.</source>
-      <translation>ไม่สามารถจัดสรรสตรีมข้อมูลเสียงเอาท์พุท.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output metadata stream.</source>
-      <translation type="unfinished">Could not allocate output metadata stream.</translation>
-    </message>
-    <message>
-      <source>Invalid audio codec information.</source>
-      <translation>ข้อมูลตัวแปลงสัญญาณเสียงไม่ถูกต้อง.</translation>
-    </message>
-    <message>
-      <source>Video or audio codec is incompatible with the selected format.</source>
-      <translation>วิดีโอหรือตัวแปลงสัญญาณเสียงไม่เข้ากันกับรูปแบบที่เลือก.</translation>
-    </message>
-    <message>
-      <source>Video transcoding required.</source>
-      <translation>จำเป็นต้องมีการแปลงรหัสวิดีโอ</translation>
-    </message>
-    <message>
-      <source>File write error. Not enough free space.</source>
-      <translation>ข้อผิดพลาดในการเขียนไฟล์ เนื้อที่ว่างไม่เพียงพอ.</translation>
-    </message>
-    <message>
-      <source>Invalid resource type for data export.</source>
-      <translation>ประเภทรีซอร์สไม่ถูกต้องสำหรับการส่งออกข้อมูล</translation>
-    </message>
-    <message>
-      <source>No data exported.</source>
-      <translation>ไม่มีข้อมูลที่ส่งออก</translation>
-    </message>
-    <message>
-      <source>Unlock this portion of the archive to export its contents.</source>
-      <translation type="unfinished">Unlock this portion of the archive to export its contents.</translation>
-    </message>
-    <message>
-      <source>Archive is unavailable now. Please try again later.</source>
-      <translation type="unfinished">Archive is unavailable now. Please try again later.</translation>
     </message>
   </context>
   <context>

@@ -1218,7 +1218,99 @@
     </message>
   </context>
   <context>
-    <name>SystemSettings</name>
+    <name>TimeFormat</name>
+    <message>
+      <source>just now</source>
+      <translation type="unfinished">just now</translation>
+    </message>
+    <message>
+      <source>yesterday</source>
+      <translation type="unfinished">yesterday</translation>
+    </message>
+    <message>
+      <source>a week ago</source>
+      <translation type="unfinished">a week ago</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n minutes ago</source>
+      <translation type="unfinished">
+        <numerusform>%n minutes ago</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n hours ago</source>
+      <translation type="unfinished">
+        <numerusform>%n hours ago</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n days ago</source>
+      <translation type="unfinished">
+        <numerusform>%n days ago</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::recording::Error</name>
+    <message>
+      <source>Internal error</source>
+      <translation>내부 오류</translation>
+    </message>
+    <message>
+      <source>Corresponding container in FFMPEG library was not found.</source>
+      <translation>FFMPEG 라이브러리에서 해당 컨테이너 찾을 수 없습니다.</translation>
+    </message>
+    <message>
+      <source>Could not create output file for video recording.</source>
+      <translation>비디오 저장에 대한 출력 파일을 만들수 없습니다.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output stream for recording.</source>
+      <translation>저장을 위한 출력 스트림을 할당 할 수 없습니다.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output audio stream.</source>
+      <translation>오디오 출력 스트림을 할당할 수 없습니다.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output metadata stream.</source>
+      <translation>출력 메타데이터 스트림을 할당할 수 없습니다.</translation>
+    </message>
+    <message>
+      <source>Invalid audio codec information.</source>
+      <translation>잘못된 오디오 코덱 정보임.</translation>
+    </message>
+    <message>
+      <source>Video or audio codec is incompatible with the selected format.</source>
+      <translation>비디오 또는 오디오 코덱은 선택된 포맷과 호환되지 않습니다.</translation>
+    </message>
+    <message>
+      <source>Video transcoding required.</source>
+      <translation>비디오 트랜스코딩이 필요합니다.</translation>
+    </message>
+    <message>
+      <source>File write error. Not enough free space.</source>
+      <translation>파일 쓰기 오류입니다. 충분 하지 않은 여유 공간입니다.</translation>
+    </message>
+    <message>
+      <source>Invalid resource type for data export.</source>
+      <translation>데이터 내보내기에 대 한 잘못 된 리소스 형식입니다.</translation>
+    </message>
+    <message>
+      <source>No data exported.</source>
+      <translation>내 보낼 데이타가 없습니다.</translation>
+    </message>
+    <message>
+      <source>Unlock this portion of the archive to export its contents.</source>
+      <translation type="unfinished">Unlock this portion of the archive to export its contents.</translation>
+    </message>
+    <message>
+      <source>Archive is unavailable now. Please try again later.</source>
+      <translation>지금은 아카이브를 사용할 수 없습니다. 나중에 다시 시도 해주십시오.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::common::SystemSettings</name>
     <message>
       <source>Anonymous statistics report allowed</source>
       <translation type="unfinished">Anonymous statistics report allowed</translation>
@@ -1639,98 +1731,6 @@
     <message>
       <source>Local System ID, null means the System is not set up yet.</source>
       <translation type="unfinished">Local System ID, null means the System is not set up yet.</translation>
-    </message>
-  </context>
-  <context>
-    <name>TimeFormat</name>
-    <message>
-      <source>just now</source>
-      <translation type="unfinished">just now</translation>
-    </message>
-    <message>
-      <source>yesterday</source>
-      <translation type="unfinished">yesterday</translation>
-    </message>
-    <message>
-      <source>a week ago</source>
-      <translation type="unfinished">a week ago</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n minutes ago</source>
-      <translation type="unfinished">
-        <numerusform>%n minutes ago</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n hours ago</source>
-      <translation type="unfinished">
-        <numerusform>%n hours ago</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n days ago</source>
-      <translation type="unfinished">
-        <numerusform>%n days ago</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::recording::Error</name>
-    <message>
-      <source>Internal error</source>
-      <translation>내부 오류</translation>
-    </message>
-    <message>
-      <source>Corresponding container in FFMPEG library was not found.</source>
-      <translation>FFMPEG 라이브러리에서 해당 컨테이너 찾을 수 없습니다.</translation>
-    </message>
-    <message>
-      <source>Could not create output file for video recording.</source>
-      <translation>비디오 저장에 대한 출력 파일을 만들수 없습니다.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output stream for recording.</source>
-      <translation>저장을 위한 출력 스트림을 할당 할 수 없습니다.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output audio stream.</source>
-      <translation>오디오 출력 스트림을 할당할 수 없습니다.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output metadata stream.</source>
-      <translation>출력 메타데이터 스트림을 할당할 수 없습니다.</translation>
-    </message>
-    <message>
-      <source>Invalid audio codec information.</source>
-      <translation>잘못된 오디오 코덱 정보임.</translation>
-    </message>
-    <message>
-      <source>Video or audio codec is incompatible with the selected format.</source>
-      <translation>비디오 또는 오디오 코덱은 선택된 포맷과 호환되지 않습니다.</translation>
-    </message>
-    <message>
-      <source>Video transcoding required.</source>
-      <translation>비디오 트랜스코딩이 필요합니다.</translation>
-    </message>
-    <message>
-      <source>File write error. Not enough free space.</source>
-      <translation>파일 쓰기 오류입니다. 충분 하지 않은 여유 공간입니다.</translation>
-    </message>
-    <message>
-      <source>Invalid resource type for data export.</source>
-      <translation>데이터 내보내기에 대 한 잘못 된 리소스 형식입니다.</translation>
-    </message>
-    <message>
-      <source>No data exported.</source>
-      <translation>내 보낼 데이타가 없습니다.</translation>
-    </message>
-    <message>
-      <source>Unlock this portion of the archive to export its contents.</source>
-      <translation type="unfinished">Unlock this portion of the archive to export its contents.</translation>
-    </message>
-    <message>
-      <source>Archive is unavailable now. Please try again later.</source>
-      <translation>지금은 아카이브를 사용할 수 없습니다. 나중에 다시 시도 해주십시오.</translation>
     </message>
   </context>
   <context>
