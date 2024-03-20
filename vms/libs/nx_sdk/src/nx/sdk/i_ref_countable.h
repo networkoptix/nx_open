@@ -71,7 +71,7 @@ public:
     };
 
 protected:
-    /** Intended to be used in interface(). Can be called only with a string literal. */
+    /** Intended to be used in interfaceId(). Can be called only with a string literal. */
     template<int len>
     static constexpr const InterfaceId* makeId(const char (&charArray)[len])
     {
@@ -131,18 +131,57 @@ protected:
         return nullptr;
     }
 
-public:
-    template<class Interface>
-    Ptr<Interface> queryInterface()
+    /** Intended to be used via hasAlternativeInterfaceId. */
+    template<typename RefCountable>
+    struct HasAlternativeInterfaceId
     {
-        return Ptr(static_cast<Interface*>(queryInterface(Interface::interfaceId())));
+    private:
+        // SFINAE: The first overload will be chosen when T::alternativeInterfaceId() exists,
+        // the second overload will be chosen otherwise. Since test() is used only in decltype(),
+        // it does not need a function definition.
+
+        template<typename T>
+        static constexpr std::true_type test(decltype(T::alternativeInterfaceId())* arg);
+
+        template<typename T>
+        static constexpr std::false_type test(...);
+
+    public:
+        static constexpr bool value = decltype(test<RefCountable>(nullptr))::value;
+    };
+
+    /**
+     * Checks whether the specified interface class has alternativeInterfaceId(). Usage example:
+     * ```
+     *     if constexpr (hasAlternativeInterfaceId<ISomething>)
+     *         return something->queryInterface(ISomething::alternativeInterfaceId());
+     * ```
+     */
+    template<typename RefCountable>
+    static constexpr bool hasAlternativeInterfaceId = HasAlternativeInterfaceId<RefCountable>::value;
+
+public:
+    template<class RefCountable>
+    Ptr<RefCountable> queryInterface()
+    {
+        IRefCountable* refCountable = nullptr;
+        if constexpr (hasAlternativeInterfaceId<RefCountable>)
+            refCountable = queryInterface(RefCountable::alternativeInterfaceId());
+        if (!refCountable)
+            refCountable = queryInterface(RefCountable::interfaceId());
+        return Ptr(static_cast<RefCountable*>(refCountable));
     }
 
-    template<class Interface>
-    Ptr<const Interface> queryInterface() const
+    template<class RefCountable>
+    Ptr<const RefCountable> queryInterface() const
     {
-        return Ptr(static_cast<const Interface*>(
-            const_cast<IRefCountable*>(this)->queryInterface(Interface::interfaceId())));
+        auto nonConstThis = const_cast<IRefCountable*>(this);
+        IRefCountable* refCountable = nullptr;
+        if constexpr (hasAlternativeInterfaceId<RefCountable>)
+            refCountable = nonConstThis->queryInterface(RefCountable::alternativeInterfaceId());
+        if (!refCountable)
+            refCountable = nonConstThis->queryInterface(RefCountable::interfaceId());
+        return Ptr(static_cast<const RefCountable*>(refCountable));
     }
 
     /**
