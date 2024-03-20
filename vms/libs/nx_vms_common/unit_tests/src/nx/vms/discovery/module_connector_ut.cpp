@@ -2,13 +2,12 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/network/address_resolver.h>
 #include <nx/network/app_info.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
+#include <nx/network/dns_alias.h>
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/http/test_http_server.h>
 #include <nx/network/nettools.h>
-#include <nx/network/socket_global.h>
 #include <nx/network/rest/result.h>
 #include <nx/utils/lockable.h>
 #include <nx/utils/log/log.h>
@@ -227,27 +226,6 @@ private:
     std::vector<std::pair<api::ModuleInformation, api::ModuleInformation>> m_conflicts;
 };
 
-struct DnsAlias
-{
-    const nx::network::SocketAddress original;
-    const nx::network::SocketAddress alias;
-
-    DnsAlias(nx::network::SocketAddress original_, nx::network::HostAddress alias_):
-        original(original_),
-        alias(alias_, original_.port)
-    {
-        nx::network::SocketGlobals::addressResolver().addFixedAddress(alias.address, original);
-    }
-
-    ~DnsAlias()
-    {
-        nx::network::SocketGlobals::addressResolver().removeFixedAddress(alias.address, original);
-    }
-
-    DnsAlias(const DnsAlias&) = delete;
-    DnsAlias& operator=(const DnsAlias&) = delete;
-};
-
 TEST_F(DiscoveryModuleConnector, AddEndpoints)
 {
     const auto id1 = nx::Uuid::createUuid();
@@ -351,6 +329,8 @@ TEST_F(DiscoveryModuleConnector, ActivateDiactivate)
 
 TEST_F(DiscoveryModuleConnector, EndpointPriority)
 {
+    using namespace nx::network;
+
     nx::network::HostAddress interfaceIp;
     const auto interfaceIpsV4 = nx::network::getLocalIpV4AddressList();
     if (interfaceIpsV4.empty())
