@@ -479,23 +479,23 @@
     </message>
     <message>
       <source>Show Motion/Smart Search</source>
-      <translation>モーション/スマート検索の表示</translation>
+      <translation>モーション/スマート検索を表示</translation>
     </message>
     <message>
       <source>Show Motion</source>
-      <translation>モーション表示</translation>
+      <translation>モーションを表示</translation>
     </message>
     <message>
       <source>Hide Motion/Smart Search</source>
-      <translation>モーション/スマート検索の非表示</translation>
+      <translation>モーション/スマート検索を非表示</translation>
     </message>
     <message>
       <source>Hide Motion</source>
-      <translation>モーション非表示</translation>
+      <translation>モーションを非表示</translation>
     </message>
     <message>
       <source>Clear Motion Selection</source>
-      <translation>モーション選択の削除</translation>
+      <translation>モーション選択をクリア</translation>
     </message>
     <message>
       <source>Check File Watermark</source>
@@ -527,7 +527,7 @@
     </message>
     <message>
       <source>Rename</source>
-      <translation>名前の変更</translation>
+      <translation>名前を変更</translation>
     </message>
     <message>
       <source>Delete from Disk</source>
@@ -535,7 +535,7 @@
     </message>
     <message>
       <source>Set as Layout Background</source>
-      <translation>レイアウト背景として設定</translation>
+      <translation>レイアウトの背景として設定</translation>
     </message>
     <message>
       <source>User Settings...</source>
@@ -751,7 +751,7 @@
     </message>
     <message>
       <source>Bookmark Log...</source>
-      <translation>ブックマークログ</translation>
+      <translation>ブックマークログ...</translation>
     </message>
     <message>
       <source>Showreel...</source>
@@ -799,7 +799,7 @@
     </message>
     <message>
       <source>Export Bookmarks...</source>
-      <translation>ブックマークのエクスポート...</translation>
+      <translation>ブックマークをエクスポート...</translation>
     </message>
     <message>
       <source>Forget password</source>
@@ -807,7 +807,7 @@
     </message>
     <message>
       <source>Cancel Upload...</source>
-      <translation>アップロードのキャンセル...</translation>
+      <translation>アップロードをキャンセル...</translation>
     </message>
     <message>
       <source>Analytics Engine Settings...</source>
@@ -1108,27 +1108,27 @@
     </message>
     <message>
       <source>License does not exist.</source>
-      <translation>ライセンスがありません</translation>
+      <translation>ライセンスがありません。</translation>
     </message>
     <message>
       <source>License is disabled.</source>
-      <translation>ライセンスは無効です</translation>
+      <translation>ライセンスが無効になっています。</translation>
     </message>
     <message>
       <source>License is inactive.</source>
-      <translation>ライセンスはアクティブではありません</translation>
+      <translation>ライセンスは非アクティブです。</translation>
     </message>
     <message>
       <source>Invalid license.</source>
-      <translation>無効なライセンス</translation>
+      <translation>無効なライセンスです。</translation>
     </message>
     <message>
       <source>License is trial.</source>
-      <translation>ライセンスは試用版です</translation>
+      <translation>ライセンスは試用版です。</translation>
     </message>
     <message>
       <source>License is in pending deactivation state, but has not been deactivated yet.</source>
-      <translation>保留中のライセンスは非アクティブ状態ですが、まだ非アクティブ化されていません</translation>
+      <translation>ライセンスは非アクティブ化の保留状態ですが、まだ非アクティブ化されていません。</translation>
     </message>
     <message>
       <source>Number of deactivations exceeded limit for this license.</source>
@@ -1196,11 +1196,11 @@
     <name>EncryptedLayoutStrings</name>
     <message>
       <source>Please enter a valid password</source>
-      <translation>正しいパスワードを入力してください</translation>
+      <translation>有効なパスワードを入力してください</translation>
     </message>
     <message>
       <source>The password is not valid.</source>
-      <translation>パスワードが無効です</translation>
+      <translation>パスワードが無効です。</translation>
     </message>
     <message>
       <source>Encrypted layout</source>
@@ -1212,7 +1212,7 @@
     </message>
     <message>
       <source>Please re-enter password for layout %1:</source>
-      <translation>レイアウト %1 のパスワードを再入力してください</translation>
+      <translation>レイアウト %1 のパスワードを再入力してください:</translation>
     </message>
   </context>
   <context>

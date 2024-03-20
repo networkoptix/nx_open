@@ -1033,7 +1033,7 @@
     </message>
     <message>
       <source>Device...</source>
-      <translation type="unfinished">Device...</translation>
+      <translation>設備...</translation>
     </message>
     <message>
       <source>Add User...</source>
@@ -1053,7 +1053,7 @@
     </message>
     <message>
       <source>Add Showreel...</source>
-      <translation type="unfinished">Add Showreel...</translation>
+      <translation>新增幻燈片</translation>
     </message>
     <message>
       <source>Add Virtual Camera...</source>
@@ -1081,7 +1081,7 @@
     </message>
     <message>
       <source>New Welcome Screen</source>
-      <translation type="unfinished">New Welcome Screen</translation>
+      <translation>新增歡迎畫面</translation>
     </message>
     <message>
       <source>Show Proxied Resources</source>
@@ -1089,11 +1089,11 @@
     </message>
     <message>
       <source>Import From Devices...</source>
-      <translation type="unfinished">Import From Devices...</translation>
+      <translation>從設備匯入...</translation>
     </message>
     <message>
       <source>User Manual...</source>
-      <translation type="unfinished">User Manual...</translation>
+      <translation>使用者手冊...</translation>
     </message>
     <message>
       <source>Convert to Shared Layout</source>
@@ -1162,15 +1162,15 @@
     </message>
     <message>
       <source>Event Occurs</source>
-      <translation type="unfinished">Event Occurs</translation>
+      <translation>事件發生</translation>
     </message>
     <message>
       <source>Event Starts</source>
-      <translation type="unfinished">Event Starts</translation>
+      <translation>事件開炲</translation>
     </message>
     <message>
       <source>Event Stops</source>
-      <translation type="unfinished">Event Stops</translation>
+      <translation>事件停止</translation>
     </message>
   </context>
   <context>
@@ -1684,7 +1684,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Username or Password are incorrect</source>
-      <translation type="unfinished">Username or Password are incorrect</translation>
+      <translation>使用者名稱或密碼不正確</translation>
     </message>
     <message>
       <source>Insecure</source>
@@ -1696,7 +1696,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Username cannot be empty</source>
-      <translation type="unfinished">Username cannot be empty</translation>
+      <translation>使用者名稱不能為空</translation>
     </message>
     <message>
       <source>Password cannot be empty</source>
@@ -1761,8 +1761,8 @@ License Key: %2</source>
     </message>
     <message numerus="yes">
       <source>Password must be at least %n characters long</source>
-      <translation type="unfinished">
-        <numerusform>Password must be at least %n characters long</numerusform>
+      <translation>
+        <numerusform>密碼最少要有 %n 個字元</numerusform>
       </translation>
     </message>
     <message numerus="yes">
