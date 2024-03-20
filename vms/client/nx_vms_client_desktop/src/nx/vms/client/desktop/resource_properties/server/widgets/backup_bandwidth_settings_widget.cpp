@@ -9,7 +9,9 @@
 #include <QtGui/QMouseEvent>
 #include <QtWidgets/QGroupBox>
 
+#include <api/server_rest_connection.h>
 #include <core/resource/media_server_resource.h>
+#include <nx/utils/guarded_callback.h>
 #include <nx/vms/api/data/media_server_data.h>
 #include <nx/vms/api/types/day_of_week.h>
 #include <nx/vms/api/types/resource_types.h>
@@ -17,6 +19,7 @@
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/resource_properties/schedule/backup_bandwidth_schedule_cell_painter.h>
 #include <nx/vms/common/utils/schedule.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <utils/common/event_processors.h>
 
 namespace {
@@ -246,6 +249,8 @@ BackupBandwidthSettingsWidget::BackupBandwidthSettingsWidget(QWidget* parent):
 
 BackupBandwidthSettingsWidget::~BackupBandwidthSettingsWidget()
 {
+    if (!NX_ASSERT(!isNetworkRequestRunning(), "Requests should already be completed."))
+        discardChanges();
 }
 
 bool BackupBandwidthSettingsWidget::hasChanges() const
@@ -288,14 +293,41 @@ void BackupBandwidthSettingsWidget::applyChanges()
 {
     const auto newBackupBitrateLimits = getBackupBitrateLimitsFromGrid(ui->scheduleGridWidget);
     m_server->setBackupBitrateLimitsBps(newBackupBitrateLimits);
+
+    auto callback = nx::utils::guarded(this,
+        [this](bool /*success*/, rest::Handle requestId)
+        {
+            if (NX_ASSERT(requestId == requestHandle || requestHandle == 0))
+                requestHandle = 0;
+        });
+
+    requestHandle = qnResourcesChangesManager->saveServer(m_server, callback);
 }
 
 void BackupBandwidthSettingsWidget::discardChanges()
 {
-    if (m_server)
-        loadDataToUi();
-    else
+    if (!m_server)
+    {
         ui->limitTypeComboBox->setCurrentIndex(NoLimit);
+        return;
+    }
+
+    loadDataToUi();
+
+    const auto systemContext = SystemContext::fromResource(m_server);
+    if (!NX_ASSERT(systemContext))
+        return;
+
+    if (auto api = systemContext->connectedServerApi(); api && requestHandle != 0)
+    {
+        api->cancelRequest(requestHandle);
+        requestHandle = 0;
+    }
+}
+
+bool BackupBandwidthSettingsWidget::isNetworkRequestRunning() const
+{
+    return requestHandle != 0;
 }
 
 void BackupBandwidthSettingsWidget::setServer(const QnMediaServerResourcePtr& server)
