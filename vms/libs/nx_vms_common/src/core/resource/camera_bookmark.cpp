@@ -439,7 +439,7 @@ void deserialize_field(const QVariant& /*value*/, CameraBookmarkTags* /*target*/
 
 void serialize_field(const BookmarkShareableParams& from, QVariant* to)
 {
-    *to = QString(QJson::serialized(from));
+    *to = from.shareable ? QString(QJson::serialized(from)) : QString();
 }
 void deserialize_field(const QVariant& from, BookmarkShareableParams* to)
 {
