@@ -1031,7 +1031,7 @@
     </message>
     <message>
       <source>User Manual...</source>
-      <translation type="unfinished">User Manual...</translation>
+      <translation>使用者手冊...</translation>
     </message>
   </context>
   <context>

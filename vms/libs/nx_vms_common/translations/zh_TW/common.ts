@@ -1389,31 +1389,31 @@
     </message>
     <message>
       <source>Max RTSP connection duration (seconds)</source>
-      <translation type="unfinished">Max RTSP connection duration (seconds)</translation>
+      <translation>最大 RTSP 連線持續時間（秒）</translation>
     </message>
     <message>
       <source>Enable cloud-connect UDP hole-punching</source>
-      <translation type="unfinished">Enable cloud-connect UDP hole-punching</translation>
+      <translation>啟用雲端連接UDP打洞</translation>
     </message>
     <message>
       <source>Enable cloud-connect relays usage</source>
-      <translation type="unfinished">Enable cloud-connect relays usage</translation>
+      <translation>啟用雲端連線中繼用法</translation>
     </message>
     <message>
       <source>Enforce SSL for cloud-connect relays</source>
-      <translation type="unfinished">Enforce SSL for cloud-connect relays</translation>
+      <translation>強制雲端連線中繼使用 SSL</translation>
     </message>
     <message>
       <source>Enable recording on EDGE</source>
-      <translation type="unfinished">Enable recording on EDGE</translation>
+      <translation>在 EDGE 上啟用錄影</translation>
     </message>
     <message>
       <source>Target update information</source>
-      <translation type="unfinished">Target update information</translation>
+      <translation>目標更新資訊</translation>
     </message>
     <message>
       <source>Installed update information</source>
-      <translation type="unfinished">Installed update information</translation>
+      <translation>已安裝的更新資訊</translation>
     </message>
     <message>
       <source>Downloader peers for files</source>
@@ -1429,15 +1429,15 @@
     </message>
     <message>
       <source>Authorization Session token lifetime (minutes)</source>
-      <translation type="unfinished">Authorization Session token lifetime (minutes)</translation>
+      <translation>Session授權Token生命週期（分鐘）</translation>
     </message>
     <message>
       <source>Session token count limit on a single Server</source>
-      <translation type="unfinished">Session token count limit on a single Server</translation>
+      <translation>單一伺服器限制的session token數</translation>
     </message>
     <message>
       <source>Max session token count per user on single Server</source>
-      <translation type="unfinished">Max session token count per user on single Server</translation>
+      <translation>單一伺服器上每個使用者最大的session token數</translation>
     </message>
     <message>
       <source>Update interval for remote session token cache (other Servers and Cloud)</source>
@@ -1465,7 +1465,7 @@
     </message>
     <message>
       <source>URI for resource_data.json automatic update</source>
-      <translation type="unfinished">URI for resource_data.json automatic update</translation>
+      <translation>自動更新 resources_data.json 的 URI</translation>
     </message>
     <message>
       <source>Meta data storage change policy</source>
@@ -1481,7 +1481,7 @@
     </message>
     <message>
       <source>VMS Server version specific features</source>
-      <translation type="unfinished">VMS Server version specific features</translation>
+      <translation>VMS 伺服器版本特定功能</translation>
     </message>
     <message>
       <source>Additional local FS storage types for recording</source>
@@ -1493,7 +1493,7 @@
     </message>
     <message>
       <source>Check video stream period (milliseconds)</source>
-      <translation type="unfinished">Check video stream period (milliseconds)</translation>
+      <translation>視訊串流檢查週期（毫秒）</translation>
     </message>
     <message>
       <source>Storage encryption enabled</source>
@@ -1525,7 +1525,7 @@
     </message>
     <message>
       <source>Enable cross-domain policy</source>
-      <translation type="unfinished">Enable cross-domain policy</translation>
+      <translation>啟用跨域策略</translation>
     </message>
     <message>
       <source>Enable WebSocket for P2P</source>
@@ -1541,7 +1541,7 @@
     </message>
     <message>
       <source>Enable deprecated API functions (unsecure)</source>
-      <translation type="unfinished">Enable deprecated API functions (unsecure)</translation>
+      <translation>啟用已棄用的 API 函數（不安全）</translation>
     </message>
     <message>
       <source>Expose IP addresses for autodiscovery</source>
@@ -1573,15 +1573,15 @@
     </message>
     <message>
       <source>Maximum event log records to keep in the database. Real amount of undeleted records may be up to 20% higher than the specified value.</source>
-      <translation type="unfinished">Maximum event log records to keep in the database. Real amount of undeleted records may be up to 20% higher than the specified value.</translation>
+      <translation>資料庫中保留的事件日誌記錄數量最大值。實際的未刪除記錄數量可能比指定值高出 20%。</translation>
     </message>
     <message>
       <source>Whether or not to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improving the user experience (e.g. when some Analytics plugin is working on the Camera).</source>
-      <translation type="unfinished">Whether or not to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improving the user experience (e.g. when some Analytics plugin is working on the Camera).</translation>
+      <translation>是否緩存一些主串流幀數。數值：&apos;是&apos; - 永遠啟用(可能占用大量RAM)，&apos;否&apos; - 永遠停用，除非重播影片需要(例如HLS)，&apos;自動&apos; - 類似於&apos;否&apos; ，但會在改善使用者體驗時開啟(例如當某些分析插件在攝影機上運作時)。</translation>
     </message>
     <message>
       <source>Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then closes the first one. We recommend setting this parameter&apos;s value to 2 or more.</source>
-      <translation type="unfinished">Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then closes the first one. We recommend setting this parameter&apos;s value to 2 or more.</translation>
+      <translation>伺服器使用轉碼 HTTP 連線數的最大值。 Chrome 一次開啟 2 個連線，然後關閉第一個連線。我們建議將此參數&apos;的值設為 2 或更大。</translation>
     </message>
     <message>
       <source>Update releases.json file URL</source>
@@ -1590,7 +1590,7 @@
     <message>
       <source>Enable deprecated API functions currently used by %1 software (unsecure)</source>
       <comment>%1 is a company name</comment>
-      <translation type="unfinished">Enable deprecated API functions currently used by %1 software (unsecure)</translation>
+      <translation>啟用 %1 軟體目前使用的已棄用API 函數（不安全）</translation>
     </message>
     <message>
       <source>Semicolon-separated list of Servers designated to connect to the Cloud. Servers at the top of the list have higher priority. If the list is empty a Server for the Cloud connection is selected automatically.</source>
@@ -1598,7 +1598,7 @@
     </message>
     <message>
       <source>Maximum number of consecutive RTP errors before the server reconnects the RTSP session.</source>
-      <translation type="unfinished">Maximum number of consecutive RTP errors before the server reconnects the RTSP session.</translation>
+      <translation>伺服器重新連接 RTSP session 之前連續 RTP 錯誤的最大數量。</translation>
     </message>
     <message>
       <source>RTP timeout (milliseconds)</source>
