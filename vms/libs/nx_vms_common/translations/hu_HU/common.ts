@@ -1274,7 +1274,102 @@
     </message>
   </context>
   <context>
-    <name>SystemSettings</name>
+    <name>TimeFormat</name>
+    <message>
+      <source>just now</source>
+      <translation type="unfinished">just now</translation>
+    </message>
+    <message>
+      <source>yesterday</source>
+      <translation type="unfinished">yesterday</translation>
+    </message>
+    <message>
+      <source>a week ago</source>
+      <translation type="unfinished">a week ago</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n minutes ago</source>
+      <translation type="unfinished">
+        <numerusform>%n minutes ago</numerusform>
+        <numerusform>%n minutes ago</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n hours ago</source>
+      <translation type="unfinished">
+        <numerusform>%n hours ago</numerusform>
+        <numerusform>%n hours ago</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n days ago</source>
+      <translation type="unfinished">
+        <numerusform>%n days ago</numerusform>
+        <numerusform>%n days ago</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::recording::Error</name>
+    <message>
+      <source>Internal error</source>
+      <translation>Belső hiba</translation>
+    </message>
+    <message>
+      <source>Corresponding container in FFMPEG library was not found.</source>
+      <translation>A vonatkozó rész az FFMPEG mappában nem található.</translation>
+    </message>
+    <message>
+      <source>Could not create output file for video recording.</source>
+      <translation>Nem lehet létrehozni kimeneti fájlt a video rögzítéshez.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output stream for recording.</source>
+      <translation>Nem lehet lefoglalni a kimeneti stream-et a rogzítéshez.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output audio stream.</source>
+      <translation>Nem lehet lefoglalni a kimeneti audio streamet.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output metadata stream.</source>
+      <translation type="unfinished">Could not allocate output metadata stream.</translation>
+    </message>
+    <message>
+      <source>Invalid audio codec information.</source>
+      <translation>Érvénytelen audio kodek információ.</translation>
+    </message>
+    <message>
+      <source>Video or audio codec is incompatible with the selected format.</source>
+      <translation>Video vagy audio kodek nem kompatibilis a választott formátummal.</translation>
+    </message>
+    <message>
+      <source>Video transcoding required.</source>
+      <translation>Videokódolás szükséges.</translation>
+    </message>
+    <message>
+      <source>File write error. Not enough free space.</source>
+      <translation>Íráshiba. Nincs elég tárhely.</translation>
+    </message>
+    <message>
+      <source>Invalid resource type for data export.</source>
+      <translation>Érvénytelen forrástípus lett megadva az adat exportáláshoz.</translation>
+    </message>
+    <message>
+      <source>No data exported.</source>
+      <translation>Nincs exportált adat.</translation>
+    </message>
+    <message>
+      <source>Unlock this portion of the archive to export its contents.</source>
+      <translation type="unfinished">Unlock this portion of the archive to export its contents.</translation>
+    </message>
+    <message>
+      <source>Archive is unavailable now. Please try again later.</source>
+      <translation type="unfinished">Archive is unavailable now. Please try again later.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::common::SystemSettings</name>
     <message>
       <source>Anonymous statistics report allowed</source>
       <translation type="unfinished">Anonymous statistics report allowed</translation>
@@ -1695,101 +1790,6 @@
     <message>
       <source>Local System ID, null means the System is not set up yet.</source>
       <translation type="unfinished">Local System ID, null means the System is not set up yet.</translation>
-    </message>
-  </context>
-  <context>
-    <name>TimeFormat</name>
-    <message>
-      <source>just now</source>
-      <translation type="unfinished">just now</translation>
-    </message>
-    <message>
-      <source>yesterday</source>
-      <translation type="unfinished">yesterday</translation>
-    </message>
-    <message>
-      <source>a week ago</source>
-      <translation type="unfinished">a week ago</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n minutes ago</source>
-      <translation type="unfinished">
-        <numerusform>%n minutes ago</numerusform>
-        <numerusform>%n minutes ago</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n hours ago</source>
-      <translation type="unfinished">
-        <numerusform>%n hours ago</numerusform>
-        <numerusform>%n hours ago</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n days ago</source>
-      <translation type="unfinished">
-        <numerusform>%n days ago</numerusform>
-        <numerusform>%n days ago</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::recording::Error</name>
-    <message>
-      <source>Internal error</source>
-      <translation>Belső hiba</translation>
-    </message>
-    <message>
-      <source>Corresponding container in FFMPEG library was not found.</source>
-      <translation>A vonatkozó rész az FFMPEG mappában nem található.</translation>
-    </message>
-    <message>
-      <source>Could not create output file for video recording.</source>
-      <translation>Nem lehet létrehozni kimeneti fájlt a video rögzítéshez.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output stream for recording.</source>
-      <translation>Nem lehet lefoglalni a kimeneti stream-et a rogzítéshez.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output audio stream.</source>
-      <translation>Nem lehet lefoglalni a kimeneti audio streamet.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output metadata stream.</source>
-      <translation type="unfinished">Could not allocate output metadata stream.</translation>
-    </message>
-    <message>
-      <source>Invalid audio codec information.</source>
-      <translation>Érvénytelen audio kodek információ.</translation>
-    </message>
-    <message>
-      <source>Video or audio codec is incompatible with the selected format.</source>
-      <translation>Video vagy audio kodek nem kompatibilis a választott formátummal.</translation>
-    </message>
-    <message>
-      <source>Video transcoding required.</source>
-      <translation>Videokódolás szükséges.</translation>
-    </message>
-    <message>
-      <source>File write error. Not enough free space.</source>
-      <translation>Íráshiba. Nincs elég tárhely.</translation>
-    </message>
-    <message>
-      <source>Invalid resource type for data export.</source>
-      <translation>Érvénytelen forrástípus lett megadva az adat exportáláshoz.</translation>
-    </message>
-    <message>
-      <source>No data exported.</source>
-      <translation>Nincs exportált adat.</translation>
-    </message>
-    <message>
-      <source>Unlock this portion of the archive to export its contents.</source>
-      <translation type="unfinished">Unlock this portion of the archive to export its contents.</translation>
-    </message>
-    <message>
-      <source>Archive is unavailable now. Please try again later.</source>
-      <translation type="unfinished">Archive is unavailable now. Please try again later.</translation>
     </message>
   </context>
   <context>

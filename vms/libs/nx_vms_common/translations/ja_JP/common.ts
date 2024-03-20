@@ -1218,7 +1218,99 @@
     </message>
   </context>
   <context>
-    <name>SystemSettings</name>
+    <name>TimeFormat</name>
+    <message>
+      <source>just now</source>
+      <translation>たった今</translation>
+    </message>
+    <message>
+      <source>yesterday</source>
+      <translation>昨日</translation>
+    </message>
+    <message>
+      <source>a week ago</source>
+      <translation>1週間前</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n minutes ago</source>
+      <translation>
+        <numerusform>%n 分前</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n hours ago</source>
+      <translation>
+        <numerusform>%n 時間前</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n days ago</source>
+      <translation>
+        <numerusform>%n 日前</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::recording::Error</name>
+    <message>
+      <source>Internal error</source>
+      <translation>内部エラー</translation>
+    </message>
+    <message>
+      <source>Corresponding container in FFMPEG library was not found.</source>
+      <translation>FFMPEGライブラリーにコンテナが見つかりません.</translation>
+    </message>
+    <message>
+      <source>Could not create output file for video recording.</source>
+      <translation>映像録画用の出力ファイルを作成できませんでした。</translation>
+    </message>
+    <message>
+      <source>Could not allocate output stream for recording.</source>
+      <translation>録画用の出力ストリームを割り当てることができませんでした。</translation>
+    </message>
+    <message>
+      <source>Could not allocate output audio stream.</source>
+      <translation>音声出力ストリームを割り当てることができませんでした。</translation>
+    </message>
+    <message>
+      <source>Could not allocate output metadata stream.</source>
+      <translation>メタデータ出力ストリームを割り当てることができませんでした。</translation>
+    </message>
+    <message>
+      <source>Invalid audio codec information.</source>
+      <translation>音声コーデック情報が不正です。</translation>
+    </message>
+    <message>
+      <source>Video or audio codec is incompatible with the selected format.</source>
+      <translation>映像または音声のコーデックが、選択した形式との互換性を持ちません。</translation>
+    </message>
+    <message>
+      <source>Video transcoding required.</source>
+      <translation>映像のトランスコーディングが必要です。</translation>
+    </message>
+    <message>
+      <source>File write error. Not enough free space.</source>
+      <translation>空き容量が十分でない為に書き込みエラー.</translation>
+    </message>
+    <message>
+      <source>Invalid resource type for data export.</source>
+      <translation>データのエクスポートには無効なリソースタイプです。</translation>
+    </message>
+    <message>
+      <source>No data exported.</source>
+      <translation>データはエクスポートされませんでした。</translation>
+    </message>
+    <message>
+      <source>Unlock this portion of the archive to export its contents.</source>
+      <translation>エクスポートするには、アーカイブのこの部分をロック解除してください。</translation>
+    </message>
+    <message>
+      <source>Archive is unavailable now. Please try again later.</source>
+      <translation>アーカイブは現在利用できません。後でもう一度お試しください。</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::common::SystemSettings</name>
     <message>
       <source>Anonymous statistics report allowed</source>
       <translation>匿名の統計レポートを許可</translation>
@@ -1639,98 +1731,6 @@
     <message>
       <source>Local System ID, null means the System is not set up yet.</source>
       <translation>ローカルシステム ID。null の場合、システムがまだセットアップされていないことを意味します。</translation>
-    </message>
-  </context>
-  <context>
-    <name>TimeFormat</name>
-    <message>
-      <source>just now</source>
-      <translation>たった今</translation>
-    </message>
-    <message>
-      <source>yesterday</source>
-      <translation>昨日</translation>
-    </message>
-    <message>
-      <source>a week ago</source>
-      <translation>1週間前</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n minutes ago</source>
-      <translation>
-        <numerusform>%n 分前</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n hours ago</source>
-      <translation>
-        <numerusform>%n 時間前</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n days ago</source>
-      <translation>
-        <numerusform>%n 日前</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::recording::Error</name>
-    <message>
-      <source>Internal error</source>
-      <translation>内部エラー</translation>
-    </message>
-    <message>
-      <source>Corresponding container in FFMPEG library was not found.</source>
-      <translation>FFMPEGライブラリーにコンテナが見つかりません.</translation>
-    </message>
-    <message>
-      <source>Could not create output file for video recording.</source>
-      <translation>映像録画用の出力ファイルを作成できませんでした。</translation>
-    </message>
-    <message>
-      <source>Could not allocate output stream for recording.</source>
-      <translation>録画用の出力ストリームを割り当てることができませんでした。</translation>
-    </message>
-    <message>
-      <source>Could not allocate output audio stream.</source>
-      <translation>音声出力ストリームを割り当てることができませんでした。</translation>
-    </message>
-    <message>
-      <source>Could not allocate output metadata stream.</source>
-      <translation>メタデータ出力ストリームを割り当てることができませんでした。</translation>
-    </message>
-    <message>
-      <source>Invalid audio codec information.</source>
-      <translation>音声コーデック情報が不正です。</translation>
-    </message>
-    <message>
-      <source>Video or audio codec is incompatible with the selected format.</source>
-      <translation>映像または音声のコーデックが、選択した形式との互換性を持ちません。</translation>
-    </message>
-    <message>
-      <source>Video transcoding required.</source>
-      <translation>映像のトランスコーディングが必要です。</translation>
-    </message>
-    <message>
-      <source>File write error. Not enough free space.</source>
-      <translation>空き容量が十分でない為に書き込みエラー.</translation>
-    </message>
-    <message>
-      <source>Invalid resource type for data export.</source>
-      <translation>データのエクスポートには無効なリソースタイプです。</translation>
-    </message>
-    <message>
-      <source>No data exported.</source>
-      <translation>データはエクスポートされませんでした。</translation>
-    </message>
-    <message>
-      <source>Unlock this portion of the archive to export its contents.</source>
-      <translation>エクスポートするには、アーカイブのこの部分をロック解除してください。</translation>
-    </message>
-    <message>
-      <source>Archive is unavailable now. Please try again later.</source>
-      <translation>アーカイブは現在利用できません。後でもう一度お試しください。</translation>
     </message>
   </context>
   <context>

@@ -1274,7 +1274,102 @@
     </message>
   </context>
   <context>
-    <name>SystemSettings</name>
+    <name>TimeFormat</name>
+    <message>
+      <source>just now</source>
+      <translation>precis nu</translation>
+    </message>
+    <message>
+      <source>yesterday</source>
+      <translation>igår</translation>
+    </message>
+    <message>
+      <source>a week ago</source>
+      <translation>en vecka sedan</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n minutes ago</source>
+      <translation>
+        <numerusform>%n minuter sedan</numerusform>
+        <numerusform>%n minuter sedan</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n hours ago</source>
+      <translation>
+        <numerusform>%n timmar sedan</numerusform>
+        <numerusform>%n timmar sedan</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n days ago</source>
+      <translation>
+        <numerusform>%n dagar sedan</numerusform>
+        <numerusform>%n dagar sedan</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::recording::Error</name>
+    <message>
+      <source>Internal error</source>
+      <translation>Internt fel</translation>
+    </message>
+    <message>
+      <source>Corresponding container in FFMPEG library was not found.</source>
+      <translation>Motsvarande behållare i FFMPEG-biblioteket kunde inte hittas.</translation>
+    </message>
+    <message>
+      <source>Could not create output file for video recording.</source>
+      <translation>Det gick inte att skapa en utdatafil för videoinspelning.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output stream for recording.</source>
+      <translation>Kunde inte allokera utmatningsströmmen för inspelning.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output audio stream.</source>
+      <translation>Det gick inte att allokera utgång för ljudström.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output metadata stream.</source>
+      <translation>Det gick inte att allokera metadataström.</translation>
+    </message>
+    <message>
+      <source>Invalid audio codec information.</source>
+      <translation>Ogiltig ljudkodekinformation.</translation>
+    </message>
+    <message>
+      <source>Video or audio codec is incompatible with the selected format.</source>
+      <translation>Video eller ljudkodek är inkompatibel med behållare.</translation>
+    </message>
+    <message>
+      <source>Video transcoding required.</source>
+      <translation>Omkodning av video krävs.</translation>
+    </message>
+    <message>
+      <source>File write error. Not enough free space.</source>
+      <translation>Filskrivningsfel. Inte tillräckligt med ledigt utrymme.</translation>
+    </message>
+    <message>
+      <source>Invalid resource type for data export.</source>
+      <translation>Ogiltig resurstyp för dataexport.</translation>
+    </message>
+    <message>
+      <source>No data exported.</source>
+      <translation>Ingen data exporterad.</translation>
+    </message>
+    <message>
+      <source>Unlock this portion of the archive to export its contents.</source>
+      <translation>Lås upp denna del av arkivet för att exportera dess innehåll.</translation>
+    </message>
+    <message>
+      <source>Archive is unavailable now. Please try again later.</source>
+      <translation>Arkivet är inte tillgängligt nu. Vänligen försök igen senare.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::common::SystemSettings</name>
     <message>
       <source>Anonymous statistics report allowed</source>
       <translation>Anonym statistikrapport tillåten</translation>
@@ -1695,101 +1790,6 @@
     <message>
       <source>Local System ID, null means the System is not set up yet.</source>
       <translation>Lokalt system-ID, null betyder att systemet inte är konfigurerat ännu.</translation>
-    </message>
-  </context>
-  <context>
-    <name>TimeFormat</name>
-    <message>
-      <source>just now</source>
-      <translation>precis nu</translation>
-    </message>
-    <message>
-      <source>yesterday</source>
-      <translation>igår</translation>
-    </message>
-    <message>
-      <source>a week ago</source>
-      <translation>en vecka sedan</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n minutes ago</source>
-      <translation>
-        <numerusform>%n minuter sedan</numerusform>
-        <numerusform>%n minuter sedan</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n hours ago</source>
-      <translation>
-        <numerusform>%n timmar sedan</numerusform>
-        <numerusform>%n timmar sedan</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n days ago</source>
-      <translation>
-        <numerusform>%n dagar sedan</numerusform>
-        <numerusform>%n dagar sedan</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::recording::Error</name>
-    <message>
-      <source>Internal error</source>
-      <translation>Internt fel</translation>
-    </message>
-    <message>
-      <source>Corresponding container in FFMPEG library was not found.</source>
-      <translation>Motsvarande behållare i FFMPEG-biblioteket kunde inte hittas.</translation>
-    </message>
-    <message>
-      <source>Could not create output file for video recording.</source>
-      <translation>Det gick inte att skapa en utdatafil för videoinspelning.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output stream for recording.</source>
-      <translation>Kunde inte allokera utmatningsströmmen för inspelning.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output audio stream.</source>
-      <translation>Det gick inte att allokera utgång för ljudström.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output metadata stream.</source>
-      <translation>Det gick inte att allokera metadataström.</translation>
-    </message>
-    <message>
-      <source>Invalid audio codec information.</source>
-      <translation>Ogiltig ljudkodekinformation.</translation>
-    </message>
-    <message>
-      <source>Video or audio codec is incompatible with the selected format.</source>
-      <translation>Video eller ljudkodek är inkompatibel med behållare.</translation>
-    </message>
-    <message>
-      <source>Video transcoding required.</source>
-      <translation>Omkodning av video krävs.</translation>
-    </message>
-    <message>
-      <source>File write error. Not enough free space.</source>
-      <translation>Filskrivningsfel. Inte tillräckligt med ledigt utrymme.</translation>
-    </message>
-    <message>
-      <source>Invalid resource type for data export.</source>
-      <translation>Ogiltig resurstyp för dataexport.</translation>
-    </message>
-    <message>
-      <source>No data exported.</source>
-      <translation>Ingen data exporterad.</translation>
-    </message>
-    <message>
-      <source>Unlock this portion of the archive to export its contents.</source>
-      <translation>Lås upp denna del av arkivet för att exportera dess innehåll.</translation>
-    </message>
-    <message>
-      <source>Archive is unavailable now. Please try again later.</source>
-      <translation>Arkivet är inte tillgängligt nu. Vänligen försök igen senare.</translation>
     </message>
   </context>
   <context>

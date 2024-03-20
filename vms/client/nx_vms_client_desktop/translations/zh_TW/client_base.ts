@@ -12309,14 +12309,14 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <name>nx::vms::client::desktop::integrations::OverlappedIdDialogModel</name>
     <message>
       <source>Latest</source>
-      <translation type="unfinished">Latest</translation>
+      <translation>最新</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::integrations::OverlappedIdIntegration</name>
     <message>
       <source>Overlapped ID...</source>
-      <translation type="unfinished">Overlapped ID...</translation>
+      <translation>ID重疊...</translation>
     </message>
   </context>
   <context>
@@ -12359,11 +12359,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Modifier</source>
-      <translation type="unfinished">Modifier</translation>
+      <translation>修改器</translation>
     </message>
     <message>
       <source>Multiple</source>
-      <translation type="unfinished">Multiple</translation>
+      <translation>多個</translation>
     </message>
   </context>
   <context>

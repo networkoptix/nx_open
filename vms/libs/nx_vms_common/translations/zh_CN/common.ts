@@ -1218,7 +1218,99 @@
     </message>
   </context>
   <context>
-    <name>SystemSettings</name>
+    <name>TimeFormat</name>
+    <message>
+      <source>just now</source>
+      <translation type="unfinished">just now</translation>
+    </message>
+    <message>
+      <source>yesterday</source>
+      <translation type="unfinished">yesterday</translation>
+    </message>
+    <message>
+      <source>a week ago</source>
+      <translation type="unfinished">a week ago</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n minutes ago</source>
+      <translation type="unfinished">
+        <numerusform>%n minutes ago</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n hours ago</source>
+      <translation type="unfinished">
+        <numerusform>%n hours ago</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n days ago</source>
+      <translation type="unfinished">
+        <numerusform>%n days ago</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::recording::Error</name>
+    <message>
+      <source>Internal error</source>
+      <translation>内部错误</translation>
+    </message>
+    <message>
+      <source>Corresponding container in FFMPEG library was not found.</source>
+      <translation>未找到FFMPEG库相应的容器。</translation>
+    </message>
+    <message>
+      <source>Could not create output file for video recording.</source>
+      <translation>无法为视频录像创建输出文件.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output stream for recording.</source>
+      <translation>无法为录像分配输出流。</translation>
+    </message>
+    <message>
+      <source>Could not allocate output audio stream.</source>
+      <translation>无法分配输出音频流。</translation>
+    </message>
+    <message>
+      <source>Could not allocate output metadata stream.</source>
+      <translation>无法分配输出Meta数据流。</translation>
+    </message>
+    <message>
+      <source>Invalid audio codec information.</source>
+      <translation>无效的音频编解码器的信息。</translation>
+    </message>
+    <message>
+      <source>Video or audio codec is incompatible with the selected format.</source>
+      <translation>视频或音频编解码器与选定格式不兼容。</translation>
+    </message>
+    <message>
+      <source>Video transcoding required.</source>
+      <translation>需要视频转码。</translation>
+    </message>
+    <message>
+      <source>File write error. Not enough free space.</source>
+      <translation>文件写入错误，没有足够空间.</translation>
+    </message>
+    <message>
+      <source>Invalid resource type for data export.</source>
+      <translation>数据导出非法资源类型.</translation>
+    </message>
+    <message>
+      <source>No data exported.</source>
+      <translation>没有数据导出。</translation>
+    </message>
+    <message>
+      <source>Unlock this portion of the archive to export its contents.</source>
+      <translation type="unfinished">Unlock this portion of the archive to export its contents.</translation>
+    </message>
+    <message>
+      <source>Archive is unavailable now. Please try again later.</source>
+      <translation>目前无法取得录像存档，请稍后再试。</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::common::SystemSettings</name>
     <message>
       <source>Anonymous statistics report allowed</source>
       <translation type="unfinished">Anonymous statistics report allowed</translation>
@@ -1639,98 +1731,6 @@
     <message>
       <source>Local System ID, null means the System is not set up yet.</source>
       <translation type="unfinished">Local System ID, null means the System is not set up yet.</translation>
-    </message>
-  </context>
-  <context>
-    <name>TimeFormat</name>
-    <message>
-      <source>just now</source>
-      <translation type="unfinished">just now</translation>
-    </message>
-    <message>
-      <source>yesterday</source>
-      <translation type="unfinished">yesterday</translation>
-    </message>
-    <message>
-      <source>a week ago</source>
-      <translation type="unfinished">a week ago</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n minutes ago</source>
-      <translation type="unfinished">
-        <numerusform>%n minutes ago</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n hours ago</source>
-      <translation type="unfinished">
-        <numerusform>%n hours ago</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n days ago</source>
-      <translation type="unfinished">
-        <numerusform>%n days ago</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::recording::Error</name>
-    <message>
-      <source>Internal error</source>
-      <translation>内部错误</translation>
-    </message>
-    <message>
-      <source>Corresponding container in FFMPEG library was not found.</source>
-      <translation>未找到FFMPEG库相应的容器。</translation>
-    </message>
-    <message>
-      <source>Could not create output file for video recording.</source>
-      <translation>无法为视频录像创建输出文件.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output stream for recording.</source>
-      <translation>无法为录像分配输出流。</translation>
-    </message>
-    <message>
-      <source>Could not allocate output audio stream.</source>
-      <translation>无法分配输出音频流。</translation>
-    </message>
-    <message>
-      <source>Could not allocate output metadata stream.</source>
-      <translation>无法分配输出Meta数据流。</translation>
-    </message>
-    <message>
-      <source>Invalid audio codec information.</source>
-      <translation>无效的音频编解码器的信息。</translation>
-    </message>
-    <message>
-      <source>Video or audio codec is incompatible with the selected format.</source>
-      <translation>视频或音频编解码器与选定格式不兼容。</translation>
-    </message>
-    <message>
-      <source>Video transcoding required.</source>
-      <translation>需要视频转码。</translation>
-    </message>
-    <message>
-      <source>File write error. Not enough free space.</source>
-      <translation>文件写入错误，没有足够空间.</translation>
-    </message>
-    <message>
-      <source>Invalid resource type for data export.</source>
-      <translation>数据导出非法资源类型.</translation>
-    </message>
-    <message>
-      <source>No data exported.</source>
-      <translation>没有数据导出。</translation>
-    </message>
-    <message>
-      <source>Unlock this portion of the archive to export its contents.</source>
-      <translation type="unfinished">Unlock this portion of the archive to export its contents.</translation>
-    </message>
-    <message>
-      <source>Archive is unavailable now. Please try again later.</source>
-      <translation>目前无法取得录像存档，请稍后再试。</translation>
     </message>
   </context>
   <context>

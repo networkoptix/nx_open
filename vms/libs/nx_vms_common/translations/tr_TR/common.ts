@@ -1274,7 +1274,102 @@
     </message>
   </context>
   <context>
-    <name>SystemSettings</name>
+    <name>TimeFormat</name>
+    <message>
+      <source>just now</source>
+      <translation>şu anda</translation>
+    </message>
+    <message>
+      <source>yesterday</source>
+      <translation>dün</translation>
+    </message>
+    <message>
+      <source>a week ago</source>
+      <translation>bir hafta önce</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n minutes ago</source>
+      <translation type="unfinished">
+        <numerusform>%n minutes ago</numerusform>
+        <numerusform>%n minutes ago</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n hours ago</source>
+      <translation type="unfinished">
+        <numerusform>%n hours ago</numerusform>
+        <numerusform>%n hours ago</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n days ago</source>
+      <translation type="unfinished">
+        <numerusform>%n days ago</numerusform>
+        <numerusform>%n days ago</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::recording::Error</name>
+    <message>
+      <source>Internal error</source>
+      <translation>İç hata</translation>
+    </message>
+    <message>
+      <source>Corresponding container in FFMPEG library was not found.</source>
+      <translation>FFMPEG Kütüphanesindeki Karşılık Gelen Taşıyıcı Bulunamadı.</translation>
+    </message>
+    <message>
+      <source>Could not create output file for video recording.</source>
+      <translation>Video Kaydı İçin Çıkış Dosyası Oluşturulamadı.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output stream for recording.</source>
+      <translation>Kayıt İçin Çıkış Akışı Sağlanamadı.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output audio stream.</source>
+      <translation>Ses Akış Çıkışı Ayrılamadı.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output metadata stream.</source>
+      <translation>Çıkış meta veri akışı tahsis edilemedi.</translation>
+    </message>
+    <message>
+      <source>Invalid audio codec information.</source>
+      <translation>Geçersiz Ses Kodek Bilgisi.</translation>
+    </message>
+    <message>
+      <source>Video or audio codec is incompatible with the selected format.</source>
+      <translation>Ses veya Video Kodek'i Seçilen Formatla Uyumsuz.</translation>
+    </message>
+    <message>
+      <source>Video transcoding required.</source>
+      <translation>Video kod dönüştürmesi gerekiyor.</translation>
+    </message>
+    <message>
+      <source>File write error. Not enough free space.</source>
+      <translation>Dosya Yazım Hatası. Yeterli Boş Alan Yok.</translation>
+    </message>
+    <message>
+      <source>Invalid resource type for data export.</source>
+      <translation>Data aktarma için geçersiz kaynak tipi.</translation>
+    </message>
+    <message>
+      <source>No data exported.</source>
+      <translation>Dışa aktarılan veri yok.</translation>
+    </message>
+    <message>
+      <source>Unlock this portion of the archive to export its contents.</source>
+      <translation type="unfinished">Unlock this portion of the archive to export its contents.</translation>
+    </message>
+    <message>
+      <source>Archive is unavailable now. Please try again later.</source>
+      <translation>Arşiv şu anda kullanılamıyor. Lütfen daha sonra tekrar deneyiniz.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::common::SystemSettings</name>
     <message>
       <source>Anonymous statistics report allowed</source>
       <translation>Anonim istatistik raporuna izin verilir</translation>
@@ -1695,101 +1790,6 @@
     <message>
       <source>Local System ID, null means the System is not set up yet.</source>
       <translation>Yerel Sistem Kimliği, boş, Sistemin henüz kurulmadığı anlamına gelir.</translation>
-    </message>
-  </context>
-  <context>
-    <name>TimeFormat</name>
-    <message>
-      <source>just now</source>
-      <translation>şu anda</translation>
-    </message>
-    <message>
-      <source>yesterday</source>
-      <translation>dün</translation>
-    </message>
-    <message>
-      <source>a week ago</source>
-      <translation>bir hafta önce</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n minutes ago</source>
-      <translation type="unfinished">
-        <numerusform>%n minutes ago</numerusform>
-        <numerusform>%n minutes ago</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n hours ago</source>
-      <translation type="unfinished">
-        <numerusform>%n hours ago</numerusform>
-        <numerusform>%n hours ago</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n days ago</source>
-      <translation type="unfinished">
-        <numerusform>%n days ago</numerusform>
-        <numerusform>%n days ago</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::recording::Error</name>
-    <message>
-      <source>Internal error</source>
-      <translation>İç hata</translation>
-    </message>
-    <message>
-      <source>Corresponding container in FFMPEG library was not found.</source>
-      <translation>FFMPEG Kütüphanesindeki Karşılık Gelen Taşıyıcı Bulunamadı.</translation>
-    </message>
-    <message>
-      <source>Could not create output file for video recording.</source>
-      <translation>Video Kaydı İçin Çıkış Dosyası Oluşturulamadı.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output stream for recording.</source>
-      <translation>Kayıt İçin Çıkış Akışı Sağlanamadı.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output audio stream.</source>
-      <translation>Ses Akış Çıkışı Ayrılamadı.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output metadata stream.</source>
-      <translation>Çıkış meta veri akışı tahsis edilemedi.</translation>
-    </message>
-    <message>
-      <source>Invalid audio codec information.</source>
-      <translation>Geçersiz Ses Kodek Bilgisi.</translation>
-    </message>
-    <message>
-      <source>Video or audio codec is incompatible with the selected format.</source>
-      <translation>Ses veya Video Kodek'i Seçilen Formatla Uyumsuz.</translation>
-    </message>
-    <message>
-      <source>Video transcoding required.</source>
-      <translation>Video kod dönüştürmesi gerekiyor.</translation>
-    </message>
-    <message>
-      <source>File write error. Not enough free space.</source>
-      <translation>Dosya Yazım Hatası. Yeterli Boş Alan Yok.</translation>
-    </message>
-    <message>
-      <source>Invalid resource type for data export.</source>
-      <translation>Data aktarma için geçersiz kaynak tipi.</translation>
-    </message>
-    <message>
-      <source>No data exported.</source>
-      <translation>Dışa aktarılan veri yok.</translation>
-    </message>
-    <message>
-      <source>Unlock this portion of the archive to export its contents.</source>
-      <translation type="unfinished">Unlock this portion of the archive to export its contents.</translation>
-    </message>
-    <message>
-      <source>Archive is unavailable now. Please try again later.</source>
-      <translation>Arşiv şu anda kullanılamıyor. Lütfen daha sonra tekrar deneyiniz.</translation>
     </message>
   </context>
   <context>
