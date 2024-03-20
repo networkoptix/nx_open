@@ -1,11 +1,11 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#ifndef QN_SERIALIZATION_LEXICAL_FUNCTIONS_H
-#define QN_SERIALIZATION_LEXICAL_FUNCTIONS_H
+#pragma once
 
 #include <chrono>
 
 #include <QtCore/QBitArray>
+#include <QtCore/QDateTime>
 #include <QtCore/QJsonValue>
 #include <QtCore/QUrl>
 #include <QtGui/QColor>
@@ -219,5 +219,4 @@ QN_FUSION_DECLARE_FUNCTIONS(nx::Uuid, (lexical), NX_FUSION_API)
 QN_FUSION_DECLARE_FUNCTIONS(QUrl, (lexical), NX_FUSION_API)
 QN_FUSION_DECLARE_FUNCTIONS(nx::utils::Url, (lexical), NX_FUSION_API)
 QN_FUSION_DECLARE_FUNCTIONS(QColor, (lexical), NX_FUSION_API)
-
-#endif // QN_SERIALIZATION_LEXICAL_FUNCTIONS_H
+QN_FUSION_DECLARE_FUNCTIONS(QDateTime, (lexical), NX_FUSION_API)
