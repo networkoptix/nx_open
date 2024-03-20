@@ -90,12 +90,23 @@ private:
 
     IRefCountable* doQueryInterface(const IRefCountable::InterfaceId* id)
     {
+        const auto interfaceSupported =
+            [this]()
+            {
+                this->addRef();
+                // The cast is needed to shift the pointer in case of multiple inheritance.
+                return static_cast<DerivedInterface*>(this);
+            };
+
         if (*DerivedInterface::interfaceId() == *id)
+            return interfaceSupported();
+
+        if constexpr (IRefCountable::hasAlternativeInterfaceId<DerivedInterface>)
         {
-            this->addRef();
-            // The cast is needed to shift the pointer in case of multiple inheritance.
-            return static_cast<DerivedInterface*>(this);
+            if (*DerivedInterface::alternativeInterfaceId() == *id)
+                return interfaceSupported();
         }
+
         return BaseInterface::queryInterface(id);
     }
 };
