@@ -1267,7 +1267,69 @@
     </message>
   </context>
   <context>
-    <name>SystemSettings</name>
+    <name>nx::recording::Error</name>
+    <message>
+      <source>Internal error</source>
+      <translation>שגיאה פנימית</translation>
+    </message>
+    <message>
+      <source>Corresponding container in FFMPEG library was not found.</source>
+      <translation>המעטפת המתאימה בספריית FFMPEG לא נמצאה.</translation>
+    </message>
+    <message>
+      <source>Could not create output file for video recording.</source>
+      <translation>יצירת קובץ פלט להקלטת הוידאו נכשלה.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output stream for recording.</source>
+      <translation>לא ניתן להקצות זרם פלט להקלטה.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output audio stream.</source>
+      <translation>לא ניתן להקצות זרם פלט.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output metadata stream.</source>
+      <translation type="unfinished">Could not allocate output metadata stream.</translation>
+    </message>
+    <message>
+      <source>Invalid audio codec information.</source>
+      <translation>מידע קודק אודיו שגוי.</translation>
+    </message>
+    <message>
+      <source>Video or audio codec is incompatible with the selected format.</source>
+      <translation>קודק הוידאו/אודיו אינו תואם לפורמט שנבחר.</translation>
+    </message>
+    <message>
+      <source>Video transcoding required.</source>
+      <translation>קידוד וידאו נדרש.</translation>
+    </message>
+    <message>
+      <source>File write error. Not enough free space.</source>
+      <translation>שגיאה בכתיבת קובץ. אין מספיק מקום פנוי.</translation>
+    </message>
+    <message>
+      <source>Invalid resource type for data export.</source>
+      <translation>סוג משאב לא חוקי לייצוא נתונים.</translation>
+    </message>
+    <message>
+      <source>No data exported.</source>
+      <translation>ייצוא נתונים לא בוצע.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::utils::CryptedFileStream</name>
+    <message>
+      <source>Wrong crypted stream size.</source>
+      <translation>גודל זרם שגוי.</translation>
+    </message>
+    <message>
+      <source>Damaged crypted stream header.</source>
+      <translation>כותרת זרם מוצפן פגומה.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::common::SystemSettings</name>
     <message>
       <source>SMTP host</source>
       <translation>מארח SMTP</translation>
@@ -1741,68 +1803,6 @@
     <message>
       <source>RTP timeout (milliseconds)</source>
       <translation>RTP פסק זמן (אלפיות השנייה)</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::recording::Error</name>
-    <message>
-      <source>Internal error</source>
-      <translation>שגיאה פנימית</translation>
-    </message>
-    <message>
-      <source>Corresponding container in FFMPEG library was not found.</source>
-      <translation>המעטפת המתאימה בספריית FFMPEG לא נמצאה.</translation>
-    </message>
-    <message>
-      <source>Could not create output file for video recording.</source>
-      <translation>יצירת קובץ פלט להקלטת הוידאו נכשלה.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output stream for recording.</source>
-      <translation>לא ניתן להקצות זרם פלט להקלטה.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output audio stream.</source>
-      <translation>לא ניתן להקצות זרם פלט.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output metadata stream.</source>
-      <translation type="unfinished">Could not allocate output metadata stream.</translation>
-    </message>
-    <message>
-      <source>Invalid audio codec information.</source>
-      <translation>מידע קודק אודיו שגוי.</translation>
-    </message>
-    <message>
-      <source>Video or audio codec is incompatible with the selected format.</source>
-      <translation>קודק הוידאו/אודיו אינו תואם לפורמט שנבחר.</translation>
-    </message>
-    <message>
-      <source>Video transcoding required.</source>
-      <translation>קידוד וידאו נדרש.</translation>
-    </message>
-    <message>
-      <source>File write error. Not enough free space.</source>
-      <translation>שגיאה בכתיבת קובץ. אין מספיק מקום פנוי.</translation>
-    </message>
-    <message>
-      <source>Invalid resource type for data export.</source>
-      <translation>סוג משאב לא חוקי לייצוא נתונים.</translation>
-    </message>
-    <message>
-      <source>No data exported.</source>
-      <translation>ייצוא נתונים לא בוצע.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::utils::CryptedFileStream</name>
-    <message>
-      <source>Wrong crypted stream size.</source>
-      <translation>גודל זרם שגוי.</translation>
-    </message>
-    <message>
-      <source>Damaged crypted stream header.</source>
-      <translation>כותרת זרם מוצפן פגומה.</translation>
     </message>
   </context>
   <context>

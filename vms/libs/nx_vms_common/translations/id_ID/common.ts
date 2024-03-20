@@ -1129,14 +1129,76 @@
     </message>
   </context>
   <context>
-    <name>SystemSettings</name>
+    <name>nx::recording::Error</name>
+    <message>
+      <source>Internal error</source>
+      <translation type="unfinished">Internal error</translation>
+    </message>
+    <message>
+      <source>Corresponding container in FFMPEG library was not found.</source>
+      <translation type="unfinished">Corresponding container in FFMPEG library was not found.</translation>
+    </message>
+    <message>
+      <source>Could not create output file for video recording.</source>
+      <translation type="unfinished">Could not create output file for video recording.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output stream for recording.</source>
+      <translation type="unfinished">Could not allocate output stream for recording.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output audio stream.</source>
+      <translation type="unfinished">Could not allocate output audio stream.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output metadata stream.</source>
+      <translation type="unfinished">Could not allocate output metadata stream.</translation>
+    </message>
+    <message>
+      <source>Invalid audio codec information.</source>
+      <translation type="unfinished">Invalid audio codec information.</translation>
+    </message>
+    <message>
+      <source>Video or audio codec is incompatible with the selected format.</source>
+      <translation type="unfinished">Video or audio codec is incompatible with the selected format.</translation>
+    </message>
+    <message>
+      <source>Video transcoding required.</source>
+      <translation type="unfinished">Video transcoding required.</translation>
+    </message>
+    <message>
+      <source>File write error. Not enough free space.</source>
+      <translation type="unfinished">File write error. Not enough free space.</translation>
+    </message>
+    <message>
+      <source>Invalid resource type for data export.</source>
+      <translation type="unfinished">Invalid resource type for data export.</translation>
+    </message>
+    <message>
+      <source>No data exported.</source>
+      <translation type="unfinished">No data exported.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::utils::CryptedFileStream</name>
+    <message>
+      <source>Wrong crypted stream size.</source>
+      <translation type="unfinished">Wrong crypted stream size.</translation>
+    </message>
+    <message>
+      <source>Damaged crypted stream header.</source>
+      <translation type="unfinished">Damaged crypted stream header.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::common::SystemSettings</name>
     <message>
       <source>SMTP host</source>
       <translation type="unfinished">SMTP host</translation>
     </message>
     <message>
       <source>Email from</source>
-      <translation type="unfinished">Email from</translation>
+      <translation>Email dari</translation>
     </message>
     <message>
       <source>SMTP user</source>
@@ -1148,7 +1210,7 @@
     </message>
     <message>
       <source>Email signature</source>
-      <translation type="unfinished">Email signature</translation>
+      <translation>Signature email</translation>
     </message>
     <message>
       <source>Email support link</source>
@@ -1172,7 +1234,7 @@
     </message>
     <message>
       <source>LDAP URI</source>
-      <translation type="unfinished">LDAP URI</translation>
+      <translation>URI LDAP</translation>
     </message>
     <message>
       <source>LDAP Admin DN</source>
@@ -1184,11 +1246,11 @@
     </message>
     <message>
       <source>LDAP search base</source>
-      <translation type="unfinished">LDAP search base</translation>
+      <translation>Basis pencarian LDAP</translation>
     </message>
     <message>
       <source>LDAP search filter</source>
-      <translation type="unfinished">LDAP search filter</translation>
+      <translation>Filter pencarian LDAP</translation>
     </message>
     <message>
       <source>LDAP password expiration (milliseconds)</source>
@@ -1264,7 +1326,7 @@
     </message>
     <message>
       <source>Cloud owner account</source>
-      <translation type="unfinished">Cloud owner account</translation>
+      <translation>Akun pemilik cloud</translation>
     </message>
     <message>
       <source>Cloud System ID</source>
@@ -1329,7 +1391,7 @@
     </message>
     <message>
       <source>Event log period (days)</source>
-      <translation type="unfinished">Event log period (days)</translation>
+      <translation>Periode event log (hari)</translation>
     </message>
     <message>
       <source>Enforce HTTPS (data traffic encryption)</source>
@@ -1449,7 +1511,7 @@
     </message>
     <message>
       <source>Default video codec</source>
-      <translation type="unfinished">Default video codec</translation>
+      <translation>Default video codec</translation>
     </message>
     <message>
       <source>Default codec for export video</source>
@@ -1603,68 +1665,6 @@
     <message>
       <source>RTP timeout (milliseconds)</source>
       <translation type="unfinished">RTP timeout (milliseconds)</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::recording::Error</name>
-    <message>
-      <source>Internal error</source>
-      <translation type="unfinished">Internal error</translation>
-    </message>
-    <message>
-      <source>Corresponding container in FFMPEG library was not found.</source>
-      <translation type="unfinished">Corresponding container in FFMPEG library was not found.</translation>
-    </message>
-    <message>
-      <source>Could not create output file for video recording.</source>
-      <translation type="unfinished">Could not create output file for video recording.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output stream for recording.</source>
-      <translation type="unfinished">Could not allocate output stream for recording.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output audio stream.</source>
-      <translation type="unfinished">Could not allocate output audio stream.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output metadata stream.</source>
-      <translation type="unfinished">Could not allocate output metadata stream.</translation>
-    </message>
-    <message>
-      <source>Invalid audio codec information.</source>
-      <translation type="unfinished">Invalid audio codec information.</translation>
-    </message>
-    <message>
-      <source>Video or audio codec is incompatible with the selected format.</source>
-      <translation type="unfinished">Video or audio codec is incompatible with the selected format.</translation>
-    </message>
-    <message>
-      <source>Video transcoding required.</source>
-      <translation type="unfinished">Video transcoding required.</translation>
-    </message>
-    <message>
-      <source>File write error. Not enough free space.</source>
-      <translation type="unfinished">File write error. Not enough free space.</translation>
-    </message>
-    <message>
-      <source>Invalid resource type for data export.</source>
-      <translation type="unfinished">Invalid resource type for data export.</translation>
-    </message>
-    <message>
-      <source>No data exported.</source>
-      <translation type="unfinished">No data exported.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::utils::CryptedFileStream</name>
-    <message>
-      <source>Wrong crypted stream size.</source>
-      <translation type="unfinished">Wrong crypted stream size.</translation>
-    </message>
-    <message>
-      <source>Damaged crypted stream header.</source>
-      <translation type="unfinished">Damaged crypted stream header.</translation>
     </message>
   </context>
   <context>

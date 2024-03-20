@@ -1175,7 +1175,69 @@
     </message>
   </context>
   <context>
-    <name>SystemSettings</name>
+    <name>nx::recording::Error</name>
+    <message>
+      <source>Internal error</source>
+      <translation>Intern feil</translation>
+    </message>
+    <message>
+      <source>Corresponding container in FFMPEG library was not found.</source>
+      <translation>Tilsvarende beholder i FFMPEG-bibliotek ble ikke funnet.</translation>
+    </message>
+    <message>
+      <source>Could not create output file for video recording.</source>
+      <translation>Kunne ikke opprette utdatafil for videoopptak.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output stream for recording.</source>
+      <translation>Kunne ikke allokere utgangsstrøm for opptak.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output audio stream.</source>
+      <translation>Kunne ikke allokere utgangsljudstrøm.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output metadata stream.</source>
+      <translation>Kunne ikke allokere metadatastrøm.</translation>
+    </message>
+    <message>
+      <source>Invalid audio codec information.</source>
+      <translation>Ugyldig lydkodingsinformasjon.</translation>
+    </message>
+    <message>
+      <source>Video or audio codec is incompatible with the selected format.</source>
+      <translation>Video- eller lydkodek er uforenlig med det valgte formatet.</translation>
+    </message>
+    <message>
+      <source>Video transcoding required.</source>
+      <translation>Videotranskoding kreves.</translation>
+    </message>
+    <message>
+      <source>File write error. Not enough free space.</source>
+      <translation>Fil skrive feil. Ikke nok ledig plass.</translation>
+    </message>
+    <message>
+      <source>Invalid resource type for data export.</source>
+      <translation>Ugyldig ressurstype for dataeksport.</translation>
+    </message>
+    <message>
+      <source>No data exported.</source>
+      <translation>Ingen data eksportert.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::utils::CryptedFileStream</name>
+    <message>
+      <source>Wrong crypted stream size.</source>
+      <translation>Feil kryptert strømstørrelse.</translation>
+    </message>
+    <message>
+      <source>Damaged crypted stream header.</source>
+      <translation>Skadet kryptert strøm header.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::common::SystemSettings</name>
     <message>
       <source>SMTP host</source>
       <translation>SMTP-vert</translation>
@@ -1194,7 +1256,7 @@
     </message>
     <message>
       <source>Email signature</source>
-      <translation>E-post signatur</translation>
+      <translation>E-postsignatur</translation>
     </message>
     <message>
       <source>Email support link</source>
@@ -1234,7 +1296,7 @@
     </message>
     <message>
       <source>LDAP search filter</source>
-      <translation>LDAP-søkefilter</translation>
+      <translation>LDAP søkefilter</translation>
     </message>
     <message>
       <source>LDAP password expiration (milliseconds)</source>
@@ -1310,7 +1372,7 @@
     </message>
     <message>
       <source>Cloud owner account</source>
-      <translation>Cloud eierkonto</translation>
+      <translation>Eiers skykonto</translation>
     </message>
     <message>
       <source>Cloud System ID</source>
@@ -1326,7 +1388,7 @@
     </message>
     <message>
       <source>Local System ID</source>
-      <translation>Lokal System-ID</translation>
+      <translation>Lokal system-ID</translation>
     </message>
     <message>
       <source>Last master System merge ID</source>
@@ -1649,68 +1711,6 @@
     <message>
       <source>RTP timeout (milliseconds)</source>
       <translation>RTP timeout (millisekunder)</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::recording::Error</name>
-    <message>
-      <source>Internal error</source>
-      <translation>Intern feil</translation>
-    </message>
-    <message>
-      <source>Corresponding container in FFMPEG library was not found.</source>
-      <translation>Tilsvarende beholder i FFMPEG-bibliotek ble ikke funnet.</translation>
-    </message>
-    <message>
-      <source>Could not create output file for video recording.</source>
-      <translation>Kunne ikke opprette utdatafil for videoopptak.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output stream for recording.</source>
-      <translation>Kunne ikke allokere utgangsstrøm for opptak.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output audio stream.</source>
-      <translation>Kunne ikke allokere utgangsljudstrøm.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output metadata stream.</source>
-      <translation>Kunne ikke allokere metadatastrøm.</translation>
-    </message>
-    <message>
-      <source>Invalid audio codec information.</source>
-      <translation>Ugyldig lydkodingsinformasjon.</translation>
-    </message>
-    <message>
-      <source>Video or audio codec is incompatible with the selected format.</source>
-      <translation>Video- eller lydkodek er uforenlig med det valgte formatet.</translation>
-    </message>
-    <message>
-      <source>Video transcoding required.</source>
-      <translation>Videotranskoding kreves.</translation>
-    </message>
-    <message>
-      <source>File write error. Not enough free space.</source>
-      <translation>Fil skrive feil. Ikke nok ledig plass.</translation>
-    </message>
-    <message>
-      <source>Invalid resource type for data export.</source>
-      <translation>Ugyldig ressurstype for dataeksport.</translation>
-    </message>
-    <message>
-      <source>No data exported.</source>
-      <translation>Ingen data eksportert.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::utils::CryptedFileStream</name>
-    <message>
-      <source>Wrong crypted stream size.</source>
-      <translation>Feil kryptert strømstørrelse.</translation>
-    </message>
-    <message>
-      <source>Damaged crypted stream header.</source>
-      <translation>Skadet kryptert strøm header.</translation>
     </message>
   </context>
   <context>

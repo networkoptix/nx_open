@@ -1129,7 +1129,69 @@
     </message>
   </context>
   <context>
-    <name>SystemSettings</name>
+    <name>nx::recording::Error</name>
+    <message>
+      <source>Internal error</source>
+      <translation>내부 오류</translation>
+    </message>
+    <message>
+      <source>Corresponding container in FFMPEG library was not found.</source>
+      <translation>FFMPEG 라이브러리에서 해당 컨테이너 찾을 수 없습니다.</translation>
+    </message>
+    <message>
+      <source>Could not create output file for video recording.</source>
+      <translation>비디오 저장에 대한 출력 파일을 만들수 없습니다.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output stream for recording.</source>
+      <translation>저장을 위한 출력 스트림을 할당 할 수 없습니다.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output audio stream.</source>
+      <translation>오디오 출력 스트림을 할당할 수 없습니다.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output metadata stream.</source>
+      <translation>출력 메타데이터 스트림을 할당할 수 없습니다.</translation>
+    </message>
+    <message>
+      <source>Invalid audio codec information.</source>
+      <translation>잘못된 오디오 코덱 정보임.</translation>
+    </message>
+    <message>
+      <source>Video or audio codec is incompatible with the selected format.</source>
+      <translation>비디오 또는 오디오 코덱은 선택된 포맷과 호환되지 않습니다.</translation>
+    </message>
+    <message>
+      <source>Video transcoding required.</source>
+      <translation>비디오 트랜스코딩이 필요합니다.</translation>
+    </message>
+    <message>
+      <source>File write error. Not enough free space.</source>
+      <translation>파일 쓰기 오류입니다. 충분 하지 않은 여유 공간입니다.</translation>
+    </message>
+    <message>
+      <source>Invalid resource type for data export.</source>
+      <translation>데이터 내보내기에 대 한 잘못 된 리소스 형식입니다.</translation>
+    </message>
+    <message>
+      <source>No data exported.</source>
+      <translation>내 보낼 데이타가 없습니다.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::utils::CryptedFileStream</name>
+    <message>
+      <source>Wrong crypted stream size.</source>
+      <translation>암호화 된 스트림 크기가 잘못되었습니다.</translation>
+    </message>
+    <message>
+      <source>Damaged crypted stream header.</source>
+      <translation>암호화 된 스트림 헤더가 손상되었습니다.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::common::SystemSettings</name>
     <message>
       <source>SMTP host</source>
       <translation>SMTP 호스트</translation>
@@ -1603,68 +1665,6 @@
     <message>
       <source>RTP timeout (milliseconds)</source>
       <translation>RTP 휴식시간 (1/1000초)</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::recording::Error</name>
-    <message>
-      <source>Internal error</source>
-      <translation>내부 오류</translation>
-    </message>
-    <message>
-      <source>Corresponding container in FFMPEG library was not found.</source>
-      <translation>FFMPEG 라이브러리에서 해당 컨테이너 찾을 수 없습니다.</translation>
-    </message>
-    <message>
-      <source>Could not create output file for video recording.</source>
-      <translation>비디오 저장에 대한 출력 파일을 만들수 없습니다.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output stream for recording.</source>
-      <translation>저장을 위한 출력 스트림을 할당 할 수 없습니다.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output audio stream.</source>
-      <translation>오디오 출력 스트림을 할당할 수 없습니다.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output metadata stream.</source>
-      <translation>출력 메타데이터 스트림을 할당할 수 없습니다.</translation>
-    </message>
-    <message>
-      <source>Invalid audio codec information.</source>
-      <translation>잘못된 오디오 코덱 정보임.</translation>
-    </message>
-    <message>
-      <source>Video or audio codec is incompatible with the selected format.</source>
-      <translation>비디오 또는 오디오 코덱은 선택된 포맷과 호환되지 않습니다.</translation>
-    </message>
-    <message>
-      <source>Video transcoding required.</source>
-      <translation>비디오 트랜스코딩이 필요합니다.</translation>
-    </message>
-    <message>
-      <source>File write error. Not enough free space.</source>
-      <translation>파일 쓰기 오류입니다. 충분 하지 않은 여유 공간입니다.</translation>
-    </message>
-    <message>
-      <source>Invalid resource type for data export.</source>
-      <translation>데이터 내보내기에 대 한 잘못 된 리소스 형식입니다.</translation>
-    </message>
-    <message>
-      <source>No data exported.</source>
-      <translation>내 보낼 데이타가 없습니다.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::utils::CryptedFileStream</name>
-    <message>
-      <source>Wrong crypted stream size.</source>
-      <translation>암호화 된 스트림 크기가 잘못되었습니다.</translation>
-    </message>
-    <message>
-      <source>Damaged crypted stream header.</source>
-      <translation>암호화 된 스트림 헤더가 손상되었습니다.</translation>
     </message>
   </context>
   <context>

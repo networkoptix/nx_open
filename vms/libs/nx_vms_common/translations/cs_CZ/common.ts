@@ -1267,7 +1267,69 @@
     </message>
   </context>
   <context>
-    <name>SystemSettings</name>
+    <name>nx::recording::Error</name>
+    <message>
+      <source>Internal error</source>
+      <translation>Vnitřní chyba</translation>
+    </message>
+    <message>
+      <source>Corresponding container in FFMPEG library was not found.</source>
+      <translation>Nebyl nalezen odpovídající kontejner v knihovně FFMPEG.</translation>
+    </message>
+    <message>
+      <source>Could not create output file for video recording.</source>
+      <translation>Nelze vytvořit výstupní soubor pro záznam videa.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output stream for recording.</source>
+      <translation>Nelze přidělit výstupní stream pro záznam.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output audio stream.</source>
+      <translation>Nelze přidělit výstupní zvukový stream.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output metadata stream.</source>
+      <translation type="unfinished">Could not allocate output metadata stream.</translation>
+    </message>
+    <message>
+      <source>Invalid audio codec information.</source>
+      <translation>Neplatné informace o kodeku zvuku.</translation>
+    </message>
+    <message>
+      <source>Video or audio codec is incompatible with the selected format.</source>
+      <translation>Video nebo audio kodek není kompatibilní s vybraným formátem.</translation>
+    </message>
+    <message>
+      <source>Video transcoding required.</source>
+      <translation>Je vyžadováno překódování videa.</translation>
+    </message>
+    <message>
+      <source>File write error. Not enough free space.</source>
+      <translation>Chyba zápisu souboru. Nedostatek volného místa.</translation>
+    </message>
+    <message>
+      <source>Invalid resource type for data export.</source>
+      <translation>Neplatný typ zdroje pro export dat.</translation>
+    </message>
+    <message>
+      <source>No data exported.</source>
+      <translation>Žádná data nebyla vyexportována.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::utils::CryptedFileStream</name>
+    <message>
+      <source>Wrong crypted stream size.</source>
+      <translation>Špatná velikost šifrovaného proudu.</translation>
+    </message>
+    <message>
+      <source>Damaged crypted stream header.</source>
+      <translation>Poškozená záhlaví šifrovaného proudu.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::common::SystemSettings</name>
     <message>
       <source>SMTP host</source>
       <translation>SMTP host</translation>
@@ -1741,68 +1803,6 @@
     <message>
       <source>RTP timeout (milliseconds)</source>
       <translation>Časový limit rtp (milisekundy)</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::recording::Error</name>
-    <message>
-      <source>Internal error</source>
-      <translation>Vnitřní chyba</translation>
-    </message>
-    <message>
-      <source>Corresponding container in FFMPEG library was not found.</source>
-      <translation>Nebyl nalezen odpovídající kontejner v knihovně FFMPEG.</translation>
-    </message>
-    <message>
-      <source>Could not create output file for video recording.</source>
-      <translation>Nelze vytvořit výstupní soubor pro záznam videa.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output stream for recording.</source>
-      <translation>Nelze přidělit výstupní stream pro záznam.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output audio stream.</source>
-      <translation>Nelze přidělit výstupní zvukový stream.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output metadata stream.</source>
-      <translation type="unfinished">Could not allocate output metadata stream.</translation>
-    </message>
-    <message>
-      <source>Invalid audio codec information.</source>
-      <translation>Neplatné informace o kodeku zvuku.</translation>
-    </message>
-    <message>
-      <source>Video or audio codec is incompatible with the selected format.</source>
-      <translation>Video nebo audio kodek není kompatibilní s vybraným formátem.</translation>
-    </message>
-    <message>
-      <source>Video transcoding required.</source>
-      <translation>Je vyžadováno překódování videa.</translation>
-    </message>
-    <message>
-      <source>File write error. Not enough free space.</source>
-      <translation>Chyba zápisu souboru. Nedostatek volného místa.</translation>
-    </message>
-    <message>
-      <source>Invalid resource type for data export.</source>
-      <translation>Neplatný typ zdroje pro export dat.</translation>
-    </message>
-    <message>
-      <source>No data exported.</source>
-      <translation>Žádná data nebyla vyexportována.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::utils::CryptedFileStream</name>
-    <message>
-      <source>Wrong crypted stream size.</source>
-      <translation>Špatná velikost šifrovaného proudu.</translation>
-    </message>
-    <message>
-      <source>Damaged crypted stream header.</source>
-      <translation>Poškozená záhlaví šifrovaného proudu.</translation>
     </message>
   </context>
   <context>

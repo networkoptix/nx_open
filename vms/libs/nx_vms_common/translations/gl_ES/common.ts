@@ -9,7 +9,7 @@
     </message>
     <message>
       <source>empty</source>
-      <translation type="unfinished">empty</translation>
+      <translation>baleiro</translation>
     </message>
     <message>
       <source>less than an hour</source>
@@ -20,11 +20,11 @@
     <name>AuthResultTranslations</name>
     <message>
       <source>This user does not exist.</source>
-      <translation type="unfinished">This user does not exist.</translation>
+      <translation>Esta persoa usuaria non existe.</translation>
     </message>
     <message>
       <source>Wrong password.</source>
-      <translation type="unfinished">Wrong password.</translation>
+      <translation>Contrasinal incorrecto.</translation>
     </message>
     <message>
       <source>The password is expired. Please contact your system administrator.</source>
@@ -44,7 +44,7 @@
     </message>
     <message>
       <source>This authorization method is forbidden. Please contact your system administrator.</source>
-      <translation type="unfinished">This authorization method is forbidden. Please contact your system administrator.</translation>
+      <translation>Este método de autorización está prohibido. Por favor, ponte en contacto co teu administrador do sistema.</translation>
     </message>
     <message>
       <source>The session key is invalid or expired.</source>
@@ -56,7 +56,7 @@
     </message>
     <message>
       <source>This user has been disabled by a system administrator.</source>
-      <translation type="unfinished">This user has been disabled by a system administrator.</translation>
+      <translation>Esta persoa usuaria foi desactivada por unha persoa administradora do sistema.</translation>
     </message>
   </context>
   <context>
@@ -152,7 +152,7 @@
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>Ok</translation>
     </message>
     <message>
       <source>Server has been stopped.</source>
@@ -168,7 +168,7 @@
     </message>
     <message>
       <source>(unknown)</source>
-      <translation type="unfinished">(unknown)</translation>
+      <translation>(descoñecido)</translation>
     </message>
     <message>
       <source>Server %1 is not available.</source>
@@ -463,15 +463,15 @@
     <name>QnLicense</name>
     <message>
       <source>Analog</source>
-      <translation type="unfinished">Analog</translation>
+      <translation>Analóxico</translation>
     </message>
     <message>
       <source>Professional</source>
-      <translation type="unfinished">Professional</translation>
+      <translation>Profesional</translation>
     </message>
     <message>
       <source>Edge</source>
-      <translation type="unfinished">Edge</translation>
+      <translation>Borde</translation>
     </message>
     <message>
       <source>Vmax</source>
@@ -479,7 +479,7 @@
     </message>
     <message>
       <source>Video Wall</source>
-      <translation type="unfinished">Video Wall</translation>
+      <translation>Video Wall / Muro</translation>
     </message>
     <message>
       <source>I/O Module</source>
@@ -487,11 +487,11 @@
     </message>
     <message>
       <source>Start</source>
-      <translation type="unfinished">Start</translation>
+      <translation>Comezar</translation>
     </message>
     <message>
       <source>Analog Encoder</source>
-      <translation type="unfinished">Analog Encoder</translation>
+      <translation>Codificador analóxico</translation>
     </message>
     <message>
       <source>Analog Licenses</source>
@@ -527,7 +527,7 @@
     </message>
     <message>
       <source>Invalid</source>
-      <translation type="unfinished">Invalid</translation>
+      <translation>Non válido</translation>
     </message>
     <message>
       <source>Invalid Licenses</source>
@@ -539,7 +539,7 @@
     </message>
     <message>
       <source>Time</source>
-      <translation type="unfinished">Time</translation>
+      <translation>Tempo</translation>
     </message>
     <message>
       <source>Time Licenses</source>
@@ -547,7 +547,7 @@
     </message>
     <message>
       <source>Bridge</source>
-      <translation type="unfinished">Bridge</translation>
+      <translation>Bridge</translation>
     </message>
     <message>
       <source>Bridge Licenses</source>
@@ -739,7 +739,7 @@
     </message>
     <message>
       <source>NVR</source>
-      <translation type="unfinished">NVR</translation>
+      <translation>NVR</translation>
     </message>
     <message>
       <source>NVR Licenses</source>
@@ -765,35 +765,35 @@
     <name>QnResourceNameStrings</name>
     <message>
       <source>Cameras</source>
-      <translation type="unfinished">Cameras</translation>
+      <translation>Cámaras</translation>
     </message>
     <message>
       <source>cameras</source>
-      <translation type="unfinished">cameras</translation>
+      <translation>cámaras</translation>
     </message>
     <message>
       <source>Camera</source>
-      <translation type="unfinished">Camera</translation>
+      <translation>Cámara</translation>
     </message>
     <message>
       <source>camera</source>
-      <translation type="unfinished">camera</translation>
+      <translation>cámara</translation>
     </message>
     <message>
       <source>Devices</source>
-      <translation type="unfinished">Devices</translation>
+      <translation>Dispositivos</translation>
     </message>
     <message>
       <source>devices</source>
-      <translation type="unfinished">devices</translation>
+      <translation>dispositivos</translation>
     </message>
     <message>
       <source>Device</source>
-      <translation type="unfinished">Device</translation>
+      <translation>Dispositivo</translation>
     </message>
     <message>
       <source>device</source>
-      <translation type="unfinished">device</translation>
+      <translation>dispositivo</translation>
     </message>
     <message>
       <source>I/O Modules</source>
@@ -858,7 +858,7 @@
     <name>QnSignHelper</name>
     <message>
       <source>Unknown</source>
-      <translation type="unfinished">Unknown</translation>
+      <translation>Descoñecido</translation>
     </message>
     <message>
       <source>FREE License</source>
@@ -942,7 +942,7 @@
     <message>
       <source>days</source>
       <comment>Long suffix for displaying days</comment>
-      <translation type="unfinished">days</translation>
+      <translation>días</translation>
     </message>
     <message>
       <source>wks</source>
@@ -978,25 +978,25 @@
     <message numerus="yes">
       <source>minutes</source>
       <comment>Full suffix for displaying minutes</comment>
-      <translation type="unfinished">
-        <numerusform>minutes</numerusform>
-        <numerusform>minutes</numerusform>
+      <translation>
+        <numerusform>minutos</numerusform>
+        <numerusform>minutos</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>hours</source>
       <comment>Full suffix for displaying hours</comment>
-      <translation type="unfinished">
-        <numerusform>hours</numerusform>
-        <numerusform>hours</numerusform>
+      <translation>
+        <numerusform>horas</numerusform>
+        <numerusform>horas</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>days</source>
       <comment>Full suffix for displaying days</comment>
-      <translation type="unfinished">
-        <numerusform>days</numerusform>
-        <numerusform>days</numerusform>
+      <translation>
+        <numerusform>días</numerusform>
+        <numerusform>días</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1047,23 +1047,23 @@
     <name>QnUserRolesManager</name>
     <message>
       <source>Owner</source>
-      <translation type="unfinished">Owner</translation>
+      <translation>Propietario/a</translation>
     </message>
     <message>
       <source>Administrator</source>
-      <translation type="unfinished">Administrator</translation>
+      <translation>Administrador/a</translation>
     </message>
     <message>
       <source>Advanced Viewer</source>
-      <translation type="unfinished">Advanced Viewer</translation>
+      <translation>Visor avanzado</translation>
     </message>
     <message>
       <source>Viewer</source>
-      <translation type="unfinished">Viewer</translation>
+      <translation>Visor</translation>
     </message>
     <message>
       <source>Live Viewer</source>
-      <translation type="unfinished">Live Viewer</translation>
+      <translation>Visor en directo</translation>
     </message>
     <message>
       <source>Custom Role</source>
@@ -1071,7 +1071,7 @@
     </message>
     <message>
       <source>Custom</source>
-      <translation type="unfinished">Custom</translation>
+      <translation>Personalizado</translation>
     </message>
     <message>
       <source>Can manage all cameras and bookmarks.</source>
@@ -1135,7 +1135,7 @@
     <message>
       <source>Not found.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Not found.</translation>
+      <translation>Non atopado.</translation>
     </message>
     <message>
       <source>Internal error.</source>
@@ -1171,22 +1171,84 @@
     <name>SystemHelpers</name>
     <message>
       <source>New System</source>
-      <translation type="unfinished">New System</translation>
+      <translation>Novo sistema</translation>
     </message>
   </context>
   <context>
-    <name>SystemSettings</name>
+    <name>nx::recording::Error</name>
+    <message>
+      <source>Internal error</source>
+      <translation type="unfinished">Internal error</translation>
+    </message>
+    <message>
+      <source>Corresponding container in FFMPEG library was not found.</source>
+      <translation type="unfinished">Corresponding container in FFMPEG library was not found.</translation>
+    </message>
+    <message>
+      <source>Could not create output file for video recording.</source>
+      <translation type="unfinished">Could not create output file for video recording.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output stream for recording.</source>
+      <translation type="unfinished">Could not allocate output stream for recording.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output audio stream.</source>
+      <translation type="unfinished">Could not allocate output audio stream.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output metadata stream.</source>
+      <translation type="unfinished">Could not allocate output metadata stream.</translation>
+    </message>
+    <message>
+      <source>Invalid audio codec information.</source>
+      <translation type="unfinished">Invalid audio codec information.</translation>
+    </message>
+    <message>
+      <source>Video or audio codec is incompatible with the selected format.</source>
+      <translation type="unfinished">Video or audio codec is incompatible with the selected format.</translation>
+    </message>
+    <message>
+      <source>Video transcoding required.</source>
+      <translation type="unfinished">Video transcoding required.</translation>
+    </message>
+    <message>
+      <source>File write error. Not enough free space.</source>
+      <translation type="unfinished">File write error. Not enough free space.</translation>
+    </message>
+    <message>
+      <source>Invalid resource type for data export.</source>
+      <translation type="unfinished">Invalid resource type for data export.</translation>
+    </message>
+    <message>
+      <source>No data exported.</source>
+      <translation type="unfinished">No data exported.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::utils::CryptedFileStream</name>
+    <message>
+      <source>Wrong crypted stream size.</source>
+      <translation type="unfinished">Wrong crypted stream size.</translation>
+    </message>
+    <message>
+      <source>Damaged crypted stream header.</source>
+      <translation type="unfinished">Damaged crypted stream header.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::common::SystemSettings</name>
     <message>
       <source>SMTP host</source>
-      <translation type="unfinished">SMTP host</translation>
+      <translation>SMTP Host</translation>
     </message>
     <message>
       <source>Email from</source>
-      <translation type="unfinished">Email from</translation>
+      <translation>Correo electrónico de</translation>
     </message>
     <message>
       <source>SMTP user</source>
-      <translation type="unfinished">SMTP user</translation>
+      <translation>SMTP Usuario</translation>
     </message>
     <message>
       <source>SMTP password</source>
@@ -1194,7 +1256,7 @@
     </message>
     <message>
       <source>Email signature</source>
-      <translation type="unfinished">Email signature</translation>
+      <translation>Sinatura de correo electrónico</translation>
     </message>
     <message>
       <source>Email support link</source>
@@ -1202,11 +1264,11 @@
     </message>
     <message>
       <source>SMTP connection type</source>
-      <translation type="unfinished">SMTP connection type</translation>
+      <translation>SMTP Tipo de conexión</translation>
     </message>
     <message>
       <source>SMTP port</source>
-      <translation type="unfinished">SMTP port</translation>
+      <translation>SMTP Porto</translation>
     </message>
     <message>
       <source>SMTP timeout (seconds)</source>
@@ -1218,7 +1280,7 @@
     </message>
     <message>
       <source>LDAP URI</source>
-      <translation type="unfinished">LDAP URI</translation>
+      <translation>URI LDAP</translation>
     </message>
     <message>
       <source>LDAP Admin DN</source>
@@ -1230,11 +1292,11 @@
     </message>
     <message>
       <source>LDAP search base</source>
-      <translation type="unfinished">LDAP search base</translation>
+      <translation>Base de busca LDAP</translation>
     </message>
     <message>
       <source>LDAP search filter</source>
-      <translation type="unfinished">LDAP search filter</translation>
+      <translation>Filtro de busca LDAP</translation>
     </message>
     <message>
       <source>LDAP password expiration (milliseconds)</source>
@@ -1286,7 +1348,7 @@
     </message>
     <message>
       <source>Time synchronization enabled</source>
-      <translation type="unfinished">Time synchronization enabled</translation>
+      <translation>Sincronización horaria activada</translation>
     </message>
     <message>
       <source>Primary time synchronization Server ID</source>
@@ -1298,19 +1360,19 @@
     </message>
     <message>
       <source>OS time change check period</source>
-      <translation type="unfinished">OS time change check period</translation>
+      <translation>Período de verificación do cambio de hora do sistema operativo</translation>
     </message>
     <message>
       <source>Sync time synchronization interval for network requests</source>
-      <translation type="unfinished">Sync time synchronization interval for network requests</translation>
+      <translation>Sincronizar o intervalo de sincronización horaria para as solicitudes de rede</translation>
     </message>
     <message>
       <source>Sync time epsilon. New value is not applied if time delta less than epsilon</source>
-      <translation type="unfinished">Sync time epsilon. New value is not applied if time delta less than epsilon</translation>
+      <translation>Sincronizar tempo epsilon. O novo valor non se aplica se o delta de tempo é inferior á épsilon</translation>
     </message>
     <message>
       <source>Cloud owner account</source>
-      <translation type="unfinished">Cloud owner account</translation>
+      <translation>Conta do propietario da nube</translation>
     </message>
     <message>
       <source>Cloud System ID</source>
@@ -1322,11 +1384,11 @@
     </message>
     <message>
       <source>System name</source>
-      <translation type="unfinished">System name</translation>
+      <translation>Nome do sistema</translation>
     </message>
     <message>
       <source>Local System ID</source>
-      <translation type="unfinished">Local System ID</translation>
+      <translation>ID do sistema local</translation>
     </message>
     <message>
       <source>Last master System merge ID</source>
@@ -1355,19 +1417,19 @@
     </message>
     <message>
       <source>Max scene items (0 means default)</source>
-      <translation type="unfinished">Max scene items (0 means default)</translation>
+      <translation>Máximo de elementos en escena (0 significa predeterminado)</translation>
     </message>
     <message>
       <source>Send plain-text emails</source>
-      <translation type="unfinished">Send plain-text emails</translation>
+      <translation>Enviar correos electrónicos de texto sen formato</translation>
     </message>
     <message>
       <source>Use Windows line feed in emails</source>
-      <translation type="unfinished">Use Windows line feed in emails</translation>
+      <translation>Usa o salto de liña de Windows nos correos electrónicos</translation>
     </message>
     <message>
       <source>Enable audit trail</source>
-      <translation type="unfinished">Enable audit trail</translation>
+      <translation>Activar a pista de auditoría</translation>
     </message>
     <message>
       <source>Audit trail period (days, 14-730)</source>
@@ -1375,7 +1437,7 @@
     </message>
     <message>
       <source>Event log period (days)</source>
-      <translation type="unfinished">Event log period (days)</translation>
+      <translation>Período de rexistro de eventos (días)</translation>
     </message>
     <message>
       <source>Enforce HTTPS (data traffic encryption)</source>
@@ -1471,7 +1533,7 @@
     </message>
     <message>
       <source>Watermark settings</source>
-      <translation type="unfinished">Watermark settings</translation>
+      <translation>Configuración da marca de auga</translation>
     </message>
     <message>
       <source>Authorization Session token lifetime (minutes)</source>
@@ -1495,7 +1557,7 @@
     </message>
     <message>
       <source>Default video codec</source>
-      <translation type="unfinished">Default video codec</translation>
+      <translation>Códec de vídeo predeterminado</translation>
     </message>
     <message>
       <source>Default codec for export video</source>
@@ -1503,11 +1565,11 @@
     </message>
     <message>
       <source>Low quality screen video codec</source>
-      <translation type="unfinished">Low quality screen video codec</translation>
+      <translation>Códec de vídeo de pantalla de baixa calidade</translation>
     </message>
     <message>
       <source>License server</source>
-      <translation type="unfinished">License server</translation>
+      <translation>Servidor de licenzas</translation>
     </message>
     <message>
       <source>URI for resource_data.json automatic update</source>
@@ -1515,7 +1577,7 @@
     </message>
     <message>
       <source>Meta data storage change policy</source>
-      <translation type="unfinished">Meta data storage change policy</translation>
+      <translation>Política de cambio de almacenamento de metadatos</translation>
     </message>
     <message>
       <source>Persistent Servers for update storage</source>
@@ -1649,68 +1711,6 @@
     <message>
       <source>RTP timeout (milliseconds)</source>
       <translation>Tempo de espera RTP (milisegundos)</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::recording::Error</name>
-    <message>
-      <source>Internal error</source>
-      <translation type="unfinished">Internal error</translation>
-    </message>
-    <message>
-      <source>Corresponding container in FFMPEG library was not found.</source>
-      <translation type="unfinished">Corresponding container in FFMPEG library was not found.</translation>
-    </message>
-    <message>
-      <source>Could not create output file for video recording.</source>
-      <translation type="unfinished">Could not create output file for video recording.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output stream for recording.</source>
-      <translation type="unfinished">Could not allocate output stream for recording.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output audio stream.</source>
-      <translation type="unfinished">Could not allocate output audio stream.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output metadata stream.</source>
-      <translation type="unfinished">Could not allocate output metadata stream.</translation>
-    </message>
-    <message>
-      <source>Invalid audio codec information.</source>
-      <translation type="unfinished">Invalid audio codec information.</translation>
-    </message>
-    <message>
-      <source>Video or audio codec is incompatible with the selected format.</source>
-      <translation type="unfinished">Video or audio codec is incompatible with the selected format.</translation>
-    </message>
-    <message>
-      <source>Video transcoding required.</source>
-      <translation type="unfinished">Video transcoding required.</translation>
-    </message>
-    <message>
-      <source>File write error. Not enough free space.</source>
-      <translation type="unfinished">File write error. Not enough free space.</translation>
-    </message>
-    <message>
-      <source>Invalid resource type for data export.</source>
-      <translation type="unfinished">Invalid resource type for data export.</translation>
-    </message>
-    <message>
-      <source>No data exported.</source>
-      <translation type="unfinished">No data exported.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::utils::CryptedFileStream</name>
-    <message>
-      <source>Wrong crypted stream size.</source>
-      <translation type="unfinished">Wrong crypted stream size.</translation>
-    </message>
-    <message>
-      <source>Damaged crypted stream header.</source>
-      <translation type="unfinished">Damaged crypted stream header.</translation>
     </message>
   </context>
   <context>
@@ -2031,7 +2031,7 @@
     </message>
     <message>
       <source>start</source>
-      <translation type="unfinished">start</translation>
+      <translation>comezar</translation>
     </message>
     <message>
       <source>stop</source>
@@ -2051,7 +2051,7 @@
     </message>
     <message>
       <source>Role</source>
-      <translation type="unfinished">Role</translation>
+      <translation>Rol</translation>
     </message>
     <message numerus="yes">
       <source>%n Users</source>
@@ -2101,7 +2101,7 @@
     </message>
     <message>
       <source>Analytics Event</source>
-      <translation type="unfinished">Analytics Event</translation>
+      <translation>Evento analítico</translation>
     </message>
     <message>
       <source>%1 at %2</source>

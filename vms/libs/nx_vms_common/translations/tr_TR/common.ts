@@ -1175,18 +1175,80 @@
     </message>
   </context>
   <context>
-    <name>SystemSettings</name>
+    <name>nx::recording::Error</name>
+    <message>
+      <source>Internal error</source>
+      <translation>İç hata</translation>
+    </message>
+    <message>
+      <source>Corresponding container in FFMPEG library was not found.</source>
+      <translation>FFMPEG Kütüphanesindeki Karşılık Gelen Taşıyıcı Bulunamadı.</translation>
+    </message>
+    <message>
+      <source>Could not create output file for video recording.</source>
+      <translation>Video Kaydı İçin Çıkış Dosyası Oluşturulamadı.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output stream for recording.</source>
+      <translation>Kayıt İçin Çıkış Akışı Sağlanamadı.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output audio stream.</source>
+      <translation>Ses Akış Çıkışı Ayrılamadı.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output metadata stream.</source>
+      <translation>Çıkış meta veri akışı tahsis edilemedi.</translation>
+    </message>
+    <message>
+      <source>Invalid audio codec information.</source>
+      <translation>Geçersiz Ses Kodek Bilgisi.</translation>
+    </message>
+    <message>
+      <source>Video or audio codec is incompatible with the selected format.</source>
+      <translation>Ses veya Video Kodek'i Seçilen Formatla Uyumsuz.</translation>
+    </message>
+    <message>
+      <source>Video transcoding required.</source>
+      <translation>Video kod dönüştürmesi gerekiyor.</translation>
+    </message>
+    <message>
+      <source>File write error. Not enough free space.</source>
+      <translation>Dosya Yazım Hatası. Yeterli Boş Alan Yok.</translation>
+    </message>
+    <message>
+      <source>Invalid resource type for data export.</source>
+      <translation>Data aktarma için geçersiz kaynak tipi.</translation>
+    </message>
+    <message>
+      <source>No data exported.</source>
+      <translation>Dışa aktarılan veri yok.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::utils::CryptedFileStream</name>
+    <message>
+      <source>Wrong crypted stream size.</source>
+      <translation>Yanlış akış boyutu.</translation>
+    </message>
+    <message>
+      <source>Damaged crypted stream header.</source>
+      <translation>Hasarlı akış başlığı.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::common::SystemSettings</name>
     <message>
       <source>SMTP host</source>
       <translation>SMTP Sunucusu</translation>
     </message>
     <message>
       <source>Email from</source>
-      <translation>Kimden</translation>
+      <translation>Tarafından eposta</translation>
     </message>
     <message>
       <source>SMTP user</source>
-      <translation>SMTP kullanıcı</translation>
+      <translation>SMTP kullanıcısı</translation>
     </message>
     <message>
       <source>SMTP password</source>
@@ -1230,7 +1292,7 @@
     </message>
     <message>
       <source>LDAP search base</source>
-      <translation>LDAP veritabanı</translation>
+      <translation>LDAP arama tabanı</translation>
     </message>
     <message>
       <source>LDAP search filter</source>
@@ -1302,11 +1364,11 @@
     </message>
     <message>
       <source>Sync time synchronization interval for network requests</source>
-      <translation>Ağ istekleri için senkronizasyon zamanı senkronizasyon aralığı</translation>
+      <translation>Ağ istekleri için zaman eşitleme aralığını eşitle</translation>
     </message>
     <message>
       <source>Sync time epsilon. New value is not applied if time delta less than epsilon</source>
-      <translation>Sync time epsilon. New value is not applied if time detla less than epsilon</translation>
+      <translation>Zaman epsilonunu senkronize et. Zaman deltası epsilondan küçükse yeni değer uygulanmaz</translation>
     </message>
     <message>
       <source>Cloud owner account</source>
@@ -1649,68 +1711,6 @@
     <message>
       <source>RTP timeout (milliseconds)</source>
       <translation>RTP zaman aşımı (milisaniye)</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::recording::Error</name>
-    <message>
-      <source>Internal error</source>
-      <translation>İç hata</translation>
-    </message>
-    <message>
-      <source>Corresponding container in FFMPEG library was not found.</source>
-      <translation>FFMPEG Kütüphanesindeki Karşılık Gelen Taşıyıcı Bulunamadı.</translation>
-    </message>
-    <message>
-      <source>Could not create output file for video recording.</source>
-      <translation>Video Kaydı İçin Çıkış Dosyası Oluşturulamadı.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output stream for recording.</source>
-      <translation>Kayıt İçin Çıkış Akışı Sağlanamadı.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output audio stream.</source>
-      <translation>Ses Akış Çıkışı Ayrılamadı.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output metadata stream.</source>
-      <translation>Çıkış meta veri akışı tahsis edilemedi.</translation>
-    </message>
-    <message>
-      <source>Invalid audio codec information.</source>
-      <translation>Geçersiz Ses Kodek Bilgisi.</translation>
-    </message>
-    <message>
-      <source>Video or audio codec is incompatible with the selected format.</source>
-      <translation>Ses veya Video Kodek'i Seçilen Formatla Uyumsuz.</translation>
-    </message>
-    <message>
-      <source>Video transcoding required.</source>
-      <translation>Video kod dönüştürmesi gerekiyor.</translation>
-    </message>
-    <message>
-      <source>File write error. Not enough free space.</source>
-      <translation>Dosya Yazım Hatası. Yeterli Boş Alan Yok.</translation>
-    </message>
-    <message>
-      <source>Invalid resource type for data export.</source>
-      <translation>Data aktarma için geçersiz kaynak tipi.</translation>
-    </message>
-    <message>
-      <source>No data exported.</source>
-      <translation>Dışa aktarılan veri yok.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::utils::CryptedFileStream</name>
-    <message>
-      <source>Wrong crypted stream size.</source>
-      <translation>Yanlış akış boyutu.</translation>
-    </message>
-    <message>
-      <source>Damaged crypted stream header.</source>
-      <translation>Hasarlı akış başlığı.</translation>
     </message>
   </context>
   <context>

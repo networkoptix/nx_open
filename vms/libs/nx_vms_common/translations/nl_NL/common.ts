@@ -1175,7 +1175,69 @@
     </message>
   </context>
   <context>
-    <name>SystemSettings</name>
+    <name>nx::recording::Error</name>
+    <message>
+      <source>Internal error</source>
+      <translation>Interne fout</translation>
+    </message>
+    <message>
+      <source>Corresponding container in FFMPEG library was not found.</source>
+      <translation>Corresponderende container in FFMPEG-bibliotheek werd niet gevonden.</translation>
+    </message>
+    <message>
+      <source>Could not create output file for video recording.</source>
+      <translation>Kon outputbestand niet maken voor video-opname.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output stream for recording.</source>
+      <translation>Kan de output stream niet toewijzen voor opname.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output audio stream.</source>
+      <translation>Kan de audio output stream niet toewijzen.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output metadata stream.</source>
+      <translation>Kan de uitvoer metadata stream niet toewijzen.</translation>
+    </message>
+    <message>
+      <source>Invalid audio codec information.</source>
+      <translation>Ongeldige audio codec informatie.</translation>
+    </message>
+    <message>
+      <source>Video or audio codec is incompatible with the selected format.</source>
+      <translation>Video- of audiocodec is niet compatible met het geselecteerde formaat.</translation>
+    </message>
+    <message>
+      <source>Video transcoding required.</source>
+      <translation>Video-transcodering vereist.</translation>
+    </message>
+    <message>
+      <source>File write error. Not enough free space.</source>
+      <translation>Schrijffout van het bestand. Niet genoeg vrije ruimte.</translation>
+    </message>
+    <message>
+      <source>Invalid resource type for data export.</source>
+      <translation>Ongeldig brontype voor gegevensuitvoer.</translation>
+    </message>
+    <message>
+      <source>No data exported.</source>
+      <translation>Er zijn geen gegevens geëxporteerd.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::utils::CryptedFileStream</name>
+    <message>
+      <source>Wrong crypted stream size.</source>
+      <translation>Verkeerde crypted stream grootte.</translation>
+    </message>
+    <message>
+      <source>Damaged crypted stream header.</source>
+      <translation>Beschadigde crypted stream header.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::common::SystemSettings</name>
     <message>
       <source>SMTP host</source>
       <translation>SMTP host</translation>
@@ -1649,68 +1711,6 @@
     <message>
       <source>RTP timeout (milliseconds)</source>
       <translation>RTP timeout (milliseconden)</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::recording::Error</name>
-    <message>
-      <source>Internal error</source>
-      <translation>Interne fout</translation>
-    </message>
-    <message>
-      <source>Corresponding container in FFMPEG library was not found.</source>
-      <translation>Corresponderende container in FFMPEG-bibliotheek werd niet gevonden.</translation>
-    </message>
-    <message>
-      <source>Could not create output file for video recording.</source>
-      <translation>Kon outputbestand niet maken voor video-opname.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output stream for recording.</source>
-      <translation>Kan de output stream niet toewijzen voor opname.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output audio stream.</source>
-      <translation>Kan de audio output stream niet toewijzen.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output metadata stream.</source>
-      <translation>Kan de uitvoer metadata stream niet toewijzen.</translation>
-    </message>
-    <message>
-      <source>Invalid audio codec information.</source>
-      <translation>Ongeldige audio codec informatie.</translation>
-    </message>
-    <message>
-      <source>Video or audio codec is incompatible with the selected format.</source>
-      <translation>Video- of audiocodec is niet compatible met het geselecteerde formaat.</translation>
-    </message>
-    <message>
-      <source>Video transcoding required.</source>
-      <translation>Video-transcodering vereist.</translation>
-    </message>
-    <message>
-      <source>File write error. Not enough free space.</source>
-      <translation>Schrijffout van het bestand. Niet genoeg vrije ruimte.</translation>
-    </message>
-    <message>
-      <source>Invalid resource type for data export.</source>
-      <translation>Ongeldig brontype voor gegevensuitvoer.</translation>
-    </message>
-    <message>
-      <source>No data exported.</source>
-      <translation>Er zijn geen gegevens geëxporteerd.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::utils::CryptedFileStream</name>
-    <message>
-      <source>Wrong crypted stream size.</source>
-      <translation>Verkeerde crypted stream grootte.</translation>
-    </message>
-    <message>
-      <source>Damaged crypted stream header.</source>
-      <translation>Beschadigde crypted stream header.</translation>
     </message>
   </context>
   <context>

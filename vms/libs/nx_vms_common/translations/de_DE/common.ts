@@ -1175,7 +1175,69 @@
     </message>
   </context>
   <context>
-    <name>SystemSettings</name>
+    <name>nx::recording::Error</name>
+    <message>
+      <source>Internal error</source>
+      <translation>Interner Fehler</translation>
+    </message>
+    <message>
+      <source>Corresponding container in FFMPEG library was not found.</source>
+      <translation>Entsprechender Container konnte in der FFMPEG-Library nicht gefunden werden.</translation>
+    </message>
+    <message>
+      <source>Could not create output file for video recording.</source>
+      <translation>Die Output-Datei für die Videoaufnahme konnte nicht angelegt werden.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output stream for recording.</source>
+      <translation>Der Output-Stream für die Aufnahme konnte nicht belegt werden.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output audio stream.</source>
+      <translation>Der Output für den Audiostream konnte nicht belegt werden.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output metadata stream.</source>
+      <translation>Ausgabe-Metadatenstream konnte nicht zugewiesen werden.</translation>
+    </message>
+    <message>
+      <source>Invalid audio codec information.</source>
+      <translation>Information zum Audiocodec ist ungültig.</translation>
+    </message>
+    <message>
+      <source>Video or audio codec is incompatible with the selected format.</source>
+      <translation>Video- oder Audiocodec ist mit dem gewählten Format nicht kompatibel.</translation>
+    </message>
+    <message>
+      <source>Video transcoding required.</source>
+      <translation>Videotranscodierung erforderlich.</translation>
+    </message>
+    <message>
+      <source>File write error. Not enough free space.</source>
+      <translation>Fehler beim Schreiben. Nicht genügend Speicherplatz.</translation>
+    </message>
+    <message>
+      <source>Invalid resource type for data export.</source>
+      <translation>Ungültige Ressourcentyp für den Datenexport.</translation>
+    </message>
+    <message>
+      <source>No data exported.</source>
+      <translation>Keine Daten wurden exportiert.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::utils::CryptedFileStream</name>
+    <message>
+      <source>Wrong crypted stream size.</source>
+      <translation>Falsche verschlüsselte Streamgröße.</translation>
+    </message>
+    <message>
+      <source>Damaged crypted stream header.</source>
+      <translation>Beschädigter verschlüsselter Streamheader.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::common::SystemSettings</name>
     <message>
       <source>SMTP host</source>
       <translation>SMTP-Host</translation>
@@ -1286,7 +1348,7 @@
     </message>
     <message>
       <source>Time synchronization enabled</source>
-      <translation>Zeitsynchronisierung aktiviert</translation>
+      <translation>Synchronisierung aktiviert</translation>
     </message>
     <message>
       <source>Primary time synchronization Server ID</source>
@@ -1306,7 +1368,7 @@
     </message>
     <message>
       <source>Sync time epsilon. New value is not applied if time delta less than epsilon</source>
-      <translation>Zeitsumme synchronisieren. Neuer Wert wird nicht angewendet, wenn die Delta-Zeit kleiner als die Summe ist</translation>
+      <translation>Zeitsumme synchronisieren. Neuer Wert wird nicht angewendet, wenn die Deltazeit kleiner als die Summe ist</translation>
     </message>
     <message>
       <source>Cloud owner account</source>
@@ -1359,7 +1421,7 @@
     </message>
     <message>
       <source>Send plain-text emails</source>
-      <translation>Nur Textemails senden</translation>
+      <translation>Nur Textmails senden</translation>
     </message>
     <message>
       <source>Use Windows line feed in emails</source>
@@ -1471,7 +1533,7 @@
     </message>
     <message>
       <source>Watermark settings</source>
-      <translation>Wasserzeichen-Einstellungen</translation>
+      <translation>Wasserzeicheneinstellungen</translation>
     </message>
     <message>
       <source>Authorization Session token lifetime (minutes)</source>
@@ -1503,7 +1565,7 @@
     </message>
     <message>
       <source>Low quality screen video codec</source>
-      <translation>Bildschirm-Videocodec mit niedriger Qualität</translation>
+      <translation>Bildschirmvideocodec mit niedriger Qualität</translation>
     </message>
     <message>
       <source>License server</source>
@@ -1649,68 +1711,6 @@
     <message>
       <source>RTP timeout (milliseconds)</source>
       <translation>RTP-Zeitüberschreitung (Millisekunden)</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::recording::Error</name>
-    <message>
-      <source>Internal error</source>
-      <translation>Interner Fehler</translation>
-    </message>
-    <message>
-      <source>Corresponding container in FFMPEG library was not found.</source>
-      <translation>Entsprechender Container konnte in der FFMPEG-Library nicht gefunden werden.</translation>
-    </message>
-    <message>
-      <source>Could not create output file for video recording.</source>
-      <translation>Die Output-Datei für die Videoaufnahme konnte nicht angelegt werden.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output stream for recording.</source>
-      <translation>Der Output-Stream für die Aufnahme konnte nicht belegt werden.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output audio stream.</source>
-      <translation>Der Output für den Audiostream konnte nicht belegt werden.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output metadata stream.</source>
-      <translation>Ausgabe-Metadatenstream konnte nicht zugewiesen werden.</translation>
-    </message>
-    <message>
-      <source>Invalid audio codec information.</source>
-      <translation>Information zum Audiocodec ist ungültig.</translation>
-    </message>
-    <message>
-      <source>Video or audio codec is incompatible with the selected format.</source>
-      <translation>Video- oder Audiocodec ist mit dem gewählten Format nicht kompatibel.</translation>
-    </message>
-    <message>
-      <source>Video transcoding required.</source>
-      <translation>Videotranscodierung erforderlich.</translation>
-    </message>
-    <message>
-      <source>File write error. Not enough free space.</source>
-      <translation>Fehler beim Schreiben. Nicht genügend Speicherplatz.</translation>
-    </message>
-    <message>
-      <source>Invalid resource type for data export.</source>
-      <translation>Ungültige Ressourcentyp für den Datenexport.</translation>
-    </message>
-    <message>
-      <source>No data exported.</source>
-      <translation>Keine Daten wurden exportiert.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::utils::CryptedFileStream</name>
-    <message>
-      <source>Wrong crypted stream size.</source>
-      <translation>Falsche verschlüsselte Streamgröße.</translation>
-    </message>
-    <message>
-      <source>Damaged crypted stream header.</source>
-      <translation>Beschädigter verschlüsselter Streamheader.</translation>
     </message>
   </context>
   <context>

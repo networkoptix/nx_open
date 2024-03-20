@@ -1175,7 +1175,69 @@
     </message>
   </context>
   <context>
-    <name>SystemSettings</name>
+    <name>nx::recording::Error</name>
+    <message>
+      <source>Internal error</source>
+      <translation>Error intern</translation>
+    </message>
+    <message>
+      <source>Corresponding container in FFMPEG library was not found.</source>
+      <translation>No s'ha trobat el contenidor corresponent a la biblioteca FFMPEG.</translation>
+    </message>
+    <message>
+      <source>Could not create output file for video recording.</source>
+      <translation>No s'ha pogut crear l'arxiu de sortida per a l'enregistrament de vídeo.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output stream for recording.</source>
+      <translation>No s'ha pogut assignar el flux de sortida per a l'enregistrament.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output audio stream.</source>
+      <translation>No s'ha pogut assignar el flux d'àudio de sortida.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output metadata stream.</source>
+      <translation type="unfinished">Could not allocate output metadata stream.</translation>
+    </message>
+    <message>
+      <source>Invalid audio codec information.</source>
+      <translation>La informació del còdec d'àudio no és vàlida.</translation>
+    </message>
+    <message>
+      <source>Video or audio codec is incompatible with the selected format.</source>
+      <translation>El còdec de vídeo o àudio és incompatible amb el format seleccionat.</translation>
+    </message>
+    <message>
+      <source>Video transcoding required.</source>
+      <translation>Cal transcodificar el vídeo.</translation>
+    </message>
+    <message>
+      <source>File write error. Not enough free space.</source>
+      <translation>Error d'escriptura d'arxiu. No hi ha prou espai lliure.</translation>
+    </message>
+    <message>
+      <source>Invalid resource type for data export.</source>
+      <translation>El tipus de recurs per a l'exportació de dades no és vàlid.</translation>
+    </message>
+    <message>
+      <source>No data exported.</source>
+      <translation>No s'han exportat dades.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::utils::CryptedFileStream</name>
+    <message>
+      <source>Wrong crypted stream size.</source>
+      <translation>Mida de flux encriptat incorrecta.</translation>
+    </message>
+    <message>
+      <source>Damaged crypted stream header.</source>
+      <translation>Capçalera de flux xifrat malmesa.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::common::SystemSettings</name>
     <message>
       <source>SMTP host</source>
       <translation>Amfitrió SMTP</translation>
@@ -1649,68 +1711,6 @@
     <message>
       <source>RTP timeout (milliseconds)</source>
       <translation>Temps d'espera RTP (mil·lisegons)</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::recording::Error</name>
-    <message>
-      <source>Internal error</source>
-      <translation>Error intern</translation>
-    </message>
-    <message>
-      <source>Corresponding container in FFMPEG library was not found.</source>
-      <translation>No s'ha trobat el contenidor corresponent a la biblioteca FFMPEG.</translation>
-    </message>
-    <message>
-      <source>Could not create output file for video recording.</source>
-      <translation>No s'ha pogut crear l'arxiu de sortida per a l'enregistrament de vídeo.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output stream for recording.</source>
-      <translation>No s'ha pogut assignar el flux de sortida per a l'enregistrament.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output audio stream.</source>
-      <translation>No s'ha pogut assignar el flux d'àudio de sortida.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output metadata stream.</source>
-      <translation type="unfinished">Could not allocate output metadata stream.</translation>
-    </message>
-    <message>
-      <source>Invalid audio codec information.</source>
-      <translation>La informació del còdec d'àudio no és vàlida.</translation>
-    </message>
-    <message>
-      <source>Video or audio codec is incompatible with the selected format.</source>
-      <translation>El còdec de vídeo o àudio és incompatible amb el format seleccionat.</translation>
-    </message>
-    <message>
-      <source>Video transcoding required.</source>
-      <translation>Cal transcodificar el vídeo.</translation>
-    </message>
-    <message>
-      <source>File write error. Not enough free space.</source>
-      <translation>Error d'escriptura d'arxiu. No hi ha prou espai lliure.</translation>
-    </message>
-    <message>
-      <source>Invalid resource type for data export.</source>
-      <translation>El tipus de recurs per a l'exportació de dades no és vàlid.</translation>
-    </message>
-    <message>
-      <source>No data exported.</source>
-      <translation>No s'han exportat dades.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::utils::CryptedFileStream</name>
-    <message>
-      <source>Wrong crypted stream size.</source>
-      <translation>Mida de flux encriptat incorrecta.</translation>
-    </message>
-    <message>
-      <source>Damaged crypted stream header.</source>
-      <translation>Capçalera de flux xifrat malmesa.</translation>
     </message>
   </context>
   <context>

@@ -1129,7 +1129,69 @@
     </message>
   </context>
   <context>
-    <name>SystemSettings</name>
+    <name>nx::recording::Error</name>
+    <message>
+      <source>Internal error</source>
+      <translation>內部發生錯誤</translation>
+    </message>
+    <message>
+      <source>Corresponding container in FFMPEG library was not found.</source>
+      <translation>在 FFMPEG 函式庫中並未找到相對應的影像容器(container)</translation>
+    </message>
+    <message>
+      <source>Could not create output file for video recording.</source>
+      <translation>無法建立錄影用的輸出檔案。</translation>
+    </message>
+    <message>
+      <source>Could not allocate output stream for recording.</source>
+      <translation>無法分配錄影用的輸出串流。</translation>
+    </message>
+    <message>
+      <source>Could not allocate output audio stream.</source>
+      <translation>無法配置所需的音訊輸出串流。</translation>
+    </message>
+    <message>
+      <source>Could not allocate output metadata stream.</source>
+      <translation>無法配置Metadata輸出串流。</translation>
+    </message>
+    <message>
+      <source>Invalid audio codec information.</source>
+      <translation>無效的聲音編碼資訊。</translation>
+    </message>
+    <message>
+      <source>Video or audio codec is incompatible with the selected format.</source>
+      <translation>影像或聲音編碼無法相容於選擇的格式。</translation>
+    </message>
+    <message>
+      <source>Video transcoding required.</source>
+      <translation>影片需要重新編碼。</translation>
+    </message>
+    <message>
+      <source>File write error. Not enough free space.</source>
+      <translation>檔案寫入錯誤(磁碟可用空間不足)</translation>
+    </message>
+    <message>
+      <source>Invalid resource type for data export.</source>
+      <translation>無效的資料匯出資源類型.</translation>
+    </message>
+    <message>
+      <source>No data exported.</source>
+      <translation>未匯出任何資料.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::utils::CryptedFileStream</name>
+    <message>
+      <source>Wrong crypted stream size.</source>
+      <translation>錯誤的加密串流量。</translation>
+    </message>
+    <message>
+      <source>Damaged crypted stream header.</source>
+      <translation>損壞的加密串流表頭。</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::common::SystemSettings</name>
     <message>
       <source>SMTP host</source>
       <translation>SMTP 主機地址</translation>
@@ -1565,11 +1627,11 @@
     </message>
     <message>
       <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32)</source>
-      <translation type="unfinished">Max thread count for remote archive synchronization (&lt;=0 - auto, max 32)</translation>
+      <translation>遠端存檔同步的最大執行緒數（&lt;=0 - 自動，最大 32）</translation>
     </message>
     <message>
       <source>Thread count limit for camera archive synchronization</source>
-      <translation type="unfinished">Thread count limit for camera archive synchronization</translation>
+      <translation>攝影機存檔同步的執行緒數量限制</translation>
     </message>
     <message>
       <source>Maximum event log records to keep in the database. Real amount of undeleted records may be up to 20% higher than the specified value.</source>
@@ -1603,68 +1665,6 @@
     <message>
       <source>RTP timeout (milliseconds)</source>
       <translation>RTP 超時時間 (毫秒)</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::recording::Error</name>
-    <message>
-      <source>Internal error</source>
-      <translation>內部發生錯誤</translation>
-    </message>
-    <message>
-      <source>Corresponding container in FFMPEG library was not found.</source>
-      <translation>在 FFMPEG 函式庫中並未找到相對應的影像容器(container)</translation>
-    </message>
-    <message>
-      <source>Could not create output file for video recording.</source>
-      <translation>無法建立錄影用的輸出檔案。</translation>
-    </message>
-    <message>
-      <source>Could not allocate output stream for recording.</source>
-      <translation>無法分配錄影用的輸出串流。</translation>
-    </message>
-    <message>
-      <source>Could not allocate output audio stream.</source>
-      <translation>無法配置所需的音訊輸出串流。</translation>
-    </message>
-    <message>
-      <source>Could not allocate output metadata stream.</source>
-      <translation>無法配置Metadata輸出串流。</translation>
-    </message>
-    <message>
-      <source>Invalid audio codec information.</source>
-      <translation>無效的聲音編碼資訊。</translation>
-    </message>
-    <message>
-      <source>Video or audio codec is incompatible with the selected format.</source>
-      <translation>影像或聲音編碼無法相容於選擇的格式。</translation>
-    </message>
-    <message>
-      <source>Video transcoding required.</source>
-      <translation>影片需要重新編碼。</translation>
-    </message>
-    <message>
-      <source>File write error. Not enough free space.</source>
-      <translation>檔案寫入錯誤(磁碟可用空間不足)</translation>
-    </message>
-    <message>
-      <source>Invalid resource type for data export.</source>
-      <translation>無效的資料匯出資源類型.</translation>
-    </message>
-    <message>
-      <source>No data exported.</source>
-      <translation>未匯出任何資料.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::utils::CryptedFileStream</name>
-    <message>
-      <source>Wrong crypted stream size.</source>
-      <translation>錯誤的加密串流量。</translation>
-    </message>
-    <message>
-      <source>Damaged crypted stream header.</source>
-      <translation>損壞的加密串流表頭。</translation>
     </message>
   </context>
   <context>

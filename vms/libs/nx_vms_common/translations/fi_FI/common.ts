@@ -1175,7 +1175,69 @@
     </message>
   </context>
   <context>
-    <name>SystemSettings</name>
+    <name>nx::recording::Error</name>
+    <message>
+      <source>Internal error</source>
+      <translation>Sisäinen virhe</translation>
+    </message>
+    <message>
+      <source>Corresponding container in FFMPEG library was not found.</source>
+      <translation>Vastaavaa sisältöä FFMPEG-kirjastossa ei löytynyt.</translation>
+    </message>
+    <message>
+      <source>Could not create output file for video recording.</source>
+      <translation>Videotallennuksen tulostustiedostoa ei voitu luoda.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output stream for recording.</source>
+      <translation>Ulostulon streamia ei voinut varata tallentamiseen.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output audio stream.</source>
+      <translation>Lähtevän äänivirran jakaminen ei onnistunut.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output metadata stream.</source>
+      <translation type="unfinished">Could not allocate output metadata stream.</translation>
+    </message>
+    <message>
+      <source>Invalid audio codec information.</source>
+      <translation>Virheellinen audiokoodekin tiedot.</translation>
+    </message>
+    <message>
+      <source>Video or audio codec is incompatible with the selected format.</source>
+      <translation>Video- tai äänikoodekki ei ole yhteensopiva valitun formaatin kanssa.</translation>
+    </message>
+    <message>
+      <source>Video transcoding required.</source>
+      <translation type="unfinished">Video transcoding required.</translation>
+    </message>
+    <message>
+      <source>File write error. Not enough free space.</source>
+      <translation>Tiedoston kirjoitusvirhe. Ei tarpeeksi vapaata tilaa.</translation>
+    </message>
+    <message>
+      <source>Invalid resource type for data export.</source>
+      <translation>Virheellinen resurssityyppi tietojen viennille.</translation>
+    </message>
+    <message>
+      <source>No data exported.</source>
+      <translation>Tietoja ei viety.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::utils::CryptedFileStream</name>
+    <message>
+      <source>Wrong crypted stream size.</source>
+      <translation>Väärä salatun streamin koko.</translation>
+    </message>
+    <message>
+      <source>Damaged crypted stream header.</source>
+      <translation>Vaurioitunut salatun streamin-otsikko.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::common::SystemSettings</name>
     <message>
       <source>SMTP host</source>
       <translation>SMTP isäntä</translation>
@@ -1649,68 +1711,6 @@
     <message>
       <source>RTP timeout (milliseconds)</source>
       <translation>RTP-aikakatkaisu (millisekuntia)</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::recording::Error</name>
-    <message>
-      <source>Internal error</source>
-      <translation>Sisäinen virhe</translation>
-    </message>
-    <message>
-      <source>Corresponding container in FFMPEG library was not found.</source>
-      <translation>Vastaavaa sisältöä FFMPEG-kirjastossa ei löytynyt.</translation>
-    </message>
-    <message>
-      <source>Could not create output file for video recording.</source>
-      <translation>Videotallennuksen tulostustiedostoa ei voitu luoda.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output stream for recording.</source>
-      <translation>Ulostulon streamia ei voinut varata tallentamiseen.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output audio stream.</source>
-      <translation>Lähtevän äänivirran jakaminen ei onnistunut.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output metadata stream.</source>
-      <translation type="unfinished">Could not allocate output metadata stream.</translation>
-    </message>
-    <message>
-      <source>Invalid audio codec information.</source>
-      <translation>Virheellinen audiokoodekin tiedot.</translation>
-    </message>
-    <message>
-      <source>Video or audio codec is incompatible with the selected format.</source>
-      <translation>Video- tai äänikoodekki ei ole yhteensopiva valitun formaatin kanssa.</translation>
-    </message>
-    <message>
-      <source>Video transcoding required.</source>
-      <translation type="unfinished">Video transcoding required.</translation>
-    </message>
-    <message>
-      <source>File write error. Not enough free space.</source>
-      <translation>Tiedoston kirjoitusvirhe. Ei tarpeeksi vapaata tilaa.</translation>
-    </message>
-    <message>
-      <source>Invalid resource type for data export.</source>
-      <translation>Virheellinen resurssityyppi tietojen viennille.</translation>
-    </message>
-    <message>
-      <source>No data exported.</source>
-      <translation>Tietoja ei viety.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::utils::CryptedFileStream</name>
-    <message>
-      <source>Wrong crypted stream size.</source>
-      <translation>Väärä salatun streamin koko.</translation>
-    </message>
-    <message>
-      <source>Damaged crypted stream header.</source>
-      <translation>Vaurioitunut salatun streamin-otsikko.</translation>
     </message>
   </context>
   <context>

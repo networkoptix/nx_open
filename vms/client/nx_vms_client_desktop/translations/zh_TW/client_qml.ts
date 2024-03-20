@@ -1095,7 +1095,7 @@ to activate PTZ</source>
     <name>SelectOverlappedIdDialog</name>
     <message>
       <source>Timeline identifier, which is created when time is changed backward on a remote NVR. The new timeline can overlap the existing one.</source>
-      <translation type="unfinished">Timeline identifier, which is created when time is changed backward on a remote NVR. The new timeline can overlap the existing one.</translation>
+      <translation>時間軸ID，當遠端 NVR 上的時間往後調整時建立。新的時間軸可以與現有的時間軸重疊。</translation>
     </message>
     <message>
       <source>Select</source>

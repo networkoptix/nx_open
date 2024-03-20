@@ -1267,7 +1267,69 @@
     </message>
   </context>
   <context>
-    <name>SystemSettings</name>
+    <name>nx::recording::Error</name>
+    <message>
+      <source>Internal error</source>
+      <translation>Внутрішня помилка</translation>
+    </message>
+    <message>
+      <source>Corresponding container in FFMPEG library was not found.</source>
+      <translation>Відповідний контейнер у бібліотеці FFMPEG не знайдено.</translation>
+    </message>
+    <message>
+      <source>Could not create output file for video recording.</source>
+      <translation>Неможливо створити файл для запису відео.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output stream for recording.</source>
+      <translation>Неможливо створити буфер для запису потоку.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output audio stream.</source>
+      <translation>Неможливо створити буфер для звукового потоку.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output metadata stream.</source>
+      <translation type="unfinished">Could not allocate output metadata stream.</translation>
+    </message>
+    <message>
+      <source>Invalid audio codec information.</source>
+      <translation>Невірна інформація про звуковий кодек.</translation>
+    </message>
+    <message>
+      <source>Video or audio codec is incompatible with the selected format.</source>
+      <translation>Відео або аудіо кодек несумісний із вибраним форматом.</translation>
+    </message>
+    <message>
+      <source>Video transcoding required.</source>
+      <translation>Необхідне перекодування відео.</translation>
+    </message>
+    <message>
+      <source>File write error. Not enough free space.</source>
+      <translation>Помилка запису файлу. Не вистачає вільного простору.</translation>
+    </message>
+    <message>
+      <source>Invalid resource type for data export.</source>
+      <translation>Недійсний тип ресурсу для експорту даних.</translation>
+    </message>
+    <message>
+      <source>No data exported.</source>
+      <translation>Немає даних для експорту.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::utils::CryptedFileStream</name>
+    <message>
+      <source>Wrong crypted stream size.</source>
+      <translation>Неправильно зашифрований розмір потоку.</translation>
+    </message>
+    <message>
+      <source>Damaged crypted stream header.</source>
+      <translation>Пошкоджений заголовок зашифрованого потоку.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::common::SystemSettings</name>
     <message>
       <source>SMTP host</source>
       <translation>SMTP-хост</translation>
@@ -1741,68 +1803,6 @@
     <message>
       <source>RTP timeout (milliseconds)</source>
       <translation>Тайм-аут RTP (мілісекунди)</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::recording::Error</name>
-    <message>
-      <source>Internal error</source>
-      <translation>Внутрішня помилка</translation>
-    </message>
-    <message>
-      <source>Corresponding container in FFMPEG library was not found.</source>
-      <translation>Відповідний контейнер у бібліотеці FFMPEG не знайдено.</translation>
-    </message>
-    <message>
-      <source>Could not create output file for video recording.</source>
-      <translation>Неможливо створити файл для запису відео.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output stream for recording.</source>
-      <translation>Неможливо створити буфер для запису потоку.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output audio stream.</source>
-      <translation>Неможливо створити буфер для звукового потоку.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output metadata stream.</source>
-      <translation type="unfinished">Could not allocate output metadata stream.</translation>
-    </message>
-    <message>
-      <source>Invalid audio codec information.</source>
-      <translation>Невірна інформація про звуковий кодек.</translation>
-    </message>
-    <message>
-      <source>Video or audio codec is incompatible with the selected format.</source>
-      <translation>Відео або аудіо кодек несумісний із вибраним форматом.</translation>
-    </message>
-    <message>
-      <source>Video transcoding required.</source>
-      <translation>Необхідне перекодування відео.</translation>
-    </message>
-    <message>
-      <source>File write error. Not enough free space.</source>
-      <translation>Помилка запису файлу. Не вистачає вільного простору.</translation>
-    </message>
-    <message>
-      <source>Invalid resource type for data export.</source>
-      <translation>Недійсний тип ресурсу для експорту даних.</translation>
-    </message>
-    <message>
-      <source>No data exported.</source>
-      <translation>Немає даних для експорту.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::utils::CryptedFileStream</name>
-    <message>
-      <source>Wrong crypted stream size.</source>
-      <translation>Неправильно зашифрований розмір потоку.</translation>
-    </message>
-    <message>
-      <source>Damaged crypted stream header.</source>
-      <translation>Пошкоджений заголовок зашифрованого потоку.</translation>
     </message>
   </context>
   <context>

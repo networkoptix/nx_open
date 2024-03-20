@@ -1175,7 +1175,69 @@
     </message>
   </context>
   <context>
-    <name>SystemSettings</name>
+    <name>nx::recording::Error</name>
+    <message>
+      <source>Internal error</source>
+      <translation>Belső hiba</translation>
+    </message>
+    <message>
+      <source>Corresponding container in FFMPEG library was not found.</source>
+      <translation>A vonatkozó rész az FFMPEG mappában nem található.</translation>
+    </message>
+    <message>
+      <source>Could not create output file for video recording.</source>
+      <translation>Nem lehet létrehozni kimeneti fájlt a video rögzítéshez.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output stream for recording.</source>
+      <translation>Nem lehet lefoglalni a kimeneti stream-et a rogzítéshez.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output audio stream.</source>
+      <translation>Nem lehet lefoglalni a kimeneti audio streamet.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output metadata stream.</source>
+      <translation type="unfinished">Could not allocate output metadata stream.</translation>
+    </message>
+    <message>
+      <source>Invalid audio codec information.</source>
+      <translation>Érvénytelen audio kodek információ.</translation>
+    </message>
+    <message>
+      <source>Video or audio codec is incompatible with the selected format.</source>
+      <translation>Video vagy audio kodek nem kompatibilis a választott formátummal.</translation>
+    </message>
+    <message>
+      <source>Video transcoding required.</source>
+      <translation>Videokódolás szükséges.</translation>
+    </message>
+    <message>
+      <source>File write error. Not enough free space.</source>
+      <translation>Íráshiba. Nincs elég tárhely.</translation>
+    </message>
+    <message>
+      <source>Invalid resource type for data export.</source>
+      <translation>Érvénytelen forrástípus lett megadva az adat exportáláshoz.</translation>
+    </message>
+    <message>
+      <source>No data exported.</source>
+      <translation>Nincs exportált adat.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::utils::CryptedFileStream</name>
+    <message>
+      <source>Wrong crypted stream size.</source>
+      <translation>Rossz titkosított adatfolyam méret.</translation>
+    </message>
+    <message>
+      <source>Damaged crypted stream header.</source>
+      <translation>Sérült titkosított adatfolyam fejléc.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::common::SystemSettings</name>
     <message>
       <source>SMTP host</source>
       <translation>SMTP host</translation>
@@ -1649,68 +1711,6 @@
     <message>
       <source>RTP timeout (milliseconds)</source>
       <translation>RTP időtúllépés (millisec)</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::recording::Error</name>
-    <message>
-      <source>Internal error</source>
-      <translation>Belső hiba</translation>
-    </message>
-    <message>
-      <source>Corresponding container in FFMPEG library was not found.</source>
-      <translation>A vonatkozó rész az FFMPEG mappában nem található.</translation>
-    </message>
-    <message>
-      <source>Could not create output file for video recording.</source>
-      <translation>Nem lehet létrehozni kimeneti fájlt a video rögzítéshez.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output stream for recording.</source>
-      <translation>Nem lehet lefoglalni a kimeneti stream-et a rogzítéshez.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output audio stream.</source>
-      <translation>Nem lehet lefoglalni a kimeneti audio streamet.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output metadata stream.</source>
-      <translation type="unfinished">Could not allocate output metadata stream.</translation>
-    </message>
-    <message>
-      <source>Invalid audio codec information.</source>
-      <translation>Érvénytelen audio kodek információ.</translation>
-    </message>
-    <message>
-      <source>Video or audio codec is incompatible with the selected format.</source>
-      <translation>Video vagy audio kodek nem kompatibilis a választott formátummal.</translation>
-    </message>
-    <message>
-      <source>Video transcoding required.</source>
-      <translation>Videokódolás szükséges.</translation>
-    </message>
-    <message>
-      <source>File write error. Not enough free space.</source>
-      <translation>Íráshiba. Nincs elég tárhely.</translation>
-    </message>
-    <message>
-      <source>Invalid resource type for data export.</source>
-      <translation>Érvénytelen forrástípus lett megadva az adat exportáláshoz.</translation>
-    </message>
-    <message>
-      <source>No data exported.</source>
-      <translation>Nincs exportált adat.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::utils::CryptedFileStream</name>
-    <message>
-      <source>Wrong crypted stream size.</source>
-      <translation>Rossz titkosított adatfolyam méret.</translation>
-    </message>
-    <message>
-      <source>Damaged crypted stream header.</source>
-      <translation>Sérült titkosított adatfolyam fejléc.</translation>
     </message>
   </context>
   <context>

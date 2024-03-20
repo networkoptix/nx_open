@@ -1175,10 +1175,72 @@
     </message>
   </context>
   <context>
-    <name>SystemSettings</name>
+    <name>nx::recording::Error</name>
+    <message>
+      <source>Internal error</source>
+      <translation>Internt fel</translation>
+    </message>
+    <message>
+      <source>Corresponding container in FFMPEG library was not found.</source>
+      <translation>Motsvarande behållare i FFMPEG-biblioteket kunde inte hittas.</translation>
+    </message>
+    <message>
+      <source>Could not create output file for video recording.</source>
+      <translation>Det gick inte att skapa en utdatafil för videoinspelning.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output stream for recording.</source>
+      <translation>Kunde inte allokera utmatningsströmmen för inspelning.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output audio stream.</source>
+      <translation>Det gick inte att allokera utgång för ljudström.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output metadata stream.</source>
+      <translation>Det gick inte att allokera metadataström.</translation>
+    </message>
+    <message>
+      <source>Invalid audio codec information.</source>
+      <translation>Ogiltig ljudkodekinformation.</translation>
+    </message>
+    <message>
+      <source>Video or audio codec is incompatible with the selected format.</source>
+      <translation>Video eller ljudkodek är inkompatibel med behållare.</translation>
+    </message>
+    <message>
+      <source>Video transcoding required.</source>
+      <translation>Omkodning av video krävs.</translation>
+    </message>
+    <message>
+      <source>File write error. Not enough free space.</source>
+      <translation>Filskrivningsfel. Inte tillräckligt med ledigt utrymme.</translation>
+    </message>
+    <message>
+      <source>Invalid resource type for data export.</source>
+      <translation>Ogiltig resurstyp för dataexport.</translation>
+    </message>
+    <message>
+      <source>No data exported.</source>
+      <translation>Ingen data exporterad.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::utils::CryptedFileStream</name>
+    <message>
+      <source>Wrong crypted stream size.</source>
+      <translation>Fel krypterad strömstorlek.</translation>
+    </message>
+    <message>
+      <source>Damaged crypted stream header.</source>
+      <translation>Skadad krypterad strömhuvud.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::common::SystemSettings</name>
     <message>
       <source>SMTP host</source>
-      <translation>SMTP Server</translation>
+      <translation>SMTP värd</translation>
     </message>
     <message>
       <source>Email from</source>
@@ -1206,7 +1268,7 @@
     </message>
     <message>
       <source>SMTP port</source>
-      <translation>SMTP Port</translation>
+      <translation>SMTP port</translation>
     </message>
     <message>
       <source>SMTP timeout (seconds)</source>
@@ -1234,7 +1296,7 @@
     </message>
     <message>
       <source>LDAP search filter</source>
-      <translation>LDAP-sökfilter</translation>
+      <translation>LDAP sökfilter</translation>
     </message>
     <message>
       <source>LDAP password expiration (milliseconds)</source>
@@ -1310,7 +1372,7 @@
     </message>
     <message>
       <source>Cloud owner account</source>
-      <translation>Cloud ägarkonto</translation>
+      <translation>Molnägarkonto</translation>
     </message>
     <message>
       <source>Cloud System ID</source>
@@ -1322,7 +1384,7 @@
     </message>
     <message>
       <source>System name</source>
-      <translation>Systemets namn</translation>
+      <translation>Systemnamn</translation>
     </message>
     <message>
       <source>Local System ID</source>
@@ -1649,68 +1711,6 @@
     <message>
       <source>RTP timeout (milliseconds)</source>
       <translation>RTP timeout (millisekunder)</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::recording::Error</name>
-    <message>
-      <source>Internal error</source>
-      <translation>Internt fel</translation>
-    </message>
-    <message>
-      <source>Corresponding container in FFMPEG library was not found.</source>
-      <translation>Motsvarande behållare i FFMPEG-biblioteket kunde inte hittas.</translation>
-    </message>
-    <message>
-      <source>Could not create output file for video recording.</source>
-      <translation>Det gick inte att skapa en utdatafil för videoinspelning.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output stream for recording.</source>
-      <translation>Kunde inte allokera utmatningsströmmen för inspelning.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output audio stream.</source>
-      <translation>Det gick inte att allokera utgång för ljudström.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output metadata stream.</source>
-      <translation>Det gick inte att allokera metadataström.</translation>
-    </message>
-    <message>
-      <source>Invalid audio codec information.</source>
-      <translation>Ogiltig ljudkodekinformation.</translation>
-    </message>
-    <message>
-      <source>Video or audio codec is incompatible with the selected format.</source>
-      <translation>Video eller ljudkodek är inkompatibel med behållare.</translation>
-    </message>
-    <message>
-      <source>Video transcoding required.</source>
-      <translation>Omkodning av video krävs.</translation>
-    </message>
-    <message>
-      <source>File write error. Not enough free space.</source>
-      <translation>Filskrivningsfel. Inte tillräckligt med ledigt utrymme.</translation>
-    </message>
-    <message>
-      <source>Invalid resource type for data export.</source>
-      <translation>Ogiltig resurstyp för dataexport.</translation>
-    </message>
-    <message>
-      <source>No data exported.</source>
-      <translation>Ingen data exporterad.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::utils::CryptedFileStream</name>
-    <message>
-      <source>Wrong crypted stream size.</source>
-      <translation>Fel krypterad strömstorlek.</translation>
-    </message>
-    <message>
-      <source>Damaged crypted stream header.</source>
-      <translation>Skadad krypterad strömhuvud.</translation>
     </message>
   </context>
   <context>

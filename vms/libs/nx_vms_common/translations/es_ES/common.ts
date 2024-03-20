@@ -1175,7 +1175,69 @@
     </message>
   </context>
   <context>
-    <name>SystemSettings</name>
+    <name>nx::recording::Error</name>
+    <message>
+      <source>Internal error</source>
+      <translation>Error interno</translation>
+    </message>
+    <message>
+      <source>Corresponding container in FFMPEG library was not found.</source>
+      <translation>Contenedor correspondiente no se encontró en la biblioteca FFMPEG.</translation>
+    </message>
+    <message>
+      <source>Could not create output file for video recording.</source>
+      <translation>No se pudo crear el archivo de salida para la grabación de vídeo.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output stream for recording.</source>
+      <translation>No se pudo asignar secuencia de salida para la grabación.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output audio stream.</source>
+      <translation>No se pudo asignar salida del flujo de audio.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output metadata stream.</source>
+      <translation>No se pudo asignar el flujo de metadatos de salida.</translation>
+    </message>
+    <message>
+      <source>Invalid audio codec information.</source>
+      <translation>Información de codec de audio no es válida.</translation>
+    </message>
+    <message>
+      <source>Video or audio codec is incompatible with the selected format.</source>
+      <translation>Codec de audio o video es incompatible con el formato seleccionado.</translation>
+    </message>
+    <message>
+      <source>Video transcoding required.</source>
+      <translation>Se requiere transcodificación de video.</translation>
+    </message>
+    <message>
+      <source>File write error. Not enough free space.</source>
+      <translation>Error al escribir archivo. No hay suficiente espacio libre.</translation>
+    </message>
+    <message>
+      <source>Invalid resource type for data export.</source>
+      <translation>Tipo de recurso no válido para la exportación de datos.</translation>
+    </message>
+    <message>
+      <source>No data exported.</source>
+      <translation>No se exportaron datos.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::utils::CryptedFileStream</name>
+    <message>
+      <source>Wrong crypted stream size.</source>
+      <translation>Tamaño de flujo encriptado incorrecto.</translation>
+    </message>
+    <message>
+      <source>Damaged crypted stream header.</source>
+      <translation>Cabezal de la secuencia cifrada dañada.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::common::SystemSettings</name>
     <message>
       <source>SMTP host</source>
       <translation>Host SMTP</translation>
@@ -1649,68 +1711,6 @@
     <message>
       <source>RTP timeout (milliseconds)</source>
       <translation>Tiempo de espera de RTP (milisegundos)</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::recording::Error</name>
-    <message>
-      <source>Internal error</source>
-      <translation>Error interno</translation>
-    </message>
-    <message>
-      <source>Corresponding container in FFMPEG library was not found.</source>
-      <translation>Contenedor correspondiente no se encontró en la biblioteca FFMPEG.</translation>
-    </message>
-    <message>
-      <source>Could not create output file for video recording.</source>
-      <translation>No se pudo crear el archivo de salida para la grabación de vídeo.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output stream for recording.</source>
-      <translation>No se pudo asignar secuencia de salida para la grabación.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output audio stream.</source>
-      <translation>No se pudo asignar salida del flujo de audio.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output metadata stream.</source>
-      <translation>No se pudo asignar el flujo de metadatos de salida.</translation>
-    </message>
-    <message>
-      <source>Invalid audio codec information.</source>
-      <translation>Información de codec de audio no es válida.</translation>
-    </message>
-    <message>
-      <source>Video or audio codec is incompatible with the selected format.</source>
-      <translation>Codec de audio o video es incompatible con el formato seleccionado.</translation>
-    </message>
-    <message>
-      <source>Video transcoding required.</source>
-      <translation>Se requiere transcodificación de video.</translation>
-    </message>
-    <message>
-      <source>File write error. Not enough free space.</source>
-      <translation>Error al escribir archivo. No hay suficiente espacio libre.</translation>
-    </message>
-    <message>
-      <source>Invalid resource type for data export.</source>
-      <translation>Tipo de recurso no válido para la exportación de datos.</translation>
-    </message>
-    <message>
-      <source>No data exported.</source>
-      <translation>No se exportaron datos.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::utils::CryptedFileStream</name>
-    <message>
-      <source>Wrong crypted stream size.</source>
-      <translation>Tamaño de flujo encriptado incorrecto.</translation>
-    </message>
-    <message>
-      <source>Damaged crypted stream header.</source>
-      <translation>Cabezal de la secuencia cifrada dañada.</translation>
     </message>
   </context>
   <context>

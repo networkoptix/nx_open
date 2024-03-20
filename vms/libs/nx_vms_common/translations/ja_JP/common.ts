@@ -1129,14 +1129,76 @@
     </message>
   </context>
   <context>
-    <name>SystemSettings</name>
+    <name>nx::recording::Error</name>
+    <message>
+      <source>Internal error</source>
+      <translation>内部エラー</translation>
+    </message>
+    <message>
+      <source>Corresponding container in FFMPEG library was not found.</source>
+      <translation>FFMPEGライブラリーにコンテナが見つかりません.</translation>
+    </message>
+    <message>
+      <source>Could not create output file for video recording.</source>
+      <translation>映像録画用の出力ファイルを作成できませんでした。</translation>
+    </message>
+    <message>
+      <source>Could not allocate output stream for recording.</source>
+      <translation>録画用の出力ストリームを割り当てることができませんでした。</translation>
+    </message>
+    <message>
+      <source>Could not allocate output audio stream.</source>
+      <translation>音声出力ストリームを割り当てることができませんでした。</translation>
+    </message>
+    <message>
+      <source>Could not allocate output metadata stream.</source>
+      <translation>メタデータ出力ストリームを割り当てることができませんでした。</translation>
+    </message>
+    <message>
+      <source>Invalid audio codec information.</source>
+      <translation>音声コーデック情報が不正です。</translation>
+    </message>
+    <message>
+      <source>Video or audio codec is incompatible with the selected format.</source>
+      <translation>映像または音声のコーデックが、選択した形式との互換性を持ちません。</translation>
+    </message>
+    <message>
+      <source>Video transcoding required.</source>
+      <translation>映像のトランスコーディングが必要です。</translation>
+    </message>
+    <message>
+      <source>File write error. Not enough free space.</source>
+      <translation>空き容量が十分でない為に書き込みエラー.</translation>
+    </message>
+    <message>
+      <source>Invalid resource type for data export.</source>
+      <translation>データのエクスポートには無効なリソースタイプです。</translation>
+    </message>
+    <message>
+      <source>No data exported.</source>
+      <translation>データはエクスポートされませんでした。</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::utils::CryptedFileStream</name>
+    <message>
+      <source>Wrong crypted stream size.</source>
+      <translation>暗号化されたストリームのサイズが間違っています。</translation>
+    </message>
+    <message>
+      <source>Damaged crypted stream header.</source>
+      <translation>暗号化されたストリームのヘッダーが破損しています。</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::common::SystemSettings</name>
     <message>
       <source>SMTP host</source>
       <translation>SMTPホスト</translation>
     </message>
     <message>
       <source>Email from</source>
-      <translation>差出人</translation>
+      <translation>Eメール差出人</translation>
     </message>
     <message>
       <source>SMTP user</source>
@@ -1148,7 +1210,7 @@
     </message>
     <message>
       <source>Email signature</source>
-      <translation>メールの署名</translation>
+      <translation>Eメール署名</translation>
     </message>
     <message>
       <source>Email support link</source>
@@ -1309,7 +1371,7 @@
     </message>
     <message>
       <source>Max scene items (0 means default)</source>
-      <translation>シーンの最大アイテム数 (0でデフォルト値を使用)</translation>
+      <translation>シーン内最大アイテム数 (0でデフォルト値を使用)</translation>
     </message>
     <message>
       <source>Send plain-text emails</source>
@@ -1321,7 +1383,7 @@
     </message>
     <message>
       <source>Enable audit trail</source>
-      <translation>操作履歴を有効にする</translation>
+      <translation>操作履歴有効</translation>
     </message>
     <message>
       <source>Audit trail period (days, 14-730)</source>
@@ -1425,7 +1487,7 @@
     </message>
     <message>
       <source>Watermark settings</source>
-      <translation>ウォーターマーク設定</translation>
+      <translation>透かし設定</translation>
     </message>
     <message>
       <source>Authorization Session token lifetime (minutes)</source>
@@ -1603,68 +1665,6 @@
     <message>
       <source>RTP timeout (milliseconds)</source>
       <translation>RTPタイムアウト (ミリ秒)</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::recording::Error</name>
-    <message>
-      <source>Internal error</source>
-      <translation>内部エラー</translation>
-    </message>
-    <message>
-      <source>Corresponding container in FFMPEG library was not found.</source>
-      <translation>FFMPEGライブラリーにコンテナが見つかりません.</translation>
-    </message>
-    <message>
-      <source>Could not create output file for video recording.</source>
-      <translation>映像録画用の出力ファイルを作成できませんでした。</translation>
-    </message>
-    <message>
-      <source>Could not allocate output stream for recording.</source>
-      <translation>録画用の出力ストリームを割り当てることができませんでした。</translation>
-    </message>
-    <message>
-      <source>Could not allocate output audio stream.</source>
-      <translation>音声出力ストリームを割り当てることができませんでした。</translation>
-    </message>
-    <message>
-      <source>Could not allocate output metadata stream.</source>
-      <translation>メタデータ出力ストリームを割り当てることができませんでした。</translation>
-    </message>
-    <message>
-      <source>Invalid audio codec information.</source>
-      <translation>音声コーデック情報が不正です。</translation>
-    </message>
-    <message>
-      <source>Video or audio codec is incompatible with the selected format.</source>
-      <translation>映像または音声のコーデックが、選択した形式との互換性を持ちません。</translation>
-    </message>
-    <message>
-      <source>Video transcoding required.</source>
-      <translation>映像のトランスコーディングが必要です。</translation>
-    </message>
-    <message>
-      <source>File write error. Not enough free space.</source>
-      <translation>空き容量が十分でない為に書き込みエラー.</translation>
-    </message>
-    <message>
-      <source>Invalid resource type for data export.</source>
-      <translation>データのエクスポートには無効なリソースタイプです。</translation>
-    </message>
-    <message>
-      <source>No data exported.</source>
-      <translation>データはエクスポートされませんでした。</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::utils::CryptedFileStream</name>
-    <message>
-      <source>Wrong crypted stream size.</source>
-      <translation>暗号化されたストリームのサイズが間違っています。</translation>
-    </message>
-    <message>
-      <source>Damaged crypted stream header.</source>
-      <translation>暗号化されたストリームのヘッダーが破損しています。</translation>
     </message>
   </context>
   <context>

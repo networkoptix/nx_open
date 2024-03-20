@@ -1175,7 +1175,69 @@
     </message>
   </context>
   <context>
-    <name>SystemSettings</name>
+    <name>nx::recording::Error</name>
+    <message>
+      <source>Internal error</source>
+      <translation>Erro interno</translation>
+    </message>
+    <message>
+      <source>Corresponding container in FFMPEG library was not found.</source>
+      <translation>Não foi encontrado o container correspondente na biblioteca FFMPEG.</translation>
+    </message>
+    <message>
+      <source>Could not create output file for video recording.</source>
+      <translation>Não foi possível criar ficheiro para gravação de vídeo.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output stream for recording.</source>
+      <translation>Não foi possível alocar fluxo de saída para gravação.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output audio stream.</source>
+      <translation>Não foi possível alocar o stream de áudio de saída de áudio.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output metadata stream.</source>
+      <translation>Não foi possível alocar o fluxo de metadados de saída.</translation>
+    </message>
+    <message>
+      <source>Invalid audio codec information.</source>
+      <translation>Informações de codec de áudio inválidas.</translation>
+    </message>
+    <message>
+      <source>Video or audio codec is incompatible with the selected format.</source>
+      <translation>O codec de vídeo ou áudio é incompatível com o formato selecionado.</translation>
+    </message>
+    <message>
+      <source>Video transcoding required.</source>
+      <translation>É necessária a transcodificação de vídeo.</translation>
+    </message>
+    <message>
+      <source>File write error. Not enough free space.</source>
+      <translation>Erro de gravação de arquivo. Não há espaço livre suficiente.</translation>
+    </message>
+    <message>
+      <source>Invalid resource type for data export.</source>
+      <translation>Tipo de recurso inválido para exportação de dados.</translation>
+    </message>
+    <message>
+      <source>No data exported.</source>
+      <translation>Nenhum dado exportado.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::utils::CryptedFileStream</name>
+    <message>
+      <source>Wrong crypted stream size.</source>
+      <translation>Tamanho de fluxo criptografado incorreto.</translation>
+    </message>
+    <message>
+      <source>Damaged crypted stream header.</source>
+      <translation>Cabeçalho de stream criptografado danificado.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::common::SystemSettings</name>
     <message>
       <source>SMTP host</source>
       <translation>Servidor SMTP</translation>
@@ -1322,7 +1384,7 @@
     </message>
     <message>
       <source>System name</source>
-      <translation>Nome do Sistema</translation>
+      <translation>Nome do sistema</translation>
     </message>
     <message>
       <source>Local System ID</source>
@@ -1355,7 +1417,7 @@
     </message>
     <message>
       <source>Max scene items (0 means default)</source>
-      <translation>Máximo de itens de cena (0 significa padrão)</translation>
+      <translation>Itens de cena máximos (0 significa padrão)</translation>
     </message>
     <message>
       <source>Send plain-text emails</source>
@@ -1367,7 +1429,7 @@
     </message>
     <message>
       <source>Enable audit trail</source>
-      <translation>Ativar trilha de auditoria</translation>
+      <translation>Activar Trilho de Auditoria</translation>
     </message>
     <message>
       <source>Audit trail period (days, 14-730)</source>
@@ -1648,69 +1710,7 @@
     </message>
     <message>
       <source>RTP timeout (milliseconds)</source>
-      <translation>Tempo limite RTP (milissegundos)</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::recording::Error</name>
-    <message>
-      <source>Internal error</source>
-      <translation>Erro interno</translation>
-    </message>
-    <message>
-      <source>Corresponding container in FFMPEG library was not found.</source>
-      <translation>Não foi encontrado o container correspondente na biblioteca FFMPEG.</translation>
-    </message>
-    <message>
-      <source>Could not create output file for video recording.</source>
-      <translation>Não foi possível criar ficheiro para gravação de vídeo.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output stream for recording.</source>
-      <translation>Não foi possível alocar fluxo de saída para gravação.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output audio stream.</source>
-      <translation>Não foi possível alocar o stream de áudio de saída de áudio.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output metadata stream.</source>
-      <translation>Não foi possível alocar o fluxo de metadados de saída.</translation>
-    </message>
-    <message>
-      <source>Invalid audio codec information.</source>
-      <translation>Informações de codec de áudio inválidas.</translation>
-    </message>
-    <message>
-      <source>Video or audio codec is incompatible with the selected format.</source>
-      <translation>O codec de vídeo ou áudio é incompatível com o formato selecionado.</translation>
-    </message>
-    <message>
-      <source>Video transcoding required.</source>
-      <translation>É necessária a transcodificação de vídeo.</translation>
-    </message>
-    <message>
-      <source>File write error. Not enough free space.</source>
-      <translation>Erro de gravação de arquivo. Não há espaço livre suficiente.</translation>
-    </message>
-    <message>
-      <source>Invalid resource type for data export.</source>
-      <translation>Tipo de recurso inválido para exportação de dados.</translation>
-    </message>
-    <message>
-      <source>No data exported.</source>
-      <translation>Nenhum dado exportado.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::utils::CryptedFileStream</name>
-    <message>
-      <source>Wrong crypted stream size.</source>
-      <translation>Tamanho de fluxo criptografado incorreto.</translation>
-    </message>
-    <message>
-      <source>Damaged crypted stream header.</source>
-      <translation>Cabeçalho de stream criptografado danificado.</translation>
+      <translation>Tempo limite em(milissegundos)</translation>
     </message>
   </context>
   <context>

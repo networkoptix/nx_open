@@ -1175,7 +1175,69 @@
     </message>
   </context>
   <context>
-    <name>SystemSettings</name>
+    <name>nx::recording::Error</name>
+    <message>
+      <source>Internal error</source>
+      <translation>Erreur interne</translation>
+    </message>
+    <message>
+      <source>Corresponding container in FFMPEG library was not found.</source>
+      <translation>Aucun conteneur correspondant n'a été trouvé dans la librairie FFMPEG.</translation>
+    </message>
+    <message>
+      <source>Could not create output file for video recording.</source>
+      <translation>Ne peut pas créer un fichier de sortie pour l'enregistrement vidéo.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output stream for recording.</source>
+      <translation>Ne peut pas allouer un flux de sortie pour l'enregistrement.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output audio stream.</source>
+      <translation>Ne peut pas allouer le flux audio de sortie.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output metadata stream.</source>
+      <translation>Impossible d'allouer le flux de métadonnées de sortie.</translation>
+    </message>
+    <message>
+      <source>Invalid audio codec information.</source>
+      <translation>Information de codec audio invalide.</translation>
+    </message>
+    <message>
+      <source>Video or audio codec is incompatible with the selected format.</source>
+      <translation>Le codec vidéo ou audio est incompatible avec le format sélectionné.</translation>
+    </message>
+    <message>
+      <source>Video transcoding required.</source>
+      <translation>Transcodage vidéo requis.</translation>
+    </message>
+    <message>
+      <source>File write error. Not enough free space.</source>
+      <translation>Erreur d'écriture de fichier. Pas d'éspace libre.</translation>
+    </message>
+    <message>
+      <source>Invalid resource type for data export.</source>
+      <translation>Type de ressource invalide pour l’exportation de données.</translation>
+    </message>
+    <message>
+      <source>No data exported.</source>
+      <translation>Aucune donnée exportée.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::utils::CryptedFileStream</name>
+    <message>
+      <source>Wrong crypted stream size.</source>
+      <translation>Mauvaise taille de flux chiffré.</translation>
+    </message>
+    <message>
+      <source>Damaged crypted stream header.</source>
+      <translation>En-tête de flux chiffré endommagé.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::common::SystemSettings</name>
     <message>
       <source>SMTP host</source>
       <translation>Hôte SMTP</translation>
@@ -1194,7 +1256,7 @@
     </message>
     <message>
       <source>Email signature</source>
-      <translation>Signature de l'e-mail</translation>
+      <translation>Signature Courriel</translation>
     </message>
     <message>
       <source>Email support link</source>
@@ -1218,7 +1280,7 @@
     </message>
     <message>
       <source>LDAP URI</source>
-      <translation>LDAP URI</translation>
+      <translation>LDAP URL</translation>
     </message>
     <message>
       <source>LDAP Admin DN</source>
@@ -1230,11 +1292,11 @@
     </message>
     <message>
       <source>LDAP search base</source>
-      <translation>Base de recherche LDAP</translation>
+      <translation>LDAP Base de recherche</translation>
     </message>
     <message>
       <source>LDAP search filter</source>
-      <translation>Filtre de recherche LDAP</translation>
+      <translation>LDAP Filtre de recherche</translation>
     </message>
     <message>
       <source>LDAP password expiration (milliseconds)</source>
@@ -1287,7 +1349,7 @@
     </message>
     <message>
       <source>Time synchronization enabled</source>
-      <translation>Synchronisation du temps activée</translation>
+      <translation>Synchronisation de l'heure activée</translation>
     </message>
     <message>
       <source>Primary time synchronization Server ID</source>
@@ -1303,15 +1365,15 @@
     </message>
     <message>
       <source>Sync time synchronization interval for network requests</source>
-      <translation>Intervalle de synchronisation des temps de synchronisation pour les requêtes réseau</translation>
+      <translation>Intervalle de synchronisation de synchronisation de l'heure pour les requêtes réseau</translation>
     </message>
     <message>
       <source>Sync time epsilon. New value is not applied if time delta less than epsilon</source>
-      <translation>Synchroniser le temps epsilon. La nouvelle valeur n'est pas appliquée si le temps delta est inférieur à epsilon</translation>
+      <translation>Synchroniser le temps epsilon. La nouvelle valeur n'est pas appliquée si le delta temps est inférieur à epsilon</translation>
     </message>
     <message>
       <source>Cloud owner account</source>
-      <translation>Compte propriétaire du Cloud</translation>
+      <translation>Compte propriétaire du cloud</translation>
     </message>
     <message>
       <source>Cloud System ID</source>
@@ -1356,15 +1418,15 @@
     </message>
     <message>
       <source>Max scene items (0 means default)</source>
-      <translation>Nombre maximum d'éléments de scène (0 signifie par défaut)</translation>
+      <translation>Max éléments de scène (0 signifie par défaut)</translation>
     </message>
     <message>
       <source>Send plain-text emails</source>
-      <translation>Envoyer des e-mails en texte brut</translation>
+      <translation>Envoyer des courriels en texte brut</translation>
     </message>
     <message>
       <source>Use Windows line feed in emails</source>
-      <translation>Utiliser le Windows 'line feed' dans les e-mails</translation>
+      <translation>Utiliser le Windows 'line feed' dans les courriels</translation>
     </message>
     <message>
       <source>Enable audit trail</source>
@@ -1376,7 +1438,7 @@
     </message>
     <message>
       <source>Event log period (days)</source>
-      <translation>Période du journal des événements (jours)</translation>
+      <translation>Période du journal d'événements (jours)</translation>
     </message>
     <message>
       <source>Enforce HTTPS (data traffic encryption)</source>
@@ -1651,68 +1713,6 @@
     <message>
       <source>RTP timeout (milliseconds)</source>
       <translation>Délai RTP (millisecondes)</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::recording::Error</name>
-    <message>
-      <source>Internal error</source>
-      <translation>Erreur interne</translation>
-    </message>
-    <message>
-      <source>Corresponding container in FFMPEG library was not found.</source>
-      <translation>Aucun conteneur correspondant n'a été trouvé dans la librairie FFMPEG.</translation>
-    </message>
-    <message>
-      <source>Could not create output file for video recording.</source>
-      <translation>Ne peut pas créer un fichier de sortie pour l'enregistrement vidéo.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output stream for recording.</source>
-      <translation>Ne peut pas allouer un flux de sortie pour l'enregistrement.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output audio stream.</source>
-      <translation>Ne peut pas allouer le flux audio de sortie.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output metadata stream.</source>
-      <translation>Impossible d'allouer le flux de métadonnées de sortie.</translation>
-    </message>
-    <message>
-      <source>Invalid audio codec information.</source>
-      <translation>Information de codec audio invalide.</translation>
-    </message>
-    <message>
-      <source>Video or audio codec is incompatible with the selected format.</source>
-      <translation>Le codec vidéo ou audio est incompatible avec le format sélectionné.</translation>
-    </message>
-    <message>
-      <source>Video transcoding required.</source>
-      <translation>Transcodage vidéo requis.</translation>
-    </message>
-    <message>
-      <source>File write error. Not enough free space.</source>
-      <translation>Erreur d'écriture de fichier. Pas d'éspace libre.</translation>
-    </message>
-    <message>
-      <source>Invalid resource type for data export.</source>
-      <translation>Type de ressource invalide pour l’exportation de données.</translation>
-    </message>
-    <message>
-      <source>No data exported.</source>
-      <translation>Aucune donnée exportée.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::utils::CryptedFileStream</name>
-    <message>
-      <source>Wrong crypted stream size.</source>
-      <translation>Mauvaise taille de flux chiffré.</translation>
-    </message>
-    <message>
-      <source>Damaged crypted stream header.</source>
-      <translation>En-tête de flux chiffré endommagé.</translation>
     </message>
   </context>
   <context>
