@@ -43,6 +43,7 @@ static constexpr auto kEventTypeIdFieldName = "eventTypeId";
 static constexpr auto kEngineIdFieldName = "engineId";
 static constexpr auto kIdFieldName = "id";
 static constexpr auto kIntervalFieldName = "interval";
+static constexpr auto kLayoutIdFieldName = "layoutId";
 static constexpr auto kLayoutIdsFieldName = "layoutIds";
 static constexpr auto kObjectTypeIdFieldName = "objectTypeId";
 static constexpr auto kOmitLoggingFieldName = "omitLogging";

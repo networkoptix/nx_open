@@ -4,6 +4,7 @@
 
 #include "../group.h"
 #include "../utils/event_details.h"
+#include "../utils/field.h"
 #include "../utils/string_helper.h"
 #include "../utils/type.h"
 
@@ -48,7 +49,8 @@ const ItemDescriptor& ServerCertificateErrorEvent::manifest()
         .id = utils::type<ServerCertificateErrorEvent>(),
         .groupId = kServerIssueEventGroup,
         .displayName = tr("Server Certificate Error"),
-        .permissions = {.globalPermission = GlobalPermission::powerUser},
+        .resources = {{utils::kServerIdFieldName, {ResourceType::Server}}},
+        .readPermissions = GlobalPermission::powerUser,
         .emailTemplatePath = ":/email_templates/server_certificate_error.mustache"
     };
     return kDescriptor;

@@ -15,12 +15,12 @@ const ItemDescriptor& OpenLayoutAction::manifest()
         .displayName = tr("Open Layout"),
         .flags = ItemFlag::instant,
         .fields = {
-            makeFieldDescriptor<LayoutField>("layoutId", {}),
+            makeFieldDescriptor<LayoutField>(utils::kLayoutIdFieldName, {}),
             utils::makeTargetUserFieldDescriptor(tr("To"), {}, utils::UserFieldPreset::None),
             utils::makePlaybackFieldDescriptor(tr("Rewind")),
             utils::makeIntervalFieldDescriptor(tr("Interval of Action")),
         },
-        .permissions = {.resourcePermissions = {{"layoutId", Qn::ReadPermission}}},
+        .resources = {{utils::kLayoutIdFieldName, {ResourceType::Layout, Qn::ReadPermission}}},
     };
     return kDescriptor;
 }

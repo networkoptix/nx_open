@@ -6,8 +6,8 @@
 
 namespace nx::vms::rules {
 
-QN_FUSION_ADAPT_STRUCT(PermissionsDescriptor, nx_vms_rules_PermissionsDescriptor_Fields)
-void serialize(QnJsonContext* ctx, const PermissionsDescriptor& value, QJsonValue* target)
+QN_FUSION_ADAPT_STRUCT(ResourceDescriptor, nx_vms_rules_ResourceDescriptor_Fields)
+void serialize(QnJsonContext* ctx, const ResourceDescriptor& value, QJsonValue* target)
 {
     QnFusion::serialize(ctx, value, target);
 }
@@ -23,11 +23,5 @@ void serialize(QnJsonContext* ctx, const ItemDescriptor& value, QJsonValue* targ
 {
     QnFusion::serialize(ctx, value, target);
 }
-
-bool PermissionsDescriptor::empty() const
-{
-    return globalPermission == nx::vms::api::GlobalPermission::none
-        && resourcePermissions.empty();
-};
 
 } // namespace nx::vms::rules

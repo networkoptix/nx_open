@@ -493,12 +493,13 @@ EventPtr Engine::buildEvent(const EventData& eventData) const
 {
     const QString eventType = eventData.value(utils::kType).toString();
     if (!NX_ASSERT(m_eventTypes.contains(eventType), "Unknown event type: %1", eventType))
-        return EventPtr();
+        return {};
 
     auto event = EventPtr(m_eventTypes[eventType]());
-    deserializeProperties(eventData, event.get());
+    if (deserializeProperties(eventData, event.get()))
+        return event;
 
-    return event;
+    return {};
 }
 
 EventPtr Engine::cloneEvent(const EventPtr& event) const

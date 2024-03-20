@@ -91,18 +91,50 @@ public:
     }
 
     template<class T>
+    void testResourceDescriptors()
+    {
+        const auto& manifest = T::manifest();
+        const auto& meta = T::staticMetaObject;
+
+        static const auto resProps = QSet<QString>{
+            utils::kCameraIdFieldName,
+            utils::kDeviceIdsFieldName,
+            utils::kUserIdFieldName,
+            utils::kServerIdFieldName,
+            utils::kServerIdsFieldName,
+            utils::kLayoutIdsFieldName,
+            utils::kEngineIdFieldName,
+            utils::kLayoutIdFieldName,
+            utils::kLayoutIdsFieldName,
+        };
+
+        // Check resource named fields for descriptors.
+        for (int i = 0; i < meta.propertyCount(); ++i)
+        {
+            const auto prop = meta.property(i);
+            const auto propName = prop.name();
+
+            if (resProps.contains(propName))
+            {
+                SCOPED_TRACE(NX_FMT("%1 %2", manifest.id, propName).toStdString());
+                auto it = manifest.resources.find(propName);
+                EXPECT_NE(it, manifest.resources.end());
+            }
+        }
+    }
+
+    template<class T>
     void testPermissionsValidity()
     {
         const auto& manifest = T::manifest();
         const auto& meta = T::staticMetaObject;
 
         // Check all permission fields correspond to properties with the same name.
-        for (const auto& [fieldName, permissions]: manifest.permissions.resourcePermissions)
+        for (const auto& [fieldName, descriptor]: manifest.resources)
         {
             SCOPED_TRACE(nx::format("Resource permission field: %1", fieldName).toStdString());
             ASSERT_FALSE(fieldName.empty());
-            ASSERT_FALSE(!permissions);
-
+            ASSERT_FALSE(!descriptor.readPermissions);
 
             const auto propIndex = meta.indexOfProperty(fieldName.c_str());
             EXPECT_GE(propIndex, 0);
@@ -146,6 +178,7 @@ public:
         SCOPED_TRACE(nx::format("Event id: %1", manifest.id).toStdString());
 
         testManifestValidity<T>();
+        testResourceDescriptors<T>();
         testPermissionsValidity<T>();
 
         SCOPED_TRACE(nx::format("Group id: %1", manifest.groupId).toStdString());

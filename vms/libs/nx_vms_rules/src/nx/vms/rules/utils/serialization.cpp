@@ -55,10 +55,10 @@ QMap<QString, QJsonValue> serializeProperties(const QObject* object, const QSet<
     return serialized;
 }
 
-void deserializeProperties(const QMap<QString, QJsonValue>& propMap, QObject* object)
+bool deserializeProperties(const QMap<QString, QJsonValue>& propMap, QObject* object)
 {
     if (!NX_ASSERT(object))
-        return;
+        return false;
 
     auto meta = object->metaObject();
     for (auto it = propMap.begin(); it != propMap.end(); ++it)
@@ -66,8 +66,12 @@ void deserializeProperties(const QMap<QString, QJsonValue>& propMap, QObject* ob
         const auto& propName = it.key();
         const auto& propValue = it.value();
         auto propIndex = meta->indexOfProperty(propName.toUtf8());
-        if (!NX_ASSERT(propIndex >= 0, "Absent property: %1", propName))
+        if (propIndex < 0)
+        {
+            NX_DEBUG(
+                NX_SCOPE_TAG, "Absent property: %1 in class: %2", propName, meta->className());
             continue;
+        }
 
         auto prop = meta->property(propIndex);
         auto userType = prop.userType();
@@ -76,21 +80,27 @@ void deserializeProperties(const QMap<QString, QJsonValue>& propMap, QObject* ob
             "Unregistered prop type: %1",
             prop.typeName()))
         {
-            continue;
+            return false;
         }
 
         auto serializer = QnJsonSerializer::serializer(userType);
         if (!NX_ASSERT(serializer, "Unregistered serializer for prop type: %1", prop.typeName()))
-            continue;
+            return false;
 
         QnJsonContext ctx;
         QVariant propVariant;
 
-        serializer->deserialize(&ctx, propValue, &propVariant);
+        if (!serializer->deserialize(&ctx, propValue, &propVariant))
+        {
+            NX_DEBUG(NX_SCOPE_TAG, "Can't deserialize property: %1, value: %2", propName, propValue);
+            return false;
+        }
 
         if (NX_ASSERT(propVariant.isValid()))
             prop.write(object, propVariant);
     }
+
+    return true;
 }
 
 QByteArray serialized(const QObject* object)

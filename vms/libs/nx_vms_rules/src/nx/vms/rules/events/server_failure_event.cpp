@@ -4,6 +4,7 @@
 
 #include "../group.h"
 #include "../utils/event_details.h"
+#include "../utils/field.h"
 #include "../utils/string_helper.h"
 #include "../utils/type.h"
 
@@ -77,7 +78,8 @@ const ItemDescriptor& ServerFailureEvent::manifest()
         .id = utils::type<ServerFailureEvent>(),
         .groupId = kServerIssueEventGroup,
         .displayName = tr("Server Failure"),
-        .permissions = {.globalPermission = GlobalPermission::powerUser},
+        .resources = {{utils::kServerIdFieldName, {ResourceType::Server}}},
+        .readPermissions = GlobalPermission::powerUser,
         .emailTemplatePath = ":/email_templates/mediaserver_failure.mustache"
     };
     return kDescriptor;

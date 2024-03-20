@@ -82,10 +82,9 @@ const ItemDescriptor& CameraInputEvent::manifest()
                 {},
                 {utils::kCameraIdFieldName}),
         },
-        .permissions = {
-            .resourcePermissions = {
-                {utils::kCameraIdFieldName, {Qn::ViewContentPermission, Qn::ViewLivePermission}}
-            }
+        .resources = {
+            {utils::kCameraIdFieldName,
+                {ResourceType::Device, {Qn::ViewContentPermission, Qn::ViewLivePermission}}}
         },
         .emailTemplatePath = ":/email_templates/camera_input.mustache"
     };

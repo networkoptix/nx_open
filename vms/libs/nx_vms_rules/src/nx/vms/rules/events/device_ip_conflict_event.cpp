@@ -97,7 +97,9 @@ const ItemDescriptor& DeviceIpConflictEvent::manifest()
         .id = utils::type<DeviceIpConflictEvent>(),
         .groupId = kDeviceIssueEventGroup,
         .displayName = tr("Device IP Conflict"),
-        .permissions = {.resourcePermissions = {{utils::kDeviceIdsFieldName, Qn::WritePermission}}},
+        .resources = {
+            {utils::kDeviceIdsFieldName, {ResourceType::Device, Qn::WritePermission}},
+            {utils::kServerIdFieldName, {ResourceType::Server}}},
         .emailTemplatePath = ":/email_templates/camera_ip_conflict.mustache"
     };
     return kDescriptor;

@@ -4,6 +4,7 @@
 
 #include "../group.h"
 #include "../utils/event_details.h"
+#include "../utils/field.h"
 #include "../utils/string_helper.h"
 #include "../utils/type.h"
 
@@ -109,7 +110,8 @@ const ItemDescriptor& StorageIssueEvent::manifest()
         .id = utils::type<StorageIssueEvent>(),
         .groupId = kServerIssueEventGroup,
         .displayName = tr("Storage Issue"),
-        .permissions = {.globalPermission = GlobalPermission::powerUser},
+        .resources = {{utils::kServerIdFieldName, {ResourceType::Server}}},
+        .readPermissions = GlobalPermission::powerUser,
         .emailTemplatePath = ":/email_templates/storage_failure.mustache"
     };
     return kDescriptor;
