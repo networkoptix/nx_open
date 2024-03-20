@@ -135,6 +135,7 @@ void TwoWayAudioCameraButtonController::setResourceInternal(const QnResourcePtr&
         return;
 
     d->controller = std::make_unique<TwoWayAudioController>(systemContext);
+    d->controller->setCamera(resource.dynamicCast<QnVirtualCameraResource>());
 
     const auto updateControllerSourceId =
         [this, systemContext]()
@@ -175,6 +176,7 @@ void TwoWayAudioCameraButtonController::setResourceInternal(const QnResourcePtr&
         this,
         updateButton);
     d->connections << connect(resource.get(), &QnResource::flagsChanged, this, updateButton);
+    d->updateButton();
 }
 
 bool TwoWayAudioCameraButtonController::setButtonActionState(
