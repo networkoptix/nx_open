@@ -1274,7 +1274,102 @@
     </message>
 </context>
 <context>
-    <name>SystemSettings</name>
+    <name>TimeFormat</name>
+    <message>
+        <source>just now</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>yesterday</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>a week ago</source>
+        <translation></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minutes ago</source>
+        <translation>
+            <numerusform>%n minute ago</numerusform>
+            <numerusform>%n minutes ago</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n hours ago</source>
+        <translation>
+            <numerusform>%n hour ago</numerusform>
+            <numerusform>%n hours ago</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n days ago</source>
+        <translation>
+            <numerusform>%n day ago</numerusform>
+            <numerusform>%n days ago</numerusform>
+        </translation>
+    </message>
+</context>
+<context>
+    <name>nx::recording::Error</name>
+    <message>
+        <source>Internal error</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Corresponding container in FFMPEG library was not found.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Could not create output file for video recording.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Could not allocate output stream for recording.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Could not allocate output audio stream.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Could not allocate output metadata stream.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Invalid audio codec information.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Video or audio codec is incompatible with the selected format.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Video transcoding required.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>File write error. Not enough free space.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Invalid resource type for data export.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>No data exported.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Unlock this portion of the archive to export its contents.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Archive is unavailable now. Please try again later.</source>
+        <translation></translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::common::SystemSettings</name>
     <message>
         <source>Anonymous statistics report allowed</source>
         <translation></translation>
@@ -1694,101 +1789,6 @@
     </message>
     <message>
         <source>Local System ID, null means the System is not set up yet.</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>TimeFormat</name>
-    <message>
-        <source>just now</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>yesterday</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>a week ago</source>
-        <translation></translation>
-    </message>
-    <message numerus="yes">
-        <source>%n minutes ago</source>
-        <translation>
-            <numerusform>%n minute ago</numerusform>
-            <numerusform>%n minutes ago</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n hours ago</source>
-        <translation>
-            <numerusform>%n hour ago</numerusform>
-            <numerusform>%n hours ago</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n days ago</source>
-        <translation>
-            <numerusform>%n day ago</numerusform>
-            <numerusform>%n days ago</numerusform>
-        </translation>
-    </message>
-</context>
-<context>
-    <name>nx::recording::Error</name>
-    <message>
-        <source>Internal error</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Corresponding container in FFMPEG library was not found.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Could not create output file for video recording.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Could not allocate output stream for recording.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Could not allocate output audio stream.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Could not allocate output metadata stream.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Invalid audio codec information.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Video or audio codec is incompatible with the selected format.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Video transcoding required.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>File write error. Not enough free space.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Invalid resource type for data export.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>No data exported.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Unlock this portion of the archive to export its contents.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Archive is unavailable now. Please try again later.</source>
         <translation></translation>
     </message>
 </context>
