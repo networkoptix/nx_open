@@ -4,6 +4,7 @@
 
 #include "../group.h"
 #include "../utils/event_details.h"
+#include "../utils/field.h"
 #include "../utils/string_helper.h"
 #include "../utils/type.h"
 
@@ -39,7 +40,9 @@ const ItemDescriptor& BackupFinishedEvent::manifest()
         .id = utils::type<BackupFinishedEvent>(),
         .groupId = kServerIssueEventGroup,
         .displayName = tr("Backup Finished"),
-        .permissions = {.globalPermission = GlobalPermission::powerUser},
+        .flags = {ItemFlag::instant, ItemFlag::deprecated},
+        .resources = {{utils::kServerIdFieldName, {ResourceType::Server}}},
+        .readPermissions = GlobalPermission::powerUser,
         .emailTemplatePath = ":/email_templates/backup_finished.mustache"
     };
     return kDescriptor;

@@ -105,11 +105,9 @@ const ItemDescriptor& AnalyticsObjectEvent::manifest()
             makeFieldDescriptor<ObjectLookupField>(
                 utils::kAttributesFieldName, tr("And Object"), {}, {}, {utils::kObjectTypeIdFieldName}),
         },
-        .permissions = {
-            .resourcePermissions = {
-                {utils::kCameraIdFieldName, {Qn::ViewContentPermission}}
-            }
-        },
+        .resources = {
+            {utils::kCameraIdFieldName, {ResourceType::Device, Qn::ViewContentPermission}},
+            {utils::kEngineIdFieldName, {ResourceType::AnalyticsEngine}}},
         .emailTemplatePath = ":/email_templates/analytics_object.mustache"
     };
 

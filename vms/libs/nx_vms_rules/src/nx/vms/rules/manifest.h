@@ -37,23 +37,39 @@ NX_REFLECTION_ENUM_CLASS(ItemFlag,
     aggregationByTypeSupported = 1 << 3,
     omitLogging = 1 << 4,
     /** The action may be displayed in event log, but not in rule editor. */
-    system = 1 << 5
+    system = 1 << 5,
+    /** The item may appear in the event log, but must not be created. */
+    deprecated = 1 << 6
 )
 
 Q_DECLARE_FLAGS(ItemFlags, ItemFlag)
 
-struct PermissionsDescriptor
+NX_REFLECTION_ENUM_CLASS(ResourceType,
+    None,
+    Device,
+    Server,
+    Layout,
+    AnalyticsEngine,
+    User
+)
+
+/** Description of event or action resource data field. */
+struct ResourceDescriptor
 {
-    nx::vms::api::GlobalPermission globalPermission = nx::vms::api::GlobalPermission::none;
+    /**%apidoc The type of the resource. */
+    ResourceType type = ResourceType::None;
 
-    std::map<std::string, Qn::Permissions> resourcePermissions;
+    /**%apidoc[opt] Permissions required to view the item. */
+    Qn::Permissions readPermissions = Qn::ReadPermission;
 
-    bool empty() const;
+    /**%apidoc[opt] Permissions required to create an item. */
+    Qn::Permissions createPermissions = Qn::UserInputPermissions;
 };
-#define nx_vms_rules_PermissionsDescriptor_Fields \
-    (globalPermission)(resourcePermissions)
+
+#define nx_vms_rules_ResourceDescriptor_Fields \
+    (type)(readPermissions)(createPermissions)
 NX_VMS_RULES_API void serialize(
-    QnJsonContext* ctx, const PermissionsDescriptor& value, QJsonValue* target);
+    QnJsonContext* ctx, const ResourceDescriptor& value, QJsonValue* target);
 
 /** Description of event or action field. */
 struct FieldDescriptor
@@ -71,13 +87,13 @@ struct FieldDescriptor
     /**%apidoc Field display name. */
     QString displayName;
 
-    /**%apidoc Field description to show hint to the user. */
+    /**%apidoc[opt] Field description to show hint to the user. */
     QString description;
 
-    /**%apidoc:object Optional properties corresponding to the actual field id. */
+    /**%apidoc[opt]:object Optional properties corresponding to the actual field id. */
     QVariantMap properties;
 
-    /**%apidoc Field names of the parent item that required for the current field. */
+    /**%apidoc[opt] Field names of the parent item that required for the current field. */
     QStringList linkedFields;
 };
 #define nx_vms_rules_FieldDescriptor_Fields \
@@ -100,13 +116,22 @@ struct ItemDescriptor
     /**%apidoc[opt] Item description, to show hint to the user. */
     QString description;
 
+    /**%apidoc Item flags. */
     ItemFlags flags = ItemFlag::instant;
 
-    /**%apidoc Item fields. */
+    /**%apidoc The list of event filter fields or action builder fields. */
     QList<FieldDescriptor> fields;
 
-    /**%apidoc Permissions required for action recipient. */
-    PermissionsDescriptor permissions;
+    /**%apidoc Resource descriptors of the item data fields. */
+    std::map<std::string, ResourceDescriptor> resources;
+
+    /**%apidoc[opt] Global permissions required to view the item. */
+    nx::vms::api::GlobalPermissions readPermissions;
+
+    /**%apidoc[opt] Global permissions required to create an item. */
+    nx::vms::api::GlobalPermissions createPermissions;
+
+    // TODO: #amalov Consider unifying fields, permissions and resources members.
 
     /**%apidoc Path to the mustache template file used to generate email. */
     QString emailTemplatePath; // TODO: #mmalofeev split ItemDescriptor to EventDescriptior and ActionDescriptor.
@@ -118,7 +143,8 @@ struct ItemDescriptor
     vms::api::ServerFlags serverFlags;
 };
 #define nx_vms_rules_ItemDescriptor_Fields \
-    (id)(groupId)(displayName)(description)(flags)(fields)(permissions)(emailTemplatePath)(serverFlags)
+    (id)(groupId)(displayName)(description)(flags)(fields)(resources) \
+    (readPermissions)(createPermissions)(emailTemplatePath)(serverFlags)
 NX_VMS_RULES_API void serialize(
     QnJsonContext* ctx, const ItemDescriptor& value, QJsonValue* target);
 

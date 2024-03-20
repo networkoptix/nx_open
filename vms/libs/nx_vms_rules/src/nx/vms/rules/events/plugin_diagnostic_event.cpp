@@ -91,9 +91,9 @@ const ItemDescriptor& PluginDiagnosticEvent::manifest()
             makeFieldDescriptor<TextLookupField>(utils::kDescriptionFieldName, tr("And Description")),
             makeFieldDescriptor<AnalyticsEventLevelField>("level", tr("And Level Is")),
         },
-        .permissions = {
-            .resourcePermissions = {{utils::kCameraIdFieldName, Qn::ViewContentPermission}}
-        },
+        .resources = {
+            {utils::kCameraIdFieldName, {ResourceType::Device, Qn::ViewContentPermission}},
+            {utils::kEngineIdFieldName, {ResourceType::AnalyticsEngine}}},
     };
 
     return kDescriptor;

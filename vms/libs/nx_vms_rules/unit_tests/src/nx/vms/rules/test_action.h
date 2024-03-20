@@ -117,13 +117,10 @@ public:
                 makeFieldDescriptor<TargetUserField>(utils::kUsersFieldName, "Users"),
                 makeFieldDescriptor<TargetDeviceField>(
                     utils::kDeviceIdsFieldName, "Devices", {}, {{"useSource", true}})},
-            .permissions = {
-                .globalPermission = GlobalPermission::generateEvents,
-                .resourcePermissions = {
-                    {utils::kCameraIdFieldName, Qn::WritePermission},
-                    {utils::kDeviceIdsFieldName, Qn::WritePermission},
-                },
-            },
+            .resources = {
+                {utils::kCameraIdFieldName, {ResourceType::Device, Qn::WritePermission}},
+                {utils::kDeviceIdsFieldName, {ResourceType::Device, Qn::WritePermission}}},
+            .readPermissions = GlobalPermission::generateEvents,
         };
     }
 };

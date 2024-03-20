@@ -146,9 +146,8 @@ const ItemDescriptor& NetworkIssueEvent::manifest()
         .groupId = kDeviceIssueEventGroup,
         .displayName = tr("Network Issue"),
         .flags = {ItemFlag::instant, ItemFlag::aggregationByTypeSupported},
-        .permissions = {
-            .resourcePermissions = {{utils::kCameraIdFieldName, Qn::ViewContentPermission}}
-        },
+        .resources = {
+            {utils::kCameraIdFieldName, { ResourceType::Device, Qn::ViewContentPermission}}},
         .emailTemplatePath = ":/email_templates/network_issue.mustache"
     };
     return kDescriptor;

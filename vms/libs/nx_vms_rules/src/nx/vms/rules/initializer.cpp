@@ -24,6 +24,7 @@ void Initializer::registerEvents() const
     // Register built-in events.
     registerEvent<AnalyticsEvent>();
     registerEvent<AnalyticsObjectEvent>();
+    registerEvent<BackupFinishedEvent>();
     registerEvent<CameraInputEvent>();
     registerEvent<DeviceDisconnectedEvent>();
     registerEvent<DeviceIpConflictEvent>();

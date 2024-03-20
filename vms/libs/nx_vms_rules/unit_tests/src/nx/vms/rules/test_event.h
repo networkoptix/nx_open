@@ -72,13 +72,10 @@ public:
             .id = utils::type<TestEvent>(),
             .displayName = "Test event with permissions",
             .flags = {ItemFlag::instant, ItemFlag::prolonged},
-            .permissions = {
-                .globalPermission = nx::vms::api::GlobalPermission::viewLogs,
-                .resourcePermissions = {
-                    {"cameraId", Qn::ViewContentPermission},
-                    {"deviceIds", Qn::ViewContentPermission},
-                }
-            },
+            .resources = {
+                {"cameraId", {ResourceType::Device, Qn::ViewContentPermission}},
+                {"deviceIds", {ResourceType::Device, Qn::ViewContentPermission}}},
+            .readPermissions = nx::vms::api::GlobalPermission::viewLogs,
         };
     }
 

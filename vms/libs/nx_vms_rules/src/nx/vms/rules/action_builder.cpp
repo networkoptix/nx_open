@@ -59,11 +59,11 @@ struct FiltrationResult
 
 // Events or actions may differ by resource list depending on user permissions.
 template<class T>
-QByteArray permissionHash(const PermissionsDescriptor& permissions, const T& object)
+QByteArray permissionHash(const ItemDescriptor& manifest, const T& object)
 {
     QByteArray result;
 
-    for (const auto& [fieldName, _] : permissions.resourcePermissions)
+    for (const auto& [fieldName, _]: manifest.resources)
     {
         const auto property = object->property(fieldName.c_str());
         if (property.template canConvert<nx::Uuid>())
@@ -79,31 +79,45 @@ QByteArray permissionHash(const PermissionsDescriptor& permissions, const T& obj
     return result;
 }
 
+bool requireReadPermissions(const ItemDescriptor& manifest)
+{
+    if (manifest.readPermissions)
+        return true;
+
+    for (const auto& [_, desc]: manifest.resources)
+    {
+        if (desc.readPermissions)
+            return true;
+    }
+
+    return false;
+}
+
 FiltrationResult filterResourcesByPermission(
     const QObject* object,
     const QString& type,
     const QnUserResourcePtr& user,
-    const PermissionsDescriptor& permissionsDescriptor)
+    const ItemDescriptor& manifest)
 {
-    if (permissionsDescriptor.empty())
+    if (!requireReadPermissions(manifest))
         return {FiltrationAction::Accept};
 
     const auto context = user->systemContext();
     const auto accessManager = context->resourceAccessManager();
-    const auto globalPermission = permissionsDescriptor.globalPermission;
+    const auto globalPermissions = manifest.readPermissions;
 
-    if ((globalPermission != nx::vms::api::GlobalPermission::none)
-        && !accessManager->hasGlobalPermission(user, globalPermission))
+    if ((globalPermissions != nx::vms::api::GlobalPermission::none)
+        && !accessManager->globalPermissions(user).testFlags(globalPermissions))
     {
         NX_VERBOSE(NX_SCOPE_TAG,
-            "User %1 has no global permission %2 for the object %3",
-            user, globalPermission, type);
+            "User %1 has no global permissions %2 for the object %3",
+            user, globalPermissions, type);
 
         return {FiltrationAction::Discard};
     }
 
     auto result = FiltrationResult{FiltrationAction::Clone};
-    for (const auto& [fieldName, permissions]: permissionsDescriptor.resourcePermissions)
+    for (const auto& [fieldName, descriptor]: manifest.resources)
     {
         const QVariant value = object->property(fieldName.c_str());
 
@@ -113,7 +127,7 @@ FiltrationResult filterResourcesByPermission(
             const auto resource = context->resourcePool()->getResourceById(resourceId);
 
             if (resource &&
-                !accessManager->hasPermission(user, resource, permissions))
+                !accessManager->hasPermission(user, resource, descriptor.readPermissions))
             {
                 NX_VERBOSE(NX_SCOPE_TAG,
                     "User %1 has no permission for the object %2 with resource %3",
@@ -135,7 +149,7 @@ FiltrationResult filterResourcesByPermission(
             {
                 const auto resource = context->resourcePool()->getResourceById(resourceId);
                 if (!resource
-                    || accessManager->hasPermission(user, resource, permissions))
+                    || accessManager->hasPermission(user, resource, descriptor.readPermissions))
                 {
                     filteredResourceIds << resourceId;
                 }
@@ -172,9 +186,9 @@ FiltrationResult filterResourcesByPermission(
 EventPtr filterEventPermissions(
     const EventPtr& event,
     const QnUserResourcePtr& user,
-    const PermissionsDescriptor& permissionsDescriptor)
+    const ItemDescriptor& manifest)
 {
-    auto result = filterResourcesByPermission(event.get(), event->type(), user, permissionsDescriptor);
+    auto result = filterResourcesByPermission(event.get(), event->type(), user, manifest);
     if (result.action == FiltrationAction::Accept)
         return event;
 
@@ -193,7 +207,7 @@ EventPtr filterEventPermissions(
 ActionBuilder::Actions filterActionPermissions(
     const ActionPtr& action,
     const nx::vms::common::SystemContext* context,
-    const PermissionsDescriptor& permissionsDescriptor)
+    const ItemDescriptor& manifest)
 {
     const auto selection = action->property(utils::kUsersFieldName).value<UuidSelection>();
     NX_ASSERT(!selection.ids.isEmpty());
@@ -210,7 +224,7 @@ ActionBuilder::Actions filterActionPermissions(
         context->resourcePool()->getResourcesByIds<QnUserResource>(selection.ids))
     {
         auto filterResult =
-            filterResourcesByPermission(action.get(), action->type(), user, permissionsDescriptor);
+            filterResourcesByPermission(action.get(), action->type(), user, manifest);
 
         if (filterResult.action == FiltrationAction::Discard)
             continue;
@@ -587,16 +601,16 @@ ActionBuilder::Actions ActionBuilder::buildActionsForTargetUsers(
         }
 
         auto filteredAggregatedEvent = aggregatedEvent->filtered(
-            [&user, &permissions = eventManifest->permissions](const EventPtr& event)
+            [&user, &eventManifest](const EventPtr& event)
             {
-                return filterEventPermissions(event, user, permissions);
+                return filterEventPermissions(event, user, *eventManifest);
             });
 
         if (!filteredAggregatedEvent)
             continue;
 
         // Grouping users with the same permissions.
-        auto hash = permissionHash(eventManifest->permissions, filteredAggregatedEvent);
+        auto hash = permissionHash(*eventManifest, filteredAggregatedEvent);
         auto it = eventUsersMap.find(hash);
 
         if (it == eventUsersMap.end())
@@ -645,7 +659,7 @@ ActionBuilder::Actions ActionBuilder::buildActionsForTargetUsers(
         auto actions = filterActionPermissions(
             buildAction(value.event),
             targetUsersField->systemContext(),
-            actionManifest->permissions);
+            *actionManifest);
 
         result.insert(result.end(), actions.begin(), actions.end());
     }
