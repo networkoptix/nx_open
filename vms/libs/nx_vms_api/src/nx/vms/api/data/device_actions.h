@@ -8,6 +8,7 @@
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/enum_instrument.h>
 #include <nx/vms/api/analytics/types.h>
+#include <nx/vms/api/json/value_or_array.h>
 #include <nx/vms/api/types/resource_types.h>
 #include <nx/vms/api/types/storage_location.h>
 #include <nx/vms/api/types/time_period_content_type.h>
@@ -92,8 +93,11 @@ struct NX_VMS_API AnalyticsFilter
 QN_FUSION_DECLARE_FUNCTIONS(AnalyticsFilter, (json), NX_VMS_API);
 NX_REFLECTION_INSTRUMENT(AnalyticsFilter, AnalyticsFilter_Fields)
 
-struct DeviceFootageRequest: IdData
+struct DeviceFootageRequest
 {
+    /**%apidoc:stringArray Device ids to get Footage on. */
+    nx::vms::api::json::ValueOrArray<QString> id;
+
     /**%apidoc[opt]
      * Start time of the interval to search for chunks, in milliseconds.
      */
