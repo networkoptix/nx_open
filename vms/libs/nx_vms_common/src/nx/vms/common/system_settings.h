@@ -11,9 +11,8 @@
 
 #include <common/common_globals.h>
 #include <core/resource/resource_fwd.h>
+#include <nx/utils/impl_ptr.h>
 #include <nx/utils/move_only_func.h>
-#include <nx/utils/singleton.h>
-#include <nx/utils/thread/mutex.h>
 #include <nx/utils/url.h>
 #include <nx/vms/common/api/client_update_settings.h>
 #include <nx/vms/common/system_context_aware.h>
@@ -23,7 +22,6 @@
 #include <utils/email/email_fwd.h>
 
 class QnAbstractResourcePropertyAdaptor;
-template<class T> class QnResourcePropertyAdaptor;
 class QSettings;
 
 namespace nx::vms::api {
@@ -572,156 +570,8 @@ private:
     void at_resourcePool_resourceRemoved(const QnResourcePtr& resource);
 
 private:
-    QnResourcePropertyAdaptor<bool>* m_cameraSettingsOptimizationAdaptor = nullptr;
-    QnResourcePropertyAdaptor<bool>* m_autoUpdateThumbnailsAdaptor = nullptr;
-    QnResourcePropertyAdaptor<bool>* m_useCloudServiceToSendEmailAdaptor = nullptr;
-    QnResourcePropertyAdaptor<int>* m_maxSceneItemsAdaptor = nullptr;
-    QnResourcePropertyAdaptor<bool>* m_useTextEmailFormatAdaptor = nullptr;
-    QnResourcePropertyAdaptor<bool>* m_useWindowsEmailLineFeedAdaptor = nullptr;
-    QnResourcePropertyAdaptor<bool>* m_auditTrailEnabledAdaptor = nullptr;
-    QnResourcePropertyAdaptor<int>* m_auditTrailPeriodDaysAdaptor = nullptr;
-    QnResourcePropertyAdaptor<int>* m_eventLogPeriodDaysAdaptor = nullptr;
-    QnResourcePropertyAdaptor<bool>* m_trafficEncryptionForcedAdaptor = nullptr;
-    QnResourcePropertyAdaptor<bool>* m_videoTrafficEncryptionForcedAdaptor = nullptr;
-    QnResourcePropertyAdaptor<bool>* m_exposeDeviceCredentialsAdaptor = nullptr;
-
-    QnResourcePropertyAdaptor<QString>* m_disabledVendorsAdaptor = nullptr;
-    QnResourcePropertyAdaptor<bool>* m_autoDiscoveryEnabledAdaptor = nullptr;
-    QnResourcePropertyAdaptor<bool>* m_autoDiscoveryResponseEnabledAdaptor = nullptr;
-    QnResourcePropertyAdaptor<bool>* m_updateNotificationsEnabledAdaptor = nullptr;
-    QnResourcePropertyAdaptor<bool>* m_timeSynchronizationEnabledAdaptor = nullptr;
-    QnResourcePropertyAdaptor<bool>* m_synchronizeTimeWithInternetAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QnUuid> *m_primaryTimeServerAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString>* m_masterCloudSyncAdaptor = nullptr;
-    QnResourcePropertyAdaptor<int>* m_maxDifferenceBetweenSynchronizedAndInternetTimeAdaptor = nullptr;
-    QnResourcePropertyAdaptor<int>* m_maxDifferenceBetweenSynchronizedAndLocalTimeAdaptor = nullptr;
-    QnResourcePropertyAdaptor<int>* m_osTimeChangeCheckPeriodAdaptor = nullptr;
-    QnResourcePropertyAdaptor<int>* m_syncTimeExchangePeriodAdaptor = nullptr;
-    QnResourcePropertyAdaptor<int>* m_syncTimeEpsilonAdaptor = nullptr;
-    QnResourcePropertyAdaptor<nx::vms::api::BackupSettings>* m_backupSettingsAdaptor = nullptr;
-
-    // set of statistics settings adaptors
-    QnResourcePropertyAdaptor<bool>* m_statisticsAllowedAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString>* m_statisticsReportLastTimeAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString>* m_statisticsReportLastVersionAdaptor = nullptr;
-    QnResourcePropertyAdaptor<int>* m_statisticsReportLastNumberAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString>* m_statisticsReportTimeCycleAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString>* m_statisticsReportUpdateDelayAdaptor = nullptr;
-    QnResourcePropertyAdaptor<bool>* m_upnpPortMappingEnabledAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString>* m_localSystemIdAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString>* m_lastMergeMasterIdAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString>* m_lastMergeSlaveIdAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString>* m_statisticsReportServerApiAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString>* m_clientStatisticsSettingsUrlAdaptor = nullptr;
-
-    // set of email settings adaptors
-    QnResourcePropertyAdaptor<QString>* m_serverAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString>* m_fromAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString>* m_userAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString>* m_smtpPasswordAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString>* m_signatureAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString>* m_supportLinkAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QnEmail::ConnectionType>* m_connectionTypeAdaptor = nullptr;
-    QnResourcePropertyAdaptor<int>* m_portAdaptor = nullptr;
-    QnResourcePropertyAdaptor<int>* m_timeoutAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString>* m_smtpNameAdaptor = nullptr;
-
-    // set of ldap settings adaptors
-    QnResourcePropertyAdaptor<QUrl>* m_ldapUriAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString>* m_ldapAdminDnAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString>* m_ldapAdminPasswordAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString>* m_ldapSearchBaseAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString>* m_ldapSearchFilterAdaptor = nullptr;
-    QnResourcePropertyAdaptor<int>* m_ldapPasswordExpirationPeriodAdaptor = nullptr;
-    QnResourcePropertyAdaptor<int>* m_ldapSearchTimeoutSAdaptor = nullptr;
-
-    QnResourcePropertyAdaptor<int>* m_ec2AliveUpdateIntervalAdaptor = nullptr;
-    /** seconds */
-    QnResourcePropertyAdaptor<int>* m_proxyConnectTimeoutAdaptor = nullptr;
-    QnResourcePropertyAdaptor<bool>* m_takeCameraOwnershipWithoutLock = nullptr;
-
-    // set of cloud adaptors
-    QnResourcePropertyAdaptor<QString>* m_cloudAccountNameAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString>* m_cloudSystemIdAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString>* m_cloudAuthKeyAdaptor = nullptr;
-    QnResourcePropertyAdaptor<bool>* m_system2faEnabledAdaptor = nullptr;
-
-    // misc adaptors
-    QnResourcePropertyAdaptor<int>* m_maxEventLogRecordsAdaptor = nullptr;
-
-    QnResourcePropertyAdaptor<QString>* m_systemNameAdaptor = nullptr;
-    QnResourcePropertyAdaptor<bool>* m_arecontRtspEnabledAdaptor = nullptr;
-    QnResourcePropertyAdaptor<bool>* m_sequentialFlirOnvifSearcherEnabledAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString>* m_cloudHostAdaptor = nullptr;
-    QnResourcePropertyAdaptor<bool>* m_crossdomainEnabledAdaptor = nullptr;
-
-    QnResourcePropertyAdaptor<int>* m_maxP2pQueueSizeBytes = nullptr;
-    QnResourcePropertyAdaptor<qint64>* m_maxP2pQueueSizeForAllClientsBytes = nullptr;
-    QnResourcePropertyAdaptor<int>* m_maxRecorderQueueSizeBytes = nullptr;
-    QnResourcePropertyAdaptor<int>* m_maxRecorderQueueSizePackets = nullptr;
-
-    QnResourcePropertyAdaptor<int>* m_maxHttpTranscodingSessions = nullptr;
-
-    QnResourcePropertyAdaptor<int>* m_maxRtpRetryCount = nullptr;
-
-    QnResourcePropertyAdaptor<int>* m_rtpFrameTimeoutMs = nullptr;
-    QnResourcePropertyAdaptor<int>* m_maxRtspConnectDuration = nullptr;
-
-    QnResourcePropertyAdaptor<bool>* m_cloudConnectUdpHolePunchingEnabledAdaptor = nullptr;
-    QnResourcePropertyAdaptor<bool>* m_cloudConnectRelayingEnabledAdaptor = nullptr;
-    QnResourcePropertyAdaptor<bool>* m_cloudConnectRelayingOverSslForcedAdaptor = nullptr;
-
-    QnResourcePropertyAdaptor<bool>* m_edgeRecordingEnabledAdaptor = nullptr;
-    QnResourcePropertyAdaptor<bool>* m_webSocketEnabledAdaptor = nullptr;
-
-    QnResourcePropertyAdaptor<int>* m_maxRemoteArchiveSynchronizationThreads = nullptr;
-    QnResourcePropertyAdaptor<int>* m_maxVirtualCameraArchiveSynchronizationThreads = nullptr;
-
-    QnResourcePropertyAdaptor<nx::utils::Url>* m_customReleaseListUrlAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QByteArray>* m_targetUpdateInformationAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QByteArray>* m_installedUpdateInformationAdaptor = nullptr;
-    QnResourcePropertyAdaptor<nx::vms::common::update::PersistentUpdateStorage>* m_targetPersistentUpdateStorageAdaptor = nullptr;
-    QnResourcePropertyAdaptor<nx::vms::common::update::PersistentUpdateStorage>* m_installedPersistentUpdateStorageAdaptor = nullptr;
-    QnResourcePropertyAdaptor<FileToPeerList>* m_downloaderPeersAdaptor = nullptr;
-    QnResourcePropertyAdaptor<nx::vms::common::api::ClientUpdateSettings>*
-        m_clientUpdateSettingsAdaptor = nullptr;
-    QnResourcePropertyAdaptor<nx::vms::api::WatermarkSettings>* m_watermarkSettingsAdaptor = nullptr;
-
-    QnResourcePropertyAdaptor<int>* m_sessionTimeoutLimitMinutesAdaptor = nullptr;
-    QnResourcePropertyAdaptor<int>* m_sessionsLimitAdaptor = nullptr;
-    QnResourcePropertyAdaptor<int>* m_sessionsLimitPerUserAdaptor = nullptr;
-    QnResourcePropertyAdaptor<int>* m_remoteSessionUpdateAdaptor = nullptr;
-    QnResourcePropertyAdaptor<int>* m_remoteSessionTimeoutAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString>* m_defaultVideoCodecAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString>* m_defaultExportVideoCodecAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString>* m_lowQualityScreenVideoCodecAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString>* m_forceLiveCacheForPrimaryStreamAdaptor = nullptr;
-    QnResourcePropertyAdaptor<nx::vms::api::MetadataStorageChangePolicy>* m_metadataStorageChangePolicyAdaptor = nullptr;
-    QnResourcePropertyAdaptor<std::map<QString, int>>* m_specificFeaturesAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString>* m_licenseServerUrlAdaptor = nullptr;
-    QnResourcePropertyAdaptor<nx::utils::Url>* m_resourceFileUriAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString>* m_cloudNotificationsLanguageAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString>* m_additionalLocalFsTypesAdaptor = nullptr;
-    QnResourcePropertyAdaptor<bool>* m_keepIoPortStateIntactOnInitializationAdaptor= nullptr;
-    QnResourcePropertyAdaptor<int>* m_mediaBufferSizeKbAdaptor = nullptr;
-    QnResourcePropertyAdaptor<int>* m_mediaBufferSizeKbForAudioOnlyDeviceAdaptor = nullptr;
-    QnResourcePropertyAdaptor<bool>* m_forceAnalyticsDbStoragePermissionsAdaptor = nullptr;
-    QnResourcePropertyAdaptor<int>* m_checkVideoStreamPeriodMsAdaptor = nullptr;
-    QnResourcePropertyAdaptor<bool>* m_useStorageEncryptionAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QByteArray>* m_currentStorageEncryptionKeyAdaptor = nullptr;
-    QnResourcePropertyAdaptor<bool>* m_showServersInTreeForNonAdminsAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString>* m_supportedOriginsAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString>* m_frameOptionsHeaderAdaptor = nullptr;
-    QnResourcePropertyAdaptor<bool>* m_useHttpsOnlyCamerasAdaptor = nullptr;
-    QnResourcePropertyAdaptor<bool>* m_insecureDeprecatedApiEnabledAdaptor = nullptr;
-    QnResourcePropertyAdaptor<bool>* m_insecureDeprecatedApiInUseEnabledAdaptor = nullptr;
-    QnResourcePropertyAdaptor<bool>* m_exposeServerEndpointsAdaptor = nullptr;
-    QnResourcePropertyAdaptor<bool>* m_showMouseTimelinePreviewAdaptor = nullptr;
-
-    AdaptorList m_allAdaptors;
-
-    mutable nx::Mutex m_mutex;
-    QnUserResourcePtr m_admin;
+    struct Private;
+    nx::utils::ImplPtr<Private> d;
 };
 
 } // namespace nx::vms::common
