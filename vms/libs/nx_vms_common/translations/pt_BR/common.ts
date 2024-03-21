@@ -1458,7 +1458,7 @@
     </message>
     <message>
       <source>System name</source>
-      <translation>Nome do Sistema</translation>
+      <translation>Nome do sistema</translation>
     </message>
     <message>
       <source>Local System ID</source>
@@ -1486,7 +1486,7 @@
     </message>
     <message>
       <source>Max scene items (0 means default)</source>
-      <translation>Máximo de itens de cena (0 significa padrão)</translation>
+      <translation>Itens de cena máximos (0 significa padrão)</translation>
     </message>
     <message>
       <source>Send plain-text emails</source>
@@ -1498,7 +1498,7 @@
     </message>
     <message>
       <source>Enable audit trail</source>
-      <translation>Ativar trilha de auditoria</translation>
+      <translation>Activar Trilho de Auditoria</translation>
     </message>
     <message>
       <source>Audit trail period (days, 14-730)</source>
@@ -1566,7 +1566,7 @@
     </message>
     <message>
       <source>RTP timeout (milliseconds)</source>
-      <translation>Tempo limite RTP (milissegundos)</translation>
+      <translation>Tempo limite em(milissegundos)</translation>
     </message>
     <message>
       <source>Max RTSP connection duration (seconds)</source>

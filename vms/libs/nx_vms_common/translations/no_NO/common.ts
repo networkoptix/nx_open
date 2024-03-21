@@ -1446,7 +1446,7 @@
     </message>
     <message>
       <source>Cloud owner account</source>
-      <translation>Cloud eierkonto</translation>
+      <translation>Eiers skykonto</translation>
     </message>
     <message>
       <source>Cloud System ID</source>
@@ -1462,7 +1462,7 @@
     </message>
     <message>
       <source>Local System ID</source>
-      <translation>Lokal System-ID</translation>
+      <translation>Lokal system-ID</translation>
     </message>
     <message>
       <source>Last master System merge ID</source>

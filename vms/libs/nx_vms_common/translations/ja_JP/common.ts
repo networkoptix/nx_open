@@ -35,7 +35,7 @@
     </message>
     <message>
       <source>The LDAP server is not accessible. Please try again later.</source>
-      <translation>LDAPサーバーにアクセスできません。後でもう一度お試しください。</translation>
+      <translation>LDAP サーバーにアクセスできません。後でもう一度お試しください。</translation>
     </message>
     <message>
       <source>%1 is not accessible yet. Please try again later.</source>
@@ -1430,7 +1430,7 @@
     </message>
     <message>
       <source>Max scene items (0 means default)</source>
-      <translation>シーンの最大アイテム数 (0でデフォルト値を使用)</translation>
+      <translation>シーン内最大アイテム数 (0でデフォルト値を使用)</translation>
     </message>
     <message>
       <source>Send plain-text emails</source>
@@ -1442,7 +1442,7 @@
     </message>
     <message>
       <source>Enable audit trail</source>
-      <translation>操作履歴を有効にする</translation>
+      <translation>操作履歴有効</translation>
     </message>
     <message>
       <source>Audit trail period (days, 14-730)</source>
@@ -1550,7 +1550,7 @@
     </message>
     <message>
       <source>Watermark settings</source>
-      <translation>ウォーターマーク設定</translation>
+      <translation>透かし設定</translation>
     </message>
     <message>
       <source>Session token count limit on a single Server</source>
@@ -1706,7 +1706,7 @@
     </message>
     <message>
       <source>LDAP settings</source>
-      <translation>LDAP設定</translation>
+      <translation>LDAP 設定</translation>
     </message>
     <message>
       <source>SMTP settings</source>
@@ -1747,7 +1747,7 @@
     </message>
     <message>
       <source>Interval between the Cloud polling HTTP requests to synchronize the data.</source>
-      <translation>データを同期するためにクラウドが HTTP リクエストをポーリングする間隔。</translation>
+      <translation>データ同期のためのクラウドポーリングHTTPリクエストの間隔。</translation>
     </message>
   </context>
   <context>
@@ -2455,7 +2455,7 @@
     </message>
     <message>
       <source>LDAP Sync Issue</source>
-      <translation>LDAP 同期の問題</translation>
+      <translation>LDAP 同期障害</translation>
     </message>
     <message>
       <source>Failed to connect to the LDAP server.</source>

@@ -1446,7 +1446,7 @@
     </message>
     <message>
       <source>Cloud owner account</source>
-      <translation>Cloud ägarkonto</translation>
+      <translation>Molnägarkonto</translation>
     </message>
     <message>
       <source>Cloud System ID</source>
@@ -1458,7 +1458,7 @@
     </message>
     <message>
       <source>System name</source>
-      <translation>Systemets namn</translation>
+      <translation>Systemnamn</translation>
     </message>
     <message>
       <source>Local System ID</source>
