@@ -68,6 +68,7 @@ class NxOpenConan(ConanFile):
         "customization": "default",
         "installRuntimeDependencies": True,
         "quick_start_guide:format": "pdf",
+        "mobile_user_manual:format": "pdf",
         "onlyUnrevisionedPackages": False,
     }
 
@@ -79,6 +80,7 @@ class NxOpenConan(ConanFile):
         self.options["customization"].customization = "opensource-meta"
         self.options["vms_help"].customization = "metavms"
         self.options["quick_start_guide"].customization = "metavms"
+        self.options["mobile_user_manual"].customization = "metavms"
 
     def generate(self):
         generate_conan_package_paths(self)
@@ -152,8 +154,11 @@ class NxOpenConan(ConanFile):
     def requirements(self):
         if not self.options.skipCustomizationPackage:
             self.requires("customization/1.0")  #< Always use the latest revision.
-        self.requires("vms_help/6.0.0")
-        self.requires("quick_start_guide/6.0.0")
+
+        if self.haveDesktopClient:
+            self.requires("vms_help/6.0.0")
+            self.requires("quick_start_guide/6.0.0")
+            self.requires("mobile_user_manual/21.2")
 
         if self.options.onlyUnrevisionedPackages:
             return
