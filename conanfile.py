@@ -66,6 +66,7 @@ class NxOpenConan(ConanFile):
         "customization": "default",
         "installRuntimeDependencies": True,
         "quick_start_guide:format": "pdf",
+        "mobile_user_manual:format": "pdf",
     }
 
     ffmpeg_version_and_revision = "4.4#1edf014620e091c2d51dca81685f092b"
@@ -74,8 +75,6 @@ class NxOpenConan(ConanFile):
         "openssl/1.1.1q" "#a23bd98469b500b2d658a17351fa279c",
         "qt/6.5.3" "#72ebee10be6db529926703510d7cfd8c",
         "roboto-fonts/1.0" "#a1d64ec2d6a2e16f8f476b2b47162123",
-        "vms_help/6.0.0",
-        "quick_start_guide/6.0.0",
     )
 
     def configure(self):
@@ -84,6 +83,7 @@ class NxOpenConan(ConanFile):
         self.options["customization"].customization = "opensource-meta"
         self.options["vms_help"].customization = "metavms"
         self.options["quick_start_guide"].customization = "metavms"
+        self.options["mobile_user_manual"].customization = "metavms"
 
     def generate(self):
         generate_conan_package_paths(self)
@@ -157,6 +157,11 @@ class NxOpenConan(ConanFile):
     def requirements(self):
         if not self.options.skipCustomizationPackage:
             self.requires("customization/1.0")  #< Always use the latest revision.
+
+        if self.haveDesktopClient:
+            self.requires("vms_help/6.0.0")
+            self.requires("quick_start_guide/6.0.0")
+            self.requires("mobile_user_manual/21.2")
 
         self.requires("boost/1.83.0" "#e0be85c6f8107d7e960246e31cbbf7ab")
         self.requires("rapidjson/1.1.0" "#c2e048b9e956f5d9ff93d2d72b4486da")
