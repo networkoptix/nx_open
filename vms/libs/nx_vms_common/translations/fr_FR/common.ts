@@ -1423,7 +1423,7 @@
     </message>
     <message>
       <source>Time synchronization enabled</source>
-      <translation>Synchronisation du temps activée</translation>
+      <translation>Synchronisation de l'heure activée</translation>
     </message>
     <message>
       <source>Primary time synchronization Server ID</source>
@@ -1439,15 +1439,15 @@
     </message>
     <message>
       <source>Sync time synchronization interval for network requests</source>
-      <translation>Intervalle de synchronisation des temps de synchronisation pour les requêtes réseau</translation>
+      <translation>Intervalle de synchronisation de synchronisation de l'heure pour les requêtes réseau</translation>
     </message>
     <message>
       <source>Sync time epsilon. New value is not applied if time delta less than epsilon</source>
-      <translation>Synchroniser le temps epsilon. La nouvelle valeur n'est pas appliquée si le temps delta est inférieur à epsilon</translation>
+      <translation>Synchroniser le temps epsilon. La nouvelle valeur n'est pas appliquée si le delta temps est inférieur à epsilon</translation>
     </message>
     <message>
       <source>Cloud owner account</source>
-      <translation>Compte propriétaire du Cloud</translation>
+      <translation>Compte propriétaire du cloud</translation>
     </message>
     <message>
       <source>Cloud System ID</source>
@@ -1487,15 +1487,15 @@
     </message>
     <message>
       <source>Max scene items (0 means default)</source>
-      <translation>Nombre maximum d'éléments de scène (0 signifie par défaut)</translation>
+      <translation>Max éléments de scène (0 signifie par défaut)</translation>
     </message>
     <message>
       <source>Send plain-text emails</source>
-      <translation>Envoyer des e-mails en texte brut</translation>
+      <translation>Envoyer des courriels en texte brut</translation>
     </message>
     <message>
       <source>Use Windows line feed in emails</source>
-      <translation>Utiliser le Windows 'line feed' dans les e-mails</translation>
+      <translation>Utiliser le Windows 'line feed' dans les courriels</translation>
     </message>
     <message>
       <source>Enable audit trail</source>
@@ -1507,7 +1507,7 @@
     </message>
     <message>
       <source>Event log period (days)</source>
-      <translation>Période du journal des événements (jours)</translation>
+      <translation>Période du journal d'événements (jours)</translation>
     </message>
     <message>
       <source>Enforce HTTPS (data traffic encryption)</source>

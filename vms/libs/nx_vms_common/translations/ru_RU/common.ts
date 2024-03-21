@@ -2659,11 +2659,11 @@
     </message>
     <message numerus="yes">
       <source>%n Groups</source>
-      <translation type="unfinished">
-        <numerusform>%n Groups</numerusform>
-        <numerusform>%n Groups</numerusform>
-        <numerusform>%n Groups</numerusform>
-        <numerusform>%n Groups</numerusform>
+      <translation>
+        <numerusform>%n Групп</numerusform>
+        <numerusform>%n Групп</numerusform>
+        <numerusform>%n Групп</numerusform>
+        <numerusform>%n Групп</numerusform>
       </translation>
     </message>
     <message>

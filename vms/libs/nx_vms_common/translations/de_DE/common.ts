@@ -1422,7 +1422,7 @@
     </message>
     <message>
       <source>Time synchronization enabled</source>
-      <translation>Zeitsynchronisierung aktiviert</translation>
+      <translation>Synchronisierung aktiviert</translation>
     </message>
     <message>
       <source>Primary time synchronization Server ID</source>
@@ -1442,7 +1442,7 @@
     </message>
     <message>
       <source>Sync time epsilon. New value is not applied if time delta less than epsilon</source>
-      <translation>Zeitsumme synchronisieren. Neuer Wert wird nicht angewendet, wenn die Delta-Zeit kleiner als die Summe ist</translation>
+      <translation>Zeitsumme synchronisieren. Neuer Wert wird nicht angewendet, wenn die Deltazeit kleiner als die Summe ist</translation>
     </message>
     <message>
       <source>Cloud owner account</source>
@@ -1490,7 +1490,7 @@
     </message>
     <message>
       <source>Send plain-text emails</source>
-      <translation>Nur Textemails senden</translation>
+      <translation>Nur Textmails senden</translation>
     </message>
     <message>
       <source>Use Windows line feed in emails</source>
@@ -1606,7 +1606,7 @@
     </message>
     <message>
       <source>Watermark settings</source>
-      <translation>Wasserzeichen-Einstellungen</translation>
+      <translation>Wasserzeicheneinstellungen</translation>
     </message>
     <message>
       <source>Session token count limit on a single Server</source>
@@ -1634,7 +1634,7 @@
     </message>
     <message>
       <source>Low quality screen video codec</source>
-      <translation>Bildschirm-Videocodec mit niedriger Qualität</translation>
+      <translation>Bildschirmvideocodec mit niedriger Qualität</translation>
     </message>
     <message>
       <source>License server</source>
