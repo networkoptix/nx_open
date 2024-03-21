@@ -32,4 +32,15 @@ bool ServerResource::isDetached() const
     return m_isDetached;
 }
 
+void ServerResource::setForwardedPortConfigurations(
+    const std::vector<ForwardedPortConfiguration>& value)
+{
+    forwardedPortConfigurations = value;
+}
+
+std::vector<ForwardedPortConfiguration> ServerResource::getForwardedPortConfigurations() const
+{
+    return forwardedPortConfigurations;
+}
+
 } // namespace nx::vms::client::desktop

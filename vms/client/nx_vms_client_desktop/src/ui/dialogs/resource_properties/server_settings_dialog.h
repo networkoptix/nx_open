@@ -22,6 +22,7 @@ public:
         PoePage,
         PluginsPage,
         BackupPage,
+        FailoverPage,
 
         PageCount
     };

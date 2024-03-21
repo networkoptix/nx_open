@@ -58,6 +58,7 @@ Item
     ClipboardCopyButton
     {
         id: clipboardCopyButton
+        textFieldReference: control
         anchors.left: label.right
         anchors.leftMargin: 4
         anchors.verticalCenter: label.verticalCenter

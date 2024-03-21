@@ -35,6 +35,8 @@
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/network/cloud_url_validator.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
+#include <nx/vms/client/desktop/resource/server.h>
+#include <nx/vms/client/desktop/resource_properties/server/widgets/remote_access_widget.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/ui/server_certificate_viewer.h>
@@ -50,10 +52,6 @@ using namespace nx;
 using namespace nx::vms::client::desktop;
 
 namespace {
-
-static const int PC_SERVER_MAX_CAMERAS = 128;
-static const int ARM_SERVER_MAX_CAMERAS = 12;
-static const int EDGE_SERVER_MAX_CAMERAS = 1;
 
 static const QString kLinkPattern("<a href='%1' style='text-decoration: none;'>%2</a>");
 static const QString kGeneratedCertificateLink = "#gen";
@@ -84,7 +82,12 @@ std::optional<QString> certificateName(const std::string& pem)
 class QnServerSettingsWidget::Private
 {
 public:
-    Private(QnServerSettingsWidget* parent): q(parent) {}
+    Private(QnServerSettingsWidget* parent):
+        remoteAccessWidget(new RemoteAccessWidget(appContext()->qmlEngine(), parent)),
+        q(parent)
+    {
+        remoteAccessWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+    }
 
     void cancelRequests()
     {
@@ -193,6 +196,7 @@ private:
 public:
     QSet<int> requests;
     rest::Handle requestHandle = 0;
+    RemoteAccessWidget* remoteAccessWidget = nullptr;
 
 private:
     QPointer<QnServerSettingsWidget> q;
@@ -207,9 +211,6 @@ QnServerSettingsWidget::QnServerSettingsWidget(QWidget* parent /* = 0*/) :
     ui(new Ui::ServerSettingsWidget)
     , d(new Private(this))
     , m_server()
-    , m_tableBottomLabel()
-    , m_maxCamerasAdjusted(false)
-    , m_rebuildWasCanceled(false)
     , m_initServerName()
 {
     ui->setupUi(this);
@@ -218,55 +219,21 @@ QnServerSettingsWidget::QnServerSettingsWidget(QWidget* parent /* = 0*/) :
     connect(ui->alertBar, &CommonMessageBar::linkActivated,
         this, &QnServerSettingsWidget::showServerCertificate);
 
-    setWarningStyle(ui->failoverWarningLabel);
-
     /* Set up context help. */
     setHelpTopic(ui->nameLabel, ui->nameLineEdit, HelpTopic::Id::ServerSettings_General);
-    setHelpTopic(ui->nameLabel, ui->maxCamerasSpinBox, HelpTopic::Id::ServerSettings_General);
-    setHelpTopic(ui->nameLabel, ui->locationIdSpinBox, HelpTopic::Id::ServerSettings_General);
     setHelpTopic(ui->ipAddressLabel, ui->ipAddressLineEdit,
         HelpTopic::Id::ServerSettings_General);
     setHelpTopic(ui->portLabel, ui->portLineEdit, HelpTopic::Id::ServerSettings_General);
     setHelpTopic(ui->webCamerasDiscoveryCheckBox, HelpTopic::Id::ServerSettings_General);
-    setHelpTopic(ui->failoverGroupBox, HelpTopic::Id::ServerSettings_Failover);
-
-    const auto failoverHint = HintButton::createGroupBoxHint(ui->failoverGroupBox);
-    // Notice: this hint button uses help topic from the parent class.
-    failoverHint->setHintText(
-        tr("Servers with failover enabled will automatically take cameras from offline Servers "
-           "with the same Location ID."));
 
     connect(ui->pingButton, &QPushButton::clicked, this, &QnServerSettingsWidget::at_pingButton_clicked);
 
     connect(ui->nameLineEdit, &QLineEdit::textChanged, this, &QnAbstractPreferencesWidget::hasChangesChanged);
 
-    connect(ui->failoverGroupBox, &QGroupBox::toggled, this, [this](bool checked)
-    {
-        ui->maxCamerasWidget->setEnabled(checked);
-        updateFailoverLabel();
-        emit hasChangesChanged();
-    });
-
-    connect(ui->maxCamerasSpinBox, QnSpinboxIntValueChanged, this, [this]
-    {
-        m_maxCamerasAdjusted = true;
-        updateFailoverLabel();
-        emit hasChangesChanged();
-    });
-
-    connect(ui->locationIdSpinBox, QnSpinboxIntValueChanged, this,
-        [this]
-        {
-            updateFailoverLabel();
-            emit hasChangesChanged();
-        });
-
-    connect(ui->failoverPriorityButton, &QPushButton::clicked, action(menu::OpenFailoverPriorityAction), &QAction::trigger);
-
     connect(ui->webCamerasDiscoveryCheckBox, &QCheckBox::stateChanged, this,
         &QnAbstractPreferencesWidget::hasChangesChanged);
 
-    retranslateUi();
+    ui->contentLayout->addWidget(d->remoteAccessWidget);
 }
 
 QnServerSettingsWidget::~QnServerSettingsWidget()
@@ -316,27 +283,24 @@ void QnServerSettingsWidget::setServer(const QnMediaServerResourcePtr &server)
             &QnServerSettingsWidget::updateCertificatesInfo);
         connect(m_server.get(), &QnMediaServerResource::statusChanged, this,
             &QnServerSettingsWidget::updateCertificatesInfo);
-        connect(m_server.get(), &QnMediaServerResource::redundancyChanged, this,
-            &QnServerSettingsWidget::updateFailoverSettings);
-        connect(m_server.get(), &QnMediaServerResource::maxCamerasChanged, this, [this]()
-            {
-                updateMaxCamerasSettings();
-                m_maxCamerasAdjusted = true;
-            });
-        connect(m_server.get(), &QnMediaServerResource::locationIdChanged,
-            this, &QnServerSettingsWidget::updateLocationIdSettings);
     }
 
     updateReadOnly();
+    updateRemoteAccess();
+}
+
+void QnServerSettingsWidget::updateRemoteAccess()
+{
+    if (!m_server)
+        return;
+
+    d->remoteAccessWidget->setServer(m_server.objectCast<ServerResource>());
 }
 
 void QnServerSettingsWidget::setReadOnlyInternal(bool readOnly)
 {
     using ::setReadOnly;
     setReadOnly(ui->webCamerasDiscoveryCheckBox, readOnly);
-    setReadOnly(ui->failoverGroupBox, readOnly);
-    setReadOnly(ui->maxCamerasSpinBox, readOnly);
-    setReadOnly(ui->locationIdSpinBox, readOnly);
 }
 
 void QnServerSettingsWidget::updateReadOnly()
@@ -367,34 +331,10 @@ bool QnServerSettingsWidget::hasChanges() const
     if (m_server->getName() != ui->nameLineEdit->text())
         return true;
 
-    if (m_server->isRedundancy() != ui->failoverGroupBox->isChecked())
-        return true;
-
-    if (m_server->isRedundancy())
-    {
-        if (m_server->getMaxCameras() != ui->maxCamerasSpinBox->value())
-            return true;
-        if (m_server->locationId() != ui->locationIdSpinBox->value())
-            return true;
-    }
-
     if (isWebCamerasDiscoveryEnabledChanged())
         return true;
 
     return false;
-}
-
-void QnServerSettingsWidget::retranslateUi()
-{
-    ui->failoverGroupBox->setTitle(tr("Failover"));
-
-    ui->maxCamerasLabel->setText(QnDeviceDependentStrings::getDefaultNameFromSet(
-        resourcePool(),
-        tr("Max devices on this server:"),
-        tr("Max cameras on this server:")
-    ));
-
-    updateFailoverLabel();
 }
 
 bool QnServerSettingsWidget::canApplyChanges() const
@@ -407,48 +347,6 @@ bool QnServerSettingsWidget::isNetworkRequestRunning() const
     return !d->requests.empty() || d->requestHandle != 0;
 }
 
-void QnServerSettingsWidget::updateMaxCamerasSettings()
-{
-    if (!m_server)
-        return;
-
-    int maxCameras;
-    if (m_server->getServerFlags().testFlag(vms::api::SF_Edge))
-        maxCameras = EDGE_SERVER_MAX_CAMERAS;   //edge server
-    else if (m_server->getServerFlags().testFlag(vms::api::SF_ArmServer))
-        maxCameras = ARM_SERVER_MAX_CAMERAS;   //generic ARM based servre
-    else
-        maxCameras = PC_SERVER_MAX_CAMERAS;    //PC server
-    ui->maxCamerasSpinBox->setMaximum(maxCameras);
-
-    int currentMaxCamerasValue = m_server->getMaxCameras();
-    if (currentMaxCamerasValue == 0)
-        currentMaxCamerasValue = maxCameras;
-
-    ui->maxCamerasSpinBox->setValue(currentMaxCamerasValue);
-    ui->maxCamerasWidget->setEnabled(m_server->isRedundancy());
-}
-
-void QnServerSettingsWidget::updateLocationIdSettings()
-{
-    if (!m_server)
-        return;
-
-    ui->locationIdSpinBox->setValue(m_server->locationId());
-}
-
-void QnServerSettingsWidget::updateFailoverSettings()
-{
-    if (!m_server)
-        return;
-
-    updateMaxCamerasSettings();
-    updateLocationIdSettings();
-
-    ui->failoverGroupBox->setChecked(m_server->isRedundancy());
-    updateFailoverLabel();
-}
-
 void QnServerSettingsWidget::loadDataToUi()
 {
     if (!m_server)
@@ -457,8 +355,6 @@ void QnServerSettingsWidget::loadDataToUi()
     m_initServerName = m_server->getName();
     ui->nameLineEdit->setText(m_initServerName);
 
-    updateFailoverSettings();
-    m_maxCamerasAdjusted = false;
     updateUrl();
     updateWebCamerasDiscoveryEnabled();
     updateCertificatesInfo();
@@ -473,9 +369,6 @@ void QnServerSettingsWidget::applyChanges()
         return;
 
     m_server->setName(ui->nameLineEdit->text());
-    m_server->setMaxCameras(ui->maxCamerasSpinBox->value());
-    m_server->setLocationId(ui->locationIdSpinBox->value());
-    m_server->setRedundancy(ui->failoverGroupBox->isChecked());
     m_server->setWebCamerasDiscoveryEnabled(isWebCamerasDiscoveryEnabled());
 
     auto callback = nx::utils::guarded(this,
@@ -628,43 +521,6 @@ bool QnServerSettingsWidget::currentIsWebCamerasDiscoveryEnabled() const
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-
-void QnServerSettingsWidget::updateFailoverLabel()
-{
-    auto getErrorText = [this]
-    {
-        if (!m_server)
-            return QString();
-
-        if (resourcePool()->getResources<QnMediaServerResource>().size() < 2)
-            return tr("At least two servers are required for this feature.");
-
-        if (resourcePool()->getAllCameras(m_server, true).size() > ui->maxCamerasSpinBox->value())
-            return QnDeviceDependentStrings::getDefaultNameFromSet(
-                resourcePool(),
-                tr("This server already has more than max devices"),
-                tr("This server already has more than max cameras")
-            );
-
-        if (!m_server->isRedundancy() && !m_maxCamerasAdjusted)
-            return QnDeviceDependentStrings::getDefaultNameFromSet(
-                resourcePool(),
-                tr("To avoid issues adjust max number of devices"),
-                tr("To avoid issues adjust max number of cameras")
-            );
-
-        return QString();
-    };
-
-    QString error;
-    if (ui->failoverGroupBox->isChecked())
-        error = getErrorText();
-
-    ui->failoverWarningLabel->setText(error);
-    ui->failoverWarningLabel->setHidden(error.isEmpty());
-}
-
-
 void QnServerSettingsWidget::at_pingButton_clicked()
 {
     if (!m_server)

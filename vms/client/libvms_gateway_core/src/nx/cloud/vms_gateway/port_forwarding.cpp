@@ -202,13 +202,15 @@ std::map<uint16_t, uint16_t> PortForwarding::forward(
     auto serversIt = m_servers.find(target);
     if (targetPorts.empty())
     {
-        for (auto server = serversIt->second.begin(); server != serversIt->second.end(); ++server)
+        if (serversIt == m_servers.end())
+            return result;
+
+        for (auto server = serversIt->second.begin(); server != serversIt->second.end();)
         {
             serversToRemove.emplace_back(std::move(server->second));
             server = serversIt->second.erase(server);
         }
-        if (serversIt != m_servers.end())
-            m_servers.erase(serversIt);
+        m_servers.erase(serversIt);
         return result;
     }
 

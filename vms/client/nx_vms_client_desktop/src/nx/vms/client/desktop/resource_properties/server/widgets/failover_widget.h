@@ -7,26 +7,25 @@
 #include <ui/widgets/common/abstract_preferences_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
 
-class QLabel;
+namespace Ui { class FailoverWidget; }
 
-namespace Ui {
-    class ServerSettingsWidget;
-}
+namespace nx::vms::client::desktop {
 
-class QnServerSettingsWidget:
+class FailoverWidget:
     public QnAbstractPreferencesWidget, public QnWorkbenchContextAware
 {
     Q_OBJECT
     using base_type = QnAbstractPreferencesWidget;
 
 public:
-    QnServerSettingsWidget(QWidget* parent = nullptr);
-    virtual ~QnServerSettingsWidget();
+    FailoverWidget(QWidget* parent = nullptr);
+    virtual ~FailoverWidget();
 
     virtual bool hasChanges() const override;
     virtual void loadDataToUi() override;
     virtual void applyChanges() override;
     virtual void discardChanges() override;
+    virtual void retranslateUi() override;
     virtual bool canApplyChanges() const override;
     virtual bool isNetworkRequestRunning() const override;
 
@@ -37,30 +36,17 @@ protected:
     void setReadOnlyInternal(bool readOnly) override;
 
 private:
-    void updateUrl();
+    void updateFailoverLabel();
+    void updateFailoverSettings();
+    void updateMaxCamerasSettings();
+    void updateLocationIdSettings();
     void updateReadOnly();
-    void updateRemoteAccess();
-    void updateWebCamerasDiscoveryEnabled();
-    void updateCertificatesInfo();
-    void showCertificateMismatchBanner(bool dataLoaded);
-    int updateCertificatesLabels();
-
-    bool isWebCamerasDiscoveryEnabled() const;
-    bool isWebCamerasDiscoveryEnabledChanged() const;
-    bool isCertificateMismatch() const;
-
-    bool currentIsWebCamerasDiscoveryEnabled() const;
-
-private slots:
-    void at_pingButton_clicked();
-    void showServerCertificate(const QString& id);
 
 private:
-    QScopedPointer<Ui::ServerSettingsWidget> ui;
+    QScopedPointer<Ui::FailoverWidget> ui;
 
-    class Private;
+    struct Private;
     nx::utils::ImplPtr<Private> d;
-
-    QnMediaServerResourcePtr m_server;
-    QString m_initServerName;
 };
+
+} // namespace nx::vms::client::desktop
