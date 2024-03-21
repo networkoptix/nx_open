@@ -1377,7 +1377,7 @@
     </message>
     <message>
       <source>Cloud owner account</source>
-      <translation type="unfinished">Cloud owner account</translation>
+      <translation>Akun pemilik cloud</translation>
     </message>
     <message>
       <source>Cloud System ID</source>
@@ -1433,7 +1433,7 @@
     </message>
     <message>
       <source>Event log period (days)</source>
-      <translation type="unfinished">Event log period (days)</translation>
+      <translation>Periode event log (hari)</translation>
     </message>
     <message>
       <source>Enforce HTTPS (data traffic encryption)</source>
@@ -1553,7 +1553,7 @@
     </message>
     <message>
       <source>Default video codec</source>
-      <translation type="unfinished">Default video codec</translation>
+      <translation>Default video codec</translation>
     </message>
     <message>
       <source>Default codec for export video</source>

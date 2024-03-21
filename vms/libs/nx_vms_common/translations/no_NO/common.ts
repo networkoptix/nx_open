@@ -1436,7 +1436,7 @@
     </message>
     <message>
       <source>Cloud owner account</source>
-      <translation>Cloud eierkonto</translation>
+      <translation>Eiers skykonto</translation>
     </message>
     <message>
       <source>Cloud System ID</source>
