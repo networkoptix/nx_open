@@ -38,6 +38,7 @@
 #include <nx/vms/client/desktop/utils/local_file_cache.h>
 #include <nx/vms/client/desktop/utils/server_image_cache.h>
 #include <nx/vms/client/desktop/utils/server_notification_cache.h>
+#include <nx/vms/client/desktop/utils/server_remote_access_watcher.h>
 #include <nx/vms/client/desktop/utils/video_cache.h>
 #include <nx/vms/client/desktop/videowall/desktop_camera_initializer.h>
 #include <nx/vms/client/desktop/videowall/videowall_online_screens_watcher.h>
@@ -90,6 +91,7 @@ struct SystemContext::Private
     std::unique_ptr<LocalFileCache> localFileCache;
     std::unique_ptr<ServerImageCache> serverImageCache;
     std::unique_ptr<ServerNotificationCache> serverNotificationCache;
+    std::unique_ptr<ServerRemoteAccessWatcher> serverRemoteAccessWatcher;
 
     void initLocalRuntimeInfo()
     {
@@ -153,6 +155,7 @@ SystemContext::SystemContext(
             d->localFileCache = std::make_unique<LocalFileCache>(this);
             d->serverImageCache = std::make_unique<ServerImageCache>(this);
             d->serverNotificationCache = std::make_unique<ServerNotificationCache>(this);
+            d->serverRemoteAccessWatcher = std::make_unique<ServerRemoteAccessWatcher>(this);
             break;
 
         case Mode::crossSystem:

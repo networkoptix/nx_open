@@ -804,6 +804,9 @@ std::vector<nx::vms::api::PortForwardingConfiguration>
 {
     std::vector<nx::vms::api::PortForwardingConfiguration> result;
     auto serialized = getProperty(ResourcePropertyKey::Server::kPortForwardingConfigurations);
+    if (serialized.isEmpty())
+        return result;
+
     NX_ASSERT(QJson::deserialize(serialized, &result), serialized);
     return result;
 }

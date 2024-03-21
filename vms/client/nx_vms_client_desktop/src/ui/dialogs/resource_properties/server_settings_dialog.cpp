@@ -28,6 +28,7 @@
 #include <nx/vms/client/desktop/resource_properties/server/watchers/server_settings_backup_storages_watcher.h>
 #include <nx/vms/client/desktop/resource_properties/server/watchers/server_settings_saas_state_watcher.h>
 #include <nx/vms/client/desktop/resource_properties/server/widgets/backup_settings_widget.h>
+#include <nx/vms/client/desktop/resource_properties/server/widgets/failover_widget.h>
 #include <nx/vms/client/desktop/resource_properties/server/widgets/server_plugins_settings_widget.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/html/html.h>
@@ -55,6 +56,7 @@ struct QnServerSettingsDialog::Private
     PoeSettingsWidget* const poeSettingsPage;
     ServerPluginsSettingsWidget* const pluginsPage;
     BackupSettingsWidget* const backupPage;
+    FailoverWidget* const failoverPage;
     QLabel* const webPageLink;
 
     Private(QnServerSettingsDialog* q):
@@ -71,6 +73,7 @@ struct QnServerSettingsDialog::Private
             ? new ServerPluginsSettingsWidget(store, appContext()->qmlEngine(), q)
             : nullptr),
         backupPage(new BackupSettingsWidget(store, q)),
+        failoverPage(new FailoverWidget(q)),
         webPageLink(new QLabel(q))
     {
     }
@@ -113,6 +116,7 @@ QnServerSettingsDialog::QnServerSettingsDialog(QWidget* parent) :
     addPage(StatisticsPage, d->statisticsPage, tr("Storage Analytics"));
     addPage(PoePage, d->poeSettingsPage, tr("PoE"));
     addPage(BackupPage, d->backupPage, tr("Backup"));
+    addPage(FailoverPage, d->failoverPage, tr("Failover"));
     d->updatePoeSettingsPageVisibility();
 
     if (ini().pluginInformationInServerSettings)
@@ -212,6 +216,7 @@ void QnServerSettingsDialog::setServer(const QnMediaServerResourcePtr& server)
     d->storagesPage->setServer(server);
     d->poeSettingsPage->setServer(server);
     d->backupPage->setServer(server);
+    d->failoverPage->setServer(server);
 
     if (d->server)
     {

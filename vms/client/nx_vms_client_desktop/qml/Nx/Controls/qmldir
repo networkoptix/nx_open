@@ -17,6 +17,7 @@ Button 1.0 Button.qml
 CheckableTableView 1.0 CheckableTableView.qml
 CheckBox 1.0 CheckBox.qml
 CheckBoxImage 1.0 CheckBoxImage.qml
+ClipboardCopyButton 1.0 ClipboardCopyButton.qml
 ComboBox 1.0 ComboBox.qml
 CompactTabButton 1.0 CompactTabButton.qml
 CompactMenu 1.0 CompactMenu.qml
@@ -25,6 +26,7 @@ ContextMenuMouseArea 1.0 ContextMenuMouseArea.qml
 CompactMenuSeparator 1.0 CompactMenuSeparator.qml
 ContextHintButton 1.0 ContextHintButton.qml
 ContextHintLabel 1.0 ContextHintLabel.qml
+CopyableLabel 1.0 CopyableLabel.qml
 DateField 1.0 DateField.qml
 DebugRect 1.0 DebugRect.qml
 DeprecatedIconButton 1.0 DeprecatedIconButton.qml
@@ -54,6 +56,7 @@ NxCirclesPreloader 1.0 NxCirclesPreloader.qml
 NxDotPreloader 1.0 NxDotPreloader.qml
 NumberInput 1.0 NumberInput.qml
 Panel 1.0 Panel.qml
+Placeholder 1.0 Placeholder.qml
 PlatformMenu 1.0 PlatformMenu.qml
 PlatformMenuItem 1.0 PlatformMenuItem.qml
 PlatformMenuSeparator 1.0 PlatformMenuSeparator.qml

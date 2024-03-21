@@ -4,8 +4,8 @@ import QtQuick
 import QtQuick.Window
 
 import Nx
-import Nx.Core
 import Nx.Controls
+import Nx.Core
 
 import nx.vms.client.desktop
 
@@ -15,6 +15,9 @@ Item
 
     implicitWidth: copyButton.width
     implicitHeight: copyButton.height
+
+    /** Reference to object with text property to be copied. */
+    required property var textFieldReference
 
     readonly property bool hovered: copyButton.hovered
     readonly property bool animationRunning: iconsCrossFade.running
@@ -96,7 +99,7 @@ Item
 
     function copy()
     {
-        NxGlobals.copyToClipboard(labelTextField.text)
+        NxGlobals.copyToClipboard(textFieldReference.text)
         iconsCrossFade.start()
     }
 }
