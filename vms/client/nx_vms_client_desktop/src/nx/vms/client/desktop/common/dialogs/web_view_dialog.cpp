@@ -8,7 +8,10 @@
 #include <QtWidgets/QFrame>
 #include <QtWidgets/QVBoxLayout>
 
+#include <nx/network/ssl/certificate.h>
 #include <nx/vms/client/desktop/common/widgets/web_widget.h>
+#include <nx/vms/client/desktop/ui/dialogs/web_page_certificate_dialog.h>
+#include <nx/vms/client/desktop/window_context.h>
 
 namespace {
 
@@ -51,7 +54,25 @@ void WebViewDialog::init(
     std::shared_ptr<AbstractWebAuthenticator> authenticator,
     bool checkCertificate)
 {
-    if (!checkCertificate)
+    if (checkCertificate)
+    {
+        m_webWidget->controller()->setCertificateValidator(
+            [context](const QString& certificateChain, const QUrl& url)
+            {
+                if (certificateChain.isEmpty())
+                    return false;
+
+                const auto chain =
+                    nx::network::ssl::Certificate::parse(certificateChain.toStdString());
+
+                if (chain.empty())
+                    return false;
+
+                return WebPageCertificateDialog(context->mainWindowWidget(), url).exec()
+                    == QDialogButtonBox::AcceptRole;
+            });
+    }
+    else
     {
         m_webWidget->controller()->setCertificateValidator(
             [](const QString& /*certificateChain*/, const QUrl&) { return true; });
