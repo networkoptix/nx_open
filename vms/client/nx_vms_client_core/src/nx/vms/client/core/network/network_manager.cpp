@@ -6,7 +6,6 @@
 #include <nx/network/http/http_async_client.h>
 #include <nx/reflect/string_conversion.h>
 #include <nx/utils/thread/mutex.h>
-#include <nx/vms/auth/auth_result.h>
 #include <nx_ec/ec_api_common.h>
 
 using AsyncClient = nx::network::http::AsyncClient;

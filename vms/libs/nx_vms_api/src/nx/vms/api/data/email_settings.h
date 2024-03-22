@@ -7,9 +7,9 @@
 
 #include <nx/branding.h>
 #include <nx/reflect/instrument.h>
+#include <nx/utils/type_traits.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/data/data_macros.h>
-#include <nx/vms/api/data/type_traits.h>
 #include <nx/vms/api/types/smtp_types.h>
 
 namespace nx::vms::api {

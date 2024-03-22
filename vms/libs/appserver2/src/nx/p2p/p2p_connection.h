@@ -34,7 +34,7 @@ public:
         const vms::api::PeerDataEx& localPeer,
         P2pTransportPtr p2pTransport,
         const QUrlQuery& requestUrlQuery,
-        const Qn::UserAccessData& userAccessData,
+        const nx::network::rest::UserAccessData& userAccessData,
         std::unique_ptr<QObject> opaqueObject,
         ConnectionLockGuard connectionLockGuard);
 
@@ -42,14 +42,14 @@ public:
 
     virtual ~Connection() override;
 
-    const Qn::UserAccessData& userAccessData() const { return m_userAccessData; }
+    const nx::network::rest::UserAccessData& userAccessData() const { return m_userAccessData; }
     virtual bool validateRemotePeerData(const vms::api::PeerDataEx& peer) const override;
 
 protected:
     virtual bool fillAuthInfo(nx::network::http::AsyncClient* httpClient, bool authByKey) override;
 
 private:
-    const Qn::UserAccessData m_userAccessData = Qn::kSystemAccess;
+    const nx::network::rest::UserAccessData m_userAccessData = nx::network::rest::kSystemAccess;
     ValidateRemotePeerFunc m_validateRemotePeerFunc;
     std::optional<nx::network::http::Credentials> m_credentials;
 };

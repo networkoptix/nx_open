@@ -16,7 +16,7 @@
 #include <boost/multi_index/ordered_index.hpp>
 #include <boost/multi_index_container.hpp>
 
-#include <core/resource_access/user_access_data.h>
+#include <nx/network/rest/user_access_data.h>
 #include <nx/utils/type_utils.h>
 #include <nx/vms/api/data/analytics_data.h>
 #include <nx/vms/api/data/camera_attributes_data.h>
@@ -104,25 +104,25 @@ struct NoneType {};
 template<typename ParamType>
 using CheckSavePermissionFuncType = std::function<Result(
     nx::vms::common::SystemContext* systemContext,
-    const Qn::UserAccessData& accessData,
+    const nx::network::rest::UserAccessData& accessData,
     const ParamType&)>;
 
 template<typename ParamType>
 using CheckReadPermissionFuncType = std::function<Result(
     nx::vms::common::SystemContext* systemContext,
-    const Qn::UserAccessData& accessData,
+    const nx::network::rest::UserAccessData& accessData,
     ParamType&)>;
 
 template<typename ParamType>
 using FilterByReadPermissionFuncType = std::function<void(
     nx::vms::common::SystemContext* systemContext,
-    const Qn::UserAccessData& accessData,
+    const nx::network::rest::UserAccessData& accessData,
     ParamType&)>;
 
 template<typename ParamType>
 using CheckRemotePeerAccessFuncType = std::function<RemotePeerAccess(
     nx::vms::common::SystemContext* systemContext,
-    const Qn::UserAccessData& accessData,
+    const nx::network::rest::UserAccessData& accessData,
     const ParamType&)>;
 
 template<typename ParamType>

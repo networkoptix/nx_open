@@ -12,6 +12,7 @@
 #include <nx/network/http/custom_headers.h>
 #include <nx/network/http/http_async_client.h>
 #include <nx/network/nx_network_ini.h>
+#include <nx/network/rest/auth_result.h>
 #include <nx/network/rest/result.h>
 #include <nx/network/ssl/certificate.h>
 #include <nx/network/url/url_builder.h>
@@ -22,7 +23,6 @@
 #include <nx/utils/serialization/qjson.h>
 #include <nx/utils/serialization/qt_containers_reflect_json.h>
 #include <nx/vms/api/data/server_model.h>
-#include <nx/vms/auth/auth_result.h>
 #include <nx/vms/client/core/utils/cloud_session_token_updater.h>
 #include <nx/vms/common/saas/saas_service_manager.h>
 #include <nx_ec/ec_api_common.h>
@@ -60,7 +60,7 @@ ExternalErrorHandler expectedErrorCodes(ExternalErrorMap errorCodes)
 
 std::optional<RemoteConnectionErrorCode> unauthorizedErrorDetails(const HttpHeaders& headers)
 {
-    using AuthResult = nx::vms::common::AuthResult;
+    using AuthResult = nx::network::rest::AuthResult;
 
     AuthResult authResult;
     const auto authResultStr = getHeaderValue(headers, Qn::AUTH_RESULT_HEADER_NAME);

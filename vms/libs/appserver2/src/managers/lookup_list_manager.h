@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <core/resource_access/user_access_data.h>
+#include <nx/network/rest/user_access_data.h>
 #include <nx/vms/api/data/lookup_list_data.h>
 #include <nx_ec/managers/abstract_lookup_list_manager.h>
 #include <transaction/transaction.h>
@@ -13,7 +13,7 @@ template<class QueryProcessorType>
 class LookupListManager: public AbstractLookupListManager
 {
 public:
-    LookupListManager(QueryProcessorType* queryProcessor, const Qn::UserSession& userSession);
+    LookupListManager(QueryProcessorType* queryProcessor, const nx::network::rest::UserSession& userSession);
 
     virtual int getLookupLists(
         Handler<nx::vms::api::LookupListDataList> handler,
@@ -34,12 +34,12 @@ private:
 
 private:
     QueryProcessorType* const m_queryProcessor;
-    Qn::UserSession m_userSession;
+    nx::network::rest::UserSession m_userSession;
 };
 
 template<typename QueryProcessorType>
 LookupListManager<QueryProcessorType>::LookupListManager(
-    QueryProcessorType* queryProcessor, const Qn::UserSession& userSession)
+    QueryProcessorType* queryProcessor, const nx::network::rest::UserSession& userSession)
     :
     m_queryProcessor(queryProcessor),
     m_userSession(userSession)

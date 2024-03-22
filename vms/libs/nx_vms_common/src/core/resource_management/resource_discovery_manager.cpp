@@ -41,7 +41,7 @@ QnManualCameraInfo::QnManualCameraInfo(
     const QAuthenticator& auth,
     const QString& resType,
     const QString& physicalId,
-    Qn::UserSession userSession)
+    nx::network::rest::UserSession userSession)
     :
     url(url),
     resType(qnResTypePool->getResourceTypeByName(resType)),
@@ -533,14 +533,14 @@ bool QnResourceDiscoveryManager::processDiscoveredResources(QnResourceList& reso
 }
 
 QnManualCameraInfo QnResourceDiscoveryManager::manualCameraInfo(
-    const QnSecurityCamResourcePtr& camera, const Qn::UserSession& userSession) const
+    const QnSecurityCamResourcePtr& camera, const nx::network::rest::UserSession& userSession) const
 {
     NX_MUTEX_LOCKER lock(&m_searchersListMutex);
     return manualCameraInfoUnsafe(camera, userSession);
 }
 
 QnManualCameraInfo QnResourceDiscoveryManager::manualCameraInfoUnsafe(
-    const QnSecurityCamResourcePtr& camera, const Qn::UserSession& userSession) const
+    const QnSecurityCamResourcePtr& camera, const nx::network::rest::UserSession& userSession) const
 {
     const auto resourceTypeId = camera->getTypeId();
     QnResourceTypePtr resourceType = qnResTypePool->getResourceType(resourceTypeId);

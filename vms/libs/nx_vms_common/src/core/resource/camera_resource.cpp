@@ -6,12 +6,12 @@
 
 #include <common/common_module.h>
 #include <core/resource/camera_media_stream_info.h>
-#include <core/resource_access/user_access_data.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
 #include <nx/build_info.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/kit/utils.h>
+#include <nx/network/rest/user_access_data.h>
 #include <nx/reflect/string_conversion.h>
 #include <nx/utils/crypt/symmetrical.h>
 #include <nx/utils/log/log_main.h>

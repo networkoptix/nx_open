@@ -8,10 +8,10 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/instrument.h>
+#include <nx/utils/type_traits.h>
 
 #include "media_server_data.h"
 #include "resource_data.h"
-#include "type_traits.h"
 
 namespace nx::vms::api {
 
@@ -59,8 +59,8 @@ struct NX_VMS_API StorageModel: ResourceWithParameters
 
     nx::Uuid getId() const { return id; }
     void setId(nx::Uuid id_) { id = std::move(id_); }
-    static_assert(isCreateModelV<StorageModel>);
-    static_assert(isUpdateModelV<StorageModel>);
+    static_assert(nx::utils::isCreateModelV<StorageModel>);
+    static_assert(nx::utils::isUpdateModelV<StorageModel>);
 
     DbUpdateTypes toDbTypes() &&;
     static std::vector<StorageModel> fromDbTypes(DbListTypes data);

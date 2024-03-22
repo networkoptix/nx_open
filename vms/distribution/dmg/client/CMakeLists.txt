@@ -133,6 +133,7 @@ if(CMAKE_BUILD_TYPE MATCHES "RelWithDebInfo")
     if(withDesktopClient OR withMediaServer OR withTestCamera)
         set(libs_debug_dependencies
             nx_network
+            nx_network_rest
             nx_pathkit
             nx_utils
             nx_fusion

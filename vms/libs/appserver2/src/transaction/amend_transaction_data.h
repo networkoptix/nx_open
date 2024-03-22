@@ -5,7 +5,7 @@
 #include <vector>
 
 #include <core/resource/resource_property_key.h>
-#include <core/resource_access/user_access_data.h>
+#include <nx/network/rest/user_access_data.h>
 #include <nx/vms/api/data/full_info_data.h>
 #include <nx/vms/api/data/resource_data.h>
 #include <transaction/transaction.h>
@@ -20,58 +20,58 @@ extern const std::set<QString> kResourceParamToAmend;
 
 // Returns true if data has been amended.
 template <typename T>
-bool amendOutputDataIfNeeded(const Qn::UserAccessData&, QnResourceAccessManager*, T*)
+bool amendOutputDataIfNeeded(const nx::network::rest::UserAccessData&, QnResourceAccessManager*, T*)
 {
     return false;
 }
 
-bool amendOutputDataIfNeeded(const Qn::UserAccessData& accessData,
+bool amendOutputDataIfNeeded(const nx::network::rest::UserAccessData& accessData,
     QnResourceAccessManager* accessManager,
     nx::vms::api::UserData* userData);
 
-bool amendOutputDataIfNeeded(const Qn::UserAccessData& accessData,
+bool amendOutputDataIfNeeded(const nx::network::rest::UserAccessData& accessData,
     QnResourceAccessManager* accessManager,
     nx::vms::api::ResourceParamData* paramData);
 
-bool amendOutputDataIfNeeded(const Qn::UserAccessData& accessData,
+bool amendOutputDataIfNeeded(const nx::network::rest::UserAccessData& accessData,
     QnResourceAccessManager* accessManager,
     nx::vms::api::ResourceParamWithRefData* paramData);
 
-bool amendOutputDataIfNeeded(const Qn::UserAccessData& accessData,
+bool amendOutputDataIfNeeded(const nx::network::rest::UserAccessData& accessData,
     QnResourceAccessManager* accessManager,
     nx::vms::api::FullInfoData* paramData);
 
-bool amendOutputDataIfNeeded(const Qn::UserAccessData& accessData,
+bool amendOutputDataIfNeeded(const nx::network::rest::UserAccessData& accessData,
     QnResourceAccessManager* accessManager,
     nx::vms::api::CameraDataEx* paramData);
 
-bool amendOutputDataIfNeeded(const Qn::UserAccessData& accessData,
+bool amendOutputDataIfNeeded(const nx::network::rest::UserAccessData& accessData,
     QnResourceAccessManager* accessManager,
     nx::vms::api::EventRuleData* rule);
 
 bool amendOutputDataIfNeeded(
-    const Qn::UserAccessData& accessData,
+    const nx::network::rest::UserAccessData& accessData,
     QnResourceAccessManager* accessManager,
     nx::vms::api::StorageData* storageData);
 
 bool amendOutputDataIfNeeded(
-    const Qn::UserAccessData& accessData,
+    const nx::network::rest::UserAccessData& accessData,
     QnResourceAccessManager* accessManager,
     nx::vms::api::MediaServerData* mediaServerData);
 
 bool amendOutputDataIfNeeded(
-    const Qn::UserAccessData& accessData,
+    const nx::network::rest::UserAccessData& accessData,
     QnResourceAccessManager* accessManager,
     nx::vms::api::MediaServerDataEx* mediaServerDataEx);
 
 bool amendOutputDataIfNeeded(
-    const Qn::UserAccessData& accessData,
+    const nx::network::rest::UserAccessData& accessData,
     QnResourceAccessManager* accessManager,
     nx::vms::api::ServerFootageData* serverFootageData);
 
 template<typename T>
 bool amendOutputDataIfNeeded(
-    const Qn::UserAccessData& accessData,
+    const nx::network::rest::UserAccessData& accessData,
     QnResourceAccessManager* accessManager,
     std::vector<T>* dataList)
 {

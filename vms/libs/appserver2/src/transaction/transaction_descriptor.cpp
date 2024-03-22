@@ -14,11 +14,11 @@
 #include <core/resource_access/access_rights_manager.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/resource_access_subject.h>
-#include <core/resource_access/user_access_data.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/branding.h>
 #include <nx/cloud/db/client/data/auth_data.h>
 #include <nx/media/motion_detection.h>
+#include <nx/network/rest/user_access_data.h>
 #include <nx/utils/qt_helpers.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/vms/api/data/backup_settings.h>
@@ -58,7 +58,7 @@ GlobalPermissions getGlobalPermissions(const SystemContext& context, const nx::U
         ->globalPermissions(context.accessSubjectHierarchy()->subjectById(id));
 }
 
-// Access and User info of the caller. Unlike `Qn::UserAccessData` can't represent 'Access::System'.
+// Access and User info of the caller. Unlike `nx::network::rest::UserAccessData` can't represent 'Access::System'.
 struct UserAccessorInfo
 {
     nx::Uuid id;
@@ -66,7 +66,7 @@ struct UserAccessorInfo
     GlobalPermissions permissions;
 };
 
-auto userAccessorInfo(const SystemContext& context, const Qn::UserAccessData& access)
+auto userAccessorInfo(const SystemContext& context, const nx::network::rest::UserAccessData& access)
     -> std::pair<UserAccessorInfo, Result>
 {
     const auto existingUser =
@@ -831,7 +831,7 @@ void apiIdDataListTriggerNotificationHelper(
 struct InvalidAccess
 {
     template<typename Param>
-    Result operator()(SystemContext*, const Qn::UserAccessData&, const Param&)
+    Result operator()(SystemContext*, const nx::network::rest::UserAccessData&, const Param&)
     {
         NX_ASSERT(false, "Invalid access check for %1", typeid(Param));
         return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
@@ -843,7 +843,7 @@ struct InvalidAccessOut
 {
     template<typename Param>
     RemotePeerAccess operator()(SystemContext* systemContext,
-        const Qn::UserAccessData&, const Param&)
+        const nx::network::rest::UserAccessData&, const Param&)
     {
         NX_ASSERT(false,
             "Invalid outgoing transaction access check (%1).", typeid(Param));
@@ -851,15 +851,15 @@ struct InvalidAccessOut
     }
 };
 
-bool hasSystemAccess(const Qn::UserAccessData& accessData)
+bool hasSystemAccess(const nx::network::rest::UserAccessData& accessData)
 {
-    return accessData.access == Qn::UserAccessData::Access::System;
+    return accessData.access == nx::network::rest::UserAccessData::Access::System;
 }
 
 struct SystemSuperUserAccessOnly
 {
     template<typename Param>
-    bool operator()(SystemContext*, const Qn::UserAccessData& accessData, const Param&)
+    bool operator()(SystemContext*, const nx::network::rest::UserAccessData& accessData, const Param&)
     {
         return hasSystemAccess(accessData);
     }
@@ -868,7 +868,7 @@ struct SystemSuperUserAccessOnly
 struct SystemSuperUserAccessOnlyOut
 {
     template<typename Param>
-    RemotePeerAccess operator()(SystemContext*, const Qn::UserAccessData& accessData, const Param&)
+    RemotePeerAccess operator()(SystemContext*, const nx::network::rest::UserAccessData& accessData, const Param&)
     {
         return hasSystemAccess(accessData)
             ? RemotePeerAccess::Allowed
@@ -879,7 +879,7 @@ struct SystemSuperUserAccessOnlyOut
 struct AllowForAllAccess
 {
     template<typename Param>
-    Result operator()(SystemContext*, const Qn::UserAccessData&, const Param&)
+    Result operator()(SystemContext*, const nx::network::rest::UserAccessData&, const Param&)
     {
         return Result();
     }
@@ -888,12 +888,12 @@ struct AllowForAllAccess
 struct AllowForAllAccessOut
 {
     template<typename Param>
-    RemotePeerAccess operator()(SystemContext*, const Qn::UserAccessData&, const Param&) { return RemotePeerAccess::Allowed; }
+    RemotePeerAccess operator()(SystemContext*, const nx::network::rest::UserAccessData&, const Param&) { return RemotePeerAccess::Allowed; }
 };
 
 static Result checkExistingResourceAccess(
     SystemContext* systemContext,
-    const Qn::UserAccessData& accessData,
+    const nx::network::rest::UserAccessData& accessData,
     const nx::Uuid& resourceId,
     Qn::Permissions permissions)
 {
@@ -925,19 +925,19 @@ static Result checkExistingResourceAccess(
 }
 
 static Result checkReadResourceAccess(
-    SystemContext* systemContext, const Qn::UserAccessData& accessData, const nx::Uuid& resourceId)
+    SystemContext* systemContext, const nx::network::rest::UserAccessData& accessData, const nx::Uuid& resourceId)
 {
     if (hasSystemAccess(accessData))
         return Result();
 
-    if (accessData.access == Qn::UserAccessData::Access::ReadAllResources)
+    if (accessData.access == nx::network::rest::UserAccessData::Access::ReadAllResources)
         return Result();
 
     return checkExistingResourceAccess(systemContext, accessData, resourceId, Qn::ReadPermission);
 }
 
 static Result checkSaveResourceAccess(
-    SystemContext* systemContext, const Qn::UserAccessData& accessData, const nx::Uuid& resourceId)
+    SystemContext* systemContext, const nx::network::rest::UserAccessData& accessData, const nx::Uuid& resourceId)
 {
     if (hasSystemAccess(accessData))
         return Result();
@@ -950,7 +950,7 @@ struct ModifyResourceAccess
     ModifyResourceAccess() {}
 
     template<typename Param>
-    Result operator()(SystemContext* systemContext, const Qn::UserAccessData& accessData,
+    Result operator()(SystemContext* systemContext, const nx::network::rest::UserAccessData& accessData,
         const Param& param)
     {
         NX_VERBOSE(this,
@@ -998,7 +998,7 @@ struct ModifyStorageAccess
 {
     Result operator()(
         SystemContext* systemContext,
-        const Qn::UserAccessData& accessData,
+        const nx::network::rest::UserAccessData& accessData,
         const nx::vms::api::StorageData& param)
     {
         if (param.url.isEmpty())
@@ -1035,7 +1035,7 @@ struct RemoveResourceAccess
     RemoveResourceAccess()  {}
 
     template<typename Param>
-    Result operator()(SystemContext* systemContext, const Qn::UserAccessData& accessData,
+    Result operator()(SystemContext* systemContext, const nx::network::rest::UserAccessData& accessData,
         const Param& param)
     {
         NX_VERBOSE(this,
@@ -1082,7 +1082,7 @@ struct RemoveResourceAccess
 
 struct SaveUserAccess
 {
-    Result operator()(SystemContext* systemContext, const Qn::UserAccessData& accessData,
+    Result operator()(SystemContext* systemContext, const nx::network::rest::UserAccessData& accessData,
         const nx::vms::api::UserData& param)
     {
         NX_CRITICAL(systemContext);
@@ -1154,7 +1154,7 @@ struct SaveUserAccess
 
     Result operator()(
         SystemContext* systemContext,
-        const Qn::UserAccessData& accessData,
+        const nx::network::rest::UserAccessData& accessData,
         const nx::vms::api::UserDataDeprecated& param)
     {
         return (*this)(systemContext, accessData, param.toUserData());
@@ -1491,7 +1491,7 @@ struct ModifyCameraDataAccess
 {
     Result operator()(
         SystemContext* systemContext,
-        const Qn::UserAccessData& accessData,
+        const nx::network::rest::UserAccessData& accessData,
         const nx::vms::api::CameraData& param)
     {
         if (!hasSystemAccess(accessData))
@@ -1513,27 +1513,27 @@ struct ModifyCameraDataAccess
 };
 
 template<typename Param>
-void applyColumnFilter(SystemContext*, const Qn::UserAccessData& /*accessData*/, Param& /*data*/)
+void applyColumnFilter(SystemContext*, const nx::network::rest::UserAccessData& /*accessData*/, Param& /*data*/)
 {
 }
 
 void applyColumnFilter(
-    SystemContext*, const Qn::UserAccessData& accessData, api::MediaServerData& data)
+    SystemContext*, const nx::network::rest::UserAccessData& accessData, api::MediaServerData& data)
 {
-    if (accessData != Qn::kSystemAccess)
+    if (accessData != nx::network::rest::kSystemAccess)
         data.authKey.clear();
 }
 
 void applyColumnFilter(SystemContext* /*systemContext*/,
-    const Qn::UserAccessData& accessData,
+    const nx::network::rest::UserAccessData& accessData,
     api::MediaServerDataEx& data)
 {
-    if (accessData != Qn::kSystemAccess)
+    if (accessData != nx::network::rest::kSystemAccess)
         data.authKey.clear();
 }
 
 void applyColumnFilter(
-    SystemContext* systemContext, const Qn::UserAccessData& accessData, api::StorageData& data)
+    SystemContext* systemContext, const nx::network::rest::UserAccessData& accessData, api::StorageData& data)
 {
     if (!hasSystemAccess(accessData)
         && !systemContext->resourceAccessManager()->hasPowerUserPermissions(accessData))
@@ -1545,7 +1545,7 @@ void applyColumnFilter(
 struct ReadResourceAccess
 {
     template<typename Param>
-    Result operator()(SystemContext* systemContext, const Qn::UserAccessData& accessData, Param& param)
+    Result operator()(SystemContext* systemContext, const nx::network::rest::UserAccessData& accessData, Param& param)
     {
         if (const auto r = checkReadResourceAccess(systemContext, accessData, param.id); !r)
             return r;
@@ -1558,7 +1558,7 @@ struct ReadResourceAccess
 struct ReadResourceAccessOut
 {
     template<typename Param>
-    RemotePeerAccess operator()(SystemContext* systemContext, const Qn::UserAccessData& accessData, const Param& param)
+    RemotePeerAccess operator()(SystemContext* systemContext, const nx::network::rest::UserAccessData& accessData, const Param& param)
     {
         return checkReadResourceAccess(systemContext, accessData, param.id)
             ? RemotePeerAccess::Allowed
@@ -1570,7 +1570,7 @@ struct ReadResourceParamAccess
 {
     Result operator()(
         SystemContext* systemContext,
-        const Qn::UserAccessData& accessData,
+        const nx::network::rest::UserAccessData& accessData,
         nx::vms::api::ResourceParamWithRefData& param)
     {
         if (const auto r = checkReadResourceAccess(systemContext, accessData, param.resourceId); !r)
@@ -1585,12 +1585,12 @@ struct ReadResourceParamAccess
 
     Result operator()(
         SystemContext* systemContext,
-        const Qn::UserAccessData& accessData,
+        const nx::network::rest::UserAccessData& accessData,
         nx::vms::api::ResourceParamData& param)
     {
         const auto accessManager = systemContext->resourceAccessManager();
-        if (accessData == Qn::kSystemAccess
-            || accessData.access == Qn::UserAccessData::Access::ReadAllResources
+        if (accessData == nx::network::rest::kSystemAccess
+            || accessData.access == nx::network::rest::UserAccessData::Access::ReadAllResources
             || accessManager->hasPowerUserPermissions(accessData))
         {
             return Result();
@@ -1606,7 +1606,7 @@ struct ReadResourceParamAccessOut
 {
     RemotePeerAccess operator()(
         SystemContext* systemContext,
-        const Qn::UserAccessData& accessData,
+        const nx::network::rest::UserAccessData& accessData,
         const nx::vms::api::ResourceParamWithRefData& param)
     {
         return checkReadResourceAccess(systemContext, accessData, param.resourceId)
@@ -1619,12 +1619,12 @@ struct ModifyResourceParamAccess
 {
     static const std::set<QString> kSystemAccessOnlyProperties;
 
-    static QString userNameOrId(const QnUserResourcePtr& user, const Qn::UserAccessData& accessData)
+    static QString userNameOrId(const QnUserResourcePtr& user, const nx::network::rest::UserAccessData& accessData)
     {
         return user ? user->getName() : accessData.userId.toString();
     }
 
-    static QString userNameOrId(const Qn::UserAccessData& accessData, SystemContext* systemContext)
+    static QString userNameOrId(const nx::network::rest::UserAccessData& accessData, SystemContext* systemContext)
     {
         auto user = systemContext->resourcePool()->getResourceById<QnUserResource>(accessData.userId);
         return userNameOrId(user, accessData);
@@ -1648,7 +1648,7 @@ struct ModifyResourceParamAccess
 
     Result checkAnalyticsIntegrationAccess(
         SystemContext* systemContext,
-        const Qn::UserAccessData& accessData,
+        const nx::network::rest::UserAccessData& accessData,
         const nx::vms::api::ResourceParamWithRefData& param)
     {
         const auto resPool = systemContext->resourcePool();
@@ -1666,7 +1666,7 @@ struct ModifyResourceParamAccess
 
     Result checkMetadataStorageAccess(
         SystemContext* systemContext,
-        const Qn::UserAccessData& /*accessData*/,
+        const nx::network::rest::UserAccessData& /*accessData*/,
         const nx::vms::api::ResourceParamWithRefData& param)
     {
         const auto resPool = systemContext->resourcePool();
@@ -1705,7 +1705,7 @@ struct ModifyResourceParamAccess
 
     Result operator()(
         SystemContext* systemContext,
-        const Qn::UserAccessData& accessData,
+        const nx::network::rest::UserAccessData& accessData,
         const nx::vms::api::ResourceParamWithRefData& param)
     {
         if (hasSystemAccess(accessData))
@@ -1787,7 +1787,7 @@ struct ReadFootageDataAccess
 {
     Result operator()(
         SystemContext* systemContext,
-        const Qn::UserAccessData& accessData,
+        const nx::network::rest::UserAccessData& accessData,
         const nx::vms::api::ServerFootageData& param)
     {
         return checkReadResourceAccess(systemContext, accessData, param.serverGuid);
@@ -1798,7 +1798,7 @@ struct ReadFootageDataAccessOut
 {
     RemotePeerAccess operator()(
         SystemContext* systemContext,
-        const Qn::UserAccessData& accessData,
+        const nx::network::rest::UserAccessData& accessData,
         const nx::vms::api::ServerFootageData& param)
     {
         return checkReadResourceAccess(systemContext, accessData, param.serverGuid)
@@ -1811,7 +1811,7 @@ struct ModifyFootageDataAccess
 {
     Result operator()(
         SystemContext* systemContext,
-        const Qn::UserAccessData& accessData,
+        const nx::network::rest::UserAccessData& accessData,
         const nx::vms::api::ServerFootageData& param)
     {
         return checkSaveResourceAccess(systemContext, accessData, param.serverGuid);
@@ -1822,7 +1822,7 @@ struct ReadCameraAttributesAccess
 {
     Result operator()(
         SystemContext* systemContext,
-        const Qn::UserAccessData& accessData,
+        const nx::network::rest::UserAccessData& accessData,
         const nx::vms::api::CameraAttributesData& param)
     {
         return checkReadResourceAccess(systemContext, accessData, param.cameraId);
@@ -1833,7 +1833,7 @@ struct ReadCameraAttributesAccessOut
 {
     RemotePeerAccess operator()(
         SystemContext* systemContext,
-        const Qn::UserAccessData& accessData,
+        const nx::network::rest::UserAccessData& accessData,
         const nx::vms::api::CameraAttributesData& param)
     {
         return checkReadResourceAccess(systemContext, accessData, param.cameraId)
@@ -1846,7 +1846,7 @@ struct ModifyCameraAttributesAccess
 {
     Result operator()(
         SystemContext* systemContext,
-        const Qn::UserAccessData& accessData,
+        const nx::network::rest::UserAccessData& accessData,
         const nx::vms::api::CameraAttributesData& param)
     {
         if (hasSystemAccess(accessData))
@@ -2007,7 +2007,7 @@ struct ModifyCameraAttributesListAccess
 {
     Result operator()(
         SystemContext* systemContext,
-        const Qn::UserAccessData& accessData,
+        const nx::network::rest::UserAccessData& accessData,
         const nx::vms::api::CameraAttributesDataList& param)
     {
         if (hasSystemAccess(accessData))
@@ -2065,7 +2065,7 @@ struct ReadServerAttributesAccess
 {
     Result operator()(
         SystemContext* systemContext,
-        const Qn::UserAccessData& accessData,
+        const nx::network::rest::UserAccessData& accessData,
         const api::MediaServerUserAttributesData& param)
     {
         return checkReadResourceAccess(systemContext, accessData, param.serverId);
@@ -2074,7 +2074,7 @@ struct ReadServerAttributesAccess
 
 struct ReadServerAttributesAccessOut
 {
-    RemotePeerAccess operator()(SystemContext* systemContext, const Qn::UserAccessData& accessData,
+    RemotePeerAccess operator()(SystemContext* systemContext, const nx::network::rest::UserAccessData& accessData,
         const api::MediaServerUserAttributesData& param)
     {
         return checkReadResourceAccess(systemContext, accessData, param.serverId)
@@ -2087,7 +2087,7 @@ struct ModifyServerAttributesAccess
 {
     Result operator()(
         SystemContext* systemContext,
-        const Qn::UserAccessData& accessData,
+        const nx::network::rest::UserAccessData& accessData,
         const api::MediaServerUserAttributesData& param)
     {
         NX_CRITICAL(systemContext);
@@ -2144,7 +2144,7 @@ private:
 
 static Result userHasGlobalAccess(
     SystemContext* systemContext,
-    const Qn::UserAccessData& accessData,
+    const nx::network::rest::UserAccessData& accessData,
     GlobalPermission permissions)
 {
     if (hasSystemAccess(accessData))
@@ -2165,7 +2165,7 @@ static Result userHasGlobalAccess(
 
 static Result userHasAccess(
     SystemContext* systemContext,
-    const Qn::UserAccessData& accessData,
+    const nx::network::rest::UserAccessData& accessData,
     const nx::Uuid& targetResourceOrGroupId,
     nx::vms::api::AccessRights requiredAccess)
 {
@@ -2210,7 +2210,7 @@ class SaveServerDataAccess
 {
 public:
     Result operator()(SystemContext* context,
-        const Qn::UserAccessData& accessData,
+        const nx::network::rest::UserAccessData& accessData,
         const api::MediaServerData& param) const
     {
         NX_CRITICAL(context);
@@ -2263,7 +2263,7 @@ struct PowerUserAccess
 {
     template<typename Param>
     Result operator()(
-        SystemContext* systemContext, const Qn::UserAccessData& accessData, const Param&)
+        SystemContext* systemContext, const nx::network::rest::UserAccessData& accessData, const Param&)
     {
         return userHasGlobalAccess(systemContext, accessData, GlobalPermission::powerUser);
     }
@@ -2273,7 +2273,7 @@ struct PowerUserAccessOut
 {
     template<typename Param>
     RemotePeerAccess operator()(
-        SystemContext* systemContext, const Qn::UserAccessData& accessData, const Param&)
+        SystemContext* systemContext, const nx::network::rest::UserAccessData& accessData, const Param&)
     {
         return userHasGlobalAccess(systemContext, accessData, GlobalPermission::powerUser)
             ? RemotePeerAccess::Allowed
@@ -2285,7 +2285,7 @@ struct SaveUserRoleAccess
 {
     Result operator()(
         SystemContext* systemContext,
-        const Qn::UserAccessData& accessData,
+        const nx::network::rest::UserAccessData& accessData,
         const nx::vms::api::UserGroupData& param)
     {
         NX_CRITICAL(systemContext);
@@ -2424,7 +2424,7 @@ struct RemoveUserRoleAccess
 {
     Result operator()(
         SystemContext* systemContext,
-        const Qn::UserAccessData& accessData,
+        const nx::network::rest::UserAccessData& accessData,
         const nx::vms::api::IdData& param)
     {
         if (hasSystemAccess(accessData))
@@ -2574,7 +2574,7 @@ struct VideoWallControlAccess
 {
     Result operator()(
         SystemContext* systemContext,
-        const Qn::UserAccessData& accessData,
+        const nx::network::rest::UserAccessData& accessData,
         const nx::vms::api::VideowallControlMessageData& data)
     {
         return userHasAccess(systemContext, accessData, data.videowallGuid,
@@ -2586,7 +2586,7 @@ struct ShowreelAccess
 {
     Result operator()(
         SystemContext*,
-        const Qn::UserAccessData& accessData,
+        const nx::network::rest::UserAccessData& accessData,
         const nx::vms::api::ShowreelData& showreel)
     {
         if (hasSystemAccess(accessData)
@@ -2606,7 +2606,7 @@ struct ShowreelAccessById
 {
     Result operator()(
         SystemContext* systemContext,
-        const Qn::UserAccessData& accessData,
+        const nx::network::rest::UserAccessData& accessData,
         const nx::vms::api::IdData& showreelId)
     {
         const auto showreel = systemContext->showreelManager()->showreel(
@@ -2620,7 +2620,7 @@ struct ShowreelAccessById
 struct InvalidFilterFunc
 {
     template<typename ParamType>
-    void operator()(SystemContext*, const Qn::UserAccessData&, ParamType&)
+    void operator()(SystemContext*, const nx::network::rest::UserAccessData&, ParamType&)
     {
         NX_ASSERT(false,
             "This transaction (%1) param type doesn't support filtering", typeid(ParamType));
@@ -2632,7 +2632,7 @@ struct AccessOut
 {
     template<typename Param>
     RemotePeerAccess operator()(
-        SystemContext* systemContext, const Qn::UserAccessData& accessData, const Param& param)
+        SystemContext* systemContext, const nx::network::rest::UserAccessData& accessData, const Param& param)
     {
         return SingleAccess()(systemContext, accessData, param)
             ? RemotePeerAccess::Allowed
@@ -2645,7 +2645,7 @@ struct FilterListByAccess
 {
     template<typename ParamContainer>
     void operator()(
-        SystemContext* systemContext, const Qn::UserAccessData& accessData, ParamContainer& outList)
+        SystemContext* systemContext, const nx::network::rest::UserAccessData& accessData, ParamContainer& outList)
     {
         outList.erase(std::remove_if(
             outList.begin(),
@@ -2658,7 +2658,7 @@ struct FilterListByAccess
     }
 
     void operator()(
-        SystemContext* systemContext, const Qn::UserAccessData& accessData, api::MediaServerDataExList& outList)
+        SystemContext* systemContext, const nx::network::rest::UserAccessData& accessData, api::MediaServerDataExList& outList)
     {
         outList.erase(std::remove_if(
             outList.begin(),
@@ -2682,7 +2682,7 @@ struct FilterListByAccess<ModifyResourceAccess>
 
     template<typename ParamContainer>
     void operator()(
-        SystemContext* systemContext, const Qn::UserAccessData& accessData, ParamContainer& outList)
+        SystemContext* systemContext, const nx::network::rest::UserAccessData& accessData, ParamContainer& outList)
     {
         outList.erase(std::remove_if(
             outList.begin(),
@@ -2702,7 +2702,7 @@ struct FilterListByAccess<ModifyResourceParamAccess>
 
     void operator()(
         SystemContext* systemContext,
-        const Qn::UserAccessData& accessData,
+        const nx::network::rest::UserAccessData& accessData,
         nx::vms::api::ResourceParamWithRefDataList& outList)
     {
         outList.erase(std::remove_if(
@@ -2724,7 +2724,7 @@ struct ModifyListAccess
     template<typename ParamContainer>
     Result operator()(
         SystemContext* systemContext,
-        const Qn::UserAccessData& accessData,
+        const nx::network::rest::UserAccessData& accessData,
         const ParamContainer& paramContainer)
     {
         ParamContainer tmpContainer = paramContainer;
@@ -2745,7 +2745,7 @@ template<typename SingleAccess>
 struct ReadListAccess
 {
     template<typename ParamContainer>
-    bool operator()(SystemContext* systemContext, const Qn::UserAccessData& accessData, const ParamContainer& paramContainer)
+    bool operator()(SystemContext* systemContext, const nx::network::rest::UserAccessData& accessData, const ParamContainer& paramContainer)
     {
         ParamContainer tmpContainer = paramContainer;
         FilterListByAccess<SingleAccess>()(systemContext, accessData, tmpContainer);
@@ -2757,7 +2757,7 @@ template<typename SingleAccess>
 struct ReadListAccessOut
 {
     template<typename ParamContainer>
-    RemotePeerAccess operator()(SystemContext* systemContext, const Qn::UserAccessData& accessData, const ParamContainer& paramContainer)
+    RemotePeerAccess operator()(SystemContext* systemContext, const nx::network::rest::UserAccessData& accessData, const ParamContainer& paramContainer)
     {
         ParamContainer tmpContainer = paramContainer;
         FilterListByAccess<SingleAccess>()(systemContext, accessData, tmpContainer);

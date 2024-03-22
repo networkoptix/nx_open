@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <core/resource_access/user_access_data.h>
+#include <nx/network/rest/user_access_data.h>
 #include <nx/vms/api/data/layout_data.h>
 #include <nx_ec/managers/abstract_layout_manager.h>
 #include <transaction/transaction.h>
@@ -13,7 +13,7 @@ template<class QueryProcessorType>
 class QnLayoutManager: public AbstractLayoutManager
 {
 public:
-    QnLayoutManager(QueryProcessorType* queryProcessor, const Qn::UserSession& userSession);
+    QnLayoutManager(QueryProcessorType* queryProcessor, const nx::network::rest::UserSession& userSession);
 
     virtual int getLayouts(
         Handler<nx::vms::api::LayoutDataList> handler,
@@ -34,12 +34,12 @@ private:
 
 private:
     QueryProcessorType* const m_queryProcessor;
-    Qn::UserSession m_userSession;
+    nx::network::rest::UserSession m_userSession;
 };
 
 template<typename QueryProcessorType>
 QnLayoutManager<QueryProcessorType>::QnLayoutManager(
-    QueryProcessorType* queryProcessor, const Qn::UserSession& userSession)
+    QueryProcessorType* queryProcessor, const nx::network::rest::UserSession& userSession)
     :
     m_queryProcessor(queryProcessor),
     m_userSession(userSession)

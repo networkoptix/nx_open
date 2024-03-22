@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <core/resource_access/user_access_data.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/network/rest/user_access_data.h>
 #include <nx/utils/log/log.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/ec_api_common.h>
@@ -16,7 +16,7 @@ template<class QueryProcessorType>
 class QnResourceManager: public AbstractResourceManager
 {
 public:
-    QnResourceManager(QueryProcessorType* queryProcessor, const Qn::UserSession& userSession);
+    QnResourceManager(QueryProcessorType* queryProcessor, const nx::network::rest::UserSession& userSession);
 
     virtual int getResourceTypes(
         Handler<QnResourceTypeList> handler,
@@ -69,12 +69,12 @@ private:
 
 private:
     QueryProcessorType* const m_queryProcessor;
-    Qn::UserSession m_userSession;
+    nx::network::rest::UserSession m_userSession;
 };
 
 template<class T>
 QnResourceManager<T>::QnResourceManager(
-    T* queryProcessor, const Qn::UserSession& userSession)
+    T* queryProcessor, const nx::network::rest::UserSession& userSession)
     :
     m_queryProcessor(queryProcessor),
     m_userSession(userSession)

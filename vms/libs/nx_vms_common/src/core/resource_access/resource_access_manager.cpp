@@ -151,9 +151,9 @@ QnResourceAccessManager::QnResourceAccessManager(
         [this]() { emit permissionsDependencyChanged(QSet<nx::Uuid>({kDefaultLdapGroupId})); });
 }
 
-bool QnResourceAccessManager::hasPowerUserPermissions(const Qn::UserAccessData& accessData) const
+bool QnResourceAccessManager::hasPowerUserPermissions(const nx::network::rest::UserAccessData& accessData) const
 {
-    if (accessData == Qn::kSystemAccess)
+    if (accessData == nx::network::rest::kSystemAccess)
         return true;
 
     return m_accessRightsResolver->hasFullAccessRights(accessData.userId);
@@ -223,10 +223,10 @@ GlobalPermissions QnResourceAccessManager::globalPermissions(
 }
 
 bool QnResourceAccessManager::hasGlobalPermission(
-    const Qn::UserAccessData& accessData,
+    const nx::network::rest::UserAccessData& accessData,
     GlobalPermission requiredPermission) const
 {
-    if (accessData == Qn::kSystemAccess)
+    if (accessData == nx::network::rest::kSystemAccess)
         return true;
 
     const auto user = resourcePool()->getResourceById<QnUserResource>(accessData.userId);
@@ -334,14 +334,14 @@ bool QnResourceAccessManager::hasPermission(
 }
 
 bool QnResourceAccessManager::hasPermission(
-    const Qn::UserAccessData& accessRights,
+    const nx::network::rest::UserAccessData& accessRights,
     const QnResourcePtr& resource,
     Qn::Permissions permissions) const
 {
-    if (accessRights == Qn::kSystemAccess)
+    if (accessRights == nx::network::rest::kSystemAccess)
         return true;
 
-    if (accessRights.access == Qn::UserAccessData::Access::ReadAllResources
+    if (accessRights.access == nx::network::rest::UserAccessData::Access::ReadAllResources
         && permissions == Qn::ReadPermission)
     {
         return true;
@@ -1284,7 +1284,7 @@ bool QnResourceAccessManager::hasAccessToAllCameras(
 }
 
 bool QnResourceAccessManager::hasAccessToAllCameras(
-    const Qn::UserAccessData& userAccessData,
+    const nx::network::rest::UserAccessData& userAccessData,
     nx::vms::api::AccessRights accessRights) const
 {
     return hasAccessToAllCameras(userAccessData.userId, accessRights);

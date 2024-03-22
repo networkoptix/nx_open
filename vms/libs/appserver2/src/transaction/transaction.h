@@ -1912,6 +1912,22 @@ struct TransactionModel
 #define TransactionModel_Fields (id)(info)(binaryDataSizeB)(data)(_error)
 QN_FUSION_DECLARE_FUNCTIONS(TransactionModel, (json))
 
+enum ApiObjectType
+{
+    ApiObject_NotDefined,
+    ApiObject_Server,
+    ApiObject_Camera,
+    ApiObject_User,
+    ApiObject_Layout,
+    ApiObject_Videowall,
+    ApiObject_BusinessRule,
+    ApiObject_VmsRule,
+    ApiObject_Storage,
+    ApiObject_WebPage,
+    ApiObject_AnalyticsPlugin,
+    ApiObject_AnalyticsEngine,
+};
+
 int generateRequestID();
 
 } // namespace ec2

@@ -10,13 +10,13 @@
 
 #include <api/model/audit/audit_details.h>
 #include <api/model/audit/audit_record.h>
-#include <api/model/audit/auth_session.h>
+#include <nx/network/rest/user_access_data.h>
 #include <nx/utils/thread/mutex.h>
 #include <recording/time_period.h>
 
 #include "audit_manager_fwd.h"
 
-namespace Qn { struct UserAccessData; }
+namespace nx::network::rest { struct UserAccessData; }
 
 class NX_VMS_COMMON_API QnAuditManager
 {
@@ -30,13 +30,13 @@ public:
     /* notify new playback was started from position timestamp
     *  return internal ID of started session
     */
-    virtual AuditHandle notifyPlaybackStarted(const QnAuthSession& session, const nx::Uuid& id, qint64 timestampUsec, bool isExport = false) = 0;
+    virtual AuditHandle notifyPlaybackStarted(const nx::network::rest::AuthSession& session, const nx::Uuid& id, qint64 timestampUsec, bool isExport = false) = 0;
     virtual void notifyPlaybackInProgress(const AuditHandle& handle, qint64 timestampUsec) = 0;
-    virtual void notifySettingsChanged(const QnAuthSession& authInfo, std::map<QString, QString> settings) = 0;
+    virtual void notifySettingsChanged(const nx::network::rest::AuthSession& authInfo, std::map<QString, QString> settings) = 0;
 
     template <nx::vms::api::AuditRecordType type,
         typename Details = typename details::details_type<type, AllAuditDetails::mapping>::type>
-    int addAuditRecord(const QnAuthSession& authInfo, Details&& details = {})
+    int addAuditRecord(const nx::network::rest::AuthSession& authInfo, Details&& details = {})
     {
         return addAuditRecord(QnAuditRecord::prepareRecord<type>(authInfo,
             std::forward<Details>(details)));
@@ -45,7 +45,7 @@ public:
     virtual int addAuditRecord(const QnAuditRecord& record) = 0;
     virtual void flushAuditRecords() = 0;
 
-    virtual void at_connectionOpened(const QnAuthSession& session, const Qn::UserAccessData& accessRights) = 0;
-    virtual void at_connectionClosed(const QnAuthSession& session) = 0;
+    virtual void at_connectionOpened(const nx::network::rest::AuthSession& session, const nx::network::rest::UserAccessData& accessRights) = 0;
+    virtual void at_connectionClosed(const nx::network::rest::AuthSession& session) = 0;
     virtual void stop() = 0;
 };

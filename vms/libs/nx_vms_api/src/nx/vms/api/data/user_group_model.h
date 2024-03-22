@@ -64,8 +64,8 @@ struct NX_VMS_API UserGroupModel
     nx::Uuid getId() const { return id; }
     void setId(nx::Uuid id_) { id = std::move(id_); }
 
-    static_assert(isCreateModelV<UserGroupModel>);
-    static_assert(isUpdateModelV<UserGroupModel>);
+    static_assert(nx::utils::isCreateModelV<UserGroupModel>);
+    static_assert(nx::utils::isUpdateModelV<UserGroupModel>);
 
     DbUpdateTypes toDbTypes() &&;
     static std::vector<UserGroupModel> fromDbTypes(DbListTypes data);

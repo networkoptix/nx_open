@@ -23,6 +23,7 @@
 #include <nx/api/mediaserver/requests_fwd.h>
 #include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/network/http/http_types.h>
+#include <nx/network/rest/auth_result.h>
 #include <nx/network/rest/params.h>
 #include <nx/network/rest/result.h>
 #include <nx/utils/async_handler_executor.h>
@@ -58,7 +59,6 @@
 #include <nx/vms/api/data/user_group_model.h>
 #include <nx/vms/api/data/user_model.h>
 #include <nx/vms/api/rules/acknowledge.h>
-#include <nx/vms/auth/auth_result.h>
 #include <nx/vms/event/event_fwd.h>
 #include <nx/vms/utils/abstract_session_token_helper.h>
 #include <recording/time_period_list.h>
@@ -725,7 +725,7 @@ public:
     using LdapAuthenticateCallback = std::function<void(
         Handle requestId,
         ErrorOrData<nx::vms::api::UserModelV3> userOrError,
-        nx::vms::common::AuthResult authResult)>;
+        nx::network::rest::AuthResult authResult)>;
 
     Handle ldapAuthenticateAsync(
         const nx::vms::api::Credentials& credentials,

@@ -35,7 +35,7 @@ public:
         Qn::SerializationFormat serializationFormat);
     virtual ~QueryProcessor() override;
 
-    QueryProcessor& getAccess(const Qn::UserSession& /*session*/) { return *this; }
+    QueryProcessor& getAccess(const nx::network::rest::UserSession& /*session*/) { return *this; }
 
 private:
     void pleaseStopSync();

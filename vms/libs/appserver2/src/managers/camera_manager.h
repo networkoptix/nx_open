@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <api/model/audit/auth_session.h>
+#include <nx/network/rest/user_access_data.h>
 #include <nx_ec/managers/abstract_camera_manager.h>
 #include <rest/request_type_wrappers.h>
 #include <transaction/transaction.h>
@@ -13,7 +13,7 @@ template<class QueryProcessorType>
 class QnCameraManager: public AbstractCameraManager
 {
 public:
-    QnCameraManager(QueryProcessorType* queryProcessor, const Qn::UserSession& userSession);
+    QnCameraManager(QueryProcessorType* queryProcessor, const nx::network::rest::UserSession& userSession);
 
     virtual int getCameras(
         Handler<nx::vms::api::CameraDataList> handler,
@@ -76,12 +76,12 @@ private:
 
 private:
     QueryProcessorType* const m_queryProcessor;
-    Qn::UserSession m_userSession;
+    nx::network::rest::UserSession m_userSession;
 };
 
 template<class QueryProcessorType>
 QnCameraManager<QueryProcessorType>::QnCameraManager(
-    QueryProcessorType* queryProcessor, const Qn::UserSession& userSession)
+    QueryProcessorType* queryProcessor, const nx::network::rest::UserSession& userSession)
     :
     m_queryProcessor(queryProcessor),
     m_userSession(userSession)

@@ -7,9 +7,9 @@
 #include <api/server_rest_connection.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
+#include <nx/network/rest/auth_result.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/url.h>
-#include <nx/vms/auth/auth_result.h>
 #include <nx/vms/client/desktop/common/widgets/busy_indicator_button.h>
 #include <nx/vms/client/desktop/common/widgets/password_input_field.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
@@ -241,7 +241,7 @@ void SessionRefreshDialog::validatePassword(const nx::vms::api::LoginSessionRequ
     {
         m_validationResult = ValidationResult(
             QValidator::Invalid,
-            nx::vms::common::toErrorMessage(nx::vms::common::Auth_WrongPassword));
+            nx::network::rest::toErrorMessage(nx::network::rest::Auth_WrongPassword));
     }
 
     validationResultReady();

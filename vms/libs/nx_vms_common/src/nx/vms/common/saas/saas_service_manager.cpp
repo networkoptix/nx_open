@@ -159,7 +159,7 @@ void ServiceManager::setSaasStateInternal(api::SaasState saasState, bool waitFor
             QString::fromStdString(nx::reflect::json::serialize(d)));
         nx::vms::api::ResourceParamWithRefDataList dataList;
         dataList.push_back(data);
-        connection->getResourceManager(Qn::kSystemSession)->save(
+        connection->getResourceManager(nx::network::rest::kSystemSession)->save(
             dataList,
             [promise](int, ec2::ErrorCode)
             {

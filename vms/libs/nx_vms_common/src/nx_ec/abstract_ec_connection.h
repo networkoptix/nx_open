@@ -5,8 +5,8 @@
 #include <QtCore/QObject>
 #include <QtCore/QString>
 
-#include <core/resource_access/user_access_data.h>
 #include <nx/network/http/auth_tools.h>
+#include <nx/network/rest/user_access_data.h>
 #include <nx/network/socket_common.h>
 #include <nx/network/ssl/helpers.h>
 #include <nx/utils/async_handler_executor.h>
@@ -74,37 +74,37 @@ public:
     virtual bool resyncTransactionLog(const std::set<nx::Uuid>& filter = std::set<nx::Uuid>()) = 0;
 
     virtual AbstractResourceManagerPtr getResourceManager(
-        const Qn::UserSession& userSession) = 0;
+        const nx::network::rest::UserSession& userSession) = 0;
     virtual AbstractMediaServerManagerPtr getMediaServerManager(
-        const Qn::UserSession& userSession) = 0;
+        const nx::network::rest::UserSession& userSession) = 0;
     virtual AbstractCameraManagerPtr getCameraManager(
-        const Qn::UserSession& userSession) = 0;
+        const nx::network::rest::UserSession& userSession) = 0;
     virtual AbstractLicenseManagerPtr getLicenseManager(
-        const Qn::UserSession& userSession) = 0;
+        const nx::network::rest::UserSession& userSession) = 0;
     virtual AbstractEventRulesManagerPtr getEventRulesManager(
-        const Qn::UserSession& userSession) = 0;
+        const nx::network::rest::UserSession& userSession) = 0;
     virtual AbstractVmsRulesManagerPtr getVmsRulesManager(
-        const Qn::UserSession& userSession) = 0;
+        const nx::network::rest::UserSession& userSession) = 0;
     virtual AbstractUserManagerPtr getUserManager(
-        const Qn::UserSession& userSession) = 0;
+        const nx::network::rest::UserSession& userSession) = 0;
     virtual AbstractLayoutManagerPtr getLayoutManager(
-        const Qn::UserSession& userSession) = 0;
+        const nx::network::rest::UserSession& userSession) = 0;
     virtual AbstractShowreelManagerPtr getShowreelManager(
-        const Qn::UserSession& userSession) = 0;
+        const nx::network::rest::UserSession& userSession) = 0;
     virtual AbstractVideowallManagerPtr getVideowallManager(
-        const Qn::UserSession& userSession) = 0;
+        const nx::network::rest::UserSession& userSession) = 0;
     virtual AbstractStoredFileManagerPtr getStoredFileManager(
-        const Qn::UserSession& userSession) = 0;
+        const nx::network::rest::UserSession& userSession) = 0;
     virtual AbstractMiscManagerPtr getMiscManager(
-        const Qn::UserSession& userSession) = 0;
+        const nx::network::rest::UserSession& userSession) = 0;
     virtual AbstractDiscoveryManagerPtr getDiscoveryManager(
-        const Qn::UserSession& userSession) = 0;
+        const nx::network::rest::UserSession& userSession) = 0;
     virtual AbstractWebPageManagerPtr getWebPageManager(
-        const Qn::UserSession& userSession) = 0;
+        const nx::network::rest::UserSession& userSession) = 0;
     virtual AbstractAnalyticsManagerPtr getAnalyticsManager(
-        const Qn::UserSession& userSession) = 0;
+        const nx::network::rest::UserSession& userSession) = 0;
     virtual AbstractLookupListManagerPtr getLookupListManager(
-        const Qn::UserSession& userSession) = 0;
+        const nx::network::rest::UserSession& userSession) = 0;
 
     virtual AbstractResourceNotificationManagerPtr resourceNotificationManager() = 0;
     virtual AbstractMediaServerNotificationManagerPtr mediaServerNotificationManager() = 0;

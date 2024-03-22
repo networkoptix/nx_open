@@ -4,6 +4,7 @@
 
 #include <nx/utils/member_detector.h>
 #include <nx/utils/type_traits.h>
+#include <nx/vms/api/data/data_fwd.h>
 
 namespace ec2::details {
 

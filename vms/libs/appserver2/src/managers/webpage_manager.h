@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <core/resource_access/user_access_data.h>
+#include <nx/network/rest/user_access_data.h>
 #include <nx_ec/managers/abstract_webpage_manager.h>
 #include <transaction/transaction.h>
 
@@ -12,7 +12,7 @@ template<class QueryProcessorType>
 class QnWebPageManager: public AbstractWebPageManager
 {
 public:
-    QnWebPageManager(QueryProcessorType* queryProcessor, const Qn::UserSession& userSession);
+    QnWebPageManager(QueryProcessorType* queryProcessor, const nx::network::rest::UserSession& userSession);
 
     virtual int getWebPages(
         Handler<nx::vms::api::WebPageDataList> handler,
@@ -33,13 +33,13 @@ private:
 
 private:
     QueryProcessorType* const m_queryProcessor;
-    Qn::UserSession m_userSession;
+    nx::network::rest::UserSession m_userSession;
 };
 
 template<class QueryProcessorType>
 QnWebPageManager<QueryProcessorType>::QnWebPageManager(
     QueryProcessorType* queryProcessor,
-    const Qn::UserSession& userSession)
+    const nx::network::rest::UserSession& userSession)
     :
     m_queryProcessor(queryProcessor),
     m_userSession(userSession)

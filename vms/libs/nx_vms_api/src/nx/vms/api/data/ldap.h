@@ -10,9 +10,9 @@
 
 #include <nx/utils/url.h>
 #include <nx/utils/uuid.h>
+#include <nx/utils/void.h>
 
 #include "data_macros.h"
-#include "void.h"
 
 namespace nx::vms::api {
 
@@ -150,7 +150,7 @@ struct NX_VMS_API LdapSettings
     bool removeRecords = false;
 
     bool operator==(const LdapSettings&) const = default;
-    Void getId() const { return {}; }
+    nx::utils::Void getId() const { return {}; }
 
     bool isValid(bool checkPassword = true) const;
     bool isEmpty() const;

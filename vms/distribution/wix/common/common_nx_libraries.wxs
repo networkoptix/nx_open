@@ -17,6 +17,7 @@
             <Component><File Name="nx_codec.dll" KeyPath="yes" DiskId="2"/></Component>
             <Component><File Name="nx_vms_utils.dll" KeyPath="yes" DiskId="2"/></Component>
             <Component><File Name="nx_network.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="nx_network_rest.dll" KeyPath="yes" DiskId="2"/></Component>
             <Component><File Name="nx_kit.dll" KeyPath="yes" DiskId="2"/></Component>
             <Component><File Name="nx_zip.dll" KeyPath="yes" DiskId="2"/></Component>
             <Component><File Name="nx_vms_api.dll" KeyPath="yes" DiskId="2"/></Component>

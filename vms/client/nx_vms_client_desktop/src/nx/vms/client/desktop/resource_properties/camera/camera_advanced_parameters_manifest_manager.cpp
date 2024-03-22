@@ -5,7 +5,6 @@
 #include <api/server_rest_connection.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <nx/network/rest/params.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/desktop/system_context.h>

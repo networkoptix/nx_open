@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <core/resource_access/user_access_data.h>
+#include <nx/network/rest/user_access_data.h>
 #include <nx_ec/managers/abstract_analytics_manager.h>
 #include <transaction/transaction.h>
 
@@ -12,7 +12,7 @@ template<typename QueryProcessor>
 class AnalyticsManager: public AbstractAnalyticsManager
 {
 public:
-    AnalyticsManager(QueryProcessor* queryProcessor, const Qn::UserSession& userSession);
+    AnalyticsManager(QueryProcessor* queryProcessor, const nx::network::rest::UserSession& userSession);
 
     virtual int getAnalyticsPlugins(
         Handler<nx::vms::api::AnalyticsPluginDataList> handler,
@@ -47,12 +47,12 @@ private:
 
 private:
     QueryProcessor* m_queryProcessor;
-    Qn::UserSession m_userSession;
+    nx::network::rest::UserSession m_userSession;
 };
 
 template<typename QueryProcessor>
 AnalyticsManager<QueryProcessor>::AnalyticsManager(
-    QueryProcessor* queryProcessor, const Qn::UserSession& userSession)
+    QueryProcessor* queryProcessor, const nx::network::rest::UserSession& userSession)
     :
     m_queryProcessor(queryProcessor),
     m_userSession(userSession)

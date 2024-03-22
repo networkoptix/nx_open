@@ -54,7 +54,7 @@ void QnBusinessRulesActualModel::saveRule(const QModelIndex& index)
     nx::vms::api::EventRuleData params;
     ec2::fromResourceToApi(rule, params);
 
-    int handle = connection->getEventRulesManager(Qn::kSystemSession)->save(
+    int handle = connection->getEventRulesManager(nx::network::rest::kSystemSession)->save(
         params,
         [this, rule](int requestId, ec2::ErrorCode errorCode)
         {

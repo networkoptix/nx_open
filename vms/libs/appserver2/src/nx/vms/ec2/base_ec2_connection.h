@@ -43,22 +43,22 @@ public:
 
     void init(nx::vms::discovery::Manager* discoveryManager);
 
-    virtual AbstractResourceManagerPtr getResourceManager(const Qn::UserSession& userSession) override;
-    virtual AbstractMediaServerManagerPtr getMediaServerManager(const Qn::UserSession& userSession) override;
-    virtual AbstractCameraManagerPtr getCameraManager(const Qn::UserSession& userSession) override;
-    virtual AbstractLicenseManagerPtr getLicenseManager(const Qn::UserSession& userSession) override;
-    virtual AbstractEventRulesManagerPtr getEventRulesManager(const Qn::UserSession& userSession) override;
-    virtual AbstractVmsRulesManagerPtr getVmsRulesManager(const Qn::UserSession& userSession) override;
-    virtual AbstractUserManagerPtr getUserManager(const Qn::UserSession& userSession) override;
-    virtual AbstractLayoutManagerPtr getLayoutManager(const Qn::UserSession& userSession) override;
-    virtual AbstractShowreelManagerPtr getShowreelManager(const Qn::UserSession& userSession) override;
-    virtual AbstractVideowallManagerPtr getVideowallManager(const Qn::UserSession& userSession) override;
-    virtual AbstractWebPageManagerPtr getWebPageManager(const Qn::UserSession& userSession) override;
-    virtual AbstractStoredFileManagerPtr getStoredFileManager(const Qn::UserSession& userSession) override;
-    virtual AbstractMiscManagerPtr getMiscManager(const Qn::UserSession& userSession) override;
-    virtual AbstractDiscoveryManagerPtr getDiscoveryManager(const Qn::UserSession& userSession) override;
-    virtual AbstractAnalyticsManagerPtr getAnalyticsManager(const Qn::UserSession& userSession) override;
-    virtual AbstractLookupListManagerPtr getLookupListManager(const Qn::UserSession& userSession) override;
+    virtual AbstractResourceManagerPtr getResourceManager(const nx::network::rest::UserSession& userSession) override;
+    virtual AbstractMediaServerManagerPtr getMediaServerManager(const nx::network::rest::UserSession& userSession) override;
+    virtual AbstractCameraManagerPtr getCameraManager(const nx::network::rest::UserSession& userSession) override;
+    virtual AbstractLicenseManagerPtr getLicenseManager(const nx::network::rest::UserSession& userSession) override;
+    virtual AbstractEventRulesManagerPtr getEventRulesManager(const nx::network::rest::UserSession& userSession) override;
+    virtual AbstractVmsRulesManagerPtr getVmsRulesManager(const nx::network::rest::UserSession& userSession) override;
+    virtual AbstractUserManagerPtr getUserManager(const nx::network::rest::UserSession& userSession) override;
+    virtual AbstractLayoutManagerPtr getLayoutManager(const nx::network::rest::UserSession& userSession) override;
+    virtual AbstractShowreelManagerPtr getShowreelManager(const nx::network::rest::UserSession& userSession) override;
+    virtual AbstractVideowallManagerPtr getVideowallManager(const nx::network::rest::UserSession& userSession) override;
+    virtual AbstractWebPageManagerPtr getWebPageManager(const nx::network::rest::UserSession& userSession) override;
+    virtual AbstractStoredFileManagerPtr getStoredFileManager(const nx::network::rest::UserSession& userSession) override;
+    virtual AbstractMiscManagerPtr getMiscManager(const nx::network::rest::UserSession& userSession) override;
+    virtual AbstractDiscoveryManagerPtr getDiscoveryManager(const nx::network::rest::UserSession& userSession) override;
+    virtual AbstractAnalyticsManagerPtr getAnalyticsManager(const nx::network::rest::UserSession& userSession) override;
+    virtual AbstractLookupListManagerPtr getLookupListManager(const nx::network::rest::UserSession& userSession) override;
 
     virtual AbstractLicenseNotificationManagerPtr licenseNotificationManager() override;
     virtual AbstractTimeNotificationManagerPtr timeNotificationManager() override;
@@ -212,7 +212,7 @@ void BaseEc2Connection<QueryProcessorType>::stopReceivingNotifications()
 
 template<class QueryProcessorType>
 AbstractResourceManagerPtr BaseEc2Connection<QueryProcessorType>::getResourceManager(
-    const Qn::UserSession& userSession)
+    const nx::network::rest::UserSession& userSession)
 {
     return std::make_shared<QnResourceManager<QueryProcessorType>>(
         m_queryProcessor, userSession);
@@ -227,7 +227,7 @@ AbstractResourceNotificationManagerPtr
 
 template<class QueryProcessorType>
 AbstractMediaServerManagerPtr BaseEc2Connection<QueryProcessorType>::getMediaServerManager(
-    const Qn::UserSession& userSession)
+    const nx::network::rest::UserSession& userSession)
 {
     return std::make_shared<QnMediaServerManager<QueryProcessorType>>(
         m_queryProcessor, userSession);
@@ -242,7 +242,7 @@ AbstractMediaServerNotificationManagerPtr
 
 template<class QueryProcessorType>
 AbstractCameraManagerPtr BaseEc2Connection<QueryProcessorType>::getCameraManager(
-    const Qn::UserSession& userSession)
+    const nx::network::rest::UserSession& userSession)
 {
     return std::make_shared<QnCameraManager<QueryProcessorType>>(
         m_queryProcessor, userSession);
@@ -257,7 +257,7 @@ AbstractCameraNotificationManagerPtr
 
 template<class QueryProcessorType>
 AbstractLicenseManagerPtr BaseEc2Connection<QueryProcessorType>::getLicenseManager(
-    const Qn::UserSession& userSession)
+    const nx::network::rest::UserSession& userSession)
 {
     return std::make_shared<QnLicenseManager<QueryProcessorType>>(
         m_queryProcessor, userSession);
@@ -272,7 +272,7 @@ AbstractLicenseNotificationManagerPtr
 
 template<class QueryProcessorType>
 AbstractEventRulesManagerPtr BaseEc2Connection<QueryProcessorType>::getEventRulesManager(
-    const Qn::UserSession& userSession)
+    const nx::network::rest::UserSession& userSession)
 {
     return std::make_shared<EventRulesManager<QueryProcessorType>>(
         m_queryProcessor, userSession);
@@ -280,7 +280,7 @@ AbstractEventRulesManagerPtr BaseEc2Connection<QueryProcessorType>::getEventRule
 
 template<class QueryProcessorType>
 AbstractVmsRulesManagerPtr BaseEc2Connection<QueryProcessorType>::getVmsRulesManager(
-    const Qn::UserSession& userSession)
+    const nx::network::rest::UserSession& userSession)
 {
     return std::make_shared<VmsRulesManager<QueryProcessorType>>(m_queryProcessor, userSession);
 }
@@ -301,7 +301,7 @@ AbstractVmsRulesNotificationManagerPtr
 
 template<class QueryProcessorType>
 AbstractUserManagerPtr BaseEc2Connection<QueryProcessorType>::getUserManager(
-    const Qn::UserSession& userSession)
+    const nx::network::rest::UserSession& userSession)
 {
     return std::make_shared<QnUserManager<QueryProcessorType>>(m_queryProcessor, userSession);
 }
@@ -315,14 +315,14 @@ AbstractUserNotificationManagerPtr
 
 template<class QueryProcessorType>
 AbstractLayoutManagerPtr BaseEc2Connection<QueryProcessorType>::getLayoutManager(
-    const Qn::UserSession& userSession)
+    const nx::network::rest::UserSession& userSession)
 {
     return std::make_shared<QnLayoutManager<QueryProcessorType>>(m_queryProcessor, userSession);
 }
 
 template<class QueryProcessorType>
 AbstractShowreelManagerPtr BaseEc2Connection<QueryProcessorType>::getShowreelManager(
-    const Qn::UserSession& userSession)
+    const nx::network::rest::UserSession& userSession)
 {
     return std::make_shared<ShowreelManager<QueryProcessorType>>(m_queryProcessor, userSession);
 }
@@ -343,7 +343,7 @@ AbstractShowreelNotificationManagerPtr
 
 template<class QueryProcessorType>
 AbstractVideowallManagerPtr BaseEc2Connection<QueryProcessorType>::getVideowallManager(
-    const Qn::UserSession& userSession)
+    const nx::network::rest::UserSession& userSession)
 {
     return std::make_shared<QnVideowallManager<QueryProcessorType>>(
         m_queryProcessor, userSession);
@@ -358,7 +358,7 @@ AbstractVideowallNotificationManagerPtr
 
 template<class QueryProcessorType>
 AbstractWebPageManagerPtr BaseEc2Connection<QueryProcessorType>::getWebPageManager(
-    const Qn::UserSession& userSession)
+    const nx::network::rest::UserSession& userSession)
 {
     return std::make_shared<QnWebPageManager<QueryProcessorType>>(
         m_queryProcessor, userSession);
@@ -373,7 +373,7 @@ AbstractWebPageNotificationManagerPtr
 
 template<class QueryProcessorType>
 AbstractStoredFileManagerPtr BaseEc2Connection<QueryProcessorType>::getStoredFileManager(
-    const Qn::UserSession& userSession)
+    const nx::network::rest::UserSession& userSession)
 {
     return std::make_shared<QnStoredFileManager<QueryProcessorType>>(
         m_queryProcessor, userSession);
@@ -388,7 +388,7 @@ AbstractStoredFileNotificationManagerPtr
 
 template<class QueryProcessorType>
 AbstractMiscManagerPtr BaseEc2Connection<QueryProcessorType>::getMiscManager(
-    const Qn::UserSession& userSession)
+    const nx::network::rest::UserSession& userSession)
 {
     return std::make_shared<QnMiscManager<QueryProcessorType>>(m_queryProcessor, userSession);
 }
@@ -402,7 +402,7 @@ AbstractMiscNotificationManagerPtr
 
 template<class QueryProcessorType>
 AbstractDiscoveryManagerPtr BaseEc2Connection<QueryProcessorType>::getDiscoveryManager(
-    const Qn::UserSession& userSession)
+    const nx::network::rest::UserSession& userSession)
 {
     return std::make_shared<QnDiscoveryManager<QueryProcessorType>>(
         m_queryProcessor, userSession);
@@ -424,7 +424,7 @@ AbstractTimeNotificationManagerPtr
 
 template<class QueryProcessorType>
 AbstractAnalyticsManagerPtr BaseEc2Connection<QueryProcessorType>::getAnalyticsManager(
-    const Qn::UserSession& userSession)
+    const nx::network::rest::UserSession& userSession)
 {
     return std::make_shared<AnalyticsManager<QueryProcessorType>>(
         m_queryProcessor, userSession);
@@ -432,7 +432,7 @@ AbstractAnalyticsManagerPtr BaseEc2Connection<QueryProcessorType>::getAnalyticsM
 
 template<class QueryProcessorType>
 AbstractLookupListManagerPtr BaseEc2Connection<QueryProcessorType>::getLookupListManager(
-    const Qn::UserSession& userSession)
+    const nx::network::rest::UserSession& userSession)
 {
     return std::make_shared<LookupListManager<QueryProcessorType>>(m_queryProcessor, userSession);
 }
@@ -463,7 +463,7 @@ int BaseEc2Connection<QueryProcessorType>::dumpDatabase(
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
     const int requestId = generateRequestID();
-    m_queryProcessor->getAccess(Qn::kSystemSession)
+    m_queryProcessor->getAccess(nx::network::rest::kSystemSession)
         .template processQueryAsync<std::nullptr_t, nx::vms::api::DatabaseDumpData>(
             ApiCommand::dumpDatabase,
             nullptr,
@@ -485,7 +485,7 @@ int BaseEc2Connection<QueryProcessorType>::dumpDatabaseToFile(
     dumpFilePathData.path = dumpFilePath;
 
     const int requestId = generateRequestID();
-    m_queryProcessor->getAccess(Qn::kSystemSession)
+    m_queryProcessor->getAccess(nx::network::rest::kSystemSession)
         .template processQueryAsync<
             nx::vms::api::StoredFilePath, nx::vms::api::DatabaseDumpToFileData>(
                 ApiCommand::dumpDatabaseToFile,
@@ -505,7 +505,7 @@ int BaseEc2Connection<QueryProcessorType>::restoreDatabase(
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
     const int requestId = generateRequestID();
-    m_queryProcessor->getAccess(Qn::kSystemSession).processUpdateAsync(
+    m_queryProcessor->getAccess(nx::network::rest::kSystemSession).processUpdateAsync(
         ApiCommand::restoreDatabase,
         data,
         [requestId, handler = handlerExecutor.bind(std::move(handler))](auto&&... args) mutable
