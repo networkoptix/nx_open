@@ -491,7 +491,7 @@
     </message>
     <message>
       <source>Could not allocate sample buffers</source>
-      <translation>サンプルバッファを割り当てることができませんでした</translation>
+      <translation>サンプルバッファーを割り当てることができませんでした</translation>
     </message>
   </context>
   <context>
@@ -1334,11 +1334,11 @@
     </message>
     <message>
       <source>Anonymous statistics report last version</source>
-      <translation>匿名統計レポートの最終バージョン</translation>
+      <translation>匿名統計レポートの最新バージョン</translation>
     </message>
     <message>
       <source>Anonymous statistics report last number</source>
-      <translation>匿名統計レポートの最後の番号</translation>
+      <translation>匿名統計レポートの最終番号</translation>
     </message>
     <message>
       <source>Anonymous statistics time cycle</source>
@@ -1382,11 +1382,11 @@
     </message>
     <message>
       <source>Sync time synchronization interval for network requests</source>
-      <translation>ネットワーク要求の時刻同期間隔を同期する</translation>
+      <translation>ネットワークリクエストの時刻同期間隔を同期する</translation>
     </message>
     <message>
       <source>Sync time epsilon. New value is not applied if time delta less than epsilon</source>
-      <translation>時刻同期の閾値。時刻差がこの設定値より小さい場合、新しい値は適用されません。</translation>
+      <translation>同期時刻イプシロン。時間デルタがイプシロンより小さい場合、新しい値は適用されません</translation>
     </message>
     <message>
       <source>Cloud owner account</source>
@@ -1438,19 +1438,19 @@
     </message>
     <message>
       <source>Use Windows line feed in emails</source>
-      <translation>メールにWindowsラインフィードを使用する</translation>
+      <translation>Eメールで Windows ラインフィードを使用する</translation>
     </message>
     <message>
       <source>Enable audit trail</source>
-      <translation>操作履歴有効</translation>
+      <translation>操作履歴を有効にする</translation>
     </message>
     <message>
       <source>Audit trail period (days, 14-730)</source>
-      <translation>操作履歴保存日数 (日, 14-730)</translation>
+      <translation>操作履歴保存期間 (日, 14-730)</translation>
     </message>
     <message>
       <source>Event log period (days)</source>
-      <translation>イベントログ期間 (日)</translation>
+      <translation>イベントログ保存期間 (日)</translation>
     </message>
     <message>
       <source>Enforce HTTPS (data traffic encryption)</source>
@@ -1494,11 +1494,11 @@
     </message>
     <message>
       <source>Max P2P queue size (bytes, 32-512MB)</source>
-      <translation>最大P2Pキューサイズ (バイト, 32-512MB)</translation>
+      <translation>P2P キューの最大サイズ (バイト, 32-512MB)</translation>
     </message>
     <message>
       <source>Max P2P all clients size (bytes, 32-512MB)</source>
-      <translation>最大P2P全クライアントサイズ (バイト, 32-512MB)</translation>
+      <translation>P2P 全クライアントの最大サイズ (バイト, 32-512MB)</translation>
     </message>
     <message>
       <source>Max record queue size (bytes, 6-96MB)</source>
@@ -1514,11 +1514,11 @@
     </message>
     <message>
       <source>Max RTSP connection duration (seconds)</source>
-      <translation>最大RTSP接続時間 (秒)</translation>
+      <translation>RTSP 接続最大時間 (秒)</translation>
     </message>
     <message>
       <source>Enable cloud-connect UDP hole-punching</source>
-      <translation>クラウド接続UDPホールパンチングを有効にする</translation>
+      <translation>クラウド接続の UDP ホールパンチングを有効にする</translation>
     </message>
     <message>
       <source>Enable cloud-connect relays usage</source>
@@ -1550,11 +1550,11 @@
     </message>
     <message>
       <source>Watermark settings</source>
-      <translation>透かし設定</translation>
+      <translation>ウォーターマーク設定</translation>
     </message>
     <message>
       <source>Session token count limit on a single Server</source>
-      <translation>単一サーバー上のセッショントークン数の制限</translation>
+      <translation>単一サーバー上のセッショントークン数上限</translation>
     </message>
     <message>
       <source>Max session token count per user on single Server</source>
@@ -1562,11 +1562,11 @@
     </message>
     <message>
       <source>Update interval for remote session token cache (other Servers and Cloud)</source>
-      <translation>リモートセッショントークンキャッシュの更新間隔 (他のサーバーとクラウド)</translation>
+      <translation>リモートセッショントークンキャッシュの更新間隔 (他のサーバーおよびクラウド)</translation>
     </message>
     <message>
       <source>Timeout for remote session token cache (other Servers and Cloud)</source>
-      <translation>リモートセッショントークンキャッシュのタイムアウト (他のサーバーとクラウド)</translation>
+      <translation>リモートセッショントークンキャッシュのタイムアウト (他のサーバーおよびクラウド)</translation>
     </message>
     <message>
       <source>Default video codec</source>
@@ -1610,15 +1610,15 @@
     </message>
     <message>
       <source>Force analytics DB storage mount point permissions in case of failure</source>
-      <translation>障害が発生した場合に分析DBストレージのマウントポイントのアクセス許可を強制する</translation>
+      <translation>障害が発生した場合に、分析DBストレージのマウントポイントの権限取得を強制する</translation>
     </message>
     <message>
       <source>Check video stream period (milliseconds)</source>
-      <translation>映像ストリームの期間を確認する (ミリ秒)</translation>
+      <translation>映像ストリーム期間を確認する (ミリ秒)</translation>
     </message>
     <message>
       <source>Storage encryption enabled</source>
-      <translation>ストレージの暗号化が有効です</translation>
+      <translation>ストレージ暗号化有効</translation>
     </message>
     <message>
       <source>Current storage encryption key</source>
@@ -1642,7 +1642,7 @@
     </message>
     <message>
       <source>Media buffer size (KB, 10KB-4MB)</source>
-      <translation>メディアバッファサイズ (KB, 10KB-4MB)</translation>
+      <translation>メディアバッファーサイズ (KB, 10KB-4MB)</translation>
     </message>
     <message>
       <source>Enable cross-domain policy</source>
@@ -1650,7 +1650,7 @@
     </message>
     <message>
       <source>Enable WebSocket for P2P</source>
-      <translation>P2P用WebSocketを有効にする</translation>
+      <translation>P2P用 WebSocket を有効にする</translation>
     </message>
     <message>
       <source>Show Servers in the Resource Tree for non-admins</source>
@@ -1666,11 +1666,11 @@
     </message>
     <message>
       <source>Keep IO port state on when Server connects to the device</source>
-      <translation>サーバーがデバイスに接続する際、IO ポートの状態を維持する</translation>
+      <translation>サーバーがデバイスに接続する際、I/O ポートの状態を維持する</translation>
     </message>
     <message>
       <source>Media buffer size for audio only devices (KB, 1KB-1MB)</source>
-      <translation>音声のみのデバイスに対するメディアバッファサイズ (KB, 1KB-1MB)</translation>
+      <translation>音声のみのデバイスに対するメディアバッファーサイズ (KB, 1KB-1MB)</translation>
     </message>
     <message>
       <source>Enable 2FA for the System</source>
@@ -2122,7 +2122,7 @@
     </message>
     <message>
       <source>Device does not respond to network requests.</source>
-      <translation>デバイスがネットワーク要求に応答しません。</translation>
+      <translation>デバイスがネットワークリクエストに応答しません。</translation>
     </message>
     <message>
       <source>Connection to server is lost.</source>
