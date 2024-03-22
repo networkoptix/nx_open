@@ -110,25 +110,33 @@ QString getToolTip(const CameraButton& data)
     switch (data.type)
     {
         case CameraButton::Type::instant:
+        {
             return data.name;
+        }
         case CameraButton::Type::prolonged:
-            return nx::format("%1 (%2)").args(data.name, data.hint).toQString();
+        {
+            return data.hint.isEmpty()
+                ? data.name
+                : nx::format("%1 (%2)").args(data.name, data.hint).toQString();
+        }
         case CameraButton::Type::checkable:
+        {
             return data.checked
                 ? data.checkedName
                 : data.name;
+        }
         default:
+        {
             return {};
+        }
     }
-};
+}
 
 AggregatedControllerPtr createController()
 {
     auto result = std::make_unique<core::AggregatedCameraButtonController>();
 
-    using IntercomButtonMode = core::TwoWayAudioCameraButtonController::IntercomButtonMode;
-    result->addController<core::TwoWayAudioCameraButtonController>(
-        ButtonGroup::twoWayAudio, IntercomButtonMode::checkable);
+    result->addController<core::TwoWayAudioCameraButtonController>(ButtonGroup::twoWayAudio);
 
     using HintStyle = core::SoftwareTriggerCameraButtonController::HintStyle;
     result->addController<core::SoftwareTriggerCameraButtonController>(

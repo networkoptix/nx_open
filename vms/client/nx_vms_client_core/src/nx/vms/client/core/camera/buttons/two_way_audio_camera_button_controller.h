@@ -15,14 +15,7 @@ class NX_VMS_CLIENT_CORE_API TwoWayAudioCameraButtonController: public BaseCamer
     using base_type = BaseCameraButtonController;
 
 public:
-    enum class IntercomButtonMode
-    {
-        instant,
-        checkable
-    };
-
     TwoWayAudioCameraButtonController(
-        IntercomButtonMode intercomButtonMode,
         CameraButton::Group buttonGroup,
         QObject* parent = nullptr);
     virtual ~TwoWayAudioCameraButtonController() override;
