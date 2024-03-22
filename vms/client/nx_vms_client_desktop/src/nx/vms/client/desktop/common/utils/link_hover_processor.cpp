@@ -2,12 +2,20 @@
 
 #include "link_hover_processor.h"
 
+#include <QtCore/QHash>
 #include <QtCore/QMetaObject>
+#include <QtCore/QPointer>
 #include <QtGui/QMouseEvent>
+#include <QtGui/QTextBlock>
+#include <QtGui/QTextCursor>
+#include <QtGui/QTextDocument>
+#include <QtGui/QTextFragment>
+#include <QtGui/QTextFrame>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QLabel>
 
 #include <nx/vms/client/desktop/style/helper.h>
+#include <nx/vms/common/html/html.h>
 #include <ui/workaround/label_link_tabstop_workaround.h>
 #include <utils/common/delayed.h>
 #include <utils/common/scoped_value_rollback.h>
@@ -28,21 +36,51 @@ bool isAlive(const QPointer<QLabel>& label)
     return label && label->metaObject()->inherits(&QLabel::staticMetaObject);
 }
 
+Qt::TextFormat labelFormat(QLabel* label)
+{
+    const auto format = label->textFormat();
+    if (format != Qt::AutoText)
+        return format;
+
+    return common::html::mightBeHtml(label->text())
+        ? Qt::RichText
+        : Qt::PlainText;
+}
+
+void changeForeground(QTextCursor& cursor, const QColor& color)
+{
+    QTextCharFormat format;
+    format.setForeground(color);
+    cursor.mergeCharFormat(format);
+}
+
 } // namespace
+
+struct LinkHoverProcessor::Private
+{
+    LinkHoverProcessor* const q;
+    const QPointer<QLabel> label;
+    QString alteredText;
+    QString hoveredLink;
+    QTextDocument textDocument{};
+    QTextCursor hoveredLinkCursor;
+    QHash<QString, QTextCursor> linkCursors;
+
+    void handleLinkHovered(const QString& href);
+    void changeLabelState(const QString& text, bool hovered);
+    void checkForOriginalTextChange();
+};
 
 LinkHoverProcessor::LinkHoverProcessor(QLabel* parent):
     QObject(parent),
-    m_label(parent)
+    d(new Private{.q = this, .label = parent})
 {
     NX_ASSERT(parent);
     if (!parent)
         return;
 
-    m_label->setAttribute(Qt::WA_Hover);
-    m_originalText = m_label->text();
-    m_alteredText = m_originalText;
-
-    updateColors(UpdateTime::Now);
+    d->label->setAttribute(Qt::WA_Hover);
+    d->checkForOriginalTextChange();
 
     const auto handledEvents = {
         QEvent::UpdateRequest,
@@ -51,10 +89,10 @@ LinkHoverProcessor::LinkHoverProcessor(QLabel* parent):
         QEvent::HoverLeave,
         QEvent::MouseButtonRelease };
 
-    installEventHandler(m_label, handledEvents, this,
+    installEventHandler(d->label, handledEvents, this,
         [this](QObject* /*object*/, QEvent* event)
         {
-            if (!isAlive(m_label))
+            if (!isAlive(d->label))
                 return;
 
             switch (event->type())
@@ -63,8 +101,7 @@ LinkHoverProcessor::LinkHoverProcessor(QLabel* parent):
                 case QEvent::UpdateLater:
                 case QEvent::Show:
                 {
-                    if (updateOriginalText())
-                        updateColors(UpdateTime::Now);
+                    d->checkForOriginalTextChange();
                     break;
                 }
 
@@ -80,12 +117,12 @@ LinkHoverProcessor::LinkHoverProcessor(QLabel* parent):
                         Qt::NoButton, Qt::NoButton, Qt::NoModifier);
 
                     QnScopedTypedPropertyRollback<bool, QLabel> propagationGuard(
-                        m_label,
+                        d->label,
                         [](QLabel* label, bool value) { label->setAttribute(Qt::WA_NoMousePropagation, value); },
                         [](const QLabel* label) { return label->testAttribute(Qt::WA_NoMousePropagation); },
                         true);
 
-                    QApplication::sendEvent(m_label, &kFakeMouseMove);
+                    QApplication::sendEvent(d->label, &kFakeMouseMove);
                     break;
                 }
 
@@ -94,7 +131,7 @@ LinkHoverProcessor::LinkHoverProcessor(QLabel* parent):
                     // QLabel ignores MouseButtonPress events, but keeps MouseButtonRelease events
                     // accepted if it contains hypertext links. To fix that (parent receiving
                     // presses but not releases) we need to accept events only if link is hovered.
-                    event->setAccepted(!m_hoveredLink.isEmpty());
+                    event->setAccepted(!d->hoveredLink.isEmpty());
                     break;
                 }
 
@@ -104,79 +141,116 @@ LinkHoverProcessor::LinkHoverProcessor(QLabel* parent):
         });
 
     auto tabstopListener = new QnLabelFocusListener(this);
-    m_label->installEventFilter(tabstopListener);
+    d->label->installEventFilter(tabstopListener);
 
-    connect(m_label, &QLabel::linkHovered, this, &LinkHoverProcessor::linkHovered);
+    connect(d->label, &QLabel::linkHovered, this,
+        [this](const QString& link) { d->handleLinkHovered(link); });
 }
 
-bool LinkHoverProcessor::updateOriginalText()
+LinkHoverProcessor::~LinkHoverProcessor()
 {
-    if (!NX_ASSERT(isAlive(m_label)))
-        return false;
-
-    const QString text = m_label->text();
-    if (m_alteredText == text)
-        return false;
-
-    m_originalText = text;
-    return true;
+    // Required here for forward-declared scoped pointer destruction.
 }
 
-void LinkHoverProcessor::changeLabelState(const QString& text, bool hovered)
+void LinkHoverProcessor::Private::checkForOriginalTextChange()
 {
-    if (!isAlive(m_label))
+    if (!NX_ASSERT(isAlive(label)))
         return;
 
-    m_alteredText = text;
-    m_label->setText(text);
+    const QString text = label->text();
+    if (alteredText == text)
+        return;
 
-    if (hovered)
-        m_label->setCursor(Qt::PointingHandCursor);
+    label->unsetCursor();
+
+    if (labelFormat(label) == Qt::RichText)
+        textDocument.setHtml(text);
     else
-        m_label->unsetCursor();
-}
+        textDocument.clear();
 
-void LinkHoverProcessor::linkHovered(const QString& href)
-{
-    m_hoveredLink = href;
-    updateOriginalText();
-    updateColors(UpdateTime::Later);
-}
+    hoveredLinkCursor = {};
+    hoveredLink.clear();
+    linkCursors.clear();
 
-void LinkHoverProcessor::updateColors(UpdateTime when)
-{
-    if (!NX_ASSERT(isAlive(m_label)))
+    // Bypass empty and plain text labels.
+    if (textDocument.isEmpty())
         return;
 
-    /* Find anchor position: */
-    const bool hovered = !m_hoveredLink.isEmpty();
-    const int linkPos = hovered ? m_originalText.indexOf(m_hoveredLink) : -1;
-    const int hoveredHrefPos = hovered
-        ? m_originalText.lastIndexOf("href", linkPos, Qt::CaseInsensitive)
-        : -1;
-
-    /* Insert color attribute before each href attribute: */
-    QString alteredText = m_originalText;
-    for (int pos = -1;;)
+    // Find all hyperlinks.
+    for (auto block = textDocument.begin(); block != textDocument.end(); block = block.next())
     {
-        /* Find href attribute position: */
-        pos = alteredText.lastIndexOf("href", pos, Qt::CaseInsensitive);
-        if (pos == -1)
-            break;
+        if (!block.isValid())
+            continue;
 
-        // TODO: #vkutin Implement a better parsing for this to work if "style" attribute already
-        // exists.
-        const QColor color = style::linkColor(m_label->palette(), pos == hoveredHrefPos);
-        alteredText.insert(pos, QString("style='color: %1' ").arg(color.name(QColor::HexRgb)));
+        for (auto it = block.begin(); !it.atEnd(); ++it)
+        {
+            const auto fragment = it.fragment();
+            if (fragment.isValid())
+            {
+                const auto charFormat = fragment.charFormat();
+                if (charFormat.isAnchor())
+                {
+                    QTextCursor cursor(&textDocument);
+                    cursor.setPosition(fragment.position(), QTextCursor::MoveAnchor);
+                    cursor.setPosition(fragment.position() + fragment.length(),
+                        QTextCursor::KeepAnchor);
+                    linkCursors[charFormat.anchorHref()] = cursor;
+                }
+            }
+        }
     }
 
-    /* Apply altered label text: */
+    // Bypass labels without hyperlinks.
+    if (linkCursors.empty())
+        return;
+
+    // Force initial not hovered color for all hyperlinks.
+    for (auto& linkCursor: linkCursors)
+        changeForeground(linkCursor, style::linkColor(label->palette(), /*hovered*/ false));
+
+    changeLabelState(textDocument.toHtml(), /*hovered*/ false);
+}
+
+void LinkHoverProcessor::Private::changeLabelState(const QString& text, bool hovered)
+{
+    if (!isAlive(label))
+        return;
+
+    alteredText = text;
+    label->setText(text);
+
+    if (hovered)
+        label->setCursor(Qt::PointingHandCursor);
+    else
+        label->unsetCursor();
+}
+
+void LinkHoverProcessor::Private::handleLinkHovered(const QString& href)
+{
+    if (!NX_ASSERT(isAlive(label)))
+        return;
+
+    hoveredLink = href;
+    checkForOriginalTextChange();
+
+    if (textDocument.isEmpty())
+        return;
+
+    if (!hoveredLinkCursor.isNull())
+        changeForeground(hoveredLinkCursor, style::linkColor(label->palette(), /*hovered*/ false));
+
+    hoveredLinkCursor = linkCursors.value(hoveredLink);
+
+    if (!hoveredLinkCursor.isNull())
+        changeForeground(hoveredLinkCursor, style::linkColor(label->palette(), /*hovered*/ true));
+
+    const bool hovered = !hoveredLink.isEmpty();
+    const auto alteredText = textDocument.toHtml();
+
     auto changer =
         [this, alteredText, hovered]() { changeLabelState(alteredText, hovered); };
-    if (when == UpdateTime::Now)
-        changer();
-    else
-        executeLater(changer, this);
+
+    executeLater(changer, q);
 }
 
 } // namespace nx::vms::client::desktop
