@@ -1948,7 +1948,7 @@
     </message>
     <message>
       <source>Show to</source>
-      <translation>表示先</translation>
+      <translation>対象ユーザー</translation>
     </message>
     <message>
       <source>Select layout...</source>
@@ -2075,7 +2075,7 @@
     </message>
     <message>
       <source>to</source>
-      <translation>宛先</translation>
+      <translation>対象ユーザー</translation>
     </message>
   </context>
   <context>
@@ -2155,7 +2155,7 @@
     <name>PushNotificationBusinessActionWidget</name>
     <message>
       <source>To</source>
-      <translation>宛先</translation>
+      <translation>対象ユーザー</translation>
     </message>
     <message>
       <source>Language Settings</source>

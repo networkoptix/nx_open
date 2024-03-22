@@ -1866,7 +1866,7 @@
     </message>
     <message>
       <source>LDAP settings</source>
-      <translation type="unfinished">LDAP settings</translation>
+      <translation>Настройки LDAP</translation>
     </message>
     <message>
       <source>SMTP settings</source>

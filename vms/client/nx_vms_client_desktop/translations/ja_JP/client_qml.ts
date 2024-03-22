@@ -510,7 +510,7 @@
     </message>
     <message>
       <source>Ignore LDAP server certificate errors</source>
-      <translation>LDAPサーバーの証明書エラーを無視する</translation>
+      <translation>LDAP サーバーの証明書エラーを無視する</translation>
     </message>
     <message>
       <source>Test</source>
@@ -1236,7 +1236,7 @@
     </message>
     <message>
       <source>Please use care when altering LDAP settings. Incorrect configuration could disrupt system availability for a large number of users simultaneously.</source>
-      <translation>LDAP設定を変更する際はご注意ください。誤った設定により、多数のユーザーがシステムに接続できなくなる可能性があります。</translation>
+      <translation>LDAP 設定を変更する際はご注意ください。誤った設定により、多数のユーザーがシステムに接続できなくなる可能性があります。</translation>
     </message>
     <message>
       <source>Connect your System to an LDAP server for easier user management</source>
@@ -2109,7 +2109,7 @@ Alt + クリックでオブジェクトを追跡します。</translation>
     </message>
     <message>
       <source>Set minimum and maximum object size.</source>
-      <translation>オブジェクトの最小サイズと最大サイズを設定します。</translation>
+      <translation>オブジェクトの最小サイズと最大サイズを設定してください。</translation>
     </message>
     <message>
       <source>Minimum object size cannot be greater than maximum.</source>
@@ -2545,7 +2545,7 @@ Alt + クリックでオブジェクトを追跡します。</translation>
     </message>
     <message>
       <source>This user is not found in LDAP database and is not able to log in.</source>
-      <translation>このユーザーはLDAPデータベースに存在しないため、ログインできません。</translation>
+      <translation>このユーザーは LDAP データベースに存在しないため、ログインできません。</translation>
     </message>
     <message>
       <source>Permission Groups</source>
@@ -2591,11 +2591,11 @@ Alt + クリックでオブジェクトを追跡します。</translation>
     </message>
     <message>
       <source>LDAP server is offline. User is not able to log in.</source>
-      <translation>LDAPサーバーがオフラインです。ユーザーはログインできません。</translation>
+      <translation>LDAP サーバーがオフラインです。ユーザーはログインできません。</translation>
     </message>
     <message>
       <source>When continuous sync with LDAP server is disabled, user membership in groups does not synchronize automatically. To update this information, initiate a manual sync.</source>
-      <translation>LDAPサーバーとの継続的同期が無効になっている場合、グループのユーザーメンバーシップは自動的に同期されません。この情報を更新するには、手動同期を開始してください。</translation>
+      <translation>LDAP サーバーとの継続的同期が無効になっている場合、グループのユーザーメンバーシップは自動的に同期されません。この情報を更新するには、手動同期を開始してください。</translation>
     </message>
     <message>
       <source>This user’s login duplicates the login of another user. None of them is able to log in. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</source>

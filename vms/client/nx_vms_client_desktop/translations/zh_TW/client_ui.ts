@@ -657,7 +657,7 @@
     </message>
     <message>
       <source>Disable import</source>
-      <translation type="unfinished">Disable import</translation>
+      <translation>停用匯入</translation>
     </message>
     <message>
       <source>Import Video from Device</source>
@@ -669,11 +669,11 @@
     </message>
     <message>
       <source>Do not send Stop PTZ command</source>
-      <translation type="unfinished">Do not send Stop PTZ command</translation>
+      <translation>不發送停止 PTZ 命令</translation>
     </message>
     <message>
       <source>Do not record audio</source>
-      <translation type="unfinished">Do not record audio</translation>
+      <translation>不錄製音訊</translation>
     </message>
   </context>
   <context>
@@ -966,7 +966,7 @@
     </message>
     <message>
       <source>No connection</source>
-      <translation type="unfinished">No connection</translation>
+      <translation>沒有連線</translation>
     </message>
   </context>
   <context>
@@ -1724,15 +1724,15 @@
     </message>
     <message>
       <source>Use Credentials</source>
-      <translation type="unfinished">Use Credentials</translation>
+      <translation>使用認證資訊</translation>
     </message>
     <message>
       <source>Use Link</source>
-      <translation type="unfinished">Use Link</translation>
+      <translation>使用連結</translation>
     </message>
     <message>
       <source>Link</source>
-      <translation type="unfinished">Link</translation>
+      <translation>連結</translation>
     </message>
   </context>
   <context>
@@ -1857,7 +1857,7 @@
     </message>
     <message>
       <source>warn icon</source>
-      <translation type="unfinished">warn icon</translation>
+      <translation>警告圖示</translation>
     </message>
   </context>
   <context>
@@ -1991,7 +1991,7 @@
     </message>
     <message>
       <source>Mail from</source>
-      <translation type="unfinished">Mail from</translation>
+      <translation>寄件者</translation>
     </message>
   </context>
   <context>
@@ -2006,7 +2006,7 @@
     </message>
     <message>
       <source>Sign in to web page</source>
-      <translation type="unfinished">Sign in to web page</translation>
+      <translation>登入Web頁面</translation>
     </message>
   </context>
   <context>
@@ -2443,23 +2443,23 @@
     <name>SaasInfoWidget</name>
     <message>
       <source>No services found</source>
-      <translation type="unfinished">No services found</translation>
+      <translation>未找到服務</translation>
     </message>
     <message>
       <source>Contact your Channel Partner to add services</source>
-      <translation type="unfinished">Contact your Channel Partner to add services</translation>
+      <translation>請聯絡您的通路合作夥伴新增服務</translation>
     </message>
     <message>
       <source>Channel Partner Contact</source>
-      <translation type="unfinished">Channel Partner Contact</translation>
+      <translation>通路合作夥伴聯絡方式</translation>
     </message>
     <message>
       <source>Services Usage</source>
-      <translation type="unfinished">Services Usage</translation>
+      <translation>服務使用情況</translation>
     </message>
     <message>
       <source>Services state</source>
-      <translation type="unfinished">Services state</translation>
+      <translation>服務狀態</translation>
     </message>
   </context>
   <context>
@@ -2592,7 +2592,7 @@
     </message>
     <message>
       <source>Display servers in tree for non-power users</source>
-      <translation type="unfinished">Display servers in tree for non-power users</translation>
+      <translation>為非進階使用者在資源樹列表中顯示伺服器</translation>
     </message>
   </context>
   <context>
@@ -2922,7 +2922,7 @@
     </message>
     <message>
       <source>Del</source>
-      <translation type="unfinished">Del</translation>
+      <translation>刪除</translation>
     </message>
   </context>
   <context>
@@ -2937,7 +2937,7 @@
     </message>
     <message>
       <source>Del</source>
-      <translation type="unfinished">Del</translation>
+      <translation>刪除</translation>
     </message>
   </context>
   <context>

@@ -13,7 +13,7 @@
     </message>
     <message>
       <source>Any server issue</source>
-      <translation type="unfinished">Any server issue</translation>
+      <translation>任何伺服器問題</translation>
     </message>
   </context>
   <context>
@@ -705,7 +705,7 @@
     <name>nx::vms::rules::PtzPresetAction</name>
     <message>
       <source>Execute PTZ Preset</source>
-      <translation type="unfinished">Execute PTZ Preset</translation>
+      <translation>移動PTZ至預設點</translation>
     </message>
     <message>
       <source>At</source>
@@ -713,7 +713,7 @@
     </message>
     <message>
       <source>PTZ Preset</source>
-      <translation type="unfinished">PTZ Preset</translation>
+      <translation>PTZ預設點</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -740,7 +740,7 @@
     </message>
     <message>
       <source>Send Mobile Notification</source>
-      <translation type="unfinished">Send Mobile Notification</translation>
+      <translation>傳送手機通知</translation>
     </message>
     <message>
       <source>Add Source Device name to Body</source>
@@ -914,7 +914,7 @@
     </message>
     <message>
       <source>Occurs at</source>
-      <translation type="unfinished">Occurs at</translation>
+      <translation>發生於</translation>
     </message>
     <message>
       <source>By</source>
@@ -1003,7 +1003,7 @@
     <name>nx::vms::rules::TextOverlayAction</name>
     <message>
       <source>Show Text Overlay</source>
-      <translation type="unfinished">Show Text Overlay</translation>
+      <translation>顯示疊加文字</translation>
     </message>
     <message>
       <source>At</source>
@@ -1015,7 +1015,7 @@
     </message>
     <message>
       <source>Custom Text</source>
-      <translation type="unfinished">Custom Text</translation>
+      <translation>自訂文字</translation>
     </message>
     <message>
       <source>Show to</source>
@@ -1049,7 +1049,7 @@
     <name>nx::vms::rules::WriteToLogAction</name>
     <message>
       <source>Write to Log</source>
-      <translation type="unfinished">Write to Log</translation>
+      <translation>寫入至日誌</translation>
     </message>
     <message>
       <source>Interval of Action</source>
