@@ -18,7 +18,7 @@ class NX_VMS_COMMON_API AnalyticsSdkObjectDetected: public InstantEvent
 public:
     AnalyticsSdkObjectDetected(
         const QnResourcePtr& resource,
-        const nx::common::metadata::ObjectMetadataPacketPtr& packet, 
+        const nx::common::metadata::ObjectMetadataPacketPtr& packet,
         const nx::common::metadata::ObjectMetadata& metadata);
 
     QnUuid engineId() const;
@@ -30,6 +30,11 @@ public:
         const EventParameters& ruleEventParams) const override;
 
     virtual bool checkEventParams(const EventParameters &params) const override;
+
+    static bool checkEventParams(
+        nx::vms::common::SystemContext* systemContext,
+        const EventParameters& params,
+        const nx::common::metadata::ObjectMetadata& metadata);
 
     virtual QString getExternalUniqueKey() const override;
 
