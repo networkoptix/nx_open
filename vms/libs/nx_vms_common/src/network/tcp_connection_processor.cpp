@@ -18,6 +18,7 @@
 #include <nx/network/http/http_types.h>
 #include <nx/network/rest/result.h>
 #include <nx/network/stun/message.h>
+#include <nx/utils/datetime.h>
 #include <nx/utils/gzip/gzip_compressor.h>
 #include <nx/utils/log/log.h>
 #include <utils/common/util.h>
@@ -451,7 +452,7 @@ nx::String QnTCPConnectionProcessor::createResponse(
     }
     nx::network::http::insertOrReplaceHeader(
         &d->response.headers,
-        nx::network::http::HttpHeader("Date", nx::network::http::formatDateTime(QDateTime::currentDateTime())) );
+        nx::network::http::HttpHeader("Date", nx::utils::formatDateTime(QDateTime::currentDateTime())) );
 
     if (d->request.requestLine.url.scheme().startsWith("rtsp"))
         copyAndReplaceHeader(&d->request.headers, &d->response.headers, "CSeq");

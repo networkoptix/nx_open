@@ -8,6 +8,7 @@
 
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/network/url/url_builder.h>
+#include <nx/utils/datetime.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/type_utils.h>
 #include <nx/utils/url.h>
@@ -525,7 +526,7 @@ void GenericApiClient<ApiResultCodeDescriptor, Base>::processResponse(
     const auto date = http::getHeaderValue(
         response ? response->headers : network::http::HttpHeaders(), "Date");
     m_lastResponseTime = std::chrono::milliseconds(
-        date.empty() ? 0 : parseDate(date).currentMSecsSinceEpoch());
+        date.empty() ? 0 : nx::utils::parseDateToQDateTime(date).currentMSecsSinceEpoch());
 
     if constexpr (!std::is_void_v<CachedType>)
     {

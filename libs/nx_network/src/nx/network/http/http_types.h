@@ -1127,22 +1127,6 @@ NX_NETWORK_API std::string serverString();
  */
 NX_NETWORK_API std::string compatibilityServerName();
 
-/**
- * Convert QDateTime to HTTP header date format according to RFC 1123#5.2.14.
- */
-NX_NETWORK_API std::string formatDateTime(const QDateTime& value);
-
-/**
- * Parses the http Date according to RFC 2616#3.3 Date/Time Formats.
- *
- * NOTE: There are 3 different formats, though 2 and 3 are deprecated by HTTP 1.1 standard
- * The order in which parsing is attempted is:
- * 1. Sun, 06 Nov 1994 08:49:37 GMT  ; RFC 822, updated by RFC 1123
- * 2. Sunday, 06-Nov-94 08:49:37 GMT ; RFC 850
- * 3. Sun Nov  6 08:49:37 1994       ; ANSI C's asctime() format
- */
-NX_NETWORK_API QDateTime parseDate(const std::string_view& str);
-
 } // namespace nx::network::http
 
 template<>
