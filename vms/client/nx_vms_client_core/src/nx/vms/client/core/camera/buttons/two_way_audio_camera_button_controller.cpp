@@ -16,7 +16,6 @@ namespace nx::vms::client::core {
 struct TwoWayAudioCameraButtonController::Private
 {
     TwoWayAudioCameraButtonController * const q;
-    const IntercomButtonMode intercomButtonMode;
     std::unique_ptr<TwoWayAudioController> controller;
     nx::utils::ScopedConnections connections;
 
@@ -42,22 +41,6 @@ void TwoWayAudioCameraButtonController::Private::updateButton()
 
             static const auto kTwoWayAudioButtonId =
                 nx::Uuid::fromArbitraryData(std::string_view("two_way_camera_button_id"));
-
-            using Mode = TwoWayAudioCameraButtonController::IntercomButtonMode;
-            if (common::isIntercom(q->camera().staticCast<QnResource>())
-                && intercomButtonMode == Mode::checkable)
-            {
-                // Checkable "Mute" button
-                return CameraButton {
-                    .id = kTwoWayAudioButtonId,
-                    .name = TwoWayAudioCameraButtonController::tr("Unmute"),
-                    .checkedName = TwoWayAudioCameraButtonController::tr("Mute"),
-                    .hint = "",
-                    .iconName = "unmute_call",
-                    .checkedIconName = "mute_call",
-                    .type = CameraButton::Type::checkable,
-                    .enabled = true};
-            }
 
             return CameraButton {
                 .id = kTwoWayAudioButtonId,
@@ -126,12 +109,11 @@ void TwoWayAudioCameraButtonController::Private::setButtonChecked(
 //-------------------------------------------------------------------------------------------------
 
 TwoWayAudioCameraButtonController::TwoWayAudioCameraButtonController(
-    IntercomButtonMode intercomButtonMode,
     CameraButton::Group buttonGroup,
     QObject* parent)
     :
     base_type(buttonGroup, Qn::TwoWayAudioPermission, parent),
-    d(new Private{.q = this, .intercomButtonMode = intercomButtonMode})
+    d(new Private{.q = this})
 {
 }
 
