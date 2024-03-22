@@ -30,6 +30,11 @@ public:
 
     virtual bool checkEventParams(const EventParameters &params) const override;
 
+    static bool checkEventParams(
+        nx::vms::common::SystemContext* systemContext,
+        const EventParameters& params,
+        const nx::common::metadata::ObjectMetadata& metadata);
+
     virtual QString getExternalUniqueKey() const override;
 
     const nx::common::metadata::Attributes& attributes() const;
