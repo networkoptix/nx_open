@@ -69,18 +69,26 @@ bool AnalyticsSdkObjectDetected::checkEventParams(const EventParameters& params)
 {
     if (!getResource())
         return false;
+    return checkEventParams(getResource()->systemContext(), params, m_metadata);
+}
+
+bool AnalyticsSdkObjectDetected::checkEventParams(
+    nx::vms::common::SystemContext* systemContext,
+    const EventParameters& params,
+    const nx::common::metadata::ObjectMetadata& metadata)
+{
 
     const auto ruleTypeId = params.getAnalyticsObjectTypeId();
 
-    const bool isObjectTypeMatched = ruleTypeId == m_metadata.typeId
+    const bool isObjectTypeMatched = ruleTypeId == metadata.typeId
         || nx::analytics::taxonomy::isBaseType(
-            getResource()->systemContext()->analyticsTaxonomyState().get(),
-            ruleTypeId, m_metadata.typeId);
+            systemContext->analyticsTaxonomyState().get(),
+            ruleTypeId, metadata.typeId);
     if (!isObjectTypeMatched)
         return false;
 
     nx::analytics::db::TextMatcher textMatcher(params.description);
-    return textMatcher.matchAttributes(m_metadata.attributes);
+    return textMatcher.matchAttributes(metadata.attributes);
 }
 
 const nx::common::metadata::Attributes& AnalyticsSdkObjectDetected::attributes() const
