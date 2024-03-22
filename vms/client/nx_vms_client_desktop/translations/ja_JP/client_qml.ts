@@ -1134,7 +1134,7 @@ PTZを行います</translation>
     </message>
     <message>
       <source>Set minimum and maximum object size.</source>
-      <translation>オブジェクトの最小サイズと最大サイズを設定します。</translation>
+      <translation>オブジェクトの最小サイズと最大サイズを設定してください。</translation>
     </message>
     <message>
       <source>Minimum object size cannot be greater than maximum.</source>

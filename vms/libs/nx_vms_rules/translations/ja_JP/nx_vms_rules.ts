@@ -365,7 +365,7 @@
     </message>
     <message>
       <source>Device does not respond to network requests.</source>
-      <translation>デバイスがネットワーク要求に応答しません。</translation>
+      <translation>デバイスがネットワークリクエストに応答しません。</translation>
     </message>
     <message>
       <source>Address %1 is already in use by %2 on primary stream.</source>
@@ -410,7 +410,7 @@
     </message>
     <message>
       <source>To</source>
-      <translation>宛先</translation>
+      <translation>対象ユーザー</translation>
     </message>
     <message>
       <source>Interval of action</source>

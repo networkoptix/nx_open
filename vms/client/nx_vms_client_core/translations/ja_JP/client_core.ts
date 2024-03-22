@@ -120,11 +120,11 @@
     </message>
     <message>
       <source>LDAP Server connection timed out</source>
-      <translation>LDAPサーバーとの接続がタイムアウトしました</translation>
+      <translation>LDAP サーバーとの接続がタイムアウトしました</translation>
     </message>
     <message>
       <source>LDAP Server connection timed out.</source>
-      <translation>LDAPサーバーとの接続がタイムアウトしました。</translation>
+      <translation>LDAP サーバーとの接続がタイムアウトしました。</translation>
     </message>
     <message>
       <source>Session expired. Re-enter your password.</source>

@@ -1247,7 +1247,7 @@
     </message>
     <message>
       <source>Database error occurred.</source>
-      <translation>データベース エラーが発生しました</translation>
+      <translation>データベースエラーが発生しました。</translation>
     </message>
     <message>
       <source>Invalid License Key</source>
@@ -1255,7 +1255,7 @@
     </message>
     <message>
       <source>Please make sure it is entered correctly.</source>
-      <translation>正しく入力されたことを確認してください</translation>
+      <translation>正しく入力されていることを確認してください。</translation>
     </message>
     <message>
       <source>Invalid activation key file</source>
@@ -1372,7 +1372,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Please make sure your server has active Internet connection or check firewall settings.</source>
-      <translation>サーバーがインターネットに接続されているか、ファイアウォールの設定を確認してください</translation>
+      <translation>サーバーがインターネットに接続可能か確認のうえ、ファイアウォールの設定を見直してください。</translation>
     </message>
     <message>
       <source>License Server error</source>
@@ -1380,7 +1380,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Failed to remove license from Server</source>
-      <translation>サーバーからライセンスを削除できませんでした</translation>
+      <translation>サーバーからのライセンス削除に失敗しました</translation>
     </message>
     <message numerus="yes">
       <source>%n licenses deactivated</source>
@@ -1426,19 +1426,19 @@ License Key: %2</source>
     <name>LocalFiles</name>
     <message>
       <source>Path &quot;%1&quot; is invalid. Please try another path.</source>
-      <translation>パス&quot;%1&quot; は無効です　別のパスを試してください</translation>
+      <translation>パス &quot;%1&quot; は無効です。別のパスをお試しください。</translation>
     </message>
     <message>
       <source>File &quot;%1&quot; already exists. Please try another name.</source>
-      <translation>ファイル&quot;%1&quot; は既に存在します　別の名前をお試しください</translation>
+      <translation>ファイル &quot;%1&quot; は既に存在します。別の名前をお試しください。</translation>
     </message>
     <message>
       <source>File &quot;%1&quot; is used by another process.</source>
-      <translation>ファイル&quot;%1&quot; は、別のプロセスで使用されています</translation>
+      <translation>ファイル &quot;%1&quot; は別のプロセスによって使用されています。</translation>
     </message>
     <message>
       <source>File &quot;%1&quot; cannot be written. Please try another name.</source>
-      <translation>ファイル&quot;%1&quot; は書き込めません。別の名前をお試しください</translation>
+      <translation>ファイル &quot;%1&quot; に書き込むことができません。別の名前をお試しください。</translation>
     </message>
     <message>
       <source>File name &quot;%1&quot; is reserved by operating system. Please try another name.</source>
@@ -1487,7 +1487,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Enter a short System description here.</source>
-      <translation>簡単なシステム説明を入力してください</translation>
+      <translation>システムの簡単な説明をここに入力してください。</translation>
     </message>
     <message>
       <source>Active</source>
@@ -1503,7 +1503,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Set your email address or SMTP server</source>
-      <translation>メールアドレスまたはSMTPサーバーを設定してください</translation>
+      <translation>メールアドレスまたは SMTP サーバーを設定してください</translation>
     </message>
     <message>
       <source>%1 users are receiving emails</source>
@@ -1555,7 +1555,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Unable to test SMTP server</source>
-      <translation>SMTPサーバーをテストできません</translation>
+      <translation>SMTP サーバーをテストできません</translation>
     </message>
     <message>
       <source>Additional info required</source>
@@ -1574,16 +1574,16 @@ License Key: %2</source>
     </message>
     <message>
       <source>Weak</source>
-      <translation>弱い</translation>
+      <translation>脆弱</translation>
     </message>
     <message>
       <source>Password should contain different types of symbols.</source>
-      <translation>パスワードには異なる種類の文字を含める必要があります</translation>
+      <translation>パスワードには異なる種類の文字を含める必要があります。</translation>
     </message>
     <message numerus="yes">
       <source>Password should contain %n different combinations of either characters, symbols, or digits</source>
       <translation>
-        <numerusform>パスワードには %n の文字、記号、または数字の異なる組み合わせが含まれている必要があります</numerusform>
+        <numerusform>パスワードは文字、記号、数字から %n 種類の組み合わせを含む必要があります</numerusform>
       </translation>
     </message>
     <message>
@@ -1593,7 +1593,7 @@ License Key: %2</source>
     <message numerus="yes">
       <source>Password must be at least %n characters long.</source>
       <translation>
-        <numerusform>パスワードは最低でも %n 文字以上必要です</numerusform>
+        <numerusform>パスワードは %n 文字以上必要です。</numerusform>
       </translation>
     </message>
     <message>
@@ -1603,7 +1603,7 @@ License Key: %2</source>
     <message numerus="yes">
       <source>Password must be no longer than %n characters.</source>
       <translation>
-        <numerusform>パスワードは %n 文字以内である必要があります</numerusform>
+        <numerusform>パスワードは %n 文字以内にする必要があります。</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1620,11 +1620,11 @@ License Key: %2</source>
     </message>
     <message>
       <source>Common</source>
-      <translation>共通</translation>
+      <translation>一般的</translation>
     </message>
     <message>
       <source>This password is in list of the most popular passwords.</source>
-      <translation>このパスワードは最も一般的なパスワードのうちのひとつです</translation>
+      <translation>このパスワードは、最も一般的なパスワードのうちのひとつです。</translation>
     </message>
     <message>
       <source>Incorrect</source>
@@ -1771,7 +1771,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>OpenGL max texture size</source>
-      <translation>OpenGL 最大テクスチャ サイズ</translation>
+      <translation>OpenGL 最大テクスチャサイズ</translation>
     </message>
     <message>
       <source>%1 version %2 (%3).</source>
@@ -1779,7 +1779,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Built for %1-%2 with %3.</source>
-      <translation>ビルド %1-%2 　 %3</translation>
+      <translation>%3 による %1-%2 向けビルド</translation>
     </message>
     <message>
       <source>Regional / License support</source>
@@ -1819,7 +1819,7 @@ License Key: %2</source>
     <name>QnAdvancedSettingsWidget</name>
     <message>
       <source>Helps avoid problems with OpenGL drawing which result in 100% CPU load.</source>
-      <translation>OpenGLの描画により、CPU負荷が100%発生する問題を回避できます。</translation>
+      <translation>OpenGLの描画により、CPU負荷が100%に達する問題を回避できます。</translation>
     </message>
     <message>
       <source>Adjust to smallest value that does not degrade live view. Bigger buffer makes playback smoother but increases delay between real time and live view; smaller buffer decreases delay but can cause stutters.</source>
@@ -1945,11 +1945,11 @@ License Key: %2</source>
     </message>
     <message>
       <source>No sessions</source>
-      <translation>セッションなし</translation>
+      <translation>セッションがありません</translation>
     </message>
     <message>
       <source>No cameras</source>
-      <translation>カメラなし</translation>
+      <translation>カメラがありません</translation>
     </message>
     <message>
       <source>Select sessions to see their details</source>
@@ -2250,7 +2250,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Description cannot be empty</source>
-      <translation>説明を入力してください</translation>
+      <translation>説明を入力してください。</translation>
     </message>
   </context>
   <context>
@@ -2445,7 +2445,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Restore All Rules to Default</source>
-      <translation>すべてのルールを既定に戻す</translation>
+      <translation>すべてのルールをデフォルトに戻す</translation>
     </message>
     <message>
       <source>No event rules</source>
@@ -2465,7 +2465,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Failed to save rule</source>
-      <translation>ルールを保存できませんでした</translation>
+      <translation>ルールの保存に失敗しました</translation>
     </message>
     <message>
       <source>This action cannot be undone.</source>
@@ -2473,7 +2473,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Restore all rules to default?</source>
-      <translation>すべてのルールを既定に戻しますか？</translation>
+      <translation>すべてのルールをデフォルトに戻しますか?</translation>
     </message>
     <message>
       <source>Some rules are not valid and may not work</source>
@@ -2530,7 +2530,7 @@ License Key: %2</source>
     <name>QnCameraAnalyticsPolicy</name>
     <message>
       <source>Analytics is not available for %1</source>
-      <translation>%1では分析を利用できません</translation>
+      <translation>%1 では分析を利用できません</translation>
     </message>
   </context>
   <context>
@@ -2574,7 +2574,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Diagnostics for camera %1</source>
-      <translation>カメラ %1の診断</translation>
+      <translation>カメラ %1 の診断</translation>
     </message>
     <message>
       <source>Device Diagnostics</source>
@@ -2625,7 +2625,7 @@ License Key: %2</source>
     <name>QnCameraInputBusinessEventWidget</name>
     <message>
       <source>automatic</source>
-      <translation>オート</translation>
+      <translation>自動</translation>
     </message>
   </context>
   <context>
@@ -2687,17 +2687,17 @@ License Key: %2</source>
     </message>
     <message>
       <source>No cameras</source>
-      <translation>カメラなし</translation>
+      <translation>カメラがありません</translation>
     </message>
     <message>
       <source>Devices List for %1</source>
       <comment>%1 will be substituted with a server name</comment>
-      <translation>%1 デバイスリスト</translation>
+      <translation>%1 のデバイスリスト</translation>
     </message>
     <message>
       <source>Cameras List for %1</source>
       <comment>%1 will be substituted with a server name</comment>
-      <translation>%1 カメラリスト</translation>
+      <translation>%1 のカメラリスト</translation>
     </message>
   </context>
   <context>
@@ -2774,11 +2774,11 @@ License Key: %2</source>
     </message>
     <message>
       <source>Repeat Password</source>
-      <translation>パスワード(確認用)</translation>
+      <translation>パスワードを再入力</translation>
     </message>
     <message>
       <source>Passwords do not match.</source>
-      <translation>パスワードが一致しません.</translation>
+      <translation>パスワードが一致しません。</translation>
     </message>
     <message>
       <source>Password should be at least 8 symbols long and contain different types of characters.</source>
@@ -2808,7 +2808,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Passwords do not match.</source>
-      <translation>パスワードが一致しません.</translation>
+      <translation>パスワードが一致しません。</translation>
     </message>
     <message>
       <source>Current Password</source>
@@ -2816,7 +2816,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>To modify your password please enter the existing one.</source>
-      <translation>パスワードを変更するには、既存のパスワードを入力してください</translation>
+      <translation>パスワードを変更するには、既存のパスワードを入力してください。</translation>
     </message>
     <message>
       <source>Invalid current password.</source>
@@ -2968,7 +2968,7 @@ to %1</source>
     <message>
       <source>Please log in to %1 and follow the provided instructions.</source>
       <comment>%1 is a cloud site name like &quot;Nx Cloud&quot;</comment>
-      <translation>%1 ログインし、表示される指示に従ってください。</translation>
+      <translation>%1 にログインし、表示される指示に従ってください。</translation>
     </message>
     <message>
       <source>Invalid password</source>
@@ -3301,7 +3301,7 @@ to %1</source>
     </message>
     <message>
       <source>Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</source>
-      <translation>LDAPサーバーからユーザーをインポートできます。インポートされたユーザーは、 LDAPサーバーがオンラインかつアカウントが有効な場合のみログインできます。</translation>
+      <translation>LDAP サーバーからユーザーをインポートできます。インポートされたユーザーは、 LDAP サーバーがオンラインかつアカウントが有効な場合のみログインできます。</translation>
     </message>
   </context>
   <context>
@@ -3737,7 +3737,7 @@ to %1</source>
     </message>
     <message>
       <source>Changing any LDAP settings other than &quot;Search Filter&quot; will result in connectivity loss for all LDAP fetched users.</source>
-      <translation>&quot;検索フィルター&quot; 以外のLDAP設定を変更すると、LDAP で取得されたすべてのユーザーの接続が失われます。</translation>
+      <translation>&quot;検索フィルター&quot; 以外の LDAP 設定を変更すると、LDAP で取得されたすべてのユーザーの接続が失われます。</translation>
     </message>
   </context>
   <context>
@@ -5873,7 +5873,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>User has been renamed. Password must be updated.</source>
-      <translation>ユーザーは変更されました　パスワードを更新してください</translation>
+      <translation>ユーザー名が変更されました。パスワードを更新する必要があります。</translation>
     </message>
     <message>
       <source>Name</source>
@@ -5897,7 +5897,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Passwords do not match.</source>
-      <translation>パスワードが一致しません</translation>
+      <translation>パスワードが一致しません。</translation>
     </message>
     <message>
       <source>%1 user with specified email already exists.</source>
@@ -7939,12 +7939,12 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Copied</source>
       <comment>to Clipboard</comment>
-      <translation>コピー</translation>
+      <translation>コピー完了</translation>
     </message>
     <message>
       <source>Pasted</source>
       <comment>from Clipboard</comment>
-      <translation>貼付け</translation>
+      <translation>貼り付け完了</translation>
     </message>
   </context>
   <context>
@@ -10244,7 +10244,7 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>Local and LDAP users will be automatically logged out if their session exceeds the specified duration.</source>
-      <translation>セッションが指定期間を超えると、ローカルおよびLDAPユーザーは自動的にログアウトされます。</translation>
+      <translation>セッションが指定期間を超えると、ローカルおよび LDAP ユーザーは自動的にログアウトされます。</translation>
     </message>
     <message>
       <source>Unlimited user session lifetime threatens overall System security and may lead to degradation in System performance</source>
@@ -10813,7 +10813,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <name>nx::vms::client::desktop::UserGroupListModel</name>
     <message>
       <source>LDAP group</source>
-      <translation>LDAPグループ</translation>
+      <translation>LDAP グループ</translation>
     </message>
     <message>
       <source>Built-in group</source>
@@ -11725,7 +11725,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Maximum size is %1 MB.</source>
-      <translation>最大サイズは、%1 MB です</translation>
+      <translation>最大サイズは %1 MB です。</translation>
     </message>
     <message>
       <source>Failed to upload image</source>

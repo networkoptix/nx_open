@@ -1649,7 +1649,7 @@
     </message>
     <message>
       <source>LDAP Settings</source>
-      <translation>LDAP設定</translation>
+      <translation>LDAP 設定</translation>
     </message>
     <message>
       <source>Server URL</source>
@@ -1680,7 +1680,7 @@
     <name>LdapUsersDialog</name>
     <message>
       <source>Fetch Users from LDAP...</source>
-      <translation>LDAPからユーザー登録...</translation>
+      <translation>LDAP からユーザー登録...</translation>
     </message>
     <message>
       <source>Loading...</source>
@@ -2072,7 +2072,7 @@
     </message>
     <message>
       <source>Show to</source>
-      <translation>表示先</translation>
+      <translation>対象ユーザー</translation>
     </message>
     <message>
       <source>Select layout...</source>
@@ -2206,7 +2206,7 @@
     </message>
     <message>
       <source>to</source>
-      <translation>宛先</translation>
+      <translation>対象ユーザー</translation>
     </message>
   </context>
   <context>
@@ -2297,7 +2297,7 @@
     <name>PushNotificationBusinessActionWidget</name>
     <message>
       <source>To</source>
-      <translation>宛先</translation>
+      <translation>対象ユーザー</translation>
     </message>
     <message>
       <source>Language Settings</source>
@@ -2393,11 +2393,11 @@
     </message>
     <message>
       <source>LDAP Settings...</source>
-      <translation>LDAP設定...</translation>
+      <translation>LDAP 設定...</translation>
     </message>
     <message>
       <source>Fetch Users from LDAP...</source>
-      <translation>LDAPからユーザー登録...</translation>
+      <translation>LDAP からユーザー登録...</translation>
     </message>
   </context>
   <context>
