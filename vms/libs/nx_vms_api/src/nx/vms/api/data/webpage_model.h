@@ -24,9 +24,9 @@ struct NX_VMS_API WebPageModelV1: ResourceWithParameters
 
     nx::Uuid getId() const { return id; }
     void setId(nx::Uuid value) { id = std::move(value); }
-    static_assert(isCreateModelV<WebPageModelV1>);
-    static_assert(isUpdateModelV<WebPageModelV1>);
-    static_assert(isFlexibleIdModelV<WebPageModelV1>);
+    static_assert(nx::utils::isCreateModelV<WebPageModelV1>);
+    static_assert(nx::utils::isUpdateModelV<WebPageModelV1>);
+    static_assert(nx::utils::isFlexibleIdModelV<WebPageModelV1>);
 
     DbUpdateTypes toDbTypes() &&;
     static std::vector<WebPageModelV1> fromDbTypes(DbListTypes data);
@@ -41,9 +41,9 @@ struct NX_VMS_API WebPageModelV3: WebPageModelV1
     bool certificateCheck = false;
     std::vector<QString> proxyDomainAllowList{};
 
-    static_assert(isCreateModelV<WebPageModelV3>);
-    static_assert(isUpdateModelV<WebPageModelV3>);
-    static_assert(isFlexibleIdModelV<WebPageModelV3>);
+    static_assert(nx::utils::isCreateModelV<WebPageModelV3>);
+    static_assert(nx::utils::isUpdateModelV<WebPageModelV3>);
+    static_assert(nx::utils::isFlexibleIdModelV<WebPageModelV3>);
 
     DbUpdateTypes toDbTypes() &&;
     static std::vector<WebPageModelV3> fromDbTypes(DbListTypes data);

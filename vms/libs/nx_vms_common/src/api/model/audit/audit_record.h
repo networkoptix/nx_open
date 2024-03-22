@@ -4,11 +4,11 @@
 
 #include <common/common_globals.h>
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/network/rest/auth_session.h>
 #include <nx/utils/latin1_array.h>
 #include <nx/utils/qnbytearrayref.h>
 #include <nx/utils/uuid.h>
 
-#include "auth_session.h"
 #include "audit_details.h"
 
 struct QnAuditRecord;
@@ -38,9 +38,9 @@ struct NX_VMS_COMMON_API QnLegacyAuditRecord
      */
     QnLatin1Array params;
 
-    QnAuthSession authSession;
+    nx::network::rest::AuthSession authSession;
 
-    QnLegacyAuditRecord(QnAuthSession authSession = nx::Uuid{}):
+    QnLegacyAuditRecord(nx::network::rest::AuthSession authSession = nx::Uuid{}):
         authSession(std::move(authSession))
     {
     }
@@ -67,12 +67,12 @@ struct NX_VMS_COMMON_API QnAuditRecord
     std::chrono::seconds createdTimeS{0};
 
     /**%apidoc Information about the user whose actions created the record. */
-    QnAuthSession authSession;
+    nx::network::rest::AuthSession authSession;
 
     /**%apidoc Detailed information about what's happened. */
     AllAuditDetails::type details = nullptr;
 
-    QnAuditRecord(QnAuthSession authSession): authSession(std::move(authSession)) {}
+    QnAuditRecord(nx::network::rest::AuthSession authSession): authSession(std::move(authSession)) {}
 
     template<typename T>
     T* get()
@@ -90,7 +90,7 @@ struct NX_VMS_COMMON_API QnAuditRecord
 
     template <nx::vms::api::AuditRecordType type,
         typename Details = typename details::details_type<type, AllAuditDetails::mapping>::type>
-    static QnAuditRecord prepareRecord(const QnAuthSession& authInfo, Details&& details = {})
+    static QnAuditRecord prepareRecord(const nx::network::rest::AuthSession& authInfo, Details&& details = {})
     {
         static_assert(
             std::is_same_v<typename details::details_type<type, AllAuditDetails::mapping>::type,
@@ -100,7 +100,8 @@ struct NX_VMS_COMMON_API QnAuditRecord
         return result;
     }
 
-    static QnAuditRecord prepareRecord(nx::vms::api::AuditRecordType type, const QnAuthSession& authInfo);
+    static QnAuditRecord prepareRecord(
+        nx::vms::api::AuditRecordType type, const nx::network::rest::AuthSession& authInfo);
     static void setCreatedTimeForTests(std::optional<std::chrono::seconds> value);
 };
 #define QnAuditRecord_Fields (eventType)(createdTimeS)(authSession)(details)

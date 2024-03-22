@@ -54,7 +54,6 @@
 #include <nx/fusion/serialization/json_functions.h>
 #include <nx/media/abstract_data_packet.h>
 #include <nx/media/media_data_packet.h>
-#include <nx/network/rest/params.h>
 #include <nx/network/socket_common.h>
 #include <nx/streaming/archive_stream_reader.h>
 #include <nx/string.h>
@@ -165,8 +164,6 @@ void QnCommonMetaTypes::initialize()
     qRegisterMetaType<QnMotionRegion>();
     qRegisterMetaType<QnScheduleTask>();
     qRegisterMetaType<QnScheduleTaskList>();
-
-    qRegisterMetaType<nx::network::rest::Params>();
 
     qRegisterMetaType<Qn::TimePeriodContent>();
     qRegisterMetaType<QnTimePeriodList>();

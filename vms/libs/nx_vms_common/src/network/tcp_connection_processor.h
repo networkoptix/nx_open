@@ -4,8 +4,8 @@
 
 #include <optional>
 
-#include <api/model/audit/auth_session.h>
 #include <nx/network/http/http_types.h>
+#include <nx/network/rest/user_access_data.h>
 #include <nx/network/socket.h>
 #include <nx/network/socket_delegate.h>
 #include <nx/string.h>
@@ -18,8 +18,6 @@ class QnTcpListener;
 class QnTCPConnectionProcessorPrivate;
 
 static constexpr char kRfc4571Stun[] = "RFC4571+STUN";
-
-namespace Qn { struct UserAccessData; }
 
 class NX_VMS_COMMON_API QnTCPConnectionProcessor:
     public QnLongRunnable,
@@ -113,12 +111,12 @@ public:
 
     int redirectTo(const nx::network::http::Method& method, const QByteArray& page, QByteArray* contentType);
     int notFound(QByteArray& contentType);
-    QnAuthSession authSession() const;
+    nx::network::rest::AuthSession authSession() const;
 
     QnTcpListener* owner() const;
 
 protected:
-    QnAuthSession authSession(const Qn::UserAccessData& accessRights) const;
+    nx::network::rest::AuthSession authSession(const nx::network::rest::UserAccessData& accessRights) const;
     QString extractPath() const;
     static QString extractPath(const QString& fullUrl);
 

@@ -45,13 +45,13 @@ extern const std::set<QString> kResourceParamToAmend =
     }();
 
 bool amendOutputDataIfNeeded(
-    const Qn::UserAccessData& accessData,
+    const nx::network::rest::UserAccessData& accessData,
     QnResourceAccessManager* accessManager,
     nx::vms::api::ResourceParamData* paramData)
 {
     if (kResourceParamToAmend.contains(paramData->name))
     {
-        if (accessData == Qn::kSystemAccess)
+        if (accessData == nx::network::rest::kSystemAccess)
         {
             paramData->value = nx::crypt::decodeStringFromHexStringAES128CBC(paramData->value);
         }
@@ -71,7 +71,7 @@ bool amendOutputDataIfNeeded(
         return true;
     }
 
-    if (accessData != Qn::kSystemAccess && paramData->name.startsWith("aes_key_"))
+    if (accessData != nx::network::rest::kSystemAccess && paramData->name.startsWith("aes_key_"))
     {
         using namespace nx::vms::crypt;
         bool success = false;
@@ -94,7 +94,7 @@ bool amendOutputDataIfNeeded(
         return true;
     }
 
-    if (accessData != Qn::kSystemAccess && paramData->name == "ldap")
+    if (accessData != nx::network::rest::kSystemAccess && paramData->name == "ldap")
     {
         bool success = false;
         auto ldap =
@@ -118,7 +118,7 @@ bool amendOutputDataIfNeeded(
 }
 
 bool amendOutputDataIfNeeded(
-    const Qn::UserAccessData& accessData,
+    const nx::network::rest::UserAccessData& accessData,
     QnResourceAccessManager* accessManager,
     nx::vms::api::StorageData* storageData)
 {
@@ -130,7 +130,7 @@ bool amendOutputDataIfNeeded(
         return false;
     }
 
-    if (accessData == Qn::kSystemAccess || accessManager->hasPowerUserPermissions(accessData))
+    if (accessData == nx::network::rest::kSystemAccess || accessManager->hasPowerUserPermissions(accessData))
     {
         NX_VERBOSE(
             kLogTag, "%1: Decyphering url '%2' password",
@@ -149,11 +149,11 @@ bool amendOutputDataIfNeeded(
     return true;
 }
 
-bool amendOutputDataIfNeeded(const Qn::UserAccessData& accessData,
+bool amendOutputDataIfNeeded(const nx::network::rest::UserAccessData& accessData,
     QnResourceAccessManager* accessManager,
     nx::vms::api::UserData* userData)
 {
-    if (accessData == Qn::kSystemAccess)
+    if (accessData == nx::network::rest::kSystemAccess)
         return false;
 
     // All owners should be able to see all password data. This is required for merge with
@@ -190,11 +190,11 @@ bool amendOutputDataIfNeeded(const Qn::UserAccessData& accessData,
 }
 
 bool amendOutputDataIfNeeded(
-    const Qn::UserAccessData& accessData,
+    const nx::network::rest::UserAccessData& accessData,
     QnResourceAccessManager* /*accessManager*/,
     nx::vms::api::MediaServerData* mediaServerData)
 {
-    if (accessData == Qn::kSystemAccess)
+    if (accessData == nx::network::rest::kSystemAccess)
         return false;
 
     if (mediaServerData->authKey.isEmpty())
@@ -205,7 +205,7 @@ bool amendOutputDataIfNeeded(
 }
 
 bool amendOutputDataIfNeeded(
-    const Qn::UserAccessData& accessData,
+    const nx::network::rest::UserAccessData& accessData,
     QnResourceAccessManager* accessManager,
     nx::vms::api::MediaServerDataEx* mediaServerDataEx)
 {
@@ -216,7 +216,7 @@ bool amendOutputDataIfNeeded(
     return result;
 }
 
-bool amendOutputDataIfNeeded(const Qn::UserAccessData& accessData,
+bool amendOutputDataIfNeeded(const nx::network::rest::UserAccessData& accessData,
     QnResourceAccessManager* accessManager,
     nx::vms::api::EventRuleData* rule)
 {
@@ -228,7 +228,7 @@ bool amendOutputDataIfNeeded(const Qn::UserAccessData& accessData,
     if (url.password().isEmpty())
         return false;
 
-    const bool isGranted = accessData == Qn::kSystemAccess || accessManager->hasPowerUserPermissions(accessData);
+    const bool isGranted = accessData == nx::network::rest::kSystemAccess || accessManager->hasPowerUserPermissions(accessData);
     if (isGranted)
         url.setPassword(nx::crypt::decodeStringFromHexStringAES128CBC(url.password()));
     else
@@ -239,7 +239,7 @@ bool amendOutputDataIfNeeded(const Qn::UserAccessData& accessData,
 }
 
 bool amendOutputDataIfNeeded(
-    const Qn::UserAccessData& accessData,
+    const nx::network::rest::UserAccessData& accessData,
     QnResourceAccessManager* accessManager,
     nx::vms::api::ResourceParamWithRefData* paramData)
 {
@@ -247,7 +247,7 @@ bool amendOutputDataIfNeeded(
         accessData, accessManager, static_cast<nx::vms::api::ResourceParamData*>(paramData));
 }
 
-bool amendOutputDataIfNeeded(const Qn::UserAccessData& accessData,
+bool amendOutputDataIfNeeded(const nx::network::rest::UserAccessData& accessData,
     QnResourceAccessManager* accessManager,
     nx::vms::api::FullInfoData* paramData)
 {
@@ -258,7 +258,7 @@ bool amendOutputDataIfNeeded(const Qn::UserAccessData& accessData,
     return result;
 }
 
-bool amendOutputDataIfNeeded(const Qn::UserAccessData& accessData,
+bool amendOutputDataIfNeeded(const nx::network::rest::UserAccessData& accessData,
     QnResourceAccessManager* accessManager,
     nx::vms::api::CameraDataEx* paramData)
 {
@@ -266,11 +266,11 @@ bool amendOutputDataIfNeeded(const Qn::UserAccessData& accessData,
 }
 
 bool amendOutputDataIfNeeded(
-    const Qn::UserAccessData& accessData,
+    const nx::network::rest::UserAccessData& accessData,
     QnResourceAccessManager* accessManager,
     nx::vms::api::ServerFootageData* paramData)
 {
-    if (accessData == Qn::kSystemAccess
+    if (accessData == nx::network::rest::kSystemAccess
         || accessManager->hasGlobalPermission(accessData, GlobalPermission::powerUser))
     {
         return false;

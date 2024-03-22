@@ -35,7 +35,7 @@ bool QnResourcePropertyDictionary::saveParams(const nx::Uuid& resourceId)
         return true;
 
     ec2::AbstractECConnectionPtr conn = messageBusConnection();
-    ec2::ErrorCode rez = conn->getResourceManager(Qn::kSystemSession)->saveSync(params);
+    ec2::ErrorCode rez = conn->getResourceManager(nx::network::rest::kSystemSession)->saveSync(params);
 
     if (rez != ec2::ErrorCode::ok)
     {
@@ -67,7 +67,7 @@ int QnResourcePropertyDictionary::saveData(const nx::vms::api::ResourceParamWith
     ec2::AbstractECConnectionPtr conn = messageBusConnection();
     if (!conn)
         return -1; // not connected to ec2
-    int requestId = conn->getResourceManager(Qn::kSystemSession)->save(
+    int requestId = conn->getResourceManager(nx::network::rest::kSystemSession)->save(
         data,
         [this](int requestId, ec2::ErrorCode errorCode)
         {

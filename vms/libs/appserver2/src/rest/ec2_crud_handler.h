@@ -2,19 +2,14 @@
 
 #pragma once
 
-#include <tuple>
-
-#include <core/resource/resource_type.h>
-#include <database/db_manager.h>
 #include <nx/network/rest/params.h>
 #include <nx/network/rest/request.h>
+#include <nx/network/rest/subscription.h>
 #include <nx/utils/elapsed_timer.h>
 #include <nx/utils/scope_guard.h>
-#include <nx/vms/ec2/ec_connection_notification_manager.h>
 #include <transaction/transaction.h>
 
 #include "details.h"
-#include "subscription.h"
 
 namespace ec2 {
 
@@ -218,7 +213,7 @@ protected:
 private:
     bool isValidType(const nx::Uuid& id) const
     {
-        const auto objectType = m_queryProcessor->getAccess(Qn::kSystemSession).getObjectType(id);
+        const auto objectType = m_queryProcessor->getAccess(nx::network::rest::kSystemSession).getObjectType(id);
         return objectType == ApiObject_NotDefined || objectType == m_objectType;
     }
 

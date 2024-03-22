@@ -138,7 +138,7 @@ bool LayoutSnapshotManager::save(
     nx::vms::api::LayoutData apiLayout;
     ec2::fromResourceToApi(layout, apiLayout);
 
-    int reqID = connection->getLayoutManager(Qn::kSystemSession)->save(
+    int reqID = connection->getLayoutManager(nx::network::rest::kSystemSession)->save(
         apiLayout,
         [internalCallback](int /*reqID*/, ec2::ErrorCode errorCode)
         {

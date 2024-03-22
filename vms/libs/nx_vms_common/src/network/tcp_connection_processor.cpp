@@ -794,17 +794,17 @@ bool QnTCPConnectionProcessor::isConnectionCanBePersistent() const
     }
 }
 
-QnAuthSession QnTCPConnectionProcessor::authSession() const
+nx::network::rest::AuthSession QnTCPConnectionProcessor::authSession() const
 {
     Q_D(const QnTCPConnectionProcessor);
     return authSession(d->accessRights);
 }
 
-QnAuthSession QnTCPConnectionProcessor::authSession(const Qn::UserAccessData& accessRights) const
+nx::network::rest::AuthSession QnTCPConnectionProcessor::authSession(const nx::network::rest::UserAccessData& accessRights) const
 {
     Q_D(const QnTCPConnectionProcessor);
     const auto& user = resourcePool()->getResourceById(accessRights.userId);
-    return QnAuthSession(
+    return nx::network::rest::AuthSession(
         user ? user->getName() : QString(), d->request, d->socket->getForeignAddress().address);
 }
 

@@ -15,7 +15,7 @@ template<class QueryProcessorType>
 class QnMiscManager: public AbstractMiscManager
 {
 public:
-    QnMiscManager(QueryProcessorType* queryProcessor, const Qn::UserSession& userSession);
+    QnMiscManager(QueryProcessorType* queryProcessor, const nx::network::rest::UserSession& userSession);
 
     virtual int changeSystemId(
         const nx::Uuid& systemId,
@@ -76,12 +76,12 @@ private:
 
 private:
     QueryProcessorType* const m_queryProcessor;
-    Qn::UserSession m_userSession;
+    nx::network::rest::UserSession m_userSession;
 };
 
 template<class QueryProcessorType>
 QnMiscManager<QueryProcessorType>::QnMiscManager(
-    QueryProcessorType* queryProcessor, const Qn::UserSession& userSession)
+    QueryProcessorType* queryProcessor, const nx::network::rest::UserSession& userSession)
     :
     m_queryProcessor(queryProcessor),
     m_userSession(userSession)

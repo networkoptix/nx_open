@@ -26,7 +26,6 @@ struct NX_VMS_API LicenseKey
     LicenseKey(const QString& id): key(id.toUtf8()) {}
     QString toString() const { return key; }
     const LicenseKey& getId() const { return *this; }
-    void setId(const LicenseKey& id) { key = id.key; }
 
     bool operator==(const LicenseKey& other) const = default;
 };

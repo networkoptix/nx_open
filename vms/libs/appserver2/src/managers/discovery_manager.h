@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <core/resource_access/user_access_data.h>
+#include <nx/network/rest/user_access_data.h>
 #include <nx/vms/discovery/manager.h>
 #include <nx_ec/managers/abstract_discovery_manager.h>
 #include <transaction/transaction.h>
@@ -17,7 +17,7 @@ template<class QueryProcessorType>
 class QnDiscoveryManager: public AbstractDiscoveryManager
 {
 public:
-    QnDiscoveryManager(QueryProcessorType* queryProcessor, const Qn::UserSession& userSession);
+    QnDiscoveryManager(QueryProcessorType* queryProcessor, const nx::network::rest::UserSession& userSession);
 
     virtual int discoverPeer(
         const nx::Uuid& id,
@@ -48,12 +48,12 @@ private:
 
 private:
     QueryProcessorType* const m_queryProcessor;
-    Qn::UserSession m_userSession;
+    nx::network::rest::UserSession m_userSession;
 };
 
 template<class QueryProcessorType>
 QnDiscoveryManager<QueryProcessorType>::QnDiscoveryManager(
-    QueryProcessorType* queryProcessor, const Qn::UserSession& userSession)
+    QueryProcessorType* queryProcessor, const nx::network::rest::UserSession& userSession)
     :
     m_queryProcessor(queryProcessor),
     m_userSession(userSession)

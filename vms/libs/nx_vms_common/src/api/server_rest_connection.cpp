@@ -2120,7 +2120,7 @@ Handle ServerConnection::ldapAuthenticateAsync(
                 QByteArray body,
                 const nx::network::http::HttpHeaders& httpHeaders)
             {
-                using AuthResult = nx::vms::common::AuthResult;
+                using AuthResult = nx::network::rest::AuthResult;
                 AuthResult authResult = AuthResult::Auth_LDAPConnectError;
                 const auto authResultString = nx::network::http::getHeaderValue(
                     httpHeaders, Qn::AUTH_RESULT_HEADER_NAME);

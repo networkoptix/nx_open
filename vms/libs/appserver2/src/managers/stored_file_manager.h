@@ -13,7 +13,7 @@ template<class QueryProcessorType>
 class QnStoredFileManager : public AbstractStoredFileManager
 {
 public:
-    QnStoredFileManager(QueryProcessorType* queryProcessor, const Qn::UserSession& userSession);
+    QnStoredFileManager(QueryProcessorType* queryProcessor, const nx::network::rest::UserSession& userSession);
 
     virtual int getStoredFile(
         const QString& fileName,
@@ -41,12 +41,12 @@ private:
 
 private:
     QueryProcessorType* const m_queryProcessor;
-    Qn::UserSession m_userSession;
+    nx::network::rest::UserSession m_userSession;
 };
 
 template<class QueryProcessorType>
 QnStoredFileManager<QueryProcessorType>::QnStoredFileManager(
-    QueryProcessorType* queryProcessor, const Qn::UserSession& userSession)
+    QueryProcessorType* queryProcessor, const nx::network::rest::UserSession& userSession)
     :
     m_queryProcessor(queryProcessor),
     m_userSession(userSession)

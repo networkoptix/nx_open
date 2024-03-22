@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <core/resource_access/user_access_data.h>
+#include <nx/network/rest/user_access_data.h>
 #include <nx/utils/concurrent.h>
 #include <nx/vms/ec2/ec2_thread_pool.h>
 #include <nx_ec/managers/abstract_vms_rules_manager.h>
@@ -14,7 +14,7 @@ template<class QueryProcessorType>
 class VmsRulesManager: public AbstractVmsRulesManager
 {
 public:
-    VmsRulesManager(QueryProcessorType* queryProcessor, const Qn::UserSession& userSession);
+    VmsRulesManager(QueryProcessorType* queryProcessor, const nx::network::rest::UserSession& userSession);
 
     virtual int getVmsRules(
         Handler<nx::vms::api::rules::RuleList> handler,
@@ -44,12 +44,12 @@ private:
 
 private:
     QueryProcessorType* const m_queryProcessor;
-    Qn::UserSession m_userSession;
+    nx::network::rest::UserSession m_userSession;
 };
 
 template<class QueryProcessorType>
 VmsRulesManager<QueryProcessorType>::VmsRulesManager(
-    QueryProcessorType* queryProcessor, const Qn::UserSession& userSession)
+    QueryProcessorType* queryProcessor, const nx::network::rest::UserSession& userSession)
     :
     m_queryProcessor(queryProcessor),
     m_userSession(userSession)

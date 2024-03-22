@@ -8,9 +8,8 @@
 
 #include <core/resource/resource_fwd.h>
 #include <nx/network/http/http_types.h>
+#include <nx/network/rest/auth_result.h>
 #include <nx/string.h>
-
-#include "auth_result.h"
 
 namespace nx {
 namespace vms {
@@ -19,7 +18,7 @@ namespace auth {
 class AbstractUserDataProvider
 {
 public:
-    using AuthResult = nx::vms::common::AuthResult;
+    using AuthResult = nx::network::rest::AuthResult;
 
     virtual ~AbstractUserDataProvider() = default;
 

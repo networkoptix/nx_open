@@ -309,7 +309,7 @@ void QnRoutingManagementWidget::applyChanges() {
         QHash<nx::utils::Url, bool> additional = it->addresses;
         QHash<nx::utils::Url, bool> ignored = it->ignoredAddresses;
 
-        const auto discoveryManager = connection->getDiscoveryManager(Qn::kSystemSession);
+        const auto discoveryManager = connection->getDiscoveryManager(nx::network::rest::kSystemSession);
         for (auto it = additional.begin(); it != additional.end(); ++it) {
             nx::utils::Url url = it.key();
 

@@ -8,10 +8,11 @@
 #include <vector>
 
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/utils/type_traits.h>
 
+#include "../types/access_rights_types.h"
 #include "global_permission_deprecated.h"
 #include "resource_data.h"
-#include "type_traits.h"
 #include "user_data_ex.h"
 #include "user_external_id.h"
 
@@ -119,8 +120,8 @@ struct NX_VMS_API UserModelV1: public UserModelBase
     DbUpdateTypes toDbTypes() &&;
     static std::vector<UserModelV1> fromDbTypes(DbListTypes data);
 
-    static_assert(isCreateModelV<UserModelV1>);
-    static_assert(isUpdateModelV<UserModelV1>);
+    static_assert(nx::utils::isCreateModelV<UserModelV1>);
+    static_assert(nx::utils::isUpdateModelV<UserModelV1>);
 };
 #define UserModelV1_Fields UserModelBase_Fields(isOwner)(permissions)(userRoleId)(accessibleResources)
 QN_FUSION_DECLARE_FUNCTIONS(UserModelV1, (json), NX_VMS_API)
@@ -201,8 +202,8 @@ struct NX_VMS_API UserModelV3: public UserModelBase, public ResourceWithParamete
     DbUpdateTypes toDbTypes() &&;
     static std::vector<UserModelV3> fromDbTypes(DbListTypes data);
 
-    static_assert(isCreateModelV<UserModelV3>);
-    static_assert(isUpdateModelV<UserModelV3>);
+    static_assert(nx::utils::isCreateModelV<UserModelV3>);
+    static_assert(nx::utils::isUpdateModelV<UserModelV3>);
 };
 #define UserModelV3_Fields UserModelBase_Fields(groupIds)(permissions)(resourceAccessRights) \
     (temporaryToken)(parameters)

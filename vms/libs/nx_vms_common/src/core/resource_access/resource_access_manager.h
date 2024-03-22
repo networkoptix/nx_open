@@ -8,8 +8,8 @@
 #include <core/resource/resource_fwd.h>
 #include <core/resource_access/access_rights_resolver.h>
 #include <core/resource_access/resource_access_details.h>
-#include <core/resource_access/user_access_data.h>
 #include <nx/core/core_fwd.h>
+#include <nx/network/rest/user_access_data.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/common/system_context_aware.h>
 #include <utils/common/updatable.h>
@@ -44,7 +44,7 @@ public:
         QObject* parent = nullptr);
 
     // Helper functions to avoid direct GlobalPermissions checking.
-    bool hasPowerUserPermissions(const Qn::UserAccessData& accessData) const;
+    bool hasPowerUserPermissions(const nx::network::rest::UserAccessData& accessData) const;
     bool hasPowerUserPermissions(const QnResourceAccessSubject& subject) const;
 
     // TODO: #vkutin
@@ -84,7 +84,7 @@ public:
      * @param requiredPermission Global permission to check.
      * @returns True if actual global permissions include required permission.
      */
-    bool hasGlobalPermission(const Qn::UserAccessData& accessData,
+    bool hasGlobalPermission(const nx::network::rest::UserAccessData& accessData,
         GlobalPermission requiredPermission) const;
 
     /**
@@ -151,7 +151,7 @@ public:
      * @returns True if actual permissions include required permission.
      */
     bool hasPermission(
-        const Qn::UserAccessData& accessData,
+        const nx::network::rest::UserAccessData& accessData,
         const QnResourcePtr& targetResource,
         Qn::Permissions permissions) const;
 
@@ -213,7 +213,7 @@ public:
         nx::vms::api::AccessRights accessRights) const;
 
     bool hasAccessToAllCameras(
-        const Qn::UserAccessData& userAccessData,
+        const nx::network::rest::UserAccessData& userAccessData,
         nx::vms::api::AccessRights) const;
 
 //-------------------------------------------------------------------------------------------------

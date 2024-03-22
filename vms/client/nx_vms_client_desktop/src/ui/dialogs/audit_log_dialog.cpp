@@ -985,7 +985,7 @@ void QnAuditLogDialog::makeSessionData()
 void QnAuditLogDialog::makeCameraData()
 {
     m_cameraData.clear();
-    QMap<nx::Uuid, std::pair<int, const QnAuthSession*>> activityPerCamera;
+    QMap<nx::Uuid, std::pair<int, const nx::network::rest::AuthSession*>> activityPerCamera;
     for (const QnLegacyAuditRecord& record: m_allData)
     {
         if (record.isPlaybackType() || record.isCameraType())

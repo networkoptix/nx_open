@@ -17,7 +17,6 @@
 #include <core/resource/webpage_resource.h>
 #include <core/resource_access/access_rights_manager.h>
 #include <core/resource_access/resource_access_manager.h>
-#include <core/resource_access/user_access_data.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
@@ -25,6 +24,7 @@
 #include <core/resource_management/status_dictionary.h>
 #include <licensing/license.h>
 #include <nx/fusion/serialization/json.h>
+#include <nx/network/rest/user_access_data.h>
 #include <nx/network/socket_common.h>
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/log/log.h>
@@ -697,7 +697,7 @@ void QnCommonMessageProcessor::on_resourceStatusRemoved(
         {
             if (auto connection = messageBusConnection())
             {
-                connection->getResourceManager(Qn::kSystemSession)->setResourceStatus(
+                connection->getResourceManager(nx::network::rest::kSystemSession)->setResourceStatus(
                     resourceId, res->getStatus(), [](int /*requestId*/, ec2::ErrorCode) {});
             }
         }

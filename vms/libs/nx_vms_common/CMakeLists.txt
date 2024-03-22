@@ -30,6 +30,7 @@ nx_add_target(nx_vms_common LIBRARY
         nx_vms_api
         nx_vms_utils
         nx_network
+        nx_network_rest
         nx_utils
         nx_sdk
         nx_fusion

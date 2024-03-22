@@ -288,8 +288,6 @@ QnLegacyAuditRecord::operator QnAuditRecord() const
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    QnAuthSession, (ubjson)(json)(sql_record), QnAuthSession_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     QnAuditRecord, (ubjson)(json), QnAuditRecord_Fields)
 
 QN_FUSION_ADAPT_CLASS(QnAuditRecordModel,
@@ -356,7 +354,7 @@ QnAuditRecord::operator QnLegacyAuditRecord() const
 static std::optional<std::chrono::seconds> s_createdTimeForTests;
 
 QnAuditRecord QnAuditRecord::prepareRecord(
-    nx::vms::api::AuditRecordType type, const QnAuthSession& authSession)
+    nx::vms::api::AuditRecordType type, const nx::network::rest::AuthSession& authSession)
 {
     QnAuditRecord result(authSession);
     result.eventType = type;

@@ -8,9 +8,9 @@
 #include <QtCore/QUrlQuery>
 
 #include <core/resource/shared_resource_pointer.h>
-#include <core/resource_access/user_access_data.h>
 #include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/network/http/http_async_client.h>
+#include <nx/network/rest/user_access_data.h>
 #include <nx/network/websocket/websocket.h>
 #include <nx/p2p/transport/i_p2p_transport.h>
 #include <nx/utils/scope_guard.h>

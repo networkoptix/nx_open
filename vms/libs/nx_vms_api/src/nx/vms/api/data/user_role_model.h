@@ -47,8 +47,8 @@ struct NX_VMS_API UserRoleModel
     DbUpdateTypes toDbTypes() &&;
     static std::vector<UserRoleModel> fromDbTypes(DbListTypes data);
 
-    static_assert(isCreateModelV<UserRoleModel>);
-    static_assert(isUpdateModelV<UserRoleModel>);
+    static_assert(nx::utils::isCreateModelV<UserRoleModel>);
+    static_assert(nx::utils::isUpdateModelV<UserRoleModel>);
 };
 #define UserRoleModel_Fields (id)(name)(description)(permissions)(parentGroupIds)(accessibleResources)
 QN_FUSION_DECLARE_FUNCTIONS(UserRoleModel, (csv_record)(json)(ubjson)(xml), NX_VMS_API)

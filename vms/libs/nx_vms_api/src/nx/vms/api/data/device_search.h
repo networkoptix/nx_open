@@ -4,9 +4,9 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/enum_instrument.h>
+#include <nx/utils/type_traits.h>
 
 #include "device_model.h"
-#include "type_traits.h"
 
 namespace nx::vms::api {
 
@@ -72,7 +72,7 @@ struct NX_VMS_API DeviceSearchBase
 
     nx::Uuid getId() const { return id; }
     void setId(nx::Uuid value) { id = std::move(value); }
-    static_assert(nx::vms::api::isCreateModelV<DeviceSearchBase>);
+    static_assert(nx::utils::isCreateModelV<DeviceSearchBase>);
 };
 #define DeviceSearchBase_Fields (id)(port)(credentials)(mode)(status)(devices)
 

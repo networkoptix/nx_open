@@ -45,6 +45,30 @@ struct IsVector: std::false_type {};
 template<typename T, typename A>
 struct IsVector<std::vector<T, A>>: std::true_type {};
 
+template<typename, typename = std::void_t<>>
+struct HasGetId: std::false_type {};
+template<typename T>
+struct HasGetId<T, std::void_t<decltype(&T::getId)>>: std::true_type {};
+
+template<typename, typename = std::void_t<>>
+struct HasSetId: std::false_type {};
+template<typename T>
+struct HasSetId<T, std::void_t<decltype(&T::setId)>>: std::true_type {};
+
+template <typename T>
+struct HasGetIdAndSetId
+{
+    static constexpr bool value = HasGetId<T>::value && HasSetId<T>::value;
+};
+
+template <typename T> using IsCreateModel = HasGetIdAndSetId<T>;
+template <typename T> using IsUpdateModel = HasGetId<T>;
+template <typename T> using IsFlexibleIdModel = HasGetIdAndSetId<T>;
+
+template <typename T> constexpr bool isCreateModelV = IsCreateModel<T>::value;
+template <typename T> constexpr bool isUpdateModelV = IsUpdateModel<T>::value;
+template <typename T> constexpr bool isFlexibleIdModelV = IsFlexibleIdModel<T>::value;
+
 } // namespace nx::utils
 
 namespace QnTypeTraits {

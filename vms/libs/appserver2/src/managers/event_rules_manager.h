@@ -13,7 +13,7 @@ template<class QueryProcessorType>
 class EventRulesManager: public AbstractEventRulesManager
 {
 public:
-    EventRulesManager(QueryProcessorType* queryProcessor, const Qn::UserSession& userSession);
+    EventRulesManager(QueryProcessorType* queryProcessor, const nx::network::rest::UserSession& userSession);
 
     virtual int getEventRules(
         Handler<nx::vms::api::EventRuleDataList> handler,
@@ -43,12 +43,12 @@ private:
 
 private:
     QueryProcessorType* const m_queryProcessor;
-    Qn::UserSession m_userSession;
+    nx::network::rest::UserSession m_userSession;
 };
 
 template<class QueryProcessorType>
 EventRulesManager<QueryProcessorType>::EventRulesManager(
-    QueryProcessorType* queryProcessor, const Qn::UserSession& userSession)
+    QueryProcessorType* queryProcessor, const nx::network::rest::UserSession& userSession)
     :
     m_queryProcessor(queryProcessor),
     m_userSession(userSession)

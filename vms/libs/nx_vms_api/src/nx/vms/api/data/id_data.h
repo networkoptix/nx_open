@@ -3,8 +3,8 @@
 #pragma once
 
 #include <nx/reflect/instrument.h>
+#include <nx/utils/type_traits.h>
 #include <nx/utils/uuid.h>
-#include <nx/vms/api/data/type_traits.h>
 
 #include "data_macros.h"
 
@@ -39,7 +39,7 @@ struct NX_VMS_API IdData
 
     nx::Uuid getId() const { return id; }
     void setId(nx::Uuid value) { id = std::move(value); }
-    static_assert(isFlexibleIdModelV<IdData>);
+    static_assert(nx::utils::isFlexibleIdModelV<IdData>);
 
     nx::Uuid id;
 };

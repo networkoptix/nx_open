@@ -19,7 +19,6 @@ struct NX_VMS_API StoredFileData
     bool operator==(const StoredFileData& other) const = default;
 
     const QString& getId() const { return path; }
-    void setId(const QString& id) { path = id; }
 };
 #define StoredFileData_Fields (path)(data)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(StoredFileData)

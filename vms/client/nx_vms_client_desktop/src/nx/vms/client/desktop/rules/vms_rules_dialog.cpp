@@ -177,7 +177,7 @@ void VmsRulesDialog::deleteRulesImpl(const UuidList& ids)
     if (!connection)
         return;
 
-    const auto rulesManager = connection->getVmsRulesManager(Qn::kSystemSession);
+    const auto rulesManager = connection->getVmsRulesManager(nx::network::rest::kSystemSession);
     for (const auto& id: ids)
     {
         rulesManager->deleteRule(
@@ -198,7 +198,7 @@ void VmsRulesDialog::saveRuleImpl(const std::shared_ptr<vms::rules::Rule>& rule)
         return;
 
     const auto serializedRule = serialize(rule.get());
-    const auto rulesManager = connection->getVmsRulesManager(Qn::kSystemSession);
+    const auto rulesManager = connection->getVmsRulesManager(nx::network::rest::kSystemSession);
     rulesManager->save(
         serializedRule,
         [this](int /*requestId*/, ec2::ErrorCode errorCode)
@@ -215,7 +215,7 @@ void VmsRulesDialog::resetToDefaultsImpl()
     if (!connection)
         return;
 
-    connection->getVmsRulesManager(Qn::kSystemSession)->resetVmsRules(
+    connection->getVmsRulesManager(nx::network::rest::kSystemSession)->resetVmsRules(
         [this](int /*requestId*/, ec2::ErrorCode errorCode)
         {
             if (errorCode != ec2::ErrorCode::ok)

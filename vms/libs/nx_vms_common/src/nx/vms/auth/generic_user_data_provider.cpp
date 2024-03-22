@@ -13,7 +13,7 @@
 #include <nx/utils/cryptographic_hash.h>
 #include <nx/utils/log/log.h>
 
-using namespace nx::vms::common;
+using namespace nx::network::rest;
 
 GenericUserDataProvider::GenericUserDataProvider(QnCommonModule* commonModule):
     QnCommonModuleAware(commonModule)

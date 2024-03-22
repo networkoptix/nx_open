@@ -412,6 +412,7 @@ distrib_copyServerLibs() # additional_libs_to_copy...
         libnx_build_info
         libnx_monitoring
         libnx_network
+        libnx_network_rest
         libnx_utils
         libnx_vms_utils
         libnx_zip

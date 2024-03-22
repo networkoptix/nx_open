@@ -11,7 +11,7 @@ template<class QueryProcessorType>
 class QnUserManager: public AbstractUserManager
 {
 public:
-    QnUserManager(QueryProcessorType* queryProcessor, Qn::UserSession userSession);
+    QnUserManager(QueryProcessorType* queryProcessor, nx::network::rest::UserSession userSession);
 
     virtual int getUsers(
         Handler<nx::vms::api::UserDataList> handler,
@@ -51,12 +51,12 @@ private:
 
 private:
     QueryProcessorType* const m_queryProcessor;
-    Qn::UserSession m_userSession;
+    nx::network::rest::UserSession m_userSession;
 };
 
 template<class QueryProcessorType>
 QnUserManager<QueryProcessorType>::QnUserManager(
-    QueryProcessorType* queryProcessor, Qn::UserSession userSession)
+    QueryProcessorType* queryProcessor, nx::network::rest::UserSession userSession)
     :
     m_queryProcessor(queryProcessor),
     m_userSession(std::move(userSession))

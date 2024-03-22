@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <core/resource_access/user_access_data.h>
+#include <nx/network/rest/user_access_data.h>
 #include <nx/vms/api/data/showreel_data.h>
 #include <nx_ec/managers/abstract_showreel_manager.h>
 #include <transaction/transaction.h>
@@ -13,7 +13,7 @@ template<class QueryProcessorType>
 class ShowreelManager: public AbstractShowreelManager
 {
 public:
-    ShowreelManager(QueryProcessorType* queryProcessor, const Qn::UserSession& userSession);
+    ShowreelManager(QueryProcessorType* queryProcessor, const nx::network::rest::UserSession& userSession);
 
     virtual int getShowreels(
         Handler<nx::vms::api::ShowreelDataList> handler,
@@ -34,12 +34,12 @@ private:
 
 private:
     QueryProcessorType* const m_queryProcessor;
-    Qn::UserSession m_userSession;
+    nx::network::rest::UserSession m_userSession;
 };
 
 template<typename QueryProcessorType>
 ShowreelManager<QueryProcessorType>::ShowreelManager(
-    QueryProcessorType* queryProcessor, const Qn::UserSession& userSession)
+    QueryProcessorType* queryProcessor, const nx::network::rest::UserSession& userSession)
     :
     m_queryProcessor(queryProcessor),
     m_userSession(userSession)

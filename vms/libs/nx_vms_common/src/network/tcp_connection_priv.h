@@ -8,11 +8,11 @@
 
 #include <QtCore/QByteArray>
 
-#include <core/resource_access/user_access_data.h>
 #include <nx/kit/utils.h>
 #include <nx/network/http/http_stream_reader.h>
 #include <nx/network/http/http_types.h>
 #include <nx/network/nx_network_ini.h>
+#include <nx/network/rest/user_access_data.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/system_error.h>
 
@@ -117,7 +117,7 @@ public:
     bool binaryProtocol = false;
     int clientRequestOffset;
     QDateTime lastModified;
-    Qn::UserAccessData accessRights;
+    nx::network::rest::UserAccessData accessRights;
     SystemError::ErrorCode prevSocketError;
     bool authenticatedOnce;
     bool requestLogged;

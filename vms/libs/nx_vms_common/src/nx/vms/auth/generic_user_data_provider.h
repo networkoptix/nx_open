@@ -24,13 +24,13 @@ public:
     virtual std::pair<QnResourcePtr, bool /*hasClash*/> findResByName(
         const nx::String& nxUserName) const override;
 
-    virtual nx::vms::common::AuthResult authorize(
+    virtual nx::network::rest::AuthResult authorize(
         const QnResourcePtr& res,
         const nx::network::http::Method& method,
         const nx::network::http::header::Authorization& authorizationHeader,
         nx::network::http::HttpHeaders* const responseHeaders) override;
 
-    virtual std::tuple<nx::vms::common::AuthResult, QnResourcePtr> authorize(
+    virtual std::tuple<nx::network::rest::AuthResult, QnResourcePtr> authorize(
         const nx::network::http::Method& method,
         const nx::network::http::header::Authorization& authorizationHeader,
         nx::network::http::HttpHeaders* const responseHeaders) override;

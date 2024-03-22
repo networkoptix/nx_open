@@ -246,7 +246,7 @@ void ShowreelActionsHandler::saveShowreelToServer(const nx::vms::api::ShowreelDa
 
     if (const auto connection = system()->messageBusConnection())
     {
-        int reqId = connection->getShowreelManager(Qn::kSystemSession)->save(
+        int reqId = connection->getShowreelManager(nx::network::rest::kSystemSession)->save(
             showreel,
             [showreel, stateManager](int reqId, ec2::ErrorCode errorCode)
             {
@@ -272,7 +272,7 @@ void ShowreelActionsHandler::removeShowreelFromServer(const nx::Uuid& showreelId
 {
     if (const auto connection = system()->messageBusConnection())
     {
-        connection->getShowreelManager(Qn::kSystemSession)->remove(
+        connection->getShowreelManager(nx::network::rest::kSystemSession)->remove(
             showreelId, [](int /*reqId*/, ec2::ErrorCode) {});
     }
 }

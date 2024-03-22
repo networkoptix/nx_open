@@ -109,9 +109,9 @@ struct NX_VMS_API DeviceModelGeneral: ResourceWithParameters
 
     [[nodiscard]] nx::Uuid getId() const { return id; }
     void setId(nx::Uuid id_) { id = id_; }
-    static_assert(isCreateModelV<DeviceModelGeneral>);
-    static_assert(isUpdateModelV<DeviceModelGeneral>);
-    static_assert(isFlexibleIdModelV<DeviceModelGeneral>);
+    static_assert(nx::utils::isCreateModelV<DeviceModelGeneral>);
+    static_assert(nx::utils::isUpdateModelV<DeviceModelGeneral>);
+    static_assert(nx::utils::isFlexibleIdModelV<DeviceModelGeneral>);
 };
 #define DeviceModelGeneral_Fields \
     (id)(name)(url)(typeId)(mac)(serverId)(physicalId) \

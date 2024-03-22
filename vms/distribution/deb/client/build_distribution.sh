@@ -148,6 +148,7 @@ copyLibs()
         nx_media
         nx_media_core
         nx_network
+        nx_network_rest
         nx_pathkit
         nx_rtp
         nx_vms_api

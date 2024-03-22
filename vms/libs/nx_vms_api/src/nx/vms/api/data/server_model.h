@@ -123,9 +123,9 @@ struct NX_VMS_API ServerModel: ResourceWithParameters
 
     nx::Uuid getId() const { return id; }
     void setId(nx::Uuid id_) { id = std::move(id_); }
-    static_assert(isCreateModelV<ServerModel>);
-    static_assert(isUpdateModelV<ServerModel>);
-    static_assert(isFlexibleIdModelV<ServerModel>);
+    static_assert(nx::utils::isCreateModelV<ServerModel>);
+    static_assert(nx::utils::isUpdateModelV<ServerModel>);
+    static_assert(nx::utils::isFlexibleIdModelV<ServerModel>);
 
     DbUpdateTypes toDbTypes() &&;
     static std::vector<ServerModel> fromDbTypes(DbListTypes data);

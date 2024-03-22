@@ -16,7 +16,7 @@ template<class QueryProcessorType>
 class QnLicenseManager: public AbstractLicenseManager
 {
 public:
-    QnLicenseManager(QueryProcessorType* queryProcessor, const Qn::UserSession& userSession);
+    QnLicenseManager(QueryProcessorType* queryProcessor, const nx::network::rest::UserSession& userSession);
 
     virtual int getLicenses(
         Handler<QnLicenseList> handler,
@@ -37,7 +37,7 @@ private:
 
 private:
     QueryProcessorType* const m_queryProcessor;
-    Qn::UserSession m_userSession;
+    nx::network::rest::UserSession m_userSession;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -45,7 +45,7 @@ private:
 
 template<class T>
 QnLicenseManager<T>::QnLicenseManager(
-    T* queryProcessor, const Qn::UserSession& userSession)
+    T* queryProcessor, const nx::network::rest::UserSession& userSession)
     :
     m_queryProcessor(queryProcessor),
     m_userSession(userSession)
