@@ -8,6 +8,7 @@
 #include <nx/network/socket_global.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/network/url/url_parse_helper.h>
+#include <nx/utils/datetime.h>
 #include <nx/utils/crypt/linux_passwd_crypt.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/system_error.h>
@@ -1268,7 +1269,7 @@ void AsyncClient::prepareRequestHeaders(
 {
     nx::network::http::insertOrReplaceHeader(
         &m_request.headers,
-        HttpHeader("Date", nx::network::http::formatDateTime(
+        HttpHeader("Date", nx::utils::formatDateTime(
             QDateTime::fromMSecsSinceEpoch(nx::utils::millisSinceEpoch().count()))));
     nx::network::http::insertOrReplaceHeader(
         &m_request.headers,

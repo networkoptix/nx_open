@@ -2,6 +2,7 @@
 
 #include "uplink_bandwidth_tester.h"
 
+#include <nx/utils/datetime.h>
 #include <nx/network/system_socket.h>
 #include <nx/network/url/url_builder.h>
 
@@ -126,7 +127,7 @@ std::pair<int, nx::Buffer> UplinkBandwidthTester::makeRequest()
     ++m_testContext.sequence;
 
     Request request;
-    request.headers.emplace("Date", formatDateTime(QDateTime::currentDateTime()));
+    request.headers.emplace("Date", nx::utils::formatDateTime(QDateTime::currentDateTime()));
     request.headers.emplace("User-Agent", userAgentString());
     request.headers.emplace("Host", url::getEndpoint(m_url).toString());
     request.headers.emplace("Content-Type", "text/plain");

@@ -18,42 +18,6 @@
 
 namespace nx::network::http {
 
-namespace {
-
-// Sun, 06 Nov 1994 08:49:37 GMT (RFC 822, updated by RFC 1123)
-static QDateTime parseRfc1123Date(const std::string_view& str)
-{
-    static constexpr char kRfc1123Template[] = "ddd, dd MMM yyyy hh:mm:ss";
-    return QLocale(QLocale::C).toDateTime(
-        QByteArray::fromRawData(str.data(), str.size()), kRfc1123Template);
-}
-
-// Sunday, 06-Nov-94 08:49:37 GMT (RFC 850, obsoleted by RFC 1036)
-static QDateTime parseRfc850Date(const std::string_view& str)
-{
-    static constexpr char kRfc850Template[] = "dddd, dd-MMM-yy hh:mm:ss";
-    return QLocale(QLocale::C).toDateTime(
-        QByteArray::fromRawData(str.data(), str.size()), kRfc850Template);
-}
-
-// Sun Nov  6 08:49:37 1994  (ANSI C's asctime() format)
-static QDateTime parseAnsiCDate(const std::string_view& str)
-{
-    // QDateTime::fromString() requires exact format match, so two templates are required:
-    // Non padded if the day of the month is >= 10, and padded if day of the month is < 10
-    static constexpr char kAnsiCTemplate[]       = "ddd MMM d hh:mm:ss yyyy";
-    static constexpr char kAnsiCTemplatePadded[] = "ddd MMM  d hh:mm:ss yyyy";
-
-    if (str.size() < 9)
-        return QDateTime();
-
-    return QLocale(QLocale::C).toDateTime(
-        QByteArray::fromRawData(str.data(), str.size()),
-        str[8] == ' ' ? kAnsiCTemplatePadded : kAnsiCTemplate);
-}
-
-} //namespace
-
 const char* urlScheme(bool isSecure)
 {
     return isSecure ? kSecureUrlSchemeName : kUrlSchemeName;
@@ -2358,68 +2322,6 @@ std::string serverString()
 std::string compatibilityServerName()
 {
     return COMPATIBILITY_SERVER_STRING;
-}
-
-std::string formatDateTime(const QDateTime& value)
-{
-    // Starts with Monday to correspond to QDate::dayOfWeek() return value: 1 for Monday, 7 for Sunday
-    static constexpr const char* kWeekDays[] = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
-    static constexpr const char* kMonths[] = {
-         "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
-
-    if (value.isNull() || !value.isValid())
-        return std::string();
-
-    QDateTime utc = value.toUTC();
-    const QDate& date = utc.date();
-    const QTime& time = utc.time();
-
-    char strDateBuf[256];
-    snprintf(strDateBuf, sizeof(strDateBuf), "%s, %02d %s %d %02d:%02d:%02d GMT",
-        kWeekDays[date.dayOfWeek() - 1],
-        date.day(),
-        kMonths[date.month() - 1],
-        date.year(),
-        time.hour(),
-        time.minute(),
-        time.second());
-
-    return std::string(strDateBuf);
-}
-
-QDateTime parseDate(const std::string_view& str)
-{
-    auto date = nx::utils::trim(str);
-
-    // Sanity check. parseAnsiCDate() has hard-coded array access.
-    if (date.length() < 8)
-        return QDateTime();
-
-    // If the string ends with " GMT" it is either RFC 1123 or RFC 850
-    if (nx::utils::endsWith(date, " GMT"))
-    {
-        // QDateTime::fromString() fails if string contains " GMT"
-        // because "M" is used as a formatter.
-        date = date.substr(0, date.length() - 4);
-        QDateTime parsedDate;
-
-        // RFC 1123 date: first three characters are abbreviated day of the week, like "Sun",
-        // followed by a comma
-        if (date[3] == ',')
-            parsedDate = parseRfc1123Date(date);
-
-        if (!parsedDate.isValid())
-            parsedDate = parseRfc850Date(date);
-
-        if (parsedDate.isValid())
-        {
-            parsedDate.setTimeSpec(Qt::UTC);
-            return parsedDate;
-        }
-    }
-
-    // Fall back to ANSI C date.
-    return parseAnsiCDate(date);
 }
 
 } // namespace nx::network::http
