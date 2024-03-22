@@ -1224,17 +1224,26 @@ void WebViewController::requestCertificateDialog(QObject* selection)
         QMetaObject::invokeMethod(selection, "selectNone");
 }
 
-bool WebViewController::verifyCertificate(const QWebEngineCertificateError& error)
+bool WebViewController::verifyCertificate(const QVariant& error)
 {
     if (!nx::network::ini().verifySslCertificates)
         return true;
 
+    if (!error.canConvert<QWebEngineCertificateError>())
+        return false;
+
+    // Helps to avoid warning in logs because QWebEngineCertificateError has no default constructor
+    // and value() cannot be used.
+    auto certificateError = static_cast<const QWebEngineCertificateError*>(error.data());
+    if (!certificateError)
+        return false;
+
     QString pemString;
-    for (const auto& cert: error.certificateChain())
-        pemString += cert.toPem();
+    for (const auto& certificate: certificateError->certificateChain())
+        pemString += certificate.toPem();
 
     return d->certificateValidator
-        ? d->certificateValidator(pemString, error.url())
+        ? d->certificateValidator(pemString, certificateError->url())
         : false;
 }
 

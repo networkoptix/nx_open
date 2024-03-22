@@ -18,6 +18,7 @@
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/ui/dialogs/client_api_auth_dialog.h>
+#include <nx/vms/client/desktop/ui/dialogs/web_page_certificate_dialog.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/text/time_strings.h>
@@ -389,31 +390,7 @@ bool QnWebResourceWidget::askUserToAcceptCertificate(
     const bool isIntegration = ini().webPagesAndIntegrations
         && webPage->getOptions().testFlag(QnWebPageResource::Integration);
 
-    QnSessionAwareMessageBox warning(mainWindowWidget());
-    warning.setText(isIntegration
-        ? tr("Open this integration?")
-        : tr("Open this web page?"));
-    warning.setIcon(QnMessageBox::Icon::Question);
-
-    const QString addressLine = isIntegration
-        ? nx::vms::common::html::bold(tr("Integration")).append(": ").append(url.toDisplayString())
-        : nx::vms::common::html::bold(tr("Web Page")).append(": ").append(url.toDisplayString());
-
-    const QString infoText = isIntegration
-        ? tr("You try to open the\n%1\nbut this integration presented an untrusted certificate"
-            " auth.\nWe recommend you not to open this integration. If you understand the risks,"
-            " you can open the integration.", "%1 is the integration address").arg(addressLine)
-        : tr("You try to open the\n%1\nbut this web page presented an untrusted certificate auth."
-            "\nWe recommend you not to open this web page. If you understand the risks, you can"
-            " open the web page.", "%1 is the web page address").arg(addressLine);
-
-    warning.setInformativeText(infoText);
-
-    warning.addButton(
-        tr("Connect anyway"), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
-
-    warning.setStandardButtons({QDialogButtonBox::Cancel});
-    warning.button(QDialogButtonBox::Cancel)->setFocus();
+    WebPageCertificateDialog warning(mainWindowWidget(), url.toQUrl(), isIntegration);
 
     const auto settingsAction =
         isIntegration ? menu::IntegrationSettingsAction : menu::WebPageSettingsAction;
