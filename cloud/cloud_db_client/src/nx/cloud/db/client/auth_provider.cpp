@@ -167,7 +167,7 @@ void AuthProvider::getVmsServerTlsPublicKey(
             || res == api::ResultCode::notFound
             || res == api::ResultCode::noContent)
         {
-            QDateTime qdt = nx::network::http::parseDate(validToStr);
+            QDateTime qdt = nx::utils::parseDateToQDateTime(validToStr);
             if (!qdt.isValid())
             {
                 NX_DEBUG(this, "Invalid date-time string received: %1", validToStr);
