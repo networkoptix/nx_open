@@ -8,7 +8,10 @@
 #include <QtWidgets/QFrame>
 #include <QtWidgets/QVBoxLayout>
 
+#include <nx/network/ssl/certificate.h>
 #include <nx/vms/client/desktop/common/widgets/web_widget.h>
+#include <nx/vms/client/desktop/ui/dialogs/web_page_certificate_dialog.h>
+#include <ui/workbench/workbench_context.h>
 
 namespace {
 
@@ -46,7 +49,25 @@ WebViewDialog::WebViewDialog(
     // Set some resonable size to avoid completely shrinked dialog.
     resize(kBaseDialogSize);
 
-    if (!checkCertificate)
+    if (checkCertificate)
+    {
+        webWidget->controller()->setCertificateValidator(
+            [context](const QString& certificateChain, const QUrl& url)
+            {
+                if (certificateChain.isEmpty())
+                    return false;
+
+                const auto chain =
+                    nx::network::ssl::Certificate::parse(certificateChain.toStdString());
+
+                if (chain.empty())
+                    return false;
+
+                return WebPageCertificateDialog(context->mainWindowWidget(), url).exec()
+                    == QDialogButtonBox::AcceptRole;
+            });
+    }
+    else
     {
         webWidget->controller()->setCertificateValidator(
             [](const QString& /*certificateChain*/, const QUrl&) { return true; });
