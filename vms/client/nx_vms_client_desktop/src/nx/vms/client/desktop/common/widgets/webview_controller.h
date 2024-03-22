@@ -213,7 +213,7 @@ public:
      * Request external validator to check provided certificate chain. If no validator has been set,
      * returns false (i.e. only valid public certificates are accepted by the Chromium engine).
      */
-    Q_INVOKABLE bool verifyCertificate(const QWebEngineCertificateError& error);
+    Q_INVOKABLE bool verifyCertificate(const QVariant& error);
 
     Q_INVOKABLE QUrl resourceUrl() const;
 
