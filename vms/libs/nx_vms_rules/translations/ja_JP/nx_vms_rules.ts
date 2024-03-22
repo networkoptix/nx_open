@@ -354,7 +354,7 @@
     </message>
     <message>
       <source>To</source>
-      <translation>宛先</translation>
+      <translation>対象ユーザー</translation>
     </message>
   </context>
   <context>
@@ -525,7 +525,7 @@
     </message>
     <message>
       <source>Device does not respond to network requests.</source>
-      <translation>デバイスがネットワーク要求に応答しません。</translation>
+      <translation>デバイスがネットワークリクエストに応答しません。</translation>
     </message>
     <message>
       <source>Address %1 is already in use by %2 on primary stream.</source>
@@ -566,7 +566,7 @@
     <name>nx::vms::rules::NotificationAction</name>
     <message>
       <source>To</source>
-      <translation>宛先</translation>
+      <translation>対象ユーザー</translation>
     </message>
     <message>
       <source>Force Acknowledgement</source>
@@ -601,7 +601,7 @@
     </message>
     <message>
       <source>To</source>
-      <translation>宛先</translation>
+      <translation>対象ユーザー</translation>
     </message>
     <message>
       <source>Rewind</source>
@@ -728,7 +728,7 @@
     <name>nx::vms::rules::PushNotificationAction</name>
     <message>
       <source>To</source>
-      <translation>宛先</translation>
+      <translation>対象ユーザー</translation>
     </message>
     <message>
       <source>Header</source>
@@ -771,7 +771,7 @@
     </message>
     <message>
       <source>To</source>
-      <translation>宛先</translation>
+      <translation>対象ユーザー</translation>
     </message>
   </context>
   <context>
@@ -786,7 +786,7 @@
     </message>
     <message>
       <source>To</source>
-      <translation>宛先</translation>
+      <translation>対象ユーザー</translation>
     </message>
     <message>
       <source>Additional Recipients</source>
@@ -875,7 +875,7 @@
     </message>
     <message>
       <source>To</source>
-      <translation>宛先</translation>
+      <translation>対象ユーザー</translation>
     </message>
     <message>
       <source>Rewind</source>
