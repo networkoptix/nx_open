@@ -6,6 +6,7 @@
 #include <nx/network/http/http_async_client.h>
 #include <nx/network/http/http_types.h>
 #include <nx/p2p/transport/ping_headers.h>
+#include <nx/utils/datetime.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/log_main.h>
 #include <nx/utils/system_error.h>
@@ -387,7 +388,7 @@ void P2PHttpServerTransport::addDateHeader(network::http::HttpHeaders* headers)
     using namespace std::chrono;
     const auto dateTime = QDateTime::fromMSecsSinceEpoch(
         duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count());
-    headers->emplace("Date", network::http::formatDateTime(dateTime));
+    headers->emplace("Date", nx::utils::formatDateTime(dateTime));
 }
 
 void P2PHttpServerTransport::sendPostResponse(network::IoCompletionHandler handler)
