@@ -3193,7 +3193,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Failed to download and launch version %1</source>
-      <translation>バージョン %1 のダウンロードと起動に失敗しました</translation>
+      <translation>バージョン %1 のダウンロードおよび起動に失敗しました</translation>
     </message>
     <message>
       <source>Try Again</source>
@@ -3201,7 +3201,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Failed to restart %1 in compatibility mode</source>
-      <translation>互換モードでの %1 再起動に失敗しました</translation>
+      <translation>互換モードでの %1 の再起動に失敗しました</translation>
     </message>
     <message>
       <source>Please close %1 and start it again using the shortcut in the start menu.</source>
@@ -3318,11 +3318,11 @@ License Key: %2</source>
     </message>
     <message>
       <source>Database backed up to file</source>
-      <translation>データベース をファイルにバックアップ</translation>
+      <translation>データベースがファイルにバックアップされました</translation>
     </message>
     <message>
       <source>Failed to open file</source>
-      <translation>ファイルが開けませんでした：</translation>
+      <translation>ファイルオープンに失敗しました</translation>
     </message>
     <message>
       <source>Failed to restore database</source>
@@ -3362,7 +3362,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>System configuration will be restored from backup, Server application will be restarted.</source>
-      <translation>システム構成をバックアップから復元するとサーバー アプリケーションが再起動されます</translation>
+      <translation>システム構成がバックアップから復元され、サーバーアプリケーションが再起動されます。</translation>
     </message>
     <message>
       <source>Database successfully restored. Server application will restart shortly.</source>
@@ -3373,7 +3373,7 @@ License Key: %2</source>
     <name>QnEmptyBusinessActionWidget</name>
     <message>
       <source>Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</source>
-      <translation>パニック録画モードは、すべてのカメラの録画設定を最大FPSと品質に切り替えます。</translation>
+      <translation>パニック録画モードでは、すべてのカメラの録画設定について、FPSと映像品質が最大値に切り替わります。</translation>
     </message>
   </context>
   <context>
@@ -3408,7 +3408,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>No events</source>
-      <translation>イベントなし</translation>
+      <translation>イベントはありません</translation>
     </message>
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - %n events found</source>
@@ -3421,7 +3421,7 @@ License Key: %2</source>
       <source>Event log for %1 - %n events found</source>
       <comment>Date is substituted</comment>
       <translation>
-        <numerusform>イベントログ%1 - %n イベントが見つかりました</numerusform>
+        <numerusform>%1 のイベントログ - %n イベントが見つかりました</numerusform>
       </translation>
     </message>
     <message>
@@ -3494,7 +3494,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Subject removed</source>
-      <translation>サブジェクト削除</translation>
+      <translation>サブジェクトが削除されました</translation>
     </message>
     <message numerus="yes">
       <source>%1 (%n cameras)</source>
@@ -3523,7 +3523,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>%1 has no PTZ presets</source>
-      <translation>%1 に PTZ プリセットがありません</translation>
+      <translation>%1 には PTZ プリセットがありません</translation>
     </message>
   </context>
   <context>
@@ -3537,22 +3537,22 @@ License Key: %2</source>
     <name>QnFileMessages</name>
     <message>
       <source>Overwrite existing file?</source>
-      <translation>既存のファイルを上書きしますか？</translation>
+      <translation>既存のファイルを上書きしますか?</translation>
     </message>
     <message>
       <source>Failed to overwrite file</source>
-      <translation>ファイルを上書きできませんでした</translation>
+      <translation>ファイルの上書きに失敗しました</translation>
     </message>
   </context>
   <context>
     <name>QnFullscreenCameraActionWidget</name>
     <message>
       <source>This camera is not currently on the selected layout. Action will work if camera is added before action triggers.</source>
-      <translation>このカメラを含まないレイアウトが選択されています。アクションが実行される前にカメラを追加すればアクションは動作します。</translation>
+      <translation>このカメラは現在、選択されたレイアウトに含まれていません。アクションがトリガーされる前にカメラを追加すれば、アクションは機能します。</translation>
     </message>
     <message>
       <source>This camera is not currently on some of the selected layouts. Action will work if camera is added before action triggers.</source>
-      <translation>このカメラを含まないレイアウトが選択されています。アクションが実行される前にカメラを追加すればアクションは動作します。</translation>
+      <translation>このカメラは現在、選択されたうちの一部のレイアウトに含まれていません。アクションがトリガーされる前にカメラを追加すれば、アクションは機能します。</translation>
     </message>
   </context>
   <context>
@@ -3570,14 +3570,14 @@ License Key: %2</source>
     </message>
     <message>
       <source>%1 may not work properly.</source>
-      <translation>%1 が正しく動作しない場合があります</translation>
+      <translation>%1 が正しく動作しない可能性があります。</translation>
     </message>
   </context>
   <context>
     <name>QnGeneralPreferencesWidget</name>
     <message>
       <source>Folder already added</source>
-      <translation>指定したフォルダーは既に追加されています。</translation>
+      <translation>指定したフォルダーはすでに追加されています</translation>
     </message>
     <message>
       <source>None</source>
@@ -3620,7 +3620,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Device List</source>
-      <translation>デバイス リスト</translation>
+      <translation>デバイスリスト</translation>
     </message>
     <message>
       <source>Camera List</source>
@@ -3731,7 +3731,7 @@ License Key: %2</source>
     <name>QnInputDialog</name>
     <message>
       <source>Please enter a value.</source>
-      <translation>値を入力してください</translation>
+      <translation>値を入力してください。</translation>
     </message>
     <message>
       <source>Please enter a password.</source>
@@ -3742,11 +3742,11 @@ License Key: %2</source>
     <name>QnIoModuleOverlayWidgetPrivate</name>
     <message>
       <source>Failed to turn off I/O port %1</source>
-      <translation>I/O ポート %1 のオフに失敗しました</translation>
+      <translation>I/O ポート %1 のオフ切替に失敗しました</translation>
     </message>
     <message>
       <source>Failed to turn on I/O port %1</source>
-      <translation>I/O ポート %1 のオンに失敗しました</translation>
+      <translation>I/O ポート %1 のオン切替に失敗しました</translation>
     </message>
   </context>
   <context>
@@ -3832,7 +3832,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>License is active</source>
-      <translation>ライセンス アクティブ</translation>
+      <translation>ライセンスはアクティブです。</translation>
     </message>
     <message>
       <source>License is expired</source>
@@ -3840,7 +3840,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Expires soon</source>
-      <translation>期限切れ間近</translation>
+      <translation>まもなく期限切れ</translation>
     </message>
     <message>
       <source>License expires today</source>
@@ -3877,7 +3877,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Failed to open file</source>
-      <translation>ファイルが開けませんでした</translation>
+      <translation>ファイルオープンに失敗しました</translation>
     </message>
     <message>
       <source>To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</source>
@@ -3917,7 +3917,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Restart required</source>
-      <translation>再起動が必要</translation>
+      <translation>再起動が必要です</translation>
     </message>
     <message>
       <source>Restart Now</source>
@@ -3929,7 +3929,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Some changes will take effect only after %1 restart</source>
-      <translation>%1 再起動後に適用される変更があります</translation>
+      <translation>一部の変更は %1 再起動後にのみ有効になります</translation>
     </message>
     <message>
       <source>Settings are read-only. Please contact your system administrator. All changes will be lost after program exit.</source>
@@ -3980,7 +3980,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Sets the time to use in the client (timeline, timestamps, etc.) when client and server machines are in different time zones.</source>
-      <translation>クライアントとサーバーが異なるタイムゾーンにある場合に、クライアントで使用する時間 (タイムライン、タイムスタンプなど) を設定します。</translation>
+      <translation>クライアントとサーバーが異なるタイムゾーンにある場合に、クライアントで使用する時刻 (タイムライン、タイムスタンプなど) を設定します。</translation>
     </message>
     <message>
       <source>Displays IP addresses for cameras and servers and roles for users.</source>
@@ -4019,7 +4019,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>%1 (Tour &quot;%2&quot; is active)</source>
-      <translation>%1(ツアー&quot;%2&quot; が有効)</translation>
+      <translation>%1 (ツアー &quot;%2&quot; が有効)</translation>
     </message>
     <message>
       <source>I/O Module</source>
@@ -8579,7 +8579,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>No events</source>
-      <translation>イベントなし</translation>
+      <translation>イベントはありません</translation>
     </message>
     <message>
       <source>Any Action</source>
@@ -8596,7 +8596,7 @@ We recommend you not to open this integration. If you understand the risks, you 
       <source>Event log for %1 - %n events found</source>
       <comment>Date is substituted</comment>
       <translation>
-        <numerusform>イベントログ%1 - %n イベントが見つかりました</numerusform>
+        <numerusform>%1 のイベントログ - %n イベントが見つかりました</numerusform>
       </translation>
     </message>
     <message>
@@ -9301,7 +9301,7 @@ We recommend you not to open this integration. If you understand the risks, you 
       <source>At least %1 are required</source>
       <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
       <translation>
-        <numerusform>少なくとも%1 が必要</numerusform>
+        <numerusform>少なくとも %1 が必要です</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -12012,7 +12012,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>No events</source>
-      <translation>イベントなし</translation>
+      <translation>イベントはありません</translation>
     </message>
     <message>
       <source>Try changing the filters or create an Event Rule</source>
