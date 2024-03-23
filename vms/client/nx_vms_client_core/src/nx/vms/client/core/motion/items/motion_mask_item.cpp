@@ -76,6 +76,7 @@ public:
         // - single transformation with QMatrix(0,1,1,0, 0,0) - is not optimized.
         auto image = bitmap.toImage().transformed(QTransform().rotate(-90)).mirrored();
         image.setColorTable({0, 0xFFFFFFFF});
+        image.convertTo(QImage::Format_RGBA8888_Premultiplied);
 
         const auto newTexture = window->createTextureFromImage(image);
         newTexture->setHorizontalWrapMode(QSGTexture::ClampToEdge);
