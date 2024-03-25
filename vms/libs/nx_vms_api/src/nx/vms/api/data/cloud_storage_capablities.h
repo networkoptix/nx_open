@@ -7,10 +7,10 @@
 namespace nx::vms::api {
 
 NX_REFLECTION_ENUM_CLASS(CloudStorageCapability,
-    archive,
-    analytics,
-    bookmarks,
-    motion
+    archive = 1,
+    analytics = 2,
+    bookmarks = 4,
+    motion = 8
 )
 
 Q_DECLARE_FLAGS(CloudStorageCapabilities, CloudStorageCapability)
