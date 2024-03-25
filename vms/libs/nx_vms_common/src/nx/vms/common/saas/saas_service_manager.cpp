@@ -35,6 +35,9 @@ std::optional<T> getObjectFromDictionary(
 {
     const auto array = dictionary->value(nx::Uuid(), propertyKey).toUtf8();
     T result;
+    if (array.isEmpty())
+        return result;
+
     return nx::reflect::json::deserialize(std::string_view(array.data(), array.size()), &result)
         ? result
         : std::optional<T>();
