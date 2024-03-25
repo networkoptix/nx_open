@@ -332,6 +332,8 @@ Dialog
                 model: SortFilterProxyModel
                 {
                     sourceModel: listsModel
+                    sortCaseSensitivity: Qt.CaseInsensitive
+                    sortRoleName: "text"
                 }
                 enabled: !!currentList
                 textRole: "text"
