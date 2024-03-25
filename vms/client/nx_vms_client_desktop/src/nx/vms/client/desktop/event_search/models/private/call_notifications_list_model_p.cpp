@@ -40,7 +40,8 @@ CallNotificationsListModel::Private::Private(CallNotificationsListModel* q):
     base_type(),
     WindowContextAware(q),
     q(q),
-    m_helper(new vms::event::StringsHelper(system()))
+    m_helper(new vms::event::StringsHelper(system())),
+    m_soundController(this)
 {
     const auto handler = windowContext()->notificationActionHandler();
 
@@ -105,6 +106,9 @@ void CallNotificationsListModel::Private::addNotification(
             eventData.actionParameters =
                 system()->resourcePool()->getResourceById(intercomLayoutId);
             eventData.removable = false;
+
+            m_soundController.play("doorbell.mp3");
+
             break;
         }
         case MessageType::showMissedCallInformer:

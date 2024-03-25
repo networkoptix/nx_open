@@ -7,6 +7,7 @@
 #include <nx/vms/common/system_health/message_type.h>
 
 #include "../call_notifications_list_model.h"
+#include "sound_controller.h"
 
 namespace nx::vms::client::desktop {
 
@@ -34,6 +35,7 @@ private:
 private:
     CallNotificationsListModel* const q = nullptr;
     QScopedPointer<vms::event::StringsHelper> m_helper;
+    SoundController m_soundController;
 };
 
 } // namespace nx::vms::client::desktop

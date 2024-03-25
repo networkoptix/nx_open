@@ -70,40 +70,6 @@ QPixmap toPixmap(const QIcon& icon)
     return core::Skin::maximumSizePixmap(icon);
 }
 
-QSharedPointer<AudioPlayer> loopSound(const QString& filePath)
-{
-    auto player = std::make_unique<AudioPlayer>();
-    if (!player->open(filePath))
-        return {};
-
-    const auto restart =
-        [filePath, player = player.get()]()
-        {
-            player->close();
-            if (player->open(filePath))
-                player->playAsync();
-        };
-
-    const auto loopConnection = QObject::connect(player.get(), &AudioPlayer::done,
-        player.get(), restart, Qt::QueuedConnection);
-
-    if (!player->playAsync())
-        return {};
-
-    return QSharedPointer<AudioPlayer>(player.release(),
-        [loopConnection](AudioPlayer* player)
-        {
-            // Due to AudioPlayer strange architecture simple calling pleaseStop doesn't work well:
-            //  it makes the calling thread wait until current playback finishes playing.
-
-            QObject::disconnect(loopConnection);
-            if (player->isRunning())
-                QObject::connect(player, &AudioPlayer::done, player, &AudioPlayer::deleteLater);
-            else
-                player->deleteLater();
-        });
-}
-
 QnVirtualCameraResourceList getAlarmCameras(
     const nx::vms::event::AbstractAction* action,
     const nx::vms::client::desktop::SystemContext* context)
@@ -214,7 +180,8 @@ nx::Uuid actionSourceId(const nx::vms::rules::NotificationActionBasePtr& action)
 NotificationListModel::Private::Private(NotificationListModel* q):
     WindowContextAware(q),
     q(q),
-    m_helper(new vms::event::StringsHelper(system()))
+    m_helper(new vms::event::StringsHelper(system())),
+    m_soundController(this)
 {
     const auto handler = windowContext()->notificationActionHandler();
     connect(handler, &NotificationActionHandler::cleared, q, &EventListModel::clear);
@@ -227,29 +194,12 @@ NotificationListModel::Private::Private(NotificationListModel* q):
         [this]()
         {
             m_uuidHashes.clear();
-            m_itemsByLoadingSound.clear();
-            m_players.clear();
             m_itemsByCloudSystem.clear();
+            m_soundController.resetLoopedPlayers();
         });
 
     connect(q, &EventListModel::rowsAboutToBeRemoved,
         this, &Private::onRowsAboutToBeRemoved);
-
-    const auto serverNotificationCache = system()->serverNotificationCache();
-    connect(serverNotificationCache,
-        &ServerNotificationCache::fileDownloaded, this,
-        [this, serverNotificationCache]
-            (const QString& fileName, ServerFileCache::OperationResult status)
-        {
-            if (status == ServerFileCache::OperationResult::ok)
-            {
-                const auto path = serverNotificationCache->getFullPath(fileName);
-                for (const auto& id: m_itemsByLoadingSound.values(fileName))
-                    m_players[id] = loopSound(path);
-            }
-
-            m_itemsByLoadingSound.remove(fileName);
-        });
 
     connect(workbenchContext()->instance<NotificationActionExecutor>(),
         &NotificationActionExecutor::notificationActionReceived,
@@ -319,16 +269,8 @@ void NotificationListModel::Private::onRowsAboutToBeRemoved(
     {
         const auto& event = this->q->getEvent(row);
         m_uuidHashes[event.ruleId][event.sourceId()].remove(event.id);
-        m_players.remove(event.id);
 
-        for (auto it = m_itemsByLoadingSound.begin(); it != m_itemsByLoadingSound.end(); ++it)
-        {
-            if (it.value() == event.id)
-            {
-                m_itemsByLoadingSound.erase(it);
-                break;
-            }
-        }
+        m_soundController.removeLoopedPlay(event.id);
 
         if (!event.cloudSystemId.isEmpty() && event.previewCamera)
             m_itemsByCloudSystem.remove(event.cloudSystemId, event.id);
@@ -446,11 +388,7 @@ void NotificationListModel::Private::onRepeatSoundAction(
         if (!this->q->addEvent(eventData))
             return;
 
-        const auto soundUrl = action->sound();
-        if (!m_itemsByLoadingSound.contains(soundUrl))
-            system()->serverNotificationCache()->downloadFile(soundUrl);
-
-        m_itemsByLoadingSound.insert(soundUrl, eventData.id);
+        m_soundController.addLoopedPlay(action->sound(), eventData.id);
 
         m_uuidHashes[action->ruleId()][actionSourceId(action)].insert(eventData.id);
     }
@@ -558,11 +496,7 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
 
     if (actionType == ActionType::playSoundAction)
     {
-        const auto soundUrl = action->getParams().url;
-        if (!m_itemsByLoadingSound.contains(soundUrl))
-            system()->serverNotificationCache()->downloadFile(soundUrl);
-
-        m_itemsByLoadingSound.insert(soundUrl, eventData.id);
+        m_soundController.addLoopedPlay(action->getParams().url, eventData.id);
     }
     else if (actionType == ActionType::showOnAlarmLayoutAction)
     {
