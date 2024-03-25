@@ -10,6 +10,7 @@
 #include <nx/vms/rules/actions/actions_fwd.h>
 
 #include "../notification_list_model.h"
+#include "sound_controller.h"
 
 class AudioPlayer;
 
@@ -106,8 +107,7 @@ private:
     // Used for deduplication of alarm layout tiles.
     QHash<nx::Uuid/*ruleId*/, QHash<nx::Uuid /*sourceId*/, QSet<nx::Uuid /*itemId*/>>> m_uuidHashes;
 
-    QMultiHash<QString, nx::Uuid> m_itemsByLoadingSound;
-    QHash<nx::Uuid /*item id*/, QSharedPointer<AudioPlayer>> m_players;
+    SoundController m_soundController;
 
     QMultiHash<QString /*system id*/, nx::Uuid /*item id*/> m_itemsByCloudSystem;
 };
