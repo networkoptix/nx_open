@@ -68,7 +68,7 @@ bool LookupListPreviewProcessor::buildTablePreview(LookupListImportEntriesModel*
         QTextStream in(&file);
 
         LookupListImportEntriesModel::PreviewRawData newData;
-        while (!in.atEnd() && lineIndex < d->rowsNumber)
+        while (!in.atEnd() && lineIndex <= d->rowsNumber)
         {
             QString fileLine = in.readLine();
             if (hasHeader && lineIndex == 0)

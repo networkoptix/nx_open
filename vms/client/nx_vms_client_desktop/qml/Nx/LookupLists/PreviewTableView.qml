@@ -16,9 +16,9 @@ CoreItems.TableView
 
     property bool correct: true
     readonly property string needSelectionText: qsTr("Select attribute")
-    flickableDirection: CoreItems.Flickable.VerticalFlick
     boundsBehavior: CoreItems.Flickable.StopAtBounds
     topMargin: columnsHeader.height
+    clip: true
 
     // TODO: make width of header and elements dynamic
     columnWidthProvider: function (column)
@@ -26,13 +26,9 @@ CoreItems.TableView
         return columnsHeader.comboBoxWidth + columnsHeader.comboBoxSpacing
     }
 
-    ScrollBar.vertical: ScrollBar
+    ScrollBar.horizontal: ScrollBar
     {
-        parent: control.parent //< The only way to shift ScrollBar yCoord and change height.
-
-        x: control.x + control.width - width
-        y: control.y + (columnsHeader.visible ? columnsHeader.height : 0)
-        height: control.height - (columnsHeader.visible ? columnsHeader.height : 0)
+        policy: ScrollBar.AsNeeded
     }
 
     delegate: BasicTableCellDelegate
