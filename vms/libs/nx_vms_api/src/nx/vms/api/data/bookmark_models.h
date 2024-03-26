@@ -46,7 +46,12 @@ struct NX_VMS_API BookmarkFilter
     /**%apidoc[opt] Maximum end time for the bookmark. */
     std::chrono::milliseconds endTimeMs{};
 
-    /**%apidoc[opt] Text-search filter string. */
+    /**%apidoc[opt]
+     * Text-search filter string. Bookmarks can be found by their description or tag. This filter
+     * can contain several words, any of them can match a bookmark. Each of these words can match
+     * a bookmark if the caption or tag contains the Text-search word in the middle of its value.
+     * For example: a bookmark has tag1="12345", the search string "234" will match the bookmark.
+    */
     QString text;
 
     /**%apidoc Returned bookmark count limit. */
