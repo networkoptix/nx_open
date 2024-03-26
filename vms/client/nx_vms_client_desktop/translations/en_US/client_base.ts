@@ -5748,42 +5748,6 @@ If you intended to move analytics data to another storage location, please conta
 <context>
     <name>QnWebResourceWidget</name>
     <message>
-        <source>Open this web page?</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Connect anyway</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>You try to open the
-%1
-but this web page presented an untrusted certificate auth.
-We recommend you not to open this web page. If you understand the risks, you can open the web page.</source>
-        <comment>%1 is the web page address</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Open this integration?</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Integration</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Web Page</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>You try to open the
-%1
-but this integration presented an untrusted certificate auth.
-We recommend you not to open this integration. If you understand the risks, you can open the integration.</source>
-        <comment>%1 is the integration address</comment>
-        <translation></translation>
-    </message>
-    <message>
         <source>Integration settings...</source>
         <translation></translation>
     </message>
@@ -12183,6 +12147,45 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
             <numerusform>%n event</numerusform>
             <numerusform>%n events</numerusform>
         </translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::client::desktop::WebPageCertificateDialog</name>
+    <message>
+        <source>Open this integration?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open this web page?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Integration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Web Page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You try to open the
+%1
+but this integration presented an untrusted certificate auth.
+We recommend you not to open this integration. If you understand the risks, you can open the integration.</source>
+        <comment>%1 is the integration address</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You try to open the
+%1
+but this web page presented an untrusted certificate auth.
+We recommend you not to open this web page. If you understand the risks, you can open the web page.</source>
+        <comment>%1 is the web page address</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connect anyway</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
