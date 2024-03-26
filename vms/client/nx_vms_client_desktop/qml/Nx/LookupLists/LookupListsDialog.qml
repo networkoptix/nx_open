@@ -171,10 +171,13 @@ Dialog
             taxonomy: control.taxonomy
             visible: false
             model: currentList
+            Component.onCompleted: editing = true
+            onRejected: editing = false
             onAccepted:
             {
                 entriesModel.addEntry(entry)
                 hasChanges = true
+                editing = false
             }
         }
     }
