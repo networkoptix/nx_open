@@ -7,6 +7,7 @@
 #include <queue>
 
 #include <QtCore/QCache>
+#include <QtCore/QCoreApplication>
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QJniEnvironment>
 #include <QtCore/QJniObject>
@@ -26,6 +27,8 @@
 #include <nx/media/video_frame.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
+
+#include "fbo_manager.h"
 
 namespace nx {
 namespace media {
@@ -97,65 +100,6 @@ static void fillInputBuffer(
         qDebug() << QString("gl error %1").arg(error); \
 
 } // namespace
-
-//-------------------------------------------------------------------------------------------------
-
-class FboManager
-{
-    static constexpr int kFboPoolSize = 4;
-
-public:
-    struct FboHolder
-    {
-        FboHolder(std::weak_ptr<QOpenGLFramebufferObject> fbo, FboManager* manager):
-            fbo(fbo),
-            manager(manager)
-        {
-        }
-
-        ~FboHolder()
-        {
-            const auto fboPtr = fbo.lock();
-            if (!fboPtr)
-                return;
-
-            NX_MUTEX_LOCKER lock(&manager->m_mutex);
-            manager->m_fbos.erase(
-                std::find(manager->m_fbos.begin(), manager->m_fbos.end(), fboPtr));
-            manager->m_fbosToDelete.push(fboPtr);
-        }
-
-        std::weak_ptr<QOpenGLFramebufferObject> fbo;
-        FboManager* manager = nullptr;
-    };
-
-    using FboPtr = std::shared_ptr<FboHolder>;
-
-    FboManager(const QSize& frameSize):
-        m_frameSize(frameSize)
-    {
-    }
-
-    FboPtr getFbo()
-    {
-        NX_MUTEX_LOCKER lock(&m_mutex);
-
-        // It looks like the video surface we use releases the presented QVideoFrame too early
-        // (before it is actually rendered). If we delete it immediately, we'll get screen
-        // blinking. Here we give the FBO a slight delay defore the deletion.
-        while (m_fbosToDelete.size() > 1)
-            m_fbosToDelete.pop();
-
-        m_fbos.emplace_back(new QOpenGLFramebufferObject(m_frameSize));
-        return std::make_shared<FboHolder>(m_fbos.back(), this);
-    }
-
-private:
-    std::vector<std::shared_ptr<QOpenGLFramebufferObject>> m_fbos;
-    std::queue<std::shared_ptr<QOpenGLFramebufferObject>> m_fbosToDelete;
-    Mutex m_mutex;
-    QSize m_frameSize;
-};
 
 //-------------------------------------------------------------------------------------------------
 
@@ -444,6 +388,9 @@ AndroidVideoDecoder::AndroidVideoDecoder(
 
 AndroidVideoDecoder::~AndroidVideoDecoder()
 {
+    // Some frames might still be in use, we cannot just delete their backing buffers here.
+    if (d->fboManager)
+        d->fboManager.release()->deleteWhenEmptyInThread(QCoreApplication::instance()->thread());
 }
 
 void AndroidVideoDecoderPrivate::addMaxResolutionIfNeeded(const AVCodecID codec)
