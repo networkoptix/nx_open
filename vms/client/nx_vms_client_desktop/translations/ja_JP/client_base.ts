@@ -3519,7 +3519,7 @@ License Key: %2</source>
     <name>QnExecPtzPresetPolicy</name>
     <message>
       <source>Select exactly one camera</source>
-      <translation>1台のカメラを選択してください</translation>
+      <translation>カメラを 1 台だけ選択してください</translation>
     </message>
     <message>
       <source>%1 has no PTZ presets</source>
@@ -3559,7 +3559,7 @@ License Key: %2</source>
     <name>QnFullscreenCameraPolicy</name>
     <message>
       <source>Select exactly one camera</source>
-      <translation>1台のカメラを選択してください</translation>
+      <translation>カメラを 1 台だけ選択してください</translation>
     </message>
   </context>
   <context>
@@ -4058,7 +4058,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Disabled by schedule</source>
-      <translation>スケジュールで無効</translation>
+      <translation>スケジュールにより無効</translation>
     </message>
   </context>
   <context>
@@ -4187,7 +4187,7 @@ License Key: %2</source>
     <name>QnPopupBusinessActionWidget</name>
     <message>
       <source>Notification will be shown until one of the users who see it creates bookmark with event description</source>
-      <translation>通知はユーザーがイベントの説明を記述するまで表示され続けます</translation>
+      <translation>通知を見たいずれかのユーザーが、イベントの説明を含むブックマークを作成するまでの間、通知が表示されます。</translation>
     </message>
   </context>
   <context>
@@ -4300,15 +4300,15 @@ License Key: %2</source>
     </message>
     <message>
       <source>Reassign</source>
-      <translation>再割り当て</translation>
+      <translation>割り当て変更</translation>
     </message>
     <message>
       <source>Hotkey used by preset &quot;%1&quot;</source>
-      <translation>プリセット&quot;%1&quot; で使用されているホットキー</translation>
+      <translation>このホットキーはすでにプリセット &quot;%1&quot; に割り当てられています</translation>
     </message>
     <message>
       <source>Hotkey used by tour &quot;%1&quot;</source>
-      <translation>ツアー&quot;%1&quot; で使用されているホットキー</translation>
+      <translation>このホットキーはすでにツアー &quot;%1&quot; に割り当てられています</translation>
     </message>
   </context>
   <context>
@@ -4515,7 +4515,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>URL already added</source>
-      <translation>既に追加された URL</translation>
+      <translation>このURLはすでに追加されています</translation>
     </message>
   </context>
   <context>
@@ -4541,7 +4541,7 @@ License Key: %2</source>
     <name>QnSearchBookmarksDialogPrivate</name>
     <message>
       <source>No bookmarks</source>
-      <translation>ブックマークなし</translation>
+      <translation>ブックマークはありません</translation>
     </message>
     <message>
       <source>Search</source>
@@ -4591,11 +4591,11 @@ License Key: %2</source>
     <name>QnSelectDevicesButton</name>
     <message>
       <source>Any Device</source>
-      <translation>全デバイス</translation>
+      <translation>すべてのデバイス</translation>
     </message>
     <message>
       <source>Any Camera</source>
-      <translation>全カメラ</translation>
+      <translation>すべてのカメラ</translation>
     </message>
     <message>
       <source>All Devices</source>
@@ -7764,11 +7764,11 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Select Device</source>
-      <translation>デバイス選択</translation>
+      <translation>デバイスを選択してください</translation>
     </message>
     <message>
       <source>Select Camera</source>
-      <translation>カメラ選択</translation>
+      <translation>カメラを選択してください</translation>
     </message>
     <message>
       <source>No cameras available</source>
@@ -8309,7 +8309,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     <name>nx::vms::client::desktop::CopyScheduleCameraSelectionDialog</name>
     <message>
       <source>Recording cannot be enabled for some cameras.</source>
-      <translation>幾つかのカメラで録画を有効にできません.</translation>
+      <translation>一部のカメラの録画を有効にできません。</translation>
     </message>
     <message>
       <source>Schedule settings are not compatible with some devices.</source>
