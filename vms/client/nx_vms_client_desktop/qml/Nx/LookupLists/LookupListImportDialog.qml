@@ -22,7 +22,7 @@ Dialog
     required property LookupListEntriesModel model
     title: qsTr("Import List")
     minimumWidth: 611
-    minimumHeight: 464
+    minimumHeight: 551
     maximumHeight: minimumHeight
     modality: Qt.ApplicationModal
     topPadding: 16
