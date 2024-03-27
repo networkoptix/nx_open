@@ -61,6 +61,12 @@ Dialog
         editLookupListDialog.createObject(control, properties).openNewIn(control)
     }
 
+    function importList()
+    {
+        const properties = {"model": entriesModel, "taxonomy": control.taxonomy}
+        importDialog.createObject(control, properties).openNewIn(control)
+    }
+
     // TODO: #sivanov Implement error handling.
     // This function is to be called from the dialog to show message box (e.g. if saving failed).
     function showError(text: string)
@@ -260,7 +266,7 @@ Dialog
                     {
                         text: qsTr("Import")
                         icon.source: "image://svg/skin/text_buttons/import.svg"
-                        onClicked: importDialog.visible = true
+                        onClicked: importList()
                     }
                     TextButton
                     {
@@ -358,14 +364,15 @@ Dialog
         }
     }
 
-    LookupListImportDialog
+    Component
     {
         id: importDialog
 
-        model: entriesModel
-        taxonomy: control.taxonomy
-        visible: false
-        onEntriesImported: hasChanges = true
+        LookupListImportDialog
+        {
+            visible: false
+            onEntriesImported: hasChanges = true
+        }
     }
 
     contentItem: Loader

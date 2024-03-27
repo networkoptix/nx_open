@@ -14,7 +14,7 @@ import Nx.Dialogs
 import nx.vms.client.desktop
 import nx.vms.client.desktop.analytics as Analytics
 
-Dialog
+ModalDialog
 {
     id: control
 
@@ -35,6 +35,12 @@ Dialog
     function resetTextFieldFocus()
     {
         separatorField.focus = false
+    }
+
+    function showProgressBar(processName)
+    {
+        importProgressBar.processName = processName
+        importProgressBar.progressStarted()
     }
 
     contentItem: Item
@@ -264,10 +270,14 @@ Dialog
         onDataHasHeaderRowChanged: initImportModel()
     }
 
+    Component.onCompleted:
+    {
+        processor.setImportFilePathFromDialog()
+    }
+
     onVisibleChanged:
     {
         separatorField.focus = false
-        processor.reset(importModel)
     }
 
     onRejected:
@@ -280,7 +290,6 @@ Dialog
         id: importProgressBar
 
         title: qsTr("Import List")
-        processName: qsTr("Importing")
         visible: false
         onRejected: importProcessor.cancelRunningTask()
         onDoneClicked: control.accept()
@@ -300,11 +309,7 @@ Dialog
     {
         id: importProcessor
 
-        onImportStarted:
-        {
-            importProgressBar.processName = qsTr("Importing")
-            importProgressBar.progressStarted()
-        }
+        onImportStarted: showProgressBar(qsTr("Importing"))
         onImportFinished: (exitCode) =>
         {
             switch (exitCode)
@@ -329,11 +334,7 @@ Dialog
             }
         }
 
-        onFixupStarted:
-        {
-            importProgressBar.processName = qsTr("Fixing imported entries")
-            importProgressBar.progressStarted()
-        }
+        onFixupStarted: showProgressBar(qsTr("Fixing imported entries"))
 
         onFixupFinished: (exitCode) =>
         {

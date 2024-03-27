@@ -74,6 +74,8 @@ public:
 
     Q_INVOKABLE void removeIncorrectEntries();
 
+    void update();
+
 signals:
     void listModelChanged(LookupListModel* listModel);
     void rowCountChanged();

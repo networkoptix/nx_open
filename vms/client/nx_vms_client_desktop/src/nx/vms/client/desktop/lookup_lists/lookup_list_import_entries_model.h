@@ -69,6 +69,7 @@ public:
         int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
     virtual int rowCount(const QModelIndex& parent = QModelIndex()) const override;
     virtual int columnCount(const QModelIndex& parent = QModelIndex()) const override;
+    bool hasIndex(int row, int column, const QModelIndex &parent = QModelIndex()) const;
     virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
     Q_INVOKABLE void setRawData(const PreviewRawData& rawData);
     Q_INVOKABLE void reset();
