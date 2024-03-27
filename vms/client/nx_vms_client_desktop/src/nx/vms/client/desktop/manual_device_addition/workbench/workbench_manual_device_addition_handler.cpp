@@ -6,11 +6,32 @@
 
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/manual_device_addition/dialog/device_addition_dialog.h>
+#include <nx/vms/client/desktop/manual_device_addition/dialog/new_device_addition_dialog.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/utils/parameter_helper.h>
 #include <ui/dialogs/common/non_modal_dialog_constructor.h>
+
+template<typename Dialog>
+static void configureDialog(
+    nx::vms::client::desktop::WorkbenchManualDeviceAdditionHandler* handler,
+    QPointer<Dialog> dialog,
+    const QnMediaServerResourcePtr server)
+{
+    dialog->setServer(server);
+    const auto removeOnClose = [handler, dialog]()
+    {
+        if (dialog)
+            dialog->deleteLater();
+    };
+
+    // Prevents dialog controls blinking.
+    QObject::connect(dialog, &QDialog::accepted, handler, removeOnClose);
+    QObject::connect(dialog, &QDialog::rejected, handler, removeOnClose);
+    QObject::connect(dialog, &QDialog::finished, handler, removeOnClose);
+}
 
 namespace nx::vms::client::desktop {
 
@@ -27,21 +48,18 @@ WorkbenchManualDeviceAdditionHandler::WorkbenchManualDeviceAdditionHandler(QObje
 
             const auto parent = utils::extractParentWidget(params, mainWindowWidget());
 
-            QnNonModalDialogConstructor<DeviceAdditionDialog> dialogContructor(
-                m_deviceAdditionDialog, parent);
-
-            m_deviceAdditionDialog->setServer(server);
-            const auto removeOnClose =
-                [this]()
-                {
-                    if (m_deviceAdditionDialog)
-                        m_deviceAdditionDialog->deleteLater();
-                };
-
-            // Prevents dialog controls blinking.
-            connect(m_deviceAdditionDialog, &QDialog::accepted, this, removeOnClose);
-            connect(m_deviceAdditionDialog, &QDialog::rejected, this, removeOnClose);
-            connect(m_deviceAdditionDialog, &QDialog::finished, this, removeOnClose);
+            if (ini().newAddDevicesDialog)
+            {
+                QnNonModalDialogConstructor<NewDeviceAdditionDialog> dialogContructor(
+                    m_newDeviceAdditionDialog, parent);
+                configureDialog(this, m_newDeviceAdditionDialog, server);
+            }
+            else
+            {
+                QnNonModalDialogConstructor<DeviceAdditionDialog> dialogContructor(
+                    m_deviceAdditionDialog, parent);
+                configureDialog(this, m_deviceAdditionDialog, server);
+            }
         });
 
     connect(action(menu::MainMenuAddDeviceManuallyAction), &QAction::triggered, this,
