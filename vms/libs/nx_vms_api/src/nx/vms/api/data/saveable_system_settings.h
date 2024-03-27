@@ -11,6 +11,7 @@
 #include <nx/vms/api/data/backup_settings.h>
 #include <nx/vms/api/data/client_update_settings.h>
 #include <nx/vms/api/data/email_settings.h>
+#include <nx/vms/api/data/pixelation_settings.h>
 #include <nx/vms/api/data/watermark_settings.h>
 #include <nx/vms/common/update/persistent_update_storage.h>
 
@@ -33,6 +34,7 @@ struct SaveableSystemSettings
     std::optional<nx::Uuid> primaryTimeServer;
 
     std::optional<WatermarkSettings> watermarkSettings;
+    std::optional<PixelationSettings> pixelationSettings;
     std::optional<bool> auditTrailEnabled;
     std::optional<bool> trafficEncryptionForced;
     std::optional<bool> useHttpsOnlyForCameras;
@@ -54,10 +56,11 @@ struct SaveableSystemSettings
 NX_REFLECTION_INSTRUMENT(SaveableSystemSettings,
     (systemName)(autoDiscoveryEnabled)(cameraSettingsOptimization)(statisticsAllowed)
     (cloudNotificationsLanguage)(emailSettings)(timeSynchronizationEnabled)(primaryTimeServer)
-    (watermarkSettings)(auditTrailEnabled)(trafficEncryptionForced)(useHttpsOnlyForCameras)
-    (videoTrafficEncryptionForced)(sessionLimitS)(storageEncryption)(showServersInTreeForNonAdmins)
-    (updateNotificationsEnabled)(customReleaseListUrl)(clientUpdateSettings)
-    (backupSettings)(metadataStorageChangePolicy)(targetPersistentUpdateStorage))
+    (watermarkSettings)(pixelationSettings)(auditTrailEnabled)(trafficEncryptionForced)
+    (useHttpsOnlyForCameras)(videoTrafficEncryptionForced)(sessionLimitS)(storageEncryption)
+    (showServersInTreeForNonAdmins)(updateNotificationsEnabled)(customReleaseListUrl)
+    (clientUpdateSettings)(backupSettings)(metadataStorageChangePolicy)
+    (targetPersistentUpdateStorage))
 
 NX_REFLECTION_TAG_TYPE(SaveableSystemSettings, jsonSerializeChronoDurationAsNumber)
 

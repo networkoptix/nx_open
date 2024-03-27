@@ -30,6 +30,7 @@ struct LdapSettings;
 struct ResourceParamWithRefData;
 struct SystemSettings;
 struct WatermarkSettings;
+struct PixelationSettings;
 enum class ProxyConnectionAccessPolicy;
 
 } // nx::vms::api
@@ -81,6 +82,7 @@ struct SystemSettingNames
     DECLARE_SETTING_NAME(trafficEncryptionForced);
     DECLARE_SETTING_NAME(videoTrafficEncryptionForced);
     DECLARE_SETTING_NAME(webSocketEnabled);
+    DECLARE_SETTING_NAME(pixelationSettings);
 
     static const inline std::set<QString> kReadOnlyNames = {
         cloudAccountName,
@@ -118,6 +120,7 @@ struct SystemSettingNames
         sessionsLimitPerUser,
         trafficEncryptionForced,
         webSocketEnabled,
+        pixelationSettings,
     };
 
     static const inline std::set<QString> kHiddenNames = {
@@ -419,6 +422,9 @@ public:
     nx::vms::api::WatermarkSettings watermarkSettings() const;
     void setWatermarkSettings(const nx::vms::api::WatermarkSettings& settings) const;
 
+    nx::vms::api::PixelationSettings pixelationSettings() const;
+    void setPixelationSettings(const nx::vms::api::PixelationSettings& settings);
+
     std::optional<std::chrono::seconds> sessionTimeoutLimit() const;
     void setSessionTimeoutLimit(std::optional<std::chrono::seconds> value);
 
@@ -557,6 +563,7 @@ signals:
     void targetPersistentUpdateStorageChanged();
     void installedPersistentUpdateStorageChanged();
     void watermarkChanged();
+    void pixelationSettingsChanged();
     void sessionTimeoutChanged();
     void sessionsLimitChanged();
     void sessionsLimitPerUserChanged();

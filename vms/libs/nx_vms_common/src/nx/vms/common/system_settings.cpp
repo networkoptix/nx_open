@@ -19,6 +19,7 @@
 #include <nx/vms/api/data/backup_settings.h>
 #include <nx/vms/api/data/email_settings.h>
 #include <nx/vms/api/data/ldap.h>
+#include <nx/vms/api/data/pixelation_settings.h>
 #include <nx/vms/api/data/resource_data.h>
 #include <nx/vms/api/data/system_settings.h>
 #include <nx/vms/api/data/watermark_settings.h>
@@ -170,6 +171,9 @@ struct SystemSettings::Private
     QnResourcePropertyAdaptor<nx::vms::api::ClientUpdateSettings>*
         clientUpdateSettingsAdaptor = nullptr;
     QnResourcePropertyAdaptor<nx::vms::api::WatermarkSettings>* watermarkSettingsAdaptor = nullptr;
+
+    QnResourcePropertyAdaptor<nx::vms::api::PixelationSettings>*
+        pixelationSettingsAdapter = nullptr;
 
     QnResourcePropertyAdaptor<int>* sessionTimeoutLimitSecondsAdaptor = nullptr;
 	QnResourcePropertyAdaptor<bool>* useSessionTimeoutLimitForCloudAdaptor = nullptr;
@@ -718,6 +722,11 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         "watermarkSettings", nx::vms::api::WatermarkSettings(), this,
         [] { return tr("Watermark settings"); });
 
+    d->pixelationSettingsAdapter =
+        new QnJsonResourcePropertyAdaptor<nx::vms::api::PixelationSettings>(
+            "pixelationSettings", nx::vms::api::PixelationSettings{}, this,
+            [] { return tr("Pixelation settings"); });
+
     d->sessionTimeoutLimitSecondsAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
         Names::sessionLimitS,
         kDefaultSessionLimit.count(),
@@ -1059,6 +1068,13 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         Qt::QueuedConnection);
 
     connect(
+        d->pixelationSettingsAdapter,
+        &QnAbstractResourcePropertyAdaptor::valueChanged,
+        this,
+        &SystemSettings::pixelationSettingsChanged,
+        Qt::QueuedConnection);
+
+    connect(
         d->sessionTimeoutLimitSecondsAdaptor,
         &QnAbstractResourcePropertyAdaptor::valueChanged,
         this,
@@ -1267,6 +1283,7 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         << d->installedUpdateInformationAdaptor
         << d->maxVirtualCameraArchiveSynchronizationThreads
         << d->watermarkSettingsAdaptor
+        << d->pixelationSettingsAdapter
         << d->sessionTimeoutLimitSecondsAdaptor
         << d->useSessionTimeoutLimitForCloudAdaptor
         << d->sessionsLimitAdaptor
@@ -2098,6 +2115,16 @@ void SystemSettings::setWatermarkSettings(const nx::vms::api::WatermarkSettings&
     d->watermarkSettingsAdaptor->setValue(settings);
 }
 
+nx::vms::api::PixelationSettings SystemSettings::pixelationSettings() const
+{
+    return d->pixelationSettingsAdapter->value();
+}
+
+void SystemSettings::setPixelationSettings(const nx::vms::api::PixelationSettings& settings)
+{
+    d->pixelationSettingsAdapter->setValue(settings);
+}
+
 std::optional<std::chrono::seconds> SystemSettings::sessionTimeoutLimit() const
 {
     int seconds = d->sessionTimeoutLimitSecondsAdaptor->value();
@@ -2503,6 +2530,7 @@ void SystemSettings::update(const vms::api::SystemSettings& value)
     d->cameraSettingsOptimizationAdaptor->setValue(value.cameraSettingsOptimization);
     d->statisticsAllowedAdaptor->setValue(value.statisticsAllowed);
     d->cloudNotificationsLanguageAdaptor->setValue(value.cloudNotificationsLanguage);
+    d->pixelationSettingsAdapter->setValue(value.pixelationSettings);
     d->auditTrailEnabledAdaptor->setValue(value.auditTrailEnabled);
     d->trafficEncryptionForcedAdaptor->setValue(value.trafficEncryptionForced);
     d->useHttpsOnlyForCamerasAdaptor->setValue(value.useHttpsOnlyForCameras);

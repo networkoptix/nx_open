@@ -11,6 +11,7 @@
 #include <nx/vms/api/data/backup_settings.h>
 #include <nx/vms/api/data/client_update_settings.h>
 #include <nx/vms/api/data/email_settings.h>
+#include <nx/vms/api/data/pixelation_settings.h>
 
 #include "watermark_settings.h"
 
@@ -25,6 +26,7 @@ struct SystemSettings
     QString localSystemId;
     QString systemName;
     WatermarkSettings watermarkSettings;
+    PixelationSettings pixelationSettings;
     bool webSocketEnabled = true;
 
     bool autoDiscoveryEnabled = true;
@@ -59,11 +61,12 @@ struct SystemSettings
     bool operator==(const SystemSettings& other) const = default;
 };
 
-NX_REFLECTION_INSTRUMENT(SystemSettings, (cloudAccountName)(organization)(cloudSystemID)(defaultExportVideoCodec)
-    (localSystemId)(systemName)(watermarkSettings)(webSocketEnabled)(autoDiscoveryEnabled)
-    (cameraSettingsOptimization)(statisticsAllowed)(cloudNotificationsLanguage)
-    (auditTrailEnabled)(trafficEncryptionForced)(useHttpsOnlyForCameras)
-    (videoTrafficEncryptionForced)(sessionLimitS)(storageEncryption)
+NX_REFLECTION_INSTRUMENT(SystemSettings,
+    (cloudAccountName)(organization)(cloudSystemID)(defaultExportVideoCodec)
+    (localSystemId)(systemName)(watermarkSettings)(pixelationSettings)(webSocketEnabled)
+    (autoDiscoveryEnabled)(cameraSettingsOptimization)(statisticsAllowed)
+    (cloudNotificationsLanguage)(auditTrailEnabled)(trafficEncryptionForced)
+    (useHttpsOnlyForCameras)(videoTrafficEncryptionForced)(sessionLimitS)(storageEncryption)
     (showServersInTreeForNonAdmins)(updateNotificationsEnabled)(emailSettings)
     (timeSynchronizationEnabled)(primaryTimeServer)(customReleaseListUrl)(clientUpdateSettings)
     (backupSettings)(metadataStorageChangePolicy)(allowRegisteringIntegrations));
