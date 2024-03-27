@@ -5,6 +5,7 @@
 #include <QtCore/QString>
 
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/reflect/instrument.h>
 #include <nx/utils/uuid.h>
 
 namespace nx::vms::api {
@@ -28,5 +29,6 @@ struct NX_VMS_API ConnnectServersData
 };
 #define ConnnectServersData_Fields (id)(remoteServerId)(remoteCertificatePem)
 QN_FUSION_DECLARE_FUNCTIONS(ConnnectServersData, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(ConnnectServersData, ConnnectServersData_Fields)
 
 } // namespace nx::vms::api
