@@ -5751,48 +5751,6 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
   <context>
     <name>QnWebResourceWidget</name>
     <message>
-      <source>Open this web page?</source>
-      <translation>Diese Webseite öffnen?</translation>
-    </message>
-    <message>
-      <source>Connect anyway</source>
-      <translation>Trotzdem verbinden</translation>
-    </message>
-    <message>
-      <source>You try to open the
-%1
-but this web page presented an untrusted certificate auth.
-We recommend you not to open this web page. If you understand the risks, you can open the web page.</source>
-      <comment>%1 is the web page address</comment>
-      <translation>Sie versuchen
-%1
-zu öffnen, aber diese Webseite zeigte ein nicht vertrauenswürdiges Zertifikat an.
-Wir empfehlen Ihnen, diese Webseite nicht zu öffnen. Wenn Sie die Risiken verstehen, können Sie die Webseite öffnen.</translation>
-    </message>
-    <message>
-      <source>Open this integration?</source>
-      <translation type="unfinished">Open this integration?</translation>
-    </message>
-    <message>
-      <source>Integration</source>
-      <translation type="unfinished">Integration</translation>
-    </message>
-    <message>
-      <source>Web Page</source>
-      <translation>Webseite:</translation>
-    </message>
-    <message>
-      <source>You try to open the
-%1
-but this integration presented an untrusted certificate auth.
-We recommend you not to open this integration. If you understand the risks, you can open the integration.</source>
-      <comment>%1 is the integration address</comment>
-      <translation type="unfinished">You try to open the
-%1
-but this integration presented an untrusted certificate auth.
-We recommend you not to open this integration. If you understand the risks, you can open the integration.</translation>
-    </message>
-    <message>
       <source>Integration settings...</source>
       <translation type="unfinished">Integration settings...</translation>
     </message>
@@ -12204,6 +12162,51 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
         <numerusform>%n Ereignis</numerusform>
         <numerusform>%n Ereignisse</numerusform>
       </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::WebPageCertificateDialog</name>
+    <message>
+      <source>Open this integration?</source>
+      <translation type="unfinished">Open this integration?</translation>
+    </message>
+    <message>
+      <source>Open this web page?</source>
+      <translation>Diese Webseite öffnen?</translation>
+    </message>
+    <message>
+      <source>Integration</source>
+      <translation type="unfinished">Integration</translation>
+    </message>
+    <message>
+      <source>Web Page</source>
+      <translation>Webseite:</translation>
+    </message>
+    <message>
+      <source>You try to open the
+%1
+but this integration presented an untrusted certificate auth.
+We recommend you not to open this integration. If you understand the risks, you can open the integration.</source>
+      <comment>%1 is the integration address</comment>
+      <translation type="unfinished">You try to open the
+%1
+but this integration presented an untrusted certificate auth.
+We recommend you not to open this integration. If you understand the risks, you can open the integration.</translation>
+    </message>
+    <message>
+      <source>You try to open the
+%1
+but this web page presented an untrusted certificate auth.
+We recommend you not to open this web page. If you understand the risks, you can open the web page.</source>
+      <comment>%1 is the web page address</comment>
+      <translation>Sie versuchen
+%1
+zu öffnen, aber diese Webseite zeigte ein nicht vertrauenswürdiges Zertifikat an.
+Wir empfehlen Ihnen, diese Webseite nicht zu öffnen. Wenn Sie die Risiken verstehen, können Sie die Webseite öffnen.</translation>
+    </message>
+    <message>
+      <source>Connect anyway</source>
+      <translation>Trotzdem verbinden</translation>
     </message>
   </context>
   <context>
