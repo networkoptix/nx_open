@@ -303,16 +303,15 @@ void LookupListEntriesModel::deleteEntries(const QVector<int>& rows)
         return;
 
     const std::set<int, std::greater<>> uniqueValuesInDescendingOrder(rows.begin(), rows.end());
+    beginResetModel();
     for (const auto& index: uniqueValuesInDescendingOrder)
     {
         if (index >= d->data->rawData().entries.size())
             continue;
-
-        beginRemoveRows({}, index, index);
         d->data->rawData().entries.erase(d->data->rawData().entries.begin() + index);
-        endRemoveRows();
-        emit rowCountChanged();
     }
+    endResetModel();
+    emit rowCountChanged();
 }
 
 void LookupListEntriesModel::exportEntries(const QSet<int>& selectedRows, QTextStream& outputCsv)
@@ -421,6 +420,12 @@ void LookupListEntriesModel::removeIncorrectEntries()
 
     // Remove empty rows.
     deleteEntries(emptyRowsToDelete);
+}
+
+void LookupListEntriesModel::update()
+{
+    beginResetModel();
+    endResetModel();
 }
 
 } // namespace nx::vms::client::desktop

@@ -17,7 +17,7 @@ struct LookupListPreviewProcessor::Private
     int rowsNumber = 10;
     QString separator;
     QString filePath;
-    bool dataHasHeaderRow;
+    bool dataHasHeaderRow = false;
 };
 
 LookupListPreviewProcessor::LookupListPreviewProcessor(QObject* parent):
@@ -34,9 +34,10 @@ void LookupListPreviewProcessor::setImportFilePathFromDialog()
 
     const auto options = QnCustomFileDialog::fileDialogOptions();
     const QString caption = tr("Import Lookup List");
-    const QString filter = QnCustomFileDialog::createFilter({{tr("Text files"), {"csv","txt","tsv"}}});
+    const QString fileFilters = QnCustomFileDialog::createFilter(
+        {{tr("Text files"), {"txt", "csv", "tsv"}}, {tr("All other text files"), {"*"}}});
     const QString fileName =
-        QFileDialog::getOpenFileName(nullptr, caption, previousDir, filter, nullptr, options);
+        QFileDialog::getOpenFileName(nullptr, caption, previousDir, fileFilters, nullptr, options);
 
     setDataHasHeaderRow(true);
     setFilePath(fileName);
@@ -44,7 +45,8 @@ void LookupListPreviewProcessor::setImportFilePathFromDialog()
     if (d->separator.isEmpty())
     {
         const auto extension = QFileInfo(fileName).suffix();
-        setSeparator(extension == "csv" ? "," : "\t");
+        // By default set separator as comma.
+        setSeparator(extension == "tsv" ? "\t" : ",");
     }
 
     appContext()->localSettings()->lastImportDir = QFileInfo(fileName).absolutePath();

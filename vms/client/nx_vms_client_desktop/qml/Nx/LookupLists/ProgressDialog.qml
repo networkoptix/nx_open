@@ -13,7 +13,7 @@ Dialog
 {
     id: control
 
-    required property string processName
+    property string processName
 
     // Properties isVisibleCancelButton and isVisibleDoneButton
     // shouldn't be changed outside this file and must be treated by external user as readonly.
@@ -81,13 +81,16 @@ Dialog
         isVisibleDoneButton = true
     }
 
-    ProgressBar
+    contentItem: Item
     {
-        id: progressBar
+        ProgressBar
+        {
+            id: progressBar
 
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.top: parent.top
-        anchors.margins: 16
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.top: parent.top
+            anchors.margins: 16
+        }
     }
 }

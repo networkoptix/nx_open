@@ -173,6 +173,13 @@ QString LookupListImportEntriesModel::doNotImportText() const
     return kDoNotImportText;
 }
 
+bool LookupListImportEntriesModel::hasIndex(
+    int row, int column, const QModelIndex& /*parent*/) const
+{
+    return row >= 0 && column >= 0 && row < d->previewData.size()
+        && column < d->previewData[row].size();
+}
+
 QVariant LookupListImportEntriesModel::data(const QModelIndex& index, int role) const
 {
     if (role != Qt::DisplayRole || !hasIndex(index.row(), index.column()))
