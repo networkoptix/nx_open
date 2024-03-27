@@ -1146,7 +1146,7 @@
     <name>ExitFullscreenActionHelper</name>
     <message>
       <source>Select layout...</source>
-      <translation>少なくとも一つのレイアウトを選択してください</translation>
+      <translation>レイアウトを選択してください...</translation>
     </message>
     <message numerus="yes">
       <source>%n layouts</source>
@@ -1186,15 +1186,15 @@
     </message>
     <message>
       <source>Select device...</source>
-      <translation>一つのデバイスを選択してください</translation>
+      <translation>デバイスを選択してください...</translation>
     </message>
     <message>
       <source>Select camera...</source>
-      <translation>1台のカメラを選択してください</translation>
+      <translation>カメラを選択してください...</translation>
     </message>
     <message>
       <source>Select layout...</source>
-      <translation>少なくとも一つのレイアウトを選択してください</translation>
+      <translation>レイアウトを選択してください...</translation>
     </message>
     <message numerus="yes">
       <source>%n layouts</source>
@@ -2804,7 +2804,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Confirm Password</source>
-      <translation>パスワード確認</translation>
+      <translation>パスワード再確認</translation>
     </message>
     <message>
       <source>Passwords do not match.</source>
@@ -4817,7 +4817,7 @@ to %1</source>
     <name>QnSelectUsersButton</name>
     <message>
       <source>Any User</source>
-      <translation>任意のユーザ</translation>
+      <translation>任意のユーザー</translation>
     </message>
     <message>
       <source>All Users</source>
@@ -5373,11 +5373,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Reindexing Backup...</source>
-      <translation>バックアップの再インデックス...</translation>
+      <translation>バックアップの再インデックス中...</translation>
     </message>
     <message>
       <source>Reindexing Archive...</source>
-      <translation>アーカイブの再インデックス...</translation>
+      <translation>アーカイブの再インデックス中...</translation>
     </message>
   </context>
   <context>
@@ -5392,7 +5392,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Invalid credentials for external storage</source>
-      <translation>外部ストレージへの認証情報が不正です</translation>
+      <translation>外部ストレージの認証情報が不正です</translation>
     </message>
     <message>
       <source>Invalid storage path</source>
@@ -5404,15 +5404,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Storage path used by another server</source>
-      <translation>別のサーバーによって使用されているストレージ パス</translation>
+      <translation>このストレージパスはすでに別のサーバーで使用されています。</translation>
     </message>
     <message>
       <source>Add Storage</source>
-      <translation>ストレージを追加します</translation>
+      <translation>ストレージを追加</translation>
     </message>
     <message>
       <source>It is not recommended to use one recording location for different servers.</source>
-      <translation>別のサーバーに 保存場所を使用することは推奨されません</translation>
+      <translation>1 つの保存先を複数のサーバーで共有することは推奨されません。</translation>
     </message>
     <message>
       <source>Storage is available but will not be writable because it is too small in comparison to the already present storages</source>
@@ -5498,11 +5498,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Email address is not set.</source>
-      <translation>Emailアドレスが設定されていません。</translation>
+      <translation>メールアドレスが設定されていません。</translation>
     </message>
     <message>
       <source>Email server is not set.</source>
-      <translation>Emailサーバーが設定されていません。</translation>
+      <translation>メールサーバーが設定されていません。</translation>
     </message>
     <message>
       <source>You have no licenses.</source>
@@ -5530,7 +5530,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Some users have not set their email addresses</source>
-      <translation>一部のユーザーにメール アドレスが設定されていません</translation>
+      <translation>一部のユーザーにメールアドレスが設定されていません</translation>
     </message>
     <message>
       <source>You cannot receive System notifications by email.</source>
@@ -5546,7 +5546,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Error while sending email</source>
-      <translation>Email送信中のエラー</translation>
+      <translation>メール送信時エラー</translation>
     </message>
     <message>
       <source>Remote archive synchronization has been finished</source>
@@ -5567,20 +5567,20 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Connect your System to %1 &amp;mdash; make it accessible from anywhere!</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>%1にシステムを接続&amp;mdash; どこからでもアクセスできます！</translation>
+      <translation>システムを %1 に接続すると、どこからでもアクセスできるようになります。</translation>
     </message>
     <message>
       <source>Check out %1 &amp;mdash; connect to your System from anywhere!</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>%1 をチェックしてください &amp;mdash; どこからでもサーバーに接続可能!</translation>
+      <translation>要チェック: %1 &amp;mdash; どこからでもシステムに接続可能!</translation>
     </message>
     <message>
       <source>Some cameras require passwords to be set</source>
-      <translation>一部カメラにパスワード設定が必要です</translation>
+      <translation>一部のカメラにパスワード設定が必要です</translation>
     </message>
     <message>
       <source>No server has internet access for time synchronization</source>
-      <translation>時刻同期のためのインターネット接続ができません</translation>
+      <translation>時刻同期のためのインターネット接続ができるサーバーがありません</translation>
     </message>
     <message>
       <source>The System has no internet access for time synchronization</source>
@@ -5588,7 +5588,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>No online server in the System has internet access for time synchronization.</source>
-      <translation>システム内のどのオンラインサーバーも時刻同期のためのインターネット接続ができません。</translation>
+      <translation>システム内のどのオンラインサーバーも、時刻同期のためのインターネット接続ができません。</translation>
     </message>
     <message>
       <source>Error occurred during remote archive synchronization</source>
@@ -5666,7 +5666,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnTableExportHelper</name>
     <message>
       <source>Close all programs which may use this file and try again</source>
-      <translation>このファイルを使用するすべてのプログラムを閉じて、もう一度やり直してください</translation>
+      <translation>このファイルを使用する可能性のあるプログラムをすべて閉じて、再度お試しください</translation>
     </message>
     <message>
       <source>File used by another process</source>
@@ -5685,7 +5685,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnTimeSlider</name>
     <message>
       <source>No thumbnails available</source>
-      <translation>使用できるサムネイルはありません</translation>
+      <translation>利用可能なサムネイルがありません</translation>
     </message>
   </context>
   <context>
@@ -5696,7 +5696,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Streaming is not ready yet</source>
-      <translation>ストリーミングはまだ準備ができていません</translation>
+      <translation>ストリーミングの準備ができていません</translation>
     </message>
     <message>
       <source>Network error</source>
@@ -5738,7 +5738,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Role with same name already exists.</source>
-      <translation>同じ名前のロールが既に存在します。</translation>
+      <translation>同じ名前のロールがすでに存在します。</translation>
     </message>
   </context>
   <context>
@@ -5842,7 +5842,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>This user has not yet signed up for %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>このユーザーはまだ%1にサインアップしていません</translation>
+      <translation>このユーザーはまだ %1 にサインアップしていません</translation>
     </message>
     <message>
       <source>Allow digest authentication for this user</source>
@@ -5869,7 +5869,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>User with specified login already exists.</source>
-      <translation>ユーザーは既に存在します</translation>
+      <translation>指定されたログイン名を持つユーザーはすでに存在します。</translation>
     </message>
     <message>
       <source>User has been renamed. Password must be updated.</source>
@@ -5893,7 +5893,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Confirm Password</source>
-      <translation>パスワード確認</translation>
+      <translation>パスワード再確認</translation>
     </message>
     <message>
       <source>Passwords do not match.</source>
@@ -5902,7 +5902,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>%1 user with specified email already exists.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>指定されたメールアドレスを持つ%1 ユーザーは既に存在します。</translation>
+      <translation>指定されたメールアドレスを持つ%1 ユーザーはすでに存在します。</translation>
     </message>
     <message>
       <source>Local users</source>
@@ -5911,7 +5911,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>%1 users</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>%1ユーザー</translation>
+      <translation>%1 ユーザー</translation>
     </message>
     <message>
       <source>%1 belong to this system only and are fully managed by system administrators.</source>
@@ -5921,7 +5921,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>%1 can have access to many Systems. Administrators can manage their rights only.</source>
       <comment>%1 is cloud users definition, e.g. &apos;Cloud users&apos;</comment>
-      <translation>%1 は、多くのシステムへアクセスできます。管理者は、自分の権利のみを管理できます。</translation>
+      <translation>%1 は複数のシステムにアクセスできます。管理者は権限のみを管理できます。</translation>
     </message>
     <message>
       <source>Password reset is required</source>
@@ -5948,7 +5948,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Avoid leading and trailing spaces.</source>
-      <translation>先頭と末尾の空白を避けてください</translation>
+      <translation>先頭と末尾のスペースは避けてください。</translation>
     </message>
   </context>
   <context>
@@ -6021,7 +6021,7 @@ We recommend you not to open this web page. If you understand the risks, you can
       <comment>%1 is the web page address</comment>
       <translation>%1
 を開こうとしましたが、このWebページは信頼できない証明書認証を提示しました。
-このWebページを開かないことをお勧めします。リスクを理解していれば、Webページを開いても構いません。</translation>
+このWebページを開かないことをお勧めします。リスクを理解している場合は、Webページを開いても構いません。</translation>
     </message>
   </context>
   <context>
@@ -6096,7 +6096,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Failed to save changes</source>
-      <translation>変更を保存できませんでした</translation>
+      <translation>変更の保存に失敗しました</translation>
     </message>
     <message numerus="yes">
       <source>Failed to delete %n items:</source>
@@ -6113,7 +6113,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Recording in %1...</source>
-      <translation>スクリーン録画開始 %1 秒前</translation>
+      <translation>スクリーン録画開始 %1 秒前...</translation>
     </message>
     <message>
       <source>Recorded Video</source>
@@ -6125,7 +6125,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Failed to start recording</source>
-      <translation>録画開始に失敗しました</translation>
+      <translation>録画の開始に失敗しました</translation>
     </message>
     <message>
       <source>AVI (Audio/Video Interleaved)</source>
@@ -6156,11 +6156,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Failed to save screenshot</source>
-      <translation>スクリーン ショットを保存できませんでした</translation>
+      <translation>スクリーンショットの保存に失敗しました</translation>
     </message>
     <message>
       <source>Failed to take screenshot</source>
-      <translation>スクリーン ショットを保存できませんでした</translation>
+      <translation>スクリーンショットの撮影に失敗しました</translation>
     </message>
     <message>
       <source>PNG Image</source>
@@ -6207,7 +6207,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Failed to apply changes</source>
-      <translation>変更を保存できませんでした</translation>
+      <translation>変更の適用に失敗しました</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n items?</source>
@@ -6270,7 +6270,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Open Virtual Camera Recordings...</source>
-      <translation>仮想カメラの録画ファイルを開く...</translation>
+      <translation>仮想カメラ用動画ファイルの参照...</translation>
     </message>
     <message>
       <source>No video files found in selected folder</source>
@@ -6282,7 +6282,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Already uploaded files will be kept.</source>
-      <translation>既にアップロードされたファイルは保管されます。</translation>
+      <translation>アップロード済みのファイルは保持されます。</translation>
     </message>
     <message numerus="yes">
       <source>Selected file formats are not supported</source>
@@ -6325,7 +6325,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>Selected files cover periods for which videos are already being uploaded</source>
       <translation>
-        <numerusform>選択したファイルは、既にアップロードされている期間と重複します</numerusform>
+        <numerusform>選択したファイルは、すでにアップロードされている映像の期間と重複します。</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -6337,7 +6337,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>Selected files cover periods for which videos have already been uploaded</source>
       <translation>
-        <numerusform>選択したファイルは、既にアップロードされている期間と重複します</numerusform>
+        <numerusform>選択したファイルは、すでにアップロードされている映像の期間と重複します。</numerusform>
       </translation>
     </message>
     <message>
@@ -6409,17 +6409,17 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>%1 is older than allowed in camera archive settings.</source>
       <comment>Filename will be substituted</comment>
-      <translation>%1はカメラのアーカイブ設定より古いです。</translation>
+      <translation>%1 はカメラのアーカイブ設定で許可されている日数よりも古いです。</translation>
     </message>
     <message>
       <source>%1 covers period for which video has already been uploaded.</source>
       <comment>Filename will be substituted</comment>
-      <translation>%1 はすでにアップロードされている映像の期間と重複します。</translation>
+      <translation>%1 は、すでにアップロードされている映像の期間と重複します。</translation>
     </message>
     <message>
       <source>%1 covers period for which video is being uploaded.</source>
       <comment>Filename will be substituted</comment>
-      <translation>%1 はアップロード中の映像の期間と重複します。</translation>
+      <translation>%1 は、アップロードされている映像の期間と重複します。</translation>
     </message>
   </context>
   <context>
@@ -6779,7 +6779,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>UpdateStrings</name>
     <message>
       <source>This Linux platform is no longer supported</source>
-      <translation>このLinuxプラットフォームはサポートされなくなりました</translation>
+      <translation>この Linux プラットフォームはサポートされなくなりました</translation>
     </message>
     <message>
       <source>This OS version is no longer supported</source>
@@ -6894,7 +6894,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Selected on Timeline</source>
-      <translation>タイムラインで選択</translation>
+      <translation>タイムラインの選択期間内</translation>
     </message>
     <message>
       <source>Any time</source>
@@ -6998,7 +6998,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::AnalyticsSearchWidget</name>
     <message>
       <source>No objects</source>
-      <translation>オブジェクトなし</translation>
+      <translation>オブジェクトはありません</translation>
     </message>
     <message numerus="yes">
       <source>%n objects</source>
@@ -7295,7 +7295,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::BookmarkSearchWidget</name>
     <message>
       <source>No bookmarks</source>
-      <translation>ブックマークなし</translation>
+      <translation>ブックマークはありません</translation>
     </message>
     <message numerus="yes">
       <source>%n bookmarks</source>
@@ -10982,7 +10982,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <message>
       <source>Uploading %1...</source>
       <comment>Filename will be substituted</comment>
-      <translation>%1 アップロード中...</translation>
+      <translation>%1 をアップロードしています...</translation>
     </message>
   </context>
   <context>
@@ -11299,7 +11299,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <name>nx::vms::client::desktop::joystick::JoystickButtonSettingsModel</name>
     <message>
       <source>Select Layout...</source>
-      <translation>レイアウトを選択...</translation>
+      <translation>レイアウトを選択してください...</translation>
     </message>
     <message>
       <source>Button</source>

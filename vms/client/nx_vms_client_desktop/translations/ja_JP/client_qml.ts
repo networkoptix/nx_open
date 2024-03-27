@@ -1329,7 +1329,7 @@ PTZを行います</translation>
     </message>
     <message>
       <source>Selected on Timeline</source>
-      <translation>タイムラインで選択</translation>
+      <translation>タイムラインの選択期間内</translation>
     </message>
   </context>
   <context>

@@ -2043,7 +2043,7 @@
     <name>MultipleLayoutSelectionDialog</name>
     <message>
       <source>Select Layouts</source>
-      <translation>レイアウトを選択</translation>
+      <translation>レイアウト選択</translation>
     </message>
   </context>
   <context>
