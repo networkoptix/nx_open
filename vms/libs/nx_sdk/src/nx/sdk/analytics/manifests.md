@@ -108,6 +108,12 @@ Plugin Manifest is a JSON Object containing the following fields:
 
     Optional. If omitted or empty, means there are no settings.
 
+- `"isLicenseRequired"`: Bool
+
+    Whether the Integaration requires a license.
+
+    Optional.
+
 ---------------------------------------------------------------------------------------------------
 ## Engine Manifest
 

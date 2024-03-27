@@ -145,7 +145,7 @@ struct EngineDescriptor
     nx::Uuid id;
     QString name;
     QString pluginId;
-    EngineManifest::Capabilities capabilities;
+    EngineCapabilities capabilities;
 
     EngineDescriptor() = default;
     EngineDescriptor(
@@ -272,7 +272,7 @@ NX_REFLECTION_INSTRUMENT(ObjectTypeDescriptor, nx_vms_api_analyitcs_ObjectTypeDe
 struct ActionTypeDescriptor: BaseDescriptor
 {
     ActionTypeDescriptor() = default;
-    ActionTypeDescriptor(nx::Uuid /*engineId*/, EngineManifest::ObjectAction actionType):
+    ActionTypeDescriptor(nx::Uuid /*engineId*/, ObjectAction actionType):
         BaseDescriptor(
             actionType.id,
             actionType.name),
@@ -286,7 +286,7 @@ struct ActionTypeDescriptor: BaseDescriptor
 
     QList<QString> supportedObjectTypeIds;
     QJsonObject parametersModel;
-    analytics::EngineManifest::ObjectAction::Requirements requirements;
+    analytics::ObjectActionRequirements requirements;
 };
 #define nx_vms_api_analytics_ActionTypeDescriptor_Fields \
     nx_vms_api_analytics_BaseDescriptor_Fields \

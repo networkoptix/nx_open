@@ -20,7 +20,7 @@ struct EngineTestExpectedData
 {
     QString id;
     QString name;
-    EngineManifest::Capabilities capabilities;
+    EngineCapabilities capabilities;
     std::optional<PluginDescriptor> plugin;
 };
 #define EngineTestExpectedData_Fields \

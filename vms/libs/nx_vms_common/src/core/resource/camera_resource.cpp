@@ -532,7 +532,7 @@ std::optional<nx::vms::api::StreamIndex>
         return std::nullopt;
 
     if (deviceAgentManifest->capabilities.testFlag(
-        DeviceAgentManifest::Capability::disableStreamSelection))
+        nx::vms::api::analytics::DeviceAgentCapability::disableStreamSelection))
     {
         return std::nullopt;
     }

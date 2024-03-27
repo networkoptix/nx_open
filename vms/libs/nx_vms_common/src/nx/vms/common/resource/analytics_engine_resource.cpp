@@ -14,6 +14,7 @@
 #include <nx/reflect/json/deserializer.h>
 #include <nx/reflect/json/serializer.h>
 #include <nx/vms/api/analytics/engine_manifest.h>
+#include <nx/vms/api/analytics/object_action.h>
 
 namespace nx::vms::common {
 
@@ -82,7 +83,7 @@ std::set<QString> AnalyticsEngineResource::objectTypeIds() const
         &engineManifest.typeLibrary.objectTypes});
 }
 
-QList<nx::vms::api::analytics::EngineManifest::ObjectAction>
+QList<nx::vms::api::analytics::ObjectAction>
     AnalyticsEngineResource::supportedObjectActions() const
 {
     return manifest().objectActions;
@@ -90,7 +91,7 @@ QList<nx::vms::api::analytics::EngineManifest::ObjectAction>
 
 bool AnalyticsEngineResource::isDeviceDependent() const
 {
-    return manifest().capabilities.testFlag(EngineManifest::Capability::deviceDependent);
+    return manifest().capabilities.testFlag(EngineCapability::deviceDependent);
 }
 
 bool AnalyticsEngineResource::isEnabledForDevice(const QnVirtualCameraResourcePtr& device) const

@@ -23,7 +23,7 @@ public:
 
     virtual AbstractPlugin* plugin() const override;
 
-    virtual nx::vms::api::analytics::EngineManifest::Capabilities capabilities() const override;
+    virtual nx::vms::api::analytics::EngineCapabilities capabilities() const override;
 
     virtual nx::vms::api::analytics::EngineDescriptor serialize() const override;
 

@@ -4,6 +4,7 @@
 
 #include <nx/vms/api/base_manifest_validation_test.h>
 #include <nx/vms/api/analytics/engine_manifest.h>
+#include <nx/vms/api/analytics/object_action.h>
 
 namespace nx::vms::api::analytics {
 
@@ -18,7 +19,7 @@ protected:
         m_manifest.eventTypes = makeEntries<EventType>("Event");
         m_manifest.objectTypes = makeEntries<ObjectType>("Object");
         m_manifest.groups = makeEntries<Group>("Group");
-        m_manifest.objectActions = makeEntries<EngineManifest::ObjectAction>("ObjectAction");
+        m_manifest.objectActions = makeEntries<ObjectAction>("ObjectAction");
     }
 
     template<typename List, typename TransformationFunc>
@@ -121,14 +122,14 @@ protected:
     void givenManifestWithRequestUncompressedVideoStreamAndUnspecifiedPixelFormat()
     {
         givenCorrectManifest();
-        m_manifest.capabilities = EngineManifest::Capabilities();
+        m_manifest.capabilities = EngineCapabilities();
         m_manifest.streamTypeFilter = StreamType::uncompressedVideo;
     }
 
     void givenManifestWithoutRequestedUncompressedVideoStreamButWithSpecifiedPixelFormat()
     {
         givenCorrectManifest();
-        m_manifest.capabilities = EngineManifest::Capability::needUncompressedVideoFrames_abgr;
+        m_manifest.capabilities = EngineCapability::needUncompressedVideoFrames_abgr;
         m_manifest.streamTypeFilter = StreamType::compressedVideo;
     }
 };

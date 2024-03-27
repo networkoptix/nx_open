@@ -13,6 +13,12 @@
 
 namespace nx::vms::api::analytics {
 
+/**%apidoc
+ * The data structure that is given by each Analytics Integration after the Integration has been
+ * created.
+ * <br/>
+ * See the description of the fields in `src/nx/sdk/analytics/manifests.md` in Metadata SDK.
+ */
 struct NX_VMS_API PluginManifest
 {
     Q_GADGET
@@ -22,13 +28,17 @@ public: //< Required for Qt MOC run.
     QString name;
     QString description;
     QString version;
+
+    /**%apidoc[opt] */
     QString vendor;
+
+    /**%apidoc[opt] */
     QJsonObject engineSettingsModel;
 
-    /**%apidoc
-     * Whether an integaration requires license to use.
-     */
+    /**%apidoc[opt] */
     bool isLicenseRequired = false;
+
+    bool operator==(const PluginManifest& other) const = default;
 };
 
 #define nx_vms_api_analytics_PluginManifest_Fields \

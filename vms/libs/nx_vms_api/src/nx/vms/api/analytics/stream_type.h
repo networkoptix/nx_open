@@ -30,7 +30,7 @@ constexpr auto nxReflectVisitAllEnumItems(StreamType*, Visitor&& visitor)
     );
 }
 
-Q_DECLARE_FLAGS(StreamTypes, StreamType);
-Q_DECLARE_OPERATORS_FOR_FLAGS(StreamTypes);
+Q_DECLARE_FLAGS(StreamTypes, StreamType)
+Q_DECLARE_OPERATORS_FOR_FLAGS(StreamTypes)
 
 } // namespace nx::vms::api::analytics
