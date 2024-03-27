@@ -169,7 +169,7 @@ nx::vms::api::StreamIndex CameraSettingsAnalyticsEnginesWatcher::Private::analyz
 
     const auto manifest = camera->deviceAgentManifest(engineId);
     const auto disableStreamSelection = manifest && manifest->capabilities
-        .testFlag(nx::vms::api::analytics::DeviceAgentManifest::disableStreamSelection);
+        .testFlag(nx::vms::api::analytics::DeviceAgentCapability::disableStreamSelection);
 
     return disableStreamSelection
         ? nx::vms::api::StreamIndex::undefined

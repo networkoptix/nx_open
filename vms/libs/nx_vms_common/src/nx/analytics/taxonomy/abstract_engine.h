@@ -31,7 +31,7 @@ public:
 
     virtual AbstractPlugin* plugin() const = 0;
 
-    virtual nx::vms::api::analytics::EngineManifest::Capabilities capabilities() const = 0;
+    virtual nx::vms::api::analytics::EngineCapabilities capabilities() const = 0;
 
     virtual nx::vms::api::analytics::EngineDescriptor serialize() const = 0;
 };

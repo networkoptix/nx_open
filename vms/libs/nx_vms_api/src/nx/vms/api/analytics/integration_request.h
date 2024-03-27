@@ -4,12 +4,19 @@
 
 #include <chrono>
 
+#include <QtCore/QJsonValue>
 #include <QtCore/QString>
 
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/fusion/serialization/json_fwd.h>
+#include <nx/fusion/serialization/json_functions.h>
 #include <nx/reflect/instrument.h>
+#include <nx/reflect/json.h>
+#include <nx/utils/serialization/qjson.h>
 #include <nx/utils/serialization/qt_core_types.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/api/analytics/engine_manifest.h>
+#include <nx/vms/api/analytics/plugin_manifest.h>
 
 namespace nx::vms::api::analytics {
 
@@ -27,68 +34,34 @@ struct NX_VMS_API IntegrationRequestIdentity
 };
 #define nx_vms_api_analytics_IntegrationRequestIdentity_Fields (requestId)
 QN_FUSION_DECLARE_FUNCTIONS(
-    IntegrationRequestIdentity, (json)(ubjson), NX_VMS_API);
+    IntegrationRequestIdentity, (json), NX_VMS_API);
 NX_REFLECTION_INSTRUMENT(
     IntegrationRequestIdentity,
     nx_vms_api_analytics_IntegrationRequestIdentity_Fields);
-
-/**%apidoc
- * Integration manifest.
- */
-struct NX_VMS_API ApiIntegrationManifest
-{
-    /**%apidoc Integration id. */
-    QString id;
-
-    /**%apidoc Integration name. */
-    QString name;
-
-    /**%apidoc Integration description. */
-    QString description;
-
-    /**%apidoc Integration version. */
-    QString version;
-
-    /**%apidoc Integration vendor. */
-    QString vendor;
-
-    /**%apidoc Integration authentication code, 4 decimal digits. */
-    QString pinCode;
-
-    bool operator==(const ApiIntegrationManifest& other) const = default;
-};
-#define nx_vms_api_analytics_ApiIntegrationManifest_Fields \
-    (id) \
-    (name) \
-    (description) \
-    (version) \
-    (vendor) \
-    (pinCode)
-QN_FUSION_DECLARE_FUNCTIONS(
-    ApiIntegrationManifest, (json)(ubjson), NX_VMS_API);
-NX_REFLECTION_INSTRUMENT(
-    ApiIntegrationManifest,
-    nx_vms_api_analytics_ApiIntegrationManifest_Fields);
 
 /**%apidoc
  * Data to create/update an Integration request in the VMS.
  */
 struct NX_VMS_API RegisterIntegrationRequest: public IntegrationRequestIdentity
 {
-    /**%apidoc Integration manifest. */
-    ApiIntegrationManifest integrationManifest;
+    /**%apidoc Integration Manifest. */
+    PluginManifest integrationManifest;
 
-    /**%apidoc String containing the Engine manifest. */
-    QString engineManifestString;
+    /**%apidoc Engine Manifest. */
+    EngineManifest engineManifest;
+
+    /**%apidoc Integration authentication code, 4 decimal digits. */
+    QString pinCode;
 
     bool operator==(const RegisterIntegrationRequest& other) const = default;
 };
 #define nx_vms_api_analytics_RegisterIntegrationRequest_Fields \
     nx_vms_api_analytics_IntegrationRequestIdentity_Fields \
     (integrationManifest) \
-    (engineManifestString)
+    (engineManifest) \
+    (pinCode)
 QN_FUSION_DECLARE_FUNCTIONS(
-    RegisterIntegrationRequest, (json)(ubjson), NX_VMS_API);
+    RegisterIntegrationRequest, (json), NX_VMS_API);
 NX_REFLECTION_INSTRUMENT(
     RegisterIntegrationRequest,
     nx_vms_api_analytics_RegisterIntegrationRequest_Fields);
@@ -113,14 +86,11 @@ struct NX_VMS_API RegisterIntegrationResponse: public IntegrationRequestIdentity
     (user) \
     (password)
 QN_FUSION_DECLARE_FUNCTIONS(
-    RegisterIntegrationResponse, (json)(ubjson), NX_VMS_API);
+    RegisterIntegrationResponse, (json), NX_VMS_API);
 NX_REFLECTION_INSTRUMENT(
     RegisterIntegrationResponse,
     nx_vms_api_analytics_RegisterIntegrationResponse_Fields);
 
-/**%apidoc
- * Inforamtion about an Integration request.
- */
 struct NX_VMS_API IntegrationRequestData: public RegisterIntegrationRequest
 {
     IntegrationRequestData() = default;
@@ -147,7 +117,7 @@ struct NX_VMS_API IntegrationRequestData: public RegisterIntegrationRequest
     nx_vms_api_analytics_RegisterIntegrationRequest_Fields \
     (timestampMs)(expirationTimeoutMs)(requestAddress)(isApproved)
 QN_FUSION_DECLARE_FUNCTIONS(
-    IntegrationRequestData, (json)(ubjson), NX_VMS_API);
+    IntegrationRequestData, (json), NX_VMS_API);
 NX_REFLECTION_INSTRUMENT(
     IntegrationRequestData,
     nx_vms_api_analytics_IntegrationRequestData_Fields);

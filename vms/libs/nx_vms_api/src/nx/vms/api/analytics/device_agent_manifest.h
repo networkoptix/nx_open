@@ -16,52 +16,55 @@
 
 namespace nx::vms::api::analytics {
 
-// TODO: Move this class to server-only library; eliminate its usages in the Client.
-/**
- * The JSON-serializable data structure that is given by each Analytics Engine's DeviceAgent to the
- * Server after the DeviceAgent has been created by the Engine.
- *
- * See the description of the fields in manifests.md.
+NX_REFLECTION_ENUM_CLASS(DeviceAgentCapability,
+    noCapabilities = 0,
+    disableStreamSelection = 1 << 0,
+    doNotSaveSettingsValuesToProperty = 1 << 31 /**<%apidoc[proprietary] */
+)
+Q_DECLARE_FLAGS(DeviceAgentCapabilities, DeviceAgentCapability)
+
+/**%apidoc
+ * The data structure that is given by each Analytics Engine's DeviceAgent to the Server after the
+ * DeviceAgent has been created by the Engine.
+ * <br/>
+ * See the description of the fields in `src/nx/sdk/analytics/manifests.md` in Metadata SDK.
  */
 struct NX_VMS_API DeviceAgentManifest
 {
-    NX_REFLECTION_ENUM_IN_CLASS(Capability,
-        noCapabilities = 0,
-        disableStreamSelection = 1 << 0,
-        doNotSaveSettingsValuesToProperty = 1 << 31 /**< Proprietary. */
-    )
-    Q_DECLARE_FLAGS(Capabilities, Capability)
+    /**%apidoc[opt] */
+    DeviceAgentCapabilities capabilities;
 
-    Capabilities capabilities;
-
-    /**%apidoc
+    /**%apidoc[opt]
      * %deprecated Use "supportedTypes" field instead.
      */
     QList<QString> supportedEventTypeIds;
 
-    /**%apidoc
+    /**%apidoc[opt]
      * %deprecated Use "supportedTypes" field instead.
      */
     QList<QString> supportedObjectTypeIds;
 
-    /**%apidoc
+    /**%apidoc[opt]
      * %deprecated Use "typeLibrary" and "supportedTypes" fields instead.
      */
     QList<EventType> eventTypes;
 
-    /**%apidoc
+    /**%apidoc[opt]
      * %deprecated Use "typeLibrary" and "supportedTypes" fields instead.
      */
     QList<ObjectType> objectTypes;
 
-    /**%apidoc
+    /**%apidoc[opt]
      * %deprecated Use "typeLibrary" field instead.
      */
     QList<Group> groups;
 
     QJsonValue deviceAgentSettingsModel; /**<%apidoc[proprietary] */
 
+    /**%apidoc[opt] */
     QList<TypeSupportInfo> supportedTypes;
+
+    /**%apidoc[opt] */
     TypeLibrary typeLibrary;
 };
 
@@ -80,7 +83,7 @@ NX_VMS_API std::vector<ManifestError> validate(const DeviceAgentManifest& device
 
 NX_REFLECTION_INSTRUMENT(DeviceAgentManifest, DeviceAgentManifest_Fields);
 
-Q_DECLARE_OPERATORS_FOR_FLAGS(DeviceAgentManifest::Capabilities)
+Q_DECLARE_OPERATORS_FOR_FLAGS(DeviceAgentCapabilities)
 
 QN_FUSION_DECLARE_FUNCTIONS(DeviceAgentManifest, (json), NX_VMS_API)
 

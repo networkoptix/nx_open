@@ -31,7 +31,7 @@ AbstractPlugin* Engine::plugin() const
     return m_plugin;
 }
 
-nx::vms::api::analytics::EngineManifest::Capabilities Engine::capabilities() const
+nx::vms::api::analytics::EngineCapabilities Engine::capabilities() const
 {
     return m_descriptor.capabilities;
 }

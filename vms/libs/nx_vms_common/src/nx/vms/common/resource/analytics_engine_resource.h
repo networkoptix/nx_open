@@ -8,6 +8,7 @@
 #include <nx/utils/value_cache.h>
 #include <nx/vms/api/analytics/descriptors.h>
 #include <nx/vms/api/analytics/engine_manifest.h>
+#include <nx/vms/api/analytics/object_action.h>
 #include <nx/vms/api/data/analytics_integration_model.h>
 
 namespace nx::vms::common {
@@ -39,7 +40,7 @@ public:
     virtual std::set<QString> eventTypeIds() const;
     virtual std::set<QString> objectTypeIds() const;
 
-    QList<nx::vms::api::analytics::EngineManifest::ObjectAction> supportedObjectActions() const;
+    QList<nx::vms::api::analytics::ObjectAction> supportedObjectActions() const;
 
     /**
      * Device-dependent Engines are always running on a Device and cannot be disabled by the user.
