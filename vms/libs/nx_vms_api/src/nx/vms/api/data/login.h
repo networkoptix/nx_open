@@ -73,8 +73,18 @@ struct NX_VMS_API LoginSessionRequest
 
     /**%apidoc[opt] Set HTTP cookie for automatic login by browser. */
     bool setCookie = false;
+
+    /**%apidoc
+     * Authorization Session token lifetime (seconds).
+     * If the field is not set, the Site-wide value is used by default.
+     * If the value is longer than the value of the Site-wide limit,
+     * then the limit will be used.
+     * If the value is present, it must be greater than or equal to 5 seconds.
+     * %example 100
+     */
+    std::optional<std::chrono::seconds> durationS;
 };
-#define LoginSessionRequest_Fields (username)(password)(setCookie)
+#define LoginSessionRequest_Fields (username)(password)(setCookie)(durationS)
 NX_VMS_API_DECLARE_STRUCT_EX(LoginSessionRequest, (json))
 NX_REFLECTION_INSTRUMENT(LoginSessionRequest, LoginSessionRequest_Fields);
 

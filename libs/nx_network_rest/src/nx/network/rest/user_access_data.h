@@ -55,7 +55,12 @@ struct NX_NETWORK_REST_API UserAccessData
     Duration expiresIn(TimePoint now = nx::utils::monotonicTime()) const;
     TimePoint issued() const;
 
-    void setDuration(Duration duration);
+    std::optional<Duration> userDuration() const;
+    void setUserDuration(std::optional<Duration> duration);
+
+    void setSiteDuration(Duration duration);
+    Duration siteDuration() const;
+
     void setToken(
         Token token, Duration duration,
         std::optional<TimePoint> issued = nx::utils::monotonicTime());
@@ -65,7 +70,8 @@ struct NX_NETWORK_REST_API UserAccessData
 private:
     Token m_token;
     std::optional<TimePoint> m_issued;
-    Duration m_duration{0};
+    Duration m_siteDuration{0};
+    std::optional<Duration> m_userDuration;
 };
 
 struct UserSession
