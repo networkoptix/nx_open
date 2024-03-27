@@ -30,8 +30,7 @@ UserAccessData::UserAccessData(
 
 // TODO: In future versions all sessions should have normal timestamps, but for legacy auth we're
 // going to use this really big value.
-// TODO: Change to std::chrono::days when MSVC supports it.
-constexpr const UserAccessData::Duration kDefaultDuration = std::chrono::hours(24) * 100;
+constexpr UserAccessData::Duration kDefaultDuration = std::chrono::days(100);
 
 UserAccessData::Duration UserAccessData::age(TimePoint now) const
 {
@@ -40,7 +39,27 @@ UserAccessData::Duration UserAccessData::age(TimePoint now) const
 
 UserAccessData::Duration UserAccessData::expiresIn(TimePoint now) const
 {
-    return (m_issued && m_duration.count() > 0) ? m_duration - age(now) : kDefaultDuration;
+    if (!m_issued)
+        return kDefaultDuration;
+    if (m_siteDuration.count() > 0 || m_userDuration)
+    {
+        auto duration = m_siteDuration.count() > 0
+            ? m_siteDuration
+            : m_userDuration.value_or(kDefaultDuration);
+        return std::min(duration, m_userDuration.value_or(duration)) - age(now);
+    }
+
+    return kDefaultDuration;
+}
+
+std::optional<UserAccessData::Duration> UserAccessData::userDuration() const
+{
+    return m_userDuration;
+}
+
+void UserAccessData::setUserDuration(std::optional<Duration> duration)
+{
+    m_userDuration = duration;
 }
 
 UserAccessData::TimePoint UserAccessData::issued() const
@@ -48,16 +67,21 @@ UserAccessData::TimePoint UserAccessData::issued() const
     return m_issued ? *m_issued : (nx::utils::monotonicTime() - kDefaultDuration);
 }
 
-void UserAccessData::setDuration(Duration duration)
+void UserAccessData::setSiteDuration(Duration duration)
 {
-    m_duration = std::move(duration);
+    m_siteDuration = std::move(duration);
+}
+
+UserAccessData::Duration UserAccessData::siteDuration() const
+{
+    return m_siteDuration;
 }
 
 void UserAccessData::setToken(Token token, Duration duration, std::optional<TimePoint> issued)
 {
     m_token = std::move(token);
     m_issued = std::move(issued);
-    m_duration = std::move(duration);
+    m_siteDuration = std::move(duration);
 }
 
 QString UserAccessData::toString() const
