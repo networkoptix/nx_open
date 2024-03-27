@@ -432,6 +432,7 @@ distrib_copyServerLibs() # additional_libs_to_copy...
         libnx_cloud_storage_client
         libnx_qr_code_service_client
         libnx_aws_client
+        libnx_merge_service_client
 
         # third-party
         libquazip
