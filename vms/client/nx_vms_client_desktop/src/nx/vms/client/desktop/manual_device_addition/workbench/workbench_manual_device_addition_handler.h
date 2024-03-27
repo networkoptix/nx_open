@@ -9,6 +9,7 @@
 namespace nx::vms::client::desktop {
 
 class DeviceAdditionDialog;
+class NewDeviceAdditionDialog;
 
 class WorkbenchManualDeviceAdditionHandler: public QObject, public QnWorkbenchContextAware
 {
@@ -20,6 +21,7 @@ public:
 
 private:
     QPointer<DeviceAdditionDialog> m_deviceAdditionDialog;
+    QPointer<NewDeviceAdditionDialog> m_newDeviceAdditionDialog;
 };
 
 } // namespace nx::vms::client::desktop
