@@ -408,7 +408,7 @@ Dialog
                 case LookupListExportProcessor.Success:
                     exportProgressBar.progressFinished()
                     break;
-                case LookupListExportProcessor.ErrorFileNotOpened:
+                case LookupListExportProcessor.ErrorFileNotSaved:
                     exportProgressBar.visible = false
                     MessageBox.exec(MessageBox.Icon.Critical,
                         qsTr("Could not save file"),
@@ -417,6 +417,10 @@ Dialog
                     break;
                 default:
                     exportProgressBar.visible = false
+                    MessageBox.exec(MessageBox.Icon.Critical,
+                        qsTr("Export failed"),
+                        qsTr("Please ensure that you have access to selected folder and enough disk space"),
+                        MessageBox.Ok);
             }
         }
     }

@@ -22,6 +22,7 @@ public:
         QVector<int> rows, LookupListEntriesModel* model, const QString& filename);
     QFutureWatcher<ExportExitCode> currentTask;
     QString currentExportFolder;
+    bool connectionInitialized = false;
 };
 
 LookupListExportProcessor::Private::Private(LookupListExportProcessor* q):
@@ -92,18 +93,22 @@ bool LookupListExportProcessor::exportListEntries(
         return false;
     d->currentExportFolder = QFileInfo(fileName).absolutePath();
 
-    auto future =
-        QtConcurrent::run(LookupListExportProcessor::Private::runTask, rows, model, fileName);
-    d->currentTask.setFuture(future);
+    if (!d->connectionInitialized)
+    {
+        connect(&d->currentTask,
+            &QFutureWatcherBase::started,
+            this,
+            &LookupListExportProcessor::exportStarted);
+        connect(&d->currentTask,
+            &QFutureWatcherBase::finished,
+            d.get(),
+            &Private::processExportTaskResult);
 
-    connect(&d->currentTask,
-        &QFutureWatcherBase::started,
-        this,
-        &LookupListExportProcessor::exportStarted);
-    connect(&d->currentTask,
-        &QFutureWatcherBase::finished,
-        d.get(),
-        &LookupListExportProcessor::Private::processExportTaskResult);
+        d->connectionInitialized = true;
+    }
+
+    auto future = QtConcurrent::run(Private::runTask, rows, model, fileName);
+    d->currentTask.setFuture(future);
 
     return true;
 }
