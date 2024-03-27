@@ -271,6 +271,7 @@ namespace Qn
         ObjectTrackIdRole,                          /**< Role for camera preview stream (CameraImageRequest::objectTrackId). */
         HasExternalBestShotRole,                    /**< Whether object detection track has an external best shot image (bool). */
         ForcePreviewLoaderRole,                     /**< Display loading indicator on tile preview. */
+        ShowVideoPreviewRole,                       /**< Display camera video stream on tile preview. */
 
         DecorationPathRole,                         /**< Role for icon path (QString). */
 

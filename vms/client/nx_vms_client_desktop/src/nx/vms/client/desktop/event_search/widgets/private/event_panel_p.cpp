@@ -576,7 +576,7 @@ void EventPanel::Private::at_eventTileHovered(const QModelIndex& index, EventTil
     }
 
     auto multiImageProvider = this->multiImageProvider(index);
-    const auto imageProvider = multiImageProvider ? multiImageProvider.get() : tile->preview();
+    const auto imageProvider = multiImageProvider ? multiImageProvider.get() : tile->imageProvider();
 
     auto text = tile->toolTip();
     if (text.isEmpty() && imageProvider)

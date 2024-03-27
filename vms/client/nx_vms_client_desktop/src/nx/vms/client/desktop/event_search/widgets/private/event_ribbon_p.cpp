@@ -14,6 +14,7 @@
 #include <QtWidgets/QScrollBar>
 
 #include <client/client_globals.h>
+#include <core/resource/client_camera.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <nx/api/mediaserver/image_request.h>
@@ -381,6 +382,15 @@ void EventRibbon::Private::updateTilePreview(int index)
     if (!mediaResource)
         return;
 
+    if (auto cameraResource = mediaResource->toResourcePtr())
+    {
+        auto camera = cameraResource.dynamicCast<QnVirtualCameraResource>();
+        widget->setVideoPreviewResource(
+            camera && modelIndex.data(Qn::ShowVideoPreviewRole).toBool()
+            ? camera
+            : QnVirtualCameraResourcePtr{});
+    }
+
     const bool forcePreviewLoader = modelIndex.data(Qn::ForcePreviewLoaderRole).toBool();
     widget->setForcePreviewLoader(forcePreviewLoader);
     if (forcePreviewLoader)
@@ -435,24 +445,24 @@ void EventRibbon::Private::updateTilePreview(int index)
 
     bool forceUpdate = true;
 
-    auto& previewProvider = m_tiles[index]->preview;
-    if (!previewProvider || request.resource != previewProvider->requestData().resource)
+    auto& imagePreviewProvider = m_tiles[index]->preview;
+    if (!imagePreviewProvider || request.resource != imagePreviewProvider->requestData().resource)
     {
-        previewProvider.reset(createPreviewProvider(request));
+        imagePreviewProvider.reset(createPreviewProvider(request));
     }
     else
     {
-        const auto oldRequest = previewProvider->requestData();
+        const auto oldRequest = imagePreviewProvider->requestData();
         forceUpdate = oldRequest.timestampMs != request.timestampMs
             || oldRequest.streamSelectionMode != request.streamSelectionMode;
 
-        previewProvider->setRequestData(request);
+        imagePreviewProvider->setRequestData(request);
     }
-    previewProvider->setProperty(kBypassVideoCachePropertyName,
+    imagePreviewProvider->setProperty(kBypassVideoCachePropertyName,
         modelIndex.data(Qn::HasExternalBestShotRole).toBool());
 
     widget->setPlaceholder({});
-    widget->setPreview(previewProvider.get(), forceUpdate);
+    widget->setImageProvider(imagePreviewProvider.get(), forceUpdate);
     widget->setPreviewHighlightRect(previewCropRect);
 }
 
