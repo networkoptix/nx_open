@@ -146,6 +146,7 @@ struct EventTile::Private
     QString title;
     QCache<int, QString> titleByWidth; //< key - width of nameLabel, value - trimmed title string
     int currentWidth = 0;
+    bool previewEnabled = false;
 
     Private(EventTile* q):
         q(q),
@@ -257,18 +258,18 @@ struct EventTile::Private
 
     bool isPreviewNeeded() const
     {
-        return q->preview() && q->previewEnabled();
+        return q->imageProvider() && q->previewEnabled();
     }
 
     bool isPreviewUpdateRequired() const
     {
-        if (!isPreviewNeeded() || !NX_ASSERT(q->preview()))
+        if (!isPreviewNeeded() || !NX_ASSERT(q->imageProvider()))
             return false;
 
         if (forceNextPreviewUpdate)
             return true;
 
-        switch (q->preview()->status())
+        switch (q->imageProvider()->status())
         {
             case Qn::ThumbnailStatus::Invalid:
             case Qn::ThumbnailStatus::NoData:
@@ -289,7 +290,7 @@ struct EventTile::Private
 
         if (automaticPreviewLoad)
         {
-            q->preview()->loadAsync();
+            q->imageProvider()->loadAsync();
         }
         else
         {
@@ -317,7 +318,7 @@ struct EventTile::Private
 
     void showDebugPreviewTimestamp()
     {
-        auto provider = qobject_cast<ResourceThumbnailProvider*>(q->preview());
+        auto provider = qobject_cast<ResourceThumbnailProvider*>(q->imageProvider());
         if (provider)
         {
             q->ui->debugPreviewTimeLabel->setText(
@@ -330,7 +331,32 @@ struct EventTile::Private
             q->ui->debugPreviewTimeLabel->hide();
             q->ui->debugPreviewTimeLabel->setText({});
         }
-    };
+    }
+
+    void updatePreviewsVisibility()
+    {
+        if (previewEnabled)
+        {
+            if (q->ui->videoPreviewWidget->camera())
+            {
+                q->ui->videoPreviewWidget->show();
+                q->ui->imagePreviewWidget->hide();
+                q->ui->imagePreviewWidget->parentWidget()->show();
+                return;
+            }
+            else if (q->ui->imagePreviewWidget->imageProvider())
+            {
+                q->ui->videoPreviewWidget->hide();
+                q->ui->imagePreviewWidget->show();
+                q->ui->imagePreviewWidget->parentWidget()->show();
+                return;
+            }
+        }
+
+        q->ui->imagePreviewWidget->hide();
+        q->ui->videoPreviewWidget->hide();
+        q->ui->imagePreviewWidget->parentWidget()->hide();
+    }
 };
 
 // ------------------------------------------------------------------------------------------------
@@ -356,7 +382,9 @@ EventTile::EventTile(QWidget* parent):
     ui->mainWidget->layout()->setContentsMargins(kMarginsWithHeader);
     ui->wideHolder->layout()->setContentsMargins(kWidePreviewMarginsWithHeader);
     ui->narrowHolder->layout()->setContentsMargins(kNarrowPreviewMarginsWithHeader);
-    ui->previewWidget->setMaximumHeight(kMaximumPreviewHeightWithHeader);
+    ui->imagePreviewWidget->setMaximumHeight(kMaximumPreviewHeightWithHeader);
+    ui->videoPreviewWidget->setMinimumHeight(kMaximumPreviewHeightWithHeader);
+    ui->videoPreviewWidget->setMaximumHeight(kMaximumPreviewHeightWithHeader);
 
     auto sizePolicy = ui->timestampLabel->sizePolicy();
     sizePolicy.setRetainSizeWhenHidden(true);
@@ -373,13 +401,13 @@ EventTile::EventTile(QWidget* parent):
     ui->narrowHolder->hide();
     ui->wideHolder->hide();
 
-    auto dots = ui->previewWidget->busyIndicator()->dots();
+    auto dots = ui->imagePreviewWidget->busyIndicator()->dots();
     dots->setDotRadius(kDotRadius);
     dots->setDotSpacing(kDotSpacing);
 
-    ui->previewWidget->setAutoScaleUp(true);
-    ui->previewWidget->setReloadMode(kDefaultReloadMode);
-    ui->previewWidget->setCropMode(AsyncImageWidget::CropMode::always);
+    ui->imagePreviewWidget->setAutoScaleUp(true);
+    ui->imagePreviewWidget->setReloadMode(kDefaultReloadMode);
+    ui->imagePreviewWidget->setCropMode(AsyncImageWidget::CropMode::always);
 
     ui->nameLabel->setForegroundRole(QPalette::Light);
     ui->timestampLabel->setForegroundRole(QPalette::WindowText);
@@ -433,6 +461,7 @@ EventTile::EventTile(QWidget* parent):
     ui->busyIndicator->hide();
     ui->progressHolder->hide();
     ui->mainWidget->hide();
+    d->updatePreviewsVisibility();
 
     ui->secondaryTimestampHolder->hide();
 
@@ -627,22 +656,24 @@ void EventTile::setIcon(const QPixmap& value)
     // Icon label is always visible. It keeps column width fixed.
 }
 
-ImageProvider* EventTile::preview() const
+ImageProvider* EventTile::imageProvider() const
 {
-    return ui->previewWidget->imageProvider();
+    return ui->imagePreviewWidget->imageProvider();
 }
 
-void EventTile::setPreview(ImageProvider* value, bool forceUpdate)
+void EventTile::setImageProvider(ImageProvider* value, bool forceUpdate)
 {
-    if (preview() == value && !forceUpdate)
+    if (imageProvider() == value && !forceUpdate)
         return;
 
-    if (preview())
-        preview()->disconnect(this);
+    if (imageProvider())
+        imageProvider()->disconnect(this);
 
-    ui->previewWidget->setImageProvider(value);
-    ui->previewWidget->parentWidget()->setVisible(
-        value || !ui->previewWidget->placeholder().isEmpty());
+    if (value)
+        value->loadAsync();
+
+    ui->imagePreviewWidget->setImageProvider(value);
+    d->updatePreviewsVisibility();
 
     d->isPreviewLoadNeeded = false;
     d->forceNextPreviewUpdate = forceUpdate;
@@ -651,10 +682,10 @@ void EventTile::setPreview(ImageProvider* value, bool forceUpdate)
     if (ini().showDebugTimeInformationInRibbon)
         d->showDebugPreviewTimestamp();
 
-    if (!preview())
+    if (!imageProvider())
         return;
 
-    connect(preview(), &ImageProvider::statusChanged, this,
+    connect(imageProvider(), &ImageProvider::statusChanged, this,
         [this](Qn::ThumbnailStatus status)
         {
             if (status != Qn::ThumbnailStatus::Invalid)
@@ -668,31 +699,38 @@ void EventTile::setPreview(ImageProvider* value, bool forceUpdate)
         });
 }
 
+void EventTile::setVideoPreviewResource(const QnVirtualCameraResourcePtr& camera)
+{
+    ui->videoPreviewWidget->setCamera(camera);
+
+    d->updatePreviewsVisibility();
+}
+
 void EventTile::setPlaceholder(const QString& text)
 {
-    ui->previewWidget->setPlaceholder(text);
+    ui->imagePreviewWidget->setPlaceholder(text);
 
     if (!text.isEmpty())
-       setPreview(nullptr, /*forceUpdate*/ true);
+       setImageProvider(nullptr, /*forceUpdate*/ true);
 }
 
 void EventTile::setForcePreviewLoader(bool force)
 {
-    ui->previewWidget->setReloadMode(force
+    ui->imagePreviewWidget->setReloadMode(force
         ? AsyncImageWidget::ReloadMode::showLoadingIndicator
         : kDefaultReloadMode);
 
-    ui->previewWidget->setForceLoadingIndicator(force);
+    ui->imagePreviewWidget->setForceLoadingIndicator(force);
 }
 
 QRectF EventTile::previewHighlightRect() const
 {
-    return ui->previewWidget->highlightRect();
+    return ui->imagePreviewWidget->highlightRect();
 }
 
 void EventTile::setPreviewHighlightRect(const QRectF& relativeRect)
 {
-    ui->previewWidget->setHighlightRect(relativeRect);
+    ui->imagePreviewWidget->setHighlightRect(relativeRect);
 }
 
 bool EventTile::automaticPreviewLoad() const
@@ -909,16 +947,17 @@ void EventTile::setProgressFormat(const QString& value)
 
 bool EventTile::previewEnabled() const
 {
-    return !ui->previewWidget->isHidden();
+    return d->previewEnabled;
 }
 
 void EventTile::setPreviewEnabled(bool value)
 {
-    if (previewEnabled() == value)
+    if (d->previewEnabled == value)
         return;
 
-    ui->previewWidget->setHidden(!value);
-    ui->previewWidget->parentWidget()->setHidden(!value || !ui->previewWidget->imageProvider());
+    d->previewEnabled = value;
+
+    d->updatePreviewsVisibility();
 
     d->updatePreview();
 }
@@ -953,7 +992,9 @@ void EventTile::setHeaderEnabled(bool value)
         setWidgetHolder(ui->timestampLabel, ui->primaryTimestampHolder);
         ui->secondaryTimestampHolder->hide();
         ui->primaryTimestampHolder->show();
-        ui->previewWidget->setMaximumHeight(kMaximumPreviewHeightWithHeader);
+        ui->imagePreviewWidget->setMaximumHeight(kMaximumPreviewHeightWithHeader);
+        ui->videoPreviewWidget->setMinimumHeight(kMaximumPreviewHeightWithHeader);
+        ui->videoPreviewWidget->setMaximumHeight(kMaximumPreviewHeightWithHeader);
         ui->mainWidget->layout()->setContentsMargins(kMarginsWithHeader);
         ui->wideHolder->layout()->setContentsMargins(kWidePreviewMarginsWithHeader);
         ui->narrowHolder->layout()->setContentsMargins(kNarrowPreviewMarginsWithHeader);
@@ -964,7 +1005,9 @@ void EventTile::setHeaderEnabled(bool value)
         setWidgetHolder(ui->timestampLabel, ui->secondaryTimestampHolder);
         ui->secondaryTimestampHolder->show();
         ui->primaryTimestampHolder->hide();
-        ui->previewWidget->setMaximumHeight(kMaximumPreviewHeightWithoutHeader);
+        ui->imagePreviewWidget->setMaximumHeight(kMaximumPreviewHeightWithoutHeader);
+        ui->videoPreviewWidget->setMinimumHeight(kMaximumPreviewHeightWithoutHeader);
+        ui->videoPreviewWidget->setMaximumHeight(kMaximumPreviewHeightWithoutHeader);
         ui->mainWidget->layout()->setContentsMargins(kMarginsWithoutHeader);
         ui->wideHolder->layout()->setContentsMargins(kWidePreviewMarginsWithoutHeader);
         ui->narrowHolder->layout()->setContentsMargins(kNarrowPreviewMarginsWithoutHeader);
@@ -974,10 +1017,10 @@ void EventTile::setHeaderEnabled(bool value)
 
 EventTile::Mode EventTile::mode() const
 {
-    if (ui->previewWidget->parentWidget() == ui->narrowHolder)
+    if (ui->imagePreviewWidget->parentWidget() == ui->narrowHolder)
         return Mode::standard;
 
-    NX_ASSERT(ui->previewWidget->parentWidget() == ui->wideHolder);
+    NX_ASSERT(ui->imagePreviewWidget->parentWidget() == ui->wideHolder);
     return Mode::wide;
 }
 
@@ -986,17 +1029,19 @@ void EventTile::setMode(Mode value)
     if (mode() == value)
         return;
 
-    const bool noPreview = ui->previewWidget->isHidden() || !ui->previewWidget->imageProvider();
+    const bool noPreview = d->previewEnabled;
     switch (value)
     {
         case Mode::standard:
-            setWidgetHolder(ui->previewWidget, ui->narrowHolder);
+            setWidgetHolder(ui->imagePreviewWidget, ui->narrowHolder);
+            setWidgetHolder(ui->videoPreviewWidget, ui->narrowHolder);
             ui->narrowHolder->setHidden(noPreview);
             ui->wideHolder->setHidden(true);
             break;
 
         case Mode::wide:
-            setWidgetHolder(ui->previewWidget, ui->wideHolder);
+            setWidgetHolder(ui->imagePreviewWidget, ui->wideHolder);
+            setWidgetHolder(ui->videoPreviewWidget, ui->wideHolder);
             ui->wideHolder->setHidden(noPreview);
             ui->narrowHolder->setHidden(false); //< There is a spacer child item.
             break;
@@ -1046,7 +1091,7 @@ void EventTile::clear()
     setTimestamp({});
     setIcon({});
     setPlaceholder({});
-    setPreview({}, true);
+    setImageProvider({}, true);
     setPreviewHighlightRect({});
     setAction({});
     setBusyIndicatorVisible(false);

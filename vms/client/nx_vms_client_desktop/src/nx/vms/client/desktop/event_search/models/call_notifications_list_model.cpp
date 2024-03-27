@@ -31,6 +31,17 @@ CallNotificationsListModel::~CallNotificationsListModel()
 {
 }
 
+QVariant CallNotificationsListModel::data(const QModelIndex& index, int role) const
+{
+    if (!isValid(index))
+        return {};
+
+    if (role == Qn::ShowVideoPreviewRole)
+        return index.data(Qn::ActionIdRole).value<menu::IDType>() == menu::OpenIntercomLayoutAction;
+
+    return EventListModel::data(index, role);
+}
+
 bool CallNotificationsListModel::defaultAction(const QModelIndex& index)
 {
     const auto result = base_type::defaultAction(index);

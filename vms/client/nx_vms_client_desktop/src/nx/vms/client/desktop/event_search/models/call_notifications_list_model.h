@@ -16,6 +16,8 @@ public:
     explicit CallNotificationsListModel(WindowContext* context, QObject* parent = nullptr);
     virtual ~CallNotificationsListModel() override;
 
+    virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
+
 protected:
     virtual bool defaultAction(const QModelIndex& index) override;
 

@@ -112,6 +112,9 @@ QVariant EventListModel::data(const QModelIndex& index, int role) const
         case Qn::ForcePreviewLoaderRole:
             return event.forcePreviewLoader;
 
+        case Qn::ShowVideoPreviewRole:
+            return false;
+
         default:
             return base_type::data(index, role);
     }

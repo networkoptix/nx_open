@@ -20,3 +20,4 @@ InteractiveGrid 1.0 InteractiveGrid.qml
 IntervalPreview 1.0 IntervalPreview.qml
 IntervalPreviewControls 1.0 IntervalPreviewControls.qml
 NameValueTable 1.0 NameValueTable.qml
+VideoPreviewItem 1.0 VideoPreviewItem.qml

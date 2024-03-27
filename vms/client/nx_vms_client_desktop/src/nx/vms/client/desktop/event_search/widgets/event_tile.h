@@ -53,8 +53,10 @@ public:
     void setIcon(const QPixmap& value);
 
     // Does not take ownership.
-    ImageProvider* preview() const;
-    void setPreview(ImageProvider* value, bool forceUpdate);
+    ImageProvider* imageProvider() const;
+    void setImageProvider(ImageProvider* value, bool forceUpdate);
+
+    void setVideoPreviewResource(const QnVirtualCameraResourcePtr& camera);
 
     void setPlaceholder(const QString& text);
     void setForcePreviewLoader(bool force);
