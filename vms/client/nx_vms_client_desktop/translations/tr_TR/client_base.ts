@@ -5749,47 +5749,6 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
   <context>
     <name>QnWebResourceWidget</name>
     <message>
-      <source>Open this web page?</source>
-      <translation>Bu web sayfası açılsın mı?</translation>
-    </message>
-    <message>
-      <source>Connect anyway</source>
-      <translation>Yine de bağlan</translation>
-    </message>
-    <message>
-      <source>You try to open the
-%1
-but this web page presented an untrusted certificate auth.
-We recommend you not to open this web page. If you understand the risks, you can open the web page.</source>
-      <comment>%1 is the web page address</comment>
-      <translation>%1
-açmaya çalışıyorsunuz ancak bu web sayfası güvenilmeyen bir sertifika kimlik doğrulaması sundu.
-Bu web sayfasını açmamanızı öneririz. Riskleri anlıyorsanız web sayfasını açabilirsiniz.</translation>
-    </message>
-    <message>
-      <source>Open this integration?</source>
-      <translation>Bu entegrasyon açılsın mı?</translation>
-    </message>
-    <message>
-      <source>Integration</source>
-      <translation>Entegrasyon</translation>
-    </message>
-    <message>
-      <source>Web Page</source>
-      <translation>Web Sayfası</translation>
-    </message>
-    <message>
-      <source>You try to open the
-%1
-but this integration presented an untrusted certificate auth.
-We recommend you not to open this integration. If you understand the risks, you can open the integration.</source>
-      <comment>%1 is the integration address</comment>
-      <translation type="unfinished">You try to open the
-%1
-but this integration presented an untrusted certificate auth.
-We recommend you not to open this integration. If you understand the risks, you can open the integration.</translation>
-    </message>
-    <message>
       <source>Integration settings...</source>
       <translation>Entegrasyon ayarları...</translation>
     </message>
@@ -12198,6 +12157,50 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
         <numerusform>%n etkinlik</numerusform>
         <numerusform>%n etkinlik</numerusform>
       </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::WebPageCertificateDialog</name>
+    <message>
+      <source>Open this integration?</source>
+      <translation type="unfinished">Open this integration?</translation>
+    </message>
+    <message>
+      <source>Open this web page?</source>
+      <translation>Bu web sayfası açılsın mı?</translation>
+    </message>
+    <message>
+      <source>Integration</source>
+      <translation type="unfinished">Integration</translation>
+    </message>
+    <message>
+      <source>Web Page</source>
+      <translation>Web Sayfası</translation>
+    </message>
+    <message>
+      <source>You try to open the
+%1
+but this integration presented an untrusted certificate auth.
+We recommend you not to open this integration. If you understand the risks, you can open the integration.</source>
+      <comment>%1 is the integration address</comment>
+      <translation type="unfinished">You try to open the
+%1
+but this integration presented an untrusted certificate auth.
+We recommend you not to open this integration. If you understand the risks, you can open the integration.</translation>
+    </message>
+    <message>
+      <source>You try to open the
+%1
+but this web page presented an untrusted certificate auth.
+We recommend you not to open this web page. If you understand the risks, you can open the web page.</source>
+      <comment>%1 is the web page address</comment>
+      <translation>%1
+açmaya çalışıyorsunuz ancak bu web sayfası güvenilmeyen bir sertifika kimlik doğrulaması sundu.
+Bu web sayfasını açmamanızı öneririz. Riskleri anlıyorsanız web sayfasını açabilirsiniz.</translation>
+    </message>
+    <message>
+      <source>Connect anyway</source>
+      <translation>Yine de bağlan</translation>
     </message>
   </context>
   <context>

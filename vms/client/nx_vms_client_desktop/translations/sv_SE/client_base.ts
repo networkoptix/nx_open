@@ -5751,48 +5751,6 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
   <context>
     <name>QnWebResourceWidget</name>
     <message>
-      <source>Open this web page?</source>
-      <translation>Öppna den här webbsidan?</translation>
-    </message>
-    <message>
-      <source>Connect anyway</source>
-      <translation>Anslut ändå</translation>
-    </message>
-    <message>
-      <source>You try to open the
-%1
-but this web page presented an untrusted certificate auth.
-We recommend you not to open this web page. If you understand the risks, you can open the web page.</source>
-      <comment>%1 is the web page address</comment>
-      <translation>Du försöker öppna
-%1
-men den här webbsidan presenterade en opålitlig certifikatautentisering.
-Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskerna kan du öppna webbsidan.</translation>
-    </message>
-    <message>
-      <source>Open this integration?</source>
-      <translation>Öppna denna integration?</translation>
-    </message>
-    <message>
-      <source>Integration</source>
-      <translation>Integration</translation>
-    </message>
-    <message>
-      <source>Web Page</source>
-      <translation>Webbsida</translation>
-    </message>
-    <message>
-      <source>You try to open the
-%1
-but this integration presented an untrusted certificate auth.
-We recommend you not to open this integration. If you understand the risks, you can open the integration.</source>
-      <comment>%1 is the integration address</comment>
-      <translation>Du försöker öppna
-%1
-men den här webbsidan presenterade en opålitlig certifikatautentisering.
-Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskerna kan du öppna webbsidan.</translation>
-    </message>
-    <message>
       <source>Integration settings...</source>
       <translation>Integrationsinställningar...</translation>
     </message>
@@ -12203,6 +12161,51 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
         <numerusform>%n händelser</numerusform>
         <numerusform>%n händelser</numerusform>
       </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::WebPageCertificateDialog</name>
+    <message>
+      <source>Open this integration?</source>
+      <translation>Öppna denna integration?</translation>
+    </message>
+    <message>
+      <source>Open this web page?</source>
+      <translation>Öppna den här webbsidan?</translation>
+    </message>
+    <message>
+      <source>Integration</source>
+      <translation>Integration</translation>
+    </message>
+    <message>
+      <source>Web Page</source>
+      <translation>Webbsida</translation>
+    </message>
+    <message>
+      <source>You try to open the
+%1
+but this integration presented an untrusted certificate auth.
+We recommend you not to open this integration. If you understand the risks, you can open the integration.</source>
+      <comment>%1 is the integration address</comment>
+      <translation>Du försöker öppna
+%1
+men den här webbsidan presenterade en opålitlig certifikatautentisering.
+Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskerna kan du öppna webbsidan.</translation>
+    </message>
+    <message>
+      <source>You try to open the
+%1
+but this web page presented an untrusted certificate auth.
+We recommend you not to open this web page. If you understand the risks, you can open the web page.</source>
+      <comment>%1 is the web page address</comment>
+      <translation>Du försöker öppna
+%1
+men den här webbsidan presenterade en opålitlig certifikatautentisering.
+Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskerna kan du öppna webbsidan.</translation>
+    </message>
+    <message>
+      <source>Connect anyway</source>
+      <translation>Anslut ändå</translation>
     </message>
   </context>
   <context>

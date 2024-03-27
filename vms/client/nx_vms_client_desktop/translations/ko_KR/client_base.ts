@@ -5681,48 +5681,6 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>QnWebResourceWidget</name>
     <message>
-      <source>Open this web page?</source>
-      <translation>웹페이지를 여시겠습니까?</translation>
-    </message>
-    <message>
-      <source>Connect anyway</source>
-      <translation>그래도 연결</translation>
-    </message>
-    <message>
-      <source>You try to open the
-%1
-but this web page presented an untrusted certificate auth.
-We recommend you not to open this web page. If you understand the risks, you can open the web page.</source>
-      <comment>%1 is the web page address</comment>
-      <translation>
-%1
-를 열려고 시도했지만 이 웹 페이지는 신뢰할 수 없는 인증을 제공했습니다.
-이 웹 페이지를 열지 않는 것이 좋습니다. 위험을 이해하면 웹 페이지를 열 수 있습니다.</translation>
-    </message>
-    <message>
-      <source>Open this integration?</source>
-      <translation type="unfinished">Open this integration?</translation>
-    </message>
-    <message>
-      <source>Integration</source>
-      <translation type="unfinished">Integration</translation>
-    </message>
-    <message>
-      <source>Web Page</source>
-      <translation>웹페이지:</translation>
-    </message>
-    <message>
-      <source>You try to open the
-%1
-but this integration presented an untrusted certificate auth.
-We recommend you not to open this integration. If you understand the risks, you can open the integration.</source>
-      <comment>%1 is the integration address</comment>
-      <translation type="unfinished">You try to open the
-%1
-but this integration presented an untrusted certificate auth.
-We recommend you not to open this integration. If you understand the risks, you can open the integration.</translation>
-    </message>
-    <message>
       <source>Integration settings...</source>
       <translation type="unfinished">Integration settings...</translation>
     </message>
@@ -12024,6 +11982,51 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <translation>
         <numerusform>%n 이벤트</numerusform>
       </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::WebPageCertificateDialog</name>
+    <message>
+      <source>Open this integration?</source>
+      <translation type="unfinished">Open this integration?</translation>
+    </message>
+    <message>
+      <source>Open this web page?</source>
+      <translation>웹페이지를 여시겠습니까?</translation>
+    </message>
+    <message>
+      <source>Integration</source>
+      <translation type="unfinished">Integration</translation>
+    </message>
+    <message>
+      <source>Web Page</source>
+      <translation>웹페이지:</translation>
+    </message>
+    <message>
+      <source>You try to open the
+%1
+but this integration presented an untrusted certificate auth.
+We recommend you not to open this integration. If you understand the risks, you can open the integration.</source>
+      <comment>%1 is the integration address</comment>
+      <translation type="unfinished">You try to open the
+%1
+but this integration presented an untrusted certificate auth.
+We recommend you not to open this integration. If you understand the risks, you can open the integration.</translation>
+    </message>
+    <message>
+      <source>You try to open the
+%1
+but this web page presented an untrusted certificate auth.
+We recommend you not to open this web page. If you understand the risks, you can open the web page.</source>
+      <comment>%1 is the web page address</comment>
+      <translation>
+%1
+를 열려고 시도했지만 이 웹 페이지는 신뢰할 수 없는 인증을 제공했습니다.
+이 웹 페이지를 열지 않는 것이 좋습니다. 위험을 이해하면 웹 페이지를 열 수 있습니다.</translation>
+    </message>
+    <message>
+      <source>Connect anyway</source>
+      <translation>그래도 연결</translation>
     </message>
   </context>
   <context>

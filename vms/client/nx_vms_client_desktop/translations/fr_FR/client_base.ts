@@ -5751,48 +5751,6 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
   <context>
     <name>QnWebResourceWidget</name>
     <message>
-      <source>Open this web page?</source>
-      <translation>Ouvrir cette page web ?</translation>
-    </message>
-    <message>
-      <source>Connect anyway</source>
-      <translation>Se connecter quand même</translation>
-    </message>
-    <message>
-      <source>You try to open the
-%1
-but this web page presented an untrusted certificate auth.
-We recommend you not to open this web page. If you understand the risks, you can open the web page.</source>
-      <comment>%1 is the web page address</comment>
-      <translation>Vous essayez d'ouvrir le
-%1
-mais cette page Web a présenté un certificat d'authentification non approuvé.
-Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les risques, vous pouvez ouvrir la page Web.</translation>
-    </message>
-    <message>
-      <source>Open this integration?</source>
-      <translation type="unfinished">Open this integration?</translation>
-    </message>
-    <message>
-      <source>Integration</source>
-      <translation>Intégration</translation>
-    </message>
-    <message>
-      <source>Web Page</source>
-      <translation>Page Web</translation>
-    </message>
-    <message>
-      <source>You try to open the
-%1
-but this integration presented an untrusted certificate auth.
-We recommend you not to open this integration. If you understand the risks, you can open the integration.</source>
-      <comment>%1 is the integration address</comment>
-      <translation type="unfinished">You try to open the
-%1
-but this integration presented an untrusted certificate auth.
-We recommend you not to open this integration. If you understand the risks, you can open the integration.</translation>
-    </message>
-    <message>
       <source>Integration settings...</source>
       <translation type="unfinished">Integration settings...</translation>
     </message>
@@ -12205,6 +12163,51 @@ N'épinglez pas ce certificat si vous n'avez pas modifié le certificat SSL du s
         <numerusform>%n événement</numerusform>
         <numerusform>%n événements</numerusform>
       </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::WebPageCertificateDialog</name>
+    <message>
+      <source>Open this integration?</source>
+      <translation type="unfinished">Open this integration?</translation>
+    </message>
+    <message>
+      <source>Open this web page?</source>
+      <translation>Ouvrir cette page web ?</translation>
+    </message>
+    <message>
+      <source>Integration</source>
+      <translation type="unfinished">Integration</translation>
+    </message>
+    <message>
+      <source>Web Page</source>
+      <translation>Page Web</translation>
+    </message>
+    <message>
+      <source>You try to open the
+%1
+but this integration presented an untrusted certificate auth.
+We recommend you not to open this integration. If you understand the risks, you can open the integration.</source>
+      <comment>%1 is the integration address</comment>
+      <translation type="unfinished">You try to open the
+%1
+but this integration presented an untrusted certificate auth.
+We recommend you not to open this integration. If you understand the risks, you can open the integration.</translation>
+    </message>
+    <message>
+      <source>You try to open the
+%1
+but this web page presented an untrusted certificate auth.
+We recommend you not to open this web page. If you understand the risks, you can open the web page.</source>
+      <comment>%1 is the web page address</comment>
+      <translation>Vous essayez d'ouvrir le
+%1
+mais cette page Web a présenté un certificat d'authentification non approuvé.
+Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les risques, vous pouvez ouvrir la page Web.</translation>
+    </message>
+    <message>
+      <source>Connect anyway</source>
+      <translation>Se connecter quand même</translation>
     </message>
   </context>
   <context>

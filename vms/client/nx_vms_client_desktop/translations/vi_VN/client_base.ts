@@ -5680,48 +5680,6 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
   <context>
     <name>QnWebResourceWidget</name>
     <message>
-      <source>Open this web page?</source>
-      <translation>Mở trang web này?</translation>
-    </message>
-    <message>
-      <source>Connect anyway</source>
-      <translation>Vẫn kết nối</translation>
-    </message>
-    <message>
-      <source>You try to open the
-%1
-but this web page presented an untrusted certificate auth.
-We recommend you not to open this web page. If you understand the risks, you can open the web page.</source>
-      <comment>%1 is the web page address</comment>
-      <translation>Bạn cố gắng mở
-%1
-nhưng trang web này hiển thị xác thực chứng chỉ không đáng tin cậy.
-Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn hiểu về các rủi ro, bạn vẫn có thể mở trang web.</translation>
-    </message>
-    <message>
-      <source>Open this integration?</source>
-      <translation>Mở tích hợp này?</translation>
-    </message>
-    <message>
-      <source>Integration</source>
-      <translation>Tích hợp</translation>
-    </message>
-    <message>
-      <source>Web Page</source>
-      <translation>Trang Web</translation>
-    </message>
-    <message>
-      <source>You try to open the
-%1
-but this integration presented an untrusted certificate auth.
-We recommend you not to open this integration. If you understand the risks, you can open the integration.</source>
-      <comment>%1 is the integration address</comment>
-      <translation>Bạn cố gắng mở
-%1
-nhưng tích hợp này đưa ra chứng chỉ xác thực không đáng tin cậy.
-Chúng tôi khuyên bạn không nên mở tích hợp này. Nếu bạn hiểu được rủi ro, bạn có thể mở.</translation>
-    </message>
-    <message>
       <source>Integration settings...</source>
       <translation>Cài đặt tích hợp...</translation>
     </message>
@@ -12023,6 +11981,51 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
       <translation>
         <numerusform>%n sự kiện</numerusform>
       </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::WebPageCertificateDialog</name>
+    <message>
+      <source>Open this integration?</source>
+      <translation type="unfinished">Open this integration?</translation>
+    </message>
+    <message>
+      <source>Open this web page?</source>
+      <translation>Mở trang web này?</translation>
+    </message>
+    <message>
+      <source>Integration</source>
+      <translation type="unfinished">Integration</translation>
+    </message>
+    <message>
+      <source>Web Page</source>
+      <translation>Trang Web</translation>
+    </message>
+    <message>
+      <source>You try to open the
+%1
+but this integration presented an untrusted certificate auth.
+We recommend you not to open this integration. If you understand the risks, you can open the integration.</source>
+      <comment>%1 is the integration address</comment>
+      <translation type="unfinished">You try to open the
+%1
+but this integration presented an untrusted certificate auth.
+We recommend you not to open this integration. If you understand the risks, you can open the integration.</translation>
+    </message>
+    <message>
+      <source>You try to open the
+%1
+but this web page presented an untrusted certificate auth.
+We recommend you not to open this web page. If you understand the risks, you can open the web page.</source>
+      <comment>%1 is the web page address</comment>
+      <translation>Bạn cố gắng mở
+%1
+nhưng trang web này hiển thị xác thực chứng chỉ không đáng tin cậy.
+Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn hiểu về các rủi ro, bạn vẫn có thể mở trang web.</translation>
+    </message>
+    <message>
+      <source>Connect anyway</source>
+      <translation>Vẫn kết nối</translation>
     </message>
   </context>
   <context>

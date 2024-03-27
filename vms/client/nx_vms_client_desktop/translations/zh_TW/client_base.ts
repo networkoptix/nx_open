@@ -5681,46 +5681,6 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>QnWebResourceWidget</name>
     <message>
-      <source>Open this web page?</source>
-      <translation>開啟此網頁?</translation>
-    </message>
-    <message>
-      <source>Connect anyway</source>
-      <translation>仍繼續連線</translation>
-    </message>
-    <message>
-      <source>You try to open the
-%1
-but this web page presented an untrusted certificate auth.
-We recommend you not to open this web page. If you understand the risks, you can open the web page.</source>
-      <comment>%1 is the web page address</comment>
-      <translation>嘗試開啟的網頁 %1 使用了不安全的憑證。
-若仍然要前往此網頁，可能會有潛在的安全性問題。</translation>
-    </message>
-    <message>
-      <source>Open this integration?</source>
-      <translation type="unfinished">Open this integration?</translation>
-    </message>
-    <message>
-      <source>Integration</source>
-      <translation type="unfinished">Integration</translation>
-    </message>
-    <message>
-      <source>Web Page</source>
-      <translation>網頁:</translation>
-    </message>
-    <message>
-      <source>You try to open the
-%1
-but this integration presented an untrusted certificate auth.
-We recommend you not to open this integration. If you understand the risks, you can open the integration.</source>
-      <comment>%1 is the integration address</comment>
-      <translation type="unfinished">You try to open the
-%1
-but this integration presented an untrusted certificate auth.
-We recommend you not to open this integration. If you understand the risks, you can open the integration.</translation>
-    </message>
-    <message>
       <source>Integration settings...</source>
       <translation type="unfinished">Integration settings...</translation>
     </message>
@@ -12019,6 +11979,49 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
       <translation>
         <numerusform>%n 事件</numerusform>
       </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::WebPageCertificateDialog</name>
+    <message>
+      <source>Open this integration?</source>
+      <translation type="unfinished">Open this integration?</translation>
+    </message>
+    <message>
+      <source>Open this web page?</source>
+      <translation>開啟此網頁?</translation>
+    </message>
+    <message>
+      <source>Integration</source>
+      <translation type="unfinished">Integration</translation>
+    </message>
+    <message>
+      <source>Web Page</source>
+      <translation>網頁:</translation>
+    </message>
+    <message>
+      <source>You try to open the
+%1
+but this integration presented an untrusted certificate auth.
+We recommend you not to open this integration. If you understand the risks, you can open the integration.</source>
+      <comment>%1 is the integration address</comment>
+      <translation type="unfinished">You try to open the
+%1
+but this integration presented an untrusted certificate auth.
+We recommend you not to open this integration. If you understand the risks, you can open the integration.</translation>
+    </message>
+    <message>
+      <source>You try to open the
+%1
+but this web page presented an untrusted certificate auth.
+We recommend you not to open this web page. If you understand the risks, you can open the web page.</source>
+      <comment>%1 is the web page address</comment>
+      <translation>嘗試開啟的網頁 %1 使用了不安全的憑證。
+若仍然要前往此網頁，可能會有潛在的安全性問題。</translation>
+    </message>
+    <message>
+      <source>Connect anyway</source>
+      <translation>仍繼續連線</translation>
     </message>
   </context>
   <context>
