@@ -7457,7 +7457,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>Use License</source>
       <translation>
-        <numerusform>ライセンスの使用</numerusform>
+        <numerusform>ライセンスを使用</numerusform>
       </translation>
     </message>
   </context>
@@ -7465,11 +7465,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::CameraMotionSettingsWidget</name>
     <message>
       <source>Motion detection will work only when camera is being viewed. Enable recording to make it work all the time.</source>
-      <translation>モーション検知は、カメラが表示されている場合にのみ動作します。常に動作させるためには録画を有効にしてください。</translation>
+      <translation>モーション検知は、カメラ映像が表示されている間のみ動作します。常に動作させるためには、録画を有効にしてください。</translation>
     </message>
     <message>
       <source>Maximum number of motion detection rectangles for current camera is reached</source>
-      <translation>現在のカメラのモーションエリアの最大数に達しました</translation>
+      <translation>現在のカメラのモーション検知エリアの最大数に達しました</translation>
     </message>
     <message>
       <source>Maximum number of ignore motion rectangles for current camera is reached</source>
@@ -7477,7 +7477,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Maximum number of detect motion rectangles for current camera is reached</source>
-      <translation>現在のカメラのモーションエリアの最大数に達しました</translation>
+      <translation>現在のカメラのモーション検知エリアの最大数に達しました</translation>
     </message>
     <message>
       <source>Reset motion regions to default?</source>
@@ -7485,11 +7485,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>This action cannot be undone.</source>
-      <translation>この操作は元に戻せません</translation>
+      <translation>この操作は元に戻せません。</translation>
     </message>
     <message>
       <source>Primary Stream</source>
-      <translation>プライマリ ストリーム</translation>
+      <translation>プライマリストリーム</translation>
     </message>
     <message>
       <source>Secondary Stream</source>
@@ -7584,11 +7584,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>High minimum value can lead to archive length decrease on other devices.</source>
-      <translation>高い最小値は、他のデバイスのアーカイブ期間を減少させる可能性があります</translation>
+      <translation>最小値を高くすると、他のデバイスのアーカイブ期間が短くなる可能性があります。</translation>
     </message>
     <message>
       <source>High minimum value can lead to archive length decrease on other cameras.</source>
-      <translation>高い最小値は、他のカメラのアーカイブ期間を減少させる可能性があります</translation>
+      <translation>最小値を高くすると、他のカメラのアーカイブ期間が短くなる可能性があります。</translation>
     </message>
     <message>
       <source>High pre-recording time will increase RAM utilization on the server</source>
@@ -7807,7 +7807,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::CameraStreamsDialog</name>
     <message>
       <source>Primary Stream</source>
-      <translation>プライマリ ストリーム</translation>
+      <translation>プライマリストリーム</translation>
     </message>
     <message>
       <source>Secondary Stream</source>
@@ -7815,7 +7815,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>No secondary stream</source>
-      <translation>セカンダリストリームなし</translation>
+      <translation>セカンダリストリームがありません</translation>
     </message>
     <message>
       <source>Invalid stream address</source>
@@ -7885,15 +7885,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Broken update package.</source>
-      <translation>更新プログラムパッケージが壊れています。</translation>
+      <translation>更新パッケージが壊れています。</translation>
     </message>
     <message>
       <source>Internal error.</source>
-      <translation>内部エラー</translation>
+      <translation>内部エラー。</translation>
     </message>
     <message>
       <source>Not enough space on disk to install the client update.</source>
-      <translation>クライアント更新プログラムをインストールするにはディスク容量が足りません。</translation>
+      <translation>クライアント更新プログラムをインストールするためのディスク領域が不足しています。</translation>
     </message>
     <message>
       <source>Installation package has been lost.</source>
@@ -8012,7 +8012,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Could not connect to server. Video Wall will be closed.</source>
-      <translation>サーバーに接続できませんでした。ビデオウォールを閉じます。</translation>
+      <translation>サーバーに接続できませんでした。ビデオウォールを終了します。</translation>
     </message>
     <message>
       <source>Could not connect to server. Application will be closed.</source>
@@ -8219,7 +8219,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Device search failed</source>
-      <translation>デバイス検索失敗</translation>
+      <translation>デバイス検索に失敗しました</translation>
     </message>
     <message numerus="yes">
       <source>Failed to add %n devices</source>
@@ -8229,7 +8229,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Scan</source>
-      <translation>検索</translation>
+      <translation>スキャン</translation>
     </message>
     <message>
       <source>Search</source>
@@ -8270,7 +8270,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>%n devices are being added. You can close this dialog or start a new search</source>
       <translation>
-        <numerusform>%n デバイスを追加しています。このダイアログボックスを閉じるか、新しい検索を開始することができます。</numerusform>
+        <numerusform>%n デバイスを追加しています。このダイアログを閉じることも、新しい検索を開始することもできます。</numerusform>
       </translation>
     </message>
     <message>
@@ -8311,7 +8311,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::EulaDialog</name>
     <message>
       <source>Please review and agree to the %1 in order to proceed</source>
-      <translation>続行するには %1 に同意してください</translation>
+      <translation>続行するには、 %1 を確認して同意してください</translation>
     </message>
     <message>
       <source>To use the software you must agree with the end user license agreement</source>
@@ -8357,7 +8357,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::EventSearchWidget</name>
     <message>
       <source>No events</source>
-      <translation>イベントなし</translation>
+      <translation>イベントはありません</translation>
     </message>
     <message numerus="yes">
       <source>%n events</source>
@@ -8509,11 +8509,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
-      <translation>エクスポートされた .EXE ファイルのサイズは4 GBを超えるため、Windowsではダブルクリックで開くことができません。%1 クライアントでのみ再生できます。</translation>
+      <translation>エクスポートされる .EXE ファイルのサイズが 4 GB を超えるため、Windows でのダブルクリックでは開くことができません。 %1 クライアントでのみ再生できます。</translation>
     </message>
     <message>
       <source>Settings are not available for .NOV and .EXE files.</source>
-      <translation>.NOVファイルおよび.EXEファイルでは設定を使用できません。</translation>
+      <translation>.NOV ファイルおよび .EXE ファイルでは設定を利用できません。</translation>
     </message>
     <message>
       <source>Local files, server monitor widgets and webpages will not be exported.</source>
@@ -8666,7 +8666,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Image cannot be loaded.</source>
-      <translation>画像を読み取ることができません。</translation>
+      <translation>画像を読み込むことができません。</translation>
     </message>
   </context>
   <context>
@@ -8677,11 +8677,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Servers from the other System will appear in the resource tree.</source>
-      <translation>他のシステムのサーバーはリソース ツリーに表示されます</translation>
+      <translation>他システムのサーバーがリソースツリーに表示されます。</translation>
     </message>
     <message>
       <source>Connecting to the current System...</source>
-      <translation>システムに接続...</translation>
+      <translation>現在のシステムに接続しています...</translation>
     </message>
     <message>
       <source>Server will be connected to System shortly</source>
@@ -8689,11 +8689,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>It will appear in the resource tree when the database synchronization is finished.</source>
-      <translation>データベースの同期が完了すると、リソースツリーに表示されます</translation>
+      <translation>データベースの同期が完了すると、サーバーがリソースツリーに表示されます。</translation>
     </message>
     <message>
       <source>Failed to merge %1 to our system.</source>
-      <translation>システムに %1 を統合できませんでした。</translation>
+      <translation>このシステムに %1 を統合することに失敗しました。</translation>
     </message>
   </context>
   <context>
@@ -8755,11 +8755,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Picture is too big. Maximum size is %1 MB</source>
-      <translation>画像が大きすぎます。最大サイズは %1 MB です</translation>
+      <translation>画像が大きすぎます。最大サイズは %1 MB です。</translation>
     </message>
     <message>
       <source>Picture cannot be loaded</source>
-      <translation>画像を読み取ることができません</translation>
+      <translation>画像を読み込むことができません</translation>
     </message>
   </context>
   <context>
@@ -8770,7 +8770,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Custom number that can be assigned to a layout for quick identification and access</source>
-      <translation>迅速な識別とアクセスのためにレイアウトに割り当てることのできるカスタム番号</translation>
+      <translation>識別や制御を簡単にするための、レイアウトに割り当て可能なカスタム番号</translation>
     </message>
     <message>
       <source>This ID is already used in the System. Use Generate button to find a free ID.</source>
@@ -8859,7 +8859,7 @@ Remember to return the Logging Level to its default setting after you have colle
     <name>nx::vms::client::desktop::LoginDialog</name>
     <message>
       <source>Connect to Server...</source>
-      <translation>サーバーに接続....</translation>
+      <translation>サーバーに接続...</translation>
     </message>
     <message>
       <source>Version %1</source>
@@ -9048,11 +9048,11 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Use a specific hostname or IP address rather than %1.</source>
-      <translation>%1 よりも具体的なホスト名またはIPアドレスを使用してください。</translation>
+      <translation>%1ではなく、具体的なホスト名またはIPアドレスを使用してください。</translation>
     </message>
     <message>
       <source>This is the current System URL.</source>
-      <translation>既存のシステムのURL</translation>
+      <translation>これは現在のシステムの URL です。</translation>
     </message>
     <message>
       <source>Merge with %1</source>
@@ -9072,7 +9072,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Failed to merge Systems</source>
-      <translation>システム統合に失敗しました</translation>
+      <translation>システムの統合に失敗しました</translation>
     </message>
   </context>
   <context>
@@ -9221,7 +9221,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Download in External Browser</source>
-      <translation>外部ブラウザーでダウンロード</translation>
+      <translation>外部ブラウザでダウンロード</translation>
     </message>
     <message>
       <source>Copy Link to Clipboard</source>
@@ -9229,7 +9229,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>You have already installed this version.</source>
-      <translation>このバージョンは既にインストールされています</translation>
+      <translation>このバージョンはすでにインストールされています。</translation>
     </message>
     <message>
       <source>Build not found</source>
@@ -9249,7 +9249,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Update file is not found</source>
-      <translation>更新プログラム ファイルが見つかりませんでした</translation>
+      <translation>更新ファイルが見つかりません</translation>
     </message>
     <message>
       <source>Upgrade package is broken</source>
@@ -9262,7 +9262,7 @@ You can force it, but it may significantly increase CPU load.</source>
     <message>
       <source>Incompatible %1 instance. To update disconnect System from %1 first.</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation>%1 とは互換性がありません。更新するにはシステムを %1 から切断します。</translation>
+      <translation>互換性のない %1 インスタンスです。更新するには、まず %1 からシステムを切断してください。</translation>
     </message>
     <message>
       <source>No update package available</source>
@@ -9278,7 +9278,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Some servers are offline and will not be updated. Skip them?</source>
-      <translation>一部のサーバーはオフラインであり、更新されません。スキップしますか？</translation>
+      <translation>一部のサーバーはオフラインであるため、更新されません。それらをスキップしてよろしいですか?</translation>
     </message>
     <message numerus="yes">
       <source>Missing update package for the client and %n servers</source>
@@ -9292,7 +9292,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>There are no online servers to update.</source>
-      <translation>更新するオンラインサーバーはありません。</translation>
+      <translation>更新できるオンラインサーバーがありません。</translation>
     </message>
     <message>
       <source>Cancel update and delete all downloaded data?</source>
@@ -9328,7 +9328,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>If the problem persists, please contact Customer Support.</source>
-      <translation>問題が解決しない場合は、カスタマー サポートに連絡してください</translation>
+      <translation>問題が解決しない場合は、カスタマーサポートにお問い合わせください。</translation>
     </message>
     <message>
       <source>Try again</source>
@@ -9348,11 +9348,11 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Please update %1 manually using an installation package.</source>
-      <translation>インストール パッケージを使用して手動で %1 を更新してください</translation>
+      <translation>インストールパッケージを使用して、手動で %1 を更新してください。</translation>
     </message>
     <message>
       <source>%1 will be restarted to the updated version.</source>
-      <translation>%1 は、更新されたバージョンで再起動します</translation>
+      <translation>更新されたバージョンに %1 を再起動します。</translation>
     </message>
     <message>
       <source>OK</source>
@@ -9360,7 +9360,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>There was an error while installing updates:</source>
-      <translation>アップデートのインストール中にエラーが発生しました。</translation>
+      <translation>更新プログラムのインストール中にエラーが発生しました:</translation>
     </message>
     <message>
       <source>Downloading updates...</source>
@@ -9368,7 +9368,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Finish Update</source>
-      <translation>更新終了</translation>
+      <translation>更新を完了する</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -9376,11 +9376,11 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>The latest version is already installed</source>
-      <translation>お使いのソフトウェアは最新版です</translation>
+      <translation>最新バージョンがすでにインストールされています</translation>
     </message>
     <message>
       <source>This version is already installed</source>
-      <translation>このバージョンは既にインストールされています</translation>
+      <translation>このバージョンはすでにインストールされています</translation>
     </message>
     <message>
       <source>Install update</source>
@@ -9392,7 +9392,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Upload &amp;&amp; Install</source>
-      <translation>アップロードとインストール</translation>
+      <translation>アップロードしてインストール</translation>
     </message>
     <message>
       <source>Download</source>
@@ -9420,11 +9420,11 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Installing updates...</source>
-      <translation>更新をインストール中...</translation>
+      <translation>更新プログラムをインストールしています...</translation>
     </message>
     <message>
       <source>Installing client updates...</source>
-      <translation>クライアントアップデートをインストールしています...</translation>
+      <translation>クライアント用更新プログラムをインストールしています...</translation>
     </message>
     <message>
       <source>Starting update to ...</source>
@@ -10375,7 +10375,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>library file cannot be loaded</source>
-      <translation>ライブラリファイルを読み込めません</translation>
+      <translation>ライブラリファイルを読み込むことができません</translation>
     </message>
     <message>
       <source>invalid or incompatible plugin library</source>
