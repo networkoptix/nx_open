@@ -396,6 +396,19 @@ Ptr<ObjectMetadata> generateInstanceOfObjectTypeWithDependentAttributes()
     return objectMetadata;
 }
 
+Ptr<ObjectMetadata> generateInstanceOfObjectTypeWithEnumAttributesWithInlineItems()
+{
+    auto objectMetadata = makePtr<ObjectMetadata>();
+    objectMetadata->setTypeId("nx.stub.objectTypeEnumAtributesWithInlineItems");
+    objectMetadata->addAttributes({
+        makePtr<Attribute>(
+            "(Base) Enum attribute",
+            "Enum Type item 1")
+        });
+
+    return objectMetadata;
+}
+
 } // namespace taxonomy_features
 } // namespace stub
 } // namespace analytics

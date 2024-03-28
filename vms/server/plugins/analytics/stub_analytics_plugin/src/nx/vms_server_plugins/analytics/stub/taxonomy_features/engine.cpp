@@ -228,6 +228,12 @@ std::string Engine::manifestString() const
                 "caption": "Object Type with dependent attributes",
                 "name": "generateInstanceOfObjectTypeWithDependentAttributes",
                 "defaultValue": true
+            },
+            {
+                "type": "CheckBox",
+                "caption": "Object Type with Enum attributes with inline items.",
+                "name": "generateInstanceOfObjectTypeWithEnumAttributesWithInlineItems",
+                "defaultValue": true
             }
         ]
     }
