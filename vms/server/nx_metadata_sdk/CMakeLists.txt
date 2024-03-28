@@ -33,6 +33,7 @@ file(GLOB_RECURSE copied_static_files CONFIGURE_DEPENDS ${copied_static_origin}/
 # Collect source files for nx_kit.
 set(copied_nx_kit_origin ${open_source_root}/artifacts/nx_kit)
 file(GLOB_RECURSE copied_nx_kit_files CONFIGURE_DEPENDS ${copied_nx_kit_origin}/*)
+list(FILTER copied_nx_kit_files EXCLUDE REGEX "package-license.absent$")
 
 # Collect source files for SDK.
 set(copied_nx_sdk_src_nx_sdk_origin ${open_source_root}/vms/libs/nx_sdk/src/nx/sdk)
