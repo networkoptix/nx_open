@@ -70,8 +70,7 @@ bool merge(
     const QString fieldReference = fieldName.isEmpty() ? "" : NX_FMT(" field \"%1\"", fieldName);
     NX_VERBOSE(NX_SCOPE_TAG, "BEGIN merge%1", fieldReference);
 
-    if (incompleteValue.type() == QJsonValue::Undefined //< Missing field type, as per Qt doc.
-        || incompleteValue.type() == QJsonValue::Null) //< Missing field type, actual.
+    if (incompleteValue.type() == QJsonValue::Undefined) //< Missing field type, as per Qt doc.
     {
         NX_VERBOSE(NX_SCOPE_TAG, "    Incomplete value is missing - ignored");
         return true; //< leave recursion
@@ -90,6 +89,13 @@ bool merge(
 
         case QJsonValue::Object:
         {
+            if (incompleteValue.isNull())
+            {
+                NX_VERBOSE(NX_SCOPE_TAG, "    Nullify object");
+                *existingValue = incompleteValue;
+                break;
+            }
+
             NX_VERBOSE(NX_SCOPE_TAG, "    Object - process recursively");
             QJsonObject object = existingValue->toObject();
             if (!merge(&object, incompleteValue.toObject(), outErrorMessage, fieldName))
@@ -98,6 +104,8 @@ bool merge(
             break;
         }
 
+        case QJsonValue::Null:
+            break;
         default:
             NX_VERBOSE(NX_SCOPE_TAG, "    Unknown type - ignored");
     }

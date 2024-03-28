@@ -54,9 +54,11 @@ bool merge(
     if (!details::merge(&jsonValue, incompleteValue, outErrorMessage, QString()))
         return false;
 
+    jsonContext.setStrictMode(true);
     jsonContext.deserializeReplacesExistingOptional(false);
     if (QJson::deserialize(&jsonContext, jsonValue, requestedValue))
         return true;
+
     *outErrorMessage = "Unable to deserialize merged Json data to destination object.";
     return false;
 }

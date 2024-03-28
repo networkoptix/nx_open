@@ -17,6 +17,8 @@ void serialize_field(const AllAuditDetails::type& data, QVariant* target)
 {
     QByteArray tmp;
     QnJsonContext jsonContext;
+    jsonContext.setChronoSerializedAsDouble(true);
+    jsonContext.setSerializeMapToObject(true);
     QJson::serialize(&jsonContext, data, &tmp);
     serialize_field(tmp, target);
 }
@@ -25,6 +27,7 @@ void deserialize_field(const QVariant& value, AllAuditDetails::type* target)
 {
     QByteArray tmp;
     QnJsonContext jsonContext;
+    jsonContext.setStrictMode(true);
     deserialize_field(value, &tmp);
     NX_ASSERT(QJson::deserialize(&jsonContext, tmp, target));
 }

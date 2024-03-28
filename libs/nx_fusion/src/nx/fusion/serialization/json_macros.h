@@ -168,7 +168,9 @@ private:
             return false;
         }
 
-        if (!found)
+        if (found)
+            m_ctx->setSomeFieldsFound(true);
+        else
             m_ctx->setSomeFieldsNotFound(true);
         return true;
     }

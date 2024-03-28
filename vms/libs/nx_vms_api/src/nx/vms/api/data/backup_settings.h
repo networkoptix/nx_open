@@ -2,9 +2,6 @@
 
 #pragma once
 
-#include <map>
-#include <vector>
-
 #include <nx/reflect/instrument.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/data/data_macros.h>

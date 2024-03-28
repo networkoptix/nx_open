@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <map>
+
 #include <QtCore/QString>
 
 #include <nx/reflect/enum_instrument.h>
