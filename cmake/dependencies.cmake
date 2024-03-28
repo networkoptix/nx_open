@@ -8,6 +8,10 @@ if(LINUX AND NOT ANDROID)
     endif()
 
     include(${OS_DEPS_ROOT}/os_deps.cmake)
+    set(CMAKE_FIND_USE_CMAKE_SYSTEM_PATH OFF)
+    set(os_deps_pkg_config_dir ${CMAKE_BINARY_DIR}/os_deps_pkg_config)
+    nx_store_known_files_in_directory(${os_deps_pkg_config_dir})
+    set(ENV{PKG_CONFIG_PATH} ${os_deps_pkg_config_dir})
 
     if(arch STREQUAL "arm")
         set(icu_version 57)
