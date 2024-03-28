@@ -413,23 +413,42 @@ namespace QJsonDetail {
         const QJsonValue& value,
         std::variant<Args...>* target)
     {
-        // Note: Optional in variant is not supported. So we need temporary
-        // setSomeFieldsNotFound(false) to check that variant field is not found.
+        static_assert(!nx::utils::IsOptional<T>::value);
+        if constexpr (std::is_same<std::nullptr_t, T>::value)
+        {
+            if (value.isNull())
+            {
+                *target = std::nullptr_t{};
+                return true;
+            }
+        }
+
+        T typedTarget;
+        if (!value.isObject())
+        {
+            if (!deserialize(ctx, value, &typedTarget))
+                return false;
+
+            *target = typedTarget;
+            return true;
+        }
+
         const bool areSomeFieldsNotFound = ctx->areSomeFieldsNotFound();
         nx::utils::ScopeGuard guard(
             [ctx, areSomeFieldsNotFound]()
             {
-                if (areSomeFieldsNotFound)
-                    ctx->setSomeFieldsNotFound(true);
+                ctx->setSomeFieldsNotFound(areSomeFieldsNotFound);
             });
-        if (areSomeFieldsNotFound)
-            ctx->setSomeFieldsNotFound(false);
+        ctx->setSomeFieldsNotFound(false);
+        ctx->setSomeFieldsFound(false);
 
-        T typedTarget;
         if (!deserialize(ctx, value, &typedTarget))
             return false;
 
-        if (ctx->areSomeFieldsNotFound())
+        if (!ctx->areSomeFieldsFound())
+            return false;
+
+        if (ctx->isStrictMode() && ctx->areSomeFieldsNotFound())
             return false;
 
         *target = typedTarget;
@@ -579,7 +598,7 @@ inline bool deserialize(
     const QJsonValue& value,
     std::optional<T>* target)
 {
-    if (!ctx->doesDeserializeReplaceExistingOptional() && *target)
+    if (!ctx->doesDeserializeReplaceExistingOptional() && !value.isObject() && *target)
         return true;
 
     if (value.isUndefined())

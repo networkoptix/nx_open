@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <map>
-
 #include <nx/utils/uuid.h>
 
 #include "data_macros.h"

@@ -52,6 +52,9 @@ public:
     bool areSomeFieldsNotFound() const { return m_someFieldsNotFound; }
     void setSomeFieldsNotFound(bool value) { m_someFieldsNotFound = value; }
 
+    bool areSomeFieldsFound() const { return m_someFieldsFound; }
+    void setSomeFieldsFound(bool value) { m_someFieldsFound = value; }
+
     bool serializeMapToObject() const { return m_serializeMapToObject; }
     void setSerializeMapToObject(bool value) { m_serializeMapToObject = value; }
 
@@ -114,6 +117,7 @@ public:
 
 private:
     bool m_someFieldsNotFound{false};
+    bool m_someFieldsFound{false};
     bool m_serializeMapToObject{false};
     bool m_isMapKeyDeserializationMode{false};
     bool m_allowStringConversions{false};

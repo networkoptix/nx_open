@@ -2,9 +2,7 @@
 
 #pragma once
 
-#include <map>
 #include <set>
-#include <string>
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/enum_instrument.h>

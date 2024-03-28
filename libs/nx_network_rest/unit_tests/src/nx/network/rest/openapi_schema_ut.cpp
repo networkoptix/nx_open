@@ -255,6 +255,18 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(TestData, (json), (id)(name)(list))
      * %return:{TestDataMap}
      */
     reg("rest/v1/map");
+
+    /**%apidoc PATCH /rest/v{3-}/devices/{deviceId}/bookmarks/{id}
+     * Modifies certain fields of the particular Bookmark record stored in the Site.
+     * %caption Modify Bookmark
+     * %ingroup Device Media
+     * %struct[opt] BookmarkV3
+     *     %param[unused] creationTimeMs
+     * %permissions Manage bookmarks.
+     * %return:{BookmarkV3} Bookmark record.
+     *     %param[unused] password
+     */
+    reg("rest/v3/bookmarks");
 }
 
 TEST_F(OpenApiSchemaTest, Validate)

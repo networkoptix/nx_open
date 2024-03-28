@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <map>
 #include <optional>
 
 #include <nx/reflect/enum_instrument.h>
