@@ -188,10 +188,11 @@ class NxOpenConan(ConanFile):
                 self.requires("libpq/13.4" "#3c130555eda25ad50be3824716b0ce4d")
 
             if not self.isArm32:
+                self._os_deps_package = "os_deps_for_desktop_linux"
                 self.requires("os_deps_for_desktop_linux/ubuntu_bionic"
-                    "#eb589ca476b9b48622da3261e5342d4d")
+                    "#a75c6592816cd2d5a60b73b457eaa6ac")
                 self.requires("legacy_os_deps_from_ubuntu_xenial/1.0"
-                    "#665d5fc7371ad819e30bb2d25b529846")
+                    "#14bc87c62a0184c7f8c9ddefacf30a83")
 
         if self.haveDesktopClient:
             self.requires("hidapi/0.10.1" "#569759f2f39447fe3dbef070243585cc")
@@ -215,6 +216,12 @@ class NxOpenConan(ConanFile):
 
         if self.isArm32 or self.isArm64:
             self.requires("sse2neon/7bd15ea" "#d5c087ce33dbf1425b29d6435284d2c7")
+
+    def prepare_pkg_config_files(self):
+        if self.isLinux:
+            pc_files_dir = Path(self.build_folder) / "os_deps_pkg_config"
+            script = self.deps_user_info[self._os_deps_package].pkg_config_transformer_script
+            self.run(f"{script} -o {pc_files_dir}")
 
     def import_files_from_package(self, package, src, dst, glob):
         if package not in self.deps_cpp_info.deps:
@@ -255,6 +262,8 @@ class NxOpenConan(ConanFile):
                 file.write(f"{dst}: {src}\n")
 
     def imports(self, finish_import=True):
+        self.prepare_pkg_config_files()
+
         self.__imported_files = {}
 
         if self.isLinux:
