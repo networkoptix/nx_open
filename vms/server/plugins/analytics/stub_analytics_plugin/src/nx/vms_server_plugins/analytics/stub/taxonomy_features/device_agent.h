@@ -60,6 +60,7 @@ private:
         std::atomic<bool> generateInstanceOfExtendedObjectType{true};
         std::atomic<bool> generateInstanceOfObjectTypeWithAttributeList{true};
         std::atomic<bool> generateInstanceOfObjectTypeWithDependentAttributes{true};
+        std::atomic<bool> generateInstanceOfObjectTypeWithEnumAttributesWithInlineItems{true};
     };
 
     Engine* const m_engine;
