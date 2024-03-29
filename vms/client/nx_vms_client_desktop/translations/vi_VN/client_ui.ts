@@ -1251,7 +1251,7 @@
     </message>
     <message>
       <source>Rotation, Dewarping, Image Enhancement etc.</source>
-      <translation>Rotation, Dewarping, Image Enhancement vv.</translation>
+      <translation>Xoay, làm phẳng, cải thiện hình ảnh, v. v.</translation>
     </message>
     <message>
       <source>Applying filters and adding overlays require transcoding which will increase CPU usage and may take significant time.</source>

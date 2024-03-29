@@ -4003,7 +4003,7 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>Dewarping</source>
-      <translation>Correction Fish-Eye (Dewarping)</translation>
+      <translation>Làm phẳng</translation>
     </message>
     <message>
       <source>Create Zoom Window</source>
@@ -7812,7 +7812,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Dewarping</source>
-      <translation>Correction Fish-Eye (Dewarping)</translation>
+      <translation>Làm phẳng</translation>
     </message>
     <message>
       <source>Change invalid schedule to &quot;Record Always&quot;</source>
@@ -11987,7 +11987,7 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     <name>nx::vms::client::desktop::WebPageCertificateDialog</name>
     <message>
       <source>Open this integration?</source>
-      <translation type="unfinished">Open this integration?</translation>
+      <translation>Mở tích hợp này?</translation>
     </message>
     <message>
       <source>Open this web page?</source>
@@ -11995,7 +11995,7 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>Integration</source>
-      <translation type="unfinished">Integration</translation>
+      <translation>Tích hợp</translation>
     </message>
     <message>
       <source>Web Page</source>
@@ -12007,10 +12007,10 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
 but this integration presented an untrusted certificate auth.
 We recommend you not to open this integration. If you understand the risks, you can open the integration.</source>
       <comment>%1 is the integration address</comment>
-      <translation type="unfinished">You try to open the
+      <translation>Bạn cố gắng mở
 %1
-but this integration presented an untrusted certificate auth.
-We recommend you not to open this integration. If you understand the risks, you can open the integration.</translation>
+nhưng tích hợp này đưa ra chứng chỉ xác thực không đáng tin cậy.
+Chúng tôi khuyên bạn không nên mở tích hợp này. Nếu bạn hiểu được rủi ro, bạn có thể mở.</translation>
     </message>
     <message>
       <source>You try to open the
