@@ -290,13 +290,26 @@
             "subtype": "base.object.type.2"
           }
         ]
+      },
+      "derived.object.type.1": {
+        "id": "derived.object.type.1",
+        "name": "Derived Object Type 1",
+        "base": "base.object.type.1",
+        "icon": "derived.1.icon",
+        "attributes": [
+          {
+            "name": "Derived Number Attribute",
+            "type": "Number"
+          }
+        ]
       }
     }
   },
   "input": {
     "objectTypes": [
       "base.object.type.2",
-      "base.object.type.1"
+      "base.object.type.1",
+      "derived.object.type.1"
     ],
     "attributeSupportInfo": {
       "base.object.type.2": {
@@ -333,6 +346,11 @@
           "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
         },
         "License": {
+          "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+        }
+      },
+      "derived.object.type.1": {
+        "Derived Number Attribute": {
           "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
         }
       }

@@ -22,9 +22,11 @@ class LookupListTests: public TaxonomyBasedTest
 {
 public:
     void checkValidationOfEmptyRowWithOneIncorrect(
-        const QString& attributeName, const QString& incorrect, const QString& correct)
+        const QString& attributeName, const QString& incorrect, const QString& correct,
+        const std::optional<LookupListData>& testData = {})
     {
-        const int initialRowCount = givenImportModel(bigColumnNumberExampleData());
+        const int initialRowCount =
+            givenImportModel(testData.value_or(bigColumnNumberExampleData()));
 
         // Create invalid entry for Generic List and attempt to add it to the model.
         whenAddEntriesByImportModel({{{attributeName, incorrect}}});
@@ -43,14 +45,16 @@ public:
     }
 
     void checkValidationOfRowsWithCorrectAndIncorrectValues(
-        const QString& attributeNameOfIncorrectVal)
+        const QString& attributeNameOfIncorrectVal,
+        const std::optional<LookupListData>& testData = {})
     {
         std::vector<QVariantMap> entriesToAdd;
         std::map<QString, QString> incorrectToCorrect;
         givenRowsWithAllCorrectValuesExceptOne(
             entriesToAdd, incorrectToCorrect, attributeNameOfIncorrectVal, 5);
 
-        const int initialRowCount = givenImportModel(bigColumnNumberExampleData());
+        const int initialRowCount =
+            givenImportModel(testData.value_or(bigColumnNumberExampleData()));
 
         // Attempt to add number of entries to the model
         whenAddEntriesByImportModel(entriesToAdd);
@@ -358,6 +362,15 @@ protected:
         return e1;
     }
 
+    LookupListData derivedObjectExampleData()
+    {
+        LookupListData e1 = bigColumnNumberExampleData();
+        e1.objectTypeId = "derived.object.type.1";
+        e1.attributeNames.push_back("Derived Number Attribute");
+        e1.entries.push_back({{"Derived Number Attribute", "1"}, {"Number", "9876"}});
+        return e1;
+    }
+
     LookupListDataList exampleDataList()
     {
         LookupListDataList result;
@@ -521,6 +534,15 @@ TEST_F(LookupListTests, remove_middle_column)
     const auto data = bigColumnNumberExampleData();
     const auto columnToDelete = data.attributeNames[data.attributeNames.size() / 2];
     checkRemovingOfAttribute(columnToDelete);
+}
+
+/**
+ * Check validation of attribute in derived Object.
+ */
+TEST_F(LookupListTests, derived_type_as_list_type)
+{
+    const auto data = derivedObjectExampleData();
+    checkValidationOfEmptyRowWithOneIncorrect("Derived Number Attribute", "incorrect", "1", data);
 }
 
 /**

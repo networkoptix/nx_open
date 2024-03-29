@@ -58,6 +58,24 @@ Control
 
     Component
     {
+        id: objectDelegate
+
+        ElementViewer
+        {
+            text:
+            {
+                if (!value)
+                    return qsTr("ANY")
+
+                return value == "true"
+                    ? qsTr("Present")
+                    : qsTr("Absent")
+            }
+        }
+    }
+
+    Component
+    {
         id: colorDelegate
 
         ElementViewer
@@ -100,6 +118,9 @@ Control
 
             case Analytics.Attribute.Type.colorSet:
                 return colorDelegate
+
+            case Analytics.Attribute.Type.attributeSet:
+                return objectDelegate
         }
         return textDelegate
     }

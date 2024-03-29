@@ -174,10 +174,10 @@ QList<QString> getAttributesNames(const AbstractState* taxonomyState, const QStr
                 const QString attributeName =
                     prefix.isEmpty() ? attribute->name() : prefix + "." + attribute->name();
 
+                result.push_back(attributeName);
+
                 if (attribute->type() == AbstractAttribute::Type::object)
                     addAttributesRecursive(attribute->objectType(), attributeName);
-                else
-                    result.push_back(attributeName);
             }
         };
 

@@ -39,19 +39,25 @@ ModalDialog
 
     title: editMode ? qsTr("List Settings") : qsTr("New List")
 
+
+    function _addObjectTypesToModelRecursive(result, objectTypes, currentLevel)
+    {
+        for(let i = 0; i < objectTypes.length; ++i)
+        {
+            if (objectTypes[i].attributes.length === 0)
+                return
+
+            // Add spaces in beginning of text, to indicate the level in hierarchy.
+            result.push({value: objectTypes[i], text: ("  ").repeat(currentLevel) + objectTypes[i].name})
+            _addObjectTypesToModelRecursive(result, objectTypes[i].derivedObjectTypes, currentLevel + 1)
+        }
+    }
+
     function createListTypeModel()
     {
         let result = [{ value: null, text: qsTr("Generic") }]
-        return taxonomy.objectTypes.reduce(
-            (list, objectType) =>
-            {
-                // Skip object types wihtout attributes.
-                if (objectType.attributes.length == 0)
-                    return list
-
-                list.push({value: objectType, text: objectType.name})
-                return list
-            }, result)
+        _addObjectTypesToModelRecursive(result, taxonomy.objectTypes, 0)
+        return result
     }
 
     function addAttributesRecursive(objectType, prefix)
@@ -66,16 +72,13 @@ ModalDialog
         {
             const attribute = objectType.attributes[i]
             const attributeName = prefix ? prefix + "." + attribute.name : attribute.name
+            attributesModel.append({
+                text: attributeName,
+                checked: model.attributeNames.indexOf(attributeName) >= 0
+            })
             if (attribute.type === Analytics.Attribute.Type.attributeSet)
             {
                 addAttributesRecursive(attribute.attributeSet, attributeName)
-            }
-            else
-            {
-                attributesModel.append({
-                    text: attributeName,
-                    checked: model.attributeNames.indexOf(attributeName) >= 0
-                })
             }
         }
     }
@@ -206,6 +209,12 @@ ModalDialog
                 {
                     populateAttributesModel()
                     currentIndex = editMode ? indexOfValue(model.listType) : -1
+                }
+
+                onCurrentTextChanged:
+                {
+                    // Remove spaces in beginning of text, used for displaying hierarchy in popup.
+                    displayText = currentText.replace(/^\s+/, '')
                 }
 
                 onCurrentIndexChanged: dialog.typeIsSelected = currentIndex !== -1
