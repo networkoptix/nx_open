@@ -20,7 +20,7 @@ const ItemDescriptor& OpenLayoutAction::manifest()
             utils::makePlaybackFieldDescriptor(tr("Rewind")),
             utils::makeIntervalFieldDescriptor(tr("Interval of Action")),
         },
-        .resources = {{utils::kLayoutIdFieldName, {ResourceType::Layout, Qn::ReadPermission}}},
+        .resources = {{utils::kLayoutIdFieldName, {ResourceType::layout, Qn::ReadPermission}}},
     };
     return kDescriptor;
 }

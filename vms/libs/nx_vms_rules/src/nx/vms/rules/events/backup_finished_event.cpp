@@ -41,7 +41,7 @@ const ItemDescriptor& BackupFinishedEvent::manifest()
         .groupId = kServerIssueEventGroup,
         .displayName = tr("Backup Finished"),
         .flags = {ItemFlag::instant, ItemFlag::deprecated},
-        .resources = {{utils::kServerIdFieldName, {ResourceType::Server}}},
+        .resources = {{utils::kServerIdFieldName, {ResourceType::server}}},
         .readPermissions = GlobalPermission::powerUser,
         .emailTemplatePath = ":/email_templates/backup_finished.mustache"
     };

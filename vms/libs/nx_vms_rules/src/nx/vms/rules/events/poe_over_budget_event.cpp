@@ -103,7 +103,7 @@ const ItemDescriptor& PoeOverBudgetEvent::manifest()
             utils::makeStateFieldDescriptor(tr("Begin When")),
             makeFieldDescriptor<SourceServerField>(utils::kServerIdFieldName, tr("Server")),
         },
-        .resources = {{utils::kServerIdFieldName, {ResourceType::Server}}},
+        .resources = {{utils::kServerIdFieldName, {ResourceType::server}}},
         .readPermissions = GlobalPermission::powerUser,
         .emailTemplatePath = ":/email_templates/poe_over_budget.mustache",
         .serverFlags = {api::ServerFlag::SF_HasPoeManagementCapability}

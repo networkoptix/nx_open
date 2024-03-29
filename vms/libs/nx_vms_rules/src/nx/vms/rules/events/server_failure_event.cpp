@@ -78,7 +78,7 @@ const ItemDescriptor& ServerFailureEvent::manifest()
         .id = utils::type<ServerFailureEvent>(),
         .groupId = kServerIssueEventGroup,
         .displayName = tr("Server Failure"),
-        .resources = {{utils::kServerIdFieldName, {ResourceType::Server}}},
+        .resources = {{utils::kServerIdFieldName, {ResourceType::server}}},
         .readPermissions = GlobalPermission::powerUser,
         .emailTemplatePath = ":/email_templates/mediaserver_failure.mustache"
     };

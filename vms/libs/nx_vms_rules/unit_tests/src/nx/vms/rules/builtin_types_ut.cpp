@@ -134,7 +134,7 @@ public:
         {
             SCOPED_TRACE(nx::format("Resource permission field: %1", fieldName).toStdString());
             ASSERT_FALSE(fieldName.empty());
-            ASSERT_FALSE(!descriptor.readPermissions);
+            EXPECT_FALSE(!descriptor.createPermissions);
 
             const auto propIndex = meta.indexOfProperty(fieldName.c_str());
             EXPECT_GE(propIndex, 0);

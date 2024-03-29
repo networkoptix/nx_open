@@ -116,8 +116,8 @@ const ItemDescriptor& AnalyticsEvent::manifest()
             // makeFieldDescriptor<AnalyticsObjectAttributesField>("attributes", tr("Attributes")),
         },
         .resources = {
-            {utils::kCameraIdFieldName, {ResourceType::Device, Qn::ViewContentPermission}},
-            {utils::kEngineIdFieldName, {ResourceType::AnalyticsEngine}}},
+            {utils::kCameraIdFieldName, {ResourceType::device, Qn::ViewContentPermission}},
+            {utils::kEngineIdFieldName, {ResourceType::analyticsEngine}}},
         .emailTemplatePath = ":/email_templates/analytics_event.mustache"
     };
     return kDescriptor;

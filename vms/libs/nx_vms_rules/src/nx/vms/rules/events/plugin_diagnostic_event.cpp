@@ -92,8 +92,8 @@ const ItemDescriptor& PluginDiagnosticEvent::manifest()
             makeFieldDescriptor<AnalyticsEventLevelField>("level", tr("And Level Is")),
         },
         .resources = {
-            {utils::kCameraIdFieldName, {ResourceType::Device, Qn::ViewContentPermission}},
-            {utils::kEngineIdFieldName, {ResourceType::AnalyticsEngine}}},
+            {utils::kCameraIdFieldName, {ResourceType::device, Qn::ViewContentPermission}},
+            {utils::kEngineIdFieldName, {ResourceType::analyticsEngine}}},
     };
 
     return kDescriptor;

@@ -49,7 +49,7 @@ const ItemDescriptor& FanErrorEvent::manifest()
         .fields = {
             makeFieldDescriptor<SourceServerField>(utils::kServerIdFieldName, tr("At")),
         },
-        .resources = {{utils::kServerIdFieldName, {ResourceType::Server}}},
+        .resources = {{utils::kServerIdFieldName, {ResourceType::server}}},
         .readPermissions = GlobalPermission::powerUser,
         .emailTemplatePath = ":/email_templates/fan_error.mustache",
         .serverFlags = {api::ServerFlag::SF_HasFanMonitoringCapability}

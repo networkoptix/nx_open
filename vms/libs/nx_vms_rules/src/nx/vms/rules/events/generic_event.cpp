@@ -78,8 +78,13 @@ const ItemDescriptor& GenericEvent::manifest()
             makeFieldDescriptor<DummyField>(utils::kDeviceIdsFieldName, utils::kDeviceIdsFieldName)
         },
         .resources = {
-            {utils::kDeviceIdsFieldName, {ResourceType::Device, Qn::ViewContentPermission}},
-            {utils::kServerIdFieldName, {ResourceType::Server}}},
+            {utils::kServerIdFieldName,
+                {ResourceType::server, {}, Qn::ReadPermission, FieldFlag::optional}},
+            {utils::kDeviceIdsFieldName, {
+                ResourceType::device,
+                Qn::ViewContentPermission,
+                Qn::UserInputPermissions,
+                FieldFlag::optional}}},
         .emailTemplatePath = ":/email_templates/generic_event.mustache"
     };
     return kDescriptor;
