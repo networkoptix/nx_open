@@ -190,9 +190,9 @@ class NxOpenConan(ConanFile):
             if not self.isArm32:
                 self._os_deps_package = "os_deps_for_desktop_linux"
                 self.requires("os_deps_for_desktop_linux/ubuntu_bionic"
-                    "#a75c6592816cd2d5a60b73b457eaa6ac")
+                    "#5763a249358e5dc84fa08a8c15e65772")
                 self.requires("legacy_os_deps_from_ubuntu_xenial/1.0"
-                    "#14bc87c62a0184c7f8c9ddefacf30a83")
+                    "#f4d51fa07577df743eeb97ddad45c51b")
 
         if self.haveDesktopClient:
             self.requires("hidapi/0.10.1" "#569759f2f39447fe3dbef070243585cc")
