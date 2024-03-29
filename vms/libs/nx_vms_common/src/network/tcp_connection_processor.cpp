@@ -6,12 +6,12 @@
 #include <optional>
 
 #ifndef Q_OS_WIN
-#include <netinet/tcp.h>
+    #include <netinet/tcp.h>
 #endif
 
 #include <common/common_module.h>
-#include <core/resource/resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/resource.h>
 #include <nx/metrics/metrics_storage.h>
 #include <nx/network/aio/unified_pollset.h>
 #include <nx/network/flash_socket/types.h>
@@ -22,6 +22,8 @@
 #include <nx/utils/datetime.h>
 #include <nx/utils/gzip/gzip_compressor.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/value_cache.h>
+#include <nx/vms/common/system_settings.h>
 #include <utils/common/util.h>
 
 #include "tcp_connection_priv.h"
@@ -444,16 +446,13 @@ nx::String QnTCPConnectionProcessor::createResponse(
             d->response.headers.insert(nx::network::http::HttpHeader("Keep-Alive", lit("timeout=%1").arg(KEEP_ALIVE_TIMEOUT/1000).toLatin1()) );
     }
 
-    if (d->authenticatedOnce)
-    {
-        //revealing Server name to authenticated entity only
-        nx::network::http::insertOrReplaceHeader(
-            &d->response.headers,
-            nx::network::http::HttpHeader(nx::network::http::header::Server::NAME, nx::network::http::serverString() ) );
-    }
     nx::network::http::insertOrReplaceHeader(
         &d->response.headers,
-        nx::network::http::HttpHeader("Date", nx::utils::formatDateTime(QDateTime::currentDateTime())) );
+        nx::network::http::HttpHeader(
+            nx::network::http::header::Server::NAME, d->owner->globalSettings()->makeServerHeader()));
+    nx::network::http::insertOrReplaceHeader(
+        &d->response.headers,
+        nx::network::http::HttpHeader("Date", nx::utils::formatDateTime(QDateTime::currentDateTime())));
 
     if (d->request.requestLine.url.scheme().startsWith("rtsp"))
         copyAndReplaceHeader(&d->request.headers, &d->response.headers, "CSeq");

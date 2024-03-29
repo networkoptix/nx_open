@@ -72,6 +72,7 @@ struct SystemSettingNames
     DECLARE_SETTING_NAME(statisticsReportLastNumber);
     DECLARE_SETTING_NAME(statisticsReportLastTime);
     DECLARE_SETTING_NAME(statisticsReportLastVersion);
+    DECLARE_SETTING_NAME(serverHeader);
     DECLARE_SETTING_NAME(supportedOrigins);
     DECLARE_SETTING_NAME(system2faEnabled);
     DECLARE_SETTING_NAME(systemName);
@@ -477,6 +478,10 @@ public:
 
     bool showServersInTreeForNonAdmins() const;
     void setShowServersInTreeForNonAdmins(bool value);
+
+    QString serverHeader() const;
+    void setServerHeader(const QString& value);
+    std::string makeServerHeader() const;
 
     QString supportedOrigins() const;
     void setSupportedOrigins(const QString& value);
