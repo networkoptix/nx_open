@@ -9,8 +9,6 @@
 #include <nx/vms/common/system_health/message_type.h>
 #include <nx/vms/event/event_fwd.h>
 
-namespace nx::vms::common { class BusinessEventFilterResourcePropertyAdaptor; }
-
 namespace nx::vms::client::desktop {
 
 class NotificationActionHandler:
@@ -60,9 +58,6 @@ private:
     void handleExitFullscreenAction(const nx::vms::event::AbstractActionPtr& action);
 
     void showSplash(const nx::vms::event::AbstractActionPtr &action);
-
-private:
-    nx::vms::common::BusinessEventFilterResourcePropertyAdaptor* m_adaptor;
 };
 
 } // namespace nx::vms::client::desktop

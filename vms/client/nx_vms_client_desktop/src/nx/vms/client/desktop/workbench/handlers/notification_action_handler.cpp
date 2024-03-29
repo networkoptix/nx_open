@@ -28,7 +28,6 @@
 #include <nx/vms/client/desktop/utils/server_notification_cache.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
-#include <nx/vms/common/resource/property_adaptors.h>
 #include <nx/vms/event/actions/common_action.h>
 #include <nx/vms/event/events/abstract_event.h>
 #include <nx/vms/rules/actions/show_notification_action.h>
@@ -76,8 +75,7 @@ NotificationActionHandler::NotificationActionHandler(
     WindowContext* windowContext, QObject *parent)
     :
     base_type(parent),
-    WindowContextAware(windowContext),
-    m_adaptor(new nx::vms::common::BusinessEventFilterResourcePropertyAdaptor(this))
+    WindowContextAware(windowContext)
 {
     connect(windowContext, &WindowContext::beforeSystemChanged,
         this, &NotificationActionHandler::clear);
@@ -279,7 +277,7 @@ void NotificationActionHandler::addNotification(const vms::event::AbstractAction
             break;
     }
 
-    if (!alwaysNotify && !m_adaptor->isAllowed(eventType))
+    if (!alwaysNotify && !system()->user()->settings().isEventWatched(eventType))
         return;
 
     emit notificationAdded(action);
@@ -367,11 +365,7 @@ void NotificationActionHandler::setSystemHealthEventVisibleInternal(
 
 void NotificationActionHandler::at_context_userChanged()
 {
-    const auto user = system()->user();
-
-    m_adaptor->setResource(user);
-
-    if (!user)
+    if (!system()->user())
         clear();
 }
 

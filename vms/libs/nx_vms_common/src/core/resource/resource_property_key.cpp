@@ -125,6 +125,12 @@ const QString kPortForwardingConfigurations("portForwardingConfigurations");
 
 } // namespace ResourcePropertyKey::Server
 
+namespace User {
+
+const QString kUserSettings = "userSettings";
+
+} // namespace ResourcePropertyKey::User
+
 namespace WebPage {
 
 const QString kSubtypeKey("subtype");

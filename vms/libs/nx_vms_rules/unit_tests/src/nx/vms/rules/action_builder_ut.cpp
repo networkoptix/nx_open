@@ -9,7 +9,6 @@
 #include <core/resource_access/access_rights_manager.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/resource_access_subject.h>
-#include <nx/vms/common/resource/property_adaptors.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/test_support/resource/camera_resource_stub.h>
 #include <nx/vms/common/test_support/test_context.h>
@@ -493,10 +492,10 @@ TEST_F(ActionBuilderTest, userEventFilterPropertyWorks)
     using namespace std::chrono;
 
     auto user1 = addUser(kPowerUsersGroupId);
-    auto filterProp = nx::vms::common::BusinessEventFilterResourcePropertyAdaptor();
 
-    filterProp.setResource(user1);
-    filterProp.setWatchedEvents({EventType::serverStartEvent});
+    auto settings = user1->settings();
+    settings.setWatchedEvents({EventType::serverStartEvent});
+    user1->setSettings(settings);
 
     UuidSelection selection{.ids = {user1->getId()}};
     auto builder = makeBuilderWithTargetUserField(selection);

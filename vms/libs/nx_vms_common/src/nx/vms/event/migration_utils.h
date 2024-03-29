@@ -8,6 +8,7 @@
 
 namespace nx::vms::event {
 
-NX_VMS_COMMON_API EventType convertEventType(const QString& typeId);
+NX_VMS_COMMON_API EventType convertToOldEvent(const QString& typeId);
+NX_VMS_COMMON_API QString convertToNewEvent(const EventType& eventType);
 
 } // namespace nx::vms::event
