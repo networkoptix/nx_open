@@ -219,24 +219,24 @@
     </message>
     <message>
       <source>Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the System configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</source>
-      <translation type="unfinished">Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the System configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</translation>
+      <translation>Członkowie tej grupy mają kontrolę nad większością konfiguracji systemu, ale nie mogą zmieniać żadnych ustawień administratora, usuwać ani zmieniać własnych grup i uprawnień, a także nie mogą tworzyć ani edytować innych użytkowników zaawansowanych.</translation>
     </message>
     <message>
       <source>Members of this group can, in addition to the permissions granted by the Viewers group, see and activate PTZ positions and PTZ tours, use 2-way audio, operate I/O module buttons, create and edit bookmarks, and view the Event Log.</source>
-      <translation type="unfinished">Members of this group can, in addition to the permissions granted by the Viewers group, see and activate PTZ positions and PTZ tours, use 2-way audio, operate I/O module buttons, create and edit bookmarks, and view the Event Log.</translation>
+      <translation>Członkowie tej grupy mogą, oprócz uprawnień przyznanych przez grupę Podglądu na żywo, przeglądać i aktywować pozycje PTZ i trasy PTZ, korzystać z dwukierunkowego dźwięku, obsługiwać przyciski modułu we/wy, tworzyć i edytować zakładki oraz przeglądać dziennik zdarzeń.</translation>
     </message>
     <message>
       <source>Members of this group can, in addition to the permissions granted by the Live Viewers group, view and export archive and Bookmarks.</source>
-      <translation type="unfinished">Members of this group can, in addition to the permissions granted by the Live Viewers group, view and export archive and Bookmarks.</translation>
+      <translation>Członkowie tej grupy mogą, oprócz uprawnień nadanych przez grupę przeglądających na żywo, przeglądać i eksportować archiwum i zakładki.</translation>
     </message>
     <message>
       <source>Members of this group can view System Health Monitoring information and server processor load in real-time (Server Monitoring).</source>
-      <translation type="unfinished">Members of this group can view System Health Monitoring information and server processor load in real-time (Server Monitoring).</translation>
+      <translation>Członkowie tej grupy mogą przeglądać informacje o monitorowaniu stanu systemu i obciążeniu procesora serwera w czasie rzeczywistym (monitorowanie serwera).</translation>
     </message>
     <message>
       <source>Members of this group have unlimited System privileges. Administrators can create and modify Power Users, merge Systems and connect or disconnect System to %1.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Members of this group have unlimited System privileges. Administrators can create and modify Power Users, merge Systems and connect or disconnect System to %1.</translation>
+      <translation>Członkowie tej grupy mają nieograniczone uprawnienia systemowe. Administratorzy mogą tworzyć i modyfikować użytkowników zaawansowanych, łączyć systemy oraz podłączać lub odłączać system od %1.</translation>
     </message>
   </context>
   <context>
@@ -1147,12 +1147,12 @@
     <message>
       <source>Msec</source>
       <comment>Capitalized long suffix for displaying milliseconds</comment>
-      <translation type="unfinished">Msec</translation>
+      <translation>milisekund</translation>
     </message>
     <message>
       <source>Sec</source>
       <comment>Capitalized long suffix for displaying seconds</comment>
-      <translation type="unfinished">Sec</translation>
+      <translation>sekund</translation>
     </message>
     <message>
       <source>Min</source>
@@ -1162,34 +1162,34 @@
     <message>
       <source>Hrs</source>
       <comment>Capitalized long suffix for displaying hours</comment>
-      <translation type="unfinished">Hrs</translation>
+      <translation>godzin</translation>
     </message>
     <message>
       <source>Days</source>
       <comment>Capitalized long suffix for displaying days</comment>
-      <translation type="unfinished">Days</translation>
+      <translation>dni</translation>
     </message>
     <message>
       <source>Wks</source>
       <comment>Capitalized long suffix for displaying weeks</comment>
-      <translation type="unfinished">Wks</translation>
+      <translation>tygodni</translation>
     </message>
     <message>
       <source>Mos</source>
       <comment>Capitalized long suffix for displaying months</comment>
-      <translation type="unfinished">Mos</translation>
+      <translation>miesięcy</translation>
     </message>
     <message>
       <source>Yrs</source>
       <comment>Capitalized long suffix for displaying years</comment>
-      <translation type="unfinished">Yrs</translation>
+      <translation>lat</translation>
     </message>
     <message numerus="yes">
       <source>Milliseconds</source>
       <comment>Capitalized full suffix for displaying milliseconds</comment>
       <translation type="unfinished">
-        <numerusform>Milliseconds</numerusform>
-        <numerusform>Milliseconds</numerusform>
+        <numerusform>milisekund</numerusform>
+        <numerusform>sekund</numerusform>
         <numerusform>Milliseconds</numerusform>
         <numerusform>Milliseconds</numerusform>
       </translation>
@@ -1198,7 +1198,7 @@
       <source>Seconds</source>
       <comment>Capitalized full suffix for displaying seconds</comment>
       <translation type="unfinished">
-        <numerusform>Seconds</numerusform>
+        <numerusform>sekund</numerusform>
         <numerusform>Seconds</numerusform>
         <numerusform>Seconds</numerusform>
         <numerusform>Seconds</numerusform>
@@ -1218,7 +1218,7 @@
       <source>Hours</source>
       <comment>Capitalized full suffix for displaying hours</comment>
       <translation type="unfinished">
-        <numerusform>Hours</numerusform>
+        <numerusform>godzin</numerusform>
         <numerusform>Hours</numerusform>
         <numerusform>Hours</numerusform>
         <numerusform>Hours</numerusform>
@@ -1228,7 +1228,7 @@
       <source>Days</source>
       <comment>Capitalized fapitalized full suffix for displaying days</comment>
       <translation type="unfinished">
-        <numerusform>Days</numerusform>
+        <numerusform>dni</numerusform>
         <numerusform>Days</numerusform>
         <numerusform>Days</numerusform>
         <numerusform>Days</numerusform>
@@ -1238,7 +1238,7 @@
       <source>Weeks</source>
       <comment>Capitalized full suffix for displaying weeks</comment>
       <translation type="unfinished">
-        <numerusform>Weeks</numerusform>
+        <numerusform>tygodni</numerusform>
         <numerusform>Weeks</numerusform>
         <numerusform>Weeks</numerusform>
         <numerusform>Weeks</numerusform>
@@ -1248,7 +1248,7 @@
       <source>Months</source>
       <comment>Capitalized full suffix for displaying months</comment>
       <translation type="unfinished">
-        <numerusform>Months</numerusform>
+        <numerusform>miesięcy</numerusform>
         <numerusform>Months</numerusform>
         <numerusform>Months</numerusform>
         <numerusform>Months</numerusform>
@@ -1258,7 +1258,7 @@
       <source>Years</source>
       <comment>Capitalized full suffix for displaying years</comment>
       <translation type="unfinished">
-        <numerusform>Years</numerusform>
+        <numerusform>lat</numerusform>
         <numerusform>Years</numerusform>
         <numerusform>Years</numerusform>
         <numerusform>Years</numerusform>
@@ -1356,7 +1356,7 @@
     <name>ServiceTypeDisplayStringHelper</name>
     <message>
       <source>Local recording</source>
-      <translation type="unfinished">Local recording</translation>
+      <translation>Nagrywanie lokalne</translation>
     </message>
     <message>
       <source>Integration</source>
@@ -1364,18 +1364,18 @@
     </message>
     <message>
       <source>Cloud storage</source>
-      <translation type="unfinished">Cloud storage</translation>
+      <translation>Przechowywanie w chmurze</translation>
     </message>
   </context>
   <context>
     <name>StringsHelper</name>
     <message>
       <source>Contact your channel partner for details.</source>
-      <translation type="unfinished">Contact your channel partner for details.</translation>
+      <translation>Skontaktuj się z partnerem kanału aby dodać usługi.</translation>
     </message>
     <message>
       <source>Check internet connection between VMS and license server.</source>
-      <translation type="unfinished">Check internet connection between VMS and license server.</translation>
+      <translation>Sprawdź połączenie internetowe pomiędzy VMS a serwerem licencji.</translation>
     </message>
   </context>
   <context>
@@ -1389,20 +1389,20 @@
     <name>TimeFormat</name>
     <message>
       <source>just now</source>
-      <translation type="unfinished">just now</translation>
+      <translation>przed chwilą</translation>
     </message>
     <message>
       <source>yesterday</source>
-      <translation type="unfinished">yesterday</translation>
+      <translation>wczoraj</translation>
     </message>
     <message>
       <source>a week ago</source>
-      <translation type="unfinished">a week ago</translation>
+      <translation>tydzień temu</translation>
     </message>
     <message numerus="yes">
       <source>%n minutes ago</source>
       <translation type="unfinished">
-        <numerusform>%n minutes ago</numerusform>
+        <numerusform>%n minut temu</numerusform>
         <numerusform>%n minutes ago</numerusform>
         <numerusform>%n minutes ago</numerusform>
         <numerusform>%n minutes ago</numerusform>
@@ -1411,7 +1411,7 @@
     <message numerus="yes">
       <source>%n hours ago</source>
       <translation type="unfinished">
-        <numerusform>%n hours ago</numerusform>
+        <numerusform>%n godzin temu</numerusform>
         <numerusform>%n hours ago</numerusform>
         <numerusform>%n hours ago</numerusform>
         <numerusform>%n hours ago</numerusform>
@@ -1420,7 +1420,7 @@
     <message numerus="yes">
       <source>%n days ago</source>
       <translation type="unfinished">
-        <numerusform>%n days ago</numerusform>
+        <numerusform>%n dni temu</numerusform>
         <numerusform>%n days ago</numerusform>
         <numerusform>%n days ago</numerusform>
         <numerusform>%n days ago</numerusform>
