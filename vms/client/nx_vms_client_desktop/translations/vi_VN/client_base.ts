@@ -4113,7 +4113,7 @@ to %1</source>
     </message>
     <message>
       <source>Dewarping</source>
-      <translation>Correction Fish-Eye (Dewarping)</translation>
+      <translation>Làm phẳng</translation>
     </message>
     <message>
       <source>Create Zoom Window</source>
@@ -7703,7 +7703,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Dewarping</source>
-      <translation>Correction Fish-Eye (Dewarping)</translation>
+      <translation>Làm phẳng</translation>
     </message>
     <message>
       <source>Change invalid schedule to &quot;Record Always&quot;</source>

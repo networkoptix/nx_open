@@ -1981,7 +1981,7 @@
     </message>
     <message>
       <source>You have the latest version installed</source>
-      <translation>最新バージョンを利用しています</translation>
+      <translation>最新バージョンがインストールされています</translation>
     </message>
     <message>
       <source>Download</source>
@@ -1989,7 +1989,7 @@
     </message>
     <message>
       <source>Browse</source>
-      <translation>閲覧</translation>
+      <translation>参照</translation>
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
@@ -2009,7 +2009,7 @@
     </message>
     <message>
       <source>It looks like the update process is taking more time than usual. Please keep waiting.</source>
-      <translation>通常より時間を要しますがこのままお待ちください。</translation>
+      <translation>更新処理に通常より時間がかかっているようです。そのままお待ちください。</translation>
     </message>
     <message>
       <source>Advanced settings</source>

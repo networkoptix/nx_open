@@ -9308,15 +9308,15 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Failed to start update</source>
-      <translation>更新を開始できませんでした</translation>
+      <translation>更新の開始に失敗しました</translation>
     </message>
     <message>
       <source>Failed to cancel update</source>
-      <translation>更新をキャンセルできませんでした</translation>
+      <translation>更新のキャンセルに失敗しました</translation>
     </message>
     <message>
       <source>Failed to start installation</source>
-      <translation>インストールを開始できませんでした</translation>
+      <translation>インストールの開始に失敗しました</translation>
     </message>
     <message>
       <source>Some servers have not completed the update process. Finish it anyway?</source>
@@ -9344,7 +9344,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Update completed, but some components have failed an update</source>
-      <translation>アップデートは完了しましたが、一部のコンポーネントがアップデートに失敗しました</translation>
+      <translation>更新は完了しましたが、一部のコンポーネントは更新に失敗しました</translation>
     </message>
     <message>
       <source>Please update %1 manually using an installation package.</source>
@@ -9428,7 +9428,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Starting update to ...</source>
-      <translation>更新を開始中...</translation>
+      <translation>更新を開始しています...</translation>
     </message>
     <message>
       <source>Updating to ...</source>
@@ -9452,19 +9452,19 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Please contact Customer Support.</source>
-      <translation>サポートにお問合せください.</translation>
+      <translation>カスタマーサポートにお問い合わせください。</translation>
     </message>
     <message>
       <source>Some servers have gone offline. Please wait until they become online to continue.</source>
-      <translation>一部のサーバーがオフラインになりました。オンラインになるまで待ってください。</translation>
+      <translation>一部のサーバーがオフラインになりました。続行するには、オンラインになるまでお待ちください。</translation>
     </message>
     <message>
       <source>System update in process</source>
-      <translation>処理中のシステム更新</translation>
+      <translation>システムを更新しています</translation>
     </message>
     <message>
       <source>Continue in Background</source>
-      <translation>バック グラウンドで続行</translation>
+      <translation>バックグラウンドで続行</translation>
     </message>
     <message>
       <source>Latest Available Update</source>
@@ -9476,7 +9476,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Browse for Update File</source>
-      <translation>更新ファイルの参照</translation>
+      <translation>更新ファイルを参照</translation>
     </message>
     <message>
       <source>Update from mediaservers</source>
@@ -9484,11 +9484,11 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Unable to check updates on the Internet</source>
-      <translation>インターネット上でアップデートを確認できません</translation>
+      <translation>インターネット上の更新プログラムを確認できません</translation>
     </message>
     <message>
       <source>Applying System updates at the end of the week is not recommended.</source>
-      <translation>週末にシステムの更新プログラムを適用することは推奨されません</translation>
+      <translation>週末にシステムの更新プログラムを適用することは推奨されません。</translation>
     </message>
     <message>
       <source>You are using a custom client. Please contact %1 to get the update instructions.</source>
@@ -9500,7 +9500,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</source>
-      <translation>クライアントアップデートをダウンロードするのに十分な空き容量がありません。ハードドライブの空き容量を確保して、もう一度お試しください。</translation>
+      <translation>クライアント用更新ファイルをダウンロードするのに十分な空き容量がありません。ハードドライブの空き容量を確保して、再度お試しください。</translation>
     </message>
   </context>
   <context>
@@ -10488,7 +10488,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Installed Version</source>
-      <translation>インストール済のバージョン</translation>
+      <translation>インストールされているバージョン</translation>
     </message>
   </context>
   <context>

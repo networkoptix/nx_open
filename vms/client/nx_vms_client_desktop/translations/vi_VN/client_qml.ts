@@ -340,7 +340,7 @@
     <name>DewarpingSettings</name>
     <message>
       <source>Dewarping</source>
-      <translation>Correction Fish-Eye (Dewarping)</translation>
+      <translation>Làm phẳng</translation>
     </message>
     <message>
       <source>Fisheye</source>
@@ -487,7 +487,7 @@
     </message>
     <message>
       <source>Ellipticity</source>
-      <translation>Ellipticity</translation>
+      <translation>Chế độ elip</translation>
     </message>
     <message>
       <source>Auto calibration failed</source>
