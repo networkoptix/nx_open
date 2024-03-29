@@ -49,7 +49,7 @@ const ItemDescriptor& ServerCertificateErrorEvent::manifest()
         .id = utils::type<ServerCertificateErrorEvent>(),
         .groupId = kServerIssueEventGroup,
         .displayName = tr("Server Certificate Error"),
-        .resources = {{utils::kServerIdFieldName, {ResourceType::Server}}},
+        .resources = {{utils::kServerIdFieldName, {ResourceType::server}}},
         .readPermissions = GlobalPermission::powerUser,
         .emailTemplatePath = ":/email_templates/server_certificate_error.mustache"
     };

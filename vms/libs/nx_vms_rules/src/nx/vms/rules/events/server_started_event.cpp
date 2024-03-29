@@ -46,7 +46,7 @@ const ItemDescriptor& ServerStartedEvent::manifest()
         .id = utils::type<ServerStartedEvent>(),
         .groupId = kServerIssueEventGroup,
         .displayName = tr("Server Started"),
-        .resources = {{utils::kServerIdFieldName, {ResourceType::Server}}},
+        .resources = {{utils::kServerIdFieldName, {ResourceType::server}}},
         .readPermissions = GlobalPermission::powerUser,
         .emailTemplatePath = ":/email_templates/mediaserver_started.mustache"
     };

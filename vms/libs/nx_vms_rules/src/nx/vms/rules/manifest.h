@@ -45,29 +45,39 @@ NX_REFLECTION_ENUM_CLASS(ItemFlag,
 Q_DECLARE_FLAGS(ItemFlags, ItemFlag)
 
 NX_REFLECTION_ENUM_CLASS(ResourceType,
-    None,
-    Device,
-    Server,
-    Layout,
-    AnalyticsEngine,
-    User
+    none,
+    device,
+    server,
+    layout,
+    analyticsEngine,
+    user
 )
+
+NX_REFLECTION_ENUM_CLASS(FieldFlag,
+    none,
+    optional = 1 << 0
+)
+
+Q_DECLARE_FLAGS(FieldFlags, FieldFlag)
 
 /** Description of event or action resource data field. */
 struct ResourceDescriptor
 {
     /**%apidoc The type of the resource. */
-    ResourceType type = ResourceType::None;
+    ResourceType type = ResourceType::none;
 
     /**%apidoc[opt] Permissions required to view the item. */
-    Qn::Permissions readPermissions = Qn::ReadPermission;
+    Qn::Permissions readPermissions;
 
     /**%apidoc[opt] Permissions required to create an item. */
     Qn::Permissions createPermissions = Qn::UserInputPermissions;
+
+    /**%apidoc[opt] Resource requirements and processing flags. */
+    FieldFlags flags;
 };
 
 #define nx_vms_rules_ResourceDescriptor_Fields \
-    (type)(readPermissions)(createPermissions)
+    (type)(readPermissions)(createPermissions)(flags)
 NX_VMS_RULES_API void serialize(
     QnJsonContext* ctx, const ResourceDescriptor& value, QJsonValue* target);
 

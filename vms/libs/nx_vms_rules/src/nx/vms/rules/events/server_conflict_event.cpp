@@ -75,7 +75,7 @@ const ItemDescriptor& ServerConflictEvent::manifest()
         .id = utils::type<ServerConflictEvent>(),
         .groupId = kServerIssueEventGroup,
         .displayName = tr("Server Conflict"),
-        .resources = {{utils::kServerIdFieldName, {ResourceType::Server}}},
+        .resources = {{utils::kServerIdFieldName, {ResourceType::server}}},
         .readPermissions = GlobalPermission::powerUser,
         .emailTemplatePath = ":/email_templates/mediaserver_conflict.mustache"
     };

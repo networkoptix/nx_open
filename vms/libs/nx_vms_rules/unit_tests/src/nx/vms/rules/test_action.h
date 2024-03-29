@@ -118,8 +118,8 @@ public:
                 makeFieldDescriptor<TargetDeviceField>(
                     utils::kDeviceIdsFieldName, "Devices", {}, {{"useSource", true}})},
             .resources = {
-                {utils::kCameraIdFieldName, {ResourceType::Device, Qn::WritePermission}},
-                {utils::kDeviceIdsFieldName, {ResourceType::Device, Qn::WritePermission}}},
+                {utils::kCameraIdFieldName, {ResourceType::device, Qn::WritePermission}},
+                {utils::kDeviceIdsFieldName, {ResourceType::device, Qn::WritePermission}}},
             .readPermissions = GlobalPermission::generateEvents,
         };
     }

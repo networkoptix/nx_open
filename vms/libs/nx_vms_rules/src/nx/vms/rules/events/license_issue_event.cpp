@@ -60,8 +60,8 @@ const ItemDescriptor& LicenseIssueEvent::manifest()
         .groupId = kServerIssueEventGroup,
         .displayName = tr("License Issue"),
         .resources = {
-            {utils::kDeviceIdsFieldName, {ResourceType::Device, Qn::ViewContentPermission}},
-            {utils::kServerIdFieldName, {ResourceType::Server}}},
+            {utils::kDeviceIdsFieldName, {ResourceType::device, Qn::ViewContentPermission}},
+            {utils::kServerIdFieldName, {ResourceType::server}}},
         .emailTemplatePath = ":/email_templates/license_issue.mustache"
     };
     return kDescriptor;

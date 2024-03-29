@@ -51,7 +51,7 @@ const ItemDescriptor& MotionEvent::manifest()
                 {{"acceptAll", true}}),
         },
         .resources = {
-            {utils::kCameraIdFieldName, {ResourceType::Device, Qn::ViewContentPermission}}},
+            {utils::kCameraIdFieldName, {ResourceType::device, Qn::ViewContentPermission}}},
         .emailTemplatePath = ":/email_templates/camera_motion.mustache"
     };
     return kDescriptor;

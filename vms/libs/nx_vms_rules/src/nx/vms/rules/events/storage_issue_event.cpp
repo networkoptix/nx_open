@@ -110,7 +110,7 @@ const ItemDescriptor& StorageIssueEvent::manifest()
         .id = utils::type<StorageIssueEvent>(),
         .groupId = kServerIssueEventGroup,
         .displayName = tr("Storage Issue"),
-        .resources = {{utils::kServerIdFieldName, {ResourceType::Server}}},
+        .resources = {{utils::kServerIdFieldName, {ResourceType::server}}},
         .readPermissions = GlobalPermission::powerUser,
         .emailTemplatePath = ":/email_templates/storage_failure.mustache"
     };
