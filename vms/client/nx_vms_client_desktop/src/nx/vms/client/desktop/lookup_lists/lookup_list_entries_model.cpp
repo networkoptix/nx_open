@@ -100,6 +100,7 @@ void LookupListEntriesModel::Private::initValidators()
                 }
                 case Attribute::Type::attributeSet:
                 {
+                    validatorByAttributeName[fullAttributeName] = &Private::booleanValidator;
                     collectAttributesValuesRecursive(
                         attribute->attributeSet->attributes(), fullAttributeName);
                     break;

@@ -212,6 +212,22 @@ Control
         }
     }
 
+    Component
+    {
+        id: objectDelegate
+
+        ComboBoxBasedEditor
+        {
+            textRole: "text"
+            valueRole: "value"
+            model: [
+                {"text": qsTr("Any %1").arg(attribute.name), "value": ""},
+                {"text": qsTr("Present"), "value": "true"},
+                {"text": qsTr("Absent"), "value": "false"}
+            ]
+        }
+    }
+
     function calculateComponent()
     {
         if (isGeneric || !attribute)
@@ -233,6 +249,9 @@ Control
 
             case Analytics.Attribute.Type.enumeration:
                 return enumDelegate
+
+            case Analytics.Attribute.Type.attributeSet:
+                return objectDelegate
         }
         return textDelegate
     }
