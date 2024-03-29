@@ -67,7 +67,8 @@ struct NX_VMS_API StorageModel: ResourceWithParameters
     static StorageModel fromDb(StorageData data);
 };
 #define StorageModel_Fields \
-    (id)(serverId)(name)(path)(type)(spaceLimitB)(isUsedForWriting)(isBackup)(status)(parameters)
+    ResourceWithParameters_Fields \
+    (id)(serverId)(name)(path)(type)(spaceLimitB)(isUsedForWriting)(isBackup)(status)
 
 #define StorageModel_Funcs (csv_record)(json)(ubjson)(xml)
 QN_FUSION_DECLARE_FUNCTIONS(StorageModel, StorageModel_Funcs, NX_VMS_API)

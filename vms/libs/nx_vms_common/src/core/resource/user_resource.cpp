@@ -24,6 +24,8 @@
 #include <nx/vms/api/data/user_data.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
+#include <nx/vms/event/events/abstract_event.h>
+#include <nx/vms/event/migration_utils.h>
 #include <utils/common/id.h>
 #include <utils/common/synctime.h>
 
@@ -31,6 +33,43 @@ const nx::Uuid QnUserResource::kAdminGuid("99cbc715-539b-4bfe-856f-799b45b69b1e"
 const QString QnUserResource::kIntegrationRequestDataProperty("integrationRequestData");
 
 using nx::vms::api::analytics::IntegrationRequestData;
+using namespace nx::vms::api;
+using namespace nx::vms::event;
+
+QList<EventType> UserSettings::watchedEvents() const
+{
+    QList<EventType> result;
+    for (const auto eventType: allEvents())
+    {
+        if (!eventFilter.contains(convertToNewEvent(eventType).toStdString()))
+            result << eventType;
+    }
+    return result;
+}
+
+void UserSettings::setWatchedEvents(const QList<EventType>& events)
+{
+    static const auto allEventFilter =
+        []
+        {
+            std::set<std::string> result;
+            for (const auto eventType: allEvents())
+                result.insert(convertToNewEvent(eventType).toStdString());
+
+            return result;
+        }();
+
+    auto newEventFilter = allEventFilter;
+    for (const auto eventType: events)
+        newEventFilter.erase(convertToNewEvent(eventType).toStdString());
+
+    eventFilter = newEventFilter;
+}
+
+bool UserSettings::isEventWatched(EventType eventType) const
+{
+    return !eventFilter.contains(convertToNewEvent(eventType).toStdString());
+}
 
 QByteArray QnUserHash::toString(const Type& type)
 {
@@ -253,6 +292,9 @@ QnUserResource::QnUserResource(nx::vms::api::UserType userType, nx::vms::api::Us
         m_digest = nx::vms::api::UserData::kCloudPasswordStub;
         m_hash.type = QnUserHash::Type::cloud;
     }
+
+    connect(this, &QnResource::propertyChanged,
+        this, &QnUserResource::atPropertyChanged, Qt::DirectConnection);
 }
 
 std::optional<std::chrono::seconds> QnUserResource::temporarySessionExpiresIn() const
@@ -756,6 +798,14 @@ void QnUserResource::updateInternal(const QnResourcePtr& source, NotifierList& n
     }
 }
 
+void QnUserResource::atPropertyChanged(const QnResourcePtr& self, const QString& key)
+{
+    if (key == ResourcePropertyKey::User::kUserSettings)
+    {
+        emit userSettingsChanged(toSharedPointer(this));
+    }
+}
+
 nx::vms::api::ResourceStatus QnUserResource::getStatus() const
 {
     return nx::vms::api::ResourceStatus::online;
@@ -773,4 +823,23 @@ QString QnUserResource::idForToStringFromPtr() const
 {
     NX_MUTEX_LOCKER locker(&m_mutex);
     return NX_FMT("%1: %2, %3", m_userType, m_name, getId());
+}
+
+void QnUserResource::setSettings(const UserSettings& settings)
+{
+    NX_MUTEX_LOCKER locker(&m_mutex);
+
+    setProperty(ResourcePropertyKey::User::kUserSettings,
+        QString::fromStdString(nx::reflect::json::serialize(settings)));
+}
+
+UserSettings QnUserResource::settings() const
+{
+    NX_MUTEX_LOCKER locker(&m_mutex);
+
+    const auto value = getProperty(ResourcePropertyKey::User::kUserSettings);
+    UserSettings result;
+    nx::reflect::json::deserialize<UserSettings>(value.toStdString(), &result);
+
+    return result;
 }

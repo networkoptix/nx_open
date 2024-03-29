@@ -31,7 +31,9 @@ struct NX_VMS_API WebPageModelV1: ResourceWithParameters
     DbUpdateTypes toDbTypes() &&;
     static std::vector<WebPageModelV1> fromDbTypes(DbListTypes data);
 };
-#define WebPageModelV1_Fields (id)(name)(url)(parameters)
+#define WebPageModelV1_Fields \
+    ResourceWithParameters_Fields \
+    (id)(name)(url)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST_EX(WebPageModelV1, (json))
 NX_REFLECTION_INSTRUMENT(WebPageModelV1, WebPageModelV1_Fields)
 

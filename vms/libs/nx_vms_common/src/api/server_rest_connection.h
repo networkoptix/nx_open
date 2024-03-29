@@ -792,6 +792,13 @@ public:
         Result<ErrorOrData<nx::vms::api::UserModelV3>>::type&& callback,
         QThread* targetThread);
 
+    Handle patchUserParameters(
+        nx::Uuid id,
+        const nx::vms::api::ResourceWithParameters& parameters,
+        nx::vms::common::SessionTokenHelperPtr helper,
+        Result<ErrorOrData<nx::vms::api::UserModelV3>>::type&& callback,
+        QThread* targetThread);
+
     Handle removeUserAsync(
         const nx::Uuid& userId,
         nx::vms::common::SessionTokenHelperPtr helper,

@@ -20,7 +20,7 @@ static const std::pair<EventType, QString> eventTypes[] = {
     {EventType::cameraDisconnectEvent, QStringLiteral("nx.events.deviceDisconnected")},
     {EventType::cameraIpConflictEvent, QStringLiteral("nx.events.deviceIpConflict")},
     {EventType::fanErrorEvent, QStringLiteral("nx.events.fanError")},
-    {EventType::ldapSyncIssueEvent, QStringLiteral("nx.events.ldapIssue")},
+    {EventType::ldapSyncIssueEvent, QStringLiteral("nx.events.ldapSyncIssue")},
     {EventType::licenseIssueEvent, QStringLiteral("nx.events.licenseIssue")},
     {EventType::networkIssueEvent, QStringLiteral("nx.events.networkIssue")},
     {EventType::poeOverBudgetEvent, QStringLiteral("nx.events.poeOverBudget")},
@@ -34,7 +34,7 @@ static const std::pair<EventType, QString> eventTypes[] = {
 
 } // namespace
 
-EventType convertEventType(const QString& typeId)
+EventType convertToOldEvent(const QString& typeId)
 {
     static const auto eventTypeMap =
         []
@@ -50,6 +50,24 @@ EventType convertEventType(const QString& typeId)
     NX_ASSERT(result != EventType::undefinedEvent);
 
     return result;
+}
+
+QString convertToNewEvent(const EventType& eventType)
+{
+    static const auto eventTypeMap =
+        []
+        {
+            QMap<EventType, QStringView> result;
+            for(const auto& [oldType, newType]: eventTypes)
+                result[oldType] = newType;
+
+            return result;
+        }();
+
+    const auto result = eventTypeMap.value(eventType);
+    NX_ASSERT(!result.isEmpty());
+
+    return result.toString();
 }
 
 } // namespace nx::vms::event

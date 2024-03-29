@@ -134,5 +134,7 @@ struct NX_VMS_API ResourceWithParameters
         return result;
     }
 };
+#define ResourceWithParameters_Fields (parameters)
+NX_REFLECTION_INSTRUMENT(ResourceWithParameters, ResourceWithParameters_Fields)
 
 } // namespace nx::vms::api

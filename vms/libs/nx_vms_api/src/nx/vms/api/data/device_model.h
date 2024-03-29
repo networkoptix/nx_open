@@ -114,8 +114,9 @@ struct NX_VMS_API DeviceModelGeneral: ResourceWithParameters
     static_assert(nx::utils::isFlexibleIdModelV<DeviceModelGeneral>);
 };
 #define DeviceModelGeneral_Fields \
+    ResourceWithParameters_Fields \
     (id)(name)(url)(typeId)(mac)(serverId)(physicalId) \
-    (isManuallyAdded)(vendor)(model)(group)(credentials)(parameters)
+    (isManuallyAdded)(vendor)(model)(group)(credentials)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST_EX(DeviceModelGeneral, (json))
 NX_REFLECTION_INSTRUMENT(DeviceModelGeneral, DeviceModelGeneral_Fields);
 
