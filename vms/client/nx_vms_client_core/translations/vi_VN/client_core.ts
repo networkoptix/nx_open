@@ -321,7 +321,7 @@
     </message>
     <message>
       <source>Stop Object Tracking</source>
-      <translation type="unfinished">Stop Object Tracking</translation>
+      <translation>Dừng theo dõi đối tượng</translation>
     </message>
   </context>
   <context>
