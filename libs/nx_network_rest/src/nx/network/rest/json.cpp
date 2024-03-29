@@ -79,6 +79,7 @@ bool merge(
 
     switch (existingValue->type())
     {
+        case QJsonValue::Null:
         case QJsonValue::Bool:
         case QJsonValue::Double:
         case QJsonValue::String:
