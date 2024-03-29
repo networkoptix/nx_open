@@ -5,15 +5,19 @@
 #include <chrono>
 
 #include <api/resource_property_adaptor.h>
-#include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
+#include <core/resource/user_resource.h>
+#include <nx_ec/abstract_ec_connection.h>
+#include <nx_ec/managers/abstract_misc_manager.h>
 #include <nx/branding.h>
+#include <nx/build_info.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/http/http_types.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/value_cache.h>
 #include <nx/vms/api/data/backup_settings.h>
 #include <nx/vms/api/data/email_settings.h>
 #include <nx/vms/api/data/ldap.h>
@@ -21,8 +25,6 @@
 #include <nx/vms/api/data/system_settings.h>
 #include <nx/vms/api/data/watermark_settings.h>
 #include <nx/vms/common/system_context.h>
-#include <nx_ec/abstract_ec_connection.h>
-#include <nx_ec/managers/abstract_misc_manager.h>
 #include <utils/email/email.h>
 
 using namespace std::chrono;
@@ -50,6 +52,16 @@ QSet<QString> parseDisabledVendors(const QString& disabledVendors)
     }
 
     return QSet(updatedVendorList.begin(), updatedVendorList.end());
+}
+
+std::string makeServerHeaderValue(QString value)
+{
+    return value
+        .replace("$vmsName", nx::branding::vmsName())
+        .replace("$vmsVersion", nx::build_info::vmsVersion())
+        .replace("$company", nx::branding::company())
+        .replace("$compatibility", QString::fromStdString(nx::network::http::compatibilityServerName()))
+        .toStdString();
 }
 
 } // namespace
@@ -181,6 +193,7 @@ struct SystemSettings::Private
     QnResourcePropertyAdaptor<bool>* useStorageEncryptionAdaptor = nullptr;
     QnResourcePropertyAdaptor<QByteArray>* currentStorageEncryptionKeyAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* showServersInTreeForNonAdminsAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QString>* serverHeaderAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* supportedOriginsAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* frameOptionsHeaderAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* useHttpsOnlyForCamerasAdaptor = nullptr;
@@ -195,6 +208,9 @@ struct SystemSettings::Private
 
     mutable nx::Mutex mutex;
     QnUserResourcePtr admin;
+
+    nx::utils::CachedValue<std::string> serverHeaderCache{
+        [this] { return makeServerHeaderValue(serverHeaderAdaptor->value()); }};
 };
 
 SystemSettings::SystemSettings(SystemContext* context, QObject* parent):
@@ -814,6 +830,14 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         "showServersInTreeForNonAdmins", true, this,
         [] { return tr("Show Servers in the Resource Tree for non-admins"); });
 
+    d->serverHeaderAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
+        Names::serverHeader, "$vmsName/$vmsVersion ($company) $compatibility", this,
+        [] { return tr("HTTP header: Server, supported variables: $vmsName, $vmsVersion, $company, $compatibility"); });
+    connect(
+        d->serverHeaderAdaptor,
+        &QnAbstractResourcePropertyAdaptor::valueChanged,
+        [this] { d->serverHeaderCache.reset(); });
+
     d->supportedOriginsAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
          Names::supportedOrigins, "*", this, [] { return tr("HTTP header: Origin"); });
 
@@ -1250,6 +1274,7 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         << d->useStorageEncryptionAdaptor
         << d->currentStorageEncryptionKeyAdaptor
         << d->showServersInTreeForNonAdminsAdaptor
+        << d->serverHeaderAdaptor
         << d->supportedOriginsAdaptor
         << d->frameOptionsHeaderAdaptor
         << d->showMouseTimelinePreviewAdaptor
@@ -2268,6 +2293,21 @@ nx::vms::api::MetadataStorageChangePolicy SystemSettings::metadataStorageChangeP
 void SystemSettings::setMetadataStorageChangePolicy(nx::vms::api::MetadataStorageChangePolicy value)
 {
     d->metadataStorageChangePolicyAdaptor->setValue(value);
+}
+
+QString SystemSettings::serverHeader() const
+{
+    return d->serverHeaderAdaptor->value();
+}
+
+void SystemSettings::setServerHeader(const QString& value)
+{
+    d->serverHeaderAdaptor->setValue(value);
+}
+
+std::string SystemSettings::makeServerHeader() const
+{
+    return d->serverHeaderCache.get();
 }
 
 QString SystemSettings::supportedOrigins() const
