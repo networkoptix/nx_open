@@ -204,8 +204,10 @@ struct NX_VMS_API UserModelV3: public UserModelBase, public ResourceWithParamete
     static_assert(isCreateModelV<UserModelV3>);
     static_assert(isUpdateModelV<UserModelV3>);
 };
-#define UserModelV3_Fields UserModelBase_Fields(groupIds)(permissions)(resourceAccessRights) \
-    (temporaryToken)(parameters)
+#define UserModelV3_Fields \
+    UserModelBase_Fields \
+    ResourceWithParameters_Fields \
+    (groupIds)(permissions)(resourceAccessRights)(temporaryToken)
 
 QN_FUSION_DECLARE_FUNCTIONS(UserModelV3, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(UserModelV3, UserModelV3_Fields)
