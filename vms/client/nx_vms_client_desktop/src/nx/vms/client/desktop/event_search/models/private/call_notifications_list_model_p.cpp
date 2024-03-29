@@ -2,9 +2,14 @@
 
 #include "call_notifications_list_model_p.h"
 
+#include <api/server_rest_connection.h>
 #include <client/client_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/utils/guarded_callback.h>
+#include <nx/vms/api/data/event_rule_data.h>
+#include <nx/vms/client/core/camera/buttons/intercom_helper.h>
+#include <nx/vms/client/core/resource/camera.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/analytics/analytics_attribute_helper.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -19,6 +24,7 @@
 #include <nx/vms/common/intercom/utils.h>
 #include <nx/vms/event/aggregation_info.h>
 #include <nx/vms/event/strings_helper.h>
+#include <utils/common/delayed.h>
 
 namespace nx::vms::client::desktop {
 
@@ -30,6 +36,25 @@ bool messageIsSupported(MessageType message)
 {
     return message == MessageType::showIntercomInformer
         || message == MessageType::showMissedCallInformer;
+}
+
+bool setRelayOutputId(const QnVirtualCameraResourcePtr camera,
+    api::ExtendedCameraOutput cameraOutput,
+    nx::vms::event::ActionParameters* actionParameters)
+{
+    const auto portDescriptions = camera->ioPortDescriptions();
+    const auto portIter =
+        std::find_if(portDescriptions.begin(), portDescriptions.end(),
+            [cameraOutput](const QnIOPortData& portData)
+            {
+                return portData.outputName == QString::fromStdString(
+                    nx::reflect::toString(cameraOutput));
+            });
+    if (portIter == portDescriptions.end())
+        return false;
+
+    actionParameters->relayOutputId = portIter->id;
+    return true;
 }
 
 } // namespace
@@ -106,6 +131,47 @@ void CallNotificationsListModel::Private::addNotification(
             eventData.actionParameters =
                 system()->resourcePool()->getResourceById(intercomLayoutId);
             eventData.removable = false;
+
+            eventData.extraAction = CommandActionPtr(new CommandAction());
+            eventData.extraAction->setText(tr("Open"));
+
+            const auto openDoorActionHandler =
+                [this, action, camera]()
+                {
+                    nx::vms::event::ActionParameters actionParameters;
+
+                    if (!setRelayOutputId(
+                        camera, api::ExtendedCameraOutput::powerRelay, &actionParameters))
+                    {
+                        // Is possible when the camera is removed while the call is in progress.
+                        return;
+                    }
+
+                    actionParameters.durationMs =
+                        nx::vms::client::core::IntercomHelper::kOpenedDoorDuration.count();
+
+                    nx::vms::api::EventActionData actionData;
+                    actionData.actionType = nx::vms::api::ActionType::cameraOutputAction;
+                    actionData.toggleState = nx::vms::api::EventState::active;
+                    actionData.resourceIds.push_back(camera->getId());
+                    actionData.params = QJson::serialized(actionParameters);
+
+                    auto callback = nx::utils::guarded(this,
+                        [this](
+                            bool success,
+                            rest::Handle /*requestId*/,
+                            nx::network::rest::JsonResult result)
+                        {
+                            if (!success)
+                                NX_WARNING(this, "Open door operation was unsuccessful.");
+                        });
+
+                    if (auto connection = q->system()->connectedServerApi())
+                        connection->executeEventAction(actionData, callback, thread());
+                };
+
+            connect(eventData.extraAction.data(), &QAction::triggered,
+                [this, openDoorActionHandler]() { executeLater(openDoorActionHandler, this); });
 
             m_soundController.play("doorbell.mp3");
 

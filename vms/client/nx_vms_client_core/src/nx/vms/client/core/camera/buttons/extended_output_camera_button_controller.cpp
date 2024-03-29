@@ -248,7 +248,6 @@ bool ExtendedOutputCameraButtonController::setButtonActionState(
         return false;
 
     const auto itOutputType = supportedButtonToOutputType.find(button.id);
-
     if (itOutputType == supportedButtonToOutputType.end())
         return false;
 
@@ -258,22 +257,17 @@ bool ExtendedOutputCameraButtonController::setButtonActionState(
 
     nx::vms::event::ActionParameters actionParameters;
 
-    /**
-     * In 5.0 opend door software trigger has 6 seconds duration and it should be managed by the
-     * client. In 5.1 duration is managed (replaced) by server, and it is safe to send any value.
-     */
+    actionParameters.relayOutputId = d->outputId(outputType);
+    if (actionParameters.relayOutputId.isEmpty())
+        return false;
+
     actionParameters.durationMs = outputType == ExtendedCameraOutput::powerRelay
         ? IntercomHelper::kOpenedDoorDuration.count()
         : 0;
 
-    actionParameters.relayOutputId = d->outputId(outputType);
-
-    if (actionParameters.relayOutputId.isEmpty())
-        return false;
-
     nx::vms::api::EventActionData actionData;
     actionData.actionType = nx::vms::api::ActionType::cameraOutputAction;
-    actionData.toggleState =  outputType == ExtendedCameraOutput::autoTracking
+    actionData.toggleState = outputType == ExtendedCameraOutput::autoTracking
         ? nx::vms::api::EventState::inactive //< Disable auto tracking feature.
         : nx::vms::api::EventState::active;
     actionData.resourceIds.push_back(targetCamera->getId());
