@@ -16,7 +16,6 @@ namespace Ui {
 class PopupSettingsWidget;
 }
 
-namespace nx::vms::common { class BusinessEventFilterResourcePropertyAdaptor; }
 namespace nx::vms::event { class StringsHelper; }
 
 class QnPopupSettingsWidget: public QnAbstractPreferencesWidget, public QnWorkbenchContextAware
@@ -35,12 +34,13 @@ public:
 private:
     QList<nx::vms::api::EventType> watchedEvents() const;
     std::set<nx::vms::common::system_health::MessageType> storedSystemHealth() const;
+    void at_userChanged(const QnUserResourcePtr& user);
 
 private:
     QScopedPointer<Ui::PopupSettingsWidget> ui;
     QMap<nx::vms::api::EventType, QCheckBox*> m_businessRulesCheckBoxes;
     QMap<nx::vms::common::system_health::MessageType, QCheckBox*> m_systemHealthCheckBoxes;
-    nx::vms::common::BusinessEventFilterResourcePropertyAdaptor* m_adaptor;
     bool m_updating;
     std::unique_ptr<nx::vms::event::StringsHelper> m_helper;
+    QnUserResourcePtr m_currentUser;
 };

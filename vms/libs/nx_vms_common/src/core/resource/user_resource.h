@@ -6,6 +6,7 @@
 
 #include <core/resource/resource.h>
 #include <core/resource/resource_fwd.h>
+#include <nx/reflect/instrument.h>
 #include <nx/utils/scrypt.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/data/user_data.h>
@@ -22,6 +23,22 @@ struct ResourceParamWithRefData;
 using ResourceParamWithRefDataList = std::vector<ResourceParamWithRefData>;
 
 } // namespace nx::vms::api
+
+struct NX_VMS_COMMON_API UserSettings
+{
+    /**
+     * Black list of events, contains events that are disabled.
+     * Example value: ["nx.events.motion", "nx.events.deviceDisconnected"]
+     */
+    std::set<std::string> eventFilter;
+
+    bool operator == (const UserSettings& /*other*/) const = default;
+    bool isEventWatched(nx::vms::api::EventType eventType) const;
+    QList<nx::vms::api::EventType> watchedEvents() const;
+    void setWatchedEvents(const QList<nx::vms::api::EventType>& events);
+};
+#define UserSettings_Fields (eventFilter)
+NX_REFLECTION_INSTRUMENT(UserSettings, UserSettings_Fields)
 
 struct NX_VMS_COMMON_API QnUserHash
 {
@@ -178,6 +195,9 @@ public:
 
     virtual QString idForToStringFromPtr() const override; //< Used by toString(const T*).
 
+    void setSettings(const UserSettings& settings);
+    UserSettings settings() const;
+
 signals:
     void permissionsChanged(const QnUserResourcePtr& user);
     void userGroupsChanged(const QnUserResourcePtr& user, const std::vector<nx::Uuid>& previousRoleIds);
@@ -195,10 +215,12 @@ signals:
 
     // Emitted if Temporary user has any changes in the token an/or lifetime bounds.
     void temporaryTokenChanged(const QnUserResourcePtr& user);
+    void userSettingsChanged(const QnUserResourcePtr& user);
 
 protected:
     virtual void setSystemContext(nx::vms::common::SystemContext* systemContext) override;
     virtual void updateInternal(const QnResourcePtr& source, NotifierList& notifiers) override;
+    void atPropertyChanged(const QnResourcePtr& self, const QString& key);
 
 private:
     bool setPasswordHashesInternal(const PasswordHashes& hashes, bool isNewPassword);

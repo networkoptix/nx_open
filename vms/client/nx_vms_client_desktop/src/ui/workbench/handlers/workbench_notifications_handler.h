@@ -11,8 +11,6 @@
 #include <nx/vms/event/event_fwd.h>
 #include <ui/workbench/workbench_state_manager.h>
 
-namespace nx::vms::common { class BusinessEventFilterResourcePropertyAdaptor; }
-
 class QnWorkbenchNotificationsHandler:
     public QObject,
     public QnSessionAwareDelegate
@@ -63,6 +61,5 @@ private:
     void handleFullscreenCameraAction(const nx::vms::event::AbstractActionPtr& action);
     void handleExitFullscreenAction(const nx::vms::event::AbstractActionPtr& action);
 
-private:
-    nx::vms::common::BusinessEventFilterResourcePropertyAdaptor* m_adaptor;
+    void showSplash(const nx::vms::event::AbstractActionPtr &action);
 };

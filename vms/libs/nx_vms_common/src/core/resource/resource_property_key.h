@@ -181,6 +181,12 @@ NX_VMS_COMMON_API extern const QString kTimeZoneInformation;
 
 } // namespace Server
 
+namespace User {
+
+NX_VMS_COMMON_API extern const QString kUserSettings;
+
+} // namespace User
+
 namespace WebPage {
 
 NX_VMS_COMMON_API extern const QString kSubtypeKey;

@@ -2284,6 +2284,31 @@ Handle ServerConnection::saveUserAsync(
     return handle;
 }
 
+ Handle ServerConnection::patchUserParameters(
+    nx::Uuid id,
+    const nx::vms::api::ResourceWithParameters& parameters,
+    nx::vms::common::SessionTokenHelperPtr helper,
+    Result<ErrorOrData<nx::vms::api::UserModelV3>>::type&& callback,
+    QThread* targetThread)
+{
+    auto request = prepareRequest(
+        nx::network::http::Method::patch,
+        prepareUrl(
+            QString("/rest/v3/users/%1").arg(id.toString()),
+            /*params*/ {}),
+        Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
+        nx::reflect::json::serialize(parameters));
+
+    auto wrapper = makeSessionAwareCallback(helper, request, std::move(callback));
+
+    auto handle = request.isValid()
+        ? executeRequest(request, std::move(wrapper), targetThread)
+        : Handle();
+
+    NX_VERBOSE(d->logTag, "<%1> %2", handle, request.url);
+    return handle;
+}
+
 Handle ServerConnection::removeUserAsync(
     const nx::Uuid& userId,
     nx::vms::common::SessionTokenHelperPtr helper,

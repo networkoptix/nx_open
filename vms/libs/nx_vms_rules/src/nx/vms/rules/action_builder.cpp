@@ -14,7 +14,6 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/qobject.h>
-#include <nx/vms/common/resource/property_adaptors.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/event/migration_utils.h>
 
@@ -565,7 +564,6 @@ ActionBuilder::Actions ActionBuilder::buildActionsForTargetUsers(
     };
 
     std::unordered_map<QByteArray, EventUsers> eventUsersMap;
-    nx::vms::common::BusinessEventFilterResourcePropertyAdaptor userFilter;
 
     QSignalBlocker signalBlocker{targetUsersField};
 
@@ -575,8 +573,8 @@ ActionBuilder::Actions ActionBuilder::buildActionsForTargetUsers(
     {
         if (!kAllowedEvents.contains(aggregatedEvent->type()))
         {
-            userFilter.setResource(user);
-            if (!userFilter.isAllowed(nx::vms::event::convertEventType(aggregatedEvent->type())))
+            if (!user->settings().isEventWatched(
+                nx::vms::event::convertToOldEvent(aggregatedEvent->type())))
             {
                 NX_VERBOSE(this, "Event %1 is filtered by user %2",
                     aggregatedEvent->type(), user->getName());

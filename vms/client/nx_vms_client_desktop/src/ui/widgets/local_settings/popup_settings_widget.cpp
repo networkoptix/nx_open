@@ -5,9 +5,12 @@
 
 #include <QtCore/QScopedValueRollback>
 
+#include <api/server_rest_connection.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_properties.h>
 #include <health/system_health_strings_helper.h>
+#include <nx/reflect/json.h>
+#include <nx/utils/guarded_callback.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
@@ -15,7 +18,7 @@
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/settings/message_bar_settings.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/common/resource/property_adaptors.h>
+#include <nx/vms/client/desktop/system_logon/logic/fresh_session_token_helper.h>
 #include <nx/vms/event/events/abstract_event.h>
 #include <nx/vms/event/strings_helper.h>
 #include <ui/workbench/workbench_context.h>
@@ -51,7 +54,6 @@ QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget* parent):
     ui(new Ui::PopupSettingsWidget),
     m_businessRulesCheckBoxes(),
     m_systemHealthCheckBoxes(),
-    m_adaptor(new nx::vms::common::BusinessEventFilterResourcePropertyAdaptor(this)),
     m_updating(false),
     m_helper(new nx::vms::event::StringsHelper(systemContext()))
 {
@@ -89,8 +91,8 @@ QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget* parent):
             &QnAbstractPreferencesWidget::hasChangesChanged);
     }
 
-    connect(m_adaptor, &QnAbstractResourcePropertyAdaptor::valueChanged, this,
-        &QnPopupSettingsWidget::loadDataToUi);
+    connect(
+        context(), &QnWorkbenchContext::userChanged, this, &QnPopupSettingsWidget::at_userChanged);
 
     connect(ui->showAllCheckBox, &QCheckBox::toggled, this,
         [this](bool checked)
@@ -106,6 +108,7 @@ QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget* parent):
             emit hasChangesChanged();
         });
 
+    at_userChanged(context()->user());
 }
 
 QnPopupSettingsWidget::~QnPopupSettingsWidget()
@@ -116,6 +119,7 @@ void QnPopupSettingsWidget::loadDataToUi()
 {
     if (m_updating)
         return;
+
     QScopedValueRollback<bool> guard(m_updating, true);
 
     bool all = true;
@@ -131,13 +135,9 @@ void QnPopupSettingsWidget::loadDataToUi()
         all &= checked;
     }
 
-    if (context()->user())
-        m_adaptor->setResource(context()->user());
-
     const auto eventTypes = supportedEventTypes(systemContext());
-
-    const auto watchedEvents = context()->user()
-        ? m_adaptor->watchedEvents()
+    QList<EventType> watchedEvents = m_currentUser
+        ? m_currentUser->settings().watchedEvents()
         : eventTypes;
 
     for (const auto eventType: eventTypes)
@@ -148,7 +148,8 @@ void QnPopupSettingsWidget::loadDataToUi()
     }
 
     ui->showAllCheckBox->setChecked(all);
-    ui->businessEventsGroupBox->setEnabled((bool) context()->user());
+
+    ui->businessEventsGroupBox->setEnabled((bool) m_currentUser);
 }
 
 void QnPopupSettingsWidget::applyChanges()
@@ -156,11 +157,39 @@ void QnPopupSettingsWidget::applyChanges()
     NX_ASSERT(!m_updating, "Should never get here while updating");
     QScopedValueRollback<bool> guard(m_updating, true);
 
-    if (context()->user())
+    if (m_currentUser)
     {
-        m_adaptor->setWatchedEvents(watchedEvents());
-        m_adaptor->saveToResource();
-        systemContext()->resourcePropertyDictionary()->saveParamsAsync(context()->user()->getId());
+        auto userSettings = m_currentUser->settings();
+        const auto oldUserSettings = userSettings;
+        userSettings.setWatchedEvents(watchedEvents());
+        m_currentUser->setSettings(userSettings);
+
+        nx::vms::api::ResourceWithParameters parameters;
+        parameters.setFromParameter({ResourcePropertyKey::User::kUserSettings,
+            QString::fromStdString(nx::reflect::json::serialize(m_currentUser->settings()))});
+
+        auto sessionTokenHelper = FreshSessionTokenHelper::makeHelper(this,
+            tr("Save user"),
+            tr("Enter your account password"),
+            tr("Save"),
+            FreshSessionTokenHelper::ActionType::updateSettings);
+
+        systemContext()->connectedServerApi()->patchUserParameters(
+            m_currentUser->getId(),
+            parameters,
+            sessionTokenHelper,
+            nx::utils::guarded(this,
+                [this, oldUserSettings](bool success,
+                    int /*handle*/,
+                    rest::ErrorOrData<nx::vms::api::UserModelV3> /*errorOrData*/)
+                {
+                    if (success)
+                        return;
+
+                    if (m_currentUser)
+                        m_currentUser->setSettings(oldUserSettings);
+                }),
+            thread());
     }
 
     appContext()->localSettings()->popupSystemHealth = storedSystemHealth();
@@ -169,7 +198,7 @@ void QnPopupSettingsWidget::applyChanges()
 bool QnPopupSettingsWidget::hasChanges() const
 {
     return appContext()->localSettings()->popupSystemHealth() != storedSystemHealth()
-        || (context()->user() && m_adaptor->watchedEvents() != watchedEvents());
+        || (m_currentUser && m_currentUser->settings().watchedEvents() != watchedEvents());
 }
 
 QList<EventType> QnPopupSettingsWidget::watchedEvents() const
@@ -200,4 +229,24 @@ std::set<nx::vms::common::system_health::MessageType>
     }
 
     return result;
+}
+
+void QnPopupSettingsWidget::at_userChanged(const QnUserResourcePtr& user)
+{
+    if (user == m_currentUser)
+        return;
+
+    if (m_currentUser)
+        m_currentUser->disconnect(this);
+
+    m_currentUser = user;
+
+    if (!m_currentUser)
+        return;
+
+    connect(
+        m_currentUser.get(),
+        &QnUserResource::userSettingsChanged,
+        this,
+        &QnPopupSettingsWidget::loadDataToUi);
 }

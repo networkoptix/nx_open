@@ -26,7 +26,6 @@
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
 #include <nx/vms/client/desktop/utils/server_notification_cache.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
-#include <nx/vms/common/resource/property_adaptors.h>
 #include <nx/vms/event/actions/common_action.h>
 #include <nx/vms/event/events/abstract_event.h>
 #include <nx/vms/rules/actions/show_notification_action.h>
@@ -72,8 +71,7 @@ QString toString(vms::event::AbstractActionPtr action)
 
 QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent):
     base_type(parent),
-    QnSessionAwareDelegate(parent),
-    m_adaptor(new nx::vms::common::BusinessEventFilterResourcePropertyAdaptor(this))
+    QnSessionAwareDelegate(parent)
 {
     auto sessionDelegate = new QnBasicWorkbenchStateDelegate<QnWorkbenchNotificationsHandler>(this);
     static_cast<void>(sessionDelegate); //< Debug?
@@ -269,7 +267,7 @@ void QnWorkbenchNotificationsHandler::addNotification(const vms::event::Abstract
             break;
     }
 
-    if (!alwaysNotify && !m_adaptor->isAllowed(eventType))
+    if (!alwaysNotify && !context()->user()->settings().isEventWatched(eventType))
         return;
 
     emit notificationAdded(action);
@@ -365,11 +363,7 @@ void QnWorkbenchNotificationsHandler::setSystemHealthEventVisibleInternal(
 
 void QnWorkbenchNotificationsHandler::at_context_userChanged()
 {
-    const auto user = context()->user();
-
-    m_adaptor->setResource(user);
-
-    if (!user)
+    if (!context()->user())
         clear();
 }
 
