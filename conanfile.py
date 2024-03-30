@@ -135,6 +135,11 @@ class NxOpenConan(ConanFile):
         self.install_system_requirements(packages)
 
     def build_requirements(self):
+        # Put any unrevisioned requirements here if necessary.
+
+        if self.options.onlyUnrevisionedPackages:
+            return
+
         if self.isLinux:
             # Note: For gcc-toolchain requirement see open/cmake/conan_profiles/gcc.profile.
             if self.options.useClang:

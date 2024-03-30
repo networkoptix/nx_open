@@ -6,6 +6,13 @@ option(runConanAutomatically "Run Conan automatically when configuring the proje
 set(extraConanArgs "" CACHE STRING "Extra command line arguments for Conan.")
 set(customConanHome "" CACHE STRING "Custom Conan home directory.")
 
+set(default_conan_update_mode "force")
+if(developerBuild)
+    set(default_conan_update_mode "min")
+endif()
+set(conanUpdateMode ${default_conan_update_mode} CACHE STRING
+    "One of: default, force, min, avoid. See run_conan.cmake.in for details.")
+
 set(installSystemRequirementsDoc "Allow installation of system requirements by Conan.")
 option(installSystemRequirements ${installSystemRequirementsDoc} OFF)
 # Due to security reasons `installSystemRequirements` should be reset to OFF after every CMake run.
@@ -118,7 +125,7 @@ function(nx_run_conan)
         endif()
 
         nx_execute_process_or_fail(
-            COMMAND ${CMAKE_COMMAND} -P ${run_conan_script}
+            COMMAND ${CMAKE_COMMAND} -DconanUpdateMode=${conanUpdateMode} -P ${run_conan_script}
             ERROR_MESSAGE "Conan execution failed."
         )
     else()
