@@ -43,7 +43,7 @@
     </message>
     <message>
       <source>The user is locked out due to several failed attempts. Please try again later.</source>
-      <translation>複数回の試行に失敗したため、ユーザーはロックされています。後でもう一度お試しください。</translation>
+      <translation>複数回の試行に失敗したため、ユーザーがロックされました。後ほどお試しください。</translation>
     </message>
     <message>
       <source>This authorization method is forbidden. Please contact your system administrator.</source>
