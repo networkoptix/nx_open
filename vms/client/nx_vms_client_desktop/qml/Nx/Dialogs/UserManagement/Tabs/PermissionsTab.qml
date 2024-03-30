@@ -30,8 +30,6 @@ Item
 
     property bool editingEnabled: true
 
-    property bool advancedMode: true
-
     property real rehoverDistance: 4
 
     readonly property var availableAccessRightDescriptors:
@@ -102,12 +100,13 @@ Item
 
                     onClicked:
                     {
-                        if (!control.editingContext)
+                        if (!control.editingContext || !selectionContext.accessRight)
                             return
 
-                        control.editingContext.modifyAccessRights(tree.selection(),
-                            accessRight,
-                            tree.nextBatchCheckState === Qt.Checked,
+                        control.editingContext.modifyAccessRights(
+                            selectionContext.selectedIndexes,
+                            selectionContext.accessRight,
+                            selectionContext.nextCheckState === Qt.Checked,
                             automaticDependenciesSwitch.checked)
                     }
                 }
@@ -153,52 +152,7 @@ Item
         property var hoveredRow: null
         readonly property var hoveredCell: hoveredRow ? hoveredRow.hoveredCell : null
 
-        readonly property int hoveredColumnAccessRight:
-        {
-            if (accessRightsHeader.hoveredAccessRight)
-                return accessRightsHeader.hoveredAccessRight
-
-            if (hoveredRow && (hoveredRow.selected || hoveredRow.parentNodeSelected))
-                return hoveredCell.accessRight
-
-            return 0
-        }
-
-        readonly property var hoverData: // {indexes[], accessRight, toggledOn, fromSelection}
-        {
-            if (tree.hoveredColumnAccessRight && control.editingContext)
-            {
-                const selection = tree.selection()
-                if (!selection.length)
-                    return undefined
-
-                return {
-                    "indexes": selection,
-                    "accessRight": tree.hoveredColumnAccessRight,
-                    "toggledOn": tree.nextBatchCheckState !== Qt.Checked,
-                    "fromSelection": true}
-            }
-
-            if (tree.hoveredRow)
-            {
-                return {
-                    "indexes": [tree.hoveredRow.resourceTreeIndex],
-                    "accessRight": tree.hoveredCell.accessRight,
-                    "toggledOn": tree.hoveredCell.toggledOn,
-                    "fromSelection": false}
-            }
-
-            return undefined
-        }
-
-        property int selectionRelevantAccessRights: 0
-        property int selectionCombinedAccessRights: 0
-
         readonly property real scrollBarWidth: scrollBarVisible ? scrollBar.width : 0
-
-        property int nextBatchCheckState: Qt.Checked
-        property int selectionSize: 0
-        property var selectedLayouts
 
         property var currentSearchRegExp: null
 
@@ -266,46 +220,9 @@ Item
 
         selectAllSiblingsRoleName: "nodeType"
 
-        function updateSelectionInfo()
-        {
-            if (!hoveredColumnAccessRight || !control.editingContext)
-            {
-                selectionRelevantAccessRights = 0
-                selectionCombinedAccessRights = 0
-                selectedLayouts = undefined
-                return
-            }
-
-            const selection = tree.selection()
-
-            const currentCheckState = control.editingContext.combinedOwnCheckState(
-                selection, hoveredColumnAccessRight)
-
-            selectionSize = selection.length
-
-            nextBatchCheckState = currentCheckState === Qt.Checked
-                ? Qt.Unchecked
-                : Qt.Checked
-
-            selectionCombinedAccessRights =
-                control.editingContext.combinedAccessRights(selection)
-
-            selectionRelevantAccessRights =
-                control.editingContext.combinedRelevantAccessRights(selection)
-
-            selectedLayouts = control.editingContext.selectionLayouts(selection)
-        }
-
-        onSelectionChanged:
-            updateSelectionInfo()
-
-        onHoveredColumnAccessRightChanged:
-            updateSelectionInfo()
-
         Connections
         {
             target: control.editingContext
-            function onResourceAccessChanged() { tree.updateSelectionInfo() }
             function onSubjectChanged() { tree.clearSelection(/*clearCurrentIndex*/ true) }
         }
 
@@ -315,6 +232,84 @@ Item
             property: "externalFilter"
             value: control.editingContext && control.editingContext.accessibleByPermissionsFilter
             when: control.editingContext && filterButton.withPermissionsOnly
+        }
+
+        PermissionsOperationContext
+        {
+            id: singleLineContext
+
+            // A context for a permission toggle operation performed over a single resource
+            // or single grouping node and its recursive children.
+
+            accessRight: tree.hoveredCell ? tree.hoveredCell.accessRight : 0
+            currentCheckState: tree.hoveredCell ? tree.hoveredCell.checkState : Qt.Unchecked
+
+            selectedIndexes: tree.hoveredRow ? [tree.hoveredRow.resourceTreeIndex] : []
+            selectedLayouts: [] //< Not required for single-line operation.
+
+            currentAccessRights: tree.hoveredRow ? tree.hoveredRow.currentAccessRights : 0
+            relevantAccessRights: tree.hoveredRow ? tree.hoveredRow.relevantAccessRights : 0
+        }
+
+        PermissionsOperationContext
+        {
+            id: selectionContext
+
+            // A context for a permission toggle operation performed over a selection of resources
+            // and/or grouping nodes and their recursive children.
+
+            readonly property bool isPreferred: control.editingContext
+                && (accessRightsHeader.hoveredAccessRight
+                    || (tree.hoveredCell && tree.hoveredRow.effectivelySelected))
+
+            accessRight:
+            {
+                if (!isPreferred)
+                    return 0
+
+                return accessRightsHeader.hoveredAccessRight
+                    ? accessRightsHeader.hoveredAccessRight
+                    : tree.hoveredCell.accessRight
+            }
+
+            function update()
+            {
+                if (!accessRight)
+                {
+                    selectedIndexes = []
+                    selectedLayouts = undefined
+                    currentCheckState = Qt.Unchecked
+                    currentAccessRights = 0
+                    relevantAccessRights = 0
+                    return
+                }
+
+                selectedIndexes = tree.selection()
+                selectedLayouts = control.editingContext.selectionLayouts(selectedIndexes)
+
+                currentCheckState = control.editingContext.combinedOwnCheckState(
+                    selectedIndexes, accessRight)
+
+                currentAccessRights = control.editingContext.combinedAccessRights(selectedIndexes)
+
+                relevantAccessRights =
+                    control.editingContext.combinedRelevantAccessRights(selectedIndexes)
+            }
+
+            onAccessRightChanged:
+                update()
+
+            Connections
+            {
+                target: tree
+                function onSelectionChanged() { selectionContext.update() }
+            }
+
+            Connections
+            {
+                target: control.editingContext
+                function onResourceAccessChanged() { selectionContext.update() }
+            }
         }
 
         delegate: ResourceAccessDelegate
@@ -334,15 +329,51 @@ Item
             automaticDependencies: automaticDependenciesSwitch.checked
             accessRightDescriptors: control.availableAccessRightDescriptors
             highlightRegExp: tree.currentSearchRegExp
-            hoveredColumnAccessRight: tree.hoveredColumnAccessRight
-            externallySelectedLayouts: tree.selectedLayouts
-            selectionSize: tree.selectionSize
             rehoverDistance: control.rehoverDistance
 
-            externalNextCheckState: tree.nextBatchCheckState
-            externalHoverData: tree.hoverData
-            externalRelevantAccessRights: tree.selectionRelevantAccessRights
-            externalGrantedAccessRights: tree.selectionCombinedAccessRights
+            property bool parentNodeSelected: false
+            readonly property bool effectivelySelected: selected || parentNodeSelected
+
+            readonly property bool parentNodeHovered:
+            {
+                const hoveredModelIndex = tree.hoveredCell
+                    ? NxGlobals.fromPersistent(tree.hoveredRow.resourceTreeIndex)
+                    : undefined
+
+                for (let index = modelIndex.parent; index.valid; index = index.parent)
+                {
+                    if (index === hoveredModelIndex)
+                        return true
+                }
+
+                return false
+            }
+
+            operationContext:
+            {
+                // Toggle operation can be performed over a selection and its children,
+                // or over a single line and its children.
+
+                // Selection operation is performed by hovering and clicking either a cell inside
+                // the selection or a header item.
+
+                // A rows is assigned the selection operation context - `selectionContext` - if it
+                // is within the selection or its children (`effectivelySelected` check) and
+                // if either currently hovered row is within the selection or its children,
+                // or a header item is hovered (`selectionContext.accessRight` check,
+                // see its binding).
+                if (effectivelySelected && selectionContext.isPreferred)
+                    return selectionContext
+
+                // Single line operation is performed by hovering and clicking a cell outside a
+                // selection (or if there's no selection).
+
+                // A row is assigned the single line operation context - `singleLineContext` - if
+                // it's hovered, or if it's a child, direct or recursive, of a hovered parent row.
+                return singleLineContext.accessRight && (parentNodeHovered || hoveredCell)
+                    ? singleLineContext
+                    : null
+            }
 
             onHoveredCellChanged:
             {
@@ -352,27 +383,19 @@ Item
                     tree.hoveredRow = null
             }
 
-            onTriggered: (cell) =>
+            onTriggered: (operation) =>
             {
                 if (!control.editingContext)
                     return
 
-                if (rowAccess.selected || rowAccess.parentNodeSelected)
-                {
-                    control.editingContext.modifyAccessRights(tree.selection(),
-                        cell.accessRight,
-                        tree.nextBatchCheckState === Qt.Checked,
-                        automaticDependenciesSwitch.checked)
-                }
-                else
-                {
-                    control.editingContext.modifyAccessRight(modelIndex,
-                        cell.accessRight,
-                        !cell.toggledOn,
-                        automaticDependenciesSwitch.checked)
+                control.editingContext.modifyAccessRights(operation.selectedIndexes,
+                    operation.accessRight,
+                    operation.nextCheckState === Qt.Checked,
+                    automaticDependenciesSwitch.checked)
 
+                // Clear selection if a cell was clicked outside of it.
+                if (!rowAccess.effectivelySelected)
                     tree.clearSelection(/*clearCurrentIndex*/ true)
-                }
             }
 
             function isParentNodeSelected()
@@ -394,6 +417,11 @@ Item
                 target: tree
 
                 function onSelectionChanged()
+                {
+                    rowAccess.parentNodeSelected = rowAccess.isParentNodeSelected()
+                }
+
+                function onHoveredCellChanged()
                 {
                     rowAccess.parentNodeSelected = rowAccess.isParentNodeSelected()
                 }
