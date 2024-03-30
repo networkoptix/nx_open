@@ -3817,7 +3817,7 @@ to %1</source>
     </message>
     <message>
       <source>Locked to Hardware ID</source>
-      <translation>ハードウェアIDのロック</translation>
+      <translation>ロックされたハードウェアID</translation>
     </message>
     <message>
       <source>Generic</source>
@@ -8870,7 +8870,7 @@ Remember to return the Logging Level to its default setting after you have colle
     <name>nx::vms::client::desktop::LogsManagementModel</name>
     <message>
       <source>Unit</source>
-      <translation>単位</translation>
+      <translation>ユニット</translation>
     </message>
     <message>
       <source>Current Level</source>
@@ -9440,7 +9440,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>System updated to</source>
-      <translation>システム更新</translation>
+      <translation>システムが更新されました</translation>
     </message>
     <message>
       <source>Some servers have no update packages available.</source>
@@ -9561,7 +9561,7 @@ You can force it, but it may significantly increase CPU load.</source>
     <name>nx::vms::client::desktop::OpenLayoutActionWidget</name>
     <message>
       <source>None of selected users have access to the selected layout. Action will not work.</source>
-      <translation>選択したいずれのユーザーも指定されたレイアウトにアクセスできません。アクションは機能しません。</translation>
+      <translation>選択したユーザーは全員、指定したレイアウトにアクセスできません。アクションは機能しません。</translation>
     </message>
     <message>
       <source>Select layout...</source>
@@ -9573,7 +9573,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
-      <translation>選択されたユーザーロールにはユーザーが含まれていません。アクションは機能しません。</translation>
+      <translation>選択したユーザーロールにはユーザーが含まれていません。アクションは機能しません。</translation>
     </message>
     <message>
       <source>Some users do not have access to the selected layout. Action will not work for them.</source>
@@ -9814,7 +9814,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Wrong URL format.</source>
-      <translation>URL形式が間違っています</translation>
+      <translation>URLの形式が間違っています。</translation>
     </message>
     <message>
       <source>Web Page</source>
