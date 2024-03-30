@@ -135,6 +135,11 @@ class NxOpenConan(ConanFile):
         self.install_system_requirements(packages)
 
     def build_requirements(self):
+        # Put any unrevisioned requirements here if necessary.
+
+        if self.options.onlyUnrevisionedPackages:
+            return
+
         self.build_requires("qt-host/6.5.3" "#cb4a89251221cd4683f58f03fd308218")
 
         if self.isLinux:
