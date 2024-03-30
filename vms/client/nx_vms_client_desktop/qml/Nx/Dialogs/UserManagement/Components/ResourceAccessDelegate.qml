@@ -15,71 +15,31 @@ Item
 {
     id: root
 
+    required property AccessSubjectEditingContext editingContext
+    required property PermissionsOperationContext operationContext
+    required property var accessRightDescriptors
+    required property bool editingEnabled
+    required property bool automaticDependencies
+    required property real rehoverDistance
+    required property real columnWidth
+
     property alias showExtraInfo: mainDelegate.showExtraInfo
     property alias selectionMode: mainDelegate.selectionMode
     property alias showResourceStatus: mainDelegate.showResourceStatus
 
-    property var accessRightDescriptors: []
-
     property alias highlightRegExp: mainDelegate.highlightRegExp
 
-    required property real columnWidth
-
-    required property var editingContext
-
-    required property real rehoverDistance
-
-    property bool editingEnabled: true
-
-    property bool automaticDependencies: false
-
     readonly property alias hoveredCell: cellsRow.hoveredCell
-
     readonly property var resourceTreeIndex: modelIndex
-
-    readonly property bool selected: isSelected //< TreeView delegate's context property.
-
-    property int hoveredColumnAccessRight: 0
-    property int externalNextCheckState: Qt.Checked
-
-    readonly property int externallySelectedAccessRight: (selected || parentNodeSelected)
-        ? hoveredColumnAccessRight
-        : 0
-
-    property int selectionSize: 0
-
-    property var externalHoverData //< {indexes[], accessRight, toggledOn, fromSelection}
-    property int externalRelevantAccessRights: 0
-    property int externalGrantedAccessRights: 0
-
-    property var externallySelectedLayouts
-
-    readonly property int relevantAccessRights:
-        externalRelevantAccessRights | accessRightsModel.relevantAccessRights
-
-    readonly property int grantedAccessRights:
-        externalGrantedAccessRights | accessRightsModel.grantedAccessRights
-
-    property bool parentNodeSelected: false
-
-    readonly property bool parentNodeHovered:
-    {
-        if (!externalHoverData)
-            return false
-
-        for (let parent of externalHoverData.indexes)
-        {
-            if (parent.valid && NxGlobals.isRecursiveChildOf(root.resourceTreeIndex, parent))
-                return true
-        }
-
-        return false
-    }
+    readonly property int currentAccessRights: accessRightsModel.grantedAccessRights
+    readonly property int relevantAccessRights: accessRightsModel.relevantAccessRights
 
     readonly property Resource resource: (model && model.resource) || null
     readonly property var nodeType: (model && model.nodeType) || -1
 
-    signal triggered(var cell)
+    readonly property bool selected: isSelected //< TreeView delegate's context property.
+
+    signal triggered(var effectiveOperationContext)
 
     implicitWidth: mainDelegate.implicitWidth + cellsRow.width + 1
     implicitHeight: 28
@@ -108,14 +68,9 @@ Item
         resourceTreeIndex: root.resourceTreeIndex
         accessRightsList: root.accessRightDescriptors.map(item => item.accessRight)
 
-        // If a resource selection contains both layouts and resources that are their items,
-        // and a remove operation is highlighted, then the future state inheritance for those
-        // resources should not display layouts as they're getting the permission removed as well.
-
-        ignoredProviders:
-            root.externallySelectedAccessRight && root.externalNextCheckState == Qt.Unchecked
-                ? root.externallySelectedLayouts
-                : undefined
+        ignoredProviders: operationContext && operationContext.nextCheckState === Qt.Unchecked
+            ? operationContext.selectedLayouts
+            : undefined
     }
 
     Row
@@ -145,7 +100,11 @@ Item
 
                     property point clickPos
 
+                    readonly property int accessRight: model.accessRight
+                    readonly property bool relevant: model.editable
+
                     GlobalToolTip.enabled: cell.relevant && root.hoveredCell === cell
+                        && (operationContext || !root.editingEnabled)
 
                     Binding on GlobalToolTip.text
                     {
@@ -195,9 +154,15 @@ Item
 
                     function normalTooltipText()
                     {
+                        if (!operationContext)
+                            return "" //< Should never happen.
+
                         const name = "<b>" + root.accessRightDescriptors[index].name + "</b>"
-                        let inheritance = (root.selectionSize > 1) ? "" : model.inheritanceInfoText
                         let operation = ""
+
+                        let inheritance = operationContext.selectedIndexes.length > 1
+                            ? ""
+                            : model.inheritanceInfoText
 
                         if (inheritance)
                         {
@@ -208,16 +173,12 @@ Item
                                 : (" " + inheritance)
                         }
 
-                        const nextCheckState = root.hoveredColumnAccessRight
-                            ? root.externalNextCheckState
-                            : (toggledOn ? Qt.Unchecked : Qt.Checked)
-
-                        if (nextCheckState == Qt.Checked)
+                        if (operationContext.nextCheckState === Qt.Checked)
                         {
                             if (root.automaticDependencies
                                 && (model.requiredAccessRights
-                                    & root.relevantAccessRights
-                                    & ~root.grantedAccessRights))
+                                    & operationContext.relevantAccessRights
+                                    & ~operationContext.currentAccessRights))
                             {
                                 operation = qsTr("Add %1 and dependent permissions",
                                     "%1 will be substituted with a permission name").arg(name)
@@ -238,8 +199,8 @@ Item
                         {
                             if (root.automaticDependencies
                                 && (model.dependentAccessRights
-                                    & root.relevantAccessRights
-                                    & root.grantedAccessRights))
+                                    & operationContext.relevantAccessRights
+                                    & operationContext.currentAccessRights))
                             {
                                 operation = qsTr("Remove %1 and dependent permissions",
                                     "%1 will be substituted with a permission name").arg(name)
@@ -260,34 +221,52 @@ Item
                         return operation + inheritance
                     }
 
-                    readonly property int accessRight: model.accessRight
-                    readonly property bool relevant: model.editable
-
-                    readonly property bool toggledOn:
+                    readonly property int checkState:
                     {
                         switch (accessRightsModel.rowType)
                         {
                             case ResourceAccessTreeItem.Type.resource:
-                                return model.providedVia === ResourceAccessInfo.ProvidedVia.own
+                            {
+                                if (model.providedVia === ResourceAccessInfo.ProvidedVia.own
                                     || model.providedVia
-                                            === ResourceAccessInfo.ProvidedVia.ownResourceGroup
+                                        === ResourceAccessInfo.ProvidedVia.ownResourceGroup)
+                                {
+                                    return Qt.Checked
+                                }
+
+                                return Qt.Unchecked
+                            }
 
                             case ResourceAccessTreeItem.Type.specialResourceGroup:
-                                return model.providedVia === ResourceAccessInfo.ProvidedVia.own
+                            {
+                                if (model.providedVia === ResourceAccessInfo.ProvidedVia.own)
+                                    return Qt.Checked
+
+                                return model.checkedChildCount
+                                    ? Qt.PartiallyChecked
+                                    : Qt.Unchecked
+                            }
 
                             default:
-                                return model.checkedChildCount === model.totalChildCount
+                            {
+                                if (model.checkedChildCount === model.totalChildCount)
+                                    return Qt.Checked
+
+                                return model.checkedChildCount
+                                    ? Qt.PartiallyChecked
+                                    : Qt.Unchecked
+                            }
                         }
                     }
 
                     readonly property int displayedProvider:
                     {
-                        if (!highlighted)
+                        if (!highlighted || !operationContext)
                             return model.providedVia
 
-                        return toggledOn
-                            ? model.inheritedFrom
-                            : ResourceAccessInfo.ProvidedVia.own
+                        return operationContext.nextCheckState === Qt.Checked
+                            ? ResourceAccessInfo.ProvidedVia.own
+                            : model.inheritedFrom
                     }
 
                     // Highlighted to indicate that a mouse click at current mouse position
@@ -295,72 +274,21 @@ Item
                     readonly property bool highlighted:
                     {
                         const context = root.editingContext
-                        if (!context || !relevant)
+                        if (!context || !relevant || !operationContext)
                             return false
 
-                        // Highlight external selection (selected rows & hovered column crossings).
-                        if (accessRight === root.externallySelectedAccessRight)
-                        {
-                            const willBeToggledOn =
-                                root.externalNextCheckState === Qt.Checked
-
-                            return toggledOn !== willBeToggledOn
-                        }
-
-                        // Highlight directly hovered cell.
-                        if (root.editingEnabled && cellsRow.hoveredCell === cell)
-                            return true
-
-                        const hd = root.externalHoverData
-
-                        if (hd
-                            && root.parentNodeHovered
-                            && hd.toggledOn === toggledOn
-                            && (hd.fromSelection || root.editingEnabled)
-                            && (accessRightsModel.relevantAccessRights & hd.accessRight))
-                        {
-                            // Highlight a child of a hovered resource group cell.
-                            if (hd.accessRight === accessRight)
-                                return true
-
-                            if (root.automaticDependencies)
-                            {
-                                if (toggledOn && context.isDependingOn(accessRight, hd.accessRight)
-                                    || !toggledOn && context.isRequiredFor(accessRight,
-                                        hd.accessRight))
-                                {
-                                    return true
-                                }
-                            }
-                        }
+                        if (accessRight === operationContext.accessRight)
+                            return checkState !== operationContext.nextCheckState
 
                         if (!root.automaticDependencies)
                             return false
 
-                        // Highlight dependencies from the external selection.
-                        if (root.externallySelectedAccessRight
-                            && (accessRightsModel.relevantAccessRights
-                                & root.externallySelectedAccessRight))
+                        if ((accessRightsModel.relevantAccessRights & operationContext.accessRight)
+                            && operationContext.nextCheckState !== checkState)
                         {
-                            if (root.externalNextCheckState === Qt.Unchecked)
-                            {
-                                return toggledOn && context.isDependingOn(
-                                    accessRight, root.externallySelectedAccessRight)
-                            }
-                            else
-                            {
-                                return !toggledOn && context.isRequiredFor(
-                                    accessRight, root.externallySelectedAccessRight)
-                            }
-                        }
-
-                        // Highlight access rights dependency from hovered other cell.
-                        const base = root.editingEnabled ? cellsRow.hoveredCell : null
-                        if (base && base.relevant && toggledOn == base.toggledOn)
-                        {
-                            return toggledOn
-                                ? context.isDependingOn(accessRight, base.accessRight)
-                                : context.isRequiredFor(accessRight, base.accessRight)
+                            return (operationContext.nextCheckState === Qt.Unchecked)
+                                ? context.isDependingOn(accessRight, operationContext.accessRight)
+                                : context.isRequiredFor(accessRight, operationContext.accessRight)
                         }
 
                         return false
@@ -382,7 +310,7 @@ Item
                             return ColorTheme.colors.brand_core
                         }
 
-                        return root.selected
+                        return root.directlySelected
                             ? ColorTheme.colors.light10
                             : ColorTheme.colors.dark13
                     }
@@ -397,12 +325,24 @@ Item
 
                     onClicked: (mouse) =>
                     {
-                        if (!cell.relevant || !root.editingEnabled || cell !== root.hoveredCell)
+                        if (!cell.relevant
+                            || !operationContext
+                            || !root.editingEnabled
+                            || cell !== root.hoveredCell)
+                        {
                             return
+                        }
 
+                        // Make one-level-deep copy of the operation context.
+                        const effectiveOperationContext = Object.assign({}, operationContext)
+
+                        // Current operation context is cleaned up here, hence the copying above.
+                        // Hover must be cleaned before actual toggle operation for proper update
+                        // of tooltips: they shouldn't display opposite operation during fade out.
                         cellsRow.hoveredCell = null
+
                         cell.clickPos = Qt.point(mouse.x, mouse.y)
-                        root.triggered(cell)
+                        root.triggered(effectiveOperationContext)
                     }
 
                     onPositionChanged: (mouse) =>
