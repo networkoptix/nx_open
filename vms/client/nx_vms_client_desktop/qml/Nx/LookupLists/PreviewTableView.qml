@@ -98,11 +98,11 @@ CoreItems.TableView
                     if (changedColumnIndex === i)
                         continue
 
-                    if (repeater.itemAt(i).displayText === changedColumnName &&
-                        repeater.itemAt(i).displayText !== control.model.doNotImportText &&
-                        repeater.itemAt(i).displayText !== control.needSelectionText)
+                    if (repeater.itemAt(i).currentText === changedColumnName &&
+                        repeater.itemAt(i).currentText !== control.model.doNotImportText &&
+                        repeater.itemAt(i).currentIndex !== -1)
                     {
-                        repeater.itemAt(i).displayText = control.needSelectionText
+                        repeater.itemAt(i).currentIndex = -1
                     }
                 }
             }
@@ -121,10 +121,10 @@ CoreItems.TableView
                     height: columnsHeader.comboBoxHeight
                     visible: control.model.rowCount
                     model: columnsHeader.getModel(index)
+                    placeholderText: control.needSelectionText
 
                     onCurrentTextChanged:
                     {
-                        displayText = currentText
                         control.model.headerIndexChanged(index, currentText)
                         headerRow.reassignDependantColumns(currentText, index)
                         control.correct = !headerRow.columnWithoutSelectionExist()
