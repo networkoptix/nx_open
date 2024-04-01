@@ -14,7 +14,7 @@ namespace {
 using namespace std::chrono;
 
 // The following timeouts got from the event rule processor.
-constexpr auto kEventTimeout = 30s;
+constexpr auto kEventTimeout = 3s;
 constexpr auto kCleanupTimeout = 5s;
 
 } // namespace
@@ -34,8 +34,9 @@ void EventCache::cleanupOldEventsFromCache(
 
 bool EventCache::eventWasCached(const QString& cacheKey) const
 {
-    // TODO: #amalov Check for cached event expiration here.
-    return !cacheKey.isEmpty() && m_cachedEvents.contains(cacheKey);
+    const auto it = m_cachedEvents.find(cacheKey);
+    return it != m_cachedEvents.end()
+        && !it->second.hasExpired(kEventTimeout);
 }
 
 void EventCache::cacheEvent(const QString& eventKey)
