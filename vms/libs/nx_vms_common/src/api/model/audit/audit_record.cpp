@@ -13,9 +13,6 @@ struct Conversion
     static constexpr auto verifyDetailsToParams =
         [](auto F, const QnAuditRecord& record, QnLegacyAuditRecord& legacyRecord)
         {
-            const auto details = record.get<typename details::details_type<recordType, AllAuditDetails::mapping>::type>();
-            NX_ASSERT(details);
-
             return F(record, legacyRecord);
         };
 
