@@ -83,7 +83,9 @@ public: // For testing.
 private:
     void updateState();
 
-    bool wasEventCached(const QString& cacheKey) const;
+    bool wasEventCached(
+        std::chrono::milliseconds eventTimeout,
+        const QString& cacheKey) const;
     void cacheEvent(const QString& cacheKey) const;
 
     bool matchFields(const EventPtr& event) const;

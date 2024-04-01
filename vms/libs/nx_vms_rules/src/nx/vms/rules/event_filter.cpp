@@ -26,7 +26,9 @@ namespace {
 using namespace std::chrono;
 
 // The following timeouts got from the event rule processor.
-constexpr auto kEventTimeout = 30s;
+// Timeout shouldn't be too long because new events are filtered out during this timeout and actions
+// could be triggered too rare.
+constexpr auto kEventTimeout = 3s;
 constexpr auto kCleanupTimeout = 5s;
 
 bool isProlonged(const EventPtr& event)
@@ -146,10 +148,13 @@ void EventFilter::cleanupOldEventsFromCache(
     }
 }
 
-bool EventFilter::wasEventCached(const QString& cacheKey) const
+bool EventFilter::wasEventCached(
+    std::chrono::milliseconds eventTimeout,
+    const QString& cacheKey) const
 {
-    // TODO: #amalov Check for cached event expiration here.
-    return !cacheKey.isEmpty() && m_cachedEvents.contains(cacheKey);
+    const auto it = m_cachedEvents.find(cacheKey);
+    return it != m_cachedEvents.end()
+        && !it->second.hasExpired(eventTimeout);
 }
 
 void EventFilter::cacheEvent(const QString& eventKey) const
@@ -168,7 +173,7 @@ bool EventFilter::match(const EventPtr& event) const
     NX_VERBOSE(this, "Matching filter id: %1", m_id);
 
     const auto cacheKey = event->cacheKey();
-    if (wasEventCached(cacheKey))
+    if (wasEventCached(kEventTimeout, cacheKey))
     {
         NX_VERBOSE(this, "Skipping cached event with key: %1", cacheKey);
         return false;
