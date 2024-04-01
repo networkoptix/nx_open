@@ -127,7 +127,7 @@ Dialog
                     text: viewModel.name,
                     value: viewModel
                 })
-                listComboBox.currentIndex = listsModel.count - 1
+                listComboBox.currentIndex = listComboBox.indexOfValue(viewModel)
             }
         }
     }
@@ -143,7 +143,7 @@ Dialog
             visible: false
             onAccepted:
             {
-                listsModel.set(listComboBox.currentIndex, {
+                listsModel.set(listComboBox.listsModelIndex, {
                     text: viewModel.name,
                     value: viewModel
                 })
@@ -153,6 +153,7 @@ Dialog
                     entriesModel.removeIncorrectEntries()
 
                 hasChanges = true
+                listComboBox.currentIndex = listComboBox.indexOfValue(viewModel)
             }
 
             onDeleteRequested:
@@ -160,7 +161,7 @@ Dialog
                 const idx = listComboBox.currentIndex > 0
                     ? listComboBox.currentIndex - 1
                     : listsModel.count > 1 ? 0 : -1
-                listsModel.remove(listComboBox.currentIndex)
+                listsModel.remove(listComboBox.listsModelIndex)
                 listComboBox.currentIndex = idx
                 hasChanges = true
             }
@@ -338,8 +339,13 @@ Dialog
             ComboBox
             {
                 id: listComboBox
+
+                readonly property var listsModelIndex: sortModel.mapToSource(sortModel.index(listComboBox.currentIndex, 0)).row
+
                 model: SortFilterProxyModel
                 {
+                    id: sortModel
+
                     sourceModel: listsModel
                     sortCaseSensitivity: Qt.CaseInsensitive
                     sortRoleName: "text"
