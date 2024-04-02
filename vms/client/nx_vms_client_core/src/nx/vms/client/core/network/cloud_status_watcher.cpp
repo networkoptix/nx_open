@@ -528,7 +528,8 @@ void CloudStatusWatcher::Private::onAccessTokenIssued(
 
     if (result != ResultCode::ok)
     {
-        if (grantType == GrantType::refresh_token && result == ResultCode::notAuthorized)
+        if (grantType == GrantType::refresh_token
+            && (result == ResultCode::notAuthorized || result == ResultCode::badUsername))
         {
             m_authData = {};
             setStatus(CloudStatusWatcher::LoggedOut, CloudStatusWatcher::InvalidPassword);

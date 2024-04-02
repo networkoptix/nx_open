@@ -19,6 +19,7 @@ using namespace std::chrono;
 
 namespace {
 
+static constexpr auto kTokenIsExpiringRatio = 0.1;
 static constexpr auto kTokenUpdateInterval = 1min;
 static constexpr auto kTokenUpdateThreshold = 10min;
 static constexpr auto kMaxTokenUpdateRequestTime = 20s;
@@ -29,7 +30,6 @@ CloudSessionTokenUpdater::CloudSessionTokenUpdater(QObject* parent):
     QObject(parent),
     m_timer(new QTimer(this))
 {
-    m_timer->setInterval(kTokenUpdateInterval);
     m_timer->callOnTimeout([this]() { updateTokenIfNeeded(); });
 
     connect(qApp, &QGuiApplication::applicationStateChanged, this,
@@ -77,9 +77,21 @@ void CloudSessionTokenUpdater::updateTokenIfNeeded()
 
 void CloudSessionTokenUpdater::onTokenUpdated(microseconds expirationTime)
 {
-    const auto duration = expirationTime - kTokenUpdateThreshold - qnSyncTime->currentTimePoint();
-    m_expirationTimer.setRemainingTime(duration > microseconds::zero()
-        ? duration
+    // Actual token lifetime.
+    const auto tokenDuration = expirationTime - qnSyncTime->currentTimePoint();
+
+    // Interval before the token expiration point when the token is considered expiring.
+    const auto updateInterval = std::clamp(
+        duration_cast<microseconds>(kTokenIsExpiringRatio * tokenDuration),
+        duration_cast<microseconds>(kMaxTokenUpdateRequestTime),
+        duration_cast<microseconds>(kTokenUpdateThreshold));
+
+    // Time left before the token is considered expiring.
+    const auto timeToUpdate = tokenDuration - updateInterval;
+
+    // Set expiration timer.
+    m_expirationTimer.setRemainingTime(timeToUpdate > microseconds::zero()
+        ? timeToUpdate
         : microseconds::max());
 
     // Reset timed "request in progress" flag.
@@ -88,11 +100,26 @@ void CloudSessionTokenUpdater::onTokenUpdated(microseconds expirationTime)
     NX_DEBUG(this, "Access token updated, expires at: %1, expiring/expired: %2",
         expirationTime, m_expirationTimer.hasExpired());
 
-    // Do not update already expiring token.
-    if (expirationTime - qnSyncTime->currentTimePoint() > kTokenUpdateThreshold)
-        m_timer->start();
+    // Access token lifetime can't exceed the lifespan of the refresh token. Therefore, we can
+    // receive a new token which already expires. In that case it's wortheless to update it again.
+    if (tokenDuration > kMaxTokenUpdateRequestTime)
+    {
+        // Adjust timer interval. For tokens with a very short lifespan, the token will be checked
+        // and updated right after it's marked as expiring. For others, the timer interval will be
+        // linearly increased depending on the token's lifespan until it reaches the value of
+        // kTokenUpdateInterval. As a future improvement, we could think about enforcing several
+        // update attempts for short-living tokens by using a decreased update interval for them.
+        const auto interval = std::min(
+            duration_cast<milliseconds>(timeToUpdate + kTokenUpdateInterval
+                * (kTokenIsExpiringRatio * tokenDuration / kTokenUpdateThreshold)),
+            duration_cast<milliseconds>(kTokenUpdateInterval));
+
+        m_timer->start(interval);
+    }
     else
+    {
         m_timer->stop();
+    }
 }
 
 void CloudSessionTokenUpdater::issueToken(
