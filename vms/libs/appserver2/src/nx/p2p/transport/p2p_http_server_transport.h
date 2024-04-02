@@ -52,6 +52,8 @@ public:
     static void setPingTimeout(std::optional<std::chrono::milliseconds> pingTimeout);
     static void setPingPongDisabled(bool value);
 
+    QString lastErrorMessage() const;
+
 private:
     enum Headers
     {
@@ -89,6 +91,7 @@ private:
     bool m_sendInProgress = false;
     network::http::MessageParser m_httpParser;
     network::http::Message m_httpMessage;
+    QString m_lastErrorMessage;
 
     // For tests.
     static std::optional<std::chrono::milliseconds> s_pingTimeout;
@@ -101,7 +104,7 @@ private:
     void onReadFromSendSocket(SystemError::ErrorCode error, size_t transferred);
     void initiatePingPong();
     std::optional<std::chrono::milliseconds> pingTimeout() const;
-    void setFailedState(SystemError::ErrorCode errorCode);
+    void setFailedState(SystemError::ErrorCode errorCode, const QString& message);
     void sendPingOrPong(Headers type);
     void sendNextMessage();
     void onRead(SystemError::ErrorCode error, size_t transferred);

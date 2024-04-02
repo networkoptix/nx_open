@@ -192,12 +192,11 @@ void ConnectionBase::addRequestQueryParams(
 
 void ConnectionBase::cancelConnecting(State newState, const QString& reason)
 {
-    NX_DEBUG(
-        this,
-        "Connection to peer %1 canceled from state %2. Reason: %3",
+    auto message = nx::format("Connection to peer %1 canceled from state %2. Reason: %3",
         m_remotePeer.id.toString(), toString(state()), reason);
+    NX_DEBUG(this, message);
     m_lastErrorMessage = reason;
-    setState(newState);
+    setState(newState, message);
 }
 
 QString ConnectionBase::idForToStringFromPtr() const
@@ -382,7 +381,8 @@ void ConnectionBase::onHttpClientDone()
         {
             if (errorCode == SystemError::noError)
             {
-                setState(State::Connected);
+                setState(State::Connected,
+                    nx::format("Connection to peer %1 successfully opened", m_remotePeerUrl));
             }
             else
             {
@@ -448,7 +448,7 @@ ConnectionBase::State ConnectionBase::state() const
     return m_state;
 }
 
-void ConnectionBase::setState(State state)
+void ConnectionBase::setState(State state, const QString& reason)
 {
     if (state == m_state)
         return;
@@ -465,9 +465,9 @@ void ConnectionBase::setState(State state)
         return;
     }
 
-    NX_VERBOSE(this,
-        "Connection State change: [%1] -> [%2]",
-        toString(m_state), toString(state));
+    NX_INFO(this,
+        "Connection State change: [%1] -> [%2]. %3",
+        toString(m_state), toString(state), reason);
     m_state = state;
     emit stateChanged(weakPointer(), state);
 }
@@ -553,7 +553,7 @@ void ConnectionBase::sendMessage(const nx::Buffer& data)
                 NX_WARNING(this,
                     "p2p send queue overflow for peer %1, queue size: %2. Close connection.",
                     remotePeer().id, m_dataToSend.dataSize());
-                setState(State::Error);
+                setState(State::Error, "p2p send queue overflow for peer %1, queue size: %2. Close connection.");
                 return;
             }
 
@@ -584,7 +584,8 @@ void ConnectionBase::onMessageSent(SystemError::ErrorCode errorCode, size_t byte
         NX_DEBUG(
             this, "onMessageSent: Connection closed. Error: %1, bytesSent: %2",
             errorCode, bytesSent);
-        setState(State::Error);
+        setState(State::Error,
+            nx::format("Connection closed. Error: %1, bytesSent: %2", errorCode, bytesSent));
         return;
     }
 
@@ -614,17 +615,29 @@ void ConnectionBase::transactionSkipped()
 
 void ConnectionBase::onNewMessageRead(SystemError::ErrorCode errorCode, size_t bytesRead)
 {
+    QString message;
+    if (auto httpTransport = dynamic_cast<P2PHttpServerTransport*>(m_p2pTransport.get()))
+    {
+        message = httpTransport->lastErrorMessage();
+        if (!message.isEmpty())
+        {
+            NX_DEBUG(this, "onNewMessageRead: %1", message);
+            setState(State::Error, message);
+            return;
+        }
+    }
     if (bytesRead == 0)
     {
         NX_DEBUG( this, "onNewMessageRead: Connection closed by remote peer");
-        setState(State::Error);
+        setState(State::Error, "Connection closed by remote peer");
         return; //< connection closed
     }
 
     if (errorCode != SystemError::noError)
     {
         NX_DEBUG( this, "onNewMessageRead: Connection closed with error: %1", errorCode);
-        setState(State::Error);
+        setState(State::Error,
+            nx::format("Connection closed with error: %1", errorCode));
         return;
     }
 
