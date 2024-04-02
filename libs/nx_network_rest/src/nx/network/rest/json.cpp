@@ -104,8 +104,6 @@ bool merge(
             break;
         }
 
-        case QJsonValue::Null:
-            break;
         default:
             NX_VERBOSE(NX_SCOPE_TAG, "    Unknown type - ignored");
     }
