@@ -53,7 +53,8 @@ void RowCheckModel::setSourceModel(QAbstractItemModel* sourceModel)
                 beginResetModel();
                 m_checkedRows.clear();
                 emit checkedRowsChanged();
-            });
+                emit headerDataChanged(Qt::Orientation::Horizontal, 0, 0);
+        });
 
     m_connections <<
         connect(sourceModel, &QAbstractItemModel::modelReset,
