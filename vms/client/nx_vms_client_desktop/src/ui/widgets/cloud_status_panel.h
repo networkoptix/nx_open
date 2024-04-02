@@ -23,6 +23,11 @@ public:
     virtual QSize minimumSizeHint() const override;
     virtual QSize sizeHint() const override;
 
+protected:
+    virtual void resizeEvent(QResizeEvent* event) override;
+    virtual void paintEvent(QPaintEvent* event) override;
+    virtual void mousePressEvent(QMouseEvent* e) override;
+
 private:
     QScopedPointer<QnCloudStatusPanelPrivate> d_ptr;
     Q_DECLARE_PRIVATE(QnCloudStatusPanel)

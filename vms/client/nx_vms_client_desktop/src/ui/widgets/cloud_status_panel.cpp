@@ -2,6 +2,8 @@
 
 #include "cloud_status_panel.h"
 
+#include <QtGui/QPainter>
+#include <QtGui/QResizeEvent>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QMenu>
 
@@ -19,6 +21,7 @@
 #include <nx/vms/client/desktop/window_context.h>
 #include <ui/common/palette.h>
 #include <ui/workaround/hidpi_workarounds.h>
+#include <utils/common/delayed.h>
 
 // TODO: #dklychkov Uncomment when cloud login is implemented
 //#define DIRECT_CLOUD_CONNECT
@@ -28,10 +31,12 @@ using nx::vms::client::core::CloudStatusWatcher;
 
 namespace {
 
-static const int kFontPixelSize = 12;
-static const int kMinimumPanelWidth = 36;
+constexpr int kFontPixelSize = 12;
+constexpr int kMinimumPanelWidth = 36;
+constexpr int kSideMargin = 5;
+constexpr int kMenuIconWidth = 20;
 
-}
+} // namespace
 
 class QnCloudStatusPanelPrivate: public QObject
 {
@@ -54,6 +59,8 @@ public:
     QIcon loggedInIcon;     /*< User is logged in. */
     QIcon loggedOutIcon;    /*< User is logged out. */
     QIcon offlineIcon;      /*< User is logged in, but cloud is unreachable. */
+
+    bool isPressed{false};
 };
 
 QnCloudStatusPanel::QnCloudStatusPanel(
@@ -69,7 +76,8 @@ QnCloudStatusPanel::QnCloudStatusPanel(
     setProperty(nx::style::Properties::kDontPolishFontProperty, true);
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Minimum);
     setPaletteColor(this, QPalette::Window, nx::vms::client::core::colorTheme()->color("dark7"));
-    setContentsMargins(10, 0, 0, 0);
+    setContentsMargins(kSideMargin, 0, kSideMargin, 0);
+    setPopupMode(QToolButton::InstantPopup);
 
     QFont font = qApp->font();
     font.setPixelSize(kFontPixelSize);
@@ -81,41 +89,17 @@ QnCloudStatusPanel::QnCloudStatusPanel(
     connect(this, &QnCloudStatusPanel::justPressed, qnCloudStatusWatcher,
         &CloudStatusWatcher::updateSystems);
 
-    auto showMenu =
-        [this, d]
+    connect(
+        this,
+        &QnCloudStatusPanel::clicked,
+        this,
+        [this]
         {
+            // This handler is used instead of setting a default action is used because the default
+            // action changes button appearance from icon button to text button.
             if (qnCloudStatusWatcher->status() == CloudStatusWatcher::LoggedOut)
-            {
                 this->windowContext()->menu()->trigger(menu::LoginToCloud);
-                return;
-            }
-
-            const auto menu =
-                [d]() -> QMenu*
-                {
-                    switch (qnCloudStatusWatcher->status())
-                    {
-                        case CloudStatusWatcher::Online:
-                            return d->loggedInMenu;
-                        case CloudStatusWatcher::Offline:
-                            return d->offlineMenu;
-                        default:
-                            return nullptr;
-                    }
-                }();
-
-            if (!menu)
-                return;
-
-            QnHiDpiWorkarounds::showMenu(menu,
-                QnHiDpiWorkarounds::safeMapToGlobal(this, rect().bottomLeft()));
-        };
-
-    connect(this, &QnCloudStatusPanel::clicked, this, showMenu);
-
-    QMenu* mockMenu = new QMenu(this);
-    setMenu(mockMenu);
-    connect(mockMenu, &QMenu::aboutToShow, this, showMenu);
+        });
 
     d->updateUi();
 }
@@ -130,6 +114,7 @@ QSize QnCloudStatusPanel::minimumSizeHint() const
     base = nx::vms::client::core::Geometry::dilated(base, contentsMargins());
     if (base.width() < kMinimumPanelWidth)
         base.setWidth(kMinimumPanelWidth);
+
     return base;
 }
 
@@ -138,7 +123,46 @@ QSize QnCloudStatusPanel::sizeHint() const
     auto base = base_type::sizeHint();
     if (base.width() < kMinimumPanelWidth)
         base.setWidth(kMinimumPanelWidth);
+
     return base;
+}
+
+void QnCloudStatusPanel::resizeEvent(QResizeEvent* event)
+{
+    base_type::resizeEvent(event);
+
+    d_ptr->loggedInMenu->setFixedWidth(event->size().width());
+    d_ptr->offlineMenu->setFixedWidth(event->size().width());
+}
+
+void QnCloudStatusPanel::paintEvent(QPaintEvent* event)
+{
+    base_type::paintEvent(event);
+
+    if (!static_cast<base_type*>(this)->menu())
+        return;
+
+    QPainter painter{this};
+
+    QIcon icon = qnSkin->icon(isDown() ? "titlebar/arrow_close.svg" : "titlebar/arrow_open.svg");
+    icon.paint(
+        &painter,
+        QRect{width() - kMenuIconWidth - kSideMargin, 0, kMenuIconWidth, height()});
+}
+
+void QnCloudStatusPanel::mousePressEvent(QMouseEvent* e)
+{
+    if (d_ptr->isPressed)
+        return;
+
+    d_ptr->isPressed = true;
+
+    // While the menu is opened the event loop is running in this function.
+    base_type::mousePressEvent(e);
+
+    // This workaround is required to support the behaviour when button click closes opened menu
+    // instead opening it again.
+    executeLater([this]{ d_ptr->isPressed = false; }, this);
 }
 
 QnCloudStatusPanelPrivate::QnCloudStatusPanelPrivate(QnCloudStatusPanel* parent):
@@ -189,31 +213,38 @@ void QnCloudStatusPanelPrivate::updateUi()
     if (effectiveUserName.isEmpty())
         effectiveUserName = QnCloudStatusPanel::tr("Logging in...");
 
-    switch (qnCloudStatusWatcher->status())
+    const auto cloudStatus = qnCloudStatusWatcher->status();
+    switch (cloudStatus)
     {
         case CloudStatusWatcher::LoggedOut:
             q->setText(QString());
             q->setIcon(loggedOutIcon);
             q->setToolButtonStyle(Qt::ToolButtonIconOnly);
-            q->setPopupMode(QToolButton::DelayedPopup);
+            q->setMenu(nullptr);
             break;
         case CloudStatusWatcher::Online:
             q->setText(effectiveUserName);
             q->setIcon(loggedInIcon);
             q->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-            q->setPopupMode(QToolButton::MenuButtonPopup);
+            q->setMenu(loggedInMenu);
             break;
         case CloudStatusWatcher::Offline:
             q->setText(effectiveUserName);
             q->setIcon(offlineIcon);
             q->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-            q->setPopupMode(QToolButton::MenuButtonPopup);
+            q->setMenu(offlineMenu);
             break;
         default:
             NX_ASSERT(false, "Should never get here.");
             break;
     }
     q->adjustIconSize();
+
+    q->setContentsMargins(
+        kSideMargin,
+        0,
+        kSideMargin + (cloudStatus == CloudStatusWatcher::LoggedOut ? 0 : kMenuIconWidth),
+        0);
 }
 
 #ifdef DIRECT_CLOUD_CONNECT
