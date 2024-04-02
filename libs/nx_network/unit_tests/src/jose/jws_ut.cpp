@@ -108,10 +108,15 @@ TEST_F(JoseJws, altered_token_cannot_be_verified)
     TokenEncodeResult signResult = whenEncodeAndSignToken(
         expectedToken.header.typ, expectedToken.payload, kp.priv);
 
-    // Alter the token.
-    ++nx::utils::random::choice(signResult.encodedAndSignedToken);
+    std::string tmp(signResult.encodedAndSignedToken);
 
-    ASSERT_FALSE(verifyToken(signResult.encodedAndSignedToken, kp.pub));
+    // Alter the token.
+    // NOTE: Never altering the last character since it may be a base64 padding modifying which
+    // does not actually corrupts the encoded message.
+    const int pos = nx::utils::random::number<int>(0, tmp.size() - 2);
+    ++tmp[pos];
+
+    ASSERT_FALSE(verifyToken(tmp, kp.pub));
 }
 
 TEST_F(JoseJws, decoding_trash_does_not_crash)
