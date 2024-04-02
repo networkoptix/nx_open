@@ -364,8 +364,11 @@ protected:
 
     LookupListData derivedObjectExampleData()
     {
-        LookupListData e1 = bigColumnNumberExampleData();
+        LookupListData e1;
+        e1.id = nx::Uuid::createUuid();
+        e1.name = "Derived";
         e1.objectTypeId = "derived.object.type.1";
+        e1.attributeNames.push_back("Number");
         e1.attributeNames.push_back("Derived Number Attribute");
         e1.entries.push_back({{"Derived Number Attribute", "1"}, {"Number", "9876"}});
         return e1;

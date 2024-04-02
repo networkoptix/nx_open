@@ -45,7 +45,7 @@ ModalDialog
         for(let i = 0; i < objectTypes.length; ++i)
         {
             if (objectTypes[i].attributes.length === 0)
-                return
+                continue
 
             // Add spaces in beginning of text, to indicate the level in hierarchy.
             result.push({value: objectTypes[i], text: ("  ").repeat(currentLevel) + objectTypes[i].name})
