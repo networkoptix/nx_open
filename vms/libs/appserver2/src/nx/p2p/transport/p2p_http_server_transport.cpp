@@ -40,6 +40,7 @@ P2PHttpServerTransport::P2PHttpServerTransport(
     bindToAioThread(m_sendSocket->getAioThread());
     m_sendSocket->setNonBlockingMode(true);
     m_sendSocket->setRecvTimeout(0);
+    m_sendSocket->setSendTimeout(0);
     m_sendBuffer.reserve(kBufferSize);
     m_sendChannelReadBuffer.reserve(kBufferSize);
     m_readBuffer.reserve(kBufferSize);
@@ -127,7 +128,8 @@ void P2PHttpServerTransport::initiatePingPong()
                         return;
 
                     NX_DEBUG(this, "Closing connection because there was no answer to ping");
-                    setFailedState(SystemError::connectionAbort);
+                    setFailedState(SystemError::connectionAbort,
+                        "Closing connection because there was no answer to ping");
                 });
         });
 }
@@ -173,10 +175,13 @@ void P2PHttpServerTransport::setPingTimeout(std::optional<std::chrono::milliseco
     s_pingTimeout = pingTimeout;
 }
 
-void P2PHttpServerTransport::setFailedState(SystemError::ErrorCode errorCode)
+void P2PHttpServerTransport::setFailedState(
+    SystemError::ErrorCode errorCode,
+    const QString& message)
 {
     NX_DEBUG(this, "Going to failed state");
     m_failed = true;
+    m_lastErrorMessage = message;
     if (m_userReadHandlerPair)
     {
         auto userReadHandlerPair = std::move(m_userReadHandlerPair);
@@ -190,7 +195,8 @@ void P2PHttpServerTransport::onReadFromSendSocket(
 {
     if (error != SystemError::noError || transferred == 0)
     {
-        setFailedState(error);
+        setFailedState(error, NX_FMT("Reading from send socket failed. "
+            "Error: %1, transferred: %2", error, transferred));
     }
     else
     {
@@ -219,7 +225,8 @@ void P2PHttpServerTransport::onRead(SystemError::ErrorCode error, size_t transfe
         NX_DEBUG(
             this, "%1: failed. Error: %2, transferred: %3",
             __func__, error, transferred);
-        setFailedState(SystemError::connectionAbort);
+        setFailedState(SystemError::connectionAbort,
+            NX_FMT("Reading from read socket failed with error %1. Bytes read = %2", error, transferred));
         return;
     }
 
@@ -254,7 +261,7 @@ void P2PHttpServerTransport::onRead(SystemError::ErrorCode error, size_t transfe
             }
             case nx::network::server::ParserState::failed:
             {
-                setFailedState(SystemError::connectionAbort);
+                setFailedState(SystemError::connectionAbort, "Failed to parse incoming http message");
                 return;
             }
         }
@@ -350,7 +357,9 @@ void P2PHttpServerTransport::onIncomingPost(nx::network::http::Request request)
                 if (error != SystemError::noError || transferred <= 0)
                 {
                     NX_VERBOSE(this, "Response to POST failed");
-                    setFailedState(error);
+                    setFailedState(error, NX_FMT(
+                        "Response to POST failed, errorCode: %1, bytes transfered: %2",
+                        error, transferred));
                 }
                 else if (NX_ASSERT(m_userReadHandlerPair))
                 {
@@ -376,7 +385,10 @@ void P2PHttpServerTransport::onIncomingPost(nx::network::http::Request request)
                     error, transferred);
 
                 if (error != SystemError::noError || transferred <= 0)
-                    setFailedState(error);
+                {
+                    setFailedState(error, NX_FMT("Response to POST (ping or pong) failed. "
+                        "Error: %1, transferred: %2", error, transferred));
+                }
             });
     }
 
@@ -472,7 +484,10 @@ void P2PHttpServerTransport::sendNextMessage()
                 nx::format("Send completed. error: %1, transferred: %2").args(error, transferred));
 
             if (error != SystemError::noError || transferred == 0)
-                setFailedState(error);
+            {
+                setFailedState(error,
+                    NX_FMT("Sending data via send socket failed with error %1", error));
+            }
 
             resetBuffer(&m_sendBuffer);
             utils::InterruptionFlag::Watcher watcher(&m_destructionFlag);
@@ -590,6 +605,11 @@ void P2PHttpServerTransport::stopWhileInAioThread()
     m_timer.cancelSync();
     m_sendSocket.reset();
     m_readSocket.reset();
+}
+
+QString P2PHttpServerTransport::lastErrorMessage() const
+{
+    return m_lastErrorMessage;
 }
 
 } // namespace nx::network
