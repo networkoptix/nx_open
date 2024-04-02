@@ -73,6 +73,7 @@ Button
                 return
 
             control.text = model.headerData(index, Qt.Horizontal)
+            updateCheckState()
         }
 
         onDataChanged: updateCheckState()

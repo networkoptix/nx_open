@@ -99,7 +99,7 @@ Control
                 return control.value
             }
 
-            placeholderText: control.value ? control.value : qsTr("Any %1").arg(attribute.name)
+            placeholderText: control.value ? control.value : qsTr("Any %1").arg(attribute ? attribute.name : "value")
 
             Connections
             {

@@ -427,6 +427,7 @@ void LookupListEntriesModel::update()
 {
     beginResetModel();
     endResetModel();
+    emit rowCountChanged();
 }
 
 } // namespace nx::vms::client::desktop
