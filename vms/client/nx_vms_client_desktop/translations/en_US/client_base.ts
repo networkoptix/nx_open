@@ -4245,6 +4245,18 @@ License Key: %2</source>
         <source>These settings apply only to the system you are logged in. They will be removed in future versions.</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Save user</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter your account password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnPtzManageDialog</name>
