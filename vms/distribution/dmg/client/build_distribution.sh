@@ -90,6 +90,20 @@ copyHelpFiles()
     fi
 }
 
+copyMetadata()
+{
+    echo "Copying metadata"
+
+    local -r metadataDir="${APP_DIR}/SharedSupport/metadata"
+
+    mkdir -p "${metadataDir}"
+
+    cp "${DISTRIBUTION_OUTPUT_DIR}/build_info.txt" "${metadataDir}"
+    cp "${DISTRIBUTION_OUTPUT_DIR}/build_info.json" "${metadataDir}"
+    cp "${DISTRIBUTION_OUTPUT_DIR}/conan_refs.txt" "${metadataDir}"
+}
+
+
 buildDistribution()
 {
     mv "$SRC/client.app" "$APP_DIR"
@@ -108,6 +122,7 @@ buildDistribution()
     copyResources
     copyTranslations
     copyHelpFiles
+    copyMetadata
 
     if [ $CODE_SIGNING = true ]
     then

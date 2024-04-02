@@ -27,5 +27,6 @@ QUICK_START_GUIDE_FILE="@quick_start_guide_directory@/@quick_start_guide_file_na
 PYTHON="@PYTHON_EXECUTABLE@"
 VMS_DISTRIBUTION_COMMON_DIR="@vms_distribution_common_dir@"
 MOBILE_HELP_FILE="@mobile_help_directory@/@mobile_help_file_name@"
+DISTRIBUTION_OUTPUT_DIR="@distribution_output_dir@"
 
 ZIP_COMPRESSION_LEVEL=@zip_compression_level@
