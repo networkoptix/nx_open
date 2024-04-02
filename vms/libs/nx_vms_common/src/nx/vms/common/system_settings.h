@@ -11,13 +11,13 @@
 
 #include <common/common_globals.h>
 #include <core/resource/resource_fwd.h>
+#include <nx/utils/impl_ptr.h>
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/url.h>
 #include <nx/vms/api/data/client_update_settings.h>
 #include <nx/vms/common/system_context_aware.h>
 #include <nx/vms/common/update/persistent_update_storage.h>
 #include <utils/email/email_fwd.h>
-#include <nx/utils/impl_ptr.h>
 
 class QSettings;
 class QnAbstractResourcePropertyAdaptor;
@@ -30,6 +30,7 @@ struct LdapSettings;
 struct ResourceParamWithRefData;
 struct SystemSettings;
 struct WatermarkSettings;
+enum class ProxyConnectionAccessPolicy;
 
 } // nx::vms::api
 
@@ -351,6 +352,9 @@ public:
     void setRtpFrameTimeoutMs(int newValue);
 
     std::chrono::seconds proxyConnectTimeout() const;
+
+    nx::vms::api::ProxyConnectionAccessPolicy proxyConnectionAccessPolicy() const;
+    void setProxyConnectionAccessPolicy(nx::vms::api::ProxyConnectionAccessPolicy value);
 
     bool cloudConnectUdpHolePunchingEnabled() const;
     bool cloudConnectRelayingEnabled() const;

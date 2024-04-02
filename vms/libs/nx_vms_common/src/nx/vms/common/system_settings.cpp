@@ -5,11 +5,9 @@
 #include <chrono>
 
 #include <api/resource_property_adaptor.h>
+#include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
-#include <core/resource/user_resource.h>
-#include <nx_ec/abstract_ec_connection.h>
-#include <nx_ec/managers/abstract_misc_manager.h>
 #include <nx/branding.h>
 #include <nx/build_info.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
@@ -24,7 +22,10 @@
 #include <nx/vms/api/data/resource_data.h>
 #include <nx/vms/api/data/system_settings.h>
 #include <nx/vms/api/data/watermark_settings.h>
+#include <nx/vms/api/types/proxy_connection_access_policy.h>
 #include <nx/vms/common/system_context.h>
+#include <nx_ec/abstract_ec_connection.h>
+#include <nx_ec/managers/abstract_misc_manager.h>
 #include <utils/email/email.h>
 
 using namespace std::chrono;
@@ -119,6 +120,7 @@ struct SystemSettings::Private
     QnResourcePropertyAdaptor<int>* ec2AliveUpdateIntervalAdaptor = nullptr;
     /** seconds */
     QnResourcePropertyAdaptor<int>* proxyConnectTimeoutAdaptor = nullptr;
+    QnResourcePropertyAdaptor<nx::vms::api::ProxyConnectionAccessPolicy>* proxyConnectionAccessPolicyAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* takeCameraOwnershipWithoutLock = nullptr;
 
     // set of cloud adaptors
@@ -377,6 +379,12 @@ SystemSettings::AdaptorList SystemSettings::initConnectionAdaptors()
         [](auto v) { return v >= 1 && v <= 60 * 60; }, this,
         [] { return tr("Proxy connection timeout (seconds, 1s-1h)"); });
     ec2Adaptors << d->proxyConnectTimeoutAdaptor;
+
+    d->proxyConnectionAccessPolicyAdaptor =
+        new QnReflectLexicalResourcePropertyAdaptor<nx::vms::api::ProxyConnectionAccessPolicy>(
+            "proxyConnectionAccessPolicy", nx::vms::api::ProxyConnectionAccessPolicy::disabled, this,
+            [] { return tr("Proxy connection access policy"); });
+    ec2Adaptors << d->proxyConnectionAccessPolicyAdaptor;
 
     for (auto adaptor: ec2Adaptors)
     {
@@ -2027,6 +2035,16 @@ void SystemSettings::setMaxVirtualCameraArchiveSynchronizationThreads(int newVal
 std::chrono::seconds SystemSettings::proxyConnectTimeout() const
 {
     return std::chrono::seconds(d->proxyConnectTimeoutAdaptor->value());
+}
+
+api::ProxyConnectionAccessPolicy SystemSettings::proxyConnectionAccessPolicy() const
+{
+    return d->proxyConnectionAccessPolicyAdaptor->value();
+}
+
+void SystemSettings::setProxyConnectionAccessPolicy(api::ProxyConnectionAccessPolicy value)
+{
+    d->proxyConnectionAccessPolicyAdaptor->setValue(value);
 }
 
 bool SystemSettings::cloudConnectUdpHolePunchingEnabled() const
