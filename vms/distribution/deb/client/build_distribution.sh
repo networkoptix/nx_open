@@ -433,14 +433,9 @@ buildDistribution()
     local FILE
 
     echo "Prepare stage directory"
-    mkdir -p "$STAGE_MODULE/"
+    mkdir -p "${STAGE_MODULE}/"
 
-    echo "Copying build_info.txt"
-    cp "$DISTRIBUTION_OUTPUT_DIR/build_info.txt" "$STAGE_MODULE/"
-
-    echo "Copying build_info.json"
-    cp "$DISTRIBUTION_OUTPUT_DIR/build_info.json" "$STAGE_MODULE/"
-
+    distrib_copyMetadata
     copyBins
     copyIcons
     copyHelpFiles
