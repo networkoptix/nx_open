@@ -303,8 +303,21 @@ ModalDialog
 
         onClicked:
         {
-            dialog.deleteRequested()
-            dialog.reject()
+            const result = MessageBox.exec(
+                MessageBox.Icon.Question,
+                qsTr("Delete List?"),
+                qsTr("Deleting the list will erase all the data inside it."),
+                MessageBox.Cancel,
+                {
+                    text: qsTr("Delete"),
+                    role: MessageBox.AcceptRole
+                });
+
+            if (result !== MessageBox.Cancel)
+            {
+                dialog.deleteRequested()
+                dialog.reject()
+            }
         }
     }
 }
