@@ -81,6 +81,8 @@ ModalDialog
                                 delete entry[modelData]
                             updateAddButton()
                         }
+
+                        Component.onCompleted: startEditing()
                     }
                 }
             }
