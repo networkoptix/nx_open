@@ -25,6 +25,16 @@ CheckableTableView
     columnSpacing: 0
     rowSpacing: 0
 
+    ScrollBar.horizontal: ScrollBar
+    {
+        policy: ScrollBar.AsNeeded
+    }
+
+    columnWidthProvider: function (column)
+    {
+        return column ? Math.max(100, columnWidth(column)) : 35
+    }
+
     horizontalHeaderVisible: true
     horizontalHeaderEnabled: !editing
 
@@ -54,7 +64,6 @@ CheckableTableView
         {
             Rectangle
             {
-                implicitWidth: Math.max(124, delegateItem.implicitWidth)
                 implicitHeight: 28
                 color: ColorTheme.colors.dark7
                 required property bool selected
