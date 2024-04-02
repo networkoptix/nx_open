@@ -519,7 +519,8 @@ void CloudStatusWatcher::Private::onAccessTokenIssued(
 
     if (result != ResultCode::ok)
     {
-        if (grantType == GrantType::refresh_token && result == ResultCode::notAuthorized)
+        if (grantType == GrantType::refresh_token
+            && (result == ResultCode::notAuthorized || result == ResultCode::badUsername))
         {
             m_authData = {};
             setStatus(CloudStatusWatcher::LoggedOut, CloudStatusWatcher::InvalidPassword);
@@ -584,7 +585,9 @@ void CloudStatusWatcher::Private::issueAccessToken()
 
     auto callback =
         [this, grant = request.grant_type](ResultCode result, IssueTokenResponse response)
-        { onAccessTokenIssued(result, std::move(response), grant); };
+        {
+            onAccessTokenIssued(result, std::move(response), grant);
+        };
 
     m_tokenUpdater->issueToken(request, std::move(callback), this);
 }
