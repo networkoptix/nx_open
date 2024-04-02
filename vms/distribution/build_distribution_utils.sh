@@ -840,3 +840,22 @@ distrib_prepareToBuildDistribution() # work_dir log_file "$@"
         distrib_redirectOutputToLog "$LOG_FILE"
     fi
 }
+
+# [in] STAGE_MODULE
+# [in] DISTRIBUTION_OUTPUT_DIR
+#
+distrib_copyMetadata() {
+    echo "Copying metadata"
+
+    local -r metadataDir="${STAGE_MODULE}/metadata"
+
+    mkdir -p "${metadataDir}"
+
+    # Copy these files to two places for the compatibility reasons.
+    cp "${DISTRIBUTION_OUTPUT_DIR}/build_info.txt" "${STAGE_MODULE}"
+    cp "${DISTRIBUTION_OUTPUT_DIR}/build_info.json" "${STAGE_MODULE}"
+
+    cp "${DISTRIBUTION_OUTPUT_DIR}/build_info.txt" "${metadataDir}"
+    cp "${DISTRIBUTION_OUTPUT_DIR}/build_info.json" "${metadataDir}"
+    cp "${DISTRIBUTION_OUTPUT_DIR}/conan_refs.txt" "${metadataDir}"
+}
