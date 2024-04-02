@@ -99,7 +99,7 @@ public:
     virtual bool isIncoming() const override { return m_direction == Direction::incoming;  }
     virtual std::multimap<QString, QString> httpQueryParams() const override;
 
-    virtual void setState(State state);
+    virtual void setState(State state, const QString& reason);
     State state() const;
 
     /**
