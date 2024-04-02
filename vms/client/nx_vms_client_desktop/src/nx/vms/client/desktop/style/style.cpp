@@ -66,7 +66,6 @@
 #include <ui/common/indents.h>
 #include <ui/common/palette.h>
 #include <ui/dialogs/common/dialog.h>
-#include <ui/widgets/cloud_status_panel.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
 #include <ui/workaround/hidpi_workarounds.h>
 #include <utils/common/delayed.h>
@@ -1518,12 +1517,6 @@ void Style::drawPrimitive(PrimitiveElement element,
                         default:
                             break;
                     }
-                }
-                else if (qobject_cast<const QnCloudStatusPanel*>(widget))
-                {
-                    QIcon icon = qnSkin->icon("titlebar/cloud_dropdown.svg");
-                    icon.paint(painter, option->rect);
-                    return;
                 }
             }
 
