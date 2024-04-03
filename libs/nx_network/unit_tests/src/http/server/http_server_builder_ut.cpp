@@ -16,6 +16,22 @@
 
 namespace nx::network::http::server::test {
 
+namespace {
+
+class TestRequestHandler:
+    public AbstractRequestHandler
+{
+public:
+    virtual void serve(
+        network::http::RequestContext /*requestContext*/,
+        nx::utils::MoveOnlyFunc<void(network::http::RequestResult)> handler) override
+    {
+        handler(StatusCode::noContent);
+    }
+};
+
+} // namespace
+
 class HttpServerBuilder:
     public ::testing::Test,
     public nx::utils::test::TestWithTemporaryDirectory
@@ -32,7 +48,7 @@ public:
     void buildServer()
     {
         SystemError::ErrorCode err = SystemError::noError;
-        std::tie(m_server, err) = Builder::build(settings(), /*request handler*/ nullptr);
+        std::tie(m_server, err) = Builder::build(settings(), &m_requestHandler);
         ASSERT_EQ(SystemError::noError, err) << SystemError::toString(err);
         ASSERT_NE(nullptr, m_server);
     }
@@ -159,6 +175,7 @@ private:
 
 private:
     Settings m_settings;
+    TestRequestHandler m_requestHandler;
     std::unique_ptr<MultiEndpointServer> m_server;
     HttpClient m_client{ssl::kAcceptAnyCertificate};
     ssl::X509Name m_issuer;
@@ -237,10 +254,10 @@ TEST_F(HttpServerBuilder, multiple_listeners_on_the_same_local_port)
     assertListenersAreDistributedAcrossAioThreadPool();
 }
 
-TEST_F(HttpServerBuilder, extra_response_headers)
+TEST_F(HttpServerBuilder, extra_success_response_headers)
 {
-    settings().extraResponseHeaders.emplace(header::Server::NAME, compatibilityServerName());
-    settings().extraResponseHeaders.emplace("Hello", "World");
+    settings().extraSuccessResponseHeaders.emplace(header::Server::NAME, compatibilityServerName());
+    settings().extraSuccessResponseHeaders.emplace("Hello", "World");
 
     buildServer();
     ASSERT_TRUE(server().listen());

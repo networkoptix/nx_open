@@ -91,7 +91,7 @@ void Settings::loadSsl(const SettingsReader& settings0)
 
 void Settings::loadHeaders(const SettingsReader& settings)
 {
-    static constexpr char kHeaders[] = "extraResponseHeaders";
+    static constexpr char kHeaders[] = "extraSuccessResponseHeaders";
 
     if (!settings.containsGroup(kHeaders))
         return;
@@ -100,7 +100,7 @@ void Settings::loadHeaders(const SettingsReader& settings)
     for (const auto& arg : args)
     {
         insertOrReplaceHeader(
-            &extraResponseHeaders,
+            &extraSuccessResponseHeaders,
             HttpHeader{arg.first.toStdString(), arg.second.toStdString()});
     }
 }
