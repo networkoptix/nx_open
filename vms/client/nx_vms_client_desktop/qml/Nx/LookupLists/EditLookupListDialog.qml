@@ -74,7 +74,7 @@ ModalDialog
             const attributeName = prefix ? prefix + "." + attribute.name : attribute.name
             attributesModel.append({
                 text: attributeName,
-                checked: model.attributeNames.indexOf(attributeName) >= 0
+                checked: model.attributeNames.indexOf(attributeName) >= 0 && editMode
             })
             if (attribute.type === Analytics.Attribute.Type.attributeSet)
             {
@@ -86,6 +86,7 @@ ModalDialog
     function populateAttributesModel()
     {
         attributesModel.clear()
+        attributesSelector.selectionState = AnalyticsObjectAttributesSelector.SelectionState.Partial
         if (model.isGeneric)
             return
 
@@ -245,6 +246,8 @@ ModalDialog
 
             AnalyticsObjectAttributesSelector
             {
+                id: attributesSelector
+
                 Layout.fillWidth: true
                 visible: !model.isGeneric && attributesModel.count
                 model: attributesModel
