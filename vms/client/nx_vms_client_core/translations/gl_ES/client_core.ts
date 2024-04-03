@@ -178,7 +178,7 @@
     <message>
       <source>Connection to %1 is not ready yet. Check the server&apos;s internet connection or try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connection to %1 is not ready yet. Check the server&apos;s internet connection or try again later.</translation>
+      <translation>A conexión a %1 aínda non está lista. Comproba a conexión a Internet do servidor&apos; ou téntao de novo máis tarde.</translation>
     </message>
     <message>
       <source>Connection failed</source>
@@ -195,16 +195,16 @@
     <message>
       <source>To log in to this System, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</source>
       <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation type="unfinished">To log in to this System, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</translation>
+      <translation>Para iniciar sesión neste sistema, desactiva &quot;Solicita un código de verificación en cada inicio de sesión coa túa %1 conta&quot; no teu %2.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::core::AbstractAttributedEventModel</name>
     <message numerus="yes">
       <source>+%n values</source>
-      <translation type="unfinished">
-        <numerusform>+%n values</numerusform>
-        <numerusform>+%n values</numerusform>
+      <translation>
+        <numerusform>+%n valores</numerusform>
+        <numerusform>+%n valores</numerusform>
       </translation>
     </message>
   </context>
@@ -212,7 +212,7 @@
     <name>nx::vms::client::core::AnalyticsSearchListModel</name>
     <message>
       <source>Unknown track</source>
-      <translation type="unfinished">Unknown track</translation>
+      <translation>Pista descoñecida</translation>
     </message>
     <message>
       <source>deleted camera</source>
@@ -258,7 +258,7 @@
     </message>
     <message>
       <source>This might be due to an expired server certificate or or an invalid certificate. Contact your system administrator for further investigation.</source>
-      <translation type="unfinished">This might be due to an expired server certificate or or an invalid certificate. Contact your system administrator for further investigation.</translation>
+      <translation>Isto pode deberse a un certificado de servidor caducado ou a un certificado non válido. Ponte en contacto co administrador do sistema para máis información.</translation>
     </message>
     <message>
       <source>To learn more about the current problem read this %1.</source>
@@ -281,30 +281,30 @@
     <name>nx::vms::client::core::EventSearchUtils</name>
     <message>
       <source>Last day</source>
-      <translation type="unfinished">Last day</translation>
+      <translation>Último día</translation>
     </message>
     <message>
       <source>Last 7 days</source>
-      <translation type="unfinished">Last 7 days</translation>
+      <translation>Últimos 7 días</translation>
     </message>
     <message>
       <source>Last 30 days</source>
-      <translation type="unfinished">Last 30 days</translation>
+      <translation>Últimos 30 días</translation>
     </message>
     <message>
       <source>Any time</source>
-      <translation type="unfinished">Any time</translation>
+      <translation>En calquera momento</translation>
     </message>
     <message>
       <source>Any</source>
-      <translation type="unfinished">Any</translation>
+      <translation>Calquera</translation>
     </message>
     <message numerus="yes">
       <source>%n Cameras</source>
       <comment>%n is a number of cameras</comment>
-      <translation type="unfinished">
-        <numerusform>%n Cameras</numerusform>
-        <numerusform>%n Cameras</numerusform>
+      <translation>
+        <numerusform>%n Cámaras</numerusform>
+        <numerusform>%n Cámaras</numerusform>
       </translation>
     </message>
   </context>
@@ -312,45 +312,45 @@
     <name>nx::vms::client::core::ExtendedOutputCameraButtonController</name>
     <message>
       <source>Heater</source>
-      <translation type="unfinished">Heater</translation>
+      <translation>Quentador</translation>
     </message>
     <message>
       <source>Wiper</source>
-      <translation type="unfinished">Wiper</translation>
+      <translation>Limpador</translation>
     </message>
     <message>
       <source>Open Door</source>
-      <translation type="unfinished">Open Door</translation>
+      <translation>Porta aberta</translation>
     </message>
     <message>
       <source>Stop Object Tracking</source>
-      <translation type="unfinished">Stop Object Tracking</translation>
+      <translation>Deter o seguimento de obxectos</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::core::SoftwareTriggerCameraButtonController</name>
     <message>
       <source>Press and hold to</source>
-      <translation type="unfinished">Press and hold to</translation>
+      <translation>Premer e manter para</translation>
     </message>
     <message>
       <source>press and hold</source>
-      <translation type="unfinished">press and hold</translation>
+      <translation>premer e manter</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::core::TwoWayAudioCameraButtonController</name>
     <message>
       <source>Unmute</source>
-      <translation type="unfinished">Unmute</translation>
+      <translation>Cancelar silencio</translation>
     </message>
     <message>
       <source>Mute</source>
-      <translation type="unfinished">Mute</translation>
+      <translation>Silenciar</translation>
     </message>
     <message>
       <source>Press and hold to speak</source>
-      <translation type="unfinished">Press and hold to speak</translation>
+      <translation>Premer e manter para falar</translation>
     </message>
   </context>
 </TS>
