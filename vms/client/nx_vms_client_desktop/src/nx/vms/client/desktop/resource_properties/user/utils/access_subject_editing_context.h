@@ -113,9 +113,6 @@ public:
 
     nx::core::access::ResourceAccessMap ownResourceAccessMap() const;
 
-    bool hasOwnAccessRight(
-        const nx::Uuid& resourceOrGroupId, nx::vms::api::AccessRight accessRight) const;
-
     /** Overrides current subject access rights. */
     void setOwnResourceAccessMap(const nx::core::access::ResourceAccessMap& resourceAccessMap);
 
