@@ -169,10 +169,6 @@ ExportMediaValidator::Results ExportMediaValidator::validateSettings(
 ExportMediaValidator::Results ExportMediaValidator::validateSettings(
     const ExportLayoutSettings& settings, QnLayoutResourcePtr layout)
 {
-    auto systemContext = SystemContext::fromResource(layout);
-    if (!NX_ASSERT(systemContext))
-        return {};
-
     Results results;
 
     const auto isExecutable = FileExtensionUtils::isExecutable(settings.fileName.extension);
@@ -183,6 +179,10 @@ ExportMediaValidator::Results ExportMediaValidator::validateSettings(
     {
         const auto resource = getResourceByDescriptor(item.resource);
         if (!resource)
+            continue;
+
+        auto systemContext = SystemContext::fromResource(resource);
+        if (!NX_ASSERT(systemContext))
             continue;
 
         if (!systemContext->accessController()->hasPermissions(resource, Qn::ExportPermission))
@@ -203,10 +203,6 @@ ExportMediaValidator::Results ExportMediaValidator::validateSettings(
             results.set(int(Result::nonCameraResources));
             continue;
         }
-
-        auto systemContext = SystemContext::fromResource(resource);
-        if (!NX_ASSERT(systemContext))
-            continue;
 
         const auto loader = systemContext->cameraDataManager()->loader(mediaResource, false);
         const auto durationMs = loader
