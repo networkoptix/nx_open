@@ -186,7 +186,7 @@
     <message>
       <source>Connection to %1 is not ready yet. Check the server&apos;s internet connection or try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connection to %1 is not ready yet. Check the server&apos;s internet connection or try again later.</translation>
+      <translation>A conexión a %1 aínda non está lista. Comproba a conexión a Internet do servidor&apos; ou téntao de novo máis tarde.</translation>
     </message>
     <message>
       <source>Log in as a %1 user to the system in a shutdown state is forbidden. You can still connect as local user.</source>
@@ -201,7 +201,7 @@
     <message>
       <source>To log in to this System, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</source>
       <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation type="unfinished">To log in to this System, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</translation>
+      <translation>Para iniciar sesión neste sistema, desactiva &quot;Solicita un código de verificación en cada inicio de sesión coa túa %1 conta&quot; no teu %2.</translation>
     </message>
     <message>
       <source>The server&apos;s certificate was rejected.</source>

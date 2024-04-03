@@ -4196,6 +4196,18 @@ Khóa giấy phép: %2</translation>
       <source>These settings apply only to the system you are logged in. They will be removed in future versions.</source>
       <translation>Các cài đặt này chỉ áp dụng cho hệ thống bạn đã đăng nhập. Chúng sẽ bị xóa trong các phiên bản sau.</translation>
     </message>
+    <message>
+      <source>Save user</source>
+      <translation type="unfinished">Save user</translation>
+    </message>
+    <message>
+      <source>Enter your account password</source>
+      <translation>Nhập mật khẩu tài khoản của bạn</translation>
+    </message>
+    <message>
+      <source>Save</source>
+      <translation type="unfinished">Save</translation>
+    </message>
   </context>
   <context>
     <name>QnPtzManageDialog</name>

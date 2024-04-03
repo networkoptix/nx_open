@@ -1791,6 +1791,10 @@
       <source>Local System ID, null means the System is not set up yet.</source>
       <translation>Lokalt system-ID, null betyder att systemet inte är konfigurerat ännu.</translation>
     </message>
+    <message>
+      <source>HTTP header: Server, supported variables: $vmsName, $vmsVersion, $company, $compatibility</source>
+      <translation>HTTP-huvud: Server, variabler som stöds: $vmsName, $vmsVersion, $company, $compatibility</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::event::StringsHelper</name>

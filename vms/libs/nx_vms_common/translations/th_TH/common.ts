@@ -1732,6 +1732,10 @@
       <source>Local System ID, null means the System is not set up yet.</source>
       <translation>Local System ID null หมายความว่าระบบยังไม่ได้ตั้งค่า</translation>
     </message>
+    <message>
+      <source>HTTP header: Server, supported variables: $vmsName, $vmsVersion, $company, $compatibility</source>
+      <translation type="unfinished">HTTP header: Server, supported variables: $vmsName, $vmsVersion, $company, $compatibility</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::event::StringsHelper</name>
