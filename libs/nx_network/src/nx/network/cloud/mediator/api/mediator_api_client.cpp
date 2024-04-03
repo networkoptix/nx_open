@@ -119,8 +119,12 @@ ApiResultCodeDescriptor::ResultCode ApiResultCodeDescriptor::systemErrorCodeToRe
 }
 
 ApiResultCodeDescriptor::ResultCode ApiResultCodeDescriptor::getResultCodeFromResponse(
+    const network::http::ApiRequestResult& apiResult,
     const network::http::Response& response)
 {
+    if (apiResult.hasErrorDetail())
+        return static_cast<ApiResultCodeDescriptor::ResultCode>(apiResult.getErrorDetail());
+
     using namespace network::http;
 
     if (StatusCode::isSuccessCode(response.statusLine.statusCode))

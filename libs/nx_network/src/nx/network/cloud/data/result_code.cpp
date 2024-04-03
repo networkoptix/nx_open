@@ -85,4 +85,11 @@ void convert(const Result& result, ApiRequestResult* httpResult)
     }
 }
 
+nx::network::http::ApiRequestResult toApiResult(const Result& result)
+{
+    ApiRequestResult apiResult;
+    convert(result, &apiResult);
+    return apiResult;
+}
+
 } // namespace nx::hpm::api

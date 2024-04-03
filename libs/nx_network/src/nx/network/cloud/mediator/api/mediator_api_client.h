@@ -24,7 +24,7 @@ struct NX_NETWORK_API ApiResultCodeDescriptor
     static ResultCode getResultCode(
         SystemError::ErrorCode systemErrorCode,
         const network::http::Response* response,
-        const network::http::ApiRequestResult& /*fusionRequestResult*/,
+        const network::http::ApiRequestResult& apiResult,
         const Output&...)
     {
         if (systemErrorCode != SystemError::noError)
@@ -33,13 +33,15 @@ struct NX_NETWORK_API ApiResultCodeDescriptor
         if (!response)
             return api::ResultCode::networkError;
 
-        return getResultCodeFromResponse(*response);
+        return getResultCodeFromResponse(apiResult, *response);
     }
 
 private:
     static ResultCode systemErrorCodeToResultCode(SystemError::ErrorCode systemErrorCode);
 
-    static ResultCode getResultCodeFromResponse(const network::http::Response& response);
+    static ResultCode getResultCodeFromResponse(
+        const network::http::ApiRequestResult& apiResult,
+        const network::http::Response& response);
 };
 
 class NX_NETWORK_API Client:

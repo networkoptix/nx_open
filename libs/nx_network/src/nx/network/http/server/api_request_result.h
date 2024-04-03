@@ -39,9 +39,16 @@ static constexpr char kErrorText[] = "errorText";
 class ApiRequestResult : public std::map<std::string, std::string>
 {
 public:
+    bool hasErrorClass() const;
     ApiRequestErrorClass getErrorClass() const;
+
+    bool hasResultCode() const;
     const std::string& getResultCode() const;
+
+    bool hasErrorDetail() const;
     int getErrorDetail() const;
+
+    bool hasErrorText() const;
     const std::string& getErrorText() const;
 
     void setErrorClass(ApiRequestErrorClass errorClass);
@@ -178,26 +185,39 @@ inline nx::network::http::StatusCode::Value ApiRequestResult::calculateHttpStatu
     }
 }
 
+inline bool ApiRequestResult::hasErrorClass() const { return contains(kErrorClass); }
+
 inline ApiRequestErrorClass ApiRequestResult::getErrorClass() const
 {
+    if (!hasErrorClass())
+        return ApiRequestErrorClass::internalError; //< The method shouldn't been called.
+
     ApiRequestErrorClass errorClassVal;
     nx::reflect::fromString(at(kErrorClass), &errorClassVal);
     return errorClassVal;
 }
 
+inline bool ApiRequestResult::hasResultCode() const { return contains(kResultCode); }
+
 inline const std::string& ApiRequestResult::getResultCode() const
 {
-    return at(kResultCode);
+    static const std::string kEmpty;
+    return hasResultCode() ? at(kResultCode) : kEmpty;
 }
+
+inline bool ApiRequestResult::hasErrorDetail() const { return contains(kErrorDetail); }
 
 inline int ApiRequestResult::getErrorDetail() const
 {
-    return std::stoi(at(kErrorDetail));
+    return hasErrorDetail() ? std::stoi(at(kErrorDetail)) : -1;
 }
+
+inline bool ApiRequestResult::hasErrorText() const { return contains(kErrorText); }
 
 inline const std::string& ApiRequestResult::getErrorText() const
 {
-    return at(kErrorText);
+    static const std::string kEmpty;
+    return hasErrorText() ? at(kErrorText) : kEmpty;
 }
 
 inline void ApiRequestResult::setErrorClass(ApiRequestErrorClass errorClass)
