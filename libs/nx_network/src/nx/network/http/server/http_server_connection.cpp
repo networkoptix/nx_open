@@ -79,9 +79,9 @@ void HttpServerConnection::setPersistentConnectionEnabled(bool value)
     m_persistentConnectionEnabled = value;
 }
 
-void HttpServerConnection::setExtraResponseHeaders(HttpHeaders responseHeaders)
+void HttpServerConnection::setExtraSuccessResponseHeaders(HttpHeaders responseHeaders)
 {
-    m_extraResponseHeaders = std::move(responseHeaders);
+    m_extraSuccessResponseHeaders = std::move(responseHeaders);
 }
 
 void HttpServerConnection::setOnResponseSent(
@@ -389,15 +389,20 @@ void HttpServerConnection::addResponseHeaders(
 {
     static constexpr auto kYear = std::chrono::hours(24) * 365;
 
-    for (const auto& hdr : m_extraResponseHeaders)
+    if (StatusCode::isSuccessCode(response->statusLine.statusCode))
     {
-        // Don't replace headers added by the request processors.
-        if (!response->headers.contains(hdr.first))
-            response->headers.insert(hdr);
+        for (const auto& hdr: m_extraSuccessResponseHeaders)
+        {
+            // Don't replace headers added by the request processors.
+            if (!response->headers.contains(hdr.first))
+                response->headers.insert(hdr);
+        }
     }
 
     // ... Except for the Server header. It should be customizable and only added if not present.
-    if (!response->headers.contains(header::Server::NAME))
+    if (!response->headers.contains(header::Server::NAME) &&
+        // if there is an effort to override Server header conditionally, then not defaulting it.
+        !m_extraSuccessResponseHeaders.contains(header::Server::NAME))
     {
         nx::network::http::insertOrReplaceHeader(
             &response->headers,

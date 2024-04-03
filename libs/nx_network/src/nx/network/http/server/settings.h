@@ -77,11 +77,11 @@ public:
     Ssl ssl;
 
     /**
-     * HTTP headers to be included in every response sent by the server. They are parsed
-     * under the "<groupName>/extraResponseHeaders/<headerName>" section of the settings, e.g.
-     * "http/extraResponseHeaders/Server" will add a "Server" header.
+     * HTTP headers to be included in every response with 2xx status reported by the server.
+     * They are parsed under the "<groupName>/extraSuccessResponseHeaders/<headerName>" section of
+     * the settings, e.g. "http/extraSuccessResponseHeaders/Server" will add a "Server" header.
      */
-    HttpHeaders extraResponseHeaders;
+    HttpHeaders extraSuccessResponseHeaders;
 
     void load(const SettingsReader& settings, const char * groupName = "http");
 

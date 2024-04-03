@@ -156,7 +156,7 @@ bool Builder::applySettings(
     }
 
     ctx->server->setTcpBackLogSize(ctx->settings.tcpBacklogSize);
-    ctx->server->setExtraResponseHeaders(ctx->settings.extraResponseHeaders);
+    ctx->server->setExtraSuccessResponseHeaders(ctx->settings.extraSuccessResponseHeaders);
 
     return true;
 }

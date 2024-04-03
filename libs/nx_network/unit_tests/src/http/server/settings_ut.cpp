@@ -25,18 +25,18 @@ private:
 
 TEST_F(HttpServerSettings, load_extraResponseHeaders)
 {
-    addArg("-http/extraResponseHeaders/server", compatibilityServerName());
-    addArg("-http/extraResponseHeaders/other", "other");
+    addArg("-http/extraSuccessResponseHeaders/server", compatibilityServerName());
+    addArg("-http/extraSuccessResponseHeaders/other", "other");
 
     loadSettings();
 
     ASSERT_EQ(
         compatibilityServerName(),
-        httpServerSettings().extraResponseHeaders.find("server")->second);
+        httpServerSettings().extraSuccessResponseHeaders.find("server")->second);
 
     ASSERT_EQ(
         "other",
-        httpServerSettings().extraResponseHeaders.find("other")->second);
+        httpServerSettings().extraSuccessResponseHeaders.find("other")->second);
 }
 
 } // namespace nx::network::http::server::test
