@@ -4247,15 +4247,15 @@ License Key: %2</source>
     </message>
     <message>
         <source>Save user</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Enter your account password</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Save</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -12165,19 +12165,19 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <name>nx::vms::client::desktop::WebPageCertificateDialog</name>
     <message>
         <source>Open this integration?</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Open this web page?</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Integration</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Web Page</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>You try to open the
@@ -12185,7 +12185,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
 but this integration presented an untrusted certificate auth.
 We recommend you not to open this integration. If you understand the risks, you can open the integration.</source>
         <comment>%1 is the integration address</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>You try to open the
@@ -12193,11 +12193,11 @@ We recommend you not to open this integration. If you understand the risks, you 
 but this web page presented an untrusted certificate auth.
 We recommend you not to open this web page. If you understand the risks, you can open the web page.</source>
         <comment>%1 is the web page address</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Connect anyway</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -12824,11 +12824,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::rules::TargetLayoutPicker</name>
     <message>
         <source>Select layout...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message numerus="yes">
         <source>%n layouts</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>%n layout</numerusform>
             <numerusform>%n layouts</numerusform>
         </translation>
