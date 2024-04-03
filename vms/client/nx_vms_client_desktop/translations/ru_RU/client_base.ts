@@ -4346,6 +4346,18 @@ License Key: %2</translation>
       <source>These settings apply only to the system you are logged in. They will be removed in future versions.</source>
       <translation type="unfinished">These settings apply only to the system you are logged in. They will be removed in future versions.</translation>
     </message>
+    <message>
+      <source>Save user</source>
+      <translation>Сохранить пользователя</translation>
+    </message>
+    <message>
+      <source>Enter your account password</source>
+      <translation>Введите пароль своей учетной записи</translation>
+    </message>
+    <message>
+      <source>Save</source>
+      <translation>Сохранить</translation>
+    </message>
   </context>
   <context>
     <name>QnPtzManageDialog</name>

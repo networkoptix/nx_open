@@ -4196,6 +4196,18 @@ License Key: %2</source>
       <source>These settings apply only to the system you are logged in. They will be removed in future versions.</source>
       <translation>これらの設定は、ログインしているシステムにのみ適用されます。また、将来のバージョンでは削除されます。</translation>
     </message>
+    <message>
+      <source>Save user</source>
+      <translation>ユーザーを保存</translation>
+    </message>
+    <message>
+      <source>Enter your account password</source>
+      <translation>アカウントのパスワードを入力してください</translation>
+    </message>
+    <message>
+      <source>Save</source>
+      <translation>保存</translation>
+    </message>
   </context>
   <context>
     <name>QnPtzManageDialog</name>

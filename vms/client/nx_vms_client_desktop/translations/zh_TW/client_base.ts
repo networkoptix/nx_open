@@ -4196,6 +4196,18 @@ License Key: %2</source>
       <source>These settings apply only to the system you are logged in. They will be removed in future versions.</source>
       <translation type="unfinished">These settings apply only to the system you are logged in. They will be removed in future versions.</translation>
     </message>
+    <message>
+      <source>Save user</source>
+      <translation type="unfinished">Save user</translation>
+    </message>
+    <message>
+      <source>Enter your account password</source>
+      <translation>請輸入您的帳號密碼</translation>
+    </message>
+    <message>
+      <source>Save</source>
+      <translation type="unfinished">Save</translation>
+    </message>
   </context>
   <context>
     <name>QnPtzManageDialog</name>

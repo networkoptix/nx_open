@@ -4346,6 +4346,18 @@ Klucz licencyjny: %2</translation>
       <source>These settings apply only to the system you are logged in. They will be removed in future versions.</source>
       <translation>Te ustawienia dotyczą tylko systemu, do którego jesteś zalogowany i zostaną usunięte w przyszłych wersjach.</translation>
     </message>
+    <message>
+      <source>Save user</source>
+      <translation type="unfinished">Save user</translation>
+    </message>
+    <message>
+      <source>Enter your account password</source>
+      <translation>Wprowadź hasło do konta</translation>
+    </message>
+    <message>
+      <source>Save</source>
+      <translation type="unfinished">Save</translation>
+    </message>
   </context>
   <context>
     <name>QnPtzManageDialog</name>

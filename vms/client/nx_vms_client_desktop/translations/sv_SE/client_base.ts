@@ -4246,6 +4246,18 @@ Licensnyckel: %2</translation>
       <source>These settings apply only to the system you are logged in. They will be removed in future versions.</source>
       <translation>Dessa inställningar gäller endast det system du är inloggad på och kommer att tas bort i framtida versioner.</translation>
     </message>
+    <message>
+      <source>Save user</source>
+      <translation>Spara användare</translation>
+    </message>
+    <message>
+      <source>Enter your account password</source>
+      <translation>Ange ditt kontolösenord</translation>
+    </message>
+    <message>
+      <source>Save</source>
+      <translation>Spara</translation>
+    </message>
   </context>
   <context>
     <name>QnPtzManageDialog</name>

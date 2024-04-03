@@ -4246,6 +4246,18 @@ Lisensnøkkel: %2</translation>
       <source>These settings apply only to the system you are logged in. They will be removed in future versions.</source>
       <translation>Disse innstillingene gjelder kun for systemet du er logget på. De vil bli fjernet i fremtidige versjoner.</translation>
     </message>
+    <message>
+      <source>Save user</source>
+      <translation type="unfinished">Save user</translation>
+    </message>
+    <message>
+      <source>Enter your account password</source>
+      <translation>Skriv inn kontopassordet ditt</translation>
+    </message>
+    <message>
+      <source>Save</source>
+      <translation type="unfinished">Save</translation>
+    </message>
   </context>
   <context>
     <name>QnPtzManageDialog</name>

@@ -1732,6 +1732,10 @@
       <source>Local System ID, null means the System is not set up yet.</source>
       <translation>ID hệ thống cục bộ, null có nghĩa là Hệ thống chưa được thiết lập.</translation>
     </message>
+    <message>
+      <source>HTTP header: Server, supported variables: $vmsName, $vmsVersion, $company, $compatibility</source>
+      <translation type="unfinished">HTTP header: Server, supported variables: $vmsName, $vmsVersion, $company, $compatibility</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::event::StringsHelper</name>
