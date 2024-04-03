@@ -274,7 +274,7 @@ Item
                     readonly property bool highlighted:
                     {
                         const context = root.editingContext
-                        if (!context || !relevant || !operationContext)
+                        if (!(context && relevant && operationContext && editingEnabled))
                             return false
 
                         if (accessRight === operationContext.accessRight)
