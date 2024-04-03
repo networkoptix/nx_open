@@ -374,16 +374,21 @@ QVector<ResourceAccessInfo> ResourceAccessRightsModel::Private::calculateInfo() 
     if (!context || context->currentSubjectId().isNull() || !resourceTreeIndex.isValid())
         return result;
 
+    const bool isPowerGroup = api::kAllPowerUserGroupIds.contains(context->currentSubjectId());
     const auto childResources = AccessSubjectEditingContext::getChildResources(resourceTreeIndex);
-    const auto accessMap = context->ownResourceAccessMap();
+    const auto ownAccessMap = context->ownResourceAccessMap();
 
     for (int i = 0; i < count; ++i)
     {
         auto& newInfo = result[i];
         const auto accessRight = accessRightList[i];
-        const bool checked = context->hasOwnAccessRight(item.target.id(), accessRight);
+
+        const bool checked = isPowerGroup //< Predefined power groups have forced access rights.
+            ? context->accessRights(item.target).testFlag(accessRight)
+            : ownAccessMap.value(item.target.id()).testFlag(accessRight);
+
         const bool outerGroupChecked =
-            accessMap.value(item.outerSpecialResourceGroupId).testFlag(accessRight);
+            ownAccessMap.value(item.outerSpecialResourceGroupId).testFlag(accessRight);
 
         if (!item.relevantAccessRights.testFlag(accessRight))
             continue;
@@ -393,9 +398,9 @@ QVector<ResourceAccessInfo> ResourceAccessRightsModel::Private::calculateInfo() 
         newInfo.checkedChildCount = outerGroupChecked
             ? newInfo.totalChildCount
             : std::count_if(childResources.cbegin(), childResources.cend(),
-                [&accessMap, accessRight](const QnResourcePtr& resource)
+                [&ownAccessMap, accessRight](const QnResourcePtr& resource)
                 {
-                    return accessMap.value(resource->getId()).testFlag(accessRight);
+                    return ownAccessMap.value(resource->getId()).testFlag(accessRight);
                 });
 
         newInfo.checkedAndInheritedChildCount = outerGroupChecked
