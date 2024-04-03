@@ -56,5 +56,6 @@ struct NX_NETWORK_API Result
 NX_REFLECTION_INSTRUMENT(Result, (code)(text))
 
 NX_NETWORK_API void convert(const Result& result, nx::network::http::ApiRequestResult* httpResult);
+NX_NETWORK_API nx::network::http::ApiRequestResult toApiResult(const Result& result);
 
 } // nx::hpm::api
