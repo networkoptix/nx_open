@@ -584,13 +584,6 @@ ResourceAccessMap AccessSubjectEditingContext::ownResourceAccessMap() const
     return {};
 }
 
-bool AccessSubjectEditingContext::hasOwnAccessRight(
-    const nx::Uuid& resourceOrGroupId,
-    nx::vms::api::AccessRight accessRight) const
-{
-    return ownResourceAccessMap().value(resourceOrGroupId, {}).testFlag(accessRight);
-}
-
 void AccessSubjectEditingContext::setOwnResourceAccessMap(
     const ResourceAccessMap& resourceAccessMap)
 {
