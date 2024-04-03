@@ -51,7 +51,7 @@ public:
     /**
      * Set some HTTP headers to be included in every response.
      */
-    void setExtraResponseHeaders(HttpHeaders responseHeaders);
+    void setExtraSuccessResponseHeaders(HttpHeaders responseHeaders);
 
     void redirectAllRequestsTo(SocketAddress addressToRedirect);
 
@@ -64,7 +64,7 @@ protected:
 private:
     nx::network::http::AbstractRequestHandler* m_requestHandler = nullptr;
     bool m_persistentConnectionEnabled = true;
-    HttpHeaders m_extraResponseHeaders;
+    HttpHeaders m_extraSuccessResponseHeaders;
 
     mutable nx::Mutex m_mutex;
     nx::network::http::server::RequestStatisticsCalculator m_statsCalculator;

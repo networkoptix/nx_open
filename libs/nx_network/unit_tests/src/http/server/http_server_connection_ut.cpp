@@ -297,9 +297,18 @@ protected:
             .setScheme(urlScheme).setEndpoint(m_httpServer.serverAddress()).setPath(path);
     }
 
-    void setExtraResponseHeaders(HttpHeaders headers)
+    void setExtraSuccessResponseHeaders(HttpHeaders headers)
     {
-        m_httpServer.server().setExtraResponseHeaders(std::move(headers));
+        m_httpServer.server().setExtraSuccessResponseHeaders(std::move(headers));
+    }
+
+    void installRequestHandlerWithEmptyBody()
+    {
+        using namespace std::placeholders;
+
+        m_httpServer.registerRequestProcessorFunc(
+            kTestPath,
+            std::bind(&HttpServerConnection::provideEmptyMessageBody, this, _1, _2));
     }
 
 private:
@@ -322,15 +331,6 @@ private:
     nx::Buffer m_lastSentRequestBody;
     std::vector<std::unique_ptr<TCPSocket>> m_rawConnections;
     nx::utils::test::ScopedTimeShift m_timeShift;
-
-    void installRequestHandlerWithEmptyBody()
-    {
-        using namespace std::placeholders;
-
-        m_httpServer.registerRequestProcessorFunc(
-            kTestPath,
-            std::bind(&HttpServerConnection::provideEmptyMessageBody, this, _1, _2));
-    }
 
     void performRequest(const nx::utils::Url& url, bool reuseConnection = false)
     {
@@ -601,8 +601,9 @@ TEST_F(HttpServerConnection, inactivity_timeout_is_prolonged)
 TEST_F(HttpServerConnection, custom_server_header)
 {
     HttpHeaders responseHeaders {{"Server", compatibilityServerName()}};
-    setExtraResponseHeaders(responseHeaders);
+    setExtraSuccessResponseHeaders(responseHeaders);
 
+    installRequestHandlerWithEmptyBody();
     whenIssuedRequestViaRawTcp();
 
     thenResponseHeaderIs("Server", compatibilityServerName());
@@ -617,13 +618,14 @@ TEST_F(HttpServerConnection, default_server_header)
     thenResponseHeaderIs("Server", serverString());
 }
 
-TEST_F(HttpServerConnection, set_response_headers)
+TEST_F(HttpServerConnection, set_success_response_headers)
 {
     HttpHeaders responseHeaders {
         {"Hello", "World"},
         {"Server", compatibilityServerName()}};
-    setExtraResponseHeaders(responseHeaders);
+    setExtraSuccessResponseHeaders(responseHeaders);
 
+    installRequestHandlerWithEmptyBody();
     whenIssuedRequestViaRawTcp();
 
     thenResponseHeaderIs("Hello", "World");
