@@ -683,7 +683,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>&lt;b&gt;The name &quot;%1&quot; can not be used.&lt;/b&gt;&lt;p&gt;Try using another name, with fewer characters or no punctuations marks.</source>
-      <translation>&lt;b&gt; &quot;%1&quot;という名前は使用できません。 &lt;/b&gt;&lt;p&gt;文字数を減らすか、句読記号を付けずに別の名前を使用してください。</translation>
+      <translation>&lt;b&gt; &quot;%1&quot; という名前は使用できません。&lt;/b&gt;&lt;p&gt;文字数を減らすか、句読点を含まない別の名前を使用してください。</translation>
     </message>
     <message>
       <source>Name</source>
