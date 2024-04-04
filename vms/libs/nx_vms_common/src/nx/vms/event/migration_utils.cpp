@@ -22,6 +22,7 @@ static const std::pair<EventType, QString> eventTypes[] = {
     {EventType::fanErrorEvent, QStringLiteral("nx.events.fanError")},
     {EventType::ldapSyncIssueEvent, QStringLiteral("nx.events.ldapSyncIssue")},
     {EventType::licenseIssueEvent, QStringLiteral("nx.events.licenseIssue")},
+    {EventType::saasIssueEvent, QStringLiteral("nx.events.saasIssue")},
     {EventType::networkIssueEvent, QStringLiteral("nx.events.networkIssue")},
     {EventType::poeOverBudgetEvent, QStringLiteral("nx.events.poeOverBudget")},
     {EventType::serverCertificateError, QStringLiteral("nx.events.serverCertificateError")},

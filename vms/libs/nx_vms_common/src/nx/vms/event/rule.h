@@ -73,6 +73,7 @@ public:
     static RuleList getDefaultRules();
 
     static RuleList getNotificationRules();
+    static RuleList getSaasIssueNotificationRules();
     static RuleList getSystemRules();
     static RuleList getRulesUpd43();
     static RuleList getPluginDiagnosticEventUpdateRules();

@@ -40,6 +40,7 @@ Level levelOf(const EventParameters& params)
         case EventType::networkIssueEvent:
         case EventType::cameraIpConflictEvent:
         case EventType::serverConflictEvent:
+        case EventType::saasIssueEvent:
             return Level::important;
 
         // Red notifications.

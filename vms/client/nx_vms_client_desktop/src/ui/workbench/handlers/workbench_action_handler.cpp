@@ -261,6 +261,8 @@ ActionHandler::ActionHandler(QObject *parent) :
     // TODO: #vkutin #sivanov Remove these actions, use FocusTabRole in action parameters instead.
     connect(action(action::PreferencesLicensesTabAction), &QAction::triggered, this,
         [this] { openSystemAdministrationDialog(QnSystemAdministrationDialog::LicensesPage); });
+    connect(action(action::PreferencesServicesTabAction), &QAction::triggered, this,
+        [this] { openSystemAdministrationDialog(QnSystemAdministrationDialog::SaasInfoPage); });
     connect(action(action::PreferencesSmtpTabAction), &QAction::triggered, this,
         [this] { openSystemAdministrationDialog(QnSystemAdministrationDialog::MailSettingsPage); });
     connect(action(action::PreferencesCloudTabAction), &QAction::triggered, this,

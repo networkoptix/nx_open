@@ -31,6 +31,8 @@
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/utils/widget_utils.h>
+#include <nx/vms/common/saas/saas_service_manager.h>
+#include <nx/vms/common/system_settings.h>
 #include <nx/vms/event/event_fwd.h>
 #include <nx/vms/event/strings_helper.h>
 #include <nx/vms/rules/engine.h>
@@ -130,6 +132,16 @@ EventSearchWidget::Private::Private(EventSearchWidget* q):
         this, updateServerEventsMenuIfNeeded);
     connect(q->resourcePool(), &QnResourcePool::resourceRemoved,
         this, updateServerEventsMenuIfNeeded);
+
+    connect(q->systemContext()->saasServiceManager(),
+        &nx::vms::common::saas::ServiceManager::dataChanged,
+        this,
+        &EventSearchWidget::Private::updateServerEventsMenu);
+
+    connect(q->systemContext()->globalSettings(),
+        &nx::vms::common::SystemSettings::organizationIdChanged,
+        this,
+        &EventSearchWidget::Private::updateServerEventsMenu);
 
     const auto updateAnalyticsMenuIfEventModelIsOnline =
         [this]

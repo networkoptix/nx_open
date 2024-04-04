@@ -258,6 +258,7 @@ TEST_F(BuiltinTypesTest, BuiltinEvents)
     testEventRegistration<ServerStartedEvent>();
     testEventRegistration<SoftTriggerEvent>();
     testEventRegistration<StorageIssueEvent>();
+    testEventRegistration<SaasIssueEvent>();
 }
 
 TEST_F(BuiltinTypesTest, BuiltinActions)

@@ -462,9 +462,14 @@ rest::Handle EventSearchListModel::Private::getEvents(
 
 QString EventSearchListModel::Private::title(const vms::event::EventParameters& parameters) const
 {
-    return parameters.eventType == EventType::analyticsSdkEvent
-        ? m_helper->getAnalyticsSdkEventName(parameters)
-        : m_helper->eventName(parameters.eventType);
+    switch (parameters.eventType)
+    {
+        case EventType::analyticsSdkEvent:
+            return m_helper->getAnalyticsSdkEventName(parameters);
+
+        default:
+            return m_helper->eventName(parameters.eventType);
+    }
 }
 
 QString EventSearchListModel::Private::description(
@@ -502,6 +507,7 @@ QString EventSearchListModel::Private::iconPath(const vms::event::EventParameter
             return "events/connection_red.png";
 
         case EventType::networkIssueEvent:
+        case EventType::saasIssueEvent:
             return "events/alert_yellow.png";
 
         case EventType::cameraIpConflictEvent:
