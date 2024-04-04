@@ -82,7 +82,11 @@ ModalDialog
                             updateAddButton()
                         }
 
-                        Component.onCompleted: startEditing()
+                        Component.onCompleted:
+                        {
+                            if (index === 0)
+                                startEditing()
+                        }
                     }
                 }
             }
