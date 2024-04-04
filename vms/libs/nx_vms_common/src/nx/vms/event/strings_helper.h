@@ -96,6 +96,7 @@ public:
 
     QnResourcePtr eventSource(const EventParameters &params) const;
     QString eventReason(const EventParameters& params) const;
+    QString resourceTypeName(const EventParameters& params) const;
 
     QString eventTimestampInHtml(const EventParameters &params, int aggregationCount) const;
     QString eventTimestampTime(const EventParameters &params) const;
@@ -131,6 +132,12 @@ public:
         EventReason reasonCode,
         std::optional<std::chrono::seconds> syncInterval);
     static QString ldapSyncIssueText(const EventParameters& params);
+
+    static QString servicesDisabledReason(const EventParameters& params);
+    static QString licenseMigrationReason(EventReason reasonCode);
+
+    static QStringList licenseMigrationDetails(
+        const QStringList& licenseKeys, common::SystemContext* context);
 
     QString getAnalyticsSdkEventName(const EventParameters& params,
         const QString& locale = QString()) const;

@@ -17,6 +17,7 @@
 #include "network_issue_event.h"
 #include "plugin_diagnostic_event.h"
 #include "poe_over_budget_event.h"
+#include "saas_issue_event.h"
 #include "server_certificate_error_event.h"
 #include "server_conflict_event.h"
 #include "server_failure_event.h"

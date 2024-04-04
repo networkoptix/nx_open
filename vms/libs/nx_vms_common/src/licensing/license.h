@@ -16,8 +16,8 @@
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/latin1_array.h>
 #include <nx/utils/thread/mutex.h>
-#include <nx/vms/api/data/saas_data.h>
 #include <nx/vms/api/data/license_data.h>
+#include <nx/vms/api/data/saas_data.h>
 #include <nx/vms/common/system_context_aware.h>
 #include <utils/common/id.h>
 
@@ -210,6 +210,7 @@ public:
 
     QnLicenseList getLicenses() const;
     QnLicensePtr findLicense(const QString& key) const;
+    QnLicensePtr findLicense(const std::string& key) const;
 
     void addLicense(const QnLicensePtr& license);
     void addLicenses(const QnLicenseList& licenses);

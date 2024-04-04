@@ -3,18 +3,18 @@
 #include "strings_helper.h"
 
 #include <analytics/common/object_metadata.h>
-#include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_history.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/network_resource.h>
-#include <core/resource/resource_display_info.h>
 #include <core/resource/resource.h>
+#include <core/resource/resource_display_info.h>
 #include <core/resource/user_resource.h>
-#include <nx_ec/abstract_ec_connection.h>
-#include <nx/analytics/taxonomy/abstract_state_watcher.h>
+#include <core/resource_management/resource_pool.h>
+#include <licensing/license.h>
 #include <nx/analytics/taxonomy/abstract_state.h>
+#include <nx/analytics/taxonomy/abstract_state_watcher.h>
 #include <nx/fusion/serialization/json.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/url/url_builder.h>
@@ -30,6 +30,7 @@
 #include <nx/vms/common/user_management/user_management_helpers.h>
 #include <nx/vms/text/human_readable.h>
 #include <nx/vms/time/formatter.h>
+#include <nx_ec/abstract_ec_connection.h>
 #include <utils/common/id.h>
 
 #include "aggregation_info.h"
@@ -169,6 +170,7 @@ QString StringsHelper::eventName(EventType value, int count) const
         case EventType::serverStartEvent:       return tr("Server Started");
         case EventType::ldapSyncIssueEvent:     return tr("LDAP Sync Issue");
         case EventType::licenseIssueEvent:      return tr("License Issue");
+        case EventType::saasIssueEvent:         return tr("Services Issue");
         case EventType::backupFinishedEvent:    return tr("Archive Backup Finished");
         case EventType::analyticsSdkEvent:      return tr("Analytics Event");
         case EventType::analyticsSdkObjectDetected: return tr("Analytics Object Detected");
@@ -262,6 +264,11 @@ QString StringsHelper::eventAtResource(const EventParameters& params,
 
         case EventType::licenseIssueEvent:
             return tr("Server \"%1\" has a license problem").arg(resourceName);
+
+        case EventType::saasIssueEvent:
+            return SaasIssueEvent::isLicenseMigrationIssue(params.reasonCode)
+                ? tr("Server \"%1\" has license migration issue").arg(resourceName)
+                : tr("Service overuse");
 
         case EventType::backupFinishedEvent:
             return tr("Server \"%1\" has finished an archive backup").arg(resourceName);
@@ -424,6 +431,23 @@ QStringList StringsHelper::eventDetails(
         case EventType::backupFinishedEvent:
         {
             result << tr("Reason: %1").arg(eventReason(params));
+            break;
+        }
+
+        case EventType::saasIssueEvent:
+        {
+            result << tr("Reason: %1").arg(eventReason(params));
+            if (SaasIssueEvent::isLicenseMigrationIssue(params.reasonCode))
+            {
+                const QStringList licenseNames = StringsHelper::licenseMigrationDetails(
+                    SaasIssueEvent::decodeLicenseKeys(params),
+                    systemContext());
+                if (!licenseNames.isEmpty())
+                {
+                    result << tr("The following licenses were not migrated:") + QString(" <b>");
+                    result << licenseNames;
+                }
+            }
             break;
         }
 
@@ -754,12 +778,27 @@ QString StringsHelper::eventReason(const EventParameters& params) const
 
             break;
         }
+        case EventReason::licenseMigrationFailed:
+        case EventReason::licenseMigrationSkipped:
+            return licenseMigrationReason(params.reasonCode);
+
+        case EventReason::notEnoughLocalRecordingServices:
+        case EventReason::notEnoughCloudRecordingServices:
+        case EventReason::notEnoughIntegrationServices:
+            return servicesDisabledReason(params);
 
         default:
             break;
     }
 
     return result;
+}
+
+QString StringsHelper::resourceTypeName(const EventParameters& params) const
+{
+    return SaasIssueEvent::isLicenseMigrationIssue(params.reasonCode)
+        ? tr("License")
+        : tr("Camera");
 }
 
 QStringList StringsHelper::aggregatedEventDetails(
@@ -1155,6 +1194,69 @@ QString StringsHelper::ldapSyncIssueText(const EventParameters& params)
     }
 
     return ldapSyncIssueReason(params.reasonCode, syncInterval);
+}
+
+QString StringsHelper::servicesDisabledReason(const EventParameters& params)
+{
+    NX_ASSERT(params.eventType == EventType::saasIssueEvent);
+
+    const auto channelCount = SaasIssueEvent::decodeLicenseKeys(params).size();
+
+    switch (params.reasonCode)
+    {
+        case EventReason::notEnoughLocalRecordingServices:
+            return tr("Recording on %n channels was stopped due to service overuse.",
+                "", channelCount);
+
+        case EventReason::notEnoughCloudRecordingServices:
+            return tr("Cloud storage backup on %n channels was stopped due to service overuse.",
+                "", channelCount);
+
+        case EventReason::notEnoughIntegrationServices:
+            return tr("Paid integration service usage on %n channels was stopped due to service "
+                "overuse.", "", channelCount);
+            break;
+
+        default:
+            NX_ASSERT(false, "Unexpected reason code");
+            return {};
+    }
+}
+
+QString StringsHelper::licenseMigrationReason(EventReason reasonCode)
+{
+    switch (reasonCode)
+    {
+        case EventReason::licenseMigrationFailed:
+            return tr("Failed to migrate licenses.");
+
+        case EventReason::licenseMigrationSkipped:
+            return tr("Skipped import of licenses. Another migration attempt will be "
+                "automatically scheduled for later.");
+
+        default:
+            NX_ASSERT(false, "Unexpected reason code");
+            return {};
+    }
+}
+
+QStringList StringsHelper::licenseMigrationDetails(
+    const QStringList& licenseKeys,
+    common::SystemContext* context)
+{
+    using namespace nx::vms::api;
+
+    QStringList result;
+
+    for (const auto& key: licenseKeys)
+    {
+        const QnLicensePtr license = context->licensePool()->findLicense(key);
+        if (!license)
+            continue;
+
+        result << QnLicense::displayText(license->type(), license->cameraCount());
+    }
+    return result;
 }
 
 QString StringsHelper::notificationCaption(

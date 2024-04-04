@@ -23,6 +23,9 @@ using IpConflictEventPtr = QSharedPointer<class IpConflictEvent>;
 class LicenseIssueEvent;
 using LicenseIssueEventPtr = QSharedPointer<class LicenseIssueEvent>;
 
+class SaasIssueEvent;
+using SaasIssueEventPtr = QSharedPointer<class SaasIssueEvent>;
+
 class MotionEvent;
 using MotionEventPtr = QSharedPointer<class MotionEvent>;
 

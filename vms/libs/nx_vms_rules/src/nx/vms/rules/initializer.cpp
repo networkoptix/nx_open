@@ -33,6 +33,7 @@ void Initializer::registerEvents() const
     registerEvent<GenericEvent>();
     registerEvent<LdapSyncIssueEvent>();
     registerEvent<LicenseIssueEvent>();
+    registerEvent<SaasIssueEvent>();
     registerEvent<MotionEvent>();
     registerEvent<NetworkIssueEvent>();
     registerEvent<PluginDiagnosticEvent>();

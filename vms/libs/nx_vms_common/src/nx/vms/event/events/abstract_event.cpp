@@ -44,6 +44,7 @@ static const std::set<EventType> kAllEvents{
     EventType::serverStartEvent,
     EventType::ldapSyncIssueEvent,
     EventType::licenseIssueEvent,
+    EventType::saasIssueEvent,
     EventType::backupFinishedEvent,
     EventType::poeOverBudgetEvent,
     EventType::fanErrorEvent,
@@ -61,6 +62,10 @@ static const std::set<EventType> kAllEvents{
  */
 static const std::set<EventType> kDeprecatedEvents{
     EventType::backupFinishedEvent
+};
+
+static const std::set<EventType> kEventsNotSupportedBySoftwareLicenseMode{
+    EventType::saasIssueEvent
 };
 
 static const std::set<EventType> kEventsNotSupportedBySaas{
@@ -97,6 +102,7 @@ EventType parentEvent(EventType eventType)
         case EventType::serverStartEvent:
         case EventType::ldapSyncIssueEvent:
         case EventType::licenseIssueEvent:
+        case EventType::saasIssueEvent:
         case EventType::backupFinishedEvent:
         case EventType::poeOverBudgetEvent:
         case EventType::fanErrorEvent:
@@ -132,6 +138,7 @@ QList<EventType> childEvents(EventType eventType)
                 EventType::serverStartEvent,
                 EventType::ldapSyncIssueEvent,
                 EventType::licenseIssueEvent,
+                EventType::saasIssueEvent,
                 EventType::backupFinishedEvent,
                 EventType::poeOverBudgetEvent,
                 EventType::fanErrorEvent,
@@ -162,17 +169,16 @@ bool isNonDeprecatedEvent(EventType eventType)
     return !kDeprecatedEvents.contains(eventType);
 }
 
-EventTypePredicate isApplicableForLicensingMode(common::SystemContext* systemContext)
+EventTypePredicate isApplicableForLicensingMode(SystemContext* systemContext)
 {
-    const auto isSaasSystem = nx::vms::common::saas::saasInitialized(systemContext);
-    return [isSaasSystem](const EventType eventType)
-    {
-        // TODO: #vbreus Add service issue event as specific to the saas model as it will be
-        // implemented.
-        return isSaasSystem
-            ? !kEventsNotSupportedBySaas.contains(eventType)
-            : true;
-    };
+    const auto isSaasSystem = saas::saasInitialized(systemContext);
+    return
+        [isSaasSystem](const EventType eventType)
+        {
+            return isSaasSystem
+                ? !kEventsNotSupportedBySaas.contains(eventType)
+                : !kEventsNotSupportedBySoftwareLicenseMode.contains(eventType);
+        };
 }
 
 QList<EventType> allEvents(const EventTypePredicateList& predicates)
