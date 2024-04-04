@@ -46,9 +46,14 @@ NX_REFLECTION_ENUM_CLASS(EventReason,
     someUsersNotFoundInLdap = 28,
 
     // Backup Finished event & Storage Failure event
-    backupFailedSourceFileError = 13
+    backupFailedSourceFileError = 13,
 
-    // Last number is 28, see someUsersNotFoundInLdap. Some numbers are 1000+.
+    // Saas Issue event.
+    notEnoughLocalRecordingServices = 29,
+    notEnoughCloudRecordingServices = 30,
+    notEnoughIntegrationServices = 31,
+    licenseMigrationFailed = 32,
+    licenseMigrationSkipped = 33
 )
 
 enum class EventState
@@ -141,6 +146,9 @@ NX_REFLECTION_ENUM(EventType,
 
     /** LDAP sync issue. */
     ldapSyncIssueEvent = 19,
+
+    /** Common event type for SaaS related issues. */
+    saasIssueEvent = 20,
 
     /** Site health message. */
     systemHealthEvent = 500,

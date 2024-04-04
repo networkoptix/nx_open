@@ -80,6 +80,11 @@ enum IDType
     PreferencesLicensesTabAction,
 
     /**
+     * Opens saas services tab.
+     */
+     PreferencesServicesTabAction,
+
+    /**
      * Opens smtp settings preferences tab.
      */
     PreferencesSmtpTabAction,

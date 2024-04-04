@@ -572,6 +572,12 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
                 break;
             }
 
+            case EventType::saasIssueEvent:
+            {
+                eventData.actionId = action::PreferencesServicesTabAction;
+                break;
+            }
+
             case EventType::licenseIssueEvent:
             {
                 eventData.actionId = menu::PreferencesLicensesTabAction;
@@ -972,6 +978,7 @@ QPixmap NotificationListModel::Private::pixmapForAction(
         case EventType::serverCertificateError:
             return qnSkin->icon("events/server_20.svg", kIconSubstitutions).pixmap(QSize(20, 20));
 
+        case EventType::saasIssueEvent:
         case EventType::licenseIssueEvent:
             return qnSkin->icon("events/license_20.svg", kIconSubstitutions).pixmap(QSize(20, 20));
 

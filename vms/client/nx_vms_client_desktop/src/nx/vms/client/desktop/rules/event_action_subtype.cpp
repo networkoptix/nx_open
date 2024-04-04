@@ -32,6 +32,7 @@ EventSubtype eventSubtype(nx::vms::api::EventType event)
         case EventType::poeOverBudgetEvent:
         case EventType::fanErrorEvent:
         case EventType::serverCertificateError:
+        case EventType::saasIssueEvent:
             return EventSubtype::failure;
 
         case EventType::serverStartEvent:

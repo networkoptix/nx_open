@@ -19,6 +19,7 @@
 #include "poe_over_budget_event.h"
 #include "prolonged_event.h"
 #include "reasoned_event.h"
+#include "saas_issue_event.h"
 #include "server_certificate_error.h"
 #include "server_conflict_event.h"
 #include "server_failure_event.h"
