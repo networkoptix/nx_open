@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 
+#include <nx/reflect/enum_instrument.h>
+
 namespace nx::cloud::db::api {
 
 struct GenerateKeyResponse
@@ -40,10 +42,9 @@ struct BackupCodeInfo
 /**%apidoc Array of backup codes. */
 using BackupCodes = std::vector<BackupCodeInfo>;
 
-enum class SecondFactorState
-{
-    notEntered, //< The token requires the 2nd factor but it wasn't provided.
-    entered,
-};
+NX_REFLECTION_ENUM_CLASS(SecondFactorState,
+    notEntered,
+    entered
+);
 
 } // namespace nx::cloud::db::api
