@@ -5,6 +5,8 @@
 import os
 import zipfile
 
+from pathlib import Path
+
 import distribution_tools as tools
 
 qt_libraries = [
@@ -145,12 +147,11 @@ def create_client_update_file(config, output_file):
         zip.write(os.path.join(binaries_dir, 'client_external.dat'), 'client_external.dat')
         zip.write(os.path.join(binaries_dir, 'client_core_external.dat'), 'client_core_external.dat')
         zip.write(os.path.join(binaries_dir, 'bytedance_iconpark.dat'), 'bytedance_iconpark.dat')
+
         translations_dir = os.path.join(binaries_dir, 'translations')
-        zip.write(os.path.join(translations_dir, 'nx_vms_common.dat'), 'translations/nx_vms_common.dat')
-        zip.write(os.path.join(translations_dir, 'nx_vms_license.dat'), 'translations/nx_vms_license.dat')
-        zip.write(os.path.join(translations_dir, 'nx_vms_rules.dat'), 'translations/nx_vms_rules.dat')
-        zip.write(os.path.join(translations_dir, 'nx_vms_client_core.dat'), 'translations/nx_vms_client_core.dat')
-        zip.write(os.path.join(translations_dir, 'nx_vms_client_desktop.dat'), 'translations/nx_vms_client_desktop.dat')
+        for file in config['client_translation_files'].split(';'):
+            zip.write(os.path.join(translations_dir, file), f'translations/{file}')
+
         if asan_library_name:
             zip.write(os.path.join(binaries_dir, asan_library_name), asan_library_name)
 

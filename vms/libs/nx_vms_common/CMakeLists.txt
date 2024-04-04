@@ -42,7 +42,7 @@ nx_add_target(nx_vms_common LIBRARY
         nx_codec
     FOLDER common/libs
 )
-nx_make_target_translatable(nx_vms_common)
+nx_make_target_translatable(nx_vms_common COMPONENTS "client" "server" "mobile")
 
 target_compile_definitions(nx_vms_common
     PRIVATE NX_VMS_COMMON_API=${API_EXPORT_MACRO}

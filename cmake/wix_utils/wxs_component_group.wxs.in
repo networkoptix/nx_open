@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/ -->
+
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Fragment>
+        <ComponentGroup Id="${WXS_ID}"
+            Source="${WXS_SOURCE}"
+            Directory="${WXS_DIRECTORY}">
+${WXS_COMPONENTS}
+        </ComponentGroup>
+    </Fragment>
+</Wix>

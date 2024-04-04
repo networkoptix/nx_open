@@ -111,15 +111,7 @@ copyTranslations()
     local -r STAGE_TRANSLATIONS="$STAGE_BIN/translations"
     mkdir -p "$STAGE_TRANSLATIONS"
 
-    local -r TRANSLATIONS=(
-        nx_vms_common.dat
-        nx_vms_license.dat
-        nx_vms_client_core.dat
-        nx_vms_client_desktop.dat
-        nx_vms_rules.dat
-    )
-
-    for FILE in "${TRANSLATIONS[@]}"
+    for FILE in "${TRANSLATION_FILES[@]}"
     do
         echo "  Copying bin/translations/$FILE"
         cp "$BUILD_DIR/bin/translations/$FILE" "$STAGE_TRANSLATIONS"

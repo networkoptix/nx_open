@@ -34,6 +34,8 @@ nx_store_known_file(${CMAKE_CURRENT_BINARY_DIR}/qt.conf)
 file(WRITE ${bin_source_dir}/${launcher.version.file} "${releaseVersion.full}")
 nx_store_known_file(${bin_source_dir}/${launcher.version.file})
 
+nx_get_component_translation_list(client_translation_files "client")
+
 set(wix_distribution_config_source_file "${CMAKE_CURRENT_SOURCE_DIR}/config.yaml"
     CACHE INTERNAL "" FORCE)
 set(distribution_config_file "${CMAKE_CURRENT_BINARY_DIR}/config.yaml")

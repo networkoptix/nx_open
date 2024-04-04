@@ -5,7 +5,7 @@ nx_add_target(nx_vms_license LIBRARY NO_API_MACROS LIBRARY_TYPE STATIC
     FOLDER common/libs
 )
 
-nx_make_target_translatable(nx_vms_license)
+nx_make_target_translatable(nx_vms_license COMPONENTS "client" "server")
 
 if(withTests AND (withMediaServer OR withClouds OR openSourceBuild))
     add_subdirectory(unit_tests)

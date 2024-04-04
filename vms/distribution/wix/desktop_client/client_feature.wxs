@@ -168,13 +168,6 @@
             </Directory>
         </DirectoryRef>
 
-        <ComponentGroup Id="client_translations"
-                Directory="translations"
-                Source="${bin_source_dir}/translations">
-            <Component><File Name="nx_vms_client_core.dat" KeyPath="yes"/></Component>
-            <Component><File Name="nx_vms_client_desktop.dat" KeyPath="yes"/></Component>
-        </ComponentGroup>
-
         <ComponentGroup Id="external_resources"
                 Directory="InstallDirRoot"
                 Source="${bin_source_dir}">
@@ -208,6 +201,7 @@
                 Display="expand">
 
             <ComponentGroupRef Id="client_nx_libraries"/>
+            <ComponentGroupRef Id="client_translations"/>
             <ComponentGroupRef Id="openal_libraries"/>
             <ComponentGroupRef Id="hidapi_libraries"/>
             <ComponentGroupRef Id="client_qt_libraries"/>
@@ -245,8 +239,6 @@
             <ComponentGroupRef Id="nx_log_viewer"/>
             <ComponentGroupRef Id="build_info_files"/>
             <ComponentGroupRef Id="external_resources"/>
-            <ComponentGroupRef Id="client_translations"/>
-            <ComponentGroupRef Id="common_translations"/>
             <ComponentGroupRef Id="metadata_files"/>
 
             <MergeRef Id="client_help_module"/>

@@ -12,6 +12,18 @@ set(unsigned_msi_filename ${CMAKE_CURRENT_BINARY_DIR}/client-unsigned.msi)
 set(signed_msi_filename ${CMAKE_CURRENT_BINARY_DIR}/client-signed.msi)
 set(signed_distribution_path "${distribution_output_dir}/${client_distribution_name}.exe")
 
+set(client_translation_wxs_path "${CMAKE_CURRENT_BINARY_DIR}/client_translations.wxs")
+set(client_translation_wixobj_path "${CMAKE_CURRENT_BINARY_DIR}/client_translations.wixobj")
+
+nx_wix_generate_wxs_file(${client_translation_wxs_path}
+    ID "client_translations"
+    SOURCE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/translations"
+    DIRECTORY "translations"
+    FILENAMES ${client_translation_files})
+
+nx_wix_candle_ext(${client_translation_wixobj_path}
+    SOURCE_FILE ${client_translation_wxs_path}
+    STATIC)
 
 nx_wix_heat(${CMAKE_CURRENT_BINARY_DIR}/client_webengine_resources.wixobj
     SOURCE_DIR ${QT_DIR}/resources
@@ -42,6 +54,7 @@ nx_wix_candle(client_product)
 nx_wix_light(${unsigned_msi_filename}
     LOCALIZATION_FILE ${localization_file}
     SOURCE_FILES
+        ${client_translation_wixobj_path}
         ${CMAKE_CURRENT_BINARY_DIR}/client_product.wixobj
         ${CMAKE_CURRENT_BINARY_DIR}/client_feature.wixobj
         ${CMAKE_CURRENT_BINARY_DIR}/client_nx_libraries.wixobj
@@ -54,7 +67,6 @@ nx_wix_light(${unsigned_msi_filename}
         ${common_wixobjects_path}/common_nx_libraries.wixobj
         ${common_wixobjects_path}/common_qt_libraries.wixobj
         ${common_wixobjects_path}/common_qt_platforms.wixobj
-        ${common_wixobjects_path}/common_translations.wixobj
         ${common_wixobjects_path}/metadata.wixobj
         ${common_wixobjects_path}/ffmpeg_libraries.wixobj
         ${common_wixobjects_path}/icu_libraries.wixobj
