@@ -1484,7 +1484,8 @@ void initialize(Manager* manager, Action* root)
         .flags(Scene | SingleTarget | ResourceTarget)
         .text(ContextMenu::tr("Page..."))
         .childFactory(new WebPageFactory(manager))
-        .condition(condition::hasFlags(Qn::web_page, MatchMode::exactlyOne));
+        .condition(condition::hasFlags(Qn::web_page, MatchMode::exactlyOne)
+            && !condition::isShowreelReviewMode());
 
     factory(RenameResourceAction)
         .flags(Tree | SingleTarget | MultiTarget | ResourceTarget | IntentionallyAmbiguous)
