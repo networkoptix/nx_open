@@ -36,6 +36,7 @@ public:
         RuleIdRole = Qt::UserRole,
         ResourceIdsRole,
         FieldRole,
+        IsRuleValidRole,
         IsSystemRuleRole,
         SortDataRole
     };
@@ -66,8 +67,8 @@ private:
     void onRulesReset();
 
     void initialise();
-    bool isIndexValid(const QModelIndex &index) const;
-    bool isRuleValid(const ConstRulePtr& rule) const;
+    bool isIndexValid(const QModelIndex& index) const;
+    bool canDisplayRule(const ConstRulePtr& rule) const;
 
     QVariant stateColumnData(const ConstRulePtr& rule, int role) const;
     QVariant eventColumnData(const ConstRulePtr& rule, int role) const;

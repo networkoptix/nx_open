@@ -103,7 +103,7 @@ void VolumePicker::onTestButtonClicked()
         if (soundUrl.isEmpty())
             return;
 
-        QString filePath = system()->serverNotificationCache()->getFullPath(soundUrl);
+        QString filePath = systemContext()->serverNotificationCache()->getFullPath(soundUrl);
         if (!QFileInfo(filePath).exists())
             return;
 

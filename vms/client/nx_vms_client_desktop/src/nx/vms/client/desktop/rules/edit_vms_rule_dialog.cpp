@@ -2,25 +2,32 @@
 
 #include "edit_vms_rule_dialog.h"
 
+#include <QtCore/QJsonDocument>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QStackedWidget>
 #include <QtWidgets/QVBoxLayout>
 
+#include <nx/fusion/model_functions.h>
+#include <nx/vms/api/rules/action_builder.h>
+#include <nx/vms/api/rules/event_filter.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/common/widgets/panel.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/skin/font_config.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/dialogs/week_time_schedule_dialog.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/rules/action_builder.h>
+#include <nx/vms/rules/action_builder_fields/optional_time_field.h>
 #include <nx/vms/rules/engine.h>
 #include <nx/vms/rules/event_filter.h>
 #include <nx/vms/rules/event_filter_fields/state_field.h>
 #include <nx/vms/rules/events/debug_event.h>
+#include <nx/vms/rules/utils/api.h>
 #include <nx/vms/rules/utils/common.h>
 #include <nx/vms/rules/utils/field.h>
 #include <ui/common/palette.h>
@@ -33,18 +40,151 @@
 #include "params_widgets/event_parameters_widget.h"
 #include "utils/confirmation_dialogs.h"
 
+namespace nx::vms::client::desktop::rules {
+
 namespace {
 
-static const QColor kLight16Color = "#698796";
-static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
+const QColor kLight16Color = "#698796";
+const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
     {QIcon::Normal, {{kLight16Color, "light16"}}},
     {QIcon::Active, {{kLight16Color, "light17"}}},
     {QIcon::Selected, {{kLight16Color, "light15"}}},
 };
 
-} // namespace
+QSet<vms::rules::State> getAvailableStates(
+    const vms::rules::ItemDescriptor& eventDescriptor,
+    const vms::rules::ItemDescriptor& actionDescriptor)
+{
+    QSet<vms::rules::State> availableEventStates;
 
-namespace nx::vms::client::desktop::rules {
+    if (eventDescriptor.flags.testFlag(vms::rules::ItemFlag::instant))
+        availableEventStates.insert(vms::rules::State::instant);
+
+    if (eventDescriptor.flags.testFlag(vms::rules::ItemFlag::prolonged))
+    {
+        availableEventStates.insert(vms::rules::State::none);
+        availableEventStates.insert(vms::rules::State::started);
+        availableEventStates.insert(vms::rules::State::stopped);
+    }
+
+    QSet<vms::rules::State> availableActionStates;
+
+    if (actionDescriptor.flags.testFlag(vms::rules::ItemFlag::instant))
+    {
+        availableActionStates.insert(vms::rules::State::instant);
+        availableActionStates.insert(vms::rules::State::started);
+        availableActionStates.insert(vms::rules::State::stopped);
+    }
+
+    if (actionDescriptor.flags.testFlag(vms::rules::ItemFlag::prolonged))
+        availableActionStates.insert({vms::rules::State::none});
+
+    if (const auto durationFieldDescriptor =
+        vms::rules::utils::fieldByName(vms::rules::utils::kDurationFieldName, actionDescriptor))
+    {
+        availableActionStates.insert(vms::rules::State::started);
+        availableActionStates.insert(vms::rules::State::stopped);
+    }
+
+    return availableEventStates & availableActionStates;
+}
+
+std::chrono::seconds getDefaultActionDuration(const vms::rules::ItemDescriptor& actionDescriptor)
+{
+    const auto durationFieldDescriptor =
+        vms::rules::utils::fieldByName(vms::rules::utils::kDurationFieldName, actionDescriptor);
+    if (!durationFieldDescriptor)
+        return std::chrono::seconds::zero();
+
+    const auto defaultValue =
+        durationFieldDescriptor->properties.value("default").value<std::chrono::seconds>();
+
+    if (!NX_ASSERT(defaultValue != std::chrono::seconds::zero()))
+    {
+        constexpr auto kDefaultActionDuration = std::chrono::seconds{5};
+        return kDefaultActionDuration;
+    }
+
+    return defaultValue;
+}
+
+void fixStateAndDuration(
+    vms::rules::Engine* engine,
+    vms::rules::EventFilter* eventFilter,
+    vms::rules::ActionBuilder* actionBuilder)
+{
+    using namespace vms::rules;
+
+    if (utils::isCompatible(engine, eventFilter, actionBuilder))
+        return;
+
+    auto actionDescriptor = engine->actionDescriptor(actionBuilder->actionType());
+    auto eventDescriptor = engine->eventDescriptor(eventFilter->eventType());
+
+    auto durationField = actionBuilder->fieldByName<OptionalTimeField>(utils::kDurationFieldName);
+    auto stateField = eventFilter->fieldByName<StateField>(utils::kStateFieldName);
+
+    if (stateField)
+    {
+        const auto availableStates =
+            getAvailableStates(eventDescriptor.value(), actionDescriptor.value());
+        if (!NX_ASSERT(!availableStates.isEmpty()))
+            return;
+
+        if (durationField)
+        {
+            if (durationField->value() != std::chrono::microseconds::zero())
+            {
+                if (availableStates.contains(State::instant))
+                {
+                    stateField->setValue(State::instant);
+                }
+                else if (availableStates.contains(State::started))
+                {
+                    stateField->setValue(State::started);
+                }
+                else
+                {
+                    stateField->setValue(State::none);
+                    durationField->setValue(getDefaultActionDuration(actionDescriptor.value()));
+                }
+            }
+            else
+            {
+                if (availableStates.contains(State::none))
+                {
+                    stateField->setValue(State::none);
+                }
+                else
+                {
+                    stateField->setValue(*availableStates.cbegin());
+                    durationField->setValue(getDefaultActionDuration(actionDescriptor.value()));
+                }
+            }
+        }
+        else
+        {
+            if (!availableStates.contains(stateField->value()))
+                stateField->setValue(*availableStates.cbegin());
+        }
+    }
+    else if (durationField)
+    {
+        if (utils::isInstantOnly(eventDescriptor.value())
+            && durationField->value() == std::chrono::microseconds::zero())
+        {
+            // Duration can not be zero for the instant event.
+            durationField->setValue(getDefaultActionDuration(actionDescriptor.value()));
+        }
+    }
+}
+
+QString indentedJson(const QByteArray& json)
+{
+    return QJsonDocument::fromJson(json).toJson();
+}
+
+} // namespace
 
 EditVmsRuleDialog::EditVmsRuleDialog(QWidget* parent):
     QnSessionAwareButtonBoxDialog{parent}
@@ -115,12 +255,12 @@ EditVmsRuleDialog::EditVmsRuleDialog(QWidget* parent):
         auto eventLayout = new QVBoxLayout;
         eventLayout->setSpacing(style::Metrics::kDefaultLayoutSpacing.height());
 
-        auto eventLabel = new QLabel;
-        eventLabel->setText(
+        m_eventLabel = new QLabel;
+        m_eventLabel->setText(
             QString{"%1 %2"}
                 .arg(common::html::colored(tr("WHEN"), core::colorTheme()->color("light4")))
                 .arg(common::html::colored(tr("EVENT"), core::colorTheme()->color("light10"))));
-        eventLayout->addWidget(eventLabel);
+        eventLayout->addWidget(m_eventLabel);
 
         auto eventFrame = new StyledFrame;
         eventFrame->setContentsMargins(
@@ -158,12 +298,12 @@ EditVmsRuleDialog::EditVmsRuleDialog(QWidget* parent):
         auto actionLayout = new QVBoxLayout;
         actionLayout->setSpacing(style::Metrics::kDefaultLayoutSpacing.width());
 
-        auto actionLabel = new QLabel;
-        actionLabel->setText(
+        m_actionLabel = new QLabel;
+        m_actionLabel->setText(
             QString{"%1 %2"}
                 .arg(common::html::colored(tr("DO"), core::colorTheme()->color("light4")))
                 .arg(common::html::colored(tr("ACTION"), core::colorTheme()->color("light10"))));
-        actionLayout->addWidget(actionLabel);
+        actionLayout->addWidget(m_actionLabel);
 
         auto actionFrame = new StyledFrame;
         actionFrame->setContentsMargins(
@@ -302,6 +442,26 @@ void EditVmsRuleDialog::displayRule()
         m_actionTypePicker->setActionType(m_rule->actionBuilders().first()->actionType());
     }
 
+    if (ini().developerMode)
+    {
+        onEventFilterModified();
+        onActionBuilderModified();
+
+        m_scopedConnections.reset();
+
+        m_scopedConnections << connect(
+            m_rule->eventFilters().first(),
+            &vms::rules::EventFilter::changed,
+            this,
+            &EditVmsRuleDialog::onEventFilterModified);
+
+        m_scopedConnections << connect(
+            m_rule->actionBuilders().first(),
+            &vms::rules::ActionBuilder::changed,
+            this,
+            &EditVmsRuleDialog::onActionBuilderModified);
+    }
+
     displayEventEditor();
     displayActionEditor();
 }
@@ -390,13 +550,13 @@ void EditVmsRuleDialog::onActionTypeChanged(const QString& actionType)
         return;
     }
 
-    if (auto stateField =
-        eventFilter->fieldByName<vms::rules::StateField>(vms::rules::utils::kStateFieldName))
+    fixStateAndDuration(engine, eventFilter, actionBuilder.get());
+
+    if (!NX_ASSERT(
+        vms::rules::utils::isCompatible(engine, eventFilter, actionBuilder.get()),
+        "Fixing rule compatibility failed"))
     {
-        if (!vms::rules::utils::isCompatible(engine, stateField, actionBuilder.get()))
-        {
-            // TODO: #mmalofeev correct values(at least state and duration).
-        }
+        return;
     }
 
     m_rule->takeActionBuilder(0);
@@ -423,13 +583,13 @@ void EditVmsRuleDialog::onEventTypeChanged(const QString& eventType)
         return;
     }
 
-    if (auto stateField =
-        eventFilter->fieldByName<vms::rules::StateField>(vms::rules::utils::kStateFieldName))
+    fixStateAndDuration(engine, eventFilter.get(), actionBuilder);
+
+    if (!NX_ASSERT(
+        vms::rules::utils::isCompatible(engine, eventFilter.get(), actionBuilder),
+        "Fixing rule compatibility failed"))
     {
-        if (!vms::rules::utils::isCompatible(engine, stateField, actionBuilder))
-        {
-            // TODO: #mmalofeev correct values(at least state and duration).
-        }
+        return;
     }
 
     m_rule->takeEventFilter(0);
@@ -441,6 +601,20 @@ void EditVmsRuleDialog::onEventTypeChanged(const QString& eventType)
 void EditVmsRuleDialog::onEnabledButtonClicked(bool checked)
 {
     m_rule->setEnabled(checked);
+}
+
+void EditVmsRuleDialog::onEventFilterModified()
+{
+    const auto serializedEventFilter =
+        QJson::serialized(serialize(m_rule->eventFilters().first()));
+    m_eventLabel->setToolTip(indentedJson(serializedEventFilter));
+}
+
+void EditVmsRuleDialog::onActionBuilderModified()
+{
+    const auto serializedActionBuilder =
+        QJson::serialized(serialize(m_rule->actionBuilders().first()));
+    m_actionLabel->setToolTip(indentedJson(serializedActionBuilder));
 }
 
 } // namespace nx::vms::client::desktop::rules
