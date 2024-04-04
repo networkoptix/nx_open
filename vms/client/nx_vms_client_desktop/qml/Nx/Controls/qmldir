@@ -15,6 +15,7 @@ Bubble 1.0 Bubble.qml
 BubbleToolTip 1.0 BubbleToolTip.qml
 Button 1.0 Button.qml
 CheckableTableView 1.0 CheckableTableView.qml
+CheckListItem 1.0 CheckListItem.qml
 CheckBox 1.0 CheckBox.qml
 CheckBoxImage 1.0 CheckBoxImage.qml
 ClipboardCopyButton 1.0 ClipboardCopyButton.qml

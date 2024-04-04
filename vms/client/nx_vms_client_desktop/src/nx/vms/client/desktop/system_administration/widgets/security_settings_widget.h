@@ -6,6 +6,7 @@
 #include <optional>
 
 #include <api/server_rest_connection_fwd.h>
+#include <nx/vms/api/data/pixelation_settings.h>
 #include <nx/vms/api/data/watermark_settings.h>
 #include <nx/vms/client/desktop/system_administration/widgets/abstract_system_settings_widget.h>
 
@@ -53,6 +54,10 @@ private:
     std::chrono::seconds calculateSessionLimit() const;
     void showArchiveEncryptionPasswordDialog(bool viaButton);
     void updateLimitSessionControls();
+    void openPixelationObjectSelectionDialog();
+    void openPixelationConfigurationDialog();
+    void openExcludeCameraSelectionDialog();
+    void updatePixelationSettings();
 
     void loadEncryptionSettingsToUi();
     void loadUserInfoToUi();
@@ -60,6 +65,7 @@ private:
 private:
     QScopedPointer<Ui::SecuritySettingsWidget> ui;
     api::WatermarkSettings m_watermarkSettings;
+    api::PixelationSettings m_pixelationSettings;
     RepeatedPasswordDialog* const m_archiveEncryptionPasswordDialog;
     ArchivePasswordState m_archivePasswordState = ArchivePasswordState::notSet;
     bool m_archiveEncryptionPasswordDialogOpenedViaButton = false;

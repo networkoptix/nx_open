@@ -7,82 +7,24 @@ import QtQuick.Layouts
 import Nx.Core
 import Nx.Controls
 
-Control
+CheckListItem
 {
     id: control
 
-    property string iconSource: ""
-    property alias text: text.text
-    property alias checked: checkBox.checked
     property bool current: false
 
-    signal clicked()
+    primaryColors.normal: ColorTheme.colors.light4
+    checkedPrimaryColors.normal: "white"
 
     implicitHeight: 28
-    baselineOffset: text.baselineOffset
-
     leftPadding: iconSource ? 6 : 8
     rightPadding: 8
+    spacing: 0
 
     background: Rectangle
     {
-        color: mouseArea.containsMouse || control.current
+        color: control.hovered || control.current
             ? ColorTheme.colors.dark15
             : ColorTheme.colors.dark13
-    }
-
-    contentItem: RowLayout
-    {
-        id: layout
-
-        spacing: 0
-
-        baselineOffset: text.baselineOffset
-
-        ColoredImage
-        {
-            id: icon
-
-            Layout.alignment: Qt.AlignVCenter
-
-            primaryColor: "light10"
-            secondaryColor: "light4"
-            visible: !!iconSource
-            sourcePath: iconSource
-            sourceSize: Qt.size(20, 20)
-        }
-
-        Text
-        {
-            id: text
-
-            Layout.fillWidth: true
-            Layout.alignment: Qt.AlignVCenter
-
-            elide: Text.ElideRight
-            color: ColorTheme.colors.light4
-            font: Qt.font({pixelSize: 14, weight: Font.Normal})
-
-            textFormat: Text.StyledText
-        }
-
-        CheckBox
-        {
-            id: checkBox
-
-            Layout.alignment: Qt.AlignBaseline
-            Layout.bottomMargin: 1 //< Position adjustment.
-            focusPolicy: Qt.NoFocus
-        }
-    }
-
-    MouseArea
-    {
-        id: mouseArea
-
-        anchors.fill: parent
-        hoverEnabled: true
-
-        onClicked: control.clicked()
     }
 }

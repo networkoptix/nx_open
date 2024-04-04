@@ -36,18 +36,17 @@ using namespace nx::vms::client::desktop;
 using namespace nx::vms::api;
 
 namespace {
-    const int ROUND_COEFF = 8;
 
-    int minPow2(int value)
-    {
-        int result = 1;
-        while (value > result)
-            result <<= 1;
+const int ROUND_COEFF = 8;
 
-        return result;
-    }
+int minPow2(int value)
+{
+    int result = 1;
+    while (value > result)
+        result <<= 1;
 
-    static const int kMaxBlurSize = 2048;
+    return result;
+}
 
 } // anonymous namespace
 
@@ -152,10 +151,10 @@ Qn::RenderStatus QnGLRenderer::prepareBlurBuffers()
     }
 
     result = QSize(picLock->width(), picLock->height());
-    if (result.width() > kMaxBlurSize)
+    if (result.width() > kMaxBlurMaskSize)
     {
         qreal ar = result.width() / (qreal) result.height();
-        result = QSize(kMaxBlurSize, kMaxBlurSize / ar);
+        result = QSize(kMaxBlurMaskSize, kMaxBlurMaskSize / ar);
     }
 
     // QOpenGLFramebufferObject texture size must be power of 2 for compatibility reasons.
@@ -176,13 +175,7 @@ Qn::RenderStatus QnGLRenderer::prepareBlurBuffers()
     return Qn::NewFrameRendered;
 }
 
-void QnGLRenderer::doBlurStep(
-    const QRectF& sourceRect,
-    const QRectF& dstRect,
-    GLuint texture,
-    GLuint mask,
-    const QVector2D& textureOffset,
-    bool isHorizontalPass)
+void QnGLRenderer::doBlurStep(const QRectF& sourceRect, const QRectF& dstRect)
 {
     const float v_array[] =
     {
@@ -208,24 +201,10 @@ void QnGLRenderer::doBlurStep(
         (float)sourceRect.x(), (float)sourceRect.bottom()
     };
 
-    m_gl->glActiveTexture(GL_TEXTURE0);
-    m_gl->glBindTexture(GL_TEXTURE_2D, texture);
-    glCheckError("glBindTexture");
-    m_gl->glActiveTexture(GL_TEXTURE1);
-    m_gl->glBindTexture(GL_TEXTURE_2D, mask);
-    glCheckError("glBindTexture");
-
     const auto renderer = QnOpenGLRendererManager::instance(glWidget());
     const auto shader = renderer->getBlurShader();
-    shader->bind();
-    shader->setTexture(0); //< GL_TEXTURE0.
-    shader->setTextureOffset(textureOffset);
-    shader->setHorizontalPass(isHorizontalPass);
-    shader->setMask(1); //< GL_TEXTURE1.
-    //shader->setBlurSize(9);
-    //shader->setSigma(6);
+
     drawBindedTexture(shader, v_array, tx_array);
-    shader->release();
 }
 
 void QnGLRenderer::setBlurFactor(qreal value)
@@ -246,7 +225,6 @@ Qn::RenderStatus QnGLRenderer::renderBlurFBO(const QRectF &sourceRect)
 
     QRectF dstPaintRect(prevViewPort[0], prevViewPort[1], prevViewPort[2], prevViewPort[3]);
 
-    // first step: blur to FBO_A
     QSize blurSize = m_blurBufferA->size();
     glViewport(0, 0, blurSize.width(), blurSize.height());
 
@@ -255,30 +233,19 @@ Qn::RenderStatus QnGLRenderer::renderBlurFBO(const QRectF &sourceRect)
     auto result = drawVideoData(nullptr, sourceRect, dstPaintRect, kOpaque);
     m_blurBufferA->release();
 
-    const int kIterations = 8;
+    QnBlurShaderProgram* shader = renderer->getBlurShader();
+    shader->bind();
 
-    QOpenGLFramebufferObject* fboA = m_blurBufferA.get();
-    QOpenGLFramebufferObject* fboB = m_blurBufferB.get();
-    for (int i = 0; i < kIterations; ++i)
-    {
-        // blur A->B, B->A several times
-        const float blurStep = (kIterations - i - 1) * m_blurFactor * 1.2;
-        const QVector2D textureOffset(
-            1.0 / kMaxBlurSize * blurStep,
-            1.0 / kMaxBlurSize * blurStep);
+    blur(
+        [&]() { doBlurStep(sourceRect, dstPaintRect); },
+        renderer.get(),
+        shader,
+        m_blurMaskBuffer.get(),
+        m_blurBufferA.get(),
+        m_blurBufferB.get(),
+        m_blurFactor);
 
-        fboB->bind();
-        doBlurStep(
-            sourceRect,
-            dstPaintRect,
-            fboA->texture(),
-            m_blurMaskBuffer->texture(),
-            textureOffset,
-            i % 2 == 0);
-
-        fboB->release();
-        std::swap(fboA, fboB);
-    }
+    shader->release();
 
     renderer->setModelViewMatrix(prevMatrix);
     glViewport(prevViewPort[0], prevViewPort[1], prevViewPort[2], prevViewPort[3]);
