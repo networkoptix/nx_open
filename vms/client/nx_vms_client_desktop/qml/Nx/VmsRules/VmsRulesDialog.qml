@@ -174,16 +174,34 @@ Dialog
 
             delegate: DelegateChooser
             {
+                id: delegateChooser
+
+                function getDelegateColor(isSelected, isValid)
+                {
+                    if (isSelected)
+                        return ColorTheme.colors.brand_d6
+
+                    if (!isValid)
+                        return ColorTheme.colors.red_attention
+
+                    return ColorTheme.colors.dark7
+                }
+
                 DelegateChoice
                 {
                     column: 0
-                    BasicSelectableTableCheckableCellDelegate {}
+                    BasicSelectableTableCheckableCellDelegate
+                    {
+                        color: delegateChooser.getDelegateColor(selected, model.isValid)
+                    }
                 }
 
                 DelegateChoice
                 {
                     BasicSelectableTableCellDelegate
                     {
+                        color: delegateChooser.getDelegateColor(selected, model.isValid)
+
                         onDoubleClicked:
                         {
                             root.dialog.editRule(tableView.model.data(

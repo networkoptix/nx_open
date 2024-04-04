@@ -122,8 +122,11 @@ QVariant RulesTableModel::data(const QModelIndex& index, int role) const
         return {};
 
     const auto rule = m_engine->rule(m_ruleIds[index.row()]);
-    if (!isRuleValid(rule))
+    if (!canDisplayRule(rule))
         return {};
+
+    if (role == IsRuleValidRole)
+        return rule->isValid();
 
     const auto column = index.column();
     if (role == SortDataRole)
@@ -201,6 +204,7 @@ QHash<int, QByteArray> RulesTableModel::roleNames() const
     auto roles = QAbstractTableModel::roleNames();
 
     roles[RuleIdRole] = "ruleId";
+    roles[IsRuleValidRole] = "isValid";
     roles[SortDataRole] = "sortData";
 
     return roles;
@@ -222,7 +226,7 @@ bool RulesTableModel::isIndexValid(const QModelIndex& index) const
     return index.isValid() && index.row() < m_ruleIds.size();
 }
 
-bool RulesTableModel::isRuleValid(const ConstRulePtr& rule) const
+bool RulesTableModel::canDisplayRule(const ConstRulePtr& rule) const
 {
     if (!rule)
         return false;
