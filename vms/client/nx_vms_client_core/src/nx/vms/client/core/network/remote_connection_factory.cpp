@@ -591,10 +591,11 @@ struct RemoteConnectionFactory::Private
         NX_DEBUG(this, "Checking System compatibility with the User.");
 
         // The system version below 5.0 is not compatible with a cloud user with 2fa enabled, but
-        // we still can download compatible client.
+        // we still can download compatible client and can connect using Mobile client.
         if (!isRestApiSupported(context)
             && context->logonData.purpose != LogonData::Purpose::connectInCompatibilityMode
             && context->userType() == nx::vms::api::UserType::cloud
+            && peerType != nx::vms::api::PeerType::mobileClient
             && cloudCredentialsProvider.is2FaEnabledForUser())
         {
             context->setError(RemoteConnectionErrorCode::systemIsNotCompatibleWith2Fa);
