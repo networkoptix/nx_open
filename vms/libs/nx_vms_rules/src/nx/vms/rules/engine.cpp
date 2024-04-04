@@ -61,7 +61,9 @@ size_t qHash(const vms::rules::ActionPtr& action)
 {
     UuidList ids = utils::getResourceIds(action);
 
-    ids << utils::getFieldValue<UuidList>(action, utils::kUsersFieldName); //< TODO: #mmalofeev remove when https://networkoptix.atlassian.net/browse/VMS-38891 will be done.
+    const auto users = //< TODO: #mmalofeev remove when https://networkoptix.atlassian.net/browse/VMS-38891 will be done.
+        utils::getFieldValue<vms::rules::UuidSelection>(action, utils::kUsersFieldName);
+    ids << UuidList{users.ids.cbegin(), users.ids.constEnd()};
 
     return qHash(ids);
 }
