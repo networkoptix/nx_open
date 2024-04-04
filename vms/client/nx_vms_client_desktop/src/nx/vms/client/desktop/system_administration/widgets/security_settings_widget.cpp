@@ -6,6 +6,7 @@
 #include <chrono>
 
 #include <api/server_rest_connection.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/guarded_callback.h>
@@ -15,7 +16,10 @@
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/resource_dialogs/camera_selection_dialog.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
+#include <nx/vms/client/desktop/system_administration/dialogs/pixelation_intensity_dialog.h>
+#include <nx/vms/client/desktop/system_administration/dialogs/pixelation_object_selection_dialog.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/watermark/watermark_edit_settings.h>
 #include <nx/vms/common/html/html.h>
@@ -34,6 +38,14 @@ namespace {
 
 constexpr auto kSessionLengthAlertLimit = std::chrono::hours(720);
 constexpr auto kNoLimitSessionDuration = 0s;
+
+static const QColor kLight10Color = "#A5B7C0";
+static const QColor kLight16Color = "#698796";
+static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
+    {QIcon::Normal, {{kLight10Color, "light10"}, {kLight16Color, "light16"}}},
+    {QIcon::Active, {{kLight10Color, "light11"}, {kLight16Color, "light17"}}},
+    {QIcon::Selected, {{kLight16Color, "light15"}}},
+};
 
 } // namespace
 
@@ -115,6 +127,20 @@ SecuritySettingsWidget::SecuritySettingsWidget(
         this, updateWatermarkState);
     // Need to sync checkbox to button, loadDataToUi() will do the rest.
     updateWatermarkState(ui->displayWatermarkCheckBox->checkState());
+
+    connect(ui->pixelateObjectTypesButton, &QPushButton::clicked,
+        this, &SecuritySettingsWidget::openPixelationObjectSelectionDialog);
+
+    ui->configurePixelationButton->setIcon(
+        qnSkin->icon("text_buttons/settings_20.svg", kIconSubstitutions));
+
+    connect(ui->configurePixelationButton, &QPushButton::clicked, this,
+        &SecuritySettingsWidget::openPixelationConfigurationDialog);
+
+    connect(ui->excludeCamerasButton, &QPushButton::clicked,
+        this, &SecuritySettingsWidget::openExcludeCameraSelectionDialog);
+
+    ui->videoRedactionGroupBox->setVisible(ini().objectPixelation);
 
     ui->limitSessionUnitsComboBox->addItem(
         QnTimeStrings::fullSuffixCapitalized(QnTimeStrings::Suffix::Minutes),
@@ -280,6 +306,8 @@ void SecuritySettingsWidget::loadDataToUi()
     m_watermarkSettings = systemSettings()->watermarkSettings();
     ui->displayWatermarkCheckBox->setChecked(m_watermarkSettings.useWatermark);
 
+    m_pixelationSettings = systemSettings()->pixelationSettings();
+
     const auto sessionTimeoutLimit = systemSettings()->sessionTimeoutLimit();
     ui->limitSessionLengthCheckBox->setChecked(
         sessionTimeoutLimit.value_or(kNoLimitSessionDuration) != kNoLimitSessionDuration);
@@ -307,8 +335,82 @@ void SecuritySettingsWidget::loadDataToUi()
     loadEncryptionSettingsToUi();
     loadUserInfoToUi();
     updateLimitSessionControls();
+    updatePixelationSettings();
 
     ui->showServersInTreeCheckBox->setChecked(systemSettings()->showServersInTreeForNonAdmins());
+}
+
+void SecuritySettingsWidget::openPixelationObjectSelectionDialog()
+{
+    PixelationObjectSelectionDialog dialog(
+        systemContext(),
+        m_pixelationSettings.isAllObjectTypes,
+        m_pixelationSettings.objectTypeIds,
+        mainWindowWidget());
+
+    if (dialog.exec(Qt::ApplicationModal) == QDialog::Accepted)
+    {
+        m_pixelationSettings.isAllObjectTypes = dialog.allObjects();
+        m_pixelationSettings.objectTypeIds = dialog.objectTypeIds();
+
+        emit hasChangesChanged();
+        updatePixelationSettings();
+    }
+}
+
+void SecuritySettingsWidget::openPixelationConfigurationDialog()
+{
+    PixelationIntensityDialog dialog(
+        m_pixelationSettings.intensity,
+        mainWindowWidget());
+
+    if (dialog.exec(Qt::ApplicationModal) == QDialog::Accepted)
+    {
+        m_pixelationSettings.intensity = dialog.intensity();
+        emit hasChangesChanged();
+    }
+}
+
+void SecuritySettingsWidget::openExcludeCameraSelectionDialog()
+{
+    if (CameraSelectionDialog::selectCameras<CameraSelectionDialog::DummyPolicy>(
+        m_pixelationSettings.excludeCameraIds, this))
+    {
+        updatePixelationSettings();
+        emit hasChangesChanged();
+    }
+}
+
+void SecuritySettingsWidget::updatePixelationSettings()
+{
+    QnVirtualCameraResourceList resources =
+        resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
+            m_pixelationSettings.excludeCameraIds);
+
+    if (resources.empty())
+        ui->excludeCamerasButton->selectNone();
+    else
+        ui->excludeCamerasButton->selectDevices(resources);
+
+    ui->pixelateObjectTypesButton->setProperty(
+        nx::style::Properties::kPushButtonMargin, nx::style::Metrics::kStandardPadding);
+
+    if (m_pixelationSettings.isAllObjectTypes)
+    {
+        ui->pixelateObjectTypesButton->setSelectedAllObjectTypes();
+    }
+    else
+    {
+        ui->pixelateObjectTypesButton->setSelectedObjectTypes(
+            systemContext(), m_pixelationSettings.objectTypeIds);
+    }
+
+    const bool isPixelationEnabled =
+        m_pixelationSettings.isAllObjectTypes || !m_pixelationSettings.objectTypeIds.empty();
+
+    ui->configurePixelationButton->setVisible(isPixelationEnabled);
+    ui->excludeCamerasLabelWidget->setVisible(isPixelationEnabled);
+    ui->excludeCamerasButton->setVisible(isPixelationEnabled);
 }
 
 void SecuritySettingsWidget::loadEncryptionSettingsToUi()
@@ -367,6 +469,7 @@ void SecuritySettingsWidget::applyChanges()
     editableSystemSettings->videoTrafficEncryptionForced =
         ui->forceVideoTrafficEncryptionCheckBox->isChecked();
     editableSystemSettings->watermarkSettings = m_watermarkSettings;
+    editableSystemSettings->pixelationSettings = m_pixelationSettings;
     editableSystemSettings->sessionLimitS = calculateSessionLimit();
     editableSystemSettings->storageEncryption = ui->archiveEncryptionGroupBox->isChecked();
     editableSystemSettings->showServersInTreeForNonAdmins =
@@ -428,6 +531,7 @@ bool SecuritySettingsWidget::hasChanges() const
         || (ui->forceVideoTrafficEncryptionCheckBox->isChecked()
             != systemSettings()->isVideoTrafficEncryptionForced())
         || (m_watermarkSettings != systemSettings()->watermarkSettings())
+        || (m_pixelationSettings != systemSettings()->pixelationSettings())
         || (calculateSessionLimit() != systemSettings()->sessionTimeoutLimit().value_or(kNoLimitSessionDuration))
         || (ui->archiveEncryptionGroupBox->isChecked() != systemSettings()->useStorageEncryption())
         || m_archivePasswordState == ArchivePasswordState::changed

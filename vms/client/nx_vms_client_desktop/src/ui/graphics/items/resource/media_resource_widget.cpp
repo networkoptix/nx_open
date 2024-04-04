@@ -174,8 +174,6 @@ static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kArchiveRe
     {QIcon::Normal, {{kLight10Color, "light10"}, {kRedL1, "red_l1"}}},
 };
 
-static constexpr double kAnalyticsBlurFactor = 3;
-
 template<class Cont, class Item>
 bool contains(const Cont& cont, const Item& item)
 {
@@ -639,7 +637,6 @@ void QnMediaResourceWidget::initBlurMask()
     }
 
     m_blurMask = std::make_unique<BlurMask>(
-        d->analyticsMetadataProvider.get(),
         QnOpenGLRendererManager::instance(m_renderer->openGLWidget()).get());
 }
 
@@ -1310,9 +1307,16 @@ Qn::RenderStatus QnMediaResourceWidget::paintVideoTexture(
         }
     }
 
-    if (ini().objectPixelation && m_blurMask && d->isAnalyticsEnabledInStream())
+    if (ini().objectPixelation
+        && m_blurMask
+        && d->isAnalyticsEnabledInStream()
+        && !systemSettings()->pixelationSettings().excludeCameraIds.contains(camera()->getId()))
     {
-        m_renderer->setBlurFactor(std::max(kAnalyticsBlurFactor, m_statusOverlay->opacity()));
+        const nx::vms::api::PixelationSettings& pixelationSettings =
+            systemSettings()->pixelationSettings();
+
+        m_renderer->setBlurFactor(
+            std::max(pixelationSettings.intensity, (double)m_statusOverlay->opacity()));
 
         if (m_statusOverlay->opacity() > 0)
         {
@@ -1322,8 +1326,14 @@ Qn::RenderStatus QnMediaResourceWidget::paintVideoTexture(
         else
         {
             const auto timestamp = position();
+            const auto types = pixelationSettings.isAllObjectTypes
+                ? std::optional<QStringList>{}
+                : pixelationSettings.objectTypeIds;
+
             m_blurMask->draw(
                 m_renderer->blurMaskFrameBuffer(channel),
+                d->analyticsMetadataProvider.get(),
+                types,
                 timestamp,
                 channel);
         }

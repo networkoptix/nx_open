@@ -89,6 +89,7 @@
 #include <nx/vms/client/desktop/ui/scene/item_model_utils.h>
 #include <nx/vms/client/desktop/ui/scene/models/layout_model.h>
 #include <nx/vms/client/desktop/ui/scene/models/resource_tree_model_adapter.h>
+#include <nx/vms/client/desktop/utils/blur_mask.h>
 #include <nx/vms/client/desktop/utils/cursor_manager.h>
 #include <nx/vms/client/desktop/utils/date_validator.h>
 #include <nx/vms/client/desktop/utils/mouse_spy.h>
@@ -354,4 +355,5 @@ void QnClientMetaTypes::registerQmlTypes()
     rules::RulesSortFilterProxyModel::registerQmlType();
     SortFilterProxyModel::registerQmlType();
     ldap_settings::registerQmlType();
+    BlurMaskPreview::registerQmlType();
 }

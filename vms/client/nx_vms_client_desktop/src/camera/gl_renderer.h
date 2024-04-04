@@ -133,13 +133,7 @@ private:
 
     Qn::RenderStatus prepareBlurBuffers();
     Qn::RenderStatus renderBlurFBO(const QRectF &sourceRect);
-    void doBlurStep(
-        const QRectF& sourceRect,
-        const QRectF& dstRect,
-        GLuint texture,
-        GLuint mask,
-        const QVector2D& textureOffset,
-        bool isHorizontalPass);
+    void doBlurStep(const QRectF& sourceRect, const QRectF& dstRect);
 
 private:
     bool m_initialized;

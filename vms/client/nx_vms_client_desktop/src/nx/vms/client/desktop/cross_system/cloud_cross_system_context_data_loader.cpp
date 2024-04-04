@@ -12,6 +12,7 @@
 #include <nx/reflect/json.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/serialization/qt_containers_reflect_json.h>
 
 using namespace std::chrono;
 using namespace nx::vms::api;

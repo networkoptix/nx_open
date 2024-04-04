@@ -40,7 +40,7 @@
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_5" stretch="0,0,0">
+     <layout class="QVBoxLayout" name="verticalLayout_5" stretch="0,0,0,0">
       <property name="spacing">
        <number>14</number>
       </property>
@@ -64,10 +64,7 @@
         <property name="flat">
          <bool>true</bool>
         </property>
-        <layout class="QVBoxLayout" name="verticalLayout_3">
-         <property name="spacing">
-          <number>7</number>
-         </property>
+        <layout class="QGridLayout" name="gridLayout_2" columnstretch="23,77">
          <property name="leftMargin">
           <number>0</number>
          </property>
@@ -80,41 +77,55 @@
          <property name="bottomMargin">
           <number>0</number>
          </property>
-         <item>
-          <widget class="nx::vms::client::desktop::CheckBoxWithHint" name="useHttpsOnlyCamerasCheckBox">
-           <property name="text">
-            <string>Use only HTTPS to connect to cameras</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="nx::vms::client::desktop::AlertLabel" name="useHttpsOnlyCamerasWarning" native="true"/>
-         </item>
-         <item>
-          <widget class="nx::vms::client::desktop::CheckBoxWithHint" name="forceTrafficEncryptionCheckBox">
-           <property name="text">
-            <string>Force servers to accept only encrypted connections</string>
-           </property>
-          </widget>
-         </item>
-         <item>
+         <property name="horizontalSpacing">
+          <number>0</number>
+         </property>
+         <property name="verticalSpacing">
+          <number>7</number>
+         </property>
+         <item row="4" column="1">
           <widget class="nx::vms::client::desktop::CheckBoxWithHint" name="forceVideoTrafficEncryptionCheckBox">
            <property name="text">
             <string>Encrypt video traffic to desktop and mobile clients</string>
            </property>
           </widget>
          </item>
-         <item>
-          <widget class="nx::vms::client::desktop::AlertLabel" name="forceVideoEncryptionWarning" native="true"/>
-         </item>
-         <item>
-          <widget class="nx::vms::client::desktop::CheckBoxWithHint" name="displayWatermarkCheckBox">
+         <item row="0" column="1">
+          <widget class="nx::vms::client::desktop::CheckBoxWithHint" name="useHttpsOnlyCamerasCheckBox">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="baseSize">
+            <size>
+             <width>521</width>
+             <height>0</height>
+            </size>
+           </property>
            <property name="text">
-            <string>Display watermark with username over video</string>
+            <string>Use only HTTPS to connect to cameras</string>
            </property>
           </widget>
          </item>
-         <item>
+         <item row="0" column="0">
+          <widget class="QWidget" name="widget" native="true">
+           <property name="baseSize">
+            <size>
+             <width>165</width>
+             <height>0</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="1" alignment="Qt::AlignLeft">
           <widget class="QPushButton" name="watermarkSettingsButton">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -125,6 +136,228 @@
            <property name="text">
             <string>Watermark Preview</string>
            </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="nx::vms::client::desktop::CheckBoxWithHint" name="forceTrafficEncryptionCheckBox">
+           <property name="text">
+            <string>Force servers to accept only encrypted connections</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="nx::vms::client::desktop::AlertLabel" name="useHttpsOnlyCamerasWarning" native="true"/>
+         </item>
+         <item row="6" column="1">
+          <widget class="nx::vms::client::desktop::CheckBoxWithHint" name="displayWatermarkCheckBox">
+           <property name="text">
+            <string>Display watermark with username over video</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="1">
+          <widget class="nx::vms::client::desktop::AlertLabel" name="forceVideoEncryptionWarning" native="true"/>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="videoRedactionGroupBox">
+        <property name="title">
+         <string>Video Redaction</string>
+        </property>
+        <property name="flat">
+         <bool>true</bool>
+        </property>
+        <layout class="QGridLayout" name="gridLayout_5" columnstretch="23,77">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <property name="horizontalSpacing">
+          <number>0</number>
+         </property>
+         <property name="verticalSpacing">
+          <number>7</number>
+         </property>
+         <item row="0" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout">
+           <property name="spacing">
+            <number>8</number>
+           </property>
+           <item>
+            <widget class="nx::vms::client::desktop::SelectAnalyticsObjectTypesButton" name="pixelateObjectTypesButton">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>180</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>180</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="configurePixelationButton">
+             <property name="text">
+              <string>Configure...</string>
+             </property>
+             <property name="flat">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_2">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+         <item row="0" column="0">
+          <widget class="QWidget" name="blurLabelWidget" native="true">
+           <property name="baseSize">
+            <size>
+             <width>165</width>
+             <height>0</height>
+            </size>
+           </property>
+           <layout class="QHBoxLayout" name="horizontalLayout_2">
+            <property name="spacing">
+             <number>0</number>
+            </property>
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>16</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="blurLabel">
+              <property name="baseSize">
+               <size>
+                <width>165</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Blur</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+              <property name="margin">
+               <number>0</number>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QnSelectDevicesButton" name="excludeCamerasButton">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>180</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>180</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QWidget" name="excludeCamerasLabelWidget" native="true">
+           <property name="baseSize">
+            <size>
+             <width>165</width>
+             <height>0</height>
+            </size>
+           </property>
+           <layout class="QHBoxLayout" name="horizontalLayout_5">
+            <property name="spacing">
+             <number>0</number>
+            </property>
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>16</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="excludeCamerasLabel">
+              <property name="baseSize">
+               <size>
+                <width>165</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Exclude Cameras</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+              <property name="margin">
+               <number>0</number>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </widget>
          </item>
         </layout>
@@ -138,10 +371,7 @@
         <property name="flat">
          <bool>true</bool>
         </property>
-        <layout class="QVBoxLayout" name="verticalLayout_4">
-         <property name="spacing">
-          <number>7</number>
-         </property>
+        <layout class="QGridLayout" name="gridLayout_3" columnstretch="23,77">
          <property name="leftMargin">
           <number>0</number>
          </property>
@@ -154,7 +384,16 @@
          <property name="bottomMargin">
           <number>0</number>
          </property>
-         <item>
+         <property name="horizontalSpacing">
+          <number>0</number>
+         </property>
+         <property name="verticalSpacing">
+          <number>7</number>
+         </property>
+         <item row="3" column="1">
+          <widget class="nx::vms::client::desktop::AlertLabel" name="limitSessionAlertLabel" native="true"/>
+         </item>
+         <item row="0" column="1">
           <widget class="QWidget" name="digestAlertWidget" native="true">
            <layout class="QVBoxLayout" name="verticalLayout_6">
             <property name="spacing">
@@ -198,24 +437,24 @@
            </layout>
           </widget>
          </item>
-         <item>
+         <item row="6" column="0">
+          <widget class="QWidget" name="widget_3" native="true"/>
+         </item>
+         <item row="6" column="1">
+          <widget class="QCheckBox" name="showServersInTreeCheckBox">
+           <property name="text">
+            <string>Display servers in tree for non-power users</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
           <widget class="nx::vms::client::desktop::CheckBoxWithHint" name="auditTrailCheckBox">
            <property name="text">
             <string>Enable audit trail</string>
            </property>
           </widget>
          </item>
-         <item>
-          <widget class="nx::vms::client::desktop::CheckBoxWithHint" name="limitSessionLengthCheckBox">
-           <property name="text">
-            <string>Limit session duration</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="nx::vms::client::desktop::AlertLabel" name="limitSessionAlertLabel" native="true"/>
-         </item>
-         <item>
+         <item row="4" column="1">
           <widget class="QWidget" name="limitSessionDetailsWidget" native="true">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
@@ -225,7 +464,7 @@
            </property>
            <layout class="QGridLayout" name="gridLayout">
             <property name="leftMargin">
-             <number>0</number>
+             <number>16</number>
             </property>
             <property name="topMargin">
              <number>2</number>
@@ -278,13 +517,13 @@
            </layout>
           </widget>
          </item>
-         <item>
+         <item row="5" column="1">
           <widget class="nx::vms::client::desktop::AlertLabel" name="limitSessionLengthAlertLabel" native="true"/>
          </item>
-         <item>
-          <widget class="QCheckBox" name="showServersInTreeCheckBox">
+         <item row="2" column="1">
+          <widget class="nx::vms::client::desktop::CheckBoxWithHint" name="limitSessionLengthCheckBox">
            <property name="text">
-            <string>Display servers in tree for non-power users</string>
+            <string>Limit session duration</string>
            </property>
           </widget>
          </item>
@@ -305,10 +544,7 @@
         <property name="checked">
          <bool>false</bool>
         </property>
-        <layout class="QVBoxLayout" name="verticalLayout">
-         <property name="spacing">
-          <number>7</number>
-         </property>
+        <layout class="QGridLayout" name="gridLayout_4" rowstretch="0,0" columnstretch="23,77">
          <property name="leftMargin">
           <number>0</number>
          </property>
@@ -321,10 +557,20 @@
          <property name="bottomMargin">
           <number>0</number>
          </property>
-         <item>
-          <widget class="nx::vms::client::desktop::AlertLabel" name="archiveEncryptionWarning"/>
+         <property name="horizontalSpacing">
+          <number>0</number>
+         </property>
+         <property name="verticalSpacing">
+          <number>7</number>
+         </property>
+         <item row="1" column="0">
+          <widget class="QLabel" name="archiveEncryptionSpacer">
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
          </item>
-         <item>
+         <item row="1" column="1" alignment="Qt::AlignLeft">
           <widget class="QPushButton" name="changeArchivePasswordButton">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -336,6 +582,9 @@
             <string>Change Password...</string>
            </property>
           </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="nx::vms::client::desktop::AlertLabel" name="archiveEncryptionWarning" native="true"/>
          </item>
         </layout>
        </widget>
@@ -360,11 +609,6 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>nx::vms::client::desktop::AlertBar</class>
-   <extends>QWidget</extends>
-   <header location="global">nx/vms/client/desktop/common/widgets/control_bars.h</header>
-  </customwidget>
-  <customwidget>
    <class>nx::vms::client::desktop::CheckBoxWithHint</class>
    <extends>QCheckBox</extends>
    <header location="global">nx/vms/client/desktop/common/widgets/widget_with_hint.h</header>
@@ -374,6 +618,16 @@
    <extends>QWidget</extends>
    <header location="global">nx/vms/client/desktop/common/widgets/alert_label.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QnSelectDevicesButton</class>
+   <extends>QPushButton</extends>
+   <header location="global">ui/widgets/select_resources_button.h</header>
+  </customwidget>
+  <customwidget>
+   <class>nx::vms::client::desktop::SelectAnalyticsObjectTypesButton</class>
+   <extends>QPushButton</extends>
+   <header location="global">nx/vms/client/desktop/ui/common/select_analytics_object_types_button.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>
