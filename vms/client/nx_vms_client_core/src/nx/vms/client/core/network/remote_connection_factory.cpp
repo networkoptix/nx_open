@@ -490,11 +490,12 @@ struct RemoteConnectionFactory::Private
                         context->address(),
                         context->handshakeCertificateChain});
                 }
-                return false;
+                return true; //< Status is ok.
             };
 
-        if (auto accepted = context->logonData.userInteractionAllowed
-            && executeInUiThreadSync(context, accept))
+        if ((status == CertificateVerifier::Status::ok)
+            || (context->logonData.userInteractionAllowed
+                && executeInUiThreadSync(context, accept)))
         {
             pinTargetServerCertificate();
         }
@@ -816,8 +817,12 @@ struct RemoteConnectionFactory::Private
         if (!context)
             return;
 
-        context->compatibilityUserModel = nx::vms::api::UserModelV1();
-        context->compatibilityUserModel->isOwner = true;
+        context->compatibilityUserModel = nx::vms::api::UserModelV1{
+            .isOwner = true,
+            .permissions = nx::vms::api::GlobalPermissionDeprecated::admin
+        };
+        context->compatibilityUserModel->name = QString::fromStdString(
+            context->logonData.credentials.username);
     }
 
     void requestCompatibilityUserPermissions(ContextPtr context)
@@ -833,7 +838,8 @@ struct RemoteConnectionFactory::Private
         {
             NX_VERBOSE(this, "Compatibility user model received");
             if (userModel.permissions.testFlag(
-                nx::vms::api::GlobalPermissionDeprecated::customUser))
+                nx::vms::api::GlobalPermissionDeprecated::customUser)
+                || !userModel.userRoleId.isNull()) //< Custom role.
             {
                 // Requesting roles and migrating their permissions correctly may be a pain, which
                 // is actually not needed in the compatibility mode. Camera list access is limited

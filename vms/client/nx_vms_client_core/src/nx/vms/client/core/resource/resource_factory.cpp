@@ -10,6 +10,12 @@
 
 namespace nx::vms::client::core {
 
+namespace {
+
+static const nx::utils::SoftwareVersion kRestApiSupportVersion(5, 0);
+
+} // namespace
+
 QnMediaServerResourcePtr ResourceFactory::createServer() const
 {
     return QnMediaServerResourcePtr(new ServerResource());
@@ -26,14 +32,22 @@ QnUserResourcePtr ResourceFactory::createUser(
         if (NX_ASSERT(connection))
         {
             // User info for the pre-6.0 Systems where old permissions model is implemented.
-            const auto userModel = connection->connectionInfo().compatibilityUserModel;
-            if (userModel && userModel->id == data.id)
+            if (auto userModel = connection->connectionInfo().compatibilityUserModel)
             {
                 NX_ASSERT(
                     connection->moduleInformation().version < nx::utils::SoftwareVersion(6, 0),
                     "Compatibility model should not be requested for the 6.0 systems");
 
-                return QnUserResourcePtr(new UserResource(*userModel));
+                if (userModel->id == data.id)
+                    return QnUserResourcePtr(new UserResource(*userModel));
+
+                // For the pre-5.0 versions we do not know the user id.
+                if (connection->moduleInformation().version < kRestApiSupportVersion
+                    && QString::compare(userModel->name, data.name, Qt::CaseInsensitive) == 0)
+                {
+                    userModel->id = data.id;
+                    return QnUserResourcePtr(new UserResource(*userModel));
+                }
             }
         }
     }
