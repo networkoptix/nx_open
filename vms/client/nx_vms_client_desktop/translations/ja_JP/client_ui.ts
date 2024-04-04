@@ -1071,7 +1071,7 @@
     </message>
     <message>
       <source>Subnet Scan</source>
-      <translation>サブネット検索(&amp;U)</translation>
+      <translation>サブネット検索</translation>
     </message>
     <message>
       <source>Address</source>
