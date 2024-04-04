@@ -92,12 +92,16 @@ QList<int> LookupListManager::filter(
 {
     NX_MUTEX_LOCKER lk(&d->mutex);
     QList<int> result;
+    const QString lowerFilterText = filterText.toLower();
     for (int i = 0; i < list.entries.size() && i < resultLimit; i++)
     {
         for (auto& [key, value]: list.entries[i])
         {
-            if (value.contains(filterText))
+            if (value.toLower().contains(lowerFilterText))
+            {
                 result.push_back(i);
+                break;
+            }
         }
     }
     return result;
