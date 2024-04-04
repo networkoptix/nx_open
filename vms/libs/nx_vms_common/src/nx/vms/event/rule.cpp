@@ -300,7 +300,7 @@ RuleList Rule::getDefaultRules()
 
 RuleList Rule::getNotificationRules()
 {
-    return { //          Id     period isSystem actionType                   eventType
+    return RuleList{ //          Id     period isSystem actionType                   eventType
         RulePtr(new Rule(1,     30,      false, ActionType::showPopupAction, EventType::cameraDisconnectEvent, {},        true)),
         RulePtr(new Rule(2,     30,      false, ActionType::showPopupAction, EventType::storageFailureEvent,   {},        true)),
         RulePtr(new Rule(3,     30,      false, ActionType::showPopupAction, EventType::networkIssueEvent,     {},        true)),
@@ -326,6 +326,16 @@ RuleList Rule::getNotificationRules()
         RulePtr(new Rule(11006, 6*3600,  false, ActionType::pushNotificationAction, EventType::serverConflictEvent,   {api::kAdministratorsGroupId})),
         RulePtr(new Rule(11007, 6*3600,  false, ActionType::pushNotificationAction, EventType::serverStartEvent,      {api::kAdministratorsGroupId})),
         RulePtr(new Rule(11008, 6*3600,  false, ActionType::pushNotificationAction, EventType::licenseIssueEvent,     {api::kAdministratorsGroupId})),
+    } + getSaasIssueNotificationRules();
+}
+
+RuleList Rule::getSaasIssueNotificationRules()
+{
+    return {
+        RulePtr(new Rule(10028, 30, false, ActionType::showPopupAction, EventType::saasIssueEvent, {}, true)),
+        RulePtr(new Rule(10029, 6 * 3600, false, ActionType::sendMailAction, EventType::saasIssueEvent, { api::kAdministratorsGroupId })),
+        RulePtr(new Rule(11030, 6 * 3600, false, ActionType::pushNotificationAction, EventType::saasIssueEvent, { api::kAdministratorsGroupId })),
+        RulePtr(new Rule(11031, 30, true, ActionType::diagnosticsAction, EventType::saasIssueEvent))
     };
 }
 

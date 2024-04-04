@@ -2,15 +2,13 @@
 
 #include "license.h"
 
-#include <cassert>
+#include <openssl/bio.h>
+#include <openssl/err.h>
+#include <openssl/pem.h>
+#include <openssl/rsa.h>
 
 #include <QtCore/QCryptographicHash>
 #include <QtCore/QStringList>
-
-#include <openssl/rsa.h>
-#include <openssl/pem.h>
-#include <openssl/bio.h>
-#include <openssl/err.h>
 
 #include <api/runtime_info_manager.h>
 #include <common/common_globals.h>
@@ -685,6 +683,11 @@ QnLicenseList QnLicensePool::getLicenses() const
 {
     NX_MUTEX_LOCKER locker(&m_mutex);
     return m_licenseDict.values();
+}
+
+QnLicensePtr QnLicensePool::findLicense(const std::string& key) const
+{
+    return findLicense(QString::fromStdString(key));
 }
 
 QnLicensePtr QnLicensePool::findLicense(const QString& key) const

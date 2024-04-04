@@ -123,6 +123,10 @@ void initialize(Manager* manager, Action* root)
         .flags(NoTarget)
         .requiredPowerUserPermissions();
 
+    factory(PreferencesServicesTabAction)
+        .flags(NoTarget)
+        .requiredPowerUserPermissions();
+
     factory(PreferencesSmtpTabAction)
         .flags(NoTarget)
         .requiredPowerUserPermissions();
