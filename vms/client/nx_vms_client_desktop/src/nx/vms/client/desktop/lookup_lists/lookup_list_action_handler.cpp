@@ -59,6 +59,8 @@ LookupListDataList exampleData()
     return result;
 }
 
+constexpr auto kMaxRequestAttemptCount = 5;
+
 } // namespace
 
 struct LookupListActionHandler::Private
@@ -67,13 +69,17 @@ struct LookupListActionHandler::Private
     std::unique_ptr<LookupListsDialog> dialog;
     std::optional<rest::Handle> requestId;
     std::deque<LookupListData> saveQueue;
+    std::deque<Uuid> removeQueue;
+    size_t requestAttemptsCount{0};
 
     void cancelRequest()
     {
         if (requestId)
             q->connectedServerApi()->cancelRequest(*requestId);
+
         requestId = {};
         saveQueue = {};
+        removeQueue = {};
     }
 
     void handleError(const QString& text)
@@ -92,15 +98,25 @@ struct LookupListActionHandler::Private
                 if (this->requestId != requestId)
                     return;
 
-                this->requestId = std::nullopt;
-
                 if (success)
                 {
-                    processSaveQueue();
+                    this->requestId = std::nullopt;
+                    requestAttemptsCount = 0;
+                    saveQueue.pop_front();
+                    processQueues();
                 }
                 else
                 {
+                    ++requestAttemptsCount;
+                    if (requestAttemptsCount <= kMaxRequestAttemptCount)
+                    {
+                        processQueues();
+                        return;
+                    }
+
                     NX_WARNING(this, "Lookup List save request %1 failed", requestId);
+                    this->requestId = std::nullopt;
+
                     handleError(tr("Network request failed"));
                     if (dialog)
                         dialog->setSaveResult(false);
@@ -113,33 +129,93 @@ struct LookupListActionHandler::Private
             QByteArray::fromStdString(nx::reflect::json::serialize(list)),
             callback,
             q->thread());
+
         NX_VERBOSE(this, "Send save list %1 request (%2)", list.id, *requestId);
     }
 
-    void processSaveQueue()
+    void removeList(Uuid listId)
     {
-        if (saveQueue.empty())
+        auto callback = nx::utils::guarded(q,
+            [this](bool success,
+                rest::Handle requestId,
+                const rest::ServerConnection::EmptyResponseType& /*response*/)
+            {
+                if (this->requestId != requestId)
+                    return;
+
+                if (success)
+                {
+                    this->requestId = std::nullopt;
+                    requestAttemptsCount = 0;
+                    removeQueue.pop_front();
+                    processQueues();
+                }
+                else
+                {
+                    ++requestAttemptsCount;
+                    if (requestAttemptsCount <= kMaxRequestAttemptCount)
+                    {
+                        processQueues();
+                        return;
+                    }
+
+                    NX_WARNING(this, "Lookup List remove request %1 failed", requestId);
+                    this->requestId = std::nullopt;
+
+                    handleError(tr("Network request failed"));
+                    if (dialog)
+                        dialog->setSaveResult(false);
+                }
+            });
+
+        requestId = q->connectedServerApi()->deleteEmptyResult(
+            nx::format("/rest/v3/lookupLists/%1").arg(listId),
+            {},
+            callback,
+            q->thread());
+
+        NX_VERBOSE(this, "Send remove list %1 request (%2)", listId, *requestId);
+    }
+
+    void processQueues()
+    {
+        if (!saveQueue.empty())
         {
-            if (dialog)
-                dialog->setSaveResult(/*success*/ true);
+            saveList(std::move(saveQueue.front()));
             return;
         }
 
-        saveList(std::move(saveQueue.front()));
-        saveQueue.pop_front();
+        if (!removeQueue.empty())
+        {
+            removeList(removeQueue.front());
+            return;
+        }
+
+        if (dialog)
+            dialog->setSaveResult(/*success*/ true);
     }
 
     void saveData(LookupListDataList data)
     {
+        UuidSet listsToRemove;
+        for (auto& list: q->lookupListManager()->lookupLists())
+            listsToRemove.insert(list.id);
+
         for (auto list: data)
         {
             if (!NX_ASSERT(!list.id.isNull()))
                 continue;
 
+            listsToRemove.remove(list.id);
+
             if (list != q->lookupListManager()->lookupList(list.id))
                 saveQueue.push_back(std::move(list));
         }
-        processSaveQueue();
+
+        removeQueue.assign(listsToRemove.cbegin(), listsToRemove.cend());
+
+        requestAttemptsCount = 0;
+        processQueues();
     }
 };
 
