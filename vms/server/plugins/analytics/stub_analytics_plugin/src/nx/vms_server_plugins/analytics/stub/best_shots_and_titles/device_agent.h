@@ -7,6 +7,7 @@
 #include <nx/sdk/analytics/helpers/consuming_device_agent.h>
 #include <nx/sdk/analytics/i_object_metadata_packet.h>
 #include <nx/sdk/analytics/i_object_track_best_shot_packet.h>
+#include <nx/sdk/analytics/i_object_track_title_packet.h>
 #include <nx/sdk/analytics/rect.h>
 
 namespace nx {
@@ -47,6 +48,12 @@ private:
         image,
     };
 
+    enum class TitleGenerationPolicy
+    {
+        url,
+        image,
+    };
+
     struct BestShotGenerationContext
     {
         BestShotGenerationPolicy policy;
@@ -60,9 +67,24 @@ private:
         nx::sdk::analytics::Rect fixedBestShotBoundingBox;
     };
 
+    struct TitleGenerationConext
+    {
+        TitleGenerationPolicy policy;
+
+        std::string url;
+
+        std::string imageDataFormat;
+        std::vector<char> imageData;
+
+        std::string text;
+    };
+
 private:
     using BestShotList = std::vector<nx::sdk::Ptr<nx::sdk::analytics::IObjectTrackBestShotPacket>>;
     BestShotList generateBestShots();
+
+    using TitleList = std::vector<nx::sdk::Ptr<nx::sdk::analytics::IObjectTrackTitlePacket>>;
+    TitleList generateTitles();
 
     nx::sdk::Ptr<nx::sdk::analytics::IObjectTrackBestShotPacket> generateFixedBestShot(
         nx::sdk::Uuid trackId);
@@ -76,10 +98,13 @@ private:
     nx::sdk::Ptr<nx::sdk::analytics::IObjectMetadataPacket> generateObjects();
 
     static BestShotGenerationPolicy bestShotGenerationPolicyFromString(const std::string& str);
+    static TitleGenerationPolicy titleGenerationPolicyFromString(const std::string& str);
 
 private:
     std::vector<TrackContext> m_trackContexts;
     BestShotGenerationContext m_bestShotGenerationContext;
+    TitleGenerationConext m_titleGenerationContext;
+
     int64_t m_lastFrameTimestampUs = 0;
     std::map<nx::sdk::Uuid, int> m_bestShotGenerationCounterByTrackId;
 };

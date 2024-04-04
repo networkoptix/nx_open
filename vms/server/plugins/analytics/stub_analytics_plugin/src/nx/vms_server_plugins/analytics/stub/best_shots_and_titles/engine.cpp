@@ -125,7 +125,7 @@ R"json(
                 [
                     {
                         "type": "TextArea",
-                        "name": ")json" + kUrlSetting + R"json(",
+                        "name": ")json" + kBestShotUrlSetting + R"json(",
                         "caption": "Best Shot URL"
                     }
                 ]
@@ -137,8 +137,67 @@ R"json(
                 [
                     {
                         "type": "TextArea",
-                        "name": ")json" + kImagePathSetting + R"json(",
+                        "name": ")json" + kBestShotImagePathSetting + R"json(",
                         "caption": "Path to Best Shot image"
+                    }
+                ]
+            },
+            {
+                "type": "GroupBox",
+                "caption": "General Track Title generation settings",
+                "items":
+                [
+                    {
+                        "type": "ComboBox",
+                        "name": ")json" + kTitleGenerationPolicySetting + R"json(",
+                        "caption": "Track Title generation policy",
+                        "defaultValue": ")json" + kUrlTitleGenerationPolicy + R"json(",
+                        "range":
+                        [
+                            ")json" + kUrlTitleGenerationPolicy + R"json(",
+                            ")json" + kImageTitleGenerationPolicy + R"json("
+                        ],
+                        "itemCaptions":
+                        {
+                            ")json" + kUrlTitleGenerationPolicy + R"json(": "URL",
+                            ")json" + kImageTitleGenerationPolicy + R"json(": "Image"
+                        }
+                    }
+                ]
+            },
+            {
+                "type": "GroupBox",
+                "caption": "URL Title settings",
+                "items":
+                [
+                    {
+                        "type": "TextArea",
+                        "name": ")json" + kTitleUrlSetting + R"json(",
+                        "caption": "Title URL"
+                    }
+                ]
+            },
+            {
+                "type": "GroupBox",
+                "caption": "Image Title settings",
+                "items":
+                [
+                    {
+                        "type": "TextArea",
+                        "name": ")json" + kTitleImagePathSetting + R"json(",
+                        "caption": "Path to Title image"
+                    }
+                ]
+            },
+            {
+                "type": "GroupBox",
+                "caption": "Title Text settings",
+                "items":
+                [
+                    {
+                        "type": "TextArea",
+                        "name": ")json" + kTitleTextSetting + R"json(",
+                        "caption": "Title text"
                     }
                 ]
             }

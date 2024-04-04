@@ -8,6 +8,7 @@
 #include <nx/sdk/analytics/helpers/object_metadata.h>
 #include <nx/sdk/analytics/helpers/object_metadata_packet.h>
 #include <nx/sdk/analytics/helpers/object_track_best_shot_packet.h>
+#include <nx/sdk/analytics/helpers/object_track_title_packet.h>
 #include <nx/sdk/helpers/uuid_helper.h>
 #include <nx/sdk/helpers/settings_response.h>
 
@@ -90,15 +91,21 @@ std::vector<Ptr<IMetadataPacket>> DeviceAgent::generateMetadata(
 {
     std::vector<Ptr<IMetadataPacket>> result;
 
-    if (m_streamInfo.objectsByFrameNumber.find(frameNumber) == m_streamInfo.objectsByFrameNumber.cend())
+    if (m_streamInfo.objectsByFrameNumber.find(frameNumber) ==
+            m_streamInfo.objectsByFrameNumber.cend())
         return result;
 
     std::map<int64_t, Ptr<ObjectMetadataPacket>> objectMetadataPacketByTimestamp;
     std::vector<Ptr<ObjectTrackBestShotPacket>> objectTrackBestShotPackets;
+    std::vector<Ptr<ObjectTrackTitlePacket>> objectTrackTitlePackets;
+
     for (Object& object: m_streamInfo.objectsByFrameNumber[frameNumber])
     {
-        if (m_disabledObjectTypeIds.find(object.typeId) != m_disabledObjectTypeIds.cend())
+        if (!object.typeId.empty() &&
+            m_disabledObjectTypeIds.find(object.typeId) != m_disabledObjectTypeIds.cend())
+        {
             continue;
+        }
 
         const int64_t timestampUs = object.timestampUs >= 0
             ? object.timestampUs
@@ -132,6 +139,29 @@ std::vector<Ptr<IMetadataPacket>> DeviceAgent::generateMetadata(
 
             objectTrackBestShotPackets.push_back(std::move(bestShotPacket));
         }
+        else if (object.entryType == Object::EntryType::title)
+        {
+            auto titlePacket = makePtr<ObjectTrackTitlePacket>(object.trackId,
+                m_lastFrameTimestampUs);
+
+            if (isHttpOrHttpsUrl(object.imageSource))
+            {
+                titlePacket->setImageUrl(object.imageSource);
+            }
+            else if (!object.imageSource.empty())
+            {
+                std::string imageFormat = imageFormatFromPath(object.imageSource);
+                if (!imageFormat.empty())
+                {
+                    titlePacket->setImageDataFormat(std::move(imageFormat));
+                    titlePacket->setImageData(loadFile(object.imageSource));
+                }
+            }
+
+            titlePacket->setText(object.titleText);
+
+            objectTrackTitlePackets.push_back(std::move(titlePacket));
+        }
         else
         {
             Ptr<ObjectMetadataPacket>& objectMetadataPacket =
@@ -161,6 +191,9 @@ std::vector<Ptr<IMetadataPacket>> DeviceAgent::generateMetadata(
 
     for (const auto& bestShotPacket: objectTrackBestShotPackets)
         result.push_back(bestShotPacket);
+
+    for (const auto& titlePacket: objectTrackTitlePackets)
+        result.push_back(titlePacket);
 
     return result;
 }

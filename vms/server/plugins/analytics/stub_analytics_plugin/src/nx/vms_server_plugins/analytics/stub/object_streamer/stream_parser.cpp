@@ -72,7 +72,7 @@ StreamInfo parseObjectStreamFile(const std::string& filePath, Issues* issues)
     std::string error;
     const Json json = Json::parse(jsonString, error);
 
-    if (!error.empty() && json.is_null())
+    if (!error.empty() || json.is_null())
     {
         addError(issues, Issue::objectStreamIsNotAValidJson);
         return {};
@@ -106,8 +106,12 @@ StreamInfo parseObjectStreamFile(const std::string& filePath, Issues* issues)
             continue;
         if (!parseImageSource(objectDescription, &object.imageSource, issues))
             continue;
+        if (!parseTitleText(objectDescription, &object.titleText, issues))
+            continue;
 
-        result.objectTypeIds.insert(object.typeId);
+        if (!object.typeId.empty())
+            result.objectTypeIds.insert(object.typeId);
+
         result.objectsByFrameNumber[object.frameNumberToGenerateObject].push_back(
             std::move(object));
     }
@@ -146,13 +150,15 @@ bool parseCommonFields(
     Issues* issues)
 {
     const Json& typeId = objectDescription[kTypeIdField];
-    if (!typeId.is_string())
+    if (!typeId.is_null() && !typeId.is_string())
         return addError(issues, Issue::typeIdIsNotAString, dumpJson(typeId));
     outObject->typeId = typeId.string_value();
 
     const Json& frameNumber = objectDescription[kFrameNumberField];
+
     if (!frameNumber.is_number())
         return addError(issues, Issue::frameNumberIsNotANumber, dumpJson(frameNumber));
+
     outObject->frameNumberToGenerateObject = frameNumber.int_value();
 
     outObject->entryType = Object::EntryType::regular;
@@ -162,6 +168,8 @@ bool parseCommonFields(
         const std::string& entryTypeString = entryType.string_value();
         if (entryTypeString == kBestShotEntryType)
             outObject->entryType = Object::EntryType::bestShot;
+        else if (entryTypeString == kTitleTextEntryType)
+            outObject->entryType = Object::EntryType::title;
         else if (entryTypeString != kRegularEntryType && !entryTypeString.empty())
             addWarning(issues, Issue::objectEntryTypeIsUnknown, dumpString(entryTypeString));
     }
@@ -178,6 +186,10 @@ bool parseBoundingBox(
     Issues* issues)
 {
     const Json& boundingBox = objectDescription[kBoundingBoxField];
+
+    if (boundingBox.is_null())
+        return true;
+
     if (!boundingBox.is_object())
         return addError(issues, Issue::boundingBoxIsNotAJsonObject, dumpJson(boundingBox));
 
@@ -215,6 +227,10 @@ bool parseAttributes(
     Issues* issues)
 {
     const Json& attributes = objectDescription[kAttributesField];
+
+    if (attributes.is_null())
+        return true;
+
     if (!attributes.is_object())
         return addWarning(issues, Issue::attributesFieldIsNotAJsonObject, dumpJson(attributes));
 
@@ -238,6 +254,10 @@ bool parseTimestamp(
     Issues* issues)
 {
     const Json& timestampUs = objectDescription[kTimestampUsField];
+
+    if (timestampUs.is_null())
+        return true;
+
     if (timestampUs.is_number())
         *outTimestampUs = (int64_t) timestampUs.number_value();
     else if (!timestampUs.is_null())
@@ -256,6 +276,20 @@ bool parseImageSource(
         *outImageSource = objectDescription[kImageSourceField].string_value();
     else if (!imageSource.is_null())
         addWarning(issues, Issue::imageSourceIsNotAString);
+
+    return true;
+}
+
+bool parseTitleText(
+    const Json& objectDescription,
+    std::string* outTitleText,
+    Issues* issues)
+{
+    const Json& title = objectDescription[kTitleTextField];
+    if (title.is_string())
+        *outTitleText = objectDescription[kTitleTextField].string_value();
+    else if (!title.is_null())
+        addWarning(issues, Issue::titleTextIsNotAString);
 
     return true;
 }
@@ -302,6 +336,8 @@ std::string issueToString(Issue issue)
             return "Entry type of some Items in the Object stream is invalid";
         case Issue::imageSourceIsNotAString:
             return "Image source of some Items in the Object stream is not a string";
+        case Issue::titleTextIsNotAString:
+            return "Title text of some Items in the Object stream is not a string";
         default:
             NX_KIT_ASSERT(false, "Unexpected issue");
             return {};

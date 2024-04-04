@@ -23,6 +23,7 @@ struct Object
     {
         regular,
         bestShot,
+        title
     };
 
     std::string typeId;
@@ -34,6 +35,7 @@ struct Object
     int64_t timestampUs = -1;
     EntryType entryType = EntryType::regular;
     std::string imageSource;
+    std::string titleText;
 };
 
 enum class Issue
@@ -57,6 +59,7 @@ enum class Issue
     objectEntryTypeIsNotAString,
     objectEntryTypeIsUnknown,
     imageSourceIsNotAString,
+    titleTextIsNotAString
 };
 
 struct Issues
@@ -101,6 +104,11 @@ bool parseTimestamp(
 bool parseImageSource(
     const nx::kit::Json& objectDescription,
     std::string* outImageSource,
+    Issues* issues);
+
+bool parseTitleText(
+    const nx::kit::Json& objectDescription,
+    std::string* outTitleText,
     Issues* issues);
 
 std::string issueToString(Issue issue);

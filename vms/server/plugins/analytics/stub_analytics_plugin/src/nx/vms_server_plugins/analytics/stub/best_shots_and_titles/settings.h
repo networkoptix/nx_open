@@ -23,8 +23,15 @@ extern const std::string kTopLeftYSetting;
 extern const std::string kWidthSetting;
 extern const std::string kHeightSetting;
 
-extern const std::string kUrlSetting;
-extern const std::string kImagePathSetting;
+extern const std::string kBestShotUrlSetting;
+extern const std::string kBestShotImagePathSetting;
+
+extern const  std::string kTitleGenerationPolicySetting;
+extern const  std::string kUrlTitleGenerationPolicy;
+extern const  std::string kImageTitleGenerationPolicy;
+extern const  std::string kTitleUrlSetting;
+extern const  std::string kTitleImagePathSetting;
+extern const  std::string kTitleTextSetting;
 
 } // namespace best_shots
 } // namespace stub

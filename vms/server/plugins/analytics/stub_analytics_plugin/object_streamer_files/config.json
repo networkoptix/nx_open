@@ -43,7 +43,12 @@
                         "LicensePlate.Country": "Kazakhstan"
                     }
                 }
-            ]
+            ],
+            "objectTrackTitle":
+            {
+                "imageSource": "https://picsum.photos/200/300",
+                "titleText": "Title Text 1"
+            }
         },
         {
             "objectTypeId": "nx.base.Car",
@@ -68,7 +73,12 @@
                         "Best Shot Type": "Bounding Box"
                     }
                 }
-            ]
+            ],
+            "objectTrackTitle":
+            {
+                "imageSource": "https://picsum.photos/200/300",
+                "titleText": "Title Text 2"
+            }
         },
         {
             "objectTypeId": "nx.base.Car",
