@@ -133,12 +133,12 @@ EventSearchWidget::Private::Private(EventSearchWidget* q):
     connect(q->system()->resourcePool(), &QnResourcePool::resourceRemoved,
         this, updateServerEventsMenuIfNeeded);
 
-    connect(q->systemContext()->saasServiceManager(),
+    connect(q->system()->saasServiceManager(),
         &nx::vms::common::saas::ServiceManager::dataChanged,
         this,
         &EventSearchWidget::Private::updateServerEventsMenu);
 
-    connect(q->systemContext()->globalSettings(),
+    connect(q->system()->globalSettings(),
         &nx::vms::common::SystemSettings::organizationIdChanged,
         this,
         &EventSearchWidget::Private::updateServerEventsMenu);

@@ -574,7 +574,7 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
 
             case EventType::saasIssueEvent:
             {
-                eventData.actionId = action::PreferencesServicesTabAction;
+                eventData.actionId = menu::PreferencesServicesTabAction;
                 break;
             }
 
