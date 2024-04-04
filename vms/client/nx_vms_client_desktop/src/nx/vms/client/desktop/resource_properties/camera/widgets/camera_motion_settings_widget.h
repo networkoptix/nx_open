@@ -5,6 +5,7 @@
 #include <QtCore/QScopedPointer>
 #include <QtWidgets/QWidget>
 
+#include <core/resource/resource_fwd.h>
 #include <nx/utils/uuid.h>
 
 class QButtonGroup;
@@ -29,8 +30,11 @@ class CameraMotionSettingsWidget: public QWidget
 
 public:
     explicit CameraMotionSettingsWidget(
-        CameraSettingsDialogStore* store, QWidget* parent = nullptr);
+        CameraSettingsDialogStore* store,
+        QWidget* parent = nullptr);
     virtual ~CameraMotionSettingsWidget() override;
+
+    void setCamera(const QnVirtualCameraResourcePtr& camera);
 
 protected:
     virtual void showEvent(QShowEvent* event) override;
@@ -47,7 +51,9 @@ private:
     const QScopedPointer<core::CameraMotionHelper> m_motionHelper;
     QButtonGroup* const m_sensitivityButtons = nullptr;
     QQuickWidget* const m_motionWidget = nullptr;
-    nx::Uuid m_cameraId;
+
+    // It should be used only for videostream in QML. Do not modify camera state.
+    QnVirtualCameraResourcePtr m_camera;
 };
 
 } // namespace nx::vms::client::desktop

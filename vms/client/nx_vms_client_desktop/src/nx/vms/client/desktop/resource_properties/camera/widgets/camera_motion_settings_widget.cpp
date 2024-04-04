@@ -10,6 +10,7 @@
 #include <QtQuickWidgets/QQuickWidget>
 #include <QtWidgets/QButtonGroup>
 
+#include <core/resource/camera_resource.h>
 #include <nx/vms/client/core/media/media_player.h>
 #include <nx/vms/client/core/motion/helpers/camera_motion_helper.h>
 #include <nx/vms/client/core/skin/color_theme.h>
@@ -148,8 +149,10 @@ CameraMotionSettingsWidget::CameraMotionSettingsWidget(
 
             auto motionItem = this->motionItem();
             NX_ASSERT(motionItem);
-            motionItem->setProperty("cameraResourceId", QVariant::fromValue(m_cameraId));
-            motionItem->setProperty("cameraMotionHelper", QVariant::fromValue(m_motionHelper.data()));
+
+            motionItem->setProperty("cameraResource", QVariant::fromValue(m_camera.data()));
+            motionItem->setProperty("cameraMotionHelper",
+                QVariant::fromValue(m_motionHelper.data()));
             motionItem->setProperty("currentSensitivity", m_sensitivityButtons->checkedId());
             motionItem->setProperty("sensitivityColors", QVariant::fromValue(sensitivityColors));
             motionItem->setProperty("visible", QVariant::fromValue(false));
@@ -182,6 +185,11 @@ CameraMotionSettingsWidget::~CameraMotionSettingsWidget()
 {
 }
 
+void CameraMotionSettingsWidget::setCamera(const QnVirtualCameraResourcePtr& camera)
+{
+    m_camera = camera;
+}
+
 QQuickItem* CameraMotionSettingsWidget::motionItem() const
 {
     return m_motionWidget->rootObject();
@@ -192,7 +200,8 @@ void CameraMotionSettingsWidget::loadState(const CameraSettingsDialogState& stat
     if (!state.isSingleCamera())
         return;
 
-    m_cameraId = state.singleCameraId();
+    NX_ASSERT(m_camera && m_camera->getId() == state.singleCameraId());
+
     m_motionHelper->setMotionRegionList(state.motion.regionList());
 
     const bool turnedOn = state.motion.enabled();
@@ -234,7 +243,7 @@ void CameraMotionSettingsWidget::loadState(const CameraSettingsDialogState& stat
     if (auto motionItem = this->motionItem())
     {
         motionItem->setProperty("currentSensitivity", state.motion.currentSensitivity);
-        motionItem->setProperty("cameraResourceId", QVariant::fromValue(m_cameraId));
+        motionItem->setProperty("cameraResource", QVariant::fromValue(m_camera.data()));
         motionItem->setEnabled(turnedOn && !state.readOnly);
         motionItem->setOpacity(turnedOn ? 1.0 : style::Hints::kDisabledItemOpacity);
 

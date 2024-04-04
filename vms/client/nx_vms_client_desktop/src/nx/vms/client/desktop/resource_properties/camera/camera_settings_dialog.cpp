@@ -92,6 +92,7 @@ struct CameraSettingsDialog::Private: public QObject
     QnVirtualCameraResourceList cameras;
     QPointer<nx::vms::license::CamLicenseUsageHelper> licenseUsageHelper;
     QPointer<CameraAdvancedParamsWidget> advancedSettingsWidget;
+    QPointer<CameraMotionSettingsWidget> motionSettingsWidget;
     QPointer<DeviceAgentSettingsAdapter> deviceAgentSettingsAdapter;
     QPointer<FisheyePreviewController> fisheyePreviewController;
     QPointer<QPushButton> fixupScheduleButton;
@@ -357,9 +358,10 @@ CameraSettingsDialog::CameraSettingsDialog(SystemContext* systemContext, QWidget
         new IoModuleSettingsWidget(d->store, ui->tabWidget),
         tr("I/O Ports"));
 
+    d->motionSettingsWidget = new CameraMotionSettingsWidget(d->store, ui->tabWidget);
     GenericTabbedDialog::addPage(
         int(CameraSettingsTab::motion),
-        new CameraMotionSettingsWidget(d->store, ui->tabWidget),
+        d->motionSettingsWidget,
         tr("Motion"));
 
     GenericTabbedDialog::addPage(
@@ -501,6 +503,9 @@ bool CameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& cameras
     const auto singleCamera = cameras.size() == 1 ? cameras.first() : QnVirtualCameraResourcePtr();
 
     d->cameras = cameras;
+
+    if (NX_ASSERT(d->motionSettingsWidget))
+        d->motionSettingsWidget->setCamera(singleCamera);
 
     // All correctly implemented watchers are going before 'resetChanges' as their 'setCamera'
     // method is clean and does not send anything to the store.
