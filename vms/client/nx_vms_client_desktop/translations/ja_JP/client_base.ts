@@ -365,7 +365,7 @@
     </message>
     <message>
       <source>Monitor in New Tab</source>
-      <translation>モニターを新規タブで開く</translation>
+      <translation>モニターを新しいタブで開く</translation>
     </message>
     <message>
       <source>Open in Alarm Layout</source>
@@ -5290,7 +5290,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>%1 (Scanning... %2%)</source>
-      <translation>%1 (検索中... %2%)</translation>
+      <translation>%1 (スキャン中... %2%)</translation>
     </message>
     <message>
       <source>%1 (Rebuilding... %2%)</source>
@@ -5365,11 +5365,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnStorageRebuildWidget</name>
     <message>
       <source>Fast Backup Scan...</source>
-      <translation>高速バックアップ スキャン...</translation>
+      <translation>高速バックアップスキャン...</translation>
     </message>
     <message>
       <source>Fast Archive Scan...</source>
-      <translation>高速アーカイブ スキャン...</translation>
+      <translation>高速アーカイブスキャン...</translation>
     </message>
     <message>
       <source>Reindexing Backup...</source>
@@ -8241,7 +8241,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Scanning online hosts...</source>
-      <translation>オンラインホストの検索中...</translation>
+      <translation>オンラインホストをスキャンしています...</translation>
     </message>
     <message>
       <source>Checking host...</source>
@@ -9872,7 +9872,7 @@ You can force it, but it may significantly increase CPU load.</source>
     <name>nx::vms::client::desktop::RadassActionHandler</name>
     <message>
       <source>Set layout resolution to &quot;Auto&quot; to increase performance.</source>
-      <translation>パフォーマンスを向上させるには、レイアウトの解像度を &quot;自動&quot; に設定します。</translation>
+      <translation>パフォーマンスを向上させるには、レイアウトの解像度を &quot;自動&quot; に設定してください。</translation>
     </message>
   </context>
   <context>
@@ -10514,7 +10514,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Bookmark it...</source>
-      <translation>ブックマークする</translation>
+      <translation>ブックマーク...</translation>
     </message>
   </context>
   <context>
@@ -10538,7 +10538,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <name>nx::vms::client::desktop::SoftwareTriggerButton</name>
     <message>
       <source>Go to Live</source>
-      <translation>ライブ</translation>
+      <translation>ライブへ移動</translation>
     </message>
   </context>
   <context>
@@ -10546,7 +10546,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <message numerus="yes">
       <source>Email address is not set for %n users</source>
       <translation>
-        <numerusform>%n ユーザーのEmailアドレスが設定されていません</numerusform>
+        <numerusform>%n ユーザーのメールアドレスが設定されていません</numerusform>
       </translation>
     </message>
     <message>
@@ -10778,11 +10778,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <name>nx::vms::client::desktop::UploadWorker</name>
     <message>
       <source>Could not open file &quot;%1&quot;</source>
-      <translation>ファイルを開くことができません"%1"</translation>
+      <translation>ファイル &quot;%1&quot; を開けませんでした</translation>
     </message>
     <message>
       <source>Could not calculate md5 for file &quot;%1&quot;</source>
-      <translation>ファイル &quot;%1&amp;quot のmd5が計算できませんでした</translation>
+      <translation>ファイル &quot;%1&quot; の md5 を計算できませんでした</translation>
     </message>
     <message>
       <source>Could not create upload on the server side: %1</source>
@@ -10798,7 +10798,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>File was corrupted while being uploaded to the server</source>
-      <translation>ファイルがサーバーにアップロードされている間に破損しました</translation>
+      <translation>サーバーへのアップロード中にファイルが破損しました</translation>
     </message>
     <message>
       <source>Remote file &quot;%1&quot; is corrupted</source>
@@ -10851,7 +10851,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <name>nx::vms::client::desktop::UserListModel</name>
     <message>
       <source>Local user</source>
-      <translation>ローカル ユーザー</translation>
+      <translation>ローカルユーザー</translation>
     </message>
     <message>
       <source>%1 user</source>
@@ -10952,11 +10952,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <name>nx::vms::client::desktop::VirtualCameraMotionWidget</name>
     <message>
       <source>Motion is being detected only during video uploading.</source>
-      <translation>動画のアップロード時のみモーション検出を行います。</translation>
+      <translation>モーション検知は、動画のアップロード時のみ行われます。</translation>
     </message>
     <message>
       <source>Enabling or disabling this setting does not change anything in the existing archive.</source>
-      <translation>この設定を有効または無効にしても、既存のアーカイブの内容は変更されません。</translation>
+      <translation>この設定を有効化・無効化しても、既存のアーカイブは影響を受けません。</translation>
     </message>
   </context>
   <context>
@@ -10989,7 +10989,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <name>nx::vms::client::desktop::VirtualCameraWorker</name>
     <message>
       <source>Failed to send request to the server.</source>
-      <translation>サーバーに要求を送信できませんでした。</translation>
+      <translation>サーバーへのリクエストの送信に失敗しました。</translation>
     </message>
   </context>
   <context>
