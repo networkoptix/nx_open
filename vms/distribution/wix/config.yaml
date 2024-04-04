@@ -30,3 +30,6 @@ launcher_version_file: '${launcher.version.file}'
 
 # ASan required library
 asan_library_name: '${asan_library_name}'
+
+# List of translation packages
+client_translation_files: '${client_translation_files}'

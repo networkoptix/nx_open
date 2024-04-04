@@ -50,7 +50,7 @@ nx_add_target(nx_vms_client_core LIBRARY
         ${qt_helpers_headers}
     FOLDER client/libs
 )
-nx_make_target_translatable(nx_vms_client_core)
+nx_make_target_translatable(nx_vms_client_core COMPONENTS "client" "mobile")
 add_dependencies(nx_vms_client_core nx_vms_client_core_external_resources)
 add_dependencies(nx_vms_client_core bytedance_iconpark)
 

@@ -241,3 +241,23 @@ function(nx_wix_add_signed_exe_target target)
     set_target_properties(${target} PROPERTIES FOLDER distribution)
 
 endfunction()
+
+
+function(nx_wix_generate_wxs_file target_file)
+    set(oneValueArgs
+        ID
+        SOURCE
+        DIRECTORY)
+    set(multiValueArgs
+        FILENAMES)
+    cmake_parse_arguments(WXS "" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+
+    set(WXS_COMPONENTS)
+    foreach(filename ${WXS_FILENAMES})
+        string(APPEND WXS_COMPONENTS
+            "<Component><File Name=\"${filename}\" KeyPath=\"yes\"/></Component>\n")
+    endforeach()
+    nx_configure_file(${CMAKE_CURRENT_FUNCTION_LIST_DIR}/wix_utils/wxs_component_group.wxs.in
+        ${target_file})
+
+endfunction()

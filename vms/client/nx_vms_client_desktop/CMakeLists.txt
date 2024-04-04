@@ -137,7 +137,7 @@ nx_add_target(nx_vms_client_desktop LIBRARY
     GDI
     MACOS_ARG_MAX_WORKAROUND
 )
-nx_make_target_translatable(nx_vms_client_desktop)
+nx_make_target_translatable(nx_vms_client_desktop COMPONENTS "client")
 add_dependencies(nx_vms_client_desktop nx_vms_client_desktop_external_resources)
 
 file(GLOB_RECURSE shader_sources CONFIGURE_DEPENDS

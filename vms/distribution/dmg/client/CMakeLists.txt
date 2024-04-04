@@ -32,6 +32,8 @@ if(NOT EXISTS ${installer_icon})
     set(installer_icon ${app_icon})
 endif()
 
+nx_get_component_translation_list(client_translation_files "client" SHELL_COMPATIBLE)
+
 set(distribution_config_file "${CMAKE_CURRENT_BINARY_DIR}/build_distribution.conf")
 nx_configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/build_distribution.conf.in

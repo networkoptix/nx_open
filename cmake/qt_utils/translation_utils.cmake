@@ -1,5 +1,9 @@
 ## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+include_guard(GLOBAL)
+
+set_property(GLOBAL PROPERTY nx_translatable_targets)
+
 function(_nx_add_generate_translations_target target)
     set(oneValueArgs
         SOURCE_DIRECTORY
@@ -39,9 +43,45 @@ function(_nx_add_generate_translations_target target)
 endfunction()
 
 function(nx_make_target_translatable target)
+    set(multiValueArgs COMPONENTS)
+    cmake_parse_arguments(TRANSLATABLE_TARGET "" "" "${multiValueArgs}" ${ARGN})
+
     set(translations_target ${target}_translations)
     _nx_add_generate_translations_target(${translations_target}
         SOURCE_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/translations
         TARGET_FILE ${translations_output_dir}/${target}.dat)
     add_dependencies(${target} ${translations_target})
+
+    set_property(
+        TARGET ${target}
+        PROPERTY translation_components ${TRANSLATABLE_TARGET_COMPONENTS})
+
+    set_property(GLOBAL APPEND PROPERTY nx_translatable_targets ${target})
+endfunction()
+
+function(nx_get_component_translation_list variable_name component)
+    set(options
+        FULL_PATH
+        SHELL_COMPATIBLE)
+    cmake_parse_arguments(NX "${options}" "" "" ${ARGN})
+
+    get_property(targets GLOBAL PROPERTY nx_translatable_targets)
+
+    set(result)
+    foreach(target ${targets})
+        get_property(components TARGET ${target} PROPERTY translation_components)
+        if(component IN_LIST components)
+            if(NX_FULL_PATH)
+                list(APPEND result "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/translations/${target}.dat")
+            else()
+                list(APPEND result "${target}.dat")
+            endif()
+        endif()
+    endforeach()
+
+    if(NX_SHELL_COMPATIBLE)
+        string(REPLACE ";" " " result "${result}")
+    endif()
+
+    set(${variable_name} ${result} PARENT_SCOPE)
 endfunction()
