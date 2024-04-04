@@ -2,7 +2,7 @@
 
 #include <nx/kit/debug.h>
 
-#include "best_shots/plugin.h"
+#include "best_shots_and_titles/plugin.h"
 #include "custom_metadata/plugin.h"
 #include "diagnostic_events/plugin.h"
 #include "events/plugin.h"

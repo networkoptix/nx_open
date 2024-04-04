@@ -22,8 +22,15 @@ const std::string kTopLeftYSetting = "topLeftY";
 const std::string kWidthSetting = "width";
 const std::string kHeightSetting = "height";
 
-const std::string kUrlSetting = "url";
-const std::string kImagePathSetting = "image";
+const std::string kBestShotUrlSetting = "bestShotUrl";
+const std::string kBestShotImagePathSetting = "bestShotImage";
+
+const std::string kTitleGenerationPolicySetting = "titleGenerationPolicy";
+const std::string kUrlTitleGenerationPolicy = "urlTitleGenerationPolicy";
+const std::string kImageTitleGenerationPolicy = "imageTitleGenerationPolicy";
+const std::string kTitleUrlSetting = "titleUrl";
+const std::string kTitleImagePathSetting = "titleImage";
+const std::string kTitleTextSetting = "titleText";
 
 } // namespace best_shots
 } // namespace stub

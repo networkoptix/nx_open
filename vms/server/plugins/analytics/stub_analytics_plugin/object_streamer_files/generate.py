@@ -192,17 +192,26 @@ class BestShot:
         self.attributes = {}
         self.image_source = ''
 
+class Title:
+    '''Information about Object Track Title Text and Title Image.'''
+
+    def __init__(self):
+        self.title_text = "Some text"
+        self.image_source = ''
+
 class StreamEntry:
     '''Single entry of the stream file.'''
 
     REGULAR_ENTRY_TYPE = 'regular'
     BEST_SHOT_ENTRY_TYPE = 'bestShot'
+    TITLE_ENTRY_TYPE = 'title'
     DEFAULT_ENTRY_TYPE = REGULAR_ENTRY_TYPE
 
     def __init__(self, frame_number: int, object_position: ObjectPosition):
         self.frame_number = frame_number
         self.entry_type = self.DEFAULT_ENTRY_TYPE
         self.image_source = ''
+        self.title_text = ''
         self.object_position = object_position
 
 class StreamEntryEncoder(json.JSONEncoder):
@@ -219,12 +228,23 @@ class StreamEntryEncoder(json.JSONEncoder):
     HEIGHT_KEY = 'height'
     IMAGE_SOURCE_KEY = 'imageSource'
     ENTRY_TYPE_KEY = 'entryType'
+    TITLE_TEXT_KEY = 'titleText'
 
     def default(self, o: StreamEntry) -> Dict:
         result = {}
-        result[self.FRAME_NUMBER_KEY] = o.frame_number
-        result[self.TYPE_ID_KEY] = o.object_position.type_id
+
         result[self.TRACK_ID_KEY] = o.object_position.track_id
+        result[self.FRAME_NUMBER_KEY] = o.frame_number
+
+        if o.entry_type == StreamEntry.TITLE_ENTRY_TYPE:
+            result[self.ENTRY_TYPE_KEY] = StreamEntry.TITLE_ENTRY_TYPE
+            result[self.IMAGE_SOURCE_KEY] = o.image_source
+            result[self.TITLE_TEXT_KEY] = o.title_text
+            return result # We don't need to fill anything else for Object Track Titles.
+
+
+        result[self.TYPE_ID_KEY] = o.object_position.type_id
+
         result[self.ATTRIBUTES_KEY] = o.object_position.attributes
         result[self.BOUNDING_BOX_KEY] = {}
         result[self.BOUNDING_BOX_KEY][self.TOP_LEFT_X_KEY] = o.object_position.bounding_box.x
@@ -254,6 +274,10 @@ class Generator(ABC):
         '''Generates Object Track Best Shot.'''
 
     @abstractmethod
+    def generate_title(self, frame_number: int, object_context: ObjectContext) -> StreamEntry:
+        '''Generates Object Track Title Text and Title Image.'''
+
+    @abstractmethod
     def object_type_info(self) -> ObjectTypeInfo:
         '''Returns information about Object Type of the current Object Track.'''
 
@@ -275,7 +299,9 @@ class RandomMovementGenerator(Generator):
         MAX_HEIGHT_KEY = 'maxHeight'
         ATTRIBUTES_KEY = 'attributes'
         BEST_SHOTS_KEY = 'bestShots'
+        OBJECT_TRACK_TITLE_KEY = 'objectTrackTitle'
         IMAGE_SOURCE_KEY = 'imageSource'
+        TITLE_TEXT_KEY = 'titleText'
         FRAME_NUMBER_KEY = 'frameNumber'
 
         DEFAULT_TRACK_ID_POLICY = FIXED_TRACK_ID_POLICY
@@ -307,6 +333,7 @@ class RandomMovementGenerator(Generator):
             self.attributes = (config.get(self.ATTRIBUTES_KEY)
                 if config.get(self.ATTRIBUTES_KEY) is not None else {})
             self.best_shots_by_frame_number = {}
+            self.title = None
 
             best_shots = config.get(self.BEST_SHOTS_KEY)
             if isinstance(best_shots, collections.abc.Sequence):
@@ -318,6 +345,13 @@ class RandomMovementGenerator(Generator):
                     best_shot.attributes = entry.get(self.ATTRIBUTES_KEY)
                     best_shot.image_source = entry.get(self.IMAGE_SOURCE_KEY)
                     self.best_shots_by_frame_number[frame_number] = best_shot
+
+            titleEntry = config.get(self.OBJECT_TRACK_TITLE_KEY)
+            if titleEntry is not None:
+                title = Title()
+                title.image_source = titleEntry.get(self.IMAGE_SOURCE_KEY)
+                title.title_text = titleEntry.get(self.TITLE_TEXT_KEY)
+                self.title = title
 
     def __init__(self, config: Dict, generator_id: int):
         self._config = self.Config(config)
@@ -371,6 +405,22 @@ class RandomMovementGenerator(Generator):
         stream_entry.image_source = best_shot.image_source
         stream_entry.object_position = copy.deepcopy(object_context.object_position)
         stream_entry.object_position.attributes = best_shot.attributes
+
+        return stream_entry
+
+    def generate_title(self, frame_number: int, object_context: ObjectContext) -> StreamEntry:
+        title = self._config.title
+
+        if title is None:
+            return None
+
+        stream_entry = StreamEntry(frame_number, object_context)
+        stream_entry.entry_type = StreamEntry.TITLE_ENTRY_TYPE
+        stream_entry.title_text = title.title_text
+        stream_entry.image_source = title.image_source
+
+        stream_entry.object_position = copy.deepcopy(object_context.object_position)
+
         return stream_entry
 
     def object_type_info(self) -> ObjectTypeInfo:
@@ -487,6 +537,11 @@ class GenerationManager:
                 if best_shot_entry is not None:
                     objects_in_frame.append(best_shot_entry)
 
+                title_entry = track_generator.generate_title(frame_number, context.object_context)
+
+                if title_entry is not None:
+                    objects_in_frame.append(title_entry)
+
             stream.extend(objects_in_frame)
 
         return stream
@@ -519,8 +574,8 @@ def parse_arguments():
     # pylint: disable=missing-function-docstring
     parser = argparse.ArgumentParser(
         description='Generate an object stream for the Stub Object Streamer sub-plugin')
-    parser.add_argument('-c', '--config', default='config.json',
-        type=Path, help='Configuration file for this script')
+    parser.add_argument('-c', '--config', default='config.json', type=Path,
+        help='Configuration file for this script')
     parser.add_argument('-m', '--manifest-file', dest='manifest_file',
         nargs='?', default='manifest.json', const='manifest.json', type=Path,
         help='Output manifest file')

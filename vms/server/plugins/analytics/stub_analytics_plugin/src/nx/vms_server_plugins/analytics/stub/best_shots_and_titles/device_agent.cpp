@@ -8,6 +8,7 @@
 #include <nx/sdk/analytics/helpers/object_metadata.h>
 #include <nx/sdk/analytics/helpers/object_metadata_packet.h>
 #include <nx/sdk/analytics/helpers/object_track_best_shot_packet.h>
+#include <nx/sdk/analytics/helpers/object_track_title_packet.h>
 
 #include <nx/vms_server_plugins/analytics/stub/utils.h>
 
@@ -41,6 +42,18 @@ static const std::string kObjectTypeId = "nx.stub.objectBestShotDemo";
         return BestShotGenerationPolicy::image;
 
     return BestShotGenerationPolicy::fixed;
+}
+
+/*static*/ DeviceAgent::TitleGenerationPolicy DeviceAgent::titleGenerationPolicyFromString(
+    const std::string& str)
+{
+    if (str == kUrlTitleGenerationPolicy)
+        return TitleGenerationPolicy::url;
+
+    if (str == kImageTitleGenerationPolicy)
+        return TitleGenerationPolicy::image;
+
+    return TitleGenerationPolicy::url;
 }
 
 DeviceAgent::DeviceAgent(const nx::sdk::IDeviceInfo* deviceInfo):
@@ -87,6 +100,10 @@ bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* videoPa
     for (Ptr<IObjectTrackBestShotPacket>& bestShotPacket: bestShotPackets)
         pushMetadataPacket(bestShotPacket.releasePtr());
 
+    std::vector<Ptr<IObjectTrackTitlePacket>> titlePackets = generateTitles();
+    for (Ptr<IObjectTrackTitlePacket>& titlePacket: titlePackets)
+        pushMetadataPacket(titlePacket.releasePtr());
+
     return true;
 }
 
@@ -105,14 +122,14 @@ nx::sdk::Result<const nx::sdk::ISettingsResponse*> DeviceAgent::settingsReceived
     m_bestShotGenerationContext.policy = bestShotGenerationPolicyFromString(
         settings[kBestShotGenerationPolicySetting]);
 
-    const std::string imagePath = settings[kImagePathSetting];
-    if (!imagePath.empty())
+    const std::string bestShotImagePath = settings[kBestShotImagePathSetting];
+    if (!bestShotImagePath.empty())
     {
-        m_bestShotGenerationContext.imageData = loadFile(imagePath);
-        m_bestShotGenerationContext.imageDataFormat = imageFormatFromPath(imagePath);
+        m_bestShotGenerationContext.imageData = loadFile(bestShotImagePath);
+        m_bestShotGenerationContext.imageDataFormat = imageFormatFromPath(bestShotImagePath);
     }
 
-    m_bestShotGenerationContext.url = settings[kUrlSetting];
+    m_bestShotGenerationContext.url = settings[kBestShotUrlSetting];
 
     nx::kit::utils::fromString(
         settings[kTopLeftXSetting],
@@ -156,6 +173,23 @@ nx::sdk::Result<const nx::sdk::ISettingsResponse*> DeviceAgent::settingsReceived
 
         m_trackContexts.push_back(std::move(trackContext));
     }
+
+    m_titleGenerationContext.policy = titleGenerationPolicyFromString(
+        settings[kTitleGenerationPolicySetting]);
+
+    const std::string titleImagePath = settings[kTitleImagePathSetting];
+    if (!titleImagePath.empty())
+    {
+        m_titleGenerationContext.imageData = loadFile(titleImagePath);
+        m_titleGenerationContext.imageDataFormat = imageFormatFromPath(titleImagePath);
+    }
+
+    m_titleGenerationContext.url = settings[kTitleUrlSetting];
+
+    m_titleGenerationContext.text = settings[kTitleTextSetting];
+
+    if (m_titleGenerationContext.text.empty())
+        m_titleGenerationContext.text = "Default Title";
 
     return nullptr;
 }
@@ -201,11 +235,9 @@ DeviceAgent::BestShotList DeviceAgent::generateBestShots()
         {
             if (m_bestShotGenerationContext.policy == BestShotGenerationPolicy::fixed)
                 result.push_back(generateFixedBestShot(trackId));
-
-            if (m_bestShotGenerationContext.policy == BestShotGenerationPolicy::url)
+            else if (m_bestShotGenerationContext.policy == BestShotGenerationPolicy::url)
                 result.push_back(generateUrlBestShot(trackId));
-
-            if (m_bestShotGenerationContext.policy == BestShotGenerationPolicy::image)
+            else if (m_bestShotGenerationContext.policy == BestShotGenerationPolicy::image)
                 result.push_back(generateImageBestShot(trackId));
 
             it = m_bestShotGenerationCounterByTrackId.erase(it);
@@ -215,6 +247,33 @@ DeviceAgent::BestShotList DeviceAgent::generateBestShots()
             --counter;
             ++it;
         }
+    }
+
+    return result;
+}
+
+DeviceAgent::TitleList DeviceAgent::generateTitles()
+{
+    TitleList result;
+
+    for (const TrackContext& trackContext: m_trackContexts)
+    {
+        auto titlePacket = makePtr<ObjectTrackTitlePacket>(trackContext.trackId,
+            m_lastFrameTimestampUs);
+
+        titlePacket->setText(m_titleGenerationContext.text);
+
+        if (m_titleGenerationContext.policy == TitleGenerationPolicy::url)
+        {
+            titlePacket->setImageUrl(m_titleGenerationContext.url);
+        }
+        else if (m_titleGenerationContext.policy == TitleGenerationPolicy::image)
+        {
+            titlePacket->setImageDataFormat(m_titleGenerationContext.imageDataFormat);
+            titlePacket->setImageData(m_titleGenerationContext.imageData);
+        }
+
+        result.push_back(titlePacket);
     }
 
     return result;

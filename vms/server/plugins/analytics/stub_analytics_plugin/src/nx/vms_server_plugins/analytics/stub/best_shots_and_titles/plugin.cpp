@@ -23,9 +23,9 @@ std::string Plugin::manifestString() const
     return /*suppress newline*/ 1 + (const char*)
 R"json(
 {
-    "id": "nx.stub.best_shots",
-    "name": "Stub, Best Shots",
-    "description": "A plugin for testing and debugging Best Shots.",
+    "id": "nx.stub.best_shots_and_titles",
+    "name": "Stub, Best Shots and Titles",
+    "description": "A plugin for testing and debugging Best Shots and Titles.",
     "version": "1.0.0",
     "vendor": "Plugin vendor"
 }
