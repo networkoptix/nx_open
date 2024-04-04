@@ -8,6 +8,8 @@ nx_add_target(nx_network_rest LIBRARY
     FOLDER common/libs
 )
 
+nx_make_target_translatable(nx_network_rest COMPONENTS "server")
+
 target_compile_definitions(nx_network_rest
     PRIVATE NX_NETWORK_REST_API=${API_EXPORT_MACRO}
     INTERFACE NX_NETWORK_REST_API=${API_IMPORT_MACRO}
