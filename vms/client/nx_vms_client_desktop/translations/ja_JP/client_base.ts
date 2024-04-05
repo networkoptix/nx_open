@@ -3054,7 +3054,7 @@ License Key: %2</source>
     <message>
       <source>There is currently no connection between your system and %1.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>現在、システムと %1 の接続ができません。</translation>
+      <translation>現在、システムと %1 は接続していません。</translation>
     </message>
   </context>
   <context>
@@ -13309,7 +13309,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To Start</source>
-      <translation>開始</translation>
+      <translation>開始位置へ</translation>
     </message>
     <message>
       <source>Next Chunk</source>
@@ -13317,7 +13317,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To End</source>
-      <translation>終了</translation>
+      <translation>終了位置へ</translation>
     </message>
     <message>
       <source>Rewind is not available for VMAX</source>

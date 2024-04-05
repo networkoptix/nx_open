@@ -1706,20 +1706,23 @@
     <message>
       <source>Drag over any part of the video
 to activate PTZ</source>
-      <translation>映像上の任意の箇所をドラッグし
-PTZを行います</translation>
+      <translation>PTZを行うには、映像上の任意の
+箇所をドラッグしてください。</translation>
     </message>
     <message>
       <source>Go to Local Settings to enable a drag marker over the center of the video</source>
-      <translation>映像中央にドラッグマーカーを表示するには、ローカル設定を開いてください</translation>
+      <translation>映像中央にドラッグマーカーを表示するには、ローカル設定を開いてください。</translation>
     </message>
     <message>
       <source>Press arrow keys to move around. Use plus and minus keys to zoom.</source>
-      <translation>移動には矢印キー、ズームにはプラス・マイナスキーを使用してください。</translation>
+      <translation>移動には矢印キー、
+ズームにはプラス・マイナスキー
+を使用してください。</translation>
     </message>
     <message>
       <source>Use mouse wheel to zoom</source>
-      <translation>ズームするには、マウスホイールを使用してください</translation>
+      <translation>ズームには、マウスホイールも
+使用できます。</translation>
     </message>
     <message>
       <source>You can enable this guide again by going to Local Settings &gt; Advanced &gt; Reset All Warnings</source>
@@ -1728,29 +1731,28 @@ PTZを行います</translation>
     <message>
       <source>Introducing
 New PTZ controls</source>
-      <translation>
-新しいPTZコントロール
+      <translation>新しいPTZコントロール
 の紹介</translation>
     </message>
     <message>
       <source>Click, double-click, or drag
 mouse pointer while pressing
 Shift key to use Advanced PTZ</source>
-      <translation>Shift キーを押しながら
-クリック、ダブルクリック、ドラッグ操作を行うことで、
-アドバンストPTZ を使用できます</translation>
+      <translation>Shift キーを押しながらクリック・
+ダブルクリック・ドラッグすると、
+アドバンストPTZ を使用できます。</translation>
     </message>
     <message>
       <source>Here is a quick guide
 on what has changed.</source>
-      <translation>変更内容を
-簡単に説明します。</translation>
+      <translation>変更内容を簡単に説明します。</translation>
     </message>
     <message>
       <source>To use Target Lock Tracking,
 Press Alt + Click to follow object</source>
-      <translation>ターゲットロックトラッキングを使用するには、
-Alt + クリックでオブジェクトを追跡します。</translation>
+      <translation>ターゲットロックトラッキングで
+オブジェクトを追跡するには、
+Alt + クリックを使用してください。</translation>
     </message>
   </context>
   <context>
@@ -2266,20 +2268,20 @@ Alt + クリックでオブジェクトを追跡します。</translation>
     </message>
     <message>
       <source>The link will remain accessible until the date specified (including, based on server time)</source>
-      <translation>リンクは指定された日付までアクセス可能です (サーバー時間に基づき、当日を含む)</translation>
+      <translation>リンクは指定された日付までアクセス可能です (サーバー時刻に基づき、当日を含む)</translation>
     </message>
     <message>
       <source>Revoke access after login</source>
-      <translation>ログイン後の</translation>
+      <translation>ログイン後にアクセスを取り消す</translation>
     </message>
     <message>
       <source>Access may be revoked earlier if the link validity period ends</source>
-      <translation>リンクの有効期間が終了すると、アクセスが取り消される可能性があります</translation>
+      <translation>リンクの有効期限を過ぎた場合、指定期間を待たずにアクセスが取り消されます</translation>
     </message>
     <message>
       <source>In</source>
       <extracomment>&apos;In&apos; as in sentence: &apos;Revoke access after login in N hours&apos;.</extracomment>
-      <translation>有効期間</translation>
+      <translation>上限</translation>
     </message>
   </context>
   <context>
