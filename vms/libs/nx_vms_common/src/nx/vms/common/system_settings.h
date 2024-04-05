@@ -515,6 +515,9 @@ public:
 
     void update(const vms::api::SystemSettings& value);
 
+    bool isAllowRegisteringIntegrationsEnabled() const;
+    void setAllowRegisteringIntegrationsEnabled(bool value);
+
 signals:
     void initialized();
 
@@ -568,6 +571,7 @@ signals:
     void masterCloudSyncChanged();
     void securityForPowerUsersChanged();
     void cloudPollingIntervalChanged();
+    void allowRegisteringIntegrationsChanged();
 
 private:
     typedef QList<QnAbstractResourcePropertyAdaptor*> AdaptorList;
