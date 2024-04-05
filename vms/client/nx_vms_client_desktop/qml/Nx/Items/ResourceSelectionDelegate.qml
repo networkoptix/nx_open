@@ -92,33 +92,39 @@ Item
 
                 readonly property int flags: (model && model.resourceExtraStatus) || 0
 
-                Image
+                SvgImage
                 {
                     id: problemsIcon
                     visible: extras.flags & ResourceTree.ResourceExtraStatusFlag.buggy
-                    source: "image://svg/skin/tree/locked.svg"
+                    sourcePath: "image://svg/skin/20x20/Solid/locked.svg"
+                    primaryColor: "light4"
                     sourceSize: Qt.size(20, 20)
                 }
 
-                Image
+                SvgImage
                 {
                     id: recordingIcon
 
                     sourceSize: Qt.size(20, 20)
 
-                    source:
+                    sourcePath:
                     {
                         if (extras.flags & ResourceTree.ResourceExtraStatusFlag.recording)
-                            return "image://svg/skin/tree/record_on.svg"
+                            return "image://svg/skin/20x20/Solid/record_on.svg"
 
                         if (extras.flags & ResourceTree.ResourceExtraStatusFlag.scheduled)
-                            return "image://svg/skin/tree/record_part.svg"
+                            return "image://svg/skin/20x20/Solid/record_part.svg"
 
                         if (extras.flags & ResourceTree.ResourceExtraStatusFlag.hasArchive)
-                            return "image://svg/skin/tree/archive.svg"
+                            return "image://svg/skin/20x20/Solid/archive.svg"
 
                         return ""
                     }
+
+                    primaryColor: (extras.flags & ResourceTree.ResourceExtraStatusFlag.recording
+                        || extras.flags & ResourceTree.ResourceExtraStatusFlag.scheduled)
+                        ? "red_l"
+                        : "dark17"
                 }
             }
         }

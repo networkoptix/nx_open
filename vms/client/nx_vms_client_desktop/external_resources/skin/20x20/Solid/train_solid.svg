@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 20 20">
+  <g class="20x20/Solid/train_solid">
+    <path fill="#A5B7C0" fill-rule="evenodd" d="M18.5 8v-.003V8H11v1h7.8l.3 1H11a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1h7.115a7.017 7.017 0 0 0-6.335-4H1v4h7a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1H1v3a1 1 0 0 0 2 .009A1 1 0 0 0 5 13h7a1 1 0 0 0 2 .008A1 1 0 0 0 16 13h1.312a1.998 1.998 0 0 0 1.916-2.575L18.5 8ZM8 9H1V8h7v1Zm12 6v1H0v-1h20Z" class="Primary" clip-rule="evenodd"/>
+  </g>
+</svg>

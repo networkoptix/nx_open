@@ -16,8 +16,65 @@ class QSvgRenderer;
 
 namespace nx::vms::client::core {
 
+#define NX_DECLARE_COLORIZED_ICON(name, ...) \
+const static nx::vms::client::core::ColorizedIconDeclaration name(__FILE__, __VA_ARGS__);
+
+static const SvgIconColorer::IconSubstitutions kEmptySubstitutions = {};
+
 class IconLoader;
 class GenericPalette;
+
+class NX_VMS_CLIENT_CORE_API ColorizedIconDeclaration
+{
+public:
+    ColorizedIconDeclaration(
+        const QString& sourceFile,
+        const QString& iconPath,
+        const SvgIconColorer::IconSubstitutions& substitutions);
+
+    ColorizedIconDeclaration(
+        const QString& sourceFile,
+        const QString& name,
+        const SvgIconColorer::IconSubstitutions& svgColorSubstitutions,
+        const QString& checkedName,
+        const SvgIconColorer::IconSubstitutions& svgCheckedColorSubstitutions);
+
+    ColorizedIconDeclaration(
+        const QString& sourceFile,
+        const QString& iconPath,
+        const SvgIconColorer::ThemeSubstitutions& themeSubstitutions);
+
+    ColorizedIconDeclaration(
+        const QString& sourceFile,
+        const QString& iconPath,
+        const SvgIconColorer::ThemeSubstitutions& themeSubstitutions,
+        const QString& checkedIconPath,
+        const SvgIconColorer::ThemeSubstitutions& checkedThemeSubstitutions);
+
+
+    ~ColorizedIconDeclaration();
+
+    QString sourceFile() const;
+
+    QString iconPath() const;
+    QString checkedIconPath() const;
+    SvgIconColorer::IconSubstitutions substitutions() const;
+    SvgIconColorer::IconSubstitutions checkedSubstitutions() const;
+    SvgIconColorer::ThemeSubstitutions themeSubstitutions() const;
+    SvgIconColorer::ThemeSubstitutions checkedThemeSubstitutions() const;
+
+    using Storage = QList<ColorizedIconDeclaration*>;
+    static Storage* storage();
+
+private:
+    QString m_sourceFile;
+    QString m_iconPath;
+    QString m_checkedIconPath;
+    SvgIconColorer::IconSubstitutions m_substitutions;
+    SvgIconColorer::IconSubstitutions m_checkedSubstitutions;
+    SvgIconColorer::ThemeSubstitutions m_themeSubstitutions;
+    SvgIconColorer::ThemeSubstitutions m_checkedThemeSubstitutions;
+};
 
 class NX_VMS_CLIENT_CORE_API Skin: public QObject
 {
@@ -47,6 +104,7 @@ public:
         const SvgIconColorer::ThemeSubstitutions& svgThemeSubstitutions = {});
     QIcon icon(const char* name, const char* checkedName = nullptr);
     QIcon icon(const QIcon& icon);
+    QIcon icon(const ColorizedIconDeclaration& decl);
     QIcon icon(const QString& name,
         const SvgIconColorer::IconSubstitutions& svgColorSubstitutions,
         const SvgIconColorer::IconSubstitutions& svgCheckedColorSubstitutions = {});
@@ -95,6 +153,9 @@ private:
     QStringList m_paths;
     IconLoader* m_iconLoader;
 };
+
+NX_DECLARE_COLORIZED_ICON(kAlertIcon, "20x20/Solid/alert2.svg", \
+    nx::vms::client::core::kEmptySubstitutions)
 
 } // namespace nx::vms::client::core
 

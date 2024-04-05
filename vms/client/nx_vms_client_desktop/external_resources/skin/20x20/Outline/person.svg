@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 20 20">
+  <g class="20x20/Outline/person">
+    <path fill="#A5B7C0" d="M3 14v3h3v1H3a1 1 0 0 1-1-1v-3h1Zm15 0v3a1 1 0 0 1-1 1h-3v-1h3v-3h1Zm-8-7.5c2.45 0 3.5 1.651 3.5 4a.5.5 0 0 1-1 0c0-1.208-.303-2.11-1-2.595V15.5a.5.5 0 0 1-1 0V12a.5.5 0 0 0-1 0v3.5a.5.5 0 0 1-1 0V7.904c-.697.485-1 1.387-1 2.596a.5.5 0 0 1-1 0c0-2.349 1.05-4 3.5-4ZM17 2a1 1 0 0 1 1 1v3h-1V3h-3V2h3ZM6 2v1H3v3H2V3a1 1 0 0 1 1-1h3Zm4 2a1 1 0 1 1 0 2 1 1 0 0 1 0-2Z" class="Primary"/>
+  </g>
+</svg>

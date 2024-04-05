@@ -39,7 +39,6 @@ using namespace nx::vms::client::desktop;
 Q_GLOBAL_STATIC(QnResourceIconCache, qn_resourceIconCache);
 
 namespace {
-
 static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kTreeThemeSubstitutions = {
     {QnIcon::Disabled, {.primary = "light10", .secondary = "light4", .alpha=0.3}},
     {QnIcon::Selected, {.primary = "light4", .secondary = "light2"}},
@@ -47,6 +46,135 @@ static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kTreeThem
     {QnIcon::Normal, {.primary = "light10", .secondary = "light4"}},
     {QnIcon::Error, {.primary = "red_l2", .secondary = "red_l2"}},
     {QnIcon::Pressed, {.primary = "light4", .secondary = "light2"}}};
+
+NX_DECLARE_COLORIZED_ICON(kHasArchiveIcon, "20x20/Solid/archive.svg",\
+    nx::vms::client::core::kEmptySubstitutions)
+NX_DECLARE_COLORIZED_ICON(kRecordOnIcon, "20x20/Solid/record_on.svg",\
+    kTreeThemeSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kRecordPartIcon, "20x20/Solid/record_part.svg",\
+    kTreeThemeSubstitutions)
+
+NX_DECLARE_COLORIZED_ICON(kCameraWarningIcon, "20x20/Solid/camera_warning.svg",\
+    kTreeThemeSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kCameraOfflineIcon, "20x20/Solid/camera_offline.svg",\
+    kTreeThemeSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kCameraUnauthorizedIcon, "20x20/Solid/camera_unauthorized.svg",\
+    kTreeThemeSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kCameraIcon, "20x20/Solid/camera.svg",\
+    kTreeThemeSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kCamerasIcon, "20x20/Solid/cameras.svg",\
+    kTreeThemeSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kVirtualCamerasIcon, "20x20/Solid/virtual_camera.svg",\
+    kTreeThemeSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kMultisensorIcon, "20x20/Solid/multisensor.svg",\
+    kTreeThemeSubstitutions)
+
+NX_DECLARE_COLORIZED_ICON(kClientIcon, "20x20/Solid/client.svg",\
+    kTreeThemeSubstitutions)
+
+NX_DECLARE_COLORIZED_ICON(kSystemCloudUnauthIcon, "20x20/Solid/system_cloud_unauthorized.svg",\
+    kTreeThemeSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kSystemCloudOfflineIcon, "20x20/Solid/system_cloud_offline.svg",\
+    kTreeThemeSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kSystemCloudWarningIcon, "20x20/Solid/system_cloud_warning.svg",\
+    kTreeThemeSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kSystemCloudIcon, "20x20/Solid/system_cloud.svg",\
+    kTreeThemeSubstitutions)
+
+NX_DECLARE_COLORIZED_ICON(kEncoderIcon, "20x20/Solid/encoder.svg",\
+    kTreeThemeSubstitutions)
+
+NX_DECLARE_COLORIZED_ICON(kHealthMonitorOfflineIcon, "20x20/Solid/health_monitor_offline.svg",\
+    kTreeThemeSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kHealthMonitorIcon, "20x20/Solid/health_monitor.svg",\
+    kTreeThemeSubstitutions)
+
+NX_DECLARE_COLORIZED_ICON(kExtensionProxiedIcon, "20x20/Solid/extension_proxied.svg",\
+    kTreeThemeSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kExtensionIcon, "20x20/Solid/extension.svg",\
+    kTreeThemeSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kExtensionsIcon, "20x20/Solid/extensions.svg",\
+    kTreeThemeSubstitutions)
+
+NX_DECLARE_COLORIZED_ICON(kIOOfflineIcon, "20x20/Solid/io_offline.svg",\
+    kTreeThemeSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kIOUnauthorizedIcon, "20x20/Solid/io_unauthorized.svg",\
+    kTreeThemeSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kIOIcon, "20x20/Solid/io.svg",\
+    kTreeThemeSubstitutions)
+
+NX_DECLARE_COLORIZED_ICON(kLayoutCloudIcon, "20x20/Solid/layout_cloud.svg",\
+    kTreeThemeSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kLayoutExportEncryptedIcon, "20x20/Solid/layout_exported_encrypted.svg",\
+    kTreeThemeSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kLayoutSharedIcon, "20x20/Solid/layout_shared.svg",\
+    kTreeThemeSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kLayoutTourIcon, "20x20/Solid/layout_tour.svg",\
+    kTreeThemeSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kLayoutToursIcon, "20x20/Solid/layout_tours.svg",\
+    kTreeThemeSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kLayoutIcon, "20x20/Solid/layout.svg",\
+    kTreeThemeSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kLayoutsIcon, "20x20/Solid/layouts.svg",\
+    kTreeThemeSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kLayoutsSharedIcon, "20x20/Solid/layouts_shared.svg",\
+    kTreeThemeSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kLayoutsIntercomIcon, "20x20/Solid/layouts_intercom.svg",\
+    kTreeThemeSubstitutions)
+
+NX_DECLARE_COLORIZED_ICON(kFolderOpenIcon, "20x20/Solid/ws_folder_open.svg",\
+    kTreeThemeSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kMediaIcon, "20x20/Solid/media.svg",\
+    kTreeThemeSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kMediaOfflineIcon, "20x20/Solid/media_offline.svg",\
+    kTreeThemeSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kSnapshotIcon, "20x20/Solid/snapshot.svg",\
+    kTreeThemeSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kSnapshotOfflineIcon, "20x20/Solid/snapshot_offline.svg",\
+    kTreeThemeSubstitutions)
+
+NX_DECLARE_COLORIZED_ICON(kMatrixIcon, "20x20/Solid/matrix.svg",\
+    kTreeThemeSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kVideowallIcon, "20x20/Solid/videowall.svg",\
+    kTreeThemeSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kScreenIcon, "20x20/Solid/screen.svg",\
+    kTreeThemeSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kScreenLockedIcon, "20x20/Solid/screen_locked.svg",\
+    kTreeThemeSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kScreenControlledIcon, "20x20/Solid/screen_controlled.svg",\
+    kTreeThemeSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kScreenOfflineIcon, "20x20/Solid/screen_offline.svg",\
+    kTreeThemeSubstitutions)
+
+NX_DECLARE_COLORIZED_ICON(kSystemLocalIcon, "20x20/Solid/system_local.svg",\
+    kTreeThemeSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kOtherSystemsIcon, "20x20/Solid/other_systems.svg",\
+    kTreeThemeSubstitutions)
+
+NX_DECLARE_COLORIZED_ICON(kServersIcon, "20x20/Solid/servers.svg",\
+    kTreeThemeSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kServerIcon, "20x20/Solid/server.svg",\
+    kTreeThemeSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kServerOfflineIcon, "20x20/Solid/server_offline.svg",\
+    kTreeThemeSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kServerCurrentIcon, "20x20/Solid/server_current.svg",\
+    kTreeThemeSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kServerIncompatibleIcon, "20x20/Solid/server_incompatible.svg",\
+    kTreeThemeSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kServerUnauthorizedIcon, "20x20/Solid/server_unauthorized.svg",\
+    kTreeThemeSubstitutions)
+
+NX_DECLARE_COLORIZED_ICON(kUserIcon, "20x20/Solid/user.svg",\
+    kTreeThemeSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kGroupIcon, "20x20/Solid/group.svg",\
+    kTreeThemeSubstitutions)
+
+NX_DECLARE_COLORIZED_ICON(kWebpagesIcon, "20x20/Solid/webpages.svg",\
+    kTreeThemeSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kWebpageIcon, "20x20/Solid/webpage.svg",\
+    kTreeThemeSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kWebpageProxiedIcon, "20x20/Solid/webpage_proxied.svg",\
+    kTreeThemeSubstitutions)
 
 bool isCurrentlyConnectedServer(const QnResourcePtr& resource)
 {
@@ -139,69 +267,69 @@ QnResourceIconCache::QnResourceIconCache(QObject* parent):
     m_cache.insert(Unknown, QIcon());
 
     // Systems.
-    m_cache.insert(CurrentSystem, loadIcon("tree/system_local.svg"));
+    m_cache.insert(CurrentSystem, qnSkin->icon(kSystemLocalIcon));
     // TODO: pprivalov ask dbatov how it should looks actually
-    m_cache.insert(OtherSystem, loadIcon("tree/system_local.svg"));
-    m_cache.insert(OtherSystems, loadIcon("tree/other_systems.svg"));
+    m_cache.insert(OtherSystem, qnSkin->icon(kSystemLocalIcon));
+    m_cache.insert(OtherSystems, qnSkin->icon(kOtherSystemsIcon));
 
     // Servers.
-    m_cache.insert(Servers, loadIcon("tree/servers.svg"));
-    m_cache.insert(Server, loadIcon("tree/server.svg"));
-    m_cache.insert(Server | Offline, loadIcon("tree/server_offline.svg"));
-    m_cache.insert(Server | Incompatible, loadIcon("tree/server_incompatible.svg"));
-    m_cache.insert(Server | Control, loadIcon("tree/server_current.svg"));
-    m_cache.insert(Server | Unauthorized, loadIcon("tree/server_unauthorized.svg"));
+    m_cache.insert(Servers, qnSkin->icon(kServersIcon));
+    m_cache.insert(Server, qnSkin->icon(kServerIcon));
+    m_cache.insert(Server | Offline, qnSkin->icon(kServerOfflineIcon));
+    m_cache.insert(Server | Incompatible, qnSkin->icon(kServerIncompatibleIcon));
+    m_cache.insert(Server | Control, qnSkin->icon(kServerCurrentIcon));
+    m_cache.insert(Server | Unauthorized, qnSkin->icon(kServerUnauthorizedIcon));
     // TODO: separate icon for Server with mismatched certificate.
     // TODO: pprivalov check that it works correctly with svg and if previous todo is still valid
-    m_cache.insert(Server | MismatchedCertificate, loadIcon("tree/server_incompatible.svg"));
+    m_cache.insert(Server | MismatchedCertificate, qnSkin->icon(kServerIncompatibleIcon));
     // Read-only server that is auto-discovered.
     // TODO: pprivalov check that correct collor is used
     m_cache.insert(Server | Incompatible | ReadOnly,
-        loadIcon("tree/server_incompatible.svg"));
+        qnSkin->icon(kServerIncompatibleIcon));
     // Read-only server we are connected to.
-    m_cache.insert(Server | Control | ReadOnly, loadIcon("tree/server_incompatible.svg"));
-    m_cache.insert(HealthMonitor, loadIcon("tree/health_monitor.svg"));
-    m_cache.insert(HealthMonitor | Offline, loadIcon("tree/health_monitor_offline.svg"));
+    m_cache.insert(Server | Control | ReadOnly, qnSkin->icon(kServerIncompatibleIcon));
+    m_cache.insert(HealthMonitor, qnSkin->icon(kHealthMonitorIcon));
+    m_cache.insert(HealthMonitor | Offline, qnSkin->icon(kHealthMonitorOfflineIcon));
 
     // Layouts.
-    m_cache.insert(Layouts, loadIcon("tree/layouts.svg"));
-    m_cache.insert(Layout, loadIcon("tree/layout.svg"));
-    m_cache.insert(ExportedLayout, loadIcon("tree/layout.svg"));
-    m_cache.insert(ExportedEncryptedLayout, loadIcon("tree/layout_exported_encrypted.svg"));
-    m_cache.insert(IntercomLayout, loadIcon("tree/layouts_intercom.svg"));
-    m_cache.insert(SharedLayout, loadIcon("tree/layout_shared.svg"));
-    m_cache.insert(CloudLayout, loadIcon("tree/layout_cloud.svg"));
-    m_cache.insert(SharedLayouts, loadIcon("tree/layouts_shared.svg"));
-    m_cache.insert(Showreel, loadIcon("tree/layout_tour_20.svg"));
-    m_cache.insert(Showreels, loadIcon("tree/layout_tours_20.svg"));
+    m_cache.insert(Layouts, qnSkin->icon(kLayoutsIcon));
+    m_cache.insert(Layout, qnSkin->icon(kLayoutIcon));
+    m_cache.insert(ExportedLayout, qnSkin->icon(kLayoutIcon));
+    m_cache.insert(ExportedEncryptedLayout, qnSkin->icon(kLayoutExportEncryptedIcon));
+    m_cache.insert(IntercomLayout, qnSkin->icon(kLayoutsIntercomIcon));
+    m_cache.insert(SharedLayout, qnSkin->icon(kLayoutSharedIcon));
+    m_cache.insert(CloudLayout, qnSkin->icon(kLayoutCloudIcon));
+    m_cache.insert(SharedLayouts, qnSkin->icon(kLayoutsSharedIcon));
+    m_cache.insert(Showreel, qnSkin->icon(kLayoutTourIcon));
+    m_cache.insert(Showreels, qnSkin->icon(kLayoutToursIcon));
 
     // Cameras.
-    m_cache.insert(Cameras, loadIcon("tree/cameras.svg"));
-    m_cache.insert(Camera, loadIcon("tree/camera.svg"));
-    m_cache.insert(Camera | Offline, loadIcon("tree/camera_offline.svg"));
-    m_cache.insert(Camera | Unauthorized, loadIcon("tree/camera_unauthorized.svg"));
-    m_cache.insert(Camera | Incompatible, loadIcon("tree/camera_alert.svg"));
-    m_cache.insert(VirtualCamera, loadIcon("tree/virtual_camera.svg", kTreeThemeSubstitutions));
+    m_cache.insert(Cameras, qnSkin->icon(kCamerasIcon));
+    m_cache.insert(Camera, qnSkin->icon(kCameraIcon));
+    m_cache.insert(Camera | Offline, qnSkin->icon(kCameraOfflineIcon));
+    m_cache.insert(Camera | Unauthorized, qnSkin->icon(kCameraUnauthorizedIcon));
+    m_cache.insert(Camera | Incompatible, qnSkin->icon(kCameraWarningIcon));
+    m_cache.insert(VirtualCamera, qnSkin->icon(kVirtualCamerasIcon));
     m_cache.insert(CrossSystemStatus | Unauthorized, loadIcon("events/alert_yellow.png"));
     m_cache.insert(CrossSystemStatus | Control, loadIcon("legacy/loading.gif")); //< The Control uses to describe loading state.
     m_cache.insert(CrossSystemStatus | Offline, loadIcon("cloud/cloud_20_disabled.png"));
-    m_cache.insert(IOModule, loadIcon("tree/io.svg"));
-    m_cache.insert(IOModule | Offline, loadIcon("tree/io_offline.svg"));
-    m_cache.insert(IOModule | Unauthorized, loadIcon("tree/io_unauthorized.svg"));
-    m_cache.insert(IOModule | Incompatible, loadIcon("tree/camera_alert.svg"));
-    m_cache.insert(Recorder, loadIcon("tree/encoder.svg"));
-    m_cache.insert(MultisensorCamera, loadIcon("tree/multisensor.svg"));
+    m_cache.insert(IOModule, qnSkin->icon(kIOIcon));
+    m_cache.insert(IOModule | Offline, qnSkin->icon(kIOOfflineIcon));
+    m_cache.insert(IOModule | Unauthorized, qnSkin->icon(kIOUnauthorizedIcon));
+    m_cache.insert(IOModule | Incompatible, qnSkin->icon(kCameraWarningIcon));
+    m_cache.insert(Recorder, qnSkin->icon(kEncoderIcon));
+    m_cache.insert(MultisensorCamera, qnSkin->icon(kMultisensorIcon));
 
     // Local files.
-    m_cache.insert(LocalResources, loadIcon("tree/local.svg"));
-    m_cache.insert(Image, loadIcon("tree/snapshot.svg"));
-    m_cache.insert(Image | Offline, loadIcon("tree/snapshot_offline.svg"));
-    m_cache.insert(Media, loadIcon("tree/media.svg"));
-    m_cache.insert(Media | Offline, loadIcon("tree/media_offline.svg"));
+    m_cache.insert(LocalResources, qnSkin->icon(kFolderOpenIcon));
+    m_cache.insert(Image, qnSkin->icon(kSnapshotIcon));
+    m_cache.insert(Image | Offline, qnSkin->icon(kSnapshotOfflineIcon));
+    m_cache.insert(Media, qnSkin->icon(kMediaIcon));
+    m_cache.insert(Media | Offline, qnSkin->icon(kMediaOfflineIcon));
 
     // Users.
-    m_cache.insert(Users, loadIcon("tree/users.svg", kTreeThemeSubstitutions));
-    m_cache.insert(User, loadIcon("tree/user.svg", kTreeThemeSubstitutions));
+    m_cache.insert(Users, qnSkin->icon(kGroupIcon));
+    m_cache.insert(User, qnSkin->icon(kUserIcon));
     m_cache.insert(CloudUser, loadIcon("user_settings/user_cloud.svg", kTreeThemeSubstitutions));
     m_cache.insert(LdapUser, loadIcon("user_settings/user_ldap.svg", kTreeThemeSubstitutions));
     m_cache.insert(LocalUser, loadIcon("user_settings/user_local.svg", kTreeThemeSubstitutions));
@@ -209,36 +337,36 @@ QnResourceIconCache::QnResourceIconCache(QObject* parent):
         TemporaryUser, loadIcon("user_settings/user_local_temp.svg", kTreeThemeSubstitutions));
 
     // Videowalls.
-    m_cache.insert(VideoWall, loadIcon("tree/videowall.svg"));
-    m_cache.insert(VideoWallItem, loadIcon("tree/screen.svg"));
-    m_cache.insert(VideoWallItem | Locked, loadIcon("tree/screen_locked.svg"));
-    m_cache.insert(VideoWallItem | Control, loadIcon("tree/screen_controlled.svg"));
-    m_cache.insert(VideoWallItem | Offline, loadIcon("tree/screen_offline.svg"));
-    m_cache.insert(VideoWallMatrix, loadIcon("tree/matrix.svg"));
+    m_cache.insert(VideoWall, qnSkin->icon(kVideowallIcon));
+    m_cache.insert(VideoWallItem, qnSkin->icon(kScreenIcon));
+    m_cache.insert(VideoWallItem | Locked, qnSkin->icon(kScreenLockedIcon));
+    m_cache.insert(VideoWallItem | Control, qnSkin->icon(kScreenControlledIcon));
+    m_cache.insert(VideoWallItem | Offline, qnSkin->icon(kScreenOfflineIcon));
+    m_cache.insert(VideoWallMatrix, qnSkin->icon(kMatrixIcon));
 
     // Integrations.
-    m_cache.insert(Integrations, loadIcon("tree/integrations.svg"));
-    m_cache.insert(Integration, loadIcon("tree/integration.svg"));
-    m_cache.insert(IntegrationProxied, loadIcon("tree/integration_proxied.svg"));
+    m_cache.insert(Integrations, qnSkin->icon(kExtensionsIcon));
+    m_cache.insert(Integration, qnSkin->icon(kExtensionIcon));
+    m_cache.insert(IntegrationProxied, qnSkin->icon(kExtensionProxiedIcon));
 
     // Web Pages.
-    m_cache.insert(WebPages, loadIcon("tree/webpages.svg"));
-    m_cache.insert(WebPage, loadIcon("tree/webpage.svg"));
-    m_cache.insert(WebPageProxied, loadIcon("tree/webpage_proxied.svg"));
+    m_cache.insert(WebPages, qnSkin->icon(kWebpagesIcon));
+    m_cache.insert(WebPage, qnSkin->icon(kWebpageIcon));
+    m_cache.insert(WebPageProxied, qnSkin->icon(kWebpageProxiedIcon));
 
     // Analytics.
-    m_cache.insert(AnalyticsEngine, loadIcon("tree/server.svg"));
-    m_cache.insert(AnalyticsEngines, loadIcon("tree/servers.svg"));
-    m_cache.insert(AnalyticsEngine | Offline, loadIcon("tree/server_offline.svg"));
+    m_cache.insert(AnalyticsEngine, qnSkin->icon(kServerIcon));
+    m_cache.insert(AnalyticsEngines, qnSkin->icon(kServersIcon));
+    m_cache.insert(AnalyticsEngine | Offline, qnSkin->icon(kServerOfflineIcon));
 
     // Client.
-    m_cache.insert(Client, loadIcon("tree/client.svg"));
+    m_cache.insert(Client, qnSkin->icon(kClientIcon));
 
     // Cloud system.
-    m_cache.insert(CloudSystem, loadIcon("tree/cloud_system.svg"));
-    m_cache.insert(CloudSystem | Offline, loadIcon("tree/cloud_system_offline.svg"));
-    m_cache.insert(CloudSystem | Locked, loadIcon("tree/cloud_system_warning.svg"));
-    m_cache.insert(CloudSystem | Incompatible, loadIcon("tree/cloud_system_incompatible.svg"));
+    m_cache.insert(CloudSystem, qnSkin->icon(kSystemCloudIcon));
+    m_cache.insert(CloudSystem | Offline, qnSkin->icon(kSystemCloudOfflineIcon));
+    m_cache.insert(CloudSystem | Locked, qnSkin->icon(kSystemCloudWarningIcon));
+    m_cache.insert(CloudSystem | Incompatible, qnSkin->icon(kSystemCloudUnauthIcon));
 }
 
 QnResourceIconCache::~QnResourceIconCache()
@@ -451,13 +579,13 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
 QIcon QnResourceIconCache::cameraRecordingStatusIcon(ResourceExtraStatus status)
 {
     if (status.testFlag(ResourceExtraStatusFlag::recording))
-        return qnSkin->icon("tree/record_on.svg");
+        return qnSkin->icon(kRecordOnIcon);
 
     if (status.testFlag(ResourceExtraStatusFlag::scheduled))
-        return qnSkin->icon("tree/record_part.svg");
+        return qnSkin->icon(kRecordPartIcon);
 
     if (status.testFlag(ResourceExtraStatusFlag::hasArchive))
-        return qnSkin->icon("tree/archive.svg");
+        return qnSkin->icon(kHasArchiveIcon);
 
     return QIcon();
 }

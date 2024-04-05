@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 20 20">
+  <g class="20x20/Outline/checkmark">
+    <path fill="#698796" fill-rule="evenodd" d="M16.5 10a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0Zm1.5 0a8 8 0 1 1-16 0 8 8 0 0 1 16 0Zm-8.64 3.034 4.872-4.906-1.064-1.057-3.818 3.845-2.123-2.1-1.054 1.067 3.187 3.151Z" class="Primary" clip-rule="evenodd"/>
+  </g>
+</svg>

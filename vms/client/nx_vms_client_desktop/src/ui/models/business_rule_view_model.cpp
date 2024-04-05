@@ -55,6 +55,14 @@ const int ProlongedActionRole = Qt::UserRole + 2;
 const int defaultActionDurationMs = 5000;
 const int defaultAggregationPeriodSec = 60;
 
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions colorSubs = {
+    {QnIcon::Normal, {.primary = "light10", .secondary = "yellow_core"}},
+    {QnIcon::Selected, {.primary = "light4", .secondary = "yellow_core"}}
+};
+
+NX_DECLARE_COLORIZED_ICON(kUserAlertIcon, "20x20/Solid/user_alert.svg",\
+    colorSubs)
+
 QString braced(const QString& source)
 {
     return '<' + source + '>';
@@ -601,18 +609,12 @@ QIcon QnBusinessRuleViewModel::iconForAction() const
     if (isActionUsingSourceCamera())
         return qnResIconCache->icon(QnResourceIconCache::Camera);
 
-    static const QColor kBaseColor{"#A5B7C0"};
-    static const QColor kWarningColor{"#FBBC05"};
-    static const nx::vms::client::core::SvgIconColorer::IconSubstitutions colorSubs = {
-        {QnIcon::Normal, {{kBaseColor, "light10"}, {kWarningColor, "yellow_core"}}},
-        {QnIcon::Selected, {{kBaseColor, "light4"}, {kWarningColor, "yellow_core"}}}};
-
     switch (m_actionType)
     {
         case vms::event::ActionType::sendMailAction:
         {
             if (!isValid(Column::target))
-                return qnSkin->icon("tree/user_alert.svg", colorSubs);
+                return qnSkin->icon(kUserAlertIcon);
             return qnResIconCache->icon(QnResourceIconCache::Users);
         }
 
@@ -623,7 +625,7 @@ QIcon QnBusinessRuleViewModel::iconForAction() const
             if (m_actionParams.allUsers)
                 return qnResIconCache->icon(QnResourceIconCache::Users);
             if (!isValid(Column::target))
-                return qnSkin->icon("tree/user_alert.svg", colorSubs);
+                return qnSkin->icon(kUserAlertIcon);
 
             QnUserResourceList users;
             QSet<nx::Uuid> groupIds;
@@ -661,7 +663,7 @@ QIcon QnBusinessRuleViewModel::iconForAction() const
         {
             const QnResourceList resources = resourcePool()->getResourcesByIds(actionResources());
             if (resources.empty())
-                return qnSkin->icon("tree/buggy.svg");
+                return qnSkin->icon(vms::client::core::kAlertIcon);
 
             if (resources.size() == 1)
                 return qnResIconCache->icon(resources.first());

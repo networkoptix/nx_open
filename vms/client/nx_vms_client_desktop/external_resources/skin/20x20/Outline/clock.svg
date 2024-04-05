@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 20 20">
+  <g class="20x20/Outline/clock">
+    <path fill="#698796" fill-rule="evenodd" d="M16.5 10a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0Zm1.5 0a8 8 0 1 1-16 0 8 8 0 0 1 16 0Zm-7.25-3.5a.75.75 0 0 0-1.5 0v3.446c0 .388.18.754.488.99l2.805 2.159a.75.75 0 0 0 .914-1.19L10.75 9.824V6.5Z" class="Primary" clip-rule="evenodd"/>
+  </g>
+</svg>

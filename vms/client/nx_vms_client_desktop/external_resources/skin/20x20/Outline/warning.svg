@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 20 20">
+  <g class="20x20/Outline/warning">
+    <path fill="#EDB732" fill-rule="evenodd" d="M10.292 5.02 3.856 16.46h12.87L10.293 5.02Zm.871-1.51a1 1 0 0 0-1.743 0L2.13 16.47A1 1 0 0 0 3 17.96h14.58a1 1 0 0 0 .872-1.49l-7.29-12.96Z" class="Rectangle 426 (Stroke)" clip-rule="evenodd"/>
+    <path fill="#FFCA28" fill-rule="evenodd" d="M10.941 8.46h-1.5v3.5h1.5v-3.5Zm0 6.5h-1.5v-1.5h1.5v1.5Z" class="Primary" clip-rule="evenodd"/>
+  </g>
+</svg>

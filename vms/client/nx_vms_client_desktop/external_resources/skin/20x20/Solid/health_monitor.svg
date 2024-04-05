@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 20 20">
+  <g class="20x20/Solid/health_monitor">
+    <path fill="#A5B7C0" fill-rule="evenodd" d="M3 16V4h14v12H3ZM2 3.5a.5.5 0 0 1 .5-.5h15a.5.5 0 0 1 .5.5v13a.5.5 0 0 1-.5.5h-15a.5.5 0 0 1-.5-.5v-13Zm6.624 3.084a.75.75 0 0 0-1.248 0L5.599 9.25H4v1.5h2a.75.75 0 0 0 .624-.334L8 8.352l1.376 2.064 2 3a.75.75 0 0 0 1.248 0l1.777-2.666H16v-1.5h-2a.75.75 0 0 0-.624.334L12 11.648l-1.376-2.064-2-3Z" class="Primary" clip-rule="evenodd"/>
+  </g>
+</svg>

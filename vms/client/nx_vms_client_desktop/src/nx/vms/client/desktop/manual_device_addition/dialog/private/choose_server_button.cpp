@@ -12,6 +12,11 @@
 
 namespace {
 
+NX_DECLARE_COLORIZED_ICON(kServerIcon, "20x20/Solid/server.svg",\
+    nx::vms::client::core::kEmptySubstitutions)
+NX_DECLARE_COLORIZED_ICON(kServerOfflineIcon, "20x20/Solid/server_offline.svg",\
+    nx::vms::client::core::kEmptySubstitutions)
+
 QString getText(const QnMediaServerResourcePtr& server)
 {
     return QnResourceDisplayInfo(server).toString(Qn::RI_WithUrl);
@@ -21,8 +26,8 @@ QIcon getIcon(const QnMediaServerResourcePtr& server)
 {
     // TODO: add icon for mismatchedCertificate status.
     return server->getStatus() == nx::vms::api::ResourceStatus::online
-        ? qnSkin->icon("tree/server.svg")
-        : qnSkin->icon("tree/server_offline.svg");
+        ? qnSkin->icon(kServerIcon)
+        : qnSkin->icon(kServerOfflineIcon);
 }
 
 } // namespace

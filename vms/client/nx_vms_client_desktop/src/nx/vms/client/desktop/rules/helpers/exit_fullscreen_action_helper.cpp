@@ -23,7 +23,7 @@ QIcon selectedIcon(const QIcon& base)
 
 QIcon invalidIcon()
 {
-    return qnSkin->icon("tree/buggy.svg");
+    return qnSkin->icon(core::kAlertIcon);
 }
 
 QnLayoutResourceList getLayoutsInternal(const QnBusinessRuleViewModel* model)

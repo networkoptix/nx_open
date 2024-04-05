@@ -40,6 +40,109 @@ void correctPixelRatio(QPixmap& pixmap)
 
 } // namespace
 
+ColorizedIconDeclaration::Storage* ColorizedIconDeclaration::storage()
+{
+    static auto ptr = new Storage(); //< To guarantee that it's initialized on time.
+    return ptr;
+}
+
+ColorizedIconDeclaration::ColorizedIconDeclaration(
+    const QString& sourceFile,
+    const QString& iconPath,
+    const SvgIconColorer::IconSubstitutions& substitutions)
+    :
+    m_sourceFile(sourceFile),
+    m_iconPath(iconPath),
+    m_substitutions(substitutions)
+{
+    storage()->append(this);
+}
+
+ColorizedIconDeclaration::ColorizedIconDeclaration(
+    const QString& sourceFile,
+    const QString& iconPath,
+    const SvgIconColorer::IconSubstitutions& substitutions,
+    const QString& checkedIconPath,
+    const SvgIconColorer::IconSubstitutions& checkedSubstitutions)
+    :
+    m_sourceFile(sourceFile),
+    m_iconPath(iconPath),
+    m_checkedIconPath(checkedIconPath),
+    m_substitutions(substitutions),
+    m_checkedSubstitutions(checkedSubstitutions)
+{
+    storage()->append(this);
+}
+
+ColorizedIconDeclaration::ColorizedIconDeclaration(
+    const QString& sourceFile,
+    const QString& iconPath,
+    const SvgIconColorer::ThemeSubstitutions& themeSubstitutions)
+    :
+    m_sourceFile(sourceFile),
+    m_iconPath(iconPath),
+    m_themeSubstitutions(themeSubstitutions)
+{
+    storage()->append(this);
+}
+
+ColorizedIconDeclaration::ColorizedIconDeclaration(
+    const QString& sourceFile,
+    const QString& iconPath,
+    const SvgIconColorer::ThemeSubstitutions& themeSubstitutions,
+    const QString& checkedIconPath,
+    const SvgIconColorer::ThemeSubstitutions& checkedThemeSubstitutions)
+    :
+    m_sourceFile(sourceFile),
+    m_iconPath(iconPath),
+    m_checkedIconPath(checkedIconPath),
+    m_themeSubstitutions(themeSubstitutions),
+
+    m_checkedThemeSubstitutions(checkedThemeSubstitutions)
+{
+    storage()->append(this);
+}
+
+ColorizedIconDeclaration::~ColorizedIconDeclaration()
+{
+    storage()->removeOne(this);
+}
+
+QString ColorizedIconDeclaration::sourceFile() const
+{
+    return m_sourceFile;
+}
+
+QString ColorizedIconDeclaration::iconPath() const
+{
+    return m_iconPath;
+}
+
+QString ColorizedIconDeclaration::checkedIconPath() const
+{
+    return m_checkedIconPath;
+}
+
+SvgIconColorer::IconSubstitutions ColorizedIconDeclaration::substitutions() const
+{
+    return m_substitutions;
+}
+
+SvgIconColorer::IconSubstitutions ColorizedIconDeclaration::checkedSubstitutions() const
+{
+    return m_checkedSubstitutions;
+}
+
+SvgIconColorer::ThemeSubstitutions ColorizedIconDeclaration::themeSubstitutions() const
+{
+    return m_themeSubstitutions;
+}
+
+SvgIconColorer::ThemeSubstitutions ColorizedIconDeclaration::checkedThemeSubstitutions() const
+{
+    return m_checkedThemeSubstitutions;
+}
+
 Skin::Skin(const QStringList& paths, QObject* parent):
     QObject(parent)
 {
@@ -146,6 +249,17 @@ QIcon Skin::icon(const char* name, const char* checkedName)
 QIcon Skin::icon(const QIcon& icon)
 {
     return m_iconLoader->polish(icon);
+}
+
+QIcon Skin::icon(const ColorizedIconDeclaration& decl)
+{
+    return m_iconLoader->load(
+        decl.iconPath(),
+        decl.checkedIconPath(),
+        decl.themeSubstitutions(),
+        nullptr,
+        decl.substitutions(),
+        decl.checkedSubstitutions());
 }
 
 QIcon Skin::icon(const QString& name,

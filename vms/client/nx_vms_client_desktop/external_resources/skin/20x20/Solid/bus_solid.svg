@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 20 20">
+  <g class="20x20/Solid/bus_solid" clip-path="url(#a)">
+    <path fill="#A5B7C0" fill-rule="evenodd" d="M19.995 6.8A4 4 0 0 0 16 3H1a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h2.05a2.487 2.487 0 0 0-.05-.5 2.5 2.5 0 1 1 4.95.5h5.1l.022.097A2.5 2.5 0 1 1 17.95 14H19a1 1 0 0 0 1-1V7l-.005-.2ZM2 4a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1H2Zm5 0a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1H7Zm4 1a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1V5Zm5-.703c0-.164.133-.297.298-.297A2.803 2.803 0 0 1 19 6.758V8h-3V4.297ZM7 13.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm10 0a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z" class="Primary" clip-rule="evenodd"/>
+  </g>
+  <defs>
+    <clipPath id="a" class="a">
+      <path fill="#fff" d="M0 0h20v20H0z"/>
+    </clipPath>
+  </defs>
+</svg>

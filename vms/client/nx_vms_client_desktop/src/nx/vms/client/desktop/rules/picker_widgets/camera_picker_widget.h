@@ -126,7 +126,7 @@ protected:
 
             QIcon icon;
             if (resources.empty())
-                icon = qnSkin->icon("tree/buggy.png");
+                icon = qnSkin->icon(core::kAlertIcon);
             else if (resources.size() == 1)
                 icon = qnResIconCache->icon(resources.first());
             else

@@ -62,6 +62,14 @@ namespace
         else
             return QString();
     }
+
+NX_DECLARE_COLORIZED_ICON(kServerIcon, "20x20/Solid/server.svg",\
+    core::kEmptySubstitutions)
+NX_DECLARE_COLORIZED_ICON(kUserIcon, "20x20/Solid/user.svg",\
+    core::kEmptySubstitutions)
+NX_DECLARE_COLORIZED_ICON(kCameraIcon, "20x20/Solid/camera.svg", \
+    core::kEmptySubstitutions)
+
 }
 
 // -------------------------------------------------------------------------- //
@@ -951,16 +959,16 @@ QVariant QnAuditLogModel::data(const QModelIndex &index, int role) const
             switch (record->eventType)
             {
             case Qn::AR_UserUpdate:
-                return qnSkin->icon("tree/user.svg");
+                return qnSkin->icon(kUserIcon);
 
             case Qn::AR_StorageInsert:
             case Qn::AR_StorageUpdate:
             case Qn::AR_ServerUpdate:
-                return qnSkin->icon("tree/server.svg");
+                return qnSkin->icon(kServerIcon);
 
             case Qn::AR_CameraInsert:
             case Qn::AR_CameraUpdate:
-                return qnSkin->icon("tree/camera.svg");
+                return qnSkin->icon(kCameraIcon);
 
             default:
                 return QVariant();

@@ -58,7 +58,7 @@ protected:
     QIcon buttonIcon(const QnSharedResourcePointerList<QnLayoutResource>& layouts) const
     {
         if (layouts.empty())
-            return qnSkin->icon("tree/buggy.png");
+            return qnSkin->icon(core::kAlertIcon);
 
         return core::Skin::maximumSizePixmap(
             layouts.size() > 1

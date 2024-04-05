@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 20 20">
+  <g class="20x20/Solid/camera">
+    <path fill="#A5B7C0" fill-rule="evenodd" d="M2 4a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1v3a7 7 0 1 1-14 0V7a1 1 0 0 1-1-1V4Zm13 3H5v3a5 5 0 0 0 10 0V7Zm-5 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z" class="Primary" clip-rule="evenodd"/>
+  </g>
+</svg>

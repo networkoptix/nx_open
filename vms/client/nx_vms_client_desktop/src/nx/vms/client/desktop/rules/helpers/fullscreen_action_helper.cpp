@@ -24,7 +24,7 @@ QIcon selectedIcon(const QIcon& base)
 
 QIcon invalidIcon()
 {
-    return qnSkin->icon("tree/buggy.svg");
+    return qnSkin->icon(core::kAlertIcon);
 }
 
 QnVirtualCameraResourcePtr getCameraInternal(const QnBusinessRuleViewModel* model)

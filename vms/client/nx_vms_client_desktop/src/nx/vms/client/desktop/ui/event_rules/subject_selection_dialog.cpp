@@ -47,6 +47,20 @@ SubjectSelectionDialog::CustomizableOptions
     return options;
 }
 
+namespace {
+
+static const core::SvgIconColorer::ThemeSubstitutions colorSubs = {
+    {QnIcon::Normal, {.primary = "light10", .secondary="yellow_l"}},
+    {QnIcon::Selected, {.primary = "light4", .secondary="yellow_l"}}
+};
+
+NX_DECLARE_COLORIZED_ICON(kGroupIcon, "20x20/Solid/group.svg",\
+    colorSubs)
+NX_DECLARE_COLORIZED_ICON(kGroupAlertIcon, "20x20/Solid/group_alert.svg",\
+    colorSubs)
+
+} //  namespace
+
 using namespace subject_selection_dialog_private;
 
 SubjectSelectionDialog::SubjectSelectionDialog(QWidget* parent, Qt::WindowFlags windowFlags):
@@ -322,14 +336,11 @@ void SubjectSelectionDialog::setValidationPolicy(QnSubjectValidationPolicy* poli
 
 void SubjectSelectionDialog::validateAllUsers()
 {
-    static const core::SvgIconColorer::ThemeSubstitutions colorSubs = {
-        {QnIcon::Normal, {.primary = "light10"}}, {QnIcon::Selected, {.primary = "light4"}}};
-
     const auto validationState = m_roles->validateUsers(std::move(allSubjects()));
 
     QIcon icon = (validationState == QValidator::Acceptable
-        ? qnSkin->icon(lit("tree/users.svg"), colorSubs)
-        : qnSkin->icon(lit("tree/users_alert.svg"), colorSubs));
+        ? qnSkin->icon(kGroupIcon)
+        : qnSkin->icon(kGroupAlertIcon));
 
     ui->allUsersCheckableLine->setIcon(icon);
 

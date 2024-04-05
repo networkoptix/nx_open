@@ -83,16 +83,17 @@ Item
                 width: groupImage.width
                 height: groupImage.height
 
-                IconImage
+                SvgImage
                 {
                     id: groupImage
                     width: 20
                     height: 20
 
-                    source: treeItem.iconSource
+                    sourcePath: treeItem.iconSource
                     sourceSize: Qt.size(width, height)
 
-                    color: treeItem.textColor
+                    primaryColor: treeItem.textColor
+                    secondaryColor: treeItem.hovered ? "light4" : "light1"
                 }
             }
 

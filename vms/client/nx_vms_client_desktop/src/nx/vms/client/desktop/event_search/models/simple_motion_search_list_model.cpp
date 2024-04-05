@@ -52,6 +52,9 @@ milliseconds startTime(const QnTimePeriod& period)
     return period.startTime();
 }
 
+NX_DECLARE_COLORIZED_ICON(kCameraIcon, "20x20/Solid/camera.svg", \
+    core::kEmptySubstitutions)
+
 } // namespace
 
 SimpleMotionSearchListModel::SimpleMotionSearchListModel(WindowContext* context, QObject* parent):
@@ -123,7 +126,7 @@ QVariant SimpleMotionSearchListModel::data(const QModelIndex& index, int role) c
             return tr("Motion");
 
         case Qt::DecorationRole:
-            return QVariant::fromValue(qnSkin->pixmap("tree/camera.svg"));
+            return QVariant::fromValue(qnSkin->icon(kCameraIcon).pixmap(20, 20));
 
         case Qn::HelpTopicIdRole:
             return rules::eventHelpId(vms::api::EventType::cameraMotionEvent);

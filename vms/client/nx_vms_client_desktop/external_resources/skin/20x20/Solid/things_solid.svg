@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 20 20">
+  <g class="20x20/Solid/things_solid">
+    <path fill="#A5B7C0" fill-rule="evenodd" d="M3 4h15v2h-1v1a1 1 0 0 1-1 1H2V5a1 1 0 0 1 1-1Zm2 1H4v1h1V5Zm1 0h1v1H6V5Zm2.194 4H3.01l.642.874c.206.308.297.69.236 1.073l-.026.122L2.5 15.447l.28.243.015.01c.203.153.445.253.703.287l.016.002.164.011h2.377a1.5 1.5 0 0 0 1.426-1.035l.005-.014.032-.123.676-2.36V9Zm5 0h-4v3h2.5a1.5 1.5 0 0 0 1.49-1.326l.002-.014.008-.146V9Z" class="Primary" clip-rule="evenodd"/>
+  </g>
+</svg>

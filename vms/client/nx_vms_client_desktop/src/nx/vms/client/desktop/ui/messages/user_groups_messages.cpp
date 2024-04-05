@@ -19,6 +19,11 @@ namespace {
 static constexpr int kMaximumRows = 10;
 static constexpr int kRecommendedWidth = 284;
 
+NX_DECLARE_COLORIZED_ICON(kGroupLdapIcon, "20x20/Solid/group_ldap.svg",\
+    nx::vms::client::core::kEmptySubstitutions)
+NX_DECLARE_COLORIZED_ICON(kGroupIcon, "20x20/Solid/group.svg",\
+    nx::vms::client::core::kEmptySubstitutions)
+
 class GroupListWidget: public QListWidget
 {
 public:
@@ -41,10 +46,10 @@ QIcon iconForGroup(const nx::vms::api::UserGroupData& group)
     switch (group.type)
     {
         case nx::vms::api::UserType::local:
-            return qnSkin->pixmap("user_settings/group_custom.svg");
+            return qnSkin->icon(kGroupIcon);
 
         case nx::vms::api::UserType::ldap:
-            return qnSkin->pixmap("user_settings/group_ldap.svg");
+            return qnSkin->icon(kGroupLdapIcon);
 
         case nx::vms::api::UserType::cloud:
         default:

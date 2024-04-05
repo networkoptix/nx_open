@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 20 20">
+  <g class="20x20/Solid/webpage_proxied">
+    <path fill="#D9D9D9" fill-rule="evenodd" d="M10 10.2c0-.11.09-.2.2-.2h7.6c.11 0 .2.09.2.2v2.6a.2.2 0 0 1-.2.2h-7.6a.2.2 0 0 1-.2-.2v-2.6Zm0 4c0-.11.09-.2.2-.2h7.6c.11 0 .2.09.2.2v2.6a.2.2 0 0 1-.2.2h-7.6a.2.2 0 0 1-.2-.2v-2.6Zm3-3.7h-2v1h2v-1Z" class="Secondary" clip-rule="evenodd"/>
+    <path fill="#A5B7C0" fill-rule="evenodd" d="M2.5 3a.5.5 0 0 0-.5.5V6h16V3.5a.5.5 0 0 0-.5-.5h-15ZM18 7H2v9.5a.5.5 0 0 0 .5.5h6.517A1.208 1.208 0 0 1 9 16.8v-2.6c0-.261.083-.503.225-.7A1.195 1.195 0 0 1 9 12.8v-2.6A1.2 1.2 0 0 1 10.2 9h7.6a1.2 1.2 0 0 1 .2.017V7ZM7 4h1v1H7V4ZM4 4H3v1h1V4Zm1 0h1v1H5V4Z" class="Primary" clip-rule="evenodd"/>
+  </g>
+</svg>

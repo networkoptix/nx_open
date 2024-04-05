@@ -39,13 +39,15 @@ Control
 
         baselineOffset: text.baselineOffset
 
-        Image
+        SvgImage
         {
             id: icon
 
             Layout.alignment: Qt.AlignVCenter
 
-            source: iconSource
+            sourcePath: iconSource
+            primaryColor: "light10"
+            secondaryColor: "light4"
             visible: !!iconSource
             sourceSize: Qt.size(20, 20)
         }

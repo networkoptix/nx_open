@@ -29,6 +29,20 @@ namespace {
 
 static constexpr int kDropdownIconSize = 40;
 
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions colorSubs = {
+    {QnIcon::Normal, {.primary = "light10", .secondary="yellow_l"}},
+};
+
+NX_DECLARE_COLORIZED_ICON(kUserIcon, "20x20/Solid/user.svg",\
+    colorSubs)
+NX_DECLARE_COLORIZED_ICON(kUserAlertIcon, "20x20/Solid/user_alert.svg",\
+    colorSubs)
+
+NX_DECLARE_COLORIZED_ICON(kGroupIcon, "20x20/Solid/group.svg",\
+    colorSubs)
+NX_DECLARE_COLORIZED_ICON(kGroupAlertIcon, "20x20/Solid/group_alert.svg",\
+    colorSubs)
+
 } // namespace
 
 QnSoftwareTriggerBusinessEventWidget::QnSoftwareTriggerBusinessEventWidget(
@@ -174,17 +188,7 @@ void QnSoftwareTriggerBusinessEventWidget::at_usersButton_clicked()
 
 void QnSoftwareTriggerBusinessEventWidget::updateUsersButton()
 {
-    static const QColor mainColor = "#A5B7C0";
-    static const nx::vms::client::core::SvgIconColorer::IconSubstitutions colorSubs = {
-        {QnIcon::Normal, {{mainColor, "light10"}}}};
-
     const auto params = model()->eventParams();
-
-    const auto icon =
-        [](const QString& path) -> QIcon
-        {
-            return qnSkin->icon(path, QString(), {}, colorSubs);
-        };
 
     if (params.metadata.allUsers)
     {
@@ -199,9 +203,7 @@ void QnSoftwareTriggerBusinessEventWidget::updateUsersButton()
                 });
 
         ui->usersButton->setText(vms::event::StringsHelper::allUsersText());
-        ui->usersButton->setIcon(icon(allValid
-            ? lit("tree/users.svg")
-            : lit("tree/users_alert.svg")));
+        ui->usersButton->setIcon(qnSkin->icon(allValid ? kGroupIcon : kGroupAlertIcon));
     }
     else
     {
@@ -215,7 +217,7 @@ void QnSoftwareTriggerBusinessEventWidget::updateUsersButton()
         if (users.empty() && groups.empty())
         {
             ui->usersButton->setText(vms::event::StringsHelper::needToSelectUserText());
-            ui->usersButton->setIcon(qnSkin->icon(lit("tree/user_alert.svg"), colorSubs));
+            ui->usersButton->setIcon(qnSkin->icon(kUserAlertIcon));
         }
         else
         {
@@ -235,9 +237,9 @@ void QnSoftwareTriggerBusinessEventWidget::updateUsersButton()
 
             const bool multiple = users.size() > 1 || !groups.empty();
             ui->usersButton->setText(m_helper->actionSubjects(users, groups));
-            ui->usersButton->setIcon(icon(multiple
-                ? (allValid ? lit("tree/users.svg") : lit("tree/users_alert.svg"))
-                : (allValid ? lit("tree/user.svg") : lit("tree/user_alert.svg"))));
+            ui->usersButton->setIcon(qnSkin->icon(multiple
+                ? (allValid ? kGroupIcon : kGroupAlertIcon)
+                : (allValid ? kUserIcon : kUserAlertIcon)));
         }
     }
 }

@@ -65,6 +65,9 @@ static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubst
     {QnIcon::Normal, {{kLight12Color, "light12"}, {kLight10Color, "light10"}}},
 };
 
+NX_DECLARE_COLORIZED_ICON(kPaintedCameraIcon, "20x20/Solid/camera.svg", \
+    kIconSubstitutions)
+
 QPixmap toPixmap(const QIcon& icon)
 {
     return core::Skin::maximumSizePixmap(icon);
@@ -959,7 +962,7 @@ QPixmap NotificationListModel::Private::pixmapForAction(
         }
 
         case EventType::cameraMotionEvent:
-            return qnSkin->icon("tree/camera.svg", kIconSubstitutions).pixmap(QSize(20, 20));
+            return qnSkin->icon(kPaintedCameraIcon).pixmap(QSize(20, 20));
 
         case EventType::storageFailureEvent:
             return qnSkin->icon("events/storage_20.svg", kIconSubstitutions).pixmap(QSize(20, 20));

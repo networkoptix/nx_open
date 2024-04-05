@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 20 20">
+  <g class="20x20/Solid/ws_tiles_folder">
+    <path fill="#C3CFD5" d="M0 4h18a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4Z" class="Primary"/>
+    <path fill="#91A7B2" d="M0 4a2 2 0 0 1 2-2h7.04a2 2 0 0 1 1.352.526L12 4H0Z" class="Secondary"/>
+  </g>
+</svg>

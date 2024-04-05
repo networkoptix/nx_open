@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 20 20">
+  <g class="20x20/Solid/matrix">
+    <path fill="#A5B7C0" fill-rule="evenodd" d="M3 4v3.5h4V4H3ZM2 7.5v9a.5.5 0 0 0 .5.5h15a.5.5 0 0 0 .5-.5v-13a.5.5 0 0 0-.5-.5h-15a.5.5 0 0 0-.5.5v4Zm15 4v-3h-4v3h4Zm-5 0v-3H8v3h4Zm-4 1h4V16H8v-3.5Zm-1-1v-3H3v3h4Zm-4 1h4V16H3v-3.5Zm10 0h4V16h-4v-3.5ZM17 4v3.5h-4V4h4Zm-5 0v3.5H8V4h4Z" class="Primary" clip-rule="evenodd"/>
+  </g>
+</svg>

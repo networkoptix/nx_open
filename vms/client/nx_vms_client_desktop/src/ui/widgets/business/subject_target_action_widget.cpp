@@ -22,6 +22,23 @@ using namespace nx::vms::api;
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
 
+namespace {
+
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions colorSubs = {
+    {QnIcon::Normal, {.primary = "light10", .secondary="yellow_l"}},
+    {QnIcon::Selected, {.primary = "light4", .secondary="yellow_l"}}
+};
+
+NX_DECLARE_COLORIZED_ICON(kUserIcon, "20x20/Solid/user.svg",\
+    colorSubs)
+NX_DECLARE_COLORIZED_ICON(kUserAlertIcon, "20x20/Solid/user_alert.svg",\
+    colorSubs)
+NX_DECLARE_COLORIZED_ICON(kGroupIcon, "20x20/Solid/group.svg",\
+    colorSubs)
+NX_DECLARE_COLORIZED_ICON(kGroupAlertIcon, "20x20/Solid/group_alert.svg",\
+    colorSubs)
+} //  namespace
+
 QnSubjectTargetActionWidget::QnSubjectTargetActionWidget(
     SystemContext* systemContext,
     QWidget* parent)
@@ -124,13 +141,6 @@ void QnSubjectTargetActionWidget::updateSubjectsButton()
     if (!m_subjectsButton || !model())
         return;
 
-    const auto icon = [](const QString& path) -> QIcon
-    {
-        static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions colorSubs = {
-            {QnIcon::Normal, {.primary = "light10"}}, {QnIcon::Selected, {.primary = "light4"}}};
-        return qnSkin->icon(path, colorSubs);
-    };
-
     const auto params = model()->actionParams();
     if (params.allUsers)
     {
@@ -143,9 +153,7 @@ void QnSubjectTargetActionWidget::updateSubjectsButton()
             std::all_of(users.begin(), users.end(),
                 [this](const QnUserResourcePtr& user) { return userValidity(user); });
 
-        m_subjectsButton->setIcon(icon(allValid
-            ? lit("tree/users.svg")
-            : lit("tree/users_alert.svg")));
+        m_subjectsButton->setIcon(qnSkin->icon(allValid ? kGroupIcon : kGroupAlertIcon));
     }
     else
     {
@@ -161,7 +169,7 @@ void QnSubjectTargetActionWidget::updateSubjectsButton()
         if (users.empty() && groups.empty())
         {
             m_subjectsButton->setText(vms::event::StringsHelper::needToSelectUserText());
-            m_subjectsButton->setIcon(icon(lit("tree/user_alert.svg")));
+            m_subjectsButton->setIcon(qnSkin->icon(kUserAlertIcon));
         }
         else
         {
@@ -178,9 +186,9 @@ void QnSubjectTargetActionWidget::updateSubjectsButton()
 
             const bool multiple = users.size() > 1 || !groups.empty();
             m_subjectsButton->setText(m_helper->actionSubjects(users, groups));
-            m_subjectsButton->setIcon(icon(multiple
-                ? (allValid ? lit("tree/users.svg") : lit("tree/users_alert.svg"))
-                : (allValid ? lit("tree/user.svg") : lit("tree/user_alert.svg"))));
+            m_subjectsButton->setIcon(qnSkin->icon(multiple
+                ? (allValid ? kGroupIcon : kGroupAlertIcon)
+                : (allValid ? kUserIcon : kUserAlertIcon)));
         }
     }
 }

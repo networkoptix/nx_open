@@ -45,6 +45,13 @@ constexpr int kSeparatorItemHeight = 16;
 constexpr int kExtraTextMargin = 5;
 static constexpr int kMaxResourceNameLength = 120; //< TODO: #sivanov Move to common place to use.
 
+NX_DECLARE_COLORIZED_ICON(kLockedIcon, "20x20/Solid/locked.svg",\
+    core::kEmptySubstitutions)
+NX_DECLARE_COLORIZED_ICON(kRecordOnIcon, "20x20/Solid/record_on.svg",\
+    core::kEmptySubstitutions)
+NX_DECLARE_COLORIZED_ICON(kRecordPartIcon, "20x20/Solid/record_part.svg",\
+    core::kEmptySubstitutions)
+
 bool isCollapsibleNode(const QModelIndex& index)
 {
     NX_ASSERT(index.model());
@@ -58,9 +65,9 @@ bool isCollapsibleNode(const QModelIndex& index)
 
 QnResourceItemDelegate::QnResourceItemDelegate(QObject* parent):
     base_type(parent),
-    m_recordingIcon(qnSkin->icon("tree/record_on.svg")),
-    m_scheduledIcon(qnSkin->icon("tree/record_part.svg")),
-    m_lockedIcon(qnSkin->icon("tree/locked.svg")),
+    m_recordingIcon(qnSkin->icon(kRecordOnIcon)),
+    m_scheduledIcon(qnSkin->icon(kRecordPartIcon)),
+    m_lockedIcon(qnSkin->icon(kLockedIcon)),
     m_fixedHeight(nx::style::Metrics::kViewRowHeight),
     m_rowSpacing(0),
     m_customInfoLevel(Qn::ResourceInfoLevel::RI_Invalid),

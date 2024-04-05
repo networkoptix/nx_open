@@ -33,6 +33,22 @@ int countEnabledUsers(const auto& subjects)
         });
 }
 
+
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions colorSubs = {
+    {QnIcon::Normal, {.primary = "light10", .secondary="light4"}},
+    {QnIcon::Selected, {.primary = "light4", .secondary="light1"}}};
+
+NX_DECLARE_COLORIZED_ICON(kUserAlertIcon, "20x20/Solid/user_alert.svg",\
+    colorSubs)
+NX_DECLARE_COLORIZED_ICON(kGroupIcon, "20x20/Solid/group.svg",\
+    colorSubs)
+NX_DECLARE_COLORIZED_ICON(kGroupAlertIcon, "20x20/Solid/group_alert.svg",\
+    colorSubs)
+NX_DECLARE_COLORIZED_ICON(kGroupLdapIcon, "20x20/Solid/group_ldap.svg",\
+    colorSubs)
+NX_DECLARE_COLORIZED_ICON(kGroupDefaultIcon, "20x20/Solid/group_default.svg",\
+    colorSubs)
+
 } // namespace
 
 namespace nx::vms::client::desktop {
@@ -271,9 +287,6 @@ Qt::ItemFlags UserListModel::flags(const QModelIndex& index) const
 
 QVariant UserListModel::data(const QModelIndex& index, int role) const
 {
-    static const core::SvgIconColorer::ThemeSubstitutions colorSubs = {
-        {QnIcon::Normal, {.primary = "light10"}}, {QnIcon::Selected, {.primary = "light4"}}};
-
     switch (role)
     {
         case Qt::CheckStateRole:
@@ -290,7 +303,7 @@ QVariant UserListModel::data(const QModelIndex& index, int role) const
                 return base_type::data(index, role);
 
             return !m_allUsers && isIndirectlyChecked(index)
-                ? QVariant(qnSkin->icon(lit("tree/users.svg"), colorSubs))
+                ? QVariant(qnSkin->icon(kGroupIcon))
                 : QVariant();
         }
 
@@ -396,25 +409,20 @@ void GroupListDelegate::initStyleOption(QStyleOptionViewItem* option,
     base_type::initStyleOption(option, index);
     if (index.column() == QnUserRolesModel::NameColumn)
     {
-        static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions colorSubs = {
-            {QnIcon::Normal, {.primary = "light10"}},
-            {QnIcon::Selected, {.primary = "light4"}}};
-
         const auto roleId = index.data(Qn::UuidRole).value<nx::Uuid>();
         const auto role = userGroupManager()->find(roleId).value_or(api::UserGroupData{});
         QString iconPath;
         const auto validationState =
             index.data(Qn::ValidationStateRole).value<QValidator::State>();
         if (validationState != QValidator::Acceptable)
-            iconPath = "tree/users_alert.svg";
+            option->icon = qnSkin->icon(kGroupAlertIcon);
         else if (role.type == nx::vms::api::UserType::ldap)
-            iconPath = "user_settings/group_ldap.svg";
+            option->icon = qnSkin->icon(kGroupLdapIcon);
         else if (nx::vms::common::PredefinedUserGroups::contains(roleId))
-            iconPath = "user_settings/group_built_in.svg";
+            option->icon = qnSkin->icon(kGroupDefaultIcon);
         else
-            iconPath = "user_settings/group_custom.svg";
+            option->icon = qnSkin->icon(kGroupIcon);
 
-        option->icon = qnSkin->icon(iconPath, colorSubs);
         option->decorationSize = core::Skin::maximumSize(option->icon);
         option->features |= QStyleOptionViewItem::HasDecoration;
     }
@@ -446,7 +454,7 @@ void UserListDelegate::initStyleOption(
 {
     base_type::initStyleOption(option, index);
     if (index.column() == UserListModel::NameColumn && !index.data(Qn::ValidRole).toBool())
-        option->icon = qnSkin->icon(lit("tree/user_alert.svg"));
+        option->icon = qnSkin->icon(kUserAlertIcon);
 }
 
 QnResourceItemDelegate::ItemState UserListDelegate::itemState(const QModelIndex& index) const
