@@ -29,4 +29,6 @@ using ServerConnectionPtr = std::shared_ptr<ServerConnection>;
 using JsonResultCallback = Callback<nx::network::rest::JsonResult>;
 using UbJsonResultCallback = Callback<nx::network::rest::UbjsonResult>;
 
+static constexpr std::chrono::seconds kDefaultVmsApiTimeout = std::chrono::seconds(30);
+
 }; // namespace rest
