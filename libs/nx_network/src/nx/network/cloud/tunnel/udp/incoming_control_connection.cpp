@@ -13,7 +13,7 @@ static constexpr int kBufferSize = 4 * 1024;
 
 IncomingControlConnection::IncomingControlConnection(
     std::string connectionId,
-    std::unique_ptr<UdtStreamSocket> socket,
+    std::unique_ptr<AbstractStreamSocket> socket,
     const nx::hpm::api::ConnectionParameters& connectionParameters)
     :
     m_connectionId(std::move(connectionId)),
@@ -66,6 +66,14 @@ void IncomingControlConnection::stopWhileInAioThread()
 AbstractStreamSocket* IncomingControlConnection::socket()
 {
     return m_socket.get();
+}
+
+std::unique_ptr<AbstractStreamSocket> IncomingControlConnection::takeSocket()
+{
+    auto sock = std::exchange(m_socket, nullptr);
+    sock->cancelRead();
+    sock->cancelWrite();
+    return sock;
 }
 
 void IncomingControlConnection::monitorKeepAlive(
@@ -185,29 +193,32 @@ void IncomingControlConnection::reportError(SystemError::ErrorCode code)
 }
 
 hpm::api::UdpHolePunchingSynResponse IncomingControlConnection::process(
-    hpm::api::UdpHolePunchingSynRequest syn)
+    hpm::api::UdpHolePunchingSynRequest /*syn*/)
 {
-    static_cast<void>(syn);
-    NX_DEBUG(this, nx::format("Send SYN+ACK for connection %1")
-        .arg(m_connectionId));
+    NX_DEBUG(this, "Send SYN+ACK for connection %1", m_connectionId);
 
     hpm::api::UdpHolePunchingSynResponse synAck;
     synAck.connectSessionId = m_connectionId;
+
+    notifyOnConnectionSelectedIfNeeded();
+
     return synAck;
 }
 
 hpm::api::TunnelConnectionChosenResponse IncomingControlConnection::process(
-    hpm::api::TunnelConnectionChosenRequest reqest)
+    hpm::api::TunnelConnectionChosenRequest /*request*/)
 {
-    static_cast<void>(reqest);
-    NX_DEBUG(this, nx::format("Connection %1 has been chosen")
-        .arg(m_connectionId));
+    NX_DEBUG(this, "Connection %1 has been chosen", m_connectionId);
 
-    auto handler = std::move(m_selectedHandler);
-    m_selectedHandler = nullptr;
+    notifyOnConnectionSelectedIfNeeded();
 
-    handler();
     return hpm::api::TunnelConnectionChosenResponse();
+}
+
+void IncomingControlConnection::notifyOnConnectionSelectedIfNeeded()
+{
+    if (m_selectedHandler)
+        nx::utils::moveAndCall(m_selectedHandler);
 }
 
 } // namespace nx::network::cloud::udp
