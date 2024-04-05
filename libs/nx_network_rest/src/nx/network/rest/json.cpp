@@ -95,9 +95,10 @@ bool merge(
 
         case QJsonValue::Object:
         {
-            if (incompleteValue.isNull())
+            if (!incompleteValue.isObject())
             {
-                NX_VERBOSE(NX_SCOPE_TAG, "    Nullify object");
+                NX_VERBOSE(NX_SCOPE_TAG, "    Replace object with %1",
+                    QJson::toString(incompleteValue.type()));
                 *existingValue = incompleteValue;
                 break;
             }

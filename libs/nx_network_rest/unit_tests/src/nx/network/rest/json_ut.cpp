@@ -2,11 +2,11 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/utils/json.h>
-#include <nx/utils/log/log.h>
 #include <nx/fusion/serialization/json.h>
 #include <nx/network/rest/exception.h>
 #include <nx/network/rest/json.h>
+#include <nx/utils/json.h>
+#include <nx/utils/log/log.h>
 #include <nx/vms/api/data/device_model.h>
 
 namespace nx::network::rest::json::test {
@@ -343,6 +343,109 @@ TEST(Json, With)
         "*.nested2");
 
     #undef EXPECT_WITH
+}
+
+QJsonValue rawJsonToJsonValue(QByteArray json)
+{
+    QJsonValue value;
+    NX_ASSERT(QJson::deserialize(json, &value));
+    return value;
+}
+
+TEST(Json, replaceObjectWithNotObject)
+{
+    auto existingValue = rawJsonToJsonValue(R"json(
+        {
+            "params": {"settings": {"innerInt": 1}},
+            "id": "id1",
+            "params2": {}
+        })json");
+    QString error;
+
+    {
+        auto incompleteValue = rawJsonToJsonValue(R"json(
+            {
+                "params": {"settings": "string_value"}
+            })json");
+        auto expectedValue = rawJsonToJsonValue(R"json(
+            {
+                "params": {"settings": "string_value"},
+                "id": "id1",
+                "params2": {}
+            })json");
+        QJsonValue mergedValue;
+        ASSERT_TRUE(merge(&mergedValue, existingValue, incompleteValue, &error, /*chronoSerializedAsDouble*/ true));
+        ASSERT_EQ(mergedValue, expectedValue)
+            << QJson::serialized(mergedValue).toStdString() << "!=" << QJson::serialized(expectedValue).toStdString();
+    }
+
+    {
+        auto incompleteValue = rawJsonToJsonValue(R"json(
+            {
+                "params": {"settings": null}
+            })json");
+        auto expectedValue = rawJsonToJsonValue(R"json(
+            {
+                "params": {"settings": null},
+                "id": "id1",
+                "params2": {}
+            })json");
+        QJsonValue mergedValue;
+        ASSERT_TRUE(merge(&mergedValue, existingValue, incompleteValue, &error, /*chronoSerializedAsDouble*/ true));
+        ASSERT_EQ(mergedValue, expectedValue)
+            << QJson::serialized(mergedValue).toStdString() << "!=" << QJson::serialized(expectedValue).toStdString();
+    }
+
+    {
+        auto incompleteValue = rawJsonToJsonValue(R"json(
+            {
+                "params": {"settings": {"innerString": "innner_string"} }
+            })json");
+        auto expectedValue = rawJsonToJsonValue(R"json(
+            {
+                "params": {"settings": {"innerInt": 1, "innerString": "innner_string"} },
+                "id": "id1",
+                "params2": {}
+            })json");
+        QJsonValue mergedValue;
+        ASSERT_TRUE(merge(&mergedValue, existingValue, incompleteValue, &error, /*chronoSerializedAsDouble*/ true));
+        ASSERT_EQ(mergedValue, expectedValue)
+            << QJson::serialized(mergedValue).toStdString() << "!=" << QJson::serialized(expectedValue).toStdString();
+    }
+}
+
+struct TestModel
+{
+    QString id;
+    std::map<QString, QString> params;
+    bool operator==(const TestModel& rhs) const = default;
+};
+QN_FUSION_ADAPT_STRUCT(TestModel, (id)(params))
+QN_FUSION_DEFINE_FUNCTIONS(TestModel, (json))
+
+TEST(Json, replacedObjectFailsDeserialization)
+{
+    const TestModel existingValue{"id1", {{"inner", "innerValue"}}};
+    QString error;
+    {
+        auto incompleteValue = rawJsonToJsonValue(R"json(
+            {
+                "params": "string"
+            })json");
+        TestModel mergedValue;
+        ASSERT_FALSE(merge(&mergedValue, existingValue, incompleteValue, &error, /*chronoSerializedAsDouble*/ true));
+    }
+    {
+        auto incompleteValue = rawJsonToJsonValue(R"json(
+            {
+                "params": {"inner2": "innerValue2"}
+            })json");
+        TestModel mergedValue;
+        ASSERT_TRUE(merge(&mergedValue, existingValue, incompleteValue, &error, /*chronoSerializedAsDouble*/ true));
+        auto expectedValue = existingValue;
+        expectedValue.params["inner2"] = "innerValue2";
+        ASSERT_EQ(mergedValue, expectedValue);
+    }
 }
 
 } // namespace nx::network::rest::json::test

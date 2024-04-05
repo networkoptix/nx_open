@@ -534,6 +534,6 @@ T deserialized(const char* value, const T& defaultValue, bool* success)
         success);
 }
 
-QString toString(QJsonValue::Type jsonType);
+NX_FUSION_API QString toString(QJsonValue::Type jsonType);
 
 } // namespace QJson
