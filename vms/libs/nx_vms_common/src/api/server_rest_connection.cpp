@@ -394,6 +394,12 @@ ServerConnection::ServerConnection(
         .serverId = serverId,
         .logTag = makeLogTag(this, serverId)})
 {
+    setDefaultTimeouts(
+        nx::network::http::AsyncClient::Timeouts{
+        ::rest::kDefaultVmsApiTimeout,
+        ::rest::kDefaultVmsApiTimeout,
+        ::rest::kDefaultVmsApiTimeout });
+
     // TODO: #sivanov Raw pointer is unsafe here as ServerConnection instance may be not deleted
     // after it's owning server (and context) are destroyed. Need to change
     // QnMediaServerResource::restConnection() method to return weak pointer instead.
