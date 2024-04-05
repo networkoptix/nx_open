@@ -966,7 +966,7 @@
     </message>
     <message>
       <source>No connection</source>
-      <translation>接続できません</translation>
+      <translation>接続していません</translation>
     </message>
   </context>
   <context>
