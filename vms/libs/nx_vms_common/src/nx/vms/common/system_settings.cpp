@@ -205,6 +205,7 @@ struct SystemSettings::Private
     QnResourcePropertyAdaptor<bool>* exposeServerEndpointsAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* showMouseTimelinePreviewAdaptor = nullptr;
     QnResourcePropertyAdaptor<int>* cloudPollingIntervalAdaptor = nullptr;
+    QnResourcePropertyAdaptor<bool>* allowRegisteringIntegrationsAdaptor = nullptr;
 
     AdaptorList allAdaptors;
 
@@ -896,6 +897,13 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
             return tr("Interval between the Cloud polling HTTP requests to synchronize the data.");
         });
 
+    d->allowRegisteringIntegrationsAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
+        "allowRegisteringIntegrations", /*defaultValue*/ true, this,
+            []()
+            {
+                return tr("Enable or disable the creation of new Integration registration requests");
+            });
+
     connect(
         d->systemNameAdaptor,
         &QnAbstractResourcePropertyAdaptor::valueChanged,
@@ -1204,6 +1212,13 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         &SystemSettings::cloudPollingIntervalChanged,
         Qt::QueuedConnection);
 
+    connect(
+        d->allowRegisteringIntegrationsAdaptor,
+        &QnAbstractResourcePropertyAdaptor::valueChanged,
+        this,
+        &SystemSettings::allowRegisteringIntegrationsChanged,
+        Qt::QueuedConnection);
+
     AdaptorList result;
     result
         << d->systemNameAdaptor
@@ -1289,6 +1304,7 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         << d->ldapAdaptor
         << d->exposeServerEndpointsAdaptor
         << d->cloudPollingIntervalAdaptor
+        << d->allowRegisteringIntegrationsAdaptor
     ;
 
     return result;
@@ -1427,6 +1443,16 @@ bool SystemSettings::isAutoDiscoveryResponseEnabled() const
 void SystemSettings::setAutoDiscoveryResponseEnabled(bool enabled)
 {
     d->autoDiscoveryResponseEnabledAdaptor->setValue(enabled);
+}
+
+bool SystemSettings::isAllowRegisteringIntegrationsEnabled() const
+{
+    return d->allowRegisteringIntegrationsAdaptor->value();
+}
+
+void SystemSettings::setAllowRegisteringIntegrationsEnabled(bool value)
+{
+    d->allowRegisteringIntegrationsAdaptor->setValue(value);
 }
 
 void SystemSettings::at_resourcePool_resourceRemoved(const QnResourcePtr& resource)
@@ -2493,6 +2519,7 @@ void SystemSettings::update(const vms::api::SystemSettings& value)
     d->clientUpdateSettingsAdaptor->setValue(value.clientUpdateSettings);
     d->backupSettingsAdaptor->setValue(value.backupSettings);
     d->metadataStorageChangePolicyAdaptor->setValue(value.metadataStorageChangePolicy);
+    d->allowRegisteringIntegrationsAdaptor->setValue(value.allowRegisteringIntegrations);
 }
 
 } // namespace nx::vms::common

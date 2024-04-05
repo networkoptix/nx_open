@@ -54,6 +54,8 @@ struct SystemSettings
     BackupSettings backupSettings;
     MetadataStorageChangePolicy metadataStorageChangePolicy = MetadataStorageChangePolicy::keep;
 
+    bool allowRegisteringIntegrations = true;
+
     bool operator==(const SystemSettings& other) const = default;
 };
 
@@ -64,7 +66,7 @@ NX_REFLECTION_INSTRUMENT(SystemSettings, (cloudAccountName)(organization)(cloudS
     (videoTrafficEncryptionForced)(sessionLimitS)(storageEncryption)
     (showServersInTreeForNonAdmins)(updateNotificationsEnabled)(emailSettings)
     (timeSynchronizationEnabled)(primaryTimeServer)(customReleaseListUrl)(clientUpdateSettings)
-    (backupSettings)(metadataStorageChangePolicy));
+    (backupSettings)(metadataStorageChangePolicy)(allowRegisteringIntegrations));
 
 NX_REFLECTION_TAG_TYPE(SystemSettings, jsonSerializeChronoDurationAsNumber)
 
