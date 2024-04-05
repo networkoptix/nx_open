@@ -26,7 +26,7 @@ class NX_NETWORK_API IncomingControlConnection:
 public:
     IncomingControlConnection(
         std::string connectionId,
-        std::unique_ptr<UdtStreamSocket> socket,
+        std::unique_ptr<AbstractStreamSocket> socket,
         const nx::hpm::api::ConnectionParameters& connectionParameters);
 
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
@@ -43,6 +43,8 @@ public:
     void start(utils::MoveOnlyFunc<void()> selectedHandler);
 
     AbstractStreamSocket* socket();
+    std::unique_ptr<AbstractStreamSocket> takeSocket();
+
     void resetLastKeepAlive();
 
 private:
@@ -58,11 +60,12 @@ private:
     bool tryProcess(stun::Message* response);
 
     hpm::api::UdpHolePunchingSynResponse process(hpm::api::UdpHolePunchingSynRequest syn);
-    hpm::api::TunnelConnectionChosenResponse process(
-        hpm::api::TunnelConnectionChosenRequest reqest);
+    hpm::api::TunnelConnectionChosenResponse process(hpm::api::TunnelConnectionChosenRequest reqest);
+    void notifyOnConnectionSelectedIfNeeded();
 
+private:
     const std::string m_connectionId;
-    std::unique_ptr<UdtStreamSocket> m_socket;
+    std::unique_ptr<AbstractStreamSocket> m_socket;
     const std::chrono::milliseconds m_maxKeepAliveInterval;
 
     std::chrono::steady_clock::time_point m_lastKeepAliveTime;
