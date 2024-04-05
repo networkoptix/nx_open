@@ -780,6 +780,50 @@
     </message>
 </context>
 <context>
+    <name>nx::vms::rules::SaasIssueEvent</name>
+    <message>
+        <source>License migration issue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording services disabled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cloud storage services disabled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Paid integration services disabled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Services issue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Recording on %n channels was stopped due to service overuse.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+</context>
+<context>
     <name>nx::vms::rules::SendEmailAction</name>
     <message>
         <source>Email Message</source>
