@@ -2,9 +2,9 @@
 
 #include "json.h"
 
-#include <QtCore/QJsonValue>
-#include <QtCore/QJsonObject>
 #include <QtCore/QJsonDocument>
+#include <QtCore/QJsonObject>
+#include <QtCore/QJsonValue>
 #include <QtCore/QtNumeric> //< for qIsFinite
 #include <QtGui/QBrush>
 
@@ -336,7 +336,7 @@ QJsonObject::const_iterator QJsonDetail::findField(
     return deprecatedFieldPos;
 }
 
-QString toString(QJsonValue::Type jsonType)
+QString QJson::toString(QJsonValue::Type jsonType)
 {
     switch (jsonType)
     {
