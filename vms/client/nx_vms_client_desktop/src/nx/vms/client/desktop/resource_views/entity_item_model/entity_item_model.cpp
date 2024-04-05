@@ -118,6 +118,15 @@ QModelIndex EntityItemModel::parent(const QModelIndex& index) const
     if (indexEntity == m_rootEntity)
         return {};
 
+    if (!NX_ASSERT(indexEntity && indexEntity->modelMapping(),
+        "Root entity: %1, index: %2, index entity: %3",
+        m_rootEntity->data(/*row*/ 0, Qt::DisplayRole),
+        index,
+        indexEntity ? indexEntity->data(/*row*/ 0, Qt::DisplayRole) : "nullptr"))
+    {
+        return {};
+    }
+
     return indexEntity->modelMapping()->parentModelIndex();
 }
 
