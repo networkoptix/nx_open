@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 20 20">
+  <g class="20x20/Solid/layout_tours">
+    <path fill="#A5B7C0" fill-rule="evenodd" d="M10.5 2a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-.5.5H.5a.5.5 0 0 1-.5-.5v-7A.5.5 0 0 1 .5 2h10ZM4 13.5V11h6.5A1.5 1.5 0 0 0 12 9.5V6h2.5a.5.5 0 0 1 .5.5V14H4.5a.5.5 0 0 1-.5-.5ZM14 3h-2V2h2.5a.5.5 0 0 1 .5.5V5h-1V3ZM0 11v2.5a.5.5 0 0 0 .5.5H3v-1H1v-2H0Zm2 4h3v1H2v-1Zm4 1v-1h10V8h1v8H6Zm11-9h-1V4h1v3ZM4 17v1h3v-1H4Zm4 0v1h11v-8h-1v7H8Zm10-8h1V6h-1v3Z" class="Primary" clip-rule="evenodd"/>
+  </g>
+</svg>

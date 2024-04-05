@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 20 20">
+  <g class="20x20/Solid/camera_unauthorized">
+    <path fill="#EF5350" fill-rule="evenodd" d="M14 10.5h1a.5.5 0 0 1 .5.5v2h-2v-2a.5.5 0 0 1 .5-.5ZM12 13v-2a2 2 0 0 1 2-2h1a2 2 0 0 1 2 2v2h.5a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-.5.5h-6a.5.5 0 0 1-.5-.5v-3a.5.5 0 0 1 .5-.5h.5Z" class="Secondary" clip-rule="evenodd"/>
+    <path fill="#A5B7C0" fill-rule="evenodd" d="M3 3a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1v3a7 7 0 0 0 7.085 7 1.497 1.497 0 0 1-.085-.5V15a5 5 0 0 1-5-5V7h10v1c.768 0 1.47.289 2 .764V7a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1H3Zm8.079 7.315A2 2 0 1 0 10 14v-.5a1.5 1.5 0 0 1 1-1.415V11c0-.236.027-.465.079-.685Z" class="Primary" clip-rule="evenodd"/>
+  </g>
+</svg>

@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 20 20">
+  <g class="20x20/Solid/attention">
+    <path fill="#FFCA28" fill-rule="evenodd" d="M1.414 8.586a2 2 0 0 0 0 2.828l7.172 7.172a2 2 0 0 0 2.828 0l7.172-7.172a2 2 0 0 0 0-2.828l-7.172-7.172a2 2 0 0 0-2.828 0L1.414 8.586ZM10 5a1 1 0 0 1 1 1v4a1 1 0 1 1-2 0V6a1 1 0 0 1 1-1Zm1 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z" class="Primary" clip-rule="evenodd"/>
+  </g>
+</svg>

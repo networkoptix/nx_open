@@ -528,7 +528,7 @@ FocusScope
                     }
                 }
 
-                Image
+                SvgImage
                 {
                     id: button
 
@@ -541,16 +541,17 @@ FocusScope
                     verticalAlignment: Image.AlignVCenter
                     visible: rootIsDecorated || model.level
 
-                    source:
+                    sourcePath:
                     {
                         if (!model.hasChildren)
                             return ""
 
                         return model.expanded
-                            ? "image://svg/skin/tree/arrow_open_20.svg"
-                            : "image://svg/skin/tree/arrow_close_20.svg"
+                            ? "image://svg/skin/20x20/Solid/arrow_open.svg"
+                            : "image://svg/skin/20x20/Solid/arrow_close.svg"
                     }
                     sourceSize: Qt.size(20, 20)
+                    primaryColor: "dark17"
                 }
 
                 MouseArea

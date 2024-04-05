@@ -234,7 +234,7 @@ void ResourceDialogItemDelegate::paintItemIcon(
     const auto isWarningStyle = index.data(IsItemWarningStyleRole).toBool();
     if (isWarningStyle)
     {
-        const auto warningIcon = qnSkin->icon("tree/buggy.svg");
+        const auto warningIcon = qnSkin->icon(core::kAlertIcon);
         warningIcon.paint(painter, iconRect.translated(-style::Metrics::kDefaultIconSize, 0));
     }
     else if (showRecordingIndicator())

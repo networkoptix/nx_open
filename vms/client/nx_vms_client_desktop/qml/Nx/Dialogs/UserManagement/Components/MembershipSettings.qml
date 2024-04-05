@@ -68,11 +68,11 @@ Item
             }
         }
         if (model.isPredefined)
-            return "image://svg/skin/user_settings/group_built_in.svg"
+            return "image://svg/skin/20x20/Solid/group_default.svg"
 
         return model.isLdap
-            ? "image://svg/skin/user_settings/group_ldap.svg"
-            : "image://svg/skin/user_settings/group_custom.svg"
+            ? "image://svg/skin/20x20/Solid/group_ldap.svg"
+            : "image://svg/skin/20x20/Solid/group.svg"
     }
 
     component SelectableGroupItem: MembershipEditableItem

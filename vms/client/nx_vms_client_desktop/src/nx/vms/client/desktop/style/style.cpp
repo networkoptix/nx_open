@@ -135,6 +135,10 @@ const QColor kAttentionYellow = "#FBBC05";
 const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutionsYellow = {
     {QIcon::Normal, {{kAttentionYellow, "yellow_attention"}}}};
 
+NX_DECLARE_COLORIZED_ICON(kArrowOpenIcon, "20x20/Solid/arrow_open.svg", core::kEmptySubstitutions)
+NX_DECLARE_COLORIZED_ICON(kArrowCloseIcon, "20x20/Solid/arrow_close.svg", \
+    core::kEmptySubstitutions)
+
 void drawArrow(Direction direction,
     QPainter* painter,
     const QRectF& rect,
@@ -1340,8 +1344,8 @@ void Style::drawPrimitive(PrimitiveElement element,
                 return;
 
             auto icon = option->state.testFlag(State_Open)
-                ? qnSkin->icon("tree/arrow_open_20.svg")
-                : qnSkin->icon("tree/arrow_close_20.svg");
+                ? qnSkin->icon(kArrowOpenIcon)
+                : qnSkin->icon(kArrowCloseIcon);
 
             const auto rect = qobject_cast<const QAbstractItemView*>(widget)
                 ? subElementRect(SE_TreeViewDisclosureItem, option, widget)

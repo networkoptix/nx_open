@@ -131,7 +131,7 @@ private:
     QIcon icon(const QnVirtualCameraResourcePtr& camera)
     {
         if (!camera)
-            return qnSkin->icon("tree/buggy.png");
+            return qnSkin->icon(core::kAlertIcon);
 
         if (descriptor()->linkedFields.contains(vms::rules::utils::kLayoutIdsFieldName))
         {
@@ -139,7 +139,7 @@ private:
                 vms::rules::utils::kLayoutIdsFieldName);
 
             if (!NX_ASSERT(layoutIdsField))
-                return qnSkin->icon("tree/buggy.png");
+                return qnSkin->icon(core::kAlertIcon);
 
             const auto layouts = resourcePool()->template getResourcesByIds<QnLayoutResource>(
                 layoutIdsField->value());

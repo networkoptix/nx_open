@@ -209,10 +209,10 @@ MembershipSettings
             id: groupTreeHeader
             onRemoveClicked: model.isParent = false
             iconSource: model.isPredefined
-                ? "image://svg/skin/user_settings/group_built_in.svg"
+                ? "image://svg/skin/20x20/Solid/group_default.svg"
                 : model.isLdap
-                    ? "image://svg/skin/user_settings/group_ldap.svg"
-                    : "image://svg/skin/user_settings/group_custom.svg"
+                    ? "image://svg/skin/20x20/Solid/group_ldap.svg"
+                    : "image://svg/skin/20x20/Solid/group.svg"
 
             offset: 0
             interactive: model.isParent

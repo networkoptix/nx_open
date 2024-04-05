@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 20 20">
+  <g class="20x20/Solid/emergency_solid">
+    <path fill="#A5B7C0" fill-rule="evenodd" d="M11 4a1 1 0 0 1 1 1v1.042A3 3 0 0 1 13.9 7.2L16 10h2a2 2 0 0 1 2 2v1a2 2 0 0 1-2 2h-.05a2.5 2.5 0 1 0-4.9 0h-5.1a2.5 2.5 0 1 0-4.9 0H2a2 2 0 0 1-2-2v-2.333a2 2 0 0 1 .4-1.2L2.7 6.4a1 1 0 0 1 .8-.4H10V5a1 1 0 0 1 1-1Zm.5 3H9v3h5.75L13.1 7.8a2 2 0 0 0-1.43-.793L11.5 7ZM6 7.999V7H5v.999L4 8v1l1-.001V10h1V8.999L7 9V8l-1-.001ZM7 14.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm10 0a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z" class="Primary" clip-rule="evenodd"/>
+  </g>
+</svg>

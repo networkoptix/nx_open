@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 20 20">
+  <g class="20x20/Solid/organizations">
+    <path fill="#A5B7C0" fill-rule="evenodd" d="M2 1h12v5H9a1 1 0 0 0-1 1v8H2V1Zm7 6h5v8H9V7ZM3 2h9v1H3V2Zm0 2h9v1H3V4Zm4 2H3v1h4V6ZM3 8h4v1H3V8Zm4 2H3v1h4v-1Zm3-2h1v1h-1V8Zm3 0h-1v1h1V8Zm-3 2h1v1h-1v-1Zm6-7h-1v5h1V3Zm-1 13V9h1v8h-5v-1h4Zm-5 0v1H4v-1h6Zm-4 3v-1h6v1H6Zm7 0v-1h4v-7h1v8h-5Zm5-9h-1V4h1v6Z" class="Primary" clip-rule="evenodd"/>
+  </g>
+</svg>

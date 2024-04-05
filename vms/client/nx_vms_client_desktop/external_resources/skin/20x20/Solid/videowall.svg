@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 20 20">
+  <g class="20x20/Solid/videowall">
+    <path fill="#A5B7C0" fill-rule="evenodd" d="M3 10.5V16h6.5v-5.5H3Zm-1 0v-7a.5.5 0 0 1 .5-.5h15a.5.5 0 0 1 .5.5v13a.5.5 0 0 1-.5.5h-15a.5.5 0 0 1-.5-.5v-6Zm15-1V4h-6.5v5.5H17Zm-6.5 1H17V16h-6.5v-5.5Zm-1-1V4H3v5.5h6.5ZM4 5h4.5v3.5H4V5Zm4.5 6.5H4V15h4.5v-3.5Zm3 0H16V15h-4.5v-3.5ZM16 5h-4.5v3.5H16V5Z" class="Primary" clip-rule="evenodd"/>
+  </g>
+</svg>

@@ -31,6 +31,19 @@ QString makeText(const QString& base, const QString& additional)
     return QString{"%1, %2"}.arg(base).arg(additional);
 }
 
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions colorSubs = {
+    {QnIcon::Normal, {.primary="light10", .secondary="yellow_l"}}
+};
+
+NX_DECLARE_COLORIZED_ICON(kUserIcon, "20x20/Solid/user.svg",\
+    colorSubs)
+NX_DECLARE_COLORIZED_ICON(kUserAlertIcon, "20x20/Solid/user_alert.svg",\
+    colorSubs)
+NX_DECLARE_COLORIZED_ICON(kGroupIcon, "20x20/Solid/group.svg",\
+    colorSubs)
+NX_DECLARE_COLORIZED_ICON(kGroupAlertIcon, "20x20/Solid/group_alert.svg",\
+    colorSubs)
+
 } // namespace
 
 UserPickerHelper::UserPickerHelper(
@@ -105,28 +118,24 @@ QString UserPickerHelper::text() const
 
 QIcon UserPickerHelper::icon() const
 {
-    static const QColor mainColor = "#A5B7C0";
-    static const nx::vms::client::core::SvgIconColorer::IconSubstitutions colorSubs = {
-        {QnIcon::Normal, {{mainColor, "light10"}}}};
-
     if (m_acceptAll)
     {
         return core::Skin::maximumSizePixmap(m_isValid
-                ? qnSkin->icon("tree/users.svg", colorSubs)
-                : qnSkin->icon("tree/users_alert.svg", colorSubs),
+                ? qnSkin->icon(kGroupIcon)
+                : qnSkin->icon(kGroupAlertIcon),
             QIcon::Selected,
             QIcon::Off,
             /*correctDevicePixelRatio*/ false);
     }
 
     if (m_users.isEmpty() && m_groups.empty() && m_parameters.additionalUsers == 0)
-        return qnSkin->icon("tree/user_alert.svg");
+        return qnSkin->icon(kUserAlertIcon);
 
     const auto users = m_users.size() + m_parameters.additionalUsers;
     const bool multiple = users > 1 || !m_groups.empty();
     const QIcon icon = qnSkin->icon(multiple
-        ? (m_isValid ? "tree/users.svg" : "tree/users_alert.svg")
-        : (m_isValid ? "tree/user.svg" : "tree/user_alert.svg"), colorSubs);
+        ? (m_isValid ? kGroupIcon : kGroupAlertIcon)
+        : (m_isValid ? kUserIcon : kUserAlertIcon));
 
     return core::Skin::maximumSizePixmap(
         icon,

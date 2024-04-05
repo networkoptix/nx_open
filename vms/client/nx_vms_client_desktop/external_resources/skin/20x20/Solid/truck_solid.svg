@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 20 20">
+  <g class="20x20/Solid/truck_solid">
+    <path fill="#A5B7C0" fill-rule="evenodd" d="M6.95 14a2.5 2.5 0 0 0-4.9 0H1a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h11v8h1V5h4.54a.97.97 0 0 1 .755.354C19.432 6.759 20 7.974 20 9v3a2 2 0 0 1-2 2h-.05a2.5 2.5 0 0 0-4.9 0h-6.1ZM16 6h-1v3h3V8h-2V6ZM6 14.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm11 0a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z" class="Primary" clip-rule="evenodd"/>
+  </g>
+</svg>

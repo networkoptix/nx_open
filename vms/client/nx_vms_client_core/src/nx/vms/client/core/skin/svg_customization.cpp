@@ -55,7 +55,10 @@ QByteArray customizeSvgColorClasses(const QByteArray& sourceData,
     const auto updateElement =
         [&](QDomElement element)
         {
-            const auto className = element.attribute("class", "");
+            if (!element.hasAttribute("fill"))
+                return;
+
+            const auto className = element.attribute("class", "").toLower();
             if (className.isEmpty())
                 return;
 

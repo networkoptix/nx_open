@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 20 20">
+  <g class="20x20/Outline/table_view">
+    <path fill="#698796" fill-rule="evenodd" d="M3.5 2.5a1 1 0 0 0-1 1v13a1 1 0 0 0 1 1h13a1 1 0 0 0 1-1v-13a1 1 0 0 0-1-1h-13ZM7 4H4v3h3V4Zm0 4.5H4v3h3v-3ZM4 13h3v3H4v-3Zm7.5-9h-3v3h3V4Zm-3 4.5h3v3h-3v-3Zm3 4.5h-3v3h3v-3ZM13 4h3v3h-3V4Zm3 4.5h-3v3h3v-3ZM13 13h3v3h-3v-3Z" class="Primary" clip-rule="evenodd"/>
+  </g>
+</svg>

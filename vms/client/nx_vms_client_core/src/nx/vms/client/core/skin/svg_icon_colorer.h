@@ -11,10 +11,11 @@
 #include <QtGui/QColor>
 #include <QtGui/QIcon>
 
+#include <nx/utils/log/log.h>
+
 namespace nx::vms::client::core {
 
 static const QString kInvalidColor = "invalidColor";
-
 
 class NX_VMS_CLIENT_CORE_API SvgIconColorer
 {
@@ -26,9 +27,10 @@ public:
         QString tertiary = kInvalidColor;
         double alpha = 1.0;
 
-        bool contains(QString name) const
+        bool contains(const QString& name) const
         {
-            return name == "primary" || name == "secondary" || name == "tertiary";
+            auto lName = name.toLower();
+            return lName == "primary" || lName == "secondary" || lName == "tertiary";
         }
 
         bool empty() const
@@ -40,6 +42,7 @@ public:
 
         const QString operator[](QString name) const
         {
+            name = name.toLower();
             if (name == "primary")
                 return primary;
             if (name == "secondary")
@@ -69,6 +72,22 @@ public:
     class IconSubstitutions: public QMap<QIcon::Mode, Substitutions>
     {
     public:
+        inline IconSubstitutions(std::initializer_list<std::pair<QIcon::Mode, Substitutions>> list):
+            QMap(list)
+        {
+            for (auto it1 = begin(); it1 != end(); ++it1)
+            {
+                auto mode = it1.key();
+                NX_TRACE(this, "QIcon mode " + mode);
+                auto subst = it1.value();
+                for (auto it2 = subst.constBegin(); it2 != subst.constEnd(); ++it2)
+                {
+                    auto color = it2.key();
+                    auto name = it2.value();
+                    NX_TRACE(this, "  " + color.name() + " " + name);
+                }
+            }
+        }
         using QMap<QIcon::Mode, Substitutions>::QMap;
 
         /**

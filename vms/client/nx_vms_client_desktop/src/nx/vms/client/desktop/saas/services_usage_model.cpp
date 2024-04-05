@@ -265,7 +265,7 @@ QVariant ServicesUsageModel::data(const QModelIndex& index, int role) const
         && index.column() == ServiceOveruseWarningIconColumn
         && serviceOverused)
     {
-        return qnSkin->icon("tree/buggy.svg");
+        return qnSkin->icon(core::kAlertIcon);
     }
 
     if (role == ServiceTypeRole)

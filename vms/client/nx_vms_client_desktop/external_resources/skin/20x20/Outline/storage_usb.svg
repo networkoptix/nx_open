@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 20 20">
+  <g class="20x20/Outline/storage_usb">
+    <path fill="#698796" fill-rule="evenodd" d="M7 4.5h6a.5.5 0 0 1 .5.5v7.182h-7V5a.5.5 0 0 1 .5-.5Zm-2 7.682V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v7.182h.357c.386 0 .781.097 1.1.338.336.254.543.64.543 1.088v2.64a.75.75 0 0 1-1.5 0v-2.55a.586.586 0 0 0-.143-.016H4.643a.585.585 0 0 0-.143.015v2.55a.75.75 0 0 1-1.5 0v-2.64c0-.446.207-.833.543-1.087.319-.241.714-.338 1.1-.338H5Zm6-3.762H9v2h2v-2Z" class="Primary" clip-rule="evenodd"/>
+  </g>
+</svg>

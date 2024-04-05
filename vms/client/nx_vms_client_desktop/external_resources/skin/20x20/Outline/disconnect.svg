@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 20 20">
+  <g class="20x20/Outline/disconnect">
+    <path fill="#698796" fill-rule="evenodd" d="M7.321 1v4.5h5.358V1h1.5v4.5H17a1 1 0 0 1 1 1v6.25a4 4 0 0 1-4 4h-3.25V19h-1.5v-2.25H6a4 4 0 0 1-4-4V6.5a1 1 0 0 1 1-1h2.821V1h1.5ZM3.5 7v5.75a2.5 2.5 0 0 0 2.5 2.5h8a2.5 2.5 0 0 0 2.5-2.5V7h-13Zm6.507 6.625a1.25 1.25 0 1 0 0-2.5 1.25 1.25 0 0 0 0 2.5Z" class="Primary" clip-rule="evenodd"/>
+  </g>
+</svg>

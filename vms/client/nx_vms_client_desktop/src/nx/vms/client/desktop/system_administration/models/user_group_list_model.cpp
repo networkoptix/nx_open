@@ -30,19 +30,18 @@ namespace nx::vms::client::desktop {
 
 namespace {
 
-static const QColor kLight10Color = "#A5B7C0";
-static const core::SvgIconColorer::IconSubstitutions kEnabledUncheckedIconSubstitutions = {
-    {QIcon::Normal, {{kLight10Color, "light10"}}},
-    {QIcon::Selected, {{kLight10Color, "light4"}}}};
-static const core::SvgIconColorer::IconSubstitutions kEnabledCheckedIconSubstitutions = {
-    {QIcon::Normal, {{kLight10Color, "light4"}}},
-    {QIcon::Selected, {{kLight10Color, "light2"}}}};
-static const core::SvgIconColorer::IconSubstitutions kDisabledUncheckedIconSubstitutions = {
-    {QIcon::Normal, {{kLight10Color, "dark16"}}},
-    {QIcon::Selected, {{kLight10Color, "light13"}}}};
-static const core::SvgIconColorer::IconSubstitutions kDisabledCheckedIconSubstitutions = {
-    {QIcon::Normal, {{kLight10Color, "light13"}}},
-    {QIcon::Selected, {{kLight10Color, "light10"}}}};
+static const core::SvgIconColorer::ThemeSubstitutions kEnabledUncheckedIconSubstitutions = {
+    {QIcon::Normal, {.primary = "light10", .secondary = "light4"}},
+    {QIcon::Selected, {.primary = "light4", .secondary = "light1"}}};
+static const core::SvgIconColorer::ThemeSubstitutions kEnabledCheckedIconSubstitutions = {
+    {QIcon::Normal, {.primary = "light10", .secondary = "light4"}},
+    {QIcon::Selected, {.primary = "light2", .secondary = "light1"}}};
+static const core::SvgIconColorer::ThemeSubstitutions kDisabledUncheckedIconSubstitutions = {
+    {QIcon::Normal, {.primary = "dark16", .secondary = "light10"}},
+    {QIcon::Selected, {.primary = "light13", .secondary = "light7"}}};
+static const core::SvgIconColorer::ThemeSubstitutions kDisabledCheckedIconSubstitutions = {
+    {QIcon::Normal, {.primary = "light13", .secondary = "light7"}},
+    {QIcon::Selected, {.primary = "light10", .secondary = "light4"}}};
 
 } // namespace
 
@@ -480,11 +479,11 @@ QVariant UserGroupListModel::data(const QModelIndex& index, int role) const
                 case GroupTypeColumn:
                 {
                     if (group.type == nx::vms::api::UserType::ldap)
-                        return QString("user_settings/group_ldap.svg");
+                        return QString("20x20/Solid/group_ldap.svg");
 
                     return Private::isBuiltIn(group)
-                        ? QString("user_settings/group_built_in.svg")
-                        : QString("user_settings/group_custom.svg");
+                        ? QString("20x20/Solid/group_default.svg")
+                        : QString("20x20/Solid/group.svg");
                 }
 
                 case PermissionsColumn:
@@ -504,7 +503,7 @@ QVariant UserGroupListModel::data(const QModelIndex& index, int role) const
         {
             if (const auto path = data(index, Qn::DecorationPathRole).toString(); !path.isEmpty())
             {
-                core::SvgIconColorer::IconSubstitutions colorSubstitutions;
+                core::SvgIconColorer::ThemeSubstitutions colorSubstitutions;
 
                 const bool checked =
                     data(index.siblingAtColumn(CheckBoxColumn), Qt::CheckStateRole).toBool();

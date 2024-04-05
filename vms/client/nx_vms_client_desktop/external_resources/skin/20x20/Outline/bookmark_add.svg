@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 20 20">
+  <g class="20x20/Outline/bookmark_add">
+    <path fill="#698796" fill-rule="evenodd" d="M16 3.5h-6a.5.5 0 0 0-.5.5v1H8V4a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v13.496a.5.5 0 0 1-.801.4l-3.955-2.985a.5.5 0 0 0-.607.004l-3.831 2.962A.5.5 0 0 1 8 17.48V14h1.5v1.444l2.22-1.716a2 2 0 0 1 2.427-.014l2.353 1.775V4a.5.5 0 0 0-.5-.5ZM6.232 5.75v2.992h3.022v1.5H6.232v3.008h-1.5v-3.008H1.75v-1.5h2.982V5.75h1.5Z" class="Primary" clip-rule="evenodd"/>
+  </g>
+</svg>
