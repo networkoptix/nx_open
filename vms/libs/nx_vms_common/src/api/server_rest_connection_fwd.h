@@ -32,6 +32,6 @@ using JsonRpcBatchResultCallback = Callback<std::vector<nx::vms::api::JsonRpcRes
 using JsonResultCallback = Callback<nx::network::rest::JsonResult>;
 using UbJsonResultCallback = Callback<nx::network::rest::UbjsonResult>;
 
-static constexpr std::chrono::seconds kDefaultVmsApiTimeout = std::chrono::seconds(20);
+static constexpr std::chrono::seconds kDefaultVmsApiTimeout = std::chrono::seconds(30);
 
 }; // namespace rest
