@@ -283,11 +283,14 @@ NX_NETWORK_API bool deserialize(QnJsonContext*, const QJsonValue& source, Socket
 
 struct NX_NETWORK_API KeepAliveOptions
 {
-    std::chrono::milliseconds inactivityPeriodBeforeFirstProbe;
-    std::chrono::milliseconds probeSendPeriod;
+    std::chrono::milliseconds inactivityPeriodBeforeFirstProbe = std::chrono::milliseconds::zero();
+    std::chrono::milliseconds probeSendPeriod = std::chrono::milliseconds::zero();
+
     /**
      * The number of unacknowledged probes to send before considering the connection dead and
      * notifying the application layer.
+     * The probe is considered unacknowledged if there was no response to it during the
+     * probeSendPeriod period.
      */
     int probeCount = 0;
 

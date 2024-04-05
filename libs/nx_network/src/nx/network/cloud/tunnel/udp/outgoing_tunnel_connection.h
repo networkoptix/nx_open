@@ -6,8 +6,10 @@
 #include <list>
 #include <memory>
 
+#include <nx/network/aio/repetitive_timer.h>
 #include <nx/network/aio/timer.h>
 #include <nx/network/connection_server/base_stream_protocol_connection.h>
+#include <nx/network/socket_common.h>
 #include <nx/network/stun/message_parser.h>
 #include <nx/network/stun/message_serializer.h>
 #include <nx/network/udt/udt_socket.h>
@@ -18,24 +20,12 @@
 
 namespace nx::network::cloud::udp {
 
-class Timeouts
+struct NX_NETWORK_API Settings
 {
-public:
-    std::chrono::seconds keepAlivePeriod;
-    /** Number of missing keep-alives before connection can be treated as closed. */
-    int keepAliveProbeCount;
+    static const KeepAliveOptions kDefaultKeepAliveOptions; // = {0s, 11s, 5}
 
-    Timeouts()
-    :
-        keepAlivePeriod(std::chrono::hours(2)),
-        keepAliveProbeCount(3)
-    {
-    }
-
-    std::chrono::seconds maxConnectionInactivityPeriod() const
-    {
-        return keepAlivePeriod*keepAliveProbeCount;
-    }
+    std::chrono::milliseconds verificationTimeout = std::chrono::seconds(15);
+    KeepAliveOptions keepAliveOptions = kDefaultKeepAliveOptions;
 };
 
 /**
@@ -47,6 +37,8 @@ public:
 class NX_NETWORK_API OutgoingTunnelConnection:
     public AbstractOutgoingTunnelConnection
 {
+    using base_type = AbstractOutgoingTunnelConnection;
+
 public:
     /**
      * @param connectionId unique id of connection established.
@@ -56,12 +48,7 @@ public:
         aio::AbstractAioThread* aioThread,
         std::string connectionId,
         std::unique_ptr<UdtStreamSocket> udtConnection,
-        Timeouts timeouts);
-
-    OutgoingTunnelConnection(
-        aio::AbstractAioThread* aioThread,
-        std::string connectionId,
-        std::unique_ptr<UdtStreamSocket> udtConnection);
+        Settings settings = Settings());
 
     ~OutgoingTunnelConnection();
 
@@ -100,13 +87,16 @@ private:
     const SocketAddress m_localPunchedAddress;
     const SocketAddress m_remoteHostAddress;
     nx::utils::AtomicUniquePtr<ConnectionType> m_controlConnection;
-    const Timeouts m_timeouts;
+    const Settings m_settings;
     std::map<UdtStreamSocket*, ConnectionContext> m_ongoingConnections;
     nx::Mutex m_mutex;
-    bool m_pleaseStopHasBeenCalled;
-    bool m_pleaseStopCompleted;
+    bool m_pleaseStopHasBeenCalled = false;
+    bool m_pleaseStopCompleted = false;
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)>
         m_controlConnectionClosedHandler;
+    aio::RepetitiveTimer m_keepAliveTimer;
+    bool m_isVerified = false;
+    std::chrono::steady_clock::time_point m_lastAckTime;
 
     void proceedWithConnection(
         UdtStreamSocket* connectionPtr,
@@ -123,6 +113,10 @@ private:
     void onConnectionClosed(SystemError::ErrorCode closeReason);
 
     void onStunMessageReceived(nx::network::stun::Message message);
+
+    void startKeepAlive();
+    void performKeepAliveIteration();
+    void sendKeepAliveProbe();
 };
 
 } // namespace nx::network::cloud::udp
