@@ -12013,7 +12013,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To Start</source>
-      <translation>開始</translation>
+      <translation>開始位置へ</translation>
     </message>
     <message>
       <source>Next Chunk</source>
@@ -12021,7 +12021,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To End</source>
-      <translation>終了</translation>
+      <translation>終了位置へ</translation>
     </message>
     <message>
       <source>Rewind is not available for VMAX</source>

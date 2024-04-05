@@ -884,8 +884,8 @@ of what has changed</source>
     <message>
       <source>Drag over any part of the video
 to activate PTZ</source>
-      <translation>映像上の任意の箇所をドラッグし
-PTZを行います</translation>
+      <translation>PTZを行うには、映像上の任意の
+箇所をドラッグしてください。</translation>
     </message>
     <message>
       <source>Press arrows keys to move and plus or minus keys to zoom</source>
@@ -901,7 +901,7 @@ PTZを行います</translation>
     </message>
     <message>
       <source>Go to Local Settings to enable a drag marker over the center of the video</source>
-      <translation>映像中央にドラッグマーカーを表示するには、ローカル設定を開いてください</translation>
+      <translation>映像中央にドラッグマーカーを表示するには、ローカル設定を開いてください。</translation>
     </message>
   </context>
   <context>
