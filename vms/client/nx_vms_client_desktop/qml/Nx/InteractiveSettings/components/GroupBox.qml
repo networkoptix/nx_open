@@ -18,6 +18,12 @@ Group
     property string caption: ""
     property string description: ""
     property string style: defaultStyle
+    property bool useSwitchButton: false
+    property var defaultValue
+    property var value: defaultValue
+    property bool isActive: false
+
+    property string switchButtonBehavior: "disable"
 
     property int depth: 1
     readonly property string defaultStyle: depth === 1 ? "panel" : "group"
@@ -61,10 +67,19 @@ Group
             id: panel
 
             title: control.caption
-            contentHeight: column.implicitHeight
-            clip: true
+            checkable: control.useSwitchButton
+            checked: control.value ?? defaultValue ?? true
+            width: parent.width
+            switchButtonBehavior: ({
+                "none": Panel.SwitchButtonBehavior.None,
+                "hide": Panel.SwitchButtonBehavior.Hide,
+                "disable": Panel.SwitchButtonBehavior.Disable,
+            })[control.switchButtonBehavior] ?? Panel.SwitchButtonBehavior.None
 
-            topPadding: 36
+            onTriggered: (checked) => control.value = checked
+
+            topPadding: contentHeight > 0 ? 36 : 0
+
             bottomPadding: 16
 
             contentItem: LabeledColumnLayout

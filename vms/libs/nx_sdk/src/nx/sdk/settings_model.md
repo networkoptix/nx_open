@@ -761,19 +761,36 @@ The `"style"` field is optional and accepts the following values:
 - `"group"`
 - `"label"`
 
+`GroupBox` that has `"style"` set to `"panel"` also supports the field `"useSwitchButton"` (`false`
+by default) which is used to show or hide the switch button.
+
+The `"switchButtonBehavior"` field is optional and accepts the following values:
+- `"none"` (default, the button does not affect the content)
+- `"disable"` (the button enables and disables the content)
+- `"hide"` (the button shows and hides the content; note that the values of hidden controls are
+    present in the value set)
+
+The field `"defaultValue"` is optional (`false` by default) and is used to set the default state of
+the switch button.
+
 [proprietary]
 
 ![](doc/images/group-box.png)
 ![](doc/images/group-box-styles.png)
+![](doc/images/group-box-switch-button.png)
 
 [/proprietary]
 
 ### Setting Model
 
     {
+        "name": "groupBox",
         "type": "GroupBox",
         "caption": "Top-level groupbox",
         "style": "default",
+        "useSwitchButton": true,
+        "defaultValue": true,
+        "isActive": true,
         "items": [
             { "type": "CheckBox", "caption": "CheckBox", "description": "Hint" },
             { "type": "SpinBox", "caption": "SpinBox",  "description": "Hint" },
@@ -795,6 +812,10 @@ The `"style"` field is optional and accepts the following values:
             }
         ]
     }
+
+### Setting Value
+
+    "groupBox": true
 
 ---------------------------------------------------------------------------------------------------
 ## Separator
