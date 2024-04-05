@@ -196,6 +196,42 @@ static const std::string kEngineSettingsModel = /*suppress newline*/ 1 + R"json(
                 },
                 {
                     "type": "GroupBox",
+                    "caption": "Styled GroupBox",
+                    "style": "panel",
+                    "useSwitchButton": true,
+                    "defaultValue": true,
+                    "switchButtonBehavior": "disable",
+                    "name": "styledGroupBox1",
+                    "items": [
+                        {
+                            "type": "TextField",
+                            "name": "textFieldInGroupBox1",
+                            "caption": "Text Field",
+                            "description": "A text field",
+                            "defaultValue": "a text"
+                        }
+                    ]
+                },
+                {
+                    "type": "GroupBox",
+                    "caption": "Styled GroupBox",
+                    "style": "panel",
+                    "useSwitchButton": true,
+                    "defaultValue": true,
+                    "switchButtonBehavior": "hide",
+                    "name": "styledGroupBox2",
+                    "items": [
+                        {
+                            "type": "TextField",
+                            "name": "textFieldInGroupBox2",
+                            "caption": "Text Field",
+                            "description": "A text field",
+                            "defaultValue": "a text"
+                        }
+                    ]
+                },
+                {
+                    "type": "GroupBox",
                     "caption": "Nested GroupBox",
                     "items": [
                         {
@@ -555,6 +591,42 @@ static const std::string kRegularSettingsModelPart2 = /*suppress newline*/ 1 + R
                             "type": "Link",
                             "caption": "Customer Support",
                             "url": "https://example.com/"
+                        }
+                    ]
+                },
+                {
+                    "type": "GroupBox",
+                    "caption": "Styled GroupBox",
+                    "style": "panel",
+                    "useSwitchButton": true,
+                    "defaultValue": true,
+                    "switchButtonBehavior": "disable",
+                    "name": "styledGroupBox1",
+                    "items": [
+                        {
+                            "type": "TextField",
+                            "name": "textFieldInGroupBox1",
+                            "caption": "Text Field",
+                            "description": "A text field",
+                            "defaultValue": "a text"
+                        }
+                    ]
+                },
+                {
+                    "type": "GroupBox",
+                    "caption": "Styled GroupBox",
+                    "style": "panel",
+                    "useSwitchButton": true,
+                    "defaultValue": true,
+                    "switchButtonBehavior": "hide",
+                    "name": "styledGroupBox2",
+                    "items": [
+                        {
+                            "type": "TextField",
+                            "name": "textFieldInGroupBox2",
+                            "caption": "Text Field",
+                            "description": "A text field",
+                            "defaultValue": "a text"
                         }
                     ]
                 },

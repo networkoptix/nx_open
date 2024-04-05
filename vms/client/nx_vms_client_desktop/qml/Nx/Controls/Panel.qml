@@ -22,7 +22,33 @@ GroupBox
     property alias checkable: switchItem.visible
     property alias checked: switchItem.checked
 
+    enum SwitchButtonBehavior { None, Disable, Hide }
+
+    property int switchButtonBehavior: Panel.SwitchButtonBehavior.None
+
     signal triggered(bool checked)
+
+    Binding on contentHeight
+    {
+        when: checkable && switchButtonBehavior === Panel.SwitchButtonBehavior.Hide
+        value: checked ? contentItem.implicitHeight : 0
+    }
+
+    Binding
+    {
+        when: checkable && switchButtonBehavior === Panel.SwitchButtonBehavior.Hide
+        target: contentItem
+        property: "visible"
+        value: contentHeight > 0
+    }
+
+    Binding
+    {
+        when: checkable && switchButtonBehavior === Panel.SwitchButtonBehavior.Disable
+        target: contentItem
+        property: "enabled"
+        value: checked
+    }
 
     background: Rectangle
     {
