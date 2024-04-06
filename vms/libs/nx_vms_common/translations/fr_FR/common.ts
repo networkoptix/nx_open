@@ -1795,7 +1795,7 @@
     </message>
     <message>
       <source>HTTP header: Server, supported variables: $vmsName, $vmsVersion, $company, $compatibility</source>
-      <translation type="unfinished">HTTP header: Server, supported variables: $vmsName, $vmsVersion, $company, $compatibility</translation>
+      <translation>En-tête HTTP : Serveur, variables supportées : $vmsName, $vmsVersion, $company, $compatibility</translation>
     </message>
   </context>
   <context>
@@ -2453,6 +2453,59 @@
     <message>
       <source>Some LDAP users or groups were not found in the LDAP database.</source>
       <translation>Certains utilisateurs LDAP ou groupes n'ont pas été trouvés dans la base de données LDAP.</translation>
+    </message>
+    <message>
+      <source>Services Issue</source>
+      <translation>Problème de services</translation>
+    </message>
+    <message>
+      <source>Server &quot;%1&quot; has license migration issue</source>
+      <translation>Le serveur &quot;%1&quot; a un problème de migration de licence</translation>
+    </message>
+    <message>
+      <source>Service overuse</source>
+      <translation>Surutilisation du service</translation>
+    </message>
+    <message>
+      <source>The following licenses were not migrated:</source>
+      <translation>Les licences suivantes n'ont pas été migrées:</translation>
+    </message>
+    <message>
+      <source>License</source>
+      <translation>Licence :</translation>
+    </message>
+    <message>
+      <source>Camera</source>
+      <translation>Caméra</translation>
+    </message>
+    <message numerus="yes">
+      <source>Recording on %n channels was stopped due to service overuse.</source>
+      <translation>
+        <numerusform>L'enregistrement sur le canal %n a été arrêté en raison d'une utilisation excessive du service.</numerusform>
+        <numerusform>L'enregistrement sur les canaux %n a été arrêté en raison d'une utilisation excessive du service.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
+      <translation>
+        <numerusform>La sauvegarde du stockage cloud sur le canal %n a été arrêtée en raison d'une utilisation excessive du service.</numerusform>
+        <numerusform>La sauvegarde du stockage cloud sur %n canaux a été arrêtée en raison d'une surutilisation du service.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
+      <translation>
+        <numerusform>L'utilisation du service d'intégration payante sur le canal %n a été arrêtée en raison d'une utilisation excessive du service.</numerusform>
+        <numerusform>L'utilisation du service d'intégration payante sur les canaux %n a été arrêtée en raison d'une utilisation excessive du service.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Failed to migrate licenses.</source>
+      <translation>Échec de la migration des licences.</translation>
+    </message>
+    <message>
+      <source>Skipped import of licenses. Another migration attempt will be automatically scheduled for later.</source>
+      <translation>Importation des licences ignorée. Une autre tentative de migration sera automatiquement planifiée pour plus tard.</translation>
     </message>
   </context>
 </TS>

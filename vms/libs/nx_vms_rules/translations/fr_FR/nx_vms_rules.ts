@@ -780,6 +780,50 @@
     </message>
   </context>
   <context>
+    <name>nx::vms::rules::SaasIssueEvent</name>
+    <message>
+      <source>License migration issue</source>
+      <translation>Problème de migration de licence</translation>
+    </message>
+    <message>
+      <source>Recording services disabled</source>
+      <translation>Services d'enregistrement désactivés</translation>
+    </message>
+    <message>
+      <source>Cloud storage services disabled</source>
+      <translation>Services de stockage cloud désactivés</translation>
+    </message>
+    <message>
+      <source>Paid integration services disabled</source>
+      <translation>Services d'intégration payants désactivés</translation>
+    </message>
+    <message>
+      <source>Services issue</source>
+      <translation>Problème de services</translation>
+    </message>
+    <message numerus="yes">
+      <source>Recording on %n channels was stopped due to service overuse.</source>
+      <translation>
+        <numerusform>L'enregistrement sur le canal %n a été arrêté en raison d'une utilisation excessive du service.</numerusform>
+        <numerusform>L'enregistrement sur les canaux %n a été arrêté en raison d'une utilisation excessive du service.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
+      <translation>
+        <numerusform>La sauvegarde du stockage cloud sur le canal %n a été arrêtée en raison d'une utilisation excessive du service.</numerusform>
+        <numerusform>La sauvegarde du stockage cloud sur %n canaux a été arrêtée en raison d'une surutilisation du service.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
+      <translation>
+        <numerusform>L'utilisation du service d'intégration payante sur le canal %n a été arrêtée en raison d'une utilisation excessive du service.</numerusform>
+        <numerusform>L'utilisation du service d'intégration payante sur les canaux %n a été arrêtée en raison d'une utilisation excessive du service.</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::rules::SendEmailAction</name>
     <message>
       <source>Email Message</source>

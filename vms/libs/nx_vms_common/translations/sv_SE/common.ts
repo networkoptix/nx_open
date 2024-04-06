@@ -2452,5 +2452,58 @@
       <source>Some LDAP users or groups were not found in the LDAP database.</source>
       <translation>Vissa LDAP-användare eller grupper hittades inte i LDAP-databasen.</translation>
     </message>
+    <message>
+      <source>Services Issue</source>
+      <translation>Problem med tjänster</translation>
+    </message>
+    <message>
+      <source>Server &quot;%1&quot; has license migration issue</source>
+      <translation>Server &quot;%1&quot; har problem med licensmigrering</translation>
+    </message>
+    <message>
+      <source>Service overuse</source>
+      <translation>Överanvändning av tjänsten</translation>
+    </message>
+    <message>
+      <source>The following licenses were not migrated:</source>
+      <translation>Följande licenser migrerades inte:</translation>
+    </message>
+    <message>
+      <source>License</source>
+      <translation>Licens</translation>
+    </message>
+    <message>
+      <source>Camera</source>
+      <translation>Kamera</translation>
+    </message>
+    <message numerus="yes">
+      <source>Recording on %n channels was stopped due to service overuse.</source>
+      <translation>
+        <numerusform>Inspelning på %n kanaler stoppades på grund av överanvändning av tjänsten.</numerusform>
+        <numerusform>Inspelning på %n kanaler stoppades på grund av överanvändning av tjänsten.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
+      <translation>
+        <numerusform>Säkerhetskopiering av molnlagring på %n -kanaler stoppades på grund av överanvändning av tjänsten.</numerusform>
+        <numerusform>Säkerhetskopiering av molnlagring på %n -kanaler stoppades på grund av överanvändning av tjänsten.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
+      <translation>
+        <numerusform>Användningen av betalda integrationstjänster på %n kanaler stoppades på grund av överanvändning av tjänster.</numerusform>
+        <numerusform>Användningen av betalda integrationstjänster på %n kanaler stoppades på grund av överanvändning av tjänster.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Failed to migrate licenses.</source>
+      <translation>Det gick inte att migrera licenser.</translation>
+    </message>
+    <message>
+      <source>Skipped import of licenses. Another migration attempt will be automatically scheduled for later.</source>
+      <translation>Hoppade över import av licenser. Ett nytt migreringsförsök schemaläggs automatiskt för senare.</translation>
+    </message>
   </context>
 </TS>

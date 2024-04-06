@@ -3869,7 +3869,7 @@ License Key: %2</source>
     <name>QnLicenseWidget</name>
     <message>
       <source>Activate Trial License</source>
-      <translation>試用ライセンスの有効化</translation>
+      <translation>試用ライセンスを有効化</translation>
     </message>
     <message>
       <source>Open License File</source>
@@ -3877,7 +3877,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Failed to open file</source>
-      <translation>ファイルオープンに失敗しました</translation>
+      <translation>ファイルを開けませんでした</translation>
     </message>
     <message>
       <source>To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</source>
@@ -5517,7 +5517,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Paid integrations services overused</source>
-      <translation>有料の統合サービスが上限を超えて使用されています</translation>
+      <translation>有料インテグレーションサービスが上限を超えて使用されています</translation>
     </message>
     <message>
       <source>System suspended</source>
@@ -5635,7 +5635,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Email is not valid</source>
-      <translation>メールアドレスが無効です</translation>
+      <translation>メールアドレスが不正です</translation>
     </message>
     <message>
       <source>Password cannot be empty</source>
@@ -12108,7 +12108,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Selected period cannot be exported for the current camera.</source>
-      <translation>選択した期間は現在のカメラではエクスポートできません。</translation>
+      <translation>選択した期間は、現在のカメラではエクスポートできません。</translation>
     </message>
     <message>
       <source>Several bookmarks can be exported as layout only.</source>
@@ -12116,7 +12116,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Local files not allowed for Multi-Video export</source>
-      <translation>ローカルファイルは、複数映像のエクスポートには使用できません</translation>
+      <translation>ローカルファイルは、複数映像のエクスポートには使用できません。</translation>
     </message>
     <message>
       <source>Please remove all local files from the layout and try again.</source>
@@ -12143,7 +12143,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::WorkbenchUpdateWatcher</name>
     <message>
       <source>%1 version available</source>
-      <translation>%1 バージョンが利用可能</translation>
+      <translation>%1 バージョンが利用可能です</translation>
     </message>
     <message>
       <source>Major issues have been fixed. Update is strongly recommended.</source>
@@ -12215,7 +12215,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
-      <translation>カメラとデバイス</translation>
+      <translation>カメラ &amp; デバイス</translation>
     </message>
     <message>
       <source>Layouts</source>
@@ -12828,7 +12828,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>%1 users</source>
       <comment>%1 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
-      <translation>%1ユーザー</translation>
+      <translation>%1 ユーザー</translation>
     </message>
   </context>
   <context>
@@ -12905,11 +12905,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Name is necessary</source>
-      <translation>名前が必要です</translation>
+      <translation>名前を入力してください</translation>
     </message>
     <message>
       <source>Reason is necessary</source>
-      <translation>理由が必要です</translation>
+      <translation>理由を入力してください</translation>
     </message>
     <message>
       <source>Name</source>
@@ -12929,11 +12929,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>I am upgrading my machine</source>
-      <translation>PCをアップグレードしています</translation>
+      <translation>マシンをアップグレードする</translation>
     </message>
     <message>
       <source>I accidentally assigned the license to a wrong machine</source>
-      <translation>誤って別のPCにライセンスを割り当てた</translation>
+      <translation>誤ってライセンスを別のマシンに割り当てた</translation>
     </message>
     <message>
       <source>Other Reason</source>
@@ -12967,7 +12967,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Failed to change password</source>
-      <translation>パスワードを変更できませんでした</translation>
+      <translation>パスワードの変更に失敗しました</translation>
     </message>
     <message numerus="yes">
       <source>Failed to move %n devices</source>
@@ -12989,7 +12989,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Server &quot;%1&quot; is not responding.</source>
-      <translation>サーバー&quot;%1&quot; は応答していません</translation>
+      <translation>サーバー &quot;%1&quot; が応答していません。</translation>
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</source>
@@ -13031,7 +13031,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Cannot perform Preview Search. Please select a period of 15 seconds or longer.</source>
-      <translation>プレビューの検索を実行できません　15 秒以上の期間を選択してください</translation>
+      <translation>プレビュー検索を実行できません。15秒以上の期間を選択してください。</translation>
     </message>
     <message>
       <source>Preview Search for %1</source>
@@ -13039,7 +13039,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Confirm files deleting</source>
-      <translation>ファイル削除の確認をします</translation>
+      <translation>ファイルの削除確認</translation>
     </message>
     <message numerus="yes">
       <source>Are you sure you want to permanently delete these %n files?</source>
@@ -13065,11 +13065,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Components of System have different versions:</source>
-      <translation>バージョンの異なるサーバーが含まれています</translation>
+      <translation>バージョンの異なるシステムコンポーネントが含まれています:</translation>
     </message>
     <message>
       <source>Please update all components to the version %1</source>
-      <translation>すべてのコンポーネントをバージョン %1 にアップデートしてください</translation>
+      <translation>すべてのコンポーネントをバージョン %1 に更新してください</translation>
     </message>
     <message>
       <source>Update...</source>
@@ -13085,17 +13085,17 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Please upgrade to a next available patch or release version once available.</source>
-      <translation>利用可能な次のパッチまたはリリースバージョンにアップグレードしてください。</translation>
+      <translation>利用可能になり次第、次回のパッチまたはリリースバージョンに更新してください。</translation>
     </message>
     <message>
       <source>Failed to open server web page</source>
-      <translation>サーバーのWebページを開けませんでした</translation>
+      <translation>サーバーWebページを開くことに失敗しました</translation>
     </message>
     <message numerus="yes">
       <source>Failed to change password on %n cameras of %1</source>
       <comment>Total number of cameras will be substituted as %1</comment>
       <translation>
-        <numerusform>%1 カメラの %n のパスワードを変更できませんでした</numerusform>
+        <numerusform>%1 台中 %n 台のカメラでパスワード変更に失敗しました</numerusform>
       </translation>
     </message>
     <message>

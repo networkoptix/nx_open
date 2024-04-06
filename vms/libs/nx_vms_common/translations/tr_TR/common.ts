@@ -1756,7 +1756,7 @@
     </message>
     <message>
       <source>Authorization Session token lifetime (seconds)</source>
-      <translation type="unfinished">Authorization Session token lifetime (seconds)</translation>
+      <translation>Yetkilendirme Oturumu jetonunun ömrü (saniye)</translation>
     </message>
     <message>
       <source>Semicolon-separated list of Servers designated to connect to the Cloud. Servers at the top of the list have higher priority. If the list is empty a Server for the Cloud connection is selected automatically.</source>
@@ -1764,7 +1764,7 @@
     </message>
     <message>
       <source>Allow Power User editing Security Settings</source>
-      <translation type="unfinished">Allow Power User editing Security Settings</translation>
+      <translation>Uzman Kullanıcının Güvenlik Ayarlarını düzenlemesine izin ver</translation>
     </message>
     <message>
       <source>Enable deprecated API functions (insecure)</source>
@@ -1793,7 +1793,7 @@
     </message>
     <message>
       <source>HTTP header: Server, supported variables: $vmsName, $vmsVersion, $company, $compatibility</source>
-      <translation type="unfinished">HTTP header: Server, supported variables: $vmsName, $vmsVersion, $company, $compatibility</translation>
+      <translation>HTTP başlığı: Sunucu, desteklenen değişkenler: $vmsName, $vmsVersion, $company, $compatibility</translation>
     </message>
   </context>
   <context>
@@ -2451,6 +2451,59 @@
     <message>
       <source>Some LDAP users or groups were not found in the LDAP database.</source>
       <translation>Bazı LDAP kullanıcıları veya grupları LDAP veritabanında bulunamadı.</translation>
+    </message>
+    <message>
+      <source>Services Issue</source>
+      <translation type="unfinished">Services Issue</translation>
+    </message>
+    <message>
+      <source>Server &quot;%1&quot; has license migration issue</source>
+      <translation type="unfinished">Server &quot;%1&quot; has license migration issue</translation>
+    </message>
+    <message>
+      <source>Service overuse</source>
+      <translation>Hizmetin aşırı kullanımı</translation>
+    </message>
+    <message>
+      <source>The following licenses were not migrated:</source>
+      <translation type="unfinished">The following licenses were not migrated:</translation>
+    </message>
+    <message>
+      <source>License</source>
+      <translation>Lisans</translation>
+    </message>
+    <message>
+      <source>Camera</source>
+      <translation>Kamera</translation>
+    </message>
+    <message numerus="yes">
+      <source>Recording on %n channels was stopped due to service overuse.</source>
+      <translation type="unfinished">
+        <numerusform>Hizmetin aşırı kullanımı nedeniyle %n kanallarındaki kayıt durduruldu.</numerusform>
+        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
+      <translation type="unfinished">
+        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
+        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
+      <translation type="unfinished">
+        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
+        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Failed to migrate licenses.</source>
+      <translation type="unfinished">Failed to migrate licenses.</translation>
+    </message>
+    <message>
+      <source>Skipped import of licenses. Another migration attempt will be automatically scheduled for later.</source>
+      <translation type="unfinished">Skipped import of licenses. Another migration attempt will be automatically scheduled for later.</translation>
     </message>
   </context>
 </TS>

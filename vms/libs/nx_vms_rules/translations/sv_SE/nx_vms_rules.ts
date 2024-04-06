@@ -780,6 +780,50 @@
     </message>
   </context>
   <context>
+    <name>nx::vms::rules::SaasIssueEvent</name>
+    <message>
+      <source>License migration issue</source>
+      <translation>Problem med licensmigrering</translation>
+    </message>
+    <message>
+      <source>Recording services disabled</source>
+      <translation>Inspelningstjänster inaktiverade</translation>
+    </message>
+    <message>
+      <source>Cloud storage services disabled</source>
+      <translation>Molnlagringstjänster inaktiverade</translation>
+    </message>
+    <message>
+      <source>Paid integration services disabled</source>
+      <translation>Betalda integrationstjänster inaktiverade</translation>
+    </message>
+    <message>
+      <source>Services issue</source>
+      <translation>Problem med tjänster</translation>
+    </message>
+    <message numerus="yes">
+      <source>Recording on %n channels was stopped due to service overuse.</source>
+      <translation>
+        <numerusform>Inspelning på %n kanaler stoppades på grund av överanvändning av tjänsten.</numerusform>
+        <numerusform>Inspelning på %n kanaler stoppades på grund av överanvändning av tjänsten.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
+      <translation>
+        <numerusform>Säkerhetskopiering av molnlagring på %n kanaler stoppades på grund av överanvändning av tjänster.</numerusform>
+        <numerusform>Säkerhetskopiering av molnlagring på %n kanaler stoppades på grund av överanvändning av tjänster.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
+      <translation>
+        <numerusform>Användningen av betalda integrationstjänster på %n kanaler stoppades på grund av överanvändning av tjänster.</numerusform>
+        <numerusform>Användningen av betalda integrationstjänster på %n kanaler stoppades på grund av överanvändning av tjänster.</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::rules::SendEmailAction</name>
     <message>
       <source>Email Message</source>

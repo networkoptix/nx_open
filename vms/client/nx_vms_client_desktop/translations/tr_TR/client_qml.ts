@@ -731,7 +731,7 @@
     </message>
     <message>
       <source>Edit Search Base</source>
-      <translation type="unfinished">Edit Search Base</translation>
+      <translation>Arama Tabanını Düzenle</translation>
     </message>
   </context>
   <context>
@@ -828,11 +828,11 @@
     <name>GlobalPermissionsTab</name>
     <message>
       <source>At the system level, group members have permissions to:</source>
-      <translation type="unfinished">At the system level, group members have permissions to:</translation>
+      <translation>Sistem düzeyinde grup üyelerinin sahip olduğu izinler:</translation>
     </message>
     <message>
       <source>At the system level, the user has permissions to:</source>
-      <translation type="unfinished">At the system level, the user has permissions to:</translation>
+      <translation>Sistem düzeyinde kullanıcının sahip olduğu izinler:</translation>
     </message>
   </context>
   <context>
@@ -1275,7 +1275,7 @@
     </message>
     <message>
       <source>No users or groups match synchronization settings and are added to the system DB. Make sure LDAP server parameters and search bases are configured correctly.</source>
-      <translation type="unfinished">No users or groups match synchronization settings and are added to the system DB. Make sure LDAP server parameters and search bases are configured correctly.</translation>
+      <translation>Sistem veritabanına eklenen ve senkronizasyon ayarları ile eşleşen kullanıcı yada grup yok. LDAP sunucusu parametrelerinin ve arama tabanlarının doğru şekilde yapılandırıldığından emin olun.</translation>
     </message>
   </context>
   <context>
@@ -2609,7 +2609,7 @@ Nesneyi takip etmek için Alt + Tıklama tuşlarına basın</translation>
     </message>
     <message>
       <source>This user’s login duplicates the login of another user. None of them is able to log in. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</source>
-      <translation type="unfinished">This user’s login duplicates the login of another user. None of them is able to log in. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</translation>
+      <translation>Bu kullanıcının oturum açma bilgileri başka bir kullanıcının oturum açma bilgileri ile aynı. Hiçbiri giriş yapamaz. Bu sorunu çözmek için kullanıcının oturum açma bilgilerini değiştirebilir, oturum açma bilgileri kopyalanan kullanıcıları devre dışı bırakabilir veya silebilirsiniz.</translation>
     </message>
   </context>
   <context>

@@ -191,12 +191,12 @@
     <message>
       <source>Log in as a %1 user to the system in a shutdown state is forbidden. You can still connect as local user.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">Log in as a %1 user to the system in a shutdown state is forbidden. You can still connect as local user.</translation>
+      <translation>Kapalı durumdayken sisteme %1 kullanıcısı olarak giriş yapılması yasaktır. Hala yerel kullanıcı olarak bağlanabilirsiniz.</translation>
     </message>
     <message>
       <source>Log in as a %1 user to the system in a suspended state is forbidden. You can still connect as local user.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">Log in as a %1 user to the system in a suspended state is forbidden. You can still connect as local user.</translation>
+      <translation>Askıya alınmış durumdayken sisteme %1 kullanıcısı olarak giriş yapılması yasaktır. Hala yerel kullanıcı olarak bağlanabilirsiniz.</translation>
     </message>
     <message>
       <source>To log in to this System, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</source>
@@ -245,7 +245,7 @@
     </message>
     <message>
       <source>This might be due to an expired server certificate or an invalid certificate. Contact your system administrator for further investigation.</source>
-      <translation type="unfinished">This might be due to an expired server certificate or an invalid certificate. Contact your system administrator for further investigation.</translation>
+      <translation>Bunun nedeni, süresi dolmuş bir sunucu sertifikası veya geçersiz bir sertifika olabilir. Daha fazlası için sistem yöneticinizle iletişime geçin.</translation>
     </message>
     <message>
       <source>Cannot verify the identity of %1</source>

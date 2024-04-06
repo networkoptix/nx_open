@@ -1975,11 +1975,11 @@ License Key: %2</source>
     </message>
     <message>
       <source>Graphics API</source>
-      <translation type="unfinished">Graphics API</translation>
+      <translation>Grafik API'si</translation>
     </message>
     <message>
       <source>Unable to get GPU information for %1</source>
-      <translation type="unfinished">Unable to get GPU information for %1</translation>
+      <translation>%1 için GPU bilgisi alınamıyor</translation>
     </message>
   </context>
   <context>
@@ -2079,7 +2079,7 @@ License Key: %2</source>
     <name>QnAttachToVideowallDialog</name>
     <message>
       <source>System shut down. To attach to a Video Wall, the System should be in active state. %1</source>
-      <translation type="unfinished">System shut down. To attach to a Video Wall, the System should be in active state. %1</translation>
+      <translation>Sistem kapatıldı. Video Duvarına eklemek için Sistemin aktif durumda olması gerekir. %1</translation>
     </message>
   </context>
   <context>
@@ -3093,7 +3093,7 @@ License Key: %2</source>
     <message>
       <source>There is currently no connection between your system and %1.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">There is currently no connection between your system and %1.</translation>
+      <translation>Şu anda sisteminiz ile %1 arasında bağlantı yok.</translation>
     </message>
   </context>
   <context>
@@ -4247,7 +4247,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Save user</source>
-      <translation type="unfinished">Save user</translation>
+      <translation>Kullanıcıyı kaydet</translation>
     </message>
     <message>
       <source>Enter your account password</source>
@@ -4255,7 +4255,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Save</source>
-      <translation type="unfinished">Save</translation>
+      <translation>Kaydet</translation>
     </message>
   </context>
   <context>
@@ -4489,7 +4489,7 @@ License Key: %2</source>
     <message>
       <source>%1 user does not have %2 permission for some of selected cameras</source>
       <comment>%1 is the name of the selected user, %2 is the permission name</comment>
-      <translation type="unfinished">%1 user does not have %2 permission for some of selected cameras</translation>
+      <translation>%1 kullanıcısının seçilen kameralardan bazıları için %2 izni yok</translation>
     </message>
     <message numerus="yes">
       <source>%n groups</source>
@@ -4918,11 +4918,11 @@ License Key: %2</source>
     </message>
     <message>
       <source>Certificate details are not available</source>
-      <translation type="unfinished">Certificate details are not available</translation>
+      <translation>Sertifika ayrıntıları mevcut değil</translation>
     </message>
     <message>
       <source>To access certificate details, enable the Audit Trail feature.</source>
-      <translation type="unfinished">To access certificate details, enable the Audit Trail feature.</translation>
+      <translation>Sertifika ayrıntılarına erişmek için Denetim İzi özelliğini etkinleştirin.</translation>
     </message>
   </context>
   <context>
@@ -5058,7 +5058,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>SYSTEM SHUT DOWN</source>
-      <translation type="unfinished">SYSTEM SHUT DOWN</translation>
+      <translation>SİSTEM KAPATILDI</translation>
     </message>
   </context>
   <context>
@@ -6023,15 +6023,15 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>System shut down</source>
-      <translation type="unfinished">System shut down</translation>
+      <translation>Sistem kapatıldı</translation>
     </message>
     <message>
       <source>To add a Video Wall, the System should be in active state. %1</source>
-      <translation type="unfinished">To add a Video Wall, the System should be in active state. %1</translation>
+      <translation>Video Duvarı eklemek için Sistemin aktif durumda olması gerekmektedir. %1</translation>
     </message>
     <message>
       <source>Screen is locked and cannot be changed</source>
-      <translation type="unfinished">Screen is locked and cannot be changed</translation>
+      <translation>Ekran kilitli ve değiştirilemez</translation>
     </message>
   </context>
   <context>
@@ -7267,7 +7267,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Insufficient services</source>
-      <translation type="unfinished">Insufficient services</translation>
+      <translation>Yetersiz hizmetler</translation>
     </message>
     <message numerus="yes">
       <source>%n suitable cloud storage services are required</source>
@@ -7311,11 +7311,11 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Setting was changed</source>
-      <translation type="unfinished">Setting was changed</translation>
+      <translation>Ayar değiştirildi</translation>
     </message>
     <message>
       <source>&quot;All archive&quot; option was changed to &quot;Motion, Objects, Bookmarks&quot; due to cloud storage backup was enabled</source>
-      <translation type="unfinished">&quot;All archive&quot; option was changed to &quot;Motion, Objects, Bookmarks&quot; due to cloud storage backup was enabled</translation>
+      <translation>&quot;Tüm arşiv&quot; seçeneği, bulut depolama yedeklemesinin etkinleştirilmesi nedeniyle &quot;Hareket, Nesneler, Yer İmleri&quot; olarak değiştirildi</translation>
     </message>
   </context>
   <context>
@@ -7385,19 +7385,19 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>System shut down</source>
-      <translation type="unfinished">System shut down</translation>
+      <translation>Sistem kapatıldı</translation>
     </message>
     <message>
       <source>To perform backup to a cloud storage, the System should be in active state. %1</source>
-      <translation type="unfinished">To perform backup to a cloud storage, the System should be in active state. %1</translation>
+      <translation>Buluta depolama yedeklemesi yapabilmek için Sistemin aktif durumda olması gerekmektedir. %1</translation>
     </message>
     <message>
       <source>System suspended. To make changes to backup configuration, the System should be in active state. %1</source>
-      <translation type="unfinished">System suspended. To make changes to backup configuration, the System should be in active state. %1</translation>
+      <translation>Sistem askıya alındı. Yedekleme konfigürasyonunda değişiklik yapabilmek için Sistemin aktif durumda olması gerekmektedir. %1</translation>
     </message>
     <message>
       <source>Applies to all servers</source>
-      <translation type="unfinished">Applies to all servers</translation>
+      <translation>Tüm sunucular için geçerlidir</translation>
     </message>
   </context>
   <context>
@@ -8970,7 +8970,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>You do not have a permission to export archive for some of the selected cameras. Video from those cameras will not be exported to the resulting file.</source>
-      <translation type="unfinished">You do not have a permission to export archive for some of the selected cameras. Video from those cameras will not be exported to the resulting file.</translation>
+      <translation>Seçilen kameralardan bazıları için arşivi dışa aktarma izniniz yok. Bu kameralardan gelen video, çıkan dosyaya aktarılmayacaktır.</translation>
     </message>
   </context>
   <context>
@@ -9561,7 +9561,7 @@ Yeterince günlük topladıktan sonra Günlük Düzeyini varsayılan ayarına d�
     </message>
     <message>
       <source>Non-default Logging level. We recommend setting it to &quot;info&quot;</source>
-      <translation type="unfinished">Non-default Logging level. We recommend setting it to &quot;info&quot;</translation>
+      <translation>Varsayılan olmayan Günlük kaydı düzeyi. Bunu &quot;info&quot; olarak ayarlamanızı öneririz</translation>
     </message>
   </context>
   <context>
@@ -10208,7 +10208,7 @@ Zorlayabilirsiniz, ancak CPU yükünü önemli ölçüde artırabilir.</translat
     </message>
     <message>
       <source>LDAP Default group cannot be deleted as long as the system is connected to LDAP server</source>
-      <translation type="unfinished">LDAP Default group cannot be deleted as long as the system is connected to LDAP server</translation>
+      <translation>Sistem LDAP sunucusuna bağlı olduğu sürece LDAP Varsayılan grubu silinemez</translation>
     </message>
   </context>
   <context>
@@ -12175,7 +12175,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <name>nx::vms::client::desktop::WebPageCertificateDialog</name>
     <message>
       <source>Open this integration?</source>
-      <translation type="unfinished">Open this integration?</translation>
+      <translation>Bu entegrasyon açılsın mı?</translation>
     </message>
     <message>
       <source>Open this web page?</source>
@@ -12183,7 +12183,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Integration</source>
-      <translation type="unfinished">Integration</translation>
+      <translation>Entegrasyon</translation>
     </message>
     <message>
       <source>Web Page</source>
@@ -12195,10 +12195,9 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
 but this integration presented an untrusted certificate auth.
 We recommend you not to open this integration. If you understand the risks, you can open the integration.</source>
       <comment>%1 is the integration address</comment>
-      <translation type="unfinished">You try to open the
-%1
-but this integration presented an untrusted certificate auth.
-We recommend you not to open this integration. If you understand the risks, you can open the integration.</translation>
+      <translation>%1
+açmaya çalışıyorsunuz ancak bu web sayfası güvenilmeyen bir sertifika kimlik doğrulaması sundu.
+Bu web sayfasını açmamanızı öneririz. Riskleri anlıyorsanız web sayfasını açabilirsiniz.</translation>
     </message>
     <message>
       <source>You try to open the
