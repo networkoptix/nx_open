@@ -2380,5 +2380,55 @@
       <source>Some LDAP users or groups were not found in the LDAP database.</source>
       <translation>一部の LDAP ユーザーまたはグループが LDAP データベースで見つかりませんでした。</translation>
     </message>
+    <message>
+      <source>Services Issue</source>
+      <translation>サービス障害</translation>
+    </message>
+    <message>
+      <source>Server &quot;%1&quot; has license migration issue</source>
+      <translation>サーバー &quot;%1&quot; にライセンス移行の問題が発生しています</translation>
+    </message>
+    <message>
+      <source>Service overuse</source>
+      <translation>サービスの過剰使用</translation>
+    </message>
+    <message>
+      <source>The following licenses were not migrated:</source>
+      <translation>次のライセンスは移行されませんでした:</translation>
+    </message>
+    <message>
+      <source>License</source>
+      <translation>ライセンス</translation>
+    </message>
+    <message>
+      <source>Camera</source>
+      <translation>カメラ</translation>
+    </message>
+    <message numerus="yes">
+      <source>Recording on %n channels was stopped due to service overuse.</source>
+      <translation>
+        <numerusform>サービスの過剰使用のため、 %n チャンネルの録画が停止されました。</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
+      <translation>
+        <numerusform>サービスの過剰使用のため、 %n チャンネルのクラウドストレージバックアップが停止されました。</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
+      <translation>
+        <numerusform>サービスの過剰使用のため、 %n チャンネルでの有料インテグレーションサービスの使用が停止されました。</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Failed to migrate licenses.</source>
+      <translation>ライセンスの移行に失敗しました。</translation>
+    </message>
+    <message>
+      <source>Skipped import of licenses. Another migration attempt will be automatically scheduled for later.</source>
+      <translation>ライセンスのインポートをスキップしました。後ほど別の移行試行が自動的にスケジュールされます。</translation>
+    </message>
   </context>
 </TS>

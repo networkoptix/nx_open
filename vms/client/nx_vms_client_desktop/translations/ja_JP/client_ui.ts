@@ -404,7 +404,7 @@
     </message>
     <message>
       <source>List of tags divided by commas</source>
-      <translation>カンマで分けられるタグの一覧</translation>
+      <translation>タグのリスト (カンマ区切り)</translation>
     </message>
   </context>
   <context>
@@ -529,7 +529,7 @@
     </message>
     <message>
       <source>Calculate bitrate per GOP instead of bitrate per second</source>
-      <translation>毎秒のビットレートの代わりにGOPあたりのビットレートを計算する</translation>
+      <translation>1秒あたりのビットレートの代わりに、GOPあたりのビットレートを計算する</translation>
     </message>
     <message>
       <source>It will increase bitrate for camera.</source>
@@ -565,7 +565,7 @@
     </message>
     <message>
       <source>Trust camera timestamp</source>
-      <translation>カメラのタイムスタンプを使う</translation>
+      <translation>カメラのタイムスタンプを信頼する</translation>
     </message>
     <message>
       <source>Native camera presets will not be avaliable.</source>
@@ -601,7 +601,7 @@
     </message>
     <message>
       <source>Media Port</source>
-      <translation>メディア ポート</translation>
+      <translation>メディアポート</translation>
     </message>
     <message>
       <source>Use system presets</source>
@@ -1383,7 +1383,7 @@
     </message>
     <message>
       <source>First Source</source>
-      <translation>入力１</translation>
+      <translation>入力1</translation>
     </message>
     <message>
       <source>Second Source</source>
@@ -1437,7 +1437,7 @@
     </message>
     <message>
       <source>Default rotation</source>
-      <translation>既定の回転</translation>
+      <translation>デフォルトの回転</translation>
     </message>
   </context>
   <context>
@@ -1627,7 +1627,7 @@
     <name>LicenseWidget</name>
     <message>
       <source>Manual Activation</source>
-      <translation>オフライン認証</translation>
+      <translation>オフラインでの有効化</translation>
     </message>
     <message>
       <source>Select License File...</source>
@@ -1651,7 +1651,7 @@
     </message>
     <message>
       <source>Internet Activation</source>
-      <translation>インターネットによるライセンス認証</translation>
+      <translation>インターネット経由での有効化</translation>
     </message>
     <message>
       <source>License Key</source>
@@ -1659,7 +1659,7 @@
     </message>
     <message>
       <source>Invalid License Key</source>
-      <translation>無効なライセンス キー</translation>
+      <translation>ライセンスキーが無効です。</translation>
     </message>
     <message>
       <source>Activation Key File</source>
@@ -1822,7 +1822,7 @@
     </message>
     <message>
       <source>IP addresses for cameras, and servers, groups for users, etc.</source>
-      <translation>カメラのIPアドレス、サーバー、ユーザーのグループなど</translation>
+      <translation>カメラやサーバーのIPアドレス、ユーザーのグループなど</translation>
     </message>
     <message>
       <source>Show aim overlay for PTZ cameras</source>
@@ -2261,7 +2261,7 @@
     </message>
     <message>
       <source>Removing this connection option could lead to System malfunction.</source>
-      <translation>この接続オプションを削除するとシステム誤動作の可能性があります.</translation>
+      <translation>この接続オプションを削除すると、システムの誤動作につながる可能性があります。</translation>
     </message>
   </context>
   <context>

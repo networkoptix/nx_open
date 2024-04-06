@@ -775,6 +775,47 @@
     </message>
   </context>
   <context>
+    <name>nx::vms::rules::SaasIssueEvent</name>
+    <message>
+      <source>License migration issue</source>
+      <translation>ライセンス移行障害</translation>
+    </message>
+    <message>
+      <source>Recording services disabled</source>
+      <translation>録画サービスが無効になっています</translation>
+    </message>
+    <message>
+      <source>Cloud storage services disabled</source>
+      <translation>クラウド ストレージ サービスが無効になっています</translation>
+    </message>
+    <message>
+      <source>Paid integration services disabled</source>
+      <translation>有料インテグレーションサービスが無効になっています</translation>
+    </message>
+    <message>
+      <source>Services issue</source>
+      <translation>サービス障害</translation>
+    </message>
+    <message numerus="yes">
+      <source>Recording on %n channels was stopped due to service overuse.</source>
+      <translation>
+        <numerusform>サービスの過剰使用のため、 %n チャンネルの録画が停止されました。</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
+      <translation>
+        <numerusform>サービスの過剰使用のため、 %n チャンネルのクラウドストレージバックアップが停止されました。</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
+      <translation>
+        <numerusform>サービスの過剰使用のため、 %n チャンネルでの有料インテグレーションサービスの使用が停止されました。</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::rules::SendEmailAction</name>
     <message>
       <source>Email Message</source>
