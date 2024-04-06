@@ -687,7 +687,7 @@
     </message>
     <message>
       <source>Do not record audio</source>
-      <translation type="unfinished">Do not record audio</translation>
+      <translation>Sesi kayıt etme</translation>
     </message>
   </context>
   <context>

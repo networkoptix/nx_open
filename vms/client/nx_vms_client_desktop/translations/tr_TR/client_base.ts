@@ -6331,7 +6331,7 @@ Bu web sayfasını açmamanızı öneririz. Riskleri anlıyorsanız web sayfası
     </message>
     <message>
       <source>Screen is locked and cannot be changed</source>
-      <translation type="unfinished">Screen is locked and cannot be changed</translation>
+      <translation>Ekran kilitli ve değiştirilemez</translation>
     </message>
   </context>
   <context>

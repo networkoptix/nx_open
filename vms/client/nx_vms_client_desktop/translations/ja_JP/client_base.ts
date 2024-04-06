@@ -3976,7 +3976,7 @@ to %1</source>
     <name>QnLicenseWidget</name>
     <message>
       <source>Activate Trial License</source>
-      <translation>試用ライセンスの有効化</translation>
+      <translation>試用ライセンスを有効化</translation>
     </message>
     <message>
       <source>Open License File</source>
@@ -3984,7 +3984,7 @@ to %1</source>
     </message>
     <message>
       <source>Failed to open file</source>
-      <translation>ファイルオープンに失敗しました</translation>
+      <translation>ファイルを開けませんでした</translation>
     </message>
     <message>
       <source>To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</source>
@@ -11061,7 +11061,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Selected period cannot be exported for the current camera.</source>
-      <translation>選択した期間は現在のカメラではエクスポートできません。</translation>
+      <translation>選択した期間は、現在のカメラではエクスポートできません。</translation>
     </message>
     <message>
       <source>Several bookmarks can be exported as layout only.</source>
@@ -11069,7 +11069,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Local files not allowed for Multi-Video export</source>
-      <translation>ローカルファイルは、複数映像のエクスポートには使用できません</translation>
+      <translation>ローカルファイルは、複数映像のエクスポートには使用できません。</translation>
     </message>
     <message>
       <source>Please remove all local files from the layout and try again.</source>
@@ -11108,7 +11108,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <name>nx::vms::client::desktop::WorkbenchUpdateWatcher</name>
     <message>
       <source>%1 version available</source>
-      <translation>%1 バージョンが利用可能</translation>
+      <translation>%1 バージョンが利用可能です</translation>
     </message>
     <message>
       <source>Release Notes</source>
@@ -11180,7 +11180,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
-      <translation>カメラとデバイス</translation>
+      <translation>カメラ &amp; デバイス</translation>
     </message>
     <message>
       <source>Layouts</source>
@@ -11374,7 +11374,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <name>nx::vms::client::desktop::rules::RulesDialog</name>
     <message>
       <source>Restore all rules to default?</source>
-      <translation>すべてのルールを既定に戻しますか？</translation>
+      <translation>すべてのルールをデフォルトに戻しますか?</translation>
     </message>
     <message>
       <source>This action cannot be undone.</source>
@@ -11496,7 +11496,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <message>
       <source>%1 users</source>
       <comment>%1 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
-      <translation>%1ユーザー</translation>
+      <translation>%1 ユーザー</translation>
     </message>
   </context>
   <context>
@@ -11565,11 +11565,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Name is necessary</source>
-      <translation>名前が必要です</translation>
+      <translation>名前を入力してください</translation>
     </message>
     <message>
       <source>Reason is necessary</source>
-      <translation>理由が必要です</translation>
+      <translation>理由を入力してください</translation>
     </message>
     <message>
       <source>Name</source>
@@ -11589,11 +11589,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>I am upgrading my machine</source>
-      <translation>PCをアップグレードしています</translation>
+      <translation>マシンをアップグレードする</translation>
     </message>
     <message>
       <source>I accidentally assigned the license to a wrong machine</source>
-      <translation>誤って別のPCにライセンスを割り当てた</translation>
+      <translation>誤ってライセンスを別のマシンに割り当てた</translation>
     </message>
     <message>
       <source>Other Reason</source>
@@ -11627,7 +11627,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Failed to change password</source>
-      <translation>パスワードを変更できませんでした</translation>
+      <translation>パスワードの変更に失敗しました</translation>
     </message>
     <message numerus="yes">
       <source>Failed to move %n devices</source>
@@ -11649,7 +11649,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Server &quot;%1&quot; is not responding.</source>
-      <translation>サーバー&quot;%1&quot; は応答していません</translation>
+      <translation>サーバー &quot;%1&quot; が応答していません。</translation>
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</source>
@@ -11691,7 +11691,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Cannot perform Preview Search. Please select a period of 15 seconds or longer.</source>
-      <translation>プレビューの検索を実行できません　15 秒以上の期間を選択してください</translation>
+      <translation>プレビュー検索を実行できません。15秒以上の期間を選択してください。</translation>
     </message>
     <message>
       <source>Preview Search for %1</source>
@@ -11699,7 +11699,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Confirm files deleting</source>
-      <translation>ファイル削除の確認をします</translation>
+      <translation>ファイルの削除確認</translation>
     </message>
     <message numerus="yes">
       <source>Are you sure you want to permanently delete these %n files?</source>
@@ -11721,7 +11721,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Image too big</source>
-      <translation>画像大きすぎます</translation>
+      <translation>画像が大きすぎます</translation>
     </message>
     <message>
       <source>Maximum size is %1 MB.</source>
@@ -11733,11 +11733,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Components of System have different versions:</source>
-      <translation>バージョンの異なるサーバーが含まれています</translation>
+      <translation>バージョンの異なるシステムコンポーネントが含まれています:</translation>
     </message>
     <message>
       <source>Please update all components to the version %1</source>
-      <translation>すべてのコンポーネントをバージョン %1 にアップデートしてください</translation>
+      <translation>すべてのコンポーネントをバージョン %1 に更新してください</translation>
     </message>
     <message>
       <source>Update...</source>
@@ -11753,17 +11753,17 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Please upgrade to a next available patch or release version once available.</source>
-      <translation>利用可能な次のパッチまたはリリースバージョンにアップグレードしてください。</translation>
+      <translation>利用可能になり次第、次回のパッチまたはリリースバージョンに更新してください。</translation>
     </message>
     <message>
       <source>Failed to open server web page</source>
-      <translation>サーバーのWebページを開けませんでした</translation>
+      <translation>サーバーWebページを開くことに失敗しました</translation>
     </message>
     <message numerus="yes">
       <source>Failed to change password on %n cameras of %1</source>
       <comment>Total number of cameras will be substituted as %1</comment>
       <translation>
-        <numerusform>%1 カメラの %n のパスワードを変更できませんでした</numerusform>
+        <numerusform>%1 台中 %n 台のカメラでパスワード変更に失敗しました</numerusform>
       </translation>
     </message>
     <message>
