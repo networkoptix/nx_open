@@ -19,8 +19,14 @@
 
 class QnJsonSerializer;
 
+template<typename Type, typename Enable = void>
+struct HasDirectObjectKeySerializer: std::false_type
+{
+};
+
+// Should have key serializers for all enum values
 template<typename Type>
-struct HasDirectObjectKeySerializer: public std::false_type
+struct HasDirectObjectKeySerializer<Type, std::enable_if_t<std::is_enum_v<Type>>>: std::true_type
 {
 };
 

@@ -203,6 +203,17 @@ struct BriefMockWithDefaults
 };
 #define BriefMockWithDefaults_Fields (boolean)(integer)(string)(flag)(vector)
 
+NX_REFLECTION_ENUM_CLASS(MapKeyEnum,
+    unknown,
+    test
+)
+
+struct EnumKeyMap
+{
+    std::map<MapKeyEnum, std::string> map;
+};
+#define EnumKeyMap_Fields (map)
+
 struct MapKey
 {
     nx::Uuid uuidField;
@@ -310,6 +321,7 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     BriefMockWithDefaults, (json), BriefMockWithDefaults_Fields, (brief, true))
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(MapKey, (json), MapKey_Fields, (brief, true))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(EnumKeyMap, (json), EnumKeyMap_Fields, (brief, true))
 
 } // namespace
 
@@ -334,6 +346,23 @@ TEST_F(QnJsonTextFixture, integralTypes)
     ASSERT_EQ("\"100000000000\"", QJson::serialized((std::uint64_t) 100000000000ULL));
     ASSERT_EQ(100000000000ULL, QJson::deserialized<std::uint64_t>("\"100000000000\""));
     ASSERT_EQ(100000000000ULL, QJson::deserialized<std::uint64_t>("100000000000"));
+}
+
+TEST_F(QnJsonTextFixture, enumKeyedMap)
+{
+    EnumKeyMap keymap{.map{{MapKeyEnum::test, "test"}}};
+
+    QnJsonContext serializeContext;
+    serializeContext.setSerializeMapToObject(true);
+    QByteArray serialized;
+    QJson::serialize(&serializeContext, keymap, &serialized);
+
+    QnJsonContext deserializeCtx;
+    deserializeCtx.setStrictMode(true);
+    EnumKeyMap result;
+    ASSERT_TRUE(QJson::deserialize(
+        &deserializeCtx, QJsonValue(QJsonDocument::fromJson(serialized).object()), &result))
+        << "Unable to deserialize a struct with an enum keyed map.";
 }
 
 TEST_F(QnJsonTextFixture, chrono_duration)
