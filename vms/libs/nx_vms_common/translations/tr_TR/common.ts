@@ -1782,7 +1782,7 @@
     </message>
     <message>
       <source>Authorization Session token lifetime (seconds)</source>
-      <translation type="unfinished">Authorization Session token lifetime (seconds)</translation>
+      <translation>Yetkilendirme Oturumu jetonunun ömrü (saniye)</translation>
     </message>
     <message>
       <source>Channel partners service</source>
@@ -1790,7 +1790,7 @@
     </message>
     <message>
       <source>Allow Power User editing Security Settings</source>
-      <translation type="unfinished">Allow Power User editing Security Settings</translation>
+      <translation>Uzman Kullanıcının Güvenlik Ayarlarını düzenlemesine izin ver</translation>
     </message>
     <message>
       <source>Enable deprecated API functions (insecure)</source>
@@ -1815,14 +1815,14 @@
     <message numerus="yes">
       <source>%n minute(s) ago</source>
       <translation type="unfinished">
-        <numerusform>%n minute(s) ago</numerusform>
+        <numerusform>%n dakika önce</numerusform>
         <numerusform>%n minute(s) ago</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n hour(s) ago</source>
       <translation type="unfinished">
-        <numerusform>%n hour(s) ago</numerusform>
+        <numerusform>%n saat önce</numerusform>
         <numerusform>%n hour(s) ago</numerusform>
       </translation>
     </message>
@@ -1833,7 +1833,7 @@
     <message numerus="yes">
       <source>%n day(s) ago</source>
       <translation type="unfinished">
-        <numerusform>%n day(s) ago</numerusform>
+        <numerusform>%n gün önce</numerusform>
         <numerusform>%n day(s) ago</numerusform>
       </translation>
     </message>
