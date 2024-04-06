@@ -178,7 +178,7 @@
     <message>
       <source>Connection to %1 is not ready yet. Check the server&apos;s internet connection or try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connection to %1 is not ready yet. Check the server&apos;s internet connection or try again later.</translation>
+      <translation>La connexion à %1 n'est pas encore prête. Vérifiez la connexion Internet du serveur ou réessayez plus tard.</translation>
     </message>
     <message>
       <source>Connection failed</source>
@@ -195,7 +195,7 @@
     <message>
       <source>To log in to this System, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</source>
       <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation type="unfinished">To log in to this System, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</translation>
+      <translation>Pour vous connecter à ce système, désactivez &quot;Demandez un code de vérification à chaque connexion avec votre compte %1&quot; dans votre %2.</translation>
     </message>
   </context>
   <context>
@@ -258,7 +258,7 @@
     </message>
     <message>
       <source>This might be due to an expired server certificate or or an invalid certificate. Contact your system administrator for further investigation.</source>
-      <translation type="unfinished">This might be due to an expired server certificate or or an invalid certificate. Contact your system administrator for further investigation.</translation>
+      <translation>Cela peut être dû à un certificat de serveur expiré ou à un certificat non valide. Contactez votre administrateur système pour plus d'informations.</translation>
     </message>
     <message>
       <source>To learn more about the current problem read this %1.</source>
@@ -324,7 +324,7 @@
     </message>
     <message>
       <source>Stop Object Tracking</source>
-      <translation type="unfinished">Stop Object Tracking</translation>
+      <translation>Arrêter le suivi des objets</translation>
     </message>
   </context>
   <context>
