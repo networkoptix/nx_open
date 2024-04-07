@@ -392,7 +392,7 @@
     </message>
     <message>
       <source>Omit logging</source>
-      <translation type="unfinished">Omit logging</translation>
+      <translation>Günlüğe kaydetmeyi atla</translation>
     </message>
     <message>
       <source>And Source</source>
@@ -783,7 +783,7 @@
     <name>nx::vms::rules::SaasIssueEvent</name>
     <message>
       <source>License migration issue</source>
-      <translation type="unfinished">License migration issue</translation>
+      <translation>Lisans taşıma sorunu</translation>
     </message>
     <message>
       <source>Recording services disabled</source>
@@ -799,7 +799,7 @@
     </message>
     <message>
       <source>Services issue</source>
-      <translation type="unfinished">Services issue</translation>
+      <translation>Hizmet sorunu</translation>
     </message>
     <message numerus="yes">
       <source>Recording on %n channels was stopped due to service overuse.</source>
@@ -811,14 +811,14 @@
     <message numerus="yes">
       <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
       <translation type="unfinished">
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
+        <numerusform>Hizmetin aşırı kullanımı nedeniyle %n kanallarındaki bulut depolama yedeklemesi durduruldu.</numerusform>
         <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
       <translation type="unfinished">
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
+        <numerusform>Hizmetin aşırı kullanımı nedeniyle %n kanalda ücretli entegrasyon hizmeti kullanımı durduruldu.</numerusform>
         <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
       </translation>
     </message>
