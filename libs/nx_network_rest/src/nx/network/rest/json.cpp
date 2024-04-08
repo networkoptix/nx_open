@@ -83,13 +83,8 @@ bool merge(
         case QJsonValue::Double:
         case QJsonValue::String:
         case QJsonValue::Array: //< Arrays treated as scalars - no items merging is performed.
-            if (incompleteValue.isNull()) //< Missing field type.
-            {
-                NX_VERBOSE(NX_SCOPE_TAG, "    Incomplete value is missing - ignored");
-                return true; //< leave recursion
-            }
-
-            NX_VERBOSE(NX_SCOPE_TAG, "    Scalar or array - replacing");
+            NX_VERBOSE(NX_SCOPE_TAG, "    Replace %1 with %2",
+                QJson::toString(existingValue->type()), QJson::toString(incompleteValue.type()));
             *existingValue = incompleteValue;
             break;
 
