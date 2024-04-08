@@ -67,6 +67,10 @@ add_definitions(
     -DRAPIDJSON_HAS_STDSTRING
 )
 
+if(developerBuild)
+    add_definitions(-DNX_DEVELOPER_BUILD)
+endif()
+
 # These definitions are specific for Windows headers.
 if(WINDOWS)
     add_definitions(
