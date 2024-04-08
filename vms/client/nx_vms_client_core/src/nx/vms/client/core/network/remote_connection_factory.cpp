@@ -837,20 +837,20 @@ struct RemoteConnectionFactory::Private
         nx::vms::api::UserModelV1 userModel = requestsManager->getUserModel(context);
         if (!context->failed())
         {
-            NX_VERBOSE(this, "Compatibility user model received");
-            if (userModel.permissions.testFlag(
-                nx::vms::api::GlobalPermissionDeprecated::customUser)
-                || !userModel.userRoleId.isNull()) //< Custom role.
-            {
-                // Requesting roles and migrating their permissions correctly may be a pain, which
-                // is actually not needed in the compatibility mode. Camera list access is limited
-                // on the server side anyway, so the only major drawback here is that user can see
-                // PTZ control icon even if it has no access to PTZ.
-                NX_VERBOSE(this, "User has custom role. Promoting to admin as a workaround.");
-                userModel.permissions = nx::vms::api::GlobalPermissionDeprecated::admin;
-            }
-
             context->compatibilityUserModel = userModel;
+
+            // Custom role handling.
+            if (!userModel.userRoleId.isNull())
+            {
+                nx::vms::api::UserRoleModel role = requestsManager->getUserRoleModel(context);
+                if (context->failed())
+                    return;
+
+                // As we don't really need compatibility mode for the desktop client, it is enough
+                // to just copy permissions and accessible resources to user.
+                context->compatibilityUserModel->permissions = role.permissions;
+                context->compatibilityUserModel->accessibleResources = role.accessibleResources;
+            }
         }
     }
 
