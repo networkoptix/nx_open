@@ -333,6 +333,10 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
     NX_INI_FLAG(true, javaScriptApiDocumentation,
         "[Feature] Enables the JavaScript API documentation.");
 
+    // VMS-51677
+    NX_INI_FLAG(false, objectPixelation,
+        "[Feature] Enables Object Pixelation feature.");
+
     // ---------------------------------------------------------------------------------------------
     // Support section.
     // Flags here can be removed when support engineers decide whether to discard the flag or move

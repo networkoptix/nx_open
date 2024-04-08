@@ -15,6 +15,7 @@ public:
         setUniformValue(m_texOffset, textOffset);
     }
     void setHorizontalPass(bool value) { setUniformValue(m_horizontalPass, value ? 1 : 0); }
+    void setMask(int target) { setUniformValue(m_mask, target); }
 
     virtual bool link() override
     {
@@ -22,6 +23,7 @@ public:
         if (rez)
         {
             m_texture = uniformLocation("uTexture");
+            m_mask = uniformLocation("uMask");
             m_texOffset = uniformLocation("texOffset");
             m_horizontalPass = uniformLocation("horizontalPass");
         }
@@ -29,7 +31,8 @@ public:
     }
 
 private:
-    int m_texture;
-    int m_texOffset;
-    int m_horizontalPass;
+    int m_texture = -1;
+    int m_texOffset = -1;
+    int m_horizontalPass = -1;
+    int m_mask = -1;
 };

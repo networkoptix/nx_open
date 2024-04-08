@@ -21,6 +21,7 @@ class ScreenshotInterface;
 class QnHistogramConsumer;
 class QnFisheyePtzController;
 class QnGLShaderProgram;
+class QOpenGLTexture;
 
 namespace nx::vms::client::desktop { class RhiVideoRenderer; }
 
@@ -39,6 +40,8 @@ public:
 
     bool isBlurEnabled() const;
     void setBlurEnabled(bool value);
+
+    QOpenGLFramebufferObject* blurMaskFrameBuffer() const;
 
     /**
      * Set blur in range [0..1]
@@ -134,6 +137,7 @@ private:
         const QRectF& sourceRect,
         const QRectF& dstRect,
         GLuint texture,
+        GLuint mask,
         const QVector2D& textureOffset,
         bool isHorizontalPass);
 
@@ -148,6 +152,7 @@ private:
 
     std::unique_ptr<QOpenGLFramebufferObject> m_blurBufferA;
     std::unique_ptr<QOpenGLFramebufferObject> m_blurBufferB;
+    std::unique_ptr<QOpenGLFramebufferObject> m_blurMaskBuffer;
     qreal m_blurFactor;
     qreal m_prevBlurFactor;
 

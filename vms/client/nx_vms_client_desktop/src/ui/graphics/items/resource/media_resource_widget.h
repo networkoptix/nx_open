@@ -51,6 +51,7 @@ class SoftwareTriggerButton;
 class EncryptedArchivePasswordDialog;
 class CameraHotspotsOverlayWidget;
 class CameraButtonManager;
+class BlurMask;
 
 } // namespace nx::vms::client::desktop
 
@@ -431,6 +432,7 @@ private:
 
     void initRenderer();
     void initDisplay();
+    void initBlurMask();
     void initIoModuleOverlay();
     void initAreaSelectOverlay();
     void initAnalyticsOverlays();
@@ -459,6 +461,8 @@ private:
 
     /** Associated renderer. */
     QnResourceWidgetRenderer* m_renderer = nullptr;
+
+    std::unique_ptr<nx::vms::client::desktop::BlurMask> m_blurMask;
 
     /** Selected region for search-by-motion, in parrots. */
     MotionSelection m_motionSelection;

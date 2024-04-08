@@ -213,6 +213,14 @@ void QnResourceWidgetRenderer::setBlurFactor(qreal value)
     m_blurFactor = value;
 }
 
+QOpenGLFramebufferObject* QnResourceWidgetRenderer::blurMaskFrameBuffer(int channel) const
+{
+    if (channel >= m_renderingContexts.size())
+        return nullptr;
+
+    return m_renderingContexts[channel].renderer->blurMaskFrameBuffer();
+}
+
 Qn::RenderStatus QnResourceWidgetRenderer::paint(
     QPainter* painter,
     int channel,
