@@ -99,6 +99,12 @@ NX_REFLECTION_INSTRUMENT(AnalyticsFilter, AnalyticsFilter_Fields)
 
 struct DeviceFootageRequest
 {
+    NX_REFLECTION_ENUM_CLASS_IN_CLASS(Quality,
+        both = 0,
+        low = 1,
+        high = 2)
+    Q_DECLARE_FLAGS(Qualities, Quality)
+
     /**%apidoc:stringArray
      * Device id(s) to get Footage on. It can be obtained from "id", "physicalId" or "logicalId"
      * field via `GET /rest/v{1-}/devices`. MAC address can also be used but it is not supported
@@ -144,6 +150,9 @@ struct DeviceFootageRequest
      * %// Appeared starting from /rest/v2/devices/{id}/footage.
      */
     StorageLocation storageLocation = StorageLocation::both;
+
+    /**%apidoc[opt] */
+    Quality quality = Quality::both;
 
     /**%apidoc[opt]
      * %// Appeared starting from /rest/v2/devices/{id}/footage.
