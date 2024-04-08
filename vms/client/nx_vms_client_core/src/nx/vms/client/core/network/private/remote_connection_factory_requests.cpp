@@ -413,6 +413,24 @@ nx::vms::api::UserModelV1 RemoteConnectionFactoryRequestsManager::getUserModel(
         }));
 }
 
+nx::vms::api::UserRoleModel RemoteConnectionFactoryRequestsManager::getUserRoleModel(
+    ContextPtr context) const
+{
+    NX_DEBUG(this, "Requesting user role model for %1 from %2",
+        context->credentials().username, context);
+
+    const auto encodedRoleId = QUrl::toPercentEncoding(
+        context->compatibilityUserModel->userRoleId.toString()).toStdString();
+
+    const auto url = makeUrl(context->address(), "/rest/v1/userRoles/" + encodedRoleId);
+    auto request = d->makeRequestWithCertificateValidation(context->handshakeCertificateChain);
+    request->setCredentials(context->credentials());
+    return d->doGet<nx::vms::api::UserRoleModel>(
+        url,
+        context,
+        std::move(request));
+}
+
 nx::vms::api::LoginUser RemoteConnectionFactoryRequestsManager::getUserType(
     ContextPtr context) const
 {
