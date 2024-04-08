@@ -106,6 +106,10 @@ DeserializationResult deserialize(
         *data = (T) ctx.value.GetInt64();
     else if (ctx.value.IsString())
         *data = (T) std::stod(std::string(ctx.value.GetString(), ctx.value.GetStringLength()));
+    else
+        // Null value should raise failure here to make sure existing field value is not
+        // overwritten with the default-initialized one.
+        return DeserializationResult(false);
 
     return DeserializationResult(true);
 }
