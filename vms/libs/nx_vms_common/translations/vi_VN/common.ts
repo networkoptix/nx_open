@@ -1734,7 +1734,7 @@
     </message>
     <message>
       <source>HTTP header: Server, supported variables: $vmsName, $vmsVersion, $company, $compatibility</source>
-      <translation type="unfinished">HTTP header: Server, supported variables: $vmsName, $vmsVersion, $company, $compatibility</translation>
+      <translation>Tiêu đề HTTP: Máy chủ, các biến được hỗ trợ: $vmsName, $vmsVersion, $company, $compatibility</translation>
     </message>
   </context>
   <context>
@@ -2382,23 +2382,23 @@
     </message>
     <message>
       <source>Services Issue</source>
-      <translation type="unfinished">Services Issue</translation>
+      <translation>Sự cố dịch vụ</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; has license migration issue</source>
-      <translation type="unfinished">Server &quot;%1&quot; has license migration issue</translation>
+      <translation>Máy chủ &quot;%1&quot; có vấn đề di chuyển giấy phép</translation>
     </message>
     <message>
       <source>Service overuse</source>
-      <translation type="unfinished">Service overuse</translation>
+      <translation>Lạm dụng dịch vụ</translation>
     </message>
     <message>
       <source>The following licenses were not migrated:</source>
-      <translation type="unfinished">The following licenses were not migrated:</translation>
+      <translation>Các giấy phép sau chưa được di chuyển:</translation>
     </message>
     <message>
       <source>License</source>
-      <translation type="unfinished">License</translation>
+      <translation>Giấy phép</translation>
     </message>
     <message>
       <source>Camera</source>
@@ -2406,29 +2406,29 @@
     </message>
     <message numerus="yes">
       <source>Recording on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>Quá trình ghi trên %n kênh đã bị dừng do sử dụng dịch vụ quá mức.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>Sao lưu bộ nhớ đám mây trên %n kênh đã bị dừng do sử dụng dịch vụ quá mức.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>Việc sử dụng dịch vụ tích hợp trả phí trên %n kênh đã bị ngừng do sử dụng dịch vụ quá mức.</numerusform>
       </translation>
     </message>
     <message>
       <source>Failed to migrate licenses.</source>
-      <translation type="unfinished">Failed to migrate licenses.</translation>
+      <translation>Không thể di chuyển giấy phép.</translation>
     </message>
     <message>
       <source>Skipped import of licenses. Another migration attempt will be automatically scheduled for later.</source>
-      <translation type="unfinished">Skipped import of licenses. Another migration attempt will be automatically scheduled for later.</translation>
+      <translation>Bỏ qua việc nhập giấy phép. Việc di chuyển tiếp theo sẽ được tự động lên lịch sau.</translation>
     </message>
   </context>
 </TS>

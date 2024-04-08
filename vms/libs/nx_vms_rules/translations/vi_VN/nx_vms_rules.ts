@@ -778,40 +778,40 @@
     <name>nx::vms::rules::SaasIssueEvent</name>
     <message>
       <source>License migration issue</source>
-      <translation type="unfinished">License migration issue</translation>
+      <translation>Vấn đề di chuyển giấy phép</translation>
     </message>
     <message>
       <source>Recording services disabled</source>
-      <translation type="unfinished">Recording services disabled</translation>
+      <translation>Dịch vụ ghi bị vô hiệu hóa</translation>
     </message>
     <message>
       <source>Cloud storage services disabled</source>
-      <translation type="unfinished">Cloud storage services disabled</translation>
+      <translation>Dịch vụ lưu trữ đám mây bị vô hiệu hóa</translation>
     </message>
     <message>
       <source>Paid integration services disabled</source>
-      <translation type="unfinished">Paid integration services disabled</translation>
+      <translation>Dịch vụ tích hợp trả phí đã bị vô hiệu hóa</translation>
     </message>
     <message>
       <source>Services issue</source>
-      <translation type="unfinished">Services issue</translation>
+      <translation>Sự cố dịch vụ</translation>
     </message>
     <message numerus="yes">
       <source>Recording on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>Quá trình ghi trên %n kênh đã bị dừng do sử dụng dịch vụ quá mức.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>Sao lưu bộ nhớ đám mây trên %n kênh đã bị dừng do sử dụng dịch vụ quá mức.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>Việc sử dụng dịch vụ tích hợp trả phí trên %n kênh đã bị ngừng do sử dụng dịch vụ quá mức.</numerusform>
       </translation>
     </message>
   </context>
