@@ -783,43 +783,43 @@
     <name>nx::vms::rules::SaasIssueEvent</name>
     <message>
         <source>License migration issue</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Recording services disabled</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Cloud storage services disabled</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Paid integration services disabled</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Services issue</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message numerus="yes">
         <source>Recording on %n channels was stopped due to service overuse.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Recording on %n channel was stopped due to service overuse.</numerusform>
+            <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Cloud storage backup on %n channel was stopped due to service overuse.</numerusform>
+            <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Paid integration service usage on %n channel was stopped due to service overuse.</numerusform>
+            <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
         </translation>
     </message>
 </context>

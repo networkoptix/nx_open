@@ -1793,7 +1793,7 @@
     </message>
     <message>
         <source>HTTP header: Server, supported variables: $vmsName, $vmsVersion, $company, $compatibility</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2454,56 +2454,56 @@
     </message>
     <message>
         <source>Services Issue</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Server &quot;%1&quot; has license migration issue</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Service overuse</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>The following licenses were not migrated:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>License</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Camera</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message numerus="yes">
         <source>Recording on %n channels was stopped due to service overuse.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Recording on %n channel was stopped due to service overuse.</numerusform>
+            <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Cloud storage backup on %n channel was stopped due to service overuse.</numerusform>
+            <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Paid integration service usage on %n channel was stopped due to service overuse.</numerusform>
+            <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
         </translation>
     </message>
     <message>
         <source>Failed to migrate licenses.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Skipped import of licenses. Another migration attempt will be automatically scheduled for later.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 </TS>
