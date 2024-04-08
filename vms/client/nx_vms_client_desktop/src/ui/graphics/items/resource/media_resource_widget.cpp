@@ -68,6 +68,7 @@
 #include <nx/vms/client/desktop/license/videowall_license_validator.h>
 #include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/opengl/opengl_renderer.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
@@ -91,6 +92,7 @@
 #include <nx/vms/client/desktop/ui/graphics/items/overlays/figure/figures_watcher.h>
 #include <nx/vms/client/desktop/ui/graphics/items/overlays/roi_figures_overlay_widget.h>
 #include <nx/vms/client/desktop/ui/graphics/items/resource/widget_analytics_controller.h>
+#include <nx/vms/client/desktop/utils/blur_mask.h>
 #include <nx/vms/client/desktop/utils/timezone_helper.h>
 #include <nx/vms/client/desktop/watermark/watermark_painter.h>
 #include <nx/vms/client/desktop/window_context.h>
@@ -171,6 +173,8 @@ static const QColor kRedL1 = "#D92A2A";
 static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kArchiveRecordingSubstitutions = {
     {QIcon::Normal, {{kLight10Color, "light10"}, {kRedL1, "red_l1"}}},
 };
+
+static constexpr double kAnalyticsBlurFactor = 3;
 
 template<class Cont, class Item>
 bool contains(const Cont& cont, const Item& item)
@@ -341,6 +345,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(
 
     initRenderer();
     initDisplay();
+    initBlurMask();
 
     setupHud();
 
@@ -541,6 +546,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(
         Qn::WritePermission);
     setOption(WindowRotationForbidden, !hasVideo() || !canRotate);
     setAnalyticsObjectsVisible(item->displayAnalyticsObjects(), false);
+    d->setAnalyticsEnabledInStream(ini().objectPixelation);
     setRoiVisible(item->displayRoi(), false);
     updateButtonsVisibility();
     updateHotspotsState();
@@ -619,6 +625,16 @@ void QnMediaResourceWidget::initDisplay()
     setDisplay(zoomTargetWidget
         ? zoomTargetWidget->display()
         : QnResourceDisplayPtr(new QnResourceDisplay(d->resource)));
+}
+
+void QnMediaResourceWidget::initBlurMask()
+{
+    if (!NX_ASSERT(m_renderer))
+        return;
+
+    m_blurMask = std::make_unique<BlurMask>(
+        d->analyticsMetadataProvider.get(),
+        QnOpenGLRendererManager::instance(m_renderer->openGLWidget()).get());
 }
 
 void QnMediaResourceWidget::initIoModuleOverlay()
@@ -1288,7 +1304,31 @@ Qn::RenderStatus QnMediaResourceWidget::paintVideoTexture(
         }
     }
 
-    m_renderer->setBlurFactor(m_statusOverlay->opacity());
+    if (ini().objectPixelation && d->isAnalyticsEnabledInStream())
+    {
+        m_renderer->setBlurFactor(std::max(kAnalyticsBlurFactor, m_statusOverlay->opacity()));
+
+        if (m_statusOverlay->opacity() > 0)
+        {
+            // Blur everything when overlay is displayed.
+            m_blurMask->drawFull(m_renderer->blurMaskFrameBuffer(channel));
+        }
+        else
+        {
+            const auto timestamp = position();
+            m_blurMask->draw(
+                m_renderer->blurMaskFrameBuffer(channel),
+                timestamp,
+                channel);
+        }
+    }
+    else
+    {
+        // Blur everything when overlay is displayed.
+        m_renderer->setBlurFactor(m_statusOverlay->opacity());
+        m_blurMask->drawFull(m_renderer->blurMaskFrameBuffer(channel));
+    }
+
     Qn::RenderStatus result = Qn::RenderStatus::NothingRendered;
 
     result = m_renderer->paint(painter, channel, sourceSubRect, targetRect, opacity);
@@ -1692,7 +1732,7 @@ void QnMediaResourceWidget::paintChannelForeground(QPainter *painter, int channe
         }
     }
 
-    if (isAnalyticsModeEnabled())
+    if (isAnalyticsObjectsVisible())
     {
         // Avoid adding/removing scene items inside scene painting functions.
         executeDelayedParented(
@@ -2909,7 +2949,7 @@ void QnMediaResourceWidget::updateAnalyticsVisibility(bool animate)
         return;
 
     setOverlayWidgetVisible(m_analyticsOverlayWidget,
-        m_statusOverlay->opacity() == 0 && d->analyticsEnabled,
+        m_statusOverlay->opacity() == 0 && d->analyticsModeEnabled,
         animate);
 }
 
@@ -3206,18 +3246,20 @@ void QnMediaResourceWidget::setHotspotsVisible(bool visible)
 
 void QnMediaResourceWidget::setAnalyticsModeEnabled(bool enabled, bool animate)
 {
-    if (d->analyticsEnabled == enabled)
+    if (d->analyticsModeEnabled == enabled)
         return;
 
     // Cleanup existing object frames in any case.
     if (!enabled)
         d->analyticsController->clearAreas();
 
-    d->analyticsEnabled = enabled;
+    d->analyticsModeEnabled = enabled;
+
+    const bool isAnalyticsInStreamEnabled = enabled || ini().objectPixelation;
 
     // We should be able to disable analytics if it is not supported anymore.
-    if (isAnalyticsSupported() || !enabled)
-        d->setAnalyticsEnabledInStream(enabled);
+    if (isAnalyticsSupported() || !isAnalyticsInStreamEnabled)
+        d->setAnalyticsEnabledInStream(isAnalyticsInStreamEnabled);
 
     updateAnalyticsVisibility(animate);
 }

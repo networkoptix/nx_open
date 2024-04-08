@@ -23,12 +23,19 @@ QnBlurShaderProgram::QnBlurShaderProgram(QObject *parent):
     QByteArray shader(QN_SHADER_SOURCE(
         varying vec2 vTexCoord;
         uniform sampler2D uTexture;
+        uniform sampler2D uMask;
 
         uniform vec2 texOffset; //< The inverse of the texture dimensions along X and Y
         uniform int horizontalPass; //< 0 or 1 to indicate vertical or horizontal pass
 
         void main()
         {
+            if (texture2D(uMask, vTexCoord).a < 0.5) //< 0.0 or 1.0 is expected.
+            {
+                gl_FragColor = texture2D(uTexture, vTexCoord);
+                return;
+            }
+
             vec4 color = vec4(0.0);
             vec2 direction = 0 < horizontalPass ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
 

@@ -10,12 +10,16 @@
 
 #include <camera/client_video_camera.h>
 #include <nx/media/sse_helper.h>
+#include <nx/pathkit/rhi_paint_engine.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/opengl/opengl_renderer.h>
+#include <nx/vms/client/desktop/shaders/media_output_shader_data.h>
 #include <nx/vms/client/desktop/shaders/media_output_shader_manager.h>
 #include <nx/vms/client/desktop/shaders/media_output_shader_program.h>
+#include <nx/vms/client/desktop/shaders/rhi_video_renderer.h>
+#include <nx/vms/client/desktop/utils/blur_mask.h>
 #include <ui/fisheye/fisheye_ptz_controller.h>
 #include <ui/graphics/items/resource/decodedpicturetoopengluploader.h>
 #include <ui/graphics/opengl/gl_buffer_stream.h>
@@ -26,10 +30,6 @@
 #include <utils/color_space/image_correction.h>
 #include <utils/color_space/yuvconvert.h>
 #include <utils/common/util.h>
-
-#include <nx/pathkit/rhi_paint_engine.h>
-#include <nx/vms/client/desktop/shaders/media_output_shader_data.h>
-#include <nx/vms/client/desktop/shaders/rhi_video_renderer.h>
 
 using nx::vms::client::core::Geometry;
 using namespace nx::vms::client::desktop;
@@ -122,7 +122,13 @@ void QnGLRenderer::setBlurEnabled(bool value)
     {
         m_blurBufferA.reset();
         m_blurBufferB.reset();
+        m_blurMaskBuffer.reset();
     }
+}
+
+QOpenGLFramebufferObject* QnGLRenderer::blurMaskFrameBuffer() const
+{
+    return m_blurMaskBuffer.get();
 }
 
 void QnGLRenderer::applyMixerSettings(qreal brightness, qreal contrast, qreal hue, qreal saturation)
@@ -160,6 +166,7 @@ Qn::RenderStatus QnGLRenderer::prepareBlurBuffers()
     {
         m_blurBufferA.reset(new QOpenGLFramebufferObject(result));
         m_blurBufferB.reset(new QOpenGLFramebufferObject(result));
+        m_blurMaskBuffer.reset(new QOpenGLFramebufferObject(result));
         return Qn::NewFrameRendered;
     }
 
@@ -173,6 +180,7 @@ void QnGLRenderer::doBlurStep(
     const QRectF& sourceRect,
     const QRectF& dstRect,
     GLuint texture,
+    GLuint mask,
     const QVector2D& textureOffset,
     bool isHorizontalPass)
 {
@@ -203,13 +211,17 @@ void QnGLRenderer::doBlurStep(
     m_gl->glActiveTexture(GL_TEXTURE0);
     m_gl->glBindTexture(GL_TEXTURE_2D, texture);
     glCheckError("glBindTexture");
+    m_gl->glActiveTexture(GL_TEXTURE1);
+    m_gl->glBindTexture(GL_TEXTURE_2D, mask);
+    glCheckError("glBindTexture");
 
     const auto renderer = QnOpenGLRendererManager::instance(glWidget());
     const auto shader = renderer->getBlurShader();
     shader->bind();
-    shader->setTexture(0);
+    shader->setTexture(0); //< GL_TEXTURE0.
     shader->setTextureOffset(textureOffset);
     shader->setHorizontalPass(isHorizontalPass);
+    shader->setMask(1); //< GL_TEXTURE1.
     //shader->setBlurSize(9);
     //shader->setSigma(6);
     drawBindedTexture(shader, v_array, tx_array);
@@ -256,7 +268,14 @@ Qn::RenderStatus QnGLRenderer::renderBlurFBO(const QRectF &sourceRect)
             1.0 / kMaxBlurSize * blurStep);
 
         fboB->bind();
-        doBlurStep(sourceRect, dstPaintRect, fboA->texture(), textureOffset, i % 2 == 0);
+        doBlurStep(
+            sourceRect,
+            dstPaintRect,
+            fboA->texture(),
+            m_blurMaskBuffer->texture(),
+            textureOffset,
+            i % 2 == 0);
+
         fboB->release();
         std::swap(fboA, fboB);
     }
@@ -273,6 +292,7 @@ Qn::RenderStatus QnGLRenderer::paint(
     {
         m_blurBufferA.reset();
         m_blurBufferB.reset();
+        m_blurMaskBuffer.reset();
         m_prevBlurFactor = 0.0;
         return drawVideoData(painter, sourceRect, targetRect, m_decodedPictureProvider.opacity());
     }
@@ -285,6 +305,7 @@ Qn::RenderStatus QnGLRenderer::paint(
     {
         m_blurBufferA.reset();
         m_blurBufferB.reset();
+        m_blurMaskBuffer.reset();
         m_prevBlurFactor = 0.0;
         return drawVideoData(painter, sourceRect, targetRect, m_decodedPictureProvider.opacity());
     }

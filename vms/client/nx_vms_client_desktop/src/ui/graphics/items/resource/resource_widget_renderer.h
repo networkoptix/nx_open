@@ -19,6 +19,7 @@ class QQuickWidget;
 class QPainter;
 class DecodedPictureToOpenGLUploader;
 class QnGLRenderer;
+class QOpenGLFramebufferObject;
 
 /**
  * This class is supposed to be used from two threads &mdash; a <i>rendering</i> thread
@@ -108,6 +109,7 @@ public:
 
     /** Set blur in range [0..1]. */
     void setBlurFactor(qreal value);
+    QOpenGLFramebufferObject* blurMaskFrameBuffer(int channel) const;
 
     Qn::RenderStatus paint(
         QPainter* painter, int channel, const QRectF& sourceRect,
