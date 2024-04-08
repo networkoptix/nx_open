@@ -4198,7 +4198,7 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>Save user</source>
-      <translation type="unfinished">Save user</translation>
+      <translation>Lưu người dùng</translation>
     </message>
     <message>
       <source>Enter your account password</source>
@@ -4206,7 +4206,7 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>Save</source>
-      <translation type="unfinished">Save</translation>
+      <translation>Lưu</translation>
     </message>
   </context>
   <context>
