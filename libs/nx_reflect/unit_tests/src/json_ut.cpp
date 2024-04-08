@@ -26,8 +26,8 @@ template<class T>
 void deserializedAsExpected(
     const T& value, const std::tuple<T, DeserializationResult>& deserializationContext)
 {
-    ASSERT_EQ(value, std::get<0>(deserializationContext));
-    ASSERT_TRUE(std::get<1>(deserializationContext));
+    EXPECT_TRUE(std::get<1>(deserializationContext));
+    EXPECT_EQ(value, std::get<0>(deserializationContext));
 }
 
 template <class T>
@@ -240,9 +240,9 @@ protected:
 
 struct FooBuiltInTypes
 {
-    int n;
-    bool b;
-    double d;
+    int n = 1;
+    bool b = true;
+    double d = 2.2;
 
     bool operator==(const FooBuiltInTypes& right) const
     {
@@ -251,6 +251,11 @@ struct FooBuiltInTypes
 };
 
 NX_REFLECTION_INSTRUMENT(FooBuiltInTypes, (n)(b)(d))
+
+void PrintTo(const FooBuiltInTypes& val, ::std::ostream* os)
+{
+    *os << json::serialize(val);
+}
 
 TEST_F(Json, builtin_type_support)
 {
@@ -268,6 +273,25 @@ TEST_F(Json, builtin_type_support)
     deserializedAsExpected(
         FooBuiltInTypes{12, true, 56.0},
         json::deserialize<FooBuiltInTypes>(R"({"n":12,"b":"true","d":56})"));
+}
+
+TEST_F(Json, support_nan_in_double)
+{
+    static const FooBuiltInTypes kDefaultValues;
+
+    FooBuiltInTypes valueWithNaN{
+        .n = 0,
+        .b = false,
+        .d = std::numeric_limits<double>::quiet_NaN()
+    };
+
+    const auto serialized = json::serialize(valueWithNaN);
+    ASSERT_EQ(R"({"n":0,"b":false,"d":null})", serialized);
+
+    // Null value should not override existing field contents.
+    deserializedAsExpected(
+        kDefaultValues,
+        json::deserialize<FooBuiltInTypes>(R"({"n":1,"b":"true","d":null})"));
 }
 
 struct FooString

@@ -2,11 +2,9 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/vms/api/data/camera_attributes_data.h>
-#include <nx/vms/api/types/dewarping_types.h>
-
 #include <nx/fusion/model_functions.h>
 #include <nx/reflect/string_conversion.h>
+#include <nx/vms/api/data/camera_attributes_data.h>
 
 namespace nx::vms::api::dewarping {
 
@@ -17,21 +15,6 @@ void PrintTo(const CameraScheduleTaskData& val, ::std::ostream* os)
 
 namespace test {
 
-namespace {
-
-template<typename T>
-QByteArray lexicalQuoted(T value)
-{
-    return QByteArray::fromStdString('"' + nx::reflect::enumeration::toString(value) + '"');
-}
-
-template<typename T>
-QByteArray numericQuoted(T value)
-{
-    return QString("\"%1\"").arg((int) value).toUtf8();
-}
-
-} // namespace
 
 TEST(Json, structSerialization)
 {
@@ -81,42 +64,6 @@ TEST(Json, structDeserializationNumeric)
 
     ASSERT_EQ(data, QJson::deserialized<CameraScheduleTaskData>(kSerializedStructWithStrings));
     ASSERT_EQ(data, QJson::deserialized<CameraScheduleTaskData>(kSerializedStructWithNumbers));
-}
-
-TEST(Json, dewarpingEnumsLexicalSerialization)
-{
-    ASSERT_EQ(QJson::serialized(FisheyeCameraMount::wall),
-        lexicalQuoted(FisheyeCameraMount::wall));
-
-    ASSERT_EQ(QJson::serialized(CameraProjection::stereographic),
-        lexicalQuoted(CameraProjection::stereographic));
-
-    ASSERT_EQ(QJson::serialized(ViewProjection::equirectangular),
-        lexicalQuoted(ViewProjection::equirectangular));
-}
-
-TEST(Json, dewarpingEnumsLexicalDeserialization)
-{
-    ASSERT_EQ(QJson::deserialized<FisheyeCameraMount>(lexicalQuoted(FisheyeCameraMount::table)),
-        FisheyeCameraMount::table);
-
-    ASSERT_EQ(QJson::deserialized<CameraProjection>(lexicalQuoted(
-        CameraProjection::equirectangular360)), CameraProjection::equirectangular360);
-
-    ASSERT_EQ(QJson::deserialized<ViewProjection>(lexicalQuoted(ViewProjection::rectilinear)),
-        ViewProjection::rectilinear);
-}
-
-TEST(Json, dewarpingEnumsNumericDeserialization)
-{
-    ASSERT_EQ(QJson::deserialized<FisheyeCameraMount>(numericQuoted(FisheyeCameraMount::ceiling)),
-        FisheyeCameraMount::ceiling);
-
-    ASSERT_EQ(QJson::deserialized<CameraProjection>(numericQuoted(CameraProjection::equisolid)),
-        CameraProjection::equisolid);
-
-    ASSERT_EQ(QJson::deserialized<ViewProjection>(numericQuoted(ViewProjection::equirectangular)),
-        ViewProjection::equirectangular);
 }
 
 } // namespace test

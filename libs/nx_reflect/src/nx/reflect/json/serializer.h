@@ -39,7 +39,12 @@ public:
 private:
     std::string m_text;
     rapidjson::StringBuffer m_buffer;
-    rapidjson::Writer<rapidjson::StringBuffer> m_writer;
+    rapidjson::Writer<
+        rapidjson::StringBuffer,
+        rapidjson::UTF8<>,
+        rapidjson::UTF8<>,
+        rapidjson::CrtAllocator,
+        rapidjson::kWriteNanAndInfNullFlag> m_writer;
 };
 
 struct SerializationContext
