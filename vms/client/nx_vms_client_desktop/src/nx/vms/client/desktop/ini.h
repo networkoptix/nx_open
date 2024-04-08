@@ -20,7 +20,13 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
     // Developers' section
     // Flags here can be removed by developers' decision.
 
-    NX_INI_FLAG(false, developerMode,
+    #if defined(NX_DEVELOPER_BUILD)
+        static constexpr bool kEnableDeveloperModeByDefault = true;
+    #else
+        static constexpr bool kEnableDeveloperModeByDefault = false;
+    #endif
+
+    NX_INI_FLAG(kEnableDeveloperModeByDefault, developerMode,
         "[Dev] Enable developer mode.");
 
     NX_INI_FLAG(false, profilerMode,
