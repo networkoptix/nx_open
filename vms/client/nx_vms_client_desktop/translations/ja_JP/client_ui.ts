@@ -2540,7 +2540,7 @@
     </message>
     <message>
       <source>s</source>
-      <translation>s</translation>
+      <translation>秒</translation>
     </message>
     <message>
       <source>Pre-Recording:</source>
