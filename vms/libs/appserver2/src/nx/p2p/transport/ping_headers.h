@@ -5,6 +5,5 @@
 namespace nx::p2p {
 
 static constexpr char kPingHeaderName[] = "X-Nx-Ping";
-static constexpr char kPongHeaderName[] = "X-Nx-Pong";
 
 } // namespace nx::p2p
