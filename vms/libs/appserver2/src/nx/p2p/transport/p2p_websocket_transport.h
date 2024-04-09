@@ -32,6 +32,7 @@ public:
     virtual void start(
         utils::MoveOnlyFunc<void(SystemError::ErrorCode)> onStart = nullptr) override;
 
+    virtual QString lastErrorMessage() const override;
 private:
     network::WebSocketPtr m_webSocket;
 };
