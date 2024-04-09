@@ -58,7 +58,8 @@ TabButton
     property alias underline: underline
     property alias focusFrame: focusFrame
 
-    height: TabBar.tabBar ? TabBar.tabBar.height : implicitHeight
+    anchors.top: parent ? parent.top : undefined
+    anchors.bottom: parent ? parent.bottom : undefined
 
     font.pixelSize: FontConfig.tabBar.pixelSize
 
