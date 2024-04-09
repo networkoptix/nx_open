@@ -52,14 +52,13 @@ public:
     static void setPingTimeout(std::optional<std::chrono::milliseconds> pingTimeout);
     static void setPingPongDisabled(bool value);
 
-    QString lastErrorMessage() const;
+    virtual QString lastErrorMessage() const override;
 
 private:
     enum Headers
     {
         contentType = 0x1,
-        ping = 0x2,
-        pong = 0x4
+        ping = 0x2
     };
 
     struct OutgoingData
@@ -81,7 +80,8 @@ private:
     nx::Buffer m_sendChannelReadBuffer;
     nx::Buffer m_readBuffer;
     bool m_firstSend = true;
-    network::aio::Timer m_timer;
+    network::aio::Timer m_pingTimer;
+    network::aio::Timer m_inactivityTimer;
     utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_onGetRequestReceived = nullptr;
     bool m_failed = false;
     utils::InterruptionFlag m_destructionFlag;
@@ -102,10 +102,11 @@ private:
     nx::Buffer makeFrameHeader(int headers, int length) const;
     void sendPostResponse(network::IoCompletionHandler handler);
     void onReadFromSendSocket(SystemError::ErrorCode error, size_t transferred);
-    void initiatePingPong();
+    void initiatePing();
+    void initiateInactivityTimer();
     std::optional<std::chrono::milliseconds> pingTimeout() const;
     void setFailedState(SystemError::ErrorCode errorCode, const QString& message);
-    void sendPingOrPong(Headers type);
+    void sendPing();
     void sendNextMessage();
     void onRead(SystemError::ErrorCode error, size_t transferred);
 

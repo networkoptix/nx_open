@@ -41,8 +41,14 @@ P2PHttpClientTransport::P2PHttpClientTransport(
 {
     using namespace std::chrono_literals;
 
-    m_readHttpClient->setResponseReadTimeout(0ms);
-    m_readHttpClient->setMessageBodyReadTimeout(0ms);
+    using namespace nx::network::http;
+    for (const auto& httpClient: { m_readHttpClient.get(), m_writeHttpClient.get() })
+    {
+        httpClient->setResponseReadTimeout(0ms);
+        httpClient->setMessageBodyReadTimeout(0ms);
+        httpClient->setSendTimeout(0ms);
+    }
+
     const auto keepAliveOptions =
         nx::network::KeepAliveOptions(std::chrono::minutes(1), std::chrono::seconds(10), 5);
     m_readHttpClient->setKeepAlive(keepAliveOptions);
@@ -52,8 +58,6 @@ P2PHttpClientTransport::P2PHttpClientTransport(
 
     bindToAioThread(m_readHttpClient->getAioThread());
     m_writeHttpClient->setCredentials(m_readHttpClient->credentials());
-
-    initiatePingPong();
 }
 
 void P2PHttpClientTransport::start(utils::MoveOnlyFunc<void(SystemError::ErrorCode)> onStart)
@@ -63,6 +67,8 @@ void P2PHttpClientTransport::start(utils::MoveOnlyFunc<void(SystemError::ErrorCo
         {
             m_onStartHandler = std::move(onStart);
             startReading();
+            initiatePing();
+            initiateInactivityTimer();
         });
 }
 
@@ -84,45 +90,70 @@ std::optional<std::chrono::milliseconds> P2PHttpClientTransport::pingTimeout() c
     return m_pingTimeout;
 }
 
-void P2PHttpClientTransport::sendPingOrPong(const std::string& name)
+void P2PHttpClientTransport::sendPing()
 {
-    NX_ASSERT(name == "ping" || name == "pong");
     post(
-        [this, name]() mutable
+        [this]() mutable
         {
             if (m_failed)
                 return;
 
-            NX_VERBOSE(this, "Sending %1", name);
+            NX_VERBOSE(this, "Sending ping");
             m_outgoingMessageQueue.push(OutgoingData{
                 std::nullopt,
-                [name, this](SystemError::ErrorCode error, size_t transferred)
+                [this](SystemError::ErrorCode error, size_t transferred)
                 {
                     NX_VERBOSE(
-                        this, "%1 sent. Error: %2, transferred: %3",
-                        name, error, transferred);
+                        this, "Ping sent. Error: %1, transferred: %2",
+                        error, transferred);
                 },
                 network::http::HttpHeaders{}});
 
             m_outgoingMessageQueue.back().headers.emplace(Qn::EC2_CONNECTION_GUID_HEADER_NAME, m_connectionGuid);
-            if (name == "ping")
-                m_outgoingMessageQueue.back().headers.emplace(kPingHeaderName, name);
-            else
-                m_outgoingMessageQueue.back().headers.emplace(kPongHeaderName, name);
-
+            m_outgoingMessageQueue.back().headers.emplace(kPingHeaderName, "ping");
             sendNextMessage();
+            initiatePing();
         });
 }
 
-void P2PHttpClientTransport::setFailedState()
+void P2PHttpClientTransport::initiateInactivityTimer()
 {
-    NX_DEBUG(this, "%1: Going to failed state", __func__);
+    if (!pingTimeout())
+    {
+        NX_DEBUG(this, "Ping-pong is disabled");
+        return;
+    }
+
+    if (s_pingPongDisabled)
+    {
+        NX_DEBUG(this, "Ping-pong is disabled for tests");
+        return;
+    }
+
+    const auto kInactivityTimeout = *pingTimeout() * 2;
+    NX_VERBOSE(this,
+        "Ping-pong is enabled. Starting inactivity timer with %1 timeout", kInactivityTimeout);
+    m_inactivityTimer.start(
+        kInactivityTimeout,
+        [this]()
+        {
+            if (m_failed)
+                return;
+
+            setFailedState("Closing connection because of inactivity");
+        });
+}
+
+void P2PHttpClientTransport::setFailedState(const QString& message)
+{
+    NX_DEBUG(this, "%1: Going to failed state. Reason: %2", __func__, message);
     m_failed = true;
+    m_lastErrorMessage = message;
     if (m_userReadHandlerPair)
         m_userReadHandlerPair->second(SystemError::timedOut, 0);
 }
 
-void P2PHttpClientTransport::initiatePingPong()
+void P2PHttpClientTransport::initiatePing()
 {
     if (!pingTimeout())
     {
@@ -137,24 +168,14 @@ void P2PHttpClientTransport::initiatePingPong()
     }
 
     NX_DEBUG(this, "Ping-pong is enabled. Starting with %1 timeout", *pingTimeout());
-    m_timer.start(
+    m_pingTimer.start(
         *pingTimeout(),
         [this]()
         {
             if (m_failed)
                 return;
 
-            sendPingOrPong("ping");
-            m_timer.start(
-                *pingTimeout() / 2,
-                [this]()
-                {
-                    if (m_failed)
-                        return;
-
-                    NX_DEBUG(this, "Closing connection because there was no answer to ping");
-                    setFailedState();
-                });
+            sendPing();
         });
 }
 
@@ -165,7 +186,8 @@ P2PHttpClientTransport::~P2PHttpClientTransport()
 
 void P2PHttpClientTransport::stopWhileInAioThread()
 {
-    m_timer.cancelSync();
+    m_pingTimer.cancelSync();
+    m_inactivityTimer.cancelSync();
     m_writeHttpClient.reset();
     m_readHttpClient.reset();
 }
@@ -280,8 +302,10 @@ void P2PHttpClientTransport::sendNextMessage()
             if (next.buffer && resultCode == SystemError::noError)
                 transferred = next.buffer->size();
 
-            if (m_writeHttpClient->failed() || !isResponseValid)
-                setFailedState();
+            if (m_writeHttpClient->failed())
+                setFailedState("Closing connection because write http can't send request");
+            else if (!isResponseValid)
+                setFailedState("Closing connection because response is not valid");
 
             utils::InterruptionFlag::Watcher watcher(&m_destructionFlag);
             next.handler(resultCode, transferred);
@@ -316,12 +340,14 @@ void P2PHttpClientTransport::bindToAioThread(network::aio::AbstractAioThread* ai
     BasicPollable::bindToAioThread(aioThread);
     m_readHttpClient->bindToAioThread(aioThread);
     m_writeHttpClient->bindToAioThread(aioThread);
-    m_timer.bindToAioThread(aioThread);
+    m_pingTimer.bindToAioThread(aioThread);
+    m_inactivityTimer.bindToAioThread(aioThread);
 }
 
 void P2PHttpClientTransport::cancelIoInAioThread(nx::network::aio::EventType eventType)
 {
-    m_timer.cancelSync();
+    m_pingTimer.cancelSync();
+    m_inactivityTimer.cancelSync();
     m_readHttpClient->socket()->cancelIOSync(eventType);
     m_writeHttpClient->socket()->cancelIOSync(eventType);
 }
@@ -372,7 +398,6 @@ void P2PHttpClientTransport::startReading()
                             if (watcher.interrupted())
                                 return;
 
-                            initiatePingPong();
                         });
 
                     NX_VERBOSE(
@@ -381,14 +406,7 @@ void P2PHttpClientTransport::startReading()
 
                     if (m_multipartContentParser.prevFrameHeaders().contains(kPingHeaderName))
                     {
-                        NX_DEBUG(this, "Ping received, sending pong");
-                        sendPingOrPong("pong");
-                        return;
-                    }
-
-                    if (m_multipartContentParser.prevFrameHeaders().contains(kPongHeaderName))
-                    {
-                        NX_DEBUG(this, "Pong received");
+                        NX_DEBUG(this, "Ping received");
                         return;
                     }
 
@@ -427,14 +445,15 @@ void P2PHttpClientTransport::startReading()
                 if (contentTypeIt == headers.end() ||
                     !m_multipartContentParser.setContentType(contentTypeIt->second))
                 {
-                    NX_WARNING(
-                        this, "startReading: Expected a multipart response from '%1'. It is not.", m_url);
-                    setFailedState();
+                    auto message = nx::format(
+                        "startReading: Expected a multipart response from '%1'. It is not.", m_url);
+                    NX_WARNING(this, message);
+                    setFailedState(message);
                 }
             }
             else
             {
-                setFailedState();
+                setFailedState(nx::format("Http error code %1", statusCode));
             }
 
             if (m_onStartHandler)
@@ -458,7 +477,9 @@ void P2PHttpClientTransport::startReading()
         [this]()
         {
             if (!m_multipartContentParser.processData(m_readHttpClient->fetchMessageBodyBuffer()))
-                setFailedState();
+                setFailedState("Can't parse message");
+            else
+                initiateInactivityTimer();
         });
 
     m_readHttpClient->setOnDone(
@@ -471,7 +492,7 @@ void P2PHttpClientTransport::startReading()
                 this,
                 "The read (GET) http client emitted 'onDone'. Moving to a failed state.");
 
-            setFailedState();
+            setFailedState("The read (GET) http client emitted 'onDone'. Moving to a failed state.");
             if (m_onStartHandler)
                 nx::utils::swapAndCall(m_onStartHandler, SystemError::connectionAbort);
         });
@@ -504,6 +525,11 @@ std::optional<uint64_t> P2PHttpClientTransport::PostBodySource::contentLength() 
 void P2PHttpClientTransport::PostBodySource::readAsync(CompletionHandler completionHandler)
 {
     completionHandler(SystemError::noError, m_data);
+}
+
+QString P2PHttpClientTransport::lastErrorMessage() const
+{
+    return m_lastErrorMessage;
 }
 
 } // namespace nx::network

@@ -581,6 +581,7 @@ void ConnectionBase::onMessageSent(SystemError::ErrorCode errorCode, size_t byte
     if (errorCode != SystemError::noError ||
         bytesSent == 0)
     {
+
         NX_DEBUG(
             this, "onMessageSent: Connection closed. Error: %1, bytesSent: %2",
             errorCode, bytesSent);
@@ -616,9 +617,9 @@ void ConnectionBase::transactionSkipped()
 void ConnectionBase::onNewMessageRead(SystemError::ErrorCode errorCode, size_t bytesRead)
 {
     QString message;
-    if (auto httpTransport = dynamic_cast<P2PHttpServerTransport*>(m_p2pTransport.get()))
+    if (m_p2pTransport)
     {
-        message = httpTransport->lastErrorMessage();
+        message = m_p2pTransport->lastErrorMessage();
         if (!message.isEmpty())
         {
             NX_DEBUG(this, "onNewMessageRead: %1", message);
@@ -626,6 +627,7 @@ void ConnectionBase::onNewMessageRead(SystemError::ErrorCode errorCode, size_t b
             return;
         }
     }
+
     if (bytesRead == 0)
     {
         NX_DEBUG( this, "onNewMessageRead: Connection closed by remote peer");

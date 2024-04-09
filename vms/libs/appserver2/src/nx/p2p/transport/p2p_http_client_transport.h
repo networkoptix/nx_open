@@ -49,6 +49,8 @@ public:
     static void setPingTimeout(std::optional<std::chrono::milliseconds> pingTimeout);
     static void setPingPongDisabled(bool value);
 
+    virtual QString lastErrorMessage() const override;
+
 private:
     class PostBodySource: public network::http::AbstractMsgBodySource
     {
@@ -88,7 +90,8 @@ private:
     nx::String m_connectionGuid;
     utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_onStartHandler;
     std::optional<std::chrono::milliseconds> m_pingTimeout;
-    network::aio::Timer m_timer;
+    network::aio::Timer m_pingTimer;
+    network::aio::Timer m_inactivityTimer;
     std::queue<OutgoingData> m_outgoingMessageQueue;
     bool m_sendInProgress = false;
 
@@ -100,10 +103,14 @@ private:
     void stopOrResumeReaderWhileInAioThread();
     virtual void stopWhileInAioThread() override;
     std::optional<std::chrono::milliseconds> pingTimeout() const;
-    void sendPingOrPong(const std::string& name);
-    void initiatePingPong();
-    void setFailedState();
+    void sendPing();
+    void initiatePing();
+    void initiateInactivityTimer();
+    void setFailedState(const QString& message);
     void sendNextMessage();
+
+private:
+    QString m_lastErrorMessage;
 };
 
 } // namespace nx::network
