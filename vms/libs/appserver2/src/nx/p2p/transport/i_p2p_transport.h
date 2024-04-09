@@ -14,6 +14,7 @@ public:
     virtual ~IP2PTransport() = default;
     virtual network::SocketAddress getForeignAddress() const = 0;
     virtual void start(utils::MoveOnlyFunc<void(SystemError::ErrorCode)> onStart = nullptr) = 0;
+    virtual QString lastErrorMessage() const = 0;
 };
 
 using P2pTransportPtr = std::unique_ptr<IP2PTransport>;
