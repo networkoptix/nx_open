@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <nx/network/rest/handler.h>
 #include <nx/network/rest/params.h>
 #include <nx/network/rest/request.h>
 #include <nx/network/rest/subscription.h>
@@ -23,7 +24,7 @@ template<
 class CrudHandler: public SubscriptionHandler
 {
 public:
-    CrudHandler(QueryProcessor* queryProcessor):
+    CrudHandler(QueryProcessor* queryProcessor, nx::network::rest::Handler* owner):
         SubscriptionHandler(
             [this]()
             {
@@ -34,7 +35,8 @@ public:
                 return nx::utils::Guard{
                     [this, guard = std::move(guard)]() { NX_VERBOSE(this, "Remove monitor"); }};
             }),
-        m_queryProcessor(queryProcessor)
+        m_queryProcessor(queryProcessor),
+        m_owner(owner)
     {
     }
 
@@ -42,7 +44,7 @@ public:
     {
         using namespace details;
 
-        auto processor = m_queryProcessor->getAccess(request.userSession);
+        auto processor = m_queryProcessor->getAccess(m_owner->prepareAuditRecord(request));
         validateType(processor, filter, m_objectType);
 
         // `std::type_identity` (or similar) can be used to pass the read type info and avoid
@@ -96,7 +98,7 @@ public:
     {
         using namespace details;
 
-        auto processor = m_queryProcessor->getAccess(request.userSession);
+        auto processor = m_queryProcessor->getAccess(m_owner->prepareAuditRecord(request));
         validateType(processor, id, m_objectType);
 
         std::promise<Result> promise;
@@ -118,7 +120,7 @@ public:
         using namespace details;
 
         std::promise<Result> promise;
-        auto processor = m_queryProcessor->getAccess(request.userSession);
+        auto processor = m_queryProcessor->getAccess(m_owner->prepareAuditRecord(request));
         if constexpr (toDbTypesExists<Model>::value)
         {
             auto items = std::move(data).toDbTypes();
@@ -266,6 +268,7 @@ private:
 
 private:
     static constexpr ApiObjectType m_objectType = details::commandToObjectType(DeleteCommand);
+    const nx::network::rest::Handler* const m_owner;
 };
 
 } // namespace ec2

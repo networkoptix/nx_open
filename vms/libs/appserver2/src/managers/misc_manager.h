@@ -15,7 +15,7 @@ template<class QueryProcessorType>
 class QnMiscManager: public AbstractMiscManager
 {
 public:
-    QnMiscManager(QueryProcessorType* queryProcessor, const nx::network::rest::UserSession& userSession);
+    QnMiscManager(QueryProcessorType* queryProcessor, const nx::network::rest::audit::Record& auditRecord);
 
     virtual int changeSystemId(
         const nx::Uuid& systemId,
@@ -72,19 +72,19 @@ public:
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
 
 private:
-    decltype(auto) processor() { return m_queryProcessor->getAccess(m_userSession); }
+    decltype(auto) processor() { return m_queryProcessor->getAccess(m_auditRecord); }
 
 private:
     QueryProcessorType* const m_queryProcessor;
-    nx::network::rest::UserSession m_userSession;
+    nx::network::rest::audit::Record m_auditRecord;
 };
 
 template<class QueryProcessorType>
 QnMiscManager<QueryProcessorType>::QnMiscManager(
-    QueryProcessorType* queryProcessor, const nx::network::rest::UserSession& userSession)
+    QueryProcessorType* queryProcessor, const nx::network::rest::audit::Record& auditRecord)
     :
     m_queryProcessor(queryProcessor),
-    m_userSession(userSession)
+    m_auditRecord(auditRecord)
 {
 }
 

@@ -2,21 +2,11 @@
 
 #pragma once
 
-#include <atomic>
-#include <deque>
-
-#include <QtCore/QElapsedTimer>
-#include <QtCore/QTimer>
-
 #include <api/model/audit/audit_details.h>
 #include <api/model/audit/audit_record.h>
-#include <nx/network/rest/user_access_data.h>
-#include <nx/utils/thread/mutex.h>
-#include <recording/time_period.h>
+#include <nx/network/rest/audit.h>
 
 #include "audit_manager_fwd.h"
-
-namespace nx::network::rest { struct UserAccessData; }
 
 class NX_VMS_COMMON_API QnAuditManager
 {
@@ -30,22 +20,28 @@ public:
     /* notify new playback was started from position timestamp
     *  return internal ID of started session
     */
-    virtual AuditHandle notifyPlaybackStarted(const nx::network::rest::AuthSession& session, const nx::Uuid& id, qint64 timestampUsec, bool isExport = false) = 0;
+    virtual AuditHandle notifyPlaybackStarted(
+        const nx::network::rest::audit::Record& auditRecord,
+        const nx::Uuid& id,
+        qint64 timestampUsec,
+        bool isExport = false) = 0;
+
     virtual void notifyPlaybackInProgress(const AuditHandle& handle, qint64 timestampUsec) = 0;
-    virtual void notifySettingsChanged(const nx::network::rest::AuthSession& authInfo, std::map<QString, QString> settings) = 0;
+    virtual void notifySettingsChanged(const nx::network::rest::audit::Record& auditRecord,
+        std::map<QString, QString> settings) = 0;
 
     template <nx::vms::api::AuditRecordType type,
         typename Details = typename details::details_type<type, AllAuditDetails::mapping>::type>
-    int addAuditRecord(const nx::network::rest::AuthSession& authInfo, Details&& details = {})
+    void addAuditRecord(const nx::network::rest::audit::Record& auditRecord, Details&& details = {})
     {
-        return addAuditRecord(QnAuditRecord::prepareRecord<type>(authInfo,
-            std::forward<Details>(details)));
+        return addAuditRecord(
+            QnAuditRecord::prepareRecord<type>(auditRecord, std::forward<Details>(details)));
     }
-    /* return internal id of inserted record. Returns <= 0 if error */
-    virtual int addAuditRecord(const QnAuditRecord& record) = 0;
+
+    virtual void addAuditRecord(const QnAuditRecord& record) = 0;
     virtual void flushAuditRecords() = 0;
 
-    virtual void at_connectionOpened(const nx::network::rest::AuthSession& session, const nx::network::rest::UserAccessData& accessRights) = 0;
-    virtual void at_connectionClosed(const nx::network::rest::AuthSession& session) = 0;
+    virtual void at_connectionOpened(const nx::network::rest::audit::Record& auditRecord) = 0;
+    virtual void at_connectionClosed(const nx::network::rest::audit::Record& auditRecord) = 0;
     virtual void stop() = 0;
 };

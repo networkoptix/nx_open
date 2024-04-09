@@ -16,7 +16,7 @@ template<class QueryProcessorType>
 class QnLicenseManager: public AbstractLicenseManager
 {
 public:
-    QnLicenseManager(QueryProcessorType* queryProcessor, const nx::network::rest::UserSession& userSession);
+    QnLicenseManager(QueryProcessorType* queryProcessor, const nx::network::rest::audit::Record& auditRecord);
 
     virtual int getLicenses(
         Handler<QnLicenseList> handler,
@@ -33,11 +33,11 @@ public:
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
 
 private:
-    decltype(auto) processor() { return m_queryProcessor->getAccess(m_userSession); }
+    decltype(auto) processor() { return m_queryProcessor->getAccess(m_auditRecord); }
 
 private:
     QueryProcessorType* const m_queryProcessor;
-    nx::network::rest::UserSession m_userSession;
+    nx::network::rest::audit::Record m_auditRecord;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -45,10 +45,10 @@ private:
 
 template<class T>
 QnLicenseManager<T>::QnLicenseManager(
-    T* queryProcessor, const nx::network::rest::UserSession& userSession)
+    T* queryProcessor, const nx::network::rest::audit::Record& auditRecord)
     :
     m_queryProcessor(queryProcessor),
-    m_userSession(userSession)
+    m_auditRecord(auditRecord)
 {
 }
 

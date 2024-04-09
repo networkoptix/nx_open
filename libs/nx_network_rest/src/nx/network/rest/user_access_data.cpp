@@ -114,6 +114,6 @@ const UserAccessData kVideowallUserAccess(
     nx::Uuid("1044d2a5-639d-4c49-963e-c03898d0c113"),
     UserAccessData::Access::ReadAllResources);
 
-const UserSession kSystemSession{kSystemAccess, {nx::Uuid()}};
+const UserSession kSystemSession{{nx::Uuid()}, kSystemAccess};
 
 } // namespace nx::network::rest

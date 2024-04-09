@@ -6,7 +6,7 @@
 #include <QtCore/QString>
 
 #include <nx/network/http/auth_tools.h>
-#include <nx/network/rest/user_access_data.h>
+#include <nx/network/rest/audit.h>
 #include <nx/network/socket_common.h>
 #include <nx/network/ssl/helpers.h>
 #include <nx/utils/async_handler_executor.h>
@@ -74,37 +74,37 @@ public:
     virtual bool resyncTransactionLog(const std::set<nx::Uuid>& filter = std::set<nx::Uuid>()) = 0;
 
     virtual AbstractResourceManagerPtr getResourceManager(
-        const nx::network::rest::UserSession& userSession) = 0;
+        const nx::network::rest::audit::Record& auditRecord) = 0;
     virtual AbstractMediaServerManagerPtr getMediaServerManager(
-        const nx::network::rest::UserSession& userSession) = 0;
+        const nx::network::rest::audit::Record& auditRecord) = 0;
     virtual AbstractCameraManagerPtr getCameraManager(
-        const nx::network::rest::UserSession& userSession) = 0;
+        const nx::network::rest::audit::Record& auditRecord) = 0;
     virtual AbstractLicenseManagerPtr getLicenseManager(
-        const nx::network::rest::UserSession& userSession) = 0;
+        const nx::network::rest::audit::Record& auditRecord) = 0;
     virtual AbstractEventRulesManagerPtr getEventRulesManager(
-        const nx::network::rest::UserSession& userSession) = 0;
+        const nx::network::rest::audit::Record& auditRecord) = 0;
     virtual AbstractVmsRulesManagerPtr getVmsRulesManager(
-        const nx::network::rest::UserSession& userSession) = 0;
+        const nx::network::rest::audit::Record& auditRecord) = 0;
     virtual AbstractUserManagerPtr getUserManager(
-        const nx::network::rest::UserSession& userSession) = 0;
+        const nx::network::rest::audit::Record& auditRecord) = 0;
     virtual AbstractLayoutManagerPtr getLayoutManager(
-        const nx::network::rest::UserSession& userSession) = 0;
+        const nx::network::rest::audit::Record& auditRecord) = 0;
     virtual AbstractShowreelManagerPtr getShowreelManager(
-        const nx::network::rest::UserSession& userSession) = 0;
+        const nx::network::rest::audit::Record& auditRecord) = 0;
     virtual AbstractVideowallManagerPtr getVideowallManager(
-        const nx::network::rest::UserSession& userSession) = 0;
+        const nx::network::rest::audit::Record& auditRecord) = 0;
     virtual AbstractStoredFileManagerPtr getStoredFileManager(
-        const nx::network::rest::UserSession& userSession) = 0;
+        const nx::network::rest::audit::Record& auditRecord) = 0;
     virtual AbstractMiscManagerPtr getMiscManager(
-        const nx::network::rest::UserSession& userSession) = 0;
+        const nx::network::rest::audit::Record& auditRecord) = 0;
     virtual AbstractDiscoveryManagerPtr getDiscoveryManager(
-        const nx::network::rest::UserSession& userSession) = 0;
+        const nx::network::rest::audit::Record& auditRecord) = 0;
     virtual AbstractWebPageManagerPtr getWebPageManager(
-        const nx::network::rest::UserSession& userSession) = 0;
+        const nx::network::rest::audit::Record& auditRecord) = 0;
     virtual AbstractAnalyticsManagerPtr getAnalyticsManager(
-        const nx::network::rest::UserSession& userSession) = 0;
+        const nx::network::rest::audit::Record& auditRecord) = 0;
     virtual AbstractLookupListManagerPtr getLookupListManager(
-        const nx::network::rest::UserSession& userSession) = 0;
+        const nx::network::rest::audit::Record& auditRecord) = 0;
 
     virtual AbstractResourceNotificationManagerPtr resourceNotificationManager() = 0;
     virtual AbstractMediaServerNotificationManagerPtr mediaServerNotificationManager() = 0;

@@ -12,7 +12,7 @@ template<typename QueryProcessor>
 class AnalyticsManager: public AbstractAnalyticsManager
 {
 public:
-    AnalyticsManager(QueryProcessor* queryProcessor, const nx::network::rest::UserSession& userSession);
+    AnalyticsManager(QueryProcessor* queryProcessor, const nx::network::rest::audit::Record& auditRecord);
 
     virtual int getAnalyticsPlugins(
         Handler<nx::vms::api::AnalyticsPluginDataList> handler,
@@ -43,19 +43,19 @@ public:
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
 
 private:
-    decltype(auto) processor() { return m_queryProcessor->getAccess(m_userSession); }
+    decltype(auto) processor() { return m_queryProcessor->getAccess(m_auditRecord); }
 
 private:
     QueryProcessor* m_queryProcessor;
-    nx::network::rest::UserSession m_userSession;
+    nx::network::rest::audit::Record m_auditRecord;
 };
 
 template<typename QueryProcessor>
 AnalyticsManager<QueryProcessor>::AnalyticsManager(
-    QueryProcessor* queryProcessor, const nx::network::rest::UserSession& userSession)
+    QueryProcessor* queryProcessor, const nx::network::rest::audit::Record& auditRecord)
     :
     m_queryProcessor(queryProcessor),
-    m_userSession(userSession)
+    m_auditRecord(auditRecord)
 {
 }
 

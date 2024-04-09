@@ -41,13 +41,13 @@ QnManualCameraInfo::QnManualCameraInfo(
     const QAuthenticator& auth,
     const QString& resType,
     const QString& physicalId,
-    nx::network::rest::UserSession userSession)
+    nx::network::rest::audit::Record auditRecord)
     :
     url(url),
     resType(qnResTypePool->getResourceTypeByName(resType)),
     auth(auth),
     physicalId(physicalId),
-    userSession(std::move(userSession))
+    auditRecord(std::move(auditRecord))
 {
 }
 
@@ -533,14 +533,14 @@ bool QnResourceDiscoveryManager::processDiscoveredResources(QnResourceList& reso
 }
 
 QnManualCameraInfo QnResourceDiscoveryManager::manualCameraInfo(
-    const QnSecurityCamResourcePtr& camera, const nx::network::rest::UserSession& userSession) const
+    const QnSecurityCamResourcePtr& camera, const nx::network::rest::audit::Record& auditRecord) const
 {
     NX_MUTEX_LOCKER lock(&m_searchersListMutex);
-    return manualCameraInfoUnsafe(camera, userSession);
+    return manualCameraInfoUnsafe(camera, auditRecord);
 }
 
 QnManualCameraInfo QnResourceDiscoveryManager::manualCameraInfoUnsafe(
-    const QnSecurityCamResourcePtr& camera, const nx::network::rest::UserSession& userSession) const
+    const QnSecurityCamResourcePtr& camera, const nx::network::rest::audit::Record& auditRecord) const
 {
     const auto resourceTypeId = camera->getTypeId();
     QnResourceTypePtr resourceType = qnResTypePool->getResourceType(resourceTypeId);
@@ -550,7 +550,7 @@ QnManualCameraInfo QnResourceDiscoveryManager::manualCameraInfoUnsafe(
         ? resourceType->getName()
         : camera->getModel();
     QnManualCameraInfo info(
-        nx::utils::Url(camera->getUrl()), camera->getAuth(), model, camera->getPhysicalId(), userSession);
+        nx::utils::Url(camera->getUrl()), camera->getAuth(), model, camera->getPhysicalId(), auditRecord);
 
     for (const auto& searcher: m_searchersList)
     {

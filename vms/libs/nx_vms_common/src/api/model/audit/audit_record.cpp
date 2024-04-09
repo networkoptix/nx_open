@@ -271,7 +271,7 @@ QnLegacyAuditRecord::operator QnAuditRecord() const
     return visitAllConversions(
         [this](auto&&... items)
         {
-            QnAuditRecord record(authSession);
+            QnAuditRecord record{{{authSession}}};
             record.eventType = static_cast<nx::vms::api::AuditRecordType>(eventType);
             record.createdTimeS = std::chrono::seconds(createdTimeSec);
             switchByRecordType(record.eventType,
@@ -351,9 +351,9 @@ QnAuditRecord::operator QnLegacyAuditRecord() const
 static std::optional<std::chrono::seconds> s_createdTimeForTests;
 
 QnAuditRecord QnAuditRecord::prepareRecord(
-    nx::vms::api::AuditRecordType type, const nx::network::rest::AuthSession& authSession)
+    nx::vms::api::AuditRecordType type, const nx::network::rest::audit::Record& auditRecord)
 {
-    QnAuditRecord result(authSession);
+    QnAuditRecord result(auditRecord);
     result.eventType = type;
     result.createdTimeS = s_createdTimeForTests.value_or(
         std::chrono::seconds(qnSyncTime->currentMSecsSinceEpoch() / 1000));
