@@ -31,8 +31,10 @@ Dialog
     ]
 
     title: qsTr("Select Objects")
-    width: 500
-    height: 440
+    minimumWidth: 500
+    minimumHeight: 440
+    maximumWidth: 500
+    maximumHeight: 440
 
     function updateSelected()
     {
