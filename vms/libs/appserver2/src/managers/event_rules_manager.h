@@ -13,7 +13,7 @@ template<class QueryProcessorType>
 class EventRulesManager: public AbstractEventRulesManager
 {
 public:
-    EventRulesManager(QueryProcessorType* queryProcessor, const nx::network::rest::UserSession& userSession);
+    EventRulesManager(QueryProcessorType* queryProcessor, const nx::network::rest::audit::Record& auditRecord);
 
     virtual int getEventRules(
         Handler<nx::vms::api::EventRuleDataList> handler,
@@ -39,19 +39,19 @@ public:
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
 
 private:
-    decltype(auto) processor() { return m_queryProcessor->getAccess(m_userSession); }
+    decltype(auto) processor() { return m_queryProcessor->getAccess(m_auditRecord); }
 
 private:
     QueryProcessorType* const m_queryProcessor;
-    nx::network::rest::UserSession m_userSession;
+    nx::network::rest::audit::Record m_auditRecord;
 };
 
 template<class QueryProcessorType>
 EventRulesManager<QueryProcessorType>::EventRulesManager(
-    QueryProcessorType* queryProcessor, const nx::network::rest::UserSession& userSession)
+    QueryProcessorType* queryProcessor, const nx::network::rest::audit::Record& auditRecord)
     :
     m_queryProcessor(queryProcessor),
-    m_userSession(userSession)
+    m_auditRecord(auditRecord)
 {
 }
 

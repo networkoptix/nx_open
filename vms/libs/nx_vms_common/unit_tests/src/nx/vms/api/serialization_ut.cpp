@@ -64,7 +64,7 @@ TEST(IOPortTypes, serialization)
 
 TEST(QnAuditRecord, serialization)
 {
-    QnAuditRecord record{nx::Uuid()};
+    QnAuditRecord record{{{nx::Uuid{}}}};
     record.details = ResourceDetails{{{nx::Uuid()}}, {"detailed description"}};
     nx::network::rest::JsonReflectResult<QnAuditRecordList> result;
     result.reply.push_back(record);

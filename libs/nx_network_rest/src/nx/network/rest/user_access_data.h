@@ -74,12 +74,6 @@ private:
     std::optional<Duration> m_userDuration;
 };
 
-struct UserSession
-{
-    UserAccessData access;
-    AuthSession session;
-};
-
 NX_NETWORK_REST_API QString toString(UserAccessData::Access access);
 
 inline bool operator==(const UserAccessData& lhs, const UserAccessData& rhs)
@@ -91,6 +85,17 @@ inline bool operator!=(const UserAccessData& lhs, const UserAccessData& rhs)
 {
     return !operator==(lhs, rhs);
 }
+
+struct UserSession
+{
+    AuthSession session;
+    UserAccessData access;
+
+    inline bool operator==(const UserSession& other) const
+    {
+        return session == other.session && access == other.access;
+    }
+};
 
 NX_NETWORK_REST_API extern const UserSession kSystemSession;
 NX_NETWORK_REST_API extern const UserAccessData kSystemAccess;

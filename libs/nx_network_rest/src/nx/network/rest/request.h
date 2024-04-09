@@ -2,9 +2,9 @@
 
 #pragma once
 
+#include "audit.h"
 #include "exception.h"
 #include "params.h"
-#include "user_access_data.h"
 
 namespace nx::network::rest {
 
@@ -87,6 +87,8 @@ struct NX_NETWORK_REST_API Request
     /** The safe version of parseContent. */
     template<typename T>
     std::optional<T> parseContent(bool wrapInObject = false) const;
+
+    audit::Record auditRecord() const { return userSession; }
 
     bool isExtraFormattingRequired() const;
     Qn::SerializationFormat responseFormatOrThrow() const;

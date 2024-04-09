@@ -16,7 +16,7 @@
 #include <core/resource/resource_factory.h>
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource_processor.h>
-#include <nx/network/rest/user_access_data.h>
+#include <nx/network/rest/audit.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/long_runnable.h>
 #include <nx/utils/thread/mutex.h>
@@ -29,13 +29,13 @@ class QnAbstractResourceSearcher;
 
 struct NX_VMS_COMMON_API QnManualCameraInfo
 {
-    QnManualCameraInfo(nx::network::rest::UserSession userSession): userSession(std::move(userSession)) {}
+    QnManualCameraInfo(nx::network::rest::audit::Record auditRecord): auditRecord(std::move(auditRecord)) {}
     QnManualCameraInfo(
         const nx::utils::Url& url,
         const QAuthenticator& auth,
         const QString& resType,
         const QString& physicalId,
-        nx::network::rest::UserSession userSession);
+        nx::network::rest::audit::Record auditRecord);
 
     nx::utils::Url url;
     QnResourceTypePtr resType;
@@ -43,7 +43,7 @@ struct NX_VMS_COMMON_API QnManualCameraInfo
     QnAbstractResourceSearcher* searcher = nullptr;
     QString physicalId;
     bool isUpdated = false;
-    nx::network::rest::UserSession userSession;
+    nx::network::rest::audit::Record auditRecord;
 };
 
 class QnAbstractResourceSearcher;
@@ -111,7 +111,7 @@ public:
     QSet<QString> registerManualCameras(const std::vector<QnManualCameraInfo>& cameras);
     bool isManuallyAdded(const QnSecurityCamResourcePtr& camera) const;
     QnManualCameraInfo manualCameraInfo(
-        const QnSecurityCamResourcePtr& camera, const nx::network::rest::UserSession& userSession) const;
+        const QnSecurityCamResourcePtr& camera, const nx::network::rest::audit::Record& auditRecord) const;
 
     ResourceSearcherList plugins() const;
 
@@ -132,7 +132,7 @@ public slots:
 protected:
     virtual void run() override;
     QnManualCameraInfo manualCameraInfoUnsafe(
-        const QnSecurityCamResourcePtr& camera, const nx::network::rest::UserSession& userSession) const;
+        const QnSecurityCamResourcePtr& camera, const nx::network::rest::audit::Record& auditRecord) const;
 
 signals:
     void localSearchDone();

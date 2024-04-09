@@ -7,6 +7,7 @@
 #include <nx/utils/exception.h>
 #include <nx/utils/scope_guard.h>
 
+#include "audit.h"
 #include "open_api_schema.h"
 #include "params.h"
 #include "path_router.h"
@@ -111,6 +112,11 @@ public:
     virtual nx::utils::Guard subscribe(const QString& /*id*/, SubscriptionCallback) { return {}; }
     virtual QString idParamName() const { return {}; }
     virtual QString subscriptionId(const Request&) { return {}; }
+
+    virtual audit::Record prepareAuditRecord(const Request& request) const
+    {
+        return request.auditRecord();
+    }
 
 protected:
     std::atomic<bool> m_needStop = false;

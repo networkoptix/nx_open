@@ -4,7 +4,7 @@
 
 #include <common/common_globals.h>
 #include <nx/fusion/model_functions_fwd.h>
-#include <nx/network/rest/auth_session.h>
+#include <nx/network/rest/audit.h>
 #include <nx/utils/latin1_array.h>
 #include <nx/utils/qnbytearrayref.h>
 #include <nx/utils/uuid.h>
@@ -58,8 +58,6 @@ using QnLegacyAuditRecordRefList = QVector<QnLegacyAuditRecord*>;
 
 struct NX_VMS_COMMON_API QnAuditRecord
 {
-    bool operator==(const QnAuditRecord& other) const = default;
-
     /**%apidoc Record type. */
     nx::vms::api::AuditRecordType eventType = nx::vms::api::AuditRecordType::notDefined;
 
@@ -69,10 +67,15 @@ struct NX_VMS_COMMON_API QnAuditRecord
     /**%apidoc Information about the user whose actions created the record. */
     nx::network::rest::AuthSession authSession;
 
-    /**%apidoc Detailed information about what's happened. */
+    /**%apidoc:any Detailed information about what's happened. */
     AllAuditDetails::type details = nullptr;
 
-    QnAuditRecord(nx::network::rest::AuthSession authSession): authSession(std::move(authSession)) {}
+    QnAuditRecord(nx::network::rest::audit::Record auditRecord):
+        authSession(std::move(auditRecord.session))
+    {
+    }
+
+    bool operator==(const QnAuditRecord& other) const = default;
 
     template<typename T>
     T* get()
@@ -90,18 +93,19 @@ struct NX_VMS_COMMON_API QnAuditRecord
 
     template <nx::vms::api::AuditRecordType type,
         typename Details = typename details::details_type<type, AllAuditDetails::mapping>::type>
-    static QnAuditRecord prepareRecord(const nx::network::rest::AuthSession& authInfo, Details&& details = {})
+    static QnAuditRecord prepareRecord(
+        const nx::network::rest::audit::Record& auditRecord, Details&& details = {})
     {
         static_assert(
             std::is_same_v<typename details::details_type<type, AllAuditDetails::mapping>::type,
             std::decay_t<Details>>);
-        QnAuditRecord result = prepareRecord(type, authInfo);
+        QnAuditRecord result = prepareRecord(type, auditRecord);
         result.details.emplace<std::decay_t<Details>>(std::forward<Details>(details));
         return result;
     }
 
     static QnAuditRecord prepareRecord(
-        nx::vms::api::AuditRecordType type, const nx::network::rest::AuthSession& authInfo);
+        nx::vms::api::AuditRecordType type, const nx::network::rest::audit::Record& auditRecord);
     static void setCreatedTimeForTests(std::optional<std::chrono::seconds> value);
 };
 #define QnAuditRecord_Fields (eventType)(createdTimeS)(authSession)(details)
