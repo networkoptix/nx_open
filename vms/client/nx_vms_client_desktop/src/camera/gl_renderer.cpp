@@ -204,6 +204,7 @@ void QnGLRenderer::doBlurStep(const QRectF& sourceRect, const QRectF& dstRect)
     const auto renderer = QnOpenGLRendererManager::instance(glWidget());
     const auto shader = renderer->getBlurShader();
 
+    // Shader is already bound in renderBlurFBO.
     drawBindedTexture(shader, v_array, tx_array);
 }
 

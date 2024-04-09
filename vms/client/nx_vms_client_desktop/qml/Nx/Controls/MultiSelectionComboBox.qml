@@ -248,7 +248,7 @@ Control
                         width: listView.width
                             - (listView.scrollBar.visible ? listView.scrollBar.width : 0)
 
-                        onClicked: setChecked(!checked)
+                        onClicked: setChecked(checked)
 
                         onYChanged:
                         {
