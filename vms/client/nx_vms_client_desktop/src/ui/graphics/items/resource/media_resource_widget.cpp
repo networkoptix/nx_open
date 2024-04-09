@@ -1307,23 +1307,25 @@ Qn::RenderStatus QnMediaResourceWidget::paintVideoTexture(
         }
     }
 
-    if (ini().objectPixelation
-        && m_blurMask
-        && d->isAnalyticsEnabledInStream()
-        && !systemSettings()->pixelationSettings().excludeCameraIds.contains(camera()->getId()))
+    if (ini().objectPixelation && m_blurMask)
     {
         const nx::vms::api::PixelationSettings& pixelationSettings =
             systemSettings()->pixelationSettings();
 
-        m_renderer->setBlurFactor(
-            std::max(pixelationSettings.intensity, (double)m_statusOverlay->opacity()));
+        const bool pixelateObjects = d->isAnalyticsEnabledInStream()
+            && !accessController()->hasGlobalPermissions(GlobalPermission::viewUnredactedVideo)
+            && !pixelationSettings.excludeCameraIds.contains(camera()->getId());
+
+        m_renderer->setBlurFactor(pixelateObjects
+            ? std::max(pixelationSettings.intensity, m_statusOverlay->opacity())
+            : m_statusOverlay->opacity());
 
         if (m_statusOverlay->opacity() > 0)
         {
             // Blur everything when overlay is displayed.
             m_blurMask->drawFull(m_renderer->blurMaskFrameBuffer(channel));
         }
-        else
+        else if (pixelateObjects)
         {
             const auto timestamp = position();
             const auto types = pixelationSettings.isAllObjectTypes

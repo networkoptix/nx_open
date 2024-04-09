@@ -17,7 +17,10 @@ using GlobalPermission = nx::utils::auth::GlobalPermission;
 using GlobalPermissions = nx::utils::auth::GlobalPermissions;
 
 constexpr GlobalPermissions kAssignableGlobalPermissions =
-    GlobalPermission::viewLogs | GlobalPermission::generateEvents | GlobalPermission::viewMetrics;
+    GlobalPermission::viewLogs
+    | GlobalPermission::generateEvents
+    | GlobalPermission::viewMetrics
+    | GlobalPermission::viewUnredactedVideo;
 
 // -------------------------------------------------------------------------------------------------
 
