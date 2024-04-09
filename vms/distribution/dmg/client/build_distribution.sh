@@ -96,7 +96,7 @@ copyMetadata()
 {
     echo "Copying metadata"
 
-    local -r metadataDir="${APP_DIR}/SharedSupport/metadata"
+    local -r metadataDir="${APP_DIR}/Contents/SharedSupport/metadata"
 
     mkdir -p "${metadataDir}"
 
