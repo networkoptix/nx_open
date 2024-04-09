@@ -209,8 +209,6 @@ public:
     nx::vms::api::CameraMediaCapability cameraMediaCapability() const;
     void setCameraMediaCapability(const nx::vms::api::CameraMediaCapability& value);
 
-    bool isRecordingEventAttached() const;
-
     virtual QnAbstractArchiveDelegate* createArchiveDelegate() { return 0; }
     virtual QnAbstractStreamDataProvider* createArchiveDataProvider() { return 0; }
 
@@ -597,10 +595,6 @@ public:
 
     bool isRtspMetatadaRequired() const;
 
-public slots:
-    virtual void recordingEventAttached();
-    virtual void recordingEventDetached();
-
 signals:
     void vendorChanged(const QnResourcePtr& resource);
     void modelChanged(const QnResourcePtr& resource);
@@ -626,7 +620,6 @@ signals:
     void mediaCapabilitiesChanged(const QnSecurityCamResourcePtr& camera);
     void cameraHotspotsEnabledChanged(const QnSecurityCamResourcePtr& camera);
     void cameraHotspotsChanged(const QnSecurityCamResourcePtr& camera);
-    void recordingActionChanged(const QnResourcePtr& resource);
 
 protected slots:
     virtual void at_motionRegionChanged();
@@ -649,7 +642,6 @@ private:
     QPointF storedPtzPanTiltSensitivity() const;
 
 private:
-    int m_recActionCnt;
     QString m_groupName;
     QString m_groupId;
     Qn::CameraStatusFlags m_statusFlags;
