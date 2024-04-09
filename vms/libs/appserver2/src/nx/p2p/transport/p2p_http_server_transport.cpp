@@ -51,20 +51,6 @@ void P2PHttpServerTransport::start(
     utils::MoveOnlyFunc<void(SystemError::ErrorCode)> onGetRequestReceived)
 {
     m_onGetRequestReceived = std::move(onGetRequestReceived);
-
-    m_timer.start(
-        std::chrono::seconds(10),
-        [this]()
-        {
-            if (m_failed)
-                return;
-
-            if (m_onGetRequestReceived)
-                m_onGetRequestReceived(SystemError::connectionAbort);
-            else
-                initiatePingPong();
-        });
-
     m_sendSocket->readSomeAsync(
         &m_sendChannelReadBuffer,
         [this](SystemError::ErrorCode error, size_t transferred)
@@ -94,10 +80,42 @@ void P2PHttpServerTransport::start(
                 {
                     onReadFromSendSocket(error, transferred);
                 });
+
+            initiatePing();
+            initiateInactivityTimer();
         });
 }
 
-void P2PHttpServerTransport::initiatePingPong()
+void P2PHttpServerTransport::initiateInactivityTimer()
+{
+    if (!pingTimeout())
+    {
+        NX_DEBUG(this, "Ping-pong is disabled");
+        return;
+    }
+
+    if (s_pingPongDisabled)
+    {
+        NX_DEBUG(this, "Ping-pong is disabled for tests");
+        return;
+    }
+
+    const auto kInactivityTimeout = *pingTimeout() * 2;
+    NX_VERBOSE(this,
+        "Ping-pong is enabled. Starting inactivity timer with %1 timeout", kInactivityTimeout);
+    m_inactivityTimer.start(
+        kInactivityTimeout,
+        [this]()
+        {
+            if (m_failed)
+                return;
+
+            setFailedState(
+                SystemError::connectionAbort, "Closing connection because of inactivity");
+        });
+}
+
+void P2PHttpServerTransport::initiatePing()
 {
     if (!pingTimeout())
     {
@@ -112,48 +130,38 @@ void P2PHttpServerTransport::initiatePingPong()
     }
 
     NX_DEBUG(this, "Ping-pong is enabled. Starting with %1 timeout", *pingTimeout());
-    m_timer.start(
+    m_pingTimer.start(
         *pingTimeout(),
         [this]()
         {
             if (m_failed)
                 return;
 
-            sendPingOrPong(Headers::ping);
-            m_timer.start(
-                *pingTimeout() / 2,
-                [this]()
-                {
-                    if (m_failed)
-                        return;
-
-                    NX_DEBUG(this, "Closing connection because there was no answer to ping");
-                    setFailedState(SystemError::connectionAbort,
-                        "Closing connection because there was no answer to ping");
-                });
+            sendPing();
         });
 }
 
-void P2PHttpServerTransport::sendPingOrPong(Headers type)
+void P2PHttpServerTransport::sendPing()
 {
     post(
-        [this, type]()
+        [this]()
         {
             if (m_failed)
                 return;
 
             auto handler =
-                [this, type](SystemError::ErrorCode code, size_t transferred)
+                [this](SystemError::ErrorCode code, size_t transferred)
                 {
                     NX_VERBOSE(
-                        this, "%1 sent. code: %2, transferred: %3",
-                        (type == Headers::ping ? "ping" : "pong"), code, transferred);
+                        this, "Ping sent. code: %1, transferred: %2",
+                        code, transferred);
                 };
 
             m_outgoingMessageQueue.push(OutgoingData{
-                std::nullopt, std::move(handler), type});
+                std::nullopt, std::move(handler), Headers::ping});
 
             sendNextMessage();
+            initiatePing();
         });
 }
 
@@ -179,7 +187,7 @@ void P2PHttpServerTransport::setFailedState(
     SystemError::ErrorCode errorCode,
     const QString& message)
 {
-    NX_DEBUG(this, "Going to failed state");
+    NX_DEBUG(this, "Going to failed state. Reason: %1", message);
     m_failed = true;
     m_lastErrorMessage = message;
     if (m_userReadHandlerPair)
@@ -279,6 +287,8 @@ void P2PHttpServerTransport::onRead(SystemError::ErrorCode error, size_t transfe
 
             onRead(error, transferred);
         });
+
+    initiateInactivityTimer();
 }
 
 void P2PHttpServerTransport::gotPostConnection(
@@ -295,6 +305,7 @@ void P2PHttpServerTransport::gotPostConnection(
             m_readSocket->setNonBlockingMode(true);
             m_readSocket->bindToAioThread(getAioThread());
             m_readSocket->setRecvTimeout(0);
+            m_readSocket->setSendTimeout(0);
 
             NX_VERBOSE(this, "Got post connection");
             onIncomingPost(std::move(request));
@@ -331,21 +342,23 @@ void P2PHttpServerTransport::readSomeAsync(
 
 void P2PHttpServerTransport::onIncomingPost(nx::network::http::Request request)
 {
-    bool pingOrPong = false;
     if (request.headers.contains(kPingHeaderName))
     {
-        NX_VERBOSE(this, "Ping received. Sending pong");
-        sendPingOrPong(Headers::pong);
-        pingOrPong = true;
+        NX_VERBOSE(this, "Ping received");
+        sendPostResponse(
+            [this](SystemError::ErrorCode error, size_t transferred)
+            {
+                NX_VERBOSE(
+                    this, "Response to POST (ping). Error: %1, transferred: %2",
+                    error, transferred);
+                if (error != SystemError::noError || transferred <= 0)
+                {
+                    setFailedState(error, NX_FMT("Response to POST (ping) failed. "
+                        "Error: %1, transferred: %2", error, transferred));
+                }
+            });
     }
-
-    if (request.headers.contains(kPongHeaderName))
-    {
-        NX_VERBOSE(this, "Pong received");
-        pingOrPong = true;
-    }
-
-    if (!pingOrPong)
+    else
     {
         sendPostResponse(
             [this, request = std::move(request)]
@@ -375,24 +388,6 @@ void P2PHttpServerTransport::onIncomingPost(nx::network::http::Request request)
                 }
             });
     }
-    else
-    {
-        sendPostResponse(
-            [this](SystemError::ErrorCode error, size_t transferred)
-            {
-                NX_VERBOSE(
-                    this, "Response to POST (ping or pong). Error: %1, transferred: %2",
-                    error, transferred);
-
-                if (error != SystemError::noError || transferred <= 0)
-                {
-                    setFailedState(error, NX_FMT("Response to POST (ping or pong) failed. "
-                        "Error: %1, transferred: %2", error, transferred));
-                }
-            });
-    }
-
-    initiatePingPong();
 }
 
 void P2PHttpServerTransport::addDateHeader(network::http::HttpHeaders* headers)
@@ -562,12 +557,6 @@ nx::Buffer P2PHttpServerTransport::makeFrameHeader(int headers, int length) cons
             {network::http::HttpHeader(kPingHeaderName, "ping")}, &headerBuffer);
     }
 
-    if (headers & Headers::pong)
-    {
-        network::http::serializeHeaders(
-            {network::http::HttpHeader(kPingHeaderName, "pong")}, &headerBuffer);
-    }
-
     network::http::serializeHeaders(
         {network::http::HttpHeader("Content-Length", std::to_string(length))}, &headerBuffer);
 
@@ -580,7 +569,8 @@ void P2PHttpServerTransport::bindToAioThread(network::aio::AbstractAioThread* ai
     m_sendSocket->bindToAioThread(aioThread);
     if (m_readSocket)
         m_readSocket->bindToAioThread(aioThread);
-    m_timer.bindToAioThread(aioThread);
+    m_pingTimer.bindToAioThread(aioThread);
+    m_inactivityTimer.bindToAioThread(aioThread);
 }
 
 void P2PHttpServerTransport::cancelIoInAioThread(nx::network::aio::EventType eventType)
@@ -602,7 +592,8 @@ network::SocketAddress P2PHttpServerTransport::getForeignAddress() const
 
 void P2PHttpServerTransport::stopWhileInAioThread()
 {
-    m_timer.cancelSync();
+    m_pingTimer.cancelSync();
+    m_inactivityTimer.cancelSync();
     m_sendSocket.reset();
     m_readSocket.reset();
 }
