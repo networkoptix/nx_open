@@ -114,7 +114,6 @@ void QnSecurityCamResource::setSystemContext(nx::vms::common::SystemContext* sys
 
 QnSecurityCamResource::QnSecurityCamResource():
     base_type(),
-    m_recActionCnt(0),
     m_manuallyAdded(false),
     m_cachedAudioRequired(
         [this] {
@@ -958,23 +957,6 @@ void QnSecurityCamResource::setCameraCapability(
     nx::vms::api::DeviceCapability capability, bool value)
 {
     setCameraCapabilities(getCameraCapabilities().setFlag(capability, value));
-}
-
-bool QnSecurityCamResource::isRecordingEventAttached() const
-{
-    return m_recActionCnt > 0;
-}
-
-void QnSecurityCamResource::recordingEventAttached()
-{
-    m_recActionCnt++;
-    emit recordingActionChanged(toSharedPointer(this));
-}
-
-void QnSecurityCamResource::recordingEventDetached()
-{
-    m_recActionCnt = qMax(0, m_recActionCnt-1);
-    emit recordingActionChanged(toSharedPointer(this));
 }
 
 QString QnSecurityCamResource::getUserDefinedName() const
