@@ -82,7 +82,8 @@ struct PredefinedUserGroups::Private
                 | GlobalPermission::powerUser
                 | GlobalPermission::viewLogs
                 | GlobalPermission::generateEvents
-                | GlobalPermission::viewMetrics;
+                | GlobalPermission::viewMetrics
+                | GlobalPermission::viewUnredactedVideo;
         }
 
         if (groupId == kPowerUsersGroupId)
@@ -90,7 +91,8 @@ struct PredefinedUserGroups::Private
             return GlobalPermission::powerUser
                 | GlobalPermission::viewLogs
                 | GlobalPermission::generateEvents
-                | GlobalPermission::viewMetrics;
+                | GlobalPermission::viewMetrics
+                | GlobalPermission::viewUnredactedVideo;
         }
 
         if (groupId == kAdvancedViewersGroupId)

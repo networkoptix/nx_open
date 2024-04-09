@@ -48,6 +48,11 @@ enum class GlobalPermission
      */
     generateEvents = 0x00020000,
 
+    /**%apidoc
+     * Can view video without redaction.
+     */
+    viewUnredactedVideo = 0x00040000,
+
     /**%apidoc[unused] */
     requireFreshSession = 0x40000000,
 
@@ -63,7 +68,8 @@ NX_REFLECTION_INSTRUMENT_ENUM(GlobalPermission,
     powerUser,
     viewLogs,
     viewMetrics,
-    generateEvents)
+    generateEvents,
+    viewUnredactedVideo)
 
 Q_DECLARE_FLAGS(GlobalPermissions, GlobalPermission)
 Q_DECLARE_OPERATORS_FOR_FLAGS(GlobalPermissions)

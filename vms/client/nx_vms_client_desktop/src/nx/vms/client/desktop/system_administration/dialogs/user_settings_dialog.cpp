@@ -891,7 +891,9 @@ QString UserSettingsDialog::warningForTemporaryUser(
 {
     using namespace nx::vms::api;
     static constexpr GlobalPermissions kUserPermissions =
-        GlobalPermission::viewLogs | GlobalPermission::generateEvents;
+        GlobalPermission::viewLogs
+        | GlobalPermission::generateEvents
+        | GlobalPermission::viewUnredactedVideo;
 
     static constexpr AccessRights kTemporaryUserViewAccessRights = AccessRight::view
         | AccessRight::audio

@@ -9,6 +9,7 @@
 #include <core/resource_access/subject_hierarchy.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/api/types/access_rights_types.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/system_administration/models/members_model.h>
 #include <nx/vms/client/desktop/system_administration/models/members_sort.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -21,10 +22,22 @@ namespace {
 
 std::vector<std::pair<api::GlobalPermission, QString>> globalPermissions()
 {
-    return {
-        {api::GlobalPermission::viewLogs, GlobalPermissionsModel::tr("View event log")},
-        {api::GlobalPermission::generateEvents, GlobalPermissionsModel::tr("Generate events")},
-    };
+    if (ini().objectPixelation)
+    {
+        return {
+            {api::GlobalPermission::viewLogs, GlobalPermissionsModel::tr("View event log")},
+            {api::GlobalPermission::generateEvents, GlobalPermissionsModel::tr("Generate events")},
+            {api::GlobalPermission::viewUnredactedVideo,
+                GlobalPermissionsModel::tr("View video without redaction")},
+        };
+    }
+    else
+    {
+        return {
+            {api::GlobalPermission::viewLogs, GlobalPermissionsModel::tr("View event log")},
+            {api::GlobalPermission::generateEvents, GlobalPermissionsModel::tr("Generate events")},
+        };
+    }
 };
 
 } // namespace

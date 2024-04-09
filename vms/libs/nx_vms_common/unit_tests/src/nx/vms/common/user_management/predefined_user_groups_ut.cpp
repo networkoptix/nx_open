@@ -66,13 +66,15 @@ TEST(PredefinedUserGroups, globalPermissions)
         | GlobalPermission::powerUser
         | GlobalPermission::viewLogs
         | GlobalPermission::generateEvents
-        | GlobalPermission::viewMetrics);
+        | GlobalPermission::viewMetrics
+        | GlobalPermission::viewUnredactedVideo);
 
     EXPECT_EQ(PredefinedUserGroups::find(kPowerUsersGroupId)->permissions,
         GlobalPermission::powerUser
         | GlobalPermission::viewLogs
         | GlobalPermission::generateEvents
-        | GlobalPermission::viewMetrics);
+        | GlobalPermission::viewMetrics
+        | GlobalPermission::viewUnredactedVideo);
 
     EXPECT_EQ(PredefinedUserGroups::find(kAdvancedViewersGroupId)->permissions,
         GlobalPermission::viewLogs);
