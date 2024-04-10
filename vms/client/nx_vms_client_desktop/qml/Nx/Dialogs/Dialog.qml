@@ -41,6 +41,8 @@ Window
     property real fixedWidth: 0
     property real fixedHeight: 0
 
+    property bool acceptShortcutEnabled: true
+
     // Dig out the shadowed contentItem of Window.
     readonly property alias rootItem: dummy.parent
     Item { id: dummy; visible: false }
@@ -60,6 +62,7 @@ Window
 
     Shortcut
     {
+        enabled: acceptShortcutEnabled
         sequences: ["Enter", "Return"]
         onActivated: dialog.accept()
     }
