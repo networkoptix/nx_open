@@ -90,8 +90,8 @@ def sign_file(
         command += ['/f', str(certificate)]
         command += ['/kc', keypair_alias]
     else:
-        logging.info(f'Using certificate file: {certificate_file!s}')
         certificate_file = (config_file.parent / config.get('file')).resolve()
+        logging.info(f'Using certificate file: {certificate_file!s}')
         sign_password = config.get('password')
         print_certificate_info(certificate_file, sign_password)
         command += ['/f', str(certificate_file)]
