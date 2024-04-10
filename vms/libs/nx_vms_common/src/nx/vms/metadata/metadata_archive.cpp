@@ -284,13 +284,22 @@ bool MetadataArchive::openFiles(qint64 timestampMs)
 
     auto dirName = getFilePrefix(QDateTime::fromMSecsSinceEpoch(timestampMs).date());
     QDir dir;
-    dir.mkpath(dirName);
+    if (!dir.mkpath(dirName))
+    {
+        NX_WARNING(this, "Failed to create directory %1", dirName);
+    }
 
     if (!m_detailedMetadataFile->openRW())
+    {
+        NX_WARNING(this, "Failed to open file %1", m_detailedMetadataFile->fileName());
         return false;
+    }
 
     if (!m_detailedIndexFile->openRW())
+    {
+        NX_WARNING(this, "Failed to open file %1", m_detailedIndexFile->fileName());
         return false;
+    }
 
     if (m_detailedIndexFile->size() == 0)
     {
@@ -311,7 +320,9 @@ bool MetadataArchive::openFiles(qint64 timestampMs)
         name = name.replace("detailed", "nogeometry");
         m_noGeometryMetadataFile = MetadataBinaryFileFactory::instance().create();
         m_noGeometryMetadataFile->setFileName(name);
-        m_noGeometryMetadataFile->openRW();
+        if (!m_noGeometryMetadataFile->openRW())
+            NX_WARNING(this, "Failed to open file %1", m_noGeometryMetadataFile->fileName());
+
     }
 
     bool isUpdated = m_index.truncateToBytes(m_detailedMetadataFile->size(), /*noGeometryMode*/ false);
@@ -322,7 +333,10 @@ bool MetadataArchive::openFiles(qint64 timestampMs)
     if (isUpdated)
     {
         if (!m_index.updateTail(m_detailedIndexFile.get()))
+        {
+            NX_WARNING(this, "Failed to update index file");
             return false;
+        }
     }
 
     qint64 newMetadataFileSize = m_index.mediaFileSize(/*noGeometryMode*/ false);
