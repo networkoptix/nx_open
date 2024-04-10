@@ -40,11 +40,11 @@
     </message>
     <message>
       <source>To enable digest authentication for LDAP users that are already added to the VMS database, you need to enable it directly in these users&apos; settings.</source>
-      <translation type="unfinished">To enable digest authentication for LDAP users that are already added to the VMS database, you need to enable it directly in these users&apos; settings.</translation>
+      <translation>Zaten VMS veritabanına eklenmiş olan LDAP kullanıcıları için özet kimlik doğrulamasını etkinleştirmek için, bunu doğrudan bu kullanıcıların&apos; ayarlarında etkinleştirmeniz gerekir.</translation>
     </message>
     <message>
       <source>To disable digest authentication for LDAP users that are already added to the VMS database, you need to disable it directly in these users&apos; settings.</source>
-      <translation type="unfinished">To disable digest authentication for LDAP users that are already added to the VMS database, you need to disable it directly in these users&apos; settings.</translation>
+      <translation>Zaten VMS veritabanına eklenmiş olan LDAP kullanıcıları için özet kimlik doğrulamasını devre dışı bırakmak için, bunu doğrudan bu kullanıcıların&apos; ayarlarında devre dışı bırakmanız gerekir.</translation>
     </message>
     <message>
       <source>Allow insecure (digest) authentication for imported users</source>
@@ -274,7 +274,7 @@
     </message>
     <message>
       <source>API Integration may be enabled after verifying the code received from Integration provider. New requests may be disabled to prevent unwanted interaction.</source>
-      <translation type="unfinished">API Integration may be enabled after verifying the code received from Integration provider. New requests may be disabled to prevent unwanted interaction.</translation>
+      <translation>Entegrasyon sağlayıcısından alınan kod doğrulandıktan sonra API Entegrasyonu etkinleştirilebilir. İstenmeyen etkileşimi önlemek için yeni istekler devre dışı bırakılabilir.</translation>
     </message>
     <message>
       <source>Enable %1?</source>
@@ -286,11 +286,11 @@
  • get access to archive
  • process video streams
  • exchange metadata over the network</source>
-      <translation type="unfinished">This Integration will be able to:
- • change settings on cameras
- • get access to archive
- • process video streams
- • exchange metadata over the network</translation>
+      <translation>Bu Entegrasyon şunları yapabilecektir:
+ • kameralardaki ayarları değiştirme
+ • arşive erişim sağlama
+ • video akışlarını işleme
+ • ağ üzerinden meta veri alışverişi yapma</translation>
     </message>
     <message>
       <source>Enable Integration</source>
@@ -329,7 +329,7 @@
     <message numerus="yes">
       <source>Batch Edit - %n Users</source>
       <translation type="unfinished">
-        <numerusform>Batch Edit - %n Users</numerusform>
+        <numerusform>Toplu Düzenleme - %n Kullanıcı</numerusform>
         <numerusform>Batch Edit - %n Users</numerusform>
       </translation>
     </message>
@@ -544,7 +544,7 @@
     </message>
     <message>
       <source>To allow LDAP users to log in to %1, it is necessary to establish a connection between %1 and a corporate LDAP server.</source>
-      <translation type="unfinished">To allow LDAP users to log in to %1, it is necessary to establish a connection between %1 and a corporate LDAP server.</translation>
+      <translation>LDAP kullanıcılarının %1 adresinde oturum açmasına izin vermek için %1 ile kurumsal bir LDAP sunucusu arasında bağlantı kurulması gerekir.</translation>
     </message>
   </context>
   <context>
@@ -723,7 +723,7 @@
     </message>
     <message>
       <source>The Base DN sets the starting point for LDAP searches and synchronization.</source>
-      <translation type="unfinished">The Base DN sets the starting point for LDAP searches and synchronization.</translation>
+      <translation>Base DN, LDAP aramaları ve senkronizasyonu için başlangıç noktasını belirler.</translation>
     </message>
     <message>
       <source>Filters help control access to the system and synchronization by specifying which users and/or groups from the Base DN are allowed.</source>
@@ -983,7 +983,7 @@
     </message>
     <message>
       <source>Inherits membership in current group</source>
-      <translation type="unfinished">Inherits membership in current group</translation>
+      <translation>Mevcut gruptaki üyeliği devralır</translation>
     </message>
   </context>
   <context>
@@ -1042,26 +1042,26 @@
     <name>InsecureWarning</name>
     <message>
       <source>Account security is important. Do not enable this setting unless you have good reasons to do so.</source>
-      <translation type="unfinished">Account security is important. Do not enable this setting unless you have good reasons to do so.</translation>
+      <translation>Hesap güvenliği önemlidir. Bunu yapmak için iyi bir nedeniniz olmadığı sürece bu ayarı etkinleştirmeyin.</translation>
     </message>
   </context>
   <context>
     <name>IntegrationHeader</name>
     <message>
       <source>Insufficient services</source>
-      <translation type="unfinished">Insufficient services</translation>
+      <translation>Yetersiz hizmetler</translation>
     </message>
     <message numerus="yes">
       <source>%n suitable integration services are required to turn on the integration</source>
       <comment>Required integration count</comment>
       <translation type="unfinished">
-        <numerusform>%n suitable integration services are required to turn on the integration</numerusform>
+        <numerusform>entegrasyonun açılması için %n uygun entegrasyon hizmetleri gereklidir</numerusform>
         <numerusform>%n suitable integration services are required to turn on the integration</numerusform>
       </translation>
     </message>
     <message>
       <source>0 suitable services available</source>
-      <translation type="unfinished">0 suitable services available</translation>
+      <translation>0 uygun hizmet mevcut</translation>
     </message>
     <message>
       <source>OFFLINE</source>
@@ -1073,7 +1073,7 @@
     </message>
     <message>
       <source>Services Required</source>
-      <translation type="unfinished">Services Required</translation>
+      <translation>Gerekli Hizmetler</translation>
     </message>
     <message>
       <source>Refreshing...</source>
@@ -1082,7 +1082,7 @@
     <message>
       <source>There are more cameras using this integration than available services. Please disable integration for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</source>
       <comment>%1 will be substituted by a date</comment>
-      <translation type="unfinished">There are more cameras using this integration than available services. Please disable integration for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</translation>
+      <translation>Bu entegrasyonu kullanan mevcut hizmetlerden daha fazla kamera var. Lütfen bazı kameralar için entegrasyonu devre dışı bırakın veya daha fazla uygun hizmet ekleyin. Aksi halde %1 tarihinde otomatik olarak yapılacaktır</translation>
     </message>
   </context>
   <context>
@@ -1243,7 +1243,7 @@
     </message>
     <message>
       <source>Please use care when altering LDAP settings. Incorrect configuration could disrupt system availability for a large number of users simultaneously.</source>
-      <translation type="unfinished">Please use care when altering LDAP settings. Incorrect configuration could disrupt system availability for a large number of users simultaneously.</translation>
+      <translation>LDAP ayarlarını değiştirirken lütfen dikkatli olun. Yanlış yapılandırma, çok sayıda kullanıcının sistem kullanılabilirliğini aynı anda kesintiye uğratabilir.</translation>
     </message>
     <message>
       <source>Connect your System to an LDAP server for easier user management</source>
@@ -1370,7 +1370,7 @@
     <name>LookupListElementEditor</name>
     <message>
       <source>Any %1</source>
-      <translation type="unfinished">Any %1</translation>
+      <translation>Herhangi bir %1</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -1385,7 +1385,7 @@
     <name>LookupListTableCellDelegate</name>
     <message>
       <source>ANY</source>
-      <translation type="unfinished">ANY</translation>
+      <translation>HERHANGİ</translation>
     </message>
   </context>
   <context>
@@ -1430,11 +1430,11 @@
     <name>NewLinkDialog</name>
     <message>
       <source>New Link - %1</source>
-      <translation type="unfinished">New Link - %1</translation>
+      <translation>Yeni Bağlantı - %1</translation>
     </message>
     <message>
       <source>The previous link will be invalidated once a new one has been issued</source>
-      <translation type="unfinished">The previous link will be invalidated once a new one has been issued</translation>
+      <translation>Yeni bir bağlantı yayınlandığında önceki bağlantı geçersiz kılınacaktır</translation>
     </message>
     <message>
       <source>Create</source>
@@ -1449,7 +1449,7 @@
     </message>
     <message>
       <source>You have not created any Lists yet. With lists you can store multiple values to use them in Event Rules. Create a new List to start adding entries.</source>
-      <translation type="unfinished">You have not created any Lists yet. With lists you can store multiple values to use them in Event Rules. Create a new List to start adding entries.</translation>
+      <translation>Henüz herhangi bir Liste oluşturmadınız. Listelerle, Etkinlik Kurallarında kullanmak üzere birden fazla değeri saklayabilirsiniz. Giriş eklemeye başlamak için yeni bir Liste oluşturun.</translation>
     </message>
     <message>
       <source>Create New...</source>
@@ -1524,7 +1524,7 @@
     </message>
     <message>
       <source>No custom groups yet</source>
-      <translation type="unfinished">No custom groups yet</translation>
+      <translation>Henüz özel grup yok</translation>
     </message>
     <message>
       <source>No groups found</source>
@@ -1540,7 +1540,7 @@
     </message>
     <message>
       <source>Use controls on the left to add to a group</source>
-      <translation type="unfinished">Use controls on the left to add to a group</translation>
+      <translation>Bir gruba eklemek için soldaki kontrolleri kullanın</translation>
     </message>
     <message>
       <source>Member of</source>
@@ -1567,7 +1567,7 @@
     <name>PasswordChangeDialog</name>
     <message>
       <source>Change password - %1</source>
-      <translation type="unfinished">Change password - %1</translation>
+      <translation>Şifreyi değiştir - %1</translation>
     </message>
     <message>
       <source>Login</source>
@@ -1605,7 +1605,7 @@
     </message>
     <message>
       <source>Automatically add dependent permissions</source>
-      <translation type="unfinished">Automatically add dependent permissions</translation>
+      <translation>Bağımlı izinleri otomatik olarak ekle</translation>
     </message>
     <message>
       <source>Use %1 or %2 to select multiple resources, or %3 to clear the selection</source>
@@ -1629,7 +1629,7 @@
     </message>
     <message>
       <source>Plugins are programs that run on the %1 Server to enable seamless video analytics integrations.</source>
-      <translation type="unfinished">Plugins are programs that run on the %1 Server to enable seamless video analytics integrations.</translation>
+      <translation>Eklentiler, kesintisiz video analizi entegrasyonlarını sağlamak için %1 Sunucusu üzerinde çalışan programlardır.</translation>
     </message>
   </context>
   <context>
@@ -2271,24 +2271,24 @@ Nesneyi takip etmek için Alt + Tıklama tuşlarına basın</translation>
     <name>TemporaryLinkSettings</name>
     <message>
       <source>Link Valid Until</source>
-      <translation type="unfinished">Link Valid Until</translation>
+      <translation>Bağlantı Geçerlilik Tarihi</translation>
     </message>
     <message>
       <source>The link will remain accessible until the date specified (including, based on server time)</source>
-      <translation type="unfinished">The link will remain accessible until the date specified (including, based on server time)</translation>
+      <translation>Bağlantı, belirtilen tarihe kadar erişilebilir kalacaktır (sunucu zamanına bağlı olarak)</translation>
     </message>
     <message>
       <source>Revoke access after login</source>
-      <translation type="unfinished">Revoke access after login</translation>
+      <translation>Giriş yaptıktan sonra erişimi iptal edin</translation>
     </message>
     <message>
       <source>Access may be revoked earlier if the link validity period ends</source>
-      <translation type="unfinished">Access may be revoked earlier if the link validity period ends</translation>
+      <translation>Bağlantı geçerlilik süresi sona ererse erişim daha erken iptal edilebilir</translation>
     </message>
     <message>
       <source>In</source>
       <extracomment>&apos;In&apos; as in sentence: &apos;Revoke access after login in N hours&apos;.</extracomment>
-      <translation type="unfinished">In</translation>
+      <translation>İçinde</translation>
     </message>
   </context>
   <context>
@@ -2365,7 +2365,7 @@ Nesneyi takip etmek için Alt + Tıklama tuşlarına basın</translation>
     </message>
     <message>
       <source>Time is unavailable due to DST changes</source>
-      <translation type="unfinished">Time is unavailable due to DST changes</translation>
+      <translation>DST değişiklikleri nedeniyle saat kullanılamıyor</translation>
     </message>
   </context>
   <context>
@@ -2449,11 +2449,11 @@ Nesneyi takip etmek için Alt + Tıklama tuşlarına basın</translation>
     </message>
     <message>
       <source>You need to specify only user&apos;s email address.</source>
-      <translation type="unfinished">You need to specify only user&apos;s email address.</translation>
+      <translation>Yalnızca kullanıcı e-posta adresini belirtmeniz gerekir.</translation>
     </message>
     <message>
       <source>If user already has an account, he will see this system and will be able to log in to it. If not, we&apos;ll send an invitation to this address and user will see this system right after he creates an account.</source>
-      <translation type="unfinished">If user already has an account, he will see this system and will be able to log in to it. If not, we&apos;ll send an invitation to this address and user will see this system right after he creates an account.</translation>
+      <translation>Kullanıcının halihazırda bir hesabı varsa bu sistemi görecek ve giriş yapabilecektir. Değilse bu adrese bir davet gönderilecek ve kullanıcı hesap oluşturduktan hemen sonra bu sistemi görecektir.</translation>
     </message>
     <message>
       <source>Permission Groups</source>
@@ -2465,11 +2465,11 @@ Nesneyi takip etmek için Alt + Tıklama tuşlarına basın</translation>
     </message>
     <message>
       <source>Regular user with credentials</source>
-      <translation type="unfinished">Regular user with credentials</translation>
+      <translation>Kimlik bilgilerine sahip normal kullanıcı</translation>
     </message>
     <message>
       <source>Temporary with link</source>
-      <translation type="unfinished">Temporary with link</translation>
+      <translation>Bağlantılı geçici</translation>
     </message>
     <message>
       <source>Passwords do not match</source>
@@ -2547,7 +2547,7 @@ Nesneyi takip etmek için Alt + Tıklama tuşlarına basın</translation>
     </message>
     <message>
       <source>Set password to enable insecure authentication</source>
-      <translation type="unfinished">Set password to enable insecure authentication</translation>
+      <translation>Güvenli olmayan kimlik doğrulamayı etkinleştirmek için şifre belirleyin</translation>
     </message>
     <message>
       <source>Allow insecure (digest) authentication</source>
@@ -2563,7 +2563,7 @@ Nesneyi takip etmek için Alt + Tıklama tuşlarına basın</translation>
     </message>
     <message>
       <source>Access expires</source>
-      <translation type="unfinished">Access expires</translation>
+      <translation>Erişimin süresi doluyor</translation>
     </message>
     <message>
       <source>Access Link</source>
@@ -2583,7 +2583,7 @@ Nesneyi takip etmek için Alt + Tıklama tuşlarına basın</translation>
     </message>
     <message>
       <source>No valid link for this user</source>
-      <translation type="unfinished">No valid link for this user</translation>
+      <translation>Bu kullanıcı için geçerli bir bağlantı yok</translation>
     </message>
     <message>
       <source>Copied</source>

@@ -904,7 +904,7 @@
     <name>ChangeUserPasswordDialog</name>
     <message>
       <source>Change password</source>
-      <translation>パスワードを変更</translation>
+      <translation>パスワードの変更</translation>
     </message>
   </context>
   <context>
@@ -2755,7 +2755,7 @@
     </message>
     <message>
       <source>Server is offline. Statistics are not available.</source>
-      <translation>サーバーがオフラインです　統計情報は利用できません</translation>
+      <translation>サーバーがオフラインです。統計情報は利用できません。</translation>
     </message>
     <message>
       <source>Additional storage</source>
@@ -2827,7 +2827,7 @@
     </message>
     <message>
       <source>Nothing matches your search.</source>
-      <translation>検索で一致するものはありません</translation>
+      <translation>検索に一致するものはありません。</translation>
     </message>
     <message>
       <source>Groups</source>
@@ -2985,7 +2985,7 @@
     </message>
     <message>
       <source>Upload Footage</source>
-      <translation>映像をアップロード</translation>
+      <translation>映像のアップロード</translation>
     </message>
     <message>
       <source>Upload File...</source>

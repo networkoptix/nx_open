@@ -75,7 +75,7 @@
     </message>
     <message>
       <source>The ticket key is invalid or expired.</source>
-      <translation type="unfinished">The ticket key is invalid or expired.</translation>
+      <translation>Bilet anahtarı geçersiz veya süresi dolmuş.</translation>
     </message>
     <message>
       <source>Wrong password</source>
@@ -224,7 +224,7 @@
     <message>
       <source>Members of this group have unlimited System privileges. Administrators can create and modify Power Users, merge Systems and connect or disconnect System to %1.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Members of this group have unlimited System privileges. Administrators can create and modify Power Users, merge Systems and connect or disconnect System to %1.</translation>
+      <translation>Bu grubun üyeleri sınırsız Sistem ayrıcalıklarına sahiptir. Yöneticiler Uzman Kullanıcılar oluşturabilir ve değiştirebilir, Sistemleri birleştirebilir ve Sistemi %1 ile bağlayabilir veya bağlantısını kesebilir.</translation>
     </message>
   </context>
   <context>
@@ -773,7 +773,7 @@
     <message numerus="yes">
       <source>%n Local Recording Services</source>
       <translation type="unfinished">
-        <numerusform>%n Local Recording Services</numerusform>
+        <numerusform>%n Yerel Kayıt Hizmetleri</numerusform>
         <numerusform>%n Local Recording Services</numerusform>
       </translation>
     </message>
@@ -781,7 +781,7 @@
       <source>%n/%1 Local Recording Services</source>
       <comment>%n will be replaced by the total count</comment>
       <translation type="unfinished">
-        <numerusform>%n/%1 Local Recording Services</numerusform>
+        <numerusform>%n/%1 Yerel Kayıt Hizmetleri</numerusform>
         <numerusform>%n/%1 Local Recording Services</numerusform>
       </translation>
     </message>
@@ -1051,7 +1051,7 @@
     <message>
       <source>Msec</source>
       <comment>Capitalized long suffix for displaying milliseconds</comment>
-      <translation type="unfinished">Msec</translation>
+      <translation>Msn</translation>
     </message>
     <message>
       <source>Sec</source>
@@ -1071,17 +1071,17 @@
     <message>
       <source>Days</source>
       <comment>Capitalized long suffix for displaying days</comment>
-      <translation type="unfinished">Days</translation>
+      <translation>Günler</translation>
     </message>
     <message>
       <source>Wks</source>
       <comment>Capitalized long suffix for displaying weeks</comment>
-      <translation type="unfinished">Wks</translation>
+      <translation>Haftalar</translation>
     </message>
     <message>
       <source>Mos</source>
       <comment>Capitalized long suffix for displaying months</comment>
-      <translation type="unfinished">Mos</translation>
+      <translation>Aylar</translation>
     </message>
     <message>
       <source>Yrs</source>
@@ -1124,7 +1124,7 @@
       <source>Days</source>
       <comment>Capitalized fapitalized full suffix for displaying days</comment>
       <translation type="unfinished">
-        <numerusform>Days</numerusform>
+        <numerusform>Günler</numerusform>
         <numerusform>Days</numerusform>
       </translation>
     </message>
@@ -1132,7 +1132,7 @@
       <source>Weeks</source>
       <comment>Capitalized full suffix for displaying weeks</comment>
       <translation type="unfinished">
-        <numerusform>Weeks</numerusform>
+        <numerusform>Haftalar</numerusform>
         <numerusform>Weeks</numerusform>
       </translation>
     </message>
@@ -1140,7 +1140,7 @@
       <source>Months</source>
       <comment>Capitalized full suffix for displaying months</comment>
       <translation type="unfinished">
-        <numerusform>Months</numerusform>
+        <numerusform>Aylar</numerusform>
         <numerusform>Months</numerusform>
       </translation>
     </message>
@@ -1148,7 +1148,7 @@
       <source>Years</source>
       <comment>Capitalized full suffix for displaying years</comment>
       <translation type="unfinished">
-        <numerusform>Years</numerusform>
+        <numerusform>Yıllar</numerusform>
         <numerusform>Years</numerusform>
       </translation>
     </message>
@@ -1263,7 +1263,7 @@
     </message>
     <message>
       <source>Check internet connection between VMS and license server.</source>
-      <translation type="unfinished">Check internet connection between VMS and license server.</translation>
+      <translation>VMS ile lisans sunucusu arasındaki internet bağlantısını kontrol edin.</translation>
     </message>
   </context>
   <context>
@@ -1290,21 +1290,21 @@
     <message numerus="yes">
       <source>%n minutes ago</source>
       <translation type="unfinished">
-        <numerusform>%n minutes ago</numerusform>
+        <numerusform>%n dakika önce</numerusform>
         <numerusform>%n minutes ago</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n hours ago</source>
       <translation type="unfinished">
-        <numerusform>%n hours ago</numerusform>
+        <numerusform>%n saat önce</numerusform>
         <numerusform>%n hours ago</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n days ago</source>
       <translation type="unfinished">
-        <numerusform>%n days ago</numerusform>
+        <numerusform>%n gün önce</numerusform>
         <numerusform>%n days ago</numerusform>
       </translation>
     </message>
@@ -1361,7 +1361,7 @@
     </message>
     <message>
       <source>Unlock this portion of the archive to export its contents.</source>
-      <translation type="unfinished">Unlock this portion of the archive to export its contents.</translation>
+      <translation>İçeriğini dışa aktarmak için arşivin bu bölümünün kilidini açın.</translation>
     </message>
     <message>
       <source>Archive is unavailable now. Please try again later.</source>
@@ -2454,7 +2454,7 @@
     </message>
     <message>
       <source>Services Issue</source>
-      <translation type="unfinished">Services Issue</translation>
+      <translation>Hizmet Sorunu</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; has license migration issue</source>
@@ -2466,7 +2466,7 @@
     </message>
     <message>
       <source>The following licenses were not migrated:</source>
-      <translation type="unfinished">The following licenses were not migrated:</translation>
+      <translation>Aşağıdaki lisanslar taşınmadı:</translation>
     </message>
     <message>
       <source>License</source>
@@ -2493,17 +2493,17 @@
     <message numerus="yes">
       <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
       <translation type="unfinished">
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
+        <numerusform>Hizmetin aşırı kullanımı nedeniyle %n kanalda ücretli entegrasyon hizmeti kullanımı durduruldu.</numerusform>
         <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
       </translation>
     </message>
     <message>
       <source>Failed to migrate licenses.</source>
-      <translation type="unfinished">Failed to migrate licenses.</translation>
+      <translation>Lisanslar taşınamadı.</translation>
     </message>
     <message>
       <source>Skipped import of licenses. Another migration attempt will be automatically scheduled for later.</source>
-      <translation type="unfinished">Skipped import of licenses. Another migration attempt will be automatically scheduled for later.</translation>
+      <translation>Lisansların içe aktarımı atlandı. Başka bir aktarım denemesi daha sonra otomatik olarak planlanacak.</translation>
     </message>
   </context>
 </TS>

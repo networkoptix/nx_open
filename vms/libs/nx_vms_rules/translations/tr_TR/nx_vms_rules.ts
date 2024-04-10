@@ -36,7 +36,7 @@
     </message>
     <message>
       <source>Begin When</source>
-      <translation type="unfinished">Begin When</translation>
+      <translation>Başlama Zamanı</translation>
     </message>
     <message>
       <source>Occurs at</source>
@@ -488,7 +488,7 @@
     </message>
     <message>
       <source>Begin When</source>
-      <translation type="unfinished">Begin When</translation>
+      <translation>Başlama Zamanı</translation>
     </message>
     <message>
       <source>Occurs at</source>
@@ -703,7 +703,7 @@
     </message>
     <message>
       <source>Begin When</source>
-      <translation type="unfinished">Begin When</translation>
+      <translation>Başlama Zamanı</translation>
     </message>
   </context>
   <context>
@@ -804,7 +804,7 @@
     <message numerus="yes">
       <source>Recording on %n channels was stopped due to service overuse.</source>
       <translation type="unfinished">
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
+        <numerusform>Hizmetin aşırı kullanımı nedeniyle %n kanallarındaki kayıt durduruldu.</numerusform>
         <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
       </translation>
     </message>
@@ -967,7 +967,7 @@
     </message>
     <message>
       <source>By</source>
-      <translation type="unfinished">By</translation>
+      <translation>Tarafından</translation>
     </message>
   </context>
   <context>
