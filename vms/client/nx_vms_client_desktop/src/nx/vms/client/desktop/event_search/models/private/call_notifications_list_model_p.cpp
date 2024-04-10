@@ -116,14 +116,14 @@ void CallNotificationsListModel::Private::addNotification(
     eventData.source = camera;
     eventData.previewCamera = camera;
 
-    // Id is fixed and equal to intercom id, so this informer will be removed
-    // when another client instance via changing toogle state.
-    eventData.id = runtimeParameters.eventResourceId;
-
     switch (message)
     {
         case MessageType::showIntercomInformer:
         {
+            // Id is fixed and equal to intercom id, so this informer will be removed
+            // on every client instance via changing toggle state.
+            eventData.id = runtimeParameters.eventResourceId;
+
             eventData.actionId = menu::OpenIntercomLayoutAction;
             eventData.title = tr("Calling...");
             eventData.icon = qnSkin->pixmap("events/call.svg");
@@ -179,6 +179,7 @@ void CallNotificationsListModel::Private::addNotification(
         }
         case MessageType::showMissedCallInformer:
         {
+            eventData.id = nx::Uuid::createUuid(); //< We have to show every missed call separately.
             eventData.actionId = menu::NoAction;
             eventData.title = tr("Missed Call");
             eventData.icon = qnSkin->pixmap("events/missed_call.svg");
