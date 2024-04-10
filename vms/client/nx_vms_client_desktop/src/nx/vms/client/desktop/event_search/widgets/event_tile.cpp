@@ -1092,6 +1092,7 @@ void EventTile::clear()
     setIcon({});
     setPlaceholder({});
     setImageProvider({}, true);
+    setVideoPreviewResource({});
     setPreviewHighlightRect({});
     setAction({});
     setBusyIndicatorVisible(false);
