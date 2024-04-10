@@ -15,5 +15,6 @@ struct NX_VMS_API AccessRightsDataDeprecated
 };
 #define AccessRightsDataDeprecated_Fields (userId)(resourceIds)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST_EX(AccessRightsDataDeprecated, (ubjson)(json))
+NX_REFLECTION_INSTRUMENT(AccessRightsDataDeprecated, AccessRightsDataDeprecated_Fields)
 
 } // namespace nx::vms::api

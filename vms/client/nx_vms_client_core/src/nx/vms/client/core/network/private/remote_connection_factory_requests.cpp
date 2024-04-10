@@ -22,7 +22,10 @@
 #include <nx/utils/serialization/format.h>
 #include <nx/utils/serialization/qjson.h>
 #include <nx/utils/serialization/qt_containers_reflect_json.h>
+#include <nx/vms/api/data/access_rights_data_deprecated.h>
+#include <nx/vms/api/data/global_permission_deprecated.h>
 #include <nx/vms/api/data/server_model.h>
+#include <nx/vms/api/data/user_data_deprecated.h>
 #include <nx/vms/client/core/utils/cloud_session_token_updater.h>
 #include <nx/vms/common/saas/saas_service_manager.h>
 #include <nx_ec/ec_api_common.h>
@@ -57,6 +60,12 @@ ExternalErrorHandler expectedErrorCodes(ExternalErrorMap errorCodes)
             return iter->second;
         };
 }
+
+static const auto kExpectedUserErrorCodes = expectedErrorCodes({
+    // We are forming REST api url including a user name, so "not found" error can be
+    // returned in case of server-cloud db desync.
+    {StatusCode::notFound, RemoteConnectionErrorCode::networkContentError}
+});
 
 std::optional<RemoteConnectionErrorCode> unauthorizedErrorDetails(const HttpHeaders& headers)
 {
@@ -300,7 +309,151 @@ struct RemoteConnectionFactoryRequestsManager::Private
         return future.get();
     }
 
+
+    Request makeRequestWithCredentials(ContextPtr context) const;
+    nx::vms::api::UserModelV1 getUserModel(ContextPtr context) const;
+    nx::vms::api::UserModelV1 getUserModelDeprecated(ContextPtr context) const;
 };
+
+Request RemoteConnectionFactoryRequestsManager::Private::makeRequestWithCredentials(
+    ContextPtr context) const
+{
+    auto request = makeRequestWithCertificateValidation(context->handshakeCertificateChain);
+    request->setCredentials(context->credentials());
+    return request;
+}
+
+nx::vms::api::UserModelV1 RemoteConnectionFactoryRequestsManager::Private::getUserModel(
+    ContextPtr context) const
+{
+    using namespace nx::vms::api;
+
+    if (!NX_ASSERT(context->isRestApiSupported()))
+        return {};
+
+    NX_DEBUG(this, "Requesting user %1 model from %2", context->credentials().username, context);
+
+    const auto encodedUsername = QUrl::toPercentEncoding(
+        QString::fromStdString(context->credentials().username)).toStdString();
+    const auto url = makeUrl(context->address(), "/rest/v1/users/" + encodedUsername);
+    auto result = doGet<UserModelV1>(
+        url, context, makeRequestWithCredentials(context), kExpectedUserErrorCodes);
+
+    if (context->failed())
+        return {};
+
+    if (!result.userRoleId.isNull())
+    {
+        NX_DEBUG(this, "Requesting user role model for %1 from %2",
+            context->credentials().username, context);
+
+        const auto encodedRoleId = QUrl::toPercentEncoding(
+            context->compatibilityUserModel->userRoleId.toString()).toStdString();
+        const auto url = makeUrl(context->address(), "/rest/v1/userRoles/" + encodedRoleId);
+        const auto role = doGet<UserRoleModel>(url, context, makeRequestWithCredentials(context));
+        if (context->failed())
+            return {};
+
+        // As we don't really need compatibility mode for the desktop client, it is enough
+        // to just copy permissions and accessible resources to user.
+        result.permissions = role.permissions;
+        result.accessibleResources = role.accessibleResources;
+    }
+    return result;
+}
+
+nx::vms::api::UserModelV1 RemoteConnectionFactoryRequestsManager::Private::getUserModelDeprecated(
+    ContextPtr context) const
+{
+    using namespace nx::vms::api;
+
+    NX_DEBUG(this, "Requesting deprecated user %1 model from %2", context->credentials().username,
+        context);
+
+    const auto url = makeUrl(context->address(), "/ec2/getUsers");
+    const auto users = doGet<UserDataDeprecatedList>(
+        url, context, makeRequestWithCredentials(context), kExpectedUserErrorCodes);
+
+    if (context->failed())
+        return {};
+
+    const auto userIt = std::find_if(users.cbegin(), users.cend(),
+        [userName = context->credentials().username](const auto& user)
+        {
+            return user.name == userName;
+        });
+
+    if (userIt == users.cend())
+    {
+        context->setError(RemoteConnectionErrorCode::unauthorized);
+        return {};
+    }
+
+    UserModelV1 result;
+    result.id = userIt->id;
+    result.isOwner = userIt->isAdmin;
+    result.name = userIt->name;
+    result.permissions = userIt->permissions;
+    result.userRoleId = userIt->userRoleId;
+    result.email = userIt->email;
+    result.fullName = userIt->fullName;
+    result.type = userIt->isCloud
+        ? UserType::cloud
+        : (userIt->isLdap ? UserType::ldap : UserType::local);
+
+    if (!result.userRoleId.isNull()
+        || result.permissions.testFlag(GlobalPermissionDeprecated::customUser))
+    {
+        // Request available resources.
+
+        const auto url = makeUrl(context->address(), "/ec2/getAccessRights");
+        const auto accessRights = doGet<AccessRightsDataDeprecatedList>(
+            url, context, makeRequestWithCredentials(context));
+        if (context->failed())
+            return {};
+
+        const auto itRights = std::find_if(accessRights.cbegin(), accessRights.cend(),
+            [result](const auto& rights)
+            {
+                return rights.userId == result.id || rights.userId == result.userRoleId;
+            });
+
+        if (itRights == accessRights.cend())
+        {
+            context->setError(RemoteConnectionErrorCode::unauthorized);
+            return {};
+        }
+
+        result.accessibleResources = itRights->resourceIds;
+    }
+
+    if (!result.userRoleId.isNull())
+    {
+        // Request permissions for custom role.
+
+        const auto url = makeUrl(context->address(), "/ec2/getUserRoles");
+        const auto roles = doGet<UserRoleModelList>(
+            url, context, makeRequestWithCredentials(context));
+        if (context->failed())
+            return {};
+
+        const auto itRole = std::find_if(roles.cbegin(), roles.cend(),
+            [roleId = result.userRoleId](const auto& role)
+            {
+                return roleId == role.id;
+            });
+
+        if (itRole == roles.cend())
+        {
+            context->setError(RemoteConnectionErrorCode::unauthorized);
+            return {};
+        }
+
+        result.permissions = itRole->permissions;
+    }
+
+    return result;
+}
 
 RemoteConnectionFactoryRequestsManager::RemoteConnectionFactoryRequestsManager(
     CertificateVerifier* certificateVerifier)
@@ -398,42 +551,9 @@ RemoteConnectionFactoryRequestsManager::ServersInfoReply
 nx::vms::api::UserModelV1 RemoteConnectionFactoryRequestsManager::getUserModel(
     ContextPtr context) const
 {
-    NX_DEBUG(this, "Requesting user %1 model from %2", context->credentials().username, context);
-
-    const auto encodedUsername =
-        QUrl::toPercentEncoding(QString::fromStdString(context->credentials().username))
-            .toStdString();
-
-    const auto url = makeUrl(context->address(), "/rest/v1/users/" + encodedUsername);
-    auto request = d->makeRequestWithCertificateValidation(context->handshakeCertificateChain);
-    request->setCredentials(context->credentials());
-    return d->doGet<nx::vms::api::UserModelV1>(
-        url,
-        context,
-        std::move(request),
-        expectedErrorCodes({
-            // We are forming REST api url including a user name, so "not found" error can be
-            // returned in case of server-cloud db desync.
-            {StatusCode::notFound, RemoteConnectionErrorCode::networkContentError}
-        }));
-}
-
-nx::vms::api::UserRoleModel RemoteConnectionFactoryRequestsManager::getUserRoleModel(
-    ContextPtr context) const
-{
-    NX_DEBUG(this, "Requesting user role model for %1 from %2",
-        context->credentials().username, context);
-
-    const auto encodedRoleId = QUrl::toPercentEncoding(
-        context->compatibilityUserModel->userRoleId.toString()).toStdString();
-
-    const auto url = makeUrl(context->address(), "/rest/v1/userRoles/" + encodedRoleId);
-    auto request = d->makeRequestWithCertificateValidation(context->handshakeCertificateChain);
-    request->setCredentials(context->credentials());
-    return d->doGet<nx::vms::api::UserRoleModel>(
-        url,
-        context,
-        std::move(request));
+    return context->isRestApiSupported()
+        ? d->getUserModel(context)
+        : d->getUserModelDeprecated(context);
 }
 
 nx::vms::api::LoginUser RemoteConnectionFactoryRequestsManager::getUserType(
@@ -533,8 +653,6 @@ nx::vms::api::LoginSession RemoteConnectionFactoryRequestsManager::getCurrentSes
 {
     NX_DEBUG(this, "Requesting username from %1", context);
     const auto url = makeUrl(context->address(), "/rest/v1/login/sessions/current");
-    auto request = d->makeRequestWithCertificateValidation(context->handshakeCertificateChain);
-    request->setCredentials(context->credentials());
 
     ExternalErrorMap expectedErrors{
         {StatusCode::unprocessableEntity, RemoteConnectionErrorCode::sessionExpired},
@@ -562,7 +680,7 @@ nx::vms::api::LoginSession RemoteConnectionFactoryRequestsManager::getCurrentSes
     return d->doGet<nx::vms::api::LoginSession>(
         url,
         context,
-        std::move(request),
+        d->makeRequestWithCredentials(context),
         expectedErrorCodes(expectedErrors));
 }
 
@@ -585,9 +703,7 @@ void RemoteConnectionFactoryRequestsManager::checkDigestAuthentication(ContextPt
     }
 
     const auto url = makeUrl(context->address(), "/api/moduleInformationAuthenticated");
-    auto request = d->makeRequestWithCertificateValidation(context->handshakeCertificateChain);
-    request->setCredentials(context->credentials());
-    d->doGet<ModuleInformationWrapper>(url, context, std::move(request));
+    d->doGet<ModuleInformationWrapper>(url, context, d->makeRequestWithCredentials(context));
 }
 
 std::future<RemoteConnectionFactoryContext::CloudTokenInfo>
