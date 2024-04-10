@@ -16,8 +16,7 @@
 namespace nx::cloud::relay::api::detail {
 
 BasicClient::BasicClient(const nx::utils::Url& baseUrl):
-    m_baseUrl(baseUrl),
-    m_prevSysErrorCode(SystemError::noError)
+    m_baseUrl(baseUrl)
 {
 }
 
@@ -67,6 +66,11 @@ nx::utils::Url BasicClient::url() const
 SystemError::ErrorCode BasicClient::prevRequestSysErrorCode() const
 {
     return m_prevSysErrorCode;
+}
+
+nx::network::http::StatusCode::Value BasicClient::prevRequestHttpStatusCode() const
+{
+    return m_prevHttpStatusCode;
 }
 
 void BasicClient::setTimeout(std::optional<std::chrono::milliseconds> timeout)

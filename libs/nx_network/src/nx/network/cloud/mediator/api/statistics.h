@@ -11,19 +11,56 @@
 
 namespace nx::hpm::api {
 
+template<typename T>
+using Percentiles = std::map<int /*percentile (50, 95, 99)*/, T>;
+
+using PercentilesMs = Percentiles<std::chrono::milliseconds>;
+
+
+struct ConnectTypeStatistics
+{
+    int count = 0;
+    PercentilesMs responseTimePercentiles;
+};
+NX_REFLECTION_INSTRUMENT(ConnectTypeStatistics, (count)(responseTimePercentiles))
+
+
+struct HostStatistics
+{
+    std::map<std::string /*errorCode*/, int /*count*/> sysErrorCodes;
+    //NOTE: using int here for the http status code so that json shows "502" instead of "Service Unavailable"
+    std::optional<std::map<int/*http status code*/, int /*count*/>> httpStatusCodes;
+};
+NX_REFLECTION_INSTRUMENT(HostStatistics, (sysErrorCodes)(httpStatusCodes))
+
+
+struct NatTraversalResultCodeStatistics
+{
+    int count = 0;
+    std::map<std::string /*hostname*/, HostStatistics> hosts;
+};
+NX_REFLECTION_INSTRUMENT(NatTraversalResultCodeStatistics, (count)(hosts))
+
+
 struct CloudConnectStatistics
 {
     int serverCount = 0;
     int clientCount = 0;
+
     int totalConnectionsEstablishedPerMinute = 0;
-    std::map<nx::network::cloud::ConnectType, int> establishedConnectionsPerType;
+    std::map<nx::network::cloud::ConnectType, ConnectTypeStatistics> establishedConnectionsPerType;
+
     int totalConnectionsFailedPerMinute = 0;
-    std::map<api::NatTraversalResultCode, int> failedConnectionsPerResultCode;
+    std::map<api::NatTraversalResultCode, NatTraversalResultCodeStatistics> failedConnectionsPerResultCode;
+
+    // Response times from the mediator for successful connections.
+    PercentilesMs mediatorResponseTimePercentiles;
 };
 
 #define CloudConnectStatistics_Fields (serverCount)(clientCount) \
     (totalConnectionsEstablishedPerMinute)(totalConnectionsFailedPerMinute) \
-    (establishedConnectionsPerType)(failedConnectionsPerResultCode)
+    (establishedConnectionsPerType)(failedConnectionsPerResultCode) \
+    (mediatorResponseTimePercentiles)
 
 NX_REFLECTION_INSTRUMENT(CloudConnectStatistics, CloudConnectStatistics_Fields)
 

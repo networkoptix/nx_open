@@ -120,7 +120,10 @@ const char* toString(AttributeType val)
             return "directTcpConnectStartDelay";
         case connectType:
             return "connectType";
-
+        case httpStatusCode:
+            return "httpStatusCode";
+        case duration:
+            return "duration";
         case systemErrorCode:
             return "systemErrorCode";
 

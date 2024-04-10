@@ -34,10 +34,6 @@ RendezvousConnectorWithVerification::RendezvousConnectorWithVerification(
 {
 }
 
-RendezvousConnectorWithVerification::~RendezvousConnectorWithVerification()
-{
-}
-
 void RendezvousConnectorWithVerification::pleaseStop(
     nx::utils::MoveOnlyFunc<void()> completionHandler)
 {

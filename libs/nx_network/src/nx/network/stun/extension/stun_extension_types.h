@@ -5,6 +5,8 @@
 #include <string_view>
 #include <vector>
 
+#include <nx/reflect/type_utils.h>
+
 #include <nx/network/cloud/cloud_connect_type.h>
 #include <nx/network/cloud/data/result_code.h>
 #include <nx/network/socket_common.h>
@@ -139,6 +141,11 @@ enum AttributeType
     trafficRelayingStartDelay,
     directTcpConnectStartDelay,
     connectType,
+    httpStatusCode,
+    duration,
+    tunnelConnectResponseTime,
+    mediatorResponseTime,
+
 
     systemErrorCode = stun::attrs::userDefined + 0x500,
 };
@@ -289,6 +296,51 @@ struct NX_NETWORK_API HostNameList : StringList
     static const AttributeType TYPE = hostNameList;
     HostNameList( const std::vector< std::string >& hostNames )
         : StringList( TYPE, hostNames ) {}
+};
+
+struct NX_NETWORK_API HttpStatusCode : stun::attrs::IntAttribute
+{
+    static constexpr AttributeType TYPE = httpStatusCode;
+    HttpStatusCode(int value) :
+        stun::attrs::IntAttribute(TYPE, value) {}
+
+    inline int get() const { return value(); }
+};
+
+struct NX_NETWORK_API Duration : stun::attrs::Int64Attribute
+{
+    static constexpr AttributeType TYPE = duration;
+
+    template<
+        typename StdChronoDuration,
+        typename = std::enable_if_t<nx::reflect::IsStdChronoDurationV<StdChronoDuration>>
+    >
+    Duration(StdChronoDuration value) :
+        stun::attrs::Int64Attribute(TYPE, value.count()) {}
+};
+
+struct NX_NETWORK_API TunnelConnectResponseTime : stun::attrs::Int64Attribute
+{
+    static constexpr AttributeType TYPE = tunnelConnectResponseTime;
+
+    template<
+        typename StdChronoDuration,
+        typename = std::enable_if_t<nx::reflect::IsStdChronoDurationV<StdChronoDuration>>
+    >
+    TunnelConnectResponseTime(StdChronoDuration value) :
+        stun::attrs::Int64Attribute(TYPE, value.count()) {}
+};
+
+struct NX_NETWORK_API MediatorResponseTime : stun::attrs::Int64Attribute
+{
+    static constexpr AttributeType TYPE = mediatorResponseTime;
+
+    template<
+        typename StdChronoDuration,
+        typename = std::enable_if_t<nx::reflect::IsStdChronoDurationV<StdChronoDuration>>
+    >
+    MediatorResponseTime(StdChronoDuration value) :
+        stun::attrs::Int64Attribute(TYPE, value.count()) {}
 };
 
 } // namespace attrs

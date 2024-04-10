@@ -8,13 +8,13 @@
 #include <nx/network/aio/timer.h>
 #include <nx/network/cloud/mediator_address_publisher.h>
 #include <nx/network/cloud/mediator_connector.h>
-#include <nx/network/http/server/http_message_dispatcher.h>
-#include <nx/network/http/server/http_stream_socket_server.h>
+#include <nx/network/http/test_http_server.h>
 #include <nx/network/socket.h>
 #include <nx/network/stun/async_client.h>
 #include <nx/network/udt/udt_socket.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/thread/stoppable.h>
+#include "nx/network/http/test_http_server.h"
 
 namespace nx::network::cloud::test {
 
@@ -104,13 +104,19 @@ public:
      */
     void setCloudConnectionMethodMask(int mask);
 
+    bool registerStaticProcessor(
+        const std::string& path,
+        nx::Buffer msgBody,
+        const std::string& mimeType,
+        const nx::network::http::Method& method);
+
     //---------------------------------------------------------------------------------------------
 
     static std::unique_ptr<TestListeningPeer> buildServer(
         const SystemCredentials& system,
         std::string name,
         ServerTweak serverConf,
-        const SocketAddress& stunUdpEndpoint,
+        const SocketAddress& mediatorStunUdpEndpoint,
         const nx::utils::Url& mediatorTcpUrl);
 
 private:

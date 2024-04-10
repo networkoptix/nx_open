@@ -3,7 +3,7 @@
 #pragma once
 
 #include <nx/network/cloud/data/connection_result_data.h>
-#include <nx/network/http/http_types.h>
+#include <nx/network/http/http_status.h>
 #include <nx/network/http/server/api_request_result.h>
 #include <nx/reflect/enum_instrument.h>
 #include <nx/utils/system_error.h>
@@ -18,7 +18,8 @@ NX_REFLECTION_ENUM_CLASS(ResultCode,
     networkError,
     preemptiveConnectionCountAtMaximum,
     needRedirect,
-    unknownError
+    unknownError,
+    proxyError
 )
 
 NX_NETWORK_API hpm::api::NatTraversalResultCode toNatTraversalResultCode(ResultCode);

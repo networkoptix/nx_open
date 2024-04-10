@@ -6,6 +6,8 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 
+#include "nx/network/cloud/data/connection_result_data.h"
+#include "nx/network/http/http_status.h"
 #include "relay_outgoing_tunnel_connection.h"
 
 namespace nx::network::cloud::relay {
@@ -34,7 +36,7 @@ void Connector::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
     base_type::bindToAioThread(aioThread);
     m_relayClient->bindToAioThread(aioThread);
-    m_timer.bindToAioThread(aioThread);
+    m_timeoutTimer.bindToAioThread(aioThread);
 }
 
 int Connector::getPriority() const
@@ -56,7 +58,7 @@ void Connector::connect(
         [this, timeout]()
         {
             m_relayClient->setTimeout(timeout);
-
+            m_responseTimer.restart();
             m_relayClient->startSession(
                 m_connectSessionId,
                 m_targetHostAddress.host.toString(),
@@ -67,11 +69,12 @@ void Connector::connect(
                     onStartRelaySessionResponse(
                         resultCode,
                         m_relayClient->prevRequestSysErrorCode(),
+                        m_relayClient->prevRequestHttpStatusCode(),
                         std::move(response));
                 });
 
             if (timeout > std::chrono::milliseconds::zero())
-                m_timer.start(timeout, std::bind(&Connector::connectTimedOut, this));
+                m_timeoutTimer.start(timeout, std::bind(&Connector::connectTimedOut, this));
         });
 }
 
@@ -83,29 +86,39 @@ const AddressEntry& Connector::targetPeerAddress() const
 void Connector::stopWhileInAioThread()
 {
     m_relayClient.reset();
-    m_timer.pleaseStopSync();
+    m_timeoutTimer.pleaseStopSync();
 }
 
 void Connector::onStartRelaySessionResponse(
     nx::cloud::relay::api::ResultCode resultCode,
     SystemError::ErrorCode sysErrorCode,
+    nx::network::http::StatusCode::Value httpStatusCode,
     nx::cloud::relay::api::CreateClientSessionResponse response)
 {
-    NX_VERBOSE(this, "%1. Received relay start session response %2, %3",
-        m_connectSessionId, resultCode, SystemError::toString(sysErrorCode));
+    TunnelConnectResult result {
+        .resultCode = toNatTraversalResultCode(resultCode),
+        .sysErrorCode = sysErrorCode,
+        .stats = {
+            .connectType = ConnectType::proxy,
+            .responseTime = m_responseTimer.elapsed(),
+            .remoteAddress = m_relayUrl.displayAddress().toStdString()},
+    };
+    if (httpStatusCode != http::StatusCode::undefined)
+        result.stats.httpStatusCode = httpStatusCode;
+
+    NX_VERBOSE(this, "%1. Received relay start session response %2, %3, %4",
+        m_connectSessionId, resultCode, SystemError::toString(sysErrorCode),
+        http::StatusCode::toString(httpStatusCode));
 
     decltype(m_handler) handler;
     handler.swap(m_handler);
 
-    m_timer.pleaseStopSync();
+    m_timeoutTimer.pleaseStopSync();
 
-    if (resultCode != nx::cloud::relay::api::ResultCode::ok)
+    if (!result.ok())
     {
         m_relayClient.reset();
-        return handler(
-            toNatTraversalResultCode(resultCode),
-            sysErrorCode,
-            nullptr);
+        return handler(std::move(result));
     }
 
     if (response.sessionId != m_connectSessionId)
@@ -115,15 +128,12 @@ void Connector::onStartRelaySessionResponse(
         m_connectSessionId = response.sessionId;
     }
 
-    auto tunnelConnection = std::make_unique<OutgoingTunnelConnection>(
+    result.connection = std::make_unique<OutgoingTunnelConnection>(
         nx::utils::Url(response.actualRelayUrl),
         m_connectSessionId,
         std::move(m_relayClient));
 
-    handler(
-        hpm::api::NatTraversalResultCode::ok,
-        SystemError::noError,
-        std::move(tunnelConnection));
+    handler(std::move(result));
 }
 
 void Connector::connectTimedOut()
@@ -131,6 +141,7 @@ void Connector::connectTimedOut()
     onStartRelaySessionResponse(
         nx::cloud::relay::api::ResultCode::timedOut,
         SystemError::timedOut,
+        http::StatusCode::undefined,
         nx::cloud::relay::api::CreateClientSessionResponse());
 }
 

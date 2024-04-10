@@ -60,6 +60,11 @@ SystemError::ErrorCode Client::prevRequestSysErrorCode() const
     return m_actualClient->prevRequestSysErrorCode();
 }
 
+nx::network::http::StatusCode::Value Client::prevRequestHttpStatusCode() const
+{
+    return m_actualClient->prevRequestHttpStatusCode();
+}
+
 void Client::setTimeout(std::optional<std::chrono::milliseconds> timeout)
 {
     m_actualClient->setTimeout(timeout);

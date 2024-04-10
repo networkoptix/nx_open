@@ -29,6 +29,7 @@ public:
     virtual nx::utils::Url url() const override;
 
     virtual SystemError::ErrorCode prevRequestSysErrorCode() const override;
+    virtual nx::network::http::StatusCode::Value prevRequestHttpStatusCode() const override;
 
     virtual void setTimeout(std::optional<std::chrono::milliseconds> timeout) override;
 
@@ -68,7 +69,8 @@ protected:
 
 private:
     const nx::utils::Url m_baseUrl;
-    SystemError::ErrorCode m_prevSysErrorCode;
+    SystemError::ErrorCode m_prevSysErrorCode = SystemError::noError;
+    nx::network::http::StatusCode::Value m_prevHttpStatusCode = nx::network::http::StatusCode::undefined;
     std::optional<std::chrono::milliseconds> m_timeout;
 
     template<
@@ -202,6 +204,7 @@ void BasicClient::executeUpgradeRequest(
     CompletionHandler completionHandler)
 {
     auto httpClientPtr = httpClient.get();
+
     m_activeRequests.push_back(std::move(httpClient));
     httpClientPtr->executeUpgrade(
         httpMethod,
@@ -216,6 +219,9 @@ void BasicClient::executeUpgradeRequest(
             auto connection = httpClientPtr->takeSocket();
             auto httpClient = std::move(*httpClientIter);
             m_prevSysErrorCode = sysErrorCode;
+            m_prevHttpStatusCode = httpResponse
+                ? httpResponse->statusLine.statusCode
+                : nx::network::http::StatusCode::undefined;
             const auto resultCode = toUpgradeResultCode(sysErrorCode, httpResponse);
             m_activeRequests.erase(httpClientIter);
             completionHandler(
@@ -243,6 +249,9 @@ void BasicClient::executeRequest(
             auto contentLocationUrl =
                 httpClientPtr->httpClient().contentLocationUrl().toString().toStdString();
             m_prevSysErrorCode = sysErrorCode;
+            m_prevHttpStatusCode = httpResponse
+                ? httpResponse->statusLine.statusCode
+                : nx::network::http::StatusCode::undefined;
             const auto resultCode = toResultCode(sysErrorCode, httpResponse);
             auto requestContext = std::move(*httpClientIter);
             m_activeRequests.erase(httpClientIter);

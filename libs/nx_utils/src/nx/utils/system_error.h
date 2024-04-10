@@ -9,6 +9,7 @@
     #include <netdb.h>
 #endif
 
+#include <compare>
 #include <string>
 
 namespace SystemError {
@@ -90,6 +91,13 @@ NX_UTILS_API ErrorCode getLastOSErrorCode();
  * @return text description of errorCode in UTF-8 encoding.
  */
 NX_UTILS_API std::string toString(ErrorCode errorCode);
+
+/**
+ * @return short string description of the error code for named error codes e.g.
+ * SystemError::already is "already". For unknown error codes,
+ * "OS error: " + std::to_string(errorCode) is returned.
+ */
+NX_UTILS_API std::string toShortString(ErrorCode errorCode);
 
 /**
  * Same as toString(getLastOSErrorCode()).

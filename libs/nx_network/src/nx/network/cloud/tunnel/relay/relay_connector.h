@@ -5,6 +5,7 @@
 #include <memory>
 
 #include <nx/network/aio/timer.h>
+#include <nx/utils/elapsed_timer.h>
 
 #include "../abstract_tunnel_connector.h"
 #include "api/relay_api_client.h"
@@ -38,13 +39,15 @@ private:
     std::string m_connectSessionId;
     std::unique_ptr<nx::cloud::relay::api::Client> m_relayClient;
     ConnectCompletionHandler m_handler;
-    aio::Timer m_timer;
+    aio::Timer m_timeoutTimer;
+    nx::utils::ElapsedTimer m_responseTimer;
 
     virtual void stopWhileInAioThread() override;
 
     void onStartRelaySessionResponse(
         nx::cloud::relay::api::ResultCode resultCode,
         SystemError::ErrorCode sysErrorCode,
+        nx::network::http::StatusCode::Value httpStatusCode,
         nx::cloud::relay::api::CreateClientSessionResponse response);
     void connectTimedOut();
 };

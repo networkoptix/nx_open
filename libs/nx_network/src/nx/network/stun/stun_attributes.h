@@ -280,6 +280,13 @@ struct NX_NETWORK_API IntAttribute: Unknown
     int value() const;
 };
 
+struct NX_NETWORK_API Int64Attribute: Unknown
+{
+    Int64Attribute(int userType, std::int64_t value = 0);
+
+    std::int64_t value() const;
+};
+
 struct NX_NETWORK_API Priority: IntAttribute
 {
     static const int TYPE = priority;

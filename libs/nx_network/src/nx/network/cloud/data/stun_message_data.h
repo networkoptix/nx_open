@@ -85,6 +85,45 @@ protected:
         return true;
     }
 
+    bool readInt64AttributeValue(
+        const nx::network::stun::Message& message,
+        const int type,
+        std::int64_t* const value)
+    {
+        const auto attribute = message.getAttribute< network::stun::attrs::Int64Attribute >(type);
+        if (!attribute)
+        {
+            setErrorText(nx::utils::buildString(
+                "Missing required attribute ",
+                network::stun::extension::attrs::toString(
+                    static_cast<network::stun::extension::attrs::AttributeType>(type))));
+            return false;
+        }
+        *value = attribute->value();
+        return true;
+    }
+
+    /**
+     * Looks for an Int64Attribute with the duration type and stores its value into the given
+     * std::chrono::duration pointer.
+     * NOTE: this must be an explicit call to keep compatibility with older deployments that treat
+     * std::chrono::duration as an IntAttribute instead of Int64Attribute.
+    */
+    template<typename Rep, typename Period>
+    bool readDurationAttributeValue(
+        const nx::network::stun::Message& message,
+        int type,
+        std::chrono::duration<Rep, Period>* const value)
+    {
+        std::int64_t temp;
+        if (!readInt64AttributeValue(message, type, &temp))
+            return false;
+
+        *value = std::chrono::duration<Rep, Period>(temp);
+
+        return true;
+    }
+
     bool readAttributeValue(
         const nx::network::stun::Message& message,
         const int type,

@@ -136,6 +136,7 @@ public:
         { return m_httpMessageDispatcher; }
 
     void terminateListener();
+    void pleaseStopSync();
 
     // Installs handler to receive all incoming HTTP request.
     // handler->setNextHandler() receives the previous default handler.

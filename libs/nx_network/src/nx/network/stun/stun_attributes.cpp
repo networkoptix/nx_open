@@ -323,6 +323,34 @@ int IntAttribute::value() const
 }
 
 //-------------------------------------------------------------------------------------------------
+// Int64Attribute
+
+Int64Attribute::Int64Attribute(int userType, std::int64_t value):
+    Unknown(userType)
+{
+    const std::int64_t valueInNetworkByteOrder = htonll(value);
+    setBuffer(
+        Buffer(
+            reinterpret_cast<const char*>(&valueInNetworkByteOrder),
+            sizeof(valueInNetworkByteOrder)));
+}
+
+std::int64_t Int64Attribute::value() const
+{
+    const auto& buf = getBuffer();
+    std::int64_t valueInNetworkByteOrder = 0;
+    if (buf.size() != sizeof(valueInNetworkByteOrder))
+        return 0;
+
+    memcpy(
+        &valueInNetworkByteOrder,
+        buf.data(),
+        sizeof(valueInNetworkByteOrder));
+
+    return ntohll(valueInNetworkByteOrder);
+}
+
+//-------------------------------------------------------------------------------------------------
 // Priority
 
 Priority::Priority(int value):

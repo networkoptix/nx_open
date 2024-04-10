@@ -25,11 +25,9 @@ ConnectorExecutor::ConnectorExecutor(
 
     for (auto& connector: connectors)
     {
-        ConnectorContext context;
-        context.connector = std::move(connector.connector);
-        context.startDelay = connector.startDelay;
-        context.timer = std::make_unique<aio::Timer>();
-        m_connectors.emplace_back(std::move(context));
+        auto& connectorCtx = m_connectors.emplace_back();
+        connectorCtx.tunnelCtx = std::move(connector);
+        connectorCtx.startDelayTimer = std::make_unique<aio::Timer>();
     }
 
     bindToAioThread(getAioThread());
@@ -38,10 +36,10 @@ ConnectorExecutor::ConnectorExecutor(
 void ConnectorExecutor::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
     base_type::bindToAioThread(aioThread);
-    for (auto& connectorContext: m_connectors)
+    for (auto& ctx: m_connectors)
     {
-        connectorContext.connector->bindToAioThread(aioThread);
-        connectorContext.timer->bindToAioThread(aioThread);
+        ctx.tunnelCtx.connector->bindToAioThread(aioThread);
+        ctx.startDelayTimer->bindToAioThread(aioThread);
     }
 }
 
@@ -67,12 +65,12 @@ void ConnectorExecutor::start(CompletionHandler handler)
                 m_connectors.begin(), m_connectors.end(),
                 [](const ConnectorContext& left, const ConnectorContext& right)
                 {
-                    return left.startDelay < right.startDelay;
+                    return left.tunnelCtx.startDelay < right.tunnelCtx.startDelay;
                 });
-            const auto minDelay = connectorWithMinDelayIter->startDelay;
+            const auto minDelay = connectorWithMinDelayIter->tunnelCtx.startDelay;
 
             for (auto& connectorContext: m_connectors)
-                connectorContext.startDelay -= minDelay;
+                connectorContext.tunnelCtx.startDelay -= minDelay;
 
             startConnectors();
         });
@@ -88,11 +86,11 @@ void ConnectorExecutor::reportNoSuitableConnectMethod()
     post(
         [this]()
         {
-            nx::utils::swapAndCall(
-                m_handler,
-                nx::hpm::api::NatTraversalResultCode::noSuitableMethod,
-                SystemError::hostUnreachable,
-                nullptr);
+            TunnelConnectResult connectResult {
+                .resultCode = nx::hpm::api::NatTraversalResultCode::noSuitableMethod,
+                .sysErrorCode = SystemError::hostUnreachable,
+            };
+            nx::utils::swapAndCall(m_handler, std::move(connectResult));
         });
 }
 
@@ -100,10 +98,10 @@ void ConnectorExecutor::startConnectors()
 {
     for (auto it = m_connectors.begin(); it != m_connectors.end(); ++it)
     {
-        if (it->startDelay > std::chrono::milliseconds::zero())
+        if (it->tunnelCtx.startDelay > std::chrono::milliseconds::zero())
         {
-            it->timer->start(
-                it->startDelay,
+            it->startDelayTimer->start(
+                it->tunnelCtx.startDelay,
                 std::bind(&ConnectorExecutor::startConnector, this, it));
         }
         else
@@ -116,34 +114,32 @@ void ConnectorExecutor::startConnectors()
 void ConnectorExecutor::startConnector(
     std::list<ConnectorContext>::iterator connectorIter)
 {
-    using namespace std::placeholders;
-
-    connectorIter->connector->connect(
+    connectorIter->tunnelCtx.connector->connect(
         m_response,
         m_connectTimeout,
-        std::bind(&ConnectorExecutor::onConnectorFinished, this,
-            connectorIter, _1, _2, _3));
+        [this, connectorIter](auto&& ... args)
+        {
+            onConnectorFinished(std::move(connectorIter), std::forward<decltype(args)>(args)...);
+        });
 }
 
 void ConnectorExecutor::onConnectorFinished(
     std::list<ConnectorContext>::iterator connectorIter,
-    nx::hpm::api::NatTraversalResultCode resultCode,
-    SystemError::ErrorCode sysErrorCode,
-    std::unique_ptr<AbstractOutgoingTunnelConnection> connection)
+    TunnelConnectResult result)
 {
     NX_VERBOSE(this, "cross-nat %1. Connector has finished with result: %2, %3",
-        m_connectSessionId, resultCode, SystemError::toString(sysErrorCode));
+        m_connectSessionId, result.resultCode, result.sysErrorCode);
 
     auto connector = std::move(*connectorIter);
     m_connectors.erase(connectorIter);
 
-    if (resultCode != api::NatTraversalResultCode::ok && !m_connectors.empty())
+    if (!result.ok() && !m_connectors.empty())
         return;     // Waiting for other connectors to complete.
 
-    NX_CRITICAL((resultCode != api::NatTraversalResultCode::ok) || connection);
+    NX_CRITICAL(!result.ok() || result.connection);
     m_connectors.clear();   // Cancelling other connectors.
 
-    nx::utils::swapAndCall(m_handler, resultCode, sysErrorCode, std::move(connection));
+    nx::utils::swapAndCall(m_handler, std::move(result));
 }
 
 } // namespace nx::network::cloud

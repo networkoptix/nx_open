@@ -50,10 +50,9 @@ public:
     {
     }
 
-    void setNextHandler(AbstractRequestHandler* nextHandler)
-    {
-        m_nextHandler = nextHandler;
-    }
+    virtual ~IntermediaryHandler() = default;
+
+    void setNextHandler(AbstractRequestHandler* nextHandler) { m_nextHandler = nextHandler; }
 
     const AbstractRequestHandler* nextHandler() const { return m_nextHandler; }
     AbstractRequestHandler* nextHandler() { return m_nextHandler; }

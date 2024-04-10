@@ -40,7 +40,7 @@ class NX_NETWORK_API AbstractClient:
 public:
     virtual void beginListening(
         const std::string& peerName,
-        BeginListeningHandler completionHandler) = 0;
+        BeginListeningHandler handler) = 0;
 
     /**
      * @param desiredSessionId Can be empty.
@@ -61,6 +61,7 @@ public:
     virtual nx::utils::Url url() const = 0;
 
     virtual SystemError::ErrorCode prevRequestSysErrorCode() const = 0;
+    virtual nx::network::http::StatusCode::Value prevRequestHttpStatusCode() const = 0;
 
     virtual void setTimeout(std::optional<std::chrono::milliseconds> timeout) = 0;
 };
@@ -102,6 +103,7 @@ public:
     virtual nx::utils::Url url() const override;
 
     virtual SystemError::ErrorCode prevRequestSysErrorCode() const override;
+    virtual nx::network::http::StatusCode::Value prevRequestHttpStatusCode() const override;
 
     virtual void setTimeout(std::optional<std::chrono::milliseconds> timeout) override;
 

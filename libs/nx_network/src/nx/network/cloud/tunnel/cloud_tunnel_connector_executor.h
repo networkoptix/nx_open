@@ -8,21 +8,25 @@
 
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/utils/move_only_func.h>
+#include <nx/utils/elapsed_timer.h>
 
 #include "connector_factory.h"
 
 namespace nx::network::cloud {
 
+/**
+ * Responsible for establishing connection to the target server AFTER successful communication
+ * with the connection_mediator. It does not communicate with the connection_mediator; this is done
+ * by the CrossNatConnector. This class manages different connector types: [tcp|udp] direct connection
+ * or via proxy (traffic_relay).
+*/
 class NX_NETWORK_API ConnectorExecutor:
     public aio::BasicPollable
 {
     using base_type = aio::BasicPollable;
 
 public:
-    using CompletionHandler = nx::utils::MoveOnlyFunc<void(
-        nx::hpm::api::NatTraversalResultCode /*resultCode*/,
-        SystemError::ErrorCode /*sysErrorCode*/,
-        std::unique_ptr<AbstractOutgoingTunnelConnection> /*connection*/)>;
+    using CompletionHandler = nx::utils::MoveOnlyFunc<void(TunnelConnectResult)>;
 
     ConnectorExecutor(
         const AddressEntry& targetAddress,
@@ -41,9 +45,9 @@ protected:
 private:
     struct ConnectorContext
     {
-        std::unique_ptr<AbstractTunnelConnector> connector;
-        std::chrono::milliseconds startDelay{0};
-        std::unique_ptr<aio::Timer> timer;
+        TunnelConnectorContext tunnelCtx;
+        std::unique_ptr<aio::Timer> startDelayTimer;
+        TunnelConnectStatistics stats;
     };
 
     const std::string m_connectSessionId;
@@ -60,9 +64,7 @@ private:
 
     void onConnectorFinished(
         std::list<ConnectorContext>::iterator connectorIter,
-        nx::hpm::api::NatTraversalResultCode resultCode,
-        SystemError::ErrorCode sysErrorCode,
-        std::unique_ptr<AbstractOutgoingTunnelConnection> connection);
+        TunnelConnectResult result);
 };
 
 } // namespace nx::network::cloud

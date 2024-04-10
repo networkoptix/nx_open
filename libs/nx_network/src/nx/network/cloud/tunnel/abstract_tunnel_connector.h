@@ -10,12 +10,26 @@
 #include <nx/network/async_stoppable.h>
 #include <nx/network/cloud/data/connect_data.h>
 #include <nx/utils/move_only_func.h>
+#include <nx/utils/std/expected.h>
 
 #include "../data/connection_result_data.h"
 #include "abstract_outgoing_tunnel_connection.h"
+#include "tunnel_connect_statistics.h"
 #include "tunnel.h"
 
 namespace nx::network::cloud {
+
+struct TunnelConnectResult
+{
+    nx::hpm::api::NatTraversalResultCode resultCode = nx::hpm::api::NatTraversalResultCode::ok;
+    SystemError::ErrorCode sysErrorCode = SystemError::noError;
+
+    std::unique_ptr<AbstractOutgoingTunnelConnection> connection;
+
+    TunnelConnectStatistics stats;
+
+    inline bool ok() const { return resultCode == nx::hpm::api::NatTraversalResultCode::ok; }
+};
 
 /**
  * Creates outgoing specialized AbstractTunnelConnection.
@@ -25,10 +39,7 @@ class NX_NETWORK_API AbstractTunnelConnector:
     public aio::BasicPollable
 {
 public:
-    typedef nx::utils::MoveOnlyFunc<void(
-        nx::hpm::api::NatTraversalResultCode resultCode,
-        SystemError::ErrorCode sysErrorCode,
-        std::unique_ptr<AbstractOutgoingTunnelConnection>)> ConnectCompletionHandler;
+    using ConnectCompletionHandler = nx::utils::MoveOnlyFunc<void(TunnelConnectResult)>;
 
     /**
      * Helps to decide which method shall be used first.

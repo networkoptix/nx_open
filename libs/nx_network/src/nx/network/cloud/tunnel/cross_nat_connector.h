@@ -18,6 +18,7 @@
 #include <nx/utils/result_counter.h>
 #include <nx/utils/system_error.h>
 #include <nx/utils/type_utils.h>
+#include <nx/utils/elapsed_timer.h>
 
 #include "abstract_cross_nat_connector.h"
 #include "abstract_outgoing_tunnel_connection.h"
@@ -88,6 +89,7 @@ private:
     std::unique_ptr<aio::Timer> m_timer;
     std::unique_ptr<ConnectorExecutor> m_cloudConnectorExecutor;
     MediatorUdpEndpointFetcher m_mediatorAddressFetcher;
+    nx::utils::ElapsedTimer m_mediatorResponseTimer;
 
     void fetchMediatorUdpEndpoint();
 
@@ -100,7 +102,7 @@ private:
     std::tuple<SystemError::ErrorCode, std::unique_ptr<hpm::api::MediatorClientUdpConnection>>
         prepareForUdpHolePunching();
 
-    void onConnectResponse(
+    void onMediatorConnectResponse(
         nx::hpm::api::ResultCode resultCode,
         nx::hpm::api::ConnectResponse response);
 
@@ -110,20 +112,15 @@ private:
         std::chrono::milliseconds connectTimeout,
         nx::hpm::api::ConnectResponse response);
 
-    void onConnectorFinished(
-        nx::hpm::api::NatTraversalResultCode resultCode,
-        SystemError::ErrorCode errorCode,
-        std::unique_ptr<AbstractOutgoingTunnelConnection> connection);
+    void onConnectorExecutorFinished(TunnelConnectResult connectResult);
 
     void onTimeout();
 
-    void holePunchingDone(
-        nx::hpm::api::NatTraversalResultCode resultCode,
-        SystemError::ErrorCode sysErrorCode);
+    void holePunchingDone(TunnelConnectResult connectResult);
 
     void connectSessionReportSent(SystemError::ErrorCode errorCode);
 
-    hpm::api::ConnectRequest prepareConnectRequest(
+    hpm::api::ConnectRequest prepareMediatorConnectRequest(
         const SocketAddress& udpHolePunchingLocalEndpoint) const;
 };
 
