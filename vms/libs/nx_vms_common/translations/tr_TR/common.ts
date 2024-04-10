@@ -71,7 +71,7 @@
     </message>
     <message>
       <source>The ticket key is invalid or expired.</source>
-      <translation type="unfinished">The ticket key is invalid or expired.</translation>
+      <translation>Bilet anahtarı geçersiz veya süresi dolmuş.</translation>
     </message>
     <message>
       <source>More than one user with the same login are presented.</source>
@@ -850,7 +850,7 @@
     <message numerus="yes">
       <source>%n Local Recording Services</source>
       <translation type="unfinished">
-        <numerusform>%n Local Recording Services</numerusform>
+        <numerusform>%n Yerel Kayıt Hizmetleri</numerusform>
         <numerusform>%n Local Recording Services</numerusform>
       </translation>
     </message>
@@ -858,7 +858,7 @@
       <source>%n/%1 Local Recording Services</source>
       <comment>%n will be replaced by the total count</comment>
       <translation type="unfinished">
-        <numerusform>%n/%1 Local Recording Services</numerusform>
+        <numerusform>%n/%1 Yerel Kayıt Hizmetleri</numerusform>
         <numerusform>%n/%1 Local Recording Services</numerusform>
       </translation>
     </message>
@@ -1128,7 +1128,7 @@
     <message>
       <source>Msec</source>
       <comment>Capitalized long suffix for displaying milliseconds</comment>
-      <translation type="unfinished">Msec</translation>
+      <translation>Msn</translation>
     </message>
     <message>
       <source>Sec</source>
@@ -1148,17 +1148,17 @@
     <message>
       <source>Days</source>
       <comment>Capitalized long suffix for displaying days</comment>
-      <translation type="unfinished">Days</translation>
+      <translation>Günler</translation>
     </message>
     <message>
       <source>Wks</source>
       <comment>Capitalized long suffix for displaying weeks</comment>
-      <translation type="unfinished">Wks</translation>
+      <translation>Haftalar</translation>
     </message>
     <message>
       <source>Mos</source>
       <comment>Capitalized long suffix for displaying months</comment>
-      <translation type="unfinished">Mos</translation>
+      <translation>Aylar</translation>
     </message>
     <message>
       <source>Yrs</source>
@@ -1201,7 +1201,7 @@
       <source>Days</source>
       <comment>Capitalized fapitalized full suffix for displaying days</comment>
       <translation type="unfinished">
-        <numerusform>Days</numerusform>
+        <numerusform>Günler</numerusform>
         <numerusform>Days</numerusform>
       </translation>
     </message>
@@ -1209,7 +1209,7 @@
       <source>Weeks</source>
       <comment>Capitalized full suffix for displaying weeks</comment>
       <translation type="unfinished">
-        <numerusform>Weeks</numerusform>
+        <numerusform>Haftalar</numerusform>
         <numerusform>Weeks</numerusform>
       </translation>
     </message>
@@ -1217,7 +1217,7 @@
       <source>Months</source>
       <comment>Capitalized full suffix for displaying months</comment>
       <translation type="unfinished">
-        <numerusform>Months</numerusform>
+        <numerusform>Aylar</numerusform>
         <numerusform>Months</numerusform>
       </translation>
     </message>
@@ -1225,7 +1225,7 @@
       <source>Years</source>
       <comment>Capitalized full suffix for displaying years</comment>
       <translation type="unfinished">
-        <numerusform>Years</numerusform>
+        <numerusform>Yıllar</numerusform>
         <numerusform>Years</numerusform>
       </translation>
     </message>
@@ -1368,7 +1368,7 @@
     </message>
     <message>
       <source>Check internet connection between VMS and license server.</source>
-      <translation type="unfinished">Check internet connection between VMS and license server.</translation>
+      <translation>VMS ile lisans sunucusu arasındaki internet bağlantısını kontrol edin.</translation>
     </message>
   </context>
   <context>
@@ -1894,7 +1894,7 @@
     </message>
     <message>
       <source>Unlock this portion of the archive to export its contents.</source>
-      <translation type="unfinished">Unlock this portion of the archive to export its contents.</translation>
+      <translation>İçeriğini dışa aktarmak için arşivin bu bölümünün kilidini açın.</translation>
     </message>
     <message>
       <source>Archive is unavailable now. Please try again later.</source>

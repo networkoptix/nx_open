@@ -178,7 +178,7 @@
     <message>
       <source>Connection to %1 is not ready yet. Check the server&apos;s internet connection or try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connection to %1 is not ready yet. Check the server&apos;s internet connection or try again later.</translation>
+      <translation>%1 bağlantısı henüz hazır değil. Sunucunun internet bağlantısını kontrol edin veya daha sonra tekrar deneyin.</translation>
     </message>
     <message>
       <source>Connection failed</source>
