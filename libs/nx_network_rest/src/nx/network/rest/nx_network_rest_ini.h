@@ -25,6 +25,9 @@ struct Ini: nx::kit::IniConfig
         const std::chrono::seconds default_(kDefaultMaxSessionAgeForPrivilegedApiS);
         return (value.count() <= 0 || value > default_) ? default_ : value;
     }
+
+    NX_INI_FLAG(true, auditOnlyParameterNames,
+        "Audit parameter values along with names if false.");
 };
 
 NX_NETWORK_REST_API Ini& ini();

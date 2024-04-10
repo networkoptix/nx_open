@@ -14,6 +14,31 @@ void Handler::validateAndAmend(Request* request, http::HttpHeaders* headers)
         m_schemas->validateOrThrow(request, headers);
 }
 
+void Handler::audit(const Request& request, const Response&)
+{
+    if (!NX_ASSERT(m_auditManager))
+        return;
+
+    auto r = prepareAuditRecord(request);
+    if (!r.apiInfo)
+        return;
+
+    m_auditManager->addAuditRecord(std::move(r));
+}
+
+audit::Record Handler::prepareAuditRecord(const Request& request) const
+{
+    if (request.method() == nx::network::http::Method::post
+        || request.method() == nx::network::http::Method::put
+        || request.method() == nx::network::http::Method::patch
+        || request.method() == nx::network::http::Method::delete_)
+    {
+        return (audit::Record) request;
+    }
+
+    return audit::Record{request.userSession};
+}
+
 Response Handler::executeAnyMethod(const Request& request)
 {
     // Default implementation should respond with `notAllowed` if a Method is not defined by the
@@ -28,19 +53,29 @@ Response Handler::executeAnyMethod(const Request& request)
     // indicates that the server knows the request method, **but the target resource doesn't
     // support this method**. [emphasis added]
 
+    Response result;
+    auto auditGuard = nx::utils::makeScopeGuard(
+        [this, &request, &result]
+        {
+            if (m_auditManager && http::StatusCode::isSuccessCode(result.statusCode))
+                audit(request, result);
+        });
+
     if (request.method() == nx::network::http::Method::get)
-        return executeGet(request);
-    if (request.method() == nx::network::http::Method::post)
-        return executePost(request);
-    if (request.method() == nx::network::http::Method::put)
-        return executePut(request);
-    if (request.method() == nx::network::http::Method::patch)
-        return executePatch(request);
-    if (request.method() == nx::network::http::Method::delete_)
-        return executeDelete(request);
-    if (request.method() == nx::network::http::Method::options)
-        return {nx::network::http::StatusCode::ok};
-    return {nx::network::http::StatusCode::notAllowed};
+        result = executeGet(request);
+    else if (request.method() == nx::network::http::Method::post)
+        result = executePost(request);
+    else if (request.method() == nx::network::http::Method::put)
+        result = executePut(request);
+    else if (request.method() == nx::network::http::Method::patch)
+        result = executePatch(request);
+    else if (request.method() == nx::network::http::Method::delete_)
+        result = executeDelete(request);
+    else if (request.method() == nx::network::http::Method::options)
+        result.statusCode = nx::network::http::StatusCode::ok;
+    else
+        result.statusCode = nx::network::http::StatusCode::notAllowed;
+    return result;
 }
 
 Response Handler::executeGet(const Request& /*request*/)

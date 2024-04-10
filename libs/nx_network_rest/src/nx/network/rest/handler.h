@@ -82,6 +82,7 @@ public:
 
     void setPath(const QString& path);
     void setSchemas(std::shared_ptr<json::OpenApiSchemas> schemas);
+    void setAuditManager(audit::Manager* auditManager) { m_auditManager = auditManager; }
 
     QString extractAction(const QString& path) const;
 
@@ -112,11 +113,8 @@ public:
     virtual nx::utils::Guard subscribe(const QString& /*id*/, SubscriptionCallback) { return {}; }
     virtual QString idParamName() const { return {}; }
     virtual QString subscriptionId(const Request&) { return {}; }
-
-    virtual audit::Record prepareAuditRecord(const Request& request) const
-    {
-        return request.auditRecord();
-    }
+    virtual void audit(const Request& request, const Response& response);
+    virtual audit::Record prepareAuditRecord(const Request& request) const;
 
 protected:
     std::atomic<bool> m_needStop = false;
@@ -129,6 +127,7 @@ protected:
     //   Also, a lot of checks can be performed implicitly by code generation from an OpenAPI
     //   schema file.
     std::shared_ptr<json::OpenApiSchemas> m_schemas;
+    audit::Manager* m_auditManager = nullptr;
 };
 
 } // namespace nx::network::rest

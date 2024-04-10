@@ -23,8 +23,7 @@ bool merge(
 bool merge(
     QJsonObject* object,
     const QJsonObject& incompleteObject,
-    QString* outErrorMessage,
-    const QString& fieldName)
+    QString* outErrorMessage)
 {
     auto field = object->begin();
     auto incompleteField = incompleteObject.constBegin();
@@ -100,7 +99,7 @@ bool merge(
 
             NX_VERBOSE(NX_SCOPE_TAG, "    Object - process recursively");
             QJsonObject object = existingValue->toObject();
-            if (!merge(&object, incompleteValue.toObject(), outErrorMessage, fieldName))
+            if (!merge(&object, incompleteValue.toObject(), outErrorMessage))
                 return false;
             *existingValue = object; //< Write back possibly changed object.
             break;
@@ -570,13 +569,12 @@ void filter(
     if (!params.empty())
     {
         QMap<QString, FilterItems> items;
-        for (auto [key, value]: params.keyValueRange())
+        for (auto [k, v]: params.keyValueRange())
         {
-            if (key.isEmpty())
+            if (k.isEmpty())
                 throw Exception::badRequest("Empty name of parameter");
-            if (key.startsWith(QChar('_')))
-                continue;
-            filterToItems(key, value, &items);
+            if (!k.startsWith(QChar('_')))
+                filterToItems(k, v, &items);
         }
         if (!items.empty())
             matchAny(items, value);

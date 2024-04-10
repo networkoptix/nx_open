@@ -231,7 +231,7 @@ bool PathRouter::Item::fillResultIfMatched(
                     result->pathParams.insert(paramQStr, *requestParam);
                     result->validationPath.append(QString("/{") + paramQStr + '}');
                 }
-                return result->handler = m_handler.get();
+                return (result->handler = m_handler.get());
             }
         }
 
