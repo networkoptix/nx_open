@@ -39,7 +39,6 @@ namespace nx::vms::client::core {
 
 namespace {
 
-static const nx::utils::SoftwareVersion kRestApiSupportVersion(5, 0);
 static const nx::utils::SoftwareVersion kSimplifiedLoginSupportVersion(5, 1);
 static const nx::utils::SoftwareVersion kUserRightsRedesignVersion(6, 0);
 
@@ -252,7 +251,7 @@ struct RemoteConnectionFactory::Private
             return false;
 
         return !context->expectedServerVersion()
-            || *context->expectedServerVersion() < kRestApiSupportVersion;
+            || *context->expectedServerVersion() < Context::kRestApiSupportVersion;
     };
 
     /** Check whether System supports REST API by it's version (which must be known already). */
@@ -267,7 +266,7 @@ struct RemoteConnectionFactory::Private
             return false;
         }
 
-        return *context->expectedServerVersion() >= kRestApiSupportVersion;
+        return *context->expectedServerVersion() >= Context::kRestApiSupportVersion;
     }
 
     /**
@@ -519,7 +518,7 @@ struct RemoteConnectionFactory::Private
 
         // Use refresh token to issue new session token if server supports OAuth cloud
         // authorization through the REST API.
-        if (serverVersion >= kRestApiSupportVersion)
+        if (serverVersion >= Context::kRestApiSupportVersion)
         {
             credentials = cloudCredentialsProvider.getCredentials();
         }
@@ -571,18 +570,6 @@ struct RemoteConnectionFactory::Private
             context->rewriteError(RemoteConnectionErrorCode::cloudUnavailableOnServer);
     }
 
-    bool isRestApiSupported(ContextPtr context)
-    {
-        if (!context)
-            return false;
-
-        if (!context->moduleInformation.version.isNull())
-            return context->moduleInformation.version >= kRestApiSupportVersion;
-
-        return context->expectedServerVersion()
-            && *context->expectedServerVersion() >= kRestApiSupportVersion;
-    }
-
     bool isSystemCompatibleWithUser(ContextPtr context)
     {
         if (!context)
@@ -592,7 +579,7 @@ struct RemoteConnectionFactory::Private
 
         // The system version below 5.0 is not compatible with a cloud user with 2fa enabled, but
         // we still can download compatible client and can connect using Mobile client.
-        if (!isRestApiSupported(context)
+        if (!context->isRestApiSupported()
             && context->logonData.purpose != LogonData::Purpose::connectInCompatibilityMode
             && context->userType() == nx::vms::api::UserType::cloud
             && peerType != nx::vms::api::PeerType::mobileClient
@@ -834,24 +821,9 @@ struct RemoteConnectionFactory::Private
         if (!NX_ASSERT(!context->credentials().username.empty()))
             return;
 
-        nx::vms::api::UserModelV1 userModel = requestsManager->getUserModel(context);
+        const auto userModel = requestsManager->getUserModel(context);
         if (!context->failed())
-        {
             context->compatibilityUserModel = userModel;
-
-            // Custom role handling.
-            if (!userModel.userRoleId.isNull())
-            {
-                nx::vms::api::UserRoleModel role = requestsManager->getUserRoleModel(context);
-                if (context->failed())
-                    return;
-
-                // As we don't really need compatibility mode for the desktop client, it is enough
-                // to just copy permissions and accessible resources to user.
-                context->compatibilityUserModel->permissions = role.permissions;
-                context->compatibilityUserModel->accessibleResources = role.accessibleResources;
-            }
-        }
     }
 
     struct CertificateVerificationResult
@@ -1101,13 +1073,13 @@ struct RemoteConnectionFactory::Private
             return;
 
         pinCloudConnectionAddressIfNeeded(context());
-        if (!isRestApiSupported(context()))
+        if (!context()->isRestApiSupported())
         {
             NX_DEBUG(this, "Login with Digest to the System with no REST API support.");
             loginWithDigest(context()); //< GET /api/moduleInformationAuthenticated
 
-            /** Emulate admin user for the old systems. */
-            emulateCompatibilityUserModel(context());
+            // GET /ec2/getUsers in this case.
+            requestCompatibilityUserPermissions(context());
             return;
         }
 
@@ -1159,7 +1131,7 @@ struct RemoteConnectionFactory::Private
         // permissions.
         if (isOldPermissionsModelUsed(context()))
         {
-            // GET /rest/v1/users/<username>
+            // GET /rest/v1/users/<username> in this case.
             requestCompatibilityUserPermissions(context());
         }
     }

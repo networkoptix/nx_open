@@ -51,7 +51,7 @@ struct NX_VMS_API UserRoleModel
     static_assert(isUpdateModelV<UserRoleModel>);
 };
 #define UserRoleModel_Fields (id)(name)(description)(permissions)(parentGroupIds)(accessibleResources)
-QN_FUSION_DECLARE_FUNCTIONS(UserRoleModel, (csv_record)(json)(ubjson)(xml), NX_VMS_API)
+NX_VMS_API_DECLARE_STRUCT_AND_LIST_EX(UserRoleModel, (csv_record)(json)(ubjson)(xml))
 NX_REFLECTION_INSTRUMENT(UserRoleModel, UserRoleModel_Fields)
 
 } // namespace nx::vms::api

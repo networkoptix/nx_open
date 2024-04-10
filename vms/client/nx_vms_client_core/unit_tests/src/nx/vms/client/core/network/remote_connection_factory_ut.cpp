@@ -418,7 +418,7 @@ TEST_F(RemoteConnectionFactoryTest, localSystem42MinimalTest)
     givenSystem({.version = kVersion42});
     givenLogonData({.hasToken = false});
     whenConnectToSystem();
-    thenRequestsCountIs(2); //< moduleInformation, loginWithDigest
+    thenRequestsCountIs(3); //< moduleInformation, loginWithDigest, userModel
     thenConnectionSuccessful();
 }
 
@@ -427,7 +427,7 @@ TEST_F(RemoteConnectionFactoryTest, localSystem42NoIdMultipleServersTest)
     givenSystem({.version = kVersion42, .serversCount = 2});
     givenLogonData({.hasId = false, .hasToken = false});
     whenConnectToSystem();
-    thenRequestsCountIs(2); //< moduleInformation, loginWithDigest
+    thenRequestsCountIs(3); //< moduleInformation, loginWithDigest, userModel
     thenConnectionSuccessful();
 }
 
@@ -481,7 +481,7 @@ TEST_F(RemoteConnectionFactoryTest, cloudSystem42Test)
     givenSystem({.version = kVersion42});
     givenLogonData({.hasToken = false, .isCloud = true});
     whenConnectToSystem();
-    thenRequestsCountIs(2); //< moduleInformation, loginWithDigest
+    thenRequestsCountIs(3); //< moduleInformation, loginWithDigest, userModel
     thenConnectionSuccessful();
 }
 
