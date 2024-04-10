@@ -8,6 +8,7 @@
 #include <unordered_set>
 
 #include "generic_visitor.h"
+#include "instrument.h"
 
 namespace nx::reflect {
 

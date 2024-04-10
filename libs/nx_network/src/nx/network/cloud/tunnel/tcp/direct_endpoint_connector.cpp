@@ -24,8 +24,8 @@ void DirectEndpointConnector::bindToAioThread(
 {
     base_type::bindToAioThread(aioThread);
 
-    for (auto& verificator: m_verificators)
-        verificator->bindToAioThread(aioThread);
+    for (auto& verificatorCtx: m_verificators)
+        verificatorCtx.verificator->bindToAioThread(aioThread);
 }
 
 int DirectEndpointConnector::getPriority() const
@@ -54,7 +54,7 @@ void DirectEndpointConnector::connect(
             [this, endpoint = std::move(endpoint), handler = std::move(handler)]() mutable
             {
                 m_completionHandler = std::move(handler);
-                reportSuccessfulVerificationResult(std::move(endpoint), nullptr);
+                reportSuccessfulVerificationResult({.endpoint = endpoint});
             });
     }
 
@@ -95,11 +95,9 @@ void DirectEndpointConnector::performEndpointVerification(
             {
                 NX_WARNING(this, "%1. target %2. Cannot verify empty address list",
                     m_connectSessionId, m_targetHostAddress);
-                handler(
-                    nx::hpm::api::NatTraversalResultCode::tcpConnectFailed,
-                    SystemError::connectionReset,
-                    nullptr);
-                return;
+                return handler({
+                    .resultCode = nx::hpm::api::NatTraversalResultCode::tcpConnectFailed,
+                    .sysErrorCode = SystemError::connectionReset});
             }
 
             m_completionHandler = std::move(handler);
@@ -130,87 +128,97 @@ void DirectEndpointConnector::launchVerificators(
     const std::vector<SocketAddress>& endpoints,
     std::chrono::milliseconds timeout)
 {
-    using namespace std::placeholders;
-
     for (const SocketAddress& endpoint: endpoints)
     {
         NX_VERBOSE(this, "%1. Verifying host %2", m_connectSessionId, endpoint);
 
-        m_verificators.push_back(
-            EndpointVerificatorFactory::instance().create(m_connectSessionId));
-        m_verificators.back()->setTimeout(timeout);
-        m_verificators.back()->verifyHost(
+        auto& ctx = m_verificators.emplace_back();
+        ctx.endpoint = endpoint;
+        ctx.verificator = EndpointVerificatorFactory::instance().create(m_connectSessionId);
+        ctx.stats.remoteAddress = endpoint.toString();
+        ctx.stats.connectType = ConnectType::forwardedTcpPort;
+
+        ctx.verificator->setTimeout(timeout);
+        ctx.reponseTimer.restart();
+
+        ctx.verificator->verifyHost(
             endpoint,
             m_targetHostAddress,
             std::bind(&DirectEndpointConnector::onVerificationDone, this,
-                endpoint, --m_verificators.end(), _1));
+                --m_verificators.end(), std::placeholders::_1));
     }
 }
 
 void DirectEndpointConnector::onVerificationDone(
-    const SocketAddress& endpoint,
     Verificators::iterator verificatorIter,
     AbstractEndpointVerificator::VerificationResult verificationResult)
 {
-    auto verificator = std::move(*verificatorIter);
+    verificatorIter->stats.responseTime = verificatorIter->reponseTimer.elapsed();
+
+    auto verificatorCtx = std::move(*verificatorIter);
     m_verificators.erase(verificatorIter);
 
     switch (verificationResult)
     {
         case AbstractEndpointVerificator::VerificationResult::passed:
-            reportSuccessfulVerificationResult(
-                endpoint,
-                verificator->takeSocket());
+            reportSuccessfulVerificationResult(std::move(verificatorCtx));
             break;
 
         case AbstractEndpointVerificator::VerificationResult::ioError:
+        {
+            const auto sysErrorCode = verificatorCtx.verificator->lastSystemErrorCode();
             return reportErrorOnEndpointVerificationFailure(
                 nx::hpm::api::NatTraversalResultCode::tcpConnectFailed,
-                verificator->lastSystemErrorCode());
+                sysErrorCode,
+                std::move(verificatorCtx));
             break;
-
+        }
         case AbstractEndpointVerificator::VerificationResult::notPassed:
             return reportErrorOnEndpointVerificationFailure(
                 nx::hpm::api::NatTraversalResultCode::endpointVerificationFailure,
-                SystemError::noError);
+                SystemError::noError,
+                std::move(verificatorCtx));
             break;
     }
 }
 
 void DirectEndpointConnector::reportErrorOnEndpointVerificationFailure(
     nx::hpm::api::NatTraversalResultCode resultCode,
-    SystemError::ErrorCode sysErrorCode)
+    SystemError::ErrorCode sysErrorCode,
+    VerificatorContext verificatorCtx)
 {
     if (!m_verificators.empty())
         return;
-    auto handler = std::move(m_completionHandler);
-    m_completionHandler = nullptr;
-    return handler(
-        resultCode,
-        sysErrorCode,
-        nullptr);
+
+    TunnelConnectResult error{
+        .resultCode = resultCode,
+        .sysErrorCode = sysErrorCode,
+        .stats = std::move(verificatorCtx.stats)};
+
+    nx::utils::swapAndCall(m_completionHandler, std::move(error));
 }
 
-void DirectEndpointConnector::reportSuccessfulVerificationResult(
-    SocketAddress endpoint,
-    std::unique_ptr<AbstractStreamSocket> streamSocket)
+void DirectEndpointConnector::reportSuccessfulVerificationResult(VerificatorContext verificatorCtx)
 {
-    NX_VERBOSE(this, "%1. Reporting successful connection to %2", m_connectSessionId, endpoint);
+    NX_VERBOSE(this, "%1. Reporting successful connection to %2",
+        m_connectSessionId, verificatorCtx.endpoint);
+
+    auto socket = verificatorCtx.verificator ? verificatorCtx.verificator->takeSocket() : nullptr;
+
+    TunnelConnectResult result {
+        .resultCode = nx::hpm::api::NatTraversalResultCode::ok,
+        .sysErrorCode = SystemError::noError,
+        .connection = std::make_unique<DirectTcpEndpointTunnel>(
+            getAioThread(),
+            m_connectSessionId,
+            std::move(verificatorCtx.endpoint),
+            std::move(socket)),
+        .stats = std::move(verificatorCtx.stats),
+    };
 
     m_verificators.clear();
 
-    auto tunnel = std::make_unique<DirectTcpEndpointTunnel>(
-        getAioThread(),
-        m_connectSessionId,
-        std::move(endpoint),
-        std::move(streamSocket));
-
-    auto handler = std::move(m_completionHandler);
-    m_completionHandler = nullptr;
-    handler(
-        nx::hpm::api::NatTraversalResultCode::ok,
-        SystemError::noError,
-        std::move(tunnel));
+    nx::utils::swapAndCall(m_completionHandler, std::move(result));
 }
 
 } // namespace nx::network::cloud::tcp

@@ -3,6 +3,8 @@
 #include "relay_api_result_code.h"
 
 #include <nx/reflect/string_conversion.h>
+#include "nx/network/cloud/data/connection_result_data.h"
+#include "nx/network/http/http_status.h"
 
 namespace nx::cloud::relay::api {
 
@@ -21,6 +23,9 @@ hpm::api::NatTraversalResultCode toNatTraversalResultCode(
         case ResultCode::networkError:
         case ResultCode::notAuthorized:
             return hpm::api::NatTraversalResultCode::errorConnectingToRelay;
+
+        case ResultCode::proxyError:
+            return hpm::api::NatTraversalResultCode::relayProxyError;
 
         default:
             return hpm::api::NatTraversalResultCode::tcpConnectFailed;
@@ -68,6 +73,9 @@ ResultCode fromHttpStatusCode(nx::network::http::StatusCode::Value statusCode)
         case nx::network::http::StatusCode::forbidden:
         case nx::network::http::StatusCode::unauthorized:
             return ResultCode::notAuthorized;
+
+        case nx::network::http::StatusCode::badGateway:
+            return ResultCode::proxyError;
 
         default:
             return ResultCode::networkError;

@@ -9,6 +9,7 @@
 #include <nx/reflect/enum_instrument.h>
 #include <nx/utils/system_error.h>
 
+#include "../tunnel/tunnel_connect_statistics.h"
 #include "stun_message_data.h"
 
 namespace nx::hpm::api {
@@ -24,7 +25,8 @@ NX_REFLECTION_ENUM_CLASS(NatTraversalResultCode,
     endpointVerificationFailure,
     errorConnectingToRelay,
     notFoundOnRelay,
-    noSuitableMethod
+    noSuitableMethod,
+    relayProxyError
 )
 
 /**
@@ -42,7 +44,8 @@ public:
     std::string connectSessionId;
     NatTraversalResultCode resultCode = NatTraversalResultCode::ok;
     SystemError::ErrorCode sysErrorCode = SystemError::noError;
-    nx::network::cloud::ConnectType connectType = nx::network::cloud::ConnectType::unknown;
+    nx::network::cloud::TunnelConnectStatistics stats;
+    std::chrono::milliseconds mediatorResponseTime;
 
     ConnectionResultRequest();
     virtual void serializeAttributes(nx::network::stun::Message* const message) override;

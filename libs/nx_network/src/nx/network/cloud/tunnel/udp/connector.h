@@ -11,6 +11,7 @@
 #include <nx/network/cloud/mediator_client_connections.h>
 #include <nx/network/stun/udp_client.h>
 #include <nx/network/udt/udt_socket.h>
+#include <nx/utils/elapsed_timer.h>
 
 #include "../abstract_tunnel_connector.h"
 
@@ -61,15 +62,21 @@ protected:
     virtual void stopWhileInAioThread() override;
 
 private:
+    struct ConnectorContext
+    {
+        std::unique_ptr<RendezvousConnectorWithVerification> connector;
+        TunnelConnectStatistics stats;
+        nx::utils::ElapsedTimer responseTimer;
+    };
+
     const AddressEntry m_targetHostAddress;
     const std::string m_connectSessionId;
     std::unique_ptr<AbstractDatagramSocket> m_udpSocket;
     ConnectCompletionHandler m_completionHandler;
-    std::unique_ptr<UdtStreamSocket> m_udtConnection;
     std::unique_ptr<nx::network::aio::Timer> m_timer;
-    std::deque<std::unique_ptr<RendezvousConnectorWithVerification>> m_rendezvousConnectors;
+    std::deque<ConnectorContext> m_rendezvousConnectors;
     SocketAddress m_localAddress;
-    std::unique_ptr<RendezvousConnectorWithVerification> m_chosenRendezvousConnector;
+    std::optional<ConnectorContext> m_chosenConnectorCtx;
     hpm::api::CloudConnectVersion m_remotePeerCloudConnectVersion;
 
     void onUdtConnectionEstablished(
@@ -81,9 +88,9 @@ private:
      */
     void holePunchingDone(
         nx::hpm::api::NatTraversalResultCode resultCode,
-        SystemError::ErrorCode sysErrorCode);
-    std::unique_ptr<RendezvousConnectorWithVerification>
-        createRendezvousConnector(SocketAddress endpoint);
+        SystemError::ErrorCode sysErrorCode,
+        std::optional<ConnectorContext> connectorCtx);
+    ConnectorContext createRendezvousConnector(SocketAddress endpoint);
 };
 
 } // namespace nx::network::cloud::udp

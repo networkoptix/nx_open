@@ -2,13 +2,14 @@
 
 #include "system_error.h"
 
-#include <QtCore/QString>
+#include <array>
+#include <locale>
 
 #ifndef _WIN32
 #include <cerrno>
 #endif
 
-#include <locale>
+#include <QtCore/QString>
 
 namespace SystemError {
 
@@ -71,6 +72,55 @@ void setLastErrorCode(ErrorCode errorCode)
 #else
     errno = errorCode;
 #endif
+}
+
+namespace {
+static constexpr std::array<std::pair<SystemError::ErrorCode, std::string_view>, 30>
+    kKnownErrorCodes = {{
+        {noError, "noError"},
+        {sslHandshakeError, "sslHandhshakeError"},
+        {wouldBlock, "wouldBlock"},
+        {inProgress, "inProgress"},
+        {timedOut, "timedOut"},
+        {fileNotFound, "fileNotFound"},
+        {pathNotFound, "pathNotFound"},
+        {connectionAbort, "connectionAbort"},
+        {connectionReset, "connectionReset"},
+        {connectionRefused, "connectionRefused"},
+        {hostNotFound, "hostNotFound"},
+        {notConnected, "notConnected"},
+        {interrupted, "interrupted"},
+        {again, "again"},
+        {networkUnreachable, "networkUnreachable"},
+        {hostUnreachable, "hostUnreachable"},
+        {noMemory, "noMemory"},
+        {notImplemented, "notImplemented"},
+        {invalidData, "invalidData"},
+        {addressInUse, "addressInUse"},
+        {noBufferSpace, "noBufferSpace"},
+        {noPermission, "noPermission"},
+        {badDescriptor, "badDescriptor"},
+        {ioError, "ioError"},
+        {notSupported, "notSupported"},
+        {messageTooLarge, "messageTooLarge"},
+        {dnsServerFailure, "dnsServerFailure"},
+        {already, "already"},
+        {addressNotAvailable, "addressNotAvailable"},
+        {unknownProtocolOption, "unknownProtocolOption"},
+    }};
+} // namespace
+
+std::string toShortString(ErrorCode errorCode)
+{
+    const auto it = std::find_if(
+        kKnownErrorCodes.begin(),
+        kKnownErrorCodes.end(),
+        [&errorCode](auto& errorPair) { return errorPair.first == errorCode; });
+
+    if (it != kKnownErrorCodes.end())
+        return std::string{it->second};
+
+    return "OS_error_" + std::to_string(errorCode);
 }
 
 } // namespace SystemError

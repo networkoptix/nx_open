@@ -26,8 +26,6 @@ public:
         SocketAddress remotePeerAddress,
         SocketAddress localAddressToBindTo);
 
-    virtual ~RendezvousConnectorWithVerification();
-
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
 
     /**

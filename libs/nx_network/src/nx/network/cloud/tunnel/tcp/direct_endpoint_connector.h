@@ -7,6 +7,7 @@
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/network/system_socket.h>
+#include <nx/utils/elapsed_timer.h>
 #include <nx/utils/move_only_func.h>
 
 #include "../abstract_tunnel_connector.h"
@@ -46,7 +47,14 @@ protected:
     virtual void stopWhileInAioThread() override;
 
 private:
-    using Verificators = std::list<std::unique_ptr<AbstractEndpointVerificator>>;
+    struct VerificatorContext
+    {
+        SocketAddress endpoint;
+        std::unique_ptr<AbstractEndpointVerificator> verificator;
+        TunnelConnectStatistics stats;
+        nx::utils::ElapsedTimer reponseTimer;
+    };
+    using Verificators = std::list<VerificatorContext>;
 
     const AddressEntry m_targetHostAddress;
     const std::string m_connectSessionId;
@@ -66,17 +74,15 @@ private:
         std::chrono::milliseconds timeout);
 
     void onVerificationDone(
-        const SocketAddress& endpoint,
         Verificators::iterator verificatorIter,
         AbstractEndpointVerificator::VerificationResult result);
 
     void reportErrorOnEndpointVerificationFailure(
         nx::hpm::api::NatTraversalResultCode resultCode,
-        SystemError::ErrorCode sysErrorCode);
+        SystemError::ErrorCode sysErrorCode,
+        VerificatorContext verificatorCtx);
 
-    void reportSuccessfulVerificationResult(
-        SocketAddress endpoint,
-        std::unique_ptr<AbstractStreamSocket> streamSocket);
+    void reportSuccessfulVerificationResult(VerificatorContext verificatorCtx);
 };
 
 } // namespace nx::network::cloud::tcp
