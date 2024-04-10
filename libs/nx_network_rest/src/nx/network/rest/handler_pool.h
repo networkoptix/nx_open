@@ -63,6 +63,7 @@ public:
     std::optional<QString> getRedirectRule(const QString& path);
 
     void setSchemas(std::shared_ptr<json::OpenApiSchemas> schemas);
+    void setAuditManager(audit::Manager* auditManager) { m_auditManager = auditManager; }
 
     Handler* findHandler(
         const nx::network::http::Method& httpMethod, const QString& normalizedPath) const;
@@ -104,6 +105,7 @@ private:
     RedirectRules m_redirectRules;
     std::map<nx::network::http::Method, PathRouter> m_crudHandlers;
     std::shared_ptr<json::OpenApiSchemas> m_crudSchemas;
+    audit::Manager* m_auditManager = nullptr;
     std::map<std::pair<nx::network::http::Method, QString>, std::function<void()>>
         m_postprocessFunctions;
 };

@@ -7,11 +7,56 @@
 #include <nx/network/rest/audit.h>
 #include <nx/utils/latin1_array.h>
 #include <nx/utils/qnbytearrayref.h>
+#include <nx/utils/serialization/qjson.h>
 #include <nx/utils/uuid.h>
 
 #include "audit_details.h"
 
+namespace QnCollection { struct list_tag; }
+
+namespace QJsonDetail {
+
+template<class Collection>
+void serialize_collection(QnJsonContext*, const Collection&, QJsonValue*);
+
+template<class Collection, class Element>
+bool deserialize_collection_element(
+    QnJsonContext*, const QJsonValue&, Collection*, const Element*, const QnCollection::list_tag&);
+
+} // namespace QJsonDetail
+
 struct QnAuditRecord;
+
+struct NX_VMS_COMMON_API AuditLogFilter
+{
+    /**%apidoc:string
+     * Server id. Can be obtained from "id" field via `GET /rest/v{1-}/servers`, or be `this` to
+     * refer to the current Server, or be `*` to involve all Servers.
+     * %example this
+     */
+    nx::Uuid serverId;
+
+    /**%apidoc[opt]
+     * Start time of a time interval, as a string containing time in milliseconds since epoch, or a
+     * local time formatted like
+     * <code>"<i>YYYY</i>-<i>MM</i>-<i>DD</i>T<i>HH</i>:<i>mm</i>:<i>ss</i>.<i>zzz</i>"</code> -
+     * the format is auto-detected.
+     */
+    QString from;
+
+    /**%apidoc[opt]
+     * End time of a time interval, as a string containing time in milliseconds since epoch, or a
+     * local time formatted like
+     * <code>"<i>YYYY</i>-<i>MM</i>-<i>DD</i>T<i>HH</i>:<i>mm</i>:<i>ss</i>.<i>zzz</i>"</code> -
+     * the format is auto-detected.
+     */
+    QString to;
+
+    /**%apidoc[opt] */
+    nx::Uuid sessionId;
+};
+#define AuditLogFilter_Fields (serverId)(from)(to)(sessionId)
+QN_FUSION_DECLARE_FUNCTIONS(AuditLogFilter, (json), NX_VMS_COMMON_API)
 
 struct NX_VMS_COMMON_API QnLegacyAuditRecord
 {
@@ -70,8 +115,13 @@ struct NX_VMS_COMMON_API QnAuditRecord
     /**%apidoc:any Detailed information about what's happened. */
     AllAuditDetails::type details = nullptr;
 
+    /**%apidoc[proprietary]
+     * Internal audit information about API request.
+     */
+    std::optional<QJsonValue> apiInfo;
+
     QnAuditRecord(nx::network::rest::audit::Record auditRecord):
-        authSession(std::move(auditRecord.session))
+        authSession(std::move(auditRecord.session)), apiInfo(std::move(auditRecord.apiInfo))
     {
     }
 
@@ -107,8 +157,18 @@ struct NX_VMS_COMMON_API QnAuditRecord
     static QnAuditRecord prepareRecord(
         nx::vms::api::AuditRecordType type, const nx::network::rest::audit::Record& auditRecord);
     static void setCreatedTimeForTests(std::optional<std::chrono::seconds> value);
+
+private:
+    QnAuditRecord(): authSession{{{nx::Uuid{}}}} {}
+
+    template<class Collection>
+    friend void QJsonDetail::serialize_collection(QnJsonContext*, const Collection&, QJsonValue*);
+
+    template<class Collection, class Element>
+    friend bool QJsonDetail::deserialize_collection_element(
+        QnJsonContext*, const QJsonValue&, Collection*, const Element*, const QnCollection::list_tag&);
 };
-#define QnAuditRecord_Fields (eventType)(createdTimeS)(authSession)(details)
+#define QnAuditRecord_Fields (eventType)(createdTimeS)(authSession)(details)(apiInfo)
 QN_FUSION_DECLARE_FUNCTIONS(QnAuditRecord, (ubjson)(json), NX_VMS_COMMON_API)
 NX_REFLECTION_INSTRUMENT(QnAuditRecord, QnAuditRecord_Fields)
 

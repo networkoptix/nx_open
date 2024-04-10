@@ -40,17 +40,6 @@ QList<QByteArray> quotedSplit(const QByteArray& data)
     return result;
 }
 
-bool validateParams(const QSqlQuery& query)
-{
-    const auto values = query.boundValues();
-    for (const auto& value: values)
-    {
-        if (!value.isValid())
-            return false;
-    }
-    return true;
-}
-
 QString queryLogString(const QSqlQuery& query)
 {
     const auto values = query.boundValues();
@@ -70,8 +59,6 @@ bool SqlQueryExecutionHelper::execSQLQuery(const QString& queryStr, QSqlDatabase
 
 bool SqlQueryExecutionHelper::execSQLQuery(QSqlQuery* query, const char* details)
 {
-    NX_ASSERT_HEAVY_CONDITION(
-        validateParams(*query), "Failure SQL in %1: %2", details, queryLogString(*query));
     if (query->exec())
     {
         NX_VERBOSE(NX_SCOPE_TAG, "%1 executed SQL query: %2", details, queryLogString(*query));

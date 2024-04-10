@@ -214,6 +214,8 @@ inline void deserialize_field(const QVariant& value, std::optional<T>* target)
     *target = val;
 }
 
+NX_FUSION_API void serialize_field(const QJsonValue& value, QVariant* target);
+NX_FUSION_API void deserialize_field(const QVariant& value, QJsonValue* target);
 
 NX_FUSION_API void serialize_field(const std::vector<nx::Uuid>&value, QVariant *target);
 NX_FUSION_API void deserialize_field(const QVariant &value, std::vector<nx::Uuid> *target);

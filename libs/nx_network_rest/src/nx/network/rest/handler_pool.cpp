@@ -21,6 +21,8 @@ void HandlerPool::registerHandler(
     handler->setModifyPermissions(modifyPermissions);
     if (m_crudSchemas)
         handler->setSchemas(m_crudSchemas);
+    if (m_auditManager)
+        handler->setAuditManager(m_auditManager);
     m_crudHandlers[method].addHandler(path, std::move(handler));
 }
 
@@ -132,8 +134,8 @@ Handler* HandlerPool::findHandlerByPath(
             return it->second.get();
     } while (it != handlersByPath.begin());
 
-    if (auto it = handlersByPath.find(kAnyPath); it != handlersByPath.end())
-        return it->second.get();
+    if (auto handler = handlersByPath.find(kAnyPath); handler != handlersByPath.end())
+        return handler->second.get();
 
     return nullptr;
 }

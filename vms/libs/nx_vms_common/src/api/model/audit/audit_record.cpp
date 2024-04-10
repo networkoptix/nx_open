@@ -293,7 +293,8 @@ QN_FUSION_ADAPT_CLASS(QnAuditRecordModel,
     ((getter, &QnAuditRecordModel::createdTimeS)(setter, &QnAuditRecordModel::createdTimeS)(name, "createdTimeSec"))
     ((getter, &QnAuditRecordModel::getRangeStartSec)(setter, &QnAuditRecordModel::setRangeStartSec)(name, "rangeStartSec"))
     ((getter, &QnAuditRecordModel::getRangeEndSec)(setter, &QnAuditRecordModel::setRangeEndSec)(name, "rangeEndSec"))
-    ((getter, &QnAuditRecordModel::authSession)(setter, &QnAuditRecordModel::authSession)(name, "authSession")))
+    ((getter, &QnAuditRecordModel::authSession)(setter, &QnAuditRecordModel::authSession)(name, "authSession"))
+    ((getter, &QnAuditRecordModel::apiInfo)(setter, &QnAuditRecordModel::apiInfo)(name, "apiInfo")))
 QN_FUSION_DEFINE_FUNCTIONS(QnAuditRecordModel, (sql_record))
 
 QnAuditRecordModel::QnAuditRecordModel(const QnAuditRecord& record)
@@ -364,3 +365,5 @@ void QnAuditRecord::setCreatedTimeForTests(std::optional<std::chrono::seconds> v
 {
     s_createdTimeForTests = value;
 }
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(AuditLogFilter, (json), AuditLogFilter_Fields)

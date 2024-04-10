@@ -2,6 +2,8 @@
 
 #include "request.h"
 
+#include <QtCore/QJsonObject>
+
 #include <nx/branding.h>
 #include <nx/network/http/custom_headers.h>
 
@@ -260,6 +262,74 @@ QJsonValue Request::calculateContent(bool useException, bool wrapInObject) const
     for (auto it = urlParamsContent.begin(); it != urlParamsContent.end(); ++it)
         object.insert(it.key(), it.value());
     return object;
+}
+
+namespace {
+
+QJsonArray parameterNames(const QJsonValueConstRef& value);
+
+QJsonArray parameterNames(const QJsonObject& object)
+{
+    QJsonArray result;
+    for (auto it = object.begin(); it != object.end(); ++it)
+    {
+        auto r = parameterNames(it.value());
+        if (r.isEmpty())
+            result.append(it.key());
+        else
+            result.append(QJsonObject{{it.key(), r}});
+    }
+    return result;
+}
+
+QJsonArray parameterNames(const QJsonArray& list)
+{
+    QJsonArray result;
+
+    // Assume that list value types are the same.
+    if (list.isEmpty() || !list.first().isObject())
+        return result;
+
+    for (const auto& item: list)
+    {
+        NX_ASSERT(item.isObject());
+        result.append(parameterNames(item.toObject()));
+    }
+    return result;
+}
+
+QJsonArray parameterNames(const QJsonValueConstRef& value)
+{
+    if (value.isArray())
+        return parameterNames(value.toArray());
+
+    if (value.isObject())
+        return parameterNames(value.toObject());
+
+    return {};
+}
+
+QJsonArray parameterNames(const QJsonValue& value)
+{
+    if (value.isArray())
+        return parameterNames(value.toArray());
+
+    if (value.isObject())
+        return parameterNames(value.toObject());
+
+    return {};
+}
+
+} // namespace
+
+Request::operator audit::Record() const
+{
+    auto value = parseContent<QJsonValue>().value_or(QJsonValue{});
+    return audit::Record{userSession,
+        QJsonObject{
+            {"method", QString::fromStdString(method().toString())},
+            {"path", decodedPath()},
+            {"parameters", ini().auditOnlyParameterNames ? parameterNames(value) : value}}};
 }
 
 Request::SystemAccessGuard::SystemAccessGuard(UserAccessData* userAccessData):

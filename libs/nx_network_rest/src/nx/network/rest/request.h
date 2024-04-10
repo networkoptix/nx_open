@@ -88,7 +88,8 @@ struct NX_NETWORK_REST_API Request
     template<typename T>
     std::optional<T> parseContent(bool wrapInObject = false) const;
 
-    audit::Record auditRecord() const { return userSession; }
+    /** Prefer to use Handler::prepareAuditRecord() instead. */
+    explicit operator audit::Record() const;
 
     bool isExtraFormattingRequired() const;
     Qn::SerializationFormat responseFormatOrThrow() const;

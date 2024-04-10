@@ -8,7 +8,7 @@
 
 #include "audit_manager_fwd.h"
 
-class NX_VMS_COMMON_API QnAuditManager
+class NX_VMS_COMMON_API QnAuditManager: public nx::network::rest::audit::Manager
 {
 public:
     virtual ~QnAuditManager();
@@ -36,6 +36,12 @@ public:
     {
         return addAuditRecord(
             QnAuditRecord::prepareRecord<type>(auditRecord, std::forward<Details>(details)));
+    }
+
+    virtual void addAuditRecord(const nx::network::rest::audit::Record& auditRecord) override
+    {
+        return addAuditRecord(
+            QnAuditRecord::prepareRecord<nx::vms::api::AuditRecordType::notDefined>(auditRecord));
     }
 
     virtual void addAuditRecord(const QnAuditRecord& record) = 0;

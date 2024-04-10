@@ -346,13 +346,13 @@ UbjsonResult::UbjsonResult(Error error, QString errorString):
 {
 }
 
-void serialize(QnJsonContext* context, const UbjsonResult& value, QJsonValue* outTarget)
+void serialize(QnJsonContext*, const UbjsonResult&, QJsonValue* outTarget)
 {
     NX_ASSERT(false, "We should not serialize UbjsonResult to QJsonValue.");
     *outTarget = QJsonValue();
 }
 
-bool deserialize(QnJsonContext* context, QnConversionWrapper<QJsonValue> value, UbjsonResult* outTarget)
+bool deserialize(QnJsonContext*, QnConversionWrapper<QJsonValue>, UbjsonResult*)
 {
     NX_ASSERT(false, "We should not deserialize UbjsonResult from QJsonValue.");
     return false;
