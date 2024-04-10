@@ -1589,6 +1589,7 @@ bool QnSecurityCamResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &s
                 const auto currentValue = (this->*getter)();
                 if (currentValue != newValue)
                 {
+                    NX_VERBOSE(this, "Merge resources. The value changed from %1 to %2", currentValue, newValue);
                     (this->*setter)(newValue);
                     result = true;
                 }

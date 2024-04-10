@@ -14,6 +14,7 @@
 #include <nx/network/rtsp/rtsp_types.h>
 #include <nx/network/socket.h>
 #include <nx/network/socket_global.h>
+#include <nx/utils/log/log.h>
 #include <nx/utils/thread/long_runnable.h>
 #include <nx/vms/api/data/camera_data.h>
 #include <recording/time_period_list.h>
@@ -246,11 +247,15 @@ bool QnNetworkResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr& sourc
     bool mergedSomething = false;
     if (const auto newUrl = source->getUrl(); newUrl != getUrl())
     {
+        NX_VERBOSE(this,
+            "Found camera has new url. Existing url=%1, new url=%2", getUrl(), newUrl);
         setUrl(newUrl);
         mergedSomething = true;
     }
     if (const auto newMac = source->getMAC(); !newMac.isNull() && newMac != getMAC())
     {
+        NX_VERBOSE(this,
+            "Found camera has new mac. Existing mac=%1, new mac=%2", getMAC(), newMac);
         setMAC(newMac);
         mergedSomething = true;
     }
