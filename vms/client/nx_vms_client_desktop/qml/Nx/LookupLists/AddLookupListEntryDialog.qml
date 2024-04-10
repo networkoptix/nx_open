@@ -24,6 +24,8 @@ ModalDialog
     property Analytics.ObjectType objectType: taxonomy.objectTypeById(model.data.objectTypeId)
     property var entry: ({})
 
+    acceptShortcutEnabled: addButton.enabled
+
     function updateAddButton()
     {
         addButton.enabled = Object.keys(entry).length > 0
