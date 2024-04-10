@@ -31,6 +31,8 @@ class CertificateCache;
  */
 struct NX_VMS_CLIENT_CORE_API RemoteConnectionFactoryContext: public QObject
 {
+    static const nx::utils::SoftwareVersion kRestApiSupportVersion;
+
     /** Whether connection process was terminated. */
     std::atomic_bool terminated = false;
 
@@ -106,6 +108,8 @@ struct NX_VMS_CLIENT_CORE_API RemoteConnectionFactoryContext: public QObject
     void resetError() { m_error = {}; }
 
     QString toString() const;
+
+    bool isRestApiSupported() const;
 
 private:
     std::optional<RemoteConnectionError> m_error;

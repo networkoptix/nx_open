@@ -40,7 +40,6 @@ public:
     virtual ServersInfoReply getServersInfo(ContextPtr context) const = 0;
 
     virtual nx::vms::api::UserModelV1 getUserModel(ContextPtr context) const = 0;
-    virtual nx::vms::api::UserRoleModel getUserRoleModel(ContextPtr context) const = 0;
 
     virtual nx::vms::api::LoginUser getUserType(ContextPtr context) const = 0;
     virtual nx::vms::api::LoginSession createLocalSession(ContextPtr context) const = 0;

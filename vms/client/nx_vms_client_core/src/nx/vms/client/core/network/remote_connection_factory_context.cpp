@@ -4,9 +4,20 @@
 
 namespace nx::vms::client::core {
 
+const nx::utils::SoftwareVersion RemoteConnectionFactoryContext::kRestApiSupportVersion(5, 0);
+
 QString RemoteConnectionFactoryContext::toString() const
 {
     return nx::format("ConnectionContext to %1", logonData.address);
+}
+
+bool RemoteConnectionFactoryContext::isRestApiSupported() const
+{
+    if (!moduleInformation.version.isNull())
+        return moduleInformation.version >= kRestApiSupportVersion;
+
+    return logonData.expectedServerVersion
+        && *logonData.expectedServerVersion >= kRestApiSupportVersion;
 }
 
 RemoteConnectionProcess::RemoteConnectionProcess():

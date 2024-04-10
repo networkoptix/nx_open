@@ -41,13 +41,6 @@ nx::vms::api::UserModelV1
     return {};
 }
 
-nx::vms::api::UserRoleModel
-    RemoteConnectionFactoryRequestsManager::getUserRoleModel(ContextPtr context) const
-{
-    ++m_requestsCount;
-    return {};
-}
-
 nx::vms::api::LoginUser RemoteConnectionFactoryRequestsManager::getUserType(
     ContextPtr context) const
 {
