@@ -63,9 +63,9 @@
   <String Id="msierrFirewallCannotConnect">Windowsファイアウォールに接続できません。 ([2]   [3]   [4]   [5])</String>
   <String Id="WixSchedFirewallExceptionsInstall">Windowsファイアウォールを構成中</String>
   <String Id="WixSchedFirewallExceptionsUninstall">Windowsファイアウォールを構成中</String>
-  <String Id="WixRollbackFirewallExceptionsInstall">Windowsファイアウォールの設定のロールバック</String>
+  <String Id="WixRollbackFirewallExceptionsInstall">Windowsファイアウォール設定のロールバック</String>
   <String Id="WixExecFirewallExceptionsInstall">Windowsファイアウォール設定のインストール</String>
-  <String Id="WixRollbackFirewallExceptionsUninstall">Windowsファイアウォールの設定のロールバック</String>
+  <String Id="WixRollbackFirewallExceptionsUninstall">Windowsファイアウォール設定のロールバック</String>
   <String Id="WixExecFirewallExceptionsUninstall">Windowsファイアウォール設定のアンインストール</String>
   <String Id="Product_ArchMismatch_x86">このパッケージは32ビットOS向けに設計されています。セットアップを終了します。</String>
   <String Id="Product_ArchMismatch_x64">このパッケージは64ビットOS向けに設計されています。セットアップを終了します。</String>

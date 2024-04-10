@@ -1955,23 +1955,23 @@ License Key: %2</source>
     </message>
     <message>
       <source>RHI backend</source>
-      <translation type="unfinished">RHI backend</translation>
+      <translation>RHI arka yüzü</translation>
     </message>
     <message>
       <source>RHI device</source>
-      <translation type="unfinished">RHI device</translation>
+      <translation>RHI cihazı</translation>
     </message>
     <message>
       <source>RHI device ID</source>
-      <translation type="unfinished">RHI device ID</translation>
+      <translation>RHI cihaz kimliği</translation>
     </message>
     <message>
       <source>RHI vendor ID</source>
-      <translation type="unfinished">RHI vendor ID</translation>
+      <translation>RHI satıcı kimliği</translation>
     </message>
     <message>
       <source>RHI max texture size</source>
-      <translation type="unfinished">RHI max texture size</translation>
+      <translation>RHI maksimum doku boyutu</translation>
     </message>
     <message>
       <source>Graphics API</source>
@@ -3289,7 +3289,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Please sign in again with your link to continue</source>
-      <translation type="unfinished">Please sign in again with your link to continue</translation>
+      <translation>Devam etmek için lütfen bağlantınızla tekrar oturum açın</translation>
     </message>
   </context>
   <context>
@@ -4494,40 +4494,40 @@ License Key: %2</source>
     <message numerus="yes">
       <source>%n groups</source>
       <translation type="unfinished">
-        <numerusform>%n groups</numerusform>
+        <numerusform>%n gruplar</numerusform>
         <numerusform>%n groups</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n users</source>
       <translation type="unfinished">
-        <numerusform>%n users</numerusform>
+        <numerusform>%n kullanıcılar</numerusform>
         <numerusform>%n users</numerusform>
       </translation>
     </message>
     <message>
       <source>%1 and %2 do not have %3 permission for some of selected cameras</source>
       <comment>%1 and %2 are the numbers of user groups and users in a correct numeric form (e.g. &apos;2 groups and 1 user&apos;), %3 is the permission name</comment>
-      <translation type="unfinished">%1 and %2 do not have %3 permission for some of selected cameras</translation>
+      <translation>%1 ve %2, seçilen bazı kameralar için %3 iznine sahip değil</translation>
     </message>
     <message numerus="yes">
       <source>%n groups do not have %1 permission for some of selected cameras</source>
       <comment>%1 is the permission name</comment>
       <translation type="unfinished">
-        <numerusform>%n groups do not have %1 permission for some of selected cameras</numerusform>
+        <numerusform>%n grupların seçilen bazı kameralar için %1 izni yok</numerusform>
         <numerusform>%n groups do not have %1 permission for some of selected cameras</numerusform>
       </translation>
     </message>
     <message>
       <source>%1 group does not have %2 permission for some of selected cameras</source>
       <comment>%1 is the name of selected user group, %2 is the permission name</comment>
-      <translation type="unfinished">%1 group does not have %2 permission for some of selected cameras</translation>
+      <translation>%1 grubunun seçilen bazı kameralar için %2 izni yok</translation>
     </message>
     <message numerus="yes">
       <source>%n users do not have %1 permission for some of selected cameras</source>
       <comment>%1 is the permission name</comment>
       <translation type="unfinished">
-        <numerusform>%n users do not have %1 permission for some of selected cameras</numerusform>
+        <numerusform>%n kullanıcıların seçilen bazı kameralar için %1 izni yok</numerusform>
         <numerusform>%n users do not have %1 permission for some of selected cameras</numerusform>
       </translation>
     </message>
@@ -5203,11 +5203,11 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>If cloud storage is activated for backup, other backup storages will be deactivated and the &quot;All archive&quot; option for already configured devices will be changed to &quot;Motion, Object, Bookmarks&quot;</source>
-      <translation type="unfinished">If cloud storage is activated for backup, other backup storages will be deactivated and the &quot;All archive&quot; option for already configured devices will be changed to &quot;Motion, Object, Bookmarks&quot;</translation>
+      <translation>Yedekleme için bulut depolama etkinleştirilirse, diğer yedek depolama seçenekleri pasif yapılacak ve halihazırda yapılandırılmış cihazlar için &quot;Tüm arşiv&quot; seçeneği &quot;Hareket, Nesne, Yer İmleri&quot; olarak değiştirilecektir</translation>
     </message>
     <message>
       <source>If cloud storage is activated for backup, the &quot;All archive&quot; option for already configured devices will be changed to &quot;Motion, Object, Bookmarks&quot;</source>
-      <translation type="unfinished">If cloud storage is activated for backup, the &quot;All archive&quot; option for already configured devices will be changed to &quot;Motion, Object, Bookmarks&quot;</translation>
+      <translation>Yedekleme için bulut depolama etkinleştirilirse, halihazırda yapılandırılmış cihazlar için &quot;Tüm arşiv&quot; seçeneği &quot;Hareket, Nesne, Yer İmleri&quot; olarak değiştirilecektir</translation>
     </message>
   </context>
   <context>
@@ -5576,15 +5576,15 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Local recording services overused</source>
-      <translation type="unfinished">Local recording services overused</translation>
+      <translation>Yerel kayıt hizmetleri aşırı kullanıldı</translation>
     </message>
     <message>
       <source>Cloud storage services overused</source>
-      <translation type="unfinished">Cloud storage services overused</translation>
+      <translation>Bulut depolama hizmetlerinin aşırı kullanımı</translation>
     </message>
     <message>
       <source>Paid integrations services overused</source>
-      <translation type="unfinished">Paid integrations services overused</translation>
+      <translation>Ücretli entegrasyon hizmetlerinin aşırı kullanımı</translation>
     </message>
     <message>
       <source>System suspended</source>
@@ -5592,7 +5592,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>System shut down</source>
-      <translation type="unfinished">System shut down</translation>
+      <translation>Sistem kapatıldı</translation>
     </message>
     <message>
       <source>Intercom call</source>
@@ -6421,7 +6421,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <source>These layouts are shared with other users, so they will be deleted for their accounts as well.</source>
       <comment>Numerical form depends on layouts count</comment>
       <translation type="unfinished">
-        <numerusform>These layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
+        <numerusform>Bu ekran düzenleri diğer kullanıcılarla paylaşıldığından onların hesaplarından da silinecektir.</numerusform>
         <numerusform>These layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
       </translation>
     </message>
@@ -6429,7 +6429,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <source>%n layouts are shared with other users, so they will be deleted for their accounts as well.</source>
       <comment>Numerical form depends on layouts count</comment>
       <translation type="unfinished">
-        <numerusform>%n layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
+        <numerusform>%n ekran düzenleri diğer kullanıcılarla paylaşıldığından onların hesaplarından da silinecek.</numerusform>
         <numerusform>%n layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
       </translation>
     </message>
@@ -7033,7 +7033,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Depending on the resource type it either allows user to modify device settings or to control video wall.</source>
-      <translation type="unfinished">Depending on the resource type it either allows user to modify device settings or to control video wall.</translation>
+      <translation>Kaynak türüne bağlı olarak, kullanıcının cihaz ayarlarını değiştirmesine veya video duvarını kontrol etmesine olanak tanır.</translation>
     </message>
     <message>
       <source>Allows users to access a resource and view live footage from a camera.</source>
@@ -7272,7 +7272,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <message numerus="yes">
       <source>%n suitable cloud storage services are required</source>
       <translation type="unfinished">
-        <numerusform>%n suitable cloud storage services are required</numerusform>
+        <numerusform>%n uygun bulut depolama hizmetleri gereklidir</numerusform>
         <numerusform>%n suitable cloud storage services are required</numerusform>
       </translation>
     </message>
@@ -7286,7 +7286,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <message numerus="yes">
       <source>%n Megapixels</source>
       <translation type="unfinished">
-        <numerusform>%n Megapixels</numerusform>
+        <numerusform>%n Megapiksel</numerusform>
         <numerusform>%n Megapixels</numerusform>
       </translation>
     </message>
@@ -7296,12 +7296,12 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>No suitable cloud storage services available</source>
-      <translation type="unfinished">No suitable cloud storage services available</translation>
+      <translation>Uygun bulut depolama hizmeti yok</translation>
     </message>
     <message numerus="yes">
       <source>%n suitable cloud storage services available</source>
       <translation type="unfinished">
-        <numerusform>%n suitable cloud storage services available</numerusform>
+        <numerusform>%n uygun bulut depolama hizmeti mevcut</numerusform>
         <numerusform>%n suitable cloud storage services available</numerusform>
       </translation>
     </message>
@@ -7344,7 +7344,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <name>nx::vms::client::desktop::BackupSettingsViewWidget</name>
     <message>
       <source>There are more cameras being backed up than available services. Please disable backup for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</source>
-      <translation type="unfinished">There are more cameras being backed up than available services. Please disable backup for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</translation>
+      <translation>Mevcut hizmetlerden daha fazla kamera yedekleniyor. Lütfen bazı kameralar için yedeklemeyi devre dışı bırakın veya daha fazla uygun hizmet ekleyin. Aksi halde %1 tarihinde otomatik olarak yapılacaktır</translation>
     </message>
   </context>
   <context>
@@ -7596,7 +7596,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Only camera or server offline periods after the first addition to the system will be imported automatically.</source>
-      <translation type="unfinished">Only camera or server offline periods after the first addition to the system will be imported automatically.</translation>
+      <translation>Yalnızca kamera veya sunucunun sisteme ilk eklenmesinden sonraki çevrimdışı süreleri otomatik olarak içe aktarılacaktır.</translation>
     </message>
     <message>
       <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant</source>
@@ -8851,7 +8851,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Unlock this portion of the archive to export its contents.</source>
-      <translation type="unfinished">Unlock this portion of the archive to export its contents.</translation>
+      <translation>İçeriğini dışa aktarmak için arşivin bu bölümünün kilidini açın.</translation>
     </message>
   </context>
   <context>
@@ -9152,7 +9152,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Failed to apply changes to %1 group</source>
-      <translation type="unfinished">Failed to apply changes to %1 group</translation>
+      <translation>Değişiklikler %1 grubuna uygulanamadı</translation>
     </message>
     <message>
       <source>Current group is a member of all groups selected on this tab and inherits permissions from each of them.</source>
@@ -9350,7 +9350,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Looks like you have changed LDAP server. It is recommended to remove all existing LDAP users and groups before importing users and groups from a new LDAP server.</source>
-      <translation type="unfinished">Looks like you have changed LDAP server. It is recommended to remove all existing LDAP users and groups before importing users and groups from a new LDAP server.</translation>
+      <translation>LDAP sunucusunu değiştirmişsiniz gibi görünüyor. Kullanıcıları ve grupları yeni bir LDAP sunucusundan içe aktarmadan önce mevcut tüm LDAP kullanıcılarının ve gruplarının kaldırılması önerilir.</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -9510,7 +9510,7 @@ Yeterince günlük topladıktan sonra Günlük Düzeyini varsayılan ayarına d�
     </message>
     <message>
       <source>The provided link is not valid or has expired</source>
-      <translation type="unfinished">The provided link is not valid or has expired</translation>
+      <translation>Sağlanan bağlantı geçerli değil veya süresi dolmuş</translation>
     </message>
   </context>
   <context>
@@ -9557,7 +9557,7 @@ Yeterince günlük topladıktan sonra Günlük Düzeyini varsayılan ayarına d�
     </message>
     <message>
       <source>Logging level degrades the performance of the system</source>
-      <translation type="unfinished">Logging level degrades the performance of the system</translation>
+      <translation>Günlük tutma düzeyi sistemin performansını düşürür</translation>
     </message>
     <message>
       <source>Non-default Logging level. We recommend setting it to &quot;info&quot;</source>
@@ -10159,7 +10159,7 @@ Zorlayabilirsiniz, ancak CPU yükünü önemli ölçüde artırabilir.</translat
     </message>
     <message>
       <source>Uploading offline update packages to Servers...</source>
-      <translation type="unfinished">Uploading offline update packages to Servers...</translation>
+      <translation>Çevrimdışı güncelleme paketleri Sunuculara yükleniyor...</translation>
     </message>
     <message>
       <source>Applying System updates at the end of the week is not recommended</source>
@@ -10556,23 +10556,23 @@ Zorlayabilirsiniz, ancak CPU yükünü önemli ölçüde artırabilir.</translat
     </message>
     <message>
       <source>An integration may interact with the Desktop Client and request access to the user session</source>
-      <translation type="unfinished">An integration may interact with the Desktop Client and request access to the user session</translation>
+      <translation>Entegrasyon, Masaüstü İstemcisi ile etkileşime girebilir ve kullanıcı oturumuna erişim talebinde bulunabilir</translation>
     </message>
     <message>
       <source>Proxy this integration through the server</source>
-      <translation type="unfinished">Proxy this integration through the server</translation>
+      <translation>Bu entegrasyonu sunucu üzerinden proxy yapın</translation>
     </message>
     <message>
       <source>Proxy this web page through the server</source>
-      <translation type="unfinished">Proxy this web page through the server</translation>
+      <translation>Bu web sayfasını sunucu üzerinden proxy yapın</translation>
     </message>
     <message>
       <source>Allow opening this integration without SSL certificate checking</source>
-      <translation type="unfinished">Allow opening this integration without SSL certificate checking</translation>
+      <translation>Bu entegrasyonun SSL sertifikası kontrolü olmadan açılmasına izin ver</translation>
     </message>
     <message>
       <source>Allow opening this web page without SSL certificate checking</source>
-      <translation type="unfinished">Allow opening this web page without SSL certificate checking</translation>
+      <translation>Bu web sayfasının SSL sertifikası kontrolü olmadan açılmasına izin ver</translation>
     </message>
     <message>
       <source>New Web Page</source>
@@ -10814,7 +10814,7 @@ Zorlayabilirsiniz, ancak CPU yükünü önemli ölçüde artırabilir.</translat
     <name>nx::vms::client::desktop::RestApiHelper</name>
     <message>
       <source>Password confirmation is required to apply changes</source>
-      <translation type="unfinished">Password confirmation is required to apply changes</translation>
+      <translation>Değişikliklerin uygulanması için şifre onayı gerekiyor</translation>
     </message>
     <message>
       <source>Confirm</source>
@@ -11125,7 +11125,7 @@ Dikkat: Bu parola sıfırlanamaz. Kaybederseniz arşiv kurtarılamaz.</translati
     </message>
     <message>
       <source>Watermarks will be displayed over live, archive and exported videos for non-power users only. You and other power users will not see them.</source>
-      <translation type="unfinished">Watermarks will be displayed over live, archive and exported videos for non-power users only. You and other power users will not see them.</translation>
+      <translation>Filigranlar yalnızca uzman olmayan kullanıcılar için canlı, arşiv ve dışa aktarılan videolarda görüntülenecektir. Siz ve diğer uzman kullanıcılar bunları görmeyeceksiniz.</translation>
     </message>
     <message>
       <source>Encrypting video traffic may significantly increase CPU usage</source>
@@ -11201,7 +11201,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Contact a user with Administrators permissions to resolve this issue.</source>
-      <translation type="unfinished">Contact a user with Administrators permissions to resolve this issue.</translation>
+      <translation>Bu sorunu çözmek için Yönetici izinlerine sahip bir kullanıcıyla iletişime geçin.</translation>
     </message>
     <message>
       <source>Not Part Of Certificate</source>
@@ -11572,11 +11572,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Add more services or fix overuse by stopping using services for some devices.</source>
-      <translation type="unfinished">Add more services or fix overuse by stopping using services for some devices.</translation>
+      <translation>Bazı cihazlarda hizmetleri kullanmayı bırakarak veya daha fazla hizmet ekleyerek aşırı kullanımı düzeltin.</translation>
     </message>
     <message>
       <source>If no action is taken, required number of services will be released automatically on %1.</source>
-      <translation type="unfinished">If no action is taken, required number of services will be released automatically on %1.</translation>
+      <translation>Herhangi bir işlem yapılmazsa %1 tarihinde gerekli sayıda hizmet otomatik bırakılacaktır.</translation>
     </message>
     <message>
       <source>Some features may not be available.</source>
@@ -11593,12 +11593,12 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <message>
       <source>Your access to the System expires %1</source>
       <comment>%1 is a date</comment>
-      <translation type="unfinished">Your access to the System expires %1</translation>
+      <translation>Sisteme erişiminiz %1 içinde sona eriyor</translation>
     </message>
     <message>
       <source>Your access to the System expires in %1</source>
       <comment>%1 is a duration</comment>
-      <translation type="unfinished">Your access to the System expires in %1</translation>
+      <translation>Sisteme erişiminiz %1 içinde sona eriyor</translation>
     </message>
   </context>
   <context>
@@ -11794,11 +11794,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Group is not found in the LDAP database.</source>
-      <translation type="unfinished">Group is not found in the LDAP database.</translation>
+      <translation>Grup LDAP veritabanında bulunamadı.</translation>
     </message>
     <message>
       <source>There are multiple groups with this name in the system. To maintain a clear and organized structure, we suggest providing unique names for each group.</source>
-      <translation type="unfinished">There are multiple groups with this name in the system. To maintain a clear and organized structure, we suggest providing unique names for each group.</translation>
+      <translation>Sistemde bu isimde birden fazla grup var. Açık ve düzenli bir yapıyı sürdürmek için her gruba benzersiz adlar vermenizi öneririz.</translation>
     </message>
     <message>
       <source>Group has another group as both its parent, and as a child member, or is a part of such circular reference chain. This can lead to an incorrect calculation of permissions.</source>
@@ -12000,11 +12000,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Are you sure you want to terminate access link?</source>
-      <translation type="unfinished">Are you sure you want to terminate access link?</translation>
+      <translation>Erişim bağlantısını sonlandırmak istediğinizden emin misiniz?</translation>
     </message>
     <message>
       <source>This will instantly remove an access to the system for this user</source>
-      <translation type="unfinished">This will instantly remove an access to the system for this user</translation>
+      <translation>Bu, bu kullanıcının sisteme erişimini anında kaldıracaktır</translation>
     </message>
     <message>
       <source>Terminate</source>
@@ -12024,19 +12024,19 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>New Link - %1</source>
-      <translation type="unfinished">New Link - %1</translation>
+      <translation>Yeni Bağlantı - %1</translation>
     </message>
     <message>
       <source>Access link has been successfully created!</source>
-      <translation type="unfinished">Access link has been successfully created!</translation>
+      <translation>Erişim bağlantısı başarıyla oluşturuldu!</translation>
     </message>
     <message>
       <source>Granting broad permissions to the temporary user is not recommended. Some actions may not work.</source>
-      <translation type="unfinished">Granting broad permissions to the temporary user is not recommended. Some actions may not work.</translation>
+      <translation>Geçici kullanıcıya geniş izinler verilmesi önerilmez. Bazı eylemler işe yaramayabilir.</translation>
     </message>
     <message>
       <source>Granting broad permissions to the temporary user is not recommended.</source>
-      <translation type="unfinished">Granting broad permissions to the temporary user is not recommended.</translation>
+      <translation>Geçici kullanıcıya geniş izinler verilmesi önerilmez.</translation>
     </message>
     <message>
       <source>and</source>
@@ -12049,7 +12049,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>User %1 has been successfully created!</source>
-      <translation type="unfinished">User %1 has been successfully created!</translation>
+      <translation>%1 Kullanıcısı başarıyla oluşturuldu!</translation>
     </message>
     <message>
       <source>Obtaining Link...</source>
@@ -12472,7 +12472,7 @@ Bu web sayfasını açmamanızı öneririz. Riskleri anlıyorsanız web sayfası
     </message>
     <message>
       <source>In progress... (%1 left)</source>
-      <translation type="unfinished">In progress... (%1 left)</translation>
+      <translation>Devam ediyor... (%1 kaldı)</translation>
     </message>
     <message>
       <source>Disabled</source>
@@ -12484,7 +12484,7 @@ Bu web sayfasını açmamanızı öneririz. Riskleri anlıyorsanız web sayfası
     </message>
     <message>
       <source>Failed to import. Retry in 1 minute.</source>
-      <translation type="unfinished">Failed to import. Retry in 1 minute.</translation>
+      <translation>İçe aktarma başarısız oldu. 1 dakika sonra tekrar deneyin.</translation>
     </message>
     <message>
       <source>Name</source>
@@ -12650,15 +12650,15 @@ Bu web sayfasını açmamanızı öneririz. Riskleri anlıyorsanız web sayfası
     </message>
     <message>
       <source>WHEN</source>
-      <translation type="unfinished">WHEN</translation>
+      <translation>NE ZAMAN</translation>
     </message>
     <message>
       <source>EVENT</source>
-      <translation type="unfinished">EVENT</translation>
+      <translation>ETKİNLİK</translation>
     </message>
     <message>
       <source>DO</source>
-      <translation type="unfinished">DO</translation>
+      <translation>YAP</translation>
     </message>
     <message>
       <source>ACTION</source>
@@ -12684,7 +12684,7 @@ Bu web sayfasını açmamanızı öneririz. Riskleri anlıyorsanız web sayfası
     <name>nx::vms::client::desktop::rules::ObjectLookupPicker</name>
     <message>
       <source>Has attributes</source>
-      <translation type="unfinished">Has attributes</translation>
+      <translation>Niteliklere sahip</translation>
     </message>
     <message>
       <source>Listed</source>
@@ -12707,7 +12707,7 @@ Bu web sayfasını açmamanızı öneririz. Riskleri anlıyorsanız web sayfası
     <name>nx::vms::client::desktop::rules::OptionalDurationPicker</name>
     <message>
       <source>Once in</source>
-      <translation type="unfinished">Once in</translation>
+      <translation>Bir kez</translation>
     </message>
     <message>
       <source>For</source>
@@ -12879,7 +12879,7 @@ Bu web sayfasını açmamanızı öneririz. Riskleri anlıyorsanız web sayfası
     <name>nx::vms::client::desktop::rules::VmsRulesActionHandler</name>
     <message>
       <source>Lookup lists network request failed</source>
-      <translation type="unfinished">Lookup lists network request failed</translation>
+      <translation>Arama listeleri ağ isteği başarısız oldu</translation>
     </message>
   </context>
   <context>
@@ -12894,7 +12894,7 @@ Bu web sayfasını açmamanızı öneririz. Riskleri anlıyorsanız web sayfası
     </message>
     <message>
       <source>Reset to defaults error:</source>
-      <translation type="unfinished">Reset to defaults error:</translation>
+      <translation>Varsayılanlara sıfırlama hatası:</translation>
     </message>
   </context>
   <context>
@@ -12917,11 +12917,11 @@ Bu web sayfasını açmamanızı öneririz. Riskleri anlıyorsanız web sayfası
     </message>
     <message>
       <source>Number of devices using this service exceeds the available service quantity.</source>
-      <translation type="unfinished">Number of devices using this service exceeds the available service quantity.</translation>
+      <translation>Bu hizmeti kullanan cihaz sayısı mevcut hizmet miktarını aşıyor.</translation>
     </message>
     <message>
       <source>Please disable it for some devices or add more suitable services. Otherwise it will be done automatically on %1</source>
-      <translation type="unfinished">Please disable it for some devices or add more suitable services. Otherwise it will be done automatically on %1</translation>
+      <translation>Lütfen bazı cihazlar için bu özelliği devre dışı bırakın veya daha fazla uygun hizmet ekleyin. Aksi halde %1 tarihinde otomatik olarak yapılacaktır</translation>
     </message>
   </context>
   <context>
@@ -13581,7 +13581,7 @@ to view more bookmarks</source>
     <name>runApplication</name>
     <message>
       <source>Would you like to try switching to DirectX?</source>
-      <translation type="unfinished">Would you like to try switching to DirectX?</translation>
+      <translation>DirectX'e geçmeyi denemek ister misiniz?</translation>
     </message>
   </context>
 </TS>
