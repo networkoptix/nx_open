@@ -307,27 +307,35 @@ Rectangle
             anchors.rightMargin: -12
 
             ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
+
             contentWidth: availableWidth - 8 //< Mind vertical scrollbar width.
+            contentHeight: attributeTable.height
             clip: true
 
-            NameValueTable
+            Flickable
             {
-                id: attributeTable
+                anchors.fill: parent
+                boundsBehavior: Flickable.StopAtBounds
 
-                items: previewPanel.selectedItem ? previewPanel.selectedItem.attributes : []
-                rawItems: previewPanel.selectedItem ? previewPanel.selectedItem.rawAttributes : []
-                visible: items.length
-                width: nameValueScrollView.contentWidth
+                NameValueTable
+                {
+                    id: attributeTable
 
-                copyable: true
+                    items: previewPanel.selectedItem ? previewPanel.selectedItem.attributes : []
+                    rawItems: previewPanel.selectedItem ? previewPanel.selectedItem.rawAttributes : []
+                    visible: items.length
+                    width: nameValueScrollView.contentWidth
 
-                nameColor: ColorTheme.colors.light16
-                valueColor: ColorTheme.colors.light10
-                nameFont { pixelSize: FontConfig.normal.pixelSize; weight: Font.Normal }
-                valueFont { pixelSize: FontConfig.normal.pixelSize; weight: Font.Normal }
+                    copyable: true
 
-                onSearchRequested: (row) =>
-                    previewPanel.searchRequested(row)
+                    nameColor: ColorTheme.colors.light16
+                    valueColor: ColorTheme.colors.light10
+                    nameFont { pixelSize: FontConfig.normal.pixelSize; weight: Font.Normal }
+                    valueFont { pixelSize: FontConfig.normal.pixelSize; weight: Font.Normal }
+
+                    onSearchRequested: (row) =>
+                        previewPanel.searchRequested(row)
+                }
             }
         }
     }
