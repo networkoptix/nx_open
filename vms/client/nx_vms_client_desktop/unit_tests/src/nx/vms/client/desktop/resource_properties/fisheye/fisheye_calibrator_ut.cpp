@@ -232,5 +232,29 @@ TEST_F(FisheyeCalibratorTest, tooLowLight)
     ASSERT_EQ(result, FisheyeCalibrator::Result::errorTooLowLight);
 }
 
+TEST_F(FisheyeCalibratorTest, notFisheyeImage)
+{
+    QImage image(800, 600, QImage::Format_RGB32);
+    image.fill(Qt::black);
+    {
+        QPainter painter(&image);
+        painter.fillRect(0, 0, 800, 600, QBrush(Qt::white, Qt::DiagCrossPattern));
+    }
+
+    FisheyeCalibrator calibrator;
+    const auto result = analyzeFrame(image);
+    ASSERT_EQ(result, FisheyeCalibrator::Result::errorNotFisheyeImage);
+}
+
+TEST_F(FisheyeCalibratorTest, notFisheyeImage_barrelDistorted)
+{
+    QImage image;
+    image.load(":/fisheye_calibrator_ut/calibration_test.png");
+
+    FisheyeCalibrator calibrator;
+    const auto result = analyzeFrame(image);
+    ASSERT_EQ(result, FisheyeCalibrator::Result::errorNotFisheyeImage);
+}
+
 } // namespace test
 } // namespace nx::vms::client::desktop
