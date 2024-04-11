@@ -1339,7 +1339,7 @@ QString AnalyticsSearchListModel::Private::engineName(
 void AnalyticsSearchListModel::Private::addCreateNewListAction(
     QMenu* menu, const ObjectTrack& track) const
 {
-    menu->addAction<std::function<void()>>(tr("Create New List by object"),
+    menu->addAction<std::function<void()>>(tr("Create New List..."),
         nx::utils::guarded(this,
             [&]()
             {
