@@ -43,6 +43,9 @@ FocusScope
 
     function commit()
     {
+        if (!isEditing)
+            return
+
         const previousValue = model.display
         const newValue = editor.value
 
