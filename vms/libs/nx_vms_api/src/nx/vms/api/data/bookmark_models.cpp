@@ -96,11 +96,14 @@ QString BookmarkProtection::getProtection(
     return QString::number(synchronizedMs.count()) + ":" + hasher.result().toHex();
 }
 
-QString BookmarkProtection::getDigest(const QString& bookmarkId, const QString& password)
+QString BookmarkProtection::getDigest(
+    const nx::Uuid& bookmarkId, const nx::Uuid& serverId, const QString& password)
 {
     nx::utils::QnCryptographicHash hasher(nx::utils::QnCryptographicHash::Algorithm::Sha256);
 
-    hasher.addData(bookmarkId.toUtf8());
+    BookmarkIdV3 id;
+    id.setIds(bookmarkId, serverId);
+    hasher.addData(id.id.toUtf8());
     hasher.addData(password.toUtf8());
 
     return hasher.result().toHex();

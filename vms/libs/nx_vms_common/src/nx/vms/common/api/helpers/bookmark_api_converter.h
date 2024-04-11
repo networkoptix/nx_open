@@ -21,21 +21,14 @@ common::BookmarkShareableParams shareableParams(
     {
         if (data.share && std::holds_alternative<api::BookmarkSharingSettings>(data.share.value()))
         {
-            QString id;
-            if constexpr (std::is_same_v<BookmarkWithRule, api::BookmarkWithRuleV1>)
-                id = NX_FMT("%1_%2", data.id->toSimpleString(), data.serverId->toSimpleString());
-            else
-                id = data.id;
-
             auto& sharingSettings = std::get<api::BookmarkSharingSettings>(data.share.value());
-
             std::optional<QString> digest;
             if (!sharingSettings.password.isEmpty())
             {
                 if (digestPassword)
                 {
                     digest = api::BookmarkProtection::getDigest(
-                        id, sharingSettings.password);
+                        data.bookmarkId(), data.serverId(), sharingSettings.password);
                 }
                 else
                 {
