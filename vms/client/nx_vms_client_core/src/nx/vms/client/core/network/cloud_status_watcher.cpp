@@ -681,7 +681,12 @@ void CloudStatusWatcher::Private::setStatus(
     }
 
     if (isNewStatus)
+    {
+        if (status != Status::LoggedOut)
+            updateCurrentCloudUserSecuritySettings(); //< Speedup security settings gathering.
+
         emit q->statusChanged(status);
+    }
 
     if (isNewErrorCode && (errorCode != CloudStatusWatcher::NoError))
         emit q->errorChanged(errorCode);

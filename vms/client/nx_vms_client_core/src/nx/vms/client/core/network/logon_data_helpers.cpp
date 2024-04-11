@@ -92,7 +92,9 @@ std::optional<LogonData> cloudLogonData(const QnSystemDescriptionPtr& system)
         }
     }
 
-    if (auto systemVersion = system->version(); !systemVersion.isNull())
+    static const auto kStartVersionStoring = nx::utils::SoftwareVersion(6, 0);
+    if (auto systemVersion = system->version(); !systemVersion.isNull()
+        && !(systemHasInitialServerOnly && systemVersion < kStartVersionStoring))
     {
         result.expectedServerVersion = systemVersion;
         NX_DEBUG(NX_SCOPE_TAG, "Expect system version %1.", systemVersion);
