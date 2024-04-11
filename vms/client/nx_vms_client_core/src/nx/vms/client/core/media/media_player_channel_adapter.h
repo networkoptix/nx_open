@@ -24,6 +24,7 @@ class MediaPlayerChannelAdapter: public QObject
 
 public:
     MediaPlayerChannelAdapter(QObject* parent = nullptr);
+    virtual ~MediaPlayerChannelAdapter() override;
 
     QVideoSink* videoSurface() const;
     void setVideoSurface(QVideoSink* videoSurface);

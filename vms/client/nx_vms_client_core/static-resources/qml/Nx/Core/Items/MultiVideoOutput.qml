@@ -24,21 +24,22 @@ MultiVideoLayout
     delegate: VideoOutput
     {
         id: videoOutput
-        fillMode: VideoOutput.Stretch
 
         readonly property int index: model.index
+
+        fillMode: VideoOutput.Stretch
+
+        onSourceRectChanged:
+        {
+            if (index === 0 && __sourceSize.width <= 0.0)
+                __sourceSize = Qt.size(sourceRect.width, sourceRect.height)
+        }
 
         MediaPlayerChannelAdapter
         {
             mediaPlayer: layout.mediaPlayer
             channel: index
             videoSurface: videoOutput.videoSink
-        }
-
-        onSourceRectChanged:
-        {
-            if (index === 0 && __sourceSize.width <= 0.0)
-                __sourceSize = Qt.size(sourceRect.width, sourceRect.height)
         }
 
         Loader
