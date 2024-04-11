@@ -570,28 +570,6 @@ struct RemoteConnectionFactory::Private
             context->rewriteError(RemoteConnectionErrorCode::cloudUnavailableOnServer);
     }
 
-    bool isSystemCompatibleWithUser(ContextPtr context)
-    {
-        if (!context)
-            return false;
-
-        NX_DEBUG(this, "Checking System compatibility with the User.");
-
-        // The system version below 5.0 is not compatible with a cloud user with 2fa enabled, but
-        // we still can download compatible client and can connect using Mobile client.
-        if (!context->isRestApiSupported()
-            && context->logonData.purpose != LogonData::Purpose::connectInCompatibilityMode
-            && context->userType() == nx::vms::api::UserType::cloud
-            && peerType != nx::vms::api::PeerType::mobileClient
-            && cloudCredentialsProvider.is2FaEnabledForUser())
-        {
-            context->setError(RemoteConnectionErrorCode::systemIsNotCompatibleWith2Fa);
-            return false;
-        }
-
-        return true;
-    }
-
     /**
      * Systems before 6.0 use old permissions model, where resource access is controlled by global
      * permissions and there is a special `isAdmin` field.
@@ -613,7 +591,8 @@ struct RemoteConnectionFactory::Private
         if (context)
         {
             ensureUserNameIsLowercaseIfDigest(context->logonData.credentials);
-            requestsManager->checkDigestAuthentication(context);
+            requestsManager->checkDigestAuthentication(
+                context, cloudCredentialsProvider.is2FaEnabledForUser());
         }
     }
 
@@ -1069,11 +1048,8 @@ struct RemoteConnectionFactory::Private
         if (!checkCompatibility(context()))
             return;
 
-        if (!isSystemCompatibleWithUser(context()))
-            return;
-
         pinCloudConnectionAddressIfNeeded(context());
-        if (!context()->isRestApiSupported())
+        if (context() && !context()->isRestApiSupported())
         {
             NX_DEBUG(this, "Login with Digest to the System with no REST API support.");
             loginWithDigest(context()); //< GET /api/moduleInformationAuthenticated
