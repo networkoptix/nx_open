@@ -296,9 +296,16 @@ QPointF FisheyeCalibrator::Private::calculateEllipseRadii(
 
     const qreal c = p2.x() * p2.x() * p1.y() * p1.y() - p1.x() * p1.x() * p2.y() * p2.y();
     const qreal k = p2.x() * p2.x() - p1.x() * p1.x();
-    const qreal b = sqrt(qAbs(c / k));
-    const qreal a = sqrt(qAbs(p1.x() * p1.x() * b * b / (b * b - p1.y() * p1.y())));
 
+    if (qFuzzyIsNull(k))
+        return {0, 0};
+
+    const qreal b = sqrt(qAbs(c / k));
+
+    if (qFuzzyEquals(b, p1.y()))
+        return {0, 0};
+
+    const qreal a = sqrt(qAbs(p1.x() * p1.x() * b * b / (b * b - p1.y() * p1.y())));
     return {a, b};
 }
 
@@ -403,6 +410,9 @@ FisheyeCalibrator::Result FisheyeCalibrator::Private::computeParameters()
     const qreal r = sqrt(dx * dx + dy * dy) + 0.5;
 
     const auto radii = calculateEllipseRadii({centerX, centerY}, r / width * height);
+    if (qFuzzyIsNull(radii.x()) || qFuzzyIsNull(radii.y()))
+        return Result::errorNotFisheyeImage; //< Not found.
+
     qreal stretch = radii.x() / radii.y();
     qreal radius = radii.x() / width;
 
