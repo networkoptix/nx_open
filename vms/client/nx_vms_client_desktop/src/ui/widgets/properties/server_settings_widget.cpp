@@ -53,8 +53,8 @@ using namespace nx::vms::client::desktop::ui;
 
 namespace {
 
-static const int PC_SERVER_MAX_CAMERAS = 128;
-static const int ARM_SERVER_MAX_CAMERAS = 12;
+static const int PC_SERVER_MAX_CAMERAS = 256;
+static const int ARM_SERVER_MAX_CAMERAS = 16;
 static const int EDGE_SERVER_MAX_CAMERAS = 1;
 
 static const QString kLinkPattern("<a href='%1' style='text-decoration: none;'>%2</a>");
