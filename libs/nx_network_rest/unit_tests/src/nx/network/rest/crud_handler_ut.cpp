@@ -39,7 +39,8 @@ public:
             if (!share.password.isEmpty())
             {
                 std::get<BookmarkSharingSettings>(*data.share).password =
-                    BookmarkProtection::getDigest(data.id, share.password);
+                    BookmarkProtection::getDigest(
+                        data.bookmarkId(), data.serverId(), share.password);
             }
         }
         m_bookmark = data;
@@ -106,7 +107,7 @@ TEST(CrudHandler, BookmarkPatch)
     "name": "",
     "share": {
         "expirationTimeMs": 1,
-        "password": "0b14d501a594442a01c6859541bcb3e8164d183d32937b851835442f69d5c94e"
+        "password": "8c1a3fc80f3607db0c6dbf47ff96e60f7cc26ad385d178c5c79be094531c979f"
     },
     "startTimeMs": 0,
     "tags": []
@@ -130,7 +131,7 @@ TEST(CrudHandler, BookmarkPatch)
     "name": "",
     "share": {
         "expirationTimeMs": 2,
-        "password": "0b14d501a594442a01c6859541bcb3e8164d183d32937b851835442f69d5c94e"
+        "password": "8c1a3fc80f3607db0c6dbf47ff96e60f7cc26ad385d178c5c79be094531c979f"
     },
     "startTimeMs": 0,
     "tags": []
@@ -154,7 +155,7 @@ TEST(CrudHandler, BookmarkPatch)
     "name": "",
     "share": {
         "expirationTimeMs": 2,
-        "password": "6cf615d5bcaac778352a8f1f3360d23f02f34ec182e259897fd6ce485d7870d4"
+        "password": "913a9615ba626dec634e88007bb8ecebdcc399d8b9eabfbe5aad77b905431668"
     },
     "startTimeMs": 0,
     "tags": []

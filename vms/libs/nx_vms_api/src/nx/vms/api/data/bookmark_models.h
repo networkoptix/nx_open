@@ -285,7 +285,8 @@ QN_FUSION_DECLARE_FUNCTIONS(BookmarkTagFilter, (json), NX_VMS_API)
 
 struct NX_VMS_API BookmarkProtection
 {
-    static QString getDigest(const QString& bookmarkId, const QString& password);
+    static QString getDigest(
+        const nx::Uuid& bookmarkId, const nx::Uuid& serverId, const QString& password);
     static QString getProtection(const QString& digest, std::chrono::milliseconds syncTime);
     static std::chrono::milliseconds getSyncTime(const QString& protection);
 
