@@ -287,7 +287,7 @@ void LookupListActionHandler::openLookupListsDialog()
     connect(d->dialog.get(), &LookupListsDialog::saveRequested, this,
         [this](LookupListDataList data) { d->saveData(std::move(data)); });
 
-    d->dialog->exec(Qt::NonModal);
+    d->dialog->exec(Qt::ApplicationModal);
     d->dialog.reset();
 }
 
