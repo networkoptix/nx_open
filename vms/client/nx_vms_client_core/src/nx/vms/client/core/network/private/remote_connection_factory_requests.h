@@ -36,7 +36,8 @@ public:
         ContextPtr context) const override;
 
     virtual nx::vms::api::LoginSession getCurrentSession(ContextPtr context) const override;
-    virtual void checkDigestAuthentication(ContextPtr context) const override;
+    virtual void checkDigestAuthentication(
+        ContextPtr context, bool is2FaEnabledForUser) const override;
 
     virtual std::future<Context::CloudTokenInfo> issueCloudToken(
         ContextPtr context,
