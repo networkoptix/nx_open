@@ -120,7 +120,6 @@ void QnSystemDescription::addServer(
 {
     NX_DEBUG(this, nx::format("Cloud system <%1>, server <%2>(%3): adding server information"),
         id(), serverInfo.id, online ? "online" : "offline");
-    NX_ASSERT(!serverInfo.version.isNull(), "Server %1 has null version", serverInfo.id);
 
     const bool containsServer = m_servers.contains(serverInfo.id);
     NX_ASSERT(!containsServer, "System contains specified server");

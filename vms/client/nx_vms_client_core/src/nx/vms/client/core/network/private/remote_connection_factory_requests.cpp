@@ -684,7 +684,8 @@ nx::vms::api::LoginSession RemoteConnectionFactoryRequestsManager::getCurrentSes
         expectedErrorCodes(expectedErrors));
 }
 
-void RemoteConnectionFactoryRequestsManager::checkDigestAuthentication(ContextPtr context) const
+void RemoteConnectionFactoryRequestsManager::checkDigestAuthentication(
+    ContextPtr context, bool is2FaEnabledForUser) const
 {
     NX_DEBUG(this, "Checking digest authentication as %1 in %2",
         context->credentials().username, context);
@@ -702,8 +703,23 @@ void RemoteConnectionFactoryRequestsManager::checkDigestAuthentication(ContextPt
         return;
     }
 
+    const auto expectedErrors = expectedErrorCodes(
+        [context, is2FaEnabledForUser]() -> ExternalErrorMap
+        {
+            if (is2FaEnabledForUser
+                && context->logonData.purpose != LogonData::Purpose::connectInCompatibilityMode
+                && context->userType() == nx::vms::api::UserType::cloud
+                && !context->isRestApiSupported())
+            {
+                using Code = RemoteConnectionErrorCode;
+                return {{StatusCode::unauthorized, Code::systemIsNotCompatibleWith2Fa}};
+            }
+            return {};
+        }());
+
     const auto url = makeUrl(context->address(), "/api/moduleInformationAuthenticated");
-    d->doGet<ModuleInformationWrapper>(url, context, d->makeRequestWithCredentials(context));
+    d->doGet<ModuleInformationWrapper>(
+        url, context, d->makeRequestWithCredentials(context), expectedErrors);
 }
 
 std::future<RemoteConnectionFactoryContext::CloudTokenInfo>
