@@ -619,7 +619,7 @@
     </message>
     <message>
       <source>Cameras List by Server...</source>
-      <translation>カメラリスト...</translation>
+      <translation>サーバー別カメラリスト...</translation>
     </message>
     <message>
       <source>Server Logs...</source>
@@ -4795,7 +4795,7 @@ License Key: %2</source>
     <name>QnServerSettingsWidget</name>
     <message>
       <source>At least two servers are required for this feature.</source>
-      <translation>この機能には最低2台のサーバーが必要です.</translation>
+      <translation>この機能には少なくとも 2 台のサーバーが必要です。</translation>
     </message>
     <message>
       <source>Max devices on this server:</source>
@@ -7361,7 +7361,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Applying changes...</source>
-      <translation>変更の適応中...</translation>
+      <translation>変更を適用しています...</translation>
     </message>
     <message>
       <source>Force Motion Detection</source>
