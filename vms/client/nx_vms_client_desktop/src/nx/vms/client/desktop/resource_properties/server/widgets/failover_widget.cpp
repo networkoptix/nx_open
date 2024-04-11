@@ -35,8 +35,8 @@
 
 namespace {
 
-static const int kPcServerMaxCameras = 128;
-static const int kArmServerMaxCameras = 12;
+static const int kPcServerMaxCameras = 256;
+static const int kArmServerMaxCameras = 16;
 static const int kEdgeServerMaxCameras = 1;
 
 } // namespace
