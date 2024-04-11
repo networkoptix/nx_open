@@ -11,6 +11,11 @@ MediaPlayerChannelAdapter::MediaPlayerChannelAdapter(QObject* parent):
 {
 }
 
+MediaPlayerChannelAdapter::~MediaPlayerChannelAdapter()
+{
+    setVideoSurface(nullptr);
+}
+
 QVideoSink* MediaPlayerChannelAdapter::videoSurface() const
 {
     return m_videoSurface;
