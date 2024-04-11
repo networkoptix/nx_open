@@ -605,7 +605,7 @@
     </message>
     <message>
       <source>Cameras List by Server...</source>
-      <translation>カメラリスト...</translation>
+      <translation>サーバー別カメラリスト...</translation>
     </message>
     <message>
       <source>Server Logs...</source>
@@ -4940,7 +4940,7 @@ to %1</source>
     <name>QnServerSettingsWidget</name>
     <message>
       <source>At least two servers are required for this feature.</source>
-      <translation>この機能には最低2台のサーバーが必要です.</translation>
+      <translation>この機能には少なくとも 2 台のサーバーが必要です。</translation>
     </message>
     <message>
       <source>Max devices on this server:</source>
@@ -7316,7 +7316,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Applying changes...</source>
-      <translation>変更の適応中...</translation>
+      <translation>変更を適用しています...</translation>
     </message>
   </context>
   <context>

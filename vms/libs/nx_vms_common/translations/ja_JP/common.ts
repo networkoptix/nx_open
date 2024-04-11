@@ -282,7 +282,7 @@
     </message>
     <message>
       <source>Camera initialization process is in progress.</source>
-      <translation>カメラをイニシャライズしています。</translation>
+      <translation>カメラのイニシャライズ処理中です。</translation>
     </message>
     <message>
       <source>I/O Module initialization process is in progress.</source>

@@ -701,7 +701,7 @@
     </message>
     <message>
       <source>No bookmarks</source>
-      <translation>ブックマークなし</translation>
+      <translation>ブックマークはありません</translation>
     </message>
     <message>
       <source>Select a time span on the timeline and right-click the highlighted section to create a bookmark</source>
