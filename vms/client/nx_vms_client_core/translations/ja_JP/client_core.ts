@@ -109,7 +109,7 @@
     </message>
     <message>
       <source>Incorrect username or password.</source>
-      <translation>ユーザー名またはパスワードが間違っています.</translation>
+      <translation>ユーザー名またはパスワードが違います。</translation>
     </message>
     <message>
       <source>User is disabled</source>

@@ -220,7 +220,7 @@
     </message>
     <message>
       <source>Members of this group can view live videos, I/O modules and web pages.</source>
-      <translation type="unfinished">Members of this group can view live videos, I/O modules and web pages.</translation>
+      <translation>Bu grubun üyeleri canlı videoları, I/O modüllerini ve web sayfalarını görüntüleyebilir.</translation>
     </message>
     <message>
       <source>Members of this group can view System Health Monitoring information and server processor load in real-time (Server Monitoring).</source>
