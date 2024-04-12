@@ -93,6 +93,12 @@ std::optional<QueryQueue::value_type> QueryQueue::pop(
     }
 }
 
+void QueryQueue::reportTimedOutQueries()
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    removeExpiredElements(&lock);
+}
+
 void QueryQueue::enableItemStayTimeoutEvent(
     std::chrono::milliseconds timeout,
     ItemStayTimeoutHandler itemStayTimeoutHandler)

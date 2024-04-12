@@ -46,13 +46,13 @@ AsyncSqlQueryExecutor::AsyncSqlQueryExecutor(
     m_dropConnectionThread = nx::utils::thread(
         std::bind(&AsyncSqlQueryExecutor::dropExpiredConnectionsThreadFunc, this));
 
-    using namespace std::placeholders;
-    if (m_connectionOptions.maxPeriodQueryWaitsForAvailableConnection
-            > std::chrono::minutes::zero())
+    if (m_connectionOptions.maxPeriodQueryWaitsForAvailableConnection > std::chrono::minutes::zero())
     {
         m_queryQueue.enableItemStayTimeoutEvent(
             m_connectionOptions.maxPeriodQueryWaitsForAvailableConnection,
-            std::bind(&AsyncSqlQueryExecutor::reportQueryCancellation, this, _1));
+            [this](auto&&... args) { reportQueryCancellation(std::forward<decltype(args)>(args)...); });
+
+        m_queryTimeoutThread = nx::utils::thread([this]() { reportQueryTimeoutThreadMain(); });
     }
 
     if (m_connectionOptions.driverType == RdbmsDriverType::sqlite)
@@ -84,6 +84,7 @@ void AsyncSqlQueryExecutor::pleaseStopSync()
     decltype(m_cursorProcessorContexts) cursorProcessorContexts;
     {
         NX_MUTEX_LOCKER lk(&m_mutex);
+
         std::swap(m_dbThreadList, dbThreadPool);
         std::swap(m_cursorProcessorContexts, cursorProcessorContexts);
         m_terminated = true;
@@ -96,6 +97,12 @@ void AsyncSqlQueryExecutor::pleaseStopSync()
     for (auto& context: cursorProcessorContexts)
         context->processingThread->pleaseStop();
     cursorProcessorContexts.clear();
+
+    if (m_queryTimeoutThread.joinable())
+    {
+        m_queryTimeoutThreadStoppedCondition.wakeAll();
+        m_queryTimeoutThread.join();
+    }
 }
 
 const ConnectionOptions& AsyncSqlQueryExecutor::connectionOptions() const
@@ -373,6 +380,24 @@ void AsyncSqlQueryExecutor::addCursorProcessingThread(const nx::Locker<nx::Mutex
     m_cursorProcessorContexts.back()->processingThread =
         createNewConnectionThread(connectionOptions, &m_cursorTaskQueue);
     m_cursorProcessorContexts.back()->processingThread->start();
+}
+
+void AsyncSqlQueryExecutor::reportQueryTimeoutThreadMain()
+{
+    static constexpr auto kMinDelay = std::chrono::milliseconds(1);
+    static constexpr auto kMaxDelay = std::chrono::seconds(3);
+
+    const auto delay = std::min<std::chrono::milliseconds>(
+        std::max(m_connectionOptions.maxPeriodQueryWaitsForAvailableConnection / 3, kMinDelay),
+        kMaxDelay);
+
+    while (!m_terminated)
+    {
+        m_queryQueue.reportTimedOutQueries();
+
+        NX_MUTEX_LOCKER lk(&m_mutex);
+        m_queryTimeoutThreadStoppedCondition.wait(lk.mutex(), delay);
+    }
 }
 
 } // namespace nx::sql
