@@ -34,6 +34,12 @@ public:
     std::optional<value_type> pop(
         std::optional<std::chrono::milliseconds> timeout = std::nullopt);
 
+    /**
+     * Checks for timed out queries and calls the timeout handler for each of them within this
+     * fuction. Does not block.
+     */
+    void reportTimedOutQueries();
+
     void enableItemStayTimeoutEvent(
         std::chrono::milliseconds timeout,
         ItemStayTimeoutHandler itemStayTimeoutHandler);

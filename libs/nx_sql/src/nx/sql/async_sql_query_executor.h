@@ -384,11 +384,13 @@ private:
     const ConnectionOptions m_connectionOptions;
     mutable nx::Mutex m_mutex;
     StatisticsCollector m_statisticsCollector;
+    nx::utils::thread m_queryTimeoutThread;
+    nx::WaitCondition m_queryTimeoutThreadStoppedCondition;
     detail::QueryQueue m_queryQueue;
     std::vector<std::unique_ptr<detail::BaseQueryExecutor>> m_dbThreadList;
     nx::utils::thread m_dropConnectionThread;
     nx::utils::SyncQueue<std::unique_ptr<detail::BaseQueryExecutor>> m_connectionsToDropQueue;
-    bool m_terminated = false;
+    std::atomic<bool> m_terminated = false;
     std::optional<ConnectionFactoryFunc> m_connectionFactory;
 
     detail::QueryQueue m_cursorTaskQueue;
@@ -423,6 +425,8 @@ private:
         CompletionHandler completionHandler);
 
     void addCursorProcessingThread(const nx::Locker<nx::Mutex>& lock);
+
+    void reportQueryTimeoutThreadMain();
 };
 
 } // namespace nx::sql
