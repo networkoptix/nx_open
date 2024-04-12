@@ -1307,15 +1307,15 @@
     </message>
     <message>
       <source>Select a camera to see its motion events</source>
-      <translation>カメラを選択してモーションイベントを表示します</translation>
+      <translation>モーションイベントを表示するには、カメラを選択してください。</translation>
     </message>
     <message>
       <source>No motion detected</source>
-      <translation>モーションが検出されませんでした</translation>
+      <translation>モーションは検出されませんでした</translation>
     </message>
     <message>
       <source>Try changing the filters or enable motion recording</source>
-      <translation>フィルターを変更するか、モーション録画を有効にしてください</translation>
+      <translation>フィルターを変更するか、モーション録画を有効にしてください。</translation>
     </message>
     <message>
       <source>Select Camera...</source>
@@ -1327,7 +1327,7 @@
     </message>
     <message>
       <source>Select a time span on the timeline and right-click the highlighted section to create a bookmark</source>
-      <translation>ブックマークを作成するには、タイムラインで期間を選択し、強調表示されたセクションを右クリックします</translation>
+      <translation>ブックマークを作成するには、タイムラインで期間を選択し、強調表示されたセクションを右クリックしてください。</translation>
     </message>
   </context>
   <context>
@@ -1731,8 +1731,7 @@ to activate PTZ</source>
     <message>
       <source>Introducing
 New PTZ controls</source>
-      <translation>新しいPTZコントロール
-の紹介</translation>
+      <translation>新しいPTZコントロールの紹介</translation>
     </message>
     <message>
       <source>Click, double-click, or drag
@@ -1750,7 +1749,7 @@ on what has changed.</source>
     <message>
       <source>To use Target Lock Tracking,
 Press Alt + Click to follow object</source>
-      <translation>ターゲットロックトラッキングで
+      <translation>ターゲットロック追跡で
 オブジェクトを追跡するには、
 Alt + クリックを使用してください。</translation>
     </message>
@@ -2584,7 +2583,7 @@ Alt + クリックを使用してください。</translation>
     </message>
     <message>
       <source>Obtaining Link...</source>
-      <translation>リンクを取得中...</translation>
+      <translation>リンクを取得しています...</translation>
     </message>
     <message>
       <source>Ensure that this computer is able to connect to the %1</source>
