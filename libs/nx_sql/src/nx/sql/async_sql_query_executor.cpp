@@ -46,6 +46,8 @@ AsyncSqlQueryExecutor::AsyncSqlQueryExecutor(
     m_dropConnectionThread = nx::utils::thread(
         std::bind(&AsyncSqlQueryExecutor::dropExpiredConnectionsThreadFunc, this));
 
+    m_queryTimeoutThread = nx::utils::thread([this]() { reportQueryTimeoutThreadMain(); });
+
     m_queryQueue.setOnItemStayTimeout([this](auto&&... args) {
         reportQueryCancellation(std::forward<decltype(args)>(args)...);
     });
@@ -104,6 +106,12 @@ void AsyncSqlQueryExecutor::pleaseStopSync()
     for (auto& context: cursorProcessorContexts)
         context->processingThread->pleaseStop();
     cursorProcessorContexts.clear();
+
+    if (m_queryTimeoutThread.joinable())
+    {
+        m_queryTimeoutThreadStoppedCondition.wakeAll();
+        m_queryTimeoutThread.join();
+    }
 }
 
 const ConnectionOptions& AsyncSqlQueryExecutor::connectionOptions() const
@@ -400,6 +408,26 @@ void AsyncSqlQueryExecutor::addCursorProcessingThread(const nx::Locker<nx::Mutex
     m_cursorProcessorContexts.back()->processingThread =
         createNewConnectionThread(connectionOptions, &m_cursorTaskQueue);
     m_cursorProcessorContexts.back()->processingThread->start();
+}
+
+void AsyncSqlQueryExecutor::reportQueryTimeoutThreadMain()
+{
+    static constexpr auto kMinDelay = std::chrono::milliseconds(101);
+    static constexpr auto kMaxDelay = std::chrono::seconds(3);
+
+    while (!m_terminated)
+    {
+        m_queryQueue.reportTimedOutQueries();
+
+        // Recalculating the delay since maxPeriodQueryWaitsForAvailableConnection setting may be
+        // changed.
+        const auto delay = std::min<std::chrono::milliseconds>(
+            std::max(m_connectionOptions.maxPeriodQueryWaitsForAvailableConnection / 3, kMinDelay),
+            kMaxDelay);
+
+        NX_MUTEX_LOCKER lk(&m_mutex);
+        m_queryTimeoutThreadStoppedCondition.wait(lk.mutex(), delay);
+    }
 }
 
 } // namespace nx::sql
