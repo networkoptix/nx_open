@@ -583,7 +583,7 @@ void DeviceAdditionDialog::handleDeviceRemoved(const QString& physicalId)
         return;
 
     const auto state = index.data(FoundDevicesModel::presentedStateRole);
-    if (NX_ASSERT(state == FoundDevicesModel::alreadyAddedState,
+    if (NX_ASSERT(state != FoundDevicesModel::notPresentedState,
         "Wrong presented state: %1", state))
     {
         m_model->setData(
