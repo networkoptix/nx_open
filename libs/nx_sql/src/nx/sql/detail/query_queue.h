@@ -43,6 +43,12 @@ public:
     void setOnItemStayTimeout(ItemStayTimeoutHandler itemStayTimeoutHandler);
 
     /**
+     * Checks for timed out queries and calls the timeout handler for each of them within this
+     * fuction. Does not block.
+     */
+    void reportTimedOutQueries();
+
+    /**
      * @param value Zero - no limit. By default, zero.
      */
     void setConcurrentModificationQueryLimit(int value);
@@ -99,6 +105,8 @@ private:
 
     std::optional<std::chrono::milliseconds> m_itemStayTimeout;
     ItemStayTimeoutHandler m_itemStayTimeoutHandler;
+
+    void moveFromPreliminaryToMainQueue();
 
     int getPriority(const AbstractExecutor& query) const;
 
