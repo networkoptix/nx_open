@@ -73,7 +73,7 @@ public:
         m_forcedDbConnectionError(std::make_shared<DBResult>(DBResultCode::ok))
     {
         setConnectionFactory([this](auto&&... args) {
-            return createConnection(std::forward<decltype(args)>(args)...);
+            return createMockDbConnection(std::forward<decltype(args)>(args)...);
         });
 
         connectionOptions().maxConnectionCount = kDefaultMaxConnectionCount;
@@ -282,17 +282,7 @@ protected:
         *m_forcedDbConnectionError = DBResultCode::ok;
     }
 
-private:
-    DbConnectionEventsReceiver* m_eventsReceiver = nullptr;
-    nx::utils::SyncQueue<DBResult> m_queryResults;
-    int m_issuedRequestCount = 0;
-    nx::utils::promise<void> m_finishHangingQuery;
-    std::atomic<int> m_maxNumberOfConcurrentDataModificationRequests = 0;
-    std::atomic<int> m_concurrentDataModificationRequests = 0;
-    bool m_lastDbOpenResult = false;
-    std::shared_ptr<DBResult> m_forcedDbConnectionError;
-
-    std::unique_ptr<AbstractDbConnection> createConnection(
+    std::unique_ptr<AbstractDbConnection> createMockDbConnection(
         const ConnectionOptions& connectionOptions)
     {
         auto connection = std::make_unique<DbConnectionMock>(
@@ -307,6 +297,16 @@ private:
 
         return connection;
     }
+
+private:
+    DbConnectionEventsReceiver* m_eventsReceiver = nullptr;
+    nx::utils::SyncQueue<DBResult> m_queryResults;
+    int m_issuedRequestCount = 0;
+    nx::utils::promise<void> m_finishHangingQuery;
+    std::atomic<int> m_maxNumberOfConcurrentDataModificationRequests = 0;
+    std::atomic<int> m_concurrentDataModificationRequests = 0;
+    bool m_lastDbOpenResult = false;
+    std::shared_ptr<DBResult> m_forcedDbConnectionError;
 
     void emulateQueryError(DBResultCode dbResultToEmulate)
     {
@@ -465,6 +465,59 @@ TEST_F(DbAsyncSqlQueryExecutor, reconnect_after_db_failure)
 
     // Then DB becomes available again.
     ASSERT_EQ(DBResultCode::ok, executeUpdate("INSERT INTO company VALUES ('Bar', 1976)"));
+}
+
+//-------------------------------------------------------------------------------------------------
+
+class DbAsyncSqlQueryExecutorQueryTimeout:
+    public DbAsyncSqlQueryExecutor
+{
+    using base_type = DbAsyncSqlQueryExecutor;
+
+protected:
+    void prepareQueryExecutor()
+    {
+        m_queryExecutor = std::make_unique<AsyncSqlQueryExecutor>(connectionOptions());
+        m_queryExecutor->setCustomConnectionFactory([this](auto&&... args)
+        {
+            return createMockDbConnection(std::forward<decltype(args)>(args)...);
+        });
+    }
+
+    DBResult executeAnyQuery()
+    {
+        try
+        {
+            m_queryExecutor->executeUpdateSync(
+                [](QueryContext* queryContext)
+                {
+                    SqlQuery query(queryContext->connection());
+                    query.prepare("INSERT INTO company VALUES ('Foo', 1975)");
+                    query.exec();
+                    return DBResultCode::ok;
+                });
+
+            return DBResultCode::ok;
+        }
+        catch (const Exception& e)
+        {
+            return e.dbResult();
+        }
+    }
+
+private:
+    std::unique_ptr<AsyncSqlQueryExecutor> m_queryExecutor;
+};
+
+TEST_F(DbAsyncSqlQueryExecutorQueryTimeout, queries_time_out_when_the_db_is_unavailable)
+{
+    connectionOptions().maxPeriodQueryWaitsForAvailableConnection = std::chrono::milliseconds(100);
+
+    makeDbUnavailable();
+    prepareQueryExecutor();
+
+    // Expecting every query to fail with timeout.
+    ASSERT_EQ(DBResultCode::cancelled, executeAnyQuery());
 }
 
 //-------------------------------------------------------------------------------------------------

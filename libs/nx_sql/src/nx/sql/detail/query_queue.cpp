@@ -76,22 +76,9 @@ std::optional<QueryQueue::value_type> QueryQueue::pop(
     std::vector<QueryQueue::value_type> resultingQueries;
     for (;;)
     {
-        Queries lightQueue;
-        {
-            std::lock_guard<std::mutex> lock(m_preliminaryQueueMutex);
-            std::swap(lightQueue, m_preliminaryQueue);
-        }
+        moveFromPreliminaryToMainQueue();
 
         NX_MUTEX_LOCKER lock(&m_mainQueueMutex);
-
-        // Enqueuing tasks.
-        for (auto& task: lightQueue)
-        {
-            const auto priority = getPriority(*task.value);
-            m_priorityToQueue[priority].push_back(std::move(task));
-            --m_preliminaryQueueSize;
-            ++m_pendingQueryCount;
-        }
 
         removeExpiredElements(&lock);
 
@@ -134,6 +121,14 @@ void QueryQueue::setOnItemStayTimeout(ItemStayTimeoutHandler itemStayTimeoutHand
     m_itemStayTimeoutHandler = std::move(itemStayTimeoutHandler);
 }
 
+void QueryQueue::reportTimedOutQueries()
+{
+    moveFromPreliminaryToMainQueue();
+
+    NX_MUTEX_LOCKER lock(&m_mainQueueMutex);
+    removeExpiredElements(&lock);
+}
+
 void QueryQueue::setConcurrentModificationQueryLimit(int value)
 {
     m_concurrentModificationQueryLimit = value;
@@ -158,6 +153,26 @@ void QueryQueue::setAggregationLimit(int limit)
 int QueryQueue::aggregationLimit() const
 {
     return m_aggregationLimit;
+}
+
+void QueryQueue::moveFromPreliminaryToMainQueue()
+{
+    Queries lightQueue;
+    {
+        std::lock_guard<std::mutex> lock(m_preliminaryQueueMutex);
+        std::swap(lightQueue, m_preliminaryQueue);
+    }
+
+    NX_MUTEX_LOCKER lock(&m_mainQueueMutex);
+
+    // Enqueuing tasks.
+    for (auto& task: lightQueue)
+    {
+        const auto priority = getPriority(*task.value);
+        m_priorityToQueue[priority].push_back(std::move(task));
+        --m_preliminaryQueueSize;
+        ++m_pendingQueryCount;
+    }
 }
 
 int QueryQueue::getPriority(const AbstractExecutor& value) const
