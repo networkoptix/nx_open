@@ -725,7 +725,7 @@
     </message>
     <message>
       <source>Source: %1</source>
-      <translation>ソース:.%1</translation>
+      <translation>ソース: %1</translation>
     </message>
     <message>
       <source>Plugin: %1</source>

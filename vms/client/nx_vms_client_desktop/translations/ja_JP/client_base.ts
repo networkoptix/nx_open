@@ -34,7 +34,7 @@
     <name>CameraDiagnostics::DiagnoseTool</name>
     <message>
       <source>No connection to Server %1.</source>
-      <translation>サーバー %1に接続できません.</translation>
+      <translation>サーバー %1 に接続できません。</translation>
     </message>
   </context>
   <context>
@@ -134,7 +134,7 @@
     </message>
     <message>
       <source>Connect to Server...</source>
-      <translation>サーバーに接続....</translation>
+      <translation>サーバーに接続...</translation>
     </message>
     <message>
       <source>Disconnect from Server</source>
@@ -601,7 +601,7 @@
     </message>
     <message>
       <source>Devices List by Server...</source>
-      <translation>デバイスリスト...</translation>
+      <translation>サーバー別デバイスリスト...</translation>
     </message>
     <message>
       <source>Cameras List by Server...</source>
@@ -1667,7 +1667,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Please wait for the camera to go online.</source>
-      <translation>カメラがオンラインになるまでお待ちください.</translation>
+      <translation>カメラがオンラインになるまでお待ちください。</translation>
     </message>
     <message>
       <source>Failed to get current position</source>
@@ -2562,11 +2562,11 @@ License Key: %2</source>
     </message>
     <message>
       <source>Confirming server availability.</source>
-      <translation>サーバーをチェック</translation>
+      <translation>サーバーの可用性の確認</translation>
     </message>
     <message>
       <source>Evaluating media stream for errors.</source>
-      <translation>メディアストリームのエラーをチェック</translation>
+      <translation>メディアストリームのエラー確認</translation>
     </message>
     <message>
       <source>Diagnostics for device %1</source>
@@ -2594,11 +2594,11 @@ License Key: %2</source>
     </message>
     <message>
       <source>Confirming target device provides media stream.</source>
-      <translation>対象デバイスのメディアストリームを確認</translation>
+      <translation>対象デバイスによるメディアストリーム提供の確認</translation>
     </message>
     <message>
       <source>Confirming target camera provides media stream.</source>
-      <translation>対象カメラのメディアストリームを確認</translation>
+      <translation>対象カメラによるメディアストリーム提供の確認</translation>
     </message>
     <message>
       <source>Diagnostics for I/O module %1</source>
@@ -2614,7 +2614,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Confirming target I/O module provides media stream.</source>
-      <translation>対象I/Oモジュールのメディアストリームを確認</translation>
+      <translation>対象I/Oモジュールによるメディアストリーム提供の確認</translation>
     </message>
     <message>
       <source>Diagnostics complete</source>
@@ -2673,11 +2673,11 @@ License Key: %2</source>
     </message>
     <message>
       <source>Export selected devices to a file.</source>
-      <translation>選択したデバイスをファイルにエクスポートします。</translation>
+      <translation>選択したデバイスをファイルにエクスポート</translation>
     </message>
     <message>
       <source>Export selected cameras to a file.</source>
-      <translation>選択したカメラをファイルにエクスポートします。</translation>
+      <translation>選択したカメラをファイルにエクスポート</translation>
     </message>
     <message numerus="yes">
       <source>%n I/O modules found</source>
@@ -3139,11 +3139,11 @@ to %1</source>
     <name>QnDatabaseManagementWidget</name>
     <message>
       <source>Save Database Backup...</source>
-      <translation>バックアップデータベース保存...</translation>
+      <translation>データベースのバックアップを保存...</translation>
     </message>
     <message>
       <source>Database backup is being downloaded from the server. Please wait.</source>
-      <translation>サーバーからデータベースバックアップをダウンロード中　暫くお待ちください.</translation>
+      <translation>データベースのバックアップをサーバーからダウンロードしています。しばらくお待ちください。</translation>
     </message>
     <message>
       <source>Open Database Backup...</source>
@@ -3262,11 +3262,11 @@ to %1</source>
     </message>
     <message>
       <source>Adjust device settings</source>
-      <translation>デバイス設定</translation>
+      <translation>デバイス設定の調整</translation>
     </message>
     <message>
       <source>Adjust camera settings</source>
-      <translation>カメラ設定</translation>
+      <translation>カメラ設定の調整</translation>
     </message>
     <message>
       <source>Use PTZ controls</source>
@@ -3316,7 +3316,7 @@ to %1</source>
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation>音声エンコーダーを初期化できませんでした。</translation>
+      <translation>オーディオエンコーダーを初期化できませんでした。</translation>
     </message>
     <message>
       <source>Could not start primary audio device.</source>
@@ -3324,7 +3324,7 @@ to %1</source>
     </message>
     <message>
       <source>Screen width must be a multiple of 8.</source>
-      <translation>スクリーン幅は8の倍数に設定して下さい.</translation>
+      <translation>画面の幅は 8 の倍数である必要があります。</translation>
     </message>
     <message>
       <source>Could not initialize audio device &quot;%1&quot;.</source>
@@ -4265,7 +4265,7 @@ to %1</source>
     <name>QnNotificationSoundModel</name>
     <message>
       <source>Downloading sound list...</source>
-      <translation>サウンドリストをダウンロード中...</translation>
+      <translation>サウンドリストをダウンロードしています...</translation>
     </message>
     <message>
       <source>No Sound</source>
@@ -4273,11 +4273,11 @@ to %1</source>
     </message>
     <message>
       <source>Downloading sound...</source>
-      <translation>サウンドをダウンロード中...</translation>
+      <translation>サウンドをダウンロードしています...</translation>
     </message>
     <message>
       <source>Uploading sound...</source>
-      <translation>サウンドをアップロード中...</translation>
+      <translation>サウンドをアップロードしています...</translation>
     </message>
   </context>
   <context>
@@ -4830,7 +4830,7 @@ to %1</source>
     <message numerus="yes">
       <source>%n Users</source>
       <translation>
-        <numerusform>ユーザー %n</numerusform>
+        <numerusform>%n ユーザー</numerusform>
       </translation>
     </message>
   </context>
@@ -5692,7 +5692,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnTwoWayAudioWidget::Private</name>
     <message>
       <source>Input device is not selected</source>
-      <translation>入力デバイスが選択されていません.</translation>
+      <translation>入力デバイスが選択されていません</translation>
     </message>
     <message>
       <source>Streaming is not ready yet</source>
@@ -5700,7 +5700,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Network error</source>
-      <translation>ネットワークエラー.</translation>
+      <translation>ネットワークエラー</translation>
     </message>
     <message>
       <source>Hold to Speak</source>
@@ -6109,7 +6109,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>QnWorkbenchScreenRecordingHandler</name>
     <message>
       <source>Screen capturing subsystem is not initialized yet. Please try again later.</source>
-      <translation>スクリーンキャプチャーがイニシャライズされていません　後で再度実行して下さい.</translation>
+      <translation>スクリーンキャプチャのサブシステムはまだ初期化されていません。後ほどお試しください。</translation>
     </message>
     <message>
       <source>Recording in %1...</source>
@@ -6121,7 +6121,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Save Recording As...</source>
-      <translation>名前を付けて保存...</translation>
+      <translation>名前を付けて録画を保存...</translation>
     </message>
     <message>
       <source>Failed to start recording</source>
@@ -6152,7 +6152,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Saving Screenshot...</source>
-      <translation>スクリーンショット保存...</translation>
+      <translation>スクリーンショットを保存しています...</translation>
     </message>
     <message>
       <source>Failed to save screenshot</source>
@@ -6812,11 +6812,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Adjust device settings</source>
-      <translation>デバイス設定</translation>
+      <translation>デバイス設定の調整</translation>
     </message>
     <message>
       <source>Adjust camera settings</source>
-      <translation>カメラ設定</translation>
+      <translation>カメラ設定の調整</translation>
     </message>
     <message>
       <source>Use PTZ controls</source>
@@ -7312,7 +7312,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::CameraAdvancedParamsWidget</name>
     <message>
       <source>Loading values...</source>
-      <translation>値を読み込み中...</translation>
+      <translation>値を読み込んでいます...</translation>
     </message>
     <message>
       <source>Applying changes...</source>
@@ -8237,7 +8237,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Initializing scan...</source>
-      <translation>スキャンを初期化中...</translation>
+      <translation>スキャンを初期化しています...</translation>
     </message>
     <message>
       <source>Scanning online hosts...</source>
@@ -8985,15 +8985,15 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Device address field must contain a valid URL, IP address, or RTSP link.</source>
-      <translation>デバイスアドレスにはURL、アドレス、RTSPリンク等を入力してください.</translation>
+      <translation>デバイスアドレス欄には、有効な URL、IP アドレス、または RTSP リンクが含まれている必要があります。</translation>
     </message>
     <message>
       <source>First address in range is greater than the last one.</source>
-      <translation>開始は終了前に設定してください.</translation>
+      <translation>範囲内の最初のアドレスが、最後のアドレスよりも大きいです。</translation>
     </message>
     <message>
       <source>The specified IP address range has more than 255 addresses.</source>
-      <translation>IPアドレス範囲を255以内にしてください。</translation>
+      <translation>アドレス数が 255 以内になるよう IP アドレス範囲を指定してください。</translation>
     </message>
     <message>
       <source>Can not start the search process</source>
@@ -9565,7 +9565,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Select layout...</source>
-      <translation>レイアウトを選択...</translation>
+      <translation>レイアウトを選択してください...</translation>
     </message>
     <message>
       <source>Local layouts can only be shown to their owners.</source>
@@ -11534,12 +11534,12 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <message>
       <source>%1 (active)</source>
       <comment>Template for active PTZ preset</comment>
-      <translation>%1(アクティブ)</translation>
+      <translation>%1 (アクティブ)</translation>
     </message>
     <message>
       <source>%1 (active)</source>
       <comment>Template for active PTZ tour</comment>
-      <translation>%1(アクティブ)</translation>
+      <translation>%1 (アクティブ)</translation>
     </message>
   </context>
   <context>
@@ -11615,7 +11615,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <message numerus="yes">
       <source>%n Users</source>
       <translation>
-        <numerusform>ユーザー %n</numerusform>
+        <numerusform>%n ユーザー</numerusform>
       </translation>
     </message>
   </context>
@@ -11921,7 +11921,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     <name>nx::vms::client::desktop::utils::WebDownloader</name>
     <message>
       <source>Save File As...</source>
-      <translation>ファイルに名前を付けて保存...</translation>
+      <translation>名前を付けてファイルを保存...</translation>
     </message>
     <message>
       <source>Failed to overwrite file</source>

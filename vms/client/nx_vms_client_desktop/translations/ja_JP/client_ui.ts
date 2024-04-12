@@ -983,7 +983,7 @@
     </message>
     <message>
       <source>Testing connection...</source>
-      <translation>接続テスト中...</translation>
+      <translation>接続をテストしています...</translation>
     </message>
   </context>
   <context>
@@ -1035,7 +1035,7 @@
     <name>DatabaseManagementWidget</name>
     <message>
       <source>Create Backup...</source>
-      <translation>バックアップ...</translation>
+      <translation>バックアップを作成...</translation>
     </message>
     <message>
       <source>Restore from Backup...</source>
@@ -1508,7 +1508,7 @@
     </message>
     <message>
       <source>Loading Image...Please Wait.</source>
-      <translation>ローディング中...お待ちください.</translation>
+      <translation>画像を読み込んでいます... しばらくお待ちください。</translation>
     </message>
     <message>
       <source>No image</source>
@@ -1760,7 +1760,7 @@
     </message>
     <message>
       <source>Select License File...</source>
-      <translation>ライセンスファイル選択...</translation>
+      <translation>ライセンスファイルを選択...</translation>
     </message>
     <message>
       <source>Browse...</source>
@@ -2076,7 +2076,7 @@
     </message>
     <message>
       <source>Select layout...</source>
-      <translation>レイアウトを選択...</translation>
+      <translation>レイアウトを選択してください...</translation>
     </message>
   </context>
   <context>
@@ -2464,11 +2464,11 @@
     </message>
     <message>
       <source>Launch video wall when Windows starts.</source>
-      <translation>Windows起動時にビデオウォールを開始する</translation>
+      <translation>Windows の起動時にビデオウォールを開始する</translation>
     </message>
     <message>
       <source>Place shortcut on desktop.</source>
-      <translation>デスクトップにショートカットを作成</translation>
+      <translation>デスクトップにショートカットを作成する</translation>
     </message>
     <message>
       <source>Enable timeline on video wall</source>
@@ -2517,7 +2517,7 @@
     <name>ReconnectInfoDialog</name>
     <message>
       <source>Reconnecting...</source>
-      <translation>再接続...</translation>
+      <translation>再接続中...</translation>
     </message>
     <message>
       <source>Please wait while the connection is being restored...</source>
@@ -2811,7 +2811,7 @@
     </message>
     <message>
       <source>Global Email Settings...</source>
-      <translation>グローバルEmail設定(&amp;G)...</translation>
+      <translation>メールサーバー設定...</translation>
     </message>
   </context>
   <context>

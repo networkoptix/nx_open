@@ -685,15 +685,15 @@
     </message>
     <message>
       <source>Select a camera to see its motion events</source>
-      <translation>カメラを選択してモーションイベントを表示します</translation>
+      <translation>モーションイベントを表示するには、カメラを選択してください。</translation>
     </message>
     <message>
       <source>No motion detected</source>
-      <translation>モーションが検出されませんでした</translation>
+      <translation>モーションは検出されませんでした</translation>
     </message>
     <message>
       <source>Try changing the filters or enable motion recording</source>
-      <translation>フィルターを変更するか、モーション録画を有効にしてください</translation>
+      <translation>フィルターを変更するか、モーション録画を有効にしてください。</translation>
     </message>
     <message>
       <source>Select Camera...</source>
@@ -705,7 +705,7 @@
     </message>
     <message>
       <source>Select a time span on the timeline and right-click the highlighted section to create a bookmark</source>
-      <translation>ブックマークを作成するには、タイムラインで期間を選択し、強調表示されたセクションを右クリックします</translation>
+      <translation>ブックマークを作成するには、タイムラインで期間を選択し、強調表示されたセクションを右クリックしてください。</translation>
     </message>
   </context>
   <context>
@@ -874,12 +874,12 @@
     <message>
       <source>Introducing you
 new PTZ controls</source>
-      <translation>新しいPTZコントロールをご紹介します</translation>
+      <translation>新しいPTZコントロールの紹介</translation>
     </message>
     <message>
       <source>Here is a quick presentation
 of what has changed</source>
-      <translation>変更内容を簡単に説明します</translation>
+      <translation>変更内容を簡単に説明します。</translation>
     </message>
     <message>
       <source>Drag over any part of the video
@@ -889,15 +889,15 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Press arrows keys to move and plus or minus keys to zoom</source>
-      <translation>矢印キーで移動、プラスまたはマイナスキーでズームします</translation>
+      <translation>移動には矢印キー、ズームにはプラス・マイナスキーを使用してください。</translation>
     </message>
     <message>
       <source>Use the mouse wheel to zoom</source>
-      <translation>ズームするには、マウスホイールを使用してください</translation>
+      <translation>ズームには、マウスホイールも使用できます。</translation>
     </message>
     <message>
       <source>Click, double-click, or drag the mouse pointer while pressing the Shift key to use Advanced PTZ</source>
-      <translation>アドバンストPTZ を使用するには、Shift キーを押しながらマウスクリック、ダブルクリック、ドラッグ操作を行ってください</translation>
+      <translation>アドバンストPTZ を使用するには、Shift キーを押しながらクリック、ダブルクリック、ドラッグ操作を行ってください。</translation>
     </message>
     <message>
       <source>Go to Local Settings to enable a drag marker over the center of the video</source>
