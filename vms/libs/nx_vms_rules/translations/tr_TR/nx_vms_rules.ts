@@ -1052,7 +1052,7 @@
     <name>nx::vms::rules::TextOverlayAction</name>
     <message>
       <source>Show Text Overlay</source>
-      <translation type="unfinished">Show Text Overlay</translation>
+      <translation>Metin Yerleşimini Göster</translation>
     </message>
     <message>
       <source>At</source>

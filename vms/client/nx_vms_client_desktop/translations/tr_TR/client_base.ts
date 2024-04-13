@@ -1356,7 +1356,7 @@
       <source>Delete %n groups?</source>
       <comment>Numerical form depends on groups count</comment>
       <translation type="unfinished">
-        <numerusform>%n grup(lar) silinsin mi?</numerusform>
+        <numerusform>%n Grup silinsin mi?</numerusform>
         <numerusform>Delete %n groups?</numerusform>
       </translation>
     </message>
@@ -1772,7 +1772,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Password should contain different types of symbols</source>
-      <translation>Parola farklı simgeler içermelidir.</translation>
+      <translation>Parola farklı simgeler içermelidir</translation>
     </message>
     <message numerus="yes">
       <source>Password must be at least %n characters long</source>
@@ -5996,14 +5996,14 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <message numerus="yes">
       <source>Failed to open %n devices on the video wall:</source>
       <translation type="unfinished">
-        <numerusform>%n cihaz(lar) Video duvarında açılamadı:</numerusform>
+        <numerusform>%n Cihaz video duvarında açılamadı:</numerusform>
         <numerusform>Failed to open %n devices on the video wall:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Failed to open %n cameras on the video wall:</source>
       <translation type="unfinished">
-        <numerusform>%n kamera(lar) Video duvarında açılamadı:</numerusform>
+        <numerusform>%n Kamera video duvarında açılamadı:</numerusform>
         <numerusform>Failed to open %n cameras on the video wall:</numerusform>
       </translation>
     </message>
@@ -6402,7 +6402,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <message numerus="yes">
       <source>Delete %n layouts?</source>
       <translation type="unfinished">
-        <numerusform>%n ekran düzen(leri) silinsin mi?</numerusform>
+        <numerusform>%n Ekran düzeni silinsin mi?</numerusform>
         <numerusform>Delete %n layouts?</numerusform>
       </translation>
     </message>
@@ -6696,7 +6696,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <message numerus="yes">
       <source>Delete %n groups</source>
       <translation>
-        <numerusform>%n grup(lar) silinsin mi</numerusform>
+        <numerusform>%n Grup silinsin mi</numerusform>
         <numerusform>%n grup(lar) silinsin mi</numerusform>
       </translation>
     </message>
@@ -6711,7 +6711,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <message numerus="yes">
       <source>Failed to delete %n groups.</source>
       <translation type="unfinished">
-        <numerusform>%n grup(lar) silinemedi.</numerusform>
+        <numerusform>%n Grup silinemedi.</numerusform>
         <numerusform>Failed to delete %n groups.</numerusform>
       </translation>
     </message>
@@ -6771,7 +6771,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <message numerus="yes">
       <source>Failed to delete %n users.</source>
       <translation type="unfinished">
-        <numerusform>%n kullanıcı(lar) silinemedi.</numerusform>
+        <numerusform>%n Kullanıcı silinemedi.</numerusform>
         <numerusform>Failed to delete %n users.</numerusform>
       </translation>
     </message>
@@ -7634,7 +7634,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Pointed</source>
-      <translation type="unfinished">Pointed</translation>
+      <translation>İşaretlendi</translation>
     </message>
     <message>
       <source>Place Hotspot</source>
@@ -7669,7 +7669,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Pointed</source>
-      <translation type="unfinished">Pointed</translation>
+      <translation>İşaretlendi</translation>
     </message>
     <message>
       <source>Select Camera...</source>
@@ -12688,11 +12688,11 @@ Bu web sayfasını açmamanızı öneririz. Riskleri anlıyorsanız web sayfası
     </message>
     <message>
       <source>Listed</source>
-      <translation type="unfinished">Listed</translation>
+      <translation>Listelenmiş</translation>
     </message>
     <message>
       <source>Not listed</source>
-      <translation type="unfinished">Not listed</translation>
+      <translation>Listelenmemiş</translation>
     </message>
     <message>
       <source>Attributes</source>

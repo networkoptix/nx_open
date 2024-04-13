@@ -266,7 +266,7 @@
     </message>
     <message>
       <source>API Integrations interact with %1 Server via REST API and exchange metadata</source>
-      <translation type="unfinished">API Integrations interact with %1 Server via REST API and exchange metadata</translation>
+      <translation>API Entegrasyonları, REST API aracılığıyla %1 Sunucu ile etkileşime girer ve meta veri alışverişinde bulunur</translation>
     </message>
     <message>
       <source>New requests</source>
@@ -727,7 +727,7 @@
     </message>
     <message>
       <source>Filters help control access to the system and synchronization by specifying which users and/or groups from the Base DN are allowed.</source>
-      <translation type="unfinished">Filters help control access to the system and synchronization by specifying which users and/or groups from the Base DN are allowed.</translation>
+      <translation>Filtreler, Base DN'den hangi kullanıcılara ve/veya gruplara izin verildiğini belirterek sisteme erişimin ve senkronizasyonun kontrol edilmesine yardımcı olur.</translation>
     </message>
     <message>
       <source>Edit Search Base</source>
