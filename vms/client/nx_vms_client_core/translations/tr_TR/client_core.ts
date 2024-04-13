@@ -248,7 +248,7 @@
     <message numerus="yes">
       <source>Cannot verify the identity of %n servers</source>
       <translation type="unfinished">
-        <numerusform>%n sunucuların kimliği doğrulanamıyor</numerusform>
+        <numerusform>%n Sunucu kimliği doğrulanamıyor</numerusform>
         <numerusform>Cannot verify the identity of %n servers</numerusform>
       </translation>
     </message>

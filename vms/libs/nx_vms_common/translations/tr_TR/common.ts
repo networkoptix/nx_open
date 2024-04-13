@@ -75,7 +75,7 @@
     </message>
     <message>
       <source>More than one user with the same login are presented.</source>
-      <translation type="unfinished">More than one user with the same login are presented.</translation>
+      <translation>Aynı girişe sahip birden fazla kullanıcı sunuldu.</translation>
     </message>
     <message>
       <source>Unable to verify LDAP server SSL/TLS certificate.</source>
