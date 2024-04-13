@@ -67,7 +67,7 @@
     </message>
     <message>
       <source>More than one user with the same login are presented.</source>
-      <translation type="unfinished">More than one user with the same login are presented.</translation>
+      <translation>Aynı girişe sahip birden fazla kullanıcı sunuldu.</translation>
     </message>
     <message>
       <source>Unable to verify LDAP server SSL/TLS certificate.</source>
@@ -2458,7 +2458,7 @@
     </message>
     <message>
       <source>Server &quot;%1&quot; has license migration issue</source>
-      <translation type="unfinished">Server &quot;%1&quot; has license migration issue</translation>
+      <translation>&quot;%1&quot; Sunucusu için lisans taşıma sorunu var</translation>
     </message>
     <message>
       <source>Service overuse</source>
@@ -2486,7 +2486,7 @@
     <message numerus="yes">
       <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
       <translation type="unfinished">
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
+        <numerusform>Hizmetin aşırı kullanımı nedeniyle %n kanalında bulut depolama yedeklemesi durduruldu.</numerusform>
         <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
       </translation>
     </message>

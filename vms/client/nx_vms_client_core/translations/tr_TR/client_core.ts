@@ -205,7 +205,7 @@
     </message>
     <message>
       <source>The server&apos;s certificate was rejected.</source>
-      <translation type="unfinished">The server&apos;s certificate was rejected.</translation>
+      <translation>Sunucu sertifikası reddedildi.</translation>
     </message>
   </context>
   <context>
@@ -230,7 +230,7 @@
     <message numerus="yes">
       <source>Cannot verify the identity of %n servers</source>
       <translation type="unfinished">
-        <numerusform>%n sunucuların kimliği doğrulanamıyor</numerusform>
+        <numerusform>%n Sunucu kimliği doğrulanamıyor</numerusform>
         <numerusform>Cannot verify the identity of %n servers</numerusform>
       </translation>
     </message>
