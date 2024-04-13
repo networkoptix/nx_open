@@ -24,7 +24,7 @@
     </message>
     <message>
       <source>Wrong password.</source>
-      <translation>Hatalı parola.</translation>
+      <translation>Hatalı şifre.</translation>
     </message>
     <message>
       <source>The password is expired. Please contact your system administrator.</source>
