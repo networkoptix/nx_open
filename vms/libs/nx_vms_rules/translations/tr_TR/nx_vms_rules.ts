@@ -40,11 +40,11 @@
     </message>
     <message>
       <source>Occurs at</source>
-      <translation type="unfinished">Occurs at</translation>
+      <translation>Şurada oluşur</translation>
     </message>
     <message>
       <source>Of Type</source>
-      <translation type="unfinished">Of Type</translation>
+      <translation>Türüne Göre</translation>
     </message>
     <message>
       <source>And Caption</source>
@@ -72,15 +72,15 @@
     </message>
     <message>
       <source>Occurs At</source>
-      <translation type="unfinished">Occurs At</translation>
+      <translation>Şurada Oluşur</translation>
     </message>
     <message>
       <source>Of Type</source>
-      <translation type="unfinished">Of Type</translation>
+      <translation>Türüne Göre</translation>
     </message>
     <message>
       <source>And Object</source>
-      <translation type="unfinished">And Object</translation>
+      <translation>Ve Nesne</translation>
     </message>
   </context>
   <context>
@@ -144,7 +144,7 @@
     </message>
     <message>
       <source>Action Throttling</source>
-      <translation type="unfinished">Action Throttling</translation>
+      <translation>Aksiyon Kısma</translation>
     </message>
   </context>
   <context>
@@ -167,11 +167,11 @@
     </message>
     <message>
       <source>Occurs at</source>
-      <translation type="unfinished">Occurs at</translation>
+      <translation>Şurada oluşur</translation>
     </message>
     <message>
       <source>With ID</source>
-      <translation type="unfinished">With ID</translation>
+      <translation>ID ile</translation>
     </message>
   </context>
   <context>
@@ -339,7 +339,7 @@
     </message>
     <message>
       <source>Set for</source>
-      <translation type="unfinished">Set for</translation>
+      <translation>Şunun için ayarla</translation>
     </message>
     <message>
       <source>Rewind</source>
@@ -492,7 +492,7 @@
     </message>
     <message>
       <source>Occurs at</source>
-      <translation type="unfinished">Occurs at</translation>
+      <translation>Şurada oluşur</translation>
     </message>
   </context>
   <context>
@@ -659,7 +659,7 @@
     </message>
     <message>
       <source>Occurs at</source>
-      <translation type="unfinished">Occurs at</translation>
+      <translation>Şurada oluşur</translation>
     </message>
     <message>
       <source>For Plugin</source>
@@ -675,7 +675,7 @@
     </message>
     <message>
       <source>And Level Is</source>
-      <translation type="unfinished">And Level Is</translation>
+      <translation>Ve Seviye</translation>
     </message>
   </context>
   <context>
@@ -726,7 +726,7 @@
     </message>
     <message>
       <source>Execute to users</source>
-      <translation type="unfinished">Execute to users</translation>
+      <translation>Kullanıcılar için çalıştır</translation>
     </message>
   </context>
   <context>
@@ -963,7 +963,7 @@
     </message>
     <message>
       <source>Occurs at</source>
-      <translation type="unfinished">Occurs at</translation>
+      <translation>Şurada oluşur</translation>
     </message>
     <message>
       <source>By</source>
