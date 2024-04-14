@@ -269,6 +269,8 @@ public:
 
     bool animationAllowed() const;
 
+    void showMultiSplashOnResource(const QnResourcePtr &resource, const nx::vms::event::AbstractActionPtr &businessAction);
+
 public slots:
     void fitInView(bool animate);
 

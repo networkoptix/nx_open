@@ -2510,15 +2510,20 @@ void QnWorkbenchDisplay::at_notificationsHandler_businessActionAdded(const vms::
 
     for (const QnResourcePtr &resource : targetResources)
     {
-        const auto callback =
-            [this, resource, businessAction]
-            {
-                showSplashOnResource(resource, businessAction);
-            };
-
-        for (int timeMs = 0; timeMs <= splashTotalLengthMs; timeMs += splashPeriodMs)
-            executeDelayedParented(callback, timeMs, this);
+        showMultiSplashOnResource(resource, businessAction);
     }
+}
+
+void QnWorkbenchDisplay::showMultiSplashOnResource(const QnResourcePtr &resource, const vms::event::AbstractActionPtr &businessAction)
+{
+    const auto callback =
+        [this, resource, businessAction]
+        {
+            showSplashOnResource(resource, businessAction);
+        };
+
+    for (int timeMs = 0; timeMs <= splashTotalLengthMs; timeMs += splashPeriodMs)
+        executeDelayedParented(callback, timeMs, this);
 }
 
 void QnWorkbenchDisplay::showSplashOnResource(const QnResourcePtr &resource, const vms::event::AbstractActionPtr &businessAction)
