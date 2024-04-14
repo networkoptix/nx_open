@@ -201,7 +201,7 @@
     <message>
       <source>To log in to this System, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</source>
       <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation type="unfinished">To log in to this System, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</translation>
+      <translation>Bu Sisteme giriş yapmak için %2 hesabınızda &quot;%1 hesabınızla her girişte bir doğrulama kodu isteyin&quot; seçeneğini devre dışı bırakın.</translation>
     </message>
     <message>
       <source>The server&apos;s certificate was rejected.</source>

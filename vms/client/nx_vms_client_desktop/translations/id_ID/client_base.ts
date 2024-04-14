@@ -35,7 +35,7 @@
     <message>
       <source>System Event</source>
       <comment>Shows that the bookmark was created by a system event</comment>
-      <translation type="unfinished">System Event</translation>
+      <translation>Event Sistem</translation>
     </message>
   </context>
   <context>
@@ -1025,7 +1025,7 @@
     </message>
     <message>
       <source>Lookup Lists...</source>
-      <translation type="unfinished">Lookup Lists...</translation>
+      <translation>Daftar Pencarian...</translation>
     </message>
     <message>
       <source>Add</source>
@@ -1033,19 +1033,19 @@
     </message>
     <message>
       <source>Device...</source>
-      <translation type="unfinished">Device...</translation>
+      <translation>Perangkat...</translation>
     </message>
     <message>
       <source>Add User...</source>
-      <translation type="unfinished">Add User...</translation>
+      <translation>Tambahkan Pengguna...</translation>
     </message>
     <message>
       <source>Integration...</source>
-      <translation type="unfinished">Integration...</translation>
+      <translation>Integrasi...</translation>
     </message>
     <message>
       <source>New Integration...</source>
-      <translation type="unfinished">New Integration...</translation>
+      <translation>Integrasi Baru...</translation>
     </message>
     <message>
       <source>New Web Page...</source>
@@ -1053,27 +1053,27 @@
     </message>
     <message>
       <source>Add Showreel...</source>
-      <translation type="unfinished">Add Showreel...</translation>
+      <translation>Tambahkan Showreel...</translation>
     </message>
     <message>
       <source>Add Virtual Camera...</source>
-      <translation type="unfinished">Add Virtual Camera...</translation>
+      <translation>Tambahkan Kamera Virtual...</translation>
     </message>
     <message>
       <source>Integration Settings...</source>
-      <translation type="unfinished">Integration Settings...</translation>
+      <translation>Pengaturan Integrasi...</translation>
     </message>
     <message>
       <source>Proxied Integration...</source>
-      <translation type="unfinished">Proxied Integration...</translation>
+      <translation>Integrasi yang Diproksi...</translation>
     </message>
     <message>
       <source>Proxied Web Page...</source>
-      <translation type="unfinished">Proxied Web Page...</translation>
+      <translation>Halaman Web yang Diproksi...</translation>
     </message>
     <message>
       <source>Layout</source>
-      <translation type="unfinished">Layout</translation>
+      <translation>Layout</translation>
     </message>
     <message>
       <source>New Layout</source>
@@ -1081,15 +1081,15 @@
     </message>
     <message>
       <source>New Welcome Screen</source>
-      <translation type="unfinished">New Welcome Screen</translation>
+      <translation>Layar Selamat Datang Baru</translation>
     </message>
     <message>
       <source>Show Proxied Resources</source>
-      <translation type="unfinished">Show Proxied Resources</translation>
+      <translation>Tampilkan Resource yang Diproksi</translation>
     </message>
     <message>
       <source>Import From Devices...</source>
-      <translation type="unfinished">Import From Devices...</translation>
+      <translation>Impor Dari Perangkat...</translation>
     </message>
     <message>
       <source>User Manual...</source>
@@ -1097,7 +1097,7 @@
     </message>
     <message>
       <source>Convert to Shared Layout</source>
-      <translation type="unfinished">Convert to Shared Layout</translation>
+      <translation>Konversikan ke Layout yang Dibagi</translation>
     </message>
   </context>
   <context>
@@ -1143,7 +1143,7 @@
     <name>DirectParentsModel</name>
     <message>
       <source>LDAP group membership is managed on LDAP server</source>
-      <translation type="unfinished">LDAP group membership is managed on LDAP server</translation>
+      <translation>Keanggotaan grup LDAP dikelola di server LDAP</translation>
     </message>
   </context>
   <context>
@@ -1162,15 +1162,15 @@
     </message>
     <message>
       <source>Event Occurs</source>
-      <translation type="unfinished">Event Occurs</translation>
+      <translation>Event Terjadi</translation>
     </message>
     <message>
       <source>Event Starts</source>
-      <translation type="unfinished">Event Starts</translation>
+      <translation>Event Dimulai</translation>
     </message>
     <message>
       <source>Event Stops</source>
-      <translation type="unfinished">Event Stops</translation>
+      <translation>Event Berhenti</translation>
     </message>
   </context>
   <context>
@@ -1189,7 +1189,7 @@
     </message>
     <message>
       <source>Rewind for</source>
-      <translation type="unfinished">Rewind for</translation>
+      <translation>Rewind untuk</translation>
     </message>
   </context>
   <context>
@@ -1343,13 +1343,13 @@
     <name>Groups</name>
     <message>
       <source>Delete group?</source>
-      <translation type="unfinished">Delete group?</translation>
+      <translation>Hapus grup?</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n groups?</source>
       <comment>Numerical form depends on groups count</comment>
-      <translation type="unfinished">
-        <numerusform>Delete %n groups?</numerusform>
+      <translation>
+        <numerusform>Hapus %n grup?</numerusform>
       </translation>
     </message>
   </context>
@@ -1478,7 +1478,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>License has already been activated</source>
-      <translation type="unfinished">License has already been activated</translation>
+      <translation>Lisensi telah diaktifkan</translation>
     </message>
   </context>
   <context>
@@ -1680,23 +1680,23 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Cannot reach the server</source>
-      <translation type="unfinished">Cannot reach the server</translation>
+      <translation>Tidak dapat menjangkau server</translation>
     </message>
     <message>
       <source>Username or Password are incorrect</source>
-      <translation type="unfinished">Username or Password are incorrect</translation>
+      <translation>Nama Pengguna atau Kata Sandi salah</translation>
     </message>
     <message>
       <source>Insecure</source>
-      <translation type="unfinished">Insecure</translation>
+      <translation>Tidak aman</translation>
     </message>
     <message>
       <source>Connection failed</source>
-      <translation type="unfinished">Connection failed</translation>
+      <translation>Koneksi gagal</translation>
     </message>
     <message>
       <source>Username cannot be empty</source>
-      <translation type="unfinished">Username cannot be empty</translation>
+      <translation>Nama pengguna tidak boleh kosong</translation>
     </message>
     <message>
       <source>Password cannot be empty</source>
@@ -1761,26 +1761,26 @@ License Key: %2</translation>
     </message>
     <message numerus="yes">
       <source>Password must be at least %n characters long</source>
-      <translation type="unfinished">
-        <numerusform>Password must be at least %n characters long</numerusform>
+      <translation>
+        <numerusform>Kata sandi setidaknya harus sepanjang %n karakter</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password must be no longer than %n characters</source>
-      <translation type="unfinished">
-        <numerusform>Password must be no longer than %n characters</numerusform>
+      <translation>
+        <numerusform>Kata sandi tidak boleh lebih panjang dari %n karakter</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more consecutive characters together</source>
-      <translation type="unfinished">
-        <numerusform>Password should not contain %n or more consecutive characters together</numerusform>
+      <translation>
+        <numerusform>Kata sandi tidak boleh mengandung %n atau lebih karakter yang berurutan secara bersamaan</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more repeating characters</source>
-      <translation type="unfinished">
-        <numerusform>Password should not contain %n or more repeating characters</numerusform>
+      <translation>
+        <numerusform>Kata sandi tidak boleh berisi %n atau lebih karakter berulang</numerusform>
       </translation>
     </message>
     <message>
@@ -1789,7 +1789,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Only latin letters, numbers and keyboard symbols %1 are allowed</source>
-      <translation type="unfinished">Only latin letters, numbers and keyboard symbols %1 are allowed</translation>
+      <translation>Hanya huruf latin, angka, dan simbol keyboard %1 yang diperbolehkan</translation>
     </message>
     <message>
       <source>Only latin letters, numbers and keyboard symbols are allowed</source>
@@ -1924,43 +1924,43 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Partner information</source>
-      <translation type="unfinished">Partner information</translation>
+      <translation>Informasi partner</translation>
     </message>
     <message>
       <source>Phones</source>
-      <translation type="unfinished">Phones</translation>
+      <translation>Telepon</translation>
     </message>
     <message>
       <source>Emails</source>
-      <translation type="unfinished">Emails</translation>
+      <translation>Email</translation>
     </message>
     <message>
       <source>RHI backend</source>
-      <translation type="unfinished">RHI backend</translation>
+      <translation>Backend RHI</translation>
     </message>
     <message>
       <source>RHI device</source>
-      <translation type="unfinished">RHI device</translation>
+      <translation>Perangkat RHI</translation>
     </message>
     <message>
       <source>RHI device ID</source>
-      <translation type="unfinished">RHI device ID</translation>
+      <translation>ID perangkat RHI</translation>
     </message>
     <message>
       <source>RHI vendor ID</source>
-      <translation type="unfinished">RHI vendor ID</translation>
+      <translation>ID vendor RHI</translation>
     </message>
     <message>
       <source>RHI max texture size</source>
-      <translation type="unfinished">RHI max texture size</translation>
+      <translation>Ukuran tekstur maksimal RHI</translation>
     </message>
     <message>
       <source>Graphics API</source>
-      <translation type="unfinished">Graphics API</translation>
+      <translation>API Grafik</translation>
     </message>
     <message>
       <source>Unable to get GPU information for %1</source>
-      <translation type="unfinished">Unable to get GPU information for %1</translation>
+      <translation>Tidak dapat memperoleh informasi GPU untuk %1</translation>
     </message>
   </context>
   <context>
@@ -2060,7 +2060,7 @@ License Key: %2</translation>
     <name>QnAttachToVideowallDialog</name>
     <message>
       <source>System shut down. To attach to a Video Wall, the System should be in active state. %1</source>
-      <translation type="unfinished">System shut down. To attach to a Video Wall, the System should be in active state. %1</translation>
+      <translation>Sistem dimatikan. Untuk melampirkan ke Video Wall, Sistem harus dalam keadaan aktif. %1</translation>
     </message>
   </context>
   <context>
@@ -2423,7 +2423,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Year</source>
-      <translation type="unfinished">Year</translation>
+      <translation>Tahun</translation>
     </message>
   </context>
   <context>
@@ -3054,7 +3054,7 @@ License Key: %2</translation>
     <message>
       <source>There is currently no connection between your system and %1.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">There is currently no connection between your system and %1.</translation>
+      <translation>Saat ini tidak ada koneksi antara sistem Anda dan %1.</translation>
     </message>
   </context>
   <context>
@@ -3241,15 +3241,15 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Log In...</source>
-      <translation type="unfinished">Log In...</translation>
+      <translation>Masuk...</translation>
     </message>
     <message>
       <source>Your session has expired</source>
-      <translation type="unfinished">Your session has expired</translation>
+      <translation>Sesi Anda telah berakhir</translation>
     </message>
     <message>
       <source>Please sign in again with your link to continue</source>
-      <translation type="unfinished">Please sign in again with your link to continue</translation>
+      <translation>Silakan masuk lagi dengan link Anda untuk melanjutkan</translation>
     </message>
   </context>
   <context>
@@ -6317,25 +6317,25 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Delete layout?</source>
-      <translation type="unfinished">Delete layout?</translation>
+      <translation>Hapus layout?</translation>
     </message>
     <message numerus="yes">
       <source>These layouts are shared with other users, so they will be deleted for their accounts as well.</source>
       <comment>Numerical form depends on layouts count</comment>
-      <translation type="unfinished">
-        <numerusform>These layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
+      <translation>
+        <numerusform>Layout ini dibagikan dengan pengguna lain, sehingga akun mereka juga akan dihapus.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n layouts are shared with other users, so they will be deleted for their accounts as well.</source>
       <comment>Numerical form depends on layouts count</comment>
-      <translation type="unfinished">
-        <numerusform>%n layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
+      <translation>
+        <numerusform>%n layout dibagikan dengan pengguna lain, jadi layout tersebut juga akan dihapus untuk akun mereka.</numerusform>
       </translation>
     </message>
     <message>
       <source>Delete user?</source>
-      <translation type="unfinished">Delete user?</translation>
+      <translation>Hapus pengguna?</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n users?</source>
@@ -6353,12 +6353,12 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>All members of %1 and %2 groups will get access to this layout</source>
       <comment>%1 and %2 will be substituted with user group names</comment>
-      <translation type="unfinished">All members of %1 and %2 groups will get access to this layout</translation>
+      <translation>Semua anggota grup %1 dan %2 akan mendapatkan akses ke layout ini</translation>
     </message>
     <message>
       <source>Convert</source>
       <comment>Converting layout to shared</comment>
-      <translation type="unfinished">Convert</translation>
+      <translation>Konversi</translation>
     </message>
   </context>
   <context>
@@ -6383,8 +6383,8 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Source Server and %n Servers</source>
-      <translation type="unfinished">
-        <numerusform>Source Server and %n Servers</numerusform>
+      <translation>
+        <numerusform>Source Server dan %n Server</numerusform>
       </translation>
     </message>
   </context>
@@ -6451,15 +6451,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Also set on source camera</source>
-      <translation type="unfinished">Also set on source camera</translation>
+      <translation>Juga disetel pada source kamera</translation>
     </message>
     <message>
       <source>Also trigger on source camera</source>
-      <translation type="unfinished">Also trigger on source camera</translation>
+      <translation>Juga trigger pada source kamera</translation>
     </message>
     <message>
       <source>Also record source camera</source>
-      <translation type="unfinished">Also record source camera</translation>
+      <translation>Juga rekam source kamera</translation>
     </message>
     <message>
       <source>Source camera</source>
@@ -6467,7 +6467,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Also play on source camera</source>
-      <translation type="unfinished">Also play on source camera</translation>
+      <translation>Juga mainkan di source kamera</translation>
     </message>
     <message>
       <source>Also show source camera</source>
@@ -6479,7 +6479,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Use event source camera</source>
-      <translation type="unfinished">Use event source camera</translation>
+      <translation>Gunakan event source kamera</translation>
     </message>
   </context>
   <context>
@@ -6572,45 +6572,45 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>No groups found</source>
-      <translation type="unfinished">No groups found</translation>
+      <translation>Tidak ada grup yang ditemukan</translation>
     </message>
     <message>
       <source>Change search criteria or create a new group</source>
-      <translation type="unfinished">Change search criteria or create a new group</translation>
+      <translation>Ubah kriteria pencarian atau buat grup baru</translation>
     </message>
     <message>
       <source>Multiple groups share the same name, which can lead to confusion. To maintain a clear and organized structure, we suggest providing unique names for each group.</source>
-      <translation type="unfinished">Multiple groups share the same name, which can lead to confusion. To maintain a clear and organized structure, we suggest providing unique names for each group.</translation>
+      <translation>Beberapa grup memiliki nama yang sama, sehingga dapat menimbulkan kebingungan. Untuk menjaga struktur yang jelas dan terorganisir, kami menyarankan untuk memberikan nama unik untuk setiap kelompok.</translation>
     </message>
     <message numerus="yes">
       <source>%n existing LDAP groups are not found in the LDAP database.</source>
-      <translation type="unfinished">
-        <numerusform>%n existing LDAP groups are not found in the LDAP database.</numerusform>
+      <translation>
+        <numerusform>%n grup LDAP yang ada tidak ditemukan di database LDAP.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n groups</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n groups</numerusform>
+      <translation>
+        <numerusform>Hapus %n grup</numerusform>
       </translation>
     </message>
     <message>
       <source>Failed to delete group &quot;%1&quot;.</source>
-      <translation type="unfinished">Failed to delete group &quot;%1&quot;.</translation>
+      <translation>Gagal menghapus grup &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Failed to delete group.</source>
-      <translation type="unfinished">Failed to delete group.</translation>
+      <translation>Gagal menghapus grup.</translation>
     </message>
     <message numerus="yes">
       <source>Failed to delete %n groups.</source>
-      <translation type="unfinished">
-        <numerusform>Failed to delete %n groups.</numerusform>
+      <translation>
+        <numerusform>Gagal menghapus %n grup.</numerusform>
       </translation>
     </message>
     <message>
       <source>Some groups have each other as both their parent and child members, or are part of such a circular reference chain. This can lead to incorrect calculations of permissions.</source>
-      <translation type="unfinished">Some groups have each other as both their parent and child members, or are part of such a circular reference chain. This can lead to incorrect calculations of permissions.</translation>
+      <translation>Beberapa kelompok mempunyai satu sama lain sebagai anggota induk dan anak, atau menjadi bagian dari rantai referensi sirkular. Hal ini dapat menyebabkan penghitungan izin yang salah.</translation>
     </message>
   </context>
   <context>
@@ -6629,11 +6629,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>No users found</source>
-      <translation type="unfinished">No users found</translation>
+      <translation>Tidak ada pengguna yang ditemukan</translation>
     </message>
     <message>
       <source>Change search criteria or create a new user</source>
-      <translation type="unfinished">Change search criteria or create a new user</translation>
+      <translation>Ubah kriteria pencarian atau buat pengguna baru</translation>
     </message>
     <message>
       <source>Edit</source>
@@ -6641,7 +6641,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Multiple users share the same login, causing login failures. To resolve this issue, either update the affected user logins or disable/delete duplicates.</source>
-      <translation type="unfinished">Multiple users share the same login, causing login failures. To resolve this issue, either update the affected user logins or disable/delete duplicates.</translation>
+      <translation>Beberapa pengguna berbagi login yang sama, menyebabkan kegagalan login. Untuk mengatasi masalah ini, perbarui login pengguna yang terpengaruh atau nonaktifkan/hapus duplikat.</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n users</source>
@@ -6651,24 +6651,24 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>LDAP server is offline. %n users are not able to log in.</source>
-      <translation type="unfinished">
-        <numerusform>LDAP server is offline. %n users are not able to log in.</numerusform>
+      <translation>
+        <numerusform>Server LDAP sedang offline. %n pengguna tidak dapat masuk.</numerusform>
       </translation>
     </message>
     <message>
       <source>Failed to delete user &quot;%1&quot;.</source>
-      <translation type="unfinished">Failed to delete user &quot;%1&quot;.</translation>
+      <translation>Gagal menghapus pengguna &quot;%1&quot;.</translation>
     </message>
     <message numerus="yes">
       <source>Failed to delete %n users.</source>
-      <translation type="unfinished">
-        <numerusform>Failed to delete %n users.</numerusform>
+      <translation>
+        <numerusform>Gagal menghapus %n pengguna.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n existing LDAP users are not found in the LDAP database</source>
-      <translation type="unfinished">
-        <numerusform>%n existing LDAP users are not found in the LDAP database</numerusform>
+      <translation>
+        <numerusform>%n pengguna LDAP yang ada tidak ditemukan di database LDAP</numerusform>
       </translation>
     </message>
   </context>
@@ -6690,8 +6690,8 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>%n Groups</source>
-      <translation type="unfinished">
-        <numerusform>%n Groups</numerusform>
+      <translation>
+        <numerusform>%n Grup</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -6732,7 +6732,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>VmsRulesDialogHelper</name>
     <message>
       <source>Delete Rule?</source>
-      <translation type="unfinished">Delete Rule?</translation>
+      <translation>Hapus Aturan?</translation>
     </message>
     <message>
       <source>This action cannot be undone</source>
@@ -6740,7 +6740,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Reset all rules to defaults?</source>
-      <translation type="unfinished">Reset all rules to defaults?</translation>
+      <translation>Reset semua aturan ke default?</translation>
     </message>
   </context>
   <context>
@@ -6889,15 +6889,15 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::AccessRightsList</name>
     <message>
       <source>View Archive</source>
-      <translation type="unfinished">View Archive</translation>
+      <translation>Lihat Archive</translation>
     </message>
     <message>
       <source>Export Archive</source>
-      <translation type="unfinished">Export Archive</translation>
+      <translation>Ekspor Archive</translation>
     </message>
     <message>
       <source>View Bookmarks</source>
-      <translation type="unfinished">View Bookmarks</translation>
+      <translation>Lihat Bookmark</translation>
     </message>
     <message>
       <source>Manage Bookmarks</source>
@@ -6909,23 +6909,23 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Edit Settings</source>
-      <translation type="unfinished">Edit Settings</translation>
+      <translation>Edit Pengaturan</translation>
     </message>
     <message>
       <source>View Live</source>
-      <translation type="unfinished">View Live</translation>
+      <translation>Lihat Live</translation>
     </message>
     <message>
       <source>Depending on the resource type it either allows user to modify device settings or to control video wall.</source>
-      <translation type="unfinished">Depending on the resource type it either allows user to modify device settings or to control video wall.</translation>
+      <translation>Tergantung pada jenis resource, ini memungkinkan pengguna untuk memodifikasi pengaturan perangkat atau mengontrol video wall.</translation>
     </message>
     <message>
       <source>Allows users to access a resource and view live footage from a camera.</source>
-      <translation type="unfinished">Allows users to access a resource and view live footage from a camera.</translation>
+      <translation>Memungkinkan pengguna mengakses resource dan melihat cuplikan live dari kamera.</translation>
     </message>
     <message>
       <source>Allows user to control PTZ, use 2-Way Audio, Soft Triggers and I/O buttons.</source>
-      <translation type="unfinished">Allows user to control PTZ, use 2-Way Audio, Soft Triggers and I/O buttons.</translation>
+      <translation>Memungkinkan pengguna untuk mengontrol PTZ, menggunakan 2-Way Audio, Soft Triggers dan tombol I/O.</translation>
     </message>
   </context>
   <context>
@@ -7150,38 +7150,38 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Insufficient services</source>
-      <translation type="unfinished">Insufficient services</translation>
+      <translation>Layanan tidak memadai</translation>
     </message>
     <message numerus="yes">
       <source>%n suitable cloud storage services are required</source>
-      <translation type="unfinished">
-        <numerusform>%n suitable cloud storage services are required</numerusform>
+      <translation>
+        <numerusform>%n layanan penyimpanan cloud yang sesuai diperlukan</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n MP</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n MP</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Megapixels</source>
-      <translation type="unfinished">
-        <numerusform>%n Megapixels</numerusform>
+      <translation>
+        <numerusform>%n Megapiksel</numerusform>
       </translation>
     </message>
     <message>
       <source>Unknown resolution</source>
-      <translation type="unfinished">Unknown resolution</translation>
+      <translation>Resolusi tidak diketahui</translation>
     </message>
     <message>
       <source>No suitable cloud storage services available</source>
-      <translation type="unfinished">No suitable cloud storage services available</translation>
+      <translation>Tidak tersedia layanan penyimpanan cloud yang sesuai</translation>
     </message>
     <message numerus="yes">
       <source>%n suitable cloud storage services available</source>
-      <translation type="unfinished">
-        <numerusform>%n suitable cloud storage services available</numerusform>
+      <translation>
+        <numerusform>%n tersedia layanan penyimpanan cloud yang sesuai</numerusform>
       </translation>
     </message>
     <message>
@@ -7190,11 +7190,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Setting was changed</source>
-      <translation type="unfinished">Setting was changed</translation>
+      <translation>Pengaturan diubah</translation>
     </message>
     <message>
       <source>&quot;All archive&quot; option was changed to &quot;Motion, Objects, Bookmarks&quot; due to cloud storage backup was enabled</source>
-      <translation type="unfinished">&quot;All archive&quot; option was changed to &quot;Motion, Objects, Bookmarks&quot; due to cloud storage backup was enabled</translation>
+      <translation>&quot;Semua archive&quot; opsi diubah menjadi &quot;Gerakan, Objek, Bookmark&quot; karena backup penyimpanan cloud diaktifkan</translation>
     </message>
   </context>
   <context>
@@ -7222,7 +7222,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::BackupSettingsViewWidget</name>
     <message>
       <source>There are more cameras being backed up than available services. Please disable backup for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</source>
-      <translation type="unfinished">There are more cameras being backed up than available services. Please disable backup for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</translation>
+      <translation>Ada lebih banyak kamera yang dibackup daripada layanan yang tersedia. Mohon nonaktifkan backup untuk beberapa kamera atau tambahkan layanan yang lebih sesuai. Jika tidak, ini akan dilakukan secara otomatis pada %1</translation>
     </message>
   </context>
   <context>
@@ -7259,7 +7259,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Backup settings are not available</source>
-      <translation type="unfinished">Backup settings are not available</translation>
+      <translation>Pengaturan backup tidak tersedia</translation>
     </message>
     <message>
       <source>System shut down</source>

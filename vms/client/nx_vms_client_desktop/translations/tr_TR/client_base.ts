@@ -11802,7 +11802,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Group has another group as both its parent, and as a child member, or is a part of such circular reference chain. This can lead to an incorrect calculation of permissions.</source>
-      <translation type="unfinished">Group has another group as both its parent, and as a child member, or is a part of such circular reference chain. This can lead to an incorrect calculation of permissions.</translation>
+      <translation>Grubun hem ana üyesi hem de alt üyesi olarak başka bir grubu vardır veya bu döngüsel referans zincirinin bir parçasıdır. Bu, izinlerin yanlış hesaplanmasına yol açabilir.</translation>
     </message>
     <message>
       <source>Groups</source>
