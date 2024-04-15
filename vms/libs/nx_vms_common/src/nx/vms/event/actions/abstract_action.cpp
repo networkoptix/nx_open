@@ -407,6 +407,14 @@ QString ActionData::toString() const
     return QJson::serialized(*this);
 }
 
+bool ActionData::canHaveVideoLink() const
+{
+    return eventParams.canHaveVideoLink()
+        || actionType == ActionType::bookmarkAction
+        || actionType == ActionType::acknowledgeAction
+        || actionType == ActionType::fullscreenCameraAction;
+}
+
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ActionData, (ubjson)(json)(xml)(csv_record), ActionData_Fields)
 
 } // namespace nx::vms::event
