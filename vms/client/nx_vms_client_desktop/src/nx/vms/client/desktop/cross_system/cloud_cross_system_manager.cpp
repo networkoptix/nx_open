@@ -42,7 +42,10 @@ CloudCrossSystemManager::CloudCrossSystemManager(QObject* parent):
             for (const auto& systemId: addedCloudIds)
             {
                 auto systemDescription = QnSystemsFinder::instance()->getSystem(systemId);
-                NX_VERBOSE(this, "Found new cloud system %1", systemDescription->name());
+                if (!systemDescription)
+                    continue;
+
+                NX_VERBOSE(this, "Found new cloud system %1", systemDescription);
                 d->cloudSystems[systemId] =
                     std::make_unique<CloudCrossSystemContext>(systemDescription);
                 emit systemFound(systemId);
