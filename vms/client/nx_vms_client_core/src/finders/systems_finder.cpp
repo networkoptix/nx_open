@@ -7,6 +7,7 @@
 #include <finders/recent_local_systems_finder.h>
 #include <finders/scope_local_systems_finder.h>
 #include <network/system_description_aggregator.h>
+#include <nx/utils/log/log.h>
 #include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/ini.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
@@ -80,7 +81,10 @@ void QnSystemsFinder::addSystemsFinder(QnAbstractSystemsFinder* finder, int prio
         });
 
     *connections << connect(finder, &QnAbstractSystemsFinder::systemLost, this,
-        [this, priority](const QString& id) { onSystemLost(id, priority); });
+        [this, priority](const QString& id, const nx::Uuid& localId)
+        {
+            onSystemLost(id, localId, priority);
+        });
 
     *connections << connect(finder, &QObject::destroyed, this,
         [this, finder]() { m_finders.remove(finder); });
@@ -92,12 +96,13 @@ void QnSystemsFinder::addSystemsFinder(QnAbstractSystemsFinder* finder, int prio
 
 void QnSystemsFinder::onBaseSystemDiscovered(const QnSystemDescriptionPtr& system, int priority)
 {
+    NX_VERBOSE(this, "Discovered system %1 (priority %2)", system, priority);
     const auto it = m_systems.find(system->localId());
     if (it != m_systems.end())
     {
-        m_systemToLocalId[system->id()] = system->localId();
-
         const auto existingSystem = *it;
+        NX_VERBOSE(this, "Merging system %1 into existing one %2 by id %3",
+            system, existingSystem, system->localId());
         existingSystem->mergeSystem(priority, system);
         return;
     }
@@ -127,8 +132,6 @@ void QnSystemsFinder::onBaseSystemDiscovered(const QnSystemDescriptionPtr& syste
     if (systemHideOptions.testFlag(SystemHideFlag::autoDiscovered) && priority == kDirectFinder)
         return;
 
-    m_systemToLocalId[system->id()] = system->localId();
-
     const AggregatorPtr target(new QnSystemDescriptionAggregator(priority, system));
 
     auto updateRecordInRecentConnections =
@@ -148,6 +151,7 @@ void QnSystemsFinder::onBaseSystemDiscovered(const QnSystemDescriptionPtr& syste
             appContext()->coreSettings()->recentLocalConnections = connections;
         };
 
+    NX_VERBOSE(this, "Creating a new aggregator from %1", target);
     m_systems.insert(target->localId(), target);
     connect(target.get(), &QnBaseSystemDescription::systemNameChanged, this,
         updateRecordInRecentConnections);
@@ -158,13 +162,11 @@ void QnSystemsFinder::onBaseSystemDiscovered(const QnSystemDescriptionPtr& syste
     emit systemDiscovered(target.dynamicCast<QnBaseSystemDescription>());
 }
 
-void QnSystemsFinder::onSystemLost(const QString& systemId, int priority)
+void QnSystemsFinder::onSystemLost(const QString& systemId, const nx::Uuid& localId, int priority)
 {
-    const auto localIdIter = m_systemToLocalId.find(systemId);
-    if (localIdIter == m_systemToLocalId.end())
-        return;
+    NX_VERBOSE(this, "Lost system %1 (local id %2, priority %3)", systemId, localId, priority);
 
-    const auto it = m_systems.find(*localIdIter);
+    const auto it = m_systems.find(localId);
     if (it == m_systems.end())
         return;
 
@@ -174,13 +176,14 @@ void QnSystemsFinder::onSystemLost(const QString& systemId, int priority)
 
     if (aggregator->isAggregator())
     {
+        NX_VERBOSE(this, "Removing system %1 from aggregator %2", systemId, aggregator);
         aggregator->removeSystem(systemId, priority);
         return;
     }
 
-    m_systemToLocalId.erase(localIdIter);
+    NX_VERBOSE(this, "Removing aggregator %1 as the system is the last one", aggregator);
     m_systems.erase(it);
-    emit systemLost(systemId);
+    emit systemLost(systemId, localId);
 }
 
 QnAbstractSystemsFinder::SystemDescriptionList QnSystemsFinder::systems() const
@@ -194,12 +197,10 @@ QnAbstractSystemsFinder::SystemDescriptionList QnSystemsFinder::systems() const
 
 QnSystemDescriptionPtr QnSystemsFinder::getSystem(const QString& systemId) const
 {
-    const auto localIdIter = m_systemToLocalId.find(systemId);
-    if (localIdIter == m_systemToLocalId.end())
-        return QnSystemDescriptionPtr();
-
-    const auto it = m_systems.find(*localIdIter);
-    return (it == m_systems.end()
-        ? QnSystemDescriptionPtr()
-        : it->dynamicCast<QnBaseSystemDescription>());
+    for (const auto& system: m_systems)
+    {
+        if (system->id() == systemId)
+            return system;
+    }
+    return {};
 }

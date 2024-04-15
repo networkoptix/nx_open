@@ -269,6 +269,12 @@ nx::utils::SoftwareVersion QnSystemDescription::version() const
         })->version;
 }
 
+QString QnSystemDescription::idForToStringFromPtr() const
+{
+    return nx::format("System %1 [id: %2, local id: %3]",
+        name(), id(), localId());
+}
+
 void QnSystemDescription::handleReachableServerAdded(const nx::Uuid& serverId)
 {
     const bool containsAlready = m_reachableServers.contains(serverId);

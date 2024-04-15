@@ -31,5 +31,5 @@ signals:
     void cloudLoginChanged();
 
     void systemDiscovered(const QnSystemDescriptionPtr& systemDescription);
-    void systemLost(const QString& systemId);
+    void systemLost(const QString& systemId, const nx::Uuid& localId);
 };

@@ -85,7 +85,7 @@ void TestSystemsController::emitSystemLost(const QString& systemId)
     if (iter != m_systems.end())
         m_systems.erase(iter);
 
-    emit systemLost(systemId);
+    emit systemLost(systemId, nx::Uuid(systemId));
 }
 
 } // namespace test
