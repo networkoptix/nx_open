@@ -898,28 +898,26 @@ void LayoutsHandler::openLayouts(
         {
             wbLayout = workbench()->addLayout(layout);
 
-            if (!wbLayout->isPreviewSearchLayout())
+            // Use zero position for nov files.
+            const auto state = layout->isFile()
+                ? StreamSynchronizationState::playFromStart()
+                : playbackState;
+
+            // Force playback state.
+            wbLayout->setStreamSynchronizationState(state);
+
+            for (auto item: wbLayout->items())
             {
-                // Use zero position for nov files.
-                const auto state = layout->isFile()
-                    ? StreamSynchronizationState::playFromStart()
-                    : playbackState;
-
-                // Force playback state.
-                wbLayout->setStreamSynchronizationState(state);
-
-                for (auto item: wbLayout->items())
+                // Do not set item's playback parameters if they are already set.
+                if (!item->data(Qn::ItemTimeRole).isValid())
                 {
-                    // Do not set item's playback parameters if they are already set.
-                    if (!item->data(Qn::ItemTimeRole).isValid())
-                    {
-                        item->setData(Qn::ItemTimeRole,
-                            state.timeUs == DATETIME_NOW ? DATETIME_NOW : state.timeUs / 1000);
-                        item->setData(Qn::ItemPausedRole, state.speed == 0);
-                        item->setData(Qn::ItemSpeedRole, state.speed);
-                    }
+                    item->setData(Qn::ItemTimeRole,
+                        state.timeUs == DATETIME_NOW ? DATETIME_NOW : state.timeUs / 1000);
+                    item->setData(Qn::ItemPausedRole, state.speed == 0);
+                    item->setData(Qn::ItemSpeedRole, state.speed);
                 }
             }
+
         }
         // Explicitly set that we do not control videowall through this layout.
         wbLayout->setData(Qn::VideoWallItemGuidRole, QVariant::fromValue(nx::Uuid()));
@@ -1128,7 +1126,11 @@ void LayoutsHandler::at_openInNewTabAction_triggered()
 
     // Update state depending on how the action was called.
     auto currentState = streamSynchronizer->state();
-    if (!currentMediaWidget
+    if (parameters.hasArgument(Qn::LayoutSyncStateRole))
+    {
+        currentState = parameters.argument<StreamSynchronizationState>(Qn::LayoutSyncStateRole);
+    }
+    else if (!currentMediaWidget
         || !isCameraWithFootage(currentMediaWidget)
         || currentMediaWidget->isPlayingLive())
     {
