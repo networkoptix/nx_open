@@ -283,8 +283,7 @@ Dialog
                     Item { Layout.fillWidth: true }
                     SearchField
                     {
-                        property var numOfResultOnPage: 20
-                        onTextChanged: entriesModel.setFilter(text, numOfResultOnPage)
+                        onTextChanged: entriesModel.setFilter(text)
                     }
                 }
             }

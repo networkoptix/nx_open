@@ -42,10 +42,4 @@ void LookupListModel::setAttributeNames(QList<QString> value)
     emit attributeNamesChanged();
 }
 
-QList<int> LookupListModel::setFilter(const QString& filterText, int resultLimit) const
-{
-    return appContext()->currentSystemContext()->lookupListManager()->filter(
-        m_data, filterText, resultLimit);
-}
-
 } // namespace nx::vms::client::desktop

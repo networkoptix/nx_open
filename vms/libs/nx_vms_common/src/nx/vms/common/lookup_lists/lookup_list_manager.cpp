@@ -87,26 +87,6 @@ void LookupListManager::addOrUpdate(nx::vms::api::LookupListData list)
     emit addedOrUpdated(id);
 }
 
-QList<int> LookupListManager::filter(
-    const nx::vms::api::LookupListData& list, const QString& filterText, int resultLimit) const
-{
-    NX_MUTEX_LOCKER lk(&d->mutex);
-    QList<int> result;
-    const QString lowerFilterText = filterText.toLower();
-    for (int i = 0; i < list.entries.size() && i < resultLimit; i++)
-    {
-        for (auto& [key, value]: list.entries[i])
-        {
-            if (value.toLower().contains(lowerFilterText))
-            {
-                result.push_back(i);
-                break;
-            }
-        }
-    }
-    return result;
-}
-
 void LookupListManager::remove(const nx::Uuid& id)
 {
     {

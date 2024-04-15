@@ -40,42 +40,6 @@ Control
 
     Component
     {
-        id: booleanDelegate
-
-        ElementViewer
-        {
-            text:
-            {
-                if (!value)
-                    return qsTr("ANY")
-
-                return value == "true"
-                    ? qsTr("Yes")
-                    : qsTr("No")
-            }
-        }
-    }
-
-    Component
-    {
-        id: objectDelegate
-
-        ElementViewer
-        {
-            text:
-            {
-                if (!value)
-                    return qsTr("ANY")
-
-                return value == "true"
-                    ? qsTr("Present")
-                    : qsTr("Absent")
-            }
-        }
-    }
-
-    Component
-    {
         id: colorDelegate
 
         ElementViewer
@@ -84,14 +48,7 @@ Control
             leftPadding: 26
             rightPadding: 8
             verticalAlignment: Text.AlignVCenter
-            text:
-            {
-                const colorSet = attribute.colorSet
-                if (value)
-                    colorSet.items.find((colorName) => value === colorSet.color(colorName)) || value
-                else
-                    qsTr("ANY color")
-            }
+            text: value || qsTr("ANY color")
 
             Rectangle
             {
@@ -111,17 +68,8 @@ Control
         if (isGeneric || !attribute)
             return textDelegate
 
-        switch (attribute.type)
-        {
-            case Analytics.Attribute.Type.boolean:
-                return booleanDelegate
-
-            case Analytics.Attribute.Type.colorSet:
-                return colorDelegate
-
-            case Analytics.Attribute.Type.attributeSet:
-                return objectDelegate
-        }
+        if (attribute.type === Analytics.Attribute.Type.colorSet)
+            return colorDelegate
         return textDelegate
     }
 
