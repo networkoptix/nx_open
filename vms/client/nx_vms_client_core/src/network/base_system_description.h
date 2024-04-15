@@ -4,12 +4,10 @@
 
 #include <QtCore/QObject>
 
+#include <nx/utils/log/format.h>
 #include <nx/utils/url.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/data/module_information.h>
-
-class QnBaseSystemDescription;
-typedef QSharedPointer<QnBaseSystemDescription> QnSystemDescriptionPtr;
 
 enum class QnServerField
 {
@@ -95,6 +93,8 @@ public:
 
     virtual nx::utils::SoftwareVersion version() const = 0;
 
+    virtual QString idForToStringFromPtr() const = 0;
+
 signals:
     void serverAdded(const nx::Uuid& serverId);
     void serverChanged(const nx::Uuid& serverId, QnServerFields flags);
@@ -112,3 +112,5 @@ signals:
     void saasStateChanged();
     void organizationChanged();
 };
+
+using QnSystemDescriptionPtr = QSharedPointer<QnBaseSystemDescription>;

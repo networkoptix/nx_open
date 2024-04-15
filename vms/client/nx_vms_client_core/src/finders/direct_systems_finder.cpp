@@ -86,8 +86,7 @@ void QnDirectSystemsFinder::removeSystem(SystemsHash::iterator it)
         system->removeServer(server.id);
 
     m_systems.erase(it);
-    emit systemLostInternal(system->id(), system->localId());
-    emit systemLost(system->id());
+    emit systemLost(system->id(), system->localId());
 }
 
 void QnDirectSystemsFinder::updateServerData(const nx::vms::discovery::ModuleEndpoint& module)
