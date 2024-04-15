@@ -16,17 +16,7 @@ FocusScope
 
     signal editingFinished()
 
-    readonly property var value:
-    {
-        if (textField.value === undefined)
-            return undefined
-
-        // TODO: #vbutkevich. There is a bug here, when value is out of range of (min, max).
-        // The textField.value is not updated correctly, so Binding loop occurs. VMS-51810
-        return textField.validator
-            ? MathUtils.bound(textField.validator.bottom, textField.value, textField.validator.top)
-            : textField.value
-    }
+    readonly property alias value: textField.value
 
     property alias editorCursorPosition: textField.cursorPosition
 
@@ -48,8 +38,13 @@ FocusScope
     function setValue(value)
     {
         const parsedValue = valueFromText(value)
-        if (textField.value !== parsedValue)
-            textField.value = parsedValue
+        const isInvalidValue = textField.validator && parsedValue && textField.validator.validate(parsedValue) !== Qt.Acceptable
+        if (textField.value !== parsedValue || isInvalidValue)
+        {
+            textField.value = textField.validator
+                ? MathUtils.bound(textField.validator.bottom, parsedValue, textField.validator.top)
+                : parsedValue
+        }
     }
 
     function clear()
