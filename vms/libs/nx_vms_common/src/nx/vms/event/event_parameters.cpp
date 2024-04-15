@@ -125,6 +125,14 @@ void EventParameters::setDiagnosticEventLevels(nx::vms::api::EventLevels levels)
     inputPortId = QString::fromStdString(nx::reflect::toString(levels));
 }
 
+bool EventParameters::canHaveVideoLink() const
+{
+    return eventType == EventType::cameraMotionEvent
+        || eventType == EventType::cameraInputEvent
+        || eventType == EventType::analyticsSdkEvent
+        || eventType == EventType::analyticsSdkObjectDetected;
+}
+
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     EventMetaData, (ubjson)(json)(xml)(csv_record), EventMetaData_Fields, (brief, true))
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(

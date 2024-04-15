@@ -75,12 +75,14 @@ struct NX_VMS_COMMON_API ActionData
     int aggregationCount;
 
     /**%apidoc Combination of the flags:
-     * - 1 indicates that Video Link exists.
+     * - 1 indicates that the Action has a video link.
      */
-    int flags;
+    int flags{0};
     QString compareString; //< TODO: This string is used on a client side for internal purpose. Need to move it to separate class.
 
     QString toString() const;
+
+    bool canHaveVideoLink() const;
 };
 
 #define ActionData_Fields (actionType)(actionParams)(eventParams)(businessRuleId)(aggregationCount)(flags)
