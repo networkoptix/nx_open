@@ -14,6 +14,7 @@ class IntValidator: public QIntValidator
 public:
     explicit IntValidator(QObject* parent = nullptr);
     static void registerQmlType();
+    Q_INVOKABLE QValidator::State validate(QString value) const;
 
 private:
     static int lowest();
@@ -29,6 +30,7 @@ class DoubleValidator: public QDoubleValidator
 
 public:
     explicit DoubleValidator(QObject* parent = nullptr);
+    Q_INVOKABLE QValidator::State validate(QString value) const;
     static void registerQmlType();
 
 private:

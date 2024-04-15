@@ -27,6 +27,12 @@ int IntValidator::highest()
     return std::numeric_limits<int>::max();
 }
 
+QValidator::State IntValidator::validate(QString value) const
+{
+    int pos = 0;
+    return QIntValidator::validate(value, pos);
+}
+
 DoubleValidator::DoubleValidator(QObject* parent):
     QDoubleValidator(lowest(), highest(), /*decimals*/ -1, parent)
 {
@@ -49,6 +55,12 @@ double DoubleValidator::highest()
     // QDoubleValidator works correctly only when the range values are within the int limits,
     // because it casts double to int during validation.
     return std::numeric_limits<int>::max();
+}
+
+QValidator::State DoubleValidator::validate(QString value) const
+{
+    int pos = 0;
+    return QDoubleValidator::validate(value, pos);
 }
 
 } // namespace nx::vms::client::core
