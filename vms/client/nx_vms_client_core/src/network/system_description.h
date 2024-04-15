@@ -58,6 +58,8 @@ public: // overrides
 
     virtual nx::utils::SoftwareVersion version() const override;
 
+    virtual QString idForToStringFromPtr() const override;
+
     static QString extractSystemName(const QString& systemName);
 
 public:

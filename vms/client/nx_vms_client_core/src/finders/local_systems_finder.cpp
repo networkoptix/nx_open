@@ -42,6 +42,6 @@ void LocalSystemsFinder::setSystems(const SystemsHash& newSystems)
 
 void LocalSystemsFinder::removeSystem(const QString& id)
 {
-    if (m_systems.remove(id))
-        emit systemLost(id);
+    if (auto removed = m_systems.take(id))
+        emit systemLost(id, removed->localId());
 }

@@ -70,6 +70,8 @@ public: // overrides
 
     virtual nx::utils::SoftwareVersion version() const override;
 
+    virtual QString idForToStringFromPtr() const override;
+
 private:
     void emitSystemChanged();
 

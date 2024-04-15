@@ -8,6 +8,7 @@
 #include <optional>
 #include <type_traits>
 
+#include <QtCore/QSharedPointer>
 #include <QtCore/QString>
 #include <QtCore/QtDebug>
 
@@ -203,6 +204,12 @@ QString toString(const std::unique_ptr<T>& value)
 
 template<typename T>
 QString toString(const std::shared_ptr<T>& value)
+{
+    return toString(value.get());
+}
+
+template<typename T>
+QString toString(const QSharedPointer<T>& value)
 {
     return toString(value.get());
 }

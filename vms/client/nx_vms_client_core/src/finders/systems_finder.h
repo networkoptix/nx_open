@@ -31,7 +31,7 @@ public: //overrides
 
 private:
     void onBaseSystemDiscovered(const QnSystemDescriptionPtr& system, int priority);
-    void onSystemLost(const QString& systemId, int priority);
+    void onSystemLost(const QString& systemId, const nx::Uuid& localId, int priority);
 
 private:
     using SystemsFinderList = QMap<QnAbstractSystemsFinder*, nx::utils::ScopedConnectionsPtr>;
@@ -40,7 +40,6 @@ private:
 
     SystemsFinderList m_finders;
     AggregatorsList m_systems;
-    QHash<QString, nx::Uuid> m_systemToLocalId;
 };
 
 #define qnSystemsFinder QnSystemsFinder::instance()

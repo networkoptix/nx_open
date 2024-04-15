@@ -89,8 +89,7 @@ bool QnSystemDescriptionAggregator::containsSystem(int priority) const
 void QnSystemDescriptionAggregator::mergeSystem(int priority,
     const QnSystemDescriptionPtr& system)
 {
-    NX_ASSERT(system, "System is empty");
-    if (!system)
+    if (!NX_ASSERT(system))
         return;
 
     if (const auto it = m_systems.find(priority); it != m_systems.end())
@@ -460,4 +459,13 @@ nx::utils::SoftwareVersion QnSystemDescriptionAggregator::version() const
         {
             return l->version() < r->version();
         }))->version();
+}
+
+QString QnSystemDescriptionAggregator::idForToStringFromPtr() const
+{
+    QString result = nx::format("System Aggregator %1 [id: %2, local id: %3]:\n",
+        name(), id(), localId());
+    for (const auto& system: m_systems)
+        result += nx::toString(system) + '\n';
+    return result;
 }

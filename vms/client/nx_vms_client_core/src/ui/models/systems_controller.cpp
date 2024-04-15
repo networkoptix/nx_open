@@ -18,7 +18,7 @@ SystemsController::SystemsController(QObject* parent): AbstractSystemsController
         this, &AbstractSystemsController::systemDiscovered);
 
     connect(qnSystemsFinder, &QnAbstractSystemsFinder::systemLost,
-        this, &AbstractSystemsController::systemLost);
+        this, &SystemsController::systemLost);
 
     connect(qnCloudStatusWatcher, &CloudStatusWatcher::statusChanged,
         this, &AbstractSystemsController::cloudStatusChanged);

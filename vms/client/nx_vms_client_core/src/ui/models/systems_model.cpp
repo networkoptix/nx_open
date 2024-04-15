@@ -64,7 +64,7 @@ public:
 
     void addSystem(const QnSystemDescriptionPtr& systemDescription);
 
-    void removeSystem(const QString& systemId);
+    void removeSystem(const QString& systemId, const nx::Uuid& localId);
 
     struct InternalSystemData
     {
@@ -459,15 +459,16 @@ void QnSystemsModelPrivate::addSystem(const QnSystemDescriptionPtr& systemDescri
     q->endInsertRows();
 }
 
-void QnSystemsModelPrivate::removeSystem(const QString &systemId)
+void QnSystemsModelPrivate::removeSystem(const QString &systemId, const nx::Uuid& localId)
 {
     Q_Q(QnSystemsModel);
 
-    const auto removeIt = std::find_if(internalData.begin()
-        , internalData.end(), [systemId](const InternalSystemDataPtr &value)
-    {
-        return (value->system->id() == systemId);
-    });
+    const auto removeIt = std::find_if(internalData.begin(), internalData.end(),
+        [systemId, localId](const InternalSystemDataPtr &value)
+        {
+            const auto& system = value->system;
+            return system->id() == systemId || system->localId() == localId;
+        });
 
     if (removeIt == internalData.end())
         return;
