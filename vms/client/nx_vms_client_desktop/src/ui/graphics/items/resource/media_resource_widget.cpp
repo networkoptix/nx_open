@@ -632,6 +632,12 @@ void QnMediaResourceWidget::initBlurMask()
     if (!NX_ASSERT(m_renderer))
         return;
 
+    if (!m_renderer->openGLWidget())
+    {
+        NX_ASSERT(!ini().objectPixelation);
+        return;
+    }
+
     m_blurMask = std::make_unique<BlurMask>(
         d->analyticsMetadataProvider.get(),
         QnOpenGLRendererManager::instance(m_renderer->openGLWidget()).get());
@@ -1304,7 +1310,7 @@ Qn::RenderStatus QnMediaResourceWidget::paintVideoTexture(
         }
     }
 
-    if (ini().objectPixelation && d->isAnalyticsEnabledInStream())
+    if (ini().objectPixelation && m_blurMask && d->isAnalyticsEnabledInStream())
     {
         m_renderer->setBlurFactor(std::max(kAnalyticsBlurFactor, m_statusOverlay->opacity()));
 
@@ -1322,7 +1328,7 @@ Qn::RenderStatus QnMediaResourceWidget::paintVideoTexture(
                 channel);
         }
     }
-    else
+    else if (m_blurMask)
     {
         // Blur everything when overlay is displayed.
         m_renderer->setBlurFactor(m_statusOverlay->opacity());
