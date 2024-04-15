@@ -2134,8 +2134,14 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged()
         && layoutSearchStateData.value<QnThumbnailsSearchState>().step > 0
         && !workbenchLayout->items().empty();
 
-    const auto streamSynchronizer = workbench()->windowContext()->streamSynchronizer();
-    streamSynchronizer->setState(workbenchLayout->streamSynchronizationState());
+    auto syncState = workbenchLayout->streamSynchronizationState();
+    if (isPreviewSearchLayout)
+    {
+        NX_ASSERT(!syncState.isSyncOn);
+        syncState.isSyncOn = false;
+    }
+
+    workbench()->windowContext()->streamSynchronizer()->setState(syncState);
 
     // Sort items to guarantee the same item placement for each time the same new layout is opened.
     const auto items = workbenchLayout->items();
