@@ -143,7 +143,6 @@ endif()
 if(WINDOWS)
     add_definitions(
         -D_CRT_RAND_S
-        -D_WINSOCKAPI_=
         -DNOMINMAX=
         -DUNICODE
         -DWIN32_LEAN_AND_MEAN
