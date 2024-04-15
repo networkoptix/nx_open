@@ -2256,7 +2256,8 @@ void ActionHandler::at_thumbnailsSearchAction_triggered()
     layout->setLocalRange(period);
     NX_ASSERT(layout->isPreviewSearchLayout());
     menu()->trigger(action::OpenInNewTabAction, action::Parameters(layout)
-        .withArgument(Qn::LayoutSyncStateRole, QVariant::fromValue<StreamSynchronizationState>({}))
+        .withArgument(Qn::LayoutSyncStateRole,
+            QVariant::fromValue<StreamSynchronizationState>(StreamSynchronizationState::disabled()))
     );
 }
 

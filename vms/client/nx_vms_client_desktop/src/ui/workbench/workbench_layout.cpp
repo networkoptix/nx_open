@@ -128,7 +128,9 @@ QnWorkbenchLayout::QnWorkbenchLayout(const LayoutResourcePtr& resource):
                 emit titleChanged();
         });
 
-    setStreamSynchronizationState(StreamSynchronizationState::live());
+    setStreamSynchronizationState(isPreviewSearchLayout()
+        ? StreamSynchronizationState::disabled()
+        : StreamSynchronizationState::live());
 }
 
 QnWorkbenchLayout::~QnWorkbenchLayout()
