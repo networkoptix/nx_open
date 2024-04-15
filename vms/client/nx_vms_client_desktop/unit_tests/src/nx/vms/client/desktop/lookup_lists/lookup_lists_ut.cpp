@@ -236,6 +236,11 @@ protected:
 
     void whenRevertImport() { m_importModel->revertImport(); }
 
+    void whenSetFilter(const QString& filter)
+    {
+        m_entriesModel->setFilter(filter);
+    }
+
     void thenFixUpIsRequired() { ASSERT_TRUE(m_importModel->fixupRequired()); }
     void thenFixUpIsNotRequired() { ASSERT_FALSE(m_importModel->fixupRequired()); }
 
@@ -309,7 +314,7 @@ protected:
         QVariantMap entry;
         entry["Approved"] = "true";
         entry["Number"] = "1";
-        entry["Color"] = "red";
+        entry["Color"] = "#FF0000";
         entry["Enum"] = "base enum item 2.1";
         return entry;
     }
@@ -352,12 +357,12 @@ protected:
         e1.attributeNames.push_back("Approved");
         e1.entries = {
             {{"Number", "12345"},
-                {"Color", "red"},
+                {"Color", "#FF0000"},
                 {"Enum", "base enum item 2.1"},
                 {"Approved", "true"}},
             {{"Number", "67890"}, {"Approved", "false"}},
-            {{"Color", "blue"}, {"Number", "9876"}},
-            {{"Enum", "base enum item 2.1"}, {"Color", "blue"}},
+            {{"Color", "#0000FF"}, {"Number", "9876"}},
+            {{"Enum", "base enum item 2.1"}, {"Color", "#0000FF"}},
         };
         return e1;
     }
@@ -576,6 +581,54 @@ TEST_F(LookupListTests, change_lookup_list)
 
     // Check that previous Lookup List Model didn't change.
     ASSERT_EQ(initialLookupListModelData, initialGenericLookupList.rawData());
+}
+
+/**
+ * Check search of values in Lookup List Entries Model is case independent
+ */
+TEST_F(LookupListTests, search_is_case_independent)
+{
+    LookupListData testData;
+    testData.id = nx::Uuid::createUuid();
+    testData.name = "Values";
+    testData.attributeNames.push_back("Value");
+    testData.entries = {{{"Value", "aaa"}},
+        {{"Value", "Aaa"}},
+        {{"Value", "bbb"}},
+        {{"Value", "bbbaa"}},
+        {{"Value", "AAAA"}},
+        {{"Value", "AaaA"}},
+        {{"Value", "6"}}};
+
+    givenLookupListEntriesModel(testData);
+
+    whenSetFilter("aa");
+    const int expectedRowCount = 5;
+    thenRowCountIs(expectedRowCount, m_entriesModel.get());
+
+    whenSetFilter("AA");
+    thenRowCountIs(expectedRowCount, m_entriesModel.get());
+}
+
+/**
+ * Check search of values in Lookup List Entries Model is performed on displayed values
+ */
+
+TEST_F(LookupListTests, search_on_displayed_values)
+{
+    givenLookupListEntriesModel(bigColumnNumberExampleData());
+
+    whenSetFilter("red");
+    thenRowCountIs(1, m_entriesModel.get());
+
+    whenSetFilter("No");
+    thenRowCountIs(1, m_entriesModel.get());
+
+    whenSetFilter("Yes");
+    thenRowCountIs(1, m_entriesModel.get());
+
+    whenSetFilter("blue");
+    thenRowCountIs(2, m_entriesModel.get());
 }
 
 } // namespace nx::vms::client::desktop

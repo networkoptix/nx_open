@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <unordered_map>
+
 #include <QtCore/QObject>
 
 #include <nx/utils/impl_ptr.h>
@@ -19,6 +21,7 @@ public:
     ColorSet(QObject* parent);
     virtual ~ColorSet() override;
 
+    std::unordered_map<QString, QString> colorByHex() const;
     std::vector<QString> items() const;
 
     Q_INVOKABLE QString color(const QString& item) const;

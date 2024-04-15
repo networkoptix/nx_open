@@ -61,7 +61,7 @@ Control
 
         function initCurrentIndex()
         {
-            const index = indexOfValue(control.value)
+            const index = find(control.value)
             if (index !== -1)
                 currentIndex = index
         }
