@@ -160,6 +160,8 @@ struct NX_VMS_COMMON_API EventParameters
 
     /** Hash for events aggregation. */
     nx::Uuid getParamsHash() const;
+
+    bool canHaveVideoLink() const;
 };
 
 #define EventParameters_Fields \
