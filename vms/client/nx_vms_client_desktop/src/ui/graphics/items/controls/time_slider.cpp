@@ -1861,7 +1861,8 @@ void QnTimeSlider::updateToolTipVisibilityInternal()
     }
 
     m_tooltip->setShown(visible);
-    m_livePreview->widget()->raise();
+    if (m_livePreview->isShown())
+        m_livePreview->widget()->raise();
 }
 
 void QnTimeSlider::updateToolTipPosition()
@@ -1880,8 +1881,6 @@ void QnTimeSlider::updateToolTipPosition()
 
     m_tooltip->setPosition(positionAtTopLine.x(), positionAtTopLine.y(),
         horizontalBounds.left(), horizontalBounds.right());
-
-    m_livePreview->widget()->raise();
 }
 
 void QnTimeSlider::queueTooltipPositionUpdate()
@@ -1994,8 +1993,6 @@ void QnTimeSlider::updateLivePreview()
             globalCursorPos,
             globalRect,
             tooltipTimeContent(timeFromPosition(localCursorPos)));
-
-        m_livePreview->widget()->raise();
     }
     else
     {
