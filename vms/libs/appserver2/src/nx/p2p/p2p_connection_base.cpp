@@ -585,12 +585,10 @@ void ConnectionBase::onMessageSent(SystemError::ErrorCode errorCode, size_t byte
     if (errorCode != SystemError::noError ||
         bytesSent == 0)
     {
-
-        NX_DEBUG(
-            this, "onMessageSent: Connection closed. Error: %1, bytesSent: %2",
-            errorCode, bytesSent);
-        setState(State::Error,
-            nx::format("Connection closed. Error: %1, bytesSent: %2", errorCode, bytesSent));
+        const auto errorMessage = nx::format("Error: %1, bytesSent: %2. Transport error message: %3",
+            errorCode, bytesSent, m_p2pTransport->lastErrorMessage());
+        NX_DEBUG(this, "%1: %2", __func__, errorMessage);
+        setState(State::Error, errorMessage);
         return;
     }
 
