@@ -219,6 +219,7 @@ void ConnectionBase::onHttpClientDone()
     }
 
     const int statusCode = m_httpClient->response()->statusLine.statusCode;
+    m_responseHeaders = m_httpClient->response()->headers;
 
     NX_VERBOSE(this, "%1. statusCode = %2", Q_FUNC_INFO, statusCode);
 
@@ -232,12 +233,15 @@ void ConnectionBase::onHttpClientDone()
             && fillAuthInfo(m_httpClient.get(), m_credentialsSource == CredentialsSource::serverKey))
         {
             m_httpClient->doGet(
-                m_httpClient->url(),
-                std::bind(&ConnectionBase::onHttpClientDone, this));
+                m_httpClient->url(), [this] { return ConnectionBase::onHttpClientDone(); });
         }
         else
         {
-            cancelConnecting(State::Unauthorized, nx::format("Unauthorized"));
+            using nx::network::http::getHeaderValue;
+            auto headerValue = getHeaderValue(m_responseHeaders, Qn::AUTH_RESULT_HEADER_NAME);
+            if (headerValue.empty())
+                headerValue = "Unauthorized";
+            cancelConnecting(State::Unauthorized, nx::format(headerValue));
         }
         return;
     }

@@ -98,6 +98,7 @@ public:
     virtual const vms::api::PeerDataEx& remotePeer() const override { return m_remotePeer; }
     virtual bool isIncoming() const override { return m_direction == Direction::incoming;  }
     virtual std::multimap<QString, QString> httpQueryParams() const override;
+    const nx::network::http::HttpHeaders& responseHeaders() const { return m_responseHeaders; }
 
     virtual void setState(State state, const QString& reason);
     State state() const;
@@ -267,6 +268,7 @@ private:
     nx::network::http::HttpHeaders m_additionalRequestHeaders;
     std::vector<std::pair<QString, QString>> m_requestQueryParams;
     std::multimap<QString, QString> m_remoteQueryParams;
+    nx::network::http::HttpHeaders m_responseHeaders;
     QByteArray m_connectionGuid;
     size_t m_startedClassId = 0;
     QString m_lastErrorMessage;

@@ -30,7 +30,8 @@ NX_REFLECTION_ENUM(AuthResult,
     Auth_WrongTicketToken, /**< Ticket token is invalid or expired. */
     Auth_DisabledBasicAndDigest, /**< HTTP basic and digest are disabled. */
     Auth_ClashedLogin, /**< More than one user with the same login are presented. */
-    Auth_LdapTlsError /**< Error related to upgrading LDAP session to TLS */
+    Auth_LdapTlsError, /**< Error related to upgrading LDAP session to TLS */
+    Auth_UnknownError /**< Unknown Error */
 )
 
 NX_NETWORK_REST_API QString toErrorMessage(AuthResult value);

@@ -19,6 +19,7 @@
 #include <nx/network/http/http_message_stream_parser.h>
 #include <nx/network/http/http_stream_reader.h>
 #include <nx/network/http/multipart_content_parser.h>
+#include <nx/network/rest/auth_result.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
@@ -227,7 +228,7 @@ signals:
         QByteArray data,
         const QnTransactionTransportHeader &transportHeader);
     void stateChanged(State state);
-    void remotePeerUnauthorized(const nx::Uuid& id);
+    void remotePeerUnauthorized(const nx::Uuid& id, nx::network::rest::AuthResult);
     void peerIdDiscovered(const nx::utils::Url& url, const nx::Uuid& id);
     void onSomeDataReceivedFromRemotePeer();
 
