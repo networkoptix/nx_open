@@ -380,7 +380,7 @@ Item
                             border.color: ColorTheme.colors.dark5
                         }
 
-                        IconImage
+                        ColoredImage
                         {
                             id: icon
 
@@ -388,29 +388,29 @@ Item
 
                             sourceSize: Qt.size(20, 20)
 
-                            source:
+                            sourcePath:
                             {
                                 switch (cell.displayedProvider)
                                 {
                                     case ResourceAccessInfo.ProvidedVia.own:
                                     case ResourceAccessInfo.ProvidedVia.ownResourceGroup:
-                                        return "image://svg/skin/user_settings/sharing/own.svg"
+                                        return "image://skin/user_settings/sharing/own.svg"
 
                                     case ResourceAccessInfo.ProvidedVia.layout:
-                                        return "image://svg/skin/user_settings/sharing/layout.svg"
+                                        return "image://skin/user_settings/sharing/layout.svg"
 
                                     case ResourceAccessInfo.ProvidedVia.videowall:
-                                        return "image://svg/skin/user_settings/sharing/videowall.svg"
+                                        return "image://skin/user_settings/sharing/videowall.svg"
 
                                     case ResourceAccessInfo.ProvidedVia.parentUserGroup:
-                                        return "image://svg/skin/user_settings/sharing/group.svg"
+                                        return "image://skin/user_settings/sharing/group.svg"
 
                                     default:
                                         return ""
                                 }
                             }
 
-                            color: cell.foregroundColor
+                            primaryColor: cell.foregroundColor
                         }
 
                         Text
@@ -418,7 +418,7 @@ Item
                             id: checkedChildResourceCounter
 
                             height: parent.height
-                            width: (icon.source != "") ? icon.x : parent.width
+                            width: icon.sourcePath ? icon.x : parent.width
 
                             horizontalAlignment: Qt.AlignHCenter
                             verticalAlignment: Qt.AlignVCenter

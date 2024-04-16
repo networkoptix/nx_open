@@ -137,13 +137,13 @@ Button
         {
             spacing: button.spacing
 
-            IconImage
+            ColoredImage
             {
                 id: icon
 
                 name: button.icon.name
-                color: text.color
-                source: button.icon.source
+                primaryColor: text.color
+                sourcePath: button.icon.source
                 sourceSize: Qt.size(button.icon.width, button.icon.height)
 
                 visible: status === Image.Ready
@@ -200,7 +200,7 @@ Button
                     hoverEnabled: true
                     radius: 2
 
-                    icon.source: "image://svg/skin/text_buttons/cross_close_20.svg"
+                    icon.source: "image://skin/text_buttons/cross_close_20.svg"
                     icon.color: text.color
 
                     visible: button.state != SelectableTextButton.State.Deactivated

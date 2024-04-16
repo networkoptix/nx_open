@@ -82,7 +82,7 @@ QString IconManager::absoluteIconPath(const QString& iconName) const
 
 QString IconManager::iconUrl(const QString& iconName) const
 {
-    static const QString kSvgSkinRootUrl = "image://svg/skin/";
+    static const QString kSvgSkinRootUrl = "image://skin/";
     static const QString kDefaultSkinRootUrl = "qrc:///skin/";
 
     const auto relativePath = iconPath(iconName);

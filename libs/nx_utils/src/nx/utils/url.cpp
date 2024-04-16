@@ -346,6 +346,19 @@ QString Url::queryItem(const QString& key) const
     return QUrlQuery(m_url).queryItemValue(key);
 }
 
+QList<QPair<QString, QString>> Url::queryItems() const
+{
+    return QUrlQuery(m_url).queryItems();
+}
+
+QVariantMap Url::queryMap() const
+{
+    QVariantMap result;
+    for (const auto& [key, value]: queryItems())
+        result[key] = value;
+    return result;
+}
+
 void Url::setPathAndQuery(const QString& pathAndQuery, QUrl::ParsingMode mode)
 {
     const int queryPos = pathAndQuery.indexOf('?');

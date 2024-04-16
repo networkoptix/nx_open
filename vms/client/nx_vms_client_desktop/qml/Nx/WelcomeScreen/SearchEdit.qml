@@ -54,7 +54,7 @@ TextField
             width: 20
             height: 20
 
-            source: "image://svg/skin/welcome_screen/search.svg"
+            source: "image://skin/welcome_screen/search.svg"
             sourceSize: Qt.size(width, height)
         }
     }
@@ -110,7 +110,7 @@ TextField
         flat: true
         backgroundColor: ColorTheme.colors.dark5
 
-        iconUrl: "image://svg/skin/welcome_screen/cross.svg"
+        iconUrl: "image://skin/welcome_screen/cross.svg"
         iconWidth: 20
         iconHeight: 20
 

@@ -55,10 +55,10 @@ Dialog
         Image
         {
             property var icons: ({
-                "information": "image://svg/skin/standard_icons/sp_message_box_information_64.svg",
-                "question": "image://svg/skin/standard_icons/sp_message_box_question_64.svg",
-                "warning": "image://svg/skin/standard_icons/sp_message_box_warning_64.svg",
-                "critical": "image://svg/skin/standard_icons/sp_message_box_critical_64.svg"
+                "information": "image://skin/standard_icons/sp_message_box_information_64.svg",
+                "question": "image://skin/standard_icons/sp_message_box_question_64.svg",
+                "warning": "image://skin/standard_icons/sp_message_box_warning_64.svg",
+                "critical": "image://skin/standard_icons/sp_message_box_critical_64.svg"
             })
             source: icons[settingsModel && settingsModel.icon] || icons["information"]
             Layout.alignment: Qt.AlignTop

@@ -161,8 +161,8 @@ QVariant VmsEventSearchListModel::Private::data(
         case Qt::DisplayRole:
             return eventTitle(details);
 
-        case Qt::DecorationRole:
-            return iconPixmap(event, details);
+        case Qn::DecorationPathRole:
+            return iconPath(event, details);
 
         case Qt::ForegroundRole:
             return QVariant::fromValue(color(details));
@@ -495,7 +495,7 @@ QString VmsEventSearchListModel::Private::description(const QVariantMap& details
         .join(common::html::kLineBreak);
 }
 
-QPixmap VmsEventSearchListModel::Private::iconPixmap(
+QString VmsEventSearchListModel::Private::iconPath(
     const EventPtr& event,
     const QVariantMap& details) const
 {
@@ -503,7 +503,6 @@ QPixmap VmsEventSearchListModel::Private::iconPixmap(
     using nx::vms::rules::Icon;
 
     const auto icon = details.value(rules::utils::kIconDetailName).value<Icon>();
-    const auto level = details.value(rules::utils::kLevelDetailName).value<Level>();
     const auto customIcon = details.value(rules::utils::kCustomIconDetailName).toString();
 
     QnResourceList devices;
@@ -513,7 +512,7 @@ QPixmap VmsEventSearchListModel::Private::iconPixmap(
             rules::utils::getDeviceIds(AggregatedEventPtr::create(event)));
     }
 
-    return eventIcon(icon, level, customIcon, color(details), devices);
+    return eventIconPath(icon, customIcon, devices);
 }
 
 QColor VmsEventSearchListModel::Private::color(const QVariantMap& details)

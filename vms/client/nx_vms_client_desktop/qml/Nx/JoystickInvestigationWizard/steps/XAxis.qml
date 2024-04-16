@@ -29,7 +29,7 @@ WizardStep
             id: joystickImage
 
             Layout.alignment: Qt.AlignHCenter
-            source: "image://svg/skin/joystick_settings/pan.svg"
+            source: "image://skin/joystick_settings/pan.svg"
             sourceSize: Qt.size(120, 120)
         }
     }

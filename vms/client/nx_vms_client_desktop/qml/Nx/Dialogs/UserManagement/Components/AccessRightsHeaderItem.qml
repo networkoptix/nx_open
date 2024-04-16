@@ -10,9 +10,9 @@ Item
 {
     id: item
 
-    property alias icon: icon.source
+    property alias icon: icon.sourcePath
     property alias text: caption.text
-    property alias color: icon.color
+    property alias color: icon.primaryColor
 
     property bool interactive: false
     property real rehoverDistance: 1
@@ -82,7 +82,7 @@ Item
             border.color: ColorTheme.colors.dark7
         }
 
-        IconImage
+        ColoredImage
         {
             id: icon
 

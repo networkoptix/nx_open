@@ -6,7 +6,7 @@ import Nx.Core
 
 import "private"
 
-IconImage
+ColoredImage
 {
     property bool checked: false
     property bool hovered: false
@@ -20,7 +20,7 @@ IconImage
     baselineOffset: 12
     sourceSize: Qt.size(16, 16)
 
-    color:
+    primaryColor:
     {
         const baseColors = checked ? checkedColors : colors
         if (!enabled)
@@ -31,10 +31,10 @@ IconImage
             : (hovered ? baseColors.hovered : baseColors.normal)
     }
 
-    source:
+    sourcePath:
     {
         return checked
-            ? "qrc:///skin/theme/radiobutton_checked.png"
-            : "qrc:///skin/theme/radiobutton.png"
+            ? "theme/radiobutton_checked.png"
+            : "theme/radiobutton.png"
     }
 }

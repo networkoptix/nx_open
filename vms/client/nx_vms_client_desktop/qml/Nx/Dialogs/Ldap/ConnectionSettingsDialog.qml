@@ -277,7 +277,7 @@ Dialog
                 {
                     id: testStatus
 
-                    SvgImage
+                    ColoredImage
                     {
                         visible: dialog.testState == LdapSettings.TestState.ok
                             || dialog.testState == LdapSettings.TestState.error
@@ -291,8 +291,9 @@ Dialog
                             : "red_core"
 
                         sourcePath: dialog.testState == LdapSettings.TestState.ok
-                            ? "image://svg/skin/user_settings/connection_ok.svg"
-                            : "image://svg/skin/text_buttons/error.svg"
+                            ? "image://skin/user_settings/connection_ok.svg"
+                            : "image://skin/text_buttons/error.svg"
+
                         sourceSize: Qt.size(20, 20)
                     }
 

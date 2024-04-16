@@ -28,7 +28,7 @@ Menu
     {
         text: qsTr("Edit")
 
-        icon.source: "image://svg/skin/welcome_screen/tile/menu/edit.svg"
+        icon.source: "image://skin/welcome_screen/tile/menu/edit.svg"
         visible: (menu.model.tileType === ConnectTilesModel.GeneralTileType)
             && menu.model.isOnline
             && menu.loggedIn
@@ -43,8 +43,8 @@ Menu
             : qsTr("Show")
 
         icon.source: menu.model.visibilityScope !== WelcomeScreen.HiddenTileVisibilityScope
-            ? "image://svg/skin/welcome_screen/tile/menu/eye_crossed.svg"
-            : "image://svg/skin/welcome_screen/tile/menu/eye.svg"
+            ? "image://skin/welcome_screen/tile/menu/eye_crossed.svg"
+            : "image://skin/welcome_screen/tile/menu/eye.svg"
 
         visible: menu.hideActionEnabled || menu.model.tileType === ConnectTilesModel.CloudButtonTileType
 
@@ -72,7 +72,7 @@ Menu
     {
         text: qsTr("Delete")
 
-        icon.source: "image://svg/skin/welcome_screen/tile/menu/delete.svg"
+        icon.source: "image://skin/welcome_screen/tile/menu/delete.svg"
 
         visible: !menu.cloud && !menu.connectable
 
@@ -86,8 +86,8 @@ Menu
             : qsTr("Remove from Favorites")
 
         icon.source: menu.model.visibilityScope !== WelcomeScreen.FavoriteTileVisibilityScope
-            ? "image://svg/skin/welcome_screen/tile/menu/star.svg"
-            : "image://svg/skin/welcome_screen/tile/menu/star_crossed.svg"
+            ? "image://skin/welcome_screen/tile/menu/star.svg"
+            : "image://skin/welcome_screen/tile/menu/star_crossed.svg"
 
         visible: menu.model.tileType === ConnectTilesModel.GeneralTileType
 

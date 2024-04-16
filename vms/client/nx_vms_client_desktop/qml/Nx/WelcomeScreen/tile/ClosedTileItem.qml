@@ -103,7 +103,7 @@ Item
             width: 20
             height: 20
 
-            source: "image://svg/skin/welcome_screen/tile/delete.svg"
+            source: "image://skin/welcome_screen/tile/delete.svg"
             sourceSize: Qt.size(width, height)
         }
     }
@@ -115,7 +115,7 @@ Item
         width: 39
         height: 78
 
-        source: "image://svg/skin/welcome_screen/tile/settings.svg"
+        source: "image://skin/welcome_screen/tile/settings.svg"
         sourceSize: Qt.size(width, height)
 
         visible: isFactorySystem
@@ -135,8 +135,8 @@ Item
             height: 16
 
             source: closedTileItem.tile.connectable && !context.hasCloudConnectionIssue
-                ? "image://svg/skin/welcome_screen/tile/cloud.svg"
-                : "image://svg/skin/welcome_screen/tile/cloud_offline.svg"
+                ? "image://skin/welcome_screen/tile/cloud.svg"
+                : "image://skin/welcome_screen/tile/cloud_offline.svg"
             sourceSize: Qt.size(width, height)
 
             visible: tile.cloud
@@ -213,7 +213,7 @@ Item
             width: 10
             height: 14
 
-            source: "image://svg/skin/welcome_screen/tile/lock.svg"
+            source: "image://skin/welcome_screen/tile/lock.svg"
             sourceSize: Qt.size(width, height)
 
             visible: tile.systemRequires2FaEnabledForUser

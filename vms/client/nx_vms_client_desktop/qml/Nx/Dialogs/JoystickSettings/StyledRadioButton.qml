@@ -24,7 +24,7 @@ RadioButton
 
         source:
         {
-            let source = "qrc:///skin/theme/radiobutton"
+            let source = "image://skin/theme/radiobutton"
             if (control.checked)
                 source += "_checked"
             if (control.hovered)
@@ -37,7 +37,7 @@ RadioButton
     {
         anchors.left: parent.left
 
-        IconImage
+        ColoredImage
         {
             id: icon
 
@@ -47,8 +47,8 @@ RadioButton
             opacity: enabled ? 1.0 : 0.3
             visible: !!source
 
-            source: control.iconSource
-            color: control.currentColor
+            sourcePath: control.iconSource
+            primaryColor: control.currentColor
         }
 
         Text

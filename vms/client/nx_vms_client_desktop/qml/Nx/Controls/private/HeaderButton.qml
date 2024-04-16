@@ -48,15 +48,15 @@ Button
 
     text: !!model ? model.headerData(index, Qt.Horizontal) : ""
 
-    iconUrl:
+    icon.source:
     {
         if (!!model && model.sortColumn === index)
         {
             if (model.sortOrder == Qt.AscendingOrder)
-                return "image://svg/skin/table_view/ascending.svg"
+                return "image://skin/table_view/ascending.svg"
 
             if (model.sortOrder == Qt.DescendingOrder)
-                return "image://svg/skin/table_view/descending.svg"
+                return "image://skin/table_view/descending.svg"
         }
 
         return ""
@@ -85,7 +85,7 @@ Button
             elide: Text.ElideRight
         }
 
-        IconImage
+        ColoredImage
         {
             id: iconItem
 
@@ -93,14 +93,14 @@ Button
             anchors.leftMargin: 4
             anchors.verticalCenter: parent.verticalCenter
 
-            source: control.icon.source
+            sourcePath: control.icon.source
             sourceSize: Qt.size(control.icon.width, control.icon.height)
             visible: !!source && width > 0 && height > 0
 
             width: source != "" ? control.icon.width : 0
             height: source != "" ? control.icon.height : 0
 
-            color: control.textColor
+            primaryColor: control.textColor
         }
     }
 

@@ -120,7 +120,7 @@ Control
 
                 checkable: true
                 checked: true
-                icon.source: "image://svg/skin/advanced_search_dialog/eye_open.svg"
+                icon.source: "image://skin/advanced_search_dialog/eye_open.svg"
                 icon.width: control.iconWidth
                 icon.height: control.iconHeight
 

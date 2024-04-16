@@ -143,11 +143,11 @@ ModalDialog
                                         text: modelData
                                     }
 
-                                    IconImage
+                                    ColoredImage
                                     {
                                         sourceSize: Qt.size(20, 20)
-                                        source: "image://svg/skin/standard_icons/arrow_right_2px_24.svg"
-                                        color: ColorTheme.colors.light16
+                                        sourcePath: "standard_icons/arrow_right_2px_24.svg"
+                                        primaryColor: ColorTheme.colors.light16
                                     }
 
                                     LookupListElementEditor

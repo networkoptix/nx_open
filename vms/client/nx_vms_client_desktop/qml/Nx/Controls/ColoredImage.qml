@@ -2,18 +2,20 @@
 
 import QtQuick
 
+import Nx
+
 Item
 {
     id: item
 
-    property string sourcePath
+    property string sourcePath //< Relative to core::Skin paths.
 
-    // Predefined color channel overrides.
+    // Predefined color channel overrides. Non-SVG images support only `primaryColor`.
     property var primaryColor: undefined
     property var secondaryColor: undefined
     property var tertiaryColor: undefined
 
-    // Additional color customization, as a map `name`-->`colorOrColorName`.
+    // Additional color customization, as a map `name`-->`color or colorName`.
     property var customColors: ({})
 
     property alias sourceSize: image.sourceSize
@@ -43,7 +45,8 @@ Item
             if (!item.sourcePath)
                 return ""
 
-            let customization = {}
+            const url = NxGlobals.url(item.sourcePath)
+            let customization = url.queryMap()
 
             for (let customChannel in item.customColors)
                 customization[customChannel] = item.customColors[customChannel]
@@ -65,9 +68,11 @@ Item
                     + encodeURIComponent(customization[channel]))
             }
 
-            const schemeAndPath = item.sourcePath.startsWith("image://")
-                ? item.sourcePath
-                : "image://svg/" + item.sourcePath
+            let path = url.path()
+            if (path[0] != "/")
+                path = "/" + path
+
+            const schemeAndPath = "image://skin" + path
 
             return query.length
                 ? `${schemeAndPath}?${query.join("&")}`

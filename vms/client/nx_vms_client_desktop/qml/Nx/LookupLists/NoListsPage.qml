@@ -19,7 +19,7 @@ Column
     Image
     {
         anchors.horizontalCenter: parent.horizontalCenter
-        source: "image://svg/skin/placeholders/list_placeholder.svg"
+        source: "image://skin/placeholders/list_placeholder.svg"
         sourceSize: Qt.size(64, 64)
     }
 

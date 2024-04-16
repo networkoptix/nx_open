@@ -24,7 +24,7 @@ ColumnLayout
 
     spacing: 8
 
-    SvgImage
+    ColoredImage
     {
         id: placeholderImage
 

@@ -54,29 +54,18 @@ TileBase
                 Layout.fillHeight: true
                 Layout.rightMargin: 4
 
-                visible: !!icon.decorationPath
+                visible: !!icon.sourcePath
 
-                IconImage
+                ColoredImage
                 {
                     id: icon
 
-                    readonly property string decorationPath:
-                        (tile.controller && tile.controller.showIcons && model && model.decorationPath)
-                            || ""
+                    sourcePath: (tile.controller && tile.controller.showIcons && model
+                        && model.decorationPath) || ""
 
                     anchors.centerIn: parent
                     sourceSize: Qt.size(20, 20)
-                    color: caption.color
-
-                    source:
-                    {
-                        if (!decorationPath)
-                            return ""
-
-                        return decorationPath.endsWith(".svg")
-                            ? ("image://svg/skin/" + decorationPath)
-                            : ("qrc:/skin/" + decorationPath)
-                    }
+                    primaryColor: caption.color
                 }
             }
 
@@ -231,7 +220,7 @@ TileBase
         anchors.top: parent.top
         anchors.topMargin: 6
 
-        icon.source: "image://svg/skin/text_buttons/cross_close_20.svg"
+        icon.source: "image://skin/text_buttons/cross_close_20.svg"
         radius: 2
 
         onClicked:

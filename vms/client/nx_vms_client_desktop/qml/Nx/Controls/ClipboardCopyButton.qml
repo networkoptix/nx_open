@@ -29,7 +29,7 @@ Item
         anchors.fill: parent
         hoverEnabled: true
 
-        icon.source: "image://svg/skin/text_buttons/copy_20.svg"
+        icon.source: "image://skin/text_buttons/copy_20.svg"
         icon.width: 20
         icon.height: 20
         icon.color: hovered ? ColorTheme.colors.light13 : ColorTheme.colors.light16
@@ -46,7 +46,7 @@ Item
         anchors.fill: parent
         opacity: 0
 
-        source: "image://svg/skin/user_settings/ok.svg"
+        source: "image://skin/user_settings/ok.svg"
         sourceSize: Qt.size(20, 20)
     }
 

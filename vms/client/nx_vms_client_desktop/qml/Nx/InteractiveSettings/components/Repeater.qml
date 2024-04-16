@@ -55,7 +55,7 @@ Item
 
             text: addButtonCaption || qsTr("Add")
             visible: visibleItemsCount < column.layoutItems.length
-            iconUrl: "image://svg/skin/buttons/add_20x20_deprecated.svg"
+            iconUrl: "image://skin/buttons/add_20x20_deprecated.svg"
 
             onClicked:
             {
@@ -70,7 +70,7 @@ Item
 
             text: deleteButtonCaption || qsTr("Delete")
             visible: visibleItemsCount > 1
-            iconUrl: "image://svg/skin/buttons/minus_20x20_deprecated.svg"
+            iconUrl: "image://skin/buttons/minus_20x20_deprecated.svg"
 
             onClicked:
             {

@@ -163,7 +163,7 @@ Window
                         width: Math.min(implicitWidth, header.filtersColumn.width)
 
                         selectable: false
-                        icon.source: "image://svg/skin/text_buttons/frame_20x20_deprecated.svg"
+                        icon.source: "image://skin/text_buttons/frame_20x20_deprecated.svg"
                         accented: eventModel.analyticsSetup
                             && eventModel.analyticsSetup.areaSelectionActive
 
@@ -348,7 +348,7 @@ Window
 
                 placeholder
                 {
-                    icon: "image://svg/skin/left_panel/placeholders/objects.svg"
+                    icon: "image://skin/left_panel/placeholders/objects.svg"
                     title: qsTr("No objects")
                     description: qsTr("Try changing the filters or configure object detection "
                         + "in the camera plugin settings")
@@ -396,7 +396,7 @@ Window
 
                         TileOverlayButton
                         {
-                            icon.source: "image://svg/skin/advanced_search_dialog/show_on_layout.svg"
+                            icon.source: "image://skin/advanced_search_dialog/show_on_layout.svg"
                             accent: true
 
                             onClicked:

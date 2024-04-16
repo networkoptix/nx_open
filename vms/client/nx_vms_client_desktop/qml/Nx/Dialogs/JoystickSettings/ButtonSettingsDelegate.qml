@@ -261,7 +261,7 @@ Item
                 contentHAlignment: Qt.AlignLeft
 
                 iconUrl: (model.iconKey && model.iconKey !== 0
-                    && ("image://resource/" + model.iconKey)) || "image://svg/skin/20x20/Solid/layout.svg"
+                    && ("image://resource/" + model.iconKey)) || "image://skin/20x20/Solid/layout.svg"
                 text: model.display
 
                 onClicked: loader.sourceComponent = dialogComponent

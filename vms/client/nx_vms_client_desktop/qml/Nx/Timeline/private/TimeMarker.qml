@@ -101,7 +101,7 @@ SliderToolTip
             width: 5
             height: 10
 
-            source: "image://svg/skin/timeline_tooltip/arrow_left.svg"
+            source: "image://skin/timeline_tooltip/arrow_left.svg"
             visible: timeMarker.mode === Timeline.TimeMarkerMode.leftmost
             x: 8
             y: row.y + row.height / 2 - height / 2
@@ -114,7 +114,7 @@ SliderToolTip
             width: 5
             height: 10
 
-            source: "image://svg/skin/timeline_tooltip/arrow_right.svg"
+            source: "image://skin/timeline_tooltip/arrow_right.svg"
             visible: timeMarker.mode === Timeline.TimeMarkerMode.rightmost
             x: content.width - width - 8
             y: row.y + row.height / 2 - height / 2

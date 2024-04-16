@@ -144,6 +144,7 @@ struct EventTile::Private
     Qt::KeyboardModifiers clickModifiers;
     QPoint clickPoint;
     QString title;
+    QString iconPath;
     QCache<int, QString> titleByWidth; //< key - width of nameLabel, value - trimmed title string
     int currentWidth = 0;
     bool previewEnabled = false;
@@ -228,6 +229,22 @@ struct EventTile::Private
         pal.setColor(QPalette::Window, core::colorTheme()->lighter(base, lighterBy));
         pal.setColor(QPalette::Midlight, core::colorTheme()->lighter(base, lighterBy + 1));
         q->setPalette(pal);
+    }
+
+    void updateIcon()
+    {
+        // Icon label is always visible. It keeps column width fixed.
+
+        if (iconPath.isEmpty())
+        {
+            q->ui->iconLabel->setPixmap({});
+            return;
+        }
+
+        q->ui->iconLabel->setPixmap(qnSkin->colorizedPixmap(iconPath,
+            q->ui->iconLabel->maximumSize() * q->devicePixelRatio(),
+            q->titleColor(),
+            q->devicePixelRatio()));
     }
 
     void setResourceList(const QStringList& list, int andMore)
@@ -558,10 +575,15 @@ QColor EventTile::titleColor() const
 
 void EventTile::setTitleColor(const QColor& value)
 {
+    if (titleColor() == value)
+        return;
+
     if (value.isValid())
         setPaletteColor(ui->nameLabel, ui->nameLabel->foregroundRole(), value);
     else
         ui->nameLabel->setPalette(d->defaultTitlePalette);
+
+    d->updateIcon();
 }
 
 QString EventTile::description() const
@@ -641,19 +663,18 @@ void EventTile::setTimestamp(const QString& value)
     ui->timestampLabel->setHidden(value.isEmpty() || !d->closeButton->isHidden());
 }
 
-QPixmap EventTile::icon() const
+QString EventTile::iconPath() const
 {
-    return ui->iconLabel->pixmap();
+    return d->iconPath;
 }
 
-void EventTile::setIcon(const QPixmap& value)
+void EventTile::setIconPath(const QString& value)
 {
-    // TODO: #vkutin Do we want to scale them? Now it's a temporary measure for soft triggers.
-    ui->iconLabel->setPixmap(value.isNull() ? value : value.scaled(
-        ui->iconLabel->maximumSize() * value.devicePixelRatio(),
-        Qt::KeepAspectRatio,
-        Qt::SmoothTransformation));
-    // Icon label is always visible. It keeps column width fixed.
+    if (d->iconPath == value)
+        return;
+
+    d->iconPath = value;
+    d->updateIcon();
 }
 
 ImageProvider* EventTile::imageProvider() const
@@ -1083,13 +1104,13 @@ void EventTile::setHighlighted(bool value)
 void EventTile::clear()
 {
     setCloseable(false);
+    setIconPath({});
     setTitle({});
     setTitleColor({});
     setDescription({});
     setAttributeList({});
     setFooterText({});
     setTimestamp({});
-    setIcon({});
     setPlaceholder({});
     setImageProvider({}, true);
     setVideoPreviewResource({});

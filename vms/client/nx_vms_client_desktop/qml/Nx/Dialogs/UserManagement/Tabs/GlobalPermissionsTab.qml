@@ -67,7 +67,7 @@ Item
                         Layout.alignment: Qt.AlignTop
                     }
 
-                    IconImage
+                    ColoredImage
                     {
                         id: inheritedFromIcon
 
@@ -78,8 +78,8 @@ Item
                         Layout.topMargin: viewLogsCheckBox.baselineOffset - baselineOffset
                         baselineOffset: height * 0.7 //< This is a property of this icon type.
                         sourceSize: Qt.size(20, 20)
-                        source: "image://svg/skin/user_settings/sharing/group.svg"
-                        color: groupMouseArea.containsMouse
+                        sourcePath: "image://skin/user_settings/sharing/group.svg"
+                        primaryColor: groupMouseArea.containsMouse
                             ? ColorTheme.colors.light16
                             : ColorTheme.colors.dark13
 

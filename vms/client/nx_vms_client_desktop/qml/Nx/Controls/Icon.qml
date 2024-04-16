@@ -3,7 +3,7 @@
 import Nx.Controls
 import Nx.Core
 
-SvgImage
+ColoredImage
 {
     id: item
 

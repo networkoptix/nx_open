@@ -18,6 +18,7 @@ CheckableTableView 1.0 CheckableTableView.qml
 CheckBox 1.0 CheckBox.qml
 CheckBoxImage 1.0 CheckBoxImage.qml
 ClipboardCopyButton 1.0 ClipboardCopyButton.qml
+ColoredImage 1.0 ColoredImage.qml
 ComboBox 1.0 ComboBox.qml
 CompactTabButton 1.0 CompactTabButton.qml
 CompactMenu 1.0 CompactMenu.qml
@@ -41,7 +42,7 @@ DynamicMenuItems 1.0 DynamicMenuItems.qml
 EditContextMenu 1.0 EditContextMenu.qml
 Fader 1.0 Fader.qml
 GroupBox 1.0 GroupBox.qml
-IconImage 1.0 IconImage.qml
+Icon 1.0 Icon.qml
 ImageButton 1.0 ImageButton.qml
 Label 1.0 Label.qml
 LinearPaletteColorPicker 1.0 LinearPaletteColorPicker.qml
@@ -84,8 +85,6 @@ SimpleColumn 1.0 SimpleColumn.qml
 Slider 1.0 Slider.qml
 SpinBox 1.0 SpinBox.qml
 Stack 1.0 Stack.qml
-SvgIcon 1.0 SvgIcon.qml
-SvgImage 1.0 SvgImage.qml
 Switch 1.0 Switch.qml
 SwitchButton 1.0 SwitchButton.qml
 SwitchIcon 1.0 SwitchIcon.qml

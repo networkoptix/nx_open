@@ -232,8 +232,8 @@ Button
                 fillMode: Image.Stretch
 
                 source: visibilityScope === WelcomeScreen.FavoriteTileVisibilityScope
-                    ? "image://svg/skin/welcome_screen/tile/star_full.svg"
-                    : "image://svg/skin/welcome_screen/tile/eye_full.svg"
+                    ? "image://skin/welcome_screen/tile/star_full.svg"
+                    : "image://skin/welcome_screen/tile/eye_full.svg"
                 sourceSize: Qt.size(width, height)
 
                 visible: visibilityScope !== WelcomeScreen.DefaultTileVisibilityScope

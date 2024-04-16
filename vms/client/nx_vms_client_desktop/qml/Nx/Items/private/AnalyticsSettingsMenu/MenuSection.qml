@@ -54,13 +54,14 @@ Column
         Component
         {
             id: icon
-            SvgImage
+
+            ColoredImage
             {
                 sourcePath: level === 0
                     ? iconSource
-                    : collapsed
-                        ? "skin/text_buttons/arrow_right_20.svg"
-                        : "skin/text_buttons/arrow_down_20.svg"
+                    : (collapsed
+                        ? "image://skin/text_buttons/arrow_right_20.svg"
+                        : "image://skin/text_buttons/arrow_down_20.svg")
 
                 primaryColor: menuItem.color
                 visible: level === 0 || collapsible
@@ -68,6 +69,7 @@ Column
                 MouseArea
                 {
                     anchors.fill: parent
+
                     onClicked:
                     {
                         if (selected && !menuItem.current)

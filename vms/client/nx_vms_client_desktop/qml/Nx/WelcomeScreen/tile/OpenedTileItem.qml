@@ -103,7 +103,7 @@ Item
         hoveredColor: ColorTheme.colors.dark9
         outlineColor: "transparent"
 
-        iconUrl: "image://svg/skin/welcome_screen/tile/close.svg"
+        iconUrl: "image://skin/welcome_screen/tile/close.svg"
         iconWidth: 20
         iconHeight: 20
 
@@ -299,7 +299,7 @@ Item
 
                     flat: true
                     backgroundColor: ColorTheme.colors.dark5
-                    iconUrl: "image://svg/skin/welcome_screen/cross.svg"
+                    iconUrl: "image://skin/welcome_screen/cross.svg"
                     iconWidth: 20
                     iconHeight: 20
                     activeFocusOnTab: false

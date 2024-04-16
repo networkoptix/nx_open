@@ -23,7 +23,7 @@ CheckBox
     property alias colors: checkIndicator.colors
     property alias checkedColors: checkIndicator.checkedColors
 
-    readonly property alias currentColor: checkIndicator.color
+    readonly property alias currentColor: checkIndicator.primaryColor
 
     padding: 0
     topPadding: 1

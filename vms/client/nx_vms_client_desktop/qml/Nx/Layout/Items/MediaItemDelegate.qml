@@ -72,43 +72,43 @@ ResourceItemDelegate
     [
         TitleBarButton
         {
-            iconUrl: "image://svg/skin/item/image_enhancement_24.svg"
+            iconUrl: "image://skin/item/image_enhancement_24.svg"
             checkable: true
         },
 
         TitleBarButton
         {
-            iconUrl: "image://svg/skin/item/zoom_window.svg"
+            iconUrl: "image://skin/item/zoom_window.svg"
             checkable: true
         },
 
         TitleBarButton
         {
-            iconUrl: "image://svg/skin/item/ptz.svg"
+            iconUrl: "image://skin/item/ptz.svg"
             checkable: true
         },
 
         TitleBarButton
         {
-            iconUrl: "image://svg/skin/item/fisheye.svg"
+            iconUrl: "image://skin/item/fisheye.svg"
             checkable: true
         },
 
         TitleBarButton
         {
             id: motionSearchButton
-            iconUrl: "image://svg/skin/item/motion.svg"
+            iconUrl: "image://skin/item/motion.svg"
             checkable: true
         },
 
         TitleBarButton
         {
-            iconUrl: "image://svg/skin/item/screenshot.svg"
+            iconUrl: "image://skin/item/screenshot.svg"
         },
 
         TitleBarButton
         {
-            iconUrl: "image://svg/skin/item/rotate.svg"
+            iconUrl: "image://skin/item/rotate.svg"
 
             onPressed: resourceItem.rotationInstrument.start(mousePosition, this)
             onMousePositionChanged: resourceItem.rotationInstrument.move(mousePosition, this)
@@ -120,7 +120,7 @@ ResourceItemDelegate
         {
             id: infoButton
 
-            iconUrl: "image://svg/skin/item/info.svg"
+            iconUrl: "image://skin/item/info.svg"
             checkable: true
 
             Binding
@@ -135,7 +135,7 @@ ResourceItemDelegate
 
         TitleBarButton
         {
-            iconUrl: "image://svg/skin/item/close.svg"
+            iconUrl: "image://skin/item/close.svg"
             onClicked: layoutItemData.layout.removeItem(layoutItemData.itemId)
         }
     ]

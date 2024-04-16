@@ -128,6 +128,12 @@ public:
         bool correctDevicePixelRatio = true,
         const QSize& desiredSize = QSize());
 
+    QPixmap colorizedPixmap(
+        const QString& pathAndParams,
+        const QSize& desiredPhysicalSize,
+        QColor primaryColor = QColor{},
+        qreal devicePixelRatio = 1.0);
+
     QMovie* newMovie(const QString& name, QObject* parent = nullptr);
     QMovie* newMovie(const char* name, QObject* parent = nullptr);
 

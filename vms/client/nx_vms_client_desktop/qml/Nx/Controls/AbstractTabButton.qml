@@ -89,13 +89,13 @@ TabButton
             topPadding: 1
             spacing: tabButton.spacing
 
-            IconImage
+            ColoredImage
             {
                 id: image
 
-                source: tabButton.icon.source
+                sourcePath: tabButton.icon.source
                 sourceSize: Qt.size(tabButton.icon.width, tabButton.icon.height)
-                color: tabButton.color
+                primaryColor: tabButton.color
                 name: tabButton.icon.name
                 anchors.verticalCenter: parent.verticalCenter
             }

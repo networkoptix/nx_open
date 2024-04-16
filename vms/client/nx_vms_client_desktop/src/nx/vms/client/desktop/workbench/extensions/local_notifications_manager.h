@@ -42,8 +42,8 @@ public:
     QString description(const nx::Uuid& notificationId) const;
     void setDescription(const nx::Uuid& notificationId, const QString& value);
 
-    QPixmap icon(const nx::Uuid& notificationId) const;
-    void setIcon(const nx::Uuid& notificationId, const QPixmap& value);
+    QString iconPath(const nx::Uuid& notificationId) const;
+    void setIconPath(const nx::Uuid& notificationId, const QString& value);
 
     std::optional<ProgressState> progress(const nx::Uuid& notificationId) const;
     void setProgress(const nx::Uuid& notificationId, std::optional<ProgressState> value);
@@ -87,7 +87,7 @@ signals:
     void cancellableChanged(const nx::Uuid& notificationId, bool isCancellable);
     void titleChanged(const nx::Uuid& notificationId, const QString& title);
     void descriptionChanged(const nx::Uuid& notificationId, const QString& description);
-    void iconChanged(const nx::Uuid& notificationId, const QIcon& icon);
+    void iconPathChanged(const nx::Uuid& notificationId, const QString& iconPath);
     void actionChanged(const nx::Uuid& notificationId, CommandActionPtr action);
     void levelChanged(const nx::Uuid& notificationId, QnNotificationLevel::Value level);
     void additionalTextChanged(const nx::Uuid& notificationId, const QString& additionalText);
@@ -104,7 +104,7 @@ private:
         CommandActionPtr action = nullptr;
         CommandActionPtr additionalAction = nullptr;
         QString format;
-        QPixmap icon;
+        QString iconPath;
         QnNotificationLevel::Value level = QnNotificationLevel::Value::NoNotification;
         QString additionalText;
         QString tooltip;

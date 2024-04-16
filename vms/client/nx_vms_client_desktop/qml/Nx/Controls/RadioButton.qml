@@ -22,7 +22,7 @@ RadioButton
     property alias colors: radioIndicator.colors
     property alias checkedColors: radioIndicator.checkedColors
 
-    readonly property alias currentColor: radioIndicator.color
+    readonly property alias currentColor: radioIndicator.primaryColor
 
     padding: 0
     topPadding: 0

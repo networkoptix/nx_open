@@ -36,7 +36,7 @@ Grid
             {
                 width: 20
                 height: 20
-                source: model.checkState == Qt.Checked ? "image://svg/skin/user_settings/ok.svg" : ""
+                source: model.checkState == Qt.Checked ? "image://skin/user_settings/ok.svg" : ""
                 sourceSize: Qt.size(width, height)
             }
 

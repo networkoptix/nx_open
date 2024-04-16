@@ -97,7 +97,7 @@ QByteArray substituteColors(
     const auto updateElement =
         [&themeSubstitutions](QDomElement element)
         {
-            if (auto _class = element.attribute("class", "");
+            if (auto _class = element.attribute("class", "").toLower();
                 themeSubstitutions.contains(_class))
             {
                 QColor value;
@@ -116,7 +116,14 @@ QByteArray substituteColors(
 
                 if (themeSubstitutions.alpha < 1.0)
                     element.setAttribute("opacity", themeSubstitutions.alpha);
-                element.setAttribute("fill", value.name().toLatin1());
+
+                const bool hasStroke = element.attribute("stroke", "transparent") != "transparent";
+                const bool hasFill = element.attribute("fill", "transparent") != "transparent";
+
+                if (hasStroke && !hasFill)
+                    element.setAttribute("stroke", value.name().toLatin1());
+                else
+                    element.setAttribute("fill", value.name().toLatin1());
             }
         };
 

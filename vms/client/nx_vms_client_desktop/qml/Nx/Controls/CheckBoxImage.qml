@@ -6,7 +6,7 @@ import Nx.Core
 
 import "private"
 
-IconImage
+ColoredImage
 {
     property int checkState: Qt.Unchecked
     property bool hovered: false
@@ -20,7 +20,7 @@ IconImage
     baselineOffset: 14
     sourceSize: Qt.size(20, 20)
 
-    color:
+    primaryColor:
     {
         const baseColors = (checkState === Qt.Unchecked) ? colors : checkedColors
         if (!enabled)
@@ -31,18 +31,18 @@ IconImage
             : (hovered ? baseColors.hovered : baseColors.normal)
     }
 
-    source:
+    sourcePath:
     {
         switch (checkState)
         {
             case Qt.Checked:
-                return "image://svg/skin/theme/checkbox_checked.svg"
+                return "image://skin/theme/checkbox_checked.svg"
 
             case Qt.Unchecked:
-                return "image://svg/skin/theme/checkbox_unchecked.svg"
+                return "image://skin/theme/checkbox_unchecked.svg"
 
             case Qt.PartiallyChecked:
-                return "image://svg/skin/theme/checkbox_partially_checked.svg"
+                return "image://skin/theme/checkbox_partially_checked.svg"
 
             default:
                 console.assert(false, `Invalid check state ${checkState}`)

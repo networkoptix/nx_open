@@ -38,9 +38,15 @@ public:
 
     QColor color(const QString& name) const;
     QColor color(const QString& name, std::uint8_t alpha) const;
+    bool hasColor(const QString& name) const;
+
+    /**
+     * Returns color with specified name from the theme if it exists.
+     * Otherwise returns `QColor::fromString(name)`.
+     */
+    QColor safeColor(const QString& name) const;
 
     QList<QColor> colors(const QString& name) const;
-
     QVariantMap colors() const;
 
     using ImageCustomization = QMap<QString /*source class name*/, QString /*target color name*/>;

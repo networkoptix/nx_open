@@ -27,7 +27,7 @@ ProgressDialog
                 anchors.left: parent.left
                 anchors.margins: 16
                 text: qsTr("Open File Folder...")
-                icon.source: "image://svg/skin/text_buttons/folder_20x20.svg"
+                icon.source: "image://skin/text_buttons/folder_20x20.svg"
                 onClicked: control.openFolderRequested()
             }
 

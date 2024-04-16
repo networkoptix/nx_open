@@ -30,7 +30,7 @@ StackLayout
             width: parent.width
             preferredWidth: 260
             headerFont.pixelSize: 14
-            imageSource: "image://svg/skin/integrations/integrations_placeholder.svg"
+            imageSource: "image://skin/integrations/integrations_placeholder.svg"
             header: qsTr("Integrations allow the seamless utilization of video analytics on"
                 + " various devices from the VMS.\nSelect an Integration to begin configuring its"
                 + " parameters.")

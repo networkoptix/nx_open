@@ -82,7 +82,7 @@ Item
         hoverEnabled: true
         enabled: control.enabled
 
-        icon.source: "image://svg/skin/user_settings/edit_filled.svg"
+        icon.source: "image://skin/user_settings/edit_filled.svg"
         icon.width: width
         icon.height: height
         icon.color: hovered ? ColorTheme.colors.light13 : ColorTheme.colors.light16

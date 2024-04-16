@@ -20,7 +20,7 @@ BusyIndicator
 
             anchors.centerIn: parent
 
-            source: "image://svg/skin/user_settings/spinner.svg"
+            source: "image://skin/user_settings/spinner.svg"
             sourceSize: Qt.size(20, 20)
 
             transformOrigin: Item.Center

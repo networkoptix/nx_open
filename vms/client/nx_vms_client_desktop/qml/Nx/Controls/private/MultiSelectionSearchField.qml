@@ -39,7 +39,7 @@ TextField
         width: 16
         height: 16
 
-        icon.source: "image://svg/skin/user_settings/clear_text_field.svg"
+        icon.source: "image://skin/user_settings/clear_text_field.svg"
         icon.width: width
         icon.height: height
 
@@ -48,14 +48,14 @@ TextField
 
     background: Rectangle
     {
-        IconImage
+        ColoredImage
         {
             x: 6
             anchors.verticalCenter: parent.verticalCenter
 
             sourceSize: Qt.size(16, 16)
-            source: "image://svg/skin/user_settings/search.svg"
-            color: searchField.color
+            sourcePath: "user_settings/search.svg"
+            primaryColor: searchField.color
         }
 
         radius: 2

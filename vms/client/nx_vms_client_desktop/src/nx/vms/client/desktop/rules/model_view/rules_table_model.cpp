@@ -253,7 +253,7 @@ QVariant RulesTableModel::stateColumnData(const ConstRulePtr& rule, int role) co
         // TODO: #mmalofeev check if the rule has warning.
 
         if (!rule->enabled())
-            return "image://svg/skin/misc/disabled.svg";
+            return "misc/disabled.svg";
     }
 
     return {};

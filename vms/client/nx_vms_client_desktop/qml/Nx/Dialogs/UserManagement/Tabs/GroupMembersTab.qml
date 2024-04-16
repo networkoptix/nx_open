@@ -36,7 +36,7 @@ MembershipSettings
     }
 
     summaryPlaceholder: [
-        "image://svg/skin/user_settings/no_members.svg",
+        "image://skin/user_settings/no_members.svg",
         qsTr("No members"),
         control.editable ? qsTr("Use controls on the left to add members") : ""
     ]
@@ -68,7 +68,7 @@ MembershipSettings
     {
         enabled: control.enabled && !!model.canEditParents //< model.canEditParents can be undefined
         offset: model.offset
-        iconSource: iconPath(model) + "?primary=light10&secondary=light4"
+        iconSource: iconPath(model)
         GlobalToolTip.text: model.offset > 0 ? qsTr("Inherits membership in current group") : ""
     }
 

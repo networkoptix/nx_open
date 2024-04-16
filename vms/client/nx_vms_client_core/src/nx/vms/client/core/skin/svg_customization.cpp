@@ -55,11 +55,14 @@ QByteArray customizeSvgColorClasses(const QByteArray& sourceData,
     const auto updateElement =
         [&](QDomElement element)
         {
-            if (!element.hasAttribute("fill"))
-                return;
-
             const auto className = element.attribute("class", "").toLower();
             if (className.isEmpty())
+                return;
+
+            const bool hasStroke = element.attribute("stroke", "transparent") != "transparent";
+            const bool hasFill = element.attribute("fill", "transparent") != "transparent";
+
+            if (!(hasStroke || hasFill))
                 return;
 
             const bool hasColor = customization.contains(className);
@@ -76,7 +79,12 @@ QByteArray customizeSvgColorClasses(const QByteArray& sourceData,
             if (targetColor.alphaF() < 1.0)
                 element.setAttribute("opacity", targetColor.alphaF());
 
-            element.setAttribute("fill", targetColor.name(QColor::NameFormat::HexRgb).toLatin1());
+            const auto colorValue = targetColor.name(QColor::NameFormat::HexRgb).toLatin1();
+
+            if (hasStroke && !hasFill)
+                element.setAttribute("stroke", colorValue);
+            else
+                element.setAttribute("fill", colorValue);
         };
 
     const auto recursiveDfs = nx::utils::y_combinator(

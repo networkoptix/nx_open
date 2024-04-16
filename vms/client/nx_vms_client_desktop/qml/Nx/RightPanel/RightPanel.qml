@@ -21,7 +21,7 @@ TabControl
 
         button: RightPanelTabButton
         {
-            icon.source: "image://svg/skin/events/tabs/notifications.svg?primary=white"
+            icon.source: "image://skin/events/tabs/notifications.svg?primary=white"
             text: qsTr("Notifications")
         }
 
@@ -47,7 +47,7 @@ TabControl
 
         button: RightPanelTabButton
         {
-            icon.source: "image://svg/skin/events/tabs/motion.svg?primary=white"
+            icon.source: "image://skin/events/tabs/motion.svg?primary=white"
             text: qsTr("Motion")
         }
 
@@ -74,7 +74,7 @@ TabControl
 
         button: RightPanelTabButton
         {
-            icon.source: "image://svg/skin/events/tabs/bookmarks.svg?primary=white"
+            icon.source: "image://skin/events/tabs/bookmarks.svg?primary=white"
             text: qsTr("Bookmarks")
         }
 
@@ -100,7 +100,7 @@ TabControl
 
         button: RightPanelTabButton
         {
-            icon.source: "image://svg/skin/events/tabs/events.svg?primary=white"
+            icon.source: "image://skin/events/tabs/events.svg?primary=white"
             text: qsTr("Events")
         }
 
@@ -126,7 +126,7 @@ TabControl
 
         button: RightPanelTabButton
         {
-            icon.source: "image://svg/skin/events/tabs/analytics.svg?primary=white"
+            icon.source: "image://skin/events/tabs/analytics.svg?primary=white"
             text: qsTr("Analytics")
         }
 

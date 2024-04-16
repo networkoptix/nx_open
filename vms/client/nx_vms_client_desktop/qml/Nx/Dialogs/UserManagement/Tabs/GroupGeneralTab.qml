@@ -70,10 +70,10 @@ Item
                 width: 64
                 height: 64
                 source: control.isLdap
-                    ? "image://svg/skin/user_settings/group_type_ldap.svg"
+                    ? "image://skin/user_settings/group_type_ldap.svg"
                     : (control.isPredefined
-                        ? "image://svg/skin/user_settings/group_type_built_in.svg"
-                        : "image://svg/skin/user_settings/group_type_local.svg")
+                        ? "image://skin/user_settings/group_type_built_in.svg"
+                        : "image://skin/user_settings/group_type_local.svg")
                 sourceSize: Qt.size(width, height)
             }
 
@@ -108,7 +108,7 @@ Item
 
                 TextButton
                 {
-                    icon.source: "image://svg/skin/user_settings/user_delete.svg"
+                    icon.source: "image://skin/user_settings/user_delete.svg"
                     icon.width: 12
                     icon.height: 14
                     spacing: 8
@@ -216,7 +216,7 @@ Item
                 text: qsTr("This group is not found in the LDAP database.")
 
                 buttonText: control.deleteAvailable && control.enabled ? qsTr("Delete") : ""
-                buttonIcon: "image://svg/skin/user_settings/trash.svg"
+                buttonIcon: "image://skin/user_settings/trash.svg"
 
                 onButtonClicked: control.deleteRequested()
             }

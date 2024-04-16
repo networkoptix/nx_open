@@ -137,11 +137,11 @@ FocusScope
 
             visible: opacity > 0
 
-            contentItem: Image
+            contentItem: ColoredImage
             {
-                source: "image://svg/skin/text_buttons/cross_close_20.svg"
-                fillMode: Image.Pad
+                sourcePath: "image://skin/text_buttons/cross_close_20.svg"
                 sourceSize: Qt.size(20, 20)
+                fillMode: Image.Pad
             }
 
             background: Rectangle

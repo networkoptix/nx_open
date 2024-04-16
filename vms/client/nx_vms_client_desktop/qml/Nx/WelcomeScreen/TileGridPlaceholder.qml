@@ -38,11 +38,11 @@ Item
             switch (parent.mode)
             {
                 case TileGridPlaceholder.Mode.NoSystemsFound:
-                    return "image://svg/skin/welcome_screen/placeholder/no_systems_found.svg"
+                    return "image://skin/welcome_screen/placeholder/no_systems_found.svg"
                 case TileGridPlaceholder.Mode.NoFavorites:
-                    return "image://svg/skin/welcome_screen/placeholder/no_favorites.svg"
+                    return "image://skin/welcome_screen/placeholder/no_favorites.svg"
                 case TileGridPlaceholder.Mode.NoHidden:
-                    return "image://svg/skin/welcome_screen/placeholder/no_hidden.svg"
+                    return "image://skin/welcome_screen/placeholder/no_hidden.svg"
                 default:
                     return ""
             }

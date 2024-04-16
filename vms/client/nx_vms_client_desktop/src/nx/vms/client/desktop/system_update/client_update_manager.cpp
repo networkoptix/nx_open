@@ -315,8 +315,8 @@ void ClientUpdateManager::Private::notifyUserAboutSuccessfulInstallation()
             "%1 is a version like '4.3.0', %2 is a VMS name like 'Nx Witness'")
             .arg(versionUrl, branding::vmsName()),
         /*cancellable*/ true);
-    notificationsManager->setIcon(
-        installationNotificationId, qnSkin->pixmap("events/update_complete.svg"));
+    notificationsManager->setIconPath(
+        installationNotificationId, "events/update_complete.svg");
     notificationsManager->setProgress(
         installationNotificationId, ProgressState::completed);
     notificationsManager->setAction(installationNotificationId, restartAction);
@@ -346,8 +346,8 @@ void ClientUpdateManager::Private::notifyUserAboutClientAutoUpdate()
         tr("New client-only updates will be installed automatically. "
            "You can change this in the settings."),
         /*cancellable*/ true);
-    notificationsManager->setIcon(
-        autoUpdateFeatureNotificationId, qnSkin->pixmap("events/update_auto.svg"));
+    notificationsManager->setIconPath(
+        autoUpdateFeatureNotificationId, "events/update_auto.svg");
     notificationsManager->setProgress(
         autoUpdateFeatureNotificationId, ProgressState::completed);
     notificationsManager->setAction(autoUpdateFeatureNotificationId, settingsAction);
@@ -389,7 +389,7 @@ void ClientUpdateManager::Private::showErrorNotification(const QString& message)
         notificationsManager->setTitle(errorNotificationId, message);
     }
 
-    notificationsManager->setIcon(errorNotificationId, qnSkin->pixmap("events/alert_yellow.png"));
+    notificationsManager->setIconPath(errorNotificationId, "events/alert_yellow.png");
 }
 
 void ClientUpdateManager::Private::hideErrorNotification()

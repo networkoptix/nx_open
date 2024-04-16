@@ -302,7 +302,7 @@ ModalDialog
         visible: editMode
         text: qsTr("Delete")
         DialogButtonBox.buttonRole: DialogButtonBox.RejectRole
-        icon.source: "image://svg/skin/text_buttons/trash.svg"
+        icon.source: "image://skin/text_buttons/trash.svg"
 
         onClicked:
         {

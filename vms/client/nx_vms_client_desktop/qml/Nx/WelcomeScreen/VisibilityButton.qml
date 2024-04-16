@@ -58,7 +58,7 @@ Button
                 color: control.currentColor
             }
 
-            IconImage
+            ColoredImage
             {
                 anchors.verticalCenter: label.verticalCenter
                 width: 20
@@ -66,8 +66,8 @@ Button
 
                 sourceSize: Qt.size(width, height)
 
-                source: "image://svg/skin/welcome_screen/arrow_down.svg"
-                color: control.currentColor
+                sourcePath: "welcome_screen/arrow_down.svg"
+                primaryColor: control.currentColor
             }
         }
     }

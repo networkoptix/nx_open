@@ -58,25 +58,6 @@ QVariant AbstractEventListModel::data(const QModelIndex& index, int role) const
         case Qt::AccessibleDescriptionRole:
             return index.data(Qn::DescriptionTextRole);
 
-        case Qt::DecorationRole:
-        {
-            const auto path = index.data(Qn::DecorationPathRole).toString();
-            if (path.isEmpty())
-                return QPixmap();
-
-            const auto colorVariant = index.data(Qt::ForegroundRole);
-            const QColor color =
-                colorVariant.canConvert<QColor>() ? colorVariant.value<QColor>() : QColor();
-
-            if (path.endsWith(".svg"))
-            {
-                return qnSkin->icon(path, kIconSubstitutions)
-                    .pixmap(style::Metrics::kDefaultIconSize);
-            }
-
-            return color.isValid() ? qnSkin->colorize(qnSkin->pixmap(path), color)
-                                   : qnSkin->pixmap(path);
-        }
         default:
             return QVariant();
     }

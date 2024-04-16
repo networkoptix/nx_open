@@ -91,23 +91,23 @@ void LocalNotificationsManager::setDescription(const nx::Uuid& notificationId, c
     emit descriptionChanged(notificationId, value);
 }
 
-QPixmap LocalNotificationsManager::icon(const nx::Uuid& notificationId) const
+QString LocalNotificationsManager::iconPath(const nx::Uuid& notificationId) const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
-    return m_lookup.value(notificationId).icon;
+    return m_lookup.value(notificationId).iconPath;
 }
 
-void LocalNotificationsManager::setIcon(const nx::Uuid& notificationId, const QPixmap& value)
+void LocalNotificationsManager::setIconPath(const nx::Uuid& notificationId, const QString& value)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     auto iter = m_lookup.find(notificationId);
-    if (iter == m_lookup.end())
+    if (iter == m_lookup.end() || iter->iconPath == value)
         return;
 
-    iter->icon = value;
+    iter->iconPath = value;
 
     lock.unlock();
-    emit iconChanged(notificationId, value);
+    emit iconPathChanged(notificationId, value);
 }
 
 std::optional<ProgressState> LocalNotificationsManager::progress(

@@ -98,9 +98,7 @@ QPixmap loadSvgImage(const QString& sourcePath,
 
     for (const auto& [sourceClassName, targetColorName]: customization.asKeyValueRange())
     {
-        const auto targetColor = colorTheme()->colors().contains(targetColorName)
-            ? colorTheme()->colors().value(targetColorName).value<QColor>()
-            : QColor::fromString(targetColorName);
+        const auto targetColor = colorTheme()->safeColor(targetColorName);
 
         NX_ASSERT(targetColor.isValid(),
             "Invalid color \"%1\" in customization for svg image \"%2\"",

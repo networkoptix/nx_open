@@ -827,11 +827,11 @@ QVariant MembersModel::data(const QModelIndex& index, int role) const
         case Qn::DecorationPathRole:
         {
             if (index.data(MembersModel::IsPredefined).toBool())
-                return "image://svg/skin/20x20/Solid/group_default.svg";
+                return "20x20/Solid/group_default.svg";
 
             return index.data(MembersModel::IsLdap).toBool()
-                ? "image://svg/skin/20x20/Solid/group_ldap.svg"
-                : "image://svg/skin/20x20/Solid/group.svg";
+                ? "20x20/Solid/group_ldap.svg"
+                : "20x20/Solid/group.svg";
         }
 
         default:

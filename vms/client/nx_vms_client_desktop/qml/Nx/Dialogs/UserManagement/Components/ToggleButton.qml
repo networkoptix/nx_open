@@ -62,12 +62,12 @@ AbstractButton
             anchors.centerIn: parent
             spacing: 2
 
-            IconImage
+            ColoredImage
             {
                 id: iconImage
 
-                source: button.icon.source
-                color: buttonText.color
+                sourcePath: button.icon.source
+                primaryColor: buttonText.color
                 sourceSize: Qt.size(button.icon.width, button.icon.height)
             }
 

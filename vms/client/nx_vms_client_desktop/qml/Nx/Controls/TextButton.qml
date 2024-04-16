@@ -43,16 +43,16 @@ AbstractButton
         implicitWidth: buttonIcon.width + buttonText.implicitWidth + content.spacing
         implicitHeight: Math.max(buttonIcon.height, buttonText.implicitHeight)
 
-        IconImage
+        ColoredImage
         {
             id: buttonIcon
 
             name: button.icon.name
-            source: button.icon.source
+            sourcePath: button.icon.source
             sourceSize: Qt.size(button.icon.width, button.icon.height)
             visible: !!button.icon.source.toString()
             anchors.verticalCenter: parent.verticalCenter
-            color: button.down
+            primaryColor: button.down
                 ? button.pressedColor
                 : button.hovered ? button.hoveredColor : button.color
         }
@@ -65,7 +65,7 @@ AbstractButton
             text: button.text
             anchors.verticalCenter: parent.verticalCenter
             elide: Text.ElideRight
-            color: buttonIcon.color
+            color: buttonIcon.primaryColor
 
             x: buttonIcon.width + content.spacing
             width: content.width - x

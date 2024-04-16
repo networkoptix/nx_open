@@ -37,15 +37,15 @@ Control
 
         baselineOffset: text.baselineOffset
 
-        SvgImage
+        ColoredImage
         {
             Layout.alignment: Qt.AlignVCenter
 
             visible: !!iconSource
             sourcePath: iconSource
+            sourceSize: Qt.size(20, 20)
             primaryColor: "light10"
             secondaryColor: "light4"
-            sourceSize: Qt.size(20, 20)
         }
 
         Text
@@ -69,7 +69,7 @@ Control
 
             visible: removable
 
-            icon.source: "image://svg/skin/user_settings/cross_input.svg"
+            icon.source: "image://skin/user_settings/cross_input.svg"
             icon.width: 20
             icon.height: 20
             icon.color: ColorTheme.colors.light10

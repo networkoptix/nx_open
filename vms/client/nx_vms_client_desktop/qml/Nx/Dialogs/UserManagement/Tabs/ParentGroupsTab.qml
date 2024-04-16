@@ -159,7 +159,7 @@ MembershipSettings
         Placeholder
         {
             anchors.verticalCenterOffset: -32
-            imageSource: "image://svg/skin/user_settings/no_results.svg"
+            imageSource: "image://skin/user_settings/no_results.svg"
             text: qsTr("No groups found")
             additionalText: qsTr("Change search criteria or create a new group")
 
@@ -171,7 +171,7 @@ MembershipSettings
 
                 text: qsTr("Add Group")
 
-                iconUrl: "image://svg/skin/user_settings/add.svg"
+                iconUrl: "image://skin/user_settings/add.svg"
                 iconWidth: 20
                 iconHeight: 20
                 leftPadding: 12
@@ -191,7 +191,7 @@ MembershipSettings
     }
 
     summaryPlaceholder: [
-        "image://svg/skin/user_settings/no_groups.svg",
+        "image://skin/user_settings/no_groups.svg",
         qsTr("No groups"),
         control.editable ? qsTr("Use controls on the left to add to a group") : ""
     ]
@@ -209,10 +209,10 @@ MembershipSettings
             id: groupTreeHeader
             onRemoveClicked: model.isParent = false
             iconSource: model.isPredefined
-                ? "image://svg/skin/20x20/Solid/group_default.svg"
+                ? "image://skin/20x20/Solid/group_default.svg"
                 : model.isLdap
-                    ? "image://svg/skin/20x20/Solid/group_ldap.svg"
-                    : "image://svg/skin/20x20/Solid/group.svg"
+                    ? "image://skin/20x20/Solid/group_ldap.svg"
+                    : "image://skin/20x20/Solid/group.svg"
 
             offset: 0
             interactive: model.isParent
