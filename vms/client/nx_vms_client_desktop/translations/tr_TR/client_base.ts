@@ -1356,7 +1356,7 @@
       <source>Delete %n groups?</source>
       <comment>Numerical form depends on groups count</comment>
       <translation type="unfinished">
-        <numerusform>%n Grup silinsin mi?</numerusform>
+        <numerusform>Grup %n silinsin mi?</numerusform>
         <numerusform>Delete %n groups?</numerusform>
       </translation>
     </message>
@@ -7638,7 +7638,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Place Hotspot</source>
-      <translation type="unfinished">Place Hotspot</translation>
+      <translation>Kamera Bağlantısı Yerleştir</translation>
     </message>
     <message>
       <source>NO DATA</source>
