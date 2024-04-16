@@ -108,14 +108,14 @@ void WebSocket::onRead(SystemError::ErrorCode error, size_t transferred)
 
     if (error != SystemError::noError)
     {
-        m_failed = true;
+        setFailedState(nx::format("Read error %1", error));
         callOnReadhandler(error, 0);
         return;
     }
 
     if (transferred == 0)
     {
-        m_failed = true;
+        setFailedState("0 bytes read");
         callOnReadhandler(SystemError::connectionAbort, 0);
         return;
     }
@@ -297,6 +297,17 @@ void WebSocket::sendMessage(const nx::Buffer& message, int writeSize, IoCompleti
     }
 }
 
+QString WebSocket::lastErrorMessage() const
+{
+    return m_lastErrorMessage;
+}
+
+void WebSocket::setFailedState(const QString& message)
+{
+    m_failed = true;
+    m_lastErrorMessage = message;
+}
+
 void WebSocket::onWrite(SystemError::ErrorCode error, size_t transferred)
 {
     if (m_failed)
@@ -313,7 +324,7 @@ void WebSocket::onWrite(SystemError::ErrorCode error, size_t transferred)
 
     if (error != SystemError::noError)
     {
-        m_failed = true;
+        setFailedState(nx::format("Write error %1", error));
         while (!m_writeQueue.empty())
         {
             utils::InterruptionFlag::Watcher watcher(&m_destructionFlag);
@@ -324,7 +335,7 @@ void WebSocket::onWrite(SystemError::ErrorCode error, size_t transferred)
     }
     else if (transferred == 0)
     {
-        m_failed = true;
+        setFailedState("0 bytes written");
         while (!m_writeQueue.empty())
         {
             utils::InterruptionFlag::Watcher watcher(&m_destructionFlag);
@@ -393,10 +404,10 @@ void WebSocket::gotFrame(FrameType type, const nx::Buffer& data, bool fin)
             break;
         case FrameType::close:
             sendControlResponse(FrameType::close);
-            m_failed = true;
+            setFailedState("Received 'close' control frame");
             break;
         default:
-            m_failed = true;
+            setFailedState(nx::format("Invaild frame type %1", (int) type));
             NX_DEBUG(
                 this, "%1: Got frame with invalid type %2. Going to failed state.",
                 __func__, (int) type);
