@@ -32,10 +32,14 @@ struct Group;
 using EventPtr = QSharedPointer<BasicEvent>;
 using ActionPtr = QSharedPointer<BasicAction>;
 
+using RulePtr = std::shared_ptr<Rule>;
+using ConstRulePtr = std::shared_ptr<const Rule>;
+
 class AggregatedEvent;
 using AggregatedEventPtr = QSharedPointer<AggregatedEvent>;
 
 using EventData = nx::vms::api::rules::PropertyMap;
+using ActionData = nx::vms::api::rules::PropertyMap;
 
 using State = nx::vms::api::rules::State;
 

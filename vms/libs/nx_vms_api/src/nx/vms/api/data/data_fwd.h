@@ -8,6 +8,7 @@ namespace nx::vms::api {
 
 namespace rules {
 
+struct ActionInfo;
 struct EventInfo;
 
 struct Rule;

@@ -15,14 +15,17 @@ const ItemDescriptor& SpeakAction::manifest()
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<SpeakAction>(),
         .displayName = tr("Speak"),
-        .flags = {ItemFlag::instant, ItemFlag::executeOnClientAndServer},
+        .flags = {ItemFlag::instant},
+        .executionTargets = {ExecutionTarget::clients, ExecutionTarget::servers},
+        .targetServers = TargetServers::resourceOwner,
         .fields = {
             makeFieldDescriptor<TextWithFields>(utils::kTextFieldName, tr("Text")),
             makeFieldDescriptor<TargetDeviceField>(utils::kDeviceIdsFieldName, tr("At Device")),
             utils::makeTargetUserFieldDescriptor(tr("To users")),
             makeFieldDescriptor<VolumeField>("volume", tr("Volume"), {}, {}, {utils::kTextFieldName}),
             utils::makeIntervalFieldDescriptor(tr("Interval of Action")),
-        }
+        },
+        .resources = {{utils::kDeviceIdsFieldName, {ResourceType::device, {}, {}, FieldFlag::target}}},
     };
     return kDescriptor;
 }

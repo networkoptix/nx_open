@@ -14,14 +14,17 @@ const ItemDescriptor& PtzPresetAction::manifest()
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<PtzPresetAction>(),
         .displayName = tr("Execute PTZ Preset"),
-        .flags = {ItemFlag::instant, ItemFlag::executeOnClientAndServer},
+        .flags = {ItemFlag::instant},
+        .executionTargets = {ExecutionTarget::servers},
+        .targetServers = TargetServers::resourceOwner,
         .fields = {
             makeFieldDescriptor<TargetSingleDeviceField>(utils::kCameraIdFieldName, tr("At")),
             makeFieldDescriptor<PtzPresetField>("presetId", tr("PTZ Preset")),
             utils::makeIntervalFieldDescriptor(tr("Interval of Action")),
             utils::makeTargetUserFieldDescriptor(
                 tr("Execute to users"), {}, utils::UserFieldPreset::All, /*visible*/ false),
-        }
+        },
+        .resources = {{utils::kCameraIdFieldName, {ResourceType::device, {}, {}, FieldFlag::target}}},
     };
     return kDescriptor;
 }

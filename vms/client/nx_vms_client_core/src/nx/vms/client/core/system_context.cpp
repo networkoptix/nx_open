@@ -14,6 +14,7 @@
 #include <nx/vms/client/core/network/remote_session.h>
 #include <nx/vms/client/core/network/server_primary_interface_watcher.h>
 #include <nx/vms/client/core/ptz/client_ptz_controller_pool.h>
+#include <nx/vms/client/core/rules/client_router.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/core/watchers/watermark_watcher.h>
@@ -100,6 +101,7 @@ SystemContext::SystemContext(
                 this);
             d->vmsRulesEngineHolder = std::make_unique<nx::vms::rules::EngineHolder>(
                 this,
+                std::make_unique<nx::vms::client::core::rules::ClientRouter>(this),
                 std::make_unique<nx::vms::rules::Initializer>(this),
                 /*separateThread*/ false);
             break;

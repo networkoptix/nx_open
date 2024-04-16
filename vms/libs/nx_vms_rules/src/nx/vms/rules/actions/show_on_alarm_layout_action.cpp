@@ -17,6 +17,7 @@ const ItemDescriptor& ShowOnAlarmLayoutAction::manifest()
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<ShowOnAlarmLayoutAction>(),
         .displayName = tr("Show on Alarm Layout"),
+        .executionTargets = ExecutionTarget::clients,
         .fields = {
             makeFieldDescriptor<TargetDeviceField>(utils::kDeviceIdsFieldName, {}),
             utils::makeTargetUserFieldDescriptor(tr("To")),
@@ -31,7 +32,11 @@ const ItemDescriptor& ShowOnAlarmLayoutAction::manifest()
             utils::makeTextFormatterFieldDescriptor("description", "{@EventDescription}"),
             utils::makeTextFormatterFieldDescriptor("tooltip", "{@ExtendedEventDescription}"),
             utils::makeExtractDetailFieldDescriptor("sourceName", utils::kSourceNameDetailName),
-        }
+        },
+        .resources = {
+            {utils::kDeviceIdsFieldName, {ResourceType::device}},
+            {utils::kServerIdFieldName, {ResourceType::server}},
+        },
     };
     return kDescriptor;
 }

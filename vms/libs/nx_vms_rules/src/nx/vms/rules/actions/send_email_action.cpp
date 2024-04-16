@@ -21,6 +21,8 @@ const ItemDescriptor& SendEmailAction::manifest()
         .displayName = tr("Send Email"),
         .description = "",
         .flags = {ItemFlag::instant, ItemFlag::aggregationByTypeSupported, ItemFlag::omitLogging},
+        .executionTargets = ExecutionTarget::servers,
+        .targetServers = TargetServers::serverWithPublicIp,
         .fields = {
             utils::makeTargetUserFieldDescriptor(
                 tr("To"),

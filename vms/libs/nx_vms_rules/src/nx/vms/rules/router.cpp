@@ -12,8 +12,9 @@ Router::~Router()
 {
 }
 
-void Router::init(const nx::Uuid& /*id*/)
+void Router::receiveAction(const ActionPtr& action)
 {
+    emit actionReceived(action);
 }
 
 } // namespace nx::vms::rules

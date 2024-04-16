@@ -14,7 +14,8 @@ template<class QueryProcessorType>
 class VmsRulesManager: public AbstractVmsRulesManager
 {
 public:
-    VmsRulesManager(QueryProcessorType* queryProcessor, const nx::network::rest::audit::Record& auditRecord);
+    VmsRulesManager(
+        QueryProcessorType* queryProcessor, const nx::network::rest::audit::Record& auditRecord);
 
     virtual int getVmsRules(
         Handler<nx::vms::api::rules::RuleList> handler,
@@ -30,8 +31,13 @@ public:
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
 
-    virtual int broadcastEvent(
+    virtual int transmitEvent(
         const nx::vms::api::rules::EventInfo& info,
+        Handler<> handler,
+        nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
+
+    virtual int transmitAction(
+        const nx::vms::api::rules::ActionInfo& info,
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
 
@@ -107,14 +113,31 @@ int VmsRulesManager<T>::deleteRule(
 }
 
 template<class T>
-int VmsRulesManager<T>::broadcastEvent(
+int VmsRulesManager<T>::transmitEvent(
     const nx::vms::api::rules::EventInfo& info,
     Handler<> handler,
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
     const int requestId = generateRequestID();
     processor().processUpdateAsync(
-        ApiCommand::broadcastVmsEvent,
+        ApiCommand::transmitVmsEvent,
+        info,
+        [requestId, handler = handlerExecutor.bind(std::move(handler))](auto&&... args) mutable
+        {
+            handler(requestId, std::move(args)...);
+        });
+    return requestId;
+}
+
+template<class T>
+int VmsRulesManager<T>::transmitAction(
+    const nx::vms::api::rules::ActionInfo& info,
+    Handler<> handler,
+    nx::utils::AsyncHandlerExecutor handlerExecutor)
+{
+    const int requestId = generateRequestID();
+    processor().processUpdateAsync(
+        ApiCommand::transmitVmsAction,
         info,
         [requestId, handler = handlerExecutor.bind(std::move(handler))](auto&&... args) mutable
         {

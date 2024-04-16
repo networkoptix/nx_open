@@ -20,6 +20,8 @@ const ItemDescriptor& BookmarkAction::manifest()
         .id = utils::type<BookmarkAction>(),
         .displayName = tr("Create Bookmark"),
         .flags = ItemFlag::prolonged,
+        .executionTargets = ExecutionTarget::servers,
+        .targetServers = TargetServers::resourceOwner,
         .fields = {
             makeFieldDescriptor<TargetDeviceField>(utils::kDeviceIdsFieldName, tr("At")),
             utils::makeTimeFieldDescriptor<OptionalTimeField>(
@@ -43,7 +45,8 @@ const ItemDescriptor& BookmarkAction::manifest()
             // TODO: #amalov Use Qn::ResouceInfoLevel::RI_WithUrl & AttrSerializePolicy::singleLine
             utils::makeExtractDetailFieldDescriptor("name", utils::kExtendedCaptionDetailName),
             utils::makeExtractDetailFieldDescriptor("description", utils::kDetailingDetailName),
-        }
+        },
+        .resources = {{utils::kDeviceIdsFieldName, {ResourceType::device, {}, {}, FieldFlag::target}}},
     };
     return kDescriptor;
 }

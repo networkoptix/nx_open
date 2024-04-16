@@ -19,6 +19,7 @@ const ItemDescriptor& TextOverlayAction::manifest()
         .id = utils::type<TextOverlayAction>(),
         .displayName = tr("Show Text Overlay"),
         .flags = ItemFlag::prolonged,
+        .executionTargets = ExecutionTarget::clients,
         .fields = {
             makeFieldDescriptor<TargetDeviceField>(utils::kDeviceIdsFieldName, tr("At")),
             utils::makeTimeFieldDescriptor<OptionalTimeField>(
@@ -33,7 +34,8 @@ const ItemDescriptor& TextOverlayAction::manifest()
             // TODO: #amalov Use Qn::ResouceInfoLevel::RI_WithUrl & AttrSerializePolicy::singleLine
             utils::makeExtractDetailFieldDescriptor("extendedCaption", utils::kExtendedCaptionDetailName),
             utils::makeExtractDetailFieldDescriptor("detailing", utils::kDetailingDetailName),
-        }
+        },
+        .resources = {{utils::kDeviceIdsFieldName, {ResourceType::device}}},
     };
     return kDescriptor;
 }

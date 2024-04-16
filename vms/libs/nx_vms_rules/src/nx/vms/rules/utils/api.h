@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <nx/utils/uuid.h>
+
 #include "../rules_fwd.h"
 
 namespace nx::vms::api::rules {
@@ -10,6 +12,9 @@ struct ActionBuilder;
 struct EventFilter;
 struct Field;
 struct Rule;
+
+struct ActionInfo;
+struct EventInfo;
 
 } // namespace nx::vms::api::rules
 
@@ -21,5 +26,8 @@ namespace api = ::nx::vms::api::rules;
 NX_VMS_RULES_API api::Rule serialize(const Rule* rule);
 NX_VMS_RULES_API api::EventFilter serialize(const EventFilter* filter);
 NX_VMS_RULES_API api::ActionBuilder serialize(const ActionBuilder *builder);
+
+NX_VMS_RULES_API api::ActionInfo serialize(const BasicAction* action);
+NX_VMS_RULES_API api::EventInfo serialize(const BasicEvent* action, UuidList ruleIds = {});
 
 } // namespace nx::vms::rules

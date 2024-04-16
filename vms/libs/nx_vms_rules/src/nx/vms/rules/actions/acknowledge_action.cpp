@@ -15,6 +15,8 @@ const ItemDescriptor& AcknowledgeAction::manifest()
         .id = utils::type<AcknowledgeAction>(),
         .displayName = tr("Acknowledge"),
         .flags = {ItemFlag::instant, ItemFlag::system},
+        .executionTargets = {ExecutionTarget::clients, ExecutionTarget::servers},
+        .targetServers = TargetServers::currentServer,
     };
     return kDescriptor;
 }

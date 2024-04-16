@@ -15,7 +15,9 @@ const ItemDescriptor& PlaySoundAction::manifest()
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<PlaySoundAction>(),
         .displayName = tr("Play Sound"),
-        .flags = {ItemFlag::instant, ItemFlag::executeOnClientAndServer},
+        .flags = {ItemFlag::instant},
+        .executionTargets = {ExecutionTarget::clients, ExecutionTarget::servers},
+        .targetServers = TargetServers::resourceOwner,
         .fields = {
             makeFieldDescriptor<SoundField>(utils::kSoundFieldName, {}),
             makeFieldDescriptor<TargetDeviceField>(utils::kDeviceIdsFieldName, tr("At")),
@@ -23,7 +25,8 @@ const ItemDescriptor& PlaySoundAction::manifest()
             makeFieldDescriptor<VolumeField>(
                 "volume", tr("Volume"), {}, {}, {utils::kSoundFieldName}),
             utils::makeIntervalFieldDescriptor(tr("Interval of Action")),
-        }
+        },
+        .resources = {{utils::kDeviceIdsFieldName, {ResourceType::device, {}, {}, FieldFlag::target}}},
     };
     return kDescriptor;
 }

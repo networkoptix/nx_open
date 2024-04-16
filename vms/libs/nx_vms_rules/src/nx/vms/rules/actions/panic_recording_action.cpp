@@ -19,6 +19,8 @@ const ItemDescriptor& PanicRecordingAction::manifest()
         .description = tr("Panic Recording mode switches recording settings for all cameras"
             " to maximum FPS and quality."),
         .flags = ItemFlag::prolonged,
+        .executionTargets = ExecutionTarget::servers,
+        .targetServers = TargetServers::currentServer,
         .fields = {
             utils::makeTimeFieldDescriptor<OptionalTimeField>(
                     utils::kDurationFieldName,
@@ -26,7 +28,7 @@ const ItemDescriptor& PanicRecordingAction::manifest()
                     {},
                     {.initialValue = 5s, .defaultValue = 5s, .maximumValue = 9999h, .minimumValue = 1s}),
             utils::makeIntervalFieldDescriptor(tr("Interval of Action"))
-        }
+        },
     };
     return kDescriptor;
 }

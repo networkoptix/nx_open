@@ -22,18 +22,22 @@ class NX_VMS_RULES_API Router: public QObject
     Q_OBJECT
 
 public:
+    using RuleList = std::vector<ConstRulePtr>;
+
+public:
     Router();
     virtual ~Router();
 
-    virtual void init(const nx::Uuid& id);
+    virtual void routeEvent(const EventPtr& event, const RuleList& triggeredRules) = 0;
 
-    virtual void routeEvent(
-        const EventData& eventData,
-        const QSet<nx::Uuid>& triggeredRules, //< TODO: #spanasenko Use filter IDs instead.
-        const QSet<nx::Uuid>& affectedResources) = 0;
+    virtual void routeAction(const ActionPtr& action) = 0;
+
+    // Default implementation emits the corresponding signal.
+    virtual void receiveAction(const ActionPtr& action);
 
 signals:
-    void eventReceived(const nx::Uuid& ruleId, const EventData& eventData);
+    void eventReceived(const EventPtr& event, const RuleList& triggeredRules);
+    void actionReceived(const nx::vms::rules::ActionPtr& action);
 };
 
 } // namespace nx::vms::rules

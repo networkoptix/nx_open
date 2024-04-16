@@ -100,6 +100,8 @@ signals:
     void videowallControlMessageReceived(const nx::vms::api::VideowallControlMessageData& message);
 
     void vmsEventReceived(const nx::vms::api::rules::EventInfo& eventInfo);
+    void vmsActionReceived(const nx::vms::api::rules::ActionInfo& eventInfo);
+
     void vmsRulesReset(nx::Uuid peerId, const nx::vms::api::rules::RuleList& vmsRules);
     void vmsRuleUpdated(const nx::vms::api::rules::Rule& rule, ec2::NotificationSource source);
     void vmsRuleRemoved(nx::Uuid id);
