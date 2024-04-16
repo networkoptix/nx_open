@@ -184,7 +184,7 @@
     </message>
     <message>
       <source>Config</source>
-      <translation>コンフィグ</translation>
+      <translation>設定</translation>
     </message>
     <message>
       <source>Preference</source>
@@ -380,7 +380,7 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>Destination file exists</source>
-      <translation>コピー先のファイルは既に存在しています</translation>
+      <translation>保存先のファイルはすでに存在しています</translation>
     </message>
     <message>
       <source>Error while renaming.</source>
@@ -400,11 +400,11 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>Cannot open %1 for input</source>
-      <translation>コピー元ファイル %1 を読み込み用に開けません</translation>
+      <translation>入力用に %1 を開けません</translation>
     </message>
     <message>
       <source>Cannot open for output</source>
-      <translation>コピー先のファイルを開けません</translation>
+      <translation>出力用にファイルを開けません</translation>
     </message>
     <message>
       <source>Failure to write block</source>
@@ -412,7 +412,7 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>Cannot create %1 for output</source>
-      <translation>コピー先として %1 を作成できません</translation>
+      <translation>出力用の %1 を作成できません</translation>
     </message>
   </context>
   <context>
@@ -824,7 +824,7 @@ Do you want to delete it anyway?</source>
     <name>QInputDialog</name>
     <message>
       <source>Enter a value:</source>
-      <translation>値を入力:</translation>
+      <translation>値を入力してください:</translation>
     </message>
   </context>
   <context>
