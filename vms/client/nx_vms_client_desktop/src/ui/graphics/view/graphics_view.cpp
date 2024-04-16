@@ -94,6 +94,7 @@ QnGraphicsView::QnGraphicsView(QGraphicsScene* scene, nx::vms::client::desktop::
 
     auto container = new QuickWidgetContainer();
     setViewport(container);
+    container->setAutoFillBackground(false);
 
     d->quickWidget = new QQuickWidget(
         nx::vms::client::core::appContext()->qmlEngine(), this->viewport());
@@ -107,6 +108,7 @@ QnGraphicsView::QnGraphicsView(QGraphicsScene* scene, nx::vms::client::desktop::
     d->quickWidget->setSource(QUrl("Nx/MainScene/Scene.qml"));
 
     container->setQuickWidget(d->quickWidget);
+    container->setView(this);
 
     if (auto root = d->quickWidget->rootObject())
     {
@@ -161,6 +163,11 @@ void QnGraphicsView::paintEvent(QPaintEvent* event)
         return;
     }
 
+    paintRhi();
+}
+
+void QnGraphicsView::paintRhi()
+{
     // Avoid painting frames faster than QQuickWidget can render them.
     if (!d->frameEnded)
         return;
