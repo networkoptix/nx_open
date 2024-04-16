@@ -86,7 +86,7 @@ if(codeSigning)
     nx_wix_sign_msi(${signed_msi_filename} SOURCE_FILE ${unsigned_msi_filename})
 else()
     set(unsigned_distribution_path
-        "${distribution_output_dir}/${client_distribution_name}-unsigned.exe")
+        "${distribution_output_dir}/${client_distribution_name}.exe")
     set(client_msi_filename ${unsigned_msi_filename})
     set(client_package_wixobject_filename
         ${CMAKE_CURRENT_BINARY_DIR}/client_unsigned_package.wixobj CACHE INTERNAL "" FORCE)
