@@ -1315,7 +1315,7 @@
     </message>
     <message>
       <source>Copied</source>
-      <translation>コピー</translation>
+      <translation>コピー完了</translation>
     </message>
     <message>
       <source>Hardware ID: %1
@@ -1353,13 +1353,13 @@ License Key: %2</source>
     <message numerus="yes">
       <source>Deactivate %n Other</source>
       <translation>
-        <numerusform>無効化%nその他</numerusform>
+        <numerusform>その他 %n を無効化</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cannot deactivate licenses</source>
       <translation>
-        <numerusform>ライセンスを無効にできません</numerusform>
+        <numerusform>ライセンスを無効化できません</numerusform>
       </translation>
     </message>
     <message>
@@ -1456,7 +1456,7 @@ License Key: %2</source>
     <name>OauthLoginDialog</name>
     <message>
       <source>Connect to System</source>
-      <translation>システムへ接続</translation>
+      <translation>システムに接続</translation>
     </message>
   </context>
   <context>
@@ -5470,7 +5470,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnSystemHealthStringsHelper</name>
     <message>
       <source>Email address is not set</source>
-      <translation>Emailアドレスが設定されていません</translation>
+      <translation>メールアドレスが設定されていません</translation>
     </message>
     <message>
       <source>No licenses</source>
@@ -5494,7 +5494,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Email address is not set for user %1</source>
-      <translation>Emailアドレスがユーザー %1 に設定されていません</translation>
+      <translation>ユーザー %1 のメールアドレスが設定されていません</translation>
     </message>
     <message>
       <source>Email address is not set.</source>
@@ -7665,13 +7665,13 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>Changes to the following %n cameras are not saved:</source>
       <translation>
-        <numerusform>次の %n カメラへの変更は保存されません</numerusform>
+        <numerusform>次の %n カメラへの変更は保存されません:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n I/O Modules are not saved:</source>
       <translation>
-        <numerusform>次の %n I/O モジュールのへの変更は保存されません</numerusform>
+        <numerusform>次の %n I/Oモジュールへの変更は保存されません:</numerusform>
       </translation>
     </message>
     <message>
@@ -8090,7 +8090,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::ConnectToCurrentSystemTool</name>
     <message>
       <source>Configuring Server</source>
-      <translation>サーバー構成</translation>
+      <translation>サーバーの設定</translation>
     </message>
     <message>
       <source>Total amount of licenses will decrease</source>

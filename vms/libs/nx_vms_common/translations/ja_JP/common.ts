@@ -2137,7 +2137,7 @@
     </message>
     <message>
       <source>Camera was disconnected</source>
-      <translation>カメラの接続が切断されました</translation>
+      <translation>カメラが切断されました</translation>
     </message>
     <message>
       <source>I/O Module was disconnected</source>

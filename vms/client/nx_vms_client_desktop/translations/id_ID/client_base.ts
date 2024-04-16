@@ -5,28 +5,28 @@
     <name>AnalyticsSearchWidget::Private</name>
     <message>
       <source>Any type</source>
-      <translation type="unfinished">Any type</translation>
+      <translation>Semua jenis</translation>
     </message>
     <message>
       <source>Select area</source>
-      <translation type="unfinished">Select area</translation>
+      <translation>Pilih area</translation>
     </message>
     <message>
       <source>Select some area on the video...</source>
-      <translation type="unfinished">Select some area on the video...</translation>
+      <translation>Pilih beberapa area pada video...</translation>
     </message>
     <message>
       <source>In selected area</source>
-      <translation type="unfinished">In selected area</translation>
+      <translation>Di area yang dipilih</translation>
     </message>
     <message>
       <source>Any plugin</source>
-      <translation type="unfinished">Any plugin</translation>
+      <translation>Plugin apa pun</translation>
     </message>
     <message numerus="yes">
       <source>%1 with %n attributes</source>
-      <translation type="unfinished">
-        <numerusform>%1 with %n attributes</numerusform>
+      <translation>
+        <numerusform>%1 dengan atribut %n</numerusform>
       </translation>
     </message>
   </context>
@@ -41,11 +41,11 @@
     <name>CertificatesModel</name>
     <message>
       <source>Subject</source>
-      <translation type="unfinished">Subject</translation>
+      <translation>Subyek</translation>
     </message>
     <message>
       <source>Issuer</source>
-      <translation type="unfinished">Issuer</translation>
+      <translation>Penerbit</translation>
     </message>
     <message>
       <source>Expires</source>
@@ -75,23 +75,23 @@
     </message>
     <message>
       <source>Getting update information from the server</source>
-      <translation type="unfinished">Getting update information from the server</translation>
+      <translation>Mendapatkan update informasi dari server</translation>
     </message>
     <message>
       <source>Downloading update package</source>
-      <translation type="unfinished">Downloading update package</translation>
+      <translation>Mendownload paket update</translation>
     </message>
     <message>
       <source>Installing</source>
-      <translation type="unfinished">Installing</translation>
+      <translation>Menginstal</translation>
     </message>
     <message>
       <source>Verifying update package</source>
-      <translation type="unfinished">Verifying update package</translation>
+      <translation>Memverifikasi paket update</translation>
     </message>
     <message>
       <source>Cannot connect to the System</source>
-      <translation type="unfinished">Cannot connect to the System</translation>
+      <translation>Tidak dapat terkoneksi ke Sistem</translation>
     </message>
   </context>
   <context>
@@ -757,19 +757,19 @@
     </message>
     <message>
       <source>Upload File...</source>
-      <translation type="unfinished">Upload File...</translation>
+      <translation>Upload File...</translation>
     </message>
     <message>
       <source>Upload Folder...</source>
-      <translation type="unfinished">Upload Folder...</translation>
+      <translation>Upload Folder...</translation>
     </message>
     <message>
       <source>Some cameras require passwords to be set</source>
-      <translation type="unfinished">Some cameras require passwords to be set</translation>
+      <translation>Beberapa kamera memerlukan kata sandi untuk ditetapkan</translation>
     </message>
     <message>
       <source>Export Video...</source>
-      <translation type="unfinished">Export Video...</translation>
+      <translation>Ekspor Video...</translation>
     </message>
     <message>
       <source>Export Bookmark...</source>
@@ -781,43 +781,43 @@
     </message>
     <message>
       <source>Cell Aspect Ratio...</source>
-      <translation type="unfinished">Cell Aspect Ratio...</translation>
+      <translation>Rasio Aspek Sel...</translation>
     </message>
     <message>
       <source>Screen Settings...</source>
-      <translation type="unfinished">Screen Settings...</translation>
+      <translation>Pengaturan Layar...</translation>
     </message>
     <message>
       <source>Export Bookmarks...</source>
-      <translation type="unfinished">Export Bookmarks...</translation>
+      <translation>Ekspor Bookmark...</translation>
     </message>
     <message>
       <source>Forget password</source>
-      <translation type="unfinished">Forget password</translation>
+      <translation>Lupa kata sandi</translation>
     </message>
     <message>
       <source>Cancel Upload...</source>
-      <translation type="unfinished">Cancel Upload...</translation>
+      <translation>Batal Upload...</translation>
     </message>
     <message>
       <source>Analytics Engine Settings...</source>
-      <translation type="unfinished">Analytics Engine Settings...</translation>
+      <translation>Pengaturan Mesin Analitik...</translation>
     </message>
     <message>
       <source>Show Thumbnails</source>
-      <translation type="unfinished">Show Thumbnails</translation>
+      <translation>Tampilkan Thumbnail</translation>
     </message>
     <message>
       <source>Hide Thumbnails</source>
-      <translation type="unfinished">Hide Thumbnails</translation>
+      <translation>Sembunyikan Thumbnail</translation>
     </message>
     <message>
       <source>Virtual Camera...</source>
-      <translation type="unfinished">Virtual Camera...</translation>
+      <translation>Kamera Virtual...</translation>
     </message>
     <message>
       <source>New Virtual Camera...</source>
-      <translation type="unfinished">New Virtual Camera...</translation>
+      <translation>Kamera Virtual Baru...</translation>
     </message>
     <message>
       <source>Show Tree</source>
@@ -837,55 +837,55 @@
     </message>
     <message>
       <source>Files...</source>
-      <translation type="unfinished">Files...</translation>
+      <translation>File...</translation>
     </message>
     <message>
       <source>Switch to Notifications tab</source>
-      <translation type="unfinished">Switch to Notifications tab</translation>
+      <translation>Beralih ke tab Notifikasi</translation>
     </message>
     <message>
       <source>Switch to Motion tab</source>
-      <translation type="unfinished">Switch to Motion tab</translation>
+      <translation>Beralih ke tab Gerakan</translation>
     </message>
     <message>
       <source>Switch to Bookmarks tab</source>
-      <translation type="unfinished">Switch to Bookmarks tab</translation>
+      <translation>Beralih ke tab Bookmark</translation>
     </message>
     <message>
       <source>Switch to Events tab</source>
-      <translation type="unfinished">Switch to Events tab</translation>
+      <translation>Beralih ke tab Event</translation>
     </message>
     <message>
       <source>Switch to Objects tab</source>
-      <translation type="unfinished">Switch to Objects tab</translation>
+      <translation>Beralih ke tab Objek</translation>
     </message>
     <message>
       <source>Pin Calendar</source>
-      <translation type="unfinished">Pin Calendar</translation>
+      <translation>Sematkan Kalender</translation>
     </message>
     <message>
       <source>Unpin Calendar</source>
-      <translation type="unfinished">Unpin Calendar</translation>
+      <translation>Lepas sematan Kalender</translation>
     </message>
     <message>
       <source>Page...</source>
-      <translation type="unfinished">Page...</translation>
+      <translation>Halaman...</translation>
     </message>
     <message>
       <source>Connect to this Server</source>
-      <translation type="unfinished">Connect to this Server</translation>
+      <translation>Koneksikan ke Server ini</translation>
     </message>
     <message>
       <source>Pin</source>
-      <translation type="unfinished">Pin</translation>
+      <translation>Sematkan</translation>
     </message>
     <message>
       <source>Switch to Cameras &amp; Resources tab</source>
-      <translation type="unfinished">Switch to Cameras &amp; Resources tab</translation>
+      <translation>Beralih ke tab Kamera &amp; Resource</translation>
     </message>
     <message>
       <source>Search Cameras &amp; Resources</source>
-      <translation type="unfinished">Search Cameras &amp; Resources</translation>
+      <translation>Cari Kamera &amp; Resource</translation>
     </message>
     <message>
       <source>Connect to Another Server...</source>
@@ -893,43 +893,43 @@
     </message>
     <message>
       <source>New</source>
-      <translation type="unfinished">New</translation>
+      <translation>Baru</translation>
     </message>
     <message>
       <source>Welcome Screen</source>
-      <translation type="unfinished">Welcome Screen</translation>
+      <translation>Layar Selamat Datang</translation>
     </message>
     <message>
       <source>Add Web Page...</source>
-      <translation type="unfinished">Add Web Page...</translation>
+      <translation>Tambahkan Halaman Web...</translation>
     </message>
     <message>
       <source>Show Servers</source>
-      <translation type="unfinished">Show Servers</translation>
+      <translation>Tampilkan Server</translation>
     </message>
     <message>
       <source>Save Window Configuration</source>
-      <translation type="unfinished">Save Window Configuration</translation>
+      <translation>Simpan Konfigurasi Window</translation>
     </message>
     <message>
       <source>Save Windows Configuration</source>
-      <translation type="unfinished">Save Windows Configuration</translation>
+      <translation>Simpan Konfigurasi Windows</translation>
     </message>
     <message>
       <source>Windows Configuration</source>
-      <translation type="unfinished">Windows Configuration</translation>
+      <translation>Konfigurasi Windows</translation>
     </message>
     <message>
       <source>Save Current State</source>
-      <translation type="unfinished">Save Current State</translation>
+      <translation>Simpan Status Saat Ini</translation>
     </message>
     <message>
       <source>Restore Saved State</source>
-      <translation type="unfinished">Restore Saved State</translation>
+      <translation>Pulihkan Status Tersimpan</translation>
     </message>
     <message>
       <source>Delete Saved State</source>
-      <translation type="unfinished">Delete Saved State</translation>
+      <translation>Hapus Status Tersimpan</translation>
     </message>
     <message>
       <source>Close all Windows</source>
@@ -1283,7 +1283,7 @@
     </message>
     <message>
       <source>To activate License Key manually please contact %1.</source>
-      <translation type="unfinished">To activate License Key manually please contact %1.</translation>
+      <translation>Untuk mengaktifkan Kunci Lisensi secara manual silakan hubungi %1.</translation>
     </message>
     <message>
       <source>Network error</source>
@@ -1295,15 +1295,15 @@
     </message>
     <message>
       <source>To report the issue please contact your Regional / License support:</source>
-      <translation type="unfinished">To report the issue please contact your Regional / License support:</translation>
+      <translation>Untuk melaporkan masalah ini silakan hubungi support Regional / Lisensi Anda:</translation>
     </message>
     <message>
       <source>To activate License Key manually please contact your Regional / License support:</source>
-      <translation type="unfinished">To activate License Key manually please contact your Regional / License support:</translation>
+      <translation>Untuk mengaktifkan Kunci Lisensi secara manual silakan hubungi support Regional/Lisensi Anda:</translation>
     </message>
     <message>
       <source>Hardware ID</source>
-      <translation type="unfinished">Hardware ID</translation>
+      <translation>ID Hardware</translation>
     </message>
     <message>
       <source>License Key</source>
@@ -1311,7 +1311,7 @@
     </message>
     <message>
       <source>Failed to activate free license</source>
-      <translation type="unfinished">Failed to activate free license</translation>
+      <translation>Gagal mengaktifkan lisensi gratis</translation>
     </message>
     <message>
       <source>Copied</source>
@@ -1320,20 +1320,20 @@
     <message>
       <source>Hardware ID: %1
 License Key: %2</source>
-      <translation type="unfinished">Hardware ID: %1
-License Key: %2</translation>
+      <translation>ID Hardware: %1
+Kunci Lisensi: %2</translation>
     </message>
     <message>
       <source>Copy Parameters</source>
-      <translation type="unfinished">Copy Parameters</translation>
+      <translation>Salin Parameter</translation>
     </message>
     <message>
       <source>If your System does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</source>
-      <translation type="unfinished">If your System does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</translation>
+      <translation>Jika Sistem Anda tidak memiliki akses ke Internet, kirimkan Kunci Lisensi dan ID Hardware yang disediakan ke %1 untuk menerima file aktivasi.</translation>
     </message>
     <message>
       <source>If your System does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</source>
-      <translation type="unfinished">If your System does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</translation>
+      <translation>Jika Sistem Anda tidak memiliki akses ke Internet, kirimkan Kunci Lisensi dan ID Hardware yang diberikan ke tim support Regional/Lisensi Anda untuk menerima file aktivasi:</translation>
     </message>
   </context>
   <context>
@@ -1364,7 +1364,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Please try again later.</source>
-      <translation type="unfinished">Please try again later.</translation>
+      <translation>Silakan coba lagi nanti.</translation>
     </message>
     <message>
       <source>Cannot connect to the License Server</source>
@@ -1399,27 +1399,27 @@ License Key: %2</translation>
     </message>
     <message>
       <source>To get a valid License Key please contact %1.</source>
-      <translation type="unfinished">To get a valid License Key please contact %1.</translation>
+      <translation>Untuk mendapatkan Kunci Lisensi yang valid silakan menghubungi %1.</translation>
     </message>
     <message>
       <source>If the problem persists, please contact %1.</source>
-      <translation type="unfinished">If the problem persists, please contact %1.</translation>
+      <translation>Jika masalah terus berlanjut, silakan hubungi %1.</translation>
     </message>
     <message>
       <source>Please contact %1.</source>
-      <translation type="unfinished">Please contact %1.</translation>
+      <translation>Silakan hubungi %1.</translation>
     </message>
     <message>
       <source>To get a valid License Key please contact your Regional / License support:</source>
-      <translation type="unfinished">To get a valid License Key please contact your Regional / License support:</translation>
+      <translation>Untuk mendapatkan Kunci Lisensi yang valid silakan menghubungi support Regional/Lisensi Anda:</translation>
     </message>
     <message>
       <source>If the problem persists, please contact your Regional / License support:</source>
-      <translation type="unfinished">If the problem persists, please contact your Regional / License support:</translation>
+      <translation>Jika masalah terus berlanjut, silakan hubungi support Regional/Lisensi Anda:</translation>
     </message>
     <message>
       <source>Please contact your Regional / License support:</source>
-      <translation type="unfinished">Please contact your Regional / License support:</translation>
+      <translation>Silakan hubungi support Regional / Lisensi Anda:</translation>
     </message>
   </context>
   <context>
@@ -1442,13 +1442,13 @@ License Key: %2</translation>
     </message>
     <message>
       <source>File name &quot;%1&quot; is reserved by operating system. Please try another name.</source>
-      <translation type="unfinished">File name &quot;%1&quot; is reserved by operating system. Please try another name.</translation>
+      <translation>Nama file &quot;%1&quot; direserved oleh sistem operasi. Silakan coba nama lain.</translation>
     </message>
     <message numerus="yes">
       <source>File name must not contain the following reserved characters:</source>
       <comment>Plural relates to the word _characters_ here, not _file name_.</comment>
-      <translation type="unfinished">
-        <numerusform>File name must not contain the following reserved characters:</numerusform>
+      <translation>
+        <numerusform>Nama file tidak boleh berisi karakter yang direserved berikut:</numerusform>
       </translation>
     </message>
   </context>
@@ -1471,7 +1471,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Unsecure</source>
-      <translation type="unfinished">Unsecure</translation>
+      <translation>Tidak aman</translation>
     </message>
     <message>
       <source>Check</source>
@@ -1483,7 +1483,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>URL is not valid.</source>
-      <translation type="unfinished">URL is not valid.</translation>
+      <translation>URL tidak valid.</translation>
     </message>
     <message>
       <source>Enter a short System description here.</source>
@@ -1491,11 +1491,11 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Active</source>
-      <translation type="unfinished">Active</translation>
+      <translation>Aktif</translation>
     </message>
     <message>
       <source>Not configured</source>
-      <translation type="unfinished">Not configured</translation>
+      <translation>Tidak dikonfigurasi</translation>
     </message>
     <message>
       <source>Error</source>
@@ -1503,26 +1503,26 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Set your email address or SMTP server</source>
-      <translation type="unfinished">Set your email address or SMTP server</translation>
+      <translation>Tetapkan alamat email atau server SMTP Anda</translation>
     </message>
     <message>
       <source>%1 users are receiving emails</source>
       <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
-      <translation type="unfinished">%1 users are receiving emails</translation>
+      <translation>%1 pengguna menerima email</translation>
     </message>
     <message>
       <source>%1 is not available</source>
       <extracomment>%1 will be substituted with branded cloud service name e.g. &quot;Nx Cloud&quot;.</extracomment>
-      <translation type="unfinished">%1 is not available</translation>
+      <translation>%1 tidak tersedia</translation>
     </message>
     <message>
       <source>Route via %1</source>
       <extracomment>%1 will be substituted with branded cloud service name e.g. &quot;Nx Cloud&quot;.</extracomment>
-      <translation type="unfinished">Route via %1</translation>
+      <translation>Route melalui %1</translation>
     </message>
     <message>
       <source>Route via SMTP server</source>
-      <translation type="unfinished">Route via SMTP server</translation>
+      <translation>Route melalui server SMTP</translation>
     </message>
     <message>
       <source>Success</source>
@@ -1543,23 +1543,23 @@ License Key: %2</translation>
     <message>
       <source>%1 users will start receiving emails immediately after you apply these settings</source>
       <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
-      <translation type="unfinished">%1 users will start receiving emails immediately after you apply these settings</translation>
+      <translation>%1 pengguna akan mulai menerima email segera setelah Anda menerapkan pengaturan ini</translation>
     </message>
     <message>
       <source>Users are receiving emails</source>
-      <translation type="unfinished">Users are receiving emails</translation>
+      <translation>Pengguna menerima email</translation>
     </message>
     <message>
       <source>Users will start receiving emails right after you apply settings</source>
-      <translation type="unfinished">Users will start receiving emails right after you apply settings</translation>
+      <translation>Pengguna akan mulai menerima email segera setelah Anda menerapkan pengaturan</translation>
     </message>
     <message>
       <source>Unable to test SMTP server</source>
-      <translation type="unfinished">Unable to test SMTP server</translation>
+      <translation>Tidak dapat test server SMTP</translation>
     </message>
     <message>
       <source>Additional info required</source>
-      <translation type="unfinished">Additional info required</translation>
+      <translation>Informasi tambahan diperlukan</translation>
     </message>
   </context>
   <context>
@@ -1582,8 +1582,8 @@ License Key: %2</translation>
     </message>
     <message numerus="yes">
       <source>Password should contain %n different combinations of either characters, symbols, or digits</source>
-      <translation type="unfinished">
-        <numerusform>Password should contain %n different combinations of either characters, symbols, or digits</numerusform>
+      <translation>
+        <numerusform>Kata sandi harus berisi %n kombinasi karakter, simbol, atau angka yang berbeda</numerusform>
       </translation>
     </message>
     <message>
@@ -1592,30 +1592,30 @@ License Key: %2</translation>
     </message>
     <message numerus="yes">
       <source>Password must be at least %n characters long.</source>
-      <translation type="unfinished">
-        <numerusform>Password must be at least %n characters long.</numerusform>
+      <translation>
+        <numerusform>Kata sandi setidaknya harus sepanjang %n karakter.</numerusform>
       </translation>
     </message>
     <message>
       <source>Long</source>
-      <translation type="unfinished">Long</translation>
+      <translation>Panjang</translation>
     </message>
     <message numerus="yes">
       <source>Password must be no longer than %n characters.</source>
-      <translation type="unfinished">
-        <numerusform>Password must be no longer than %n characters.</numerusform>
+      <translation>
+        <numerusform>Kata sandi tidak boleh lebih panjang dari %n karakter.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more consecutive characters together.</source>
-      <translation type="unfinished">
-        <numerusform>Password should not contain %n or more consecutive characters together.</numerusform>
+      <translation>
+        <numerusform>Kata sandi tidak boleh mengandung %n atau lebih karakter yang berurutan secara bersamaan.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more repeating characters.</source>
-      <translation type="unfinished">
-        <numerusform>Password should not contain %n or more repeating characters.</numerusform>
+      <translation>
+        <numerusform>Kata sandi tidak boleh berisi %n atau lebih karakter berulang.</numerusform>
       </translation>
     </message>
     <message>
@@ -1632,7 +1632,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Only latin letters, numbers and keyboard symbols %1 are allowed.</source>
-      <translation type="unfinished">Only latin letters, numbers and keyboard symbols %1 are allowed.</translation>
+      <translation>Hanya huruf latin, angka, dan simbol keyboard %1 yang diperbolehkan.</translation>
     </message>
     <message>
       <source>Only latin letters, numbers and keyboard symbols are allowed.</source>
@@ -1694,31 +1694,31 @@ License Key: %2</translation>
     <name>PtzInstrument</name>
     <message>
       <source>Layout is locked</source>
-      <translation type="unfinished">Layout is locked</translation>
+      <translation>Layout terkunci</translation>
     </message>
     <message>
       <source>This camera does not support advanced PTZ</source>
-      <translation type="unfinished">This camera does not support advanced PTZ</translation>
+      <translation>Kamera ini tidak mendukung advanced PTZ</translation>
     </message>
     <message>
       <source>Zooming out...</source>
-      <translation type="unfinished">Zooming out...</translation>
+      <translation>Zoom Out...</translation>
     </message>
     <message>
       <source>Moving...</source>
-      <translation type="unfinished">Moving...</translation>
+      <translation>Bergerak...</translation>
     </message>
     <message>
       <source>Zooming in...</source>
-      <translation type="unfinished">Zooming in...</translation>
+      <translation>Zoom In...</translation>
     </message>
     <message>
       <source>Focusing...</source>
-      <translation type="unfinished">Focusing...</translation>
+      <translation>Sedang Memfokus...</translation>
     </message>
     <message>
       <source>PTZ can only be used in the live mode</source>
-      <translation type="unfinished">PTZ can only be used in the live mode</translation>
+      <translation>PTZ hanya dapat digunakan dalam mode live</translation>
     </message>
   </context>
   <context>
@@ -1752,7 +1752,7 @@ License Key: %2</translation>
     <name>QWebEnginePage</name>
     <message>
       <source>Are you sure you want to leave this page? Changes that you made may not be saved.</source>
-      <translation type="unfinished">Are you sure you want to leave this page? Changes that you made may not be saved.</translation>
+      <translation>Apakah Anda yakin ingin meninggalkan halaman ini? Perubahan yang Anda buat mungkin tidak disimpan.</translation>
     </message>
   </context>
   <context>
@@ -1783,7 +1783,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Regional / License support</source>
-      <translation type="unfinished">Regional / License support</translation>
+      <translation>Support Regional / Lisensi</translation>
     </message>
   </context>
   <context>
@@ -1819,11 +1819,11 @@ License Key: %2</translation>
     <name>QnAdvancedSettingsWidget</name>
     <message>
       <source>Helps avoid problems with OpenGL drawing which result in 100% CPU load.</source>
-      <translation type="unfinished">Helps avoid problems with OpenGL drawing which result in 100% CPU load.</translation>
+      <translation>Membantu menghindari masalah dengan OpenGL drawing yang mengakibatkan beban CPU 100%.</translation>
     </message>
     <message>
       <source>Adjust to smallest value that does not degrade live view. Bigger buffer makes playback smoother but increases delay between real time and live view; smaller buffer decreases delay but can cause stutters.</source>
-      <translation type="unfinished">Adjust to smallest value that does not degrade live view. Bigger buffer makes playback smoother but increases delay between real time and live view; smaller buffer decreases delay but can cause stutters.</translation>
+      <translation>Sesuaikan ke nilai terkecil yang tidak menurunkan view live. Buffer yang lebih besar membuat playback lebih lancar namun meningkatkan penundaan antara real-time dan live view; buffer yang lebih kecil mengurangi penundaan tetapi dapat menyebabkan kegagapan.</translation>
     </message>
     <message>
       <source>Warning! This is an experimental option that saves CPU but may affect animation.</source>
@@ -2884,20 +2884,20 @@ to %1</translation>
     <message>
       <source>You are about to disconnect System from %1</source>
       <comment>%1 is the cloud name, like Nx Cloud</comment>
-      <translation type="unfinished">You are about to disconnect System from %1</translation>
+      <translation>Anda akan memutuskan koneksi Sistem dari %1</translation>
     </message>
     <message>
       <source>All %1 users will be deleted.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">All %1 users will be deleted.</translation>
+      <translation>Semua %1 pengguna akan dihapus.</translation>
     </message>
     <message>
       <source>You will be logged out.</source>
-      <translation type="unfinished">You will be logged out.</translation>
+      <translation>Anda akan keluar.</translation>
     </message>
     <message>
       <source>System will be accessible through local network with a local administrator account.</source>
-      <translation type="unfinished">System will be accessible through local network with a local administrator account.</translation>
+      <translation>Sistem akan dapat diakses melalui jaringan lokal dengan akun administrator lokal.</translation>
     </message>
     <message>
       <source>Continue</source>
@@ -2906,30 +2906,30 @@ to %1</translation>
     <message>
       <source>Cannot disconnect the System from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Cannot disconnect the System from %1</translation>
+      <translation>Tidak dapat memutuskan koneksi Sistem dari %1</translation>
     </message>
     <message>
       <source>System will be accessible only through local network.</source>
-      <translation type="unfinished">System will be accessible only through local network.</translation>
+      <translation>Sistem hanya dapat diakses melalui jaringan lokal.</translation>
     </message>
   </context>
   <context>
     <name>QnCloudResultInfo</name>
     <message>
       <source>Successful.</source>
-      <translation type="unfinished">Successful.</translation>
+      <translation>Berhasil.</translation>
     </message>
     <message>
       <source>Invalid login or password.</source>
-      <translation type="unfinished">Invalid login or password.</translation>
+      <translation>Login atau kata sandi tidak valid.</translation>
     </message>
     <message>
       <source>Requested operation is not allowed with provided credentials.</source>
-      <translation type="unfinished">Requested operation is not allowed with provided credentials.</translation>
+      <translation>Operasi yang diminta tidak diperbolehkan dengan kredensial yang diberikan.</translation>
     </message>
     <message>
       <source>This account is not activated. Please check your email.</source>
-      <translation type="unfinished">This account is not activated. Please check your email.</translation>
+      <translation>Akun ini tidak diaktifkan. Silakan periksa email Anda.</translation>
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
@@ -2937,25 +2937,25 @@ to %1</translation>
     </message>
     <message>
       <source>Network error. Please check your Internet connection and try again.</source>
-      <translation type="unfinished">Network error. Please check your Internet connection and try again.</translation>
+      <translation>Jaringan error: Mohon periksa koneksi internet Anda dan coba lagi.</translation>
     </message>
     <message>
       <source>Invalid login.</source>
-      <translation type="unfinished">Invalid login.</translation>
+      <translation>Login tidak valid.</translation>
     </message>
     <message>
       <source>%1 is temporary unavailable. Please try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">%1 is temporary unavailable. Please try again later.</translation>
+      <translation>%1 untuk sementara tidak tersedia. Silakan coba lagi nanti.</translation>
     </message>
     <message>
       <source>Credentials are no longer valid.</source>
-      <translation type="unfinished">Credentials are no longer valid.</translation>
+      <translation>Kredensial tidak lagi valid.</translation>
     </message>
     <message>
       <source>Internal %1 error. Please contact support team.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Internal %1 error. Please contact support team.</translation>
+      <translation>Internal error %1. Silakan hubungi tim support.</translation>
     </message>
   </context>
   <context>
@@ -2966,16 +2966,16 @@ to %1</translation>
     </message>
     <message>
       <source>Account is not activated.</source>
-      <translation type="unfinished">Account is not activated.</translation>
+      <translation>Akun tidak diaktifkan.</translation>
     </message>
     <message>
       <source>Please log in to %1 and follow the provided instructions.</source>
       <comment>%1 is a cloud site name like &quot;Nx Cloud&quot;</comment>
-      <translation type="unfinished">Please log in to %1 and follow the provided instructions.</translation>
+      <translation>Silakan masuk ke %1 dan ikuti instruksi yang diberikan.</translation>
     </message>
     <message>
       <source>Invalid password</source>
-      <translation type="unfinished">Invalid password</translation>
+      <translation>Kata sandi tidak valid</translation>
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
@@ -3010,8 +3010,8 @@ to %1</translation>
     <message numerus="yes">
       <source>%n of %1 selected users are not %2 users and will not get mobile notifications.</source>
       <comment>%2 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
-      <translation type="unfinished">
-        <numerusform>%n of %1 selected users are not %2 users and will not get mobile notifications.</numerusform>
+      <translation>
+        <numerusform>%n dari %1 pengguna yang dipilih bukan %2 pengguna dan tidak akan mendapatkan notifikasi seluler.</numerusform>
       </translation>
     </message>
   </context>
@@ -3081,38 +3081,38 @@ to %1</translation>
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
-      <translation type="unfinished">Download &amp;&amp; Install</translation>
+      <translation>Download &amp;&amp; Instal</translation>
     </message>
     <message>
       <source>Failed to enter compatibility mode for version %1</source>
-      <translation type="unfinished">Failed to enter compatibility mode for version %1</translation>
+      <translation>Gagal masuk ke mode kompatibilitas untuk versi %1</translation>
     </message>
     <message>
       <source>System is not compatible with two-factor authentication</source>
-      <translation type="unfinished">System is not compatible with two-factor authentication</translation>
+      <translation>Sistem tidak kompatibel dengan otentikasi dua faktor</translation>
     </message>
     <message>
       <source>Failed to log in to System &quot;%1&quot;</source>
-      <translation type="unfinished">Failed to log in to System &quot;%1&quot;</translation>
+      <translation>Gagal masuk ke Sistem &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
     <name>QnCustomBusinessEventWidget</name>
     <message>
       <source>If the field is empty, event will always trigger.</source>
-      <translation type="unfinished">If the field is empty, event will always trigger.</translation>
+      <translation>Jika bidangnya kosong, event akan selalu trigger.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the source with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the source with any of the entered keywords.</translation>
+      <translation>Event hanya akan trigger jika ada kecocokan dalam source dengan salah satu kata kunci yang dimasukkan.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the caption with any of the entered keywords.</translation>
+      <translation>Event hanya akan trigger jika ada kecocokan dalam caption dengan salah satu kata kunci yang dimasukkan.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the description with any of the entered keywords.</translation>
+      <translation>Event hanya akan trigger jika ada kecocokan dalam description dengan salah satu kata kunci yang dimasukkan.</translation>
     </message>
     <message>
       <source>Server API</source>
@@ -3174,7 +3174,7 @@ to %1</translation>
     </message>
     <message>
       <source>Database Backup Files</source>
-      <translation type="unfinished">Database Backup Files</translation>
+      <translation>File Backup Database</translation>
     </message>
     <message>
       <source>Save Database Backup</source>
@@ -3182,23 +3182,23 @@ to %1</translation>
     </message>
     <message>
       <source>Enter your account password to create backup</source>
-      <translation type="unfinished">Enter your account password to create backup</translation>
+      <translation>Masukkan kata sandi akun Anda untuk membuat backup</translation>
     </message>
     <message>
       <source>Create</source>
-      <translation type="unfinished">Create</translation>
+      <translation>Buat</translation>
     </message>
     <message>
       <source>Restore from Database Backup</source>
-      <translation type="unfinished">Restore from Database Backup</translation>
+      <translation>Pulihkan dari Backup Database</translation>
     </message>
     <message>
       <source>Enter your account password to restore System from backup</source>
-      <translation type="unfinished">Enter your account password to restore System from backup</translation>
+      <translation>Masukkan kata sandi akun Anda untuk memulihkan Sistem dari backup</translation>
     </message>
     <message>
       <source>Restore</source>
-      <translation type="unfinished">Restore</translation>
+      <translation>Pulihkan</translation>
     </message>
     <message>
       <source>Restore database?</source>
@@ -3210,7 +3210,7 @@ to %1</translation>
     </message>
     <message>
       <source>Database successfully restored. Server application will restart shortly.</source>
-      <translation type="unfinished">Database successfully restored. Server application will restart shortly.</translation>
+      <translation>Database berhasil dipulihkan. Aplikasi server akan segera direstart.</translation>
     </message>
   </context>
   <context>
@@ -3222,7 +3222,7 @@ to %1</translation>
     <message>
       <source>%1 user</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 user</translation>
+      <translation>%1 pengguna</translation>
     </message>
     <message>
       <source>LDAP user</source>
@@ -3300,11 +3300,11 @@ to %1</translation>
     </message>
     <message>
       <source>With enabled digest authentication</source>
-      <translation type="unfinished">With enabled digest authentication</translation>
+      <translation>Dengan otentikasi digest yang diaktifkan</translation>
     </message>
     <message>
       <source>Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</source>
-      <translation type="unfinished">Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</translation>
+      <translation>Pengguna dapat diimpor dari server LDAP. Mereka akan dapat masuk hanya jika server LDAP online dan akun mereka aktif di dalamnya.</translation>
     </message>
   </context>
   <context>
@@ -3335,18 +3335,18 @@ to %1</translation>
     </message>
     <message>
       <source>Could not detect capturing resolution</source>
-      <translation type="unfinished">Could not detect capturing resolution</translation>
+      <translation>Tidak dapat mendeteksi resolusi pengambilan</translation>
     </message>
     <message>
       <source>The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
-      <translation type="unfinished">The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</translation>
+      <translation>Perangkat perekam audio tidak mendukung format audio yang sesuai. Silakan pilih perangkat audio lain atau &quot;tidak ada&quot; di pengaturan Screen Recording.</translation>
     </message>
   </context>
   <context>
     <name>QnEmptyBusinessActionWidget</name>
     <message>
       <source>Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</source>
-      <translation type="unfinished">Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</translation>
+      <translation>Mode Perekaman Panik mengalihkan pengaturan perekaman untuk semua kamera ke FPS dan kualitas maksimum.</translation>
     </message>
   </context>
   <context>
@@ -3386,15 +3386,15 @@ to %1</translation>
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - %n events found</source>
       <comment>Dates are substituted</comment>
-      <translation type="unfinished">
-        <numerusform>Event log for period from %1 to %2 - %n events found</numerusform>
+      <translation>
+        <numerusform>Log event untuk periode dari %1 hingga %2 - %n event ditemukan</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Event log for %1 - %n events found</source>
       <comment>Date is substituted</comment>
-      <translation type="unfinished">
-        <numerusform>Event log for %1 - %n events found</numerusform>
+      <translation>
+        <numerusform>Log event untuk %1 - %n event ditemukan</numerusform>
       </translation>
     </message>
     <message>
@@ -3472,8 +3472,8 @@ to %1</translation>
     <message numerus="yes">
       <source>%1 (%n cameras)</source>
       <comment>%1 is description of event. Will be replaced in runtime</comment>
-      <translation type="unfinished">
-        <numerusform>%1 (%n cameras)</numerusform>
+      <translation>
+        <numerusform>%1 (%n kamera)</numerusform>
       </translation>
     </message>
   </context>
@@ -3485,7 +3485,7 @@ to %1</translation>
     </message>
     <message>
       <source>Basic</source>
-      <translation type="unfinished">Basic</translation>
+      <translation>Dasar</translation>
     </message>
   </context>
   <context>
@@ -3503,7 +3503,7 @@ to %1</translation>
     <name>QnFanErrorPolicy</name>
     <message>
       <source>Servers that support fan diagnostic</source>
-      <translation type="unfinished">Servers that support fan diagnostic</translation>
+      <translation>Server yang mendukung diagnostik kipas</translation>
     </message>
   </context>
   <context>
@@ -3521,11 +3521,11 @@ to %1</translation>
     <name>QnFullscreenCameraActionWidget</name>
     <message>
       <source>This camera is not currently on the selected layout. Action will work if camera is added before action triggers.</source>
-      <translation type="unfinished">This camera is not currently on the selected layout. Action will work if camera is added before action triggers.</translation>
+      <translation>Kamera ini saat ini tidak berada pada layout yang dipilih. Aksi akan berfungsi jika kamera ditambahkan sebelum aksi ditrigger.</translation>
     </message>
     <message>
       <source>This camera is not currently on some of the selected layouts. Action will work if camera is added before action triggers.</source>
-      <translation type="unfinished">This camera is not currently on some of the selected layouts. Action will work if camera is added before action triggers.</translation>
+      <translation>Kamera ini saat ini tidak berada pada layout yang dipilih. Aksi akan berfungsi jika kamera ditambahkan sebelum aksi ditrigger.</translation>
     </message>
   </context>
   <context>
@@ -3558,11 +3558,11 @@ to %1</translation>
     </message>
     <message>
       <source>Auto (%1)</source>
-      <translation type="unfinished">Auto (%1)</translation>
+      <translation>Otomatis (%1)</translation>
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>Pilih Folder...</translation>
     </message>
   </context>
   <context>
@@ -3697,7 +3697,7 @@ to %1</translation>
     </message>
     <message>
       <source>ID</source>
-      <translation type="unfinished">ID</translation>
+      <translation>ID</translation>
     </message>
   </context>
   <context>
@@ -5146,7 +5146,7 @@ to %1</translation>
     </message>
     <message>
       <source>ACCESS DENIED</source>
-      <translation type="unfinished">ACCESS DENIED</translation>
+      <translation>AKSES DITOLAK</translation>
     </message>
   </context>
   <context>
@@ -5185,23 +5185,23 @@ to %1</translation>
     </message>
     <message>
       <source>Last 5 minutes</source>
-      <translation type="unfinished">Last 5 minutes</translation>
+      <translation>5 menit terakhir</translation>
     </message>
     <message>
       <source>Last 60 minutes</source>
-      <translation type="unfinished">Last 60 minutes</translation>
+      <translation>60 menit terakhir</translation>
     </message>
     <message>
       <source>Last 24 hours</source>
-      <translation type="unfinished">Last 24 hours</translation>
+      <translation>24 jam terakhir</translation>
     </message>
     <message>
       <source>Longest period available</source>
-      <translation type="unfinished">Longest period available</translation>
+      <translation>Periode terlama yang tersedia</translation>
     </message>
     <message>
       <source>Forecast available only for cameras with enabled recording.</source>
-      <translation type="unfinished">Forecast available only for cameras with enabled recording.</translation>
+      <translation>Prakiraan hanya tersedia untuk kamera dengan perekaman yang diaktifkan.</translation>
     </message>
   </context>
   <context>
@@ -5244,11 +5244,11 @@ to %1</translation>
     </message>
     <message>
       <source>Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</source>
-      <translation type="unfinished">Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</translation>
+      <translation>Reindexing dapat memperbaiki masalah pada archive atau backup jika hilang atau rusak, atau jika beberapa hardware telah diganti.</translation>
     </message>
     <message>
       <source>What to do with current analytics data?</source>
-      <translation type="unfinished">What to do with current analytics data?</translation>
+      <translation>Apa yang harus dilakukan dengan data analitik saat ini?</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -5265,12 +5265,12 @@ to %1</translation>
     <message>
       <source>Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
 If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
-      <translation type="unfinished">Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
-If you intended to move analytics data to another storage location, please contact support before proceeding.</translation>
+      <translation>Data analitik saat ini tidak akan secara otomatis dipindahkan ke lokasi lain dan tidak dapat diakses. Anda dapat menyimpannya dan memindahkannya secara manual nanti, atau menghapusnya secara permanen.
+Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap hubungi support sebelum melanjutkan.</translation>
     </message>
     <message>
       <source>Insufficient permissions to store analytics data.</source>
-      <translation type="unfinished">Insufficient permissions to store analytics data.</translation>
+      <translation>Izin tidak memadai untuk menyimpan data analitik.</translation>
     </message>
   </context>
   <context>
@@ -5329,23 +5329,23 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>ram</source>
-      <translation type="unfinished">ram</translation>
+      <translation>ram</translation>
     </message>
     <message>
       <source>optical</source>
-      <translation type="unfinished">optical</translation>
+      <translation>optik</translation>
     </message>
     <message>
       <source>swap</source>
-      <translation type="unfinished">swap</translation>
+      <translation>tukar</translation>
     </message>
     <message>
       <source>network</source>
-      <translation type="unfinished">network</translation>
+      <translation>jaringan</translation>
     </message>
     <message>
       <source>usb</source>
-      <translation type="unfinished">usb</translation>
+      <translation>usb</translation>
     </message>
     <message>
       <source>%1 TB</source>
@@ -5353,15 +5353,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>smb</source>
-      <translation type="unfinished">smb</translation>
+      <translation>smb</translation>
     </message>
     <message>
       <source>Use to store analytics and motion data</source>
-      <translation type="unfinished">Use to store analytics and motion data</translation>
+      <translation>Gunakan untuk menyimpan analitik dan data gerakan</translation>
     </message>
     <message>
       <source>Stores analytics and motion data</source>
-      <translation type="unfinished">Stores analytics and motion data</translation>
+      <translation>Menyimpan analitik dan data gerakan</translation>
     </message>
   </context>
   <context>
@@ -5419,7 +5419,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Storage is available but will not be writable because it is too small in comparison to the already present storages</source>
-      <translation type="unfinished">Storage is available but will not be writable because it is too small in comparison to the already present storages</translation>
+      <translation>Penyimpanan tersedia tetapi tidak dapat ditulisi karena terlalu kecil dibandingkan dengan penyimpanan yang sudah ada</translation>
     </message>
   </context>
   <context>
@@ -5454,15 +5454,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Time Sync</source>
-      <translation type="unfinished">Time Sync</translation>
+      <translation>Sinkronisasi Waktu</translation>
     </message>
     <message>
       <source>Routing</source>
-      <translation type="unfinished">Routing</translation>
+      <translation>Routing</translation>
     </message>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>Plugin</translation>
     </message>
     <message>
       <source>Advanced</source>
@@ -5565,7 +5565,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Archive integrity problem detected</source>
-      <translation type="unfinished">Archive integrity problem detected</translation>
+      <translation>Masalah integritas archive terdeteksi</translation>
     </message>
     <message>
       <source>Connect your System to %1 &amp;mdash; make it accessible from anywhere!</source>
@@ -5579,43 +5579,43 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Some cameras require passwords to be set</source>
-      <translation type="unfinished">Some cameras require passwords to be set</translation>
+      <translation>Beberapa kamera memerlukan kata sandi untuk ditetapkan</translation>
     </message>
     <message>
       <source>No server has internet access for time synchronization</source>
-      <translation type="unfinished">No server has internet access for time synchronization</translation>
+      <translation>Tidak ada server yang memiliki akses internet untuk sinkronisasi waktu</translation>
     </message>
     <message>
       <source>The System has no internet access for time synchronization</source>
-      <translation type="unfinished">The System has no internet access for time synchronization</translation>
+      <translation>Sistem tidak memiliki akses internet untuk sinkronisasi waktu</translation>
     </message>
     <message>
       <source>No online server in the System has internet access for time synchronization.</source>
-      <translation type="unfinished">No online server in the System has internet access for time synchronization.</translation>
+      <translation>Tidak ada server online di Sistem yang memiliki akses internet untuk sinkronisasi waktu.</translation>
     </message>
     <message>
       <source>Error occurred during remote archive synchronization</source>
-      <translation type="unfinished">Error occurred during remote archive synchronization</translation>
+      <translation>Terjadi error selama sinkronisasi remote archive</translation>
     </message>
     <message>
       <source>Backup storage is not configured</source>
-      <translation type="unfinished">Backup storage is not configured</translation>
+      <translation>Penyimpanan backup tidak dikonfigurasi</translation>
     </message>
     <message>
       <source>Camera recording schedule is invalid</source>
-      <translation type="unfinished">Camera recording schedule is invalid</translation>
+      <translation>Jadwal perekaman kamera tidak valid</translation>
     </message>
     <message>
       <source>Remote archive synchronization has been stopped</source>
-      <translation type="unfinished">Remote archive synchronization has been stopped</translation>
+      <translation>Sinkronisasi remote archive telah dihentikan</translation>
     </message>
     <message>
       <source>Storage for analytics data is not set</source>
-      <translation type="unfinished">Storage for analytics data is not set</translation>
+      <translation>Penyimpanan untuk data analitik belum ditetapkan</translation>
     </message>
     <message>
       <source>System storage is used for analytics data</source>
-      <translation type="unfinished">System storage is used for analytics data</translation>
+      <translation>Penyimpanan sistem digunakan untuk data analitik</translation>
     </message>
     <message>
       <source>Analytics data can take up large amounts of space.</source>
@@ -5623,11 +5623,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Remote archive synchronization is available</source>
-      <translation type="unfinished">Remote archive synchronization is available</translation>
+      <translation>Sinkronisasi remote archive tersedia</translation>
     </message>
     <message>
       <source>We recommend choosing another location for it instead of the system partition.</source>
-      <translation type="unfinished">We recommend choosing another location for it instead of the system partition.</translation>
+      <translation>Kami menyarankan untuk memilih lokasi lain daripada partisi sistem.</translation>
     </message>
   </context>
   <context>
@@ -5642,27 +5642,27 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Includes information about system, such as cameras models and firmware versions, number of servers, etc.</source>
-      <translation type="unfinished">Includes information about system, such as cameras models and firmware versions, number of servers, etc.</translation>
+      <translation>Berisi informasi tentang sistem, seperti model kamera dan versi firmware, jumlah server, dll.</translation>
     </message>
     <message>
       <source>Does not include any personal information and is completely anonymous.</source>
-      <translation type="unfinished">Does not include any personal information and is completely anonymous.</translation>
+      <translation>Tidak menyertakan informasi pribadi apa pun dan sepenuhnya anonim.</translation>
     </message>
     <message>
       <source>Enable devices and servers autodiscovery and automated device status check</source>
-      <translation type="unfinished">Enable devices and servers autodiscovery and automated device status check</translation>
+      <translation>Aktifkan penemuan otomatis perangkat dan server serta pemeriksaan status perangkat otomatis</translation>
     </message>
     <message>
       <source>Enable cameras and servers autodiscovery and automated camera status check</source>
-      <translation type="unfinished">Enable cameras and servers autodiscovery and automated camera status check</translation>
+      <translation>Aktifkan penemuan otomatis kamera dan server serta pemeriksaan status kamera otomatis</translation>
     </message>
     <message>
       <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
-      <translation type="unfinished">When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</translation>
+      <translation>Saat diaktifkan, sistem akan terus menemukan kamera dan server baru, dan mengirimkan permintaan penemuan ke kamera untuk pembaruan status.</translation>
     </message>
     <message>
       <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
-      <translation type="unfinished">If Failover is enabled, server may still request camera status updates regardless of this setting.</translation>
+      <translation>Jika Failover diaktifkan, server masih dapat meminta pembaruan status kamera terlepas dari pengaturan ini.</translation>
     </message>
   </context>
   <context>
@@ -5677,11 +5677,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>HTML file</source>
-      <translation type="unfinished">HTML file</translation>
+      <translation>File HTML</translation>
     </message>
     <message>
       <source>Spread Sheet (CSV) File</source>
-      <translation type="unfinished">Spread Sheet (CSV) File</translation>
+      <translation>File Lembar Spread (CSV)</translation>
     </message>
   </context>
   <context>
@@ -5730,7 +5730,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>To enable digest authentication password reset is required</source>
-      <translation type="unfinished">To enable digest authentication password reset is required</translation>
+      <translation>Untuk mengaktifkan reset kata sandi otentikasi digest diperlukan</translation>
     </message>
   </context>
   <context>
@@ -5849,11 +5849,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Allow digest authentication for this user</source>
-      <translation type="unfinished">Allow digest authentication for this user</translation>
+      <translation>Izinkan otentikasi digest untuk pengguna ini</translation>
     </message>
     <message>
       <source>Learn More</source>
-      <translation type="unfinished">Learn More</translation>
+      <translation>Pelajari Lebih Lanjut</translation>
     </message>
   </context>
   <context>
@@ -5905,11 +5905,11 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>%1 user with specified email already exists.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 user with specified email already exists.</translation>
+      <translation>%1 pengguna dengan email tertentu sudah ada.</translation>
     </message>
     <message>
       <source>Local users</source>
-      <translation type="unfinished">Local users</translation>
+      <translation>Pengguna lokal</translation>
     </message>
     <message>
       <source>%1 users</source>
@@ -5919,12 +5919,12 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>%1 belong to this system only and are fully managed by system administrators.</source>
       <comment>%1 is local users definition, e.g. &apos;Local users&apos;</comment>
-      <translation type="unfinished">%1 belong to this system only and are fully managed by system administrators.</translation>
+      <translation>%1 hanya milik sistem ini dan dikelola sepenuhnya oleh administrator sistem.</translation>
     </message>
     <message>
       <source>%1 can have access to many Systems. Administrators can manage their rights only.</source>
       <comment>%1 is cloud users definition, e.g. &apos;Cloud users&apos;</comment>
-      <translation type="unfinished">%1 can have access to many Systems. Administrators can manage their rights only.</translation>
+      <translation>%1 dapat memiliki akses ke banyak Sistem. Administrator hanya dapat mengelola haknya.</translation>
     </message>
     <message>
       <source>Password reset is required</source>
@@ -6413,17 +6413,17 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>%1 is older than allowed in camera archive settings.</source>
       <comment>Filename will be substituted</comment>
-      <translation type="unfinished">%1 is older than allowed in camera archive settings.</translation>
+      <translation>%1 lebih lama dari yang diizinkan dalam pengaturan archive kamera.</translation>
     </message>
     <message>
       <source>%1 covers period for which video has already been uploaded.</source>
       <comment>Filename will be substituted</comment>
-      <translation type="unfinished">%1 covers period for which video has already been uploaded.</translation>
+      <translation>%1 mencakup periode saat video telah diupload.</translation>
     </message>
     <message>
       <source>%1 covers period for which video is being uploaded.</source>
       <comment>Filename will be substituted</comment>
-      <translation type="unfinished">%1 covers period for which video is being uploaded.</translation>
+      <translation>%1 mencakup periode saat video masih diupload.</translation>
     </message>
   </context>
   <context>
@@ -6588,7 +6588,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Stop uploading?</source>
-      <translation type="unfinished">Stop uploading?</translation>
+      <translation>Berhenti mengupload?</translation>
     </message>
     <message>
       <source>Stop</source>
@@ -6596,29 +6596,29 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message numerus="yes">
       <source>Some video files are still being uploaded to %n virtual cameras:</source>
-      <translation type="unfinished">
-        <numerusform>Some video files are still being uploaded to %n virtual cameras:</numerusform>
+      <translation>
+        <numerusform>Beberapa file video masih diupload ke %n kamera virtual:</numerusform>
       </translation>
     </message>
     <message>
       <source>Merge this group with %1?</source>
-      <translation type="unfinished">Merge this group with %1?</translation>
+      <translation>Gabungkan grup ini dengan %1?</translation>
     </message>
     <message>
       <source>Two groups with the same name cannot exist.</source>
-      <translation type="unfinished">Two groups with the same name cannot exist.</translation>
+      <translation>Dua grup dengan nama yang sama tidak boleh ada.</translation>
     </message>
     <message>
       <source>Merge</source>
-      <translation type="unfinished">Merge</translation>
+      <translation>Gabungkan</translation>
     </message>
     <message>
       <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage.</source>
-      <translation type="unfinished">Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage.</translation>
+      <translation>Proxy semua konten mengekspos layanan atau perangkat apa pun di jaringan server&apos;kepada pengguna halaman web ini.</translation>
     </message>
     <message>
       <source>Move anyway?</source>
-      <translation type="unfinished">Move anyway?</translation>
+      <translation>Tetap pindah?</translation>
     </message>
     <message>
       <source>Move</source>
@@ -6630,40 +6630,40 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Virtual cameras, USB or web cameras cannot be moved between servers. These devices will remain on %1:</source>
-      <translation type="unfinished">Virtual cameras, USB or web cameras cannot be moved between servers. These devices will remain on %1:</translation>
+      <translation>Kamera virtual, USB, atau kamera web tidak dapat dipindahkan antar server. Perangkat ini akan tetap pada %1:</translation>
     </message>
     <message>
       <source>USB or web cameras cannot be moved between servers. These devices will remain on %1:</source>
-      <translation type="unfinished">USB or web cameras cannot be moved between servers. These devices will remain on %1:</translation>
+      <translation>USB atau kamera web tidak dapat dipindahkan antar server. Perangkat ini akan tetap pada %1:</translation>
     </message>
     <message>
       <source>Virtual cameras cannot be moved between servers. These devices will remain on %1:</source>
-      <translation type="unfinished">Virtual cameras cannot be moved between servers. These devices will remain on %1:</translation>
+      <translation>Kamera virtual tidak dapat dipindahkan antar server. Perangkat ini akan tetap pada %1:</translation>
     </message>
     <message>
       <source>Virtual cameras, USB or web cameras cannot be moved between servers</source>
-      <translation type="unfinished">Virtual cameras, USB or web cameras cannot be moved between servers</translation>
+      <translation>Kamera virtual, USB, atau kamera web tidak dapat dipindahkan antar server</translation>
     </message>
     <message>
       <source>Virtual cameras cannot be moved between servers</source>
-      <translation type="unfinished">Virtual cameras cannot be moved between servers</translation>
+      <translation>Kamera virtual tidak dapat dipindahkan antar server</translation>
     </message>
     <message>
       <source>USB or web cameras cannot be moved between servers</source>
-      <translation type="unfinished">USB or web cameras cannot be moved between servers</translation>
+      <translation>USB atau kamera web tidak dapat dipindahkan antar server</translation>
     </message>
     <message>
       <source>Only some of the selected devices can be moved to %1</source>
-      <translation type="unfinished">Only some of the selected devices can be moved to %1</translation>
+      <translation>Hanya beberapa perangkat yang dipilih yang dapat dipindahkan ke %1</translation>
     </message>
     <message>
       <source>Move Partially</source>
-      <translation type="unfinished">Move Partially</translation>
+      <translation>Pindah Sebagian</translation>
     </message>
     <message numerus="yes">
       <source>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</source>
-      <translation type="unfinished">
-        <numerusform>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</numerusform>
+      <translation>
+        <numerusform>Anda akan memindahkan halaman web ini ke Server &quot;%1&quot;. Halaman web ini memproksi semua konten yang diminta, dan server proksinya akan berubah menjadi Server &quot;%1&quot;.</numerusform>
       </translation>
     </message>
   </context>
@@ -6671,23 +6671,23 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>SimpleMotionSearchWidget::Private</name>
     <message>
       <source>Select area on the video to filter results</source>
-      <translation type="unfinished">Select area on the video to filter results</translation>
+      <translation>Pilih area pada video untuk memfilter hasil</translation>
     </message>
     <message>
       <source>In selected area</source>
-      <translation type="unfinished">In selected area</translation>
+      <translation>Di area yang dipilih</translation>
     </message>
     <message>
       <source>Selected camera</source>
-      <translation type="unfinished">Selected camera</translation>
+      <translation>Kamera yang dipilih</translation>
     </message>
     <message>
       <source>Selected device</source>
-      <translation type="unfinished">Selected device</translation>
+      <translation>Perangkat yang dipilih</translation>
     </message>
     <message>
       <source>Selected media</source>
-      <translation type="unfinished">Selected media</translation>
+      <translation>Media yang dipilih</translation>
     </message>
     <message>
       <source>none</source>
@@ -6699,11 +6699,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>SourcePickerWidgetStrings</name>
     <message>
       <source>Select at least one Server</source>
-      <translation type="unfinished">Select at least one Server</translation>
+      <translation>Pilih setidaknya satu Server</translation>
     </message>
     <message>
       <source>Select at least one user</source>
-      <translation type="unfinished">Select at least one user</translation>
+      <translation>Pilih setidaknya satu pengguna</translation>
     </message>
     <message>
       <source>Select at least one device</source>
@@ -6715,7 +6715,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Select at least one I/O module</source>
-      <translation type="unfinished">Select at least one I/O module</translation>
+      <translation>Pilih setidaknya satu modul I/O</translation>
     </message>
   </context>
   <context>
@@ -6742,62 +6742,62 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Preset</source>
-      <translation type="unfinished">Preset</translation>
+      <translation>Preset</translation>
     </message>
     <message>
       <source>Undefined</source>
-      <translation type="unfinished">Undefined</translation>
+      <translation>Tidak terdefinisi</translation>
     </message>
     <message>
       <source>Lst</source>
       <extracomment>Short for &apos;Lowest&apos;</extracomment>
-      <translation type="unfinished">Lst</translation>
+      <translation>Lst</translation>
     </message>
     <message>
       <source>Lo</source>
       <extracomment>Short for &apos;Low&apos;</extracomment>
-      <translation type="unfinished">Lo</translation>
+      <translation>Rendah</translation>
     </message>
     <message>
       <source>Me</source>
       <extracomment>Short for &apos;Medium&apos;</extracomment>
-      <translation type="unfinished">Me</translation>
+      <translation>Medium</translation>
     </message>
     <message>
       <source>Hi</source>
       <extracomment>Short for &apos;High&apos;</extracomment>
-      <translation type="unfinished">Hi</translation>
+      <translation>Tinggi</translation>
     </message>
     <message>
       <source>Bst</source>
       <extracomment>Short for &apos;Best&apos;</extracomment>
-      <translation type="unfinished">Bst</translation>
+      <translation>Bst</translation>
     </message>
     <message>
       <source>Ps</source>
       <extracomment>Short for &apos;Preset&apos;</extracomment>
-      <translation type="unfinished">Ps</translation>
+      <translation>Ps</translation>
     </message>
   </context>
   <context>
     <name>UpdateStrings</name>
     <message>
       <source>This Linux platform is no longer supported</source>
-      <translation type="unfinished">This Linux platform is no longer supported</translation>
+      <translation>Platform Linux ini tidak lagi didukung</translation>
     </message>
     <message>
       <source>This OS version is no longer supported</source>
-      <translation type="unfinished">This OS version is no longer supported</translation>
+      <translation>Versi OS ini tidak lagi didukung</translation>
     </message>
     <message>
       <source>This %1 version is no longer supported</source>
       <comment>%1 is OS name, e.g. Windows</comment>
-      <translation type="unfinished">This %1 version is no longer supported</translation>
+      <translation>Versi %1 ini tidak lagi didukung</translation>
     </message>
     <message>
       <source>%1 %2 is no longer supported</source>
       <comment>%1 %2 are OS name and version, e.g. Windows 7</comment>
-      <translation type="unfinished">%1 %2 is no longer supported</translation>
+      <translation>%1 %2 tidak lagi didukung</translation>
     </message>
   </context>
   <context>
@@ -6870,39 +6870,39 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::AbstractSearchWidget::Private</name>
     <message>
       <source>Hide information</source>
-      <translation type="unfinished">Hide information</translation>
+      <translation>Sembunyikan informasi</translation>
     </message>
     <message>
       <source>Show information</source>
-      <translation type="unfinished">Show information</translation>
+      <translation>Tampilkan informasi</translation>
     </message>
     <message>
       <source>Hide thumbnails</source>
-      <translation type="unfinished">Hide thumbnails</translation>
+      <translation>Sembunyikan thumbnail</translation>
     </message>
     <message>
       <source>Show thumbnails</source>
-      <translation type="unfinished">Show thumbnails</translation>
+      <translation>Tampilkan thumbnail</translation>
     </message>
     <message>
       <source>Last day</source>
-      <translation type="unfinished">Last day</translation>
+      <translation>Hari terakhir</translation>
     </message>
     <message>
       <source>Last 7 days</source>
-      <translation type="unfinished">Last 7 days</translation>
+      <translation>7 Hari terakhir</translation>
     </message>
     <message>
       <source>Last 30 days</source>
-      <translation type="unfinished">Last 30 days</translation>
+      <translation>30 Hari terakhir</translation>
     </message>
     <message>
       <source>Selected on Timeline</source>
-      <translation type="unfinished">Selected on Timeline</translation>
+      <translation>Dipilih di Timeline</translation>
     </message>
     <message>
       <source>Any time</source>
-      <translation type="unfinished">Any time</translation>
+      <translation>Semua waktu</translation>
     </message>
     <message>
       <source>none</source>
@@ -6911,11 +6911,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Devices on layout</source>
-      <translation type="unfinished">Devices on layout</translation>
+      <translation>Perangkat pada layout</translation>
     </message>
     <message>
       <source>Cameras on layout</source>
-      <translation type="unfinished">Cameras on layout</translation>
+      <translation>Kamera pada layout</translation>
     </message>
     <message>
       <source>Any device</source>
@@ -7176,18 +7176,18 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Backup is not supported for this device</source>
-      <translation type="unfinished">Backup is not supported for this device</translation>
+      <translation>Backup tidak didukung untuk perangkat ini</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BackupSettingsPickerWidget</name>
     <message>
       <source>Use %1 or %2 to select multiple devices for batch edit. Use %3 to select all devices.</source>
-      <translation type="unfinished">Use %1 or %2 to select multiple devices for batch edit. Use %3 to select all devices.</translation>
+      <translation>Gunakan %1 atau %2 untuk memilih beberapa perangkat untuk pengeditan batch. Gunakan %3 untuk memilih semua perangkat.</translation>
     </message>
     <message>
       <source>What to backup</source>
-      <translation type="unfinished">What to backup</translation>
+      <translation>Apa yang dibackup</translation>
     </message>
     <message>
       <source>Quality</source>
@@ -7195,8 +7195,8 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message numerus="yes">
       <source>Set for %n selected devices</source>
-      <translation type="unfinished">
-        <numerusform>Set for %n selected devices</numerusform>
+      <translation>
+        <numerusform>Ditetapkan untuk %n perangkat yang dipilih</numerusform>
       </translation>
     </message>
   </context>
@@ -7204,7 +7204,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::BackupSettingsViewWidget</name>
     <message>
       <source>Nothing to backup</source>
-      <translation type="unfinished">Nothing to backup</translation>
+      <translation>Tidak ada yang dibackup</translation>
     </message>
   </context>
   <context>
@@ -7215,23 +7215,23 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Bandwidth Limit</source>
-      <translation type="unfinished">Bandwidth Limit</translation>
+      <translation>Batas Bandwidth</translation>
     </message>
     <message>
       <source>New added cameras</source>
-      <translation type="unfinished">New added cameras</translation>
+      <translation>Kamera tambahan baru</translation>
     </message>
     <message>
       <source>New added cameras settings will apply to all servers in the system.</source>
-      <translation type="unfinished">New added cameras settings will apply to all servers in the system.</translation>
+      <translation>Pengaturan kamera baru yang ditambahkan akan berlaku untuk semua server di sistem.</translation>
     </message>
     <message>
       <source>Backup will be turned on for new added cameras on all servers in the system.</source>
-      <translation type="unfinished">Backup will be turned on for new added cameras on all servers in the system.</translation>
+      <translation>Backup akan diaktifkan untuk kamera baru yang ditambahkan di semua server di sistem.</translation>
     </message>
     <message>
       <source>Backup will be turned off for new added cameras on all servers in the system.</source>
-      <translation type="unfinished">Backup will be turned off for new added cameras on all servers in the system.</translation>
+      <translation>Backup akan dimatikan untuk kamera baru yang ditambahkan di semua server di sistem.</translation>
     </message>
     <message>
       <source>Storage Management</source>
@@ -7240,23 +7240,23 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>To enable backup change &quot;Main&quot; to &quot;Backup&quot; from some of the storages in %1</source>
       <extracomment>&quot;Storage Management&quot; link will be substituted as %1.</extracomment>
-      <translation type="unfinished">To enable backup change &quot;Main&quot; to &quot;Backup&quot; from some of the storages in %1</translation>
+      <translation>Untuk mengaktifkan perubahan backup &quot;Utama&quot; menjadi &quot;Backup&quot; dari beberapa penyimpanan di %1</translation>
     </message>
     <message>
       <source>To enable backup add more drives to use them as backup storage in %1</source>
       <extracomment>&quot;Storage Management&quot; link will be substituted as %1.</extracomment>
-      <translation type="unfinished">To enable backup add more drives to use them as backup storage in %1</translation>
+      <translation>Untuk mengaktifkan backup, tambahkan lebih banyak drive untuk digunakan sebagai penyimpanan backup di %1</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BackupStatusWidget</name>
     <message>
       <source>Backup process will ignore existing footage. Only further recording will be backed up.</source>
-      <translation type="unfinished">Backup process will ignore existing footage. Only further recording will be backed up.</translation>
+      <translation>Proses backup akan mengabaikan cuplikan yang ada. Hanya rekaman selanjutnya yang akan dibackup.</translation>
     </message>
     <message>
       <source>Skip backup for existing footage?</source>
-      <translation type="unfinished">Skip backup for existing footage?</translation>
+      <translation>Lewati backup untuk cuplikan yang ada?</translation>
     </message>
     <message>
       <source>This action cannot be undone.</source>
@@ -7264,35 +7264,35 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Applies only to the cameras connected to current server.</source>
-      <translation type="unfinished">Applies only to the cameras connected to current server.</translation>
+      <translation>Hanya berlaku untuk kamera yang terkoneksi ke server saat ini.</translation>
     </message>
     <message numerus="yes">
       <source>Backup is enabled for %n devices</source>
-      <translation type="unfinished">
-        <numerusform>Backup is enabled for %n devices</numerusform>
+      <translation>
+        <numerusform>Backup diaktifkan untuk %n perangkat</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Backup is enabled for %n cameras</source>
-      <translation type="unfinished">
-        <numerusform>Backup is enabled for %n cameras</numerusform>
+      <translation>
+        <numerusform>Backup diaktifkan untuk %n kamera</numerusform>
       </translation>
     </message>
     <message>
       <source>Footage from these cameras is backed up through to %1 %2</source>
       <comment>%1 and %2 will be replaced respectively by the date and time in the system format.</comment>
-      <translation type="unfinished">Footage from these cameras is backed up through to %1 %2</translation>
+      <translation>Cuplikan dari kamera ini diback up ke %1 %2</translation>
     </message>
     <message>
       <source>The progress will be displayed once the backup process starts</source>
-      <translation type="unfinished">The progress will be displayed once the backup process starts</translation>
+      <translation>Progressnya akan ditampilkan setelah proses backup dimulai</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BookmarkSearchListModel::Private</name>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>kamera yang dihapus</translation>
     </message>
   </context>
   <context>
@@ -7303,13 +7303,13 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message numerus="yes">
       <source>%n bookmarks</source>
-      <translation type="unfinished">
-        <numerusform>%n bookmarks</numerusform>
+      <translation>
+        <numerusform>%n bookmark</numerusform>
       </translation>
     </message>
     <message>
       <source>Select a time span on the timeline and right-click the highlighted section to create a bookmark</source>
-      <translation type="unfinished">Select a time span on the timeline and right-click the highlighted section to create a bookmark</translation>
+      <translation>Pilih rentang waktu pada timeline dan klik kanan bagian yang dihighlight untuk membuat bookmark</translation>
     </message>
   </context>
   <context>
@@ -7327,23 +7327,23 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::CameraButtonController</name>
     <message>
       <source>Heater</source>
-      <translation type="unfinished">Heater</translation>
+      <translation>Heater</translation>
     </message>
     <message>
       <source>Wiper</source>
-      <translation type="unfinished">Wiper</translation>
+      <translation>Wiper</translation>
     </message>
     <message>
       <source>Mute</source>
-      <translation type="unfinished">Mute</translation>
+      <translation>Mute</translation>
     </message>
     <message>
       <source>Unmute</source>
-      <translation type="unfinished">Unmute</translation>
+      <translation>Tidak mute</translation>
     </message>
     <message>
       <source>Open Door</source>
-      <translation type="unfinished">Open Door</translation>
+      <translation>Buka Pintu</translation>
     </message>
   </context>
   <context>
@@ -7366,29 +7366,29 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
-      <translation type="unfinished">Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</translation>
+      <translation>Membantu memperbaiki masalah kualitas gambar pada beberapa kamera; bagi yang lain akan menyebabkan peningkatan bitrate yang signifikan.</translation>
     </message>
     <message>
       <source>Custom number that can be assigned to a camera for quick identification and access</source>
-      <translation type="unfinished">Custom number that can be assigned to a camera for quick identification and access</translation>
+      <translation>Nomor kustom yang dapat ditetapkan ke kamera untuk identifikasi dan akses cepat</translation>
     </message>
     <message numerus="yes">
       <source>This ID is already used on the following %n cameras:</source>
-      <translation type="unfinished">
-        <numerusform>This ID is already used on the following %n cameras:</numerusform>
+      <translation>
+        <numerusform>ID ini sudah digunakan pada kamera %n berikut:</numerusform>
       </translation>
     </message>
     <message>
       <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
-      <translation type="unfinished">Server will not change any cameras settings, it will receive and use camera stream as-is.</translation>
+      <translation>Server tidak akan mengubah pengaturan kamera apa pun, server akan menerima dan menggunakan stream kamera apa adanya.</translation>
     </message>
     <message>
       <source>Multicast</source>
-      <translation type="unfinished">Multicast</translation>
+      <translation>Multicast</translation>
     </message>
     <message>
       <source>Use if supported</source>
-      <translation type="unfinished">Use if supported</translation>
+      <translation>Gunakan jika didukung</translation>
     </message>
     <message>
       <source>Never</source>
@@ -7396,27 +7396,27 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Force Motion Detection</source>
-      <translation type="unfinished">Force Motion Detection</translation>
+      <translation>Paksa Deteksi Gerakan</translation>
     </message>
     <message>
       <source>Pan</source>
-      <translation type="unfinished">Pan</translation>
+      <translation>Pan</translation>
     </message>
     <message>
       <source>Pan &amp; Tilt</source>
-      <translation type="unfinished">Pan &amp; Tilt</translation>
+      <translation>Pan &amp; Tilt</translation>
     </message>
     <message>
       <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant.</source>
-      <translation type="unfinished">Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant.</translation>
+      <translation>Pengaturan kualitas dan frame rate (FPS) di Jadwal Perekaman menjadi tidak relevan.</translation>
     </message>
     <message>
       <source>Server will not push time settings to the camera.</source>
-      <translation type="unfinished">Server will not push time settings to the camera.</translation>
+      <translation>Server tidak akan memasukkan pengaturan waktu ke kamera.</translation>
     </message>
     <message>
       <source>default</source>
-      <translation type="unfinished">default</translation>
+      <translation>default</translation>
     </message>
     <message>
       <source>Auto</source>
@@ -7430,7 +7430,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Video recorded on the internal camera&apos;s storage will be automatically uploaded to the main archive.</source>
-      <translation type="unfinished">Video recorded on the internal camera&apos;s storage will be automatically uploaded to the main archive.</translation>
+      <translation>Video yang direkam pada penyimpanan kamera internal&apos;akan otomatis diupload ke archive utama.</translation>
     </message>
   </context>
   <context>
@@ -7449,19 +7449,19 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>More Info</source>
-      <translation type="unfinished">More Info</translation>
+      <translation>Informasi Lebih Lanjut</translation>
     </message>
     <message>
       <source>Less Info</source>
-      <translation type="unfinished">Less Info</translation>
+      <translation>Informasi Lebih Sedikit</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraLicensePanelWidget</name>
     <message numerus="yes">
       <source>Use License</source>
-      <translation type="unfinished">
-        <numerusform>Use License</numerusform>
+      <translation>
+        <numerusform>Gunakan Lisensi</numerusform>
       </translation>
     </message>
   </context>
@@ -7473,15 +7473,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Maximum number of motion detection rectangles for current camera is reached</source>
-      <translation type="unfinished">Maximum number of motion detection rectangles for current camera is reached</translation>
+      <translation>Jumlah maksimum kotak deteksi gerakan untuk kamera saat ini telah tercapai</translation>
     </message>
     <message>
       <source>Maximum number of ignore motion rectangles for current camera is reached</source>
-      <translation type="unfinished">Maximum number of ignore motion rectangles for current camera is reached</translation>
+      <translation>Jumlah maksimum kotak gerakan yang diabaikan untuk kamera saat ini telah tercapai</translation>
     </message>
     <message>
       <source>Maximum number of detect motion rectangles for current camera is reached</source>
-      <translation type="unfinished">Maximum number of detect motion rectangles for current camera is reached</translation>
+      <translation>Jumlah maksimum kotak deteksi gerakan untuk kamera saat ini telah tercapai</translation>
     </message>
     <message>
       <source>Reset motion regions to default?</source>
@@ -7501,22 +7501,22 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Force Motion Detection</source>
-      <translation type="unfinished">Force Motion Detection</translation>
+      <translation>Paksa Deteksi Gerakan</translation>
     </message>
     <message>
       <source>Select areas on the preview to set chosen sensitivity for.</source>
-      <translation type="unfinished">Select areas on the preview to set chosen sensitivity for.</translation>
+      <translation>Pilih area pada preview untuk menetapkan sensitivitas yang dipilih.</translation>
     </message>
     <message>
       <source>Choose a motion detection sensitivity and select some areas on the preview to set it for.</source>
-      <translation type="unfinished">Choose a motion detection sensitivity and select some areas on the preview to set it for.</translation>
+      <translation>Pilih sensitivitas deteksi gerakan dan pilih beberapa area pada preview untuk menetapkannya.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraReplacementDialog</name>
     <message>
       <source>Failed to replace camera</source>
-      <translation type="unfinished">Failed to replace camera</translation>
+      <translation>Gagal mengganti kamera</translation>
     </message>
     <message>
       <source>Abort camera replacement?</source>

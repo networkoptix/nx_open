@@ -141,7 +141,7 @@
     <name>AggregationWidget</name>
     <message>
       <source>Check to set aggregation period</source>
-      <translation>集計期間を設定する場合チェック</translation>
+      <translation>集計期間を設定する場合はチェックを入れてください</translation>
     </message>
     <message>
       <source>Interval of action :</source>
@@ -406,7 +406,7 @@
     </message>
     <message>
       <source>Description</source>
-      <translation>説明(&amp;D)</translation>
+      <translation>説明</translation>
     </message>
     <message>
       <source>Timeout</source>
