@@ -877,12 +877,12 @@ void Engine::processAcceptedEvent(const EventPtr& event, const ConstRulePtr& rul
 
     for (const auto builder: rule->actionBuilders())
     {
+        nx::vms::utils::ScopedLocalePtr scopedLocale;
+
         if (auto executor = m_executors.value(builder->actionType()))
-        {
-            nx::vms::utils::ScopedLocalePtr scopedLocale = executor->translateAction(
-                builder->actionType());
-            builder->process(event);
-        }
+            scopedLocale = executor->translateAction(builder->actionType());
+
+        builder->process(event);
     }
 }
 

@@ -149,9 +149,21 @@ public:
                 ++targetCount;
         }
 
+        // Check routing target resource validity.
         EXPECT_LE(targetCount, 1);
         if (manifest.targetServers == TargetServers::resourceOwner)
             EXPECT_EQ(targetCount, 1);
+
+        // Check users target field.
+        if (manifest.executionTargets.testFlag(ExecutionTarget::clients))
+        {
+            const auto it = std::find_if(
+                manifest.fields.begin(),
+                manifest.fields.end(),
+                [](const auto& field) { return field.fieldName == utils::kUsersFieldName; });
+            EXPECT_NE(it, manifest.fields.end());
+        }
+
     }
 
     template<class T, class... Args>
