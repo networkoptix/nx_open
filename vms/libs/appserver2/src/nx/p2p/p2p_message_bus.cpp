@@ -1594,11 +1594,11 @@ void MessageBus::sendTransaction(const ec2::QnTransaction<T>& tran, const Transp
 }
 
 template<class T>
-void MessageBus::sendTransaction(const ec2::QnTransaction<T>& tran, const vms::api::PeerSet& dstPeers)
+bool MessageBus::sendTransaction(const ec2::QnTransaction<T>& tran, const vms::api::PeerSet& dstPeers)
 {
     NX_ASSERT(tran.command != ApiCommand::NotDefined);
     NX_MUTEX_LOCKER lock(&m_mutex);
-    sendUnicastTransaction(tran, dstPeers);
+    return sendUnicastTransaction(tran, dstPeers);
 }
 
 template<class T>
@@ -1610,7 +1610,7 @@ void MessageBus::sendTransaction(const ec2::QnTransaction<T>& tran)
 }
 
 template<class T>
-void MessageBus::sendUnicastTransaction(const QnTransaction<T>& tran, const vms::api::PeerSet& dstPeers)
+bool MessageBus::sendUnicastTransaction(const QnTransaction<T>& tran, const vms::api::PeerSet& dstPeers)
 {
     QMap<P2pConnectionPtr, TransportHeader> dstByConnection;
 
@@ -1622,11 +1622,14 @@ void MessageBus::sendUnicastTransaction(const QnTransaction<T>& tran, const vms:
         if (const auto& connection = m_connections.value(dstPeer))
             dstByConnection[connection].dstPeers.push_back(peer);
     }
-    sendUnicastTransactionImpl(tran, dstByConnection);
+    if (dstByConnection.empty())
+        return false;
+
+    return sendUnicastTransactionImpl(tran, dstByConnection);
 }
 
 template<class T>
-void MessageBus::sendUnicastTransactionImpl(
+bool MessageBus::sendUnicastTransactionImpl(
     const QnTransaction<T>& tran,
     const QMap<P2pConnectionPtr, TransportHeader>& dstByConnection)
 {
@@ -1646,7 +1649,7 @@ void MessageBus::sendUnicastTransactionImpl(
                 NX_ASSERT(0, nx::format("Unicast transaction routing error. "
                     "Transaction %1 skipped. remotePeer: %2")
                     .args(tran.command, connection->remotePeer().id));
-                return;
+                break;
             }
             switch (connection->remotePeer().dataFormat)
             {
@@ -1654,12 +1657,12 @@ void MessageBus::sendUnicastTransactionImpl(
                 connection->sendTransaction(
                     tran,
                     m_jsonTranSerializer->serializedTransactionWithoutHeader(tran) + QByteArray("\r\n"));
-                break;
+                return true;
             case Qn::SerializationFormat::ubjson:
                 connection->sendTransaction(
                     tran,
                     m_ubjsonTranSerializer->serializedTransactionWithoutHeader(tran));
-                break;
+                return true;
             default:
                 NX_WARNING(this,
                     nx::format("Client has requested data in an unsupported format %1")
@@ -1677,7 +1680,7 @@ void MessageBus::sendUnicastTransactionImpl(
                     tran,
                     MessageType::pushImpersistentUnicastTransaction,
                     m_ubjsonTranSerializer->serializedTransactionWithHeader(tran, transportHeader));
-                break;
+                return true;
             default:
                 NX_WARNING(this, nx::format("Server has requested data in an unsupported format %1")
                     .arg(connection->remotePeer().dataFormat));
@@ -1685,14 +1688,15 @@ void MessageBus::sendUnicastTransactionImpl(
             }
         }
     }
+    return false;
 }
 
 #define INSTANTIATE(unused1, unused2, T) \
 template void MessageBus::sendTransaction(const ec2::QnTransaction<T>&); \
 template void MessageBus::sendTransaction(const ec2::QnTransaction<T>&, const TransportHeader&); \
-template void MessageBus::sendTransaction(const ec2::QnTransaction<T>&, const vms::api::PeerSet&); \
-template void MessageBus::sendTransactionImpl(const P2pConnectionPtr&, \
-    const ec2::QnTransaction<T>&, TransportHeader);
+template bool MessageBus::sendTransaction(const ec2::QnTransaction<T>&, const vms::api::PeerSet&); \
+template void MessageBus::sendTransactionImpl( \
+    const P2pConnectionPtr&, const ec2::QnTransaction<T>&, TransportHeader);
 
 #include <transaction_types.i>
 BOOST_PP_SEQ_FOR_EACH(INSTANTIATE, _, TransactionDataTypes (UserDataEx))
