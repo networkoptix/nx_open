@@ -66,7 +66,7 @@ network::SocketAddress P2PWebsocketTransport::getForeignAddress() const
 
 QString P2PWebsocketTransport::lastErrorMessage() const
 {
-    return QString();
+    return m_webSocket->lastErrorMessage();
 }
 
 } // namespace nx::network

@@ -78,6 +78,7 @@ public:
     void setAliveTimeout(std::chrono::milliseconds timeout);
     AbstractStreamSocket* socket() { return m_socket.get(); }
     const AbstractStreamSocket* socket() const { return m_socket.get(); }
+    QString lastErrorMessage() const;
 
     /**
      * Disable PONG responses.
@@ -122,6 +123,7 @@ private:
     network::websocket::CompressionType m_compressionType;
     bool m_readingCeased = false;
     bool m_pingPongDisabled = false;
+    QString m_lastErrorMessage;
 
     virtual void stopWhileInAioThread() override;
 
@@ -140,6 +142,7 @@ private:
     size_t handleRead(nx::Buffer* const bufferPtr, Frame* const framePtr);
     void callOnReadhandler(SystemError::ErrorCode error, size_t transferred);
     void callOnWriteHandler(SystemError::ErrorCode error, size_t transferred);
+    void setFailedState(const QString& message);
 };
 
 } // namespace websocket
