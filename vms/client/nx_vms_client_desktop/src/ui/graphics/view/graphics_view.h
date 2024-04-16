@@ -25,6 +25,8 @@ public:
 
     QQuickWidget* quickWidget() const;
 
+    void paintRhi();
+
 protected:
     virtual void paintEvent(QPaintEvent* event) override;
     virtual void wheelEvent(QWheelEvent* event) override;

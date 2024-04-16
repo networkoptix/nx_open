@@ -31,6 +31,7 @@ private:
     QtBasedAnimationTimer* m_animationTimer;
     QPointer<QObject> m_currentWatched;
     QWidget* m_currentWidget;
+    bool m_sendPaintEvent = false;
     nx::utils::ImplPtr<nx::utils::PendingOperation> m_update;
     AnimationTimerListenerPtr m_animationTimerListener = AnimationTimerListener::create();
 };
