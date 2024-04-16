@@ -396,8 +396,6 @@ nx::vms::api::UserModelV1 RemoteConnectionFactoryRequestsManager::Private::getUs
         ? UserType::cloud
         : (userIt->isLdap ? UserType::ldap : UserType::local);
 
-    if (!result.userRoleId.isNull()
-        || result.permissions.testFlag(GlobalPermissionDeprecated::customUser))
     {
         // Request available resources.
 
@@ -413,13 +411,8 @@ nx::vms::api::UserModelV1 RemoteConnectionFactoryRequestsManager::Private::getUs
                 return rights.userId == result.id || rights.userId == result.userRoleId;
             });
 
-        if (itRights == accessRights.cend())
-        {
-            context->setError(RemoteConnectionErrorCode::unauthorized);
-            return {};
-        }
-
-        result.accessibleResources = itRights->resourceIds;
+        if (itRights != accessRights.cend())
+            result.accessibleResources = itRights->resourceIds;
     }
 
     if (!result.userRoleId.isNull())
