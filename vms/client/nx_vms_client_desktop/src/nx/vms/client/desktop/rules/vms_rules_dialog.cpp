@@ -54,6 +54,7 @@ void VmsRulesDialog::addRule()
     EditVmsRuleDialog editVmsRuleDialog{m_parentWidget};
 
     editVmsRuleDialog.setRule(newRule);
+    connect(&editVmsRuleDialog, &EditVmsRuleDialog::accepted, [&]() { saveRuleImpl(newRule); });
 
     if (editVmsRuleDialog.exec() == QDialogButtonBox::Cancel)
         return;
@@ -105,6 +106,7 @@ void VmsRulesDialog::duplicateRule(nx::Uuid id)
     EditVmsRuleDialog editVmsRuleDialog(m_parentWidget);
 
     editVmsRuleDialog.setRule(clone);
+    connect(&editVmsRuleDialog, &EditVmsRuleDialog::accepted, [&]() { saveRuleImpl(clone); });
 
     if (editVmsRuleDialog.exec() == QDialogButtonBox::Cancel)
         return;
@@ -123,6 +125,7 @@ void VmsRulesDialog::editRule(nx::Uuid id)
     EditVmsRuleDialog editVmsRuleDialog(m_parentWidget);
 
     editVmsRuleDialog.setRule(clone);
+    connect(&editVmsRuleDialog, &EditVmsRuleDialog::accepted, [&]() { saveRuleImpl(clone); });
 
     const auto result = editVmsRuleDialog.exec();
     if (result == QDialogButtonBox::Cancel)
