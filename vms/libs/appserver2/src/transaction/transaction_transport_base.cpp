@@ -1246,11 +1246,24 @@ void QnTransactionTransportBase::at_responseReceived(
         }
         else
         {
-            nx::Uuid guid(nx::network::http::getHeaderValue(client->response()->headers, Qn::EC2_SERVER_GUID_HEADER_NAME));
+            using nx::network::http::getHeaderValue;
+            const auto& headers = client->response()->headers;
+            nx::Uuid guid(getHeaderValue(headers, Qn::EC2_SERVER_GUID_HEADER_NAME));
             if (!guid.isNull())
             {
                 emit peerIdDiscovered(remoteAddr(), guid);
-                emit remotePeerUnauthorized(guid);
+
+                nx::network::rest::AuthResult authResult =
+                    nx::network::rest::AuthResult::Auth_UnknownError;
+                if (auto authResultValue = getHeaderValue(headers, Qn::AUTH_RESULT_HEADER_NAME);
+                    !nx::reflect::fromString(authResultValue, &authResult))
+                {
+                    NX_DEBUG(this,
+                        "Unexpected `%1` value: `%2`",
+                        Qn::AUTH_RESULT_HEADER_NAME,
+                        authResultValue);
+                }
+                emit remotePeerUnauthorized(guid, authResult);
             }
             cancelConnecting();
         }

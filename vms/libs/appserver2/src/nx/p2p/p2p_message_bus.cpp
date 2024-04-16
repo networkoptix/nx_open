@@ -6,6 +6,7 @@
 #include <common/static_common_module.h>
 #include <nx/cloud/db/api/ec2_request_paths.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
+#include <nx/network/http/custom_headers.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/bit_stream.h>
@@ -534,7 +535,18 @@ void MessageBus::removeConnectionUnsafe(QWeakPointer<ConnectionBase> weakRef)
     emitPeerFoundLostSignals();
     if (connection->state() == Connection::State::Unauthorized)
     {
-        emitAsync(this, &MessageBus::remotePeerUnauthorized, remotePeer.id);
+        using nx::network::http::getHeaderValue;
+        const auto& headers = connection->responseHeaders();
+        nx::network::rest::AuthResult authResult =
+            nx::network::rest::AuthResult::Auth_UnknownError;
+        if (auto authResultValue = getHeaderValue(headers, Qn::AUTH_RESULT_HEADER_NAME);
+            !nx::reflect::fromString(authResultValue, &authResult))
+        {
+            NX_DEBUG(
+                this, "Unexpected `%1` value: `%2`", Qn::AUTH_RESULT_HEADER_NAME, authResultValue);
+        }
+
+        emitAsync(this, &MessageBus::remotePeerUnauthorized, remotePeer.id, authResult);
     }
     else if (connection->state() == Connection::State::forbidden)
     {

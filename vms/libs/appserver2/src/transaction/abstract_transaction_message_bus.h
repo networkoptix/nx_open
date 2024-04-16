@@ -6,6 +6,7 @@
 #include <QtNetwork/QHostAddress>
 
 #include <nx/network/http/auth_tools.h>
+#include <nx/network/rest/auth_result.h>
 #include <nx/network/ssl/helpers.h>
 #include <nx/vms/common/system_context_aware.h>
 #include <utils/common/enable_multi_thread_direct_connection.h>
@@ -74,7 +75,7 @@ public:
 signals:
     void peerFound(nx::Uuid data, nx::vms::api::PeerType peerType);
     void peerLost(nx::Uuid data, nx::vms::api::PeerType peerType);
-    void remotePeerUnauthorized(nx::Uuid id);
+    void remotePeerUnauthorized(nx::Uuid id, nx::network::rest::AuthResult);
     void remotePeerForbidden(nx::Uuid id, const QString& message);
     void remotePeerHandshakeError(nx::Uuid id);
     void stateChanged(const nx::Uuid& id, const QString& state);

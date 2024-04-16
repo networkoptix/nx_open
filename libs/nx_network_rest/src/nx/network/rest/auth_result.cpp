@@ -69,6 +69,8 @@ QString AuthResultTranslations::toErrorMessage(AuthResult value)
             return tr("More than one user with the same login are presented.");
         case Auth_LdapTlsError:
             return tr("Unable to verify LDAP server SSL/TLS certificate.");
+        case Auth_UnknownError:
+            return tr("The request is unauthorized due to an unknown error.");
     }
 
     NX_ASSERT(false, "Unhandled value: %1", value);

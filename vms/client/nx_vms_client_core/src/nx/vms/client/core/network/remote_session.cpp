@@ -326,8 +326,9 @@ void RemoteSession::establishConnection(RemoteConnectionPtr connection)
     connect(messageBus,
         &ec2::TransactionMessageBusAdapter::remotePeerUnauthorized,
         this,
-        [this, makeServerMarkingFunction]
+        [this, makeServerMarkingFunction](nx::Uuid, nx::network::rest::AuthResult)
         {
+            // todo: handle `AuthResult`
             auto errorCode = RemoteConnectionErrorCode::unauthorized;
             auto connection = this->connection();
             if (connection->credentials().authToken.isBearerToken())
