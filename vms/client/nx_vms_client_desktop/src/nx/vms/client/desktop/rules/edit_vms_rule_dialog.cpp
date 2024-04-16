@@ -418,7 +418,7 @@ void EditVmsRuleDialog::buttonBoxClicked(QDialogButtonBox::StandardButton button
 {
     if (button == QDialogButtonBox::StandardButton::Apply)
     {
-        done(QDialogButtonBox::Ok);
+        emit accepted();
         return;
     }
 
