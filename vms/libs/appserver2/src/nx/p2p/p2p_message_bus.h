@@ -91,7 +91,7 @@ public:
     void sendTransaction(const ec2::QnTransaction<T>& tran, const TransportHeader& header);
 
     template<class T>
-    void sendTransaction(const ec2::QnTransaction<T>& tran, const vms::api::PeerSet& dstPeers);
+    bool sendTransaction(const ec2::QnTransaction<T>& tran, const vms::api::PeerSet& dstPeers);
 
     bool isSubscribedTo(const vms::api::PersistentIdData& peer) const;
     qint32 distanceTo(const vms::api::PersistentIdData& peer) const;
@@ -109,10 +109,10 @@ protected:
         TransportHeader transportHeader);
 
     template<class T>
-    void sendUnicastTransaction(const QnTransaction<T>& tran, const vms::api::PeerSet& dstPeers);
+    bool sendUnicastTransaction(const QnTransaction<T>& tran, const vms::api::PeerSet& dstPeers);
 
     template<class T>
-    void sendUnicastTransactionImpl(
+    bool sendUnicastTransactionImpl(
         const QnTransaction<T>& tran,
         const QMap<P2pConnectionPtr, TransportHeader>& dstByConnection);
 

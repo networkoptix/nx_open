@@ -84,23 +84,25 @@ namespace ec2 {
         }
 
         template<class T>
-        void sendTransaction(
+        bool sendTransaction(
             const QnTransaction<T>& tran,
             const nx::vms::api::PeerSet& dstPeers)
         {
             if (auto p2pBus = dynamicCast<nx::p2p::MessageBus*>())
-                p2pBus->sendTransaction(tran, dstPeers);
+                return p2pBus->sendTransaction(tran, dstPeers);
+            return false;
         }
 
         template<class T>
-        void sendTransaction(
+        bool sendTransaction(
             const QnTransaction<T>& tran,
             const nx::Uuid& peer)
         {
             if (auto p2pBus = dynamicCast<nx::p2p::MessageBus*>())
-                p2pBus->sendTransaction(tran, {peer});
-            else
-                NX_CRITICAL(false, "Not implemented");
+                return p2pBus->sendTransaction(tran, {peer});
+
+            NX_CRITICAL(false, "Not implemented");
+            return false;
         }
 
     private:
