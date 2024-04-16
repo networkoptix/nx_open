@@ -1427,7 +1427,7 @@ void Style::drawPrimitive(PrimitiveElement element,
             if (tabBar && tabShape(tabBar) == TabShape::Rectangular)
             {
                 QIcon::State state = selected ? QIcon::On : QIcon::Off;
-                QIcon icon = qnSkin->icon(
+                static const QIcon icon = qnSkin->icon(
                     "tab_bar/tab_close.svg",
                     "tab_bar/tab_close_checked.svg",
                     nullptr,
