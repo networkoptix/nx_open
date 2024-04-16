@@ -164,15 +164,6 @@ QVariant EventSearchListModel::Private::data(const QModelIndex& index, int role,
         case Qn::DecorationPathRole:
             return iconPath(eventParams);
 
-        case Qt::DecorationRole:
-            if (eventParams.eventType == EventType::softwareTriggerEvent)
-            {
-                return QVariant::fromValue(SoftwareTriggerPixmaps::colorizedPixmap(
-                    eventParams.description, QPalette().light().color()));
-            }
-            handled = false;
-            return {};
-
         case Qt::ForegroundRole:
             return QVariant::fromValue(color(eventParams));
 
@@ -486,49 +477,30 @@ QString EventSearchListModel::Private::iconPath(const vms::event::EventParameter
     switch (parameters.eventType)
     {
         case EventType::storageFailureEvent:
-            return "events/storage_red.png";
-
         case EventType::backupFinishedEvent:
-            return "events/storage_green.png";
+            return "events/storage_20.svg";
 
         case EventType::serverStartEvent:
-            return "events/server_20.svg";
-
         case EventType::serverFailureEvent:
         case EventType::serverCertificateError:
-            return "events/server_red.png";
-
         case EventType::serverConflictEvent:
-            return "events/server_yellow.png";
+            return "events/server_20.svg";
 
         case EventType::licenseIssueEvent:
-            return "events/license_red.png";
+            return "events/license_20.svg";
 
         case EventType::cameraDisconnectEvent:
-            return "events/connection_red.png";
-
-        case EventType::networkIssueEvent:
-        case EventType::saasIssueEvent:
-            return "events/alert_yellow.png";
-
         case EventType::cameraIpConflictEvent:
-            return "events/connection_yellow.png";
+            return "events/connection_20.svg";
+
+        case EventType::ldapSyncIssueEvent:
+        case EventType::networkIssueEvent:
+        case EventType::pluginDiagnosticEvent:
+        case EventType::saasIssueEvent:
+            return "events/alert_20.svg";
 
         case EventType::softwareTriggerEvent:
-            return SoftwareTriggerPixmaps::pixmapsPath() + parameters.description + ".png";
-
-        case EventType::pluginDiagnosticEvent:
-        {
-            switch (QnNotificationLevel::valueOf(parameters))
-            {
-                case QnNotificationLevel::Value::CriticalNotification:
-                    return "events/alert_red.png";
-                case QnNotificationLevel::Value::ImportantNotification:
-                    return "events/alert_yellow.png";
-                default:
-                    return "events/alert_20.svg";
-            }
-        }
+            return SoftwareTriggerPixmaps::effectivePixmapPath(parameters.description);
 
         case EventType::cameraMotionEvent:
         // TODO: #spanasenko Fill with actual pixmaps as soon as they're created.
@@ -536,9 +508,6 @@ QString EventSearchListModel::Private::iconPath(const vms::event::EventParameter
         case EventType::analyticsSdkEvent:
         case EventType::analyticsSdkObjectDetected:
             return "20x20/Solid/camera.svg";
-
-        case EventType::ldapSyncIssueEvent:
-            return "events/alert_yellow.png";
 
         default:
             return {};

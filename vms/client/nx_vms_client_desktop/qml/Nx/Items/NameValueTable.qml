@@ -68,7 +68,7 @@ Item
             width: kCopyWidth
             height: parent.height
 
-            IconImage
+            ColoredImage
             {
                 id: icon
 
@@ -87,8 +87,8 @@ Item
                 property bool pressed: gridMouseArea.containsPress
                     && gridMouseArea.mouseX > gridMouseArea.width - kCopyWidth
 
-                color: pressed ? pressedColor : (hovered ? hoveredColor : mainColor)
-                source: "image://svg/skin/advanced_search_dialog/tosearch.svg"
+                primaryColor: pressed ? pressedColor : (hovered ? hoveredColor : mainColor)
+                sourcePath: "image://skin/advanced_search_dialog/tosearch.svg"
                 sourceSize: Qt.size(width, height)
             }
         }

@@ -74,7 +74,7 @@ RowLayout
         enabled: !popup.opened
         focusPolicy: Qt.NoFocus
 
-        icon.source: "image://svg/skin/calendar/calendar.svg"
+        icon.source: "image://skin/calendar/calendar.svg"
         icon.width: width
         icon.height: height
         icon.color: hovered
@@ -162,7 +162,7 @@ RowLayout
 
                     ArrowButton
                     {
-                        icon.source: "image://svg/skin/calendar/arrow_left.svg"
+                        icon.source: "image://skin/calendar/arrow_left.svg"
                         objectName: "backArrowButton"
 
                         readonly property int kMinYear: 1970
@@ -199,7 +199,7 @@ RowLayout
 
                     ArrowButton
                     {
-                        icon.source: "image://svg/skin/calendar/arrow_right.svg"
+                        icon.source: "image://skin/calendar/arrow_right.svg"
                         objectName: "forwardArrowButton"
 
                         onClicked:

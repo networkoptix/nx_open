@@ -56,7 +56,7 @@ ComboBox
 
             visible: serverItem.hasIcon
 
-            source: "image://svg/skin/user_settings/vms_server.svg"
+            source: "image://skin/user_settings/vms_server.svg"
             sourceSize: Qt.size(20, 20)
         }
 

@@ -453,20 +453,6 @@ QVariant RightPanelModelsAdapter::data(const QModelIndex& index, int role) const
             return QVariant::fromValue(duration_cast<milliseconds>(time).count());
         }
 
-        case Qt::DecorationRole:
-        case Qn::DecorationPathRole:
-        {
-            switch (d->type())
-            {
-                case Type::events:
-                case Type::analytics:
-                    return base_type::data(index, role);
-
-                default:
-                    return {};
-            }
-        }
-
         case Qn::ProgressValueRole:
         {
             const auto progressVariant = base_type::data(index, role);

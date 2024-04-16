@@ -54,7 +54,7 @@ Dialog
             Button
             {
                 text: qsTr("Add Rule")
-                iconUrl: "image://svg/skin/buttons/add_20x20_deprecated.svg"
+                iconUrl: "image://skin/buttons/add_20x20_deprecated.svg"
                 visible: !tableView.hasCheckedRows
                 onClicked:
                 {
@@ -73,7 +73,7 @@ Dialog
             TextButton
             {
                 text: qsTr("Schedule")
-                icon.source: "image://svg/skin/text_buttons/calendar_20.svg"
+                icon.source: "image://skin/text_buttons/calendar_20.svg"
                 visible: tableView.hasCheckedRows
 
                 onClicked:
@@ -86,7 +86,7 @@ Dialog
             TextButton
             {
                 text: qsTr("Duplicate")
-                icon.source: "image://svg/skin/text_buttons/copy_20.svg"
+                icon.source: "image://skin/text_buttons/copy_20.svg"
                 visible: tableView.checkedRows.length === 1
 
                 onClicked:
@@ -99,7 +99,7 @@ Dialog
             TextButton
             {
                 text: qsTr("Delete")
-                icon.source: "image://svg/skin/text_buttons/delete_20_deprecated.svg"
+                icon.source: "image://skin/text_buttons/delete_20_deprecated.svg"
                 visible: tableView.hasCheckedRows
 
                 onClicked:
@@ -233,7 +233,7 @@ Dialog
             TextButton
             {
                 text: qsTr("Event Log...")
-                icon.source: "image://svg/skin/buttons/event_log_20_deprecated.svg"
+                icon.source: "image://skin/buttons/event_log_20_deprecated.svg"
 
                 onClicked:
                 {
@@ -244,7 +244,7 @@ Dialog
             TextButton
             {
                 text: qsTr("Reset To Defaults...")
-                icon.source: "image://svg/skin/text_buttons/reload_20.svg"
+                icon.source: "image://skin/text_buttons/reload_20.svg"
 
                 onClicked:
                 {

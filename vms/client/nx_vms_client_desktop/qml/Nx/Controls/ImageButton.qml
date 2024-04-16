@@ -37,13 +37,13 @@ AbstractButton
             : (hovered ? hoveredBackground : normalBackground)
     }
 
-    contentItem: IconImage
+    contentItem: ColoredImage
     {
         id: image
 
         name: button.icon.name
-        color: button.icon.color
-        source: button.icon.source
+        primaryColor: button.icon.color
+        sourcePath: button.icon.source
         sourceSize: Qt.size(button.icon.width, button.icon.height)
     }
 }

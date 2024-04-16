@@ -2,6 +2,7 @@
 
 #include "server_certificate_warning.h"
 
+#include <QtGui/QGuiApplication>
 #include <QtWidgets/QBoxLayout>
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QLabel>
@@ -112,13 +113,17 @@ ServerCertificateWarning::ServerCertificateWarning(
             layout->setContentsMargins(8, 8, 8, 10);
             layout->setSpacing(4);
 
+            const auto foregroundColor = core::colorTheme()->color("light10");
+
             auto serverIconLabel = new QLabel();
-            serverIconLabel->setPixmap(
-                qnSkin->icon("events/server_20.svg").pixmap(QSize(20, 20)));
+            serverIconLabel->setPixmap(qnSkin->colorizedPixmap(
+                "events/server_20.svg",
+                QSize(20, 20) * qApp->devicePixelRatio(),
+                foregroundColor,
+                qApp->devicePixelRatio()));
 
             auto serverNameLabel = new QLabel(certificateInfo.target.name);
-            setPaletteColor(serverNameLabel,
-                QPalette::WindowText, core::colorTheme()->color("light10"));
+            setPaletteColor(serverNameLabel, QPalette::WindowText, foregroundColor);
 
             auto certificateDetailsLabel = new QLabel(
                 common::html::localLink("Certificate details", kCertificateLink));

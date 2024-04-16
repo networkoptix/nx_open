@@ -343,6 +343,16 @@ QColor ColorTheme::color(const QString& name, std::uint8_t alpha) const
     return withAlpha(color(name), alpha);
 }
 
+bool ColorTheme::hasColor(const QString& name) const
+{
+    return d->colorsByPath.contains(name);
+}
+
+QColor ColorTheme::safeColor(const QString& name) const
+{
+    return hasColor(name) ? color(name) : QColor::fromString(name);
+}
+
 QList<QColor> ColorTheme::colors(const QString& name) const
 {
     NX_ASSERT(d->colorsByPath.contains(name));

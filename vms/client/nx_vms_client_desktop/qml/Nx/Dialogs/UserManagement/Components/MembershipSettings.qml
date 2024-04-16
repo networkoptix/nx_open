@@ -56,23 +56,24 @@ Item
             switch (model.userType)
             {
                 case UserSettingsGlobal.LocalUser:
-                    return "image://svg/skin/user_settings/user_local.svg"
+                    return "image://skin/user_settings/user_local.svg"
                 case UserSettingsGlobal.TemporaryUser:
-                    return "image://svg/skin/user_settings/user_local_temp.svg"
+                    return "image://skin/user_settings/user_local_temp.svg"
                 case UserSettingsGlobal.CloudUser:
-                    return "image://svg/skin/user_settings/user_cloud.svg"
+                    return "image://skin/user_settings/user_cloud.svg"
                 case UserSettingsGlobal.LdapUser:
-                    return "image://svg/skin/user_settings/user_ldap.svg"
+                    return "image://skin/user_settings/user_ldap.svg"
                 default:
                     return ""
             }
         }
+	
         if (model.isPredefined)
-            return "image://svg/skin/20x20/Solid/group_default.svg"
+            return "image://skin/20x20/Solid/group_default.svg"
 
         return model.isLdap
-            ? "image://svg/skin/20x20/Solid/group_ldap.svg"
-            : "image://svg/skin/20x20/Solid/group.svg"
+            ? "image://skin/20x20/Solid/group_ldap.svg"
+            : "image://skin/20x20/Solid/group.svg"
     }
 
     component SelectableGroupItem: MembershipEditableItem

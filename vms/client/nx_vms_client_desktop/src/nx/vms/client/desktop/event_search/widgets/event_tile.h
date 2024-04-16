@@ -49,8 +49,8 @@ public:
     QString timestamp() const;
     void setTimestamp(const QString& value);
 
-    QPixmap icon() const;
-    void setIcon(const QPixmap& value);
+    QString iconPath() const;
+    void setIconPath(const QString& value);
 
     // Does not take ownership.
     ImageProvider* imageProvider() const;

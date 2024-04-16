@@ -351,32 +351,32 @@ Item
 
                 case StatusOverlay.UnauthorizedOverlay:
                     return makeErrorOverlayData(qsTr("Unauthorized"),
-                        "qrc:///skin/item_placeholders/unauthorized.png",
+                        "image://skin/item_placeholders/unauthorized.png",
                         qsTr("Please check authentication information"))
 
                 case StatusOverlay.AccessDenied:
                     return makeErrorOverlayData(qsTr("No access"),
-                        "image://svg/skin/item_placeholders/no_access.svg")
+                        "image://skin/item_placeholders/no_access.svg")
 
                 case StatusOverlay.OfflineOverlay:
                     return makeErrorOverlayData(qsTr("No signal"),
-                        "image://svg/skin/item_placeholders/offline.svg")
+                        "image://skin/item_placeholders/offline.svg")
 
                 case StatusOverlay.AnalogWithoutLicenseOverlay:
                 case StatusOverlay.VideowallWithoutLicenseOverlay:
                     return makeErrorOverlayData(qsTr("Not enough licenses"),
-                        "qrc:///skin/item_placeholders/license.png")
+                        "image://skin/item_placeholders/license.png")
 
                 case StatusOverlay.ServerOfflineOverlay:
                     return makeErrorOverlayData(qsTr("Server unavailable"))
 
                 case StatusOverlay.ServerUnauthorizedOverlay:
                     return makeErrorOverlayData(qsTr("No access"),
-                        "qrc:///skin/item_placeholders/no_access.svg")
+                        "image://skin/item_placeholders/no_access.svg")
 
                 case StatusOverlay.IoModuleDisabledOverlay:
                     return makeErrorOverlayData(qsTr("Device disabled"),
-                        "qrc:///skin/item_placeholders/disabled.png")
+                        "image://skin/item_placeholders/disabled.png")
 
                 case StatusOverlay.TooManyOpenedConnectionsOverlay:
                     return makeErrorOverlayData(qsTr("Too many connections"))
@@ -386,7 +386,7 @@ Item
 
                 case StatusOverlay.PasswordRequiredOverlay:
                     return makeErrorOverlayData(qsTr("Password required"),
-                        "qrc:///skin/item_placeholders/alert.png")
+                        "image://skin/item_placeholders/alert.png")
 
                 case StatusOverlay.NoLiveStreamOverlay:
                     return makeOverlayData(qsTr("No live stream"))
@@ -395,10 +395,10 @@ Item
                     return makeErrorOverlayData(qsTr("Unsupported firmware version"))
 
                 case StatusOverlay.NoVideoDataOverlay:
-                    return makeIconOverlayData("qrc:///skin/item_placeholders/sound.png")
+                    return makeIconOverlayData("image://skin/item_placeholders/sound.png")
 
                 case StatusOverlay.PausedOverlay:
-                    return makeIconOverlayData("qrc:///skin/item_placeholders/pause.png")
+                    return makeIconOverlayData("image://skin/item_placeholders/pause.png")
 
                 default:
                     return makeOverlayData()

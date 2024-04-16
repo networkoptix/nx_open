@@ -108,6 +108,9 @@ public:
      */
     QIcon icon(Key key);
 
+    QString iconPath(Key key) const;
+    QString iconPath(const QnResourcePtr& resource) const;
+
     static Key userKey(const QnUserResourcePtr& user);
 
     static Key key(const QnResourcePtr& resource);
@@ -117,6 +120,7 @@ public:
     static QIcon cameraRecordingStatusIcon(nx::vms::client::desktop::ResourceExtraStatus status);
 
 private:
+    QHash<Key, QString> m_paths;
     QHash<Key, QIcon> m_cache;
 };
 

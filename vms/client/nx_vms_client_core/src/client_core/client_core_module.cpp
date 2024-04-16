@@ -19,6 +19,7 @@
 #include <nx/vms/client/core/resource/screen_recording/audio_only/desktop_audio_only_resource.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/core/skin/svg_image_provider.h>
+#include <nx/vms/client/core/skin/skin_image_provider.h>
 #include <nx/vms/client/core/system_context.h>
 
 using namespace nx::vms::client::core;
@@ -52,6 +53,9 @@ QnClientCoreModule::QnClientCoreModule(
     d->resourceDataProviderFactory.reset(new QnDataProviderFactory());
     d->resourceDataProviderFactory->registerResourceType<DesktopAudioOnlyResource>();
     d->sessionTokenTerminator = std::make_unique<SessionTokenTerminator>();
+
+    appContext()->qmlEngine()->addImageProvider("skin",
+        new nx::vms::client::core::SkinImageProvider());
 
     appContext()->qmlEngine()->addImageProvider("svg",
         new nx::vms::client::core::SvgImageProvider());

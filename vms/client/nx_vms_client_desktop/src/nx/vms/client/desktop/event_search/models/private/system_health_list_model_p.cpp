@@ -780,13 +780,11 @@ QString SystemHealthListModel::Private::decorationPath(MessageType message)
     switch (QnNotificationLevel::valueOf(message))
     {
         case QnNotificationLevel::Value::CriticalNotification:
-            return "events/alert_red.png";
-
         case QnNotificationLevel::Value::ImportantNotification:
-            return "events/alert_yellow.png";
+            return "events/alert_20.svg";
 
         case QnNotificationLevel::Value::SuccessNotification:
-            return "events/success_mark.png";
+            return "events/success_mark.svg";
 
         default:
             break;

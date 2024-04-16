@@ -108,9 +108,6 @@ QVariant BookmarkSearchListModel::Private::data(const QModelIndex& index, int ro
         case Qn::DecorationPathRole:
             return iconPath();
 
-        case Qt::DecorationRole:
-            return QVariant::fromValue(pixmap());
-
         case Qt::ForegroundRole:
             return QVariant::fromValue(color());
 
@@ -495,11 +492,6 @@ QnVirtualCameraResourcePtr BookmarkSearchListModel::Private::camera(
 QString BookmarkSearchListModel::Private::iconPath()
 {
     return "soft_triggers/user_selectable/bookmark.png";
-}
-
-QPixmap BookmarkSearchListModel::Private::pixmap()
-{
-    return core::Skin::colorize(qnSkin->pixmap(iconPath()), color());
 }
 
 QColor BookmarkSearchListModel::Private::color()

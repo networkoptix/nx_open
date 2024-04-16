@@ -89,7 +89,7 @@ Button
         width: 3
         height: 15
 
-        source: "image://svg/skin/welcome_screen/tile/dots.svg"
+        source: "image://skin/welcome_screen/tile/dots.svg"
         sourceSize: Qt.size(width, height)
     }
 }

@@ -52,8 +52,8 @@ Control
 
             font.pixelSize: 16
             icon.source: control.collapsed
-                ? "image://svg/skin/text_buttons/arrow_down_20.svg"
-                : "image://svg/skin/text_buttons/arrow_up_20.svg"
+                ? "image://skin/text_buttons/arrow_down_20.svg"
+                : "image://skin/text_buttons/arrow_up_20.svg"
 
             onClicked: control.collapsed = !control.collapsed
         }

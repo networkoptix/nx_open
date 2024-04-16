@@ -27,7 +27,7 @@ WizardStep
         Image
         {
             Layout.alignment: Qt.AlignHCenter
-            source: "image://svg/skin/joystick_settings/rotate.svg"
+            source: "image://skin/joystick_settings/rotate.svg"
             sourceSize: Qt.size(120, 120)
         }
     }

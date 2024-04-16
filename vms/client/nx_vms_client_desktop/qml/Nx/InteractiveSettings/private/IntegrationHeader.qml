@@ -102,7 +102,7 @@ RowLayout
 
             return !!licenseSummary && licenseSummary.available < licenseSummary.inUse
         }
-        source: "image://svg/skin/banners/warning.svg"
+        source: "image://skin/banners/warning.svg"
         sourceSize: Qt.size(20, 20)
 
         GlobalToolTip.text: licenseSummary && licenseSummary.issueExpirationDate
@@ -161,7 +161,7 @@ RowLayout
         id: refreshButton
 
         text: qsTr("Refresh")
-        icon.source: "image://svg/skin/text_buttons/reload_20.svg"
+        icon.source: "image://skin/text_buttons/reload_20.svg"
         visible: header.refreshable && !header.refreshing
 
         onClicked:
@@ -206,7 +206,7 @@ RowLayout
     {
         visible: header.removable
         text: qsTr("Remove")
-        icon.source: "image://svg/skin/text_buttons/trash.svg"
+        icon.source: "image://skin/text_buttons/trash.svg"
 
         Layout.alignment: Qt.AlignBaseline
         onClicked:

@@ -49,12 +49,12 @@ Item
             implicitWidth: image.implicitWidth
             implicitHeight: image.implicitHeight
 
-            IconImage
+            Image
             {
                 id: image
 
                 anchors.centerIn: content
-                source: "image://svg/skin/buttons/filter_16x16.svg"
+                source: "image://skin/buttons/filter_16x16.svg"
                 sourceSize: Qt.size(16, 16)
             }
 
@@ -82,7 +82,7 @@ Item
                 shortcut: null //< Explicitly hide shortcut spacing.
 
                 icon.source: checked
-                    ? "image://svg/skin/user_settings/access_rights/filter_checked.svg"
+                    ? "image://skin/user_settings/access_rights/filter_checked.svg"
                     : ""
             }
 

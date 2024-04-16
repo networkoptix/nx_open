@@ -48,21 +48,23 @@ Rectangle
 
         onCheckedChanged: model[control.editableProperty] = checked
 
-        middleItem: IconImage
+        middleItem: ColoredImage
         {
             id: groupImage
 
             width: 20
             height: 20
 
-            source: iconPath(model) + "?primary=light10&secondary=light4"
+            sourcePath: iconPath(model)
             sourceSize: Qt.size(width, height)
 
             opacity: groupCheckbox.enabled ? 1.0 : 0.3
 
-            color: groupCheckbox.enabled
+            primaryColor: groupCheckbox.enabled
                 ? checkableItem.selectedColor
                 : ColorTheme.colors.light10
+
+            secondaryColor: "light4"
         }
 
         font: Qt.font({pixelSize: 12, weight: Font.Medium})

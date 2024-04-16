@@ -64,13 +64,13 @@ AbstractButton
 
             anchors.verticalCenter: defaultArea.verticalCenter
 
-            IconImage
+            ColoredImage
             {
                 id: iconImage
 
-                source: button.icon.source
-                color: buttonText.color
+                sourcePath: button.icon.source
                 sourceSize: Qt.size(button.icon.width, button.icon.height)
+                primaryColor: buttonText.color
 
                 x: button.horizontal ? 0 : Math.round((content.width - iconImage.width) / 2)
                 y: button.horizontal ? Math.round((content.height - iconImage.height) / 2) : 0

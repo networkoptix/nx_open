@@ -166,7 +166,7 @@ Dialog
                 TextButton
                 {
                     text: qsTr("Check for updates")
-                    icon.source: "image://svg/skin/text_buttons/reload_20.svg"
+                    icon.source: "image://skin/text_buttons/reload_20.svg"
                     visible: !!autoClientUpdatesPanel.uiState.checkUpdatesButton
 
                     onClicked:
@@ -179,7 +179,7 @@ Dialog
                 TextButton
                 {
                     text: qsTr("Speed up this update")
-                    icon.source: "image://svg/skin/text_buttons/shopping_cart.svg"
+                    icon.source: "image://skin/text_buttons/shopping_cart.svg"
                     visible: advancedMode && !!autoClientUpdatesPanel.uiState.speedUpButton
 
                     onClicked:

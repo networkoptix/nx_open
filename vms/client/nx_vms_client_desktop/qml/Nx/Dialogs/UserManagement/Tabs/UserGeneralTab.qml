@@ -113,13 +113,13 @@ Item
                     switch (control.userType)
                     {
                         case UserSettingsGlobal.LocalUser:
-                            return "image://svg/skin/user_settings/user_type_local.svg"
+                            return "image://skin/user_settings/user_type_local.svg"
                         case UserSettingsGlobal.TemporaryUser:
-                            return "image://svg/skin/user_settings/user_type_local_temp.svg"
+                            return "image://skin/user_settings/user_type_local_temp.svg"
                         case UserSettingsGlobal.CloudUser:
-                            return "image://svg/skin/user_settings/user_type_cloud.svg"
+                            return "image://skin/user_settings/user_type_cloud.svg"
                         case UserSettingsGlobal.LdapUser:
-                            return "image://svg/skin/user_settings/user_type_ldap.svg"
+                            return "image://skin/user_settings/user_type_ldap.svg"
                     }
                 }
 
@@ -175,7 +175,7 @@ Item
                 {
                     id: auditTrailButton
 
-                    icon.source: "image://svg/skin/user_settings/audit_trail.svg"
+                    icon.source: "image://skin/user_settings/audit_trail.svg"
                     icon.width: 12
                     icon.height: 14
                     spacing: 8
@@ -190,7 +190,7 @@ Item
 
                     visible: control.deleteAvailable
                     enabled: control.enabled
-                    icon.source: "image://svg/skin/user_settings/user_delete.svg"
+                    icon.source: "image://skin/user_settings/user_delete.svg"
                     icon.width: 12
                     icon.height: 14
                     spacing: 8
@@ -562,7 +562,7 @@ Item
                             {
                                 id: obtainLinkButton
 
-                                icon.source: "image://svg/skin/user_settings/spinner.svg"
+                                icon.source: "image://skin/user_settings/spinner.svg"
                                 icon.width: 20
                                 icon.height: 20
                                 spacing: 4
@@ -586,7 +586,7 @@ Item
 
                             Image
                             {
-                                source: "image://svg/skin/tree/warning_yellow.svg"
+                                source: "image://skin/tree/warning_yellow.svg"
                                 sourceSize.width: 24
                                 sourceSize.height: 24
                             }
@@ -727,7 +727,7 @@ Item
                                 enabled: control.enabled
                                 text: copied ? copiedText : copyLinkText
                                 icon.source:
-                                    copied ? "image://svg/skin/user_settings/copied.svg" : ""
+                                    copied ? "image://skin/user_settings/copied.svg" : ""
                                 icon.width: 20
                                 icon.height: 20
                                 Layout.preferredWidth:
@@ -762,7 +762,7 @@ Item
 
                             TextButton
                             {
-                                icon.source: "image://svg/skin/user_settings/terminate_link.svg"
+                                icon.source: "image://skin/user_settings/terminate_link.svg"
                                 icon.width: 20
                                 icon.height: 20
                                 spacing: 4
@@ -774,7 +774,7 @@ Item
 
                             TextButton
                             {
-                                icon.source: "image://svg/skin/user_settings/reset_link.svg"
+                                icon.source: "image://skin/user_settings/reset_link.svg"
                                 icon.width: 20
                                 icon.height: 20
                                 spacing: 4
@@ -828,7 +828,7 @@ Item
                 text: qsTr("This user is not found in LDAP database and is not able to log in.")
 
                 buttonText: control.deleteAvailable && control.enabled ? qsTr("Delete") : ""
-                buttonIcon: "image://svg/skin/user_settings/trash.svg"
+                buttonIcon: "image://skin/user_settings/trash.svg"
 
                 onButtonClicked: control.deleteRequested()
             }

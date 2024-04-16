@@ -46,15 +46,15 @@ Button
 
             spacing: 5
 
-            IconImage
+            ColoredImage
             {
                 width: 15
                 height: 15
 
                 sourceSize: Qt.size(width, height)
 
-                source: "image://svg/skin/welcome_screen/plus.svg"
-                color: control.currentColor
+                sourcePath: "welcome_screen/plus.svg"
+                primaryColor: control.currentColor
             }
 
             Label

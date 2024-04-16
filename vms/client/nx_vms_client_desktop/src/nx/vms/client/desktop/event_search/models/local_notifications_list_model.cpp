@@ -20,26 +20,29 @@ namespace {
 // Same as for other notifications.
 static const auto kFailedDisplayTimeout = std::chrono::milliseconds(12500);
 
-QPixmap levelDecoration(QnNotificationLevel::Value level)
+QString levelDecorationPath(QnNotificationLevel::Value level)
 {
     switch (level)
     {
         case QnNotificationLevel::Value::SuccessNotification:
-            return qnSkin->pixmap("events/success_mark.png");
+            return "events/success_mark.svg";
+
         case QnNotificationLevel::Value::ImportantNotification:
-            return qnSkin->pixmap("events/alert_yellow.png");
         case QnNotificationLevel::Value::CriticalNotification:
-            return qnSkin->pixmap("events/alert_red.png");
+            return "events/alert_20.svg";
+
+        default:
+            return {};
     }
-    return {};
 }
 
-QPixmap progressDecoration(ProgressState progress)
+QString progressDecorationPath(ProgressState progress)
 {
     if (progress.isFailed())
-        return qnSkin->pixmap("events/alert_yellow.png");
+        return "events/alert_20.svg";
+
     if (progress.isCompleted())
-        return qnSkin->pixmap("events/success_mark.svg");
+        return "events/success_mark.svg";
 
     return {};
 }
@@ -102,8 +105,8 @@ LocalNotificationsListModel::LocalNotificationsListModel(WindowContext* context,
         this, changed({Qt::DisplayRole}));
     connect(manager, &workbench::LocalNotificationsManager::descriptionChanged,
         this, changed({Qn::DescriptionTextRole}));
-    connect(manager, &workbench::LocalNotificationsManager::iconChanged,
-        this, changed({Qt::DecorationRole}));
+    connect(manager, &workbench::LocalNotificationsManager::iconPathChanged,
+        this, changed({Qt::DecorationRole, Qn::DecorationPathRole}));
     connect(manager, &workbench::LocalNotificationsManager::cancellableChanged,
         this, changed({Qn::RemovableRole, Qn::TimeoutRole}));
     connect(manager, &workbench::LocalNotificationsManager::actionChanged,
@@ -175,14 +178,15 @@ QVariant LocalNotificationsListModel::data(const QModelIndex& index, int role) c
             return QVariant();
         }
 
-        case Qt::DecorationRole:
+        case Qn::DecorationPathRole:
         {
-            if (const auto pixmap = manager->icon(notificationId); !pixmap.isNull())
-                return pixmap;
-            if (const auto progress = manager->progress(notificationId))
-                return progressDecoration(*progress);
+            if (const auto path = manager->iconPath(notificationId); !path.isEmpty())
+                return path;
 
-            return levelDecoration(manager->level(notificationId));
+            if (const auto progress = manager->progress(notificationId))
+                return progressDecorationPath(*progress);
+
+            return levelDecorationPath(manager->level(notificationId));
         }
 
         case Qt::ForegroundRole:

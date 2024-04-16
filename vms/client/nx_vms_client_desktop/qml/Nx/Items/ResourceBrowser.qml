@@ -115,8 +115,8 @@ Item
             resourceTree.localFilesMode && !resourceTree.isFiltering
 
         icon: localFilesAbsent
-            ? "image://svg/skin/left_panel/placeholders/folder.svg"
-            : "image://svg/skin/left_panel/placeholders/search.svg"
+            ? "image://skin/left_panel/placeholders/folder.svg"
+            : "image://skin/left_panel/placeholders/search.svg"
 
         title: parent.localFilesAbsent ? qsTr("No local files") : qsTr("Nothing found")
 

@@ -196,7 +196,7 @@ Rectangle
     {
         visible: !control.hasConfig
         anchors.verticalCenterOffset: -32
-        imageSource: "image://svg/skin/user_settings/ldap_not_configured.svg"
+        imageSource: "image://skin/user_settings/ldap_not_configured.svg"
         text: qsTr("Not configured yet")
         additionalText: qsTr("Connect your Site to an LDAP server for easier user management")
 
@@ -447,7 +447,7 @@ Rectangle
                                 && !control.syncIsRunning
                                 && control.syncIntervalS > control.kShortSyncIntervalS
 
-                            icon.source: "image://svg/skin/user_settings/sync_ldap.svg"
+                            icon.source: "image://skin/user_settings/sync_ldap.svg"
                             icon.width: width
                             icon.height: height
                             icon.color: hovered
@@ -500,7 +500,7 @@ Rectangle
                         text: qsTr("Advanced Settings")
                         font: Qt.font({pixelSize: 14, weight: Font.Normal})
                         color: ColorTheme.colors.light16
-                        icon.source: "image://svg/skin/user_settings/ldap_advanced_settings.svg"
+                        icon.source: "image://skin/user_settings/ldap_advanced_settings.svg"
 
                         onClicked:
                         {
@@ -537,7 +537,7 @@ Rectangle
                         text: qsTr("Disconnect")
                         font: Qt.font({pixelSize: 14, weight: Font.Normal})
                         color: ColorTheme.colors.light16
-                        icon.source: "image://svg/skin/user_settings/disconnect.svg"
+                        icon.source: "image://skin/user_settings/disconnect.svg"
 
                         onClicked: self.requestLdapReset()
                     }
@@ -704,7 +704,7 @@ Rectangle
 
                             hoverEnabled: true
 
-                            icon.source: "image://svg/skin/user_settings/trash.svg"
+                            icon.source: "image://skin/user_settings/trash.svg"
                             icon.width: width
                             icon.height: height
                             icon.color: hovered ? ColorTheme.colors.light15 : ColorTheme.colors.light16
@@ -724,7 +724,7 @@ Rectangle
                 Image
                 {
                     Layout.alignment: Qt.AlignTop
-                    source: "image://svg/skin/user_settings/warning_icon.svg"
+                    source: "image://skin/user_settings/warning_icon.svg"
                     sourceSize: Qt.size(20, 20)
                 }
 

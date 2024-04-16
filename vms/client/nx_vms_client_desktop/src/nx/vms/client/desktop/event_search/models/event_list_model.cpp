@@ -3,6 +3,7 @@
 #include "event_list_model.h"
 
 #include <core/resource/camera_resource.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 
@@ -43,10 +44,8 @@ QVariant EventListModel::data(const QModelIndex& index, int role) const
         case Qt::DisplayRole:
             return QVariant::fromValue(event.title);
 
-        case Qt::DecorationRole:
-            return QVariant::fromValue(event.titleColor.isValid()
-                    ? qnSkin->colorize(event.icon, event.titleColor)
-                    : event.icon);
+        case Qn::DecorationPathRole:
+            return event.iconPath;
 
         case Qn::UuidRole:
             return QVariant::fromValue(event.id);

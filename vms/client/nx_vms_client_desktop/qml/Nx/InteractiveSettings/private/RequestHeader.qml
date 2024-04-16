@@ -27,11 +27,13 @@ RowLayout
 
         property alias text: authCode.text
 
-        IconImage
+        ColoredImage
         {
             id: image
-            source: "image://svg/skin/welcome_screen/tile/lock.svg"
-            color: ColorTheme.highlight
+
+            sourcePath: "image://skin/welcome_screen/tile/lock.svg"
+            sourceSize: Qt.size(10, 14)
+            primaryColor: ColorTheme.highlight
         }
 
         Text

@@ -143,13 +143,12 @@ Control
                 }
             }
 
-            Image
+            ColoredImage
             {
                 Layout.margins: 6
                 Layout.alignment: Qt.AlignTop
 
-                source: "image://svg/skin/user_settings/arrow_down.svg"
-
+                sourcePath: "image://skin/user_settings/arrow_down.svg"
                 sourceSize: Qt.size(16, 16)
             }
         }

@@ -528,7 +528,7 @@ FocusScope
                     }
                 }
 
-                SvgImage
+                ColoredImage
                 {
                     id: button
 
@@ -547,8 +547,8 @@ FocusScope
                             return ""
 
                         return model.expanded
-                            ? "image://svg/skin/20x20/Solid/arrow_open.svg"
-                            : "image://svg/skin/20x20/Solid/arrow_close.svg"
+                            ? "image://skin/20x20/Solid/arrow_open.svg"
+                            : "image://skin/20x20/Solid/arrow_close.svg"
                     }
                     sourceSize: Qt.size(20, 20)
                     primaryColor: "dark17"

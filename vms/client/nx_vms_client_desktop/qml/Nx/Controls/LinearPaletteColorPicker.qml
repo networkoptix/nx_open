@@ -39,7 +39,7 @@ Item
                 ColorImage
                 {
                     anchors.centerIn: parent
-                    source: "image://svg/skin/buttons/ok_20.svg"
+                    source: "image://skin/buttons/ok_20.svg"
                     color: checkColor
                     visible: parent.current
                 }

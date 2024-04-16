@@ -39,7 +39,7 @@ public:
         QString description;
         QString toolTip;
         std::chrono::microseconds timestamp{0};
-        QPixmap icon;
+        QString iconPath;
         QColor titleColor;
         bool removable = false;
         std::chrono::milliseconds lifetime{0};

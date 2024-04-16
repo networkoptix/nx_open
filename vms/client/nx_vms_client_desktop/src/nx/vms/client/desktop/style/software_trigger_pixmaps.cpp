@@ -44,6 +44,11 @@ QString SoftwareTriggerPixmaps::effectivePixmapName(const QString& name)
     return hasPixmap(name) ? name : defaultPixmapName();
 }
 
+QString SoftwareTriggerPixmaps::effectivePixmapPath(const QString& name)
+{
+    return pixmapsPath() + effectivePixmapName(name) + kPixmapExtension;
+}
+
 const QStringList& SoftwareTriggerPixmaps::pixmapNames()
 {
     static const QStringList pixmapNames =

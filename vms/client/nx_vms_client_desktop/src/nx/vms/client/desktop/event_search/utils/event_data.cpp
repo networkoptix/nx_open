@@ -13,67 +13,25 @@
 
 namespace nx::vms::client::desktop {
 
-using nx::vms::event::Level;
 using nx::vms::rules::Icon;
 
-namespace {
-
-static const QColor kLight12Color = "#91A7B2";
-static const QColor kLight10Color = "#A5B7C0";
-static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
-    {QnIcon::Normal, {{kLight12Color, "light12"}, {kLight10Color, "light10"}}},
+static const QMap<Icon, QString> kIconPaths = {
+    {Icon::alert, "events/alert_20.svg"},
+    {Icon::motion, "events/motion.svg"},
+    {Icon::license, "events/license_20.svg"},
+    {Icon::connection, "events/connection_20.svg"},
+    {Icon::storage, "events/storage_20.svg"},
+    {Icon::server, "events/server_20.svg"},
 };
-
-struct IconInfo
-{
-    QString defaultPath;
-    QMap<Level, QString> pathByLevel;
-
-    QString icon(Level level) const
-    {
-        return pathByLevel.value(level, defaultPath);
-    }
-};
-
-static const QMap<Icon, IconInfo> kIconByLevel = {
-    {Icon::alert, {"events/alert_20.svg", {
-        {Level::critical, "events/alert_red.png"},
-        {Level::important, "events/alert_yellow.png"},
-    }}},
-    {Icon::motion, {"events/motion.svg", {}}},
-    {Icon::license, {"events/license_red.png", {}}},
-    {Icon::connection, {"events/connection_20.svg", {
-        {Level::critical, "events/connection_red.png"},
-        {Level::important, "events/connection_yellow.png"},
-    }}},
-    {Icon::storage, {"events/storage_20.svg", {
-        {Level::success, "events/storage_green.png"},
-        {Level::critical, "events/storage_red.png"},
-    }}},
-    {Icon::server, {"events/server_20.svg", {
-        {Level::critical, "events/server_red.png"},
-        {Level::important, "events/server_yellow.png"},
-    }}},
-
-};
-
-QPixmap toPixmap(const QIcon& icon)
-{
-    return core::Skin::maximumSizePixmap(icon);
-}
-
-} // namespace
 
 bool needIconDevices(nx::vms::rules::Icon icon)
 {
     return icon == nx::vms::rules::Icon::resource;
 }
 
-QPixmap eventIcon(
+QString eventIconPath(
     nx::vms::rules::Icon icon,
-    nx::vms::event::Level level,
     const QString& custom,
-    const QColor& color,
     const QnResourceList& devices)
 {
     switch (icon)
@@ -82,27 +40,15 @@ QPixmap eventIcon(
             return {};
 
         case Icon::resource:
-            return toPixmap(!devices.isEmpty()
-                ? qnResIconCache->icon(devices.front())
-                : qnResIconCache->icon(QnResourceIconCache::Camera));
+            return devices.isEmpty()
+                ? qnResIconCache->iconPath(QnResourceIconCache::Camera)
+                : qnResIconCache->iconPath(devices.front());
 
         case Icon::custom:
-            return SoftwareTriggerPixmaps::colorizedPixmap(
-                custom,
-                color.isValid() ? color : QPalette().light().color());
+            return SoftwareTriggerPixmaps::effectivePixmapPath(custom);
 
         default:
-            if (const auto& path = kIconByLevel.value(icon).icon(level);
-                NX_ASSERT(!path.isEmpty(), "Unhandled icon: %1, level: %2, devices: %3",
-                    icon, level, devices))
-            {
-                if (path.endsWith(".svg"))
-                    return qnSkin->icon(path, kIconSubstitutions).pixmap(QSize(20, 20));
-
-                return qnSkin->colorize(qnSkin->pixmap(path), color);
-            }
-
-            return {};
+            return kIconPaths.value(icon);
     }
 }
 

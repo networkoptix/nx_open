@@ -102,15 +102,15 @@ MenuItem
         color: menuItem.highlighted ? ColorTheme.highlight : "transparent"
     }
 
-    arrow: IconImage
+    arrow: ColoredImage
     {
         anchors.right: parent.right
         anchors.verticalCenter: parent.verticalCenter
         visible: !!menuItem.subMenu
 
-        source: "image://svg/skin/text_buttons/arrow_right_20.svg"
+        sourcePath: "image://skin/text_buttons/arrow_right_20.svg"
         sourceSize: Qt.size(20, 20)
-        color: itemText.color
+        primaryColor: itemText.color
     }
 
     indicator: null

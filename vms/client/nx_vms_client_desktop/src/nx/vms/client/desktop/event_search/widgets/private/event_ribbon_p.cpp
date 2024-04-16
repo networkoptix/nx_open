@@ -331,7 +331,8 @@ void EventRibbon::Private::updateTile(int index)
     // Tile is a normal information tile.
     widget->setProgressBarVisible(false);
     widget->setTitle(title);
-    widget->setIcon(modelIndex.data(Qt::DecorationRole).value<QPixmap>());
+    widget->setTitleColor(modelIndex.data(Qt::ForegroundRole).value<QColor>());
+    widget->setIconPath(modelIndex.data(Qn::DecorationPathRole).value<QString>());
     widget->setTimestamp(modelIndex.data(Qn::TimestampTextRole).toString());
     widget->setDescription(tileDescription);
     widget->setFooterText(modelIndex.data(Qn::AdditionalTextRole).toString());
@@ -341,7 +342,6 @@ void EventRibbon::Private::updateTile(int index)
     widget->setCloseable(modelIndex.data(Qn::RemovableRole).toBool());
     widget->setAction(modelIndex.data(Qn::CommandActionRole).value<CommandActionPtr>());
     widget->setAdditionalAction(modelIndex.data(Qn::AdditionalActionRole).value<CommandActionPtr>());
-    widget->setTitleColor(modelIndex.data(Qt::ForegroundRole).value<QColor>());
     widget->setFooterEnabled(m_footersEnabled);
     widget->setHeaderEnabled(m_headersEnabled);
 

@@ -12,12 +12,10 @@ namespace nx::vms::client::desktop {
 
 bool needIconDevices(nx::vms::rules::Icon icon);
 
-QPixmap eventIcon(
+QString eventIconPath(
     nx::vms::rules::Icon icon,
-    nx::vms::event::Level level,
-    const QString& custom,
-    const QColor& color,
-    const QnResourceList& devices);
+    const QString& custom = {},
+    const QnResourceList& devices = {});
 
 QString eventTitle(const QVariantMap& details);
 

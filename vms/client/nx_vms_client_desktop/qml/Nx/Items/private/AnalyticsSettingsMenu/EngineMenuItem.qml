@@ -23,13 +23,13 @@ MenuSection
     iconSource:
     {
         if (type === "api" && !requestId)
-            return "image://svg/skin/integrations/api_integration.svg"
+            return "image://skin/integrations/api_integration.svg"
         if (type === "api" && !!engineId && !!requestId)
-            return "image://svg/skin/integrations/api_integration_request.svg"
+            return "image://skin/integrations/api_integration_request.svg"
         if (type === "api" && !engineId && !!requestId)
-            return "image://svg/skin/integrations/new_api_integration_request.svg"
+            return "image://skin/integrations/new_api_integration_request.svg"
 
-        return "image://svg/skin/integrations/sdk_integration.svg"
+        return "image://skin/integrations/sdk_integration.svg"
     }
 
     onClicked:

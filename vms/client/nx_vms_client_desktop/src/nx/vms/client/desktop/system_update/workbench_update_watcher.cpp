@@ -353,11 +353,7 @@ void WorkbenchUpdateWatcher::notifyUserAboutWorkbenchUpdate(
             ? QnNotificationLevel::Value::ImportantNotification
             : QnNotificationLevel::Value::CommonNotification);
 
-    m_private->notificationsManager->setIcon(
-        updateNotificationId,
-        majorVersionChange
-            ? qnSkin->pixmap("events/update_auto_1_major.svg")
-            : qnSkin->pixmap("events/update_auto_1.svg"));
+    m_private->notificationsManager->setIconPath(updateNotificationId, "events/update_auto_1.svg");
 
     m_private->notificationsManager->setAction(updateNotificationId, m_updateAction);
     m_private->notificationsManager->setAdditionalAction(updateNotificationId, m_skipAction);

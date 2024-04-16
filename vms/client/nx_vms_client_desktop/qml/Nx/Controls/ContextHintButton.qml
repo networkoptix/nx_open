@@ -20,7 +20,7 @@ Control
 
     focusPolicy: Qt.NoFocus
 
-    contentItem: SvgImage
+    contentItem: ColoredImage
     {
         id: image
 
@@ -28,7 +28,7 @@ Control
             ? "dark15"
             : "dark14"
 
-        sourcePath: "skin/buttons/context_hint_16.svg"
+        sourcePath: "image://skin/buttons/context_hint_16.svg"
         sourceSize: Qt.size(16, 16)
 
         baselineOffset: 12.5

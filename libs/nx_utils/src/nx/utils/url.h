@@ -5,6 +5,7 @@
 #include <iostream>
 
 #include <QtCore/QUrl>
+#include <QtCore/QVariantMap>
 
 #include <nx/reflect/instrument.h>
 #include <nx/utils/serialization/qt_core_types.h>
@@ -140,6 +141,8 @@ public:
     Q_INVOKABLE QString query(QUrl::ComponentFormattingOptions = QUrl::PrettyDecoded) const;
     Q_INVOKABLE bool hasQueryItem(const QString& key) const;
     Q_INVOKABLE QString queryItem(const QString& key) const;
+    QList<QPair<QString, QString>> queryItems() const;
+    Q_INVOKABLE QVariantMap queryMap() const;
 
     void setPathAndQuery(const QString& pathAndQuery, QUrl::ParsingMode mode = QUrl::DecodedMode);
     void setPathAndQuery(std::string_view pathAndQuery, QUrl::ParsingMode mode = QUrl::DecodedMode);

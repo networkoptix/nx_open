@@ -125,8 +125,8 @@ QVariant SimpleMotionSearchListModel::data(const QModelIndex& index, int role) c
         case Qt::DisplayRole:
             return tr("Motion");
 
-        case Qt::DecorationRole:
-            return QVariant::fromValue(qnSkin->icon(kCameraIcon).pixmap(20, 20));
+        case Qn::DecorationPathRole:
+            return "tree/camera.svg";
 
         case Qn::HelpTopicIdRole:
             return rules::eventHelpId(vms::api::EventType::cameraMotionEvent);

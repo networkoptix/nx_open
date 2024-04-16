@@ -42,18 +42,18 @@ Nx.TextField
         focusPolicy: Qt.NoFocus
         padding: 0
 
-        icon.color: searchField.text ? searchField.color : searchField.placeholderTextColor
-
         icon.source: searchField.menu
-            ? "image://svg/skin/tree/search_drop.svg"
-            : "image://svg/skin/tree/search.svg"
+            ? "image://skin/tree/search_drop.svg"
+            : "image://skin/tree/search.svg"
+
+        icon.color: searchField.text ? searchField.color : searchField.placeholderTextColor
 
         icon.width: implicitWidth
         icon.height: implicitHeight
 
         contentItem: Item
         {
-            Nx.IconImage
+            Nx.ColoredImage
             {
                 id: image
 
@@ -65,10 +65,10 @@ Nx.TextField
                 width: implicitWidth * factor
                 height: implicitHeight * factor
 
-                source: actionButton.icon.source
+                sourcePath: actionButton.icon.source
                 sourceSize: searchField.menu ? Qt.size(39, 32) : Qt.size(31, 32)
 
-                color: actionButton.icon.color
+                primaryColor: actionButton.icon.color
             }
         }
 
@@ -98,7 +98,7 @@ Nx.TextField
         anchors.verticalCenter: parent.verticalCenter
         padding: 0
         focusPolicy: Qt.NoFocus
-        icon.source: "image://svg/skin/text_buttons/cross_close_20.svg"
+        icon.source: "image://skin/text_buttons/cross_close_20.svg"
         icon.color: searchField.color
 
         enabled: searchField.text

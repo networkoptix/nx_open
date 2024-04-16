@@ -225,7 +225,7 @@ Item
             {
                 const muted = muteButton.muted || !AudioDispatcher.audioEnabled
                 const filename = muted ? "unmute.svg" : "mute.svg"
-                return `image://svg/skin/advanced_search_dialog/${filename}`
+                return `image://skin/advanced_search_dialog/${filename}`
             }
 
             tooltipText: qsTr("Toggle Mute")
@@ -266,7 +266,7 @@ Item
 
                 enabled: controls.prevEnabled && buttons.enabled
 
-                icon.source: "image://svg/skin/advanced_search_dialog/previous.svg"
+                icon.source: "image://skin/advanced_search_dialog/previous.svg"
                 tooltipText: qsTr("Previous Object")
 
                 onClicked:
@@ -279,7 +279,7 @@ Item
 
                 enabled: buttons.enabled && preview.isReady
 
-                icon.source: `image://svg/skin/advanced_search_dialog/${preview.playing ? "pause" : "play"}.svg`
+                icon.source: `image://skin/advanced_search_dialog/${preview.playing ? "pause" : "play"}.svg`
                 tooltipText: preview.playing ? qsTr("Pause") : qsTr("Play")
 
                 onClicked:
@@ -302,7 +302,7 @@ Item
 
                 enabled: controls.nextEnabled && buttons.enabled
 
-                icon.source: "image://svg/skin/advanced_search_dialog/next.svg"
+                icon.source: "image://skin/advanced_search_dialog/next.svg"
                 tooltipText: qsTr("Next Object")
 
                 onClicked:
@@ -316,7 +316,7 @@ Item
 
             enabled: buttons.enabled && preview.isReady
             anchors.right: parent.right
-            icon.source: "image://svg/skin/advanced_search_dialog/repeat.svg"
+            icon.source: "image://skin/advanced_search_dialog/repeat.svg"
             icon.width: 24
 
             tooltipText: qsTr("Toggle Repeat")

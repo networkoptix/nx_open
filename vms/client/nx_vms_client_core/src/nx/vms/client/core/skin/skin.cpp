@@ -10,6 +10,8 @@
 #include <QtCore/QMap>
 #include <QtCore/QPluginLoader>
 #include <QtCore/QString>
+#include <QtCore/QUrl>
+#include <QtCore/QUrlQuery>
 #include <QtGui/QIcon>
 #include <QtGui/QImage>
 #include <QtGui/QPainter>
@@ -19,6 +21,8 @@
 #include <QtWidgets/QStyleFactory>
 
 #include <nx/utils/log/log.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/svg_loader.h>
 
 #include "icon_loader.h"
 #include "svg_icon_colorer.h"
@@ -453,6 +457,63 @@ QPixmap Skin::colorize(const QPixmap& source, const QColor& color)
     painter.setCompositionMode(QPainter::CompositionMode_SourceAtop);
     painter.fillRect(QRect(QPoint(), result.size() / result.devicePixelRatio()), color);
 
+    return result;
+}
+
+QPixmap Skin::colorizedPixmap(
+    const QString& pathAndParams,
+    const QSize& desiredPhysicalSize,
+    QColor primaryColor,
+    qreal devicePixelRatio)
+{
+    QUrl url(pathAndParams);
+    if (!NX_ASSERT(url.isValid() && url.isRelative(),
+        "Invalid skin image relative URL: \"%1\"", pathAndParams))
+    {
+        return {};
+    }
+
+    QMap<QString /*source class name*/, QString /*target color name*/> colorMap;
+    for (const auto& [className, colorName]: QUrlQuery(url.query()).queryItems())
+        colorMap[className] = colorName;
+
+    static const QString kPrimaryKey = "primary";
+    if (primaryColor.isValid())
+    {
+        // Set/reset primary color to the specified value.
+        colorMap[kPrimaryKey] = primaryColor.name();
+    }
+
+    const auto path = url.path();
+    if (path.endsWith(".svg"))
+    {
+        const auto fullPath = this->path(path);
+        return NX_ASSERT(!fullPath.isEmpty(), "\"%1\" not found.", path)
+            ? loadSvgImage(fullPath, colorMap, desiredPhysicalSize, devicePixelRatio)
+            : QPixmap{};
+    }
+
+    // Only optional primary channel is allowed for non-SVG images.
+    NX_ASSERT(colorMap.empty() || (colorMap.size() == 1 && colorMap.contains(kPrimaryKey)));
+
+    auto result = pixmap(path);
+    if (!NX_ASSERT(!result.isNull()))
+        return result;
+
+    if (colorMap.contains(kPrimaryKey))
+    {
+        const auto colorName = colorMap.value(kPrimaryKey);
+        const auto targetColor = colorTheme()->safeColor(colorName);
+
+        NX_ASSERT(targetColor.isValid(), "Invalid color \"%1\" for image \"%2\"", colorName, path);
+        if (targetColor.isValid())
+            result = colorize(result, targetColor);
+    }
+
+    if (!desiredPhysicalSize.isEmpty())
+        result = result.scaled(desiredPhysicalSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+
+    result.setDevicePixelRatio(devicePixelRatio);
     return result;
 }
 

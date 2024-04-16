@@ -11,7 +11,7 @@ namespace nx::vms::client::desktop {
 
 namespace {
 
-static const QString kIconsDir = "image://svg/skin/user_settings/access_rights/";
+static const QString kIconsDir = "user_settings/access_rights/";
 
 } // namespace
 

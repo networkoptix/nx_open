@@ -141,7 +141,7 @@ Rectangle
                 width: sourceSize.width
                 height: maxHeight - (logoArea.maxHeight - logoArea.height) / squeezefactor
 
-                source: "qrc:/skin/welcome_page/logo.png"
+                source: "image://skin/welcome_page/logo.png"
                 fillMode: (sourceSize.height < height) && (sourceSize.width < width)
                     ? Image.Pad
                     : Image.PreserveAspectFit

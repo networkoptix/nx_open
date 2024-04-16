@@ -34,7 +34,7 @@ Button
 
             fillMode: Image.Stretch
 
-            source: "image://svg/skin/welcome_screen/tile/connect_to_server.svg"
+            source: "image://skin/welcome_screen/tile/connect_to_server.svg"
             sourceSize: Qt.size(width, height)
         }
 

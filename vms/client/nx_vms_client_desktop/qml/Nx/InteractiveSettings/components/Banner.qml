@@ -34,7 +34,7 @@ Control
         {
             id: image
 
-            source: "qrc:///skin/analytics_icons/settings/%1.png".arg(icon)
+            source: "image://skin/analytics_icons/settings/%1.png".arg(icon)
 
             Layout.preferredWidth: 20
             Layout.preferredHeight: 20

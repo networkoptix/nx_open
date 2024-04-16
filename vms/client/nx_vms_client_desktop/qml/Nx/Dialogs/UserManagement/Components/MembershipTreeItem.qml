@@ -70,7 +70,7 @@ Item
                 width: 20
                 height: 20
 
-                source: "image://svg/skin/user_settings/tree_item_linked.svg"
+                source: "image://skin/user_settings/tree_item_linked.svg"
                 sourceSize: Qt.size(width, height)
 
                 visible: !treeItem.isTopLevel
@@ -83,7 +83,7 @@ Item
                 width: groupImage.width
                 height: groupImage.height
 
-                SvgImage
+                ColoredImage
                 {
                     id: groupImage
                     width: 20
@@ -134,7 +134,7 @@ Item
                 visible: treeItem.hovered && treeItem.enabled
                 hoverEnabled: true
 
-                icon.source: "image://svg/skin/user_settings/tree_item_remove.svg"
+                icon.source: "image://skin/user_settings/tree_item_remove.svg"
                 icon.width: width
                 icon.height: height
 

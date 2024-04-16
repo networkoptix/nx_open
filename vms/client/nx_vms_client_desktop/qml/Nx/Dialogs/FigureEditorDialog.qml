@@ -191,7 +191,7 @@ Window
             {
                 text: qsTr("Clear")
 
-                icon.source: "image://svg/skin/text_buttons/reload_20.svg"
+                icon.source: "image://skin/text_buttons/reload_20.svg"
                 anchors.verticalCenter: parent.verticalCenter
                 visible: dialog.showClearButton
                 onClicked: editor.clear()
