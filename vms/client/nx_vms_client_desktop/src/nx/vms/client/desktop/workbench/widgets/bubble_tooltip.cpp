@@ -89,6 +89,10 @@ BubbleToolTip::BubbleToolTip(
     d->widget->setAttribute(Qt::WA_TranslucentBackground);
     d->widget->setAttribute(Qt::WA_ShowWithoutActivating);
     d->widget->setAttribute(Qt::WA_AlwaysStackOnTop);
+
+    // The custom patch in Qt allows us to partially disable the updates.
+    d->widget->setProperty("_disable_updates", true);
+
     d->widget->setMouseTracking(true);
     d->widget->setSource(componentUrl);
     d->widget->setObjectName("BubbleTooltip");
@@ -112,7 +116,8 @@ void BubbleToolTip::show()
     {
         d->widget->setParent(mainWindowWidget());
         invokeQmlMethod<void>(d->widget->rootObject(), "show");
-        d->widget->raise();
+        if (d->state != State::shown)
+            d->widget->raise();
     }
 
     d->setState(State::shown);
