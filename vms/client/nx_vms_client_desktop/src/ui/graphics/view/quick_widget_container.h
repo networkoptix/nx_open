@@ -20,16 +20,23 @@ class QuickWidgetContainer: public QWidget
 public:
     using base_type::base_type;
 
+    void setView(QWidget* view);
+    QWidget* view() const;
+
     void setQuickWidget(QQuickWidget* quickWidget);
     QQuickWidget* quickWidget() const;
+
+    QPaintEngine* paintEngine() const override;
 
 protected:
     void moveEvent(QMoveEvent* event) override;
     void resizeEvent(QResizeEvent* event) override;
     void showEvent(QShowEvent* event) override;
+    bool event(QEvent* event) override;
 
 private:
     QPointer<QQuickWidget> m_quickWidget;
+    QPointer<QWidget> m_view;
 };
 
 } // namespace nx::vms::client::desktop
