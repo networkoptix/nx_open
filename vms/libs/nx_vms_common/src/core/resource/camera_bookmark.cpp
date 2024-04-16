@@ -133,7 +133,7 @@ const QString CameraBookmark::kCreationEndTimeParam("creationEndTimeMs");
 bool CameraBookmark::bookmarkMatchesFilter(api::BookmarkShareFilters filters) const
 {
     // Only perform share specific filtering if the filter asks for shareable bookmarks.
-    if (!filters.testFlag(nx::vms::api::BookmarkShareFilter::shareable))
+    if (!filters.testFlag(nx::vms::api::BookmarkShareFilter::shared))
         return true;
 
     if (filters.testFlag(nx::vms::api::BookmarkShareFilter::hasExpiration))
