@@ -66,6 +66,7 @@ void Metatypes::initialize()
     qRegisterMetaType<nx::vms::rules::ClientAction>();
     QnJsonSerializer::registerSerializer<nx::vms::rules::ClientAction>();
 
+    qRegisterMetaType<nx::vms::rules::ActionPtr>("nx::vms::rules::ActionPtr");
     qRegisterMetaType<nx::vms::rules::EventPtr>();
     qRegisterMetaType<std::vector<nx::vms::rules::EventPtr>>();
 

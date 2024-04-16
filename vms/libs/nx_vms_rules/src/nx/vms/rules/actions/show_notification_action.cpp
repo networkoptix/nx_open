@@ -19,6 +19,7 @@ const ItemDescriptor& NotificationAction::manifest()
         .id = utils::type<NotificationAction>(),
         .displayName = tr("Show Desktop Notification"),
         .description = "",
+        .executionTargets = {ExecutionTarget::clients, ExecutionTarget::cloud},
         .fields = {
             makeFieldDescriptor<EventIdField>(utils::kIdFieldName, "Event ID"),
             utils::makeTargetUserFieldDescriptor(tr("To")),
@@ -48,7 +49,11 @@ const ItemDescriptor& NotificationAction::manifest()
             utils::makeExtractDetailFieldDescriptor("clientAction", utils::kClientActionDetailName),
             utils::makeExtractDetailFieldDescriptor("url", utils::kUrlDetailName),
             utils::makeExtractDetailFieldDescriptor("extendedCaption", utils::kExtendedCaptionDetailName),
-        }
+        },
+        .resources = {
+            {utils::kDeviceIdsFieldName, {ResourceType::device}},
+            {utils::kServerIdFieldName, {ResourceType::server}},
+        },
     };
     return kDescriptor;
 }

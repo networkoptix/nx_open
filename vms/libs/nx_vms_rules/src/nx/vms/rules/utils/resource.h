@@ -22,5 +22,7 @@ NX_VMS_RULES_API bool isUserSelected(
     const common::SystemContext* context,
     nx::Uuid userId);
 
+NX_VMS_RULES_API UuidList getResourceIds(const QObject* entity, std::string_view fieldName);
+
 } // namespace utils
 } // namespace nx::vms::rules

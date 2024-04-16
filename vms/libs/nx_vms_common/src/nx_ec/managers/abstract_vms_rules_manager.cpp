@@ -34,12 +34,21 @@ ErrorCode AbstractVmsRulesManager::deleteRuleSync(const nx::Uuid& id)
         });
 }
 
-Result AbstractVmsRulesManager::broadcastEventSync(const nx::vms::api::rules::EventInfo& info)
+Result AbstractVmsRulesManager::transmitEventSync(const nx::vms::api::rules::EventInfo& info)
 {
     return detail::callSync(
         [&](auto handler)
         {
-            broadcastEvent(info, std::move(handler));
+            transmitEvent(info, std::move(handler));
+        });
+}
+
+Result AbstractVmsRulesManager::transmitActionSync(const nx::vms::api::rules::ActionInfo& info)
+{
+    return detail::callSync(
+        [&](auto handler)
+        {
+            transmitAction(info, std::move(handler));
         });
 }
 

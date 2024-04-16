@@ -700,8 +700,9 @@ TEST_F(EngineTest, stopProlongedActionsIsEmittedWhenRuleIsDisabled)
     const auto sourceCamera = Uuid::createUuid();
     event->m_cameraId = sourceCamera;
 
-    // After the event is stared.
+    // After the event is started.
     connector.process(event);
+    EXPECT_EQ(executor.actions.size(), 1);
 
     // Disable rule.
     rule->setEnabled(false);

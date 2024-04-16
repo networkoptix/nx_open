@@ -15,6 +15,7 @@ const ItemDescriptor& EnterFullscreenAction::manifest()
         .id = utils::type<EnterFullscreenAction>(),
         .displayName = tr("Set to Fullscreen"),
         .flags = ItemFlag::instant,
+        .executionTargets = ExecutionTarget::clients,
         .fields = {
             makeFieldDescriptor<TargetSingleDeviceField>(
                 utils::kCameraIdFieldName, tr("Camera"), {}, {}, {utils::kLayoutIdsFieldName}),
@@ -22,7 +23,11 @@ const ItemDescriptor& EnterFullscreenAction::manifest()
             utils::makeTargetUserFieldDescriptor(
                 tr("Set for"), {}, utils::UserFieldPreset::All, /*visible*/ false),
             utils::makePlaybackFieldDescriptor(tr("Rewind")),
-        }
+        },
+        .resources = {
+            {utils::kCameraIdFieldName, {ResourceType::device}},
+            {utils::kLayoutIdsFieldName, {ResourceType::layout}},
+        },
     };
     return kDescriptor;
 }

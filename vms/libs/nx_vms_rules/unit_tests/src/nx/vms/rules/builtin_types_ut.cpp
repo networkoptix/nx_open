@@ -102,7 +102,6 @@ public:
             utils::kUserIdFieldName,
             utils::kServerIdFieldName,
             utils::kServerIdsFieldName,
-            utils::kLayoutIdsFieldName,
             utils::kEngineIdFieldName,
             utils::kLayoutIdFieldName,
             utils::kLayoutIdsFieldName,
@@ -128,22 +127,31 @@ public:
     {
         const auto& manifest = T::manifest();
         const auto& meta = T::staticMetaObject;
+        static const auto propTypes =
+            std::set{qMetaTypeId<nx::Uuid>(), qMetaTypeId<UuidList>(), qMetaTypeId<UuidSet>()};
+
+        int targetCount = 0;
 
         // Check all permission fields correspond to properties with the same name.
         for (const auto& [fieldName, descriptor]: manifest.resources)
         {
             SCOPED_TRACE(nx::format("Resource permission field: %1", fieldName).toStdString());
             ASSERT_FALSE(fieldName.empty());
-            EXPECT_FALSE(!descriptor.createPermissions);
 
             const auto propIndex = meta.indexOfProperty(fieldName.c_str());
             EXPECT_GE(propIndex, 0);
 
             const auto prop = meta.property(propIndex);
             EXPECT_TRUE(prop.isValid());
-            EXPECT_TRUE(prop.userType() == qMetaTypeId<nx::Uuid>()
-                || prop.userType() == qMetaTypeId<UuidList>());
+            EXPECT_TRUE(propTypes.contains(prop.userType()));
+
+            if (descriptor.flags.testFlag(FieldFlag::target))
+                ++targetCount;
         }
+
+        EXPECT_LE(targetCount, 1);
+        if (manifest.targetServers == TargetServers::resourceOwner)
+            EXPECT_EQ(targetCount, 1);
     }
 
     template<class T, class... Args>
@@ -211,6 +219,7 @@ public:
         SCOPED_TRACE(nx::format("Action id: %1", manifest.id).toStdString());
 
         testManifestValidity<T>();
+        testResourceDescriptors<T>();
         testPermissionsValidity<T>();
 
         // Check if all fields are registered.

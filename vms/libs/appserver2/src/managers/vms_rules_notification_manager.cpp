@@ -2,9 +2,6 @@
 
 #include "vms_rules_notification_manager.h"
 
-#include <nx_ec/data/api_conversion_functions.h>
-#include <nx/vms/event/actions/abstract_action.h>
-
 namespace ec2
 {
 
@@ -36,11 +33,16 @@ void VmsRulesNotificationManager::triggerNotification(
     const QnTransaction<nx::vms::api::rules::EventInfo>& tran,
     NotificationSource /*source*/)
 {
-    NX_ASSERT(tran.command == ApiCommand::broadcastVmsEvent
-        || tran.command == ApiCommand::transmitVmsEvent);
-
-    // TODO: #spanasenko Check action type.
+    NX_ASSERT(tran.command == ApiCommand::transmitVmsEvent);
     emit eventReceived(tran.params);
+}
+
+void VmsRulesNotificationManager::triggerNotification(
+    const QnTransaction<nx::vms::api::rules::ActionInfo>& tran,
+    NotificationSource /*source*/)
+{
+    NX_ASSERT(tran.command == ApiCommand::transmitVmsAction);
+    emit actionReceived(tran.params);
 }
 
 } // namespace ec2

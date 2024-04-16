@@ -17,6 +17,8 @@ const ItemDescriptor& BuzzerAction::manifest()
         .id = utils::type<BuzzerAction>(),
         .displayName = tr("Buzzer"),
         .flags = ItemFlag::prolonged,
+        .executionTargets = ExecutionTarget::servers,
+        .targetServers = TargetServers::resourceOwner,
         .fields = {
             makeFieldDescriptor<TargetServerField>(utils::kServerIdsFieldName, tr("At")),
             utils::makeTimeFieldDescriptor<OptionalTimeField>(
@@ -26,6 +28,7 @@ const ItemDescriptor& BuzzerAction::manifest()
                 {.initialValue = 1s, .defaultValue = 1s, .maximumValue = 24h, .minimumValue = 1s}),
             utils::makeIntervalFieldDescriptor(tr("Action Throttling")),
         },
+        .resources = {{utils::kServerIdsFieldName, {ResourceType::server, {}, {}, FieldFlag::target}}},
         .serverFlags = {api::ServerFlag::SF_HasBuzzer}
     };
     return kDescriptor;

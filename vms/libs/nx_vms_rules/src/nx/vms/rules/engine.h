@@ -46,9 +46,7 @@ class NX_VMS_RULES_API Engine: public QObject
     Q_OBJECT
 
 public:
-    using RulePtr = std::shared_ptr<Rule>;
     using RuleSet = std::unordered_map<nx::Uuid, RulePtr>;
-    using ConstRulePtr = std::shared_ptr<const Rule>;
     using ConstRuleSet = std::unordered_map<nx::Uuid, ConstRulePtr>;
 
     using EventConstructor = std::function<BasicEvent*()>;
@@ -62,6 +60,7 @@ public:
     ~Engine();
 
     void setId(nx::Uuid id);
+    Router* router() const;
 
     bool isEnabled() const;
     bool isOldEngineEnabled() const;
@@ -74,10 +73,10 @@ public:
     ConstRuleSet rules() const;
 
     /** Returns rule with the given id or nullptr. */
-    ConstRulePtr rule(const nx::Uuid& id) const;
+    ConstRulePtr rule(nx::Uuid id) const;
 
     /** Returns a copy of the rule with the given id or nullptr. */
-    RulePtr cloneRule(const nx::Uuid& id) const;
+    RulePtr cloneRule(nx::Uuid id) const;
 
     /** Emits corresponding signal. */
     void updateRule(const api::Rule& ruleData);
@@ -197,8 +196,11 @@ private:
     std::unique_ptr<Rule> buildRule(const api::Rule& ruleData) const;
     std::unique_ptr<Rule> cloneRule(const Rule* rule) const;
 
-    void processAcceptedEvent(const nx::Uuid& ruleId, const EventData& eventData);
-    void processAction(const ActionPtr& action);
+    void onEventReceved(const EventPtr& event, const std::vector<ConstRulePtr>& triggeredRules);
+    void processAcceptedEvent(const EventPtr& event, const ConstRulePtr& rule);
+
+    void processAction(const ActionPtr& action) const;
+    void processAcceptedAction(const ActionPtr& action);
 
     std::unique_ptr<EventFilter> buildEventFilter(const ItemDescriptor& descriptor) const;
     std::unique_ptr<EventFilter> buildEventFilter(nx::Uuid id, const QString& type) const;

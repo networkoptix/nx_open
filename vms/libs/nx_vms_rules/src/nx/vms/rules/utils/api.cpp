@@ -2,14 +2,20 @@
 
 #include "api.h"
 
+#include <nx/utils/qobject.h>
+#include <nx/vms/api/rules/action_info.h>
+#include <nx/vms/api/rules/event_info.h>
 #include <nx/vms/api/rules/rule.h>
 #include <nx/vms/common/utils/schedule.h>
 
 #include "../action_builder.h"
 #include "../action_builder_field.h"
+#include "../basic_action.h"
+#include "../basic_event.h"
 #include "../event_filter.h"
 #include "../event_filter_field.h"
 #include "../rule.h"
+#include "serialization.h"
 
 namespace nx::vms::rules {
 
@@ -81,6 +87,26 @@ api::ActionBuilder serialize(const ActionBuilder* builder)
     }
     result.id = builder->id();
     result.type = builder->actionType();
+
+    return result;
+}
+
+api::ActionInfo serialize(const BasicAction* action)
+{
+    return api::ActionInfo{
+        .ruleId = action->ruleId(),
+        .props = serializeProperties(action, nx::utils::propertyNames(action))
+    };
+}
+
+api::EventInfo serialize(const BasicEvent* event, UuidList ruleIds)
+{
+    nx::vms::api::rules::EventInfo result;
+
+    result.props = serializeProperties(event, nx::utils::propertyNames(event));
+
+    for (auto id: ruleIds)
+        result.triggeredRules.push_back(id);
 
     return result;
 }

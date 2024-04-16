@@ -1012,7 +1012,7 @@ APPLY(813, resetVmsRules, nx::vms::api::rules::ResetRules, \
     AllowForAllAccessOut(), /*< check remote peer rights for outgoing transaction */ \
     RegularTransactionType()) /*< regular transaction type */ \
 /**%apidoc */ \
-APPLY(814, broadcastVmsEvent, nx::vms::api::rules::EventInfo, \
+APPLY(814, transmitVmsEvent, nx::vms::api::rules::EventInfo, \
     false, /*< isPersistent */ \
     false, /*< isSystem */ \
     false, /*< isRemoveOperation */ \
@@ -1024,7 +1024,7 @@ APPLY(814, broadcastVmsEvent, nx::vms::api::rules::EventInfo, \
     AllowForAllAccessOut(), /*< check remote peer rights for outgoing transaction */ \
     RegularTransactionType()) /*< regular transaction type */ \
 /**%apidoc */ \
-APPLY(815, transmitVmsEvent, nx::vms::api::rules::EventInfo, \
+APPLY(815, transmitVmsAction, nx::vms::api::rules::ActionInfo, \
     false, /*< isPersistent */ \
     false, /*< isSystem */ \
     false, /*< isRemoveOperation */ \

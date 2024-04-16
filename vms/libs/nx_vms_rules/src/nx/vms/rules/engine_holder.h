@@ -19,6 +19,7 @@ class NX_VMS_RULES_API EngineHolder: public QObject
 public:
     EngineHolder(
         nx::vms::common::SystemContext* context,
+        std::unique_ptr<Router> router,
         std::unique_ptr<Plugin> plugin,
         bool separateThread);
     ~EngineHolder();

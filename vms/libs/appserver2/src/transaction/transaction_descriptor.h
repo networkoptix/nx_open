@@ -42,6 +42,7 @@
 #include <nx/vms/api/data/videowall_data.h>
 #include <nx/vms/api/data/videowall_license_overflow_data.h>
 #include <nx/vms/api/data/webpage_data.h>
+#include <nx/vms/api/rules/action_info.h>
 #include <nx/vms/api/rules/event_info.h>
 #include <nx/vms/api/rules/rule.h>
 #include <nx_ec/ec_api_fwd.h>

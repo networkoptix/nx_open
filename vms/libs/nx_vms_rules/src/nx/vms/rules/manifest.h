@@ -21,13 +21,8 @@ NX_REFLECTION_ENUM_CLASS(ItemFlag,
     instant = 1 << 0,
     prolonged = 1 << 1,
 
-    /**
-    * Separate action copies with different resources (filtered according to user permissions)
-    * may be created for different target users. One action copy without any filtration,
-    * containing all of the resources and no target users may be needed for server processing.
-    * The flag marks actions requiring such separate copy.
-    */
-    executeOnClientAndServer = 1 << 2,
+    /** The action may be displayed in the event log, but not in the rule editor. */
+    system = 1 << 2,
 
     /**
      * The default way to aggregate events is to use the EventPtr::aggregationKey function.
@@ -36,13 +31,26 @@ NX_REFLECTION_ENUM_CLASS(ItemFlag,
      */
     aggregationByTypeSupported = 1 << 3,
     omitLogging = 1 << 4,
-    /** The action may be displayed in event log, but not in rule editor. */
-    system = 1 << 5,
+
     /** The item may appear in the event log, but must not be created. */
-    deprecated = 1 << 6
+    deprecated = 1 << 5
 )
 
 Q_DECLARE_FLAGS(ItemFlags, ItemFlag)
+
+NX_REFLECTION_ENUM_CLASS(ExecutionTarget,
+    clients = 1 << 0,
+    servers = 1 << 1,
+    cloud = 1 << 2
+)
+
+Q_DECLARE_FLAGS(ExecutionTargets, ExecutionTarget)
+
+NX_REFLECTION_ENUM_CLASS(TargetServers,
+    currentServer,
+    resourceOwner,
+    serverWithPublicIp
+)
 
 NX_REFLECTION_ENUM_CLASS(ResourceType,
     none,
@@ -55,7 +63,10 @@ NX_REFLECTION_ENUM_CLASS(ResourceType,
 
 NX_REFLECTION_ENUM_CLASS(FieldFlag,
     none,
-    optional = 1 << 0
+    /** Allows absence of the resource. */
+    optional = 1 << 0,
+    /** Target resource for action routing. */
+    target = 1 << 1
 )
 
 Q_DECLARE_FLAGS(FieldFlags, FieldFlag)
@@ -129,6 +140,10 @@ struct ItemDescriptor
     /**%apidoc Item flags. */
     ItemFlags flags = ItemFlag::instant;
 
+    ExecutionTargets executionTargets = ExecutionTarget::servers;
+
+    TargetServers targetServers = TargetServers::currentServer;
+
     /**%apidoc The list of event filter fields or action builder fields. */
     QList<FieldDescriptor> fields;
 
@@ -153,8 +168,8 @@ struct ItemDescriptor
     vms::api::ServerFlags serverFlags;
 };
 #define nx_vms_rules_ItemDescriptor_Fields \
-    (id)(groupId)(displayName)(description)(flags)(fields)(resources) \
-    (readPermissions)(createPermissions)(emailTemplatePath)(serverFlags)
+    (id)(groupId)(displayName)(description)(flags)(executionTargets)(targetServers)(fields) \
+    (resources)(readPermissions)(createPermissions)(emailTemplatePath)(serverFlags)
 NX_VMS_RULES_API void serialize(
     QnJsonContext* ctx, const ItemDescriptor& value, QJsonValue* target);
 

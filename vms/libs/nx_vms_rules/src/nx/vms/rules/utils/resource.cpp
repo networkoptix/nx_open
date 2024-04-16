@@ -46,4 +46,23 @@ bool isUserSelected(
     return false;
 }
 
+UuidList getResourceIds(const QObject* entity, std::string_view fieldName)
+{
+    const auto value = entity->property(fieldName.data());
+
+    if (!value.isValid())
+        return {};
+
+    UuidList result;
+
+    if (value.canConvert<UuidList>())
+        result = value.value<UuidList>();
+    else if (value.canConvert<nx::Uuid>())
+        result.emplace_back(value.value<nx::Uuid>());
+
+    result.removeAll({});
+
+    return result;
+}
+
 } // namespace nx::vms::rules::utils

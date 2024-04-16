@@ -90,6 +90,7 @@ public:
             .id = utils::type<TestActionWithTargetUsers>(),
             .displayName = "Test action with users",
             .flags = ItemFlag::instant,
+            .executionTargets = {ExecutionTarget::clients},
             .fields = {
                 makeFieldDescriptor<TargetUserField>(utils::kUsersFieldName, "Users")},
         };
@@ -113,6 +114,7 @@ public:
             .id = utils::type<TestActionWithPermissions>(),
             .displayName = "Test action with permissions",
             .flags = ItemFlag::instant,
+            .executionTargets = {ExecutionTarget::clients},
             .fields = {
                 makeFieldDescriptor<TargetUserField>(utils::kUsersFieldName, "Users"),
                 makeFieldDescriptor<TargetDeviceField>(
@@ -138,7 +140,8 @@ public:
         return ItemDescriptor{
             .id = utils::type<TestActionForUserAndServer>(),
             .displayName = "Test action for user & server",
-            .flags = {ItemFlag::instant, ItemFlag::executeOnClientAndServer},
+            .flags = {ItemFlag::instant},
+            .executionTargets = {ExecutionTarget::clients, ExecutionTarget::servers},
             .fields = {
                 makeFieldDescriptor<TargetUserField>(utils::kUsersFieldName, "Users")},
         };

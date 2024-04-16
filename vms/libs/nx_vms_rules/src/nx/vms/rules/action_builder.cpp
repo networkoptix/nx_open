@@ -525,23 +525,17 @@ void ActionBuilder::buildAndEmitAction(const AggregatedEventPtr& aggregatedEvent
         return;
 
     Actions actions;
+    const auto manifest = engine()->actionDescriptor(actionType());
 
-    if (m_fields.contains(utils::kUsersFieldName))
-    {
+    if (manifest->executionTargets.testFlag(ExecutionTarget::clients))
         actions = buildActionsForTargetUsers(aggregatedEvent);
 
-        if (engine()->actionDescriptor(actionType())->flags
-            .testFlag(ItemFlag::executeOnClientAndServer))
-        {
-            // Action with all data, but without users for server processing.
-            auto serverAction = engine()->cloneAction(logAction);
-            serverAction->setProperty(utils::kUsersFieldName, {});
-            actions.push_back(serverAction);
-        }
-    }
-    else
+    if (manifest->executionTargets.testFlag(ExecutionTarget::servers))
     {
-        actions.push_back(logAction);
+        // Action with all data, but without users for server processing.
+        auto serverAction = engine()->cloneAction(logAction);
+        serverAction->setProperty(utils::kUsersFieldName, {});
+        actions.push_back(serverAction);
     }
 
     std::erase(actions, ActionPtr());

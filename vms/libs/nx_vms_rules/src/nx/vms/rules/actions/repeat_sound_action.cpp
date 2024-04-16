@@ -22,7 +22,9 @@ const ItemDescriptor& RepeatSoundAction::manifest()
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<RepeatSoundAction>(),
         .displayName = tr("Repeat Sound"),
-        .flags = {ItemFlag::prolonged, ItemFlag::executeOnClientAndServer},
+        .flags = {ItemFlag::prolonged},
+        .executionTargets = {ExecutionTarget::clients, ExecutionTarget::servers},
+        .targetServers = TargetServers::resourceOwner,
         .fields = {
             makeFieldDescriptor<SoundField>(utils::kSoundFieldName, tr("Sound")),
             makeFieldDescriptor<TargetDeviceField>(utils::kDeviceIdsFieldName, tr("At")),
@@ -36,7 +38,11 @@ const ItemDescriptor& RepeatSoundAction::manifest()
             utils::makeTextFormatterFieldDescriptor("description", "{@EventDescription}"),
             utils::makeTextFormatterFieldDescriptor("tooltip", "{@ExtendedEventDescription}"),
             utils::makeExtractDetailFieldDescriptor("sourceName", utils::kSourceNameDetailName),
-        }
+        },
+        .resources = {
+            {utils::kDeviceIdsFieldName, {ResourceType::device, {}, {}, FieldFlag::target}},
+            {utils::kServerIdFieldName, {ResourceType::server}},
+        },
     };
     return kDescriptor;
 }

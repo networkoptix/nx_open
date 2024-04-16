@@ -20,6 +20,8 @@ const ItemDescriptor& DeviceRecordingAction::manifest()
         .id = utils::type<DeviceRecordingAction>(),
         .displayName = tr("Camera Recording"),
         .flags = ItemFlag::prolonged,
+        .executionTargets = ExecutionTarget::servers,
+        .targetServers = TargetServers::resourceOwner,
         .fields = {
             makeFieldDescriptor<TargetDeviceField>(utils::kDeviceIdsFieldName, tr("On")),
             makeFieldDescriptor<StreamQualityField>("quality", tr("Quality")),
@@ -42,7 +44,8 @@ const ItemDescriptor& DeviceRecordingAction::manifest()
                 {.initialValue = 0s, .maximumValue = 600s, .minimumValue = 0s},
                 {utils::kDurationFieldName}),
             utils::makeIntervalFieldDescriptor(tr("Interval of Action")),
-        }
+        },
+        .resources = {{utils::kDeviceIdsFieldName, {ResourceType::device, {}, {}, FieldFlag::target}}},
     };
     return kDescriptor;
 }

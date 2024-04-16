@@ -6,6 +6,7 @@
 
 #include <nx/utils/async_handler_executor.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/api/rules/action_info.h>
 #include <nx/vms/api/rules/event_info.h>
 #include <nx/vms/api/rules/rule.h>
 
@@ -22,6 +23,7 @@ signals:
     void ruleRemoved(const nx::Uuid& id);
     void reset();
     void eventReceived(const nx::vms::api::rules::EventInfo& eventInfo);
+    void actionReceived(const nx::vms::api::rules::ActionInfo& actionInfo);
 };
 
 /*!
@@ -52,12 +54,19 @@ public:
 
     ErrorCode deleteRuleSync(const nx::Uuid& id);
 
-    virtual int broadcastEvent(
+    virtual int transmitEvent(
         const nx::vms::api::rules::EventInfo& info,
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) = 0;
 
-    Result broadcastEventSync(const nx::vms::api::rules::EventInfo& info);
+    Result transmitEventSync(const nx::vms::api::rules::EventInfo& info);
+
+    virtual int transmitAction(
+        const nx::vms::api::rules::ActionInfo& info,
+        Handler<> handler,
+        nx::utils::AsyncHandlerExecutor handlerExecutor = {}) = 0;
+
+    Result transmitActionSync(const nx::vms::api::rules::ActionInfo& info);
 
     virtual int resetVmsRules(
         Handler<> handler,

@@ -27,6 +27,9 @@ public:
     void triggerNotification(
         const QnTransaction<nx::vms::api::rules::EventInfo>& tran,
         NotificationSource /*source*/);
+    void triggerNotification(
+        const QnTransaction<nx::vms::api::rules::ActionInfo>& tran,
+        NotificationSource /*source*/);
 };
 
 typedef std::shared_ptr<VmsRulesNotificationManager> VmsRulesNotificationManagerPtr;

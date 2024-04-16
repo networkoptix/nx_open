@@ -90,7 +90,8 @@ Engine::Engine(std::unique_ptr<Router> router, QObject* parent):
                 handler->onTimer(0);
         });
 
-    connect(m_router.get(), &Router::eventReceived, this, &Engine::processAcceptedEvent);
+    connect(m_router.get(), &Router::eventReceived, this, &Engine::onEventReceved);
+    connect(m_router.get(), &Router::actionReceived, this, &Engine::processAcceptedAction);
 
     connect(
         this,
@@ -129,13 +130,9 @@ Engine::~Engine()
     m_rules.clear();
 }
 
-void Engine::setId(nx::Uuid id)
+Router* Engine::router() const
 {
-    if (m_id == id)
-        return;
-
-    m_id = id;
-    m_router->init(id);
+    return m_router.get();
 }
 
 bool Engine::isEnabled() const
@@ -184,7 +181,7 @@ Engine::ConstRuleSet Engine::rules() const
     return result;
 }
 
-Engine::ConstRulePtr Engine::rule(const nx::Uuid& id) const
+ConstRulePtr Engine::rule(nx::Uuid id) const
 {
     NX_MUTEX_LOCKER lock(&m_ruleMutex);
     if (const auto it = m_rules.find(id); it != m_rules.end())
@@ -193,7 +190,7 @@ Engine::ConstRulePtr Engine::rule(const nx::Uuid& id) const
     return {};
 }
 
-Engine::RulePtr Engine::cloneRule(const nx::Uuid& id) const
+RulePtr Engine::cloneRule(nx::Uuid id) const
 {
     auto rule = this->rule(id);
     if (!rule)
@@ -802,8 +799,7 @@ size_t Engine::processEvent(const EventPtr& event)
     }
 
     EventData eventData;
-    QSet<QByteArray> eventFields; // TODO: #spanasenko Cache data.
-    QSet<nx::Uuid> ruleIds, resources;
+    std::vector<ConstRulePtr> triggeredRules;
 
     {
         NX_MUTEX_LOCKER lock(&m_ruleMutex);
@@ -826,29 +822,14 @@ size_t Engine::processEvent(const EventPtr& event)
 
             if (matched)
             {
-                //for (const auto& builder: rule->actionBuilders())
-                //{
-                //    eventFields += builder->requiredEventFields();
-                //}
-
-                //for (const auto& builder: rule->actionBuilders())
-                //{
-                //    resources += builder->affectedResources(eventData);
-                //}
-
-                for (const auto& fieldName: nx::utils::propertyNames(event.get()))
-                {
-                    eventFields += fieldName;
-                }
-
-                ruleIds += id;
+                triggeredRules.push_back(rule);
             }
         }
     }
 
-    NX_DEBUG(this, "Matched with %1 rules", ruleIds.size());
+    NX_DEBUG(this, "Matched with %1 rules", triggeredRules.size());
 
-    if (ruleIds.empty())
+    if (triggeredRules.empty())
     {
         if (event->state() == State::stopped)
             m_runningEventWatcher.erase(event);
@@ -858,10 +839,12 @@ size_t Engine::processEvent(const EventPtr& event)
 
     m_eventCache.cacheEvent(event->cacheKey());
 
-    eventData = serializeProperties(event.get(), eventFields);
-    m_router->routeEvent(eventData, ruleIds, resources);
+    m_router->routeEvent(event, triggeredRules);
 
-    return ruleIds.size();
+    if (event->state() == State::stopped)
+        m_runningEventWatcher.erase(event);
+
+    return triggeredRules.size();
 }
 
 size_t Engine::processAnalyticsEvents(const std::vector<EventPtr>& events)
@@ -875,25 +858,22 @@ size_t Engine::processAnalyticsEvents(const std::vector<EventPtr>& events)
     return matchedRules;
 }
 
-// TODO: #spanasenko Use a wrapper with additional checks instead of QHash.
-void Engine::processAcceptedEvent(const nx::Uuid& ruleId, const EventData& eventData)
+void Engine::onEventReceved(const EventPtr& event, const std::vector<ConstRulePtr>& triggeredRules)
+{
+    for (const auto& rule: triggeredRules)
+        processAcceptedEvent(event, rule);
+}
+
+void Engine::processAcceptedEvent(const EventPtr& event, const ConstRulePtr& rule)
 {
     checkOwnThread();
-    NX_DEBUG(this, "Processing accepted event, rule id: %1", ruleId);
-
-    const auto rule = this->rule(ruleId);
-    if (!rule)
-        return;
+    NX_DEBUG(this, "Processing accepted event: %1, rule: %2", event->type(), rule->id());
 
     if (!rule->timeInSchedule(qnSyncTime->currentDateTime()))
     {
         NX_VERBOSE(this, "Time is not in rule schedule, skipping the event.");
         return;
     }
-
-    auto event = buildEvent(eventData);
-    if (!NX_ASSERT(event))
-        return;
 
     for (const auto builder: rule->actionBuilders())
     {
@@ -904,15 +884,21 @@ void Engine::processAcceptedEvent(const nx::Uuid& ruleId, const EventData& event
             builder->process(event);
         }
     }
-
-    if (event->state() == State::stopped)
-        m_runningEventWatcher.erase(event);
 }
 
-void Engine::processAction(const ActionPtr& action)
+void Engine::processAction(const ActionPtr& action) const
 {
     checkOwnThread();
     NX_DEBUG(this, "Processing Action '%1' (state %2)", action->type(), action->state());
+
+    m_router->routeAction(action);
+}
+
+void Engine::processAcceptedAction(const ActionPtr& action)
+{
+    checkOwnThread();
+
+    NX_DEBUG(this, "Processing accepted action: %1, rule : %2", action->type(), action->ruleId());
 
     if (auto executor = m_executors.value(action->type()))
     {

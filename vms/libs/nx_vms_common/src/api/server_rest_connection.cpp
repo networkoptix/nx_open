@@ -1293,6 +1293,18 @@ Handle ServerConnection::eventLog(
         timeouts);
 }
 
+Handle ServerConnection::createEvent(
+    const nx::vms::api::rules::EventInfo& info,
+    Result<ErrorOrEmpty>::type callback,
+    QThread* targetThread)
+{
+    return executePost(
+        "rest/v4/events/create",
+        nx::reflect::json::serialize(info),
+        std::move(callback),
+        targetThread);
+}
+
 Handle ServerConnection::getEventsToAcknowledge(
     Result<ErrorOrData<nx::vms::api::rules::EventLogRecordList>>::type callback,
     QThread* targetThread)

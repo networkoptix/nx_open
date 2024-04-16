@@ -12,6 +12,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/reflect/string_conversion.h>
 #include <nx/utils/guarded_callback.h>
+#include <nx/utils/qobject.h>
 #include <nx/utils/qt_helpers.h>
 #include <nx/utils/scoped_connections.h>
 #include <nx/utils/std/algorithm.h>
@@ -37,6 +38,7 @@
 #include <nx/vms/rules/rule.h>
 #include <nx/vms/rules/utils.h>
 #include <nx/vms/rules/utils/action.h>
+#include <nx/vms/rules/utils/api.h>
 #include <nx/vms/rules/utils/field.h>
 #include <utils/common/delayed.h>
 #include <utils/common/synctime.h>
@@ -373,6 +375,10 @@ bool SoftwareTriggerCameraButtonController::Private::setVmsTriggerState(
     const nx::Uuid& ruleId,
     vms::event::EventState state)
 {
+    auto api = q->systemContext()->connectedServerApi();
+    if (!api)
+        return false;
+
     const auto rule = q->systemContext()->vmsRulesEngine()->rule(ruleId);
     if (!NX_ASSERT(rule, "Trigger does not exist"))
         return false;
@@ -395,11 +401,18 @@ bool SoftwareTriggerCameraButtonController::Private::setVmsTriggerState(
         nx::vms::event::StringsHelper::getSoftwareTriggerName(nameField->value()),
         iconField->value());
 
-    q->systemContext()->vmsRulesEngine()->processEvent(triggerEvent);
+    api->createEvent(nx::vms::rules::serialize(triggerEvent.get()),
+        [this, ruleId, state](bool success, auto handle, auto result)
+        {
+            if (const auto error = std::get_if<nx::network::rest::Result>(&result))
+            {
+                NX_ERROR(this, "Can't activate soft trigger, rule: %1, code: %2, error: %3",
+                    ruleId, error->error, error->errorString);
+            }
 
-    const auto completionHandler =
-        [this, ruleId, state]() { updateActiveTrigger(ruleId, state, /*success*/ true); };
-    executeLater(completionHandler , q);
+            updateActiveTrigger(ruleId, state, success);
+        },
+        q->thread());
 
     return true;
 }

@@ -13,16 +13,17 @@ namespace nx::vms::api::rules {
 
 struct NX_VMS_API EventInfo
 {
-    /**%apidoc[opt] VMS Rule ID. */
-    nx::Uuid ruleId;
+    /**%apidoc[opt] Ids of the triggered rules. */
+    std::vector<nx::Uuid> triggeredRules;
 
     /**%apidoc Event properties. */
     QMap<QString, QJsonValue> props;
 };
 
 #define nx_vms_api_rules_EventInfo_Fields \
-    (ruleId)(props)
+    (triggeredRules)(props)
 
 NX_VMS_API_DECLARE_STRUCT_EX(EventInfo, (json)(ubjson))
+NX_REFLECTION_INSTRUMENT(EventInfo, nx_vms_api_rules_EventInfo_Fields)
 
 } // namespace nx::vms::api::rules

@@ -4,6 +4,7 @@
 
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/rules/router.h>
+#include <nx/vms/rules/rule.h>
 #include <utils/common/synctime.h>
 
 namespace nx::vms::rules::test {
@@ -13,14 +14,18 @@ class TestRouter: public nx::vms::rules::Router
 {
 public:
     virtual void routeEvent(
-        const EventData& eventData,
-        const QSet<nx::Uuid>& triggeredRules,
-        const QSet<nx::Uuid>& /*affectedResources*/) override
+        const EventPtr& event,
+        const std::vector<ConstRulePtr>& triggeredRules) override
     {
-        for (const auto ruleId: triggeredRules)
+        for (const auto& rule: triggeredRules)
         {
-            emit eventReceived(ruleId, eventData);
+            emit eventReceived(event, triggeredRules);
         }
+    }
+
+    virtual void routeAction(const ActionPtr& action) override
+    {
+        receiveAction(action);
     }
 };
 

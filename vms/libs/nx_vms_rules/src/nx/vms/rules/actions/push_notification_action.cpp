@@ -17,6 +17,8 @@ const ItemDescriptor& PushNotificationAction::manifest()
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<PushNotificationAction>(),
         .displayName = tr("Send Mobile Notification"),
+        .executionTargets = ExecutionTarget::servers,
+        .targetServers = TargetServers::serverWithPublicIp,
         .fields = {
             utils::makeTargetUserFieldDescriptor(tr("To")),
             makeFieldDescriptor<TextWithFields>("caption", tr("Header"), QString(),
@@ -32,7 +34,11 @@ const ItemDescriptor& PushNotificationAction::manifest()
 
             makeFieldDescriptor<EventDevicesField>(utils::kDeviceIdsFieldName, "Event devices"),
             utils::makeExtractDetailFieldDescriptor("level", utils::kLevelDetailName),
-            }
+        },
+        .resources = {
+            {utils::kDeviceIdsFieldName, {ResourceType::device}},
+            {utils::kServerIdFieldName, {ResourceType::server}},
+        },
     };
     return kDescriptor;
 }

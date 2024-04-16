@@ -8,19 +8,20 @@
 #include <nx_ec/abstract_ec_connection.h>
 #include <nx_ec/managers/abstract_vms_rules_manager.h>
 
-#include "ec2_router.h"
 #include "plugin.h"
+#include "router.h"
 #include "rule.h"
 
 namespace nx::vms::rules {
 
 EngineHolder::EngineHolder(
     nx::vms::common::SystemContext* context,
+    std::unique_ptr<Router> router,
     std::unique_ptr<Plugin> plugin,
     bool separateThread)
     :
     m_builtinPlugin(std::move(plugin)),
-    m_engine(std::make_unique<Engine>(std::make_unique<Ec2Router>(context)))
+    m_engine(std::make_unique<Engine>(std::move(router)))
 {
     m_builtinPlugin->initialize(m_engine.get());
 
@@ -73,7 +74,6 @@ void EngineHolder::connectEngine(
     connect(processor, &QnCommonMessageProcessor::vmsRulesReset, engine,
         [engine](nx::Uuid peerId, const nx::vms::api::rules::RuleList& rules)
         {
-            engine->setId(peerId);
             engine->resetRules(rules);
         },
         connectionType);
@@ -89,6 +89,14 @@ void EngineHolder::connectEngine(
         [engine](nx::Uuid id)
         {
             engine->removeRule(id);
+        },
+        connectionType);
+
+    auto router = engine->router();
+    connect(processor, &QnCommonMessageProcessor::vmsActionReceived, router,
+        [engine](const nx::vms::api::rules::ActionInfo& info)
+        {
+            engine->router()->receiveAction(engine->buildAction(info.props));
         },
         connectionType);
 }

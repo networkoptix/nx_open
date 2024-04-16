@@ -23,6 +23,8 @@ const ItemDescriptor& DeviceOutputAction::manifest()
         .id = utils::type<DeviceOutputAction>(),
         .displayName = tr("Device Output"),
         .flags = ItemFlag::prolonged,
+        .executionTargets = ExecutionTarget::servers,
+        .targetServers = TargetServers::resourceOwner,
         .fields = {
             makeFieldDescriptor<TargetDeviceField>(utils::kDeviceIdsFieldName, tr("At")),
             makeFieldDescriptor<OutputPortField>("outputPortId", tr("Output ID")),
@@ -31,7 +33,8 @@ const ItemDescriptor& DeviceOutputAction::manifest()
                 tr("Duration"),
                 {},
                 {.initialValue = 1s, .defaultValue = 1s, .minimumValue = 1s}),
-        }
+        },
+        .resources = {{utils::kDeviceIdsFieldName, {ResourceType::device, {}, {}, FieldFlag::target}}},
     };
     return kDescriptor;
 }

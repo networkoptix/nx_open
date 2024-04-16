@@ -21,6 +21,8 @@ const ItemDescriptor& HttpAction::manifest()
         .id = utils::type<HttpAction>(),
         .displayName = tr("HTTP(S) Request"),
         .description = "",
+        .executionTargets = ExecutionTarget::servers,
+        .targetServers = TargetServers::currentServer,
         .fields = {
             makeFieldDescriptor<TextWithFields>("url", tr("URL")),
             makeFieldDescriptor<TextWithFields>("content", tr("Content")),

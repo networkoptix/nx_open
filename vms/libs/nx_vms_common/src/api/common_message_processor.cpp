@@ -419,6 +419,12 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
         connectionType);
     connect(
         vmsRulesManager.get(),
+        &ec2::AbstractVmsRulesNotificationManager::actionReceived,
+        this,
+        &QnCommonMessageProcessor::vmsActionReceived,
+        connectionType);
+    connect(
+        vmsRulesManager.get(),
         &ec2::AbstractVmsRulesNotificationManager::reset,
         this,
         [this]{ resetVmsRules({}); },

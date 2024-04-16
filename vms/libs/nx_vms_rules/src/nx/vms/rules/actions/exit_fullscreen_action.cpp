@@ -14,11 +14,13 @@ const ItemDescriptor& ExitFullscreenAction::manifest()
         .id = utils::type<ExitFullscreenAction>(),
         .displayName = tr("Exit Fullscreen"),
         .flags = ItemFlag::instant,
+        .executionTargets = ExecutionTarget::clients,
         .fields = {
             utils::makeTargetUserFieldDescriptor(
                 tr("To"), {}, utils::UserFieldPreset::All, /*visible*/ false),
             makeFieldDescriptor<TargetLayoutField>(utils::kLayoutIdsFieldName, tr("On Layout")),
-        }
+        },
+        .resources = {{utils::kLayoutIdsFieldName, {ResourceType::layout}}},
     };
     return kDescriptor;
 }

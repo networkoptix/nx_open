@@ -14,6 +14,7 @@ const ItemDescriptor& OpenLayoutAction::manifest()
         .id = utils::type<OpenLayoutAction>(),
         .displayName = tr("Open Layout"),
         .flags = ItemFlag::instant,
+        .executionTargets = ExecutionTarget::clients,
         .fields = {
             makeFieldDescriptor<LayoutField>(utils::kLayoutIdFieldName, {}),
             utils::makeTargetUserFieldDescriptor(tr("To"), {}, utils::UserFieldPreset::None),
