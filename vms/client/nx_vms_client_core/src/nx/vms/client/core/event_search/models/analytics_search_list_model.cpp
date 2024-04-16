@@ -103,7 +103,7 @@ void mergeOldData(NewDataContainer& newData,
         Predicate::upperBound(direction));
 
     // We don't expect a wide range to check here as it consists of items with one timestamp.
-    std::set<QnUuid> foundIds;
+    std::set<nx::Uuid> foundIds;
     const auto removeStartIt = std::remove_if(startIt, endIt,
         [&foundIds](const auto& item)
         {
