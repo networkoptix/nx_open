@@ -27,8 +27,9 @@ public:
 
     virtual nx::vms::utils::ScopedLocalePtr translateAction(const QString& /*actionType*/)
     {
-        return nullptr;
+        return {};
     };
+
     virtual void initialize(Engine* /*engine*/) {};
     virtual void execute(const ActionPtr& action) = 0;
 };
