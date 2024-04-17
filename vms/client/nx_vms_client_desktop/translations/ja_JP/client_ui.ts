@@ -2571,7 +2571,7 @@
     </message>
     <message>
       <source>Capture Cursor</source>
-      <translation>カーソルを録画する</translation>
+      <translation>カーソルを録画に含める</translation>
     </message>
     <message>
       <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
