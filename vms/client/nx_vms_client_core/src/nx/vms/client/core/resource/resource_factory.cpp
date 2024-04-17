@@ -10,12 +10,6 @@
 
 namespace nx::vms::client::core {
 
-namespace {
-
-static const nx::utils::SoftwareVersion kRestApiSupportVersion(5, 0);
-
-} // namespace
-
 QnMediaServerResourcePtr ResourceFactory::createServer() const
 {
     return QnMediaServerResourcePtr(new ServerResource());
@@ -43,7 +37,7 @@ QnUserResourcePtr ResourceFactory::createUser(
                     return QnUserResourcePtr(new UserResource(*userModel));
 
                 // For the pre-5.0 versions we do not know the user id.
-                if (connection->moduleInformation().version < kRestApiSupportVersion
+                if (!connection->isRestApiSupported()
                     && QString::compare(userModel->name, data.name, Qt::CaseInsensitive) == 0)
                 {
                     userModel->id = data.id;
