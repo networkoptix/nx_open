@@ -85,6 +85,10 @@ void initialize(Manager* manager, Action* root)
         .shortcut("Ctrl+Alt+F")
         .checkable();
 
+    factory(OpenEditLookupListsDialogAction)
+        .flags(NoTarget)
+        .mode(DesktopMode);
+
     factory(DropResourcesAction)
         .flags(ResourceTarget | WidgetTarget | LayoutItemTarget | LayoutTarget | SingleTarget | MultiTarget)
         .mode(DesktopMode);

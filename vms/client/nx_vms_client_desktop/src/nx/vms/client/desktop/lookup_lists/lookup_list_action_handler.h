@@ -19,6 +19,7 @@ public:
     virtual ~LookupListActionHandler() override;
 
 private:
+    void openLookupListEditDialog();
     void openLookupListsDialog();
     void onAddEntryToLookupListAction();
 

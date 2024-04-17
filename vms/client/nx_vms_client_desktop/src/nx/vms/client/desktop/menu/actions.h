@@ -1508,6 +1508,11 @@ enum IDType
     UndoReplaceCameraAction,
 
     /**
+     * Opens Lookup Lists create dialog.
+     */
+    OpenEditLookupListsDialogAction,
+
+    /**
      * Opens Lookup Lists dialog.
      */
     OpenLookupListsDialogAction,

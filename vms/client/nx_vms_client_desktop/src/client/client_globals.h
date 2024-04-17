@@ -308,6 +308,7 @@ namespace Qn
         SelectedGroupFullyMatchesFilter,            /**< Role indicating whether selected group fully matches current search filter, always true for empty search string. (bool). */
 
         AnalyticsEngineNameRole,                    /**< Role for related analytics engine name. (QString) */
+        AnalyticsObjectTypeIdRole,                  /**< Role for type Id of Anlytics Object. (QString) */
 
         /**
          * Role for passing existing remote connection.
