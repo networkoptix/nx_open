@@ -2,9 +2,7 @@
 
 #pragma once
 
-#include <nx/network/rest/handler.h>
-#include <nx/network/rest/params.h>
-#include <nx/network/rest/request.h>
+#include <nx/network/rest/crud_handler.h>
 #include <nx/network/rest/subscription.h>
 #include <nx/utils/elapsed_timer.h>
 #include <nx/utils/scope_guard.h>
@@ -15,16 +13,23 @@
 namespace ec2 {
 
 template<
+    typename Derived,
     typename Filter,
     typename Model,
     typename DeleteInput,
     typename QueryProcessor,
     ApiCommand::Value DeleteCommand
 >
-class CrudHandler: public SubscriptionHandler
+class CrudHandler:
+    public nx::network::rest::CrudHandler<Derived>,
+    public SubscriptionHandler
 {
 public:
-    CrudHandler(QueryProcessor* queryProcessor, nx::network::rest::Handler* owner):
+    using base_type = nx::network::rest::CrudHandler<Derived>;
+
+    template<typename... Args>
+    CrudHandler(QueryProcessor* queryProcessor, Args&&... args):
+        base_type(std::forward<Args>(args)...),
         SubscriptionHandler(
             [this]()
             {
@@ -35,8 +40,7 @@ public:
                 return nx::utils::Guard{
                     [this, guard = std::move(guard)]() { NX_VERBOSE(this, "Remove monitor"); }};
             }),
-        m_queryProcessor(queryProcessor),
-        m_owner(owner)
+        m_queryProcessor(queryProcessor)
     {
     }
 
@@ -44,7 +48,8 @@ public:
     {
         using namespace details;
 
-        auto processor = m_queryProcessor->getAccess(m_owner->prepareAuditRecord(request));
+        auto processor = m_queryProcessor->getAccess(
+            static_cast<const Derived*>(this)->prepareAuditRecord(request));
         validateType(processor, filter, m_objectType);
 
         // `std::type_identity` (or similar) can be used to pass the read type info and avoid
@@ -98,7 +103,8 @@ public:
     {
         using namespace details;
 
-        auto processor = m_queryProcessor->getAccess(m_owner->prepareAuditRecord(request));
+        auto processor = m_queryProcessor->getAccess(
+            static_cast<const Derived*>(this)->prepareAuditRecord(request));
         validateType(processor, id, m_objectType);
 
         std::promise<Result> promise;
@@ -120,7 +126,8 @@ public:
         using namespace details;
 
         std::promise<Result> promise;
-        auto processor = m_queryProcessor->getAccess(m_owner->prepareAuditRecord(request));
+        auto processor = m_queryProcessor->getAccess(
+            static_cast<const Derived*>(this)->prepareAuditRecord(request));
         if constexpr (toDbTypesExists<Model>::value)
         {
             auto items = std::move(data).toDbTypes();
@@ -268,7 +275,6 @@ private:
 
 private:
     static constexpr ApiObjectType m_objectType = details::commandToObjectType(DeleteCommand);
-    const nx::network::rest::Handler* const m_owner;
 };
 
 } // namespace ec2
