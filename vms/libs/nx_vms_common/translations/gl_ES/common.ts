@@ -204,7 +204,7 @@
     <message>
       <source>Members of this group have unlimited System privileges. Administrators can create and modify Power Users, merge Systems and connect or disconnect System to  %1.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Members of this group have unlimited System privileges. Administrators can create and modify Power Users, merge Systems and connect or disconnect System to  %1.</translation>
+      <translation>Os membros deste grupo teñen privilexios de sistema ilimitados. As persoas administradoras poden crear e modificar usuarios avanzados, combinar sistemas e conectar ou desconectar o sistema a  %1.</translation>
     </message>
     <message>
       <source>Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the System configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</source>
@@ -1344,23 +1344,23 @@
     <name>StringsHelper</name>
     <message>
       <source>SaaS uninitialized</source>
-      <translation type="unfinished">SaaS uninitialized</translation>
+      <translation>SaaS sen inicializar</translation>
     </message>
     <message>
       <source>SaaS active</source>
-      <translation type="unfinished">SaaS active</translation>
+      <translation>SaaS activo</translation>
     </message>
     <message>
       <source>SaaS suspended</source>
-      <translation type="unfinished">SaaS suspended</translation>
+      <translation>SaaS suspendido</translation>
     </message>
     <message>
       <source>SaaS shut down</source>
-      <translation type="unfinished">SaaS shut down</translation>
+      <translation>SaaS apagado</translation>
     </message>
     <message>
       <source>SaaS shut down automatically</source>
-      <translation type="unfinished">SaaS shut down automatically</translation>
+      <translation>SaaS apágase automaticamente</translation>
     </message>
     <message>
       <source>Contact your channel partner for details.</source>
@@ -1786,7 +1786,7 @@
     </message>
     <message>
       <source>Channel partners service</source>
-      <translation type="unfinished">Channel partners service</translation>
+      <translation>Servizo de partners da canle</translation>
     </message>
     <message>
       <source>Allow Power User editing Security Settings</source>
@@ -1814,16 +1814,16 @@
     </message>
     <message numerus="yes">
       <source>%n minute(s) ago</source>
-      <translation type="unfinished">
-        <numerusform>%n minute(s) ago</numerusform>
-        <numerusform>%n minute(s) ago</numerusform>
+      <translation>
+        <numerusform>Hai %n minuto(s)</numerusform>
+        <numerusform>Hai %n minuto(s)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n hour(s) ago</source>
-      <translation type="unfinished">
-        <numerusform>%n hour(s) ago</numerusform>
-        <numerusform>%n hour(s) ago</numerusform>
+      <translation>
+        <numerusform>Hai %n hora(s)</numerusform>
+        <numerusform>Hai %n hora(s)</numerusform>
       </translation>
     </message>
     <message>
@@ -1832,9 +1832,9 @@
     </message>
     <message numerus="yes">
       <source>%n day(s) ago</source>
-      <translation type="unfinished">
-        <numerusform>%n day(s) ago</numerusform>
-        <numerusform>%n day(s) ago</numerusform>
+      <translation>
+        <numerusform>Hai %n día(s)</numerusform>
+        <numerusform>Hai %n día(s)</numerusform>
       </translation>
     </message>
     <message>
