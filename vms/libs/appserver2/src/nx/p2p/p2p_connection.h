@@ -16,6 +16,9 @@ public:
     using ValidateRemotePeerFunc =
         nx::utils::MoveOnlyFunc<bool(const vms::api::PeerDataEx&)>;
 
+    using UnauthorizedWatcher = std::function<std::vector<nx::utils::Guard>(
+        const nx::network::rest::UserAccessData& userAccessData, std::function<void()> handler)>;
+
     Connection(
         nx::network::ssl::AdapterFunc adapterFunc,
         std::optional<nx::network::http::Credentials> credentials,
@@ -35,6 +38,7 @@ public:
         P2pTransportPtr p2pTransport,
         const QUrlQuery& requestUrlQuery,
         const nx::network::rest::UserAccessData& userAccessData,
+        const UnauthorizedWatcher& unauthorizedWatcher,
         std::unique_ptr<QObject> opaqueObject,
         ConnectionLockGuard connectionLockGuard);
 
@@ -44,14 +48,20 @@ public:
 
     const nx::network::rest::UserAccessData& userAccessData() const { return m_userAccessData; }
     virtual bool validateRemotePeerData(const vms::api::PeerDataEx& peer) const override;
+    virtual void updateCredentials(nx::network::http::Credentials credentials);
 
 protected:
     virtual bool fillAuthInfo(nx::network::http::AsyncClient* httpClient, bool authByKey) override;
 
 private:
-    const nx::network::rest::UserAccessData m_userAccessData = nx::network::rest::kSystemAccess;
+    void watchForUnauthorize();
+
+private:
+    nx::network::rest::UserAccessData m_userAccessData = nx::network::rest::kSystemAccess;
     ValidateRemotePeerFunc m_validateRemotePeerFunc;
     std::optional<nx::network::http::Credentials> m_credentials;
+    std::vector<nx::utils::Guard> m_scopeGuards;
+    UnauthorizedWatcher m_unauthorizedWatcher;
 };
 
 } // namespace p2p

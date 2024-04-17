@@ -92,7 +92,7 @@ void TransactionMessageBusAdapter::removeOutgoingConnectionFromPeer(const nx::Uu
 void TransactionMessageBusAdapter::updateOutgoingConnection(
     const nx::Uuid& id, nx::network::http::Credentials credentials)
 {
-    m_bus->updateOutgoingConnection(id, credentials);
+    m_bus->updateOutgoingConnection(id, std::move(credentials));
 }
 
 void TransactionMessageBusAdapter::dropConnections()

@@ -94,11 +94,13 @@ public:
     /** Peer that opens this connection */
     Direction direction() const { return m_direction; }
 
+    const nx::network::http::HttpHeaders& responseHeaders() const { return m_responseHeaders; }
+
     virtual const vms::api::PeerDataEx& localPeer() const override { return m_localPeer; }
     virtual const vms::api::PeerDataEx& remotePeer() const override { return m_remotePeer; }
     virtual bool isIncoming() const override { return m_direction == Direction::incoming;  }
     virtual std::multimap<QString, QString> httpQueryParams() const override;
-    const nx::network::http::HttpHeaders& responseHeaders() const { return m_responseHeaders; }
+    virtual void updateCredentials(nx::network::http::Credentials) {}
 
     virtual void setState(State state, const QString& reason);
     State state() const;
@@ -170,8 +172,6 @@ public:
 
     size_t maxSendBufferSize() const { return m_maxBufferSize; }
     size_t sendBufferSize() const { return m_dataToSend.dataSize(); }
-
-    void setScopeGuards(std::vector<nx::utils::Guard> guards) { m_scopeGuards = std::move(guards); }
 
     static constexpr auto kPingTimeout = std::chrono::seconds(30);
 
@@ -274,7 +274,6 @@ private:
     QString m_lastErrorMessage;
     int64_t m_extraBufferSize = 0;
     size_t m_maxBufferSize = 0;
-    std::vector<nx::utils::Guard> m_scopeGuards;
     nx::network::aio::Timer m_pongTimer;
     const bool m_isClient;
 

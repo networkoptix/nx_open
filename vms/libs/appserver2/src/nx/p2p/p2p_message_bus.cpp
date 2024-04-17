@@ -290,8 +290,21 @@ void MessageBus::updateOutgoingConnection(
         return;
     }
 
-    remoteUrl->credentials = credentials;
-    removeConnectionUnsafe(m_connections.value(id));
+    remoteUrl->credentials = std::move(credentials);
+
+    auto connection = m_connections.find(id);
+    if (connection == m_connections.end())
+    {
+        NX_DEBUG(this, "Can not find connection '%1'", id);
+        return;
+    }
+
+    QnTransaction<nx::vms::api::UpdateCredentialsData> transaction{
+        ApiCommand::updateCredentials, id};
+    transaction.params.token = remoteUrl->credentials->authToken.value;
+    QMap<P2pConnectionPtr, TransportHeader> dstByConnection;
+    dstByConnection[*connection].dstPeers.push_back(id);
+    sendUnicastTransactionImpl(transaction, dstByConnection);
 }
 
 void MessageBus::connectSignals(const P2pConnectionPtr& connection)
@@ -1227,6 +1240,18 @@ void MessageBus::gotTransaction(
         nx::Unlocker<nx::Mutex> unlock(lock);
         m_handler->triggerNotification(tran, NotificationSource::Remote);
     }
+}
+
+template<>
+void MessageBus::gotUnicastTransaction(
+    const QnTransaction<nx::vms::api::UpdateCredentialsData>& tran,
+    const P2pConnectionPtr& connection,
+    const TransportHeader& transportHeader,
+    nx::Locker<nx::Mutex>* lock)
+{
+    NX_ASSERT(transportHeader.dstPeers.size() == 1
+        && transportHeader.dstPeers.front() == localPeer().id);
+    connection->updateCredentials(nx::network::http::BearerAuthToken{tran.params.token});
 }
 
 template <class T>
