@@ -19,12 +19,18 @@ FboManager::FboHolder::~FboHolder()
     if (!fboPtr)
         return;
 
-    NX_MUTEX_LOCKER lock(&manager->m_mutex);
-    manager->m_fbos.erase(
-        std::find(manager->m_fbos.begin(), manager->m_fbos.end(), fboPtr));
-    manager->m_fbosToDelete.push(fboPtr);
-    if (manager->m_deleteWhenEmpty && manager->m_fbos.empty())
-        manager->deleteLater();
+    {
+        NX_MUTEX_LOCKER lock(&manager->m_mutex);
+        manager->m_fbos.erase(
+            std::find(manager->m_fbos.begin(), manager->m_fbos.end(), fboPtr));
+        manager->m_fbosToDelete.push(fboPtr);
+        if (!manager->m_deleteWhenEmpty || !manager->m_fbos.empty())
+            return; //< Do not destroy manager object.
+    }
+
+    // Destruction via deleteLater() may happen before returning from this function because manager
+    // may be in another thread. So make sure manager->m_mutex is unlocked when we get here.
+    manager->deleteLater();
 }
 
 FboManager::FboManager(const QSize& frameSize):
