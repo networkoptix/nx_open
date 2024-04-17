@@ -8,7 +8,9 @@ Item
 {
     id: item
 
-    property string sourcePath //< Relative to core::Skin paths.
+    // A path relative to `core::Skin` paths, or an absolute URL
+    // starting with "image://skin/" followed by such relative path.
+    property string sourcePath
 
     // Predefined color channel overrides. Non-SVG images support only `primaryColor`.
     property var primaryColor: undefined
@@ -46,6 +48,8 @@ Item
                 return ""
 
             const url = NxGlobals.url(item.sourcePath)
+            console.assert(url.isRelative() || item.sourcePath.startsWith("image://skin/"))
+
             let customization = url.queryMap()
 
             for (let customChannel in item.customColors)
