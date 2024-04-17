@@ -100,7 +100,7 @@ std::string Processor::toStdString() const
 
 bool Processor::isValid() const
 {
-    return m_data->HasParseError();
+    return !m_data->HasParseError();
 }
 
 ::rapidjson::ParseErrorCode Processor::getParseError()
