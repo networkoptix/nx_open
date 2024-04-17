@@ -247,26 +247,13 @@ struct RemoteConnectionFactory::Private
 
     bool needToRequestModuleInformationFirst(ContextPtr context) const
     {
-        if (!context)
-            return false;
-
-        return !context->expectedServerVersion()
-            || *context->expectedServerVersion() < Context::kRestApiSupportVersion;
+        return context && !context->isRestApiSupported();
     };
 
     /** Check whether System supports REST API by it's version (which must be known already). */
     bool systemSupportsRestApi(ContextPtr context) const
     {
-        if (!context)
-            return false;
-
-        if (!context->expectedServerVersion())
-        {
-            context->setError(RemoteConnectionErrorCode::internalError);
-            return false;
-        }
-
-        return *context->expectedServerVersion() >= Context::kRestApiSupportVersion;
+        return context && context->isRestApiSupported();
     }
 
     /**
@@ -518,7 +505,7 @@ struct RemoteConnectionFactory::Private
 
         // Use refresh token to issue new session token if server supports OAuth cloud
         // authorization through the REST API.
-        if (serverVersion >= Context::kRestApiSupportVersion)
+        if (serverVersion >= RemoteConnection::kRestApiSupportVersion)
         {
             credentials = cloudCredentialsProvider.getCredentials();
         }

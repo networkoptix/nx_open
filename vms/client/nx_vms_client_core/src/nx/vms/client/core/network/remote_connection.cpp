@@ -23,6 +23,8 @@ using namespace ec2;
 
 namespace nx::vms::client::core {
 
+const nx::utils::SoftwareVersion RemoteConnection::kRestApiSupportVersion(5, 0);
+
 /**
  * Actual system connection, provides access to different manager classes, which in their turn
  * represent an abstraction layer to send and receive transactions. Managers are using query
@@ -348,6 +350,11 @@ common::AbstractTimeSyncManagerPtr RemoteConnection::timeSynchronizationManager(
 std::shared_ptr<CertificateCache> RemoteConnection::certificateCache() const
 {
     return d->certificateCache;
+}
+
+bool RemoteConnection::isRestApiSupported() const
+{
+    return d->moduleInformation.version >= kRestApiSupportVersion;
 }
 
 } // namespace nx::vms::client::core

@@ -40,7 +40,10 @@ class CertificateVerifier;
 class NX_VMS_CLIENT_CORE_API RemoteConnection: public QObject
 {
     Q_OBJECT
+
 public:
+    static const nx::utils::SoftwareVersion kRestApiSupportVersion;
+
     RemoteConnection(
         nx::vms::api::PeerType peerType,
         const nx::vms::api::ModuleInformation& moduleInformation,
@@ -97,6 +100,8 @@ public:
     void updateSessionId(const QnUuid& sessionId);
 
     std::shared_ptr<CertificateCache> certificateCache() const;
+
+    bool isRestApiSupported() const;
 
 signals:
     void credentialsChanged();

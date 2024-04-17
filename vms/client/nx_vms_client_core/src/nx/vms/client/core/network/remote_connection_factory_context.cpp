@@ -2,9 +2,9 @@
 
 #include "remote_connection_factory_context.h"
 
-namespace nx::vms::client::core {
+#include "remote_connection.h"
 
-const nx::utils::SoftwareVersion RemoteConnectionFactoryContext::kRestApiSupportVersion(5, 0);
+namespace nx::vms::client::core {
 
 QString RemoteConnectionFactoryContext::toString() const
 {
@@ -14,10 +14,10 @@ QString RemoteConnectionFactoryContext::toString() const
 bool RemoteConnectionFactoryContext::isRestApiSupported() const
 {
     if (!moduleInformation.version.isNull())
-        return moduleInformation.version >= kRestApiSupportVersion;
+        return moduleInformation.version >= RemoteConnection::kRestApiSupportVersion;
 
     return logonData.expectedServerVersion
-        && *logonData.expectedServerVersion >= kRestApiSupportVersion;
+        && *logonData.expectedServerVersion >= RemoteConnection::kRestApiSupportVersion;
 }
 
 RemoteConnectionProcess::RemoteConnectionProcess():

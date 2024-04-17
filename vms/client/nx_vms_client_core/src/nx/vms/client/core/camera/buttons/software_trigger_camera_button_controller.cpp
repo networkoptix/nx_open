@@ -14,7 +14,7 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/application_context.h>
-#include <nx/vms/client/core/network/remote_connection_factory_context.h>
+#include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/resource/server.h>
 #include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
@@ -339,6 +339,14 @@ bool SoftwareTriggerCameraButtonController::Private::setEventTriggerState(
     const QnUuid& ruleId,
     vms::event::EventState state)
 {
+    const auto connection = q->systemContext()->connection();
+    if (!connection)
+        return false;
+
+    const auto api = connection->serverApi();
+    if (!NX_ASSERT(api))
+        return false;
+
     const auto rule = q->systemContext()->eventRuleManager()->rule(ruleId);
     if (!NX_ASSERT(rule, "Trigger does not exist"))
         return false;
@@ -364,23 +372,13 @@ bool SoftwareTriggerCameraButtonController::Private::setEventTriggerState(
     if (state != nx::vms::api::EventState::undefined)
         params.insert("state", nx::reflect::toString(state));
 
+    static constexpr auto kAction = "/api/createEvent";
+    const auto thread = QThread::currentThread();
+    const rest::Handle handle = connection->isRestApiSupported()
+        ? api->postJsonResult(kAction, params, /*body*/ {}, callback, thread)
+        : api->getJsonResult(kAction, params, callback, thread);
 
-    const auto handle =
-        [this, params, callback]() -> rest::Handle
-        {
-            const auto server = q->systemContext()->currentServer();
-            if (!server)
-                return -1;
-
-            static constexpr auto kAction = "/api/createEvent";
-            const auto thread = QThread::currentThread();
-            const auto connection = q->connectedServerApi();
-            return server->getVersion() < RemoteConnectionFactoryContext::kRestApiSupportVersion
-                ? connection->getJsonResult(kAction, params, callback, thread)
-                : connection->postJsonResult(kAction, params, {}, callback, thread);
-        }();
-
-    return handle != -1;
+    return handle != rest::Handle{};
 }
 
 bool SoftwareTriggerCameraButtonController::Private::setVmsTriggerState(
