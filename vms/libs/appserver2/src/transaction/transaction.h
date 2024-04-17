@@ -23,6 +23,7 @@
 #include <nx/vms/api/data/server_runtime_event_data.h>
 #include <nx/vms/api/data/system_merge_history_record.h>
 #include <nx/vms/api/data/timestamp.h>
+#include <nx/vms/api/data/update_credentials_data.h>
 #include <nx/vms/api/data/update_sequence_data.h>
 #include <nx/vms/api/data/user_data_deprecated.h>
 #include <nx_ec/abstract_ec_connection.h>
@@ -178,6 +179,18 @@ APPLY(7, tranSyncDone, nx::vms::api::TranSyncDoneData, \
     PowerUserAccess(), /*< read permission checker */ \
     InvalidFilterFunc(), /*< filter read func */ \
     PowerUserAccessOut(), /*< check remote peer rights for outgoing transaction */ \
+    RegularTransactionType()) /*< regular transaction type */ \
+/**%apidoc */ \
+APPLY(8, updateCredentials, nx::vms::api::UpdateCredentialsData, \
+    false, /*< isPersistent */ \
+    true, /*< isSystem */ \
+    false, /*< isRemoveOperation */ \
+    InvalidGetHashHelper(), /*< getHash */ \
+    InvalidTriggerNotificationHelper(), /*< trigger notification */ \
+    AllowForAllAccess(), /*< save permission checker */ \
+    AllowForAllAccess(), /*< read permission checker */ \
+    InvalidFilterFunc(), /*< filter read func */ \
+    AllowForAllAccessOut(), /*< check remote peer rights for outgoing transaction */ \
     RegularTransactionType()) /*< regular transaction type */ \
 APPLY(102, openReverseConnection, nx::vms::api::ReverseConnectionData, \
     false, /*< isPersistent */ \

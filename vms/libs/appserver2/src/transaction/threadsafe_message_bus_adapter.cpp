@@ -59,7 +59,7 @@ void ThreadsafeMessageBusAdapter::updateOutgoingConnection(
     const nx::Uuid& id, nx::network::http::Credentials credentials)
 {
     NX_MUTEX_LOCKER guard(&m_mutex);
-    base_type::updateOutgoingConnection(id, credentials);
+    base_type::updateOutgoingConnection(id, std::move(credentials));
 }
 
 void ThreadsafeMessageBusAdapter::dropConnections()

@@ -70,6 +70,7 @@ Connection::Connection(
     P2pTransportPtr p2pTransport,
     const QUrlQuery& requestUrlQuery,
     const nx::network::rest::UserAccessData& userAccessData,
+    const UnauthorizedWatcher& unauthorizedWatcher,
     std::unique_ptr<QObject> opaqueObject,
     ConnectionLockGuard connectionLockGuard)
     :
@@ -81,9 +82,11 @@ Connection::Connection(
         std::move(opaqueObject),
         std::make_unique<ConnectionLockGuard>(std::move(connectionLockGuard))),
     nx::vms::common::SystemContextAware(systemContext),
-    m_userAccessData(userAccessData)
+    m_userAccessData(userAccessData),
+    m_unauthorizedWatcher(std::move(unauthorizedWatcher))
 {
     systemContext->metrics()->tcpConnections().p2p()++;
+    watchForUnauthorize();
 }
 
 Connection::~Connection()
@@ -134,6 +137,22 @@ bool Connection::fillAuthInfo(nx::network::http::AsyncClient* httpClient, bool a
 bool Connection::validateRemotePeerData(const vms::api::PeerDataEx& remotePeer) const
 {
     return m_validateRemotePeerFunc ? m_validateRemotePeerFunc(remotePeer) : true;
+}
+
+void Connection::updateCredentials(nx::network::http::Credentials credentials)
+{
+    m_credentials = std::move(credentials);
+    m_userAccessData.setToken(m_credentials->authToken.value, /*duration*/ {});
+    watchForUnauthorize();
+}
+
+void Connection::watchForUnauthorize()
+{
+    if (!remotePeer().isClient())
+        return;
+
+    m_scopeGuards = m_unauthorizedWatcher(
+        m_userAccessData, [this]() { setState(State::Unauthorized, "Unauthorized"); });
 }
 
 } // namespace p2p
