@@ -824,7 +824,7 @@ Do you want to delete it anyway?</source>
     <name>QInputDialog</name>
     <message>
       <source>Enter a value:</source>
-      <translation>値を入力:</translation>
+      <translation>値を入力してください:</translation>
     </message>
   </context>
   <context>

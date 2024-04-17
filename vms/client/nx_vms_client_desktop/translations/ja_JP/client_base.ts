@@ -3054,7 +3054,7 @@ License Key: %2</source>
     <message>
       <source>There is currently no connection between your system and %1.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>現在、システムと %1 は接続していません。</translation>
+      <translation>現在、このシステムは %1 に接続していません。</translation>
     </message>
   </context>
   <context>
@@ -3322,7 +3322,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Failed to open file</source>
-      <translation>ファイルオープンに失敗しました</translation>
+      <translation>ファイルを開けませんでした</translation>
     </message>
     <message>
       <source>Failed to restore database</source>
@@ -5778,7 +5778,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Failed to delete %n items:</source>
       <translation>
-        <numerusform>%n アイテムを削除できませんでした:</numerusform>
+        <numerusform>%n アイテムの削除に失敗しました:</numerusform>
       </translation>
     </message>
   </context>
@@ -8229,7 +8229,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Enter password...</source>
-      <translation>パスワード入力...</translation>
+      <translation>パスワードを入力してください...</translation>
     </message>
     <message>
       <source>Administrator password</source>
@@ -8429,7 +8429,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Failed to add %n devices</source>
       <translation>
-        <numerusform>%n デバイスを追加できませんでした</numerusform>
+        <numerusform>%n デバイスの追加に失敗しました</numerusform>
       </translation>
     </message>
     <message>
@@ -12972,19 +12972,19 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>Failed to move %n devices</source>
       <translation>
-        <numerusform>%n デバイスを移動できませんでした</numerusform>
+        <numerusform>%n デバイスの移動に失敗しました</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Failed to move %n cameras</source>
       <translation>
-        <numerusform>%n カメラを移動できませんでした</numerusform>
+        <numerusform>%n カメラの移動に失敗しました</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Failed to move %n I/O Modules</source>
       <translation>
-        <numerusform>%n I/O モジュールを移動できませんでした</numerusform>
+        <numerusform>%n I/Oモジュールの移動に失敗しました</numerusform>
       </translation>
     </message>
     <message>
@@ -13191,7 +13191,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Enter Layout Name:</source>
-      <translation>レイアウト名を入力:</translation>
+      <translation>レイアウト名を入力してください:</translation>
     </message>
     <message>
       <source>New Layout</source>
@@ -13199,7 +13199,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Enter the name of the layout to create:</source>
-      <translation>登録するレイアウトの名前入力:</translation>
+      <translation>作成するレイアウトの名前を入力してください:</translation>
     </message>
     <message>
       <source>Save Layout As Cloud</source>
@@ -13221,7 +13221,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Failed to overwrite file</source>
-      <translation>ファイルを上書きできませんでした</translation>
+      <translation>ファイルの上書きに失敗しました</translation>
     </message>
     <message>
       <source>Failed to save file</source>
