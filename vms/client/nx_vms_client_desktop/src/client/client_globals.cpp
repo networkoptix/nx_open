@@ -233,6 +233,8 @@ constexpr auto nxReflectVisitAllEnumItems(ItemDataRole*, Visitor&& visitor)
 
         IDR_ITEM(ExtraInfoRole),
 
+        IDR_ITEM(AnalyticsObjectTypeIdRole),
+
         IDR_ITEM(AutoExpandRole),
 
         IDR_ITEM(RawResourceRole),

@@ -1340,27 +1340,11 @@ void AnalyticsSearchListModel::Private::addCreateNewListAction(
     QMenu* menu, const ObjectTrack& track) const
 {
     menu->addAction<std::function<void()>>(tr("Create New List..."),
-        nx::utils::guarded(this,
-            [&]()
+            [id = track.objectTypeId, this]()
             {
-                std::vector<QString> attributeNames;
-                std::vector<std::map<QString, QString>> entries;
-                std::map<QString, QString> val;
-
-                for (const auto& attribute: track.attributes)
-                {
-                    attributeNames.push_back(attribute.name);
-                    val[attribute.name] = attribute.value;
-                }
-                entries.push_back(val);
-
-                nx::vms::api::LookupListData list{
-                    .name = track.objectTypeId, //< TODO: #pprivalov Add check for name duplication.
-                    .objectTypeId = track.objectTypeId,
-                    .attributeNames = attributeNames,
-                    .entries = entries};
-                q->system()->lookupListManager()->addOrUpdate(list);
-            }));
+                q->menu()->triggerForced(menu::OpenEditLookupListsDialogAction,
+                    menu::Parameters().withArgument(Qn::AnalyticsObjectTypeIdRole, id));
+            });
 }
 
 QSharedPointer<QMenu> AnalyticsSearchListModel::Private::contextMenu(

@@ -14,12 +14,16 @@
 #include <nx/reflect/json.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/api/data/lookup_list_data.h>
+#include <nx/vms/client/desktop/analytics/analytics_taxonomy_manager.h>
+#include <nx/vms/client/desktop/analytics/taxonomy/state_view.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/debug_utils/utils/debug_custom_actions.h>
+#include <nx/vms/client/desktop/lookup_lists/lookup_list_edit_dialog.h>
 #include <nx/vms/client/desktop/lookup_lists/lookup_lists_dialog.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/menu/action_parameters.h>
 #include <nx/vms/client/desktop/menu/actions.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/lookup_lists/lookup_list_manager.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/workbench/workbench_context.h>
@@ -118,7 +122,8 @@ struct LookupListActionHandler::Private
                     requestAttemptsCount = 0;
                     saveQueue.pop_front();
 
-                    successHandler();
+                    if (successHandler)
+                        successHandler();
                     processQueues();
                 }
                 else
@@ -279,6 +284,12 @@ LookupListActionHandler::LookupListActionHandler(QObject* parent):
             dialog->exec();
         });
 
+
+    connect(action(menu::OpenEditLookupListsDialogAction),
+        &QAction::triggered,
+        this,
+        &LookupListActionHandler::openLookupListEditDialog);
+
     connect(action(menu::OpenLookupListsDialogAction),
         &QAction::triggered,
         this,
@@ -325,10 +336,10 @@ void LookupListActionHandler::onAddEntryToLookupListAction()
         return;
 
     lookupList.entries.push_back(entryToAdd);
-    lookupListManager()->addOrUpdate(lookupList);
     d->saveData({lookupList,
         [this]()
         { QnMessageBox::success(mainWindowWidget(), tr("Object was added to the List")); }});
+    lookupListManager()->addOrUpdate(lookupList);
 }
 
 void LookupListActionHandler::openLookupListsDialog()
@@ -347,6 +358,32 @@ void LookupListActionHandler::openLookupListsDialog()
 
     d->dialog->exec(Qt::ApplicationModal);
     d->dialog.reset();
+}
+
+void LookupListActionHandler::openLookupListEditDialog()
+{
+    const auto params = menu()->currentParameters(sender());
+    if (!params.hasArgument(Qn::AnalyticsObjectTypeIdRole))
+        return;
+
+    if (appContext()->qmlEngine()->baseUrl().isLocalFile())
+        appContext()->qmlEngine()->clearComponentCache();
+
+    LookupListData data;
+    data.objectTypeId = params.argument(Qn::AnalyticsObjectTypeIdRole).toString();
+    data.id = nx::Uuid::createUuid();
+    LookupListModel sourceModel(data);
+
+    auto taxonomy = systemContext()->taxonomyManager()->createStateView();
+    LookupListEditDialog dialog(systemContext(), taxonomy, &sourceModel, mainWindowWidget());
+    dialog.setTransientParent(mainWindowWidget());
+
+    if (dialog.exec(Qt::ApplicationModal) != QDialog::Accepted)
+        return;
+
+    auto resultData = dialog.getLookupListData();
+    d->saveData(Private::DataDescriptor{.data = resultData});
+    systemContext()->lookupListManager()->addOrUpdate(resultData);
 }
 
 } // namespace nx::vms::client::desktop

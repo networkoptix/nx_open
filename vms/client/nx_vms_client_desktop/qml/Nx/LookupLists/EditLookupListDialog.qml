@@ -33,6 +33,8 @@ ModalDialog
 
     property bool columnWithDataWasRemoved: false
 
+    property bool deletionIsAllowed: editMode
+
     // Attributes of sourceModel, before any edit was applied to LookupListModel.
     // Can't be alias, since sourceModel.attributeNames changes during the editing.
     readonly property var previousAttrbutes: editMode ? sourceModel.attributeNames : []
@@ -57,6 +59,9 @@ ModalDialog
 
     function createListTypeModel()
     {
+        if (!taxonomy)
+            return;
+
         let result = [{ value: null, text: qsTr("Generic") }]
         _addObjectTypesToModelRecursive(result, taxonomy.objectTypes, 0)
         return result
@@ -122,7 +127,7 @@ ModalDialog
 
         property alias name: model.data.name
         property alias objectTypeId: model.data.objectTypeId
-        property Analytics.ObjectType listType: taxonomy.objectTypeById(data.objectTypeId)
+        property Analytics.ObjectType listType: taxonomy ? taxonomy.objectTypeById(data.objectTypeId) : null
         property bool isGeneric: !listType
         property bool isValid: !!name && (isGeneric ? !!columnName : attributeNames.length)
         property string columnName: (isGeneric && attributeNames.length) ? attributeNames[0] : ""
@@ -301,14 +306,14 @@ ModalDialog
     {
         x: 16
         anchors.verticalCenter: buttonBox.verticalCenter
-        visible: editMode
+        visible: deletionIsAllowed
         text: qsTr("Delete")
         DialogButtonBox.buttonRole: DialogButtonBox.RejectRole
         icon.source: "image://skin/text_buttons/trash.svg"
 
         onClicked:
         {
-            const countOfRules = dialog.sourceModel.countOfAssociatedVmsRules(control.systemContext)
+            const countOfRules = dialog.sourceModel.countOfAssociatedVmsRules(dialog.systemContext)
 
             const descriptionText = countOfRules
                 ? qsTr("This list is associated with %1 Event Rules. Are you sure you want to delete it?").arg(countOfRules)
