@@ -2395,7 +2395,7 @@
     </message>
     <message>
       <source>Capture Cursor</source>
-      <translation>カーソルを録画する</translation>
+      <translation>カーソルを録画に含める</translation>
     </message>
   </context>
   <context>

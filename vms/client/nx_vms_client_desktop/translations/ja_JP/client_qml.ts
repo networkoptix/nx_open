@@ -1244,7 +1244,7 @@
     </message>
     <message>
       <source>Not configured yet</source>
-      <translation>まだ設定されていません</translation>
+      <translation>未設定</translation>
     </message>
     <message>
       <source>Configure</source>
