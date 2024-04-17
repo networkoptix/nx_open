@@ -87,6 +87,7 @@ function(nx_generate_openapi_schema)
     )
 
     file(WRITE "${ARG_TMP_DIR}/README.md" "")
+    nx_store_known_file("${ARG_TMP_DIR}/README.md")
 
     add_custom_command(
         OUTPUT
