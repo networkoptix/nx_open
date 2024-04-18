@@ -5,6 +5,11 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/lookup_lists/lookup_list_manager.h>
+#include <nx/vms/rules/engine.h>
+#include <nx/vms/rules/event_filter.h>
+#include <nx/vms/rules/event_filter_fields/object_lookup_field.h>
+#include <nx/vms/rules/event_filter_fields/text_lookup_field.h>
+#include <nx/vms/rules/rule.h>
 
 namespace nx::vms::client::desktop {
 
@@ -40,6 +45,49 @@ void LookupListModel::setAttributeNames(QList<QString> value)
     for (const auto& v: value)
         m_data.attributeNames.push_back(v);
     emit attributeNamesChanged();
+}
+
+int LookupListModel::countOfAssociatedVmsRules(SystemContext* systemContext) const
+{
+    using namespace nx::vms::rules;
+    if (!NX_ASSERT(systemContext))
+        return 0;
+
+    int countOfRules = 0;
+    const auto rules = systemContext->vmsRulesEngine()->rules();
+    for (const auto& [_, rule]: rules)
+    {
+        if (rule == nullptr)
+            continue;
+
+        bool ruleIsChecked = false;
+        for (const auto& eventFilter: rule->eventFilters())
+        {
+            if (eventFilter == nullptr)
+                continue;
+
+            for (const auto& field: eventFilter->fields())
+            {
+                const auto textLookupField = dynamic_cast<TextLookupField*>(field);
+                const auto objectLookupField = dynamic_cast<ObjectLookupField*>(field);
+                const QString fieldValue = textLookupField
+                    ? textLookupField->value()
+                    : objectLookupField ? objectLookupField->value() : "";
+
+                if (fieldValue == m_data.id.toString())
+                {
+                    ruleIsChecked = true;
+                    countOfRules += 1;
+                    break;
+                }
+            }
+
+            if (ruleIsChecked)
+                break;
+        }
+    }
+
+    return countOfRules;
 }
 
 } // namespace nx::vms::client::desktop

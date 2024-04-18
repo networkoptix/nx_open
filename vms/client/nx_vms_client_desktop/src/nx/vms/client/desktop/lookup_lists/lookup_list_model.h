@@ -3,6 +3,7 @@
 #pragma once
 
 #include <nx/vms/api/data/lookup_list_data.h>
+#include <nx/vms/client/desktop/system_context.h>
 
 namespace nx::vms::client::desktop {
 
@@ -24,6 +25,8 @@ public:
     QList<QString> attributeNames() const;
     void setAttributeNames(QList<QString> value);
     nx::vms::api::LookupListData& rawData() { return m_data; }
+
+    Q_INVOKABLE int countOfAssociatedVmsRules(SystemContext* systemContext) const;
 
 signals:
     void dataChanged();

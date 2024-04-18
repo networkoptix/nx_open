@@ -95,6 +95,7 @@ ObjectLookupPicker::ObjectLookupPicker(SystemContext* context, ParamsWidget* par
         sortModel->setSortCaseSensitivity(Qt::CaseInsensitive);
         sortModel->sort(0);
         m_lookupListComboBox->setModel(sortModel);
+        m_lookupListComboBox->setPlaceholderText(tr("Select a list"));
 
         lookupListsLayout->addWidget(m_lookupListComboBox);
 

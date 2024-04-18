@@ -57,7 +57,7 @@ Dialog
 
     function editCurrentList()
     {
-        const properties = { "sourceModel": currentList }
+        const properties = { "sourceModel": currentList, "systemContext": systemContext }
         editLookupListDialog.createObject(control, properties).openNewIn(control)
     }
 
