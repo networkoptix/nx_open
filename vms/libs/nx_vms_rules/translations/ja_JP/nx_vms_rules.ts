@@ -236,7 +236,7 @@
     <name>nx::vms::rules::DeviceIpConflictEvent</name>
     <message>
       <source>Conflicting Address: %1</source>
-      <translation>重複アドレス %1</translation>
+      <translation>競合アドレス: %1</translation>
     </message>
     <message>
       <source>MAC #%1: %2</source>
@@ -245,12 +245,12 @@
     <message>
       <source>Device IP Conflict at %1</source>
       <comment>Device IP Conflict at &lt;server_name&gt;</comment>
-      <translation>デバイスのIPが %1 と重複</translation>
+      <translation>%1 でデバイスIPが競合しています</translation>
     </message>
     <message>
       <source>Camera IP Conflict at %1</source>
       <comment>Camera IP Conflict at &lt;server_name&gt;</comment>
-      <translation>カメラIPが %1 と重複</translation>
+      <translation>%1 でカメラIPが競合しています</translation>
     </message>
     <message numerus="yes">
       <source>Device IP Conflict</source>

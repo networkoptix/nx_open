@@ -1011,7 +1011,7 @@
     <name>ImportFromDeviceDialog</name>
     <message>
       <source>Import From Devices</source>
-      <translation>デバイスからインポート</translation>
+      <translation>デバイスからのインポート</translation>
     </message>
   </context>
   <context>

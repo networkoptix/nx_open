@@ -1540,7 +1540,7 @@
     </message>
     <message>
       <source>Keep Aspect Ratio</source>
-      <translation>アスペクト比を固定</translation>
+      <translation>アスペクト比を維持</translation>
     </message>
     <message>
       <source>Opacity:</source>
@@ -1605,7 +1605,7 @@
     </message>
     <message>
       <source>Generic</source>
-      <translation>一般</translation>
+      <translation>全般</translation>
     </message>
     <message>
       <source>Features</source>
@@ -1667,7 +1667,7 @@
     </message>
     <message>
       <source>Hardware ID</source>
-      <translation>ハードウェア ID</translation>
+      <translation>ハードウェアID</translation>
     </message>
   </context>
   <context>
@@ -2310,7 +2310,7 @@
     </message>
     <message>
       <source>Frames interval</source>
-      <translation>フレームインターバル</translation>
+      <translation>フレーム間隔</translation>
     </message>
     <message>
       <source>Reset Speed</source>
@@ -2668,7 +2668,7 @@
     </message>
     <message>
       <source>IP Address</source>
-      <translation>IPアドレス:</translation>
+      <translation>IPアドレス</translation>
     </message>
     <message>
       <source>Port</source>

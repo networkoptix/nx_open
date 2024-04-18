@@ -723,15 +723,15 @@
     </message>
     <message>
       <source>Hide Bookmarks</source>
-      <translation>ブックマーク非表示</translation>
+      <translation>ブックマークを非表示</translation>
     </message>
     <message>
       <source>Show Calendar</source>
-      <translation>カレンダー表示</translation>
+      <translation>カレンダーを表示</translation>
     </message>
     <message>
       <source>Hide Calendar</source>
-      <translation>カレンダー非表示</translation>
+      <translation>カレンダーを非表示</translation>
     </message>
     <message>
       <source>Show Title Bar</source>
@@ -739,7 +739,7 @@
     </message>
     <message>
       <source>Hide Title Bar</source>
-      <translation>タイトルバー非表示</translation>
+      <translation>タイトルバーを非表示</translation>
     </message>
     <message>
       <source>Show Timeline</source>
@@ -815,11 +815,11 @@
     </message>
     <message>
       <source>Show Thumbnails</source>
-      <translation>サムネイルを表示する</translation>
+      <translation>サムネイルを表示</translation>
     </message>
     <message>
       <source>Hide Thumbnails</source>
-      <translation>サムネイルを非表示にする</translation>
+      <translation>サムネイルを非表示</translation>
     </message>
     <message>
       <source>Virtual Camera...</source>
@@ -831,7 +831,7 @@
     </message>
     <message>
       <source>Hide Tree</source>
-      <translation>ツリーを隠す</translation>
+      <translation>ツリーを非表示</translation>
     </message>
     <message>
       <source>Show Notifications</source>
@@ -1089,7 +1089,7 @@
     </message>
     <message>
       <source>Import From Devices...</source>
-      <translation>デバイスからインポート...</translation>
+      <translation>デバイスからのインポート...</translation>
     </message>
     <message>
       <source>User Manual...</source>
@@ -1136,7 +1136,7 @@
     </message>
     <message>
       <source>Hardware ID of Server with this license does not match Hardware ID on which license was activated.</source>
-      <translation>このライセンスを持つサーバーのハードウェアIDは、ライセンスが有効化されたハードウェアIDと一致しません。</translation>
+      <translation>このライセンスを持つサーバーのハードウェアIDが、ライセンスが有効化された際のハードウェアIDと一致しません。</translation>
     </message>
   </context>
   <context>
@@ -1388,7 +1388,7 @@
     </message>
     <message>
       <source>Invalid data received.</source>
-      <translation>無効なデータを受信しました</translation>
+      <translation>無効なデータを受信しました。</translation>
     </message>
     <message>
       <source>Database error occurred.</source>
@@ -1396,7 +1396,7 @@
     </message>
     <message>
       <source>Invalid License Key</source>
-      <translation>無効なライセンス キー</translation>
+      <translation>無効なライセンスキー</translation>
     </message>
     <message>
       <source>Please make sure it is entered correctly.</source>
@@ -1587,7 +1587,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>File name &quot;%1&quot; is reserved by operating system. Please try another name.</source>
-      <translation>ファイル名&quot;%1&quot; は、オペレーティングシステムによって予約されています。別の名前をお試しください</translation>
+      <translation>ファイル名 &quot;%1&quot; は、オペレーティングシステムによって予約されています。別の名前をお試しください。</translation>
     </message>
     <message numerus="yes">
       <source>File name must not contain the following reserved characters:</source>
@@ -2391,7 +2391,7 @@ License Key: %2</source>
     <message numerus="yes">
       <source>You have %n notifications</source>
       <translation>
-        <numerusform>%n 通知があります</numerusform>
+        <numerusform>%n 件の通知があります</numerusform>
       </translation>
     </message>
   </context>
@@ -2890,7 +2890,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>IP/Name</source>
-      <translation>IP/名前</translation>
+      <translation>IP/ホスト名</translation>
     </message>
     <message>
       <source>MAC address</source>
@@ -3765,7 +3765,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Generic</source>
-      <translation>一般</translation>
+      <translation>全般</translation>
     </message>
     <message>
       <source>Features</source>
@@ -3853,7 +3853,7 @@ License Key: %2</source>
     <message numerus="yes">
       <source>License expires in %n days</source>
       <translation>
-        <numerusform>あと%n 日でライセンスの有効期限が切れます</numerusform>
+        <numerusform>%n 日後にライセンスの有効期限が切れます</numerusform>
       </translation>
     </message>
     <message>
@@ -4264,7 +4264,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>less than a minute</source>
-      <translation>1分以下</translation>
+      <translation>1分未満</translation>
     </message>
     <message>
       <source>Invalid tour</source>
@@ -5078,7 +5078,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Hard disk load will increase significantly</source>
-      <translation>ハード ディスクの負荷が大幅に増加します</translation>
+      <translation>ハードディスクの負荷が大幅に増加します</translation>
     </message>
     <message>
       <source>Archive reindexing completed</source>
@@ -5289,7 +5289,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Invalid storage path</source>
-      <translation>無効なストレージ パス</translation>
+      <translation>無効なストレージパス</translation>
     </message>
     <message>
       <source>Add this storage anyway?</source>
@@ -10666,7 +10666,7 @@ You can force it, but it may significantly increase CPU load.</source>
     <message numerus="yes">
       <source>%n motion events</source>
       <translation>
-        <numerusform>%n 個のモーションイベント</numerusform>
+        <numerusform>%n モーションイベント</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -10713,7 +10713,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Device IP Conflict</source>
-      <translation>デバイスの IPの競合</translation>
+      <translation>デバイスの IP競合</translation>
     </message>
     <message numerus="yes">
       <source>+%n values</source>
@@ -12309,7 +12309,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Failed to import. Retry in 1 minute.</source>
-      <translation>インポートに失敗しました。1分以内に再試行してください。</translation>
+      <translation>インポートに失敗しました。1 分後に再試行してください。</translation>
     </message>
     <message>
       <source>Name</source>
@@ -12317,7 +12317,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Imported up to</source>
-      <translation>インポート済み:</translation>
+      <translation>インポート進捗</translation>
     </message>
     <message>
       <source>Status</source>
