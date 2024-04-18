@@ -76,6 +76,10 @@ void initialize(Manager* manager, Action* root)
 
     /* Actions that are not assigned to any menu. */
 
+    factory(AddEntryToLookupListAction)
+        .flags(NoTarget)
+        .mode(DesktopMode);
+
     factory(ShowFpsAction)
         .flags(GlobalHotkey)
         .shortcut("Ctrl+Alt+F")

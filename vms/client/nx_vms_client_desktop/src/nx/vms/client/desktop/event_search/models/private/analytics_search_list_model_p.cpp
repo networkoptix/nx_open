@@ -1410,31 +1410,22 @@ QSharedPointer<QMenu> AnalyticsSearchListModel::Private::contextMenu(
             addMenu->addSeparator();
             for (const auto& list: lists)
             {
+                if (list.objectTypeId != track.objectTypeId)
+                    continue; //< We can add object only to list with same objectTypeId.
+
                 addMenu->addAction<std::function<void()>>(list.name,
-                    nx::utils::guarded(this,
-                        [&]()
-                        {
-                            auto lookupList =
-                                q->system()->lookupListManager()->lookupList(list.id);
+                    [this, track, id = list.id]()
+                    {
+                        api::LookupListEntry entry;
+                        for(const auto& attribute: track.attributes)
+                            entry[attribute.name] = attribute.value;
 
-                            std::map<QString, QString> val;
-                            for (const auto& attribute: track.attributes)
-                            {
-                                for (const auto& name: lookupList.attributeNames)
-                                {
-                                    if (attribute.name == name)
-                                    {
-                                        val[name] = attribute.value;
-                                        continue;
-                                    }
-                                }
-                            }
-                            if (val.empty())
-                                return;
-
-                            lookupList.entries.push_back(val);
-                            q->system()->lookupListManager()->addOrUpdate(lookupList);
-                        }));
+                        menu::Parameters parameters;
+                        parameters.setArguments({
+                            {Qn::LookupListEntryRole, QVariant::fromValue(entry)},
+                            {Qn::ItemUuidRole, QVariant::fromValue(id)}});
+                        q->menu()->triggerForced(menu::AddEntryToLookupListAction, parameters);
+                    });
             }
         }
     }
