@@ -59,8 +59,15 @@ public:
      */
     virtual int decrement();
 
+    /**
+     * Provides current counter value. Usually, this value is of not much use, because it can be
+     * changed concurrently. But, it may still be useful to compare it against zero in some cases.
+     * @return Current value.
+     */
+    int value() const;
+
 private:
-    nx::Mutex m_mutex;
+    mutable nx::Mutex m_mutex;
     nx::WaitCondition m_counterReachedZeroCondition;
     int m_count;
 };

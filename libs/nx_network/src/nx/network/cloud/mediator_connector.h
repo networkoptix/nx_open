@@ -103,6 +103,13 @@ public:
     void unsubscribeFromSystemCredentialsSet(nx::utils::SubscriptionId id);
 
     /**
+     * @param handler Will be called when connection to the mediator is terminated for any reason.
+     * Depending on settings, a reconnect attempt could be scheduled automatically. So, generally,
+     * there is no need to response to this event.
+     */
+    void setOnConnectionClosedHandler(nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler);
+
+    /**
      * @return The previous settings.
      */
     static network::stun::AbstractAsyncClient::Settings setStunClientSettings(
