@@ -52,17 +52,17 @@ void invokeOnDbTypes(Functor&& functor)
         if constexpr (type == applyAnd)
         {
             std::apply([&invoke](auto&&... args) { (... && invoke(std::move(args))); },
-                Model().toDbTypes());
+                typename Model::DbListTypes{});
         }
         else if constexpr (type == applyComma)
         {
             std::apply([&invoke](auto&&... args) { (..., invoke(std::move(args))); },
-                Model().toDbTypes());
+                typename Model::DbListTypes{});
         }
         else if constexpr (type == applyOr)
         {
             std::apply([&invoke](auto&&... args) { (... || invoke(std::move(args))); },
-                Model().toDbTypes());
+                typename Model::DbListTypes{});
         }
     }
     else
@@ -213,6 +213,7 @@ constexpr ApiCommand::Value getUpdateCommand()
 {
     static_assert(std::is_same_v<T, nx::vms::api::StoredFileData>
         || std::is_same_v<T, nx::vms::api::UserGroupData>
+        || std::is_same_v<T, nx::vms::api::UserData>
         || std::is_same_v<T, nx::vms::api::UserDataEx>
         || std::is_same_v<T, nx::vms::api::LayoutData>
         || std::is_same_v<T, nx::vms::api::ShowreelData>
@@ -232,6 +233,8 @@ constexpr ApiCommand::Value getUpdateCommand()
         || std::is_same_v<T, nx::vms::api::rules::Rule>);
     if constexpr (std::is_same_v<T, nx::vms::api::StoredFileData>)
         return ApiCommand::Value::updateStoredFile;
+    else if constexpr (std::is_same_v<T, nx::vms::api::UserData>)
+        return ApiCommand::Value::saveUser;
     else if constexpr (std::is_same_v<T, nx::vms::api::UserDataEx>)
         return ApiCommand::Value::saveUser;
     else if constexpr (std::is_same_v<T, nx::vms::api::UserGroupData>)
@@ -264,7 +267,7 @@ constexpr ApiCommand::Value getUpdateCommand()
         return ApiCommand::Value::setResourceParam;
     else if constexpr (std::is_same_v<T, nx::vms::api::AnalyticsPluginData>)
         return ApiCommand::Value::saveAnalyticsPlugin;
-    else if constexpr (std::is_same_v<T, nx::vms::api::ResourceParamWithRefData>)
+    else if constexpr (std::is_same_v<T, nx::vms::api::AnalyticsEngineData>)
         return ApiCommand::Value::saveAnalyticsEngine;
     else if constexpr (std::is_same_v<T, nx::vms::api::rules::Rule>)
         return ApiCommand::Value::saveVmsRule;
