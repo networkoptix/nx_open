@@ -112,9 +112,6 @@ struct ValidateTokenResponse : public TokenInfo
     /**%apidoc The username the token belongs to.*/
     std::string username;
 
-    /**%apidoc The VMS user id. Present only if defined for specific account and specific system.*/
-    std::optional<std::string> vms_user_id;
-
     /**%apidoc Seconds. Time that passed since this token was confirmed with a password entry
      * (explicitly or implicitly).<br/>
      * E.g., if an access token was issued with <pre>grant_type=refresh_token</pre>, then
@@ -169,9 +166,6 @@ struct TokenIntrospectionResponse
 
     TokenType token_type = TokenType::bearer;
 
-    /**%apidoc The VMS user id. Present only if defined for specific account and specific system.*/
-    std::optional<std::string> vms_user_id;
-
     /**%apidoc Specifies the list of role ids assigned to user for each system requested.
      * Present only if the request contained system_ids attribute.
      */
@@ -179,7 +173,7 @@ struct TokenIntrospectionResponse
 };
 
 NX_REFLECTION_INSTRUMENT(TokenIntrospectionResponse, (active)(client_id)(username)(scope)(exp) \
-    (expires_in)(time_since_password)(token_type)(vms_user_id)(system_role_ids))
+    (expires_in)(time_since_password)(token_type)(system_role_ids))
 
 struct IssueStunTokenRequest
 {

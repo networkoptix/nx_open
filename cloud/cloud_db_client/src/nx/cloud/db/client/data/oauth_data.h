@@ -25,7 +25,7 @@ NX_REFLECTION_INSTRUMENT(IssueTokenRequest, Token_request_Fields)
 NX_REFLECTION_INSTRUMENT(IssueTokenResponse, Issue_token_response_Fields);
 
 NX_REFLECTION_INSTRUMENT(ValidateTokenResponse, (access_token)(expires_in)(expires_at)(token_type) \
-    (scope)(username)(vms_user_id)(time_since_password))
+    (scope)(username)(time_since_password))
 
 NX_REFLECTION_INSTRUMENT(IssueCodeResponse, Issue_code_response_Fields);
 
