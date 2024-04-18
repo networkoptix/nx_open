@@ -25,6 +25,8 @@ ModalDialog
     // Model working as backend of the dialog.
     property alias viewModel: model
 
+    property SystemContext systemContext: null
+
     property bool typeIsSelected: false
     property bool canAccept: model.isValid && typeIsSelected
     property int minimumLabelColumnWidth: 0
@@ -306,10 +308,16 @@ ModalDialog
 
         onClicked:
         {
+            const countOfRules = dialog.sourceModel.countOfAssociatedVmsRules(control.systemContext)
+
+            const descriptionText = countOfRules
+                ? qsTr("This list is associated with %1 Event Rules. Are you sure you want to delete it?").arg(countOfRules)
+                : qsTr("Deleting the list will erase all the data inside it.")
+
             const result = MessageBox.exec(
                 MessageBox.Icon.Question,
                 qsTr("Delete List?"),
-                qsTr("Deleting the list will erase all the data inside it."),
+                descriptionText,
                 MessageBox.Cancel,
                 {
                     text: qsTr("Delete"),
