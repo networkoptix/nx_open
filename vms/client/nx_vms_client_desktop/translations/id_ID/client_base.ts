@@ -49,12 +49,12 @@
     <name>CameraPickerStrings</name>
     <message>
       <source>Source Camera</source>
-      <translation type="unfinished">Source Camera</translation>
+      <translation>Kamera Sumber</translation>
     </message>
     <message numerus="yes">
       <source>Source and %n more Cameras</source>
-      <translation type="unfinished">
-        <numerusform>Source and %n more Cameras</numerusform>
+      <translation>
+        <numerusform>Sumber dan %n Kamera lainnya</numerusform>
       </translation>
     </message>
   </context>
@@ -63,15 +63,15 @@
     <message numerus="yes">
       <source>%1 are used</source>
       <comment>Text like &apos;5/10 Professional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
-        <numerusform>%1 are used</numerusform>
+      <translation>
+        <numerusform>%1 digunakan</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%1 are required</source>
       <comment>Text like &apos;5 Professional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
-        <numerusform>%1 are required</numerusform>
+      <translation>
+        <numerusform>%1 diperlukan</numerusform>
       </translation>
     </message>
   </context>
@@ -1997,7 +1997,7 @@ Kunci Lisensi: %2</translation>
     </message>
     <message>
       <source>Warning! This is an experimental option that saves CPU but may affect animation.</source>
-      <translation type="unfinished">Warning! This is an experimental option that saves CPU but may affect animation.</translation>
+      <translation>Peringatan! Ini adalah opsi eksperimental yang menghemat CPU tetapi dapat mempengaruhi animasi.</translation>
     </message>
     <message>
       <source>Disabled</source>
@@ -2009,31 +2009,31 @@ Kunci Lisensi: %2</translation>
     </message>
     <message>
       <source>Strict</source>
-      <translation type="unfinished">Strict</translation>
+      <translation>Ketat</translation>
     </message>
     <message>
       <source>May lead to privacy issues</source>
-      <translation type="unfinished">May lead to privacy issues</translation>
+      <translation>Dapat menyebabkan masalah privasi</translation>
     </message>
     <message>
       <source>Connect only servers with public certificate</source>
-      <translation type="unfinished">Connect only servers with public certificate</translation>
+      <translation>Koneksikan hanya server dengan sertifikat publik</translation>
     </message>
     <message>
       <source>Certificate storage will be cleared.</source>
-      <translation type="unfinished">Certificate storage will be cleared.</translation>
+      <translation>Penyimpanan sertifikat akan dihapus.</translation>
     </message>
     <message>
       <source>Current client instance will be disconnected.</source>
-      <translation type="unfinished">Current client instance will be disconnected.</translation>
+      <translation>Instance klien saat ini akan tidak terkoneksi.</translation>
     </message>
     <message>
       <source>All other client windows will be closed.</source>
-      <translation type="unfinished">All other client windows will be closed.</translation>
+      <translation>Semua windows klien lainnya akan ditutup.</translation>
     </message>
     <message>
       <source>Security settings changed</source>
-      <translation type="unfinished">Security settings changed</translation>
+      <translation>Pengaturan keamanan diubah</translation>
     </message>
     <message>
       <source>Continue</source>
@@ -2041,19 +2041,19 @@ Kunci Lisensi: %2</translation>
     </message>
     <message>
       <source>On the first connection to the server, your confirmation will be requested to accept the certificate if it contains errors</source>
-      <translation type="unfinished">On the first connection to the server, your confirmation will be requested to accept the certificate if it contains errors</translation>
+      <translation>Pada koneksi pertama ke server, konfirmasi Anda akan diminta untuk menerima sertifikat jika mengandung error</translation>
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>Pilih Folder...</translation>
     </message>
     <message>
       <source>Failed to save logs to the selected folder</source>
-      <translation type="unfinished">Failed to save logs to the selected folder</translation>
+      <translation>Gagal menyimpan log ke folder yang dipilih</translation>
     </message>
     <message>
       <source>Download complete!</source>
-      <translation type="unfinished">Download complete!</translation>
+      <translation>Download selesai!</translation>
     </message>
   </context>
   <context>
@@ -2173,15 +2173,15 @@ Kunci Lisensi: %2</translation>
     <message numerus="yes">
       <source>Details for %n sessions of %1</source>
       <comment>Total number will be substituted as %1</comment>
-      <translation type="unfinished">
-        <numerusform>Details for %n sessions of %1</numerusform>
+      <translation>
+        <numerusform>Detail untuk %n sesi %1</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Details for %n cameras of %1</source>
       <comment>Total number will be substituted as %1</comment>
-      <translation type="unfinished">
-        <numerusform>Details for %n cameras of %1</numerusform>
+      <translation>
+        <numerusform>Detail untuk %n kamera %1</numerusform>
       </translation>
     </message>
   </context>
@@ -2325,65 +2325,65 @@ Kunci Lisensi: %2</translation>
     </message>
     <message>
       <source>Update installed</source>
-      <translation type="unfinished">Update installed</translation>
+      <translation>Update diinstal</translation>
     </message>
     <message numerus="yes">
       <source>%n actions</source>
-      <translation type="unfinished">
-        <numerusform>%n actions</numerusform>
+      <translation>
+        <numerusform>%n aksi</numerusform>
       </translation>
     </message>
     <message>
       <source>Event rule changed</source>
-      <translation type="unfinished">Event rule changed</translation>
+      <translation>Aturan event diubah</translation>
     </message>
     <message>
       <source>Event rule removed</source>
-      <translation type="unfinished">Event rule removed</translation>
+      <translation>Aturan event dihapus</translation>
     </message>
     <message>
       <source>Event rules reset to default</source>
-      <translation type="unfinished">Event rules reset to default</translation>
+      <translation>Aturan event direset ke default</translation>
     </message>
     <message>
       <source>Storage added</source>
-      <translation type="unfinished">Storage added</translation>
+      <translation>Penyimpanan ditambahkan</translation>
     </message>
     <message>
       <source>Storage updated</source>
-      <translation type="unfinished">Storage updated</translation>
+      <translation>Penyimpanan diupdate</translation>
     </message>
     <message>
       <source>Storage removed</source>
-      <translation type="unfinished">Storage removed</translation>
+      <translation>Penyimpanan dihapus</translation>
     </message>
     <message>
       <source>MitM Attack</source>
-      <translation type="unfinished">MitM Attack</translation>
+      <translation>Serangan MitM</translation>
     </message>
     <message>
       <source>MitM attack from server %1</source>
-      <translation type="unfinished">MitM attack from server %1</translation>
+      <translation>Serangan MitM dari server %1</translation>
     </message>
     <message>
       <source>Connected to %1</source>
       <comment>%1 is the Cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connected to %1</translation>
+      <translation>Terkoneksi ke %1</translation>
     </message>
     <message>
       <source>Disconnected from %1</source>
       <comment>%1 is the Cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Disconnected from %1</translation>
+      <translation>Tidak terkoneksi dari %1</translation>
     </message>
     <message>
       <source>Connected to %1 via %2</source>
       <comment>%1 is the Cloud name (like Nx Cloud), %2 is a description of the agent used for establishing the connection (like Nx Witness Desktop Client 6.0.0.0)</comment>
-      <translation type="unfinished">Connected to %1 via %2</translation>
+      <translation>Terkoneksi ke %1 melalui %2</translation>
     </message>
     <message>
       <source>Disconnected from %1 via %2</source>
       <comment>%1 is the Cloud name (like Nx Cloud), %2 is a description of the agent used for establishing the connection (like Nx Witness Desktop Client 6.0.0.0)</comment>
-      <translation type="unfinished">Disconnected from %1 via %2</translation>
+      <translation>Tidak terkoneksi dari %1 melalui %2</translation>
     </message>
   </context>
   <context>
@@ -2521,33 +2521,33 @@ Kunci Lisensi: %2</translation>
     </message>
     <message>
       <source>Source Server</source>
-      <translation type="unfinished">Source Server</translation>
+      <translation>Server Sumber</translation>
     </message>
     <message>
       <source>Source Camera</source>
-      <translation type="unfinished">Source Camera</translation>
+      <translation>Kamera Sumber</translation>
     </message>
     <message numerus="yes">
       <source>Source and %n more Cameras</source>
-      <translation type="unfinished">
-        <numerusform>Source and %n more Cameras</numerusform>
+      <translation>
+        <numerusform>Sumber dan %n Kamera lainnya</numerusform>
       </translation>
     </message>
     <message>
       <source>Select at least one Device</source>
-      <translation type="unfinished">Select at least one Device</translation>
+      <translation>Pilih setidaknya satu Perangkat</translation>
     </message>
     <message>
       <source>Select at least one Camera</source>
-      <translation type="unfinished">Select at least one Camera</translation>
+      <translation>Pilih setidaknya satu Kamera</translation>
     </message>
     <message>
       <source>Select Server</source>
-      <translation type="unfinished">Select Server</translation>
+      <translation>Pilih Server</translation>
     </message>
     <message>
       <source>Source Server and %1</source>
-      <translation type="unfinished">Source Server and %1</translation>
+      <translation>Server Sumber dan %1</translation>
     </message>
   </context>
   <context>
@@ -2588,11 +2588,11 @@ Kunci Lisensi: %2</translation>
     </message>
     <message>
       <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
-      <translation type="unfinished">Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</translation>
+      <translation>Force Acknowledgement hanya akan berfungsi untuk Event Generik jika pengidentifikasi kamera digunakan di URL Event Generik</translation>
     </message>
     <message>
       <source>High pre-recording time will increase RAM utilization on the server</source>
-      <translation type="unfinished">High pre-recording time will increase RAM utilization on the server</translation>
+      <translation>Waktu pra-perekaman yang tinggi akan meningkatkan penggunaan RAM di server</translation>
     </message>
   </context>
   <context>
@@ -2643,11 +2643,11 @@ Kunci Lisensi: %2</translation>
     </message>
     <message>
       <source>Some rules are not valid and may not work</source>
-      <translation type="unfinished">Some rules are not valid and may not work</translation>
+      <translation>Beberapa aturan tidak valid dan mungkin tidak berfungsi</translation>
     </message>
     <message>
       <source>Apply changes before exiting?</source>
-      <translation type="unfinished">Apply changes before exiting?</translation>
+      <translation>Terapkan perubahan sebelum keluar?</translation>
     </message>
   </context>
   <context>
@@ -2681,7 +2681,7 @@ Kunci Lisensi: %2</translation>
     <name>QnBuzzerPolicy</name>
     <message>
       <source>Servers that support buzzer</source>
-      <translation type="unfinished">Servers that support buzzer</translation>
+      <translation>Server yang mendukung buzzer</translation>
     </message>
   </context>
   <context>
@@ -2689,14 +2689,14 @@ Kunci Lisensi: %2</translation>
     <message>
       <source>%1 Running</source>
       <comment>%1 will be substituted with desktop client display name, e.g &apos;NX Witness Client&apos;</comment>
-      <translation type="unfinished">%1 Running</translation>
+      <translation>%1 Berjalan</translation>
     </message>
   </context>
   <context>
     <name>QnCameraAnalyticsPolicy</name>
     <message>
       <source>Analytics is not available for %1</source>
-      <translation type="unfinished">Analytics is not available for %1</translation>
+      <translation>Analitik tidak tersedia untuk %1</translation>
     </message>
   </context>
   <context>
@@ -2902,11 +2902,11 @@ Kunci Lisensi: %2</translation>
     </message>
     <message>
       <source>ID</source>
-      <translation type="unfinished">ID</translation>
+      <translation>ID</translation>
     </message>
     <message>
       <source>Logical ID</source>
-      <translation type="unfinished">Logical ID</translation>
+      <translation>ID logis</translation>
     </message>
   </context>
   <context>
@@ -2940,15 +2940,15 @@ Kunci Lisensi: %2</translation>
     </message>
     <message>
       <source>Repeat Password</source>
-      <translation type="unfinished">Repeat Password</translation>
+      <translation>Ulangi Kata Sandi</translation>
     </message>
     <message>
       <source>Password should be at least 8 symbols long and contain different types of characters.</source>
-      <translation type="unfinished">Password should be at least 8 symbols long and contain different types of characters.</translation>
+      <translation>Kata sandi harus terdiri dari minimal 8 simbol dan mengandung berbagai jenis karakter.</translation>
     </message>
     <message>
       <source>Password should not be equal to camera&apos;s user name</source>
-      <translation type="unfinished">Password should not be equal to camera&apos;s user name</translation>
+      <translation>Kata sandi tidak boleh sama dengan nama pengguna kamera&apos;</translation>
     </message>
     <message>
       <source>Passwords do not match</source>
@@ -3009,7 +3009,7 @@ Kunci Lisensi: %2</translation>
     <message>
       <source>Enter your account password to disconnect System from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Enter your account password to disconnect System from %1</translation>
+      <translation>Masukkan kata sandi akun Anda untuk memutuskan koneksi Sistem dari %1</translation>
     </message>
     <message>
       <source>Disconnect</source>
@@ -3018,7 +3018,7 @@ Kunci Lisensi: %2</translation>
     <message>
       <source>System disconnected from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">System disconnected from %1</translation>
+      <translation>Sistem tidak terkoneksi dari %1</translation>
     </message>
     <message>
       <source>You are about to disconnect System from %1</source>
@@ -6375,11 +6375,11 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>Select Server</source>
-      <translation type="unfinished">Select Server</translation>
+      <translation>Pilih Server</translation>
     </message>
     <message>
       <source>Source Server</source>
-      <translation type="unfinished">Source Server</translation>
+      <translation>Server Sumber</translation>
     </message>
     <message numerus="yes">
       <source>Source Server and %n Servers</source>
@@ -7637,15 +7637,15 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>Abort camera replacement?</source>
-      <translation type="unfinished">Abort camera replacement?</translation>
+      <translation>Batalkan penggantian kamera?</translation>
     </message>
     <message>
       <source>Will be transferred partially:</source>
-      <translation type="unfinished">Will be transferred partially:</translation>
+      <translation>Akan ditransfer sebagian:</translation>
     </message>
     <message>
       <source>Will not be transferred:</source>
-      <translation type="unfinished">Will not be transferred:</translation>
+      <translation>Tidak akan ditransfer:</translation>
     </message>
     <message>
       <source>Next</source>
@@ -7657,32 +7657,32 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>Camera for Replacement</source>
-      <translation type="unfinished">Camera for Replacement</translation>
+      <translation>Kamera untuk Penggantian</translation>
     </message>
     <message>
       <source>Data for Transfer</source>
-      <translation type="unfinished">Data for Transfer</translation>
+      <translation>Data untuk Transfer</translation>
     </message>
     <message>
       <source>Camera replaced!</source>
-      <translation type="unfinished">Camera replaced!</translation>
+      <translation>Kamera diganti!</translation>
     </message>
     <message>
       <source>Checking if the old camera&apos;s data can be transferred to the new camera.</source>
-      <translation type="unfinished">Checking if the old camera&apos;s data can be transferred to the new camera.</translation>
+      <translation>Memeriksa apakah data kamera lama&apos;dapat ditransfer ke kamera baru.</translation>
     </message>
     <message>
       <source>Some data and settings may not be compatible with the new camera</source>
-      <translation type="unfinished">Some data and settings may not be compatible with the new camera</translation>
+      <translation>Beberapa data dan pengaturan mungkin tidak kompatibel dengan kamera baru</translation>
     </message>
     <message>
       <source>%1 will be removed from the System and replaced by the selected camera</source>
       <extracomment>%1 will be substituted with the camera&apos;s name.</extracomment>
-      <translation type="unfinished">%1 will be removed from the System and replaced by the selected camera</translation>
+      <translation>%1 akan dihapus dari Sistem dan digantikan oleh kamera yang dipilih</translation>
     </message>
     <message>
       <source>The Camera Replacement operation is not possible as the Server is unavailable.</source>
-      <translation type="unfinished">The Camera Replacement operation is not possible as the Server is unavailable.</translation>
+      <translation>Operasi Penggantian Kamera tidak dapat dilakukan karena Server tidak tersedia.</translation>
     </message>
   </context>
   <context>
@@ -7697,7 +7697,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>High pre-recording time will increase RAM utilization on the server</source>
-      <translation type="unfinished">High pre-recording time will increase RAM utilization on the server</translation>
+      <translation>Waktu pra-perekaman yang tinggi akan meningkatkan penggunaan RAM di server</translation>
     </message>
     <message>
       <source>Select areas on the schedule to apply chosen parameters to</source>
@@ -7720,11 +7720,11 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <name>nx::vms::client::desktop::CameraSelectionDialog</name>
     <message>
       <source>Show all devices</source>
-      <translation type="unfinished">Show all devices</translation>
+      <translation>Tampilkan seluruh perangkat</translation>
     </message>
     <message>
       <source>Show all cameras</source>
-      <translation type="unfinished">Show all cameras</translation>
+      <translation>Tampilkan semua kamera</translation>
     </message>
     <message>
       <source>Select Devices</source>
@@ -7736,15 +7736,15 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>Select Device</source>
-      <translation type="unfinished">Select Device</translation>
+      <translation>Pilih Perangkat</translation>
     </message>
     <message>
       <source>Select Camera</source>
-      <translation type="unfinished">Select Camera</translation>
+      <translation>Pilih Kamera</translation>
     </message>
     <message>
       <source>No cameras available</source>
-      <translation type="unfinished">No cameras available</translation>
+      <translation>Tidak ada kamera yang tersedia</translation>
     </message>
   </context>
   <context>
@@ -7759,7 +7759,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>I/O Ports</source>
-      <translation type="unfinished">I/O Ports</translation>
+      <translation>Port I/O</translation>
     </message>
     <message>
       <source>Motion</source>
@@ -7829,11 +7829,11 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>Change invalid schedule to &quot;Record Always&quot;</source>
-      <translation type="unfinished">Change invalid schedule to &quot;Record Always&quot;</translation>
+      <translation>Ubah jadwal yang tidak valid menjadi &quot;Rekam Selalu&quot;</translation>
     </message>
     <message>
       <source>Some cells of the recording schedule are set to an invalid recording mode: %1. During the hours set to an invalid recording mode camera will record in &quot;Record Always&quot; mode.</source>
-      <translation type="unfinished">Some cells of the recording schedule are set to an invalid recording mode: %1. During the hours set to an invalid recording mode camera will record in &quot;Record Always&quot; mode.</translation>
+      <translation>Beberapa sel jadwal perekaman ditetapkan ke mode perekaman yang tidak valid: %1. Selama jam yang ditetapkan ke mode perekaman tidak valid, kamera akan merekam dalam mode &quot;Rekam Selalu&quot;.</translation>
     </message>
     <message>
       <source>Motion Only</source>
@@ -7841,11 +7841,11 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>Objects Only</source>
-      <translation type="unfinished">Objects Only</translation>
+      <translation>Hanya Objek</translation>
     </message>
     <message>
       <source>Motion &amp; Objects Only</source>
-      <translation type="unfinished">Motion &amp; Objects Only</translation>
+      <translation>Hanya Gerakan &amp; Objek</translation>
     </message>
     <message>
       <source>Motion + Lo-Res</source>
@@ -7853,15 +7853,15 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>Objects + Lo-Res</source>
-      <translation type="unfinished">Objects + Lo-Res</translation>
+      <translation>Objek + Resolusi Rendah</translation>
     </message>
     <message>
       <source>Motion &amp; Objects + Lo-Res</source>
-      <translation type="unfinished">Motion &amp; Objects + Lo-Res</translation>
+      <translation>Gerakan, Objek + Resolusi Rendah</translation>
     </message>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>Plugin</translation>
     </message>
     <message>
       <source>Hotspots</source>
@@ -7876,43 +7876,43 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <name>nx::vms::client::desktop::CameraSettingsDialogStateConversionFunctions</name>
     <message numerus="yes">
       <source>Failed to enable audio on %n devices</source>
-      <translation type="unfinished">
-        <numerusform>Failed to enable audio on %n devices</numerusform>
+      <translation>
+        <numerusform>Gagal mengaktifkan audio di perangkat %n</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These devices do not have audio inputs or are not configured correctly.</source>
-      <translation type="unfinished">
-        <numerusform>These devices do not have audio inputs or are not configured correctly.</numerusform>
+      <translation>
+        <numerusform>Perangkat ini tidak memiliki input audio atau tidak dikonfigurasi dengan benar.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Failed to enable 2-way audio on %n devices</source>
-      <translation type="unfinished">
-        <numerusform>Failed to enable 2-way audio on %n devices</numerusform>
+      <translation>
+        <numerusform>Gagal mengaktifkan 2-way audio di perangkat %n</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These devices do not have audio outputs or are not configured correctly.</source>
-      <translation type="unfinished">
-        <numerusform>These devices do not have audio outputs or are not configured correctly.</numerusform>
+      <translation>
+        <numerusform>Perangkat ini tidak memiliki output audio atau tidak dikonfigurasi dengan benar.</numerusform>
       </translation>
     </message>
     <message>
       <source>Audio will be disabled</source>
-      <translation type="unfinished">Audio will be disabled</translation>
+      <translation>Audio akan dinonaktifkan</translation>
     </message>
     <message>
       <source>You need to select a device that will provide audio.</source>
-      <translation type="unfinished">You need to select a device that will provide audio.</translation>
+      <translation>Anda harus memilih perangkat yang akan menyediakan audio.</translation>
     </message>
     <message>
       <source>2-way audio will be disabled</source>
-      <translation type="unfinished">2-way audio will be disabled</translation>
+      <translation>2-way audio akan dinonaktifkan</translation>
     </message>
     <message>
       <source>You need to select a device to transmit the audio stream to and use for audio playback.</source>
-      <translation type="unfinished">You need to select a device to transmit the audio stream to and use for audio playback.</translation>
+      <translation>Anda perlu memilih perangkat untuk mentransmisikan stream audio dan digunakan untuk playback audio.</translation>
     </message>
   </context>
   <context>
@@ -7927,15 +7927,15 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>No secondary stream</source>
-      <translation type="unfinished">No secondary stream</translation>
+      <translation>Tidak ada stream sekunder</translation>
     </message>
     <message>
       <source>Invalid stream address</source>
-      <translation type="unfinished">Invalid stream address</translation>
+      <translation>Alamat stream tidak valid</translation>
     </message>
     <message>
       <source>Streaming protocol mismatch</source>
-      <translation type="unfinished">Streaming protocol mismatch</translation>
+      <translation>Ketidakcocokan protokol streaming</translation>
     </message>
   </context>
   <context>
@@ -7943,26 +7943,26 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <message>
       <source>Select a certificate to authenticate yourself to %1:</source>
       <extracomment>%1 here is a host name for which you provide a certificate.</extracomment>
-      <translation type="unfinished">Select a certificate to authenticate yourself to %1:</translation>
+      <translation>Pilih sertifikat untuk mengotentikasi diri Anda ke %1:</translation>
     </message>
     <message>
       <source>Select</source>
-      <translation type="unfinished">Select</translation>
+      <translation>Pilih</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ChunksFilterActionFactory</name>
     <message>
       <source>No filter</source>
-      <translation type="unfinished">No filter</translation>
+      <translation>Tidak ada filter</translation>
     </message>
     <message>
       <source>Main storage only</source>
-      <translation type="unfinished">Main storage only</translation>
+      <translation>Penyimpanan utama saja</translation>
     </message>
     <message>
       <source>Backup storage only</source>
-      <translation type="unfinished">Backup storage only</translation>
+      <translation>Penyimpanan backup saja</translation>
     </message>
   </context>
   <context>
@@ -7970,30 +7970,30 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <message>
       <source>Your confirmation is required to provide a token to</source>
       <comment>... a web page (below there is a web page name with an icon)</comment>
-      <translation type="unfinished">Your confirmation is required to provide a token to</translation>
+      <translation>Konfirmasi Anda diperlukan untuk memberikan token</translation>
     </message>
     <message>
       <source>Allow</source>
-      <translation type="unfinished">Allow</translation>
+      <translation>Izinkan</translation>
     </message>
     <message>
       <source>This web page is requesting access to your account for authorization</source>
-      <translation type="unfinished">This web page is requesting access to your account for authorization</translation>
+      <translation>Halaman web ini meminta akses ke akun Anda untuk otorisasi</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ClientUpdateTool</name>
     <message>
       <source>This update is already installed.</source>
-      <translation type="unfinished">This update is already installed.</translation>
+      <translation>Update ini sudah diinstal.</translation>
     </message>
     <message>
       <source>This version is not installed.</source>
-      <translation type="unfinished">This version is not installed.</translation>
+      <translation>Versi ini tidak diinstal.</translation>
     </message>
     <message>
       <source>Invalid version format.</source>
-      <translation type="unfinished">Invalid version format.</translation>
+      <translation>Format versi tidak valid.</translation>
     </message>
     <message>
       <source>Broken update package.</source>
@@ -9658,20 +9658,20 @@ Ingatlah untuk mengembalikan Level Logging ke pengaturan default setelah Anda me
     <message>
       <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 System can only be merged with non-%1. System name and password are taken from %1 System.</translation>
+      <translation>%1 Sistem hanya dapat digabungkan dengan non-%1. Nama sistem dan kata sandi diambil dari %1 System.</translation>
     </message>
     <message>
       <source>Both Systems are connected to %1. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Both Systems are connected to %1. Merge is not allowed.</translation>
+      <translation>Kedua Sistem terhubung ke %1. Penggabungan tidak diperbolehkan.</translation>
     </message>
     <message>
       <source>Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</source>
-      <translation type="unfinished">Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</translation>
+      <translation>Tidak dapat menggabungkan Sistem karena mereka memiliki setidaknya satu server dengan ID yang sama. Mohon hapus server ini dan coba lagi.</translation>
     </message>
     <message>
       <source>System name is not configured yet.</source>
-      <translation type="unfinished">System name is not configured yet.</translation>
+      <translation>Nama sistem belum dikonfigurasi.</translation>
     </message>
     <message>
       <source>Connection to Server could not be established. The Server&apos;s certificate is invalid.</source>
@@ -10525,7 +10525,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>Pilih Folder...</translation>
     </message>
   </context>
   <context>
@@ -12594,8 +12594,8 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message numerus="yes">
       <source>Source and %n more Cameras</source>
-      <translation type="unfinished">
-        <numerusform>Source and %n more Cameras</numerusform>
+      <translation>
+        <numerusform>Sumber dan %n Kamera lainnya</numerusform>
       </translation>
     </message>
     <message>
@@ -12626,7 +12626,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Source Server and %1</source>
-      <translation type="unfinished">Source Server and %1</translation>
+      <translation>Server Sumber dan %1</translation>
     </message>
     <message>
       <source>System</source>
