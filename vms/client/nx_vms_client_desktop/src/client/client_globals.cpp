@@ -237,6 +237,8 @@ constexpr auto nxReflectVisitAllEnumItems(ItemDataRole*, Visitor&& visitor)
 
         IDR_ITEM(RawResourceRole),
 
+        IDR_ITEM(LookupListEntryRole),
+
         /** Enable advanced UI features (typically in settings dialogs). */
         IDR_ITEM(AdvancedModeRole),
 

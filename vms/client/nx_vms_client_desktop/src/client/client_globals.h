@@ -223,6 +223,8 @@ namespace Qn
         RuleModelRole, /* #deprecate #3.2 */        /**< Role for business rule caching model. Value of type QnBusinessRuleViewModelPtr. */
         EventParametersRole,                            /**< Role for business event parameters. Value of type nx::vms::event::EventParameters. */
 
+        LookupListEntryRole,                        /**< Role for value of Lookup List Entry object (nx::vms::api::LookupListEntry) */
+
         StorageUrlRole,                             /**< Role for storing real storage Url in storage_url_dialog. */
 
         IOPortDataRole,                             /**< Return QnIOPortData object. Used in IOPortDataModel */

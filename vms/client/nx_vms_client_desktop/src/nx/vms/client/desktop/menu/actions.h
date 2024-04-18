@@ -1513,6 +1513,11 @@ enum IDType
     OpenLookupListsDialogAction,
 
     /**
+     * Add entry to selected Lookup List.
+     */
+    AddEntryToLookupListAction,
+
+    /**
      * Open Import From Devices dialog.
      */
     OpenImportFromDevices,

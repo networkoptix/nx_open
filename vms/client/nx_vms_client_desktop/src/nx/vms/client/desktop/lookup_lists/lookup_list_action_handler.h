@@ -20,6 +20,7 @@ public:
 
 private:
     void openLookupListsDialog();
+    void onAddEntryToLookupListAction();
 
 private:
     struct Private;
