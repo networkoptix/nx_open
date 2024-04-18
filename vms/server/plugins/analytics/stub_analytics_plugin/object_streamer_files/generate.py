@@ -519,7 +519,8 @@ def parse_arguments():
     # pylint: disable=missing-function-docstring
     parser = argparse.ArgumentParser(
         description='Generate an object stream for the Stub Object Streamer sub-plugin')
-    parser.add_argument('-c', '--config', type=Path, help='Configuration file for this script')
+    parser.add_argument('-c', '--config', default='config.json',
+        type=Path, help='Configuration file for this script')
     parser.add_argument('-m', '--manifest-file', dest='manifest_file',
         nargs='?', default='manifest.json', const='manifest.json', type=Path,
         help='Output manifest file')
@@ -544,12 +545,14 @@ def main():
     manifest = generation_manager.generate_manifest()
     with open(args.manifest_file, 'w', encoding='UTF-8') as manifest_file:
         json.dump(manifest, manifest_file, cls=ManifestEncoder, indent=4)
+        manifest_file.write("\n")
 
     stream = generation_manager.generate_stream()
     with open(args.stream_file, 'w', encoding='UTF-8') as stream_file:
         indent = None if args.compressed_stream else 4
-        separators = (",", ":") if args.compressed_stream else (", ", ": ")
+        separators = (",", ":") if args.compressed_stream else (",", ": ")
         json.dump(stream, stream_file, cls=StreamEntryEncoder, indent=indent, separators=separators)
+        stream_file.write("\n")
 
 if __name__ == '__main__':
     main()

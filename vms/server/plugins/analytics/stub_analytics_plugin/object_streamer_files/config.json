@@ -129,11 +129,28 @@
             "maxHeight": 0.2,
             "attributes": {
                 "Age": "32",
-                "Gender": "Female",
+                "Gender": "Woman",
                 "Body Shape": "Normal",
                 "Height": "170",
                 "Top Clothing Color": "White",
                 "Bottom Clothing Color": "Black"
+            }
+        },
+        {
+            "objectTypeId": "nx.base.Person",
+            "movementPolicy": "random",
+            "trackIdPolicy": "changeOncePerStreamCycle",
+            "minWidth": 0.05,
+            "minHeight": 0.1,
+            "maxWidth": 0.1,
+            "maxHeight": 0.2,
+            "attributes": {
+                "Age": "39",
+                "Gender": "Man",
+                "Body Shape": "Normal",
+                "Height": "185",
+                "Top Clothing Color": "Black",
+                "Bottom Clothing Color": "White"
             }
         },
         {
