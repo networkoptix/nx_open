@@ -22,6 +22,25 @@ struct LessById
     }
 } constexpr lessById{};
 
+struct LessByParentId
+{
+    using is_transparent = std::true_type;
+
+    template<typename L, typename R>
+    bool operator()(const L& lhs, const R& rhs) const
+    {
+        return lhs.parentId < rhs.parentId;
+    }
+};
+
+struct ServerIdAsParentId
+{
+    nx::Uuid parentId;
+
+    ServerIdAsParentId() = default;
+    ServerIdAsParentId(const ServerModel& model): parentId(model.id) {}
+};
+
 std::vector<ServerModel> fromServerData(std::vector<MediaServerData> dataList)
 {
     using namespace nx::utils;
@@ -123,7 +142,7 @@ std::vector<ServerModel> ServerModel::fromDbTypes(DbListTypes all)
     auto storages =
         [](std::vector<StorageData> list)
         {
-            std::multiset<StorageData, LessById> result;
+            std::multiset<StorageData, LessByParentId> result;
             for (auto&& s: list)
                 result.insert(std::move(s));
             return result;
@@ -160,13 +179,14 @@ std::vector<ServerModel> ServerModel::fromDbTypes(DbListTypes all)
             parameters.erase(f);
         }
 
+        if (!storages.empty())
         {
-            const auto [begin, end] = storages.equal_range(s);
+            auto [begin, end] = storages.equal_range(ServerIdAsParentId(s));
             s.storages.reserve(std::distance(begin, end));
-            std::transform(std::make_move_iterator(begin),
-                std::make_move_iterator(end),
+            std::transform(std::make_move_iterator(std::move(begin)),
+                std::make_move_iterator(std::move(end)),
                 std::back_inserter(s.storages),
-                [](StorageData d) -> StorageModel { return StorageModel::fromDb(std::move(d)); });
+                [](StorageData d) { return StorageModel::fromDb(std::move(d)); });
         }
     }
 

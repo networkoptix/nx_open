@@ -31,7 +31,13 @@ public:
     SubscriptionHandler(AddMonitor addMonitor): m_addMonitor(std::move(addMonitor)) {}
     virtual ~SubscriptionHandler() = default;
     nx::utils::Guard addSubscription(const QString& id, SubscriptionCallback callback);
-    void notify(const QString& id, NotifyType notifyType, QJsonValue payload);
+    void notify(const QString& id, NotifyType notifyType, QJsonValue payload = {});
+
+    void setAddMonitor(AddMonitor addMonitor)
+    {
+        NX_ASSERT(!m_guard);
+        m_addMonitor = std::move(addMonitor);
+    }
 
 private:
     void removeSubscription(const std::shared_ptr<SubscriptionCallback>& subscription);
