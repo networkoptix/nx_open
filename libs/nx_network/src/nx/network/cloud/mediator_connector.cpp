@@ -147,6 +147,12 @@ void MediatorConnector::unsubscribeFromSystemCredentialsSet(nx::utils::Subscript
     m_credentialsSetEvent.removeSubscription(id);
 }
 
+void MediatorConnector::setOnConnectionClosedHandler(
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
+{
+    m_stunClient->setOnConnectionClosedHandler(std::move(handler));
+}
+
 network::stun::AbstractAsyncClient::Settings
     MediatorConnector::setStunClientSettings(
         network::stun::AbstractAsyncClient::Settings stunClientSettings)

@@ -93,6 +93,12 @@ int Counter::decrement()
     return val;
 }
 
+int Counter::value() const
+{
+    NX_MUTEX_LOCKER locker(&m_mutex);
+    return m_count;
+}
+
 //-------------------------------------------------------------------------------------------------
 
 CounterWithSignal::CounterWithSignal(int initialCount, QObject* parent):
