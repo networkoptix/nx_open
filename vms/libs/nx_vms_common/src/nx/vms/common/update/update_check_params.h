@@ -29,6 +29,8 @@ public:
     UpdateInfoParams(const nx::vms::update::PublicationInfoParams& params);
 
     std::optional<vms::update::PublicationInfoParams> toPublicationInfoParams() const;
+    static UpdateInfoParams fromPublicationInfoParams(
+        const vms::update::PublicationInfoParams& params);
 
     QMultiMap<QString, QString> toRestParams() const;
     static UpdateInfoParams fromRestParams(const QMultiMap<QString, QString>& params);

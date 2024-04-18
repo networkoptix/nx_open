@@ -6,19 +6,285 @@
 #include <QtCore/QString>
 #include <QtCore/QtGlobal>
 
+#include <nx/utils/software_version.h>
+#include <nx/utils/url.h>
 #include <nx/utils/uuid.h>
 
 #include "data_macros.h"
 
-namespace nx {
-namespace vms {
-namespace api {
+namespace nx::vms::api {
+
+NX_REFLECTION_ENUM(UpdateAction,
+    /**%apidoc Starts update process. */
+    start,
+
+    /**%apidoc Initiates update package installation. */
+    install,
+
+    /**%apidoc Retries the latest failed update action. */
+    retry,
+
+    /**%apidoc Completes the update process. */
+    finish
+)
+
+NX_REFLECTION_ENUM_CLASS(UpdateComponent,
+    /**%apidoc Component is not known. */
+    unknown,
+
+    /**%apidoc Desktop Client. */
+    client,
+
+    /**%apidoc Desktop Client with custom branding. */
+    customClient,
+
+    /**%apidoc VMS Server. */
+    server
+)
+
+NX_REFLECTION_ENUM(InformationCategory,
+    /**%apidoc The version to be installed. */
+    target,
+
+    /**%apidoc The currently installed version. */
+    installed,
+
+    /**%apidoc The latest available version. */
+    latest,
+
+    /**%apidoc The explicitly specified version. */
+    specific
+)
+
+NX_REFLECTION_ENUM_CLASS(PublicationType,
+    /**%apidoc Local developer build. */
+    local,
+
+    /**%apidoc Private build for QA team. */
+    private_build,
+
+    /**%apidoc Private patch for a single setup. */
+    private_patch,
+
+    /**%apidoc Regular monthly patch. */
+    patch,
+
+    /**%apidoc Public beta version. */
+    beta,
+
+    /**%apidoc Public release candidate. */
+    rc,
+
+    /**%apidoc Public release. */
+    release
+)
+
+struct NX_VMS_API ProductInfo
+{
+    UpdateComponent updateComponent{UpdateComponent::server};
+    PublicationType publicationType{PublicationType::release};
+    std::string version{};
+
+    /**%apidoc[opt] Integer version of the release
+     * %example 50100
+     */
+    int protocolVersion{0};
+};
+#define ProductInfo_Fields (updateComponent)(publicationType)(version)(protocolVersion)
+NX_VMS_API_DECLARE_STRUCT_EX(ProductInfo, (json))
+NX_REFLECTION_INSTRUMENT(ProductInfo, ProductInfo_Fields)
+
+struct NX_VMS_API UpdateInfoRequest: ProductInfo
+{
+    /**%apidoc[opt] Information Category to request. */
+    InformationCategory infoCategory{target};
+};
+#define UpdateInfoRequest_Fields ProductInfo_Fields (infoCategory)
+NX_VMS_API_DECLARE_STRUCT_EX(UpdateInfoRequest, (json))
+NX_REFLECTION_INSTRUMENT(UpdateInfoRequest, UpdateInfoRequest_Fields)
+
+struct NX_VMS_API UpdateVersions
+{
+    std::string minVersion;
+    std::string maxVersion;
+};
+#define UpdateVersions_Fields (minVersion)(maxVersion)
+NX_VMS_API_DECLARE_STRUCT_EX(UpdateVersions, (json))
+
+struct NX_VMS_API UpdatePackage
+{
+    std::string platform;
+    std::optional<std::string> customClientVariant;
+    std::map<std::string, UpdateVersions> platformVariants;
+
+    std::string file;
+    QString md5;
+
+    /**%apidoc:integer Size of update package in bytes.
+     * %example 1073741824
+     */
+    double sizeB{0.0};
+    std::optional<std::string> signature;
+
+    std::string url;
+};
+#define UpdatePackage_Fields (platform)(customClientVariant)(platformVariants)(file)(md5)(sizeB) \
+    (signature)(url)
+
+NX_VMS_API_DECLARE_STRUCT_EX(UpdatePackage, (json))
+
+struct NX_VMS_API UpdateInformation
+{
+    std::string version;
+    std::string cloudHost;
+    std::string eulaLink;
+
+    /**%apidoc Version of the latest read and accepted EULA.
+     * %example 50100
+     */
+    int eulaVersion{0};
+    std::string releaseNotesUrl;
+
+    /**%apidoc Release date in milliseconds since epoch.
+     * %example 86400000
+     */
+    std::chrono::milliseconds releaseDateMs{};
+
+    /**%apidoc Maximum days for release delivery.
+     * %example 90
+     */
+    int releaseDeliveryDays{0};
+    std::string description;
+    std::string eula;
+    std::map<UpdateComponent, std::vector<UpdatePackage>> packages;
+    std::string url;
+
+    /**%apidoc:integer Bytes of free space on server.
+     * %example 1073741824
+     */
+    double freeSpaceB{0.0};
+    std::vector<nx::Uuid> participants;
+
+    /**%apidoc The time the Server was last updated in milliseconds since epoch.
+     * %example 86400000
+     */
+    std::chrono::milliseconds lastInstallationRequestTimeMs{-1};
+};
+#define UpdateInformation_Fields (version)(cloudHost) (eulaLink)(eulaVersion)(releaseNotesUrl) \
+    (releaseDateMs)(releaseDeliveryDays)(description)(eula)(packages)(url)(freeSpaceB) \
+    (participants)(lastInstallationRequestTimeMs)
+NX_VMS_API_DECLARE_STRUCT_EX(UpdateInformation, (json))
+
+struct NX_VMS_API StartUpdateReply
+{
+    UpdateInformation updateInformation;
+    std::vector<nx::Uuid> persistentStorageServers;
+};
+#define StartUpdateReply_Fields (updateInformation)(persistentStorageServers)
+NX_VMS_API_DECLARE_STRUCT_EX(StartUpdateReply, (json))
+
+struct NX_VMS_API InstallUpdateRequest
+{
+    std::vector<nx::Uuid> peers;
+};
+#define InstallUpdateRequest_Fields (peers)
+NX_VMS_API_DECLARE_STRUCT_EX(InstallUpdateRequest, (json))
+
+struct NX_VMS_API FinishUpdateRequest
+{
+    bool ignorePendingPeers;
+};
+#define FinishUpdateRequest_Fields (ignorePendingPeers)
+NX_VMS_API_DECLARE_STRUCT_EX(FinishUpdateRequest, (json))
+
+struct NX_VMS_API DownloadStatus
+{
+    NX_REFLECTION_ENUM_CLASS_IN_CLASS(Status,
+        downloading,
+        downloaded,
+        corrupted)
+
+    std::string file;
+    Status status{Status::downloading};
+
+    /**%apidoc:integer Size of file to download in bytes.
+     * %example 1073741824
+     */
+    double sizeB{0.0};
+
+    /**%apidoc:integer Number of bytes currently downloaded.
+     * %example 536870912
+     */
+    double downloadedSizeB{0.0};
+};
+#define DownloadStatus_Fields (file)(status)(sizeB)(downloadedSizeB)
+NX_VMS_API_DECLARE_STRUCT_EX(DownloadStatus, (json))
+
+struct NX_VMS_API UpdateStatusInfo
+{
+    NX_REFLECTION_ENUM_CLASS_IN_CLASS(State,
+        idle,
+        starting,
+        downloading,
+        preparing,
+        readyToInstall,
+        latestUpdateInstalled,
+        offline,
+        error)
+
+    NX_REFLECTION_ENUM_CLASS_IN_CLASS(Error,
+        noError,
+        updatePackageNotFound,
+        osVersionNotSupported,
+        noFreeSpaceToDownload,
+        noFreeSpaceToExtract,
+        noFreeSpaceToInstall,
+        downloadFailed,
+        invalidUpdateContents,
+        corruptedArchive,
+        extractionError,
+        internalDownloaderError,
+        internalError,
+        unknownError,
+        verificationError,
+        installationError)
+
+    nx::Uuid serverId;
+    State state{State::idle};
+
+    /**%apidoc Only significant if 'state' is 'error'
+     */
+    Error error{Error::noError};
+    std::string message;
+    int progress{0};
+    std::vector<DownloadStatus> downloads;
+    std::string mainUpdatePackage;
+};
+#define UpdateStatusInfo_Fields (serverId)(state)(error)(message)(progress)(downloads)\
+    (mainUpdatePackage)
+NX_VMS_API_DECLARE_STRUCT_EX(UpdateStatusInfo, (json))
+
+struct NX_VMS_API PersistentUpdateStorageInfo
+{
+    InformationCategory infoCategory;
+    std::vector<nx::Uuid> servers;
+    bool autoSelection{false};
+};
+#define PersistentUpdateStorageInfo_Fields (infoCategory)(servers)(autoSelection)
+NX_VMS_API_DECLARE_STRUCT_EX(PersistentUpdateStorageInfo, (json))
+
+struct NX_VMS_API PersistentUpdateStorageRequest
+{
+    InformationCategory infoCategory;
+};
+#define PersistentUpdateStorageRequest_Fields (infoCategory)
+NX_VMS_API_DECLARE_STRUCT_EX(PersistentUpdateStorageRequest, (json))
 
 struct NX_VMS_API UpdateUploadData
 {
     QString updateId;
     QByteArray data;
-    qint64 offset = 0;
+    qint64 offset{0};
 };
 #define UpdateUploadData_Fields \
     (updateId) \
@@ -30,7 +296,7 @@ struct NX_VMS_API UpdateUploadResponseData
 {
     nx::Uuid id;
     QString updateId;
-    int chunks = 0;
+    int chunks{0};
 };
 #define UpdateUploadResponseData_Fields (id)(updateId)(chunks)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(UpdateUploadResponseData)
@@ -42,6 +308,4 @@ struct NX_VMS_API UpdateInstallData
 #define UpdateInstallData_Fields (updateId)
 NX_VMS_API_DECLARE_STRUCT(UpdateInstallData)
 
-} // namespace api
-} // namespace vms
-} // namespace nx
+} // namespace nx::vms::api
