@@ -348,7 +348,7 @@ nx::vms::api::UserModelV1 RemoteConnectionFactoryRequestsManager::Private::getUs
             context->credentials().username, context);
 
         const auto encodedRoleId = QUrl::toPercentEncoding(
-            context->compatibilityUserModel->userRoleId.toString()).toStdString();
+            result.userRoleId.toString()).toStdString();
         const auto url = makeUrl(context->address(), "/rest/v1/userRoles/" + encodedRoleId);
         const auto role = doGet<UserRoleModel>(url, context, makeRequestWithCredentials(context));
         if (context->failed())
