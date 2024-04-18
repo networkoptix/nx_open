@@ -408,7 +408,7 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>Failure to write block</source>
-      <translation>ブロックの書き込みに失敗</translation>
+      <translation>ブロックの書き込みに失敗しました</translation>
     </message>
     <message>
       <source>Cannot create %1 for output</source>
@@ -775,7 +775,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>file to open is a directory</source>
-      <translation>開くファイルはディレクトリです</translation>
+      <translation>開くファイルとしてディレクトリが指定されています</translation>
     </message>
   </context>
   <context>
@@ -878,7 +878,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Hide Details...</source>
-      <translation>詳細の非表示</translation>
+      <translation>詳細を非表示...</translation>
     </message>
     <message>
       <source>OK</source>
@@ -986,7 +986,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Filename refers to a directory</source>
-      <translation>ファイル名でディレクトリを指定しています。</translation>
+      <translation>ディレクトリをファイル名として指定しています。</translation>
     </message>
     <message>
       <source>Writing canceled by application</source>
