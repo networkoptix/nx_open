@@ -7,9 +7,12 @@
 
 #include <sysmem_allocator.h>
 
+#include <QtCore/QCoreApplication>
+#include <QtCore/QDir>
 #include <QtMultimedia/QVideoFrame>
 
 #include <media/filters/h264_mp4_to_annexb.h>
+#include <nx/build_info.h>
 #include <nx/codec/nal_units.h>
 #include <nx/media/video_frame.h>
 #include <nx/utils/log/log.h>
@@ -33,6 +36,14 @@ bool QuickSyncVideoDecoderImpl::isCompatible(
 bool QuickSyncVideoDecoderImpl::isAvailable()
 {
     auto isAvalibaleImpl = []() {
+        if (nx::build_info::isLinux())
+        {
+            QString driverPath = QDir(
+                QCoreApplication::applicationDirPath()).absoluteFilePath("../lib/libva-drivers");
+            qputenv("LIBVA_DRIVERS_PATH", driverPath.toUtf8());
+            NX_DEBUG(NX_SCOPE_TAG, "Intel media driver path: %1", driverPath);
+        }
+
         MFXVideoSession mfxSession;
         mfxIMPL impl = MFX_IMPL_TYPE_HARDWARE;
         mfxVersion version = { {0, 1} };
@@ -44,7 +55,7 @@ bool QuickSyncVideoDecoderImpl::isAvailable()
         nx::media::quick_sync::DeviceContext device;
         if (!device.initialize(mfxSession, /*width*/0, /*height*/0))
             return false;
-    #endif //__linux__
+    #endif // defined(__linux__)
         return true;
     };
 

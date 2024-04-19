@@ -2,6 +2,7 @@
 build_type=Release
 # OpenCV compilation fails with C++20.
 opencv/*:compiler.cppstd=17
+intel-media-driver/*:compiler.cppstd=17
 
 [options]
 boost/*:zlib = False
