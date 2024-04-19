@@ -101,10 +101,18 @@ void mergeOldData(NewDataContainer& newData,
         Predicate::lowerBound(direction));
     const auto endIt = std::upper_bound(startIt, newData.end(), centralTimePoint,
         Predicate::upperBound(direction));
-    const auto removeStartIt = std::unique(startIt, endIt,
-        [](const auto& left, const auto& right)
+
+    // We don't expect a wide range to check here as it consists of items with one timestamp.
+    std::set<QnUuid> foundIds;
+    const auto removeStartIt = std::remove_if(startIt, endIt,
+        [&foundIds](const auto& item)
         {
-            return Facade::id(left) == Facade::id(right);
+            const auto id = Facade::id(item);
+            if (foundIds.find(id) != foundIds.end())
+                return true;
+
+            foundIds.insert(id);
+            return false;
         });
 
     newData.erase(removeStartIt, endIt);
