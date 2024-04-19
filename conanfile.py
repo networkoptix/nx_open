@@ -178,9 +178,11 @@ class NxOpenConan(ConanFile):
 
         if self.isLinux:
             if self.settings.arch == "x86_64":
-                self.requires("libva/2.16.0" "#a0949cd8f15ba93d12dd835002fe1170")
+                self.requires("libva/2.16.0" "#b2c637d798ea5fe5ee939ec3d89d5b91")
                 self.requires("intel-media-sdk/19.4" "#ecb7939833f8de0ffb197905a4f5a75a")
                 self.requires("intel-onevpl/23.4.2" "#da72e6e5e4cb8ce4baf25ce4c0b1a602")
+                self.requires("intel-gmmlib/22.3.15" "#6c54e5bd7885b8f25ff748ec7b2f991c")
+                self.requires("intel-media-driver/23.4.3" "#f39057b746ee544509b0014aba18ec0a")
 
                 self.requires("libmysqlclient/8.0.17" "#87d0d0dca416ff91ff910c66b57eab1a")
                 self.requires("libpq/13.4" "#3c130555eda25ad50be3824716b0ce4d")
@@ -283,6 +285,8 @@ class NxOpenConan(ConanFile):
                 self.import_package("libva")
                 self.import_package("intel-media-sdk")
                 self.import_package("intel-onevpl")
+                self.import_package("intel-gmmlib")
+                self.import_files_from_package("intel-media-driver", "lib/dri", "lib/libva-drivers", "*.so*")
                 self.import_package("libvpl")
 
             if not self.isArm32:
