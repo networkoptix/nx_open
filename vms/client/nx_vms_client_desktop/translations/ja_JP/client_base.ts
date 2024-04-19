@@ -365,7 +365,7 @@
     </message>
     <message>
       <source>Monitor in New Tab</source>
-      <translation>モニターを新しいタブで開く</translation>
+      <translation>モニターを新規タブで開く</translation>
     </message>
     <message>
       <source>Open in Alarm Layout</source>
@@ -3214,7 +3214,7 @@ to %1</source>
     <name>QnDeprecatedUserListModel</name>
     <message>
       <source>Local user</source>
-      <translation>ローカル ユーザー</translation>
+      <translation>ローカルユーザー</translation>
     </message>
     <message>
       <source>%1 user</source>
@@ -3817,7 +3817,7 @@ to %1</source>
     </message>
     <message>
       <source>Locked to Hardware ID</source>
-      <translation>ロックされたハードウェアID</translation>
+      <translation>紐づいたハードウェアID</translation>
     </message>
     <message>
       <source>Generic</source>
@@ -4944,11 +4944,11 @@ to %1</source>
     </message>
     <message>
       <source>Max devices on this server:</source>
-      <translation>最大接続デバイス:</translation>
+      <translation>このサーバー上の最大デバイス数:</translation>
     </message>
     <message>
       <source>Max cameras on this server:</source>
-      <translation>最大接続カメラ:</translation>
+      <translation>このサーバー上の最大カメラ数:</translation>
     </message>
     <message>
       <source>This server already has more than max devices</source>
@@ -8261,7 +8261,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>No devices found</source>
-      <translation>デバイスは見つかりませんでした</translation>
+      <translation>デバイスが見つかりません</translation>
     </message>
     <message>
       <source>All devices are already added</source>
@@ -9044,7 +9044,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Merging Systems...</source>
-      <translation>システム統合...</translation>
+      <translation>システムを統合しています...</translation>
     </message>
     <message>
       <source>Use a specific hostname or IP address rather than %1.</source>
@@ -9888,19 +9888,19 @@ You can force it, but it may significantly increase CPU load.</source>
     <name>nx::vms::client::desktop::RecordingStatusHelper</name>
     <message>
       <source>Not recording</source>
-      <translation>録画なし</translation>
+      <translation>録画しない</translation>
     </message>
     <message>
       <source>Recording everything</source>
-      <translation>全てを録画する</translation>
+      <translation>全てを録画</translation>
     </message>
     <message>
       <source>Recording motion only</source>
-      <translation>モーション録画のみ</translation>
+      <translation>モーションのみ録画</translation>
     </message>
     <message>
       <source>Recording motion and low quality</source>
-      <translation>モーション録画＋低解像度</translation>
+      <translation>モーションと低解像度を録画</translation>
     </message>
     <message>
       <source>Continuous</source>
