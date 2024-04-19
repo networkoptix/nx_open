@@ -78,7 +78,7 @@ Item
                         Layout.topMargin: viewLogsCheckBox.baselineOffset - baselineOffset
                         baselineOffset: height * 0.7 //< This is a property of this icon type.
                         sourceSize: Qt.size(20, 20)
-                        sourcePath: "image://skin/user_settings/sharing/group.svg"
+                        sourcePath: "image://skin/20x20/Solid/group.svg"
                         primaryColor: groupMouseArea.containsMouse
                             ? ColorTheme.colors.light16
                             : ColorTheme.colors.dark13
