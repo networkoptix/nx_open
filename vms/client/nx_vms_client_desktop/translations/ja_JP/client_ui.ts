@@ -1179,7 +1179,7 @@
     <name>ExecHttpRequestActionWidget</name>
     <message>
       <source>Login to authenticate (optional)</source>
-      <translation>ログイン認証</translation>
+      <translation>認証のためにログイン（オプション）</translation>
     </message>
     <message>
       <source>Login</source>
@@ -2129,7 +2129,7 @@
     </message>
     <message>
       <source>No preview available</source>
-      <translation>プレビュー不可</translation>
+      <translation>プレビューは利用できません</translation>
     </message>
     <message>
       <source>Get Preview</source>
