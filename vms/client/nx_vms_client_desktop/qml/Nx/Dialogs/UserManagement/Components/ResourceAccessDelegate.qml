@@ -394,16 +394,16 @@ Item
                                 {
                                     case ResourceAccessInfo.ProvidedVia.own:
                                     case ResourceAccessInfo.ProvidedVia.ownResourceGroup:
-                                        return "image://skin/user_settings/sharing/own.svg"
+                                        return "image://skin/20x20/Outline/success.svg"
 
                                     case ResourceAccessInfo.ProvidedVia.layout:
-                                        return "image://skin/user_settings/sharing/layout.svg"
+                                        return "image://skin/20x20/Solid/layout.svg"
 
                                     case ResourceAccessInfo.ProvidedVia.videowall:
-                                        return "image://skin/user_settings/sharing/videowall.svg"
+                                        return "image://skin/20x20/Solid/videowall.svg"
 
                                     case ResourceAccessInfo.ProvidedVia.parentUserGroup:
-                                        return "image://skin/user_settings/sharing/group.svg"
+                                        return "image://skin/20x20/Solid/group.svg"
 
                                     default:
                                         return ""
