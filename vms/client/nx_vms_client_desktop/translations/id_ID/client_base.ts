@@ -3131,11 +3131,11 @@ to %1</translation>
     </message>
     <message>
       <source>Video</source>
-      <translation type="unfinished">Video</translation>
+      <translation>Video</translation>
     </message>
     <message>
       <source>All Files</source>
-      <translation type="unfinished">All Files</translation>
+      <translation>Semua File</translation>
     </message>
   </context>
   <context>
@@ -6263,7 +6263,7 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     </message>
     <message>
       <source>Screen is locked and cannot be changed</source>
-      <translation type="unfinished">Screen is locked and cannot be changed</translation>
+      <translation>Layar terkunci dan tidak dapat diubah</translation>
     </message>
   </context>
   <context>
@@ -10475,11 +10475,11 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     </message>
     <message>
       <source>Message</source>
-      <translation type="unfinished">Message</translation>
+      <translation>Pesan</translation>
     </message>
     <message>
       <source>Store Update Files</source>
-      <translation type="unfinished">Store Update Files</translation>
+      <translation>Simpan File Update</translation>
     </message>
     <message>
       <source>Client</source>
@@ -10487,11 +10487,11 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     </message>
     <message>
       <source>Component</source>
-      <translation type="unfinished">Component</translation>
+      <translation>Komponen</translation>
     </message>
     <message>
       <source>Installed Version</source>
-      <translation type="unfinished">Installed Version</translation>
+      <translation>Versi Terinstal</translation>
     </message>
   </context>
   <context>
@@ -10517,24 +10517,24 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     </message>
     <message>
       <source>Bookmark it...</source>
-      <translation type="unfinished">Bookmark it...</translation>
+      <translation>Bookmark itu...</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::SimpleMotionSearchWidget</name>
     <message>
       <source>No motion detected</source>
-      <translation type="unfinished">No motion detected</translation>
+      <translation>Tidak ada gerakan yang terdeteksi</translation>
     </message>
     <message numerus="yes">
       <source>%n motion events</source>
-      <translation type="unfinished">
-        <numerusform>%n motion events</numerusform>
+      <translation>
+        <numerusform>%n event gerakan</numerusform>
       </translation>
     </message>
     <message>
       <source>Try changing the filters or enable motion recording</source>
-      <translation type="unfinished">Try changing the filters or enable motion recording</translation>
+      <translation>Coba ubah filter atau aktifkan perekaman gerakan</translation>
     </message>
   </context>
   <context>
@@ -10548,39 +10548,39 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     <name>nx::vms::client::desktop::SystemHealthListModel::Private</name>
     <message numerus="yes">
       <source>Email address is not set for %n users</source>
-      <translation type="unfinished">
-        <numerusform>Email address is not set for %n users</numerusform>
+      <translation>
+        <numerusform>Alamat email tidak ditetapkan untuk %n pengguna</numerusform>
       </translation>
     </message>
     <message>
       <source>Set Passwords</source>
-      <translation type="unfinished">Set Passwords</translation>
+      <translation>Tetapkan Kata Sandi</translation>
     </message>
     <message numerus="yes">
       <source>Recording schedule is invalid for %n cameras</source>
-      <translation type="unfinished">
-        <numerusform>Recording schedule is invalid for %n cameras</numerusform>
+      <translation>
+        <numerusform>Jadwal perekaman tidak valid untuk %n kamera</numerusform>
       </translation>
     </message>
     <message>
       <source>Recording schedule on some cameras contains recording modes that are not supported.</source>
-      <translation type="unfinished">Recording schedule on some cameras contains recording modes that are not supported.</translation>
+      <translation>Jadwal perekaman pada beberapa kamera berisi mode perekaman yang tidak didukung.</translation>
     </message>
     <message>
       <source>Replaced camera discovered</source>
-      <translation type="unfinished">Replaced camera discovered</translation>
+      <translation>Kamera pengganti ditemukan</translation>
     </message>
     <message>
       <source>Camera %1 has been replaced by %2.</source>
-      <translation type="unfinished">Camera %1 has been replaced by %2.</translation>
+      <translation>Kamera %1 telah digantikan oleh %2.</translation>
     </message>
     <message>
       <source>Click on the &quot;Undo Replace&quot; button to continue using two devices.</source>
-      <translation type="unfinished">Click on the &quot;Undo Replace&quot; button to continue using two devices.</translation>
+      <translation>Klik tombol &quot;Undo replace&quot; untuk terus menggunakan dua perangkat.</translation>
     </message>
     <message>
       <source>Undo Replace</source>
-      <translation type="unfinished">Undo Replace</translation>
+      <translation>Batalkan Penggantian</translation>
     </message>
     <message>
       <source>Export</source>
@@ -10588,32 +10588,32 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     </message>
     <message>
       <source>On-device recordings were found</source>
-      <translation type="unfinished">On-device recordings were found</translation>
+      <translation>Rekaman di perangkat ditemukan</translation>
     </message>
     <message>
       <source>Import in progress...</source>
-      <translation type="unfinished">Import in progress...</translation>
+      <translation>Impor sedang berlangsung...</translation>
     </message>
     <message>
       <source>Import archive from %1 completed</source>
-      <translation type="unfinished">Import archive from %1 completed</translation>
+      <translation>Impor archive dari %1 selesai</translation>
     </message>
     <message>
       <source>Import archive from %1 failed</source>
-      <translation type="unfinished">Import archive from %1 failed</translation>
+      <translation>Impor archive dari %1 gagal</translation>
     </message>
     <message>
       <source>Import archive from %1 stopped</source>
-      <translation type="unfinished">Import archive from %1 stopped</translation>
+      <translation>Impor archive dari %1 berhenti</translation>
     </message>
     <message>
       <source>Import archive from %1</source>
-      <translation type="unfinished">Import archive from %1</translation>
+      <translation>Impor archive dari %1</translation>
     </message>
     <message numerus="yes">
       <source>Backup storage is not configured on %n Servers</source>
-      <translation type="unfinished">
-        <numerusform>Backup storage is not configured on %n Servers</numerusform>
+      <translation>
+        <numerusform>Penyimpanan backup tidak dikonfigurasi di Server %n</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -10655,17 +10655,17 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     </message>
     <message numerus="yes">
       <source>Double click to add cameras to the current layout or ctrl+click to open in a new tab</source>
-      <translation type="unfinished">
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
+      <translation>
+        <numerusform>Klik dua kali untuk menambahkan kamera ke layout saat ini atau ctrl+klik untuk membuka di tab baru</numerusform>
       </translation>
     </message>
     <message>
       <source>No available archive</source>
-      <translation type="unfinished">No available archive</translation>
+      <translation>Tidak ada archive yang tersedia</translation>
     </message>
     <message>
       <source>Failed to execute plugin action</source>
-      <translation type="unfinished">Failed to execute plugin action</translation>
+      <translation>Gagal menjalankan aksi plugin</translation>
     </message>
     <message>
       <source>Name</source>
@@ -10709,7 +10709,7 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     </message>
     <message>
       <source>This action is not supported for notifications from other Systems</source>
-      <translation type="unfinished">This action is not supported for notifications from other Systems</translation>
+      <translation>Aksi ini tidak didukung untuk notifikasi dari Sistem lain</translation>
     </message>
   </context>
   <context>
@@ -10720,7 +10720,7 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     </message>
     <message>
       <source>Time Zone</source>
-      <translation type="unfinished">Time Zone</translation>
+      <translation>Zona Waktu</translation>
     </message>
     <message>
       <source>Date</source>
@@ -10728,49 +10728,49 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     </message>
     <message>
       <source>Server OS Time</source>
-      <translation type="unfinished">Server OS Time</translation>
+      <translation>Waktu OS Server</translation>
     </message>
     <message>
       <source>VMS Time</source>
-      <translation type="unfinished">VMS Time</translation>
+      <translation>Waktu VMS</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::TimeSynchronizationWidget</name>
     <message>
       <source>Time, common and synchronized between all servers. Can be different with OS time on any particular server.</source>
-      <translation type="unfinished">Time, common and synchronized between all servers. Can be different with OS time on any particular server.</translation>
+      <translation>Waktu, umum dan tersinkronisasi antara semua server. Bisa berbeda dengan waktu OS di server tertentu.</translation>
     </message>
     <message>
       <source>Synchronized with the Internet</source>
-      <translation type="unfinished">Synchronized with the Internet</translation>
+      <translation>Disinkronkan dengan Internet</translation>
     </message>
     <message>
       <source>Synchronized with the local time at the selected server</source>
-      <translation type="unfinished">Synchronized with the local time at the selected server</translation>
+      <translation>Disinkronkan dengan waktu lokal di server yang dipilih</translation>
     </message>
     <message>
       <source>Not synchronized. Each server uses its own local time.</source>
-      <translation type="unfinished">Not synchronized. Each server uses its own local time.</translation>
+      <translation>Tidak disinkronkan. Setiap server menggunakan waktu lokalnya sendiri.</translation>
     </message>
     <message>
       <source>Equal to the server local time</source>
-      <translation type="unfinished">Equal to the server local time</translation>
+      <translation>Sama dengan waktu lokal server</translation>
     </message>
     <message>
       <source>No Internet connection. Time is not being synchronized.</source>
-      <translation type="unfinished">No Internet connection. Time is not being synchronized.</translation>
+      <translation>Tidak ada koneksi internet. Waktu tidak disinkronkan.</translation>
     </message>
     <message>
       <source>Time Server is offline. Time is not being synchronized.</source>
-      <translation type="unfinished">Time Server is offline. Time is not being synchronized.</translation>
+      <translation>Server Waktu sedang offline. Waktu tidak disinkronkan.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::TimestampOverlaySettingsWidget</name>
     <message>
       <source>Long</source>
-      <translation type="unfinished">Long</translation>
+      <translation>Panjang</translation>
     </message>
     <message>
       <source>Short</source>
@@ -10781,50 +10781,50 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     <name>nx::vms::client::desktop::UploadWorker</name>
     <message>
       <source>Could not open file &quot;%1&quot;</source>
-      <translation type="unfinished">Could not open file &quot;%1&quot;</translation>
+      <translation>Tidak dapat membuka file &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Could not calculate md5 for file &quot;%1&quot;</source>
-      <translation type="unfinished">Could not calculate md5 for file &quot;%1&quot;</translation>
+      <translation>Tidak dapat menghitung md5 untuk file &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Could not create upload on the server side: %1</source>
-      <translation type="unfinished">Could not create upload on the server side: %1</translation>
+      <translation>Tidak dapat membuat upload di sisi server: %1</translation>
     </message>
     <message>
       <source>Could not upload file chunk to the server</source>
-      <translation type="unfinished">Could not upload file chunk to the server</translation>
+      <translation>Tidak dapat mengupload potongan file ke server</translation>
     </message>
     <message>
       <source>Could not check uploaded file on the server</source>
-      <translation type="unfinished">Could not check uploaded file on the server</translation>
+      <translation>Tidak dapat memeriksa file yang diupload di server</translation>
     </message>
     <message>
       <source>File was corrupted while being uploaded to the server</source>
-      <translation type="unfinished">File was corrupted while being uploaded to the server</translation>
+      <translation>File rusak saat diupload ke server</translation>
     </message>
     <message>
       <source>Remote file &quot;%1&quot; is corrupted</source>
-      <translation type="unfinished">Remote file &quot;%1&quot; is corrupted</translation>
+      <translation>File remote &quot;%1&quot; rusak</translation>
     </message>
     <message>
       <source>Server already has this file &quot;%1&quot;</source>
-      <translation type="unfinished">Server already has this file &quot;%1&quot;</translation>
+      <translation>Server sudah memiliki file ini &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::UserGroupListModel</name>
     <message>
       <source>LDAP group</source>
-      <translation type="unfinished">LDAP group</translation>
+      <translation>Grup LDAP</translation>
     </message>
     <message>
       <source>Built-in group</source>
-      <translation type="unfinished">Built-in group</translation>
+      <translation>Grup Built-in</translation>
     </message>
     <message>
       <source>Custom group</source>
-      <translation type="unfinished">Custom group</translation>
+      <translation>Grup Kustom</translation>
     </message>
     <message>
       <source>Name</source>
@@ -10836,7 +10836,7 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     </message>
     <message>
       <source>Member of</source>
-      <translation type="unfinished">Member of</translation>
+      <translation>Anggota dari</translation>
     </message>
     <message>
       <source>Permissions</source>
@@ -11279,11 +11279,11 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     </message>
     <message>
       <source>Next Camera on Layout</source>
-      <translation type="unfinished">Next Camera on Layout</translation>
+      <translation>Kamera Berikutnya pada Layout</translation>
     </message>
     <message>
       <source>Previous Camera on Layout</source>
-      <translation type="unfinished">Previous Camera on Layout</translation>
+      <translation>Kamera Sebelumnya pada Layout</translation>
     </message>
     <message>
       <source>Open Layout</source>
@@ -11291,60 +11291,60 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     </message>
     <message>
       <source>Modifier</source>
-      <translation type="unfinished">Modifier</translation>
+      <translation>Modifier</translation>
     </message>
     <message>
       <source>Multiple</source>
-      <translation type="unfinished">Multiple</translation>
+      <translation>Multipel</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::joystick::JoystickButtonSettingsModel</name>
     <message>
       <source>Select Layout...</source>
-      <translation type="unfinished">Select Layout...</translation>
+      <translation>Pilih Layout...</translation>
     </message>
     <message>
       <source>Button</source>
-      <translation type="unfinished">Button</translation>
+      <translation>Tombol</translation>
     </message>
     <message>
       <source>Selected Layout</source>
-      <translation type="unfinished">Selected Layout</translation>
+      <translation>Layout yang Dipilih</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::jsapi::detail::ResourcesApiBackend</name>
     <message>
       <source>Resource is not available for the usage with JS API</source>
-      <translation type="unfinished">Resource is not available for the usage with JS API</translation>
+      <translation>Resource tidak tersedia untuk penggunaan dengan JS API</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::jsapi::detail::TabApiBackend</name>
     <message>
       <source>Cannot specify a media parameters for the resource without media stream.</source>
-      <translation type="unfinished">Cannot specify a media parameters for the resource without media stream.</translation>
+      <translation>Tidak dapat menentukan parameter media untuk resource tanpa media stream.</translation>
     </message>
     <message>
       <source>Cannot add the resource to the layout</source>
-      <translation type="unfinished">Cannot add the resource to the layout</translation>
+      <translation>Tidak dapat menambahkan resource ke layout</translation>
     </message>
     <message>
       <source>Cannot find a widget corresponding to the specified item.</source>
-      <translation type="unfinished">Cannot find a widget corresponding to the specified item.</translation>
+      <translation>Tidak dapat menemukan widget yang sesuai dengan item yang ditentukan.</translation>
     </message>
     <message>
       <source>Cannot find an item with the specified ID</source>
-      <translation type="unfinished">Cannot find an item with the specified ID</translation>
+      <translation>Tidak dapat menemukan item dengan ID yang ditentukan</translation>
     </message>
     <message>
       <source>Cannot find a resource with the specified ID.</source>
-      <translation type="unfinished">Cannot find a resource with the specified ID.</translation>
+      <translation>Tidak dapat menemukan resource dengan ID yang ditentukan.</translation>
     </message>
     <message>
       <source>Cannot add resources from other Systems.</source>
-      <translation type="unfinished">Cannot add resources from other Systems.</translation>
+      <translation>Tidak dapat menambahkan resource dari Sistem lain.</translation>
     </message>
   </context>
   <context>
@@ -11370,7 +11370,7 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     <name>nx::vms::client::desktop::rules::ModificationMarkItemDelegate</name>
     <message>
       <source>Not saved</source>
-      <translation type="unfinished">Not saved</translation>
+      <translation>Tidak tersimpan</translation>
     </message>
   </context>
   <context>
@@ -11389,11 +11389,11 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     </message>
     <message>
       <source>Failed to restore rules.</source>
-      <translation type="unfinished">Failed to restore rules.</translation>
+      <translation>Gagal memulihkan aturan.</translation>
     </message>
     <message>
       <source>Apply changes before exiting?</source>
-      <translation type="unfinished">Apply changes before exiting?</translation>
+      <translation>Terapkan perubahan sebelum keluar?</translation>
     </message>
   </context>
   <context>
@@ -11411,42 +11411,42 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     <name>nx::vms::client::desktop::ui::AnalyticsSdkEventWidget</name>
     <message>
       <source>Analytics events can be set up on a certain cameras.</source>
-      <translation type="unfinished">Analytics events can be set up on a certain cameras.</translation>
+      <translation>Event analitik dapat diatur pada kamera tertentu.</translation>
     </message>
     <message>
       <source>Choose cameras using the button above to see the list of supported events.</source>
-      <translation type="unfinished">Choose cameras using the button above to see the list of supported events.</translation>
+      <translation>Pilih kamera menggunakan tombol di atas untuk melihat daftar event yang didukung.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the caption with any of the entered keywords.</translation>
+      <translation>Event hanya akan trigger jika ada kecocokan dalam caption dengan salah satu kata kunci yang dimasukkan.</translation>
     </message>
     <message>
       <source>If the field is empty, event will always trigger.</source>
-      <translation type="unfinished">If the field is empty, event will always trigger.</translation>
+      <translation>Jika bidangnya kosong, event akan selalu trigger.</translation>
     </message>
     <message>
       <source>This field is case sensitive.</source>
-      <translation type="unfinished">This field is case sensitive.</translation>
+      <translation>Bidang ini peka huruf besar-kecil.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the description field with any of the entered keywords.</translation>
+      <translation>Event hanya akan trigger jika ada kecocokan dalam description dengan salah satu kata kunci yang dimasukkan.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ui::AnalyticsSdkObjectDetectedWidget</name>
     <message>
       <source>Analytics object detection can be set up on a certain cameras.</source>
-      <translation type="unfinished">Analytics object detection can be set up on a certain cameras.</translation>
+      <translation>Deteksi objek analitik dapat diatur pada kamera tertentu.</translation>
     </message>
     <message>
       <source>Choose cameras using the button above to see the list of supported events.</source>
-      <translation type="unfinished">Choose cameras using the button above to see the list of supported events.</translation>
+      <translation>Pilih kamera menggunakan tombol di atas untuk melihat daftar event yang didukung.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches any of attributes. You can see the names of the attributes and their values on the Objects tab.</source>
-      <translation type="unfinished">Event will trigger only if there are matches any of attributes. You can see the names of the attributes and their values on the Objects tab.</translation>
+      <translation>Event hanya akan triger hanya jika ada atribut yang cocok. Anda dapat melihat nama atribut dan nilainya pada tab Objek.</translation>
     </message>
   </context>
   <context>
@@ -11460,26 +11460,26 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventModel</name>
     <message>
       <source>Any Plugin</source>
-      <translation type="unfinished">Any Plugin</translation>
+      <translation>Plugin apa pun</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventWidget</name>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the caption with any of the entered keywords.</translation>
+      <translation>Event hanya akan trigger jika ada kecocokan dalam caption dengan salah satu kata kunci yang dimasukkan.</translation>
     </message>
     <message>
       <source>If the field is empty, event will always trigger.</source>
-      <translation type="unfinished">If the field is empty, event will always trigger.</translation>
+      <translation>Jika bidangnya kosong, event akan selalu trigger.</translation>
     </message>
     <message>
       <source>This field is case sensitive.</source>
-      <translation type="unfinished">This field is case sensitive.</translation>
+      <translation>Bidang ini peka huruf besar-kecil.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the description field with any of the entered keywords.</translation>
+      <translation>Event hanya akan trigger jika ada kecocokan dalam description dengan salah satu kata kunci yang dimasukkan.</translation>
     </message>
   </context>
   <context>
@@ -11549,15 +11549,15 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     <name>nx::vms::client::desktop::ui::action::ShowOnItemsFactory</name>
     <message>
       <source>Info</source>
-      <translation type="unfinished">Info</translation>
+      <translation>Informasi</translation>
     </message>
     <message>
       <source>Objects</source>
-      <translation type="unfinished">Objects</translation>
+      <translation>Objek</translation>
     </message>
     <message>
       <source>Regions of Interest</source>
-      <translation type="unfinished">Regions of Interest</translation>
+      <translation>Wilayah yang Diminati</translation>
     </message>
   </context>
   <context>
@@ -11604,12 +11604,12 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     </message>
     <message>
       <source>Please complete the following for license deactivation</source>
-      <translation type="unfinished">Please complete the following for license deactivation</translation>
+      <translation>Silakan selesaikan hal berikut untuk penonaktifan lisensi</translation>
     </message>
     <message numerus="yes">
       <source>Note that each license key may be deactivated a maximum of %n times.</source>
-      <translation type="unfinished">
-        <numerusform>Note that each license key may be deactivated a maximum of %n times.</numerusform>
+      <translation>
+        <numerusform>Perhatikan bahwa setiap kunci lisensi dapat dinonaktifkan maksimal %n kali.</numerusform>
       </translation>
     </message>
   </context>
@@ -11626,11 +11626,11 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     <name>nx::vms::client::desktop::ui::workbench::ActionHandler</name>
     <message>
       <source>Layout is full</source>
-      <translation type="unfinished">Layout is full</translation>
+      <translation>Layout sudah penuh</translation>
     </message>
     <message>
       <source>Failed to change password</source>
-      <translation type="unfinished">Failed to change password</translation>
+      <translation>Gagal mengubah kata sandi</translation>
     </message>
     <message numerus="yes">
       <source>Failed to move %n devices</source>
@@ -11686,7 +11686,7 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     </message>
     <message>
       <source>All Supported</source>
-      <translation type="unfinished">All Supported</translation>
+      <translation>Semua Didukung</translation>
     </message>
     <message>
       <source>Too short period selected</source>
@@ -11756,7 +11756,7 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     </message>
     <message>
       <source>Please upgrade to a next available patch or release version once available.</source>
-      <translation type="unfinished">Please upgrade to a next available patch or release version once available.</translation>
+      <translation>Mohon update ke versi patch atau rilis berikutnya yang tersedia apabila tersedia.</translation>
     </message>
     <message>
       <source>Failed to open server web page</source>
@@ -11765,17 +11765,17 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     <message numerus="yes">
       <source>Failed to change password on %n cameras of %1</source>
       <comment>Total number of cameras will be substituted as %1</comment>
-      <translation type="unfinished">
-        <numerusform>Failed to change password on %n cameras of %1</numerusform>
+      <translation>
+        <numerusform>Gagal mengubah kata sandi pada %n kamera %1</numerusform>
       </translation>
     </message>
     <message>
       <source>This build is for testing purposes only.</source>
-      <translation type="unfinished">This build is for testing purposes only.</translation>
+      <translation>Pembuatan ini hanya untuk tujuan testing.</translation>
     </message>
     <message>
       <source>Open Server Settings</source>
-      <translation type="unfinished">Open Server Settings</translation>
+      <translation>Buka Pengaturan Server</translation>
     </message>
     <message>
       <source>OK</source>
@@ -11783,38 +11783,38 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     </message>
     <message>
       <source>Confirm storage location for the analytics data on &quot;%1&quot;</source>
-      <translation type="unfinished">Confirm storage location for the analytics data on &quot;%1&quot;</translation>
+      <translation>Konfirmasikan lokasi penyimpanan untuk data analitik di &quot;%1&quot;</translation>
     </message>
     <message>
       <source>the largest available partition</source>
-      <translation type="unfinished">the largest available partition</translation>
+      <translation>partisi terbesar yang tersedia</translation>
     </message>
     <message>
       <source>The analytics database should only be stored on a local drive and can take up large amounts of space.
 Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
 By default analytics data will be stored on %1.
 You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
-      <translation type="unfinished">The analytics database should only be stored on a local drive and can take up large amounts of space.
-Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
-By default analytics data will be stored on %1.
-You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</translation>
+      <translation>Database analitik hanya boleh disimpan di drive lokal dan dapat menggunakan banyak ruang.
+Setelah lokasi untuk menyimpan data analitik dipilih, lokasi tersebut tidak dapat diubah dengan mudah tanpa kehilangan data yang ada. Kami menyarankan untuk memilih lokasi dengan hati-hati dan menghindari penggunaan partisi sistem karena dapat menyebabkan kegagalan fungsi sistem yang parah.
+Secara default data analitik akan disimpan di %1.
+Anda dapat memilih lokasi penyimpanan lain di tab &quot;Manajemen Penyimpanan&quot; pada dialog Pengaturan Server.</translation>
     </message>
     <message>
       <source>Window configuration saved</source>
-      <translation type="unfinished">Window configuration saved</translation>
+      <translation>Konfigurasi Window disimpan</translation>
     </message>
     <message>
       <source>This build is for demo purposes only.</source>
-      <translation type="unfinished">This build is for demo purposes only.</translation>
+      <translation>Build ini hanya untuk tujuan testing.</translation>
     </message>
     <message>
       <source>It cannot be upgraded to subsequent builds as they become available.</source>
-      <translation type="unfinished">It cannot be upgraded to subsequent builds as they become available.</translation>
+      <translation>Itu tidak dapat diupdate ke versi berikutnya saat sudah tersedia.</translation>
     </message>
     <message>
       <source>To upgrade, please uninstall %1 before installing an updated build (all data will be lost).</source>
       <comment>%1 is the product name</comment>
-      <translation type="unfinished">To upgrade, please uninstall %1 before installing an updated build (all data will be lost).</translation>
+      <translation>Untuk update, harap hapus instalan %1 sebelum menginstal versi yang terupdate (semua data akan hilang).</translation>
     </message>
     <message>
       <source>%1 Beta</source>

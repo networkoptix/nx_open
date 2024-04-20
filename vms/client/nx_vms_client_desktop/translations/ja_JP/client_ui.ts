@@ -398,7 +398,7 @@
     <name>BookmarkWidget</name>
     <message>
       <source>Popular tags</source>
-      <translation>ポピュラータグ</translation>
+      <translation>よく使われるタグ</translation>
     </message>
     <message>
       <source>Name</source>
@@ -535,7 +535,7 @@
     </message>
     <message>
       <source>Restore Defaults</source>
-      <translation>初期設定に戻す</translation>
+      <translation>デフォルトに戻す</translation>
     </message>
     <message>
       <source>Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
@@ -798,7 +798,7 @@
     </message>
     <message>
       <source>Output ID:</source>
-      <translation>出力ID：</translation>
+      <translation>出力ID:</translation>
     </message>
   </context>
   <context>
@@ -1039,7 +1039,7 @@
     </message>
     <message>
       <source>Restore from Backup...</source>
-      <translation>リストア...</translation>
+      <translation>バックアップから復元...</translation>
     </message>
     <message>
       <source>Create a backup of System management data, or restore System management data from an existing backup</source>
@@ -1201,7 +1201,7 @@
     </message>
     <message>
       <source>Password to authenticate (optional)</source>
-      <translation>パスワード認証</translation>
+      <translation>認証用パスワード (オプション)</translation>
     </message>
     <message>
       <source>Password</source>
@@ -1232,7 +1232,7 @@
     <name>ExecPtzPresetBusinessActionWidget</name>
     <message>
       <source>PTZ preset:</source>
-      <translation>&amp;PTZ プリセット:</translation>
+      <translation>PTZ プリセット:</translation>
     </message>
   </context>
   <context>
