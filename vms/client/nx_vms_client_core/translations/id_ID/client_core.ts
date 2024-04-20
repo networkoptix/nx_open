@@ -178,7 +178,7 @@
     <message>
       <source>Connection to %1 is not ready yet. Check the server&apos;s internet connection or try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connection to %1 is not ready yet. Check the server&apos;s internet connection or try again later.</translation>
+      <translation>Koneksi ke %1 belum siap. Periksa koneksi internet server&apos;atau coba lagi nanti.</translation>
     </message>
     <message>
       <source>Connection failed</source>
@@ -195,15 +195,15 @@
     <message>
       <source>To log in to this System, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</source>
       <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation type="unfinished">To log in to this System, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</translation>
+      <translation>Untuk masuk ke Sistem ini, nonaktifkan &quot;Minta kode verifikasi pada setiap login dengan akun %1 Anda&quot; di %2Anda.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::core::AbstractAttributedEventModel</name>
     <message numerus="yes">
       <source>+%n values</source>
-      <translation type="unfinished">
-        <numerusform>+%n values</numerusform>
+      <translation>
+        <numerusform>+%n nilai</numerusform>
       </translation>
     </message>
   </context>
@@ -211,7 +211,7 @@
     <name>nx::vms::client::core::AnalyticsSearchListModel</name>
     <message>
       <source>Unknown track</source>
-      <translation type="unfinished">Unknown track</translation>
+      <translation>Track tidak diketahui</translation>
     </message>
     <message>
       <source>deleted camera</source>
@@ -256,7 +256,7 @@
     </message>
     <message>
       <source>This might be due to an expired server certificate or or an invalid certificate. Contact your system administrator for further investigation.</source>
-      <translation type="unfinished">This might be due to an expired server certificate or or an invalid certificate. Contact your system administrator for further investigation.</translation>
+      <translation>Hal ini mungkin disebabkan oleh sertifikat server kadaluarsa atau sertifikat yang tidak valid. Hubungi administrator sistem Anda untuk investigasi lebih lanjut.</translation>
     </message>
     <message>
       <source>To learn more about the current problem read this %1.</source>
@@ -279,29 +279,29 @@
     <name>nx::vms::client::core::EventSearchUtils</name>
     <message>
       <source>Last day</source>
-      <translation type="unfinished">Last day</translation>
+      <translation>Hari terakhir</translation>
     </message>
     <message>
       <source>Last 7 days</source>
-      <translation type="unfinished">Last 7 days</translation>
+      <translation>7 Hari terakhir</translation>
     </message>
     <message>
       <source>Last 30 days</source>
-      <translation type="unfinished">Last 30 days</translation>
+      <translation>30 Hari terakhir</translation>
     </message>
     <message>
       <source>Any time</source>
-      <translation type="unfinished">Any time</translation>
+      <translation>Semua waktu</translation>
     </message>
     <message>
       <source>Any</source>
-      <translation type="unfinished">Any</translation>
+      <translation>Semua</translation>
     </message>
     <message numerus="yes">
       <source>%n Cameras</source>
       <comment>%n is a number of cameras</comment>
-      <translation type="unfinished">
-        <numerusform>%n Cameras</numerusform>
+      <translation>
+        <numerusform>%n Kamera</numerusform>
       </translation>
     </message>
   </context>
@@ -309,26 +309,26 @@
     <name>nx::vms::client::core::ExtendedOutputCameraButtonController</name>
     <message>
       <source>Heater</source>
-      <translation type="unfinished">Heater</translation>
+      <translation>Heater</translation>
     </message>
     <message>
       <source>Wiper</source>
-      <translation type="unfinished">Wiper</translation>
+      <translation>Wiper</translation>
     </message>
     <message>
       <source>Open Door</source>
-      <translation type="unfinished">Open Door</translation>
+      <translation>Buka Pintu</translation>
     </message>
     <message>
       <source>Stop Object Tracking</source>
-      <translation type="unfinished">Stop Object Tracking</translation>
+      <translation>Hentikan Pelacakan Objek</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::core::SoftwareTriggerCameraButtonController</name>
     <message>
       <source>Press and hold to</source>
-      <translation type="unfinished">Press and hold to</translation>
+      <translation>Tekan dan tahan</translation>
     </message>
     <message>
       <source>press and hold</source>
@@ -339,15 +339,15 @@
     <name>nx::vms::client::core::TwoWayAudioCameraButtonController</name>
     <message>
       <source>Unmute</source>
-      <translation type="unfinished">Unmute</translation>
+      <translation>Tidak mute</translation>
     </message>
     <message>
       <source>Mute</source>
-      <translation type="unfinished">Mute</translation>
+      <translation>Mute</translation>
     </message>
     <message>
       <source>Press and hold to speak</source>
-      <translation type="unfinished">Press and hold to speak</translation>
+      <translation>Tekan dan tahan untuk berbicara</translation>
     </message>
   </context>
 </TS>
