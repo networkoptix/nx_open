@@ -395,7 +395,7 @@
     </message>
     <message>
       <source>Monitor in New Tab</source>
-      <translation>モニターを新規タブで開く</translation>
+      <translation>モニターを新しいタブで開く</translation>
     </message>
     <message>
       <source>Open in Alarm Layout</source>
@@ -3306,7 +3306,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Open Database Backup...</source>
-      <translation>データベースバックアップを開く...</translation>
+      <translation>データベースのバックアップを開く...</translation>
     </message>
     <message>
       <source>Database backup is being uploaded to the server. Please wait.</source>
@@ -3346,7 +3346,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Restore from Database Backup</source>
-      <translation>データベースバックアップから復元</translation>
+      <translation>データベースのバックアップから復元</translation>
     </message>
     <message>
       <source>Enter your account password to restore System from backup</source>
@@ -3628,7 +3628,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Open Event Rules Management</source>
-      <translation>イベントルール管理を開く</translation>
+      <translation>イベントルール管理画面を開く</translation>
     </message>
     <message>
       <source>Open Audit Trail Log</source>
@@ -5825,7 +5825,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Saving %1</source>
-      <translation>保存 %1</translation>
+      <translation>%1 を保存しています</translation>
     </message>
     <message>
       <source>Saving Screenshot...</source>
@@ -9115,11 +9115,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Picture cannot be read</source>
-      <translation>画像を読み取ることができません</translation>
+      <translation>画像を読み込めません</translation>
     </message>
     <message>
       <source>Picture cannot be loaded</source>
-      <translation>画像を読み込むことができません</translation>
+      <translation>画像を読み込めません</translation>
     </message>
   </context>
   <context>
