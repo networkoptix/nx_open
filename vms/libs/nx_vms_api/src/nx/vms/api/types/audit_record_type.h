@@ -36,7 +36,5 @@ NX_REFLECTION_ENUM_CLASS(AuditRecordType,
     cloudBind = 0x2000000,
     cloudUnbind = 0x4000000
 )
-Q_DECLARE_FLAGS(AuditRecordTypes, AuditRecordType)
-Q_DECLARE_OPERATORS_FOR_FLAGS(AuditRecordTypes)
 
 } // namespace nx::vms::api
