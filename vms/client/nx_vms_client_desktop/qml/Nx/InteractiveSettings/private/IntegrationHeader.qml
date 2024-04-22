@@ -89,7 +89,7 @@ RowLayout
         Layout.alignment: Qt.AlignBaseline
     }
 
-    Image
+    ColoredImage
     {
         id: warning
         visible:
@@ -102,7 +102,8 @@ RowLayout
 
             return !!licenseSummary && licenseSummary.available < licenseSummary.inUse
         }
-        source: "image://skin/banners/warning.svg"
+        sourcePath: "image://skin/20x20/Solid/attention.svg"
+        primaryColor: "yellow_l"
         sourceSize: Qt.size(20, 20)
 
         GlobalToolTip.text: licenseSummary && licenseSummary.issueExpirationDate
