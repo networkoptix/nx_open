@@ -12,7 +12,7 @@
     <name>MAC_APPLICATION_MENU</name>
     <message>
       <source>Services</source>
-      <translation type="unfinished">Services</translation>
+      <translation>Layanan</translation>
     </message>
     <message>
       <source>Hide %1</source>
