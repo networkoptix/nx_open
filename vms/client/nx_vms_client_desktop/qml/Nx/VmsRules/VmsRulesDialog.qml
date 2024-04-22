@@ -30,7 +30,7 @@ Dialog
         dialog.deleteRules(rulesSortFilterModel.getRuleIds(tableView.checkedRows))
     }
 
-    title: qsTr("Vms Rules")
+    title: qsTr("Event Rules")
 
     width: 1177
     height: 745
