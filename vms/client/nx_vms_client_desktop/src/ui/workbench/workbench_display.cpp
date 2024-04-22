@@ -24,8 +24,8 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/streaming/abstract_archive_stream_reader.h>
 #include <nx/streaming/abstract_stream_data_provider.h>
+#include <nx/utils/datetime.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/log/log_main.h>
 #include <nx/utils/math/math.h>
 #include <nx/utils/qt_helpers.h>
 #include <nx/vms/client/core/skin/skin.h>
@@ -1217,6 +1217,8 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
         return false;
     }
 
+    NX_VERBOSE(this, "Add new item %1 to the current layout", item);
+
     widget->setParent(this); /* Just to feel totally safe and not to leak memory no matter what happens. */
     widget->setAttribute(Qt::WA_DeleteOnClose);
 
@@ -1321,6 +1323,8 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
                     time *= 1000;
                 if (time > 0)
                 {
+                    NX_VERBOSE(this, "Navigate item %1 to time %2", item,
+                        nx::utils::timestampToDebugString(time));
                     mediaWidget->display()->archiveReader()->jumpTo(time, time);
                 }
                 else
@@ -2139,6 +2143,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutAboutToBeChanged()
 void QnWorkbenchDisplay::at_workbench_currentLayoutChanged()
 {
     const auto workbenchLayout = workbench()->currentLayout();
+    NX_DEBUG(this, "Current layout is changed to %1", workbenchLayout->name());
 
     const auto layoutSearchStateData = workbenchLayout->data(Qn::LayoutSearchStateRole);
     const bool isPreviewSearchLayout = !layoutSearchStateData.isNull()
@@ -2148,6 +2153,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged()
     auto syncState = workbenchLayout->streamSynchronizationState();
     if (isPreviewSearchLayout)
     {
+        NX_VERBOSE(this, "Open preview search layout");
         NX_ASSERT(!syncState.isSyncOn);
         syncState.isSyncOn = false;
     }
@@ -2227,6 +2233,8 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged()
             {
                 if (timeMs)
                 {
+                    NX_VERBOSE(this, "Navigate %1 to position %2",
+                        mediaResourceWidget, nx::utils::timestampToDebugString(*timeMs));
                     const qint64 timeUSec = timeMs.value() == DATETIME_NOW
                         ? DATETIME_NOW
                         : timeMs.value() * 1000;
@@ -2235,6 +2243,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged()
                 }
                 else if (!resource->hasFlags(Qn::live))
                 {
+                    NX_VERBOSE(this, "Navigate %1 to position 0", mediaResourceWidget);
                     // Default position in SyncPlay is LIVE. If current resource is synchronized
                     // and it is not camera (does not has live) than seek to 0 (default position).
                     archiveReader->jumpTo(0, 0);
@@ -2255,6 +2264,8 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged()
 
             if (isPreviewSearchLayout && timeMs)
             {
+                NX_VERBOSE(this, "Navigate %1 to preview position %2",
+                    mediaResourceWidget, nx::utils::timestampToDebugString(*timeMs));
                 const auto camDisplay = mediaResourceWidget->display()->camDisplay();
                 camDisplay->setMTDecoding(false);
                 camDisplay->start();

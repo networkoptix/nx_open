@@ -71,21 +71,27 @@ QnWorkbenchStreamSynchronizer::QnWorkbenchStreamSynchronizer(
         at_display_widgetAdded(widget);
 }
 
-void QnWorkbenchStreamSynchronizer::stop() {
-    if(!m_syncPlay->isEnabled())
+void QnWorkbenchStreamSynchronizer::stop()
+{
+    if (!m_syncPlay->isEnabled())
         return;
 
+    NX_DEBUG(this, "Stop sync");
     m_syncPlay->disableSync();
 
     emit runningChanged();
 }
 
-void QnWorkbenchStreamSynchronizer::start(qint64 timeUSec, float speed) {
+void QnWorkbenchStreamSynchronizer::start(qint64 timeUSec, float speed)
+{
     bool wasRunning = isRunning();
+
+    if (!wasRunning)
+        NX_DEBUG(this, "Start sync");
 
     m_syncPlay->enableSync(timeUSec, speed);
 
-    if(!wasRunning)
+    if (!wasRunning)
         emit runningChanged();
 }
 
