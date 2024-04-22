@@ -28,7 +28,7 @@ Menu
     {
         text: qsTr("Edit")
 
-        icon.source: "image://skin/welcome_screen/tile/menu/edit.svg"
+        icon.source: "image://skin/20x20/Outline/edit.svg"
         visible: (menu.model.tileType === ConnectTilesModel.GeneralTileType)
             && menu.model.isOnline
             && menu.loggedIn
@@ -43,8 +43,8 @@ Menu
             : qsTr("Show")
 
         icon.source: menu.model.visibilityScope !== WelcomeScreen.HiddenTileVisibilityScope
-            ? "image://skin/welcome_screen/tile/menu/eye_crossed.svg"
-            : "image://skin/welcome_screen/tile/menu/eye.svg"
+            ? "image://skin/20x20/Outline/eye_closed.svg"
+            : "image://skin/20x20/Outline/eye_open.svg"
 
         visible: menu.hideActionEnabled || menu.model.tileType === ConnectTilesModel.CloudButtonTileType
 
@@ -72,7 +72,7 @@ Menu
     {
         text: qsTr("Delete")
 
-        icon.source: "image://skin/welcome_screen/tile/menu/delete.svg"
+        icon.source: "image://skin/20x20/Outline/delete.svg"
 
         visible: !menu.cloud && !menu.connectable
 

@@ -53,7 +53,7 @@ Button
 
                 sourceSize: Qt.size(width, height)
 
-                sourcePath: "welcome_screen/plus.svg"
+                sourcePath: "image://skin/20x20/Outline/connect.svg"
                 primaryColor: control.currentColor
             }
 

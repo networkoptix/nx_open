@@ -83,13 +83,14 @@ Button
         }
     }
 
-    Image
+    ColoredImage
     {
         anchors.centerIn: parent
         width: 3
         height: 15
 
-        source: "image://skin/welcome_screen/tile/dots.svg"
+        sourcePath: "image://skin/20x20/Outline/menu.svg"
+        primaryColor: "dark14"
         sourceSize: Qt.size(width, height)
     }
 }

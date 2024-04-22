@@ -103,7 +103,7 @@ Item
             width: 20
             height: 20
 
-            sourcePath: "image://skin/welcome_screen/tile/delete.svg"
+            sourcePath: "image://skin/20x20/Outline/delete.svg"
             primaryColor: "light16"
             sourceSize: Qt.size(width, height)
         }
@@ -130,15 +130,18 @@ Item
 
         spacing: 8
 
-        Image
+        Nx.ColoredImage
         {
             width: 22
             height: 16
 
-            source: closedTileItem.tile.connectable && !context.hasCloudConnectionIssue
-                ? "image://skin/welcome_screen/tile/cloud.svg"
-                : "image://skin/welcome_screen/tile/cloud_offline.svg"
+            sourcePath: closedTileItem.tile.connectable && !context.hasCloudConnectionIssue
+                ? "image://skin/20x20/Outline/cloud.svg"
+                : "image://skin/20x20/Outline/cloud_offline.svg"
             sourceSize: Qt.size(width, height)
+            primaryColor: closedTileItem.tile.connectable && !context.hasCloudConnectionIssue
+                ? "blue_l"
+                : "red_l"
 
             visible: tile.cloud
         }
@@ -208,14 +211,16 @@ Item
             visible: tile.isFactorySystem && tile.online
         }
 
-        Image
+        Nx.ColoredImage
         {
             anchors.verticalCenter: anchorTag.verticalCenter
             width: 10
             height: 14
 
-            source: "image://skin/welcome_screen/tile/lock.svg"
+            sourcePath: "image://skin/16x16/Solid/lock.svg"
             sourceSize: Qt.size(width, height)
+
+            primaryColor: "dark12" // TODO: inherit colors from something
 
             visible: tile.systemRequires2FaEnabledForUser
                 || (!tile.cloud && !tile.isFactorySystem && !tile.loggedIn)

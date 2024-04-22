@@ -31,7 +31,7 @@ Button
 
     contentItem: Item
     {
-        Image
+        Nx.ColoredImage
         {
             id: stateIcon
 
@@ -42,7 +42,7 @@ Button
 
             fillMode: Image.Stretch
 
-            source: "image://skin/welcome_screen/tile/connect_to_cloud.svg"
+            sourcePath: "image://skin/welcome_screen/tile/connect_to_cloud.svg"
             sourceSize: Qt.size(width, height)
         }
 

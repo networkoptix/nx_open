@@ -51,13 +51,14 @@ MenuItem
                 width: 28
                 height: menuItem.contentItem.implicitHeight
 
-                Image
+                ColoredImage
                 {
                     anchors.centerIn: iconArea
                     width: 20
                     height: 20
 
-                    source: menuItem.icon.source
+                    sourcePath: menuItem.icon.source
+                    primaryColor: itemText.color
                     sourceSize: Qt.size(width, height)
                 }
             }

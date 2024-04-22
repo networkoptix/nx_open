@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+  <g class="24x24/Solid/microphone">
+    <path fill="#fff" fill-rule="evenodd" d="M12 3a3 3 0 0 0-3 3h2v1H9v1h2v1H9v1h2v1H9v1a3 3 0 1 0 6 0v-1h-2v-1h2V9h-2V8h2V7h-2V6h2a3 3 0 0 0-3-3Zm-4.5 9a.5.5 0 0 0-1 0 5.5 5.5 0 0 0 5 5.478V20h-3a.5.5 0 0 0 0 1h7a.5.5 0 0 0 0-1h-3v-2.522a5.5 5.5 0 0 0 5-5.478.5.5 0 0 0-1 0 4.5 4.5 0 1 1-9 0Z" class="Primary" clip-rule="evenodd"/>
+  </g>
+</svg>

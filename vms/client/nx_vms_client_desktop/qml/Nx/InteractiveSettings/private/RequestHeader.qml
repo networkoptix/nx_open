@@ -31,7 +31,7 @@ RowLayout
         {
             id: image
 
-            sourcePath: "image://skin/welcome_screen/tile/lock.svg"
+            sourcePath: "image://skin/16x16/Solid/lock.svg"
             sourceSize: Qt.size(10, 14)
             primaryColor: ColorTheme.highlight
         }
