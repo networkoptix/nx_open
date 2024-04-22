@@ -149,11 +149,11 @@ void NotificationActionExecutor::handleAcknowledgeAction()
     bookmark.creatorId = context()->user()->getId();
     bookmark.creationTimeStampMs = qnSyncTime->value();
 
-    // TODO: #amalov Set proper source server.
     auto acknowledgeBookmark =
         nx::vms::common::bookmarkToApi<nx::vms::api::rules::AcknowledgeBookmark>(
-            std::move(bookmark), notification->serverId());
+            std::move(bookmark), notification->originPeerId());
     acknowledgeBookmark.eventId = notification->id();
+    acknowledgeBookmark.eventServerId = notification->originPeerId();
 
     auto callback = nx::utils::guarded(
         this,
@@ -217,6 +217,9 @@ void NotificationActionExecutor::execute(const ActionPtr& action)
         return;
 
     emit notificationActionReceived(notificationAction, {});
+
+    if (notificationAction->state() == State::stopped)
+        return;
 
     // Show splash.
     QSet<QnResourcePtr> targetResources;

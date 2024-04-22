@@ -26,6 +26,7 @@
 #include "basic_action.h"
 #include "basic_event.h"
 #include "engine.h"
+#include "router.h"
 #include "rule.h"
 #include "utils/action.h"
 #include "utils/common.h"
@@ -673,6 +674,7 @@ ActionPtr ActionBuilder::buildAction(const AggregatedEventPtr& aggregatedEvent)
         return {};
 
     action->setRuleId(m_rule ? m_rule->id() : nx::Uuid());
+    action->setOriginPeerId(engine()->router()->peerId());
 
     const auto propertyNames =
         nx::utils::propertyNames(action.get(), nx::utils::PropertyAccess::writable);

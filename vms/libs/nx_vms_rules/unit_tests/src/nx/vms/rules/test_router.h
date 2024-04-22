@@ -27,6 +27,12 @@ public:
     {
         receiveAction(action);
     }
+
+    virtual nx::Uuid peerId() const override
+    {
+        static auto result = nx::Uuid::createUuid();
+        return result;
+    }
 };
 
 /** May be used for test fixture inheritance. */

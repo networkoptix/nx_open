@@ -32,6 +32,11 @@ ClientRouter::~ClientRouter()
 {
 }
 
+nx::Uuid ClientRouter::peerId() const
+{
+    return SystemContextAware::peerId();
+}
+
 void ClientRouter::routeEvent(
     const EventPtr& event,
     const RuleList& triggeredRules)

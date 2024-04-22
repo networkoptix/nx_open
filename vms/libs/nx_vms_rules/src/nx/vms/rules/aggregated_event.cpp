@@ -82,7 +82,11 @@ AggregatedEventPtr AggregatedEvent::filtered(const Filter& filter) const
     if (filteredList.empty())
         return {};
 
-    return AggregatedEventPtr::create(std::move(filteredList));
+    // TODO: #amalov Redesign event/action id mechanics.
+    auto result = AggregatedEventPtr::create(std::move(filteredList));
+    result->m_id = this->m_id;
+
+    return result;
 }
 
 std::vector<AggregatedEventPtr> AggregatedEvent::split(const SplitKeyFunction& splitKeyFunction) const
