@@ -69,17 +69,10 @@ signals:
     void camerasAboutToBeChanged(QPrivateSignal);
     void camerasChanged(QPrivateSignal);
 
-    /**
-     * These signals are sent when a camera is added to or removed from the resource pool
-     * and it affects currently maintained camera set.
-     */
-    void cameraAdded(const QnVirtualCameraResourcePtr& camera, QPrivateSignal);
-    void cameraRemoved(const QnVirtualCameraResourcePtr& camera, QPrivateSignal);
-
 private:
     void setCameras(Type type, const QnVirtualCameraResourceSet& cameras);
-    void addCamera(const QnVirtualCameraResourcePtr& camera);
-    void removeCamera(const QnVirtualCameraResourcePtr& camera);
+    void handleResourcesAdded(const QnResourceList& resources);
+    void handleResourcesRemoved(const QnResourceList& resources);
     QnVirtualCameraResourceSet filteredCameras() const;
 
     /** Function to filter out Cross-System cameras. */

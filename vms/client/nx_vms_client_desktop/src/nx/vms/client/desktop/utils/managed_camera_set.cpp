@@ -18,18 +18,11 @@ ManagedCameraSet::ManagedCameraSet(QnResourcePool* resourcePool, Filter filter, 
     if (!m_resourcePool)
         return;
 
-    connect(m_resourcePool, &QnResourcePool::resourceAdded, this,
-        [this](const QnResourcePtr& resource)
-        {
-            if (m_type == Type::all)
-                addCamera(resource.dynamicCast<QnVirtualCameraResource>());
-        });
+    connect(m_resourcePool, &QnResourcePool::resourcesAdded, this,
+        &ManagedCameraSet::handleResourcesAdded);
 
-    connect(m_resourcePool, &QnResourcePool::resourceRemoved, this,
-        [this](const QnResourcePtr& resource)
-        {
-            removeCamera(resource.dynamicCast<QnVirtualCameraResource>());
-        });
+    connect(m_resourcePool, &QnResourcePool::resourcesRemoved, this,
+        &ManagedCameraSet::handleResourcesRemoved);
 }
 
 ManagedCameraSet::Type ManagedCameraSet::type() const
@@ -132,43 +125,61 @@ bool ManagedCameraSet::cameraBelongsToLocalResourcePool(const QnVirtualCameraRes
         && camera->resourcePool() == m_resourcePool;
 }
 
-void ManagedCameraSet::addCamera(const QnVirtualCameraResourcePtr& camera)
+void ManagedCameraSet::handleResourcesAdded(const QnResourceList& resources)
 {
-    if (!camera || camera->hasFlags(Qn::desktop_camera))
+    if (m_type != Type::all)
         return;
 
-    m_notFilteredCameras.insert(camera);
-    if ((m_filter && !m_filter(camera)) || m_cameras.contains(camera))
-        return;
+    QnVirtualCameraResourceSet addedCameras;
 
-    NX_VERBOSE(this, "Applicable camera added to the pool: %1", camera->getName());
+    for (const auto& resource: resources)
+    {
+        const auto& camera = resource.dynamicCast<QnVirtualCameraResource>();
+        if (!camera || camera->hasFlags(Qn::desktop_camera))
+            continue;
+
+        m_notFilteredCameras.insert(camera);
+        if ((m_filter && !m_filter(camera)) || m_cameras.contains(camera))
+            continue;
+
+        NX_VERBOSE(this, "Applicable camera added to the pool: %1", camera->getName());
+        addedCameras.insert(camera);
+    }
+
+    if (addedCameras.empty())
+        return;
 
     emit camerasAboutToBeChanged(QPrivateSignal());
 
-    m_cameras.insert(camera);
-    emit cameraAdded(camera, QPrivateSignal());
+    m_cameras += addedCameras;
 
     emit camerasChanged(QPrivateSignal());
 }
 
-void ManagedCameraSet::removeCamera(const QnVirtualCameraResourcePtr& camera)
+void ManagedCameraSet::handleResourcesRemoved(const QnResourceList& resources)
 {
-    if (!camera)
-        return;
+    QnVirtualCameraResourceSet removedCameras;
 
-    if (!m_cameras.contains(camera))
+    for (const auto& resource: resources)
     {
+        const auto& camera = resource.dynamicCast<QnVirtualCameraResource>();
+        if (!camera)
+            continue;
+
+        if (m_cameras.contains(camera))
+        {
+            removedCameras.insert(camera);
+            NX_VERBOSE(this, "Applicable camera removed from the pool: %1", camera->getName());
+        }
         m_notFilteredCameras.remove(camera);
-        return;
     }
 
-    NX_VERBOSE(this, "Applicable camera removed from the pool: %1", camera->getName());
+    if (removedCameras.empty())
+        return;
 
     emit camerasAboutToBeChanged(QPrivateSignal());
 
-    m_notFilteredCameras.remove(camera);
-    m_cameras.remove(camera);
-    emit cameraRemoved(camera, QPrivateSignal());
+    m_cameras -= removedCameras;
 
     emit camerasChanged(QPrivateSignal());
 }
