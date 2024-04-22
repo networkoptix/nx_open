@@ -220,7 +220,7 @@ Button
 
             opacity: !tile.isExpanded && tile.isConnecting ? 0.4 : 1
 
-            Image
+            Nx.ColoredImage
             {
                 id: stateIcon
 
@@ -231,9 +231,12 @@ Button
 
                 fillMode: Image.Stretch
 
-                source: visibilityScope === WelcomeScreen.FavoriteTileVisibilityScope
-                    ? "image://skin/welcome_screen/tile/star_full.svg"
-                    : "image://skin/welcome_screen/tile/eye_full.svg"
+                sourcePath: visibilityScope === WelcomeScreen.FavoriteTileVisibilityScope
+                    ? "image://skin/16x16/Solid/star.svg"
+                    : "image://skin/20x20/Outline/eye_closed.svg"
+                primaryColor: visibilityScope === WelcomeScreen.FavoriteTileVisibilityScope
+                    ? "yellow_l"
+                    : "light16"
                 sourceSize: Qt.size(width, height)
 
                 visible: visibilityScope !== WelcomeScreen.DefaultTileVisibilityScope
@@ -688,4 +691,5 @@ Button
         color: ColorTheme.shadow
         source: background
     }
+
 }

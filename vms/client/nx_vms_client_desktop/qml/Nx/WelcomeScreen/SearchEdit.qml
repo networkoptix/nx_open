@@ -48,13 +48,14 @@ TextField
         width: height
         height: parent.height
 
-        Image
+        ColoredImage
         {
             anchors.centerIn: parent
             width: 20
             height: 20
 
-            source: "image://skin/welcome_screen/search.svg"
+            sourcePath: "image://skin/20x20/Outline/search.svg"
+            primaryColor: ColorTheme.windowText
             sourceSize: Qt.size(width, height)
         }
     }
@@ -110,7 +111,7 @@ TextField
         flat: true
         backgroundColor: ColorTheme.colors.dark5
 
-        iconUrl: "image://skin/welcome_screen/cross.svg"
+        iconUrl: "image://skin/20x20/Outline/close_medium.svg?primary=light16"
         iconWidth: 20
         iconHeight: 20
 

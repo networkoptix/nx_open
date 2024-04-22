@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+  <g class="24x24/Outline/add_folder_2px">
+    <path fill="#fff" fill-rule="evenodd" d="M2 18.422C2 19.345 2.774 20 3.61 20H12v-2H4V6h5.601l1.541 2.362.01.015a1.54 1.54 0 0 0 1.26.648h5.593v2.022h2v-2.47c0-.909-.762-1.552-1.583-1.552h-5.764l-1.527-2.34-.01-.015A1.593 1.593 0 0 0 9.818 4H3.583C2.762 4 2 4.643 2 5.552v12.87ZM18 18v-3h2v3h3v2h-3v3h-2v-3h-3v-2h3Z" class="Primary" clip-rule="evenodd"/>
+  </g>
+</svg>
