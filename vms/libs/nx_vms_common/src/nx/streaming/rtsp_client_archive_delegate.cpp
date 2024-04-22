@@ -899,6 +899,9 @@ bool QnRtspClientArchiveDelegate::setQuality(
 {
     if (m_quality == quality && fastSwitch <= m_qualityFastSwitch && m_resolution == resolution)
         return false;
+
+    NX_VERBOSE(this, "Set quality to %1 (fast %2, resolution %3)",
+         quality, fastSwitch, resolution);
     m_quality = quality;
     m_qualityFastSwitch = fastSwitch;
     m_resolution = resolution;
