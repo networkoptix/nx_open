@@ -46,6 +46,7 @@ struct RemoteSessionTimeoutWatcher::Private
 
     std::optional<std::chrono::seconds> timeLeftWhenCancelled;
     bool notificationVisible = false;
+    bool useSessionTimeoutLimitForCloud = false;
 
     QTimer timer;
 
@@ -84,6 +85,9 @@ struct RemoteSessionTimeoutWatcher::Private
 
     std::optional<seconds> calculateSessionRemainingTime(RemoteConnectionPtr connection) const
     {
+        if (connection->connectionInfo().isCloud())
+            return calculatePasswordRemainingTime();
+
         return connection->credentials().authToken.isBearerToken()
             ? calculateTokenRemainingTime(connection)
             : calculatePasswordRemainingTime();
@@ -92,6 +96,26 @@ struct RemoteSessionTimeoutWatcher::Private
     bool sessionExpired(RemoteConnectionPtr connection) const
     {
         return isExpired(calculateSessionRemainingTime(connection));
+    }
+
+    SessionExpirationReason sessionExpirationReason(std::shared_ptr<RemoteSession> session)
+    {
+        if (session->connection()->connectionInfo().isCloud())
+            return SessionExpirationReason::truncatedSessionToken;
+
+        const auto temporaryTokenRemainingTime = this->temporaryTokenRemainingTime(session);
+
+        // Time calculation error caused by duration cast from microseconds to seconds.
+        const auto kTimeCalculationError = 5s;
+        const auto reason = temporaryTokenRemainingTime
+            && *temporaryTokenRemainingTime <= kForceDisconnectTime + kTimeCalculationError
+                ? SessionExpirationReason::temporaryTokenExpired
+                : SessionExpirationReason::sessionExpired;
+
+        if (temporaryTokenRemainingTime)
+            NX_VERBOSE(this, "Temporary token remaining time: %1", *temporaryTokenRemainingTime);
+
+        return reason;
     }
 };
 
@@ -105,10 +129,13 @@ RemoteSessionTimeoutWatcher::RemoteSessionTimeoutWatcher(
     d(new Private())
 {
     d->passwordSessionTimeoutLimit = settings->sessionTimeoutLimit();
+    d->useSessionTimeoutLimitForCloud = settings->useSessionTimeoutLimitForCloud();
     connect(settings, &SystemSettings::sessionTimeoutChanged, this,
         [this, settings]()
         {
             d->passwordSessionTimeoutLimit = settings->sessionTimeoutLimit();
+            d->useSessionTimeoutLimitForCloud = settings->useSessionTimeoutLimitForCloud();
+            tick();
         });
 
     d->timer.setInterval(kTimerInterval);
@@ -130,8 +157,16 @@ void RemoteSessionTimeoutWatcher::tick()
     if (!NX_ASSERT(connection))
         return;
 
-    if (connection->connectionInfo().isCloud())
+    if (connection->connectionInfo().isCloud() && !d->useSessionTimeoutLimitForCloud)
+    {
+        if (d->notificationVisible)
+        {
+            d->timeLeftWhenCancelled.reset();
+            d->notificationVisible = false;
+            emit hideNotification();
+        }
         return;
+    }
 
     const std::optional<seconds> timeLeft = d->calculateSessionRemainingTime(connection);
     if (timeLeft)
@@ -148,19 +183,7 @@ void RemoteSessionTimeoutWatcher::tick()
             emit hideNotification();
         }
 
-        const auto temporaryTokenRemainingTime = d->temporaryTokenRemainingTime(session);
-
-        // Time calculation error caused by duration cast from microseconds to seconds.
-        const auto kTimeCalculationError = 5s;
-        const auto reason = temporaryTokenRemainingTime
-            && *temporaryTokenRemainingTime <= kForceDisconnectTime + kTimeCalculationError
-                ? SessionExpirationReason::temporaryTokenExpired
-                : SessionExpirationReason::sessionExpired;
-
-        if (temporaryTokenRemainingTime)
-            NX_VERBOSE(this, "Temporary token remaining time: %1", *temporaryTokenRemainingTime);
-
-        emit sessionExpired(reason);
+        emit sessionExpired(d->sessionExpirationReason(session));
         return;
     }
 

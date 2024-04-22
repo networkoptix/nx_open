@@ -29,7 +29,8 @@ public:
     enum class SessionExpirationReason
     {
         sessionExpired,
-        temporaryTokenExpired
+        temporaryTokenExpired,
+        truncatedSessionToken
     };
 
 public:

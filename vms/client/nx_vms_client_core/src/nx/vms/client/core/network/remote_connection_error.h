@@ -63,6 +63,9 @@ NX_REFLECTION_ENUM_CLASS(RemoteConnectionErrorCode,
     /** Temporary token expired, session token can not be created. */
     temporaryTokenExpired,
 
+    /** Cloud session lifetime is truncated by Site setting. */
+    truncatedSessionToken,
+
     /** System is not compatible with two-factor authentication. */
     systemIsNotCompatibleWith2Fa,
 

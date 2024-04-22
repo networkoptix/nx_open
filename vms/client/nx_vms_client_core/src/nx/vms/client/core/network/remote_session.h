@@ -55,6 +55,7 @@ public:
 
     void updatePassword(const QString& newPassword);
     void updateBearerToken(std::string token);
+    void updateCloudSessionToken();
 
     /** Allow to reconnect only to the current server (disabled by default). */
     void setStickyReconnect(bool value);

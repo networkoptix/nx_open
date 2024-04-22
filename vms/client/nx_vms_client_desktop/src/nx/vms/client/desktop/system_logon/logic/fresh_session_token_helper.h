@@ -6,6 +6,7 @@
 #include <QtWidgets/QWidget>
 
 #include <nx/network/http/auth_tools.h>
+#include <nx/vms/client/core/network/cloud_auth_data.h>
 #include <nx/vms/client/core/network/remote_connection_aware.h>
 #include <nx/vms/utils/abstract_session_token_helper.h>
 
@@ -28,6 +29,7 @@ public:
         backup,
         restore,
         updateSettings,
+        issueRefreshToken,
     };
 
 public:
@@ -41,7 +43,15 @@ public:
         const QString& actionText, //< Action button text.
         ActionType actionType);
 
+    static FreshSessionTokenHelper* makeFreshSessionTokenHelper(
+        QWidget* parent,
+        const QString& title,
+        const QString& mainText,
+        const QString& actionText,
+        ActionType actionType);
+
     std::optional<nx::network::http::AuthToken> refreshToken() override;
+    core::CloudAuthData requestAuthData();
 
     virtual QString password() const override;
 

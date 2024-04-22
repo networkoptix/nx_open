@@ -212,6 +212,11 @@ void RemoteSession::updateBearerToken(std::string token)
     d->updateTokenExpirationTime();
 }
 
+void RemoteSession::updateCloudSessionToken()
+{
+    onCloudSessionTokenExpiring();
+}
+
 void RemoteSession::setStickyReconnect(bool value)
 {
     d->stickyReconnect = value;
@@ -326,14 +331,15 @@ void RemoteSession::establishConnection(RemoteConnectionPtr connection)
     connect(messageBus,
         &ec2::TransactionMessageBusAdapter::remotePeerUnauthorized,
         this,
-        [this, makeServerMarkingFunction](nx::Uuid, nx::network::rest::AuthResult)
+        [this, makeServerMarkingFunction](nx::Uuid, nx::network::rest::AuthResult authResult)
         {
-            // todo: handle `AuthResult`
             auto errorCode = RemoteConnectionErrorCode::unauthorized;
             auto connection = this->connection();
             if (connection->credentials().authToken.isBearerToken())
             {
-                if (connection->connectionInfo().isCloud())
+                if (authResult == nx::network::rest::AuthResult::Auth_TruncatedSessionToken)
+                    errorCode = RemoteConnectionErrorCode::truncatedSessionToken;
+                else if (connection->connectionInfo().isCloud())
                     errorCode = RemoteConnectionErrorCode::cloudSessionExpired;
                 else if (connection->connectionInfo().isTemporary())
                     errorCode = RemoteConnectionErrorCode::temporaryTokenExpired;

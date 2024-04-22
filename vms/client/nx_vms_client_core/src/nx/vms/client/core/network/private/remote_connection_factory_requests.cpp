@@ -89,6 +89,9 @@ std::optional<RemoteConnectionErrorCode> unauthorizedErrorDetails(const HttpHead
     if (authResult == AuthResult::Auth_LockedOut)
         return RemoteConnectionErrorCode::userIsLockedOut;
 
+    if (authResult == AuthResult::Auth_TruncatedSessionToken)
+        return RemoteConnectionErrorCode::truncatedSessionToken;
+
     return std::nullopt;
 }
 

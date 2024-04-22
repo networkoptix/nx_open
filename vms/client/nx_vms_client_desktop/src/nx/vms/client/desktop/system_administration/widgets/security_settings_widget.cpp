@@ -233,6 +233,8 @@ SecuritySettingsWidget::SecuritySettingsWidget(
         &SecuritySettingsWidget::updateLimitSessionControls);
     connect(ui->limitSessionUnitsComboBox, QnComboboxCurrentIndexChanged, this,
         &SecuritySettingsWidget::updateLimitSessionControls);
+    connect(ui->useSessionLimitForCloudComboBox, &QCheckBox::stateChanged, this,
+        &QnAbstractPreferencesWidget::hasChangesChanged);
 
     connect(ui->archiveEncryptionGroupBox, &QGroupBox::toggled, this,
         &QnAbstractPreferencesWidget::hasChangesChanged);
@@ -311,6 +313,9 @@ void SecuritySettingsWidget::loadDataToUi()
     const auto sessionTimeoutLimit = systemSettings()->sessionTimeoutLimit();
     ui->limitSessionLengthCheckBox->setChecked(
         sessionTimeoutLimit.value_or(kNoLimitSessionDuration) != kNoLimitSessionDuration);
+    ui->useSessionLimitForCloudComboBox->setChecked(
+        systemSettings()->useSessionTimeoutLimitForCloud());
+
     if (sessionTimeoutLimit)
     {
         for (int index = ui->limitSessionUnitsComboBox->count() - 1; index >= 0; --index)
@@ -471,6 +476,8 @@ void SecuritySettingsWidget::applyChanges()
     editableSystemSettings->watermarkSettings = m_watermarkSettings;
     editableSystemSettings->pixelationSettings = m_pixelationSettings;
     editableSystemSettings->sessionLimitS = calculateSessionLimit();
+    editableSystemSettings->useSessionLimitForCloud =
+        ui->useSessionLimitForCloudComboBox->isChecked();
     editableSystemSettings->storageEncryption = ui->archiveEncryptionGroupBox->isChecked();
     editableSystemSettings->showServersInTreeForNonAdmins =
         ui->showServersInTreeCheckBox->isChecked();
@@ -534,10 +541,12 @@ bool SecuritySettingsWidget::hasChanges() const
         || (m_pixelationSettings != systemSettings()->pixelationSettings())
         || (calculateSessionLimit() != systemSettings()->sessionTimeoutLimit().value_or(kNoLimitSessionDuration))
         || (ui->archiveEncryptionGroupBox->isChecked() != systemSettings()->useStorageEncryption())
-        || m_archivePasswordState == ArchivePasswordState::changed
-        || m_archivePasswordState == ArchivePasswordState::failedToSet
-        || ui->showServersInTreeCheckBox->isChecked()
-            != systemSettings()->showServersInTreeForNonAdmins();
+        || (m_archivePasswordState == ArchivePasswordState::changed)
+        || (m_archivePasswordState == ArchivePasswordState::failedToSet)
+        || (ui->showServersInTreeCheckBox->isChecked()
+            != systemSettings()->showServersInTreeForNonAdmins())
+        || (ui->useSessionLimitForCloudComboBox->isChecked()
+            != systemSettings()->useSessionTimeoutLimitForCloud());
 }
 
 bool SecuritySettingsWidget::isNetworkRequestRunning() const
@@ -575,6 +584,7 @@ void SecuritySettingsWidget::setReadOnlyInternal(bool readOnly)
     setReadOnly(ui->limitSessionDetailsWidget, readOnly);
     setReadOnly(ui->archiveEncryptionGroupBox, readOnly);
     setReadOnly(ui->showServersInTreeCheckBox, readOnly);
+    setReadOnly(ui->useSessionLimitForCloudComboBox, readOnly);
 }
 
 void SecuritySettingsWidget::showEvent(QShowEvent* event)
