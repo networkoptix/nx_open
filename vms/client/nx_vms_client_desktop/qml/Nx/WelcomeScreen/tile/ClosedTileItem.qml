@@ -136,12 +136,12 @@ Item
             height: 16
 
             sourcePath: closedTileItem.tile.connectable && !context.hasCloudConnectionIssue
-                ? "image://skin/20x20/Outline/cloud.svg"
-                : "image://skin/20x20/Outline/cloud_offline.svg"
+                ? "image://skin/22x16/Solid/cloud.svg"
+                : "image://skin/22x16/Outline/cloud_offline.svg"
             sourceSize: Qt.size(width, height)
             primaryColor: closedTileItem.tile.connectable && !context.hasCloudConnectionIssue
-                ? "blue_l"
-                : "red_l"
+                ? "brand_core"
+                : "dark12"
 
             visible: tile.cloud
         }
@@ -217,10 +217,10 @@ Item
             width: 10
             height: 14
 
-            sourcePath: "image://skin/16x16/Solid/lock.svg"
+            sourcePath: "image://skin/10x14/Solid/lock.svg"
             sourceSize: Qt.size(width, height)
 
-            primaryColor: "dark12" // TODO: inherit colors from something
+            primaryColor: "dark12"
 
             visible: tile.systemRequires2FaEnabledForUser
                 || (!tile.cloud && !tile.isFactorySystem && !tile.loggedIn)
