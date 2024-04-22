@@ -155,8 +155,7 @@ void QnRtspClientArchiveDelegate::setCamera(const QnSecurityCamResourcePtr& came
     if (m_camera == camera)
         return;
 
-    if (m_camera && m_camera->systemContext())
-        m_camera->systemContext()->cameraHistoryPool()->disconnect(this);
+    m_cameraConnections.reset();
 
     m_camera = camera;
 
@@ -172,7 +171,7 @@ void QnRtspClientArchiveDelegate::setCamera(const QnSecurityCamResourcePtr& came
     else
         m_maxSessionDurationMs = std::chrono::milliseconds::max();
 
-    connect(context->cameraHistoryPool(),
+    m_cameraConnections << connect(context->cameraHistoryPool(),
         &QnCameraHistoryPool::cameraHistoryChanged,
         this,
         [this](const QnSecurityCamResourcePtr& camera)
@@ -185,7 +184,7 @@ void QnRtspClientArchiveDelegate::setCamera(const QnSecurityCamResourcePtr& came
                 m_currentServerUpToDate.clear();
         });
 
-    connect(context->cameraHistoryPool(),
+    m_cameraConnections << connect(context->cameraHistoryPool(),
         &QnCameraHistoryPool::cameraFootageChanged,
         this,
         [this](const QnSecurityCamResourcePtr& camera)
@@ -196,7 +195,19 @@ void QnRtspClientArchiveDelegate::setCamera(const QnSecurityCamResourcePtr& came
             m_footageUpToDate.clear();
         });
 
-    setupRtspSession(camera, m_server, m_rtspSession.get());
+    if (camera->hasFlags(Qn::cross_system | Qn::fake))
+    {
+        m_cameraConnections << connect(m_camera.get(), &QnResource::flagsChanged, this,
+            [this]()
+            {
+                if (!m_camera->flags().testFlag(Qn::fake))
+                    setupRtspSession(m_camera, m_server, m_rtspSession.get());
+            });
+    }
+    else
+    {
+        setupRtspSession(camera, m_server, m_rtspSession.get());
+    }
 }
 
 void QnRtspClientArchiveDelegate::updateCredentials(
