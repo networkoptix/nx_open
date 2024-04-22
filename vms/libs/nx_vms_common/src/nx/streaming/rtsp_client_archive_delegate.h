@@ -10,6 +10,7 @@
 #include <nx/network/http/auth_tools.h>
 #include <nx/streaming/abstract_archive_delegate.h>
 #include <nx/streaming/rtp/parsers/nx_rtp_parser.h>
+#include <nx/utils/scoped_connections.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/types/storage_location.h>
@@ -211,6 +212,7 @@ private:
     QString m_rtpLogTag;
     const bool m_sleepIfEmptySocket;
     CameraDiagnostics::Result m_lastError = CameraDiagnostics::NoErrorResult();
+    nx::utils::ScopedConnections m_cameraConnections;
 };
 
 typedef QSharedPointer<QnRtspClientArchiveDelegate> QnRtspClientArchiveDelegatePtr;
