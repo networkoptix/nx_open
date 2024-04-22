@@ -63,14 +63,15 @@ Item
             anchors.verticalCenter: parent.verticalCenter
             spacing: 4
 
-            Image
+            ColoredImage
             {
                 Layout.alignment: Qt.AlignVCenter
 
                 width: 20
                 height: 20
 
-                source: "image://skin/user_settings/tree_item_linked.svg"
+                sourcePath: "image://skin/20x20/Outline/arrow_down_right.svg"
+                primaryColor: "dark12"
                 sourceSize: Qt.size(width, height)
 
                 visible: !treeItem.isTopLevel
@@ -134,7 +135,8 @@ Item
                 visible: treeItem.hovered && treeItem.enabled
                 hoverEnabled: true
 
-                icon.source: "image://skin/user_settings/tree_item_remove.svg"
+                icon.source: "image://skin/20x20/Outline/cross_close.svg"
+                icon.color: ColorTheme.colors.light16
                 icon.width: width
                 icon.height: height
 

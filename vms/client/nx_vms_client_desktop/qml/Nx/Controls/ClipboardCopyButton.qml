@@ -39,15 +39,16 @@ Item
         onClicked: parent.copy()
     }
 
-    Image
+    ColoredImage
     {
         id: okImage
 
         anchors.fill: parent
         opacity: 0
 
-        source: "image://skin/user_settings/ok.svg"
+        sourcePath: "image://skin/20x20/Outline/success.svg"
         sourceSize: Qt.size(20, 20)
+        primaryColor: "light10"
     }
 
     ParallelAnimation

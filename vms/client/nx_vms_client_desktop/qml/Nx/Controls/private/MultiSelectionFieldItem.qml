@@ -69,7 +69,7 @@ Control
 
             visible: removable
 
-            icon.source: "image://skin/user_settings/cross_input.svg"
+            icon.source: "image://skin/20x20/Outline/cross_input.svg"
             icon.width: 20
             icon.height: 20
             icon.color: ColorTheme.colors.light10

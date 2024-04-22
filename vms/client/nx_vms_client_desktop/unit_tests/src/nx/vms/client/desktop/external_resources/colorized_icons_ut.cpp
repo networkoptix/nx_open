@@ -50,15 +50,9 @@ public:
     }
 
 public:
-    QSet<QString> pngPaths() const
-    {
-        return m_skinPngFiles;
-    }
+    QSet<QString> pngPaths() const { return m_skinPngFiles; }
 
-    QSet<QString> svgPaths() const
-    {
-        return m_skinSvgFiles;
-    }
+    QSet<QString> svgPaths() const { return m_skinSvgFiles; }
 
 private:
     std::unique_ptr<core::ColorTheme> m_colorTheme;

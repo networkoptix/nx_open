@@ -50,13 +50,14 @@ ComboBox
 
         spacing: 6
 
-        Image
+        ColoredImage
         {
             Layout.alignment: Qt.AlignVCenter
 
             visible: serverItem.hasIcon
 
-            source: "image://skin/user_settings/vms_server.svg"
+            sourcePath: "image://skin/20x20/Solid/server.svg"
+            primaryColor: "light4"
             sourceSize: Qt.size(20, 20)
         }
 

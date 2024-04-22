@@ -148,7 +148,8 @@ Control
                 Layout.margins: 6
                 Layout.alignment: Qt.AlignTop
 
-                sourcePath: "image://skin/user_settings/arrow_down.svg"
+                sourcePath: "image://skin/16x16/Outline/arrow_down.svg"
+                primaryColor: ColorTheme.colors.light16
                 sourceSize: Qt.size(16, 16)
             }
         }

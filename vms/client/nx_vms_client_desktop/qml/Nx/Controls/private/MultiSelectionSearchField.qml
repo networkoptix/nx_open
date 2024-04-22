@@ -39,7 +39,7 @@ TextField
         width: 16
         height: 16
 
-        icon.source: "image://skin/user_settings/clear_text_field.svg"
+        icon.source: "image://skin/16x16/Outline/close.svg"
         icon.width: width
         icon.height: height
 
@@ -54,7 +54,7 @@ TextField
             anchors.verticalCenter: parent.verticalCenter
 
             sourceSize: Qt.size(16, 16)
-            sourcePath: "user_settings/search.svg"
+            sourcePath: "image://skin/16x16/Outline/search.svg"
             primaryColor: searchField.color
         }
 

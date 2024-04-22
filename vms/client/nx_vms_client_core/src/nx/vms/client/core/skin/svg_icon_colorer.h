@@ -40,14 +40,14 @@ public:
                 && tertiary == kInvalidColor;
         }
 
-        const QString operator[](QString name) const
+        const QString operator[](const QString& name) const
         {
-            name = name.toLower();
-            if (name == "primary")
+            auto lname = name.toLower();
+            if (lname == "primary")
                 return primary;
-            if (name == "secondary")
+            if (lname == "secondary")
                 return secondary;
-            if (name == "tertiary")
+            if (lname == "tertiary")
                 return tertiary;
             return kInvalidColor;
         }

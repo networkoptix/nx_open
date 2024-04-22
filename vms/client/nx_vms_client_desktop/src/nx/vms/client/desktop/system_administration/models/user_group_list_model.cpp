@@ -470,7 +470,7 @@ QVariant UserGroupListModel::data(const QModelIndex& index, int role) const
                         || !nonUniqueNameTracker->nonUniqueGroups().isUnique(group.id)
                         || d->cycledGroups.contains(group.id))
                     {
-                        return QString("user_settings/user_alert.svg");
+                        return QString("20x20/Solid/alert2.svg");
                     }
 
                     return {};

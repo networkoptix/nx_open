@@ -99,7 +99,7 @@ Item
                 103,
                 enabledUserSwitch.y + enabledUserSwitch.height + 22)
 
-            Image
+            ColoredImage
             {
                 id: userTypeIcon
 
@@ -108,22 +108,24 @@ Item
                 width: 64
                 height: 64
 
-                source:
+                sourcePath:
                 {
                     switch (control.userType)
                     {
                         case UserSettingsGlobal.LocalUser:
-                            return "image://skin/user_settings/user_type_local.svg"
+                            return "image://skin/64x64/Solid/user.svg"
                         case UserSettingsGlobal.TemporaryUser:
-                            return "image://skin/user_settings/user_type_local_temp.svg"
+                            return "image://skin/64x64/Solid/user_temp.svg"
                         case UserSettingsGlobal.CloudUser:
-                            return "image://skin/user_settings/user_type_cloud.svg"
+                            return "image://skin/64x64/Solid/user_cloud.svg"
                         case UserSettingsGlobal.LdapUser:
-                            return "image://skin/user_settings/user_type_ldap.svg"
+                            return "image://skin/64x64/Solid/user_ldap.svg"
                     }
                 }
 
                 sourceSize: Qt.size(width, height)
+		primaryColor: ColorTheme.colors.dark7
+		secondaryColor: ColorTheme.colors.light10
             }
 
             EditableLabel
@@ -175,7 +177,7 @@ Item
                 {
                     id: auditTrailButton
 
-                    icon.source: "image://skin/user_settings/audit_trail.svg"
+                    icon.source: "image://skin/20x20/Outline/calendar.svg"
                     icon.width: 12
                     icon.height: 14
                     spacing: 8
@@ -190,7 +192,7 @@ Item
 
                     visible: control.deleteAvailable
                     enabled: control.enabled
-                    icon.source: "image://skin/user_settings/user_delete.svg"
+                    icon.source: "image://skin/20x20/Outline/delete.svg"
                     icon.width: 12
                     icon.height: 14
                     spacing: 8
@@ -726,8 +728,10 @@ Item
                                     "Copied here means that a link is copied")
                                 enabled: control.enabled
                                 text: copied ? copiedText : copyLinkText
+                                // TODO: @pprivalov check the correctness of color,
+                                //  probably the entire element should be redesigned
                                 icon.source:
-                                    copied ? "image://skin/user_settings/copied.svg" : ""
+                                    copied ? "image://skin/20x20/Outline/success.svg" : ""
                                 icon.width: 20
                                 icon.height: 20
                                 Layout.preferredWidth:
@@ -762,7 +766,7 @@ Item
 
                             TextButton
                             {
-                                icon.source: "image://skin/user_settings/terminate_link.svg"
+                                icon.source: "image://skin/20x20/Outline/terminate.svg"
                                 icon.width: 20
                                 icon.height: 20
                                 spacing: 4
@@ -774,7 +778,7 @@ Item
 
                             TextButton
                             {
-                                icon.source: "image://skin/user_settings/reset_link.svg"
+                                icon.source: "image://skin/20x20/Outline/rollback.svg"
                                 icon.width: 20
                                 icon.height: 20
                                 spacing: 4
@@ -828,7 +832,7 @@ Item
                 text: qsTr("This user is not found in LDAP database and is not able to log in.")
 
                 buttonText: control.deleteAvailable && control.enabled ? qsTr("Delete") : ""
-                buttonIcon: "image://skin/user_settings/trash.svg"
+                buttonIcon: "image://skin/20x20/Outline/delete.svg?primary=light4"
 
                 onButtonClicked: control.deleteRequested()
             }

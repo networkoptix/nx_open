@@ -62,19 +62,21 @@ Item
             Layout.fillWidth: true
             height: 103
 
-            Image
+            ColoredImage
             {
                 id: groupTypeIcon
                 x: 24
                 y: 24
                 width: 64
                 height: 64
-                source: control.isLdap
-                    ? "image://skin/user_settings/group_type_ldap.svg"
+                sourcePath: control.isLdap
+                    ? "image://skin/64x64/Solid/ldap_group.svg"
                     : (control.isPredefined
-                        ? "image://skin/user_settings/group_type_built_in.svg"
-                        : "image://skin/user_settings/group_type_local.svg")
+                        ? "image://skin/64x64/Solid/group_default.svg"
+                        : "image://skin/64x64/Solid/group.svg")
                 sourceSize: Qt.size(width, height)
+                primaryColor: "dark7"
+                secondaryColor: "light10"
             }
 
             EditableLabel
@@ -108,7 +110,8 @@ Item
 
                 TextButton
                 {
-                    icon.source: "image://skin/user_settings/user_delete.svg"
+                    icon.source: "image://skin/20x20/Outline/delete.svg"
+                    color: ColorTheme.windowText
                     icon.width: 12
                     icon.height: 14
                     spacing: 8
@@ -216,7 +219,7 @@ Item
                 text: qsTr("This group is not found in the LDAP database.")
 
                 buttonText: control.deleteAvailable && control.enabled ? qsTr("Delete") : ""
-                buttonIcon: "image://skin/user_settings/trash.svg"
+                buttonIcon: "image://skin/20x20/Outline/delete.svg?primary=light16"
 
                 onButtonClicked: control.deleteRequested()
             }

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="20" fill="none" viewBox="0 0 24 20">
+  <g class="24x20/Solid/bookmark_edit">
+    <g class="Primary">
+      <path fill="#A5B7C0" d="M2 4a2 2 0 0 1 2-2h5a2 2 0 0 1 2 2v12.6a.5.5 0 0 1-.887.316l-2.839-3.47a1 1 0 0 0-1.548 0l-2.839 3.47A.5.5 0 0 1 2 16.599V4Z"/>
+      <path fill="#A5B7C0" fill-rule="evenodd" d="M13 13v2h2l8-8-2-2-8 8Zm1.823 1.177-1-1 .354-.354 1 1-.354.354Z" clip-rule="evenodd"/>
+    </g>
+  </g>
+</svg>

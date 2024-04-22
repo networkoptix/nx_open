@@ -97,13 +97,14 @@ Item
 
         onClicked: tile.deleteSystem()
 
-        Image
+        Nx.ColoredImage
         {
             anchors.centerIn: parent
             width: 20
             height: 20
 
-            source: "image://skin/welcome_screen/tile/delete.svg"
+            sourcePath: "image://skin/welcome_screen/tile/delete.svg"
+            primaryColor: "light16"
             sourceSize: Qt.size(width, height)
         }
     }

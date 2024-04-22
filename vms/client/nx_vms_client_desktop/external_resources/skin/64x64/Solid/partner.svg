@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="none" viewBox="0 0 64 64">
+  <g class="64x64/Solid/partner">
+    <path fill="#2FA2DB" fill-rule="evenodd" d="M12 16H6v2h6v-2Zm38 0h-6v2h6v-2Z" class="Third" clip-rule="evenodd"/>
+    <path fill="#A5B7C0" fill-rule="evenodd" d="M21 14v4h-3v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5h-3v-4H21ZM0 52V34.048C6.217 35.41 19.946 38 28 38c8.054 0 21.783-2.591 28-3.952V52a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2Zm56-31v11c-6 1.333-20 4-28 4S6 33.333 0 32V21a2 2 0 0 1 2-2h52a2 2 0 0 1 2 2Z" class="Secondary" clip-rule="evenodd"/>
+    <path fill="#CDD7DC" d="M28 36c-8 0-22-2.667-28-4V21a2 2 0 0 1 2-2h52a2 2 0 0 1 2 2v11c-6 1.333-20 4-28 4Z" class="Primary"/>
+  </g>
+</svg>

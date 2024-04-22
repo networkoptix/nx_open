@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="none" viewBox="0 0 64 64">
+  <g class="64x64/Solid/ldap_group">
+    <circle cx="32" cy="32" r="32" fill="#212A2F" class="Primary"/>
+    <path fill="#E1E7EA" fill-rule="evenodd" d="M28 43a6 6 0 0 1 6-6h2.5a1.5 1.5 0 0 1 0 3H34a3 3 0 1 0 0 6h2.5a1.5 1.5 0 0 1 0 3H34a6 6 0 0 1-6-6Zm23 0a6 6 0 0 0-6-6h-2.5a1.5 1.5 0 0 0 0 3H45a3 3 0 1 1 0 6h-2.5a1.5 1.5 0 0 0 0 3H45a6 6 0 0 0 6-6Zm-15-1.5a1.5 1.5 0 0 0 0 3h7a1.5 1.5 0 0 0 0-3h-7Z" class="Third" clip-rule="evenodd"/>
+    <path fill="#A5B7C0" fill-rule="evenodd" d="M27 18a6 6 0 0 0-6 6v2a6 6 0 0 0 12 0v-2a6 6 0 0 0-6-6Zm-5.56 18c-3.502 0-6.522 2.476-7.23 5.927l-.172.84A1.854 1.854 0 0 0 15.846 45H24.2c-.131-.646-.2-1.315-.2-2a9.967 9.967 0 0 1 2.859-7H21.44Zm13.968-4.587A6 6 0 0 0 44 26v-2a6 6 0 0 0-8.59-5.413A9.954 9.954 0 0 1 37 24v2a9.953 9.953 0 0 1-1.59 5.413Z" class="Secondary" clip-rule="evenodd"/>
+  </g>
+</svg>

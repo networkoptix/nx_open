@@ -196,7 +196,7 @@ Rectangle
     {
         visible: !control.hasConfig
         anchors.verticalCenterOffset: -32
-        imageSource: "image://skin/user_settings/ldap_not_configured.svg"
+        imageSource: "image://skin/64x64/Outline/nosettings.svg"
         text: qsTr("Not configured yet")
         additionalText: qsTr("Connect your Site to an LDAP server for easier user management")
 
@@ -447,7 +447,7 @@ Rectangle
                                 && !control.syncIsRunning
                                 && control.syncIntervalS > control.kShortSyncIntervalS
 
-                            icon.source: "image://skin/user_settings/sync_ldap.svg"
+                            icon.source: "image://skin/20x20/Outline/rotate_cw.svg"
                             icon.width: width
                             icon.height: height
                             icon.color: hovered
@@ -500,7 +500,7 @@ Rectangle
                         text: qsTr("Advanced Settings")
                         font: Qt.font({pixelSize: 14, weight: Font.Normal})
                         color: ColorTheme.colors.light16
-                        icon.source: "image://skin/user_settings/ldap_advanced_settings.svg"
+                        icon.source: "image://skin/20x20/Outline/settings.svg"
 
                         onClicked:
                         {
@@ -537,7 +537,7 @@ Rectangle
                         text: qsTr("Disconnect")
                         font: Qt.font({pixelSize: 14, weight: Font.Normal})
                         color: ColorTheme.colors.light16
-                        icon.source: "image://skin/user_settings/disconnect.svg"
+                        icon.source: "image://skin/20x20/Outline/disconnect.svg"
 
                         onClicked: self.requestLdapReset()
                     }
@@ -704,7 +704,9 @@ Rectangle
 
                             hoverEnabled: true
 
-                            icon.source: "image://skin/user_settings/trash.svg"
+                            icon.source: hovered
+                                ? "image://skin/20x20/Outline/delete.svg?primary=light15"
+                                : "image://skin/20x20/Outline/delete.svg?primary=light16"
                             icon.width: width
                             icon.height: height
                             icon.color: hovered ? ColorTheme.colors.light15 : ColorTheme.colors.light16
@@ -721,10 +723,11 @@ Rectangle
             {
                 visible: list.count == 0
 
-                Image
+                ColoredImage
                 {
                     Layout.alignment: Qt.AlignTop
-                    source: "image://skin/user_settings/warning_icon.svg"
+                    sourcePath: "image://skin/20x20/Solid/alert2.svg"
+                    primaryColor: "yellow_l"
                     sourceSize: Qt.size(20, 20)
                 }
 

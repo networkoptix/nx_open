@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="none" viewBox="0 0 64 64">
+  <g class="64x64/Outline/health">
+    <path fill="#53707F" fill-rule="evenodd" d="M19 11h-8v42h8V11Zm-8-2a2 2 0 0 0-2 2v42a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V11a2 2 0 0 0-2-2h-8Zm25 14h-8v30h8V23Zm-8-2a2 2 0 0 0-2 2v30a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V23a2 2 0 0 0-2-2h-8Zm17 12h8v20h-8V33Zm-2 0a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v20a2 2 0 0 1-2 2h-8a2 2 0 0 1-2-2V33Z" class="Primary" clip-rule="evenodd"/>
+  </g>
+</svg>

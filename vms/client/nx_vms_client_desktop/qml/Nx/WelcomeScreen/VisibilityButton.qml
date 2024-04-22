@@ -66,7 +66,7 @@ Button
 
                 sourceSize: Qt.size(width, height)
 
-                sourcePath: "welcome_screen/arrow_down.svg"
+                sourcePath: "image://skin/16x16/Outline/arrow_down.svg"
                 primaryColor: control.currentColor
             }
         }
