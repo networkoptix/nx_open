@@ -152,7 +152,7 @@ Item
                     {
                         id: localUserButton
                         text: qsTr("Local")
-                        icon.source: "image://skin/user_settings/toggle_local_user.svg"
+                        icon.source: "image://skin/20x20/Solid/user.svg"
                         flatSide: -1 //< Rigth.
                         checked: control.userType == UserSettingsGlobal.LocalUser
                             || control.userType == UserSettingsGlobal.TemporaryUser
@@ -167,7 +167,7 @@ Item
                     ToggleButton
                     {
                         text: qsTr("Cloud")
-                        icon.source: "image://skin/user_settings/toggle_cloud_user.svg"
+                        icon.source: "image://skin/20x20/Outline/cloud.svg"
                         flatSide: 1 //< Left.
                         checked: control.userType == UserSettingsGlobal.CloudUser
 

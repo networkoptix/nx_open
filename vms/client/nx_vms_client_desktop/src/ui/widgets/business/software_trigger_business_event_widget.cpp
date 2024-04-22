@@ -37,12 +37,10 @@ NX_DECLARE_COLORIZED_ICON(kUserIcon, "20x20/Solid/user.svg",\
     colorSubs)
 NX_DECLARE_COLORIZED_ICON(kUserAlertIcon, "20x20/Solid/user_alert.svg",\
     colorSubs)
-
 NX_DECLARE_COLORIZED_ICON(kGroupIcon, "20x20/Solid/group.svg",\
     colorSubs)
 NX_DECLARE_COLORIZED_ICON(kGroupAlertIcon, "20x20/Solid/group_alert.svg",\
     colorSubs)
-
 } // namespace
 
 QnSoftwareTriggerBusinessEventWidget::QnSoftwareTriggerBusinessEventWidget(

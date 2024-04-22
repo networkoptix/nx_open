@@ -659,7 +659,7 @@ QVariant UserListModel::data(const QModelIndex& index, int role) const
                         || (user->userType() == nx::vms::api::UserType::ldap
                             && (!d->ldapServerOnline || d->notFoundUsers.contains(user->getId()))))
                     {
-                        return QString("user_settings/user_alert.svg");
+                        return QString("20x20/Solid/alert2.svg");
                     }
                     break;
                 }
@@ -669,16 +669,16 @@ QVariant UserListModel::data(const QModelIndex& index, int role) const
                     switch (user->userType())
                     {
                         case nx::vms::api::UserType::cloud:
-                            return QString("user_settings/user_cloud.svg");
+                            return QString("20x20/Solid/user_cloud.svg");
 
                         case nx::vms::api::UserType::ldap:
-                            return QString("user_settings/user_ldap.svg");
+                            return QString("20x20/Solid/user_ldap.svg");
 
                         case nx::vms::api::UserType::local:
-                            return QString("user_settings/user_local.svg");
+                            return QString("20x20/Solid/user.svg");
 
                         case nx::vms::api::UserType::temporaryLocal:
-                            return QString("user_settings/user_local_temp.svg");
+                            return QString("20x20/Solid/user_temp.svg");
 
                         default:
                             break;

@@ -5,13 +5,15 @@ import QtQuick.Layouts 1.15
 
 import Nx 1.0
 import Nx.Core 1.0
+import Nx.Controls 1.0
 
 RowLayout
 {
-    Image
+    ColoredImage
     {
         Layout.alignment: Qt.AlignTop
-        source: "image://skin/user_settings/warning_icon.svg"
+        sourcePath: "image://skin/20x20/Solid/alert2.svg"
+        primaryColor: "yellow_l"
         sourceSize: Qt.size(20, 20)
     }
 

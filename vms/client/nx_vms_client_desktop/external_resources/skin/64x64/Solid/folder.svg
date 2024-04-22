@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="none" viewBox="0 0 64 64">
+  <g class="64x64/Solid/folder">
+    <path fill="#2FA2DB" d="M10 15a4 4 0 0 1 4-4h14.928a6.4 6.4 0 0 1 4.134 1.514L36 15H10Z" class="Third"/>
+    <path fill="#A5B7C0" fill-rule="evenodd" d="M4 11a4 4 0 0 0-4 4v27.6A6.4 6.4 0 0 0 6.4 49h35.2a6.4 6.4 0 0 0 6.4-6.4V21.4a6.4 6.4 0 0 0-6.4-6.4H26l-2.938-2.486A6.4 6.4 0 0 0 18.928 11H4Z" class="Secondary" clip-rule="evenodd"/>
+    <path fill="#CDD7DC" d="M0 15h50a6 6 0 0 1 6 6v26a6 6 0 0 1-6 6H6a6 6 0 0 1-6-6V15Z" class="Primary"/>
+  </g>
+</svg>

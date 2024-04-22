@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="20" fill="none" viewBox="0 0 24 20">
+  <g class="24x20/Solid/video">
+    <path fill="#A5B7C0" fill-rule="evenodd" d="M4 3a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2H4Zm4 1H4v1h4V4Zm6 0h-4v1h4V4Zm2 0h4v1h-4V4ZM8 15H4v1h4v-1Zm2 0h4v1h-4v-1Zm10 0h-4v1h4v-1ZM10 7.883a.5.5 0 0 1 .757-.429l3.528 2.117a.5.5 0 0 1 0 .858l-3.528 2.117a.5.5 0 0 1-.757-.43V7.884Z" class="Primary" clip-rule="evenodd"/>
+  </g>
+</svg>

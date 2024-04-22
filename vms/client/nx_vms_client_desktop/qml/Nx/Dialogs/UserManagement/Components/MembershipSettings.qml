@@ -56,13 +56,13 @@ Item
             switch (model.userType)
             {
                 case UserSettingsGlobal.LocalUser:
-                    return "image://skin/user_settings/user_local.svg"
+                    return "image://skin/20x20/Solid/user.svg"
                 case UserSettingsGlobal.TemporaryUser:
-                    return "image://skin/user_settings/user_local_temp.svg"
+                    return "image://skin/20x20/Solid/user_temp.svg"
                 case UserSettingsGlobal.CloudUser:
-                    return "image://skin/user_settings/user_cloud.svg"
+                    return "image://skin/20x20/Solid/user_cloud.svg"
                 case UserSettingsGlobal.LdapUser:
-                    return "image://skin/user_settings/user_ldap.svg"
+                    return "image://skin/20x20/Solid/user_ldap.svg"
                 default:
                     return ""
             }

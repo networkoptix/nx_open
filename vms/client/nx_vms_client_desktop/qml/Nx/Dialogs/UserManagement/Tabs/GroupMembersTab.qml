@@ -36,7 +36,7 @@ MembershipSettings
     }
 
     summaryPlaceholder: [
-        "image://skin/user_settings/no_members.svg",
+        "image://skin/64x64/Outline/nomembers.svg",
         qsTr("No members"),
         control.editable ? qsTr("Use controls on the left to add members") : ""
     ]

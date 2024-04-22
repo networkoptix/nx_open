@@ -159,7 +159,7 @@ MembershipSettings
         Placeholder
         {
             anchors.verticalCenterOffset: -32
-            imageSource: "image://skin/user_settings/no_results.svg"
+            imageSource: "image://skin/64x64/Outline/notfound.svg"
             text: qsTr("No groups found")
             additionalText: qsTr("Change search criteria or create a new group")
 
@@ -171,7 +171,7 @@ MembershipSettings
 
                 text: qsTr("Add Group")
 
-                iconUrl: "image://skin/user_settings/add.svg"
+                iconUrl: "image://skin/20x20/Outline/add.svg?primary=light10"
                 iconWidth: 20
                 iconHeight: 20
                 leftPadding: 12
@@ -191,7 +191,7 @@ MembershipSettings
     }
 
     summaryPlaceholder: [
-        "image://skin/user_settings/no_groups.svg",
+        "image://skin/64x64/Outline/nogroups.svg",
         qsTr("No groups"),
         control.editable ? qsTr("Use controls on the left to add to a group") : ""
     ]

@@ -20,6 +20,7 @@ namespace nx::vms::client::core {
 const static nx::vms::client::core::ColorizedIconDeclaration name(__FILE__, __VA_ARGS__);
 
 static const SvgIconColorer::IconSubstitutions kEmptySubstitutions = {};
+static constexpr auto kIconSize = QSize{20, 20};
 
 class IconLoader;
 class GenericPalette;

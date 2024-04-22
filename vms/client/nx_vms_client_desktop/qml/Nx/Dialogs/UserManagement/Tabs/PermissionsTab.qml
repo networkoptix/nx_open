@@ -469,7 +469,7 @@ Item
             anchors.centerIn: parent
             anchors.verticalCenterOffset: -(searchField.y + searchField.height)
 
-            imageSource: "image://skin/user_settings/no_resources.svg"
+            imageSource: "image://skin/64x64/Outline/notfound.svg"
 
             text: qsTr("No resources found")
         }

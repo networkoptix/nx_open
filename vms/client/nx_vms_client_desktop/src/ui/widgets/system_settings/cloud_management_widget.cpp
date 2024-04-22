@@ -35,6 +35,9 @@ using namespace nx::vms::common;
 
 namespace {
 
+NX_DECLARE_COLORIZED_ICON(kUserCloudIcon, "20x20/Solid/user_cloud.svg",\
+    core::kEmptySubstitutions)
+
 core::CloudUrlHelper urlHelper()
 {
     using nx::vms::utils::SystemUri;
@@ -154,7 +157,7 @@ void QnCloudManagementWidget::loadDataToUi()
 
         const auto accountPixmap = saasInitialized
             ? qnSkin->pixmap("saas/organization_icon.svg")
-            : qnSkin->pixmap("user_settings/user_cloud.svg");
+            : qnSkin->icon(kUserCloudIcon).pixmap(core::kIconSize);
 
         ui->accountLabel->setText(accountText);
         ui->accountLabelIcon->setPixmap(accountPixmap);

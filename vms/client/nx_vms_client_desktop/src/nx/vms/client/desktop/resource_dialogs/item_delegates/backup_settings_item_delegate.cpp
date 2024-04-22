@@ -60,7 +60,7 @@ BackupSettingsItemDelegate::BackupSettingsItemDelegate(
     :
     base_type(parent),
     m_hoverTracker(hoverTracker),
-    m_warningPixmap(qnSkin->icon(core::kAlertIcon).pixmap(20, 20))
+    m_warningPixmap(qnSkin->icon(core::kAlertIcon).pixmap(core::kIconSize))
 {
     NX_ASSERT(m_hoverTracker);
     initDropdownColorTable();

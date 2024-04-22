@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="none" viewBox="0 0 64 64">
+  <g class="64x64/Solid/report">
+    <rect width="12" height="51" y="6" fill="#A5B7C0" class="Secondary" rx="2"/>
+    <rect width="12" height="37" x="16" y="20" fill="#2FA2DB" class="Third" rx="2"/>
+    <rect width="12" height="22" x="32" y="35" fill="#CDD7DC" class="Primary" rx="2"/>
+  </g>
+</svg>

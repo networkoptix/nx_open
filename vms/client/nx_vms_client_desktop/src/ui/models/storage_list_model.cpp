@@ -527,7 +527,8 @@ QVariant QnStorageListModel::storageArchiveModeWarningIconColumnData(
             return QVariant::fromValue<int>(Qt::PointingHandCursor);
 
         case Qt::DecorationRole:
-            return qnSkin->icon(nx::vms::client::core::kAlertIcon).pixmap(20, 20);
+            return qnSkin->icon(nx::vms::client::core::kAlertIcon)
+                .pixmap(nx::vms::client::core::kIconSize);
 
         case Qt::ToolTipRole:
         {

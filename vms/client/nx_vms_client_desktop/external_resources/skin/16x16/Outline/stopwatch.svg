@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 16 16">
+  <g class="16x16/Outline/stopwatch">
+    <path fill="#E1E7EA" fill-rule="evenodd" d="M6 1a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1H8.473v2.02a5.95 5.95 0 0 1 2.437.733l1.51-1.775a.5.5 0 1 1 .761.647l-1.435 1.689a6 6 0 1 1-7.431-.047L2.918 3.125a.5.5 0 1 1 .762-.647l1.48 1.738a5.962 5.962 0 0 1 2.314-.692V1.5H6.5A.5.5 0 0 1 6 1Zm7 8.502a5 5 0 1 1-10 0 5 5 0 0 1 10 0Zm-1.932-.83a.5.5 0 1 0-.336-.941l-2.8 1a.5.5 0 0 0 .336.942l2.8-1Z" class="Primary" clip-rule="evenodd"/>
+  </g>
+</svg>

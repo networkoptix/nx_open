@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="none" viewBox="0 0 64 64">
+  <g class="64x64/Outline/email_sent">
+    <path fill="#53707F" fill-rule="evenodd" d="M56.526 11H7.474l23.848 22.013a1 1 0 0 0 1.356 0L56.526 11ZM6 12.36v32.226l16.757-16.757L6 12.36ZM7.414 46h49.172L39.772 29.186l-5.737 5.297a3 3 0 0 1-4.07 0l-5.737-5.296L7.414 46ZM58 44.586V12.36L41.243 27.829 58 44.586ZM4 11a2 2 0 0 1 2-2h52a2 2 0 0 1 2 2v35a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V11Zm8 39a1 1 0 0 1 1 1v4a1 1 0 1 1-2 0v-4a1 1 0 0 1 1-1Zm11 1a1 1 0 1 0-2 0v6a1 1 0 1 0 2 0v-6Zm9-1a1 1 0 0 1 1 1v8a1 1 0 1 1-2 0v-8a1 1 0 0 1 1-1Zm11 1a1 1 0 1 0-2 0v6a1 1 0 1 0 2 0v-6Zm9-1a1 1 0 0 1 1 1v4a1 1 0 1 1-2 0v-4a1 1 0 0 1 1-1Z" class="Primary" clip-rule="evenodd"/>
+  </g>
+</svg>
