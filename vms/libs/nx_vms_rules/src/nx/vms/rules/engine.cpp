@@ -90,8 +90,11 @@ Engine::Engine(std::unique_ptr<Router> router, QObject* parent):
                 handler->onTimer(0);
         });
 
-    connect(m_router.get(), &Router::eventReceived, this, &Engine::onEventReceved);
-    connect(m_router.get(), &Router::actionReceived, this, &Engine::processAcceptedAction);
+    if (m_router) //< Router may absent in test scenarios.
+    {
+        connect(m_router.get(), &Router::eventReceived, this, &Engine::onEventReceved);
+        connect(m_router.get(), &Router::actionReceived, this, &Engine::processAcceptedAction);
+    }
 
     connect(
         this,

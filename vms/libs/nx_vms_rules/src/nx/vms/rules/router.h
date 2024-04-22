@@ -28,6 +28,8 @@ public:
     Router();
     virtual ~Router();
 
+    virtual nx::Uuid peerId() const = 0;
+
     virtual void routeEvent(const EventPtr& event, const RuleList& triggeredRules) = 0;
 
     virtual void routeAction(const ActionPtr& action) = 0;

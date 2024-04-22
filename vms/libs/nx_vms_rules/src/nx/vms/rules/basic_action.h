@@ -25,6 +25,7 @@ class NX_VMS_RULES_API BasicAction: public QObject
     Q_PROPERTY(std::chrono::microseconds timestamp READ timestamp WRITE setTimestamp)
     Q_PROPERTY(nx::vms::api::rules::State state READ state WRITE setState)
     Q_PROPERTY(nx::Uuid ruleId READ ruleId WRITE setRuleId)
+    Q_PROPERTY(nx::Uuid originPeerId READ originPeerId WRITE setOriginPeerId)
 
 public:
     QString type() const;
@@ -38,6 +39,10 @@ public:
     /** Returns a rule id the action belongs to. */
     nx::Uuid ruleId() const;
     void setRuleId(const nx::Uuid& ruleId);
+
+    /** Returns id of the peer emitting the action. */
+    nx::Uuid originPeerId() const;
+    void setOriginPeerId(const nx::Uuid& peerId);
 
     /**
      * Used to keep track of running prolonged actions.
@@ -57,6 +62,7 @@ private:
     std::chrono::microseconds m_timestamp = std::chrono::microseconds::zero();
     State m_state = State::instant;
     nx::Uuid m_ruleId;
+    nx::Uuid m_originPeerId;
 };
 
 } // namespace nx::vms::rules

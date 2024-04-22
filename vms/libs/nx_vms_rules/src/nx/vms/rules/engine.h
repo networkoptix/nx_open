@@ -16,17 +16,11 @@
 
 #include <nx/utils/time/timer_event_handler.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/api/rules/rules_fwd.h>
 
 #include "event_cache.h"
 #include "rules_fwd.h"
 #include "running_event_watcher.h"
-
-namespace nx::vms::api::rules {
-struct ActionBuilder;
-struct EventFilter;
-struct Field;
-struct Rule;
-} // namespace nx::vms::api::rules
 
 namespace nx::vms::rules {
 

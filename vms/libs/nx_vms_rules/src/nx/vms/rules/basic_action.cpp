@@ -46,6 +46,17 @@ void BasicAction::setRuleId(const nx::Uuid& ruleId)
     m_ruleId = ruleId;
 }
 
+nx::Uuid BasicAction::originPeerId() const
+{
+    return m_originPeerId;
+}
+
+void BasicAction::setOriginPeerId(const nx::Uuid & peerId)
+{
+    NX_ASSERT(!peerId.isNull());
+    m_originPeerId = peerId;
+}
+
 QString BasicAction::uniqueKey() const
 {
     return type();

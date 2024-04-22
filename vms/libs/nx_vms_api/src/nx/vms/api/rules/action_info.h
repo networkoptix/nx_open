@@ -13,10 +13,10 @@ namespace nx::vms::api::rules {
 
 struct NX_VMS_API ActionInfo
 {
-    /** Id of the executed rule. */
+    /**%apidoc[opt] Id of the executed rule. */
     nx::Uuid ruleId;
 
-    /** Action properties. */
+    /**%apidoc Action properties. */
     QMap<QString, QJsonValue> props;
 };
 #define nx_vms_api_rules_ActionInfo_Fields \

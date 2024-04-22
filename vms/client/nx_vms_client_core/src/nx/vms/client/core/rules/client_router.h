@@ -12,8 +12,10 @@ class ClientRouter:
     public nx::vms::client::core::SystemContextAware
 {
 public:
-    ClientRouter(nx::vms::client::core::SystemContext* context);
+    explicit ClientRouter(nx::vms::client::core::SystemContext* context);
     virtual ~ClientRouter() override;
+
+    virtual nx::Uuid peerId() const override;
 
     virtual void routeEvent(
         const nx::vms::rules::EventPtr& event,
