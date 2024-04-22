@@ -2,20 +2,19 @@
 
 #include "syncplay_wrapper.h"
 
-#include <QtCore/QElapsedTimer>
-#include <nx/utils/thread/wait_condition.h>
 #include <QtCore/QCoreApplication>
+#include <QtCore/QElapsedTimer>
 
-#include "utils/common/util.h"
-#include "utils/common/synctime.h"
-
+#include <core/resource/resource.h>
+#include <core/resource/security_cam_resource.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/thread/wait_condition.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <recording/playbackmask_helper.h>
+#include <utils/common/synctime.h>
+#include <utils/common/util.h>
 
 #include "syncplay_archive_delegate.h"
-#include "core/resource/resource.h"
-#include <core/resource/security_cam_resource.h>
-
-#include <nx/vms/client/desktop/ini.h>
 
 static const qint64 SYNC_EPS = 1000 * 500;
 static const qint64 SYNC_FOR_FRAME_EPS = 1000 * 50;
@@ -191,6 +190,8 @@ void QnArchiveSyncPlayWrapper::setSkipFramesToTime(qint64 skipTime)
 
 bool QnArchiveSyncPlayWrapper::jumpTo(qint64 mksec,  qint64 skipTime)
 {
+    NX_VERBOSE(this, "Jump to %1 (skip %2)", mksecToDateTime(mksec), mksecToDateTime(skipTime));
+
     Q_D(QnArchiveSyncPlayWrapper);
     NX_MUTEX_LOCKER lock(&d->readerListMutex);
     {
@@ -763,6 +764,8 @@ void QnArchiveSyncPlayWrapper::onConsumerBlocksReader(QnAbstractStreamDataProvid
 
 void QnArchiveSyncPlayWrapper::disableSync()
 {
+    NX_VERBOSE(this, "Disable sync");
+
     Q_D(QnArchiveSyncPlayWrapper);
     NX_MUTEX_LOCKER lock1(&d->readerListMutex);
     NX_MUTEX_LOCKER lock2(&d->timeMutex);
@@ -782,6 +785,8 @@ void QnArchiveSyncPlayWrapper::disableSync()
 
 void QnArchiveSyncPlayWrapper::enableSync(qint64 currentTime, float currentSpeed)
 {
+    NX_VERBOSE(this, "Enable sync");
+
     Q_D(QnArchiveSyncPlayWrapper);
     NX_MUTEX_LOCKER lock1(&d->readerListMutex);
     NX_MUTEX_LOCKER lock2(&d->timeMutex);

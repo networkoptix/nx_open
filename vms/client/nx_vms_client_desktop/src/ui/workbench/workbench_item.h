@@ -326,6 +326,11 @@ public:
 
     static void sortByGeometryAndName(QList<QnWorkbenchItem*>& items);
 
+    /**
+     * Debug helper for NX_LOG implementation. Used by toString(const T*).
+     */
+    QString idForToStringFromPtr() const;
+
 signals:
     void geometryChanged();
     void geometryDeltaChanged();
