@@ -553,7 +553,6 @@ void Workbench::setCurrentLayout(QnWorkbenchLayout* layout)
             {
                 // The layout must be removed after opening, not during opening. Otherwise, the
                 // tabbar invariant will be violated.
-                d->currentLayout = layout;
                 executeDelayedParented(
                     [this, layout]
                     {
