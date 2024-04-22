@@ -9,12 +9,6 @@
 
 namespace nx::vms::client::desktop {
 
-namespace {
-
-static const QString kIconsDir = "user_settings/access_rights/";
-
-} // namespace
-
 using namespace nx::vms::api;
 
 AccessRightsList::AccessRightsList(QObject* parent):
@@ -28,47 +22,47 @@ AccessRightsList::AccessRightsList(QObject* parent):
                     .name = tr("View Live"),
                     .description = common::html::bold(tr("View Live") + ".") + " " +
                         tr("Allows users to access a resource and view live footage from a camera."),
-                    .icon = QUrl(kIconsDir + "view_live_24x20.svg")},
+                    .icon = QUrl("24x20/Solid/live.svg")},
                 AccessRightDescriptor{
                     .accessRight = AccessRight::audio,
                     .name = tr("Play Sound"),
                     .description = common::html::bold(tr("Access Audio") + ".") + " " +
                         tr("Allows users to access an audio stream from a Device. "
                             "Used in combination with View Live and/or View Archive."),
-                    .icon = QUrl(kIconsDir + "sound_24x20.svg")},
+                    .icon = QUrl("24x20/Solid/audio.svg")},
                 AccessRightDescriptor{
                     .accessRight = AccessRight::viewArchive,
                     .name = tr("View Archive"),
                     .description = common::html::bold(tr("View Archive")),
-                    .icon = QUrl(kIconsDir + "view_archive_24x20.svg")},
+                    .icon = QUrl("24x20/Solid/video.svg")},
                 AccessRightDescriptor{
                     .accessRight = AccessRight::exportArchive,
                     .name = tr("Export Archive"),
                     .description = common::html::bold(tr("Export Archive")),
-                    .icon = QUrl(kIconsDir + "export_archive_24x20.svg")},
+                    .icon = QUrl("24x20/Solid/video_export.svg")},
                 AccessRightDescriptor{
                     .accessRight = AccessRight::viewBookmarks,
                     .name = tr("View Bookmarks"),
                     .description = common::html::bold(tr("View Bookmarks")),
-                    .icon = QUrl(kIconsDir + "view_bookmarks_24x20.svg")},
+                    .icon = QUrl("24x20/Solid/bookmarks.svg")},
                 AccessRightDescriptor{
                     .accessRight = AccessRight::manageBookmarks,
                     .name = tr("Manage Bookmarks"),
                     .description = common::html::bold(tr("Manage Bookmarks")),
-                    .icon = QUrl(kIconsDir + "manage_bookmarks_24x20.svg")},
+                    .icon = QUrl("24x20/Solid/bookmark_edit.svg")},
                 AccessRightDescriptor{
                     .accessRight = AccessRight::userInput,
                     .name = tr("User Input"),
                     .description = common::html::bold(tr("User Input") + ".") + " " +
                         tr("Allows user to control PTZ, use 2-Way Audio, Soft Triggers and I/O buttons."),
-                    .icon = QUrl(kIconsDir + "user_input_24x20.svg")},
+                    .icon = QUrl("24x20/Solid/userinput.svg")},
                 AccessRightDescriptor{
                     .accessRight = AccessRight::edit,
                     .name = tr("Edit Settings"),
                     .description = common::html::bold(tr("Edit Settings") + ".") + " " +
                         tr("Depending on the resource type it either allows user to modify device settings"
                         " or to control video wall."),
-                    .icon = QUrl(kIconsDir + "edit_settings_24x20.svg")}});
+                    .icon = QUrl("24x20/Solid/camera_edit.svg")}});
 
             return result;
         }()),

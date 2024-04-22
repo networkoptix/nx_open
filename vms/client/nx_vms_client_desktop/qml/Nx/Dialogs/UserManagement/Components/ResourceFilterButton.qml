@@ -81,9 +81,7 @@ Item
                 checked: button.selection === data
                 shortcut: null //< Explicitly hide shortcut spacing.
 
-                icon.source: checked
-                    ? "image://skin/user_settings/access_rights/filter_checked.svg"
-                    : ""
+                icon.source: checked ? "image://skin/20x20/Outline/success.svg" : ""
             }
 
             MenuAction
