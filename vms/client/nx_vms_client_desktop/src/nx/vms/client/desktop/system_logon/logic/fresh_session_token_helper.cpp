@@ -5,7 +5,6 @@
 #include <QtCore/QThread>
 #include <QtWidgets/QApplication>
 
-#include <nx/vms/client/core/network/cloud_auth_data.h>
 #include <nx/vms/client/core/network/oauth_client_constants.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/desktop/system_logon/ui/oauth_login_dialog.h>
@@ -35,6 +34,8 @@ ActionTypeInfo info(FreshSessionTokenHelper::ActionType actionType)
             return {core::OauthClientType::passwordMerge};
         case ActionType::updateSettings:
             return {core::OauthClientType::passwordApply};
+        case ActionType::issueRefreshToken:
+            return {core::OauthClientType::loginCloud};
     }
 
     NX_ASSERT(false, "Unexpected action type");
@@ -66,6 +67,21 @@ common::SessionTokenHelperPtr FreshSessionTokenHelper::makeHelper(
     result->m_actionText = actionText;
     result->m_actionType = actionType;
     return common::SessionTokenHelperPtr(result);
+}
+
+FreshSessionTokenHelper* FreshSessionTokenHelper::makeFreshSessionTokenHelper(
+    QWidget* parent,
+    const QString& title,
+    const QString& mainText,
+    const QString& actionText,
+    ActionType actionType)
+{
+    auto result = new FreshSessionTokenHelper(parent);
+    result->m_title = title;
+    result->m_mainText = mainText;
+    result->m_actionText = actionText;
+    result->m_actionType = actionType;
+    return result;
 }
 
 std::optional<nx::network::http::AuthToken> FreshSessionTokenHelper::refreshToken()
@@ -125,6 +141,30 @@ std::optional<nx::network::http::AuthToken> FreshSessionTokenHelper::refreshToke
         return {};
 
     return token;
+}
+
+core::CloudAuthData FreshSessionTokenHelper::requestAuthData()
+{
+    if (!NX_ASSERT(QThread::currentThread() == qApp->thread()))
+        return {};
+
+    if (!m_parent)
+        return {};
+
+    const auto cloudAuthData = OauthLoginDialog::login(
+        m_parent,
+        m_title,
+        info(m_actionType).clientType,
+        /*sessionAware*/ false
+    );
+
+    if (cloudAuthData.needValidateToken
+        && !OauthLoginDialog::validateToken(m_parent, m_title, cloudAuthData.credentials))
+    {
+        return {};
+    }
+
+    return cloudAuthData;
 }
 
 QString FreshSessionTokenHelper::password() const

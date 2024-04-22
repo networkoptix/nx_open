@@ -65,6 +65,7 @@
 #include <nx/vms/client/desktop/statistics/context_statistics_module.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/logic/connection_delegate_helper.h>
+#include <nx/vms/client/desktop/system_logon/logic/fresh_session_token_helper.h>
 #include <nx/vms/client/desktop/ui/dialogs/connecting_to_server_dialog.h>
 #include <nx/vms/client/desktop/ui/dialogs/session_refresh_dialog.h>
 #include <nx/vms/client/desktop/ui/scene/widgets/scene_banners.h>
@@ -138,6 +139,9 @@ struct ConnectActionsHandler::Private
     bool warnMessagesDisplayed = false;
     std::unique_ptr<nx::utils::TimerManager> timerManager;
     std::unique_ptr<ec2::CrashReporter> crashReporter;
+    bool needReconnectToLastCloudSystem = false;
+    bool cloudLoginDialogIsDisplayed = false;
+    QString lastCloudSystemId;
 
     Private(ConnectActionsHandler* owner):
         q(owner)
@@ -164,6 +168,50 @@ struct ConnectActionsHandler::Private
             welcomeScreen && welcomeScreen->connectingTileExists();
         if (connectingTileExists)
             welcomeScreen->openConnectingTile(errorCode);
+    }
+
+    void reconnectToLastCloudSystemIfNeeded()
+    {
+        if (!needReconnectToLastCloudSystem)
+            return;
+
+        needReconnectToLastCloudSystem = false;
+
+        q->connectToCloudSystem({lastCloudSystemId, /*connectScenario*/ std::nullopt});
+    }
+
+    void reconnectToCloudIfNeeded()
+    {
+        if (cloudLoginDialogIsDisplayed)
+            return;
+
+        QScopedValueRollback<bool> guard(cloudLoginDialogIsDisplayed, true);
+
+        auto cloudAuthDataHelper = FreshSessionTokenHelper::makeFreshSessionTokenHelper(
+            q->mainWindowWidget(),
+            tr("Login to %1", "%1 is the cloud name (like Nx Cloud)")
+                .arg(nx::branding::cloudName()),
+            /*mainText*/ "",
+            /*actionText*/ "",
+            FreshSessionTokenHelper::ActionType::issueRefreshToken);
+
+        const auto newCloudAuthData = cloudAuthDataHelper->requestAuthData();
+        if (newCloudAuthData.empty())
+            return;
+
+        qnCloudStatusWatcher->setAuthData(newCloudAuthData);
+
+        if (auto session = q->system()->session(); session && session->connection())
+        {
+            session->updateCloudSessionToken();
+        }
+        else
+        {
+            if (qnCloudStatusWatcher->status() == core::CloudStatusWatcher::Online)
+                q->connectToCloudSystem({lastCloudSystemId, /*connectScenario*/ std::nullopt});
+            else
+                needReconnectToLastCloudSystem = true;
+        }
     }
 };
 
@@ -205,12 +253,20 @@ ConnectActionsHandler::ConnectActionsHandler(WindowContext* windowContext, QObje
                         }
                         else
                         {
-                            auto errorCode =
-                                reason == SessionExpirationReason::temporaryTokenExpired
-                                    ? RemoteConnectionErrorCode::temporaryTokenExpired
-                                    : RemoteConnectionErrorCode::sessionExpired;
+                            auto errorCode = RemoteConnectionErrorCode::sessionExpired;
+
+                            if (reason == SessionExpirationReason::temporaryTokenExpired)
+                                errorCode = RemoteConnectionErrorCode::temporaryTokenExpired;
+                            else if (reason == SessionExpirationReason::truncatedSessionToken)
+                                errorCode = RemoteConnectionErrorCode::truncatedSessionToken;
 
                             d->handleWSError(errorCode);
+
+                            if (errorCode == RemoteConnectionErrorCode::truncatedSessionToken)
+                            {
+                                d->reconnectToCloudIfNeeded();
+                                return;
+                            }
 
                             QnConnectionDiagnosticsHelper::showConnectionErrorMessage(
                                 this->windowContext(),
@@ -240,6 +296,12 @@ ConnectActionsHandler::ConnectActionsHandler(WindowContext* windowContext, QObje
         this,
         [this]()
         {
+            if (system()->connection()->connectionInfo().isCloud())
+            {
+                d->reconnectToCloudIfNeeded();
+                return;
+            }
+
             auto existingCredentials = system()->connectionCredentials();
 
             QString mainText = system()->userWatcher()->user()->isTemporary()
@@ -407,6 +469,13 @@ ConnectActionsHandler::ConnectActionsHandler(WindowContext* windowContext, QObje
     workbenchContext()->instance<UserAuthDebugInfoWatcher>();
 
     new TemporaryUserExpirationWatcher(this);
+
+    connect(qnCloudStatusWatcher, &core::CloudStatusWatcher::statusChanged, this,
+        [this]
+        {
+            if (qnCloudStatusWatcher->status() == core::CloudStatusWatcher::Online)
+                d->reconnectToLastCloudSystemIfNeeded();
+        });
 }
 
 ConnectActionsHandler::~ConnectActionsHandler()
@@ -576,6 +645,12 @@ void ConnectActionsHandler::handleConnectionError(RemoteConnectionError error)
         {
             if (!connectingTileExists || isCloudConnection)
             {
+                if (error.code == RemoteConnectionErrorCode::truncatedSessionToken)
+                {
+                    d->reconnectToCloudIfNeeded();
+                    return;
+                }
+
                 QnConnectionDiagnosticsHelper::showConnectionErrorMessage(
                     windowContext(),
                     error,
@@ -678,6 +753,12 @@ void ConnectActionsHandler::establishConnection(RemoteConnectionPtr connection)
                 [this, errorCode, serverModuleInformation]()
                 {
                     d->handleWSError(errorCode);
+
+                    if (errorCode == RemoteConnectionErrorCode::truncatedSessionToken)
+                    {
+                        d->reconnectToCloudIfNeeded();
+                        return;
+                    }
 
                     QnConnectionDiagnosticsHelper::showConnectionErrorMessage(
                         windowContext(),
@@ -945,6 +1026,51 @@ void ConnectActionsHandler::updatePreloaderVisibility()
     }
 }
 
+void ConnectActionsHandler::connectToCloudSystem(const CloudSystemConnectData& connectData)
+{
+    const auto connectionInfo = core::cloudLogonData(connectData.systemId);
+    d->lastCloudSystemId = connectData.systemId;
+
+    if (!connectionInfo)
+        return;
+
+    statisticsModule()->certificates()->resetScenario();
+    std::shared_ptr<QnStatisticsScenarioGuard> connectScenario = connectData.connectScenario
+        ? statisticsModule()->certificates()->beginScenario(*connectData.connectScenario)
+        : nullptr;
+
+    auto callback = d->makeSingleConnectionCallback(
+        [this, connectionInfo, connectScenario](RemoteConnectionFactory::ConnectionOrError result)
+        {
+            if (auto error = std::get_if<RemoteConnectionError>(&result))
+            {
+                handleConnectionError(*error);
+                if (logicalState() != LogicalState::connected)
+                    setState(LogicalState::disconnected);
+            }
+            else
+            {
+                if (logicalState() == LogicalState::connected
+                    && !disconnectFromServer(DisconnectFlag::NoFlags))
+                {
+                    return;
+                }
+
+                auto connection = std::get<RemoteConnectionPtr>(result);
+                establishConnection(connection);
+                storeConnectionRecord(
+                    connection->connectionInfo(),
+                    connection->moduleInformation(),
+                    ConnectionOptions(UpdateSystemWeight | StoreSession));
+            }
+        });
+
+    NX_VERBOSE(this, "Executing connect to the %1", connectionInfo->address);
+    auto remoteConnectionFactory = qnClientCoreModule->networkModule()->connectionFactory();
+
+    d->currentConnectionProcess = remoteConnectionFactory->connect(*connectionInfo, callback);
+}
+
 void ConnectActionsHandler::at_connectAction_triggered()
 {
     NX_VERBOSE(this, "Connect to server triggered");
@@ -1061,48 +1187,11 @@ void ConnectActionsHandler::at_connectAction_triggered()
 void ConnectActionsHandler::at_connectToCloudSystemAction_triggered()
 {
     const auto parameters = menu()->currentParameters(sender());
+
     const auto connectData = parameters.argument<CloudSystemConnectData>(
         Qn::CloudSystemConnectDataRole);
-    const auto connectionInfo = core::cloudLogonData(connectData.systemId);
 
-    if (!connectionInfo)
-        return;
-
-    statisticsModule()->certificates()->resetScenario();
-    std::shared_ptr<QnStatisticsScenarioGuard> connectScenario = connectData.connectScenario
-        ? statisticsModule()->certificates()->beginScenario(*connectData.connectScenario)
-        : nullptr;
-
-    auto callback = d->makeSingleConnectionCallback(
-        [this, connectionInfo, connectScenario](RemoteConnectionFactory::ConnectionOrError result)
-        {
-            if (auto error = std::get_if<RemoteConnectionError>(&result))
-            {
-                handleConnectionError(*error);
-                if (logicalState() != LogicalState::connected)
-                    setState(LogicalState::disconnected);
-            }
-            else
-            {
-                if (logicalState() == LogicalState::connected
-                    && !disconnectFromServer(DisconnectFlag::NoFlags))
-                {
-                    return;
-                }
-
-                auto connection = std::get<RemoteConnectionPtr>(result);
-                establishConnection(connection);
-                storeConnectionRecord(
-                    connection->connectionInfo(),
-                    connection->moduleInformation(),
-                    ConnectionOptions(UpdateSystemWeight | StoreSession));
-            }
-        });
-
-    NX_VERBOSE(this, "Executing connect to the %1", connectionInfo->address);
-    auto remoteConnectionFactory = qnClientCoreModule->networkModule()->connectionFactory();
-
-    d->currentConnectionProcess = remoteConnectionFactory->connect(*connectionInfo, callback);
+    connectToCloudSystem(connectData);
 }
 
 void ConnectActionsHandler::onConnectToCloudSystemWithUserInteractionTriggered()
@@ -1174,6 +1263,8 @@ void ConnectActionsHandler::at_disconnectAction_triggered()
     menu()->trigger(
         menu::RemoveSystemFromTabBarAction,
         menu::Parameters(Qn::LocalSystemIdRole, systemId));
+
+    d->lastCloudSystemId = {};
     emit mainWindow()->welcomeScreen()->dropConnectingState();
 }
 

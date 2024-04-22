@@ -40,6 +40,7 @@ struct SaveableSystemSettings
     std::optional<bool> useHttpsOnlyForCameras;
     std::optional<bool> videoTrafficEncryptionForced;
     std::optional<std::chrono::seconds> sessionLimitS;
+    std::optional<bool> useSessionLimitForCloud;
     std::optional<bool> storageEncryption;
     std::optional<bool> showServersInTreeForNonAdmins;
 
@@ -57,9 +58,9 @@ NX_REFLECTION_INSTRUMENT(SaveableSystemSettings,
     (systemName)(autoDiscoveryEnabled)(cameraSettingsOptimization)(statisticsAllowed)
     (cloudNotificationsLanguage)(emailSettings)(timeSynchronizationEnabled)(primaryTimeServer)
     (watermarkSettings)(pixelationSettings)(auditTrailEnabled)(trafficEncryptionForced)
-    (useHttpsOnlyForCameras)(videoTrafficEncryptionForced)(sessionLimitS)(storageEncryption)
-    (showServersInTreeForNonAdmins)(updateNotificationsEnabled)(customReleaseListUrl)
-    (clientUpdateSettings)(backupSettings)(metadataStorageChangePolicy)
+    (useHttpsOnlyForCameras)(videoTrafficEncryptionForced)(sessionLimitS)(useSessionLimitForCloud)
+    (storageEncryption)(showServersInTreeForNonAdmins)(updateNotificationsEnabled)
+    (customReleaseListUrl)(clientUpdateSettings)(backupSettings)(metadataStorageChangePolicy)
     (targetPersistentUpdateStorage))
 
 NX_REFLECTION_TAG_TYPE(SaveableSystemSettings, jsonSerializeChronoDurationAsNumber)

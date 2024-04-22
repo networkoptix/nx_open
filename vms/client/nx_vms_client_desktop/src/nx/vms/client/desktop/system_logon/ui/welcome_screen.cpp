@@ -234,6 +234,7 @@ void WelcomeScreen::openConnectingTile(std::optional<RemoteConnectionErrorCode> 
             || *errorCode == RemoteConnectionErrorCode::cloudSessionExpired
             || *errorCode == RemoteConnectionErrorCode::userIsLockedOut
             || *errorCode == RemoteConnectionErrorCode::userIsDisabled
+            || *errorCode == RemoteConnectionErrorCode::truncatedSessionToken
             );
 
     m_connectingSystemId.clear(); //< Connection process is finished.

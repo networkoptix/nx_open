@@ -514,6 +514,13 @@
               </property>
              </spacer>
             </item>
+            <item row="0" column="3">
+             <widget class="QCheckBox" name="useSessionLimitForCloudComboBox">
+              <property name="text">
+               <string>Apply session duration to Cloud users</string>
+              </property>
+             </widget>
+            </item>
            </layout>
           </widget>
          </item>
