@@ -750,6 +750,7 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
                 m_timeMutex.unlock();
                 if (m_buffering == 0)
                 {
+                    NX_VERBOSE(this, "Frame is displayed");
                     unblockTimeValue();
                     waitForFramesDisplayed(); // new videoStreamDisplay displays data async, so ensure that new position actual
                     if (m_extTimeSrc)
@@ -869,6 +870,7 @@ void QnCamDisplay::onSkippingFrames(qint64 time)
     m_buffering = getBufferingMask();
     m_skippingFramesTime = time;
 
+    NX_VERBOSE(this, "Skipping frames at %1", nx::utils::timestampToDebugString(time));
     if (m_speed >= 0)
         blockTimeValue(qMax(time, getCurrentTime()));
     else
@@ -883,6 +885,7 @@ void QnCamDisplay::blockTimeValue(qint64 time)
 {
     if (!m_doNotChangeDisplayTime)
     {
+        NX_VERBOSE(this, "Block time value to %1", nx::utils::timestampToDebugString(time));
         for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i)
         {
             m_nextReverseTime[i] = AV_NOPTS_VALUE;
@@ -897,6 +900,7 @@ void QnCamDisplay::blockTimeValueSafe(qint64 time)
 {
     if (!m_doNotChangeDisplayTime)
     {
+        NX_VERBOSE(this, "Block time value safe to %1", nx::utils::timestampToDebugString(time));
         for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i)
         {
             m_nextReverseTime[i] = AV_NOPTS_VALUE;
@@ -915,6 +919,7 @@ void QnCamDisplay::waitForFramesDisplayed()
 
 void QnCamDisplay::onBeforeJump(qint64 time)
 {
+    NX_VERBOSE(this, "Before jump to %1", nx::utils::timestampToDebugString(time));
     m_lastMediaEventTimeout.invalidate();
     if (m_extTimeSrc)
         m_extTimeSrc->onBufferingStarted(this, m_doNotChangeDisplayTime ? getDisplayedTime() : time);
@@ -1067,7 +1072,10 @@ void QnCamDisplay::setSpeed(float speed)
             m_executingChangeSpeed = true; // do not show "No data" while display preparing for new speed.
             qint64 time = getExternalTime();
             if (time != DATETIME_NOW)
+            {
+                NX_VERBOSE(this, "Block time value on speed change to %1", speed);
                 blockTimeValue(time);
+            }
         }
         if (speed < 0 && m_speed >= 0)
         {
@@ -1080,6 +1088,7 @@ void QnCamDisplay::setSpeed(float speed)
 
 void QnCamDisplay::unblockTimeValue()
 {
+    NX_VERBOSE(this, "Unblock time value");
     for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i)
         m_display[i]->unblockTimeValue();
     NX_MUTEX_LOCKER lock(&m_audioChangeMutex);
@@ -1129,6 +1138,7 @@ void QnCamDisplay::processNewSpeed(float speed)
         m_lastDecodedTime = AV_NOPTS_VALUE;
         for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i)
             m_nextReverseTime[i] = AV_NOPTS_VALUE;
+        NX_VERBOSE(this, "Unblock time value after speed changed");
         unblockTimeValue();
     }
     if (qAbs(speed) > 1.0) {
@@ -2005,19 +2015,34 @@ qint64 QnCamDisplay::getDisplayedMin() const
 
 qint64 QnCamDisplay::getCurrentTime() const
 {
-    if (!m_hasVideo) {
+    if (!m_hasVideo)
+    {
+        NX_VERBOSE(this, "Video is absent, using audio stream as the time source");
         NX_MUTEX_LOCKER lock(&m_audioChangeMutex);
         if (m_speed < 0)
             return AV_NOPTS_VALUE;
         else
             return m_audioDisplay->getCurrentTime();
     }
+
     if (m_display[0] && m_display[0]->isTimeBlocked())
-        return m_display[0]->getTimestampOfNextFrameToRender();
+    {
+        const auto result = m_display[0]->getTimestampOfNextFrameToRender();
+        NX_VERBOSE(this, "Next frame to render is %1", nx::utils::timestampToDebugString(result));
+        return result;
+    }
     else if (m_speed >= 0)
-        return getDisplayedMax();
+    {
+        const auto result = getDisplayedMax();
+        NX_VERBOSE(this, "Max displayed time is %1", nx::utils::timestampToDebugString(result));
+        return result;
+    }
     else
-        return getDisplayedMin();
+    {
+        const auto result = getDisplayedMin();
+        NX_VERBOSE(this, "Min displayed time is %1", nx::utils::timestampToDebugString(result));
+        return result;
+    }
 }
 
 qint64 QnCamDisplay::getMinReverseTime() const
@@ -2064,9 +2089,13 @@ qint64 QnCamDisplay::getDisplayedTime() const
 qint64 QnCamDisplay::getExternalTime() const
 {
     if (m_extTimeSrc && m_extTimeSrc->isEnabled())
+    {
         return m_extTimeSrc->getDisplayedTime();
+    }
     else
+    {
         return getCurrentTime();
+    }
 }
 
 void QnCamDisplay::setExternalTimeSource(QnlTimeSource* value)

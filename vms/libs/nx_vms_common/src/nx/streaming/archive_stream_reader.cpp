@@ -515,7 +515,13 @@ begin_label:
     m_currentTimeHint = AV_NOPTS_VALUE;
 
     bool needChangeQuality = m_oldQuality != quality || qualityFastSwitch > m_oldQualityFastSwitch || resolution != m_oldResolution;
-    if (needChangeQuality) {
+    if (needChangeQuality)
+    {
+        NX_VERBOSE(this,
+            "Change quality from %1 to %2, fast switch from %3 to %4, resolution from %5 to %6",
+            m_oldQuality, quality,
+            m_oldQualityFastSwitch, qualityFastSwitch,
+            m_oldResolution, resolution);
         m_oldQuality = quality;
         m_oldQualityFastSwitch = qualityFastSwitch;
         m_oldResolution = resolution;
@@ -533,7 +539,10 @@ begin_label:
         if (needSeek && jumpTime == qint64(AV_NOPTS_VALUE) && reverseMode == prevReverseMode)
         {
             qint64 displayTime = determineDisplayTime(reverseMode);
-            if (displayTime != qint64(AV_NOPTS_VALUE)) {
+            if (displayTime != qint64(AV_NOPTS_VALUE))
+            {
+                NX_VERBOSE(this, "Jump to %1 to change quality",
+                    nx::utils::timestampToDebugString(displayTime));
                 beforeJumpInternal(displayTime);
                 if (!exactJumpToSpecifiedFrame && channelCount > 1)
                     setNeedKeyData();
@@ -1213,6 +1222,8 @@ void QnArchiveStreamReader::directJumpToNonKeyFrame(qint64 mksec)
     if (useMutex)
         m_jumpMtx.lock();
 
+    NX_VERBOSE(this, "Direct jump to non-key frame to %1",
+        nx::utils::timestampToDebugString(mksec));
     beforeJumpInternal(mksec);
     m_exactJumpToSpecifiedFrame = true;
     channeljumpToUnsync(mksec, 0, mksec);
@@ -1260,9 +1271,7 @@ bool QnArchiveStreamReader::jumpToEx(
         return m_navDelegate->jumpTo(mksec, skipTime);
     }
 
-    if (m_resource)
-
-        NX_VERBOSE(this, "Set position %1 for device %2", mksecToDateTime(mksec), m_resource->getId());
+    NX_VERBOSE(this, "Set position %1 for device %2", mksecToDateTime(mksec), m_resource);
 
     qint64 newTime = mksec;
     if (bindPositionToPlaybackMask)
@@ -1303,6 +1312,7 @@ bool QnArchiveStreamReader::jumpToEx(
 
 void QnArchiveStreamReader::beforeJumpInternal(qint64 mksec)
 {
+    NX_VERBOSE(this, "Before jump to %1", nx::utils::timestampToDebugString(mksec));
     emit beforeJump(mksec);
     m_delegate->beforeSeek(mksec);
 }
@@ -1351,6 +1361,9 @@ void QnArchiveStreamReader::setQuality(MediaQuality quality, bool fastSwitch, co
 {
     if (m_quality != quality || fastSwitch > m_qualityFastSwitch || m_customResolution != resolution)
     {
+        NX_VERBOSE(this, "Set quality to %1 (fast %2, resolution %3)",
+             quality, fastSwitch, resolution);
+
         bool useMutex = !m_externalLocked;
         if (useMutex)
             m_jumpMtx.lock();

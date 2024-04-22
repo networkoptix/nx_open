@@ -525,3 +525,10 @@ void QnWorkbenchItem::sortByGeometryAndName(QList<QnWorkbenchItem*>& items)
             return lg.y() < rg.y() || (lg.y() == rg.y() && lg.x() < rg.x());
         });
 }
+
+QString QnWorkbenchItem::idForToStringFromPtr() const
+{
+    return m_resource
+        ? m_resource->idForToStringFromPtr()
+        : "Invalid item";
+}
