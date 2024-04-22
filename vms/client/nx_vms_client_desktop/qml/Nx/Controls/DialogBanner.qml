@@ -21,14 +21,14 @@ Rectangle
                 return {
                     "color": ColorTheme.colors.red_l,
                     "background": ColorTheme.colors.dark10,
-                    "icon": "image://skin/banners/error.svg"
+                    "icon": "image://skin/20x20/Solid/error.svg"
                 }
 
             case DialogBanner.Style.Warning:
                 return {
                     "color": ColorTheme.colors.light4,
                     "background": ColorTheme.colors.dark10,
-                    "icon": "image://skin/banners/warning.svg"
+                    "icon": "image://skin/20x20/Solid/attention.svg"
                 }
 
             case DialogBanner.Style.Info:
@@ -36,7 +36,7 @@ Rectangle
                 return {
                     "color": ColorTheme.colors.light4,
                     "background": ColorTheme.colors.dark10,
-                    "icon": "image://skin/banners/info.svg"
+                    "icon": "image://skin/20x20/Solid/info.svg"
                 }
         }
     }
@@ -77,13 +77,14 @@ Rectangle
 
         spacing: 8
 
-        Image
+        ColoredImage
         {
             id: icon
 
             Layout.alignment: Qt.AlignTop | Qt.AlignLeft
 
-            source: control.styleData.icon
+            sourcePath: control.styleData.icon
+            primaryColor: control.styleData.color
             sourceSize: Qt.size(20, 20)
         }
 
@@ -140,7 +141,7 @@ Rectangle
 
             Layout.alignment: Qt.AlignTop | Qt.AlignRight
 
-            icon.source: "image://skin/banners/close.svg"
+            icon.source: "image://skin/20x20/Outline/cross_close.svg"
             icon.color: ColorTheme.colors.light4
 
             onClicked:
