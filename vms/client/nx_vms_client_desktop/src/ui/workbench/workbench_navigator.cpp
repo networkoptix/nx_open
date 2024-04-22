@@ -1798,9 +1798,17 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
             const auto streamSynchronizer = workbench()->windowContext()->streamSynchronizer();
             qint64 timeUSec;
             if (isCurrentWidgetSynced())
+            {
                 timeUSec = streamSynchronizer->state().timeUs; // Fetch "current" time instead of "displayed"
+                NX_VERBOSE(this, "Synced time for the widget %1 is %2", mediaWidget,
+                    nx::utils::timestampToDebugString(timeUSec));
+            }
             else
+            {
                 timeUSec = mediaWidget->display()->camDisplay()->getExternalTime();
+                NX_VERBOSE(this, "External time for the widget %1 is %2", mediaWidget,
+                    nx::utils::timestampToDebugString(timeUSec));
+            }
 
             if (timeUSec == AV_NOPTS_VALUE)
                 timeUSec = -1;
@@ -1810,6 +1818,9 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
                 timeUSec = mediaWidget->item()->data<qint64>(Qn::ItemTimeRole, -1);
                 if (timeUSec != DATETIME_NOW && timeUSec >= 0)
                     timeUSec *= 1000;
+                NX_VERBOSE(this, "Corrected preview search time for the widget %1 is %2",
+                    mediaWidget,
+                    nx::utils::timestampToDebugString(timeUSec));
             }
 
             return timeUSec;
