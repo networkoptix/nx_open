@@ -47,8 +47,8 @@ NX_REFLECTION_INSTRUMENT(LoginUser, LoginUser_Fields);
 struct NX_VMS_API TemporaryLoginSessionRequest
 {
     /**%apidoc
-     * A token, previously recevied as a response to the `POST /rest/v{3-}/users` or
-     * `GET /rest/v{3-}/login/temporaryToken`
+     * A token (UserModel.temporaryToken.token), previously recevied as a response to the
+     * `POST /rest/v{3-}/users` request for creation a `temporaryLocal` user.
      */
     QString token;
 
