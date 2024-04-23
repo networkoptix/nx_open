@@ -19,7 +19,6 @@ class IPlugin: public Interface<IPlugin, nx::sdk::IPlugin>
 {
 public:
     static constexpr auto interfaceId() { return makeId("nx::sdk::archive::IPlugin"); }
-    static auto alternativeInterfaceId() { return makeId("nx::sdk::archive::IIntegration"); }
 
     protected: virtual void getManifest(Result<const IString*>* outResult) const = 0;
     /**
