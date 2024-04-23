@@ -27,7 +27,6 @@ class IPlugin: public Interface<IPlugin>
 {
 public:
     static auto interfaceId() { return makeId("nx::sdk::IPlugin"); }
-    static auto alternativeInterfaceId() { return makeId("nx::sdk::IIntegration"); }
 
     /**
      * Prototype of a plugin entry point function for single-IPlugin Plugins.

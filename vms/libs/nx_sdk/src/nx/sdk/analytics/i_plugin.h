@@ -18,7 +18,6 @@ class IPlugin: public Interface<IPlugin, nx::sdk::IPlugin0>
 {
 public:
     static auto interfaceId() { return makeId("nx::sdk::analytics::IPlugin"); }
-    static auto alternativeInterfaceId() { return makeId("nx::sdk::analytics::IIntegration"); }
 
     /** Called by manifest() */
     protected: virtual void getManifest(Result<const IString*>* outResult) const = 0;
