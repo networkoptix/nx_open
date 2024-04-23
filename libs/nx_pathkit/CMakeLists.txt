@@ -11,6 +11,7 @@ nx_add_target(nx_pathkit LIBRARY NO_MOC
     FOLDER common/libs
 )
 
+# This command generates nx_pathkit_other_files target.
 qt6_add_shaders(nx_pathkit "pathkit_shaders"
     PREFIX
         "/nx_pathkit"
@@ -20,6 +21,7 @@ qt6_add_shaders(nx_pathkit "pathkit_shaders"
         "shaders/texture.frag"
         "shaders/texture.vert"
 )
+set_property(TARGET nx_pathkit_other_files PROPERTY FOLDER common/other_files)
 
 target_compile_definitions(nx_pathkit
     PRIVATE NX_PATHKIT_API=${API_EXPORT_MACRO}
