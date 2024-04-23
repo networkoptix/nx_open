@@ -111,9 +111,7 @@ TextField
         flat: true
         backgroundColor: ColorTheme.colors.dark5
 
-        iconUrl: "image://skin/20x20/Outline/close_medium.svg?primary=light16"
-        iconWidth: 20
-        iconHeight: 20
+        icon.source: "image://skin/20x20/Outline/close_medium.svg"
 
         visible: control.text
 

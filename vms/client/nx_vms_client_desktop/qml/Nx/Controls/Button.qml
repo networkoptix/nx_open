@@ -2,7 +2,7 @@
 
 import QtQuick
 import QtQuick.Controls
-import QtQuick.Controls.impl
+import QtQuick.Controls.impl as T
 
 import Nx
 import Nx.Core
@@ -14,10 +14,10 @@ import "private"
 
 Button
 {
-    id: control
+    id: button
 
     property bool isAccentButton: false
-    property var contentHAlignment: Qt.AlignHCenter
+    property int contentHAlignment: Qt.AlignHCenter
     readonly property real leftPaddingWithIcon: 4
     readonly property real leftPaddingOnlyText: 16
     property color backgroundColor:
@@ -29,42 +29,30 @@ Button
     property color outlineColor: ColorTheme.darker(backgroundColor, 2)
 
     property color textColor:
-        control.isAccentButton ? ColorTheme.colors.brand_contrast : ColorTheme.buttonText
-
-    property string iconUrl
-    property string hoveredIconUrl
-    property string pressedIconUrl
-    property alias iconWidth: control.icon.width
-    property alias iconHeight: control.icon.height
-    property alias iconSpacing: iconLabel.spacing
+        button.isAccentButton ? ColorTheme.colors.brand_contrast : ColorTheme.buttonText
 
     property real menuXOffset: 0
-
-    icon.color: textColor
-    icon.width: action ? action.icon.width : 20
-    icon.height: action ? action.icon.height : 20
-
-    icon.source:
-    {
-        if (action)
-            return action.icon.source
-
-        if (control.pressed)
-            return iconLabel.nonEmptyIcon(control.pressedIconUrl, control.iconUrl)
-
-        return (control.hovered && control.hoveredIconUrl.length)
-            ? control.hoveredIconUrl
-            : control.iconUrl
-    }
 
     property bool showBackground: true
 
     property var menu: null
 
+    icon
+    {
+        color: textColor
+        width: action ? action.icon.width : 20
+        height: action ? action.icon.height : 20
+        source: action ? action.icon.source : ""
+    }
+
     leftPadding: icon.source.toString() ? leftPaddingWithIcon : leftPaddingOnlyText
     rightPadding: 16
 
+    spacing: 4
+
     implicitHeight: 28
+
+    baselineOffset: (contentItem && contentItem.baselineOffset) || 0
 
     font.pixelSize: FontConfig.normal.pixelSize
     font.weight: Font.Medium
@@ -72,70 +60,91 @@ Button
     focusPolicy: Qt.TabFocus
 
     Keys.enabled: true
-    Keys.onEnterPressed: control.clicked()
-    Keys.onReturnPressed: control.clicked()
+    Keys.onEnterPressed: button.clicked()
+    Keys.onReturnPressed: button.clicked()
 
-    Binding
+    Binding on opacity
     {
-        target: control
-        property: "opacity"
         value: enabled ? 1.0 : (isAccentButton ? 0.2 : 0.3)
     }
 
     contentItem: Item
     {
-        implicitWidth: iconLabel.implicitWidth
-        implicitHeight: iconLabel.implicitHeight
-        baselineOffset: iconLabel.y + iconLabel.baselineOffset
+        implicitWidth: buttonText.x + buttonText.implicitWidth
+        implicitHeight: Math.max(buttonIcon.height, buttonText.implicitHeight)
 
-        IconLabel
+        baselineOffset: buttonText.y + buttonText.baselineOffset
+
+        Item
         {
-            id: iconLabel
-
             x:
             {
-                if (control.contentHAlignment === Qt.AlignHCenter)
+                if (button.contentHAlignment === Qt.AlignHCenter)
                     return (parent.width - width) / 2
 
-                if (control.contentHAlignment === Qt.AlignRight)
+                if (button.contentHAlignment === Qt.AlignRight)
                     return parent.width - width
 
                 return 0
             }
 
-            width: Math.min(implicitWidth, parent.width)
+            width: Math.min(parent.implicitWidth, parent.width)
+            height: parent.height
 
-            anchors.verticalCenter: parent.verticalCenter
-
-            text: control.text
-            icon: control.icon
-            font: control.font
-            color: control.textColor
-            spacing: 4
-
-            function nonEmptyIcon(target, base)
+            ColoredImage
             {
-                return target.length ? target : base
+                id: buttonIcon
+
+                name: button.icon.name
+                sourcePath: button.icon.source
+                sourceSize: Qt.size(button.icon.width, button.icon.height)
+                primaryColor: button.textColor
+                visible: !!sourcePath
+
+                anchors.verticalCenter: parent.verticalCenter
+            }
+
+            T.MnemonicLabel
+            {
+                id: buttonText
+
+                text: button.text
+                font: button.font
+                color: button.textColor
+                elide: Text.ElideRight
+
+                anchors.verticalCenter: parent.verticalCenter
+
+                width: parent.width - x
+
+                x:
+                {
+                    if (!buttonIcon.sourcePath)
+                        return 0
+
+                    const spacing = button.text ? button.spacing : 0
+                    return buttonIcon.width + spacing
+                }
             }
         }
     }
 
     background: ButtonBackground
     {
-        hovered: control.hovered && control.enabled
-        pressed: control.pressed
-        flat: control.flat
-        backgroundColor: control.backgroundColor
-        hoveredColor: control.hoveredColor
-        pressedColor: control.pressedColor
-        outlineColor: control.outlineColor
+        hovered: button.hovered && button.enabled
+        pressed: button.pressed
+        flat: button.flat
+        backgroundColor: button.backgroundColor
+        hoveredColor: button.hoveredColor
+        pressedColor: button.pressedColor
+        outlineColor: button.outlineColor
 
         FocusFrame
         {
             anchors.fill: parent
             anchors.margins: 1
-            visible: control.visualFocus
-            color: control.isAccentButton ? ColorTheme.brightText : ColorTheme.highlight
+            visible: button.visualFocus
+            color: button.isAccentButton ? ColorTheme.brightText : ColorTheme.highlight
         }
     }
 
@@ -144,8 +153,8 @@ Button
         if (menu instanceof Menu)
         {
             menu.popup(this)
-            menu.x = Qt.binding(() => control.menuXOffset)
-            menu.y = Qt.binding(() => control.height)
+            menu.x = Qt.binding(() => button.menuXOffset)
+            menu.y = Qt.binding(() => button.height)
         }
         else if (menu instanceof PlatformMenu)
         {

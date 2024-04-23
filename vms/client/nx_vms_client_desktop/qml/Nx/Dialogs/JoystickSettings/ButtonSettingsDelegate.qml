@@ -260,7 +260,7 @@ Item
                 leftPadding: 8
                 contentHAlignment: Qt.AlignLeft
 
-                iconUrl: (model.iconKey && model.iconKey !== 0
+                icon.source: (model.iconKey && model.iconKey !== 0
                     && ("image://resource/" + model.iconKey)) || "image://skin/20x20/Solid/layout.svg"
                 text: model.display
 

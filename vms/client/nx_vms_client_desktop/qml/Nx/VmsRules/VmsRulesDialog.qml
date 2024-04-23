@@ -54,7 +54,7 @@ Dialog
             Button
             {
                 text: qsTr("Add Rule")
-                iconUrl: "image://skin/buttons/add_20x20_deprecated.svg"
+                icon.source: "image://skin/buttons/add_20x20_deprecated.svg"
                 visible: !tableView.hasCheckedRows
                 onClicked:
                 {

@@ -103,11 +103,9 @@ Item
         hoveredColor: ColorTheme.colors.dark9
         outlineColor: "transparent"
 
-        iconUrl: "image://skin/24x24/Outline/close.svg?primary=light16"
-        hoveredIconUrl: "image://skin/24x24/Outline/close.svg?primary=dark9"
-        pressedIconUrl: "image://skin/24x24/Outline/close.svg?primary=dark6"
-        iconWidth: 20
-        iconHeight: 20
+        icon.source: "image://skin/24x24/Outline/close.svg"
+        icon.width: 20
+        icon.height: 20
 
         onClicked:
         {
@@ -301,9 +299,7 @@ Item
 
                     flat: true
                     backgroundColor: ColorTheme.colors.dark5
-                    iconUrl: "image://skin/20x20/Outline/close_medium.svg?primary=light16"
-                    iconWidth: 20
-                    iconHeight: 20
+                    icon.source: "image://skin/20x20/Outline/close_medium.svg"
                     activeFocusOnTab: false
 
                     enabled: !openedTileItem.isConnecting

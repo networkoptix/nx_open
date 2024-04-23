@@ -61,8 +61,6 @@ Button
 
         return ""
     }
-    iconWidth: 20
-    iconHeight: 20
 
     contentItem: Item
     {
