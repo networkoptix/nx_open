@@ -410,7 +410,7 @@
     </message>
     <message>
       <source>Timeout</source>
-      <translation>タイムアウト(&amp;T)</translation>
+      <translation>タイムアウト</translation>
     </message>
     <message>
       <source>Tags</source>
@@ -2130,7 +2130,7 @@
     </message>
     <message>
       <source>Username</source>
-      <translation>ユーザ名</translation>
+      <translation>ユーザー名</translation>
     </message>
   </context>
   <context>

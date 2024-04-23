@@ -697,15 +697,15 @@
     </message>
     <message>
       <source>Synchronize Streams</source>
-      <translation>ストリームの同期</translation>
+      <translation>ストリームを同期</translation>
     </message>
     <message>
       <source>Disable Stream Synchronization</source>
-      <translation>ストリームの同期無効</translation>
+      <translation>ストリームの同期を解除</translation>
     </message>
     <message>
       <source>Show Bookmarks</source>
-      <translation>ブックマーク表示</translation>
+      <translation>ブックマークを表示</translation>
     </message>
     <message>
       <source>Hide Bookmarks</source>
@@ -721,7 +721,7 @@
     </message>
     <message>
       <source>Show Title Bar</source>
-      <translation>タイトルバー表示</translation>
+      <translation>タイトルバーを表示</translation>
     </message>
     <message>
       <source>Hide Title Bar</source>
@@ -821,7 +821,7 @@
     </message>
     <message>
       <source>Show Tree</source>
-      <translation>ツリーを表示する</translation>
+      <translation>ツリーを表示</translation>
     </message>
     <message>
       <source>Hide Tree</source>
@@ -1038,7 +1038,7 @@
     <name>Deactivator</name>
     <message>
       <source>Unknown error.</source>
-      <translation>不明なエラー</translation>
+      <translation>不明なエラー。</translation>
     </message>
     <message>
       <source>License does not exist.</source>
@@ -3274,7 +3274,7 @@ to %1</source>
     </message>
     <message>
       <source>View video archives</source>
-      <translation>再生表示</translation>
+      <translation>映像アーカイブの表示</translation>
     </message>
     <message>
       <source>Export video</source>
@@ -4399,7 +4399,7 @@ to %1</source>
     <message numerus="yes">
       <source>This preset will be activated after %n minutes of inactivity</source>
       <translation>
-        <numerusform>プリセットは%n分後に有効になります</numerusform>
+        <numerusform>このプリセットは、 %n 分間無操作の場合に有効になります</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -4901,7 +4901,7 @@ to %1</source>
     </message>
     <message>
       <source>Server Settings - %1 (readonly)</source>
-      <translation>サーバー設定 - %1 (読取りのみ)</translation>
+      <translation>サーバー設定 - %1 (読み取り専用)</translation>
     </message>
     <message>
       <source>Server Settings - %1</source>
@@ -4952,19 +4952,19 @@ to %1</source>
     </message>
     <message>
       <source>This server already has more than max devices</source>
-      <translation>既に最大デバイス以上のデバイスが接続されています</translation>
+      <translation>このサーバーにはすでに最大台数を超えるデバイスが接続されています</translation>
     </message>
     <message>
       <source>This server already has more than max cameras</source>
-      <translation>既に最大以上のカメラが接続されています</translation>
+      <translation>このサーバーにはすでに最大台数を超えるカメラが接続されています</translation>
     </message>
     <message>
       <source>To avoid issues adjust max number of devices</source>
-      <translation>問題回避の為に最大のデバイス数を調整してください</translation>
+      <translation>問題を回避するために、デバイスの最大数を調整してください。</translation>
     </message>
     <message>
       <source>To avoid issues adjust max number of cameras</source>
-      <translation>問題回避の為に最大のカメラ数を調整してください</translation>
+      <translation>問題を回避するために、カメラの最大数を調整してください。</translation>
     </message>
     <message>
       <source>Failover</source>
@@ -6426,7 +6426,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>Resources</name>
     <message>
       <source>There is another layout with the same name</source>
-      <translation>同じ名前の別のレイアウトがあります</translation>
+      <translation>同名の異なるレイアウトが存在します</translation>
     </message>
     <message>
       <source>You do not have permission to overwrite it.</source>
@@ -6438,17 +6438,17 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>There is another layout with the same name.</source>
-      <translation>同じ名前の別のレイアウトがあります</translation>
+      <translation>同名の異なるレイアウトが存在します。</translation>
     </message>
     <message numerus="yes">
       <source>User will still have access to %n removed resources:</source>
       <translation>
-        <numerusform>ユーザーは削除された %n リソースへアクセスできます</numerusform>
+        <numerusform>ユーザーは引き続き、削除された %n リソースにアクセスできます:</numerusform>
       </translation>
     </message>
     <message>
       <source>To remove access, please go to User Settings.</source>
-      <translation>アクセスを削除するには、ユーザーの設定をご覧ください</translation>
+      <translation>アクセス権を削除するには、ユーザー設定に移動してください。</translation>
     </message>
     <message numerus="yes">
       <source>All users with this role will get access to %n resources:</source>
@@ -6477,7 +6477,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>User will lose access to %n resources:</source>
       <translation>
-        <numerusform>ユーザーは、%n リソースにアクセスをできなくなります</numerusform>
+        <numerusform>ユーザーは %n リソースにアクセスできなくなります:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -6574,7 +6574,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>There is another showreel with the same name.</source>
-      <translation>同じ名前の別のシーケンシャル表示があります。</translation>
+      <translation>同名の異なるシーケンシャル表示が存在します。</translation>
     </message>
     <message numerus="yes">
       <source>Remove %n items from showreel?</source>
@@ -6824,7 +6824,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>View video archives</source>
-      <translation>再生表示</translation>
+      <translation>映像アーカイブの表示</translation>
     </message>
     <message>
       <source>Export video</source>
@@ -6839,7 +6839,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>Videowall</name>
     <message>
       <source>There is another video wall with the same name</source>
-      <translation>同じ名前を持つ別のビデオウォールがあります。</translation>
+      <translation>同名の異なるビデオウォールが存在します</translation>
     </message>
     <message>
       <source>Close %1 before starting Video Wall?</source>
@@ -6859,7 +6859,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>To display local files on Video Wall, please attach them using computer where Video Wall is hosted.</source>
-      <translation>ビデオウォールにローカルファイルを表示するには、ビデオウォールをホストしているコンピューターでファイルを添付してください。</translation>
+      <translation>ビデオウォールにローカルファイルを表示するには、ビデオウォールを表示するコンピューターでファイルを添付してください。</translation>
     </message>
   </context>
   <context>
@@ -8049,7 +8049,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>System connected to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>システムは%1 に接続されました</translation>
+      <translation>システムは %1 に接続されました</translation>
     </message>
     <message>
       <source>Failed to connect System to %1</source>
@@ -8094,7 +8094,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Total amount of licenses will decrease</source>
-      <translation>ライセンスの合計数が減少します</translation>
+      <translation>ライセンスの総量が減少します</translation>
     </message>
     <message>
       <source>Enter password...</source>
@@ -9159,7 +9159,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation>不明なエラー</translation>
+      <translation>不明なエラー。</translation>
     </message>
     <message>
       <source>%1 systems have different owners. Merge is not allowed.</source>
@@ -9670,7 +9670,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation>不明なエラー</translation>
+      <translation>不明なエラー。</translation>
     </message>
     <message>
       <source>Unexpected error code.</source>
@@ -11654,19 +11654,19 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</source>
       <translation>
-        <numerusform>サーバー&quot;%1&quot; は%nデバイスにアクセスできません　移動しますか？</numerusform>
+        <numerusform>サーバー &quot;%1&quot; は %n 台のデバイスにアクセスできません。移動しますか?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</source>
       <translation>
-        <numerusform>サーバー&quot;%1&quot; は%nカメラにアクセスできません　移動しますか？</numerusform>
+        <numerusform>サーバー &quot;%1&quot; は %n 台のカメラにアクセスできません。移動しますか?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</source>
       <translation>
-        <numerusform>サーバー &quot;%1&quot; は %n 個のI/Oモジュールにアクセスできません。移動しますか？</numerusform>
+        <numerusform>サーバー &quot;%1&quot; は %n 台のI/Oモジュールにアクセスできません。移動しますか?</numerusform>
       </translation>
     </message>
     <message>
@@ -11709,7 +11709,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>There is another user with the same name</source>
-      <translation>同じ名前を持つ別のユーザーがいます</translation>
+      <translation>同名の異なるユーザーが存在します</translation>
     </message>
     <message>
       <source>Updating Background...</source>
