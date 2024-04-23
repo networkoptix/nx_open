@@ -228,6 +228,12 @@ public:
             << "caption " << nx::kit::utils::toString(event->caption()) << ", "
             << "description " << nx::kit::utils::toString(event->description());
     }
+
+    virtual void pushManifest(const IString* manifest) override
+    {
+        ASSERT_TRUE(manifest);
+        NX_PRINT << "EngineHandler: Received a manifest: " << manifest->str();
+    }
 };
 
 class CompressedVideoPacket: public RefCountable<ICompressedVideoPacket>

@@ -104,6 +104,8 @@ protected:
         Result<const IActiveSettingChangedResponse*>* outResult,
         const IActiveSettingChangedAction* activeSettingChangedAction) override;
 
+    void pushManifest(const std::string& manifest);
+
 public:
     virtual ~Engine() override;
 

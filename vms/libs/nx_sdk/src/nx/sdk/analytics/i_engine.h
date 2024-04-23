@@ -31,6 +31,9 @@ public:
 
         virtual ~IHandler() = default;
         virtual void handlePluginDiagnosticEvent(IPluginDiagnosticEvent* event) = 0;
+
+        /** Must be called when the Plugin needs to change the data in the Engine manifest. */
+        virtual void pushManifest(const IString* manifest) = 0;
     };
 
     /**

@@ -89,6 +89,12 @@ void Engine::pushPluginDiagnosticEvent(
     m_handler->handlePluginDiagnosticEvent(event.get());
 }
 
+void Engine::pushManifest(const std::string& manifest)
+{
+    const auto manifestSdkString = nx::sdk::makePtr<nx::sdk::String>(manifest);
+    m_handler->pushManifest(manifestSdkString.get());
+}
+
 Engine::~Engine()
 {
     NX_PRINT << "Destroyed " << this;
