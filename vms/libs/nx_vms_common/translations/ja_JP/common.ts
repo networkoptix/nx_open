@@ -1190,7 +1190,7 @@
     </message>
     <message>
       <source>Unknown transcode method</source>
-      <translation>未知のトランスコード手段</translation>
+      <translation>不明なトランスコード方法</translation>
     </message>
   </context>
   <context>
