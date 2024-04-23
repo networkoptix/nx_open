@@ -376,7 +376,7 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>Source file does not exist.</source>
-      <translation>コピー元のファイルが存在しません。</translation>
+      <translation>ソースファイルが存在しません。</translation>
     </message>
     <message>
       <source>Destination file exists</source>
@@ -771,7 +771,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Unknown error</source>
-      <translation>未知のエラー</translation>
+      <translation>不明なエラー</translation>
     </message>
     <message>
       <source>file to open is a directory</source>
@@ -798,14 +798,14 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Unknown error</source>
-      <translation>未知のエラー</translation>
+      <translation>不明なエラー</translation>
     </message>
   </context>
   <context>
     <name>QImageWriter</name>
     <message>
       <source>Unknown error</source>
-      <translation>未知のエラー</translation>
+      <translation>不明なエラー</translation>
     </message>
     <message>
       <source>Device is not set</source>
