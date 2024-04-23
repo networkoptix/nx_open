@@ -42,6 +42,7 @@ RulesSortFilterProxyModel::RulesSortFilterProxyModel(QObject* parent):
     setDynamicSortFilter(true);
     setSortRole(RulesTableModel::SortDataRole);
     setFilterCaseSensitivity(Qt::CaseInsensitive);
+    setFilterKeyColumn(-1);
 }
 
 bool RulesSortFilterProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const
@@ -71,6 +72,8 @@ bool RulesSortFilterProxyModel::filterAcceptsRow(int sourceRow, const QModelInde
     return actionColumnIndex.data().toString().contains(filterRegExp)
         || eventColumnIndex.data().toString().contains(filterRegExp)
         || commentColumnIndex.data().toString().contains(filterRegExp)
+        || sourceColumnIndex.data().toString().contains(filterRegExp)
+        || targetColumnIndex.data().toString().contains(filterRegExp)
         || matches(filterRegExp.pattern(),
             sourceColumnIndex.data(RulesTableModel::ResourceIdsRole).value<UuidSet>())
         || matches(filterRegExp.pattern(),
