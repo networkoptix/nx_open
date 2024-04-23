@@ -61,16 +61,7 @@ void Engine::doObtainDeviceAgent(Result<IDeviceAgent*>* outResult, const IDevice
 
 static std::string buildCapabilities()
 {
-    std::string capabilities;
-
-    if (ini().deviceDependent)
-        capabilities += "|deviceDependent";
-
-    // Delete first '|', if any.
-    if (!capabilities.empty() && capabilities.at(0) == '|')
-        capabilities.erase(0, 1);
-
-    return capabilities;
+    return ini().deviceDependent ? "deviceDependent" : "";
 }
 
 std::string Engine::manifestString() const
