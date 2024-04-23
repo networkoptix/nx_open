@@ -171,12 +171,13 @@ MembershipSettings
 
                 text: qsTr("Add Group")
 
-                iconUrl: "image://skin/20x20/Outline/add.svg?primary=light10"
-                iconWidth: 20
-                iconHeight: 20
+                icon.source: "image://skin/20x20/Outline/add.svg"
+                icon.width: 20
+                icon.height: 20
+
                 leftPadding: 12
                 rightPadding: 16
-                iconSpacing: 2
+                spacing: 2
 
                 onClicked: control.addGroupRequested()
             }

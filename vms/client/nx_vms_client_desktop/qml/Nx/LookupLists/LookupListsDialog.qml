@@ -247,7 +247,7 @@ Dialog
                     {
                         text: qsTr("Add")
                         visible: tableView.checkedRows.length === 0
-                        iconUrl: "image://skin/buttons/add_20x20_deprecated.svg"
+                        icon.source: "image://skin/buttons/add_20x20_deprecated.svg"
                         onClicked: addEntryDialog.createObject(control).openNewIn(control)
                     }
                     TextButton

@@ -23,11 +23,11 @@ AbstractButton
     font.pixelSize: FontConfig.normal.pixelSize
     hoverEnabled: enabled
     background: null
-    spacing: text ? 2 : 0
+    spacing: 2
 
     opacity: enabled ? 1.0 : 0.3
 
-    baselineOffset: contentItem.y + buttonText.y + buttonText.baselineOffset
+    baselineOffset: (contentItem && contentItem.baselineOffset) || 0
 
     focusPolicy: Qt.TabFocus
 
@@ -36,11 +36,7 @@ AbstractButton
 
     contentItem: Item
     {
-        id: content
-
-        readonly property real spacing: (buttonIcon.width > 0 && button.text) ? button.spacing : 0
-
-        implicitWidth: buttonIcon.width + buttonText.implicitWidth + content.spacing
+        implicitWidth: buttonText.x + buttonText.implicitWidth
         implicitHeight: Math.max(buttonIcon.height, buttonText.implicitHeight)
 
         ColoredImage
@@ -50,8 +46,10 @@ AbstractButton
             name: button.icon.name
             sourcePath: button.icon.source
             sourceSize: Qt.size(button.icon.width, button.icon.height)
-            visible: !!button.icon.source.toString()
+            visible: !!sourcePath
+
             anchors.verticalCenter: parent.verticalCenter
+
             primaryColor: button.down
                 ? button.pressedColor
                 : button.hovered ? button.hoveredColor : button.color
@@ -67,8 +65,16 @@ AbstractButton
             elide: Text.ElideRight
             color: buttonIcon.primaryColor
 
-            x: buttonIcon.width + content.spacing
-            width: content.width - x
+            width: parent.width - x
+
+            x:
+            {
+                if (!buttonIcon.sourcePath)
+                    return 0
+
+                const spacing = button.text ? button.spacing : 0
+                return buttonIcon.width + spacing
+            }
         }
 
         FocusFrame

@@ -201,7 +201,7 @@ Dialog
 
         text: qsTr("Reset to Default")
 
-        iconUrl: "image://skin/joystick_settings/reset.svg"
+        icon.source: "image://skin/joystick_settings/reset.svg"
 
         onClicked: control.resetToDefault()
     }

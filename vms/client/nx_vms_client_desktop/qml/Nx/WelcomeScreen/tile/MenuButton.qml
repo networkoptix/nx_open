@@ -86,11 +86,9 @@ Button
     ColoredImage
     {
         anchors.centerIn: parent
-        width: 3
-        height: 15
 
         sourcePath: "image://skin/20x20/Outline/menu.svg"
         primaryColor: "dark14"
-        sourceSize: Qt.size(width, height)
+        sourceSize: Qt.size(20, 20)
     }
 }

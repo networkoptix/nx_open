@@ -8,12 +8,12 @@ ResourceItemDelegate
     [
         TitleBarButton
         {
-            iconUrl: "image://skin/item/back.svg"
+            icon.source: "image://skin/item/back.svg"
         },
 
         TitleBarButton
         {
-            iconUrl: "image://skin/item/refresh.svg"
+            icon.source: "image://skin/item/refresh.svg"
         }
     ]
 
@@ -21,8 +21,10 @@ ResourceItemDelegate
     [
         TitleBarButton
         {
-            iconUrl: "image://skin/item/fullscreen.svg"
-            checkedIconUrl: "image://skin/item/exit_fullscreen.svg"
+            icon.source: checked
+                ? "image://skin/item/exit_fullscreen.svg"
+                : "image://skin/item/fullscreen.svg"
+
             checkable: true
         },
 
@@ -30,7 +32,7 @@ ResourceItemDelegate
         {
             id: infoButton
 
-            iconUrl: "image://skin/item/info.svg"
+            icon.source: "image://skin/item/info.svg"
             checkable: true
 
             Binding
@@ -45,7 +47,7 @@ ResourceItemDelegate
 
         TitleBarButton
         {
-            iconUrl: "image://skin/item/close.svg"
+            icon.source: "image://skin/item/close.svg"
             onClicked: layoutItemData.layout.removeItem(layoutItemData.itemId)
         }
     ]
