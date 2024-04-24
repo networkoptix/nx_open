@@ -20,7 +20,7 @@ Rectangle
 
     implicitWidth: Math.max(contentRowLayout.implicitWidth, 28)
     implicitHeight: Math.max(contentRowLayout.implicitHeight, 28)
-    color: control.selected ? ColorTheme.colors.brand_d6 : ColorTheme.colors.dark7
+    color: control.selected ? ColorTheme.colors.dark9 : ColorTheme.colors.dark7
 
     RowLayout
     {

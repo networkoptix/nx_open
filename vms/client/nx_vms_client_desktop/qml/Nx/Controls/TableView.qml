@@ -30,6 +30,7 @@ TableView
     property var useDelegateWidthAsColumnWidth: (column => false)
 
     signal deleteKeyPressed()
+    signal enterKeyPressed()
 
     function getButtonItem(columnIndex)
     {
@@ -214,7 +215,12 @@ TableView
 
             event.accepted = true;
         }
+        else if (event.key == Qt.Key_Enter || (Qt.platform.os === "osx" && event.key == Qt.Key_Return))
+        {
+            enterKeyPressed()
+            event.accepted = true;
+        }
 
-        // TODO: #mmalofeev add Key_Escape and Key_Enter handlers.
+        // TODO: #mmalofeev add Key_Escape handler.
     }
 }
