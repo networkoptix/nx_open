@@ -175,7 +175,7 @@ EventLogDialog::EventLogDialog(QWidget* parent):
     retranslateUi();
 
     m_filterAction      = new QAction(tr("Filter Similar Rows"), this);
-    m_filterAction->setShortcut({Qt::ControlModifier, Qt::Key_F});
+    m_filterAction->setShortcut(QKeySequence::Find);
     m_clipboardAction   = new QAction(tr("Copy Selection to Clipboard"), this);
     m_exportAction      = new QAction(tr("Export Selection to File..."), this);
     m_selectAllAction   = new QAction(tr("Select All"), this);
@@ -183,7 +183,7 @@ EventLogDialog::EventLogDialog(QWidget* parent):
     m_clipboardAction->setShortcut(QKeySequence::Copy);
     m_resetFilterAction = new QAction(tr("Clear Filter"), this);
     // TODO: #sivanov shouldn't we use QKeySequence::Refresh instead (evaluates to F5 on win)?
-    m_resetFilterAction->setShortcut({Qt::ControlModifier, Qt::Key_R});
+    m_resetFilterAction->setShortcut({Qt::ControlModifier | Qt::Key_R});
 
     installEventHandler(ui->gridEvents->viewport(), QEvent::MouseButtonRelease,
         this, &EventLogDialog::at_mouseButtonRelease);
