@@ -561,4 +561,61 @@ TEST(Processor, AddToArray)
     ASSERT_EQ(r.toStdString(), jsonString.toStdString());
 }
 
+TEST(Processor, CustomAction)
+{
+    // Custom action applies to rapidjson::MemberIterator.
+    {
+        Processor r{manyFieldsObject.toUtf8()};
+        std::vector<std::string> names;
+        auto addNamesToVector = [&names](::rapidjson::Value* name, ::rapidjson::Value* /*val*/)
+        {
+            if (!name)
+                return false;
+            names.push_back(name->GetString());
+            return true;
+        };
+        auto s = r.applyActionToValues(addNamesToVector, "/[?]", NameCont("A"));
+
+        std::vector<std::string> rightResult = {"A1", "A2", "A3", "A4", "A5"};
+        ASSERT_EQ(s, 5);
+        ASSERT_EQ(names, rightResult);
+    }
+    // Custom action applies to rapidjson::ValueIterator.
+    {
+        Processor r{json.toUtf8()};
+        std::vector<int> counts;
+        auto memberCount = [&counts](::rapidjson::Value* name, ::rapidjson::Value* val)
+        {
+            if (name || !val->IsObject())
+                return false;
+            counts.push_back(val->MemberCount());
+            return true;
+        };
+        auto s = r.applyActionToValues(memberCount, "/sections/[?]", All());
+
+        std::vector<int> rightResult = {1, 2, 2};
+        ASSERT_EQ(s, 3);
+        ASSERT_EQ(counts, rightResult);
+    }
+    // Custom action applies to rapidjson::Value*.
+    {
+        Processor r{coordinate.toUtf8()};
+        auto increment = [](::rapidjson::Value* name, ::rapidjson::Value* val)
+        {
+            if (name || !(val->IsInt()))
+                return false;
+            int i = val->GetInt();
+            val->SetInt(++i);
+            return true;
+        };
+        auto s = r.applyActionToValues(increment, "/[?]/[?]/0", All(), All());
+
+        ASSERT_EQ(s, 4);
+        ASSERT_EQ(r.getValue<int>("/y/device/0"), 0);
+        ASSERT_EQ(r.getValue<int>("/y/logical/0"), 21);
+        ASSERT_EQ(r.getValue<int>("/z/device/0"), 1);
+        ASSERT_EQ(r.getValue<int>("/z/logical/0"), 2);
+    }
+}
+
 } // namespace nx::utils::rapidjson::test
