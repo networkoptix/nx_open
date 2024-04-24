@@ -32,6 +32,9 @@ public:
     virtual int rowCount(const QModelIndex& parent = QModelIndex()) const override;
 
 private:
+    void updateModel();
+
+private:
     struct Private;
     nx::utils::ImplPtr<Private> d;
 };

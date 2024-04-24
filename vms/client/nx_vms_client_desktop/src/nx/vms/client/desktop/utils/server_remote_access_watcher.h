@@ -24,6 +24,8 @@ private:
     void onResourcesAdded(const QnResourceList& resources);
     void onResourcesRemoved(const QnResourceList& resources);
     void updateRemoteAccess(const ServerResourcePtr& server);
+    void updateRemoteAccessForAllServers();
+    bool isRemoteAccessEnabledForCurrentUser();
 };
 
 } // namespace nx::vms::client::desktop

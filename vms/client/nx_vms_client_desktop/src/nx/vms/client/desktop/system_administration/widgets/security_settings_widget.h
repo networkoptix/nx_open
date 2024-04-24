@@ -61,6 +61,8 @@ private:
 
     void loadEncryptionSettingsToUi();
     void loadUserInfoToUi();
+    nx::vms::api::ProxyConnectionAccessPolicy proxyConnectionAccessPolicyFromUi() const;
+    void updateRemoteAccessToolReadOnlyState(std::optional<bool> readOnly = std::nullopt);
 
 private:
     QScopedPointer<Ui::SecuritySettingsWidget> ui;

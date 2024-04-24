@@ -10,6 +10,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/guarded_callback.h>
+#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/desktop/common/dialogs/repeated_password_dialog.h>
 #include <nx/vms/client/desktop/common/widgets/hint_button.h>
 #include <nx/vms/client/desktop/help/help_handler.h>
@@ -38,6 +39,7 @@ namespace {
 
 constexpr auto kSessionLengthAlertLimit = std::chrono::hours(720);
 constexpr auto kNoLimitSessionDuration = 0s;
+static const QString kProxyConnectionAccessPolicy = "proxyConnectionAccessPolicy";
 
 static const QColor kLight10Color = "#A5B7C0";
 static const QColor kLight16Color = "#698796";
@@ -64,6 +66,16 @@ SecuritySettingsWidget::SecuritySettingsWidget(
     ui->setupUi(this);
     resetWarnings();
     ui->archiveEncryptionWarning->setText(tr("Archive encryption increases CPU usage"));
+
+
+    QString additionalConfigurationText =
+        tr("Additional configuration might be required on the server machine.");
+    additionalConfigurationText.append(" ");
+    additionalConfigurationText.append(nx::vms::common::html::localLink(tr("Learn more.")));
+    ui->additionalConfigurationLabel->setText(additionalConfigurationText);
+    ui->additionalConfigurationLabel->setType(AlertLabel::info);
+    ui->administratorsCheckBox->setChecked(true);
+    ui->administratorsCheckBox->setEnabled(false);
 
     m_archiveEncryptionPasswordDialog->setWindowTitle(tr("Archive encryption password"));
     m_archiveEncryptionPasswordDialog->setHeaderText(tr(
@@ -165,6 +177,25 @@ SecuritySettingsWidget::SecuritySettingsWidget(
     const auto updateArchiveEncryptionControls =
         [this](bool enabled) { ui->archiveEncryptionWarning->setVisible(enabled); };
 
+    connect(ui->remoteAccessToolGroupBox, &QGroupBox::toggled, this,
+        [this](bool checked)
+        {
+            ui->additionalConfigurationLabel->setVisible(checked);
+            emit hasChangesChanged();
+        });
+
+    connect(ui->powerUsersCheckBox, &QCheckBox::stateChanged, this,
+        &QnAbstractPreferencesWidget::hasChangesChanged);
+
+    connect(system()->accessController(),
+        &nx::vms::client::core::AccessController::globalPermissionsChanged,
+        this,
+        [this]()
+        {
+            updateRemoteAccessToolReadOnlyState();
+        });
+    updateRemoteAccessToolReadOnlyState();
+
     connect(ui->archiveEncryptionGroupBox, &QGroupBox::toggled, this,
         [this, updateArchiveEncryptionControls](bool checked)
         {
@@ -199,6 +230,12 @@ SecuritySettingsWidget::SecuritySettingsWidget(
             {
                 loadEncryptionSettingsToUi();
             }
+        });
+
+    connect(ui->additionalConfigurationLabel, &AlertLabel::linkActivated, this,
+        []
+        {
+            //TODO: #esobolev add link (see VMS-51876)
         });
 
     connect(ui->digestAlertLabel, &AlertLabel::linkActivated, this,
@@ -259,6 +296,12 @@ SecuritySettingsWidget::SecuritySettingsWidget(
         &SecuritySettingsWidget::loadDataToUi);
     connect(systemSettings(), &SystemSettings::showServersInTreeForNonAdminsChanged, this,
         &SecuritySettingsWidget::loadDataToUi);
+    connect(systemSettings(), &SystemSettings::ec2ConnectionSettingsChanged, this,
+        [this](const QString& key)
+        {
+            if (key == kProxyConnectionAccessPolicy)
+                loadDataToUi();
+        });
 }
 
 SecuritySettingsWidget::~SecuritySettingsWidget()
@@ -331,6 +374,13 @@ void SecuritySettingsWidget::loadDataToUi()
             }
         }
     }
+
+    const auto proxyConnectionAccessPolicy = systemSettings()->proxyConnectionAccessPolicy();
+    ui->remoteAccessToolGroupBox->setChecked(
+        proxyConnectionAccessPolicy != nx::vms::api::ProxyConnectionAccessPolicy::disabled);
+    ui->powerUsersCheckBox->setChecked(
+        proxyConnectionAccessPolicy == nx::vms::api::ProxyConnectionAccessPolicy::powerUsers);
+    ui->additionalConfigurationLabel->setVisible(ui->remoteAccessToolGroupBox->isChecked());
 
     if (!systemSettings()->isVideoTrafficEncryptionForced())
         ui->forceVideoEncryptionWarning->hide();
@@ -481,6 +531,7 @@ void SecuritySettingsWidget::applyChanges()
     editableSystemSettings->storageEncryption = ui->archiveEncryptionGroupBox->isChecked();
     editableSystemSettings->showServersInTreeForNonAdmins =
         ui->showServersInTreeCheckBox->isChecked();
+    editableSystemSettings->proxyConnectionAccessPolicy = proxyConnectionAccessPolicyFromUi();
 
     resetWarnings();
 
@@ -525,6 +576,29 @@ void SecuritySettingsWidget::discardChanges()
     m_currentRequest = 0;
 }
 
+nx::vms::api::ProxyConnectionAccessPolicy
+    SecuritySettingsWidget::proxyConnectionAccessPolicyFromUi() const
+{
+    if (!ui->remoteAccessToolGroupBox->isChecked())
+        return nx::vms::api::ProxyConnectionAccessPolicy::disabled;
+    else if (ui->powerUsersCheckBox->isChecked())
+        return nx::vms::api::ProxyConnectionAccessPolicy::powerUsers;
+    else
+        return nx::vms::api::ProxyConnectionAccessPolicy::admins;
+}
+
+void SecuritySettingsWidget::updateRemoteAccessToolReadOnlyState(std::optional<bool> readOnly)
+{
+    using ::setReadOnly;
+
+    bool currentReadOnlyState = readOnly.value_or(isReadOnly())
+        || !accessController()->globalPermissions().testFlag(GlobalPermission::administrator);
+
+    setReadOnly(ui->remoteAccessToolGroupBox, currentReadOnlyState);
+    setReadOnly(ui->administratorsCheckBox, currentReadOnlyState);
+    setReadOnly(ui->powerUsersCheckBox, currentReadOnlyState);
+}
+
 bool SecuritySettingsWidget::hasChanges() const
 {
     if (isReadOnly())
@@ -541,10 +615,11 @@ bool SecuritySettingsWidget::hasChanges() const
         || (m_pixelationSettings != systemSettings()->pixelationSettings())
         || (calculateSessionLimit() != systemSettings()->sessionTimeoutLimit().value_or(kNoLimitSessionDuration))
         || (ui->archiveEncryptionGroupBox->isChecked() != systemSettings()->useStorageEncryption())
-        || (m_archivePasswordState == ArchivePasswordState::changed)
-        || (m_archivePasswordState == ArchivePasswordState::failedToSet)
-        || (ui->showServersInTreeCheckBox->isChecked()
-            != systemSettings()->showServersInTreeForNonAdmins())
+        || m_archivePasswordState == ArchivePasswordState::changed
+        || m_archivePasswordState == ArchivePasswordState::failedToSet
+        || ui->showServersInTreeCheckBox->isChecked()
+            != systemSettings()->showServersInTreeForNonAdmins()
+        || proxyConnectionAccessPolicyFromUi() != systemSettings()->proxyConnectionAccessPolicy()
         || (ui->useSessionLimitForCloudComboBox->isChecked()
             != systemSettings()->useSessionTimeoutLimitForCloud());
 }
@@ -585,6 +660,7 @@ void SecuritySettingsWidget::setReadOnlyInternal(bool readOnly)
     setReadOnly(ui->archiveEncryptionGroupBox, readOnly);
     setReadOnly(ui->showServersInTreeCheckBox, readOnly);
     setReadOnly(ui->useSessionLimitForCloudComboBox, readOnly);
+    updateRemoteAccessToolReadOnlyState(readOnly);
 }
 
 void SecuritySettingsWidget::showEvent(QShowEvent* event)

@@ -11,6 +11,7 @@ namespace nx::vms::client::desktop {
 struct RemoteAccessModel::Private
 {
     std::vector<ForwardedPortConfiguration> configurations;
+    ServerResourcePtr server;
 };
 
 RemoteAccessModel::RemoteAccessModel(QObject* parent):
@@ -25,12 +26,20 @@ RemoteAccessModel::~RemoteAccessModel()
 
 void RemoteAccessModel::setServer(const ServerResourcePtr& server)
 {
-    if (server->getForwardedPortConfigurations() == d->configurations)
+    if (server == d->server)
         return;
 
-    beginResetModel();
-    d->configurations = server->getForwardedPortConfigurations();
-    endResetModel();
+    if (server)
+        server->disconnect(this);
+
+    d->server = server;
+
+    connect(server.get(),
+        &ServerResource::forwardedPortConfigurationsChanged,
+        this,
+        &RemoteAccessModel::updateModel);
+
+    updateModel();
 }
 
 QHash<int, QByteArray> RemoteAccessModel::roleNames() const
@@ -61,7 +70,7 @@ QVariant RemoteAccessModel::data(const QModelIndex& index, int role) const
         case Roles::password:
             return QVariant::fromValue(item.password);
         case Roles::port:
-            return QVariant::fromValue(item.forwardedPort);
+            return item.forwardedPort != 0 ? QVariant::fromValue(item.forwardedPort) : QVariant();
     }
 
     return QVariant();
@@ -73,6 +82,13 @@ int RemoteAccessModel::rowCount(const QModelIndex& parent) const
         return 0;
 
     return d->configurations.size();
+}
+
+void RemoteAccessModel::updateModel()
+{
+    beginResetModel();
+    d->configurations = d->server->getForwardedPortConfigurations();
+    endResetModel();
 }
 
 } // namespace nx::vms::client::desktop
