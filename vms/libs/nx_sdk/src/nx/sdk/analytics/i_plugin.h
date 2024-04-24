@@ -17,7 +17,11 @@ namespace nx::sdk::analytics {
 class IPlugin: public Interface<IPlugin, nx::sdk::IPlugin0>
 {
 public:
-    static auto interfaceId() { return makeId("nx::sdk::analytics::IPlugin"); }
+    static auto interfaceId()
+    {
+        return makeIdWithAlternative("nx::sdk::analytics::IPlugin",
+            /* Planned future renaming. */ "nx::sdk::analytics::IIntegration");
+    }
 
     /** Called by manifest() */
     protected: virtual void getManifest(Result<const IString*>* outResult) const = 0;
