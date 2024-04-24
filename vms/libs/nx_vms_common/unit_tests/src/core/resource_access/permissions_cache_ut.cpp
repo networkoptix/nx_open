@@ -6,7 +6,6 @@
 
 #include <core/resource_access/permissions_cache.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/core/access/access_types.h>
 #include <nx/vms/common/test_support/test_context.h>
 
 namespace nx::core::access {
@@ -17,12 +16,6 @@ using namespace nx::vms::common::test;
 
 class PermissionsCacheTest: public ContextBasedTest
 {
-public:
-    PermissionsCacheTest():
-        ContextBasedTest(nx::core::access::Mode::cached)
-    {
-    }
-
 protected:
     static constexpr int kRoleSubjectsCount = 200;
     static constexpr int kUserSubjectsCount = 1000;

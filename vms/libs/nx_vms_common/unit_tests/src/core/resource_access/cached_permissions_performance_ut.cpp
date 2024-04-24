@@ -12,11 +12,6 @@ namespace nx::vms::common::test {
 class QnCachedPermissionsPerformanceTest: public ContextBasedTest
 {
 public:
-    QnCachedPermissionsPerformanceTest():
-        ContextBasedTest(nx::core::access::Mode::cached)
-    {
-    }
-
     template<typename Action>
     void run(const Action& action)
     {

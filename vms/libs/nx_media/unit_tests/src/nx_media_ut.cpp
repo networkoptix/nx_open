@@ -9,7 +9,6 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/core/access/access_types.h>
 #include <nx/media/abstract_video_decoder.h>
 #include <nx/media/media_player.h>
 #include <nx/media/media_player_quality_chooser.h>
@@ -302,7 +301,7 @@ public:
     void test(const TestCase& testCase);
 
 private:
-    nx::vms::common::test::Context m_context{nx::core::access::Mode::direct};
+    nx::vms::common::test::Context m_context;
     QnSharedResourcePointer<MockServer> m_server{new MockServer()};
     QnSharedResourcePointer<MockCamera> m_camera{new MockCamera(m_server->getId())};
 };
