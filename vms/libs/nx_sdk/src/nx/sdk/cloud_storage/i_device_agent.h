@@ -21,7 +21,7 @@ namespace nx::sdk::cloud_storage {
 class IDeviceAgent: public Interface<IDeviceAgent>
 {
 public:
-    static constexpr auto interfaceId() { return makeId("nx::sdk::archive::IDevice"); }
+    static auto interfaceId() { return makeId("nx::sdk::archive::IDevice"); }
 
     /** Provides device description */
     protected: virtual void getDeviceInfo(Result<const IDeviceInfo*>* outResult) const = 0;
