@@ -30,7 +30,7 @@ enum class MetadataType
 class IDevice: public Interface<IDevice>
 {
 public:
-    static constexpr auto interfaceId() { return makeId("nx::sdk::archive::IDevice"); }
+    static auto interfaceId() { return makeId("nx::sdk::archive::IDevice"); }
 
     /** Provides device description */
     protected: virtual void doDeviceInfo(Result<const IDeviceInfo*>* outResult) const = 0;

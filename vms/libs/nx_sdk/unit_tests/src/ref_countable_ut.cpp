@@ -25,6 +25,13 @@ static constexpr int kOldInterfaceIdSize = 16;
         static auto interfaceId() { return makeId(INTERFACE_ID); } \
     }
 
+#define DEF_INTERFACE_WITH_ALTERNATIVE_ID(INTERFACE_ID, ALTERNATIVE_ID, INTERFACE, BASE) \
+    class INTERFACE: public Interface<INTERFACE, BASE> \
+    { \
+    public: \
+        static auto interfaceId() { return makeIdWithAlternative(INTERFACE_ID, ALTERNATIVE_ID); } \
+    }
+
 #define DEF_REF_COUNTABLE(CLASS, INTERFACE) \
     class CLASS: public RefCountable<INTERFACE> \
     { \
@@ -88,6 +95,16 @@ std::string objectAndInterfaceIdRef(ObjectPtr objectPtr)
     {
         // New interface with a single id; interfaceId() is a struct pointer.
         interfaceIdRef = nx::kit::utils::toString(Interface::interfaceId()->value);
+    }
+    else if constexpr (std::is_same_v<decltype(Interface::interfaceId()),
+        std::vector<const IRefCountable::InterfaceId*>>)
+    {
+        // New interface with alternative id; interfaceId() is a vector of struct pointers.
+        for (const auto& id: Interface::interfaceId())
+        {
+            interfaceIdRef += (interfaceIdRef.empty() ? "" : "|")
+                + nx::kit::utils::toString(id->value);
+        }
     }
     else
     {
@@ -249,6 +266,105 @@ TEST(RefCountable, makeIdForTemplate)
 {
     ASSERT_STREQ(ID_PREFIX "IBunch<" ID_PREFIX "ISomeItem>",
         static_cast<const char*>(IBunch<ISomeItem>::interfaceId()->value));
+}
+
+//-------------------------------------------------------------------------------------------------
+// Test alternative interface id.
+
+// Define Id... interfaces to be used as holders for interfaceId() to call queryInterface<Id...>().
+#define ID_BASE ID_PREFIX "Base"
+#define ID_ALT_BASE ID_PREFIX "AltBase"
+#define ID_DERIVED_1 ID_PREFIX "Derived1"
+#define ID_DERIVED_2 ID_PREFIX "Derived2"
+DEF_INTERFACE(ID_BASE, IdBase, IRefCountable);
+DEF_INTERFACE(ID_ALT_BASE, IdAltBase, IRefCountable);
+DEF_INTERFACE(ID_DERIVED_1, IdDerived1, IRefCountable);
+DEF_INTERFACE(ID_DERIVED_2, IdDerived2, IRefCountable);
+
+DEF_INTERFACE_WITH_ALTERNATIVE_ID(ID_BASE, ID_ALT_BASE, IBase, IRefCountable);
+
+DEF_INTERFACE(ID_DERIVED_1, IDerived1, IBase);
+DEF_INTERFACE(ID_DERIVED_2, IDerived2, IBase);
+DEF_REF_COUNTABLE(Derived1, IDerived1);
+
+/** Test that an object of a sibling interface does not support its sibling interface. */
+TEST(RefCountable, alternativeInterfaceIdOfSibling)
+{
+    IDerived1* const derived1 = new Derived1;
+
+    TEST_QUERY_INTERFACE(nonNull, derived1, IdBase);
+    TEST_QUERY_INTERFACE(nonNull, derived1, IdAltBase);
+    TEST_QUERY_INTERFACE(nonNull, derived1, IdDerived1);
+    TEST_QUERY_INTERFACE(null, derived1, IdDerived2);
+
+    TEST_QUERY_INTERFACE(nonNull, derived1, IBase);
+    TEST_QUERY_INTERFACE(nonNull, derived1, IDerived1);
+    
+    // Test that the alternative id of IBase is not treated as an alternative id of IDerived2.
+    TEST_QUERY_INTERFACE(null, derived1, IDerived2);
+
+    ASSERT_EQ(0, derived1->releaseRef());
+}
+
+#define ID_DEPRECATED ID_PREFIX "Deprecated"
+DEF_INTERFACE(ID_DEPRECATED, IDeprecated, IRefCountable);
+DEF_REF_COUNTABLE(Deprecated, IDeprecated);
+
+#define ID_CURRENT ID_PREFIX "Current"
+DEF_INTERFACE(ID_CURRENT, ICurrent, IRefCountable);
+DEF_REF_COUNTABLE(Current, ICurrent);
+DEF_INTERFACE_WITH_ALTERNATIVE_ID(ID_CURRENT, ID_DEPRECATED, ICurrentAndDeprecated, IRefCountable);
+DEF_REF_COUNTABLE(CurrentAndDeprecated, ICurrentAndDeprecated);
+
+/**
+ * Test that an object from a deprecated plugin called from the current application (in which this
+ * interface has been renamed and retained the deprecated id as an alternative one) supports its
+ * current interface.
+ */
+TEST(RefCountable, alternativeInterfaceIdDeprecatedPluginFromCurrentApp)
+{
+    Deprecated* const deprecated = new Deprecated;
+    TEST_QUERY_INTERFACE(nonNull, deprecated, IDeprecated);
+    TEST_QUERY_INTERFACE(null, deprecated, ICurrent);
+
+    const auto asCurrentAndDeprecated = reinterpret_cast<ICurrentAndDeprecated*>(deprecated);
+    TEST_QUERY_INTERFACE(nonNull, asCurrentAndDeprecated, ICurrentAndDeprecated);
+
+    ASSERT_EQ(0, deprecated->releaseRef());
+}
+
+/**
+ * Test that an object from the current plugin (which has both current and deprecated interface
+ * ids) called from a deprecated application supports its deprecated interface.
+ */
+TEST(RefCountable, alternativeInterfaceIdCurrentPluginFromDeprecatedApp)
+{
+    CurrentAndDeprecated* const currentAndDeprecated = new CurrentAndDeprecated;
+    TEST_QUERY_INTERFACE(nonNull, currentAndDeprecated, IDeprecated);
+    TEST_QUERY_INTERFACE(nonNull, currentAndDeprecated, ICurrent);
+    TEST_QUERY_INTERFACE(nonNull, currentAndDeprecated, ICurrentAndDeprecated);
+
+    const auto asDeprecated = reinterpret_cast<IDeprecated*>(currentAndDeprecated);
+    TEST_QUERY_INTERFACE(nonNull, asDeprecated, IDeprecated);
+
+    ASSERT_EQ(0, currentAndDeprecated->releaseRef());
+}
+
+/**
+ * Test that an object from a future plugin (which doesn't support the deprecated interface
+ * anymore) called from the current application (which supports both the deprecated and the current
+ * interface ids) supports its current interface.
+ */
+TEST(RefCountable, alternativeInterfaceIdFuturePluginFromCurrentApp)
+{
+    Current* const current = new Current;
+    TEST_QUERY_INTERFACE(null, current, IDeprecated);
+    TEST_QUERY_INTERFACE(nonNull, current, ICurrent);
+
+    const auto asCurrentAndDeprecated = reinterpret_cast<ICurrentAndDeprecated*>(current);
+    TEST_QUERY_INTERFACE(nonNull, asCurrentAndDeprecated, ICurrentAndDeprecated);
+
+    ASSERT_EQ(0, current->releaseRef());
 }
 
 //-------------------------------------------------------------------------------------------------

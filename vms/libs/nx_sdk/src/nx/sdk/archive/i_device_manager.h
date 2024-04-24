@@ -37,7 +37,7 @@ public:
     class IDeviceManagerHandler: public Interface<IDeviceManagerHandler>
     {
     public:
-        static constexpr auto interfaceId()
+        static auto interfaceId()
         {
             return makeId("nx::sdk::archive::IDeviceManager::IDeviceManagerHandler");
         }
