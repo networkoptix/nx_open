@@ -25,6 +25,7 @@
 #include <nx/vms/api/data/storage_flags.h>
 #include <nx/vms/api/data/storage_space_data.h>
 #include <nx/vms/api/data/user_model.h>
+#include <nx/vms/common/lookup_lists/lookup_list_manager.h>
 #include <nx/vms/common/saas/saas_service_manager.h>
 #include <nx/vms/common/saas/saas_service_usage_helper.h>
 #include <nx/vms/common/showreel/showreel_manager.h>
@@ -37,6 +38,7 @@
 #include <nx_ec/data/api_fwd.h>
 
 #include "amend_transaction_data.h"
+#include "transaction_validate_utils.h"
 
 using namespace nx::vms;
 using SystemContext = nx::vms::common::SystemContext;
@@ -46,11 +48,6 @@ namespace ec2 {
 namespace detail {
 
 namespace {
-
-struct ServerApiErrors
-{
-    Q_DECLARE_TR_FUNCTIONS(ServerApiErrors);
-};
 
 GlobalPermissions getGlobalPermissions(const SystemContext& context, const nx::Uuid& id)
 {
@@ -990,7 +987,7 @@ struct ModifyResourceAccess
                 param.typeId));
         }
 
-        return Result();
+        return validateModifyResourceParam(param, target);
     }
 };
 
@@ -1008,8 +1005,15 @@ struct ModifyStorageAccess
                 "Empty Storage URL is not allowed."));
         }
 
-        transaction_descriptor::CanModifyStorageData data;
         const auto existingResource = systemContext->resourcePool()->getResourceById(param.id);
+        if (!hasSystemAccess(accessData)
+            && !validateResourceName(param, existingResource))
+        {
+
+            return invalidParameterError("name");
+        }
+
+        transaction_descriptor::CanModifyStorageData data;
         data.hasExistingStorage = (bool) existingResource;
         data.storageType = param.storageType;
         data.isBackup = param.isBackup;
@@ -1161,6 +1165,15 @@ struct SaveUserAccess
     }
 
 private:
+    static Result validateNames(const api::UserData& user, const api::UserData* existing)
+    {
+        if (!validateName(user, existing))
+            return invalidParameterError("name");
+        if (!validateFieldWithoutSpaces(user, existing, &api::UserData::fullName))
+            return invalidParameterError("fullName");
+        return {};
+    }
+
     static Result validateUserCreation(const SystemContext& context,
         const UserAccessorInfo& accessor,
         const api::UserData& user)
@@ -1212,7 +1225,7 @@ private:
             return r;
         }
 
-        return {};
+        return validateNames(user, nullptr);
     }
 
     static Result validateUserModifications(const SystemContext& context,
@@ -1318,7 +1331,7 @@ private:
             return r;
         }
 
-        return {};
+        return validateNames(modified, &existing);
     }
 
     static Result checkIfCanModifyUser(const SystemContext& context,
@@ -2243,6 +2256,10 @@ public:
                         accessor.id.toString())};
             }
         }
+        if (!validateResourceName(param, existing))
+            return invalidParameterError("name");
+        if (!validateResourceUrlOrEmpty(param, existing))
+            return invalidParameterError("url");
 
         return {};
     }
@@ -2313,6 +2330,8 @@ struct SaveUserRoleAccess
                 return {ErrorCode::badRequest,
                     ServerApiErrors::tr("Change of `externalId` is forbidden.")};
             }
+            if (existing->name != param.name && !validateNotEmptyWithoutSpaces(param.name))
+                return invalidParameterError("name");
         }
         else
         {
@@ -2329,6 +2348,8 @@ struct SaveUserRoleAccess
 
             if (Result r = checkNonLocalCreation(param.type); !r)
                 return r;
+            if (!validateNotEmptyWithoutSpaces(param.name))
+                return invalidParameterError("name");
         }
 
         // `forbidUserGroupModification` will most likely shadow the removal errors...
@@ -2585,12 +2606,14 @@ struct VideoWallControlAccess
 struct ShowreelAccess
 {
     Result operator()(
-        SystemContext*,
+        SystemContext* systemContext,
         const nx::network::rest::UserAccessData& accessData,
         const nx::vms::api::ShowreelData& showreel)
     {
-        if (hasSystemAccess(accessData)
-            || showreel.parentId.isNull()
+        if (hasSystemAccess(accessData))
+            return Result();
+
+        if (showreel.parentId.isNull()
             || accessData.userId == showreel.parentId)
         {
             return Result();
@@ -2599,6 +2622,30 @@ struct ShowreelAccess
             "User %1 is not allowed to modify the Showreel with parentId %2."),
             accessData.userId,
             showreel.parentId));
+    }
+};
+
+struct SaveShowreelAccess
+{
+    Result operator()(
+        SystemContext* systemContext,
+        const nx::network::rest::UserAccessData& accessData,
+        const nx::vms::api::ShowreelData& showreel)
+    {
+        if (hasSystemAccess(accessData))
+            return {};
+
+        if (auto r = ShowreelAccess()(systemContext, accessData, showreel); !r)
+            return r;
+
+        const auto existing = systemContext->showreelManager()->showreel(
+            showreel.id);
+        if (!existing.isValid() || existing.name != showreel.name)
+        {
+            if (!validateNotEmptyWithoutSpaces(showreel.name))
+                return invalidParameterError("name");
+        }
+        return {};
     }
 };
 
@@ -2614,6 +2661,42 @@ struct ShowreelAccessById
         if (!showreel.isValid())
             return Result(); //< Allow everyone to work with tours which are already deleted.
         return ShowreelAccess()(systemContext, accessData, showreel);
+    }
+};
+
+struct SaveStoredFileAccess
+{
+    Result operator()(SystemContext*, const nx::network::rest::UserAccessData& accessData, const nx::vms::api::StoredFileData& data)
+    {
+        if (hasSystemAccess(accessData))
+            return {};
+        if (!validateNotEmptyWithoutSpaces(data.path))
+            return invalidParameterError("path");
+
+        return {};
+    }
+};
+
+struct SaveLookupListAccess
+{
+    Result operator()(SystemContext* systemContext, const nx::network::rest::UserAccessData& accessData, const nx::vms::api::LookupListData& data)
+    {
+        if (auto r = PowerUserAccess()(systemContext, accessData, data); !r)
+            return r;
+
+        if (hasSystemAccess(accessData))
+            return {};
+
+        auto* lookupManager = systemContext->lookupListManager();
+        if (!NX_ASSERT(lookupManager))
+            return {};
+
+        auto existingData = lookupManager->lookupList(data.id);
+        auto* existing = existingData.id.isNull() ? nullptr : &existingData;
+        if (!validateName(data, existing))
+            return invalidParameterError("name");
+
+        return {};
     }
 };
 
