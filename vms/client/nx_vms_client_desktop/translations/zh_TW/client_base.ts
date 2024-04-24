@@ -4198,7 +4198,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Save user</source>
-      <translation type="unfinished">Save user</translation>
+      <translation>儲存使用者</translation>
     </message>
     <message>
       <source>Enter your account password</source>
@@ -4206,7 +4206,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Save</source>
-      <translation type="unfinished">Save</translation>
+      <translation>儲存</translation>
     </message>
   </context>
   <context>
@@ -4434,18 +4434,18 @@ License Key: %2</source>
     <message>
       <source>%1 user does not have %2 permission for some of selected cameras</source>
       <comment>%1 is the name of the selected user, %2 is the permission name</comment>
-      <translation type="unfinished">%1 user does not have %2 permission for some of selected cameras</translation>
+      <translation>%1 使用者對某些所選攝影機沒有 %2 權限</translation>
     </message>
     <message numerus="yes">
       <source>%n groups</source>
-      <translation type="unfinished">
-        <numerusform>%n groups</numerusform>
+      <translation>
+        <numerusform>%n 群組</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n users</source>
-      <translation type="unfinished">
-        <numerusform>%n users</numerusform>
+      <translation>
+        <numerusform>%n 使用者</numerusform>
       </translation>
     </message>
     <message>
@@ -4456,14 +4456,14 @@ License Key: %2</source>
     <message numerus="yes">
       <source>%n groups do not have %1 permission for some of selected cameras</source>
       <comment>%1 is the permission name</comment>
-      <translation type="unfinished">
-        <numerusform>%n groups do not have %1 permission for some of selected cameras</numerusform>
+      <translation>
+        <numerusform>%n 群組對某些選取攝影機沒有 %1 權限</numerusform>
       </translation>
     </message>
     <message>
       <source>%1 group does not have %2 permission for some of selected cameras</source>
       <comment>%1 is the name of selected user group, %2 is the permission name</comment>
-      <translation type="unfinished">%1 group does not have %2 permission for some of selected cameras</translation>
+      <translation>%1 群組對某些所選攝影機沒有 %2 權限</translation>
     </message>
     <message numerus="yes">
       <source>%n users do not have %1 permission for some of selected cameras</source>
@@ -4630,11 +4630,11 @@ License Key: %2</source>
     <name>QnSelectLayoutsButton</name>
     <message>
       <source>Any Layout</source>
-      <translation type="unfinished">Any Layout</translation>
+      <translation>任何佈局</translation>
     </message>
     <message>
       <source>All Layouts</source>
-      <translation type="unfinished">All Layouts</translation>
+      <translation>所有佈局</translation>
     </message>
     <message>
       <source>Select Layouts...</source>
@@ -4851,11 +4851,11 @@ License Key: %2</source>
     </message>
     <message>
       <source>Certificate details are not available</source>
-      <translation type="unfinished">Certificate details are not available</translation>
+      <translation>憑證詳細資料無法使用</translation>
     </message>
     <message>
       <source>To access certificate details, enable the Audit Trail feature.</source>
-      <translation type="unfinished">To access certificate details, enable the Audit Trail feature.</translation>
+      <translation>要取得憑證詳細資料，請啟用使用者行為記錄功能。</translation>
     </message>
   </context>
   <context>
@@ -4988,11 +4988,11 @@ License Key: %2</source>
     </message>
     <message>
       <source>NO EXPORT PERMISSION</source>
-      <translation type="unfinished">NO EXPORT PERMISSION</translation>
+      <translation>無匯出權限</translation>
     </message>
     <message>
       <source>SYSTEM SHUT DOWN</source>
-      <translation type="unfinished">SYSTEM SHUT DOWN</translation>
+      <translation>系統關閉</translation>
     </message>
   </context>
   <context>
@@ -5124,7 +5124,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Analytics and motion data will continue to be stored on the disabled storage</source>
-      <translation type="unfinished">Analytics and motion data will continue to be stored on the disabled storage</translation>
+      <translation>分析和位移資料將繼續儲存在停用的儲存裝置上</translation>
     </message>
     <message>
       <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
@@ -5694,11 +5694,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnWebResourceWidget</name>
     <message>
       <source>Integration settings...</source>
-      <translation type="unfinished">Integration settings...</translation>
+      <translation>整合設定...</translation>
     </message>
     <message>
       <source>Web Page settings...</source>
-      <translation type="unfinished">Web Page settings...</translation>
+      <translation>Ｗeb頁面設定...</translation>
     </message>
   </context>
   <context>
@@ -5924,39 +5924,39 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Failed to open %n devices on the video wall:</source>
-      <translation type="unfinished">
-        <numerusform>Failed to open %n devices on the video wall:</numerusform>
+      <translation>
+        <numerusform>無法在電視牆上打開 %n 設備：</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Failed to open %n cameras on the video wall:</source>
-      <translation type="unfinished">
-        <numerusform>Failed to open %n cameras on the video wall:</numerusform>
+      <translation>
+        <numerusform>無法在電視牆上打開 %n 設備：</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>You cannot add to the video wall devices for which you do not have View Live permission.</source>
-      <translation type="unfinished">
-        <numerusform>You cannot add to the video wall devices for which you do not have View Live permission.</numerusform>
+      <translation>
+        <numerusform>您無法將沒有「瀏覽即時影像」權限的裝置新增至電視牆。</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>You cannot add to the video wall cameras for which you do not have View Live permission.</source>
-      <translation type="unfinished">
-        <numerusform>You cannot add to the video wall cameras for which you do not have View Live permission.</numerusform>
+      <translation>
+        <numerusform>您無法將沒有「瀏覽即時影像」權限的裝置新增至電視牆。</numerusform>
       </translation>
     </message>
     <message>
       <source>System shut down</source>
-      <translation type="unfinished">System shut down</translation>
+      <translation>系統關閉</translation>
     </message>
     <message>
       <source>To add a Video Wall, the System should be in active state. %1</source>
-      <translation type="unfinished">To add a Video Wall, the System should be in active state. %1</translation>
+      <translation>系統為活躍狀態時才能新增電視牆。%1</translation>
     </message>
     <message>
       <source>Screen is locked and cannot be changed</source>
-      <translation type="unfinished">Screen is locked and cannot be changed</translation>
+      <translation>螢幕已鎖定且無法被更改</translation>
     </message>
   </context>
   <context>
@@ -6305,25 +6305,25 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Delete %n layouts?</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n layouts?</numerusform>
+      <translation>
+        <numerusform>刪除 %n 佈局?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n items were not deleted.</source>
-      <translation type="unfinished">
-        <numerusform>%n items were not deleted.</numerusform>
+      <translation>
+        <numerusform>%n 項目未刪除。</numerusform>
       </translation>
     </message>
     <message>
       <source>Delete layout?</source>
-      <translation type="unfinished">Delete layout?</translation>
+      <translation>刪除佈局?</translation>
     </message>
     <message numerus="yes">
       <source>These layouts are shared with other users, so they will be deleted for their accounts as well.</source>
       <comment>Numerical form depends on layouts count</comment>
-      <translation type="unfinished">
-        <numerusform>These layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
+      <translation>
+        <numerusform>這些佈局與其他使用者共享，因此也將從他們的帳戶中刪除。</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -6740,7 +6740,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Reset all rules to defaults?</source>
-      <translation type="unfinished">Reset all rules to defaults?</translation>
+      <translation>重置所有規則？</translation>
     </message>
   </context>
   <context>
@@ -6889,15 +6889,15 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::AccessRightsList</name>
     <message>
       <source>View Archive</source>
-      <translation type="unfinished">View Archive</translation>
+      <translation>瀏覽錄影資料</translation>
     </message>
     <message>
       <source>Export Archive</source>
-      <translation type="unfinished">Export Archive</translation>
+      <translation>匯出錄影資料</translation>
     </message>
     <message>
       <source>View Bookmarks</source>
-      <translation type="unfinished">View Bookmarks</translation>
+      <translation>瀏覽書籤</translation>
     </message>
     <message>
       <source>Manage Bookmarks</source>
@@ -6909,23 +6909,23 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Edit Settings</source>
-      <translation type="unfinished">Edit Settings</translation>
+      <translation>編輯設定</translation>
     </message>
     <message>
       <source>View Live</source>
-      <translation type="unfinished">View Live</translation>
+      <translation>瀏覽即時影像</translation>
     </message>
     <message>
       <source>Depending on the resource type it either allows user to modify device settings or to control video wall.</source>
-      <translation type="unfinished">Depending on the resource type it either allows user to modify device settings or to control video wall.</translation>
+      <translation>根據資源類型，它允許使用者修改設備設定或控制電視牆。</translation>
     </message>
     <message>
       <source>Allows users to access a resource and view live footage from a camera.</source>
-      <translation type="unfinished">Allows users to access a resource and view live footage from a camera.</translation>
+      <translation>允許使用者存取資源列並查看攝影機的即時影像。</translation>
     </message>
     <message>
       <source>Allows user to control PTZ, use 2-Way Audio, Soft Triggers and I/O buttons.</source>
-      <translation type="unfinished">Allows user to control PTZ, use 2-Way Audio, Soft Triggers and I/O buttons.</translation>
+      <translation>允許使用者控制 PTZ、使用雙向語音、觸發按鈕和 I/O 按鈕。</translation>
     </message>
   </context>
   <context>
@@ -7150,38 +7150,38 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Insufficient services</source>
-      <translation type="unfinished">Insufficient services</translation>
+      <translation>服務不足</translation>
     </message>
     <message numerus="yes">
       <source>%n suitable cloud storage services are required</source>
-      <translation type="unfinished">
-        <numerusform>%n suitable cloud storage services are required</numerusform>
+      <translation>
+        <numerusform>需要 %n 合適的雲端儲存服務</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n MP</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n MP</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Megapixels</source>
-      <translation type="unfinished">
-        <numerusform>%n Megapixels</numerusform>
+      <translation>
+        <numerusform>%n 百萬畫素</numerusform>
       </translation>
     </message>
     <message>
       <source>Unknown resolution</source>
-      <translation type="unfinished">Unknown resolution</translation>
+      <translation>未知解析度</translation>
     </message>
     <message>
       <source>No suitable cloud storage services available</source>
-      <translation type="unfinished">No suitable cloud storage services available</translation>
+      <translation>沒有合適的雲端儲存服務可用</translation>
     </message>
     <message numerus="yes">
       <source>%n suitable cloud storage services available</source>
-      <translation type="unfinished">
-        <numerusform>%n suitable cloud storage services available</numerusform>
+      <translation>
+        <numerusform>%n 合適的雲端儲存服務可用</numerusform>
       </translation>
     </message>
     <message>
@@ -7190,7 +7190,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Setting was changed</source>
-      <translation type="unfinished">Setting was changed</translation>
+      <translation>設定已變更</translation>
     </message>
     <message>
       <source>&quot;All archive&quot; option was changed to &quot;Motion, Objects, Bookmarks&quot; due to cloud storage backup was enabled</source>

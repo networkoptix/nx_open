@@ -808,7 +808,7 @@
     </message>
     <message>
       <source>Auto calibration failed</source>
-      <translation>自動キャリブレーションに失敗しました</translation>
+      <translation>自動較正に失敗しました</translation>
     </message>
   </context>
   <context>
@@ -1883,7 +1883,7 @@ Alt + クリックを使用してください。</translation>
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
-      <translation>カメラとデバイス</translation>
+      <translation>カメラ &amp; デバイス</translation>
     </message>
     <message>
       <source>Layouts</source>
@@ -1942,7 +1942,7 @@ Alt + クリックを使用してください。</translation>
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
-      <translation>カメラとデバイス</translation>
+      <translation>カメラ &amp; デバイス</translation>
     </message>
     <message>
       <source>Layouts</source>
