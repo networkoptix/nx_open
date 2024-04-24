@@ -11,58 +11,92 @@
 #include <nx/sdk/interface.h>
 #include <nx/sdk/helpers/ref_countable.h>
 
-namespace nx {
-namespace sdk {
-namespace ref_countable_ut {
+namespace nx::sdk::ref_countable_ut {
 
 static constexpr int kOldInterfaceIdSize = 16;
 
+/** Prefix for all "new SDK" interface ids used in the tests. */
+#define ID_PREFIX "nx::sdk::test::"
+
+#define DEF_INTERFACE(INTERFACE_ID, INTERFACE, BASE) \
+    class INTERFACE: public Interface<INTERFACE, BASE> \
+    { \
+    public: \
+        static auto interfaceId() { return makeId(INTERFACE_ID); } \
+    }
+
+#define DEF_REF_COUNTABLE(CLASS, INTERFACE) \
+    class CLASS: public RefCountable<INTERFACE> \
+    { \
+    };
+
 //-------------------------------------------------------------------------------------------------
-// TEST_QUERY_INTERFACE macro.
+// TEST_QUERY_INTERFACE()
 
 /**
  * Supports both old SDK and current SDK objects/interfaces. Assumes that the initial object's
- * refCount is 1. The object should implement methods:
- * ```
- * int refCountForTest() const;
- * const char* interfaceIdForTest() const; //< Should return object's immediate interface.
- * ```
+ * refCount is 1. Extracts the required interface id from the INTERFACE class.
  */
 #define TEST_QUERY_INTERFACE(EXPECTED_RESULT, OBJECT_PTR, INTERFACE) \
     detail::testQueryInterface<INTERFACE>(__LINE__, \
-        ExpectedQueryInterfaceResult::EXPECTED_RESULT, OBJECT_PTR)
-
-enum class ExpectedQueryInterfaceResult {null, nonNull};
+        detail::ExpectedQueryInterfaceResult::EXPECTED_RESULT, \
+        OBJECT_PTR)
 
 namespace detail {
 
-template<typename Interface>
-using IsIRefCountable = std::is_base_of<IRefCountable, Interface>;
+enum class ExpectedQueryInterfaceResult { null, nonNull };
 
-/** Sfinae: overload for an old interface: queryInterface() receives interfaceId. */
-template<class Interface, typename ObjectPtr,
-    typename = std::enable_if_t<!IsIRefCountable<Interface>::value>
->
-const void* callQueryInterface(int /*line*/, ObjectPtr objectPtr)
+template<class Interface, typename ObjectPtr>
+const void* callQueryInterface(int line, ObjectPtr objectPtr)
 {
-    return objectPtr->queryInterface(Interface::interfaceId());
+    using Object = typename std::remove_pointer<ObjectPtr>::type;
+
+    if constexpr (std::is_base_of<IRefCountable, Interface>::value) //< New interface.
+    {
+        // To be able to call queryInterface<>() on old SDK object pointers, we need to cast the
+        // object pointer to IRefCountable*, preserving its constness.
+        using RefCountable = typename std::conditional<std::is_const_v<Object>,
+            /*?*/ const IRefCountable*,
+            /*:*/ IRefCountable*>::type;
+        const Ptr<Interface> ptr =
+            reinterpret_cast<RefCountable>(objectPtr)->
+                IRefCountable::template queryInterface<Interface>();
+
+        // Increase result's ref-count because the caller will call releaseRef() when finished.
+        if (ptr)
+            ASSERT_EQ_AT_LINE(line, 3, objectPtr->addRef());
+
+        return ptr.get();
+    }
+    else //< Old interface.
+    {
+        // Remove const from the object because the virtual queryInterface() does not have a const
+        // overload.
+        using NonConstObjectPtr = typename std::remove_const<Object>::type*;
+        return const_cast<NonConstObjectPtr>(objectPtr)->queryInterface(Interface::interfaceId());
+    }
 }
 
-/** Sfinae: overload for a new interface: queryInterface<>() extracts interfaceId from the type. */
-template<class Interface, typename ObjectPtr,
-    typename = std::enable_if_t<IsIRefCountable<Interface>::value>
->
-const void* callQueryInterface(int line, ObjectPtr objectPtr, int sfinaeDummy = 0)
+/**
+ * Produces a human-readable reference to the object pointer, type, and the requested interface id.
+ */
+template<class Interface, typename ObjectPtr>
+std::string objectAndInterfaceIdRef(ObjectPtr objectPtr)
 {
-    /*unused*/ (void) sfinaeDummy;
+    std::string interfaceIdRef;
+    if constexpr (std::is_pointer_v<decltype(Interface::interfaceId())>)
+    {
+        // New interface with a single id; interfaceId() is a struct pointer.
+        interfaceIdRef = nx::kit::utils::toString(Interface::interfaceId()->value);
+    }
+    else
+    {
+        // Old interface; interfaceId() is a struct reference.
+        interfaceIdRef = nx::kit::utils::toString((const char*) Interface::interfaceId().value);
+    }
 
-    const Ptr<Interface> ptr = objectPtr->IRefCountable::template queryInterface<Interface>();
-
-    // Increase result's ref-count because the caller will call releaseRef() when finished.
-    if (ptr)
-        ASSERT_EQ_AT_LINE(line, 3, objectPtr->addRef());
-
-    return ptr.get();
+    return "Requested interfaceId " + interfaceIdRef + " for " + typeid(*objectPtr).name()
+        + " @" + nx::kit::utils::toString(objectPtr);
 }
 
 /**
@@ -70,25 +104,13 @@ const void* callQueryInterface(int line, ObjectPtr objectPtr, int sfinaeDummy = 
  * same object pointer is returned on success.
  */
 template<class Interface, typename ObjectPtr>
-void testQueryInterface(
+void doTestQueryInterface(
     int line, ExpectedQueryInterfaceResult expectedQueryInterfaceResult, ObjectPtr objectPtr)
 {
-    const auto printDetails =
-        [objectPtr]()
-        {
-            // Both old and new interface ids are supported: for new ids, print the first 16 chars.
-            NX_PRINT_HEX_DUMP("Requested interfaceId",
-                Interface::interfaceId(), kOldInterfaceIdSize);
-            NX_PRINT_HEX_DUMP("Object's interfaceId",
-                objectPtr->interfaceIdForTest(), kOldInterfaceIdSize);
-        };
-
     ASSERT_TRUE_AT_LINE(line, objectPtr);
-    ASSERT_EQ_AT_LINE(line, 1, objectPtr->refCountForTest());
+    ASSERT_EQ_AT_LINE(line, 1, objectPtr->refCountThreadUnsafe());
 
-    NX_OUTPUT << "Test at line " << line << " for object " << nx::kit::utils::toString(objectPtr);
-    if (NX_DEBUG_ENABLE_OUTPUT)
-        printDetails();
+    NX_OUTPUT << "Test at line " << line << ": " << objectAndInterfaceIdRef<Interface>(objectPtr);
 
     const void* const ptr = callQueryInterface<Interface, ObjectPtr>(line, objectPtr);
 
@@ -99,25 +121,47 @@ void testQueryInterface(
         case ExpectedQueryInterfaceResult::null:
             if (ptr) //< Test will fail: print detailed diagnostics.
             {
+                if (!NX_DEBUG_ENABLE_OUTPUT)
+                    NX_PRINT << objectAndInterfaceIdRef<Interface>(objectPtr);
                 ASSERT_EQ_AT_LINE(line, (void*) objectPtr, ptr); //< Fail here if ptr is bad.
-                printDetails();
                 ASSERT_FALSE_AT_LINE(line, ptr); //< Fail the test.
             }
-            ASSERT_EQ_AT_LINE(line, 1, objectPtr->refCountForTest());
+            ASSERT_EQ_AT_LINE(line, 1, objectPtr->refCountThreadUnsafe());
             break;
 
         case ExpectedQueryInterfaceResult::nonNull:
             if (ptr != (void*) objectPtr) //< Test will fail: print detailed diagnostics.
             {
+                if (!NX_DEBUG_ENABLE_OUTPUT)
+                    NX_PRINT << objectAndInterfaceIdRef<Interface>(objectPtr);
                 ASSERT_EQ_AT_LINE(line, nullptr, ptr); //< Fail here if ptr is bad.
-                printDetails();
                 ASSERT_EQ_AT_LINE(line, (void*) objectPtr, ptr); //< Fail the test.
             }
-            ASSERT_EQ_AT_LINE(line, 2, objectPtr->refCountForTest());
+            ASSERT_EQ_AT_LINE(line, 2, objectPtr->refCountThreadUnsafe());
             ASSERT_EQ_AT_LINE(line, 1, (int) objectPtr->releaseRef()); //< Cast for old interfaces.
-            ASSERT_EQ_AT_LINE(line, 1, objectPtr->refCountForTest());
+            ASSERT_EQ_AT_LINE(line, 1, objectPtr->refCountThreadUnsafe());
             break;
     }
+}
+
+/**
+ * Intended to be used from the macro TEST_QUERY_INTERFACE(). Calls queryInterface<>() with removed
+ * and added const, to test both its const overloads.
+ */
+template<class Interface, typename ObjectPtr>
+void testQueryInterface(
+    int line, ExpectedQueryInterfaceResult expectedQueryInterfaceResult, ObjectPtr objectPtr)
+{
+    using Object = typename std::remove_pointer<ObjectPtr>::type;
+    using NonConstObjectPtr = typename std::remove_const<Object>::type*;
+
+    detail::doTestQueryInterface<Interface>(line,
+        expectedQueryInterfaceResult,
+        const_cast<NonConstObjectPtr>(objectPtr));
+
+    detail::doTestQueryInterface<const Interface>(line,
+        expectedQueryInterfaceResult,
+        const_cast<const Object*>(objectPtr));
 }
 
 } // namespace detail
@@ -125,41 +169,25 @@ void testQueryInterface(
 //-------------------------------------------------------------------------------------------------
 // Test classes IRefCountable and RefCountable.
 
-class IBase: public Interface<IBase>
-{
-public:
-    static auto interfaceId() { return makeId("nx::sdk::test::IBase"); }
-    virtual const char* interfaceIdForTest() const = 0; //< VMT #4 - should match old SDK method.
-    virtual int refCountForTest() const = 0; //< VMT #5 - should match old SDK method.
-};
-
-class IData: public Interface<IData, IBase>
-{
-public:
-    static auto interfaceId() { return makeId("nx::sdk::test::IData"); }
-};
+DEF_INTERFACE(ID_PREFIX "ISuper", ISuper, IRefCountable);
+DEF_INTERFACE(ID_PREFIX "IData", IData, ISuper);
 
 class Data: public RefCountable<IData>
 {
 public:
     static bool s_destructorCalled;
 
-    Data() = default;
-
     virtual ~Data() override
     {
         ASSERT_FALSE(s_destructorCalled);
         s_destructorCalled = true;
     }
-
-    virtual const char* interfaceIdForTest() const override { return interfaceId()->value; }
-    virtual int refCountForTest() const override { return refCount(); }
 };
 bool Data::s_destructorCalled = false;
 
 TEST(RefCountable, interfaceId)
 {
-    ASSERT_STREQ("nx::sdk::test::IData", static_cast<const char*>(IData::interfaceId()->value));
+    ASSERT_STREQ(ID_PREFIX "IData", static_cast<const char*>(IData::interfaceId()->value));
     ASSERT_EQ(IData::interfaceId()->value, reinterpret_cast<const char*>(IData::interfaceId()));
 }
 
@@ -181,31 +209,22 @@ TEST(RefCountable, refCountableBasics)
     ASSERT_TRUE(Data::s_destructorCalled);
 }
 
-TEST(RefCountable, queryInterfaceNonConst)
+TEST(RefCountable, queryInterface)
 {
     Data::s_destructorCalled = false;
     Data* const data = new Data;
 
+    TEST_QUERY_INTERFACE(nonNull, data, IRefCountable);
+    TEST_QUERY_INTERFACE(nonNull, data, ISuper);
     TEST_QUERY_INTERFACE(nonNull, data, IData);
-    IBase* const iIntermediate = data;
+    ISuper* const iIntermediate = data;
+    TEST_QUERY_INTERFACE(nonNull, iIntermediate, IRefCountable);
+    TEST_QUERY_INTERFACE(nonNull, iIntermediate, ISuper);
     TEST_QUERY_INTERFACE(nonNull, iIntermediate, IData);
     IData* const iData = data;
+    TEST_QUERY_INTERFACE(nonNull, iData, IRefCountable);
+    TEST_QUERY_INTERFACE(nonNull, iData, ISuper);
     TEST_QUERY_INTERFACE(nonNull, iData, IData);
-
-    ASSERT_EQ(0, data->releaseRef());
-    ASSERT_TRUE(Data::s_destructorCalled);
-}
-
-TEST(RefCountable, queryInterfaceConst)
-{
-    Data::s_destructorCalled = false;
-    const Data* const data = new Data;
-
-    TEST_QUERY_INTERFACE(nonNull, data, const IData);
-    const IBase* const iIntermediate = data;
-    TEST_QUERY_INTERFACE(nonNull, iIntermediate, const IData);
-    const IData* const iData = data;
-    TEST_QUERY_INTERFACE(nonNull, iData, const IData);
 
     ASSERT_EQ(0, data->releaseRef());
     ASSERT_TRUE(Data::s_destructorCalled);
@@ -215,25 +234,21 @@ TEST(RefCountable, queryInterfaceConst)
 // Test interface id generation for templates.
 
 template<typename IItem>
-class ITemplate: public Interface<ITemplate<IItem>>
+class IBunch: public Interface<IBunch<IItem>>
 {
 public:
     static auto interfaceId()
     {
-        return ITemplate::template makeIdForTemplate<ITemplate<IItem>, IItem>("test::ITemplate");
+        return IBunch::template makeIdForTemplate<IBunch<IItem>, IItem>(ID_PREFIX "IBunch");
     }
 };
 
-class ISomeItem: public Interface<ISomeItem>
-{
-public:
-    static auto interfaceId() { return makeId("test::ISomeItem"); }
-};
+DEF_INTERFACE(ID_PREFIX "ISomeItem", ISomeItem, IRefCountable);
 
 TEST(RefCountable, makeIdForTemplate)
 {
-    ASSERT_STREQ("test::ITemplate<test::ISomeItem>",
-        static_cast<const char*>(ITemplate<ISomeItem>::interfaceId()->value));
+    ASSERT_STREQ(ID_PREFIX "IBunch<" ID_PREFIX "ISomeItem>",
+        static_cast<const char*>(IBunch<ISomeItem>::interfaceId()->value));
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -247,13 +262,10 @@ struct OldInterfaceId
     explicit OldInterfaceId(const char (&charArray)[kOldInterfaceIdSize])
     {
         // All old interface ids in this test have last byte equal to 0 for easy conversion to
-        // the new interface id.
+        // the new interface id, and instead of the UUID bytes they contain some readable string.
         std::copy(charArray, charArray + kOldInterfaceIdSize, value);
         ASSERT_EQ(0, value[kOldInterfaceIdSize - 1]);
     }
-
-    /** To enable passing to NX_PRINT_HEX_DUMP(). */
-    operator const char*() const { return reinterpret_cast<const char*>(value); }
 };
 static_assert(sizeof(OldInterfaceId) == kOldInterfaceIdSize,
     "Old SDK InterfaceId should have 16 bytes");
@@ -286,11 +298,11 @@ public:
     /** VMT #3. */
     virtual unsigned int releaseRef() const = 0;
 
-    /** VMT #4 - added for tests; couples with the same method of NewInterface. */
-    virtual const char* interfaceIdForTest() { return (const char*) interfaceId().value; }
-
-    /** VMT #5 - added for tests; couples with the same method of NewInterface. */
-    virtual int refCountForTest() const = 0;
+    int refCountThreadUnsafe() const
+    {
+        /*unused*/ (void) addRef();
+        return releaseRef();
+    }
 };
 
 /** Mock for an object implementing the old SDK interface - used for compatibility testing. */
@@ -338,8 +350,6 @@ public:
         return newRefCount;
     }
 
-    virtual int refCountForTest() const override { return m_refCount; }
-
 private:
     mutable int m_refCount = 1;
 };
@@ -360,16 +370,9 @@ public:
     virtual IRefCountable* queryInterface(const InterfaceId* id) override
     {
         ASSERT_TRUE(id != nullptr);
-        ASSERT_TRUE(interfaceId()->value != nullptr);
 
         return queryInterfaceSupportingDeprecatedId(id, Uuid(OldInterface::interfaceId().value));
     }
-
-    /** VMT #4 - added for tests; couples with the same method of OldInterface. */
-    virtual const char* interfaceIdForTest() const { return interfaceId()->value; }
-
-    /** VMT #5 - added for tests; couples with the same method of OldInterface. */
-    virtual int refCountForTest() const = 0;
 };
 
 /** Mock for an object implementing the current SDK interface - used for compatibility testing. */
@@ -383,8 +386,6 @@ public:
         ASSERT_FALSE(s_destructorCalled);
         s_destructorCalled = true;
     }
-
-    virtual int refCountForTest() const override { return refCount(); }
 };
 bool NewObject::s_destructorCalled = false;
 
@@ -394,8 +395,9 @@ public:
     static auto interfaceId() { return makeId(NEW_INTERFACE_ID "_WITH_SUFFIX"); }
 };
 
-struct OtherOldInterface
+class OtherOldInterface
 {
+public:
     static const OldInterfaceId& interfaceId()
     {
         static OldInterfaceId id{"old2interfaceId"}; //< 15 chars, 16 bytes.
@@ -404,8 +406,9 @@ struct OtherOldInterface
 };
 
 template<class OldInterface>
-struct OldInterfaceWithNewId
+class OldInterfaceWithNewId
 {
+public:
     static const IRefCountable::InterfaceId* interfaceId()
     {
         ASSERT_EQ(0, OldInterface::interfaceId().value[kOldInterfaceIdSize - 1]);
@@ -426,11 +429,11 @@ TEST(RefCountable, binaryCompatibilityWithOldSdk)
     // Test integrity of the test.
     ASSERT_EQ(kOldInterfaceIdSize, (int) sizeof(OldInterfaceId));
 
-    const auto newObject = new NewObject;
-    ASSERT_EQ(1, newObject->refCountForTest());
+    NewObject* const newObject = new NewObject;
+    ASSERT_EQ(1, newObject->refCountThreadUnsafe());
 
-    const auto oldObject = new OldObject;
-    ASSERT_EQ(1, oldObject->refCountForTest());
+    OldObject* const oldObject = new OldObject;
+    ASSERT_EQ(1, oldObject->refCountThreadUnsafe());
 
     const auto newObjectAsOldInterface = reinterpret_cast<OldInterface*>(newObject);
     const auto oldObjectAsNewInterface = reinterpret_cast<NewInterface*>(oldObject);
@@ -459,6 +462,4 @@ TEST(RefCountable, binaryCompatibilityWithOldSdk)
     ASSERT_TRUE(NewObject::s_destructorCalled);
 }
 
-} // namespace ref_countable_ut
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk::ref_countable_ut
