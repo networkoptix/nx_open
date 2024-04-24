@@ -261,7 +261,7 @@
     <message>
       <source>To learn more about the current problem read this %1.</source>
       <comment>%1 is &lt;help article&gt; link</comment>
-      <translation type="unfinished">To learn more about the current problem read this %1.</translation>
+      <translation>要了解更多目前的問題，請閱讀 %1。</translation>
     </message>
   </context>
   <context>
