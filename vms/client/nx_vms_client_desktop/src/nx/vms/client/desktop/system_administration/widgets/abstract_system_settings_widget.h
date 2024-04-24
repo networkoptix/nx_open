@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <nx/vms/api/data/saveable_system_settings.h>
+#include <nx/vms/api/data/system_settings.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
 

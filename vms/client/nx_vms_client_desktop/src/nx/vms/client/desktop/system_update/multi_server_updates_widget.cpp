@@ -832,7 +832,7 @@ void MultiServerUpdatesWidget::updateAlertBlock()
 
 nx::utils::Url MultiServerUpdatesWidget::generateUpcombinerUrl() const
 {
-    const common::update::PersistentUpdateStorage updateStorage =
+    const api::PersistentUpdateStorage updateStorage =
         systemContext()->globalSettings()->targetPersistentUpdateStorage();
 
     const bool useLatest = m_updateInfo.sourceType == UpdateSourceType::internet;

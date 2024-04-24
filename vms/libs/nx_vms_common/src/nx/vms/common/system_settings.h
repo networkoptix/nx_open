@@ -15,8 +15,8 @@
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/url.h>
 #include <nx/vms/api/data/client_update_settings.h>
+#include <nx/vms/api/data/persistent_update_storage.h>
 #include <nx/vms/common/system_context_aware.h>
-#include <nx/vms/common/update/persistent_update_storage.h>
 #include <utils/email/email_fwd.h>
 
 class QSettings;
@@ -70,7 +70,6 @@ struct SystemSettingNames
     DECLARE_SETTING_NAME(useSessionLimitForCloud);
     DECLARE_SETTING_NAME(sessionsLimit);
     DECLARE_SETTING_NAME(sessionsLimitPerUser);
-    DECLARE_SETTING_NAME(smtpPassword);
     DECLARE_SETTING_NAME(specificFeatures);
     DECLARE_SETTING_NAME(statisticsReportLastNumber);
     DECLARE_SETTING_NAME(statisticsReportLastTime);
@@ -400,12 +399,12 @@ public:
     QByteArray targetUpdateInformation() const;
     void setTargetUpdateInformation(const QByteArray& updateInformation);
 
-    nx::vms::common::update::PersistentUpdateStorage targetPersistentUpdateStorage() const;
+    nx::vms::api::PersistentUpdateStorage targetPersistentUpdateStorage() const;
     void setTargetPersistentUpdateStorage(
-        const nx::vms::common::update::PersistentUpdateStorage& data);
+        const nx::vms::api::PersistentUpdateStorage& data);
 
-    nx::vms::common::update::PersistentUpdateStorage installedPersistentUpdateStorage() const;
-    void setInstalledPersistentUpdateStorage(const nx::vms::common::update::PersistentUpdateStorage& data);
+    nx::vms::api::PersistentUpdateStorage installedPersistentUpdateStorage() const;
+    void setInstalledPersistentUpdateStorage(const nx::vms::api::PersistentUpdateStorage& data);
 
     QByteArray installedUpdateInformation() const;
     void setInstalledUpdateInformation(const QByteArray& updateInformation);
@@ -519,7 +518,7 @@ public:
     std::chrono::seconds cloudPollingInterval() const;
     void setCloudPollingInterval(std::chrono::seconds value);
 
-    void update(const vms::api::SystemSettings& value);
+    void update(const nx::vms::api::SystemSettings& value);
 
     bool isAllowRegisteringIntegrationsEnabled() const;
     void setAllowRegisteringIntegrationsEnabled(bool value);

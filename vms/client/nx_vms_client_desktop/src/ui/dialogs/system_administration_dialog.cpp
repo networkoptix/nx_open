@@ -7,7 +7,7 @@
 
 #include <nx/branding.h>
 #include <nx/utils/guarded_callback.h>
-#include <nx/vms/api/data/saveable_system_settings.h>
+#include <nx/vms/api/data/system_settings.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/help/help_topic.h>

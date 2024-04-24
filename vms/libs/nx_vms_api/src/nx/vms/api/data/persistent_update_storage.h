@@ -3,25 +3,22 @@
 #pragma once
 
 #include <QtCore/QList>
-#include <QtCore/QString>
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/instrument.h>
 #include <nx/utils/uuid.h>
 
-namespace nx::vms::common::update {
+namespace nx::vms::api {
 
-struct NX_VMS_COMMON_API PersistentUpdateStorage
+struct NX_VMS_API PersistentUpdateStorage
 {
     QList<nx::Uuid> servers;
     bool autoSelection = false;
 
     bool operator==(const PersistentUpdateStorage& other) const = default;
 };
-
 #define PersistentUpdateStorage_Fields (servers)(autoSelection)
-QN_FUSION_DECLARE_FUNCTIONS(PersistentUpdateStorage, (ubjson)(json), NX_VMS_COMMON_API)
-
+QN_FUSION_DECLARE_FUNCTIONS(PersistentUpdateStorage, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(PersistentUpdateStorage, PersistentUpdateStorage_Fields)
 
-} // namespace nx::vms::common::update
+} // namespace nx::vms::api

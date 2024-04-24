@@ -52,7 +52,7 @@ bool AdvancedUpdateSettingsDialog::tryClose(bool /*force*/)
 void AdvancedUpdateSettingsDialog::loadSettings()
 {
     notifyAboutUpdates = systemSettings()->isUpdateNotificationsEnabled();
-    const update::PersistentUpdateStorage storage =
+    const api::PersistentUpdateStorage storage =
         systemSettings()->targetPersistentUpdateStorage();
     offlineUpdatesEnabled = storage.autoSelection || !storage.servers.isEmpty();
 }
@@ -72,7 +72,7 @@ void AdvancedUpdateSettingsDialog::saveSettings()
         systemContext()->getSessionTokenHelper(),
         api::SaveableSystemSettings{
             .updateNotificationsEnabled = notifyAboutUpdates,
-            .targetPersistentUpdateStorage = update::PersistentUpdateStorage{
+            .targetPersistentUpdateStorage = api::PersistentUpdateStorage{
                 .autoSelection = offlineUpdatesEnabled
             }
         },

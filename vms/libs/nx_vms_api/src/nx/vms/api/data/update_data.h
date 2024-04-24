@@ -11,6 +11,7 @@
 #include <nx/utils/uuid.h>
 
 #include "data_macros.h"
+#include "persistent_update_storage.h"
 
 namespace nx::vms::api {
 
@@ -264,13 +265,11 @@ struct NX_VMS_API UpdateStatusInfo
     (mainUpdatePackage)
 NX_VMS_API_DECLARE_STRUCT_EX(UpdateStatusInfo, (json))
 
-struct NX_VMS_API PersistentUpdateStorageInfo
+struct NX_VMS_API PersistentUpdateStorageInfo: PersistentUpdateStorage
 {
     InformationCategory infoCategory;
-    std::vector<nx::Uuid> servers;
-    bool autoSelection{false};
 };
-#define PersistentUpdateStorageInfo_Fields (infoCategory)(servers)(autoSelection)
+#define PersistentUpdateStorageInfo_Fields  PersistentUpdateStorage_Fields(infoCategory)
 NX_VMS_API_DECLARE_STRUCT_EX(PersistentUpdateStorageInfo, (json))
 
 struct NX_VMS_API PersistentUpdateStorageRequest
