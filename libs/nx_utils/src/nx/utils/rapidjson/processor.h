@@ -249,6 +249,7 @@ struct NX_UTILS_API Condition
     {
         using Ts::operator()...;
     };
+
     template<class... Ts>
     Overload(Ts...) -> Overload<Ts...>;
 
@@ -319,6 +320,14 @@ struct ValuePtrHelper
             return it;
     }
 
+    static ::rapidjson::Value* name(const IteratorType& it)
+    {
+        if constexpr (IsObjectIterator<IteratorType>)
+            return &(it->name);
+        else
+            return nullptr;
+    }
+
     IteratorType erase(const IteratorType& itr) const
     {
         if constexpr (IsObjectIterator<IteratorType>)
@@ -372,8 +381,8 @@ public:
 
     ReturnType result = {};
 
-    template<RapidjsonIteratorType ItratorType>
-    void execute(ItratorType& it, const ValuePtrHelper<ItratorType>& ptrHelper)
+    template<RapidjsonIteratorType IteratorType>
+    void execute(IteratorType& it, const ValuePtrHelper<IteratorType>& ptrHelper)
     {
         addToRes<returnCount>(result, ptrHelper.get(it));
         ++it;
@@ -394,8 +403,8 @@ public:
 
     ReturnType result = {};
 
-    template<RapidjsonIteratorType ItratorType>
-    void execute(ItratorType& it, const ValuePtrHelper<ItratorType>& ptrHelper)
+    template<RapidjsonIteratorType IteratorType>
+    void execute(IteratorType& it, const ValuePtrHelper<IteratorType>& ptrHelper)
     {
         it = ptrHelper.erase(it);
         addToRes<returnCount>(result, true);
@@ -418,8 +427,8 @@ public:
 
     ModifyValue(ValueHelper&& val): m_val(std::move(val)) {}
 
-    template<RapidjsonIteratorType ItratorType>
-    void execute(ItratorType& it, const ValuePtrHelper<ItratorType>& ptrHelper)
+    template<RapidjsonIteratorType IteratorType>
+    void execute(IteratorType& it, const ValuePtrHelper<IteratorType>& ptrHelper)
     {
 
         addToRes<returnCount>(result, ptrHelper.set(it, std::move(m_val.get<returnCount>())));
@@ -450,8 +459,8 @@ public:
 
     AddValueToArray(ValueHelper&& val): m_val(std::move(val)) {}
 
-    template<RapidjsonIteratorType ItratorType>
-    void execute(ItratorType& it, const ValuePtrHelper<ItratorType>& ptrHelper)
+    template<RapidjsonIteratorType IteratorType>
+    void execute(IteratorType& it, const ValuePtrHelper<IteratorType>& ptrHelper)
     {
         ArrayPtrHelper curr{ptrHelper.get(it)};
         addToRes<returnCount>(result, curr.add(std::move(m_val.get<returnCount>()), m_val.allocator));
@@ -479,8 +488,8 @@ public:
 
     AddValueToObject(ValueHelper&& name, ValueHelper&& val): m_name(std::move(name)), m_val(std::move(val)) {}
 
-    template<RapidjsonIteratorType ItratorType>
-    void execute(ItratorType& it, const ValuePtrHelper<ItratorType>& ptrHelper)
+    template<RapidjsonIteratorType IteratorType>
+    void execute(IteratorType& it, const ValuePtrHelper<IteratorType>& ptrHelper)
     {
         ObjectPtrHelper curr{ptrHelper.get(it)};
         addToRes<returnCount>(result, curr.add(std::move(m_name.get<returnCount>()), std::move(m_val.get<returnCount>()), m_val.allocator));
@@ -498,6 +507,44 @@ private:
     ValueHelper m_val;
 };
 
+template<typename T>
+concept CustomActionFuncType = requires(T t, ::rapidjson::Value* name, ::rapidjson::Value* value)
+{
+    { t(name, value) } -> convertible_to<bool>;
+};
+
+template<ReturnCount Count>
+class CustomAction
+{
+public:
+    static constexpr ReturnCount returnCount = Count;
+    using ReturnType = OneOrMore<Count, bool>;
+
+    ReturnType result = {};
+
+    template<CustomActionFuncType CustomActionFunc>
+    CustomAction(const CustomActionFunc& action): m_customAction(action) {}
+
+    template<RapidjsonIteratorType IteratorType>
+    void execute(IteratorType& it, const ValuePtrHelper<IteratorType>& ptrHelper)
+    {
+        addToRes<returnCount>(result, m_customAction(ptrHelper.name(it), ptrHelper.get(it)));
+        ++it;
+    }
+
+    void execute(const ::rapidjson::Pointer& path, ::rapidjson::Value* root)
+    {
+        ::rapidjson::Value* curr = path.Get(*root);
+        if (curr)
+            addToRes<returnCount>(result, m_customAction(nullptr, curr));
+        else
+            addToRes<returnCount>(result, false);
+    }
+
+private:
+    std::function<bool(::rapidjson::Value*, ::rapidjson::Value*)> m_customAction;
+};
+
 class NX_UTILS_API Path
 {
 public:
@@ -513,7 +560,6 @@ public:
 
         template<PredicateType Predicate>
         Token(Predicate pred): token(std::move(pred)) {}
-
         Token(const std::string& stringToken): token(Pointer(stringToken)) {}
     };
 
@@ -823,6 +869,31 @@ public:
         details::AddValueToObject<details::ReturnCount::All> action{
             details::ValueHelper(name, m_data->GetAllocator()),
             details::ValueHelper(std::move(newValue), m_data->GetAllocator())};
+        applyActionWithCondition(parsedPath, m_curr, &action);
+        return std::count_if(action.result.begin(), action.result.end(),
+            [](const auto& t) { return t; });
+    }
+
+    template<details::CustomActionFuncType CustomActionFunc, PredicateType... Predicates>
+    bool applyActionToValue(
+        const CustomActionFunc& customAction, const std::string& path, Predicates... preds)
+    {
+        details::Path parsedPath{path, preds...};
+        if (!parsedPath.isValid())
+            return false;
+        details::CustomAction<details::ReturnCount::One> action{customAction};
+        applyActionWithCondition(parsedPath, m_curr, &action);
+        return action.result;
+    }
+
+    template<details::CustomActionFuncType CustomActionFunc, PredicateType... Predicates>
+    int applyActionToValues(
+        const CustomActionFunc& customAction, const std::string& path, Predicates... preds)
+    {
+        details::Path parsedPath{path, preds...};
+        if (!parsedPath.isValid())
+            return 0;
+        details::CustomAction<details::ReturnCount::All> action{customAction};
         applyActionWithCondition(parsedPath, m_curr, &action);
         return std::count_if(action.result.begin(), action.result.end(),
             [](const auto& t) { return t; });
