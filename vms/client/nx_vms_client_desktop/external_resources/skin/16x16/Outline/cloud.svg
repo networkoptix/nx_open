@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 16 16">
   <g class="16x16/Outline/cloud">
-    <path fill="#E1E7EA" fill-rule="evenodd" d="m12.044 7.91-.102-.594a4.002 4.002 0 0 0-7.675-.757l-.166.43-.434.153a2.501 2.501 0 0 0 .475 4.833l.177.025H12a2 2 0 0 0 .618-3.903l-.574-.186ZM4 12.966A3.5 3.5 0 0 1 3.334 6.2a5.002 5.002 0 0 1 9.593.947A3.001 3.001 0 0 1 12 13H4v-.035Z" class="Primary" clip-rule="evenodd"/>
+    <path fill="#E5E9EB" fill-rule="evenodd" d="M8 4.5c-1.286 0-2.36.866-2.664 2.026l-.098.374H4.3a2.3 2.3 0 0 0 0 4.6h7.8a1.9 1.9 0 0 0 0-3.8h-1.35v-.5c0-1.484-1.224-2.7-2.75-2.7ZM4.488 5.9A3.75 3.75 0 0 1 8 3.5c1.893 0 3.468 1.388 3.716 3.2h.384a2.9 2.9 0 0 1 0 5.8H4.3a3.3 3.3 0 0 1 0-6.6h.188Z" class="Primary" clip-rule="evenodd"/>
   </g>
 </svg>
