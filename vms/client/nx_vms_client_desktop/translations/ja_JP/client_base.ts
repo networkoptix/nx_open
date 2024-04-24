@@ -5262,7 +5262,7 @@ to %1</source>
     <message>
       <source>Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
 If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
-      <translation>現在の分析データは自動的に別の場所に移動されず、アクセスできなくなります。保持して後で手動で移動するか、完全に削除できます。
+      <translation>現在の分析データは自動的に別の場所に移動されず、アクセスできなくなります。データを維持して後ほど手動で移動させる、もしくはここで完全に削除することができます。
 分析データを別の保管場所に移動する場合は、移動作業を進める前にサポートに連絡してください。</translation>
     </message>
     <message>
@@ -6489,7 +6489,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>Delete %n shared layouts?</source>
       <translation>
-        <numerusform>共有されている %n レイアウトを削除しますか？</numerusform>
+        <numerusform>%n 共有レイアウトを削除しますか?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -6514,7 +6514,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>You will lose access to following resources:</source>
-      <translation>次のリソースにアクセスをできなくなります:</translation>
+      <translation>次のリソースにアクセスできなくなります:</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n users?</source>

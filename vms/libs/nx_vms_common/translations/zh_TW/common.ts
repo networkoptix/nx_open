@@ -1443,7 +1443,7 @@
     </message>
     <message>
       <source>Max record queue size (bytes, 6-96MB)</source>
-      <translation type="unfinished">Max record queue size (bytes, 6-96MB)</translation>
+      <translation>最大錄影佇列(bytes, 6-96MB)</translation>
     </message>
     <message>
       <source>Max record queue size (elements, 250-4000)</source>
@@ -1551,7 +1551,7 @@
     </message>
     <message>
       <source>Force analytics DB storage mount point permissions in case of failure</source>
-      <translation type="unfinished">Force analytics DB storage mount point permissions in case of failure</translation>
+      <translation>失敗時強制授予分析資料庫儲存掛載點權限</translation>
     </message>
     <message>
       <source>Check video stream period (milliseconds)</source>
@@ -1607,15 +1607,15 @@
     </message>
     <message>
       <source>Expose IP addresses for autodiscovery</source>
-      <translation type="unfinished">Expose IP addresses for autodiscovery</translation>
+      <translation>揭露 IP 位址以進行自動搜尋</translation>
     </message>
     <message>
       <source>Keep IO port state on when Server connects to the device</source>
-      <translation type="unfinished">Keep IO port state on when Server connects to the device</translation>
+      <translation>伺服器連接設備時保持IO接口狀態開啟</translation>
     </message>
     <message>
       <source>Media buffer size for audio only devices (KB, 1KB-1MB)</source>
-      <translation type="unfinished">Media buffer size for audio only devices (KB, 1KB-1MB)</translation>
+      <translation>僅音訊設備的媒體緩衝區大小（KB、1KB-1MB）</translation>
     </message>
     <message>
       <source>Enable 2FA for the System</source>
@@ -1623,7 +1623,7 @@
     </message>
     <message>
       <source>Expose device passwords stored in VMS for administrators (for web pages)</source>
-      <translation type="unfinished">Expose device passwords stored in VMS for administrators (for web pages)</translation>
+      <translation>向管理員揭露儲存在 VMS 中的設備密碼（針對網頁）</translation>
     </message>
     <message>
       <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32)</source>

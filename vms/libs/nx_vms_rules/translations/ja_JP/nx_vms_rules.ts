@@ -140,7 +140,7 @@
     </message>
     <message>
       <source>Camera was disconnected</source>
-      <translation>カメラの接続が切断されました</translation>
+      <translation>カメラが切断されました</translation>
     </message>
     <message>
       <source>I/O Module was disconnected</source>
@@ -156,7 +156,7 @@
     </message>
     <message>
       <source>I/O Module %1 was disconnected</source>
-      <translation>IOモジュール %1 が切断されました</translation>
+      <translation>I/Oモジュール %1 が切断されました</translation>
     </message>
     <message numerus="yes">
       <source>Device Disconnected</source>
@@ -193,7 +193,7 @@
     <message>
       <source>Camera IP Conflict at %1</source>
       <comment>Camera IP Conflict at &lt;server_name&gt;</comment>
-      <translation>%1 でカメラIPが競合しています</translation>
+      <translation>%1 でカメラのIPが競合しています</translation>
     </message>
     <message numerus="yes">
       <source>Device IP Conflict</source>
@@ -251,7 +251,7 @@
     </message>
     <message>
       <source>Description</source>
-      <translation>説明(&amp;D)</translation>
+      <translation>説明</translation>
     </message>
   </context>
   <context>
@@ -426,7 +426,7 @@
     </message>
     <message>
       <source>Description</source>
-      <translation>説明(&amp;D)</translation>
+      <translation>説明</translation>
     </message>
     <message>
       <source>Tooltip</source>

@@ -6261,7 +6261,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Screen is locked and cannot be changed</source>
-      <translation type="unfinished">Screen is locked and cannot be changed</translation>
+      <translation>螢幕已鎖定且無法被更改</translation>
     </message>
   </context>
   <context>
