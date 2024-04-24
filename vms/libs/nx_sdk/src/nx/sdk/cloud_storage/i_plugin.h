@@ -18,7 +18,11 @@ namespace nx::sdk::cloud_storage {
 class IPlugin: public Interface<IPlugin, nx::sdk::IPlugin>
 {
 public:
-    static auto interfaceId() { return makeId("nx::sdk::archive::IPlugin"); }
+    static auto interfaceId()
+    {
+        return makeIdWithAlternative("nx::sdk::archive::IPlugin",
+            /* Planned future renaming. */ "nx::sdk::archive::IIntegration");
+    }
 
     protected: virtual void getManifest(Result<const IString*>* outResult) const = 0;
     /**

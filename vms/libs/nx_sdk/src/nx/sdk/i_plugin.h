@@ -26,7 +26,11 @@ class IUtilityProvider;
 class IPlugin: public Interface<IPlugin>
 {
 public:
-    static auto interfaceId() { return makeId("nx::sdk::IPlugin"); }
+    static auto interfaceId()
+    {
+        return makeIdWithAlternative("nx::sdk::IPlugin",
+            /* Planned future renaming. */ "nx::sdk::IIntegration");
+    }
 
     /**
      * Prototype of a plugin entry point function for single-IPlugin Plugins.
