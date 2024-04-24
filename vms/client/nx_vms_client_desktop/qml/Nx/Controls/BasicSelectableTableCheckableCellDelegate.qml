@@ -13,7 +13,7 @@ Rectangle
 
     implicitWidth: 28
     implicitHeight: 28
-    color: selected ? ColorTheme.colors.brand_d6 : ColorTheme.colors.dark7
+    color: selected ? ColorTheme.colors.dark9 : ColorTheme.colors.dark7
 
     CheckBox
     {
@@ -21,6 +21,7 @@ Rectangle
         checked: model.checkState
         onCheckStateChanged:
         {
+            control.TableView.view.focus = true
             if (checkState !== model.checkState)
                 model.checkState = checkState
         }

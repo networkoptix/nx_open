@@ -93,10 +93,10 @@ Button
 
             sourcePath: control.icon.source
             sourceSize: Qt.size(control.icon.width, control.icon.height)
-            visible: !!source && width > 0 && height > 0
+            visible: !!sourcePath && width > 0 && height > 0
 
-            width: source != "" ? control.icon.width : 0
-            height: source != "" ? control.icon.height : 0
+            width: sourcePath !== "" ? control.icon.width : 0
+            height: sourcePath !== "" ? control.icon.height : 0
 
             primaryColor: control.textColor
         }

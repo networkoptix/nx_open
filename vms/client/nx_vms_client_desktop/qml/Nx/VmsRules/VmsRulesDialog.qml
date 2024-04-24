@@ -19,7 +19,7 @@ Dialog
     id: root
 
     property alias rulesTableModel: rulesSortFilterModel.sourceModel
-    property alias errorString: alertBar.label.text
+    property alias errorString: alertBar.text
     property var dialog: null
 
     function deleteCheckedRules()
@@ -40,6 +40,8 @@ Dialog
     rightPadding: 0
     topPadding: 0
     bottomPadding: 0
+
+    acceptShortcutEnabled: !tableView.selectionModel.hasSelection
 
     Control
     {
@@ -179,7 +181,7 @@ Dialog
                 function getDelegateColor(isSelected, isValid)
                 {
                     if (isSelected)
-                        return ColorTheme.colors.brand_d6
+                        return ColorTheme.colors.dark9
 
                     if (!isValid)
                         return ColorTheme.colors.red_attention
@@ -202,7 +204,7 @@ Dialog
                     {
                         color: delegateChooser.getDelegateColor(selected, model.isValid)
 
-                        onDoubleClicked:
+                        onClicked:
                         {
                             root.dialog.editRule(tableView.model.data(
                                 tableView.model.index(row, column), RulesTableModel.RuleIdRole))
@@ -210,15 +212,25 @@ Dialog
                     }
                 }
             }
+
+            onDeleteKeyPressed: root.deleteCheckedRules()
+            onEnterKeyPressed:
+            {
+                root.dialog.editRule(tableView.model.data(
+                    tableView.selectionModel.selectedIndexes[0], RulesTableModel.RuleIdRole))
+            }
         }
     }
 
-    AlertBar
+    DialogBanner
     {
         id: alertBar
+
         anchors.bottom: buttonBox.top
-        label.text: ""
-        visible: !!label.text
+        anchors.left: parent.left
+        anchors.right: parent.right
+        style: DialogBanner.Style.Error
+        visible: text
     }
 
     Control
