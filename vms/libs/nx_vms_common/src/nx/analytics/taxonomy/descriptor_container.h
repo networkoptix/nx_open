@@ -34,6 +34,8 @@ signals:
 private:
     void at_descriptorsUpdated();
 
+    void fixScopeCompatibility(nx::vms::api::analytics::Descriptors* descriptors);
+
 private:
     mutable nx::Mutex m_mutex;
 
