@@ -240,11 +240,11 @@
     <message>
       <source>To learn more about the current problem read this %1.</source>
       <comment>%1 is &lt;help article&gt; link</comment>
-      <translation type="unfinished">To learn more about the current problem read this %1.</translation>
+      <translation>要了解更多目前的問題，請閱讀 %1。</translation>
     </message>
     <message>
       <source>This might be due to an expired server certificate or an invalid certificate. Contact your system administrator for further investigation.</source>
-      <translation type="unfinished">This might be due to an expired server certificate or an invalid certificate. Contact your system administrator for further investigation.</translation>
+      <translation>這可能是由於伺服器憑證過期或憑證無效。請聯絡您的系統管理員進行進一步調查。</translation>
     </message>
     <message>
       <source>Cannot verify the identity of %1</source>

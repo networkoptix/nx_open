@@ -5111,7 +5111,7 @@ License Key: %2</source>
     <message>
       <source>Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
 If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
-      <translation>現在の分析データは自動的に別の場所に移動されず、アクセスできなくなります。保持して後で手動で移動するか、完全に削除できます。
+      <translation>現在の分析データは自動的に別の場所に移動されず、アクセスできなくなります。データを維持して後ほど手動で移動させる、もしくはここで完全に削除することができます。
 分析データを別の保管場所に移動する場合は、移動作業を進める前にサポートに連絡してください。</translation>
     </message>
     <message>
@@ -6161,7 +6161,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>You will lose access to following resources:</source>
-      <translation>次のリソースにアクセスをできなくなります:</translation>
+      <translation>次のリソースにアクセスできなくなります:</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n devices?</source>
@@ -6917,7 +6917,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Depending on the resource type it either allows user to modify device settings or to control video wall.</source>
-      <translation>リソースの種類に応じて、ユーザーはデバイス設定を変更することも、ビデオ ウォールを制御することもできます。</translation>
+      <translation>ユーザーはリソースの種類に応じて、デバイス設定の変更やビデオウォールの制御が可能になります。</translation>
     </message>
     <message>
       <source>Allows users to access a resource and view live footage from a camera.</source>
