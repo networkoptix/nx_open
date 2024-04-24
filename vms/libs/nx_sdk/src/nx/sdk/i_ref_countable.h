@@ -3,6 +3,7 @@
 #pragma once
 
 #include <cstring>
+#include <vector>
 #include <string>
 #include <type_traits>
 
@@ -73,7 +74,7 @@ public:
 protected:
     /** Intended to be used in interfaceId(). Can be called only with a string literal. */
     template<int len>
-    static constexpr const InterfaceId* makeId(const char (&charArray)[len])
+    static const InterfaceId* makeId(const char (&charArray)[len])
     {
         static_assert(len + /*terminating \0*/ 1 >= InterfaceId::minSize(),
             "Interface id is too short");
@@ -81,8 +82,24 @@ protected:
         return reinterpret_cast<const InterfaceId*>(charArray);
     }
 
+    /** Intended to be used in interfaceId(). Can be called only with two string literals. */
+    template<int len, int alternativeLen>
+    static std::vector<const InterfaceId*> makeIdWithAlternative(
+        const char (&charArray)[len], const char (&alternativeCharArray)[alternativeLen])
+    {
+        static_assert(len + /*terminating \0*/ 1 >= InterfaceId::minSize(),
+            "Interface id is too short");
+        static_assert(alternativeLen + /*terminating \0*/ 1 >= InterfaceId::minSize(),
+            "Alternative interface id is too short");
+
+        return {
+            reinterpret_cast<const InterfaceId*>(charArray),
+            reinterpret_cast<const InterfaceId*>(alternativeCharArray),
+        };
+    }
+
 public:
-    /** Each derived interface is expected to implement such static method with its own string. */
+    /** Each derived interface is expected to implement such static method with its own data. */
     static auto interfaceId() { return makeId("nx::sdk::IRefCountable"); }
 
     /** VMT #0. */
@@ -97,6 +114,7 @@ protected:
      *     return IList::template makeIdForTemplate<IList<IItem>, IItem>("nx::sdk::IList");
      * }
      * ```
+     * NOTE: Currently, this function does not support interfaces with alternative interface ids.
      */
     template<class TemplateInstance, class TemplateArg, int len>
     static const InterfaceId* makeIdForTemplate(const char (&baseIdCharArray)[len])
@@ -112,6 +130,16 @@ protected:
             std::string(&baseIdCharArray[0]) + "<" + &TemplateArg::interfaceId()->value[0] + ">";
 
         return reinterpret_cast<const InterfaceId*>(id.c_str());
+    }
+
+    static std::vector<const InterfaceId*> alternativeInterfaceIds(const InterfaceId* id)
+    {
+        return std::vector<const InterfaceId*>(1, id);
+    }
+
+    static std::vector<const InterfaceId*> alternativeInterfaceIds(std::vector<const InterfaceId*> ids)
+    {
+        return ids;
     }
 
     /**
@@ -135,14 +163,19 @@ public:
     template<class Interface>
     Ptr<Interface> queryInterface()
     {
-        return Ptr(static_cast<Interface*>(queryInterface(Interface::interfaceId())));
+        for (const auto& id: alternativeInterfaceIds(Interface::interfaceId()))
+        {
+            if (IRefCountable* refCountable = queryInterface(id))
+                return Ptr(static_cast<Interface*>(refCountable));
+        }
+        return nullptr;
     }
 
     template<class Interface>
     Ptr<const Interface> queryInterface() const
     {
-        return Ptr(static_cast<const Interface*>(
-            const_cast<IRefCountable*>(this)->queryInterface(Interface::interfaceId())));
+        // The virtual queryInterface() does not have a const overload.
+        return const_cast<IRefCountable*>(this)->queryInterface<const Interface>();
     }
 
     /**

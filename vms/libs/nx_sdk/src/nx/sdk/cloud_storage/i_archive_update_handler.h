@@ -39,10 +39,7 @@ public:
 class IArchiveUpdateHandler: public Interface<IArchiveUpdateHandler>
 {
 public:
-    static constexpr auto interfaceId()
-    {
-        return makeId("nx::sdk::archive::IArchiveUpdateHandler");
-    }
+    static auto interfaceId() { return makeId("nx::sdk::archive::IArchiveUpdateHandler"); }
 
     /**
      * Engine should call this periodically to check if something is changed on the backend.
