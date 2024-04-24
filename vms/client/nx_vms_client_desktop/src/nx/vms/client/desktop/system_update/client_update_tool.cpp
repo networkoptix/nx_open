@@ -15,6 +15,7 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/api/data/media_server_data.h>
+#include <nx/vms/api/data/persistent_update_storage.h>
 #include <nx/vms/client/core/network/certificate_verifier.h>
 #include <nx/vms/client/core/network/logon_data.h>
 #include <nx/vms/client/core/network/network_module.h>
@@ -25,7 +26,6 @@
 #include <nx/vms/common/p2p/downloader/private/internet_only_peer_manager.h>
 #include <nx/vms/common/p2p/downloader/private/resource_pool_peer_manager.h>
 #include <nx/vms/common/system_settings.h>
-#include <nx/vms/common/update/persistent_update_storage.h>
 #include <nx/vms/update/update_check.h>
 #include <utils/applauncher_utils.h>
 
@@ -887,7 +887,7 @@ ClientUpdateTool::SystemServersInfo ClientUpdateTool::getSystemServersInfo(
         auto handlePersistentStorageInfo =
             [](bool success, const QByteArray& data) -> std::optional<UuidList>
             {
-                common::update::PersistentUpdateStorage storage;
+                api::PersistentUpdateStorage storage;
                 if (success && QJson::deserialize(data, &storage))
                     return storage.servers;
                 return std::nullopt;

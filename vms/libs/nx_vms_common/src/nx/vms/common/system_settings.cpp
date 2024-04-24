@@ -30,7 +30,6 @@
 #include <utils/email/email.h>
 
 using namespace std::chrono;
-using namespace std::chrono_literals;
 
 namespace {
 
@@ -165,8 +164,8 @@ struct SystemSettings::Private
     QnResourcePropertyAdaptor<nx::utils::Url>* customReleaseListUrlAdaptor = nullptr;
     QnResourcePropertyAdaptor<QByteArray>* targetUpdateInformationAdaptor = nullptr;
     QnResourcePropertyAdaptor<QByteArray>* installedUpdateInformationAdaptor = nullptr;
-    QnResourcePropertyAdaptor<nx::vms::common::update::PersistentUpdateStorage>* targetPersistentUpdateStorageAdaptor = nullptr;
-    QnResourcePropertyAdaptor<nx::vms::common::update::PersistentUpdateStorage>* installedPersistentUpdateStorageAdaptor = nullptr;
+    QnResourcePropertyAdaptor<api::PersistentUpdateStorage>* targetPersistentUpdateStorageAdaptor = nullptr;
+    QnResourcePropertyAdaptor<api::PersistentUpdateStorage>* installedPersistentUpdateStorageAdaptor = nullptr;
     QnResourcePropertyAdaptor<FileToPeerList>* downloaderPeersAdaptor = nullptr;
     QnResourcePropertyAdaptor<nx::vms::api::ClientUpdateSettings>*
         clientUpdateSettingsAdaptor = nullptr;
@@ -333,11 +332,11 @@ SystemSettings::AdaptorList SystemSettings::initStaticticsAdaptors()
         [] { return tr("Anonymous statistics report last number"); });
 
     d->statisticsReportTimeCycleAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
-        "statisticsReportTimeCycle", QString(), this,
+        "statisticsReportTimeCycle", "30d", this,
         [] { return tr("Anonymous statistics time cycle"); });
 
     d->statisticsReportUpdateDelayAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
-        "statisticsReportUpdateDelay", QString(), this,
+        "statisticsReportUpdateDelay", "3h", this,
         [] { return tr("Anonymous statistics report delay after update"); });
 
     d->statisticsReportServerApiAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
@@ -794,13 +793,13 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
             [] { return tr("Meta data storage change policy"); });
 
     d->targetPersistentUpdateStorageAdaptor =
-        new QnJsonResourcePropertyAdaptor<nx::vms::common::update::PersistentUpdateStorage>(
-            "targetPersistentUpdateStorage", nx::vms::common::update::PersistentUpdateStorage(), this,
+        new QnJsonResourcePropertyAdaptor<api::PersistentUpdateStorage>(
+            "targetPersistentUpdateStorage", api::PersistentUpdateStorage(), this,
             [] { return tr("Persistent Servers for update storage"); });
 
     d->installedPersistentUpdateStorageAdaptor =
-        new QnJsonResourcePropertyAdaptor<nx::vms::common::update::PersistentUpdateStorage>(
-            "installedPersistentUpdateStorage", nx::vms::common::update::PersistentUpdateStorage(), this,
+        new QnJsonResourcePropertyAdaptor<api::PersistentUpdateStorage>(
+            "installedPersistentUpdateStorage", api::PersistentUpdateStorage(), this,
             [] { return tr("Persistent Servers where updates are stored"); });
 
     d->specificFeaturesAdaptor = new QnJsonResourcePropertyAdaptor<std::map<QString, int>>(
@@ -2004,24 +2003,24 @@ void SystemSettings::setTargetUpdateInformation(const QByteArray& updateInformat
     d->targetUpdateInformationAdaptor->setValue(updateInformation);
 }
 
-nx::vms::common::update::PersistentUpdateStorage SystemSettings::targetPersistentUpdateStorage() const
+api::PersistentUpdateStorage SystemSettings::targetPersistentUpdateStorage() const
 {
     return d->targetPersistentUpdateStorageAdaptor->value();
 }
 
 void SystemSettings::setTargetPersistentUpdateStorage(
-    const nx::vms::common::update::PersistentUpdateStorage& data)
+    const api::PersistentUpdateStorage& data)
 {
     d->targetPersistentUpdateStorageAdaptor->setValue(data);
 }
 
-nx::vms::common::update::PersistentUpdateStorage SystemSettings::installedPersistentUpdateStorage() const
+api::PersistentUpdateStorage SystemSettings::installedPersistentUpdateStorage() const
 {
     return d->installedPersistentUpdateStorageAdaptor->value();
 }
 
 void SystemSettings::setInstalledPersistentUpdateStorage(
-    const nx::vms::common::update::PersistentUpdateStorage& data)
+    const api::PersistentUpdateStorage& data)
 {
     d->installedPersistentUpdateStorageAdaptor->setValue(data);
 }
@@ -2518,37 +2517,63 @@ void SystemSettings::setCloudPollingInterval(std::chrono::seconds period)
     d->cloudPollingIntervalAdaptor->setValue(period.count());
 }
 
-void SystemSettings::update(const vms::api::SystemSettings& value)
+void SystemSettings::update(const api::SystemSettings& value)
 {
     d->cloudAccountNameAdaptor->setValue(value.cloudAccountName);
     d->cloudSystemIdAdaptor->setValue(value.cloudSystemID);
-    d->defaultExportVideoCodecAdaptor->setValue(value.defaultExportVideoCodec);
+    if (value.defaultExportVideoCodec)
+        d->defaultExportVideoCodecAdaptor->setValue(*value.defaultExportVideoCodec);
     d->localSystemIdAdaptor->setValue(value.localSystemId);
-    d->systemNameAdaptor->setValue(value.systemName);
-    d->watermarkSettingsAdaptor->setValue(value.watermarkSettings);
-    d->webSocketEnabledAdaptor->setValue(value.webSocketEnabled);
-    d->autoDiscoveryEnabledAdaptor->setValue(value.autoDiscoveryEnabled);
-    d->cameraSettingsOptimizationAdaptor->setValue(value.cameraSettingsOptimization);
-    d->statisticsAllowedAdaptor->setValue(value.statisticsAllowed);
-    d->cloudNotificationsLanguageAdaptor->setValue(value.cloudNotificationsLanguage);
-    d->pixelationSettingsAdapter->setValue(value.pixelationSettings);
-    d->auditTrailEnabledAdaptor->setValue(value.auditTrailEnabled);
-    d->trafficEncryptionForcedAdaptor->setValue(value.trafficEncryptionForced);
-    d->useHttpsOnlyForCamerasAdaptor->setValue(value.useHttpsOnlyForCameras);
-    d->videoTrafficEncryptionForcedAdaptor->setValue(value.videoTrafficEncryptionForced);
-    d->sessionTimeoutLimitSecondsAdaptor->setValue(value.sessionLimitS.value_or(0s).count());
-    d->useSessionTimeoutLimitForCloudAdaptor->setValue(value.useSessionLimitForCloud);
-    d->useStorageEncryptionAdaptor->setValue(value.storageEncryption);
-    d->showServersInTreeForNonAdminsAdaptor->setValue(value.showServersInTreeForNonAdmins);
-    d->updateNotificationsEnabledAdaptor->setValue(value.updateNotificationsEnabled);
-    d->emailSettingsAdaptor->setValue(value.emailSettings);
-    d->timeSynchronizationEnabledAdaptor->setValue(value.timeSynchronizationEnabled);
-    d->primaryTimeServerAdaptor->setValue(value.primaryTimeServer);
-    d->customReleaseListUrlAdaptor->setValue(value.customReleaseListUrl);
-    d->clientUpdateSettingsAdaptor->setValue(value.clientUpdateSettings);
-    d->backupSettingsAdaptor->setValue(value.backupSettings);
-    d->metadataStorageChangePolicyAdaptor->setValue(value.metadataStorageChangePolicy);
-    d->allowRegisteringIntegrationsAdaptor->setValue(value.allowRegisteringIntegrations);
+    if (value.systemName)
+        d->systemNameAdaptor->setValue(*value.systemName);
+    if (value.watermarkSettings)
+        d->watermarkSettingsAdaptor->setValue(*value.watermarkSettings);
+    if (value.webSocketEnabled)
+        d->webSocketEnabledAdaptor->setValue(*value.webSocketEnabled);
+    if (value.autoDiscoveryEnabled)
+        d->autoDiscoveryEnabledAdaptor->setValue(*value.autoDiscoveryEnabled);
+    if (value.cameraSettingsOptimization)
+        d->cameraSettingsOptimizationAdaptor->setValue(*value.cameraSettingsOptimization);
+    if (value.statisticsAllowed)
+        d->statisticsAllowedAdaptor->setValue(*value.statisticsAllowed);
+    if (value.cloudNotificationsLanguage)
+        d->cloudNotificationsLanguageAdaptor->setValue(*value.cloudNotificationsLanguage);
+    if (value.pixelationSettings)
+        d->pixelationSettingsAdapter->setValue(*value.pixelationSettings);
+    if (value.auditTrailEnabled)
+        d->auditTrailEnabledAdaptor->setValue(*value.auditTrailEnabled);
+    if (value.trafficEncryptionForced)
+        d->trafficEncryptionForcedAdaptor->setValue(*value.trafficEncryptionForced);
+    if (value.useHttpsOnlyForCameras)
+        d->useHttpsOnlyForCamerasAdaptor->setValue(*value.useHttpsOnlyForCameras);
+    if (value.videoTrafficEncryptionForced)
+        d->videoTrafficEncryptionForcedAdaptor->setValue(*value.videoTrafficEncryptionForced);
+    if (value.sessionLimitS)
+        d->sessionTimeoutLimitSecondsAdaptor->setValue(value.sessionLimitS->count());
+    if (value.useSessionLimitForCloud)
+        d->useSessionTimeoutLimitForCloudAdaptor->setValue(*value.useSessionLimitForCloud);
+    if (value.storageEncryption)
+        d->useStorageEncryptionAdaptor->setValue(*value.storageEncryption);
+    if (value.showServersInTreeForNonAdmins)
+        d->showServersInTreeForNonAdminsAdaptor->setValue(*value.showServersInTreeForNonAdmins);
+    if (value.updateNotificationsEnabled)
+        d->updateNotificationsEnabledAdaptor->setValue(*value.updateNotificationsEnabled);
+    if (value.emailSettings)
+        d->emailSettingsAdaptor->setValue(*value.emailSettings);
+    if (value.timeSynchronizationEnabled)
+        d->timeSynchronizationEnabledAdaptor->setValue(*value.timeSynchronizationEnabled);
+    if (value.primaryTimeServer)
+        d->primaryTimeServerAdaptor->setValue(*value.primaryTimeServer);
+    if (value.customReleaseListUrl)
+        d->customReleaseListUrlAdaptor->setValue(*value.customReleaseListUrl);
+    if (value.clientUpdateSettings)
+        d->clientUpdateSettingsAdaptor->setValue(*value.clientUpdateSettings);
+    if (value.backupSettings)
+        d->backupSettingsAdaptor->setValue(*value.backupSettings);
+    if (value.metadataStorageChangePolicy)
+        d->metadataStorageChangePolicyAdaptor->setValue(*value.metadataStorageChangePolicy);
+    if (value.allowRegisteringIntegrations)
+        d->allowRegisteringIntegrationsAdaptor->setValue(*value.allowRegisteringIntegrations);
 }
 
 } // namespace nx::vms::common

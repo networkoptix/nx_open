@@ -50,10 +50,10 @@
 #include <nx/vms/api/data/module_information.h>
 #include <nx/vms/api/data/overlapped_id_data.h>
 #include <nx/vms/api/data/remote_archive_synchronization_status.h>
-#include <nx/vms/api/data/saveable_system_settings.h>
 #include <nx/vms/api/data/storage_init_result.h>
 #include <nx/vms/api/data/storage_scan_info.h>
 #include <nx/vms/api/data/storage_space_data.h>
+#include <nx/vms/api/data/system_settings.h>
 #include <nx/vms/api/data/time_reply.h>
 #include <nx/vms/api/data/user_data.h>
 #include <nx/vms/api/data/user_group_model.h>

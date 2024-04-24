@@ -31,9 +31,6 @@ QString hidePasswordIfCredentialsPropety(const QString& key, const QString& valu
         return value.left(value.indexOf(':')) + ":" + nx::utils::Url::kMaskedPassword;
     }
 
-    if (key == SystemSettings::Names::smtpPassword)
-        return nx::utils::Url::kMaskedPassword;
-
     return value;
 }
 
