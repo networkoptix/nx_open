@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 16 16">
+  <g class="16x16/Outline/watertransport">
+    <path fill="#E1E7EA" d="M7.2 3.2v1.6h1.6a2.4 2.4 0 0 1 2.4 2.4H16l-1.569 3.66a3.2 3.2 0 0 1-2.941 1.94H3.2a2.4 2.4 0 0 1-2.4-2.4V7.2h1.6v-4h4.8ZM14.786 8H1.6v2.4a1.6 1.6 0 0 0 1.48 1.596L3.2 12h8.29a2.4 2.4 0 0 0 2.138-1.31l.068-.145L14.786 8Zm-2.386.8a.4.4 0 1 1 0 .8.4.4 0 0 1 0-.8ZM8.8 5.6H3.2v1.6h7.2a1.6 1.6 0 0 0-1.48-1.596L8.8 5.6ZM6.4 4H3.2v.8h3.2V4Z" class="Primary"/>
+  </g>
+</svg>

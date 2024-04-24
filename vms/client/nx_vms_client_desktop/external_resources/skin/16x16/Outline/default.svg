@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 16 16">
+  <g class="16x16/Outline/default">
+    <path fill="#E1E7EA" d="M6 12.4V14h-.8v-1.6H6Zm1.6 0V14h-.8v-1.6h.8Zm1.6 0V14h-.8v-1.6h.8Zm1.6 0V14H10v-1.6h.8Zm0-8a.8.8 0 0 1 .8.8v5.6a.8.8 0 0 1-.8.8H5.2a.8.8 0 0 1-.8-.8V5.2a.8.8 0 0 1 .8-.8h5.6Zm0 .8H5.2v5.6h5.6V5.2ZM14 10v.8h-1.6V10H14ZM3.6 10v.8H2V10h1.6ZM14 8.4v.8h-1.6v-.8H14Zm-10.4 0v.8H2v-.8h1.6ZM14 6.8v.8h-1.6v-.8H14Zm-10.4 0v.8H2v-.8h1.6ZM14 5.2V6h-1.6v-.8H14Zm-10.4 0V6H2v-.8h1.6ZM6 2v1.6h-.8V2H6Zm1.6 0v1.6h-.8V2h.8Zm1.6 0v1.6h-.8V2h.8Zm1.6 0v1.6H10V2h.8Z" class="Primary"/>
+  </g>
+</svg>
