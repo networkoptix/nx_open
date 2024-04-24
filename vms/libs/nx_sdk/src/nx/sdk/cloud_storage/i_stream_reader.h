@@ -16,7 +16,7 @@ namespace nx::sdk::cloud_storage {
 class IStreamReader: public Interface<IStreamReader>
 {
 public:
-    static constexpr auto interfaceId() { return makeId("nx::sdk::archive::StreamReader"); }
+    static auto interfaceId() { return makeId("nx::sdk::archive::StreamReader"); }
 
     /**
      * Attempts to read a next media data packet. Should return ErrorCode::noData if there is
