@@ -171,6 +171,7 @@ private:
 #define QnAuditRecord_Fields (eventType)(createdTimeS)(authSession)(details)(apiInfo)
 QN_FUSION_DECLARE_FUNCTIONS(QnAuditRecord, (ubjson)(json), NX_VMS_COMMON_API)
 NX_REFLECTION_INSTRUMENT(QnAuditRecord, QnAuditRecord_Fields)
+NX_REFLECTION_TAG_TYPE(QnAuditRecord, jsonSerializeChronoDurationAsNumber)
 
 struct NX_VMS_COMMON_API QnAuditRecordModel: QnAuditRecord
 {
@@ -184,6 +185,7 @@ struct NX_VMS_COMMON_API QnAuditRecordModel: QnAuditRecord
 #define QnAuditRecordModel_Fields QnAuditRecord_Fields
 QN_FUSION_DECLARE_FUNCTIONS(QnAuditRecordModel, (sql_record), NX_VMS_COMMON_API)
 NX_REFLECTION_INSTRUMENT(QnAuditRecordModel, QnAuditRecordModel_Fields)
+NX_REFLECTION_TAG_TYPE(QnAuditRecordModel, jsonSerializeChronoDurationAsNumber)
 
 using QnAuditRecordList = QVector<QnAuditRecord>;
 using QnAuditRecordRefList = QVector<QnAuditRecord*>;

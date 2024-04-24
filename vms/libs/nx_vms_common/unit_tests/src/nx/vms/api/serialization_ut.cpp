@@ -75,7 +75,7 @@ TEST(QnAuditRecord, serialization)
     "reply": [
         {
             "eventType": "notDefined",
-            "createdTimeS": "0",
+            "createdTimeS": 0,
             "authSession": {
                 "id": "{00000000-0000-0000-0000-000000000000}",
                 "userName": "",
