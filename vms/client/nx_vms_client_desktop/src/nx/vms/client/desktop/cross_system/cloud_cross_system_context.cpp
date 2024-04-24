@@ -62,8 +62,7 @@ struct CloudCrossSystemContext::Private
 
         systemContext = std::make_unique<SystemContext>(
             SystemContext::Mode::crossSystem,
-            appContext()->peerId(),
-            nx::core::access::Mode::direct);
+            appContext()->peerId());
 
        systemContext->resourceDataPool()->setExternalSource(
            appContext()->currentSystemContext()->resourceDataPool());

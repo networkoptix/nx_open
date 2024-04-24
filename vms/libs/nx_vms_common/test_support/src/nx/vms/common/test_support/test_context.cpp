@@ -16,13 +16,12 @@ struct Context::Private
     std::unique_ptr<QnCommonModule> commonModule;
 };
 
-Context::Context(nx::core::access::Mode resourceAccessMode):
+Context::Context():
     d(new Private())
 {
     d->systemContext = std::make_unique<SystemContext>(
         SystemContext::Mode::unitTests,
-        /*peerId*/ nx::Uuid::createUuid(),
-        resourceAccessMode);
+        /*peerId*/ nx::Uuid::createUuid());
     d->commonModule = std::make_unique<QnCommonModule>(d->systemContext.get());
 }
 
@@ -43,8 +42,8 @@ SystemContext* Context::systemContext() const
 //-------------------------------------------------------------------------------------------------
 // ContextBasedTest
 
-ContextBasedTest::ContextBasedTest(nx::core::access::Mode resourceAccessMode):
-    GenericContextBasedTest(resourceAccessMode)
+ContextBasedTest::ContextBasedTest():
+    GenericContextBasedTest()
 {
 }
 

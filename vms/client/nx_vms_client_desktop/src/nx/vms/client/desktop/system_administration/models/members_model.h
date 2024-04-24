@@ -8,7 +8,6 @@
 #include <QtCore/QSet>
 
 #include <core/resource/resource_fwd.h>
-#include <nx/core/access/access_types.h>
 #include <nx/utils/scoped_connections.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/types/access_rights_types.h>

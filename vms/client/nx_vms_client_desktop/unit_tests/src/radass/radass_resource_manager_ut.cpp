@@ -10,7 +10,6 @@
 #include <common/static_common_module.h>
 #include <core/resource/layout_item_data.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/core/access/access_types.h>
 #include <nx/utils/test_support/test_with_temporary_directory.h>
 #include <nx/vms/client/desktop/radass/radass_resource_manager.h>
 #include <nx/vms/client/desktop/radass/radass_types.h>
