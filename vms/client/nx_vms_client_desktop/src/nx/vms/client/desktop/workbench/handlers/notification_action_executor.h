@@ -31,6 +31,9 @@ signals:
 private:
     virtual void execute(const nx::vms::rules::ActionPtr& action) override;
 
+    void onNotificationActionReceived(
+        const QSharedPointer<nx::vms::rules::NotificationActionBase>& notificationAction,
+        const QString& cloudSystemId);
     void onContextUserChanged();
     void handleAcknowledgeAction();
 

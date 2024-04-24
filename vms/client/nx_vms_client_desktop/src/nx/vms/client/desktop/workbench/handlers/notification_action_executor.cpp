@@ -10,6 +10,7 @@
 #include <nx/vms/api/data/bookmark_models.h>
 #include <nx/vms/api/rules/event_log.h>
 #include <nx/vms/client/core/access/access_controller.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/rules/cross_system_notifications_listener.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -199,12 +200,48 @@ void NotificationActionExecutor::onContextUserChanged()
         connect(m_listener.get(),
             &CrossSystemNotificationsListener::notificationActionReceived,
             this,
-            &NotificationActionExecutor::notificationActionReceived);
+            &NotificationActionExecutor::onNotificationActionReceived);
     }
     else
     {
         m_listener.reset();
     }
+}
+
+void NotificationActionExecutor::onNotificationActionReceived(
+    const QSharedPointer<nx::vms::rules::NotificationActionBase>& notificationAction,
+    const QString& cloudSystemId)
+{
+    emit notificationActionReceived(notificationAction, cloudSystemId);
+
+    if (notificationAction->state() == State::stopped)
+        return;
+
+    // Show splash.
+    QSet<QnResourcePtr> targetResources;
+
+    auto resourcePool = systemContext()->resourcePool();
+    if (!cloudSystemId.isEmpty())
+    {
+        auto systemContext = appContext()->systemContextByCloudSystemId(cloudSystemId);
+        if (NX_ASSERT(systemContext))
+            resourcePool = systemContext->resourcePool();
+    }
+
+    if (!notificationAction->deviceIds().empty())
+    {
+        targetResources =
+            nx::utils::toQSet(resourcePool->getResourcesByIds(notificationAction->deviceIds()));
+    }
+    else
+    {
+        targetResources.insert(resourcePool->getResourceById(notificationAction->serverId()));
+    }
+
+    targetResources.remove({});
+
+    display()->showNotificationSplash(
+        targetResources.values(), QnNotificationLevel::convert(notificationAction->level()));
 }
 
 void NotificationActionExecutor::execute(const ActionPtr& action)
@@ -216,28 +253,7 @@ void NotificationActionExecutor::execute(const ActionPtr& action)
     if (!NX_ASSERT(notificationAction, "Unexpected action: %1", action->type()))
         return;
 
-    emit notificationActionReceived(notificationAction, {});
-
-    if (notificationAction->state() == State::stopped)
-        return;
-
-    // Show splash.
-    QSet<QnResourcePtr> targetResources;
-
-    if (!notificationAction->deviceIds().empty())
-    {
-        targetResources = nx::utils::toQSet(
-            resourcePool()->getResourcesByIds(notificationAction->deviceIds()));
-    }
-    else
-    {
-        targetResources.insert(resourcePool()->getResourceById(notificationAction->serverId()));
-    }
-
-    targetResources.remove({});
-
-    display()->showNotificationSplash(
-        targetResources.values(), QnNotificationLevel::convert(notificationAction->level()));
+    onNotificationActionReceived(notificationAction, {});
 }
 
 void NotificationActionExecutor::removeNotification(
