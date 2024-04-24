@@ -836,7 +836,7 @@ APPLY(605, saveShowreel, nx::vms::api::ShowreelData, \
     false, /*< isRemoveOperation */ \
     CreateHashByIdHelper(), /*< getHash */ \
     ShowreelNotificationManagerHelper(), /*< trigger notification */ \
-    ShowreelAccess(), /*< save permission checker */ \
+    SaveShowreelAccess(), /*< save permission checker */ \
     ShowreelAccess(), /*< read permission checker */ \
     InvalidFilterFunc(), /*< filter read func */ \
     AccessOut<ShowreelAccess>(), \
@@ -1087,7 +1087,7 @@ APPLY(902, addStoredFile, nx::vms::api::StoredFileData, \
     false, /*< isRemoveOperation */ \
     &createHashForApiStoredFileDataHelper, \
     StoredFileNotificationManagerHelper(), \
-    AllowForAllAccess(), /*< save permission checker */ \
+    SaveStoredFileAccess(), /*< save permission checker */ \
     AllowForAllAccess(), /*< read permission checker */ \
     InvalidFilterFunc(), /*< filter read func */ \
     AllowForAllAccessOut(), /*< check remote peer rights for outgoing transaction */ \
@@ -1099,7 +1099,7 @@ APPLY(903, updateStoredFile, nx::vms::api::StoredFileData, \
     false, /*< isRemoveOperation */ \
     &createHashForApiStoredFileDataHelper, \
     StoredFileNotificationManagerHelper(), \
-    AllowForAllAccess(), /*< save permission checker */ \
+    SaveStoredFileAccess(), /*< save permission checker */ \
     AllowForAllAccess(), /*< read permission checker */ \
     InvalidFilterFunc(), /*< filter read func */ \
     AllowForAllAccessOut(), /*< check remote peer rights for outgoing transaction */ \
@@ -1621,7 +1621,7 @@ APPLY(10601, saveLookupList, nx::vms::api::LookupListData, \
     false, /*< isRemoveOperation */ \
     CreateHashByIdHelper(), /*< Id is enough to generate the hash. */ \
     LookupListNotificationManagerHelper(), \
-    PowerUserAccess(), /*< save permission checker */ \
+    SaveLookupListAccess(), /*< save permission checker */ \
     AllowForAllAccess(), /*< read permission checker */ \
     InvalidFilterFunc(), /*< filter read func */ \
     AllowForAllAccessOut(), /*< check remote peer rights for outgoing transaction */ \

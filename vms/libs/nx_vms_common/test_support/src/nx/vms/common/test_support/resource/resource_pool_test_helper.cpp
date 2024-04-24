@@ -56,6 +56,7 @@ QnLayoutResourcePtr QnResourcePoolTestHelper::createLayout()
 {
     QnLayoutResourcePtr layout(new QnLayoutResource());
     layout->setIdUnsafe(nx::Uuid::createUuid());
+    layout->setName(nx::Uuid::createUuid().toString());
     return layout;
 }
 
