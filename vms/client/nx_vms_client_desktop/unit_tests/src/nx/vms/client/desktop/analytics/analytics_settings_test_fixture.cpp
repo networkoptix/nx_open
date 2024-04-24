@@ -4,7 +4,6 @@
 
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/core/access/access_types.h>
 #include <nx/vms/api/analytics/device_agent_settings_response.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/common/system_context.h>

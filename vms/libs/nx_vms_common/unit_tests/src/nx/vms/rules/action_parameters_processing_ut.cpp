@@ -7,7 +7,6 @@
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/analytics/properties.h>
-#include <nx/core/access/access_types.h>
 #include <nx/core/resource/server_mock.h>
 #include <nx/vms/api/analytics/engine_manifest.h>
 #include <nx/vms/common/system_context.h>

@@ -4,7 +4,6 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/core/access/access_types.h>
 #include <nx/utils/impl_ptr.h>
 #include <nx/vms/common/system_context.h>
 
@@ -47,7 +46,7 @@ public:
 class NX_VMS_COMMON_TEST_SUPPORT_API Context
 {
 public:
-    Context(nx::core::access::Mode resourceAccessMode = nx::core::access::Mode::direct);
+    Context();
     virtual ~Context();
 
     QnCommonModule* commonModule() const;
@@ -59,10 +58,10 @@ private:
 };
 
 class NX_VMS_COMMON_TEST_SUPPORT_API ContextBasedTest:
-    public GenericContextBasedTest<Context, nx::core::access::Mode>
+    public GenericContextBasedTest<Context>
 {
 public:
-    ContextBasedTest(nx::core::access::Mode resourceAccessMode = nx::core::access::Mode::direct);
+    ContextBasedTest();
     virtual ~ContextBasedTest() override;
 
     MessageProcessorMock* createMessageProcessor();

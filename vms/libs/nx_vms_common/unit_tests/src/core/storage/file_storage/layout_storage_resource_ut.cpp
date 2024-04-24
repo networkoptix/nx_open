@@ -2,8 +2,6 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/core/access/access_types.h>
-
 #include <nx/utils/test_support/test_with_temporary_directory.h>
 #include <core/storage/file_storage/layout_storage_resource.h>
 

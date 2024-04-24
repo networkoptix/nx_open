@@ -73,12 +73,7 @@ struct SystemContext::Private
     std::unique_ptr<QnCameraNamesWatcher> cameraNamesWatcher;
 };
 
-SystemContext::SystemContext(
-    Mode mode,
-    nx::Uuid peerId,
-    nx::core::access::Mode resourceAccessMode,
-    QObject* parent)
-    :
+SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
     QObject(parent),
     d(new Private{
         .mode = mode,

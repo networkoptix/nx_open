@@ -11,7 +11,6 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource/resource_property_key.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/core/access/access_types.h>
 #include <nx/vms/client/desktop/resource_properties/camera/flux/camera_settings_dialog_state.h>
 #include <nx/vms/client/desktop/resource_properties/camera/flux/camera_settings_dialog_state_reducer.h>
 #include <nx/vms/client/desktop/resource_properties/camera/utils/camera_settings_dialog_state_conversion_functions.h>

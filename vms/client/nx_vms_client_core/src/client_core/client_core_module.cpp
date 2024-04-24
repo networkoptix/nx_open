@@ -7,7 +7,6 @@
 
 #include <api/common_message_processor.h>
 #include <core/dataprovider/data_provider_factory.h>
-#include <nx/core/access/access_types.h>
 #include <nx/utils/app_info.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/timer_manager.h>

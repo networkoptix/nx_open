@@ -106,13 +106,8 @@ struct SystemContext::Private
     }
 };
 
-SystemContext::SystemContext(
-    Mode mode,
-    nx::Uuid peerId,
-    nx::core::access::Mode resourceAccessMode,
-    QObject* parent)
-    :
-    base_type(mode, std::move(peerId), resourceAccessMode, parent),
+SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
+    base_type(mode, std::move(peerId), parent),
     d(new Private{.q = this})
 {
     resetAccessController(mode == Mode::client || mode == Mode::unitTests

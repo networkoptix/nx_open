@@ -3,7 +3,6 @@
 #include <gtest/gtest.h>
 
 #include <core/resource_management/resource_pool.h>
-#include <nx/core/access/access_types.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource_properties/layout/flux/layout_settings_dialog_state.h>

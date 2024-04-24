@@ -8,7 +8,6 @@
 #include <core/resource/resource_fwd.h>
 #include <core/resource_access/access_rights_resolver.h>
 #include <core/resource_access/resource_access_details.h>
-#include <nx/core/core_fwd.h>
 #include <nx/network/rest/user_access_data.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/common/system_context_aware.h>

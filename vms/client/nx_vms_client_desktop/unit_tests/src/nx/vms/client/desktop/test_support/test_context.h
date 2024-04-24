@@ -4,7 +4,6 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/core/access/access_types.h>
 #include <nx/utils/impl_ptr.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/test_support/test_context.h>

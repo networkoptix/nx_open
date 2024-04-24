@@ -85,8 +85,7 @@ struct CloudLayoutsManager::Private
     CloudStatus status = CloudStatus::Offline;
     std::unique_ptr<SystemContext> systemContext = std::make_unique<SystemContext>(
         SystemContext::Mode::cloudLayouts,
-        appContext()->peerId(),
-        nx::core::access::Mode::direct);
+        appContext()->peerId());
     const nx::utils::Url endpoint = actualLayoutsEndpoint();
     std::unique_ptr<NetworkManager> networkManager = std::make_unique<NetworkManager>();
     std::unique_ptr<QTimer> timer = std::make_unique<QTimer>();

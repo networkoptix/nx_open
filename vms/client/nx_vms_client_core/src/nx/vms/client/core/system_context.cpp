@@ -76,17 +76,8 @@ struct SystemContext::Private
     RemoteConnectionPtr connection;
 };
 
-SystemContext::SystemContext(
-    Mode mode,
-    nx::Uuid peerId,
-    nx::core::access::Mode resourceAccessMode,
-    QObject* parent)
-    :
-    base_type(
-        mode,
-        std::move(peerId),
-        resourceAccessMode,
-        parent),
+SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
+    base_type(mode, std::move(peerId), parent),
     d(new Private())
 {
     d->serverTimeWatcher = std::make_unique<ServerTimeWatcher>(this);

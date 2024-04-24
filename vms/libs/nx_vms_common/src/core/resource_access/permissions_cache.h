@@ -8,7 +8,6 @@
 #include <vector>
 
 #include <common/common_globals.h>
-#include <nx/core/core_fwd.h>
 #include <nx/utils/uuid.h>
 
 namespace nx::core::access {

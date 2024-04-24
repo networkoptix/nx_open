@@ -4,7 +4,6 @@
 
 #include <QtCore/QObject>
 
-#include <nx/core/access/access_types.h>
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/uuid.h>
 
@@ -79,16 +78,8 @@ public:
     /**
      * @param peerId Id of the current peer in the Message Bus. It is persistent and is not changed
      *     between the application runs. See ::peerId() for the details.
-     * @param resourceAccessMode Mode of the Resource permissions mechanism work. Direct mode is
-     *     used on the Server side, all calculations occur on the fly. Cached mode is used for the
-     *     current context on the Client side, where we need to actively listen for the changes and
-     *     emit signals. Cross-system contexts also use direct mode.
      */
-    SystemContext(
-        Mode mode,
-        nx::Uuid peerId,
-        nx::core::access::Mode resourceAccessMode,
-        QObject* parent = nullptr);
+    SystemContext(Mode mode, nx::Uuid peerId, QObject* parent = nullptr);
     virtual ~SystemContext();
 
     /**

@@ -15,7 +15,6 @@
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/core/access/access_types.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/qt_helpers.h>
 #include <nx/utils/std/algorithm.h>
