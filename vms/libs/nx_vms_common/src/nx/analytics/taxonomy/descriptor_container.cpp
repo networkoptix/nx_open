@@ -4,6 +4,7 @@
 
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx_ec/abstract_ec_connection.h>
 #include <nx/analytics/properties.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/vms/common/system_context.h>
@@ -31,6 +32,34 @@ DescriptorContainer::DescriptorContainer(
         });
 }
 
+/**
+ * As we don't have hasTypeEverBeenSupportedInThisScope field in 5.0 and below, now it is always
+ * false even if the Object type has ever been supported. To fix this behavior in connection to
+ * these old Systems, we update the Scope according to the value hasEverBeenSupported of the Object
+ * type.
+ */
+void DescriptorContainer::fixScopeCompatibility(nx::vms::api::analytics::Descriptors* descriptors)
+{
+    if (!NX_ASSERT(descriptors))
+        return;
+
+    // Do nothing if we are in the Server and its version >= 5.1.0, or if we are in a Client
+    // which is connected to a Server with version >= 5.1.0.
+    static const nx::utils::SoftwareVersion kEverBeenSupportedInScopeVersion(5, 1);
+    const auto connection = systemContext()->messageBusConnection();
+    if (!connection || connection->moduleInformation().version >= kEverBeenSupportedInScopeVersion)
+        return;
+
+    for (auto& [_, descriptor]: descriptors->objectTypeDescriptors)
+    {
+        if (!descriptor.hasEverBeenSupported)
+            continue;
+
+        for (auto& scope: descriptor.scopes)
+            scope.hasTypeEverBeenSupportedInThisScope = true;
+    }
+}
+
 Descriptors DescriptorContainer::descriptors(const QnUuid& serverId)
 {
     {
@@ -55,6 +84,8 @@ Descriptors DescriptorContainer::descriptors(const QnUuid& serverId)
 
         for (auto& [serverId, descriptors]: descriptorsByServer)
             result.merge(std::move(descriptors));
+
+        fixScopeCompatibility(&result);
 
         NX_MUTEX_LOCKER lock(&m_mutex);
         m_cachedDescriptors = result;
