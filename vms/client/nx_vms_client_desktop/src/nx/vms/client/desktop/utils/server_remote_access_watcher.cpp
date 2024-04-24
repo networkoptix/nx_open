@@ -10,11 +10,20 @@
 #include <nx/network/http/http_types.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/data/port_forwarding_configuration.h>
+#include <nx/vms/api/types/proxy_connection_access_policy.h>
+#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/network/certificate_verifier.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource/server.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/logic/remote_session.h>
+#include <nx/vms/common/system_settings.h>
+
+namespace {
+
+static const QString kProxyConnectionAccessPolicy = "proxyConnectionAccessPolicy";
+
+} // namespace
 
 namespace nx::vms::client::desktop {
 
@@ -37,22 +46,26 @@ ServerRemoteAccessWatcher::ServerRemoteAccessWatcher(
         this,
         &ServerRemoteAccessWatcher::onResourcesRemoved);
 
+    connect(systemSettings(),
+        &nx::vms::common::SystemSettings::ec2ConnectionSettingsChanged,
+        this,
+        [this](const QString& key)
+        {
+            if (key == kProxyConnectionAccessPolicy)
+                updateRemoteAccessForAllServers();
+        });
+
+    connect(accessController(),
+        &nx::vms::client::core::AccessController::globalPermissionsChanged,
+        this,
+        &ServerRemoteAccessWatcher::updateRemoteAccessForAllServers);
+
     if (auto session = this->systemContext()->session())
     {
         connect(session.get(),
             &nx::vms::client::desktop::RemoteSession::credentialsChanged,
             this,
-            [this, resourcePool]
-            {
-                for (auto& resource: resourcePool->servers())
-                {
-                    const auto server = resource.objectCast<ServerResource>();
-                    if (!NX_ASSERT(server))
-                        continue;
-
-                    updateRemoteAccess(server);
-                }
-            });
+            &ServerRemoteAccessWatcher::updateRemoteAccessForAllServers);
     }
 
     onResourcesAdded(resourcePool->servers());
@@ -92,7 +105,9 @@ void ServerRemoteAccessWatcher::onResourcesRemoved(const QnResourceList& resourc
             continue;
 
         const auto gateway = appContext()->cloudGateway();
-        gateway->forward(server->getPrimaryAddress(), {}, nx::network::ssl::kAcceptAnyCertificate);
+        gateway->forward(server->getPrimaryAddress(),
+            /*targetPorts*/ {},
+            nx::network::ssl::kAcceptAnyCertificate);
 
         server->disconnect(this);
     }
@@ -102,6 +117,14 @@ void ServerRemoteAccessWatcher::updateRemoteAccess(const ServerResourcePtr& serv
 {
     using namespace nx::network::http::header;
     const auto gateway = appContext()->cloudGateway();
+    if (!isRemoteAccessEnabledForCurrentUser())
+    {
+        gateway->forward(server->getPrimaryAddress(),
+            /*targetPorts*/ {},
+            nx::network::ssl::kAcceptAnyCertificate);
+        server->setForwardedPortConfigurations({});
+        return;
+    }
     auto configurations = server->portForwardingConfigurations();
     std::set<uint16_t> targetPorts;
     for (auto& configuration: configurations)
@@ -120,9 +143,46 @@ void ServerRemoteAccessWatcher::updateRemoteAccess(const ServerResourcePtr& serv
         configurations.begin(), configurations.end());
 
     for (auto& configuration: fowardedPortConfiguration)
-        configuration.forwardedPort = forwardedPorts[configuration.port];
+    {
+        if (auto itr = forwardedPorts.find(configuration.port); itr != forwardedPorts.end())
+            configuration.forwardedPort = itr->second;
+        else
+            NX_WARNING(this, "Failed to forward port %1", configuration.port);
+    }
 
     server->setForwardedPortConfigurations(fowardedPortConfiguration);
+}
+
+void ServerRemoteAccessWatcher::updateRemoteAccessForAllServers()
+{
+    for (auto& resource: resourcePool()->servers())
+    {
+        const auto server = resource.objectCast<ServerResource>();
+        if (!NX_ASSERT(server))
+            continue;
+
+        updateRemoteAccess(server);
+    }
+}
+
+bool ServerRemoteAccessWatcher::isRemoteAccessEnabledForCurrentUser()
+{
+    using namespace nx::vms::api;
+
+    switch (systemSettings()->proxyConnectionAccessPolicy())
+    {
+        case ProxyConnectionAccessPolicy::disabled:
+            return false;
+        case ProxyConnectionAccessPolicy::powerUsers:
+            return accessController()->hasPowerUserPermissions();
+        case ProxyConnectionAccessPolicy::admins:
+        {
+            return accessController()->globalPermissions().testFlag(
+                GlobalPermission::administrator);
+        }
+    }
+
+    return false;
 }
 
 } // namespace nx::vms::client::desktop

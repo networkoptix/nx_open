@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <optional>
 #include <vector>
 
 #include <nx/vms/api/data/port_forwarding_configuration.h>
@@ -13,7 +14,7 @@ namespace nx::vms::client::desktop {
 
 struct ForwardedPortConfiguration: public nx::vms::api::PortForwardingConfiguration
 {
-    int forwardedPort = 0;
+    uint16_t forwardedPort = 0;
 
     ForwardedPortConfiguration(const nx::vms::api::PortForwardingConfiguration& configuration):
         nx::vms::api::PortForwardingConfiguration(configuration)
@@ -39,6 +40,7 @@ public:
 signals:
     void compatibilityChanged(const QnResourcePtr& resource);
     void isDetachedChanged();
+    void forwardedPortConfigurationsChanged();
 
 private:
     bool m_isCompatible = true;

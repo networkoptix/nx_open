@@ -35,7 +35,11 @@ bool ServerResource::isDetached() const
 void ServerResource::setForwardedPortConfigurations(
     const std::vector<ForwardedPortConfiguration>& value)
 {
+    if (forwardedPortConfigurations == value)
+        return;
+
     forwardedPortConfigurations = value;
+    emit forwardedPortConfigurationsChanged();
 }
 
 std::vector<ForwardedPortConfiguration> ServerResource::getForwardedPortConfigurations() const

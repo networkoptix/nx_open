@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>705</width>
-    <height>511</height>
+    <width>706</width>
+    <height>587</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -40,7 +40,7 @@
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_5" stretch="0,0,0,0">
+     <layout class="QVBoxLayout" name="verticalLayout_5" stretch="0,0,0,0,0">
       <property name="spacing">
        <number>14</number>
       </property>
@@ -592,6 +592,117 @@
          </item>
          <item row="0" column="1">
           <widget class="nx::vms::client::desktop::AlertLabel" name="archiveEncryptionWarning" native="true"/>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="remoteAccessToolGroupBox">
+        <property name="title">
+         <string>Remote Access Tool</string>
+        </property>
+        <property name="flat">
+         <bool>true</bool>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="nx::vms::client::desktop::AlertLabel" name="additionalConfigurationLabel" native="true"/>
+         </item>
+         <item>
+          <widget class="QWidget" name="remoteAccessWidget" native="true">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>0</height>
+            </size>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_6" columnstretch="23,77">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <property name="horizontalSpacing">
+             <number>0</number>
+            </property>
+            <item row="0" column="1">
+             <widget class="QCheckBox" name="administratorsCheckBox">
+              <property name="text">
+               <string>Administrators</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0">
+             <widget class="QWidget" name="availableToWidget" native="true">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>0</height>
+               </size>
+              </property>
+              <layout class="QHBoxLayout" name="horizontalLayout_4">
+               <property name="spacing">
+                <number>0</number>
+               </property>
+               <property name="leftMargin">
+                <number>0</number>
+               </property>
+               <property name="topMargin">
+                <number>0</number>
+               </property>
+               <property name="rightMargin">
+                <number>16</number>
+               </property>
+               <property name="bottomMargin">
+                <number>0</number>
+               </property>
+               <item>
+                <widget class="QLabel" name="availableToLabel">
+                 <property name="text">
+                  <string>Available to</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QCheckBox" name="powerUsersCheckBox">
+              <property name="text">
+               <string>Power users</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
          </item>
         </layout>
        </widget>

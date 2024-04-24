@@ -7,6 +7,8 @@ import Nx
 import Nx.Controls
 import Nx.Core
 
+import nx.vms.client.desktop
+
 Item
 {
     id: control
@@ -100,14 +102,33 @@ Item
                     height: 36
                     spacing: 7
 
-                    Text
+                    Item
                     {
-                        id: title
-                        text: tile.name == "" ? qsTr("Unknown") : tile.name
-                        color: ColorTheme.colors.light4
-                        font.pixelSize: 24
-                        font.weight: Font.Medium
-                        font.capitalization: tile.name == "" ? Font.MixedCase : Font.AllUppercase
+                        id: tileHeader
+
+                        Layout.preferredHeight: title.height
+                        Layout.fillWidth: true
+
+                        Text
+                        {
+                            id: title
+                            text: tile.name ?? qsTr("Unknown")
+                            color: ColorTheme.colors.light4
+                            anchors.left: tileHeader.left
+                            font.pixelSize: 24
+                            font.weight: Font.Medium
+                            font.capitalization: tile.name ? Font.AllUppercase : Font.MixedCase
+                        }
+
+                        ContextHintButton
+                        {
+                            anchors.verticalCenter: title.verticalCenter
+                            anchors.right: tileHeader.right
+                            toolTipText: qsTr("Connect %1 application to localhost:%2 to use Cloud "
+                                + "Connect.").arg(title.text).arg(portLabel.text)
+
+                            helpTopic: HelpTopic.Empty //TODO: #esobolev add link (see VMS-51876)
+                        }
                     }
 
                     Rectangle
@@ -132,7 +153,7 @@ Item
 
                     Text
                     {
-                        text: qsTr("Port")
+                        text: qsTr("Local port")
                         font: grid.font
                         color: ColorTheme.colors.light16
 
@@ -140,14 +161,41 @@ Item
                         Layout.preferredHeight: grid.rowHeight
                     }
 
-                    CopyableLabel
+                    Item
                     {
-                        text: tile.port == "" ? "—" : tile.port
-                        font: grid.font
-                        color: ColorTheme.colors.light10
-                        width: grid.secondColumnWidth
-
                         Layout.preferredHeight: grid.rowHeight
+
+                        CopyableLabel
+                        {
+                            id: portLabel
+                            text: tile.port
+                            font: grid.font
+                            color: ColorTheme.colors.light10
+                            width: grid.secondColumnWidth
+                            visible: !!tile.port
+                        }
+
+                        Item
+                        {
+                            visible: !portLabel.visible
+
+                            ColoredImage
+                            {
+                                id: errorImage
+                                sourcePath: "image://skin/16x16/Solid/error.svg"
+                                primaryColor: ColorTheme.colors.red_l
+                            }
+
+                            Text
+                            {
+                                text: qsTr("An error occurred")
+                                color: ColorTheme.colors.red_l
+                                font.pixelSize: 14
+                                font.weight: Font.Medium
+                                anchors.left: errorImage.right
+                                anchors.leftMargin: 4
+                            }
+                        }
                     }
 
                     Text
