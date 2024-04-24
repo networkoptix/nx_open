@@ -25,7 +25,11 @@ namespace archive {
 class IPlugin: public Interface<IPlugin, nx::sdk::IPlugin>
 {
 public:
-    static auto interfaceId() { return makeId("nx::sdk::archive::IPlugin"); }
+    static auto interfaceId()
+    {
+        return makeIdWithAlternative("nx::sdk::archive::IPlugin",
+            /* Planned future renaming. */ "nx::sdk::archive::IIntegration");
+    }
 
     /** Provides an object for streaming/recording device management. */
     protected: virtual void doCreateDeviceManager(
