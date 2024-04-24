@@ -2535,7 +2535,8 @@ void QnWorkbenchDisplay::at_notificationAdded(const vms::event::AbstractActionPt
 }
 
 void QnWorkbenchDisplay::at_notificationAction(
-    const QSharedPointer<nx::vms::rules::NotificationActionBase>& action)
+    const QSharedPointer<nx::vms::rules::NotificationActionBase>& action,
+    const QString& cloudSystemId)
 {
     if (qnRuntime->lightMode().testFlag(Qn::LightModeNoNotifications))
         return;
@@ -2548,15 +2549,18 @@ void QnWorkbenchDisplay::at_notificationAction(
 
     QSet<QnResourcePtr> targetResources;
 
+    auto resourcePool = systemContext()->resourcePool();
+    if (!cloudSystemId.isEmpty())
+    {
+        auto systemContext = appContext()->systemContextByCloudSystemId(cloudSystemId);
+        if (NX_ASSERT(systemContext))
+            resourcePool = systemContext->resourcePool();
+    }
+
     if (!action->deviceIds().empty())
-    {
-        targetResources = nx::utils::toQSet(
-            resourcePool()->getResourcesByIds(action->deviceIds()));
-    }
+        targetResources = nx::utils::toQSet(resourcePool->getResourcesByIds(action->deviceIds()));
     else
-    {
-        targetResources.insert(resourcePool()->getResourceById(action->serverId()));
-    }
+        targetResources.insert(resourcePool->getResourceById(action->serverId()));
 
     targetResources.remove({});
 

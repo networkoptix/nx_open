@@ -367,7 +367,8 @@ protected slots:
 
     void at_notificationAdded(const nx::vms::event::AbstractActionPtr& businessAction);
     void at_notificationAction(
-        const QSharedPointer<nx::vms::rules::NotificationActionBase>& notificationAction);
+        const QSharedPointer<nx::vms::rules::NotificationActionBase>& notificationAction,
+        const QString& cloudSystemId);
     void showSplashOnResource(const QnResourcePtr& resource, QnNotificationLevel::Value level);
 
     bool canShowLayoutBackground() const;
