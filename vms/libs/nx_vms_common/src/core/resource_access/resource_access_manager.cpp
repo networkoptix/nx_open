@@ -19,7 +19,6 @@
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_access/resource_access_subject_hierarchy.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/core/access/access_types.h>
 #include <nx/streaming/abstract_archive_resource.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>

@@ -4,7 +4,6 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/core/access/access_types.h>
 #include <nx/utils/log/log.h>
 #include <common/common_globals.h>
 #include <common/common_module.h>
@@ -302,7 +301,7 @@ public:
     void test(const TestCase& testCase);
 
 private:
-    nx::vms::common::test::Context m_context{nx::core::access::Mode::direct};
+    nx::vms::common::test::Context m_context;
     QnSharedResourcePointer<MockServer> m_server{new MockServer()};
     QnSharedResourcePointer<MockCamera> m_camera{new MockCamera(m_server->getId())};
 };
