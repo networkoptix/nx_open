@@ -5,7 +5,6 @@
 #include <QtCore/QObject>
 
 #include <core/resource/resource_fwd.h>
-#include <nx/utils/impl_ptr.h>
 #include <nx/vms/client/core/system_context.h>
 
 #include "system_context_aware.h" //< Forward declarations.
@@ -105,7 +104,7 @@ public:
 protected:
     virtual void setMessageProcessor(QnCommonMessageProcessor* messageProcessor) override;
 
-private:
+protected:
     struct Private;
     nx::utils::ImplPtr<Private> d;
 };

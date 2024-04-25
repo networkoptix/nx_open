@@ -4,7 +4,6 @@
 
 #include <QtCore/QObject>
 
-#include <nx/utils/impl_ptr.h>
 #include <nx/vms/api/data/module_information.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/utils/abstract_session_token_helper.h>
@@ -143,7 +142,7 @@ protected:
     virtual void setMessageProcessor(QnCommonMessageProcessor* messageProcessor) override;
     void resetAccessController(AccessController* accessController);
 
-private:
+protected:
     struct Private;
     nx::utils::ImplPtr<Private> d;
 };
