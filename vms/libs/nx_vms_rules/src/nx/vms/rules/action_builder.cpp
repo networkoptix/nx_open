@@ -268,7 +268,9 @@ ActionBuilder::Actions filterActionPermissions(
 
 using namespace std::chrono;
 
-ActionBuilder::ActionBuilder(const nx::Uuid& id, const QString& actionType, const ActionConstructor& ctor):
+ActionBuilder::ActionBuilder(
+    nx::Uuid id, const QString& actionType, const ActionConstructor& ctor)
+    :
     m_id(id),
     m_actionType(actionType),
     m_constructor(ctor)
@@ -525,6 +527,8 @@ void ActionBuilder::buildAndEmitAction(const AggregatedEventPtr& aggregatedEvent
     if (!NX_ASSERT(logAction))
         return;
 
+    logAction->setId(nx::Uuid::createUuid());
+
     Actions actions;
     const auto manifest = engine()->actionDescriptor(actionType());
 
@@ -542,6 +546,9 @@ void ActionBuilder::buildAndEmitAction(const AggregatedEventPtr& aggregatedEvent
     std::erase(actions, ActionPtr());
     if (actions.empty())
         return;
+
+    for (auto& action: actions)
+        action->setId(logAction->id());
 
     // TODO: #amalov The flag is taken from the old engine algorithms.
     // Think of more clever solution to support "Use source" flag.

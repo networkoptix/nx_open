@@ -33,7 +33,6 @@ const ItemDescriptor& RepeatSoundAction::manifest()
             makeFieldDescriptor<VolumeField>(
                 "volume", tr("Volume"), {}, {}, {utils::kSoundFieldName}),
 
-            makeFieldDescriptor<EventIdField>("id", "Event ID"),
             utils::makeTextFormatterFieldDescriptor("caption", "{@EventCaption}"),
             utils::makeTextFormatterFieldDescriptor("description", "{@EventDescription}"),
             utils::makeTextFormatterFieldDescriptor("tooltip", "{@ExtendedEventDescription}"),

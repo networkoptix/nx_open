@@ -30,8 +30,8 @@ public:
     using ActionConstructor = std::function<BasicAction*()>;
     using Actions = std::vector<ActionPtr>;
 
-    ActionBuilder(const nx::Uuid& id, const QString& actionType, const ActionConstructor& ctor);
-    virtual ~ActionBuilder();
+    ActionBuilder(nx::Uuid id, const QString& actionType, const ActionConstructor& ctor);
+    virtual ~ActionBuilder() override;
 
     nx::Uuid id() const;
     QString actionType() const;

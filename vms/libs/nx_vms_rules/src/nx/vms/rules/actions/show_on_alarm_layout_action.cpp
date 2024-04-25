@@ -26,7 +26,6 @@ const ItemDescriptor& ShowOnAlarmLayoutAction::manifest()
                 "forceOpen", tr("Force Alarm Layout Opening"), {}, /*defaultValue*/ true),
             utils::makeIntervalFieldDescriptor("Interval of Action"),
 
-            makeFieldDescriptor<EventIdField>("id", "Event ID"),
             makeFieldDescriptor<EventDevicesField>("eventDeviceIds", "Event devices"),
             utils::makeTextFormatterFieldDescriptor("caption", tr("Alarm: %1").arg("{@EventCaption}")),
             utils::makeTextFormatterFieldDescriptor("description", "{@EventDescription}"),

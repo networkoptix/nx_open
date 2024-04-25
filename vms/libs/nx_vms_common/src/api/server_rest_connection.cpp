@@ -1317,7 +1317,7 @@ Handle ServerConnection::acknowledge(
     Result<ErrorOrData<nx::vms::api::BookmarkV3>>::type callback,
     QThread* targetThread)
 {
-    if (!NX_ASSERT(!bookmark.eventServerId.isNull()))
+    if (!NX_ASSERT(!bookmark.actionServerId.isNull()))
         return {};
 
     return executePost(
