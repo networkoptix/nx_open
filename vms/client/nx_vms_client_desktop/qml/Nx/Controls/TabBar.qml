@@ -183,7 +183,7 @@ TabBar
                         radius: 0
                         width: tabBar.scrollerWidth / 2 - 0.5
                         height: parent.height
-                        icon.source: "image://skin/tab_bar/arrow_left_24.svg"
+                        icon.source: "image://skin/16x16/Outline/arrow_left.svg"
                         icon.width: 24
                         icon.height: 24
                         enabled: tabBar.canScrollLeft
@@ -207,7 +207,7 @@ TabBar
                         radius: 0
                         width: tabBar.scrollerWidth / 2 - 0.5
                         height: parent.height
-                        icon.source: "image://skin/tab_bar/arrow_right_24.svg"
+                        icon.source: "image://skin/16x16/Outline/arrow_right.svg"
                         icon.width: 24
                         icon.height: 24
                         enabled: tabBar.canScrollRight
