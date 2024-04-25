@@ -10,17 +10,35 @@
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/style.h>
 
+namespace {
+
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kTabCloseTheme = {
+    {QnIcon::Normal, {.primary = "dark16"}},
+    {QnIcon::Active, {.primary = "light10"}},
+    {QnIcon::Pressed, {.primary = "dark13"}},
+};
+
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kTabCloseCheckedTheme = {
+    {QnIcon::Normal, {.primary = "light4"}},
+    {QnIcon::Active, {.primary = "light1"}},
+    {QnIcon::Pressed, {.primary = "light7"}},
+};
+
+NX_DECLARE_COLORIZED_ICON(kSystemTabBar,
+    "tab_bar/system_tab_close.svg",
+    kTabCloseTheme,
+    "tab_bar/system_tab_close_checked.svg",
+    kTabCloseCheckedTheme)
+
+};  // namespace
+
 namespace nx::vms::client::desktop {
 
 CloseTabButton::CloseTabButton(QWidget* parent): QAbstractButton(parent)
 {
     setProperty(nx::style::Properties::kIsCloseTabButton, true);
     setFocusPolicy(Qt::NoFocus);
-    QIcon icon = qnSkin->icon(
-        "tab_bar/system_tab_close.svg",
-        "tab_bar/system_tab_close_checked.svg",
-        nullptr,
-        Style::kTitleBarSubstitutions);
+    QIcon icon = qnSkin->icon(kSystemTabBar);
     setIcon(icon);
     setContentsMargins(0, 0, 10, 0);
     QSize size = core::Skin::maximumSize(icon);

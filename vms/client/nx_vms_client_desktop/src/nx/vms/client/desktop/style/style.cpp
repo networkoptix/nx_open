@@ -123,6 +123,21 @@ const QColor kLight1 = "#FFFFFF";
 const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutionsWhite = {
     {QIcon::Normal, {{kLight1, "light1"}}}};
 
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kLight1Theme = {
+    {QIcon::Normal, {.primary = "light1"}}};
+
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kTabCloseTheme = {
+    {QnIcon::Normal, {.primary = "dark15"}},
+    {QnIcon::Active, {.primary = "light10"}},
+    {QnIcon::Pressed, {.primary = "dark15"}},
+};
+
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kTabCloseCheckedTheme = {
+    {QnIcon::Normal, {.primary = "light4"}},
+    {QnIcon::Active, {.primary = "light1"}},
+    {QnIcon::Pressed, {.primary = "light7"}},
+};
+
 const QColor kLight10 = "#A5B7C0";
 const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutionsGray = {
     {QIcon::Normal, {{kLight10, "light10"}}}};
@@ -138,6 +153,12 @@ const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitution
 NX_DECLARE_COLORIZED_ICON(kArrowOpenIcon, "20x20/Solid/arrow_open.svg", core::kEmptySubstitutions)
 NX_DECLARE_COLORIZED_ICON(kArrowCloseIcon, "20x20/Solid/arrow_close.svg", \
     core::kEmptySubstitutions)
+NX_DECLARE_COLORIZED_ICON(kArrowLeftIcon, "16x16/Outline/arrow_left.svg", kLight1Theme)
+NX_DECLARE_COLORIZED_ICON(kArrowRightIcon, "16x16/Outline/arrow_right.svg", kLight1Theme)
+NX_DECLARE_COLORIZED_ICON(kTabCloseIcon,
+    "tab_bar/tab_close.svg", kTabCloseTheme,
+    "tab_bar/tab_close_checked.svg", kTabCloseCheckedTheme)
+
 
 void drawArrow(Direction direction,
     QPainter* painter,
@@ -1427,11 +1448,7 @@ void Style::drawPrimitive(PrimitiveElement element,
             if (tabBar && tabShape(tabBar) == TabShape::Rectangular)
             {
                 QIcon::State state = selected ? QIcon::On : QIcon::Off;
-                static const QIcon icon = qnSkin->icon(
-                    "tab_bar/tab_close.svg",
-                    "tab_bar/tab_close_checked.svg",
-                    nullptr,
-                    kTitleBarSubstitutions);
+                static const QIcon icon = qnSkin->icon(kTabCloseIcon);
                 QIcon::Mode mode = buttonIconMode(*option);
                 QSize size = qnSkin->maximumSize(icon, mode, state);
                 QRect placeholder = option->rect;
@@ -1489,10 +1506,10 @@ void Style::drawPrimitive(PrimitiveElement element,
                             switch (element)
                             {
                                 case PE_IndicatorArrowLeft:
-                                    icon = qnSkin->icon("tab_bar/arrow_left_24.svg");
+                                    icon = qnSkin->icon(kArrowLeftIcon);
                                     break;
                                 case PE_IndicatorArrowRight:
-                                    icon = qnSkin->icon("tab_bar/arrow_right_24.svg");
+                                    icon = qnSkin->icon(kArrowRightIcon);
                                     break;
                                 default:
                                     break;
