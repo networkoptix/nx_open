@@ -5,11 +5,12 @@
 
 #include <nx/kit/test.h>
 
-#define NX_DEBUG_ENABLE_OUTPUT false //< Change to enable verbose output for the test.
-#include <nx/kit/debug.h>
-
 #include <nx/sdk/interface.h>
 #include <nx/sdk/helpers/ref_countable.h>
+
+#undef NX_DEBUG_ENABLE_OUTPUT
+#define NX_DEBUG_ENABLE_OUTPUT false //< Change to enable verbose output for the test.
+#include <nx/kit/debug.h>
 
 namespace nx::sdk::ref_countable_ut {
 

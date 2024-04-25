@@ -5,11 +5,8 @@
 #include <thread>
 #include <algorithm>
 
-#define NX_PRINT_PREFIX (this->logUtils.printPrefix)
-#include <nx/kit/debug.h>
 #include <nx/kit/utils.h>
 #include <nx/kit/json.h>
-
 #include <nx/sdk/analytics/helpers/object_metadata.h>
 #include <nx/sdk/analytics/helpers/object_metadata_packet.h>
 #include <nx/sdk/analytics/helpers/object_track_best_shot_packet.h>
@@ -21,6 +18,10 @@
 #include "../utils.h"
 
 #include "stub_analytics_plugin_motion_metadata_ini.h"
+
+#undef NX_PRINT_PREFIX
+#define NX_PRINT_PREFIX (this->logUtils.printPrefix)
+#include <nx/kit/debug.h>
 
 namespace nx {
 namespace vms_server_plugins {

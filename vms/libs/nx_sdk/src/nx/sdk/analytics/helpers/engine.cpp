@@ -2,13 +2,8 @@
 
 #include "engine.h"
 
-#define NX_PRINT_PREFIX (this->logUtils.printPrefix)
-#define NX_DEBUG_ENABLE_OUTPUT (this->logUtils.enableOutput)
-#include <nx/kit/debug.h>
 #include <nx/kit/utils.h>
-
 #include <nx/sdk/analytics/i_plugin.h>
-
 #include <nx/sdk/helpers/uuid_helper.h>
 #include <nx/sdk/helpers/log_utils.h>
 #include <nx/sdk/ptr.h>
@@ -18,6 +13,12 @@
 #include <nx/sdk/helpers/settings_response.h>
 #include <nx/sdk/helpers/error.h>
 #include <nx/sdk/helpers/lib_context.h>
+
+#undef NX_PRINT_PREFIX
+#define NX_PRINT_PREFIX (this->logUtils.printPrefix)
+#undef NX_DEBUG_ENABLE_OUTPUT
+#define NX_DEBUG_ENABLE_OUTPUT (this->logUtils.enableOutput)
+#include <nx/kit/debug.h>
 
 namespace nx::sdk::analytics {
 

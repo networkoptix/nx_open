@@ -2,11 +2,13 @@
 
 #include "log_utils.h"
 
-#define NX_DEBUG_ENABLE_OUTPUT (this->enableOutput)
-#define NX_PRINT_PREFIX (this->printPrefix)
-#include <nx/kit/debug.h>
-
 #include <nx/sdk/i_string_map.h>
+
+#undef NX_PRINT_PREFIX
+#define NX_PRINT_PREFIX (this->printPrefix)
+#undef NX_DEBUG_ENABLE_OUTPUT
+#define NX_DEBUG_ENABLE_OUTPUT (this->enableOutput)
+#include <nx/kit/debug.h>
 
 namespace nx::sdk {
 

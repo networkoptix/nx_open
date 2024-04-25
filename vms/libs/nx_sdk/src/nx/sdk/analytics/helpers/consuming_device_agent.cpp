@@ -2,10 +2,6 @@
 
 #include "consuming_device_agent.h"
 
-#define NX_PRINT_PREFIX (this->logUtils.printPrefix)
-#define NX_DEBUG_ENABLE_OUTPUT (this->logUtils.enableOutput)
-#include <nx/kit/debug.h>
-
 #include <nx/sdk/helpers/log_utils.h>
 #include <nx/sdk/ptr.h>
 #include <nx/sdk/helpers/string.h>
@@ -19,6 +15,12 @@
 #include <nx/sdk/analytics/i_object_track_best_shot_packet.h>
 #include <nx/sdk/analytics/i_object_track_title_packet.h>
 #include <nx/sdk/analytics/i_plugin.h>
+
+#undef NX_PRINT_PREFIX
+#define NX_PRINT_PREFIX (this->logUtils.printPrefix)
+#undef NX_DEBUG_ENABLE_OUTPUT
+#define NX_DEBUG_ENABLE_OUTPUT (this->logUtils.enableOutput)
+#include <nx/kit/debug.h>
 
 namespace nx::sdk::analytics {
 
