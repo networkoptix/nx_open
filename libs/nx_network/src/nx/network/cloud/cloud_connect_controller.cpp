@@ -12,6 +12,7 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/thread/barrier_handler.h>
+#include <nx/utils/timer_manager.h>
 
 #include "cloud_connect_settings.h"
 #include "mediator_address_publisher.h"
@@ -28,12 +29,12 @@ namespace nx::network::cloud {
 struct CloudConnectControllerImpl
 {
     std::string cloudHost;
-    aio::AIOService* aioService;
-    AddressResolver* addressResolver;
+    CloudConnectSettings settings;
+    aio::AIOService* aioService = nullptr;
+    AddressResolver* addressResolver = nullptr;
     hpm::api::MediatorConnector mediatorConnector;
     MediatorAddressPublisher addressPublisher;
     OutgoingTunnelPool outgoingTunnelPool;
-    CloudConnectSettings settings;
 
     CloudConnectControllerImpl(
         const std::string& customCloudHost,
@@ -46,7 +47,8 @@ struct CloudConnectControllerImpl
         mediatorConnector(cloudHost),
         addressPublisher(
             mediatorConnector.systemConnection(),
-            &mediatorConnector)
+            &mediatorConnector),
+        outgoingTunnelPool(settings)
     {
     }
 
@@ -134,7 +136,10 @@ void CloudConnectController::printArgumentsHelp(std::ostream* outputStream)
         "  --cloud-connect-disable-udp      Disable UDP hole punching" << std::endl <<
         "  --cloud-connect-disable-direct-tcp" << std::endl <<
         "  --cloud-connect-enable-proxy-only" << std::endl <<
-        "  --cloud-connect-disable-proxy" << std::endl;
+        "  --cloud-connect-disable-proxy" << std::endl <<
+        "  --cloud-connect-timeout={val}    Timeout for establishing connection via cloud/"
+        "                                   NAT traversal. By default, 20s" << std::endl
+        ;
 }
 
 void CloudConnectController::loadSettings(const utils::ArgumentParser& arguments)
@@ -162,6 +167,9 @@ void CloudConnectController::loadSettings(const utils::ArgumentParser& arguments
         m_impl->settings.isDirectTcpConnectEnabled = false;
         m_impl->settings.isCloudProxyEnabled = true;
     }
+
+    if (const auto timeoutStr = arguments.get("cloud-connect-timeout"); timeoutStr)
+        m_impl->settings.cloudConnectTimeout = nx::utils::parseTimerDuration(*timeoutStr);
 }
 
 void CloudConnectController::applySettings()
