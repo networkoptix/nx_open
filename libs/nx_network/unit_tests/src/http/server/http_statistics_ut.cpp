@@ -58,12 +58,17 @@ protected:
 
     HttpStatistics buildStatistics(int requestPathIndex)
     {
+        // The following values are set to 1 so that when the SummingStatisticsProvider adds up the
+        // values (per provider), their sums should = providers.size() for convenience.
+
         HttpStatistics stats;
         stats.connectionCount = 1;
         stats.connectionsAcceptedPerMinute = 1;
         stats.requestsServedPerMinute = 1;
         stats.requestsAveragePerConnection = 1;
-        stats.notFound404 = 1;
+        stats.statuses[StatusCode::notFound] = 1;
+        stats.statuses[StatusCode::ok] = 1;
+        stats.statuses[StatusCode::internalServerError] = 1;
 
         auto& requestPathStats = stats.requests[m_requestPaths[requestPathIndex]];
         // Has a value from 1 to m_requestPaths.size()
@@ -126,7 +131,7 @@ protected:
         ASSERT_EQ(expected.connectionsAcceptedPerMinute, actual.connectionsAcceptedPerMinute);
         ASSERT_EQ(expected.requestsServedPerMinute, actual.requestsServedPerMinute);
         ASSERT_EQ(expected.requestsAveragePerConnection, actual.requestsAveragePerConnection);
-        ASSERT_EQ(expected.notFound404, actual.notFound404);
+        ASSERT_EQ(expected.statuses, actual.statuses);
 
         ASSERT_EQ(expected.requests.size(), actual.requests.size());
         for(const auto& [path, expectedStats]: expected.requests)
@@ -160,7 +165,9 @@ protected:
         all.averageRequestProcessingTimeUsec =
             m_averageRequestProcessingTimeSum / (int) providers.size();
         all.maxRequestProcessingTimeUsec = std::chrono::microseconds((int) providers.size());
-        all.notFound404 = (int) providers.size();
+        all.statuses[StatusCode::notFound] = (int) providers.size();
+        all.statuses[StatusCode::ok] = (int) providers.size();
+        all.statuses[StatusCode::internalServerError] = (int) providers.size();
 
         for (const auto& provider: providers)
         {
@@ -210,6 +217,13 @@ TEST_F(SummingStatisticsProvider, merges_request_path_statistics)
 class MultiEndpointServerHttpStatistics: public testing::Test
 {
 public:
+    struct RequestHandlerData
+    {
+        std::string requestPath;
+        StatusCode::Value responseCode = StatusCode::ok;
+        std::string_view method = http::Method::get;
+    };
+
     void SetUp()
     {
         http::server::Settings settings;
@@ -221,12 +235,24 @@ public:
     void givenGetRequestPaths(std::vector<std::string> requestPaths)
     {
         for (const auto& path: requestPaths)
-        {
-            m_httpDispatcher.registerRequestProcessorFunc(
-                http::Method::get,
-                path,
-                [](auto /* requestContext */, auto handler){ handler(http::StatusCode::ok); });
-        }
+            registerRequestHandler({.requestPath = path});
+    }
+
+    void givenRequestHandlers(std::vector<RequestHandlerData> requestHandlers)
+    {
+        for (const auto& handler : requestHandlers)
+            registerRequestHandler(handler);
+    }
+
+    void registerRequestHandler(const RequestHandlerData& data)
+    {
+        m_httpDispatcher.registerRequestProcessorFunc(
+            data.method,
+            data.requestPath,
+            [statusCode = data.responseCode](auto /* requestContext */, auto handler)
+            {
+                handler(statusCode);
+            });
     }
 
     void whenMakeGetRequestWithExistingClient(http::HttpClient* client, std::string path)
@@ -256,7 +282,7 @@ public:
             [&responses](auto message)
             {
                 ++responses;
-                ASSERT_EQ(StatusCode::ok, message.response->statusLine.statusCode);
+                ASSERT_NE(StatusCode::undefined, message.response->statusLine.statusCode);
             });
 
         socket->startReadingConnection();
@@ -390,6 +416,44 @@ TEST_F(MultiEndpointServerHttpStatistics, percentiles_present)
     ASSERT_NE(zero, stats.requestProcessingTimePercentilesUsec.at("50"));
     ASSERT_NE(zero, stats.requestProcessingTimePercentilesUsec.at("95"));
     ASSERT_NE(zero, stats.requestProcessingTimePercentilesUsec.at("99"));
+}
+
+TEST_F(MultiEndpointServerHttpStatistics, http_status_codes)
+{
+    std::vector<RequestHandlerData> requestHandlers = {
+        {"/200", StatusCode::ok},
+        {"/201", StatusCode::created},
+        {"/401", StatusCode::unauthorized},
+        {"/404", StatusCode::notFound},
+        {"/500", StatusCode::internalServerError},
+        {"/502", StatusCode::badGateway}};
+
+    givenRequestHandlers(requestHandlers);
+
+    std::vector<std::unique_ptr<AsyncMessagePipeline>> clients;
+    for (std::size_t i = 0; i < requestHandlers.size(); ++i)
+    {
+        auto& socket = clients.emplace_back(makeHttpClientSocket());
+        doGetRequestsOnOneSocket(socket.get(), requestHandlers[i].requestPath, i + 1);
+
+        // testing dispatch failure. It is also considered to be 404
+        if (requestHandlers[i].requestPath == "/404")
+            doGetRequestsOnOneSocket(socket.get(), "/404-unregistered", 1);
+    }
+
+    auto stats = whenRequestHttpStatistics();
+
+    for (std::size_t i = 0; i < requestHandlers.size(); ++i)
+    {
+        int expectedCount = (int) i + 1;
+        if (requestHandlers[i].requestPath == "/404")
+            ++expectedCount;
+
+        ASSERT_EQ(expectedCount, stats.statuses.at(requestHandlers[i].responseCode));
+    }
+
+    for (auto& client: clients)
+        client->pleaseStopSync();
 }
 
 } // namespace nx::network::http::server::test

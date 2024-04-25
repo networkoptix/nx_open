@@ -6,6 +6,7 @@
 
 namespace nx::network::http::server {
 
+
 //-------------------------------------------------------------------------------------------------
 // RequestStatisticsCalculator
 
@@ -84,11 +85,20 @@ HttpStatistics SummingStatisticsProvider::httpStatistics() const
     {
         HttpStatistics httpStats = provider->httpStatistics();
         accumulatedStats.add(httpStats);
+
         requestAverageProcessingTimeSum += httpStats.averageRequestProcessingTimeUsec;
+
         accumulatedStats.maxRequestProcessingTimeUsec = std::max(
             accumulatedStats.maxRequestProcessingTimeUsec,
             httpStats.maxRequestProcessingTimeUsec);
-        accumulatedStats.notFound404 += httpStats.notFound404;
+
+        for (const auto& [statusCode, count] : httpStats.statuses)
+        {
+            if (!accumulatedStats.statuses.contains(statusCode))
+                accumulatedStats.statuses[statusCode] = 0;
+            accumulatedStats.statuses[statusCode] += count;
+        }
+
         accumulatedStats.requestsServedPerMinute += httpStats.requestsServedPerMinute;
 
         for (const auto& [key, value]: httpStats.requestProcessingTimePercentilesUsec)
@@ -103,6 +113,7 @@ HttpStatistics SummingStatisticsProvider::httpStatistics() const
             accumulatedPathStats.maxRequestProcessingTimeUsec = std::max(
                 accumulatedPathStats.maxRequestProcessingTimeUsec,
                 stats.maxRequestProcessingTimeUsec);
+
             accumulatedPathStats.requestsServedPerMinute += stats.requestsServedPerMinute;
 
             auto& averageContext = pathToAverageContext[path];

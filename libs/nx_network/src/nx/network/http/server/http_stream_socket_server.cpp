@@ -37,7 +37,7 @@ server::HttpStatistics HttpStreamSocketServer::httpStatistics() const
     {
         if (auto dispatcher = dynamic_cast<AbstractMessageDispatcher*>(handler); dispatcher)
         {
-            httpStats.notFound404 = dispatcher->dispatchFailures();
+            httpStats.statuses = dispatcher->statusCodesReported();
             httpStats.requests = dispatcher->requestPathStatistics();
             break;
         }

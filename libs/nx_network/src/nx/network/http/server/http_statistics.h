@@ -34,7 +34,7 @@ struct NX_NETWORK_API HttpStatistics:
 {
     // Inherited fields are aggregate statistics
 
-    int notFound404 = 0;
+    std::map<int /*HTTP status code*/, int /*count*/> statuses;
     std::map<std::string /*requestPathTemplate*/, RequestStatistics> requests;
 
     using network::server::Statistics::operator=;
@@ -44,7 +44,7 @@ struct NX_NETWORK_API HttpStatistics:
 #define HttpStatistics_server_Fields\
     Statistics_server_Fields\
     RequestStatistics_server_Fields\
-    (notFound404)(requests)
+    (statuses)(requests)
 
 NX_REFLECTION_INSTRUMENT(HttpStatistics, HttpStatistics_server_Fields)
 
