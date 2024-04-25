@@ -153,7 +153,7 @@
     </message>
     <message>
       <source>No objects</source>
-      <translation>オブジェクトなし</translation>
+      <translation>オブジェクトはありません</translation>
     </message>
     <message>
       <source>Try changing the filters or configure object detection in the camera plugin settings</source>
@@ -194,7 +194,7 @@
     </message>
     <message>
       <source>No objects</source>
-      <translation>オブジェクトなし</translation>
+      <translation>オブジェクトはありません</translation>
     </message>
     <message>
       <source>Try changing the filters or configure object detection in the camera plugin settings</source>
@@ -649,7 +649,7 @@
     </message>
     <message>
       <source>No events</source>
-      <translation>イベントなし</translation>
+      <translation>イベントはありません</translation>
     </message>
     <message>
       <source>Try changing the filters or create an Event Rule</source>
@@ -736,7 +736,7 @@
     </message>
     <message>
       <source>Image might be too dim</source>
-      <translation>画像が暗すぎます</translation>
+      <translation>画像が暗すぎる可能性があります</translation>
     </message>
     <message>
       <source>Invalid input image</source>
@@ -1860,7 +1860,7 @@ Alt + クリックを使用してください。</translation>
     <name>ResourceBrowser</name>
     <message>
       <source>No local files</source>
-      <translation>ローカルファイルなし</translation>
+      <translation>ローカルファイルがありません</translation>
     </message>
     <message>
       <source>Nothing found</source>

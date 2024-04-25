@@ -151,11 +151,11 @@
     <name>nx::vms::rules::CameraInputEvent</name>
     <message>
       <source>Input Port: %1</source>
-      <translation>入力ポート %1</translation>
+      <translation>I/O入力ポート: %1</translation>
     </message>
     <message>
       <source>Input on %1</source>
-      <translation>入力ON %1</translation>
+      <translation>%1 I/O入力</translation>
     </message>
     <message>
       <source>State</source>
@@ -376,7 +376,7 @@
     <name>nx::vms::rules::GenericEvent</name>
     <message>
       <source>Generic Event</source>
-      <translation>一般的イベント</translation>
+      <translation>汎用イベント</translation>
     </message>
     <message>
       <source>Generic Event at %1</source>
@@ -476,7 +476,7 @@
     <name>nx::vms::rules::MotionEvent</name>
     <message>
       <source>Motion on %1</source>
-      <translation>動体検知ON %1</translation>
+      <translation>%1 モーション検知</translation>
     </message>
     <message>
       <source>Motion on Camera</source>
@@ -495,7 +495,7 @@
     <name>nx::vms::rules::NetworkIssueEvent</name>
     <message>
       <source>Network Issue at %1</source>
-      <translation>ネットワーク問題発生 %1</translation>
+      <translation>%1 ネットワーク障害</translation>
     </message>
     <message>
       <source>Network Issue</source>
@@ -1110,7 +1110,7 @@
       <source>First occurrence: %1 on %2 (%n times total)</source>
       <comment>%1 means time, %2 means date</comment>
       <translation>
-        <numerusform>最初の発生: %2 %1 (合計%n 回)</numerusform>
+        <numerusform>最初の発生: %2 %1 (合計 %n 回)</numerusform>
       </translation>
     </message>
     <message>

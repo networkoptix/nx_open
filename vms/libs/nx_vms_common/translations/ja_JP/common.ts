@@ -1393,11 +1393,11 @@
     </message>
     <message>
       <source>Last master System merge ID</source>
-      <translation>最後のマスターシステム統合ID</translation>
+      <translation>最終マスターシステム統合ID</translation>
     </message>
     <message>
       <source>Last slave System merge ID</source>
-      <translation>最後のスレーブシステム統合ID</translation>
+      <translation>最終スレーブシステム統合ID</translation>
     </message>
     <message>
       <source>Disable Device vendors</source>
@@ -1730,7 +1730,7 @@
     </message>
     <message>
       <source>Local System ID, null means the System is not set up yet.</source>
-      <translation>ローカルシステム ID。null の場合、システムがまだセットアップされていないことを意味します。</translation>
+      <translation>ローカルシステムID。null の場合、システムがまだセットアップされていないことを意味します。</translation>
     </message>
     <message>
       <source>HTTP header: Server, supported variables: $vmsName, $vmsVersion, $company, $compatibility</source>
