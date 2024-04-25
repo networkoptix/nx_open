@@ -1258,6 +1258,7 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         << d->mediaBufferSizeKbAdaptor
         << d->mediaBufferSizeKbForAudioOnlyDeviceAdaptor
         << d->forceAnalyticsDbStoragePermissionsAdaptor
+        << d->checkVideoStreamPeriodMsAdaptor
         << d->useStorageEncryptionAdaptor
         << d->currentStorageEncryptionKeyAdaptor
         << d->showServersInTreeForNonAdminsAdaptor
