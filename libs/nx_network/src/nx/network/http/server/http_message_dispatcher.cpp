@@ -71,10 +71,15 @@ bool AbstractMessageDispatcher::waitUntilAllRequestsCompleted(
     }
 }
 
-int AbstractMessageDispatcher::dispatchFailures() const
+std::map<int, int> AbstractMessageDispatcher::statusCodesReported() const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
-    return m_dispatchFailures.getSumPerLastPeriod();
+
+    std::map<int, int> result;
+    for (const auto& [httpStatusCode, counter]: m_statusCodesPerMinute)
+        result.emplace(httpStatusCode, counter.getSumPerLastPeriod());
+
+    return result;
 }
 
 std::map<std::string, server::RequestStatistics>
@@ -98,19 +103,23 @@ void AbstractMessageDispatcher::setLinger(
     m_linger = timeout;
 }
 
-void AbstractMessageDispatcher::incrementDispatchFailures() const
+void AbstractMessageDispatcher::recordDispatchFailure() const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
-    const_cast<AbstractMessageDispatcher*>(this)->m_dispatchFailures.add(1);
+    m_statusCodesPerMinute[StatusCode::notFound].add(1);
 }
 
-void AbstractMessageDispatcher::finishUpdatingRequestPathStatistics(
+void AbstractMessageDispatcher::recordStatistics(
+    const RequestResult& result,
     const std::string& requestPathTemplate,
     std::chrono::microseconds processingTime) const
 {
     m_requestPathStatsCalculators.modify(
         requestPathTemplate,
         [processingTime](auto& val) { val.processedRequest(processingTime); });
+
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    m_statusCodesPerMinute[result.statusCode].add(1);
 }
 
 } // namespace nx::network::http

@@ -113,7 +113,7 @@ public:
             requestContext.request.requestLine.url.path().toStdString());
         if (!handlerContext)
         {
-            incrementDispatchFailures();
+            recordDispatchFailure();
             return false;
         }
 
@@ -138,7 +138,8 @@ public:
                     RequestResult result) mutable
             {
                 using namespace std::chrono;
-                finishUpdatingRequestPathStatistics(
+                recordStatistics(
+                    result,
                     statisticsKey,
                     duration_cast<microseconds>(steady_clock::now() - requestProcessStartTime));
 
@@ -158,7 +159,10 @@ public:
     bool waitUntilAllRequestsCompleted(
         std::optional<std::chrono::milliseconds> timeout = std::nullopt);
 
-    int dispatchFailures() const;
+    /**
+     * Get the frequency per minute with which each HTTP Status code is occuring.
+     */
+    std::map<int /*http status*/, int /*count*/> statusCodesReported() const;
 
     // NOTE: RequestPathStatistics values that have requestsServedPerMinute == 0 are not
     // included to avoid empty values in statistics reports.
@@ -191,9 +195,9 @@ protected:
         const std::string& path) const = 0;
 
 private:
-    void incrementDispatchFailures() const;
-
-    void finishUpdatingRequestPathStatistics(
+    void recordDispatchFailure() const;
+    void recordStatistics(
+        const RequestResult& result,
         const std::string& requestPathTemplate,
         std::chrono::microseconds processingTime) const;
 
@@ -205,7 +209,7 @@ private:
     std::shared_ptr<nx::utils::Counter> m_runningRequestCounter;
 
     mutable nx::Mutex m_mutex;
-    nx::utils::math::SumPerMinute<int> m_dispatchFailures;
+    mutable std::map <StatusCode::Value, nx::utils::math::SumPerMinute<int>> m_statusCodesPerMinute;
 
     mutable nx::utils::PartitionedConcurrentHashMap<
         std::string, server::RequestStatisticsCalculator

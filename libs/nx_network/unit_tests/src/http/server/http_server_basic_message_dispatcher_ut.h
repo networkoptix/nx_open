@@ -133,6 +133,12 @@ protected:
                 [](auto&&...) {}));
     }
 
+    void assertDispatchFailureIsRecorded(int count)
+    {
+        const auto statusCodes = m_messageDispatcher->statusCodesReported();
+        ASSERT_EQ(count, statusCodes.at(StatusCode::notFound));
+    }
+
     void assertDefaultHandlerFound(
         const std::string& path,
         const Method& method = nx::network::http::Method::get)
@@ -222,6 +228,17 @@ TYPED_TEST_P(HttpServerBasicMessageDispatcher, handler_not_found)
     this->assertHandlerNotFound("");
 }
 
+TYPED_TEST_P(HttpServerBasicMessageDispatcher, records_dispatch_failures)
+{
+    this->assertHandlerNotFound("/accounts/accountId/systems");
+    this->assertHandlerNotFound("/users/");
+    this->assertHandlerNotFound("/accounts");
+    this->assertHandlerNotFound("/");
+    this->assertHandlerNotFound("");
+
+    this->assertDispatchFailureIsRecorded(5);
+}
+
 TYPED_TEST_P(HttpServerBasicMessageDispatcher, default_handler_is_used)
 {
     this->registerDefaultHandler();
@@ -263,7 +280,7 @@ TYPED_TEST_P(HttpServerBasicMessageDispatcher, waits_for_handler_completion_befo
 GTEST_ALLOW_UNINSTANTIATED_PARAMETERIZED_TEST(HttpServerBasicMessageDispatcher);
 REGISTER_TYPED_TEST_SUITE_P(HttpServerBasicMessageDispatcher,
     handler_found_by_exatch_match,
-    handler_not_found, default_handler_is_used,
+    handler_not_found, records_dispatch_failures, default_handler_is_used,
     default_handler_has_lowest_priority,
     register_handler_for_specific_method,
     waits_for_handler_completion_before_destruction);
