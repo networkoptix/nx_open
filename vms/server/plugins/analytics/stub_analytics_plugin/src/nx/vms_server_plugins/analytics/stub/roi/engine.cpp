@@ -2,12 +2,13 @@
 
 #include "engine.h"
 
-#define NX_PRINT_PREFIX (this->logUtils.printPrefix)
-#include <nx/kit/debug.h>
-
 #include "device_agent.h"
 #include "device_agent_settings_model.h"
 #include "stub_analytics_plugin_roi_ini.h"
+
+#undef NX_PRINT_PREFIX
+#define NX_PRINT_PREFIX (this->logUtils.printPrefix)
+#include <nx/kit/debug.h>
 
 namespace nx {
 namespace vms_server_plugins {

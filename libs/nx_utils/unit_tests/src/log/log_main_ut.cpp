@@ -1,19 +1,20 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include <gtest/gtest.h>
-
 #include <thread>
 
 #include <QtCore/QRegularExpression>
 #include <QtCore/QSize>
 
-#define NX_DEBUG_ENABLE_OUTPUT false //< Set to true to enable verbose output of this test.
+#include <gtest/gtest.h>
 
-#include <nx/kit/debug.h>
 #include <nx/utils/log/log_initializer.h>
 #include <nx/utils/log/log_main.h>
 #include <nx/utils/log/log_settings.h>
 #include <nx/utils/test_support/test_options.h>
+
+#undef NX_DEBUG_ENABLE_OUTPUT
+#define NX_DEBUG_ENABLE_OUTPUT false //< Set to true to enable verbose output of this test.
+#include <nx/kit/debug.h>
 
 namespace nx::log::test {
 

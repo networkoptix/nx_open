@@ -2,6 +2,7 @@
 
 #include "lib_context.h"
 
+#undef NX_PRINT_PREFIX
 #define NX_PRINT_PREFIX "[nx::sdk::LibContext] "
 #include <nx/kit/debug.h>
 

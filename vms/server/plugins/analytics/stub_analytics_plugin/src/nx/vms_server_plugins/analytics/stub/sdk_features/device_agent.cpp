@@ -10,12 +10,14 @@
 #include <thread>
 #include <type_traits>
 
-#define NX_PRINT_PREFIX (this->logUtils.printPrefix)
-#include <nx/kit/debug.h>
 #include <nx/kit/utils.h>
 #include <nx/kit/json.h>
 
 #include "stub_analytics_plugin_sdk_features_ini.h"
+
+#undef NX_PRINT_PREFIX
+#define NX_PRINT_PREFIX (this->logUtils.printPrefix)
+#include <nx/kit/debug.h>
 
 namespace nx {
 namespace vms_server_plugins {
