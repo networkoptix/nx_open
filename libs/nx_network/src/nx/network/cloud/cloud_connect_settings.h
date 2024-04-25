@@ -12,15 +12,14 @@ namespace nx::network::cloud {
 class NX_NETWORK_API CloudConnectSettings
 {
 public:
-    static constexpr std::chrono::milliseconds kDefaltDelayBeforeSendingConnectToMediatorOverTcp
-        = std::chrono::seconds(3);
-
     std::string forcedMediatorUrl;
     bool isUdpHpEnabled = true;
     bool isCloudProxyEnabled = true;
     bool isDirectTcpConnectEnabled = true;
-    std::chrono::milliseconds delayBeforeSendingConnectToMediatorOverTcp =
-        kDefaltDelayBeforeSendingConnectToMediatorOverTcp;
+    std::chrono::milliseconds delayBeforeSendingConnectToMediatorOverTcp = std::chrono::seconds(3);
+
+    // The timeout for establishing a connection via cloud/NAT traversal .
+    std::chrono::milliseconds cloudConnectTimeout = std::chrono::seconds(20);
 
     CloudConnectSettings() = default;
     CloudConnectSettings(const CloudConnectSettings&);

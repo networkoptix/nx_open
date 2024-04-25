@@ -54,16 +54,19 @@ void ConnectionMediationInitiator::start(
     {
         NX_VERBOSE(this, "%1. UDP hole punching was disabled. Querying mediator via HTTP",
             m_connectSessionId);
-        return initiateConnectOverTcp();
+        return initiateConnectOverHttp();
     }
 
     initiateConnectOverUdp();
 
-    // TODO: #akolesnikov If UDP request has failed before timed, invoke initiateConnectOverTcp ASAP.
+    // TODO: #akolesnikov If UDP request has failed before timeout, invoke initiateConnectOverHttp ASAP.
+
+    NX_VERBOSE(this, "%1. Scheduling HTTP request to mediator after %2 timeout",
+        m_connectSessionId, m_settings.delayBeforeSendingConnectToMediatorOverTcp);
 
     m_tcpConnectDelayTimer.start(
         m_settings.delayBeforeSendingConnectToMediatorOverTcp,
-        [this]() mutable { initiateConnectOverTcp(); });
+        [this]() mutable { initiateConnectOverHttp(); });
 }
 
 std::unique_ptr<AbstractDatagramSocket> ConnectionMediationInitiator::takeUdpSocket()
@@ -96,8 +99,10 @@ void ConnectionMediationInitiator::initiateConnectOverUdp()
         [this](auto&&... args) { handleResponseOverUdp(std::move(args)...); });
 }
 
-void ConnectionMediationInitiator::initiateConnectOverTcp()
+void ConnectionMediationInitiator::initiateConnectOverHttp()
 {
+    NX_VERBOSE(this, "%1. Querying mediator over HTTP", m_connectSessionId);
+
     m_mediatorApiClient = std::make_unique<nx::hpm::api::Client>(
         m_mediatorAddress.tcpUrl, ssl::kDefaultCertificateCheck);
     m_mediatorApiClient->bindToAioThread(getAioThread());
@@ -108,9 +113,19 @@ void ConnectionMediationInitiator::initiateConnectOverTcp()
         m_request,
         [this](auto&&... args)
         {
-            m_tcpRequestCompleted = true;
-            handleResponse(std::move(args)...);
+            handleResponseOverHttp(std::move(args)...);
         });
+}
+
+void ConnectionMediationInitiator::handleResponseOverHttp(
+    nx::hpm::api::ResultCode resultCode,
+    nx::hpm::api::ConnectResponse response)
+{
+    NX_VERBOSE(this, "%1. Received HTTP response %2", m_connectSessionId, resultCode);
+
+    m_httpRequestCompleted = true;
+
+    handleResponse(resultCode, std::move(response));
 }
 
 void ConnectionMediationInitiator::handleResponseOverUdp(
@@ -121,13 +136,13 @@ void ConnectionMediationInitiator::handleResponseOverUdp(
     NX_VERBOSE(this, "%1. Received UDP response %2", m_connectSessionId, resultCode);
 
     if (resultCode == hpm::api::ResultCode::networkError &&
-        !m_tcpRequestCompleted)
+        !m_httpRequestCompleted)
     {
         if (!m_mediatorApiClient) //< TCP request has not been started yet.
         {
             // Cancelling delay and sending request right away.
             m_tcpConnectDelayTimer.pleaseStopSync();
-            initiateConnectOverTcp();
+            initiateConnectOverHttp();
         }
         return;
     }
@@ -142,7 +157,7 @@ void ConnectionMediationInitiator::handleResponse(
     nx::hpm::api::ResultCode resultCode,
     nx::hpm::api::ConnectResponse response)
 {
-    NX_VERBOSE(this, "%1. Received HTTP response %2", m_connectSessionId, resultCode);
+    NX_VERBOSE(this, "%1. Received mediator response %2", m_connectSessionId, resultCode);
 
     m_mediatorUdpClient.reset();
     m_tcpConnectDelayTimer.pleaseStopSync();

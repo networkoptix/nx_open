@@ -18,13 +18,15 @@
 
 namespace nx::network::cloud {
 
+class CloudConnectSettings;
+
 class NX_NETWORK_API OutgoingTunnelPool:
     public QnStoppableAsync
 {
 public:
     using OnTunnelClosedSubscription = nx::utils::Subscription<std::string>;
 
-    OutgoingTunnelPool();
+    OutgoingTunnelPool(const CloudConnectSettings& settings);
     virtual ~OutgoingTunnelPool();
 
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
@@ -78,12 +80,13 @@ private:
 
     typedef std::map<std::string, std::unique_ptr<TunnelContext>> TunnelDictionary;
 
+    const CloudConnectSettings& m_settings;
     mutable nx::Mutex m_mutex;
-    mutable bool m_isOwnPeerIdAssigned;
+    mutable bool m_isOwnPeerIdAssigned = false;
     std::string m_ownPeerId;
     TunnelDictionary m_pool;
-    bool m_terminated;
-    bool m_stopping;
+    bool m_terminated = false;
+    bool m_stopping = false;
     aio::Timer m_aioThreadBinder;
     OnTunnelClosedSubscription m_onTunnelClosedSubscription;
     nx::utils::Counter m_counter;
