@@ -27,6 +27,8 @@ static constexpr char kConnectionSpeedUplinkPath[] = "/connection_speed/uplink";
 static constexpr char kConnectionSpeedUplinkPathV2[] =
     "/system/{systemId}/server/{serverId}/connection-speed/uplink";
 
+static constexpr char kSystemResetPath[] = "maintenance/system/{systemId}/reset";
+
 static constexpr char kApiDocPrefix[] = "/mediator/docs/api";
 
 static constexpr char kRelaysPath[] = "/maintenance/relays";

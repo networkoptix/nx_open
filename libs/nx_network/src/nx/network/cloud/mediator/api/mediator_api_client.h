@@ -69,6 +69,12 @@ public:
         const PeerConnectionSpeed& connectionSpeed,
         nx::utils::MoveOnlyFunc<void(ResultCode)> completionHandler);
 
+    void resetConnections(
+        const std::string_view& systemId,
+        nx::utils::MoveOnlyFunc<void(ResultCode, std::vector<std::string>)> completionHandler);
+
+    std::tuple<api::ResultCode, std::vector<std::string>> resetConnections(const std::string_view& systemId);
+
     void getStatistics(nx::utils::MoveOnlyFunc<void(ResultCode, Statistics)> completionHandler);
 
     std::tuple<ResultCode, Statistics> getStatistics();
