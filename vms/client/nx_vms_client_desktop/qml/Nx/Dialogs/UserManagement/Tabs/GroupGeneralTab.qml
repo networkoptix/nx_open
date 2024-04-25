@@ -203,6 +203,8 @@ Item
         {
             spacing: 2
 
+            Layout.fillHeight: false
+
             DialogBanner
             {
                 id: bannerGroupNotFound
