@@ -83,10 +83,10 @@ const Path::Token& Path::currentToken() const
 
 } // namespace details
 
-Processor::Processor(const nx::Buffer& data)
+Processor::Processor(ConstBufferRefType data)
 {
     m_data = std::make_shared<::rapidjson::Document>();
-    m_data->Parse(data.toByteArray());
+    m_data->Parse(data.data(), data.size());
     m_curr = &(*m_data);
 }
 
@@ -103,7 +103,7 @@ bool Processor::isValid() const
     return !m_data->HasParseError();
 }
 
-::rapidjson::ParseErrorCode Processor::getParseError()
+::rapidjson::ParseErrorCode Processor::getParseError() const
 {
     return m_data->GetParseError();
 }
@@ -159,7 +159,7 @@ ContainedIn::ContainedIn(
 
 bool ContainedIn::operator()(const ArrayIterator& root) const
 {
-    ::rapidjson::Pointer pointer(m_name.c_str());
+    ::rapidjson::Pointer pointer(m_name);
     if (!pointer.IsValid())
         return false;
     ::rapidjson::Value* jsonOut = pointer.Get(*root);

@@ -643,7 +643,7 @@ public:
 class NX_UTILS_API NameContains
 {
 public:
-    NameContains(const std::string& namePart): m_namePart(namePart) {}
+    explicit NameContains(const std::string& namePart): m_namePart(namePart) {}
 
     bool operator()(const ObjectIterator& root) const;
 
@@ -654,7 +654,7 @@ private:
 class NX_UTILS_API HasMember
 {
 public:
-    HasMember(const std::string& name): m_name(name) {}
+    explicit HasMember(const std::string& name): m_name(name) {}
 
     bool operator()(const ArrayIterator& root) const
     {
@@ -668,7 +668,7 @@ private:
 class NX_UTILS_API Compare
 {
 public:
-    Compare(const std::string& name, const QString& val);
+    explicit Compare(const std::string& name, const QString& val);
 
     bool operator()(const ArrayIterator& root) const;
 
@@ -680,7 +680,7 @@ private:
 class NX_UTILS_API ContainedIn
 {
 public:
-    ContainedIn(const std::string& name, const QStringList& values);
+    explicit ContainedIn(const std::string& name, const QStringList& values);
 
     bool operator()(const ArrayIterator& root) const;
 
@@ -701,7 +701,7 @@ concept ActionType = requires(T t, const ::rapidjson::Pointer& path, ::rapidjson
 class NX_UTILS_API Processor
 {
 public:
-    Processor(const nx::Buffer& data);
+    explicit Processor(ConstBufferRefType data);
     Processor(const Processor& queryProcessor) = default;
 
     template<PredicateType Predicate>
@@ -901,11 +901,11 @@ public:
 
     std::string toStdString() const;
     bool isValid() const;
-    ::rapidjson::ParseErrorCode getParseError();
+    ::rapidjson::ParseErrorCode getParseError() const;
 
 private:
-    Processor(const Processor& queryProcessor , ::rapidjson::Value* newCurr):
-        m_data(queryProcessor.m_data), m_curr(newCurr)
+    Processor(const Processor& processor, ::rapidjson::Value* newCurr):
+        m_data(processor.m_data), m_curr(newCurr)
     {
     }
 

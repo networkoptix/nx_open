@@ -618,4 +618,30 @@ TEST(Processor, CustomAction)
     }
 }
 
+TEST(Processor, Valid)
+{
+    ASSERT_TRUE(Processor("{}").isValid());
+    ASSERT_TRUE(Processor("[]").isValid());
+    ASSERT_TRUE(Processor("[{}]").isValid());
+    ASSERT_FALSE(Processor("{[]}").isValid());
+    ASSERT_FALSE(Processor("qwerty").isValid());
+}
+
+TEST(Processor, Negation)
+{
+    using namespace nx::utils::rapidjson::predicate;
+    const Processor rManyFields{manyFieldsObject.toUtf8()};
+    const auto v1 = rManyFields.getAllValues<std::string>("/[?]", std::not_fn(NameCont("B")));
+    const std::vector<std::string> rightResult1{"manyFieldsObject", "1", "2", "4", "6", "7"};
+    ASSERT_EQ(v1, rightResult1);
+
+    const auto notAll = rManyFields.getAllValues<std::string>("/[?]", std::not_fn(All()));
+    ASSERT_TRUE(notAll.empty());
+
+    const auto v2 = rManyFields.getAllValues<std::string>("/[?]", NameCont("name"));
+    const auto v3 = rManyFields.getAllValues<std::string>("/[?]",
+        std::not_fn(std::not_fn(NameCont("name"))));
+    ASSERT_EQ(v2, v3);
+}
+
 } // namespace nx::utils::rapidjson::test
