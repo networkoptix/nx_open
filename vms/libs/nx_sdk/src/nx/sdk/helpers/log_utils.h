@@ -17,7 +17,9 @@ class IStringMap;
  * To use this tool in a class, make a field "const nx::sdk::LogUtils logUtils", and add
  * the following lines:
  * <pre><code>
+ *     #undef NX_PRINT_PREFIX
  *     #define NX_PRINT_PREFIX (this->logUtils.printPrefix)
+ *     #undef NX_DEBUG_ENABLE_OUTPUT
  *     #define NX_DEBUG_ENABLE_OUTPUT (this->logUtils.enableOutput)
  *     #include <nx/kit/debug.h>
  * </code></pre>

@@ -2,9 +2,6 @@
 
 #include "engine.h"
 
-#define NX_PRINT_PREFIX (this->logUtils.printPrefix)
-#include <nx/kit/debug.h>
-
 #include <nx/sdk/i_device_info.h>
 #include <nx/sdk/helpers/uuid_helper.h>
 #include <nx/sdk/helpers/string.h>
@@ -15,6 +12,10 @@
 
 #include "device_agent.h"
 #include "stub_analytics_plugin_motion_metadata_ini.h"
+
+#undef NX_PRINT_PREFIX
+#define NX_PRINT_PREFIX (this->logUtils.printPrefix)
+#include <nx/kit/debug.h>
 
 namespace nx {
 namespace vms_server_plugins {

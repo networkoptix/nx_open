@@ -23,6 +23,7 @@ namespace nx::sdk::analytics {
  * To use NX_PRINT/NX_OUTPUT in a derived class with the prefix defined by this class, add the
  * following to the derived class .cpp:
  * <pre><code>
+ *     #undef NX_PRINT_PREFIX
  *     #define NX_PRINT_PREFIX (this->logUtils.printPrefix)
  *     #include <nx/kit/debug.h>
  * </code></pre>
