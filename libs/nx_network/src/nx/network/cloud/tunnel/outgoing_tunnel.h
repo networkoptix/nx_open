@@ -15,6 +15,8 @@
 
 namespace nx::network::cloud {
 
+class CloudConnectSettings;
+
 class NX_NETWORK_API AbstractOutgoingTunnel:
     public aio::BasicPollable
 {
@@ -68,7 +70,9 @@ public:
         closed
     };
 
-    OutgoingTunnel(AddressEntry targetPeerAddress);
+    OutgoingTunnel(
+        const CloudConnectSettings& settings,
+        AddressEntry targetPeerAddress);
     virtual ~OutgoingTunnel();
 
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
@@ -96,6 +100,7 @@ private:
     };
 
     const std::string m_tunnelId;
+    const CloudConnectSettings& m_settings;
     const AddressEntry m_targetPeerAddress;
     //map<connection request expiration time, connection request data>
     std::multimap<
@@ -142,7 +147,8 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
-using OutgoingTunnelFactoryFunction = std::unique_ptr<AbstractOutgoingTunnel>(const AddressEntry&);
+using OutgoingTunnelFactoryFunction =
+    std::unique_ptr<AbstractOutgoingTunnel>(const CloudConnectSettings& settings, const AddressEntry&);
 
 class NX_NETWORK_API OutgoingTunnelFactory:
     public nx::utils::BasicFactory<OutgoingTunnelFactoryFunction>
@@ -156,6 +162,7 @@ public:
 
 private:
     std::unique_ptr<AbstractOutgoingTunnel> defaultFactoryFunction(
+        const CloudConnectSettings& settings,
         const AddressEntry& address);
 };
 
