@@ -4,15 +4,13 @@
 
 namespace nx::network::cloud {
 
-constexpr std::chrono::milliseconds
-    CloudConnectSettings::kDefaltDelayBeforeSendingConnectToMediatorOverTcp;
-
 CloudConnectSettings::CloudConnectSettings(const CloudConnectSettings& right):
     forcedMediatorUrl(right.forcedMediatorUrl),
     isUdpHpEnabled(right.isUdpHpEnabled),
     isCloudProxyEnabled(right.isCloudProxyEnabled),
     isDirectTcpConnectEnabled(right.isDirectTcpConnectEnabled),
     delayBeforeSendingConnectToMediatorOverTcp(right.delayBeforeSendingConnectToMediatorOverTcp),
+    cloudConnectTimeout(right.cloudConnectTimeout),
     m_originatingHostAddressReplacement(right.originatingHostAddressReplacement())
 {
 }
@@ -26,8 +24,8 @@ CloudConnectSettings& CloudConnectSettings::operator=(const CloudConnectSettings
     isUdpHpEnabled = right.isUdpHpEnabled;
     isCloudProxyEnabled = right.isCloudProxyEnabled;
     isDirectTcpConnectEnabled = right.isDirectTcpConnectEnabled;
-    delayBeforeSendingConnectToMediatorOverTcp =
-        right.delayBeforeSendingConnectToMediatorOverTcp;
+    delayBeforeSendingConnectToMediatorOverTcp = right.delayBeforeSendingConnectToMediatorOverTcp;
+    cloudConnectTimeout = right.cloudConnectTimeout;
 
     auto val = right.originatingHostAddressReplacement();
     NX_MUTEX_LOCKER lk(&m_mutex);

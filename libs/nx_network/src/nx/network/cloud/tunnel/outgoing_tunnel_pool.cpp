@@ -11,11 +11,9 @@
 
 namespace nx::network::cloud {
 
-OutgoingTunnelPool::OutgoingTunnelPool():
-    m_isOwnPeerIdAssigned(false),
-    m_ownPeerId(QnUuid::createUuid().toSimpleString().toUtf8()),
-    m_terminated(false),
-    m_stopping(false)
+OutgoingTunnelPool::OutgoingTunnelPool(const CloudConnectSettings& settings):
+    m_settings(settings),
+    m_ownPeerId(QnUuid::createUuid().toSimpleString().toUtf8())
 {
 }
 
@@ -171,7 +169,7 @@ OutgoingTunnelPool::TunnelContext&
     NX_VERBOSE(this, nx::format("Creating outgoing tunnel to host %1").
             arg(targetHostAddress.host.toString()));
 
-    auto tunnel = OutgoingTunnelFactory::instance().create(targetHostAddress);
+    auto tunnel = OutgoingTunnelFactory::instance().create(m_settings, targetHostAddress);
     tunnel->bindToAioThread(SocketGlobals::aioService().getRandomAioThread());
     tunnel->setOnClosedHandler(
         std::bind(&OutgoingTunnelPool::onTunnelClosed, this, tunnel.get()));

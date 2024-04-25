@@ -64,11 +64,15 @@ private:
     std::unique_ptr<AbstractDatagramSocket> m_udpHolePunchingSocket;
     aio::Timer m_tcpConnectDelayTimer;
     std::unique_ptr<nx::hpm::api::Client> m_mediatorApiClient;
-    bool m_tcpRequestCompleted = false;
+    bool m_httpRequestCompleted = false;
     std::optional<std::chrono::milliseconds> m_timeout;
 
     void initiateConnectOverUdp();
-    void initiateConnectOverTcp();
+    void initiateConnectOverHttp();
+
+    void handleResponseOverHttp(
+        nx::hpm::api::ResultCode resultCode,
+        nx::hpm::api::ConnectResponse response);
 
     void handleResponseOverUdp(
         stun::TransportHeader stunTransportHeader,

@@ -7,15 +7,18 @@
 #include <nx/utils/thread/barrier_handler.h>
 
 #include "connector_factory.h"
+#include "../cloud_connect_settings.h"
 
 namespace nx::network::cloud {
 
-static constexpr std::chrono::seconds kCloudConnectorTimeout(10);
-
 constexpr std::chrono::milliseconds AbstractOutgoingTunnel::kNoTimeout;
 
-OutgoingTunnel::OutgoingTunnel(AddressEntry targetPeerAddress):
+OutgoingTunnel::OutgoingTunnel(
+    const CloudConnectSettings& settings,
+    AddressEntry targetPeerAddress)
+    :
     m_tunnelId(QnUuid::createUuid().toSimpleByteArray().toStdString()),
+    m_settings(settings),
     m_targetPeerAddress(std::move(targetPeerAddress)),
     m_timer(std::make_unique<aio::Timer>())
 {
@@ -262,7 +265,7 @@ void OutgoingTunnel::startAsyncTunnelConnect(nx::Locker<nx::Mutex>* const /*lock
         m_targetPeerAddress);
     m_connector->bindToAioThread(getAioThread());
     m_connector->connect(
-        kCloudConnectorTimeout,
+        m_settings.cloudConnectTimeout,
         [this](auto&&... args) { return onConnectorFinished(std::forward<decltype(args)>(args)...); });
 }
 
@@ -336,8 +339,9 @@ void OutgoingTunnel::setTunnelConnection(
 //-------------------------------------------------------------------------------------------------
 
 OutgoingTunnelFactory::OutgoingTunnelFactory():
-    base_type(std::bind(&OutgoingTunnelFactory::defaultFactoryFunction,
-        this, std::placeholders::_1))
+    base_type([this](auto&&... args) {
+        return defaultFactoryFunction(std::forward<decltype(args)>(args)...);
+    })
 {
 }
 
@@ -348,9 +352,10 @@ OutgoingTunnelFactory& OutgoingTunnelFactory::instance()
 }
 
 std::unique_ptr<AbstractOutgoingTunnel> OutgoingTunnelFactory::defaultFactoryFunction(
+    const CloudConnectSettings& settings,
     const AddressEntry& address)
 {
-    return std::make_unique<OutgoingTunnel>(address);
+    return std::make_unique<OutgoingTunnel>(settings, address);
 }
 
 } // namespace nx::network::cloud
