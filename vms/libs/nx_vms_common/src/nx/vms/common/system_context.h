@@ -249,11 +249,9 @@ public:
     QnCameraNamesWatcher* cameraNamesWatcher() const;
 
 protected:
-    Mode mode() const;
-
     virtual void setMessageProcessor(QnCommonMessageProcessor* messageProcessor);
 
-private:
+protected:
     struct Private;
     nx::utils::ImplPtr<Private> d;
 };
