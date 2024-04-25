@@ -2918,7 +2918,7 @@ to %1</source>
     </message>
     <message>
       <source>Invalid login or password.</source>
-      <translation>ユーザ名またはパスワードが無効です</translation>
+      <translation>ログインIDまたはパスワードが無効です。</translation>
     </message>
     <message>
       <source>Requested operation is not allowed with provided credentials.</source>
@@ -2938,7 +2938,7 @@ to %1</source>
     </message>
     <message>
       <source>Invalid login.</source>
-      <translation>無効なログイン</translation>
+      <translation>ログイン名が無効です。</translation>
     </message>
     <message>
       <source>%1 is temporary unavailable. Please try again later.</source>
@@ -5412,7 +5412,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>It is not recommended to use one recording location for different servers.</source>
-      <translation>1 つの保存先を複数のサーバーで共有することは推奨されません。</translation>
+      <translation>ひとつの保存先を複数サーバーで共有することは推奨されません。</translation>
     </message>
     <message>
       <source>Storage is available but will not be writable because it is too small in comparison to the already present storages</source>
@@ -11675,7 +11675,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Layout is locked and cannot be changed</source>
-      <translation>レイアウトはロックされていて変更できません</translation>
+      <translation>レイアウトはロックされているため変更できません</translation>
     </message>
     <message>
       <source>Open File</source>
