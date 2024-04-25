@@ -4,9 +4,6 @@
 
 #include <chrono>
 
-#define NX_PRINT_PREFIX (this->logUtils.printPrefix)
-#include <nx/kit/debug.h>
-
 #include <nx/sdk/analytics/helpers/object_metadata.h>
 #include <nx/sdk/analytics/helpers/object_metadata_packet.h>
 #include <nx/sdk//helpers/settings_response.h>
@@ -15,6 +12,10 @@
 #include "object_generators.h"
 #include "../utils.h"
 #include "stub_analytics_plugin_taxonomy_features_ini.h"
+
+#undef NX_PRINT_PREFIX
+#define NX_PRINT_PREFIX (this->logUtils.printPrefix)
+#include <nx/kit/debug.h>
 
 namespace nx {
 namespace vms_server_plugins {

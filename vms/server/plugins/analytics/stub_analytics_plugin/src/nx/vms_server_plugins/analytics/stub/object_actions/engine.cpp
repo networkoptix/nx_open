@@ -5,15 +5,16 @@
 #include "device_agent.h"
 #include "common.h"
 
-#define NX_PRINT_PREFIX (this->logUtils.printPrefix)
-#include <nx/kit/debug.h>
 #include <nx/kit/utils.h>
-
 #include <nx/sdk/helpers/string.h>
 #include <nx/sdk/helpers/uuid_helper.h>
 #include <nx/sdk/analytics/helpers/pixel_format.h>
 
 #include "stub_analytics_plugin_object_actions_ini.h"
+
+#undef NX_PRINT_PREFIX
+#define NX_PRINT_PREFIX (this->logUtils.printPrefix)
+#include <nx/kit/debug.h>
 
 namespace nx {
 namespace vms_server_plugins {

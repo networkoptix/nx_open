@@ -11,11 +11,13 @@
 #include "settings_model.h"
 #include "stub_analytics_plugin_settings_ini.h"
 
-#define NX_PRINT_PREFIX (this->logUtils.printPrefix)
-#include <nx/kit/debug.h>
 #include <nx/sdk/helpers/active_setting_changed_response.h>
 #include <nx/sdk/helpers/error.h>
 #include <nx/vms_server_plugins/analytics/stub/utils.h>
+
+#undef NX_PRINT_PREFIX
+#define NX_PRINT_PREFIX (this->logUtils.printPrefix)
+#include <nx/kit/debug.h>
 
 namespace nx {
 namespace vms_server_plugins {
