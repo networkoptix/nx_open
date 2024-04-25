@@ -20,7 +20,6 @@ class NX_VMS_RULES_API NotificationActionBase: public nx::vms::rules::BasicActio
     Q_CLASSINFO("type", "nx.actions.notificationBase")
 
     // Common fields.
-    FIELD(nx::Uuid, id, setId)
     FIELD(QString, caption, setCaption)
     FIELD(QString, description, setDescription)
     FIELD(QString, tooltip, setTooltip)

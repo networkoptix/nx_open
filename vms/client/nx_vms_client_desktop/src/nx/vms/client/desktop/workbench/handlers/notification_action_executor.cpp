@@ -153,8 +153,8 @@ void NotificationActionExecutor::handleAcknowledgeAction()
     auto acknowledgeBookmark =
         nx::vms::common::bookmarkToApi<nx::vms::api::rules::AcknowledgeBookmark>(
             std::move(bookmark), notification->originPeerId());
-    acknowledgeBookmark.eventId = notification->id();
-    acknowledgeBookmark.eventServerId = notification->originPeerId();
+    acknowledgeBookmark.actionId = notification->id();
+    acknowledgeBookmark.actionServerId = notification->originPeerId();
 
     auto callback = nx::utils::guarded(
         this,

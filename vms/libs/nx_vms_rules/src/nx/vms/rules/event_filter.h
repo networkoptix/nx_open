@@ -28,8 +28,8 @@ class NX_VMS_RULES_API /*FieldBased*/EventFilter: public QObject
     Q_OBJECT
 
 public:
-    EventFilter(const nx::Uuid& id, const QString& eventType);
-    virtual ~EventFilter();
+    EventFilter(nx::Uuid id, const QString& eventType);
+    virtual ~EventFilter() override;
 
     nx::Uuid id() const;
     QString eventType() const;

@@ -13,7 +13,7 @@
 
 namespace nx::vms::rules {
 
-Rule::Rule(const nx::Uuid& id, const Engine* engine): m_id(id), m_engine(engine)
+Rule::Rule(nx::Uuid id, const Engine* engine): m_id(id), m_engine(engine)
 {
 }
 

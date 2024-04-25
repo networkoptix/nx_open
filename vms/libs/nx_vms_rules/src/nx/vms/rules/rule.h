@@ -25,8 +25,8 @@ class NX_VMS_RULES_API Rule: public QObject
     Q_OBJECT
 
 public:
-    explicit Rule(const nx::Uuid& id, const Engine* engine);
-    ~Rule();
+    explicit Rule(nx::Uuid id, const Engine* engine);
+    virtual ~Rule() override;
 
     nx::Uuid id() const;
     void setId(nx::Uuid id);

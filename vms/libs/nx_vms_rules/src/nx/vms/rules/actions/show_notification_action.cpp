@@ -21,7 +21,6 @@ const ItemDescriptor& NotificationAction::manifest()
         .description = "",
         .executionTargets = {ExecutionTarget::clients, ExecutionTarget::cloud},
         .fields = {
-            makeFieldDescriptor<EventIdField>(utils::kIdFieldName, "Event ID"),
             utils::makeTargetUserFieldDescriptor(tr("To")),
             makeFieldDescriptor<ActionFlagField>(utils::kAcknowledgeFieldName, tr("Force Acknowledgement")),
             utils::makeIntervalFieldDescriptor(tr("Interval of Action")),
