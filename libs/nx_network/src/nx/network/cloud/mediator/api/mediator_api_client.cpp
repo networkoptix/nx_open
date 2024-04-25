@@ -20,14 +20,11 @@ Client::~Client()
     pleaseStopSync();
 }
 
-void Client::getListeningPeers(
-    const std::string_view& systemId,
+void Client::getListeningPeers(const std::string_view& systemId,
     nx::utils::MoveOnlyFunc<void(ResultCode, SystemPeers)> completionHandler)
 {
-    base_type::template makeAsyncCall<SystemPeers>(
-        nx::network::http::Method::get,
-        nx::network::http::rest::substituteParameters(
-            kStatisticsSystemPeersPath, {systemId}),
+    base_type::template makeAsyncCall<SystemPeers>(nx::network::http::Method::get,
+        nx::network::http::rest::substituteParameters(kStatisticsSystemPeersPath, {systemId}),
         {}, // query
         std::move(completionHandler));
 }
@@ -35,19 +32,15 @@ void Client::getListeningPeers(
 std::tuple<Client::ResultCode, SystemPeers> Client::getListeningPeers(
     const std::string_view& systemId)
 {
-    return base_type::template makeSyncCall<SystemPeers>(
-        nx::network::http::Method::get,
-        nx::network::http::rest::substituteParameters(
-            kStatisticsSystemPeersPath, {systemId}),
+    return base_type::template makeSyncCall<SystemPeers>(nx::network::http::Method::get,
+        nx::network::http::rest::substituteParameters(kStatisticsSystemPeersPath, {systemId}),
         nx::utils::UrlQuery());
 }
 
-void Client::initiateConnection(
-    const ConnectRequest& request,
+void Client::initiateConnection(const ConnectRequest& request,
     nx::utils::MoveOnlyFunc<void(ResultCode, ConnectResponse)> completionHandler)
 {
-    base_type::template makeAsyncCall<ConnectResponse>(
-        nx::network::http::Method::post,
+    base_type::template makeAsyncCall<ConnectResponse>(nx::network::http::Method::post,
         nx::network::http::rest::substituteParameters(
             kServerSessionsPath, {request.destinationHostName}),
         {}, // query
@@ -55,17 +48,34 @@ void Client::initiateConnection(
         std::move(completionHandler));
 }
 
-void Client::reportUplinkSpeed(
-    const PeerConnectionSpeed& connectionSpeed,
+void Client::reportUplinkSpeed(const PeerConnectionSpeed& connectionSpeed,
     nx::utils::MoveOnlyFunc<void(ResultCode)> completionHandler)
 {
-    base_type::template makeAsyncCall<void>(
-        nx::network::http::Method::post,
+    base_type::template makeAsyncCall<void>(nx::network::http::Method::post,
         nx::network::http::rest::substituteParameters(
             kConnectionSpeedUplinkPathV2, {connectionSpeed.systemId, connectionSpeed.serverId}),
         {}, // query
         connectionSpeed.connectionSpeed,
         std::move(completionHandler));
+}
+
+void Client::resetConnections(
+    const std::string_view& systemId,
+    nx::utils::MoveOnlyFunc<void(ResultCode, std::vector<std::string>)> completionHandler)
+{
+    base_type::template makeAsyncCall<std::vector<std::string>>(
+        nx::network::http::Method::post,
+        nx::network::http::rest::substituteParameters(kSystemResetPath, {systemId}),
+        {}, // query
+        std::move(completionHandler));
+}
+
+std::tuple<api::ResultCode, std::vector<std::string>> Client::resetConnections(const std::string_view& systemId)
+{
+    return base_type::template makeSyncCall<std::vector<std::string>>(
+        nx::network::http::Method::post,
+        nx::network::http::rest::substituteParameters(kSystemResetPath, {systemId}),
+        nx::utils::UrlQuery{});
 }
 
 void Client::getStatistics(
@@ -83,7 +93,7 @@ std::tuple<ResultCode, Statistics> Client::getStatistics()
     return base_type::template makeSyncCall<Statistics>(
         nx::network::http::Method::get,
         kStatisticsMetricsPath,
-        nx::utils::UrlQuery());
+        nx::utils::UrlQuery{});
 }
 
 void Client::getListeningPeersStatistics(
@@ -101,7 +111,7 @@ std::tuple<ResultCode, ListeningPeerStatistics> Client::getListeningPeersStatist
     return base_type::template makeSyncCall<ListeningPeerStatistics>(
         nx::network::http::Method::get,
         kStatisticsListeningPeersPath,
-        nx::utils::UrlQuery());
+        nx::utils::UrlQuery{});
 }
 
 ApiResultCodeDescriptor::ResultCode ApiResultCodeDescriptor::systemErrorCodeToResultCode(
@@ -143,9 +153,9 @@ ApiResultCodeDescriptor::ResultCode ApiResultCodeDescriptor::getResultCodeFromRe
             return api::ResultCode::internalServerError;
 
         default:
-            if (response.statusLine.statusCode / 100 * 100 == StatusCode::badRequest)
-                return api::ResultCode::badRequest;
-            return api::ResultCode::otherLogicError;
+        if (response.statusLine.statusCode / 100 * 100 == StatusCode::badRequest)
+            return api::ResultCode::badRequest;
+        return api::ResultCode::otherLogicError;
     }
 }
 

@@ -205,14 +205,22 @@ protected:
             !response ||
             !StatusCode::isSuccessCode(response->statusLine.statusCode))
         {
-            // The message body has already been fetched to try and deserialize this structure.
-            // If it failed, there may still be an error message in the body that should be saved.
-
             nx::reflect::DeserializationResult result;
             std::tie(m_lastFusionRequestResult, result) =
                 nx::reflect::json::deserialize<decltype(m_lastFusionRequestResult)>(msgBody);
-            if (!result)
+            if (result)
+                return;
+
+            // Since it did not deserialize, it is not reliable, so clear its default values.
+            m_lastFusionRequestResult.clear();
+
+            // The message body has already been fetched to try and deserialize this structure.
+            // If it failed, there may still be an error message in the body that should be saved.
+            if (!msgBody.empty())
                 m_lastFusionRequestResult.setErrorText(msgBody.toStdString());
+
+            if (response)
+                m_lastFusionRequestResult.setHttpStatusCode(response->statusLine.statusCode);
         }
     }
 
@@ -439,6 +447,7 @@ public:
 private:
     virtual void requestDone(nx::network::http::AsyncClient* client) override
     {
+
         this->deserializeFusionRequestResult(
             client->lastSysErrorCode(),
             client->response(),
