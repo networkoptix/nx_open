@@ -35,8 +35,11 @@ using namespace nx::vms::common;
 
 namespace {
 
-NX_DECLARE_COLORIZED_ICON(kUserCloudIcon, "20x20/Solid/user_cloud.svg",\
-    core::kEmptySubstitutions)
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kLight1Theme =
+    {{QnIcon::Normal, {.primary = "light1"}}};
+
+NX_DECLARE_COLORIZED_ICON(kUserCloudIcon, "20x20/Solid/user_cloud.svg", core::kEmptySubstitutions)
+NX_DECLARE_COLORIZED_ICON(kOrganizationIcon, "20x20/Solid/organization.svg", kLight1Theme)
 
 core::CloudUrlHelper urlHelper()
 {
@@ -156,7 +159,7 @@ void QnCloudManagementWidget::loadDataToUi()
             : globalSettings()->cloudAccountName();
 
         const auto accountPixmap = saasInitialized
-            ? qnSkin->pixmap("saas/organization_icon.svg")
+            ? qnSkin->icon(kOrganizationIcon).pixmap(core::kIconSize)
             : qnSkin->icon(kUserCloudIcon).pixmap(core::kIconSize);
 
         ui->accountLabel->setText(accountText);
