@@ -10023,11 +10023,11 @@ You can force it, but it may significantly increase CPU load.</source>
     <name>nx::vms::client::desktop::NoPermissionsOverlayWidget</name>
     <message>
       <source>You do not have permission to edit settings of this camera</source>
-      <translation type="unfinished">You do not have permission to edit settings of this camera</translation>
+      <translation>您沒有編輯此相機設置的權限</translation>
     </message>
     <message>
       <source>You do not have permission to edit settings of some cameras</source>
-      <translation type="unfinished">You do not have permission to edit settings of some cameras</translation>
+      <translation>您沒有編輯部分相機設置的權限</translation>
     </message>
   </context>
   <context>

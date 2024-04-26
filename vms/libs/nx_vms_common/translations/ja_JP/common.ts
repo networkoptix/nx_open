@@ -35,7 +35,7 @@
     </message>
     <message>
       <source>The LDAP server is not accessible. Please try again later.</source>
-      <translation>LDAP サーバーにアクセスできません。後でもう一度お試しください。</translation>
+      <translation>LDAP サーバーにアクセスできません。後ほどお試しください。</translation>
     </message>
     <message>
       <source>%1 is not accessible yet. Please try again later.</source>
@@ -1373,7 +1373,7 @@
     </message>
     <message>
       <source>Sync time epsilon. New value is not applied if time delta less than epsilon</source>
-      <translation>同期時刻イプシロン。時間デルタがイプシロンより小さい場合、新しい値は適用されません</translation>
+      <translation>同期時刻イプシロン。時間デルタがイプシロンより小さい場合、新しい値は適用されません。</translation>
     </message>
     <message>
       <source>Cloud owner account</source>
@@ -1637,7 +1637,7 @@
     </message>
     <message>
       <source>Show Servers in the Resource Tree for non-admins</source>
-      <translation>管理者以外のリソースツリーにもサーバーを表示</translation>
+      <translation>管理者以外のリソースツリーにもサーバーを表示する</translation>
     </message>
     <message>
       <source>Use only HTTPS for cameras</source>
@@ -2173,7 +2173,7 @@
     <message>
       <source>Reason: Power limit exceeded (%1)</source>
       <comment>%1 is consumption</comment>
-      <translation>理由：電力制限を超えました（%1）</translation>
+      <translation>理由: 電力上限を超過しました (%1)</translation>
     </message>
     <message>
       <source>Show desktop notification</source>
