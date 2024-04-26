@@ -46,19 +46,6 @@ struct DeserializationContext
 };
 
 template<typename T>
-struct IsBuiltInJsonValueType
-{
-    static constexpr bool value =
-        std::is_integral_v<T> |
-        std::is_floating_point_v<T> |
-        std::is_same_v<T, std::string>|
-        std::is_same_v<T, std::nullptr_t>;
-};
-
-template<typename... U> inline constexpr bool IsBuiltInJsonTypeV =
-    IsBuiltInJsonValueType<U...>::value;
-
-template<typename T>
 inline constexpr bool IsStringAlikeV =
     std::is_convertible_v<std::string, T> ||
     std::is_convertible_v<std::string_view, T> ||

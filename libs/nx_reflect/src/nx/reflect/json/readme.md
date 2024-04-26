@@ -69,6 +69,13 @@ NX_REFLECTION_TAG_TYPE(Foo, jsonSerializeChronoDurationAsNumber)
 ```
 As a result, every `std::chrono::duration` field of the `struct Foo` will be serialized as a number.
 
+- `jsonSerializeInt64AsString`. Causes 64 bit integer types (like `long long`, `uint64_t` etc) to
+be serialized as string values, not numbers. Example:
+```
+NX_REFLECTION_TAG_TYPE(Foo, jsonSerializeInt64AsString)
+```
+As a result, every 64 bit integer field of the `struct Foo` will be serialized as a string.
+
 - - -
 
 To convert a type T from string serializer requires it to satisfy `ConvertibleFromString`.

@@ -46,7 +46,7 @@ public:
         if constexpr (std::is_same_v<T, bool>)
             writeBool(val);
         else if constexpr (std::is_integral_v<T>)
-            writeInt(static_cast<std::int64_t>(val));
+            sizeof(T) == 8 && int64AsString() ? writeString(std::to_string(val)) : writeInt(val);
         else if constexpr (std::is_floating_point_v<T>)
             writeFloat(static_cast<double>(val));
         else if constexpr (std::is_same_v<T, std::nullptr_t>)
@@ -58,13 +58,9 @@ public:
     }
 
     template<typename... Args>
-    void writeValue(
-        const std::chrono::duration<Args...>& val)
+    void writeValue(const std::chrono::duration<Args...>& val)
     {
-        if (m_serializeDurationAsNumber)
-            writeValue(val.count());
-        else
-            writeValue(std::to_string(val.count()));
+        durationAsNumber() ? writeInt(val.count()) : writeString(std::to_string(val.count()));
     }
 
     template<typename... Args>
@@ -79,21 +75,18 @@ public:
 
     virtual Result take() = 0;
 
-    /**
-     * @return The previous value.
-     */
-    bool setSerializeDurationAsNumber(bool val)
+    unsigned int serializeFlags() const { return m_serializeFlags; }
+    unsigned int setSerializeFlags(unsigned int value)
     {
-        return std::exchange(m_serializeDurationAsNumber, val);
-    }
-
-    bool isSerializeDurationAsNumber() const
-    {
-        return m_serializeDurationAsNumber;
+        return std::exchange(m_serializeFlags, value);
     }
 
 private:
-    bool m_serializeDurationAsNumber = false;
+    bool durationAsNumber() const { return m_serializeFlags & (1u << 0); }
+    bool int64AsString() const { return m_serializeFlags & (1u << 1); }
+
+private:
+    unsigned int m_serializeFlags = 0;
 };
 
 //-------------------------------------------------------------------------------------------------

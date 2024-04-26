@@ -14,4 +14,14 @@ static constexpr bool jsonSerializeChronoDurationAsNumber(const T*)
     return false;
 }
 
+/**
+ * When set, 64 bit integer types are serialized into a JSON document as a string holding the
+ * numeric representation. By default, 64 bit integers are serialized as a numeric value.
+ */
+template<typename T>
+static constexpr bool jsonSerializeInt64AsString(const T*)
+{
+    return false;
+}
+
 } // namespace nx::reflect::json
