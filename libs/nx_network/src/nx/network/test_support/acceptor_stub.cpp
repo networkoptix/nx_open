@@ -21,7 +21,8 @@ AcceptorStub::AcceptorStub(
 AcceptorStub::~AcceptorStub()
 {
     --instanceCount;
-    m_removedAcceptorsQueue->push(this);
+    if (m_removedAcceptorsQueue)
+        m_removedAcceptorsQueue->push(this);
 
     pleaseStopSync();
 }
@@ -67,11 +68,38 @@ void AcceptorStub::setRemovedAcceptorsQueue(
 
 bool AcceptorStub::isAsyncAcceptInProgress() const
 {
+    NX_MUTEX_LOCKER lock(&m_mutex);
     return m_acceptHandler != nullptr;
+}
+
+bool AcceptorStub::reportErrorIfNeeded()
+{
+    if (m_acceptErrorHandler)
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        if (!m_acceptorErrorsToReport.empty())
+        {
+            auto nextError = std::move(m_acceptorErrorsToReport.front());
+            m_acceptorErrorsToReport.pop_front();
+            lock.unlock();
+
+            m_acceptErrorHandler(std::move(nextError));
+
+            if (m_acceptorErrorsToReport.empty() && m_allErrorsReportedEvent)
+                m_allErrorsReportedEvent->push();
+
+            return true;
+        }
+    }
+
+    return false;
 }
 
 void AcceptorStub::deliverConnectionIfAvailable()
 {
+    if (reportErrorIfNeeded())
+        return;
+
     std::optional<std::unique_ptr<AbstractStreamSocket>> connection =
         m_readyConnections->pop(std::chrono::milliseconds::zero());
     if (!connection)
@@ -114,6 +142,11 @@ void AcceptorDelegate::cancelIOSync()
 std::unique_ptr<AbstractStreamSocket> AcceptorDelegate::getNextSocketIfAny()
 {
     return m_target->getNextSocketIfAny();
+}
+
+void AcceptorDelegate::setAcceptErrorHandler(ErrorHandler handler)
+{
+    m_target->setAcceptErrorHandler(std::move(handler));
 }
 
 } // namespace test

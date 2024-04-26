@@ -118,6 +118,8 @@ void ClientOverHttpTunnel::processServerTunnelResult(
 {
     NX_VERBOSE(this, "Tunnel to %1 completed with result %2", url(), result);
 
+    setPrevRequestFields(result);
+
     const auto resultCode = getResultCode(result, tunnelingClient);
 
     if (resultCode != api::ResultCode::ok)
@@ -162,8 +164,19 @@ void ClientOverHttpTunnel::processClientTunnelResult(
     const network::http::tunneling::Client& tunnelingClient,
     network::http::tunneling::OpenTunnelResult result)
 {
+    setPrevRequestFields(result);
     const auto resultCode = getResultCode(result, tunnelingClient);
     completionHandler(resultCode, std::move(result.connection));
+}
+
+void ClientOverHttpTunnel::setPrevRequestFields(
+    const network::http::tunneling::OpenTunnelResult& tunnelResult)
+{
+    setPrevRequestSysErrorCode(tunnelResult.sysError);
+    setPrevRequestHttpStatusCode(
+        tunnelResult.httpStatus
+        ? *tunnelResult.httpStatus
+        : nx::network::http::StatusCode::undefined);
 }
 
 api::ResultCode ClientOverHttpTunnel::getResultCode(

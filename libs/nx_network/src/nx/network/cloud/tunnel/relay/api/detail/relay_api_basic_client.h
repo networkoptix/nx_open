@@ -67,6 +67,16 @@ protected:
 
     std::optional<std::chrono::milliseconds> timeout() const { return m_timeout; }
 
+    void setPrevRequestSysErrorCode(SystemError::ErrorCode sysError)
+    {
+        m_prevSysErrorCode = sysError;
+    }
+
+    void setPrevRequestHttpStatusCode(nx::network::http::StatusCode::Value httpStatusCode)
+    {
+        m_prevHttpStatusCode = httpStatusCode;
+    }
+
 private:
     const nx::utils::Url m_baseUrl;
     SystemError::ErrorCode m_prevSysErrorCode = SystemError::noError;

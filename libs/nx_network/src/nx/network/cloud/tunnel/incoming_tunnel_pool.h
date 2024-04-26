@@ -31,7 +31,12 @@ public:
 
     virtual void acceptAsync(AcceptCompletionHandler handler) override;
     virtual void cancelIOSync() override;
+
     virtual std::unique_ptr<AbstractStreamSocket> getNextSocketIfAny() override;
+    virtual void setAcceptErrorHandler(ErrorHandler) override
+    {
+        NX_ASSERT(false, "not implemented");
+    }
 
     void setAcceptTimeout(std::optional<std::chrono::milliseconds> acceptTimeout);
 
