@@ -117,13 +117,14 @@ Settings::Settings(QSettings* settings)
     if (!settings)
         return;
 
+    LoggerSettings defaults;
+    defaults.maxVolumeSizeB = kDefaultMaxLogVolumeSizeB;
+    defaults.maxFileSizeB = kDefaultMaxLogFileSizeB;
+    defaults.maxFileTimePeriodS = kDefaultMaxLogFileTimePeriodS;
+    defaults.archivingEnabled = kDefaultLogArchivingEnabled;
+
     LoggerSettings baseValues;
-    readRotationParams(settings, &baseValues, LoggerSettings{
-        .maxVolumeSizeB = kDefaultMaxLogVolumeSizeB,
-        .maxFileSizeB = kDefaultMaxLogFileSizeB,
-        .maxFileTimePeriodS = kDefaultMaxLogFileTimePeriodS,
-        .archivingEnabled = kDefaultLogArchivingEnabled,
-    });
+    readRotationParams(settings, &baseValues, defaults);
 
     for (const auto& group: settings->childGroups())
     {
