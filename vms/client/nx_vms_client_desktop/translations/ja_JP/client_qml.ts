@@ -427,7 +427,7 @@
     </message>
     <message>
       <source>Show grid</source>
-      <translation>グリッド表示</translation>
+      <translation>グリッドを表示</translation>
     </message>
     <message>
       <source>Auto Calibration</source>
@@ -646,7 +646,7 @@
     <name>LabeledItem</name>
     <message>
       <source>Default value:</source>
-      <translation>デフォルト値：</translation>
+      <translation>デフォルト値:</translation>
     </message>
   </context>
   <context>
@@ -1108,7 +1108,7 @@ to activate PTZ</source>
     <name>SensitivityItem</name>
     <message>
       <source>Sensitivity</source>
-      <translation>感度:</translation>
+      <translation>感度</translation>
     </message>
   </context>
   <context>

@@ -80,7 +80,7 @@
     </message>
     <message>
       <source>Unknown error</source>
-      <translation>未知のエラー</translation>
+      <translation>不明なエラー</translation>
     </message>
   </context>
 </TS>

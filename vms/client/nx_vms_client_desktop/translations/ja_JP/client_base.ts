@@ -1448,7 +1448,7 @@ License Key: %2</source>
       <source>File name must not contain the following reserved characters:</source>
       <comment>Plural relates to the word _characters_ here, not _file name_.</comment>
       <translation>
-        <numerusform>ファイル名には次の予約文字を含めることはできません：</numerusform>
+        <numerusform>ファイル名には、以下の予約文字は利用できません:</numerusform>
       </translation>
     </message>
   </context>
@@ -2190,7 +2190,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>MitM attack from server %1</source>
-      <translation>サーバ %1 からのMITM攻撃</translation>
+      <translation>サーバー %1 からのMITM攻撃</translation>
     </message>
     <message>
       <source>Connected to %1</source>
@@ -5384,7 +5384,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnStorageUrlDialog</name>
     <message>
       <source>\\&lt;Computer Name&gt;\&lt;Folder&gt;</source>
-      <translation>\\ &lt; コンピューター名 &gt; \ &lt; フォルダー &gt;</translation>
+      <translation>\\&lt;Computer Name&gt;\&lt;Folder&gt;</translation>
     </message>
     <message>
       <source>Network Shared Resource</source>
@@ -6638,7 +6638,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Virtual cameras, USB or web cameras cannot be moved between servers</source>
-      <translation>仮想カメラ、USBカメラ、またはWebカメラはサーバー間で移動できません</translation>
+      <translation>仮想カメラ、USBカメラ、Webカメラはサーバー間で移動できません</translation>
     </message>
     <message>
       <source>Virtual cameras cannot be moved between servers</source>
@@ -6646,7 +6646,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>USB or web cameras cannot be moved between servers</source>
-      <translation>USBカメラまたはWebカメラはサーバー間で移動できません</translation>
+      <translation>USBカメラやWebカメラはサーバー間で移動できません</translation>
     </message>
     <message>
       <source>Only some of the selected devices can be moved to %1</source>
@@ -7371,7 +7371,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>This ID is already used on the following %n cameras:</source>
       <translation>
-        <numerusform>このIDは次の %n カメラで既に使用されています：</numerusform>
+        <numerusform>このIDは次の %n カメラですでに使用されています:</numerusform>
       </translation>
     </message>
     <message>
@@ -7404,7 +7404,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant.</source>
-      <translation>録画スケジュールの画質 (ビットレート) とフレームレート (FPS) はカメラに設定されなくなります。</translation>
+      <translation>録画スケジュール内の映像品質およびフレームレート (FPS) の項目は、カメラに設定されなくなります。</translation>
     </message>
     <message>
       <source>Server will not push time settings to the camera.</source>
@@ -9083,12 +9083,12 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>System was not found.</source>
-      <translation>システムが見つかりませんでした</translation>
+      <translation>システムが見つかりませんでした。</translation>
     </message>
     <message>
       <source>The discovered System %1 has an incompatible version %2.</source>
       <comment>%1 is name of System, %2 is version information</comment>
-      <translation>検出されたシステム %1 は互換性のないバージョン %2 です</translation>
+      <translation>検出されたシステム %1 は互換性のないバージョン %2 です。</translation>
     </message>
     <message>
       <source>Selected System has an older software version that is incompatible with the current System. Update selected System to the latest build to merge it with the current one.</source>
@@ -9096,7 +9096,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>The password or user name is invalid.</source>
-      <translation>パスワードまたはユーザー名が無効です</translation>
+      <translation>パスワードまたはユーザー名が無効です。</translation>
     </message>
     <message>
       <source>This user does not have permissions for the requested operation.</source>
@@ -9147,7 +9147,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>System name is not configured yet.</source>
-      <translation>システム名がまだ構成されていません。</translation>
+      <translation>システム名がまだ設定されていません。</translation>
     </message>
     <message>
       <source>Connection to Server could not be established. The Server&apos;s certificate is invalid.</source>

@@ -1400,7 +1400,7 @@
     </message>
     <message>
       <source>Add...</source>
-      <translation>追加(&amp;A)...</translation>
+      <translation>追加...</translation>
     </message>
     <message>
       <source>Remove</source>
@@ -2373,7 +2373,7 @@
     </message>
     <message>
       <source>Delete...</source>
-      <translation>削除(&amp;D)...</translation>
+      <translation>削除...</translation>
     </message>
     <message>
       <source>Force Secure Authentication</source>
@@ -2419,15 +2419,15 @@
     </message>
     <message>
       <source>Add...</source>
-      <translation>追加(&amp;A)...</translation>
+      <translation>追加...</translation>
     </message>
     <message>
       <source>Rename...</source>
-      <translation>名前の変更(&amp;R)...</translation>
+      <translation>名前の変更...</translation>
     </message>
     <message>
       <source>Delete...</source>
-      <translation>削除(&amp;D)...</translation>
+      <translation>削除...</translation>
     </message>
   </context>
   <context>
@@ -2807,7 +2807,7 @@
     <name>SendmailBusinessActionWidget</name>
     <message>
       <source>Additional Recipients:</source>
-      <translation>追加の受信者(&amp;A)：</translation>
+      <translation>追加の受信者:</translation>
     </message>
     <message>
       <source>Global Email Settings...</source>
@@ -3104,7 +3104,7 @@
     </message>
     <message>
       <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
-      <translation>注： 録画スケジュール内の映像品質・フレームレート (FPS) 設定は無視されます。</translation>
+      <translation>警告! これにより、録画スケジュール内の映像品質およびフレームレート (FPS) の項目は、カメラに設定されなくなります。</translation>
     </message>
     <message>
       <source>Custom language for Cloud notifications</source>

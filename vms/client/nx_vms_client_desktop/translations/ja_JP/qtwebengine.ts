@@ -267,11 +267,11 @@
     </message>
     <message>
       <source>&amp;Back</source>
-      <translation>&amp;戻る</translation>
+      <translation>戻る</translation>
     </message>
     <message>
       <source>&amp;Forward</source>
-      <translation>&amp;進む</translation>
+      <translation>進む</translation>
     </message>
     <message>
       <source>&amp;Reload</source>
