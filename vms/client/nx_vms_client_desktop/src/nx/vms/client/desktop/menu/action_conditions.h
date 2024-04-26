@@ -707,6 +707,9 @@ ConditionWrapper hasOtherWindows();
 /** Check if new Event Rules Engine is present in the system and enabled. */
 ConditionWrapper hasNewEventRulesEngine();
 
+/** Check if old Event Rules Engine is present in the system and enabled. */
+ConditionWrapper hasOldEventRulesEngine();
+
 /**
  * Check if current user is allowed to see servers in the resources tree such feature may be
  * restricted for users without power user permissions by the global setting)

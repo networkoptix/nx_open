@@ -2,7 +2,6 @@
 
 #include "camera_settings_dialog.h"
 #include "ui_camera_settings_dialog.h"
-#include "widgets/private/no_permissions_overlay_widget.h"
 
 #include <chrono>
 #include <memory>
@@ -67,6 +66,7 @@
 #include "widgets/camera_settings_general_tab_widget.h"
 #include "widgets/camera_web_page_widget.h"
 #include "widgets/io_module_settings_widget.h"
+#include "widgets/private/no_permissions_overlay_widget.h"
 
 namespace nx::vms::client::desktop {
 
@@ -214,6 +214,7 @@ struct CameraSettingsDialog::Private: public QObject
 
             case menu::CameraIssuesAction:
             case menu::CameraBusinessRulesAction:
+            case menu::CameraVmsRulesAction:
             case menu::OpenInNewTabAction:
                 q->menu()->trigger(action, cameras);
                 break;

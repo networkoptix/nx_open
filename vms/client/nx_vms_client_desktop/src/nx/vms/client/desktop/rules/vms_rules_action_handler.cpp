@@ -10,6 +10,7 @@
 #include <api/server_rest_connection.h>
 #include <core/resource/camera_resource.h>
 #include <nx/utils/guarded_callback.h>
+#include <nx/utils/log/assert.h>
 #include <nx/vms/api/data/lookup_list_data.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/debug_utils/utils/debug_custom_actions.h>
@@ -43,6 +44,14 @@ struct VmsRulesActionHandler::Private
     {
         if (rulesDialog)
             rulesDialog->setError(text);
+    }
+
+    void setFilter(const QnVirtualCameraResourceList& cameras)
+    {
+        if (!NX_ASSERT(cameras.size() <= 1, "Filter is not applicable for several cameras"))
+            return;
+
+        rulesDialog->setFilter(cameras.isEmpty() ? "" : cameras.front()->getId().toString());
     }
 
     void initialiseLookupLists()
@@ -124,6 +133,9 @@ VmsRulesActionHandler::VmsRulesActionHandler(QObject* parent):
     connect(action(menu::OpenVmsRulesDialogAction), &QAction::triggered,
         this, &VmsRulesActionHandler::openVmsRulesDialog);
 
+    connect(action(menu::CameraVmsRulesAction), &QAction::triggered,
+        this, &VmsRulesActionHandler::openVmsRulesDialog);
+
     connect(action(menu::OpenEventLogAction), &QAction::triggered,
         this, &VmsRulesActionHandler::openEventLogDialog);
 }
@@ -135,9 +147,17 @@ VmsRulesActionHandler::~VmsRulesActionHandler()
 
 void VmsRulesActionHandler::openVmsRulesDialog()
 {
-    d->rulesDialog = std::make_unique<VmsRulesDialog>(mainWindowWidget());
+    if (!d->rulesDialog)
+    {
+        d->rulesDialog = std::make_unique<VmsRulesDialog>(mainWindowWidget());
+        d->initialiseLookupLists();
+    }
 
-    d->initialiseLookupLists();
+    const auto parameters = menu()->currentParameters(sender());
+    d->setFilter(parameters.resources().filtered<QnVirtualCameraResource>());
+
+    if (d->rulesDialog->isRunning())
+        return;
 
     d->rulesDialog->exec(Qt::NonModal);
     d->rulesDialog.reset();

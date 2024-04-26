@@ -46,6 +46,11 @@ void VmsRulesDialog::setError(const QString& error)
     QmlProperty<QString>(rootObjectHolder(), "errorString") = error;
 }
 
+void VmsRulesDialog::setFilter(const QString& filter)
+{
+    QmlProperty<QString>(rootObjectHolder(), "filterText") = filter;
+}
+
 void VmsRulesDialog::addRule()
 {
     auto engine = systemContext()->vmsRulesEngine();
