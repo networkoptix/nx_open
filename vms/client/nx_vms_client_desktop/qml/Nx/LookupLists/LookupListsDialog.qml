@@ -12,6 +12,7 @@ import Nx.Dialogs
 
 import nx.vms.client.desktop
 import nx.vms.client.desktop.analytics as Analytics
+import nx.vms.client.core.analytics as Analytics
 
 Dialog
 {
@@ -48,6 +49,12 @@ Dialog
 
         taxonomy: control.taxonomy
         listModel: currentList
+    }
+
+    function iconPathForLookupList(data)
+    {
+        const listType = taxonomy.objectTypeById(data.data.objectTypeId)
+        return Analytics.IconManager.iconUrl(listType ? listType.iconSource : "")
     }
 
     function createNewList()
@@ -102,6 +109,7 @@ Dialog
                 const model = data[i]
                 listsModel.append({
                     text: model.data.name,
+                    decorationPath: iconPathForLookupList(model),
                     value: model
                 })
             }
@@ -125,6 +133,7 @@ Dialog
             {
                 listsModel.append({
                     text: viewModel.name,
+                    decorationPath: iconPathForLookupList(viewModel),
                     value: viewModel
                 })
                 listComboBox.currentIndex = listComboBox.indexOfValue(viewModel)
@@ -145,6 +154,7 @@ Dialog
             {
                 listsModel.set(listComboBox.listsModelIndex, {
                     text: viewModel.name,
+                    decoration: iconPathForLookupList(viewModel),
                     value: viewModel
                 })
 
@@ -349,6 +359,7 @@ Dialog
                     sortCaseSensitivity: Qt.CaseInsensitive
                     sortRoleName: "text"
                 }
+                withIconSection: true
                 enabled: !!currentList
                 textRole: "text"
                 valueRole: "value"

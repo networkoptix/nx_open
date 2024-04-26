@@ -11,6 +11,7 @@ import Nx.Dialogs
 
 import nx.vms.client.desktop
 import nx.vms.client.desktop.analytics as Analytics
+import nx.vms.client.core.analytics as Analytics
 
 ModalDialog
 {
@@ -43,6 +44,10 @@ ModalDialog
 
     title: editMode ? qsTr("List Settings") : qsTr("New List")
 
+    function iconPathForObjectType(objectType)
+    {
+        return Analytics.IconManager.iconUrl(objectType ? objectType.iconSource: "")
+    }
 
     function _addObjectTypesToModelRecursive(result, objectTypes, currentLevel)
     {
@@ -52,7 +57,12 @@ ModalDialog
                 continue
 
             // Add spaces in beginning of text, to indicate the level in hierarchy.
-            result.push({value: objectTypes[i], text: ("  ").repeat(currentLevel) + objectTypes[i].name})
+            result.push(
+                {
+                    value: objectTypes[i],
+                    decorationPath: iconPathForObjectType(objectTypes[i]),
+                    text: ("  ").repeat(currentLevel) + objectTypes[i].name
+                })
             _addObjectTypesToModelRecursive(result, objectTypes[i].derivedObjectTypes, currentLevel + 1)
         }
     }
@@ -62,7 +72,7 @@ ModalDialog
         if (!taxonomy)
             return;
 
-        let result = [{ value: null, text: qsTr("Generic") }]
+        let result = [{ value: null, decorationPath: iconPathForObjectType(null), text: qsTr("Generic") }]
         _addObjectTypesToModelRecursive(result, taxonomy.objectTypes, 0)
         return result
     }
@@ -206,6 +216,7 @@ ModalDialog
                 enabled: !editMode //< Changing list type while editing is forbidden.
                 model: createListTypeModel()
                 placeholderText: qsTr("Select type")
+                withIconSection: true
 
                 onActivated:
                 {

@@ -23,10 +23,16 @@ ComboBox
     // Color values are taken from the model with role valueRole.
     property bool withColorSection: false
 
+    // If true, combobox displays icon to the left of the text.
+    // Icon source path are taken from the model with role decorationRole.
+    // withIconSection and withColorSection are mutually exclusive.
+    property bool withIconSection: false
+
     property string tabRole: ""
     property real tabSize: 16
 
     property string enabledRole: ""
+    property string decorationRole: "decorationPath"
 
     property var displayedColor:
     {
@@ -37,6 +43,16 @@ ComboBox
             return editText
 
         return currentValue
+    }
+
+    property string decorationPath:
+    {
+        if (!withIconSection)
+            return ""
+        if (Array.isArray(control.model))
+            return model[currentIndex] ? model[currentIndex][decorationRole] : ""
+        const data = NxGlobals.modelData(model.index(currentIndex, 0), decorationRole)
+        return data ? data : ""
     }
 
     property Component menu: Component
@@ -114,7 +130,12 @@ ComboBox
 
         width: parent.width - indicator.width
         height: parent.height
-        leftPadding: control.withColorSection ? 26 : 8
+        leftPadding:
+        {
+            if (control.withIconSection)
+                return (currentIndex === -1) ? 8 : 32
+            return control.withColorSection ? 26 : 8
+        }
         clip: true
 
         autoScroll: activeFocus
@@ -164,6 +185,16 @@ ComboBox
             visible: control.withColorSection
             color: Utils.getValue(control.displayedColor, "transparent")
             border.color: ColorTheme.transparent(ColorTheme.colors.light1, 0.1)
+        }
+
+        ColoredImage
+        {
+            x: 8
+            anchors.verticalCenter: parent.verticalCenter
+            visible: control.withIconSection
+            sourcePath: control.decorationPath
+            sourceSize: Qt.size(20, 20)
+            primaryColor: parent.color
         }
 
         ContextMenuMouseArea
@@ -248,7 +279,9 @@ ComboBox
         contentItem: Text
         {
             anchors.fill: parent
-            leftPadding: (control.withColorSection ? 26 : 8) + (tab * control.tabSize)
+            leftPadding: tab * control.tabSize
+                + (control.withIconSection ? 32 : (control.withColorSection ? 26 : 8))
+
             rightPadding: 8
             elide: Text.ElideRight
             color: highlightedIndex == index ? ColorTheme.colors.brand_contrast : ColorTheme.text
@@ -280,6 +313,20 @@ ComboBox
                     const color = popupItem.itemData[control.valueRole]
                     return Utils.getValue(color, "transparent")
                 }
+            }
+
+            ColoredImage
+            {
+                x: 8
+                anchors.verticalCenter: parent.verticalCenter
+                visible: control.withIconSection
+                sourcePath:
+                {
+                    const icon = popupItem.itemData[control.decorationRole]
+                    return icon ? icon : ""
+                }
+                sourceSize: Qt.size(20, 20)
+                primaryColor: parent.color
             }
         }
     }
