@@ -21,6 +21,7 @@ Dialog
     property alias rulesTableModel: rulesSortFilterModel.sourceModel
     property alias errorString: alertBar.text
     property var dialog: null
+    property alias filterText: searchField.text
 
     function deleteCheckedRules()
     {
@@ -138,6 +139,8 @@ Dialog
 
             SearchField
             {
+                id: searchField
+
                 onTextChanged:
                 {
                     rulesSortFilterModel.setFilterRegularExpression(text)

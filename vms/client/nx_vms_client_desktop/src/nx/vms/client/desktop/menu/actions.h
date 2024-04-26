@@ -739,6 +739,11 @@ enum IDType
     CameraBusinessRulesAction,
 
     /**
+     * Opens vms rules dialog with filter for current cameras rules
+     */
+    CameraVmsRulesAction,
+
+    /**
      * Opens camera diagnostics dialog that checks for problems with
      * selected camera.
      */

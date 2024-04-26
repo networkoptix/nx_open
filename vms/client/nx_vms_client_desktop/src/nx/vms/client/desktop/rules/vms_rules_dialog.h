@@ -19,6 +19,7 @@ public:
     ~VmsRulesDialog() override;
 
     void setError(const QString& error);
+    void setFilter(const QString& filter);
 
     Q_INVOKABLE void addRule();
     Q_INVOKABLE void editSchedule(const UuidList& ids);

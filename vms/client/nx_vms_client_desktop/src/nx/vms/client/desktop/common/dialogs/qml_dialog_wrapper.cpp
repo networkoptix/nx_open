@@ -24,7 +24,7 @@ public:
     QVariantMap initialProperties;
     core::QmlPropertyBase::ObjectHolder rootObjectHolder;
     QUrl source;
-    bool done = false;
+    bool done = true;
     bool shownMaximized = false;
     bool restoreLastPositionWhenOpened = false;
     QRect lastGeometry;
@@ -242,6 +242,11 @@ void QmlDialogWrapper::setRestoreLastPositionWhenOpened(bool value)
 
     d->restoreLastPositionWhenOpened = value;
     emit restoreLastPositionWhenOpenedChanged();
+}
+
+bool QmlDialogWrapper::isRunning() const
+{
+    return !d->done;
 }
 
 bool QmlDialogWrapper::exec(Qt::WindowModality modality)
