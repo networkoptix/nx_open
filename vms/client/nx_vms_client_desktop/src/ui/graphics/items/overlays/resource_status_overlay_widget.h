@@ -93,3 +93,5 @@ private:
     QPushButton* const m_customButton;
     QLabel* const m_suggestion;
 };
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(QnStatusOverlayWidget::Controls)
