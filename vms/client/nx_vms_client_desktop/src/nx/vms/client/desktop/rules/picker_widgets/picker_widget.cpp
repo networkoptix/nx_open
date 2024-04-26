@@ -5,6 +5,7 @@
 #include <QtWidgets/QHBoxLayout>
 
 #include <nx/vms/client/desktop/rules/params_widgets/params_widget.h>
+#include <nx/vms/client/desktop/system_context.h>
 
 namespace nx::vms::client::desktop::rules {
 

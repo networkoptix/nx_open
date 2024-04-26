@@ -18,11 +18,13 @@
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/event/action_parameters.h>
 #include <nx/vms/event/events/abstract_event.h>
 #include <nx/vms/event/strings_helper.h>
+#include <nx/vms/rules/validation_policy.h>
 
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::common;

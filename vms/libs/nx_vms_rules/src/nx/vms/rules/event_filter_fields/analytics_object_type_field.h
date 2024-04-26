@@ -18,7 +18,7 @@ class NX_VMS_RULES_API AnalyticsObjectTypeField:
     Q_PROPERTY(QString value READ value WRITE setValue NOTIFY valueChanged)
 
 public:
-    AnalyticsObjectTypeField(nx::vms::common::SystemContext* context);
+    AnalyticsObjectTypeField(common::SystemContext* context, const FieldDescriptor* descriptor);
 
     virtual bool match(const QVariant& eventValue) const override;
 

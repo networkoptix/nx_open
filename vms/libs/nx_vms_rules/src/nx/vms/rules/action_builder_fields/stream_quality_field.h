@@ -18,7 +18,7 @@ class NX_VMS_RULES_API StreamQualityField:
     Q_PROPERTY(nx::vms::api::StreamQuality value READ value WRITE setValue NOTIFY valueChanged)
 
 public:
-    StreamQualityField() = default;
+    using SimpleTypeActionField<vms::api::StreamQuality, StreamQualityField>::SimpleTypeActionField;
 
 signals:
     void valueChanged();

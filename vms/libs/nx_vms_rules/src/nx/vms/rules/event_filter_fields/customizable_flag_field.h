@@ -15,7 +15,7 @@ class NX_VMS_RULES_API CustomizableFlagField:
     Q_PROPERTY(bool value READ value WRITE setValue NOTIFY valueChanged)
 
 public:
-    CustomizableFlagField() = default;
+    using SimpleTypeEventField<bool, CustomizableFlagField>::SimpleTypeEventField;
 
     bool match(const QVariant& value) const override;
 

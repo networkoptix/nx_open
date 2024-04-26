@@ -33,7 +33,10 @@ public:
     }
 
 protected:
-    SimpleTypeField() = default;
+    explicit SimpleTypeField(const FieldDescriptor* descriptor): B{descriptor}
+    {
+    }
+
     value_type m_value = {};
 };
 
@@ -47,13 +50,15 @@ class SimpleTypeActionField: public SimpleTypeField<T, ActionBuilderField, D>
     using SimpleTypeField<T, ActionBuilderField, D>::m_value;
 
 public:
+    explicit SimpleTypeActionField(const FieldDescriptor* descriptor):
+        SimpleTypeField<T, ActionBuilderField, D>{descriptor}
+    {
+    }
+
     virtual QVariant build(const AggregatedEventPtr&) const override
     {
         return QVariant::fromValue(m_value);
     };
-
-protected:
-    SimpleTypeActionField() = default;
 };
 
 /**
@@ -66,13 +71,15 @@ class SimpleTypeEventField: public SimpleTypeField<T, EventFilterField, D>
     using SimpleTypeField<T, EventFilterField, D>::m_value;
 
 public:
+    explicit SimpleTypeEventField(const FieldDescriptor* descriptor):
+        SimpleTypeField<T, EventFilterField, D>{descriptor}
+    {
+    }
+
     virtual bool match(const QVariant& value) const override
     {
         return value.value<T>() == m_value;
     };
-
-protected:
-    SimpleTypeEventField() = default;
 };
 
 } // namespace nx::vms::rules

@@ -30,17 +30,27 @@ const ItemDescriptor& DeviceRecordingAction::manifest()
                 utils::kDurationFieldName,
                 tr("Duration"),
                 {},
-                {.initialValue = 5s, .defaultValue = 5s, .maximumValue = 9999h, .minimumValue = 1s}),
+                TimeFieldProperties{
+                    .value = 5s,
+                    .defaultValue = 5s,
+                    .maximumValue = 9999h,
+                    .minimumValue = 1s}.toVariantMap()),
             utils::makeTimeFieldDescriptor<TimeField>(
                 vms::rules::utils::kRecordBeforeFieldName,
                 tr("Pre-recording"),
                 {},
-                {.initialValue = 1s, .maximumValue = 600s, .minimumValue = 0s}),
+                TimeFieldProperties{
+                    .value = 1s,
+                    .maximumValue = 600s,
+                    .minimumValue = 0s}.toVariantMap()),
             utils::makeTimeFieldDescriptor<TimeField>(
                 vms::rules::utils::kRecordAfterFieldName,
                 tr("Post-recording"),
                 {},
-                {.initialValue = 0s, .maximumValue = 600s, .minimumValue = 0s},
+                TimeFieldProperties{
+                    .value = 0s,
+                    .maximumValue = 600s,
+                    .minimumValue = 0s}.toVariantMap(),
                 {utils::kDurationFieldName}),
             utils::makeIntervalFieldDescriptor(tr("Interval of Action")),
         },

@@ -15,7 +15,7 @@ class NX_VMS_RULES_API TargetLayoutField: public SimpleTypeActionField<UuidSet, 
     Q_PROPERTY(UuidSet value READ value WRITE setValue NOTIFY valueChanged)
 
 public:
-    TargetLayoutField() = default;
+    using SimpleTypeActionField<UuidSet, TargetLayoutField>::SimpleTypeActionField;
 
 signals:
     void valueChanged();

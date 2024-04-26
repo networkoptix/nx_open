@@ -9,10 +9,13 @@
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/test_support/test_context.h>
 #include <nx/vms/rules/event_filter_fields/builtin_fields.h>
+#include <nx/vms/rules/manifest.h>
 
 namespace nx::vms::rules::test {
 
 namespace {
+
+const FieldDescriptor kDummyDescriptor;
 
 template<class Field>
 void testSimpleTypeField(
@@ -23,7 +26,7 @@ void testSimpleTypeField(
 
     for (const auto& value: values)
     {
-        Field field;
+        Field field{&kDummyDescriptor};
         SCOPED_TRACE(nx::format(
             "Field type: %1, value: %2",
             field.metatype(),
@@ -58,7 +61,7 @@ TEST_F(EventFieldContextTest, SourceUserField)
     const auto user = addUser({group.id});
     const auto userIdValue = QVariant::fromValue(user->getId());
 
-    auto field = SourceUserField(systemContext());
+    auto field = SourceUserField(systemContext(), &kDummyDescriptor);
 
     // Default field do not match anything.
     EXPECT_FALSE(field.match(userIdValue));
@@ -108,7 +111,7 @@ TEST_F(TextLookupFieldTest, emptyLookupList)
 {
     const auto listId = makeAndRegisterList();
 
-    TextLookupField field{systemContext()};
+    TextLookupField field{systemContext(), &kDummyDescriptor};
     field.setValue(listId.toString());
 
     field.setCheckType(TextLookupCheckType::inList);
@@ -122,7 +125,7 @@ TEST_F(TextLookupFieldTest, emptyLookupList)
 
 TEST_F(TextLookupFieldTest, emptyKeywords)
 {
-    TextLookupField field{systemContext()};
+    TextLookupField field{systemContext(), &kDummyDescriptor};
     field.setValue("");
 
     // An empty keywords always return true for 'containsKeywords' comparison.
@@ -135,7 +138,7 @@ TEST_F(TextLookupFieldTest, emptyKeywords)
 
 TEST_F(TextLookupFieldTest, lookupInKeywordsWorksProperly)
 {
-    TextLookupField field{systemContext()};
+    TextLookupField field{systemContext(), &kDummyDescriptor};
     field.setValue("foo bar");
 
     field.setCheckType(TextLookupCheckType::containsKeywords);
@@ -162,7 +165,7 @@ TEST_F(TextLookupFieldTest, lookupInListWorksProperly)
             {{"foo", "three"}}
         });
 
-    TextLookupField field{systemContext()};
+    TextLookupField field{systemContext(), &kDummyDescriptor};
     field.setValue(listId.toString());
 
     field.setCheckType(TextLookupCheckType::inList);
@@ -188,7 +191,7 @@ TEST_F(ObjectLookupFieldTest, emptyLookupList)
 {
     const auto listId = makeAndRegisterList();
 
-    ObjectLookupField field{systemContext()};
+    ObjectLookupField field{systemContext(), &kDummyDescriptor};
     field.setValue(listId.toString());
 
     field.setCheckType(ObjectLookupCheckType::inList);
@@ -202,7 +205,7 @@ TEST_F(ObjectLookupFieldTest, emptyLookupList)
 
 TEST_F(ObjectLookupFieldTest, emptyAttributes)
 {
-    ObjectLookupField field{systemContext()};
+    ObjectLookupField field{systemContext(), &kDummyDescriptor};
     field.setValue("");
 
     field.setCheckType(ObjectLookupCheckType::hasAttributes);
@@ -217,7 +220,7 @@ TEST_F(ObjectLookupFieldTest, emptyListAttributeMatchAnyInputValue)
             {{"foo", ""}} //< The entry accepts any value for the 'foo' attribute.
         });
 
-    ObjectLookupField field{systemContext()};
+    ObjectLookupField field{systemContext(), &kDummyDescriptor};
     field.setValue(listId.toString());
 
     field.setCheckType(ObjectLookupCheckType::inList);
@@ -231,7 +234,7 @@ TEST_F(ObjectLookupFieldTest, emptyListAttributeMatchAnyInputValue)
 
 TEST_F(ObjectLookupFieldTest, lookupWithAttributesWorksProperly)
 {
-    ObjectLookupField field{systemContext()};
+    ObjectLookupField field{systemContext(), &kDummyDescriptor};
     field.setCheckType(ObjectLookupCheckType::hasAttributes);
 
     field.setValue("foo=1");
@@ -258,7 +261,7 @@ TEST_F(ObjectLookupFieldTest, lookupInListWorksProperly)
             {{"foo", "2"}, {"bar.baz", "two"}, {"bar.quux", "0x2"}}
         });
 
-    ObjectLookupField field{systemContext()};
+    ObjectLookupField field{systemContext(), &kDummyDescriptor};
     field.setValue(listId.toString());
 
     field.setCheckType(ObjectLookupCheckType::inList);
@@ -329,7 +332,7 @@ TEST(EventFieldTest, KeywordsField)
 
     for(const auto& data: testData)
     {
-        KeywordsField field;
+        KeywordsField field{&kDummyDescriptor};
         field.setString(data.keywords);
 
         SCOPED_TRACE(nx::format("Input: %1, keywords: %2", data.input, data.keywords).toStdString());

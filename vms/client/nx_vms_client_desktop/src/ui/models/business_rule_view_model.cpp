@@ -42,6 +42,7 @@
 #include <nx/vms/event/events/events.h>
 #include <nx/vms/event/rule.h>
 #include <nx/vms/event/strings_helper.h>
+#include <nx/vms/rules/validation_policy.h>
 #include <nx/vms/text/human_readable.h>
 #include <ui/workbench/workbench_context.h>
 

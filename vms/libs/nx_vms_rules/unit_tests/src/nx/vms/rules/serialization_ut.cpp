@@ -9,6 +9,7 @@
 #include <nx/vms/rules/event_filter.h>
 #include <nx/vms/rules/event_filter_fields/source_user_field.h>
 #include <nx/vms/rules/utils/api.h>
+#include <nx/vms/rules/utils/common.h>
 #include <nx/vms/rules/utils/serialization.h>
 
 #include "test_field.h"
@@ -24,7 +25,9 @@ TEST(VmsRulesSerialization, EventField)
 
     static const auto kEventType = "nx.vms_rules_serialization.event_field.test";
     static const auto kFieldName = "test";
-    engine->registerEventField(fieldMetatype<TestEventField>(), []{ return new TestEventField; });
+    engine->registerEventField(
+        fieldMetatype<TestEventField>(),
+        [](const FieldDescriptor* descriptor) { return new TestEventField{descriptor}; });
     engine->registerEvent(
         ItemDescriptor{
             .id = kEventType,
@@ -35,7 +38,9 @@ TEST(VmsRulesSerialization, EventField)
         },
         [](){ return new TestEvent; });
 
-    auto field = std::make_unique<TestEventField>();
+    const auto fieldDescriptor =
+        utils::fieldByName(kFieldName, engine->eventDescriptor(kEventType).value());
+    auto field = std::make_unique<TestEventField>(&fieldDescriptor.value());
     field->id = nx::Uuid::createUuid();
     field->idSet << nx::Uuid::createUuid() << nx::Uuid::createUuid();
     field->string = "test string";

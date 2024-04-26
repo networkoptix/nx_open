@@ -17,7 +17,7 @@ class NX_VMS_RULES_API EmailMessageField:
     Q_CLASSINFO("metatype", "nx.actions.fields.emailMessage")
 
 public:
-    explicit EmailMessageField(common::SystemContext* context);
+    EmailMessageField(common::SystemContext* context, const FieldDescriptor* descriptor);
 
     virtual QVariant build(const AggregatedEventPtr& eventAggregator) const override;
 };

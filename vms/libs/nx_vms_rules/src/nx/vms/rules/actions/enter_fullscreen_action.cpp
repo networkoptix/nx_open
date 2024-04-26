@@ -4,6 +4,7 @@
 
 #include "../action_builder_fields/target_layout_field.h"
 #include "../action_builder_fields/target_single_device_field.h"
+#include "../action_builder_fields/target_user_field.h"
 #include "../utils/field.h"
 #include "../utils/type.h"
 
@@ -20,8 +21,17 @@ const ItemDescriptor& EnterFullscreenAction::manifest()
             makeFieldDescriptor<TargetSingleDeviceField>(
                 utils::kCameraIdFieldName, tr("Camera"), {}, {}, {utils::kLayoutIdsFieldName}),
             makeFieldDescriptor<TargetLayoutField>(utils::kLayoutIdsFieldName, tr("On Layout")),
-            utils::makeTargetUserFieldDescriptor(
-                tr("Set for"), {}, utils::UserFieldPreset::All, /*visible*/ false),
+            makeFieldDescriptor<TargetUserField>(
+                utils::kUsersFieldName,
+                tr("Set for"),
+                {},
+                ResourceFilterFieldProperties{
+                    .visible = false,
+                    .acceptAll = true,
+                    .ids = {},
+                    .allowEmptySelection = false,
+                    .validationPolicy = {}
+                }.toVariantMap()),
             utils::makePlaybackFieldDescriptor(tr("Rewind")),
         },
         .resources = {

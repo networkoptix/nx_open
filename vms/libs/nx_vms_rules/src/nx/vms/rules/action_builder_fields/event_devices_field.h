@@ -13,7 +13,7 @@ class NX_VMS_RULES_API EventDevicesField: public ActionBuilderField
     Q_CLASSINFO("metatype", "nx.actions.fields.eventDevices")
 
 public:
-    EventDevicesField() = default;
+    using ActionBuilderField::ActionBuilderField;
 
     QVariant build(const AggregatedEventPtr& eventAggregator) const override;
 };

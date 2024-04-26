@@ -86,6 +86,9 @@ void OptionalDurationPicker::updateUi()
     }
 
     setChecked(field->value() != vms::rules::OptionalTimeField::value_type::zero());
+
+    if (auto validator = fieldValidator())
+        setValidity(validator->validity(theField(), parentParamsWidget()->rule(), systemContext()));
 }
 
 void OptionalDurationPicker::onEnabledChanged(bool isEnabled)

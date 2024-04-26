@@ -24,6 +24,7 @@ public:
     virtual void deinitialize();
 
     virtual void registerFields() const;
+    virtual void registerFieldValidators() const;
     virtual void registerEvents() const;
     virtual void registerActions() const;
 
@@ -35,7 +36,14 @@ protected:
         if (NX_ASSERT(!id.isEmpty(), "Class does not have required 'metatype' property"))
         {
             if (!m_engine->isEventFieldRegistered(id))
-                return m_engine->registerEventField(id, [] { return new C(); });
+            {
+                return m_engine->registerEventField(
+                    id,
+                    [](const FieldDescriptor* descriptor)
+                    {
+                        return new C(descriptor);
+                    });
+            }
         }
         return false;
     }
@@ -47,9 +55,22 @@ protected:
         if (NX_ASSERT(!id.isEmpty(), "Class does not have required 'metatype' property"))
         {
             if (!m_engine->isActionFieldRegistered(id))
-                return m_engine->registerActionField(id, [] { return new C(); });
+            {
+                return m_engine->registerActionField(
+                    id,
+                    [](const FieldDescriptor* descriptor)
+                    {
+                        return new C(descriptor);
+                    });
+            }
         }
         return false;
+    }
+
+    template<class F>
+    bool registerFieldValidator(FieldValidator* validator) const
+    {
+        return m_engine->registerValidator(fieldMetatype<F>(), validator);
     }
 
     template<class E>

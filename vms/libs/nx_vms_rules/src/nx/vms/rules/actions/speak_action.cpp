@@ -2,7 +2,11 @@
 
 #include "speak_action.h"
 
+#include <nx/utils/qt_helpers.h>
+#include <nx/vms/api/data/user_group_data.h>
+
 #include "../action_builder_fields/target_device_field.h"
+#include "../action_builder_fields/target_user_field.h"
 #include "../action_builder_fields/text_with_fields.h"
 #include "../action_builder_fields/volume_field.h"
 #include "../utils/field.h"
@@ -21,7 +25,16 @@ const ItemDescriptor& SpeakAction::manifest()
         .fields = {
             makeFieldDescriptor<TextWithFields>(utils::kTextFieldName, tr("Text")),
             makeFieldDescriptor<TargetDeviceField>(utils::kDeviceIdsFieldName, tr("At Device")),
-            utils::makeTargetUserFieldDescriptor(tr("To users")),
+            makeFieldDescriptor<TargetUserField>(
+                utils::kUsersFieldName,
+                tr("To users"),
+                {},
+                ResourceFilterFieldProperties{
+                    .acceptAll = false,
+                    .ids = nx::utils::toQSet(vms::api::kAllPowerUserGroupIds),
+                    .allowEmptySelection = true,
+                    .validationPolicy = {}
+                }.toVariantMap()),
             makeFieldDescriptor<VolumeField>("volume", tr("Volume"), {}, {}, {utils::kTextFieldName}),
             utils::makeIntervalFieldDescriptor(tr("Interval of Action")),
         },

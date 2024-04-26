@@ -5,6 +5,8 @@
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QVBoxLayout>
 
+#include <nx/vms/client/desktop/style/custom_style.h>
+
 #include "field_picker_widget.h"
 #include "picker_widget_utils.h"
 
@@ -32,6 +34,16 @@ public:
             &QPushButton::clicked,
             this,
             &ResourcePickerWidgetBase<F>::onSelectButtonClicked);
+    }
+
+    void setValidity(const vms::rules::ValidationResult& validationResult) override
+    {
+        base::setValidity(validationResult);
+
+        if (validationResult.validity == QValidator::State::Acceptable)
+            resetStyle(m_selectButton);
+        else
+            setWarningStyle(m_selectButton);
     }
 
 protected:

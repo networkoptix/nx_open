@@ -9,6 +9,11 @@
 
 namespace nx::vms::rules {
 
+constexpr auto kBookmarkManagementValidationPolicy = "bookmarkManagement";
+constexpr auto kUserWithEmailValidationPolicy = "userWithEmail";
+constexpr auto kCloudUserValidationPolicy = "cloudUser";
+constexpr auto kLayoutAccessValidationPolicy = "layoutAccess";
+
 class NX_VMS_RULES_API TargetUserField:
     public ResourceFilterActionField,
     public common::SystemContextAware
@@ -17,7 +22,7 @@ class NX_VMS_RULES_API TargetUserField:
     Q_CLASSINFO("metatype", "nx.actions.fields.users")
 
 public:
-    explicit TargetUserField(common::SystemContext* context);
+    TargetUserField(common::SystemContext* context, const FieldDescriptor* descriptor);
 
     QnUserResourceSet users() const;
 };

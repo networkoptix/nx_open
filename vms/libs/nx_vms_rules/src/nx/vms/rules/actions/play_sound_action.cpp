@@ -4,6 +4,7 @@
 
 #include "../action_builder_fields/sound_field.h"
 #include "../action_builder_fields/target_device_field.h"
+#include "../action_builder_fields/target_user_field.h"
 #include "../action_builder_fields/volume_field.h"
 #include "../utils/field.h"
 #include "../utils/type.h"
@@ -21,7 +22,16 @@ const ItemDescriptor& PlaySoundAction::manifest()
         .fields = {
             makeFieldDescriptor<SoundField>(utils::kSoundFieldName, {}),
             makeFieldDescriptor<TargetDeviceField>(utils::kDeviceIdsFieldName, tr("At")),
-            utils::makeTargetUserFieldDescriptor(tr("To Users")),
+            makeFieldDescriptor<TargetUserField>(
+                utils::kUsersFieldName,
+                tr("To Users"),
+                {},
+                ResourceFilterFieldProperties{
+                    .acceptAll = false,
+                    .ids = {},
+                    .allowEmptySelection = true,
+                    .validationPolicy = {}
+                }.toVariantMap()),
             makeFieldDescriptor<VolumeField>(
                 "volume", tr("Volume"), {}, {}, {utils::kSoundFieldName}),
             utils::makeIntervalFieldDescriptor(tr("Interval of Action")),

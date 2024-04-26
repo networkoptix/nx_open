@@ -26,7 +26,10 @@ FieldDescriptor makeIntervalFieldDescriptor(
         kIntervalFieldName,
         displayName,
         description,
-        {.initialValue = 1min, .defaultValue = 1min, .minimumValue = 1s});
+        TimeFieldProperties{
+            .value = 1min,
+            .defaultValue = 1min,
+            .minimumValue = 1s}.toVariantMap());
 }
 
 FieldDescriptor makePlaybackFieldDescriptor(
@@ -37,7 +40,11 @@ FieldDescriptor makePlaybackFieldDescriptor(
         kPlaybackTimeFieldName,
         displayName,
         description,
-        {.initialValue = 0s, .defaultValue = 1s, .maximumValue = 300s, .minimumValue = 0s});
+        TimeFieldProperties{
+            .value = 0s,
+            .defaultValue = 1s,
+            .maximumValue = 300s,
+            .minimumValue = 0s}.toVariantMap());
 }
 
 FieldDescriptor makeStateFieldDescriptor(
@@ -72,30 +79,6 @@ FieldDescriptor makeTextFormatterFieldDescriptor(
         fieldName,
         {},
         {{ "text", formatString }});
-}
-
-FieldDescriptor makeTargetUserFieldDescriptor(
-    const QString& displayName,
-    const QString& description,
-    UserFieldPreset preset,
-    bool visible,
-    const QStringList& linkedFields)
-{
-    QVariantMap props;
-    if (preset == UserFieldPreset::All)
-        props["acceptAll"] = true;
-    if (preset == UserFieldPreset::Power)
-        props["ids"] = QVariant::fromValue(nx::utils::toQSet(vms::api::kAllPowerUserGroupIds));
-
-    if (!visible)
-        props["visible"] = false;
-
-    return makeFieldDescriptor<TargetUserField>(
-        utils::kUsersFieldName,
-        displayName,
-        description,
-        props,
-        linkedFields);
 }
 
 FieldDescriptor makeActionFlagFieldDescriptor(

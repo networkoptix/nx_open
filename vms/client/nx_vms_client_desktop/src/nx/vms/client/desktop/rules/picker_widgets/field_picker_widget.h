@@ -2,6 +2,9 @@
 
 #pragma once
 
+#include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/rules/engine.h>
+
 #include "plain_picker_widget.h"
 #include "titled_picker_widget.h"
 
@@ -39,6 +42,11 @@ protected:
         auto field = theFieldImpl<F>();
         NX_ASSERT(field);
         return field;
+    }
+
+    vms::rules::FieldValidator* fieldValidator()
+    {
+        return P::systemContext()->vmsRulesEngine()->fieldValidator(theField()->metatype());
     }
 
 private:

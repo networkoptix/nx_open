@@ -2,15 +2,20 @@
 
 #include "source_user_field.h"
 
-#include <core/resource/user_resource.h>
+#include <QtCore/QCoreApplication>
+
+#include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/utils/qt_helpers.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
 
 namespace nx::vms::rules {
 
-SourceUserField::SourceUserField(nx::vms::common::SystemContext* context):
-    SystemContextAware(context)
+SourceUserField::SourceUserField(
+    common::SystemContext* context,
+    const FieldDescriptor* descriptor)
+    :
+    ResourceFilterEventField{descriptor},
+    SystemContextAware{context}
 {
 }
 

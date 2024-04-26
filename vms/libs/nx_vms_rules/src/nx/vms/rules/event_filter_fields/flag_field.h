@@ -15,7 +15,7 @@ class NX_VMS_RULES_API EventFlagField: public SimpleTypeEventField<bool, EventFl
     Q_PROPERTY(bool value READ value WRITE setValue NOTIFY valueChanged)
 
 public:
-    EventFlagField() = default;
+    using SimpleTypeEventField<bool, EventFlagField>::SimpleTypeEventField;
 
 signals:
     void valueChanged();

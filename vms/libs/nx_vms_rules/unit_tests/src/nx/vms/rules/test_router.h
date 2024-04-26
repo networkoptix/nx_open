@@ -3,6 +3,7 @@
 #pragma once
 
 #include <nx/vms/common/system_context.h>
+#include <nx/vms/rules/engine.h>
 #include <nx/vms/rules/router.h>
 #include <nx/vms/rules/rule.h>
 #include <utils/common/synctime.h>

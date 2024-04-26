@@ -4,6 +4,7 @@
 
 #include "../action_builder_fields/ptz_preset_field.h"
 #include "../action_builder_fields/target_single_device_field.h"
+#include "../action_builder_fields/target_user_field.h"
 #include "../utils/field.h"
 #include "../utils/type.h"
 
@@ -21,8 +22,17 @@ const ItemDescriptor& PtzPresetAction::manifest()
             makeFieldDescriptor<TargetSingleDeviceField>(utils::kCameraIdFieldName, tr("At")),
             makeFieldDescriptor<PtzPresetField>("presetId", tr("PTZ Preset")),
             utils::makeIntervalFieldDescriptor(tr("Interval of Action")),
-            utils::makeTargetUserFieldDescriptor(
-                tr("Execute to users"), {}, utils::UserFieldPreset::All, /*visible*/ false),
+            makeFieldDescriptor<TargetUserField>(
+                utils::kUsersFieldName,
+                tr("Execute to users"),
+                {},
+                ResourceFilterFieldProperties{
+                    .visible = false,
+                    .acceptAll = true,
+                    .ids = {},
+                    .allowEmptySelection = false,
+                    .validationPolicy = {}
+                }.toVariantMap()),
         },
         .resources = {{utils::kCameraIdFieldName, {ResourceType::device, {}, {}, FieldFlag::target}}},
     };

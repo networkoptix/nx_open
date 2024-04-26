@@ -26,7 +26,11 @@ const ItemDescriptor& PanicRecordingAction::manifest()
                     utils::kDurationFieldName,
                     tr("Duration"),
                     {},
-                    {.initialValue = 5s, .defaultValue = 5s, .maximumValue = 9999h, .minimumValue = 1s}),
+                    TimeFieldProperties{
+                        .value = 5s,
+                        .defaultValue = 5s,
+                        .maximumValue = 9999h,
+                        .minimumValue = 1s}.toVariantMap()),
             utils::makeIntervalFieldDescriptor(tr("Interval of Action"))
         },
     };

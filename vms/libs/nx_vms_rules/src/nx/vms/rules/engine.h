@@ -19,6 +19,7 @@
 #include <nx/vms/api/rules/rules_fwd.h>
 
 #include "event_cache.h"
+#include "field_validator.h"
 #include "rules_fwd.h"
 #include "running_event_watcher.h"
 
@@ -44,13 +45,15 @@ public:
     using ConstRuleSet = std::unordered_map<nx::Uuid, ConstRulePtr>;
 
     using EventConstructor = std::function<BasicEvent*()>;
-    using EventFieldConstructor = std::function<EventFilterField*()>;
+    using EventFieldConstructor =
+        std::function<EventFilterField*(const FieldDescriptor* descriptor)>;
 
     using ActionConstructor = std::function<BasicAction*()>;
-    using ActionFieldConstructor = std::function<ActionBuilderField*()>;
+    using ActionFieldConstructor =
+        std::function<ActionBuilderField*(const FieldDescriptor* descriptor)>;
 
 // Initialization and general info methods.
-    Engine(std::unique_ptr<Router> router, QObject* parent = nullptr);
+    explicit Engine(std::unique_ptr<Router> router, QObject* parent = nullptr);
     ~Engine();
 
     void setId(nx::Uuid id);
@@ -143,6 +146,11 @@ public:
      */
     std::unique_ptr<ActionBuilder> buildActionBuilder(const QString& actionType) const;
 
+// Field validator registration and access methods.
+
+    bool registerValidator(const QString& fieldType, FieldValidator* validator);
+    FieldValidator* fieldValidator(const QString& fieldType) const;
+
 // Runtime event processing methods.
     /** Processes incoming event and returns matched rule count. */
     size_t processEvent(const EventPtr& event);
@@ -169,14 +177,14 @@ public: // Declare following methods public for testing purposes.
     * Builds default action field based on the registered action field constructor. Returns
     * nullptr if the event constructor is not registered.
     */
-    std::unique_ptr<ActionBuilderField> buildActionField(const QString& fieldType) const;
+    std::unique_ptr<ActionBuilderField> buildActionField(const FieldDescriptor* descriptor) const;
     std::unique_ptr<ActionBuilder> buildActionBuilder(const api::ActionBuilder& serialized) const;
 
     /**
     * Builds default event field based on the registered event field constructor. Returns nullptr
     * if the event constructor is not registered.
     */
-    std::unique_ptr<EventFilterField> buildEventField(const QString& fieldType) const;
+    std::unique_ptr<EventFilterField> buildEventField(const FieldDescriptor* descriptor) const;
     std::unique_ptr<EventFilter> buildEventFilter(const api::EventFilter& serialized) const;
 
 private:
@@ -198,11 +206,13 @@ private:
 
     std::unique_ptr<EventFilter> buildEventFilter(const ItemDescriptor& descriptor) const;
     std::unique_ptr<EventFilter> buildEventFilter(nx::Uuid id, const QString& type) const;
-    std::unique_ptr<EventFilterField> buildEventField(const api::Field& serialized) const;
+    std::unique_ptr<EventFilterField> buildEventField(
+        const api::Field& serialized, const FieldDescriptor* descriptor) const;
 
     std::unique_ptr<ActionBuilder> buildActionBuilder(const ItemDescriptor& descriptor) const;
     std::unique_ptr<ActionBuilder> buildActionBuilder(nx::Uuid id, const QString& type) const;
-    std::unique_ptr<ActionBuilderField> buildActionField(const api::Field& serialized) const;
+    std::unique_ptr<ActionBuilderField> buildActionField(
+        const api::Field& serialized, const FieldDescriptor* descriptor) const;
 
     /**
     * Registers the event constructor to the engine.
@@ -230,6 +240,8 @@ private:
 
     QHash<QString, EventFieldConstructor> m_eventFields;
     QHash<QString, ActionFieldConstructor> m_actionFields;
+
+    QHash<QString, FieldValidator*> m_fieldValidators;
 
     QHash<QString, EventConstructor> m_eventTypes;
     QHash<QString, ActionConstructor> m_actionTypes;

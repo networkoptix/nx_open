@@ -16,6 +16,8 @@ class NX_VMS_RULES_API DummyField: public EventFilterField
     Q_CLASSINFO("metatype", "nx.events.fields.dummy")
 
 public:
+    using EventFilterField::EventFilterField;
+
     bool match(const QVariant& value) const override;
 };
 

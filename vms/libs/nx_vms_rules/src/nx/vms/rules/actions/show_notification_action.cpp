@@ -2,9 +2,12 @@
 
 #include "show_notification_action.h"
 
+#include <nx/utils/qt_helpers.h>
+#include <nx/vms/api/data/user_group_data.h>
+
 #include "../action_builder_fields/event_devices_field.h"
-#include "../action_builder_fields/event_id_field.h"
 #include "../action_builder_fields/flag_field.h"
+#include "../action_builder_fields/target_user_field.h"
 #include "../action_builder_fields/text_with_fields.h"
 #include "../utils/event_details.h"
 #include "../utils/field.h"
@@ -21,7 +24,16 @@ const ItemDescriptor& NotificationAction::manifest()
         .description = "",
         .executionTargets = {ExecutionTarget::clients, ExecutionTarget::cloud},
         .fields = {
-            utils::makeTargetUserFieldDescriptor(tr("To")),
+            makeFieldDescriptor<TargetUserField>(
+                utils::kUsersFieldName,
+                tr("To"),
+                {},
+                ResourceFilterFieldProperties{
+                    .acceptAll = false,
+                    .ids = nx::utils::toQSet(vms::api::kAllPowerUserGroupIds),
+                    .allowEmptySelection = false,
+                    .validationPolicy = kBookmarkManagementValidationPolicy
+                }.toVariantMap()),
             makeFieldDescriptor<ActionFlagField>(utils::kAcknowledgeFieldName, tr("Force Acknowledgement")),
             utils::makeIntervalFieldDescriptor(tr("Interval of Action")),
 

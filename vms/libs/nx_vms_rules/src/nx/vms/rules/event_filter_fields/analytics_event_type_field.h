@@ -22,7 +22,7 @@ class NX_VMS_RULES_API AnalyticsEventTypeField:
     Q_PROPERTY(QString typeId READ typeId WRITE setTypeId NOTIFY typeIdChanged)
 
 public:
-    AnalyticsEventTypeField(nx::vms::common::SystemContext* context);
+    AnalyticsEventTypeField(common::SystemContext* context, const FieldDescriptor* descriptor);
 
     virtual bool match(const QVariant& value) const override;
 

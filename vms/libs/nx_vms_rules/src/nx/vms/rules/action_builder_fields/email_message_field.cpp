@@ -10,7 +10,11 @@
 
 namespace nx::vms::rules {
 
-EmailMessageField::EmailMessageField(common::SystemContext* context):
+EmailMessageField::EmailMessageField(
+    common::SystemContext* context,
+    const FieldDescriptor* descriptor)
+    :
+    ActionBuilderField{descriptor},
     common::SystemContextAware(context)
 {
 }

@@ -15,7 +15,7 @@ class NX_VMS_RULES_API LayoutField: public SimpleTypeActionField<nx::Uuid, Layou
     Q_PROPERTY(nx::Uuid value READ value WRITE setValue NOTIFY valueChanged)
 
 public:
-    LayoutField() = default;
+    using SimpleTypeActionField<nx::Uuid, LayoutField>::SimpleTypeActionField;
 
 signals:
     void valueChanged();

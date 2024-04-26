@@ -24,6 +24,8 @@ class TestEventField: public nx::vms::rules::EventFilterField
     Q_PROPERTY(nx::vms::api::EventLevels levels MEMBER levels)
 
 public:
+    using vms::rules::EventFilterField::EventFilterField;
+
     virtual bool match(const QVariant&) const override { return false; };
 
 public:
@@ -46,6 +48,8 @@ class TestActionField: public nx::vms::rules::ActionBuilderField
     Q_CLASSINFO("metatype", "nx.actions.field.test")
 
 public:
+    using vms::rules::ActionBuilderField::ActionBuilderField;
+
     virtual QVariant build(const AggregatedEventPtr&) const override { return {}; }
 };
 

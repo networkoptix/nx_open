@@ -15,6 +15,8 @@ class NX_VMS_RULES_API AnalyticsEngineField:
     Q_PROPERTY(nx::Uuid value READ value WRITE setValue NOTIFY valueChanged)
 
 public:
+    using SimpleTypeEventField<nx::Uuid, AnalyticsEngineField>::SimpleTypeEventField;
+
     virtual bool match(const QVariant& eventValue) const override;
 
 signals:

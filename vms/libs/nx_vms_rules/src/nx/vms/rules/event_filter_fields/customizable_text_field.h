@@ -15,7 +15,7 @@ class NX_VMS_RULES_API CustomizableTextField:
     Q_PROPERTY(QString value READ value WRITE setValue NOTIFY valueChanged)
 
 public:
-    CustomizableTextField() = default;
+    using SimpleTypeEventField<QString, CustomizableTextField>::SimpleTypeEventField;
 
     virtual bool match(const QVariant& eventValue) const override;
 

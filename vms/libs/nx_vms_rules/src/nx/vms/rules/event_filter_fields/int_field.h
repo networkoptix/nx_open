@@ -15,7 +15,7 @@ class NX_VMS_RULES_API IntField: public SimpleTypeEventField<int, IntField>
     Q_PROPERTY(int value READ value WRITE setValue NOTIFY valueChanged)
 
 public:
-    IntField() = default;
+    using SimpleTypeEventField<int, IntField>::SimpleTypeEventField;
 
 signals:
     void valueChanged();

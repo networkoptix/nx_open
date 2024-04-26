@@ -11,6 +11,26 @@
 
 namespace nx::vms::rules {
 
+/** Common field properties that will be stored in the filed manifest. */
+struct FieldProperties
+{
+    /** Whether given field should be visible in the editor. */
+    bool visible{true};
+
+    QVariantMap toVariantMap() const
+    {
+        return {{"visible", visible}};
+    }
+
+    static FieldProperties fromVariantMap(const QVariantMap& properties)
+    {
+        FieldProperties result;
+        result.visible = properties.value("visible", true).toBool();
+
+        return result;
+    }
+};
+
 /**
  * Base class for storing actual rule values for event filters and action builders.
  */
@@ -23,13 +43,15 @@ public:
     static constexpr auto kMetatype = "metatype";
 
 public:
-    Field();
+    explicit Field(const FieldDescriptor* descriptor);
 
     QString metatype() const;
 
     void connectSignals();
 
     QMap<QString, QJsonValue> serializedProperties() const;
+
+    const FieldDescriptor* descriptor() const;
 
     /**
      * Set field properties.
@@ -39,6 +61,8 @@ public:
 
     bool event(QEvent* ev) override;
 
+    FieldProperties properties() const;
+
 signals:
     void stateChanged();
 
@@ -46,6 +70,7 @@ private:
     void notifyParent();
 
 private:
+    const FieldDescriptor* m_descriptor = nullptr;
     bool m_connected = false;
     bool m_updateInProgress = false;
 };

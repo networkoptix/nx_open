@@ -39,6 +39,9 @@ const QString kTestActionId = "nx.actions.testAction";
 const QString kTestEventFieldId = "nx.actions.field.test";
 const QString kTestActionFieldId = "nx.events.field.test";
 
+const FieldDescriptor kTestEventFieldDescriptor{.id = kTestEventFieldId};
+const FieldDescriptor kTestActionFiledDescriptor{.id = kTestActionFieldId};
+
 api::Rule makeEmptyRuleData()
 {
     return {{nx::Uuid::createUuid()}};
@@ -83,8 +86,10 @@ protected:
     std::unique_ptr<Engine> engine;
     Engine::EventConstructor testEventConstructor = [] { return new TestEvent; };
     Engine::ActionConstructor testActionConstructor = [] { return new TestAction; };
-    Engine::EventFieldConstructor testEventFieldConstructor = [] { return new TestEventField; };
-    Engine::ActionFieldConstructor testActionFieldConstructor = [] { return new TestActionField; };
+    Engine::EventFieldConstructor testEventFieldConstructor =
+        [](const FieldDescriptor* descriptor) { return new TestEventField{descriptor}; };
+    Engine::ActionFieldConstructor testActionFieldConstructor =
+        [](const FieldDescriptor* descriptor) { return new TestActionField{descriptor}; };
 };
 
 TEST_F(EngineTest, ruleAddedSuccessfully)
@@ -214,14 +219,14 @@ TEST_F(EngineTest, eventFieldBuiltWithCorrectType)
 {
     ASSERT_TRUE(engine->registerEventField(kTestEventFieldId, testEventFieldConstructor));
 
-    auto field = engine->buildEventField(kTestEventFieldId);
+    auto field = engine->buildEventField(&kTestEventFieldDescriptor);
 
     ASSERT_TRUE(dynamic_cast<TestEventField*>(field.get()));
 }
 
 TEST_F(EngineTest, buildEventFieldMustFailIfFieldNotRegistered)
 {
-    auto field = engine->buildEventField(kTestEventFieldId);
+    auto field = engine->buildEventField(&kTestEventFieldDescriptor);
 
     ASSERT_FALSE(field);
 }
@@ -264,7 +269,9 @@ TEST_F(EngineTest, buildEventFilterMustFailIfEventNotRegistered)
 TEST_F(EngineTest, manifestFieldNamesShouldBeUnique)
 {
     const QString fieldId = fieldMetatype<TestEventField>();
-    ASSERT_TRUE(engine->registerEventField(fieldId, []{ return new TestEventField; }));
+    ASSERT_TRUE(engine->registerEventField(
+        fieldId,
+        [](const FieldDescriptor* descriptor){ return new TestEventField{descriptor}; }));
 
     const QString eventId = "nx.events.test";
     ItemDescriptor eventDescriptor{
@@ -284,14 +291,14 @@ TEST_F(EngineTest, actionFieldBuiltWithCorrectType)
 {
     ASSERT_TRUE(engine->registerActionField(kTestActionFieldId, testActionFieldConstructor));
 
-    auto field = engine->buildActionField(kTestActionFieldId);
+    auto field = engine->buildActionField(&kTestActionFiledDescriptor);
 
     ASSERT_TRUE(dynamic_cast<TestActionField*>(field.get()));
 }
 
 TEST_F(EngineTest, buildActionFieldMustFailIfFieldNotRegistered)
 {
-    auto field = engine->buildActionField(kTestActionFieldId);
+    auto field = engine->buildActionField(&kTestActionFiledDescriptor);
 
     ASSERT_FALSE(field);
 }
@@ -409,7 +416,9 @@ TEST_F(EngineTest, defaultFieldBuiltForAbsentInManifest)
     // Suppose there is one event and one action registered. Both have two fields each.
 
     const QString eventFieldType = fieldMetatype<TestEventField>();
-    engine->registerEventField(eventFieldType, []{ return new TestEventField; });
+    engine->registerEventField(
+        eventFieldType,
+        [](const FieldDescriptor* descriptor) { return new TestEventField{descriptor}; });
 
     const QString eventType = "nx.events.test";
     ItemDescriptor eventDescriptor{
@@ -423,7 +432,9 @@ TEST_F(EngineTest, defaultFieldBuiltForAbsentInManifest)
     engine->registerEvent(eventDescriptor, testEventConstructor);
 
     const QString actionFieldType = fieldMetatype<TestActionField>();
-    engine->registerActionField(actionFieldType, []{ return new TestActionField; });
+    engine->registerActionField(
+        actionFieldType,
+        [](const FieldDescriptor* descriptor) { return new TestActionField{descriptor}; });
 
     const QString actionType = "nx.actions.test";
     ItemDescriptor actionDescriptor{
@@ -474,7 +485,8 @@ TEST_F(EngineTest, defaultFieldBuiltForAbsentInManifest)
 TEST_F(EngineTest, onlyValidProlongedActionRegistered)
 {
     ASSERT_TRUE(engine->registerActionField(
-        fieldMetatype<OptionalTimeField>(), []{ return new OptionalTimeField{}; }));
+        fieldMetatype<OptionalTimeField>(),
+        [](const FieldDescriptor* descriptor) { return new OptionalTimeField{descriptor}; }));
 
     ItemDescriptor withoutFields{
         .id = "nx.actions.withoutFields",
@@ -551,7 +563,9 @@ TEST_F(EngineTest, cacheTimeout)
 
 TEST_F(EngineTest, cacheState)
 {
-    engine->registerEventField(fieldMetatype<StateField>(), [] { return new StateField{}; });
+    engine->registerEventField(
+        fieldMetatype<StateField>(),
+        [](const FieldDescriptor* descriptor) { return new StateField{descriptor}; });
 
     auto rule = makeRule<TestEventWithState, TestAction>(
         []{ return new TestEventWithState{}; },
@@ -674,9 +688,11 @@ TEST_F(EngineTest, stopProlongedActionsIsEmittedWhenRuleIsDisabled)
     engine->addEventConnector(&connector);
 
     engine->registerEventField(
-        fieldMetatype<SourceCameraField>(), [] { return new SourceCameraField; });
+        fieldMetatype<SourceCameraField>(),
+        [](const FieldDescriptor* descriptor) { return new SourceCameraField{descriptor}; });
     engine->registerActionField(
-        fieldMetatype<TargetDeviceField>(), [] { return new TargetDeviceField; });
+        fieldMetatype<TargetDeviceField>(),
+        [](const FieldDescriptor* descriptor) { return new TargetDeviceField{descriptor}; });
 
     auto rule = makeRule<SimpleEvent, TestProlongedAction>(
         [] { return new SimpleEvent; },

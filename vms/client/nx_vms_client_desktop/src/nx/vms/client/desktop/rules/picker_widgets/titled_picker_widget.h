@@ -24,10 +24,13 @@ public:
 
     void setReadOnly(bool value) override;
 
+    virtual void setValidity(const vms::rules::ValidationResult& validationResult);
+
 protected:
     QLabel* m_title{nullptr};
     SlideSwitch* m_enabledSwitch{nullptr};
     QWidget* m_contentWidget{nullptr};
+    QLabel* m_alertLabel{nullptr};
 
     virtual void onEnabledChanged(bool isEnabled);
 

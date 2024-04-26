@@ -104,7 +104,16 @@ const ItemDescriptor& SoftTriggerEvent::manifest()
                 tr("Occurs at"),
                 {},
                 {{"acceptAll", true}}),
-            makeFieldDescriptor<SourceUserField>(utils::kUserIdFieldName, tr("By")),
+            makeFieldDescriptor<SourceUserField>(
+                utils::kUserIdFieldName,
+                tr("By"),
+                {},
+                ResourceFilterFieldProperties{
+                    .acceptAll = false,
+                    .ids = {},
+                    .allowEmptySelection = false,
+                    .validationPolicy = kUserInputValidationPolicy
+                }.toVariantMap()),
             makeFieldDescriptor<CustomizableTextField>("triggerName", tr("Name")),
             makeFieldDescriptor<CustomizableIconField>("triggerIcon", tr("Icon")),
         },

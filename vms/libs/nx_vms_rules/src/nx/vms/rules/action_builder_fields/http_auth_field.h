@@ -29,7 +29,7 @@ class NX_VMS_RULES_API HttpAuthField: public ActionBuilderField
 
 
 public:
-    HttpAuthField() = default;
+    using ActionBuilderField::ActionBuilderField;
 
     nx::network::http::AuthType authType() const;
     void setAuthType(const nx::network::http::AuthType& authType);

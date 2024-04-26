@@ -19,6 +19,8 @@ class NX_VMS_RULES_API KeywordsField: public EventFilterField
     Q_PROPERTY(QString string READ string WRITE setString NOTIFY stringChanged)
 
 public:
+    using EventFilterField::EventFilterField;
+
     virtual bool match(const QVariant& value) const override;
 
     QString string() const;

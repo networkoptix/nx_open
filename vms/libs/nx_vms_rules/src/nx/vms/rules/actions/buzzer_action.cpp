@@ -25,7 +25,11 @@ const ItemDescriptor& BuzzerAction::manifest()
                 utils::kDurationFieldName,
                 tr("Fixed duration"),
                 {},
-                {.initialValue = 1s, .defaultValue = 1s, .maximumValue = 24h, .minimumValue = 1s}),
+                TimeFieldProperties{
+                    .value = 1s,
+                    .defaultValue = 1s,
+                    .maximumValue = 24h,
+                    .minimumValue = 1s}.toVariantMap()),
             utils::makeIntervalFieldDescriptor(tr("Action Throttling")),
         },
         .resources = {{utils::kServerIdsFieldName, {ResourceType::server, {}, {}, FieldFlag::target}}},

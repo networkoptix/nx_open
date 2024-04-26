@@ -15,7 +15,7 @@ class NX_VMS_RULES_API SoundField: public SimpleTypeActionField<QString, SoundFi
     Q_PROPERTY(QString value READ value WRITE setValue NOTIFY valueChanged)
 
 public:
-    SoundField() = default;
+    using SimpleTypeActionField<QString, SoundField>::SimpleTypeActionField;
 
 signals:
     void valueChanged();

@@ -22,7 +22,7 @@ class NX_VMS_RULES_API TimeField:
     Q_PROPERTY(std::chrono::microseconds value READ value WRITE setValue NOTIFY valueChanged)
 
 public:
-    TimeField() = default;
+    using SimpleTypeActionField<std::chrono::microseconds, TimeField>::SimpleTypeActionField;
 
 signals:
     void valueChanged();

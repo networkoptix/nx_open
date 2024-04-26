@@ -2,8 +2,12 @@
 
 #include "push_notification_action.h"
 
+#include <nx/utils/qt_helpers.h>
+#include <nx/vms/api/data/user_group_data.h>
+
 #include "../action_builder_fields/event_devices_field.h"
 #include "../action_builder_fields/flag_field.h"
+#include "../action_builder_fields/target_user_field.h"
 #include "../action_builder_fields/text_with_fields.h"
 #include "../utils/event_details.h"
 #include "../utils/field.h"
@@ -20,7 +24,17 @@ const ItemDescriptor& PushNotificationAction::manifest()
         .executionTargets = ExecutionTarget::servers,
         .targetServers = TargetServers::serverWithPublicIp,
         .fields = {
-            utils::makeTargetUserFieldDescriptor(tr("To")),
+            makeFieldDescriptor<TargetUserField>(
+                utils::kUsersFieldName,
+                tr("To"),
+                {},
+                ResourceFilterFieldProperties{
+                    .visible = false,
+                    .acceptAll = false,
+                    .ids = nx::utils::toQSet(vms::api::kAllPowerUserGroupIds),
+                    .allowEmptySelection = false,
+                    .validationPolicy = kCloudUserValidationPolicy
+                }.toVariantMap()),
             makeFieldDescriptor<TextWithFields>("caption", tr("Header"), QString(),
                 {
                     { "text", "{@EventCaption}" }

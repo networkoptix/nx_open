@@ -8,7 +8,11 @@
 
 namespace nx::vms::rules {
 
-AnalyticsEventTypeField::AnalyticsEventTypeField(nx::vms::common::SystemContext* context):
+AnalyticsEventTypeField::AnalyticsEventTypeField(
+    common::SystemContext* context,
+    const FieldDescriptor* descriptor)
+    :
+    EventFilterField{descriptor},
     SystemContextAware(context)
 {
 }

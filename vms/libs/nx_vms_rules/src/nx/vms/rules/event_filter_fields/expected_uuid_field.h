@@ -14,7 +14,7 @@ class NX_VMS_RULES_API ExpectedUuidField: public SimpleTypeEventField<nx::Uuid, 
     Q_PROPERTY(nx::Uuid value READ value WRITE setValue NOTIFY valueChanged)
 
 public:
-    ExpectedUuidField() = default;
+    using SimpleTypeEventField<nx::Uuid, ExpectedUuidField>::SimpleTypeEventField;
 
 signals:
     void valueChanged();

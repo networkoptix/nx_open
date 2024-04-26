@@ -3,6 +3,7 @@
 #include "exit_fullscreen_action.h"
 
 #include "../action_builder_fields/target_layout_field.h"
+#include "../action_builder_fields/target_user_field.h"
 #include "../utils/field.h"
 #include "../utils/type.h"
 
@@ -16,8 +17,17 @@ const ItemDescriptor& ExitFullscreenAction::manifest()
         .flags = ItemFlag::instant,
         .executionTargets = ExecutionTarget::clients,
         .fields = {
-            utils::makeTargetUserFieldDescriptor(
-                tr("To"), {}, utils::UserFieldPreset::All, /*visible*/ false),
+            makeFieldDescriptor<TargetUserField>(
+                utils::kUsersFieldName,
+                tr("To"),
+                {},
+                ResourceFilterFieldProperties{
+                    .visible = false,
+                    .acceptAll = true,
+                    .ids = {},
+                    .allowEmptySelection = false,
+                    .validationPolicy = {}
+                }.toVariantMap()),
             makeFieldDescriptor<TargetLayoutField>(utils::kLayoutIdsFieldName, tr("On Layout")),
         },
         .resources = {{utils::kLayoutIdsFieldName, {ResourceType::layout}}},

@@ -25,6 +25,7 @@ public:
     explicit ParamsWidget(WindowContext* context, QWidget* parent = nullptr);
 
     void setRule(const std::shared_ptr<vms::rules::Rule>& rule);
+    vms::rules::Rule* rule() const;
 
     virtual std::optional<vms::rules::ItemDescriptor> descriptor() const = 0;
     std::optional<vms::rules::ItemDescriptor> actionDescriptor() const;

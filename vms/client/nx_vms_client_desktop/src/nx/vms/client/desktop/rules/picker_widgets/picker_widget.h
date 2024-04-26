@@ -12,6 +12,7 @@
 #include <nx/vms/rules/action_builder_field.h>
 #include <nx/vms/rules/event_filter.h>
 #include <nx/vms/rules/event_filter_field.h>
+#include <nx/vms/rules/field_validator.h>
 #include <nx/vms/rules/manifest.h>
 #include <ui/workbench/workbench_context_aware.h>
 

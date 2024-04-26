@@ -58,7 +58,11 @@ bool checkForListEntries(
 
 } // namespace
 
-ObjectLookupField::ObjectLookupField(common::SystemContext* context):
+ObjectLookupField::ObjectLookupField(
+    common::SystemContext* context,
+    const FieldDescriptor* descriptor)
+    :
+    EventFilterField{descriptor},
     common::SystemContextAware{context}
 {
     const auto messageProcessor = systemContext()->messageProcessor();

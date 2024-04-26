@@ -15,7 +15,7 @@ class NX_VMS_RULES_API HttpMethodField: public SimpleTypeActionField<QString, Ht
     Q_PROPERTY(QString value READ value WRITE setValue NOTIFY valueChanged)
 
 public:
-    HttpMethodField() = default;
+    using SimpleTypeActionField<QString, HttpMethodField>::SimpleTypeActionField;
 
 signals:
     void valueChanged();

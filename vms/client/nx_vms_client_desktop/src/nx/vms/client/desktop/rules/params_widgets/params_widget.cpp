@@ -33,6 +33,11 @@ void ParamsWidget::setRule(const std::shared_ptr<vms::rules::Rule>& rule)
     updateUi();
 }
 
+vms::rules::Rule* ParamsWidget::rule() const
+{
+    return m_rule.get();
+}
+
 std::optional<vms::rules::ItemDescriptor> ParamsWidget::actionDescriptor() const
 {
     return m_rule->engine()->actionDescriptor(m_rule->actionBuilders().first()->actionType());

@@ -15,6 +15,8 @@ class NX_VMS_RULES_API AnalyticsObjectAttributesField:
     Q_PROPERTY(QString value READ value WRITE setValue NOTIFY valueChanged)
 
 public:
+    using SimpleTypeEventField<QString, AnalyticsObjectAttributesField>::SimpleTypeEventField;
+
     virtual bool match(const QVariant& eventValue) const override;
 
 signals:

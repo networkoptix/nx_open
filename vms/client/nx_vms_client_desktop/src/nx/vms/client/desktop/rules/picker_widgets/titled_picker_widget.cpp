@@ -7,6 +7,7 @@
 #include <QtWidgets/QVBoxLayout>
 
 #include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <ui/common/palette.h>
 
@@ -56,6 +57,16 @@ TitledPickerWidget::TitledPickerWidget(SystemContext* context, ParamsWidget* par
         m_contentWidget = new QWidget;
         mainLayout->addWidget(m_contentWidget);
     }
+
+    {
+        m_alertLabel = new QLabel;
+        m_alertLabel->setSizePolicy(QSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred));
+        m_alertLabel->setVisible(false);
+        m_alertLabel->setWordWrap(true);
+        setWarningStyle(m_alertLabel);
+        m_alertLabel->setTextFormat(Qt::TextFormat::RichText);
+        mainLayout->addWidget(m_alertLabel);
+    }
 }
 
 void TitledPickerWidget::setCheckBoxEnabled(bool value)
@@ -86,6 +97,15 @@ void TitledPickerWidget::onEnabledChanged(bool isEnabled)
 void TitledPickerWidget::onDescriptorSet()
 {
     m_title->setText(m_fieldDescriptor->displayName.toUpper());
+}
+
+void TitledPickerWidget::setValidity(const vms::rules::ValidationResult& validationResult)
+{
+    m_alertLabel->setVisible(validationResult.validity != QValidator::State::Acceptable
+        && !validationResult.description.isEmpty());
+
+    if (!validationResult.description.isEmpty())
+        m_alertLabel->setText(validationResult.description);
 }
 
 } // namespace nx::vms::client::desktop::rules

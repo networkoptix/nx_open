@@ -4,6 +4,7 @@
 
 #include <QtWidgets/QHBoxLayout>
 
+#include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/helper.h>
 
 namespace nx::vms::client::desktop::rules {
@@ -27,8 +28,19 @@ PlainPickerWidget::PlainPickerWidget(SystemContext* context, ParamsWidget* paren
     mainLayout->addWidget(m_label);
     mainLayout->setAlignment(m_label, Qt::AlignTop);
 
+    auto contentLayout = new QVBoxLayout;
     m_contentWidget = new QWidget;
-    mainLayout->addWidget(m_contentWidget);
+    contentLayout->addWidget(m_contentWidget);
+
+    m_alertLabel = new QLabel;
+    m_alertLabel->setSizePolicy(QSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred));
+    m_alertLabel->setVisible(false);
+    m_alertLabel->setWordWrap(true);
+    setWarningStyle(m_alertLabel);
+    m_alertLabel->setTextFormat(Qt::TextFormat::RichText);
+    contentLayout->addWidget(m_alertLabel);
+
+    mainLayout->addLayout(contentLayout);
 
     mainLayout->setStretch(0, 1);
     mainLayout->setStretch(1, 5);
@@ -37,6 +49,15 @@ PlainPickerWidget::PlainPickerWidget(SystemContext* context, ParamsWidget* paren
 void PlainPickerWidget::setReadOnly(bool value)
 {
     m_contentWidget->setEnabled(!value);
+}
+
+void PlainPickerWidget::setValidity(const vms::rules::ValidationResult& validationResult)
+{
+    m_alertLabel->setVisible(validationResult.validity != QValidator::State::Acceptable
+        && !validationResult.description.isEmpty());
+
+    if (!validationResult.description.isEmpty())
+        m_alertLabel->setText(validationResult.description);
 }
 
 void PlainPickerWidget::onDescriptorSet()

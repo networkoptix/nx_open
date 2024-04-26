@@ -15,7 +15,7 @@ class NX_VMS_RULES_API PtzPresetField: public SimpleTypeActionField<QString, Ptz
     Q_PROPERTY(QString value READ value WRITE setValue NOTIFY valueChanged)
 
 public:
-    PtzPresetField() = default;
+    using SimpleTypeActionField<QString, PtzPresetField>::SimpleTypeActionField;
 
 signals:
     void valueChanged();

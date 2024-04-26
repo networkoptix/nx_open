@@ -19,7 +19,7 @@ class NX_VMS_RULES_API FpsField: public SimpleTypeActionField<int, FpsField>
     Q_PROPERTY(int value READ value WRITE setValue NOTIFY valueChanged)
 
 public:
-    FpsField() = default;
+    using SimpleTypeActionField<int, FpsField>::SimpleTypeActionField;
 
 signals:
     void valueChanged();

@@ -15,7 +15,7 @@ class NX_VMS_RULES_API CustomizableIconField:
     Q_PROPERTY(QString value READ value WRITE setValue NOTIFY valueChanged)
 
 public:
-    CustomizableIconField() = default;
+    using SimpleTypeEventField<QString, CustomizableIconField>::SimpleTypeEventField;
 
     virtual bool match(const QVariant& value) const override;
 
