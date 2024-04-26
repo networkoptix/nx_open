@@ -21,7 +21,7 @@ AccessRightsList::AccessRightsList(QObject* parent):
                 AccessRightDescriptor{
                     .accessRight = AccessRight::view,
                     .name = common::AccessRightHelper::name(AccessRight::view),
-                    .description = common::html::bold(tr("View Live") + ".") + " " +
+                    .description = common::html::bold(tr("View Live.")) + " " +
                         tr("Allows users to access a resource and view live footage from a camera."),
                     .icon = QUrl("24x20/Solid/live.svg")},
                 AccessRightDescriptor{
@@ -54,13 +54,13 @@ AccessRightsList::AccessRightsList(QObject* parent):
                 AccessRightDescriptor{
                     .accessRight = AccessRight::userInput,
                     .name = common::AccessRightHelper::name(AccessRight::userInput),
-                    .description = common::html::bold(tr("User Input") + ".") + " " +
+                    .description = common::html::bold(tr("User Input.")) + " " +
                         tr("Allows user to control PTZ, use 2-Way Audio, Soft Triggers and I/O buttons."),
                     .icon = QUrl("24x20/Solid/userinput.svg")},
                 AccessRightDescriptor{
                     .accessRight = AccessRight::edit,
                     .name = common::AccessRightHelper::name(AccessRight::edit),
-                    .description = common::html::bold(tr("Edit Settings") + ".") + " " +
+                    .description = common::html::bold(tr("Edit Settings.")) + " " +
                         tr("Depending on the resource type it either allows user to modify device settings"
                         " or to control video wall."),
                     .icon = QUrl("24x20/Solid/camera_edit.svg")}});
