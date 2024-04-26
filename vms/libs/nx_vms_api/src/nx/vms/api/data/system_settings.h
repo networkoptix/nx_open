@@ -214,6 +214,7 @@ struct SaveableSystemSettings
 QN_FUSION_DECLARE_FUNCTIONS(SaveableSystemSettings, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(SaveableSystemSettings, SaveableSystemSettings_Fields)
 NX_REFLECTION_TAG_TYPE(SaveableSystemSettings, jsonSerializeChronoDurationAsNumber)
+NX_REFLECTION_TAG_TYPE(SaveableSystemSettings, jsonSerializeInt64AsString)
 
 struct NX_VMS_API SystemSettings: SaveableSystemSettings
 {
@@ -248,5 +249,6 @@ struct NX_VMS_API SystemSettings: SaveableSystemSettings
 QN_FUSION_DECLARE_FUNCTIONS(SystemSettings, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(SystemSettings, SystemSettings_Fields)
 NX_REFLECTION_TAG_TYPE(SystemSettings, jsonSerializeChronoDurationAsNumber)
+NX_REFLECTION_TAG_TYPE(SystemSettings, jsonSerializeInt64AsString)
 
 } // namespace nx::vms::api

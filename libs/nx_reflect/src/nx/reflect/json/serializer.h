@@ -52,19 +52,17 @@ struct SerializationContext
     JsonComposer composer;
 
     template<typename T>
-    bool beforeSerialize(const T&)
+    unsigned int beforeSerialize(const T&)
     {
-        // Applying tag to all embedded members also.
-
-        return composer.setSerializeDurationAsNumber(
-            composer.isSerializeDurationAsNumber() ||
-            jsonSerializeChronoDurationAsNumber((const T*) nullptr));
+        return composer.setSerializeFlags(composer.serializeFlags()
+            | (jsonSerializeChronoDurationAsNumber((const T*) nullptr) << 0u)
+            | (jsonSerializeInt64AsString((const T*) nullptr) << 1u));
     }
 
     template<typename T>
-    void afterSerialize(const T&, bool bak)
+    void afterSerialize(const T&, unsigned int state)
     {
-        composer.setSerializeDurationAsNumber(bak);
+        composer.setSerializeFlags(state);
     }
 };
 

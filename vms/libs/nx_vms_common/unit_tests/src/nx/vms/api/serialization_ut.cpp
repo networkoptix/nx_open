@@ -252,10 +252,8 @@ void checkSystemSettings(
     }
     qjson = nx::utils::formatJsonString(qjson);
     ASSERT_EQ(expected.toStdString(), qjson.toStdString());
-    QJsonObject valueFromReflect;
+    QJsonValue valueFromReflect;
     ASSERT_TRUE(QJson::deserialize(reflect, &valueFromReflect));
-    auto maxP2pAllClientsSizeBytes = valueFromReflect["maxP2pAllClientsSizeBytes"];
-    maxP2pAllClientsSizeBytes = QString::number((int) maxP2pAllClientsSizeBytes.toDouble());
     QByteArray qjsonFromReflect;
     QJson::serialize(valueFromReflect, &qjsonFromReflect);
     qjsonFromReflect = nx::utils::formatJsonString(qjsonFromReflect);
