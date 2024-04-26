@@ -87,7 +87,7 @@
     <name>nx::vms::rules::BackupFinishedEvent</name>
     <message>
       <source>Server &quot;%1&quot; has finished an archive backup</source>
-      <translation>サーバー&quot;%1&quot; のアーカイブバックアップが完了しました</translation>
+      <translation>サーバー &quot;%1&quot; のアーカイブのバックアップが完了しました</translation>
     </message>
     <message>
       <source>Backup Finished</source>
@@ -686,7 +686,7 @@
     <message>
       <source>Reason: Power limit exceeded (%1)</source>
       <comment>%1 is consumption</comment>
-      <translation>理由：電力制限を超えました (%1)</translation>
+      <translation>理由: 電力上限を超過しました (%1)</translation>
     </message>
     <message>
       <source>Server</source>
@@ -867,7 +867,7 @@
     </message>
     <message>
       <source>Server &quot;%1&quot; Conflict</source>
-      <translation>サーバー&quot;%1&quot; 競合</translation>
+      <translation>サーバー &quot;%1&quot; 競合</translation>
     </message>
     <message>
       <source>Server Conflict</source>
@@ -878,11 +878,11 @@
     <name>nx::vms::rules::ServerFailureEvent</name>
     <message>
       <source>Server &quot;%1&quot; Failure</source>
-      <translation>サーバー&quot;%1&quot; エラー</translation>
+      <translation>サーバー &quot;%1&quot; 障害</translation>
     </message>
     <message>
       <source>Server Failure</source>
-      <translation>サーバー不良</translation>
+      <translation>サーバー障害</translation>
     </message>
     <message>
       <source>Connection to server is lost.</source>
@@ -897,11 +897,11 @@
     <name>nx::vms::rules::ServerStartedEvent</name>
     <message>
       <source>Server &quot;%1&quot; Started</source>
-      <translation>サーバー&quot;%1&quot; 開始</translation>
+      <translation>サーバー &quot;%1&quot; が起動しました</translation>
     </message>
     <message>
       <source>Server Started</source>
-      <translation>サーバー開始</translation>
+      <translation>サーバー起動</translation>
     </message>
   </context>
   <context>
@@ -935,11 +935,11 @@
     </message>
     <message>
       <source>Trigger: %1</source>
-      <translation>トリガー：%1</translation>
+      <translation>トリガー: %1</translation>
     </message>
     <message>
       <source>Soft Trigger %1 at %2</source>
-      <translation>%2のソフトトリガー%1</translation>
+      <translation>%2 のソフトトリガー %1</translation>
     </message>
     <message>
       <source>Soft Trigger</source>
@@ -966,7 +966,7 @@
     <name>nx::vms::rules::SpeakAction</name>
     <message>
       <source>Speak</source>
-      <translation>スピーク</translation>
+      <translation>テキスト読み上げ</translation>
     </message>
     <message>
       <source>Volume</source>
@@ -1103,7 +1103,7 @@
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
       <translation>
-        <numerusform>%n 回、最初: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+        <numerusform>%n 回、初回: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1116,7 +1116,7 @@
     <message>
       <source>Time: %1 on %2</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation>時間: %1 時分 %2・月日</translation>
+      <translation>日時: %2 %1</translation>
     </message>
     <message>
       <source>All users</source>
