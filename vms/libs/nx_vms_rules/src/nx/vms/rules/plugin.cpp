@@ -17,11 +17,16 @@ void Plugin::initialize(Engine* engine)
     m_engine = engine;
 
     registerFields();
+    registerFieldValidators();
     registerEvents();
     registerActions();
 }
 
 void Plugin::registerFields() const
+{
+}
+
+void Plugin::registerFieldValidators() const
 {
 }
 

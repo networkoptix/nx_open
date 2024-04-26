@@ -15,7 +15,7 @@ class NX_VMS_RULES_API ActionFlagField: public SimpleTypeActionField<bool, Actio
     Q_PROPERTY(bool value READ value WRITE setValue NOTIFY valueChanged)
 
 public:
-    ActionFlagField() = default;
+    using SimpleTypeActionField<bool, ActionFlagField>::SimpleTypeActionField;
 
 signals:
     void valueChanged();

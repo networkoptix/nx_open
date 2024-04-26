@@ -7,8 +7,12 @@
 
 namespace nx::vms::rules {
 
-TargetUserField::TargetUserField(common::SystemContext* context):
-    common::SystemContextAware(context)
+TargetUserField::TargetUserField(
+    common::SystemContext* context,
+    const FieldDescriptor* descriptor)
+    :
+    ResourceFilterActionField{descriptor},
+    common::SystemContextAware{context}
 {
 }
 

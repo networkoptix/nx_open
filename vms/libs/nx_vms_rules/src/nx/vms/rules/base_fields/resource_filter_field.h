@@ -10,6 +10,50 @@
 
 namespace nx::vms::rules {
 
+struct ResourceFilterFieldProperties
+{
+    /** Whether given field should be visible in the editor. */
+    bool visible{true};
+
+    /** Value for the the just created field's `acceptAll` property. */
+    bool acceptAll{false};
+
+    /** Value for the the just created field's `ids` property. */
+    UuidSet ids;
+
+    bool allowEmptySelection{false};
+    QString validationPolicy;
+
+    QVariantMap toVariantMap() const
+    {
+        QVariantMap result;
+
+        result.insert("acceptAll", acceptAll);
+        if (!ids.empty())
+            result.insert("ids", QVariant::fromValue(ids));
+
+        result.insert("visible", visible);
+        result.insert("allowEmptySelection", allowEmptySelection);
+        result.insert("validationPolicy", validationPolicy);
+
+        return result;
+    }
+
+    static ResourceFilterFieldProperties fromVariantMap(const QVariantMap& properties)
+    {
+        ResourceFilterFieldProperties result;
+
+        result.acceptAll = properties.value("acceptAll").toBool();
+        result.ids = properties.value("ids").value<UuidSet>();
+
+        result.visible = properties.value("visible", true).toBool();
+        result.allowEmptySelection = properties.value("allowEmptySelection", false).toBool();
+        result.validationPolicy = properties.value("validationPolicy").toString();
+
+        return result;
+    }
+};
+
 template<class T>
 class NX_VMS_RULES_API ResourceFilterFieldBase
 {
@@ -32,6 +76,12 @@ public:
             m_ids = ids;
             emit static_cast<T*>(this)->idsChanged();
         }
+    }
+
+    ResourceFilterFieldProperties properties() const
+    {
+        return ResourceFilterFieldProperties::fromVariantMap(
+            static_cast<const T*>(this)->descriptor()->properties);
     }
 
 protected:
@@ -57,6 +107,9 @@ signals:
     void idsChanged();
 
 public:
+    using EventFilterField::EventFilterField;
+    using ResourceFilterFieldBase<ResourceFilterEventField>::properties;
+
     virtual bool match(const QVariant& value) const override;
 };
 
@@ -74,6 +127,9 @@ signals:
     void idsChanged();
 
 public:
+    using ActionBuilderField::ActionBuilderField;
+    using ResourceFilterFieldBase<ResourceFilterActionField>::properties;
+
     virtual QVariant build(const AggregatedEventPtr& eventAggregator) const override;
 
     void setSelection(const UuidSelection& selection);

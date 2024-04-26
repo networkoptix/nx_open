@@ -3,12 +3,15 @@
 #include "extract_detail_field.h"
 
 #include "../aggregated_event.h"
-#include "../utils/event_details.h"
 
 namespace nx::vms::rules {
 
-ExtractDetailField::ExtractDetailField(nx::vms::common::SystemContext* context):
-    SystemContextAware(context)
+ExtractDetailField::ExtractDetailField(
+    nx::vms::common::SystemContext* context,
+    const FieldDescriptor* descriptor)
+    :
+    ActionBuilderField{descriptor},
+    SystemContextAware{context}
 {
 }
 

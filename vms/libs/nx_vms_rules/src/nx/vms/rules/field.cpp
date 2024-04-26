@@ -9,12 +9,14 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/qobject.h>
 
+#include "manifest.h"
 #include "utils/serialization.h"
 
 namespace nx::vms::rules {
 
-Field::Field()
+Field::Field(const FieldDescriptor* descriptor): m_descriptor{descriptor}
 {
+    NX_ASSERT(m_descriptor, "Field descriptor is required");
 }
 
 QString Field::metatype() const
@@ -55,11 +57,15 @@ QMap<QString, QJsonValue> Field::serializedProperties() const
     return serializeProperties(this, nx::utils::propertyNames(this));
 }
 
+const FieldDescriptor* Field::descriptor() const
+{
+    NX_ASSERT(m_descriptor);
+    return m_descriptor;
+}
+
 bool Field::setProperties(const QVariantMap& properties)
 {
     bool isAllPropertiesSet = true;
-    const auto propertyNames = utils::propertyNames(this);
-
     for (const auto& propertyName: utils::propertyNames(this))
     {
         const auto propertyIt = properties.constFind(propertyName);
@@ -91,6 +97,11 @@ void Field::notifyParent()
 
     QScopedValueRollback<bool> guard(m_updateInProgress, true);
     emit stateChanged();
+}
+
+FieldProperties Field::properties() const
+{
+    return FieldProperties::fromVariantMap(descriptor()->properties);
 }
 
 } // namespace nx::vms::rules

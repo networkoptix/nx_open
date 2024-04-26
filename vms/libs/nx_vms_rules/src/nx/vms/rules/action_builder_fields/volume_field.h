@@ -17,7 +17,8 @@ class NX_VMS_RULES_API VolumeField: public SimpleTypeActionField<float, VolumeFi
     static constexpr auto kDefaultVolume = 0.8f;
 
 public:
-    VolumeField()
+    explicit VolumeField(const FieldDescriptor* descriptor):
+        SimpleTypeActionField<float, VolumeField>{descriptor}
     {
         setValue(kDefaultVolume);
     };

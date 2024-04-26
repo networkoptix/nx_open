@@ -112,7 +112,7 @@ struct FieldDescriptor
     QString description;
 
     /**%apidoc[opt]:object Optional properties corresponding to the actual field id. */
-    QVariantMap properties;
+    QVariantMap properties; //< TODO: #mmalofeev should properties required for the field initialisation be separated from the supportive properties?
 
     /**%apidoc[opt] Field names of the parent item that required for the current field. */
     QStringList linkedFields;

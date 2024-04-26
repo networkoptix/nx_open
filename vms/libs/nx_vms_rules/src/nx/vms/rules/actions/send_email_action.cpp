@@ -3,9 +3,12 @@
 #include "send_email_action.h"
 
 #include <core/resource/user_resource.h>
+#include <nx/utils/qt_helpers.h>
+#include <nx/vms/api/data/user_group_data.h>
 #include <utils/email/email.h>
 
 #include "../action_builder_fields/email_message_field.h"
+#include "../action_builder_fields/target_user_field.h"
 #include "../action_builder_fields/text_field.h"
 #include "../utils/event_details.h"
 #include "../utils/field.h"
@@ -24,16 +27,24 @@ const ItemDescriptor& SendEmailAction::manifest()
         .executionTargets = ExecutionTarget::servers,
         .targetServers = TargetServers::serverWithPublicIp,
         .fields = {
-            utils::makeTargetUserFieldDescriptor(
+            makeFieldDescriptor<TargetUserField>(
+                utils::kUsersFieldName,
                 tr("To"),
                 {},
-                utils::UserFieldPreset::Power,
-                /*visible*/ true,
+                ResourceFilterFieldProperties{
+                    .acceptAll = false,
+                    .ids = nx::utils::toQSet(vms::api::kAllPowerUserGroupIds),
+                    .allowEmptySelection = false,
+                    .validationPolicy = kUserWithEmailValidationPolicy
+                }.toVariantMap(),
                 {utils::kEmailsFieldName}),
             makeFieldDescriptor<ActionTextField>(
                 utils::kEmailsFieldName, tr("Additional Recipients")),
             makeFieldDescriptor<EmailMessageField>(
-                "message", tr("Email Message"), {}, {{ "visible", false }}),
+                "message",
+                tr("Email Message"),
+                {},
+                FieldProperties{.visible = false}.toVariantMap()),
             utils::makeIntervalFieldDescriptor(tr("Interval of Action")),
         }
     };

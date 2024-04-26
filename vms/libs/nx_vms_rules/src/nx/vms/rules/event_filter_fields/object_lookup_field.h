@@ -23,7 +23,7 @@ class NX_VMS_RULES_API ObjectLookupField:
     Q_PROPERTY(ObjectLookupCheckType checkType READ checkType WRITE setCheckType NOTIFY checkTypeChanged)
 
 public:
-    explicit ObjectLookupField(common::SystemContext* context);
+    ObjectLookupField(common::SystemContext* context, const FieldDescriptor* descriptor);
 
     /*
      * Check type dependent value. If the check type is linked with attributes - atributes string,

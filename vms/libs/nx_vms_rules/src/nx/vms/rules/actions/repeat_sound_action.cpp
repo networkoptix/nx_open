@@ -5,6 +5,7 @@
 #include "../action_builder_fields/event_id_field.h"
 #include "../action_builder_fields/sound_field.h"
 #include "../action_builder_fields/target_device_field.h"
+#include "../action_builder_fields/target_user_field.h"
 #include "../action_builder_fields/volume_field.h"
 #include "../utils/event_details.h"
 #include "../utils/field.h"
@@ -28,8 +29,16 @@ const ItemDescriptor& RepeatSoundAction::manifest()
         .fields = {
             makeFieldDescriptor<SoundField>(utils::kSoundFieldName, tr("Sound")),
             makeFieldDescriptor<TargetDeviceField>(utils::kDeviceIdsFieldName, tr("At")),
-            utils::makeTargetUserFieldDescriptor(
-                tr("To"), {}, utils::UserFieldPreset::None),
+            makeFieldDescriptor<TargetUserField>(
+                utils::kUsersFieldName,
+                tr("To"),
+                {},
+                ResourceFilterFieldProperties{
+                    .acceptAll = false,
+                    .ids = {},
+                    .allowEmptySelection = true,
+                    .validationPolicy = {}
+                }.toVariantMap()),
             makeFieldDescriptor<VolumeField>(
                 "volume", tr("Volume"), {}, {}, {utils::kSoundFieldName}),
 

@@ -3,19 +3,20 @@
 #include "resource_selection_widget.h"
 
 #include <QtWidgets/QApplication>
-#include <QtWidgets/QPushButton>
 #include <QtWidgets/QHeaderView>
+#include <QtWidgets/QPushButton>
 
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/desktop/resource_dialogs/details/filtered_resource_view_widget.h>
-#include <nx/vms/client/desktop/resource_dialogs/item_delegates/resource_dialog_item_delegate.h>
 #include <nx/vms/client/desktop/resource_dialogs/item_delegates/checkbox_column_item_delegate.h>
+#include <nx/vms/client/desktop/resource_dialogs/item_delegates/resource_dialog_item_delegate.h>
 #include <nx/vms/client/desktop/resource_dialogs/models/invalid_resource_decorator_model.h>
 #include <nx/vms/client/desktop/resource_dialogs/models/invalid_resource_filter_model.h>
 #include <nx/vms/client/desktop/resource_dialogs/models/resource_selection_decorator_model.h>
 #include <nx/vms/client/desktop/resource_dialogs/resource_dialogs_constants.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
+#include <nx/vms/client/desktop/style/custom_style.h>
 #include <ui/workbench/workbench_context.h>
 
 namespace {

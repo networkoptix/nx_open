@@ -13,6 +13,7 @@
 #include <nx/vms/client/desktop/resource_dialogs/camera_selection_dialog.h>
 #include <nx/vms/client/desktop/resource_dialogs/multiple_layout_selection_dialog.h>
 #include <nx/vms/client/desktop/rules/helpers/fullscreen_action_helper.h>
+#include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/event/action_parameters.h>
 #include <nx/vms/event/events/abstract_event.h>
 

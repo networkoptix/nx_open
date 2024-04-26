@@ -173,7 +173,7 @@ public:
 
         EXPECT_TRUE(m_engine->registerActionField(
             fieldMetatype<T>(),
-            [args...]{ return new T(args...); }));
+            [args...](const FieldDescriptor* descriptor){ return new T(args..., descriptor); }));
     }
 
     template<class T, class... Args>
@@ -183,10 +183,11 @@ public:
 
         EXPECT_TRUE(m_engine->registerEventField(
             fieldMetatype<T>(),
-            [args...]{ return new T(args...); }));
+            [args...](const FieldDescriptor* descriptor){ return new T(args..., descriptor); }));
 
         // Check for serialization assertions.
-        const auto field = m_engine->buildEventField(fieldMetatype<T>());
+        const FieldDescriptor tmpDescriptor{.id = fieldMetatype<T>()};
+        const auto field = m_engine->buildEventField(&tmpDescriptor);
         const auto data = serializeProperties(field.get(), nx::utils::propertyNames(field.get()));
         deserializeProperties(data, field.get());
     }

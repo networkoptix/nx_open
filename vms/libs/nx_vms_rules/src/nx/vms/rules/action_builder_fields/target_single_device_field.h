@@ -18,7 +18,7 @@ class NX_VMS_RULES_API TargetSingleDeviceField: public ActionBuilderField
     Q_PROPERTY(bool useSource READ useSource WRITE setUseSource NOTIFY useSourceChanged)
 
 public:
-    TargetSingleDeviceField() = default;
+    using ActionBuilderField::ActionBuilderField;
 
     nx::Uuid id() const;
     void setId(nx::Uuid id);

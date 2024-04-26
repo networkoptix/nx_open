@@ -17,6 +17,8 @@ class NX_VMS_RULES_API AnalyticsEventLevelField:
     Q_PROPERTY(nx::vms::api::EventLevels value READ value WRITE setValue NOTIFY valueChanged)
 
 public:
+    using SimpleTypeEventField<vms::api::EventLevels, AnalyticsEventLevelField>::SimpleTypeEventField;
+
     virtual bool match(const QVariant& eventValue) const override;
 
 signals:

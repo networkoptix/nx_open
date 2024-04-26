@@ -19,7 +19,7 @@ class NX_VMS_RULES_API ActionBuilderField: public Field
     Q_OBJECT
 
 public:
-    ActionBuilderField();
+    using Field::Field;
 
     virtual QSet<QString> requiredEventFields() const;
     virtual QVariant build(const AggregatedEventPtr& eventAggregator) const = 0;

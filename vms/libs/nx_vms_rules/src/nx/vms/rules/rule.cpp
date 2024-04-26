@@ -8,7 +8,10 @@
 #include <core/misc/schedule_task.h>
 
 #include "action_builder.h"
+#include "action_builder_field.h"
+#include "engine.h"
 #include "event_filter.h"
+#include "event_filter_field.h"
 #include "utils/common.h"
 
 namespace nx::vms::rules {
@@ -176,6 +179,70 @@ bool Rule::isValid() const
         return false;
 
     return true;
+}
+
+ValidationResult Rule::validity(common::SystemContext* context) const
+{
+    ValidationResult result;
+
+    QStringList alerts;
+
+    for (const auto& eventFilter: m_filters)
+    {
+        for (auto [fieldName, field]: eventFilter->fields().asKeyValueRange())
+        {
+            auto fieldDescriptor = field->descriptor();
+            if (!NX_ASSERT(fieldDescriptor))
+                return {QValidator::State::Invalid, {}};
+
+            auto validator = m_engine->fieldValidator(field->metatype());
+            if (!NX_ASSERT(validator))
+                return {QValidator::State::Invalid, {}};
+
+            const auto fieldValidity = validator->validity(field, this, context);
+            if (result.validity < fieldValidity.validity)
+                result.validity = fieldValidity.validity;
+
+            if (!fieldValidity.description.isEmpty())
+            {
+                alerts << tr("`%1` field `%2` alert: %3")
+                    .arg(eventFilter->eventType())
+                    .arg(fieldName)
+                    .arg(fieldValidity.description);
+            }
+        }
+    }
+
+    for (const auto& actionBuilder: m_builders)
+    {
+        for (auto [fieldName, field]: actionBuilder->fields().asKeyValueRange())
+        {
+            auto fieldDescriptor = field->descriptor();
+            if (!NX_ASSERT(fieldDescriptor))
+                return {QValidator::State::Invalid, {}};
+
+            auto validator = m_engine->fieldValidator(field->metatype());
+            if (!NX_ASSERT(validator))
+                return {QValidator::State::Invalid, {}};
+
+            const auto fieldValidity = validator->validity(field, this, context);
+            if (result.validity < fieldValidity.validity)
+                result.validity = fieldValidity.validity;
+
+            if (!fieldValidity.description.isEmpty())
+            {
+                alerts << tr("`%1` field `%2` alert: %3")
+                    .arg(actionBuilder->actionType())
+                    .arg(fieldName)
+                    .arg(fieldValidity.description);
+            }
+        }
+    }
+
+    if (!alerts.isEmpty())
+        result.description = alerts.join('\n');
+
+    return result;
 }
 
 void Rule::connectSignals()

@@ -4,10 +4,6 @@
 
 namespace nx::vms::rules {
 
-ActionBuilderField::ActionBuilderField()
-{
-}
-
 QSet<QString> ActionBuilderField::requiredEventFields() const
 {
     return {};

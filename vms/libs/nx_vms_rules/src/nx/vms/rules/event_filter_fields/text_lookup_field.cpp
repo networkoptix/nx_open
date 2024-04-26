@@ -11,7 +11,11 @@
 
 namespace nx::vms::rules {
 
-TextLookupField::TextLookupField(common::SystemContext* context):
+TextLookupField::TextLookupField(
+    common::SystemContext* context,
+    const FieldDescriptor* descriptor)
+    :
+    EventFilterField{descriptor},
     common::SystemContextAware{context}
 {
     const auto messageProcessor = systemContext()->messageProcessor();

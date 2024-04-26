@@ -72,6 +72,9 @@ void TargetUserPicker::updateUi()
 
     m_selectButton->setText(helper.text());
     m_selectButton->setIcon(helper.icon());
+
+    if (auto validator = fieldValidator())
+        setValidity(validator->validity(theField(), parentParamsWidget()->rule(), systemContext()));
 }
 
 void TargetUserPicker::createPolicy()

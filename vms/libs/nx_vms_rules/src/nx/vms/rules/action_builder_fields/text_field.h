@@ -15,7 +15,7 @@ class NX_VMS_RULES_API ActionTextField: public SimpleTypeActionField<QString, Ac
     Q_PROPERTY(QString value READ value WRITE setValue NOTIFY valueChanged)
 
 public:
-    ActionTextField() = default;
+    using SimpleTypeActionField<QString, ActionTextField>::SimpleTypeActionField;
 
 signals:
     void valueChanged();

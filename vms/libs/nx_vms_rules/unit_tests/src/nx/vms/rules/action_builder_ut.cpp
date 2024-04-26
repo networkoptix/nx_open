@@ -22,6 +22,7 @@
 #include <nx/vms/rules/events/server_failure_event.h>
 #include <nx/vms/rules/events/server_started_event.h>
 #include <nx/vms/rules/rule.h>
+#include <nx/vms/rules/utils/common.h>
 #include <nx/vms/rules/utils/field.h>
 #include <utils/common/synctime.h>
 
@@ -62,7 +63,10 @@ public:
 
         m_engine->registerActionField(
             fieldMetatype<TargetUserField>(),
-            [this] { return new TargetUserField(context()->systemContext()); });
+            [this](const FieldDescriptor* descriptor)
+            {
+                return new TargetUserField(context()->systemContext(), descriptor);
+            });
 
         registerAction<TestActionWithTargetUsers>();
         registerAction<TestActionWithPermissions>();
@@ -101,7 +105,10 @@ public:
     {
         auto builder = makeTestActionBuilder([]{ return new TestActionWithTargetUsers; });
 
-        auto targetUserField = std::make_unique<TargetUserField>(systemContext());
+        const auto usersFieldDescriptor =
+            utils::fieldByName(utils::kUsersFieldName, TestActionWithTargetUsers::manifest());
+        auto targetUserField = std::make_unique<TargetUserField>(
+            systemContext(), &usersFieldDescriptor.value());
         targetUserField->setIds(selection.ids);
         targetUserField->setAcceptAll(selection.all);
 
@@ -117,11 +124,16 @@ public:
     {
         auto builder = makeTestActionBuilder([]{ return new TestActionWithPermissions; });
 
-        auto targetUserField = std::make_unique<TargetUserField>(systemContext());
+        const auto usersFieldDescriptor =
+            utils::fieldByName(utils::kUsersFieldName, TestActionWithPermissions::manifest());
+        auto targetUserField = std::make_unique<TargetUserField>(
+            systemContext(), &usersFieldDescriptor.value());
         targetUserField->setIds(selection.ids);
         targetUserField->setAcceptAll(selection.all);
 
-        auto devicesField = std::make_unique<TargetDeviceField>();
+        const auto deviceIdsFieldDescriptor =
+            utils::fieldByName(utils::kDeviceIdsFieldName, TestActionWithPermissions::manifest());
+        auto devicesField = std::make_unique<TargetDeviceField>(&deviceIdsFieldDescriptor.value());
         devicesField->setUseSource(useSource);
         devicesField->setIds(devices);
         devicesField->setAcceptAll(false);
@@ -134,7 +146,11 @@ public:
 
     void addIntervalField(const QSharedPointer<TestActionBuilder>& builder, std::chrono::microseconds interval)
     {
-        auto intervalField = std::make_unique<OptionalTimeField>();
+        static const FieldDescriptor kIntervalFieldDescriptor{
+            .id = fieldMetatype<OptionalTimeField>(),
+            .fieldName = utils::kIntervalFieldName};
+
+        auto intervalField = std::make_unique<OptionalTimeField>(&kIntervalFieldDescriptor);
         intervalField->setValue(interval);
 
         builder->addField(utils::kIntervalFieldName, std::move(intervalField));
@@ -142,7 +158,11 @@ public:
 
     void addDurationField(const QSharedPointer<TestActionBuilder>& builder, std::chrono::microseconds duration)
     {
-        auto durationField = std::make_unique<OptionalTimeField>();
+        static const FieldDescriptor kDurationFieldDescriptor{
+            .id = fieldMetatype<OptionalTimeField>(),
+            .fieldName = utils::kDurationFieldName};
+
+        auto durationField = std::make_unique<OptionalTimeField>(&kDurationFieldDescriptor);
         durationField->setValue(duration);
 
         builder->addField(utils::kDurationFieldName, std::move(durationField));

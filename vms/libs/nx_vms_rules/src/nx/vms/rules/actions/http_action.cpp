@@ -33,7 +33,11 @@ const ItemDescriptor& HttpAction::manifest()
                 utils::kIntervalFieldName,
                 tr("Interval of Action"),
                 {},
-                {.initialValue = 0s, .defaultValue = 1s, .maximumValue = std::chrono::days(24855), .minimumValue = 1s})
+                TimeFieldProperties{
+                    .value = 0s,
+                    .defaultValue = 1s,
+                    .maximumValue = std::chrono::days(24855),
+                    .minimumValue = 1s}.toVariantMap())
         }
     };
     return kDescriptor;

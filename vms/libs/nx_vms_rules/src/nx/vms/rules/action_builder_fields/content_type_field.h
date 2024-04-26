@@ -15,7 +15,7 @@ class NX_VMS_RULES_API ContentTypeField: public SimpleTypeActionField<QString, C
     Q_PROPERTY(QString value READ value WRITE setValue NOTIFY valueChanged)
 
 public:
-    ContentTypeField() = default;
+    using SimpleTypeActionField<QString, ContentTypeField>::SimpleTypeActionField;
 
 signals:
     void valueChanged();

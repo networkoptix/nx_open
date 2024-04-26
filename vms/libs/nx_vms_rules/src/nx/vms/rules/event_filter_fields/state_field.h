@@ -16,7 +16,7 @@ class NX_VMS_RULES_API StateField: public SimpleTypeEventField<State, StateField
     Q_PROPERTY(nx::vms::api::rules::State value READ value WRITE setValue NOTIFY valueChanged)
 
 public:
-    StateField() = default;
+    using SimpleTypeEventField<State, StateField>::SimpleTypeEventField;
 
     bool match(const QVariant& eventValue) const override;
 

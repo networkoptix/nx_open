@@ -4,6 +4,7 @@
 
 #include "../action_builder_fields/optional_time_field.h"
 #include "../action_builder_fields/target_device_field.h"
+#include "../action_builder_fields/target_user_field.h"
 #include "../action_builder_fields/text_with_fields.h"
 #include "../utils/event_details.h"
 #include "../utils/field.h"
@@ -26,11 +27,23 @@ const ItemDescriptor& TextOverlayAction::manifest()
                 utils::kDurationFieldName,
                 tr("Fixed Duration"),
                 {},
-                {.initialValue = 5s, .maximumValue = 30s, .minimumValue = 5s}),
+                TimeFieldProperties{
+                    .value = 5s,
+                    .maximumValue = 30s,
+                    .minimumValue = 5s}.toVariantMap()),
             makeFieldDescriptor<TextWithFields>("text", tr("Custom Text")),
 
-            utils::makeTargetUserFieldDescriptor(
-                tr("Show to"), {}, utils::UserFieldPreset::All, /*visible*/ false),
+            makeFieldDescriptor<TargetUserField>(
+                utils::kUsersFieldName,
+                tr("Show To"),
+                {},
+                ResourceFilterFieldProperties{
+                    .visible = false,
+                    .acceptAll = true,
+                    .ids = {},
+                    .allowEmptySelection = false,
+                    .validationPolicy = {}
+                }.toVariantMap()),
             // TODO: #amalov Use Qn::ResouceInfoLevel::RI_WithUrl & AttrSerializePolicy::singleLine
             utils::makeExtractDetailFieldDescriptor("extendedCaption", utils::kExtendedCaptionDetailName),
             utils::makeExtractDetailFieldDescriptor("detailing", utils::kDetailingDetailName),

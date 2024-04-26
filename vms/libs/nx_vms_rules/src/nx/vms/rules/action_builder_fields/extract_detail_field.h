@@ -20,7 +20,7 @@ class NX_VMS_RULES_API ExtractDetailField:
     FIELD(QString, detailName, setDetailName);
 
 public:
-    ExtractDetailField(nx::vms::common::SystemContext* context);
+    ExtractDetailField(nx::vms::common::SystemContext* context, const FieldDescriptor* descriptor);
 
     QVariant build(const AggregatedEventPtr& event) const override;
 };

@@ -3,6 +3,7 @@
 #include "open_layout_action.h"
 
 #include "../action_builder_fields/layout_field.h"
+#include "../action_builder_fields/target_user_field.h"
 #include "../utils/field.h"
 #include "../utils/type.h"
 
@@ -17,7 +18,16 @@ const ItemDescriptor& OpenLayoutAction::manifest()
         .executionTargets = ExecutionTarget::clients,
         .fields = {
             makeFieldDescriptor<LayoutField>(utils::kLayoutIdFieldName, {}),
-            utils::makeTargetUserFieldDescriptor(tr("To"), {}, utils::UserFieldPreset::None),
+            makeFieldDescriptor<TargetUserField>(
+                utils::kUsersFieldName,
+                tr("To"),
+                {},
+                ResourceFilterFieldProperties{
+                    .acceptAll = false,
+                    .ids = {},
+                    .allowEmptySelection = false,
+                    .validationPolicy = kLayoutAccessValidationPolicy
+                }.toVariantMap()),
             utils::makePlaybackFieldDescriptor(tr("Rewind")),
             utils::makeIntervalFieldDescriptor(tr("Interval of Action")),
         },

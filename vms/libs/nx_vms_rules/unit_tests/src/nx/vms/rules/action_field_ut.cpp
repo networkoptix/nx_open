@@ -36,7 +36,8 @@ void testSimpleTypeField(const std::initializer_list<T>& values)
 
     for (const auto& testValue: values)
     {
-        Field field;
+        static const FieldDescriptor fakeDescriptor;
+        Field field{&fakeDescriptor};
         SCOPED_TRACE(nx::format(
             "Field type: %1, value: %2",
             field.metatype(),
@@ -86,6 +87,7 @@ public:
     const QString kAttributeName = QStringLiteral("Temporal Displacement");
     const QString kAttributeLicensePlateNumberField = QStringLiteral("LicensePlate.Number");
     const QString kAttributeLicensePlateNumber = QStringLiteral("OUTATIME");
+    const FieldDescriptor kDummyDescriptor;
 
     ActionFieldTest(): TestEngineHolder(context()->systemContext())
     {
@@ -105,11 +107,23 @@ public:
     EventPtr makeAnalyticsObjectEvent()
     {
         engine->registerEventField(
-            fieldMetatype<SourceCameraField>(), [] { return new SourceCameraField(); });
-        engine->registerEventField(fieldMetatype<AnalyticsObjectTypeField>(),
-            [this] { return new AnalyticsObjectTypeField(systemContext()); });
-        engine->registerEventField(fieldMetatype<ObjectLookupField>(),
-            [this] { return new ObjectLookupField(systemContext()); });
+            fieldMetatype<SourceCameraField>(),
+            [](const FieldDescriptor* descriptor)
+            {
+                return new SourceCameraField(descriptor);
+            });
+        engine->registerEventField(
+            fieldMetatype<AnalyticsObjectTypeField>(),
+            [this](const FieldDescriptor* descriptor)
+            {
+                return new AnalyticsObjectTypeField(systemContext(), descriptor);
+            });
+        engine->registerEventField(
+            fieldMetatype<ObjectLookupField>(),
+            [this](const FieldDescriptor* descriptor)
+            {
+                return new ObjectLookupField(systemContext(), descriptor);
+            });
         engine->registerEvent(
             AnalyticsObjectEvent::manifest(), [] { return new AnalyticsObjectEvent(); });
 
@@ -130,15 +144,30 @@ public:
 
     EventPtr makeAnalyticsEvent()
     {
-        engine->registerEventField(fieldMetatype<StateField>(), [] { return new StateField(); });
         engine->registerEventField(
-            fieldMetatype<SourceCameraField>(), [] { return new SourceCameraField(); });
-        engine->registerEventField(fieldMetatype<AnalyticsEventTypeField>(),
-            [this] { return new AnalyticsEventTypeField(systemContext()); });
-        engine->registerEventField(fieldMetatype<TextLookupField>(),
-            [this] { return new TextLookupField(systemContext()); });
-        engine->registerEventField(fieldMetatype<TextLookupField>(),
-            [this] { return new TextLookupField(systemContext()); });
+            fieldMetatype<StateField>(),
+            [](const FieldDescriptor* descriptor) { return new StateField(descriptor); });
+        engine->registerEventField(
+            fieldMetatype<SourceCameraField>(),
+            [](const FieldDescriptor* descriptor) { return new SourceCameraField(descriptor); });
+        engine->registerEventField(
+            fieldMetatype<AnalyticsEventTypeField>(),
+            [this](const FieldDescriptor* descriptor)
+            {
+                return new AnalyticsEventTypeField(systemContext(), descriptor);
+            });
+        engine->registerEventField(
+            fieldMetatype<TextLookupField>(),
+            [this](const FieldDescriptor* descriptor)
+            {
+                return new TextLookupField(systemContext(), descriptor);
+            });
+        engine->registerEventField(
+            fieldMetatype<TextLookupField>(),
+            [this](const FieldDescriptor* descriptor)
+            {
+                return new TextLookupField(systemContext(), descriptor);
+            });
         engine->registerEvent(AnalyticsEvent::manifest(), [] { return new AnalyticsEvent(); });
 
         static const EventData kEventAtributeData = {
@@ -149,16 +178,33 @@ public:
 
     EventPtr makeSoftTriggerEvent()
     {
-        engine->registerEventField(fieldMetatype<UniqueIdField>(), [] { return new UniqueIdField(); });
         engine->registerEventField(
-            fieldMetatype<SourceCameraField>(), [] { return new SourceCameraField(); });
-        engine->registerEventField(fieldMetatype<SourceUserField>(),
-            [this] { return new SourceUserField(systemContext()); });
-        engine->registerEventField(fieldMetatype<CustomizableTextField>(),
-            [this] { return new CustomizableTextField(); });
-        engine->registerEventField(fieldMetatype<CustomizableIconField>(),
-            [this] { return new CustomizableIconField(); });
-        engine->registerEvent(SoftTriggerEvent::manifest(), [] { return new SoftTriggerEvent(); });
+            fieldMetatype<UniqueIdField>(),
+            [](const FieldDescriptor* descriptor) { return new UniqueIdField(descriptor); });
+        engine->registerEventField(
+            fieldMetatype<SourceCameraField>(),
+            [](const FieldDescriptor* descriptor) { return new SourceCameraField(descriptor); });
+        engine->registerEventField(
+            fieldMetatype<SourceUserField>(),
+            [this](const FieldDescriptor* descriptor)
+            {
+                return new SourceUserField(systemContext(), descriptor);
+            });
+        engine->registerEventField(
+            fieldMetatype<CustomizableTextField>(),
+            [](const FieldDescriptor* descriptor)
+            {
+                return new CustomizableTextField(descriptor);
+            });
+        engine->registerEventField(
+            fieldMetatype<CustomizableIconField>(),
+            [](const FieldDescriptor* descriptor)
+            {
+                return new CustomizableIconField(descriptor);
+            });
+        engine->registerEvent(
+            SoftTriggerEvent::manifest(),
+            [](){ return new SoftTriggerEvent(); });
 
         static const EventData kEventAtributeData = {
             {"type", SoftTriggerEvent::manifest().id},
@@ -170,7 +216,7 @@ public:
 
 TEST_F(ActionFieldTest, EventTimeInstantEvent)
 {
-    TextWithFields field(systemContext());
+    TextWithFields field(systemContext(), &kDummyDescriptor);
     field.setText("{event.time}");
     auto event = AggregatedEventPtr::create(makeEvent());
     EXPECT_EQ(nx::utils::timestampToISO8601(event->timestamp()), field.build(event).toString());
@@ -178,7 +224,7 @@ TEST_F(ActionFieldTest, EventTimeInstantEvent)
 
 TEST_F(ActionFieldTest, EventTimestamp)
 {
-    TextWithFields field(systemContext());
+    TextWithFields field(systemContext(), &kDummyDescriptor);
     field.setText("{event.timestamp}");
     auto event = AggregatedEventPtr::create(makeEvent());
 
@@ -191,7 +237,7 @@ TEST_F(ActionFieldTest, EventTimestamp)
 
 TEST_F(ActionFieldTest, EventStartTimeInstantEvent)
 {
-    TextWithFields fieldStartTime(systemContext());
+    TextWithFields fieldStartTime(systemContext(), &kDummyDescriptor);
     QString arg = "{event.time.start}";
     fieldStartTime.setText(arg);
     // There is no start time for Instant event, so there is no substitution.
@@ -201,7 +247,11 @@ TEST_F(ActionFieldTest, EventStartTimeInstantEvent)
 TEST_F(ActionFieldTest, EventTimeProlongedEvent)
 {
     engine->registerActionField(
-        fieldMetatype<TextWithFields>(), [this] { return new TextWithFields{systemContext()}; });
+        fieldMetatype<TextWithFields>(),
+        [this](const FieldDescriptor* descriptor)
+        {
+            return new TextWithFields{systemContext(), descriptor};
+        });
     engine->registerAction(
         TestActionWithTextWithFields::manifest(),
         [] { return new TestActionWithTextWithFields{}; });
@@ -266,7 +316,7 @@ TEST_F(ActionFieldTest, EventTimeProlongedEvent)
 
 TEST_F(ActionFieldTest, EventAttributes)
 {
-    TextWithFields field(systemContext());
+    TextWithFields field(systemContext(), &kDummyDescriptor);
     auto event = makeAnalyticsObjectEvent();
     auto aggregatedEvent = AggregatedEventPtr::create(event);
     field.setText(
@@ -282,7 +332,7 @@ TEST_F(ActionFieldTest, EventAttributes)
 
 TEST_F(ActionFieldTest, EventDotType)
 {
-    TextWithFields field(systemContext());
+    TextWithFields field(systemContext(), &kDummyDescriptor);
     field.setText("{event.type}");
     EXPECT_EQ(
         AnalyticsEvent::manifest().id,
@@ -291,7 +341,7 @@ TEST_F(ActionFieldTest, EventDotType)
 
 TEST_F(ActionFieldTest, EventDotName)
 {
-    TextWithFields field(systemContext());
+    TextWithFields field(systemContext(), &kDummyDescriptor);
     field.setText("{event.name}");
     EXPECT_EQ(
         TestEvent::manifest().displayName,
@@ -300,7 +350,7 @@ TEST_F(ActionFieldTest, EventDotName)
 
 TEST_F(ActionFieldTest, EventDotNameAnalyticsEvent)
 {
-    TextWithFields field(systemContext());
+    TextWithFields field(systemContext(), &kDummyDescriptor);
     field.setText("{event.name}");
     EXPECT_EQ(
         AnalyticsEvent::manifest().displayName,
@@ -310,7 +360,7 @@ TEST_F(ActionFieldTest, EventDotNameAnalyticsEvent)
 TEST_F(ActionFieldTest, EventCaption)
 {
     auto event = makeAnalyticsEvent();
-    TextWithFields field(systemContext());
+    TextWithFields field(systemContext(), &kDummyDescriptor);
     auto eventAggregator = AggregatedEventPtr::create(event);
 
     field.setText("{@EventCaption}");
@@ -325,7 +375,7 @@ TEST_F(ActionFieldTest, EventCaption)
 TEST_F(ActionFieldTest, EventDotCaption)
 {
     auto event = makeAnalyticsEvent();
-    TextWithFields field(systemContext());
+    TextWithFields field(systemContext(), &kDummyDescriptor);
     auto eventAggregator = AggregatedEventPtr::create(event);
 
     field.setText("{event.caption}");
@@ -339,7 +389,7 @@ TEST_F(ActionFieldTest, EventDotCaption)
 
 TEST_F(ActionFieldTest, EventDescription)
 {
-    TextWithFields field(systemContext());
+    TextWithFields field(systemContext(), &kDummyDescriptor);
     auto event = makeEvent();
     auto eventAggregator = AggregatedEventPtr::create(event);
 
@@ -354,7 +404,7 @@ TEST_F(ActionFieldTest, EventDescription)
 
 TEST_F(ActionFieldTest, EventDotDescription)
 {
-    TextWithFields field(systemContext());
+    TextWithFields field(systemContext(), &kDummyDescriptor);
     auto event = makeEvent();
     auto eventAggregator = AggregatedEventPtr::create(event);
 
@@ -369,7 +419,7 @@ TEST_F(ActionFieldTest, EventDotDescription)
 
 TEST_F(ActionFieldTest, EventDotSource)
 {
-    TextWithFields field(systemContext());
+    TextWithFields field(systemContext(), &kDummyDescriptor);
     auto event = makeEvent();
     auto eventAggregator = AggregatedEventPtr::create(event);
 
@@ -381,7 +431,7 @@ TEST_F(ActionFieldTest, EventDotSource)
 
 TEST_F(ActionFieldTest, EventTooltip)
 {
-    TextWithFields field(systemContext());
+    TextWithFields field(systemContext(), &kDummyDescriptor);
 
     field.setText("{@ExtendedEventDescription}");
 
@@ -395,7 +445,7 @@ TEST_P(ActionFieldTest, FormatLine)
 {
     const auto [expected, format] = GetParam();
 
-    TextWithFields field(systemContext());
+    TextWithFields field(systemContext(), &kDummyDescriptor);
     field.setText(format);
     SCOPED_TRACE(nx::format("Format line: %1", field.text()).toStdString());
 
@@ -446,7 +496,7 @@ TEST_F(ActionFieldTest, TargetUserField)
     selection.ids << nx::Uuid::createUuid() << nx::Uuid::createUuid();
     selection.all = true;
 
-    TargetUserField field(systemContext());
+    TargetUserField field(systemContext(), &kDummyDescriptor);
     field.setIds(selection.ids);
     field.setAcceptAll(selection.all);
 
@@ -464,7 +514,7 @@ TEST_F(ActionFieldTest, EventIdField)
     const auto event = QSharedPointer<TestEvent>::create();
     const auto aggEvent = AggregatedEventPtr::create(event);
 
-    const auto field = QSharedPointer<EventIdField>::create();
+    const auto field = QSharedPointer<EventIdField>::create(&kDummyDescriptor);
     const auto value = field->build(aggEvent);
 
     ASSERT_FALSE(aggEvent->id().isNull());
@@ -480,7 +530,7 @@ TEST_F(ActionFieldTest, TargetSingleDeviceTest)
     event->m_deviceIds = {nx::Uuid::createUuid(), nx::Uuid::createUuid()};
     const auto aggEvent = AggregatedEventPtr::create(event);
 
-    TargetSingleDeviceField field;
+    TargetSingleDeviceField field{&kDummyDescriptor};
     field.setUseSource(true);
 
     auto value = field.build(aggEvent);

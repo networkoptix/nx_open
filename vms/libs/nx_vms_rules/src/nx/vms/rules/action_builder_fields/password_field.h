@@ -15,7 +15,7 @@ class NX_VMS_RULES_API PasswordField: public SimpleTypeActionField<QString, Pass
     Q_PROPERTY(QString value READ value WRITE setValue NOTIFY valueChanged)
 
 public:
-    PasswordField() = default;
+    using SimpleTypeActionField<QString, PasswordField>::SimpleTypeActionField;
 
 signals:
     void valueChanged();

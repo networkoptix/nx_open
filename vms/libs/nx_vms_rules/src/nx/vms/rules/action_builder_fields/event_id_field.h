@@ -15,7 +15,7 @@ class NX_VMS_RULES_API EventIdField: public ActionBuilderField
     Q_CLASSINFO("metatype", "nx.actions.fields.eventId")
 
 public:
-    EventIdField() = default;
+    using ActionBuilderField::ActionBuilderField;
 
     QVariant build(const AggregatedEventPtr& event) const override;
 };

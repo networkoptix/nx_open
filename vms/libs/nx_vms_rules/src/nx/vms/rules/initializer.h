@@ -17,6 +17,7 @@ public:
     virtual void registerEvents() const override;
     virtual void registerActions() const override;
     virtual void registerFields() const override;
+    virtual void registerFieldValidators() const override;
 };
 
 } // namespace nx::vms::rules

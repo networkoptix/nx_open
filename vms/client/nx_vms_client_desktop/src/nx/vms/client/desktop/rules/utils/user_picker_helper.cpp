@@ -13,6 +13,7 @@
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
+#include <nx/vms/rules/validation_policy.h>
 
 using namespace nx::vms::api;
 

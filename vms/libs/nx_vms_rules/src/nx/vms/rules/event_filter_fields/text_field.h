@@ -18,7 +18,7 @@ class NX_VMS_RULES_API EventTextField: public SimpleTypeEventField<QString, Even
     Q_PROPERTY(QString value READ value WRITE setValue NOTIFY valueChanged)
 
 public:
-    EventTextField() = default;
+    using SimpleTypeEventField<QString, EventTextField>::SimpleTypeEventField;
 
     bool match(const QVariant& value) const override;
 

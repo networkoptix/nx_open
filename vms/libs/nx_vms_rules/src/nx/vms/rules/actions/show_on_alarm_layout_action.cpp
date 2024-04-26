@@ -2,9 +2,13 @@
 
 #include "show_on_alarm_layout_action.h"
 
+#include <nx/utils/qt_helpers.h>
+#include <nx/vms/api/data/user_group_data.h>
+
 #include "../action_builder_fields/event_devices_field.h"
 #include "../action_builder_fields/event_id_field.h"
 #include "../action_builder_fields/target_device_field.h"
+#include "../action_builder_fields/target_user_field.h"
 #include "../utils/event_details.h"
 #include "../utils/field.h"
 #include "../utils/string_helper.h"
@@ -20,7 +24,16 @@ const ItemDescriptor& ShowOnAlarmLayoutAction::manifest()
         .executionTargets = ExecutionTarget::clients,
         .fields = {
             makeFieldDescriptor<TargetDeviceField>(utils::kDeviceIdsFieldName, {}),
-            utils::makeTargetUserFieldDescriptor(tr("To")),
+            makeFieldDescriptor<TargetUserField>(
+                utils::kUsersFieldName,
+                tr("To"),
+                {},
+                ResourceFilterFieldProperties{
+                    .acceptAll = false,
+                    .ids = nx::utils::toQSet(vms::api::kAllPowerUserGroupIds),
+                    .allowEmptySelection = false,
+                    .validationPolicy = {}
+                }.toVariantMap()),
             utils::makePlaybackFieldDescriptor(tr("Rewind")),
             utils::makeActionFlagFieldDescriptor(
                 "forceOpen", tr("Force Alarm Layout Opening"), {}, /*defaultValue*/ true),

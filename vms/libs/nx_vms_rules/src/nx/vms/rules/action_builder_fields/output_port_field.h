@@ -15,7 +15,7 @@ class NX_VMS_RULES_API OutputPortField: public SimpleTypeActionField<QString, Ou
     Q_PROPERTY(QString value READ value WRITE setValue NOTIFY valueChanged)
 
 public:
-    OutputPortField() = default;
+    using SimpleTypeActionField<QString, OutputPortField>::SimpleTypeActionField;
 
 signals:
     void valueChanged();

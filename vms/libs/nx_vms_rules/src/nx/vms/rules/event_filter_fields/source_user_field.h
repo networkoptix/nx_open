@@ -8,6 +8,8 @@
 
 namespace nx::vms::rules {
 
+constexpr auto kUserInputValidationPolicy = "userInput";
+
 class NX_VMS_RULES_API SourceUserField:
     public ResourceFilterEventField,
     public nx::vms::common::SystemContextAware
@@ -16,7 +18,7 @@ class NX_VMS_RULES_API SourceUserField:
     Q_CLASSINFO("metatype", "nx.events.fields.user")
 
 public:
-    SourceUserField(nx::vms::common::SystemContext* context);
+    SourceUserField(common::SystemContext* context, const FieldDescriptor* descriptor);
 
     bool match(const QVariant& value) const override;
 };

@@ -14,7 +14,7 @@ class NX_VMS_RULES_API Substitution: public ActionBuilderField
     Q_PROPERTY(QString fieldName READ fieldName WRITE setFieldName NOTIFY fieldNameChanged)
 
 public:
-    Substitution() = default;
+    using ActionBuilderField::ActionBuilderField;
 
     virtual QVariant build(const AggregatedEventPtr& eventAggregator) const override;
 

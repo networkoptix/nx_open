@@ -570,11 +570,11 @@ std::unique_ptr<EventFilter> Engine::buildEventFilter(const api::EventFilter& se
         if (serializedFieldIt != serialized.fields.end()
             && serializedFieldIt->second.type == fieldDescriptor.id)
         {
-            field = buildEventField(serializedFieldIt->second);
+            field = buildEventField(serializedFieldIt->second, &fieldDescriptor);
         }
         else //< As the field isn't present in the received serialized filter, make a default one.
         {
-            field = buildEventField(fieldDescriptor.id);
+            field = buildEventField(&fieldDescriptor);
             field->setProperties(fieldDescriptor.properties);
         }
 
@@ -608,7 +608,7 @@ std::unique_ptr<EventFilter> Engine::buildEventFilter(const ItemDescriptor& desc
 
     for (const auto& fieldDescriptor: descriptor.fields)
     {
-        auto field = buildEventField(fieldDescriptor.id);
+        auto field = buildEventField(&fieldDescriptor);
         if (!field)
         {
             NX_ERROR(
@@ -652,11 +652,11 @@ std::unique_ptr<ActionBuilder> Engine::buildActionBuilder(const api::ActionBuild
         if (serializedFieldIt != serialized.fields.end())
         {
             NX_ASSERT(serializedFieldIt->second.type == fieldDescriptor.id);
-            field = buildActionField(serializedFieldIt->second);
+            field = buildActionField(serializedFieldIt->second, &fieldDescriptor);
         }
         else //< As the field isn't present in the received serialized builder, make a default one.
         {
-            field = buildActionField(fieldDescriptor.id);
+            field = buildActionField(&fieldDescriptor);
             field->setProperties(fieldDescriptor.properties);
         }
 
@@ -684,6 +684,23 @@ std::unique_ptr<ActionBuilder> Engine::buildActionBuilder(const QString& actionT
     return buildActionBuilder(m_actionDescriptors.value(actionType));
 }
 
+bool Engine::registerValidator(const QString& fieldType, FieldValidator* validator)
+{
+    if (!NX_ASSERT(!fieldType.isEmpty()) || !NX_ASSERT(validator))
+        return false;
+
+    validator->setParent(this); //< TODO: #mmlaofeev use unique_ptr instead?
+    m_fieldValidators.insert(fieldType, validator);
+
+    return true;
+}
+
+FieldValidator* Engine::fieldValidator(const QString& fieldType) const
+{
+    auto fieldValidatorIt = m_fieldValidators.find(fieldType);
+    return fieldValidatorIt == m_fieldValidators.cend() ? nullptr : fieldValidatorIt.value();
+}
+
 std::unique_ptr<ActionBuilder> Engine::buildActionBuilder(const ItemDescriptor& descriptor) const
 {
     auto builder = buildActionBuilder(nx::Uuid::createUuid(), descriptor.id);
@@ -692,7 +709,7 @@ std::unique_ptr<ActionBuilder> Engine::buildActionBuilder(const ItemDescriptor& 
 
     for (const auto& fieldDescriptor: descriptor.fields)
     {
-        auto field = buildActionField(fieldDescriptor.id);
+        auto field = buildActionField(&fieldDescriptor);
         if (!field)
         {
             NX_ERROR(
@@ -724,9 +741,10 @@ std::unique_ptr<ActionBuilder> Engine::buildActionBuilder(nx::Uuid id, const QSt
     return builder;
 }
 
-std::unique_ptr<EventFilterField> Engine::buildEventField(const api::Field& serialized) const
+std::unique_ptr<EventFilterField> Engine::buildEventField(
+    const api::Field& serialized, const FieldDescriptor* descriptor) const
 {
-    auto field = buildEventField(serialized.type);
+    auto field = buildEventField(descriptor);
     if (!field)
         return nullptr;
 
@@ -735,48 +753,50 @@ std::unique_ptr<EventFilterField> Engine::buildEventField(const api::Field& seri
     return field;
 }
 
-std::unique_ptr<EventFilterField> Engine::buildEventField(const QString& fieldType) const
+std::unique_ptr<EventFilterField> Engine::buildEventField(
+    const FieldDescriptor* fieldDescriptor) const
 {
-    const auto& constructor = m_eventFields.value(fieldType);
+    const auto& constructor = m_eventFields.value(fieldDescriptor->id);
     if (!constructor)
     {
         NX_ERROR(
             this,
             "Failed to build event field as an event field for the %1 type is not registered",
-            fieldType);
+            fieldDescriptor->id);
 
         return nullptr; // TODO: #spanasenko Default field type
     }
 
-    std::unique_ptr<EventFilterField> field(constructor());
+    std::unique_ptr<EventFilterField> field(constructor(fieldDescriptor));
 
     NX_ASSERT(field, "Field constructor returns nullptr");
 
     return field;
 }
 
-std::unique_ptr<ActionBuilderField> Engine::buildActionField(const api::Field& serialized) const
+std::unique_ptr<ActionBuilderField> Engine::buildActionField(
+    const api::Field& serialized, const FieldDescriptor* descriptor) const
 {
-    auto field = buildActionField(serialized.type);
+    auto field = buildActionField(descriptor);
     deserializeProperties(serialized.props, field.get());
 
     return field;
 }
 
-std::unique_ptr<ActionBuilderField> Engine::buildActionField(const QString& fieldType) const
+std::unique_ptr<ActionBuilderField> Engine::buildActionField(const FieldDescriptor* descriptor) const
 {
-    const auto& constructor = m_actionFields.value(fieldType);
+    const auto& constructor = m_actionFields.value(descriptor->id);
     if (!constructor)
     {
         NX_ERROR(
             this,
             "Failed to build action field as an action field for the %1 type is not registered",
-            fieldType);
+            descriptor->id);
 
         return nullptr; // TODO: #spanasenko Default field type
     }
 
-    std::unique_ptr<ActionBuilderField> field(constructor());
+    std::unique_ptr<ActionBuilderField> field(constructor(descriptor));
 
     NX_ASSERT(field, "Field constructor returns nullptr");
 

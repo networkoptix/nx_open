@@ -15,7 +15,7 @@ class NX_VMS_RULES_API UniqueIdField: public EventFilterField
     Q_PROPERTY(nx::Uuid id READ id WRITE setId)
 
 public:
-    UniqueIdField() = default;
+    using EventFilterField::EventFilterField;
 
     nx::Uuid id() const;
     void setId(nx::Uuid id);

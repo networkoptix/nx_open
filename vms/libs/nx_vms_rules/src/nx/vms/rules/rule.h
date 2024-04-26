@@ -9,6 +9,8 @@
 
 #include <nx/utils/uuid.h>
 
+#include "field_validator.h"
+
 class QDateTime;
 
 namespace nx::vms::rules {
@@ -67,6 +69,7 @@ public:
     bool timeInSchedule(QDateTime time) const;
 
     bool isValid() const;
+    ValidationResult validity(common::SystemContext* context) const;
 
     void connectSignals();
 

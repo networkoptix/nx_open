@@ -16,7 +16,7 @@ class NX_VMS_RULES_API TargetDeviceField: public ResourceFilterActionField
     Q_PROPERTY(bool useSource READ useSource WRITE setUseSource NOTIFY useSourceChanged)
 
 public:
-    TargetDeviceField() = default;
+    using ResourceFilterActionField::ResourceFilterActionField;
 
     bool useSource() const;
     void setUseSource(bool value);

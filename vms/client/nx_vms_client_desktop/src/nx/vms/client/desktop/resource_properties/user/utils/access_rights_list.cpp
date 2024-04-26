@@ -4,6 +4,7 @@
 
 #include <QtQml/QtQml>
 
+#include <api/helpers/access_rights_helper.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/common/html/html.h>
 
@@ -19,46 +20,46 @@ AccessRightsList::AccessRightsList(QObject* parent):
             QVector<AccessRightDescriptor> result({
                 AccessRightDescriptor{
                     .accessRight = AccessRight::view,
-                    .name = tr("View Live"),
+                    .name = common::AccessRightHelper::name(AccessRight::view),
                     .description = common::html::bold(tr("View Live") + ".") + " " +
                         tr("Allows users to access a resource and view live footage from a camera."),
                     .icon = QUrl("24x20/Solid/live.svg")},
                 AccessRightDescriptor{
                     .accessRight = AccessRight::audio,
-                    .name = tr("Play Sound"),
+                    .name = common::AccessRightHelper::name(AccessRight::audio),
                     .description = common::html::bold(tr("Access Audio") + ".") + " " +
                         tr("Allows users to access an audio stream from a Device. "
                             "Used in combination with View Live and/or View Archive."),
                     .icon = QUrl("24x20/Solid/audio.svg")},
                 AccessRightDescriptor{
                     .accessRight = AccessRight::viewArchive,
-                    .name = tr("View Archive"),
+                    .name = common::AccessRightHelper::name(AccessRight::viewArchive),
                     .description = common::html::bold(tr("View Archive")),
                     .icon = QUrl("24x20/Solid/video.svg")},
                 AccessRightDescriptor{
                     .accessRight = AccessRight::exportArchive,
-                    .name = tr("Export Archive"),
+                    .name = common::AccessRightHelper::name(AccessRight::exportArchive),
                     .description = common::html::bold(tr("Export Archive")),
                     .icon = QUrl("24x20/Solid/video_export.svg")},
                 AccessRightDescriptor{
                     .accessRight = AccessRight::viewBookmarks,
-                    .name = tr("View Bookmarks"),
+                    .name = common::AccessRightHelper::name(AccessRight::viewBookmarks),
                     .description = common::html::bold(tr("View Bookmarks")),
                     .icon = QUrl("24x20/Solid/bookmarks.svg")},
                 AccessRightDescriptor{
                     .accessRight = AccessRight::manageBookmarks,
-                    .name = tr("Manage Bookmarks"),
+                    .name = common::AccessRightHelper::name(AccessRight::manageBookmarks),
                     .description = common::html::bold(tr("Manage Bookmarks")),
                     .icon = QUrl("24x20/Solid/bookmark_edit.svg")},
                 AccessRightDescriptor{
                     .accessRight = AccessRight::userInput,
-                    .name = tr("User Input"),
+                    .name = common::AccessRightHelper::name(AccessRight::userInput),
                     .description = common::html::bold(tr("User Input") + ".") + " " +
                         tr("Allows user to control PTZ, use 2-Way Audio, Soft Triggers and I/O buttons."),
                     .icon = QUrl("24x20/Solid/userinput.svg")},
                 AccessRightDescriptor{
                     .accessRight = AccessRight::edit,
-                    .name = tr("Edit Settings"),
+                    .name = common::AccessRightHelper::name(AccessRight::edit),
                     .description = common::html::bold(tr("Edit Settings") + ".") + " " +
                         tr("Depending on the resource type it either allows user to modify device settings"
                         " or to control video wall."),

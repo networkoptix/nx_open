@@ -21,7 +21,7 @@ class NX_VMS_RULES_API TextLookupField:
     Q_PROPERTY(TextLookupCheckType checkType READ checkType WRITE setCheckType NOTIFY checkTypeChanged)
 
 public:
-    explicit TextLookupField(common::SystemContext* context);
+    TextLookupField(common::SystemContext* context, const FieldDescriptor* descriptor);
 
     /*
      * Check type dependent value. If the check type is linked with keywords - space separated string,

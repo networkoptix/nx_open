@@ -20,7 +20,7 @@ class NX_VMS_RULES_API TextWithFields:
     Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged)
 
 public:
-    explicit TextWithFields(common::SystemContext* context);
+    TextWithFields(common::SystemContext* context, const FieldDescriptor* descriptor);
     virtual ~TextWithFields() override;
 
     virtual QVariant build(const AggregatedEventPtr& eventAggregator) const override;

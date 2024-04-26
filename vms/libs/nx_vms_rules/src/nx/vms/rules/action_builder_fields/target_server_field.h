@@ -16,7 +16,7 @@ class NX_VMS_RULES_API TargetServerField: public ResourceFilterActionField
     Q_PROPERTY(bool useSource READ useSource WRITE setUseSource NOTIFY useSourceChanged)
 
 public:
-    TargetServerField() = default;
+    using ResourceFilterActionField::ResourceFilterActionField;
 
     bool useSource() const;
     void setUseSource(bool value);

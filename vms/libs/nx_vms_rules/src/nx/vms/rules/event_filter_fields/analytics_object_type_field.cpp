@@ -7,7 +7,11 @@
 
 namespace nx::vms::rules {
 
-AnalyticsObjectTypeField::AnalyticsObjectTypeField(nx::vms::common::SystemContext* context):
+AnalyticsObjectTypeField::AnalyticsObjectTypeField(
+    common::SystemContext* context,
+    const FieldDescriptor* descriptor)
+    :
+    SimpleTypeEventField<QString, AnalyticsObjectTypeField>{descriptor},
     SystemContextAware(context)
 {
 }

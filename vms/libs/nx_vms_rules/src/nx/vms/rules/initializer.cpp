@@ -8,6 +8,10 @@
 #include <nx/vms/rules/event_filter_fields/builtin_fields.h>
 #include <nx/vms/rules/events/builtin_events.h>
 
+#include "action_builder_field_validators/optional_time_field_validator.h"
+#include "action_builder_field_validators/target_user_field_validator.h"
+#include "event_filter_field_validators/source_user_field_validator.h"
+
 namespace nx::vms::rules {
 
 Initializer::Initializer(nx::vms::common::SystemContext* context):
@@ -77,11 +81,17 @@ void Initializer::registerFields() const
     registerEventField<AnalyticsEventLevelField>();
     m_engine->registerEventField(
         fieldMetatype<AnalyticsEventTypeField>(),
-        [this] { return new AnalyticsEventTypeField(this->m_context); });
+        [this](const FieldDescriptor* descriptor)
+        {
+            return new AnalyticsEventTypeField(this->m_context, descriptor);
+        });
     registerEventField<AnalyticsObjectAttributesField>();
     m_engine->registerEventField(
         fieldMetatype<AnalyticsObjectTypeField>(),
-        [this] { return new AnalyticsObjectTypeField(this->m_context); });
+        [this](const FieldDescriptor* descriptor)
+        {
+            return new AnalyticsObjectTypeField(this->m_context, descriptor);
+        });
     registerEventField<CustomizableFlagField>();
     registerEventField<CustomizableIconField>();
     registerEventField<CustomizableTextField>();
@@ -94,16 +104,25 @@ void Initializer::registerFields() const
     registerEventField<KeywordsField>();
     m_engine->registerEventField(
         fieldMetatype<ObjectLookupField>(),
-        [this] { return new ObjectLookupField(this->m_context); });
+        [this](const FieldDescriptor* descriptor)
+        {
+            return new ObjectLookupField(this->m_context, descriptor);
+        });
     registerEventField<SourceCameraField>();
     registerEventField<SourceServerField>();
     m_engine->registerEventField(
         fieldMetatype<SourceUserField>(),
-        [this] { return new SourceUserField(systemContext()); });
+        [this](const FieldDescriptor* descriptor)
+        {
+            return new SourceUserField(systemContext(), descriptor);
+        });
     registerEventField<StateField>();
     m_engine->registerEventField(
         fieldMetatype<TextLookupField>(),
-        [this] { return new TextLookupField(this->m_context); });
+        [this](const FieldDescriptor* descriptor)
+        {
+            return new TextLookupField(this->m_context, descriptor);
+        });
     registerEventField<UniqueIdField>();
 
     registerActionField<ActionIntField>();
@@ -113,10 +132,16 @@ void Initializer::registerFields() const
     registerActionField<ContentTypeField>();
     m_engine->registerActionField(
         fieldMetatype<EmailMessageField>(),
-        [this] { return new EmailMessageField(this->m_context); });
+        [this](const FieldDescriptor* descriptor)
+        {
+            return new EmailMessageField(this->m_context, descriptor);
+        });
     m_engine->registerActionField(
         fieldMetatype<ExtractDetailField>(),
-        [this] { return new ExtractDetailField(this->m_context); });
+        [this](const FieldDescriptor* descriptor)
+        {
+            return new ExtractDetailField(this->m_context, descriptor);
+        });
     registerActionField<EventIdField>();
     registerActionField<EventDevicesField>();
     registerActionField<HttpAuthTypeField>();
@@ -132,19 +157,38 @@ void Initializer::registerFields() const
     registerActionField<TargetServerField>();
     m_engine->registerActionField(
         fieldMetatype<TargetUserField>(),
-        [this] { return new TargetUserField(this->m_context); });
+        [this](const FieldDescriptor* descriptor)
+        {
+            return new TargetUserField(this->m_context, descriptor);
+        });
     m_engine->registerActionField(
         fieldMetatype<TextFormatter>(),
-        [this] { return new TextFormatter(this->m_context); });
+        [this](const FieldDescriptor* descriptor)
+        {
+            return new TextFormatter(this->m_context, descriptor);
+        });
     m_engine->registerActionField(
         fieldMetatype<TextWithFields>(),
-        [this] { return new TextWithFields(this->m_context); });
+        [this](const FieldDescriptor* descriptor)
+        {
+            return new TextWithFields(this->m_context, descriptor);
+        });
     registerActionField<Substitution>();
     registerActionField<TargetLayoutField>();
     registerActionField<TargetSingleDeviceField>();
     registerActionField<TimeField>();
     registerActionField<VolumeField>();
     registerActionField<HttpAuthField>();
+}
+
+void Initializer::registerFieldValidators() const
+{
+    // Event field validators.
+    registerFieldValidator<SourceUserField>(new SourceUserFieldValidator);
+
+    // Action field validators.
+    registerFieldValidator<OptionalTimeField>(new OptionalTimeFieldValidator);
+    registerFieldValidator<TargetUserField>(new TargetUserFieldValidator);
 }
 
 } // namespace nx::vms::rules

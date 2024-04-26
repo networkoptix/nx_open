@@ -18,7 +18,7 @@ class NX_VMS_RULES_API HttpAuthTypeField:
     Q_PROPERTY(nx::network::http::AuthType value READ value WRITE setValue NOTIFY valueChanged)
 
 public:
-    HttpAuthTypeField() = default;
+    using SimpleTypeActionField<network::http::AuthType, HttpAuthTypeField>::SimpleTypeActionField;
 
 signals:
     void valueChanged();

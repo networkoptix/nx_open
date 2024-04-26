@@ -17,6 +17,12 @@
 
 namespace nx::vms::rules::test {
 
+namespace {
+
+const FieldDescriptor kDummyDescriptor;
+
+} // namespace
+
 class EventFilterTest: public ::testing::Test
 {
 protected:
@@ -26,9 +32,9 @@ protected:
         mockRule = std::make_unique<Rule>(nx::Uuid(), engine.get());
 
         filter = std::make_unique<EventFilter>(nx::Uuid::createUuid(), "nx.events.generic");
-        filter->addField("source", std::make_unique<KeywordsField>());
-        filter->addField("caption", std::make_unique<KeywordsField>());
-        filter->addField("description", std::make_unique<KeywordsField>());
+        filter->addField("source", std::make_unique<KeywordsField>(&kDummyDescriptor));
+        filter->addField("caption", std::make_unique<KeywordsField>(&kDummyDescriptor));
+        filter->addField("description", std::make_unique<KeywordsField>(&kDummyDescriptor));
         filter->setRule(mockRule.get());
 
         auto fields = filter->fields();

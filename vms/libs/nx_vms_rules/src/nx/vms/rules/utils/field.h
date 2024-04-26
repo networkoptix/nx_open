@@ -59,46 +59,19 @@ static constexpr auto kTextFieldName = "text";
 static constexpr auto kUsersFieldName = "users";
 static constexpr auto kUserIdFieldName = "userId";
 
-enum class UserFieldPreset
-{
-    None,
-    All,
-    Power, // Owners and administrators.
-};
-
-struct TimeFieldProperties
-{
-    /* Value that used by the action builder to make a field. */
-    std::chrono::seconds initialValue = std::chrono::seconds::zero();
-
-    /* Value that used by the OptionalTimeField on switching from 'no duration' to 'has duration'. */
-    std::chrono::seconds defaultValue = initialValue;
-
-    /* Maximum duration value. */
-    std::chrono::seconds maximumValue = std::chrono::weeks{1};
-
-    /* Minimum duration value. */
-    std::chrono::seconds minimumValue = std::chrono::seconds::zero();
-};
-
 template <class T>
 FieldDescriptor makeTimeFieldDescriptor(
     const QString& fieldName,
     const QString& displayName,
     const QString& description = {},
-    const TimeFieldProperties& properties = {},
+    const QVariantMap& properties = {},
     const QStringList& linkedFields = {})
 {
     return makeFieldDescriptor<T>(
         fieldName,
         displayName,
         description,
-        {
-            {"value", QVariant::fromValue(properties.initialValue)},
-            {"default", QVariant::fromValue(properties.defaultValue)},
-            {"min", QVariant::fromValue(properties.minimumValue)},
-            {"max", QVariant::fromValue(properties.maximumValue)}
-        },
+        properties,
         linkedFields);
 }
 
@@ -122,13 +95,6 @@ FieldDescriptor makeExtractDetailFieldDescriptor(
 FieldDescriptor makeTextFormatterFieldDescriptor(
     const QString& fieldName,
     const QString& formatString);
-
-FieldDescriptor makeTargetUserFieldDescriptor(
-    const QString& displayName,
-    const QString& description = {},
-    UserFieldPreset preset = UserFieldPreset::Power,
-    bool visible = true,
-    const QStringList& linkedFields = {});
 
 FieldDescriptor makeActionFlagFieldDescriptor(
     const QString& fieldName,

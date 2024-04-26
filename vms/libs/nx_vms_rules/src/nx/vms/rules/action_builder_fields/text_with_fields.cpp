@@ -79,7 +79,11 @@ struct TextWithFields::Private
     }
 };
 
-TextWithFields::TextWithFields(common::SystemContext* context):
+TextWithFields::TextWithFields(
+    common::SystemContext* context,
+    const FieldDescriptor* descriptor)
+    :
+    ActionBuilderField{descriptor},
     common::SystemContextAware(context),
     d(new Private{.q = this})
 {

@@ -15,7 +15,7 @@ class NX_VMS_RULES_API InputPortField: public SimpleTypeEventField<QString, Inpu
     Q_PROPERTY(QString value READ value WRITE setValue NOTIFY valueChanged)
 
 public:
-    InputPortField() = default;
+    using SimpleTypeEventField<QString, InputPortField>::SimpleTypeEventField;
 
     bool match(const QVariant& eventValue) const override;
 

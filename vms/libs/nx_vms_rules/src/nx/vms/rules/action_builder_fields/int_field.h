@@ -18,7 +18,7 @@ class NX_VMS_RULES_API ActionIntField: public SimpleTypeActionField<int, ActionI
     FIELD(int, max, setMax)
 
 public:
-    ActionIntField() = default;
+    using SimpleTypeActionField<int, ActionIntField>::SimpleTypeActionField;
 
 signals:
     void valueChanged();
