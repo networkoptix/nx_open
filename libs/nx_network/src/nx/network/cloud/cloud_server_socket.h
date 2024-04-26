@@ -41,8 +41,8 @@ struct CloudConnectListenerStatusReport
      */
     std::vector<Error<nx::hpm::api::Result>> mediatorErrors;
 
-    /** Errors while interracting with relays. */
-    std::vector<Error<nx::cloud::relay::api::Result>> relayErrors;
+    /** Errors reported by the the connection acceptors. */
+    std::vector<AcceptorError> acceptorErrors;
 };
 
 /**
@@ -127,6 +127,7 @@ protected:
     void bindToAioThreadUnchecked(aio::AbstractAioThread* aioThread);
     void initTunnelPool(int queueLen);
     void startAcceptor(std::unique_ptr<AbstractTunnelAcceptor> acceptor);
+    void saveAcceptorError(AcceptorError acceptorError);
     void onListenRequestCompleted(
         nx::hpm::api::ResultCode resultCode, hpm::api::ListenResponse response);
     void startAcceptingConnections(const hpm::api::ListenResponse& response);

@@ -189,6 +189,8 @@ class ReverseConnectionAcceptor:
     public ::testing::Test
 {
 public:
+    using TestReverseConnectionAcceptor = network::ReverseConnectionAcceptor<ReverseConnection>;
+
     ReverseConnectionAcceptor():
         m_preemptiveConnectionCount(nx::utils::random::number<std::size_t>(3, 11)),
         m_acceptor(std::make_unique<SimpleReverseConnector<ReverseConnection>>(
@@ -203,12 +205,12 @@ public:
     }
 
 protected:
-    void setConnectionAllwaysFails(bool val)
+    void setConnectionAlwaysFails(bool val)
     {
         m_connectResult = val ? SystemError::connectionRefused : SystemError::noError;
     }
 
-    void setReadinessWaitAllwaysFails(bool val)
+    void setReadinessWaitAlwaysFails(bool val)
     {
         m_readinessWaitResult = val ? SystemError::connectionRefused : SystemError::noError;
     }
@@ -410,7 +412,7 @@ protected:
 
     std::size_t preemptiveConnectionCount() const { return m_preemptiveConnectionCount; }
 
-private:
+protected:
     using AcceptResult =
         std::tuple<SystemError::ErrorCode, std::unique_ptr<ReverseConnection>>;
 
@@ -418,7 +420,7 @@ private:
     nx::utils::SyncQueue<AcceptResult> m_acceptedConnections;
     std::optional<AcceptResult> m_lastAcceptedConnection;
     ReverseConnectionPool m_reverseConnectionPool;
-    network::ReverseConnectionAcceptor<ReverseConnection> m_acceptor;
+    TestReverseConnectionAcceptor m_acceptor;
     nx::utils::SyncQueue<ReverseConnection*> m_connectedConnections;
     nx::utils::SyncQueue<ReverseConnection*> m_connectionsFailedToConnect;
     nx::utils::SyncQueue<ReverseConnection*> m_removedConnections;
@@ -497,7 +499,7 @@ TEST_F(ReverseConnectionAcceptor, preemptive_connection_count_is_followed)
 
 TEST_F(ReverseConnectionAcceptor, connection_is_removed_in_case_of_connect_failure)
 {
-    setConnectionAllwaysFails(true);
+    setConnectionAlwaysFails(true);
 
     givenStartedAcceptor();
     whenConnectFails();
@@ -513,7 +515,7 @@ TEST_F(ReverseConnectionAcceptor, waits_for_connection_to_become_ready_after_suc
 
 TEST_F(ReverseConnectionAcceptor, connection_is_removed_in_case_of_wait_failure)
 {
-    setReadinessWaitAllwaysFails(true);
+    setReadinessWaitAlwaysFails(true);
 
     givenStartedAcceptor();
     whenReadinessWaitFails();
@@ -593,7 +595,7 @@ TEST_F(ReverseConnectionAcceptor, getNextConnectionIfAny_returns_null_if_no_acce
 TEST_F(ReverseConnectionAcceptor, new_connect_attempts_are_done_with_delay_after_failure)
 {
     setConnectRetryPolicy({3, {std::chrono::hours(24), 1, std::chrono::hours(24), 0}});
-    setConnectionAllwaysFails(true);
+    setConnectionAlwaysFails(true);
 
     givenStartedAcceptor();
 
@@ -607,23 +609,77 @@ TEST_F(ReverseConnectionAcceptor, new_connect_attempts_are_done_with_delay_after
 TEST_F(ReverseConnectionAcceptor, connect_attempts_are_resumed_after_number_of_failures)
 {
     setConnectRetryPolicy({3, {std::chrono::milliseconds(1), 2, std::chrono::seconds(1), 0}});
-    setConnectionAllwaysFails(true);
+    setConnectionAlwaysFails(true);
     givenStartedAcceptor();
 
     whenConnectFailureCountReaches(preemptiveConnectionCount() + 8);
-    setConnectionAllwaysFails(false);
+    setConnectionAlwaysFails(false);
 
     thenPreemptiveNumberOfConnectionsHaveBeenOpened();
 }
 
 //-------------------------------------------------------------------------------------------------
 
-//class ReverseConnectionAcceptorErrorReporting:
-//    public ReverseConnectionAcceptor
-//{
-//};
+class ReverseConnectionAcceptorErrorReporting:
+    public ReverseConnectionAcceptor
+{
+protected:
+    virtual void SetUp() override
+    {
+        m_acceptor.setConnectErrorHandler(
+            [this](
+                SystemError::ErrorCode sysError,
+                std::unique_ptr<ReverseConnection> failedConnection) mutable
+            {
+                m_errors.push(sysError, std::move(failedConnection));
+            });
+    }
 
-//TEST_F(ReverseConnectionAcceptorErrorReporting, connect_error_is_reported)
+    virtual void TearDown() override
+    {
+        m_acceptor.pleaseStopSync();
+        //deleteFailedConnectionsInOwnThread();
+    }
+
+    void deleteFailedConnectionsInOwnThread()
+    {
+        while (!m_errors.empty())
+            deleteConnectionInOwnThread(m_errors.pop().second);
+    }
+
+    void deleteConnectionInOwnThread(std::unique_ptr<ReverseConnection> connection)
+    {
+        auto connectionPtr = connection.get();
+        connectionPtr->executeInAioThreadSync(
+            [connection = std::move(connection)]() mutable
+            {
+                connection.reset();
+            });
+    }
+
+    void thenErrorIsReported()
+    {
+        auto [sysError, failedConnection] = m_errors.pop();
+        ASSERT_NE(SystemError::noError, sysError);
+        ASSERT_NE(nullptr, failedConnection);
+    }
+
+private:
+    nx::utils::SyncMultiQueue<SystemError::ErrorCode, std::unique_ptr<ReverseConnection>> m_errors;
+};
+
+TEST_F(ReverseConnectionAcceptorErrorReporting, connect_error_is_reported)
+{
+    setConnectionAlwaysFails(true);
+
+    givenStartedAcceptor();
+
+    whenInvokedAcceptAsync();
+    whenConnectFails();
+
+    thenErrorIsReported();
+}
+
 //TEST_F(ReverseConnectionAcceptorErrorReporting, connect_error_is_cached_then_reported)
 //TEST_F(ReverseConnectionAcceptorErrorReporting, wait_for_originator_event_error_is_cached_then_reported)
 //TEST_F(ReverseConnectionAcceptorErrorReporting, wait_for_originator_event_error_is_reported)

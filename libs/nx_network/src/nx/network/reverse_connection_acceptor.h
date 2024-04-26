@@ -204,6 +204,9 @@ public:
     using AcceptCompletionHandler = nx::utils::MoveOnlyFunc<
         void(SystemError::ErrorCode, std::unique_ptr<Connection>)>;
 
+    using ConnectErrorHandler = nx::utils::MoveOnlyFunc<
+        void(SystemError::ErrorCode, std::unique_ptr<Connection>)>;
+
     using OnConnectionEstablished = nx::utils::MoveOnlyFunc<
         void(const Connection& connection)>;
 
@@ -269,6 +272,15 @@ public:
     {
         m_connectRetryPolicy = policy;
         m_connectRetryDelayCalculator = nx::utils::ProgressiveDelayCalculator(m_connectRetryPolicy.delayPolicy);
+    }
+
+    /**
+     * if m_connector->connectAsync() fails, this handler is invoked with the failed connection
+     * instead of asking the connection to start accepting.
+     */
+    void setConnectErrorHandler(ConnectErrorHandler handler)
+    {
+        m_connectErrorHandler = std::move(handler);
     }
 
     void start()
@@ -365,6 +377,7 @@ private:
     std::unique_ptr<AbstractReverseConnector<Connection>> m_connector;
     Connections m_connections;
     AcceptCompletionHandler m_acceptHandler;
+    ConnectErrorHandler m_connectErrorHandler;
     OnConnectionEstablished m_onConnectionEstablished;
     std::deque<std::unique_ptr<Connection>> m_acceptedConnections;
     std::size_t m_preemptiveConnectionCount = kDefaultPreemptiveConnectionCount;
@@ -444,8 +457,11 @@ private:
         if (connectResult != SystemError::noError)
         {
             NX_VERBOSE(this, "Connect failed. %1", connectResult);
-            openConnections(/*causedByConnectError?*/ true);
-            return;
+
+            if (m_connectErrorHandler)
+                m_connectErrorHandler(connectResult, std::move(connection));
+
+            return openConnections(/*causedByConnectError?*/ true);
         }
 
         m_connections.push_back(ConnectionContext());

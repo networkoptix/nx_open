@@ -8,9 +8,6 @@
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/std/future.h>
 
-#include "tunnel/relay/relay_connection_acceptor.h"
-#include "tunnel/udp/acceptor.h"
-
 namespace nx::network::cloud {
 
 namespace {
@@ -320,6 +317,26 @@ void CloudServerSocket::startAcceptor(
         });
 }
 
+void CloudServerSocket::saveAcceptorError(AcceptorError acceptorError)
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+
+    const auto it = std::find_if(
+        m_lastListenStatusReport.acceptorErrors.begin(),
+        m_lastListenStatusReport.acceptorErrors.end(),
+        [&acceptorError](const AcceptorError& existing)
+        {
+            return existing.remoteAddress == acceptorError.remoteAddress;
+        });
+
+    // Save only one acceptor error per host, since some acceptors (relay) try to open multiple
+    // connections at once.
+    if (it == m_lastListenStatusReport.acceptorErrors.end())
+        m_lastListenStatusReport.acceptorErrors.push_back(std::move(acceptorError));
+    else
+        *it = acceptorError; //< Update error so most recent is reported.
+}
+
 void CloudServerSocket::onListenRequestCompleted(
     nx::hpm::api::ResultCode resultCode,
     hpm::api::ListenResponse response)
@@ -397,6 +414,10 @@ void CloudServerSocket::initializeCustomAcceptors(
     for (auto& acceptor: acceptors)
     {
         acceptor->bindToAioThread(getAioThread());
+
+        acceptor->setAcceptErrorHandler(
+            [this](AcceptorError error) { saveAcceptorError(std::move(error)); });
+
         m_customConnectionAcceptors.push_back(acceptor.get());
         m_aggregateAcceptor.add(std::move(acceptor));
     }

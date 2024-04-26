@@ -70,6 +70,9 @@ private:
         const network::http::tunneling::Client& tunnelingClient,
         network::http::tunneling::OpenTunnelResult result);
 
+    void setPrevRequestFields(
+        const network::http::tunneling::OpenTunnelResult& tunnelResult);
+
     static api::ResultCode getResultCode(
         const network::http::tunneling::OpenTunnelResult& tunnelResult,
         const network::http::tunneling::Client& tunnelingClient);

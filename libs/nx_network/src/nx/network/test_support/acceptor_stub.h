@@ -30,6 +30,18 @@ public:
     virtual void acceptAsync(AcceptCompletionHandler handler) override;
     virtual void cancelIOSync() override;
     virtual std::unique_ptr<AbstractStreamSocket> getNextSocketIfAny() override;
+    virtual void setAcceptErrorHandler(ErrorHandler handler) override
+    {
+        m_acceptErrorHandler = std::move(handler);
+    }
+
+    void setAcceptorErrorsToReport(
+        std::list<cloud::AcceptorError> acceptorErrors,
+        nx::utils::SyncQueue<void>* allErrorsReportedEvent = nullptr)
+    {
+        m_acceptorErrorsToReport = std::move(acceptorErrors);
+        m_allErrorsReportedEvent = allErrorsReportedEvent;
+    }
 
     void setRemovedAcceptorsQueue(utils::SyncQueue<AcceptorStub*>* removedAcceptorsQueue);
 
@@ -38,11 +50,17 @@ public:
     static std::atomic<int> instanceCount;
 
 private:
+    bool reportErrorIfNeeded();
+
+private:
     nx::utils::SyncQueue<std::unique_ptr<AbstractStreamSocket>>* m_readyConnections = nullptr;
-    utils::SyncQueue<AcceptorStub*>* m_removedAcceptorsQueue;
+    utils::SyncQueue<AcceptorStub*>* m_removedAcceptorsQueue = nullptr;
     AcceptCompletionHandler m_acceptHandler;
+    ErrorHandler m_acceptErrorHandler;
     mutable nx::Mutex m_mutex;
     nx::network::aio::RepetitiveTimer m_repetitiveTimer;
+    std::list<cloud::AcceptorError> m_acceptorErrorsToReport;
+    nx::utils::SyncQueue<void>* m_allErrorsReportedEvent = nullptr;
 
     void deliverConnectionIfAvailable();
 };
@@ -63,6 +81,7 @@ public:
     virtual void acceptAsync(AcceptCompletionHandler handler) override;
     virtual void cancelIOSync() override;
     virtual std::unique_ptr<AbstractStreamSocket> getNextSocketIfAny() override;
+    virtual void setAcceptErrorHandler(ErrorHandler) override;
 
 private:
     std::shared_ptr<cloud::AbstractConnectionAcceptor> m_target;

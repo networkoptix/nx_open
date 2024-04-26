@@ -7,6 +7,7 @@
 #include <nx/utils/log/log.h>
 
 #include "../../protocol_type.h"
+#include "nx/network/http/http_status.h"
 
 namespace nx::network::cloud::relay {
 
@@ -88,6 +89,11 @@ void ReverseConnection::waitForOriginatorToStartUsingConnection(
             m_onConnectionActivated = std::move(handler);
             m_httpPipeline->startReadingConnection();
         });
+}
+
+const nx::cloud::relay::api::Client& ReverseConnection::relayClient() const
+{
+    return *m_relayClient;
 }
 
 api::BeginListeningResponse ReverseConnection::beginListeningResponse() const
@@ -241,6 +247,9 @@ ConnectionAcceptor::ConnectionAcceptor(const nx::utils::Url& relayUrl):
 
     m_acceptor.setOnConnectionEstablished(
         [this](auto&&... args) { updateAcceptorConfiguration(std::move(args)...); });
+
+    m_acceptor.setConnectErrorHandler(
+        [this](auto&&... args) { reportAcceptorError(std::forward<decltype(args)>(args)...); });
 }
 
 void ConnectionAcceptor::bindToAioThread(aio::AbstractAioThread* aioThread)
@@ -291,6 +300,11 @@ std::unique_ptr<AbstractStreamSocket> ConnectionAcceptor::getNextSocketIfAny()
     return toStreamSocket(m_acceptor.getNextConnectionIfAny());
 }
 
+void ConnectionAcceptor::setAcceptErrorHandler(ErrorHandler handler)
+{
+    m_acceptErrorHandler = std::move(handler);
+}
+
 void ConnectionAcceptor::setConnectTimeout(
     std::optional<std::chrono::milliseconds> timeout)
 {
@@ -307,6 +321,24 @@ void ConnectionAcceptor::updateAcceptorConfiguration(
 {
     m_acceptor.setPreemptiveConnectionCount(
         newConnection.beginListeningResponse().preemptiveConnectionCount);
+}
+
+void ConnectionAcceptor::reportAcceptorError(
+    SystemError::ErrorCode sysErrorCode,
+    std::unique_ptr<detail::ReverseConnection> failedConnection)
+{
+    if (!m_acceptErrorHandler)
+        return;
+
+    const auto httpStatus = failedConnection->relayClient().prevRequestHttpStatusCode();
+
+    m_acceptErrorHandler(
+        AcceptorError{
+            failedConnection->relayClient().url(),
+            sysErrorCode,
+            httpStatus == http::StatusCode::undefined
+                ? std::nullopt
+                : std::make_optional(httpStatus)});
 }
 
 std::unique_ptr<AbstractStreamSocket> ConnectionAcceptor::toStreamSocket(

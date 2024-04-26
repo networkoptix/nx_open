@@ -40,6 +40,7 @@ public:
     virtual void waitForOriginatorToStartUsingConnection(
         ReverseConnectionCompletionHandler handler) override;
 
+    const nx::cloud::relay::api::Client& relayClient() const;
     nx::cloud::relay::api::BeginListeningResponse beginListeningResponse() const;
     std::unique_ptr<AbstractStreamSocket> takeSocket();
     void setTimeout(std::optional<std::chrono::milliseconds> timeout);
@@ -116,6 +117,8 @@ public:
 
     virtual std::unique_ptr<AbstractStreamSocket> getNextSocketIfAny() override;
 
+    virtual void setAcceptErrorHandler(ErrorHandler) override;
+
     void setConnectTimeout(std::optional<std::chrono::milliseconds> timeout);
 
 protected:
@@ -125,8 +128,12 @@ private:
     const nx::utils::Url m_relayUrl;
     ReverseConnectionAcceptor<detail::ReverseConnection> m_acceptor;
     bool m_started = false;
+    AbstractConnectionAcceptor::ErrorHandler m_acceptErrorHandler;
 
     void updateAcceptorConfiguration(const detail::ReverseConnection& newConnection);
+    void reportAcceptorError(
+        SystemError::ErrorCode sysErrorCode,
+        std::unique_ptr<detail::ReverseConnection> failedConnection);
 
     std::unique_ptr<AbstractStreamSocket> toStreamSocket(
         std::unique_ptr<detail::ReverseConnection> connection);
