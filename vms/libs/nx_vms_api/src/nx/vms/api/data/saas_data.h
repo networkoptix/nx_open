@@ -31,7 +31,6 @@ public:
 bool NX_VMS_API fromString(const std::string& value, SaasDateTime* target);
 NX_REFLECTION_TAG_TYPE(SaasDateTime, useStringConversionForSerialization)
 
-/**%apidoc Saas service state */
 NX_REFLECTION_ENUM_CLASS(SaasServiceState,
     /**%apidoc active */
     active,
@@ -42,18 +41,19 @@ NX_REFLECTION_ENUM_CLASS(SaasServiceState,
 
 using SaasServiceParameters = std::map<std::string, std::variant<QString, int>>;
 
-/**%apidoc Saas service parameters for 'localRecording' service type */
+/**%apidoc SaaS service parameters for 'localRecording' service type. */
 struct NX_VMS_API SaasLocalRecordingParameters
 {
-    /**%apidoc Amount of channels */
+    /**%apidoc Amount of channels. */
     int totalChannelNumber = 1;
 
     static SaasLocalRecordingParameters fromParams(const SaasServiceParameters& parameters);
 };
-#define SaasLocalRecordingParameters_fields (totalChannelNumber)
-NX_REFLECTION_INSTRUMENT(SaasLocalRecordingParameters, SaasLocalRecordingParameters_fields)
+#define SaasLocalRecordingParameters_Fields (totalChannelNumber)
+NX_REFLECTION_INSTRUMENT(SaasLocalRecordingParameters, SaasLocalRecordingParameters_Fields)
+QN_FUSION_DECLARE_FUNCTIONS(SaasLocalRecordingParameters, (json), NX_VMS_API)
 
-/**%apidoc Saas service parameters for 'cloudStorage' service type */
+/**%apidoc Saas service parameters for 'cloudStorage' service type. */
 struct NX_VMS_API SaasCloudStorageParameters
 {
     static const int kUnlimitedResolution;
@@ -69,10 +69,11 @@ struct NX_VMS_API SaasCloudStorageParameters
 
     static SaasCloudStorageParameters fromParams(const SaasServiceParameters& parameters);
 };
-#define SaasCloudStorageParameters_fields (totalChannelNumber)(days)(maxResolutionMp)
-NX_REFLECTION_INSTRUMENT(SaasCloudStorageParameters, SaasCloudStorageParameters_fields)
+#define SaasCloudStorageParameters_Fields (totalChannelNumber)(days)(maxResolutionMp)
+NX_REFLECTION_INSTRUMENT(SaasCloudStorageParameters, SaasCloudStorageParameters_Fields)
+QN_FUSION_DECLARE_FUNCTIONS(SaasCloudStorageParameters, (json), NX_VMS_API)
 
-/**%apidoc Saas service parameters for 'analytics' service type */
+/**%apidoc Saas service parameters for 'analytics' service type. */
 struct NX_VMS_API SaasAnalyticsParameters
 {
     int totalChannelNumber = 1;
@@ -82,17 +83,17 @@ struct NX_VMS_API SaasAnalyticsParameters
 
     static SaasAnalyticsParameters fromParams(const SaasServiceParameters& parameters);
 };
-#define SaasAnalyticsParameters_fields (totalChannelNumber)(integrationId)
-NX_REFLECTION_INSTRUMENT(SaasAnalyticsParameters, SaasAnalyticsParameters_fields)
+#define SaasAnalyticsParameters_Fields (totalChannelNumber)(integrationId)
+NX_REFLECTION_INSTRUMENT(SaasAnalyticsParameters, SaasAnalyticsParameters_Fields)
+QN_FUSION_DECLARE_FUNCTIONS(SaasAnalyticsParameters, (json), NX_VMS_API)
 
-/**%apidoc SaasService */
 struct NX_VMS_API SaasService
 {
     static const QString kLocalRecordingServiceType;
     static const QString kAnalyticsIntegrationServiceType;
     static const QString kCloudRecordingType;
 
-    /**%apidoc Internal service identifier */
+    /**%apidoc Internal service identifier. */
     nx::Uuid id;
 
     /**%apidoc service type. Service parameters depends on service type. */
@@ -111,56 +112,55 @@ struct NX_VMS_API SaasService
     nx::Uuid createdByChannelPartner;
 
     /**%apidoc Configurable service parameters.  Different block for each service type. */
-    SaasServiceParameters parameters;
+    std::map<std::string, std::variant<QString, int>> parameters;
 
     bool operator==(const SaasService&) const = default;
 };
-#define SaasService_fields (id)(type)(state)(displayName)(description)(createdByChannelPartner)(parameters)
-NX_REFLECTION_INSTRUMENT(SaasService, SaasService_fields)
+#define SaasService_Fields (id)(type)(state)(displayName)(description)(createdByChannelPartner)(parameters)
+NX_REFLECTION_INSTRUMENT(SaasService, SaasService_Fields)
+QN_FUSION_DECLARE_FUNCTIONS(SaasService, (json), NX_VMS_API)
 
-/**%apidoc SaasState */
 NX_REFLECTION_ENUM_CLASS(SaasState,
-    /**%apidoc Saas services is not loaded */
+    /**%apidoc Saas services is not loaded. */
     uninitialized,
 
-    /**%apidoc Saas services is active */
+    /**%apidoc Saas services is active. */
     active,
 
-    /**%apidoc Saas services are suspended manually */
+    /**%apidoc Saas services are suspended manually. */
     suspended,
 
-    /**%apidoc Saas services are shut down manually */
+    /**%apidoc Saas services are shut down manually. */
     shutdown,
 
-    /**%apidoc Saas services are shut down automatically */
+    /**%apidoc Saas services are shut down automatically. */
     autoShutdown
 );
 
-/**%apidoc SaasPurshase */
-struct NX_VMS_API SaasPurshase
+struct NX_VMS_API SaasPurchase
 {
-    /**%apidoc Usage count of purchased service */
+    /**%apidoc Usage count of purchased service. */
     int used = 0;
 
-    /**%apidoc Quantity of purchased service */
+    /**%apidoc Quantity of purchased service. */
     int quantity = 0;
 
-    bool operator==(const SaasPurshase&) const = default;
+    bool operator==(const SaasPurchase&) const = default;
 };
-#define SaasPurshase_fields (used)(quantity)
-NX_REFLECTION_INSTRUMENT(SaasPurshase, SaasPurshase_fields)
+#define SaasPurchase_Fields (used)(quantity)
+NX_REFLECTION_INSTRUMENT(SaasPurchase, SaasPurchase_Fields)
+QN_FUSION_DECLARE_FUNCTIONS(SaasPurchase, (json), NX_VMS_API)
 
-/**%apidoc SaasState */
 NX_REFLECTION_ENUM_CLASS(UseStatus,
 
-    /**%apidoc Not initialized */
+    /**%apidoc Not initialized. */
     uninitialized,
 
-    /**%apidoc No issues */
+    /**%apidoc No issues. */
     ok,
 
     /**%apidoc Service type should be blocked because of overuse.
-     * The block date is in 'tmpExpirationDate' field
+     * The block date is in 'tmpExpirationDate' field.
      */
     overUse
 );
@@ -172,7 +172,7 @@ struct ServiceTypeStatus
      */
     UseStatus status;
 
-    /**%apidoc There is issue with service overflow detected by license server.
+    /**%apidoc:string There is issue with service overflow detected by license server.
      * The issue should be fixed till this date, otherwise VMS will start to
      * turn off services.
      */
@@ -180,62 +180,61 @@ struct ServiceTypeStatus
 
     bool operator==(const ServiceTypeStatus&) const = default;
 };
-#define ServiceTypeState_fields (status)(issueExpirationDate)
-NX_REFLECTION_INSTRUMENT(ServiceTypeStatus, ServiceTypeState_fields)
+#define ServiceTypeStatus_Fields (status)(issueExpirationDate)
+NX_REFLECTION_INSTRUMENT(ServiceTypeStatus, ServiceTypeStatus_Fields)
+QN_FUSION_DECLARE_FUNCTIONS(ServiceTypeStatus, (json), NX_VMS_API)
 
-/**%apidoc ChannelPartnerSupportEmail */
 struct NX_VMS_API ChannelPartnerSupportContactInfoRecord
 {
-    /**%apidoc Email address, phone number or web page address */
+    /**%apidoc Email address, phone number or web page address. */
     QString value;
 
-    /**%apidoc[opt] Description of the contact information record */
+    /**%apidoc[opt] Description of the contact information record. */
     QString description;
 
     bool operator==(const ChannelPartnerSupportContactInfoRecord&) const = default;
 };
-NX_REFLECTION_INSTRUMENT(ChannelPartnerSupportContactInfoRecord, (value)(description))
+#define ChannelPartnerSupportContactInfoRecord_Fields (value)(description)
+NX_REFLECTION_INSTRUMENT(ChannelPartnerSupportContactInfoRecord, ChannelPartnerSupportContactInfoRecord_Fields)
+QN_FUSION_DECLARE_FUNCTIONS(ChannelPartnerSupportContactInfoRecord, (json), NX_VMS_API)
 
-/**%apidoc ChannelPartnerSupportCustomInfo */
 struct NX_VMS_API ChannelPartnerSupportCustomInfo
 {
-    /**%apidoc The title under which provided information will be placed */
+    /**%apidoc The title under which provided information will be placed. */
     QString label;
 
-    /**%apidoc Any information in the text form, e.g. street address */
+    /**%apidoc Any information in the text form, e.g. street address. */
     QString value;
 
     bool operator==(const ChannelPartnerSupportCustomInfo&) const = default;
 };
-NX_REFLECTION_INSTRUMENT(ChannelPartnerSupportCustomInfo, (label)(value))
+#define ChannelPartnerSupportCustomInfo_Fields (label)(value)
+NX_REFLECTION_INSTRUMENT(ChannelPartnerSupportCustomInfo, ChannelPartnerSupportCustomInfo_Fields)
+QN_FUSION_DECLARE_FUNCTIONS(ChannelPartnerSupportCustomInfo, (json), NX_VMS_API)
 
-/**%apidoc ChannelPartnerSupportInformation */
 struct NX_VMS_API ChannelPartnerSupportInformation
 {
-    /**%apidoc Set of structures describing web page addresses */
+    /**%apidoc Set of structures describing web page addresses. */
     std::vector<ChannelPartnerSupportContactInfoRecord> sites;
 
-    /**%apidoc Set of structures describing phone numbers */
+    /**%apidoc Set of structures describing phone numbers. */
     std::vector<ChannelPartnerSupportContactInfoRecord> phones;
 
-    /**%apidoc Set of structures describing email addresses */
+    /**%apidoc Set of structures describing email addresses. */
     std::vector<ChannelPartnerSupportContactInfoRecord> emails;
 
-    /**%apidoc Set of structures describing any other information */
+    /**%apidoc Set of structures describing any other information. */
     std::vector<ChannelPartnerSupportCustomInfo> custom;
 
     bool operator==(const ChannelPartnerSupportInformation&) const = default;
 };
-#define ChannelPartnerSupportInformation_fields (sites)(phones)(emails)(custom)
-NX_REFLECTION_INSTRUMENT(ChannelPartnerSupportInformation, ChannelPartnerSupportInformation_fields)
+#define ChannelPartnerSupportInformation_Fields (sites)(phones)(emails)(custom)
+NX_REFLECTION_INSTRUMENT(ChannelPartnerSupportInformation, ChannelPartnerSupportInformation_Fields)
+QN_FUSION_DECLARE_FUNCTIONS(ChannelPartnerSupportInformation, (json), NX_VMS_API)
 
-/**%apidoc ChannelPartner */
 struct NX_VMS_API ChannelPartner
 {
-    /**%apidoc Channel partner id */
     nx::Uuid id;
-
-    /**%apidoc Channel partner name */
     QString name;
 
     /**%apidoc Channel partner support information, addresses, pnone numbers etc. */
@@ -243,24 +242,21 @@ struct NX_VMS_API ChannelPartner
 
     bool operator==(const ChannelPartner&) const = default;
 };
-#define ChannelPartner_fields (id)(name)(supportInformation)
-NX_REFLECTION_INSTRUMENT(ChannelPartner, ChannelPartner_fields)
+#define ChannelPartner_Fields (id)(name)(supportInformation)
+NX_REFLECTION_INSTRUMENT(ChannelPartner, ChannelPartner_Fields)
+QN_FUSION_DECLARE_FUNCTIONS(ChannelPartner, (json), NX_VMS_API)
 
-/**%apidoc Organization */
 struct NX_VMS_API Organization
 {
-    /**%apidoc Organization id */
     nx::Uuid id;
-
-    /**%apidoc Organization name */
     QString name;
 
     bool operator==(const Organization&) const = default;
 };
-#define Organization_fields (id)(name)
-NX_REFLECTION_INSTRUMENT(Organization, Organization_fields)
+#define Organization_Fields (id)(name)
+NX_REFLECTION_INSTRUMENT(Organization, Organization_Fields)
+QN_FUSION_DECLARE_FUNCTIONS(Organization, (json), NX_VMS_API)
 
-/**%apidoc SaasSecurity */
 struct NX_VMS_API SaasSecurity
 {
     /**%apidoc Data are periodically checked on the Channel Partner Server.
@@ -268,12 +264,12 @@ struct NX_VMS_API SaasSecurity
      */
     std::chrono::seconds checkPeriodS{};
 
-    /**%apidoc Last license check date and time.
+    /**%apidoc:string Last license check date and time.
      * UTC time string in format 'YYYY-MM-DD hh:mm:ss'.
      */
     SaasDateTime lastCheck;
 
-    /**%apidoc License is checked and available to use until this time.
+    /**%apidoc:string License is checked and available to use until this time.
      * The default value for prolongation is 30 check periods.
      * UTC time string in format 'YYYY-MM-DD hh:mm:ss'.
      */
@@ -283,36 +279,41 @@ struct NX_VMS_API SaasSecurity
 
     bool operator==(const SaasSecurity&) const = default;
 };
-#define SaasSecurity_fields (checkPeriodS)(lastCheck)(tmpExpirationDate)(status)
-NX_REFLECTION_INSTRUMENT(SaasSecurity, SaasSecurity_fields)
+#define SaasSecurity_Fields (checkPeriodS)(lastCheck)(tmpExpirationDate)(status)
+NX_REFLECTION_INSTRUMENT(SaasSecurity, SaasSecurity_Fields)
+QN_FUSION_DECLARE_FUNCTIONS(SaasSecurity, (json), NX_VMS_API)
 
-/**%apidoc SaasData from license server */
+/**%apidoc SaasData from license server. */
 struct NX_VMS_API SaasData
 {
     /**%apidoc Cloud Site Id */
     nx::Uuid cloudSystemId;
-
-    /**%apidoc Channel partner information */
     ChannelPartner channelPartner;
-
-    /**%apidoc Organization information */
     Organization organization;
-
-    /**%apidoc Saas state */
     SaasState state = SaasState::uninitialized;
 
-    /**%apidoc The list of purchased services */
-    std::map<nx::Uuid, SaasPurshase> services;
+    /**%apidoc The list of purchased services. */
+    std::map<nx::Uuid, SaasPurchase> services;
 
-    /**%apidoc Security data. It is used to validate saas data*/
+    /**%apidoc Security data. It is used to validate saas data. */
     SaasSecurity security;
 
-    /**%apidoc Data block signature. Signature is calculated for data with empty signature field.*/
+    /**%apidoc Data block signature. Signature is calculated for data with empty signature field. */
     QnLatin1Array signature;
 
     bool operator==(const SaasData&) const = default;
 };
-#define SaasData_fields (cloudSystemId)(channelPartner)(organization)(state)(services)(security)(signature)
-NX_REFLECTION_INSTRUMENT(SaasData, SaasData_fields)
+#define SaasData_Fields (cloudSystemId)(channelPartner)(organization)(state)(services)(security)(signature)
+NX_REFLECTION_INSTRUMENT(SaasData, SaasData_Fields)
+QN_FUSION_DECLARE_FUNCTIONS(SaasData, (json), NX_VMS_API)
+
+struct NX_VMS_API SaasWithServices: SaasData
+{
+    /**%apidoc SaaS services available to the system from Channel Partners, indexed by the service ID. */
+    std::map<nx::Uuid, nx::vms::api::SaasService> servicesAvailable;
+};
+#define SaasWithServices_Fields SaasData_Fields(servicesAvailable)
+NX_REFLECTION_INSTRUMENT(SaasWithServices, SaasWithServices_Fields)
+QN_FUSION_DECLARE_FUNCTIONS(SaasWithServices, (json), NX_VMS_API)
 
 } // namespace nx::vms::api
