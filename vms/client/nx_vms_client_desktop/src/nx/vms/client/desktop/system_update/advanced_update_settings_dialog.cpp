@@ -69,13 +69,10 @@ void AdvancedUpdateSettingsDialog::saveSettings()
         };
 
     m_currentRequest = connectedServerApi()->patchSystemSettings(
-        systemContext()->getSessionTokenHelper(),
-        api::SaveableSystemSettings{
+        systemContext()->getSessionTokenHelper(), {{
             .updateNotificationsEnabled = notifyAboutUpdates,
             .targetPersistentUpdateStorage = api::PersistentUpdateStorage{
-                .autoSelection = offlineUpdatesEnabled
-            }
-        },
+                .autoSelection = offlineUpdatesEnabled}}},
         callback,
         this);
 }

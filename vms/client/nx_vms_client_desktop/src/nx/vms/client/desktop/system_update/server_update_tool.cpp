@@ -134,7 +134,7 @@ void ServerUpdateTool::onConnectToSystem(nx::Uuid systemId)
         NX_ASSERT(m_settingsRequest == 0);
         m_settingsRequest = systemContext()->connectedServerApi()->patchSystemSettings(
             systemContext()->getSessionTokenHelper(),
-            api::SaveableSystemSettings{.customReleaseListUrl = branding::customReleaseListUrl()},
+            {{.customReleaseListUrl = branding::customReleaseListUrl()}},
             callback,
             this);
     }
