@@ -12,8 +12,11 @@ struct NX_VMS_API WatermarkSettings
 {
     bool useWatermark = false;
 
-    double frequency = 0.5; //< 0..1
-    double opacity = 0.3; //< 0..1
+    /**%apidoc[opt]:float Frequency in range [0, 1]. */
+    double frequency = 0.5;
+
+    /**%apidoc[opt]:float Opacity in range [0, 1]. */
+    double opacity = 0.3;
 
     bool operator==(const WatermarkSettings& other) const;
 };

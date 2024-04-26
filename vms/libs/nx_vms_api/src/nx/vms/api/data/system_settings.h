@@ -20,10 +20,9 @@
 
 namespace nx::vms::api {
 
-struct SaveableSystemSettings
+struct SaveableSettingsBase
 {
     std::optional<QString> defaultExportVideoCodec;
-    std::optional<QString> systemName;
     std::optional<WatermarkSettings> watermarkSettings;
     std::optional<PixelationSettings> pixelationSettings;
     std::optional<bool> webSocketEnabled;
@@ -58,7 +57,7 @@ struct SaveableSystemSettings
 
     std::optional<QString> additionalLocalFsTypes;
     std::optional<bool> arecontRtspEnabled;
-    std::optional</*std::chrono::days*/ int> auditTrailPeriodDays;
+    std::optional<int> auditTrailPeriodDays; //< TODO: Make std::chrono.
     std::optional<bool> autoDiscoveryResponseEnabled;
     std::optional<bool> autoUpdateThumbnails;
     std::optional<std::chrono::milliseconds> checkVideoStreamPeriodMs;
@@ -72,9 +71,9 @@ struct SaveableSystemSettings
     std::optional<QString> defaultVideoCodec;
     std::optional<QString> disabledVendors;
     std::optional<QMap<QString, QList<nx::Uuid>>> downloaderPeers;
-    std::optional</*std::chrono::seconds*/ int> ec2AliveUpdateIntervalSec;
+    std::optional<int> ec2AliveUpdateIntervalSec; //< TODO: Make std::chrono.
     std::optional<bool> enableEdgeRecording;
-    std::optional</*std::chrono::days*/ int> eventLogPeriodDays;
+    std::optional<int> eventLogPeriodDays; //< TODO: Make std::chrono.
     std::optional<bool> exposeDeviceCredentials;
     std::optional<bool> exposeServerEndpoints;
     std::optional<bool> forceAnalyticsDbStoragePermissions;
@@ -88,7 +87,7 @@ struct SaveableSystemSettings
     std::optional<QString> licenseServer;
     std::optional<QString> lowQualityScreenVideoCodec;
     std::optional<QString> masterCloudSyncList;
-    std::optional</*std::chrono::milliseconds*/ int> maxDifferenceBetweenSynchronizedAndInternetTime;
+    std::optional<int> maxDifferenceBetweenSynchronizedAndInternetTime; //< TODO: Make std::chrono.
     std::optional<std::chrono::milliseconds> maxDifferenceBetweenSynchronizedAndLocalTimeMs;
     std::optional<int> maxEventLogRecords;
     std::optional<int> maxHttpTranscodingSessions;
@@ -98,7 +97,7 @@ struct SaveableSystemSettings
     std::optional<int> maxRecordQueueSizeElements;
     std::optional<int> maxRemoteArchiveSynchronizationThreads;
     std::optional<int> maxRtpRetryCount;
-    std::optional</*std::chrono::seconds*/ int> maxRtspConnectDurationSeconds;
+    std::optional<int> maxRtspConnectDurationSeconds; //< TODO: Make std::chrono.
     std::optional<int> maxSceneItems;
     std::optional<int> maxVirtualCameraArchiveSynchronizationThreads;
     std::optional<int> mediaBufferSizeForAudioOnlyDeviceKb;
@@ -120,19 +119,19 @@ struct SaveableSystemSettings
     std::optional<QString> statisticsReportTimeCycle;
     std::optional<QString> statisticsReportUpdateDelay;
     std::optional<QString> supportedOrigins;
-    std::optional</*std::chrono::milliseconds*/ int> syncTimeEpsilon;
-    std::optional</*std::chrono::milliseconds*/ int> syncTimeExchangePeriod;
+    std::optional<int> syncTimeEpsilon; //< TODO: Make std::chrono.
+    std::optional<int> syncTimeExchangePeriod; //< TODO: Make std::chrono.
     std::optional<PersistentUpdateStorage> targetPersistentUpdateStorage;
     std::optional<QString> targetUpdateInformation;
     std::optional<bool> upnpPortMappingEnabled;
     std::optional<bool> useTextEmailFormat;
     std::optional<bool> useWindowsEmailLineFeed;
 
-    bool operator==(const SaveableSystemSettings&) const = default;
+    bool operator==(const SaveableSettingsBase&) const = default;
 };
-#define SaveableSystemSettings_Fields \
+#define SaveableSettingsBase_Fields \
     (defaultExportVideoCodec) \
-    (systemName)(watermarkSettings)(pixelationSettings)(webSocketEnabled) \
+    (watermarkSettings)(pixelationSettings)(webSocketEnabled) \
     (autoDiscoveryEnabled)(cameraSettingsOptimization)(statisticsAllowed) \
     (cloudNotificationsLanguage)(auditTrailEnabled)(trafficEncryptionForced) \
     (useHttpsOnlyForCameras)(videoTrafficEncryptionForced)(sessionLimitS)(useSessionLimitForCloud) \
@@ -211,44 +210,84 @@ struct SaveableSystemSettings
     (useSessionLimitForCloud) \
     (useTextEmailFormat) \
     (useWindowsEmailLineFeed)
-QN_FUSION_DECLARE_FUNCTIONS(SaveableSystemSettings, (json), NX_VMS_API)
-NX_REFLECTION_INSTRUMENT(SaveableSystemSettings, SaveableSystemSettings_Fields)
-NX_REFLECTION_TAG_TYPE(SaveableSystemSettings, jsonSerializeChronoDurationAsNumber)
-NX_REFLECTION_TAG_TYPE(SaveableSystemSettings, jsonSerializeInt64AsString)
 
-struct NX_VMS_API SystemSettings: SaveableSystemSettings
+struct NX_VMS_API SettingsBase
 {
     QString cloudAccountName;
     QString cloudHost;
-    QString cloudSystemID;
     QString lastMergeMasterId;
     QString lastMergeSlaveId;
-    nx::Uuid localSystemId;
     nx::Uuid organizationId;
     std::map<QString, int> specificFeatures;
     int statisticsReportLastNumber = 0;
     QString statisticsReportLastTime;
     QString statisticsReportLastVersion;
-    bool system2faEnabled = false;
 
-    bool operator==(const SystemSettings&) const = default;
+    bool operator==(const SettingsBase&) const = default;
 };
-#define SystemSettings_Fields SaveableSystemSettings_Fields \
+#define SettingsBase_Fields \
     (cloudAccountName) \
     (cloudHost) \
-    (cloudSystemID) \
     (lastMergeMasterId) \
     (lastMergeSlaveId) \
-    (localSystemId) \
     (organizationId) \
     (specificFeatures) \
     (statisticsReportLastNumber) \
     (statisticsReportLastTime) \
-    (statisticsReportLastVersion) \
-    (system2faEnabled)
+    (statisticsReportLastVersion)
+
+struct NX_VMS_API SaveableSystemSettings: SaveableSettingsBase
+{
+    std::optional<QString> systemName;
+
+    bool operator==(const SaveableSystemSettings&) const = default;
+};
+#define SaveableSystemSettings_Fields SaveableSettingsBase_Fields(systemName)
+QN_FUSION_DECLARE_FUNCTIONS(SaveableSystemSettings, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(SaveableSystemSettings, SaveableSystemSettings_Fields)
+NX_REFLECTION_TAG_TYPE(SaveableSystemSettings, jsonSerializeChronoDurationAsNumber)
+NX_REFLECTION_TAG_TYPE(SaveableSystemSettings, jsonSerializeInt64AsString)
+
+struct NX_VMS_API SystemSettings: SaveableSystemSettings, SettingsBase
+{
+    QString cloudSystemID;
+    nx::Uuid localSystemId;
+    bool system2faEnabled = false;
+
+    bool operator==(const SystemSettings&) const = default;
+};
+#define SystemSettings_Fields SaveableSystemSettings_Fields SettingsBase_Fields \
+    (cloudSystemID)(localSystemId)(system2faEnabled)
 QN_FUSION_DECLARE_FUNCTIONS(SystemSettings, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(SystemSettings, SystemSettings_Fields)
 NX_REFLECTION_TAG_TYPE(SystemSettings, jsonSerializeChronoDurationAsNumber)
 NX_REFLECTION_TAG_TYPE(SystemSettings, jsonSerializeInt64AsString)
+
+struct NX_VMS_API SaveableSiteSettings: SaveableSettingsBase
+{
+    std::optional<QString> siteName;
+
+    bool operator==(const SaveableSiteSettings&) const = default;
+};
+#define SaveableSiteSettings_Fields SaveableSettingsBase_Fields(siteName)
+QN_FUSION_DECLARE_FUNCTIONS(SaveableSiteSettings, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(SaveableSiteSettings, SaveableSiteSettings_Fields)
+NX_REFLECTION_TAG_TYPE(SaveableSiteSettings, jsonSerializeChronoDurationAsNumber)
+NX_REFLECTION_TAG_TYPE(SaveableSiteSettings, jsonSerializeInt64AsString)
+
+struct SiteSettings: SaveableSiteSettings, SettingsBase
+{
+    QString cloudId;
+    nx::Uuid localId;
+    bool enabled2fa = false;
+
+    bool operator==(const SiteSettings&) const = default;
+};
+#define SiteSettings_Fields \
+    SaveableSiteSettings_Fields SettingsBase_Fields (cloudId)(localId)(enabled2fa)
+QN_FUSION_DECLARE_FUNCTIONS(SiteSettings, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(SiteSettings, SiteSettings_Fields)
+NX_REFLECTION_TAG_TYPE(SiteSettings, jsonSerializeChronoDurationAsNumber)
+NX_REFLECTION_TAG_TYPE(SiteSettings, jsonSerializeInt64AsString)
 
 } // namespace nx::vms::api

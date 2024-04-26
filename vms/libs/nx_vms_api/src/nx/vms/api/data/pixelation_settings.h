@@ -15,8 +15,8 @@ struct NX_VMS_API PixelationSettings
 {
     bool isAllObjectTypes = false;
     QStringList objectTypeIds;
-    double intensity = 1.0;
-    QSet<nx::Uuid> excludeCameraIds;
+    double intensity = 1.0; /**<%apidoc[opt]:float */
+    QSet<nx::Uuid> excludeCameraIds; /**<%apidoc:uuidArray */
 
     bool operator==(const PixelationSettings& other) const;
 };

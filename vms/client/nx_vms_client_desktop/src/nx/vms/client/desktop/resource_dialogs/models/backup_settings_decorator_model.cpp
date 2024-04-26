@@ -400,7 +400,7 @@ void BackupSettingsDecoratorModel::Private::applyChanges()
 
         auto handle = q->systemContext()->connectedServerApi()->patchSystemSettings(
             q->systemContext()->getSessionTokenHelper(),
-            api::SaveableSystemSettings{.backupSettings = changedGlobalBackupSettings.value()},
+            {{.backupSettings = changedGlobalBackupSettings.value()}},
             callback,
             q);
         if (handle > 0)

@@ -102,9 +102,8 @@ TEST(QnAuditRecord, serialization)
 
 namespace {
 
-const SaveableSystemSettings kDefaultSystemSettings{
+const SaveableSettingsBase kDefaultSettingsBase{
     .defaultExportVideoCodec = QString{"mpeg4"},
-    .systemName = QString{},
     .watermarkSettings = WatermarkSettings{},
     .pixelationSettings = PixelationSettings{},
     .webSocketEnabled = true,
@@ -209,6 +208,10 @@ const SaveableSystemSettings kDefaultSystemSettings{
     .useTextEmailFormat = false,
     .useWindowsEmailLineFeed = false
 };
+
+const SaveableSystemSettings kDefaultSystemSettings{
+    kDefaultSettingsBase,
+    /*systemName = */ QString{}};
 
 enum SystemSettingKind:bool {notReadOnly, notWriteOnly};
 

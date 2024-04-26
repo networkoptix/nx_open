@@ -674,7 +674,7 @@ void ClientUpdateManager::Private::setGlobalClientUpdateSettings(
 
     currentRequest = systemContext()->connectedServerApi()->patchSystemSettings(
         systemContext()->getSessionTokenHelper(),
-        api::SaveableSystemSettings{.clientUpdateSettings = settings},
+        {{.clientUpdateSettings = settings}},
         callback,
         this);
 }

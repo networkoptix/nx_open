@@ -1426,7 +1426,7 @@ void QnStorageConfigWidget::confirmNewMetadataStorage(const nx::Uuid& storageId)
 
             m_currentRequest = systemContext()->connectedServerApi()->patchSystemSettings(
                 systemContext()->getSessionTokenHelper(),
-                nx::vms::api::SaveableSystemSettings{.metadataStorageChangePolicy = policy},
+                {{.metadataStorageChangePolicy = policy}},
                 callback,
                 this);
         };
