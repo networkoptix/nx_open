@@ -81,4 +81,19 @@ SaasCloudStorageParameters SaasCloudStorageParameters::fromParams(const SaasServ
     return result;
 }
 
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(SaasLocalRecordingParameters, (json), SaasLocalRecordingParameters_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(SaasCloudStorageParameters, (json), SaasCloudStorageParameters_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(SaasAnalyticsParameters, (json), SaasAnalyticsParameters_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(SaasService, (json), SaasService_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(SaasPurchase, (json), SaasPurchase_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ServiceTypeStatus, (json), ServiceTypeStatus_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ChannelPartnerSupportContactInfoRecord, (json), ChannelPartnerSupportContactInfoRecord_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ChannelPartnerSupportCustomInfo, (json), ChannelPartnerSupportCustomInfo_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ChannelPartnerSupportInformation, (json), ChannelPartnerSupportInformation_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ChannelPartner, (json), ChannelPartner_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Organization, (json), Organization_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(SaasSecurity, (json), SaasSecurity_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(SaasData, (json), SaasData_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(SaasWithServices, (json), SaasWithServices_Fields)
+
 } // namespace nx::vms::api
