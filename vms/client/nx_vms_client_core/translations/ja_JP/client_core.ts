@@ -59,7 +59,7 @@
     </message>
     <message>
       <source>Server has a different version:</source>
-      <translation>サーバーのバージョンが異なります：</translation>
+      <translation>サーバーのバージョンが異なります:</translation>
     </message>
     <message>
       <source>You will be asked to restart the client in compatibility mode.</source>
@@ -113,7 +113,7 @@
     </message>
     <message>
       <source>User is disabled</source>
-      <translation>ユーザーは無効になっています</translation>
+      <translation>ユーザーは無効な状態です</translation>
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
