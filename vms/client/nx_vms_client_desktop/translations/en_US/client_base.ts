@@ -7042,6 +7042,18 @@ If you intended to move analytics data to another storage location, please conta
         <source>Allows user to control PTZ, use 2-Way Audio, Soft Triggers and I/O buttons.</source>
         <translation></translation>
     </message>
+    <message>
+        <source>View Live.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User Input.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit Settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::AccessibleMediaViewHeaderWidget</name>
