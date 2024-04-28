@@ -1664,7 +1664,7 @@
     </message>
     <message>
       <source>RTP timeout (milliseconds)</source>
-      <translation type="unfinished">RTP timeout (milliseconds)</translation>
+      <translation>Batas waktu RTP (milidetik)</translation>
     </message>
   </context>
   <context>
