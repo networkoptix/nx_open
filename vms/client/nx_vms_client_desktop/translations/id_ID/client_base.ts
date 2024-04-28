@@ -6927,6 +6927,18 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
       <source>Allows user to control PTZ, use 2-Way Audio, Soft Triggers and I/O buttons.</source>
       <translation>Memungkinkan pengguna untuk mengontrol PTZ, menggunakan 2-Way Audio, Soft Triggers dan tombol I/O.</translation>
     </message>
+    <message>
+      <source>View Live.</source>
+      <translation>Lihat Live.</translation>
+    </message>
+    <message>
+      <source>User Input.</source>
+      <translation>User Input.</translation>
+    </message>
+    <message>
+      <source>Edit Settings.</source>
+      <translation>Edit Pengaturan.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AccessibleMediaViewHeaderWidget</name>

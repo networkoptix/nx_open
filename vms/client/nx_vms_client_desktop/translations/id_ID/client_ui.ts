@@ -680,7 +680,7 @@
     <name>CameraHotspotsSettingsWidget</name>
     <message>
       <source>Hotspots</source>
-      <translation type="unfinished">Hotspots</translation>
+      <translation>Hotspot</translation>
     </message>
     <message>
       <source>Add</source>
@@ -966,7 +966,7 @@
     </message>
     <message>
       <source>No connection</source>
-      <translation type="unfinished">No connection</translation>
+      <translation>Tidak ada koneksi</translation>
     </message>
   </context>
   <context>
@@ -2831,7 +2831,7 @@
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Grup</translation>
     </message>
   </context>
   <context>
@@ -2933,7 +2933,7 @@
     </message>
     <message>
       <source>Add User</source>
-      <translation type="unfinished">Add User</translation>
+      <translation>Tambahkan Pengguna</translation>
     </message>
     <message>
       <source>Del</source>

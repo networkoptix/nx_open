@@ -882,7 +882,7 @@
     </message>
     <message>
       <source>Permission Groups</source>
-      <translation type="unfinished">Permission Groups</translation>
+      <translation>Groupes de Permissions</translation>
     </message>
   </context>
   <context>
@@ -940,7 +940,7 @@
     </message>
     <message>
       <source>Permission Groups</source>
-      <translation type="unfinished">Permission Groups</translation>
+      <translation>Groupes de Permissions</translation>
     </message>
     <message>
       <source>Another group with the same name exists in the system. It is recommended to assign unique names to the groups.</source>
@@ -1105,7 +1105,7 @@
     </message>
     <message>
       <source>Usage</source>
-      <translation type="unfinished">Usage</translation>
+      <translation>Utilisation</translation>
     </message>
   </context>
   <context>
@@ -1583,7 +1583,7 @@
     </message>
     <message>
       <source>Confirm password</source>
-      <translation type="unfinished">Confirm password</translation>
+      <translation>Confirmez le mot de passe</translation>
     </message>
     <message>
       <source>Passwords do not match</source>
@@ -2460,7 +2460,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Permission Groups</source>
-      <translation type="unfinished">Permission Groups</translation>
+      <translation>Groupes de Permissions</translation>
     </message>
     <message>
       <source>Access</source>
@@ -2562,7 +2562,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Permission Groups</source>
-      <translation type="unfinished">Permission Groups</translation>
+      <translation>Groupes de Permissions</translation>
     </message>
     <message>
       <source>Access expires</source>

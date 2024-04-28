@@ -205,7 +205,7 @@
     </message>
     <message>
       <source>The server&apos;s certificate was rejected.</source>
-      <translation type="unfinished">The server&apos;s certificate was rejected.</translation>
+      <translation>Сертифікат сервера&apos;було відхилено.</translation>
     </message>
   </context>
   <context>

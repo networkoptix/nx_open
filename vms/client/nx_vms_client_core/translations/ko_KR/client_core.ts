@@ -205,7 +205,7 @@
     </message>
     <message>
       <source>The server&apos;s certificate was rejected.</source>
-      <translation type="unfinished">The server&apos;s certificate was rejected.</translation>
+      <translation>서버&apos;의 인증서가 거부되었습니다.</translation>
     </message>
   </context>
   <context>

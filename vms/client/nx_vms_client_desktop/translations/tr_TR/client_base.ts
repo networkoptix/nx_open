@@ -1355,9 +1355,9 @@
     <message numerus="yes">
       <source>Delete %n groups?</source>
       <comment>Numerical form depends on groups count</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Grup %n silinsin mi?</numerusform>
-        <numerusform>Delete %n groups?</numerusform>
+        <numerusform>%n Grup silinsin mi?</numerusform>
       </translation>
     </message>
   </context>
@@ -4493,16 +4493,16 @@ License Key: %2</source>
     </message>
     <message numerus="yes">
       <source>%n groups</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n gruplar</numerusform>
-        <numerusform>%n groups</numerusform>
+        <numerusform>%n gruplar</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n users</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n kullanıcılar</numerusform>
-        <numerusform>%n users</numerusform>
+        <numerusform>%n kullanıcılar</numerusform>
       </translation>
     </message>
     <message>
@@ -6802,9 +6802,9 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message numerus="yes">
       <source>%n Groups</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n Gruplar</numerusform>
-        <numerusform>%n Groups</numerusform>
+        <numerusform>%n Gruplar</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -7042,6 +7042,18 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <message>
       <source>Allows user to control PTZ, use 2-Way Audio, Soft Triggers and I/O buttons.</source>
       <translation>Kullanıcının PTZ'yi kontrol etmesine, 2 Yönlü Ses, Yazılımsal Tetikleyiciler ve G/Ç düğmelerini kullanmasına olanak tanır.</translation>
+    </message>
+    <message>
+      <source>View Live.</source>
+      <translation>Canlı Görüntüle.</translation>
+    </message>
+    <message>
+      <source>User Input.</source>
+      <translation>Kullanıcı girişi.</translation>
+    </message>
+    <message>
+      <source>Edit Settings.</source>
+      <translation>Ayarları Düzenle.</translation>
     </message>
   </context>
   <context>

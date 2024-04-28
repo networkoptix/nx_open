@@ -4356,7 +4356,7 @@ Klucz licencyjny: %2</translation>
     </message>
     <message>
       <source>Save</source>
-      <translation type="unfinished">Save</translation>
+      <translation>Zachowaj</translation>
     </message>
   </context>
   <context>
@@ -4606,20 +4606,20 @@ Klucz licencyjny: %2</translation>
     </message>
     <message numerus="yes">
       <source>%n groups</source>
-      <translation type="unfinished">
-        <numerusform>%n groups</numerusform>
-        <numerusform>%n groups</numerusform>
-        <numerusform>%n groups</numerusform>
-        <numerusform>%n groups</numerusform>
+      <translation>
+        <numerusform>%n grupy</numerusform>
+        <numerusform>%n grupy</numerusform>
+        <numerusform>%n grupy</numerusform>
+        <numerusform>%n grupy</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n users</source>
-      <translation type="unfinished">
-        <numerusform>%n users</numerusform>
-        <numerusform>%n users</numerusform>
-        <numerusform>%n users</numerusform>
-        <numerusform>%n users</numerusform>
+      <translation>
+        <numerusform>%n użytkowników</numerusform>
+        <numerusform>%n użytkowników</numerusform>
+        <numerusform>%n użytkowników</numerusform>
+        <numerusform>%n użytkowników</numerusform>
       </translation>
     </message>
     <message>
@@ -4640,16 +4640,16 @@ Klucz licencyjny: %2</translation>
     <message>
       <source>%1 group does not have %2 permission for some of selected cameras</source>
       <comment>%1 is the name of selected user group, %2 is the permission name</comment>
-      <translation type="unfinished">%1 group does not have %2 permission for some of selected cameras</translation>
+      <translation>Grupa %1 nie ma uprawnień %2 do niektórych wybranych kamer</translation>
     </message>
     <message numerus="yes">
       <source>%n users do not have %1 permission for some of selected cameras</source>
       <comment>%1 is the permission name</comment>
-      <translation type="unfinished">
-        <numerusform>%n users do not have %1 permission for some of selected cameras</numerusform>
-        <numerusform>%n users do not have %1 permission for some of selected cameras</numerusform>
-        <numerusform>%n users do not have %1 permission for some of selected cameras</numerusform>
-        <numerusform>%n users do not have %1 permission for some of selected cameras</numerusform>
+      <translation>
+        <numerusform>%n użytkowników nie ma %1 uprawnień dla niektórych wybranych kamer</numerusform>
+        <numerusform>%n użytkowników nie ma %1 uprawnień dla niektórych wybranych kamer</numerusform>
+        <numerusform>%n użytkowników nie ma %1 uprawnień dla niektórych wybranych kamer</numerusform>
+        <numerusform>%n użytkowników nie ma %1 uprawnień dla niektórych wybranych kamer</numerusform>
       </translation>
     </message>
   </context>
@@ -7279,6 +7279,18 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Allows user to control PTZ, use 2-Way Audio, Soft Triggers and I/O buttons.</source>
       <translation type="unfinished">Allows user to control PTZ, use 2-Way Audio, Soft Triggers and I/O buttons.</translation>
+    </message>
+    <message>
+      <source>View Live.</source>
+      <translation>Podgląd na żywo.</translation>
+    </message>
+    <message>
+      <source>User Input.</source>
+      <translation>Dane użytkownika.</translation>
+    </message>
+    <message>
+      <source>Edit Settings.</source>
+      <translation>Edytuj ustawienia.</translation>
     </message>
   </context>
   <context>
@@ -12538,7 +12550,7 @@ Nie przypinaj tego certyfikatu, jeśli nie zmodyfikowałeś %2 certyfikatu SSL s
     <name>nx::vms::client::desktop::WebPageCertificateDialog</name>
     <message>
       <source>Open this integration?</source>
-      <translation type="unfinished">Open this integration?</translation>
+      <translation>Otworzyć tę integrację?</translation>
     </message>
     <message>
       <source>Open this web page?</source>
@@ -12546,7 +12558,7 @@ Nie przypinaj tego certyfikatu, jeśli nie zmodyfikowałeś %2 certyfikatu SSL s
     </message>
     <message>
       <source>Integration</source>
-      <translation type="unfinished">Integration</translation>
+      <translation>Integracja</translation>
     </message>
     <message>
       <source>Web Page</source>
@@ -12558,10 +12570,9 @@ Nie przypinaj tego certyfikatu, jeśli nie zmodyfikowałeś %2 certyfikatu SSL s
 but this integration presented an untrusted certificate auth.
 We recommend you not to open this integration. If you understand the risks, you can open the integration.</source>
       <comment>%1 is the integration address</comment>
-      <translation type="unfinished">You try to open the
-%1
-but this integration presented an untrusted certificate auth.
-We recommend you not to open this integration. If you understand the risks, you can open the integration.</translation>
+      <translation>Próbujesz otworzyć
+%1, ale ta integracja nie przedstawiła zaufanego certyfikatu.
+Zalecamy nie otwierać tej integracji. Jeśli rozumiesz ryzyko, możesz otworzyć integrację.</translation>
     </message>
     <message>
       <source>You try to open the

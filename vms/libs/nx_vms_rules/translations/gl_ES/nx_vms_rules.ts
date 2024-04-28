@@ -602,7 +602,7 @@
     <name>nx::vms::rules::OpenLayoutAction</name>
     <message>
       <source>Open Layout</source>
-      <translation type="unfinished">Open Layout</translation>
+      <translation>Abrir deseño</translation>
     </message>
     <message>
       <source>To</source>
