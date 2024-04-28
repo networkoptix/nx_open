@@ -5525,7 +5525,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>System shut down</source>
-      <translation type="unfinished">System shut down</translation>
+      <translation>系統關閉</translation>
     </message>
     <message>
       <source>Intercom call</source>
@@ -6690,8 +6690,8 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>%n Groups</source>
-      <translation type="unfinished">
-        <numerusform>%n Groups</numerusform>
+      <translation>
+        <numerusform>%n 群組</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -6926,6 +6926,18 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Allows user to control PTZ, use 2-Way Audio, Soft Triggers and I/O buttons.</source>
       <translation>允許使用者控制 PTZ、使用雙向語音、觸發按鈕和 I/O 按鈕。</translation>
+    </message>
+    <message>
+      <source>View Live.</source>
+      <translation>瀏覽即時影像.</translation>
+    </message>
+    <message>
+      <source>User Input.</source>
+      <translation>使用者輸入.</translation>
+    </message>
+    <message>
+      <source>Edit Settings.</source>
+      <translation>編輯設定.</translation>
     </message>
   </context>
   <context>
@@ -7263,7 +7275,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>System shut down</source>
-      <translation type="unfinished">System shut down</translation>
+      <translation>系統關閉</translation>
     </message>
     <message>
       <source>To perform backup to a cloud storage, the System should be in active state. %1</source>
@@ -8710,7 +8722,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unlock this portion of the archive to export its contents.</source>
-      <translation type="unfinished">Unlock this portion of the archive to export its contents.</translation>
+      <translation>解鎖這一部分的存檔以匯出其內容。</translation>
     </message>
   </context>
   <context>
@@ -9167,7 +9179,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>NO EXPORT PERMISSION</source>
-      <translation type="unfinished">NO EXPORT PERMISSION</translation>
+      <translation>無匯出權限</translation>
     </message>
   </context>
   <context>
@@ -11775,7 +11787,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Save user</source>
-      <translation type="unfinished">Save user</translation>
+      <translation>儲存使用者</translation>
     </message>
     <message>
       <source>Enter your account password</source>
@@ -12615,8 +12627,8 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message numerus="yes">
       <source>%n Groups</source>
-      <translation type="unfinished">
-        <numerusform>%n Groups</numerusform>
+      <translation>
+        <numerusform>%n 群組</numerusform>
       </translation>
     </message>
     <message>

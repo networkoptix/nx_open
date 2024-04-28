@@ -28,7 +28,7 @@
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Grupos</translation>
     </message>
     <message>
       <source>Membership</source>
@@ -468,7 +468,7 @@
     </message>
     <message>
       <source>Suspended</source>
-      <translation type="unfinished">Suspended</translation>
+      <translation>Suspendido</translation>
     </message>
     <message>
       <source>Shut Down</source>
@@ -540,7 +540,7 @@
     </message>
     <message>
       <source>Password cannot be empty</source>
-      <translation type="unfinished">Password cannot be empty</translation>
+      <translation>O contrasinal non pode estar baleiro</translation>
     </message>
     <message>
       <source>To allow LDAP users to log in to %1, it is necessary to establish a connection between %1 and a corporate LDAP server.</source>
@@ -839,7 +839,7 @@
     <name>GroupCreateDialog</name>
     <message>
       <source>New Group</source>
-      <translation type="unfinished">New Group</translation>
+      <translation>Novo Grupo</translation>
     </message>
     <message>
       <source>General</source>
@@ -847,7 +847,7 @@
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Grupos</translation>
     </message>
     <message>
       <source>Resources</source>
@@ -870,7 +870,7 @@
     <name>GroupCreateTab</name>
     <message>
       <source>New Group</source>
-      <translation type="unfinished">New Group</translation>
+      <translation>Novo Grupo</translation>
     </message>
     <message>
       <source>Name</source>
@@ -897,7 +897,7 @@
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Grupos</translation>
     </message>
     <message>
       <source>Resources</source>
@@ -928,7 +928,7 @@
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Grupos</translation>
     </message>
     <message>
       <source>Members</source>
@@ -967,7 +967,7 @@
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Grupos</translation>
     </message>
     <message>
       <source>No members</source>
@@ -1105,7 +1105,7 @@
     </message>
     <message>
       <source>Usage</source>
-      <translation type="unfinished">Usage</translation>
+      <translation>Uso</translation>
     </message>
   </context>
   <context>
@@ -1219,7 +1219,7 @@
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Grupos</translation>
     </message>
     <message>
       <source>Last Sync</source>
@@ -1550,7 +1550,7 @@
     <message>
       <source>LDAP</source>
       <comment>Acronym for The Lightweight Directory Access Protocol</comment>
-      <translation type="unfinished">LDAP</translation>
+      <translation>LDAP</translation>
     </message>
     <message>
       <source>Built-in</source>
@@ -2393,7 +2393,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Grupos</translation>
     </message>
     <message>
       <source>Resources</source>
@@ -2432,7 +2432,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Full Name</source>
-      <translation type="unfinished">Full Name</translation>
+      <translation>Nome completo</translation>
     </message>
     <message>
       <source>Email</source>
@@ -2491,7 +2491,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Grupos</translation>
     </message>
     <message>
       <source>Resources</source>
@@ -2534,7 +2534,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Full Name</source>
-      <translation type="unfinished">Full Name</translation>
+      <translation>Nome completo</translation>
     </message>
     <message>
       <source>Account Settings</source>
@@ -2642,7 +2642,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Duplicate</source>
-      <translation type="unfinished">Duplicate</translation>
+      <translation>Duplicar</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -2654,7 +2654,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Event Log...</source>
-      <translation type="unfinished">Event Log...</translation>
+      <translation>Rexistro de eventos...</translation>
     </message>
     <message>
       <source>Reset To Defaults...</source>

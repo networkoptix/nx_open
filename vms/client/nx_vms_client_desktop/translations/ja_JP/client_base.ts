@@ -6927,6 +6927,18 @@ If you intended to move analytics data to another storage location, please conta
       <source>Allows user to control PTZ, use 2-Way Audio, Soft Triggers and I/O buttons.</source>
       <translation>ユーザーは、PTZの制御、双方向音声、ソフトトリガーおよびI/Oボタンを使用することができます。</translation>
     </message>
+    <message>
+      <source>View Live.</source>
+      <translation>ライブの表示。</translation>
+    </message>
+    <message>
+      <source>User Input.</source>
+      <translation>ユーザー入力.</translation>
+    </message>
+    <message>
+      <source>Edit Settings.</source>
+      <translation>設定の編集.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AccessibleMediaViewHeaderWidget</name>

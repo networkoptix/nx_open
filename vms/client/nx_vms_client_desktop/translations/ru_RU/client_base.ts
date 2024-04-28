@@ -4615,11 +4615,11 @@ License Key: %2</translation>
     </message>
     <message numerus="yes">
       <source>%n users</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n пользователей</numerusform>
-        <numerusform>%n users</numerusform>
-        <numerusform>%n users</numerusform>
-        <numerusform>%n users</numerusform>
+        <numerusform>%n user</numerusform>
+        <numerusform>%n user</numerusform>
+        <numerusform>%n user</numerusform>
       </translation>
     </message>
     <message>
@@ -7032,11 +7032,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>%n Groups</source>
-      <translation type="unfinished">
-        <numerusform>%n Groups</numerusform>
-        <numerusform>%n Groups</numerusform>
-        <numerusform>%n Groups</numerusform>
-        <numerusform>%n Groups</numerusform>
+      <translation>
+        <numerusform>%n Групп</numerusform>
+        <numerusform>%n Групп</numerusform>
+        <numerusform>%n Групп</numerusform>
+        <numerusform>%n Групп</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -7280,6 +7280,18 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Allows user to control PTZ, use 2-Way Audio, Soft Triggers and I/O buttons.</source>
       <translation type="unfinished">Allows user to control PTZ, use 2-Way Audio, Soft Triggers and I/O buttons.</translation>
+    </message>
+    <message>
+      <source>View Live.</source>
+      <translation type="unfinished">View Live.</translation>
+    </message>
+    <message>
+      <source>User Input.</source>
+      <translation>Другие действия.</translation>
+    </message>
+    <message>
+      <source>Edit Settings.</source>
+      <translation type="unfinished">Edit Settings.</translation>
     </message>
   </context>
   <context>
@@ -12314,7 +12326,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Save user</source>
-      <translation type="unfinished">Save user</translation>
+      <translation>Сохранить пользователя</translation>
     </message>
     <message>
       <source>Enter your account password</source>
@@ -13174,11 +13186,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message numerus="yes">
       <source>%n Groups</source>
-      <translation type="unfinished">
-        <numerusform>%n Groups</numerusform>
-        <numerusform>%n Groups</numerusform>
-        <numerusform>%n Groups</numerusform>
-        <numerusform>%n Groups</numerusform>
+      <translation>
+        <numerusform>%n Групп</numerusform>
+        <numerusform>%n Групп</numerusform>
+        <numerusform>%n Групп</numerusform>
+        <numerusform>%n Групп</numerusform>
       </translation>
     </message>
     <message>

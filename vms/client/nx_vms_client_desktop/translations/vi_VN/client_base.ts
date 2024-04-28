@@ -6926,6 +6926,18 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <source>Allows user to control PTZ, use 2-Way Audio, Soft Triggers and I/O buttons.</source>
       <translation>Cho phép người dùng điều khiển PTZ, sử dụng Âm thanh 2 chiều, Nút kích hoạt mềm và nút I/O.</translation>
     </message>
+    <message>
+      <source>View Live.</source>
+      <translation>Xem trực tiếp.</translation>
+    </message>
+    <message>
+      <source>User Input.</source>
+      <translation>Nhập người dùng.</translation>
+    </message>
+    <message>
+      <source>Edit Settings.</source>
+      <translation>Chỉnh sửa cài đặt.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AccessibleMediaViewHeaderWidget</name>

@@ -4256,7 +4256,7 @@ Lisensnøkkel: %2</translation>
     </message>
     <message>
       <source>Save</source>
-      <translation type="unfinished">Save</translation>
+      <translation>Lagre</translation>
     </message>
   </context>
   <context>
@@ -7044,6 +7044,18 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     <message>
       <source>Allows user to control PTZ, use 2-Way Audio, Soft Triggers and I/O buttons.</source>
       <translation>Lar brukeren kontrollere PTZ, bruke 2-veis lyd, myke triggere og I/O-knapper.</translation>
+    </message>
+    <message>
+      <source>View Live.</source>
+      <translation>Se live.</translation>
+    </message>
+    <message>
+      <source>User Input.</source>
+      <translation>Brukerinndata.</translation>
+    </message>
+    <message>
+      <source>Edit Settings.</source>
+      <translation type="unfinished">Edit Settings.</translation>
     </message>
   </context>
   <context>
@@ -12177,7 +12189,7 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
     <name>nx::vms::client::desktop::WebPageCertificateDialog</name>
     <message>
       <source>Open this integration?</source>
-      <translation type="unfinished">Open this integration?</translation>
+      <translation>Åpne denne integrasjonen?</translation>
     </message>
     <message>
       <source>Open this web page?</source>
@@ -12185,7 +12197,7 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
     </message>
     <message>
       <source>Integration</source>
-      <translation type="unfinished">Integration</translation>
+      <translation>Integrasjon</translation>
     </message>
     <message>
       <source>Web Page</source>
@@ -12197,10 +12209,9 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
 but this integration presented an untrusted certificate auth.
 We recommend you not to open this integration. If you understand the risks, you can open the integration.</source>
       <comment>%1 is the integration address</comment>
-      <translation type="unfinished">You try to open the
-%1
-but this integration presented an untrusted certificate auth.
-We recommend you not to open this integration. If you understand the risks, you can open the integration.</translation>
+      <translation>Du prøver å åpne
+%1, men denne integrasjonen presenterte en uklarert sertifikatautentisering.
+Vi anbefaler at du ikke åpner denne integrasjonen. Hvis du forstår risikoen, kan du åpne integrasjonen.</translation>
     </message>
     <message>
       <source>You try to open the

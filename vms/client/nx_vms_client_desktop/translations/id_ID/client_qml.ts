@@ -28,7 +28,7 @@
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Grup</translation>
     </message>
     <message>
       <source>Membership</source>
@@ -242,7 +242,7 @@
     <name>AnalyticsSettingsMenu</name>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>Plugin</translation>
     </message>
     <message>
       <source>API Integrations</source>
@@ -462,7 +462,7 @@
     </message>
     <message>
       <source>Suspended</source>
-      <translation type="unfinished">Suspended</translation>
+      <translation>Disuspensi</translation>
     </message>
     <message>
       <source>Shut Down</source>
@@ -518,7 +518,7 @@
     </message>
     <message>
       <source>Connecting...</source>
-      <translation type="unfinished">Connecting...</translation>
+      <translation>Mengkoneksikan...</translation>
     </message>
     <message>
       <source>Use StartTLS</source>
@@ -618,7 +618,7 @@
     </message>
     <message>
       <source>Create</source>
-      <translation type="unfinished">Create</translation>
+      <translation>Buat</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -634,7 +634,7 @@
     </message>
     <message>
       <source>Attributes</source>
-      <translation type="unfinished">Attributes</translation>
+      <translation>Atribut</translation>
     </message>
   </context>
   <context>
@@ -833,7 +833,7 @@
     <name>GroupCreateDialog</name>
     <message>
       <source>New Group</source>
-      <translation type="unfinished">New Group</translation>
+      <translation>Grup Baru</translation>
     </message>
     <message>
       <source>General</source>
@@ -841,7 +841,7 @@
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Grup</translation>
     </message>
     <message>
       <source>Resources</source>
@@ -864,7 +864,7 @@
     <name>GroupCreateTab</name>
     <message>
       <source>New Group</source>
-      <translation type="unfinished">New Group</translation>
+      <translation>Grup Baru</translation>
     </message>
     <message>
       <source>Name</source>
@@ -876,7 +876,7 @@
     </message>
     <message>
       <source>Permission Groups</source>
-      <translation type="unfinished">Permission Groups</translation>
+      <translation>Perizinan Grup</translation>
     </message>
   </context>
   <context>
@@ -891,7 +891,7 @@
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Grup</translation>
     </message>
     <message>
       <source>Resources</source>
@@ -922,7 +922,7 @@
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Grup</translation>
     </message>
     <message>
       <source>Members</source>
@@ -934,7 +934,7 @@
     </message>
     <message>
       <source>Permission Groups</source>
-      <translation type="unfinished">Permission Groups</translation>
+      <translation>Perizinan Grup</translation>
     </message>
     <message>
       <source>Another group with the same name exists in the system. It is recommended to assign unique names to the groups.</source>
@@ -961,7 +961,7 @@
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Grup</translation>
     </message>
     <message>
       <source>No members</source>
@@ -1011,7 +1011,7 @@
     <name>ImportFromDeviceDialog</name>
     <message>
       <source>Import From Devices</source>
-      <translation type="unfinished">Import From Devices</translation>
+      <translation>Impor Dari Perangkat</translation>
     </message>
   </context>
   <context>
@@ -1043,7 +1043,7 @@
     <name>IntegrationHeader</name>
     <message>
       <source>Insufficient services</source>
-      <translation type="unfinished">Insufficient services</translation>
+      <translation>Layanan tidak memadai</translation>
     </message>
     <message numerus="yes">
       <source>%n suitable integration services are required to turn on the integration</source>
@@ -1098,7 +1098,7 @@
     </message>
     <message>
       <source>Usage</source>
-      <translation type="unfinished">Usage</translation>
+      <translation>Penggunaan</translation>
     </message>
   </context>
   <context>
@@ -1212,7 +1212,7 @@
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Grup</translation>
     </message>
     <message>
       <source>Last Sync</source>
@@ -1383,7 +1383,7 @@
     <name>LookupListsDialog</name>
     <message>
       <source>Lookup Lists</source>
-      <translation type="unfinished">Lookup Lists</translation>
+      <translation>Daftar Pencarian</translation>
     </message>
     <message>
       <source>Add</source>
@@ -1391,7 +1391,7 @@
     </message>
     <message>
       <source>Import</source>
-      <translation type="unfinished">Import</translation>
+      <translation>Impor</translation>
     </message>
     <message>
       <source>Export</source>
@@ -1421,7 +1421,7 @@
     <name>NewLinkDialog</name>
     <message>
       <source>New Link - %1</source>
-      <translation type="unfinished">New Link - %1</translation>
+      <translation>Link Baru - %1</translation>
     </message>
     <message>
       <source>The previous link will be invalidated once a new one has been issued</source>
@@ -1429,7 +1429,7 @@
     </message>
     <message>
       <source>Create</source>
-      <translation type="unfinished">Create</translation>
+      <translation>Buat</translation>
     </message>
   </context>
   <context>
@@ -1519,11 +1519,11 @@
     </message>
     <message>
       <source>No groups found</source>
-      <translation type="unfinished">No groups found</translation>
+      <translation>Tidak ada grup yang ditemukan</translation>
     </message>
     <message>
       <source>Change search criteria or create a new group</source>
-      <translation type="unfinished">Change search criteria or create a new group</translation>
+      <translation>Ubah kriteria pencarian atau buat grup baru</translation>
     </message>
     <message>
       <source>No groups</source>
@@ -1536,12 +1536,12 @@
     <message>
       <source>Member of</source>
       <extracomment>&apos;Member of&apos; as in sentence: &apos;Current user/group is a member of: group1, group2, group3&apos;.</extracomment>
-      <translation type="unfinished">Member of</translation>
+      <translation>Anggota dari</translation>
     </message>
     <message>
       <source>LDAP</source>
       <comment>Acronym for The Lightweight Directory Access Protocol</comment>
-      <translation type="unfinished">LDAP</translation>
+      <translation>LDAP</translation>
     </message>
     <message>
       <source>Built-in</source>
@@ -1570,11 +1570,11 @@
     </message>
     <message>
       <source>New password</source>
-      <translation type="unfinished">New password</translation>
+      <translation>Kata sandi baru</translation>
     </message>
     <message>
       <source>Confirm password</source>
-      <translation type="unfinished">Confirm password</translation>
+      <translation>Konfirmasi kata sandi</translation>
     </message>
     <message>
       <source>Passwords do not match</source>
@@ -1616,7 +1616,7 @@
     <name>Plugins</name>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>Plugin</translation>
     </message>
     <message>
       <source>Plugins are programs that run on the %1 Server to enable seamless video analytics integrations.</source>
@@ -1843,7 +1843,7 @@ Press Alt + Click to follow object</translation>
     <message>
       <source>Inherits %1 permission from</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Inherits %1 permission from</translation>
+      <translation>Mewarisi %1 izin dari</translation>
     </message>
     <message>
       <source>Already inherited from</source>
@@ -1889,7 +1889,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Web Pages &amp; Integrations</source>
-      <translation type="unfinished">Web Pages &amp; Integrations</translation>
+      <translation>Halaman Web &amp; Integrasi</translation>
     </message>
     <message>
       <source>Web Pages</source>
@@ -1897,7 +1897,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Health Monitors</source>
-      <translation type="unfinished">Health Monitors</translation>
+      <translation>Health Monitor</translation>
     </message>
     <message>
       <source>Video Walls</source>
@@ -2371,7 +2371,7 @@ Press Alt + Click to follow object</translation>
     <name>UserCreateDialog</name>
     <message>
       <source>New User</source>
-      <translation type="unfinished">New User</translation>
+      <translation>Pengguna Baru</translation>
     </message>
     <message>
       <source>General</source>
@@ -2379,7 +2379,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Grup</translation>
     </message>
     <message>
       <source>Resources</source>
@@ -2391,14 +2391,14 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Add User</source>
-      <translation type="unfinished">Add User</translation>
+      <translation>Tambahkan Pengguna</translation>
     </message>
   </context>
   <context>
     <name>UserCreateTab</name>
     <message>
       <source>New User</source>
-      <translation type="unfinished">New User</translation>
+      <translation>Pengguna Baru</translation>
     </message>
     <message>
       <source>Type</source>
@@ -2418,7 +2418,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Full Name</source>
-      <translation type="unfinished">Full Name</translation>
+      <translation>Nama lengkap</translation>
     </message>
     <message>
       <source>Email</source>
@@ -2446,7 +2446,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Permission Groups</source>
-      <translation type="unfinished">Permission Groups</translation>
+      <translation>Perizinan Grup</translation>
     </message>
     <message>
       <source>Access</source>
@@ -2477,7 +2477,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Grup</translation>
     </message>
     <message>
       <source>Resources</source>
@@ -2520,7 +2520,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Full Name</source>
-      <translation type="unfinished">Full Name</translation>
+      <translation>Nama lengkap</translation>
     </message>
     <message>
       <source>Account Settings</source>
@@ -2548,7 +2548,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Permission Groups</source>
-      <translation type="unfinished">Permission Groups</translation>
+      <translation>Perizinan Grup</translation>
     </message>
     <message>
       <source>Access expires</source>
@@ -2556,7 +2556,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Access Link</source>
-      <translation type="unfinished">Access Link</translation>
+      <translation>Akses Link</translation>
     </message>
     <message>
       <source>Copy Link</source>
@@ -2564,11 +2564,11 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Terminate</source>
-      <translation type="unfinished">Terminate</translation>
+      <translation>Mengakhiri</translation>
     </message>
     <message>
       <source>New Link...</source>
-      <translation type="unfinished">New Link...</translation>
+      <translation>Link Baru...</translation>
     </message>
     <message>
       <source>No valid link for this user</source>
@@ -2581,12 +2581,12 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Obtaining Link...</source>
-      <translation type="unfinished">Obtaining Link...</translation>
+      <translation>Mendapatkan Link...</translation>
     </message>
     <message>
       <source>Ensure that this computer is able to connect to the %1</source>
       <comment>%1 is the cloud name</comment>
-      <translation type="unfinished">Ensure that this computer is able to connect to the %1</translation>
+      <translation>Pastikan komputer ini dapat terkoneksi ke %1</translation>
     </message>
     <message>
       <source>LDAP server is offline. User is not able to log in.</source>
@@ -2628,7 +2628,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Duplicate</source>
-      <translation type="unfinished">Duplicate</translation>
+      <translation>Duplikat</translation>
     </message>
     <message>
       <source>Delete</source>

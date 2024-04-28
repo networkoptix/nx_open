@@ -5,11 +5,11 @@
     <name>GroupStrings</name>
     <message>
       <source>Any event</source>
-      <translation type="unfinished">Any event</translation>
+      <translation>Event apa pun</translation>
     </message>
     <message>
       <source>Any camera issue</source>
-      <translation type="unfinished">Any camera issue</translation>
+      <translation>Masalah kamera apa pun</translation>
     </message>
     <message>
       <source>Any server issue</source>
@@ -331,7 +331,7 @@
     </message>
     <message>
       <source>Set to Fullscreen</source>
-      <translation type="unfinished">Set to Fullscreen</translation>
+      <translation>Setel ke Layar Penuh</translation>
     </message>
     <message>
       <source>Set for</source>
@@ -427,7 +427,7 @@
     </message>
     <message>
       <source>Content</source>
-      <translation type="unfinished">Content</translation>
+      <translation>Konten</translation>
     </message>
     <message>
       <source>Method</source>
@@ -616,7 +616,7 @@
     <name>nx::vms::rules::PanicRecordingAction</name>
     <message>
       <source>Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</source>
-      <translation type="unfinished">Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</translation>
+      <translation>Mode Perekaman Panik mengalihkan pengaturan perekaman untuk semua kamera ke FPS dan kualitas maksimum.</translation>
     </message>
     <message>
       <source>Panic Recording</source>
@@ -732,7 +732,7 @@
     </message>
     <message>
       <source>Header</source>
-      <translation type="unfinished">Header</translation>
+      <translation>Header</translation>
     </message>
     <message>
       <source>Body</source>

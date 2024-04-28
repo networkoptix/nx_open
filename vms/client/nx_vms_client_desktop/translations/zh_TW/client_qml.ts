@@ -1011,7 +1011,7 @@
     <name>ImportFromDeviceDialog</name>
     <message>
       <source>Import From Devices</source>
-      <translation type="unfinished">Import From Devices</translation>
+      <translation>從設備匯入</translation>
     </message>
   </context>
   <context>
@@ -1043,7 +1043,7 @@
     <name>IntegrationHeader</name>
     <message>
       <source>Insufficient services</source>
-      <translation type="unfinished">Insufficient services</translation>
+      <translation>服務不足</translation>
     </message>
     <message numerus="yes">
       <source>%n suitable integration services are required to turn on the integration</source>
@@ -1391,7 +1391,7 @@
     </message>
     <message>
       <source>Import</source>
-      <translation type="unfinished">Import</translation>
+      <translation>匯入</translation>
     </message>
     <message>
       <source>Export</source>
@@ -1500,7 +1500,7 @@
     </message>
     <message>
       <source>Reject</source>
-      <translation type="unfinished">Reject</translation>
+      <translation>拒絕</translation>
     </message>
   </context>
   <context>

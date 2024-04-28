@@ -1078,7 +1078,7 @@
     </message>
     <message>
       <source>Layout</source>
-      <translation type="unfinished">Layout</translation>
+      <translation>Deseño</translation>
     </message>
     <message>
       <source>New Layout</source>
@@ -1715,7 +1715,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Password cannot be empty</source>
-      <translation type="unfinished">Password cannot be empty</translation>
+      <translation>O contrasinal non pode estar baleiro</translation>
     </message>
     <message>
       <source>Users are receiving emails</source>
@@ -1948,11 +1948,11 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Phones</source>
-      <translation type="unfinished">Phones</translation>
+      <translation>Teléfonos</translation>
     </message>
     <message>
       <source>Emails</source>
-      <translation type="unfinished">Emails</translation>
+      <translation>Correos electrónicos</translation>
     </message>
     <message>
       <source>RHI backend</source>
@@ -3286,7 +3286,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Your session has expired</source>
-      <translation type="unfinished">Your session has expired</translation>
+      <translation>A túa sesión caducou</translation>
     </message>
     <message>
       <source>Please sign in again with your link to continue</source>
@@ -4256,7 +4256,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Save</source>
-      <translation type="unfinished">Save</translation>
+      <translation>Gardar</translation>
     </message>
   </context>
   <context>
@@ -5320,7 +5320,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Size</source>
-      <translation type="unfinished">Size</translation>
+      <translation>Tamaño</translation>
     </message>
   </context>
   <context>
@@ -5708,7 +5708,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Password cannot be empty</source>
-      <translation type="unfinished">Password cannot be empty</translation>
+      <translation>O contrasinal non pode estar baleiro</translation>
     </message>
     <message>
       <source>Avoid leading and trailing spaces</source>
@@ -6779,9 +6779,9 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>%n existing LDAP users are not found in the LDAP database</source>
-      <translation type="unfinished">
-        <numerusform>%n existing LDAP users are not found in the LDAP database</numerusform>
-        <numerusform>%n existing LDAP users are not found in the LDAP database</numerusform>
+      <translation>
+        <numerusform>%n os usuarios LDAP existentes non se atopan na base de datos LDAP</numerusform>
+        <numerusform>%n os usuarios LDAP existentes non se atopan na base de datos LDAP</numerusform>
       </translation>
     </message>
   </context>
@@ -7044,6 +7044,18 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Allows user to control PTZ, use 2-Way Audio, Soft Triggers and I/O buttons.</source>
       <translation type="unfinished">Allows user to control PTZ, use 2-Way Audio, Soft Triggers and I/O buttons.</translation>
+    </message>
+    <message>
+      <source>View Live.</source>
+      <translation type="unfinished">View Live.</translation>
+    </message>
+    <message>
+      <source>User Input.</source>
+      <translation type="unfinished">User Input.</translation>
+    </message>
+    <message>
+      <source>Edit Settings.</source>
+      <translation type="unfinished">Edit Settings.</translation>
     </message>
   </context>
   <context>
@@ -7309,7 +7321,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Resolution</source>
-      <translation type="unfinished">Resolution</translation>
+      <translation>Resolución</translation>
     </message>
     <message>
       <source>Setting was changed</source>
@@ -9356,7 +9368,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Yes</source>
-      <translation type="unfinished">Yes</translation>
+      <translation>Si</translation>
     </message>
     <message>
       <source>Apply Settings</source>
@@ -10194,7 +10206,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>You do not have permissions to modify this user</source>
-      <translation type="unfinished">You do not have permissions to modify this user</translation>
+      <translation>Non tes permisos para modificar este usuario/a</translation>
     </message>
     <message>
       <source>You cannot modify a user with a non-unique login</source>
@@ -10897,11 +10909,11 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Suspended</source>
-      <translation type="unfinished">Suspended</translation>
+      <translation>Suspendido</translation>
     </message>
     <message>
       <source>Shut down</source>
-      <translation type="unfinished">Shut down</translation>
+      <translation>Apagar</translation>
     </message>
   </context>
   <context>
@@ -11134,7 +11146,7 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>Encrypting video traffic may significantly increase CPU usage</source>
-      <translation type="unfinished">Encrypting video traffic may significantly increase CPU usage</translation>
+      <translation>O cifrado do tráfico de vídeo aumentará significativamente o uso da CPU</translation>
     </message>
     <message>
       <source>Connection with cameras that do not support HTTPS will be lost</source>
@@ -11593,7 +11605,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>and</source>
       <comment>Example: 1 month and 2 days</comment>
-      <translation type="unfinished">and</translation>
+      <translation>e</translation>
     </message>
     <message>
       <source>Your access to the System expires %1</source>
@@ -11922,7 +11934,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Full Name</source>
-      <translation type="unfinished">Full Name</translation>
+      <translation>Nome completo</translation>
     </message>
     <message>
       <source>There is already a user with the same login in the system. To avoid issues it is required for all users to have a unique login.</source>
@@ -12046,7 +12058,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>and</source>
       <comment>Example: 1 month and 2 days</comment>
-      <translation type="unfinished">and</translation>
+      <translation>e</translation>
     </message>
     <message>
       <source>New User</source>
@@ -12893,15 +12905,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::rules::VmsRulesDialog</name>
     <message>
       <source>Delete rule error:</source>
-      <translation type="unfinished">Delete rule error:</translation>
+      <translation>Erro de borrar regra:</translation>
     </message>
     <message>
       <source>Save rule error:</source>
-      <translation type="unfinished">Save rule error:</translation>
+      <translation>Erro de gardar regra:</translation>
     </message>
     <message>
       <source>Reset to defaults error:</source>
-      <translation type="unfinished">Reset to defaults error:</translation>
+      <translation>Erro de restablecemento dos valores predeterminados:</translation>
     </message>
   </context>
   <context>
@@ -12916,7 +12928,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Total</source>
-      <translation type="unfinished">Total</translation>
+      <translation>Total</translation>
     </message>
     <message>
       <source>Used</source>

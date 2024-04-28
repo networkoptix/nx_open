@@ -7045,6 +7045,18 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <source>Allows user to control PTZ, use 2-Way Audio, Soft Triggers and I/O buttons.</source>
       <translation>Tillåter användaren att styra PTZ, använda 2-vägs ljud, mjuka utlösare och I/O-knappar.</translation>
     </message>
+    <message>
+      <source>View Live.</source>
+      <translation>Visa Live.</translation>
+    </message>
+    <message>
+      <source>User Input.</source>
+      <translation>Användarinmatning.</translation>
+    </message>
+    <message>
+      <source>Edit Settings.</source>
+      <translation>Redigera Inställningar.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AccessibleMediaViewHeaderWidget</name>

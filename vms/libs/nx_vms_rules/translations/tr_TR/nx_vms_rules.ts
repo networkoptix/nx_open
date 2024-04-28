@@ -803,23 +803,23 @@
     </message>
     <message numerus="yes">
       <source>Recording on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Hizmetin aşırı kullanımı nedeniyle %n kanallarındaki kayıt durduruldu.</numerusform>
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
+        <numerusform>Hizmetin aşırı kullanımı nedeniyle %n kanallarındaki kayıt durduruldu.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Hizmetin aşırı kullanımı nedeniyle %n kanallarındaki bulut depolama yedeklemesi durduruldu.</numerusform>
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
+        <numerusform>Hizmetin aşırı kullanımı nedeniyle %n kanalında bulut depolama yedeklemesi durduruldu.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Hizmetin aşırı kullanımı nedeniyle %n kanalda ücretli entegrasyon hizmeti kullanımı durduruldu.</numerusform>
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
+        <numerusform>Hizmetin aşırı kullanımı nedeniyle %n kanalda ücretli entegrasyon hizmeti kullanımı durduruldu.</numerusform>
       </translation>
     </message>
   </context>

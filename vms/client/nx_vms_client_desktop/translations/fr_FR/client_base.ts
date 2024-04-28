@@ -4256,7 +4256,7 @@ Clé de licence : %2</translation>
     </message>
     <message>
       <source>Save</source>
-      <translation type="unfinished">Save</translation>
+      <translation>Enregistrer</translation>
     </message>
   </context>
   <context>
@@ -4494,16 +4494,16 @@ Clé de licence : %2</translation>
     </message>
     <message numerus="yes">
       <source>%n groups</source>
-      <translation type="unfinished">
-        <numerusform>%n groups</numerusform>
-        <numerusform>%n groups</numerusform>
+      <translation>
+        <numerusform>%n groupes</numerusform>
+        <numerusform>%n groupes</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n users</source>
-      <translation type="unfinished">
-        <numerusform>%n users</numerusform>
-        <numerusform>%n users</numerusform>
+      <translation>
+        <numerusform>%n usagers</numerusform>
+        <numerusform>%n usagers</numerusform>
       </translation>
     </message>
     <message>
@@ -6417,7 +6417,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Delete layout?</source>
-      <translation type="unfinished">Delete layout?</translation>
+      <translation>Supprimer la mise en page?</translation>
     </message>
     <message numerus="yes">
       <source>These layouts are shared with other users, so they will be deleted for their accounts as well.</source>
@@ -7044,6 +7044,18 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message>
       <source>Allows user to control PTZ, use 2-Way Audio, Soft Triggers and I/O buttons.</source>
       <translation type="unfinished">Allows user to control PTZ, use 2-Way Audio, Soft Triggers and I/O buttons.</translation>
+    </message>
+    <message>
+      <source>View Live.</source>
+      <translation type="unfinished">View Live.</translation>
+    </message>
+    <message>
+      <source>User Input.</source>
+      <translation>Entrée utilisateur.</translation>
+    </message>
+    <message>
+      <source>Edit Settings.</source>
+      <translation type="unfinished">Edit Settings.</translation>
     </message>
   </context>
   <context>
@@ -10194,7 +10206,7 @@ Vous pouvez le forcer, mais il peut augmenter significativement la charge du pro
     </message>
     <message>
       <source>You do not have permissions to modify this user</source>
-      <translation type="unfinished">You do not have permissions to modify this user</translation>
+      <translation>Vous n'avez pas la permission de modifier cet utilisateur</translation>
     </message>
     <message>
       <source>You cannot modify a user with a non-unique login</source>
@@ -12189,7 +12201,7 @@ N'épinglez pas ce certificat si vous n'avez pas modifié le certificat SSL du s
     </message>
     <message>
       <source>Integration</source>
-      <translation type="unfinished">Integration</translation>
+      <translation>Intégration</translation>
     </message>
     <message>
       <source>Web Page</source>
@@ -12902,7 +12914,7 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
     </message>
     <message>
       <source>Reset to defaults error:</source>
-      <translation type="unfinished">Reset to defaults error:</translation>
+      <translation>Erreur de rétablissement des valeurs par défaut:</translation>
     </message>
   </context>
   <context>

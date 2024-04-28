@@ -173,7 +173,7 @@
     </message>
     <message>
       <source>Connection failed</source>
-      <translation type="unfinished">Connection failed</translation>
+      <translation>Koneksi gagal</translation>
     </message>
     <message>
       <source>Your access to this system has expired.</source>
@@ -205,7 +205,7 @@
     </message>
     <message>
       <source>The server&apos;s certificate was rejected.</source>
-      <translation type="unfinished">The server&apos;s certificate was rejected.</translation>
+      <translation>Sertifikat server&apos;ditolak.</translation>
     </message>
   </context>
   <context>

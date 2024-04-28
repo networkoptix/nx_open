@@ -40,7 +40,7 @@
     </message>
     <message>
       <source>Occurs at</source>
-      <translation type="unfinished">Occurs at</translation>
+      <translation>發生於</translation>
     </message>
     <message>
       <source>Of Type</source>
@@ -167,7 +167,7 @@
     </message>
     <message>
       <source>Occurs at</source>
-      <translation type="unfinished">Occurs at</translation>
+      <translation>發生於</translation>
     </message>
     <message>
       <source>With ID</source>
@@ -488,7 +488,7 @@
     </message>
     <message>
       <source>Occurs at</source>
-      <translation type="unfinished">Occurs at</translation>
+      <translation>發生於</translation>
     </message>
   </context>
   <context>
@@ -654,7 +654,7 @@
     </message>
     <message>
       <source>Occurs at</source>
-      <translation type="unfinished">Occurs at</translation>
+      <translation>發生於</translation>
     </message>
     <message>
       <source>For Plugin</source>

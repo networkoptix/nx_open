@@ -1227,11 +1227,11 @@
     <message numerus="yes">
       <source>Days</source>
       <comment>Capitalized fapitalized full suffix for displaying days</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>dni</numerusform>
-        <numerusform>Days</numerusform>
-        <numerusform>Days</numerusform>
-        <numerusform>Days</numerusform>
+        <numerusform>dni</numerusform>
+        <numerusform>dni</numerusform>
+        <numerusform>dni</numerusform>
       </translation>
     </message>
     <message numerus="yes">
