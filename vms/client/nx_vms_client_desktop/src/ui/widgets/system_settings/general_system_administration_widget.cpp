@@ -44,9 +44,15 @@ static const int kPreferencesButtonSize = 104;
 static const QMargins kPreferencesButtonMargins(8, 4, 8, 4);
 
 static const QColor kLight4Color = "#E1E7EA";
-static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kNormalIconSubstitutions = {
-    {QIcon::Normal, {{kLight4Color, "light4"}}},
-};
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kLight4Theme = {
+    {QIcon::Normal, {.primary = "light4"}}};
+
+NX_DECLARE_COLORIZED_ICON(kAuditTrailIcon, "56x56/Outline/audit_trail.svg", kLight4Theme)
+NX_DECLARE_COLORIZED_ICON(kBookmarksIcon, "56x56/Outline/bookmarks.svg", kLight4Theme)
+NX_DECLARE_COLORIZED_ICON(kDeviceListIcon, "56x56/Outline/device_list.svg", kLight4Theme)
+NX_DECLARE_COLORIZED_ICON(kEventLogIcon, "56x56/Outline/event_log.svg", kLight4Theme)
+NX_DECLARE_COLORIZED_ICON(kEventRulesIcon, "56x56/Outline/event_rules.svg", kLight4Theme)
+NX_DECLARE_COLORIZED_ICON(kIntegrationsIcon, "56x56/Outline/integrations.svg", kLight4Theme)
 
 } // namespace
 
@@ -125,18 +131,12 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(
 
     ui->buttonWidget->setFocusPolicy(Qt::NoFocus);
 
-    m_buttons[kBusinessRulesButton]->setIcon(
-        qnSkin->icon("system_settings/event_rules_56.svg", kNormalIconSubstitutions));
-    m_buttons[kEventLogButton     ]->setIcon(
-        qnSkin->icon("system_settings/event_log_56.svg", kNormalIconSubstitutions));
-    m_buttons[kCameraListButton   ]->setIcon(
-        qnSkin->icon("system_settings/cameras_list_56.svg", kNormalIconSubstitutions));
-    m_buttons[kAuditLogButton     ]->setIcon(
-        qnSkin->icon("system_settings/audit_trail_56.svg", kNormalIconSubstitutions));
-    m_buttons[kBookmarksButton    ]->setIcon(
-        qnSkin->icon("system_settings/bookmarks_56.svg", kNormalIconSubstitutions));
-    m_buttons[kIntegrationsButton ]->setIcon(
-        qnSkin->icon("system_settings/integrations_56.svg", kNormalIconSubstitutions));
+    m_buttons[kBusinessRulesButton]->setIcon(qnSkin->icon(kEventRulesIcon));
+    m_buttons[kEventLogButton     ]->setIcon(qnSkin->icon(kEventLogIcon));
+    m_buttons[kDeviceListButton   ]->setIcon(qnSkin->icon(kDeviceListIcon));
+    m_buttons[kAuditLogButton     ]->setIcon(qnSkin->icon(kAuditTrailIcon));
+    m_buttons[kBookmarksButton    ]->setIcon(qnSkin->icon(kBookmarksIcon));
+    m_buttons[kIntegrationsButton ]->setIcon(qnSkin->icon(kIntegrationsIcon));
 
     m_buttons[kIntegrationsButton]->setVisible(ini().integrationsManagement);
 
@@ -144,7 +144,7 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(
 
     setHelpTopic(m_buttons[kBusinessRulesButton], HelpTopic::Id::EventsActions);
     setHelpTopic(m_buttons[kEventLogButton], HelpTopic::Id::EventLog);
-    setHelpTopic(m_buttons[kCameraListButton],
+    setHelpTopic(m_buttons[kDeviceListButton],
         HelpTopic::Id::Administration_General_CamerasList);
     setHelpTopic(m_buttons[kAuditLogButton], HelpTopic::Id::AuditTrail);
     setHelpTopic(m_buttons[kBookmarksButton], HelpTopic::Id::Bookmarks_Search);
@@ -153,7 +153,7 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(
     connect(m_buttons[kBusinessRulesButton], &QPushButton::clicked, this,
         [this] { menu()->trigger(menu::OpenBusinessRulesAction); });
 
-    connect(m_buttons[kCameraListButton], &QPushButton::clicked, this,
+    connect(m_buttons[kDeviceListButton], &QPushButton::clicked, this,
         [this] { menu()->trigger(menu::CameraListAction); });
 
     connect(m_buttons[kAuditLogButton], &QPushButton::clicked, this,
@@ -198,7 +198,7 @@ void QnGeneralSystemAdministrationWidget::retranslateUi()
     m_buttons[kAuditLogButton     ]->setText(tr("Audit Trail"));
     m_buttons[kBookmarksButton    ]->setText(tr("Bookmarks"));
     m_buttons[kIntegrationsButton ]->setText(tr("Integrations"));
-    m_buttons[kCameraListButton   ]->setText(
+    m_buttons[kDeviceListButton]->setText(
         QnDeviceDependentStrings::getDefaultNameFromSet(resourcePool(), tr("Device List"), tr("Camera List")));
 
     auto shortcutString = [this](const menu::IDType actionId, const QString &baseString) -> QString
@@ -226,7 +226,7 @@ void QnGeneralSystemAdministrationWidget::retranslateUi()
     m_buttons[kIntegrationsButton]->setToolTip(shortcutString(menu::OpenIntegrationsAction,
         tr("Open Integrations")));
 
-    m_buttons[kCameraListButton]->setToolTip(shortcutString(menu::CameraListAction,
+    m_buttons[kDeviceListButton]->setToolTip(shortcutString(menu::CameraListAction,
         QnDeviceDependentStrings::getDefaultNameFromSet(
             resourcePool(),
             tr("Open Device List"),

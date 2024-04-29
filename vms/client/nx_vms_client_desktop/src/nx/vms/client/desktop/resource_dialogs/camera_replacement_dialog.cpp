@@ -46,12 +46,12 @@ static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kIconSubs
     {QIcon::Active, {.primary = "light17"}},
 };
 
-NX_DECLARE_COLORIZED_ICON(kReloadIcon, "20x20/Outline/reload.svg", kIconSubstitutions)
-
-static const QColor kLight4Color = "#E1E7EA";
-static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kNormalIconSubstitutions = {
-    {QIcon::Normal, {{kLight4Color, "light4"}}},
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kLight4Theme = {
+    {QIcon::Normal, {.primary = "light4"}},
 };
+
+NX_DECLARE_COLORIZED_ICON(kReloadIcon, "20x20/Outline/reload.svg", kIconSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kCheckmarkIcon, "20x20/Outline/checkmark.svg", kLight4Theme)
 
 bool showServersInTree(const QnWorkbenchContext* context)
 {
@@ -479,9 +479,7 @@ void CameraReplacementDialog::setupUiContols()
     setPaletteColor(ui->headerContentsWidget, QPalette::Window, kHeaderBackgroundColor);
     ui->headerContentsWidget->setAutoFillBackground(true);
 
-    ui->headerCheckmarkLabel->setPixmap(
-        qnSkin->icon("system_settings/update_checkmark_40.svg", kNormalIconSubstitutions)
-            .pixmap(QSize(40, 40)));
+    ui->headerCheckmarkLabel->setPixmap(qnSkin->icon(kCheckmarkIcon).pixmap(QSize(40, 40)));
 
     QFont headerCaptionFont;
     headerCaptionFont.setPixelSize(kHeaderCaptionTextPixelSize);
