@@ -16,6 +16,7 @@
 #include "email_settings.h"
 #include "persistent_update_storage.h"
 #include "pixelation_settings.h"
+#include "user_session_settings.h"
 #include "watermark_settings.h"
 
 namespace nx::vms::api {
@@ -36,8 +37,6 @@ struct SaveableSettingsBase
     std::optional<bool> trafficEncryptionForced;
     std::optional<bool> useHttpsOnlyForCameras;
     std::optional<bool> videoTrafficEncryptionForced;
-    std::optional<std::chrono::seconds> sessionLimitS;
-    std::optional<bool> useSessionLimitForCloud;
     std::optional<bool> storageEncryption;
     std::optional<bool> showServersInTreeForNonAdmins;
 
@@ -105,15 +104,11 @@ struct SaveableSettingsBase
     std::optional<std::chrono::milliseconds> osTimeChangeCheckPeriodMs;
     std::optional<int> proxyConnectTimeoutSec;
     std::optional<ProxyConnectionAccessPolicy> proxyConnectionAccessPolicy;
-    std::optional<std::chrono::seconds> remoteSessionTimeoutS;
-    std::optional<std::chrono::seconds> remoteSessionUpdateS;
     std::optional<nx::utils::Url> resourceFileUri;
     std::optional<std::chrono::milliseconds> rtpTimeoutMs;
     std::optional<bool> securityForPowerUsers;
     std::optional<bool> sequentialFlirOnvifSearcherEnabled;
     std::optional<QString> serverHeader;
-    std::optional<int> sessionsLimit;
-    std::optional<int> sessionsLimitPerUser;
     std::optional<bool> showMouseTimelinePreview;
     std::optional<QString> statisticsReportServerApi;
     std::optional<QString> statisticsReportTimeCycle;
@@ -134,7 +129,7 @@ struct SaveableSettingsBase
     (watermarkSettings)(pixelationSettings)(webSocketEnabled) \
     (autoDiscoveryEnabled)(cameraSettingsOptimization)(statisticsAllowed) \
     (cloudNotificationsLanguage)(auditTrailEnabled)(trafficEncryptionForced) \
-    (useHttpsOnlyForCameras)(videoTrafficEncryptionForced)(sessionLimitS)(useSessionLimitForCloud) \
+    (useHttpsOnlyForCameras)(videoTrafficEncryptionForced) \
     (storageEncryption)(showServersInTreeForNonAdmins)(updateNotificationsEnabled)(emailSettings) \
     (timeSynchronizationEnabled)(primaryTimeServer)(customReleaseListUrl)(clientUpdateSettings) \
     (backupSettings)(metadataStorageChangePolicy)(allowRegisteringIntegrations) \
@@ -188,15 +183,11 @@ struct SaveableSettingsBase
     (osTimeChangeCheckPeriodMs) \
     (proxyConnectTimeoutSec) \
     (proxyConnectionAccessPolicy) \
-    (remoteSessionTimeoutS) \
-    (remoteSessionUpdateS) \
     (resourceFileUri) \
     (rtpTimeoutMs) \
     (securityForPowerUsers) \
     (sequentialFlirOnvifSearcherEnabled) \
     (serverHeader) \
-    (sessionsLimit) \
-    (sessionsLimitPerUser) \
     (showMouseTimelinePreview) \
     (statisticsReportServerApi) \
     (statisticsReportTimeCycle) \
@@ -207,7 +198,6 @@ struct SaveableSettingsBase
     (targetPersistentUpdateStorage) \
     (targetUpdateInformation) \
     (upnpPortMappingEnabled) \
-    (useSessionLimitForCloud) \
     (useTextEmailFormat) \
     (useWindowsEmailLineFeed)
 
@@ -236,13 +226,16 @@ struct NX_VMS_API SettingsBase
     (statisticsReportLastTime) \
     (statisticsReportLastVersion)
 
-struct NX_VMS_API SaveableSystemSettings: SaveableSettingsBase
+struct NX_VMS_API SaveableSystemSettings: SaveableSettingsBase, UserSessionSettings
 {
     std::optional<QString> systemName;
 
     bool operator==(const SaveableSystemSettings&) const = default;
 };
-#define SaveableSystemSettings_Fields SaveableSettingsBase_Fields(systemName)
+#define SaveableSystemSettings_Fields \
+    SaveableSettingsBase_Fields \
+    UserSessionSettings_Fields \
+    (systemName)
 QN_FUSION_DECLARE_FUNCTIONS(SaveableSystemSettings, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(SaveableSystemSettings, SaveableSystemSettings_Fields)
 NX_REFLECTION_TAG_TYPE(SaveableSystemSettings, jsonSerializeChronoDurationAsNumber)
@@ -265,11 +258,15 @@ NX_REFLECTION_TAG_TYPE(SystemSettings, jsonSerializeInt64AsString)
 
 struct NX_VMS_API SaveableSiteSettings: SaveableSettingsBase
 {
+    std::optional<UserSessionSettings> userSessionSettings;
     std::optional<QString> siteName;
 
     bool operator==(const SaveableSiteSettings&) const = default;
 };
-#define SaveableSiteSettings_Fields SaveableSettingsBase_Fields(siteName)
+#define SaveableSiteSettings_Fields \
+    SaveableSettingsBase_Fields \
+    (userSessionSettings) \
+    (siteName)
 QN_FUSION_DECLARE_FUNCTIONS(SaveableSiteSettings, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(SaveableSiteSettings, SaveableSiteSettings_Fields)
 NX_REFLECTION_TAG_TYPE(SaveableSiteSettings, jsonSerializeChronoDurationAsNumber)

@@ -4,7 +4,6 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/instrument.h>
-#include <nx/vms/api/data/data_macros.h>
 
 namespace nx::vms::api {
 
@@ -23,7 +22,6 @@ struct NX_VMS_API WatermarkSettings
 
 #define WatermarkSettings_Fields (useWatermark)(frequency)(opacity)
 NX_REFLECTION_INSTRUMENT(WatermarkSettings, WatermarkSettings_Fields)
-
 QN_FUSION_DECLARE_FUNCTIONS(WatermarkSettings, (json), NX_VMS_API)
 
 } // namespace nx::vms::api
