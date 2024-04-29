@@ -809,7 +809,7 @@
     </message>
     <message>
       <source>Local Recording</source>
-      <translation type="unfinished">Local Recording</translation>
+      <translation>Rekaman Lokal</translation>
     </message>
     <message>
       <source>Local Recording service</source>
@@ -1277,7 +1277,7 @@
     </message>
     <message>
       <source>Integration</source>
-      <translation type="unfinished">Integration</translation>
+      <translation>Integrasi</translation>
     </message>
     <message>
       <source>Cloud storage</source>
@@ -1510,7 +1510,7 @@
     </message>
     <message>
       <source>RTP timeout (milliseconds)</source>
-      <translation type="unfinished">RTP timeout (milliseconds)</translation>
+      <translation>Batas waktu RTP (milidetik)</translation>
     </message>
     <message>
       <source>Max RTSP connection duration (seconds)</source>
@@ -1835,11 +1835,11 @@
     </message>
     <message>
       <source>Unlock this portion of the archive to export its contents.</source>
-      <translation type="unfinished">Unlock this portion of the archive to export its contents.</translation>
+      <translation>Buka kunci bagian archive ini untuk mengekspor isinya.</translation>
     </message>
     <message>
       <source>Archive is unavailable now. Please try again later.</source>
-      <translation type="unfinished">Archive is unavailable now. Please try again later.</translation>
+      <translation>Archive tidak tersedia sekarang. Silakan coba lagi nanti.</translation>
     </message>
   </context>
   <context>
@@ -2449,8 +2449,8 @@
     </message>
     <message numerus="yes">
       <source>%n Groups</source>
-      <translation type="unfinished">
-        <numerusform>%n Groups</numerusform>
+      <translation>
+        <numerusform>%n Grup</numerusform>
       </translation>
     </message>
     <message>

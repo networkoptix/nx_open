@@ -841,7 +841,7 @@
     </message>
     <message>
       <source>Local Recording</source>
-      <translation type="unfinished">Local Recording</translation>
+      <translation>Gravación local</translation>
     </message>
     <message>
       <source>Local Recording service</source>
