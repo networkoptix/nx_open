@@ -54,6 +54,10 @@ static const core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
     {QIcon::Normal, {{kDark10Color, "dark10"}}}
 };
 
+NX_DECLARE_COLORIZED_ICON(kTimePlaceholder,
+    "placeholders/time_placeholder.svg",
+    kIconSubstitutions) // Todo: VMS-52281: wait for update from designers
+
 } // namespace
 
 TimeSynchronizationWidget::TimeSynchronizationWidget(
@@ -255,7 +259,7 @@ void TimeSynchronizationWidget::setupUi()
     ui->syncWithInternetCheckBox->setForegroundRole(QPalette::ButtonText);
 
     ui->placeholderImageLabel->setPixmap(
-        qnSkin->icon("placeholders/time_placeholder.svg", kIconSubstitutions)
+        qnSkin->icon(kTimePlaceholder)
             .pixmap(QSize(128, 128)));
 
     QFont font;

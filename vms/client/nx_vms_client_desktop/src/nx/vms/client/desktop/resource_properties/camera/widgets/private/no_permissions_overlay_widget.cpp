@@ -1,5 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+#include "no_permissions_overlay_widget.h"
+
 #include <QtGui/QPaintEvent>
 #include <QtGui/QPainter>
 #include <QtWidgets/QBoxLayout>
@@ -8,8 +10,6 @@
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/common/widgets/scalable_image_widget.h>
 #include <ui/widgets/word_wrapped_label.h>
-
-#include "no_permissions_overlay_widget.h"
 
 namespace nx::vms::client::desktop {
 
@@ -26,7 +26,7 @@ NoPermissionsOverlayWidget::NoPermissionsOverlayWidget(QWidget* parent):
     auto layout = new QVBoxLayout(placeholder);
     placeholder->setLayout(layout);
 
-    auto image = new ScalableImageWidget(":/skin/placeholders/no_camera_settings_access.svg");
+    auto image = new ScalableImageWidget(":/skin/64x64/Outline/no_camera_settings.svg");
     image->setFixedSize(64, 64);
     layout->addWidget(image);
     layout->setAlignment(image, Qt::AlignHCenter);

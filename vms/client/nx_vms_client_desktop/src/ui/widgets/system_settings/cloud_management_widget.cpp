@@ -40,6 +40,7 @@ static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kLight1Th
 
 NX_DECLARE_COLORIZED_ICON(kUserCloudIcon, "20x20/Solid/user_cloud.svg", core::kEmptySubstitutions)
 NX_DECLARE_COLORIZED_ICON(kOrganizationIcon, "20x20/Solid/organization.svg", kLight1Theme)
+NX_DECLARE_COLORIZED_ICON(kConnectPlaceholder, "Illustrations/nx_connect_placeholder_240x240.svg", core::kEmptySubstitutions)
 
 core::CloudUrlHelper urlHelper()
 {
@@ -112,7 +113,7 @@ QnCloudManagementWidget::QnCloudManagementWidget(QWidget *parent):
             "%1 is the cloud name (like Nx Cloud)").arg(nx::branding::cloudName()));
 
     ui->notLinkedPlaceholderImageLabel->setPixmap(
-        qnSkin->pixmap("placeholders/cloud_placeholder.svg"));
+        qnSkin->icon(kConnectPlaceholder).pixmap(240, 240));
 
     connect(ui->goToCloudButton, &QPushButton::clicked, this,
         [this]
