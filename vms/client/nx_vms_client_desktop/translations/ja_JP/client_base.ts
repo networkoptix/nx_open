@@ -6933,11 +6933,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>User Input.</source>
-      <translation>ユーザー入力.</translation>
+      <translation>ユーザー入力。</translation>
     </message>
     <message>
       <source>Edit Settings.</source>
-      <translation>設定の編集.</translation>
+      <translation>編集の設定。</translation>
     </message>
   </context>
   <context>
