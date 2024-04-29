@@ -117,8 +117,6 @@ const SaveableSettingsBase kDefaultSettingsBase{
     .trafficEncryptionForced = true,
     .useHttpsOnlyForCameras = false,
     .videoTrafficEncryptionForced = false,
-    .sessionLimitS = std::chrono::seconds{30 * 24 * 60 * 60},
-    .useSessionLimitForCloud = false,
     .storageEncryption = false,
     .showServersInTreeForNonAdmins = true,
 
@@ -141,12 +139,12 @@ const SaveableSettingsBase kDefaultSettingsBase{
     .auditTrailPeriodDays = 183,
     .autoDiscoveryResponseEnabled = true,
     .autoUpdateThumbnails = true,
-    .checkVideoStreamPeriodMs = std::chrono::milliseconds{10'000},
+    .checkVideoStreamPeriodMs = 10s,
     .clientStatisticsSettingsUrl = QString{},
     .cloudConnectRelayingEnabled = true,
     .cloudConnectRelayingOverSslForced = false,
     .cloudConnectUdpHolePunchingEnabled = true,
-    .cloudPollingIntervalS = std::chrono::seconds{60},
+    .cloudPollingIntervalS = 1min,
     .crossdomainEnabled = false,
     .currentStorageEncryptionKey = QByteArray{},
     .defaultVideoCodec = QString{"h263p"},
@@ -169,7 +167,7 @@ const SaveableSettingsBase kDefaultSettingsBase{
     .lowQualityScreenVideoCodec = QString{"mpeg2video"},
     .masterCloudSyncList = QString{},
     .maxDifferenceBetweenSynchronizedAndInternetTime = 2'000,
-    .maxDifferenceBetweenSynchronizedAndLocalTimeMs = std::chrono::milliseconds{2'000},
+    .maxDifferenceBetweenSynchronizedAndLocalTimeMs = 2s,
     .maxEventLogRecords = 100'000,
     .maxHttpTranscodingSessions = 2,
     .maxP2pAllClientsSizeBytes = 1024 * 1024 * 128,
@@ -183,18 +181,14 @@ const SaveableSettingsBase kDefaultSettingsBase{
     .maxVirtualCameraArchiveSynchronizationThreads = -1,
     .mediaBufferSizeForAudioOnlyDeviceKb = 16,
     .mediaBufferSizeKb = 256,
-    .osTimeChangeCheckPeriodMs = std::chrono::milliseconds{5'000},
+    .osTimeChangeCheckPeriodMs = 5s,
     .proxyConnectTimeoutSec = 5,
     .proxyConnectionAccessPolicy = ProxyConnectionAccessPolicy::admins,
-    .remoteSessionTimeoutS = std::chrono::seconds{6 * 60 * 60},
-    .remoteSessionUpdateS = std::chrono::seconds{10},
     .resourceFileUri = nx::utils::Url{"https://resources.vmsproxy.com/resource_data.json"},
-    .rtpTimeoutMs = std::chrono::milliseconds{10'000},
+    .rtpTimeoutMs = 10s,
     .securityForPowerUsers = true,
     .sequentialFlirOnvifSearcherEnabled = false,
     .serverHeader = QString{"$vmsName/$vmsVersion ($company) $compatibility"},
-    .sessionsLimit = 100'000,
-    .sessionsLimitPerUser = 5'000,
     .showMouseTimelinePreview = true,
     .statisticsReportServerApi = QString{},
     .statisticsReportTimeCycle = QString{"30d"},
@@ -209,9 +203,19 @@ const SaveableSettingsBase kDefaultSettingsBase{
     .useWindowsEmailLineFeed = false
 };
 
+const UserSessionSettings kDefaultUserSessionSettings{
+    .sessionLimitS = std::chrono::days{30},
+    .sessionsLimit = 100'000,
+    .sessionsLimitPerUser = 5'000,
+    .remoteSessionTimeoutS = 6h,
+    .remoteSessionUpdateS = 10s,
+    .useSessionLimitForCloud = false
+};
+
 const SaveableSystemSettings kDefaultSystemSettings{
     kDefaultSettingsBase,
-    /*systemName = */ QString{}};
+    kDefaultUserSessionSettings,
+    /*systemName*/ QString{}};
 
 enum SystemSettingKind:bool {notReadOnly, notWriteOnly};
 
