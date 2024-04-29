@@ -36,6 +36,15 @@ static const int kFixedHomeIconWidth = 32;
 static const int kFixedWideHomeIconWidth = 65;
 static const QnIndents kTabIndents = {14, 10};
 static const char* kDragActionMimeData = "system-tab-move";
+
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kSystemSubstitutions =
+    {{QnIcon::Normal, {.primary = "light4"}}};
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kAddSubstitutions =
+    {{QnIcon::Normal, {.primary = "dark14"}}};
+
+NX_DECLARE_COLORIZED_ICON(kSystemIcon, "20x20/Solid/system_local.svg", kSystemSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kAddIcon, "20x20/Outline/add.svg", kAddSubstitutions)
+
 } // namespace
 
 namespace nx::vms::client::desktop {
@@ -289,19 +298,19 @@ void SystemTabBar::updateHomeTabView()
     {
         // Only home tab exists.
         closeButton->setVisible(false);
-        setTabIcon(index, qnSkin->icon("titlebar/systems.svg"));
+        setTabIcon(index, qnSkin->icon(kSystemIcon));
     }
     else if (isHomeTabActive())
     {
         // Home tab is active.
         closeButton->setVisible(true);
-        setTabIcon(index, qnSkin->icon("titlebar/systems.svg"));
+        setTabIcon(index, qnSkin->icon(kSystemIcon));
     }
     else
     {
         // Home tab is inactive.
         closeButton->setVisible(false);
-        setTabIcon(index, qnSkin->icon("titlebar/add.svg"));
+        setTabIcon(index, qnSkin->icon(kAddIcon));
     }
     resizeEvent({});
     updateGeometry();

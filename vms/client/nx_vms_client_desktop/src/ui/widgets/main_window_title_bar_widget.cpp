@@ -56,6 +56,10 @@ static const QSize kTabBarButtonSize(
 static const QMargins kSingleLevelVLineContentMargins = {0, 0, 0, 0};
 static const QMargins kDoubleLevelVLineContentMargins = {0, 5, 0, 5};
 
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kMainMenuTheme = {
+    {QnIcon::Normal, {.primary = "light4"}}};
+NX_DECLARE_COLORIZED_ICON(kMainMenuIcon, "20x20/Outline/menu_main_window.svg", kMainMenuTheme);
+
 QFrame* newVLine(const QString& lightColorName, const QString& shadowColorName)
 {
     QFrame* line = new QFrame();
@@ -190,7 +194,7 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
 
     d->mainMenuButton = newActionButton(
         menu::MainMenuAction,
-        qnSkin->icon("titlebar/main_menu.svg", "", nullptr, Style::kTitleBarSubstitutions),
+        qnSkin->icon(kMainMenuIcon),
         HelpTopic::Id::MainWindow_TitleBar_MainMenu);
     connect(d->mainMenuButton, &ToolButton::justPressed, this,
         [this]()
