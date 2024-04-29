@@ -146,7 +146,7 @@ ModalDialog
                                     ColoredImage
                                     {
                                         sourceSize: Qt.size(20, 20)
-                                        sourcePath: "standard_icons/arrow_right_2px_24.svg"
+                                        sourcePath: "24x24/Outline/arrow_right_2px.svg"
                                         primaryColor: ColorTheme.colors.light16
                                     }
 

@@ -23,6 +23,10 @@ namespace {
 
 static constexpr int kMinimumWidth = 400;
 
+const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kGreenTheme = {
+    {QIcon::Normal, {.primary = "green_attention"}}};
+NX_DECLARE_COLORIZED_ICON(kSuccessIcon, "64x64/Outline/success.svg", kGreenTheme)
+
 } // namespace
 
 class QnMessageBoxPrivate : public QObject
@@ -505,15 +509,7 @@ QPixmap QnMessageBox::getPixmapByIconId(Icon icon)
         case Icon::Question:
             return standardPixmap(QStyle::SP_MessageBoxQuestion);
         case Icon::Success:
-        {
-            const QColor kAttentionGreen = "#3A911E";
-            const nx::vms::client::core::SvgIconColorer::IconSubstitutions
-                kIconSubstitutionsGreen = {
-                    {QIcon::Normal, {{kAttentionGreen, "green_attention"}}}};
-            return qnSkin
-                ->icon("standard_icons/sp_message_box_success_64.svg", kIconSubstitutionsGreen)
-                .pixmap(QSize(64, 64));
-        }
+            return qnSkin->icon(kSuccessIcon).pixmap(QSize(64, 64));
         default:
             return QPixmap();
     }
