@@ -17,6 +17,7 @@ Control
 
     required property Analytics.ObjectType objectType
     required property Analytics.Attribute attribute
+    required property string displayValue
     required property string value
 
     property bool isGeneric: !objectType
@@ -25,7 +26,7 @@ Control
     {
         x: 8
         y: 6
-        color: value ? ColorTheme.light : ColorTheme.colors.dark17
+        color: displayValue ? ColorTheme.light : ColorTheme.colors.dark17
     }
 
     Component
@@ -34,7 +35,7 @@ Control
 
         ElementViewer
         {
-            text: value || qsTr("ANY")
+            text: displayValue || qsTr("ANY")
         }
     }
 
@@ -48,7 +49,7 @@ Control
             leftPadding: 26
             rightPadding: 8
             verticalAlignment: Text.AlignVCenter
-            text: value || qsTr("ANY color")
+            text: displayValue || qsTr("ANY color")
 
             Rectangle
             {

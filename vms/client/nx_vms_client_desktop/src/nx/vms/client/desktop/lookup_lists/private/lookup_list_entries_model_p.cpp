@@ -2,10 +2,11 @@
 
 #include "lookup_list_entries_model_p.h"
 
-#include <QtGui/QColor>
-
 #include <range/v3/algorithm/any_of.hpp>
 #include <range/v3/algorithm/contains.hpp>
+#include <range/v3/algorithm/find_if.hpp>
+
+#include <QtGui/QColor>
 
 #include <nx/reflect/json/deserializer.h>
 #include <nx/vms/client/desktop/analytics/taxonomy/attribute_set.h>
@@ -43,7 +44,7 @@ QVariant LookupListEntriesModel::Private::objectFormatter(const QString& value)
     return value == "true" ? tr("Present") : tr("Absent");
 }
 
-QVariant LookupListEntriesModel::Private::getDisplayedValue(
+QVariant LookupListEntriesModel::Private::getDisplayValue(
     const QString& attributeName, const QString& value) const
 {
     if (data->rawData().objectTypeId.isEmpty())
@@ -65,7 +66,7 @@ std::vector<int> LookupListEntriesModel::Private::getVisibleIndexes(
     {
         for (auto& [key, value]: data->rawData().entries[r])
         {
-            const auto displayedValue = getDisplayedValue(key, value);
+            const auto displayedValue = getDisplayValue(key, value);
             if (displayedValue.toString().toLower().contains(lowerFilterText))
             {
                 result.push_back(r);
@@ -155,14 +156,21 @@ void LookupListEntriesModel::Private::initAttributeFunctions()
                     validatorByAttributeName[fullAttributeName] =
                         [colorByHex](const QString& value)
                     {
-                        const auto color = QColor::fromString(value);
-                        return color.isValid() && colorByHex.contains(value);
+                        return ranges::any_of(colorByHex,
+                            [value](const auto& keyValue)
+                            {
+                                return keyValue.first == value || keyValue.second == value;
+                            });
                     };
 
                     formatterByAttributeName[fullAttributeName] =
                         [colorByHex](const QString& value)
                     {
-                        const auto colorIt = colorByHex.find(value);
+                        auto colorIt = ranges::find_if(colorByHex,
+                            [value](const auto& keyValue)
+                            {
+                                return keyValue.first == value || keyValue.second == value;
+                            });
                         return colorIt == colorByHex.cend()
                             ? QString()
                             : colorIt->second;

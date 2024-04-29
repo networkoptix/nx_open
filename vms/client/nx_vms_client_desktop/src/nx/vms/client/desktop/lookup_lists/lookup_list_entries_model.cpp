@@ -72,6 +72,7 @@ QVariant LookupListEntriesModel::data(const QModelIndex& index, int role) const
 
     switch (role)
     {
+        case RawValueRole:
         case Qt::DisplayRole:
         {
             const auto key = attribute(d->data->rawData(), index.column());
@@ -82,7 +83,8 @@ QVariant LookupListEntriesModel::data(const QModelIndex& index, int role) const
                 d->rowsIndexesToShow ? d->rowsIndexesToShow->at(index.row()) : index.row();
             const auto& entry = d->data->rawData().entries[rowIdx];
             const auto iter = entry.find(key);
-            return d->getDisplayedValue(key, iter != entry.cend() ? iter->second : QString());
+            const auto value = iter != entry.cend() ? iter->second : QString();
+            return role == RawValueRole ? value : d->getDisplayValue(key, value);
         }
 
         case ObjectTypeIdRole:
@@ -120,7 +122,7 @@ bool LookupListEntriesModel::setData(const QModelIndex& index, const QVariant& v
     else
         entry[key] = valueAsString;
 
-    emit dataChanged(index, index, {Qt::DisplayRole});
+    emit dataChanged(index, index, {Qt::DisplayRole, RawValueRole});
     return true;
 }
 
@@ -129,6 +131,7 @@ QHash<int, QByteArray> LookupListEntriesModel::roleNames() const
     auto roles = base_type::roleNames();
     roles[ObjectTypeIdRole] = "objectTypeId";
     roles[AttributeNameRole] = "attributeName";
+    roles[RawValueRole] = "rawValue";
     return roles;
 }
 
