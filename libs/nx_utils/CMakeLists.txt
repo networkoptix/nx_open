@@ -13,8 +13,6 @@ nx_add_target(nx_utils LIBRARY
     ADDITIONAL_SOURCES
         ${ios_sources}
         ${aes_library_sources}
-    OTHER_SOURCES
-        "${CMAKE_CURRENT_SOURCE_DIR}/qt5.natvis"
     PUBLIC_LIBS
         Boost::headers
         OpenSSL::OpenSSL
