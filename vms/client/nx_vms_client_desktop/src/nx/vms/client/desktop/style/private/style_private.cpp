@@ -29,11 +29,13 @@ namespace nx::vms::client::desktop {
 
 namespace {
 
-static const QColor kLight10Color = "#A5B7C0";
-static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
-    {QIcon::Normal, {{kLight10Color, "light16"}}},
-    {QIcon::Active, {{kLight10Color, "light14"}}},
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kIconSubstitutions = {
+    {QIcon::Normal, {.primary = "light16"}},
+    {QIcon::Active, {.primary = "light14"}},
 };
+
+NX_DECLARE_COLORIZED_ICON(kArrowDownIcon, "20x20/Outline/arrow_down.svg", kIconSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kArrowUpIcon, "20x20/Outline/arrow_up.svg", kIconSubstitutions)
 
 static const QColor kTextButtonBackgroundColor = "#FFFFFF";
 
@@ -509,9 +511,7 @@ void StylePrivate::drawTextButton(QPainter* painter,
 
     if (hasMenu)
     {
-        const auto icon = pressed
-            ? qnSkin->icon("text_buttons/arrow_up_20.svg", kIconSubstitutions)
-            : qnSkin->icon("text_buttons/arrow_down_20.svg", kIconSubstitutions);
+        const auto icon = pressed ? qnSkin->icon(kArrowUpIcon) : qnSkin->icon(kArrowDownIcon);
 
         paintLabelIcon(&textRect,
             painter,

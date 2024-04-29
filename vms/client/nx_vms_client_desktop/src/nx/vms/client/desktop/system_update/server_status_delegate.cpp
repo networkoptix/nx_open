@@ -20,15 +20,17 @@
 
 namespace {
 
-static const QColor kLight10Color = "#A5B7C0";
-static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
-    {QIcon::Normal, {{kLight10Color, "light10"}}},
-    {QIcon::Active, {{kLight10Color, "light11"}}},
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kIconTheme = {
+    {QIcon::Normal, {.primary = "light10"}},
+    {QIcon::Active, {.primary = "light11"}},
 };
 
-static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutionsError = {
-    {QIcon::Normal, {{kLight10Color, "red_l2"}}},
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kIconErrorTheme = {
+    {QIcon::Normal, {.primary = "red_l2"}},
 };
+
+NX_DECLARE_COLORIZED_ICON(kCrossCloseIcon, "20x20/Outline/cross_close.svg", kIconErrorTheme)
+NX_DECLARE_COLORIZED_ICON(kSuccessIcon, "20x20/Outline/success.svg", kIconTheme)
 
 } // namespace
 
@@ -64,14 +66,13 @@ public:
         bool progressHidden = true;
         bool leftHidden = true;
 
-        static const auto okIcon = qnSkin->icon("text_buttons/ok_20.svg", kIconSubstitutions);
+        static const auto okIcon = qnSkin->icon(kSuccessIcon);
 
         m_animated = false;
         if (m_owner->isVerificationErrorVisible() && !data->verificationMessage.isEmpty())
         {
             m_left->setText(data->verificationMessage);
-            m_left->setIcon(
-                qnSkin->icon("text_buttons/cross_close_20.svg", kIconSubstitutionsError));
+            m_left->setIcon(qnSkin->icon(kCrossCloseIcon));
             leftHidden = false;
             errorStyle = true;
         }
@@ -133,8 +134,7 @@ public:
                     break;
                 case StatusCode::error:
                     m_left->setText(data->statusMessage);
-                    m_left->setIcon(
-                        qnSkin->icon("text_buttons/cross_close_20.svg", kIconSubstitutionsError));
+                    m_left->setIcon(qnSkin->icon(kCrossCloseIcon));
                     leftHidden = false;
                     errorStyle = true;
                     break;

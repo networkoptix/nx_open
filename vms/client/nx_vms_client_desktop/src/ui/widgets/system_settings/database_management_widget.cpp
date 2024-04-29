@@ -30,6 +30,11 @@ static const QString kDbExtension = ".db";
 static const QString kDbFilesFilter = QnCustomFileDialog::createFilter(
     QnDatabaseManagementWidget::tr("Database Backup Files"), kDbExtension.mid(1));
 
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kThemeSubstitutions = {
+    {QnIcon::Normal, {.primary = "light16"}}};
+
+NX_DECLARE_COLORIZED_ICON(kFolderIcon, "20x20/Outline/folder.svg", kThemeSubstitutions)
+
 } // namespace
 
 QnDatabaseManagementWidget::QnDatabaseManagementWidget(QWidget *parent):
@@ -39,7 +44,7 @@ QnDatabaseManagementWidget::QnDatabaseManagementWidget(QWidget *parent):
 {
     ui->setupUi(this);
     ui->progressBar->setTextVisible(false);
-    ui->openFolderButton->setIcon(qnSkin->icon("text_buttons/newfolder.svg"));
+    ui->openFolderButton->setIcon(qnSkin->icon(kFolderIcon));
     ui->openFolderButton->setFlat(true);
 
     setHelpTopic(this, HelpTopic::Id::SystemSettings_Server_Backup);

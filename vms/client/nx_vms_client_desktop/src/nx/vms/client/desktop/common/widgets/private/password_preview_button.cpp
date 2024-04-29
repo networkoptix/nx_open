@@ -2,8 +2,6 @@
 
 #include "password_preview_button.h"
 
-#include <nx/vms/client/desktop/ini.h>
-
 #include <QtGui/QPainter>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QStyle>
@@ -11,9 +9,18 @@
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/common/widgets/line_edit_controls.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/scoped_painter_rollback.h>
+
+namespace {
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kEyeTheme =
+    {{QnIcon::Normal, {.primary = "light16"}}};
+NX_DECLARE_COLORIZED_ICON(kEyeIcon, "20x20/Outline/eye_closed.svg", kEyeTheme,
+    "20x20/Outline/eye_open.svg", kEyeTheme)
+
+}  // namespace
 
 namespace nx::vms::client::desktop {
 
@@ -21,7 +28,7 @@ PasswordPreviewButton::PasswordPreviewButton(QWidget* parent):
     base_type(parent)
 {
     setFlat(true);
-    setIcon(qnSkin->icon("text_buttons/eye_closed_20.svg", "text_buttons/eye_open_20.svg"));
+    setIcon(qnSkin->icon(kEyeIcon));
     setFixedSize(core::Skin::maximumSize(icon()));
     setCheckable(true);
     updateVisibility();

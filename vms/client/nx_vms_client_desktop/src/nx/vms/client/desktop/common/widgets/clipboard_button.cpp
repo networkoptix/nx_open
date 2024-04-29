@@ -15,13 +15,19 @@ namespace nx::vms::client::desktop {
 
 namespace {
 
-static const QColor kLight10Color = "#A5B7C0";
-static const QColor kLight16Color = "#698796";
-static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
-    {QIcon::Normal, {{kLight10Color, "light10"}, {kLight16Color, "light16"}}},
-    {QIcon::Active, {{kLight10Color, "light8"}, {kLight16Color, "light14"}}},
-    {QIcon::Selected, {{kLight16Color, "light16"}}},
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kLight10Theme = {
+    {QIcon::Normal, {.primary = "light10"}},
+    {QIcon::Active, {.primary = "light8"}},
 };
+
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kLight16Theme = {
+    {QIcon::Normal, {.primary = "light16"}},
+    {QIcon::Active, {.primary = "light14"}},
+    {QIcon::Selected, {.primary = "light16"}},
+};
+
+NX_DECLARE_COLORIZED_ICON(kCopyIcon, "20x20/Outline/copy.svg", kLight16Theme)
+NX_DECLARE_COLORIZED_ICON(kSuccessIcon, "20x20/Outline/success.svg", kLight10Theme)
 
 QString typicalText(ClipboardButton::StandardType type)
 {
@@ -81,9 +87,9 @@ ClipboardButton::ClipboardButton(
     QWidget* parent)
     :
     base_type(
-        qnSkin->icon("text_buttons/copy_20.svg", kIconSubstitutions),
+        qnSkin->icon(kCopyIcon),
         text,
-        qnSkin->icon("text_buttons/ok_20.svg", kIconSubstitutions),
+        qnSkin->icon(kSuccessIcon),
         confirmationText,
         parent)
 {

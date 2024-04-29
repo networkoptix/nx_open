@@ -59,9 +59,9 @@ Column
             {
                 sourcePath: level === 0
                     ? iconSource
-                    : (collapsed
-                        ? "image://skin/text_buttons/arrow_right_20.svg"
-                        : "image://skin/text_buttons/arrow_down_20.svg")
+                    : collapsed
+                        ? "image://skin/20x20/Outline/arrow_right.svg"
+                        : "image://skin/20x20/Outline/arrow_down.svg"
 
                 primaryColor: menuItem.color
                 visible: level === 0 || collapsible

@@ -109,7 +109,7 @@ MenuItem
         anchors.verticalCenter: parent.verticalCenter
         visible: !!menuItem.subMenu
 
-        sourcePath: "image://skin/text_buttons/arrow_right_20.svg"
+        sourcePath: "image://skin/20x20/Outline/arrow_right.svg"
         sourceSize: Qt.size(20, 20)
         primaryColor: itemText.color
     }

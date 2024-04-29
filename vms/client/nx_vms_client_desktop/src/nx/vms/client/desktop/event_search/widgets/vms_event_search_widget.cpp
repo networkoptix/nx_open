@@ -55,9 +55,16 @@ static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubst
     {QIcon::Active, {{kLight12Color, "light13"}, {kLight16Color, "light14"}}},
     {QIcon::Selected, {{kLight12Color, "light11"}, {kLight16Color, "light10"}}},
     {QnIcon::Pressed, {{kLight12Color, "light11"}, {kLight16Color, "light14"}}},
-
 };
 
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kLight16Theme = {
+    {QIcon::Normal, {.primary = "light16"}},
+    {QIcon::Active, {.primary = "light14"}},
+    {QIcon::Selected, {.primary = "light10"}},
+    {QnIcon::Pressed, {.primary = "light14"}},
+};
+
+NX_DECLARE_COLORIZED_ICON(kEventRulesIcon, "20x20/Outline/event_rules.svg", kLight16Theme)
 } // namespace
 
 // ------------------------------------------------------------------------------------------------
@@ -176,8 +183,7 @@ void VmsEventSearchWidget::Private::setupTypeSelection()
 {
     using namespace nx::vms::event;
 
-    m_typeSelectionButton->setIcon(
-        qnSkin->icon("text_buttons/event_rules_20x20.svg", kIconSubstitutions));
+    m_typeSelectionButton->setIcon(qnSkin->icon(kEventRulesIcon));
 
     auto eventFilterMenu =
         createEventGroupMenu(q->system()->vmsRulesEngine()->eventGroups());

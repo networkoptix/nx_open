@@ -48,6 +48,15 @@ static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubst
     {QnIcon::Error, {{klight10Color, "red_l2"}}},
 };
 
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kIconTheme = {
+    {QIcon::Normal, {.primary = "light10"}},
+    {QIcon::Active, {.primary = "light11"}},
+    {QIcon::Selected, {.primary = "light9"}},
+    {QnIcon::Error, {.primary = "red_l2"}},
+};
+
+NX_DECLARE_COLORIZED_ICON(kCrossCloseIcon, "20x20/Outline/cross_close.svg", kIconTheme)
+
 class MouseEaterWidget: public QGraphicsWidget
 {
 public:
@@ -178,7 +187,7 @@ void ShowreelItemWidget::initOverlay()
     connect(resource().get(), &QnResource::nameChanged, this, updateTitle);
 
     auto closeButton = new QnImageButtonWidget();
-    const auto closeButtonIcon = qnSkin->icon("text_buttons/cross_close_20.svg", kIconSubstitutions);
+    const auto closeButtonIcon = qnSkin->icon(kCrossCloseIcon);
     const auto closeButtonSize = core::Skin::maximumSize(closeButtonIcon);
     closeButton->setIcon(closeButtonIcon);
     closeButton->setFixedSize(closeButtonSize);

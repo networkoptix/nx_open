@@ -3,7 +3,6 @@
 #include "schedule_settings_widget.h"
 #include "ui_schedule_settings_widget.h"
 
-
 #include <QtCore/QVariant>
 #include <QtGui/QStandardItemModel>
 
@@ -35,13 +34,16 @@ static constexpr int kRecordingTypeLabelFontSize = 12;
 static constexpr auto kRecordingTypeLabelFontWeight = QFont::Medium;
 static constexpr int kCustomQualityOffset = 7;
 
-static const QColor kLight10Color = "#A5B7C0";
-static const QColor kLight16Color = "#698796";
-static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
-    {QIcon::Normal, {{kLight10Color, "light16"}, {kLight16Color, "light16"}}},
-    {QIcon::Active, {{kLight10Color, "light14"}, {kLight16Color, "light14"}}},
-    {QIcon::Selected, {{kLight16Color, "light16"}}},
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kIconSubstitutions = {
+    {QIcon::Normal, {.primary = "light16"}},
+    {QIcon::Active, {.primary = "light14"}},
+    {QIcon::Selected, {.primary = "light16"}},
 };
+
+NX_DECLARE_COLORIZED_ICON(kArrowDownIcon, "20x20/Outline/arrow_down.svg", kIconSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kArrowUpIcon, "20x20/Outline/arrow_up.svg", kIconSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kEyeClosedIcon, "20x20/Outline/eye_closed.svg", kIconSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kEyeOpenIcon, "20x20/Outline/eye_open.svg", kIconSubstitutions)
 
 template<class InputWidget>
 float normalizedValue(const InputWidget* widget)
@@ -379,15 +381,15 @@ void ScheduleSettingsWidget::loadState(const CameraSettingsDialogState& state)
             : tr("More Settings");
 
         const auto buttonIcon = recording.customBitrateVisible
-            ? qnSkin->icon("text_buttons/arrow_up_20.svg", kIconSubstitutions)
-            : qnSkin->icon("text_buttons/arrow_down_20.svg", kIconSubstitutions);
+            ? qnSkin->icon(kArrowUpIcon)
+            : qnSkin->icon(kArrowDownIcon);
 
         ui->advancedSettingsButton->setText(buttonText);
         ui->advancedSettingsButton->setIcon(buttonIcon);
     }
 
-    const auto eyeIcon = qnSkin->icon("text_buttons/eye_open_20.svg", kIconSubstitutions);
-    const auto closedEyeIcon = qnSkin->icon("text_buttons/eye_closed_20.svg", kIconSubstitutions);
+    const auto eyeIcon = qnSkin->icon(kEyeOpenIcon);
+    const auto closedEyeIcon = qnSkin->icon(kEyeClosedIcon);
 
     ui->displayQualityButton->setIcon(recording.showQuality && cameraControlEnabled
         ? eyeIcon

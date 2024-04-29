@@ -67,6 +67,18 @@ constexpr milliseconds kTextFilterDelay = 250ms;
 constexpr milliseconds kPlaceholderFadeDuration = 150ms;
 constexpr auto kPlaceholderFadeEasing = QEasingCurve::InOutQuad;
 
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kThemeSubstitutions = {
+    {QIcon::Normal, {.primary = "light16"}},
+    {QIcon::Active, {.primary = "light14"}},
+    {QIcon::Selected, {.primary = "light10"}},
+    {QnIcon::Pressed, {.primary = "light14"}},
+};
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kCheckedThemeSubstitutions = {
+    {QIcon::Normal, {.primary = "light2"}},
+    {QIcon::Active, {.primary = "light1"}},
+    {QIcon::Selected, {.primary = "light3"}},
+};
+
 static const QColor kLight16Color = "#698796";
 static const QColor kDark17Color = "#53707F";
 static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
@@ -76,11 +88,14 @@ static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubst
     {QnIcon::Pressed, {{kLight16Color, "light14"}, {kDark17Color, "light14"}}},
 };
 
-static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kCheckedIconSubstitutions = {
-    {QIcon::Normal, {{kLight16Color, "light2"}, {kDark17Color, "light2"}}},
-    {QIcon::Active, {{kLight16Color, "light1"}, {kDark17Color, "light1"}}},
-    {QIcon::Selected, {{kLight16Color, "light3"}, {kDark17Color, "light3"}}},
-};
+NX_DECLARE_COLORIZED_ICON(kCalendarIcon, "20x20/Outline/calendar.svg", kThemeSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kDeviceIcon, "20x20/Outline/device.svg", kThemeSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kCheckedEventLogIcon,
+    "20x20/Outline/event_log.svg", kThemeSubstitutions,
+    "20x20/Outline/event_log.svg", kCheckedThemeSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kCheckedImageIcon,
+    "20x20/Outline/image.svg", kThemeSubstitutions,
+    "20x20/Outline/image_hide.svg", kThemeSubstitutions)
 
 SearchLineEdit* createSearchLineEdit(QWidget* parent)
 {
@@ -360,10 +375,7 @@ void AbstractSearchWidget::Private::setupViewportHeader()
     m_itemCounterLabel->setText({});
 
     m_toggleFootersButton->setChecked(ui->ribbon->footersEnabled());
-    m_toggleFootersButton->setIcon(qnSkin->icon("text_buttons/event_log_20.svg",
-        kIconSubstitutions,
-        "text_buttons/event_log_20.svg",
-        kCheckedIconSubstitutions));
+    m_toggleFootersButton->setIcon(qnSkin->icon(kCheckedEventLogIcon));
 
     const auto updateInformationToolTip =
         [this]()
@@ -382,9 +394,7 @@ void AbstractSearchWidget::Private::setupViewportHeader()
     updateInformationToolTip();
 
     m_togglePreviewsButton->setChecked(ui->ribbon->previewsEnabled());
-    m_togglePreviewsButton->setIcon(qnSkin->icon("text_buttons/image_20x20.svg",
-        kIconSubstitutions,
-        "text_buttons/image_hide_20x20.svg"));
+    m_togglePreviewsButton->setIcon(qnSkin->icon(kCheckedImageIcon));
 
     const auto updateThumbnailsToolTip =
         [this]()
@@ -428,8 +438,7 @@ void AbstractSearchWidget::Private::setupTimeSelection()
 {
     ui->timeSelectionButton->setSelectable(false);
     ui->timeSelectionButton->setDeactivatable(true);
-    ui->timeSelectionButton->setIcon(qnSkin->icon(
-        "text_buttons/calendar_20.svg", kIconSubstitutions));
+    ui->timeSelectionButton->setIcon(qnSkin->icon(kCalendarIcon));
     ui->timeSelectionButton->setFocusPolicy(Qt::NoFocus);
 
     const auto updateButton =
@@ -485,7 +494,7 @@ void AbstractSearchWidget::Private::setupCameraSelection()
 {
     ui->cameraSelectionButton->setSelectable(false);
     ui->cameraSelectionButton->setDeactivatable(true);
-    auto icon = qnSkin->icon("text_buttons/camera_20.svg", kIconSubstitutions);
+    auto icon = qnSkin->icon(kDeviceIcon);
     ui->cameraSelectionButton->setIcon(icon);
     ui->cameraSelectionButton->setFocusPolicy(Qt::NoFocus);
 

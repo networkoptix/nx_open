@@ -19,12 +19,13 @@ static constexpr int kMinimumWidth = 60;
 
 static constexpr int kMaximumFontSize = 400;
 
-static const QColor klight16Color = "#698796";
-static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
-    {QIcon::Normal, {{klight16Color, "light16"}}},
-    {QIcon::Active, {{klight16Color, "light17"}}},
-    {QIcon::Selected, {{klight16Color, "light15"}}},
+const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kThemeSubstitutions = {
+    {QIcon::Normal, {.primary = "light16"}},
+    {QIcon::Active, {.primary = "light17"}},
+    {QIcon::Selected, {.primary = "light15"}},
 };
+
+NX_DECLARE_COLORIZED_ICON(kDeleteIcon, "20x20/Outline/delete.svg", kThemeSubstitutions)
 
 } // namespace
 
@@ -73,7 +74,7 @@ TextOverlaySettingsWidget::TextOverlaySettingsWidget(QWidget* parent):
             emit dataChanged(m_data);
         });
 
-    ui->deleteButton->setIcon(qnSkin->icon("text_buttons/delete_20_deprecated.svg", kIconSubstitutions));
+    ui->deleteButton->setIcon(qnSkin->icon(kDeleteIcon));
 
     connect(ui->deleteButton, &QPushButton::clicked,
         this, &TextOverlaySettingsWidget::deleteClicked);

@@ -34,6 +34,9 @@ static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kDeleteTh
     {QIcon::Selected, {.primary = "light15"}},
 };
 
+NX_DECLARE_COLORIZED_ICON(kDefaultAnalyticsIcon, "20x20/Outline/default.svg", kAnalyticsIconSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kDeleteIcon, "20x20/Outline/delete.svg", kDeleteThemeSubstitutions)
+
 int storageIndex(const QnStorageModelInfoList& list, const QnStorageModelInfo& storage)
 {
     auto byId = [storage](const QnStorageModelInfo& info)  { return storage.id == info.id;  };
@@ -408,17 +411,17 @@ QVariant QnStorageListModel::data(const QModelIndex& index, int role) const
 
                 if (storage.id == m_metadataStorageId)
                 {
-                    return qnSkin->icon("text_buttons/default_20x20.svg", kAnalyticsIconSubstitutions)
+                    return qnSkin->icon(kDefaultAnalyticsIcon)
                         .pixmap(QSize(20, 20));
                 }
 
                 if (canRemoveStorage(storage))
-                    return qnSkin->icon("text_buttons/delete_20.svg", kDeleteThemeSubstitutions)
+                    return qnSkin->icon(kDeleteIcon)
                         .pixmap(QSize(20, 20));
 
                 if (couldStoreAnalytics(storage))
                 {
-                    return qnSkin->icon("text_buttons/default_20x20.svg", kAnalyticsHoveredIconSubstitutions)
+                    return qnSkin->icon(kDefaultAnalyticsIcon)
                         .pixmap(QSize(20, 20));
                 }
             }

@@ -1,23 +1,26 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include <QtWidgets/QVBoxLayout>
-#include <QtGui/QMouseEvent>
-
 #include "button_slider.h"
-#include "hover_button.h"
+
+#include <QtGui/QMouseEvent>
+#include <QtWidgets/QVBoxLayout>
 
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
-#include <nx/vms/client/desktop/style/style.h>
 #include <nx/vms/client/desktop/style/helper.h>
+#include <nx/vms/client/desktop/style/style.h>
+
+#include "hover_button.h"
 
 namespace {
 
-static const QColor kLight10Color = "#A5B7C0";
-static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
-    {QIcon::Normal, {{kLight10Color, "light10"}}},
-    {QIcon::Active, {{kLight10Color, "light11"}}},
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kIconSubstitutions = {
+    {QIcon::Normal, {.primary = "light10"}},
+    {QIcon::Active, {.primary = "light11"}},
 };
+
+NX_DECLARE_COLORIZED_ICON(kMinusIcon, "20x20/Outline/minus.svg", kIconSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kPlusIcon, "20x20/Outline/add.svg", kIconSubstitutions)
 
 const QSize kButtonSize(20, 20);
 const int kSliderHeight = 120;
@@ -31,7 +34,7 @@ VButtonSlider::VButtonSlider(QWidget* parent):
     QWidget(parent)
 {
     const auto container = new QVBoxLayout(this);
-    m_add = new HoverButton(qnSkin->icon("text_buttons/plus_20.svg", kIconSubstitutions), this);
+    m_add = new HoverButton(qnSkin->icon(kPlusIcon), this);
     m_add->setMinimumSize(kButtonSize);
     m_slider = new QSlider(this);
     m_slider->setOrientation(Qt::Orientation::Vertical);
@@ -39,7 +42,7 @@ VButtonSlider::VButtonSlider(QWidget* parent):
     // We do not want this style right now.
     //m_slider->setProperty(style::Properties::kSliderFeatures,
     //    static_cast<int>(style::SliderFeature::FillingUp));
-    m_dec = new HoverButton(qnSkin->icon("text_buttons/minus_20.svg", kIconSubstitutions), this);
+    m_dec = new HoverButton(qnSkin->icon(kMinusIcon), this);
     m_dec->setMinimumSize(kButtonSize);
     m_label = new QLabel();
     container->setContentsMargins(8, 8, 8, 8);

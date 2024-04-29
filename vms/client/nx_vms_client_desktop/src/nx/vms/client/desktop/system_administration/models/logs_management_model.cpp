@@ -17,11 +17,15 @@ namespace {
 const QString kNormalLogLevelColor = "light16";
 const QString kWarningLogLevelColor = "yellow_d2";
 
-static const QColor kLight10Color = "#A5B7C0";
-static const QColor kLight16Color = "#698796";
-static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
-    {QIcon::Normal, {{kLight10Color, "attention.green"}, {kLight16Color, "attention.red"}}}
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kRedSubstitutions = {
+    {QIcon::Normal, {.primary = "attention.red"}}
 };
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kGreenSubstitutions = {
+    {QIcon::Normal, {.primary = "attention.green"}}
+};
+
+NX_DECLARE_COLORIZED_ICON(kCloseIcon, "20x20/Outline/close_medium.svg", kRedSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kSuccessIcon, "20x20/Outline/success.svg", kGreenSubstitutions)
 
 QIcon icon(LogsManagementUnitPtr unit)
 {
@@ -40,10 +44,10 @@ QIcon statusIcon(LogsManagementUnitPtr unit)
             return {};
 
         case State::complete:
-            return qnSkin->icon("text_buttons/yes_20x20.svg", kIconSubstitutions);
+            return qnSkin->icon(kSuccessIcon);
 
         case State::error:
-            return qnSkin->icon("text_buttons/close_medium_20x20.svg", kIconSubstitutions);
+            return qnSkin->icon(kCloseIcon);
     }
 
     return {};

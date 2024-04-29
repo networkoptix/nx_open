@@ -44,12 +44,15 @@ namespace nx::vms::client::desktop::rules {
 
 namespace {
 
-const QColor kLight16Color = "#698796";
-const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
-    {QIcon::Normal, {{kLight16Color, "light16"}}},
-    {QIcon::Active, {{kLight16Color, "light17"}}},
-    {QIcon::Selected, {{kLight16Color, "light15"}}},
+const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kThemeSubstitutions = {
+    {QIcon::Normal, {.primary = "light16"}},
+    {QIcon::Active, {.primary = "light17"}},
+    {QIcon::Selected, {.primary = "light15"}},
 };
+
+NX_DECLARE_COLORIZED_ICON(kCalendarIcon, "20x20/Outline/calendar.svg", kThemeSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kDeleteIcon, "20x20/Outline/delete.svg", kThemeSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kEditIcon, "20x20/Outline/edit.svg", kThemeSubstitutions)
 
 QSet<vms::rules::State> getAvailableStates(
     const vms::rules::ItemDescriptor& eventDescriptor,
@@ -210,7 +213,7 @@ EditVmsRuleDialog::EditVmsRuleDialog(QWidget* parent):
         headerLayout->setSpacing(style::Metrics::kDefaultLayoutSpacing.width());
 
         m_editableLabel = new EditableLabel;
-        m_editableLabel->setButtonIcon(qnSkin->pixmap("text_buttons/edit.png"));
+        m_editableLabel->setButtonIcon(qnSkin->icon(kEditIcon));
         m_editableLabel->setPlaceholderText(tr("Add Title or Comment"));
         m_editableLabel->setFont(fontConfig()->xLarge());
         m_editableLabel->setValidator({});
@@ -225,7 +228,7 @@ EditVmsRuleDialog::EditVmsRuleDialog(QWidget* parent):
 
         auto scheduleButton = new QPushButton;
         scheduleButton->setText(tr("Schedule"));
-        scheduleButton->setIcon(qnSkin->icon("text_buttons/calendar_20.svg", kIconSubstitutions));
+        scheduleButton->setIcon(qnSkin->icon(kCalendarIcon));
         scheduleButton->setFlat(true);
         connect(
             scheduleButton,
@@ -236,7 +239,7 @@ EditVmsRuleDialog::EditVmsRuleDialog(QWidget* parent):
 
         m_deleteButton = new QPushButton;
         m_deleteButton->setText(tr("Delete"));
-        m_deleteButton->setIcon(qnSkin->icon("text_buttons/delete_20_deprecated.svg", kIconSubstitutions));
+        m_deleteButton->setIcon(qnSkin->icon(kDeleteIcon));
         m_deleteButton->setFlat(true);
         connect(
             m_deleteButton,

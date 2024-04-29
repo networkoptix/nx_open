@@ -73,6 +73,9 @@ static const core::SvgIconColorer::ThemeSubstitutions kThemeSubstitutions = {
     {QnIcon::Pressed, {.primary = "light14"}},
 };
 
+NX_DECLARE_COLORIZED_ICON(kDefaultAnalyticsIcon, "20x20/Outline/default.svg", kThemeSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kFrameIcon, "20x20/Outline/frame.svg", kThemeSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kPluginsIcon, "20x20/Outline/plugins.svg", kThemeSubstitutions)
 using namespace std::chrono;
 using namespace nx::analytics::taxonomy;
 using namespace nx::vms::client::desktop::analytics;
@@ -285,7 +288,7 @@ void AnalyticsSearchWidget::Private::resetFilters()
 void AnalyticsSearchWidget::Private::setupEngineSelection()
 {
     m_engineSelectionButton->setDeactivatedText(tr("Any plugin"));
-    m_engineSelectionButton->setIcon(qnSkin->icon("text_buttons/plugins.svg", kThemeSubstitutions));
+    m_engineSelectionButton->setIcon(qnSkin->icon(kPluginsIcon));
 
     m_engineSelectionButton->setMenu(m_engineMenu);
 
@@ -315,7 +318,7 @@ void AnalyticsSearchWidget::Private::setupTypeSelection()
 {
     m_typeSelectionButton->setDeactivatedText(tr("Any type"));
     m_typeSelectionButton->setIcon(
-        qnSkin->icon("text_buttons/default_20x20.svg", kThemeSubstitutions));
+        qnSkin->icon(kDefaultAnalyticsIcon));
 
     m_typeSelectionButton->setMenu(m_objectTypeMenu);
 
@@ -365,7 +368,7 @@ void AnalyticsSearchWidget::Private::updateTypeButton()
     else
     {
         m_typeSelectionButton->setIcon(
-            qnSkin->icon("text_buttons/default_20x20.svg", kThemeSubstitutions));
+            qnSkin->icon(kDefaultAnalyticsIcon));
         m_typeSelectionButton->deactivate();
     }
 }
@@ -425,7 +428,7 @@ void AnalyticsSearchWidget::Private::setupAreaSelection()
 {
     m_areaSelectionButton->setAccented(true);
     m_areaSelectionButton->setDeactivatedText(tr("Select area"));
-    m_areaSelectionButton->setIcon(qnSkin->icon("text_buttons/frame_20x20.svg", kThemeSubstitutions));
+    m_areaSelectionButton->setIcon(qnSkin->icon(kFrameIcon));
 
     connect(m_areaSelectionButton, &SelectableTextButton::stateChanged,
         [this](SelectableTextButton::State state)

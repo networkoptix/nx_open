@@ -29,19 +29,30 @@ namespace nx::vms::client::desktop {
 
 namespace {
 
-static const QColor kLight16Color = "#698796";
-static const QColor kLight10Color = "#A5B7C0";
-static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
-    {QIcon::Normal, {{kLight16Color, "light16"}, {kLight10Color, "light4"}}},
-    {QIcon::Active, {{kLight16Color, "light15"}, {kLight10Color, "light2"}}},
-    {QIcon::Selected, {{kLight16Color, "light17"}, {kLight10Color, "light6"}}},
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kLight16Theme = {
+    {QIcon::Normal, {.primary = "light16"}},
+    {QIcon::Active, {.primary = "light15"}},
+    {QIcon::Selected, {.primary = "light17"}},
+};
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kIconTheme = {
+    {QIcon::Normal, {.primary = "light4"}},
+    {QIcon::Active, {.primary = "light2"}},
+    {QIcon::Selected, {.primary = "light6"}},
+};
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kErrorTheme = {
+    {QIcon::Normal, {.primary = "red_core"}},
+};
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kSuccessTheme = {
+    {QIcon::Normal, {.primary = "brand_core"}},
 };
 
-static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kRetryIconSubstitutions = {
-    {QIcon::Normal, {{kLight16Color, "light16"}}},
-    {QIcon::Active, {{kLight16Color, "light17"}}},
-};
-
+NX_DECLARE_COLORIZED_ICON(kDownloadIcon, "20x20/Outline/download.svg", kLight16Theme)
+NX_DECLARE_COLORIZED_ICON(kCrossCloseIcon, "20x20/Outline/cross_close.svg", kIconTheme)
+NX_DECLARE_COLORIZED_ICON(kErrorIcon, "16x16/Solid/error.svg", kErrorTheme)
+NX_DECLARE_COLORIZED_ICON(kFolderIcon, "20x20/Outline/folder.svg", kLight16Theme)
+NX_DECLARE_COLORIZED_ICON(kReloadIcon, "20x20/Outline/reload.svg", kLight16Theme)
+NX_DECLARE_COLORIZED_ICON(kSettingsIcon, "20x20/Outline/settings.svg", kLight16Theme)
+NX_DECLARE_COLORIZED_ICON(kSuccessIcon, "16x16/Solid/success.svg", kSuccessTheme)
 
 constexpr auto kUpdateDelayMs = 1000;
 
@@ -152,14 +163,12 @@ void LogsManagementWidget::setupUi()
     ui->settingsButton->setFont(font);
     ui->resetButton->setFont(font);
 
-    ui->downloadButton->setIcon(
-        qnSkin->icon("text_buttons/download_20.svg", kIconSubstitutions));
+    ui->downloadButton->setIcon(qnSkin->icon(kDownloadIcon));
     ui->downloadButton->setFlat(true);
-    ui->settingsButton->setIcon(
-        qnSkin->icon("text_buttons/settings_20.svg", kIconSubstitutions));
+    ui->settingsButton->setIcon(qnSkin->icon(kSettingsIcon));
     ui->settingsButton->setFlat(true);
-    ui->resetButton->setIcon(qnSkin->icon("text_buttons/reload_20.svg", kIconSubstitutions));
-    ui->openFolderButton->setIcon(qnSkin->icon("text_buttons/newfolder.svg"));
+    ui->resetButton->setIcon(qnSkin->icon(kReloadIcon));
+    ui->openFolderButton->setIcon(qnSkin->icon(kFolderIcon));
 
     ui->resetButton->setFlat(true);
     ui->openFolderButton->setFlat(true);
@@ -313,7 +322,7 @@ void LogsManagementWidget::setupUi()
     ui->activePage->setAutoFillBackground(true);
 
     ui->selectedButton->setFlat(true);
-    ui->selectedButton->setIcon(qnSkin->icon("text_buttons/cross_close_20.svg", kIconSubstitutions));
+    ui->selectedButton->setIcon(qnSkin->icon(kCrossCloseIcon));
     setPaletteColor(ui->selectedButton, QPalette::WindowText, core::colorTheme()->color("light4"));
 
     connect(ui->searchLineEdit, &SearchLineEdit::textChanged,
@@ -379,8 +388,8 @@ void LogsManagementWidget::updateWidgets(LogsManagementWatcher::State state)
     ui->errorLabel->setVisible(downloadFinished && errorsCount);
     ui->finishedIconButton->setVisible(downloadFinished);
     ui->finishedIconButton->setIcon(errorsCount != 0
-        ? qnSkin->icon("text_buttons/error_16x16.svg")
-        : qnSkin->icon("text_buttons/success_16x16.svg"));
+        ? qnSkin->icon(kErrorIcon)
+        : qnSkin->icon(kSuccessIcon));
     ui->finishedLabel->setVisible(downloadFinished && errorsCount == 0);
     ui->doneButton->setVisible(downloadFinished);
     ui->retryButton->setVisible(errorsCount);
@@ -425,7 +434,7 @@ void LogsManagementWidget::addTableWidgets(const QModelIndex& topLeft, const QMo
             {
                 auto* retryButton = new QPushButton(tr("Retry"));
                 retryButton->setIcon(
-                    qnSkin->icon("text_buttons/reload_20.svg", kRetryIconSubstitutions));
+                    qnSkin->icon(kReloadIcon));
                 retryButton->setFlat(true);
                 auto id = nx::Uuid::fromString(retry.data(LogsManagementModel::QnUuidRole)
                     .value<QString>().toStdString());

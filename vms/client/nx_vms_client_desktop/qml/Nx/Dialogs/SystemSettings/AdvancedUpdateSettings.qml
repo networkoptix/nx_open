@@ -166,7 +166,7 @@ Dialog
                 TextButton
                 {
                     text: qsTr("Check for updates")
-                    icon.source: "image://skin/text_buttons/reload_20.svg"
+                    icon.source: "image://skin/20x20/Outline/reload.svg"
                     visible: !!autoClientUpdatesPanel.uiState.checkUpdatesButton
 
                     onClicked:

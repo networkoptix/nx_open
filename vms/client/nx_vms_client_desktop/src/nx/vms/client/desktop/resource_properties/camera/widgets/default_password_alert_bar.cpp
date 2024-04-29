@@ -16,7 +16,7 @@ namespace nx::vms::client::desktop {
 DefaultPasswordAlertBar::DefaultPasswordAlertBar(QWidget* parent):
     base_type(parent, {.level = BarDescription::BarLevel::Error}),
     QnWorkbenchContextAware(parent),
-    m_setPasswordButton(addButton(tr("Set Password"), "text_buttons/password_20.svg"))
+    m_setPasswordButton(addButton(tr("Set Password"), "20x20/Outline/password.svg"))
 {
     connect(this, &DefaultPasswordAlertBar::targetCamerasChanged,
         this, &DefaultPasswordAlertBar::updateState);

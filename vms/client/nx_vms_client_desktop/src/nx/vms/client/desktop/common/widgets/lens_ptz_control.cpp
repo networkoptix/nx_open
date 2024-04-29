@@ -4,19 +4,18 @@
 
 #include <QtCore/QEvent>
 #include <QtCore/QSize>
+#include <QtCore/QtMath>
 #include <QtGui/QColor>
+#include <QtGui/QMouseEvent>
 #include <QtGui/QPainter>
 #include <QtGui/QVector2D>
-#include <QtWidgets/QStylePainter>
 #include <QtWidgets/QStyleOption>
-#include <QtGui/QMouseEvent>
-#include <QtCore/QtMath>
+#include <QtWidgets/QStylePainter>
 
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <utils/common/scoped_painter_rollback.h>
-#include <utils/math/color_transformations.h>
 
 namespace {
 
@@ -46,16 +45,15 @@ constexpr float kRotationIncrement = 90;
 
 static const QString kNormalIcons[] =
 {
-    "text_buttons/arrow_left_20.svg",
-    "text_buttons/arrow_right_20.svg",
-    "text_buttons/arrow_up_20.svg",
-    "text_buttons/arrow_down_20.svg",
+    "20x20/Outline/arrow_left.svg",
+    "20x20/Outline/arrow_right.svg",
+    "20x20/Outline/arrow_up.svg",
+    "20x20/Outline/arrow_down.svg",
 };
 
-static const QColor kLight10Color = "#A5B7C0";
-static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
-    {QIcon::Normal, {{kLight10Color, "light10"}}},
-    {QIcon::Active, {{kLight10Color, "light11"}}},
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kIconSubstitutions = {
+    {QIcon::Normal, {.primary = "light10"}},
+    {QIcon::Active, {.primary = "light11"}},
 };
 
 inline qreal length(const QPointF& point)

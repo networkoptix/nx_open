@@ -690,7 +690,7 @@ QVariant UserListModel::data(const QModelIndex& index, int role) const
                 case IsCustomColumn:
                 {
                     if (isCustomUser(user))
-                        return QString("text_buttons/ok_20.svg");
+                        return QString("20x20/Outline/success.svg");
 
                     break;
                 }

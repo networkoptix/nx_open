@@ -266,7 +266,7 @@ Dialog
 
                         text: qsTr("Delete")
                         visible: tableView.checkedRows.length > 0
-                        icon.source: "image://skin/text_buttons/delete_20_deprecated.svg"
+                        icon.source: "image://skin/20x20/Outline/delete.svg"
                         onClicked:
                         {
                             entriesModel.deleteEntries(tableView.checkedRows)
@@ -276,7 +276,7 @@ Dialog
                     TextButton
                     {
                         text: qsTr("Import")
-                        icon.source: "image://skin/text_buttons/import.svg"
+                        icon.source: "image://skin/20x20/Outline/import.svg"
                         onClicked: importList()
                     }
                     TextButton
@@ -284,7 +284,7 @@ Dialog
                         id: exportListButton
 
                         text: qsTr("Export")
-                        icon.source: "image://skin/text_buttons/export.svg"
+                        icon.source: "image://skin/20x20/Outline/export.svg"
                         onClicked:
                         {
                             exportProcessor.exportListEntries(tableView.checkedRows, entriesModel)
@@ -373,7 +373,7 @@ Dialog
             {
                 enabled: !!currentList
                 text: qsTr("Settings")
-                icon.source: "image://skin/text_buttons/settings_20.svg"
+                icon.source: "image://skin/20x20/Outline/settings.svg"
                 anchors.verticalCenter: parent.verticalCenter
                 onClicked: editCurrentList()
             }

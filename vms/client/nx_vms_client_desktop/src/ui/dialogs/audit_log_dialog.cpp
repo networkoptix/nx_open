@@ -63,14 +63,13 @@ const char* checkBoxFilterProperty("checkboxFilter");
 
 static constexpr qreal kDisabledCheckboxOpacity = 0.5;
 
-static const QColor kLight10Color = "#A5B7C0";
-static const QColor kLight16Color = "#698796";
-static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
-    {QIcon::Normal, {{kLight10Color, "light10"}, {kLight16Color, "light16"}}},
-    {QIcon::Active, {{kLight10Color, "light11"}, {kLight16Color, "light17"}}},
-    {QIcon::Selected, {{kLight10Color, "light9"}}},
-    {QnIcon::Error, {{kLight10Color, "red_l2"}}},
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kLight16Substitutions = {
+    {QIcon::Normal, {.primary = "light16"}},
+    {QIcon::Active, {.primary = "light17"}},
 };
+
+NX_DECLARE_COLORIZED_ICON(kCloseIcon, "20x20/Outline/close_medium.svg", kLight16Substitutions)
+NX_DECLARE_COLORIZED_ICON(kReloadIcon, "20x20/Outline/reload.svg", kLight16Substitutions)
 
 } // namespace
 
@@ -132,9 +131,8 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget* parent) :
 
     connect(ui->dateRangeWidget, &QnDateRangeWidget::rangeChanged, this, &QnAuditLogDialog::updateData);
 
-    ui->refreshButton->setIcon(qnSkin->icon("text_buttons/reload_20.svg", kIconSubstitutions));
-    ui->clearFilterButton->setIcon(
-        qnSkin->icon("text_buttons/close_medium_20x20.svg", kIconSubstitutions));
+    ui->refreshButton->setIcon(qnSkin->icon(kReloadIcon));
+    ui->clearFilterButton->setIcon(qnSkin->icon(kCloseIcon));
 
     connect(ui->mainTabWidget,  &QTabWidget::currentChanged,    this, &QnAuditLogDialog::at_currentTabChanged);
 

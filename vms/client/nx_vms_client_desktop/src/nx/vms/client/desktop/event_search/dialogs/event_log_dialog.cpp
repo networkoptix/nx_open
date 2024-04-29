@@ -66,6 +66,11 @@ constexpr auto kQueryTimeout = 15s;
 
 const auto kAnalyticsEventType = rules::utils::type<AnalyticsEvent>();
 
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kLight16Substitutions = {
+    {QIcon::Normal, {.primary = "light16"}},
+    {QIcon::Active, {.primary = "light17"}},
+};
+
 static const QColor klight10Color = "#A5B7C0";
 static const QColor kLight16Color = "#698796";
 static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
@@ -79,6 +84,8 @@ static const QColor kLight12Color = "#91A7B2";
 static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutionsLight12 = {
     {QnIcon::Normal, {{kLight12Color, "light12"}}},
 };
+
+NX_DECLARE_COLORIZED_ICON(kReloadIcon, "20x20/Outline/reload.svg", kLight16Substitutions)
 
 enum EventListRoles
 {
@@ -194,10 +201,10 @@ EventLogDialog::EventLogDialog(QWidget* parent):
     ui->gridEvents->addAction(m_resetFilterAction);
 
     ui->clearFilterButton->setIcon(
-        qnSkin->icon("text_buttons/close_medium_20x20.svg", kIconSubstitutions));
+        qnSkin->icon("20x20/Outline/close_medium.svg", kLight16Substitutions));
     connect(ui->clearFilterButton, &QPushButton::clicked, this, &EventLogDialog::reset);
 
-    ui->refreshButton->setIcon(qnSkin->icon("text_buttons/reload_20.svg", kIconSubstitutions));
+    ui->refreshButton->setIcon(qnSkin->icon(kReloadIcon));
     ui->eventRulesButton->setIcon(
         qnSkin->icon("buttons/event_rules_20.svg", kIconSubstitutionsLight12));
 

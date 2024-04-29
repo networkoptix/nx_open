@@ -69,7 +69,7 @@ Column
 
                 GlobalToolTip.text: truncated ? text : ""
 
-                icon.source: "image://skin/text_buttons/dropdown_arrow.svg"
+                icon.source: "image://skin/20x20/Outline/arrow_down.svg"
 
                 iconRotation: panel.collapsed ? -90 : 0
                 Behavior on iconRotation { NumberAnimation { duration: panel.animationDuration }}

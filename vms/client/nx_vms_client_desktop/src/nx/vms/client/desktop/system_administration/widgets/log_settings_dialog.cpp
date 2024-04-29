@@ -33,12 +33,13 @@ const std::chrono::seconds kDay = std::chrono::days(1);
 
 const std::chrono::seconds kDontSplitByTime{0};
 
-static const QColor kLight16Color = "#698796";
-static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
-    {QIcon::Normal, {{kLight16Color, "light16"}}},
-    {QIcon::Active, {{kLight16Color, "light15"}}},
-    {QIcon::Selected, {{kLight16Color, "light17"}}},
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kIconSubstitutions = {
+    {QIcon::Normal, {.primary = "light16"}},
+    {QIcon::Active, {.primary = "light15"}},
+    {QIcon::Selected, {.primary = "light17"}},
 };
+
+NX_DECLARE_COLORIZED_ICON(kReloadIcon, "20x20/Outline/reload.svg", kIconSubstitutions)
 
 bool setValueToGuiElements(unsigned long long value, QSpinBox* spin, QComboBox* combo)
 {
@@ -179,7 +180,7 @@ LogSettingsDialog::LogSettingsDialog(QWidget* parent):
         .isEnabledProperty = &messageBarSettings()->performanceLoggingWarning});
 
     auto resetButton = ui->buttonBox->button(QDialogButtonBox::Reset);
-    resetButton->setIcon(qnSkin->icon("text_buttons/reload_20.svg", kIconSubstitutions));
+    resetButton->setIcon(qnSkin->icon(kReloadIcon));
     resetButton->setFlat(true);
     resetButton->setText(tr("Reset to Default"));
     QFont font = resetButton->font();
