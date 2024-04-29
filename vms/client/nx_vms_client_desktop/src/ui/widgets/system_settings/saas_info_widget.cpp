@@ -24,6 +24,11 @@ static constexpr QSize kPlaceholderImageSize(64, 64);
 static constexpr auto kSaasStateLabelFontSize = 18;
 static constexpr auto kSaasStateLabelFontWeight = QFont::Medium;
 
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kDark17Theme = {
+    {QnIcon::Normal, {.primary = "dark17"}}};
+
+NX_DECLARE_COLORIZED_ICON(kNoServicesPlaceholder, "64x64/Outline/noservices.svg", kDark17Theme)
+
 QFont placeholderMessageCaptionFont()
 {
     static constexpr auto kPlaceholderMessageCaptionFontSize = 16;
@@ -109,8 +114,8 @@ void SaasInfoWidget::Private::setupHeaderUi()
 
 void SaasInfoWidget::Private::setupPlaceholderPageUi()
 {
-    const auto placeholderPixmap = qnSkin->pixmap(
-        "placeholders/services_placeholder.svg", true, kPlaceholderImageSize);
+    const auto placeholderPixmap =
+        qnSkin->icon(kNoServicesPlaceholder).pixmap(kPlaceholderImageSize);
     ui->placeholderIconLabel->setPixmap(qnSkin->maximumSizePixmap(placeholderPixmap));
     ui->placeholderMessageCaptionLabel->setFont(placeholderMessageCaptionFont());
     ui->placeholderMessageLabel->setFont(placeholderMessageFont());

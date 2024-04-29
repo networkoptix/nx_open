@@ -20,7 +20,7 @@ Item
         id: placeholder
 
         visible: !remoteAccessGrid.visible
-        imageSource: "image://skin/placeholders/services_placeholder.svg"
+        imageSource: "image://skin/64x64/Outline/noservices.svg"
         text: qsTr("No services")
         additionalText: qsTr("Server is not configured for remote access feature")
         maxWidth: 250
