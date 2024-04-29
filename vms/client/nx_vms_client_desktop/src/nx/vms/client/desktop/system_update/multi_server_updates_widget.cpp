@@ -94,11 +94,6 @@ constexpr int kVersionSelectionBlockHeight = 20;
 constexpr int kVersionInformationBlockMinHeight = 48;
 constexpr int kPreloaderHeight = 32;
 
-static const QColor kLight4Color = "#E1E7EA";
-static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kNormalIconSubstitutions = {
-    {QIcon::Normal, {{kLight4Color, "light4"}}},
-};
-
 static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kLight10Theme = {
     {QIcon::Normal, {.primary = "light10"}},
     {QIcon::Active, {.primary = "light11"}},
@@ -108,6 +103,9 @@ static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kLight16T
     {QIcon::Active, {.primary = "light17"}},
     {QIcon::Selected, {.primary = "light15"}},
 };
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kLight4Theme = {
+    {QIcon::Normal, {.primary = "light4"}},
+};
 
 NX_DECLARE_COLORIZED_ICON(kArrowUpIcon, "20x20/Outline/arrow_up.svg", kLight10Theme)
 NX_DECLARE_COLORIZED_ICON(kArrowDownIcon, "20x20/Outline/arrow_down.svg", kLight10Theme)
@@ -115,6 +113,7 @@ NX_DECLARE_COLORIZED_ICON(kDownloadIcon, "20x20/Outline/download.svg", kLight16T
 NX_DECLARE_COLORIZED_ICON(kSuccessIcon, "20x20/Outline/success.svg", kLight10Theme)
 NX_DECLARE_COLORIZED_ICON(kReloadIcon, "20x20/Outline/reload.svg", kLight16Theme)
 NX_DECLARE_COLORIZED_ICON(kSettingsIcon, "20x20/Outline/settings.svg", kLight16Theme)
+NX_DECLARE_COLORIZED_ICON(kCheckmarkIcon, "20x20/Outline/checkmark.svg", kLight4Theme)
 
 // Adds resource list to message box
 QTableView* injectResourceList(
@@ -237,9 +236,7 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
     ui->latestVersionBannerLabel->setFont(latestVersionBannerFont);
     ui->latestVersionBannerLabel->setProperty(style::Properties::kDontPolishFontProperty, true);
     ui->latestVersionBannerLabel->setForegroundRole(QPalette::Text);
-    ui->latestVersionIconLabel->setPixmap(
-        qnSkin->icon("system_settings/update_checkmark_40.svg", kNormalIconSubstitutions)
-            .pixmap(QSize(40, 40)));
+    ui->latestVersionIconLabel->setPixmap(qnSkin->icon(kCheckmarkIcon).pixmap(QSize(40, 40)));
     ui->linkCopiedIconLabel->setPixmap(
         qnSkin->icon(kSuccessIcon).pixmap(QSize(20, 20)));
     ui->linkCopiedWidget->hide();

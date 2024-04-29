@@ -40,7 +40,7 @@ private:
     {
         kBusinessRulesButton,
         kEventLogButton,
-        kCameraListButton,
+        kDeviceListButton,
         kAuditLogButton,
         kBookmarksButton,
         kIntegrationsButton,
