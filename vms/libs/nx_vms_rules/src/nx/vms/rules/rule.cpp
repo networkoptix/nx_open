@@ -16,6 +16,34 @@
 
 namespace nx::vms::rules {
 
+namespace {
+
+template <typename V>
+QList<typename V::value_type::pointer> extractPointers(V& v)
+{
+    QList<typename V::value_type::pointer> result;
+    result.reserve(v.size());
+
+    for (const auto& item: v)
+        result.append(item.get());
+
+    return result;
+}
+
+template <typename V>
+QList<const typename V::value_type::element_type*> extractPointers(const V& v)
+{
+    QList<const typename V::value_type::element_type*> result;
+    result.reserve(v.size());
+
+    for (const auto& item: v)
+        result.append(item.get());
+
+    return result;
+}
+
+} // namespace
+
 Rule::Rule(nx::Uuid id, const Engine* engine): m_id(id), m_engine(engine)
 {
 }
@@ -87,20 +115,19 @@ std::unique_ptr<ActionBuilder> Rule::takeActionBuilder(int index)
     return result;
 }
 
-const QList<EventFilter*> Rule::eventFilters() const
+QList<EventFilter*> Rule::eventFilters()
 {
-    QList<EventFilter*> result;
-    result.reserve(m_filters.size());
-    for (const auto& filter: m_filters)
-    {
-        result += filter.get();
-    }
-    return result;
+     return extractPointers(m_filters);
 }
 
-const QList<EventFilter*> Rule::eventFiltersByType(const QString& type) const
+QList<const EventFilter*> Rule::eventFilters() const
 {
-    QList<EventFilter*> result;
+     return extractPointers(m_filters);
+}
+
+QList<const EventFilter*> Rule::eventFiltersByType(const QString& type) const
+{
+    QList<const EventFilter*> result;
 
     for (const auto& filter: m_filters)
     {
@@ -111,13 +138,26 @@ const QList<EventFilter*> Rule::eventFiltersByType(const QString& type) const
     return result;
 }
 
-const QList<ActionBuilder*> Rule::actionBuilders() const
+QList<ActionBuilder*> Rule::actionBuilders() const
 {
     QList<ActionBuilder*> result;
     result.reserve(m_builders.size());
     for (const auto& builder: m_builders)
     {
         result += builder.get();
+    }
+    return result;
+}
+
+QList<const ActionBuilder*> Rule::actionBuildersByType(const QString& type) const
+{
+    QList<const ActionBuilder*> result;
+
+    for (const auto& builder: m_builders)
+    {
+        if (builder->actionType() == type)
+            result += builder.get();
+
     }
     return result;
 }

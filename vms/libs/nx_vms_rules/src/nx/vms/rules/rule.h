@@ -37,23 +37,23 @@ public:
 
     // Takes ownership.
     void addEventFilter(std::unique_ptr<EventFilter> filter);
+    void insertEventFilter(int index, std::unique_ptr<EventFilter> filter);
+
+    std::unique_ptr<EventFilter> takeEventFilter(int idx);
+
+    QList<EventFilter*> eventFilters();
+    QList<const EventFilter*> eventFilters() const;
+    QList<const EventFilter*> eventFiltersByType(const QString& type) const;
 
     // Takes ownership.
     void addActionBuilder(std::unique_ptr<ActionBuilder> builder);
-
-    // Takes ownership.
-    void insertEventFilter(int index, std::unique_ptr<EventFilter> filter);
-
-    // Takes ownership.
     void insertActionBuilder(int index, std::unique_ptr<ActionBuilder> builder);
 
-    std::unique_ptr<EventFilter> takeEventFilter(int idx);
     std::unique_ptr<ActionBuilder> takeActionBuilder(int idx);
 
-    // TODO: #spanasenko const pointers?
-    const QList<EventFilter*> eventFilters() const;
-    const QList<EventFilter*> eventFiltersByType(const QString& type) const;
-    const QList<ActionBuilder*> actionBuilders() const;
+    // TODO: #amalov Add const-correct builder access.
+    QList<ActionBuilder*> actionBuilders() const;
+    QList<const ActionBuilder*> actionBuildersByType(const QString& type) const;
 
     void setComment(const QString& comment);
     QString comment() const;
