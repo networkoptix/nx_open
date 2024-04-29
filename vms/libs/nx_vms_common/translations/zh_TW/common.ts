@@ -2449,8 +2449,8 @@
     </message>
     <message numerus="yes">
       <source>%n Groups</source>
-      <translation type="unfinished">
-        <numerusform>%n Groups</numerusform>
+      <translation>
+        <numerusform>%n 群組</numerusform>
       </translation>
     </message>
     <message>

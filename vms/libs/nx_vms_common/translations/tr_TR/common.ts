@@ -1200,9 +1200,9 @@
     <message numerus="yes">
       <source>Days</source>
       <comment>Capitalized fapitalized full suffix for displaying days</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Günler</numerusform>
-        <numerusform>Days</numerusform>
+        <numerusform>Günler</numerusform>
       </translation>
     </message>
     <message numerus="yes">

@@ -809,7 +809,7 @@
     </message>
     <message>
       <source>Local Recording</source>
-      <translation type="unfinished">Local Recording</translation>
+      <translation>การบันทึกในท้องถิ่น</translation>
     </message>
     <message>
       <source>Local Recording service</source>

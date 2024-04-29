@@ -182,7 +182,7 @@
     </message>
     <message>
       <source>Connection failed</source>
-      <translation type="unfinished">Connection failed</translation>
+      <translation>Koneksi gagal</translation>
     </message>
     <message>
       <source>Your access to this system has expired.</source>
