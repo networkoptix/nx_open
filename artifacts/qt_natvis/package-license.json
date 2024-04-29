@@ -1,0 +1,6 @@
+{
+    "name": "Qt6 Natvis",
+    "webLink": ["https://github.com/KDAB/KDToolBox/tree/master/qt/qt6_natvis"],
+    "licenseType": "The Qt Company GPL Exception for GPL3 license",
+    "licenseLink": ["https://github.com/KDAB/KDToolBox/tree/master/LICENSES/LicenseRef-Qt-GPL-3.0_EXCEPTION.txt"]
+}
