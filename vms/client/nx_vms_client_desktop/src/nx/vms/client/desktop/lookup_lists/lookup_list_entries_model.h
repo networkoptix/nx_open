@@ -37,7 +37,8 @@ class NX_VMS_CLIENT_DESKTOP_API LookupListEntriesModel: public QAbstractTableMod
     enum DataRole
     {
         ObjectTypeIdRole = Qt::UserRole,
-        AttributeNameRole
+        AttributeNameRole,
+        RawValueRole //< Raw value of entry.
     };
 
 public:

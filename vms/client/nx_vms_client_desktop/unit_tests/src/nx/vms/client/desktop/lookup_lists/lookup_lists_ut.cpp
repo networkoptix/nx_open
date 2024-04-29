@@ -512,6 +512,8 @@ TEST_F(LookupListTests, validate_number_value)
 TEST_F(LookupListTests, validate_color_value)
 {
     checkValidationOfEmptyRowWithOneIncorrect("Color", "incorrect", "#000000");
+    checkValidationOfEmptyRowWithOneIncorrect("Color", "incorrect", "blue");
+    checkValidationOfEmptyRowWithOneIncorrect("Color", "incorrect", "base color 1.1");
     checkValidationOfRowsWithCorrectAndIncorrectValues("Color");
 }
 

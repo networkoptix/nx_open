@@ -76,7 +76,8 @@ FocusScope
 
     LookupListElementViewer
     {
-        value: model.display ?? ""
+        displayValue: model.display ?? ""
+        value: model.rawValue ?? ""
         visible: !control.isEditing
         anchors.fill: parent
 

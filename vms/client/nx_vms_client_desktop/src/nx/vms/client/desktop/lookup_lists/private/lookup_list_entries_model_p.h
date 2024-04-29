@@ -30,7 +30,7 @@ public:
     static QVariant objectFormatter(const QString& value);
 
     std::vector<int> getVisibleIndexes(const QString& filterText) const;
-    QVariant getDisplayedValue(const QString& attributeName, const QString& value) const;
+    QVariant getDisplayValue(const QString& attributeName, const QString& value) const;
     QVector<int> removeIncorrectColumnValues();
 
     bool isValidValue(const QString& value, const QString& attributeName) const;
