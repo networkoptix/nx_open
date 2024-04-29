@@ -244,11 +244,6 @@ void QmlDialogWrapper::setRestoreLastPositionWhenOpened(bool value)
     emit restoreLastPositionWhenOpenedChanged();
 }
 
-bool QmlDialogWrapper::isRunning() const
-{
-    return !d->done;
-}
-
 bool QmlDialogWrapper::exec(Qt::WindowModality modality)
 {
     if (!d->window)

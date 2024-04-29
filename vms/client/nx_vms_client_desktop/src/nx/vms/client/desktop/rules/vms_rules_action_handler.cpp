@@ -156,11 +156,8 @@ void VmsRulesActionHandler::openVmsRulesDialog()
     const auto parameters = menu()->currentParameters(sender());
     d->setFilter(parameters.resources().filtered<QnVirtualCameraResource>());
 
-    if (d->rulesDialog->isRunning())
-        return;
-
-    d->rulesDialog->exec(Qt::NonModal);
-    d->rulesDialog.reset();
+    d->rulesDialog->open();
+    d->rulesDialog->raise();
 }
 
 void VmsRulesActionHandler::openEventLogDialog()
