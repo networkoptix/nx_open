@@ -67,19 +67,22 @@ QByteArray substituteColors(
             pos = getNextColorPos(data, pos);
             if (pos != data.size())
             {
-                QString currentColor = QString::fromLatin1(
-                    data.begin() + pos,
-                    kColorValueStringLength).toLower();
+                int length = kColorValueStringLength;
+                QString currentColor = QString::fromLatin1(data.begin() + pos, length).toLower();
+                if (auto pos = std::find(currentColor.begin(), currentColor.end(), '\"');
+                    pos != currentColor.end())
+                {
+                    length = pos - currentColor.begin();
+                    currentColor = currentColor.left(length);
+                }
 
                 if (colorSubstitutions.contains(currentColor))
                 {
                     result.replace(
-                        pos,
-                        kColorValueStringLength,
-                        colorSubstitutions[currentColor].name().toLatin1());
+                        pos, length, colorSubstitutions[currentColor].name().toLatin1());
                 }
 
-                pos += kColorValueStringLength;
+                pos += length;
             }
         }
     }

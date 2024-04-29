@@ -36,6 +36,11 @@ constexpr int kMinimumPanelWidth = 36;
 constexpr int kSideMargin = 5;
 constexpr int kMenuIconWidth = 20;
 
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kArrowTheme =
+{{QnIcon::Normal, {.primary = "dark17"}}};
+NX_DECLARE_COLORIZED_ICON(kArrowCloseIcon, "titlebar/arrow_close.svg", kArrowTheme);
+NX_DECLARE_COLORIZED_ICON(kArrowOpenIcon, "20x20/Solid/arrow_open.svg", kArrowTheme);
+
 } // namespace
 
 class QnCloudStatusPanelPrivate: public QObject
@@ -144,7 +149,7 @@ void QnCloudStatusPanel::paintEvent(QPaintEvent* event)
 
     QPainter painter{this};
 
-    QIcon icon = qnSkin->icon(isDown() ? "titlebar/arrow_close.svg" : "titlebar/arrow_open.svg");
+    QIcon icon = qnSkin->icon(isDown() ? kArrowCloseIcon : kArrowOpenIcon);
     icon.paint(
         &painter,
         QRect{width() - kMenuIconWidth - kSideMargin, 0, kMenuIconWidth, height()});

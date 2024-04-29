@@ -61,9 +61,22 @@ const core::SvgIconColorer::IconSubstitutions kTitleBarIconSubstitutions = {
     }},
 };
 
+const core::SvgIconColorer::ThemeSubstitutions kTitleBarIconTheme = {
+    { QnIcon::Normal, {.primary = "light10"}},
+    { QnIcon::Disabled, {.primary = "dark14" }},
+    { QnIcon::Selected, {.primary = "light4"}},
+    { QnIcon::Active, {.primary = "light4"}},
+    { QnIcon::Error, {.primary = "red_l2"}},
+};
+
 static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kButtonsIconSubstitutions = {
     {QnIcon::Normal, {{kLight4Color, "light4"}}},
 };
+
+NX_DECLARE_COLORIZED_ICON(kAddIcon, "20x20/Outline/add.svg", kTitleBarIconTheme);
+NX_DECLARE_COLORIZED_ICON(kArrowDownIcon,
+    "16x16/Outline/arrow_down.svg",
+    kTitleBarIconSubstitutions) // TODO: check how it works, now it is white arrow
 
 class ContextMenu
 {
@@ -401,10 +414,7 @@ void initialize(Manager* manager, Action* root)
             .pulledText(ContextMenu::tr("New Layout Tab"))
             .shortcut("Ctrl+T")
             .condition(!condition::showreelIsRunning())
-            .icon(qnSkin->icon("titlebar/plus_16.svg",
-                nullptr,
-                nullptr,
-                kTitleBarIconSubstitutions));
+            .icon(qnSkin->icon(kAddIcon));
 
         factory(OpenWelcomeScreenAction)
             .flags(Main | GlobalHotkey)
@@ -427,10 +437,7 @@ void initialize(Manager* manager, Action* root)
         .flags(TitleBar | SingleTarget | NoTarget)
         .text(ContextMenu::tr("Open Layout...")) //< To be displayed on button tooltip
         .childFactory(new OpenCurrentUserLayoutFactory(manager))
-        .icon(qnSkin->icon("titlebar/arrow_down_16.svg",
-            nullptr,
-            nullptr,
-            kTitleBarIconSubstitutions));
+        .icon(qnSkin->icon(kArrowDownIcon));
 
     factory()
         .flags(TitleBar)
