@@ -292,7 +292,7 @@ Dialog
 
                         sourcePath: dialog.testState == LdapSettings.TestState.ok
                             ? "image://skin/20x20/Outline/success.svg"
-                            : "image://skin/text_buttons/error.svg"
+                            : "image://skin/20x20/Outline/error.svg"
                         sourceSize: Qt.size(20, 20)
                     }
 

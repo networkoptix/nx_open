@@ -235,11 +235,13 @@ QIcon Skin::icon(const QString& name,
     const QnIcon::Suffixes* suffixes,
     const SvgIconColorer::IconSubstitutions& svgColorSubstitutions,
     const SvgIconColorer::IconSubstitutions& svgCheckedColorSubstitutions,
-    const SvgIconColorer::ThemeSubstitutions& svgThemeSubstitutions)
+    const SvgIconColorer::ThemeSubstitutions& svgThemeSubstitutions,
+    const SvgIconColorer::ThemeSubstitutions& svgCheckedThemeSubstitutions)
 {
     return m_iconLoader->load(name,
         checkedName,
         svgThemeSubstitutions,
+        svgCheckedThemeSubstitutions,
         suffixes,
         svgColorSubstitutions,
         svgCheckedColorSubstitutions);
@@ -261,6 +263,7 @@ QIcon Skin::icon(const ColorizedIconDeclaration& decl)
         decl.iconPath(),
         decl.checkedIconPath(),
         decl.themeSubstitutions(),
+        decl.checkedThemeSubstitutions(),
         nullptr,
         decl.substitutions(),
         decl.checkedSubstitutions());
@@ -273,6 +276,7 @@ QIcon Skin::icon(const QString& name,
     return m_iconLoader->load(name,
         QString(),
         {},
+        {},
         nullptr,
         svgColorSubstitutions,
         svgCheckedColorSubstitutions);
@@ -284,7 +288,7 @@ QIcon Skin::icon(const QString& name,
     const SvgIconColorer::IconSubstitutions& svgCheckedColorSubstitutions)
 {
     return m_iconLoader->load(
-        name, checkedName, {}, nullptr, svgColorSubstitutions, svgCheckedColorSubstitutions);
+        name, checkedName, {}, {}, nullptr, svgColorSubstitutions, svgCheckedColorSubstitutions);
 }
 
 QIcon Skin::icon(const QString& name,
@@ -300,6 +304,15 @@ QIcon Skin::icon(const QString& name,
     return m_iconLoader->load(name,
         checkedName,
         themeSubstitutions);
+}
+
+QIcon Skin::icon(const QString& name,
+    const SvgIconColorer::ThemeSubstitutions& themeSubstitutions,
+    const SvgIconColorer::ThemeSubstitutions& checkedThemeSubstitutions)
+{
+    return m_iconLoader->load(name,
+        QString(),
+        themeSubstitutions, checkedThemeSubstitutions);
 }
 
 QPixmap Skin::pixmap(const QString& name, bool correctDevicePixelRatio, const QSize& desiredSize)

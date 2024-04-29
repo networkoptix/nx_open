@@ -19,14 +19,18 @@ namespace nx::vms::client::desktop {
 
 namespace {
 
-static const QColor kLight16Color = "#698796";
-static const QColor kLight10Color = "#A5B7C0";
-static const QColor kLight12Color = "#91A7B2";
-static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
-    {QIcon::Normal, {{kLight10Color, "light16"}, {kLight16Color, "light16"}, {kLight12Color, "light16"}}},
-    {QIcon::Active, {{kLight10Color, "light14"}, {kLight16Color, "light14"}, {kLight12Color, "light14"}}},
-    {QIcon::Selected, {{kLight16Color, "light17"}, {kLight12Color, "light17"}}},
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kIconSubstitutions = {
+    {QIcon::Normal, {.primary = "light16"}},
+    {QIcon::Active, {.primary = "light14"}},
+    {QIcon::Selected, {.primary = "light17"}},
 };
+
+NX_DECLARE_COLORIZED_ICON(kArrowDownIcon, "20x20/Outline/arrow_down.svg", kIconSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kArrowUpIcon, "20x20/Outline/arrow_up.svg", kIconSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kEventLogIcon, "20x20/Outline/event_log.svg", kIconSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kEventRulesIcon, "20x20/Outline/event_rules.svg", kIconSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kPlayIcon, "20x20/Outline/play.svg", kIconSubstitutions)
+
 
 int rowOf(QGridLayout* layout, QWidget* widget)
 {
@@ -44,9 +48,9 @@ CameraInfoWidget::CameraInfoWidget(QWidget* parent):
     ui->setupUi(this);
 
     ui->multipleNameLabel->setReadOnly(true);
-    ui->showOnLayoutButton->setIcon(qnSkin->icon("text_buttons/play_20.svg", kIconSubstitutions));
-    ui->eventLogButton->setIcon(qnSkin->icon("text_buttons/event_log_20.svg", kIconSubstitutions));
-    ui->cameraRulesButton->setIcon(qnSkin->icon("text_buttons/event_rules_20x20.svg", kIconSubstitutions));
+    ui->showOnLayoutButton->setIcon(qnSkin->icon(kPlayIcon));
+    ui->eventLogButton->setIcon(qnSkin->icon(kEventLogIcon));
+    ui->cameraRulesButton->setIcon(qnSkin->icon(kEventRulesIcon));
 
     autoResizePagesToContents(ui->stackedWidget,
         {QSizePolicy::Preferred, QSizePolicy::Fixed},
@@ -252,14 +256,12 @@ void CameraInfoWidget::updatePageSwitcher()
     if (ui->stackedWidget->currentWidget() == ui->lessInfoPage)
     {
         ui->toggleInfoButton->setText(tr("More Info"));
-        ui->toggleInfoButton->setIcon(
-            qnSkin->icon("text_buttons/arrow_down_20.svg", kIconSubstitutions));
+        ui->toggleInfoButton->setIcon(qnSkin->icon(kArrowDownIcon));
     }
     else
     {
         ui->toggleInfoButton->setText(tr("Less Info"));
-        ui->toggleInfoButton->setIcon(
-            qnSkin->icon("text_buttons/arrow_up_20.svg", kIconSubstitutions));
+        ui->toggleInfoButton->setIcon(qnSkin->icon(kArrowUpIcon));
     }
 }
 

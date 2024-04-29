@@ -102,7 +102,8 @@ public:
             SvgIconColorer::kDefaultIconSubstitutions,
         const SvgIconColorer::IconSubstitutions& svgCheckedColorSubstitutions =
             SvgIconColorer::kDefaultIconSubstitutions,
-        const SvgIconColorer::ThemeSubstitutions& svgThemeSubstitutions = {});
+        const SvgIconColorer::ThemeSubstitutions& svgThemeSubstitutions = {},
+        const SvgIconColorer::ThemeSubstitutions& svgCheckedThemeSubstitutions = {});
     QIcon icon(const char* name, const char* checkedName = nullptr);
     QIcon icon(const QIcon& icon);
     QIcon icon(const ColorizedIconDeclaration& decl);
@@ -118,6 +119,9 @@ public:
     QIcon icon(const QString& name,
         const SvgIconColorer::ThemeSubstitutions& themeSubstitutions,
         const QString& checkedName);
+    QIcon icon(const QString& name,
+        const SvgIconColorer::ThemeSubstitutions& themeSubstitutions,
+        const SvgIconColorer::ThemeSubstitutions& checkedThemeSubstitutions);
 
     /**
      * Loads pixmap with appropriate size according to current hidpi settings.

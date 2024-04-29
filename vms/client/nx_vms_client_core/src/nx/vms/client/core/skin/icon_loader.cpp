@@ -201,6 +201,7 @@ QIcon IconLoader::polish(const QIcon& icon)
 QIcon IconLoader::load(const QString& name,
     const QString& checkedName,
     const SvgIconColorer::ThemeSubstitutions& themeSubstitutions,
+    const SvgIconColorer::ThemeSubstitutions& checkedThemeSubstitutions,
     const QnIcon::Suffixes* suffixes,
     const SvgIconColorer::IconSubstitutions& svgColorSubstitutions,
     const SvgIconColorer::IconSubstitutions& svgCheckedColorSubstitutions)
@@ -233,7 +234,7 @@ QIcon IconLoader::load(const QString& name,
             "Color substitutions cannot be specified for non-SVG icons.");
 
         const QIcon icon = isSvg
-            ? loadSvgIconInternal(qnSkin, name, checkedName, svgColorSubstitutions, svgCheckedColorSubstitutions, themeSubstitutions)
+            ? loadSvgIconInternal(qnSkin, name, checkedName, svgColorSubstitutions, svgCheckedColorSubstitutions, themeSubstitutions, checkedThemeSubstitutions)
             : loadPixmapIconInternal(qnSkin,  name, checkedName, suffixes);
 
         m_iconByKey.insert(key, icon);
@@ -265,7 +266,8 @@ QIcon IconLoader::loadSvgIconInternal(
     const QString& checkedName,
     const SvgIconColorer::IconSubstitutions& substitutions,
     const SvgIconColorer::IconSubstitutions& checkedSubstitutions,
-    const QMap<QIcon::Mode, SvgIconColorer::ThemeColorsRemapData>& themeSubstitutions)
+    const QMap<QIcon::Mode, SvgIconColorer::ThemeColorsRemapData>& themeSubstitutions,
+    const QMap<QIcon::Mode, SvgIconColorer::ThemeColorsRemapData>& checkedThemeSubstitutions)
 {
     IconBuilder builder(Skin::isHiDpi());
     const auto basePath = skin->path(name);
@@ -291,22 +293,24 @@ QIcon IconLoader::loadSvgIconInternal(
             const QByteArray checkedData = source.readAll();
             const auto actualSubstitutions =
                 checkedSubstitutions.empty() ? substitutions : checkedSubstitutions;
+            const auto actualThemeSubstitutions =
+                checkedThemeSubstitutions.empty() ? themeSubstitutions : checkedThemeSubstitutions;
             const core::SvgIconColorer colorer(
-                checkedData, checkedName, actualSubstitutions, themeSubstitutions);
+                checkedData, checkedName, actualSubstitutions, actualThemeSubstitutions);
             builder.addSvg(colorer, QnIcon::Normal, QIcon::On);
             for (const auto& modeSubstitutions:
-                actualSubstitutions.keys() + themeSubstitutions.keys())
+                actualSubstitutions.keys() + actualThemeSubstitutions.keys())
             {
                 builder.addSvg(colorer, modeSubstitutions, QIcon::On);
             }
         }
     }
-    else if (!checkedSubstitutions.empty())
+    else if (!checkedSubstitutions.empty() || !checkedThemeSubstitutions.isEmpty())
     {
         const core::SvgIconColorer checkedColorer(
-            baseData, name, checkedSubstitutions, themeSubstitutions);
+            baseData, name, checkedSubstitutions, checkedThemeSubstitutions);
         for (const auto& modeSubstitutions:
-            checkedSubstitutions.keys() + themeSubstitutions.keys())
+            checkedSubstitutions.keys() + checkedThemeSubstitutions.keys())
         {
             builder.addSvg(checkedColorer, modeSubstitutions, QIcon::On);
         }

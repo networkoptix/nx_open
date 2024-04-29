@@ -41,13 +41,13 @@ constexpr auto kSessionLengthAlertLimit = std::chrono::hours(720);
 constexpr auto kNoLimitSessionDuration = 0s;
 static const QString kProxyConnectionAccessPolicy = "proxyConnectionAccessPolicy";
 
-static const QColor kLight10Color = "#A5B7C0";
-static const QColor kLight16Color = "#698796";
-static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
-    {QIcon::Normal, {{kLight10Color, "light10"}, {kLight16Color, "light16"}}},
-    {QIcon::Active, {{kLight10Color, "light11"}, {kLight16Color, "light17"}}},
-    {QIcon::Selected, {{kLight16Color, "light15"}}},
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kIconTheme = {
+    {QIcon::Normal, {.primary = "light16"}},
+    {QIcon::Active, {.primary = "light17"}},
+    {QIcon::Selected, {.primary = "light15"}},
 };
+
+NX_DECLARE_COLORIZED_ICON(kSettingsIcon, "20x20/Outline/settings.svg", kIconTheme)
 
 } // namespace
 
@@ -143,8 +143,7 @@ SecuritySettingsWidget::SecuritySettingsWidget(
     connect(ui->pixelateObjectTypesButton, &QPushButton::clicked,
         this, &SecuritySettingsWidget::openPixelationObjectSelectionDialog);
 
-    ui->configurePixelationButton->setIcon(
-        qnSkin->icon("text_buttons/settings_20.svg", kIconSubstitutions));
+    ui->configurePixelationButton->setIcon(qnSkin->icon(kSettingsIcon));
 
     connect(ui->configurePixelationButton, &QPushButton::clicked, this,
         &SecuritySettingsWidget::openPixelationConfigurationDialog);

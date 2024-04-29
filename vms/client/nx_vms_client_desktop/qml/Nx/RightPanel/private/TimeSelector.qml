@@ -14,7 +14,7 @@ SelectableTextButton
 
     selectable: false
     accented: setup && setup.timeSelection === RightPanel.TimeSelection.selection
-    icon.source: "image://skin/text_buttons/calendar_20.svg"
+    icon.source: "image://skin/20x20/Outline/calendar.svg"
     text: setup ? actionNames[setup.timeSelection] : ""
 
     readonly property var actionNames:

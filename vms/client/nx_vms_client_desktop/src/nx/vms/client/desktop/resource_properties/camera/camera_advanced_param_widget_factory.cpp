@@ -29,11 +29,13 @@
 
 namespace nx::vms::client::desktop {
 
-static const QColor kLight16Color = "#698796";
-static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
-    {QIcon::Normal, {{kLight16Color, "light16"}}},
-    {QIcon::Active, {{kLight16Color, "light17"}}},
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kIconSubstitutions = {
+    {QIcon::Normal, {.primary = "light16"}},
+    {QIcon::Active, {.primary = "light17"}},
 };
+
+NX_DECLARE_COLORIZED_ICON(kRotateCCWIcon, "20x20/Outline/rotate_ccw.svg", kIconSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kRotateCWIcon, "20x20/Outline/rotate_cw.svg", kIconSubstitutions)
 
 AbstractCameraAdvancedParamWidget::AbstractCameraAdvancedParamWidget(const QnCameraAdvancedParameter &parameter, QWidget* parent) :
     QWidget(parent),
@@ -413,9 +415,9 @@ public:
         const auto ptzrInfoContainer = new QHBoxLayout();
 
         m_rotationCw = new nx::vms::client::desktop::HoverButton(
-            qnSkin->icon("text_buttons/rotate_cw_20.svg", kIconSubstitutions), this);
+            qnSkin->icon(kRotateCWIcon), this);
         m_rotationCcw = new nx::vms::client::desktop::HoverButton(
-            qnSkin->icon("text_buttons/rotate_ccw_20.svg", kIconSubstitutions), this);
+            qnSkin->icon(kRotateCCWIcon), this);
         m_rotationLabel = new QLabel();
         m_rotationLabel->setText(rotationText(0));
         ptzrInfoContainer->addWidget(m_rotationCcw);

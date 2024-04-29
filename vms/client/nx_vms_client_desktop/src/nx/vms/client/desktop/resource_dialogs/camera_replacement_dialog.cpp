@@ -41,11 +41,12 @@ constexpr int kDialogFixedWidth = 640;
 constexpr int kHeaderCaptionTextPixelSize = 24;
 constexpr auto kHeaderCaptionTextWeight = QFont::ExtraLight;
 
-static const QColor kLight16Color = "#698796";
-static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
-    {QIcon::Normal, {{kLight16Color, "light16"}}},
-    {QIcon::Active, {{kLight16Color, "light17"}}},
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kIconSubstitutions = {
+    {QIcon::Normal, {.primary = "light16"}},
+    {QIcon::Active, {.primary = "light17"}},
 };
+
+NX_DECLARE_COLORIZED_ICON(kReloadIcon, "20x20/Outline/reload.svg", kIconSubstitutions)
 
 static const QColor kLight4Color = "#E1E7EA";
 static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kNormalIconSubstitutions = {
@@ -257,7 +258,7 @@ CameraReplacementDialog::CameraReplacementDialog(
     d->resourceSelectionWidget->setTreeEntityFactoryFunction(
         treeEntityCreationFunction(cameraToBeReplaced, showServersInTree(workbenchContext())));
 
-    ui->refreshButton->setIcon(qnSkin->icon("text_buttons/reload_20.svg", kIconSubstitutions));
+    ui->refreshButton->setIcon(qnSkin->icon(kReloadIcon));
 
     setupUiContols();
     resize(minimumSizeHint());

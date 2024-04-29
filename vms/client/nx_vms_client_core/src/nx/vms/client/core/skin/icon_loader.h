@@ -2,9 +2,9 @@
 
 #pragma once
 
+#include <QtCore/QMap>
 #include <QtCore/QObject>
 #include <QtCore/QSet>
-#include <QtCore/QMap>
 #include <QtGui/QIcon>
 
 #include "icon.h"
@@ -27,6 +27,7 @@ public:
     QIcon load(const QString& name,
         const QString& checkedName = QString(),
         const SvgIconColorer::ThemeSubstitutions& themeSubstitutions = {},
+        const SvgIconColorer::ThemeSubstitutions& checkedThemeSubstitutions = {},
         const QnIcon::Suffixes* suffixes = nullptr,
         const SvgIconColorer::IconSubstitutions& svgColorSubstitutions =
             SvgIconColorer::kDefaultIconSubstitutions,
@@ -48,7 +49,8 @@ private:
         const SvgIconColorer::IconSubstitutions& substitutions,
 
         const SvgIconColorer::IconSubstitutions& checkedSubstitutions,
-        const QMap<QIcon::Mode, SvgIconColorer::ThemeColorsRemapData>& themeSubstitutions);
+        const QMap<QIcon::Mode, SvgIconColorer::ThemeColorsRemapData>& themeSubstitutions,
+        const QMap<QIcon::Mode, SvgIconColorer::ThemeColorsRemapData>& checkedThemeSubstitutions);
 
 private:
     QHash<QString, QIcon> m_iconByKey;

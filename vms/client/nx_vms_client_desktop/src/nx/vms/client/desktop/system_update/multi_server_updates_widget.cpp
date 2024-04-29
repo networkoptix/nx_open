@@ -99,13 +99,22 @@ static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kNormalIco
     {QIcon::Normal, {{kLight4Color, "light4"}}},
 };
 
-static const QColor kLight10Color = "#A5B7C0";
-static const QColor kLight16Color = "#698796";
-static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
-    {QIcon::Normal, {{kLight10Color, "light10"}, {kLight16Color, "light16"}}},
-    {QIcon::Active, {{kLight10Color, "light11"}, {kLight16Color, "light17"}}},
-    {QIcon::Selected, {{kLight16Color, "light15"}}},
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kLight10Theme = {
+    {QIcon::Normal, {.primary = "light10"}},
+    {QIcon::Active, {.primary = "light11"}},
 };
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kLight16Theme = {
+    {QIcon::Normal, {.primary = "light16"}},
+    {QIcon::Active, {.primary = "light17"}},
+    {QIcon::Selected, {.primary = "light15"}},
+};
+
+NX_DECLARE_COLORIZED_ICON(kArrowUpIcon, "20x20/Outline/arrow_up.svg", kLight10Theme)
+NX_DECLARE_COLORIZED_ICON(kArrowDownIcon, "20x20/Outline/arrow_down.svg", kLight10Theme)
+NX_DECLARE_COLORIZED_ICON(kDownloadIcon, "20x20/Outline/download.svg", kLight16Theme)
+NX_DECLARE_COLORIZED_ICON(kSuccessIcon, "20x20/Outline/success.svg", kLight10Theme)
+NX_DECLARE_COLORIZED_ICON(kReloadIcon, "20x20/Outline/reload.svg", kLight16Theme)
+NX_DECLARE_COLORIZED_ICON(kSettingsIcon, "20x20/Outline/settings.svg", kLight16Theme)
 
 // Adds resource list to message box
 QTableView* injectResourceList(
@@ -232,7 +241,7 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
         qnSkin->icon("system_settings/update_checkmark_40.svg", kNormalIconSubstitutions)
             .pixmap(QSize(40, 40)));
     ui->linkCopiedIconLabel->setPixmap(
-        qnSkin->icon("text_buttons/ok_20.svg", kIconSubstitutions).pixmap(QSize(20, 20)));
+        qnSkin->icon(kSuccessIcon).pixmap(QSize(20, 20)));
     ui->linkCopiedWidget->hide();
 
     setHelpTopic(this, HelpTopic::Id::Administration_Update);
@@ -310,7 +319,7 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
             loadDataToUi();
         });
 
-    ui->advancedUpdateSettings->setIcon(qnSkin->icon("text_buttons/arrow_up_20.svg", kIconSubstitutions));
+    ui->advancedUpdateSettings->setIcon(qnSkin->icon(kArrowUpIcon));
 
     setAccentStyle(ui->downloadButton);
     // This button is hidden for now. We will implement it in future.
@@ -444,20 +453,19 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
         ui->longUpdateWarning, &QLabel::show);
 
     ui->manualDownloadButton->hide();
-    ui->manualDownloadButton->setIcon(
-        qnSkin->icon("text_buttons/download_20.svg", kIconSubstitutions));
+    ui->manualDownloadButton->setIcon(qnSkin->icon(kDownloadIcon));
     ui->manualDownloadButton->setForegroundRole(QPalette::WindowText);
 
     ui->checkAgainButton->hide();
-    ui->checkAgainButton->setIcon(qnSkin->icon("text_buttons/reload_20.svg", kIconSubstitutions));
+    ui->checkAgainButton->setIcon(qnSkin->icon(kReloadIcon));
     ui->checkAgainButton->setForegroundRole(QPalette::WindowText);
 
     ui->tryAgainButton->hide();
-    ui->tryAgainButton->setIcon(qnSkin->icon("text_buttons/reload_20.svg", kIconSubstitutions));
+    ui->tryAgainButton->setIcon(qnSkin->icon(kReloadIcon));
     ui->tryAgainButton->setForegroundRole(QPalette::WindowText);
 
     ui->advancedSettingsButton->setIcon(
-        qnSkin->icon("text_buttons/settings_20.svg", kIconSubstitutions));
+        qnSkin->icon(kSettingsIcon));
     ui->advancedSettingsButton->setForegroundRole(QPalette::WindowText);
     connect(ui->advancedSettingsButton,
         &QPushButton::clicked,
@@ -2747,10 +2755,8 @@ void MultiServerUpdatesWidget::syncRemoteUpdateStateToUi()
     }
 
     ui->tableView->setColumnHidden(ServerUpdatesModel::Columns::StorageSettingsColumn, !m_showStorageSettings);
-    QString icon = m_showStorageSettings
-        ? QString("text_buttons/arrow_down_20.svg")
-        : QString("text_buttons/arrow_up_20.svg");
-    ui->advancedUpdateSettings->setIcon(qnSkin->icon(icon, kIconSubstitutions));
+    ui->advancedUpdateSettings->setIcon(
+        qnSkin->icon(m_showStorageSettings ? kArrowDownIcon : kArrowUpIcon));
     if (m_showStorageSettings)
         ui->tableView->setEditTriggers(QAbstractItemView::AllEditTriggers);
     else

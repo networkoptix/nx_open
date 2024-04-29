@@ -12,11 +12,12 @@
 
 namespace {
 
-static const QColor kLight10Color = "#A5B7C0";
-static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
-    {QIcon::Normal, {{kLight10Color, "light10"}}},
-    {QIcon::Active, {{kLight10Color, "light11"}}},
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kIconSubstitutions = {
+    {QIcon::Normal, {.primary = "light10"}},
+    {QIcon::Active, {.primary = "light11"}},
 };
+
+NX_DECLARE_COLORIZED_ICON(kSuccessIcon, "20x20/Outline/success.svg", kIconSubstitutions)
 
 using namespace nx::vms::client::desktop;
 
@@ -58,7 +59,7 @@ void CellWidget::setState(FoundDevicesModel::PresentedState value)
 
     if (addedState)
     {
-        button->setIcon(qnSkin->icon("text_buttons/ok_20.svg", kIconSubstitutions));
+        button->setIcon(qnSkin->icon(kSuccessIcon));
         return;
     }
 

@@ -44,14 +44,14 @@ namespace {
 
 using nx::vms::client::core::AccessController;
 
-static const QColor kLight12Color = "#91A7B2";
-static const QColor kLight16Color = "#698796";
-static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
-    {QIcon::Normal, {{kLight12Color, "light12"}, {kLight16Color, "light16"}}},
-    {QIcon::Active, {{kLight12Color, "light13"}, {kLight16Color, "light14"}}},
-    {QIcon::Selected, {{kLight12Color, "light11"}, {kLight16Color, "light14"}}},
-    {QnIcon::Pressed, {{kLight16Color, "light14"}}},
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kLight16Theme = {
+    {QIcon::Normal, {.primary = "light16"}},
+    {QIcon::Active, {.primary = "light14"}},
+    {QIcon::Selected, {.primary = "light14"}},
+    {QnIcon::Pressed, {.primary = "light14"}},
 };
+
+NX_DECLARE_COLORIZED_ICON(kEventRulesIcon, "20x20/Outline/event_rules.svg", kLight16Theme)
 
 } // namespace
 
@@ -195,8 +195,7 @@ void EventSearchWidget::Private::setupTypeSelection()
 {
     using namespace nx::vms::event;
 
-    m_typeSelectionButton->setIcon(
-        qnSkin->icon("text_buttons/event_rules_20x20.svg", kIconSubstitutions));
+    m_typeSelectionButton->setIcon(qnSkin->icon(kEventRulesIcon));
 
     auto eventFilterMenu = q->createDropdownMenu();
     auto analyticsEventsMenu = q->createDropdownMenu();

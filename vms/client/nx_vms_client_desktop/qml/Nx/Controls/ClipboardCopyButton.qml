@@ -29,7 +29,7 @@ Item
         anchors.fill: parent
         hoverEnabled: true
 
-        icon.source: "image://skin/text_buttons/copy_20.svg"
+        icon.source: "image://skin/20x20/Outline/copy.svg"
         icon.width: 20
         icon.height: 20
         icon.color: hovered ? ColorTheme.colors.light13 : ColorTheme.colors.light16

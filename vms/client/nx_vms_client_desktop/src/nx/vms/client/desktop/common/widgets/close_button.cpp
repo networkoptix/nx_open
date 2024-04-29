@@ -21,8 +21,17 @@ static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubst
     {QnIcon::Pressed, {{kLight10Color, "light10"}}},
 };
 
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kIconTheme = {
+    {QIcon::Normal, {.primary = "light14"}},
+    {QIcon::Active, {.primary = "light14"}},
+    {QIcon::Selected, {.primary = "light14"}},
+    {QnIcon::Pressed, {.primary = "light10"}},
+};
+
+NX_DECLARE_COLORIZED_ICON(kCrossCloseIcon, "20x20/Outline/cross_close.svg", kIconTheme)
+
 CloseButton::CloseButton(QWidget* parent):
-    HoverButton(qnSkin->icon("text_buttons/cross_close_20.svg", kIconSubstitutions), parent)
+    HoverButton(qnSkin->icon(kCrossCloseIcon), parent)
 {
     setFixedSize(HoverButton::sizeHint());
 }
@@ -42,7 +51,7 @@ void CloseButton::paintEvent(QPaintEvent* event)
     {
         // If button is accented then it uses another color scheme, which is stored into
         // QnIcon::Pressed mode.
-        QPixmap pixmap = qnSkin->icon("text_buttons/cross_close_20.svg", kIconSubstitutions)
+        QPixmap pixmap = qnSkin->icon(kCrossCloseIcon)
             .pixmap(nx::style::Metrics::kDefaultIconSize, QnIcon::Pressed);
         if (pixmap.isNull())
             return;

@@ -42,11 +42,12 @@ static constexpr auto kStatueLabelFontWeight = QFont::Medium;
 static constexpr int kStatusHintLabelPixelSize = 12;
 static constexpr auto kStatusHintLabelFontWeight = QFont::Normal;
 
-static const QColor kLight16Color = "#698796";
-static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
-    {QIcon::Normal, {{kLight16Color, "light16"}}},
-    {QIcon::Active, {{kLight16Color, "light17"}}},
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kIconSubstitutions = {
+    {QIcon::Normal, {.primary = "light16"}},
+    {QIcon::Active, {.primary = "light17"}},
 };
+
+NX_DECLARE_COLORIZED_ICON(kReloadIcon, "20x20/Outline/reload.svg", kIconSubstitutions)
 
 const bool isValidPort(int port) { return port >= 1 && port <= 65535; };
 
@@ -190,8 +191,7 @@ void OutgoingMailSettingsWidget::Private::setupDialogControls()
 
     m_testSmtpConfigurationButton->setText(tr("Check"));
     m_testSmtpConfigurationButton->setFlat(true);
-    m_testSmtpConfigurationButton->setIcon(
-        qnSkin->icon("text_buttons/reload_20.svg", kIconSubstitutions));
+    m_testSmtpConfigurationButton->setIcon(qnSkin->icon(kReloadIcon));
     m_testSmtpConfigurationButton->resize(m_testSmtpConfigurationButton->minimumSizeHint());
     m_testSmtpConfigurationButton->setFocusPolicy(Qt::ClickFocus);
     static constexpr QMargins kCheckButtonMargins = {0, -4, 0, 0};

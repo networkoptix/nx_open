@@ -66,6 +66,9 @@ static constexpr int kMaximumColumnWidth = 200;
 static const core::SvgIconColorer::ThemeSubstitutions kTextButtonColors = {
     {QIcon::Normal, {"light4"}}, {QIcon::Active, {"light2"}}};
 
+NX_DECLARE_COLORIZED_ICON(kDeleteIcon, "20x20/Outline/delete.svg", kTextButtonColors)
+NX_DECLARE_COLORIZED_ICON(kEditIcon, "20x20/Outline/edit.svg", kTextButtonColors)
+
 } // namespace
 
 // -----------------------------------------------------------------------------------------------
@@ -247,7 +250,7 @@ public:
     CommonMessageBar* const notFoundUsersWarning{
         new CommonMessageBar(q, {.level = BarDescription::BarLevel::Error, .isClosable = true})};
     QPushButton* const deleteNotFoundUsersButton{
-        new QPushButton(qnSkin->icon("text_buttons/delete_20.svg", kTextButtonColors),
+        new QPushButton(qnSkin->icon(kDeleteIcon),
             QString(),
             notFoundUsersWarning)};
 
@@ -259,14 +262,12 @@ public:
     ControlBar* const selectionControls{new ControlBar(q)};
 
     QPushButton* const deleteButton{new QPushButton(
-        qnSkin->icon("text_buttons/delete_20.svg", kTextButtonColors),
+        qnSkin->icon(kDeleteIcon),
         tr("Delete"),
         selectionControls)};
 
-    QPushButton* const editButton{new QPushButton(
-        qnSkin->icon("text_buttons/edit_20.svg", kTextButtonColors),
-        tr("Edit"),
-        selectionControls)};
+    QPushButton* const editButton{
+        new QPushButton(qnSkin->icon(kEditIcon), tr("Edit"), selectionControls)};
 
     bool hasChanges = false;
     std::unique_ptr<UserGroupRequestChain> requestChain;

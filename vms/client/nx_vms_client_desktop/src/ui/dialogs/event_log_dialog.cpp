@@ -64,19 +64,17 @@ namespace {
 constexpr int kUpdateDelayMs = 1000;
 
 static const QColor kLight12Color = "#91A7B2";
-static const QColor kLight10Color = "#A5B7C0";
-static const QColor kLight16Color = "#698796";
 static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
     {QnIcon::Normal, {{kLight12Color, "light4"}}},
 };
 
-static const QColor klight10Color = "#A5B7C0";
-static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutionsLight10 = {
-    {QIcon::Normal, {{kLight10Color, "light10"}, {kLight16Color, "light16"}}},
-    {QIcon::Active, {{kLight10Color, "light11"}, {kLight16Color, "light17"}}},
-    {QIcon::Selected, {{kLight10Color, "light9"}}},
-    {QnIcon::Error, {{kLight10Color, "red_l2"}}},
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kLight16Substitutions = {
+    {QIcon::Normal, {.primary = "light16"}},
+    {QIcon::Active, {.primary = "light17"}},
 };
+
+NX_DECLARE_COLORIZED_ICON(kCloseIcon, "20x20/Outline/close_medium.svg", kLight16Substitutions)
+NX_DECLARE_COLORIZED_ICON(kReloadIcon, "20x20/Outline/reload.svg", kLight16Substitutions)
 
 enum EventListRoles
 {
@@ -195,11 +193,11 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent):
     ui->gridEvents->addAction(m_filterAction);
     ui->gridEvents->addAction(m_resetFilterAction);
 
-    ui->clearFilterButton->setIcon(qnSkin->icon("text_buttons/close_medium_20x20.svg", kIconSubstitutionsLight10));
+    ui->clearFilterButton->setIcon(qnSkin->icon(kCloseIcon));
     connect(ui->clearFilterButton, &QPushButton::clicked, this,
         &QnEventLogDialog::reset);
 
-    ui->refreshButton->setIcon(qnSkin->icon("text_buttons/reload_20.svg", kIconSubstitutionsLight10));
+    ui->refreshButton->setIcon(qnSkin->icon(kReloadIcon));
     ui->eventRulesButton->setIcon(qnSkin->icon("buttons/event_rules_20.svg", kIconSubstitutions));
 
     SnappedScrollBar *scrollBar = new SnappedScrollBar(this);

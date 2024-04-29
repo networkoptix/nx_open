@@ -49,12 +49,16 @@ using namespace nx::vms::client::desktop;
 
 namespace {
 
-static const QColor kLight16Color = "#698796";
-static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
-    {QIcon::Normal, {{kLight16Color, "light4"}}},
-    {QIcon::Active, {{kLight16Color, "light4"}}},
-    {QIcon::Selected, {{kLight16Color, "light4"}}},
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kLight16Theme = {
+    {QIcon::Normal, {.primary = "light4"}},
+    {QIcon::Active, {.primary = "light4"}},
+    {QIcon::Selected, {.primary = "light4"}},
 };
+
+NX_DECLARE_COLORIZED_ICON(kDownloadIcon, "20x20/Outline/download.svg", kLight16Theme)
+NX_DECLARE_COLORIZED_ICON(kFolderIcon, "20x20/Outline/folder.svg", kLight16Theme)
+NX_DECLARE_COLORIZED_ICON(kSettingsIcon, "20x20/Outline/settings.svg", kLight16Theme)
+
 
 } // namespace
 
@@ -109,11 +113,9 @@ QnAdvancedSettingsWidget::QnAdvancedSettingsWidget(QWidget *parent) :
     combobox->addItem(tr("Strict"),
         QVariant::fromValue(ServerCertificateValidationLevel::strict));
 
-    ui->downloadLogsButton->setIcon(
-        qnSkin->icon("text_buttons/download_20.svg", kIconSubstitutions));
-    ui->logsSettingsButton->setIcon(
-        qnSkin->icon("text_buttons/settings_20.svg", kIconSubstitutions));
-    ui->openLogsFolderButton->setIcon(qnSkin->icon("text_buttons/newfolder.svg"));
+    ui->downloadLogsButton->setIcon(qnSkin->icon(kDownloadIcon));
+    ui->logsSettingsButton->setIcon(qnSkin->icon(kSettingsIcon));
+    ui->openLogsFolderButton->setIcon(qnSkin->icon(kFolderIcon));
     ui->openLogsFolderButton->setFlat(true);
 
     ui->logsManagementBox->setVisible(appContext()->localSettings()->browseLogsButtonVisible());

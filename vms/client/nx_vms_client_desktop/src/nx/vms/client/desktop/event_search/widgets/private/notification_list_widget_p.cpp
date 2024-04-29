@@ -54,13 +54,14 @@
 
 namespace {
 
-static const QColor kLight16Color = "#698796";
-static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
-    {QIcon::Normal, {{kLight16Color, "light16"}}},
-    {QIcon::Active, {{kLight16Color, "light14"}}},
-    {QIcon::Selected, {{kLight16Color, "light10"}}},
-    {QnIcon::Pressed, {{kLight16Color, "light14"}}},
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kIconSubstitutions = {
+    {QIcon::Normal, {.primary = "light16"}},
+    {QIcon::Active, {.primary = "light14"}},
+    {QIcon::Selected, {.primary = "light10"}},
+    {QnIcon::Pressed, {.primary = "light14"}},
 };
+
+NX_DECLARE_COLORIZED_ICON(kSystemIcon, "20x20/Outline/system.svg", kIconSubstitutions)
 
 } // namespace
 
@@ -181,7 +182,7 @@ void NotificationListWidget::Private::setupFilterSystemsButton()
     m_filterSystemsButton->setFlat(true);
     m_filterSystemsButton->setSelectable(false);
     m_filterSystemsButton->setDeactivatable(true);
-    m_filterSystemsButton->setIcon(qnSkin->icon("text_buttons/system.svg", kIconSubstitutions));
+    m_filterSystemsButton->setIcon(qnSkin->icon(kSystemIcon));
     m_filterSystemsButton->setFocusPolicy(Qt::NoFocus);
 
     auto menu = new QMenu(q);

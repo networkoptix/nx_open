@@ -26,13 +26,16 @@ using nx::vms::client::core::AccessController;
 
 namespace nx::vms::client::desktop {
 
-static const QColor klight16Color = "#698796";
-static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
-    {QIcon::Normal, {{klight16Color, "light16"}}},
-    {QIcon::Active, {{klight16Color, "light14"}}},
-    {QIcon::Selected, {{klight16Color, "light10"}}},
-    {QnIcon::Pressed, {{klight16Color, "light14"}}},
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kThemeSubstitutions = {
+    {QIcon::Normal, {.primary = "light16"}},
+    {QIcon::Active, {.primary = "light14"}},
+    {QIcon::Selected, {.primary = "light10"}},
+    {QnIcon::Pressed, {.primary = "light14"}},
 };
+
+NX_DECLARE_COLORIZED_ICON(kDeviceIcon, "20x20/Outline/device.svg", kThemeSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kFrameIcon, "20x20/Outline/frame.svg", kThemeSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kPlayIcon, "20x20/Outline/play.svg", kThemeSubstitutions)
 
 class SimpleMotionSearchWidget::Private: public QObject
 {
@@ -57,7 +60,7 @@ public:
         m_areaButton->setAccented(true);
         m_areaButton->setDeactivatedText(tr("Select area on the video to filter results"));
         m_areaButton->setText(tr("In selected area"));
-        m_areaButton->setIcon(qnSkin->icon("text_buttons/frame_20x20_deprecated.svg", kIconSubstitutions));
+        m_areaButton->setIcon(qnSkin->icon(kFrameIcon));
 
         connect(m_areaButton, &SelectableTextButton::stateChanged, this,
             [this](SelectableTextButton::State state)
@@ -92,8 +95,8 @@ private:
         const bool isCamera = camera || !isMedia;
 
         m_resourceButton->setIcon(isCamera
-            ? qnSkin->icon("text_buttons/camera_20.svg", kIconSubstitutions)
-            : qnSkin->icon("text_buttons/play_20.svg", kIconSubstitutions));
+            ? qnSkin->icon(kDeviceIcon)
+            : qnSkin->icon(kPlayIcon));
 
         // TODO: #vkutin Think how to avoid code duplication with AbstractSearchWidget::Private.
         if (resource)

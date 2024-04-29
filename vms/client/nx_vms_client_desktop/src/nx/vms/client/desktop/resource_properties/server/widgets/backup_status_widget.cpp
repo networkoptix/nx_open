@@ -30,10 +30,12 @@ using namespace std::chrono;
 namespace {
 
 static const QColor kLight16Color = "#698796";
-static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
-    {QIcon::Normal, {{kLight16Color, "light16"}}},
-    {QIcon::Active, {{kLight16Color, "light17"}}},
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kIconSubstitutions = {
+    {QIcon::Normal, {.primary = "light16"}},
+    {QIcon::Active, {.primary = "light17"}},
 };
+
+NX_DECLARE_COLORIZED_ICON(kReloadIcon, "20x20/Outline/reload.svg", kIconSubstitutions)
 
 nx::vms::api::BackupPosition backupPositionFromCurrentTime()
 {
@@ -93,10 +95,8 @@ BackupStatusWidget::BackupStatusWidget(QWidget* parent):
     setPaletteColor(ui->backupCamerasCountLabel, QPalette::WindowText, lightAccentColor);
     setWarningStyle(ui->storageIssueLabel);
 
-    ui->refreshStatusButton1->setIcon(
-        qnSkin->icon("text_buttons/reload_20.svg", kIconSubstitutions));
-    ui->refreshStatusButton2->setIcon(
-        qnSkin->icon("text_buttons/reload_20.svg", kIconSubstitutions));
+    ui->refreshStatusButton1->setIcon(qnSkin->icon(kReloadIcon));
+    ui->refreshStatusButton2->setIcon(qnSkin->icon(kReloadIcon));
     connect(ui->refreshStatusButton1, &QPushButton::clicked,
         this, &BackupStatusWidget::updateBackupStatus);
     connect(ui->refreshStatusButton2, &QPushButton::clicked,

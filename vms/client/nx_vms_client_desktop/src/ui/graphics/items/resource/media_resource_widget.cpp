@@ -168,11 +168,17 @@ static const auto kUpdateDetailsInterval = 1s;
 
 static constexpr auto k360VRAspectRatio = 16.0 / 9.0;
 
-static const QColor kLight10Color = "#A5B7C0";
-static const QColor kRedL1 = "#D92A2A";
-static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kArchiveRecordingSubstitutions = {
-    {QIcon::Normal, {{kLight10Color, "light10"}, {kRedL1, "red_l1"}}},
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kArchiveTheme = {
+    {QIcon::Normal, {.primary = "light10"}}
 };
+
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kRecordingTheme = {
+    {QIcon::Normal, {.primary = "red_l1"}}
+};
+
+NX_DECLARE_COLORIZED_ICON(kArchiveIcon, "16x16/Solid/archive.svg", kArchiveTheme)
+NX_DECLARE_COLORIZED_ICON(kNotRecordingIcon, "16x16/Solid/notrecordingnow.svg", kRecordingTheme)
+NX_DECLARE_COLORIZED_ICON(kRecordingIcon, "16x16/Solid/recordingnow.svg", kRecordingTheme)
 
 template<class Cont, class Item>
 bool contains(const Cont& cont, const Item& item)
@@ -1623,11 +1629,11 @@ void QnMediaResourceWidget::updateIconButton()
         QIcon icon;
         auto rec_state = d->camera->recordingState();
         if (rec_state == Qn::RecordingState::Off)
-            icon = qnSkin->icon("text_buttons/archive_16.svg", kArchiveRecordingSubstitutions);
+            icon = qnSkin->icon(kArchiveIcon);
         else if (rec_state == Qn::RecordingState::Scheduled)
-            icon = qnSkin->icon("text_buttons/notrecordingnow_16.svg", kArchiveRecordingSubstitutions);
+            icon = qnSkin->icon(kNotRecordingIcon);
         else if (rec_state == Qn::RecordingState::On)
-            icon = qnSkin->icon("text_buttons/recordingnow_16.svg", kArchiveRecordingSubstitutions);
+            icon = qnSkin->icon(kRecordingIcon);
 
         m_hudOverlay->playbackPositionItem()->setRecordingIcon(icon.pixmap(QSize(12, 12)));
     }

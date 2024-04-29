@@ -58,11 +58,12 @@ const qint64 kBytesInTB = 1024ll * kBytesInGB;
 const int kTableRowHeight = 24;
 const int kMinimumColumnWidth = 110;
 
-static const QColor kLight16Color = "#698796";
-static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
-    {QIcon::Normal, {{kLight16Color, "light16"}}},
-    {QIcon::Active, {{kLight16Color, "light17"}}},
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kIconSubstitutions = {
+    {QIcon::Normal, {.primary = "light16"}},
+    {QIcon::Active, {.primary = "light17"}},
 };
+
+NX_DECLARE_COLORIZED_ICON(kReloadIcon, "20x20/Outline/reload.svg", kIconSubstitutions)
 
 // TODO: #rvasilenko refactor all algorithms working with kExtraDataBase to STL
 const std::array<qint64, 5> kExtraDataBase =
@@ -102,7 +103,7 @@ QnStorageAnalyticsWidget::QnStorageAnalyticsWidget(QWidget* parent):
     auto refreshButton = new QPushButton(ui->tabWidget);
     refreshButton->setFlat(true);
     refreshButton->setText(tr("Refresh"));
-    refreshButton->setIcon(qnSkin->icon("text_buttons/reload_20.svg", kIconSubstitutions));
+    refreshButton->setIcon(qnSkin->icon(kReloadIcon));
     refreshButton->resize(refreshButton->sizeHint());
 
     anchorWidgetToParent(refreshButton, Qt::RightEdge | Qt::TopEdge);

@@ -102,8 +102,8 @@ TextFieldWithValidator
 
         icon.color: hovered ? ColorTheme.colors.light1: ColorTheme.colors.light4
         icon.source: control.showPassword
-            ? "image://skin/text_buttons/eye_open_20.svg"
-            : "image://skin/text_buttons/eye_closed_20.svg"
+            ? "image://skin/20x20/Outline/eye_open.svg"
+            : "image://skin/20x20/Outline/eye_closed.svg"
 
         onClicked: control.showPassword = !control.showPassword
     }
