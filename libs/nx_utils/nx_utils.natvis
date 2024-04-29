@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+
+  <Type Name="nx::utils::ImplPtr&lt;*&gt;">
+      <DisplayString Condition="m_ptr._Mypair._Myval2 == 0">empty</DisplayString>
+      <DisplayString>ImplPtr {*m_ptr}</DisplayString>
+      <Expand>
+          <ExpandedItem>m_ptr._Mypair._Myval2</ExpandedItem>
+      </Expand>
+  </Type>
+
+  <Type Name="nx::Uuid">
+      <DisplayString>{m_uuid}</DisplayString>
+  </Type>
+
+  <Type Name="nx::utils::Url">
+    <Intrinsic Name="memberOffset" Expression="sizeof(QAtomicInt) + sizeof(int) + (sizeof(QString) * count)">
+      <Parameter Name="count" Type="int"/>
+    </Intrinsic>
+    <Intrinsic Name="scheme" Expression="*((QString*)(((char*)(m_url.d) + memberOffset(0))))" />
+    <Intrinsic Name="username" Expression="*((QString*)(((char*)(m_url.d) + memberOffset(1))))" />
+    <Intrinsic Name="password" Expression="*((QString*)(((char*)(m_url.d) + memberOffset(2))))" />
+    <Intrinsic Name="host" Expression="*((QString*)(((char*)(m_url.d) + memberOffset(3))))" />
+    <Intrinsic Name="port" Expression="*((int*)(((char*)(m_url.d) + sizeof(QAtomicInt))))" />
+    <Intrinsic Name="path" Expression="*((QString*)(((char*)(m_url.d) + memberOffset(4))))" />
+    <Intrinsic Name="query" Expression="*((QString*)(((char*)(m_url.d) + memberOffset(5))))" />
+    <Intrinsic Name="fragment" Expression="*((QString*)(((char*)(m_url.d) + memberOffset(6))))" />
+    <DisplayString Condition="scheme().d.size == 0">{path()}</DisplayString>
+
+    <!-- Url with fragment -->
+    <DisplayString Condition="fragment().d.size != 0 &amp;&amp; port() != -1">
+      {scheme()}://{host()}:{port()}{path()}?{query()}#{fragment()}
+    </DisplayString>
+    <DisplayString Condition="fragment().d.size != 0">
+      {scheme()}://{host()}{path()}?{query()}#{fragment()}
+    </DisplayString>
+
+    <!-- Url with query -->
+    <DisplayString Condition="query().d.size != 0 &amp;&amp; port() != -1">
+      {scheme()}://{host()}:{port()}{path()}?{query()}
+    </DisplayString>
+    <DisplayString Condition="query().d.size != 0">
+      {scheme()}://{host()}{path()}?{query()}
+    </DisplayString>
+
+    <!-- Url with path -->
+    <DisplayString Condition="path().d.size != 0 &amp;&amp; port() != -1">
+      {scheme()}://{host()}:{port()}{path()}
+    </DisplayString>
+    <DisplayString Condition="path().d.size != 0">
+      {scheme()}://{host()}{path()}
+    </DisplayString>
+
+    <!-- Url with host only -->
+    <DisplayString Condition="port() != -1">{scheme()}://{host()}:{port()}</DisplayString>
+    <DisplayString>{scheme()}://{host()}</DisplayString>
+
+    <Expand>
+      <Item Name="[scheme]">scheme()</Item>
+      <Item Name="[username]">username()</Item>
+      <Item Name="[password]">password()</Item>
+      <Item Name="[host]">host()</Item>
+      <Item Name="[port]">port()</Item>
+      <Item Name="[path]">path()</Item>
+      <Item Name="[query]">query()</Item>
+      <Item Name="[fragment]">fragment()</Item>
+    </Expand>
+  </Type>
+
+  <Type Name="nx::Mutex">
+    <DisplayString>{*m_delegate._Mypair._Myval2}</DisplayString>
+    <Expand>
+      <ExpandedItem>m_delegate._Mypair._Myval2</ExpandedItem>
+    </Expand>
+  </Type>
+
+  <Type Name="nx::MutexDebugDelegate">
+    <Intrinsic Name="size" Expression="currentLockStack.c._Mypair._Myval2._Mysize" />
+    <DisplayString Condition="size()==0">Unlocked</DisplayString>
+    <DisplayString Condition="size()!=0">Locked by {threadHoldingMutex}</DisplayString>
+  </Type>
+
+</AutoVisualizer>
