@@ -2,15 +2,23 @@
 
 #include "search_line_edit.h"
 
+#include <QtGui/QAction>
 #include <QtWidgets/QCompleter>
 #include <QtWidgets/QLineEdit>
-#include <QtGui/QAction>
-
-#include <ui/common/palette.h>
-#include <nx/vms/client/core/skin/skin.h>
-#include <utils/common/delayed.h>
 
 #include <nx/utils/pending_operation.h>
+#include <nx/vms/client/core/skin/skin.h>
+#include <ui/common/palette.h>
+#include <utils/common/delayed.h>
+
+namespace {
+
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kSearchSubstitutions =
+    {{QnIcon::Normal, {.primary = "light16"}}};
+
+NX_DECLARE_COLORIZED_ICON(kSearchIcon, "16x16/Outline/search.svg", kSearchSubstitutions);
+
+}  // namespace
 
 namespace nx::vms::client::desktop {
 
@@ -20,7 +28,7 @@ SearchLineEdit::SearchLineEdit(QWidget* parent):
         [this]() { emit textChanged(m_lineEdit->text()); }, 0, this))
 {
     m_lineEdit->setPlaceholderText(tr("Search"));
-    m_glassIcon = m_lineEdit->addAction(qnSkin->icon("theme/input_search_16.svg"),
+    m_glassIcon = m_lineEdit->addAction(qnSkin->icon(kSearchIcon),
         QLineEdit::LeadingPosition);
     m_lineEdit->setClearButtonEnabled(true);
 
