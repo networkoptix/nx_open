@@ -75,8 +75,6 @@ public:
     bool restoreLastPositionWhenOpened() const;
     void setRestoreLastPositionWhenOpened(bool value = true);
 
-    bool isRunning() const;
-
 signals:
     void initialized();
     void sourceChanged();
