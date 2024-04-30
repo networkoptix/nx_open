@@ -33,7 +33,7 @@ private:
     /** Buffer to upload the scaled frame. */
     CUdeviceptr m_scaledFrame = 0;
 
-    CUgraphicsResource m_cuResource;
+    CUgraphicsResource m_cuResource = nullptr;
 
     /** Buffer object to upload the texture data. */
     GLuint m_pbo = 0;

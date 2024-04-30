@@ -462,10 +462,13 @@ int NvDecoder::ReconfigureDecoder(CUVIDEOFORMAT *pVideoFormat)
 *  0: fail, >=1: succeeded
 */
 int NvDecoder::HandlePictureDecode(CUVIDPICPARAMS *pPicParams) {
+    if (m_checkOnlyMode)
+        return 0;
+
     if (!m_hDecoder)
     {
         NVDEC_THROW_ERROR("Decoder not initialized.", CUDA_ERROR_NOT_INITIALIZED);
-        return false;
+        return 0;
     }
     m_nPicNumInDecodeOrder[pPicParams->CurrPicIdx] = m_nDecodePicCnt++;
     CUDA_DRVAPI_CALL(NvidiaDriverApiProxy::instance().cuCtxPushCurrent(m_cuContext));
@@ -498,10 +501,12 @@ int NvDecoder::HandlePictureDisplay(CUVIDPARSERDISPINFO *pDispInfo) {
     unsigned int nSrcPitch = 0;
     CUDA_DRVAPI_CALL(NvidiaDriverApiProxy::instance().cuCtxPushCurrent(m_cuContext));
 
+
     uint8_t *pDecodedFrame = m_frameQueue.getFreeFrame();
     if (pDecodedFrame == nullptr)
     {
         NX_WARNING(this, "Not enought frame buffers!");
+        throw NVDECException::makeNVDECException("Out of memory", CUDA_ERROR_OUT_OF_MEMORY, __FUNCTION__, __FILE__, __LINE__);
         return 1;
     }
 
@@ -550,11 +555,12 @@ int NvDecoder::HandlePictureDisplay(CUVIDPARSERDISPINFO *pDispInfo) {
     return 1;
 }
 
-NvDecoder::NvDecoder(CUcontext cuContext, bool bUseDeviceFrame, cudaVideoCodec eCodec, bool bLowLatency,
-    const Rect *pCropRect, const Dim *pResizeDim, int maxWidth, int maxHeight, unsigned int clkRate,
-    bool force_zero_latency) :
-    m_cuContext(cuContext), m_bUseDeviceFrame(bUseDeviceFrame), m_eCodec(eCodec),
-    m_nMaxWidth (maxWidth), m_nMaxHeight(maxHeight), m_bForce_zero_latency(force_zero_latency)
+NvDecoder::NvDecoder(CUcontext cuContext, bool bUseDeviceFrame, cudaVideoCodec eCodec,
+    bool checkOnlyMode, bool bLowLatency, const Rect *pCropRect, const Dim *pResizeDim,
+    int maxWidth, int maxHeight, unsigned int clkRate, bool force_zero_latency) :
+    m_cuContext(cuContext), m_checkOnlyMode(checkOnlyMode), m_bUseDeviceFrame(bUseDeviceFrame),
+    m_eCodec(eCodec), m_nMaxWidth (maxWidth), m_nMaxHeight(maxHeight),
+    m_bForce_zero_latency(force_zero_latency)
 {
     if (!NvidiaDriverDecoderProxy::instance().load() || !NvidiaDriverApiProxy::instance().load())
         throw NVDECException::makeNVDECException("Failed to load driver library", CUDA_SUCCESS, __FUNCTION__, __FILE__, __LINE__);

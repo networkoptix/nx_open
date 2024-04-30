@@ -53,8 +53,10 @@ public:
     Property<bool> showFisheyeCalibrationGrid{this, "showFisheyeCalibrationGrid"};
     Property<bool> hardwareDecodingEnabledProperty{this, "hardwareDecodingEnabled", false,
         "Whether hardware video decoding is used, if available."};
-    Property<int> maxHardwareDecoders{this, "maxHardwareDecoders", 8,
-        "Maximum number of hardware decoders."};
+    Property<int> maxIntelHardwareDecoders{this, "maxIntelHardwareDecoders", 8,
+        "Maximum number of hardware decoders for Intel QS."};
+    Property<int> maxNVidiaHardwareDecoders{ this, "maxNVidiaHardwareDecoders", 64,
+        "Maximum number of hardware decoders for NVidia." };
 
     Property<QString> locale{this, "locale", nx::branding::defaultLocale()};
 

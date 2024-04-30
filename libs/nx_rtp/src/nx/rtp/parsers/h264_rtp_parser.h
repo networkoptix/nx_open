@@ -3,7 +3,6 @@
 #pragma once
 
 #include <QtCore/QByteArray>
-#include <QtCore/QMap>
 
 #include <nx/codec/nal_units.h>
 #include <nx/media/video_data_packet.h>
@@ -29,7 +28,6 @@ public:
 
 private:
     RtpChunkBuffer m_chunks;
-    QMap <int, QByteArray> m_allNonSliceNal;
     std::vector<uint8_t> m_sdpSpsPps;
     SPSUnit m_sps;
     bool m_spsInitialized;
