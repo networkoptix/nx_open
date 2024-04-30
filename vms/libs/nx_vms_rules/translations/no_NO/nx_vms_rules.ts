@@ -783,42 +783,42 @@
     <name>nx::vms::rules::SaasIssueEvent</name>
     <message>
       <source>License migration issue</source>
-      <translation type="unfinished">License migration issue</translation>
+      <translation>Problem med lisensmigrering</translation>
     </message>
     <message>
       <source>Recording services disabled</source>
-      <translation type="unfinished">Recording services disabled</translation>
+      <translation>Opptakstjenester er deaktivert</translation>
     </message>
     <message>
       <source>Cloud storage services disabled</source>
-      <translation type="unfinished">Cloud storage services disabled</translation>
+      <translation>Skylagringstjenester er deaktivert</translation>
     </message>
     <message>
       <source>Paid integration services disabled</source>
-      <translation type="unfinished">Paid integration services disabled</translation>
+      <translation>Betalte integreringstjenester er deaktivert</translation>
     </message>
     <message>
       <source>Services issue</source>
-      <translation type="unfinished">Services issue</translation>
+      <translation>Tjenesteproblem</translation>
     </message>
     <message numerus="yes">
       <source>Recording on %n channels was stopped due to service overuse.</source>
       <translation type="unfinished">
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
+        <numerusform>Opptak på %n kanaler ble stoppet på grunn av overforbruk av tjenesten.</numerusform>
         <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
       <translation type="unfinished">
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
+        <numerusform>Sikkerhetskopiering av skylagring på %n -kanaler ble stoppet på grunn av overforbruk av tjenesten.</numerusform>
         <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
       <translation type="unfinished">
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
+        <numerusform>Bruk av betalte integreringstjenester på %n -kanaler ble stoppet på grunn av overforbruk av tjenesten.</numerusform>
         <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
       </translation>
     </message>

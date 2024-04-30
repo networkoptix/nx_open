@@ -36,7 +36,7 @@
     </message>
     <message>
       <source>Begin When</source>
-      <translation type="unfinished">Begin When</translation>
+      <translation>開始時間</translation>
     </message>
     <message>
       <source>Occurs at</source>
@@ -44,15 +44,15 @@
     </message>
     <message>
       <source>Of Type</source>
-      <translation type="unfinished">Of Type</translation>
+      <translation>類型</translation>
     </message>
     <message>
       <source>And Caption</source>
-      <translation type="unfinished">And Caption</translation>
+      <translation>和標題</translation>
     </message>
     <message>
       <source>And Description</source>
-      <translation type="unfinished">And Description</translation>
+      <translation>和敘述</translation>
     </message>
   </context>
   <context>
@@ -72,15 +72,15 @@
     </message>
     <message>
       <source>Occurs At</source>
-      <translation type="unfinished">Occurs At</translation>
+      <translation>發生於</translation>
     </message>
     <message>
       <source>Of Type</source>
-      <translation type="unfinished">Of Type</translation>
+      <translation>類型</translation>
     </message>
     <message>
       <source>And Object</source>
-      <translation type="unfinished">And Object</translation>
+      <translation>和物件</translation>
     </message>
   </context>
   <context>
@@ -113,7 +113,7 @@
     </message>
     <message>
       <source>Create Bookmark</source>
-      <translation type="unfinished">Create Bookmark</translation>
+      <translation>建立書籤</translation>
     </message>
     <message>
       <source>At</source>
@@ -121,11 +121,11 @@
     </message>
     <message>
       <source>Fixed Duration</source>
-      <translation type="unfinished">Fixed Duration</translation>
+      <translation>固定長度</translation>
     </message>
     <message>
       <source>Add Tags</source>
-      <translation type="unfinished">Add Tags</translation>
+      <translation>增加標籤</translation>
     </message>
   </context>
   <context>
@@ -163,7 +163,7 @@
     </message>
     <message>
       <source>Input Signal on Device</source>
-      <translation type="unfinished">Input Signal on Device</translation>
+      <translation>裝置上的輸入訊號</translation>
     </message>
     <message>
       <source>Occurs at</source>
@@ -281,7 +281,7 @@
     </message>
     <message>
       <source>Fixed Duration</source>
-      <translation type="unfinished">Fixed Duration</translation>
+      <translation>固定長度</translation>
     </message>
   </context>
   <context>
@@ -312,7 +312,7 @@
     </message>
     <message>
       <source>Fixed Duration</source>
-      <translation type="unfinished">Fixed Duration</translation>
+      <translation>固定長度</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -327,7 +327,7 @@
     </message>
     <message>
       <source>On Layout</source>
-      <translation type="unfinished">On Layout</translation>
+      <translation>在佈局上</translation>
     </message>
     <message>
       <source>Set to Fullscreen</source>
@@ -339,14 +339,14 @@
     </message>
     <message>
       <source>Rewind</source>
-      <translation type="unfinished">Rewind</translation>
+      <translation>倒帶</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::ExitFullscreenAction</name>
     <message>
       <source>On Layout</source>
-      <translation type="unfinished">On Layout</translation>
+      <translation>在佈局上</translation>
     </message>
     <message>
       <source>Exit Fullscreen</source>
@@ -388,19 +388,19 @@
     </message>
     <message>
       <source>Omit logging</source>
-      <translation type="unfinished">Omit logging</translation>
+      <translation>省略日誌記錄</translation>
     </message>
     <message>
       <source>And Source</source>
-      <translation type="unfinished">And Source</translation>
+      <translation>及來源</translation>
     </message>
     <message>
       <source>And Caption</source>
-      <translation type="unfinished">And Caption</translation>
+      <translation>和標題</translation>
     </message>
     <message>
       <source>And Description</source>
-      <translation type="unfinished">And Description</translation>
+      <translation>和敘述</translation>
     </message>
   </context>
   <context>
@@ -419,7 +419,7 @@
     </message>
     <message>
       <source>HTTP(S) Request</source>
-      <translation type="unfinished">HTTP(S) Request</translation>
+      <translation>HTTP(S) 請求</translation>
     </message>
     <message>
       <source>URL</source>
@@ -427,7 +427,7 @@
     </message>
     <message>
       <source>Content</source>
-      <translation type="unfinished">Content</translation>
+      <translation>內容</translation>
     </message>
     <message>
       <source>Method</source>
@@ -446,7 +446,7 @@
     <name>nx::vms::rules::LdapSyncIssueEvent</name>
     <message>
       <source>Ldap Sync Issue Event</source>
-      <translation type="unfinished">Ldap Sync Issue Event</translation>
+      <translation>LDAP 同步問題事件</translation>
     </message>
   </context>
   <context>
@@ -484,7 +484,7 @@
     </message>
     <message>
       <source>Begin When</source>
-      <translation type="unfinished">Begin When</translation>
+      <translation>開始時間</translation>
     </message>
     <message>
       <source>Occurs at</source>
@@ -586,7 +586,7 @@
     </message>
     <message>
       <source>Show Desktop Notification</source>
-      <translation type="unfinished">Show Desktop Notification</translation>
+      <translation>顯示桌面通知</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -605,7 +605,7 @@
     </message>
     <message>
       <source>Rewind</source>
-      <translation type="unfinished">Rewind</translation>
+      <translation>倒帶</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -620,7 +620,7 @@
     </message>
     <message>
       <source>Panic Recording</source>
-      <translation type="unfinished">Panic Recording</translation>
+      <translation>緊急錄影</translation>
     </message>
   </context>
   <context>
@@ -631,7 +631,7 @@
     </message>
     <message>
       <source>Play Sound</source>
-      <translation type="unfinished">Play Sound</translation>
+      <translation>播放聲音</translation>
     </message>
     <message>
       <source>At</source>
@@ -662,11 +662,11 @@
     </message>
     <message>
       <source>And Caption</source>
-      <translation type="unfinished">And Caption</translation>
+      <translation>和標題</translation>
     </message>
     <message>
       <source>And Description</source>
-      <translation type="unfinished">And Description</translation>
+      <translation>和敘述</translation>
     </message>
     <message>
       <source>And Level Is</source>
@@ -698,7 +698,7 @@
     </message>
     <message>
       <source>Begin When</source>
-      <translation type="unfinished">Begin When</translation>
+      <translation>開始時間</translation>
     </message>
   </context>
   <context>
@@ -744,7 +744,7 @@
     </message>
     <message>
       <source>Add Source Device name to Body</source>
-      <translation type="unfinished">Add Source Device name to Body</translation>
+      <translation>將來源裝置名稱新增至內容</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -763,7 +763,7 @@
     </message>
     <message>
       <source>Repeat Sound</source>
-      <translation type="unfinished">Repeat Sound</translation>
+      <translation>重複播放聲音</translation>
     </message>
     <message>
       <source>At</source>
@@ -778,23 +778,23 @@
     <name>nx::vms::rules::SaasIssueEvent</name>
     <message>
       <source>License migration issue</source>
-      <translation type="unfinished">License migration issue</translation>
+      <translation>授權轉移問題</translation>
     </message>
     <message>
       <source>Recording services disabled</source>
-      <translation type="unfinished">Recording services disabled</translation>
+      <translation>錄影服務已停用</translation>
     </message>
     <message>
       <source>Cloud storage services disabled</source>
-      <translation type="unfinished">Cloud storage services disabled</translation>
+      <translation>雲端儲存服務已停用</translation>
     </message>
     <message>
       <source>Paid integration services disabled</source>
-      <translation type="unfinished">Paid integration services disabled</translation>
+      <translation>付費整合服務已停用</translation>
     </message>
     <message>
       <source>Services issue</source>
-      <translation type="unfinished">Services issue</translation>
+      <translation>服務問題</translation>
     </message>
     <message numerus="yes">
       <source>Recording on %n channels was stopped due to service overuse.</source>
@@ -831,7 +831,7 @@
     </message>
     <message>
       <source>Additional Recipients</source>
-      <translation type="unfinished">Additional Recipients</translation>
+      <translation>其他收件者</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -920,7 +920,7 @@
     </message>
     <message>
       <source>Rewind</source>
-      <translation type="unfinished">Rewind</translation>
+      <translation>倒帶</translation>
     </message>
     <message>
       <source>Force Alarm Layout Opening</source>
@@ -978,7 +978,7 @@
     </message>
     <message>
       <source>At Device</source>
-      <translation type="unfinished">At Device</translation>
+      <translation>於裝置</translation>
     </message>
     <message>
       <source>To users</source>
@@ -1052,7 +1052,7 @@
     </message>
     <message>
       <source>Fixed Duration</source>
-      <translation type="unfinished">Fixed Duration</translation>
+      <translation>固定長度</translation>
     </message>
     <message>
       <source>Custom Text</source>
@@ -1134,7 +1134,7 @@
     </message>
     <message>
       <source>Unknown action</source>
-      <translation type="unfinished">Unknown action</translation>
+      <translation>未知的動作</translation>
     </message>
   </context>
 </TS>
