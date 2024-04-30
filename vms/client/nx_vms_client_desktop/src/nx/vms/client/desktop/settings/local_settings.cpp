@@ -158,8 +158,6 @@ void migrateSettingsFrom5_1(LocalSettings* settings, QSettings* oldSettings)
     migrateValue(settings->autoFpsLimit, "isAutoFpsLimit");
     migrateValue(settings->showFisheyeCalibrationGrid, "isFisheyeCalibrationGridShown");
     migrateValue(settings->hardwareDecodingEnabledProperty, "isHardwareDecodingEnabledProperty");
-    migrateValue(settings->maxIntelHardwareDecoders);
-    migrateValue(settings->maxNVidiaHardwareDecoders);
     migrateValue(settings->locale);
     migrateValue(settings->logLevel);
     migrateValue(settings->pcUuid);
