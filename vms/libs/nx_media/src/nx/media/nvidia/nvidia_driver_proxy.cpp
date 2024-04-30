@@ -152,7 +152,15 @@ bool NvidiaDriverApiProxy::load()
         return false;
 
     cuDriverGetVersion = (CuDriverGetVersionType) m_loader.getFunction("cuDriverGetVersion");
-    if (!cuGetErrorName)
+    if (!cuDriverGetVersion)
+        return false;
+
+    cuMemGetInfo = (CuMemGetInfo) m_loader.getFunction("cuMemGetInfo");
+    if (!cuMemGetInfo)
+        return false;
+
+    cuCtxGetApiVersion = (CuCtxGetApiVersion) m_loader.getFunction("cuCtxGetApiVersion");
+    if (!cuCtxGetApiVersion)
         return false;
 
     return true;
