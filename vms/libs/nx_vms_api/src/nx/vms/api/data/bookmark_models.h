@@ -76,6 +76,9 @@ struct NX_VMS_API BookmarkFilterBase
      * can contain several words, any of them can match a bookmark. Each of these words can match
      * a bookmark if the caption or tag contains the Text-search word in the middle of its value.
      * For example: a bookmark has tag1="12345", the search string "234" will match the bookmark.
+     * In case of several words are provided bookmark should contains all of them. If you need to
+     * find bookmark by any of them it is needed to use OR (case sensitive) word as a delimiter.
+     * For example: text="tag1 OR tag2".
     */
     QString text;
 
