@@ -483,7 +483,7 @@ void QnCameraBookmarksManagerPrivate::unregisterQuery(const QUuid &queryId)
     m_queries.remove(queryId);
 }
 
-void QnCameraBookmarksManagerPrivate::sendQueryRequest(
+rest::Handle QnCameraBookmarksManagerPrivate::sendQueryRequest(
     const QnCameraBookmarksQueryPtr& query,
     BookmarksCallbackType callback)
 {
@@ -500,7 +500,7 @@ void QnCameraBookmarksManagerPrivate::sendQueryRequest(
         if (callback)
             callback(false, kInvalidRequestId, QnCameraBookmarkList());
 
-        return;
+        return kInvalidRequestId;
     }
 
     query->setState(QnCameraBookmarksQuery::State::requested);
@@ -521,6 +521,7 @@ void QnCameraBookmarksManagerPrivate::sendQueryRequest(
     NX_VERBOSE(this, "Sending initial request [%1] with filter %2",
         info.requestId,
         filter);
+    return info.requestId;
 }
 
 void QnCameraBookmarksManagerPrivate::sendQueryTailRequest(

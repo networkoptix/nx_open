@@ -12,6 +12,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/algorithm/index_of.h>
+#include <nx/utils/guarded_callback.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -105,14 +106,13 @@ public:
 
 private:
     int getBookmarkIndex(const nx::Uuid& bookmarkId) const;
-    nx::utils::SharedGuardPtr startUpdateOperation();
+    bool startUpdateOperation();
     bool isUpdating() const;
 
 private:
     using UniqIdToStringHash = QHash<QString, QString>;
-    using UpdatingOperationWeakGuard = std::weak_ptr<nx::utils::SharedGuard>;
 
-    UpdatingOperationWeakGuard m_updatingWeakGuard;
+    int m_requestId = 0;
     QnCameraBookmarkSearchFilter m_filter;
     QnCameraBookmarksQueryPtr m_query;
     QnCameraBookmarkList m_bookmarks;
@@ -129,7 +129,7 @@ QnSearchBookmarksModelPrivate::QnSearchBookmarksModelPrivate(QnSearchBookmarksMo
     connect(systemContext()->cameraNamesWatcher(), &QnCameraNamesWatcher::cameraNameChanged, this,
         [this](/*const QString &cameraUuid*/)
         {
-            if (m_updatingWeakGuard.lock())
+            if (isUpdating())
                 return;
 
             Q_Q(QnSearchBookmarksModel);
@@ -143,7 +143,7 @@ QnSearchBookmarksModelPrivate::QnSearchBookmarksModelPrivate(QnSearchBookmarksMo
     connect(bookmarksManager, &QnCameraBookmarksManager::bookmarkRemoved, this,
         [this](const nx::Uuid& bookmarkId)
         {
-            if (m_updatingWeakGuard.lock())
+            if (isUpdating())
                 return;
 
             const auto index = getBookmarkIndex(bookmarkId);
@@ -159,7 +159,7 @@ QnSearchBookmarksModelPrivate::QnSearchBookmarksModelPrivate(QnSearchBookmarksMo
     connect(bookmarksManager, &QnCameraBookmarksManager::bookmarkUpdated, this,
         [this](const QnCameraBookmark& bookmark)
         {
-            if (m_updatingWeakGuard.lock())
+            if (isUpdating())
                 return;
 
             const auto index = getBookmarkIndex(bookmark.guid);
@@ -209,61 +209,60 @@ void QnSearchBookmarksModelPrivate::setCameras(const std::set<nx::Uuid>& cameras
 
 void QnSearchBookmarksModelPrivate::cancelUpdatingOperation()
 {
-    if (!m_updatingWeakGuard.lock())
+    if (!isUpdating())
         return;
 
-    m_bookmarks.clear();
+    m_requestId = 0;
 
-    m_updatingWeakGuard.lock()->fire();
-    m_updatingWeakGuard = UpdatingOperationWeakGuard();
+    Q_Q(QnSearchBookmarksModel);
+    q->beginResetModel();
+    m_bookmarks.clear();
+    q->endResetModel();
 }
 
 bool QnSearchBookmarksModelPrivate::isUpdating() const
 {
-    return m_updatingWeakGuard.lock() != nullptr;
+    return m_requestId > 0;
 }
 
-nx::utils::SharedGuardPtr QnSearchBookmarksModelPrivate::startUpdateOperation()
+bool QnSearchBookmarksModelPrivate::startUpdateOperation()
 {
     if (isUpdating())
     {
         if (m_query && m_query->filter() == m_filter)
-            return {}; //< Makes no sense to send a new request with the same filter data.
+            return false; //< Makes no sense to send a new request with the same filter data.
 
         cancelUpdatingOperation();
     }
-
-    Q_Q(QnSearchBookmarksModel);
-
-    q->beginResetModel();
-    const auto guard = nx::utils::makeSharedGuard(
-        [q]() { q->endResetModel(); });
-
-    m_updatingWeakGuard = UpdatingOperationWeakGuard(guard);
-    return guard;
+    return true;
 }
 
 void QnSearchBookmarksModelPrivate::applyFilter()
 {
-    const auto endUpdateOperationGuard = startUpdateOperation();
-    if (!endUpdateOperationGuard)
+    const bool canStart = startUpdateOperation();
+    if (!canStart)
         return;
 
     // FIXME: #sivanov Ensure request is sent to the correct system context (or to all required).
     auto bookmarksManager = appContext()->currentSystemContext()->cameraBookmarksManager();
     m_query = bookmarksManager->createQuery(m_filter);
-    bookmarksManager->sendQueryRequest(m_query,
-        [this, endUpdateOperationGuard]
-        (bool success, int /*requestId*/, const QnCameraBookmarkList& bookmarks)
+    m_requestId = bookmarksManager->sendQueryRequest(m_query, nx::utils::guarded(this,
+        [this]
+        (bool success, int requestId, const QnCameraBookmarkList& bookmarks)
         {
-            if (m_updatingWeakGuard.lock().get() != endUpdateOperationGuard.get())
+            if (m_requestId != requestId)
                 return; //< Operation was cancelled
 
+            m_requestId = 0;
+
+            Q_Q(QnSearchBookmarksModel);
+            q->beginResetModel();
             if (success)
                 m_bookmarks = bookmarks;
             else
                 m_bookmarks.clear();
-        });
+            q->endResetModel();
+        }));
 }
 
 void QnSearchBookmarksModelPrivate::sort(int column, Qt::SortOrder order)

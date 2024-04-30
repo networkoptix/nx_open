@@ -77,8 +77,9 @@ public:
      * @param query Target query.
      * @param callback Callback for received bookmarks data. Will be called when data is fully
      *     loaded.
+     * @returns Request ID.
      */
-    void sendQueryRequest(
+    rest::Handle sendQueryRequest(
         const QnCameraBookmarksQueryPtr& query,
         BookmarksCallbackType callback);
 
@@ -181,9 +182,14 @@ private:
 
     struct QueryInfo
     {
-        QnCameraBookmarksQueryWeakPtr   queryRef;           /**< Weak reference to Query object. */
-        QElapsedTimer                   requestTimer;       /**< Time of the last request. */
-        int                             requestId;          /**< Id of the last request. */
+        /** Weak reference to Query object. */
+        QnCameraBookmarksQueryWeakPtr queryRef;
+
+        /** Time of the last request. */
+        QElapsedTimer requestTimer;
+
+        /** Id of the last request. */
+        rest::Handle requestId;
 
         QueryInfo();
         QueryInfo(const QnCameraBookmarksQueryPtr &query);

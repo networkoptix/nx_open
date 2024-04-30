@@ -73,12 +73,12 @@ void QnCameraBookmarksManager::deleteCameraBookmark(const nx::Uuid &bookmarkId, 
     emit bookmarkRemoved(bookmarkId);
 }
 
-void QnCameraBookmarksManager::sendQueryRequest(
+rest::Handle QnCameraBookmarksManager::sendQueryRequest(
     const QnCameraBookmarksQueryPtr& query,
     BookmarksCallbackType callback)
 {
     NX_ASSERT(query);
-    d->sendQueryRequest(query, callback);
+    return d->sendQueryRequest(query, callback);
 }
 
 void QnCameraBookmarksManager::sendQueryTailRequest(
