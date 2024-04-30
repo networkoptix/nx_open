@@ -406,7 +406,7 @@ bool canAddIntel(const QnConstCompressedVideoDataPtr& data, bool reverseMode)
         && appContext()->localSettings()->hardwareDecodingEnabled()
         && !reverseMode
         && QuickSyncVideoDecoderOldPlayer::instanceCount()
-            < appContext()->localSettings()->maxHardwareDecoders()
+            < appContext()->localSettings()->maxIntelHardwareDecoders()
         && QuickSyncVideoDecoderOldPlayer::isSupported(data);
 }
 
@@ -416,7 +416,7 @@ bool canAddNvidia(const QnConstCompressedVideoDataPtr& data, bool reverseMode)
         && appContext()->localSettings()->hardwareDecodingEnabled()
         && !reverseMode
         && NvidiaVideoDecoderOldPlayer::instanceCount()
-            < appContext()->localSettings()->maxHardwareDecoders()
+            < appContext()->localSettings()->maxNVidiaHardwareDecoders()
         && NvidiaVideoDecoderOldPlayer::isSupported(data);
     return false;
 }
@@ -640,6 +640,13 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(
     decodedFrame->flags = {};
     if (!dec->decode(data, &decodedFrame))
     {
+        if (dec->getLastDecodeResult() < 0 && dec->hardwareDecoder())
+        {
+            m_decoderData.decoder.reset();
+            m_mtx.unlock();
+            return Status_Skipped;
+        }
+
         m_mtx.unlock();
         if (m_decodeMode == QnAbstractVideoDecoder::DecodeMode_Fastest)
             return Status_Skipped;

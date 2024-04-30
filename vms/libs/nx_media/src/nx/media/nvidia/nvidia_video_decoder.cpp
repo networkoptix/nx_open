@@ -3,13 +3,13 @@
 #include "nvidia_video_decoder.h"
 #include <NvCodec/NvDecoder.h>
 
-#include <nx/media/nvidia/renderer.h>
-#include <nx/utils/log/log.h>
 #include <media/filters/h264_mp4_to_annexb.h>
+#include <nx/media/nvidia/nvidia_driver_proxy.h>
 #include <nx/media/nvidia/nvidia_utils.h>
 #include <nx/media/nvidia/nvidia_video_frame.h>
-
-#include <nx/media/nvidia/nvidia_driver_proxy.h>
+#include <nx/media/nvidia/renderer.h>
+#include <nx/utils/log/log.h>
+#include <Utils/NvCodecUtils.h>
 
 namespace {
 
@@ -96,32 +96,23 @@ bool NvidiaVideoDecoder::isAvailable()
 }
 
 bool NvidiaVideoDecoder::isCompatible(
-    const QnConstCompressedVideoDataPtr& /*frame*/, AVCodecID codec, int /*width*/, int /*height*/)
+    const QnConstCompressedVideoDataPtr& frame, AVCodecID codec, int /*width*/, int /*height*/)
 {
-    if (FFmpeg2NvCodecId(codec) == cudaVideoCodec_NumCodecs) //< Codec is not supported.
+    NvidiaVideoDecoder decoder(/*checkMode*/ true);
+    if (!decoder.decode(frame))
         return false;
 
-    if (!NvidiaDriverApiProxy::instance().load())
+    // Push frame one more time to force parsing of video header to configure decoder settings.
+    // NvDecoder::HandleVideoSequence for h264/h265 not called after passing one frame only.
+    if (!decoder.decode(frame))
         return false;
 
-    CUresult status = NvidiaDriverApiProxy::instance().cuInit(0);
-    if (status != CUDA_SUCCESS)
-    {
-        NX_DEBUG(NX_SCOPE_TAG, "Failed to init nvidia decoder: %1", toString(status));
-        return false;
-    }
-
-    CUdevice device = 0;
-    status = NvidiaDriverApiProxy::instance().cuDeviceGet(&device, /*gpu*/0);
-    if (status != CUDA_SUCCESS)
-    {
-        NX_DEBUG(NX_SCOPE_TAG, "Failed to get device: %1", toString(status));
-        return false;
-    }
-    return true;
+    int kFreeMemoryLimit = 1024*1024*128;
+    return freeGpuMemory() > kFreeMemoryLimit;
 }
 
-NvidiaVideoDecoder::NvidiaVideoDecoder()
+NvidiaVideoDecoder::NvidiaVideoDecoder(bool checkMode)
+    : m_checkMode(checkMode)
 {
     m_impl = std::make_unique<NvidiaVideoDecoderImpl>();
 }
@@ -138,7 +129,7 @@ bool NvidiaVideoDecoder::initialize(const QnConstCompressedVideoDataPtr& frame)
     CUresult status = NvidiaDriverApiProxy::instance().cuInit(0);
     if (status != CUDA_SUCCESS)
     {
-        NX_WARNING(this, "Failed to init nvidia decoder: %1", toString(status));
+        NX_DEBUG(this, "Failed to init nvidia decoder: %1", toString(status));
         return false;
     }
 
@@ -146,14 +137,14 @@ bool NvidiaVideoDecoder::initialize(const QnConstCompressedVideoDataPtr& frame)
     status = NvidiaDriverApiProxy::instance().cuDeviceGet(&device, /*gpu*/0);
     if (status != CUDA_SUCCESS)
     {
-        NX_WARNING(this, "Failed to get device: %1", toString(status));
+        NX_DEBUG(this, "Failed to get device: %1", toString(status));
         return false;
     }
 
     status = NvidiaDriverApiProxy::instance().cuCtxCreate(&m_impl->context, CU_CTX_SCHED_BLOCKING_SYNC, device);
     if (status != CUDA_SUCCESS)
     {
-        NX_WARNING(this, "Failed to create context: %1", toString(status));
+        NX_DEBUG(this, "Failed to create context: %1", toString(status));
         return false;
     }
     try
@@ -162,11 +153,12 @@ bool NvidiaVideoDecoder::initialize(const QnConstCompressedVideoDataPtr& frame)
             m_impl->context,
             true,
             FFmpeg2NvCodecId(frame->compressionType),
+            m_checkMode,
             /*bLowLatency*/ false);
     }
     catch (NVDECException& e)
     {
-        NX_WARNING(this, "Failed to create Nvidia decoder: %1", e.what());
+        NX_DEBUG(this, "Failed to create Nvidia decoder: %1", e.what());
         return false;
     }
 
@@ -180,7 +172,8 @@ bool NvidiaVideoDecoder::decode(const QnConstCompressedVideoDataPtr& packet)
 
     if (!m_impl->decoder && !initialize(packet))
     {
-        NX_ERROR(this, "Failed to initialize nvidia decoder");
+        if (!m_checkMode)
+            NX_ERROR(this, "Failed to initialize nvidia decoder");
         return false;
     }
 
@@ -199,7 +192,8 @@ bool NvidiaVideoDecoder::decode(const QnConstCompressedVideoDataPtr& packet)
     }
     catch (NVDECException& e)
     {
-        NX_WARNING(this, "Failed to decode frame: %1", e.what());
+        if (!m_checkMode)
+            NX_WARNING(this, "Failed to decode frame: %1", e.what());
         return false;
     }
     return true;
