@@ -2520,6 +2520,7 @@ void SystemSettings::setCloudPollingInterval(std::chrono::seconds period)
 void SystemSettings::update(const api::SystemSettings& value)
 {
     d->cloudAccountNameAdaptor->setValue(value.cloudAccountName);
+    d->organizationIdAdaptor->setValue(value.organizationId);
     d->cloudSystemIdAdaptor->setValue(value.cloudSystemID);
     if (value.defaultExportVideoCodec)
         d->defaultExportVideoCodecAdaptor->setValue(*value.defaultExportVideoCodec);
