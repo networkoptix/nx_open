@@ -7,7 +7,7 @@
 
 #include <QtCore/QTimer>
 
-#include <nx/utils/log/assert.h>
+#include <nx/utils/log/log.h>
 
 namespace nx::vms::client::desktop {
 
@@ -230,6 +230,8 @@ struct SharedMemoryManager::Private
         if (!NX_ASSERT(process, "Current process is not registered"))
             return;
 
+        NX_DEBUG(this, "Process %1 enters session %2",
+            process->pid, process->sessionId.debugRepresentation());
         process->sessionId = sessionId;
 
         memoryInterface->setData(data);
@@ -240,13 +242,23 @@ struct SharedMemoryManager::Private
         SharedMemoryLocker guard(memoryInterface);
         auto data = memoryInterface->data();
         auto process = findCurrentProcess(data);
-        if (!NX_ASSERT(process && process->sessionId != SessionId(), "Process is not registered"))
+        if (!NX_ASSERT(process, "Process is not registered"))
             return false;
+
+        // In case of race condition current session can be already unregistered.
+        if (process->sessionId == SessionId())
+        {
+            NX_WARNING(this, "Current process session is already unregistered.");
+            return false;
+        }
 
         const auto sessionId = std::exchange(process->sessionId, {});
         auto session = data.findSession(sessionId);
-        if (!NX_ASSERT(session, "Session is not registered"))
+        if (!NX_ASSERT(session, "Session data inconsistency"))
             return false;
+
+        NX_DEBUG(this, "Process %1 leaves session %2",
+            process->pid, process->sessionId.debugRepresentation());
 
         const bool sessionIsStillActive = sessionHasOtherProcesses(data, sessionId);
         if (!sessionIsStillActive)

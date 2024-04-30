@@ -29,11 +29,15 @@ struct NX_VMS_CLIENT_DESKTOP_API SessionId
 
     static SessionId fromString(const QString& value);
 
+    QString debugRepresentation() const;
+
     bool operator!=(const SessionId& other) const;
     bool operator==(const SessionId& other) const;
 
 private:
     QByteArray m_bytes;
+    QString m_systemId;
+    QString m_userId;
 };
 
 NX_REFLECTION_TAG_TYPE(SessionId, useStringConversionForSerialization)

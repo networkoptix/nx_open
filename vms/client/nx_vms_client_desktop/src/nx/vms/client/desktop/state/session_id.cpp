@@ -3,7 +3,7 @@
 #include "session_id.h"
 
 #include <nx/utils/cryptographic_hash.h>
-#include <nx/utils/log/assert.h>
+#include <nx/utils/log/log.h>
 
 namespace nx::vms::client::desktop {
 
@@ -26,7 +26,9 @@ SessionId::SessionId():
 }
 
 SessionId::SessionId(const QString& systemId, const QString& userId):
-    m_bytes(makeSessionId(systemId, userId))
+    m_bytes(makeSessionId(systemId, userId)),
+    m_systemId(systemId),
+    m_userId(userId)
 {
     NX_ASSERT(m_bytes.size() == SessionId::kDataSize);
 }
@@ -62,6 +64,14 @@ SessionId SessionId::fromString(const QString& value)
         QByteArray::fromBase64(value.toLatin1(), QByteArray::Base64UrlEncoding));
 }
 
+QString SessionId::debugRepresentation() const
+{
+    if (!m_userId.isEmpty() || !m_systemId.isEmpty())
+        return nx::format("%1:%2 [%3]", m_userId, m_systemId, toString());
+
+    return toString();
+}
+
 bool SessionId::operator!=(const SessionId& other) const
 {
     return m_bytes != other.m_bytes;
@@ -74,7 +84,7 @@ bool SessionId::operator==(const SessionId& other) const
 
 void PrintTo(const SessionId& value, ::std::ostream* os)
 {
-    *os << value.toString().toStdString();
+    *os << value.debugRepresentation().toStdString();
 }
 
 } // namespace nx::vms::client::desktop
