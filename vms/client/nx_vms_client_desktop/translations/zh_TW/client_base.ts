@@ -8167,7 +8167,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Recording will not be enabled on some cameras.</source>
-      <translation type="unfinished">Recording will not be enabled on some cameras.</translation>
+      <translation>某些攝影機不會啟用錄影。</translation>
     </message>
   </context>
   <context>
