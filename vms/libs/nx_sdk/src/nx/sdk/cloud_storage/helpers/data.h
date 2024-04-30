@@ -3,6 +3,7 @@
 #pragma once
 
 #include <chrono>
+#include <functional>
 #include <limits>
 #include <optional>
 #include <string>
@@ -60,6 +61,15 @@ private:
  * 1) Constructors which throw exception on invalid data.
  * 2) static `fromJson` functions which never throw and return error if parsing fails.
  */
+
+enum class SortOrder
+{
+    ascending,
+    descending,
+};
+
+std::string sortOrderToString(SortOrder order);
+SortOrder sortOrderFromString(const std::string& s);
 
 struct PluginManifest
 {
@@ -122,9 +132,33 @@ struct TimePeriod
     bool operator==(const TimePeriod& other) const;
 };
 
-using TimePeriodList = std::vector<TimePeriod>;
-nx::kit::Json timePeriodListToJson(const TimePeriodList& timePeriods);
-TimePeriodList timePeriodListFromJson(const char* data);
+struct TimePeriodList
+{
+    TimePeriodList(const char* jsonStr) noexcept(false);
+    TimePeriodList(const nx::kit::Json& json) noexcept(false);
+    TimePeriodList() = default;
+
+    static ValueOrError<TimePeriodList> fromJson(const char* jsonStr) noexcept;
+    static ValueOrError<TimePeriodList> fromJson(const nx::kit::Json& json) noexcept;
+
+    template<typename T>
+    TimePeriodList(const T&) = delete;
+
+    void forEach(std::function<void(const TimePeriod&)> func) const;
+    nx::kit::Json to_json() const;
+    void reverse();
+    void shrink(size_t size);
+    void append(const TimePeriod& period);
+
+    SortOrder sortOrder() const;
+    size_t size() const;
+    bool empty() const;
+    std::optional<TimePeriod> last() const;
+
+private:
+    SortOrder order = SortOrder::ascending;
+    std::vector<int64_t> periods;
+};
 
 struct KeyValuePair
 {
@@ -214,15 +248,6 @@ struct Bookmark
 using BookmarkList = std::vector<Bookmark>;
 
 BookmarkList bookmarkListFromJson(const char* data);
-
-enum class SortOrder
-{
-    ascending,
-    descending,
-};
-
-std::string sortOrderToString(SortOrder order);
-SortOrder sortOrderFromString(const std::string& s);
 
 // This filter will be passed to the plugin when bookmarks are queried by Server.
 // For processing example refer to the 'nx/sdk/cloud_storage/algorithm.cpp'
@@ -359,15 +384,16 @@ struct MotionFilter
     // Motion matches if motion.data intersected with any of rectangles in regions contains at
     // least one cell of motion i.e. the corresponding bit in the motion.data is set to 1.
     std::vector<Rect> regions;
+
     // Maximum number of objects to return.
     std::optional<int> limit;
 
     /** Found periods are sorted by the start timestamp using this order. */
-    SortOrder order = SortOrder::descending;
+    SortOrder order = SortOrder::ascending;
 
      // If distance between two time periods less than this value, then those periods must be merged
      // ignoring the gap.
-     std::chrono::milliseconds detailLevel;
+    std::chrono::milliseconds detailLevel;
 };
 
 using Attribute = KeyValuePair;

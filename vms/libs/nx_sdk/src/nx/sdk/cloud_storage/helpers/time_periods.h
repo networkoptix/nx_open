@@ -18,7 +18,7 @@ public:
     TimePeriods() = default;
     TimePeriods(const TimePeriodList& periods);
 
-    void setPeriods(const TimePeriodList& timePeriods);
+    void setPeriods(const TimePeriodList& periods);
 
     virtual void goToBeginning() const override;
     virtual bool next() const override;
@@ -26,8 +26,8 @@ public:
     virtual bool get(int64_t* outStartUs, int64_t* outEndUs) const override;
 
 private:
-    mutable TimePeriodList m_periods;
-    mutable TimePeriodList::const_iterator m_it;
+    mutable std::vector<TimePeriod> m_periods;
+    mutable std::vector<TimePeriod>::const_iterator m_it;
 };
 
 } // namespace nx::sdk::cloud_storage

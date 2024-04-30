@@ -348,25 +348,6 @@ bool motionMaches(const Motion& motion, const MotionFilter& filter)
     return false;
 }
 
-TimePeriodList sortAndLimitMotion(const MotionFilter& filter, TimePeriodList motion)
-{
-    std::sort(
-        motion.begin(), motion.end(),
-        [&filter](const auto& tp1, const auto& tp2)
-        {
-            return orderPred(
-                filter.order == SortOrder::ascending, tp1.startTimestamp, tp2.startTimestamp);
-        });
-
-    auto last = std::unique(motion.begin(), motion.end());
-    motion.erase(last, motion.end());
-
-    if (filter.limit && filter.limit < motion.size())
-        motion.resize(*filter.limit);
-
-    return motion;
-}
-
 bool objectTrackMatches(const ObjectTrack& objectTrack, const AnalyticsFilter& filter)
 {
     if (!filter.deviceIds.empty())
@@ -475,42 +456,17 @@ bool objectTrackMatches(const ObjectTrack& objectTrack, const AnalyticsFilter& f
     return true;
 }
 
-void sortAndLimitTimePeriods(
-    SortOrder order, std::optional<int> limit, TimePeriodList* outTimePeriods)
+TimePeriodList sortAndLimitTimePeriods(
+    TimePeriodList periods, SortOrder order, std::optional<int> limit)
 {
-    std::sort(
-        outTimePeriods->begin(), outTimePeriods->end(),
-        [order](const auto& tp1, const auto& tp2)
-        {
-            return order == SortOrder::ascending
-                ? tp1.startTimestamp < tp2.startTimestamp
-                : tp2.startTimestamp < tp1.startTimestamp;
-        });
+    if (order != periods.sortOrder())
+        periods.reverse();
 
-    auto last = std::unique(outTimePeriods->begin(), outTimePeriods->end());
-    outTimePeriods->erase(last, outTimePeriods->end());
+    if (limit)
+        periods.shrink(*limit);
 
-    TimePeriodList merged;
-    for (const auto& tp: *outTimePeriods)
-    {
-        if (tp.isInfinite())
-            continue;
-
-        if (limit && limit < merged.size())
-            break;
-
-        if (merged.empty() || tp.startTimestamp > merged.back().endTimestamp())
-        {
-            merged.push_back(tp);
-            continue;
-        }
-
-        merged.back().duration =
-            std::max(merged.back().duration, *tp.endTimestamp() - merged.back().startTimestamp);
-    }
-
-    *outTimePeriods = merged;
- }
+    return periods;
+}
 
 std::vector<uint8_t> fromBase64(const std::string& data)
 {

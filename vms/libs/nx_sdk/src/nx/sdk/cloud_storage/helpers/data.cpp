@@ -113,19 +113,33 @@ std::optional<Duration> getOptionalDurationValue(
     return Duration((int64_t) value.number_value());
 }
 
-std::vector<std::string> getStringListValue(const nx::kit::Json& json, const std::string& key)
+// string or int64_t are supported so far
+template<typename T>
+std::vector<T> getBasicListValue(const nx::kit::Json& json, const std::string& key)
 {
     const auto value = json[key];
     if (!value.is_array())
         throw std::logic_error("Value '" + key + "' is not an array");
 
-    std::vector<std::string> result;
+    std::vector<T> result;
     for (const auto& entry: value.array_items())
     {
-        if (!entry.is_string())
-            throw std::logic_error("Value '" + key + "' is not an array of strings");
-
-        result.push_back(entry.string_value());
+        if constexpr (std::is_same_v<std::string, T>)
+        {
+            if (!entry.is_string())
+                throw std::logic_error("Value '" + key + "' is not an array of strings");
+            result.push_back(entry.string_value());
+        }
+        else if constexpr (std::is_same_v<int64_t, T>)
+        {
+            if (!entry.is_number())
+                throw std::logic_error("Value '" + key + "' is not an array of numbers");
+            result.push_back(entry.number_value());
+        }
+        else
+        {
+            throw std::logic_error("Unsupported array value");
+        }
     }
 
     return result;
@@ -499,7 +513,7 @@ Bookmark::Bookmark(const nx::kit::Json& json)
     timeout = milliseconds(getIntValue(json, "timeout"));
     startTimestamp = milliseconds(getIntValue(json, "startTimestamp"));
     duration = milliseconds(getIntValue(json, "duration"));
-    tags = getStringListValue(json, "tags");
+    tags = getBasicListValue<std::string>(json, "tags");
     deviceId = getStringValue(json, "deviceId");
 }
 
@@ -646,7 +660,7 @@ BookmarkFilter::BookmarkFilter(const nx::kit::Json& json)
     order = sortOrderFromString(getStringValue(json, "order"));
     column = sortColumnFromString(getStringValue(json, "column"));
     minVisibleLength = getOptionalDurationValue<milliseconds>(json, "minVisibleLength");
-    deviceIds = getStringListValue(json, "deviceIds");
+    deviceIds = getBasicListValue<std::string>(json, "deviceIds");
     creationStartTimestamp = getOptionalDurationValue<milliseconds>(json, "creationStartTimestamp");
     creationEndTimestamp = getOptionalDurationValue<milliseconds>(json, "creationEndTimestamp");
 }
@@ -912,18 +926,184 @@ TimePeriod::TimePeriod(
 {
 }
 
+TimePeriodList::TimePeriodList(const char* jsonStr): TimePeriodList(parseJson(jsonStr))
+{
+}
+
+TimePeriodList::TimePeriodList(const nx::kit::Json& json) noexcept(false)
+{
+    order = sortOrderFromString(getStringValue(json, "order"));
+    periods = getBasicListValue<int64_t>(json, "periods");
+}
+
+ValueOrError<TimePeriodList> TimePeriodList::fromJson(const char* jsonStr) noexcept
+{
+    try
+    {
+        return ValueOrError<TimePeriodList>::makeValue(TimePeriodList(jsonStr));
+    }
+    catch (const std::exception& e)
+    {
+        return ValueOrError<TimePeriodList>::makeError(e.what());
+    }
+}
+
+ValueOrError<TimePeriodList> TimePeriodList::fromJson(const nx::kit::Json& json) noexcept
+{
+    try
+    {
+        return ValueOrError<TimePeriodList>::makeValue(TimePeriodList(json));
+    }
+    catch (const std::exception& e)
+    {
+        return ValueOrError<TimePeriodList>::makeError(e.what());
+    }
+}
+
+void TimePeriodList::forEach(std::function<void(const TimePeriod&)> func) const
+{
+    if (periods.size() < 2)
+        return;
+
+    auto p = TimePeriod(milliseconds(periods[0]), milliseconds(periods[1]));
+    func(p);
+
+    for (size_t i = 3; i < periods.size(); i += 2)
+    {
+        if (order == SortOrder::ascending)
+        {
+            p = TimePeriod(
+                milliseconds(periods[i - 1]) + p.startTimestamp,
+                milliseconds(periods[i]));
+        }
+        else
+        {
+            p = TimePeriod(
+                p.startTimestamp - milliseconds(periods[i - 1]),
+                milliseconds(periods[i]));
+        }
+
+        func(p);
+    }
+}
+
+SortOrder TimePeriodList::sortOrder() const
+{
+    return order;
+}
+
+void TimePeriodList::reverse()
+{
+    if (!periods.empty())
+    {
+        std::vector<TimePeriod> reversed;
+        forEach([&reversed](const auto& p) { reversed.push_back(p); });
+        std::reverse(reversed.begin(), reversed.end());
+        periods.clear();
+        periods.push_back(reversed[0].startTimestamp.count());
+        periods.push_back(reversed[0].duration.count());
+        for (size_t i = 1; i < reversed.size(); i++)
+        {
+            if (order == SortOrder::ascending)
+            {
+                periods.push_back(
+                    reversed[i - 1].startTimestamp.count() - reversed[i].startTimestamp.count());
+                periods.push_back(reversed[i].duration.count());
+            }
+            else
+            {
+                periods.push_back(
+                    reversed[i].startTimestamp.count() - reversed[i - 1].startTimestamp.count());
+                periods.push_back(reversed[i].duration.count());
+            }
+        }
+    }
+
+    if (order == SortOrder::ascending)
+        order = SortOrder::descending;
+    else
+        order = SortOrder::ascending;
+}
+
+void TimePeriodList::append(const TimePeriod& period)
+{
+    if (periods.empty())
+    {
+        periods.push_back(period.startTimestamp.count());
+    }
+    else
+    {
+        if (order == SortOrder::ascending)
+        {
+            periods.push_back(
+                period.startTimestamp.count() - periods[periods.size() - 2]);
+        }
+        else
+        {
+            periods.push_back(
+                periods[periods.size() - 2] - period.startTimestamp.count());
+        }
+    }
+
+    periods.push_back(period.duration.count());
+}
+
+bool TimePeriodList::empty() const
+{
+    return periods.empty();
+}
+
+std::optional<TimePeriod> TimePeriodList::last() const
+{
+    if (periods.empty())
+        return std::nullopt;
+
+    auto startTimestamp = periods[0];
+    for (size_t i = 2; i < periods.size(); i += 2)
+    {
+        if (order == SortOrder::ascending)
+            startTimestamp += periods[i];
+        else
+            startTimestamp -= periods[i];
+    }
+
+    return TimePeriod{milliseconds(startTimestamp), milliseconds(periods.back())};
+}
+
+size_t TimePeriodList::size() const
+{
+    return periods.size() / 2;
+}
+
+void TimePeriodList::shrink(size_t size)
+{
+    if (size < this->size())
+        periods.resize(size * 2);
+}
+
+nx::kit::Json TimePeriodList::TimePeriodList::to_json() const
+{
+    auto result = nx::kit::Json::object();
+    result["order"] = sortOrderToString(order);
+    auto periodArray = nx::kit::Json::array();
+    for (const int64_t& v: periods)
+        periodArray.push_back((double) v);
+
+    result["periods"] = periodArray;
+    return result;
+}
+
 MotionFilter::MotionFilter(const char* jsonData): MotionFilter(parseJson(jsonData))
 {
 }
 
 MotionFilter::MotionFilter(const nx::kit::Json& json)
 {
-    deviceIds = getStringListValue(json, "deviceIds");
+    deviceIds = getBasicListValue<std::string>(json, "deviceIds");
     timePeriod = getObjectValue<TimePeriod>(json, "timePeriod");
     regions = getObjectListValue<Rect>(json, "regions");
     const auto optionalLimit = getOptionalIntValue(json, "limit");
     limit = optionalLimit ? std::optional<int>((int)*optionalLimit) : std::nullopt;
-    order = sortOrderFromString(getStringValue(json, "order"));
     detailLevel = milliseconds(getIntValue(json, "detailLevel"));
 }
 
@@ -954,7 +1134,7 @@ ValueOrError<MotionFilter> MotionFilter::fromJson(const nx::kit::Json& json) noe
 bool MotionFilter::operator==(const MotionFilter& other) const
 {
     return other.detailLevel == detailLevel && other.deviceIds == deviceIds && other.limit == limit
-        && other.order == order && other.regions == regions && other.timePeriod == timePeriod;
+        && other.regions == regions && other.timePeriod == timePeriod;
 }
 
 nx::kit::Json MotionFilter::to_json() const
@@ -966,7 +1146,7 @@ nx::kit::Json MotionFilter::to_json() const
         });
 
     auto deviceIdJson = nx::kit::Json::array();
-    for (const auto id : deviceIds)
+    for (const auto& id: deviceIds)
         deviceIdJson.push_back(nx::kit::Json(id));
 
     result["deviceIds"] = objectListToJson(deviceIds);
@@ -975,20 +1155,6 @@ nx::kit::Json MotionFilter::to_json() const
         result["limit"] = *limit;
 
     return result;
-}
-
-nx::kit::Json timePeriodListToJson(const TimePeriodList& timePeriods)
-{
-    auto result = nx::kit::Json::array();
-    for (const auto& tp: timePeriods)
-        result.push_back(nx::kit::Json(tp));
-
-    return result;
-}
-
-TimePeriodList timePeriodListFromJson(const char* data)
-{
-    return objectListFromJson<TimePeriod>(data);
 }
 
 CodecInfoData::CodecInfoData()
@@ -1392,8 +1558,8 @@ AnalyticsFilter::AnalyticsFilter(const char* jsonData): AnalyticsFilter(parseJso
 
 AnalyticsFilter::AnalyticsFilter(const nx::kit::Json& json)
 {
-    deviceIds = getStringListValue(json, "deviceIds");
-    objectTypeIds = getStringListValue(json, "objectTypeIds");
+    deviceIds = getBasicListValue<std::string>(json, "deviceIds");
+    objectTypeIds = getBasicListValue<std::string>(json, "objectTypeIds");
     objectTrackId = getOptionalStringValue(json, "objectTrackId");
     timePeriod = getObjectValue<TimePeriod>(json, "timePeriod");
     boundingBox = getOptionalObjectValue<Rect>(json, "boundingBox");
