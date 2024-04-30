@@ -67,16 +67,4 @@ TableView
             BasicSelectableTableCellDelegate {}
         }
     }
-
-    Keys.onPressed: (event) =>
-    {
-        // Need to process Delete button separately from TableView, since it's allowed to delete rows,
-        // without selection for CheckableTableView.
-        if (event.key == Qt.Key_Delete
-            || (Qt.platform.os === "osx" && event.key == Qt.Key_Backspace))
-        {
-            deleteKeyPressed()
-            event.accepted = true;
-        }
-    }
 }

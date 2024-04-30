@@ -216,8 +216,8 @@ Dialog
                 }
             }
 
-            onDeleteKeyPressed: root.deleteCheckedRules()
-            onEnterKeyPressed:
+            deleteShortcut.onActivated: root.deleteCheckedRules()
+            enterShortcut.onActivated:
             {
                 root.dialog.editRule(tableView.model.data(
                     tableView.selectionModel.selectedIndexes[0], RulesTableModel.RuleIdRole))
