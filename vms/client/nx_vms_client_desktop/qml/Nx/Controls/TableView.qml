@@ -26,11 +26,11 @@ TableView
 
     property alias headerDelegate: repeater.delegate
 
+    property alias deleteShortcut: deleteShortcut
+    property alias enterShortcut: enterShortcut
+
     // Whether column width must be equal to the appropriate header delegate width.
     property var useDelegateWidthAsColumnWidth: (column => false)
-
-    signal deleteKeyPressed()
-    signal enterKeyPressed()
 
     function getButtonItem(columnIndex)
     {
@@ -185,6 +185,20 @@ TableView
         }
     }
 
+    Shortcut
+    {
+        id: deleteShortcut
+        sequences: Qt.platform.os === "osx" ? ["Backspace", "Delete"] : ["Delete"]
+        enabled: control.activeFocus
+    }
+
+    Shortcut
+    {
+        id: enterShortcut
+        sequences: ["Enter", "Return"]
+        enabled: control.activeFocus
+    }
+
     Keys.onPressed: (event) =>
     {
         // At the moment only row selection is supported.
@@ -195,13 +209,7 @@ TableView
         if (!selectionModel.hasSelection)
             return
 
-        if (event.key == Qt.Key_Delete
-            || (Qt.platform.os === "osx" && event.key == Qt.Key_Backspace))
-        {
-            deleteKeyPressed()
-            event.accepted = true;
-        }
-        else if (event.key == Qt.Key_Down || event.key == Qt.Key_Up
+        if (event.key == Qt.Key_Down || event.key == Qt.Key_Up
             || event.key == Qt.Key_Left || event.key == Qt.Key_Right)
         {
             let offset = event.key == Qt.Key_Down || event.key == Qt.Key_Right ? 1 : -1
@@ -213,11 +221,6 @@ TableView
                 control.index(rowToSelect, 0),
                 ItemSelectionModel.ClearAndSelect | ItemSelectionModel.Rows)
 
-            event.accepted = true;
-        }
-        else if (event.key == Qt.Key_Enter || (Qt.platform.os === "osx" && event.key == Qt.Key_Return))
-        {
-            enterKeyPressed()
             event.accepted = true;
         }
 
