@@ -52,6 +52,9 @@ struct NX_NETWORK_API OpenTunnelResult
 using OpenTunnelCompletionHandler =
     nx::utils::MoveOnlyFunc<void(OpenTunnelResult)>;
 
+using ConnectOptions = std::map<std::string, std::string>;
+constexpr char kConnectOptionRunConnectionTest[] = "run-connection-test";
+
 namespace detail {
 
 using ClientFeedbackFunction = nx::utils::MoveOnlyFunc<void(bool /*success*/)>;

@@ -22,14 +22,17 @@ NX_REFLECTION_ENUM_CLASS(CloudConnectVersion,
     /** #VMS-8224. */
     clientSupportsConnectSessionWithoutUdpEndpoints,
 
-    /** CB-236. */
-    connectOverHttpHasHostnameAsString
+    /** #CB-236. */
+    connectOverHttpHasHostnameAsString,
+
+    /** #CB-2331. */
+    clientSupportsRelayConnectionTesting
 )
 
 constexpr const CloudConnectVersion kDefaultCloudConnectVersion =
     CloudConnectVersion::initial;
 
 constexpr const CloudConnectVersion kCurrentCloudConnectVersion =
-    CloudConnectVersion::connectOverHttpHasHostnameAsString;
+    CloudConnectVersion::clientSupportsRelayConnectionTesting;
 
 } // nx::hpm::api

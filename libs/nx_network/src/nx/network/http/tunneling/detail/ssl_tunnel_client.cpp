@@ -8,10 +8,12 @@ namespace nx::network::http::tunneling::detail {
 
 SslTunnelClient::SslTunnelClient(
     const nx::utils::Url& baseTunnelUrl,
+    const ConnectOptions& options,
     ClientFeedbackFunction clientFeedbackFunction)
     :
     base_type(
         convertToHttpsUrl(baseTunnelUrl),
+        options,
         std::move(clientFeedbackFunction))
 {
     NX_VERBOSE(this, "Opening SSL tunnel to %1. https URL: %2",

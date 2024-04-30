@@ -81,12 +81,13 @@ private:
 Client::Client(
     const nx::utils::Url& baseTunnelUrl,
     const std::string& userTag,
-    std::optional<int> forcedTunnelType)
+    std::optional<int> forcedTunnelType,
+    const ConnectOptions& options)
     :
     m_baseTunnelUrl(baseTunnelUrl)
 {
     auto clients = detail::ClientFactory::instance().create(
-        userTag, baseTunnelUrl, forcedTunnelType);
+        userTag, baseTunnelUrl, forcedTunnelType, options);
 
     std::transform(
         clients.begin(), clients.end(),

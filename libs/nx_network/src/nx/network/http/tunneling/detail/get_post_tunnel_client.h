@@ -20,6 +20,7 @@ class NX_NETWORK_API GetPostTunnelClient:
 public:
     GetPostTunnelClient(
         const nx::utils::Url& baseTunnelUrl,
+        const ConnectOptions& options,
         ClientFeedbackFunction clientFeedbackFunction);
 
     virtual void setTimeout(std::optional<std::chrono::milliseconds> timeout) override;
@@ -34,6 +35,7 @@ private:
     Response m_openTunnelResponse;
     nx::Buffer m_serializedOpenUpChannelRequest;
     std::optional<std::chrono::milliseconds> m_timeout;
+    bool m_isConnectionTestRequested = false;
 
     void openDownChannel();
 

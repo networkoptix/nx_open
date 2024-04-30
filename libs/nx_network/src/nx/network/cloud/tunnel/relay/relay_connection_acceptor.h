@@ -65,9 +65,13 @@ private:
         std::unique_ptr<AbstractStreamSocket> streamSocket);
 
     void dispatchRelayNotificationReceived(nx::network::http::Message message);
+    void dispatchRelayNotificationReceivedOnVerificationStage(nx::network::http::Message message);
 
     void processOpenTunnelNotification(
         nx::cloud::relay::api::OpenTunnelNotification openTunnelNotification);
+
+    void processTestConnectionNotification(
+        nx::cloud::relay::api::TestConnectionNotification notification);
 };
 
 //-------------------------------------------------------------------------------------------------

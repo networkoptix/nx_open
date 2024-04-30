@@ -72,8 +72,10 @@ public:
 
     CloudServerSocket(
         hpm::api::AbstractMediatorConnector* mediatorConnector,
-        nx::network::RetryPolicy mediatorRegistrationRetryPolicy
-            = nx::network::RetryPolicy());
+        nx::network::RetryPolicy mediatorRegistrationRetryPolicy =
+            nx::network::RetryPolicy(),
+        nx::hpm::api::CloudConnectVersion cloudConnectVersion =
+            nx::hpm::api::kCurrentCloudConnectVersion);
 
     ~CloudServerSocket();
 
@@ -168,6 +170,8 @@ protected:
     AggregateAcceptor m_aggregateAcceptor;
     mutable nx::Mutex m_mutex;
     std::optional<CloudConnectListenerStatusReport> m_lastListenStatusReport;
+    nx::hpm::api::CloudConnectVersion m_cloudConnectVersion =
+        nx::hpm::api::kDefaultCloudConnectVersion;
 
 private:
     void stopWhileInAioThread();

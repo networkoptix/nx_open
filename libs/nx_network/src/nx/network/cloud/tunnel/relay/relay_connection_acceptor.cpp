@@ -194,18 +194,70 @@ void ReverseConnection::dispatchRelayNotificationReceived(
             : std::string()));
 }
 
+void ReverseConnection::dispatchRelayNotificationReceivedOnVerificationStage(
+    nx::network::http::Message message)
+{
+    nx::cloud::relay::api::TestConnectionNotification notification;
+    if (notification.parse(message))
+        return processTestConnectionNotification(std::move(notification));
+
+    NX_VERBOSE(this, nx::format("Ignoring unknown notification %1")
+        .args(message.type == http::MessageType::request ? message.request->requestLine.toString()
+            : message.type == http::MessageType::response ? message.response->statusLine.toString()
+            : std::string()));
+}
+
 void ReverseConnection::processOpenTunnelNotification(
     api::OpenTunnelNotification openTunnelNotification)
 {
     NX_VERBOSE(this, nx::format("Received OPEN_TUNNEL notification from %1")
         .args(m_httpPipeline->socket()->getForeignAddress()));
 
-    m_streamSocket = std::make_unique<ServerSideReverseStreamSocket>(
-        m_httpPipeline->takeSocket(),
-        openTunnelNotification.clientEndpoint());
+    std::unique_ptr<AbstractStreamSocket> streamSocket =
+        std::make_unique<ServerSideReverseStreamSocket>(
+            m_httpPipeline->takeSocket(),
+            openTunnelNotification.clientEndpoint());
     m_httpPipeline.reset();
 
+    if (openTunnelNotification.connectionTestRequested())
+    {
+        m_httpPipeline = std::make_unique<nx::network::http::AsyncMessagePipeline>(
+            std::move(streamSocket));
+        m_httpPipeline->registerCloseHandler(
+            [this](auto&&... args) { onConnectionClosed(std::move(args)...); });
+        m_httpPipeline->setMessageHandler(
+            [this](auto&&... args)
+            {
+                dispatchRelayNotificationReceivedOnVerificationStage(std::move(args)...);
+            });
+        m_httpPipeline->startReadingConnection();
+        return;
+    }
+
+    m_streamSocket.swap(streamSocket);
     nx::utils::swapAndCall(m_onConnectionActivated, SystemError::noError);
+}
+
+void ReverseConnection::processTestConnectionNotification(
+    api::TestConnectionNotification notification)
+{
+    api::TestConnectionNotificationResponse response;
+    response.setTestId(notification.testId());
+
+    m_httpPipeline->sendMessage(
+        response.toHttpMessage(),
+        [this](SystemError::ErrorCode errorCode)
+        {
+            if (errorCode != SystemError::noError)
+            {
+                NX_VERBOSE(this, "Can't sent response to TestConnectionNotification: %1",
+                    errorCode);
+                return;
+            }
+            m_streamSocket = m_httpPipeline->takeSocket();
+            m_httpPipeline.reset();
+            nx::utils::swapAndCall(m_onConnectionActivated, SystemError::noError);
+        });
 }
 
 //-------------------------------------------------------------------------------------------------

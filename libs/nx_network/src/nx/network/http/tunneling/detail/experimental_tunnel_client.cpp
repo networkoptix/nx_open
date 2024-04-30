@@ -5,14 +5,15 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/uuid.h>
 
+#include "../../rest/http_rest_client.h"
 #include "request_paths.h"
 #include "separate_up_down_channel_delegate.h"
-#include "../../rest/http_rest_client.h"
 
 namespace nx::network::http::tunneling::detail {
 
 ExperimentalTunnelClient::ExperimentalTunnelClient(
     const nx::utils::Url& baseTunnelUrl,
+    const ConnectOptions& /*options*/,
     ClientFeedbackFunction clientFeedbackFunction)
     :
     base_type(baseTunnelUrl, std::move(clientFeedbackFunction))

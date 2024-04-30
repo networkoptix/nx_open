@@ -42,7 +42,8 @@ public:
     Client(
         const nx::utils::Url& baseTunnelUrl,
         const std::string& userTag = "",
-        std::optional<int> forcedTunnelType = std::nullopt);
+        std::optional<int> forcedTunnelType = std::nullopt,
+        const ConnectOptions& options = {});
 
     virtual ~Client();
 
