@@ -14,6 +14,7 @@ class NX_NETWORK_API SslTunnelClient:
 public:
     SslTunnelClient(
         const nx::utils::Url& baseTunnelUrl,
+        const ConnectOptions& options,
         ClientFeedbackFunction clientFeedbackFunction);
 
 private:

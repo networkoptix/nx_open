@@ -6,6 +6,7 @@
 #include <string>
 
 #include <nx/network/aio/basic_pollable.h>
+#include <nx/network/http/tunneling/client.h>
 #include <nx/utils/move_only_func.h>
 
 #include "relay_api_data_types.h"
@@ -56,7 +57,8 @@ public:
      */
     virtual void openConnectionToTheTargetHost(
         const std::string& sessionId,
-        OpenRelayConnectionHandler handler) = 0;
+        OpenRelayConnectionHandler handler,
+        const nx::network::http::tunneling::ConnectOptions& options = {}) = 0;
 
     virtual nx::utils::Url url() const = 0;
 
@@ -98,7 +100,8 @@ public:
 
     virtual void openConnectionToTheTargetHost(
         const std::string& sessionId,
-        OpenRelayConnectionHandler handler) override;
+        OpenRelayConnectionHandler handler,
+        const nx::network::http::tunneling::ConnectOptions& options = {}) override;
 
     virtual nx::utils::Url url() const override;
 

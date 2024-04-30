@@ -8,9 +8,9 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/algorithm.h>
 
-#include "get_post_tunnel_client.h"
 #include "connection_upgrade_tunnel_client.h"
 #include "experimental_tunnel_client.h"
+#include "get_post_tunnel_client.h"
 #include "ssl_tunnel_client.h"
 
 namespace nx::network::http::tunneling::detail {
@@ -79,7 +79,8 @@ ClientFactory& ClientFactory::instance()
 std::vector<std::unique_ptr<BaseTunnelClient>> ClientFactory::defaultFactoryFunction(
     const std::string& tag,
     const nx::utils::Url& baseUrl,
-    std::optional<int> forcedTunnelType)
+    std::optional<int> forcedTunnelType,
+    const ConnectOptions& options)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
 
@@ -87,7 +88,7 @@ std::vector<std::unique_ptr<BaseTunnelClient>> ClientFactory::defaultFactoryFunc
     {
         // No need to handle the feedback here since the client type has been forced.
         std::vector<std::unique_ptr<BaseTunnelClient>> result;
-        result.push_back(m_forcedClientFactory(baseUrl, [](bool /*success*/) {}));
+        result.push_back(m_forcedClientFactory(baseUrl, options, [](bool /*success*/) {}));
         return result;
     }
 
@@ -108,6 +109,7 @@ std::vector<std::unique_ptr<BaseTunnelClient>> ClientFactory::defaultFactoryFunc
         result.push_back(
             clientTypeIter->second.factoryFunction(
                 baseUrl,
+                options,
                 [this, tunnelTypeId, tag](bool success)
                 {
                     processClientFeedback(tunnelTypeId, tag, success);

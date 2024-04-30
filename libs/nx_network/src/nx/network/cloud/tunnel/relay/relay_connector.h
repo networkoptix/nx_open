@@ -6,6 +6,7 @@
 
 #include <nx/network/aio/timer.h>
 #include <nx/utils/elapsed_timer.h>
+#include <nx/utils/move_only_func.h>
 
 #include "../abstract_tunnel_connector.h"
 #include "api/relay_api_client.h"
@@ -41,6 +42,9 @@ private:
     ConnectCompletionHandler m_handler;
     aio::Timer m_timeoutTimer;
     nx::utils::ElapsedTimer m_responseTimer;
+    std::unique_ptr<nx::network::http::AsyncMessagePipeline> m_httpPipeline;
+    std::string m_expectedConnectionTestId;
+    nx::utils::MoveOnlyFunc<void(bool)> m_connectionTestHandler;
 
     virtual void stopWhileInAioThread() override;
 
@@ -48,7 +52,16 @@ private:
         nx::cloud::relay::api::ResultCode resultCode,
         SystemError::ErrorCode sysErrorCode,
         nx::network::http::StatusCode::Value httpStatusCode,
-        nx::cloud::relay::api::CreateClientSessionResponse response);
+        nx::cloud::relay::api::CreateClientSessionResponse response,
+        nx::hpm::api::CloudConnectVersion cloudConnectVersion);
+
+    void testConnection(nx::utils::MoveOnlyFunc<void(bool)>);
+    void onTestConnectionResponse(nx::network::http::Message message);
+
+    void onTestConnectionClosed(
+        SystemError::ErrorCode closeReason,
+        bool connectionDestroyed);
+
     void connectTimedOut();
 };
 

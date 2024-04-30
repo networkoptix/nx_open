@@ -4,16 +4,18 @@
 
 #include <nx/network/url/url_builder.h>
 
-#include "request_paths.h"
 #include "../../rest/http_rest_client.h"
+#include "request_paths.h"
 
 namespace nx::network::http::tunneling::detail {
 
 ConnectionUpgradeTunnelClient::ConnectionUpgradeTunnelClient(
     const nx::utils::Url& baseTunnelUrl,
+    const ConnectOptions& options,
     ClientFeedbackFunction clientFeedbackFunction)
     :
-    base_type(baseTunnelUrl, std::move(clientFeedbackFunction))
+    base_type(baseTunnelUrl, std::move(clientFeedbackFunction)),
+    m_isConnectionTestRequested(options.contains(kConnectOptionRunConnectionTest))
 {
 }
 
@@ -30,6 +32,8 @@ void ConnectionUpgradeTunnelClient::openTunnel(
 
     m_tunnelUrl = url::Builder(m_baseTunnelUrl)
         .appendPath(kConnectionUpgradeTunnelPath);
+    if (m_isConnectionTestRequested)
+        m_tunnelUrl.setQuery(QString(kConnectOptionRunConnectionTest) + "=1");
     m_completionHandler = std::move(completionHandler);
 
     m_httpClient = std::make_unique<AsyncClient>(ssl::kDefaultCertificateCheck);

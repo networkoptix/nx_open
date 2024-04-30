@@ -49,9 +49,10 @@ public:
             [this](
                 const std::string& tag,
                 const nx::utils::Url& baseUrl,
-                std::optional<int> forcedTunnelType)
+                std::optional<int> forcedTunnelType,
+                const ConnectOptions& options)
             {
-                return m_localFactory.create(tag, baseUrl, forcedTunnelType);
+                return m_localFactory.create(tag, baseUrl, forcedTunnelType, options);
             });
 
         enableTunnelMethods(TunnelMethodMask::value);

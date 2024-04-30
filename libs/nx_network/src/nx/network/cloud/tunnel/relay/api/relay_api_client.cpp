@@ -43,11 +43,13 @@ void Client::startSession(
 
 void Client::openConnectionToTheTargetHost(
     const std::string& sessionId,
-    OpenRelayConnectionHandler handler)
+    OpenRelayConnectionHandler handler,
+    const nx::network::http::tunneling::ConnectOptions& options)
 {
     m_actualClient->openConnectionToTheTargetHost(
         sessionId,
-        std::move(handler));
+        std::move(handler),
+        options);
 }
 
 nx::utils::Url Client::url() const

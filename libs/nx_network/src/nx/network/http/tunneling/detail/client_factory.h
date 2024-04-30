@@ -19,7 +19,8 @@ using ClientFactoryFunction =
     std::vector<std::unique_ptr<BaseTunnelClient>>(
         const std::string& /*tag*/,
         const nx::utils::Url& /*baseUrl*/,
-        std::optional<int> /*forcedTunnelType*/);
+        std::optional<int> /*forcedTunnelType*/,
+        const ConnectOptions& /*options*/);
 
 /**
  * Always instantiates client type with the highest priority.
@@ -48,10 +49,14 @@ public:
     int registerClientType(int initialPriority = 0)
     {
         return registerClientType(
-            [](const nx::utils::Url& baseUrl, ClientFeedbackFunction feedbackFunction)
+            [](
+                const nx::utils::Url& baseUrl,
+                const ConnectOptions& options,
+                ClientFeedbackFunction feedbackFunction)
             {
                 return std::make_unique<ClientType>(
                     baseUrl,
+                    options,
                     std::move(feedbackFunction));
             },
             initialPriority);
@@ -73,10 +78,14 @@ public:
     void setForcedClientType()
     {
         setForcedClientFactory(
-            [](const nx::utils::Url& baseUrl, ClientFeedbackFunction feedbackFunction)
+            [](
+                const nx::utils::Url& baseUrl,
+                const ConnectOptions& options,
+                ClientFeedbackFunction feedbackFunction)
             {
                 return std::make_unique<ClientType>(
                     baseUrl,
+                    options,
                     std::move(feedbackFunction));
             });
     }
@@ -87,7 +96,10 @@ public:
 
 private:
     using InternalFactoryFunction = nx::utils::MoveOnlyFunc<
-        std::unique_ptr<BaseTunnelClient>(const nx::utils::Url&, ClientFeedbackFunction)>;
+        std::unique_ptr<BaseTunnelClient>(
+            const nx::utils::Url&,
+            const ConnectOptions&,
+            ClientFeedbackFunction)>;
 
     using TunnelTypeSelector = nx::utils::algorithm::ItemSelector<int /*tunnel type id*/>;
 
@@ -106,7 +118,8 @@ private:
     std::vector<std::unique_ptr<BaseTunnelClient>> defaultFactoryFunction(
         const std::string& tag,
         const nx::utils::Url& baseUrl,
-        std::optional<int> forcedTunnelType);
+        std::optional<int> forcedTunnelType,
+        const ConnectOptions& options);
 
     int registerClientType(
         InternalFactoryFunction factoryFunction,

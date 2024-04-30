@@ -8,8 +8,8 @@
 #include <nx/network/http/tunneling/client.h>
 #include <nx/network/url/url_builder.h>
 
-#include "relay_tunnel_validator.h"
 #include "../relay_api_http_paths.h"
+#include "relay_tunnel_validator.h"
 
 namespace nx::cloud::relay::api::detail {
 
@@ -51,12 +51,14 @@ void ClientOverHttpTunnel::beginListening(
 
 void ClientOverHttpTunnel::openConnectionToTheTargetHost(
     const std::string& sessionId,
-    OpenRelayConnectionHandler completionHandler)
+    OpenRelayConnectionHandler completionHandler,
+    const nx::network::http::tunneling::ConnectOptions& options)
 {
     dispatch(
-        [this, sessionId, completionHandler = std::move(completionHandler)]() mutable
+        [this, sessionId, completionHandler = std::move(completionHandler),
+            options = options]() mutable
         {
-            openClientTunnel(sessionId, std::move(completionHandler));
+            openClientTunnel(sessionId, std::move(completionHandler), options);
         });
 }
 
@@ -135,7 +137,8 @@ void ClientOverHttpTunnel::processServerTunnelResult(
 
 void ClientOverHttpTunnel::openClientTunnel(
     const std::string& sessionId,
-    OpenRelayConnectionHandler completionHandler)
+    OpenRelayConnectionHandler completionHandler,
+    const nx::network::http::tunneling::ConnectOptions& options)
 {
     const auto clientTunnelBaseUrl = network::url::Builder(url())
         .appendPath(network::http::rest::substituteParameters(
@@ -144,7 +147,8 @@ void ClientOverHttpTunnel::openClientTunnel(
     auto tunnellingClient = std::make_unique<network::http::tunneling::Client>(
         clientTunnelBaseUrl,
         "",
-        m_forcedHttpTunnelType);
+        m_forcedHttpTunnelType,
+        options);
     tunnellingClient->setConsiderSilentConnectionAsTunnelFailure(true);
 
     openTunnel(

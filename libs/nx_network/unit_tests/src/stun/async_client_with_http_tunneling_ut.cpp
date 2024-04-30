@@ -149,12 +149,16 @@ protected:
     void forceHttpConnectionUpgradeTunnel()
     {
         m_tunnelFactoryBak = http::tunneling::detail::ClientFactory::instance().setCustomFunc(
-            [](const std::string& /*tag*/, const nx::utils::Url& url, std::optional<int>)
+            [](
+                const std::string& /*tag*/,
+                const nx::utils::Url& url,
+                std::optional<int>,
+                const http::tunneling::ConnectOptions& options)
             {
                 std::vector<std::unique_ptr<http::tunneling::detail::BaseTunnelClient>> result;
                 result.push_back(
                     std::make_unique<http::tunneling::detail::ConnectionUpgradeTunnelClient>(
-                        url, nullptr));
+                        url, options, nullptr));
                 return result;
             });
     }

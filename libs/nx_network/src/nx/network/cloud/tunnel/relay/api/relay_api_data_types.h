@@ -137,6 +137,7 @@ NX_NETWORK_API bool serializeToHeaders(
 struct ConnectToPeerRequest
 {
     std::string sessionId;
+    bool connectionTestRequested = false;
 };
 
 #define ConnectToPeerRequest_Fields (sessionId)

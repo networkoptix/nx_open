@@ -19,12 +19,14 @@ const KeepAliveOptions kDefaultKeepAlive(std::chrono::minutes(1), std::chrono::s
 
 CloudServerSocket::CloudServerSocket(
     hpm::api::AbstractMediatorConnector* mediatorConnector,
-    nx::network::RetryPolicy mediatorRegistrationRetryPolicy)
+    nx::network::RetryPolicy mediatorRegistrationRetryPolicy,
+    nx::hpm::api::CloudConnectVersion cloudConnectVersion)
 :
     m_mediatorConnector(mediatorConnector),
     m_mediatorConnection(mediatorConnector->systemConnection()),
     m_mediatorRegistrationRetryTimer(std::move(mediatorRegistrationRetryPolicy)),
-    m_acceptQueueLen(kDefaultAcceptQueueSize)
+    m_acceptQueueLen(kDefaultAcceptQueueSize),
+    m_cloudConnectVersion(cloudConnectVersion)
 {
     bindToAioThreadUnchecked(getAioThread());
 
@@ -530,6 +532,7 @@ void CloudServerSocket::issueRegistrationRequest()
     nx::hpm::api::ListenRequest listenRequestData;
     listenRequestData.systemId = cloudCredentials->systemId;
     listenRequestData.serverId = cloudCredentials->serverId;
+    listenRequestData.cloudConnectVersion = m_cloudConnectVersion;
     m_mediatorConnection->listen(
         std::move(listenRequestData),
         std::bind(&CloudServerSocket::onListenRequestCompleted, this, _1, _2));

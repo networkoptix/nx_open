@@ -31,7 +31,8 @@ public:
 
     virtual void openConnectionToTheTargetHost(
         const std::string& sessionId,
-        OpenRelayConnectionHandler handler) override;
+        OpenRelayConnectionHandler handler,
+        const nx::network::http::tunneling::ConnectOptions& options = {}) override;
 
 protected:
     virtual void stopWhileInAioThread() override;
@@ -63,7 +64,8 @@ private:
 
     void openClientTunnel(
         const std::string& sessionId,
-        OpenRelayConnectionHandler completionHandler);
+        OpenRelayConnectionHandler completionHandler,
+        const nx::network::http::tunneling::ConnectOptions& options);
 
     void processClientTunnelResult(
         OpenRelayConnectionHandler completionHandler,
