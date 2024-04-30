@@ -177,7 +177,7 @@
     </message>
     <message>
       <source>Power Users</source>
-      <translation type="unfinished">Power Users</translation>
+      <translation>進階使用者</translation>
     </message>
     <message>
       <source>Advanced Viewers</source>
@@ -193,7 +193,7 @@
     </message>
     <message>
       <source>System Health Viewers</source>
-      <translation type="unfinished">System Health Viewers</translation>
+      <translation>系統健康檢查員</translation>
     </message>
     <message>
       <source>Members of this group have unlimited System privileges. Administrators can create and modify Power Users, merge Systems and connect or disconnect System to  %1.</source>
@@ -202,23 +202,23 @@
     </message>
     <message>
       <source>Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the System configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</source>
-      <translation type="unfinished">Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the System configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</translation>
+      <translation>該群組的成員除了進階瀏覽者群組授予的權限外，還可以控制大部分系統設定，但不允許更改任何與管理員相關的設置，例如刪除或更改自己的群組和權限，也不能建立或編輯其他進階使用者。</translation>
     </message>
     <message>
       <source>Members of this group can, in addition to the permissions granted by the Viewers group, see and activate PTZ positions and PTZ tours, use 2-way audio, operate I/O module buttons, create and edit bookmarks, and view the Event Log.</source>
-      <translation type="unfinished">Members of this group can, in addition to the permissions granted by the Viewers group, see and activate PTZ positions and PTZ tours, use 2-way audio, operate I/O module buttons, create and edit bookmarks, and view the Event Log.</translation>
+      <translation>該群組的成員除了瀏覽者群組授予的權限外，還可以查看和啟動 PTZ 位置和 PTZ 巡航、使用雙向語音、操作 I/O 模組按鈕、建立和編輯書籤以及瀏覽事件日誌。</translation>
     </message>
     <message>
       <source>Members of this group can, in addition to the permissions granted by the Live Viewers group, view and export archive and Bookmarks.</source>
-      <translation type="unfinished">Members of this group can, in addition to the permissions granted by the Live Viewers group, view and export archive and Bookmarks.</translation>
+      <translation>該群組的成員除了即時影響瀏覽者群組授予的權限之外，還可以瀏覽和匯出錄影和書籤。</translation>
     </message>
     <message>
       <source>Members of this group can view live videos, I/O modules and web pages.</source>
-      <translation type="unfinished">Members of this group can view live videos, I/O modules and web pages.</translation>
+      <translation>該群組的成員可以瀏覽即時影像、I/O 模組和網頁。</translation>
     </message>
     <message>
       <source>Members of this group can view System Health Monitoring information and server processor load in real-time (Server Monitoring).</source>
-      <translation type="unfinished">Members of this group can view System Health Monitoring information and server processor load in real-time (Server Monitoring).</translation>
+      <translation>該群組的成員可以即時查看系統健康監控資訊和伺服器處理器負載（伺服器監控）。</translation>
     </message>
   </context>
   <context>
@@ -1277,7 +1277,7 @@
     </message>
     <message>
       <source>Integration</source>
-      <translation type="unfinished">Integration</translation>
+      <translation>整合</translation>
     </message>
     <message>
       <source>Cloud storage</source>
@@ -1494,11 +1494,11 @@
     </message>
     <message>
       <source>Max P2P queue size (bytes, 32-512MB)</source>
-      <translation type="unfinished">Max P2P queue size (bytes, 32-512MB)</translation>
+      <translation>最大P2P佇列 (bytes, 32-512MB)</translation>
     </message>
     <message>
       <source>Max P2P all clients size (bytes, 32-512MB)</source>
-      <translation type="unfinished">Max P2P all clients size (bytes, 32-512MB)</translation>
+      <translation>最大 P2P 所有用戶端大小 (bytes, 32-512MB)</translation>
     </message>
     <message>
       <source>Max record queue size (bytes, 6-96MB)</source>
@@ -1506,7 +1506,7 @@
     </message>
     <message>
       <source>Max record queue size (elements, 250-4000)</source>
-      <translation type="unfinished">Max record queue size (elements, 250-4000)</translation>
+      <translation>最大錄影佇列 (元件, 250-4000)</translation>
     </message>
     <message>
       <source>RTP timeout (milliseconds)</source>
@@ -1718,7 +1718,7 @@
     </message>
     <message>
       <source>Semicolon-separated list of Servers designated to connect to the Cloud. Servers at the top of the list have higher priority. If the list is empty a Server for the Cloud connection is selected automatically.</source>
-      <translation type="unfinished">Semicolon-separated list of Servers designated to connect to the Cloud. Servers at the top of the list have higher priority. If the list is empty a Server for the Cloud connection is selected automatically.</translation>
+      <translation>以分號分隔的Cloud連線指定伺服器清單。清單頂端的伺服器具有更高的優先權。如果清單為空白，則會自動選擇伺服器進行Cloud連線。</translation>
     </message>
     <message>
       <source>Maximum number of consecutive RTP errors before the server reconnects the RTSP session.</source>
@@ -1734,7 +1734,7 @@
     </message>
     <message>
       <source>Allow Power User editing Security Settings</source>
-      <translation type="unfinished">Allow Power User editing Security Settings</translation>
+      <translation>允許進階使用者編輯安全設定</translation>
     </message>
     <message>
       <source>Enable deprecated API functions (insecure)</source>
