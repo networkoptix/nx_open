@@ -39,6 +39,7 @@ RemoteSession::RemoteSession(
     const auto username = QString::fromStdString(connection->credentials().username);
     const auto localSystemId = connection->moduleInformation().localSystemId.toString();
     m_sessionId = SessionId(username, localSystemId);
+    NX_DEBUG(this, "Initialize session as %1 in %2", username, localSystemId);
 
     auto sharedMemoryManager = appContext()->sharedMemoryManager();
 
@@ -77,6 +78,7 @@ RemoteSession::RemoteSession(
 
 RemoteSession::~RemoteSession()
 {
+    NX_DEBUG(this, "Deinitialize session");
     const bool sessionIsStillActive = appContext()->sharedMemoryManager()->leaveSession();
     if (sessionIsStillActive)
     {
