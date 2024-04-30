@@ -76,6 +76,12 @@ static Qt::Edge invertEdge(Qt::Edge edge)
     }
 }
 
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kLight1Theme = {
+    {QnIcon::Normal, {.primary = "light1"}},
+};
+
+NX_DECLARE_COLORIZED_ICON(kGoToLiveIcon, "24x24/Solid/go_to_live.svg", kLight1Theme)
+
 } // namespace
 
 namespace nx::vms::client::desktop {
@@ -570,12 +576,12 @@ void SoftwareTriggerButtonPrivate::ensureImages()
     m_successPixmap = generatePixmap(
         kPressedColor,
         q->palette().color(QPalette::Text),
-        qnSkin->pixmap("soft_triggers/confirmation_success.png"));
+        qnSkin->pixmap("24x24/Outline/yes.svg"));
 
     m_failurePixmap = generatePixmap(
         kErrorBackgroundColor,
         QColor(),
-        qnSkin->pixmap("soft_triggers/confirmation_failure.png"));
+        qnSkin->pixmap("24x24/Outline/no.svg"));
 
     m_failureFramePixmap = generatePixmap(
         QColor(),
@@ -587,7 +593,7 @@ void SoftwareTriggerButtonPrivate::ensureImages()
         q->palette().color(QPalette::Text),
         QPixmap());
 
-    const auto goToLivePixmap = qnSkin->pixmap("soft_triggers/go_to_live.png");
+    const auto goToLivePixmap = qnSkin->icon(kGoToLiveIcon).pixmap(24, 24);
 
     m_goToLivePixmap = generatePixmap(
         kActiveColor,
