@@ -71,8 +71,9 @@ public:
      * @param query Target query.
      * @param callback Callback for received bookmarks data. Will be called when data is fully
      *     loaded.
+     * #returns Request ID.
      */
-    void sendQueryRequest(
+    rest::Handle sendQueryRequest(
         const QnCameraBookmarksQueryPtr& query,
         BookmarksCallbackType callback = {});
 
