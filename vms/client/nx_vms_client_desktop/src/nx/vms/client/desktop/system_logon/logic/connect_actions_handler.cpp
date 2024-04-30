@@ -555,6 +555,9 @@ void ConnectActionsHandler::establishConnection(RemoteConnectionPtr connection)
     if (!NX_ASSERT(connection))
         return;
 
+    NX_INFO(this, "Establish connection to %1 as %2", connection->address(),
+        connection->credentials().username);
+
     setState(LogicalState::connecting);
     const auto session = std::make_shared<desktop::RemoteSession>(connection, systemContext());
 
@@ -1261,7 +1264,7 @@ void ConnectActionsHandler::at_logoutFromCloud()
 
 bool ConnectActionsHandler::disconnectFromServer(DisconnectFlags flags)
 {
-    NX_DEBUG(this, "Disconnecting from the current server (flags %1)", int(flags));
+    NX_INFO(this, "Disconnecting from the current server (flags %1)", int(flags));
     const bool force = flags.testFlag(DisconnectFlag::Force);
 
     if (flags.testFlag(DisconnectFlag::ClearAutoLogin))
@@ -1302,7 +1305,7 @@ void ConnectActionsHandler::showLoginDialog()
 
 void ConnectActionsHandler::clearConnection()
 {
-    NX_DEBUG(this, "Clear connection: starting");
+    NX_DEBUG(this, "Clear connection");
 
     hideReconnectDialog();
     d->currentConnectionProcess.reset();
@@ -1344,7 +1347,7 @@ void ConnectActionsHandler::clearConnection()
     for (const auto& res: resourcesToRemove)
         idList.push_back(res->getId());
 
-    NX_DEBUG(this, "Clear connection: removing resources");
+    NX_DEBUG(this, "Removing resources");
     resourcePool()->removeResources(resourcesToRemove);
 
     systemContext()->showreelManager()->resetShowreels();
@@ -1357,7 +1360,7 @@ void ConnectActionsHandler::clearConnection()
 
     systemContext()->lookupListManager()->deinitialize();
 
-    NX_DEBUG(this, "Clear connection: finished");
+    NX_DEBUG(this, "Clear connection finished");
 }
 
 void ConnectActionsHandler::connectToServer(LogonData logonData, ConnectionOptions options)
