@@ -375,12 +375,12 @@ Item
                 return;
 
             const resourceUrl = controller.resourceUrl()
-            const iconCache = controller.iconCache()
+            const dataCache = controller.dataCache()
             const currentHost = (new URL(webView.url)).host
             const webPageHost = resourceUrl ? (new URL(resourceUrl)).host : ""
 
-            if (resourceUrl && iconCache && currentHost.includes(webPageHost))
-                icon.grabToImage((result) => iconCache.update(resourceUrl, result.image))
+            if (resourceUrl && dataCache && currentHost.includes(webPageHost))
+                icon.grabToImage((result) => dataCache.update(resourceUrl, result.image))
         }
     }
 }

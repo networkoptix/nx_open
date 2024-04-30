@@ -11,12 +11,14 @@
 #include <nx/build_info.h>
 #include <nx/utils/log/log_settings.h>
 #include <nx/utils/property_storage/storage.h>
+#include <nx/utils/serialization/qt_containers_reflect_json.h>
 #include <nx/vms/client/core/settings/types/detected_object.h>
 #include <nx/vms/client/core/system_logon/connection_data.h>
 #include <nx/vms/client/desktop/analytics/attribute_display_manager.h>
 #include <nx/vms/client/desktop/export/settings/export_layout_persistent_settings.h>
 #include <nx/vms/client/desktop/export/settings/export_media_persistent_settings.h>
 #include <nx/vms/client/desktop/jsapi/auth_allowed_urls.h>
+#include <nx/vms/client/desktop/webpage/web_page_settings.h>
 #include <nx/vms/common/system_health/message_type.h>
 #include <ui/workbench/handlers/workbench_screenshot_handler.h>
 
@@ -163,8 +165,8 @@ public:
     Property<int> maxMp3FileDurationSec{this, "maxMp3FileDurationSec", 30,
         "Maximum file duration in seconds for sound notification actions."};
 
-    Property<std::map<QString, QString>> webPageIcons{this, "webPageIcons", {},
-        "Web Page icon paths."};
+    Property<QMap<QString, WebPageSettings>> webPageSettings{this, "webPageSettings", {},
+        "Web Page settings."};
 
     Property<bool> showTimestampOnLiveCamera{this, "showTimestampOnLiveCamera", false,
         "Show timestamp on live cameras (instead of text \"LIVE\")."};
