@@ -181,7 +181,7 @@
     </message>
     <message>
       <source>Please contact the system administrator to regain access.</source>
-      <translation type="unfinished">Please contact the system administrator to regain access.</translation>
+      <translation>請聯絡系統管理員以重新取得存取權限。</translation>
     </message>
     <message>
       <source>Connection to %1 is not ready yet. Check the server&apos;s internet connection or try again later.</source>
@@ -191,12 +191,12 @@
     <message>
       <source>Log in as a %1 user to the system in a shutdown state is forbidden. You can still connect as local user.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">Log in as a %1 user to the system in a shutdown state is forbidden. You can still connect as local user.</translation>
+      <translation>在關機狀態以 %1 使用者身分登入系統是不被允許的。您仍然能以本地使用者身份進行連線。</translation>
     </message>
     <message>
       <source>Log in as a %1 user to the system in a suspended state is forbidden. You can still connect as local user.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">Log in as a %1 user to the system in a suspended state is forbidden. You can still connect as local user.</translation>
+      <translation>在暫停狀態以 %1 使用者身分登入系統是不被允許的。您仍然能以本地使用者身份進行連線。</translation>
     </message>
     <message>
       <source>To log in to this System, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</source>
@@ -235,7 +235,7 @@
     </message>
     <message>
       <source>Review the certificates of the servers from this system.</source>
-      <translation type="unfinished">Review the certificates of the servers from this system.</translation>
+      <translation>從此系統查看伺服器的憑證。</translation>
     </message>
     <message>
       <source>To learn more about the current problem read this %1.</source>

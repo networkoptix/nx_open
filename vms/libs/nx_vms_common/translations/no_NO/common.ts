@@ -2454,23 +2454,23 @@
     </message>
     <message>
       <source>Services Issue</source>
-      <translation type="unfinished">Services Issue</translation>
+      <translation>Tjenester problem</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; has license migration issue</source>
-      <translation type="unfinished">Server &quot;%1&quot; has license migration issue</translation>
+      <translation>Server &quot;%1&quot; har problemer med lisensmigrering</translation>
     </message>
     <message>
       <source>Service overuse</source>
-      <translation type="unfinished">Service overuse</translation>
+      <translation>Overforbruk av tjenester</translation>
     </message>
     <message>
       <source>The following licenses were not migrated:</source>
-      <translation type="unfinished">The following licenses were not migrated:</translation>
+      <translation>Følgende lisenser ble ikke migrert:</translation>
     </message>
     <message>
       <source>License</source>
-      <translation type="unfinished">License</translation>
+      <translation>Tillatelse</translation>
     </message>
     <message>
       <source>Camera</source>
@@ -2479,31 +2479,31 @@
     <message numerus="yes">
       <source>Recording on %n channels was stopped due to service overuse.</source>
       <translation type="unfinished">
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
+        <numerusform>Opptak på %n kanaler ble stoppet på grunn av overforbruk av tjenesten.</numerusform>
         <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
       <translation type="unfinished">
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
+        <numerusform>Sikkerhetskopiering av skylagring på %n -kanaler ble stoppet på grunn av overforbruk av tjenesten.</numerusform>
         <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
       <translation type="unfinished">
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
+        <numerusform>Bruk av betalte integreringstjenester på %n -kanaler ble stoppet på grunn av overforbruk av tjenesten.</numerusform>
         <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
       </translation>
     </message>
     <message>
       <source>Failed to migrate licenses.</source>
-      <translation type="unfinished">Failed to migrate licenses.</translation>
+      <translation>Kunne ikke migrere lisenser.</translation>
     </message>
     <message>
       <source>Skipped import of licenses. Another migration attempt will be automatically scheduled for later.</source>
-      <translation type="unfinished">Skipped import of licenses. Another migration attempt will be automatically scheduled for later.</translation>
+      <translation>Hoppet over import av lisenser. Et nytt migreringsforsøk blir automatisk planlagt til senere.</translation>
     </message>
   </context>
 </TS>

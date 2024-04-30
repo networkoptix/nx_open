@@ -5,7 +5,7 @@
     <name>AddLookupListEntryDialog</name>
     <message>
       <source>Add Entry</source>
-      <translation type="unfinished">Add Entry</translation>
+      <translation>新增項目</translation>
     </message>
     <message>
       <source>Add</source>
@@ -16,7 +16,7 @@
     <name>AdvancedSettingsDialog</name>
     <message>
       <source>LDAP - Advanced Settings</source>
-      <translation type="unfinished">LDAP - Advanced Settings</translation>
+      <translation>LDAP - 進階設定</translation>
     </message>
     <message>
       <source>Users</source>
@@ -24,7 +24,7 @@
     </message>
     <message>
       <source>Login Attribute</source>
-      <translation type="unfinished">Login Attribute</translation>
+      <translation>登入屬性</translation>
     </message>
     <message>
       <source>Groups</source>
@@ -36,19 +36,19 @@
     </message>
     <message>
       <source>Search Timeout</source>
-      <translation type="unfinished">Search Timeout</translation>
+      <translation>搜尋逾時</translation>
     </message>
     <message>
       <source>To enable digest authentication for LDAP users that are already added to the VMS database, you need to enable it directly in these users&apos; settings.</source>
-      <translation type="unfinished">To enable digest authentication for LDAP users that are already added to the VMS database, you need to enable it directly in these users&apos; settings.</translation>
+      <translation>若要為已新增至 VMS 資料庫的 LDAP 使用者啟用digest認證，您需要直接在這些使用者&apos; 設定中啟用它。</translation>
     </message>
     <message>
       <source>To disable digest authentication for LDAP users that are already added to the VMS database, you need to disable it directly in these users&apos; settings.</source>
-      <translation type="unfinished">To disable digest authentication for LDAP users that are already added to the VMS database, you need to disable it directly in these users&apos; settings.</translation>
+      <translation>若要為已新增至 VMS 資料庫的 LDAP 使用者啟用digest認證，您需要直接在這些使用者&apos; 設定中啟用它。</translation>
     </message>
     <message>
       <source>Allow insecure (digest) authentication for imported users</source>
-      <translation type="unfinished">Allow insecure (digest) authentication for imported users</translation>
+      <translation>允許匯入的使用者使用不安全(digest)認證</translation>
     </message>
     <message>
       <source>General</source>
@@ -56,20 +56,20 @@
     </message>
     <message>
       <source>Synchronize Users</source>
-      <translation type="unfinished">Synchronize Users</translation>
+      <translation>同步使用者</translation>
     </message>
     <message>
       <source>Sync Interval</source>
-      <translation type="unfinished">Sync Interval</translation>
+      <translation>同步間隔</translation>
     </message>
     <message>
       <source>Proxy LDAP requests %1 via server</source>
       <comment>%1 is a line break</comment>
-      <translation type="unfinished">Proxy LDAP requests %1 via server</translation>
+      <translation>透過伺服器代理 LDAP 請求 %1</translation>
     </message>
     <message>
       <source>Group Members Attribute</source>
-      <translation type="unfinished">Group Members Attribute</translation>
+      <translation>群組成員屬性</translation>
     </message>
   </context>
   <context>
@@ -246,7 +246,7 @@
     </message>
     <message>
       <source>API Integrations</source>
-      <translation type="unfinished">API Integrations</translation>
+      <translation>API 整合</translation>
     </message>
   </context>
   <context>
@@ -260,23 +260,23 @@
     <name>ApiIntegrations</name>
     <message>
       <source>API Integrations</source>
-      <translation type="unfinished">API Integrations</translation>
+      <translation>API 整合</translation>
     </message>
     <message>
       <source>API Integrations interact with %1 Server via REST API and exchange metadata</source>
-      <translation type="unfinished">API Integrations interact with %1 Server via REST API and exchange metadata</translation>
+      <translation>API 整合透過 REST API 與 %1 伺服器互動並交換詮釋資料 (metadata)</translation>
     </message>
     <message>
       <source>New requests</source>
-      <translation type="unfinished">New requests</translation>
+      <translation>新請求</translation>
     </message>
     <message>
       <source>API Integration may be enabled after verifying the code received from Integration provider. New requests may be disabled to prevent unwanted interaction.</source>
-      <translation type="unfinished">API Integration may be enabled after verifying the code received from Integration provider. New requests may be disabled to prevent unwanted interaction.</translation>
+      <translation>API整合會在驗證從整合提供者收到的代碼後啟用。可以停用新請求以防止不必要的互動。</translation>
     </message>
     <message>
       <source>Enable %1?</source>
-      <translation type="unfinished">Enable %1?</translation>
+      <translation>啟用 %1?</translation>
     </message>
     <message>
       <source>This Integration will be able to:
@@ -284,23 +284,23 @@
  • get access to archive
  • process video streams
  • exchange metadata over the network</source>
-      <translation type="unfinished">This Integration will be able to:
- • change settings on cameras
- • get access to archive
- • process video streams
- • exchange metadata over the network</translation>
+      <translation>此整合將能夠：
+ • 更改攝影機設定
+ • 存取錄影資料
+ • 處理視訊串流
+ • 透過網路交換詮釋資料(metadata)</translation>
     </message>
     <message>
       <source>Enable Integration</source>
-      <translation type="unfinished">Enable Integration</translation>
+      <translation>啟用整合</translation>
     </message>
     <message>
       <source>Remove %1?</source>
-      <translation type="unfinished">Remove %1?</translation>
+      <translation>移除 %1?</translation>
     </message>
     <message>
       <source>This will remove Integration request</source>
-      <translation type="unfinished">This will remove Integration request</translation>
+      <translation>這將移除整合請求</translation>
     </message>
     <message>
       <source>Remove</source>
@@ -308,14 +308,14 @@
     </message>
     <message>
       <source>Remove Request</source>
-      <translation type="unfinished">Remove Request</translation>
+      <translation>移除請求</translation>
     </message>
   </context>
   <context>
     <name>AutoTextField</name>
     <message>
       <source>This field cannot be empty</source>
-      <translation type="unfinished">This field cannot be empty</translation>
+      <translation>此欄位不能空白</translation>
     </message>
     <message>
       <source>Auto</source>
@@ -326,8 +326,8 @@
     <name>BatchUserEditDialog</name>
     <message numerus="yes">
       <source>Batch Edit - %n Users</source>
-      <translation type="unfinished">
-        <numerusform>Batch Edit - %n Users</numerusform>
+      <translation>
+        <numerusform>批量編輯 - %n 使用者</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -339,7 +339,7 @@
     <message>
       <source>User status</source>
       <comment>Whether users are enabled or disabled</comment>
-      <translation type="unfinished">User status</translation>
+      <translation>使用者狀態</translation>
     </message>
     <message>
       <source>Enabled</source>
@@ -351,11 +351,11 @@
     </message>
     <message>
       <source>Insecure (digest) authentication</source>
-      <translation type="unfinished">Insecure (digest) authentication</translation>
+      <translation>不安全(digest)認證</translation>
     </message>
     <message>
       <source>keep current value</source>
-      <translation type="unfinished">keep current value</translation>
+      <translation>保持目前值</translation>
     </message>
   </context>
   <context>
@@ -462,11 +462,11 @@
     </message>
     <message>
       <source>Suspended</source>
-      <translation type="unfinished">Suspended</translation>
+      <translation>已暫停</translation>
     </message>
     <message>
       <source>Shut Down</source>
-      <translation type="unfinished">Shut Down</translation>
+      <translation>關閉</translation>
     </message>
   </context>
   <context>
@@ -494,7 +494,7 @@
     <name>ConnectionSettingsDialog</name>
     <message>
       <source>LDAP - Connection Settings</source>
-      <translation type="unfinished">LDAP - Connection Settings</translation>
+      <translation>LDAP - 連線設定</translation>
     </message>
     <message>
       <source>Host</source>
@@ -502,7 +502,7 @@
     </message>
     <message>
       <source>Login DN</source>
-      <translation type="unfinished">Login DN</translation>
+      <translation>登入DN</translation>
     </message>
     <message>
       <source>Password</source>
@@ -510,7 +510,7 @@
     </message>
     <message>
       <source>Ignore LDAP server certificate errors</source>
-      <translation type="unfinished">Ignore LDAP server certificate errors</translation>
+      <translation>忽略 LDAP 伺服器憑證錯誤</translation>
     </message>
     <message>
       <source>Test</source>
@@ -522,15 +522,15 @@
     </message>
     <message>
       <source>Use StartTLS</source>
-      <translation type="unfinished">Use StartTLS</translation>
+      <translation>使用 StartTLS</translation>
     </message>
     <message>
       <source>Host cannot be empty</source>
-      <translation type="unfinished">Host cannot be empty</translation>
+      <translation>主機不能為空白</translation>
     </message>
     <message>
       <source>Login DN cannot be empty</source>
-      <translation type="unfinished">Login DN cannot be empty</translation>
+      <translation>登入DN不能為空白</translation>
     </message>
     <message>
       <source>Password cannot be empty</source>
@@ -538,7 +538,7 @@
     </message>
     <message>
       <source>To allow LDAP users to log in to %1, it is necessary to establish a connection between %1 and a corporate LDAP server.</source>
-      <translation type="unfinished">To allow LDAP users to log in to %1, it is necessary to establish a connection between %1 and a corporate LDAP server.</translation>
+      <translation>若要允許 LDAP 使用者登入 %1，需要建立 %1 和企業 LDAP 伺服器之間的連線。</translation>
     </message>
   </context>
   <context>
@@ -1216,7 +1216,7 @@
     </message>
     <message>
       <source>Last Sync</source>
-      <translation type="unfinished">Last Sync</translation>
+      <translation>上次同步</translation>
     </message>
     <message>
       <source>Edit</source>
@@ -1224,7 +1224,7 @@
     </message>
     <message>
       <source>Advanced Settings</source>
-      <translation type="unfinished">Advanced Settings</translation>
+      <translation>進階設定</translation>
     </message>
     <message>
       <source>Disconnect</source>
@@ -1244,7 +1244,7 @@
     </message>
     <message>
       <source>Not configured yet</source>
-      <translation type="unfinished">Not configured yet</translation>
+      <translation>未設定</translation>
     </message>
     <message>
       <source>Configure</source>

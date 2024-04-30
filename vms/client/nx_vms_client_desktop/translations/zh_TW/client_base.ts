@@ -1041,11 +1041,11 @@
     </message>
     <message>
       <source>Integration...</source>
-      <translation type="unfinished">Integration...</translation>
+      <translation>整合...</translation>
     </message>
     <message>
       <source>New Integration...</source>
-      <translation type="unfinished">New Integration...</translation>
+      <translation>新的整合</translation>
     </message>
     <message>
       <source>New Web Page...</source>
@@ -1057,15 +1057,15 @@
     </message>
     <message>
       <source>Add Virtual Camera...</source>
-      <translation type="unfinished">Add Virtual Camera...</translation>
+      <translation>新增虛擬攝影機...</translation>
     </message>
     <message>
       <source>Integration Settings...</source>
-      <translation type="unfinished">Integration Settings...</translation>
+      <translation>整合設定...</translation>
     </message>
     <message>
       <source>Proxied Integration...</source>
-      <translation type="unfinished">Proxied Integration...</translation>
+      <translation>代理整合...</translation>
     </message>
     <message>
       <source>Proxied Web Page...</source>
@@ -1097,7 +1097,7 @@
     </message>
     <message>
       <source>Convert to Shared Layout</source>
-      <translation type="unfinished">Convert to Shared Layout</translation>
+      <translation>轉換成共享佈局</translation>
     </message>
   </context>
   <context>
@@ -1143,7 +1143,7 @@
     <name>DirectParentsModel</name>
     <message>
       <source>LDAP group membership is managed on LDAP server</source>
-      <translation type="unfinished">LDAP group membership is managed on LDAP server</translation>
+      <translation>LDAP 群組成員資格是在 LDAP 伺服器上管理</translation>
     </message>
   </context>
   <context>
@@ -1189,7 +1189,7 @@
     </message>
     <message>
       <source>Rewind for</source>
-      <translation type="unfinished">Rewind for</translation>
+      <translation>倒帶至</translation>
     </message>
   </context>
   <context>
@@ -1348,8 +1348,8 @@
     <message numerus="yes">
       <source>Delete %n groups?</source>
       <comment>Numerical form depends on groups count</comment>
-      <translation type="unfinished">
-        <numerusform>Delete %n groups?</numerusform>
+      <translation>
+        <numerusform>刪除%n 個群組? </numerusform>
       </translation>
     </message>
   </context>
@@ -1478,7 +1478,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>License has already been activated</source>
-      <translation type="unfinished">License has already been activated</translation>
+      <translation>授權已經被啟用</translation>
     </message>
   </context>
   <context>
@@ -1680,7 +1680,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Cannot reach the server</source>
-      <translation type="unfinished">Cannot reach the server</translation>
+      <translation>無法到達伺服器</translation>
     </message>
     <message>
       <source>Username or Password are incorrect</source>
@@ -1688,7 +1688,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Insecure</source>
-      <translation type="unfinished">Insecure</translation>
+      <translation>不安全</translation>
     </message>
     <message>
       <source>Connection failed</source>
@@ -1928,11 +1928,11 @@ License Key: %2</source>
     </message>
     <message>
       <source>Phones</source>
-      <translation type="unfinished">Phones</translation>
+      <translation>電話</translation>
     </message>
     <message>
       <source>Emails</source>
-      <translation type="unfinished">Emails</translation>
+      <translation>電子郵件</translation>
     </message>
     <message>
       <source>RHI backend</source>
@@ -1960,7 +1960,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Unable to get GPU information for %1</source>
-      <translation type="unfinished">Unable to get GPU information for %1</translation>
+      <translation>無法取得 %1的 GPU 資訊</translation>
     </message>
   </context>
   <context>
@@ -2423,7 +2423,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Year</source>
-      <translation type="unfinished">Year</translation>
+      <translation>年</translation>
     </message>
   </context>
   <context>
@@ -3054,7 +3054,7 @@ License Key: %2</source>
     <message>
       <source>There is currently no connection between your system and %1.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">There is currently no connection between your system and %1.</translation>
+      <translation>目前您的系統與 %1之間沒有連線。</translation>
     </message>
   </context>
   <context>
@@ -3241,7 +3241,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Log In...</source>
-      <translation type="unfinished">Log In...</translation>
+      <translation>登入...</translation>
     </message>
     <message>
       <source>Your session has expired</source>
@@ -3249,7 +3249,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Please sign in again with your link to continue</source>
-      <translation type="unfinished">Please sign in again with your link to continue</translation>
+      <translation>請使用您的連結重新登入以繼續</translation>
     </message>
   </context>
   <context>
@@ -3862,7 +3862,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Not verified</source>
-      <translation type="unfinished">Not verified</translation>
+      <translation>未驗證的</translation>
     </message>
   </context>
   <context>
@@ -3933,7 +3933,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Settings are read-only. Please contact your system administrator. All changes will be lost after program exit.</source>
-      <translation type="unfinished">Settings are read-only. Please contact your system administrator. All changes will be lost after program exit.</translation>
+      <translation>設定是唯讀的。請聯絡您的系統管理員。程式關閉後所有變更都將遺失。</translation>
     </message>
   </context>
   <context>
@@ -4049,7 +4049,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Hotspots</source>
-      <translation type="unfinished">Hotspots</translation>
+      <translation>熱點</translation>
     </message>
     <message>
       <source>press and hold</source>
@@ -4194,7 +4194,7 @@ License Key: %2</source>
     <name>QnPopupSettingsWidget</name>
     <message>
       <source>These settings apply only to the system you are logged in. They will be removed in future versions.</source>
-      <translation type="unfinished">These settings apply only to the system you are logged in. They will be removed in future versions.</translation>
+      <translation>這些設定僅適用於您登入的系統，之後的版本將會移除。</translation>
     </message>
     <message>
       <source>Save user</source>
@@ -4468,8 +4468,8 @@ License Key: %2</source>
     <message numerus="yes">
       <source>%n users do not have %1 permission for some of selected cameras</source>
       <comment>%1 is the permission name</comment>
-      <translation type="unfinished">
-        <numerusform>%n users do not have %1 permission for some of selected cameras</numerusform>
+      <translation>
+        <numerusform>%n 使用者對某些所選攝影機沒有 %1 權限</numerusform>
       </translation>
     </message>
   </context>
@@ -5239,7 +5239,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Path</source>
-      <translation type="unfinished">Path</translation>
+      <translation>路徑</translation>
     </message>
     <message>
       <source>Type</source>
@@ -5247,7 +5247,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Purpose</source>
-      <translation type="unfinished">Purpose</translation>
+      <translation>目的</translation>
     </message>
     <message>
       <source>Size</source>
@@ -5364,7 +5364,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Failed to save system settings</source>
-      <translation type="unfinished">Failed to save system settings</translation>
+      <translation>儲存系統設定失敗</translation>
     </message>
   </context>
   <context>
@@ -5509,19 +5509,19 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Local recording services overused</source>
-      <translation type="unfinished">Local recording services overused</translation>
+      <translation>本地錄影服務已過度使用</translation>
     </message>
     <message>
       <source>Cloud storage services overused</source>
-      <translation type="unfinished">Cloud storage services overused</translation>
+      <translation>雲端儲存服務已過度使用</translation>
     </message>
     <message>
       <source>Paid integrations services overused</source>
-      <translation type="unfinished">Paid integrations services overused</translation>
+      <translation>付費整合服務已過度使用</translation>
     </message>
     <message>
       <source>System suspended</source>
-      <translation type="unfinished">System suspended</translation>
+      <translation>系統已暫停</translation>
     </message>
     <message>
       <source>System shut down</source>
@@ -5529,11 +5529,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Intercom call</source>
-      <translation type="unfinished">Intercom call</translation>
+      <translation>對講機通話</translation>
     </message>
     <message>
       <source>Intercom missed call</source>
-      <translation type="unfinished">Intercom missed call</translation>
+      <translation>對講機未接來電</translation>
     </message>
   </context>
   <context>
@@ -5624,7 +5624,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Custom access rights</source>
-      <translation type="unfinished">Custom access rights</translation>
+      <translation>自訂存取權限</translation>
     </message>
   </context>
   <context>
@@ -5635,7 +5635,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Email is not valid</source>
-      <translation type="unfinished">Email is not valid</translation>
+      <translation>電子郵件無效</translation>
     </message>
     <message>
       <source>Password cannot be empty</source>
@@ -6329,8 +6329,8 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%n layouts are shared with other users, so they will be deleted for their accounts as well.</source>
       <comment>Numerical form depends on layouts count</comment>
-      <translation type="unfinished">
-        <numerusform>%n layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
+      <translation>
+        <numerusform>%n 個佈局正與其他使用者共享，因此也將從他們的帳戶中刪除。</numerusform>
       </translation>
     </message>
     <message>
@@ -6353,12 +6353,12 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>All members of %1 and %2 groups will get access to this layout</source>
       <comment>%1 and %2 will be substituted with user group names</comment>
-      <translation type="unfinished">All members of %1 and %2 groups will get access to this layout</translation>
+      <translation>%1 和 %2 群組的所有成員都可以存取此佈局</translation>
     </message>
     <message>
       <source>Convert</source>
       <comment>Converting layout to shared</comment>
-      <translation type="unfinished">Convert</translation>
+      <translation>轉換</translation>
     </message>
   </context>
   <context>
@@ -6383,8 +6383,8 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Source Server and %n Servers</source>
-      <translation type="unfinished">
-        <numerusform>Source Server and %n Servers</numerusform>
+      <translation>
+        <numerusform>來源伺服器和 %n 個伺服器</numerusform>
       </translation>
     </message>
   </context>
@@ -6576,36 +6576,36 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Change search criteria or create a new group</source>
-      <translation type="unfinished">Change search criteria or create a new group</translation>
+      <translation>更改搜尋條件或建立新群組</translation>
     </message>
     <message>
       <source>Multiple groups share the same name, which can lead to confusion. To maintain a clear and organized structure, we suggest providing unique names for each group.</source>
-      <translation type="unfinished">Multiple groups share the same name, which can lead to confusion. To maintain a clear and organized structure, we suggest providing unique names for each group.</translation>
+      <translation>有多個群組共用相同的名稱可能會導致混亂。為了保持清楚且有組織的結構，我們建議給每個群組獨特的名稱。</translation>
     </message>
     <message numerus="yes">
       <source>%n existing LDAP groups are not found in the LDAP database.</source>
-      <translation type="unfinished">
-        <numerusform>%n existing LDAP groups are not found in the LDAP database.</numerusform>
+      <translation>
+        <numerusform>有%n 個現有 LDAP 群組在 LDAP 資料庫中找不到。</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n groups</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n groups</numerusform>
+      <translation>
+        <numerusform>刪除%n 個群組?</numerusform>
       </translation>
     </message>
     <message>
       <source>Failed to delete group &quot;%1&quot;.</source>
-      <translation type="unfinished">Failed to delete group &quot;%1&quot;.</translation>
+      <translation>刪除群組失敗 &quot;%1&quot;。</translation>
     </message>
     <message>
       <source>Failed to delete group.</source>
-      <translation type="unfinished">Failed to delete group.</translation>
+      <translation>刪除群組失敗 。</translation>
     </message>
     <message numerus="yes">
       <source>Failed to delete %n groups.</source>
-      <translation type="unfinished">
-        <numerusform>Failed to delete %n groups.</numerusform>
+      <translation>
+        <numerusform>刪除%n 個群組失敗 。</numerusform>
       </translation>
     </message>
     <message>
@@ -6633,7 +6633,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Change search criteria or create a new user</source>
-      <translation type="unfinished">Change search criteria or create a new user</translation>
+      <translation>更改搜尋條件或建立新群組</translation>
     </message>
     <message>
       <source>Edit</source>
@@ -6641,7 +6641,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Multiple users share the same login, causing login failures. To resolve this issue, either update the affected user logins or disable/delete duplicates.</source>
-      <translation type="unfinished">Multiple users share the same login, causing login failures. To resolve this issue, either update the affected user logins or disable/delete duplicates.</translation>
+      <translation>多位使用者共用同一個登入名稱導致登入失敗。若要解決此問題，請更新受影響的使用者登入名稱或停用/刪除重複的。</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n users</source>
@@ -6651,24 +6651,24 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>LDAP server is offline. %n users are not able to log in.</source>
-      <translation type="unfinished">
-        <numerusform>LDAP server is offline. %n users are not able to log in.</numerusform>
+      <translation>
+        <numerusform>LDAP 伺服器離線。 %n 位使用者無法登入。</numerusform>
       </translation>
     </message>
     <message>
       <source>Failed to delete user &quot;%1&quot;.</source>
-      <translation type="unfinished">Failed to delete user &quot;%1&quot;.</translation>
+      <translation>刪除使用者 &quot;%1&quot; 失敗。</translation>
     </message>
     <message numerus="yes">
       <source>Failed to delete %n users.</source>
-      <translation type="unfinished">
-        <numerusform>Failed to delete %n users.</numerusform>
+      <translation>
+        <numerusform>刪除%n 位使用者失敗 。</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n existing LDAP users are not found in the LDAP database</source>
-      <translation type="unfinished">
-        <numerusform>%n existing LDAP users are not found in the LDAP database</numerusform>
+      <translation>
+        <numerusform>有%n 個現有 LDAP 使用者在 LDAP 資料庫中找不到。</numerusform>
       </translation>
     </message>
   </context>
@@ -7283,11 +7283,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>System suspended. To make changes to backup configuration, the System should be in active state. %1</source>
-      <translation type="unfinished">System suspended. To make changes to backup configuration, the System should be in active state. %1</translation>
+      <translation>系統已暫停。系統需要在活躍狀態才能更改備份設定。%1</translation>
     </message>
     <message>
       <source>Applies to all servers</source>
-      <translation type="unfinished">Applies to all servers</translation>
+      <translation>適用於所有伺服器</translation>
     </message>
   </context>
   <context>
@@ -7362,7 +7362,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Missed Call</source>
-      <translation type="unfinished">Missed Call</translation>
+      <translation>未接來電</translation>
     </message>
   </context>
   <context>
@@ -7497,11 +7497,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::CameraHotspotItem</name>
     <message>
       <source>Open Camera</source>
-      <translation type="unfinished">Open Camera</translation>
+      <translation>開啟攝影機</translation>
     </message>
     <message>
       <source>Open Camera in new Tab</source>
-      <translation type="unfinished">Open Camera in new Tab</translation>
+      <translation>在新分頁中開啟攝影機</translation>
     </message>
     <message>
       <source>Open Camera in place</source>
@@ -7539,7 +7539,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::CameraHotspotsItemModel</name>
     <message>
       <source>Camera does not exist</source>
-      <translation type="unfinished">Camera does not exist</translation>
+      <translation>攝影機不存在</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -7877,7 +7877,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Hotspots</source>
-      <translation type="unfinished">Hotspots</translation>
+      <translation>熱點</translation>
     </message>
     <message>
       <source>Integrations</source>
@@ -8171,15 +8171,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Enter access link to continue your session</source>
-      <translation type="unfinished">Enter access link to continue your session</translation>
+      <translation>請輸訪問連結以繼續您的工作階段</translation>
     </message>
     <message>
       <source>Your session has expired. Please sign in again with your link to continue.</source>
-      <translation type="unfinished">Your session has expired. Please sign in again with your link to continue.</translation>
+      <translation>您的工作階段已過期，請使用您的連結重新登入以繼續。</translation>
     </message>
     <message>
       <source>Authentication details are incorrect</source>
-      <translation type="unfinished">Authentication details are incorrect</translation>
+      <translation>認證詳細資訊不正確</translation>
     </message>
   </context>
   <context>
@@ -8308,7 +8308,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Recording will not be enabled on some cameras.</source>
-      <translation type="unfinished">Recording will not be enabled on some cameras.</translation>
+      <translation>某些攝影機不會啟用錄影。</translation>
     </message>
   </context>
   <context>
@@ -8322,11 +8322,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::CustomAccessSummaryModel</name>
     <message>
       <source>View video archive</source>
-      <translation type="unfinished">View video archive</translation>
+      <translation>瀏覽影像存擋</translation>
     </message>
     <message>
       <source>Export video archive</source>
-      <translation type="unfinished">Export video archive</translation>
+      <translation>匯出影像存擋</translation>
     </message>
     <message>
       <source>View bookmarks</source>
@@ -8350,7 +8350,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>View live</source>
-      <translation type="unfinished">View live</translation>
+      <translation>瀏覽即時影像</translation>
     </message>
   </context>
   <context>
@@ -8369,11 +8369,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>This camera requires password to be set up. Ask your system administrator to do it.</source>
-      <translation type="unfinished">This camera requires password to be set up. Ask your system administrator to do it.</translation>
+      <translation>此相機需要密碼才能設定。請您的系統管理員來執行此操作。</translation>
     </message>
     <message>
       <source>Some of selected cameras require password to be set up. Ask your system administrator to do it.</source>
-      <translation type="unfinished">Some of selected cameras require password to be set up. Ask your system administrator to do it.</translation>
+      <translation>所選的攝影機某些需要密碼才能設定。請您的系統管理員來執行此操作。</translation>
     </message>
   </context>
   <context>
@@ -8841,7 +8841,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>You do not have a permission to export archive for some of the selected cameras. Video from those cameras will not be exported to the resulting file.</source>
-      <translation type="unfinished">You do not have a permission to export archive for some of the selected cameras. Video from those cameras will not be exported to the resulting file.</translation>
+      <translation>選取攝影機中有部分您無權匯出存檔。這些攝影機的影像不會匯出到產生的檔案。</translation>
     </message>
   </context>
   <context>
@@ -8949,7 +8949,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>%1 group</source>
       <comment>%1 will be substituted with a user group name</comment>
-      <translation type="unfinished">%1 group</translation>
+      <translation>%1 群組</translation>
     </message>
     <message numerus="yes">
       <source>%1 and %n more groups</source>
@@ -8961,18 +8961,18 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Inherits %1 permission from</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Inherits %1 permission from</translation>
+      <translation>繼承 %1 權限至</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::GroupSettingsDialog</name>
     <message>
       <source>Delete failed</source>
-      <translation type="unfinished">Delete failed</translation>
+      <translation>刪除失敗</translation>
     </message>
     <message>
       <source>Apply changes?</source>
-      <translation type="unfinished">Apply changes?</translation>
+      <translation>套用變更？</translation>
     </message>
     <message>
       <source>Discard</source>
@@ -8988,7 +8988,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Save changes</source>
-      <translation type="unfinished">Save changes</translation>
+      <translation>儲存變更</translation>
     </message>
     <message>
       <source>Enter your account password</source>
@@ -9004,7 +9004,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Delete groups</source>
-      <translation type="unfinished">Delete groups</translation>
+      <translation>刪除群組</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -9012,23 +9012,23 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Group name cannot be empty</source>
-      <translation type="unfinished">Group name cannot be empty</translation>
+      <translation>群組名稱不能為空白</translation>
     </message>
     <message>
       <source>Group with the same name already exists</source>
-      <translation type="unfinished">Group with the same name already exists</translation>
+      <translation>具有相同名稱的群組已存在</translation>
     </message>
     <message>
       <source>Failed to apply changes to %1 group</source>
-      <translation type="unfinished">Failed to apply changes to %1 group</translation>
+      <translation>無法將變更套用到 %1 群組</translation>
     </message>
     <message>
       <source>Current group is a member of all groups selected on this tab and inherits permissions from each of them.</source>
-      <translation type="unfinished">Current group is a member of all groups selected on this tab and inherits permissions from each of them.</translation>
+      <translation>目前群組是所有在此分頁選取的群組的成員，繼承了每個群組的權限。</translation>
     </message>
     <message>
       <source>Select one or multiple groups from which the current group will inherit permissions</source>
-      <translation type="unfinished">Select one or multiple groups from which the current group will inherit permissions</translation>
+      <translation>選擇目前群組將繼承權限的一個或多個群組</translation>
     </message>
   </context>
   <context>
@@ -9186,11 +9186,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::LdapSettingsWidget</name>
     <message>
       <source>Disconnect LDAP server?</source>
-      <translation type="unfinished">Disconnect LDAP server?</translation>
+      <translation>結束LDAP伺服器的連線?</translation>
     </message>
     <message>
       <source>All LDAP users and groups will be deleted from the system.&lt;br&gt;&lt;br&gt;LDAP settings will be also deleted.</source>
-      <translation type="unfinished">All LDAP users and groups will be deleted from the system.&lt;br&gt;&lt;br&gt;LDAP settings will be also deleted.</translation>
+      <translation>所有 LDAP 使用者和群組將從系統中刪除，&lt;br&gt;&lt;br&gt;LDAP 設定也會被刪除。</translation>
     </message>
     <message>
       <source>Disconnect</source>
@@ -9198,7 +9198,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Reset Settings</source>
-      <translation type="unfinished">Reset Settings</translation>
+      <translation>重置設定</translation>
     </message>
     <message>
       <source>Enter your account password</source>
@@ -9214,11 +9214,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Remove existing LDAP users and groups?</source>
-      <translation type="unfinished">Remove existing LDAP users and groups?</translation>
+      <translation>移除現有的 LDAP 使用者和群組？</translation>
     </message>
     <message>
       <source>Looks like you have changed LDAP server. It is recommended to remove all existing LDAP users and groups before importing users and groups from a new LDAP server.</source>
-      <translation type="unfinished">Looks like you have changed LDAP server. It is recommended to remove all existing LDAP users and groups before importing users and groups from a new LDAP server.</translation>
+      <translation>您似乎已更改 LDAP 伺服器。建議在從新 LDAP 伺服器匯入使用者和群組之前，先刪除所有現有的 LDAP 使用者和群組。</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -9234,15 +9234,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Synchronize LDAP Users and Groups</source>
-      <translation type="unfinished">Synchronize LDAP Users and Groups</translation>
+      <translation>同步 LDAP 使用者和群組</translation>
     </message>
     <message>
       <source>Synchronize</source>
-      <translation type="unfinished">Synchronize</translation>
+      <translation>同步</translation>
     </message>
     <message>
       <source>Connection OK</source>
-      <translation type="unfinished">Connection OK</translation>
+      <translation>連線正常</translation>
     </message>
     <message>
       <source>Failed to apply changes</source>
@@ -9254,7 +9254,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Cannot connect to LDAP server</source>
-      <translation type="unfinished">Cannot connect to LDAP server</translation>
+      <translation>無法連線至LDAP伺服器</translation>
     </message>
   </context>
   <context>
@@ -9372,7 +9372,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>The provided link is not valid or has expired</source>
-      <translation type="unfinished">The provided link is not valid or has expired</translation>
+      <translation>提供的連結無效或已過期</translation>
     </message>
   </context>
   <context>
@@ -9415,15 +9415,15 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Default Logging level</source>
-      <translation type="unfinished">Default Logging level</translation>
+      <translation>預設日誌等級</translation>
     </message>
     <message>
       <source>Logging level degrades the performance of the system</source>
-      <translation type="unfinished">Logging level degrades the performance of the system</translation>
+      <translation>日誌等級會降低系統效能</translation>
     </message>
     <message>
       <source>Non-default Logging level. We recommend setting it to &quot;info&quot;</source>
-      <translation type="unfinished">Non-default Logging level. We recommend setting it to &quot;info&quot;</translation>
+      <translation>非預設日誌等級。我們建議設定為 &quot;關於&quot;</translation>
     </message>
   </context>
   <context>
@@ -10017,7 +10017,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Uploading offline update packages to Servers...</source>
-      <translation type="unfinished">Uploading offline update packages to Servers...</translation>
+      <translation>正在上傳離線更新套件到伺服器...</translation>
     </message>
     <message>
       <source>Applying System updates at the end of the week is not recommended</source>
@@ -10050,7 +10050,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>You do not have permissions to modify this user</source>
-      <translation type="unfinished">You do not have permissions to modify this user</translation>
+      <translation>您沒有權限修改此使用者 </translation>
     </message>
     <message>
       <source>You cannot modify a user with a non-unique login</source>
