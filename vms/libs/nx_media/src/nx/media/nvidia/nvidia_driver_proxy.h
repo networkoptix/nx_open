@@ -61,7 +61,7 @@ private:
     LibraryLoader m_loader;
 };
 
-class NvidiaDriverApiProxy
+class NX_MEDIA_API NvidiaDriverApiProxy
 {
 public:
     bool load();
@@ -91,6 +91,8 @@ public:
     using CuGraphicsResourceGetMappedPointerType = CUresult (*)(CUdeviceptr*, size_t*, CUgraphicsResource);
     using CuMemsetD8Type = CUresult (*)(CUdeviceptr, unsigned char, size_t);
     using CuDriverGetVersionType = CUresult (*)(int*);
+    using CuMemGetInfo = CUresult (*)(size_t*, size_t*);
+    using CuCtxGetApiVersion = CUresult (*)(CUcontext, unsigned int*);
 
 
     CuInitType cuInit = nullptr;
@@ -112,6 +114,8 @@ public:
     CuStreamSynchronizeType cuStreamSynchronize = nullptr;
     CuGetErrorNameType cuGetErrorName = nullptr;
     CuDriverGetVersionType cuDriverGetVersion = nullptr;
+    CuMemGetInfo cuMemGetInfo = nullptr;
+    CuCtxGetApiVersion cuCtxGetApiVersion = nullptr;
 
 private:
     LibraryLoader m_loader;

@@ -68,9 +68,14 @@ void Renderer::freeScaledFrame()
 
 void Renderer::freePbo()
 {
-    if (m_pbo)
+    if (m_cuResource)
     {
         NvidiaDriverApiProxy::instance().cuGraphicsUnregisterResource(m_cuResource);
+        m_cuResource = nullptr;
+    }
+
+    if (m_pbo)
+    {
         glDeleteBuffers(1, &m_pbo);
         m_pbo = 0;
     }
@@ -106,6 +111,13 @@ bool Renderer::initializePbo(int width, int height)
     glGenBuffers(1, &m_pbo);
     glBindBuffer(GL_PIXEL_UNPACK_BUFFER, m_pbo);
     glBufferData(GL_PIXEL_UNPACK_BUFFER, width * height * 4, NULL, GL_DYNAMIC_DRAW);
+    auto glError = glGetError();
+    if (GL_NO_ERROR != glError)
+    {
+        m_pbo = 0;
+        NX_WARNING(this, "Failed to create GL buffer: %1", glError);
+        return false;
+    }
     glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
 
     // Attach pbo to the cuda graphics resource

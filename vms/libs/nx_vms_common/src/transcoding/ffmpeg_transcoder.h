@@ -80,7 +80,6 @@ private:
     MediaSigner m_mediaSigner;
     AVCodecParameters* m_videoCodecParameters = nullptr;
     AVCodecParameters* m_audioCodecParameters = nullptr;
-    int m_videoBitrate = 0;
     AVFormatContext* m_formatCtx = nullptr;
 
     QString m_container;

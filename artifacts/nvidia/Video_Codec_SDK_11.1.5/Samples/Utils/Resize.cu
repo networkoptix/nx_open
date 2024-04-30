@@ -11,6 +11,7 @@
 
 #include <stdint.h>
 #include <stdio.h>
+#include <iostream>
 
 #include <cuda_runtime.h>
 
@@ -202,4 +203,11 @@ void ScaleYUV420(unsigned char *dpDstY,
         ScaleKernelLaunch(dpDstU, nDstChromaPitch, chromaWidthDst, chromaHeightDst, dpSrcU, nSrcChromaPitch, chromaWidthSrc, chromaHeightSrc);
         ScaleKernelLaunch(dpDstV, nDstChromaPitch, chromaWidthDst, chromaHeightDst, dpSrcV, nSrcChromaPitch, chromaWidthSrc, chromaHeightSrc);
     }
+}
+
+int freeGpuMemory()
+{
+    size_t free, total;
+    cudaMemGetInfo(&free, &total);
+    return free;
 }

@@ -18,7 +18,7 @@ struct NvidiaVideoDecoderImpl;
 class NX_MEDIA_API NvidiaVideoDecoder: public std::enable_shared_from_this<NvidiaVideoDecoder>
 {
 public:
-    NvidiaVideoDecoder();
+    NvidiaVideoDecoder(bool checkMode = false);
     ~NvidiaVideoDecoder();
     bool decode(const QnConstCompressedVideoDataPtr& frame);
 
@@ -39,6 +39,10 @@ private:
     bool initialize(const QnConstCompressedVideoDataPtr& frame);
 
 private:
+    // Mode when video will not be decoded, just create a decoder to check compatibility and GPU
+    // memory availability.
+    bool m_checkMode = false;
+
     std::unique_ptr<NvidiaVideoDecoderImpl> m_impl;
 };
 

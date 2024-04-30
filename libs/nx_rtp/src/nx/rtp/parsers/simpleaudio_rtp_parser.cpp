@@ -2,8 +2,6 @@
 
 #include "simpleaudio_rtp_parser.h"
 
-#include <QtCore/QtEndian>
-
 #include <nx/media/audio_data_packet.h>
 #include <nx/media/codec_parameters.h>
 #include <nx/media/config.h>
