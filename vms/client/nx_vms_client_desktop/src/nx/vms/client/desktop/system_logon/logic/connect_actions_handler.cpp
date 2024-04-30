@@ -668,6 +668,9 @@ void ConnectActionsHandler::establishConnection(RemoteConnectionPtr connection)
     if (!NX_ASSERT(connection))
         return;
 
+    NX_INFO(this, "Establish connection to %1 as %2", connection->address(),
+        connection->credentials().username);
+
     emit windowContext()->beforeSystemChanged();
 
     setState(LogicalState::connecting);
@@ -1396,7 +1399,7 @@ void ConnectActionsHandler::at_logoutFromCloud()
 
 bool ConnectActionsHandler::disconnectFromServer(DisconnectFlags flags)
 {
-    NX_DEBUG(this, "Disconnecting from the current server (flags %1)", int(flags));
+    NX_INFO(this, "Disconnecting from the current server (flags %1)", int(flags));
     const bool force = flags.testFlag(DisconnectFlag::Force);
 
     if (flags.testFlag(DisconnectFlag::ClearAutoLogin))
@@ -1434,7 +1437,7 @@ void ConnectActionsHandler::showLoginDialog()
 
 void ConnectActionsHandler::clearConnection()
 {
-    NX_DEBUG(this, "Clear connection: starting");
+    NX_DEBUG(this, "Clear connection");
 
     emit windowContext()->beforeSystemChanged();
 
@@ -1479,7 +1482,7 @@ void ConnectActionsHandler::clearConnection()
     for (const auto& res: resourcesToRemove)
         idList.push_back(res->getId());
 
-    NX_DEBUG(this, "Clear connection: removing resources");
+    NX_DEBUG(this, "Removing resources");
     resourcePool->removeResources(resourcesToRemove);
 
     system()->showreelManager()->resetShowreels();
@@ -1494,7 +1497,7 @@ void ConnectActionsHandler::clearConnection()
 
     emit windowContext()->systemChanged();
 
-    NX_DEBUG(this, "Clear connection: finished");
+    NX_DEBUG(this, "Clear connection finished");
 }
 
 void ConnectActionsHandler::connectToServer(LogonData logonData, ConnectionOptions options)
