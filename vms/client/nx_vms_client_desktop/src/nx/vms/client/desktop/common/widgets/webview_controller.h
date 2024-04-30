@@ -25,7 +25,7 @@ namespace nx::vms::client::desktop {
 
 class AbstractWebAuthenticator;
 class GraphicsQmlView;
-class WebPageIconCache;
+class WebPageDataCache;
 class WindowContext;
 
 /**
@@ -224,7 +224,7 @@ public:
 
     Q_INVOKABLE QUrl resourceUrl() const;
 
-    Q_INVOKABLE nx::vms::client::desktop::WebPageIconCache* iconCache() const;
+    Q_INVOKABLE nx::vms::client::desktop::WebPageDataCache* dataCache() const;
 
     virtual bool eventFilter(QObject* watched, QEvent* event) override;
 

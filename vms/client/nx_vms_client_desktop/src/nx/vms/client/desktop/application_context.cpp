@@ -82,10 +82,10 @@
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/ui/common/custom_cursors.h>
 #include <nx/vms/client/desktop/ui/image_providers/resource_icon_provider.h>
-#include <nx/vms/client/desktop/ui/image_providers/web_page_icon_cache.h>
 #include <nx/vms/client/desktop/utils/applauncher_guard.h>
 #include <nx/vms/client/desktop/utils/local_proxy_server.h>
 #include <nx/vms/client/desktop/utils/upload_manager.h>
+#include <nx/vms/client/desktop/webpage/web_page_data_cache.h>
 #include <nx/vms/common/network/server_compatibility_validator.h>
 #include <platform/platform_abstraction.h>
 #include <ui/workaround/qtbug_workaround.h>
@@ -369,7 +369,7 @@ struct ApplicationContext::Private
     std::unique_ptr<UploadManager> uploadManager;
     std::unique_ptr<QnForgottenSystemsManager> forgottenSystemsManager;
     std::unique_ptr<ResourcesChangesManager> resourcesChangesManager;
-    std::unique_ptr<WebPageIconCache> webPageIconCache;
+    std::unique_ptr<WebPageDataCache> webPageDataCache;
     std::unique_ptr<QnQtbugWorkaround> qtBugWorkarounds;
     std::unique_ptr<core::DesktopResourceSearcher> desktopResourceSearcher;
     std::unique_ptr<core::SystemsVisibilityManager> systemsVisibilityManager;
@@ -751,7 +751,7 @@ ApplicationContext::ApplicationContext(
             d->uploadManager = std::make_unique<UploadManager>();
             d->forgottenSystemsManager = std::make_unique<QnForgottenSystemsManager>();
             d->resourcesChangesManager = std::make_unique<ResourcesChangesManager>();
-            d->webPageIconCache = std::make_unique<WebPageIconCache>();
+            d->webPageDataCache = std::make_unique<WebPageDataCache>();
             d->qtBugWorkarounds = std::make_unique<QnQtbugWorkaround>();
             d->cloudGateway = std::make_unique<nx::cloud::gateway::VmsGatewayEmbeddable>();
             d->localProxyServer = std::make_unique<LocalProxyServer>();
@@ -791,7 +791,7 @@ ApplicationContext::~ApplicationContext()
     d->cloudLayoutsManager.reset();
 
     // Web Page icon cache uses application context.
-    d->webPageIconCache.reset();
+    d->webPageDataCache.reset();
 
     if (NX_ASSERT(s_instance == this))
         s_instance = nullptr;
@@ -997,9 +997,9 @@ ResourcesChangesManager* ApplicationContext::resourcesChangesManager() const
     return d->resourcesChangesManager.get();
 }
 
-WebPageIconCache* ApplicationContext::webPageIconCache() const
+WebPageDataCache* ApplicationContext::webPageDataCache() const
 {
-    return d->webPageIconCache.get();
+    return d->webPageDataCache.get();
 }
 
 QnForgottenSystemsManager* ApplicationContext::forgottenSystemsManager() const

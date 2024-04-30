@@ -42,7 +42,7 @@
 #include <nx/vms/client/desktop/jsapi/tab.h>
 #include <nx/vms/client/desktop/jsapi/tabs.h>
 #include <nx/vms/client/desktop/resource_properties/camera/utils/camera_web_page_workarounds.h>
-#include <nx/vms/client/desktop/ui/image_providers/web_page_icon_cache.h>
+#include <nx/vms/client/desktop/webpage/web_page_data_cache.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/dialogs/common/certificate_selection_dialog.h>
@@ -1253,9 +1253,9 @@ QUrl WebViewController::resourceUrl() const
     return urlFromResource(d->resource);
 }
 
-WebPageIconCache* WebViewController::iconCache() const
+WebPageDataCache* WebViewController::dataCache() const
 {
-    return core::withCppOwnership(appContext()->webPageIconCache());
+    return core::withCppOwnership(appContext()->webPageDataCache());
 }
 
 } // namespace nx::vms::client::desktop

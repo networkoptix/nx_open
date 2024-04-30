@@ -201,7 +201,7 @@ void migrateSettingsFrom5_1(LocalSettings* settings, QSettings* oldSettings)
     migrateSerializedValue(settings->detectedObjectSettings);
     migrateSerializedValue(settings->authAllowedUrls);
     migrateValue(settings->maxMp3FileDurationSec);
-    migrateSerializedValue(settings->webPageIcons);
+    migrateSerializedValue(settings->webPageSettings);
 
     migratePopupSystemHealthFrom5_1(settings, oldSettings);
     migrateMediaFoldersFrom5_1(settings, oldSettings);

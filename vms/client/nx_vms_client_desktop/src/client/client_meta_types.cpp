@@ -87,7 +87,6 @@
 #include <nx/vms/client/desktop/ui/common/keyboard_modifiers.h>
 #include <nx/vms/client/desktop/ui/common/recording_status_helper.h>
 #include <nx/vms/client/desktop/ui/common/whats_this.h>
-#include <nx/vms/client/desktop/ui/image_providers/web_page_icon_cache.h>
 #include <nx/vms/client/desktop/ui/right_panel/models/right_panel_models_adapter.h>
 #include <nx/vms/client/desktop/ui/scene/instruments/instrument.h>
 #include <nx/vms/client/desktop/ui/scene/item_model_utils.h>
@@ -103,6 +102,7 @@
 #include <nx/vms/client/desktop/utils/window_context_aware_attached.h>
 #include <nx/vms/client/desktop/virtual_camera/virtual_camera_payload.h>
 #include <nx/vms/client/desktop/virtual_camera/virtual_camera_state.h>
+#include <nx/vms/client/desktop/webpage/web_page_data_cache.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/state/thumbnail_search_state.h>
 #include <nx/vms/client/desktop/workbench/timeline/archive_frame_extractor.h>
@@ -332,10 +332,10 @@ void QnClientMetaTypes::registerQmlTypes()
             return core::withCppOwnership(appContext()->localSettings());
         });
 
-    qmlRegisterSingletonType<WebPageIconCache>("nx.vms.client.desktop", 1, 0, "WebPageIconCache",
+    qmlRegisterSingletonType<WebPageDataCache>("nx.vms.client.desktop", 1, 0, "WebPageDataCache",
         [](QQmlEngine* /*qmlEngine*/, QJSEngine* /*jsEngine*/) -> QObject*
         {
-            return core::withCppOwnership(appContext()->webPageIconCache());
+            return core::withCppOwnership(appContext()->webPageDataCache());
         });
 
     ui::scene::Instrument::registerQmlType();

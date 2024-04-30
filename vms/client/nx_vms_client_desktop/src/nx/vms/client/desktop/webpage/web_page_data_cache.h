@@ -14,15 +14,17 @@
 #include <QtCore/QUrl>
 #include <QtGui/QImage>
 
+#include "web_page_settings.h"
+
 class QTimer;
 class QWebEnginePage;
 
 namespace nx::vms::client::desktop {
 
 /**
- * Provides a way to find Web Page icons, and downloads them if necessary.
+ * Provides a way to find Web Page icons and metadata, downloads them if necessary.
  */
-class WebPageIconCache: public QObject
+class WebPageDataCache: public QObject
 {
     Q_OBJECT
 
@@ -32,13 +34,13 @@ public:
     static inline const QString kNoPath = "";
 
 public:
-    WebPageIconCache(QObject* parent = nullptr);
-    virtual ~WebPageIconCache() override;
+    WebPageDataCache(QObject* parent = nullptr);
+    virtual ~WebPageDataCache() override;
 
     /** Finds the icon path associated with webPageUrl. */
-    std::optional<QUrl> findPath(const QUrl& webPageUrl);
+    std::optional<QUrl> findIconPath(const QUrl& webPageUrl);
 
-    /** Refreshes the icon associated with webPageUrl. */
+    /** Refreshes the data associated with webPageUrl. */
     void refresh(const QUrl& webPageUrl);
 
     /** Updates the icon associated with webPageUrl if there is no loaded icon. */
@@ -48,14 +50,20 @@ signals:
     /** Emitted when the icon associated with webPageUrl changes. */
     void iconChanged(const QUrl& webPageUrl);
 
+    /** Emitted when the webpage "windowSize" metadata parameter changes. */
+    void windowSizeChanged(const QUrl& webPageUrl, const QSize& size);
+
 private:
     void loadNext();
     void saveIcon(const QUrl& webPageUrl, const QImage& icon, const QImage& icon2x = {});
 
 private:
-    QMap<QUrl /*webPageUrl*/, QUrl /*iconUrl*/> m_iconPaths;
+    QMap<QUrl /*webPageUrl*/, WebPageSettings> m_settings;
+
     QList<QUrl> m_urlsToRefresh;
     std::unique_ptr<QWebEnginePage> m_webPage;
+    bool m_isIconLoaded = false;
+    bool m_isMetadataLoaded = false;
     QTimer* m_timer = nullptr;
 };
 

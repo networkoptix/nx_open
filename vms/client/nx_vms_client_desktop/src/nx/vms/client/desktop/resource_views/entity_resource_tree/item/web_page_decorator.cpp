@@ -7,7 +7,7 @@
 #include <core/resource/webpage_resource.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
-#include <nx/vms/client/desktop/ui/image_providers/web_page_icon_cache.h>
+#include <nx/vms/client/desktop/webpage/web_page_data_cache.h>
 
 namespace nx::vms::client::desktop::entity_resource_tree {
 
@@ -26,9 +26,9 @@ WebPageDecorator::WebPageDecorator(
     if (!NX_ASSERT(webPage))
         return;
 
-    if (const auto iconCache = appContext()->webPageIconCache())
+    if (const auto dataCache = appContext()->webPageDataCache())
     {
-        connect(iconCache, &WebPageIconCache::iconChanged, this,
+        connect(dataCache, &WebPageDataCache::iconChanged, this,
             [this, webPage](const QUrl& webPageUrl)
             {
                 if (webPage->getUrl() == webPageUrl.toString())
@@ -50,7 +50,9 @@ QVariant WebPageDecorator::data(int role) const
             if (!NX_ASSERT(webPage))
                 return {};
 
-            const auto iconPath = appContext()->webPageIconCache()->findPath(webPage->getUrl());
+            const auto iconPath =
+                appContext()->webPageDataCache()->findIconPath(webPage->getUrl());
+
             return iconPath ? iconPath->toString() : QVariant{};
         }
 

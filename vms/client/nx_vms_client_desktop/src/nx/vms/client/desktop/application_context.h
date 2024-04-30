@@ -41,7 +41,7 @@ class ShowOnceSettings;
 class MessageBarSettings;
 class SystemContext;
 class UploadManager;
-class WebPageIconCache;
+class WebPageDataCache;
 class WindowContext;
 
 namespace joystick { class Manager; }
@@ -213,7 +213,7 @@ public:
 
     QnForgottenSystemsManager* forgottenSystemsManager() const;
 
-    WebPageIconCache* webPageIconCache() const;
+    WebPageDataCache* webPageDataCache() const;
 
     nx::cloud::gateway::VmsGatewayEmbeddable* cloudGateway() const;
 
