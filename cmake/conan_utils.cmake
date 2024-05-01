@@ -58,6 +58,8 @@ function(_configure_conan)
             set(download_cache_parameter_string "download_cache = $ENV{NX_CONAN_DOWNLOAD_CACHE}")
         endif()
 
+        cmake_path(SET conan_user_home_short "$ENV{CONAN_USER_HOME}/.conan_short")
+
         set(conan_config_dir_src "${open_source_root}/conan_config")
         set(conan_config_dir "${CMAKE_BINARY_DIR}/conan_config")
         nx_configure_directory(${conan_config_dir_src} ${conan_config_dir})
