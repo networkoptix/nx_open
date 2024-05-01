@@ -115,7 +115,7 @@ class RulesNinjaFileProcessor(NinjaFileProcessor):  # pylint:disable=too-few-pub
         verify_globs_full_path = verify_globs_path.joinpath(self._VERIFY_GLOBS_TOOL_NAME)
         verify_globs_run_string = (
             f"{verify_globs_full_path.as_posix()} {self.build_directory.as_posix()}")
-        if verify_globs_run_string == command:  # verify_globs.py is already added.
+        if verify_globs_run_string == command:  # verify_globs is already added.
             return
 
         updated_line = f"  command = {verify_globs_run_string}\n"
