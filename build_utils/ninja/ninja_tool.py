@@ -156,6 +156,7 @@ def find_extra_files(build_dir: Path, known_files: set) -> list:
         'CMakeFiles',
         '_autogen',
         ".conan",
+        ".conan_short",
         ".cmake",
     }
 
