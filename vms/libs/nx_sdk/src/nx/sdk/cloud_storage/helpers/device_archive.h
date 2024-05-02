@@ -20,7 +20,7 @@ enum class ChunkOperation
 
 using IndexData = std::map<
     ChunkOperation,
-    nx::sdk::cloud_storage::TimePeriodList>;
+    std::vector<nx::sdk::cloud_storage::TimePeriod>>;
 
 using DeviceData = std::map<
     int /*streamIndex*/,

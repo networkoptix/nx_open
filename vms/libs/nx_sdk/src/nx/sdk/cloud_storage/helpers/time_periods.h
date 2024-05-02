@@ -16,9 +16,9 @@ class TimePeriods: public nx::sdk::RefCountable<ITimePeriods>
 {
 public:
     TimePeriods() = default;
-    TimePeriods(const TimePeriodList& periods);
+    TimePeriods(const std::vector<nx::sdk::cloud_storage::TimePeriod>& periods);
 
-    void setPeriods(const TimePeriodList& periods);
+    void setPeriods(const std::vector<nx::sdk::cloud_storage::TimePeriod>& periods);
 
     virtual void goToBeginning() const override;
     virtual bool next() const override;
