@@ -303,18 +303,15 @@ const QVector<nx::Uuid>& AbstractAction::getResources() const
     return m_resources;
 }
 
-QVector<nx::Uuid> AbstractAction::getSourceResources(const QnResourcePool* resourcePool) const
+QnResourceList AbstractAction::getSourceResources(const QnResourcePool* resourcePool) const
 {
     NX_ASSERT(m_params.useSource, "Method should be called only when corresponding parameter is set.");
-    QVector<nx::Uuid> result;
-    result << m_runtimeParams.eventResourceId;
-    for (const auto& flexibleId: m_runtimeParams.metadata.cameraRefs)
-    {
-        auto camera = camera_id_helper::findCameraByFlexibleId(resourcePool, flexibleId);
-        if (camera && !result.contains(camera->getId()))
-            result.push_back(camera->getId());
-    }
-    return result;
+
+    const auto sourceResources = event::sourceResources(m_runtimeParams, resourcePool);
+    if (!sourceResources)
+        return {};
+
+    return *sourceResources;
 }
 
 void AbstractAction::setParams(const ActionParameters& params)

@@ -7,18 +7,15 @@ namespace vms {
 namespace event {
 
 CustomEvent::CustomEvent(
-    EventState toggleState,
-    qint64 timeStamp,
-    const QString& resourceName,
-    const QString& caption,
-    const QString& description,
-    EventMetaData metadata)
+    const nx::vms::event::EventParameters& parameters,
+    nx::vms::api::EventState eventState,
+    const QnResourcePtr& resource)
     :
-    base_type(EventType::userDefinedEvent, QnResourcePtr(), toggleState, timeStamp),
-    m_resourceName(resourceName),
-    m_caption(caption),
-    m_description(description),
-    m_metadata(std::move(metadata))
+    base_type(EventType::userDefinedEvent, resource, eventState, parameters.eventTimestampUsec),
+    m_resourceName(parameters.resourceName),
+    m_caption(parameters.caption),
+    m_description(parameters.description),
+    m_metadata(parameters.metadata)
 {
 }
 
