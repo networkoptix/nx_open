@@ -92,8 +92,6 @@ void RecordingStatusHelper::setCamera(const QnVirtualCameraResourcePtr& camera)
 
     if (m_camera)
     {
-        QQmlEngine::setObjectOwnership(m_camera.get(), QQmlEngine::CppOwnership);
-
         m_connections << connect(
             m_camera.data(),
             &QnVirtualCameraResource::statusChanged,

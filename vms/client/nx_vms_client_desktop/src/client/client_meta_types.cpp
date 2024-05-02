@@ -19,6 +19,7 @@
 #include <nx/cloud/db/api/result_code.h>
 #include <nx/cloud/db/api/system_data.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/client/core/qml/qml_ownership.h>
 #include <nx/vms/client/desktop/access/screen_recording_watcher.h>
 #include <nx/vms/client/desktop/analytics/analytics_taxonomy_manager.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -119,6 +120,7 @@ Q_DECLARE_METATYPE(nx::cloud::db::api::ResultCode)
 Q_DECLARE_METATYPE(nx::cloud::db::api::SystemData)
 Q_DECLARE_METATYPE(rest::ServerConnectionPtr)
 
+using namespace nx::vms::client;
 using namespace nx::vms::client::desktop;
 
 namespace {
@@ -314,28 +316,22 @@ void QnClientMetaTypes::registerQmlTypes()
         "FilteredResourceProxyModel can be created from C++ code only.");
 
     qmlRegisterSingletonType<HelpHandler>("nx.vms.client.desktop", 1, 0, "HelpHandler",
-        [](QQmlEngine* qmlEngine, QJSEngine* /*jsEngine*/) -> QObject*
+        [](QQmlEngine* /*qmlEngine*/, QJSEngine* /*jsEngine*/) -> QObject*
         {
-            auto helpHandler = &HelpHandler::instance();
-            qmlEngine->setObjectOwnership(helpHandler, QQmlEngine::CppOwnership);
-            return helpHandler;
+            return core::withCppOwnership(&HelpHandler::instance());
         });
     HelpTopic::registerQmlType();
 
     qmlRegisterSingletonType<LocalSettings>("nx.vms.client.desktop", 1, 0, "LocalSettings",
-        [](QQmlEngine* qmlEngine, QJSEngine* /*jsEngine*/) -> QObject*
+        [](QQmlEngine* /*qmlEngine*/, QJSEngine* /*jsEngine*/) -> QObject*
         {
-            qmlEngine->setObjectOwnership(appContext()->localSettings(), QQmlEngine::CppOwnership);
-            return appContext()->localSettings();
+            return core::withCppOwnership(appContext()->localSettings());
         });
 
     qmlRegisterSingletonType<WebPageIconCache>("nx.vms.client.desktop", 1, 0, "WebPageIconCache",
-        [](QQmlEngine* qmlEngine, QJSEngine* /*jsEngine*/) -> QObject*
+        [](QQmlEngine* /*qmlEngine*/, QJSEngine* /*jsEngine*/) -> QObject*
         {
-            qmlEngine->setObjectOwnership(
-                appContext()->webPageIconCache(), QQmlEngine::CppOwnership);
-
-            return appContext()->webPageIconCache();
+            return core::withCppOwnership(appContext()->webPageIconCache());
         });
 
     ui::scene::Instrument::registerQmlType();

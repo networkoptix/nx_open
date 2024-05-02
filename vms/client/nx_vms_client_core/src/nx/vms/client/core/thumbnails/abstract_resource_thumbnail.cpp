@@ -174,8 +174,6 @@ void AbstractResourceThumbnail::setResource(const QnResourcePtr& value)
 
     if (d->resource)
     {
-        QQmlEngine::setObjectOwnership(d->resource.get(), QQmlEngine::CppOwnership);
-
         // Resource signals are sent from non-GUI threads. To prevent receiving a signal metacall
         // from the event queue from an old resource after it has been changed already, we use
         // a dummy receiver which is replaced every time a new resource is set.

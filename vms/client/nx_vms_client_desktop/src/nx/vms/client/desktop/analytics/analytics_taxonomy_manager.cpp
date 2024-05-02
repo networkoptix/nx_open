@@ -41,8 +41,6 @@ struct TaxonomyManager::Private
             return;
 
         currentTaxonomy = NX_ASSERT(stateWatcher) ? stateWatcher->state() : nullptr;
-        if (currentTaxonomy.value())
-            QQmlEngine::setObjectOwnership(currentTaxonomy.value().get(), QQmlEngine::CppOwnership);
     }
 
     void ensureRelevancyInfo(AbstractStateWatcher* stateWatcher) const

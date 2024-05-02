@@ -70,7 +70,6 @@ void AccessHelper::setResource(const QnResourcePtr& value)
     d->resource = value;
     if (d->resource)
     {
-        QQmlEngine::setObjectOwnership(d->resource.get(), QQmlEngine::CppOwnership);
         auto systemContext = SystemContext::fromResource(d->resource);
         if (NX_ASSERT(systemContext))
         {

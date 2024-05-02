@@ -8,6 +8,7 @@
 #include <QtWebEngineQuick/private/qquickwebenginedownloadrequest_p.h>
 
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/core/qml/qml_ownership.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/resource_properties/camera/utils/camera_web_page_workarounds.h>
@@ -117,11 +118,9 @@ void WebEngineProfileManager::registerQmlType()
 {
     qmlRegisterSingletonType<WebEngineProfileManager>(
         "nx.vms.client.desktop.utils", 1, 0, "WebEngineProfileManager",
-        [](QQmlEngine* qmlEngine, QJSEngine* /*jsEngine*/) -> QObject*
+        [](QQmlEngine* /*qmlEngine*/, QJSEngine* /*jsEngine*/) -> QObject*
         {
-            auto manager = instance();
-            qmlEngine->setObjectOwnership(manager, QQmlEngine::CppOwnership);
-            return manager;
+            return core::withCppOwnership(instance());
         });
 }
 

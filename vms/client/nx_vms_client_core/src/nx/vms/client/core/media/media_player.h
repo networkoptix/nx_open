@@ -44,9 +44,6 @@ signals:
     void failedChanged();
     void noVideoStreamsChanged();
 
-protected:
-    virtual void setResourceInternal(const QnResourcePtr& value) override;
-
 private:
     QnResource* rawResource() const;
     void setRawResource(QnResource* value);

@@ -5,6 +5,7 @@
 #include <QtQml/QtQml>
 
 #include <api/helpers/access_rights_helper.h>
+#include <nx/vms/client/core/qml/qml_ownership.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/common/html/html.h>
 
@@ -76,7 +77,6 @@ AccessRightsList::AccessRightsList(QObject* parent):
             return result;
         }())
 {
-    QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 }
 
 AccessRightDescriptor AccessRightsList::get(AccessRight accessRight) const
@@ -87,8 +87,8 @@ AccessRightDescriptor AccessRightsList::get(AccessRight accessRight) const
 
 AccessRightsList* AccessRightsList::instance()
 {
-    static AccessRightsList staticInstance;
-    return &staticInstance;
+    static AccessRightsList instance;
+    return &instance;
 }
 
 void AccessRightsList::registerQmlTypes()
@@ -102,7 +102,7 @@ void AccessRightsList::registerQmlTypes()
         "nx.vms.client.desktop", 1, 0, "AccessRightsList",
         [](QQmlEngine* /*qmlEngine*/, QJSEngine* /*jsEngine*/) -> QObject*
         {
-            return instance();
+            return core::withCppOwnership(instance());
         });
 }
 

@@ -21,6 +21,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/unicode_chars.h>
 #include <nx/vms/client/core/access/access_controller.h>
+#include <nx/vms/client/core/qml/qml_ownership.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/models/item_model_algorithm.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_extra_status.h>
@@ -406,8 +407,7 @@ QVariant ResourceTreeModelAdapter::data(const QModelIndex& index, int role) cons
             if (!resource)
                 return {};
 
-            QQmlEngine::setObjectOwnership(resource.get(), QQmlEngine::CppOwnership);
-            return QVariant::fromValue(resource.get());
+            return QVariant::fromValue(core::withCppOwnership(resource.get()));
         }
 
         case Qn::AutoExpandRole:

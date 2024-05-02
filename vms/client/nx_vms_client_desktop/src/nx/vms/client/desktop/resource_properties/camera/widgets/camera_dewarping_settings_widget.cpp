@@ -32,17 +32,14 @@ CameraDewarpingSettingsWidget::CameraDewarpingSettingsWidget(
     setResizeMode(QQuickWidget::SizeRootObjectToView);
     setSource(QUrl("Nx/Dialogs/CameraSettings/CameraDewarpingSettings.qml"));
     setMinimumSize(kMinimumSize);
+    setHelpTopic(this, HelpTopic::Id::MainWindow_MediaItem_Dewarping);
 
     if (!NX_ASSERT(rootObject()))
         return;
 
-    if (NX_ASSERT(thumbnail))
-        engine->setObjectOwnership(thumbnail.get(), QQmlEngine::CppOwnership);
-
-    setHelpTopic(this, HelpTopic::Id::MainWindow_MediaItem_Dewarping);
-
     rootObject()->setProperty("store", QVariant::fromValue(store));
-    rootObject()->setProperty("previewSource", QVariant::fromValue(thumbnail.get()));
+    if (NX_ASSERT(thumbnail))
+        rootObject()->setProperty("previewSource", QVariant::fromValue(thumbnail.get()));
 }
 
 } // namespace nx::vms::client::desktop

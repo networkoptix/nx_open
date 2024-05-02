@@ -6,6 +6,7 @@
 
 #include <QtQml/QtQml>
 
+#include <nx/vms/client/core/qml/qml_ownership.h>
 #include <nx/vms/client/core/skin/skin.h>
 
 template<> nx::vms::client::desktop::CustomCursors*
@@ -37,10 +38,9 @@ CustomCursors::CustomCursors(core::Skin* skin)
 void CustomCursors::registerQmlType()
 {
     qmlRegisterSingletonType<CustomCursors>("nx.vms.client.desktop", 1, 0, "CustomCursors",
-        [](QQmlEngine* qmlEngine, QJSEngine* /*jsEngine*/) -> QObject*
+        [](QQmlEngine* /*qmlEngine*/, QJSEngine* /*jsEngine*/) -> QObject*
         {
-            qmlEngine->setObjectOwnership(instance(), QQmlEngine::CppOwnership);
-            return instance();
+            return core::withCppOwnership(instance());
         });
 }
 

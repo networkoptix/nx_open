@@ -31,6 +31,7 @@
 #include <nx/utils/string.h>
 #include <nx/vms/api/types/event_rule_types.h>
 #include <nx/vms/client/core/access/access_controller.h>
+#include <nx/vms/client/core/qml/qml_ownership.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/thumbnails/abstract_caching_resource_thumbnail.h>
 #include <nx/vms/client/core/utils/geometry.h>
@@ -402,8 +403,7 @@ QVariant RightPanelModelsAdapter::data(const QModelIndex& index, int role) const
             if (!resource)
                 return {};
 
-            QQmlEngine::setObjectOwnership(resource.get(), QQmlEngine::CppOwnership);
-            return QVariant::fromValue(resource.get());
+            return QVariant::fromValue(core::withCppOwnership(resource.get()));
         }
 
         case Qn::DisplayedResourceListRole:

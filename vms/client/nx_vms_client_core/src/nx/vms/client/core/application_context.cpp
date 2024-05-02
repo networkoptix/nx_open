@@ -14,6 +14,7 @@
 #include <nx/vms/client/core/analytics/analytics_icon_manager.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/network/local_network_interfaces_manager.h>
+#include <nx/vms/client/core/qml/qml_ownership.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/font_config.h>
@@ -80,18 +81,16 @@ struct ApplicationContext::Private
     {
         auto brandingQmlProxy = new nx::branding::QmlProxy(q);
         qmlRegisterSingletonType<nx::branding::QmlProxy>("nx.vms.client.core", 1, 0, "Branding",
-            [brandingQmlProxy](QQmlEngine* qmlEngine, QJSEngine* /*jsEngine*/) -> QObject*
+            [brandingQmlProxy](QQmlEngine* /*qmlEngine*/, QJSEngine* /*jsEngine*/) -> QObject*
             {
-                qmlEngine->setObjectOwnership(brandingQmlProxy, QQmlEngine::CppOwnership);
-                return brandingQmlProxy;
+                return withCppOwnership(brandingQmlProxy);
             });
 
         auto buildInfoQmlProxy = new nx::build_info::QmlProxy(q);
         qmlRegisterSingletonType<nx::build_info::QmlProxy>("nx.vms.client.core", 1, 0, "BuildInfo",
-            [buildInfoQmlProxy](QQmlEngine* qmlEngine, QJSEngine* /*jsEngine*/) -> QObject*
+            [buildInfoQmlProxy](QQmlEngine* /*qmlEngine*/, QJSEngine* /*jsEngine*/) -> QObject*
             {
-                qmlEngine->setObjectOwnership(buildInfoQmlProxy, QQmlEngine::CppOwnership);
-                return buildInfoQmlProxy;
+                return withCppOwnership(buildInfoQmlProxy);
             });
 
         qmlEngine = new QQmlEngine(q);

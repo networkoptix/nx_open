@@ -29,6 +29,7 @@
 #include <core/resource/webpage_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/network/nx_network_ini.h>
+#include <nx/vms/client/core/qml/qml_ownership.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/abstract_web_authenticator.h>
 #include <nx/vms/client/desktop/ini.h>
@@ -1254,9 +1255,7 @@ QUrl WebViewController::resourceUrl() const
 
 WebPageIconCache* WebViewController::iconCache() const
 {
-    const auto iconCache = appContext()->webPageIconCache();
-    QQmlEngine::setObjectOwnership(iconCache, QQmlEngine::CppOwnership);
-    return iconCache;
+    return core::withCppOwnership(appContext()->webPageIconCache());
 }
 
 } // namespace nx::vms::client::desktop

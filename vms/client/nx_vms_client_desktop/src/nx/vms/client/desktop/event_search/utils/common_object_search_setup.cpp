@@ -160,12 +160,7 @@ QnVirtualCameraResourceSet CommonObjectSearchSetup::selectedCameras() const
 
 QnVirtualCameraResource* CommonObjectSearchSetup::singleCameraRaw() const
 {
-    const auto camera = singleCamera();
-    if (!camera)
-        return nullptr;
-
-    QQmlEngine::setObjectOwnership(camera.get(), QQmlEngine::CppOwnership);
-    return camera.get();
+    return singleCamera().get();
 }
 
 QnVirtualCameraResourcePtr CommonObjectSearchSetup::singleCamera() const
