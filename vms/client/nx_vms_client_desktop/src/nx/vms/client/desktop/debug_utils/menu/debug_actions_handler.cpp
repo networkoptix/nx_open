@@ -42,6 +42,7 @@
 #include "../dialogs/palette_dialog.h"
 #include "../dialogs/qml_test_dialog.h"
 #include "../dialogs/resource_pool_dialog.h"
+#include "../dialogs/sorting_test_dialog.h"
 #include "../dialogs/web_engine_dialog.h"
 #include "../utils/cameras_actions.h"
 #include "../utils/client_webserver.h"
@@ -163,6 +164,7 @@ DebugActionsHandler::DebugActionsHandler(WindowContext* windowContext, QObject *
     QmlTestDialog::registerAction();
     ResourcePoolDialog::registerAction();
     WebEngineDialog::registerAction();
+    SortingTestDialog::registerAction();
 
 #ifdef Q_OS_MAC
     if (ini().virtualJoystick)
