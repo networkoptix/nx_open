@@ -242,9 +242,18 @@ def main():
 
     with archiver.Archiver(conf.PACKAGE_FILE, conf=conf) as a:
         src_bin_dir = join(conf.BUILD_DIR, bin_dir)
+        distrib_dir = join(conf.BUILD_DIR, "distrib")
 
-        logging.info("Archiving metadata file")
+        logging.info("Archiving metadata")
         a.add(conf.METAINFO_FILE, Path(conf.METAINFO_FILE).name)
+        # Keep this metadata file for compatibility purposes.
+        archiveFiles(a, "", distrib_dir, ["conan_refs.txt"])
+
+        archiveFiles(
+            a,
+            target_dir=join(bin_dir, "metadata"),
+            source_dir=distrib_dir,
+            file_list=["build_info.txt", "build_info.json", "conan_refs.txt", "conan.lock"])
 
         # Since the build system doesn't know on which files Go unit tests depend, always add
         # these unit tests. TODO: Fix the build system - add dependencies to Go unit test
@@ -339,17 +348,6 @@ def main():
         # Add FFmpeg variant for ARM32 devices.
         if os.path.islink(join(conf.BUILD_DIR, lib_dir, "ffmpeg")):
             archiveFiles(a, lib_dir, join(conf.BUILD_DIR, lib_dir), ["ffmpeg"])
-
-        distrib_dir = join(conf.BUILD_DIR, "distrib")
-        # Keep this metadata file for compatibility purposes.
-        archiveFiles(a, "", distrib_dir, ["conan_refs.txt"])
-
-        # Write metadata
-        archiveFiles(
-            a,
-            target_dir=join(bin_dir, "metadata"),
-            source_dir=distrib_dir,
-            file_list=["build_info.txt", "build_info.json", "conan_refs.txt", "conan.lock"])
 
 
 if __name__ == "__main__":
