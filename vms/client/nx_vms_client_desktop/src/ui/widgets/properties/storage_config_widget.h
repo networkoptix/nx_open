@@ -97,6 +97,18 @@ private:
      */
     void updateBackupSettingsForCloudStorage();
 
+    /**
+     * Creates storage pool menu with corresponding actions, this widget has ownership of
+     * created menu.
+     */
+    QMenu* createStoragePoolMenu();
+
+    /**
+     * Creates storage archive mode menu with corresponding actions, this widget has ownership of
+     * created menu.
+     */
+    QMenu* createStorageArchiveModeMenu(const QnStorageModelInfo& storageInfo);
+
 private:
     void applyStoragesChanges(
         QnStorageResourceList& result,
@@ -111,7 +123,6 @@ private:
     QScopedPointer<QnStorageListModel> m_model;
     QTimer* m_updateStatusTimer;
     QMenu* m_storagePoolMenu;
-    QMenu* m_storageArchiveModeMenu;
 
     struct StoragePool
     {

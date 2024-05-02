@@ -585,27 +585,10 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent):
     m_server(),
     m_model(new QnStorageListModel()),
     m_updateStatusTimer(new QTimer(this)),
-    m_storagePoolMenu(new QMenu(this)),
-    m_storageArchiveModeMenu(new QMenu(this))
+    m_storagePoolMenu(createStoragePoolMenu())
 {
     ui->setupUi(this);
     connect(m_model.get(), &QnStorageListModel::dataChanged, [this] { updateWarnings(); });
-
-    m_storagePoolMenu->setProperty(style::Properties::kMenuAsDropdown, true);
-    const auto mainAction = m_storagePoolMenu->addAction(tr("Main"));
-    const auto backupAction = m_storagePoolMenu->addAction(tr("Backup"));
-
-    mainAction->setData(static_cast<int>(StoragePoolMenuItem::main));
-    backupAction->setData(static_cast<int>(StoragePoolMenuItem::backup));
-
-    m_storageArchiveModeMenu->setProperty(style::Properties::kMenuAsDropdown, true);
-    const auto exclusiveAction = m_storageArchiveModeMenu->addAction(tr("Exclusive"));
-    const auto sharedAction = m_storageArchiveModeMenu->addAction(tr("Shared"));
-    const auto isolatedAction = m_storageArchiveModeMenu->addAction(tr("Isolated"));
-
-    exclusiveAction->setData(static_cast<int>(nx::vms::api::StorageArchiveMode::exclusive));
-    sharedAction->setData(static_cast<int>(nx::vms::api::StorageArchiveMode::shared));
-    isolatedAction->setData(static_cast<int>(nx::vms::api::StorageArchiveMode::isolated));
 
     setHelpTopic(this, HelpTopic::Id::ServerSettings_Storages);
 
@@ -1003,6 +986,40 @@ void QnStorageConfigWidget::updateBackupSettingsForCloudStorage()
     qnResourcesChangesManager->saveCamerasBatch(cameras, applyChanges);
 }
 
+QMenu* QnStorageConfigWidget::createStoragePoolMenu()
+{
+    QMenu* menu = new QMenu(this);
+    menu->setProperty(style::Properties::kMenuAsDropdown, true);
+
+    const auto mainAction = menu->addAction(tr("Main"));
+    mainAction->setData(static_cast<int>(StoragePoolMenuItem::main));
+
+    const auto backupAction = menu->addAction(tr("Backup"));
+    backupAction->setData(static_cast<int>(StoragePoolMenuItem::backup));
+
+    return menu;
+}
+
+QMenu* QnStorageConfigWidget::createStorageArchiveModeMenu(const QnStorageModelInfo& storageInfo)
+{
+    QMenu* menu = new QMenu(this);
+    menu->setProperty(style::Properties::kMenuAsDropdown, true);
+
+    const auto exclusiveAction = menu->addAction(tr("Exclusive"));
+    exclusiveAction->setData(static_cast<int>(nx::vms::api::StorageArchiveMode::exclusive));
+
+    if (storageInfo.storageType != nx::reflect::toString(StorageType::local))
+    {
+        const auto sharedAction = menu->addAction(tr("Shared"));
+        sharedAction->setData(static_cast<int>(nx::vms::api::StorageArchiveMode::shared));
+    }
+
+    const auto isolatedAction = menu->addAction(tr("Isolated"));
+    isolatedAction->setData(static_cast<int>(nx::vms::api::StorageArchiveMode::isolated));
+
+    return menu;
+}
+
 void QnStorageConfigWidget::loadDataToUi()
 {
     if (!m_server)
@@ -1109,14 +1126,20 @@ void QnStorageConfigWidget::atStorageViewClicked(const QModelIndex& index)
         if (!m_model->canChangeStorageArchiveMode(record))
             return;
 
-        const auto activeMenuAction =
-            findMenuAction(m_storageArchiveModeMenu, static_cast<int>(record.archiveMode));
-        m_storageArchiveModeMenu->setActiveAction(activeMenuAction);
+        auto storageArchiveModeMenu = createStorageArchiveModeMenu(record);
+        connect(storageArchiveModeMenu, &QMenu::aboutToHide,
+            storageArchiveModeMenu, &QMenu::deleteLater);
+
+        if (const auto activeMenuAction =
+            findMenuAction(storageArchiveModeMenu, static_cast<int>(record.archiveMode)))
+        {
+            storageArchiveModeMenu->setActiveAction(activeMenuAction);
+        }
 
         QPoint menuPoint = ui->storageView->viewport()->mapToGlobal(
             ui->storageView->visualRect(index).bottomLeft()) + QPoint(0, 1);
 
-        const auto selectedAction = m_storageArchiveModeMenu->exec(menuPoint);
+        const auto selectedAction = storageArchiveModeMenu->exec(menuPoint);
         if (!selectedAction)
             return;
 
