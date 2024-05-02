@@ -200,8 +200,8 @@ void QnWorkbenchTextOverlaysHandler::at_eventActionReceived(
 
     if (actionParams.useSource)
     {
-        cameras << resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
-            businessAction->getSourceResources(resourcePool()));
+        cameras << businessAction->getSourceResources(
+            resourcePool()).filtered<QnVirtualCameraResource>();
     }
 
     /* Remove duplicates. */

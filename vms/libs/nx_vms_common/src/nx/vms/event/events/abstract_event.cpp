@@ -320,7 +320,8 @@ bool isSourceServerRequired(EventType eventType)
 }
 
 std::optional<QnResourceList> sourceResources(
-    const EventParameters& params, QnResourcePool* resourcePool)
+    const EventParameters& params,
+    const QnResourcePool* resourcePool)
 {
     if (params.eventResourceId.isNull() && params.metadata.cameraRefs.empty())
         return std::nullopt;

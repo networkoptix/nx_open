@@ -109,7 +109,7 @@ public:
     const QVector<QnUuid>& getResources() const;
 
     /** Source resource of the action (including custom for generic events). */
-    QVector<QnUuid> getSourceResources(const QnResourcePool* resourcePool) const;
+    QnResourceList getSourceResources(const QnResourcePool* resourcePool) const;
 
     void setParams(const ActionParameters& params);
     const ActionParameters& getParams() const;

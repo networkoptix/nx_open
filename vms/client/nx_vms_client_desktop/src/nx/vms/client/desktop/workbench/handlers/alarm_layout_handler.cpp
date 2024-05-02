@@ -135,8 +135,8 @@ AlarmLayoutHandler::AlarmLayoutHandler(QObject *parent):
                 action->getResources());
             if (action->getParams().useSource)
             {
-                targetCameras << resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
-                    action->getSourceResources(resourcePool()));
+                targetCameras << action->getSourceResources(
+                    resourcePool()).filtered<QnVirtualCameraResource>();
             }
             targetCameras = nx::utils::toQSet(
                 accessController()->filtered(targetCameras, Qn::ViewContentPermission)).values();
