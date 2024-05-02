@@ -469,7 +469,7 @@ void ConnectionBase::setState(State state, const QString& reason)
         return;
     }
 
-    NX_INFO(this,
+    NX_DEBUG(this,
         "Connection State change: [%1] -> [%2]. %3",
         toString(m_state), toString(state), reason);
     m_state = state;

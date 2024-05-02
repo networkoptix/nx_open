@@ -44,7 +44,7 @@ nx::network::server::ParserState MessageParser::parse(
     if (!m_httpStreamReader.parseBytes(buffer, bytesProcessed)
         || m_httpStreamReader.state() == HttpStreamReader::ReadState::parseError)
     {
-        NX_WARNING(this, "Failed to parse HTTP stream: state before parsing: %1",
+        NX_DEBUG(this, "Failed to parse HTTP stream: state before parsing: %1",
             stateBeforeParse);
         return nx::network::server::ParserState::failed;
     }
