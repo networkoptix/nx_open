@@ -143,8 +143,8 @@ AlarmLayoutHandler::AlarmLayoutHandler(QObject *parent):
                 action->getResources());
             if (action->getParams().useSource)
             {
-                targetCameras << resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
-                    action->getSourceResources(resourcePool()));
+                targetCameras << action->getSourceResources(
+                    resourcePool()).filtered<QnVirtualCameraResource>();
             }
 
             // Remove duplicates.

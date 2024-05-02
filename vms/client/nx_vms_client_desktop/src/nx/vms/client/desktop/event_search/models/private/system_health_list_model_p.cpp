@@ -648,12 +648,11 @@ void SystemHealthListModel::Private::doAddItem(
         action = params.value<vms::event::AbstractActionPtr>();
         if (action)
         {
-            const auto runtimeParameters = action->getRuntimeParams();
-            resource = runtimeParameters.metadata.cameraRefs.empty()
-                ? system()->resourcePool()->getResourceById(runtimeParameters.eventResourceId)
-                : static_cast<QnResourcePtr>(
-                    camera_id_helper::findCameraByFlexibleId(system()->resourcePool(),
-                        runtimeParameters.metadata.cameraRefs[0]));
+            const auto sourceResources = event::sourceResources(
+                action->getRuntimeParams(),
+                system()->resourcePool());
+            if (sourceResources && !sourceResources->isEmpty())
+                resource = sourceResources->first();
         }
     }
 

@@ -14,12 +14,9 @@ class NX_VMS_COMMON_API CustomEvent: public ProlongedEvent
 
 public:
     explicit CustomEvent(
-        EventState toggleState,
-        qint64 timeStamp,
-        const QString& resourceName,
-        const QString& caption,
-        const QString& description,
-        EventMetaData metadata);
+        const nx::vms::event::EventParameters& parameters,
+        nx::vms::api::EventState eventState,
+        const QnResourcePtr& resource);
 
     virtual bool checkEventParams(const EventParameters& params) const override;
     virtual EventParameters getRuntimeParams() const override;
