@@ -2511,14 +2511,13 @@ void QnWorkbenchDisplay::at_notificationAdded(const vms::event::AbstractActionPt
     {
         NX_ASSERT(actionType == vms::api::ActionType::showPopupAction
             || actionType == vms::api::ActionType::playSoundAction);
-        vms::event::EventParameters eventParams = businessAction->getRuntimeParams();
-        if (QnResourcePtr resource = resourcePool()->getResourceById(eventParams.eventResourceId))
-            targetResources.insert(resource);
-        if (eventParams.eventType >= vms::api::EventType::userDefinedEvent)
-        {
-            QnResourceList cameras = resourcePool()->getCamerasByFlexibleIds(eventParams.metadata.cameraRefs);
-            targetResources.unite({cameras.cbegin(), cameras.cend()});
-        }
+
+        const auto sourceResources = nx::vms::event::sourceResources(
+            businessAction->getRuntimeParams(),
+            resourcePool());
+
+        if (sourceResources)
+            targetResources.unite({sourceResources->cbegin(), sourceResources->cend()});
     }
 
     for (const QnResourcePtr &resource : targetResources)
