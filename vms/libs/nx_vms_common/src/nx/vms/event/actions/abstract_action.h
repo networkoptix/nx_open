@@ -112,7 +112,7 @@ public:
     const QVector<nx::Uuid>& getResources() const;
 
     /** Source resource of the action (including custom for generic events). */
-    QVector<nx::Uuid> getSourceResources(const QnResourcePool* resourcePool) const;
+    QnResourceList getSourceResources(const QnResourcePool* resourcePool) const;
 
     void setParams(const ActionParameters& params);
     const ActionParameters& getParams() const;

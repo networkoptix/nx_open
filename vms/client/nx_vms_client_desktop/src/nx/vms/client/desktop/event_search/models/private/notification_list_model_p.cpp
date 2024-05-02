@@ -83,9 +83,8 @@ QnVirtualCameraResourceList getAlarmCameras(
 
     if (action->getParams().useSource)
     {
-        const auto sourceResourceIds = action->getSourceResources(resourcePool);
-        alarmCameras.append(resourcePool->getResourcesByIds<QnVirtualCameraResource>(
-            sourceResourceIds));
+        alarmCameras.append(
+            action->getSourceResources(resourcePool).filtered<QnVirtualCameraResource>());
     }
 
     std::sort(alarmCameras.begin(), alarmCameras.end());
@@ -588,13 +587,19 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
 
             case EventType::userDefinedEvent:
             {
-                const auto sourceCameras = camera_id_helper::findCamerasByFlexibleId(
-                    system()->resourcePool(), params.metadata.cameraRefs).filtered(
-                        [this](const auto& camera)
-                        {
-                            return system()->accessController()->hasPermissions(camera,
-                                Qn::ViewContentPermission);
-                        });
+                const auto hasPermission =
+                    [this](const auto& camera)
+                    {
+                        return system()->accessController()->hasPermissions(camera,
+                            Qn::ViewContentPermission);
+                    };
+
+                const auto sourceResources = event::sourceResources(params,
+                    system()->resourcePool());
+
+                const QnVirtualCameraResourceList sourceCameras = sourceResources
+                    ? sourceResources->filtered<QnVirtualCameraResource>(hasPermission)
+                    : QnVirtualCameraResourceList();
 
                 if (!sourceCameras.isEmpty())
                 {
@@ -929,12 +934,11 @@ QString NotificationListModel::Private::iconPath(const vms::event::AbstractActio
 
     if (params.eventType >= EventType::userDefinedEvent)
     {
-        const auto camList = camera_id_helper::findCamerasByFlexibleId(
-            system()->resourcePool(),
-            params.metadata.cameraRefs);
-        return camList.isEmpty()
-            ? "events/alert_20.svg"
-            : qnResIconCache->iconPath(camList.front());
+        const auto sourceResources = event::sourceResources(params, system()->resourcePool());
+        if (sourceResources && !sourceResources->isEmpty())
+            return qnResIconCache->iconPath(sourceResources->first());
+
+        return "events/alert_20.svg";
     }
 
     switch (params.eventType)

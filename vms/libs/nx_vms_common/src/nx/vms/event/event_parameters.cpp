@@ -130,7 +130,8 @@ bool EventParameters::canHaveVideoLink() const
     return eventType == EventType::cameraMotionEvent
         || eventType == EventType::cameraInputEvent
         || eventType == EventType::analyticsSdkEvent
-        || eventType == EventType::analyticsSdkObjectDetected;
+        || eventType == EventType::analyticsSdkObjectDetected
+        || eventType == EventType::userDefinedEvent;
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(

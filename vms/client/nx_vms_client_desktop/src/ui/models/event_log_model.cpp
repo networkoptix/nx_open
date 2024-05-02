@@ -252,11 +252,17 @@ bool QnEventLogModel::hasVideoLink(const vms::event::ActionData& action) const
 
     if (eventType >= EventType::userDefinedEvent)
     {
-        for (const auto& flexibleId: action.eventParams.metadata.cameraRefs)
+        const auto sourceResources = nx::vms::event::sourceResources(
+            action.eventParams,
+            resourcePool());
+
+        if (sourceResources)
         {
-            auto id = camera_id_helper::flexibleIdToId(resourcePool(), flexibleId);
-            if (!id.isNull() && hasAccessToCamera(id))
-                return true;
+            for (const auto& resource: *sourceResources)
+            {
+                if (hasAccessToCamera(resource->getId()))
+                    return true;
+            }
         }
     }
     return false;
@@ -654,17 +660,17 @@ QnResourceList QnEventLogModel::resourcesForPlayback(const QModelIndex &index) c
     QnResourceList result;
     if (!index.isValid() || index.column() != DescriptionColumn)
         return QnResourceList();
+
     const vms::event::ActionData& action = m_index->at(index.row());
     if (action.hasFlags(vms::event::ActionData::VideoLinkExists))
     {
-        QnResourcePtr resource =
-            resourcePool()->getResourceById(action.eventParams.eventResourceId);
-        if (resource)
-            result << resource;
+        const auto sourceResources = nx::vms::event::sourceResources(
+            action.eventParams,
+            resourcePool());
+
+        if (sourceResources)
+            result << *sourceResources;
     }
-    QnResourceList extraResources = resourcePool()->getCamerasByFlexibleIds(
-        action.eventParams.metadata.cameraRefs);
-    result << extraResources;
     return result;
 }
 
