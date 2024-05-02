@@ -4,7 +4,7 @@
 
 namespace nx::sdk::cloud_storage {
 
-TimePeriods::TimePeriods(const TimePeriodList& periods)
+TimePeriods::TimePeriods(const std::vector<nx::sdk::cloud_storage::TimePeriod>& periods)
 {
     setPeriods(periods);
 }
@@ -40,9 +40,9 @@ bool TimePeriods::get(int64_t* outStartUs, int64_t* outEndUs) const
     return true;
 }
 
-void TimePeriods::setPeriods(const TimePeriodList& periods)
+void TimePeriods::setPeriods(const std::vector<nx::sdk::cloud_storage::TimePeriod>& periods)
 {
-    periods.forEach([this](const auto& p) { m_periods.push_back(p); });
+    m_periods = periods;
     m_it = m_periods.cbegin();
 }
 

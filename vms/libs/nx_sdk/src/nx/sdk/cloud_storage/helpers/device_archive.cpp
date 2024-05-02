@@ -7,8 +7,8 @@ namespace nx::sdk::cloud_storage {
 IndexArchive::IndexArchive(int streamIndex, const IndexData& indexData):
     m_streamIndex(streamIndex)
 {
-    nx::sdk::cloud_storage::TimePeriodList added;
-    nx::sdk::cloud_storage::TimePeriodList removed;
+    std::vector<nx::sdk::cloud_storage::TimePeriod> added;
+    std::vector<nx::sdk::cloud_storage::TimePeriod> removed;
     for (const auto& operationToPeriod: indexData)
     {
         switch (operationToPeriod.first)
