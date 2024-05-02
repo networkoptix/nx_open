@@ -9,6 +9,7 @@
 #include <core/resource/resource.h>
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/core/access/access_controller.h>
+#include <nx/vms/client/core/qml/qml_ownership.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource_dialogs/models/resource_selection_decorator_model.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_extra_status.h>
@@ -301,8 +302,7 @@ QVariant ResourceSelectionModelAdapter::data(const QModelIndex& index, int role)
             if (!resource)
                 return {};
 
-            QQmlEngine::setObjectOwnership(resource.get(), QQmlEngine::CppOwnership);
-            return QVariant::fromValue(resource.get());
+            return QVariant::fromValue(core::withCppOwnership(resource.get()));
         }
 
         case Qn::AutoExpandRole:

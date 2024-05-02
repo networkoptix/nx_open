@@ -2,7 +2,7 @@
 
 #include "resource_helper.h"
 
-#include <QtQml/QQmlEngine>
+#include <QtCore/QTimeZone>
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -27,8 +27,6 @@ void ResourceHelper::setResource(const QnResourcePtr& value)
 
     if (m_resource)
     {
-        QQmlEngine::setObjectOwnership(m_resource.get(), QQmlEngine::CppOwnership);
-
         m_connections << connect(m_resource.get(), &QnResource::nameChanged,
             this, &ResourceHelper::resourceNameChanged);
         m_connections << connect(m_resource.get(), &QnResource::statusChanged,

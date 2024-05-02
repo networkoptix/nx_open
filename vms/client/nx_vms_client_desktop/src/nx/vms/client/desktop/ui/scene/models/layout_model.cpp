@@ -179,9 +179,6 @@ void LayoutModel::setRawLayout(QnLayoutResource* value)
     if (layout == d->layout)
         return;
 
-    if (value)
-         QQmlEngine::setObjectOwnership(value, QQmlEngine::CppOwnership);
-
     beginResetModel();
     d->setLayout(layout);
     endResetModel();

@@ -57,14 +57,6 @@ MediaPlayer::~MediaPlayer()
 {
 }
 
-void MediaPlayer::setResourceInternal(const QnResourcePtr& value)
-{
-    if (value)
-        QQmlEngine::setObjectOwnership(value.get(), QQmlEngine::CppOwnership);
-
-    base_type::setResourceInternal(value);
-}
-
 QnResource* MediaPlayer::rawResource() const
 {
     return resource().data();

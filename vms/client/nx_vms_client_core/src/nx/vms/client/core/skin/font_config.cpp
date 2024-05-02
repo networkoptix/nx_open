@@ -15,6 +15,7 @@
 #include <nx/utils/std_string_utils.h>
 #include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/ini.h>
+#include <nx/vms/client/core/qml/qml_ownership.h>
 
 template<typename Visitor>
 constexpr auto nxReflectVisitAllEnumItems(QFont::Weight*, Visitor&& visitor)
@@ -136,10 +137,9 @@ QFont FontConfig::font(const QString& name) const
 void FontConfig::registerQmlType()
 {
     qmlRegisterSingletonType<FontConfig>("nx.vms.client.core", 1, 0, "FontConfig",
-        [](QQmlEngine* qmlEngine, QJSEngine* /*jsEngine*/) -> QObject*
+        [](QQmlEngine* /*qmlEngine*/, QJSEngine* /*jsEngine*/) -> QObject*
         {
-            qmlEngine->setObjectOwnership(appContext()->fontConfig(), QQmlEngine::CppOwnership);
-            return appContext()->fontConfig();
+            return withCppOwnership(appContext()->fontConfig());
         });
 }
 

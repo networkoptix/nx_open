@@ -4,8 +4,8 @@
 
 #include <QtCore/QCache>
 #include <QtCore/QFileInfo>
-#include <QtQml/QtQml>
 #include <QtQml/QQmlEngine>
+#include <QtQml/QtQml>
 
 #include <nx/utils/log/log.h>
 
@@ -25,9 +25,9 @@ struct IconManager::Private
     static QString analyticsIconsRoot();
 };
 
-IconManager::IconManager(): d(new Private{this})
+IconManager::IconManager():
+    d(new Private{this})
 {
-    QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 }
 
 IconManager::~IconManager()

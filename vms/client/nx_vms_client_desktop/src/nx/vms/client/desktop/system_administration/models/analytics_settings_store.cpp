@@ -10,6 +10,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/assert.h>
+#include <nx/vms/client/core/qml/qml_ownership.h>
 #include <nx/vms/client/desktop/analytics/analytics_actions_helper.h>
 #include <nx/vms/client/desktop/analytics/analytics_engines_watcher.h>
 #include <nx/vms/client/desktop/ini.h>
@@ -406,22 +407,18 @@ ApiIntegrationRequestsModel*
         return nullptr;
 
     auto requestsModel = new ApiIntegrationRequestsModel(systemContext(), m_parent);
-    QQmlEngine::setObjectOwnership(requestsModel, QQmlEngine::CppOwnership);
-    return requestsModel;
+    return core::withCppOwnership(requestsModel);
 }
 
 EngineLicenseSummaryProvider* AnalyticsSettingsStore::makeEngineLicenseSummaryProvider() const
 {
     auto licenseProvider = new EngineLicenseSummaryProvider(systemContext(), m_parent);
-    QQmlEngine::setObjectOwnership(licenseProvider, QQmlEngine::CppOwnership);
-    return licenseProvider;
+    return core::withCppOwnership(licenseProvider);
 }
 
 saas::ServiceManager* AnalyticsSettingsStore::saasServiceManager() const
 {
-    saas::ServiceManager* saasServiceManager = systemContext()->saasServiceManager();
-    QQmlEngine::setObjectOwnership(saasServiceManager, QQmlEngine::CppOwnership);
-    return saasServiceManager;
+    return core::withCppOwnership(systemContext()->saasServiceManager());
 }
 
 } // namespace nx::vms::client::desktop

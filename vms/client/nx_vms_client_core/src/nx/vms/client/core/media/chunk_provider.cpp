@@ -208,9 +208,6 @@ QnResource* ChunkProvider::rawResource() const
 
 void ChunkProvider::setRawResource(QnResource* value)
 {
-    if (value)
-        QQmlEngine::setObjectOwnership(value, QQmlEngine::CppOwnership);
-
     QnResourcePtr resource = value ? value->toSharedPointer() : QnResourcePtr();
 
     for (const auto& provider: m_providers)

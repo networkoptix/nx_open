@@ -2,8 +2,6 @@
 
 #include "workbench_layout_info_p.h"
 
-#include <QtQml/QQmlEngine>
-
 #include <client/client_runtime_settings.h>
 #include <core/resource/videowall_item_index.h>
 #include <core/resource/videowall_resource.h>
@@ -15,17 +13,6 @@
 #include <ui/workbench/workbench_navigator.h>
 
 namespace nx::vms::client::desktop {
-
-namespace {
-
-template<typename T>
-T* withCppOwnership(T* object)
-{
-    QQmlEngine::setObjectOwnership(object, QQmlEngine::CppOwnership);
-    return object;
-}
-
-} // namespace
 
 class WorkbenchLayoutInfo::ResourceContainer: public AbstractResourceContainer
 {
@@ -85,12 +72,12 @@ WorkbenchLayoutInfo::WorkbenchLayoutInfo(WindowContext* context, QObject* parent
 
 QnLayoutResource* WorkbenchLayoutInfo::currentLayout() const
 {
-    return withCppOwnership(workbench()->currentLayoutResource().get());
+    return workbench()->currentLayoutResource().get();
 }
 
 QnResource* WorkbenchLayoutInfo::currentResource() const
 {
-    return withCppOwnership(navigator()->currentResource().get());
+    return navigator()->currentResource().get();
 }
 
 AbstractResourceContainer* WorkbenchLayoutInfo::resources() const
@@ -105,8 +92,8 @@ nx::Uuid WorkbenchLayoutInfo::reviewedShowreelId() const
 
 QnVideoWallResource* WorkbenchLayoutInfo::reviewedVideoWall() const
 {
-    return withCppOwnership(workbench()->currentLayout()->data(Qn::VideoWallResourceRole)
-        .value<QnVideoWallResourcePtr>().get());
+    return workbench()->currentLayout()->data(Qn::VideoWallResourceRole)
+        .value<QnVideoWallResourcePtr>().get();
 }
 
 QnVideoWallResource* WorkbenchLayoutInfo::controlledVideoWall() const
@@ -122,8 +109,6 @@ QnVideoWallResource* WorkbenchLayoutInfo::controlledVideoWall() const
     }
 
     m_controlledVideoWall = system()->resourcePool()->getVideoWallItemByUuid(itemId).videowall();
-    QQmlEngine::setObjectOwnership(m_controlledVideoWall->get(), QQmlEngine::CppOwnership);
-
     return m_controlledVideoWall->get();
 }
 

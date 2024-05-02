@@ -7,17 +7,15 @@
 #include <QtGui/QWindow>
 #include <QtQml/QtQml>
 
-#include <utils/common/event_processors.h>
-
 #include <nx/utils/log/assert.h>
+#include <nx/vms/client/core/qml/qml_ownership.h>
+#include <utils/common/event_processors.h>
 
 namespace nx::vms::client::desktop {
 
 MouseSpy::MouseSpy(QObject* parent):
     QObject(parent)
 {
-    QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
-
     const auto kMouseEvents =
         {QEvent::MouseMove, QEvent::MouseButtonPress, QEvent::MouseButtonRelease};
 
@@ -52,17 +50,17 @@ MouseSpy::MouseSpy(QObject* parent):
 MouseSpy* MouseSpy::instance()
 {
     static MouseSpy instance;
-    QQmlEngine::setObjectOwnership(&instance, QQmlEngine::CppOwnership);
     return &instance;
 }
 
 MouseSpy* MouseSpyInterface::qmlAttachedProperties(QObject* /*parent*/)
 {
-    return MouseSpy::instance();
+    return core::withCppOwnership(MouseSpy::instance());
 }
 
 void MouseSpyInterface::registerQmlType()
 {
+    // TODO: #sivanov Shouldn't it be uncreatable?
     qmlRegisterType<MouseSpyInterface>("nx.vms.client.desktop", 1, 0, "MouseSpy");
 }
 

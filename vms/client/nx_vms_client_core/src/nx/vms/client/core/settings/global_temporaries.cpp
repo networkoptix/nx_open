@@ -10,17 +10,14 @@ namespace nx::vms::client::core {
 
 GlobalTemporaries* GlobalTemporaries::instance()
 {
-    static GlobalTemporaries theInstance;
-    return &theInstance;
+    static GlobalTemporaries instance;
+    return &instance;
 }
 
 void GlobalTemporaries::registerQmlType()
 {
-    const auto theInstance = GlobalTemporaries::instance();
-    QQmlEngine::setObjectOwnership(theInstance, QQmlEngine::CppOwnership);
-
     qmlRegisterSingletonInstance<GlobalTemporaries>("nx.vms.client.core", 1, 0,
-        "GlobalTemporaries", theInstance);
+        "GlobalTemporaries", instance());
 }
 
 } // namespace nx::vms::client::core

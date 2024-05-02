@@ -32,9 +32,6 @@ void AbstractCameraButtonController::setResource(const QnResourcePtr& value)
     if (m_resource == value)
         return;
 
-    if (value)
-        QQmlEngine::setObjectOwnership(value.data(), QQmlEngine::CppOwnership);
-
     // Let descendant classes process resource change before the signal is emitted.
     setResourceInternal(value);
 

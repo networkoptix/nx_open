@@ -10,6 +10,7 @@
 #include <core/resource/resource.h>
 #include <nx/branding.h>
 #include <nx/vms/client/core/network/remote_connection.h>
+#include <nx/vms/client/core/qml/qml_ownership.h>
 #include <nx/vms/client/desktop/access/access_controller.h>
 #include <nx/vms/client/desktop/access/caching_access_controller.h>
 #include <nx/vms/client/desktop/ini.h>
@@ -230,8 +231,8 @@ nx::Uuid SystemContext::localSystemId() const
 
 analytics::TaxonomyManager* SystemContext::taxonomyManager() const
 {
-    QQmlEngine::setObjectOwnership(d->taxonomyManager.get(), QQmlEngine::CppOwnership);
-    return d->taxonomyManager.get();
+    // TODO: #sivanov Replace with Q_PROPERTY.
+    return core::withCppOwnership(d->taxonomyManager.get());
 }
 
 OtherServersManager* SystemContext::otherServersManager() const

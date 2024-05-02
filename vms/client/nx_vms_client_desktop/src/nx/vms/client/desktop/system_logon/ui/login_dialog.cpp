@@ -195,7 +195,6 @@ void LoginDialog::setupIntroView()
     {
         d->introResource.reset(new QnAviResource(QString("file:///") + introPath));
         d->introResource->setStatus(nx::vms::api::ResourceStatus::online);
-        QQmlEngine::setObjectOwnership(d->introResource.get(), QQmlEngine::CppOwnership);
 
         const auto introWidget = new QQuickWidget(appContext()->qmlEngine(), this);
 

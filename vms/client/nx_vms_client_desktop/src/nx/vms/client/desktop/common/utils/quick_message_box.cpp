@@ -4,6 +4,8 @@
 
 #include <QtQml/QtQml>
 
+#include <nx/vms/client/core/qml/qml_ownership.h>
+
 namespace nx::vms::client::desktop {
 
 QuickMessageBox::QuickMessageBox(QObject* parent):
@@ -48,8 +50,7 @@ void QuickMessageBox::registerQmlType()
         [](QQmlEngine* qmlEngine, QJSEngine* /*jsEngine*/) -> QObject*
         {
             static QuickMessageBox instance;
-            qmlEngine->setObjectOwnership(&instance, QQmlEngine::CppOwnership);
-            return &instance;
+            return core::withCppOwnership(&instance);
         });
 }
 

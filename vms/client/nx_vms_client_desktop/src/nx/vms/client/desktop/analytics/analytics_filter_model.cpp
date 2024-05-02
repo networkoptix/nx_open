@@ -2,12 +2,11 @@
 
 #include "analytics_filter_model.h"
 
-#include <QtQml/QQmlEngine>
-
 #include <core/resource/camera_resource.h>
 #include <nx/analytics/taxonomy/abstract_resource_support_proxy.h>
 #include <nx/analytics/taxonomy/abstract_state.h>
 #include <nx/utils/range_adapters.h>
+#include <nx/vms/client/core/qml/qml_ownership.h>
 
 #include "analytics_taxonomy_manager.h"
 #include "taxonomy/abstract_state_view_filter.h"
@@ -241,9 +240,7 @@ void AnalyticsFilterModel::setLiveTypesExcluded(bool value)
 
 ObjectType* AnalyticsFilterModel::objectTypeById(const QString& id) const
 {
-    auto objectType = m_objectTypesById[id];
-    QQmlEngine::setObjectOwnership(objectType, QQmlEngine::CppOwnership);
-    return objectType;
+    return core::withCppOwnership(m_objectTypesById[id]);
 }
 
 ObjectType* AnalyticsFilterModel::findFilterObjectType(const QStringList& analyticsObjectTypeIds)

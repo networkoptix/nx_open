@@ -5,13 +5,13 @@
 #include <type_traits>
 
 #include <QtCore/QScopedValueRollback>
-#include <QtQml/QQmlEngine>
 
 #include <core/resource/camera_resource.h>
 #include <nx/reflect/json/serializer.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/qt_helpers.h>
+#include <nx/vms/client/core/qml/qml_ownership.h>
 #include <nx/vms/client/desktop/common/flux/private_flux_store.h>
 #include <nx/vms/time/formatter.h>
 
@@ -68,10 +68,7 @@ void CameraSettingsDialogStore::loadCameras(
             // FIXME: #sivanov Workaround for QML access. Need to create better architecture.
             d->resource.clear();
             if (!cameras.empty())
-            {
                 d->resource = cameras.first().data();
-                QQmlEngine::setObjectOwnership(d->resource.get(), QQmlEngine::CppOwnership);
-            }
 
             return Reducer::loadCameras(
                 std::move(state),
@@ -726,7 +723,8 @@ void CameraSettingsDialogStore::resetExpertSettings()
 
 QnResource* CameraSettingsDialogStore::resource() const
 {
-    return d->resource.data();
+    // TODO: #sivanov Replace with a Q_PROPERTY to avoid ownership change declaration.
+    return core::withCppOwnership(d->resource.data());
 }
 
 QVariantList CameraSettingsDialogStore::analyticsEngines() const

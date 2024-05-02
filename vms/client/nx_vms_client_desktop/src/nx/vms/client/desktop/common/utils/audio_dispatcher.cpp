@@ -112,7 +112,6 @@ bool AudioDispatcher::audioEnabled() const
 AudioDispatcher* AudioDispatcher::instance()
 {
     static AudioDispatcher audioDispatcher;
-    QQmlEngine::setObjectOwnership(&audioDispatcher, QQmlEngine::CppOwnership);
     return &audioDispatcher;
 }
 

@@ -79,9 +79,6 @@ MediaFileSettingsDialog::MediaFileSettingsDialog(QWidget* parent):
     if (!NX_ASSERT(d->rootObject = d->quickWidget->rootObject()))
         return;
 
-    appContext()->qmlEngine()->setObjectOwnership(d->mediaPreview,
-        QQmlEngine::CppOwnership);
-
     d->rootObject->setProperty("previewSource", QVariant::fromValue(d->mediaPreview));
     d->rootObject->setProperty("helpTopic", HelpTopic::Id::MainWindow_MediaItem_Dewarping);
 
