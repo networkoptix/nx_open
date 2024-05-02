@@ -749,9 +749,6 @@ bool QnStorageListModel::canChangeStorageArchiveMode(const QnStorageModelInfo& d
     if (m_readOnly)
         return false;
 
-    if (!data.isWritable)
-        return false;
-
     if (isStorageInRebuild(data))
         return false;
 
