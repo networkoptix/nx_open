@@ -76,7 +76,7 @@
     <name>AdvancedUpdateSettings</name>
     <message>
       <source>Advanced Update Settings</source>
-      <translation type="unfinished">Advanced Update Settings</translation>
+      <translation>Pengaturan Advanced Update</translation>
     </message>
     <message>
       <source>Notifications</source>
@@ -84,46 +84,46 @@
     </message>
     <message>
       <source>Notify about available updates</source>
-      <translation type="unfinished">Notify about available updates</translation>
+      <translation>Notifikasi tentang update yang tersedia</translation>
     </message>
     <message>
       <source>Automatic client updates</source>
-      <translation type="unfinished">Automatic client updates</translation>
+      <translation>Update klien otomatis</translation>
     </message>
     <message>
       <source>Turn this option on to make connected clients update automatically to the latest compatible version.</source>
-      <translation type="unfinished">Turn this option on to make connected clients update automatically to the latest compatible version.</translation>
+      <translation>Aktifkan opsi ini untuk membuat klien yang terkoneksi diupdate secara otomatis ke versi terbaru yang kompatibel.</translation>
     </message>
     <message>
       <source>Connecting clients will be automatically updated to the new version when it’s available.</source>
-      <translation type="unfinished">Connecting clients will be automatically updated to the new version when it’s available.</translation>
+      <translation>Klien yang terkoneksi akan diupdate secara otomatis ke versi baru jika sudah tersedia.</translation>
     </message>
     <message>
       <source>All connecting clients are updating to version %1.</source>
-      <translation type="unfinished">All connecting clients are updating to version %1.</translation>
+      <translation>Semua klien yang terkoneksi sedang diupdate ke versi %1.</translation>
     </message>
     <message>
       <source>Connecting clients will be updated to version %1 on %2.</source>
-      <translation type="unfinished">Connecting clients will be updated to version %1 on %2.</translation>
+      <translation>Klien yang terkoneksi akan diupdate ke versi %1 pada %2.</translation>
     </message>
     <message>
       <source>Check for updates</source>
-      <translation type="unfinished">Check for updates</translation>
+      <translation>Cek versi terbaru</translation>
     </message>
     <message>
       <source>Speed up this update</source>
-      <translation type="unfinished">Speed up this update</translation>
+      <translation>Percepat update ini</translation>
     </message>
     <message>
       <source>You are using a custom client. Please contact %1 to get the update instructions.</source>
-      <translation type="unfinished">You are using a custom client. Please contact %1 to get the update instructions.</translation>
+      <translation>Anda menggunakan klien kustom. Silakan hubungi %1 untuk mendapatkan instruksi update.</translation>
     </message>
   </context>
   <context>
     <name>AnalyticsEventSelector</name>
     <message>
       <source>Event Type</source>
-      <translation type="unfinished">Event Type</translation>
+      <translation>Tipe Event</translation>
     </message>
     <message>
       <source>All</source>
@@ -134,108 +134,108 @@
     <name>AnalyticsFilters</name>
     <message>
       <source>Object Type</source>
-      <translation type="unfinished">Object Type</translation>
+      <translation>Tipe Objek</translation>
     </message>
   </context>
   <context>
     <name>AnalyticsPanel</name>
     <message>
       <source>Select area</source>
-      <translation type="unfinished">Select area</translation>
+      <translation>Pilih area</translation>
     </message>
     <message>
       <source>Select some area on the video...</source>
-      <translation type="unfinished">Select some area on the video...</translation>
+      <translation>Pilih beberapa area pada video...</translation>
     </message>
     <message>
       <source>In selected area</source>
-      <translation type="unfinished">In selected area</translation>
+      <translation>Di area yang dipilih</translation>
     </message>
     <message>
       <source>No objects</source>
-      <translation type="unfinished">No objects</translation>
+      <translation>Tidak ada objek</translation>
     </message>
     <message>
       <source>Try changing the filters or configure object detection in the camera plugin settings</source>
-      <translation type="unfinished">Try changing the filters or configure object detection in the camera plugin settings</translation>
+      <translation>Coba ubah filter atau konfigurasikan deteksi objek di pengaturan plugin kamera</translation>
     </message>
     <message numerus="yes">
       <source>%n new results</source>
-      <translation type="unfinished">
-        <numerusform>%n new results</numerusform>
+      <translation>
+        <numerusform>%n hasil baru</numerusform>
       </translation>
     </message>
     <message>
       <source>new results</source>
-      <translation type="unfinished">new results</translation>
+      <translation>hasil baru</translation>
     </message>
     <message>
       <source>Detected by</source>
-      <translation type="unfinished">Detected by</translation>
+      <translation>Terdeteksi oleh</translation>
     </message>
   </context>
   <context>
     <name>AnalyticsSearchDialog</name>
     <message>
       <source>Advanced Object Search</source>
-      <translation type="unfinished">Advanced Object Search</translation>
+      <translation>Pencarian Advanced Objek</translation>
     </message>
     <message>
       <source>Select area</source>
-      <translation type="unfinished">Select area</translation>
+      <translation>Pilih area</translation>
     </message>
     <message>
       <source>Select some area on the video...</source>
-      <translation type="unfinished">Select some area on the video...</translation>
+      <translation>Pilih beberapa area pada video...</translation>
     </message>
     <message>
       <source>In selected area</source>
-      <translation type="unfinished">In selected area</translation>
+      <translation>Di area yang dipilih</translation>
     </message>
     <message>
       <source>No objects</source>
-      <translation type="unfinished">No objects</translation>
+      <translation>Tidak ada objek</translation>
     </message>
     <message>
       <source>Try changing the filters or configure object detection in the camera plugin settings</source>
-      <translation type="unfinished">Try changing the filters or configure object detection in the camera plugin settings</translation>
+      <translation>Coba ubah filter atau konfigurasikan deteksi objek di pengaturan plugin kamera</translation>
     </message>
     <message>
       <source>Any plugin</source>
-      <translation type="unfinished">Any plugin</translation>
+      <translation>Plugin apa pun</translation>
     </message>
     <message numerus="yes">
       <source>%n new results</source>
-      <translation type="unfinished">
-        <numerusform>%n new results</numerusform>
+      <translation>
+        <numerusform>%n hasil baru</numerusform>
       </translation>
     </message>
     <message>
       <source>new results</source>
-      <translation type="unfinished">new results</translation>
+      <translation>hasil baru</translation>
     </message>
   </context>
   <context>
     <name>AnalyticsSettings</name>
     <message>
       <source>Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</source>
-      <translation type="unfinished">Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</translation>
+      <translation>Analitik kamera hanya akan berfungsi saat kamera sedang dilihat. Aktifkan perekaman agar berfungsi sepanjang waktu.</translation>
     </message>
     <message>
       <source>Check Camera Settings to configure this plugin.</source>
-      <translation type="unfinished">Check Camera Settings to configure this plugin.</translation>
+      <translation>Periksa Pengaturan Kamera untuk mengkonfigurasi plugin ini.</translation>
     </message>
     <message>
       <source>Check System Administration settings to configure this plugin.</source>
-      <translation type="unfinished">Check System Administration settings to configure this plugin.</translation>
+      <translation>Periksa pengaturan System Administration untuk mengkonfigurasi plugin ini.</translation>
     </message>
     <message>
       <source>This plugin has no settings at the System level.</source>
-      <translation type="unfinished">This plugin has no settings at the System level.</translation>
+      <translation>Plugin ini tidak memiliki pengaturan di level Sistem.</translation>
     </message>
     <message>
       <source>This plugin has no settings for this camera.</source>
-      <translation type="unfinished">This plugin has no settings for this camera.</translation>
+      <translation>Plugin ini tidak memiliki pengaturan untuk kamera ini.</translation>
     </message>
   </context>
   <context>
@@ -362,60 +362,60 @@
     <name>BooleanRadioGroup</name>
     <message>
       <source>Yes</source>
-      <translation type="unfinished">Yes</translation>
+      <translation>Ya</translation>
     </message>
     <message>
       <source>No</source>
-      <translation type="unfinished">No</translation>
+      <translation>Tidak</translation>
     </message>
   </context>
   <context>
     <name>ButtonSettingsDelegate</name>
     <message>
       <source>Hotkey %1</source>
-      <translation type="unfinished">Hotkey %1</translation>
+      <translation>Hotkey %1</translation>
     </message>
   </context>
   <context>
     <name>Buttons</name>
     <message>
       <source>Press each button several times and write the names of these buttons in the table below.</source>
-      <translation type="unfinished">Press each button several times and write the names of these buttons in the table below.</translation>
+      <translation>Tekan setiap tombol beberapa kali dan tuliskan nama tombol tersebut pada tabel di bawah.</translation>
     </message>
   </context>
   <context>
     <name>CameraSelector</name>
     <message>
       <source>Any device</source>
-      <translation type="unfinished">Any device</translation>
+      <translation>Perangkat apa pun</translation>
     </message>
     <message>
       <source>Any camera</source>
-      <translation type="unfinished">Any camera</translation>
+      <translation>Kamera apa pun</translation>
     </message>
     <message>
       <source>Devices on layout</source>
-      <translation type="unfinished">Devices on layout</translation>
+      <translation>Perangkat pada layout</translation>
     </message>
     <message>
       <source>Cameras on layout</source>
-      <translation type="unfinished">Cameras on layout</translation>
+      <translation>Kamera pada layout</translation>
     </message>
     <message>
       <source>Selected device</source>
-      <translation type="unfinished">Selected device</translation>
+      <translation>Perangkat yang dipilih</translation>
     </message>
     <message>
       <source>Selected camera</source>
-      <translation type="unfinished">Selected camera</translation>
+      <translation>Kamera yang dipilih</translation>
     </message>
     <message>
       <source>Choose devices...</source>
-      <translation type="unfinished">Choose devices...</translation>
+      <translation>Pilih perangkat...</translation>
     </message>
     <message>
       <source>Choose cameras...</source>
-      <translation type="unfinished">Choose cameras...</translation>
+      <translation>Pilih kamera...</translation>
     </message>
     <message>
       <source>none</source>
@@ -423,42 +423,42 @@
     </message>
     <message numerus="yes">
       <source>%n chosen devices</source>
-      <translation type="unfinished">
-        <numerusform>%n chosen devices</numerusform>
+      <translation>
+        <numerusform>%n perangkat yang dipilih</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n chosen cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n chosen cameras</numerusform>
+      <translation>
+        <numerusform>%n kamera yang dipilih</numerusform>
       </translation>
     </message>
     <message>
       <source>Chosen device</source>
-      <translation type="unfinished">Chosen device</translation>
+      <translation>Perangkat terpilih</translation>
     </message>
     <message>
       <source>Chosen camera</source>
-      <translation type="unfinished">Chosen camera</translation>
+      <translation>Kamera terpilih</translation>
     </message>
   </context>
   <context>
     <name>ClosedTileItem</name>
     <message>
       <source>Offline</source>
-      <translation type="unfinished">Offline</translation>
+      <translation>Offline</translation>
     </message>
     <message>
       <source>Unreachable</source>
-      <translation type="unfinished">Unreachable</translation>
+      <translation>Tidak terjangkau</translation>
     </message>
     <message>
       <source>Incompatible</source>
-      <translation type="unfinished">Incompatible</translation>
+      <translation>Tidak kompatibel</translation>
     </message>
     <message>
       <source>Pending</source>
-      <translation type="unfinished">Pending</translation>
+      <translation>Tertunda</translation>
     </message>
     <message>
       <source>Suspended</source>
@@ -545,34 +545,34 @@
     <name>ContextHintButton</name>
     <message>
       <source>Click on the icon to read more</source>
-      <translation type="unfinished">Click on the icon to read more</translation>
+      <translation>Klik pada ikon untuk membaca lebih lanjut</translation>
     </message>
   </context>
   <context>
     <name>CounterBlock</name>
     <message>
       <source>Remove column</source>
-      <translation type="unfinished">Remove column</translation>
+      <translation>Hapus kolom</translation>
     </message>
     <message>
       <source>Add column</source>
-      <translation type="unfinished">Add column</translation>
+      <translation>Tambahkan kolom</translation>
     </message>
     <message>
       <source>Hide information</source>
-      <translation type="unfinished">Hide information</translation>
+      <translation>Sembunyikan informasi</translation>
     </message>
     <message>
       <source>Show information</source>
-      <translation type="unfinished">Show information</translation>
+      <translation>Tampilkan informasi</translation>
     </message>
     <message>
       <source>Hide thumbnails</source>
-      <translation type="unfinished">Hide thumbnails</translation>
+      <translation>Sembunyikan thumbnail</translation>
     </message>
     <message>
       <source>Show thumbnails</source>
-      <translation type="unfinished">Show thumbnails</translation>
+      <translation>Tampilkan thumbnail</translation>
     </message>
     <message>
       <source>Preview</source>
@@ -591,7 +591,7 @@
     </message>
     <message>
       <source>360° Equirectangular</source>
-      <translation type="unfinished">360° Equirectangular</translation>
+      <translation>Equirectangular 360°</translation>
     </message>
   </context>
   <context>
@@ -645,7 +645,7 @@
     </message>
     <message>
       <source>See %1 for other events</source>
-      <translation type="unfinished">See %1 for other events</translation>
+      <translation>Lihat %1 untuk event lainnya</translation>
     </message>
     <message>
       <source>No events</source>
@@ -653,7 +653,7 @@
     </message>
     <message>
       <source>Try changing the filters or create an Event Rule</source>
-      <translation type="unfinished">Try changing the filters or create an Event Rule</translation>
+      <translation>Coba ubah filter atau buat Aturan Event</translation>
     </message>
     <message>
       <source>Event Log</source>
@@ -664,15 +664,15 @@
     <name>Figure</name>
     <message>
       <source>Figure</source>
-      <translation type="unfinished">Figure</translation>
+      <translation>Figur</translation>
     </message>
     <message>
       <source>Click to add</source>
-      <translation type="unfinished">Click to add</translation>
+      <translation>Klik untuk menambahkan</translation>
     </message>
     <message>
       <source>Display on video</source>
-      <translation type="unfinished">Display on video</translation>
+      <translation>Tampilan di video</translation>
     </message>
   </context>
   <context>
@@ -694,7 +694,7 @@
     <name>FigureView</name>
     <message>
       <source>NO PREVIEW</source>
-      <translation type="unfinished">NO PREVIEW</translation>
+      <translation>TIDAK ADA PREVIEW</translation>
     </message>
   </context>
   <context>
@@ -740,11 +740,11 @@
     </message>
     <message>
       <source>Invalid input image</source>
-      <translation type="unfinished">Invalid input image</translation>
+      <translation>Input gambar tidak valid</translation>
     </message>
     <message>
       <source>Show grid</source>
-      <translation type="unfinished">Show grid</translation>
+      <translation>Tampilkan grid</translation>
     </message>
     <message>
       <source>Auto Calibration</source>
@@ -752,39 +752,39 @@
     </message>
     <message>
       <source>Mount</source>
-      <translation type="unfinished">Mount</translation>
+      <translation>Mount</translation>
     </message>
     <message>
       <source>Ceiling</source>
-      <translation type="unfinished">Ceiling</translation>
+      <translation>Plafon</translation>
     </message>
     <message>
       <source>Wall</source>
-      <translation type="unfinished">Wall</translation>
+      <translation>Dinding</translation>
     </message>
     <message>
       <source>Floor/table</source>
-      <translation type="unfinished">Floor/table</translation>
+      <translation>Lantai/meja</translation>
     </message>
     <message>
       <source>Angle</source>
-      <translation type="unfinished">Angle</translation>
+      <translation>Sudut</translation>
     </message>
     <message>
       <source>Camera roll correction</source>
-      <translation type="unfinished">Camera roll correction</translation>
+      <translation>Koreksi roll kamera</translation>
     </message>
     <message>
       <source>Lens projection</source>
-      <translation type="unfinished">Lens projection</translation>
+      <translation>Proyeksi lensa</translation>
     </message>
     <message>
       <source>Equidistant</source>
-      <translation type="unfinished">Equidistant</translation>
+      <translation>Equidistant</translation>
     </message>
     <message>
       <source>Stereographic</source>
-      <translation type="unfinished">Stereographic</translation>
+      <translation>Stereografis</translation>
     </message>
     <message>
       <source>Equisolid</source>
@@ -1182,18 +1182,18 @@
     </message>
     <message>
       <source>Select Camera on Layout</source>
-      <translation type="unfinished">Select Camera on Layout</translation>
+      <translation>Pilih Kamera pada Layout</translation>
     </message>
     <message>
       <source>Log in to the system to configure how to open layouts</source>
-      <translation type="unfinished">Log in to the system to configure how to open layouts</translation>
+      <translation>Masuk ke sistem untuk mengkonfigurasi cara membuka layout</translation>
     </message>
   </context>
   <context>
     <name>LabeledItem</name>
     <message>
       <source>Default value:</source>
-      <translation type="unfinished">Default value:</translation>
+      <translation>Nilai default:</translation>
     </message>
   </context>
   <context>
@@ -1299,7 +1299,7 @@
     </message>
     <message>
       <source>Objects</source>
-      <translation type="unfinished">Objects</translation>
+      <translation>Objek</translation>
     </message>
     <message>
       <source>Settings</source>
@@ -1307,19 +1307,19 @@
     </message>
     <message>
       <source>Select a camera to see its motion events</source>
-      <translation type="unfinished">Select a camera to see its motion events</translation>
+      <translation>Pilih kamera untuk melihat event gerakannya</translation>
     </message>
     <message>
       <source>No motion detected</source>
-      <translation type="unfinished">No motion detected</translation>
+      <translation>Tidak ada gerakan yang terdeteksi</translation>
     </message>
     <message>
       <source>Try changing the filters or enable motion recording</source>
-      <translation type="unfinished">Try changing the filters or enable motion recording</translation>
+      <translation>Coba ubah filter atau aktifkan perekaman gerakan</translation>
     </message>
     <message>
       <source>Select Camera...</source>
-      <translation type="unfinished">Select Camera...</translation>
+      <translation>Pilih Kamera...</translation>
     </message>
     <message>
       <source>No bookmarks</source>
@@ -1327,34 +1327,34 @@
     </message>
     <message>
       <source>Select a time span on the timeline and right-click the highlighted section to create a bookmark</source>
-      <translation type="unfinished">Select a time span on the timeline and right-click the highlighted section to create a bookmark</translation>
+      <translation>Pilih rentang waktu pada timeline dan klik kanan bagian yang dihighlight untuk membuat bookmark</translation>
     </message>
   </context>
   <context>
     <name>Line</name>
     <message>
       <source>Line is not valid. Remove self-intersections to proceed.</source>
-      <translation type="unfinished">Line is not valid. Remove self-intersections to proceed.</translation>
+      <translation>Baris tidak valid. Hapus persimpangan sendiri untuk melanjutkan.</translation>
     </message>
     <message numerus="yes">
       <source>This line requires at least %n points.</source>
-      <translation type="unfinished">
-        <numerusform>This line requires at least %n points.</numerusform>
+      <translation>
+        <numerusform>Baris ini membutuhkan setidaknya %n poin.</numerusform>
       </translation>
     </message>
     <message>
       <source>Click on the last point to finish drawing the line.</source>
-      <translation type="unfinished">Click on the last point to finish drawing the line.</translation>
+      <translation>Klik pada titik terakhir untuk menyelesaikan menggambar garis.</translation>
     </message>
     <message numerus="yes">
       <source>The maximum number of points has been reached (%n points).</source>
-      <translation type="unfinished">
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
+      <translation>
+        <numerusform>Jumlah poin maksimum telah tercapai (%n points).</numerusform>
       </translation>
     </message>
     <message>
       <source>Click on each arrow to toggle the desired direction.</source>
-      <translation type="unfinished">Click on each arrow to toggle the desired direction.</translation>
+      <translation>Klik pada setiap panah untuk beralih ke arah yang diinginkan.</translation>
     </message>
   </context>
   <context>
@@ -1365,11 +1365,11 @@
     </message>
     <message>
       <source>Yes</source>
-      <translation type="unfinished">Yes</translation>
+      <translation>Ya</translation>
     </message>
     <message>
       <source>No</source>
-      <translation type="unfinished">No</translation>
+      <translation>Tidak</translation>
     </message>
   </context>
   <context>
@@ -1410,11 +1410,11 @@
     <name>MotionAreaSelector</name>
     <message>
       <source>In selected area</source>
-      <translation type="unfinished">In selected area</translation>
+      <translation>Di area yang dipilih</translation>
     </message>
     <message>
       <source>Select an area on the video to filter results</source>
-      <translation type="unfinished">Select an area on the video to filter results</translation>
+      <translation>Pilih area pada video untuk memfilter hasil</translation>
     </message>
   </context>
   <context>
@@ -1451,18 +1451,18 @@
     <name>ObjectEditor</name>
     <message>
       <source>Present</source>
-      <translation type="unfinished">Present</translation>
+      <translation>Saat Ini</translation>
     </message>
     <message>
       <source>Absent</source>
-      <translation type="unfinished">Absent</translation>
+      <translation>Absen</translation>
     </message>
   </context>
   <context>
     <name>ObjectSizeConstraints</name>
     <message>
       <source>Size Constraints</source>
-      <translation type="unfinished">Size Constraints</translation>
+      <translation>Batasan Ukuran</translation>
     </message>
   </context>
   <context>
@@ -1473,7 +1473,7 @@
     </message>
     <message>
       <source>URL or Host:Port</source>
-      <translation type="unfinished">URL or Host:Port</translation>
+      <translation>URL atau Host:Port</translation>
     </message>
     <message>
       <source>Login</source>
@@ -1489,7 +1489,7 @@
     </message>
     <message>
       <source>Remember me</source>
-      <translation type="unfinished">Remember me</translation>
+      <translation>Ingat saya</translation>
     </message>
   </context>
   <context>
@@ -1627,7 +1627,7 @@
     <name>PluginsInformation</name>
     <message>
       <source>No plugins installed</source>
-      <translation type="unfinished">No plugins installed</translation>
+      <translation>Tidak ada plugin yang terinstal</translation>
     </message>
     <message>
       <source>Server is offline</source>
@@ -1645,22 +1645,22 @@
     <name>Polygon</name>
     <message>
       <source>Polygon is not valid. Remove self-intersections to proceed.</source>
-      <translation type="unfinished">Polygon is not valid. Remove self-intersections to proceed.</translation>
+      <translation>Poligon tidak valid. Hapus persimpangan sendiri untuk melanjutkan.</translation>
     </message>
     <message numerus="yes">
       <source>This polygon requires at least %n points.</source>
-      <translation type="unfinished">
-        <numerusform>This polygon requires at least %n points.</numerusform>
+      <translation>
+        <numerusform>Poligon ini memerlukan setidaknya %n poin.</numerusform>
       </translation>
     </message>
     <message>
       <source>Click on the last point to finish drawing the polygon.</source>
-      <translation type="unfinished">Click on the last point to finish drawing the polygon.</translation>
+      <translation>Klik pada titik terakhir untuk menyelesaikan gambar poligon.</translation>
     </message>
     <message numerus="yes">
       <source>The maximum number of points has been reached (%n points).</source>
-      <translation type="unfinished">
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
+      <translation>
+        <numerusform>Jumlah poin maksimum telah tercapai (%n points).</numerusform>
       </translation>
     </message>
   </context>
@@ -1675,11 +1675,11 @@
     <name>PreviewPanel</name>
     <message>
       <source>No Preview</source>
-      <translation type="unfinished">No Preview</translation>
+      <translation>Tidak ada preview</translation>
     </message>
     <message>
       <source>Select the object to display the preview</source>
-      <translation type="unfinished">Select the object to display the preview</translation>
+      <translation>Pilih objek untuk menampilkan preview</translation>
     </message>
     <message>
       <source>Show on Layout</source>
@@ -1687,7 +1687,7 @@
     </message>
     <message>
       <source>Preview is not available for the selected object</source>
-      <translation type="unfinished">Preview is not available for the selected object</translation>
+      <translation>Preview tidak tersedia untuk objek yang dipilih</translation>
     </message>
   </context>
   <context>
@@ -1706,12 +1706,12 @@
     <message>
       <source>Drag over any part of the video
 to activate PTZ</source>
-      <translation type="unfinished">Drag over any part of the video
-to activate PTZ</translation>
+      <translation>Geser bagian mana pun dari video
+untuk mengaktifkan PTZ</translation>
     </message>
     <message>
       <source>Go to Local Settings to enable a drag marker over the center of the video</source>
-      <translation type="unfinished">Go to Local Settings to enable a drag marker over the center of the video</translation>
+      <translation>Buka Pengaturan Lokal untuk mengaktifkan drag marker di tengah video</translation>
     </message>
     <message>
       <source>Press arrow keys to move around. Use plus and minus keys to zoom.</source>
@@ -1779,7 +1779,7 @@ Press Alt + Click to follow object</translation>
     <name>RangeEditor</name>
     <message>
       <source>from</source>
-      <translation type="unfinished">from</translation>
+      <translation>dari</translation>
     </message>
     <message>
       <source>to</source>
@@ -1790,11 +1790,11 @@ Press Alt + Click to follow object</translation>
     <name>RecursiveObjectTypeSelector</name>
     <message>
       <source>Object Type</source>
-      <translation type="unfinished">Object Type</translation>
+      <translation>Tipe Objek</translation>
     </message>
     <message>
       <source>Subtype</source>
-      <translation type="unfinished">Subtype</translation>
+      <translation>Subtipe</translation>
     </message>
   </context>
   <context>
@@ -1858,7 +1858,7 @@ Press Alt + Click to follow object</translation>
     <name>ResourceBrowser</name>
     <message>
       <source>No local files</source>
-      <translation type="unfinished">No local files</translation>
+      <translation>Tidak ada file lokal</translation>
     </message>
     <message>
       <source>Nothing found</source>
@@ -1866,11 +1866,11 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Drag video files or images to the client window, or add local media folder through the Local Settings dialog</source>
-      <translation type="unfinished">Drag video files or images to the client window, or add local media folder through the Local Settings dialog</translation>
+      <translation>Geser file video atau gambar ke jendela klien, atau tambahkan folder media lokal melalui dialog Pengaturan Lokal</translation>
     </message>
     <message>
       <source>Try searching for something else</source>
-      <translation type="unfinished">Try searching for something else</translation>
+      <translation>Mencoba cari yang lain</translation>
     </message>
   </context>
   <context>
@@ -1881,7 +1881,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
-      <translation type="unfinished">Cameras &amp; Devices</translation>
+      <translation>Kamera &amp; Perangkat</translation>
     </message>
     <message>
       <source>Layouts</source>
@@ -1901,7 +1901,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Video Walls</source>
-      <translation type="unfinished">Video Walls</translation>
+      <translation>Video Wall</translation>
     </message>
   </context>
   <context>
@@ -1921,7 +1921,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>OUTDATED</source>
-      <translation type="unfinished">OUTDATED</translation>
+      <translation>USANG</translation>
     </message>
     <message>
       <source>NO ACCESS</source>
@@ -1940,7 +1940,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
-      <translation type="unfinished">Cameras &amp; Devices</translation>
+      <translation>Kamera &amp; Perangkat</translation>
     </message>
     <message>
       <source>Layouts</source>
@@ -1952,7 +1952,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Video Walls</source>
-      <translation type="unfinished">Video Walls</translation>
+      <translation>Video Wall</translation>
     </message>
     <message>
       <source>Web Pages</source>
@@ -1971,11 +1971,11 @@ Press Alt + Click to follow object</translation>
     <name>ResourceToolTip</name>
     <message>
       <source>Cannot load preview</source>
-      <translation type="unfinished">Cannot load preview</translation>
+      <translation>Tidak dapat memuat preview</translation>
     </message>
     <message>
       <source>Preview is outdated</source>
-      <translation type="unfinished">Preview is outdated</translation>
+      <translation>Preview sudah usang</translation>
     </message>
   </context>
   <context>
@@ -1998,7 +1998,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Analytics</source>
-      <translation type="unfinished">Analytics</translation>
+      <translation>Analitik</translation>
     </message>
   </context>
   <context>
@@ -2024,7 +2024,7 @@ Press Alt + Click to follow object</translation>
     <name>SavingResults</name>
     <message>
       <source>Choose file to save</source>
-      <translation type="unfinished">Choose file to save</translation>
+      <translation>Pilih file untuk disimpan</translation>
     </message>
     <message>
       <source>JSON files (*.json)</source>
