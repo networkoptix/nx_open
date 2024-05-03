@@ -788,7 +788,7 @@
     </message>
     <message>
       <source>Equisolid</source>
-      <translation type="unfinished">Equisolid</translation>
+      <translation>Equisolid</translation>
     </message>
     <message>
       <source>Size</source>
@@ -984,7 +984,7 @@
     <name>GroupsComboBox</name>
     <message>
       <source>Select</source>
-      <translation type="unfinished">Select</translation>
+      <translation>Pilih</translation>
     </message>
     <message>
       <source>Search</source>
@@ -1004,7 +1004,7 @@
     <message>
       <source>Hold %1 to activate actions</source>
       <comment>Leave %1 as is. It will be replaced to button name.</comment>
-      <translation type="unfinished">Hold %1 to activate actions</translation>
+      <translation>Tahan %1 untuk mengaktifkan aksi</translation>
     </message>
   </context>
   <context>
@@ -1018,18 +1018,18 @@
     <name>InformationBubble</name>
     <message>
       <source>Detected by</source>
-      <translation type="unfinished">Detected by</translation>
+      <translation>Terdeteksi oleh</translation>
     </message>
   </context>
   <context>
     <name>Initial</name>
     <message>
       <source>Select the joystick.</source>
-      <translation type="unfinished">Select the joystick.</translation>
+      <translation>Pilih joystick.</translation>
     </message>
     <message>
       <source>No devices connected.</source>
-      <translation type="unfinished">No devices connected.</translation>
+      <translation>Tidak ada perangkat terkoneksi.</translation>
     </message>
   </context>
   <context>
@@ -1070,7 +1070,7 @@
     </message>
     <message>
       <source>Refreshing...</source>
-      <translation type="unfinished">Refreshing...</translation>
+      <translation>Sedang refresh...</translation>
     </message>
     <message>
       <source>There are more cameras using this integration than available services. Please disable integration for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</source>
@@ -1082,7 +1082,7 @@
     <name>IntegrationPanel</name>
     <message>
       <source>Version</source>
-      <translation type="unfinished">Version</translation>
+      <translation>Versi</translation>
     </message>
     <message>
       <source>Vendor</source>
@@ -1090,11 +1090,11 @@
     </message>
     <message>
       <source>Camera stream</source>
-      <translation type="unfinished">Camera stream</translation>
+      <translation>Stream kamera</translation>
     </message>
     <message>
       <source>Select video stream from the camera for analysis</source>
-      <translation type="unfinished">Select video stream from the camera for analysis</translation>
+      <translation>Pilih stream video dari kamera untuk dianalisis</translation>
     </message>
     <message>
       <source>Usage</source>
@@ -1109,7 +1109,7 @@
     </message>
     <message>
       <source>Previous Object</source>
-      <translation type="unfinished">Previous Object</translation>
+      <translation>Objek Sebelumnya</translation>
     </message>
     <message>
       <source>Pause</source>
@@ -1121,11 +1121,11 @@
     </message>
     <message>
       <source>Next Object</source>
-      <translation type="unfinished">Next Object</translation>
+      <translation>Objek Berikutnya</translation>
     </message>
     <message>
       <source>Toggle Repeat</source>
-      <translation type="unfinished">Toggle Repeat</translation>
+      <translation>Ulangi Toggle</translation>
     </message>
   </context>
   <context>
@@ -1136,7 +1136,7 @@
     </message>
     <message>
       <source>Previous</source>
-      <translation type="unfinished">Previous</translation>
+      <translation>Sebelumnya</translation>
     </message>
     <message>
       <source>Next</source>
@@ -1147,38 +1147,38 @@
     <name>JoystickSettingsDialog</name>
     <message>
       <source>Joystick Settings</source>
-      <translation type="unfinished">Joystick Settings</translation>
+      <translation>Pengaturan Joystick</translation>
     </message>
     <message>
       <source>joystick</source>
-      <translation type="unfinished">joystick</translation>
+      <translation>joystick</translation>
     </message>
     <message>
       <source>Basic Actions</source>
-      <translation type="unfinished">Basic Actions</translation>
+      <translation>Aksi Dasar</translation>
     </message>
     <message>
       <source>With Modifier</source>
-      <translation type="unfinished">With Modifier</translation>
+      <translation>Dengan Modifier</translation>
     </message>
     <message>
       <source>This model is not supported</source>
-      <translation type="unfinished">This model is not supported</translation>
+      <translation>Model ini tidak didukung</translation>
     </message>
     <message>
       <source>Reset to Default</source>
-      <translation type="unfinished">Reset to Default</translation>
+      <translation>Reset ke Default</translation>
     </message>
   </context>
   <context>
     <name>JoystickSettingsTab</name>
     <message>
       <source>Pan and Tilt</source>
-      <translation type="unfinished">Pan and Tilt</translation>
+      <translation>Pan dan Tilt</translation>
     </message>
     <message>
       <source>Zoom In / Zoom Out</source>
-      <translation type="unfinished">Zoom In / Zoom Out</translation>
+      <translation>Zoom In / Zoom Out</translation>
     </message>
     <message>
       <source>Select Camera on Layout</source>
@@ -2028,11 +2028,11 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>JSON files (*.json)</source>
-      <translation type="unfinished">JSON files (*.json)</translation>
+      <translation>File JSON (*.json)</translation>
     </message>
     <message>
       <source>File to save the results:</source>
-      <translation type="unfinished">File to save the results:</translation>
+      <translation>File untuk menyimpan hasilnya:</translation>
     </message>
   </context>
   <context>
@@ -2053,25 +2053,25 @@ Press Alt + Click to follow object</translation>
     <name>SecurityOverlay</name>
     <message>
       <source>No access</source>
-      <translation type="unfinished">No access</translation>
+      <translation>Tidak ada akses</translation>
     </message>
   </context>
   <context>
     <name>SelectLayoutDialog</name>
     <message>
       <source>Select layout</source>
-      <translation type="unfinished">Select layout</translation>
+      <translation>Pilih layout</translation>
     </message>
   </context>
   <context>
     <name>SelectOverlappedIdDialog</name>
     <message>
       <source>Timeline identifier, which is created when time is changed backward on a remote NVR. The new timeline can overlap the existing one.</source>
-      <translation type="unfinished">Timeline identifier, which is created when time is changed backward on a remote NVR. The new timeline can overlap the existing one.</translation>
+      <translation>Pengidentifikasi timeline, yang dibuat ketika waktu diubah mundur pada remote NVR. Timeline yang baru dapat overlap dengan timeline yang sudah ada.</translation>
     </message>
     <message>
       <source>Select</source>
-      <translation type="unfinished">Select</translation>
+      <translation>Pilih</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -2089,37 +2089,37 @@ Press Alt + Click to follow object</translation>
     <name>SettingsDialog</name>
     <message>
       <source>Enter parameters</source>
-      <translation type="unfinished">Enter parameters</translation>
+      <translation>Masukkan parameter</translation>
     </message>
     <message>
       <source>This action requires some parameters to be filled.</source>
-      <translation type="unfinished">This action requires some parameters to be filled.</translation>
+      <translation>Aksi ini memerlukan beberapa parameter untuk diisi.</translation>
     </message>
   </context>
   <context>
     <name>SizeConstraints</name>
     <message>
       <source>MAX</source>
-      <translation type="unfinished">MAX</translation>
+      <translation>MAKS</translation>
     </message>
     <message>
       <source>MIN</source>
-      <translation type="unfinished">MIN</translation>
+      <translation>MIN</translation>
     </message>
     <message>
       <source>Set minimum and maximum object size.</source>
-      <translation type="unfinished">Set minimum and maximum object size.</translation>
+      <translation>Tetapkan ukuran objek minimum dan maksimum.</translation>
     </message>
     <message>
       <source>Minimum object size cannot be greater than maximum.</source>
-      <translation type="unfinished">Minimum object size cannot be greater than maximum.</translation>
+      <translation>Ukuran objek minimum tidak boleh lebih besar dari maksimum.</translation>
     </message>
   </context>
   <context>
     <name>SphereDewarpingSettings</name>
     <message>
       <source>Horizon correction</source>
-      <translation type="unfinished">Horizon correction</translation>
+      <translation>Koreksi horizon</translation>
     </message>
     <message>
       <source>Reset</source>
@@ -2154,21 +2154,21 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Set for this Camera</source>
-      <translation type="unfinished">Set for this Camera</translation>
+      <translation>Ditetapkan untuk Kamera ini</translation>
     </message>
     <message numerus="yes">
       <source>Set for all %n Cameras</source>
-      <translation type="unfinished">
-        <numerusform>Set for all %n Cameras</numerusform>
+      <translation>
+        <numerusform>Ditetapkan untuk semua %n Kamera</numerusform>
       </translation>
     </message>
     <message>
       <source>No data</source>
-      <translation type="unfinished">No data</translation>
+      <translation>Tidak ada data</translation>
     </message>
     <message>
       <source>Unauthorized</source>
-      <translation type="unfinished">Unauthorized</translation>
+      <translation>Tidak diotorisasi</translation>
     </message>
     <message>
       <source>Please check authentication information</source>
@@ -2176,43 +2176,43 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>No signal</source>
-      <translation type="unfinished">No signal</translation>
+      <translation>Tidak ada sinyal</translation>
     </message>
     <message>
       <source>Not enough licenses</source>
-      <translation type="unfinished">Not enough licenses</translation>
+      <translation>Lisensi tidak cukup</translation>
     </message>
     <message>
       <source>Server unavailable</source>
-      <translation type="unfinished">Server unavailable</translation>
+      <translation>Server tidak tersedia</translation>
     </message>
     <message>
       <source>No access</source>
-      <translation type="unfinished">No access</translation>
+      <translation>Tidak ada akses</translation>
     </message>
     <message>
       <source>Device disabled</source>
-      <translation type="unfinished">Device disabled</translation>
+      <translation>Perangkat dinonaktifkan</translation>
     </message>
     <message>
       <source>Too many connections</source>
-      <translation type="unfinished">Too many connections</translation>
+      <translation>Terlalu banyak koneksi</translation>
     </message>
     <message>
       <source>Cannot decrypt media</source>
-      <translation type="unfinished">Cannot decrypt media</translation>
+      <translation>Tidak dapat mendekripsi media</translation>
     </message>
     <message>
       <source>Password required</source>
-      <translation type="unfinished">Password required</translation>
+      <translation>Kata sandi diperlukan</translation>
     </message>
     <message>
       <source>No live stream</source>
-      <translation type="unfinished">No live stream</translation>
+      <translation>Tidak ada streaming live</translation>
     </message>
     <message>
       <source>Unsupported firmware version</source>
-      <translation type="unfinished">Unsupported firmware version</translation>
+      <translation>Versi firmware tidak didukung</translation>
     </message>
   </context>
   <context>
@@ -2226,7 +2226,7 @@ Press Alt + Click to follow object</translation>
     <name>StyledRadioButton</name>
     <message>
       <source>Logical ID</source>
-      <translation type="unfinished">Logical ID</translation>
+      <translation>ID logis</translation>
     </message>
   </context>
   <context>
@@ -2285,23 +2285,23 @@ Press Alt + Click to follow object</translation>
     <name>TileGridPlaceholder</name>
     <message>
       <source>Nothing Found</source>
-      <translation type="unfinished">Nothing Found</translation>
+      <translation>Tidak ada yang ditemukan</translation>
     </message>
     <message>
       <source>No Favorite Systems</source>
-      <translation type="unfinished">No Favorite Systems</translation>
+      <translation>Tidak Ada Sistem Favorit</translation>
     </message>
     <message>
       <source>No Hidden Systems</source>
-      <translation type="unfinished">No Hidden Systems</translation>
+      <translation>Tidak Ada Sistem Tersembunyi</translation>
     </message>
     <message>
       <source>You can add system to the favorites from the context menu</source>
-      <translation type="unfinished">You can add system to the favorites from the context menu</translation>
+      <translation>Anda dapat menambahkan sistem ke favorit dari menu konteks</translation>
     </message>
     <message>
       <source>You can hide systems from the main list from the context menu</source>
-      <translation type="unfinished">You can hide systems from the main list from the context menu</translation>
+      <translation>Anda dapat menyembunyikan sistem dari daftar utama dari menu konteks</translation>
     </message>
   </context>
   <context>
@@ -2312,11 +2312,11 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Hide</source>
-      <translation type="unfinished">Hide</translation>
+      <translation>Sembunyikan</translation>
     </message>
     <message>
       <source>Show</source>
-      <translation type="unfinished">Show</translation>
+      <translation>Tampilkan</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -2324,34 +2324,34 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Add to Favorites</source>
-      <translation type="unfinished">Add to Favorites</translation>
+      <translation>Tambahkan ke Favorit</translation>
     </message>
     <message>
       <source>Remove from Favorites</source>
-      <translation type="unfinished">Remove from Favorites</translation>
+      <translation>Hapus dari Favorit</translation>
     </message>
   </context>
   <context>
     <name>TimeSelector</name>
     <message>
       <source>Any time</source>
-      <translation type="unfinished">Any time</translation>
+      <translation>Semua waktu</translation>
     </message>
     <message>
       <source>Last day</source>
-      <translation type="unfinished">Last day</translation>
+      <translation>Hari terakhir</translation>
     </message>
     <message>
       <source>Last 7 days</source>
-      <translation type="unfinished">Last 7 days</translation>
+      <translation>7 Hari terakhir</translation>
     </message>
     <message>
       <source>Last 30 days</source>
-      <translation type="unfinished">Last 30 days</translation>
+      <translation>30 Hari terakhir</translation>
     </message>
     <message>
       <source>Selected on Timeline</source>
-      <translation type="unfinished">Selected on Timeline</translation>
+      <translation>Dipilih di Timeline</translation>
     </message>
     <message>
       <source>Time is unavailable due to DST changes</source>
@@ -2605,15 +2605,15 @@ Press Alt + Click to follow object</translation>
     <name>VisibilityMenu</name>
     <message>
       <source>Hidden</source>
-      <translation type="unfinished">Hidden</translation>
+      <translation>Tersembunyi</translation>
     </message>
     <message>
       <source>All Systems</source>
-      <translation type="unfinished">All Systems</translation>
+      <translation>Semua Sistem</translation>
     </message>
     <message>
       <source>Favorites</source>
-      <translation type="unfinished">Favorites</translation>
+      <translation>Favorit</translation>
     </message>
   </context>
   <context>
@@ -2651,11 +2651,11 @@ Press Alt + Click to follow object</translation>
     <name>WelcomeScreen</name>
     <message>
       <source>Official Website</source>
-      <translation type="unfinished">Official Website</translation>
+      <translation>Website Ofisial</translation>
     </message>
     <message>
       <source>Help &amp; User Manual</source>
-      <translation type="unfinished">Help &amp; User Manual</translation>
+      <translation>Bantuan &amp; Panduan Pengguna</translation>
     </message>
     <message>
       <source>Support</source>
@@ -2663,28 +2663,28 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>You do not have access to the %1. Please check your internet connection.</source>
-      <translation type="unfinished">You do not have access to the %1. Please check your internet connection.</translation>
+      <translation>Anda tidak memiliki akses ke %1. Silakan periksa koneksi internet Anda.</translation>
     </message>
   </context>
   <context>
     <name>XAxis</name>
     <message>
       <source>Move the joystick left and right several times.</source>
-      <translation type="unfinished">Move the joystick left and right several times.</translation>
+      <translation>Gerakkan joystick ke kiri dan kanan beberapa kali.</translation>
     </message>
   </context>
   <context>
     <name>YAxis</name>
     <message>
       <source>Move the joystick up and down several times.</source>
-      <translation type="unfinished">Move the joystick up and down several times.</translation>
+      <translation>Gerakkan joystick ke atas dan ke bawah beberapa kali.</translation>
     </message>
   </context>
   <context>
     <name>ZAxis</name>
     <message>
       <source>Rotate the joystick clockwise and counterclockwise several times.</source>
-      <translation type="unfinished">Rotate the joystick clockwise and counterclockwise several times.</translation>
+      <translation>Putar joystick searah jarum jam dan berlawanan arah jarum jam beberapa kali.</translation>
     </message>
   </context>
 </TS>
