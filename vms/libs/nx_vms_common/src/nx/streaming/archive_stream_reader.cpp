@@ -359,6 +359,9 @@ qint64 QnArchiveStreamReader::determineDisplayTime(bool reverseMode)
 
     if(rez == qint64(AV_NOPTS_VALUE))
     {
+        if (m_lastSeekPosition != AV_NOPTS_VALUE)
+            return m_lastSeekPosition;
+
         if (reverseMode)
             return endTime();
         else
@@ -409,7 +412,7 @@ void QnArchiveStreamReader::startPaused(qint64 startTime)
 {
     m_singleShot = true;
     m_singleQuantProcessed = false;
-    m_requiredJumpTime = m_tmpSkipFramesToTime = startTime;
+    m_requiredJumpTime = m_lastSeekPosition = m_tmpSkipFramesToTime = startTime;
     start();
 }
 
@@ -1202,7 +1205,7 @@ bool QnArchiveStreamReader::isSkippingFrames() const
 void QnArchiveStreamReader::channeljumpToUnsync(qint64 mksec, int /*channel*/, qint64 skipTime)
 {
     m_singleQuantProcessed = false;
-    m_requiredJumpTime = mksec;
+    m_requiredJumpTime = m_lastSeekPosition = mksec;
     m_lastUsePreciseSeek = (skipTime != 0);
     m_tmpSkipFramesToTime = skipTime;
     m_singleShowWaitCond.wakeAll();
