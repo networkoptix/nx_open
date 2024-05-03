@@ -661,11 +661,11 @@
     </message>
     <message>
       <source>Import Video from Device</source>
-      <translation type="unfinished">Import Video from Device</translation>
+      <translation>從裝置匯入影片</translation>
     </message>
     <message>
       <source>Import camera or server offline periods</source>
-      <translation type="unfinished">Import camera or server offline periods</translation>
+      <translation>匯入攝影機或伺服器離線期間</translation>
     </message>
     <message>
       <source>Do not send Stop PTZ command</source>
@@ -680,7 +680,7 @@
     <name>CameraHotspotsSettingsWidget</name>
     <message>
       <source>Hotspots</source>
-      <translation type="unfinished">Hotspots</translation>
+      <translation>熱點</translation>
     </message>
     <message>
       <source>Add</source>

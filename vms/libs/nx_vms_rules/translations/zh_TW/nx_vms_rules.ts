@@ -5,11 +5,11 @@
     <name>GroupStrings</name>
     <message>
       <source>Any event</source>
-      <translation>任一事件</translation>
+      <translation>任何事件</translation>
     </message>
     <message>
       <source>Any camera issue</source>
-      <translation>任一攝影機問題</translation>
+      <translation>任何攝影機問題</translation>
     </message>
     <message>
       <source>Any server issue</source>
@@ -273,7 +273,7 @@
     </message>
     <message>
       <source>Device Output</source>
-      <translation type="unfinished">Device Output</translation>
+      <translation>裝置輸出</translation>
     </message>
     <message>
       <source>At</source>
@@ -304,7 +304,7 @@
     </message>
     <message>
       <source>Camera Recording</source>
-      <translation type="unfinished">Camera Recording</translation>
+      <translation>觸發攝影機錄影</translation>
     </message>
     <message>
       <source>On</source>
@@ -924,7 +924,7 @@
     </message>
     <message>
       <source>Force Alarm Layout Opening</source>
-      <translation type="unfinished">Force Alarm Layout Opening</translation>
+      <translation>強制彈跳影像</translation>
     </message>
   </context>
   <context>
@@ -959,7 +959,7 @@
     </message>
     <message>
       <source>By</source>
-      <translation type="unfinished">By</translation>
+      <translation>由</translation>
     </message>
   </context>
   <context>
@@ -982,7 +982,7 @@
     </message>
     <message>
       <source>To users</source>
-      <translation type="unfinished">To users</translation>
+      <translation>對使用者</translation>
     </message>
     <message>
       <source>Interval of Action</source>
