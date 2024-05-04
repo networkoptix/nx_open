@@ -1217,7 +1217,7 @@
     <message>
       <source>Language Name</source>
       <comment>Language name that will be displayed to the user.</comment>
-      <translation>Turkish</translation>
+      <translation>Dil Adı</translation>
     </message>
   </context>
   <context>
