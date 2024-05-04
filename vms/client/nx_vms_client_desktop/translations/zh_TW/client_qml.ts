@@ -32,7 +32,7 @@
     </message>
     <message>
       <source>Membership</source>
-      <translation>會員資格</translation>
+      <translation type="unfinished">Membership</translation>
     </message>
     <message>
       <source>Search Timeout</source>
@@ -822,7 +822,7 @@
     <name>GlobalPermissionsTab</name>
     <message>
       <source>At the system level, group members have permissions to:</source>
-      <translation type="unfinished">At the system level, group members have permissions to:</translation>
+      <translation>在系統層級，群組成員有以下權限：</translation>
     </message>
     <message>
       <source>At the system level, the user has permissions to:</source>
@@ -849,11 +849,11 @@
     </message>
     <message>
       <source>Global Permissions</source>
-      <translation type="unfinished">Global Permissions</translation>
+      <translation>全域權限</translation>
     </message>
     <message>
       <source>Members</source>
-      <translation type="unfinished">Members</translation>
+      <translation>成員</translation>
     </message>
     <message>
       <source>Add Group</source>
@@ -872,18 +872,18 @@
     </message>
     <message>
       <source>Description</source>
-      <translation>&amp;敘述</translation>
+      <translation>敘述</translation>
     </message>
     <message>
       <source>Permission Groups</source>
-      <translation type="unfinished">Permission Groups</translation>
+      <translation>權限繼承群組</translation>
     </message>
   </context>
   <context>
     <name>GroupEditDialog</name>
     <message>
       <source>Group - %1</source>
-      <translation type="unfinished">Group - %1</translation>
+      <translation>群組 - %1</translation>
     </message>
     <message>
       <source>General</source>
@@ -899,11 +899,11 @@
     </message>
     <message>
       <source>Global Permissions</source>
-      <translation type="unfinished">Global Permissions</translation>
+      <translation>全域權限</translation>
     </message>
     <message>
       <source>Members</source>
-      <translation type="unfinished">Members</translation>
+      <translation>成員</translation>
     </message>
   </context>
   <context>
@@ -926,7 +926,7 @@
     </message>
     <message>
       <source>Members</source>
-      <translation type="unfinished">Members</translation>
+      <translation>成員</translation>
     </message>
     <message>
       <source>Users</source>
@@ -942,7 +942,7 @@
     </message>
     <message>
       <source>The group has another group as both its parent, and as a child member, or is a part of such a circular reference chain. Resolve this chain to prevent incorrect calculation of permissions.</source>
-      <translation type="unfinished">The group has another group as both its parent, and as a child member, or is a part of such a circular reference chain. Resolve this chain to prevent incorrect calculation of permissions.</translation>
+      <translation>此群組有另一個群組同時為其父群組和子群組，或為這種循環繼承鏈的一部分。解決此循環以防止權限計算錯誤。</translation>
     </message>
     <message>
       <source>When continuous sync with LDAP server is disabled, groups do not synchronize automatically. To update this group, initiate a manual sync.</source>
@@ -969,15 +969,15 @@
     </message>
     <message>
       <source>Use controls on the left to add members</source>
-      <translation type="unfinished">Use controls on the left to add members</translation>
+      <translation>使用左側的控制項來新增成員</translation>
     </message>
     <message>
       <source>Members summary</source>
-      <translation type="unfinished">Members summary</translation>
+      <translation>成員總結</translation>
     </message>
     <message>
       <source>Inherits membership in current group</source>
-      <translation type="unfinished">Inherits membership in current group</translation>
+      <translation>繼承目前群組的成員身份</translation>
     </message>
   </context>
   <context>
@@ -996,7 +996,7 @@
     </message>
     <message>
       <source>No groups</source>
-      <translation type="unfinished">No groups</translation>
+      <translation>沒有群組</translation>
     </message>
   </context>
   <context>
@@ -1011,7 +1011,7 @@
     <name>ImportFromDeviceDialog</name>
     <message>
       <source>Import From Devices</source>
-      <translation>從設備匯入</translation>
+      <translation>從裝置匯入</translation>
     </message>
   </context>
   <context>
@@ -1098,7 +1098,7 @@
     </message>
     <message>
       <source>Usage</source>
-      <translation type="unfinished">Usage</translation>
+      <translation>使用情況</translation>
     </message>
   </context>
   <context>
@@ -1200,7 +1200,7 @@
     <name>LdapSettings</name>
     <message>
       <source>ONLINE</source>
-      <translation type="unfinished">ONLINE</translation>
+      <translation>線上</translation>
     </message>
     <message>
       <source>OFFLINE</source>
@@ -1236,11 +1236,11 @@
     </message>
     <message>
       <source>Please use care when altering LDAP settings. Incorrect configuration could disrupt system availability for a large number of users simultaneously.</source>
-      <translation type="unfinished">Please use care when altering LDAP settings. Incorrect configuration could disrupt system availability for a large number of users simultaneously.</translation>
+      <translation>更改 LDAP 設定時請小心，不正確的設定可能使大量使用者至系統的連線同時被中斷。</translation>
     </message>
     <message>
       <source>Connect your System to an LDAP server for easier user management</source>
-      <translation type="unfinished">Connect your System to an LDAP server for easier user management</translation>
+      <translation>將您的系統連接到 LDAP 伺服器來更簡單的管理使用者</translation>
     </message>
     <message>
       <source>Not configured yet</source>
@@ -1248,27 +1248,27 @@
     </message>
     <message>
       <source>Configure</source>
-      <translation type="unfinished">Configure</translation>
+      <translation>設定</translation>
     </message>
     <message>
       <source>Continuous sync with LDAP server is disabled for this system. Updates to groups and users and groups membership will occur solely through manual synchronization.</source>
-      <translation type="unfinished">Continuous sync with LDAP server is disabled for this system. Updates to groups and users and groups membership will occur solely through manual synchronization.</translation>
+      <translation>系統已停用與 LDAP 伺服器的持續同步。群組、使用者和群組成員的更新將僅透過手動同步進行。</translation>
     </message>
     <message>
       <source>Search Bases</source>
-      <translation type="unfinished">Search Bases</translation>
+      <translation>搜尋基礎 (Search Bases)</translation>
     </message>
     <message>
       <source>Add Search Base</source>
-      <translation type="unfinished">Add Search Base</translation>
+      <translation>新增搜尋基礎 (Search Base)</translation>
     </message>
     <message>
       <source>Specify at least one search base to synchronize users and groups</source>
-      <translation type="unfinished">Specify at least one search base to synchronize users and groups</translation>
+      <translation>指定至少一個搜尋基礎(search base) 來同步使用者和群組</translation>
     </message>
     <message>
       <source>No users or groups match synchronization settings and are added to the system DB. Make sure LDAP server parameters and search bases are configured correctly.</source>
-      <translation type="unfinished">No users or groups match synchronization settings and are added to the system DB. Make sure LDAP server parameters and search bases are configured correctly.</translation>
+      <translation>因為未符合同步設定，沒有使用者或群組被新增至系統資料庫。請確認 LDAP 伺服器參數和搜尋基礎(search base) 設定正確。</translation>
     </message>
   </context>
   <context>
@@ -1399,7 +1399,7 @@
     </message>
     <message>
       <source>Create New...</source>
-      <translation type="unfinished">Create New...</translation>
+      <translation>新增...</translation>
     </message>
     <message>
       <source>Settings</source>
@@ -1515,7 +1515,7 @@
     </message>
     <message>
       <source>No custom groups yet</source>
-      <translation type="unfinished">No custom groups yet</translation>
+      <translation>目前還沒有自訂群組</translation>
     </message>
     <message>
       <source>No groups found</source>
@@ -1523,20 +1523,20 @@
     </message>
     <message>
       <source>Change search criteria or create a new group</source>
-      <translation type="unfinished">Change search criteria or create a new group</translation>
+      <translation>更改搜尋條件或建立新群組</translation>
     </message>
     <message>
       <source>No groups</source>
-      <translation type="unfinished">No groups</translation>
+      <translation>沒有群組</translation>
     </message>
     <message>
       <source>Use controls on the left to add to a group</source>
-      <translation type="unfinished">Use controls on the left to add to a group</translation>
+      <translation>使用左側的控制項來新增群組</translation>
     </message>
     <message>
       <source>Member of</source>
       <extracomment>&apos;Member of&apos; as in sentence: &apos;Current user/group is a member of: group1, group2, group3&apos;.</extracomment>
-      <translation>隸屬於</translation>
+      <translation>屬於</translation>
     </message>
     <message>
       <source>LDAP</source>
@@ -1723,7 +1723,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>You can enable this guide again by going to Local Settings &gt; Advanced &gt; Reset All Warnings</source>
-      <translation type="unfinished">You can enable this guide again by going to Local Settings &gt; Advanced &gt; Reset All Warnings</translation>
+      <translation>若要再次啟用本指南，您可以在本機設定 &gt; 進階 &gt; 重置所有警告</translation>
     </message>
     <message>
       <source>Introducing
@@ -2267,16 +2267,16 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Revoke access after login</source>
-      <translation>登入後撤銷連結</translation>
+      <translation>登入後撤銷權限</translation>
     </message>
     <message>
       <source>Access may be revoked earlier if the link validity period ends</source>
-      <translation>如果連結效期結束，使用權可能會被提前收回</translation>
+      <translation>如果連結效期結束，權限可能會被提前撤銷</translation>
     </message>
     <message>
       <source>In</source>
       <extracomment>&apos;In&apos; as in sentence: &apos;Revoke access after login in N hours&apos;.</extracomment>
-      <translation>於</translation>
+      <translation>於登入後</translation>
     </message>
   </context>
   <context>
@@ -2369,7 +2369,7 @@ Press Alt + Click to follow object</translation>
     <name>UserCreateDialog</name>
     <message>
       <source>New User</source>
-      <translation type="unfinished">New User</translation>
+      <translation>新使用者</translation>
     </message>
     <message>
       <source>General</source>
@@ -2385,7 +2385,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Global Permissions</source>
-      <translation type="unfinished">Global Permissions</translation>
+      <translation>全域權限</translation>
     </message>
     <message>
       <source>Add User</source>
@@ -2396,11 +2396,11 @@ Press Alt + Click to follow object</translation>
     <name>UserCreateTab</name>
     <message>
       <source>New User</source>
-      <translation type="unfinished">New User</translation>
+      <translation>新使用者</translation>
     </message>
     <message>
       <source>Type</source>
-      <translation>型態</translation>
+      <translation>類型</translation>
     </message>
     <message>
       <source>Local</source>
@@ -2408,7 +2408,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Cloud</source>
-      <translation>雲端</translation>
+      <translation>Cloud</translation>
     </message>
     <message>
       <source>Login</source>
@@ -2416,7 +2416,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Full Name</source>
-      <translation>完整名稱</translation>
+      <translation>全名</translation>
     </message>
     <message>
       <source>Email</source>
@@ -2432,11 +2432,11 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Allow insecure (digest) authentication</source>
-      <translation type="unfinished">Allow insecure (digest) authentication</translation>
+      <translation>允許不安全 (digest) 身份認證</translation>
     </message>
     <message>
       <source>You need to specify only user&apos;s email address.</source>
-      <translation type="unfinished">You need to specify only user&apos;s email address.</translation>
+      <translation>您只需指定使用者的電子郵件。</translation>
     </message>
     <message>
       <source>If user already has an account, he will see this system and will be able to log in to it. If not, we&apos;ll send an invitation to this address and user will see this system right after he creates an account.</source>
@@ -2444,19 +2444,19 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Permission Groups</source>
-      <translation type="unfinished">Permission Groups</translation>
+      <translation>權限群組</translation>
     </message>
     <message>
       <source>Access</source>
-      <translation>使用權</translation>
+      <translation>登入方式</translation>
     </message>
     <message>
       <source>Regular user with credentials</source>
-      <translation>使用帳號密碼登入的一般使用者</translation>
+      <translation>一般使用者：使用帳號密碼登入</translation>
     </message>
     <message>
       <source>Temporary with link</source>
-      <translation>以連結登入的暫時使用者</translation>
+      <translation>暫時使用者：以連結登入</translation>
     </message>
     <message>
       <source>Passwords do not match</source>
@@ -2530,7 +2530,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Change password</source>
-      <translation>確定變更管理者密碼</translation>
+      <translation>變更密碼</translation>
     </message>
     <message>
       <source>Set password to enable insecure authentication</source>
@@ -2538,7 +2538,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Allow insecure (digest) authentication</source>
-      <translation>允許不安全 (digest) 認證</translation>
+      <translation>允許不安全 (digest) 身份認證</translation>
     </message>
     <message>
       <source>This user is not found in LDAP database and is not able to log in.</source>
@@ -2546,15 +2546,15 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Permission Groups</source>
-      <translation type="unfinished">Permission Groups</translation>
+      <translation>權限群組</translation>
     </message>
     <message>
       <source>Access expires</source>
-      <translation type="unfinished">Access expires</translation>
+      <translation>登入已失效</translation>
     </message>
     <message>
       <source>Access Link</source>
-      <translation type="unfinished">Access Link</translation>
+      <translation>登入連結</translation>
     </message>
     <message>
       <source>Copy Link</source>
