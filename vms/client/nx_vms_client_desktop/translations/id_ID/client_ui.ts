@@ -29,11 +29,11 @@
     </message>
     <message>
       <source>Developer</source>
-      <translation type="unfinished">Developer</translation>
+      <translation>Developer</translation>
     </message>
     <message>
       <source>Open source libraries</source>
-      <translation type="unfinished">Open source libraries</translation>
+      <translation>Pustaka open source</translation>
     </message>
   </context>
   <context>
@@ -95,19 +95,19 @@
     </message>
     <message>
       <source>Limit Frame Rate to save CPU</source>
-      <translation type="unfinished">Limit Frame Rate to save CPU</translation>
+      <translation>Batasi Frame Rate untuk menghemat CPU</translation>
     </message>
     <message>
       <source>Use Hardware Video Decoding</source>
-      <translation type="unfinished">Use Hardware Video Decoding</translation>
+      <translation>Gunakan Decoding Video Hardware</translation>
     </message>
     <message>
       <source>Server certificate validation</source>
-      <translation type="unfinished">Server certificate validation</translation>
+      <translation>Validasi sertifikat server</translation>
     </message>
     <message>
       <source>Logs Management</source>
-      <translation type="unfinished">Logs Management</translation>
+      <translation>Manajemen Log</translation>
     </message>
     <message>
       <source>Download</source>
@@ -123,11 +123,11 @@
     </message>
     <message>
       <source>Done</source>
-      <translation type="unfinished">Done</translation>
+      <translation>Selesai</translation>
     </message>
     <message>
       <source>Open Files Folder</source>
-      <translation type="unfinished">Open Files Folder</translation>
+      <translation>Buka Folder File</translation>
     </message>
   </context>
   <context>
@@ -165,18 +165,18 @@
     </message>
     <message>
       <source>Event Type:</source>
-      <translation type="unfinished">Event Type:</translation>
+      <translation>Tipe Event:</translation>
     </message>
   </context>
   <context>
     <name>AnalyticsSdkObjectDetectedWidget</name>
     <message>
       <source>Attributes:</source>
-      <translation type="unfinished">Attributes:</translation>
+      <translation>Atribut:</translation>
     </message>
     <message>
       <source>Object Type:</source>
-      <translation type="unfinished">Object Type:</translation>
+      <translation>Tipe Objek:</translation>
     </message>
   </context>
   <context>
@@ -187,15 +187,15 @@
     </message>
     <message>
       <source>Keep Archive For...</source>
-      <translation type="unfinished">Keep Archive For...</translation>
+      <translation>Simpan Archive Untuk...</translation>
     </message>
     <message>
       <source>Max</source>
-      <translation type="unfinished">Max</translation>
+      <translation>Maks</translation>
     </message>
     <message>
       <source>Min</source>
-      <translation type="unfinished">Min</translation>
+      <translation>Min</translation>
     </message>
   </context>
   <context>
@@ -276,19 +276,19 @@
     <name>BackupBandwidthSettingsWidget</name>
     <message>
       <source>No Limit</source>
-      <translation type="unfinished">No Limit</translation>
+      <translation>Tanpa Batas</translation>
     </message>
     <message>
       <source>Fixed</source>
-      <translation type="unfinished">Fixed</translation>
+      <translation>Tetap</translation>
     </message>
     <message>
       <source>Scheduled</source>
-      <translation type="unfinished">Scheduled</translation>
+      <translation>Terjadwal</translation>
     </message>
     <message>
       <source>Fix bandwidth to</source>
-      <translation type="unfinished">Fix bandwidth to</translation>
+      <translation>Tetapkan bandwidth ke</translation>
     </message>
     <message>
       <source>Mbit/s</source>
@@ -296,26 +296,26 @@
     </message>
     <message>
       <source>Unlimited</source>
-      <translation type="unfinished">Unlimited</translation>
+      <translation>Tak terbatas</translation>
     </message>
     <message>
       <source>Limited to</source>
-      <translation type="unfinished">Limited to</translation>
+      <translation>Terbatas pada</translation>
     </message>
     <message>
       <source>No backup</source>
-      <translation type="unfinished">No backup</translation>
+      <translation>Tidak ada backup</translation>
     </message>
   </context>
   <context>
     <name>BackupStatusWidget</name>
     <message>
       <source>Backup is not configured yet.</source>
-      <translation type="unfinished">Backup is not configured yet.</translation>
+      <translation>Backup belum dikonfigurasi.</translation>
     </message>
     <message>
       <source>To start backup enable it for some cameras and apply settings.</source>
-      <translation type="unfinished">To start backup enable it for some cameras and apply settings.</translation>
+      <translation>Untuk memulai backup, aktifkan untuk beberapa kamera dan terapkan pengaturan.</translation>
     </message>
     <message>
       <source>Refresh</source>
@@ -323,15 +323,15 @@
     </message>
     <message>
       <source>Skip Current Queue</source>
-      <translation type="unfinished">Skip Current Queue</translation>
+      <translation>Lewati Antrean Saat Ini</translation>
     </message>
     <message>
       <source>All files are successfully backed up! New files will be backed up automatically</source>
-      <translation type="unfinished">All files are successfully backed up! New files will be backed up automatically</translation>
+      <translation>Semua file berhasil dibackup! File baru akan dibackup secara otomatis</translation>
     </message>
     <message>
       <source>Backup is stopped due to storage issue. Backup will resume automatically after storage issue is resolved</source>
-      <translation type="unfinished">Backup is stopped due to storage issue. Backup will resume automatically after storage issue is resolved</translation>
+      <translation>Backup dihentikan karena masalah penyimpanan. Backup akan dilanjutkan secara otomatis setelah masalah penyimpanan teratasi</translation>
     </message>
   </context>
   <context>
@@ -361,7 +361,7 @@
     <name>BookmarkOverlaySettingsWidget</name>
     <message>
       <source>Bookmark Info</source>
-      <translation type="unfinished">Bookmark Info</translation>
+      <translation>Info Bookmark</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -369,15 +369,15 @@
     </message>
     <message>
       <source>Area Width</source>
-      <translation type="unfinished">Area Width</translation>
+      <translation>Lebar Area</translation>
     </message>
     <message>
       <source>Font Size</source>
-      <translation type="unfinished">Font Size</translation>
+      <translation>Ukuran Huruf</translation>
     </message>
     <message>
       <source>Include description</source>
-      <translation type="unfinished">Include description</translation>
+      <translation>Sertakan deskripsi</translation>
     </message>
   </context>
   <context>
@@ -454,11 +454,11 @@
     </message>
     <message>
       <source>Use event source server</source>
-      <translation type="unfinished">Use event source server</translation>
+      <translation>Gunakan event source server</translation>
     </message>
     <message>
       <source>Use event source camera</source>
-      <translation type="unfinished">Use event source camera</translation>
+      <translation>Gunakan event source kamera</translation>
     </message>
   </context>
   <context>
@@ -510,7 +510,7 @@
     <name>CameraCredentialsDialog</name>
     <message>
       <source>Authentication credentials</source>
-      <translation type="unfinished">Authentication credentials</translation>
+      <translation>Kredensial otentikasi</translation>
     </message>
   </context>
   <context>
@@ -525,19 +525,19 @@
     </message>
     <message>
       <source>Keep camera stream and profile settings</source>
-      <translation type="unfinished">Keep camera stream and profile settings</translation>
+      <translation>Pertahankan stream kamera dan pengaturan profil</translation>
     </message>
     <message>
       <source>Calculate bitrate per GOP instead of bitrate per second</source>
-      <translation type="unfinished">Calculate bitrate per GOP instead of bitrate per second</translation>
+      <translation>Hitung bitrate per GOP, bukan bitrate per detik</translation>
     </message>
     <message>
       <source>It will increase bitrate for camera.</source>
-      <translation type="unfinished">It will increase bitrate for camera.</translation>
+      <translation>Ini akan meningkatkan bitrate untuk kamera.</translation>
     </message>
     <message>
       <source>Disable secondary stream</source>
-      <translation type="unfinished">Disable secondary stream</translation>
+      <translation>Nonaktifkan stream sekunder</translation>
     </message>
     <message>
       <source>Motion Detection</source>
@@ -545,7 +545,7 @@
     </message>
     <message>
       <source>Media Streaming</source>
-      <translation type="unfinished">Media Streaming</translation>
+      <translation>Streaming Media</translation>
     </message>
     <message>
       <source>PTZ</source>
@@ -553,7 +553,7 @@
     </message>
     <message>
       <source>Generate</source>
-      <translation type="unfinished">Generate</translation>
+      <translation>Hasilkan</translation>
     </message>
     <message>
       <source>Reset</source>
@@ -561,91 +561,91 @@
     </message>
     <message>
       <source>Logical ID</source>
-      <translation type="unfinished">Logical ID</translation>
+      <translation>ID Logis</translation>
     </message>
     <message>
       <source>Trust camera timestamp</source>
-      <translation type="unfinished">Trust camera timestamp</translation>
+      <translation>Percayai stempel waktu kamera</translation>
     </message>
     <message>
       <source>Native camera presets will not be avaliable.</source>
-      <translation type="unfinished">Native camera presets will not be avaliable.</translation>
+      <translation>Preset kamera asli tidak akan tersedia.</translation>
     </message>
     <message>
       <source>This camera supports pan and tilt</source>
-      <translation type="unfinished">This camera supports pan and tilt</translation>
+      <translation>Kamera ini mendukung pan and tilt</translation>
     </message>
     <message>
       <source>This camera supports zoom</source>
-      <translation type="unfinished">This camera supports zoom</translation>
+      <translation>Kamera ini mendukung zoom</translation>
     </message>
     <message>
       <source>Detect motion during archive import</source>
-      <translation type="unfinished">Detect motion during archive import</translation>
+      <translation>Deteksi gerakan selama impor arhive</translation>
     </message>
     <message>
       <source>Stream Settings</source>
-      <translation type="unfinished">Stream Settings</translation>
+      <translation>Pengaturan Stream</translation>
     </message>
     <message>
       <source>Use Media2 to fetch profiles</source>
-      <translation type="unfinished">Use Media2 to fetch profiles</translation>
+      <translation>Gunakan Media2 untuk mengambil profil</translation>
     </message>
     <message>
       <source>Use different values for pan and tilt</source>
-      <translation type="unfinished">Use different values for pan and tilt</translation>
+      <translation>Gunakan nilai yang berbeda untuk pan dan tilt</translation>
     </message>
     <message>
       <source>Tilt</source>
-      <translation type="unfinished">Tilt</translation>
+      <translation>Tilt</translation>
     </message>
     <message>
       <source>Media Port</source>
-      <translation type="unfinished">Media Port</translation>
+      <translation>Port Media</translation>
     </message>
     <message>
       <source>Use system presets</source>
-      <translation type="unfinished">Use system presets</translation>
+      <translation>Gunakan preset sistem</translation>
     </message>
     <message>
       <source>PTZ Speed</source>
-      <translation type="unfinished">PTZ Speed</translation>
+      <translation>Kecepatan PTZ</translation>
     </message>
     <message>
       <source>RTP Transport</source>
-      <translation type="unfinished">RTP Transport</translation>
+      <translation>Transport RTP</translation>
     </message>
     <message>
       <source>Use camera native presets</source>
-      <translation type="unfinished">Use camera native presets</translation>
+      <translation>Gunakan preset asli kamera</translation>
     </message>
     <message>
       <source>Time Settings</source>
-      <translation type="unfinished">Time Settings</translation>
+      <translation>Pengaturan Waktu</translation>
     </message>
     <message>
       <source>Keep camera time settings</source>
-      <translation type="unfinished">Keep camera time settings</translation>
+      <translation>Pertahankan pengaturan waktu kamera</translation>
     </message>
     <message>
       <source>ONVIF Settings</source>
-      <translation type="unfinished">ONVIF Settings</translation>
+      <translation>Pengaturan ONVIF</translation>
     </message>
     <message>
       <source>Do not record primary stream</source>
-      <translation type="unfinished">Do not record primary stream</translation>
+      <translation>Jangan rekam stream primer</translation>
     </message>
     <message>
       <source>Do not record secondary stream</source>
-      <translation type="unfinished">Do not record secondary stream</translation>
+      <translation>Jangan rekam stream sekunder</translation>
     </message>
     <message>
       <source>Secondary Stream Profile</source>
-      <translation type="unfinished">Secondary Stream Profile</translation>
+      <translation>Profil Stream Sekunder</translation>
     </message>
     <message>
       <source>Primary Stream Profile</source>
-      <translation type="unfinished">Primary Stream Profile</translation>
+      <translation>Profil Stream Primer</translation>
     </message>
     <message>
       <source>Web Page</source>
@@ -653,7 +653,7 @@
     </message>
     <message>
       <source>Web Page Port</source>
-      <translation type="unfinished">Web Page Port</translation>
+      <translation>Port Halaman Web</translation>
     </message>
     <message>
       <source>Disable import</source>
@@ -711,7 +711,7 @@
     </message>
     <message>
       <source>Camera ID</source>
-      <translation type="unfinished">Camera ID</translation>
+      <translation>ID Kamera</translation>
     </message>
     <message>
       <source>Web Page</source>
@@ -731,7 +731,7 @@
     </message>
     <message>
       <source>Show on layout</source>
-      <translation type="unfinished">Show on layout</translation>
+      <translation>Tampilkan di layout</translation>
     </message>
     <message>
       <source>Event Log</source>
@@ -739,18 +739,18 @@
     </message>
     <message>
       <source>Camera rules</source>
-      <translation type="unfinished">Camera rules</translation>
+      <translation>Aturan kamera</translation>
     </message>
     <message>
       <source>Logical ID</source>
-      <translation type="unfinished">Logical ID</translation>
+      <translation>ID Logis</translation>
     </message>
   </context>
   <context>
     <name>CameraInputBusinessEventWidget</name>
     <message>
       <source>Input ID</source>
-      <translation type="unfinished">Input ID</translation>
+      <translation>ID Input</translation>
     </message>
   </context>
   <context>
@@ -784,7 +784,7 @@
     <message>
       <source>in</source>
       <comment>e.g. &quot;in Primary Stream&quot;</comment>
-      <translation type="unfinished">in</translation>
+      <translation>dalam</translation>
     </message>
   </context>
   <context>
@@ -795,14 +795,14 @@
     </message>
     <message>
       <source>Output ID:</source>
-      <translation type="unfinished">Output ID:</translation>
+      <translation>ID Output:</translation>
     </message>
   </context>
   <context>
     <name>CameraReplacementDialog</name>
     <message>
       <source>Camera Replacement</source>
-      <translation type="unfinished">Camera Replacement</translation>
+      <translation>Penggantian Kamera</translation>
     </message>
     <message>
       <source>Name</source>
@@ -810,7 +810,7 @@
     </message>
     <message>
       <source>Back</source>
-      <translation type="unfinished">Back</translation>
+      <translation>Kembali</translation>
     </message>
     <message>
       <source>Refresh</source>
@@ -822,7 +822,7 @@
     </message>
     <message>
       <source>New Device</source>
-      <translation type="unfinished">New Device</translation>
+      <translation>Perangkat Baru</translation>
     </message>
   </context>
   <context>
@@ -841,11 +841,11 @@
     </message>
     <message>
       <source>Copy Schedule to...</source>
-      <translation type="unfinished">Copy Schedule to...</translation>
+      <translation>Salin Jadwal ke...</translation>
     </message>
     <message>
       <source>Motion &amp;&amp; Objects Recording</source>
-      <translation type="unfinished">Motion &amp;&amp; Objects Recording</translation>
+      <translation>Perekaman Gerakan &amp;&amp; Objek</translation>
     </message>
   </context>
   <context>
@@ -875,29 +875,29 @@
     </message>
     <message>
       <source>Enable audio</source>
-      <translation type="unfinished">Enable audio</translation>
+      <translation>Aktifkan audio</translation>
     </message>
     <message>
       <source>Edit Streams...</source>
-      <translation type="unfinished">Edit Streams...</translation>
+      <translation>Edit Stream...</translation>
     </message>
     <message>
       <source>Enable 2-way audio</source>
-      <translation type="unfinished">Enable 2-way audio</translation>
+      <translation>Aktifkan 2-way audio</translation>
     </message>
   </context>
   <context>
     <name>CameraStreamsDialog</name>
     <message>
       <source>Streams Addresses</source>
-      <translation type="unfinished">Streams Addresses</translation>
+      <translation>Alamat Stream</translation>
     </message>
   </context>
   <context>
     <name>CertificateSelectionDialog</name>
     <message>
       <source>Web site requires a certificate</source>
-      <translation type="unfinished">Web site requires a certificate</translation>
+      <translation>Situs web memerlukan sertifikat</translation>
     </message>
   </context>
   <context>
@@ -911,19 +911,19 @@
     <name>CloudLayoutsIntroDialog</name>
     <message>
       <source>BETA</source>
-      <translation type="unfinished">BETA</translation>
+      <translation>BETA</translation>
     </message>
     <message>
       <source>Available Actions</source>
-      <translation type="unfinished">Available Actions</translation>
+      <translation>Aksi yang Tersedia</translation>
     </message>
     <message>
       <source>Video Export</source>
-      <translation type="unfinished">Video Export</translation>
+      <translation>Ekspor Video</translation>
     </message>
     <message>
       <source>Live Video and Archive</source>
-      <translation type="unfinished">Live Video and Archive</translation>
+      <translation>Video Live dan Archive</translation>
     </message>
     <message>
       <source>PTZ</source>
@@ -935,34 +935,34 @@
     </message>
     <message>
       <source>Read more on the help page</source>
-      <translation type="unfinished">Read more on the help page</translation>
+      <translation>Baca lebih lanjut di halaman bantuan</translation>
     </message>
     <message>
       <source>Do not show this window again</source>
-      <translation type="unfinished">Do not show this window again</translation>
+      <translation>Jangan tampilkan window ini lagi</translation>
     </message>
     <message>
       <source>Introducing Cloud Layouts</source>
-      <translation type="unfinished">Introducing Cloud Layouts</translation>
+      <translation>Memperkenalkan Layout Cloud</translation>
     </message>
     <message>
       <source>Motion Search</source>
-      <translation type="unfinished">Motion Search</translation>
+      <translation>Pencarian Gerakan</translation>
     </message>
     <message>
       <source>Searching Bookmarks, Objects, Events</source>
-      <translation type="unfinished">Searching Bookmarks, Objects, Events</translation>
+      <translation>Mencari Bookmark, Objek, Event</translation>
     </message>
     <message>
       <source>In the Future</source>
-      <translation type="unfinished">In the Future</translation>
+      <translation>Di masa depan</translation>
     </message>
   </context>
   <context>
     <name>CloudManagementWidget</name>
     <message>
       <source>This system is connected to</source>
-      <translation type="unfinished">This system is connected to</translation>
+      <translation>Sistem ini terkoneksi ke</translation>
     </message>
     <message>
       <source>No connection</source>
@@ -973,7 +973,7 @@
     <name>ConnectingToServerDialog</name>
     <message>
       <source>Connecting...</source>
-      <translation type="unfinished">Connecting...</translation>
+      <translation>Mengkoneksikan...</translation>
     </message>
   </context>
   <context>
@@ -995,11 +995,11 @@
     </message>
     <message>
       <source>This action can be set only for instant events</source>
-      <translation type="unfinished">This action can be set only for instant events</translation>
+      <translation>Aksi ini hanya dapat diatur untuk event instan</translation>
     </message>
     <message>
       <source>Select another event or action</source>
-      <translation type="unfinished">Select another event or action</translation>
+      <translation>Pilih event atau aksi lain</translation>
     </message>
   </context>
   <context>
@@ -1022,7 +1022,7 @@
     </message>
     <message>
       <source>Omit Logging</source>
-      <translation type="unfinished">Omit Logging</translation>
+      <translation>Abaikan Logging</translation>
     </message>
   </context>
   <context>
@@ -1044,7 +1044,7 @@
     </message>
     <message>
       <source>Create a backup of System management data, or restore System management data from an existing backup</source>
-      <translation type="unfinished">Create a backup of System management data, or restore System management data from an existing backup</translation>
+      <translation>Buat backup data manajemen Sistem, atau pulihkan data manajemen Sistem dari backup yang ada</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -1052,7 +1052,7 @@
     </message>
     <message>
       <source>Open Folder</source>
-      <translation type="unfinished">Open Folder</translation>
+      <translation>Buka Folder</translation>
     </message>
   </context>
   <context>
@@ -1063,11 +1063,11 @@
     </message>
     <message>
       <source>SELECT SERVER</source>
-      <translation type="unfinished">SELECT SERVER</translation>
+      <translation>PILIH SERVER</translation>
     </message>
     <message>
       <source>Known Address</source>
-      <translation type="unfinished">Known Address</translation>
+      <translation>Alamat yang Diketahui</translation>
     </message>
     <message>
       <source>Subnet Scan</source>
@@ -1079,7 +1079,7 @@
     </message>
     <message>
       <source>Hint</source>
-      <translation type="unfinished">Hint</translation>
+      <translation>Petunjuk</translation>
     </message>
     <message>
       <source>Port</source>
@@ -1111,26 +1111,26 @@
     </message>
     <message>
       <source>Add all Devices</source>
-      <translation type="unfinished">Add all Devices</translation>
+      <translation>Tambahkan semua Perangkat</translation>
     </message>
     <message>
       <source>Add Devices</source>
-      <translation type="unfinished">Add Devices</translation>
+      <translation>Tambahkan Perangkat</translation>
     </message>
     <message>
       <source>Default</source>
-      <translation type="unfinished">Default</translation>
+      <translation>Default</translation>
     </message>
   </context>
   <context>
     <name>EncryptedArchivePasswordDialog</name>
     <message>
       <source>Encrypted archive</source>
-      <translation type="unfinished">Encrypted archive</translation>
+      <translation>Archive terenkripsi</translation>
     </message>
     <message>
       <source>Enter your encryption password to view the archive</source>
-      <translation type="unfinished">Enter your encryption password to view the archive</translation>
+      <translation>Masukkan kata sandi enkripsi Anda untuk melihat archive</translation>
     </message>
     <message>
       <source>Password</source>
@@ -1145,11 +1145,11 @@
     </message>
     <message>
       <source>I Do Not Agree</source>
-      <translation type="unfinished">I Do Not Agree</translation>
+      <translation>Saya Tidak Setuju</translation>
     </message>
     <message>
       <source>I Agree</source>
-      <translation type="unfinished">I Agree</translation>
+      <translation>Saya Setuju</translation>
     </message>
   </context>
   <context>
@@ -1195,23 +1195,23 @@
     </message>
     <message>
       <source>HTTP(S) URL</source>
-      <translation type="unfinished">HTTP(S) URL</translation>
+      <translation>URL HTTP(S)</translation>
     </message>
     <message>
       <source>HTTP(S) Content</source>
-      <translation type="unfinished">HTTP(S) Content</translation>
+      <translation>Konten HTTP(S)</translation>
     </message>
     <message>
       <source>Content Type</source>
-      <translation type="unfinished">Content Type</translation>
+      <translation>Tipe Konten</translation>
     </message>
     <message>
       <source>Authentication Type</source>
-      <translation type="unfinished">Authentication Type</translation>
+      <translation>Tipe Otentikasi</translation>
     </message>
     <message>
       <source>Request Method</source>
-      <translation type="unfinished">Request Method</translation>
+      <translation>Metode Permintaan</translation>
     </message>
   </context>
   <context>
@@ -1225,44 +1225,44 @@
     <name>ExitFullscreenActionWidget</name>
     <message>
       <source>On layout</source>
-      <translation type="unfinished">On layout</translation>
+      <translation>Pada layout</translation>
     </message>
   </context>
   <context>
     <name>ExportLayoutSettingsWidget</name>
     <message>
       <source>Export Settings</source>
-      <translation type="unfinished">Export Settings</translation>
+      <translation>Pengaturan Ekspor</translation>
     </message>
     <message>
       <source>Make read-only</source>
-      <translation type="unfinished">Make read-only</translation>
+      <translation>Jadikan read-only</translation>
     </message>
   </context>
   <context>
     <name>ExportMediaSettingsWidget</name>
     <message>
       <source>Export Settings</source>
-      <translation type="unfinished">Export Settings</translation>
+      <translation>Pengaturan Ekspor</translation>
     </message>
     <message>
       <source>Apply Filters</source>
-      <translation type="unfinished">Apply Filters</translation>
+      <translation>Terapkan Filter</translation>
     </message>
     <message>
       <source>Rotation, Dewarping, Image Enhancement etc.</source>
-      <translation type="unfinished">Rotation, Dewarping, Image Enhancement etc.</translation>
+      <translation>Rotasi, Dewarping, Peningkatan Gambar, dll.</translation>
     </message>
     <message>
       <source>Applying filters and adding overlays require transcoding which will increase CPU usage and may take significant time.</source>
-      <translation type="unfinished">Applying filters and adding overlays require transcoding which will increase CPU usage and may take significant time.</translation>
+      <translation>Menerapkan filter dan menambahkan overlay memerlukan transcoding yang akan meningkatkan penggunaan CPU dan mungkin memerlukan waktu yang lama.</translation>
     </message>
   </context>
   <context>
     <name>ExportPasswordWidget</name>
     <message>
       <source>Protect with password</source>
-      <translation type="unfinished">Protect with password</translation>
+      <translation>Proteksi dengan kata sandi</translation>
     </message>
     <message>
       <source>Password</source>
@@ -1273,19 +1273,19 @@
     <name>ExportSettingsDialog</name>
     <message>
       <source>Export Video</source>
-      <translation type="unfinished">Export Video</translation>
+      <translation>Ekspor Video</translation>
     </message>
     <message>
       <source>Single Camera</source>
-      <translation type="unfinished">Single Camera</translation>
+      <translation>Kamera Tunggal</translation>
     </message>
     <message>
       <source>Export Settings</source>
-      <translation type="unfinished">Export Settings</translation>
+      <translation>Pengaturan Ekspor</translation>
     </message>
     <message>
       <source>Multi Video</source>
-      <translation type="unfinished">Multi Video</translation>
+      <translation>Multi Video</translation>
     </message>
   </context>
   <context>
@@ -1299,7 +1299,7 @@
     <name>FailoverPriorityPickerWidget</name>
     <message>
       <source>Set priority:</source>
-      <translation type="unfinished">Set priority:</translation>
+      <translation>Tetapkan prioritas:</translation>
     </message>
     <message>
       <source>Low</source>
@@ -1315,11 +1315,11 @@
     </message>
     <message>
       <source>Select some devices to setup failover priority</source>
-      <translation type="unfinished">Select some devices to setup failover priority</translation>
+      <translation>Pilih beberapa perangkat untuk mengatur prioritas failover</translation>
     </message>
     <message>
       <source>No Failover</source>
-      <translation type="unfinished">No Failover</translation>
+      <translation>Tidak Ada Failover</translation>
     </message>
   </context>
   <context>
@@ -1340,7 +1340,7 @@
     <name>FullscreenCameraActionWidget</name>
     <message>
       <source>On layout</source>
-      <translation type="unfinished">On layout</translation>
+      <translation>Pada layout</translation>
     </message>
     <message>
       <source>Camera</source>
@@ -1395,27 +1395,27 @@
     </message>
     <message>
       <source>Startup</source>
-      <translation type="unfinished">Startup</translation>
+      <translation>Permulaan</translation>
     </message>
     <message>
       <source>Connect to the previous system on startup</source>
-      <translation type="unfinished">Connect to the previous system on startup</translation>
+      <translation>Koneksikan ke sistem sebelumnya saat startup</translation>
     </message>
     <message>
       <source>Automatically restore saved windows configuration</source>
-      <translation type="unfinished">Automatically restore saved windows configuration</translation>
+      <translation>Secara otomatis mengembalikan konfigurasi windows yang disimpan</translation>
     </message>
     <message>
       <source>Play audio from all cameras on layout</source>
-      <translation type="unfinished">Play audio from all cameras on layout</translation>
+      <translation>Putar audio dari semua kamera pada layout</translation>
     </message>
     <message>
       <source>Mute audio when the mic is active</source>
-      <translation type="unfinished">Mute audio when the mic is active</translation>
+      <translation>Mute audio saat mikrofon aktif</translation>
     </message>
     <message>
       <source>Allow the computer to enter sleep mode on idle</source>
-      <translation type="unfinished">Allow the computer to enter sleep mode on idle</translation>
+      <translation>Izinkan komputer memasuki mode tidur saat idle</translation>
     </message>
   </context>
   <context>
@@ -1433,11 +1433,11 @@
     </message>
     <message>
       <source>Aspect ratio</source>
-      <translation type="unfinished">Aspect ratio</translation>
+      <translation>Aspek Rasio</translation>
     </message>
     <message>
       <source>Default rotation</source>
-      <translation type="unfinished">Default rotation</translation>
+      <translation>Rotasi default</translation>
     </message>
   </context>
   <context>
@@ -1460,7 +1460,7 @@
     </message>
     <message>
       <source>Default</source>
-      <translation type="unfinished">Default</translation>
+      <translation>Default</translation>
     </message>
     <message>
       <source>Browse...</source>
@@ -1486,7 +1486,7 @@
     <name>InfoOverlaySettingsWidget</name>
     <message>
       <source>Info</source>
-      <translation type="unfinished">Info</translation>
+      <translation>Info</translation>
     </message>
     <message>
       <source>Camera name</source>
@@ -1494,11 +1494,11 @@
     </message>
     <message>
       <source>Export date</source>
-      <translation type="unfinished">Export date</translation>
+      <translation>Tanggal ekspor</translation>
     </message>
     <message>
       <source>Font Size</source>
-      <translation type="unfinished">Font Size</translation>
+      <translation>Ukuran Huruf</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -1559,7 +1559,7 @@
     <name>LayoutGeneralSettingsWidget</name>
     <message>
       <source>Locked</source>
-      <translation type="unfinished">Locked</translation>
+      <translation>Dikunci</translation>
     </message>
     <message>
       <source>Width</source>
@@ -1571,11 +1571,11 @@
     </message>
     <message>
       <source>Logical ID</source>
-      <translation type="unfinished">Logical ID</translation>
+      <translation>ID Logis</translation>
     </message>
     <message>
       <source>Generate</source>
-      <translation type="unfinished">Generate</translation>
+      <translation>Hasilkan</translation>
     </message>
     <message>
       <source>Reset</source>
@@ -1583,18 +1583,18 @@
     </message>
     <message>
       <source>Minimum Grid Size</source>
-      <translation type="unfinished">Minimum Grid Size</translation>
+      <translation>Ukuran Grid Minimum</translation>
     </message>
   </context>
   <context>
     <name>LayoutSelectionDialog</name>
     <message>
       <source>Select layout</source>
-      <translation type="unfinished">Select layout</translation>
+      <translation>Pilih layout</translation>
     </message>
     <message>
       <source>Shared layouts</source>
-      <translation type="unfinished">Shared layouts</translation>
+      <translation>Layout yang dibagikan</translation>
     </message>
   </context>
   <context>
@@ -1667,7 +1667,7 @@
     </message>
     <message>
       <source>Hardware ID</source>
-      <translation type="unfinished">Hardware ID</translation>
+      <translation>ID Hardware</translation>
     </message>
   </context>
   <context>
@@ -1685,19 +1685,19 @@
     </message>
     <message>
       <source>Logging Level</source>
-      <translation type="unfinished">Logging Level</translation>
+      <translation>Level Logging</translation>
     </message>
     <message>
       <source>Split File by Size</source>
-      <translation type="unfinished">Split File by Size</translation>
+      <translation>Pisahkan File berdasarkan Ukuran</translation>
     </message>
     <message>
       <source>Split File by Time</source>
-      <translation type="unfinished">Split File by Time</translation>
+      <translation>Pisahkan File berdasarkan Waktu</translation>
     </message>
     <message>
       <source>Limit Max Volume</source>
-      <translation type="unfinished">Limit Max Volume</translation>
+      <translation>Batas Volume Maks</translation>
     </message>
   </context>
   <context>
@@ -1747,7 +1747,7 @@
     </message>
     <message>
       <source>Reset to Default</source>
-      <translation type="unfinished">Reset to Default</translation>
+      <translation>Reset ke Default</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -1755,23 +1755,23 @@
     </message>
     <message>
       <source>Done</source>
-      <translation type="unfinished">Done</translation>
+      <translation>Selesai</translation>
     </message>
     <message>
       <source>Retry</source>
-      <translation type="unfinished">Retry</translation>
+      <translation>Coba lagi</translation>
     </message>
     <message>
       <source>Download complete!</source>
-      <translation type="unfinished">Download complete!</translation>
+      <translation>Download selesai!</translation>
     </message>
     <message>
       <source>Failed to save logs to the selected folder</source>
-      <translation type="unfinished">Failed to save logs to the selected folder</translation>
+      <translation>Gagal menyimpan log ke folder yang dipilih</translation>
     </message>
     <message>
       <source>Open Files Folder</source>
-      <translation type="unfinished">Open Files Folder</translation>
+      <translation>Buka Folder File</translation>
     </message>
   </context>
   <context>
@@ -1822,11 +1822,11 @@
     </message>
     <message>
       <source>IP addresses for cameras, and servers, groups for users, etc.</source>
-      <translation type="unfinished">IP addresses for cameras, and servers, groups for users, etc.</translation>
+      <translation>Alamat IP untuk kamera, dan server, grup untuk pengguna, dll.</translation>
     </message>
     <message>
       <source>Show aim overlay for PTZ cameras</source>
-      <translation type="unfinished">Show aim overlay for PTZ cameras</translation>
+      <translation>Tampilkan hamparan bidik untuk kamera PTZ</translation>
     </message>
   </context>
   <context>
@@ -1853,7 +1853,7 @@
     </message>
     <message>
       <source>Take system name and settings from:</source>
-      <translation type="unfinished">Take system name and settings from:</translation>
+      <translation>Ambil nama sistem dan pengaturan dari:</translation>
     </message>
     <message>
       <source>warn icon</source>
@@ -1880,7 +1880,7 @@
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
-      <translation type="unfinished">Download &amp;&amp; Install</translation>
+      <translation>Download &amp;&amp; Instal</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -1892,7 +1892,7 @@
     </message>
     <message>
       <source>Advanced Update Settings</source>
-      <translation type="unfinished">Advanced Update Settings</translation>
+      <translation>Pengaturan Advanced Update</translation>
     </message>
     <message>
       <source>It looks like the update process is taking more time than usual. Please keep waiting.</source>
@@ -1904,11 +1904,11 @@
     </message>
     <message>
       <source>Get Update File</source>
-      <translation type="unfinished">Get Update File</translation>
+      <translation>Dapatkan File Update</translation>
     </message>
     <message>
       <source>Check Again</source>
-      <translation type="unfinished">Check Again</translation>
+      <translation>Periksa Lagi</translation>
     </message>
     <message>
       <source>Try Again</source>
@@ -1919,18 +1919,18 @@
     <name>MultipleLayoutSelectionDialog</name>
     <message>
       <source>Select Layouts</source>
-      <translation type="unfinished">Select Layouts</translation>
+      <translation>Pilih Layout</translation>
     </message>
   </context>
   <context>
     <name>NewVirtualCameraDialog</name>
     <message>
       <source>New Virtual Camera...</source>
-      <translation type="unfinished">New Virtual Camera...</translation>
+      <translation>Kamera Virtual Baru...</translation>
     </message>
     <message>
       <source>To server</source>
-      <translation type="unfinished">To server</translation>
+      <translation>Ke server</translation>
     </message>
   </context>
   <context>
@@ -1944,22 +1944,22 @@
     <name>OpenLayoutActionWidget</name>
     <message>
       <source>Layout</source>
-      <translation type="unfinished">Layout</translation>
+      <translation>Layout</translation>
     </message>
     <message>
       <source>Show to</source>
-      <translation type="unfinished">Show to</translation>
+      <translation>Tampilkan ke</translation>
     </message>
     <message>
       <source>Select layout...</source>
-      <translation type="unfinished">Select layout...</translation>
+      <translation>Pilih layout...</translation>
     </message>
   </context>
   <context>
     <name>OutgoingMailSettingsWidget</name>
     <message>
       <source>Connection Settings</source>
-      <translation type="unfinished">Connection Settings</translation>
+      <translation>Pengaturan Koneksi</translation>
     </message>
     <message>
       <source>Password</source>
@@ -1967,15 +1967,15 @@
     </message>
     <message>
       <source>Server Address</source>
-      <translation type="unfinished">Server Address</translation>
+      <translation>Alamat Server</translation>
     </message>
     <message>
       <source>Security Protocol</source>
-      <translation type="unfinished">Security Protocol</translation>
+      <translation>Protokol Keamanan</translation>
     </message>
     <message>
       <source>Email Settings</source>
-      <translation type="unfinished">Email Settings</translation>
+      <translation>Pengaturan Email</translation>
     </message>
     <message>
       <source>Support Signature</source>
@@ -1987,7 +1987,7 @@
     </message>
     <message>
       <source>Username</source>
-      <translation type="unfinished">Username</translation>
+      <translation>Nama pengguna</translation>
     </message>
     <message>
       <source>Mail from</source>
@@ -2002,7 +2002,7 @@
     </message>
     <message>
       <source>Username</source>
-      <translation type="unfinished">Username</translation>
+      <translation>Nama pengguna</translation>
     </message>
     <message>
       <source>Sign in to web page</source>
@@ -2048,19 +2048,19 @@
     </message>
     <message>
       <source>Level:</source>
-      <translation type="unfinished">Level:</translation>
+      <translation>Level:</translation>
     </message>
     <message>
       <source>ERROR</source>
-      <translation type="unfinished">ERROR</translation>
+      <translation>ERROR</translation>
     </message>
     <message>
       <source>WARNING</source>
-      <translation type="unfinished">WARNING</translation>
+      <translation>PERINGATAN</translation>
     </message>
     <message>
       <source>INFO</source>
-      <translation type="unfinished">INFO</translation>
+      <translation>INFO</translation>
     </message>
   </context>
   <context>
@@ -2155,35 +2155,35 @@
     <name>PushNotificationBusinessActionWidget</name>
     <message>
       <source>To</source>
-      <translation type="unfinished">To</translation>
+      <translation>Ke</translation>
     </message>
     <message>
       <source>Language Settings</source>
-      <translation type="unfinished">Language Settings</translation>
+      <translation>Pengaturan Bahasa</translation>
     </message>
     <message>
       <source>Custom notification content</source>
-      <translation type="unfinished">Custom notification content</translation>
+      <translation>Konten notifikasi kustom</translation>
     </message>
     <message>
       <source>Header</source>
-      <translation type="unfinished">Header</translation>
+      <translation>Header</translation>
     </message>
     <message>
       <source>Default notification title will be used if left empty</source>
-      <translation type="unfinished">Default notification title will be used if left empty</translation>
+      <translation>Judul notifikasi default akan digunakan jika dibiarkan kosong</translation>
     </message>
     <message>
       <source>Body</source>
-      <translation type="unfinished">Body</translation>
+      <translation>Body</translation>
     </message>
     <message>
       <source>Default text will be used if this field is empty</source>
-      <translation type="unfinished">Default text will be used if this field is empty</translation>
+      <translation>Teks default akan digunakan jika kolom ini kosong</translation>
     </message>
     <message>
       <source>Add source device name in body</source>
-      <translation type="unfinished">Add source device name in body</translation>
+      <translation>Tambahkan nama perangkat source di body</translation>
     </message>
   </context>
   <context>
@@ -2212,7 +2212,7 @@
     </message>
     <message>
       <source>Restart to the updated version when ready</source>
-      <translation type="unfinished">Restart to the updated version when ready</translation>
+      <translation>Mulai ulang ke versi yang diupdate jika sudah siap</translation>
     </message>
   </context>
   <context>
@@ -2287,22 +2287,22 @@
     </message>
     <message>
       <source>Enable timeline on video wall</source>
-      <translation type="unfinished">Enable timeline on video wall</translation>
+      <translation>Aktifkan timeline di video wall</translation>
     </message>
   </context>
   <context>
     <name>RapidReviewSettingsWidget</name>
     <message>
       <source>Rapid Review</source>
-      <translation type="unfinished">Rapid Review</translation>
+      <translation>Rapid Review</translation>
     </message>
     <message>
       <source>Initial video length</source>
-      <translation type="unfinished">Initial video length</translation>
+      <translation>Panjang video inisial</translation>
     </message>
     <message>
       <source>Exported video length</source>
-      <translation type="unfinished">Exported video length</translation>
+      <translation>Panjang video yang diekspor</translation>
     </message>
     <message>
       <source>Speed</source>
@@ -2310,11 +2310,11 @@
     </message>
     <message>
       <source>Frames interval</source>
-      <translation type="unfinished">Frames interval</translation>
+      <translation>Interval frame</translation>
     </message>
     <message>
       <source>Reset Speed</source>
-      <translation type="unfinished">Reset Speed</translation>
+      <translation>Reset Kecepatan</translation>
     </message>
   </context>
   <context>
@@ -2329,7 +2329,7 @@
     </message>
     <message>
       <source>Server name</source>
-      <translation type="unfinished">Server name</translation>
+      <translation>Nama server</translation>
     </message>
   </context>
   <context>
@@ -2413,7 +2413,7 @@
     <name>RepeatedPasswordDialog</name>
     <message>
       <source>Repeat Password</source>
-      <translation type="unfinished">Repeat Password</translation>
+      <translation>Ulangi Kata Sandi</translation>
     </message>
     <message>
       <source>Passwords do not match</source>
@@ -2428,11 +2428,11 @@
     <name>RewindForWidget</name>
     <message>
       <source>Playback time :</source>
-      <translation type="unfinished">Playback time :</translation>
+      <translation>Waktu playback :</translation>
     </message>
     <message>
       <source>rewind for</source>
-      <translation type="unfinished">rewind for</translation>
+      <translation>rewind untuk</translation>
     </message>
     <message>
       <source>Live</source>
@@ -2525,11 +2525,11 @@
     </message>
     <message>
       <source>Objects</source>
-      <translation type="unfinished">Objects</translation>
+      <translation>Objek</translation>
     </message>
     <message>
       <source>Motion &amp;&amp; Objects</source>
-      <translation type="unfinished">Motion &amp;&amp; Objects</translation>
+      <translation>Gerakan &amp;&amp; Objek</translation>
     </message>
   </context>
   <context>
@@ -2540,11 +2540,11 @@
     </message>
     <message>
       <source>Display watermark with username over video</source>
-      <translation type="unfinished">Display watermark with username over video</translation>
+      <translation>Tampilkan watermark dengan nama pengguna di atas video</translation>
     </message>
     <message>
       <source>Watermark Preview</source>
-      <translation type="unfinished">Watermark Preview</translation>
+      <translation>Preview Watermark</translation>
     </message>
     <message>
       <source>to</source>
@@ -2552,27 +2552,27 @@
     </message>
     <message>
       <source>Limit session duration</source>
-      <translation type="unfinished">Limit session duration</translation>
+      <translation>Batas durasi sesi</translation>
     </message>
     <message>
       <source>Data protection</source>
-      <translation type="unfinished">Data protection</translation>
+      <translation>Perlindungan data</translation>
     </message>
     <message>
       <source>Use only HTTPS to connect to cameras</source>
-      <translation type="unfinished">Use only HTTPS to connect to cameras</translation>
+      <translation>Gunakan hanya HTTPS untuk terkoneksi ke kamera</translation>
     </message>
     <message>
       <source>User Activity</source>
-      <translation type="unfinished">User Activity</translation>
+      <translation>Aktivitas Pengguna</translation>
     </message>
     <message>
       <source>Archive encryption</source>
-      <translation type="unfinished">Archive encryption</translation>
+      <translation>Archive dienkripsi</translation>
     </message>
     <message>
       <source>Archive encryption increases CPU usage</source>
-      <translation type="unfinished">Archive encryption increases CPU usage</translation>
+      <translation>Enkripsi archive meningkatkan penggunaan CPU</translation>
     </message>
     <message>
       <source>Change Password...</source>
@@ -2580,15 +2580,15 @@
     </message>
     <message>
       <source>Force servers to accept only encrypted connections</source>
-      <translation type="unfinished">Force servers to accept only encrypted connections</translation>
+      <translation>Paksa server untuk hanya menerima koneksi terenkripsi</translation>
     </message>
     <message>
       <source>Encrypt video traffic to desktop and mobile clients</source>
-      <translation type="unfinished">Encrypt video traffic to desktop and mobile clients</translation>
+      <translation>Enkripsi trafik video ke klien desktop dan seluler</translation>
     </message>
     <message>
       <source>Manage Users</source>
-      <translation type="unfinished">Manage Users</translation>
+      <translation>Kelola Pengguna</translation>
     </message>
     <message>
       <source>Display servers in tree for non-power users</source>
@@ -2610,7 +2610,7 @@
     <name>ServerCertificateViewer</name>
     <message>
       <source>Server certificate</source>
-      <translation type="unfinished">Server certificate</translation>
+      <translation>Sertifikat server</translation>
     </message>
     <message>
       <source>General</source>
@@ -2618,11 +2618,11 @@
     </message>
     <message>
       <source>Issued by</source>
-      <translation type="unfinished">Issued by</translation>
+      <translation>Dikeluarkan oleh</translation>
     </message>
     <message>
       <source>Self-signed root certificate</source>
-      <translation type="unfinished">Self-signed root certificate</translation>
+      <translation>Sertifikat root yang ditandatangani sendiri</translation>
     </message>
     <message>
       <source>Expires</source>
@@ -2630,11 +2630,11 @@
     </message>
     <message>
       <source>Certificate is expired</source>
-      <translation type="unfinished">Certificate is expired</translation>
+      <translation>Sertifikat ini telah kadaluarsa</translation>
     </message>
     <message>
       <source>Fingerprints</source>
-      <translation type="unfinished">Fingerprints</translation>
+      <translation>Sidik jari</translation>
     </message>
     <message>
       <source>Details</source>
@@ -2676,11 +2676,11 @@
     </message>
     <message>
       <source>Autodetect built-in and USB webcams</source>
-      <translation type="unfinished">Autodetect built-in and USB webcams</translation>
+      <translation>Deteksi otomatis webcam internal dan USB</translation>
     </message>
     <message>
       <source>Server Location ID:</source>
-      <translation type="unfinished">Server Location ID:</translation>
+      <translation>ID Lokasi Server:</translation>
     </message>
   </context>
   <context>
@@ -2763,7 +2763,7 @@
     </message>
     <message>
       <source>Base forecast on data recorded during</source>
-      <translation type="unfinished">Base forecast on data recorded during</translation>
+      <translation>Forecast dasar pada data yang direkam selama</translation>
     </message>
   </context>
   <context>
@@ -2850,14 +2850,14 @@
     </message>
     <message>
       <source>Custom language for Cloud notifications</source>
-      <translation type="unfinished">Custom language for Cloud notifications</translation>
+      <translation>Bahasa kustom untuk notifikasi Cloud</translation>
     </message>
   </context>
   <context>
     <name>TextOverlaySettingsWidget</name>
     <message>
       <source>Text</source>
-      <translation type="unfinished">Text</translation>
+      <translation>Teks</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -2865,30 +2865,30 @@
     </message>
     <message>
       <source>Font Size</source>
-      <translation type="unfinished">Font Size</translation>
+      <translation>Ukuran Huruf</translation>
     </message>
     <message>
       <source>Enter plain text or HTML</source>
-      <translation type="unfinished">Enter plain text or HTML</translation>
+      <translation>Masukkan teks biasa atau HTML</translation>
     </message>
     <message>
       <source>Area Width</source>
-      <translation type="unfinished">Area Width</translation>
+      <translation>Lebar Area</translation>
     </message>
   </context>
   <context>
     <name>TimeSynchronizationWidget</name>
     <message>
       <source>Sync Time with the Internet</source>
-      <translation type="unfinished">Sync Time with the Internet</translation>
+      <translation>Sinkronkan Waktu dengan Internet</translation>
     </message>
     <message>
       <source>VMS Time</source>
-      <translation type="unfinished">VMS Time</translation>
+      <translation>Waktu VMS</translation>
     </message>
     <message>
       <source>Do not sync time among servers</source>
-      <translation type="unfinished">Do not sync time among servers</translation>
+      <translation>Jangan mengsinkronkan waktu antar server</translation>
     </message>
   </context>
   <context>
@@ -2899,7 +2899,7 @@
     </message>
     <message>
       <source>Font Size</source>
-      <translation type="unfinished">Font Size</translation>
+      <translation>Ukuran Huruf</translation>
     </message>
     <message>
       <source>Format</source>
@@ -2955,7 +2955,7 @@
     </message>
     <message>
       <source>Detect motion</source>
-      <translation type="unfinished">Detect motion</translation>
+      <translation>Deteksi gerakan</translation>
     </message>
     <message>
       <source>Sensitivity</source>
@@ -2974,7 +2974,7 @@
     </message>
     <message>
       <source>Ignore timezone in uploaded files</source>
-      <translation type="unfinished">Ignore timezone in uploaded files</translation>
+      <translation>Abaikan zona waktu pada file yang diupload</translation>
     </message>
   </context>
   <context>
@@ -2985,15 +2985,15 @@
     </message>
     <message>
       <source>Upload Footage</source>
-      <translation type="unfinished">Upload Footage</translation>
+      <translation>Upload Cuplikan</translation>
     </message>
     <message>
       <source>Upload File...</source>
-      <translation type="unfinished">Upload File...</translation>
+      <translation>Upload File...</translation>
     </message>
     <message>
       <source>Upload Folder...</source>
-      <translation type="unfinished">Upload Folder...</translation>
+      <translation>Upload Folder...</translation>
     </message>
   </context>
   <context>
@@ -3004,7 +3004,7 @@
     </message>
     <message>
       <source>SELECT SERVER</source>
-      <translation type="unfinished">SELECT SERVER</translation>
+      <translation>PILIH SERVER</translation>
     </message>
     <message>
       <source>Advanced</source>
@@ -3012,11 +3012,11 @@
     </message>
     <message>
       <source>Allow using Client API</source>
-      <translation type="unfinished">Allow using Client API</translation>
+      <translation>Izinkan menggunakan API Klien</translation>
     </message>
     <message>
       <source>Proxy all requested contents</source>
-      <translation type="unfinished">Proxy all requested contents</translation>
+      <translation>Proksi semua konten yang diminta</translation>
     </message>
   </context>
   <context>
@@ -3069,7 +3069,7 @@
     <name>nx::vms::client::desktop::WatermarkPreviewDialog</name>
     <message>
       <source>Watermark preview</source>
-      <translation type="unfinished">Watermark preview</translation>
+      <translation>Preview watermark</translation>
     </message>
     <message>
       <source>Opacity</source>
@@ -3077,7 +3077,7 @@
     </message>
     <message>
       <source>Frequency</source>
-      <translation type="unfinished">Frequency</translation>
+      <translation>Frekuensi</translation>
     </message>
   </context>
 </TS>
