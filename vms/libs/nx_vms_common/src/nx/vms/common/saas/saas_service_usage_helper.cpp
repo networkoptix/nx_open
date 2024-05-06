@@ -495,7 +495,7 @@ LocalRecordingUsageHelper::LocalRecordingUsageHelper(
 {
 }
 
-std::map<nx::Uuid, std::set<QString>> LocalRecordingUsageHelper::camerasByService() const
+std::map<nx::Uuid, std::set<QString>> LocalRecordingUsageHelper::cameraGroupsByService() const
 {
     std::map<nx::Uuid, std::set<QString>> result;
 
@@ -513,10 +513,18 @@ std::map<nx::Uuid, std::set<QString>> LocalRecordingUsageHelper::camerasByServic
 
     std::map<nx::Uuid, int>::iterator it = channelsByService.begin();
 
+    std::set<QString> cameraGroups;
     for (const auto& camera: getAllCameras())
     {
         if (!camera->isScheduleEnabled())
             continue;
+        cameraGroups.insert(camera->isSharingLicenseInGroup()
+            ? camera->getGroupId()
+            : camera->getPhysicalId());
+    }
+
+    for (const auto& cameraGroupId: cameraGroups)
+    {
         nx::Uuid serviceId;
         if (!channelsByService.empty())
         {
@@ -531,7 +539,7 @@ std::map<nx::Uuid, std::set<QString>> LocalRecordingUsageHelper::camerasByServic
                 serviceId = defaultServiceId;
             }
         }
-        result[serviceId].insert(camera->getPhysicalId());
+        result[serviceId].insert(cameraGroupId);
     }
     return result;
 }

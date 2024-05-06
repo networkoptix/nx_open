@@ -575,7 +575,7 @@ TEST_F(SaasServiceUsageHelperTest, LocalRecordingUsage)
     for (const auto& camera: cameras)
         camera->setScheduleEnabled(true);
 
-    auto info = m_localRecordingHelper->camerasByService();
+    auto info = m_localRecordingHelper->cameraGroupsByService();
     ASSERT_EQ(1, info.size());
     ASSERT_EQ(50, info[kLocalRecordingServiceId].size());
     int total = 0;
