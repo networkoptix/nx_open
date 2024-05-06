@@ -15,7 +15,7 @@ import nx.vms.client.desktop
 import ".."
 import "../.."
 import "../../globals.js" as RightPanelGlobals
-import "metrics.js" as Metrics
+import "../metrics.js" as Metrics
 
 TileBase
 {
@@ -36,7 +36,7 @@ TileBase
     {
         id: tileContent
 
-        spacing: 6
+        spacing: 4
         topPadding: 2
 
         clip: true
@@ -45,36 +45,32 @@ TileBase
         {
             id: captionLayout
 
-            spacing: 0
+            spacing: 8
             width: tileContent.width
 
-            Item
+            ColoredImage
             {
-                implicitWidth: icon.width
-                Layout.fillHeight: true
-                Layout.rightMargin: 4
+                id: icon
 
-                visible: !!icon.sourcePath
+                Layout.alignment: Qt.AlignTop
 
-                ColoredImage
-                {
-                    id: icon
+                sourcePath: (tile.controller && tile.controller.showIcons && model
+                    && model.decorationPath) || ""
 
-                    sourcePath: (tile.controller && tile.controller.showIcons && model
-                        && model.decorationPath) || ""
+                sourceSize: Qt.size(20, 20)
 
-                    anchors.centerIn: parent
-                    sourceSize: Qt.size(20, 20)
-                    primaryColor: caption.color
-                }
+                visible: !!sourcePath
+                primaryColor: caption.color
             }
 
             Text
             {
                 id: caption
 
-                Layout.alignment: Qt.AlignLeft | Qt.AlignTop
                 Layout.fillWidth: true
+                Layout.topMargin: 2
+                Layout.alignment: Qt.AlignTop
+
                 wrapMode: Text.Wrap
                 maximumLineCount: 2
                 elide: Text.ElideRight
@@ -83,7 +79,7 @@ TileBase
                 font { pixelSize: FontConfig.normal.pixelSize; weight: Font.Medium }
 
                 rightPadding: (isCloseable && !timestamp.text.length)
-                    ? closeButton.width
+                    ? (closeButton.width - 2)
                     : 0
 
                 text: (model && model.display) || ""
@@ -97,10 +93,10 @@ TileBase
                 id: timestamp
 
                 Layout.minimumWidth: implicitWidth
-                Layout.alignment: Qt.AlignRight | Qt.AlignTop
-                Layout.leftMargin: 8
+                Layout.topMargin: 2
+                Layout.alignment: Qt.AlignTop
 
-                topPadding: 2
+                padding: 1
                 color: tile.secondaryForegroundColor
                 visible: !!text && !(tile.isCloseable && tile.hovered)
                 font { pixelSize: FontConfig.small.pixelSize; weight: Font.Normal }
@@ -109,22 +105,14 @@ TileBase
             }
         }
 
-        ResourceList
-        {
-            id: resourceList
-
-            width: tileContent.width
-            color: tile.foregroundColor
-            remainderColor: tile.secondaryForegroundColor
-            resourceNames: (model && model.resourceList) || []
-            visible: count > 0
-        }
-
         Preview
         {
             id: preview
 
             width: tileContent.width
+
+            topPadding: 2
+            topInset: 2
 
             previewId: (model && model.previewId) || ""
             previewState: (model && model.previewState) || 0
@@ -146,7 +134,7 @@ TileBase
 
             videoPreviewTimestampMs: (model && NxGlobals.toDouble(model.previewTimestampMs)) || 0
 
-            videoPreviewResource: model ? model.previewResource : null
+            videoPreviewResource: (model && model.previewResource) || null
 
             Item
             {
@@ -159,18 +147,16 @@ TileBase
         {
             id: description
 
-            readonly property string textSource: (model && model.description) || ""
-
             width: tileContent.width
             height: Math.min(implicitHeight, Metrics.kMaxDescriptionHeight)
             visible: !!text
 
             color: tile.foregroundColor
             font { pixelSize: FontConfig.small.pixelSize; weight: Font.Normal }
-            textFormat: NxGlobals.mightBeHtml(textSource) ? Text.RichText : Text.PlainText
+            textFormat: NxGlobals.mightBeHtml(text) ? Text.RichText : Text.PlainText
             wrapMode: Text.Wrap
 
-            text: textSource
+            text: (model && model.description) || ""
 
             layer.effect: EdgeOpacityGradient { edges: Qt.BottomEdge }
             layer.enabled: description.height < description.implicitHeight
@@ -207,6 +193,51 @@ TileBase
 
             text: (model && model.additionalText) || ""
         }
+
+        Item
+        {
+            id: buttonBar
+
+            width: tileContent.width
+            implicitHeight: buttonBarContent.height
+
+            visible: buttonBarContent.width > 0
+
+            Row
+            {
+                id: buttonBarContent
+
+                spacing: 8
+                topPadding: 4
+                anchors.horizontalCenter: buttonBar.horizontalCenter
+
+                Button
+                {
+                    action: (model && model.commandAction) || null
+                    visible: !!action
+                }
+
+                Button
+                {
+                    action: (model && model.additionalAction) || null
+                    visible: !!action
+                }
+            }
+        }
+
+        ResourceList
+        {
+            id: resourceList
+
+            topPadding: 3
+            bottomPadding: 4
+
+            width: tileContent.width
+            color: tile.foregroundColor
+            remainderColor: tile.secondaryForegroundColor
+            resourceNames: (model && model.resourceList) || []
+            visible: !empty
+        }
     }
 
     ImageButton
@@ -220,8 +251,7 @@ TileBase
         anchors.top: parent.top
         anchors.topMargin: 6
 
-        icon.source: "image://skin/text_buttons/cross_close_20.svg"
-        radius: 2
+        icon.source: "image://skin/20x20/Outline/cross_close.svg"
 
         onClicked:
         {

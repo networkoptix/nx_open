@@ -4,8 +4,8 @@
 
 #include <QtQml/QtQml>
 
-#include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 
 #include "layout_item_adaptor.h"
 
@@ -35,7 +35,7 @@ private:
     void setGridBoundingRect(const QRect& rect);
 
 public:
-    QnLayoutResourcePtr layout;
+    LayoutResourcePtr layout;
     QList<nx::Uuid> itemIds;
     QHash<nx::Uuid, ItemAdaptorPtr> adaptorById;
     QRect gridBoundingRect;
@@ -54,7 +54,7 @@ void LayoutModel::Private::setLayout(const QnLayoutResourcePtr& newLayout)
         itemIds.clear();
     }
 
-    layout = newLayout;
+    layout = newLayout.objectCast<LayoutResource>();
 
     if (!layout)
     {
@@ -65,6 +65,9 @@ void LayoutModel::Private::setLayout(const QnLayoutResourcePtr& newLayout)
     connect(layout.get(), &QnLayoutResource::itemAdded, this, &Private::at_itemAdded);
     connect(layout.get(), &QnLayoutResource::itemRemoved, this, &Private::at_itemRemoved);
     connect(layout.get(), &QnLayoutResource::itemChanged, this, &Private::at_itemChanged);
+
+    connect(layout.get(), &QnLayoutResource::lockedChanged, this,
+        [this]() { emit q->lockedChanged(); });
 
     for (const auto& item: layout->getItems())
         itemIds.insert(std::lower_bound(itemIds.begin(), itemIds.end(), item.uuid), item.uuid);
@@ -184,6 +187,7 @@ void LayoutModel::setRawLayout(QnLayoutResource* value)
     endResetModel();
 
     emit layoutChanged();
+    emit lockedChanged();
 }
 
 QRect LayoutModel::gridBoundingRect() const
@@ -237,6 +241,16 @@ int LayoutModel::rowCount(const QModelIndex& parent) const
         return 0;
 
     return d->itemIds.size();
+}
+
+bool LayoutModel::locked() const
+{
+    return d->layout && d->layout->locked();
+}
+
+bool LayoutModel::isShowreelReview() const
+{
+    return d->layout && d->layout->isShowreelReviewLayout();
 }
 
 void LayoutModel::registerQmlType()

@@ -148,6 +148,18 @@ QVariant DetectableObjectTypeModel::data(const QModelIndex& index, int role) con
     }
 }
 
+QHash<int, QByteArray> DetectableObjectTypeModel::roleNames() const
+{
+    static const QHash<int, QByteArray> kRoles{
+        {NameRole, "name"},
+        {IdsRole, "ids"},
+        {MainIdRole, "mainId"}};
+
+    auto result = base_type::roleNames();
+    result.insert(kRoles);
+    return result;
+}
+
 void DetectableObjectTypeModel::setLiveTypesExcluded(bool value)
 {
     d->filterModel->setLiveTypesExcluded(value);

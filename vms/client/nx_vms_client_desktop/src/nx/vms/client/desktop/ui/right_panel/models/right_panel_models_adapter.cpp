@@ -16,6 +16,7 @@
 #include <QtQml/QtQml>
 
 #include <core/resource/camera_resource.h>
+#include <core/resource/device_dependent_strings.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -31,12 +32,16 @@
 #include <nx/utils/string.h>
 #include <nx/vms/api/types/event_rule_types.h>
 #include <nx/vms/client/core/access/access_controller.h>
+#include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/qml/qml_ownership.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/thumbnails/abstract_caching_resource_thumbnail.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
+#include <nx/vms/client/desktop/analytics/analytics_taxonomy_manager.h>
+#include <nx/vms/client/desktop/common/utils/command_action.h>
 #include <nx/vms/client/desktop/common/utils/preview_rect_calculator.h>
+#include <nx/vms/client/desktop/event_rules/models/detectable_object_type_model.h>
 #include <nx/vms/client/desktop/event_search/models/analytics_search_list_model.h>
 #include <nx/vms/client/desktop/event_search/models/bookmark_search_list_model.h>
 #include <nx/vms/client/desktop/event_search/models/event_search_list_model.h>
@@ -62,6 +67,8 @@
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/system_context.h>
+#include <nx/vms/event/events/abstract_event.h>
+#include <nx/vms/event/strings_helper.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
@@ -159,6 +166,8 @@ QHash<intptr_t, QPointer<ResourceThumbnailProvider>>& previewsById()
 
 } // namespace
 
+using nx::vms::client::desktop::analytics::taxonomy::AnalyticsFilterModel;
+
 class RightPanelModelsAdapter::Private: public QObject
 {
     RightPanelModelsAdapter* const q;
@@ -180,6 +189,7 @@ public:
     CommonObjectSearchSetup* commonSetup() const { return m_commonSetup; }
     AnalyticsSearchSetup* analyticsSetup() const { return m_analyticsSetup.get(); }
     QAbstractItemModel* analyticsEvents() const { return m_analyticsEvents.get(); }
+    DetectableObjectTypeModel* objectTypeModel() const { return m_objectTypeModel; }
 
     void setAutoClosePaused(int row, bool value);
 
@@ -198,6 +208,12 @@ public:
     bool isConstrained() const { return m_constrained; }
     bool isPlaceholderRequired() const { return m_isPlaceholderRequired; }
     int itemCount() const { return m_itemCount; }
+
+    bool unreadTrackingEnabled() const { return m_unreadTrackingEnabled; }
+    void setUnreadTrackingEnabled(bool value);
+    int unreadCount() const { return m_unreadItems.size(); }
+    QnNotificationLevel::Value unreadImportance() const { return m_unreadImportance; }
+    auto makeUnreadCountGuard();
 
     AbstractSearchListModel* searchModel();
     const AbstractSearchListModel* searchModel() const;
@@ -227,11 +243,14 @@ public:
         PreviewHighlightRectRole,
         FlatAttributeListRole,
         ItemIsVisibleRole,
-        HighlightedRole
+        HighlightedRole,
+        CommandActionRole,
+        AdditionalActionRole
     };
 
 private:
     void recreateSourceModel();
+    int calculateItemCount() const;
     void updateItemCount();
     void updateIsConstrained();
     void updateIsPlaceholderRequired();
@@ -245,6 +264,7 @@ private:
     void requestPreview(int row);
     void loadNextPreview();
     bool isNextPreviewLoadAllowed(const ResourceThumbnailProvider* provider) const;
+    void createUnread(int first, int count);
 
 private:
     CommonObjectSearchSetup* const m_commonSetup = new CommonObjectSearchSetup(this);
@@ -281,7 +301,12 @@ private:
 
     QSet<QPersistentModelIndex> m_visibleItems;
 
+    QHash<QPersistentModelIndex, QnNotificationLevel::Value> m_unreadItems;
+    QnNotificationLevel::Value m_unreadImportance = QnNotificationLevel::Value::NoNotification;
+    bool m_unreadTrackingEnabled = false;
+
     std::unique_ptr<AnalyticsSearchSetup> m_analyticsSetup;
+    DetectableObjectTypeModel* m_objectTypeModel = nullptr; //< Owned by `m_analyticsSetup`.
 
     std::unique_ptr<AnalyticsEventModel> m_analyticsEvents;
 
@@ -390,6 +415,11 @@ AnalyticsSearchSetup* RightPanelModelsAdapter::analyticsSetup() const
     return d->analyticsSetup();
 }
 
+DetectableObjectTypeModel* RightPanelModelsAdapter::objectTypeModel() const
+{
+    return d->objectTypeModel();
+}
+
 QVariant RightPanelModelsAdapter::data(const QModelIndex& index, int role) const
 {
     if (!NX_ASSERT(checkIndex(index)))
@@ -465,6 +495,20 @@ QVariant RightPanelModelsAdapter::data(const QModelIndex& index, int role) const
             return progress.value() ? *progress.value() : QVariant{};
         }
 
+        case Private::CommandActionRole:
+        {
+            return CommandAction::createQmlAction(
+                data(index, Qn::CommandActionRole).value<CommandActionPtr>(),
+                core::appContext()->qmlEngine()).toVariant();
+        }
+
+        case Private::AdditionalActionRole:
+        {
+            return CommandAction::createQmlAction(
+                data(index, Qn::AdditionalActionRole).value<CommandActionPtr>(),
+                core::appContext()->qmlEngine()).toVariant();
+        }
+
         default:
             return base_type::data(index, role);
     }
@@ -494,6 +538,8 @@ QHash<int, QByteArray> RightPanelModelsAdapter::roleNames() const
     roles[Qn::HelpTopicIdRole] = "helpTopicId";
     roles[Qn::AnalyticsEngineNameRole] = "analyticsEngineName";
     roles[Qn::AnalyticsAttributesRole] = "rawAttributes";
+    roles[Private::CommandActionRole] = "commandAction";
+    roles[Private::AdditionalActionRole] = "additionalAction";
     roles[Private::FlatAttributeListRole] = "attributes";
     roles[Private::ItemIsVisibleRole] = "visible";
     roles[Private::HighlightedRole] = "highlighted";
@@ -641,6 +687,9 @@ QString RightPanelModelsAdapter::itemCountText() const
         {
             switch (type())
             {
+                case RightPanelModelsAdapter::Type::notifications:
+                    return tr("%n notifications", "", count);
+
                 case RightPanelModelsAdapter::Type::motion:
                     return tr("%n motion events", "", count);
 
@@ -679,6 +728,26 @@ bool RightPanelModelsAdapter::isPlaceholderRequired() const
     return d->isPlaceholderRequired();
 }
 
+bool RightPanelModelsAdapter::unreadTrackingEnabled() const
+{
+    return d->unreadTrackingEnabled();
+}
+
+void RightPanelModelsAdapter::setUnreadTrackingEnabled(bool value)
+{
+    d->setUnreadTrackingEnabled(value);
+}
+
+int RightPanelModelsAdapter::unreadCount() const
+{
+    return d->unreadCount();
+}
+
+QColor RightPanelModelsAdapter::unreadColor() const
+{
+    return QnNotificationLevel::notificationTextColor(d->unreadImportance());
+}
+
 bool RightPanelModelsAdapter::previewsEnabled() const
 {
     return d->previewsEnabled();
@@ -699,20 +768,51 @@ bool RightPanelModelsAdapter::fetchInProgress() const
     return d->fetchInProgress();
 }
 
-QVector<RightPanel::EventCategory> RightPanelModelsAdapter::eventCategories() const
+QVector<RightPanel::VmsEventGroup> RightPanelModelsAdapter::eventGroups() const
 {
-    using RightPanel::EventCategory;
+    if (!d->context())
+        return {};
 
-    static const QVector<EventCategory> categories({
-        {tr("Analytic"), "analytics.svg", EventCategory::Analytics},
-        {tr("Generic"), "generic.svg", EventCategory::Generic},
-        {tr("Input Signal"), "input.svg", EventCategory::Input},
-        {tr("Soft Trigger"), "trigger.svg", EventCategory::SoftTrigger},
-        {tr("Stream Issue"), "stream.svg", EventCategory::StreamIssue},
-        {tr("Device Disconnect"), "turnoff.svg", EventCategory::DeviceDisconnect},
-        {tr("Device IP Conflict"), "ip.svg", EventCategory::DeviceIpConflict}});
+    nx::vms::event::StringsHelper helper(d->context()->system());
+    const auto resourcePool = d->context()->system()->resourcePool();
 
-    return categories;
+    QVector<RightPanel::VmsEventGroup> result{
+        RightPanel::VmsEventGroup{RightPanel::VmsEventGroup::Common,
+            nx::vms::api::undefinedEvent,
+            "", //< Name is unused.
+            tr("Any event")},
+        RightPanel::VmsEventGroup{RightPanel::VmsEventGroup::DeviceIssues,
+            nx::vms::api::anyCameraEvent,
+            QnDeviceDependentStrings::getDefaultNameFromSet(
+                resourcePool, tr("Device issues"), tr("Camera issues")),
+            QnDeviceDependentStrings::getDefaultNameFromSet(
+                resourcePool, tr("Any device issue"), tr("Any camera issue"))},
+        RightPanel::VmsEventGroup{RightPanel::VmsEventGroup::Server,
+            nx::vms::api::anyServerEvent,
+            tr("Server events"),
+            tr("Any server event")},
+        RightPanel::VmsEventGroup{RightPanel::VmsEventGroup::Analytics,
+            nx::vms::api::analyticsSdkEvent,
+            tr("Analytics events"),
+            tr("Any analytics event")}};
+
+    for (auto& group: result)
+    {
+        const auto parentId = group.id == nx::vms::api::undefinedEvent
+            ? nx::vms::api::anyEvent
+            : group.id;
+
+        for (const auto eventType: nx::vms::event::allEvents())
+        {
+            if (eventType != nx::vms::api::analyticsSdkEvent
+                && nx::vms::event::parentEvent(eventType) == parentId)
+            {
+                group.events.push_back({eventType, helper.eventName(eventType)});
+            }
+        }
+    }
+
+    return result;
 }
 
 QAbstractItemModel* RightPanelModelsAdapter::analyticsEvents() const
@@ -749,11 +849,34 @@ void RightPanelModelsAdapter::registerQmlTypes()
     qmlRegisterUncreatableType<TextFilterSetup>("nx.vms.client.desktop", 1, 0, "TextFilterSetup",
         "Cannot create instance of TextFilterSetup");
 
-    qRegisterMetaType<QVector<RightPanel::EventCategory>>();
+    qmlRegisterUncreatableType<DetectableObjectTypeModel>("nx.vms.client.desktop.analytics", 1, 0,
+        "ObjectTypeModel", "Cannot create instance of ObjectTypeModel");
 }
 
 // ------------------------------------------------------------------------------------------------
 // RightPanelModelsAdapter::Private
+
+auto RightPanelModelsAdapter::Private::makeUnreadCountGuard()
+{
+    return nx::utils::makeScopeGuard(
+        [this, oldCount = m_unreadItems.size()]()
+        {
+            if (oldCount == m_unreadItems.size())
+                return;
+
+            m_unreadImportance = QnNotificationLevel::Value::NoNotification;
+            for (const auto level: m_unreadItems)
+            {
+                if (level > m_unreadImportance)
+                    m_unreadImportance = level;
+
+                if (m_unreadImportance == QnNotificationLevel::Value::CriticalNotification)
+                    break;
+            }
+
+            emit q->unreadCountChanged();
+        });
+}
 
 RightPanelModelsAdapter::Private::Private(RightPanelModelsAdapter* q):
     q(q)
@@ -764,6 +887,9 @@ RightPanelModelsAdapter::Private::Private(RightPanelModelsAdapter* q):
             m_deadlines.clear();
             m_previews.clear();
             m_visibleItems.clear();
+
+            const auto guard = makeUnreadCountGuard();
+            m_unreadItems.clear();
         });
 
     connect(q, &QAbstractListModel::rowsAboutToBeRemoved, this,
@@ -774,14 +900,19 @@ RightPanelModelsAdapter::Private::Private(RightPanelModelsAdapter* q):
 
             m_previews.erase(m_previews.begin() + first, m_previews.begin() + (last + 1));
 
-            QSet<QPersistentModelIndex> toRemove;
-            for (const auto& index: m_visibleItems)
-            {
-                if (index.row() >= first && index.row() <= last)
-                    toRemove.insert(index);
-            }
+            m_visibleItems.removeIf(
+                [first, last](const QPersistentModelIndex& index)
+                {
+                    return index.row() >= first && index.row() <= last;
+                });
 
-            m_visibleItems -= toRemove;
+            const auto guard = makeUnreadCountGuard();
+            m_unreadItems.removeIf(
+                [first, last](
+                    const QHash<QPersistentModelIndex, QnNotificationLevel::Value>::iterator it)
+                {
+                    return it.key().row() >= first && it.key().row() <= last;
+                });
         });
 
     connect(q, &QAbstractListModel::modelReset, this,
@@ -801,6 +932,7 @@ RightPanelModelsAdapter::Private::Private(RightPanelModelsAdapter* q):
             const auto count = last - first + 1;
             createDeadlines(first, count);
             createPreviews(first, count);
+            createUnread(first, count);
         });
 
     m_autoCloseTimer.callOnTimeout(this, &Private::closeExpired);
@@ -841,8 +973,12 @@ RightPanelModelsAdapter::Private::Private(RightPanelModelsAdapter* q):
     connect(q, &RightPanelModelsAdapter::fetchFinished,
         this, &Private::updateIsPlaceholderRequired);
 
-    connect(q, &RightPanelModelsAdapter::isOnlineChanged,
-        q, &RightPanelModelsAdapter::allowanceChanged);
+    connect(q, &RightPanelModelsAdapter::isOnlineChanged, q,
+        [q]()
+        {
+            emit q->allowanceChanged();
+            emit q->eventGroupsChanged();
+        });
 }
 
 void RightPanelModelsAdapter::Private::setContext(WindowContext* value)
@@ -869,6 +1005,7 @@ void RightPanelModelsAdapter::Private::setContext(WindowContext* value)
     recreateSourceModel();
     emit q->contextChanged();
     emit q->allowanceChanged();
+    emit q->eventGroupsChanged();
 }
 
 void RightPanelModelsAdapter::Private::setType(Type value)
@@ -1041,6 +1178,35 @@ void RightPanelModelsAdapter::Private::recreateSourceModel()
                 AnalyticsSearchListModel::LiveProcessingMode::manualAdd);
             m_analyticsSetup.reset(new AnalyticsSearchSetup(analyticsModel));
             q->setSourceModel(analyticsModel);
+
+            const auto analyticsFilterModel =
+                m_context->system()->taxonomyManager()->createFilterModel(
+                    /*parent*/ m_analyticsSetup.get());
+
+            m_objectTypeModel = new DetectableObjectTypeModel(analyticsFilterModel,
+                /*parent*/ m_analyticsSetup.get());
+
+            m_modelConnections << connect(
+                q->commonSetup(),
+                &CommonObjectSearchSetup::selectedCamerasChanged,
+                m_objectTypeModel,
+                [this]
+                {
+                    m_objectTypeModel->sourceModel()->setSelectedDevices(
+                        q->commonSetup()->selectedCameras());
+                });
+
+            m_modelConnections << connect(
+                q->analyticsSetup(),
+                &AnalyticsSearchSetup::engineChanged,
+                m_objectTypeModel,
+                [this]
+                {
+                    const auto engine = m_objectTypeModel->sourceModel()->findEngine(
+                        q->analyticsSetup()->engine());
+
+                    m_objectTypeModel->setEngine(engine);
+                });
 
             m_modelConnections << connect(
                 m_context->system()->analyticsTaxonomyStateWatcher(),
@@ -1241,9 +1407,20 @@ void RightPanelModelsAdapter::Private::createDeadlines(int first, int count)
     }
 }
 
+int RightPanelModelsAdapter::Private::calculateItemCount() const
+{
+    if (!q->sourceModel())
+        return 0;
+
+    if (const auto notificationsModel = qobject_cast<NotificationTabModel*>(q->sourceModel()))
+        return notificationsModel->effectiveCount();
+
+    return q->sourceModel()->rowCount();
+}
+
 void RightPanelModelsAdapter::Private::updateItemCount()
 {
-    const int value = q->sourceModel() ? q->sourceModel()->rowCount() : 0;
+    const int value = calculateItemCount();
     if (value == m_itemCount)
         return;
 
@@ -1307,6 +1484,23 @@ void RightPanelModelsAdapter::Private::createPreviews(int first, int count)
 
     for (int i = 0; i < count; ++i)
         updatePreviewProvider(first + i);
+}
+
+void RightPanelModelsAdapter::Private::createUnread(int first, int count)
+{
+    if (!m_unreadTrackingEnabled)
+        return;
+
+    const auto guard = makeUnreadCountGuard();
+    for (int i = 0; i != count; ++i)
+    {
+        const auto index = q->index(first + i, 0);
+        if (m_visibleItems.contains(index))
+            continue;
+
+        const auto level = index.data(Qn::NotificationLevelRole).value<QnNotificationLevel::Value>();
+        m_unreadItems.insert(index, level);
+    }
 }
 
 void RightPanelModelsAdapter::Private::updatePreviewProvider(int row)
@@ -1499,9 +1693,12 @@ bool RightPanelModelsAdapter::Private::setVisible(const QModelIndex& index, bool
             m_previewLoadOperation.requestOperation();
         }
 
-        const auto iter = m_deadlines.find(q->index(index.row(), 0));
+        const auto iter = m_deadlines.find(index);
         if (iter != m_deadlines.cend())
             iter->timer.setRemainingTime(kVisibleAutoCloseDelay);
+
+        const auto guard = makeUnreadCountGuard();
+        m_unreadItems.remove(index);
     }
     else
     {
@@ -1734,6 +1931,21 @@ void RightPanelModelsAdapter::Private::ensureAnalyticsRowVisible(int row)
     const auto trackId = index.data(Qn::ObjectTrackIdRole).value<nx::Uuid>();
     synchronizer->ensureVisible(duration_cast<milliseconds>(timestamp), trackId,
         m_analyticsSetup->model()->fetchedTimeWindow());
+}
+
+void RightPanelModelsAdapter::Private::setUnreadTrackingEnabled(bool value)
+{
+    if (m_unreadTrackingEnabled == value)
+        return;
+
+    m_unreadTrackingEnabled = value;
+    emit q->unreadTrackingChanged();
+
+    if (!m_unreadTrackingEnabled)
+        return;
+
+    const auto guard = makeUnreadCountGuard();
+    m_unreadItems.clear();
 }
 
 // ------------------------------------------------------------------------------------------------

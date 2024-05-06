@@ -68,8 +68,8 @@ WorkbenchUpdateWatcher::WorkbenchUpdateWatcher(WindowContext* windowContext, QOb
     m_updateStateTimer(this),
     m_checkLatestUpdateTimer(this),
     m_notifiedVersion(),
-    m_updateAction(new QAction(tr("Updates"))),
-    m_skipAction(new QAction(qnSkin->pixmap("events/skip.svg"), "Skip version")),
+    m_updateAction(new CommandAction(tr("Updates"))),
+    m_skipAction(new CommandAction(tr("Skip Version"), "events/skip.svg")),
     m_private(new Private())
 {
     m_private->notificationsManager = windowContext->localNotificationsManager();
@@ -119,7 +119,7 @@ WorkbenchUpdateWatcher::WorkbenchUpdateWatcher(WindowContext* windowContext, QOb
         });
 
     connect(m_updateAction.data(),
-        &QAction::triggered,
+        &CommandAction::triggered,
         this,
         [this]()
         {
@@ -129,7 +129,7 @@ WorkbenchUpdateWatcher::WorkbenchUpdateWatcher(WindowContext* windowContext, QOb
         });
 
     connect(m_skipAction.data(),
-        &QAction::triggered,
+        &CommandAction::triggered,
         this,
         [this]()
         {

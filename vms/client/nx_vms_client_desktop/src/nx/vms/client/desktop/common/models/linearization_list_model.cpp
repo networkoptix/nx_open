@@ -85,6 +85,8 @@ public:
     QModelIndex sourceRoot() const;
     void setSourceRoot(const QModelIndex& sourceIndex);
 
+    bool autoExpandAll() const;
+    void setAutoExpandAll(bool value);
     QString autoExpandRoleName() const;
     void setAutoExpandRoleName(const QString& value);
 
@@ -189,6 +191,8 @@ private:
     std::vector<PersistentIndexPair> m_changingIndices;
     NodeList m_layoutChangingNodes;
 
+    bool m_autoExpandAll = false;
+
     QString m_autoExpandRoleName;
     int m_autoExpandRole = kNoRole;
 
@@ -253,6 +257,16 @@ void LinearizationListModel::setSourceRoot(const QModelIndex& sourceIndex)
     d->setSourceRoot(sourceIndex);
 }
 
+bool LinearizationListModel::autoExpandAll() const
+{
+    return d->autoExpandAll();
+}
+
+void LinearizationListModel::setAutoExpandAll(bool value)
+{
+    d->setAutoExpandAll(value);
+}
+
 QString LinearizationListModel::autoExpandRoleName() const
 {
     return d->autoExpandRoleName();
@@ -260,6 +274,9 @@ QString LinearizationListModel::autoExpandRoleName() const
 
 void LinearizationListModel::setAutoExpandRoleName(const QString& value)
 {
+    NX_ASSERT(!autoExpandAll(),
+        "Setting an auto expand role while `autoExpandAll` is true is meaningless");
+
     d->setAutoExpandRoleName(value);
 }
 
@@ -494,6 +511,23 @@ void LinearizationListModel::Private::setSourceRoot(const QModelIndex& sourceInd
     reset();
 }
 
+bool LinearizationListModel::Private::autoExpandAll() const
+{
+    return m_autoExpandAll;
+}
+
+void LinearizationListModel::Private::setAutoExpandAll(bool value)
+{
+    if (m_autoExpandAll == value)
+        return;
+
+    m_autoExpandAll = value;
+    if (m_autoExpandAll)
+        expandAll();
+
+    emit q->autoExpandChanged(LinearizationListModel::QPrivateSignal());
+}
+
 QString LinearizationListModel::Private::autoExpandRoleName() const
 {
     return m_autoExpandRoleName;
@@ -507,7 +541,7 @@ void LinearizationListModel::Private::setAutoExpandRoleName(const QString& value
     m_autoExpandRoleName = value;
     setAutoExpandRole(calculateAutoExpandRole());
 
-    emit q->autoExpandRoleNameChanged(LinearizationListModel::QPrivateSignal());
+    emit q->autoExpandChanged(LinearizationListModel::QPrivateSignal());
 }
 
 void LinearizationListModel::Private::setAutoExpandRole(int value)
@@ -519,7 +553,8 @@ void LinearizationListModel::Private::setAutoExpandRole(int value)
     if (!m_sourceModel || m_autoExpandRole == kNoRole)
         return;
 
-    autoExpand(m_sourceRoot, 0, m_sourceModel->rowCount(m_sourceRoot));
+    if (!m_autoExpandAll)
+        autoExpand(m_sourceRoot, 0, m_sourceModel->rowCount(m_sourceRoot));
 }
 
 int LinearizationListModel::Private::calculateAutoExpandRole() const
@@ -1176,7 +1211,7 @@ bool LinearizationListModel::Private::isSourceExpanded(const QModelIndex& source
 void LinearizationListModel::Private::autoExpand(
     const QModelIndex& sourceParent, int first, int count)
 {
-    if (!NX_ASSERT(m_sourceModel) || m_autoExpandRole == kNoRole)
+    if (!NX_ASSERT(m_sourceModel) || (m_autoExpandRole == kNoRole && !m_autoExpandAll))
         return;
 
     if (!NX_ASSERT(sourceParent == m_sourceRoot || isSourceExpanded(sourceParent)))
@@ -1202,7 +1237,7 @@ void LinearizationListModel::Private::markAutoExpandedIndicesRecursively(
         const auto childCount = m_sourceModel->rowCount(sourceIndex);
         markAutoExpandedIndicesRecursively(sourceIndex, 0, childCount);
 
-        if (sourceIndex.data(m_autoExpandRole).toBool() && childCount > 0)
+        if ((m_autoExpandAll || sourceIndex.data(m_autoExpandRole).toBool()) && childCount > 0)
             m_expandedSourceIndices.insert(sourceIndex);
     }
 }

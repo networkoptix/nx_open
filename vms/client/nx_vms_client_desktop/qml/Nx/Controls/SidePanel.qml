@@ -1,10 +1,10 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.6
-import QtQuick.Controls 2.4
+import QtQuick
+import QtQuick.Controls
 
-import Nx 1.0
-import Nx.Core 1.0
+import Nx
+import Nx.Core
 
 Control
 {
@@ -63,19 +63,28 @@ Control
         anchors.bottom: parent.bottom
     }
 
-    DeprecatedIconButton
+    ImageButton
     {
         id: button
 
-        width: 12
-        height: 32
-        iconDir: "qrc:/skin/panel"
-        iconBaseName: sidePanel.opened ? "slide_left" : "slide_right"
         enabled: openCloseButtonVisible
         opacity: openCloseButtonVisible ? 1.0 : 0.0
         visible: opacity > 0.0
 
-        onClicked: sidePanel.opened = !sidePanel.opened
+        icon.width: 20
+        icon.height: 40
+
+        icon.source: sidePanel.opened
+            ? "image://skin/panel/slide_left_12x32.svg"
+            : "image://skin/panel/slide_right_12x32.svg"
+
+        primaryColor: down ? "light15" : (hovered ? "light17" : "light16")
+        secondaryColor: down ? "dark7" : (hovered ? "dark9" : "dark8")
+
+        background: null
+
+        onClicked:
+            sidePanel.opened = !sidePanel.opened
 
         Behavior on opacity
         {

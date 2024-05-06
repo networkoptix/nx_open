@@ -23,6 +23,19 @@ Item
         anchors.top: parent.top
         anchors.bottom: parent.bottom
 
+        component NavigationButton: ImageButton
+        {
+            id: navigationButton
+
+            icon.width: 32
+            icon.height: 32
+
+            primaryColor: (down || checked) ? "light2" : (hovered ? "light6" : "light4")
+            secondaryColor: (down || checked) ? "dark6" : (hovered ? "dark8" : "dark7")
+
+            background: null
+        }
+
         Column
         {
             leftPadding: 6
@@ -41,73 +54,61 @@ Item
             {
                 spacing: 1
 
-                DeprecatedIconButton
+                NavigationButton
                 {
                     id: rewindBackwardButton
 
-                    width: 32
-                    height: 32
-                    iconBaseName: "slider/navigation/rewind_backward_32"
+                    icon.source: "image://skin/slider/navigation/rewind_backward_32.svg"
                 }
 
-                DeprecatedIconButton
+                NavigationButton
                 {
                     id: stepBackwardButton
 
-                    width: 32
-                    height: 32
-                    iconBaseName: "slider/navigation/step_backward_32"
+                    icon.source: "image://skin/slider/navigation/step_backward_32.svg"
                     visible: !timeline.playing
                 }
 
-                DeprecatedIconButton
+                NavigationButton
                 {
                     id: speedDownButton
 
-                    width: 32
-                    height: 32
-                    iconBaseName: "slider/navigation/backward_32"
+                    icon.source: "image://skin/slider/navigation/backward_32.svg"
                     visible: timeline.playing
                 }
 
-                DeprecatedIconButton
+                NavigationButton
                 {
                     id: playPauseButton
 
-                    width: 32
-                    height: 32
                     checkable: true
-                    iconBaseName: "slider/navigation/play"
-                    iconCheckedBaseName: "slider/navigation/pause_32"
+
+                    icon.source: checked
+                        ? "image://skin/slider/navigation/pause_32.svg"
+                        : "image://skin/slider/navigation/play_32.svg"
                 }
 
-                DeprecatedIconButton
+                NavigationButton
                 {
                     id: speedUpButton
 
-                    width: 32
-                    height: 32
-                    iconBaseName: "slider/navigation/forward"
+                    icon.source: "image://skin/slider/navigation/forward_32.svg"
                     visible: timeline.playing
                 }
 
-                DeprecatedIconButton
+                NavigationButton
                 {
                     id: stepForwardButton
 
-                    width: 32
-                    height: 32
-                    iconBaseName: "slider/navigation/step_forward"
+                    icon.source: "image://skin/slider/navigation/step_forward_32.svg"
                     visible: !timeline.playing
                 }
 
-                DeprecatedIconButton
+                NavigationButton
                 {
                     id: rewindForwardButton
 
-                    width: 32
-                    height: 32
-                    iconBaseName: "slider/navigation/rewind_forward"
+                    icon.source: "image://skin/slider/navigation/rewind_forward_32.svg"
                 }
             }
 

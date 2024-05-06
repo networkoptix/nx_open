@@ -15,6 +15,8 @@
 #include <nx/vms/client/core/enums.h>
 #include <nx/vms/client/core/time/date_range.h>
 
+class QQuickItemView;
+
 namespace nx::vms::client::core {
 
 class NX_VMS_CLIENT_CORE_API NxGlobalsObject: public QObject
@@ -105,6 +107,9 @@ public:
 
     /** Returns native string representation of QQuickAction shortcut property. */
     Q_INVOKABLE QString shortcutText(const QVariant& var) const;
+
+    /** Absolutely force laying out items of the specified item view. */
+    Q_INVOKABLE void forceLayout(QQuickItemView* view) const;
 };
 
 } // namespace nx::vms::client::core

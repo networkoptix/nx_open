@@ -20,6 +20,7 @@ Item
 
         text: qsTr("In selected area")
         icon.source: "image://skin/20x20/Outline/frame.svg"
+
         selectable: false
         accented: true
         visible: state !== SelectableTextButton.Deactivated

@@ -88,6 +88,10 @@ public:
      */
     Q_INVOKABLE nx::vms::client::desktop::analytics::taxonomy::ObjectType* findFilterObjectType(
         const QStringList& analyticsObjectTypeIds);
+    /**
+     * Finds engine by id.
+     */
+    Q_INVOKABLE nx::analytics::taxonomy::AbstractEngine* findEngine(const nx::Uuid& engineId) const;
 
     /**
      * Returns analytics object type ids corresponding to the filter object type.
@@ -133,6 +137,7 @@ private:
     nx::utils::ScopedConnection m_manifestsUpdatedConnection;
     std::unique_ptr<StateViewBuilder> m_stateViewBuilder;
     std::vector<nx::analytics::taxonomy::AbstractEngine*> m_engines;
+    QMap<nx::Uuid, nx::analytics::taxonomy::AbstractEngine*> m_enginesById;
 
     QPointer<nx::analytics::taxonomy::AbstractEngine> m_engine;
     std::set<nx::Uuid> m_devices;

@@ -1,6 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 import QtQuick
+import QtQuick.Layouts
 import QtQuick.Window
 
 import Nx
@@ -160,7 +161,7 @@ Window
                         id: areaSelectionButton
 
                         parent: header.filtersColumn
-                        width: Math.min(implicitWidth, header.filtersColumn.width)
+                        Layout.maximumWidth: header.filtersColumn.width
 
                         selectable: false
                         icon.source: "image://skin/20x20/Outline/frame.svg"

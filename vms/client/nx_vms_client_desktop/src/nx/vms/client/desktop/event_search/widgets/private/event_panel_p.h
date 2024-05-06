@@ -30,7 +30,7 @@ class AbstractSearchSynchronizer;
 class OverlappableSearchWidget;
 class AnimatedCompactTabWidget;
 class NotificationBellWidget;
-class NotificationBellManager;
+class CallAlarmManager;
 
 class EventPanel::Private:
     public QObject,
@@ -85,8 +85,8 @@ private:
     QWidget* m_previousTab = nullptr;
     QWidget* m_lastTab = nullptr;
 
-    NotificationBellWidget* m_notificationBellWidget = nullptr;
-    NotificationBellManager* m_notificationBellManager = nullptr;
+    std::unique_ptr<CallAlarmManager> m_callAlarmManager;
+    QPointer<NotificationBellWidget> m_notificationBellWidget;
 
     std::unique_ptr<ThumbnailTooltip> m_tooltip;
 

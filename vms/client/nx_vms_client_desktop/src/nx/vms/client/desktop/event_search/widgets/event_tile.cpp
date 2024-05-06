@@ -127,8 +127,8 @@ struct EventTile::Private
     CloseButton* const closeButton;
     WidgetAnchor* const closeButtonAnchor;
     bool closeable = false;
-    CommandActionPtr action; //< Button action.
-    CommandActionPtr additionalAction;
+    std::unique_ptr<QAction> action; //< Button action.
+    std::unique_ptr<QAction> additionalAction;
     QnElidedLabel* const progressLabel;
     const QScopedPointer<QTimer> loadPreviewTimer;
     bool automaticPreviewLoad = true;
@@ -776,26 +776,26 @@ bool EventTile::isPreviewLoadNeeded() const
 
 CommandActionPtr EventTile::action() const
 {
-    return d->action;
+    return CommandAction::linkedCommandAction(d->action.get());
 }
 
 void EventTile::setAction(const CommandActionPtr& value)
 {
-    d->action = value;
-    ui->actionButton->setAction(d->action.data());
-    ui->actionHolder->setHidden(d->action.isNull());
+    d->action.reset(CommandAction::createQtAction(value));
+    ui->actionButton->setAction(d->action.get());
+    ui->actionHolder->setHidden(!d->action);
 }
 
 CommandActionPtr EventTile::additionalAction() const
 {
-    return d->additionalAction;
+    return CommandAction::linkedCommandAction(d->additionalAction.get());
 }
 
 void EventTile::setAdditionalAction(const CommandActionPtr& value)
 {
-    d->additionalAction = value;
-    ui->additionalActionButton->setAction(d->additionalAction.data());
-    ui->additionalActionButton->setHidden(d->additionalAction.isNull());
+    d->additionalAction.reset(CommandAction::createQtAction(value));
+    ui->additionalActionButton->setAction(d->additionalAction.get());
+    ui->additionalActionButton->setHidden(!d->additionalAction);
     ui->additionalActionButton->setFlat(true);
 }
 

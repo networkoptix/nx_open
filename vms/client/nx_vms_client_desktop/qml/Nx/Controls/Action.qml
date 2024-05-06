@@ -6,4 +6,7 @@ Action
 {
     property var data
     property bool visible: true
+
+    icon.width: 20
+    icon.height: 20
 }

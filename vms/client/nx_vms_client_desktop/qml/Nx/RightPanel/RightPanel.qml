@@ -2,146 +2,230 @@
 
 import QtQuick
 
+import Nx
 import Nx.Controls
 
 import nx.vms.client.desktop
 
-TabControl
+import "private"
+import "private/panels"
+
+Item
 {
-    id: tabs
+    id: rightPanel
 
-    Tab
+    property var scene
+
+    TabControl
     {
-        id: notificationsTab
+        id: tabs
 
-        component RightPanelTabButton: CompactTabButton
+        anchors.fill: parent
+
+        tabBar
         {
-            font.capitalization: Font.AllUppercase
+            x: 0
+            width: parent.width
+            height: 32
+            spacing: 0
         }
 
-        button: RightPanelTabButton
+        Tab
         {
-            icon.source: "image://skin/events/tabs/notifications.svg?primary=white"
-            text: qsTr("Notifications")
-        }
+            id: notificationsTab
 
-        Item
-        {
-            id: notificationsItem
-
-            EventRibbon
+            button: RightPanelTabButton
             {
-                anchors.fill: parent
-                model: RightPanelModel
+                id: notificationButton
+
+                icon.source: animatedIcon.active
+                    ? undefined
+                    : "image://skin/events/tabs/notifications.svg"
+
+                icon.name: "RightPanel.Tabs.Notifications"
+                text: qsTr("Notifications")
+
+                CallNotificationIcon
                 {
-                    context: windowContext
-                    type: { return RightPanelModel.Type.notifications }
+                    id: animatedIcon
+
+                    parent: notificationButton.iconImage
+                    anchors.fill: parent
+
+                    active: alarmManager.ringing
+
+                    CallAlarmManager
+                    {
+                        id: alarmManager
+
+                        context: WindowContextAware.context
+                        active: d.currentTab !== notificationsTab
+                    }
                 }
+
+                UnreadNotificationCounter
+                {
+                    id: unreadCounter
+
+                    count: notificationsPanel.unreadCount
+                    color: notificationsPanel.unreadColor
+
+                    parent: notificationButton.iconImage
+                    anchors.top: parent.top
+                    anchors.right: parent.right
+                    z: 1
+                }
+            }
+
+            NotificationsPanel
+            {
+                id: notificationsPanel
+                objectName: "NotificationsPanel"
+
+                onActiveChanged:
+                    d.setTabState(notificationsTab, /*isCurrent*/ active)
+            }
+        }
+
+        Tab
+        {
+            id: motionTab
+
+            visible: motionPanel.model.isAllowed
+
+            button: RightPanelTabButton
+            {
+                icon.source: "image://skin/events/tabs/motion.svg"
+                icon.name: "RightPanel.Tabs.Motion"
+                text: qsTr("Motion")
+            }
+
+            MotionPanel
+            {
+                id: motionPanel
+                objectName: "MotionPanel"
+
+                onActiveChanged:
+                    d.setTabState(motionTab, /*isCurrent*/ active)
+            }
+        }
+
+        Tab
+        {
+            id: bookmarksTab
+
+            visible: bookmarksPanel.model.isAllowed
+
+            button: RightPanelTabButton
+            {
+                icon.source: "image://skin/events/tabs/bookmarks.svg"
+                icon.name: "RightPanel.Tabs.Bookmarks"
+                text: qsTr("Bookmarks")
+            }
+
+            BookmarksPanel
+            {
+                id: bookmarksPanel
+                objectName: "BookmarksPanel"
+
+                onActiveChanged:
+                    d.setTabState(bookmarksTab, /*isCurrent*/ active)
+            }
+        }
+
+        Tab
+        {
+            id: eventsTab
+
+            visible: eventsPanel.model.isAllowed
+
+            button: RightPanelTabButton
+            {
+                icon.source: "image://skin/events/tabs/events.svg"
+                icon.name: "RightPanel.Tabs.Events"
+                text: qsTr("Events")
+            }
+
+            EventsPanel
+            {
+                id: eventsPanel
+                objectName: "EventsPanel"
+
+                onActiveChanged:
+                    d.setTabState(eventsTab, /*isCurrent*/ active)
+            }
+        }
+
+        Tab
+        {
+            id: objectsTab
+
+            visible: objectsPanel.model.isAllowed
+
+            button: RightPanelTabButton
+            {
+                icon.source: "image://skin/events/tabs/analytics.svg"
+                icon.name: "RightPanel.Tabs.Objects"
+                text: qsTr("Objects")
+            }
+
+            AnalyticsPanel
+            {
+                id: objectsPanel
+                objectName: "ObjectsPanel"
+
+                onActiveChanged:
+                    d.setTabState(objectsTab, /*isCurrent*/ active)
             }
         }
     }
 
-    Tab
+    NxObject
     {
-        id: motionTab
+        id: d
 
-        button: RightPanelTabButton
+        property Tab currentTab: notificationsTab
+        property Tab previousTab: null
+
+        property bool updating: false
+
+        function setCurrentTab(tab)
         {
-            icon.source: "image://skin/events/tabs/motion.svg?primary=white"
-            text: qsTr("Motion")
-        }
+            if (!tab || !tab.visible || tab === d.currentTab || d.updating)
+                return
 
-        Item
-        {
-            id: motionItem
+            d.updating = true
+            d.previousTab = d.currentTab
+            d.currentTab = tab
 
-            EventRibbon
+            for (let otherTab of tabs.tabs)
             {
-                brief: true
-                anchors.fill: parent
-                model: RightPanelModel
-                {
-                    context: windowContext
-                    type: { return RightPanelModel.Type.motion }
-                }
+                if (otherTab.page.hasOwnProperty("active"))
+                    otherTab.page.active = otherTab === d.currentTab
             }
-        }
-    }
 
-    Tab
-    {
-        id: bookmarksTab
-
-        button: RightPanelTabButton
-        {
-            icon.source: "image://skin/events/tabs/bookmarks.svg?primary=white"
-            text: qsTr("Bookmarks")
+            tabs.selectTab(d.currentTab)
+            d.updating = false
         }
 
-        Item
+        function setTabState(tab, isCurrent)
         {
-            id: bookmarksItem
+            if (isCurrent)
+                d.setCurrentTab(tab)
+            else if (d.currentTab === tab)
+                d.setCurrentTab(d.previousTab)
+        }
 
-            EventRibbon
+        Connections
+        {
+            target: tabs
+
+            // We need this to handle tab changes caused by user interaction,
+            // to update d.currentTab and d.previousTab and every page's active state.
+
+            function onCurrentTabChanged()
             {
-                anchors.fill: parent
-                model: RightPanelModel
-                {
-                    context: windowContext
-                    type: { return RightPanelModel.Type.bookmarks }
-                }
-            }
-        }
-    }
-
-    Tab
-    {
-        id: eventsTab
-
-        button: RightPanelTabButton
-        {
-            icon.source: "image://skin/events/tabs/events.svg?primary=white"
-            text: qsTr("Events")
-        }
-
-        Item
-        {
-            id: eventsItem
-
-            EventRibbon
-            {
-                anchors.fill: parent
-                model: RightPanelModel
-                {
-                    context: windowContext
-                    type: { return RightPanelModel.Type.events }
-                }
-            }
-        }
-    }
-
-    Tab
-    {
-        id: analyticsTab
-
-        button: RightPanelTabButton
-        {
-            icon.source: "image://skin/events/tabs/analytics.svg?primary=white"
-            text: qsTr("Analytics")
-        }
-
-        Item
-        {
-            id: analyticsItem
-
-            EventRibbon
-            {
-                anchors.fill: parent
-                model: RightPanelModel
-                {
-                    context: windowContext
-                    type: { return RightPanelModel.Type.analytics }
-                }
+                d.setCurrentTab(tabs.currentTab)
             }
         }
     }

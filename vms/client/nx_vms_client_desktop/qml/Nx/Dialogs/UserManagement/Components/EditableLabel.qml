@@ -75,16 +75,10 @@ Item
         anchors.leftMargin: 4
         anchors.verticalCenter: label.verticalCenter
 
-        width: 20
-        height: 20
-
         visible: label.visible && control.enabled && control.hovered
-        hoverEnabled: true
         enabled: control.enabled
 
         icon.source: "image://skin/20x20/Solid/edit_filled.svg"
-        icon.width: width
-        icon.height: height
         icon.color: hovered ? ColorTheme.colors.light13 : ColorTheme.colors.light16
 
         background: null

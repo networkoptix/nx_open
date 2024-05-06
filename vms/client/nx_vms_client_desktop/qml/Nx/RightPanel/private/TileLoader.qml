@@ -10,47 +10,33 @@ Loader
 
     property TileController tileController: null
 
-    Component
-    {
-        id: separatorTile
-        SeparatorTile { }
-    }
-
-    Component
-    {
-        id: progressTile
-        ProgressTile { }
-    }
-
-    Component
-    {
-        id: briefTile
-        BriefTile { }
-    }
-
-    Component
-    {
-        id: infoTile
-        InfoTile { }
-    }
-
-    sourceComponent:
+    source:
     {
         if (!model || !model.display)
-            return separatorTile
+            return "private/tiles/SeparatorTile.qml"
 
         if (model.progressValue !== undefined)
-            return progressTile
+            return "private/tiles/ProgressTile.qml"
 
         return brief
-            ? briefTile
-            : infoTile
+            ? "private/tiles/BriefTile.qml"
+            : "private/tiles/InfoTile.qml"
     }
 
-    onVisibleChanged: model.visible = visible
-    Component.onCompleted: model.visible = visible
-    Component.onDestruction: model.visible = false
+    onVisibleChanged:
+        model.visible = visible
 
-    onLoaded:
-        item.controller = loader.tileController
+    Component.onCompleted:
+        model.visible = visible
+
+    Component.onDestruction:
+        model.visible = false
+
+    Binding
+    {
+        target: item
+        when: item && item.hasOwnProperty("controller")
+        property: "controller"
+        value: loader.tileController
+    }
 }

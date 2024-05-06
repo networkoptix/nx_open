@@ -134,8 +134,9 @@ FocusScope
 
             contentItem: ColoredImage
             {
-                sourcePath: "image://skin/text_buttons/cross_close_20.svg"
+                sourcePath: "image://skin/20x20/Outline/cross_close.svg"
                 sourceSize: Qt.size(20, 20)
+                primaryColor: textField.color
                 fillMode: Image.Pad
             }
 

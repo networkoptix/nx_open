@@ -13,19 +13,13 @@ ImageButton
 {
     property bool accent: false
 
-    icon.color: "transparent"
-
     width: 24
     height: 24
-    radius: 2
 
-    property var backgroundColor: accent
-        ? ColorTheme.colors.brand_core
-        : ColorTheme.colors.dark1
-
-    normalBackground: ColorTheme.transparent(backgroundColor, 0.7)
-    hoveredBackground: ColorTheme.transparent(backgroundColor, 0.9)
-    pressedBackground: ColorTheme.transparent(backgroundColor, 0.5)
-
-    hoverEnabled: true
+    backgroundColor:
+    {
+        const base = accent ? ColorTheme.colors.brand_core : ColorTheme.colors.dark1
+        const alpha = down ? 0.5 : (hovered ? 0.9 : 0.7)
+        return ColorTheme.transparent(base, alpha)
+    }
 }

@@ -32,7 +32,7 @@ Instrument
     property int _frameSection
     property bool _started: false
 
-    onMousePress:
+    onMousePress: (mouse) =>
     {
         if (!target)
             return
@@ -58,7 +58,7 @@ Instrument
         mouse.accepted = true
     }
 
-    onMouseRelease:
+    onMouseRelease: (mouse) =>
     {
         if (!_started || !target)
             return
@@ -68,7 +68,7 @@ Instrument
         mouse.accepted = true
     }
 
-    onMouseMove:
+    onMouseMove: (mouse) =>
     {
         if (!_started || !target)
             return
@@ -112,7 +112,7 @@ Instrument
         cursorManager.unsetCursor(this)
     }
 
-    onHoverMove:
+    onHoverMove: (hover) =>
     {
         if (!target || !cursorManager)
             return

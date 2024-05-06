@@ -258,7 +258,7 @@ void WebDownloader::startDownload()
     setState(State::Downloading);
 
     auto action = CommandActionPtr(new CommandAction(tr("Open Containing Folder")));
-    connect(action.data(), &QAction::triggered, this,
+    connect(action.data(), &CommandAction::triggered, this,
         [this]()
         {
             QnEnvironment::showInGraphicalShell(m_fileInfo.absoluteFilePath());

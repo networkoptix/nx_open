@@ -771,11 +771,7 @@ void NotificationListModel::Private::setupAcknowledgeAction(EventData& eventData
 
     eventData.extraAction = CommandActionPtr(new CommandAction());
 
-    static const QColor kBasicColor = "#A5B7C0";
-    static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
-        {QnIcon::Normal, {{kBasicColor, "light10"}}},
-    };
-    eventData.extraAction->setIcon(qnSkin->icon("buttons/acknowledge_24.svg", kIconSubstitutions));
+    eventData.extraAction->setIconPath("buttons/acknowledge_24.svg?primary=light4");
     eventData.extraAction->setText(tr("Acknowledge"));
 
     // TODO: #sivanov Fix hardcoded action parameters.
@@ -795,7 +791,7 @@ void NotificationListModel::Private::setupAcknowledgeAction(EventData& eventData
             menu()->trigger(menu::AcknowledgeEventAction, params);
         };
 
-    connect(eventData.extraAction.data(), &QAction::triggered,
+    connect(eventData.extraAction.data(), &CommandAction::triggered,
         [this, actionHandler]() { executeLater(actionHandler, this); });
 }
 
@@ -820,7 +816,7 @@ void NotificationListModel::Private::setupAcknowledgeAction(
     eventData.level = QnNotificationLevel::Value::CriticalNotification;
 
     eventData.extraAction = CommandActionPtr::create();
-    eventData.extraAction->setIcon(qnSkin->icon("buttons/acknowledge_24.svg", kIconSubstitutions));
+    eventData.extraAction->setIconPath("buttons/acknowledge_24.svg?primary=light4");
     eventData.extraAction->setText(tr("Acknowledge"));
 
     const auto actionHandler =
@@ -832,7 +828,7 @@ void NotificationListModel::Private::setupAcknowledgeAction(
             menu()->trigger(menu::AcknowledgeNotificationAction, params);
         };
 
-    connect(eventData.extraAction.data(), &QAction::triggered,
+    connect(eventData.extraAction.data(), &CommandAction::triggered,
         [this, actionHandler]() { executeLater(actionHandler, this); });
 }
 

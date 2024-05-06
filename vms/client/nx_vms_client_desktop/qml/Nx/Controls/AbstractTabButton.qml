@@ -57,6 +57,8 @@ TabButton
 
     property alias underline: underline
     property alias focusFrame: focusFrame
+    property alias iconImage: image
+    property alias textLabel: tabText
 
     anchors.top: parent ? parent.top : undefined
     anchors.bottom: parent ? parent.bottom : undefined

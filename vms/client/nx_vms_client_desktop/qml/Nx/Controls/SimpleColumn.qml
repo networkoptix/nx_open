@@ -1,13 +1,12 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.15
-import QtQml 2.15
-import QtQml.Models 2.15
+import QtQuick
+import QtQml
 
-import Nx 1.0
-import Nx.Core 1.0
+import Nx
+import Nx.Core
 
-import nx.vms.client.core 1.0
+import nx.vms.client.core
 
 /**
  * Standard Column defers positioning of its items to avoid frequent repositioning.
@@ -84,7 +83,8 @@ Item
     {
         target: d
         property: "relevantChildren"
-        value: Array.prototype.filter.call(visibleChildren, child => NxGlobals.isRelevantForPositioners(child))
+        value: Array.prototype.filter.call(column.visibleChildren,
+            child => NxGlobals.isRelevantForPositioners(child))
         when: column.visible
         restoreMode: Binding.RestoreNone
     }

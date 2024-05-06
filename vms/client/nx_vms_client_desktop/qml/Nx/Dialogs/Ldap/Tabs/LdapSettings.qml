@@ -437,10 +437,6 @@ Rectangle
                         {
                             id: syncButton
 
-                            width: 20
-                            height: 20
-
-                            hoverEnabled: true
                             visible: !modified
                                 && control.online
                                 && !control.syncRequested
@@ -448,8 +444,7 @@ Rectangle
                                 && control.syncIntervalS > control.kShortSyncIntervalS
 
                             icon.source: "image://skin/20x20/Outline/rotate_cw.svg"
-                            icon.width: width
-                            icon.height: height
+
                             icon.color: hovered
                                 ? ColorTheme.colors.light13
                                 : ColorTheme.colors.light16
@@ -699,17 +694,11 @@ Rectangle
                             anchors.rightMargin: 4 + list.scrollBarWidth
                             anchors.verticalCenter: parent.verticalCenter
 
-                            width: 20
-                            height: 20
+                            icon.source: "image://skin/20x20/Outline/delete.svg"
 
-                            hoverEnabled: true
-
-                            icon.source: hovered
-                                ? "image://skin/20x20/Outline/delete.svg?primary=light15"
-                                : "image://skin/20x20/Outline/delete.svg?primary=light16"
-                            icon.width: width
-                            icon.height: height
-                            icon.color: hovered ? ColorTheme.colors.light15 : ColorTheme.colors.light16
+                            icon.color: hovered
+                                ? ColorTheme.colors.light15
+                                : ColorTheme.colors.light16
 
                             background: null
 

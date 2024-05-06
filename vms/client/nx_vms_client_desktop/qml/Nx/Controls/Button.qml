@@ -59,14 +59,11 @@ Button
 
     focusPolicy: Qt.TabFocus
 
+    opacity: enabled ? 1.0 : (isAccentButton ? 0.2 : 0.3)
+
     Keys.enabled: true
     Keys.onEnterPressed: button.clicked()
     Keys.onReturnPressed: button.clicked()
-
-    Binding on opacity
-    {
-        value: enabled ? 1.0 : (isAccentButton ? 0.2 : 0.3)
-    }
 
     contentItem: Item
     {

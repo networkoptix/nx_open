@@ -71,6 +71,7 @@ Control
                 id: tabBar
 
                 x: 16
+                implicitWidth: 0 //< To avoid possible binding loops.
                 width: parent.width - x * 2
 
                 readonly property var buttons: tabControl.visibleTabs.map(

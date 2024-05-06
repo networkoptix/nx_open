@@ -22,7 +22,7 @@ Instrument
     property real _startRotation
     property bool _started: false
 
-    onMousePress:
+    onMousePress: (mouse) =>
     {
         if (!target)
             return
@@ -35,7 +35,7 @@ Instrument
         mouse.accepted = true
     }
 
-    onMouseRelease:
+    onMouseRelease: (mouse) =>
     {
         if (!target || !_started)
             return
@@ -46,7 +46,7 @@ Instrument
         mouse.accepted = true
     }
 
-    onMouseMove:
+    onMouseMove: (mouse) =>
     {
         if (!target || !_started)
             return

@@ -67,19 +67,15 @@ RowLayout
     {
         id: calendarButton
 
-        width: 20
-        height: 20
-
         hoverEnabled: control.enabled
         enabled: !popup.opened
         focusPolicy: Qt.NoFocus
 
         icon.source: "image://skin/20x20/Outline/calendar.svg"
-        icon.width: width
-        icon.height: height
+
         icon.color: hovered
             ? ColorTheme.colors.light13
-            : popup.opened ? ColorTheme.colors.light17 : ColorTheme.colors.light16
+            : (popup.opened ? ColorTheme.colors.light17 : ColorTheme.colors.light16)
 
         background: null
 
@@ -149,11 +145,8 @@ RowLayout
 
                     component ArrowButton: ImageButton
                     {
-                        width: 20
                         height: 32
 
-                        icon.width: 20
-                        icon.height: 20
                         focusPolicy: Qt.NoFocus
 
                         background: null
