@@ -683,11 +683,11 @@
     </message>
     <message>
       <source>Do not send Stop PTZ command</source>
-      <translation type="unfinished">Do not send Stop PTZ command</translation>
+      <translation>Jangan kirim perintah Stop PTZ</translation>
     </message>
     <message>
       <source>Do not record audio</source>
-      <translation type="unfinished">Do not record audio</translation>
+      <translation>Jangan merekam audio</translation>
     </message>
   </context>
   <context>
