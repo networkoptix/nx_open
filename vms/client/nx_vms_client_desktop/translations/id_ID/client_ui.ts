@@ -657,23 +657,23 @@
     </message>
     <message>
       <source>Disable import</source>
-      <translation type="unfinished">Disable import</translation>
+      <translation>Nonaktifkan impor</translation>
     </message>
     <message>
       <source>Import Video from Device</source>
-      <translation type="unfinished">Import Video from Device</translation>
+      <translation>Impor Video dari Perangkat</translation>
     </message>
     <message>
       <source>Import camera or server offline periods</source>
-      <translation type="unfinished">Import camera or server offline periods</translation>
+      <translation>Impor periode offline kamera atau server</translation>
     </message>
     <message>
       <source>Do not send Stop PTZ command</source>
-      <translation type="unfinished">Do not send Stop PTZ command</translation>
+      <translation>Jangan kirim perintah Stop PTZ</translation>
     </message>
     <message>
       <source>Do not record audio</source>
-      <translation type="unfinished">Do not record audio</translation>
+      <translation>Jangan merekam audio</translation>
     </message>
   </context>
   <context>
@@ -1724,15 +1724,15 @@
     </message>
     <message>
       <source>Use Credentials</source>
-      <translation type="unfinished">Use Credentials</translation>
+      <translation>Gunakan Kredensial</translation>
     </message>
     <message>
       <source>Use Link</source>
-      <translation type="unfinished">Use Link</translation>
+      <translation>Gunakan Link</translation>
     </message>
     <message>
       <source>Link</source>
-      <translation type="unfinished">Link</translation>
+      <translation>Link</translation>
     </message>
   </context>
   <context>
@@ -1857,7 +1857,7 @@
     </message>
     <message>
       <source>warn icon</source>
-      <translation type="unfinished">warn icon</translation>
+      <translation>ikon peringatan</translation>
     </message>
   </context>
   <context>
@@ -1991,7 +1991,7 @@
     </message>
     <message>
       <source>Mail from</source>
-      <translation type="unfinished">Mail from</translation>
+      <translation>Mail dari</translation>
     </message>
   </context>
   <context>
@@ -2006,7 +2006,7 @@
     </message>
     <message>
       <source>Sign in to web page</source>
-      <translation type="unfinished">Sign in to web page</translation>
+      <translation>Masuk ke halaman web</translation>
     </message>
   </context>
   <context>
@@ -2443,23 +2443,23 @@
     <name>SaasInfoWidget</name>
     <message>
       <source>No services found</source>
-      <translation type="unfinished">No services found</translation>
+      <translation>Tidak ada layanan yang ditemukan</translation>
     </message>
     <message>
       <source>Contact your Channel Partner to add services</source>
-      <translation type="unfinished">Contact your Channel Partner to add services</translation>
+      <translation>Hubungi Channel Partner Anda untuk menambahkan layanan</translation>
     </message>
     <message>
       <source>Channel Partner Contact</source>
-      <translation type="unfinished">Channel Partner Contact</translation>
+      <translation>Kontak Channel Partner</translation>
     </message>
     <message>
       <source>Services Usage</source>
-      <translation type="unfinished">Services Usage</translation>
+      <translation>Penggunaan Layanan</translation>
     </message>
     <message>
       <source>Services state</source>
-      <translation type="unfinished">Services state</translation>
+      <translation>Status layanan</translation>
     </message>
   </context>
   <context>
@@ -2592,7 +2592,7 @@
     </message>
     <message>
       <source>Display servers in tree for non-power users</source>
-      <translation type="unfinished">Display servers in tree for non-power users</translation>
+      <translation>Tampilkan server di tree untuk non-power user</translation>
     </message>
   </context>
   <context>
@@ -2918,11 +2918,11 @@
     </message>
     <message>
       <source>Add Group</source>
-      <translation type="unfinished">Add Group</translation>
+      <translation>Tambahkan Grup</translation>
     </message>
     <message>
       <source>Del</source>
-      <translation type="unfinished">Del</translation>
+      <translation>Del</translation>
     </message>
   </context>
   <context>
@@ -2937,7 +2937,7 @@
     </message>
     <message>
       <source>Del</source>
-      <translation type="unfinished">Del</translation>
+      <translation>Del</translation>
     </message>
   </context>
   <context>
