@@ -141,8 +141,8 @@ int ServicesUsageModel::Private::usedServiceQuantity(const nx::Uuid& serviceId) 
     if (service.type == nx::vms::api::SaasService::kLocalRecordingServiceType)
     {
         LocalRecordingUsageHelper usageHelper(systemContext);
-        return usageHelper.camerasByService().contains(serviceId)
-            ? usageHelper.camerasByService().at(serviceId).size()
+        return usageHelper.cameraGroupsByService().contains(serviceId)
+            ? usageHelper.cameraGroupsByService().at(serviceId).size()
             : 0;
     }
     else if (service.type == nx::vms::api::SaasService::kCloudRecordingType)
