@@ -19,6 +19,8 @@ class LayoutModel: public QAbstractListModel
     Q_OBJECT
     Q_PROPERTY(QnLayoutResource* layout READ rawLayout WRITE setRawLayout NOTIFY layoutChanged)
     Q_PROPERTY(QRect gridBoundingRect READ gridBoundingRect NOTIFY gridBoundingRectChanged)
+    Q_PROPERTY(bool locked READ locked NOTIFY lockedChanged)
+    Q_PROPERTY(bool isShowreelReview READ isShowreelReview NOTIFY layoutChanged)
 
 public:
     enum class Roles
@@ -39,10 +41,14 @@ public:
     virtual QVariant data(const QModelIndex& index, int role) const override;
     virtual int rowCount(const QModelIndex& parent = QModelIndex()) const override;
 
+    bool locked() const;
+    bool isShowreelReview() const;
+
     static void registerQmlType();
 
 signals:
     void layoutChanged();
+    void lockedChanged();
     void gridBoundingRectChanged();
 
 private:

@@ -1,13 +1,13 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 import QtQuick
-import QtQuick.Controls
+import QtQuick.Controls as QC2
 
 import Nx
 import Nx.Core
-import Nx.Controls as Nx
+import Nx.Controls
 
-Nx.TextField
+TextField
 {
     id: searchField
 
@@ -28,7 +28,7 @@ Nx.TextField
     leftPadding: actionButton.visible ? (actionButton.x + actionButton.width + spacing) : 8
     rightPadding: enabled ? (width - clearButton.x) : 8
 
-    Button
+    QC2.Button
     {
         id: actionButton
 
@@ -53,7 +53,7 @@ Nx.TextField
 
         contentItem: Item
         {
-            Nx.ColoredImage
+            ColoredImage
             {
                 id: image
 
@@ -98,7 +98,8 @@ Nx.TextField
         anchors.verticalCenter: parent.verticalCenter
         padding: 0
         focusPolicy: Qt.NoFocus
-        icon.source: "image://skin/text_buttons/cross_close_20.svg"
+
+        icon.source: "image://skin/20x20/Outline/cross_close.svg"
         icon.color: searchField.color
 
         enabled: searchField.text

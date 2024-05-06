@@ -6,6 +6,7 @@
 
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/desktop/window_context.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
 
 namespace nx::vms::client::desktop {
 
@@ -23,6 +24,12 @@ WindowContextAttached::WindowContextAttached(WindowContext* context):
         this, &WindowContextAttached::userIdChanged);
 }
 
+void WindowContextAttached::triggerAction(menu::IDType actionId)
+{
+    if (NX_ASSERT(m_windowContext))
+        m_windowContext->menu()->trigger(actionId);
+}
+
 WindowContextAttached* WindowContextAwareHelper::qmlAttachedProperties(QObject* object)
 {
     return new WindowContextAttached(WindowContext::fromQmlContext(object));
@@ -31,6 +38,9 @@ WindowContextAttached* WindowContextAwareHelper::qmlAttachedProperties(QObject* 
 void WindowContextAwareHelper::registerQmlType()
 {
     qmlRegisterType<WindowContextAwareHelper>("nx.vms.client.desktop", 1, 0, "WindowContextAware");
+
+    qmlRegisterUncreatableMetaObject(menu::staticMetaObject, "nx.vms.client.desktop", 1, 0,
+        "GlobalActions", "GlobalActions is a namespace");
 }
 
 } // namespace nx::vms::client::desktop

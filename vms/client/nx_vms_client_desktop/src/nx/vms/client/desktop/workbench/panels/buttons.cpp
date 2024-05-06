@@ -30,20 +30,13 @@ QString alias(menu::Action* action)
 static const QColor kBasePrimaryColor = "#6F8694"; // ~light16
 static const QColor kBackgroundColor = "#263137"; // dark8
 
-const core::SvgIconColorer::IconSubstitutions kSlideIconSubstitutions = {
-    { QnIcon::Normal, {
-        { kBasePrimaryColor, "light16"},
-        { kBackgroundColor, "dark8"}
-    }},
-    { QnIcon::Selected, { // Pressed
-        { kBasePrimaryColor, "light15"},
-        { kBackgroundColor, "dark7" },
-    }},
-    { QnIcon::Active, { // Hovered
-        { kBasePrimaryColor, "light17"},
-        { kBackgroundColor, "dark9" },
-    }},
-};
+const core::SvgIconColorer::ThemeSubstitutions kSlideIconSubstitutions = {
+    {QnIcon::Normal,
+        {.primary = "light16", .secondary = "dark8"}},
+    {QnIcon::Selected, // Pressed.
+        {.primary = "light15", .secondary = "dark7"}},
+    {QnIcon::Active, //< Hovered.
+        {.primary = "light17", .secondary = "dark9"}}};
 
 } //namespace
 

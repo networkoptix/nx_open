@@ -1,55 +1,62 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 import QtQuick
-import QtQuick.Layouts
 
 import Nx.Controls
+import Nx.Effects
+
 import nx.vms.client.core
 import nx.vms.client.desktop
+
+import "../metrics.js" as Metrics
 
 TileBase
 {
     id: tile
 
-    contentItem: Item
+    contentItem: SimpleColumn
     {
-        implicitWidth: contentLayout.implicitWidth
-        implicitHeight: contentLayout.implicitHeight
+        id: tileContent
+
+        spacing: 8
         clip: true
 
-        ColumnLayout
+        ProgressBar
         {
-            id: contentLayout
+            id: progress
 
-            spacing: 8
-            width: parent.width
+            width: tileContent.width
 
-            ProgressBar
-            {
-                id: progress
+            from: 0
+            to: 1
 
-                Layout.fillWidth: true
-                from: 0
-                to: 1
+            value: (model && model.progressValue) || 0
+            title: (model && model.display) || ""
 
-                value: (model && model.progressValue) || 0
-                title: (model && model.display) || ""
+            font { pixelSize: FontConfig.normal.pixelSize; weight: Font.Medium }
+            percentageFont.pixelSize: FontConfig.small.pixelSize
+        }
 
-                font { pixelSize: FontConfig.normal.pixelSize; weight: Font.Medium }
-                percentageFont.pixelSize: FontConfig.small.pixelSize
-            }
+        Text
+        {
+            id: description
 
-            Text
-            {
-                id: description
+            width: tileContent.width
+            height: Math.min(implicitHeight, Metrics.kMaxDescriptionHeight)
+            visible: !!text
 
-                wrapMode: Text.Wrap
-                visible: text.length
-                color: tile.secondaryForegroundColor
-                font { pixelSize: FontConfig.small.pixelSize; weight: Font.Normal }
+            color: tile.foregroundColor
+            font { pixelSize: FontConfig.small.pixelSize; weight: Font.Normal }
+            textFormat: NxGlobals.mightBeHtml(text) ? Text.RichText : Text.PlainText
+            wrapMode: Text.Wrap
 
-                text: (model && model.description) || ""
-            }
+            text: (model && model.description) || ""
+
+            layer.effect: EdgeOpacityGradient { edges: Qt.BottomEdge }
+            layer.enabled: description.height < description.implicitHeight
+
+            onLinkActivated:
+                tile.linkActivated(link)
         }
     }
 }

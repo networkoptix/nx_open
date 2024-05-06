@@ -24,11 +24,14 @@ public:
         const auto updateModelOperation =
             [this, builder]
             {
-                NX_VERBOSE(this, "Rebuilding analytics event tree begin");
-                NX_TRACE_SCOPE("RebuildAnalyticsEventTree");
-                const ScopedReset reset(this->q);
-                rootNode = builder->eventTypesTree();
-                NX_VERBOSE(this, "Rebuilding analytics event tree completed");
+                {
+                    NX_VERBOSE(this, "Rebuilding analytics event tree begin");
+                    NX_TRACE_SCOPE("RebuildAnalyticsEventTree");
+                    const ScopedReset reset(this->q);
+                    rootNode = builder->eventTypesTree();
+                    NX_VERBOSE(this, "Rebuilding analytics event tree completed");
+                }
+                emit this->q->changed();
             };
 
         connect(

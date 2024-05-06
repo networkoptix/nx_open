@@ -18,6 +18,9 @@ public:
     explicit NotificationTabModel(WindowContext* context, QObject* parent = nullptr);
     virtual ~NotificationTabModel() override;
 
+    /** Item count excluding separators. */
+    int effectiveCount() const;
+
 private:
     struct Private;
     nx::utils::ImplPtr<Private> d;

@@ -21,6 +21,10 @@ Control
     property var layout: null
     property var zoomedItem: null
 
+    readonly property int itemCount: interactiveGrid.content.length - 1 //< subtract Repeater.
+    readonly property alias locked: layoutModel.locked
+    readonly property alias isShowreelReview: layoutModel.isShowreelReview
+
     background: Rectangle { color: ColorTheme.window }
 
     LayoutModel

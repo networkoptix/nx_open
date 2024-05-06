@@ -5,6 +5,8 @@
 #include <QtCore/QMetaType>
 #include <QtQmlIntegration/QtQmlIntegration>
 
+#include <nx/vms/client/desktop/menu/actions.h>
+
 namespace nx::vms::client::desktop {
 
 class WindowContext;
@@ -16,6 +18,8 @@ class WindowContextAttached: public QObject
 
 public:
     WindowContextAttached(WindowContext* context);
+
+    Q_INVOKABLE void triggerAction(menu::IDType actionId);
 
 signals:
     void beforeSystemChanged();

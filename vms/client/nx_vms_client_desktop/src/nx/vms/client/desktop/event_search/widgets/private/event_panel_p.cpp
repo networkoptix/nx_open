@@ -25,6 +25,7 @@
 #include <nx/vms/client/desktop/event_search/synchronizers/analytics_search_synchronizer.h>
 #include <nx/vms/client/desktop/event_search/synchronizers/bookmark_search_synchronizer.h>
 #include <nx/vms/client/desktop/event_search/synchronizers/motion_search_synchronizer.h>
+#include <nx/vms/client/desktop/event_search/utils/call_alarm_manager.h>
 #include <nx/vms/client/desktop/event_search/widgets/analytics_search_widget.h>
 #include <nx/vms/client/desktop/event_search/widgets/bookmark_search_widget.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_ribbon.h>
@@ -47,7 +48,6 @@
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/utils/widget_utils.h>
 #include <nx/vms/client/desktop/window_context.h>
-#include <nx/vms/client/desktop/workbench/handlers/notification_action_handler.h>
 #include <nx/vms/client/desktop/workbench/widgets/thumbnail_tooltip.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/animation/variant_animator.h>
@@ -59,8 +59,6 @@
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_navigator.h>
 #include <utils/common/event_processors.h>
-
-#include "notification_bell_manager_p.h"
 
 using namespace std::chrono;
 
@@ -182,6 +180,7 @@ EventPanel::Private::Private(EventPanel* q):
     QObject(q),
     WindowContextAware(q),
     q(q),
+    m_callAlarmManager(new CallAlarmManager(windowContext())),
     m_tooltip(new ThumbnailTooltip(q->windowContext()))
 {
     auto compactTabBar = new CompactTabBar();
@@ -267,9 +266,6 @@ EventPanel::Private::Private(EventPanel* q):
 
             const auto currentTab = m_tabs->currentWidget();
 
-            m_notificationBellManager->setAlarmStateActive(
-                m_tabIds[currentTab] != Tab::notifications);
-
             if (!isSpecialTab(m_lastTab) || !isSpecialTab(currentTab))
                 m_previousTab = m_notificationsTab;
 
@@ -277,6 +273,8 @@ EventPanel::Private::Private(EventPanel* q):
 
             for (const auto& data: m_synchronizers)
                 data.synchronizer->setActive(m_tabs->currentWidget() == data.tab);
+
+            m_callAlarmManager->setActive(currentTab != m_notificationsTab);
 
             NX_VERBOSE(this->q, "Tab changed; previous: %1, current: %2",
                 m_previousTab, m_lastTab);
@@ -375,13 +373,12 @@ EventPanel::Private::Private(EventPanel* q):
     appContext()->clientStateHandler()->registerDelegate(
         kEventPanelStorageKey, std::make_unique<StateDelegate>(this));
 
-    const auto handler = windowContext()->notificationActionHandler();
-
-    connect(handler, &NotificationActionHandler::systemHealthEventAdded,
-        m_notificationBellManager, &NotificationBellManager::handleNotificationAdded);
-
-    connect(handler, &NotificationActionHandler::systemHealthEventRemoved,
-        m_notificationBellManager, &NotificationBellManager::handleNotificationRemoved);
+    connect(m_callAlarmManager.get(), &CallAlarmManager::ringingChanged, this,
+        [this]()
+        {
+            if (m_notificationBellWidget)
+                m_notificationBellWidget->setAlarmState(m_callAlarmManager->isRinging());
+        });
 }
 
 EventPanel::Private::~Private()
@@ -453,10 +450,8 @@ void EventPanel::Private::rebuildTabs()
                     // Add tab.
                     if (currentIndex == kNotificationTabIndex)
                     {
-                        NX_ASSERT(!m_notificationBellWidget && !m_notificationBellManager);
+                        NX_ASSERT(!m_notificationBellWidget);
                         m_notificationBellWidget = new NotificationBellWidget(q);
-                        m_notificationBellManager =
-                            new NotificationBellManager(m_notificationBellWidget, q);
 
                         m_tabs->insertIconWidgetTab(
                             currentIndex,
@@ -534,7 +529,7 @@ void EventPanel::Private::updateUnreadCounter(int count, QnNotificationLevel::Va
     if (count == 0)
         return;
 
-    const auto text = (count > 99) ? lit("99+") : QString::number(count);
+    const auto text = (count > 99) ? QString("99+") : QString::number(count);
     const auto color = QnNotificationLevel::notificationTextColor(importance);
 
     m_counterLabel->setText(text);

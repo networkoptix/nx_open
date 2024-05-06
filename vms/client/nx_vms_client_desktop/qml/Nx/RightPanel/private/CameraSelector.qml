@@ -1,10 +1,10 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.14
+import QtQuick
 
-import Nx.Controls 1.0
+import Nx.Controls
 
-import nx.vms.client.desktop 1.0
+import nx.vms.client.desktop
 
 SelectableTextButton
 {
@@ -99,7 +99,7 @@ SelectableTextButton
 
     menu: limitToCurrentCamera ? null : menuControl
 
-    Menu
+    CompactMenu
     {
         id: menuControl
 
@@ -107,9 +107,9 @@ SelectableTextButton
 
         MenuAction { data: RightPanel.CameraSelection.layout }
         MenuAction { data: RightPanel.CameraSelection.current }
-        MenuSeparator {}
+        CompactMenuSeparator {}
         MenuAction { data: RightPanel.CameraSelection.custom }
-        MenuSeparator {}
+        CompactMenuSeparator {}
         MenuAction { id: defaultAction; data: RightPanel.CameraSelection.all }
 
         onTriggered: (action) =>

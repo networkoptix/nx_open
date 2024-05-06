@@ -105,7 +105,7 @@ Column
             {
                 id: clearButton
 
-                icon.source: "image://skin/text_buttons/cross_close_20.svg"
+                icon.source: "image://skin/20x20/Outline/cross_close.svg"
                 color: hovered ? ColorTheme.colors.light4 : ColorTheme.colors.light16
                 visible: !!panel.value
 

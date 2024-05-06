@@ -356,11 +356,11 @@ Item
 
                 case StatusOverlay.AccessDenied:
                     return makeErrorOverlayData(qsTr("No access"),
-                        "image://skin/item_placeholders/no_access.svg")
+                        "image://skin/item_placeholders/no_access.svg?primary=red_core")
 
                 case StatusOverlay.OfflineOverlay:
                     return makeErrorOverlayData(qsTr("No signal"),
-                        "image://skin/item_placeholders/offline.svg")
+                        "image://skin/item_placeholders/offline.svg?primary=red_core")
 
                 case StatusOverlay.AnalogWithoutLicenseOverlay:
                 case StatusOverlay.VideowallWithoutLicenseOverlay:
@@ -372,7 +372,7 @@ Item
 
                 case StatusOverlay.ServerUnauthorizedOverlay:
                     return makeErrorOverlayData(qsTr("No access"),
-                        "image://skin/item_placeholders/no_access.svg")
+                        "image://skin/item_placeholders/no_access.svg?primary=red_core")
 
                 case StatusOverlay.IoModuleDisabledOverlay:
                     return makeErrorOverlayData(qsTr("Device disabled"),

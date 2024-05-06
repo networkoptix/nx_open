@@ -120,4 +120,12 @@ NotificationTabModel::~NotificationTabModel()
 {
 }
 
+int NotificationTabModel::effectiveCount() const
+{
+    return d->systemHealthModel->rowCount()
+        + d->localNotificationsModel->rowCount()
+        + d->callNotificationsModel->rowCount()
+        + d->notificationsModel->rowCount();
+}
+
 } // namespace nx::vms::client::desktop

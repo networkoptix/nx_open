@@ -3,6 +3,7 @@
 #pragma once
 
 #include <QtCore/QMetaType>
+#include <QtCore/QVector>
 
 #include <nx/vms/api/types/event_rule_types.h>
 
@@ -11,18 +12,6 @@ namespace RightPanel {
 
 Q_NAMESPACE
 Q_CLASSINFO("RegisterEnumClassesUnscoped", "false")
-
-enum class Tab
-{
-    invalid = -1,
-    resources,
-    motion,
-    bookmarks,
-    events,
-    analytics,
-    settings
-};
-Q_ENUM_NS(Tab)
 
 enum class FetchDirection
 {
@@ -75,29 +64,38 @@ enum class PreviewState
 };
 Q_ENUM_NS(PreviewState)
 
-struct EventCategory
+struct VmsEvent
+{
+    nx::vms::api::EventType id;
+    QString name;
+
+    Q_GADGET
+    Q_PROPERTY(nx::vms::api::EventType id MEMBER id CONSTANT)
+    Q_PROPERTY(QString name MEMBER name CONSTANT)
+};
+
+struct VmsEventGroup: public VmsEvent
 {
     enum Type
     {
-        Any = nx::vms::api::EventType::undefinedEvent,
-        Analytics = nx::vms::api::EventType::analyticsSdkEvent,
-        Generic = nx::vms::api::EventType::userDefinedEvent,
-        Input = nx::vms::api::EventType::cameraInputEvent,
-        SoftTrigger = nx::vms::api::EventType::softwareTriggerEvent,
-        StreamIssue = nx::vms::api::EventType::networkIssueEvent,
-        DeviceDisconnect = nx::vms::api::EventType::cameraDisconnectEvent,
-        DeviceIpConflict = nx::vms::api::EventType::cameraIpConflictEvent
+        Common,
+        Server,
+        DeviceIssues,
+        Analytics
     };
     Q_ENUM(Type)
 
-    QString name;
-    QString icon;
     Type type;
+    QString any;
+    QVector<VmsEvent> events;
+
+    VmsEventGroup() = default;
+    VmsEventGroup(Type type, nx::vms::api::EventType id, const QString& name, const QString& any);
 
     Q_GADGET
-    Q_PROPERTY(QString name MEMBER name CONSTANT)
-    Q_PROPERTY(QString icon MEMBER icon CONSTANT)
     Q_PROPERTY(Type type MEMBER type CONSTANT)
+    Q_PROPERTY(QString any MEMBER any CONSTANT)
+    Q_PROPERTY(QVector<VmsEvent> events MEMBER events CONSTANT)
 };
 
 void registerQmlType();

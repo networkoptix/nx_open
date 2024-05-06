@@ -132,8 +132,8 @@ public:
 ClientUpdateManager::Private::Private(ClientUpdateManager* q):
     QnWorkbenchContextAware(q),
     q(q),
-    restartAction(new QAction(tr("Restart Client"))),
-    settingsAction(new QAction(tr("Updates Settings"))),
+    restartAction(new CommandAction(tr("Restart Client"))),
+    settingsAction(new CommandAction(tr("Updates Settings"))),
     clientUpdateTool(new ClientUpdateTool(systemContext(), this)),
     notificationsManager(windowContext()->localNotificationsManager()),
     checkForUpdateTimer(new QTimer(this)),
@@ -165,7 +165,7 @@ ClientUpdateManager::Private::Private(ClientUpdateManager* q):
         &Private::handleUpdateStateChanged);
 
     connect(restartAction.data(),
-        &QAction::triggered,
+        &CommandAction::triggered,
         this,
         [this]()
         {
@@ -176,7 +176,7 @@ ClientUpdateManager::Private::Private(ClientUpdateManager* q):
         });
 
     connect(settingsAction.data(),
-        &QAction::triggered,
+        &CommandAction::triggered,
         this,
         [this]()
         {

@@ -6,7 +6,7 @@ import QtQuick.Layouts
 import nx.vms.client.core
 import nx.vms.client.desktop
 
-ColumnLayout
+Item
 {
     id: resourceList
 
@@ -14,37 +14,57 @@ ColumnLayout
     property int maxDisplayedCount: 3
     readonly property int count: resourceNames ? resourceNames.length : 0
     readonly property int displayedCount: Math.min(count, maxDisplayedCount)
+    readonly property bool empty: count === 0
 
     property color color: "grey"
     property color remainderColor: "grey"
 
-    spacing: 0
+    property real leftPadding: 0
+    property real rightPadding: 0
+    property real topPadding: 0
+    property real bottomPadding: 0
 
-    Repeater
+    implicitWidth: layout.implicitWidth + leftPadding + rightPadding
+    implicitHeight: layout.implicitHeight + topPadding + bottomPadding
+
+    ColumnLayout
     {
-        model: displayedCount
+        id: layout
 
-        delegate: Text
+        spacing: 0
+
+        anchors.fill: resourceList
+        anchors.leftMargin: resourceList.leftPadding
+        anchors.rightMargin: resourceList.rightPadding
+        anchors.topMargin: resourceList.topPadding
+        anchors.bottomMargin: resourceList.bottomPadding
+
+        Repeater
         {
-            id: resourceName
+            model: displayedCount
 
-            Layout.fillWidth: true
-            color: resourceList.color
-            elide: Text.ElideRight
-            text: resourceNames[index]
-            font { pixelSize: FontConfig.small.pixelSize; weight: Font.Medium }
+            delegate: Text
+            {
+                id: resourceName
+
+                Layout.fillWidth: true
+                color: resourceList.color
+                elide: Text.ElideRight
+                text: resourceNames[index]
+                font { pixelSize: FontConfig.small.pixelSize; weight: Font.Medium }
+            }
         }
-    }
 
-    Text
-    {
-        id: andMore
-        readonly property int remainder: count - displayedCount
+        Text
+        {
+            id: andMore
+            readonly property int remainder: count - displayedCount
 
-        color: resourceList.remainderColor
-        text: qsTr("...and %n more", "", remainder)
-        visible: remainder > 0
-        topPadding: 4
-        font { pixelSize: FontConfig.small.pixelSize; weight: Font.Normal }
+            color: resourceList.remainderColor
+            text: qsTr("...and %n more", "", remainder)
+            visible: remainder > 0
+            topPadding: 4
+            font { pixelSize: FontConfig.small.pixelSize; weight: Font.Normal }
+        }
     }
 }

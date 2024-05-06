@@ -183,13 +183,11 @@ Item
 
             width: 6 + icon.width + 6
             height: 32
-            radius: 2
 
-            icon.color: "transparent"
+            backgroundColor: down
+                ? ColorTheme.colors.dark5
+                : (hovered ? ColorTheme.colors.dark9 : ColorTheme.colors.dark8)
 
-            normalBackground: ColorTheme.colors.dark8
-            hoveredBackground: ColorTheme.colors.dark9
-            pressedBackground: ColorTheme.colors.dark5
             opacity: enabled ? 1.0 : 0.3
 
             ToolTip

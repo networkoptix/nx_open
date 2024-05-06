@@ -15,6 +15,7 @@ Control
     property TileController controller: null
 
     readonly property bool selected: controller && controller.selectedRow === index
+
     onSelectedChanged:
     {
         if (selected)

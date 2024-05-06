@@ -6,44 +6,50 @@ import QtQuick.Controls
 import Nx
 import Nx.Core
 
+import nx.vms.client.desktop
+
 AbstractButton
 {
     id: button
 
-    property alias radius: rectangle.radius
+    property color primaryColor: icon.color
+    property color secondaryColor
+    property color tertiaryColor
 
-    property color normalBackground: "transparent"
-    property color normalForeground: ColorTheme.windowText
-    property color hoveredBackground: ColorTheme.transparent(ColorTheme.windowText, 0.1)
-    property color hoveredForeground: normalForeground
-    property color pressedBackground: ColorTheme.transparent(ColorTheme.colors.dark1, 0.1)
-    property color pressedForeground: normalForeground
+    property color backgroundColor: down || checked
+        ? ColorTheme.transparent(ColorTheme.colors.dark1, 0.1)
+        : (hovered ? ColorTheme.transparent(ColorTheme.windowText, 0.1) : "transparent")
+
+    property real radius: 2
 
     // The most common defaults.
     icon.width: 20
     icon.height: 20
 
-    icon.color: down || checked
-        ? pressedForeground
-        : (hovered ? hoveredForeground : normalForeground)
+    icon.color: ColorTheme.windowText
 
     focusPolicy: Qt.TabFocus
+    hoverEnabled: true
 
     background: Rectangle
     {
-        id: rectangle
-        color: down || checked
-            ? pressedBackground
-            : (hovered ? hoveredBackground : normalBackground)
+        radius: button.radius
+        color: button.backgroundColor
     }
 
     contentItem: ColoredImage
     {
-        id: image
-
         name: button.icon.name
-        primaryColor: button.icon.color
+        primaryColor: button.primaryColor
+        secondaryColor: button.secondaryColor
+        tertiaryColor: button.tertiaryColor
         sourcePath: button.icon.source
         sourceSize: Qt.size(button.icon.width, button.icon.height)
+    }
+
+    FocusFrame
+    {
+        anchors.fill: button
+        visible: button.visualFocus
     }
 }

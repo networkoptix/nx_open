@@ -14,6 +14,7 @@ class AnalyticsEventsSearchTreeBuilder;
 
 class AnalyticsEventModel: public ScopedModelOperations<QAbstractItemModel>
 {
+    Q_OBJECT
     using base_type = ScopedModelOperations<QAbstractItemModel>;
 
 public:
@@ -34,6 +35,9 @@ public:
     virtual int columnCount(const QModelIndex& parent) const override;
     virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
     virtual QHash<int, QByteArray> roleNames() const override;
+
+signals:
+    void changed();
 
 private:
     class Private;

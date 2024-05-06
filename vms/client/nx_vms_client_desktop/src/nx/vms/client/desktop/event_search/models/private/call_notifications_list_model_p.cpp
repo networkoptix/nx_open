@@ -170,7 +170,7 @@ void CallNotificationsListModel::Private::addNotification(
                         connection->executeEventAction(actionData, callback, thread());
                 };
 
-            connect(eventData.extraAction.data(), &QAction::triggered,
+            connect(eventData.extraAction.data(), &CommandAction::triggered,
                 [this, openDoorActionHandler]() { executeLater(openDoorActionHandler, this); });
 
             m_soundController.play("doorbell.mp3");

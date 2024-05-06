@@ -12,6 +12,7 @@
 #include <nx/vms/client/desktop/analytics/analytics_attribute_helper.h>
 #include <nx/vms/client/desktop/event_search/right_panel_globals.h>
 
+Q_MOC_INCLUDE("nx/vms/client/desktop/event_rules/models/detectable_object_type_model.h")
 Q_MOC_INCLUDE("nx/vms/client/desktop/event_search/utils/analytics_search_setup.h")
 Q_MOC_INCLUDE("nx/vms/client/desktop/event_search/utils/common_object_search_setup.h")
 Q_MOC_INCLUDE("nx/vms/client/desktop/window_context.h")
@@ -22,6 +23,7 @@ namespace nx::vms::client::desktop {
 
 class AnalyticsSearchSetup;
 class CommonObjectSearchSetup;
+class DetectableObjectTypeModel;
 class WindowContext;
 
 class RightPanelModelsAdapter: public QIdentityProxyModel
@@ -44,9 +46,17 @@ class RightPanelModelsAdapter: public QIdentityProxyModel
     Q_PROPERTY(nx::vms::client::desktop::AnalyticsSearchSetup* analyticsSetup READ analyticsSetup
         NOTIFY analyticsSetupChanged)
 
+    Q_PROPERTY(nx::vms::client::desktop::DetectableObjectTypeModel*
+        objectTypeModel READ objectTypeModel NOTIFY analyticsSetupChanged)
+
     Q_PROPERTY(int itemCount READ itemCount NOTIFY itemCountChanged)
     Q_PROPERTY(QString itemCountText READ itemCountText NOTIFY itemCountChanged)
     Q_PROPERTY(bool isConstrained READ isConstrained NOTIFY isConstrainedChanged)
+
+    Q_PROPERTY(bool unreadTracking READ unreadTrackingEnabled WRITE setUnreadTrackingEnabled
+        NOTIFY unreadTrackingChanged)
+    Q_PROPERTY(int unreadCount READ unreadCount NOTIFY unreadCountChanged)
+    Q_PROPERTY(QColor unreadColor READ unreadColor NOTIFY unreadCountChanged)
 
     Q_PROPERTY(bool placeholderRequired READ isPlaceholderRequired
         NOTIFY placeholderRequiredChanged)
@@ -61,9 +71,8 @@ class RightPanelModelsAdapter: public QIdentityProxyModel
      */
     Q_PROPERTY(bool active READ active WRITE setActive NOTIFY activeChanged)
 
-    Q_PROPERTY(QVector<nx::vms::client::desktop::RightPanel::EventCategory> eventCategories
-        READ eventCategories CONSTANT)
-
+    Q_PROPERTY(QVector<RightPanel::VmsEventGroup> eventGroups READ eventGroups
+        NOTIFY eventGroupsChanged)
     Q_PROPERTY(QAbstractItemModel* analyticsEvents READ analyticsEvents
         NOTIFY analyticsEventsChanged)
 
@@ -99,10 +108,17 @@ public:
     CommonObjectSearchSetup* commonSetup() const;
     AnalyticsSearchSetup* analyticsSetup() const;
 
+    DetectableObjectTypeModel* objectTypeModel() const;
+
     int itemCount() const;
     QString itemCountText() const;
     bool isConstrained() const;
     bool isPlaceholderRequired() const;
+
+    bool unreadTrackingEnabled() const;
+    void setUnreadTrackingEnabled(bool value);
+    int unreadCount() const;
+    QColor unreadColor() const;
 
     bool previewsEnabled() const;
     void setPreviewsEnabled(bool value);
@@ -135,7 +151,7 @@ public:
 
     Q_INVOKABLE void showOnLayout(int row);
 
-    QVector<RightPanel::EventCategory> eventCategories() const;
+    QVector<RightPanel::VmsEventGroup> eventGroups() const;
     QAbstractItemModel* analyticsEvents() const;
 
     void setHighlightedTimestamp(std::chrono::microseconds value);
@@ -161,7 +177,10 @@ signals:
     void placeholderRequiredChanged();
     void previewsEnabledChanged();
     void allowanceChanged();
+    void eventGroupsChanged();
     void analyticsEventsChanged();
+    void unreadTrackingChanged();
+    void unreadCountChanged();
 
     void clicked(const QModelIndex& index, Qt::MouseButton button, Qt::KeyboardModifiers modifiers);
     void doubleClicked(const QModelIndex& index);

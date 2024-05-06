@@ -7,19 +7,34 @@
 namespace nx::vms::client::desktop {
 namespace RightPanel {
 
+VmsEventGroup::VmsEventGroup(
+    Type type,
+    nx::vms::api::EventType id,
+    const QString& name,
+    const QString& any)
+    :
+    VmsEvent{.id = id, .name = name},
+    type(type),
+    any(any)
+{
+}
+
 void registerQmlType()
 {
     qmlRegisterUncreatableMetaObject(staticMetaObject, "nx.vms.client.desktop", 1, 0,
         "RightPanel", "RightPanel is a namespace");
 
-    qmlRegisterUncreatableType<EventCategory>("nx.vms.client.desktop", 1, 0,
-        "EventCategory", "Cannot create EventCategory");
+    qmlRegisterUncreatableType<VmsEvent>("nx.vms.client.desktop", 1, 0,
+        "VmsEvent", "Cannot create VmsEvent");
 
-    qRegisterMetaType<Tab>();
+    qmlRegisterUncreatableType<VmsEventGroup>("nx.vms.client.desktop", 1, 0,
+        "VmsEventGroup", "Cannot create VmsEventGroup");
+
     qRegisterMetaType<FetchDirection>();
     qRegisterMetaType<FetchResult>();
     qRegisterMetaType<PreviewState>();
-    qRegisterMetaType<EventCategory>();
+    qRegisterMetaType<VmsEvent>();
+    qRegisterMetaType<VmsEventGroup>();
     qRegisterMetaType<nx::vms::api::EventType>();
 }
 

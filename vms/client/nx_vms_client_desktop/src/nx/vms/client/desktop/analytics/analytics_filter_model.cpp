@@ -168,11 +168,16 @@ void AnalyticsFilterModel::setObjectTypes(const std::vector<taxonomy::ObjectType
 void AnalyticsFilterModel::setEngines(
     const std::vector<nx::analytics::taxonomy::AbstractEngine*>& engines)
 {
-    if (m_engines != engines)
-    {
-        m_engines = engines;
-        emit enginesChanged();
-    }
+    if (m_engines == engines)
+        return;
+
+    m_engines = engines;
+    m_enginesById.clear();
+
+    for (const auto engine: m_engines)
+        m_enginesById.insert(nx::Uuid::fromStringSafe(engine->id()), engine);
+
+    emit enginesChanged();
 }
 
 void AnalyticsFilterModel::update(
@@ -246,6 +251,12 @@ ObjectType* AnalyticsFilterModel::objectTypeById(const QString& id) const
 ObjectType* AnalyticsFilterModel::findFilterObjectType(const QStringList& analyticsObjectTypeIds)
 {
     return objectTypeById(ObjectType::makeId(analyticsObjectTypeIds));
+}
+
+nx::analytics::taxonomy::AbstractEngine* AnalyticsFilterModel::findEngine(
+    const nx::Uuid& engineId) const
+{
+    return m_enginesById.value(engineId);
 }
 
 QStringList AnalyticsFilterModel::getAnalyticsObjectTypeIds(ObjectType* filterObjectType)

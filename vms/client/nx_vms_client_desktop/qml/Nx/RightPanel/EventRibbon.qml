@@ -42,13 +42,21 @@ ListView
     {
         id: addTransition
 
-        NumberAnimation
+        SequentialAnimation
         {
-            property: "opacity"
-            from: 0
-            to: 1
-            duration: 320
-            easing.type: Easing.OutQuad
+            NumberAnimation
+            {
+                property: "opacity"
+                from: 0
+                to: 1
+                duration: 320
+                easing.type: Easing.OutQuad
+            }
+
+            ScriptAction
+            {
+                script: forceLayoutTimer.restart()
+            }
         }
     }
 
@@ -70,6 +78,11 @@ ListView
                 duration: 320
                 easing.type: Easing.OutQuad
             }
+
+            ScriptAction
+            {
+                script: forceLayoutTimer.restart()
+            }
         }
     }
 
@@ -77,19 +90,30 @@ ListView
     {
         id: displayTransition
 
-        NumberAnimation
+        SequentialAnimation
         {
-            property: "y"
-            duration: 320
-            easing.type: Easing.OutCubic
-        }
+            ParallelAnimation
+            {
+                NumberAnimation
+                {
+                    property: "y"
+                    duration: 320
+                    easing.type: Easing.OutCubic
+                }
 
-        // Finish possibly unfinished add animation.
-        NumberAnimation
-        {
-            property: "opacity"
-            duration: 320
-            to: 1.0
+                // Finish possibly unfinished add animation.
+                NumberAnimation
+                {
+                    property: "opacity"
+                    duration: 320
+                    to: 1.0
+                }
+            }
+
+            ScriptAction
+            {
+                script: forceLayoutTimer.restart()
+            }
         }
     }
 
@@ -107,6 +131,16 @@ ListView
 
         view: view
         loggingCategory: loggingCategory
+    }
+
+    Timer
+    {
+        id: forceLayoutTimer
+
+        interval: 10
+
+        onTriggered:
+            NxGlobals.forceLayout(view)
     }
 
     header: Component { Column { width: parent.width }}

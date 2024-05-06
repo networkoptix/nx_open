@@ -13,6 +13,7 @@ Item
     property string sourcePath
 
     // Predefined color channel overrides. Non-SVG images support only `primaryColor`.
+    // Allowed are string or color values, or undefined.
     property var primaryColor: undefined
     property var secondaryColor: undefined
     property var tertiaryColor: undefined
@@ -48,7 +49,8 @@ Item
                 return ""
 
             const url = NxGlobals.url(item.sourcePath)
-            console.assert(url.isRelative() || item.sourcePath.startsWith("image://skin/"))
+            console.assert(url.isRelative() || item.sourcePath.startsWith("image://skin/"),
+                `Invalid source path: \"${item.sourcePath}\"`)
 
             let customization = url.queryMap()
 
@@ -77,10 +79,12 @@ Item
                 path = "/" + path
 
             const schemeAndPath = "image://skin" + path
+            const queryStr = query.length ? `?${query.join("&")}` : ""
 
-            return query.length
-                ? `${schemeAndPath}?${query.join("&")}`
-                : schemeAndPath
+            // Name is passed as fragment for debugging purposes.
+            const fragmentStr = item.name ? `#${item.name}` : ""
+
+            return schemeAndPath + queryStr + fragmentStr
         }
     }
 }

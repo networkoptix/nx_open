@@ -197,10 +197,8 @@ Button
                     anchors.verticalCenter: parent.verticalCenter
 
                     focusPolicy: Qt.NoFocus
-                    hoverEnabled: true
-                    radius: 2
 
-                    icon.source: "image://skin/text_buttons/cross_close_20.svg"
+                    icon.source: "image://skin/20x20/Outline/cross_close.svg"
                     icon.color: text.color
 
                     visible: button.state != SelectableTextButton.State.Deactivated

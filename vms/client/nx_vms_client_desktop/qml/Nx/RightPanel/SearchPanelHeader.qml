@@ -2,6 +2,7 @@
 
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Layouts
 
 import Nx
 import Nx.Core
@@ -19,10 +20,18 @@ Column
     property RightPanelModel model: null
     property alias limitToCurrentCamera: cameraSelector.limitToCurrentCamera
 
+    property int defaultCameraSelection: limitToCurrentCamera
+        ? RightPanel.CameraSelection.current
+        : RightPanel.CameraSelection.layout
+
     property alias filtersColumn: filtersColumn
 
     property alias searchText: searchField.text
     property int searchDelay: 250
+
+    topPadding: 8
+    bottomPadding: 8
+    spacing: 8
 
     signal filtersReset()
 
@@ -64,14 +73,19 @@ Column
         }
     }
 
+    // Do not remove this Control wrapper.
+    // It separates inner layout from possible outer layouts.
+    // It adds paddings, making sizing in external children added to `filterColumn` easier.
     Control
     {
         id: filters
 
-        padding: 8
+        leftPadding: 8
+        rightPadding: 8
         width: header.width
 
-        contentItem: Column
+        // Do not change this to Column, it is bugged and causes binding loops.
+        contentItem: ColumnLayout
         {
             id: filtersColumn
             spacing: 2
@@ -80,14 +94,14 @@ Column
             {
                 id: timeSelector
                 setup: (header.model && header.model.commonSetup) || null
-                width: Math.min(implicitWidth, filtersColumn.width)
+                Layout.maximumWidth: filtersColumn.width
             }
 
             CameraSelector
             {
                 id: cameraSelector
                 setup: (header.model && header.model.commonSetup) || null
-                width: Math.min(implicitWidth, filtersColumn.width)
+                Layout.maximumWidth: filtersColumn.width
             }
         }
     }
@@ -131,14 +145,20 @@ Column
 
             function onIsOnlineChanged()
             {
-                if (model.isOnline)
-                    return
-
-                timeSelector.deactivate()
-                cameraSelector.deactivate()
-                searchField.clear()
-                filtersReset()
+                header.filtersReset()
             }
         }
+    }
+
+    Component.onCompleted:
+        filtersReset()
+
+    onFiltersReset:
+    {
+        if (cameraSelector.setup)
+            cameraSelector.setup.cameraSelection = header.defaultCameraSelection
+
+        timeSelector.deactivate()
+        searchField.clear()
     }
 }

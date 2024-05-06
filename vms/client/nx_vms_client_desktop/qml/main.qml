@@ -131,8 +131,8 @@ Control
         {
             id: rightPanel
 
-            readonly property real narrowWidth: 280
-            readonly property real wideWidth: 430
+            readonly property real narrowWidth: 283
+            readonly property real wideWidth: 433
 
             edge: Qt.RightEdge
             openCloseDuration: 300
@@ -144,6 +144,7 @@ Control
             contentItem: RightPanel
             {
                 id: rightPanelTabs
+                scene: layoutViewer
             }
         }
 

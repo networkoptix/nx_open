@@ -31,8 +31,10 @@ class NX_VMS_CLIENT_DESKTOP_API LinearizationListModel:
     Q_PROPERTY(QAbstractItemModel* sourceModel READ sourceModel WRITE setSourceModel
         NOTIFY sourceModelChanged)
     Q_PROPERTY(QModelIndex sourceRoot READ sourceRoot WRITE setSourceRoot)
+    Q_PROPERTY(bool autoExpandAll READ autoExpandAll WRITE setAutoExpandAll
+        NOTIFY autoExpandChanged)
     Q_PROPERTY(QString autoExpandRoleName READ autoExpandRoleName WRITE setAutoExpandRoleName
-        NOTIFY autoExpandRoleNameChanged)
+        NOTIFY autoExpandChanged)
 
     using base_type = ScopedModelOperations<AbstractMappingModel<QAbstractListModel>>;
 
@@ -46,6 +48,8 @@ public:
     QModelIndex sourceRoot() const;
     void setSourceRoot(const QModelIndex& sourceIndex);
 
+    bool autoExpandAll() const;
+    void setAutoExpandAll(bool value);
     QString autoExpandRoleName() const;
     void setAutoExpandRoleName(const QString& value);
 
@@ -85,7 +89,7 @@ public:
 
 signals:
     void sourceModelChanged(QPrivateSignal);
-    void autoExpandRoleNameChanged(QPrivateSignal);
+    void autoExpandChanged(QPrivateSignal);
 
 private:
     class Private;

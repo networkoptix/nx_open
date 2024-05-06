@@ -8,6 +8,7 @@
 #include <QtGui/QClipboard>
 #include <QtQuick/private/qquickflickable_p.h>
 #include <QtQuick/private/qquickitem_p.h>
+#include <QtQuick/private/qquickitemview_p_p.h>
 
 #include <nx/build_info.h>
 #include <nx/utils/qt_helpers.h>
@@ -390,6 +391,11 @@ QString NxGlobalsObject::shortcutText(const QVariant& var) const
         : QKeySequence::fromString(var.toString());
 
     return sequence.toString(QKeySequence::NativeText);
+}
+
+void NxGlobalsObject::forceLayout(QQuickItemView* view) const
+{
+    QQuickItemViewPrivate::get(view)->forceLayoutPolish();
 }
 
 } // namespace nx::vms::client::core

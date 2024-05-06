@@ -12,6 +12,8 @@ import Nx.RightPanel
 import nx.vms.client.core
 import nx.vms.client.desktop
 
+import "private"
+
 Item
 {
     id: searchPanel
@@ -33,9 +35,9 @@ Item
     readonly property alias model: eventModel
     readonly property alias filtersColumn: header.filtersColumn
 
-    property int defaultCameraSelection: limitToCurrentCamera
-        ? RightPanel.CameraSelection.current
-        : RightPanel.CameraSelection.all
+    property alias defaultCameraSelection: header.defaultCameraSelection
+
+    signal filtersReset()
 
     EventRibbon
     {
@@ -49,6 +51,9 @@ Item
         width: searchPanel.width
         height: searchPanel.height - y
 
+        readonly property real headerWidth: searchPanel.width - ScrollBar.vertical.width
+        readonly property real headerHeight: headerItem ? headerItem.height : 0
+
         model: RightPanelModel
         {
             id: eventModel
@@ -56,19 +61,13 @@ Item
             previewsEnabled: searchPanel.showThumbnails
         }
 
-        Binding
-        {
-            target: eventModel.commonSetup
-            property: "cameraSelection"
-            value: searchPanel.defaultCameraSelection
-        }
-
         CounterBlock
         {
             id: counterBlock
 
-            width: searchPanel.width - ribbon.ScrollBar.vertical.width
-            y: Math.max(0, ribbon.originY - ribbon.contentY + ribbon.headerItem.height - height)
+            width: ribbon.headerWidth
+            y: Math.max(0, ribbon.originY - ribbon.contentY + ribbon.headerHeight - height)
+            leftInset: 1
 
             displayedItemsText: eventModel.itemCountText
         }
@@ -80,7 +79,7 @@ Item
             // Re-parent into ribbon viewport.
             parent: ribbon.headerItem
 
-            width: searchPanel.width
+            width: ribbon.headerWidth
             bottomPadding: counterBlock.height
 
             SearchPanelHeader
@@ -88,8 +87,11 @@ Item
                 id: header
 
                 model: eventModel
-                width: searchPanel.width
+                width: ribbon.headerWidth
                 limitToCurrentCamera: searchPanel.limitToCurrentCamera
+
+                onFiltersReset:
+                    searchPanel.filtersReset()
             }
 
             Rectangle
@@ -98,7 +100,7 @@ Item
 
                 color: ColorTheme.colors.dark6
                 height: 1
-                width: searchPanel.width
+                width: ribbon.headerWidth
             }
         }
     }

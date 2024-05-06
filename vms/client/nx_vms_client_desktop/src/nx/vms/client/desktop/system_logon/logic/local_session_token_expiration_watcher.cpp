@@ -58,7 +58,7 @@ void LocalSessionTokenExpirationWatcher::notify(std::chrono::minutes timeLeft)
     auto action = CommandActionPtr(new CommandAction(tr("Re-Authenticate Now")));
     connect(
         action.get(),
-        &QAction::triggered,
+        &CommandAction::triggered,
         this,
         &LocalSessionTokenExpirationWatcher::authenticationRequested);
 

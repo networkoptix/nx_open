@@ -436,7 +436,7 @@ CommandActionPtr SystemHealthListModel::Private::commandAction(int index) const
         case MessageType::defaultCameraPasswords:
         {
             const auto action = CommandActionPtr(new CommandAction(tr("Set Passwords")));
-            connect(action.data(), &QAction::triggered, this,
+            connect(action.data(), &CommandAction::triggered, this,
                 [this]
                 {
                     const auto parameters = menu::Parameters(
@@ -453,7 +453,7 @@ CommandActionPtr SystemHealthListModel::Private::commandAction(int index) const
         case MessageType::replacedDeviceDiscovered:
         {
             const auto action = CommandActionPtr(new CommandAction(tr("Undo Replace")));
-            connect(action.data(), &QAction::triggered, this,
+            connect(action.data(), &CommandAction::triggered, this,
                 [this, resource = item.resource]
                 {
                     const auto parameters = menu::Parameters(resource);

@@ -129,16 +129,11 @@ Item
             {
                 id: removeGroupButton
                 Layout.alignment: Qt.AlignVCenter
-                width: 20
-                height: 20
 
                 visible: treeItem.hovered && treeItem.enabled
-                hoverEnabled: true
 
                 icon.source: "image://skin/20x20/Outline/cross_close.svg"
                 icon.color: ColorTheme.colors.light16
-                icon.width: width
-                icon.height: height
 
                 background: null
 
