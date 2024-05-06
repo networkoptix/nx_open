@@ -174,10 +174,12 @@ public:
 
     /*
      * @return Information about cameras which consumes SAAS services.
-     *     key - serviceId, value - camera physicalId list. If there is not enough services for some camera
+     *     key - serviceId, value - camera groupId list. If there is not enough services for some camera
      *     then the service value is an empty UUID.
+     *     groupId is the camera physicalId for regular cameras and groupId for NVR. It is used to
+     *     spend a single license for NVR.
      */
-    std::map<nx::Uuid, std::set<QString>> camerasByService() const;
+    std::map<nx::Uuid, std::set<QString>> cameraGroupsByService() const;
 
 };
 
