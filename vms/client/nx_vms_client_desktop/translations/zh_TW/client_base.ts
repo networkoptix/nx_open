@@ -9582,7 +9582,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</source>
-      <translation type="unfinished">Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</translation>
+      <translation>在尋找本地佈局？在 &quot;顯示給使用者&quot; 清單中選擇單一使用者，即可將其本地佈局列為選項。</translation>
     </message>
   </context>
   <context>

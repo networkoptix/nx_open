@@ -5,14 +5,14 @@
     <name>nx::vms::rules::AggregatedEvent</name>
     <message>
       <source>Multiple %1 events have occurred</source>
-      <translation type="unfinished">Multiple %1 events have occurred</translation>
+      <translation>Beberapa event %1 telah terjadi</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::AnalyticsEvent</name>
     <message>
       <source>Analytics Event</source>
-      <translation type="unfinished">Analytics Event</translation>
+      <translation>Event Analitik</translation>
     </message>
     <message>
       <source>%1 at %2</source>
@@ -29,11 +29,11 @@
     </message>
     <message>
       <source>Event Type</source>
-      <translation type="unfinished">Event Type</translation>
+      <translation>Tipe Event</translation>
     </message>
     <message>
       <source>Caption</source>
-      <translation type="unfinished">Caption</translation>
+      <translation>Keterangan</translation>
     </message>
     <message>
       <source>Description</source>
@@ -44,16 +44,16 @@
     <name>nx::vms::rules::AnalyticsObjectEvent</name>
     <message>
       <source>Object detected</source>
-      <translation type="unfinished">Object detected</translation>
+      <translation>Objek terdeteksi</translation>
     </message>
     <message>
       <source>%1 at camera &apos;%2&apos;</source>
       <comment> is detected</comment>
-      <translation type="unfinished">%1 at camera &apos;%2&apos;</translation>
+      <translation>%1 pada kamera &apos;%2&apos;</translation>
     </message>
     <message>
       <source>Analytics Object Detected</source>
-      <translation type="unfinished">Analytics Object Detected</translation>
+      <translation>Objek Analitik Terdeteksi</translation>
     </message>
     <message>
       <source>Camera</source>
@@ -61,48 +61,48 @@
     </message>
     <message>
       <source>Object Type</source>
-      <translation type="unfinished">Object Type</translation>
+      <translation>Tipe Objek</translation>
     </message>
     <message>
       <source>Attributes</source>
-      <translation type="unfinished">Attributes</translation>
+      <translation>Atribut</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::BackupFinishedEvent</name>
     <message>
       <source>Server &quot;%1&quot; has finished an archive backup</source>
-      <translation type="unfinished">Server &quot;%1&quot; has finished an archive backup</translation>
+      <translation>Server &quot;%1&quot; telah menyelesaikan backup archive</translation>
     </message>
     <message>
       <source>Backup Finished</source>
-      <translation type="unfinished">Backup Finished</translation>
+      <translation>Backup Selesai</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::BasicEvent</name>
     <message>
       <source>Unknown event</source>
-      <translation type="unfinished">Unknown event</translation>
+      <translation>Event yang tidak diketahui</translation>
     </message>
     <message>
       <source>%1 event has occurred</source>
-      <translation type="unfinished">%1 event has occurred</translation>
+      <translation>%1 event telah terjadi</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::CameraInputEvent</name>
     <message>
       <source>Input Port: %1</source>
-      <translation type="unfinished">Input Port: %1</translation>
+      <translation>Port Input: %1</translation>
     </message>
     <message>
       <source>Input on %1</source>
-      <translation type="unfinished">Input on %1</translation>
+      <translation>Input pada %1</translation>
     </message>
     <message>
       <source>Input Signal on Camera</source>
-      <translation type="unfinished">Input Signal on Camera</translation>
+      <translation>Sinyal Input pada Kamera</translation>
     </message>
     <message>
       <source>State</source>
@@ -114,14 +114,14 @@
     </message>
     <message>
       <source>Input ID</source>
-      <translation type="unfinished">Input ID</translation>
+      <translation>ID Input</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::DebugEvent</name>
     <message>
       <source>Debug Event</source>
-      <translation type="unfinished">Debug Event</translation>
+      <translation>Event Debug</translation>
     </message>
     <message>
       <source>Action</source>
@@ -129,49 +129,49 @@
     </message>
     <message>
       <source>Value</source>
-      <translation type="unfinished">Value</translation>
+      <translation>Nilai</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::DeviceDisconnectedEvent</name>
     <message>
       <source>Device was disconnected</source>
-      <translation type="unfinished">Device was disconnected</translation>
+      <translation>Perangkat tidak terkoneksi</translation>
     </message>
     <message>
       <source>Camera was disconnected</source>
-      <translation type="unfinished">Camera was disconnected</translation>
+      <translation>Kamera tidak terkoneksi</translation>
     </message>
     <message>
       <source>I/O Module was disconnected</source>
-      <translation type="unfinished">I/O Module was disconnected</translation>
+      <translation>Modul I/O tidak terkoneksi</translation>
     </message>
     <message>
       <source>Device %1 was disconnected</source>
-      <translation type="unfinished">Device %1 was disconnected</translation>
+      <translation>Perangkat %1 tidak terkoneksi</translation>
     </message>
     <message>
       <source>Camera %1 was disconnected</source>
-      <translation type="unfinished">Camera %1 was disconnected</translation>
+      <translation>Kamera %1 tidak terkoneksi</translation>
     </message>
     <message>
       <source>I/O Module %1 was disconnected</source>
-      <translation type="unfinished">I/O Module %1 was disconnected</translation>
+      <translation>Modul I/O %1 tidak terkoneksi</translation>
     </message>
     <message numerus="yes">
       <source>Device Disconnected</source>
-      <translation type="unfinished">
-        <numerusform>Device Disconnected</numerusform>
+      <translation>
+        <numerusform>Perangkat Tidak Terkoneksi</numerusform>
       </translation>
     </message>
     <message>
       <source>Device ID</source>
-      <translation type="unfinished">Device ID</translation>
+      <translation>ID Perangkat</translation>
     </message>
     <message numerus="yes">
       <source>Camera Disconnected</source>
-      <translation type="unfinished">
-        <numerusform>Camera Disconnected</numerusform>
+      <translation>
+        <numerusform>Kamera Tidak Terkoneksi</numerusform>
       </translation>
     </message>
   </context>
@@ -179,32 +179,32 @@
     <name>nx::vms::rules::DeviceIpConflictEvent</name>
     <message>
       <source>Conflicting Address: %1</source>
-      <translation type="unfinished">Conflicting Address: %1</translation>
+      <translation>Alamat Konflik: %1</translation>
     </message>
     <message>
       <source>MAC #%1: %2</source>
-      <translation type="unfinished">MAC #%1: %2</translation>
+      <translation>MAC #%1: %2</translation>
     </message>
     <message>
       <source>Device IP Conflict at %1</source>
       <comment>Device IP Conflict at &lt;server_name&gt;</comment>
-      <translation type="unfinished">Device IP Conflict at %1</translation>
+      <translation>Konflik IP Perangkat di %1</translation>
     </message>
     <message>
       <source>Camera IP Conflict at %1</source>
       <comment>Camera IP Conflict at &lt;server_name&gt;</comment>
-      <translation type="unfinished">Camera IP Conflict at %1</translation>
+      <translation>Konflik IP Kamera pada %1</translation>
     </message>
     <message numerus="yes">
       <source>Device IP Conflict</source>
-      <translation type="unfinished">
-        <numerusform>Device IP Conflict</numerusform>
+      <translation>
+        <numerusform>Konflik IP Perangkat</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Camera IP Conflict</source>
-      <translation type="unfinished">
-        <numerusform>Camera IP Conflict</numerusform>
+      <translation>
+        <numerusform>Konflik IP Kamera</numerusform>
       </translation>
     </message>
   </context>
@@ -212,11 +212,11 @@
     <name>nx::vms::rules::FanErrorEvent</name>
     <message>
       <source>Fan error at %1</source>
-      <translation type="unfinished">Fan error at %1</translation>
+      <translation>Error kipas pada %1</translation>
     </message>
     <message>
       <source>Fan Error</source>
-      <translation type="unfinished">Fan Error</translation>
+      <translation>Error Kipas</translation>
     </message>
     <message>
       <source>Server</source>
@@ -227,11 +227,11 @@
     <name>nx::vms::rules::GenericEvent</name>
     <message>
       <source>Generic Event</source>
-      <translation type="unfinished">Generic Event</translation>
+      <translation>Event generik</translation>
     </message>
     <message>
       <source>Generic Event at %1</source>
-      <translation type="unfinished">Generic Event at %1</translation>
+      <translation>Event generik di %1</translation>
     </message>
     <message>
       <source>Keywords separated by space</source>
@@ -247,7 +247,7 @@
     </message>
     <message>
       <source>Caption</source>
-      <translation type="unfinished">Caption</translation>
+      <translation>Keterangan</translation>
     </message>
     <message>
       <source>Description</source>
@@ -270,53 +270,53 @@
     </message>
     <message>
       <source>Do HTTP(S) request</source>
-      <translation type="unfinished">Do HTTP(S) request</translation>
+      <translation>Lakukan HTTP(S) request</translation>
     </message>
     <message>
       <source>HTTP(S) URL</source>
-      <translation type="unfinished">HTTP(S) URL</translation>
+      <translation>URL HTTP(S)</translation>
     </message>
     <message>
       <source>HTTP(S) Content</source>
-      <translation type="unfinished">HTTP(S) Content</translation>
+      <translation>Konten HTTP(S)</translation>
     </message>
     <message>
       <source>Content Type</source>
-      <translation type="unfinished">Content Type</translation>
+      <translation>Tipe Konten</translation>
     </message>
     <message>
       <source>Request Method</source>
-      <translation type="unfinished">Request Method</translation>
+      <translation>Metode Permintaan</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::LicenseIssueEvent</name>
     <message>
       <source>Server &quot;%1&quot; has a license problem</source>
-      <translation type="unfinished">Server &quot;%1&quot; has a license problem</translation>
+      <translation>Server &quot;%1&quot; mempunyai masalah lisensi</translation>
     </message>
     <message>
       <source>License Issue</source>
-      <translation type="unfinished">License Issue</translation>
+      <translation>Isu Lisensi</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on the following devices:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following devices:</translation>
+      <translation>Lisensi tidak cukup. Perekaman telah dinonaktifkan pada perangkat berikut:</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on the following cameras:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following cameras:</translation>
+      <translation>Lisensi tidak cukup. Perekaman telah dinonaktifkan pada kamera berikut:</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on the following I/O modules:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following I/O modules:</translation>
+      <translation>Lisensi tidak cukup. Perekaman telah dinonaktifkan pada modul I/O berikut:</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::MotionEvent</name>
     <message>
       <source>Motion on %1</source>
-      <translation type="unfinished">Motion on %1</translation>
+      <translation>Gerakan pada %1</translation>
     </message>
     <message>
       <source>State</source>
@@ -328,89 +328,89 @@
     </message>
     <message>
       <source>Motion on Camera</source>
-      <translation type="unfinished">Motion on Camera</translation>
+      <translation>Gerakan pada Kamera</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::NetworkIssueEvent</name>
     <message>
       <source>Network Issue at %1</source>
-      <translation type="unfinished">Network Issue at %1</translation>
+      <translation>Masalah Jaringan di %1</translation>
     </message>
     <message>
       <source>Network Issue</source>
-      <translation type="unfinished">Network Issue</translation>
+      <translation>Masalah Jaringan</translation>
     </message>
     <message numerus="yes">
       <source>No data received during last %n seconds.</source>
-      <translation type="unfinished">
-        <numerusform>No data received during last %n seconds.</numerusform>
+      <translation>
+        <numerusform>Tidak ada data yang diterima selama %n detik terakhir.</numerusform>
       </translation>
     </message>
     <message>
       <source>RTP error in primary stream (%1).</source>
-      <translation type="unfinished">RTP error in primary stream (%1).</translation>
+      <translation>Error RTP di stream primer (%1).</translation>
     </message>
     <message>
       <source>RTP error in secondary stream (%1).</source>
-      <translation type="unfinished">RTP error in secondary stream (%1).</translation>
+      <translation>Error RTP di stream sekunder (%1).</translation>
     </message>
     <message>
       <source>RTP packet loss detected.</source>
-      <translation type="unfinished">RTP packet loss detected.</translation>
+      <translation>Kehilangan paket RTP terdeteksi.</translation>
     </message>
     <message>
       <source>Camera time is back to normal.</source>
-      <translation type="unfinished">Camera time is back to normal.</translation>
+      <translation>Waktu kamera kembali normal.</translation>
     </message>
     <message>
       <source>Device does not respond to network requests.</source>
-      <translation type="unfinished">Device does not respond to network requests.</translation>
+      <translation>Perangkat tidak merespon permintaan jaringan.</translation>
     </message>
     <message>
       <source>Address %1 is already in use by %2 on primary stream.</source>
       <comment>%1 is the address, %2 is the device name</comment>
-      <translation type="unfinished">Address %1 is already in use by %2 on primary stream.</translation>
+      <translation>Alamat %1 sudah digunakan oleh %2 pada stream primer.</translation>
     </message>
     <message>
       <source>Address %1 is already in use by %2 on secondary stream.</source>
       <comment>%1 is the address, %2 is the device name</comment>
-      <translation type="unfinished">Address %1 is already in use by %2 on secondary stream.</translation>
+      <translation>Alamat %1 sudah digunakan oleh %2 pada stream sekunder.</translation>
     </message>
     <message>
       <source>Multicast address conflict detected.</source>
-      <translation type="unfinished">Multicast address conflict detected.</translation>
+      <translation>Konflik alamat multicast terdeteksi.</translation>
     </message>
     <message>
       <source>Network address %1 is not a multicast address.</source>
-      <translation type="unfinished">Network address %1 is not a multicast address.</translation>
+      <translation>Alamat network %1 bukan alamat multicast.</translation>
     </message>
     <message>
       <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to camera (primary stream) was unexpectedly closed.</translation>
+      <translation>Koneksi ke kamera (stream primer) tiba-tiba terputus.</translation>
     </message>
     <message>
       <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to camera (secondary stream) was unexpectedly closed.</translation>
+      <translation>Koneksi ke kamera (stream sekunder) tiba-tiba terputus.</translation>
     </message>
     <message>
       <source>Connection to device was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to device was unexpectedly closed.</translation>
+      <translation>Koneksi ke perangkat tiba-tiba terputus.</translation>
     </message>
     <message>
       <source>Failed to force using camera time, as it lags too much. System time will be used instead.</source>
-      <translation type="unfinished">Failed to force using camera time, as it lags too much. System time will be used instead.</translation>
+      <translation>Gagal memaksakan penggunaan waktu kamera, karena terlalu lambat. Waktu sistem akan digunakan sebagai gantinya.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::NotificationAction</name>
     <message>
       <source>Show Notification</source>
-      <translation type="unfinished">Show Notification</translation>
+      <translation>Tampilkan Notifikasi</translation>
     </message>
     <message>
       <source>To</source>
-      <translation type="unfinished">To</translation>
+      <translation>Ke</translation>
     </message>
     <message>
       <source>Interval of action</source>
@@ -418,11 +418,11 @@
     </message>
     <message>
       <source>Force Acknowledgement</source>
-      <translation type="unfinished">Force Acknowledgement</translation>
+      <translation>Force Acknowledgment</translation>
     </message>
     <message>
       <source>Caption</source>
-      <translation type="unfinished">Caption</translation>
+      <translation>Keterangan</translation>
     </message>
     <message>
       <source>Description</source>
@@ -430,14 +430,14 @@
     </message>
     <message>
       <source>Tooltip</source>
-      <translation type="unfinished">Tooltip</translation>
+      <translation>Keterangan alat</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::PluginDiagnosticEvent</name>
     <message>
       <source>Plugin Diagnostic Event</source>
-      <translation type="unfinished">Plugin Diagnostic Event</translation>
+      <translation>Event Diagnostik Plugin</translation>
     </message>
     <message>
       <source>Camera</source>
@@ -449,7 +449,7 @@
     </message>
     <message>
       <source>Caption</source>
-      <translation type="unfinished">Caption</translation>
+      <translation>Keterangan</translation>
     </message>
     <message>
       <source>Description</source>
@@ -457,27 +457,27 @@
     </message>
     <message>
       <source>Level</source>
-      <translation type="unfinished">Level</translation>
+      <translation>Level</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::PoeOverBudgetEvent</name>
     <message>
       <source>Consumption</source>
-      <translation type="unfinished">Consumption</translation>
+      <translation>Konsumsi</translation>
     </message>
     <message>
       <source>PoE over budget at %1</source>
-      <translation type="unfinished">PoE over budget at %1</translation>
+      <translation>PoE melebihi budget pada %1</translation>
     </message>
     <message>
       <source>Reason: Power limit exceeded (%1)</source>
       <comment>%1 is consumption</comment>
-      <translation type="unfinished">Reason: Power limit exceeded (%1)</translation>
+      <translation>Alasan: Batas daya terlampaui (%1)</translation>
     </message>
     <message>
       <source>PoE over Budget</source>
-      <translation type="unfinished">PoE over Budget</translation>
+      <translation>PoE melebihi Budget</translation>
     </message>
     <message>
       <source>State</source>
@@ -492,7 +492,7 @@
     <name>nx::vms::rules::SendEmailAction</name>
     <message>
       <source>Send email</source>
-      <translation type="unfinished">Send email</translation>
+      <translation>Kirim email</translation>
     </message>
     <message>
       <source>to</source>
@@ -504,96 +504,96 @@
     </message>
     <message>
       <source>Additional recipients</source>
-      <translation type="unfinished">Additional recipients</translation>
+      <translation>Penerima tambahan</translation>
     </message>
     <message>
       <source>Email Message</source>
-      <translation type="unfinished">Email Message</translation>
+      <translation>Pesan Email</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::ServerCertificateErrorEvent</name>
     <message>
       <source>Server &quot;%1&quot; certificate error</source>
-      <translation type="unfinished">Server &quot;%1&quot; certificate error</translation>
+      <translation>Server &quot;%1&quot; error sertifikat</translation>
     </message>
     <message>
       <source>Server Certificate Error</source>
-      <translation type="unfinished">Server Certificate Error</translation>
+      <translation>Error Sertifikat Server</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::ServerConflictEvent</name>
     <message>
       <source>Conflicting Server: %1</source>
-      <translation type="unfinished">Conflicting Server: %1</translation>
+      <translation>Server Konflik: %1</translation>
     </message>
     <message>
       <source>Conflicting Server #%1: %2</source>
       <extracomment>Conflicting Server #5: 10.0.2.1</extracomment>
-      <translation type="unfinished">Conflicting Server #%1: %2</translation>
+      <translation>Server Konflik #%1: %2</translation>
     </message>
     <message>
       <source>MAC #%1: %2</source>
       <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
-      <translation type="unfinished">MAC #%1: %2</translation>
+      <translation>MAC #%1: %2</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; Conflict</source>
-      <translation type="unfinished">Server &quot;%1&quot; Conflict</translation>
+      <translation>Server &quot;%1&quot; Konflik</translation>
     </message>
     <message>
       <source>Server Conflict</source>
-      <translation type="unfinished">Server Conflict</translation>
+      <translation>Konflik Server</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::ServerFailureEvent</name>
     <message>
       <source>Server &quot;%1&quot; Failure</source>
-      <translation type="unfinished">Server &quot;%1&quot; Failure</translation>
+      <translation>Server &quot;%1&quot; Gagal</translation>
     </message>
     <message>
       <source>Server Failure</source>
-      <translation type="unfinished">Server Failure</translation>
+      <translation>Kegagalan Server</translation>
     </message>
     <message>
       <source>Connection to server is lost.</source>
-      <translation type="unfinished">Connection to server is lost.</translation>
+      <translation>Koneksi ke server terputus.</translation>
     </message>
     <message>
       <source>Server stopped unexpectedly.</source>
-      <translation type="unfinished">Server stopped unexpectedly.</translation>
+      <translation>Server berhenti tiba-tiba.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::ServerStartedEvent</name>
     <message>
       <source>Server &quot;%1&quot; Started</source>
-      <translation type="unfinished">Server &quot;%1&quot; Started</translation>
+      <translation>Server &quot;%1&quot; Dimulai</translation>
     </message>
     <message>
       <source>Server Started</source>
-      <translation type="unfinished">Server Started</translation>
+      <translation>Server Dimulai</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::SoftTriggerEvent</name>
     <message>
       <source>Trigger Name</source>
-      <translation type="unfinished">Trigger Name</translation>
+      <translation>Nama Trigger</translation>
     </message>
     <message>
       <source>Trigger: %1</source>
-      <translation type="unfinished">Trigger: %1</translation>
+      <translation>Trigger: %1</translation>
     </message>
     <message>
       <source>Soft Trigger %1 at %2</source>
-      <translation type="unfinished">Soft Trigger %1 at %2</translation>
+      <translation>Soft Trigger %1 pada %2</translation>
     </message>
     <message>
       <source>Soft Trigger</source>
-      <translation type="unfinished">Soft Trigger</translation>
+      <translation>Soft Trigger</translation>
     </message>
     <message>
       <source>State</source>
@@ -620,7 +620,7 @@
     <name>nx::vms::rules::SpeakAction</name>
     <message>
       <source>Speak</source>
-      <translation type="unfinished">Speak</translation>
+      <translation>Bicara</translation>
     </message>
     <message>
       <source>Cameras</source>
@@ -647,58 +647,58 @@
     <name>nx::vms::rules::StorageIssueEvent</name>
     <message>
       <source>Storage Issue at %1</source>
-      <translation type="unfinished">Storage Issue at %1</translation>
+      <translation>Masalah Penyimpanan di %1</translation>
     </message>
     <message>
       <source>Storage Issue</source>
-      <translation type="unfinished">Storage Issue</translation>
+      <translation>Masalah Penyimpanan</translation>
     </message>
     <message>
       <source>I/O error has occurred at %1.</source>
-      <translation type="unfinished">I/O error has occurred at %1.</translation>
+      <translation>Error I/O telah terjadi di %1.</translation>
     </message>
     <message>
       <source>Not enough HDD/SSD speed for recording to %1.</source>
-      <translation type="unfinished">Not enough HDD/SSD speed for recording to %1.</translation>
+      <translation>Kecepatan HDD/SSD tidak cukup untuk merekam ke %1.</translation>
     </message>
     <message>
       <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
-      <translation type="unfinished">HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</translation>
+      <translation>Disk HDD/SSD &quot;%1&quot; penuh. Disk berisi terlalu banyak data yang tidak dikelola oleh VMS.</translation>
     </message>
     <message>
       <source>System disk &quot;%1&quot; is almost full.</source>
-      <translation type="unfinished">System disk &quot;%1&quot; is almost full.</translation>
+      <translation>Disk sistem &quot;%1&quot; hampir penuh.</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is offline.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; is offline.</translation>
+      <translation>Penyimpanan analitik &quot;%1&quot; sedang offline.</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is almost full.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; is almost full.</translation>
+      <translation>Penyimpanan analitik &quot;%1&quot; hampir penuh.</translation>
     </message>
     <message>
       <source>Archive backup failed. Failed to backup file %1.</source>
-      <translation type="unfinished">Archive backup failed. Failed to backup file %1.</translation>
+      <translation>Backup archive gagal. Gagal membuat backup file %1.</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</translation>
+      <translation>Penyimpanan analitik &quot;%1&quot; error database: Izin tidak mencukupi pada titik pemasangan.</translation>
     </message>
     <message>
       <source>Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</source>
-      <translation type="unfinished">Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</translation>
+      <translation>Tidak dapat menginisialisasi enkripsi AES saat perekaman diaktifkan pada archive media. Data ditulis tidak terenkripsi.</translation>
     </message>
     <message>
       <source>RAID error: %1.</source>
-      <translation type="unfinished">RAID error: %1.</translation>
+      <translation>Error RAID: %1.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::TextOverlayAction</name>
     <message>
       <source>Show text overlay</source>
-      <translation type="unfinished">Show text overlay</translation>
+      <translation>Tampilkan text overlay</translation>
     </message>
     <message>
       <source>Cameras</source>
@@ -714,30 +714,30 @@
     </message>
     <message>
       <source>Text</source>
-      <translation type="unfinished">Text</translation>
+      <translation>Teks</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::TextWithFields</name>
     <message>
       <source>Event: %1</source>
-      <translation type="unfinished">Event: %1</translation>
+      <translation>Event: %1</translation>
     </message>
     <message>
       <source>Source: %1</source>
-      <translation type="unfinished">Source: %1</translation>
+      <translation>Source: %1</translation>
     </message>
     <message>
       <source>Plugin: %1</source>
-      <translation type="unfinished">Plugin: %1</translation>
+      <translation>Plugin: %1</translation>
     </message>
     <message>
       <source>Caption: %1</source>
-      <translation type="unfinished">Caption: %1</translation>
+      <translation>Keterangan: %1</translation>
     </message>
     <message>
       <source>Reason: %1</source>
-      <translation type="unfinished">Reason: %1</translation>
+      <translation>Alasan: %1</translation>
     </message>
   </context>
   <context>
@@ -745,21 +745,21 @@
     <message numerus="yes">
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">
-        <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+      <translation>
+        <numerusform>%n kali, pertama: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>First occurrence: %1 on %2 (%n times total)</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">
-        <numerusform>First occurrence: %1 on %2 (%n times total)</numerusform>
+      <translation>
+        <numerusform>Kemunculan pertama: %1 pada %2 (%n kali total)</numerusform>
       </translation>
     </message>
     <message>
       <source>Time: %1 on %2</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">Time: %1 on %2</translation>
+      <translation>Waktu: %1 pada %2</translation>
     </message>
   </context>
 </TS>
