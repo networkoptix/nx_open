@@ -2376,7 +2376,8 @@ ConditionWrapper hasOldEventRulesEngine()
     return new CustomBoolCondition(
         [](const Parameters& /*parameters*/, WindowContext* /*context*/)
         {
-            return rules::ini().rulesEngine == "old" || rules::ini().rulesEngine == "both";
+            return QString::fromUtf8(rules::ini().rulesEngine) == "old"
+                || QString::fromUtf8(rules::ini().rulesEngine) == "both";
         });
 }
 
