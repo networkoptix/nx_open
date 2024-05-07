@@ -6,8 +6,11 @@
 #include <QtCore/QObject>
 
 #include <nx/utils/uuid.h>
+#include <nx/vms/api/rules/rules_fwd.h>
 
 #include "rules_fwd.h"
+
+class QnCommonMessageProcessor;
 
 namespace nx::vms::rules {
 
@@ -27,6 +30,8 @@ public:
 public:
     Router();
     virtual ~Router();
+
+    virtual void init(const QnCommonMessageProcessor* processor) = 0;
 
     virtual nx::Uuid peerId() const = 0;
 

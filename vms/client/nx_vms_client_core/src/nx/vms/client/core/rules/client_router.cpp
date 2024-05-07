@@ -11,6 +11,7 @@
 #include <nx/vms/client/core/system_context.h>
 #include <nx/vms/rules/basic_action.h>
 #include <nx/vms/rules/basic_event.h>
+#include <nx/vms/rules/engine.h>
 #include <nx/vms/rules/ini.h>
 #include <nx/vms/rules/rule.h>
 #include <nx/vms/rules/utils/serialization.h>
@@ -32,6 +33,13 @@ ClientRouter::~ClientRouter()
 {
 }
 
+void ClientRouter::init(const QnCommonMessageProcessor* processor)
+{
+    connect(processor, &QnCommonMessageProcessor::vmsActionReceived,
+        this, &ClientRouter::onActionReceived,
+        Qt::DirectConnection);
+}
+
 nx::Uuid ClientRouter::peerId() const
 {
     return SystemContextAware::peerId();
@@ -48,5 +56,36 @@ void ClientRouter::routeAction(const ActionPtr& action)
 {
     NX_ASSERT(false, "Currently we don't send Actions from the Client: %1", action->type());
 }
+
+
+void ClientRouter::onActionReceived(const nx::vms::api::rules::ActionInfo& info)
+{
+    const auto engine = systemContext()->vmsRulesEngine();
+
+    const auto type = info.props.value("type").toString();
+    const auto manifest = engine->actionDescriptor(type);
+
+    if (!manifest)
+    {
+        NX_WARNING(this, "Unknown action received: %1", type);
+        return;
+    }
+
+    if (!manifest->executionTargets.testFlag(ExecutionTarget::clients))
+    {
+        NX_WARNING(this, "Unexpected action received: %1", type);
+        return;
+    }
+
+    const auto action = engine->buildAction(info.props);
+    if (!action)
+    {
+        NX_WARNING(this, "Invalid action data: %1", type);
+        return;
+    }
+
+    receiveAction(action);
+}
+
 
 } // namespace nx::vms::client::core::rules
