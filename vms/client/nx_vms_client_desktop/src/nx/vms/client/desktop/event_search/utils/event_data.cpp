@@ -56,6 +56,9 @@ QString eventTitle(const QVariantMap& details)
 {
     auto detail = details.value(rules::utils::kAnalyticsEventTypeDetailName);
 
+    if(!detail.isValid())
+        detail = details.value(rules::utils::kCaptionDetailName);
+
     if (!detail.isValid())
         detail = details.value(rules::utils::kNameDetailName);
 
