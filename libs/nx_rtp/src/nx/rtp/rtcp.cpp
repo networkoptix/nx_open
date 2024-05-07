@@ -213,4 +213,32 @@ void RtcpSenderReporter::setCName(const std::string& cname)
     m_report.cname = cname;
 }
 
+bool RtcpFirFeedback::getNextFeedback(uint32_t senderSsrc, uint8_t* data, int size)
+{
+    if (size != kSize)
+        return false;
+    static constexpr uint16_t kRtcpFirLength = kSize / 4 - 1; //< For header.
+    try
+    {
+        nx::utils::BitStreamWriter bitstream(data, data + size);
+        bitstream.putBits(8, 0x80 | kRtcpFeedbackFormatFir);
+        bitstream.putBits(8, kRtcpPayloadSpecificFeedback);
+        bitstream.putBits(16, kRtcpFirLength);
+        bitstream.putBits(32, senderSsrc); //< Sender SSRC.
+        bitstream.putBits(32, sourceSsrc); //< Source SSRC. Probably unused.
+        bitstream.putBits(32, sourceSsrc);
+        bitstream.putBits(8, sequence);
+        bitstream.putBits(24, 0);
+        bitstream.flushBits();
+        NX_ASSERT(kSize == bitstream.getBytesCount());
+    }
+    catch (const nx::utils::BitStreamException&)
+    {
+        NX_ASSERT(false, "Got exception while serializing RTCP FIR");
+        return false;
+    }
+    ++sequence;
+    return true;
+}
+
 } // namespace nx::rtp

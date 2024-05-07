@@ -27,6 +27,12 @@ constexpr uint8_t kRtcpFeedbackFormatNackSli = 2;
 constexpr uint8_t kRtcpFeedbackFormatNackRpsi = 3;
 constexpr uint8_t kRtcpFeedbackFormatNackAfb = 15;
 
+// https://www.rfc-editor.org/rfc/rfc5104.html
+constexpr uint8_t kRtcpFeedbackFormatFir = 4;
+constexpr uint8_t kRtcpFeedbackFormatTstr = 5;
+constexpr uint8_t kRtcpFeedbackFormatTstn = 6;
+constexpr uint8_t kRtcpFeedbackFormatVbcm = 7;
+
 struct NX_RTP_API RtcpSenderReport
 {
     static constexpr uint8_t kSize = 28;
@@ -59,6 +65,15 @@ private:
     RtcpSenderReport m_report;
     std::chrono::microseconds m_lastReportTimestamp = std::chrono::microseconds::zero();
     std::chrono::microseconds m_lastTimestamp = std::chrono::microseconds::zero();
+};
+
+struct NX_RTP_API RtcpFirFeedback
+{
+    static constexpr int kSize = 20;
+    static int size() { return kSize; }
+    bool getNextFeedback(uint32_t senderSsrc, uint8_t* data, int size);
+    uint32_t sourceSsrc = 0;
+    uint8_t sequence = 0;
 };
 
 NX_RTP_API uint32_t getRtcpSsrc(const uint8_t* data, int size);
