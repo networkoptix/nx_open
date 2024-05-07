@@ -218,7 +218,7 @@ void AnalyticsFilterModel::update(
 
 void AnalyticsFilterModel::setSelectedEngine(
     nx::analytics::taxonomy::AbstractEngine* engine,
-    bool force)
+    bool /*force*/)
 {
     update(engine, m_devices, m_attributeValues, m_liveTypesExcluded);
 }

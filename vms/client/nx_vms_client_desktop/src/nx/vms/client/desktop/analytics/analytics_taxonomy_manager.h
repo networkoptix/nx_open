@@ -3,7 +3,6 @@
 #pragma once
 
 #include <memory>
-#include <optional>
 
 #include <QtCore/QHash>
 #include <QtCore/QObject>
@@ -13,15 +12,22 @@
 #include <nx/analytics/taxonomy/abstract_object_type.h>
 #include <nx/analytics/taxonomy/abstract_state.h>
 #include <nx/utils/impl_ptr.h>
+#include <nx/vms/client/desktop/analytics/attribute_display_manager.h>
 #include <nx/vms/client/desktop/system_context_aware.h>
 
 #include "taxonomy/state_view.h"
 
 namespace nx::vms::client::desktop {
+
+class AnalyticsSearchSetup;
+
 namespace analytics {
 namespace taxonomy {
+
 class AnalyticsFilterModel;
+
 } // namespace taxonomy
+
 
 using Taxonomy = nx::analytics::taxonomy::AbstractState;
 
@@ -43,6 +49,10 @@ public:
     Taxonomy* qmlCurrentTaxonomy() const;
     Q_INVOKABLE nx::vms::client::desktop::analytics::taxonomy::AnalyticsFilterModel*
         createFilterModel(QObject* parent = nullptr);
+
+    Q_INVOKABLE taxonomy::AttributeDisplayManager* createAttributeManager(
+        nx::vms::client::desktop::analytics::taxonomy::AttributeDisplayManager::Mode mode,
+        nx::vms::client::desktop::analytics::taxonomy::AnalyticsFilterModel* filterModel);
 
     Q_INVOKABLE nx::vms::client::desktop::analytics::taxonomy::StateView*
         createStateView(QObject* parent = nullptr) const;

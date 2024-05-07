@@ -9,6 +9,8 @@
 #include <nx/vms/client/desktop/system_context.h>
 
 #include "analytics_filter_model.h"
+#include "attribute_display_manager.h"
+#include "attribute_visibility_settings_model.h"
 #include "taxonomy/attribute.h"
 #include "taxonomy/enumeration.h"
 #include "taxonomy/object_type.h"
@@ -144,6 +146,13 @@ taxonomy::AnalyticsFilterModel* TaxonomyManager::createFilterModel(QObject* pare
     return new taxonomy::AnalyticsFilterModel(this, parent);
 }
 
+taxonomy::AttributeDisplayManager* TaxonomyManager::createAttributeManager(
+         taxonomy::AttributeDisplayManager::Mode mode,
+         taxonomy::AnalyticsFilterModel* filterModel)
+{
+    return new taxonomy::AttributeDisplayManager(mode, filterModel);
+}
+
 taxonomy::StateView* TaxonomyManager::createStateView(QObject* parent) const
 {
     return taxonomy::StateViewBuilder::stateView(
@@ -234,6 +243,12 @@ void TaxonomyManager::registerQmlTypes()
 
     qmlRegisterType<taxonomy::AnalyticsFilterModel>(
         "nx.vms.client.desktop.analytics", 1, 0, "FilterModel");
+
+    qmlRegisterType<taxonomy::AttributeVisibilitySettingsModel>(
+        "nx.vms.client.desktop.analytics", 1, 0, "AttributeVisibilitySettingsModel");
+
+    qmlRegisterType<taxonomy::AttributeDisplayManager>(
+        "nx.vms.client.desktop.analytics", 1, 0, "AttributeDisplayManager");
 }
 
 } // namespace analytics

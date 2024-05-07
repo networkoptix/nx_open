@@ -12,6 +12,7 @@
 #include <nx/utils/log/log_settings.h>
 #include <nx/utils/property_storage/storage.h>
 #include <nx/vms/client/core/system_logon/connection_data.h>
+#include <nx/vms/client/desktop/analytics/attribute_display_manager.h>
 #include <nx/vms/client/desktop/export/settings/export_layout_persistent_settings.h>
 #include <nx/vms/client/desktop/export/settings/export_media_persistent_settings.h>
 #include <nx/vms/client/desktop/jsapi/auth_allowed_urls.h>
@@ -168,9 +169,26 @@ public:
     Property<bool> showTimestampOnLiveCamera{this, "showTimestampOnLiveCamera", false,
         "Show timestamp on live cameras (instead of text \"LIVE\")."};
 
+    struct AnalyticsAttributeSettings
+    {
+        QString name;
+        bool visible = false;
+        bool operator==(const AnalyticsAttributeSettings& other) const = default;
+    };
+    Property<QList<AnalyticsAttributeSettings>> analyticsSearchTileVisibleAttributes{this,
+        "analyticsSearchTileVisibleAttributes",
+        {},
+        "List and order of visible attributes in the tile view of the Advanced Search Dialog."};
+    Property<QList<AnalyticsAttributeSettings>> analyticsSearchTableVisibleAttributes{this,
+        "analyticsSearchTableVisibleAttributes",
+        {},
+        "List and order of visible attributes in the table view of the Advanced Search Dialog."};
+
 public:
     void migrateOldSettings();
     void setDefaults();
 };
+
+NX_REFLECTION_INSTRUMENT(LocalSettings::AnalyticsAttributeSettings, (name)(visible))
 
 } // namespace nx::vms::client::desktop

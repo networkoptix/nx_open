@@ -13,7 +13,6 @@ import Nx.RightPanel
 
 import nx.vms.client.desktop
 import nx.vms.client.core
-import nx.vms.client.desktop
 import nx.vms.client.desktop.analytics as Analytics
 
 import "metrics.js" as Metrics
@@ -23,6 +22,7 @@ Window
     id: dialog
 
     property WindowContext windowContext: null
+    property bool showPreview: false
 
     modality: Qt.NonModal
 
@@ -272,7 +272,7 @@ Window
                 // Reduce resultsPanel width only when previewPanel is fully visible.
                 // Avoid resource-consuming grid resize animation.
                 if (eventGrid.count > 0
-                    && counterBlock.showPreview
+                    && showPreview
                     && !previewPanel.slideAnimationEnabled)
                 {
                     resultsWidth -= previewPanel.width
@@ -283,49 +283,64 @@ Window
 
             height: content.height
 
-            CounterBlock
+            Row
             {
-                id: counterBlock
-
                 width: resultsPanel.width
 
-                property int availableNewTracks: eventModel.analyticsSetup
-                    ? eventModel.analyticsSetup.availableNewTracks : 0
-
-                displayedItemsText: eventModel.itemCountText
-
-                availableItemsText:
+                CounterBlock
                 {
-                    if (!availableNewTracks)
-                        return ""
+                    id: counterBlock
 
-                    const newResults = availableNewTracks > 0
-                        ? qsTr("%n new results", "", availableNewTracks)
-                        : qsTr("new results")
+                    property int availableNewTracks: eventModel.analyticsSetup
+                        ? eventModel.analyticsSetup.availableNewTracks : 0
 
-                    return `+ ${newResults}`
+                    displayedItemsText: eventModel.itemCountText
+
+                    availableItemsText:
+                    {
+                        if (!availableNewTracks)
+                            return ""
+
+                        const newResults = availableNewTracks > 0
+                            ? qsTr("%n new results", "", availableNewTracks)
+                            : qsTr("new results")
+
+                        return `+ ${newResults}`
+                    }
+
+                    onCommitNewItemsRequested:
+                        commitAvailableNewTracks()
+
+                    onAvailableNewTracksChanged:
+                    {
+                        // Automatically commit available new tracks once if the results grid is empty.
+                        if (!eventGrid.count && availableNewTracks)
+                            Qt.callLater(commitAvailableNewTracks)
+                    }
+
+                    function commitAvailableNewTracks()
+                    {
+                        eventGrid.positionViewAtBeginning()
+                        if (eventModel.analyticsSetup)
+                            eventModel.analyticsSetup.commitAvailableNewTracks()
+                        if (eventModel.itemCount > 0)
+                            selection.index = eventModel.index(0, 0)
+                    }
                 }
 
-                onShowPreviewChanged:
-                    previewPanel.slideAnimationEnabled = true
-
-                onCommitNewItemsRequested:
-                    commitAvailableNewTracks()
-
-                onAvailableNewTracksChanged:
+                TextButton
                 {
-                    // Automatically commit available new tracks once if the results grid is empty.
-                    if (!eventGrid.count && availableNewTracks)
-                        Qt.callLater(commitAvailableNewTracks)
-                }
+                    id: settingsButton
 
-                function commitAvailableNewTracks()
-                {
-                    eventGrid.positionViewAtBeginning()
-                    if (eventModel.analyticsSetup)
-                        eventModel.analyticsSetup.commitAvailableNewTracks()
-                    if (eventModel.itemCount > 0)
-                        selection.index = eventModel.index(0, 0)
+                    text: qsTr("Settings")
+                    visible: d.objectTypeSelected
+                    anchors.verticalCenter: parent.verticalCenter
+                    icon.source: "image://skin/20x20/Outline/settings.svg"
+
+                    onClicked:
+                    {
+                        filterSettingsDialog.show()
+                    }
                 }
             }
 
@@ -357,18 +372,23 @@ Window
 
                 tileController
                 {
-                    showInformation: false
+                    showInformation: d.objectTypeSelected
                     showThumbnails: true
-                    selectedRow: selection.index.row
+                    selectedRow: dialog.showPreview ? selection.index.row : -1
+                    attributeManager: d.tileViewAttributeManager
 
-                    videoPreviewMode: counterBlock.showPreview
+                    videoPreviewMode: showPreview
                         ? RightPanelGlobals.VideoPreviewMode.none
                         : RightPanelGlobals.VideoPreviewMode.selection
 
                     onClicked: row =>
                     {
+                        if (!showPreview)
+                        {
+                            previewPanel.slideAnimationEnabled = true
+                            showPreview = true
+                        }
                         eventGrid.forceActiveFocus()
-
                         if (row !== selection.index.row)
                             selection.index = eventModel.index(row, 0)
                     }
@@ -382,11 +402,14 @@ Window
                     // Single item which is re-parented to the selected tile overlay.
                     id: tilePreviewOverlay
 
-                    parent: eventGrid.tileController.selectedTile
-                        && eventGrid.tileController.selectedTile.overlayContainer
+                    parent: eventGrid.tileController.hoveredTile
+                        && eventGrid.tileController.hoveredTile.overlayContainer
 
                     anchors.fill: parent || undefined
-                    visible: parent && !counterBlock.showPreview
+                    visible: parent
+                        && eventGrid.tileController.hoveredTile
+                        && eventGrid.tileController.hoveredTile.hovered
+                        && !showPreview
 
                     Column
                     {
@@ -421,7 +444,7 @@ Window
                 {
                     id: informationToolTip
 
-                    view: counterBlock.showPreview ? null : eventGrid
+                    view: showPreview ? null : eventGrid
                     z: 2
                 }
 
@@ -445,6 +468,7 @@ Window
                     context: windowContext
                     type: { return RightPanelModel.Type.analytics }
                     active: true
+                    attributeManager: d.tileViewAttributeManager
 
                     Component.onCompleted:
                         commonSetup.cameraSelection = RightPanel.CameraSelection.layout
@@ -576,7 +600,7 @@ Window
             target: previewPanel
             anchors.rightMargin: -width //< Place the resizer insize previewPanel.
 
-            enabled: counterBlock.showPreview
+            enabled: showPreview
 
             onDragPositionChanged:
             {
@@ -591,7 +615,7 @@ Window
 
             height: content.height
             width: 460
-            x: counterBlock.showPreview ? content.width - width : content.width
+            x: showPreview ? content.width - width : content.width
 
             visible: eventGrid.count > 0
 
@@ -615,9 +639,14 @@ Window
                     header.searchText = createSearchRequestText(attribute.id, attribute.values)
             }
 
+            onClose:
+            {
+                showPreview = false
+            }
+
             selectedItem:
             {
-                if (selection.index.row == -1 || !counterBlock.showPreview)
+                if (selection.index.row == -1 || !showPreview)
                     return null
 
                 const getData = name => accessor.getData(selection.index, name)
@@ -670,12 +699,21 @@ Window
             ? windowContext.systemContext.taxonomyManager().createFilterModel(dialog)
             : emptyFilterModel
 
+        property Analytics.AttributeDisplayManager tileViewAttributeManager:
+            windowContext && eventModel.analyticsSetup
+            ? windowContext.systemContext.taxonomyManager().createAttributeManager(
+                Analytics.AttributeDisplayManager.Mode.tileView, filterModel)
+            : null
+
         readonly property Analytics.Engine selectedAnalyticsEngine:
             tabBar.currentItem ? tabBar.currentItem.engine : null
 
         property var delayedAttributesFilter: []
 
         readonly property bool pluginTabsShown: filterModel.engines.length > 1
+
+        readonly property bool objectTypeSelected:
+            analyticsFilters.selectedAnalyticsObjectTypeIds.length > 0
 
         Analytics.FilterModel { id: emptyFilterModel }
 
@@ -694,7 +732,7 @@ Window
 
         onSelectedAnalyticsEngineChanged:
         {
-            if (filterModel.engines.length === 0)
+            if (!filterModel || filterModel.engines.length === 0)
                 return
 
             storeCurrentEngineFilterState()
@@ -789,5 +827,12 @@ Window
                 d.isModelEmpty = !hasItems
             }
         }
+    }
+
+    FilterSettingsDialog
+    {
+        id: filterSettingsDialog
+        attributeManager: d.tileViewAttributeManager
+        objectTypeIds: analyticsFilters.selectedAnalyticsObjectTypeIds
     }
 }
