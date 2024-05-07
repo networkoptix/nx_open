@@ -53,7 +53,7 @@ UserData UserDataDeprecated::toUserData() const
     for (const auto& id: this->userRoleIds)
         newUserData.groupIds.push_back(id);
 
-    return {std::move(newUserData)};
+    return newUserData;
 }
 
 std::optional<nx::Uuid> UserDataDeprecated::permissionPresetToGroupId(GlobalPermissionsDeprecated preset)
