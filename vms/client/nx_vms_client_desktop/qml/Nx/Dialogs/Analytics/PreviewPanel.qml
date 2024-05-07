@@ -1,6 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 import QtQuick
+import QtQuick.Layouts
 
 import Nx
 import Nx.Core
@@ -26,6 +27,7 @@ Rectangle
     signal prevClicked()
     signal nextClicked()
     signal showOnLayoutClicked()
+    signal close()
 
     signal searchRequested(int attributeRow)
 
@@ -64,6 +66,44 @@ Rectangle
         }
     }
 
+    RowLayout
+    {
+        id: header
+
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.topMargin: 8
+        anchors.leftMargin: 12
+        anchors.rightMargin: 12
+
+        Text
+        {
+            id: displayText
+
+            Layout.fillWidth: true
+            color: ColorTheme.colors.light10
+            font.pixelSize: 0
+            font.weight: FontConfig.normal.weight
+
+            elide: Text.ElideRight
+
+            text: previewPanel.selectedItem ? previewPanel.selectedItem.display : ""
+        }
+
+        ImageButton
+        {
+            id: closeButton
+
+            icon.source: "image://skin/banners/close.svg"
+            onClicked:
+            {
+                previewPanel.slideAnimationEnabled = true
+                previewPanel.close()
+            }
+        }
+    }
+
     Rectangle
     {
         id: playerContainer
@@ -71,10 +111,12 @@ Rectangle
         border.color: ColorTheme.colors.dark5
         radius: 1
 
-        anchors.top: parent.top
+        anchors.top: header.bottom
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.margins: 12
+        anchors.topMargin: 8
+        anchors.leftMargin: 12
+        anchors.rightMargin: 12
 
         height: Math.min(width * (9 / 16) + intervalPreviewControls.height, parent.height / 2)
 
@@ -265,18 +307,6 @@ Rectangle
             anchors.topMargin: 16
 
             spacing: 4
-
-            Text
-            {
-                id: displayText
-                color: ColorTheme.colors.light10
-                font.pixelSize: FontConfig.xLarge.pixelSize
-
-                width: parent.width
-                elide: Text.ElideRight
-
-                text: previewPanel.selectedItem ? previewPanel.selectedItem.display : ""
-            }
 
             ResourceList
             {

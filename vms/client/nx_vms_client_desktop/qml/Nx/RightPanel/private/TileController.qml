@@ -3,6 +3,7 @@
 import QtQuick 2.14
 
 import "../globals.js" as RightPanelGlobals
+import nx.vms.client.desktop.analytics as Analytics
 
 QtObject
 {
@@ -12,8 +13,10 @@ QtObject
     property int selectedRow: -1
 
     property var selectedTile: null
+    property var hoveredTile: null
 
     property int videoPreviewMode: RightPanelGlobals.VideoPreviewMode.hover
+    property Analytics.AttributeDisplayManager attributeManager: null
 
     signal clicked(int row, int mouseButton, int keyboardModifiers)
     signal doubleClicked(int row)

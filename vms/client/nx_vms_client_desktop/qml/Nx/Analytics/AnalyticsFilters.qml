@@ -293,7 +293,6 @@ Column
         id: objectAttributes
 
         width: analyticsFilters.width
-
         loggingCategory: category
     }
 

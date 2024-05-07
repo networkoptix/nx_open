@@ -12,13 +12,14 @@
 #include <nx/vms/client/desktop/analytics/analytics_attribute_helper.h>
 #include <nx/vms/client/desktop/event_search/right_panel_globals.h>
 
+Q_MOC_INCLUDE("nx/vms/client/desktop/analytics/attribute_display_manager.h")
 Q_MOC_INCLUDE("nx/vms/client/desktop/event_rules/models/detectable_object_type_model.h")
 Q_MOC_INCLUDE("nx/vms/client/desktop/event_search/utils/analytics_search_setup.h")
 Q_MOC_INCLUDE("nx/vms/client/desktop/event_search/utils/common_object_search_setup.h")
 Q_MOC_INCLUDE("nx/vms/client/desktop/window_context.h")
 
 namespace nx::analytics::db { struct ObjectTrack; }
-
+namespace nx::vms::client::desktop::analytics::taxonomy { class AttributeDisplayManager; }
 namespace nx::vms::client::desktop {
 
 class AnalyticsSearchSetup;
@@ -75,6 +76,9 @@ class RightPanelModelsAdapter: public QIdentityProxyModel
         NOTIFY eventGroupsChanged)
     Q_PROPERTY(QAbstractItemModel* analyticsEvents READ analyticsEvents
         NOTIFY analyticsEventsChanged)
+
+    Q_PROPERTY(analytics::taxonomy::AttributeDisplayManager* attributeManager
+        READ attributeManager WRITE setAttributeManager NOTIFY attributeManagerChanged)
 
     using base_type = QIdentityProxyModel;
 
@@ -154,6 +158,9 @@ public:
     QVector<RightPanel::VmsEventGroup> eventGroups() const;
     QAbstractItemModel* analyticsEvents() const;
 
+    analytics::taxonomy::AttributeDisplayManager* attributeManager() const;
+    void setAttributeManager(analytics::taxonomy::AttributeDisplayManager* attributeManager);
+
     void setHighlightedTimestamp(std::chrono::microseconds value);
     void setHighlightedResources(const QSet<QnResourcePtr>& value);
 
@@ -181,6 +188,7 @@ signals:
     void analyticsEventsChanged();
     void unreadTrackingChanged();
     void unreadCountChanged();
+    void attributeManagerChanged();
 
     void clicked(const QModelIndex& index, Qt::MouseButton button, Qt::KeyboardModifiers modifiers);
     void doubleClicked(const QModelIndex& index);

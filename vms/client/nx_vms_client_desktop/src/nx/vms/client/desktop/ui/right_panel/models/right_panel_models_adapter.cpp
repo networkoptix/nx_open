@@ -5,7 +5,6 @@
 #include <algorithm>
 #include <chrono>
 #include <deque>
-#include <limits>
 #include <memory>
 
 #include <QtCore/QDeadlineTimer>
@@ -39,6 +38,7 @@
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/analytics/analytics_taxonomy_manager.h>
+#include <nx/vms/client/desktop/analytics/attribute_display_manager.h>
 #include <nx/vms/client/desktop/common/utils/command_action.h>
 #include <nx/vms/client/desktop/common/utils/preview_rect_calculator.h>
 #include <nx/vms/client/desktop/event_rules/models/detectable_object_type_model.h>
@@ -164,6 +164,30 @@ QHash<intptr_t, QPointer<ResourceThumbnailProvider>>& previewsById()
     return data;
 }
 
+analytics::AttributeList filterAndSortAttributeList(
+    analytics::AttributeList attributes,
+    const QStringList& attributeOrder,
+    const QSet<QString>& visibleAttributes)
+{
+    analytics::AttributeList result;
+
+    for (const QString& name: attributeOrder)
+    {
+        auto it = std::find_if(attributes.begin(), attributes.end(),
+            [name](const analytics::Attribute& attribute) { return attribute.id == name; });
+
+        if (it == attributes.end())
+            continue;
+
+        if (visibleAttributes.contains(it->id))
+            result.append(*it);
+
+        attributes.erase(it);
+    }
+
+    return result;
+}
+
 } // namespace
 
 using nx::vms::client::desktop::analytics::taxonomy::AnalyticsFilterModel;
@@ -227,6 +251,9 @@ public:
 
     void ensureAnalyticsRowVisible(int row);
 
+    analytics::taxonomy::AttributeDisplayManager* attributeManager() const;
+    void setAttributeManager(analytics::taxonomy::AttributeDisplayManager* value);
+
     static QString valuesText(const QStringList& values);
 
     static void calculatePreviewRects(const QnResourcePtr& resource,
@@ -242,6 +269,7 @@ public:
         PreviewTimeMsRole,
         PreviewHighlightRectRole,
         FlatAttributeListRole,
+        FlatFilteredAttributeListRole,
         ItemIsVisibleRole,
         HighlightedRole,
         CommandActionRole,
@@ -265,6 +293,7 @@ private:
     void loadNextPreview();
     bool isNextPreviewLoadAllowed(const ResourceThumbnailProvider* provider) const;
     void createUnread(int first, int count);
+    void allItemsDataChangeNotify(const QList<int>& roles);
 
 private:
     CommonObjectSearchSetup* const m_commonSetup = new CommonObjectSearchSetup(this);
@@ -309,6 +338,7 @@ private:
     DetectableObjectTypeModel* m_objectTypeModel = nullptr; //< Owned by `m_analyticsSetup`.
 
     std::unique_ptr<AnalyticsEventModel> m_analyticsEvents;
+    analytics::taxonomy::AttributeDisplayManager* m_attributeManager = nullptr;
 
     microseconds m_highlightedTimestamp = -1us;
     QSet<QnResourcePtr> m_highlightedResources;
@@ -455,8 +485,17 @@ QVariant RightPanelModelsAdapter::data(const QModelIndex& index, int role) const
         {
             const auto attributes = data(index, Qn::AnalyticsAttributesRole)
                 .value<analytics::AttributeList>();
-
             return flattenAttributeList(attributes);
+        }
+
+        case Private::FlatFilteredAttributeListRole:
+        {
+            const auto attributes = data(index, Qn::AnalyticsAttributesRole)
+                .value<analytics::AttributeList>();
+            return flattenAttributeList(
+                filterAndSortAttributeList(attributes,
+                    d->attributeManager()->attributes(),
+                    d->attributeManager()->visibleAttributes()));
         }
 
         case Private::ItemIsVisibleRole:
@@ -524,31 +563,39 @@ bool RightPanelModelsAdapter::setData(const QModelIndex& index, const QVariant& 
 
 QHash<int, QByteArray> RightPanelModelsAdapter::roleNames() const
 {
-    auto roles = base_type::roleNames();
-    roles[Qt::ForegroundRole] = "foregroundColor";
-    roles[Qn::ResourceRole] = "previewResource";
-    roles[Qn::DescriptionTextRole] = "description";
-    roles[Qn::DecorationPathRole] = "decorationPath";
-    roles[Qn::TimestampTextRole] = "timestamp";
-    roles[Qn::AdditionalTextRole] = "additionalText";
-    roles[Qn::DisplayedResourceListRole] = "resourceList";
-    roles[Qn::RemovableRole] = "isCloseable";
-    roles[Qn::AlternateColorRole] = "isInformer";
-    roles[Qn::ProgressValueRole] = "progressValue";
-    roles[Qn::HelpTopicIdRole] = "helpTopicId";
-    roles[Qn::AnalyticsEngineNameRole] = "analyticsEngineName";
-    roles[Qn::AnalyticsAttributesRole] = "rawAttributes";
-    roles[Private::CommandActionRole] = "commandAction";
-    roles[Private::AdditionalActionRole] = "additionalAction";
-    roles[Private::FlatAttributeListRole] = "attributes";
-    roles[Private::ItemIsVisibleRole] = "visible";
-    roles[Private::HighlightedRole] = "highlighted";
-    roles[Private::PreviewIdRole] = "previewId";
-    roles[Private::PreviewStateRole] = "previewState";
-    roles[Private::PreviewAspectRatioRole] = "previewAspectRatio";
-    roles[Private::PreviewTimeMsRole] = "previewTimestampMs";
-    roles[Private::PreviewHighlightRectRole] = "previewHighlightRect";
-    return roles;
+    static QHash<int, QByteArray> roleNames;
+    if (roleNames.isEmpty())
+    {
+        roleNames = base_type::roleNames();
+        roleNames.insert({
+            {Qt::ForegroundRole, "foregroundColor"},
+            {Qn::ResourceRole, "previewResource"},
+            {Qn::DescriptionTextRole, "description"},
+            {Qn::DecorationPathRole, "decorationPath"},
+            {Qn::TimestampTextRole, "timestamp"},
+            {Qn::AdditionalTextRole, "additionalText"},
+            {Qn::DisplayedResourceListRole, "resourceList"},
+            {Qn::RemovableRole, "isCloseable"},
+            {Qn::AlternateColorRole, "isInformer"},
+            {Qn::ProgressValueRole, "progressValue"},
+            {Qn::HelpTopicIdRole, "helpTopicId"},
+            {Qn::AnalyticsEngineNameRole, "analyticsEngineName"},
+            {Qn::AnalyticsAttributesRole, "rawAttributes"},
+            {Private::CommandActionRole, "commandAction"},
+            {Private::AdditionalActionRole, "additionalAction"},
+            {Private::FlatAttributeListRole, "attributes"},
+            {Private::FlatFilteredAttributeListRole, "filteredAttributes"},
+            {Private::ItemIsVisibleRole, "visible"},
+            {Private::HighlightedRole, "highlighted"},
+            {Private::PreviewIdRole, "previewId"},
+            {Private::PreviewStateRole, "previewState"},
+            {Private::PreviewAspectRatioRole, "previewAspectRatio"},
+            {Private::PreviewTimeMsRole, "previewTimestampMs"},
+            {Private::PreviewHighlightRectRole, "previewHighlightRect"}
+            });
+    }
+
+    return roleNames;
 }
 
 bool RightPanelModelsAdapter::removeRow(int row)
@@ -818,6 +865,17 @@ QVector<RightPanel::VmsEventGroup> RightPanelModelsAdapter::eventGroups() const
 QAbstractItemModel* RightPanelModelsAdapter::analyticsEvents() const
 {
     return d->analyticsEvents();
+}
+
+analytics::taxonomy::AttributeDisplayManager* RightPanelModelsAdapter::attributeManager() const
+{
+    return d->attributeManager();
+}
+
+void RightPanelModelsAdapter::setAttributeManager(
+    analytics::taxonomy::AttributeDisplayManager* attributeManager)
+{
+    d->setAttributeManager(attributeManager);
 }
 
 QVariantList RightPanelModelsAdapter::flattenAttributeList(const analytics::AttributeList& source)
@@ -1781,6 +1839,14 @@ bool RightPanelModelsAdapter::Private::isNextPreviewLoadAllowed(
             tilePreviewLoadInterval()));
 }
 
+void RightPanelModelsAdapter::Private::allItemsDataChangeNotify(const QList<int>& roles)
+{
+    emit q->dataChanged(
+        q->index(0, 0),
+        q->index(q->rowCount() - 1, q->columnCount() - 1),
+        roles);
+}
+
 void RightPanelModelsAdapter::Private::requestPreview(int row)
 {
     const QPersistentModelIndex index(q->index(row, 0));
@@ -1946,6 +2012,36 @@ void RightPanelModelsAdapter::Private::setUnreadTrackingEnabled(bool value)
 
     const auto guard = makeUnreadCountGuard();
     m_unreadItems.clear();
+}
+
+analytics::taxonomy::AttributeDisplayManager*
+    RightPanelModelsAdapter::Private::attributeManager() const
+{
+    return m_attributeManager;
+}
+
+void RightPanelModelsAdapter::Private::setAttributeManager(
+    analytics::taxonomy::AttributeDisplayManager* value)
+{
+    using namespace analytics::taxonomy;
+
+    if (value == m_attributeManager)
+        return;
+
+    if (m_attributeManager)
+        m_attributeManager->disconnect(this);
+
+    m_attributeManager = value;
+
+    if (m_attributeManager)
+    {
+        connect(m_attributeManager, &AttributeDisplayManager::attributesChanged, this,
+            [this]() { allItemsDataChangeNotify({FlatFilteredAttributeListRole}); });
+        connect(m_attributeManager, &AttributeDisplayManager::visibleAttributesChanged, this,
+            [this]() { allItemsDataChangeNotify({FlatFilteredAttributeListRole}); });
+    }
+
+    emit q->attributeManagerChanged();
 }
 
 // ------------------------------------------------------------------------------------------------

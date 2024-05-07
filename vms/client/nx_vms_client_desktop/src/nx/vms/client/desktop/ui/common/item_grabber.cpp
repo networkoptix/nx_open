@@ -7,16 +7,15 @@
 #include <QtQml/QtQml>
 #include <QtQuick/QQuickItem>
 #include <QtQuick/QQuickWindow>
-#include <QtQuick/private/qsgcontext_p.h>
-#include <QtQuick/private/qsgadaptationlayer_p.h>
 #include <QtQuick/private/qquickitem_p.h>
 #include <QtQuick/private/qquickpixmapcache_p.h>
-
-#include <utils/common/delayed.h>
+#include <QtQuick/private/qsgadaptationlayer_p.h>
+#include <QtQuick/private/qsgcontext_p.h>
 
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/format.h>
 #include <nx/vms/client/desktop/utils/qml_utils.h>
+#include <utils/common/delayed.h>
 
 namespace nx::vms::client::desktop {
 
@@ -109,8 +108,9 @@ private:
 
     void finish()
     {
-        m_callback.call({ m_result->url().toString() });
+        // This object may be destroyed during the callback execution, so it should be called last.
         deleteLater();
+        m_callback.call({ m_result->url().toString() });
     }
 
 private:

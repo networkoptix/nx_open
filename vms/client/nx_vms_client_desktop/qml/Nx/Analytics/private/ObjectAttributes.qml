@@ -144,7 +144,7 @@ Column
                 return
 
             updateSelectedAttributeValues()
-            if (editor.attribute.isReferencedInCondition)
+            if (editor.attribute && editor.attribute.isReferencedInCondition)
             {
                 if (editor.hasTextFields && editor.activeFocus)
                 {

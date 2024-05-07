@@ -112,6 +112,12 @@ Control
     onHoveredChanged:
     {
         if (tile.controller)
+        {
+            if (tile.hovered)
+                tile.controller.hoveredTile = tile
+            else if (tile.controller.hoveredTile === tile)
+                tile.controller.hoveredTile = null
             tile.controller.hoverChanged(index, tile.hovered)
+        }
     }
 }

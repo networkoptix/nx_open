@@ -18,7 +18,6 @@ Control
 
     property alias displayedItemsText: displayedItemsLabel.text
     property alias availableItemsText: availableItemsButton.text
-    property alias showPreview: previewButton.checked
 
     readonly property int iconWidth: 20
     readonly property int iconHeight: 20
@@ -26,6 +25,8 @@ Control
     signal commitNewItemsRequested()
 
     height: displayedItemsText ? Metrics.kCounterBlockHeight : 0
+    implicitWidth: Math.max(availableItemsButton.width, 70)
+        + leftPadding + rightPadding + row.spacing
     visible: !!displayedItemsText
 
     leftPadding: 8
@@ -99,51 +100,6 @@ Control
 
                 onClicked:
                     control.commitNewItemsRequested()
-            }
-        }
-
-        Row
-        {
-            id: toolbar
-
-            topPadding: 2
-            rightPadding: 7 //< Align to the right border of the rightmost column tile.
-
-            TextButton
-            {
-                id: previewButton
-                text: qsTr("Preview")
-
-                height: 24
-                leftPadding: 8
-                rightPadding: 8
-
-                checkable: true
-                checked: true
-                icon.source: "image://skin/advanced_search_dialog/eye_open.svg"
-                icon.width: control.iconWidth
-                icon.height: control.iconHeight
-
-                color: checked ? ColorTheme.colors.light4 : ColorTheme.colors.light16
-
-                background: Rectangle
-                {
-                    radius: 2
-
-                    color:
-                    {
-                        if (previewButton.checked)
-                        {
-                            return previewButton.hovered
-                                ? ColorTheme.colors.dark11
-                                : ColorTheme.colors.dark10
-                        }
-
-                        return previewButton.hovered
-                            ? ColorTheme.colors.dark8
-                            : ColorTheme.colors.dark7
-                    }
-                }
             }
         }
     }

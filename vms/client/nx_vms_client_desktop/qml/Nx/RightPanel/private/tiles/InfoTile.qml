@@ -60,6 +60,9 @@ TileBase
                 sourceSize: Qt.size(20, 20)
 
                 visible: !!sourcePath
+                    && (!controller
+                        || !controller.attributeManager
+                        || controller.attributeManager.objectTypeVisible)
                 primaryColor: caption.color
             }
 
@@ -67,6 +70,9 @@ TileBase
             {
                 id: caption
 
+                visible: !controller
+                    || !controller.attributeManager
+                    || controller.attributeManager.objectTypeVisible
                 Layout.fillWidth: true
                 Layout.topMargin: 2
                 Layout.alignment: Qt.AlignTop
@@ -169,7 +175,7 @@ TileBase
         {
             id: attributeTable
 
-            items: (model && model.attributes) || []
+            items: (model && model.filteredAttributes) || []
             visible: items.length > 0 && (!tile.controller || tile.controller.showInformation)
             width: tileContent.width
 
@@ -237,6 +243,9 @@ TileBase
             remainderColor: tile.secondaryForegroundColor
             resourceNames: (model && model.resourceList) || []
             visible: !empty
+                && (!controller
+                    || !controller.attributeManager
+                    || controller.attributeManager.cameraVisible)
         }
     }
 
