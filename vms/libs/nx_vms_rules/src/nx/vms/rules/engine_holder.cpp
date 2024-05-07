@@ -92,13 +92,7 @@ void EngineHolder::connectEngine(
         },
         connectionType);
 
-    auto router = engine->router();
-    connect(processor, &QnCommonMessageProcessor::vmsActionReceived, router,
-        [engine](const nx::vms::api::rules::ActionInfo& info)
-        {
-            engine->router()->receiveAction(engine->buildAction(info.props));
-        },
-        connectionType);
+    engine->router()->init(processor);
 }
 
 } // namespace nx::vms::rules

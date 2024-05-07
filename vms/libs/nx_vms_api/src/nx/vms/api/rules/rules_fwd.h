@@ -9,4 +9,6 @@ struct EventFilter;
 struct Field;
 struct Rule;
 
+struct ActionInfo;
+
 } // namespace nx::vms::api::rules

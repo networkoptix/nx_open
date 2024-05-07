@@ -15,6 +15,8 @@ public:
     explicit ClientRouter(nx::vms::client::core::SystemContext* context);
     virtual ~ClientRouter() override;
 
+    virtual void init(const QnCommonMessageProcessor* processor) override;
+
     virtual nx::Uuid peerId() const override;
 
     virtual void routeEvent(
@@ -22,6 +24,9 @@ public:
         const RuleList& triggeredRules) override;
 
     virtual void routeAction(const nx::vms::rules::ActionPtr& action) override;
+
+private:
+    void onActionReceived(const nx::vms::api::rules::ActionInfo& info);
 };
 
 } // namespace nx::vms::client::core::rules
