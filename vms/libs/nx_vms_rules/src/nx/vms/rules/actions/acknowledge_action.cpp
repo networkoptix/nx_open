@@ -2,6 +2,7 @@
 
 #include "acknowledge_action.h"
 
+#include "../utils/event_details.h"
 #include "../utils/field.h"
 #include "../utils/type.h"
 
@@ -19,6 +20,15 @@ const ItemDescriptor& AcknowledgeAction::manifest()
         .targetServers = TargetServers::currentServer,
     };
     return kDescriptor;
+}
+
+QVariantMap AcknowledgeAction::details(common::SystemContext* context) const
+{
+    auto result = base_type::details(context);
+
+    utils::insertIfNotEmpty(result, utils::kDescriptionDetailName, description());
+
+    return result;
 }
 
 } // namespace nx::vms::rules

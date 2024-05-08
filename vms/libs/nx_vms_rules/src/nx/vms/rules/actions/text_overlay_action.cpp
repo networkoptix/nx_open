@@ -2,6 +2,8 @@
 
 #include "text_overlay_action.h"
 
+#include <nx/vms/common/html/html.h>
+
 #include "../action_builder_fields/optional_time_field.h"
 #include "../action_builder_fields/target_device_field.h"
 #include "../action_builder_fields/target_user_field.h"
@@ -51,6 +53,19 @@ const ItemDescriptor& TextOverlayAction::manifest()
         .resources = {{utils::kDeviceIdsFieldName, {ResourceType::device}}},
     };
     return kDescriptor;
+}
+
+QVariantMap TextOverlayAction::details(common::SystemContext* context) const
+{
+    auto result = base_type::details(context);
+
+    auto text = this->text().trimmed();
+    if (!text.isEmpty())
+        text = nx::vms::common::html::toPlainText(text);
+
+    utils::insertIfNotEmpty(result, utils::kDescriptionDetailName, text);
+
+    return result;
 }
 
 } // namespace nx::vms::rules
