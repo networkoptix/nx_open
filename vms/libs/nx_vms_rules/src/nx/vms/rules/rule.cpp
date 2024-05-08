@@ -236,12 +236,11 @@ ValidationResult Rule::validity(common::SystemContext* context) const
                 return {QValidator::State::Invalid, {}};
 
             auto validator = m_engine->fieldValidator(field->metatype());
-            if (!NX_ASSERT(validator))
-                return {QValidator::State::Invalid, {}};
+            if (!validator)
+                continue;
 
             const auto fieldValidity = validator->validity(field, this, context);
-            if (result.validity < fieldValidity.validity)
-                result.validity = fieldValidity.validity;
+            result.validity = std::min(result.validity, fieldValidity.validity);
 
             if (!fieldValidity.description.isEmpty())
             {
@@ -262,12 +261,11 @@ ValidationResult Rule::validity(common::SystemContext* context) const
                 return {QValidator::State::Invalid, {}};
 
             auto validator = m_engine->fieldValidator(field->metatype());
-            if (!NX_ASSERT(validator))
-                return {QValidator::State::Invalid, {}};
+            if (!validator)
+                continue;
 
             const auto fieldValidity = validator->validity(field, this, context);
-            if (result.validity < fieldValidity.validity)
-                result.validity = fieldValidity.validity;
+            result.validity = std::min(result.validity, fieldValidity.validity);
 
             if (!fieldValidity.description.isEmpty())
             {

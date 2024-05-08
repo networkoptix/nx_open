@@ -181,15 +181,9 @@ Dialog
             {
                 id: delegateChooser
 
-                function getDelegateColor(isSelected, isValid)
+                function getDelegateColor(isSelected)
                 {
-                    if (isSelected)
-                        return ColorTheme.colors.dark9
-
-                    if (!isValid)
-                        return ColorTheme.colors.red_attention
-
-                    return ColorTheme.colors.dark7
+                    return isSelected ? ColorTheme.colors.dark9 : ColorTheme.colors.dark7
                 }
 
                 DelegateChoice
