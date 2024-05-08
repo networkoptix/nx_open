@@ -7283,15 +7283,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>View Live.</source>
-      <translation type="unfinished">View Live.</translation>
+      <translation>Просмотр прямого эфира.</translation>
     </message>
     <message>
       <source>User Input.</source>
-      <translation>Другие действия.</translation>
+      <translation>Пользовательский ввод.</translation>
     </message>
     <message>
       <source>Edit Settings.</source>
-      <translation type="unfinished">Edit Settings.</translation>
+      <translation>Изменение настроек.</translation>
     </message>
   </context>
   <context>
