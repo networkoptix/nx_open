@@ -76,9 +76,8 @@ const QString& EventLogModelData::compareString() const
 const QVariantMap EventLogModelData::actionDetails(SystemContext* context) const
 {
     if (m_actionDetails.empty())
-        m_actionDetails = event(context)->details(context);
+        m_actionDetails = action(context)->details(context);
 
-    NX_ASSERT(!m_actionDetails.empty());
     return m_actionDetails;
 }
 

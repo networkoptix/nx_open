@@ -60,4 +60,13 @@ const ItemDescriptor& BookmarkAction::manifest()
     return kDescriptor;
 }
 
+QVariantMap BookmarkAction::details(common::SystemContext* context) const
+{
+    auto result = base_type::details(context);
+
+    utils::insertIfNotEmpty(result, utils::kDescriptionDetailName, description());
+
+    return result;
+}
+
 } // namespace nx::vms::rules
