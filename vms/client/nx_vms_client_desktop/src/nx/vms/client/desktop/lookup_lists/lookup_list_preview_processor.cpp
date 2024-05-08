@@ -12,6 +12,12 @@
 
 namespace nx::vms::client::desktop {
 
+LookupListPreviewHelper* LookupListPreviewHelper::instance()
+{
+    static LookupListPreviewHelper instance;
+    return &instance;
+}
+
 struct LookupListPreviewProcessor::Private
 {
     int rowsNumber = 10;
@@ -26,7 +32,12 @@ LookupListPreviewProcessor::LookupListPreviewProcessor(QObject* parent):
 {
 }
 
-void LookupListPreviewProcessor::setImportFilePathFromDialog()
+LookupListPreviewHelper::LookupListPreviewHelper(QObject* parent):
+    base_type(parent)
+{
+}
+
+QString LookupListPreviewHelper::getImportFilePathFromDialog()
 {
     QString previousDir = appContext()->localSettings()->lastImportDir();
     if (previousDir.isEmpty() && !appContext()->localSettings()->mediaFolders().isEmpty())
@@ -36,8 +47,15 @@ void LookupListPreviewProcessor::setImportFilePathFromDialog()
     const QString caption = tr("Import Lookup List");
     const QString fileFilters = QnCustomFileDialog::createFilter(
         {{tr("Text files"), {"txt", "csv", "tsv"}}, {tr("All other text files"), {"*"}}});
-    const QString fileName =
-        QFileDialog::getOpenFileName(nullptr, caption, previousDir, fileFilters, nullptr, options);
+    return QFileDialog::getOpenFileName(nullptr, caption, previousDir, fileFilters, nullptr, options);
+}
+
+bool LookupListPreviewProcessor::setImportFilePathFromDialog()
+{
+    const auto fileName = LookupListPreviewHelper::getImportFilePathFromDialog();
+
+    if (fileName.isEmpty())
+        return false;
 
     setDataHasHeaderRow(true);
     setFilePath(fileName);
@@ -50,6 +68,7 @@ void LookupListPreviewProcessor::setImportFilePathFromDialog()
     }
 
     appContext()->localSettings()->lastImportDir = QFileInfo(fileName).absolutePath();
+    return true;
 }
 
 bool LookupListPreviewProcessor::buildTablePreview(LookupListImportEntriesModel* model,

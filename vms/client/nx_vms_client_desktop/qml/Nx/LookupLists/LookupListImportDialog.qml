@@ -20,6 +20,9 @@ ModalDialog
 
     required property Analytics.StateView taxonomy
     required property LookupListEntriesModel model
+    property alias filePath: previewProcessor.filePath
+    property alias separatorSymbol: previewProcessor.separator
+
     title: qsTr("Import List")
     minimumWidth: 611
     minimumHeight: 551
@@ -98,7 +101,7 @@ ModalDialog
                 id: filePathField
 
                 Layout.fillWidth: true
-                text: processor.filePath
+                text: previewProcessor.filePath
                 readOnly: true
             }
 
@@ -109,7 +112,7 @@ ModalDialog
                 onClicked:
                 {
                     resetTextFieldFocus()
-                    processor.setImportFilePathFromDialog()
+                    previewProcessor.setImportFilePathFromDialog()
                 }
             }
 
@@ -125,7 +128,7 @@ ModalDialog
 
                 Layout.maximumWidth: 40
 
-                text: processor.separator
+                text: previewProcessor.separator
                 maximumLength: 1
                 Keys.onPressed: (event) =>
                 {
@@ -175,7 +178,7 @@ ModalDialog
                 Layout.row: 3
                 Layout.column: 1
 
-                checked: processor.dataHasHeaderRow
+                checked: previewProcessor.dataHasHeaderRow
                 text: qsTr("Data contains header")
                 onCheckedChanged: resetTextFieldFocus()
             }
@@ -228,8 +231,11 @@ ModalDialog
             enabled: tableView.correct
             onClicked:
             {
-                importProcessor.importListEntries(processor.filePath, processor.separator,
-                    processor.dataHasHeaderRow, importModel)
+                importProcessor.importListEntries(
+                    previewProcessor.filePath, 
+                    previewProcessor.separator,
+                    previewProcessor.dataHasHeaderRow, 
+                    importModel)
             }
         }
 
@@ -253,11 +259,13 @@ ModalDialog
 
     LookupListPreviewProcessor
     {
-        id: processor
+        id: previewProcessor
 
         function initImportModel()
         {
-            buildTablePreview(importModel, filePath, separator, dataHasHeaderRow)
+            //< Had to explicitly check this property, since it can be uninitialized when Dialog is created.
+            if (importModel.lookupListEntriesModel)
+                buildTablePreview(importModel, filePath, separator, dataHasHeaderRow)
         }
 
         rowsNumber: 10
@@ -268,11 +276,6 @@ ModalDialog
         onSeparatorChanged: initImportModel()
         onFilePathChanged: initImportModel()
         onDataHasHeaderRowChanged: initImportModel()
-    }
-
-    Component.onCompleted:
-    {
-        processor.setImportFilePathFromDialog()
     }
 
     onVisibleChanged:
