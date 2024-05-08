@@ -70,7 +70,17 @@ Dialog
 
     function importList()
     {
-        const properties = {"model": entriesModel, "taxonomy": control.taxonomy}
+        const initialPath = LookupListPreviewHelper.getImportFilePathFromDialog()
+        if (!initialPath)
+            return //< User clicked Cancel.
+
+        const properties =
+            {
+                "model": entriesModel,
+                "taxonomy": control.taxonomy,
+                "filePath": initialPath,
+                "separatorSymbol": initialPath.endsWith(".tsv") ? "\t" : ",",
+            }
         importDialog.createObject(control, properties).openNewIn(control)
     }
 

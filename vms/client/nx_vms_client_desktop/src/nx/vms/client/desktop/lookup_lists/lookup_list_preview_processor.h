@@ -15,7 +15,22 @@
 namespace nx::vms::client::desktop {
 
 /**
- * Processor of input csv/tsv file for LookupListPreview, used in QML.
+ * Allows to call static functions in QML without creation of the LookupListPreviewProcessor.
+ */
+class NX_VMS_CLIENT_DESKTOP_API LookupListPreviewHelper: public QObject
+{
+    Q_OBJECT
+    using base_type = QObject;
+
+public:
+    LookupListPreviewHelper(QObject* parent = nullptr);
+    static Q_INVOKABLE QString getImportFilePathFromDialog();
+    static LookupListPreviewHelper* instance();
+};
+
+/**
+ * Processor of reading input csv/tsv file for generating preview data in
+ * LookupListImportEntriesModel. Used in QML.
  */
 class NX_VMS_CLIENT_DESKTOP_API LookupListPreviewProcessor: public QObject
 {
@@ -32,7 +47,7 @@ public:
 
     explicit LookupListPreviewProcessor(QObject* parent = nullptr);
     virtual ~LookupListPreviewProcessor() override;
-    Q_INVOKABLE void setImportFilePathFromDialog();
+    Q_INVOKABLE bool setImportFilePathFromDialog();
     Q_INVOKABLE bool buildTablePreview(LookupListImportEntriesModel* model,
         const QString& filePath,
         const QString& separator,

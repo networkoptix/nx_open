@@ -3,6 +3,7 @@
 #include "lookup_lists_dialog.h"
 
 #include <QtCore/QUrl>
+#include <QtQml/QtQml>
 
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -21,6 +22,11 @@ void LookupListsDialog::registerQmlTypes()
         "nx.vms.client.desktop", 1, 0, "LookupListEntriesModel");
     qmlRegisterType<LookupListExportProcessor>(
         "nx.vms.client.desktop", 1, 0, "LookupListExportProcessor");
+    qmlRegisterSingletonInstance("nx.vms.client.desktop",
+        1,
+        0,
+        "LookupListPreviewHelper",
+        LookupListPreviewHelper::instance());
     qmlRegisterType<LookupListPreviewProcessor>(
         "nx.vms.client.desktop", 1, 0, "LookupListPreviewProcessor");
     qmlRegisterType<LookupListImportEntriesModel>(
