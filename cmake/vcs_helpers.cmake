@@ -3,9 +3,9 @@
 include_guard(GLOBAL)
 
 # ATTENTION: These expressions are valid only for single-digit VMS version numbers.
-set(META_RELEASE_TAG_GLOB "vms/[0-9].[0-9]/[0-9]*_meta_*")
-set(META_RELEASE_TAG_REGEX "^vms/[0-9]\.[0-9]/([0-9]+)(_beta|_rc)?.*_meta_.+$")
-set(PROTECTED_BRANCH_REGEX "^(master$|vms_[0-9]\.[0-9](_patch)?$)")
+set(META_RELEASE_TAG_GLOB "vms/[0-9].[0-9]*/[0-9]*_meta_*")
+set(META_RELEASE_TAG_REGEX "^vms/[0-9]\.[0-9](\.[0-9])?/([0-9]+)(_beta|_rc)?.*_meta_.+$")
+set(PROTECTED_BRANCH_REGEX "^(master$|vms_[0-9]\.[0-9](\.[0-9])?(_patch)?$)")
 
 # The BUILD_NUMBER argument can be omitted - in this case we do not try to obtain the compatible
 # Server build number using the algorithm described in the comment to _extract_git_info().
@@ -215,7 +215,7 @@ function(_detect_compatible_release_build_number build_number_variable)
         OUTPUT_STRIP_TRAILING_WHITESPACE
     )
     if(_return_code EQUAL 0 AND _git_tag MATCHES ${META_RELEASE_TAG_REGEX})
-        set(${build_number_variable} ${CMAKE_MATCH_1})
+        set(${build_number_variable} ${CMAKE_MATCH_2})
         # Check if there are other release tags pointing at the found commit and issue a warning
         # if there are any.
         _issue_multiple_tags_warning_if_needed(${_git_tag})
@@ -293,7 +293,7 @@ endmacro()
 
 # "buildNumber" cache variable must be set.
 function(nx_vcs_get_meta_release_build_suffix suffix_variable)
-    set(tag_glob "vms/[0-9].[0-9]/${buildNumber}*_meta_*")
+    set(tag_glob "vms/[0-9].[0-9]*/${buildNumber}*_meta_*")
     set(get_commit_release_tag_command
         git -C "${CMAKE_CURRENT_LIST_DIR}" describe --tags --match "${tag_glob}"
     )
@@ -304,7 +304,7 @@ function(nx_vcs_get_meta_release_build_suffix suffix_variable)
         OUTPUT_STRIP_TRAILING_WHITESPACE
     )
     if(_return_code EQUAL 0 AND _git_tag MATCHES ${META_RELEASE_TAG_REGEX} AND CMAKE_MATCH_2)
-        string(REPLACE "_" "-" _suffix_variable ${CMAKE_MATCH_2})
+        string(REPLACE "_" "-" _suffix_variable ${CMAKE_MATCH_3})
         set(${suffix_variable} ${_suffix_variable} PARENT_SCOPE)
     else()
         set(${suffix_variable} "" PARENT_SCOPE)
