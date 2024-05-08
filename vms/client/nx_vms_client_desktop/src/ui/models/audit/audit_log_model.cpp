@@ -954,7 +954,7 @@ QVariant QnAuditLogModel::data(const QModelIndex &index, int role) const
                 return QVariant();
 
             if (record->isPlaybackType())
-                    return qnSkin->icon("audit/play.png");
+                return QVariant();
 
             switch (record->eventType)
             {
