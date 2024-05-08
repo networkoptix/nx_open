@@ -21,14 +21,15 @@ Rectangle
                 return {
                     "color": ColorTheme.colors.red_l,
                     "background": ColorTheme.colors.dark10,
-                    "icon": "image://skin/20x20/Solid/error.svg"
+                    "icon": "image://skin/20x20/Solid/error.svg",
                 }
 
             case DialogBanner.Style.Warning:
                 return {
                     "color": ColorTheme.colors.light4,
                     "background": ColorTheme.colors.dark10,
-                    "icon": "image://skin/20x20/Solid/attention.svg"
+                    "icon": "image://skin/20x20/Solid/attention.svg",
+                    "iconColor": ColorTheme.colors.yellow_l,
                 }
 
             case DialogBanner.Style.Info:
@@ -36,7 +37,7 @@ Rectangle
                 return {
                     "color": ColorTheme.colors.light4,
                     "background": ColorTheme.colors.dark10,
-                    "icon": "image://skin/20x20/Solid/info.svg"
+                    "icon": "image://skin/20x20/Solid/info.svg",
                 }
         }
     }
@@ -84,7 +85,7 @@ Rectangle
             Layout.alignment: Qt.AlignTop | Qt.AlignLeft
 
             sourcePath: control.styleData.icon
-            primaryColor: control.styleData.color
+            primaryColor: control.styleData.iconColor ?? control.styleData.color
             sourceSize: Qt.size(20, 20)
         }
 
