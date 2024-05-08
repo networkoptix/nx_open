@@ -185,7 +185,7 @@ const SaveableSettingsBase kDefaultSettingsBase{
     .mediaBufferSizeKb = 256,
     .osTimeChangeCheckPeriodMs = std::chrono::milliseconds{5'000},
     .proxyConnectTimeoutSec = 5,
-    .proxyConnectionAccessPolicy = ProxyConnectionAccessPolicy::disabled,
+    .proxyConnectionAccessPolicy = ProxyConnectionAccessPolicy::admins,
     .remoteSessionTimeoutS = std::chrono::seconds{6 * 60 * 60},
     .remoteSessionUpdateS = std::chrono::seconds{10},
     .resourceFileUri = nx::utils::Url{"https://resources.vmsproxy.com/resource_data.json"},

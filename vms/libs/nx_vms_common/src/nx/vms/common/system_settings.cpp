@@ -386,7 +386,7 @@ SystemSettings::AdaptorList SystemSettings::initConnectionAdaptors()
 
     d->proxyConnectionAccessPolicyAdaptor =
         new QnReflectLexicalResourcePropertyAdaptor<nx::vms::api::ProxyConnectionAccessPolicy>(
-            "proxyConnectionAccessPolicy", nx::vms::api::ProxyConnectionAccessPolicy::disabled, this,
+            "proxyConnectionAccessPolicy", nx::vms::api::ProxyConnectionAccessPolicy::admins, this,
             [] { return tr("Proxy connection access policy"); });
     ec2Adaptors << d->proxyConnectionAccessPolicyAdaptor;
 
