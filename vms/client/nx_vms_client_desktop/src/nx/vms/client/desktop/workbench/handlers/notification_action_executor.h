@@ -34,7 +34,7 @@ private:
     void onNotificationActionReceived(
         const QSharedPointer<nx::vms::rules::NotificationActionBase>& notificationAction,
         const QString& cloudSystemId);
-    void onContextUserChanged();
+    void reinitializeCrossSystemNotificationsListener();
     void handleAcknowledgeAction();
 
     void removeNotification(const nx::vms::rules::NotificationActionBasePtr& action);

@@ -2522,6 +2522,7 @@ void SystemSettings::update(const api::SystemSettings& value)
     d->cloudAccountNameAdaptor->setValue(value.cloudAccountName);
     d->organizationIdAdaptor->setValue(value.organizationId);
     d->cloudSystemIdAdaptor->setValue(value.cloudSystemID);
+    d->organizationIdAdaptor->setValue(value.organizationId);
     if (value.defaultExportVideoCodec)
         d->defaultExportVideoCodecAdaptor->setValue(*value.defaultExportVideoCodec);
     d->localSystemIdAdaptor->setValue(value.localSystemId);

@@ -20,6 +20,8 @@
 #include <nx/vms/client/core/common/utils/cloud_url_helper.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
+#include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/system_settings.h>
@@ -109,6 +111,15 @@ public:
             });
     }
 
+    void reauthenticate()
+    {
+        auto const credentials = qnCloudStatusWatcher->credentials();
+        CloudAuthenticate cloudAuthenticate;
+        cloudAuthenticate.accessToken = QString::fromStdString(credentials.authToken.value);
+        const nx::Buffer writeBuffer = nx::reflect::json::serialize(cloudAuthenticate);
+        p2pWebsocketTransport->sendAsync(&writeBuffer, {});
+    }
+
 private:
 
     void stopSync()
@@ -162,6 +173,29 @@ private:
         buffer.clear();
     }
 
+    bool needCreateNotification(const CloudNotification& cloudMessage)
+    {
+        if (cloudMessage.type != kCloudNotificationType)
+            return false;
+
+        const auto cloudCrossSystemContext =
+            appContext()->cloudCrossSystemManager()->systemContext(cloudMessage.systemId);
+
+        if (!cloudCrossSystemContext)
+            return false;
+
+        const auto currentSystemSettings = appContext()->currentSystemContext()->globalSettings();
+        const auto crossSystemSettings = cloudCrossSystemContext->systemContext()->globalSettings();
+        if (const auto organizationId = currentSystemSettings->organizationId();
+            organizationId.isNull() || organizationId != crossSystemSettings->organizationId())
+        {
+            return false;
+        }
+
+        return ini().allowOwnCloudNotifications
+            || cloudMessage.systemId != currentSystemSettings->cloudSystemId();
+    }
+
     void onReadSomeAsync()
     {
         CloudNotification cloudMessage;
@@ -170,10 +204,7 @@ private:
         NX_VERBOSE(this, "Read message, deserialized: %1, type: %2",
             deserializationSucceeded, cloudMessage.type);
 
-        auto systemId = appContext()->currentSystemContext()->globalSettings()->cloudSystemId();
-
-        if (deserializationSucceeded && cloudMessage.type == kCloudNotificationType
-            && (ini().allowOwnCloudNotifications ? true : cloudMessage.systemId != systemId))
+        if (deserializationSucceeded && needCreateNotification(cloudMessage))
         {
             QSharedPointer<nx::vms::rules::NotificationAction> notificationAction(
                 new nx::vms::rules::NotificationAction);
@@ -210,6 +241,12 @@ CrossSystemNotificationsListener::CrossSystemNotificationsListener(QObject* pare
     qRegisterMetaType<QSharedPointer<nx::vms::rules::NotificationAction>>();
 
     NX_ASSERT(qnCloudStatusWatcher, "Cloud status watcher is not ready");
+
+    connect(
+        qnCloudStatusWatcher,
+        &nx::vms::client::core::CloudStatusWatcher::credentialsChanged,
+        this,
+        [this] { d->reauthenticate(); });
 
     d->reconnectWebsocket();
 }

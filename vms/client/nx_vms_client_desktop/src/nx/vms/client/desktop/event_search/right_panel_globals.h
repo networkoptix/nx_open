@@ -40,7 +40,7 @@ Q_ENUM_NS(CameraSelection)
 
 enum class SystemSelection
 {
-    all,
+    organization,
     current,
 };
 Q_ENUM_NS(SystemSelection)
