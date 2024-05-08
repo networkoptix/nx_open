@@ -39,6 +39,7 @@
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/utils/context_utils.h>
+#include <nx/vms/common/saas/saas_service_manager.h>
 #include <nx/vms/common/saas/saas_utils.h>
 #include <nx/vms/event/actions/abstract_action.h>
 #include <nx/vms/event/events/abstract_event.h>
@@ -196,7 +197,7 @@ void NotificationListWidget::Private::setupFilterSystemsButton()
             m_filterSystemsButton->setState(system == RightPanel::SystemSelection::current
                     ? SelectableTextButton::State::deactivated
                     : SelectableTextButton::State::unselected);
-           m_filterSystemsButton->setAccented(system == RightPanel::SystemSelection::all);
+           m_filterSystemsButton->setAccented(system == RightPanel::SystemSelection::organization);
         };
 
 
@@ -219,7 +220,20 @@ void NotificationListWidget::Private::setupFilterSystemsButton()
         };
 
     addMenuAction(tr("Current Site"), RightPanel::SystemSelection::current);
-    addMenuAction(tr("All Sites"), RightPanel::SystemSelection::all);
+    addMenuAction({}, RightPanel::SystemSelection::organization);
+
+    connect(
+        system()->saasServiceManager(),
+        &nx::vms::common::saas::ServiceManager::dataChanged,
+        this,
+        [this]()
+        {
+            if (!system()->saasServiceManager()->saasActive())
+                return;
+
+            m_systemSelectionActions[RightPanel::SystemSelection::organization]->setText(
+                    system()->saasServiceManager()->data().organization.name);
+        });
 
     connect(m_filterSystemsButton, &SelectableTextButton::stateChanged, this,
         [this](SelectableTextButton::State state)

@@ -6,6 +6,8 @@
 
 #include <QtCore/QJsonValue>
 
+#include <nx/reflect/instrument.h>
+
 #include "data_macros.h"
 
 namespace nx::vms::api {
@@ -19,6 +21,15 @@ struct CloudNotificationRequest
 #define CloudNotificationRequest_Fields (systemId)(targets)(notification)
 
 NX_VMS_API_DECLARE_STRUCT_EX(CloudNotificationRequest, (json))
+
+struct CloudAuthenticate
+{
+    QString type = "authenticate";
+    QString accessToken;
+};
+#define CloudAuthenticate_Fields (type)(accessToken)
+NX_REFLECTION_INSTRUMENT(CloudAuthenticate, CloudAuthenticate_Fields)
+NX_VMS_API_DECLARE_STRUCT_EX(CloudAuthenticate, (json))
 
 struct CloudNotification
 {

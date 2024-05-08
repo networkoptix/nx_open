@@ -10,6 +10,9 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     CloudNotificationRequest, (json), CloudNotificationRequest_Fields)
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
+    CloudAuthenticate, (json), CloudAuthenticate_Fields)
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     CloudNotification, (json), CloudNotification_Fields)
 
 } // namespace nx::vms::api

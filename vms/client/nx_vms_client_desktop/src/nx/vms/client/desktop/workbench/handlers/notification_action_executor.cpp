@@ -16,6 +16,7 @@
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/api/helpers/bookmark_api_converter.h>
+#include <nx/vms/common/saas/saas_service_manager.h>
 #include <nx/vms/common/saas/saas_utils.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
 #include <nx/vms/rules/actions/repeat_sound_action.h>
@@ -77,7 +78,13 @@ NotificationActionExecutor::NotificationActionExecutor(QObject* parent):
     engine->addActionExecutor(rules::utils::type<ShowOnAlarmLayoutAction>(), this);
 
     connect(context(), &QnWorkbenchContext::userChanged,
-        this, &NotificationActionExecutor::onContextUserChanged);
+        this, &NotificationActionExecutor::reinitializeCrossSystemNotificationsListener);
+
+    connect(
+        systemContext()->saasServiceManager(),
+        &nx::vms::common::saas::ServiceManager::saasStateChanged,
+        this,
+        &NotificationActionExecutor::reinitializeCrossSystemNotificationsListener);
 
     connect(action(menu::AcknowledgeNotificationAction), &QAction::triggered,
         this, &NotificationActionExecutor::handleAcknowledgeAction);
@@ -188,7 +195,7 @@ void NotificationActionExecutor::handleAcknowledgeAction()
         removeNotification(notification);
 }
 
-void NotificationActionExecutor::onContextUserChanged()
+void NotificationActionExecutor::reinitializeCrossSystemNotificationsListener()
 {
     using namespace nx::vms;
 
