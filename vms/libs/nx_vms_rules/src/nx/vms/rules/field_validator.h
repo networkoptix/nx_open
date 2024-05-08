@@ -16,6 +16,8 @@ struct ValidationResult
 {
     QValidator::State validity = QValidator::State::Acceptable;
     QString description;
+
+    bool isValid() const { return validity != QValidator::State::Invalid; }
 };
 
 /**

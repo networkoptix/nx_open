@@ -126,7 +126,7 @@ QVariant RulesTableModel::data(const QModelIndex& index, int role) const
         return {};
 
     if (role == IsRuleValidRole)
-        return rule->isValid();
+        return rule->isValid() && rule->validity(appContext()->currentSystemContext()).isValid();
 
     const auto column = index.column();
     if (role == SortDataRole)
@@ -250,10 +250,11 @@ QVariant RulesTableModel::stateColumnData(const ConstRulePtr& rule, int role) co
 
     if (role == Qt::DecorationRole)
     {
-        // TODO: #mmalofeev check if the rule has warning.
-
         if (!rule->enabled())
             return "misc/disabled.svg";
+
+        if (!rule->isValid() || !rule->validity(appContext()->currentSystemContext()).isValid())
+            return "20x20/Solid/alert2.svg?primary=yellow_d";
     }
 
     return {};

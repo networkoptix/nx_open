@@ -14,6 +14,7 @@ Rectangle
     id: control
 
     required property bool selected
+    readonly property string decorationPath: model.decoration ?? ""
 
     signal clicked()
     signal doubleClicked()
@@ -28,15 +29,36 @@ Rectangle
         anchors.fill: parent
         spacing: 8
 
-        Image
+        Loader
         {
-            id: image
-
-            sourceSize.width: 20
-            sourceSize.height: 20
-
-            source: model.decoration ?? ""
             visible: !!model.decoration
+            sourceComponent: decorationPath.startsWith("image://resource/")
+                ? resourceImage
+                : coloredImage
+        }
+
+        Component
+        {
+            id: resourceImage
+
+            Image
+            {
+                sourceSize.width: 20
+                sourceSize.height: 20
+                source: control.decorationPath
+            }
+        }
+
+        Component
+        {
+            id: coloredImage
+
+            ColoredImage
+            {
+                sourceSize.width: 20
+                sourceSize.height: 20
+                sourcePath: control.decorationPath
+            }
         }
 
         BasicTableCellDelegate
