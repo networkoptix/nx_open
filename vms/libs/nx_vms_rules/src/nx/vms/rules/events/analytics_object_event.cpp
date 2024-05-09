@@ -100,10 +100,8 @@ const ItemDescriptor& AnalyticsObjectEvent::manifest()
         .description = {},
         .fields = {
             makeFieldDescriptor<SourceCameraField>(utils::kCameraIdFieldName, tr("Occurs At")),
-            makeFieldDescriptor<AnalyticsObjectTypeField>(
-                utils::kObjectTypeIdFieldName, tr("Of Type"), {}, {}, {utils::kCameraIdFieldName}),
-            makeFieldDescriptor<ObjectLookupField>(
-                utils::kAttributesFieldName, tr("And Object"), {}, {}, {utils::kObjectTypeIdFieldName}),
+            makeFieldDescriptor<AnalyticsObjectTypeField>(utils::kObjectTypeIdFieldName, tr("Of Type")),
+            makeFieldDescriptor<ObjectLookupField>(utils::kAttributesFieldName, tr("And Object")),
         },
         .resources = {
             {utils::kCameraIdFieldName, {ResourceType::device, Qn::ViewContentPermission}},

@@ -32,8 +32,7 @@ const ItemDescriptor& PlaySoundAction::manifest()
                     .allowEmptySelection = true,
                     .validationPolicy = {}
                 }.toVariantMap()),
-            makeFieldDescriptor<VolumeField>(
-                "volume", tr("Volume"), {}, {}, {utils::kSoundFieldName}),
+            makeFieldDescriptor<VolumeField>("volume", tr("Volume")),
             utils::makeIntervalFieldDescriptor(tr("Interval of Action")),
         },
         .resources = {{utils::kDeviceIdsFieldName, {ResourceType::device, {}, {}, FieldFlag::target}}},

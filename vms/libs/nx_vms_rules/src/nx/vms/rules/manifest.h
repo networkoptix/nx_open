@@ -113,12 +113,9 @@ struct FieldDescriptor
 
     /**%apidoc[opt]:object Optional properties corresponding to the actual field id. */
     QVariantMap properties; //< TODO: #mmalofeev should properties required for the field initialisation be separated from the supportive properties?
-
-    /**%apidoc[opt] Field names of the parent item that required for the current field. */
-    QStringList linkedFields;
 };
-#define nx_vms_rules_FieldDescriptor_Fields \
-    (id)(fieldName)(displayName)(description)(properties)(linkedFields)
+#define nx_vms_rules_FieldDescriptor_Fields (id)(fieldName)(displayName)(description)(properties)
+
 NX_VMS_RULES_API void serialize(
     QnJsonContext* ctx, const FieldDescriptor& value, QJsonValue* target);
 

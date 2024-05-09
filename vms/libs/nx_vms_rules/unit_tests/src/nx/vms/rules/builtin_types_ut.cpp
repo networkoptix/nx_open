@@ -78,16 +78,6 @@ public:
         }
 
         ASSERT_EQ(fieldNames.size(), manifest.fields.size());
-
-        // Check linked fields are exist.
-        for (const auto& field: manifest.fields)
-        {
-            for (const auto& link: field.linkedFields)
-            {
-                SCOPED_TRACE(nx::format("Linked field: %1->%2", field.id, link).toStdString());
-                EXPECT_TRUE(fieldNames.contains(link));
-            }
-        }
     }
 
     template<class T>

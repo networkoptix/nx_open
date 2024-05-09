@@ -36,8 +36,7 @@ const ItemDescriptor& SendEmailAction::manifest()
                     .ids = nx::utils::toQSet(vms::api::kAllPowerUserGroupIds),
                     .allowEmptySelection = false,
                     .validationPolicy = kUserWithEmailValidationPolicy
-                }.toVariantMap(),
-                {utils::kEmailsFieldName}),
+                }.toVariantMap()),
             makeFieldDescriptor<ActionTextField>(
                 utils::kEmailsFieldName, tr("Additional Recipients")),
             makeFieldDescriptor<EmailMessageField>(

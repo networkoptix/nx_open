@@ -71,20 +71,17 @@ protected:
     {
         auto field = theField();
 
-        if (m_fieldDescriptor->linkedFields.contains(vms::rules::utils::kDurationFieldName))
+        if (field->descriptor()->fieldName == vms::rules::utils::kRecordAfterFieldName)
         {
             const auto durationField =
                 base::template getActionField<vms::rules::OptionalTimeField>(
                     vms::rules::utils::kDurationFieldName);
-            if (!NX_ASSERT(durationField))
-                return;
-
-            const auto hasDuration =
-                durationField->value() != vms::rules::OptionalTimeField::value_type::zero();
-
-            // Pre and post recording pickers (except bookmark action pre-recording) must be
-            // visible for the user only when action hasn't duration.
-            this->setVisible(!hasDuration);
+            if (durationField)
+            {
+                // Post recording must not be visible when fixed duration is set.
+                this->setVisible(
+                    durationField->value() != vms::rules::OptionalTimeField::value_type::zero());
+            }
         }
 
         QSignalBlocker blocker{m_timeDurationWidget};

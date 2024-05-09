@@ -133,16 +133,13 @@ private:
         if (!camera)
             return qnSkin->icon(core::kAlertIcon);
 
-        if (descriptor()->linkedFields.contains(vms::rules::utils::kLayoutIdsFieldName))
+        const auto layoutIdsField =
+            getActionField<vms::rules::TargetLayoutField>(vms::rules::utils::kLayoutIdsFieldName);
+        if (layoutIdsField)
         {
-            const auto layoutIdsField = getActionField<vms::rules::TargetLayoutField>(
-                vms::rules::utils::kLayoutIdsFieldName);
-
-            if (!NX_ASSERT(layoutIdsField))
-                return qnSkin->icon(core::kAlertIcon);
-
-            const auto layouts = resourcePool()->template getResourcesByIds<QnLayoutResource>(
-                layoutIdsField->value());
+            const auto layoutIds = layoutIdsField->value();
+            const auto layouts =
+                resourcePool()->template getResourcesByIds<QnLayoutResource>(layoutIds);
             const auto isCameraExistsOnLayouts = std::all_of(
                 layouts.cbegin(),
                 layouts.cend(),

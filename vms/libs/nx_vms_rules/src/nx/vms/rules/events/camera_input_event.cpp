@@ -75,12 +75,7 @@ const ItemDescriptor& CameraInputEvent::manifest()
                 tr("Occurs at"),
                 {},
                 {{"acceptAll", true}}),
-            makeFieldDescriptor<InputPortField>(
-                "inputPortId",
-                tr("With ID"),
-                {},
-                {},
-                {utils::kCameraIdFieldName}),
+            makeFieldDescriptor<InputPortField>("inputPortId", tr("With ID")),
         },
         .resources = {
             {utils::kCameraIdFieldName,

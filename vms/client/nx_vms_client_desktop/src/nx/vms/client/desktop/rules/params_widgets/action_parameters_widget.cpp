@@ -167,13 +167,10 @@ void ActionParametersWidget::onActionDurationChanged() const
                 return;
 
             const auto timeFieldDescriptor = fieldDescriptor(fieldName);
-            if (timeFieldDescriptor->linkedFields.contains(vms::rules::utils::kDurationFieldName))
+            if (durationField && durationField->value() != std::chrono::microseconds::zero())
             {
-                if (durationField->value() != std::chrono::microseconds::zero())
-                {
-                    QSignalBlocker blocker{timeField};
-                    timeField->setValue(std::chrono::microseconds::zero());
-                }
+                QSignalBlocker blocker{timeField};
+                timeField->setValue(std::chrono::microseconds::zero());
             }
         };
 

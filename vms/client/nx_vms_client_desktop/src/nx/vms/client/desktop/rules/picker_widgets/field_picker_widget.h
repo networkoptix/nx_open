@@ -37,6 +37,11 @@ protected:
         return P::parentParamsWidget()->eventDescriptor();
     }
 
+    std::optional<vms::rules::ItemDescriptor> getActionDescriptor() const
+    {
+        return P::parentParamsWidget()->actionDescriptor();
+    }
+
     F* theField() const
     {
         auto field = theFieldImpl<F>();
