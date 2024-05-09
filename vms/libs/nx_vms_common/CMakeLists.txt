@@ -1,5 +1,7 @@
 ## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+find_package(Qt6 COMPONENTS ShaderTools)
+
 set(date_time_formatter_root "${open_source_root}/artifacts/date_time_formatter")
 file(GLOB_RECURSE date_time_formatter_sources
     "${date_time_formatter_root}/src/date_time_formatter/*")
@@ -59,6 +61,7 @@ endif()
 target_include_directories(nx_vms_common
     PRIVATE
         ${Qt6Core_PRIVATE_INCLUDE_DIRS}
+        ${Qt6Gui_PRIVATE_INCLUDE_DIRS}
         ${device_vendor_names_root}/src
     PUBLIC
         ${date_time_formatter_root}/src
@@ -86,3 +89,13 @@ if(withTests)
     add_subdirectory(test_support)
     add_subdirectory(unit_tests)
 endif()
+
+qt6_add_shaders(nx_vms_common "pixelation_shaders"
+    PREFIX
+        "/"
+    FILES
+        "src/nx/vms/common/pixelation/shaders/color.frag"
+        "src/nx/vms/common/pixelation/shaders/color.vert"
+        "src/nx/vms/common/pixelation/shaders/pixelation.frag"
+        "src/nx/vms/common/pixelation/shaders/pixelation.vert"
+)
