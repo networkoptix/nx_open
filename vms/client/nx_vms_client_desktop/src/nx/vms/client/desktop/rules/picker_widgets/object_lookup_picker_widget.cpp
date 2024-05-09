@@ -160,13 +160,13 @@ void ObjectLookupPicker::updateUi()
         if (!nx::Uuid::isUuidString(theField()->value()))
             theField()->setValue({});
 
-        if (m_fieldDescriptor->linkedFields.contains(vms::rules::utils::kObjectTypeIdFieldName))
+        const auto objectTypeField = getEventField<vms::rules::AnalyticsObjectTypeField>(
+            vms::rules::utils::kObjectTypeIdFieldName);
+        if (NX_ASSERT(
+            objectTypeField,
+            "%1 field must be provided for the given event",
+            vms::rules::utils::kObjectTypeIdFieldName))
         {
-            const auto objectTypeField = getEventField<vms::rules::AnalyticsObjectTypeField>(
-                vms::rules::utils::kObjectTypeIdFieldName);
-            if (!NX_ASSERT(objectTypeField))
-                return;
-
             if (m_lookupListsModel->objectTypeId() != objectTypeField->value())
                 m_lookupListsModel->setObjectTypeId(objectTypeField->value());
         }

@@ -25,7 +25,7 @@ const ItemDescriptor& DeviceRecordingAction::manifest()
         .fields = {
             makeFieldDescriptor<TargetDeviceField>(utils::kDeviceIdsFieldName, tr("On")),
             makeFieldDescriptor<StreamQualityField>("quality", tr("Quality")),
-            makeFieldDescriptor<FpsField>("fps", tr("FPS"), {}, {}, {utils::kDeviceIdsFieldName}),
+            makeFieldDescriptor<FpsField>("fps", tr("FPS")),
             utils::makeTimeFieldDescriptor<OptionalTimeField>(
                 utils::kDurationFieldName,
                 tr("Duration"),
@@ -50,8 +50,7 @@ const ItemDescriptor& DeviceRecordingAction::manifest()
                 TimeFieldProperties{
                     .value = 0s,
                     .maximumValue = 600s,
-                    .minimumValue = 0s}.toVariantMap(),
-                {utils::kDurationFieldName}),
+                    .minimumValue = 0s}.toVariantMap()),
             utils::makeIntervalFieldDescriptor(tr("Interval of Action")),
         },
         .resources = {{utils::kDeviceIdsFieldName, {ResourceType::device, {}, {}, FieldFlag::target}}},

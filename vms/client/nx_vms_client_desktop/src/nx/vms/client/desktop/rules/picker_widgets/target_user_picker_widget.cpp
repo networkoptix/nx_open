@@ -47,11 +47,10 @@ void TargetUserPicker::updateUi()
 
     UserPickerHelperParameters helperParameters;
 
-    if (m_fieldDescriptor->linkedFields.contains(vms::rules::utils::kEmailsFieldName))
+    if (const auto additionalRecipients =
+        getActionField<vms::rules::ActionTextField>(vms::rules::utils::kEmailsFieldName))
     {
-        const auto additionalRecipients =
-            getActionField<vms::rules::ActionTextField>(vms::rules::utils::kEmailsFieldName);
-        if (NX_ASSERT(additionalRecipients) && !additionalRecipients->value().isEmpty())
+        if (!additionalRecipients->value().isEmpty())
         {
             const auto emails = additionalRecipients->value().split(';', Qt::SkipEmptyParts);
             helperParameters.additionalUsers = emails.size();

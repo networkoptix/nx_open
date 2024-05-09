@@ -16,16 +16,14 @@ FieldDescriptor makeFieldDescriptor(
     const QString& fieldName,
     const QString& displayName,
     const QString& description = {},
-    const QVariantMap& properties = {},
-    const QStringList& linkedFields = {})
+    const QVariantMap& properties = {})
 {
     return FieldDescriptor{
         .id = fieldMetatype<T>(),
         .fieldName = fieldName,
         .displayName = displayName,
         .description = description,
-        .properties = properties,
-        .linkedFields = linkedFields
+        .properties = properties
     };
 }
 
@@ -64,15 +62,13 @@ FieldDescriptor makeTimeFieldDescriptor(
     const QString& fieldName,
     const QString& displayName,
     const QString& description = {},
-    const QVariantMap& properties = {},
-    const QStringList& linkedFields = {})
+    const QVariantMap& properties = {})
 {
     return makeFieldDescriptor<T>(
         fieldName,
         displayName,
         description,
-        properties,
-        linkedFields);
+        properties);
 }
 
 NX_VMS_RULES_API FieldDescriptor makeIntervalFieldDescriptor(

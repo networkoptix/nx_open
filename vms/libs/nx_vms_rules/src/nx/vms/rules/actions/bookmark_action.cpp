@@ -48,8 +48,7 @@ const ItemDescriptor& BookmarkAction::manifest()
                 TimeFieldProperties{
                     .value = 0s,
                     .maximumValue = 600s,
-                    .minimumValue = 0s}.toVariantMap(),
-                {utils::kDurationFieldName}),
+                    .minimumValue = 0s}.toVariantMap()),
             makeFieldDescriptor<ActionTextField>("tags", tr("Add Tags")),
 
             // TODO: #amalov Use Qn::ResouceInfoLevel::RI_WithUrl & AttrSerializePolicy::singleLine

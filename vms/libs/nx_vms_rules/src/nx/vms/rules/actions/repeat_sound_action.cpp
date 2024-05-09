@@ -39,8 +39,7 @@ const ItemDescriptor& RepeatSoundAction::manifest()
                     .allowEmptySelection = true,
                     .validationPolicy = {}
                 }.toVariantMap()),
-            makeFieldDescriptor<VolumeField>(
-                "volume", tr("Volume"), {}, {}, {utils::kSoundFieldName}),
+            makeFieldDescriptor<VolumeField>("volume", tr("Volume")),
 
             utils::makeTextFormatterFieldDescriptor("caption", "{@EventCaption}"),
             utils::makeTextFormatterFieldDescriptor("description", "{@EventDescription}"),

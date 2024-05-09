@@ -11,7 +11,11 @@
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/rules/action_builder_fields/sound_field.h>
 #include <nx/vms/rules/action_builder_fields/text_with_fields.h>
+#include <nx/vms/rules/actions/play_sound_action.h>
+#include <nx/vms/rules/actions/repeat_sound_action.h>
+#include <nx/vms/rules/actions/speak_action.h>
 #include <nx/vms/rules/utils/field.h>
+#include <nx/vms/rules/utils/type.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/media/audio_player.h>
 
@@ -72,11 +76,8 @@ void VolumePicker::onVolumeChanged()
 
 void VolumePicker::onTestButtonClicked()
 {
-    const auto linkedFields = descriptor()->linkedFields;
-    if (!NX_ASSERT(!linkedFields.empty(), "Linked field is not declared"))
-        return;
-
-    if (linkedFields.contains(vms::rules::utils::kTextFieldName))
+    const auto actionId = getActionDescriptor()->id;
+    if (actionId == vms::rules::utils::type<vms::rules::SpeakAction>())
     {
         auto textField =
             getActionField<vms::rules::TextWithFields>(vms::rules::utils::kTextFieldName);
@@ -92,7 +93,8 @@ void VolumePicker::onTestButtonClicked()
         if (AudioPlayer::sayTextAsync(text, this, [this] { onTextSaid(); }))
             m_testPushButton->setEnabled(false);
     }
-    else if (linkedFields.contains(vms::rules::utils::kSoundFieldName))
+    else if (actionId == vms::rules::utils::type<vms::rules::RepeatSoundAction>()
+        || actionId == vms::rules::utils::type<vms::rules::PlaySoundAction>())
     {
         auto soundField =
             getActionField<vms::rules::SoundField>(vms::rules::utils::kSoundFieldName);
@@ -117,7 +119,7 @@ void VolumePicker::onTestButtonClicked()
     }
     else
     {
-        NX_ASSERT(false, "Unsupported linked field type declared");
+        NX_ASSERT(false, "Unexpected action type is used");
     }
 }
 

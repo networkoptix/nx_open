@@ -85,8 +85,7 @@ const ItemDescriptor& PluginDiagnosticEvent::manifest()
                 tr("Occurs at"),
                 {},
                 {{"acceptAll", false}}),
-            makeFieldDescriptor<AnalyticsEngineField>(
-                "engineId", tr("For Plugin"), {}, {}, {utils::kCameraIdFieldName}),
+            makeFieldDescriptor<AnalyticsEngineField>("engineId", tr("For Plugin")),
             makeFieldDescriptor<TextLookupField>(utils::kCaptionFieldName, tr("And Caption")),
             makeFieldDescriptor<TextLookupField>(utils::kDescriptionFieldName, tr("And Description")),
             makeFieldDescriptor<AnalyticsEventLevelField>("level", tr("And Level Is")),
