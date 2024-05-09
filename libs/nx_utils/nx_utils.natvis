@@ -10,6 +10,10 @@
       </Expand>
   </Type>
 
+  <Type Name="nx::utils::property_storage::Property&lt;*&gt;">
+    <DisplayString>Property[{name}] = {m_value}</DisplayString>
+  </Type>
+
   <Type Name="nx::Uuid">
       <DisplayString>{m_uuid}</DisplayString>
   </Type>
