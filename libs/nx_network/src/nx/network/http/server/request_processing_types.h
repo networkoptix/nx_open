@@ -29,7 +29,19 @@ struct ConnectionAttrs
     SocketAddress localAddr;
 };
 
-struct RequestContext
+struct TraceContext
+{
+    // The trace id is a unique identifier for the request. It should be used in logs to identify
+    // all log messages related to the same request.
+    std::string traceId;
+
+    // The HTTP header that contains the trace id.
+    std::pair<std::string, std::string> header;
+};
+
+std::optional<TraceContext> parseTraceContext(const HttpHeaders& headers);
+
+struct NX_NETWORK_API RequestContext
 {
     using Attrs = nx::utils::stree::StringAttrDict;
 
@@ -63,7 +75,10 @@ struct RequestContext
      */
     RequestPathParams requestPathParams;
 
-    RequestContext() = default;
+    /** Request tracing context. */
+    std::optional<TraceContext> traceContext;
+
+    RequestContext();
 
     RequestContext(
         ConnectionAttrs connectionAttrs,
@@ -71,16 +86,7 @@ struct RequestContext
         const SocketAddress& clientEndpoint,
         Attrs attrs,
         http::Request request,
-        std::unique_ptr<AbstractMsgBodySourceWithCache> body = nullptr)
-        :
-        connectionAttrs(std::move(connectionAttrs)),
-        conn(connection),
-        clientEndpoint(clientEndpoint),
-        attrs(std::move(attrs)),
-        request(std::move(request)),
-        body(std::move(body))
-    {
-    }
+        std::unique_ptr<AbstractMsgBodySourceWithCache> body = nullptr);
 };
 
 enum class MessageBodyDeliveryType
