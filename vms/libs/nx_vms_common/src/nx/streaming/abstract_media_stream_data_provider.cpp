@@ -91,7 +91,9 @@ void QnAbstractMediaStreamDataProvider::setNeedKeyData()
 
 bool QnAbstractMediaStreamDataProvider::needKeyData(int channel) const
 {
-    return m_gotKeyFrame.at(channel) == 0;
+    if (channel < CL_MAX_CHANNEL_NUMBER)
+        return m_gotKeyFrame.at(channel) == 0;
+    return false;
 }
 
 bool QnAbstractMediaStreamDataProvider::needKeyData() const
