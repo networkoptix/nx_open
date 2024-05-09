@@ -290,7 +290,7 @@ nx::Uuid QnNetworkResource::physicalIdToId(const QString& physicalId)
 
 QString QnNetworkResource::idForToStringFromPtr() const
 {
-    return getPhysicalId();
+    return NX_FMT("%1: %2", getId().toSimpleString(), getPhysicalId());
 }
 
 void QnNetworkResource::setAuth(const QString &user, const QString &password)

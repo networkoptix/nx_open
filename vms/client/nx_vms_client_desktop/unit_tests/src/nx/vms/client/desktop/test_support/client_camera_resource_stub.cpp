@@ -15,7 +15,7 @@ ClientCameraResourceStub::ClientCameraResourceStub()
     base_type(kThumbCameraTypeId)
 {
     setIdUnsafe(nx::Uuid::createUuid());
-    forceUsingLocalProperties();
+    setForceUsingLocalProperties();
 }
 
 bool ClientCameraResourceStub::setProperty(

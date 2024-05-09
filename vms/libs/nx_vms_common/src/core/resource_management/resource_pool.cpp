@@ -245,11 +245,14 @@ void QnResourcePool::removeResources(const QnResourceList& resources)
         }
     }
 
-    // Remove other resources from layouts.
+    // Remove other resources from layouts if they are not being recreated.
     QSet<nx::Uuid> removedResourcesIds;
     QSet<QString> removedResourcesPhysicalIds;
     for (const auto& resource: std::as_const(removedOtherResources))
     {
+        if (resource->flags().testFlag(Qn::need_recreate))
+            continue;
+
         removedResourcesIds.insert(resource->getId());
         if (auto networkResource = resource.dynamicCast<QnNetworkResource>())
             removedResourcesPhysicalIds.insert(networkResource->getPhysicalId());

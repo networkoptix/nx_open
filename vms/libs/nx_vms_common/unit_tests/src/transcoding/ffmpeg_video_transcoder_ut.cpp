@@ -21,7 +21,7 @@ public:
 std::unique_ptr<QnAbstractStreamDataProvider> getProvider(const QSize& maxResolution)
 {
     QnResourcePtr resource(new QnResource());
-    resource->forceUsingLocalProperties();
+    resource->setForceUsingLocalProperties();
     const CameraMediaStreams mediaStreams {{
         {nx::vms::api::StreamIndex::primary, maxResolution},
         {nx::vms::api::StreamIndex::secondary, {640, 480}}
