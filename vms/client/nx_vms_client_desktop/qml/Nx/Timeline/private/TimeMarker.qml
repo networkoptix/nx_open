@@ -3,6 +3,7 @@
 import QtQuick 2.15
 
 import Nx.Core
+import Nx.Controls
 import nx.vms.client.core
 import nx.vms.client.desktop 1.0
 
@@ -94,27 +95,31 @@ SliderToolTip
             }
         }
 
-        Image
+        ColoredImage
         {
             id: leftArrow
 
             width: 5
             height: 10
 
-            source: "image://skin/timeline_tooltip/arrow_left.svg"
+            sourcePath: "image://skin/16x16/Outline/arrow_left.svg"
+            sourceSize: Qt.size(16, 16)
+            primaryColor: timeMarker.textColor
             visible: timeMarker.mode === Timeline.TimeMarkerMode.leftmost
             x: 8
             y: row.y + row.height / 2 - height / 2
         }
 
-        Image
+        ColoredImage
         {
             id: rightArrow
 
             width: 5
             height: 10
 
-            source: "image://skin/timeline_tooltip/arrow_right.svg"
+            sourcePath: "image://skin/16x16/Outline/arrow_right.svg"
+            sourceSize: Qt.size(16, 16)
+            primaryColor: timeMarker.textColor
             visible: timeMarker.mode === Timeline.TimeMarkerMode.rightmost
             x: content.width - width - 8
             y: row.y + row.height / 2 - height / 2
