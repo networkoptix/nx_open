@@ -54,6 +54,7 @@ SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
 
     d->metrics = std::make_shared<nx::metrics::Storage>();
     d->lookupListManager = std::make_unique<LookupListManager>();
+    d->pixelationSettings = std::make_unique<PixelationSettings>(this);
 
     switch (d->mode)
     {
@@ -157,6 +158,11 @@ DeviceLicenseUsageWatcher* SystemContext::deviceLicenseUsageWatcher() const
 VideoWallLicenseUsageWatcher* SystemContext::videoWallLicenseUsageWatcher() const
 {
     return d->videoWallLicenseUsageWatcher.get();
+}
+
+PixelationSettings* SystemContext::pixelationSettings() const
+{
+    return d->pixelationSettings.get();
 }
 
 QnResourcePool* SystemContext::resourcePool() const

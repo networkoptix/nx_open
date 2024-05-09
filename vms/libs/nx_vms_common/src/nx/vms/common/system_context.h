@@ -42,6 +42,7 @@ class DeviceLicenseUsageWatcher;
 class VideoWallLicenseUsageWatcher;
 class SystemSettings;
 class UserGroupManager;
+class PixelationSettings;
 
 namespace saas { class ServiceManager; }
 
@@ -163,6 +164,8 @@ public:
 
     /** Watches and notifies when Video Wall license usage is changed in the System. */
     VideoWallLicenseUsageWatcher* videoWallLicenseUsageWatcher() const;
+
+    PixelationSettings* pixelationSettings() const;
 
     /**
      * List of all Resources in the System. Some data is stored in the external dictionaries.
