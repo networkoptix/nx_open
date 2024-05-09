@@ -8,29 +8,4 @@
 
 namespace nx::cloud::db::api {
 
-#define Token_request_Fields \
-    (grant_type)(response_type)(client_id)(scope)(password)(username)(refresh_token)(code)( \
-        refresh_token_lifetime)
-NX_REFLECTION_INSTRUMENT(IssueTokenRequest, Token_request_Fields)
-
-#define Issue_token_response_Fields \
-    (access_token)(refresh_token)(expires_in)(expires_at)(token_type)(scope)(error)
-
-#define Issue_code_response_Fields (access_code)(code)(error)
-
-#define Issue_stun_token_request_Fields (server_name)
-
-#define Issue_stun_token_response_Fields (token)(mac_code)(error)(kid)(expires_at)(expires_in)
-
-NX_REFLECTION_INSTRUMENT(IssueTokenResponse, Issue_token_response_Fields);
-
-NX_REFLECTION_INSTRUMENT(ValidateTokenResponse, (access_token)(expires_in)(expires_at)(token_type) \
-    (scope)(username)(time_since_password))
-
-NX_REFLECTION_INSTRUMENT(IssueCodeResponse, Issue_code_response_Fields);
-
-NX_REFLECTION_INSTRUMENT(IssueStunTokenRequest, Issue_stun_token_request_Fields);
-
-NX_REFLECTION_INSTRUMENT(IssueStunTokenResponse, Issue_stun_token_response_Fields);
-
 } // namespace nx::cloud::db::api
