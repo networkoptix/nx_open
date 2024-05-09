@@ -65,6 +65,13 @@ class HttpServerConnection:
     public ::testing::Test
 {
 public:
+    struct LocalRequestContext
+    {
+        Request request;
+        SocketAddress clientEndpoint;
+        std::optional<TraceContext> traceContext;
+    };
+
     HttpServerConnection():
         m_timeShift(nx::utils::test::ClockType::steady)
     {
@@ -105,6 +112,11 @@ protected:
         m_httpServer.server().setConnectionInactivityTimeout(timeout);
     }
 
+    void addAdditionalRequestHeaders(HttpHeaders headers)
+    {
+        m_requestHeaders.insert(headers.begin(), headers.end());
+    }
+
     void whenRespondWithEmptyMessageBody()
     {
         installRequestHandlerWithEmptyBody();
@@ -130,6 +142,11 @@ protected:
     void whenReceivedChunkedResponse()
     {
         performRequest(prepareUrl(kUrlSchemeName, kResourceWithChunkedBodyPath));
+    }
+
+    void whenIssueRequest()
+    {
+        performRequest(prepareUrl(kUrlSchemeName, kResourceWithBodyPath));
     }
 
     void whenIssueRequestOverExistingConnection()
@@ -248,6 +265,11 @@ protected:
         m_lastRequestReceived = m_requestsReceived.pop();
     }
 
+    const LocalRequestContext& lastRequest() const
+    {
+        return *m_lastRequestReceived;
+    }
+
     void andConnectionObjectIsValidInRequestHandler()
     {
         ASSERT_EQ(m_lastRequestOriginEndpoint, m_lastRequestReceived->clientEndpoint);
@@ -312,12 +334,6 @@ protected:
     }
 
 private:
-    struct LocalRequestContext
-    {
-        Request request;
-        SocketAddress clientEndpoint;
-    };
-
     nx::utils::SyncQueue<SystemError::ErrorCode> m_connectionClosedEvents;
     TestHttpServer m_httpServer;
     SocketAddress m_lastRequestOriginEndpoint;
@@ -331,6 +347,7 @@ private:
     nx::Buffer m_lastSentRequestBody;
     std::vector<std::unique_ptr<TCPSocket>> m_rawConnections;
     nx::utils::test::ScopedTimeShift m_timeShift;
+    HttpHeaders m_requestHeaders;
 
     void performRequest(const nx::utils::Url& url, bool reuseConnection = false)
     {
@@ -346,6 +363,9 @@ private:
             m_client->setMessageBodyReadTimeout(kNoTimeout);
         }
 
+        for (const auto& header: m_requestHeaders)
+            m_client->addAdditionalHeader(header.first, header.second);
+
         ASSERT_TRUE(m_client->doGet(url));
         m_prevResponse = *m_client->response();
 
@@ -355,14 +375,14 @@ private:
     }
 
     void provideEmptyMessageBody(
-        RequestContext /*requestContext*/,
+        RequestContext requestContext,
         RequestProcessedHandler completionHandler)
     {
-        using namespace std::placeholders;
+        recordRequest(requestContext);
 
         RequestResult result(StatusCode::ok);
         result.connectionEvents.onResponseHasBeenSent =
-            std::bind(&HttpServerConnection::onResponseSent, this, _1);
+            [this](auto&&... args) { onResponseSent(std::forward<decltype(args)>(args)...); };
         result.body = std::make_unique<EmptyMessageBodySource>("text/plain", 0);
         completionHandler(std::move(result));
     }
@@ -371,6 +391,8 @@ private:
         RequestContext requestContext,
         RequestProcessedHandler completionHandler)
     {
+        recordRequest(requestContext);
+
         requestContext.conn.lock()->registerCloseHandler(
             [this](auto&&... args) { saveConnectionClosedEvent(std::forward<decltype(args)>(args)...); });
 
@@ -383,20 +405,23 @@ private:
     }
 
     void provideMessageBody(
-        RequestContext /*requestContext*/,
+        RequestContext requestContext,
         RequestProcessedHandler completionHandler)
     {
+        recordRequest(requestContext);
+
         RequestResult result(StatusCode::ok);
         result.body = std::make_unique<BufferSource>("text/plain", kResourceBody);
         completionHandler(std::move(result));
     }
 
     void provideChunkedMessageBody(
-        RequestContext /*requestContext*/,
+        RequestContext requestContext,
         RequestProcessedHandler completionHandler)
     {
-        RequestResult result(StatusCode::ok);
+        recordRequest(requestContext);
 
+        RequestResult result(StatusCode::ok);
         result.headers.emplace("Transfer-Encoding", "chunked");
         result.body = std::make_unique<TestChunkedBodySource>(
             std::make_unique<BufferSource>("text/plain", kResourceBody));
@@ -407,9 +432,7 @@ private:
         RequestContext requestContext,
         RequestProcessedHandler completionHandler)
     {
-        m_requestsReceived.push({
-            requestContext.request,
-            requestContext.clientEndpoint});
+        recordRequest(requestContext);
 
         completionHandler(StatusCode::ok);
     }
@@ -418,9 +441,7 @@ private:
         RequestContext requestContext,
         RequestProcessedHandler completionHandler)
     {
-        m_requestsReceived.push({
-            requestContext.request,
-            requestContext.clientEndpoint});
+        recordRequest(requestContext);
 
         saveRequestBody(std::move(requestContext.body));
 
@@ -505,6 +526,14 @@ private:
             ticker.bindToAioThread(t);
             ticker.executeInAioThreadSync([](){});
         }
+    }
+
+    void recordRequest(const RequestContext& ctx)
+    {
+        m_requestsReceived.push({
+            .request = ctx.request,
+            .clientEndpoint = ctx.clientEndpoint,
+            .traceContext = ctx.traceContext});
     }
 };
 
@@ -620,7 +649,7 @@ TEST_F(HttpServerConnection, default_server_header)
 
 TEST_F(HttpServerConnection, set_success_response_headers)
 {
-    HttpHeaders responseHeaders {
+    HttpHeaders responseHeaders{
         {"Hello", "World"},
         {"Server", compatibilityServerName()}};
     setExtraSuccessResponseHeaders(responseHeaders);
@@ -630,6 +659,43 @@ TEST_F(HttpServerConnection, set_success_response_headers)
 
     thenResponseHeaderIs("Hello", "World");
     thenResponseHeaderIs("Server", compatibilityServerName());
+}
+
+//-------------------------------------------------------------------------------------------------
+
+struct TraceContextTestParams
+{
+    std::string traceId;
+    std::string headerName;
+    std::string headerValue;
+};
+
+class HttpServerConnectionTraceContext:
+    public HttpServerConnection,
+    public ::testing::WithParamInterface<TraceContextTestParams>
+{
+    using base_type = HttpServerConnection;
+};
+
+INSTANTIATE_TEST_SUITE_P(HttpServerConnectionTraceContextInstance, HttpServerConnectionTraceContext,
+    ::testing::Values(
+        TraceContextTestParams{"4b8b1b1d1", "X-Amzn-Trace-Id", "Root=1-5e7b1b1d-4b8b1b1d1;Self=1-5e7b1b1d-4b8b3b1d9"}, // AWS X-Ray.
+        TraceContextTestParams{"TRACE_ID", "X-Cloud-Trace-Context", "TRACE_ID/SPAN_ID;o=OPTIONS"},   // GCP.
+        TraceContextTestParams{"TRACE_ID", "X-Cloud-Trace-Context", "TRACE_ID"},   // GCP.
+        TraceContextTestParams{"test12", "X-Request-Id", "test12"}           // custom.
+    ));
+
+TEST_P(HttpServerConnectionTraceContext, request_trace_context_is_read)
+{
+    addAdditionalRequestHeaders({{GetParam().headerName, GetParam().headerValue}});
+
+    whenIssueRequest();
+
+    thenRequestIsReceived();
+    ASSERT_TRUE(lastRequest().traceContext);
+    ASSERT_EQ(GetParam().traceId, lastRequest().traceContext->traceId);
+    ASSERT_EQ(GetParam().headerName, lastRequest().traceContext->header.first);
+    ASSERT_EQ(GetParam().headerValue, lastRequest().traceContext->header.second);
 }
 
 //-------------------------------------------------------------------------------------------------
