@@ -21,6 +21,23 @@ public:
     virtual void getStatistics(
         std::function<void(api::ResultCode, api::Statistics)> completionHandler) override;
 
+    virtual void getAllAccountLocks(
+        std::function<void(api::ResultCode, api::AccountLockList)> completionHandler) override;
+
+    virtual void getLockedHosts(
+        std::function<void(api::ResultCode, api::AccountLockList)> completionHandler) override;
+
+    virtual void isHostLocked(
+        std::string ipAddress,
+        std::function<void (api::ResultCode, bool)> completionHandler) override;
+
+    virtual void getLockedUsers(
+        std::function<void(api::ResultCode, api::AccountLockList)> completionHandler) override;
+
+    virtual void isUserLocked(
+        std::string username,
+        std::function<void (api::ResultCode, bool)> completionHandler) override;
+
 private:
     ApiRequestsExecutor* m_requestsExecutor = nullptr;
 };

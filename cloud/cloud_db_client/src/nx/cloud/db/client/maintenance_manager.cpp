@@ -2,6 +2,8 @@
 
 #include "maintenance_manager.h"
 
+#include <nx/network/http/rest/http_rest_client.h>
+
 #include "cdb_request_path.h"
 #include "data/maintenance_data.h"
 
@@ -29,6 +31,60 @@ void MaintenanceManager::getStatistics(
         nx::network::http::Method::get,
         kMaintenanceGetStatistics,
         {}, //query
+        std::move(completionHandler));
+}
+
+void MaintenanceManager::getAllAccountLocks(
+    std::function<void(api::ResultCode, api::AccountLockList)> completionHandler)
+{
+    m_requestsExecutor->makeAsyncCall<api::AccountLockList>(
+        nx::network::http::Method::get,
+        kMaintenanceSecurityLocks,
+        {},
+        std::move(completionHandler));
+}
+
+void MaintenanceManager::getLockedHosts(
+    std::function<void(api::ResultCode, api::AccountLockList)> completionHandler)
+{
+    m_requestsExecutor->makeAsyncCall<api::AccountLockList>(
+        nx::network::http::Method::get,
+        kMaintenanceSecurityLocksHosts,
+        {},
+        std::move(completionHandler));
+}
+
+void MaintenanceManager::isHostLocked(
+    std::string ipAddress,
+    std::function<void(api::ResultCode, bool)> completionHandler)
+{
+    using namespace nx::network::http;
+    m_requestsExecutor->makeAsyncCall<bool>(
+        Method::get,
+        rest::substituteParameters(kMaintenanceSecurityLocksHostsIp, {ipAddress}),
+        {},
+        std::move(completionHandler));
+}
+
+void MaintenanceManager::getLockedUsers(
+    std::function<void(api::ResultCode, api::AccountLockList)> completionHandler)
+{
+    m_requestsExecutor->makeAsyncCall<api::AccountLockList>(
+        nx::network::http::Method::get,
+        kMaintenanceSecurityLocksUsers,
+        {},
+        std::move(completionHandler));
+}
+
+void MaintenanceManager::isUserLocked(
+    std::string username,
+    std::function<void(api::ResultCode, bool)> completionHandler)
+{
+    using namespace nx::network::http;
+    m_requestsExecutor->makeAsyncCall<bool>(
+        Method::get,
+        rest::substituteParameters(kMaintenanceSecurityLocksUsersUsername, {username}),
+        {},
         std::move(completionHandler));
 }
 

@@ -121,6 +121,12 @@ static constexpr char kMaintenanceGetTransactionLog[] = "/cdb/maintenance/transa
 static constexpr char kMaintenanceGetStatistics[] = "/cdb/maintenance/statistics";
 static constexpr char kMaintenanceGetSettings[] = "/cdb/maintenance/settings";
 
+static constexpr char kMaintenanceSecurityLocks[] = "/cdb/maintenance/security/locks";
+static constexpr char kMaintenanceSecurityLocksHosts[] = "/cdb/maintenance/security/locks/hosts";
+static constexpr char kMaintenanceSecurityLocksHostsIp[] = "/cdb/maintenance/security/locks/hosts/{ip}";
+static constexpr char kMaintenanceSecurityLocksUsers[] = "/cdb/maintenance/security/locks/users";
+static constexpr char kMaintenanceSecurityLocksUsersUsername[] = "/cdb/maintenance/security/locks/users/{username}";
+
 static constexpr char kStatisticsPath[] = "/cdb/statistics";
 static constexpr char kStatisticsMetricsPath[] = "/cdb/statistics/metrics/";
 

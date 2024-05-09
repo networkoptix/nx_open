@@ -9,5 +9,6 @@ namespace nx::cloud::db::api {
 
 NX_REFLECTION_INSTRUMENT(VmsConnectionData, (systemId)(endpoint))
 NX_REFLECTION_INSTRUMENT(Statistics, (onlineServerCount))
+NX_REFLECTION_INSTRUMENT(AccountLock, (key)(lockType))
 
 } // namespace nx::cloud::db::api

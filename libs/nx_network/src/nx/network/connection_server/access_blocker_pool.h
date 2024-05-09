@@ -65,6 +65,8 @@ public:
 
     bool isLocked(const Key& key) const;
 
+    std::vector<Key> getLockedKeys() const;
+
     std::vector<LockUpdateHistoryRecord> getCurrentLockReason(const Key& key) const;
 
     bool lockerExists(const Key& key) const;
@@ -73,6 +75,8 @@ public:
 
 protected:
     mutable nx::Mutex m_mutex;
+
+    bool isLocked(const::nx::Locker<nx::Mutex>& /*lock*/, const Key& key) const;
 
     template<typename... Args>
     LockUpdateResult updateLockoutState(
@@ -182,6 +186,15 @@ BaseAccessBlockerPool<Key, Locker, Settings, UpdateHistoryParams>::BaseAccessBlo
 }
 
 template<typename Key, typename Locker, typename Settings, typename UpdateHistoryParams>
+bool BaseAccessBlockerPool<Key, Locker, Settings, UpdateHistoryParams>::isLocked(
+    const::nx::Locker<nx::Mutex>& /*lock*/,
+    const Key& key) const
+{
+    auto val = m_userLockers.peekValue(key);
+    return val ? val->get().locker->isLocked() : false;
+}
+
+template<typename Key, typename Locker, typename Settings, typename UpdateHistoryParams>
 template<typename ... Args>
 LockUpdateResult BaseAccessBlockerPool<Key, Locker, Settings, UpdateHistoryParams>::updateLockoutState(
     const nx::Locker<nx::Mutex>& /*lock*/,
@@ -233,9 +246,23 @@ bool BaseAccessBlockerPool<Key, Locker, Settings, UpdateHistoryParams>::isLocked
     const Key& key) const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
+    return isLocked(lock, key);
+}
 
-    auto val = m_userLockers.peekValue(key);
-    return val ? val->get().locker->isLocked() : false;
+template<typename Key, typename Locker, typename Settings, typename UpdateHistoryParams>
+inline std::vector<Key> BaseAccessBlockerPool<Key, Locker, Settings, UpdateHistoryParams>::getLockedKeys() const
+{
+    std::vector<Key> lockedKeys;
+
+    NX_MUTEX_LOCKER lock(&m_mutex);
+
+    for (const auto& keyAndValue: m_userLockers)
+    {
+        if (isLocked(lock, keyAndValue.first))
+            lockedKeys.push_back(keyAndValue.first);
+    }
+
+    return lockedKeys;
 }
 
 template<typename Key, typename Locker, typename Settings, typename UpdateHistoryParams>
