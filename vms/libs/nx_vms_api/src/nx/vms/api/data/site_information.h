@@ -10,6 +10,7 @@
 #include <nx/vms/api/json/value_or_array.h>
 
 #include "module_information.h"
+#include "rest_api_versions.h"
 
 namespace nx::vms::api {
 
@@ -25,6 +26,7 @@ struct NX_VMS_API SiteInformation
     QString customization;
     nx::utils::SoftwareVersion version; /**<%apidoc:string */
     int protoVersion = 0;
+    RestApiVersions restApiVersions;
     QString cloudHost;
 
     /**%apidoc If not present, the Site is new. */
@@ -70,8 +72,8 @@ struct NX_VMS_API SiteInformation
     SiteInformation& operator=(SiteInformation&&) = default;
 };
 #define SiteInformation_Fields \
-    (name)(customization)(version)(protoVersion)(cloudHost)(localId)(cloudId)(cloudOwnerId) \
-    (organizationId)(endpoint)(servers)(edgeServerCount)(devices)(status)(ldapSyncId) \
+    (name)(customization)(version)(protoVersion)(restApiVersions)(cloudHost)(localId)(cloudId) \
+    (cloudOwnerId)(organizationId)(endpoint)(servers)(edgeServerCount)(devices)(status)(ldapSyncId) \
     (synchronizedTimeMs)
 NX_VMS_API_DECLARE_STRUCT_EX(SiteInformation, (json))
 
