@@ -7,6 +7,7 @@
 #include <memory>
 #include <optional>
 #include <type_traits>
+#include <variant>
 
 #include <QtCore/QSharedPointer>
 #include <QtCore/QString>
@@ -251,6 +252,12 @@ template<std::size_t N>
 QString toString(const std::bitset<N>& value)
 {
     return QString::fromStdString("0b" + value.to_string());
+}
+
+template<typename... Ts>
+QString toString(const std::variant<Ts...>& value)
+{
+    return std::visit([](const auto& v) { return nx::toString(v); }, value);
 }
 
 /**

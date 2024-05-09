@@ -254,6 +254,18 @@ TEST(ToString, ReflectedEnum)
     assertToString(ReflectedEnumFlags(ReflectedEnum::b) | ReflectedEnum::c, "b|c");
 }
 
+TEST(ToString, StdVariant)
+{
+    std::variant<int, std::string> v1 = 42;
+    assertToString(v1, "42");
+
+    std::variant<int, std::string> v2 = "hello";
+    assertToString(v2, "hello");
+
+    std::variant<int, std::variant<int, std::string>> v3 = v2;
+    assertToString(v3, "hello");
+}
+
 } // namespace test
 } // namespace utils
 } // namespace nx
