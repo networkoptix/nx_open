@@ -11,6 +11,7 @@ SiteInformation::SiteInformation(const ModuleInformation& module):
     customization(module.customization),
     version(module.version),
     protoVersion(module.protoVersion),
+    restApiVersions(RestApiVersions::current()),
     cloudHost(module.cloudHost),
     cloudOwnerId(module.cloudOwnerId),
     organizationId(module.organizationId),
