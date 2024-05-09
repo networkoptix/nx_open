@@ -78,9 +78,9 @@ QnResourcePtr QnResource::toSharedPointer() const
     return QnFromThisToShared<QnResource>::toSharedPointer();
 }
 
-void QnResource::forceUsingLocalProperties()
+void QnResource::setForceUsingLocalProperties(bool value)
 {
-    m_forceUseLocalProperties = true;
+    m_forceUseLocalProperties = value;
 }
 
 bool QnResource::useLocalProperties() const

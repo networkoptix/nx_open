@@ -38,7 +38,7 @@ CameraResourceStub::CameraResourceStub(
     setPhysicalId("physical_" + nx::Uuid::createUuid().toSimpleString());
     setMAC(nx::utils::MacAddress::random());
     addFlags(Qn::server_live_cam);
-    forceUsingLocalProperties();
+    setForceUsingLocalProperties();
 
     CameraMediaStreams mediaStreams{{{StreamIndex::primary, primaryResolution}}};
 
