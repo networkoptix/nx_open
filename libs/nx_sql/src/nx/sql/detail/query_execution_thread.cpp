@@ -10,22 +10,28 @@
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/std/cpp14.h>
 
+#include "../db_statistics_collector.h"
+
 namespace nx::sql::detail {
 
 QueryExecutionThread::QueryExecutionThread(
     const ConnectionOptions& connectionOptions,
-    QueryExecutorQueue* queryExecutorQueue)
-:
-    base_type(connectionOptions, queryExecutorQueue)
+    QueryExecutorQueue* queryExecutorQueue,
+    StatisticsCollector* statisticsCollector)
+    :
+    base_type(connectionOptions, queryExecutorQueue),
+    m_statisticsCollector(statisticsCollector)
 {
 }
 
 QueryExecutionThread::QueryExecutionThread(
     const ConnectionOptions& connectionOptions,
-    std::unique_ptr<AbstractDbConnection> connection,
-    QueryExecutorQueue* queryExecutorQueue)
+    QueryExecutorQueue* queryExecutorQueue,
+    StatisticsCollector* statisticsCollector,
+    std::unique_ptr<AbstractDbConnection> connection)
     :
     base_type(connectionOptions, queryExecutorQueue),
+    m_statisticsCollector(statisticsCollector),
     m_externalConnection(std::move(connection))
 {
 }
@@ -83,6 +89,7 @@ void QueryExecutionThread::queryExecutionThreadMain()
     DbConnectionHolder dbConnectionHolder(
         connectionOptions(),
         std::exchange(m_externalConnection, nullptr));
+    dbConnectionHolder.setStatisticCollector(m_statisticsCollector);
 
     if (!dbConnectionHolder.open())
     {

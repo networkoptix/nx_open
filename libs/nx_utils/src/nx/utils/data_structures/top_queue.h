@@ -35,6 +35,8 @@ public:
     bool empty() const;
     size_type size() const;
 
+    void reset();
+
 private:
     // TODO: #akolesnikov Store "current top" as an reference to an existing element.
     // This will decrease requirements to type T to movable instead of copyable.
@@ -98,6 +100,14 @@ template<typename T, typename Comp>
 typename TopQueue<T, Comp>::size_type TopQueue<T, Comp>::size() const
 {
     return m_pushStack.size() + m_popStack.size();
+}
+
+template<typename T, typename Comp>
+void TopQueue<T, Comp>::reset()
+{
+    // TODO: if the stacks are reimplemted as std::vector, they can be cleared efficiently
+    m_pushStack = decltype(m_pushStack){};
+    m_popStack = decltype(m_popStack){};
 }
 
 template<typename T, typename Comp>

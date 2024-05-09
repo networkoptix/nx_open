@@ -12,6 +12,8 @@
 #include "base_query_executor.h"
 #include "query_executor.h"
 
+namespace nx::sql { class StatisticsCollector; }
+
 namespace nx::sql::detail {
 
 /**
@@ -26,12 +28,14 @@ class NX_SQL_API QueryExecutionThread:
 public:
     QueryExecutionThread(
         const ConnectionOptions& connectionOptions,
-        QueryExecutorQueue* queryExecutorQueue);
+        QueryExecutorQueue* queryExecutorQueue,
+        StatisticsCollector* statisticsCollector);
 
     QueryExecutionThread(
         const ConnectionOptions& connectionOptions,
-        std::unique_ptr<AbstractDbConnection> connection,
-        QueryExecutorQueue* queryExecutorQueue);
+        QueryExecutorQueue* queryExecutorQueue,
+        StatisticsCollector* statisticsCollector,
+        std::unique_ptr<AbstractDbConnection> connection);
 
     virtual ~QueryExecutionThread() override;
 
@@ -51,6 +55,7 @@ private:
     static bool isDbErrorRecoverable(DBResultCode dbResult);
 
 private:
+    StatisticsCollector* m_statisticsCollector = nullptr;
     std::unique_ptr<AbstractDbConnection> m_externalConnection;
     std::chrono::milliseconds m_connectDelay = std::chrono::milliseconds::zero();
     std::atomic<ConnectionState> m_state{ConnectionState::initializing};

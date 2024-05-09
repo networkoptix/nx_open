@@ -81,7 +81,7 @@ protected:
 private:
     StatisticsCollector* m_statisticsCollector;
     std::chrono::steady_clock::time_point m_creationTime;
-    QueryExecutionInfo m_queryStatistics;
+    QueryExecutionTaskRecord m_queryStatistics;
     bool m_queryExecuted;
     nx::utils::MoveOnlyFunc<void()> m_onBeforeDestructionHandler;
     QueryType m_queryType;

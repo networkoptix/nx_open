@@ -10,9 +10,12 @@
 
 #include "database.h"
 
+#include "db_statistics_collector.h"
+
 namespace nx::sql {
 
-QtDbConnection::QtDbConnection(const ConnectionOptions& connectionOptions):
+QtDbConnection::QtDbConnection(const ConnectionOptions& connectionOptions)
+    :
     m_driverType(connectionOptions.driverType)
 {
     m_connectionName = QUuid::createUuid().toString();
@@ -97,7 +100,7 @@ DBResult QtDbConnection::lastError()
 
 std::unique_ptr<AbstractSqlQuery> QtDbConnection::createQuery()
 {
-    return std::make_unique<SqlQuery>(m_connection);
+    return std::make_unique<SqlQuery>(m_connection, statisticsCollector());
 }
 
 RdbmsDriverType QtDbConnection::driverType() const

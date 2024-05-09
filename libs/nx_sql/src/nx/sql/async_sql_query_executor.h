@@ -88,8 +88,8 @@ public:
         nx::utils::MoveOnlyFunc<DBResult(nx::sql::QueryContext*)> dbSelectFunc,
         nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler);
 
-    virtual QueryQueueStats queryQueueStatistics() const = 0;
-    virtual QueryStatistics queryStatistics() const = 0;
+    virtual QueryQueueStatistics queryQueueStatistics() const = 0;
+    virtual Statistics statistics() const = 0;
 
     /**
      * Convenience overload for executeUpdate where DbFunc returns void or throws an exception
@@ -363,8 +363,8 @@ public:
         nx::sql::QueryContext* const queryContext,
         const std::string& script) override;
 
-    virtual QueryQueueStats queryQueueStatistics() const override;
-    virtual QueryStatistics queryStatistics() const override;
+    virtual QueryQueueStatistics queryQueueStatistics() const override;
+    virtual Statistics statistics() const override;
 
     /** Have to introduce this method because we do not use exceptions. */
     bool init();
@@ -400,9 +400,9 @@ private:
     nx::utils::thread m_queryTimeoutThread;
     nx::WaitCondition m_queryTimeoutThreadStoppedCondition;
     detail::QueryQueue m_queryQueue;
-    std::vector<std::unique_ptr<detail::BaseQueryExecutor>> m_dbThreads;
     std::atomic<std::size_t> m_dbThreadPoolSize{0};
     StatisticsCollector m_statisticsCollector;
+    std::vector<std::unique_ptr<detail::BaseQueryExecutor>> m_dbThreads;
     nx::utils::thread m_dropConnectionThread;
     nx::utils::SyncQueue<std::unique_ptr<detail::BaseQueryExecutor>> m_connectionsToDropQueue;
     std::atomic<bool> m_terminated = false;
@@ -423,7 +423,8 @@ private:
 
     std::unique_ptr<detail::BaseQueryExecutor> createNewConnectionThread(
         const ConnectionOptions& connectionOptions,
-        detail::QueryQueue* queryQueue);
+        detail::QueryQueue* queryQueue,
+        StatisticsCollector* statisticsCollector);
 
     void dropExpiredConnectionsThreadFunc();
     void reportQueryCancellation(std::unique_ptr<detail::AbstractExecutor>);

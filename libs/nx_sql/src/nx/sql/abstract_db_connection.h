@@ -15,6 +15,8 @@
 
 namespace nx::sql {
 
+class StatisticsCollector;
+
 class AbstractDbConnection
 {
 public:
@@ -38,6 +40,9 @@ public:
     // TODO: #akolesnikov Remove this method. This requires switching every SqlQuery usage to createQuery().
     virtual QSqlDatabase* qtSqlConnection() = 0;
 
+    void setStatisticsCollector(StatisticsCollector* statisticsCollector);
+    StatisticsCollector* statisticsCollector();
+
     /**
      * Arguments are bound using AbstractSqlQuery::addBindValue.
      * NOTE: Throws on failure.
@@ -56,6 +61,9 @@ public:
 
         query->exec();
     }
+
+private:
+    StatisticsCollector* m_statisticsCollector = nullptr;
 };
 
 } // namespace nx::sql

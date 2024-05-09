@@ -3,6 +3,7 @@
 #pragma once
 
 #include <chrono>
+#include <map>
 #include <optional>
 #include <stdexcept>
 #include <string>
@@ -148,13 +149,13 @@ private:
 //-------------------------------------------------------------------------------------------------
 // Statistics.
 
-struct QueryQueueStats
+struct QueryQueueStatistics
 {
     int pendingQueryCount = 0;
     std::chrono::milliseconds oldestQueryAge = std::chrono::milliseconds::zero();
 };
 
-NX_REFLECTION_INSTRUMENT(QueryQueueStats, (pendingQueryCount)(oldestQueryAge))
+NX_REFLECTION_INSTRUMENT(QueryQueueStatistics, (pendingQueryCount)(oldestQueryAge))
 
 struct DurationStatistics
 {
@@ -165,7 +166,21 @@ struct DurationStatistics
 
 NX_REFLECTION_INSTRUMENT(DurationStatistics, (min)(max)(average))
 
+/**
+ * Statistics about a specific query.
+ */
 struct QueryStatistics
+{
+    int count = 0;
+    DurationStatistics requestExecutionTimes;
+};
+
+NX_REFLECTION_INSTRUMENT(QueryStatistics, (count)(requestExecutionTimes))
+
+/**
+ * Top level statistics
+ */
+struct Statistics
 {
     std::chrono::milliseconds statisticalPeriod;
     int requestsSucceeded = 0;
@@ -174,11 +189,13 @@ struct QueryStatistics
     std::size_t dbThreadPoolSize = 0;
     DurationStatistics requestExecutionTimes;
     DurationStatistics waitingForExecutionTimes;
-    QueryQueueStats queryQueue;
+    QueryQueueStatistics queryQueue;
+    std::map<std::string /* query */, QueryStatistics> queries;
 };
 
-NX_REFLECTION_INSTRUMENT(QueryStatistics,
+NX_REFLECTION_INSTRUMENT(Statistics,
     (statisticalPeriod)(requestsSucceeded)(requestsFailed)(requestsCancelled) \
-    (dbThreadPoolSize)(requestExecutionTimes)(waitingForExecutionTimes)(queryQueue))
+    (dbThreadPoolSize)(requestExecutionTimes)(waitingForExecutionTimes)(queryQueue) \
+    (queries))
 
 } // namespace nx::sql

@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <chrono>
 #include <functional>
 #include <optional>
 #include <type_traits>
@@ -44,6 +45,15 @@ struct IsVector: std::false_type {};
 
 template<typename T, typename A>
 struct IsVector<std::vector<T, A>>: std::true_type {};
+
+template<typename>
+struct IsDuration: std::false_type {};
+
+template<typename Rep, typename Period>
+struct IsDuration<std::chrono::duration<Rep, Period>>: std::true_type {};
+
+template<typename ...Args>
+constexpr bool IsDurationV = IsDuration<Args...>::value;
 
 template<typename, typename = std::void_t<>>
 struct HasGetId: std::false_type {};

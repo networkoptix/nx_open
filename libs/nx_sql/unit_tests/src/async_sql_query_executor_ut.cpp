@@ -298,6 +298,11 @@ protected:
         return connection;
     }
 
+    Statistics statistics()
+    {
+        return asyncSqlQueryExecutor().statistics();
+    }
+
 private:
     DbConnectionEventsReceiver* m_eventsReceiver = nullptr;
     nx::utils::SyncQueue<DBResult> m_queryResults;
@@ -465,6 +470,12 @@ TEST_F(DbAsyncSqlQueryExecutor, reconnect_after_db_failure)
 
     // Then DB becomes available again.
     ASSERT_EQ(DBResultCode::ok, executeUpdate("INSERT INTO company VALUES ('Bar', 1976)"));
+}
+
+TEST_F(DbAsyncSqlQueryExecutor, reports_query_statistics)
+{
+    initializeDatabase();
+    ASSERT_FALSE(statistics().queries.empty());
 }
 
 //-------------------------------------------------------------------------------------------------

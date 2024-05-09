@@ -9,6 +9,8 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/uuid.h>
 
+#include "db_statistics_collector.h"
+
 namespace nx::sql {
 
 DbConnectionHolder::DbConnectionHolder(
@@ -30,6 +32,11 @@ DbConnectionHolder::~DbConnectionHolder()
 const ConnectionOptions& DbConnectionHolder::connectionOptions() const
 {
     return m_connectionOptions;
+}
+
+void DbConnectionHolder::setStatisticCollector(StatisticsCollector* statisticsCollector)
+{
+    m_connection->setStatisticsCollector(statisticsCollector);
 }
 
 bool DbConnectionHolder::open()

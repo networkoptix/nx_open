@@ -9,6 +9,7 @@
 #include <nx/utils/log/log.h>
 
 #include "abstract_db_connection.h"
+#include "db_statistics_collector.h"
 
 namespace nx::sql {
 
@@ -19,6 +20,13 @@ SqlQuery::SqlQuery(QSqlDatabase connection):
 
 SqlQuery::SqlQuery(AbstractDbConnection* connection):
     m_sqlQuery(*connection->qtSqlConnection())
+{
+}
+
+SqlQuery::SqlQuery(QSqlDatabase connection, StatisticsCollector* statisticsCollector)
+    :
+    m_sqlQuery(connection),
+    m_statisticsCollector(statisticsCollector)
 {
 }
 
@@ -109,10 +117,14 @@ void SqlQuery::exec(const std::optional<std::string_view>& query)
         ok = m_sqlQuery.exec();
     }
 
+    auto executionTime = floor<milliseconds>(steady_clock::now() - t0);
+
+    if (m_statisticsCollector)
+        m_statisticsCollector->recordQuery(m_sqlQuery.lastQuery().toStdString(), executionTime);
+
     if (ok)
     {
-        NX_TRACE(this, "Query %1 completed in %2", m_sqlQuery.lastQuery(),
-            floor<milliseconds>(steady_clock::now() - t0));
+        NX_TRACE(this, "Query %1 completed in %2", m_sqlQuery.lastQuery(), executionTime);
     }
     else
     {

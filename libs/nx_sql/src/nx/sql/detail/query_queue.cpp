@@ -32,7 +32,7 @@ void QueryQueue::push(value_type value)
     NX_TRACE(this, "QueryQueue::push done. Preliminary queue size %1", queueSize);
 }
 
-QueryQueueStats QueryQueue::stats() const
+QueryQueueStatistics QueryQueue::stats() const
 {
     using namespace std::chrono;
 
@@ -54,7 +54,7 @@ QueryQueueStats QueryQueue::stats() const
         queueSize += q.size();
     }
 
-    return QueryQueueStats{
+    return QueryQueueStatistics{
         .pendingQueryCount = (int) queueSize,
         .oldestQueryAge = oldestQueryAge};
 }
