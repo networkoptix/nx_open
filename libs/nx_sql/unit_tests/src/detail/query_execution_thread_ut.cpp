@@ -28,7 +28,8 @@ protected:
     {
         m_thread = std::make_unique<detail::QueryExecutionThread>(
             connectionOptions(),
-            &m_queryExecutorQueue);
+            &m_queryExecutorQueue,
+            nullptr);
         m_thread->start();
     }
 

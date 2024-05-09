@@ -32,18 +32,20 @@ public:
         std::chrono::milliseconds period,
         int subPeriodCount = 20)
         :
-        m_subPeriodCount(subPeriodCount),
+        m_subperiodCount(subPeriodCount),
         m_subperiod(
-            std::chrono::duration_cast<std::chrono::microseconds>(period) / m_subPeriodCount)
+            std::chrono::duration_cast<std::chrono::microseconds>(period) / m_subperiodCount)
     {
-        m_sumPerSubperiod.resize(m_subPeriodCount);
+        m_sumPerSubperiod.resize(m_subperiodCount);
     }
+
+    std::chrono::microseconds subperiodLength() const { return m_subperiod; }
 
     void add(Value value)
     {
         const auto now = monotonicTime();
         closeExpiredPeriods(now);
-        m_sumPerSubperiod.front() += value;
+        m_sumPerSubperiod[m_front] += value;
         m_currentSum += value;
     }
 
@@ -60,22 +62,24 @@ public:
         const auto now = monotonicTime();
         closeExpiredPeriods(now);
 
-        for (int periodIndex = 0; periodIndex < m_subPeriodCount; ++periodIndex)
+        for (int count = 0, i = m_front;
+            count < m_subperiodCount;
+            ++count, i = i == m_subperiodCount - 1 ? 0 : i + 1)
         {
             const auto currentPeriodLength =
-                periodIndex == 0
+                i == m_front
                 ? duration_cast<microseconds>(now - *m_currentPeriodStart)
                 : m_subperiod;
             if (currentPeriodLength >= valuePeriod)
             {
-                m_sumPerSubperiod[periodIndex] += value;
+                m_sumPerSubperiod[i] += value;
                 m_currentSum += value;
                 return;
             }
 
             const auto valuePerCurrentPeriod =
                 (Value) (value * ((double) currentPeriodLength.count() / valuePeriod.count()));
-            m_sumPerSubperiod[periodIndex] += valuePerCurrentPeriod;
+            m_sumPerSubperiod[i] += valuePerCurrentPeriod;
             m_currentSum += valuePerCurrentPeriod;
             value -= valuePerCurrentPeriod;
             valuePeriod -= currentPeriodLength;
@@ -92,53 +96,61 @@ public:
 
     float maxError() const
     {
-        return 1.0 / m_subPeriodCount;
+        return 1.0 / m_subperiodCount;
     }
 
     void reset()
     {
-        m_sumPerSubperiod = std::deque<Value>(m_subPeriodCount);
-        m_currentSum = Value();
-        m_currentPeriodStart = std::nullopt;
+        initialize(std::nullopt);
     }
 
 private:
-    const int m_subPeriodCount;
+    const int m_subperiodCount;
     const std::chrono::microseconds m_subperiod;
-    // TODO: #akolesnikov Use cyclic array here.
-    std::deque<Value> m_sumPerSubperiod;
+    int m_front = 0;
+    int m_back = m_subperiodCount - 1;
+    std::vector<Value> m_sumPerSubperiod;
     Value m_currentSum = Value();
     std::optional<std::chrono::steady_clock::time_point> m_currentPeriodStart;
+
+    void initialize(std::optional<std::chrono::steady_clock::time_point> currentPeriodStart)
+    {
+        m_front = 0;
+        m_back = m_subperiodCount - 1;
+        std::fill(m_sumPerSubperiod.begin(), m_sumPerSubperiod.end(), Value{});
+        m_currentSum = Value{};
+        m_currentPeriodStart = currentPeriodStart;
+    }
 
     void closeExpiredPeriods(
         std::chrono::steady_clock::time_point now)
     {
-        if (!m_currentPeriodStart)
-        {
-            m_currentPeriodStart = now;
-            return;
-        }
+        const auto deadline = now - m_subperiod * m_subperiodCount;
+
+        if (!m_currentPeriodStart || deadline > *m_currentPeriodStart + m_subperiod)
+            return initialize(now);
 
         // TODO: #akolesnikov The following loop can be greatly simplified
         // if add expiration time to m_sumPerSubperiod.
 
-        const auto deadline = now - m_subperiod * m_subPeriodCount;
-        for (int i = 0; i < m_subPeriodCount; ++i)
+        for (int i = 0; i < m_subperiodCount; ++i)
         {
             const auto lastPeriodStart =
-                *m_currentPeriodStart - (m_subPeriodCount - 1) * m_subperiod;
+                *m_currentPeriodStart - (m_subperiodCount - 1) * m_subperiod;
             const auto lastPeriodEnd = lastPeriodStart + m_subperiod;
             if (lastPeriodEnd > deadline)
-            {
                 break;
-            }
-            else
-            {
-                m_currentSum -= m_sumPerSubperiod.back();
-                m_sumPerSubperiod.pop_back();
-                m_sumPerSubperiod.push_front(Value());
-                *m_currentPeriodStart += m_subperiod;
-            }
+
+            m_currentSum -= m_sumPerSubperiod[m_back];
+            m_sumPerSubperiod[m_back] = Value{};
+
+            if (--m_back < 0)
+                m_back = m_subperiodCount - 1;
+
+            if (--m_front < 0)
+                m_front = m_subperiodCount - 1;
+
+            *m_currentPeriodStart += m_subperiod;
         }
     }
 };

@@ -58,7 +58,7 @@ void TestWithDbHelper::cleanDatabase()
 {
     if (m_dbConnectionOptions.driverType == RdbmsDriverType::mysql)
     {
-        DbConnectionHolder dbConnectionHolder(m_dbConnectionOptions);
+        DbConnectionHolder dbConnectionHolder(m_dbConnectionOptions, nullptr);
         if (!dbConnectionHolder.open())
             throw Exception(dbConnectionHolder.lastError());
 

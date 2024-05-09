@@ -28,7 +28,7 @@ public:
 
     void push(value_type query);
 
-    QueryQueueStats stats() const;
+    QueryQueueStatistics stats() const;
 
     /**
      * Wait-free version of stats().pendingQueryCount.

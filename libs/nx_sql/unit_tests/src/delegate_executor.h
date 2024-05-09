@@ -211,14 +211,14 @@ public:
         return m_delegate->setQueryTimeoutEnabled(enabled);
     }
 
-    virtual QueryQueueStats queryQueueStatistics() const override
+    virtual QueryQueueStatistics queryQueueStatistics() const override
     {
         return m_delegate->queryQueueStatistics();
     }
 
-    virtual QueryStatistics queryStatistics() const override
+    virtual Statistics statistics() const override
     {
-        return m_delegate->queryStatistics();
+        return m_delegate->statistics();
     }
 
     //---------------------------------------------------------------------------------------------

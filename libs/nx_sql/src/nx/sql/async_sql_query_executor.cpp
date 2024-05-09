@@ -154,7 +154,8 @@ DBResult AsyncSqlQueryExecutor::execSqlScript(
 bool AsyncSqlQueryExecutor::init()
 {
     // Opening a single connection thread and waiting for its initialization result.
-    auto executorThread = createNewConnectionThread(m_connectionOptions, &m_queryQueue);
+    auto executorThread = createNewConnectionThread(
+        m_connectionOptions, &m_queryQueue, &m_statisticsCollector);
     executorThread->start();
 
     // Waiting for connection to change state.
@@ -195,14 +196,14 @@ void AsyncSqlQueryExecutor::reserveConnections(int count)
         openNewConnection(lock);
 }
 
-QueryQueueStats AsyncSqlQueryExecutor::queryQueueStatistics() const
+QueryQueueStatistics AsyncSqlQueryExecutor::queryQueueStatistics() const
 {
     return m_queryQueue.stats();
 }
 
-QueryStatistics AsyncSqlQueryExecutor::queryStatistics() const
+Statistics AsyncSqlQueryExecutor::statistics() const
 {
-    return m_statisticsCollector.getQueryStatistics();
+    return m_statisticsCollector.getStatistics();
 }
 
 void AsyncSqlQueryExecutor::createCursorImpl(
@@ -294,7 +295,8 @@ void AsyncSqlQueryExecutor::openNewConnection(
     const nx::Locker<nx::Mutex>& lock,
     std::chrono::milliseconds connectDelay)
 {
-    auto executorThread = createNewConnectionThread(m_connectionOptions, &m_queryQueue);
+    auto executorThread = createNewConnectionThread(
+        m_connectionOptions, &m_queryQueue, &m_statisticsCollector);
     auto executorThreadPtr = executorThread.get();
     saveOpenedConnection(lock, std::move(executorThread));
     executorThreadPtr->start(connectDelay);
@@ -313,18 +315,23 @@ void AsyncSqlQueryExecutor::saveOpenedConnection(
 
 std::unique_ptr<detail::BaseQueryExecutor> AsyncSqlQueryExecutor::createNewConnectionThread(
     const ConnectionOptions& connectionOptions,
-    detail::QueryQueue* queryQueue)
+    detail::QueryQueue* queryQueue,
+    StatisticsCollector* statisticsCollector)
 {
     if (m_connectionFactory)
     {
         return std::make_unique<detail::QueryExecutionThread>(
             connectionOptions,
-            (*m_connectionFactory)(connectionOptions),
-            queryQueue);
+            queryQueue,
+            statisticsCollector,
+            (*m_connectionFactory)(connectionOptions));
     }
     else
     {
-        return std::make_unique<detail::QueryExecutionThread>(connectionOptions, queryQueue);
+        return std::make_unique<detail::QueryExecutionThread>(
+            connectionOptions,
+            queryQueue,
+            statisticsCollector);
     }
 }
 
@@ -409,7 +416,7 @@ void AsyncSqlQueryExecutor::addCursorProcessingThread(const nx::Locker<nx::Mutex
     auto connectionOptions = m_connectionOptions;
     connectionOptions.inactivityTimeout = std::chrono::seconds::zero();
     m_cursorProcessorContexts.back()->processingThread =
-        createNewConnectionThread(connectionOptions, &m_cursorTaskQueue);
+        createNewConnectionThread(connectionOptions, &m_cursorTaskQueue, &m_statisticsCollector);
     m_cursorProcessorContexts.back()->processingThread->start();
 }
 

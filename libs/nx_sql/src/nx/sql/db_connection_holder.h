@@ -12,6 +12,8 @@
 
 namespace nx::sql {
 
+class StatisticsCollector;
+
 class NX_SQL_API DbConnectionHolder
 {
 public:
@@ -25,6 +27,8 @@ public:
     ~DbConnectionHolder();
 
     const ConnectionOptions& connectionOptions() const;
+
+    void setStatisticCollector(StatisticsCollector* statisticsCollector);
 
     /**
      * Establishes connection to DB.

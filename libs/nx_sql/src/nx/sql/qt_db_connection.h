@@ -8,9 +8,12 @@
 
 namespace nx::sql {
 
+class StatisticsCollector;
+
 class NX_SQL_API QtDbConnection:
     public AbstractDbConnection
 {
+    using base_type = AbstractDbConnection;
 public:
     QtDbConnection(const ConnectionOptions& connectionOptions);
     ~QtDbConnection();
@@ -33,10 +36,10 @@ public:
     virtual bool tableExist(const std::string_view& tableName) override;
 
 private:
+    RdbmsDriverType m_driverType;
     QString m_connectionName;
     QSqlDatabase m_connection;
     bool m_isOpen = false;
-    RdbmsDriverType m_driverType;
 };
 
 } // namespace nx::sql

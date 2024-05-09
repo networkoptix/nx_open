@@ -10,6 +10,7 @@
 
 namespace nx::sql {
 
+class StatisticsCollector;
 class AbstractDbConnection;
 
 /**
@@ -89,6 +90,7 @@ class NX_SQL_API SqlQuery:
 public:
     SqlQuery(QSqlDatabase connection);
     SqlQuery(AbstractDbConnection* connection);
+    SqlQuery(QSqlDatabase connection, StatisticsCollector* statisticsCollector);
 
     virtual void setForwardOnly(bool val) override;
     virtual void prepare(const std::string_view& query) override;
@@ -120,6 +122,8 @@ private:
     QSqlQuery m_sqlQuery;
 
     std::optional<QString> m_unpreparedQuery;
+
+    StatisticsCollector* m_statisticsCollector = nullptr;
 
 private:
     void exec(const std::optional<std::string_view>& query);

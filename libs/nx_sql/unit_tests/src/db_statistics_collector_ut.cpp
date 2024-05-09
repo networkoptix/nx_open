@@ -15,49 +15,64 @@ class DbStatisticsCollector:
 {
 public:
     DbStatisticsCollector():
-        m_statisticsCollector(std::chrono::milliseconds(100), m_queryQueue, &m_threadPoolSize)
+        m_statisticsCollector(m_period, m_queryQueue, &m_threadPoolSize)
     {
     }
 
 protected:
-    void recordRequestWithWaitForExecutionTime(std::chrono::milliseconds val)
+    std::chrono::milliseconds statisticsAggregationPeriod() const
     {
-        QueryExecutionInfo queryInfo;
-        queryInfo.waitForExecutionDuration = val;
-        m_statisticsCollector.recordQuery(queryInfo);
+        return m_period;
     }
 
-    void recordRequestWithExecutionTime(std::chrono::milliseconds val)
+    void recordQueryExecutionTaskWithWaitForExecutionTime(std::chrono::milliseconds val)
     {
-        QueryExecutionInfo queryInfo;
+        QueryExecutionTaskRecord queryInfo;
+        queryInfo.waitForExecutionDuration = val;
+        m_statisticsCollector.recordQueryExecutionTask(queryInfo);
+    }
+
+    void recordQueryExecutionTaskWithExecutionTime(std::chrono::milliseconds val)
+    {
+        QueryExecutionTaskRecord queryInfo;
         queryInfo.executionDuration = val;
-        m_statisticsCollector.recordQuery(queryInfo);
+        m_statisticsCollector.recordQueryExecutionTask(queryInfo);
+    }
+
+    void recordQueryWithExecutionTime(std::string query, std::chrono::milliseconds val)
+    {
+        m_statisticsCollector.recordQuery(std::move(query), val);
     }
 
     void addRandomRecord()
     {
         using namespace std::chrono;
 
-        QueryExecutionInfo queryInfo;
+        QueryExecutionTaskRecord queryInfo;
         queryInfo.executionDuration = milliseconds(nx::utils::random::number<int>(0, 100));
         queryInfo.waitForExecutionDuration = milliseconds(nx::utils::random::number<int>(0, 100));
         queryInfo.result = DBResultCode::ok;
-        m_statisticsCollector.recordQuery(queryInfo);
+        m_statisticsCollector.recordQueryExecutionTask(queryInfo);
         m_records.push_back(queryInfo);
     }
 
     void waitForStatisticsToExpire()
     {
-        m_timeShifts.push_back(
-            nx::utils::test::ScopedTimeShift(
-                nx::utils::test::ClockType::steady,
-                m_statisticsCollector.aggregationPeriod()));
+        // sql statistics use SumPerPeriod, which calculates using subperiods, the most recent of
+        // which is actually in the future. So, time needs to advance by the period + one extra
+        // subperiod.
+        waitForPeriod(m_period + m_period / 20 + std::chrono::milliseconds(1));
         m_records.clear();
+    }
+
+    void waitForPeriod(std::chrono::milliseconds timeShift)
+    {
+        m_timeShift.applyRelativeShift(timeShift);
     }
 
     void assertStatisticsIsCalculatedByLastRecords(int /*count*/)
     {
-        QueryStatistics queryStatistics;
+        Statistics queryStatistics;
         std::chrono::milliseconds requestExecutionTimeTotal(0);
         std::chrono::milliseconds executionWaitTimeTotal(0);
         for (const auto& record: m_records)
@@ -89,7 +104,7 @@ protected:
                 m_records.size());
         }
 
-        assertEqual(queryStatistics, m_statisticsCollector.getQueryStatistics());
+        assertEqual(queryStatistics, m_statisticsCollector.getStatistics());
     }
 
     void assertWaitForExecutionTimeMinMaxAverageEqualTo(
@@ -98,7 +113,7 @@ protected:
         std::chrono::milliseconds expectedAverage)
     {
         assertTimeMinMaxAverageEqualTo(
-            m_statisticsCollector.getQueryStatistics().waitingForExecutionTimes,
+            m_statisticsCollector.getStatistics().waitingForExecutionTimes,
             expectedMin,
             expectedMax,
             expectedAverage);
@@ -110,18 +125,36 @@ protected:
         std::chrono::milliseconds expectedAverage)
     {
         assertTimeMinMaxAverageEqualTo(
-            m_statisticsCollector.getQueryStatistics().requestExecutionTimes,
+            m_statisticsCollector.getStatistics().requestExecutionTimes,
             expectedMin,
             expectedMax,
             expectedAverage);
     }
 
+    void assertQueryStatisticsEqual(const std::map<std::string, QueryStatistics>& expected)
+    {
+        const auto actual = m_statisticsCollector.getStatistics().queries;
+
+        for (const auto& [query, expectedStatistics] : expected)
+        {
+            ASSERT_TRUE(actual.contains(query));
+            auto actualStatistics = actual.find(query)->second;
+
+            ASSERT_EQ(expectedStatistics.count, actualStatistics.count);
+            assertEqual(
+                expectedStatistics.requestExecutionTimes,
+                actualStatistics.requestExecutionTimes);
+        }
+    }
+
 private:
     detail::QueryQueue m_queryQueue;
     std::atomic<std::size_t> m_threadPoolSize{0};
+    std::chrono::milliseconds m_period = std::chrono::milliseconds(100);
     StatisticsCollector m_statisticsCollector;
-    std::deque<nx::utils::test::ScopedTimeShift> m_timeShifts;
-    std::deque<QueryExecutionInfo> m_records;
+    nx::utils::test::ScopedTimeShift m_timeShift{
+        nx::utils::test::ClockType::steady};
+    std::deque<QueryExecutionTaskRecord> m_records;
 
     void assertTimeMinMaxAverageEqualTo(
         DurationStatistics statistics,
@@ -146,7 +179,7 @@ private:
         stats->average = *total / count;
     }
 
-    void assertEqual(const QueryStatistics& expected, const QueryStatistics& actual)
+    void assertEqual(const Statistics& expected, const Statistics& actual)
     {
         ASSERT_EQ(expected.requestsCancelled, actual.requestsCancelled);
         ASSERT_EQ(expected.requestsFailed, actual.requestsFailed);
@@ -171,8 +204,8 @@ TEST_F(DbStatisticsCollector, wait_for_execution_time_min_max_average)
     const auto one = std::chrono::milliseconds(1);
     const auto two = std::chrono::milliseconds(9);
 
-    recordRequestWithWaitForExecutionTime(one);
-    recordRequestWithWaitForExecutionTime(two);
+    recordQueryExecutionTaskWithWaitForExecutionTime(one);
+    recordQueryExecutionTaskWithWaitForExecutionTime(two);
 
     assertWaitForExecutionTimeMinMaxAverageEqualTo(
         std::min(one, two),
@@ -185,8 +218,8 @@ TEST_F(DbStatisticsCollector, execution_time_min_max_average)
     const auto one = std::chrono::milliseconds(1);
     const auto two = std::chrono::milliseconds(9);
 
-    recordRequestWithExecutionTime(one);
-    recordRequestWithExecutionTime(two);
+    recordQueryExecutionTaskWithExecutionTime(one);
+    recordQueryExecutionTaskWithExecutionTime(two);
 
     assertExecutionTimeMinMaxAverageEqualTo(
         std::min(one, two),
@@ -201,6 +234,119 @@ TEST_F(DbStatisticsCollector, expired_elements_are_removed)
     addRandomRecord();
     addRandomRecord();
     assertStatisticsIsCalculatedByLastRecords(2);
+}
+
+TEST_F(DbStatisticsCollector, queries_statistics)
+{
+    const auto one = std::chrono::milliseconds(1);
+    const auto two = std::chrono::milliseconds(9);
+
+    const std::string queryOne{"SELECT * FROM table"};
+    const std::string queryTwo{"SELECT * FROM table_two"};
+
+    recordQueryWithExecutionTime(queryOne, one);
+    recordQueryWithExecutionTime(queryOne, two);
+
+    recordQueryWithExecutionTime(queryTwo, one);
+    recordQueryWithExecutionTime(queryTwo, two);
+
+    QueryStatistics expectedQueryStatistics {
+        .count = 2,
+        .requestExecutionTimes = {
+            .min = std::min(one, two),
+            .max = std::max(one, two),
+            .average = (one + two) / 2
+        },
+    };
+
+    std::map<std::string, QueryStatistics> expected = {
+        {queryOne, expectedQueryStatistics},
+        {queryTwo, expectedQueryStatistics}
+    };
+
+    assertQueryStatisticsEqual(expected);
+}
+
+TEST_F(DbStatisticsCollector, queries_expired_values)
+{
+    const auto one = std::chrono::milliseconds(1);
+    const auto two = std::chrono::milliseconds(9);
+
+    const std::string queryOne{"SELECT * FROM table"};
+    const std::string queryTwo{"SELECT * FROM table_two"};
+
+    recordQueryWithExecutionTime(queryOne, one);
+    recordQueryWithExecutionTime(queryOne, two);
+
+    recordQueryWithExecutionTime(queryTwo, one);
+    recordQueryWithExecutionTime(queryTwo, two);
+
+    waitForStatisticsToExpire();
+
+    assertQueryStatisticsEqual({});
+}
+
+TEST_F(DbStatisticsCollector, queries_partially_expired_values_one)
+{
+    const auto one = std::chrono::milliseconds(1);
+    const auto two = std::chrono::milliseconds(9);
+
+    const std::string queryOne{"SELECT * FROM table"};
+    const std::string queryTwo{"SELECT * FROM table_two"};
+
+    recordQueryWithExecutionTime(queryOne, one);
+    recordQueryWithExecutionTime(queryOne, two);
+
+    waitForPeriod(statisticsAggregationPeriod() / 2);
+
+    recordQueryWithExecutionTime(queryTwo, one);
+    recordQueryWithExecutionTime(queryTwo, two);
+
+    waitForPeriod(statisticsAggregationPeriod() / 2);
+
+    QueryStatistics expectedQueryStatistics{
+        .count = 2,
+        .requestExecutionTimes = {
+            .min = std::min(one, two),
+            .max = std::max(one, two),
+            .average = (one + two) / 2
+        },
+    };
+
+    assertQueryStatisticsEqual({{queryTwo, expectedQueryStatistics}});
+}
+
+TEST_F(DbStatisticsCollector, queries_partially_expired_values_two)
+{
+    const auto one = std::chrono::milliseconds(1);
+    const auto nine = std::chrono::milliseconds(9);
+
+    const std::string queryOne{"SELECT * FROM table"};
+    const std::string queryTwo{"SELECT * FROM table_two"};
+
+    recordQueryWithExecutionTime(queryOne, one);
+    recordQueryWithExecutionTime(queryTwo, one);
+
+    waitForPeriod(statisticsAggregationPeriod() / 2);
+
+    recordQueryWithExecutionTime(queryOne, nine);
+    recordQueryWithExecutionTime(queryTwo, nine);
+
+    waitForPeriod(statisticsAggregationPeriod() / 2 + statisticsAggregationPeriod() / 20);
+
+    QueryStatistics expectedQueryStatistics{
+        .count = 1,
+        .requestExecutionTimes = {
+            .min = nine,
+            .max = nine,
+            .average = nine
+        },
+    };
+
+    assertQueryStatisticsEqual({
+        {queryOne, expectedQueryStatistics},
+        {queryTwo, expectedQueryStatistics},
+        });
 }
 
 } // namespace nx::sql::test

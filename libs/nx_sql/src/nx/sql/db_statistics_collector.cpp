@@ -8,17 +8,36 @@
 
 namespace nx::sql {
 
-StatisticsCollector::DurationStatisticsCalculationContext::DurationStatisticsCalculationContext(
-    DurationStatistics* result)
+StatisticsCollector::QueryExecutionTaskContext::QueryExecutionTaskContext(std::chrono::milliseconds period)
     :
-    result(result)
+    successfulRequestsCounter(period),
+    failedRequestsCounter(period),
+    cancelledRequestsCounter(period),
+    taskExecutionTimeCounter(period),
+    tasksWaitingForExecutionCounter(period)
+{}
+
+void StatisticsCollector::QueryExecutionTaskContext::reset()
 {
+    successfulRequestsCounter.reset();
+    failedRequestsCounter.reset();
+    cancelledRequestsCounter.reset();
+    taskExecutionTimeCounter.reset();
+    tasksWaitingForExecutionCounter.reset();
 }
 
-StatisticsCollector::StatisticsRecordContext::StatisticsRecordContext(QueryExecutionInfo data):
-    data(std::move(data)),
-    timestamp(nx::utils::monotonicTime())
+StatisticsCollector::SingleQueryStatisticsContext::SingleQueryStatisticsContext(
+    std::chrono::milliseconds period)
+    :
+    statisticsCalculator(period),
+    frequencyCounter(period)
+{}
+
+void StatisticsCollector::SingleQueryStatisticsContext::reset()
 {
+    statisticsCalculator.reset();
+    frequencyCounter.reset();
+    durationStatistics = {};
 }
 
 StatisticsCollector::StatisticsCollector(
@@ -29,37 +48,64 @@ StatisticsCollector::StatisticsCollector(
     m_period(period),
     m_queryQueue(queryQueue),
     m_dbThreadPoolSize(dbThreadPoolSize),
-    m_requestExecutionTimesCalculationContext(&m_currentStatistics.requestExecutionTimes),
-    m_waitingForExecutionTimesCalculationContext(&m_currentStatistics.waitingForExecutionTimes)
+    m_queryExecutionTaskStatistics(m_period)
 {
-    m_currentStatistics.statisticalPeriod = m_period;
 }
 
-void StatisticsCollector::recordQuery(QueryExecutionInfo queryStatistics)
+void StatisticsCollector::recordQueryExecutionTask(QueryExecutionTaskRecord record)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
-    if (m_cleanupTimeout.hasExpired(m_period))
+
+    if (record.executionDuration)
+        m_queryExecutionTaskStatistics.taskExecutionTimeCounter.add(*record.executionDuration);
+
+    m_queryExecutionTaskStatistics.tasksWaitingForExecutionCounter.add(record.waitForExecutionDuration);
+
+    if (!record.result)
     {
-        m_cleanupTimeout.restart();
-        removeExpiredRecords(lock);
+        m_queryExecutionTaskStatistics.cancelledRequestsCounter.add(1);
+        return;
     }
 
-    updateStatisticsWithNewValue(queryStatistics);
-    m_recordQueue.push_back(StatisticsRecordContext(queryStatistics));
+    if (record.result == DBResultCode::ok)
+        m_queryExecutionTaskStatistics.successfulRequestsCounter.add(1);
+    else
+        m_queryExecutionTaskStatistics.failedRequestsCounter.add(1);
 }
 
-QueryStatistics StatisticsCollector::getQueryStatistics() const
+void StatisticsCollector::recordQuery(
+    std::string query,
+    std::chrono::milliseconds executionTime)
 {
-    QueryStatistics result;
-    {
-        NX_MUTEX_LOCKER lock(&m_mutex);
-        const_cast<StatisticsCollector*>(this)->removeExpiredRecords(lock);
-        result = m_currentStatistics;
-    }
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    auto& queryStatistics = m_queryStatistics.emplace(std::move(query), m_period).first->second;
+    queryStatistics.frequencyCounter.add(1);
+    queryStatistics.statisticsCalculator.add(executionTime);
+}
 
-    result.queryQueue = m_queryQueue.stats();
-    result.dbThreadPoolSize = m_dbThreadPoolSize->load();
-    return result;
+Statistics StatisticsCollector::getStatistics() const
+{
+    auto self = const_cast<StatisticsCollector*>(this);
+
+    NX_MUTEX_LOCKER lock(&m_mutex);
+
+    return Statistics
+    {
+        .statisticalPeriod = m_period,
+        .requestsSucceeded =
+            self->m_queryExecutionTaskStatistics.successfulRequestsCounter.getSumPerLastPeriod(),
+        .requestsFailed =
+            self->m_queryExecutionTaskStatistics.failedRequestsCounter.getSumPerLastPeriod(),
+        .requestsCancelled =
+            self->m_queryExecutionTaskStatistics.cancelledRequestsCounter.getSumPerLastPeriod(),
+        .dbThreadPoolSize = m_dbThreadPoolSize->load(),
+        .requestExecutionTimes =
+            self->getDurationStatistics(&self->m_queryExecutionTaskStatistics.taskExecutionTimeCounter),
+        .waitingForExecutionTimes =
+            self->getDurationStatistics(&self->m_queryExecutionTaskStatistics.tasksWaitingForExecutionCounter),
+        .queryQueue = m_queryQueue.stats(),
+        .queries = getQueryStatistics(lock),
+    };
 }
 
 std::chrono::milliseconds StatisticsCollector::aggregationPeriod() const
@@ -69,154 +115,53 @@ std::chrono::milliseconds StatisticsCollector::aggregationPeriod() const
 
 void StatisticsCollector::clearStatistics()
 {
-    m_recordQueue.clear();
-    m_currentStatistics = QueryStatistics();
-    m_currentStatistics.statisticalPeriod = m_period;
-    m_requestExecutionTimesCalculationContext =
-        DurationStatisticsCalculationContext(&m_currentStatistics.requestExecutionTimes);
-    m_waitingForExecutionTimesCalculationContext =
-        DurationStatisticsCalculationContext(&m_currentStatistics.waitingForExecutionTimes);
+    NX_MUTEX_LOCKER lock(&m_mutex);
+
+    m_queryExecutionTaskStatistics.reset();
+
+    for (auto& query : m_queryStatistics)
+        query.second.reset();
 }
 
-void StatisticsCollector::updateStatisticsWithNewValue(
-    const QueryExecutionInfo& queryStatistics)
+DurationStatistics StatisticsCollector::getDurationStatistics(
+    nx::utils::math::SummaryStatisticsPerPeriod<std::chrono::milliseconds>* calculator)
 {
-    if (queryStatistics.result)
-    {
-        if (*queryStatistics.result == DBResultCode::ok)
-            ++m_currentStatistics.requestsSucceeded;
-        else
-            ++m_currentStatistics.requestsFailed;
-    }
-    else
-    {
-        ++m_currentStatistics.requestsCancelled;
-    }
-
-    addValue(
-        &m_waitingForExecutionTimesCalculationContext,
-        queryStatistics.waitForExecutionDuration);
-
-    if (queryStatistics.executionDuration)
-    {
-        addValue(
-            &m_requestExecutionTimesCalculationContext,
-            *queryStatistics.executionDuration);
-    }
+    const auto summaryStatistics = calculator->summaryStatisticsPerLastPeriod();
+    return DurationStatistics{
+        .min = summaryStatistics.min,
+        .max = summaryStatistics.max,
+        .average = summaryStatistics.average
+    };
 }
 
-void StatisticsCollector::addValue(
-    DurationStatisticsCalculationContext* calculationContext,
-    std::chrono::milliseconds value)
+std::map<std::string, QueryStatistics> StatisticsCollector::getQueryStatistics(const nx::MutexLocker& /*lock*/) const
 {
-    calculationContext->currentSum += value;
-    updateMinMax(calculationContext->result, value);
-    ++calculationContext->count;
-    calculationContext->result->average =
-        calculationContext->currentSum / calculationContext->count;
-}
+    static constexpr int kQueryCount = 5;
 
-void StatisticsCollector::removeExpiredRecords(const nx::Locker<nx::Mutex>& /*lock*/)
-{
-    if (m_recordQueue.empty())
-        return;
+    std::multimap<int, decltype(m_queryStatistics)::const_iterator> queriesByCount;
+    for (auto it = m_queryStatistics.begin(); it != m_queryStatistics.end(); ++it)
+        queriesByCount.emplace(it->second.frequencyCounter.getSumPerLastPeriod(), it);
 
-    const auto t = nx::utils::monotonicTime() - m_period;
-    auto posToKeep = m_recordQueue.begin();
-    for (; posToKeep != m_recordQueue.end(); ++posToKeep)
+    std::map<std::string, QueryStatistics> result;
+
+    int i = 0;
+    for (auto it = queriesByCount.begin();
+        i < kQueryCount && it != queriesByCount.end();
+        ++i, ++it)
     {
-        if (posToKeep->timestamp >= t)
-            break;
+        auto& queryStatisticsResult = result[it->second->first];
+        auto& queryStatisticsCtx = it->second->second;
 
-        removeValueFromStatistics(posToKeep->data);
+        const auto summaryStatistics =
+            queryStatisticsCtx.statisticsCalculator.summaryStatisticsPerLastPeriod();
+
+        queryStatisticsResult.count = it->first;
+        queryStatisticsResult.requestExecutionTimes.average = summaryStatistics.average;
+        queryStatisticsResult.requestExecutionTimes.min = summaryStatistics.min;
+        queryStatisticsResult.requestExecutionTimes.max = summaryStatistics.max;
     }
 
-    m_recordQueue.erase(m_recordQueue.begin(), posToKeep);
-
-    recalcIfNeeded();
-}
-
-void StatisticsCollector::removeValueFromStatistics(const QueryExecutionInfo& queryStatistics)
-{
-    if (queryStatistics.result)
-    {
-        if (*queryStatistics.result == DBResultCode::ok)
-            --m_currentStatistics.requestsSucceeded;
-        else
-            --m_currentStatistics.requestsFailed;
-    }
-    else
-    {
-        --m_currentStatistics.requestsCancelled;
-    }
-
-    removeValue(
-        &m_waitingForExecutionTimesCalculationContext,
-        queryStatistics.waitForExecutionDuration);
-
-    if (queryStatistics.executionDuration)
-    {
-        removeValue(
-            &m_requestExecutionTimesCalculationContext,
-            *queryStatistics.executionDuration);
-    }
-}
-
-void StatisticsCollector::removeValue(
-    DurationStatisticsCalculationContext* calculationContext,
-    std::chrono::milliseconds value)
-{
-    using namespace std::chrono;
-
-    calculationContext->currentSum -= value;
-    if (calculationContext->result->min == value || calculationContext->result->max == value)
-        calculationContext->recalcMinMax = true;
-    // TODO: #akolesnikov apply min_max_queue here.
-
-    NX_ASSERT(calculationContext->count > 0);
-    --calculationContext->count;
-    calculationContext->result->average =
-        calculationContext->count > 0
-        ? duration_cast<milliseconds>(calculationContext->currentSum / calculationContext->count)
-        : milliseconds::zero();
-}
-
-void StatisticsCollector::recalcIfNeeded()
-{
-    if (m_requestExecutionTimesCalculationContext.recalcMinMax ||
-        m_waitingForExecutionTimesCalculationContext.recalcMinMax)
-    {
-        m_requestExecutionTimesCalculationContext.result->min = std::chrono::milliseconds::max();
-        m_requestExecutionTimesCalculationContext.result->max = std::chrono::milliseconds::min();
-
-        m_waitingForExecutionTimesCalculationContext.result->min = std::chrono::milliseconds::max();
-        m_waitingForExecutionTimesCalculationContext.result->max = std::chrono::milliseconds::min();
-
-        for (const auto& record: m_recordQueue)
-        {
-            if (record.data.executionDuration)
-            {
-                updateMinMax(
-                    m_requestExecutionTimesCalculationContext.result,
-                    *record.data.executionDuration);
-            }
-
-            updateMinMax(
-                m_waitingForExecutionTimesCalculationContext.result,
-                record.data.waitForExecutionDuration);
-        }
-
-        m_requestExecutionTimesCalculationContext.recalcMinMax = false;
-        m_waitingForExecutionTimesCalculationContext.recalcMinMax = false;
-    }
-}
-
-void StatisticsCollector::updateMinMax(
-    DurationStatistics* result,
-    std::chrono::milliseconds value)
-{
-    result->min = std::min(result->min, value);
-    result->max = std::max(result->max, value);
+    return result;
 }
 
 } // namespace nx::sql

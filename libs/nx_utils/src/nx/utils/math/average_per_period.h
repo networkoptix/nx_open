@@ -43,6 +43,12 @@ public:
             return static_cast<Value>(cumulativeValue / valueCount);
     }
 
+    void reset()
+    {
+        m_cumulativeValuePerPeriod.reset();
+        m_valueCountPerPeriod.reset();
+    }
+
 private:
     SumPerPeriod<typename detail::LongType<Value>::type> m_cumulativeValuePerPeriod;
     SumPerPeriod<unsigned long long> m_valueCountPerPeriod;

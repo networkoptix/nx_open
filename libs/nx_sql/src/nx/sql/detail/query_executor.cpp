@@ -34,7 +34,7 @@ BaseExecutor::~BaseExecutor()
     }
 
     if (m_statisticsCollector)
-        m_statisticsCollector->recordQuery(m_queryStatistics);
+        m_statisticsCollector->recordQueryExecutionTask(m_queryStatistics);
 
     if (m_onBeforeDestructionHandler)
         m_onBeforeDestructionHandler();
