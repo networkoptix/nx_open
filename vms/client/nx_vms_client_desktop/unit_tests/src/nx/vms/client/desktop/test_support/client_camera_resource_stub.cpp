@@ -15,7 +15,7 @@ ClientCameraResourceStub::ClientCameraResourceStub()
     base_type(kThumbCameraTypeId)
 {
     setIdUnsafe(QnUuid::createUuid());
-    forceUsingLocalProperties();
+    setForceUsingLocalProperties();
 }
 
 bool ClientCameraResourceStub::setProperty(

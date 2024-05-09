@@ -346,7 +346,7 @@ public:
      * Force using local properties for the Resource. Actual mostly for the unit tests and for the
      * temporary Resources (like Camera sub-channels).
      */
-    void forceUsingLocalProperties();
+    void setForceUsingLocalProperties(bool value = true);
 
 signals:
     void statusChanged(const QnResourcePtr& resource, Qn::StatusChangeReason reason);
