@@ -28,14 +28,15 @@ IntercomLayoutAccessProvider::IntercomLayoutAccessProvider(
             resourceAccessProvider(),
             &AbstractResourceAccessProvider::accessChanged,
             this,
-            [this](const QnResourceAccessSubject& /*subject*/, const QnResourcePtr& resource)
+            [this](const QnResourceAccessSubject& subject, const QnResourcePtr& resource)
             {
                 if (!nx::vms::common::isIntercom(resource))
                     return;
 
                 const auto intercomLayout = resourcePool()->getResourceById(
                     nx::vms::common::calculateIntercomLayoutId(resource));
-                updateAccessToResource(intercomLayout);
+
+                updateAccess(subject, intercomLayout);
             });
     }
 }
