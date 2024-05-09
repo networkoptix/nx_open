@@ -268,11 +268,14 @@ QString systemName(const AggregatedEventPtr& /*eventAggregator*/, common::System
 
 QString userName(const AggregatedEventPtr& eventAggregator, common::SystemContext* context)
 {
-    if (const auto resource = context->resourcePool()->getResourceById<QnNetworkResource>(
-            eventSourceId(eventAggregator)))
-    {
-        return resource->getAuth().user();
-    }
+    const auto userUuid =
+        eventAggregator->details(context).value(kUserIdDetailName).value<nx::Uuid>();
+    if (userUuid.isNull())
+        return {};
+
+    if (const auto user = context->resourcePool()->getResourceById<QnUserResource>(userUuid))
+        return user->getName();
+
     return {};
 }
 
