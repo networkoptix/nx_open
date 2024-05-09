@@ -8,6 +8,7 @@
 #include <nx/vms/api/json/value_or_array.h>
 
 #include "module_information.h"
+#include "rest_api_versions.h"
 
 namespace nx::vms::api {
 
@@ -23,6 +24,7 @@ struct NX_VMS_API SystemInformation
     QString customization;
     SoftwareVersion version; /**<%apidoc:string */
     int protoVersion = 0;
+    RestApiVersions restApiVersions;
     QString cloudHost;
 
     /**%apidoc If not present, the System is new. */
@@ -59,8 +61,8 @@ struct NX_VMS_API SystemInformation
     SystemInformation& operator=(SystemInformation&&) = default;
 };
 #define SystemInformation_Fields \
-    (name)(customization)(version)(protoVersion)(cloudHost)(localId)(cloudId)(cloudOwnerId) \
-    (endpoint)(servers)(devices)(status)(synchronizedTimeMs)
+    (name)(customization)(version)(protoVersion)(restApiVersions)(cloudHost)(localId)(cloudId) \
+    (cloudOwnerId)(endpoint)(servers)(devices)(status)(synchronizedTimeMs)
 NX_VMS_API_DECLARE_STRUCT_EX(SystemInformation, (json))
 
 struct NX_VMS_API OtherSystemRequest
