@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/utils/data_structures/time_out_cache.h>
+#include <nx/utils/log/log.h>
 #include <nx/utils/time.h>
 
 namespace nx::utils::test {
@@ -52,6 +53,18 @@ protected:
         m_timeShift.applyRelativeShift(period);
     }
 
+    void whenIterateThroughCache()
+    {
+        int count = 0;
+        for (auto it = m_cache.begin(); it != m_cache.end(); ++it)
+        {
+            // Just giving the loop something to do.
+            ++count;
+        }
+
+        NX_DEBUG(this, "count is: %1", count);
+    }
+
     void thenNoItemCanBeFound()
     {
         for (const auto& [key, val]: m_originalCacheItems)
@@ -92,6 +105,16 @@ TEST_F(TimeOutCache, element_access_prolongs_its_life)
 
     whenTimeHasPassed(kExpirationPeriod * 2 / 3);
     assertAddedItemIsFound();
+}
+
+TEST_F(TimeOutCache, begin_end_iteration_does_not_affect_item_expiration)
+{
+    fillCache();
+    whenTimeHasPassed(kExpirationPeriod * 2);
+
+    whenIterateThroughCache();
+
+    thenNoItemCanBeFound();
 }
 
 //-------------------------------------------------------------------------------------------------

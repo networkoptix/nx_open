@@ -51,9 +51,20 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
+struct UserKey
+{
+    std::string hostAddress;
+    std::string username;
+
+    bool operator<(const UserKey& other) const
+    {
+        return hostAddress < other.hostAddress && username < other.username;
+    }
+};
+
 template<typename UpdateHistoryParams>
 using UserAccessBlockerPool = AccessBlockerPool<
-    std::tuple<nx::network::HostAddress /*source*/, std::string /*userName*/>,
+    UserKey,
     UserLocker,
     UserLockerSettings,
     UpdateHistoryParams>;

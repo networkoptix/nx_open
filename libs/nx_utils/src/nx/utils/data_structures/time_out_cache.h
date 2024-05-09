@@ -49,8 +49,11 @@ class TimeOutCache
 {
     static constexpr int kMaxExpiredElementsToRemoveAtOnce = 10;
     using Item = detail::Item<Value>;
+    using Cache = detail::LruCacheBase<Key, Item, Dict>;
 
 public:
+    using const_iterator = typename Cache::const_iterator;
+
     TimeOutCache(
         std::chrono::milliseconds expirationPeriod,
         std::size_t maxSize,
@@ -142,6 +145,18 @@ public:
         m_lruCache.clear();
     }
 
+    // @return a non invasive iterator that does not update the LRU cache.
+    const_iterator begin() const
+    {
+        return m_lruCache.begin();
+    }
+
+    // @return the end iterator complement to begin().
+    const_iterator end() const
+    {
+        return m_lruCache.end();
+    }
+
 private:
     bool isExpired(const Item& item) const
     {
@@ -161,7 +176,7 @@ private:
 
 private:
     const std::chrono::milliseconds m_expirationPeriod;
-    detail::LruCacheBase<Key, Item, Dict> m_lruCache;
+    Cache m_lruCache;
     const bool m_updateElementTimestampOnAccess = true;
 };
 

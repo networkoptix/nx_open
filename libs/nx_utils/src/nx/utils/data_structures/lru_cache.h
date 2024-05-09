@@ -75,6 +75,9 @@ template<class Key, class Value, template<typename...> class Dict>
 class LruCacheBase
 {
 public:
+    using iterator = typename std::list<std::pair<Key, Value>>::iterator;
+    using const_iterator = typename std::list<std::pair<Key, Value>>::const_iterator;
+
     LruCacheBase(size_t size): m_maxCacheSize(size) {}
 
     std::optional<std::reference_wrapper<Value>> getValue(const Key& key)
@@ -154,7 +157,7 @@ public:
             return;
 
         // NOTE: key may be a ref into m_cacheList.
-        const IterT listIter = m_cacheMap[key];
+        const iterator listIter = m_cacheMap[key];
         m_cacheMap.erase(key);
         m_cacheList.erase(listIter);
     }
@@ -165,11 +168,20 @@ public:
         m_cacheList.clear();
     }
 
-private:
-    using IterT = typename std::list<std::pair<Key, Value>>::iterator;
+    // @return a non invasive iterator (does not upate the keys access time).
+    const_iterator begin() const
+    {
+        return m_cacheList.begin();
+    }
 
+    const const_iterator end() const
+    {
+        return m_cacheList.end();
+    }
+
+private:
     std::list<std::pair<Key, Value>> m_cacheList;
-    Dict<Key, IterT> m_cacheMap;
+    Dict<Key, iterator> m_cacheMap;
     const size_t m_maxCacheSize;
 };
 

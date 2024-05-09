@@ -2,33 +2,10 @@
 
 #pragma once
 
-#include <functional>
-#include <string>
-#include <vector>
-
+#include "maintenance_data.h"
 #include "result_code.h"
 
 namespace nx::cloud::db::api {
-
-class VmsConnectionData
-{
-public:
-    std::string systemId;
-    std::string endpoint;
-};
-
-using VmsConnectionDataList = std::vector<VmsConnectionData>;
-
-class Statistics
-{
-public:
-    int onlineServerCount;
-
-    Statistics():
-        onlineServerCount(0)
-    {
-    }
-};
 
 /**
  * Maintenance manager is for accessing cloud internal data for maintenance/debug purposes.
@@ -47,6 +24,32 @@ public:
 
     virtual void getStatistics(
         std::function<void(api::ResultCode, api::Statistics)> completionHandler) = 0;
+
+    /**
+     * provides a list of all account locks, both host locks and user locks
+     */
+    virtual void getAllAccountLocks(
+        std::function<void(api::ResultCode, api::AccountLockList)> completionHandler) = 0;
+
+    /**
+     * Provides a list of account locks with LockType::host.
+     */
+    virtual void getLockedHosts(
+        std::function<void(api::ResultCode, api::AccountLockList)> completionHandler) = 0;
+
+    virtual void isHostLocked(
+        std::string ipAddress,
+        std::function<void (api::ResultCode, bool)> completionHandler) = 0;
+
+    /**
+     * Provides a list of account locks with LockType::user
+     */
+    virtual void getLockedUsers(
+        std::function<void(api::ResultCode, api::AccountLockList)> completionHandler) = 0;
+
+    virtual void isUserLocked(
+        std::string username,
+        std::function<void (api::ResultCode, bool)> completionHandler) = 0;
 };
 
 } // namespace nx::cloud::db::api
