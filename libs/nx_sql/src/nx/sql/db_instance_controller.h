@@ -27,7 +27,6 @@ public:
 
     static DBResult configureSqliteInstance(QueryContext* queryContext);
 
-protected:
     DbStructureUpdater& dbStructureUpdater();
 
 private:

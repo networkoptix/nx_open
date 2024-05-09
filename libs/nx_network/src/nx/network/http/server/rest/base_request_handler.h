@@ -7,6 +7,15 @@
 #include <nx/network/utils.h>
 #include <nx/utils/url_query.h>
 
+namespace nx::network::http::StatusCode {
+
+inline static void convert(const StatusCode::Value& status, ApiRequestResult* httpResult)
+{
+    *httpResult = ApiRequestResult(status);
+}
+
+} // namespace nx::network::http::StatusCode
+
 namespace nx::network::http::server::rest {
 
 template<const char* name>
@@ -134,11 +143,6 @@ struct CompletionHandlerDeclarator<Result, void>
 {
     using Func = std::function<void(Result)>;
 };
-
-inline static void convert(const StatusCode::Value& status, ApiRequestResult* httpResult)
-{
-    *httpResult = ApiRequestResult(status);
-}
 
 //-------------------------------------------------------------------------------------------------
 

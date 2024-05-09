@@ -56,6 +56,9 @@ struct IssueTokenRequest
     std::optional<std::string> code;
 };
 
+NX_REFLECTION_INSTRUMENT(IssueTokenRequest, (grant_type)(response_type)(client_id)(scope) \
+    (password)(username)(refresh_token)(code)(refresh_token_lifetime))
+
 NX_REFLECTION_ENUM_CLASS(TokenType,
     bearer
 );
@@ -93,6 +96,10 @@ struct IssueTokenResponse: public TokenInfo
     std::optional<std::string> error;
 };
 
+NX_REFLECTION_INSTRUMENT(
+    IssueTokenResponse,
+    (access_token)(refresh_token)(expires_in)(expires_at)(token_type)(scope)(error));
+
 struct IssueCodeResponse
 {
     /**%apidoc
@@ -107,7 +114,9 @@ struct IssueCodeResponse
     std::optional<std::string> error;
 };
 
-struct ValidateTokenResponse : public TokenInfo
+NX_REFLECTION_INSTRUMENT(IssueCodeResponse, (access_code)(code)(error))
+
+struct ValidateTokenResponse: public TokenInfo
 {
     /**%apidoc The username the token belongs to.*/
     std::string username;
@@ -122,6 +131,9 @@ struct ValidateTokenResponse : public TokenInfo
      */
     std::chrono::seconds time_since_password;
 };
+
+NX_REFLECTION_INSTRUMENT(ValidateTokenResponse, (access_token)(expires_in)(expires_at)(token_type) \
+    (scope)(username)(time_since_password))
 
 struct TokenIntrospectionRequest
 {
@@ -181,6 +193,8 @@ struct IssueStunTokenRequest
     std::string server_name;
 };
 
+NX_REFLECTION_INSTRUMENT(IssueStunTokenRequest, (server_name))
+
 struct IssueStunTokenResponse
 {
     /**%apidoc The token itself.*/
@@ -201,6 +215,8 @@ struct IssueStunTokenResponse
     /**%apidoc Error code.*/
     std::optional<std::string> error;
 };
+
+NX_REFLECTION_INSTRUMENT(IssueStunTokenResponse, (token)(mac_code)(error)(kid)(expires_at)(expires_in))
 
 /**
  * JWT claims set. Field names extended with field from RFC 9068
