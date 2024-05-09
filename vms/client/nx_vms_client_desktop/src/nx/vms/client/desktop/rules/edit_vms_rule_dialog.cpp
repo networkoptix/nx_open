@@ -369,6 +369,16 @@ EditVmsRuleDialog::EditVmsRuleDialog(QWidget* parent):
         buttonBox->setCenterButtons(false);
         footerLayout->addWidget(buttonBox);
 
+        connect(this,
+            &EditVmsRuleDialog::hasChangesChanged,
+            [buttonBox, this]()
+            {
+                if (auto acceptButton = buttonBox->button(QDialogButtonBox::StandardButton::Apply))
+                {
+                    if (acceptButton->isEnabled() != m_hasChanges)
+                        acceptButton->setEnabled(m_hasChanges);
+                }
+            });
         mainLayout->addLayout(footerLayout);
     }
 
@@ -422,6 +432,7 @@ void EditVmsRuleDialog::buttonBoxClicked(QDialogButtonBox::StandardButton button
     if (button == QDialogButtonBox::StandardButton::Apply)
     {
         emit accepted();
+        setHasChanges(false);
         return;
     }
 
@@ -517,6 +528,7 @@ void EditVmsRuleDialog::displayControls()
 void EditVmsRuleDialog::onCommentChanged(const QString& comment)
 {
     m_rule->setComment(comment);
+    setHasChanges(true);
 }
 
 void EditVmsRuleDialog::onDeleteClicked()
@@ -529,6 +541,7 @@ void EditVmsRuleDialog::onScheduleClicked()
 {
     WeekTimeScheduleDialog dialog(this, /*isEmptyAllowed*/ false);
     dialog.setSchedule(m_rule->schedule());
+    setHasChanges(true);
     if (dialog.exec() != QDialog::Accepted)
         return;
 
@@ -564,6 +577,7 @@ void EditVmsRuleDialog::onActionTypeChanged(const QString& actionType)
 
     m_rule->takeActionBuilder(0);
     m_rule->addActionBuilder(std::move(actionBuilder));
+    setHasChanges(true);
 
     displayRule();
 }
@@ -597,6 +611,7 @@ void EditVmsRuleDialog::onEventTypeChanged(const QString& eventType)
 
     m_rule->takeEventFilter(0);
     m_rule->addEventFilter(std::move(eventFilter));
+    setHasChanges(true);
 
     displayRule();
 }
@@ -604,6 +619,7 @@ void EditVmsRuleDialog::onEventTypeChanged(const QString& eventType)
 void EditVmsRuleDialog::onEnabledButtonClicked(bool checked)
 {
     m_rule->setEnabled(checked);
+    setHasChanges(true);
 }
 
 void EditVmsRuleDialog::onEventFilterModified()
@@ -611,6 +627,7 @@ void EditVmsRuleDialog::onEventFilterModified()
     const auto serializedEventFilter =
         QJson::serialized(serialize(m_rule->eventFilters().first()));
     m_eventLabel->setToolTip(indentedJson(serializedEventFilter));
+    setHasChanges(true);
 }
 
 void EditVmsRuleDialog::onActionBuilderModified()
@@ -618,6 +635,16 @@ void EditVmsRuleDialog::onActionBuilderModified()
     const auto serializedActionBuilder =
         QJson::serialized(serialize(m_rule->actionBuilders().first()));
     m_actionLabel->setToolTip(indentedJson(serializedActionBuilder));
+    setHasChanges(true);
+}
+
+void EditVmsRuleDialog::setHasChanges(bool hasChanges)
+{
+    if (hasChanges == m_hasChanges)
+        return;
+
+    m_hasChanges = hasChanges;
+    emit hasChangesChanged();
 }
 
 } // namespace nx::vms::client::desktop::rules

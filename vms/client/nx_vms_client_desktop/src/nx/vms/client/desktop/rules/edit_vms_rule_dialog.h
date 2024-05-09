@@ -30,6 +30,9 @@ public:
     void accept() override;
     void reject() override;
 
+signals:
+    void hasChangesChanged();
+
 protected:
     void buttonBoxClicked(QDialogButtonBox::StandardButton button) override;
 
@@ -44,6 +47,7 @@ private:
     ActionTypePickerWidget* m_actionTypePicker{nullptr};
     QWidget* m_actionEditorWidget{nullptr};
     QPushButton* m_enabledButton{nullptr};
+    bool m_hasChanges = false;
 
     std::shared_ptr<vms::rules::Rule> m_rule;
 
@@ -66,6 +70,8 @@ private:
 
     void onEventFilterModified();
     void onActionBuilderModified();
+
+    void setHasChanges(bool hasChanges);
 };
 
 } // namespace nx::vms::client::desktop::rules
