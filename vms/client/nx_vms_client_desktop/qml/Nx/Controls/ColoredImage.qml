@@ -42,6 +42,7 @@ Item
         id: image
 
         anchors.fill: item
+        fillMode: Image.Pad
 
         source:
         {
