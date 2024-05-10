@@ -295,6 +295,11 @@ protected:
         return m_prevServerTunnelConnection.get();
     }
 
+    Server<>& tunnelingServer()
+    {
+        return *m_tunnelingServer;
+    }
+
 private:
     struct DelayedRequestContext
     {

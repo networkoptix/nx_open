@@ -7,12 +7,6 @@
 
 namespace nx::network::http {
 
-namespace detail {
-
-SendBodyContext::~SendBodyContext() = default;
-
-} // namespace detail
-
 AsyncMessagePipeline::~AsyncMessagePipeline() = default;
 
 void AsyncMessagePipeline::bindToAioThread(aio::AbstractAioThread* aioThread)
