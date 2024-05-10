@@ -5,7 +5,6 @@ nx_add_target(nx_monitoring LIBRARY WERROR NO_MOC
         Qt6::Core
         Qt6::Network
         nx_utils
-        nx_fusion
     FOLDER common/libs
 )
 
