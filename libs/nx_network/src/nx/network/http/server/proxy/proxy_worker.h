@@ -8,6 +8,7 @@
 
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/network/connection_server/base_stream_protocol_connection.h>
+#include <nx/network/debug/object_instance_counter.h>
 #include <nx/network/http/async_channel_message_body_source.h>
 #include <nx/network/http/http_types.h>
 #include <nx/network/http/server/abstract_http_request_handler.h>
@@ -69,6 +70,7 @@ private:
     static std::atomic<int> m_proxyingIdSequence;
     Request m_translatedRequest;
     std::unique_ptr<AbstractMsgBodySourceWithCache> m_requestBody;
+    nx::network::debug::ObjectInstanceCounter<ProxyWorker> m_instanceCounter;
 
     void onConnectionClosed(SystemError::ErrorCode closeReason);
 

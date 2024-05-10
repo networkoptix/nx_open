@@ -4,8 +4,11 @@
 
 #include <list>
 
+#include <nx/utils/buffer.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/move_only_func.h>
+
+#include "../basic_pollable.h"
 
 namespace nx::network::aio::detail {
 

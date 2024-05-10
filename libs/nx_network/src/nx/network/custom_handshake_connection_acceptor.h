@@ -8,6 +8,7 @@
 
 #include <nx/network/aio/aio_service.h>
 #include <nx/network/aio/timer.h>
+#include <nx/network/debug/object_instance_counter.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/async_operation_guard.h>
 #include <nx/utils/counter.h>
@@ -195,6 +196,9 @@ private:
             connection(std::move(connection))
         {
         }
+
+    private:
+        nx::network::debug::ObjectInstanceCounter<ConnectionContext> m_instanceCounter;
     };
 
     struct AcceptResult
@@ -210,6 +214,9 @@ private:
             connection(std::move(connection))
         {
         }
+
+    private:
+        nx::network::debug::ObjectInstanceCounter<AcceptResult> m_instanceCounter;
     };
 
     using Connections = std::map<int /*seq*/, std::unique_ptr<ConnectionContext>>;

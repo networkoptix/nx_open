@@ -4,6 +4,7 @@
 
 #include <map>
 #include <memory>
+#include <optional>
 #include <string>
 
 #include <nx/network/aio/async_object_pool.h>
@@ -59,6 +60,8 @@ public:
         const std::string& basePath,
         nx::network::http::AbstractMessageDispatcher* messageDispatcher) override;
 
+    virtual void setTunnelSetupTimeout(std::chrono::milliseconds timeout) override;
+
 private:
     /**
      * Processes the initial (GET) request. This request opens down stream.
@@ -71,6 +74,7 @@ private:
 
 private:
     nx::network::aio::AsyncObjectPool<Worker> m_pool;
+    std::optional<std::chrono::milliseconds> m_tunnelSetupTimeout;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -82,7 +86,13 @@ GetPostTunnelServer<ApplicationData...>::GetPostTunnelServer(
     base_type(std::move(newTunnelHandler)),
     m_pool(
         &nx::network::SocketGlobals::instance().aioService(),
-        [this]() { return this->createWorker(); })
+        [this]()
+        {
+            auto worker = this->createWorker();
+            if (m_tunnelSetupTimeout)
+                worker->setTunnelSetupTimeout(*m_tunnelSetupTimeout);
+            return worker;
+        })
 {
 }
 
@@ -117,6 +127,13 @@ void GetPostTunnelServer<ApplicationData...>::registerRequestHandlers(
             m_pool.get()->processOpenUpStreamRequest(std::forward<decltype(args)>(args)...);
         },
         MessageBodyDeliveryType::stream);
+}
+
+template<typename ...ApplicationData>
+void GetPostTunnelServer<ApplicationData...>::setTunnelSetupTimeout(
+    std::chrono::milliseconds timeout)
+{
+    m_tunnelSetupTimeout = timeout;
 }
 
 template<typename ...ApplicationData>
