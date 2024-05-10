@@ -7,11 +7,11 @@
 #include <QtCore/QJsonObject>
 #include <QtCore/QObject>
 
-#include <api/model/analytics_actions.h>
 #include <api/server_rest_connection_fwd.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/api/analytics/analytics_actions.h>
 #include <nx/vms/client/desktop/system_context_aware.h>
 
 #include "analytics_settings_types.h"
@@ -35,7 +35,7 @@ using AnalyticsSettingsCallback =
 using AnalyticsActiveSettingsCallback =
     rest::Callback<nx::vms::api::analytics::DeviceAgentActiveSettingChangedResponse>;
 
-using AnalyticsSettingsActionCallback = rest::Callback<AnalyticsActionResult>;
+using AnalyticsSettingsActionCallback = rest::Callback<api::AnalyticsActionResult>;
 
 class NX_VMS_CLIENT_DESKTOP_API AnalyticsSettingsServerInterface
 {
@@ -75,7 +75,7 @@ public:
 signals:
     void dataChanged(const DeviceAgentData& data);
     void previewDataReceived(const DeviceAgentData& data);
-    void actionResultReceived(const AnalyticsActionResult& result);
+    void actionResultReceived(const api::AnalyticsActionResult& result);
 
 protected:
     AnalyticsSettingsListener(const DeviceAgentId& agentId, AnalyticsSettingsManager* manager);

@@ -4,8 +4,6 @@
 
 #include <nx/fusion/model_functions.h>
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(AnalyticsActionResult, (json), AnalyticsActionResult_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(AnalyticsAction, (json), AnalyticsAction_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     AvailableAnalyticsActionsOfEngine, (json), AvailableAnalyticsActionsOfEngine_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(

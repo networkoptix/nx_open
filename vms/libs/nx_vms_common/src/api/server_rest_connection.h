@@ -9,7 +9,6 @@
 #include <analytics/db/analytics_db_types.h>
 #include <api/helpers/request_helpers_fwd.h>
 #include <api/http_client_pool.h>
-#include <api/model/analytics_actions.h>
 #include <api/model/audit/audit_record.h>
 #include <api/model/camera_diagnostics_reply.h>
 #include <api/model/camera_list_reply.h>
@@ -29,6 +28,7 @@
 #include <nx/utils/async_handler_executor.h>
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/system_error.h>
+#include <nx/vms/api/analytics/analytics_actions.h>
 #include <nx/vms/api/analytics/analytics_engine_settings_data.h>
 #include <nx/vms/api/analytics/device_agent_active_setting_changed_response.h>
 #include <nx/vms/api/analytics/device_agent_settings_response.h>
@@ -561,7 +561,7 @@ public:
         QThread* targetThread = nullptr);
 
     Handle executeAnalyticsAction(
-        const AnalyticsAction& action,
+        const nx::vms::api::AnalyticsAction& action,
         Result<nx::network::rest::JsonResult>::type callback,
         QThread* targetThread = nullptr);
 
