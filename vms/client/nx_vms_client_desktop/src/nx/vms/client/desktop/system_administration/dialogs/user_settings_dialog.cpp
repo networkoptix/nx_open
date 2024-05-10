@@ -1065,7 +1065,6 @@ UserSettingsDialogState UserSettingsDialog::createState(const QnUserResourcePtr&
         && status
         && status->state != api::LdapStatus::State::online;
     d->ldapError = user->isLdap()
-        && !user->externalId().dn.isEmpty()
         && user->externalId().syncId != d->syncId
         && !d->ldapOffline;
 
