@@ -306,7 +306,7 @@ QnUserResourcePtr UserListModel::Private::user(const QModelIndex& index) const
 
 bool UserListModel::Private::ldapUserNotFound(const QnUserResourcePtr& user) const
 {
-    return !user->externalId().dn.isEmpty()
+    return user->userType() == api::UserType::ldap
         && user->externalId().syncId != syncId
         && ldapServerOnline;
 }
