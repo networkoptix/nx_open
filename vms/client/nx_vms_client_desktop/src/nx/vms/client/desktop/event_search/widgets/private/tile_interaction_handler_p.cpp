@@ -16,7 +16,6 @@
 #include <QtWidgets/QScrollArea>
 
 #include <analytics/db/analytics_db_types.h>
-#include <api/model/analytics_actions.h>
 #include <api/server_rest_connection.h>
 #include <client/client_globals.h>
 #include <client_core/client_core_module.h>
@@ -35,6 +34,7 @@
 #include <nx/utils/pending_operation.h>
 #include <nx/utils/qt_helpers.h>
 #include <nx/utils/range_adapters.h>
+#include <nx/vms/api/analytics/analytics_actions.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
@@ -353,7 +353,7 @@ void TileInteractionHandler::executePluginAction(
     if (!actionDescriptor)
         return;
 
-    AnalyticsAction actionData;
+    api::AnalyticsAction actionData;
     actionData.engineId = engineId;
     actionData.actionId = actionDescriptor->id;
     actionData.objectTrackId = track.id;
@@ -363,13 +363,14 @@ void TileInteractionHandler::executePluginAction(
     if (!actionDescriptor->parametersModel.isEmpty())
     {
         // Show dialog to enter required parameters.
-        const auto params = AnalyticsActionsHelper::requestSettingsMap(
+        auto params = AnalyticsActionsHelper::requestSettingsMap(
             actionDescriptor->parametersModel, mainWindowWidget());
 
         if (!params)
             return;
 
-        actionData.params = *params;
+        for (auto&& [k, v]: params->asKeyValueRange())
+            actionData.parameters.emplace(std::move(k), std::move(v));
     }
 
     const auto resultCallback =
@@ -392,7 +393,7 @@ void TileInteractionHandler::executePluginAction(
             if (!systemContext)
                 return;
 
-            const auto reply = result.deserialized<AnalyticsActionResult>();
+            const auto reply = result.deserialized<api::AnalyticsActionResult>();
             AnalyticsActionsHelper::processResult(
                 reply,
                 windowContext(),

@@ -133,7 +133,7 @@ void AnalyticsSettingsMultiListener::Private::addListener(const nx::Uuid& engine
         });
 
     connect(listener.get(), &AnalyticsSettingsListener::actionResultReceived, this,
-        [this, engineId](const AnalyticsActionResult& result)
+        [this, engineId](const api::AnalyticsActionResult& result)
         {
             emit q->actionResultReceived(engineId, result);
         });

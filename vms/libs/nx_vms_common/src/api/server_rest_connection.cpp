@@ -886,7 +886,7 @@ Handle ServerConnection::searchCameraStop(
 }
 
 Handle ServerConnection::executeAnalyticsAction(
-    const AnalyticsAction& action,
+    const nx::vms::api::AnalyticsAction& action,
     Result<nx::network::rest::JsonResult>::type callback,
     QThread* targetThread)
 {

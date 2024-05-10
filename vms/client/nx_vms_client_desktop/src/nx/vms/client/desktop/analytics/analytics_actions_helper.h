@@ -7,7 +7,7 @@
 
 #include <QtCore/QJsonObject>
 
-#include <api/model/analytics_actions.h>
+#include <nx/vms/api/analytics/analytics_actions.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/client/desktop/common/utils/abstract_web_authenticator.h>
 
@@ -30,7 +30,7 @@ public:
      * @param parent Dialog's parent.
      */
     static void processResult(
-        const AnalyticsActionResult& result,
+        const api::AnalyticsActionResult& result,
         WindowContext* context = nullptr,
         const QnResourcePtr& proxyResource = {},
         std::shared_ptr<AbstractWebAuthenticator> authenticator = nullptr,

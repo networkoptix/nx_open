@@ -60,7 +60,7 @@ struct AnalyticsSettingsManager::Private
         const QJsonObject& settings);
 
     void previewDataReceived(const DeviceAgentId& id, const DeviceAgentData& data);
-    void actionResultReceived(const DeviceAgentId& id, const AnalyticsActionResult& result);
+    void actionResultReceived(const DeviceAgentId& id, const api::AnalyticsActionResult& result);
 
     void loadResponseData(
         const DeviceAgentId& id,
@@ -241,7 +241,7 @@ void AnalyticsSettingsManager::Private::previewDataReceived(
 
 void AnalyticsSettingsManager::Private::actionResultReceived(
     const DeviceAgentId& id,
-    const AnalyticsActionResult& result)
+    const api::AnalyticsActionResult& result)
 {
     if (auto listener = dataByAgentId(id).listener.lock())
         emit listener->actionResultReceived(result);
@@ -380,7 +380,7 @@ bool AnalyticsSettingsManager::activeSettingsChanged(
 
             d->actionResultReceived(
                 agentId,
-                AnalyticsActionResult{
+                api::AnalyticsActionResult{
                     .actionUrl = result.actionUrl,
                     .messageToUser = result.messageToUser,
                     .useProxy = result.useProxy,

@@ -5,7 +5,7 @@
 #include <QtCore/QJsonObject>
 #include <QtCore/QObject>
 
-#include <api/model/analytics_actions.h>
+#include <nx/vms/api/analytics/analytics_actions.h>
 #include <core/resource/resource_fwd.h>
 
 #include "analytics_settings_types.h"
@@ -40,7 +40,8 @@ signals:
     void enginesChanged();
     void dataChanged(const nx::Uuid& engineId, const DeviceAgentData& data);
     void previewDataReceived(const nx::Uuid& engineId, const DeviceAgentData& data);
-    void actionResultReceived(const nx::Uuid& engineId, const AnalyticsActionResult& result);
+    void actionResultReceived(
+        const nx::Uuid& engineId, const api::AnalyticsActionResult& result);
 
 private:
     class Private;

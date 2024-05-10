@@ -366,7 +366,7 @@ void AnalyticsSettingsStore::activeElementChanged(
                     /*changed*/ true);
 
                 AnalyticsActionsHelper::processResult(
-                    AnalyticsActionResult{
+                    api::AnalyticsActionResult{
                         .actionUrl = result.actionUrl,
                         .messageToUser = result.messageToUser,
                         .useProxy = result.useProxy,

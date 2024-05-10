@@ -83,7 +83,7 @@ void DeviceAgentSettingsAdapter::setCamera(const QnVirtualCameraResourcePtr& cam
                 d->settingsListener.get(),
                 &AnalyticsSettingsMultiListener::actionResultReceived,
                 this,
-                [this, camera](const nx::Uuid& engineId, const AnalyticsActionResult& result)
+                [this, camera](const nx::Uuid& engineId, const api::AnalyticsActionResult& result)
                 {
                     const CameraSettingsDialogState& state = d->store->state();
                     std::shared_ptr<CameraWebAuthenticator> authenticator =
