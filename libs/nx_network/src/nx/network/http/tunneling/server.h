@@ -55,6 +55,9 @@ public:
     template<template<typename...> class SpecificTunnelServer>
     SpecificTunnelServer<ApplicationData...>& addTunnelServer();
 
+    /** Set time limit on tunnel setup. */
+    void setTunnelSetupTimeout(std::chrono::milliseconds timeout);
+
     void registerRequestHandlers(
         const std::string& basePath,
         nx::network::http::AbstractMessageDispatcher* messageDispatcher);
@@ -99,6 +102,13 @@ SpecificTunnelServer<ApplicationData...>& Server<ApplicationData...>::addTunnelS
     auto tunnelServerPtr = tunnelServer.get();
     m_tunnelServers.push_back(std::move(tunnelServer));
     return *tunnelServerPtr;
+}
+
+template<typename ...ApplicationData>
+void Server<ApplicationData...>::setTunnelSetupTimeout(std::chrono::milliseconds timeout)
+{
+    for (auto& tunnelServer: m_tunnelServers)
+        tunnelServer->setTunnelSetupTimeout(timeout);
 }
 
 template<typename ...ApplicationData>

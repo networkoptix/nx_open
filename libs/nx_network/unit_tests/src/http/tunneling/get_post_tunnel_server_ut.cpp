@@ -230,6 +230,19 @@ TEST_F(HttpTunnelingGetPost, connection_is_closed_by_timeout_if_post_never_comes
     andTunnelIsClosedByServerEventually();
 }
 
+// Checking per-tunnel context timeout.
+TEST_F(HttpTunnelingGetPost, connection_is_closed_by_tunnel_setup_timeout)
+{
+    tunnelingServer().setTunnelSetupTimeout(std::chrono::milliseconds(101));
+
+    givenTunnellingServer();
+
+    whenSendGetRequest();
+    thenRequestSucceeded();
+
+    andTunnelIsClosedByServerEventually();
+}
+
 TEST_F(HttpTunnelingGetPost, get_and_post_arrive_together)
 {
     givenTunnellingServer();
