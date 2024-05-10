@@ -4,7 +4,9 @@
 
 #include <map>
 
+#include <nx/network/aio/detail/async_channel_unidirectional_bridge.h>
 #include <nx/network/connection_server/base_stream_protocol_connection.h>
+#include <nx/network/debug/object_instance_counter.h>
 
 #include "abstract_msg_body_source.h"
 #include "http_parser.h"
@@ -16,13 +18,14 @@ namespace nx::network::http {
 
 namespace detail {
 
-struct SendBodyContext
+struct NX_NETWORK_API SendBodyContext
 {
     std::unique_ptr<AbstractMsgBodySourceWithCache> msgBody;
     std::unique_ptr<aio::detail::AsyncChannelUnidirectionalBridge> bridge;
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler;
 
-    ~SendBodyContext();
+private:
+    nx::network::debug::ObjectInstanceCounter<SendBodyContext> m_instanceCounter;
 };
 
 } // namespace detail
@@ -63,6 +66,7 @@ protected:
 private:
     int m_lastId = 0;
     std::map<int, std::unique_ptr<detail::SendBodyContext>> m_sendBodyOperations;
+    nx::network::debug::ObjectInstanceCounter<AsyncMessagePipeline> m_instanceCounter;
 
     void sendBodyAsync(
         std::unique_ptr<AbstractMsgBodySourceWithCache> msgBody,

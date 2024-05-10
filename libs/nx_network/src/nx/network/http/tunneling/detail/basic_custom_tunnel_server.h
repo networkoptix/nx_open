@@ -21,6 +21,9 @@ public:
     virtual void setTunnelAuthorizer(
         TunnelAuthorizer<ApplicationData...>* tunnelAuthorizer) = 0;
 
+    /** Set time limit on tunnel setup. */
+    virtual void setTunnelSetupTimeout(std::chrono::milliseconds /*timeout*/) {};
+
     virtual void registerRequestHandlers(
         const std::string& basePath,
         nx::network::http::AbstractMessageDispatcher* messageDispatcher) = 0;
