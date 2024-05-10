@@ -31,7 +31,7 @@ void QnNotificationSoundModel::loadList(const QStringList &filenames) {
 
 
     QList<QStandardItem *> row;
-    row << new QStandardItem(braced(tr("No Sound")))
+    row << new QStandardItem(tr("No Sound"))
         << new QStandardItem(QString());
     appendRow(row);
 
