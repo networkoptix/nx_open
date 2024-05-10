@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" viewBox="0 0 32 32">
+  <g class="32x32/Solid/step_forward">
+    <rect width="32" height="32" fill="#212A2F" class="Secondary" rx="2"/>
+    <path fill="#E1E7EA" fill-rule="evenodd" d="M10 20.064v-8.127a.8.8 0 0 1 1.259-.656l5.805 4.064a.8.8 0 0 1 0 1.31l-5.805 4.064A.8.8 0 0 1 10 20.064ZM20.4 11.2a.8.8 0 0 1 .8.8v8a.8.8 0 0 1-.8.8h-1.6a.8.8 0 0 1-.8-.8v-8a.8.8 0 0 1 .8-.8h1.6Z" class="Primary" clip-rule="evenodd"/>
+  </g>
+</svg>

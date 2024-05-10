@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 20 20">
+  <g class="20x20/Solid/delete">
+    <path fill="#B0BEC4" fill-rule="evenodd" d="M8 3v1.5h4V3H8Zm-.5-1.5a1 1 0 0 0-1 1v2H3.75a.75.75 0 1 0 0 1.5h12.5a.75.75 0 0 0 0-1.5H13.5v-2a1 1 0 0 0-1-1h-5ZM4 7.5V17a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7.5H4Zm3.5 10V9H9v8.5H7.5Zm3.5 0V9h1.5v8.5H11Z" class="Primary" clip-rule="evenodd"/>
+  </g>
+</svg>

@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 16 16">
   <g class="16x16/Solid/sorting_descending">
-    <path fill="#E1E7EA" fill-rule="evenodd" d="M6 3H2v2h4V3ZM2 9V7h8v2H2Zm0 2h12v2H2v-2Z" class="Primary" clip-rule="evenodd"/>
+    <path fill="#E1E7EA" fill-rule="evenodd" d="M2 3h12v2H2V3Zm0 4h8v2H2V7Zm4 4H2v2h4v-2Z" class="Primary" clip-rule="evenodd"/>
   </g>
 </svg>

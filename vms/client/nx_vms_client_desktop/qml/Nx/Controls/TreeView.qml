@@ -548,7 +548,7 @@ FocusScope
 
                         return model.expanded
                             ? "image://skin/20x20/Solid/arrow_open.svg"
-                            : "image://skin/20x20/Solid/arrow_close.svg"
+                            : "image://skin/20x20/Solid/arrow_right.svg"
                     }
                     sourceSize: Qt.size(20, 20)
                     primaryColor: "dark17"

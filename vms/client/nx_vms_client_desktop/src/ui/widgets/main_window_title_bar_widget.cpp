@@ -58,7 +58,7 @@ static const QMargins kDoubleLevelVLineContentMargins = {0, 5, 0, 5};
 
 static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kMainMenuTheme = {
     {QnIcon::Normal, {.primary = "light4"}}};
-NX_DECLARE_COLORIZED_ICON(kMainMenuIcon, "20x20/Outline/menu_main_window.svg", kMainMenuTheme);
+NX_DECLARE_COLORIZED_ICON(kMainMenuIcon, "40x32/Solid/main_menu_2.svg", kMainMenuTheme);
 
 QFrame* newVLine(const QString& lightColorName, const QString& shadowColorName)
 {

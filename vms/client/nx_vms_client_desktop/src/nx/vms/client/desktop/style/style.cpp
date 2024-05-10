@@ -145,6 +145,8 @@ const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kYellowTheme = {
 NX_DECLARE_COLORIZED_ICON(kArrowOpenIcon, "20x20/Solid/arrow_open.svg", core::kEmptySubstitutions)
 NX_DECLARE_COLORIZED_ICON(kArrowCloseIcon, "20x20/Solid/arrow_close.svg", \
     core::kEmptySubstitutions)
+NX_DECLARE_COLORIZED_ICON(kArrowRightSolidIcon, "20x20/Solid/arrow_right.svg", \
+    core::kEmptySubstitutions)
 NX_DECLARE_COLORIZED_ICON(kArrowLeftIcon, "16x16/Outline/arrow_left.svg", kLight1Theme)
 NX_DECLARE_COLORIZED_ICON(kArrowRightIcon, "16x16/Outline/arrow_right.svg", kLight1Theme)
 NX_DECLARE_COLORIZED_ICON(kTabCloseIcon,
@@ -1368,7 +1370,7 @@ void Style::drawPrimitive(PrimitiveElement element,
 
             auto icon = option->state.testFlag(State_Open)
                 ? qnSkin->icon(kArrowOpenIcon)
-                : qnSkin->icon(kArrowCloseIcon);
+                : qnSkin->icon(kArrowRightSolidIcon);
 
             const auto rect = qobject_cast<const QAbstractItemView*>(widget)
                 ? subElementRect(SE_TreeViewDisclosureItem, option, widget)

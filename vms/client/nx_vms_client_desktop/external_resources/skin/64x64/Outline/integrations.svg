@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="none" viewBox="0 0 64 64">
+  <g class="64x64/Outline/integrations">
+    <path fill="#53707F" fill-rule="evenodd" d="M39 4a3 3 0 0 0-3 3v18a3 3 0 0 0 3 3h18a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3H39Zm-1 3a1 1 0 0 1 1-1h18a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H39a1 1 0 0 1-1-1V7ZM7 15a3 3 0 0 0-3 3v39a3 3 0 0 0 3 3h39a3 3 0 0 0 3-3V39a3 3 0 0 0-3-3H28V18a3 3 0 0 0-3-3H7Zm19 21V18a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1v18h20Zm2 22h18a1 1 0 0 0 1-1V39a1 1 0 0 0-1-1H28v20Zm-2 0V38H6v19a1 1 0 0 0 1 1h19Z" class="Primary" clip-rule="evenodd"/>
+  </g>
+</svg>
