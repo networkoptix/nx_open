@@ -138,7 +138,7 @@ struct UserGroupListModel::Private
 
     bool ldapGroupNotFound(const UserGroupData& group) const
     {
-        return !group.externalId.dn.isEmpty() && group.externalId.syncId != syncId;
+        return group.type == api::UserType::ldap && group.externalId.syncId != syncId;
     }
 
     bool isChecked(const UserGroupData& group) const

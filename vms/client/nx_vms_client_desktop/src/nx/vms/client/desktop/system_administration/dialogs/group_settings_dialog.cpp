@@ -458,7 +458,6 @@ GroupSettingsDialogState GroupSettingsDialog::createState(const nx::Uuid& groupI
         const bool ldapOffline = !status || status->state == api::LdapStatus::State::offline;
 
         d->ldapError = groupData->type == api::UserType::ldap
-            && !groupData->externalId.dn.isEmpty()
             && groupData->externalId.syncId != d->syncId
             && !ldapOffline;
     }
