@@ -29,5 +29,6 @@ if(withTests)
 
     # Actually this should be in the unit_tests/CMakeLists.txt, but that file is used as a template
     # for the auto-generated CMakeLists.txt in the sample archive.
-    nx_store_test_metainformation(nx_sdk_ut PROJECT NXLIB)
+    nx_set_test_meta_info(nx_sdk_ut PROJECT NXLIB)
+    add_dependencies(unit_tests nx_sdk_ut)
 endif()

@@ -1,16 +1,17 @@
 ## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+include_guard(GLOBAL)
+
 enable_testing()
 
-add_custom_target(unit_tests)
-set_target_properties(unit_tests PROPERTIES
-    FOLDER utils
-    TESTS "")
+include(test_meta_information)
 
+set(testInformationFile "${CMAKE_BINARY_DIR}/unit_tests_info.yml")
+nx_store_known_file(${testInformationFile})
 set(testTempDirectory "${CMAKE_BINARY_DIR}" CACHE STRING "Temp directory for running tests.")
 
-include(test_metainformation)
-
+add_custom_target(unit_tests)
+set_target_properties(unit_tests PROPERTIES FOLDER utils)
 
 function(nx_add_test target) # [NO_GTEST] [NO_QT] [NO_NX_UTILS] ...
     if(NOT withTests)
@@ -68,8 +69,7 @@ function(nx_add_test target) # [NO_GTEST] [NO_QT] [NO_NX_UTILS] ...
 
     add_test(NAME ${target} COMMAND ${target})
 
-    # Write unit test metainformation.
-    nx_store_test_metainformation(${target}
+    nx_set_test_meta_info(${target}
         PROJECT ${NX_ADD_TEST_PROJECT}
         COMPONENT ${NX_ADD_TEST_COMPONENT}
         EPIC ${NX_ADD_TEST_EPIC})
@@ -110,3 +110,54 @@ function(nx_add_server_plugin_test target) # [NO_GTEST] [NO_QT]
             VS_USER_PROPS ${CMAKE_BINARY_DIR}/vms/server/plugins/ut_msvc.user.props)
     endif()
 endfunction()
+
+function(nx_dump_unit_tests)
+    get_target_property(tests unit_tests MANUALLY_ADDED_DEPENDENCIES)
+
+    if(NOT tests)
+        return()
+    endif()
+
+    set(content)
+
+    foreach(test IN LISTS tests)
+        string(APPEND content "${test}:\n")
+
+        get_target_property(project ${test} NX_TEST_PROJECT)
+        if(NOT project)
+            message(FATAL_ERROR
+                "NX_TEST_PROJECT property is not set for test ${test}.  "
+                "Check if the meta information was set properly with nx_set_test_meta_info().")
+        endif()
+        string(APPEND content "  project: ${project}\n")
+        get_target_property(component ${test} NX_TEST_COMPONENT)
+        if(component)
+            string(APPEND content "  component: ${component}\n")
+        endif()
+        get_target_property(epic ${test} NX_TEST_EPIC)
+        if(epic)
+            string(APPEND content "  epic: ${epic}\n")
+        endif()
+
+        set(binary_dependencies)
+        nx_get_target_manual_dependencies(${test} dependencies)
+        foreach(dependency IN LISTS dependencies)
+            get_target_property(type ${dependency} TYPE)
+            get_target_property(file ${dependency} OUTPUT_FILE)
+            if(type STREQUAL EXECUTABLE OR file)
+                list(APPEND binary_dependencies ${dependency})
+            endif()
+        endforeach()
+
+        if(binary_dependencies)
+            string(APPEND content "  binary_dependencies:\n")
+            foreach(dependency IN LISTS binary_dependencies)
+                string(APPEND content "    - ${dependency}\n")
+            endforeach()
+        endif()
+    endforeach()
+
+    file(WRITE ${testInformationFile} ${content})
+endfunction()
+
+cmake_language(DEFER DIRECTORY ${CMAKE_SOURCE_DIR} CALL nx_dump_unit_tests)

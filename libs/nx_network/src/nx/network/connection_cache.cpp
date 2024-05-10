@@ -157,7 +157,7 @@ void ConnectionCache::startMonitoringConnection(
         {
             // Unexpected read or connection closed. Remove connection from the cache.
             if (result != SystemError::noError)
-                NX_DEBUG(this, "Connection closed due to an error: ", result);
+                NX_DEBUG(this, "Connection closed due to an error: %1", result);
             else if (bytesRead > 0)
                 NX_DEBUG(this, "Unexpected read from server.");
 
