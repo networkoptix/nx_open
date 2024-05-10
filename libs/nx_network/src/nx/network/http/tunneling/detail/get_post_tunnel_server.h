@@ -4,6 +4,7 @@
 
 #include <map>
 #include <memory>
+#include <optional>
 #include <string>
 
 #include <nx/network/aio/async_object_pool.h>
@@ -73,7 +74,7 @@ private:
 
 private:
     nx::network::aio::AsyncObjectPool<Worker> m_pool;
-    std::chrono::milliseconds m_tunnelSetupTimeout;
+    std::optional<std::chrono::milliseconds> m_tunnelSetupTimeout;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -88,7 +89,8 @@ GetPostTunnelServer<ApplicationData...>::GetPostTunnelServer(
         [this]()
         {
             auto worker = this->createWorker();
-            worker->setTunnelSetupTimeout(m_tunnelSetupTimeout);
+            if (m_tunnelSetupTimeout)
+                worker->setTunnelSetupTimeout(*m_tunnelSetupTimeout);
             return worker;
         })
 {
