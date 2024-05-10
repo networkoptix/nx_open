@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" viewBox="0 0 32 32">
+  <g class="32x32/Solid/play">
+    <rect width="32" height="32" fill="#212A2F" class="Secondary" rx="2"/>
+    <path fill="#E1E7EA" d="M12.5 11.065v9.87a.8.8 0 0 0 1.268.649l6.834-4.935a.8.8 0 0 0 0-1.298l-6.834-4.935a.8.8 0 0 0-1.268.649Z" class="Primary"/>
+  </g>
+</svg>

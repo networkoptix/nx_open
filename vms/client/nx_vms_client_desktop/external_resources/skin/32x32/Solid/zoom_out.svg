@@ -1,5 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" viewBox="0 0 32 32">
-  <g class="32x32/Solid/zoom_out">
+  <g class="32x32/Solid/zoom_out" clip-path="url(#a)">
+    <path fill="#212A2F" d="M0 0h32v32H0z" class="Secondary"/>
     <path fill="#fff" d="M4 18v-4h24v4z" class="Primary"/>
   </g>
+  <defs>
+    <clipPath id="a" class="a">
+      <path fill="#fff" d="M0 0h32v32H0z"/>
+    </clipPath>
+  </defs>
 </svg>

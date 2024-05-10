@@ -52,15 +52,15 @@ Dialog
     {
         spacing: 16
 
-        Image
+        ColoredImage
         {
             property var icons: ({
-                "information": "image://skin/64x64/Outline/info.svg",
-                "question": "image://skin/64x64/Outline/question.svg",
-                "warning": "image://skin/64x64/Outline/warning.svg",
-                "critical": "image://skin/64x64/Outline/error.svg"
+                "information": "image://skin/64x64/Outline/info.svg?primary=light10",
+                "question": "image://skin/64x64/Outline/question.svg?primary=light10",
+                "warning": "image://skin/64x64/Outline/warning.svg?primary=yellow_l",
+                "critical": "image://skin/64x64/Outline/error.svg?primary=red_l"
             })
-            source: icons[settingsModel && settingsModel.icon] || icons["information"]
+            sourcePath: icons[settingsModel && settingsModel.icon] || icons["information"]
             Layout.alignment: Qt.AlignTop
         }
 

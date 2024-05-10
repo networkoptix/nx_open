@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 20 20">
+  <g class="20x20/Solid/organization_suspended">
+    <path fill="#FFCA28" fill-rule="evenodd" d="M14.936 9.775a.5.5 0 0 0-.872 0l-3.645 6.48a.5.5 0 0 0 .436.745h7.29a.5.5 0 0 0 .436-.745l-3.645-6.48ZM14 11.5h1v3h-1v-3Zm0 3.5h1v1h-1v-1Z" class="Secondary" clip-rule="evenodd"/>
+    <path fill="#A5B7C0" fill-rule="evenodd" d="M3 3.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.5.5h-2a.5.5 0 0 0-.5.5v6.46l-.452.805A1.48 1.48 0 0 0 9.44 17H3.5a.5.5 0 0 1-.5-.5v-13Zm14 7.905V9.497v1.908ZM13.398 9H11.5a.5.5 0 0 0-.5.5v3.683l2.193-3.899c.06-.105.128-.2.205-.284ZM4 5h8v1H4V5Zm0 2h5v1H4V7Zm0 2h5v1H4V9Zm5 2H4v1h5v-1Z" class="Primary" clip-rule="evenodd"/>
+  </g>
+</svg>
