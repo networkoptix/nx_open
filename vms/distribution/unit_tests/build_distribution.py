@@ -12,7 +12,6 @@ from pathlib import Path
 import logging
 import os
 import re
-import subprocess
 import sys
 import yaml
 
@@ -29,22 +28,20 @@ WINDOWS_QT_PLUGINS = [
 ]
 
 
-def load_unit_test_metainfo():
-    path = Path(conf.METAINFO_FILE)
+def load_unit_test_info():
+    path = Path(conf.INFO_FILE)
     if not path.exists():
-        logging.error(f'Metainfo file {path} cannot be found')
+        logging.error(f'Test information file {path} cannot be found')
         sys.exit(1)
 
     with open(path, 'r') as f:
         return yaml.load(f, Loader=yaml.SafeLoader)
 
-    logging.error(f'Metainfo file {path} cannot be read')
+    logging.error(f'Test information file {path} cannot be read')
     sys.exit(1)
 
 
-def get_unit_tests_list(metainfo):
-    test_regex = re.compile(r"\s+Test.+: (.+)")
-
+def get_list_of_binaries(test_info):
     extension = {
         "Linux": "",
         "Windows": ".exe",
@@ -56,76 +53,18 @@ def get_unit_tests_list(metainfo):
         with open(Path(conf.BUILD_DIR) / conf.AFFECTED_TARGETS_LIST_FILE_NAME) as f:
             limit_to_targets = f.read().splitlines()
 
-    output = subprocess.check_output(
-        [conf.CTEST_EXECUTABLE, "-N"],
-        cwd=conf.BUILD_DIR)
+    result = set()
 
-    for line in output.splitlines():
-        m = test_regex.match(line.decode("utf-8"))
-        if m:
-            test_target_name = m.group(1)
-            if limit_to_targets is not None and test_target_name not in limit_to_targets:
-                continue
-
-            if test_target_name not in metainfo:
-                logging.error(f"Metainfo for {test_target_name} not found!")
-                sys.exit(1)
-            yield test_target_name + extension
-
-
-# TODO: Remove this function once Go unit test dependency issue is fixed.
-def get_go_unit_tests_list(tests_directory: str, metainfo):
-    extension = {
-        "Linux": "",
-        "Windows": ".exe",
-        "Darwin": ""
-    }[conf.CMAKE_SYSTEM_NAME]
-
-    GO_UNIT_TEST_NAMES = [
-        "nx_discovery_service_ut_discovery_ut",
-        "nx_cs_licenser_ut_cssapi_ut",
-        "nx_cs_licenser_ut_httpclientfactory_ut",
-        "nx_cs_licenser_ut_licapi_ut",
-        "nx_cs_licenser_ut_licensingpolicy_ut",
-        "nx_cs_licenser_ut_model_ut",
-        "nx_cs_licenser_ut_sysmapper_ut",
-        "nx_go_libs_ut_nxconfig_ut",
-        "nx_go_libs_ut_nxhttp_ut",
-        "nx_go_libs_ut_nxrange_ut",
-        "nx_go_libs_ut_nxtime_ut",
-        "nx_go_libs_ut_nxoauth2_ut",
-        "nx_service_authorizer_ut_authenticator_ut",
-        "nx_service_authorizer_ut_functional_ut",
-        "nx_service_authorizer_ut_jsondb_ut",
-        "nx_bookmarks_service_ut_test_ut",
-        "nx_chunk_log_service_ut_accesslog_ut",
-        "nx_chunk_log_service_ut_api_ut",
-        "nx_chunk_log_service_ut_manager_ut",
-        "nx_chunk_log_service_ut_memmodel_ut",
-        "nx_chunk_log_service_ut_service_ut",
-        "nx_chunk_log_service_ut_sqlmodel_ut",
-        "nx_chunk_log_service_ut_yugabytemodel_ut",
-        "nx_chunk_log_service_ut_mongodbmodel_ut",
-        "nx_storage_cleaner_ut_chunklogapi_ut",
-        "nx_storage_cleaner_ut_cssapi_ut",
-        "nx_storage_cleaner_ut_dao_ut",
-        "nx_storage_cleaner_ut_httpclientfactory_ut",
-        "nx_storage_cleaner_ut_licenserapi_ut",
-        "nx_storage_cleaner_ut_model_ut",
-        "nx_storage_cleaner_ut_storagecleaner_ut",
-        "nx_cs_motion_db_ut_bitmask_ut",
-        "nx_cs_motion_db_ut_model_runner_ut",
-        "nx_cs_motion_db_ut_model_ut",
-    ]
-    for test_name in GO_UNIT_TEST_NAMES:
-        test_full_name = f"{test_name}{extension}"
-        if not (Path(tests_directory) / test_full_name).is_file():
+    for test, properties in test_info.items():
+        if limit_to_targets is not None and test not in limit_to_targets:
             continue
 
-        if test_name not in metainfo:
-            logging.error(f"Metainfo for {test_name} not found!")
-            sys.exit(1)
-        yield test_full_name
+        result.add(test + extension)
+
+        for dependency in properties.get("binary_dependencies", []):
+            result.add(dependency + extension)
+
+    return sorted(result)
 
 
 def gatherFiles(source_dir, exclude):
@@ -238,14 +177,14 @@ def main():
         "Windows": ["*.dll", "*.pdb"],
         "Darwin": ["*.dylib"]
     }[conf.CMAKE_SYSTEM_NAME]
-    metainfo = load_unit_test_metainfo()
+    test_info = load_unit_test_info()
 
     with archiver.Archiver(conf.PACKAGE_FILE, conf=conf) as a:
         src_bin_dir = join(conf.BUILD_DIR, bin_dir)
         distrib_dir = join(conf.BUILD_DIR, "distrib")
 
         logging.info("Archiving metadata")
-        a.add(conf.METAINFO_FILE, Path(conf.METAINFO_FILE).name)
+        a.add(conf.INFO_FILE, Path(conf.INFO_FILE).name)
         # Keep this metadata file for compatibility purposes.
         archiveFiles(a, "", distrib_dir, ["conan_refs.txt"])
 
@@ -255,18 +194,13 @@ def main():
             source_dir=distrib_dir,
             file_list=["build_info.txt", "build_info.json", "conan_refs.txt", "conan.lock"])
 
-        # Since the build system doesn't know on which files Go unit tests depend, always add
-        # these unit tests. TODO: Fix the build system - add dependencies to Go unit test
-        # generation.
-        logging.info("Archiving Go unit tests")
-        archiveFiles(a, bin_dir, src_bin_dir, get_go_unit_tests_list(src_bin_dir, metainfo))
 
         if not isMac:
             logging.info("Archiving standalone metadata_sdk unit tests")
             archiveSdkUnitTests(a, conf, src_bin_dir)
 
         logging.info("Archiving unit test executables")
-        if not archiveFiles(a, bin_dir, src_bin_dir, get_unit_tests_list(metainfo)):
+        if not archiveFiles(a, bin_dir, src_bin_dir, get_list_of_binaries(test_info)):
             logging.info("No unit test executables found")
             return
 

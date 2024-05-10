@@ -589,3 +589,23 @@ function(nx_add_custom_command)
 
     add_custom_command(${add_custom_command_args})
 endfunction()
+
+# Recursively gathers all MANUALLY_ADDED_DEPENDENCIES for a target.
+function(nx_get_target_manual_dependencies target out_deps)
+    get_target_property(deps ${target} MANUALLY_ADDED_DEPENDENCIES)
+
+    if(NOT deps)
+        set(${out_deps} PARENT_SCOPE)
+        return()
+    endif()
+
+    set(local_out_deps)
+    foreach(dep IN LISTS deps)
+        if(TARGET ${dep})
+            nx_get_target_manual_dependencies(${dep} local_out_deps2)
+            list(APPEND local_out_deps ${local_out_deps2})
+        endif()
+    endforeach()
+
+    set(${out_deps} ${deps} ${local_out_deps} PARENT_SCOPE)
+endfunction()
