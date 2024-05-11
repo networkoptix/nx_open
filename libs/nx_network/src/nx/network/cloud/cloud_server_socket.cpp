@@ -239,7 +239,7 @@ void CloudServerSocket::setSupportedConnectionMethods(
     m_supportedConnectionMethods = value;
 }
 
-CloudConnectListenerStatusReport CloudServerSocket::getStatusReport() const
+std::optional<CloudConnectListenerStatusReport> CloudServerSocket::getStatusReport() const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     return m_lastListenStatusReport;
@@ -322,8 +322,8 @@ void CloudServerSocket::saveAcceptorError(AcceptorError acceptorError)
     NX_MUTEX_LOCKER lock(&m_mutex);
 
     const auto it = std::find_if(
-        m_lastListenStatusReport.acceptorErrors.begin(),
-        m_lastListenStatusReport.acceptorErrors.end(),
+        m_lastListenStatusReport->acceptorErrors.begin(),
+        m_lastListenStatusReport->acceptorErrors.end(),
         [&acceptorError](const AcceptorError& existing)
         {
             return existing.remoteAddress == acceptorError.remoteAddress;
@@ -331,8 +331,8 @@ void CloudServerSocket::saveAcceptorError(AcceptorError acceptorError)
 
     // Save only one acceptor error per host, since some acceptors (relay) try to open multiple
     // connections at once.
-    if (it == m_lastListenStatusReport.acceptorErrors.end())
-        m_lastListenStatusReport.acceptorErrors.push_back(std::move(acceptorError));
+    if (it == m_lastListenStatusReport->acceptorErrors.end())
+        m_lastListenStatusReport->acceptorErrors.push_back(std::move(acceptorError));
     else
         *it = acceptorError; //< Update error so most recent is reported.
 }
@@ -354,7 +354,7 @@ void CloudServerSocket::onListenRequestCompleted(
     {
         NX_DEBUG(this, "Listen request completed successfully");
         m_state = State::listening;
-        saveSuccessListenStartToStatusReport();
+        saveSuccessListenStartToStatusReport(response);
         startAcceptingConnections(response);
         return;
     }
@@ -581,27 +581,43 @@ void CloudServerSocket::onMediatorConnectionRestored()
     }
 }
 
-void CloudServerSocket::saveSuccessListenStartToStatusReport()
+void CloudServerSocket::saveSuccessListenStartToStatusReport(const nx::hpm::api::ListenResponse& listenResponse)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
-    m_lastListenStatusReport = {};
-    m_lastListenStatusReport.listening = true;
+    m_lastListenStatusReport = CloudConnectListenerStatusReport{};
+
+    if (const auto addr = m_mediatorConnector->address(); NX_ASSERT(addr))
+        m_lastListenStatusReport->mediatorUrl = addr->tcpUrl;
+
+    m_lastListenStatusReport->mediatorListenResponse = listenResponse;
 }
 
 void CloudServerSocket::saveMediatorErrorToStatusReport(
-    nx::hpm::api::ResultCode resultCode, bool clearReport)
+    nx::hpm::api::ResultCode resultCode,
+    bool clearReport)
 {
+    const auto mediatorAddress = m_mediatorConnector->address();
+
+    NX_DEBUG(this, "failed to register on the mediator %1 with resultCode: %2",
+        mediatorAddress, resultCode);
+
+    if (!mediatorAddress)
+        NX_WARNING(this, "failed to register on the mediator while there is no address");
+
     NX_MUTEX_LOCKER lock(&m_mutex);
 
     if (clearReport)
-        m_lastListenStatusReport = {};
+        m_lastListenStatusReport = CloudConnectListenerStatusReport{};
 
-    m_lastListenStatusReport.listening = false;
-    m_lastListenStatusReport.mediatorErrors.push_back({});
-    if (m_mediatorConnector->address())
-        m_lastListenStatusReport.mediatorErrors.back().url = m_mediatorConnector->address()->tcpUrl;
-    m_lastListenStatusReport.mediatorErrors.back().result =
-        nx::hpm::api::Result(resultCode, nx::reflect::toString(resultCode));
+    m_lastListenStatusReport->mediatorListenResponse = std::nullopt;
+
+    auto& errorReport = m_lastListenStatusReport->mediatorErrors.emplace_back();
+    errorReport.result = {resultCode, nx::reflect::toString(resultCode)};
+    if (mediatorAddress)
+    {
+        m_lastListenStatusReport->mediatorUrl = mediatorAddress->tcpUrl;
+        errorReport.url = mediatorAddress->tcpUrl;
+    }
 }
 
 void CloudServerSocket::stopWhileInAioThread()
