@@ -31,17 +31,24 @@ struct CloudConnectListenerStatusReport
     };
 
     /**
-     * true if listening for incoming cloud connections. Note that it is possible that some errors
-     * still occurred, but the socket is still listening.
+     * The mediator endpoint that the server socket attempts to connect to.
      */
-    bool listening = false;
+    nx::utils::Url mediatorUrl;
+
+    /**
+     * The most recent listen response sent back by the mediator. Contains the relay urls.
+     * Will have a value if the listen request succeeded, indicating the socket is listening for
+     * incoming cloud connections. Note that it is possible that some errors still occurred, but
+     * the socket is still listening, i.e. error connecting to one of the relays.
+     */
+    std::optional<nx::hpm::api::ListenResponse> mediatorListenResponse;
 
     /**
      * The list of errors connecting to a mediator encountered during the last listen attempt.
      */
     std::vector<Error<nx::hpm::api::Result>> mediatorErrors;
 
-    /** Errors reported by the the connection acceptors. */
+    /** Errors reported by the the connection acceptors (relays). */
     std::vector<AcceptorError> acceptorErrors;
 };
 
@@ -107,7 +114,7 @@ public:
      * Provides the current status of the listener. Note that the list of errors is cleared on
      * every listen attempt.
      */
-    CloudConnectListenerStatusReport getStatusReport() const;
+    std::optional<CloudConnectListenerStatusReport> getStatusReport() const;
 
     /**
      * For use in tests only.
@@ -160,12 +167,14 @@ protected:
     nx::utils::MoveOnlyFunc<void(hpm::api::ResultCode)> m_registrationHandler;
     AggregateAcceptor m_aggregateAcceptor;
     mutable nx::Mutex m_mutex;
-    CloudConnectListenerStatusReport m_lastListenStatusReport;
+    std::optional<CloudConnectListenerStatusReport> m_lastListenStatusReport;
 
 private:
     void stopWhileInAioThread();
-    void saveSuccessListenStartToStatusReport();
-    void saveMediatorErrorToStatusReport(nx::hpm::api::ResultCode resultCode, bool clearReport);
+    void saveSuccessListenStartToStatusReport(const nx::hpm::api::ListenResponse& listenResponse);
+    void saveMediatorErrorToStatusReport(
+        nx::hpm::api::ResultCode resultCode,
+        bool clearReport);
 };
 
 //-------------------------------------------------------------------------------------------------
