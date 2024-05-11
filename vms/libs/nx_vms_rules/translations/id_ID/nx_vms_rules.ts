@@ -13,7 +13,7 @@
     </message>
     <message>
       <source>Any server issue</source>
-      <translation type="unfinished">Any server issue</translation>
+      <translation>Masalah server apa pun</translation>
     </message>
   </context>
   <context>
@@ -36,23 +36,23 @@
     </message>
     <message>
       <source>Begin When</source>
-      <translation type="unfinished">Begin When</translation>
+      <translation>Mulai Ketika</translation>
     </message>
     <message>
       <source>Occurs at</source>
-      <translation type="unfinished">Occurs at</translation>
+      <translation>Terjadi di</translation>
     </message>
     <message>
       <source>Of Type</source>
-      <translation type="unfinished">Of Type</translation>
+      <translation>Tipe</translation>
     </message>
     <message>
       <source>And Caption</source>
-      <translation type="unfinished">And Caption</translation>
+      <translation>Dan Keterangan</translation>
     </message>
     <message>
       <source>And Description</source>
-      <translation type="unfinished">And Description</translation>
+      <translation>Dan Deskripsi</translation>
     </message>
   </context>
   <context>
@@ -72,15 +72,15 @@
     </message>
     <message>
       <source>Occurs At</source>
-      <translation type="unfinished">Occurs At</translation>
+      <translation>Terjadi Pada</translation>
     </message>
     <message>
       <source>Of Type</source>
-      <translation type="unfinished">Of Type</translation>
+      <translation>Tipe</translation>
     </message>
     <message>
       <source>And Object</source>
-      <translation type="unfinished">And Object</translation>
+      <translation>Dan Objek</translation>
     </message>
   </context>
   <context>
@@ -113,7 +113,7 @@
     </message>
     <message>
       <source>Create Bookmark</source>
-      <translation type="unfinished">Create Bookmark</translation>
+      <translation>Buat Bookmark</translation>
     </message>
     <message>
       <source>At</source>
@@ -121,18 +121,18 @@
     </message>
     <message>
       <source>Fixed Duration</source>
-      <translation type="unfinished">Fixed Duration</translation>
+      <translation>Durasi Tetap</translation>
     </message>
     <message>
       <source>Add Tags</source>
-      <translation type="unfinished">Add Tags</translation>
+      <translation>Tambahkan Tag</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::BuzzerAction</name>
     <message>
       <source>Buzzer</source>
-      <translation type="unfinished">Buzzer</translation>
+      <translation>Buzzer</translation>
     </message>
     <message>
       <source>Fixed duration</source>
@@ -144,7 +144,7 @@
     </message>
     <message>
       <source>Action Throttling</source>
-      <translation type="unfinished">Action Throttling</translation>
+      <translation>Pembatasan Aksi</translation>
     </message>
   </context>
   <context>
@@ -163,15 +163,15 @@
     </message>
     <message>
       <source>Input Signal on Device</source>
-      <translation type="unfinished">Input Signal on Device</translation>
+      <translation>Sinyal Input pada Perangkat</translation>
     </message>
     <message>
       <source>Occurs at</source>
-      <translation type="unfinished">Occurs at</translation>
+      <translation>Terjadi di</translation>
     </message>
     <message>
       <source>With ID</source>
-      <translation type="unfinished">With ID</translation>
+      <translation>Dengan ID</translation>
     </message>
   </context>
   <context>
@@ -269,11 +269,11 @@
     <name>nx::vms::rules::DeviceOutputAction</name>
     <message>
       <source>Output ID</source>
-      <translation type="unfinished">Output ID</translation>
+      <translation>ID Output</translation>
     </message>
     <message>
       <source>Device Output</source>
-      <translation type="unfinished">Device Output</translation>
+      <translation>Output Perangkat</translation>
     </message>
     <message>
       <source>At</source>
@@ -281,7 +281,7 @@
     </message>
     <message>
       <source>Fixed Duration</source>
-      <translation type="unfinished">Fixed Duration</translation>
+      <translation>Durasi Tetap</translation>
     </message>
   </context>
   <context>
@@ -304,7 +304,7 @@
     </message>
     <message>
       <source>Camera Recording</source>
-      <translation type="unfinished">Camera Recording</translation>
+      <translation>Rekaman Kamera</translation>
     </message>
     <message>
       <source>On</source>
@@ -312,7 +312,7 @@
     </message>
     <message>
       <source>Fixed Duration</source>
-      <translation type="unfinished">Fixed Duration</translation>
+      <translation>Durasi Tetap</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -327,7 +327,7 @@
     </message>
     <message>
       <source>On Layout</source>
-      <translation type="unfinished">On Layout</translation>
+      <translation>Pada Layout</translation>
     </message>
     <message>
       <source>Set to Fullscreen</source>
@@ -335,18 +335,18 @@
     </message>
     <message>
       <source>Set for</source>
-      <translation type="unfinished">Set for</translation>
+      <translation>Set untuk</translation>
     </message>
     <message>
       <source>Rewind</source>
-      <translation type="unfinished">Rewind</translation>
+      <translation>Rewind</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::ExitFullscreenAction</name>
     <message>
       <source>On Layout</source>
-      <translation type="unfinished">On Layout</translation>
+      <translation>Pada Layout</translation>
     </message>
     <message>
       <source>Exit Fullscreen</source>
@@ -365,7 +365,7 @@
     </message>
     <message>
       <source>Fan Failure</source>
-      <translation type="unfinished">Fan Failure</translation>
+      <translation>Kegagalan Kipas</translation>
     </message>
     <message>
       <source>At</source>
@@ -388,19 +388,19 @@
     </message>
     <message>
       <source>Omit logging</source>
-      <translation type="unfinished">Omit logging</translation>
+      <translation>Abaikan Logging</translation>
     </message>
     <message>
       <source>And Source</source>
-      <translation type="unfinished">And Source</translation>
+      <translation>Dan Source</translation>
     </message>
     <message>
       <source>And Caption</source>
-      <translation type="unfinished">And Caption</translation>
+      <translation>Dan Keterangan</translation>
     </message>
     <message>
       <source>And Description</source>
-      <translation type="unfinished">And Description</translation>
+      <translation>Dan Deskripsi</translation>
     </message>
   </context>
   <context>
@@ -419,7 +419,7 @@
     </message>
     <message>
       <source>HTTP(S) Request</source>
-      <translation type="unfinished">HTTP(S) Request</translation>
+      <translation>HTTP(S) Request</translation>
     </message>
     <message>
       <source>URL</source>
@@ -431,11 +431,11 @@
     </message>
     <message>
       <source>Method</source>
-      <translation type="unfinished">Method</translation>
+      <translation>Metode</translation>
     </message>
     <message>
       <source>Authentication Type</source>
-      <translation type="unfinished">Authentication Type</translation>
+      <translation>Tipe Otentikasi</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -446,7 +446,7 @@
     <name>nx::vms::rules::LdapSyncIssueEvent</name>
     <message>
       <source>Ldap Sync Issue Event</source>
-      <translation type="unfinished">Ldap Sync Issue Event</translation>
+      <translation>Event Masalah Sinkronisasi Ldap</translation>
     </message>
   </context>
   <context>
@@ -484,11 +484,11 @@
     </message>
     <message>
       <source>Begin When</source>
-      <translation type="unfinished">Begin When</translation>
+      <translation>Mulai Ketika</translation>
     </message>
     <message>
       <source>Occurs at</source>
-      <translation type="unfinished">Occurs at</translation>
+      <translation>Terjadi di</translation>
     </message>
   </context>
   <context>
@@ -586,7 +586,7 @@
     </message>
     <message>
       <source>Show Desktop Notification</source>
-      <translation type="unfinished">Show Desktop Notification</translation>
+      <translation>Tampilkan Notifikasi Desktop</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -605,7 +605,7 @@
     </message>
     <message>
       <source>Rewind</source>
-      <translation type="unfinished">Rewind</translation>
+      <translation>Rewind</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -620,7 +620,7 @@
     </message>
     <message>
       <source>Panic Recording</source>
-      <translation type="unfinished">Panic Recording</translation>
+      <translation>Rekaman Panik</translation>
     </message>
   </context>
   <context>
@@ -631,7 +631,7 @@
     </message>
     <message>
       <source>Play Sound</source>
-      <translation type="unfinished">Play Sound</translation>
+      <translation>Mainkan Suara</translation>
     </message>
     <message>
       <source>At</source>
@@ -639,7 +639,7 @@
     </message>
     <message>
       <source>To Users</source>
-      <translation type="unfinished">To Users</translation>
+      <translation>Kepada Pengguna</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -654,23 +654,23 @@
     </message>
     <message>
       <source>Occurs at</source>
-      <translation type="unfinished">Occurs at</translation>
+      <translation>Terjadi di</translation>
     </message>
     <message>
       <source>For Plugin</source>
-      <translation type="unfinished">For Plugin</translation>
+      <translation>Untuk Plugin</translation>
     </message>
     <message>
       <source>And Caption</source>
-      <translation type="unfinished">And Caption</translation>
+      <translation>Dan Keterangan</translation>
     </message>
     <message>
       <source>And Description</source>
-      <translation type="unfinished">And Description</translation>
+      <translation>Dan Deskripsi</translation>
     </message>
     <message>
       <source>And Level Is</source>
-      <translation type="unfinished">And Level Is</translation>
+      <translation>Dan Level Adalah</translation>
     </message>
   </context>
   <context>
@@ -694,18 +694,18 @@
     </message>
     <message>
       <source>PoE Over Budget</source>
-      <translation type="unfinished">PoE Over Budget</translation>
+      <translation>PoE melebihi Budget</translation>
     </message>
     <message>
       <source>Begin When</source>
-      <translation type="unfinished">Begin When</translation>
+      <translation>Mulai Ketika</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::PtzPresetAction</name>
     <message>
       <source>Execute PTZ Preset</source>
-      <translation type="unfinished">Execute PTZ Preset</translation>
+      <translation>Jalankan Preset PTZ</translation>
     </message>
     <message>
       <source>At</source>
@@ -713,7 +713,7 @@
     </message>
     <message>
       <source>PTZ Preset</source>
-      <translation type="unfinished">PTZ Preset</translation>
+      <translation>Preset PTZ</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -721,7 +721,7 @@
     </message>
     <message>
       <source>Execute to users</source>
-      <translation type="unfinished">Execute to users</translation>
+      <translation>Jalankan ke pengguna</translation>
     </message>
   </context>
   <context>
@@ -736,15 +736,15 @@
     </message>
     <message>
       <source>Body</source>
-      <translation type="unfinished">Body</translation>
+      <translation>Body</translation>
     </message>
     <message>
       <source>Send Mobile Notification</source>
-      <translation type="unfinished">Send Mobile Notification</translation>
+      <translation>Kirim Notifikasi Seluler</translation>
     </message>
     <message>
       <source>Add Source Device name to Body</source>
-      <translation type="unfinished">Add Source Device name to Body</translation>
+      <translation>Tambahkan nama Source Perangkat ke Body</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -755,7 +755,7 @@
     <name>nx::vms::rules::RepeatSoundAction</name>
     <message>
       <source>Sound</source>
-      <translation type="unfinished">Sound</translation>
+      <translation>Suara</translation>
     </message>
     <message>
       <source>Volume</source>
@@ -763,7 +763,7 @@
     </message>
     <message>
       <source>Repeat Sound</source>
-      <translation type="unfinished">Repeat Sound</translation>
+      <translation>Ulangi Suara</translation>
     </message>
     <message>
       <source>At</source>
@@ -778,40 +778,40 @@
     <name>nx::vms::rules::SaasIssueEvent</name>
     <message>
       <source>License migration issue</source>
-      <translation type="unfinished">License migration issue</translation>
+      <translation>Masalah migrasi lisensi</translation>
     </message>
     <message>
       <source>Recording services disabled</source>
-      <translation type="unfinished">Recording services disabled</translation>
+      <translation>Layanan perekaman dinonaktifkan</translation>
     </message>
     <message>
       <source>Cloud storage services disabled</source>
-      <translation type="unfinished">Cloud storage services disabled</translation>
+      <translation>Layanan penyimpanan cloud dinonaktifkan</translation>
     </message>
     <message>
       <source>Paid integration services disabled</source>
-      <translation type="unfinished">Paid integration services disabled</translation>
+      <translation>Layanan integrasi berbayar dinonaktifkan</translation>
     </message>
     <message>
       <source>Services issue</source>
-      <translation type="unfinished">Services issue</translation>
+      <translation>Masalah layanan</translation>
     </message>
     <message numerus="yes">
       <source>Recording on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>Perekaman pada channel %n dihentikan karena penggunaan layanan yang berlebihan.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>Backup penyimpanan cloud di channel %n dihentikan karena penggunaan layanan yang berlebihan.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>Penggunaan layanan integrasi berbayar pada channel %n dihentikan karena penggunaan layanan yang berlebihan.</numerusform>
       </translation>
     </message>
   </context>
@@ -823,7 +823,7 @@
     </message>
     <message>
       <source>Send Email</source>
-      <translation type="unfinished">Send Email</translation>
+      <translation>Kirim Email</translation>
     </message>
     <message>
       <source>To</source>
@@ -908,7 +908,7 @@
     <name>nx::vms::rules::ShowOnAlarmLayoutAction</name>
     <message>
       <source>Show on Alarm Layout</source>
-      <translation type="unfinished">Show on Alarm Layout</translation>
+      <translation>Tampilkan di Layout Alarm</translation>
     </message>
     <message>
       <source>Alarm: %1</source>
@@ -920,11 +920,11 @@
     </message>
     <message>
       <source>Rewind</source>
-      <translation type="unfinished">Rewind</translation>
+      <translation>Rewind</translation>
     </message>
     <message>
       <source>Force Alarm Layout Opening</source>
-      <translation type="unfinished">Force Alarm Layout Opening</translation>
+      <translation>Paksa Pembukaan Layout Alarm</translation>
     </message>
   </context>
   <context>
@@ -955,11 +955,11 @@
     </message>
     <message>
       <source>Occurs at</source>
-      <translation type="unfinished">Occurs at</translation>
+      <translation>Terjadi di</translation>
     </message>
     <message>
       <source>By</source>
-      <translation type="unfinished">By</translation>
+      <translation>Oleh</translation>
     </message>
   </context>
   <context>
@@ -978,11 +978,11 @@
     </message>
     <message>
       <source>At Device</source>
-      <translation type="unfinished">At Device</translation>
+      <translation>Di Perangkat</translation>
     </message>
     <message>
       <source>To users</source>
-      <translation type="unfinished">To users</translation>
+      <translation>Untuk pengguna</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -1044,7 +1044,7 @@
     <name>nx::vms::rules::TextOverlayAction</name>
     <message>
       <source>Show Text Overlay</source>
-      <translation type="unfinished">Show Text Overlay</translation>
+      <translation>Tampilkan Text Overlay</translation>
     </message>
     <message>
       <source>At</source>
@@ -1052,15 +1052,15 @@
     </message>
     <message>
       <source>Fixed Duration</source>
-      <translation type="unfinished">Fixed Duration</translation>
+      <translation>Durasi Tetap</translation>
     </message>
     <message>
       <source>Custom Text</source>
-      <translation type="unfinished">Custom Text</translation>
+      <translation>Teks Kustom</translation>
     </message>
     <message>
       <source>Show to</source>
-      <translation type="unfinished">Show to</translation>
+      <translation>Tampilkan ke</translation>
     </message>
   </context>
   <context>
@@ -1090,7 +1090,7 @@
     <name>nx::vms::rules::WriteToLogAction</name>
     <message>
       <source>Write to Log</source>
-      <translation type="unfinished">Write to Log</translation>
+      <translation>Tulis ke Log</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -1134,7 +1134,7 @@
     </message>
     <message>
       <source>Unknown action</source>
-      <translation type="unfinished">Unknown action</translation>
+      <translation>Aksi tidak diketahui</translation>
     </message>
   </context>
 </TS>

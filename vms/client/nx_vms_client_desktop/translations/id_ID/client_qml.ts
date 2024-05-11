@@ -5,7 +5,7 @@
     <name>AddLookupListEntryDialog</name>
     <message>
       <source>Add Entry</source>
-      <translation type="unfinished">Add Entry</translation>
+      <translation>Tambah Entry</translation>
     </message>
     <message>
       <source>Add</source>
@@ -16,7 +16,7 @@
     <name>AdvancedSettingsDialog</name>
     <message>
       <source>LDAP - Advanced Settings</source>
-      <translation type="unfinished">LDAP - Advanced Settings</translation>
+      <translation>LDAP - Pengaturan Advance</translation>
     </message>
     <message>
       <source>Users</source>
@@ -24,7 +24,7 @@
     </message>
     <message>
       <source>Login Attribute</source>
-      <translation type="unfinished">Login Attribute</translation>
+      <translation>Atribut Masuk</translation>
     </message>
     <message>
       <source>Groups</source>
@@ -32,23 +32,23 @@
     </message>
     <message>
       <source>Membership</source>
-      <translation type="unfinished">Membership</translation>
+      <translation>Keanggotaan</translation>
     </message>
     <message>
       <source>Search Timeout</source>
-      <translation type="unfinished">Search Timeout</translation>
+      <translation>Batas Waktu Pencarian</translation>
     </message>
     <message>
       <source>To enable digest authentication for LDAP users that are already added to the VMS database, you need to enable it directly in these users&apos; settings.</source>
-      <translation type="unfinished">To enable digest authentication for LDAP users that are already added to the VMS database, you need to enable it directly in these users&apos; settings.</translation>
+      <translation>Untuk mengaktifkan otentikasi digest bagi pengguna LDAP yang telah ditambahkan ke database VMS, Anda perlu mengaktifkannya secara langsung di pengaturan&apos; pengguna ini.</translation>
     </message>
     <message>
       <source>To disable digest authentication for LDAP users that are already added to the VMS database, you need to disable it directly in these users&apos; settings.</source>
-      <translation type="unfinished">To disable digest authentication for LDAP users that are already added to the VMS database, you need to disable it directly in these users&apos; settings.</translation>
+      <translation>Untuk menonaktifkan otentikasi digest bagi pengguna LDAP yang telah ditambahkan ke database VMS, Anda perlu menonaktifkannya secara langsung di pengaturan&apos; pengguna ini.</translation>
     </message>
     <message>
       <source>Allow insecure (digest) authentication for imported users</source>
-      <translation type="unfinished">Allow insecure (digest) authentication for imported users</translation>
+      <translation>Izinkan otentikasi (digest) yang tidak aman untuk pengguna yang diimpor</translation>
     </message>
     <message>
       <source>General</source>
@@ -56,20 +56,20 @@
     </message>
     <message>
       <source>Synchronize Users</source>
-      <translation type="unfinished">Synchronize Users</translation>
+      <translation>Sinkronisasi Pengguna</translation>
     </message>
     <message>
       <source>Sync Interval</source>
-      <translation type="unfinished">Sync Interval</translation>
+      <translation>Sinkronisasi Interval</translation>
     </message>
     <message>
       <source>Proxy LDAP requests %1 via server</source>
       <comment>%1 is a line break</comment>
-      <translation type="unfinished">Proxy LDAP requests %1 via server</translation>
+      <translation>Permintaan LDAP proksi %1 melalui server</translation>
     </message>
     <message>
       <source>Group Members Attribute</source>
-      <translation type="unfinished">Group Members Attribute</translation>
+      <translation>Atribut Anggota Grup</translation>
     </message>
   </context>
   <context>
@@ -246,7 +246,7 @@
     </message>
     <message>
       <source>API Integrations</source>
-      <translation type="unfinished">API Integrations</translation>
+      <translation>Integrasi API</translation>
     </message>
   </context>
   <context>
@@ -260,23 +260,23 @@
     <name>ApiIntegrations</name>
     <message>
       <source>API Integrations</source>
-      <translation type="unfinished">API Integrations</translation>
+      <translation>Integrasi API</translation>
     </message>
     <message>
       <source>API Integrations interact with %1 Server via REST API and exchange metadata</source>
-      <translation type="unfinished">API Integrations interact with %1 Server via REST API and exchange metadata</translation>
+      <translation>Integrasi API berinteraksi dengan %1 Server melalui REST API dan bertukar metadata</translation>
     </message>
     <message>
       <source>New requests</source>
-      <translation type="unfinished">New requests</translation>
+      <translation>Permintaan baru</translation>
     </message>
     <message>
       <source>API Integration may be enabled after verifying the code received from Integration provider. New requests may be disabled to prevent unwanted interaction.</source>
-      <translation type="unfinished">API Integration may be enabled after verifying the code received from Integration provider. New requests may be disabled to prevent unwanted interaction.</translation>
+      <translation>Integrasi API dapat diaktifkan setelah memverifikasi kode yang diterima dari penyedia Integrasi. Permintaan baru mungkin dinonaktifkan untuk mencegah interaksi yang tidak diinginkan.</translation>
     </message>
     <message>
       <source>Enable %1?</source>
-      <translation type="unfinished">Enable %1?</translation>
+      <translation>Aktifkan %1?</translation>
     </message>
     <message>
       <source>This Integration will be able to:
@@ -284,23 +284,23 @@
  • get access to archive
  • process video streams
  • exchange metadata over the network</source>
-      <translation type="unfinished">This Integration will be able to:
- • change settings on cameras
- • get access to archive
- • process video streams
- • exchange metadata over the network</translation>
+      <translation>Integrasi ini akan dapat:
+ • mengubah pengaturan pada kamera
+ • mendapatkan akses ke archive
+ • memproses streaming video
+ • bertukar metadata melalui jaringan</translation>
     </message>
     <message>
       <source>Enable Integration</source>
-      <translation type="unfinished">Enable Integration</translation>
+      <translation>Aktifkan Integrasi</translation>
     </message>
     <message>
       <source>Remove %1?</source>
-      <translation type="unfinished">Remove %1?</translation>
+      <translation>Hapus %1?</translation>
     </message>
     <message>
       <source>This will remove Integration request</source>
-      <translation type="unfinished">This will remove Integration request</translation>
+      <translation>Ini akan menghapus permintaan Integrasi</translation>
     </message>
     <message>
       <source>Remove</source>
@@ -308,14 +308,14 @@
     </message>
     <message>
       <source>Remove Request</source>
-      <translation type="unfinished">Remove Request</translation>
+      <translation>Hapus Permintaan</translation>
     </message>
   </context>
   <context>
     <name>AutoTextField</name>
     <message>
       <source>This field cannot be empty</source>
-      <translation type="unfinished">This field cannot be empty</translation>
+      <translation>Bidang ini tidak boleh kosong</translation>
     </message>
     <message>
       <source>Auto</source>
@@ -326,8 +326,8 @@
     <name>BatchUserEditDialog</name>
     <message numerus="yes">
       <source>Batch Edit - %n Users</source>
-      <translation type="unfinished">
-        <numerusform>Batch Edit - %n Users</numerusform>
+      <translation>
+        <numerusform>Pengeditan Batch - %n Pengguna</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -339,7 +339,7 @@
     <message>
       <source>User status</source>
       <comment>Whether users are enabled or disabled</comment>
-      <translation type="unfinished">User status</translation>
+      <translation>Status pengguna</translation>
     </message>
     <message>
       <source>Enabled</source>
@@ -351,11 +351,11 @@
     </message>
     <message>
       <source>Insecure (digest) authentication</source>
-      <translation type="unfinished">Insecure (digest) authentication</translation>
+      <translation>Otentikasi (digest) tidak aman</translation>
     </message>
     <message>
       <source>keep current value</source>
-      <translation type="unfinished">keep current value</translation>
+      <translation>pertahankan nilai saat ini</translation>
     </message>
   </context>
   <context>
@@ -466,7 +466,7 @@
     </message>
     <message>
       <source>Shut Down</source>
-      <translation type="unfinished">Shut Down</translation>
+      <translation>Matikan</translation>
     </message>
   </context>
   <context>
@@ -494,7 +494,7 @@
     <name>ConnectionSettingsDialog</name>
     <message>
       <source>LDAP - Connection Settings</source>
-      <translation type="unfinished">LDAP - Connection Settings</translation>
+      <translation>LDAP - Pengaturan Koneksi</translation>
     </message>
     <message>
       <source>Host</source>
@@ -502,7 +502,7 @@
     </message>
     <message>
       <source>Login DN</source>
-      <translation type="unfinished">Login DN</translation>
+      <translation>Masuk DN</translation>
     </message>
     <message>
       <source>Password</source>
@@ -510,7 +510,7 @@
     </message>
     <message>
       <source>Ignore LDAP server certificate errors</source>
-      <translation type="unfinished">Ignore LDAP server certificate errors</translation>
+      <translation>Abaikan error sertifikat server LDAP</translation>
     </message>
     <message>
       <source>Test</source>
@@ -522,15 +522,15 @@
     </message>
     <message>
       <source>Use StartTLS</source>
-      <translation type="unfinished">Use StartTLS</translation>
+      <translation>Gunakan StartTLS</translation>
     </message>
     <message>
       <source>Host cannot be empty</source>
-      <translation type="unfinished">Host cannot be empty</translation>
+      <translation>Host tidak boleh kosong</translation>
     </message>
     <message>
       <source>Login DN cannot be empty</source>
-      <translation type="unfinished">Login DN cannot be empty</translation>
+      <translation>DN Masuk tidak boleh kosong</translation>
     </message>
     <message>
       <source>Password cannot be empty</source>
@@ -538,7 +538,7 @@
     </message>
     <message>
       <source>To allow LDAP users to log in to %1, it is necessary to establish a connection between %1 and a corporate LDAP server.</source>
-      <translation type="unfinished">To allow LDAP users to log in to %1, it is necessary to establish a connection between %1 and a corporate LDAP server.</translation>
+      <translation>Untuk mengizinkan pengguna LDAP masuk ke %1, perlu membuat koneksi antara %1 dan server LDAP perusahaan.</translation>
     </message>
   </context>
   <context>
@@ -598,11 +598,11 @@
     <name>EditLookupListDialog</name>
     <message>
       <source>List Settings</source>
-      <translation type="unfinished">List Settings</translation>
+      <translation>Pengaturan Daftar</translation>
     </message>
     <message>
       <source>New List</source>
-      <translation type="unfinished">New List</translation>
+      <translation>Daftar Baru</translation>
     </message>
     <message>
       <source>Name</source>
@@ -610,7 +610,7 @@
     </message>
     <message>
       <source>Column Name</source>
-      <translation type="unfinished">Column Name</translation>
+      <translation>Nama Kolom</translation>
     </message>
     <message>
       <source>OK</source>
@@ -705,11 +705,11 @@
     </message>
     <message>
       <source>Base DN</source>
-      <translation type="unfinished">Base DN</translation>
+      <translation>Basis DN</translation>
     </message>
     <message>
       <source>Base DN cannot be empty</source>
-      <translation type="unfinished">Base DN cannot be empty</translation>
+      <translation>DN Basis tidak boleh kosong</translation>
     </message>
     <message>
       <source>Filter</source>
@@ -717,15 +717,15 @@
     </message>
     <message>
       <source>The Base DN sets the starting point for LDAP searches and synchronization.</source>
-      <translation type="unfinished">The Base DN sets the starting point for LDAP searches and synchronization.</translation>
+      <translation>Base DN menetapkan titik awal untuk pencarian dan sinkronisasi LDAP.</translation>
     </message>
     <message>
       <source>Filters help control access to the system and synchronization by specifying which users and/or groups from the Base DN are allowed.</source>
-      <translation type="unfinished">Filters help control access to the system and synchronization by specifying which users and/or groups from the Base DN are allowed.</translation>
+      <translation>Filter membantu mengontrol akses ke sistem dan sinkronisasi dengan menentukan pengguna dan/atau grup mana dari DN Basis yang diizinkan.</translation>
     </message>
     <message>
       <source>Edit Search Base</source>
-      <translation type="unfinished">Edit Search Base</translation>
+      <translation>Edit Basis Pencarian</translation>
     </message>
   </context>
   <context>
@@ -822,11 +822,11 @@
     <name>GlobalPermissionsTab</name>
     <message>
       <source>At the system level, group members have permissions to:</source>
-      <translation type="unfinished">At the system level, group members have permissions to:</translation>
+      <translation>Pada level sistem, anggota grup memiliki izin untuk:</translation>
     </message>
     <message>
       <source>At the system level, the user has permissions to:</source>
-      <translation type="unfinished">At the system level, the user has permissions to:</translation>
+      <translation>Di level sistem, pengguna memiliki izin untuk:</translation>
     </message>
   </context>
   <context>
@@ -849,15 +849,15 @@
     </message>
     <message>
       <source>Global Permissions</source>
-      <translation type="unfinished">Global Permissions</translation>
+      <translation>Izin Global</translation>
     </message>
     <message>
       <source>Members</source>
-      <translation type="unfinished">Members</translation>
+      <translation>Anggota</translation>
     </message>
     <message>
       <source>Add Group</source>
-      <translation type="unfinished">Add Group</translation>
+      <translation>Tambahkan Grup</translation>
     </message>
   </context>
   <context>
@@ -883,7 +883,7 @@
     <name>GroupEditDialog</name>
     <message>
       <source>Group - %1</source>
-      <translation type="unfinished">Group - %1</translation>
+      <translation>Grup - %1</translation>
     </message>
     <message>
       <source>General</source>
@@ -899,11 +899,11 @@
     </message>
     <message>
       <source>Global Permissions</source>
-      <translation type="unfinished">Global Permissions</translation>
+      <translation>Izin Global</translation>
     </message>
     <message>
       <source>Members</source>
-      <translation type="unfinished">Members</translation>
+      <translation>Anggota</translation>
     </message>
   </context>
   <context>
@@ -926,7 +926,7 @@
     </message>
     <message>
       <source>Members</source>
-      <translation type="unfinished">Members</translation>
+      <translation>Anggota</translation>
     </message>
     <message>
       <source>Users</source>
@@ -938,11 +938,11 @@
     </message>
     <message>
       <source>Another group with the same name exists in the system. It is recommended to assign unique names to the groups.</source>
-      <translation type="unfinished">Another group with the same name exists in the system. It is recommended to assign unique names to the groups.</translation>
+      <translation>Grup lain dengan nama yang sama ada di sistem. Disarankan untuk memberikan nama unik pada grup.</translation>
     </message>
     <message>
       <source>The group has another group as both its parent, and as a child member, or is a part of such a circular reference chain. Resolve this chain to prevent incorrect calculation of permissions.</source>
-      <translation type="unfinished">The group has another group as both its parent, and as a child member, or is a part of such a circular reference chain. Resolve this chain to prevent incorrect calculation of permissions.</translation>
+      <translation>Grup tersebut memiliki grup lain sebagai induknya, dan sebagai anggota anak, atau merupakan bagian dari rantai referensi sirkular tersebut. Selesaikan rantai ini untuk mencegah penghitungan izin yang salah.</translation>
     </message>
     <message>
       <source>When continuous sync with LDAP server is disabled, groups do not synchronize automatically. To update this group, initiate a manual sync.</source>
@@ -950,7 +950,7 @@
     </message>
     <message>
       <source>This group is not found in the LDAP database.</source>
-      <translation type="unfinished">This group is not found in the LDAP database.</translation>
+      <translation>Grup ini tidak ditemukan dalam database LDAP.</translation>
     </message>
   </context>
   <context>
@@ -965,19 +965,19 @@
     </message>
     <message>
       <source>No members</source>
-      <translation type="unfinished">No members</translation>
+      <translation>Tidak ada anggota</translation>
     </message>
     <message>
       <source>Use controls on the left to add members</source>
-      <translation type="unfinished">Use controls on the left to add members</translation>
+      <translation>Gunakan kontrol di sebelah kiri untuk menambahkan anggota</translation>
     </message>
     <message>
       <source>Members summary</source>
-      <translation type="unfinished">Members summary</translation>
+      <translation>Ringkasan anggota</translation>
     </message>
     <message>
       <source>Inherits membership in current group</source>
-      <translation type="unfinished">Inherits membership in current group</translation>
+      <translation>Mewarisi keanggotaan dalam grup saat ini</translation>
     </message>
   </context>
   <context>
@@ -996,7 +996,7 @@
     </message>
     <message>
       <source>No groups</source>
-      <translation type="unfinished">No groups</translation>
+      <translation>Tidak ada grup</translation>
     </message>
   </context>
   <context>
@@ -1036,7 +1036,7 @@
     <name>InsecureWarning</name>
     <message>
       <source>Account security is important. Do not enable this setting unless you have good reasons to do so.</source>
-      <translation type="unfinished">Account security is important. Do not enable this setting unless you have good reasons to do so.</translation>
+      <translation>Keamanan akun itu penting. Jangan aktifkan pengaturan ini kecuali Anda mempunyai alasan kuat untuk melakukannya.</translation>
     </message>
   </context>
   <context>
@@ -1048,13 +1048,13 @@
     <message numerus="yes">
       <source>%n suitable integration services are required to turn on the integration</source>
       <comment>Required integration count</comment>
-      <translation type="unfinished">
-        <numerusform>%n suitable integration services are required to turn on the integration</numerusform>
+      <translation>
+        <numerusform>%n layanan integrasi yang sesuai diperlukan untuk mengaktifkan integrasi</numerusform>
       </translation>
     </message>
     <message>
       <source>0 suitable services available</source>
-      <translation type="unfinished">0 suitable services available</translation>
+      <translation>0 layanan yang sesuai tersedia</translation>
     </message>
     <message>
       <source>OFFLINE</source>
@@ -1066,7 +1066,7 @@
     </message>
     <message>
       <source>Services Required</source>
-      <translation type="unfinished">Services Required</translation>
+      <translation>Layanan Diperlukan</translation>
     </message>
     <message>
       <source>Refreshing...</source>
@@ -1075,7 +1075,7 @@
     <message>
       <source>There are more cameras using this integration than available services. Please disable integration for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</source>
       <comment>%1 will be substituted by a date</comment>
-      <translation type="unfinished">There are more cameras using this integration than available services. Please disable integration for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</translation>
+      <translation>Ada lebih banyak kamera yang menggunakan integrasi ini daripada layanan yang tersedia. Harap nonaktifkan integrasi untuk beberapa kamera atau tambahkan layanan yang lebih sesuai. Jika tidak, ini akan dilakukan secara otomatis pada %1</translation>
     </message>
   </context>
   <context>
@@ -1200,7 +1200,7 @@
     <name>LdapSettings</name>
     <message>
       <source>ONLINE</source>
-      <translation type="unfinished">ONLINE</translation>
+      <translation>ON LINE</translation>
     </message>
     <message>
       <source>OFFLINE</source>
@@ -1216,7 +1216,7 @@
     </message>
     <message>
       <source>Last Sync</source>
-      <translation type="unfinished">Last Sync</translation>
+      <translation>Sinkronisasi Terakhir</translation>
     </message>
     <message>
       <source>Edit</source>
@@ -1224,7 +1224,7 @@
     </message>
     <message>
       <source>Advanced Settings</source>
-      <translation type="unfinished">Advanced Settings</translation>
+      <translation>Pengaturan Lanjutan</translation>
     </message>
     <message>
       <source>Disconnect</source>
@@ -1236,19 +1236,19 @@
     </message>
     <message>
       <source>Please use care when altering LDAP settings. Incorrect configuration could disrupt system availability for a large number of users simultaneously.</source>
-      <translation type="unfinished">Please use care when altering LDAP settings. Incorrect configuration could disrupt system availability for a large number of users simultaneously.</translation>
+      <translation>Harap berhati-hati saat mengubah pengaturan LDAP. Konfigurasi yang salah dapat mengganggu ketersediaan sistem untuk sejumlah besar pengguna secara bersamaan.</translation>
     </message>
     <message>
       <source>Connect your System to an LDAP server for easier user management</source>
-      <translation type="unfinished">Connect your System to an LDAP server for easier user management</translation>
+      <translation>Koneksikan Sistem Anda ke server LDAP untuk pengelolaan pengguna yang lebih mudah</translation>
     </message>
     <message>
       <source>Not configured yet</source>
-      <translation type="unfinished">Not configured yet</translation>
+      <translation>Belum dikonfigurasi</translation>
     </message>
     <message>
       <source>Configure</source>
-      <translation type="unfinished">Configure</translation>
+      <translation>Konfigurasi</translation>
     </message>
     <message>
       <source>Continuous sync with LDAP server is disabled for this system. Updates to groups and users and groups membership will occur solely through manual synchronization.</source>
@@ -1256,19 +1256,19 @@
     </message>
     <message>
       <source>Search Bases</source>
-      <translation type="unfinished">Search Bases</translation>
+      <translation>Basis Pencarian</translation>
     </message>
     <message>
       <source>Add Search Base</source>
-      <translation type="unfinished">Add Search Base</translation>
+      <translation>Tambahkan Basis Pencarian</translation>
     </message>
     <message>
       <source>Specify at least one search base to synchronize users and groups</source>
-      <translation type="unfinished">Specify at least one search base to synchronize users and groups</translation>
+      <translation>Tentukan setidaknya satu basis pencarian untuk mengsinkronkan pengguna dan grup</translation>
     </message>
     <message>
       <source>No users or groups match synchronization settings and are added to the system DB. Make sure LDAP server parameters and search bases are configured correctly.</source>
-      <translation type="unfinished">No users or groups match synchronization settings and are added to the system DB. Make sure LDAP server parameters and search bases are configured correctly.</translation>
+      <translation>Tidak ada pengguna atau grup yang cocok dengan pengaturan sinkronisasi dan ditambahkan ke DB sistem. Pastikan parameter server LDAP dan basis pencarian dikonfigurasi dengan benar.</translation>
     </message>
   </context>
   <context>
@@ -1361,7 +1361,7 @@
     <name>LookupListElementEditor</name>
     <message>
       <source>Any %1</source>
-      <translation type="unfinished">Any %1</translation>
+      <translation>Apa saja %1</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -1376,7 +1376,7 @@
     <name>LookupListTableCellDelegate</name>
     <message>
       <source>ANY</source>
-      <translation type="unfinished">ANY</translation>
+      <translation>APA SAJA</translation>
     </message>
   </context>
   <context>
@@ -1399,7 +1399,7 @@
     </message>
     <message>
       <source>Create New...</source>
-      <translation type="unfinished">Create New...</translation>
+      <translation>Membuat baru...</translation>
     </message>
     <message>
       <source>Settings</source>
@@ -1425,7 +1425,7 @@
     </message>
     <message>
       <source>The previous link will be invalidated once a new one has been issued</source>
-      <translation type="unfinished">The previous link will be invalidated once a new one has been issued</translation>
+      <translation>Link sebelumnya akan dibatalkan setelah link baru diterbitkan</translation>
     </message>
     <message>
       <source>Create</source>
@@ -1436,15 +1436,15 @@
     <name>NoListsPage</name>
     <message>
       <source>No Lists</source>
-      <translation type="unfinished">No Lists</translation>
+      <translation>Tidak Ada Daftar</translation>
     </message>
     <message>
       <source>You have not created any Lists yet. With lists you can store multiple values to use them in Event Rules. Create a new List to start adding entries.</source>
-      <translation type="unfinished">You have not created any Lists yet. With lists you can store multiple values to use them in Event Rules. Create a new List to start adding entries.</translation>
+      <translation>Anda belum membuat Daftar apa pun. Dengan daftar, Anda dapat menyimpan beberapa nilai untuk digunakan dalam Aturan Event. Buat Daftar baru untuk mulai menambahkan entri.</translation>
     </message>
     <message>
       <source>Create New...</source>
-      <translation type="unfinished">Create New...</translation>
+      <translation>Membuat Baru...</translation>
     </message>
   </context>
   <context>
@@ -1496,7 +1496,7 @@
     <name>PanelBase</name>
     <message>
       <source>Approve</source>
-      <translation type="unfinished">Approve</translation>
+      <translation>Menyetujui</translation>
     </message>
     <message>
       <source>Reject</source>
@@ -1507,7 +1507,7 @@
     <name>ParentGroupsTab</name>
     <message>
       <source>Add Group</source>
-      <translation type="unfinished">Add Group</translation>
+      <translation>Tambahkan Grup</translation>
     </message>
     <message>
       <source>Custom</source>
@@ -1515,7 +1515,7 @@
     </message>
     <message>
       <source>No custom groups yet</source>
-      <translation type="unfinished">No custom groups yet</translation>
+      <translation>Belum ada grup kustom</translation>
     </message>
     <message>
       <source>No groups found</source>
@@ -1527,11 +1527,11 @@
     </message>
     <message>
       <source>No groups</source>
-      <translation type="unfinished">No groups</translation>
+      <translation>Tidak ada grup</translation>
     </message>
     <message>
       <source>Use controls on the left to add to a group</source>
-      <translation type="unfinished">Use controls on the left to add to a group</translation>
+      <translation>Gunakan kontrol di sebelah kiri untuk menambahkan ke grup</translation>
     </message>
     <message>
       <source>Member of</source>
@@ -1546,7 +1546,7 @@
     <message>
       <source>Built-in</source>
       <comment>Section name in a list of items: &apos;Built-in groups&apos;</comment>
-      <translation type="unfinished">Built-in</translation>
+      <translation>Built-in</translation>
     </message>
     <message>
       <source>Custom</source>
@@ -1558,7 +1558,7 @@
     <name>PasswordChangeDialog</name>
     <message>
       <source>Change password - %1</source>
-      <translation type="unfinished">Change password - %1</translation>
+      <translation>Ubah kata sandi - %1</translation>
     </message>
     <message>
       <source>Login</source>
@@ -1566,7 +1566,7 @@
     </message>
     <message>
       <source>Current password</source>
-      <translation type="unfinished">Current password</translation>
+      <translation>Kata sandi saat ini</translation>
     </message>
     <message>
       <source>New password</source>
@@ -1585,31 +1585,31 @@
     <name>PermissionSummary</name>
     <message>
       <source>No custom permissions</source>
-      <translation type="unfinished">No custom permissions</translation>
+      <translation>Tidak ada izin kustom</translation>
     </message>
   </context>
   <context>
     <name>PermissionsTab</name>
     <message>
       <source>No resources found</source>
-      <translation type="unfinished">No resources found</translation>
+      <translation>Tidak ada rersource yang ditemukan</translation>
     </message>
     <message>
       <source>Automatically add dependent permissions</source>
-      <translation type="unfinished">Automatically add dependent permissions</translation>
+      <translation>Secara otomatis menambahkan izin dependen</translation>
     </message>
     <message>
       <source>Use %1 or %2 to select multiple resources, or %3 to clear the selection</source>
       <comment>%1, %2 and %3 will be replaced with keyboard key names</comment>
-      <translation type="unfinished">Use %1 or %2 to select multiple resources, or %3 to clear the selection</translation>
+      <translation>Gunakan %1 atau %2 untuk memilih beberapa resource, atau %3 untuk menghapus pilihan</translation>
     </message>
     <message>
       <source>Resources table gives you an overview of user or group permissions and allows you to assign permissions for specific resources.</source>
-      <translation type="unfinished">Resources table gives you an overview of user or group permissions and allows you to assign permissions for specific resources.</translation>
+      <translation>Tabel resource memberi Anda gambaran umum tentang izin pengguna atau grup dan memungkinkan Anda menetapkan izin untuk resource tertentu.</translation>
     </message>
     <message>
       <source>If you select a permission that depends on another permission both permissions will be granted automatically.</source>
-      <translation type="unfinished">If you select a permission that depends on another permission both permissions will be granted automatically.</translation>
+      <translation>Jika Anda memilih izin yang bergantung pada izin lain, kedua izin tersebut akan diberikan secara otomatis.</translation>
     </message>
   </context>
   <context>
@@ -1620,7 +1620,7 @@
     </message>
     <message>
       <source>Plugins are programs that run on the %1 Server to enable seamless video analytics integrations.</source>
-      <translation type="unfinished">Plugins are programs that run on the %1 Server to enable seamless video analytics integrations.</translation>
+      <translation>Plugin adalah program yang berjalan di Server %1 untuk memungkinkan integrasi analitik video yang lancar.</translation>
     </message>
   </context>
   <context>
@@ -1715,64 +1715,64 @@ untuk mengaktifkan PTZ</translation>
     </message>
     <message>
       <source>Press arrow keys to move around. Use plus and minus keys to zoom.</source>
-      <translation type="unfinished">Press arrow keys to move around. Use plus and minus keys to zoom.</translation>
+      <translation>Tekan tombol panah untuk bergerak. Gunakan tombol plus dan minus untuk memperbesar.</translation>
     </message>
     <message>
       <source>Use mouse wheel to zoom</source>
-      <translation type="unfinished">Use mouse wheel to zoom</translation>
+      <translation>Gunakan scroll mouse untuk memperbesar</translation>
     </message>
     <message>
       <source>You can enable this guide again by going to Local Settings &gt; Advanced &gt; Reset All Warnings</source>
-      <translation type="unfinished">You can enable this guide again by going to Local Settings &gt; Advanced &gt; Reset All Warnings</translation>
+      <translation>Anda dapat mengaktifkan panduan ini lagi dengan membuka Pengaturan Lokal &gt; Advanced &gt; Atur Ulang Semua Peringatan</translation>
     </message>
     <message>
       <source>Introducing
 New PTZ controls</source>
-      <translation type="unfinished">Introducing
-New PTZ controls</translation>
+      <translation>Memperkenalkan
+Kontrol PTZ baru</translation>
     </message>
     <message>
       <source>Click, double-click, or drag
 mouse pointer while pressing
 Shift key to use Advanced PTZ</source>
-      <translation type="unfinished">Click, double-click, or drag
-mouse pointer while pressing
-Shift key to use Advanced PTZ</translation>
+      <translation>Klik, klik dua kali, atau geser
+pointer mouse sambil menekan
+tombol Shift untuk menggunakan Advanced PTZ</translation>
     </message>
     <message>
       <source>Here is a quick guide
 on what has changed.</source>
-      <translation type="unfinished">Here is a quick guide
-on what has changed.</translation>
+      <translation>Berikut adalah panduan singkat
+tentang apa yang telah berubah.</translation>
     </message>
     <message>
       <source>To use Target Lock Tracking,
 Press Alt + Click to follow object</source>
-      <translation type="unfinished">To use Target Lock Tracking,
-Press Alt + Click to follow object</translation>
+      <translation>Untuk menggunakan Pelacakan Lock Target,
+Tekan Alt + Klik untuk mengikuti objek</translation>
     </message>
   </context>
   <context>
     <name>QuickIntervalPanel</name>
     <message>
       <source>today</source>
-      <translation type="unfinished">today</translation>
+      <translation>hari ini</translation>
     </message>
     <message>
       <source>-1 hour</source>
-      <translation type="unfinished">-1 hour</translation>
+      <translation>-1 jam</translation>
     </message>
     <message>
       <source>-24 hours</source>
-      <translation type="unfinished">-24 hours</translation>
+      <translation>-24 jam</translation>
     </message>
     <message>
       <source>-7 days</source>
-      <translation type="unfinished">-7 days</translation>
+      <translation>-7 hari</translation>
     </message>
     <message>
       <source>-30 days</source>
-      <translation type="unfinished">-30 days</translation>
+      <translation>-30 hari</translation>
     </message>
   </context>
   <context>
@@ -1813,32 +1813,32 @@ Press Alt + Click to follow object</translation>
     <message>
       <source>Has %1 permission</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Has %1 permission</translation>
+      <translation>Memiliki izin %1</translation>
     </message>
     <message>
       <source>Add %1 and dependent permissions</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Add %1 and dependent permissions</translation>
+      <translation>Tambahkan %1 dan izin dependen</translation>
     </message>
     <message>
       <source>Add %1 permission</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Add %1 permission</translation>
+      <translation>Tambahkan izin %1</translation>
     </message>
     <message>
       <source>Remove %1 and dependent permissions</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Remove %1 and dependent permissions</translation>
+      <translation>Tambahkan %1 dan izin dependen</translation>
     </message>
     <message>
       <source>Remove %1 permission</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Remove %1 permission</translation>
+      <translation>Hapus izin %1</translation>
     </message>
     <message>
       <source>Also inherits it from</source>
       <comment>&apos;it&apos; refers to a permission</comment>
-      <translation type="unfinished">Also inherits it from</translation>
+      <translation>Juga mewarisinya dari</translation>
     </message>
     <message>
       <source>Inherits %1 permission from</source>
@@ -1847,11 +1847,11 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Already inherited from</source>
-      <translation type="unfinished">Already inherited from</translation>
+      <translation>Sudah diwarisi dari</translation>
     </message>
     <message>
       <source>Will stay inherited from</source>
-      <translation type="unfinished">Will stay inherited from</translation>
+      <translation>Akan tetap diwarisi dari</translation>
     </message>
   </context>
   <context>
@@ -1877,7 +1877,7 @@ Press Alt + Click to follow object</translation>
     <name>ResourceFilterButton</name>
     <message>
       <source>Available by Permissions</source>
-      <translation type="unfinished">Available by Permissions</translation>
+      <translation>Tersedia dengan Izin</translation>
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
@@ -2005,19 +2005,19 @@ Press Alt + Click to follow object</translation>
     <name>SaasBanner</name>
     <message>
       <source>System has been suspended. To enable/disable the integration usage for current device the System must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">System has been suspended. To enable/disable the integration usage for current device the System must be in active state. Contact your channel partner for details</translation>
+      <translation>Sistem telah disuspensi. Untuk mengaktifkan/menonaktifkan penggunaan integrasi pada perangkat saat ini, Sistem harus dalam keadaan aktif. Hubungi channel partner Anda untuk mengetahui detailnya</translation>
     </message>
     <message>
       <source>System has been suspended. To enable/disable the integration usage for some device the System must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">System has been suspended. To enable/disable the integration usage for some device the System must be in active state. Contact your channel partner for details</translation>
+      <translation>Sistem telah disuspensi. Untuk mengaktifkan/menonaktifkan penggunaan integrasi pada beberapa perangkat, Sistem harus dalam keadaan aktif. Hubungi channel partner Anda untuk mengetahui detailnya</translation>
     </message>
     <message>
       <source>System has been shut down. To enable this integration usage for current device the System must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">System has been shut down. To enable this integration usage for current device the System must be in active state. Contact your channel partner for details</translation>
+      <translation>Sistem telah dimatikan. Untuk mengaktifkan penggunaan integrasi ini pada perangkat saat ini, Sistem harus dalam keadaan aktif. Hubungi channel partner Anda untuk mengetahui detailnya</translation>
     </message>
     <message>
       <source>System has been shut down. To activate this integration usage for some device the System must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">System has been shut down. To activate this integration usage for some device the System must be in active state. Contact your channel partner for details</translation>
+      <translation>Sistem telah dimatikan. Untuk mengaktifkan penggunaan integrasi ini pada beberapa perangkat, Sistem harus dalam keadaan aktif. Hubungi channel partner Anda untuk mengetahui detailnya</translation>
     </message>
   </context>
   <context>
@@ -2237,11 +2237,11 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Always</source>
-      <translation type="unfinished">Always</translation>
+      <translation>Selalu</translation>
     </message>
     <message>
       <source>On Log In</source>
-      <translation type="unfinished">On Log In</translation>
+      <translation>Saat Masuk</translation>
     </message>
   </context>
   <context>
@@ -2249,36 +2249,36 @@ Press Alt + Click to follow object</translation>
     <message>
       <source>Valid from %1 to %2 (by server time)</source>
       <extracomment>Example: Valid from 14.05.2023 to 24.05.2023, 12:24 (by server time)</extracomment>
-      <translation type="unfinished">Valid from %1 to %2 (by server time)</translation>
+      <translation>Berlaku dari %1 hingga %2 (berdasarkan waktu server)</translation>
     </message>
     <message>
       <source>Valid from %1 to %2 (by server time) or for %3 after login</source>
       <extracomment>Valid from 14.05.2023 to 24.05.2023 (by server time) or for 12 hours after login</extracomment>
-      <translation type="unfinished">Valid from %1 to %2 (by server time) or for %3 after login</translation>
+      <translation>Berlaku dari %1 hingga %2 (menurut waktu server) atau untuk %3 setelah login</translation>
     </message>
   </context>
   <context>
     <name>TemporaryLinkSettings</name>
     <message>
       <source>Link Valid Until</source>
-      <translation type="unfinished">Link Valid Until</translation>
+      <translation>Link Valid Sampai</translation>
     </message>
     <message>
       <source>The link will remain accessible until the date specified (including, based on server time)</source>
-      <translation type="unfinished">The link will remain accessible until the date specified (including, based on server time)</translation>
+      <translation>Link akan tetap dapat diakses hingga tanggal yang ditentukan (termasuk, berdasarkan waktu server)</translation>
     </message>
     <message>
       <source>Revoke access after login</source>
-      <translation type="unfinished">Revoke access after login</translation>
+      <translation>Cabut akses setelah login</translation>
     </message>
     <message>
       <source>Access may be revoked earlier if the link validity period ends</source>
-      <translation type="unfinished">Access may be revoked earlier if the link validity period ends</translation>
+      <translation>Akses dapat dicabut lebih awal jika masa berlaku link berakhir</translation>
     </message>
     <message>
       <source>In</source>
       <extracomment>&apos;In&apos; as in sentence: &apos;Revoke access after login in N hours&apos;.</extracomment>
-      <translation type="unfinished">In</translation>
+      <translation>Dalam</translation>
     </message>
   </context>
   <context>
@@ -2355,7 +2355,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Time is unavailable due to DST changes</source>
-      <translation type="unfinished">Time is unavailable due to DST changes</translation>
+      <translation>Waktu tidak tersedia karena perubahan DST</translation>
     </message>
   </context>
   <context>
@@ -2387,7 +2387,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Global Permissions</source>
-      <translation type="unfinished">Global Permissions</translation>
+      <translation>Izin Global</translation>
     </message>
     <message>
       <source>Add User</source>
@@ -2434,15 +2434,15 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Allow insecure (digest) authentication</source>
-      <translation type="unfinished">Allow insecure (digest) authentication</translation>
+      <translation>Izinkan otentikasi (digest) yang tidak aman</translation>
     </message>
     <message>
       <source>You need to specify only user&apos;s email address.</source>
-      <translation type="unfinished">You need to specify only user&apos;s email address.</translation>
+      <translation>Anda hanya perlu menentukan alamat email&apos;pengguna.</translation>
     </message>
     <message>
       <source>If user already has an account, he will see this system and will be able to log in to it. If not, we&apos;ll send an invitation to this address and user will see this system right after he creates an account.</source>
-      <translation type="unfinished">If user already has an account, he will see this system and will be able to log in to it. If not, we&apos;ll send an invitation to this address and user will see this system right after he creates an account.</translation>
+      <translation>Jika pengguna sudah memiliki akun, dia akan melihat sistem ini dan dapat masuk ke dalamnya. Jika tidak, kami&apos;akan mengirimkan undangan ke alamat ini dan pengguna akan melihat sistem ini segera setelah dia membuat akun.</translation>
     </message>
     <message>
       <source>Permission Groups</source>
@@ -2450,15 +2450,15 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Access</source>
-      <translation type="unfinished">Access</translation>
+      <translation>Akses</translation>
     </message>
     <message>
       <source>Regular user with credentials</source>
-      <translation type="unfinished">Regular user with credentials</translation>
+      <translation>Pengguna biasa dengan kredensial</translation>
     </message>
     <message>
       <source>Temporary with link</source>
-      <translation type="unfinished">Temporary with link</translation>
+      <translation>Temporer dengan link</translation>
     </message>
     <message>
       <source>Passwords do not match</source>
@@ -2469,7 +2469,7 @@ Press Alt + Click to follow object</translation>
     <name>UserEditDialog</name>
     <message>
       <source>User - %1</source>
-      <translation type="unfinished">User - %1</translation>
+      <translation>Pengguna - %1</translation>
     </message>
     <message>
       <source>General</source>
@@ -2485,7 +2485,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Global Permissions</source>
-      <translation type="unfinished">Global Permissions</translation>
+      <translation>Izin Global</translation>
     </message>
     <message>
       <source>This user has not yet signed up for %1</source>
@@ -2497,11 +2497,11 @@ Press Alt + Click to follow object</translation>
     <name>UserEnabledSwitch</name>
     <message>
       <source>Enabled user</source>
-      <translation type="unfinished">Enabled user</translation>
+      <translation>Pengguna yang diaktifkan</translation>
     </message>
     <message>
       <source>Disabled user</source>
-      <translation type="unfinished">Disabled user</translation>
+      <translation>Pengguna yang dinonaktifkan</translation>
     </message>
   </context>
   <context>
@@ -2536,15 +2536,15 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Set password to enable insecure authentication</source>
-      <translation type="unfinished">Set password to enable insecure authentication</translation>
+      <translation>Tetapkan kata sandi untuk mengaktifkan otentikasi tidak aman</translation>
     </message>
     <message>
       <source>Allow insecure (digest) authentication</source>
-      <translation type="unfinished">Allow insecure (digest) authentication</translation>
+      <translation>Izinkan otentikasi (digest) yang tidak aman</translation>
     </message>
     <message>
       <source>This user is not found in LDAP database and is not able to log in.</source>
-      <translation type="unfinished">This user is not found in LDAP database and is not able to log in.</translation>
+      <translation>Pengguna ini tidak ditemukan dalam database LDAP dan tidak dapat login.</translation>
     </message>
     <message>
       <source>Permission Groups</source>
@@ -2552,7 +2552,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Access expires</source>
-      <translation type="unfinished">Access expires</translation>
+      <translation>Akses kadaluarsa</translation>
     </message>
     <message>
       <source>Access Link</source>
@@ -2560,7 +2560,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Copy Link</source>
-      <translation type="unfinished">Copy Link</translation>
+      <translation>Salin Link</translation>
     </message>
     <message>
       <source>Terminate</source>
@@ -2572,7 +2572,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>No valid link for this user</source>
-      <translation type="unfinished">No valid link for this user</translation>
+      <translation>Tidak ada link yang valid untuk pengguna ini</translation>
     </message>
     <message>
       <source>Copied</source>
@@ -2590,7 +2590,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>LDAP server is offline. User is not able to log in.</source>
-      <translation type="unfinished">LDAP server is offline. User is not able to log in.</translation>
+      <translation>Server LDAP sedang offline. Pengguna tidak dapat masuk.</translation>
     </message>
     <message>
       <source>When continuous sync with LDAP server is disabled, user membership in groups does not synchronize automatically. To update this information, initiate a manual sync.</source>
@@ -2598,7 +2598,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>This user’s login duplicates the login of another user. None of them is able to log in. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</source>
-      <translation type="unfinished">This user’s login duplicates the login of another user. None of them is able to log in. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</translation>
+      <translation>Login pengguna ini menduplikasi login pengguna lain. Tak satu pun dari mereka dapat login. Untuk mengatasi masalah ini Anda dapat mengubah login pengguna atau menonaktifkan atau menghapus pengguna dengan duplikat login.</translation>
     </message>
   </context>
   <context>
@@ -2620,11 +2620,11 @@ Press Alt + Click to follow object</translation>
     <name>VmsRulesDialog</name>
     <message>
       <source>Vms Rules</source>
-      <translation type="unfinished">Vms Rules</translation>
+      <translation>Aturan Vms</translation>
     </message>
     <message>
       <source>Add Rule</source>
-      <translation type="unfinished">Add Rule</translation>
+      <translation>Tambahkan Aturan</translation>
     </message>
     <message>
       <source>Duplicate</source>
@@ -2636,7 +2636,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>No Entries</source>
-      <translation type="unfinished">No Entries</translation>
+      <translation>Tidak Ada Entri</translation>
     </message>
     <message>
       <source>Event Log...</source>
@@ -2644,7 +2644,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Reset To Defaults...</source>
-      <translation type="unfinished">Reset To Defaults...</translation>
+      <translation>Reset Ke Default...</translation>
     </message>
   </context>
   <context>
