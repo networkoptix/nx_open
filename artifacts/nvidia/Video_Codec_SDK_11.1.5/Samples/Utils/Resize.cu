@@ -205,7 +205,7 @@ void ScaleYUV420(unsigned char *dpDstY,
     }
 }
 
-int freeGpuMemory()
+size_t freeGpuMemory()
 {
     size_t free, total;
     cudaMemGetInfo(&free, &total);
