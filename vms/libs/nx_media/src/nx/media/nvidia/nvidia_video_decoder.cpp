@@ -98,6 +98,10 @@ bool NvidiaVideoDecoder::isAvailable()
 bool NvidiaVideoDecoder::isCompatible(
     const QnConstCompressedVideoDataPtr& frame, AVCodecID codec, int /*width*/, int /*height*/)
 {
+    size_t kFreeMemoryLimit = 1024 * 1024 * 128;
+    if (freeGpuMemory() < kFreeMemoryLimit)
+        return false;
+
     NvidiaVideoDecoder decoder(/*checkMode*/ true);
     if (!decoder.decode(frame))
         return false;
@@ -107,8 +111,7 @@ bool NvidiaVideoDecoder::isCompatible(
     if (!decoder.decode(frame))
         return false;
 
-    int kFreeMemoryLimit = 1024*1024*128;
-    return freeGpuMemory() > kFreeMemoryLimit;
+    return true;
 }
 
 NvidiaVideoDecoder::NvidiaVideoDecoder(bool checkMode)
