@@ -45,4 +45,4 @@ void ResizeP016(unsigned char *dpDstP016, int nDstPitch, int nDstWidth, int nDst
 void ScaleYUV420(unsigned char *dpDstY, unsigned char* dpDstU, unsigned char* dpDstV, int nDstPitch, int nDstChromaPitch, int nDstWidth, int nDstHeight,
     unsigned char *dpSrcY, unsigned char* dpSrcU, unsigned char* dpSrcV, int nSrcPitch, int nSrcChromaPitch, int nSrcWidth, int nSrcHeight, bool bSemiplanar);
 
-int freeGpuMemory();
+size_t freeGpuMemory();

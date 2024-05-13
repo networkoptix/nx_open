@@ -418,7 +418,6 @@ bool canAddNvidia(const QnConstCompressedVideoDataPtr& data, bool reverseMode)
         && NvidiaVideoDecoderOldPlayer::instanceCount()
             < appContext()->localSettings()->maxNVidiaHardwareDecoders()
         && NvidiaVideoDecoderOldPlayer::isSupported(data);
-    return false;
 }
 
 bool QnVideoStreamDisplay::shouldUpdateDecoder(
