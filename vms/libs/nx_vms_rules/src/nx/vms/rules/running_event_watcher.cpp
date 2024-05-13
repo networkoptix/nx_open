@@ -47,7 +47,7 @@ void RunningEventWatcher::erase(const EventPtr& event)
 std::chrono::microseconds RunningEventWatcher::startTime(const EventPtr& event) const
 {
     if (!event)
-        std::chrono::microseconds::zero();
+        return std::chrono::microseconds::zero();
 
     const auto it = m_events.find(runningEventKey(event));
     return it != m_events.end() ? it->second : std::chrono::microseconds::zero();
