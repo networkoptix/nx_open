@@ -210,7 +210,7 @@ signals:
 
     void emailChanged(const QnResourcePtr& user);
     void fullNameChanged(const QnResourcePtr& user);
-    void externalIdChanged(const QnResourcePtr& user);
+    void externalIdChanged(const QnUserResourcePtr& user);
     void attributesChanged(const QnResourcePtr& user);
 
     // Emitted if Temporary user has any changes in the token an/or lifetime bounds.
