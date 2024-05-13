@@ -7,6 +7,7 @@
 #include <QtCore/QLocale>
 #include <QtCore/QTimeZone>
 
+#include <common/common_globals.h>
 #include <nx/utils/impl_ptr.h>
 
 Q_MOC_INCLUDE("nx/vms/client/core/media/time_period_storage.h")
@@ -18,12 +19,13 @@ class AbstractTimePeriodStorage;
 class NX_VMS_CLIENT_CORE_API CalendarModel: public QAbstractListModel
 {
     Q_OBJECT
-    using base_type = QAbstractListModel;
 
     Q_PROPERTY(int year READ year WRITE setYear NOTIFY yearChanged)
     Q_PROPERTY(int month READ month WRITE setMonth NOTIFY monthChanged)
     Q_PROPERTY(QLocale locale READ locale WRITE setLocale NOTIFY localeChanged)
     Q_PROPERTY(QTimeZone timeZone READ timeZone WRITE setTimeZone NOTIFY timeZoneChanged)
+    Q_PROPERTY(Qn::TimePeriodContent timePeriodType READ timePeriodType WRITE setTimePeriodType
+        NOTIFY timePeriodTypeChanged)
     Q_PROPERTY(nx::vms::client::core::AbstractTimePeriodStorage* periodStorage
         READ periodStorage
         WRITE setPeriodStorage
@@ -62,6 +64,9 @@ public: // Properties and invokables.
     QTimeZone timeZone() const;
     void setTimeZone(const QTimeZone& timeZone);
 
+    Qn::TimePeriodContent timePeriodType() const;
+    void setTimePeriodType(Qn::TimePeriodContent type);
+
     AbstractTimePeriodStorage* periodStorage() const;
     void setPeriodStorage(AbstractTimePeriodStorage* store);
 
@@ -80,6 +85,7 @@ public: // Overrides section.
 signals:
     void yearChanged();
     void monthChanged();
+    void timePeriodTypeChanged();
     void periodStorageChanged();
     void allCamerasPeriodStorageChanged();
     void localeChanged();

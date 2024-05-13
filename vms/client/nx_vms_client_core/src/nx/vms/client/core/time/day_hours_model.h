@@ -7,6 +7,7 @@
 #include <QtCore/QLocale>
 #include <QtCore/QTimeZone>
 
+#include <common/common_globals.h>
 #include <nx/utils/impl_ptr.h>
 
 Q_MOC_INCLUDE("nx/vms/client/core/media/abstract_time_period_storage.h")
@@ -22,6 +23,8 @@ class NX_VMS_CLIENT_CORE_API DayHoursModel: public QAbstractListModel
 
     Q_PROPERTY(bool amPmTime READ amPmTime WRITE setAmPmTime NOTIFY amPmTimeChanged)
     Q_PROPERTY(QDate date READ date WRITE setDate NOTIFY dateChanged)
+    Q_PROPERTY(Qn::TimePeriodContent timePeriodType READ timePeriodType WRITE setTimePeriodType
+        NOTIFY timePeriodTypeChanged)
     Q_PROPERTY(nx::vms::client::core::AbstractTimePeriodStorage* periodStorage
         READ periodStorage
         WRITE setPeriodStorage
@@ -53,6 +56,9 @@ public:
     QDate date() const;
     void setDate(const QDate& date);
 
+    Qn::TimePeriodContent timePeriodType() const;
+    void setTimePeriodType(Qn::TimePeriodContent type);
+
     AbstractTimePeriodStorage* periodStorage() const;
     void setPeriodStorage(AbstractTimePeriodStorage* store);
 
@@ -76,6 +82,7 @@ public:
 signals:
     void amPmTimeChanged();
     void dateChanged();
+    void timePeriodTypeChanged();
     void periodStorageChanged();
     void allCamerasPeriodStorageChanged();
     void displayOffsetChanged();

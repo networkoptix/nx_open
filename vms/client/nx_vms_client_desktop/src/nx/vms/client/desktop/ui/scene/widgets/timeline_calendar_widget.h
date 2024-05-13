@@ -30,6 +30,7 @@ public:
     QmlProperty<qint64> displayOffset{this, "displayOffset"};
     QmlProperty<QTimeZone> timeZone{this, "timeZone"};
     QmlProperty<bool> periodsVisible{this, "periodsVisible"};
+    QmlProperty<Qn::TimePeriodContent> timePeriodType{this, "timePeriodType"};
     QmlProperty<qreal> opacity{this, "opacity"};
     QmlProperty<bool> hovered{this, "hovered"};
 
