@@ -1,11 +1,11 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.15
+import QtQuick
 import QtQuick.Controls
 
-import Nx 1.0
-import Nx.Core 1.0
-import Nx.Controls 1.0
+import Nx
+import Nx.Core
+import Nx.Controls
 
 import "private/TimelineCalendar"
 import "private/TimelineCalendar/date_utils.js" as DateUtils
@@ -20,6 +20,7 @@ Control
     property alias visibleMonth: daysSelector.visibleMonth
     property alias periodStorage: daysSelector.periodStorage
     property alias allCamerasPeriodStorage: daysSelector.allCamerasPeriodStorage
+    property alias timePeriodType: daysSelector.timePeriodType
     property alias periodsVisible: daysSelector.periodsVisible
     property alias displayOffset: daysSelector.displayOffset
     property alias timeZone: daysSelector.timeZone

@@ -1,9 +1,9 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.15
-import Nx 1.0
-import Nx.Core 1.0
-import nx.vms.client.core 1.0
+import QtQuick
+import Nx
+import Nx.Core
+import nx.vms.client.core
 
 import "date_utils.js" as DateUtils
 
@@ -21,6 +21,7 @@ Item
     property alias locale: calendarModel.locale
     property alias visibleYear: calendarModel.year
     property int visibleMonth: 0
+    property alias timePeriodType: calendarModel.timePeriodType
     property alias periodStorage: calendarModel.periodStorage
     property alias allCamerasPeriodStorage: calendarModel.allCamerasPeriodStorage
     property bool periodsVisible: true
@@ -139,6 +140,7 @@ Item
 
                 ArchiveIndicator
                 {
+                    timePeriodType: control.timePeriodType
                     cameraHasArchive: periodsVisible && model.hasArchive
                     anyCameraHasArchive: periodsVisible && model.anyCameraHasArchive
                 }
