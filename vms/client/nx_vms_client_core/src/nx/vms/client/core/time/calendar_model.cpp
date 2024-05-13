@@ -115,6 +115,7 @@ struct CalendarModel::Private
     QLocale locale;
     QTimeZone timeZone{QTimeZone::LocalTime}; //< FIXME: #sivanov Implement timezone usage.
 
+    Qn::TimePeriodContent timePeriodType = Qn::RecordingContent;
     AbstractTimePeriodStorage* periodStorage[(int) PeriodStorageType::count]{nullptr, nullptr};
     bool populated = false;
 };
@@ -157,7 +158,7 @@ void CalendarModel::Private::updateArchiveInfo(PeriodStorageType type)
     const auto store = periodStorage[(int) type];
 
     const QnTimePeriodList timePeriods =
-        store ? store->periods(Qn::RecordingContent) : QnTimePeriodList();
+        store ? store->periods(timePeriodType) : QnTimePeriodList();
 
     const qint64 startPosition = days.first().date.startOfDay(timeZone).toMSecsSinceEpoch();
 
@@ -187,7 +188,7 @@ void CalendarModel::Private::setPeriodStorage(
     const auto updateArchiveInfoInternal =
         [this, type](Qn::TimePeriodContent contentType)
         {
-            if (contentType != Qn::RecordingContent)
+            if (contentType != timePeriodType)
                 return;
 
             updateArchiveInfo(type);
@@ -201,7 +202,7 @@ void CalendarModel::Private::setPeriodStorage(
             store, &AbstractTimePeriodStorage::periodsUpdated, q, updateArchiveInfoInternal);
     }
 
-    updateArchiveInfoInternal(Qn::RecordingContent);
+    updateArchiveInfoInternal(timePeriodType);
 
     if (type == PeriodStorageType::allCameras)
         emit q->allCamerasPeriodStorageChanged();
@@ -217,7 +218,7 @@ void CalendarModel::registerQmlType()
 }
 
 CalendarModel::CalendarModel(QObject* parent):
-    base_type(parent),
+    QAbstractListModel(parent),
     d(new Private(this))
 {
     d->resetDaysModelData();
@@ -302,6 +303,21 @@ void CalendarModel::setMonth(int month)
     d->resetDaysModelData();
 }
 
+Qn::TimePeriodContent CalendarModel::timePeriodType() const
+{
+    return d->timePeriodType;
+}
+
+void CalendarModel::setTimePeriodType(Qn::TimePeriodContent type)
+{
+    if (d->timePeriodType == type)
+        return;
+
+    d->timePeriodType = type;
+    emit timePeriodTypeChanged();
+
+    d->resetDaysModelData();
+}
 
 AbstractTimePeriodStorage* CalendarModel::periodStorage() const
 {

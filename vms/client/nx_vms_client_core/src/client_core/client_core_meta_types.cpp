@@ -197,6 +197,8 @@ void initializeMetaTypes()
 
     qmlRegisterUncreatableMetaObject(nx::vms::api::staticMetaObject, "nx.vms.api", 1, 0,
         "API", "API is a namespace");
+    qmlRegisterUncreatableMetaObject(
+        Qn::staticMetaObject, "nx.vms.common", 1, 0, "CommonGlobals", "");
 }
 
 } // namespace nx::vms::client::core

@@ -23,6 +23,7 @@ Item
 
     property alias displayOffset: dayHoursModel.displayOffset
     property alias timeZone: dayHoursModel.timeZone
+    property alias timePeriodType: dayHoursModel.timePeriodType
     property alias periodStorage: dayHoursModel.periodStorage
     property alias allCamerasPeriodStorage: dayHoursModel.allCamerasPeriodStorage
     property bool periodsVisible: true
@@ -129,6 +130,7 @@ Item
                 ArchiveIndicator
                 {
                     width: 12
+                    timePeriodType: control.timePeriodType
                     cameraHasArchive: periodsVisible && model.hasArchive
                     anyCameraHasArchive: periodsVisible && model.anyCameraHasArchive
                     visible: enabled

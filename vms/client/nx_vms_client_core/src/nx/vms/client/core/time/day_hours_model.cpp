@@ -59,6 +59,7 @@ struct DayHoursModel::Private
     QTimeZone timeZone{QTimeZone::LocalTime};
     bool hourHasArchive[(int) PeriodStorageType::count][kHoursPerDay];
 
+    Qn::TimePeriodContent timePeriodType = Qn::RecordingContent;
     AbstractTimePeriodStorage* periodStorage[(int) PeriodStorageType::count]{nullptr, nullptr};
     bool populated = false;
 };
@@ -81,7 +82,7 @@ void DayHoursModel::Private::updateArchiveInfo(PeriodStorageType type)
     const auto store = periodStorage[(int) type];
 
     const QnTimePeriodList timePeriods =
-        store ? store->periods(Qn::RecordingContent) : QnTimePeriodList();
+        store ? store->periods(timePeriodType) : QnTimePeriodList();
 
     const auto startDateTime = date.startOfDay(timeZone);
     const auto endDateTime = date.addDays(1).startOfDay(timeZone);
@@ -122,7 +123,7 @@ void DayHoursModel::Private::setPeriodStorage(
     const auto updateArchiveInfoInternal =
         [this, type](Qn::TimePeriodContent contentType)
         {
-            if (contentType != Qn::RecordingContent)
+            if (contentType != timePeriodType)
                 return;
 
             updateArchiveInfo(type);
@@ -136,7 +137,7 @@ void DayHoursModel::Private::setPeriodStorage(
             store, &AbstractTimePeriodStorage::periodsUpdated, q, updateArchiveInfoInternal);
     }
 
-    updateArchiveInfoInternal(Qn::RecordingContent);
+    updateArchiveInfoInternal(timePeriodType);
 
     if (type == PeriodStorageType::allCameras)
         emit q->allCamerasPeriodStorageChanged();
@@ -183,6 +184,22 @@ void DayHoursModel::setDate(const QDate& date)
 
     d->date = date;
     emit dateChanged();
+
+    d->resetModelData();
+}
+
+Qn::TimePeriodContent DayHoursModel::timePeriodType() const
+{
+    return d->timePeriodType;
+}
+
+void DayHoursModel::setTimePeriodType(Qn::TimePeriodContent type)
+{
+    if (d->timePeriodType == type)
+        return;
+
+    d->timePeriodType = type;
+    emit timePeriodTypeChanged();
 
     d->resetModelData();
 }

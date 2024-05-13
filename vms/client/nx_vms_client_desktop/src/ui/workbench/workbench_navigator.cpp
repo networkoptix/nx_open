@@ -3107,6 +3107,8 @@ void QnWorkbenchNavigator::setSelectedExtraContent(Qn::TimePeriodContent value)
 {
     if (m_timeSlider)
         m_timeSlider->setSelectedExtraContent(value);
+    if (m_calendar)
+        m_calendar->timePeriodType = value;
 
     if (auto loader = loaderByWidget(m_currentMediaWidget, /*createIfNotExists*/ true))
     {
