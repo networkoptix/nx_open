@@ -142,8 +142,12 @@ std::string BasicClient::prepareActualRelayUrl(
 {
     auto actualRelayUrl = contentLocationUrl;
 
-    if (!NX_ASSERT(nx::utils::endsWith(actualRelayUrl, requestPath)))
+    if (!nx::utils::endsWith(actualRelayUrl, requestPath))
+    {
+        NX_DEBUG(this, "Relay URL %1 does not end with expected path %2. A compatibility issue "
+            "is likely", actualRelayUrl, requestPath);
         return actualRelayUrl; //< In worst case, a request will fail.
+    }
 
     // Removing request path from the end of response.actualRelayUrl
     // so that we have basic relay url.
