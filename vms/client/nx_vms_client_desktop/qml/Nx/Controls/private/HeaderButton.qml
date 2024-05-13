@@ -53,10 +53,10 @@ Button
         if (!!model && model.sortColumn === index)
         {
             if (model.sortOrder == Qt.AscendingOrder)
-                return "image://skin/table_view/ascending.svg"
+                return "image://skin/16x16/Solid/sorting_ascending.svg"
 
             if (model.sortOrder == Qt.DescendingOrder)
-                return "image://skin/table_view/descending.svg"
+                return "image://skin/16x16/Solid/sorting_descending.svg"
         }
 
         return ""
