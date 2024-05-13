@@ -9,9 +9,9 @@
 
 #include <api/server_rest_connection_fwd.h>
 #include <core/resource/resource_fwd.h>
+#include <nx/utils/uuid.h>
 #include <nx/vms/event/actions/abstract_action.h>
 #include <nx/vms/event/event_fwd.h>
-#include <nx/utils/uuid.h>
 
 #include "../event_search_list_model.h"
 #include "abstract_async_search_list_model_p.h"
@@ -71,7 +71,7 @@ private:
 
     QString title(const EventParameters& parameters) const;
     QString description(const EventParameters& parameters) const;
-    static QString iconPath(const EventParameters& parameters);
+    QString iconPath(const EventParameters& parameters) const;
     static QColor color(const EventParameters& parameters);
     static bool hasPreview(EventType eventType);
 

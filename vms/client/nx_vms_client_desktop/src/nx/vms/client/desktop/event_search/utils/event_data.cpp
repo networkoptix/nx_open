@@ -5,6 +5,7 @@
 #include <QtGui/QPalette>
 
 #include <core/resource/camera_resource.h>
+#include <nx/vms/client/core/analytics/analytics_icon_manager.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
@@ -46,6 +47,9 @@ QString eventIconPath(
 
         case Icon::custom:
             return SoftwareTriggerPixmaps::effectivePixmapPath(custom);
+
+        case Icon::analyticsObject:
+            return core::analytics::IconManager::instance()->iconPath(custom);
 
         default:
             return kIconPaths.value(icon);

@@ -31,11 +31,11 @@ Control
 
     property color backgroundColor: model.isInformer
         ? ColorTheme.colors.dark8
-        : ColorTheme.colors.dark7
+        : ColorTheme.colors.dark5
 
     property color hoveredBackgroundColor: model.isInformer
         ? ColorTheme.colors.dark9
-        : ColorTheme.colors.dark8
+        : ColorTheme.colors.dark6
 
     property color effectiveBackgroundColor:
     {
@@ -48,8 +48,8 @@ Control
             highlightAmount)
     }
 
-    property color foregroundColor: ColorTheme.colors.light10
-    property color secondaryForegroundColor: ColorTheme.colors.light16
+    property color foregroundColor: ColorTheme.colors.light16
+    property color secondaryForegroundColor: ColorTheme.colors.light10
 
     leftPadding: 8
     topPadding: 8

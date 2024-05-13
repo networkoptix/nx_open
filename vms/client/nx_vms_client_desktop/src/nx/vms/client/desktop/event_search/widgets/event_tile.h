@@ -145,7 +145,7 @@ protected:
     virtual bool eventFilter(QObject* object, QEvent* event) override;
 
 private:
-    struct Private;
+    class Private;
     nx::utils::ImplPtr<Private> d;
     nx::utils::ImplPtr<Ui::EventTile> ui;
 };

@@ -59,7 +59,8 @@ QString GenericEvent::extendedCaption() const
 
 Icon GenericEvent::icon() const
 {
-    return deviceIds().isEmpty() ? Icon::alert : Icon::resource;
+    // The custom icon is not set, because default analytics object icon should be used.
+    return Icon::analyticsObject;
 }
 
 const ItemDescriptor& GenericEvent::manifest()

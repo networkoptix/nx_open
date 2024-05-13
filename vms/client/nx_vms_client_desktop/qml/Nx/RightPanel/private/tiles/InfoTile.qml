@@ -179,8 +179,8 @@ TileBase
             visible: items.length > 0 && (!tile.controller || tile.controller.showInformation)
             width: tileContent.width
 
-            nameColor: ColorTheme.colors.light16
-            valueColor: ColorTheme.colors.light10
+            nameColor: ColorTheme.colors.light10
+            valueColor: ColorTheme.colors.light16
             nameFont { pixelSize: FontConfig.small.pixelSize; weight: Font.Normal }
             valueFont { pixelSize: FontConfig.small.pixelSize; weight: Font.Medium }
         }

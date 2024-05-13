@@ -51,8 +51,8 @@ BubbleToolTip
                 width: content.width
                 visible: items.length
 
-                nameColor: ColorTheme.colors.light13
-                valueColor: ColorTheme.colors.light7
+                nameColor: ColorTheme.colors.light10
+                valueColor: ColorTheme.colors.light16
                 nameFont { pixelSize: FontConfig.small.pixelSize; weight: Font.Normal }
                 valueFont { pixelSize: FontConfig.small.pixelSize; weight: Font.Medium }
             }
@@ -74,7 +74,7 @@ BubbleToolTip
                 textFormat: Text.RichText
                 visible: !!text
 
-                color: ColorTheme.colors.light13
+                color: ColorTheme.colors.light16
                 font { pixelSize: 11; weight: Font.Normal }
                 wrapMode: Text.Wrap
             }

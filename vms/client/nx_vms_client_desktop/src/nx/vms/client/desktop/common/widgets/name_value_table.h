@@ -26,6 +26,7 @@ public:
     // Warning! Calling setContent during update of a backing store of some OpenGL-backed window
     // must be avoided as OpenGL context switching at that moment can cause bugs at some systems.
     void setContent(const analytics::AttributeList& value);
+    void setMaximumNumberOfRows(int maxNumberOfRows);
 
     virtual QSize sizeHint() const override;
     virtual QSize minimumSizeHint() const override;

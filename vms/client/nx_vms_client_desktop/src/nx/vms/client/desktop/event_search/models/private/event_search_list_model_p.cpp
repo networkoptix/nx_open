@@ -14,9 +14,12 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/analytics/taxonomy/abstract_object_type.h>
+#include <nx/analytics/taxonomy/abstract_state_watcher.h>
 #include <nx/utils/datetime.h>
 #include <nx/utils/metatypes.h>
 #include <nx/utils/scope_guard.h>
+#include <nx/vms/client/core/analytics/analytics_icon_manager.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/analytics/analytics_attribute_helper.h>
@@ -472,7 +475,7 @@ QString EventSearchListModel::Private::description(
         .join(common::html::kLineBreak);
 }
 
-QString EventSearchListModel::Private::iconPath(const vms::event::EventParameters& parameters)
+QString EventSearchListModel::Private::iconPath(const vms::event::EventParameters& parameters) const
 {
     switch (parameters.eventType)
     {
@@ -506,8 +509,16 @@ QString EventSearchListModel::Private::iconPath(const vms::event::EventParameter
         // TODO: #spanasenko Fill with actual pixmaps as soon as they're created.
         case EventType::cameraInputEvent:
         case EventType::analyticsSdkEvent:
-        case EventType::analyticsSdkObjectDetected:
             return "20x20/Solid/camera.svg";
+        case EventType::analyticsSdkObjectDetected:
+        {
+            const auto objectTypeId = parameters.getAnalyticsObjectTypeId();
+            const auto objectType =
+                q->system()->analyticsTaxonomyStateWatcher()->state()->objectTypeById(
+                    objectTypeId);
+            return core::analytics::IconManager::instance()->iconPath(
+                objectType ? objectType->icon() : QString());
+        }
 
         default:
             return {};
