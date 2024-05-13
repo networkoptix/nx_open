@@ -56,7 +56,7 @@ QnLookAndFeelPreferencesWidget::QnLookAndFeelPreferencesWidget(QWidget *parent) 
     setHelpTopic(ui->showIpInTreeCheckBox,                                    HelpTopic::Id::SystemSettings_General_ShowIpInTree);
 
     ui->showIpInTreeCheckBoxHint->setHintText(
-        tr("Displays IP addresses for cameras and servers and roles for users."));
+        tr("Displays IP addresses for cameras and servers."));
 
     ui->timeModeLabel->setHint(tr("Sets the time to use in the client (timeline, timestamps, etc.) when client and server machines are in different time zones."));
     ui->tourCycleTimeLabel->setHint(tr("Length of time each camera on layout will be displayed if you start a Tour."));
