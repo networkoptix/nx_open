@@ -226,7 +226,7 @@ class NxOpenConan(ConanFile):
 
     def prepare_pkg_config_files(self):
         if self.isLinux:
-            pc_files_dir = Path(self.build_folder) / "os_deps_pkg_config"
+            pc_files_dir = Path(self.install_folder) / "os_deps_pkg_config"
             script = self.deps_user_info[self._os_deps_package].pkg_config_transformer_script
             self.run(f"{script} -o {pc_files_dir}")
 
