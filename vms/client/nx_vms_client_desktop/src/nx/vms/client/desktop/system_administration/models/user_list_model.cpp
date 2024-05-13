@@ -422,11 +422,7 @@ void UserListModel::Private::addUserInternal(const QnUserResourcePtr& user)
     connect(user.get(), &QnUserResource::userGroupsChanged, this,
         &UserListModel::Private::handleUserChanged);
     connect(user.get(), &QnUserResource::externalIdChanged, this,
-        [this](const QnResourcePtr& resource)
-        {
-            if (const auto user = resource.objectCast<QnUserResource>())
-                handleUserChanged(user);
-        });
+        [this](const auto& user) { handleUserChanged(user); });
     connect(user.get(), &QnUserResource::enabledChanged, this,
         [this](const QnUserResourcePtr &user)
         {
